@@ -1,145 +1,89 @@
-Return-Path: <netdev+bounces-63064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A63E082B0D9
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 15:42:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8575282B0E8
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 15:46:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B89FEB22E73
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 14:42:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC18E1C23BAA
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 14:46:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BF40487BA;
-	Thu, 11 Jan 2024 14:42:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 564A74B5AD;
+	Thu, 11 Jan 2024 14:45:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RvyjbbKj"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="RbrjROd/"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 539C94878B
-	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 14:42:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1704984127;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8862A33072;
+	Thu, 11 Jan 2024 14:45:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 1C7ACFF802;
+	Thu, 11 Jan 2024 14:45:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1704984337;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=fFxwv0qni+WI52FYgq03AZcxlAZpnw2jut0+tbvW+qM=;
-	b=RvyjbbKjYL2QvDCgOXRfXl0qMLORiL/ibX0pO/tEzfu/mugieu7hl9DXEsPEqClIWqf1kO
-	S+C99pTqn5FDRRwSR2rdcFQ8uLOzxpertWB9vuczj0n0pLWeeVcNIogHsMNpGm2Gv/vNbh
-	QHXqRwJXucFnP3WuL+TO42Lnx8Jstng=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-257-qstrYZNFMU6cL4k5Gtx0yQ-1; Thu, 11 Jan 2024 09:42:05 -0500
-X-MC-Unique: qstrYZNFMU6cL4k5Gtx0yQ-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a29de6a12adso96325166b.1
-        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 06:42:05 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704984124; x=1705588924;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fFxwv0qni+WI52FYgq03AZcxlAZpnw2jut0+tbvW+qM=;
-        b=IbxpSlRSn3P1TqOjuYk6zVZYpdUZHgJ0CtCC+yGQNYXorkD86GRZrr2NcXAhvL+3+B
-         DKtWaIHTlXqq1WwMgK/diIAW3VcdmX6RB9gYJKv9BqX7xk2FhbtQlK0O5GWOcsKj+tBf
-         XBnXKtY6POtPXDM/2cEq6RUuKpT6crRH3Q/YG24QL09BzpQrJwxMDCvgqPm9aedFT2ec
-         +TWRiTlBvf0HEpnuk8YrqaPX91fdJF9WFNxHfABsGFEN/cBpb0IlV/bgpg27KMlTDfHF
-         WZ8bXyHEkRfFTluozE74xhmRhbOavq+BDMsOOyX+oSwuqBa9FQPBFwYoY8za3MU4i6Pn
-         vL9A==
-X-Gm-Message-State: AOJu0YwmJZ7LX4dBXhgldRmwWEliikLxwDOo9UaypkryC82WPlw1+qD5
-	V34W1k3Zc8rjx9gyw1jO+9MC5/6kH8/f9avJZcxlnpmU0WUAPD1iiS9pJRKTv5ftfPIx7yKDJAi
-	Iif2T4YtO2LhC5nrmmb4ZvT+l
-X-Received: by 2002:a17:906:abd4:b0:a2b:d12c:ee48 with SMTP id kq20-20020a170906abd400b00a2bd12cee48mr1444076ejb.1.1704984124796;
-        Thu, 11 Jan 2024 06:42:04 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH3iXMPhWDR3ZWGZOQcaKtLYN6/qHGPpdubZ7yiq72jUQPAzF7Druorhh5oXfePQQ84Uk68rA==
-X-Received: by 2002:a17:906:abd4:b0:a2b:d12c:ee48 with SMTP id kq20-20020a170906abd400b00a2bd12cee48mr1444065ejb.1.1704984124480;
-        Thu, 11 Jan 2024 06:42:04 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-244-191.dyn.eolo.it. [146.241.244.191])
-        by smtp.gmail.com with ESMTPSA id mc12-20020a170906eb4c00b00a2b85ef0ca3sm641616ejb.202.2024.01.11.06.42.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jan 2024 06:42:04 -0800 (PST)
-Message-ID: <c68e9299e755b38c38d63d8cb121800639f5e07a.camel@redhat.com>
-Subject: Re: [PATCH] selftests/net/tcp-ao: Use LDLIBS instead of LDFLAGS
-From: Paolo Abeni <pabeni@redhat.com>
-To: Dmitry Safonov <dima@arista.com>, "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, kernel test robot <lkp@intel.com>, Dmitry
- Safonov <0x7f454c46@gmail.com>
-Date: Thu, 11 Jan 2024 15:42:02 +0100
-In-Reply-To: <20240110-tcp_ao-selftests-makefile-v1-1-aa07d043f052@arista.com>
-References: 
-	<20240110-tcp_ao-selftests-makefile-v1-1-aa07d043f052@arista.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.2 (3.50.2-1.fc39) 
+	 in-reply-to:in-reply-to:references:references;
+	bh=vkrVHLxEwhTSNjxCZbhrusosakXdhKYEMgVhXIlbl0c=;
+	b=RbrjROd/PFakx6mn3Jxbv84GBMC2jbmUIGPxirbv7E30zRpTYwhAHH9J5yozCBRRHmlES7
+	jtC1yLPThNPoRo1FNdvLSZqHn6Pt2hyRdA3DQUp4eKUNdIJmPaCoLKZG2npkH6t1W55Edt
+	kv3T8S57sKg8xC7Gons4wrPZtb3R0xCPs9us32C1vBDyQLGTEuq/Z0SzdkNgYPwEBil9qo
+	5i9yecZ9rCWHY/3o3hwnkhAYkFGczdNkINhy3uK7inerwtjzQIqh5iQpIznTreYvjEb6mz
+	4FCpkKwt7hEfzA5vuKzFf2QZ/9n7LJUX1PWWaU6tc00vvHR0iEQkiEhkaRIiZQ==
+Date: Thu, 11 Jan 2024 15:45:58 +0100 (CET)
+From: Romain Gantois <romain.gantois@bootlin.com>
+To: Paolo Abeni <pabeni@redhat.com>
+cc: Romain Gantois <romain.gantois@bootlin.com>, 
+    Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+    Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+    Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+    Miquel Raynal <miquel.raynal@bootlin.com>, 
+    Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+    Sylvain Girard <sylvain.girard@se.com>, 
+    Pascal EBERHARD <pascal.eberhard@se.com>, 
+    Richard Tresidder <rtresidd@electromag.com.au>, 
+    Linus Walleij <linus.walleij@linaro.org>, 
+    Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
+    Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
+    linux-stm32@st-md-mailman.stormreply.com, 
+    linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org, 
+    Vladimir Oltean <vladimir.oltean@nxp.com>
+Subject: Re: [PATCH v4] net: stmmac: Prevent DSA tags from breaking COE
+In-Reply-To: <99289be4aa940932acbf728ba6a926c67eb5484a.camel@redhat.com>
+Message-ID: <5dff8608-f1b2-1edb-00a5-9b0d56afd7f8@bootlin.com>
+References: <20240109-prevent_dsa_tags-v4-1-f888771fa2f6@bootlin.com> <99289be4aa940932acbf728ba6a926c67eb5484a.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+X-GND-Sasl: romain.gantois@bootlin.com
 
-On Wed, 2024-01-10 at 21:34 +0000, Dmitry Safonov wrote:
-> The rules to link selftests are:
->=20
-> > $(OUTPUT)/%_ipv4: %.c
-> > 	$(LINK.c) $^ $(LDLIBS) -o $@
-> >=20
-> > $(OUTPUT)/%_ipv6: %.c
-> > 	$(LINK.c) -DIPV6_TEST $^ $(LDLIBS) -o $@
->=20
-> The intel test robot uses only selftest's Makefile, not the top linux
-> Makefile:
->=20
-> > make W=3D1 O=3D/tmp/kselftest -C tools/testing/selftests
->=20
-> So, $(LINK.c) is determined by environment, rather than by kernel
-> Makefiles. On my machine (as well as other people that ran tcp-ao
-> selftests) GNU/Make implicit definition does use $(LDFLAGS):
->=20
-> > [dima@Mindolluin ~]$ make -p -f/dev/null | grep '^LINK.c\>'
-> > make: *** No targets.  Stop.
-> > LINK.c =3D $(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
->=20
-> But, according to build robot report, it's not the case for them.
-> While I could just avoid using pre-defined $(LINK.c), it's also used by
-> selftests/lib.mk by default.
->=20
-> Anyways, according to GNU/Make documentation [1], I should have used
-> $(LDLIBS) instead of $(LDFLAGS) in the first place, so let's just do it:
->=20
-> > LDFLAGS
-> >     Extra flags to give to compilers when they are supposed to invoke
-> >     the linker, =E2=80=98ld=E2=80=99, such as -L. Libraries (-lfoo) sho=
-uld be added
-> >     to the LDLIBS variable instead.
-> > LDLIBS
-> >     Library flags or names given to compilers when they are supposed
-> >     to invoke the linker, =E2=80=98ld=E2=80=99. LOADLIBES is a deprecat=
-ed (but still
-> >     supported) alternative to LDLIBS. Non-library linker flags, such
-> >     as -L, should go in the LDFLAGS variable.
->=20
-> [1]: https://www.gnu.org/software/make/manual/html_node/Implicit-Variable=
-s.html
->=20
-> Fixes: cfbab37b3da0 ("selftests/net: Add TCP-AO library")
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202401011151.veyYTJzq-lkp@i=
-ntel.com/
-> Signed-off-by: Dmitry Safonov <dima@arista.com>
+Hi Paolo,
 
-Acked-by: Paolo Abeni <pabeni@redhat.com>
+On Thu, 11 Jan 2024, Paolo Abeni wrote:
+> 
+> Unfortunately, you dropped the target tree tag ('net') from the
+> subject, and did not allow our CI to trigger properly.
+> 
+> Since we can't merge this patch ATM ('net' is currently frozen since we
+> merge back the net-next PR), I think it's better if you resubmit with a
+> proper tag. You can retain all Vladimir Rb tag.
 
+Alright I'll do that right away, sorry for the hassle.
+
+Best Regards,
+
+-- 
+Romain Gantois, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
