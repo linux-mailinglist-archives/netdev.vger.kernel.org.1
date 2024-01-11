@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-63113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43C4582B3E0
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 18:20:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF2BC82B3EF
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 18:21:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F5611F22E88
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 17:20:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D71A71C23C93
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 17:21:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8A2551C56;
-	Thu, 11 Jan 2024 17:20:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1B3B50279;
+	Thu, 11 Jan 2024 17:21:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nP9wpPCF"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sRZL29l+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D5575025F
-	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 17:20:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2017C524A3
+	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 17:21:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-40e6296635cso4153855e9.2
-        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 09:20:34 -0800 (PST)
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3367a304091so4812331f8f.3
+        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 09:21:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1704993633; x=1705598433; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1704993692; x=1705598492; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=6s3qiPwrXyAwGU9WfN6p4EwpZ2YgT483oI4li09j9iQ=;
-        b=nP9wpPCFVPg4RS8l2EoGXg9IwbnYRnLvPQrzYZii0PtMaUYb8TnIgQfLBJwmecJ8BC
-         ReI/jijjnWmFlYzeaA7BwRmV8HCuxyyKreDH9s6x8YCeO6JxcLcdM6MlvcpiusGgcv90
-         CT3SFBwcSp4Sqqr5GCDDz9bf4ZpVvF0HI45PcM13GFjG/yCvXzir8X7xLHbRjgboMNg8
-         +T4d0v+aEOKrOSWmhKNyqnNvn9+7Exk+E5GN6CKksGe9DNRXxu5Wt/Z++sHgXfntq2k0
-         pv4o+gpi+NOWQ5Pq6D2P9fOi/n/DqPHzUQSWAGaND6Xy6TVZObn7TQIuki3zL7opXfWI
-         52tQ==
+        bh=Wh6xioLxIDyy4m7WmjnXFA+yjBfdT2HZ245YnHt/OF8=;
+        b=sRZL29l+nB67M8IbetYJsm8IGxWw+YXyfb4QPB8XHyaIl84TF7YZW+yyVjXaT5toUS
+         0mnlnV3+34aHjgPVw7VvGQWzcDvNiabH06UJaKv8yY02yN8C3e2w6STYQbvGrnIQDnj9
+         IKOG5qX2ZJAMFkwTHOAQu3I8nhUZrp8qhS3UfOdept4+N2teWt2lqw6jqSzU2NZmgsLx
+         RX+A/A+yDHGz3yPpwoDby2AH5nIcWNi3kdl6I4LjBKCtJaDuiClKasIWsqhtHQhaqpme
+         g3VPKD5jXV3gfEgbp8yMu990uIME05Qy55h7AcJEn29rWpQ8CtEyAGm7bYeov4tJIOcn
+         ABPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704993633; x=1705598433;
+        d=1e100.net; s=20230601; t=1704993692; x=1705598492;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6s3qiPwrXyAwGU9WfN6p4EwpZ2YgT483oI4li09j9iQ=;
-        b=Ts8jrvtbv9qXd2t2Z1/GF7hUnM4ZsbomFR49eMp/y0b/0T95YFpvIzU/pxlaPjKrEa
-         wrffvYHnIxzT1qAj4ZBpUSRQBvaHViFmnDOkVnffNfI924QqK5333Thg8lzbuDYf1LUS
-         m4TNdngs+ZlQsSYOaejn8JbuHXDZ53GPv8UMl13hPFnxsfYG5eRoOhfXfpFTM7ZotRnO
-         ec6ZJP3PEztXPUlgDTXGa/wd9k2zK7YvC/RJYGNEBDi5jKMHxsVhtWdNSEaf1lwuKqAO
-         witzm3MA/N/W52gRYOkTxLkLXCyfBB5whyWsltfRqGfvZCkizCQzixNS+vdC5+o+eRdG
-         e7cQ==
-X-Gm-Message-State: AOJu0YwwUf31r72ms0Y8e7qquRIcGtX/sC4+MbLQw82JlcmVa3+5vSRW
-	HYxksE43hkqyeVDpl3KHq+oBk1bdwCYSuQ==
-X-Google-Smtp-Source: AGHT+IFm3GMILTY23wXs8VUd4tWNwejKkPgaXuPR0sV8BhPYXcZmhJ0QM7fAqEXtNCihcjoZGJEOUA==
-X-Received: by 2002:a1c:7705:0:b0:40e:5f23:413 with SMTP id t5-20020a1c7705000000b0040e5f230413mr85378wmi.177.1704993633469;
-        Thu, 11 Jan 2024 09:20:33 -0800 (PST)
+        bh=Wh6xioLxIDyy4m7WmjnXFA+yjBfdT2HZ245YnHt/OF8=;
+        b=dus7zhQZ9mLWnKF0d77iT8ZBTHrN0TWyyQZcM4dx8vfYv0iNxKaT/jTCwb5jCBbldL
+         5d24LvrwhSqTjGLXSIxXmbYZ6ic0o7OH2Ig4m2p5MUDs9XLlnUwVM4TfMFpQRZeLY4cc
+         XRsFeeCJF12zqAKXsY8AMdSj3068emmsLuG82J+EBC8NkEXGfoLRQCu/xUYkC0L3wrBF
+         DxnZYafWnIMbDL4sy6fOPkPWzCE+woTmpdPlT0DLtqOQW539pRh8eB06Q51/w26sXE9X
+         BBKc5Iww9w9YNUGg/krXf+T/uHhwqZubDdoUJ9LtnDTU9GbVPGlybuf2ZNdbOA3Xan5n
+         SrJQ==
+X-Gm-Message-State: AOJu0YyjT2o6C2dVM7rq04mQiTwoKBU/ZfQHvbRUtfTTJeq1X0Cx6JZk
+	grh8eAfAQzuaJoOa6OKfUZaWsHBwvpjr8Q==
+X-Google-Smtp-Source: AGHT+IEmO9ZedGSGZyfycuU9JTb84vXy1LyYme3/+T+71ih/UGpPHlmWr0bl9uBDiCyyhRG3ic+BTw==
+X-Received: by 2002:a5d:4589:0:b0:337:56e4:38a0 with SMTP id p9-20020a5d4589000000b0033756e438a0mr35320wrq.35.1704993692375;
+        Thu, 11 Jan 2024 09:21:32 -0800 (PST)
 Received: from [192.168.1.20] ([178.197.223.112])
-        by smtp.gmail.com with ESMTPSA id d18-20020a5d6452000000b0033761b2de64sm1673897wrw.76.2024.01.11.09.20.31
+        by smtp.gmail.com with ESMTPSA id d18-20020a5d6452000000b0033761b2de64sm1673897wrw.76.2024.01.11.09.21.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Jan 2024 09:20:32 -0800 (PST)
-Message-ID: <b6bc84f9-2ff6-40b6-8c1f-90a12f8d9149@linaro.org>
-Date: Thu, 11 Jan 2024 18:20:30 +0100
+        Thu, 11 Jan 2024 09:21:31 -0800 (PST)
+Message-ID: <0da41018-eeae-4a15-a431-954da99261d0@linaro.org>
+Date: Thu, 11 Jan 2024 18:21:29 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,14 +69,24 @@ User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH 1/3] dt-bindings: net: dp83826: add ti,cfg-dac-minus
  binding
 Content-Language: en-US
-To: Catalin Popescu <catalin.popescu@leica-geosystems.com>,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
- conor+dt@kernel.org, afd@ti.com, andrew@lunn.ch, hkallweit1@gmail.com,
- linux@armlinux.org.uk
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org
+To: POPESCU Catalin <catalin.popescu@leica-geosystems.com>,
+ "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, "davem@davemloft.net"
+ <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "robh+dt@kernel.org" <robh+dt@kernel.org>,
+ "krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+ "conor+dt@kernel.org" <conor+dt@kernel.org>, "afd@ti.com" <afd@ti.com>,
+ "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ GEO-CHHER-bsp-development <bsp-development.geo@leica-geosystems.com>
 References: <20240111161927.3689084-1-catalin.popescu@leica-geosystems.com>
+ <c795aa28-b6a2-4db8-b941-05b51b44f1fe@lunn.ch>
+ <a4af4a08-6eea-420b-b76f-47f4e836b476@leica-geosystems.com>
+ <ZaAcvwWbNmSpw/xt@shell.armlinux.org.uk>
+ <c5b4613a-261d-429b-b59c-c264bc53e315@leica-geosystems.com>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -122,51 +132,67 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20240111161927.3689084-1-catalin.popescu@leica-geosystems.com>
+In-Reply-To: <c5b4613a-261d-429b-b59c-c264bc53e315@leica-geosystems.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 11/01/2024 17:19, Catalin Popescu wrote:
-> Add property ti,cfg-dac-minus to allow for voltage tuning
-> of logical level -1 of the MLT-3 encoded data.
+On 11/01/2024 17:59, POPESCU Catalin wrote:
+> On 11.01.24 17:52, Russell King (Oracle) wrote:
+>> This email is not from Hexagon’s Office 365 instance. Please be careful while clicking links, opening attachments, or replying to this email.
+>>
+>>
+>> On Thu, Jan 11, 2024 at 04:45:26PM +0000, POPESCU Catalin wrote:
+>>> On 11.01.24 17:35, Andrew Lunn wrote:
+>>>> [You don't often get email from andrew@lunn.ch. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]
+>>>>
+>>>> This email is not from Hexagon’s Office 365 instance. Please be careful while clicking links, opening attachments, or replying to this email.
+>>>>
+>>>>
+>>>> On Thu, Jan 11, 2024 at 05:19:25PM +0100, Catalin Popescu wrote:
+>>>>> Add property ti,cfg-dac-minus to allow for voltage tuning
+>>>>> of logical level -1 of the MLT-3 encoded data.
+>>>>>
+>>>>> Signed-off-by: Catalin Popescu <catalin.popescu@leica-geosystems.com>
+>>>>> ---
+>>>>>    Documentation/devicetree/bindings/net/ti,dp83822.yaml | 9 +++++++++
+>>>>>    1 file changed, 9 insertions(+)
+>>>>>
+>>>>> diff --git a/Documentation/devicetree/bindings/net/ti,dp83822.yaml b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
+>>>>> index db74474207ed..2f010333be49 100644
+>>>>> --- a/Documentation/devicetree/bindings/net/ti,dp83822.yaml
+>>>>> +++ b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
+>>>>> @@ -62,6 +62,15 @@ properties:
+>>>>>           for the PHY.  The internal delay for the PHY is fixed to 3.5ns relative
+>>>>>           to transmit data.
+>>>>>
+>>>>> +  ti,cfg-dac-minus:
+>>>>> +    description: |
+>>>>> +       DP83826 PHY only.
+>>>>> +       Sets the voltage ratio of the logical level -1 for the MLT-3 encoded data.
+>>>>> +       0 = 50%, 1 = 56.25%, 2 = 62.50%, 3 = 68.75%, 4 = 75%, 5 = 81.25%, 6 = 87.50%,
+>>>>> +       7 = 93.75%, 8 = 100%, 9 = 106.25%, 10 = 112.50%, 11 = 118.75%, 12 = 125%,
+>>>>> +       13 = 131.25%, 14 = 137.50%, 15 = 143.75%, 16 = 150%.
+>>>>> +    enum: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+>>>> We try to avoid register values in DT. We use real units. This is a
+>>>> voltage you are configuring, so can you change the unit to millivolts?
+>>>> Have the driver do the conversion of volts to register value.
+>>>>
+>>>> Is it possible to configure any of the other logical levels?
+>>> Hi Andrew,
+>>> These are not raw register values and these are not voltage values but
+>>> voltage ratios. I'm mapping the voltage ratios to enum values [0-16]
+>>> which are converted to register raw values by the driver. I don't see a
+>>> better way to do this.
+>>          enum: [ 5000, 5625, 6250, 6875, 7500, 8125, 8750, 9375, 10000,
+>>                  10625, 11250, 11875, 12500 13125, 13750, 14375, 15000 ]
+>>
+>> ?
+> I'm okay with that approach if there's no better one. I would need to
+> remove the register raw values tables from the driver and use a switch
+> statement to map those values to raw values.
 
-A nit, subject: drop second/last, redundant "binding". The "dt-bindings"
-prefix is already stating that these are bindings.
-See also:
-https://elixir.bootlin.com/linux/v6.7-rc8/source/Documentation/devicetree/bindings/submitting-patches.rst#L18
-> 
-> Signed-off-by: Catalin Popescu <catalin.popescu@leica-geosystems.com>
-> ---
->  Documentation/devicetree/bindings/net/ti,dp83822.yaml | 9 +++++++++
->  1 file changed, 9 insertions(+)
-
-Don't add properties one by one. Especially if they are related.
-
-> 
-> diff --git a/Documentation/devicetree/bindings/net/ti,dp83822.yaml b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
-> index db74474207ed..2f010333be49 100644
-> --- a/Documentation/devicetree/bindings/net/ti,dp83822.yaml
-> +++ b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
-> @@ -62,6 +62,15 @@ properties:
->         for the PHY.  The internal delay for the PHY is fixed to 3.5ns relative
->         to transmit data.
->  
-> +  ti,cfg-dac-minus:
-> +    description: |
-> +       DP83826 PHY only.
-> +       Sets the voltage ratio of the logical level -1 for the MLT-3 encoded data.
-
-ratio between what and what?
-
-> +       0 = 50%, 1 = 56.25%, 2 = 62.50%, 3 = 68.75%, 4 = 75%, 5 = 81.25%, 6 = 87.50%,
-> +       7 = 93.75%, 8 = 100%, 9 = 106.25%, 10 = 112.50%, 11 = 118.75%, 12 = 125%,
-> +       13 = 131.25%, 14 = 137.50%, 15 = 143.75%, 16 = 150%.
-> +    enum: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
-
-Missing: "default:"
-
-
->  
+You can also use -bp or -percent:
+https://github.com/devicetree-org/dt-schema/blob/main/dtschema/schemas/property-units.yaml
 
 Best regards,
 Krzysztof
