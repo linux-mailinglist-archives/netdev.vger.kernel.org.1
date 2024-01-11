@@ -1,209 +1,218 @@
-Return-Path: <netdev+bounces-62978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 952C982A77A
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 07:20:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B082182A7AC
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 07:39:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD5B11C22899
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 06:20:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5116A284D66
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 06:39:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D862A23C3;
-	Thu, 11 Jan 2024 06:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0F4615D0;
+	Thu, 11 Jan 2024 06:39:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hSAQWfU0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fedWJcUw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EE79211A
-	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 06:20:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2cd0db24e03so56454051fa.3
-        for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 22:20:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704954022; x=1705558822; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=L8LXJjKC2VOF4Of2hJK9W50pFRjuIrNhRWsqlOTUUNk=;
-        b=hSAQWfU0/XXCjZqWhF9v4r6D9KAlRvofXFEsE+WDvXKhGe9mQmHxIkuR04qCT/0+nC
-         sqGRsOSFiw7smFCbK6VfvPAW+47k8L1I4HHSdUIY8e/O5SQqqVuz2zH4ntyt8yYEHMxg
-         /AGfIIcOUPKtrxbz1td27NrauQhxjSR0kNZP9A0+KfSsG76TcZzMJlsWRVOk+qRT+KFc
-         cBbJ+P3EZAX1xDPj0Kg1woFN+Axbxlp3dpGPWtOo+QrjFXug/c96Jcjk5qpCvIYYx6MI
-         OlpRPxxvn+VGjc41dShoh67n2LVg+toFcSVAjhlO0b0G1GQLdLaeW2D4HOYdkhL6G+Si
-         Rx2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704954022; x=1705558822;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=L8LXJjKC2VOF4Of2hJK9W50pFRjuIrNhRWsqlOTUUNk=;
-        b=Q7PT7TF4mYWPwH4AHnz36/2VYfzLX11IHsgRuNUP/9mDt50p8KXJesfugrl+vbXuuf
-         cczS7fo6apIRQmWZ76UHmP/DDccUrLO3sOdzTv0EbjMDkyiwoTYU6rGymFPSeCLSwT/u
-         3q8OByfgRe4KH01U+dVKKjiwaaK5WrL7Mz/ci0Emw+gioZH1cqY7B2+biwQEzCKv3Rxu
-         qj/33vPSBNXPMEVMTROPSd35YWS2ICLJ/N+wtT1jwWNAoVG1Th0KH7G43h4fcevDq2ex
-         i2gsEK6hKK8R9x1N/aVHXYSXcREopmDL5I71wLf5TAwTsrRoQhh21CzH2lXOagJ7qfw9
-         I4qw==
-X-Gm-Message-State: AOJu0YwM1NlQH3Nb5fEkxcu1ktE0sFgPcrAsruhABGDUCQI4KUzN+o1f
-	Zo7LfS6ENpT5wQPoXkS7PUxCn3UUWiBbxCbFgNE=
-X-Google-Smtp-Source: AGHT+IHJ+2Z9XONOcw3MmpoOayBlv/mL1J63WWvr8wTuYFFGU4xvk3HZRF7GGVegtH7mDbq9N5imD7wzw7ogdY0ZMM8=
-X-Received: by 2002:a2e:9848:0:b0:2cc:3e6d:8dcb with SMTP id
- e8-20020a2e9848000000b002cc3e6d8dcbmr42775ljj.104.1704954021688; Wed, 10 Jan
- 2024 22:20:21 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 481DA7F9;
+	Thu, 11 Jan 2024 06:39:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1704955144; x=1736491144;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=mBdSfs0sBfDzJmrhp40t4auxlOvL0pilh6aZ8pfW22c=;
+  b=fedWJcUwgyKHlxli2VUNQXwlgHNmgc3hSTFs2gQBKR7Y/lO5UBo2D80F
+   b0ZhVEcj32rvt/F1VAZ2jwGkNfQNg6GdsUw9tLt7FtUrNnamGcVrkpHr0
+   we0TOzZT8ZAxYMYj8ZvJbkVmYeEmzMR0tg1dI9PWSv2yL0u9Q+M7gZlfo
+   gUbpf88yoQTrSKUoVjHkuc2KvF33QiL+K2cfHKw5COmJUeI9tnwfdhVhr
+   K3mXKHN57iHVjmf297KyHCjt7rcQT6OdPlM/XLAdhYq9cR6fgVLeJSJjc
+   tVZM5sjDLa71zOL06Uj0tM9/ChNBNKStgB49cj3UxzSMwXGlb6s1gOlbL
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10949"; a="465145933"
+X-IronPort-AV: E=Sophos;i="6.04,185,1695711600"; 
+   d="scan'208";a="465145933"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2024 22:39:01 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.04,185,1695711600"; 
+   d="scan'208";a="24228487"
+Received: from unknown (HELO ORSMSX601.amr.corp.intel.com) ([10.22.229.14])
+  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 10 Jan 2024 22:39:01 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 10 Jan 2024 22:39:00 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 10 Jan 2024 22:39:00 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 10 Jan 2024 22:39:00 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Yty0QWB+UaNLnvcIu1Ph6ay9D8RK8CKn1XubCwnZ8s8se62qKsBWY9KAMzNG8sp35hny/98Wy7Wqz82f9cKlV/h3R9O2E+BY78Rp6XkQ6WgF8FtvCxkIrezJFdJfwdhwqmYJAojMyVObIjeJcaaenSGump8kD9MyTVJpmqlOWPPCt24iYZ+c+UDRFlgxvVksJ9K/5dysxWAPFuzXsYtDolL/aeOVDB4cu+koZgMEdLIglF5pon+XPCsLhXHiKAS1LOvTC9zIvBTh0kyZvtz/+nuM3smM5t88YDeqNPj82v0jsm5ZyyrQZHxhEZ4j97gk25bjj22XZzhHuWs0zPexWQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8hTlBKxwjB68rtNb0uUewIiLx/UqcVzsSSLzWmAKjtc=;
+ b=l+Fxf1jWobzPZq0lkYv9m0/xxQpgsm+BjY+ZuToo89i19ZSmlHMiNhGplDk9SjerzbaPKobQXAbfAViKQlhm0hi0jVhpnewQr8JYjMxjPSlUK1Zl9nGcoUyQe7mwimoM/GnrIMzz2zpxfZp0S6fHG5PG5nHxd0s5pnralJmYXCuNb0Vaz8aW79XsW/zA/ojxi02qwyywWfJVH1zjmWoBeyiMO7tooY2F/XbYL4XszcuRUDlheNkbVsLTSLeUUHigdT//EK+XwZCWq6HIdxTGD8k8pWbPpftXngGIexNfQCIyqTdrImTh9D4jig9uRYQTZl2tiTXlFDGzX6VrgRmQzg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from MW6PR11MB8310.namprd11.prod.outlook.com (2603:10b6:303:249::16)
+ by IA1PR11MB6443.namprd11.prod.outlook.com (2603:10b6:208:3a8::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.17; Thu, 11 Jan
+ 2024 06:38:58 +0000
+Received: from MW6PR11MB8310.namprd11.prod.outlook.com
+ ([fe80::a40d:5f37:ee14:6e21]) by MW6PR11MB8310.namprd11.prod.outlook.com
+ ([fe80::a40d:5f37:ee14:6e21%4]) with mapi id 15.20.7159.020; Thu, 11 Jan 2024
+ 06:38:58 +0000
+From: "Gan, Yi Fang" <yi.fang.gan@intel.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Russell King <linux@armlinux.org.uk>, Heiner Kallweit
+	<hkallweit1@gmail.com>, "David S . Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, =?iso-8859-1?Q?Marek_Beh=FAn?= <kabel@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-stm32@st-md-mailman.stormreply.com"
+	<linux-stm32@st-md-mailman.stormreply.com>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "Looi, Hong Aun" <hong.aun.looi@intel.com>,
+	"Voon, Weifeng" <weifeng.voon@intel.com>, "Song, Yoong Siang"
+	<yoong.siang.song@intel.com>, "Choong, Yong Liang"
+	<yong.liang.choong@intel.com>
+Subject: RE: [PATCH net v3 1/1] net: phylink: Add module_exit()
+Thread-Topic: [PATCH net v3 1/1] net: phylink: Add module_exit()
+Thread-Index: AQHaPvcS48imAJYtYkO0dKGHM8Fni7DJn3IAgAqTrIA=
+Date: Thu, 11 Jan 2024 06:38:58 +0000
+Message-ID: <MW6PR11MB8310698247DD950C5EBF5F2CB9682@MW6PR11MB8310.namprd11.prod.outlook.com>
+References: <20240104101255.3056090-1-yi.fang.gan@intel.com>
+ <fb1cc3a4-8615-4cee-8fe7-29966c4cb7c7@lunn.ch>
+In-Reply-To: <fb1cc3a4-8615-4cee-8fe7-29966c4cb7c7@lunn.ch>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW6PR11MB8310:EE_|IA1PR11MB6443:EE_
+x-ms-office365-filtering-correlation-id: 8d99efc0-6366-4bc6-8f28-08dc126ffd67
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: kXWvBebkwLYA1AxmOm4SjcIXLNNCLgSBFLTr5BLInuNgEvUpO3kxjL1GIluLWLq0/xEjWL+f7RKhrX394phWjNAP5HEz4IQGZtxwWBJrXhlYeyNPtt5yY8qCjCz1lpTzn4+UmmkuJEHNcg85qjybiyKVX5Iv4iJG7CjQycatXMAQDiuY7gBuDqC/JmsV5z0mfde4dJifh/P4QQto6cALioeJz7TTXDIjzqX2klMhbEFjdyY3H2vbKvhs6zn02S+awx4mUhwqzSp1Px1+dQbF/gDtRj0hlBLxP4O+4ljZolsKAswPCckXmH/H9f8uruIvDHR2tunYgm4Ombhhrro6R6VmGehlyoXXB6bSXEsRJonji7qJKs3f33YDnMORSdtBxyG1uxsiKrAtQ00DgCiMbMxltdBnbGSAy8YBTlacYE/qE+hYh7Urnh05Hu0K1QAmIcpSuoaoNsLOTZWsPBVNQZYJ7VUjbey41V9e0pmiYR9CPg5gMp0KrE2HZZqj579emclslIPRrtGhPjys1pzjnawF+dnHJ/8BfkcdjobiiNLFWsJrcNXxSoHZShMj+SXQXwxv9q2R2QTLv6f7OWXe9GoVnJdlb2ueBu8S8fpeLM6Dnh6/zLOVFuuAsHwRXaKK
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW6PR11MB8310.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(376002)(396003)(136003)(366004)(39860400002)(230922051799003)(1800799012)(451199024)(186009)(64100799003)(2906002)(7416002)(5660300002)(38070700009)(41300700001)(478600001)(38100700002)(83380400001)(122000001)(71200400001)(107886003)(26005)(66574015)(6506007)(9686003)(82960400001)(55236004)(86362001)(7696005)(33656002)(64756008)(54906003)(55016003)(4326008)(53546011)(8676002)(8936002)(52536014)(66446008)(66476007)(66556008)(66946007)(316002)(6916009)(76116006);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?8fd7niZNxha3aiDRWk7guiDpW8q7eQgUznoRlG4Z+ADcCm4o5tmCtRs7Lp?=
+ =?iso-8859-1?Q?lQ7FpkWPvzhES/s0e66WlQieCyaQ2foSqHcWAazvPUGARfzCi1pCtj9hmt?=
+ =?iso-8859-1?Q?YAqjeSFvaaCgJ6MLgf/BDpz4qSPsRLd+KfUxhctFNE59SiH/pTbnjx3oqy?=
+ =?iso-8859-1?Q?Ocrq3i8t2qF5jKsGGiLM4b73MK8HAFyEKKDXU1qtUGwPX46d8+3CSKzdK/?=
+ =?iso-8859-1?Q?Se+mZ234O//y1votrEi/FFm7cMRMZRPwY2utkRZ7anRjkfk0DEjb4F7d42?=
+ =?iso-8859-1?Q?+8TbfkjbfRGwsPZ2kSEBFhDDS0WxnGYD/AMA1p4C/FiDtyTTi3gFBEOUea?=
+ =?iso-8859-1?Q?Rq6vmcNQ7bG8fMC3Z0o9BcJ1WB2y5rV8fSRvY2ESnZ6GYDWgjbPirlyjYN?=
+ =?iso-8859-1?Q?uiVPNsjOHsg8yzTwndL0yjox9L++WxO6I48XtttRp8Vqm4IICwiSyA8K2b?=
+ =?iso-8859-1?Q?tVfDE2/Y9SMq73/pClVC3o0j/zn+cmzIZFTmMxQ6bZn6wQN2pm4WNUDqnw?=
+ =?iso-8859-1?Q?fDHpGcvuVsORUrJwG2KdAXLBTeKOJnExNYcsLbIzrAL1sIG+N2KYBqprwf?=
+ =?iso-8859-1?Q?3/W8EtePtbDN30j4UQEGulye+30N8zhbPuljKkHnMUuSq8E9WNHE+Jx0L0?=
+ =?iso-8859-1?Q?myNVbJp7WcvUNEtPrkvcnliUQob1SVbPcy5fw5VOdRWe+KD85XM0d4ahQ7?=
+ =?iso-8859-1?Q?9dMi9TerRkqmDV+Ryc/+BIvFVeeONYwgWnxvr9wn/19paUOOM9KQ1jSIry?=
+ =?iso-8859-1?Q?rTcMnCtCpWtyQsMYWbWmtJJL9c/BnStXIyHtC8X22nBCovd3xLpZQysqSI?=
+ =?iso-8859-1?Q?WCWNM04ka3az9Dc0eaaUO6rUyFs2vwZjARtY5peBzmHB0XV1IHWiJLFnUY?=
+ =?iso-8859-1?Q?48kWbJlijUuiND/UJ3aPnlHMD03VSGJa6v0r3+XYSkMZvQzGJiy0e4KLVX?=
+ =?iso-8859-1?Q?c6TYuzG3U2GuGcZUoBKxIJGxFaw2ZHxlj/vpjrSPCP3oa4YOSHAgDFEH4o?=
+ =?iso-8859-1?Q?ATzn3lrT6pU9YWwlhKT8nL7thaZOyYbNp4CzIpim5PuLmwoW57s7+OSOR9?=
+ =?iso-8859-1?Q?0w/pRnqkocqxRE9MEvLCKxJMjV8S/WOh/+rjvozORg4fVTVnFpnQ9NyvF9?=
+ =?iso-8859-1?Q?36C4Jqjlxh/Q6xUgmWykHMg8YPqefkBzdHC6GK4IL6hDTZN7t4JnKl8E8P?=
+ =?iso-8859-1?Q?1hImD5kL7Y23T9msrvmWYTwfl8saqf5oPm1YHE7SyGp6F23WyQBXtRMiiw?=
+ =?iso-8859-1?Q?vg253wkNR+NWKZ1YXgES7NFtQc8UWc/8+XCC2Il3N0EzL9tsrJV372Cfed?=
+ =?iso-8859-1?Q?vsUhCECvKWWUTyDvBVC7MXpLsKfCZONm1am0yYAgAd7i79D4qUmwTjCWrz?=
+ =?iso-8859-1?Q?6+FVcObJFdnIvnOgHKaZE8H8ZWDhwNDns3X6oVdtwt2oDZPx43QjfUGTKl?=
+ =?iso-8859-1?Q?fxy60g5FjPbC1zzVLkwKvkwKPQSBulfNu7r65ULfCeL64vecr575GNvwQY?=
+ =?iso-8859-1?Q?bCAkHMQy8AbB+dvpj7c9Cm2q6grx+6Zf/gMCOsrgQ9JtpLfhypiJUhUHjT?=
+ =?iso-8859-1?Q?V3S/yF7JY7sWf3X8QnT9a5flC93ZYr4nvDMPd/jx+fA71eB0IR6a3c7U5f?=
+ =?iso-8859-1?Q?qIQDHnaNznY6b0yqlvfhzMNQ7AVU9cXSEE?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231223005253.17891-1-luizluca@gmail.com> <20231223005253.17891-4-luizluca@gmail.com>
- <20240108140002.wpf6zj7qv2ftx476@skbuf> <CAJq09z6g+qTbzzaFAy94aV6HuESAeb4aLOUHWdUkOB4+xR_vDg@mail.gmail.com>
- <20240109123658.vqftnqsxyd64ik52@skbuf>
-In-Reply-To: <20240109123658.vqftnqsxyd64ik52@skbuf>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Thu, 11 Jan 2024 03:20:10 -0300
-Message-ID: <CAJq09z6JF0K==fO53RcimoRgujHjEkvmDKWGK3pYQAig58j__g@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 3/8] net: dsa: realtek: common realtek-dsa module
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, alsi@bang-olufsen.dk, 
-	andrew@lunn.ch, f.fainelli@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	arinc.unal@arinc9.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW6PR11MB8310.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8d99efc0-6366-4bc6-8f28-08dc126ffd67
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Jan 2024 06:38:58.1761
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 62o2WE9AWAqFlId9AvjLhImroqlcU7d63YFKd8GijeDZ4xjJCgsrtPzMhCFhRp0iDBAdKkbN5wfWOI1/S1kjrQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6443
+X-OriginatorOrg: intel.com
 
-> On Tue, Jan 09, 2024 at 02:05:29AM -0300, Luiz Angelo Daros de Luca wrote:
-> > > > +struct realtek_priv *
-> > > > +realtek_common_probe(struct device *dev, struct regmap_config rc,
-> > > > +                  struct regmap_config rc_nolock)
-> > >
-> > > Could you use "const struct regmap_config *" as the data types here, to
-> > > avoid two on-stack variable copies? Regmap will copy the config structures
-> > > anyway.
-> >
-> > I could do that for rc_nolock but not for rc as we need to modify it
-> > before passing to regmap. I would still need to duplicate rc, either
-> > using the stack or heap. What would be the best option?
-> >
-> > 1) pass two pointers and copy one to stack
-> > 2) pass two pointers and copy one to heap
-> > 3) pass two structs (as it is today)
-> > 4) pass one pointer and one struct
-> >
-> > The old code was using 1) and I'm inclined to adopt it and save a
-> > hundred and so bytes from the stack, although 2) would save even more.
->
-> I didn't notice the "rc.lock_arg = priv" assignment...
->
-> I'm not sure what you mean by "copy to heap". Perform a dynamic memory
-> allocation?
 
-Yes. However, I guess the stack can handle that structure in this context.
 
-> Also, the old code was not using exactly 1). It copied both the normal
-> and the nolock regmap config to an on-stack local variable, even though
-> only the normal regmap config had to be copied (to be fixed up).
->
-> I went back to study the 4 regmap configs, and only the reg_read() and
-> reg_write() methods differ between SMI and MDIO. The rest seems boilerplate
-> that can be dynamically constructed by realtek_common_probe(). Sure,
-> spelling out 4 regmap_config structures is more flexible, but do we need
-> that flexibility? What if realtek_common_probe() takes just the
-> reg_read() and reg_write() function prototypes as arguments, rather than
-> pointers to regmap_config structures it then has to fix up?
+> -----Original Message-----
+> From: Andrew Lunn <andrew@lunn.ch>
+> Sent: Thursday, January 4, 2024 9:05 PM
+> To: Gan, Yi Fang <yi.fang.gan@intel.com>
+> Cc: Russell King <linux@armlinux.org.uk>; Heiner Kallweit
+> <hkallweit1@gmail.com>; David S . Miller <davem@davemloft.net>; Eric
+> Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo
+> Abeni <pabeni@redhat.com>; Marek Beh=FAn <kabel@kernel.org>;
+> netdev@vger.kernel.org; linux-stm32@st-md-mailman.stormreply.com; linux-
+> arm-kernel@lists.infradead.org; linux-kernel@vger.kernel.org; Looi, Hong =
+Aun
+> <hong.aun.looi@intel.com>; Voon, Weifeng <weifeng.voon@intel.com>; Song,
+> Yoong Siang <yoong.siang.song@intel.com>; Choong, Yong Liang
+> <yong.liang.choong@intel.com>
+> Subject: Re: [PATCH net v3 1/1] net: phylink: Add module_exit()
+>=20
+> On Thu, Jan 04, 2024 at 06:12:55PM +0800, Gan, Yi Fang wrote:
+> 65;7401;1c> In delete_module(), if mod->init callback is defined but mod-=
+>exit
+> callback
+> > is not defined, it will assume the module cannot be removed and return
+> > EBUSY. The module_exit() is missing from current phylink module drive
+> > causing failure while unloading it.
+>=20
+> This is still missing the explanation why this is safe.
+>=20
+>=20
+>     Andrew
+>=20
+> ---
+> pw-bot: cr
 
-IMHO, the constant regmap_config looks cleaner than a sequence of
-assignments. However, we don't actually need 4 of them.
-As we already have a writable regmap_config in stack (to assign
-lock_arg), we can reuse the same struct and simply set
-disable_locking.
-It makes the regmap ignore all locking fields and we don't even need
-to unset them for map_nolock. Something like this:
+Hi Andrew,
 
-realtek_common_probe(struct device *dev, const struct regmap_config *rc_base)
-{
+Regarding the justification on why it is safe to remove phylink,=20
+we had done some memory leak check when unloading the phylink module.
+=20
+root@localhost:~# lsmod | grep "phylink"
+phylink               73728  0
+root@localhost:~# rmmod phylink
+root@localhost:~# echo scan > /sys/kernel/debug/kmemleak
+root@localhost:~# cat /sys/kernel/debug/kmemleak
+root@localhost:~#
+=20
+So far, we didn't observe any memory leaking happened when unloading
+phylink module. Is it sufficient or do you have any other suggestions to ch=
+eck=20
+on whether the module is safe to remove?
 
-       (...)
-
-       rc = *rc_base;
-       rc.lock_arg = priv;
-       priv->map = devm_regmap_init(dev, NULL, priv, &rc);
-       if (IS_ERR(priv->map)) {
-               ret = PTR_ERR(priv->map);
-               dev_err(dev, "regmap init failed: %d\n", ret);
-               return ERR_PTR(ret);
-       }
-
-       rc.disable_locking = true;
-       priv->map_nolock = devm_regmap_init(dev, NULL, priv, &rc);
-       if (IS_ERR(priv->map_nolock)) {
-               ret = PTR_ERR(priv->map_nolock);
-               dev_err(dev, "regmap init failed: %d\n", ret);
-               return ERR_PTR(ret);
-       }
-
-It has a cleaner function signature and we can remove the _nolock
-constants as well.
-
-The regmap configs still have some room for improvement, like moving
-from interfaces to variants, but this series is already too big. We
-can leave that as it is.
-
-> > > > +EXPORT_SYMBOL(realtek_common_probe);
-> > > > diff --git a/drivers/net/dsa/realtek/realtek.h b/drivers/net/dsa/realtek/realtek.h
-> > > > index e9ee778665b2..fbd0616c1df3 100644
-> > > > --- a/drivers/net/dsa/realtek/realtek.h
-> > > > +++ b/drivers/net/dsa/realtek/realtek.h
-> > > > @@ -58,11 +58,9 @@ struct realtek_priv {
-> > > >       struct mii_bus          *bus;
-> > > >       int                     mdio_addr;
-> > > >
-> > > > -     unsigned int            clk_delay;
-> > > > -     u8                      cmd_read;
-> > > > -     u8                      cmd_write;
-> > > >       spinlock_t              lock; /* Locks around command writes */
-> > > >       struct dsa_switch       *ds;
-> > > > +     const struct dsa_switch_ops *ds_ops;
-> > > >       struct irq_domain       *irqdomain;
-> > > >       bool                    leds_disabled;
-> > > >
-> > > > @@ -79,6 +77,8 @@ struct realtek_priv {
-> > > >       int                     vlan_enabled;
-> > > >       int                     vlan4k_enabled;
-> > > >
-> > > > +     const struct realtek_variant *variant;
-> > > > +
-> > > >       char                    buf[4096];
-> > > >       void                    *chip_data; /* Per-chip extra variant data */
-> > > >  };
-> > >
-> > > Can the changes to struct realtek_priv be a separate patch, to
-> > > clarify what is being changed, and to leave the noisy code movement
-> > > more isolated?
-> >
-> > Sure, although it will not be a patch that makes sense by itself. If
-> > it helps with the review, I'll split it. We can fold it back if
-> > needed.
->
-> Well, I don't mean only the changes to the private structure, but also
-> the code changes that accompany them.
->
-> As Andrew usually says, what you want is lots of small patches that are
-> each obviously correct, where there is only one thing being changed.
-> Code movement with small renames is trivial to review. Consolidation of
-> two identical code paths in a single function is also possible to follow.
-> The insertion of a new variable and its usage is also easy to review.
-> The removal of a variable, the same. But superimposing them all into a
-> single patch makes everything much more difficult to follow.
-
-This case in particular might be hard to justify in the commit message
-other than "preliminary work". I'll split it as it makes review much
-easier. this series will grow from 7 to 10 patches, even after
-dropping the revert patch.
-
-Regards,
-
-Luiz
+Best Regards,
+Gan Yi Fang
 
