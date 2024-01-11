@@ -1,171 +1,190 @@
-Return-Path: <netdev+bounces-63026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6285882AD3A
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 12:19:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0693282AD54
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 12:26:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB4B52832B1
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 11:19:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92CFE28A5D8
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 11:26:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 438CD14F8A;
-	Thu, 11 Jan 2024 11:19:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 103DA14F95;
+	Thu, 11 Jan 2024 11:26:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UugCewnZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TRiVqEJF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FAAD156D0;
-	Thu, 11 Jan 2024 11:19:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-555f581aed9so6061414a12.3;
-        Thu, 11 Jan 2024 03:19:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704971981; x=1705576781; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=sSbZYSutlQ3iKg6lGH1O3ekzOz9Hz/fXBF5+RgZv1j0=;
-        b=UugCewnZWvNrpnxTgRLEn3O0FZuqHeuSYo3dF0tu79hTYYmJ9dE6E3Fm396b4H8/Em
-         hhihUoJ1SLOgtCMSfM0sy5Zaf7shJRoQolcPgPSfBzxNV/shQI/yyHgtbztu1czKxvVK
-         BwzCfN9aUA9MSFyTvEQixxFWUs4Bx2Mb5UPspqr9VQ3QjvPWrimj74KNOfk0qSQPtCIP
-         jcP4ZhFt8fTyTC80Xl+uk4s/cscxO8tnm8HCvC5I0ELUubl5bPYhPn8QWEKLJJkynazn
-         ohPsoi4+vxXAIvuJNIAK8exhkP7kHLFe0LbjfZPlpP/8txIV34A56OIki8G/TUG7UJ/6
-         UiKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704971981; x=1705576781;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sSbZYSutlQ3iKg6lGH1O3ekzOz9Hz/fXBF5+RgZv1j0=;
-        b=UGrxINhh7PtsLjRiscXRbnjD6Bppnhv7JIychSiN1KxLQEuwKu4+35Esqctptd+RI4
-         t9GQcAst05EJ3pbtAivUBCheSZroyOdUwyiO78GIrxKbJRbVLtqPaEXNALxh0WU3CZAc
-         uJepdtZGTeLsOC/BHfvt+GdZv19ZmGNYHbl6XrgbwpoIazJOla38MWShsP+1DmhDUXcM
-         2jxmvVXPCPe8mrdxJpU/QRjnP/fcad4ijMpcvFpzvsQbhybCTXpQpQEq5nA9Bkd5IJ1P
-         A1NzNe0xF/WLhI8AnSAgxQIPwgiVakDVYgfRhsNIoPYdKn/6koSfO5tj68yHq6Ivfi8o
-         kSjA==
-X-Gm-Message-State: AOJu0YzxbhtZXU013lqcT3BPP7+jufos6H08lnVgzlplg1MKUHqZdOmf
-	95KWoZbrS2s8XpW+7tcJdGk=
-X-Google-Smtp-Source: AGHT+IHlubIRyhQvOI60aGnRpIe55nDMK+uaNu8XuQ/dm/7eGcZHRRHmkqZ7zKktwl8yl5+o+EbRog==
-X-Received: by 2002:aa7:d341:0:b0:556:c94a:7ca2 with SMTP id m1-20020aa7d341000000b00556c94a7ca2mr544468edr.58.1704971980684;
-        Thu, 11 Jan 2024 03:19:40 -0800 (PST)
-Received: from ?IPV6:2a01:c23:bc57:a800:4da8:42cb:4e37:553d? (dynamic-2a01-0c23-bc57-a800-4da8-42cb-4e37-553d.c23.pool.telefonica.de. [2a01:c23:bc57:a800:4da8:42cb:4e37:553d])
-        by smtp.googlemail.com with ESMTPSA id ez6-20020a056402450600b0055803202e83sm488852edb.67.2024.01.11.03.19.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Jan 2024 03:19:40 -0800 (PST)
-Message-ID: <93709245-a791-4b35-bfb4-258344cf1134@gmail.com>
-Date: Thu, 11 Jan 2024 12:19:39 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CCEA154A1;
+	Thu, 11 Jan 2024 11:26:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1704972367; x=1736508367;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=cm+Rl/9wsRSWeMgoyVofEAMpf2k5da29hv/gVIN2sKw=;
+  b=TRiVqEJFE5+1hz5/3SdAHvCBq9c34u1mp5BQKq7XG3K1UYH2sHcRzCIU
+   6wIZSDrrbQ8eeEzjqCWExjJL6k8nUeuJvX/+dyZtaCEn2iWWJSw8T8CGH
+   XLAm8f9pF+FspcY0MLOX2VzrzEggi5X7JhkXSNWmzO+c6mzb4GXI4HF0G
+   QZpAUwjQHsL8YD8jXSCLnAFaFbKmXaZEp3kWAtnUjyjR7UHoIVjpF0QMi
+   jY6yCijG1FJQ9cdm9QJwVUmF9Iw77qHaEhY/G4aVYkiNzJBSXF7axvzwX
+   +Cw8dPmuBQT6qG/OXA16OTX5hPCyfkY96ArYOlBCEq1jUJSa8tJddibrK
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10949"; a="6179083"
+X-IronPort-AV: E=Sophos;i="6.04,186,1695711600"; 
+   d="scan'208";a="6179083"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2024 03:26:04 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10949"; a="1113803847"
+X-IronPort-AV: E=Sophos;i="6.04,186,1695711600"; 
+   d="scan'208";a="1113803847"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Jan 2024 03:26:02 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 11 Jan 2024 03:26:01 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 11 Jan 2024 03:26:01 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 11 Jan 2024 03:26:01 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RpivI7i2rfTzAFDTr7lhXXf5K4vloZ+fj7mxpysgc8LITSzBOFfPz1AUjOOCO3ooPdshL17yTBkDBXJBYsbuEsKkZFjP9YOmOq6oYFpTShW+jDlvG43bDx2jp4QDM7rUsoPionVWLUvw9GvIQDWkkFx0/hUgIwnCAsy+eU6wGsnO+wrRrxJ1ZnRXjt+imZIKvkM5lcqrhFOJRboMm8ZM7CfM+VVbl7KvY/lN9QIwPkTXnh0NahZPGKhh4MxmHFWcAqgC+7s104/X/BrkJlwurrkeExdgOdMf4AF3ltapcQGDb0unnIs6EHrC6aWqI5U2+UwIovrfrHSEJ/62KQLQdw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7KLV4N6WJAKP0RxL2Ocup9IPnFe55jWSYEHAOULIF1s=;
+ b=JJfbRzTlRrmzV4lsqZJ69eLTZ2uKa9r+qpNit6hbLTjuTit/ErOA6C/mBZQJn41AZKQ0Jc0fVDUYb4UVKMLicdyDC7WqtAyE2G5MABz6KyQDYf3X/+Ikyfm88tbzMTShBME+T56CefWMXVyqzrsS4hy0JMsc5Y8PUonggb4XGi9J1EIhbeO/vavA3BuydeSt4M0baugIFtt++yIbqS/6pJow5VyUWtRrVDsZtuDZuHWeKnAewC9w+WZzkyT7778H+QgNKfieJAMeoR36K9lq3azCJUt+NwbAY5MsdT4Pw3Al8MBvQBoN+i7WtapN8wAeV4ItfGjoaKcI2STIhQ+RsA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by PH0PR11MB4968.namprd11.prod.outlook.com (2603:10b6:510:39::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.18; Thu, 11 Jan
+ 2024 11:25:58 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::b1b8:dbaa:aa04:a6bf]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::b1b8:dbaa:aa04:a6bf%6]) with mapi id 15.20.7181.019; Thu, 11 Jan 2024
+ 11:25:58 +0000
+Message-ID: <7156e5ae-5e45-43d9-b6d1-fe3ce4218338@intel.com>
+Date: Thu, 11 Jan 2024 12:25:48 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 0/2] selftests: net: Small fixes
+Content-Language: en-US
+To: Benjamin Poirier <bpoirier@nvidia.com>, <netdev@vger.kernel.org>
+CC: Jay Vosburgh <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>,
+	Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Petr Machata <petrm@nvidia.com>, Nikolay Aleksandrov
+	<razor@blackwall.org>, Hangbin Liu <liuhangbin@gmail.com>, Ido Schimmel
+	<idosch@nvidia.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, "Jonathan
+ Toppins" <jon.toppins+linux@gmail.com>, Joachim Wiberg <troglobit@gmail.com>,
+	<linux-kselftest@vger.kernel.org>
+References: <20240110141436.157419-1-bpoirier@nvidia.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+In-Reply-To: <20240110141436.157419-1-bpoirier@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR2P281CA0071.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:9a::6) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RESUBMIT] leds: trigger: netdev: add core support for hw
- not supporting fallback to LED sw control
-To: Lee Jones <lee@kernel.org>
-Cc: Pavel Machek <pavel@ucw.cz>,
- "linux-leds@vger.kernel.org" <linux-leds@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Andrew Lunn <andrew@lunn.ch>
-References: <3fd5184c-3641-4b0b-b59a-f489ec69a6cd@gmail.com>
- <7b6cf0fb-4c77-4088-b87b-5649cfaa697e@gmail.com>
- <20240111084425.GJ7948@google.com>
- <f0838b86-f008-4f14-8910-61b393d0190d@gmail.com>
- <20240111103235.GA1665043@google.com>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <20240111103235.GA1665043@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|PH0PR11MB4968:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8494cd34-8027-4856-7260-08dc1298155c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ASGZ9sP2dmI5BYb1bg3e6ojlIfrPNuSJUAA/mS2/cRBN3SIa49WG4fItphhr5pDpcRuQ2wkVJ1bos/BXGvv+zF3w7qVyoZVcjVwV70vcxvbRco8NM22XGPWEkktmbr+GQeGMW/lIdtVpRwsFpV8OMMxpopv4CdZxBXrdVu6YOSIOHDdzy/tDDwGo3eKGXxjWEdjODA63BwmyuLRxce0eH0EbzDlEaJdQW+CST7tpY9UbRRrOQWeWoylHMmrLfoGk08lx4lZrLXXmj4Rz8tHjx0r5FpXAUM+wk2wGeVC642S5RnorDE1aywgUJO9oWN5mdnD6Im+suOSMRlg+mw6lpTlpqUordO3Uug69eOZ6+b8/VSM9xMMxOi15cBx7KHftfu6Gosy1HChE69bIrEwqb0G1c2VpZqjnbJ2RnAxLZ1L2cdWQMQRskRFhZs1cYZwBxBXrncu2MeFpPj8arQuPul2mfKmjc2PTVrMLdDpZwPdf2c09hjITjrB0xQ9gxVVEELTjvQ4knOFMbiy/IRKxqIKF72HEAvqdqxDDtTE1ugXxP6F/vUVhgOk1h5A6G655A2R9RP4OCwOSmMUl5M+korGxrcBe254V0WCVeHWSdHU7werAf1sTd5Cdy26B09HT0OdpZ91E2aI4Fv5g2QFTXA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(39860400002)(136003)(376002)(396003)(366004)(230922051799003)(186009)(451199024)(1800799012)(64100799003)(31686004)(6506007)(6512007)(53546011)(26005)(66476007)(478600001)(66946007)(2616005)(6486002)(6666004)(31696002)(82960400001)(83380400001)(86362001)(66556008)(966005)(54906003)(316002)(5660300002)(8676002)(36756003)(41300700001)(7416002)(2906002)(4744005)(4326008)(38100700002)(8936002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?THZVL1pKcU5LTTZYem9VUzM2Q3hla1N5QjZpdUFEWHlTL21zbng1L2tpUzJw?=
+ =?utf-8?B?dlhjYVIzb2RsWUpCc1l3SXBJd3hhNmpldk1XSG5UZzkxUEViSnE3dTVBMTVI?=
+ =?utf-8?B?ZmtkcDA5ZVZoQ3NIcCttR2dZakZWWWNSdEdSUzZuYzgyODQrQnZqK2VVdGN2?=
+ =?utf-8?B?N2hSaC91VFZzRnZHMEw5WVJyMDQ1VUREWmNJNmVMTmJVT0N2anU5QnpIaVUw?=
+ =?utf-8?B?UmRHZ1p0UlJGVXYxcG40QUYya2VoM0pKWmJZblBQQmxMYTJlUDFLaGFwT0FG?=
+ =?utf-8?B?TWtWaUVvT1pDZHNGVGQyZHdlRSsvdno1WnE1WGxUVDhaSVFPR1hyYnVuRUIr?=
+ =?utf-8?B?b0FuVjYrUkRMTmFCbjhZRXBNamtuQUJ6L2k2TzZIYjdnUkprUkpQTlZiUWFV?=
+ =?utf-8?B?VUErUGZqQUhhNzd0blE2eWFTcWFDaWRaeE54RDZOMzdnblJwY3RyeVZNclYy?=
+ =?utf-8?B?U0JidUk5QmwxeHlST3prVk1IaDFaMGRHZjY4RzhGU1RoSU5FQStHdERoNFZG?=
+ =?utf-8?B?WHFqaDNoYUFRcGN2YkJiQW5pVFpmWkNndGNTeHVKSWFVNmpjSWQrOEhOaWNB?=
+ =?utf-8?B?Wk5CMStwL2NJcFJYT2xxeGlvWU9oYWdISU85Y243RUwrcnRiMkhiMmF6dW1I?=
+ =?utf-8?B?MzRBVFpCSHYrSWswcUNzSE1PdVBkUVpScnBlQk54TlNiOHZSRnc3RnhTUGV2?=
+ =?utf-8?B?VU9ickc3Y0tDZVlxMWhaNmZPcHVJTS81QUdFd0VGcjNFUmV5T1dQVVVIQm95?=
+ =?utf-8?B?Q1JvSEp0b2hObVZNblZvNG1sbEl1eHk3ODRtZmVVTzNZQlFkUEtOZTBYc09H?=
+ =?utf-8?B?SVBZNEhHY2lFaExuY0Y0OThGRnJDRDI3dHd2eE4ydHN6YW5zWXNjZmhOTm03?=
+ =?utf-8?B?RW9ZSGZvaFd5cEs1aXF0Znd6NVNMUDVrWGRHME1vdFFaS0VLaGFQOGtOQWx2?=
+ =?utf-8?B?Q2syZGNNOHZ0ZHFKdTFCbkRvWTZXRmpKMExBN0JoL1ppRUJlTjNJdXgxcE1r?=
+ =?utf-8?B?UFlqcTJPTnFoM0JPeFhreWtnUGtIZDB4NVBQbVJxMitvRmc5TVdhaytKazNE?=
+ =?utf-8?B?MlVmV1NtZkVaL0NsWCtvWmRPeEd4YUgzcklaa0huRHRtSEs2NVR3WWs5YkYx?=
+ =?utf-8?B?ekZTbURYT1crWk11NDd6amV0VWVTRFhjQjhrc05BdkplYnd1R1VLbmYwRWdV?=
+ =?utf-8?B?R2xzWFJzUWZlUEgvdk9QZFdqb1RxV1FKSXIzUnNudlBZa2UyZ2pocGNXTzB6?=
+ =?utf-8?B?bHBCcDFEKzRXYTRqOG0zYXdZSVZjOEIvYU9qZ1k3KzNLWFliNHZoMTVxVXlU?=
+ =?utf-8?B?dEFuWnduZWpLb2FiM2tBRVB2aGltZElNSS83UW9ucGw3UFZXc09HQXBGbVMy?=
+ =?utf-8?B?aTRSSmF6WVV1UytIalkzYmNxRUwvaHNKYTFuQ3Q2WDVWT082TCtXcy9GcmZ4?=
+ =?utf-8?B?d3lKYlg4aEk2QWEvbmtjcjN0MWt2WjE3dVBJUXllWGxxMVU2VUpQZGJ4d1J1?=
+ =?utf-8?B?OHVOaFI2eW1IOG8xQWxaYThmeHBHcTY2WjdTb1ZBTlEvd2JZOWxKRjQ4ZnAz?=
+ =?utf-8?B?ejdjbGhwQmFyUDd5YTNpejZuOTRuVHdtRk9WL1lDWFVaUmM0ZDROZzQ0RFZD?=
+ =?utf-8?B?UzFHeXRsRy9LNGtTODAySDI1K2lERFJGUlJHWWdFVWRJR0JnZng4VlVtMTE5?=
+ =?utf-8?B?c1hCbUxVR2ZHcStyWmhQdy9uallEdHJGdDljV3grdkJvZm5nV2lPTTEycHFp?=
+ =?utf-8?B?ZTY3Tkc2R1V2d0c3dURac3poMEM0MWJNZnpVOGkzYjZxd1oxMWptdFpoS2Ft?=
+ =?utf-8?B?M1JQU2U1eTZsWW5oRjY2Wjc5U2ZIdXU5ZCt3SWdHaENlenNlZjJnbFkzT1JO?=
+ =?utf-8?B?TmlZbDZiNEx5U29lazNZeEVKTXdCeHJNNUxoS2tLNUV2NlFHcGpwL3BqWTls?=
+ =?utf-8?B?TkRYYXV1eUJuZHV3NUJIalUzelNsNmJpK1N1N25UQjFoU29hOGh4ejVzZ3F6?=
+ =?utf-8?B?NmxiUnAwdmxhRDlISXdXeFV0QmlodzBjc1ptRjl2ZklaaWVicExuanRoNnEw?=
+ =?utf-8?B?NVc0LzdNMmpsYTRMUmVwSnV2MFdBejNIS2Z2b1M2RkcyR3VOK1VMOG03VTBs?=
+ =?utf-8?B?TUdVb3Z5MGd3L211aTlpVlA3VkVLRno5ak04UE9HN3BmVnlJVkE5TzgzWXFZ?=
+ =?utf-8?B?TlE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8494cd34-8027-4856-7260-08dc1298155c
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jan 2024 11:25:58.3549
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6nONp/zU19c0uMcXF8XVZvoQCpJXaOnrggq3Tl+dFuwYigwIWoesET6rxbYKu9ZYK1tgwElCNah51XsyN23PVeNvY2kguP8D4gM/rRzcXwU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4968
+X-OriginatorOrg: intel.com
 
-On 11.01.2024 11:32, Lee Jones wrote:
-> On Thu, 11 Jan 2024, Heiner Kallweit wrote:
+On 1/10/24 15:14, Benjamin Poirier wrote:
+> From: Benjamin Poirier <benjamin.poirier@gmail.com>
 > 
->> On 11.01.2024 09:44, Lee Jones wrote:
->>> On Sun, 17 Dec 2023, Heiner Kallweit wrote:
->>>
->>>> On 17.12.2023 19:46, Heiner Kallweit wrote:
->>>>> If hw doesn't support sw control of the LED and we switch to a mode
->>>>> not supported by hw, currently we get lots of errors because neither
->>>>> brigthness_set() nor brithness_set_blocking() is set.
->>>>> Deal with this by not falling back to sw control, and return
->>>>> -EOPNOTSUPP to the user. Note that we still store the new mode.
->>>>> This is needed in case an intermediate unsupported mode is necessary
->>>>> to switch from one supported mode to another.
->>>>>
->>>>> Add a comment explaining how a driver for such hw is supposed to behave.
->>>>>
->>>>> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
->>>>> ---
->>>>
->>>> For whatever reason this patch (original version and resubmit) doesn't
->>>> show up on linux-leds patchwork. In netdev patchwork it's visible.
->>>
->>> Never used it.  Do you have a link?
->>>
->> This is the original patch in netdev patchwork
->> https://patchwork.kernel.org/project/netdevbpf/patch/91e9f4c6-d869-45be-be72-ac49a3c3b818@gmail.com/
->>
->> This is my patches in linux-leds patchwork. The one from Dec 6th is missing here.
->> https://patches.linaro.org/project/linux-leds/list/?series=&submitter=6702&state=*&q=&archive=&delegate=
->> However the resubmitted one showed up later.
+> Two small fixes for net selftests.
 > 
-> AFAIW, that's not the official Patchwork for LEDs.
+> These patches were carved out of the following RFC series:
+> https://lore.kernel.org/netdev/20231222135836.992841-1-bpoirier@nvidia.com/
 > 
-> And as I say, I don't use it, so I'm not really in a position to comment.
+> I'm planning to send the rest of the series to net-next after it opens up.
 > 
-> Do we still have something outstanding?
+> Benjamin Poirier (2):
+>    selftests: bonding: Change script interpreter
+>    selftests: forwarding: Remove executable bits from lib.sh
 > 
-Thanks for asking. No, that's it for now.
+>   .../selftests/drivers/net/bonding/mode-1-recovery-updelay.sh    | 2 +-
+>   .../selftests/drivers/net/bonding/mode-2-recovery-updelay.sh    | 2 +-
+>   tools/testing/selftests/net/forwarding/lib.sh                   | 0
+>   3 files changed, 2 insertions(+), 2 deletions(-)
+>   mode change 100755 => 100644 tools/testing/selftests/net/forwarding/lib.sh
+> 
 
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 
