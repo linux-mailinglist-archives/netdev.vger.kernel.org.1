@@ -1,113 +1,127 @@
-Return-Path: <netdev+bounces-63007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D757482ABBE
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 11:16:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC04282ABDC
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 11:22:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49263284EB3
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 10:16:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78AA5281E12
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 10:22:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D70FB12E59;
-	Thu, 11 Jan 2024 10:16:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6265212E6E;
+	Thu, 11 Jan 2024 10:22:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xKGMeEMi"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="LM8IrbNh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A3D114267
-	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 10:16:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-557bbcaa4c0so6341a12.1
-        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 02:16:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1704968205; x=1705573005; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=unRXO3bgzqCCGiqSMIo1ZdR+Jk1lzWVg4UVCVYa4eOE=;
-        b=xKGMeEMiLjAIaSfB9KVnefiD/cvQbAP0mBzusMOYYx0pN5A2Htd+SEf0344fAEBmEE
-         rcBxrHudLe0sR9+P2MbVT4NCgymnmFpV0djHVXhTR1GNs3fOTTORPjjzI6f8qgfg/9wc
-         Dfpnf969MWSjH44aBa8OrbMlpL8T8OaXDQHz5UthXBfdUojeO5cyldDt9QRctYJOW52s
-         mL1r7VVS6I8MKgsRiwPk0nQqnyQF3efwTFNBC3iLZjDcQm6IhqeQpobsXOGddFo0L5WQ
-         6RfYcNQyf0krGfd7HF9xMV9bzxdnUK5G6diB63504PR0WVN6Gn2LIV1F3Tnd9DpQd8o7
-         ZbfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704968205; x=1705573005;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=unRXO3bgzqCCGiqSMIo1ZdR+Jk1lzWVg4UVCVYa4eOE=;
-        b=LxC5/pNXMfNMyvjoQ6Wo7+LdAdl8GKg2vUTZZ80OIw0tXcKYVJTfe0ybx/vKL4Bte4
-         GqE5QpO391GuCS5zHlVsxbe1Kur/U4wZwqD5bIRwpOKNVwmCkvZ9WDCSjXvZnMVR8Uq6
-         yqz4/VV1IyTNLy9NwmDBSmQvJFaY5HBKMCSFAFy5Hit5U7cK2I8JLNtw5KDsmeky88yd
-         bITowIzywL73EdYFwdLdPaFsRl/jcYORJH/CG9KMuA00jelxQ2G5gh0OzSQ0jLmkCR7Q
-         5GfNu4hD+lGa3wlElJpzu2y7BeUNK9wtvfXBUUpzS9VqxmYMW0YqJqkMwA90O8KNLh7p
-         p1KQ==
-X-Gm-Message-State: AOJu0Yy3+5s4B5egpaVHHa8mDsO6VI57bm9wSEpP8A0jc3aQuH+eYYGc
-	iQ39Vc43hhDvVJuET3w4nZ/TKa6e2FPz0qU6v6NaZgIMZOtnz6MEhDeWC6+HAg==
-X-Google-Smtp-Source: AGHT+IGxWYLQ1uL3PYlNCMstxI3MLGwlpuku2to8bjjPFO5aEOWNKZ8VRWSKdu5fSLonkU0n0e6fZ3ukIqJjHmgxMN4=
-X-Received: by 2002:a05:6402:34c9:b0:558:8016:b347 with SMTP id
- w9-20020a05640234c900b005588016b347mr59573edc.5.1704968205361; Thu, 11 Jan
- 2024 02:16:45 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88D4A12E60;
+	Thu, 11 Jan 2024 10:22:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id E659120004;
+	Thu, 11 Jan 2024 10:22:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1704968539;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qfFonYRVFf4urM+5uJF5QuqNz9TM00Eh0PPfAvORzBU=;
+	b=LM8IrbNhBB6sP+VNXbhM/PMiu4yRl818gZZJ2Uuv1XoKpUImGDyCEGSTwITmoLBFH07xp/
+	FTFrteUc/sgwpLwBvoojN1UOrcw2xcKO/Mc8sKAz5zRMotIXyoVv7DxUStr3nQa0by/U2F
+	mfP2OBVLlfn7Y6D8l0jww9ni/ocSVACBj2fGg8IpmKFGuVQtKeQD3/N2nCOGKjZI9C/2A6
+	ZiiQJCYnfxpywkEkFxlrEnmCd8kPy3tTCIwgvblyvvyomd9+q1uqW6fp5cylAEAUwcxBDx
+	U2T1LspaH3ve+YGxBV8WFhuVO8BJdPR6c8TBGgTDYkWW25ibWX9MKa2fWD5h0Q==
+Message-ID: <009fec43-0669-419e-a3a9-ce54c676a324@arinc9.com>
+Date: Thu, 11 Jan 2024 13:22:12 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240109031204.15552-1-menglong8.dong@gmail.com>
- <CADxym3azdds6dRDdvofHj1cxZ1QxcN1S8EkrLtYtKy4opoPrFw@mail.gmail.com>
- <CANn89i+G-4=70KA4DBJqmFRXH9T3_eaOUmVVDBDH9NWY2PNzwQ@mail.gmail.com>
- <CANn89iLe9q3EyouoiSfodGBuQd1bHo5BhQifk47L9gG7x29Gbg@mail.gmail.com> <CADxym3YHYoLpDsJ1qx3p74eqGPV-CY8sOqxnX+VvzL8SegD_AQ@mail.gmail.com>
-In-Reply-To: <CADxym3YHYoLpDsJ1qx3p74eqGPV-CY8sOqxnX+VvzL8SegD_AQ@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 11 Jan 2024 11:16:34 +0100
-Message-ID: <CANn89i+0CWaoPr9rMrgB6UeOQwGjfG-9Cj-c=gmNLdxYFUogaQ@mail.gmail.com>
-Subject: Re: [PATCH] net: tcp: accept old ack during closing
-To: Menglong Dong <menglong8.dong@gmail.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 07/15] net: dsa: mt7530: do not run
+ mt7530_setup_port5() if port 5 is disabled
+Content-Language: en-US
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Dan Carpenter <dan.carpenter@linaro.org>, Simon Horman
+ <horms@kernel.org>, Daniel Golle <daniel@makrotopia.org>,
+ Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org,
+ Frank Wunderlich <frank-w@public-files.de>,
+ Bartel Eerdekens <bartel.eerdekens@constell8.be>, mithat.guner@xeront.com,
+ erkin.bozoglu@xeront.com
+References: <a2826485-70a6-4ba7-89e1-59e68e622901@arinc9.com>
+ <90fde560-054e-4188-b15c-df2e082d3e33@moroto.mountain>
+ <20231207184015.u7uoyfhdxiyuw6hh@skbuf>
+ <9b729dab-aebc-4c0c-a5e1-164845cd0948@suswa.mountain>
+ <20231208184652.k2max4kf7r3fgksg@skbuf>
+ <c3a0fc6a-825c-4de3-b5cf-b454a6d4d3cf@arinc9.com>
+ <48b664fb-edf9-4170-abde-2eb99e04f0e5@suswa.mountain>
+ <2ad136ed-be3a-407f-bf3c-5faf664b927c@arinc9.com>
+ <20240109145740.3vbtkuowiwedz5hx@skbuf>
+ <0a086b5f-b319-4f08-9513-a38c214e1da7@arinc9.com>
+ <20240110182358.ci7pg7ipcbsjxqjf@skbuf>
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <20240110182358.ci7pg7ipcbsjxqjf@skbuf>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
 
-On Thu, Jan 11, 2024 at 11:06=E2=80=AFAM Menglong Dong <menglong8.dong@gmai=
-l.com> wrote:
->
-> On Wed, Jan 10, 2024 at 6:41=E2=80=AFPM Eric Dumazet <edumazet@google.com=
-> wrote:
-> >
-> > On Wed, Jan 10, 2024 at 11:25=E2=80=AFAM Eric Dumazet <edumazet@google.=
-com> wrote:
-> > >
-> > > On Wed, Jan 10, 2024 at 4:08=E2=80=AFAM Menglong Dong <menglong8.dong=
-@gmail.com> wrote:
-> > > >
-> > >
-> > > >
-> > > > Oops, It should be "SKB_DR_SET(reason, NOT_SPECIFIED);" here.
-> > > > Sorry that I shouldn't be too confident to compile it.
-> > > >
-> > >
-> > > net-next is closed, come back in ~two weeks, thanks.
->
-> Okay, I'll send the V2 after two weeks.
->
-> >
-> > Also look at commit d0e1a1b5a833b625c ("tcp: better validation of
-> > received ack sequences"), for some context.
->
-> Yeah, I already analyzed this commit before. I think that the return
-> value of tcp_ack() mean different thing to SYN_SEND and FIN_WAIT1
-> if it is zero, and should be handled separately.
->
-> Anyway, we can discuss this part when the net-next is opened.
+On 10.01.2024 21:23, Vladimir Oltean wrote:
+> On Wed, Jan 10, 2024 at 10:26:54AM +0300, Arınç ÜNAL wrote:
+>>> Are there existing systems that use PHY muxing? The possible problem I
+>>> see is breaking those boards which have a phy-handle on gmac5, if the
+>>> mt7530 driver is no longer going to modify its HWTRAP register.
+>>
+>> Ah see, for PHY muxing, the driver actually wants the phy-handle to be put
+>> on the SoC MAC, and the PHY to be defined on the SoC ethernet's MDIO bus.
+>> We don't even define gmac5 as a port on the switch dt-bindings.
+> 
+> I noticed that from the code already. Maybe I shouldn't have said
+> "gmac5" when I meant "the GMAC attached to switch port 5, aka GMAC0".
+> I was under the impression that you were also using this slightly
+> incorrect terminology, to keep a numerical association between the CPU
+> port number and its directly attached GMAC.
+> 
+>> While none of the DTs on the Linux repository utilise this, some of the
+>> mt7621 DTs on OpenWrt do. The change in behaviour will only be that phy0/4
+>> will be inaccessible from the SoC MAC's network interface. I de-facto
+>> maintain the mt7621 device tree source files there. I intend to revert it
+>> along with adding port 5 as a CPU port so that the conduit changing feature
+>> becomes available.
+> 
+> If OpenWrt kernels are always shipped in tandem with updated device
+> trees (i.e. no Arm SystemReady IR platforms, where the DT is provided by
+> U-Boot), I won't oppose to retracting features described via DT if their
+> platform maintainers agree in a wide enough circle that the breakage is
+> manageable.
 
-Discussion can start now, but make sure to add RFC tag so that netdev
-maintainers
-can prioritize accordingly ;)
+I will see to this when the time comes.
+
+> 
+> BTW, besides OpenWrt, what other software is deployed on these SoCs
+> typically?
+
+Other than OpenWrt which is widely used for these SoCs for its ease of
+flashing and upgrading, compatibility with legacy U-boot versions that
+usually come with any vendor making a product out of these SoCs, I can only
+talk about what I deploy to run Linux. I use mainline U-Boot along with the
+device trees from the Linux repository to boot mainline Linux kernels with
+Buildroot as the filesystem.
+
+Arınç
 
