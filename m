@@ -1,43 +1,65 @@
-Return-Path: <netdev+bounces-63008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC04282ABDC
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 11:22:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1604A82ABE2
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 11:24:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78AA5281E12
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 10:22:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBC2E1F23465
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 10:24:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6265212E6E;
-	Thu, 11 Jan 2024 10:22:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F8EA12E70;
+	Thu, 11 Jan 2024 10:24:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="LM8IrbNh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SldAGIOZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88D4A12E60;
-	Thu, 11 Jan 2024 10:22:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id E659120004;
-	Thu, 11 Jan 2024 10:22:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1704968539;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qfFonYRVFf4urM+5uJF5QuqNz9TM00Eh0PPfAvORzBU=;
-	b=LM8IrbNhBB6sP+VNXbhM/PMiu4yRl818gZZJ2Uuv1XoKpUImGDyCEGSTwITmoLBFH07xp/
-	FTFrteUc/sgwpLwBvoojN1UOrcw2xcKO/Mc8sKAz5zRMotIXyoVv7DxUStr3nQa0by/U2F
-	mfP2OBVLlfn7Y6D8l0jww9ni/ocSVACBj2fGg8IpmKFGuVQtKeQD3/N2nCOGKjZI9C/2A6
-	ZiiQJCYnfxpywkEkFxlrEnmCd8kPy3tTCIwgvblyvvyomd9+q1uqW6fp5cylAEAUwcxBDx
-	U2T1LspaH3ve+YGxBV8WFhuVO8BJdPR6c8TBGgTDYkWW25ibWX9MKa2fWD5h0Q==
-Message-ID: <009fec43-0669-419e-a3a9-ce54c676a324@arinc9.com>
-Date: Thu, 11 Jan 2024 13:22:12 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C405F14A82;
+	Thu, 11 Jan 2024 10:24:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-555e07761acso6192178a12.0;
+        Thu, 11 Jan 2024 02:24:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704968649; x=1705573449; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=PjiY07DgS9NGEAkLzhjaqeWPDRIGprm9hhNvl6O95fI=;
+        b=SldAGIOZAhHpS7Yb3KcbUR+ZG+qkWNCMJBnj3739D6benLwoKMBrC2kuEuZd+zQhgT
+         McXfoR/aRGuGzef2tz8c9LgDY4cMsgNcrOWkodIWHbb/f+Ynelj1+y9I8LB/N89INVbi
+         +xDUq2KVVavGOeg3eYJwDalrBM/OPS8/hcuhLKttq4k7I44QMAuJkLzRa4Wka0qQxZfp
+         Cypb5nDPzFGpYCfkv8/wjbKMI1WsKoH8M4SMozsDyT/6bCDaTYWHv7GvKmENz5923YgQ
+         wDCKgvobWP7Zpvr0tdr9fWozxEH9d+Wqc4hZnQFk4nGIzXbtNSgqB3cZP+g+kEWHY/E8
+         fcmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704968649; x=1705573449;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PjiY07DgS9NGEAkLzhjaqeWPDRIGprm9hhNvl6O95fI=;
+        b=douQ9Germ2JhGexW7pqr0z1JiOZnkiVrwW8QF/MXbs3OTt/tiNlbLmK7Mdo1Psh+8F
+         1HekdN7nln2k7vKx2LrB/nKq7ZX+WktoYY69+3FD0K83P7YtOH8VOCVlGEINottzQTrw
+         7kbubmD58h49XbZbD9ZWTztb0SfCtEg/BasI/5Sab+XCcKzXKwrW0Ce29bmuSwwzxKaO
+         nj9PkLOrfcTQ10Js5RR+eeaSowuIQny9f9a0zh0R5CsCQx5Eu7bf0PP33914aLYbbBnJ
+         Jw2eNDu7zrcKZRcLn7/Y0OiCVLNxk2K4boezA9MFKdDehLK54sllvDH0nsrbjrCMizMu
+         8XyQ==
+X-Gm-Message-State: AOJu0Yy4SbEjX05NBtL+LA4fdOq6ZgTaYt670FU2sZqCL58kN0O116+P
+	KzJNTASKtZv4Yap9HRATpbr7x2niaT4=
+X-Google-Smtp-Source: AGHT+IHpL15YWz+/ySbWPkUub6f25eF+aC9wqdEjR6dcWJ7B4UfAErj+2qLbqLfWqQWTJucmhi+dZQ==
+X-Received: by 2002:a17:906:b56:b0:a2a:c81:d80f with SMTP id v22-20020a1709060b5600b00a2a0c81d80fmr332489ejg.12.1704968648593;
+        Thu, 11 Jan 2024 02:24:08 -0800 (PST)
+Received: from ?IPV6:2a01:c23:bc57:a800:4da8:42cb:4e37:553d? (dynamic-2a01-0c23-bc57-a800-4da8-42cb-4e37-553d.c23.pool.telefonica.de. [2a01:c23:bc57:a800:4da8:42cb:4e37:553d])
+        by smtp.googlemail.com with ESMTPSA id ce2-20020a170906b24200b00a26a0145c5esm394999ejb.116.2024.01.11.02.24.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Jan 2024 02:24:08 -0800 (PST)
+Message-ID: <f0838b86-f008-4f14-8910-61b393d0190d@gmail.com>
+Date: Thu, 11 Jan 2024 11:24:08 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -45,83 +67,92 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 07/15] net: dsa: mt7530: do not run
- mt7530_setup_port5() if port 5 is disabled
+Subject: Re: [PATCH RESUBMIT] leds: trigger: netdev: add core support for hw
+ not supporting fallback to LED sw control
+To: Lee Jones <lee@kernel.org>
+Cc: Pavel Machek <pavel@ucw.cz>,
+ "linux-leds@vger.kernel.org" <linux-leds@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>
+References: <3fd5184c-3641-4b0b-b59a-f489ec69a6cd@gmail.com>
+ <7b6cf0fb-4c77-4088-b87b-5649cfaa697e@gmail.com>
+ <20240111084425.GJ7948@google.com>
 Content-Language: en-US
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Dan Carpenter <dan.carpenter@linaro.org>, Simon Horman
- <horms@kernel.org>, Daniel Golle <daniel@makrotopia.org>,
- Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
- Florian Fainelli <f.fainelli@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org,
- Frank Wunderlich <frank-w@public-files.de>,
- Bartel Eerdekens <bartel.eerdekens@constell8.be>, mithat.guner@xeront.com,
- erkin.bozoglu@xeront.com
-References: <a2826485-70a6-4ba7-89e1-59e68e622901@arinc9.com>
- <90fde560-054e-4188-b15c-df2e082d3e33@moroto.mountain>
- <20231207184015.u7uoyfhdxiyuw6hh@skbuf>
- <9b729dab-aebc-4c0c-a5e1-164845cd0948@suswa.mountain>
- <20231208184652.k2max4kf7r3fgksg@skbuf>
- <c3a0fc6a-825c-4de3-b5cf-b454a6d4d3cf@arinc9.com>
- <48b664fb-edf9-4170-abde-2eb99e04f0e5@suswa.mountain>
- <2ad136ed-be3a-407f-bf3c-5faf664b927c@arinc9.com>
- <20240109145740.3vbtkuowiwedz5hx@skbuf>
- <0a086b5f-b319-4f08-9513-a38c214e1da7@arinc9.com>
- <20240110182358.ci7pg7ipcbsjxqjf@skbuf>
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <20240110182358.ci7pg7ipcbsjxqjf@skbuf>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <20240111084425.GJ7948@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 10.01.2024 21:23, Vladimir Oltean wrote:
-> On Wed, Jan 10, 2024 at 10:26:54AM +0300, Arınç ÜNAL wrote:
->>> Are there existing systems that use PHY muxing? The possible problem I
->>> see is breaking those boards which have a phy-handle on gmac5, if the
->>> mt7530 driver is no longer going to modify its HWTRAP register.
+On 11.01.2024 09:44, Lee Jones wrote:
+> On Sun, 17 Dec 2023, Heiner Kallweit wrote:
+> 
+>> On 17.12.2023 19:46, Heiner Kallweit wrote:
+>>> If hw doesn't support sw control of the LED and we switch to a mode
+>>> not supported by hw, currently we get lots of errors because neither
+>>> brigthness_set() nor brithness_set_blocking() is set.
+>>> Deal with this by not falling back to sw control, and return
+>>> -EOPNOTSUPP to the user. Note that we still store the new mode.
+>>> This is needed in case an intermediate unsupported mode is necessary
+>>> to switch from one supported mode to another.
+>>>
+>>> Add a comment explaining how a driver for such hw is supposed to behave.
+>>>
+>>> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+>>> ---
 >>
->> Ah see, for PHY muxing, the driver actually wants the phy-handle to be put
->> on the SoC MAC, and the PHY to be defined on the SoC ethernet's MDIO bus.
->> We don't even define gmac5 as a port on the switch dt-bindings.
+>> For whatever reason this patch (original version and resubmit) doesn't
+>> show up on linux-leds patchwork. In netdev patchwork it's visible.
 > 
-> I noticed that from the code already. Maybe I shouldn't have said
-> "gmac5" when I meant "the GMAC attached to switch port 5, aka GMAC0".
-> I was under the impression that you were also using this slightly
-> incorrect terminology, to keep a numerical association between the CPU
-> port number and its directly attached GMAC.
+> Never used it.  Do you have a link?
 > 
->> While none of the DTs on the Linux repository utilise this, some of the
->> mt7621 DTs on OpenWrt do. The change in behaviour will only be that phy0/4
->> will be inaccessible from the SoC MAC's network interface. I de-facto
->> maintain the mt7621 device tree source files there. I intend to revert it
->> along with adding port 5 as a CPU port so that the conduit changing feature
->> becomes available.
-> 
-> If OpenWrt kernels are always shipped in tandem with updated device
-> trees (i.e. no Arm SystemReady IR platforms, where the DT is provided by
-> U-Boot), I won't oppose to retracting features described via DT if their
-> platform maintainers agree in a wide enough circle that the breakage is
-> manageable.
+This is the original patch in netdev patchwork
+https://patchwork.kernel.org/project/netdevbpf/patch/91e9f4c6-d869-45be-be72-ac49a3c3b818@gmail.com/
 
-I will see to this when the time comes.
+This is my patches in linux-leds patchwork. The one from Dec 6th is missing here.
+https://patches.linaro.org/project/linux-leds/list/?series=&submitter=6702&state=*&q=&archive=&delegate=
+However the resubmitted one showed up later.
 
-> 
-> BTW, besides OpenWrt, what other software is deployed on these SoCs
-> typically?
-
-Other than OpenWrt which is widely used for these SoCs for its ease of
-flashing and upgrading, compatibility with legacy U-boot versions that
-usually come with any vendor making a product out of these SoCs, I can only
-talk about what I deploy to run Linux. I use mainline U-Boot along with the
-device trees from the Linux repository to boot mainline Linux kernels with
-Buildroot as the filesystem.
-
-Arınç
 
