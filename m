@@ -1,59 +1,51 @@
-Return-Path: <netdev+bounces-63057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CD1182AF90
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 14:23:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F49882AFC4
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 14:36:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 320EC1C20B0F
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 13:23:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2AD40288C53
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 13:36:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E276017757;
-	Thu, 11 Jan 2024 13:19:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FE86179A9;
+	Thu, 11 Jan 2024 13:36:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lplxwR3L"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OU681YG8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB6981774C;
-	Thu, 11 Jan 2024 13:19:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E03DAC433C7;
-	Thu, 11 Jan 2024 13:19:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C3D715EB9;
+	Thu, 11 Jan 2024 13:36:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 430A5C433F1;
+	Thu, 11 Jan 2024 13:36:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1704979197;
-	bh=Py9GZW6bz3Ftsp/kWmIWKLoUxUT/lIEhBD9mMIzmipM=;
+	s=k20201202; t=1704980175;
+	bh=6/U0ODNJBNYX+WErisuDi9d/DTO/O/ktEPokR1uh/Ls=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lplxwR3L2EEdttM8HHLNSmBUrM7UmVYJ8JMB3tYBFb2pbmHM+jW/hnjg8kB0Uimnq
-	 z4k2rT+zgutaqfuShuj66anIZ74QRnXXjuvSE1kIXvTojHtgHgZjIqFJNFNN2ObjUH
-	 xG0uQ5jME6E9bZVTZHxP/qbyRh+mZhHm+7Yg1Dizpfd9hWpzu53d26RDNk5RA1z5CD
-	 kOzA4xNomfp6jMctsw8PVNWKlbVjl2LUP4P1nt8ypgHtsktI7/lHq0D1zKjvn+R0WL
-	 YeqK+ANinUKtrg9Px7dl9QTuIfDrCFuQ3XRa2Q9gmO1vmEGwgJyqqvRdT/2dA1jcm4
-	 gjdkPqmdct2bQ==
-Date: Thu, 11 Jan 2024 13:19:50 +0000
+	b=OU681YG8PC8jgd7JccnuO9u2ULxC7onfs4ibu6C+hev2EqDEDiUC6HKzUFTiCoZ5S
+	 3wfUn9iHy29qkMGDXCanmQ7HBnKHWGhX1YYSS+GS61wFgSntA3ekc+Bs64HwXAQzT6
+	 SLNoBJL3wuC6Amn8roXXvDeKo/7xfGPzZRikdlHz2ejbaCDkZ6GlHy+42phz5MUqrQ
+	 BTrTRYA6TgyDFoTlfzu/19UDbUQmfw1VE6SRkcBzCRZI3tOi9PoZX8F5BsRCJDfdD2
+	 brWfYl9EBWTavPHIWoVSXIpV18iAiNfOng5lp9Iqh7M08InK/nBQ5iOrrVhHpPP8py
+	 PBPT302QjeHpg==
+Date: Thu, 11 Jan 2024 13:36:09 +0000
 From: Simon Horman <horms@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	Edward Adam Davis <eadavis@qq.com>,
-	Pengfei Xu <pengfei.xu@intel.com>,
-	Markus Suvanto <markus.suvanto@gmail.com>,
-	Jeffrey E Altman <jaltman@auristor.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Wang Lei <wang840925@gmail.com>, Jeff Layton <jlayton@redhat.com>,
-	Steve French <smfrench@gmail.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-afs@lists.infradead.org, keyrings@vger.kernel.org,
-	linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] keys, dns: Fix size check of V1 server-list header
-Message-ID: <20240111131950.GB45291@kernel.org>
-References: <1850031.1704921100@warthog.procyon.org.uk>
+To: Wen Gu <guwen@linux.alibaba.com>
+Cc: wintera@linux.ibm.com, wenjia@linux.ibm.com, hca@linux.ibm.com,
+	gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	jaka@linux.ibm.com, borntraeger@linux.ibm.com, svens@linux.ibm.com,
+	alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 00/15] net/smc: implement loopback-ism used by
+ SMC-D
+Message-ID: <20240111133609.GC45291@kernel.org>
+References: <20240111120036.109903-1-guwen@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,25 +54,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1850031.1704921100@warthog.procyon.org.uk>
+In-Reply-To: <20240111120036.109903-1-guwen@linux.alibaba.com>
 
-On Wed, Jan 10, 2024 at 09:11:40PM +0000, David Howells wrote:
->     
-> Fix the size check added to dns_resolver_preparse() for the V1 server-list
-> header so that it doesn't give EINVAL if the size supplied is the same as
-> the size of the header struct (which should be valid).
-> 
-> This can be tested with:
-> 
->         echo -n -e '\0\0\01\xff\0\0' | keyctl padd dns_resolver desc @p
-> 
-> which will give "add_key: Invalid argument" without this fix.
-> 
-> Fixes: 1997b3cb4217 ("keys, dns: Fix missing size check of V1 server-list header")
-> Reported-by: Pengfei Xu <pengfei.xu@intel.com>
-> Link: https://lore.kernel.org/r/ZZ4fyY4r3rqgZL+4@xpf.sh.intel.com/
-> Signed-off-by: David Howells <dhowells@redhat.com>
+On Thu, Jan 11, 2024 at 08:00:21PM +0800, Wen Gu wrote:
+> This patch set acts as the second part of the new version of [1] (The
+> first part can be referred from [2]), the updated things of this version
+> are listed at the end.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+...
 
+Hi Wen Gu,
+
+unfortunately net-next is currently closed.
+
+[adapted from text by Jakub]
+
+## Form letter - net-next-closed
+
+The merge window for v6.8 has begun and therefore net-next is closed
+for new drivers, features, code refactoring and optimizations.
+We are currently accepting bug fixes only.
+
+Please repost when net-next reopens on or after 21st January.
+
+RFC patches sent for review only are obviously welcome at any time.
+
+See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+--
+pw-bot: defer
 
