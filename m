@@ -1,96 +1,51 @@
-Return-Path: <netdev+bounces-63011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1C6182AC06
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 11:31:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 911C782AC0C
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 11:32:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 81D641F23B9B
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 10:31:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 337A6B25C7A
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 10:32:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6E9E12E7B;
-	Thu, 11 Jan 2024 10:31:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAB9A14F65;
+	Thu, 11 Jan 2024 10:32:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SEbM+B6C"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EG094XNy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44E6514F61;
-	Thu, 11 Jan 2024 10:31:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5589cfe4b88so469900a12.2;
-        Thu, 11 Jan 2024 02:31:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704969110; x=1705573910; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=c96eHGeRMy0FA5YmUP0POLqi/6OSA4NTqHeMHP6wHhc=;
-        b=SEbM+B6CPnjiBr+8eUq2VFtygVxQbF+qShorEGwMkWbJpquAjGxKlI5WHh+8Dv7Yy3
-         oPmxeC9aND1pOzaA/aRxIj0usEAbXgu/MlugzvDBPxRCV2HnX/vpBJUqG6rcVH5rJgs1
-         QJ3bVuMLCrUNck3bCOCp3ubGvC06tElY+vc4ib4W56T+pxpCx/bOLhco6RjmyuVbkawB
-         U/xye9aGZtXwpjlVjPj5Wqdw7kMzY7Ku2/TODl2qgODnAdaq2vVRZOehTQ/w04wADLmx
-         VotUlHbU/5c/FcsqTGFalU9LpWMObbAuGp62XJ8eRQGUeGO1Hz1SG++C9kg/DFpVeCqY
-         JPmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704969110; x=1705573910;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=c96eHGeRMy0FA5YmUP0POLqi/6OSA4NTqHeMHP6wHhc=;
-        b=HKPepzRwLYVQKvZ84ena2AYSleeo4dPk9zeC0zcJwFPQ/boiA7t6PL0H1UOgLgblfk
-         5N9zh3lCHiiv3gS6Nr2wWXmgifocy/UKQt7upZsgnin7cfMs5KFwkCPuFBnF1/1uqDcF
-         WRMJDjCQ/hMef9v1ClPhs4HhJ7hLxyR2vInF0+973hBdFs8ozpPEN1Add8EOXjR7XuQs
-         Sr3cB52itfFYZQlyXl9inkHU81oH2ryPEWCaw+fCaf0AcB8QaujS0BsmoXlOMM60MBye
-         JsRMIG+swxkD9zbBIleLucHF/6RyzKRcAbre6eHqONk9RogGv8TdypXifo4UUBHcBzjS
-         gTGw==
-X-Gm-Message-State: AOJu0Yy/G62wXKCM5yiA0wvNwPpW7JdbYug2tMaXPKLSonkPIg1/U3kf
-	sjrt4EsJ8kUZJt94o+kwNP0=
-X-Google-Smtp-Source: AGHT+IG1bsDJjT+tCb6RsDzpYr+HZg8W8eOGQ5g6FgdP2xO4ZZeFbzslfzXkR//fI092SnqELgkksA==
-X-Received: by 2002:a17:907:842:b0:a28:fd0e:6051 with SMTP id ww2-20020a170907084200b00a28fd0e6051mr697695ejb.33.1704969110140;
-        Thu, 11 Jan 2024 02:31:50 -0800 (PST)
-Received: from skbuf ([188.25.255.36])
-        by smtp.gmail.com with ESMTPSA id g6-20020a170906c18600b00a2a9ddd15b8sm409460ejz.173.2024.01.11.02.31.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jan 2024 02:31:49 -0800 (PST)
-Date: Thu, 11 Jan 2024 12:31:46 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: Dan Carpenter <dan.carpenter@linaro.org>,
-	Simon Horman <horms@kernel.org>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
-	mithat.guner@xeront.com, erkin.bozoglu@xeront.com
-Subject: Re: [PATCH net-next 07/15] net: dsa: mt7530: do not run
- mt7530_setup_port5() if port 5 is disabled
-Message-ID: <20240111103146.t5fzr2wlw2tyrkkb@skbuf>
-References: <20231207184015.u7uoyfhdxiyuw6hh@skbuf>
- <9b729dab-aebc-4c0c-a5e1-164845cd0948@suswa.mountain>
- <20231208184652.k2max4kf7r3fgksg@skbuf>
- <c3a0fc6a-825c-4de3-b5cf-b454a6d4d3cf@arinc9.com>
- <48b664fb-edf9-4170-abde-2eb99e04f0e5@suswa.mountain>
- <2ad136ed-be3a-407f-bf3c-5faf664b927c@arinc9.com>
- <20240109145740.3vbtkuowiwedz5hx@skbuf>
- <0a086b5f-b319-4f08-9513-a38c214e1da7@arinc9.com>
- <20240110182358.ci7pg7ipcbsjxqjf@skbuf>
- <009fec43-0669-419e-a3a9-ce54c676a324@arinc9.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD70814F62;
+	Thu, 11 Jan 2024 10:32:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4F28C433C7;
+	Thu, 11 Jan 2024 10:32:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1704969160;
+	bh=ADF+g6oD8JBOYnP+86FGF8zatUYNiNLMIOszR08Mtwg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=EG094XNyhvQjjlZ2qfIMKJ6oft9lSavwVCo8x88lmYso00gFGJtfVX9qR6054WTfx
+	 HL9YbAu8yB0GNh2hfaHELTbTCm5cLtGejjFshVTDhoFE2SRz++VCs/9bOX4LZfKts0
+	 PkRaF1TO69Rng5TwQxuJ3r3FM57ThHdOKa+IzeMfs1EAUeGxYc5y8r/oOn9FCgJtWW
+	 r+Ufv5nwMksAhshNypFMZMtj/3RUCSfCaI4nb91uzzNeJhPy2cbks1MPYSdsJWlj9T
+	 oy6z846qfExOnhjWzsRxcjehtgK+Zza1/GwOwDWWgBjlT6MaH5VxguHz+6zYtF8e6k
+	 wwYA+tOjCBNcQ==
+Date: Thu, 11 Jan 2024 10:32:35 +0000
+From: Lee Jones <lee@kernel.org>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Pavel Machek <pavel@ucw.cz>,
+	"linux-leds@vger.kernel.org" <linux-leds@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>
+Subject: Re: [PATCH RESUBMIT] leds: trigger: netdev: add core support for hw
+ not supporting fallback to LED sw control
+Message-ID: <20240111103235.GA1665043@google.com>
+References: <3fd5184c-3641-4b0b-b59a-f489ec69a6cd@gmail.com>
+ <7b6cf0fb-4c77-4088-b87b-5649cfaa697e@gmail.com>
+ <20240111084425.GJ7948@google.com>
+ <f0838b86-f008-4f14-8910-61b393d0190d@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,21 +55,45 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <009fec43-0669-419e-a3a9-ce54c676a324@arinc9.com>
+In-Reply-To: <f0838b86-f008-4f14-8910-61b393d0190d@gmail.com>
 
-On Thu, Jan 11, 2024 at 01:22:12PM +0300, Arınç ÜNAL wrote:
-> > BTW, besides OpenWrt, what other software is deployed on these SoCs
-> > typically?
-> 
-> Other than OpenWrt which is widely used for these SoCs for its ease of
-> flashing and upgrading, compatibility with legacy U-boot versions that
-> usually come with any vendor making a product out of these SoCs, I can only
-> talk about what I deploy to run Linux. I use mainline U-Boot along with the
-> device trees from the Linux repository to boot mainline Linux kernels with
-> Buildroot as the filesystem.
-> 
-> Arınç
+On Thu, 11 Jan 2024, Heiner Kallweit wrote:
 
-I meant what other software (operating system) _instead_ of OpenWRT.
-I'm trying to figure out what other users of PHY muxing there might be.
+> On 11.01.2024 09:44, Lee Jones wrote:
+> > On Sun, 17 Dec 2023, Heiner Kallweit wrote:
+> > 
+> >> On 17.12.2023 19:46, Heiner Kallweit wrote:
+> >>> If hw doesn't support sw control of the LED and we switch to a mode
+> >>> not supported by hw, currently we get lots of errors because neither
+> >>> brigthness_set() nor brithness_set_blocking() is set.
+> >>> Deal with this by not falling back to sw control, and return
+> >>> -EOPNOTSUPP to the user. Note that we still store the new mode.
+> >>> This is needed in case an intermediate unsupported mode is necessary
+> >>> to switch from one supported mode to another.
+> >>>
+> >>> Add a comment explaining how a driver for such hw is supposed to behave.
+> >>>
+> >>> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> >>> ---
+> >>
+> >> For whatever reason this patch (original version and resubmit) doesn't
+> >> show up on linux-leds patchwork. In netdev patchwork it's visible.
+> > 
+> > Never used it.  Do you have a link?
+> > 
+> This is the original patch in netdev patchwork
+> https://patchwork.kernel.org/project/netdevbpf/patch/91e9f4c6-d869-45be-be72-ac49a3c3b818@gmail.com/
+> 
+> This is my patches in linux-leds patchwork. The one from Dec 6th is missing here.
+> https://patches.linaro.org/project/linux-leds/list/?series=&submitter=6702&state=*&q=&archive=&delegate=
+> However the resubmitted one showed up later.
+
+AFAIW, that's not the official Patchwork for LEDs.
+
+And as I say, I don't use it, so I'm not really in a position to comment.
+
+Do we still have something outstanding?
+
+-- 
+Lee Jones [李琼斯]
 
