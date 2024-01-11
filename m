@@ -1,267 +1,217 @@
-Return-Path: <netdev+bounces-63047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5D7782AE4E
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 13:05:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A919B82AEA5
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 13:23:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD5BB1C22952
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 12:05:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 267F728255D
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 12:23:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C0C832C95;
-	Thu, 11 Jan 2024 12:01:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77E29156FD;
+	Thu, 11 Jan 2024 12:23:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4FCC22093;
-	Thu, 11 Jan 2024 12:01:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R421e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0W-PfInN_1704974495;
-Received: from localhost(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W-PfInN_1704974495)
-          by smtp.aliyun-inc.com;
-          Thu, 11 Jan 2024 20:01:36 +0800
-From: Wen Gu <guwen@linux.alibaba.com>
-To: wintera@linux.ibm.com,
-	wenjia@linux.ibm.com,
-	hca@linux.ibm.com,
-	gor@linux.ibm.com,
-	agordeev@linux.ibm.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com,
-	svens@linux.ibm.com,
-	alibuda@linux.alibaba.com,
-	tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 15/15] net/smc: implement DMB-merged operations of loopback-ism
-Date: Thu, 11 Jan 2024 20:00:36 +0800
-Message-Id: <20240111120036.109903-16-guwen@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20240111120036.109903-1-guwen@linux.alibaba.com>
-References: <20240111120036.109903-1-guwen@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDD0C15AC1
+	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 12:23:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-35fc70bd879so42167375ab.3
+        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 04:23:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704975807; x=1705580607;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=C+Do2wLekHyOSCIJUK3h/DUjhFiTmTBs0NQIfxE6tXs=;
+        b=eX+A7oGjU7DzeUztMuJmdB/3kZWLnqmvCKCUUhXz1E9fvikaBmkZfHWlpd8z9DXfIP
+         DdjD+o/krFhjchq2IAxcmrl1EIjwoj8qKj/KRbDOSJqwBKM7g3ry640DpjtjzMOWnzNx
+         Db4KjZIv2SAvWkl1HiX82BRPzwMxy470mumqbAGXldWHC169lD9IDr4sgB+1obidnFU2
+         eNgeiYV4NdszMlbIbAxVNZRPPokx4Cbm8Ajssndze1r7m2KvgmIo3YRVJBujCYSoLDu1
+         vCbXl/xn9KBtufLPFxwvKy7ZvbOCvKcFiJQaQxkJpszC1IO6GRriz57IgF1dWZDEJbkf
+         AH/g==
+X-Gm-Message-State: AOJu0YzoLlp6/x1maIOY+5Dc21i71b01ap/V3xfLmZitQNJk05xwkQml
+	xkBOlRAWXHmHIQo5ACU0r5vkkBOEhqnk9sKTpyytDVmGa+Xg
+X-Google-Smtp-Source: AGHT+IEOL4YeE4wbgAcDOYdGqJ9PUjvQ4D6o/XE7rUpmKpy6r3CX4iz/JQLWeTrC8A4y69HqggnOTe+W/4Tn9uRXqjFw2QKY6yfQ
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:1ba4:b0:35f:affb:bd7b with SMTP id
+ n4-20020a056e021ba400b0035faffbbd7bmr139929ili.2.1704975807167; Thu, 11 Jan
+ 2024 04:23:27 -0800 (PST)
+Date: Thu, 11 Jan 2024 04:23:27 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000005644b8060eaa9d6e@google.com>
+Subject: [syzbot] [can?] memory leak in can_create (2)
+From: syzbot <syzbot+521ac15269e89d8546e8@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kernel@pengutronix.de, 
+	kuba@kernel.org, linux-can@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	mkl@pengutronix.de, netdev@vger.kernel.org, o.rempel@pengutronix.de, 
+	pabeni@redhat.com, robin@protonic.nl, socketcan@hartkopp.net, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-This implements operations related to merging sndbuf with peer DMB in
-loopback-ism. The DMB won't be unregistered until no sndbuf is attached
-to it.
+Hello,
 
-Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+syzbot found the following issue on:
+
+HEAD commit:    52b1853b080a Merge tag 'i2c-for-6.7-final' of git://git.ke..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=17315deee80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=dcb7609da8da79e3
+dashboard link: https://syzkaller.appspot.com/bug?extid=521ac15269e89d8546e8
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14aa5a41e80000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/0f9568a404dd/disk-52b1853b.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/e339a63284ed/vmlinux-52b1853b.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/8aae66c13215/bzImage-52b1853b.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+521ac15269e89d8546e8@syzkaller.appspotmail.com
+
+BUG: memory leak
+unreferenced object 0xffff88811f2c8400 (size 1024):
+  comm "syz-executor.6", pid 5653, jiffies 4295068840 (age 14.060s)
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    1d 00 07 41 00 00 00 00 00 00 00 00 00 00 00 00  ...A............
+  backtrace:
+    [<ffffffff8163470d>] kmemleak_alloc_recursive include/linux/kmemleak.h:42 [inline]
+    [<ffffffff8163470d>] slab_post_alloc_hook mm/slab.h:766 [inline]
+    [<ffffffff8163470d>] slab_alloc_node mm/slub.c:3478 [inline]
+    [<ffffffff8163470d>] __kmem_cache_alloc_node+0x2dd/0x3f0 mm/slub.c:3517
+    [<ffffffff8157f9db>] __do_kmalloc_node mm/slab_common.c:1006 [inline]
+    [<ffffffff8157f9db>] __kmalloc+0x4b/0x150 mm/slab_common.c:1020
+    [<ffffffff83eccc42>] kmalloc include/linux/slab.h:604 [inline]
+    [<ffffffff83eccc42>] sk_prot_alloc+0x112/0x1b0 net/core/sock.c:2082
+    [<ffffffff83ecffb6>] sk_alloc+0x36/0x2f0 net/core/sock.c:2135
+    [<ffffffff84535474>] can_create+0x194/0x320 net/can/af_can.c:158
+    [<ffffffff83ec53cf>] __sock_create+0x19f/0x2e0 net/socket.c:1571
+    [<ffffffff83ec8c58>] sock_create net/socket.c:1622 [inline]
+    [<ffffffff83ec8c58>] __sys_socket_create net/socket.c:1659 [inline]
+    [<ffffffff83ec8c58>] __sys_socket+0xb8/0x1a0 net/socket.c:1706
+    [<ffffffff83ec8d5b>] __do_sys_socket net/socket.c:1720 [inline]
+    [<ffffffff83ec8d5b>] __se_sys_socket net/socket.c:1718 [inline]
+    [<ffffffff83ec8d5b>] __x64_sys_socket+0x1b/0x20 net/socket.c:1718
+    [<ffffffff84b71e0f>] do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+    [<ffffffff84b71e0f>] do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:83
+    [<ffffffff84c0008b>] entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+BUG: memory leak
+unreferenced object 0xffff888120161490 (size 16):
+  comm "syz-executor.6", pid 5653, jiffies 4295068840 (age 14.060s)
+  hex dump (first 16 bytes):
+    00 c3 87 00 81 88 ff ff 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff8163470d>] kmemleak_alloc_recursive include/linux/kmemleak.h:42 [inline]
+    [<ffffffff8163470d>] slab_post_alloc_hook mm/slab.h:766 [inline]
+    [<ffffffff8163470d>] slab_alloc_node mm/slub.c:3478 [inline]
+    [<ffffffff8163470d>] __kmem_cache_alloc_node+0x2dd/0x3f0 mm/slub.c:3517
+    [<ffffffff8157f335>] kmalloc_trace+0x25/0x90 mm/slab_common.c:1098
+    [<ffffffff823a7a92>] kmalloc include/linux/slab.h:600 [inline]
+    [<ffffffff823a7a92>] kzalloc include/linux/slab.h:721 [inline]
+    [<ffffffff823a7a92>] apparmor_sk_alloc_security+0x52/0xd0 security/apparmor/lsm.c:997
+    [<ffffffff8236b887>] security_sk_alloc+0x47/0x80 security/security.c:4411
+    [<ffffffff83eccc5d>] sk_prot_alloc+0x12d/0x1b0 net/core/sock.c:2085
+    [<ffffffff83ecffb6>] sk_alloc+0x36/0x2f0 net/core/sock.c:2135
+    [<ffffffff84535474>] can_create+0x194/0x320 net/can/af_can.c:158
+    [<ffffffff83ec53cf>] __sock_create+0x19f/0x2e0 net/socket.c:1571
+    [<ffffffff83ec8c58>] sock_create net/socket.c:1622 [inline]
+    [<ffffffff83ec8c58>] __sys_socket_create net/socket.c:1659 [inline]
+    [<ffffffff83ec8c58>] __sys_socket+0xb8/0x1a0 net/socket.c:1706
+    [<ffffffff83ec8d5b>] __do_sys_socket net/socket.c:1720 [inline]
+    [<ffffffff83ec8d5b>] __se_sys_socket net/socket.c:1718 [inline]
+    [<ffffffff83ec8d5b>] __x64_sys_socket+0x1b/0x20 net/socket.c:1718
+    [<ffffffff84b71e0f>] do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+    [<ffffffff84b71e0f>] do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:83
+    [<ffffffff84c0008b>] entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+BUG: memory leak
+unreferenced object 0xffff88811fbf2000 (size 8192):
+  comm "syz-executor.6", pid 5653, jiffies 4295068840 (age 14.060s)
+  hex dump (first 32 bytes):
+    00 20 bf 1f 81 88 ff ff 00 20 bf 1f 81 88 ff ff  . ....... ......
+    00 00 00 00 00 00 00 00 00 00 5f 1b 81 88 ff ff  .........._.....
+  backtrace:
+    [<ffffffff8163470d>] kmemleak_alloc_recursive include/linux/kmemleak.h:42 [inline]
+    [<ffffffff8163470d>] slab_post_alloc_hook mm/slab.h:766 [inline]
+    [<ffffffff8163470d>] slab_alloc_node mm/slub.c:3478 [inline]
+    [<ffffffff8163470d>] __kmem_cache_alloc_node+0x2dd/0x3f0 mm/slub.c:3517
+    [<ffffffff8157f335>] kmalloc_trace+0x25/0x90 mm/slab_common.c:1098
+    [<ffffffff845437c9>] kmalloc include/linux/slab.h:600 [inline]
+    [<ffffffff845437c9>] kzalloc include/linux/slab.h:721 [inline]
+    [<ffffffff845437c9>] j1939_priv_create net/can/j1939/main.c:135 [inline]
+    [<ffffffff845437c9>] j1939_netdev_start+0x159/0x6f0 net/can/j1939/main.c:272
+    [<ffffffff8454540e>] j1939_sk_bind+0x21e/0x550 net/can/j1939/socket.c:485
+    [<ffffffff83ec926c>] __sys_bind+0x11c/0x130 net/socket.c:1847
+    [<ffffffff83ec929c>] __do_sys_bind net/socket.c:1858 [inline]
+    [<ffffffff83ec929c>] __se_sys_bind net/socket.c:1856 [inline]
+    [<ffffffff83ec929c>] __x64_sys_bind+0x1c/0x20 net/socket.c:1856
+    [<ffffffff84b71e0f>] do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+    [<ffffffff84b71e0f>] do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:83
+    [<ffffffff84c0008b>] entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+BUG: memory leak
+unreferenced object 0xffff888120daf700 (size 240):
+  comm "syz-executor.6", pid 5653, jiffies 4295068840 (age 14.060s)
+  hex dump (first 32 bytes):
+    68 aa 12 1e 81 88 ff ff 68 aa 12 1e 81 88 ff ff  h.......h.......
+    00 00 5f 1b 81 88 ff ff 00 84 2c 1f 81 88 ff ff  .._.......,.....
+  backtrace:
+    [<ffffffff81632177>] kmemleak_alloc_recursive include/linux/kmemleak.h:42 [inline]
+    [<ffffffff81632177>] slab_post_alloc_hook mm/slab.h:766 [inline]
+    [<ffffffff81632177>] slab_alloc_node mm/slub.c:3478 [inline]
+    [<ffffffff81632177>] kmem_cache_alloc_node+0x2c7/0x450 mm/slub.c:3523
+    [<ffffffff83edcb9f>] __alloc_skb+0x1ef/0x230 net/core/skbuff.c:641
+    [<ffffffff83ee6111>] alloc_skb include/linux/skbuff.h:1286 [inline]
+    [<ffffffff83ee6111>] alloc_skb_with_frags+0x71/0x3a0 net/core/skbuff.c:6334
+    [<ffffffff83ed0c4b>] sock_alloc_send_pskb+0x3ab/0x3e0 net/core/sock.c:2787
+    [<ffffffff84545de8>] sock_alloc_send_skb include/net/sock.h:1884 [inline]
+    [<ffffffff84545de8>] j1939_sk_alloc_skb net/can/j1939/socket.c:864 [inline]
+    [<ffffffff84545de8>] j1939_sk_send_loop net/can/j1939/socket.c:1128 [inline]
+    [<ffffffff84545de8>] j1939_sk_sendmsg+0x2f8/0x7f0 net/can/j1939/socket.c:1263
+    [<ffffffff83ec6c92>] sock_sendmsg_nosec net/socket.c:730 [inline]
+    [<ffffffff83ec6c92>] __sock_sendmsg+0x52/0xa0 net/socket.c:745
+    [<ffffffff83ec72f5>] ____sys_sendmsg+0x365/0x470 net/socket.c:2586
+    [<ffffffff83ecb019>] ___sys_sendmsg+0xc9/0x130 net/socket.c:2640
+    [<ffffffff83ecb1c6>] __sys_sendmsg+0xa6/0x120 net/socket.c:2669
+    [<ffffffff84b71e0f>] do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+    [<ffffffff84b71e0f>] do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:83
+    [<ffffffff84c0008b>] entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+
+
 ---
- net/smc/smc_loopback.c | 101 +++++++++++++++++++++++++++++++++++++++--
- net/smc/smc_loopback.h |   4 ++
- 2 files changed, 102 insertions(+), 3 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/net/smc/smc_loopback.c b/net/smc/smc_loopback.c
-index bfbb346ef01a..296a4d1f1a33 100644
---- a/net/smc/smc_loopback.c
-+++ b/net/smc/smc_loopback.c
-@@ -298,6 +298,7 @@ static int smc_lo_register_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb,
- 	}
- 	dmb_node->len = dmb->dmb_len;
- 	dmb_node->dma_addr = SMC_DMA_ADDR_INVALID;
-+	refcount_set(&dmb_node->refcnt, 1);
- 
- again:
- 	/* add new dmb into hash table */
-@@ -311,6 +312,7 @@ static int smc_lo_register_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb,
- 	}
- 	hash_add(ldev->dmb_ht, &dmb_node->list, dmb_node->token);
- 	write_unlock(&ldev->dmb_ht_lock);
-+	atomic_inc(&ldev->dmb_cnt);
- 	SMC_LO_STAT_DMBS_INC(ldev);
- 
- 	dmb->sba_idx = dmb_node->sba_idx;
-@@ -333,8 +335,8 @@ static int smc_lo_unregister_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb)
- 	struct smc_lo_dmb_node *dmb_node = NULL, *tmp_node;
- 	struct smc_lo_dev *ldev = smcd->priv;
- 
--	/* remove dmb from hash table */
--	write_lock(&ldev->dmb_ht_lock);
-+	/* find dmb from hash table */
-+	read_lock(&ldev->dmb_ht_lock);
- 	hash_for_each_possible(ldev->dmb_ht, tmp_node, list, dmb->dmb_tok) {
- 		if (tmp_node->token == dmb->dmb_tok) {
- 			dmb_node = tmp_node;
-@@ -342,9 +344,18 @@ static int smc_lo_unregister_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb)
- 		}
- 	}
- 	if (!dmb_node) {
--		write_unlock(&ldev->dmb_ht_lock);
-+		read_unlock(&ldev->dmb_ht_lock);
- 		return -EINVAL;
- 	}
-+	read_unlock(&ldev->dmb_ht_lock);
-+
-+	/* wait for peer sndbuf to detach from this dmb */
-+	if (!refcount_dec_and_test(&dmb_node->refcnt))
-+		wait_event(ldev->dmbs_release,
-+			   !refcount_read(&dmb_node->refcnt));
-+
-+	/* remove dmb from hash table */
-+	write_lock(&ldev->dmb_ht_lock);
- 	hash_del(&dmb_node->list);
- 	write_unlock(&ldev->dmb_ht_lock);
- 
-@@ -353,6 +364,73 @@ static int smc_lo_unregister_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb)
- 	kfree(dmb_node);
- 	SMC_LO_STAT_DMBS_DEC(ldev);
- 
-+	if (atomic_dec_and_test(&ldev->dmb_cnt))
-+		wake_up(&ldev->ldev_release);
-+	return 0;
-+}
-+
-+static int smc_lo_support_dmb_nocopy(struct smcd_dev *smcd)
-+{
-+	struct smc_lo_dev *ldev = smcd->priv;
-+
-+	return (ldev->dmb_copy == SMC_LO_DMB_NOCOPY);
-+}
-+
-+static int smc_lo_attach_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb)
-+{
-+	struct smc_lo_dmb_node *dmb_node = NULL, *tmp_node;
-+	struct smc_lo_dev *ldev = smcd->priv;
-+
-+	/* find dmb_node according to dmb->dmb_tok */
-+	read_lock(&ldev->dmb_ht_lock);
-+	hash_for_each_possible(ldev->dmb_ht, tmp_node, list, dmb->dmb_tok) {
-+		if (tmp_node->token == dmb->dmb_tok) {
-+			dmb_node = tmp_node;
-+			break;
-+		}
-+	}
-+	if (!dmb_node) {
-+		read_unlock(&ldev->dmb_ht_lock);
-+		return -EINVAL;
-+	}
-+	read_unlock(&ldev->dmb_ht_lock);
-+
-+	if (!refcount_inc_not_zero(&dmb_node->refcnt))
-+		/* the dmb is being unregistered, but has
-+		 * not been removed from the hash table.
-+		 */
-+		return -EINVAL;
-+
-+	/* provide dmb information */
-+	dmb->sba_idx = dmb_node->sba_idx;
-+	dmb->dmb_tok = dmb_node->token;
-+	dmb->cpu_addr = dmb_node->cpu_addr;
-+	dmb->dma_addr = dmb_node->dma_addr;
-+	dmb->dmb_len = dmb_node->len;
-+	return 0;
-+}
-+
-+static int smc_lo_detach_dmb(struct smcd_dev *smcd, u64 token)
-+{
-+	struct smc_lo_dmb_node *dmb_node = NULL, *tmp_node;
-+	struct smc_lo_dev *ldev = smcd->priv;
-+
-+	/* find dmb_node according to dmb->dmb_tok */
-+	read_lock(&ldev->dmb_ht_lock);
-+	hash_for_each_possible(ldev->dmb_ht, tmp_node, list, token) {
-+		if (tmp_node->token == token) {
-+			dmb_node = tmp_node;
-+			break;
-+		}
-+	}
-+	if (!dmb_node) {
-+		read_unlock(&ldev->dmb_ht_lock);
-+		return -EINVAL;
-+	}
-+	read_unlock(&ldev->dmb_ht_lock);
-+
-+	if (refcount_dec_and_test(&dmb_node->refcnt))
-+		wake_up_all(&ldev->dmbs_release);
- 	return 0;
- }
- 
-@@ -389,6 +467,14 @@ static int smc_lo_move_data(struct smcd_dev *smcd, u64 dmb_tok,
- 	struct smc_lo_dmb_node *rmb_node = NULL, *tmp_node;
- 	struct smc_lo_dev *ldev = smcd->priv;
- 
-+	/* if sndbuf is merged with peer DMB, there is
-+	 * no need to copy data from sndbuf to peer DMB.
-+	 */
-+	if (!sf && smc_lo_support_dmb_nocopy(smcd)) {
-+		SMC_LO_STAT_XFER_BYTES(ldev, size);
-+		return 0;
-+	}
-+
- 	read_lock(&ldev->dmb_ht_lock);
- 	hash_for_each_possible(ldev->dmb_ht, tmp_node, list, dmb_tok) {
- 		if (tmp_node->token == dmb_tok) {
-@@ -444,6 +530,9 @@ static const struct smcd_ops lo_ops = {
- 	.query_remote_gid = smc_lo_query_rgid,
- 	.register_dmb = smc_lo_register_dmb,
- 	.unregister_dmb = smc_lo_unregister_dmb,
-+	.support_dmb_nocopy = smc_lo_support_dmb_nocopy,
-+	.attach_dmb = smc_lo_attach_dmb,
-+	.detach_dmb = smc_lo_detach_dmb,
- 	.add_vlan_id = smc_lo_add_vlan_id,
- 	.del_vlan_id = smc_lo_del_vlan_id,
- 	.set_vlan_required = smc_lo_set_vlan_required,
-@@ -529,12 +618,18 @@ static int smc_lo_dev_init(struct smc_lo_dev *ldev)
- 	smc_lo_generate_id(ldev);
- 	rwlock_init(&ldev->dmb_ht_lock);
- 	hash_init(ldev->dmb_ht);
-+	atomic_set(&ldev->dmb_cnt, 0);
-+	init_waitqueue_head(&ldev->dmbs_release);
-+	init_waitqueue_head(&ldev->ldev_release);
-+
- 	return smcd_lo_register_dev(ldev);
- }
- 
- static void smc_lo_dev_exit(struct smc_lo_dev *ldev)
- {
- 	smcd_lo_unregister_dev(ldev);
-+	if (atomic_read(&ldev->dmb_cnt))
-+		wait_event(ldev->ldev_release, !atomic_read(&ldev->dmb_cnt));
- }
- 
- static void smc_lo_dev_release(struct device *dev)
-diff --git a/net/smc/smc_loopback.h b/net/smc/smc_loopback.h
-index 7ecb4a35eb36..19a1eace2255 100644
---- a/net/smc/smc_loopback.h
-+++ b/net/smc/smc_loopback.h
-@@ -40,6 +40,7 @@ struct smc_lo_dmb_node {
- 	u32 sba_idx;
- 	void *cpu_addr;
- 	dma_addr_t dma_addr;
-+	refcount_t refcnt;
- };
- 
- struct smc_lo_dev_stats64 {
-@@ -56,9 +57,12 @@ struct smc_lo_dev {
- 	u16 chid;
- 	struct smcd_gid local_gid;
- 	struct smc_lo_dev_stats64 __percpu *stats;
-+	atomic_t dmb_cnt;
- 	rwlock_t dmb_ht_lock;
- 	DECLARE_BITMAP(sba_idx_mask, SMC_LO_MAX_DMBS);
- 	DECLARE_HASHTABLE(dmb_ht, SMC_LO_DMBS_HASH_BITS);
-+	wait_queue_head_t dmbs_release;
-+	wait_queue_head_t ldev_release;
- };
- 
- #define SMC_LO_STAT_SUB(ldev, key, val) \
--- 
-2.32.0.3.g01195cf9f
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
