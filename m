@@ -1,128 +1,336 @@
-Return-Path: <netdev+bounces-62998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBEB382AAAC
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 10:20:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D4B982AB21
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 10:42:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 715351F2873D
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 09:20:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E368B2305E
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 09:41:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0112E10A0D;
-	Thu, 11 Jan 2024 09:19:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10161111A5;
+	Thu, 11 Jan 2024 09:41:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lhy2zTgw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bW7m1RzN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B51F11C94;
-	Thu, 11 Jan 2024 09:19:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32DDF11194
+	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 09:41:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-336c8ab0b20so4486083f8f.1;
-        Thu, 11 Jan 2024 01:19:41 -0800 (PST)
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-40e549adb7dso24170425e9.2
+        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 01:41:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1704964779; x=1705569579; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=0pKz3Yu/YSA1o0yNgREr/FozQgVaAcHWi4yqSk6JGiI=;
-        b=Lhy2zTgwI0aWFhzxXCDXXyHeqUxtZOLNoCQLWRYO1A82hbJgpdKPUwh3vTf+C0UJ7E
-         lxOybd+fsvkeC4EQXBDwh770SPJCiCnf3zCVCzNolsukcb1j4ToQQMIqmFrR7KmAKFXt
-         R95uN1ZJ8UI/O9LnlBTegnlpuaq2SnWE3K9rhjmWZX2ev1fBxZWzSPkwmV562zUKB0c6
-         YOi7f8rb0C2SI+gdd0aJcXSYwI5h95kt13MwS7rslEeJ8p5ESbcFbjB4CxwaLCGqpgDv
-         RdClX13FcZZJJJy9usAU8cFsJbAf0PexOFEJLUikvzl2spq9brtsv3OcyCXF03GCvsrz
-         iwzg==
+        d=gmail.com; s=20230601; t=1704966111; x=1705570911; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=OjJJwhrUU78cTcBoh5uKmR3KsNd0G61piVNlDfH4Rks=;
+        b=bW7m1RzNRMR6nyo78T4F2TYTQQi/3qXuZmSO+quoiJTczjAdNYqUN/CsScuh4//AAo
+         JmjgFSJ1lCXhW3z4gVAKF7mK9PLI7ipab4VQ/HKtTjB3nWBlSJELS+ThINGL1HuevUOc
+         W8zfqkUpn9lyhqfOVsC0bB8DJ/XvfEI9Uwlcq2EGsFJn4kFCz5tQKb9dAyMod9WZvqtZ
+         mjMcnCpl1wX71YXt7rigldBGNPkC+M2nSoFQQVSKqbJKbzjChnn1JfqugEsdFT5X9kke
+         a1txaRIMYSdMZ9O9BmSMzWMbT+qhYF5xuwMNMK8e4pSUwfq8miY0+zP45vxrWKPJrocY
+         e+lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1704964779; x=1705569579;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0pKz3Yu/YSA1o0yNgREr/FozQgVaAcHWi4yqSk6JGiI=;
-        b=WYphs3u7HbW5/nPAH6Oc/RZtGUdLVaixEQnt7zq05IOCjkS2tY7HlfwhBo7Jko2f0t
-         gs6jTfQpwZvL7JLPVOCZfdr9rXpx39Y5h9+Ckbsgf4L8lgrYsJq4N6PkE+BBBFschg9S
-         f6PS/y0eBrVoq6a2Wx0rKxQcQdChx4OQci8tomQ9A/GVDkjGK37nbeAq89z7r1QnePlS
-         k7iDjKoiuT4vnG0iw7SWVdbiLuI/tWHAG1VcGKhzbO+hciO/ZahbyReqiqPi7+ZkAPdL
-         BPPHxrXz3lsa5QKEIdjsxui8qVWGPTd5pdkDe5f6zKQ2ZFEiiPJOXKjnNWOasFxUNxGd
-         ZuNg==
-X-Gm-Message-State: AOJu0YzrtQxvJKi4Yo783/sDSqOVmFq2tTtihmYsxuve1QlQc46+o+zP
-	IECXLoBKsphSirFM5gzD/iA=
-X-Google-Smtp-Source: AGHT+IHaL1yXwN7SnYCBfwLdpKbQICRvcgvZxb0jEt+hbIXtiaPUdMz70UaWXbbgf21g3tnTfyJ7Eg==
-X-Received: by 2002:adf:edca:0:b0:336:c876:a407 with SMTP id v10-20020adfedca000000b00336c876a407mr488759wro.3.1704964779334;
-        Thu, 11 Jan 2024 01:19:39 -0800 (PST)
+        d=1e100.net; s=20230601; t=1704966111; x=1705570911;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OjJJwhrUU78cTcBoh5uKmR3KsNd0G61piVNlDfH4Rks=;
+        b=G4JK5JT+L/ZJOIN2otMVNMyX6EYBLA8s/fygM1i7SjtX27MA7HCSXt2fUTrDDWiSHn
+         WaeFiauiyrwp6LtQ05A7WBxZ7K+kpFlcFTryEhGGqpc0/I5AmEbKKnXfiDkCDXdPmDTQ
+         rObWZ+z3QZRcM307nyTgQO6fdNlGivEi99155pcxgGG6k7Ep7ClwmiAXydbf1klWNPS7
+         33GiLbujYp0vBMEo6jrRlxKs546m+62Ts6C9l4zR/r9xafZVhzNhrDTtwYMc3pFHanvu
+         ORW7HDzkDej2VInplP0QPDWqlug7P+48TVgXWc5/dtzMjRYVkoASKOGvlOX6T1/gUuo2
+         Vqbg==
+X-Gm-Message-State: AOJu0YxmUs+2dUGA/pmZ+Ddu+DZHopigozUfVbjg9OPiXkBy0zYpxZDs
+	k2TbSY3CY46Waqn4Aa0BMhY=
+X-Google-Smtp-Source: AGHT+IGlrdDG/cUw0/8ojNB6NGYZompS4NTkweIIwfIV5talHVMDBcAH7x/oNabs7RsRLYYMfzcyAA==
+X-Received: by 2002:a05:600c:6987:b0:40d:877d:ca9 with SMTP id fp7-20020a05600c698700b0040d877d0ca9mr230839wmb.104.1704966111126;
+        Thu, 11 Jan 2024 01:41:51 -0800 (PST)
 Received: from skbuf ([188.25.255.36])
-        by smtp.gmail.com with ESMTPSA id b7-20020adfe647000000b0033763a9ea2dsm692905wrn.63.2024.01.11.01.19.37
+        by smtp.gmail.com with ESMTPSA id bg23-20020a05600c3c9700b0040d91fa270fsm1226276wmb.36.2024.01.11.01.41.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jan 2024 01:19:39 -0800 (PST)
-Date: Thu, 11 Jan 2024 11:19:36 +0200
+        Thu, 11 Jan 2024 01:41:50 -0800 (PST)
+Date: Thu, 11 Jan 2024 11:41:48 +0200
 From: Vladimir Oltean <olteanv@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Richard van Schagen <richard@routerhints.com>,
-	Richard van Schagen <vschagen@cs.com>,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
-	erkin.bozoglu@xeront.com, mithat.guner@xeront.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next 08/30] net: dsa: mt7530: change p{5,6}_interface
- to p{5,6}_configured
-Message-ID: <20240111091936.y3el2yp5tndcnkzn@skbuf>
-References: <0542e150-5ff4-5f74-361a-1a531d19eb7d@arinc9.com>
- <7c224663-7588-988d-56cb-b9de5b43b504@arinc9.com>
- <20230610175553.hle2josd5s5jfhjo@skbuf>
- <22fba48c-054d-ff0a-ae2c-b38f192b26f7@arinc9.com>
- <9308fa1a-6de3-490b-9aeb-eb207b0432df@arinc9.com>
- <9308fa1a-6de3-490b-9aeb-eb207b0432df@arinc9.com>
- <20240110142721.vuthnnwhmuvghiw4@skbuf>
- <b47311f8-315d-46d9-bd5b-757141708a3f@arinc9.com>
- <20240110180525.wwxkkoqam37oqm2f@skbuf>
- <ZZ7ib5WWyH4TyirS@shell.armlinux.org.uk>
+To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, alsi@bang-olufsen.dk,
+	andrew@lunn.ch, f.fainelli@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	arinc.unal@arinc9.com
+Subject: Re: [PATCH net-next v3 3/8] net: dsa: realtek: common realtek-dsa
+ module
+Message-ID: <20240111094148.jltccq4r6b42wbgq@skbuf>
+References: <20231223005253.17891-1-luizluca@gmail.com>
+ <20231223005253.17891-4-luizluca@gmail.com>
+ <20240108140002.wpf6zj7qv2ftx476@skbuf>
+ <CAJq09z6g+qTbzzaFAy94aV6HuESAeb4aLOUHWdUkOB4+xR_vDg@mail.gmail.com>
+ <20240109123658.vqftnqsxyd64ik52@skbuf>
+ <CAJq09z6JF0K==fO53RcimoRgujHjEkvmDKWGK3pYQAig58j__g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZZ7ib5WWyH4TyirS@shell.armlinux.org.uk>
+In-Reply-To: <CAJq09z6JF0K==fO53RcimoRgujHjEkvmDKWGK3pYQAig58j__g@mail.gmail.com>
 
-On Wed, Jan 10, 2024 at 06:31:11PM +0000, Russell King (Oracle) wrote:
-> On Wed, Jan 10, 2024 at 08:05:25PM +0200, Vladimir Oltean wrote:
-> > On Wed, Jan 10, 2024 at 08:15:20PM +0300, Arınç ÜNAL wrote:
-> > > __builtin_return_address(1) doesn't seem to work. I'm running this on arm64.
-> > 
-> > I can't tell you why either, I'm sorry. I can just point to the
-> > documentation, which does specify that "On some machines it may be
-> > impossible to determine the return address of any function other than
-> > the current one". If somebody knows what this depends on, feel free to
-> > interject.
-> > https://gcc.gnu.org/onlinedocs/gcc/Return-Address.html
-> > 
-> > On my NXP LS1028A (also arm64) plus clang-16 compiler, __builtin_return_address()
-> > does work with multiple nesting levels.
+On Thu, Jan 11, 2024 at 03:20:10AM -0300, Luiz Angelo Daros de Luca wrote:
+> IMHO, the constant regmap_config looks cleaner than a sequence of
+> assignments. However, we don't actually need 4 of them.
+> As we already have a writable regmap_config in stack (to assign
+> lock_arg), we can reuse the same struct and simply set
+> disable_locking.
+> It makes the regmap ignore all locking fields and we don't even need
+> to unset them for map_nolock. Something like this:
 > 
-> gcc will probably need to be using frame pointers so it can walk the
-> stack, if gcc even implements non-zero values to
-> __builtin_return_address(). Without frame pointers, it would need an
-> unwinder.
+> realtek_common_probe(struct device *dev, const struct regmap_config *rc_base)
+> {
+> 
+>        (...)
+> 
+>        rc = *rc_base;
+>        rc.lock_arg = priv;
+>        priv->map = devm_regmap_init(dev, NULL, priv, &rc);
+>        if (IS_ERR(priv->map)) {
+>                ret = PTR_ERR(priv->map);
+>                dev_err(dev, "regmap init failed: %d\n", ret);
+>                return ERR_PTR(ret);
+>        }
+> 
+>        rc.disable_locking = true;
+>        priv->map_nolock = devm_regmap_init(dev, NULL, priv, &rc);
+>        if (IS_ERR(priv->map_nolock)) {
+>                ret = PTR_ERR(priv->map_nolock);
+>                dev_err(dev, "regmap init failed: %d\n", ret);
+>                return ERR_PTR(ret);
+>        }
+> 
+> It has a cleaner function signature and we can remove the _nolock
+> constants as well.
+> 
+> The regmap configs still have some room for improvement, like moving
+> from interfaces to variants, but this series is already too big. We
+> can leave that as it is.
 
-Yeah, I guess it's a gcc limitation. I recompiled the kernel for the same
-platform with gcc 11.2 from Arm, and I get the same result as Arınç now.
+I was thinking something like this, does it look bad?
+
+From 2e462507171ed0fd8393598842dc0f7e6c50d499 Mon Sep 17 00:00:00 2001
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+Date: Thu, 11 Jan 2024 11:38:17 +0200
+Subject: [PATCH] realtek_common_info
+
+Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+---
+ drivers/net/dsa/realtek/realtek-common.c | 35 ++++++++++++++++++------
+ drivers/net/dsa/realtek/realtek-common.h |  9 ++++--
+ drivers/net/dsa/realtek/realtek-mdio.c   | 27 ++----------------
+ drivers/net/dsa/realtek/realtek-smi.c    | 35 ++++--------------------
+ 4 files changed, 41 insertions(+), 65 deletions(-)
+
+diff --git a/drivers/net/dsa/realtek/realtek-common.c b/drivers/net/dsa/realtek/realtek-common.c
+index 80b37e5fe780..bd6b04922b6d 100644
+--- a/drivers/net/dsa/realtek/realtek-common.c
++++ b/drivers/net/dsa/realtek/realtek-common.c
+@@ -22,10 +22,21 @@ void realtek_common_unlock(void *ctx)
+ EXPORT_SYMBOL_GPL(realtek_common_unlock);
+ 
+ struct realtek_priv *
+-realtek_common_probe(struct device *dev, struct regmap_config rc,
+-		     struct regmap_config rc_nolock)
++realtek_common_probe(struct device *dev,
++		     const struct realtek_common_info *info)
+ {
+ 	const struct realtek_variant *var;
++	struct regmap_config rc = {
++		.reg_bits = 10, /* A4..A0 R4..R0 */
++		.val_bits = 16,
++		.reg_stride = 1,
++		/* PHY regs are at 0x8000 */
++		.max_register = 0xffff,
++		.reg_format_endian = REGMAP_ENDIAN_BIG,
++		.reg_read = info->reg_read,
++		.reg_write = info->reg_write,
++		.cache_type = REGCACHE_NONE,
++	};
+ 	struct realtek_priv *priv;
+ 	int ret;
+ 
+@@ -40,17 +51,23 @@ realtek_common_probe(struct device *dev, struct regmap_config rc,
+ 
+ 	mutex_init(&priv->map_lock);
+ 
+-	rc.lock_arg = priv;
+-	priv->map = devm_regmap_init(dev, NULL, priv, &rc);
+-	if (IS_ERR(priv->map)) {
+-		ret = PTR_ERR(priv->map);
++	/* Initialize the non-locking regmap first */
++	rc.disable_locking = true;
++	priv->map_nolock = devm_regmap_init(dev, NULL, priv, &rc);
++	if (IS_ERR(priv->map_nolock)) {
++		ret = PTR_ERR(priv->map_nolock);
+ 		dev_err(dev, "regmap init failed: %d\n", ret);
+ 		return ERR_PTR(ret);
+ 	}
+ 
+-	priv->map_nolock = devm_regmap_init(dev, NULL, priv, &rc_nolock);
+-	if (IS_ERR(priv->map_nolock)) {
+-		ret = PTR_ERR(priv->map_nolock);
++	/* Then the locking regmap */
++	rc.disable_locking = false;
++	rc.lock = realtek_common_lock;
++	rc.unlock = realtek_common_unlock;
++	rc.lock_arg = priv;
++	priv->map = devm_regmap_init(dev, NULL, priv, &rc);
++	if (IS_ERR(priv->map)) {
++		ret = PTR_ERR(priv->map);
+ 		dev_err(dev, "regmap init failed: %d\n", ret);
+ 		return ERR_PTR(ret);
+ 	}
+diff --git a/drivers/net/dsa/realtek/realtek-common.h b/drivers/net/dsa/realtek/realtek-common.h
+index 518d091ff496..71fc43d8d90a 100644
+--- a/drivers/net/dsa/realtek/realtek-common.h
++++ b/drivers/net/dsa/realtek/realtek-common.h
+@@ -5,11 +5,16 @@
+ 
+ #include <linux/regmap.h>
+ 
++struct realtek_common_info {
++	int (*reg_read)(void *ctx, u32 reg, u32 *val);
++	int (*reg_write)(void *ctx, u32 reg, u32 val);
++};
++
+ void realtek_common_lock(void *ctx);
+ void realtek_common_unlock(void *ctx);
+ struct realtek_priv *
+-realtek_common_probe(struct device *dev, struct regmap_config rc,
+-		     struct regmap_config rc_nolock);
++realtek_common_probe(struct device *dev,
++		     const struct realtek_common_info *info);
+ int realtek_common_register_switch(struct realtek_priv *priv);
+ void realtek_common_remove(struct realtek_priv *priv);
+ 
+diff --git a/drivers/net/dsa/realtek/realtek-mdio.c b/drivers/net/dsa/realtek/realtek-mdio.c
+index 1eed09ab3aa1..8725cd1b027b 100644
+--- a/drivers/net/dsa/realtek/realtek-mdio.c
++++ b/drivers/net/dsa/realtek/realtek-mdio.c
+@@ -101,31 +101,9 @@ static int realtek_mdio_read(void *ctx, u32 reg, u32 *val)
+ 	return ret;
+ }
+ 
+-static const struct regmap_config realtek_mdio_regmap_config = {
+-	.reg_bits = 10, /* A4..A0 R4..R0 */
+-	.val_bits = 16,
+-	.reg_stride = 1,
+-	/* PHY regs are at 0x8000 */
+-	.max_register = 0xffff,
+-	.reg_format_endian = REGMAP_ENDIAN_BIG,
++static const struct realtek_common_info realtek_mdio_info = {
+ 	.reg_read = realtek_mdio_read,
+ 	.reg_write = realtek_mdio_write,
+-	.cache_type = REGCACHE_NONE,
+-	.lock = realtek_common_lock,
+-	.unlock = realtek_common_unlock,
+-};
+-
+-static const struct regmap_config realtek_mdio_nolock_regmap_config = {
+-	.reg_bits = 10, /* A4..A0 R4..R0 */
+-	.val_bits = 16,
+-	.reg_stride = 1,
+-	/* PHY regs are at 0x8000 */
+-	.max_register = 0xffff,
+-	.reg_format_endian = REGMAP_ENDIAN_BIG,
+-	.reg_read = realtek_mdio_read,
+-	.reg_write = realtek_mdio_write,
+-	.cache_type = REGCACHE_NONE,
+-	.disable_locking = true,
+ };
+ 
+ int realtek_mdio_probe(struct mdio_device *mdiodev)
+@@ -134,8 +112,7 @@ int realtek_mdio_probe(struct mdio_device *mdiodev)
+ 	struct realtek_priv *priv;
+ 	int ret;
+ 
+-	priv = realtek_common_probe(dev, realtek_mdio_regmap_config,
+-				    realtek_mdio_nolock_regmap_config);
++	priv = realtek_common_probe(dev, &realtek_mdio_info);
+ 	if (IS_ERR(priv))
+ 		return PTR_ERR(priv);
+ 
+diff --git a/drivers/net/dsa/realtek/realtek-smi.c b/drivers/net/dsa/realtek/realtek-smi.c
+index fc54190839cf..7697dc66e5e8 100644
+--- a/drivers/net/dsa/realtek/realtek-smi.c
++++ b/drivers/net/dsa/realtek/realtek-smi.c
+@@ -312,33 +312,6 @@ static int realtek_smi_read(void *ctx, u32 reg, u32 *val)
+ 	return realtek_smi_read_reg(priv, reg, val);
+ }
+ 
+-static const struct regmap_config realtek_smi_regmap_config = {
+-	.reg_bits = 10, /* A4..A0 R4..R0 */
+-	.val_bits = 16,
+-	.reg_stride = 1,
+-	/* PHY regs are at 0x8000 */
+-	.max_register = 0xffff,
+-	.reg_format_endian = REGMAP_ENDIAN_BIG,
+-	.reg_read = realtek_smi_read,
+-	.reg_write = realtek_smi_write,
+-	.cache_type = REGCACHE_NONE,
+-	.lock = realtek_common_lock,
+-	.unlock = realtek_common_unlock,
+-};
+-
+-static const struct regmap_config realtek_smi_nolock_regmap_config = {
+-	.reg_bits = 10, /* A4..A0 R4..R0 */
+-	.val_bits = 16,
+-	.reg_stride = 1,
+-	/* PHY regs are at 0x8000 */
+-	.max_register = 0xffff,
+-	.reg_format_endian = REGMAP_ENDIAN_BIG,
+-	.reg_read = realtek_smi_read,
+-	.reg_write = realtek_smi_write,
+-	.cache_type = REGCACHE_NONE,
+-	.disable_locking = true,
+-};
+-
+ static int realtek_smi_mdio_read(struct mii_bus *bus, int addr, int regnum)
+ {
+ 	struct realtek_priv *priv = bus->priv;
+@@ -396,14 +369,18 @@ static int realtek_smi_setup_mdio(struct dsa_switch *ds)
+ 	return ret;
+ }
+ 
++static const struct realtek_common_info realtek_smi_info = {
++	.reg_read = realtek_smi_read,
++	.reg_write = realtek_smi_write,
++};
++
+ int realtek_smi_probe(struct platform_device *pdev)
+ {
+ 	struct device *dev = &pdev->dev;
+ 	struct realtek_priv *priv;
+ 	int ret;
+ 
+-	priv = realtek_common_probe(dev, realtek_smi_regmap_config,
+-				    realtek_smi_nolock_regmap_config);
++	priv = realtek_common_probe(dev, &realtek_smi_info);
+ 	if (IS_ERR(priv))
+ 		return PTR_ERR(priv);
+ 
+-- 
+2.34.1
+
+> This case in particular might be hard to justify in the commit message
+> other than "preliminary work". I'll split it as it makes review much
+> easier. this series will grow from 7 to 10 patches, even after
+> dropping the revert patch.
+
+Preliminary work is fine if you explain a bit in advance why it will be
+needed.
 
