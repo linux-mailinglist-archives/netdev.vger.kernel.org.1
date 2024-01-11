@@ -1,279 +1,209 @@
-Return-Path: <netdev+bounces-62977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-62978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEEAE82A772
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 07:13:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 952C982A77A
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 07:20:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3847281DFF
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 06:13:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD5B11C22899
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 06:20:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2962E2116;
-	Thu, 11 Jan 2024 06:13:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D862A23C3;
+	Thu, 11 Jan 2024 06:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="F4ppTMFL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hSAQWfU0"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9456C5382;
-	Thu, 11 Jan 2024 06:13:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1099)
-	id 7A36A209C43A; Wed, 10 Jan 2024 22:13:19 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 7A36A209C43A
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1704953599;
-	bh=Vx6uwJdgmYeQ9YCQC3Gj9uTpE/Inxmh3nP0kQERH+Cs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=F4ppTMFLicty7Ad4PVvjI+E3NO/r6Mx6EgTdjLUiDZxrRcX4ztiUXZlY76P9z3EEg
-	 1gnXNyMrQ3FnE4aSOYMK8WKwXEy3RN6o4TpI6SANKlk4H8UwCSKirPUch22vAsvXjr
-	 6c4N1IcWWNeQLsTlBakVSokhRjGDSJ0Svpo1x6FQ=
-Date: Wed, 10 Jan 2024 22:13:19 -0800
-From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-To: Michael Kelley <mhklinux@outlook.com>
-Cc: Yury Norov <yury.norov@gmail.com>,
-	"kys@microsoft.com" <kys@microsoft.com>,
-	"haiyangz@microsoft.com" <haiyangz@microsoft.com>,
-	"wei.liu@kernel.org" <wei.liu@kernel.org>,
-	"decui@microsoft.com" <decui@microsoft.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"longli@microsoft.com" <longli@microsoft.com>,
-	"leon@kernel.org" <leon@kernel.org>,
-	"cai.huoqing@linux.dev" <cai.huoqing@linux.dev>,
-	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
-	"vkuznets@redhat.com" <vkuznets@redhat.com>,
-	"tglx@linutronix.de" <tglx@linutronix.de>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"schakrabarti@microsoft.com" <schakrabarti@microsoft.com>,
-	"paulros@microsoft.com" <paulros@microsoft.com>
-Subject: Re: [PATCH 3/4 net-next] net: mana: add a function to spread IRQs
- per CPUs
-Message-ID: <20240111061319.GC5436@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1704797478-32377-1-git-send-email-schakrabarti@linux.microsoft.com>
- <1704797478-32377-4-git-send-email-schakrabarti@linux.microsoft.com>
- <SN6PR02MB4157CB3CB55A17255AE61BF6D46A2@SN6PR02MB4157.namprd02.prod.outlook.com>
- <ZZ3Wsxq8rHShTUdA@yury-ThinkPad>
- <SN6PR02MB415704D36B82D5793CC4558FD4692@SN6PR02MB4157.namprd02.prod.outlook.com>
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EE79211A
+	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 06:20:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2cd0db24e03so56454051fa.3
+        for <netdev@vger.kernel.org>; Wed, 10 Jan 2024 22:20:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1704954022; x=1705558822; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=L8LXJjKC2VOF4Of2hJK9W50pFRjuIrNhRWsqlOTUUNk=;
+        b=hSAQWfU0/XXCjZqWhF9v4r6D9KAlRvofXFEsE+WDvXKhGe9mQmHxIkuR04qCT/0+nC
+         sqGRsOSFiw7smFCbK6VfvPAW+47k8L1I4HHSdUIY8e/O5SQqqVuz2zH4ntyt8yYEHMxg
+         /AGfIIcOUPKtrxbz1td27NrauQhxjSR0kNZP9A0+KfSsG76TcZzMJlsWRVOk+qRT+KFc
+         cBbJ+P3EZAX1xDPj0Kg1woFN+Axbxlp3dpGPWtOo+QrjFXug/c96Jcjk5qpCvIYYx6MI
+         OlpRPxxvn+VGjc41dShoh67n2LVg+toFcSVAjhlO0b0G1GQLdLaeW2D4HOYdkhL6G+Si
+         Rx2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1704954022; x=1705558822;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=L8LXJjKC2VOF4Of2hJK9W50pFRjuIrNhRWsqlOTUUNk=;
+        b=Q7PT7TF4mYWPwH4AHnz36/2VYfzLX11IHsgRuNUP/9mDt50p8KXJesfugrl+vbXuuf
+         cczS7fo6apIRQmWZ76UHmP/DDccUrLO3sOdzTv0EbjMDkyiwoTYU6rGymFPSeCLSwT/u
+         3q8OByfgRe4KH01U+dVKKjiwaaK5WrL7Mz/ci0Emw+gioZH1cqY7B2+biwQEzCKv3Rxu
+         qj/33vPSBNXPMEVMTROPSd35YWS2ICLJ/N+wtT1jwWNAoVG1Th0KH7G43h4fcevDq2ex
+         i2gsEK6hKK8R9x1N/aVHXYSXcREopmDL5I71wLf5TAwTsrRoQhh21CzH2lXOagJ7qfw9
+         I4qw==
+X-Gm-Message-State: AOJu0YwM1NlQH3Nb5fEkxcu1ktE0sFgPcrAsruhABGDUCQI4KUzN+o1f
+	Zo7LfS6ENpT5wQPoXkS7PUxCn3UUWiBbxCbFgNE=
+X-Google-Smtp-Source: AGHT+IHJ+2Z9XONOcw3MmpoOayBlv/mL1J63WWvr8wTuYFFGU4xvk3HZRF7GGVegtH7mDbq9N5imD7wzw7ogdY0ZMM8=
+X-Received: by 2002:a2e:9848:0:b0:2cc:3e6d:8dcb with SMTP id
+ e8-20020a2e9848000000b002cc3e6d8dcbmr42775ljj.104.1704954021688; Wed, 10 Jan
+ 2024 22:20:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SN6PR02MB415704D36B82D5793CC4558FD4692@SN6PR02MB4157.namprd02.prod.outlook.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+References: <20231223005253.17891-1-luizluca@gmail.com> <20231223005253.17891-4-luizluca@gmail.com>
+ <20240108140002.wpf6zj7qv2ftx476@skbuf> <CAJq09z6g+qTbzzaFAy94aV6HuESAeb4aLOUHWdUkOB4+xR_vDg@mail.gmail.com>
+ <20240109123658.vqftnqsxyd64ik52@skbuf>
+In-Reply-To: <20240109123658.vqftnqsxyd64ik52@skbuf>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Thu, 11 Jan 2024 03:20:10 -0300
+Message-ID: <CAJq09z6JF0K==fO53RcimoRgujHjEkvmDKWGK3pYQAig58j__g@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 3/8] net: dsa: realtek: common realtek-dsa module
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, alsi@bang-olufsen.dk, 
+	andrew@lunn.ch, f.fainelli@gmail.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	arinc.unal@arinc9.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Jan 10, 2024 at 12:27:54AM +0000, Michael Kelley wrote:
-> From: Yury Norov <yury.norov@gmail.com> Sent: Tuesday, January 9, 2024 3:29 PM
-> > 
-> > Hi Michael,
-> > 
-> > So, I'm just a guy who helped to formulate the heuristics in an
-> > itemized form, and implement them using the existing kernel API.
-> > I have no access to MANA machines and I ran no performance tests
-> > myself.
-> 
-> Agreed. :-)   Given the heritage of the patch, I should have clarified
-> that my question was directed to Souradeep.  Regardless, your work
-> on the cpumask manipulation made everything better and clearer.
-> 
-> > 
-> > On Tue, Jan 09, 2024 at 07:22:38PM +0000, Michael Kelley wrote:
-> > > From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com> Sent:
-> > Tuesday, January 9, 2024 2:51 AM
-> > > >
-> > > > From: Yury Norov <yury.norov@gmail.com>
-> > > >
-> > > > Souradeep investigated that the driver performs faster if IRQs are
-> > > > spread on CPUs with the following heuristics:
-> > > >
-> > > > 1. No more than one IRQ per CPU, if possible;
-> > > > 2. NUMA locality is the second priority;
-> > > > 3. Sibling dislocality is the last priority.
-> > > >
-> > > > Let's consider this topology:
-> > > >
-> > > > Node            0               1
-> > > > Core        0       1       2       3
-> > > > CPU       0   1   2   3   4   5   6   7
-> > > >
-> > > > The most performant IRQ distribution based on the above topology
-> > > > and heuristics may look like this:
-> > > >
-> > > > IRQ     Nodes   Cores   CPUs
-> > > > 0       1       0       0-1
-> > > > 1       1       1       2-3
-> > > > 2       1       0       0-1
-> > > > 3       1       1       2-3
-> > > > 4       2       2       4-5
-> > > > 5       2       3       6-7
-> > > > 6       2       2       4-5
-> > > > 7       2       3       6-7
+> On Tue, Jan 09, 2024 at 02:05:29AM -0300, Luiz Angelo Daros de Luca wrote:
+> > > > +struct realtek_priv *
+> > > > +realtek_common_probe(struct device *dev, struct regmap_config rc,
+> > > > +                  struct regmap_config rc_nolock)
 > > >
-> > > I didn't pay attention to the detailed discussion of this issue
-> > > over the past 2 to 3 weeks during the holidays in the U.S., but
-> > > the above doesn't align with the original problem as I understood
-> > > it.  I thought the original problem was to avoid putting IRQs on
-> > > both hyper-threads in the same core, and that the perf
-> > > improvements are based on that configuration.  At least that's
-> > > what the commit message for Patch 4/4 in this series says.
-> > 
-> > Yes, and the original distribution suggested by Souradeep looks very
-> > similar:
-> > 
-> >   IRQ     Nodes   Cores   CPUs
-> >   0       1       0       0
-> >   1       1       1       2
-> >   2       1       0       1
-> >   3       1       1       3
-> >   4       2       2       4
-> >   5       2       3       6
-> >   6       2       2       5
-> >   7       2       3       7
-> > 
-> > I just added a bit more flexibility, so that kernel may pick any
-> > sibling for the IRQ. As I understand, both approaches have similar
-> > performance. Probably my fine-tune added another half-percent...
-> > 
-> > Souradeep, can you please share the exact numbers on this?
-> > 
-> > > The above chart results in 8 IRQs being assigned to the 8 CPUs,
-> > > probably with 1 IRQ per CPU.   At least on x86, if the affinity
-> > > mask for an IRQ contains multiple CPUs, matrix_find_best_cpu()
-> > > should balance the IRQ assignments between the CPUs in the mask.
-> > > So the original problem is still present because both hyper-threads
-> > > in a core are likely to have an IRQ assigned.
-> > 
-> > That's what I think, if the topology makes us to put IRQs in the
-> > same sibling group, the best thing we can to is to rely on existing
-> > balancing mechanisms in a hope that they will do their job well.
-> > 
-> > > Of course, this example has 8 IRQs and 8 CPUs, so assigning an
-> > > IRQ to every hyper-thread may be the only choice.  If that's the
-> > > case, maybe this just isn't a good example to illustrate the
-> > > original problem and solution.
-> > 
-> > Yeah... This example illustrates the order of IRQ distribution.
-> > I really doubt that if we distribute IRQs like in the above example,
-> > there would be any difference in performance. But I think it's quite
-> > a good illustration. I could write the title for the table like this:
-> > 
-> >         The order of IRQ distribution for the best performance
-> >         based on [...] may look like this.
-> > 
-> > > But even with a better example
-> > > where the # of IRQs is <= half the # of CPUs in a NUMA node,
-> > > I don't think the code below accomplishes the original intent.
+> > > Could you use "const struct regmap_config *" as the data types here, to
+> > > avoid two on-stack variable copies? Regmap will copy the config structures
+> > > anyway.
+> >
+> > I could do that for rc_nolock but not for rc as we need to modify it
+> > before passing to regmap. I would still need to duplicate rc, either
+> > using the stack or heap. What would be the best option?
+> >
+> > 1) pass two pointers and copy one to stack
+> > 2) pass two pointers and copy one to heap
+> > 3) pass two structs (as it is today)
+> > 4) pass one pointer and one struct
+> >
+> > The old code was using 1) and I'm inclined to adopt it and save a
+> > hundred and so bytes from the stack, although 2) would save even more.
+>
+> I didn't notice the "rc.lock_arg = priv" assignment...
+>
+> I'm not sure what you mean by "copy to heap". Perform a dynamic memory
+> allocation?
+
+Yes. However, I guess the stack can handle that structure in this context.
+
+> Also, the old code was not using exactly 1). It copied both the normal
+> and the nolock regmap config to an on-stack local variable, even though
+> only the normal regmap config had to be copied (to be fixed up).
+>
+> I went back to study the 4 regmap configs, and only the reg_read() and
+> reg_write() methods differ between SMI and MDIO. The rest seems boilerplate
+> that can be dynamically constructed by realtek_common_probe(). Sure,
+> spelling out 4 regmap_config structures is more flexible, but do we need
+> that flexibility? What if realtek_common_probe() takes just the
+> reg_read() and reg_write() function prototypes as arguments, rather than
+> pointers to regmap_config structures it then has to fix up?
+
+IMHO, the constant regmap_config looks cleaner than a sequence of
+assignments. However, we don't actually need 4 of them.
+As we already have a writable regmap_config in stack (to assign
+lock_arg), we can reuse the same struct and simply set
+disable_locking.
+It makes the regmap ignore all locking fields and we don't even need
+to unset them for map_nolock. Something like this:
+
+realtek_common_probe(struct device *dev, const struct regmap_config *rc_base)
+{
+
+       (...)
+
+       rc = *rc_base;
+       rc.lock_arg = priv;
+       priv->map = devm_regmap_init(dev, NULL, priv, &rc);
+       if (IS_ERR(priv->map)) {
+               ret = PTR_ERR(priv->map);
+               dev_err(dev, "regmap init failed: %d\n", ret);
+               return ERR_PTR(ret);
+       }
+
+       rc.disable_locking = true;
+       priv->map_nolock = devm_regmap_init(dev, NULL, priv, &rc);
+       if (IS_ERR(priv->map_nolock)) {
+               ret = PTR_ERR(priv->map_nolock);
+               dev_err(dev, "regmap init failed: %d\n", ret);
+               return ERR_PTR(ret);
+       }
+
+It has a cleaner function signature and we can remove the _nolock
+constants as well.
+
+The regmap configs still have some room for improvement, like moving
+from interfaces to variants, but this series is already too big. We
+can leave that as it is.
+
+> > > > +EXPORT_SYMBOL(realtek_common_probe);
+> > > > diff --git a/drivers/net/dsa/realtek/realtek.h b/drivers/net/dsa/realtek/realtek.h
+> > > > index e9ee778665b2..fbd0616c1df3 100644
+> > > > --- a/drivers/net/dsa/realtek/realtek.h
+> > > > +++ b/drivers/net/dsa/realtek/realtek.h
+> > > > @@ -58,11 +58,9 @@ struct realtek_priv {
+> > > >       struct mii_bus          *bus;
+> > > >       int                     mdio_addr;
+> > > >
+> > > > -     unsigned int            clk_delay;
+> > > > -     u8                      cmd_read;
+> > > > -     u8                      cmd_write;
+> > > >       spinlock_t              lock; /* Locks around command writes */
+> > > >       struct dsa_switch       *ds;
+> > > > +     const struct dsa_switch_ops *ds_ops;
+> > > >       struct irq_domain       *irqdomain;
+> > > >       bool                    leds_disabled;
+> > > >
+> > > > @@ -79,6 +77,8 @@ struct realtek_priv {
+> > > >       int                     vlan_enabled;
+> > > >       int                     vlan4k_enabled;
+> > > >
+> > > > +     const struct realtek_variant *variant;
+> > > > +
+> > > >       char                    buf[4096];
+> > > >       void                    *chip_data; /* Per-chip extra variant data */
+> > > >  };
 > > >
-> > > Maybe I've missed something along the way in getting to this
-> > > version of the patch.  Please feel free to set me straight. :-)
-> > 
-> > Hmm. So if the number of IRQs is the half # of CPUs in the nodes,
-> > which is 2 in the example above, the distribution will look like
-> > this:
-> > 
-> >   IRQ     Nodes   Cores   CPUs
-> >   0       1       0       0-1
-> >   1       1       1       2-3
-> > 
-> > And each IRQ belongs to a different sibling group. This follows
-> > the rules above.
-> > 
-> > I think of it like we assign an IRQ to a group of 2 CPUs, so from
-> > the heuristic #1 perspective, each CPU is assigned with 1/2 of the
-> > IRQ.
-> > 
-> > If I add one more IRQ, then according to the heuristics, NUMA locality
-> > trumps sibling dislocality, so we'd assign IRO to the same node on any
-> > core. My algorithm assigns it to the core #0:
-> > 
-> >   2       1       0       0-1
-> > 
-> > This doubles # of IRQs for the CPUs 0 and 1: from 1/2 to 1.
-> > 
-> > The next IRQ should be assigned to the same node again, and we've got
-> > the only choice:
-> > 
-> > 
-> >   3       1       1       2-3
-> > 
-> > Starting from IRQ #5, the node #1 is full - each CPU is assigned with
-> > exactly one IRQ, and the heuristic #1 makes us to switch to the other
-> > node; and then do the same thing:
-> > 
-> >   4       2       2       4-5
-> >   5       2       3       6-7
-> >   6       2       2       4-5
-> >   7       2       3       6-7
-> > 
-> > So I think the algorithm is correct... Really hope the above makes
-> > sense. :) If so, I can add it to the commit message for patch #3.
-> 
-> Thinking about it further, I agree with you.  If we want NUMA
-> locality to trump avoiding hyper-threads in the same core, then
-> I'm good with the algorithm.   If I think of the "weight" variable
-> in your function as the "number of IRQs to assign to CPUs in
-> this NUMA hop", then it makes sense to decrement it by 1
-> each time irq_set_affinity_and_hint() is called.  I was confused
-> by likely removing multiple cpus from the "cpus" cpumask
-> juxtaposed with decrementing "weight" by only 1, and by my
-> preconception that to get the perf benefit we wanted to avoid
-> hyper-threads in the same core.
-> 
-> > 
-> > Nevertheless... Souradeep, in addition to the performance numbers, can
-> > you share your topology and actual IRQ distribution that gains 15%? I
-> > think it should be added to the patch #4 commit message.
-> 
-> Yes -- this is the key thing for me.  What is the configuration that
-> shows the 15% performance gain?  Patch 3/4 and Patch 4/4 in the
-> series need to be consistent in describing when there's a performance
-> benefit and when there's no significant difference.   In Patch 4/4,
-> the mana driver creates IRQs equal to the # of CPUs, up to
-> MANA_MAX_NUM_QUEUES, which is 64.  So the new algorithm
-> still assigns IRQs to both hyper-threads in cores in the local NUMA
-> node (unless the node is bigger than 64 CPUs, which I don't think
-> happens in Azure today).  For the first hop from the local NUMA
-> node, IRQs might get assigned to only one hyper-thread in a core
-> if the total CPU count in the VM is more than 64.
-The test topology was used to check the performance between
-cpu_local_spread() and the new approach is :
-Case 1
-IRQ     Nodes  Cores CPUs
-0       1      0     0-1
-1       1      1     2-3
-2       1      2     4-5
-3       1      3     6-7
+> > > Can the changes to struct realtek_priv be a separate patch, to
+> > > clarify what is being changed, and to leave the noisy code movement
+> > > more isolated?
+> >
+> > Sure, although it will not be a patch that makes sense by itself. If
+> > it helps with the review, I'll split it. We can fold it back if
+> > needed.
+>
+> Well, I don't mean only the changes to the private structure, but also
+> the code changes that accompany them.
+>
+> As Andrew usually says, what you want is lots of small patches that are
+> each obviously correct, where there is only one thing being changed.
+> Code movement with small renames is trivial to review. Consolidation of
+> two identical code paths in a single function is also possible to follow.
+> The insertion of a new variable and its usage is also easy to review.
+> The removal of a variable, the same. But superimposing them all into a
+> single patch makes everything much more difficult to follow.
 
-and with existing cpu_local_spread()
-Case 2
-IRQ    Nodes  Cores CPUs
-0      1      0     0
-1      1      0     1
-2      1      1     2
-3      1      1     3
+This case in particular might be hard to justify in the commit message
+other than "preliminary work". I'll split it as it makes review much
+easier. this series will grow from 7 to 10 patches, even after
+dropping the revert patch.
 
-Total 4 channels were used, which was set up by ethtool.
-case 1 with ntttcp has given 15 percent better performance, than
-case 2. During the test irqbalance was disabled as well.
+Regards,
 
-Also you are right, with 64CPU system this approach will spread
-the irqs like the cpu_local_spread() but in the future we will offer
-MANA nodes, with more than 64 CPUs. There it this new design will 
-give better performance.
-
-I will add this performance benefit details in commit message of
-next version.
-> 
-> Michael
+Luiz
 
