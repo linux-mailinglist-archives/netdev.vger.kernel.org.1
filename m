@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-63127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D611382B4DB
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 19:45:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CCA282B4DC
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 19:45:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3FEBDB23302
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 18:45:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B3512B2303A
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 18:45:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D40454BC8;
-	Thu, 11 Jan 2024 18:45:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 455C454BE0;
+	Thu, 11 Jan 2024 18:45:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="JzV6ieP2"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="BsEoAtMK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C85053E19
-	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 18:45:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 575E553E23
+	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 18:45:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-5ca29c131ebso4337916a12.0
-        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 10:45:04 -0800 (PST)
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6d9344f30caso3886313b3a.1
+        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 10:45:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1704998704; x=1705603504; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=T8BdktxS3T9FnT+KN6r57I70iQkEv8DZXhJrz4qu/0s=;
-        b=JzV6ieP2otY+J8o9qYfKaOiZ37ZioBa7R45rXrGXV1BsnlA4PW1w09ckUG4lfNmS/p
-         wDFLcDUKIXSk3976aJat4AVeCkE95AgixBWiRPpbViW/UHYUa9BXqpx8sOhoJCisQ2Oh
-         gjbYvs98OGzKcnbg23kb9BsXJE+ZvK5Sxvq8709oqQsxnWY2C+1RfpLkKZDNfMAlHVB2
-         CVtN6f9N6yj8AWn/+mSDEFFU2JR9TUdk7he9f3CFlckf815l2i/NipmcWJQVDt1yKSEW
-         tcA7gYAtf1RNu+0OTjpNNnScNqor+YsR2kkl8mCsofd3MpSfE0Nl8nov01yjFiFJglL/
-         3TFQ==
+        bh=bXiwtsBj02EdK8fJqvGHYuYq6nsBbsRGVOYyO29NQoc=;
+        b=BsEoAtMKWxOL1ZAYv8zk34U9No6axjWxE9h4+rPXueTig2obRecU/Ow27KQ22uvhGG
+         6QgEtWzwSKCg+rT4CrPjHZllmCoAY6x+baX+4l5mE9M+NaZgKXxexWzVa2ZztYs6b1zc
+         Kr6wPQDYUb+BURSd+1HdXp7JL5SEG3G+XQVZMcFRAS7B+0cT32FOrCo4wdjiqMNWJs5n
+         XUXPTrlGW+o1b7Ew5Nyu837GVO6HQzLazjR0RtPH2NOMvzSkwSGTyEnWxXtvNuB50W0O
+         bI1YZGFQtY8yj5chNoSSeqxzZ1Z/XnFsFOOji+l1tfq3VOwVXL5wWvNwy06PnE1kO36c
+         UYmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1704998704; x=1705603504;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=T8BdktxS3T9FnT+KN6r57I70iQkEv8DZXhJrz4qu/0s=;
-        b=ZcvuKiHnsFccHuRwhKRJXFpWine+AUTmdaheAAh1UYI4O+SN/2VemrVNu8zGJ36fSL
-         Xk3DPq5SiWti3nijZPzerlfSE69fMlO/sv0Q6xz92UF8aIkVqQmHcPNjLQziYEvfw63r
-         4aXYiqNuS7FjjygFEWmvfRgX36LzE0vq+8VpVY9gFZgZft3Cl5pMyFfFlgvaUAWjm+0f
-         zmkymSTw2LSjBtGxdx/yxouJCcBQvDzfUt1KLgZdlnmefEU2+bfPLkMEcMKKdmunZ18s
-         22XISbKD9PSqCBn7ZnDpz7n+u+R1etTkaFfGFl0Yw0PgZCVdus6Iuil3gMTaGC62T0io
-         AEHw==
-X-Gm-Message-State: AOJu0YxWFf3HKE/FRhuim3ouW+EYlXd4VLLqFXmPcx/TWCNXGGdMR9x2
-	cS4M6N9o3D1N2DOl/PU1vLejrNgYsPdhLJajhTppC47DLCKAmg==
-X-Google-Smtp-Source: AGHT+IGVNZ/KyFooojyH+QMGKx61wTo+C4dF8eeFYzH0BIb1MICs3+/dj2kp70Ut73/rUN9L3TRyvA==
-X-Received: by 2002:a05:6a20:7503:b0:199:dab1:8b6e with SMTP id r3-20020a056a20750300b00199dab18b6emr236816pzd.39.1704998703598;
-        Thu, 11 Jan 2024 10:45:03 -0800 (PST)
+        bh=bXiwtsBj02EdK8fJqvGHYuYq6nsBbsRGVOYyO29NQoc=;
+        b=CdwjFis58w70hNrBOSA2AgO94O6mbpVb6hTrr67N9yRcBEpEwsyIWVMv2Qnz7Z10Y2
+         hY8KDbsr9BE1VjsQdoCJ1ENImNyf6oFLzYdXFD8yHaswNc2YUhrQSiHI/qVHFmnoi4BQ
+         bxrl98KovIqVTdcBso1iX6OcMi55V32vgyrVgBF1Ou4imXZ6A/fqNIzEoznzR52+D7i6
+         foSd3UQhGE/J7KW1UuPh23ITjJkqCIcq2XNJYhjHtCLZAYOrpiHWqyfSF36kxMCls47Q
+         T72q9SvOx8sWYFjZFo9EFOPvTNng/BclOc//KcDKy9xSHN2v9W5aR5JB4QxsoKz1zXIn
+         75LA==
+X-Gm-Message-State: AOJu0YwaXdOevisQ3va1tb8hqqSiOhlhBjYHFv0rrXyIO0gnPQDNo/1N
+	wRLVDc2emLQ5lKkMq0jnViaW2kZCKhgMVlR5uyPBzULbUJJgNA==
+X-Google-Smtp-Source: AGHT+IHVbAQ4PJ7gAD0FSluYsddCIj+BPGRN63XHopXC6g5MV+KJ+ohX+k5g6xAHBL3l78pEh/99rQ==
+X-Received: by 2002:a05:6a00:92a0:b0:6d9:c201:f887 with SMTP id jw32-20020a056a0092a000b006d9c201f887mr395292pfb.1.1704998704530;
+        Thu, 11 Jan 2024 10:45:04 -0800 (PST)
 Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id v3-20020aa78083000000b006d9b4303f9csm1513460pff.71.2024.01.11.10.45.02
+        by smtp.gmail.com with ESMTPSA id v3-20020aa78083000000b006d9b4303f9csm1513460pff.71.2024.01.11.10.45.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jan 2024 10:45:02 -0800 (PST)
+        Thu, 11 Jan 2024 10:45:03 -0800 (PST)
 From: Stephen Hemminger <stephen@networkplumber.org>
 To: netdev@vger.kernel.org
 Cc: Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH iproute2-next 1/4] man: get rid of doc/actions/mirred-usage
-Date: Thu, 11 Jan 2024 10:44:08 -0800
-Message-ID: <20240111184451.48227-2-stephen@networkplumber.org>
+Subject: [PATCH iproute2-next 2/4] man/tc-gact: move generic action documentation to man page
+Date: Thu, 11 Jan 2024 10:44:09 -0800
+Message-ID: <20240111184451.48227-3-stephen@networkplumber.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240111184451.48227-1-stephen@networkplumber.org>
 References: <20240111184451.48227-1-stephen@networkplumber.org>
@@ -74,205 +74,204 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The only bit of information not already on the man page
-is some of the limitations.
+Convert from free form doc to man page.
 
 Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 ---
- doc/actions/mirred-usage | 164 ---------------------------------------
- man/man8/tc-mirred.8     |   8 ++
- 2 files changed, 8 insertions(+), 164 deletions(-)
- delete mode 100644 doc/actions/mirred-usage
+ doc/actions/gact-usage | 78 --------------------------------------
+ man/man8/tc-gact.8     | 85 ++++++++++++++++++++++++++++++++++++++++++
+ man/man8/tc.8          |  1 +
+ 3 files changed, 86 insertions(+), 78 deletions(-)
+ delete mode 100644 doc/actions/gact-usage
+ create mode 100644 man/man8/tc-gact.8
 
-diff --git a/doc/actions/mirred-usage b/doc/actions/mirred-usage
+diff --git a/doc/actions/gact-usage b/doc/actions/gact-usage
 deleted file mode 100644
-index 482ff66d6aaf..000000000000
---- a/doc/actions/mirred-usage
+index 7cf48abbd90a..000000000000
+--- a/doc/actions/gact-usage
 +++ /dev/null
-@@ -1,164 +0,0 @@
+@@ -1,78 +0,0 @@
 -
--Very funky action. I do plan to add to a few more things to it
--This is the basic stuff. Idea borrowed from the way ethernet switches
--mirror and redirect packets. The main difference with say a vannila
--ethernet switch is that you can use u32 classifier to select a
--flow to be mirrored. High end switches typically can select based
--on more than just a port (eg a 5 tuple classifier). They may also be
--capable of redirecting.
+-gact <ACTION> [RAND] [INDEX]
 -
--Usage:
+-Where:
+-	ACTION := reclassify | drop | continue | pass | ok
+-	RAND := random <RANDTYPE> <ACTION> <VAL>
+-	RANDTYPE := netrand | determ
+-        VAL : = value not exceeding 10000
+-        INDEX := index value used
 -
--mirred <DIRECTION> <ACTION> [index INDEX] <dev DEVICENAME>
--where:
--DIRECTION := <ingress | egress>
--ACTION := <mirror | redirect>
--INDEX is the specific policy instance id
--DEVICENAME is the devicename
+-ACTION semantics
+-- pass and ok are equivalent to accept
+-- continue allows one to restart classification lookup
+-- drop drops packets
+-- reclassify implies continue classification where we left off
 -
--Direction:
--- Ingress is not supported at the moment. It will be in the
--future as well as mirror/redirecting to a socket.
+-randomization
+---------------
 -
--Action:
--- Mirror takes a copy of the packet and sends it to specified
--dev ("port" in ethernet switch/bridging terminology)
--- redirect
--steals the packet and redirects to specified destination dev.
+-At the moment there are only two algorithms. One is deterministic
+-and the other uses internal kernel netrand.
 -
--What NOT to do if you don't want your machine to crash:
--------------------------------------------------------
+-Examples:
 -
--Do not create loops!
--Loops are not hard to create in the egress qdiscs.
+-Rules can be installed on both ingress and egress - this shows ingress
+-only
 -
--Here are simple rules to follow if you don't want to get
--hurt:
--A) Do not have the same packet go to same netdevice twice
--in a single graph of policies. Your machine will just hang!
--This is design intent _not a bug_ to teach you some lessons.
--
--In the future if there are easy ways to do this in the kernel
--without affecting other packets not interested in this feature
--I will add them. At the moment that is not clear.
--
--Some examples of bad things NOT to do:
--1) redirecting eth0 to eth0
--2) eth0->eth1-> eth0
--3) eth0->lo-> eth1-> eth0
--
--B) Do not redirect from one IFB device to another.
--Remember that IFB is a very specialized case of packet redirecting
--device. Instead of redirecting it puts packets at the exact spot
--on the stack it found them from.
--Redirecting from ifbX->ifbY will actually not crash your machine but your
--packets will all be dropped (this is much simpler to detect
--and resolve and is only affecting users of ifb as opposed to the
--whole stack).
--
--In the case of A) the problem has to do with a recursive contention
--for the devices queue lock and in the second case for the transmit lock.
--
--Some examples:
---------------
--
--1) Mirror all packets arriving on eth0 to be sent out on eth1.
--You may have a sniffer or some accounting box hooked up on eth1.
--
-----
 -tc qdisc add dev eth0 ingress
--tc filter add dev eth0 parent ffff: protocol ip prio 10 u32 \
--match u32 0 0 flowid 1:2 action mirred egress mirror dev eth1
-----
 -
--If you replace "mirror" with "redirect" then not a copy but rather
--the original packet is sent to eth1.
+-# example 1
+-tc filter add dev eth0 parent ffff: protocol ip prio 6 u32 match ip src \
+-10.0.0.9/32 flowid 1:16 action drop
 -
--2) Host A is hooked  up to us on eth0
+-ping -c 20 10.0.0.9
 -
--# redirect all packets arriving on ingress of lo to eth0
-----
--tc qdisc add dev lo ingress
--tc filter add dev lo parent ffff: protocol ip prio 10 u32 \
--match u32 0 0 flowid 1:2 action mirred egress redirect dev eth0
-----
+---
+-filter u32
+-filter u32 fh 800: ht divisor 1
+-filter u32 fh 800::800 order 2048 key ht 800 bkt 0 flowid 1:16  (rule hit 32 success 20)
+-  match 0a000009/ffffffff at 12 (success 20 )
+-        action order 1: gact action drop
+-         random type none pass val 0
+-         index 1 ref 1 bind 1 installed 59 sec used 35 sec
+-         Sent 1680 bytes 20 pkts (dropped 20, overlimits 0 )
 -
--On host A start a tcpdump on interface connecting to us.
+-----
 -
--on our host ping -c 2 127.0.0.1
+-# example 2
+-#allow 1 out 10 randomly using the netrand generator
+-tc filter add dev eth0 parent ffff: protocol ip prio 6 u32 match ip src \
+-10.0.0.9/32 flowid 1:16 action drop random netrand ok 10
 -
--Ping would fail since all packets are heading out eth0
--tcpudmp on host A would show them
+-ping -c 20 10.0.0.9
 -
--if you substitute the redirect with mirror above as in:
--tc filter add dev lo parent ffff: protocol ip prio 10 u32 \
--match u32 0 0 flowid 1:2 action mirred egress mirror dev eth0
+-----
+-filter protocol ip pref 6 u32 filter protocol ip pref 6 u32 fh 800: ht divisor 1filter protocol ip pref 6 u32 fh 800::800 order 2048 key ht 800 bkt 0 flowid 1:16  (rule hit 20 success 20)
+-  match 0a000009/ffffffff at 12 (success 20 )
+-        action order 1: gact action drop
+-         random type netrand pass val 10
+-         index 5 ref 1 bind 1 installed 49 sec used 25 sec
+-         Sent 1680 bytes 20 pkts (dropped 16, overlimits 0 )
 -
--Then you should see the packets on both host A and the local
--stack (i.e ping would work).
+---------
+-#alternative: deterministically accept every second packet
+-tc filter add dev eth0 parent ffff: protocol ip prio 6 u32 match ip src \
+-10.0.0.9/32 flowid 1:16 action drop random determ ok 2
 -
--3) Even more funky example:
+-ping -c 20 10.0.0.9
 -
--#
--#allow 1 out 10 packets on ingress of lo to randomly make it to the
--# host A (Randomness uses the netrand generator)
--#
-----
--tc filter add dev lo parent ffff: protocol ip prio 10 u32 \
--match u32 0 0 flowid 1:2 \
--action drop random determ ok 10\
--action mirred egress mirror dev eth0
-----
--
--4)
--# for packets from 10.0.0.9 going out on eth0 (could be local
--# IP or something # we are forwarding) -
--# if exceeding a 100Kbps rate, then redirect to eth1
--#
--
-----
--tc qdisc add dev eth0 handle 1:0 root prio
--tc filter add dev eth0 parent 1:0 protocol ip prio 6 u32 \
--match ip src 10.0.0.9/32 flowid 1:16 \
--action police rate 100kbit burst 90k ok \
--action mirred egress mirror dev eth1
-----
--
--A more interesting example is when you mirror flows to a dummy device
--so you could tcpdump them (dummy by defaults drops all packets it sees).
--This is a very useful debug feature.
--
--Lets say you are policing packets from alias 192.168.200.200/32
--you don't want those to exceed 100kbps going out.
--
-----
--tc qdisc add dev eth0 handle 1:0 root prio
--tc filter add dev eth0 parent 1: protocol ip prio 10 u32 \
--match ip src 192.168.200.200/32 flowid 1:2 \
--action police rate 100kbit burst 90k drop
-----
--
--If you run tcpdump on eth0 you will see all packets going out
--with src 192.168.200.200/32 dropped or not (since tcpdump shows
--all packets being egressed).
--Extend the rule a little to see only the packets making it out.
--
-----
--tc qdisc add dev eth0 handle 1:0 root prio
--tc filter add dev eth0 parent 1: protocol ip prio 10 u32 \
--match ip src 192.168.200.200/32 flowid 1:2 \
--action police rate 10kbit burst 90k drop \
--action mirred egress mirror dev dummy0
-----
--
--Now fire tcpdump on dummy0 to see only those packets ..
--tcpdump -n -i dummy0 -x -e -t
--
--Essentially a good debugging/logging interface (sort of like
--BSDs speacialized log device does without needing one).
--
--If you replace mirror with redirect, those packets will be
--blackholed and will never make it out.
--
--cheers,
--jamal
-diff --git a/man/man8/tc-mirred.8 b/man/man8/tc-mirred.8
-index 38833b452d92..71f3c93df472 100644
---- a/man/man8/tc-mirred.8
-+++ b/man/man8/tc-mirred.8
-@@ -94,6 +94,14 @@ interface, it is possible to send ingress traffic through an instance of
- .EE
- .RE
- 
-+.SH LIMITIATIONS
-+It is possible to create loops which will cause the kernel to hang.
-+Do not have the same packet go the same netdevice twice in a single graph of policies.
-+.PP
-+Do not redirect for one IFB device to another.
-+IFB is a very specialized case of packet redirecting device.
-+Redirecting from ifbX->ifbY will cause all packets to be dropped.
+-tc -s filter show parent ffff: dev eth0
+------
+-filter protocol ip pref 6 u32 filter protocol ip pref 6 u32 fh 800: ht divisor 1filter protocol ip pref 6 u32 fh 800::800 order 2048 key ht 800 bkt 0 flowid 1:16  (rule hit 20 success 20)
+-  match 0a000009/ffffffff at 12 (success 20 )
+-        action order 1: gact action drop
+-         random type determ pass val 2
+-         index 4 ref 1 bind 1 installed 118 sec used 82 sec
+-         Sent 1680 bytes 20 pkts (dropped 10, overlimits 0 )
+------
+diff --git a/man/man8/tc-gact.8 b/man/man8/tc-gact.8
+new file mode 100644
+index 000000000000..81aa30eba5a0
+--- /dev/null
++++ b/man/man8/tc-gact.8
+@@ -0,0 +1,85 @@
++.TH "Generic actions in tc" 8 "11 Jan 2023" "iproute2" "Linux"
 +
- .SH SEE ALSO
- .BR tc (8),
- .BR tc-u32 (8)
++.SH NAME
++gact - generic action
++.SH SYNOPSIS
++.in +8
++.ti -8
++.BR tc " ... " "action gact"
++.IR CONTROL " [ " RAND " ] [ " INDEX " ]"
++.ti -8
++.IR CONTROL " := { "
++.BR reclassify " | " drop " | " continue " | " pass " | " pipe " | "
++.br
++.BI "goto chain " "CHAIN_INDEX"
++|
++.br
++.BI "jump " "JUMP_COUNT"
++}
++
++.ti -8
++.IR RAND " := "
++.BI random " RANDTYPE CONTROL VAL"
++.ti -8
++.IR RANDTYPE " := { "
++.BR netrand " | " determ " }"
++.ti -8
++.IR VAL " := number not exceeding 10000"
++.ti -8
++.IR JUMP_COUNT " := absolute jump from start of action list"
++.ti -8
++.IR INDEX " := index value used"
++
++.SH DESCRIPTION
++The
++.B gact
++action allows reclassify, dropping, passing, or accepting packets.
++At the moment there are only two algorithms. One is deterministic
++and the other uses internal kernel netrand.
++
++.SH OPTIONS
++.TP
++.BI random " RANDTYPE CONTROL VAL"
++The probability of taking the action expressed in terms of 1 out of
++.I VAL
++packets.
++
++.TP
++.I CONTROL
++Indicate how
++.B tc
++should proceed if the packet matches.
++For a description of the possible
++.I CONTROL
++values, see
++.BR tc-actions (8).
++
++.SH EXAMPLES
++Apply a rule on ingress to drop packets from a given source address.
++.RS
++.EX
++# tc filter add dev eth0 parent ffff: protocol ip prio 6 u32 match ip src \
++10.0.0.9/32 flowid 1:16 action drop
++.EE
++.RE
++
++Allow 1 out 10 packets from source randomly using the netrand generator
++.RS
++.EX
++# tc filter add dev eth0 parent ffff: protocol ip prio 6 u32 match ip src \
++10.0.0.9/32 flowid 1:16 action drop random netrand ok 10
++.EE
++.RE
++
++Deterministically accept every second packet
++.RS
++.EX
++# tc filter add dev eth0 parent ffff: protocol ip prio 6 u32 match ip src \
++10.0.0.9/32 flowid 1:16 action drop random determ ok 2
++.EE
++.RE
++
++.SH SEE ALSO
++.BR tc (8),
++.BR tc-actions (8),
++.BR tc-u32 (8)
+diff --git a/man/man8/tc.8 b/man/man8/tc.8
+index e5bef911f21b..3175454b9d60 100644
+--- a/man/man8/tc.8
++++ b/man/man8/tc.8
+@@ -871,6 +871,7 @@ was written by Alexey N. Kuznetsov and added in Linux 2.2.
+ .BR tc-fq_codel (8),
+ .BR tc-fq_pie (8),
+ .BR tc-fw (8),
++.BR tc-gact (8),
+ .BR tc-hfsc (7),
+ .BR tc-hfsc (8),
+ .BR tc-htb (8),
 -- 
 2.43.0
 
