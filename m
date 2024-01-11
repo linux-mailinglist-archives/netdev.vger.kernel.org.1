@@ -1,90 +1,234 @@
-Return-Path: <netdev+bounces-63150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63151-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E92AD82B5AD
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 21:05:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C84282B5C3
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 21:17:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 153411C21254
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 20:05:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9115F28A83A
+	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 20:17:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 385DC56761;
-	Thu, 11 Jan 2024 20:05:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8B6A56B68;
+	Thu, 11 Jan 2024 20:17:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XBLD3yxM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MLVO6ej8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2F3756751
-	for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 20:05:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-40e636fd3d2so1320835e9.1
-        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 12:05:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705003515; x=1705608315; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ahYYkZR358AVuImX9h/FxjAqnr1ZW/9Bcn6OlnpBRp0=;
-        b=XBLD3yxMkGUKIQMR+SeFPCMKgDQvjJetzSrx4rioDSKpFhEE+UAjn5HP+DFUStRKE/
-         Tj8VdEuYaVctigpPxMLWP2VCe5cu4FkOqVnNhf1iSTBRjuGxjHA9MbrR37CqqpAuQTUA
-         DchfQrcJyMFdeiwkqxL0hYfZnw6YPocGlmrgLED8QC0fSkROJFvJdQHtvttDHs9iJTFY
-         4Oi0UdTx5VVdPD87GJ8adAgmp2j8tsm3GVbBVEVQi4GXChVbC/TqJ92AajnrbUXfxMPw
-         KxA3lPs1KIPH6sjX5zf4IYHQcw0ae2g0d1KYrzFcds/IYGUn4uzu3hpf5tv5yjIUBCyP
-         J2dA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705003515; x=1705608315;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ahYYkZR358AVuImX9h/FxjAqnr1ZW/9Bcn6OlnpBRp0=;
-        b=UPNyFEdXakYcXIq5r4Spq5TLgIR9rejus7zoqhspBWWJUhgVq3GIRmjbnJ2cOFarOo
-         B6sHaBrdFZhUutRW3vjHZUYOhO8mjaAyU2UWtLbcdw8CFTMnSSMTuybGpOE6LSVtGnY7
-         GHnWdKQtPXR6i4rz/VxdbWqIb6rFnXLuGFtKnSMVqu8auvha7NwKa8zA/F1mhF/PK5su
-         N//WnsX2huMHKTT9nz4QskmxFGv3ieYESy0IrD6fmM58NcAafMOzpVUnlNHZLjFUL/KI
-         VpPlAjbOhW/6PdR9JmWU3oLrqCds5F/3iRXnESq2yBBxSDzvnpZjzqQAg7vlqPVv7fWX
-         CDsg==
-X-Gm-Message-State: AOJu0YzicRRojptHxSQ6pAt6rvmOg0nu/GLbk1+lkuzP+x84g817elec
-	m6bPk80sADdS0vEMcRAjYyI=
-X-Google-Smtp-Source: AGHT+IGUYaVGJ4yGIxoCuUIvzVVY1DATd79VN7Si06VvzXgb68pwbkLSA7sCkfFTpE018KxCT8mVXg==
-X-Received: by 2002:a05:600c:63d2:b0:40e:43e4:a015 with SMTP id dx18-20020a05600c63d200b0040e43e4a015mr206361wmb.74.1705003514615;
-        Thu, 11 Jan 2024 12:05:14 -0800 (PST)
-Received: from skbuf ([188.25.255.36])
-        by smtp.gmail.com with ESMTPSA id fc19-20020a05600c525300b0040d839e7bb3sm7074553wmb.19.2024.01.11.12.05.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jan 2024 12:05:14 -0800 (PST)
-Date: Thu, 11 Jan 2024 22:05:11 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, alsi@bang-olufsen.dk,
-	andrew@lunn.ch, f.fainelli@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	arinc.unal@arinc9.com
-Subject: Re: [PATCH net-next v3 3/8] net: dsa: realtek: common realtek-dsa
- module
-Message-ID: <20240111200511.coe26yxqhcwiiy4y@skbuf>
-References: <20231223005253.17891-1-luizluca@gmail.com>
- <20231223005253.17891-4-luizluca@gmail.com>
- <20240111095125.vtsjpzyj5rrag3sq@skbuf>
- <CAJq09z7rba+7LCrFSYk5FjJSPvfSS0gocRCTPiy4v8V5BxfW+A@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C8A656B63;
+	Thu, 11 Jan 2024 20:17:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CBE4C433F1;
+	Thu, 11 Jan 2024 20:17:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705004226;
+	bh=Wn/R667HLOu9IarBZBF7S2YrJGWsIKf4kWdjkOuJOCY=;
+	h=From:Date:Subject:To:Cc:From;
+	b=MLVO6ej8gPFD/oEWh94ZTPcIVeyGLp1dDA2t+UqFozWCTldoLwopGD6XuTP7ipNf0
+	 ur9ohAGmfPNYk3Q/r+pX8zgSCHznwrqUaAAtsSs7UjpNnW+Ds6/bxjZ31FtZnpGgNh
+	 /GAiCTObn7LxdjgvxZJHrVGjQfrQLVKTy786pA09QwHJpzAt8D4fWTSVKqlFqYl2Yq
+	 T5vMBu4TKQky7c50B0xU6qDXjJu1DsoNAZa+8BGmNLobFfpKan0wln2qxZ+Eo8iihA
+	 8fAkVeEFY1B+mm0TLuIfEpBR276zHJsmAPZQrpgbDK29IV0GYdheoLfusbEN4Gsn2P
+	 82rTY7aFYm3tw==
+From: Nathan Chancellor <nathan@kernel.org>
+Date: Thu, 11 Jan 2024 13:16:48 -0700
+Subject: [PATCH bpf-next v2] selftests/bpf: Update LLVM Phabricator links
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJq09z7rba+7LCrFSYk5FjJSPvfSS0gocRCTPiy4v8V5BxfW+A@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240111-bpf-update-llvm-phabricator-links-v2-1-9a7ae976bd64@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAK9MoGUC/x2NQQqDMBAAvyJ77kJMRYhfKT1Es9HFNIZNFEH8e
+ 9Me5zAzF2QSpgxDc4HQwZm3WEE/GpgWG2dCdpVBK92pVhkck8c9OVsIQzg+mBY7Ck+2bIKB45r
+ Rqac3ru8MtQS1k4Q8n//HC356pLPA+76/Nr1pAX0AAAA=
+To: andrii@kernel.org, ast@kernel.org, daniel@iogearbox.net
+Cc: mykolal@fb.com, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+ patches@lists.linux.dev, llvm@lists.linux.dev, 
+ Yonghong Song <yonghong.song@linux.dev>, 
+ Nathan Chancellor <nathan@kernel.org>
+X-Mailer: b4 0.13-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=7969; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=Wn/R667HLOu9IarBZBF7S2YrJGWsIKf4kWdjkOuJOCY=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDKkLfA5KS7Ql8Uv4zf6l/ykl0fOH2okKD1W16z6+c28zL
+ MybalrZUcrCIMbFICumyFL9WPW4oeGcs4w3Tk2CmcPKBDKEgYtTACbSIsnI0Lt4V8j0CQqMft7q
+ lZx8PTf/NrC+6p1RFy78b+nypUmeAYwMV1LMV93+2v2ac9n1dz4LE4IYDixisWTY67U29I/DFQ5
+ 9fgA=
+X-Developer-Key: i=nathan@kernel.org; a=openpgp;
+ fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-On Thu, Jan 11, 2024 at 04:53:01PM -0300, Luiz Angelo Daros de Luca wrote:
-> What do you mean by dropping the "common"? Use "realtek_probe" or
-> "realtek_dsa_probe"?
+reviews.llvm.org was LLVM's Phabricator instances for code review. It
+has been abandoned in favor of GitHub pull requests. While the majority
+of links in the kernel sources still work because of the work Fangrui
+has done turning the dynamic Phabricator instance into a static archive,
+there are some issues with that work, so preemptively convert all the
+links in the kernel sources to point to the commit on GitHub.
 
-Yes, I meant "realtek_probe()" etc. It's just that the word "common" has
-no added value in function names, and I can't come up with something
-good to replace it with.
+Most of the commits have the corresponding differential review link in
+the commit message itself so there should not be any loss of fidelity in
+the relevant information.
+
+Additionally, fix a typo in the xdpwall.c print ("LLMV" -> "LLVM") while
+in the area.
+
+Link: https://discourse.llvm.org/t/update-on-github-pull-requests/71540/172
+Acked-by: Yonghong Song <yonghong.song@linux.dev>
+Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+---
+Changes in v2:
+- Split patch off from rest of series, as BPF folks would like to take
+  it separately from the rest of the series.
+- Fix link in xdpwall section of README (Yonghong)
+- Add Yonghong's ack
+- Link to v1: https://lore.kernel.org/r/20240109-update-llvm-links-v1-1-eb09b59db071@kernel.org
+---
+ tools/testing/selftests/bpf/README.rst             | 32 +++++++++++-----------
+ tools/testing/selftests/bpf/prog_tests/xdpwall.c   |  2 +-
+ .../selftests/bpf/progs/test_core_reloc_type_id.c  |  2 +-
+ 3 files changed, 18 insertions(+), 18 deletions(-)
+
+diff --git a/tools/testing/selftests/bpf/README.rst b/tools/testing/selftests/bpf/README.rst
+index 9af79c7a9b58..9b974e425af3 100644
+--- a/tools/testing/selftests/bpf/README.rst
++++ b/tools/testing/selftests/bpf/README.rst
+@@ -115,7 +115,7 @@ the insn 20 undoes map_value addition. It is currently impossible for the
+ verifier to understand such speculative pointer arithmetic.
+ Hence `this patch`__ addresses it on the compiler side. It was committed on llvm 12.
+ 
+-__ https://reviews.llvm.org/D85570
++__ https://github.com/llvm/llvm-project/commit/ddf1864ace484035e3cde5e83b3a31ac81e059c6
+ 
+ The corresponding C code
+ 
+@@ -165,7 +165,7 @@ This is due to a llvm BPF backend bug. `The fix`__
+ has been pushed to llvm 10.x release branch and will be
+ available in 10.0.1. The patch is available in llvm 11.0.0 trunk.
+ 
+-__  https://reviews.llvm.org/D78466
++__  https://github.com/llvm/llvm-project/commit/3cb7e7bf959dcd3b8080986c62e10a75c7af43f0
+ 
+ bpf_verif_scale/loop6.bpf.o test failure with Clang 12
+ ======================================================
+@@ -204,7 +204,7 @@ r5(w5) is eventually saved on stack at insn #24 for later use.
+ This cause later verifier failure. The bug has been `fixed`__ in
+ Clang 13.
+ 
+-__  https://reviews.llvm.org/D97479
++__  https://github.com/llvm/llvm-project/commit/1959ead525b8830cc8a345f45e1c3ef9902d3229
+ 
+ BPF CO-RE-based tests and Clang version
+ =======================================
+@@ -221,11 +221,11 @@ failures:
+ - __builtin_btf_type_id() [0_, 1_, 2_];
+ - __builtin_preserve_type_info(), __builtin_preserve_enum_value() [3_, 4_].
+ 
+-.. _0: https://reviews.llvm.org/D74572
+-.. _1: https://reviews.llvm.org/D74668
+-.. _2: https://reviews.llvm.org/D85174
+-.. _3: https://reviews.llvm.org/D83878
+-.. _4: https://reviews.llvm.org/D83242
++.. _0: https://github.com/llvm/llvm-project/commit/6b01b465388b204d543da3cf49efd6080db094a9
++.. _1: https://github.com/llvm/llvm-project/commit/072cde03aaa13a2c57acf62d79876bf79aa1919f
++.. _2: https://github.com/llvm/llvm-project/commit/00602ee7ef0bf6c68d690a2bd729c12b95c95c99
++.. _3: https://github.com/llvm/llvm-project/commit/6d218b4adb093ff2e9764febbbc89f429412006c
++.. _4: https://github.com/llvm/llvm-project/commit/6d6750696400e7ce988d66a1a00e1d0cb32815f8
+ 
+ Floating-point tests and Clang version
+ ======================================
+@@ -234,7 +234,7 @@ Certain selftests, e.g. core_reloc, require support for the floating-point
+ types, which was introduced in `Clang 13`__. The older Clang versions will
+ either crash when compiling these tests, or generate an incorrect BTF.
+ 
+-__  https://reviews.llvm.org/D83289
++__  https://github.com/llvm/llvm-project/commit/a7137b238a07d9399d3ae96c0b461571bd5aa8b2
+ 
+ Kernel function call test and Clang version
+ ===========================================
+@@ -248,7 +248,7 @@ Without it, the error from compiling bpf selftests looks like:
+ 
+   libbpf: failed to find BTF for extern 'tcp_slow_start' [25] section: -2
+ 
+-__ https://reviews.llvm.org/D93563
++__ https://github.com/llvm/llvm-project/commit/886f9ff53155075bd5f1e994f17b85d1e1b7470c
+ 
+ btf_tag test and Clang version
+ ==============================
+@@ -264,8 +264,8 @@ Without them, the btf_tag selftest will be skipped and you will observe:
+ 
+   #<test_num> btf_tag:SKIP
+ 
+-.. _0: https://reviews.llvm.org/D111588
+-.. _1: https://reviews.llvm.org/D111199
++.. _0: https://github.com/llvm/llvm-project/commit/a162b67c98066218d0d00aa13b99afb95d9bb5e6
++.. _1: https://github.com/llvm/llvm-project/commit/3466e00716e12e32fdb100e3fcfca5c2b3e8d784
+ 
+ Clang dependencies for static linking tests
+ ===========================================
+@@ -274,7 +274,7 @@ linked_vars, linked_maps, and linked_funcs tests depend on `Clang fix`__ to
+ generate valid BTF information for weak variables. Please make sure you use
+ Clang that contains the fix.
+ 
+-__ https://reviews.llvm.org/D100362
++__ https://github.com/llvm/llvm-project/commit/968292cb93198442138128d850fd54dc7edc0035
+ 
+ Clang relocation changes
+ ========================
+@@ -292,7 +292,7 @@ Here, ``type 2`` refers to new relocation type ``R_BPF_64_ABS64``.
+ To fix this issue, user newer libbpf.
+ 
+ .. Links
+-.. _clang reloc patch: https://reviews.llvm.org/D102712
++.. _clang reloc patch: https://github.com/llvm/llvm-project/commit/6a2ea84600ba4bd3b2733bd8f08f5115eb32164b
+ .. _kernel llvm reloc: /Documentation/bpf/llvm_reloc.rst
+ 
+ Clang dependencies for the u32 spill test (xdpwall)
+@@ -304,6 +304,6 @@ from running test_progs will look like:
+ 
+ .. code-block:: console
+ 
+-  test_xdpwall:FAIL:Does LLVM have https://reviews.llvm.org/D109073? unexpected error: -4007
++  test_xdpwall:FAIL:Does LLVM have https://github.com/llvm/llvm-project/commit/ea72b0319d7b0f0c2fcf41d121afa5d031b319d5? unexpected error: -4007
+ 
+-__ https://reviews.llvm.org/D109073
++__ https://github.com/llvm/llvm-project/commit/ea72b0319d7b0f0c2fcf41d121afa5d031b319d5
+diff --git a/tools/testing/selftests/bpf/prog_tests/xdpwall.c b/tools/testing/selftests/bpf/prog_tests/xdpwall.c
+index f3927829a55a..4599154c8e9b 100644
+--- a/tools/testing/selftests/bpf/prog_tests/xdpwall.c
++++ b/tools/testing/selftests/bpf/prog_tests/xdpwall.c
+@@ -9,7 +9,7 @@ void test_xdpwall(void)
+ 	struct xdpwall *skel;
+ 
+ 	skel = xdpwall__open_and_load();
+-	ASSERT_OK_PTR(skel, "Does LLMV have https://reviews.llvm.org/D109073?");
++	ASSERT_OK_PTR(skel, "Does LLVM have https://github.com/llvm/llvm-project/commit/ea72b0319d7b0f0c2fcf41d121afa5d031b319d5?");
+ 
+ 	xdpwall__destroy(skel);
+ }
+diff --git a/tools/testing/selftests/bpf/progs/test_core_reloc_type_id.c b/tools/testing/selftests/bpf/progs/test_core_reloc_type_id.c
+index 22aba3f6e344..6fc8b9d66e34 100644
+--- a/tools/testing/selftests/bpf/progs/test_core_reloc_type_id.c
++++ b/tools/testing/selftests/bpf/progs/test_core_reloc_type_id.c
+@@ -80,7 +80,7 @@ int test_core_type_id(void *ctx)
+ 	 * to detect whether this test has to be executed, however strange
+ 	 * that might look like.
+ 	 *
+-	 *   [0] https://reviews.llvm.org/D85174
++	 *   [0] https://github.com/llvm/llvm-project/commit/00602ee7ef0bf6c68d690a2bd729c12b95c95c99
+ 	 */
+ #if __has_builtin(__builtin_preserve_type_info)
+ 	struct core_reloc_type_id_output *out = (void *)&data.out;
+
+---
+base-commit: 3fbf61207c66ff7ac9b60ab76d4bfd239f97e973
+change-id: 20240109-bpf-update-llvm-phabricator-links-d03f9d649e1e
+
+Best regards,
+-- 
+Nathan Chancellor <nathan@kernel.org>
+
 
