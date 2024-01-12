@@ -1,64 +1,54 @@
-Return-Path: <netdev+bounces-63287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82C8882C23F
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 15:55:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B50FD82C240
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 15:55:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E3A82856DB
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 14:55:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62CD2285B71
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 14:55:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A00A6DD09;
-	Fri, 12 Jan 2024 14:55:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D2146E2A5;
+	Fri, 12 Jan 2024 14:55:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="OSzCfJrt"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="AD0P7pTY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B7626E2A9
-	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 14:55:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1d4ab4e65aeso48442945ad.0
-        for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 06:55:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1705071315; x=1705676115; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=49KxL6Obx5+jxRtv5bJ9JLRo7erEIHPX8hN8OYI8/0k=;
-        b=OSzCfJrt9UeBcm9a5Kz8l0yKE095KqvwPg1hyVvIpYJV5OokcINeaLpp9ULHrzdjI/
-         SKFaSv64Pa4D1fnNm7jmzA77EiJVeXaFP3KIdCOngyn085KMqz1a4CQ84WTArKROcWt7
-         baHOuMMFzFyo9tkhoz2HRI3kB074pahb4sWdx43oH5QFBsunyNObRBUEeMsX4ZfLlmUy
-         HDgHLTz9YJgjB7x+Lv4ssqD6WYtn1ob9Lz1tw0heIqeb1RO0fkZu2W7Nzlp3u7SVVbZ4
-         lpNydGN8ZASqotqjjCbxwDMu47xUTKzxzyVh++pjkz+D+sWVLZGk5+IOwhNoioZIrJ2n
-         GALA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705071315; x=1705676115;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=49KxL6Obx5+jxRtv5bJ9JLRo7erEIHPX8hN8OYI8/0k=;
-        b=M0JcqJDszlMRlhYxQWI5frCG32UWoaGHP721uJVh8t0T+pvWrPLAPLpJ5tiklOUVUN
-         BwaHDHz8CUk+BMJkVzjziTGPPn7V/ogdSMnAlt+R9dMi6/VP9SjCRAtxk2IXwA+lEPp/
-         TGIv/lNZDIiUNLEPb4EqSuQAjH0uqV8qnNbwZBIqLgG3ZiKqRTkqPSUhJ78V6rKI2LDX
-         6NifNKp72O5UGdo73zqPmCPsTAQFbn7T8Yq1k3CGrQV3ksvtUJjiHWQ2emAz8ISM4Waq
-         fR6ovQHY3mKKTbOJC+73PWJG4cbPalfkvi/EGHBVCJ3IMUnDcjj1bBq0Rm/M7xdAQXQg
-         j45Q==
-X-Gm-Message-State: AOJu0YxqR3uFK9D+dKh6DdpXAxkkCbHGbQZV3ksg2hRJEZzy+Zy4o7or
-	v/BcfFRWLecuFL70qdUSohs6zCUD1Lhb
-X-Google-Smtp-Source: AGHT+IHZKnnT/4gZuz0ZPHziG1wdRqFGvA/Naq4+URBSai6ioyghwD75k2JUj5gdewcW5qwpLEvFaQ==
-X-Received: by 2002:a17:90b:3782:b0:28d:7674:bdff with SMTP id mz2-20020a17090b378200b0028d7674bdffmr3476320pjb.34.1705071315423;
-        Fri, 12 Jan 2024 06:55:15 -0800 (PST)
-Received: from ?IPV6:2804:7f1:e2c0:d725:4798:351e:83cf:27f2? ([2804:7f1:e2c0:d725:4798:351e:83cf:27f2])
-        by smtp.gmail.com with ESMTPSA id sl3-20020a17090b2e0300b0028b6759d8c1sm4243921pjb.29.2024.01.12.06.55.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Jan 2024 06:55:15 -0800 (PST)
-Message-ID: <a4b8480e-af22-4e6a-b1db-ac95ba9d9b31@mojatatu.com>
-Date: Fri, 12 Jan 2024 11:55:11 -0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 159736DD09;
+	Fri, 12 Jan 2024 14:55:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40CBvqpO012097;
+	Fri, 12 Jan 2024 14:55:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=3UGFsNKGRrS4TKXanKYHSZDlh/L0lTRy0EEXiGIzMFQ=; b=AD
+	0P7pTYanvr5fxNK5FqCplMLTaJthJCLkhDnILSDs8LfBxMuS5zrGsMyXEdCXII/o
+	LpkNXNrtmwooc3bStHR/z5BgGYdSls1RTieNOtvj+8xA+7iaOYdzVJEaU8CAMF9s
+	KMJnZP/4XpN0OlkbWUSBHEwd2yQkM57Bn+TZ7LH0XV46GWvpQEx+bDhHqWMVR3Hc
+	VoIx0+TR4+kWbVj0eIuK6scRmJ3P14PjVqe2pKf2KkF1pZi8jMCVO5CebHOcrltY
+	4im5mkCtDBQkZoPtdQV9rk3JATChImSzL0hcS/MWH+UAxRiN0iZjFh4a/6rWZRuv
+	pSGl3mrogFnhMBWLOvjQ==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3vk1x18wf2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 12 Jan 2024 14:55:21 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 40CEtK85003254
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 12 Jan 2024 14:55:20 GMT
+Received: from [10.253.78.164] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Fri, 12 Jan
+ 2024 06:55:16 -0800
+Message-ID: <9c19bfc3-4ecf-4953-8bee-ef46cd613caa@quicinc.com>
+Date: Fri, 12 Jan 2024 22:55:13 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,36 +56,104 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [patch net] net: sched: track device in tcf_block_get/put_ext()
- only for clsact binder types
+Subject: Re: [PATCH 0/6] Add PPE device tree node for Qualcomm IPQ SoC
 Content-Language: en-US
-To: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org
-Cc: kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net,
- edumazet@google.com, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
- pctammela@mojatatu.com, idosch@idosch.org, mleitner@redhat.com,
- vladbu@nvidia.com, paulb@nvidia.com
-References: <20240112113930.1647666-1-jiri@resnulli.us>
-From: Victor Nogueira <victor@mojatatu.com>
-In-Reply-To: <20240112113930.1647666-1-jiri@resnulli.us>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To: Konrad Dybcio <konrad.dybcio@linaro.org>, <andersson@kernel.org>,
+        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
+        <conor+dt@kernel.org>
+CC: <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <quic_kkumarcs@quicinc.com>, <quic_suruchia@quicinc.com>,
+        <quic_soni@quicinc.com>, <quic_pavir@quicinc.com>,
+        <quic_souravp@quicinc.com>, <quic_linchen@quicinc.com>,
+        <quic_leiwei@quicinc.com>
+References: <20240110112059.2498-1-quic_luoj@quicinc.com>
+ <0ac211de-e3d4-4a41-b0ed-d2bf393e58cb@linaro.org>
+From: Jie Luo <quic_luoj@quicinc.com>
+In-Reply-To: <0ac211de-e3d4-4a41-b0ed-d2bf393e58cb@linaro.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: rDGUjiaxMtXY6fN0gK_3GE5L_4_7QUsh
+X-Proofpoint-GUID: rDGUjiaxMtXY6fN0gK_3GE5L_4_7QUsh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_01,2023-12-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ clxscore=1015 mlxscore=0 spamscore=0 phishscore=0 adultscore=0 bulkscore=0
+ impostorscore=0 lowpriorityscore=0 malwarescore=0 suspectscore=0
+ mlxlogscore=773 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2311290000 definitions=main-2401120116
 
-> From: Jiri Pirko <jiri@nvidia.com>
-> 
-> Clsact/ingress qdisc is not the only one using shared block,
-> red is also using it. The device tracking was originally introduced
-> by commit 913b47d3424e ("net/sched: Introduce tc block netdev
-> tracking infra") for clsact/ingress only. Commit 94e2557d086a ("net:
-> sched: move block device tracking into tcf_block_get/put_ext()")
-> mistakenly enabled that for red as well.
-> 
-> Fix that by adding a check for the binder type being clsact when adding
-> device to the block->ports xarray.
-> 
-> Reported-by: Ido Schimmel <idosch@idosch.org>
-> Closes: https://lore.kernel.org/all/ZZ6JE0odnu1lLPtu@shredder/
-> Fixes: 94e2557d086a ("net: sched: move block device tracking into tcf_block_get/put_ext()")
-> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 
-Tested-by: Victor Nogueira <victor@mojatatu.com>
+
+On 1/10/2024 7:32 PM, Konrad Dybcio wrote:
+> 
+> 
+> On 1/10/24 12:20, Luo Jie wrote:
+>> The PPE(packet process engine) hardware block is supported by Qualcomm
+>> IPQ platforms, such as IPQ9574 and IPQ5332. The PPE includes the various
+>> packet processing modules such as the routing and bridging flow engines,
+>> L2 switch capability, VLAN and tunnels. Also included are integrated
+>> ethernet MAC and PCS(uniphy), which is used to connect with the external
+>> PHY devices by PCS.
+>>
+>> This patch series enables support for the following DTSI functionality
+>> for Qualcomm IPQ9574 and IPQ5332 chipsets.
+>>
+>> 1. Add PPE (Packet Processing Engine) HW support
+>>
+>> 2. Add IPQ9574 RDP433 board support, where the PPE is connected
+>>     with qca8075 PHY and AQ PHY.
+>>
+>> 3. Add IPQ5332 RDP441 board support, where the PPE is connected
+>>     with qca8386 and SFP
+>>
+>> PPE DTS depends on the NSSCC clock driver below, which provides the
+>> clocks for the PPE driver.
+>> https://lore.kernel.org/linux-arm-msm/20230825091234.32713-1-quic_devipriy@quicinc.com/
+>> https://lore.kernel.org/linux-arm-msm/20231211-ipq5332-nsscc-v3-0-ad13bef9b137@quicinc.com/
+> 
+> None of these describe (or even use) the compatible in the first
+> patch of this series ("qcom,ipq9574-ppe"). I didn't check the
+> subsequent ones, as I assume it's the same situtation, so this
+> is a NAK.
+
+The DT binding file was included in the PPE driver series, which
+documents the compatible string.
+
+https://lore.kernel.org/netdev/20240110142428.52026d9e@kernel.org/
+
+I will hold off this DTSI patch series for now as per discussion in the
+series. When the series is resumed later, I will mention the link of PPE 
+driver patch series in the cover letter, when updating this DTS patch 
+series. Sorry for this confusion caused.
+
+
+
+> 
+>> Lei Wei (2):
+>>    arm64: dts: qcom: ipq5332: Add RDP441 board device tree
+>>    arm64: dts: qcom: ipq9574: Add RDP433 board device tree
+> 
+> These two look unrelated?
+
+These two patches are for adding the PPE port related configuration 
+nodes (such as port speed, interface mode and MDIO address) which are 
+board specific. RDP441 and RDP433 are two different board types. Perhaps
+the title of the patches are not clear enough. I will update the title
+to make it clear when the patch series resumes.
+
+> 
+>>
+>> Luo Jie (4):
+>>    arm64: dts: qcom: ipq9574: Add PPE device tree node
+>>    arm64: dts: qcom: ipq5332: Add PPE device tree node
+>>    arm64: dts: qcom: ipq5332: Add MDIO device tree
+>>    arm64: dts: qcom: ipq9574: Add MDIO device tree
+> 
+> Konrad
 
