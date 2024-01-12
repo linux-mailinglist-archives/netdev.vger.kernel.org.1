@@ -1,114 +1,129 @@
-Return-Path: <netdev+bounces-63289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C303082C24C
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 15:56:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8428F82C25B
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 16:01:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52CDE1F26397
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 14:56:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 246B71F22D22
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 15:01:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09F396DD09;
-	Fri, 12 Jan 2024 14:56:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 615AF6E2C7;
+	Fri, 12 Jan 2024 15:00:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="STXwxPwD"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="aPP/EA2D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9344C6E2CA
-	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 14:55:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-5ed10316e22so63042197b3.3
-        for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 06:55:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1705071358; x=1705676158; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MVnHuloox4t25UnlyviJ2gBRYYCzorAJooMsAwmOhl0=;
-        b=STXwxPwDpHuRz3QeuetupHDaNTj+3Rdf2vml55PzrESbYecURPOtggXSNOxDOETzVa
-         rLBG8MqDUjcOVJgonNl9RiN1RClyvEi26J/2MQdq/aCUl0SefDrC0Cj5OfDU7bRZi9TW
-         gA1HlhPqRZGYI5879B0+6yulYXerTI3l+noy1ylUxLBjZsLIas9OgyVjK0k22BJMNIoR
-         hoDD2sk5/slM1pnb35Ym/b7KLdsL15bgejit8HLJKN2E9IaB9VmMRhMuOpss97pBOqqF
-         mMUlAJqTK96QPPpFiq+TiDiRgM12eUKMATcBj7XpgffChSsThh3vgtA/c9D4fpzPVE8Y
-         0Law==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705071358; x=1705676158;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MVnHuloox4t25UnlyviJ2gBRYYCzorAJooMsAwmOhl0=;
-        b=jMy5amfNpXKmWn9noEkUCfioHsuHtedfhCK5rWSUHSOw6tCt0ci9Z4tx02u/4ikJrf
-         N1Dg4PT5SBKisHwvrEKPHjtTN7bDQXgkjwQhVN6FtKNG0G7i4eVzaXJKWgH+AU0gBvup
-         aZ4qEwPAzW79FPBal00ujdVYIFP6lPIGVVyOJWj4F2OUob8tBes7aBsRdTOStzTCQbkN
-         DRCuEwr+zQN+9cJ7P4zha1oAa27/HTL6HPqRhmTEx10X0Nl+Zz0Q6qobn1qifM1FAPS3
-         NVfyzepBzWe5JHaq8ktPSsoLZdwMB1o1vPItakaaG562XFTLAJ0aYT8J/aY4N6ehE9UX
-         1s3Q==
-X-Gm-Message-State: AOJu0YyNyUSiCPClvbzeYQKsk1ougQX3zG08mo4U1IzIuhlePyy1J6OI
-	GKEYx0844eEmOsYvi2Zsds4ZiYv3UjvJsdjzoz7uKpqyAbS6
-X-Google-Smtp-Source: AGHT+IHU/aN/LL04Z8A/bRm2Siu0Q5O31AY6OjnFp8XB8f8LQVg06FDOfKrLgVHFlrp6BWT3LLKUFvVycdBa4+e//fQ=
-X-Received: by 2002:a05:690c:d94:b0:5f8:b42d:4707 with SMTP id
- da20-20020a05690c0d9400b005f8b42d4707mr1702129ywb.101.1705071358458; Fri, 12
- Jan 2024 06:55:58 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E52506DD07;
+	Fri, 12 Jan 2024 15:00:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40CDLlW6030090;
+	Fri, 12 Jan 2024 15:00:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=Nt/sEVIDai5Q8pS8pgV/u7mjDZ+NS62VC4KAIb5S5MM=; b=aP
+	P/EA2DldXlpghdwXF7VXxi20HKajXZe4z3q1PIiHxrStCS0E3pEAxMXmWwV5sUw5
+	gGMFQ6b1vvVyzi5kTjfCQesB1xijKg3lAhr0KqABXyAPH2nVbQuRXKEzjyVzZzDg
+	1F15x0eqEn58sW6rDaYCDS1dYxbz4opEXkwFDn0NDNrGaFlkmrhS/M47xpnXwRvg
+	FlbAVRZc/Ah2oHyNjEoKb1cY1LHPN8FRqpifRGiGRIjm9vXoZS/NDPhae08qBzNL
+	jd3EH4MiMncGk3HmQhsjpILwwyLX9hR8+oUAzBPghV/t6GvM62RI0VVlGycSZNMT
+	blG22eF0/Suei5GDMELw==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3vjymn9agm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 12 Jan 2024 15:00:44 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 40CF0hid010713
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 12 Jan 2024 15:00:43 GMT
+Received: from [10.253.78.164] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Fri, 12 Jan
+ 2024 07:00:38 -0800
+Message-ID: <840fc48b-956d-47e8-8307-c419afb1efc2@quicinc.com>
+Date: Fri, 12 Jan 2024 23:00:35 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240111184451.48227-1-stephen@networkplumber.org>
- <20240111184451.48227-2-stephen@networkplumber.org> <ZaEzpWaTLDG6Ofby@nanopsycho>
-In-Reply-To: <ZaEzpWaTLDG6Ofby@nanopsycho>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Fri, 12 Jan 2024 09:55:46 -0500
-Message-ID: <CAM0EoM=bAsbaNsQUbfO_yLHR2PFXBF9Zq3VXBGPhmKtWsMv5tA@mail.gmail.com>
-Subject: Re: [PATCH iproute2-next 1/4] man: get rid of doc/actions/mirred-usage
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/6] Add PPE device tree node for Qualcomm IPQ SoC
+Content-Language: en-US
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
+        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
+        <conor+dt@kernel.org>
+CC: <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <quic_kkumarcs@quicinc.com>, <quic_suruchia@quicinc.com>,
+        <quic_soni@quicinc.com>, <quic_pavir@quicinc.com>,
+        <quic_souravp@quicinc.com>, <quic_linchen@quicinc.com>,
+        <quic_leiwei@quicinc.com>
+References: <20240110112059.2498-1-quic_luoj@quicinc.com>
+ <458ded82-b200-4946-9b22-31cda68f1c8c@linaro.org>
+From: Jie Luo <quic_luoj@quicinc.com>
+In-Reply-To: <458ded82-b200-4946-9b22-31cda68f1c8c@linaro.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: GDThB25HhrPiZt1J6QblhAeyuRjVe6HS
+X-Proofpoint-GUID: GDThB25HhrPiZt1J6QblhAeyuRjVe6HS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
+ clxscore=1015 lowpriorityscore=0 bulkscore=0 impostorscore=0 spamscore=0
+ mlxscore=0 malwarescore=0 mlxlogscore=532 phishscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2311290000
+ definitions=main-2401120117
 
-On Fri, Jan 12, 2024 at 7:42=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wrote=
-:
->
-> Thu, Jan 11, 2024 at 07:44:08PM CET, stephen@networkplumber.org wrote:
-> >The only bit of information not already on the man page
-> >is some of the limitations.
-> >
->
-> [...]
->
-> >diff --git a/man/man8/tc-mirred.8 b/man/man8/tc-mirred.8
-> >index 38833b452d92..71f3c93df472 100644
-> >--- a/man/man8/tc-mirred.8
-> >+++ b/man/man8/tc-mirred.8
-> >@@ -94,6 +94,14 @@ interface, it is possible to send ingress traffic thr=
-ough an instance of
-> > .EE
-> > .RE
-> >
-> >+.SH LIMITIATIONS
-> >+It is possible to create loops which will cause the kernel to hang.
->
-> Hmm, I think this is not true for many many years. Perhaps you can drop
-> it? Anyway, it was a kernel issue.
 
-Hmm back at you: why do you say it is not true anymore? It is still
-there - all in the marvelous name of saving 2 bits from the skb.
-If you want to be the hero, here's the last attempt to fix this issue:
-https://lore.kernel.org/netdev/20231215180827.3638838-1-victor@mojatatu.com=
-/#t
 
-Stephen, please cc all the stakeholders when you make these changes.
-Some of us dont have the luxury to be able to scan every message in
-the list. I dont have time, at the moment, to review all the
-documentation you are removing - but if you had Cc me i would have
-made time.
+On 1/10/2024 8:13 PM, Krzysztof Kozlowski wrote:
+> On 10/01/2024 12:20, Luo Jie wrote:
+>> The PPE(packet process engine) hardware block is supported by Qualcomm
+>> IPQ platforms, such as IPQ9574 and IPQ5332. The PPE includes the various
+>> packet processing modules such as the routing and bridging flow engines,
+>> L2 switch capability, VLAN and tunnels. Also included are integrated
+>> ethernet MAC and PCS(uniphy), which is used to connect with the external
+>> PHY devices by PCS.
+>>
+>> This patch series enables support for the following DTSI functionality
+>> for Qualcomm IPQ9574 and IPQ5332 chipsets.
+>>
+>> 1. Add PPE (Packet Processing Engine) HW support
+>>
+>> 2. Add IPQ9574 RDP433 board support, where the PPE is connected
+>>     with qca8075 PHY and AQ PHY.
+>>
+>> 3. Add IPQ5332 RDP441 board support, where the PPE is connected
+>>     with qca8386 and SFP
+>>
+>> PPE DTS depends on the NSSCC clock driver below, which provides the
+>> clocks for the PPE driver.
+> 
+> DTS cannot depend on clock drivers. Maybe you meant that it depends on
+> NSSCC clock controller DTS changes, which would be fine. However
+> depending on drivers is neither necessary nor allowed.
+> 
+> Best regards,
+> Krzysztof
+> 
 
-cheers,
-jamal
+Yes, this DTSI series depends on the NSSCC clock controller DTS patches 
+which are referred to in the cover letter. I will rectify the cover 
+letter text when the series resumes later.
+
 
