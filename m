@@ -1,146 +1,130 @@
-Return-Path: <netdev+bounces-63291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E59B982C268
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 16:03:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83BDC82C38D
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 17:25:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 69EC8B20813
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 15:03:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A86F51C20C3F
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 16:25:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF1246E2C5;
-	Fri, 12 Jan 2024 15:03:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XML8ROoH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A7B1745E0;
+	Fri, 12 Jan 2024 16:25:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout5.r2.mail-out.ovh.net (smtpout5.r2.mail-out.ovh.net [54.36.141.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AAAB1E529
-	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 15:03:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-50e7f58c5fbso8838352e87.1
-        for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 07:03:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1705071806; x=1705676606; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:user-agent:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=toiihwgbBXQtxuvplwPZBYyqQgpc30K6w6RtC5O5hmA=;
-        b=XML8ROoHt8d65P08AM15DZUPJXKIP/W0H0Ps2CLjxH2tT6iL5apC9jRDwW5uwdt/O6
-         k85Z/FrfvCrB82vIL86Z5xKS8O8pc8S1QqGHIWjoyhu7bqqe7t3ftpa9NXjvmfi0vOvS
-         4j8ge9FRIcsa8JvZUg84mPvL2UTpvyBB0A4K8VnNF1UYaaqE7PKrG3Sb6wnTCnoasfVO
-         2PumFY0V4SDT8fhqLDfH+Hpm5JiRWqhlHWGFJf9sLChZEiGSGp4wWY97Gr3bRxTBHcPx
-         kx3yA9R4cIk1jzPC+nfVUZCSPHihXuE0OKqiXMHN7lqv1290rJ9ZKR5hQfGPG7faHn0H
-         YTxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705071806; x=1705676606;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:user-agent:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=toiihwgbBXQtxuvplwPZBYyqQgpc30K6w6RtC5O5hmA=;
-        b=F05fPwRTCsnIJkDzTZ5EoItslKKZh5NF4S16EQdNsoX89E+uiVinNO72d7bSjuk52F
-         D+xuXSNfBWxAoKdQ1jtNjQYpmJFhU+z9IzBizlbFcauYydSDg6N2UrMxUSWHrOznEB+s
-         gP2aU1kEUx9B/jFvawfpbi4dHhrsYMEj3Sw1S/+DILiLLqRE6yqH98Obs6KBEYaVL0N2
-         vvfosjGxhwROT6bMjMZfeeeMUstYzEG7c2Lj9D1YxTkVsI0vMcY2/Gb/E7DvW//tDKj+
-         ogBnGKv26og9g+kH5jmkTFqLgGwF2Q08jGvWWEnCsRP3Btdd7Kf38NxViHj2e9Iwfy3d
-         Nxsw==
-X-Gm-Message-State: AOJu0YzlMOqUqdBANuHy2aEMGgDV4R+dyxyFnDxDcRANGUGtNkqdbr5r
-	1z5rNlCu2wBgq9/9cG2+g97LzM7xcWZG1w==
-X-Google-Smtp-Source: AGHT+IHzWoBI/gw1ovzwFkaSh6dvJAdJYu8plavA7O8fbIQgYwdeuATmAxUsfd6HZf/jobqSR+6l8g==
-X-Received: by 2002:a05:6512:3b0b:b0:50e:4e6b:9cd7 with SMTP id f11-20020a0565123b0b00b0050e4e6b9cd7mr1128581lfv.12.1705071806353;
-        Fri, 12 Jan 2024 07:03:26 -0800 (PST)
-Received: from [127.0.0.1] (85-76-114-160-nat.elisa-mobile.fi. [85.76.114.160])
-        by smtp.gmail.com with ESMTPSA id u3-20020ac258c3000000b0050e7d22a9b8sm520518lfo.89.2024.01.12.07.03.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Jan 2024 07:03:25 -0800 (PST)
-Date: Fri, 12 Jan 2024 17:03:23 +0200
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-To: Jie Luo <quic_luoj@quicinc.com>
-CC: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, andersson@kernel.org,
- konrad.dybcio@linaro.org, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- quic_kkumarcs@quicinc.com, quic_suruchia@quicinc.com, quic_soni@quicinc.com,
- quic_pavir@quicinc.com, quic_souravp@quicinc.com, quic_linchen@quicinc.com,
- quic_leiwei@quicinc.com
-Subject: Re: [PATCH 1/6] arm64: dts: qcom: ipq9574: Add PPE device tree node
-User-Agent: K-9 Mail for Android
-In-Reply-To: <6fc9e65a-709a-4923-b0b3-7c460199417a@quicinc.com>
-References: <20240110112059.2498-1-quic_luoj@quicinc.com> <20240110112059.2498-2-quic_luoj@quicinc.com> <a42718a9-d0f9-47d9-9ee8-fb520ed2a7a8@linaro.org> <de0ad768-05fa-4bb1-bcbc-0adb28cb2257@quicinc.com> <CAA8EJppeQdB4W8u0ux16pxBBwF_fpt1j-5aC0f849n9_iaaYtQ@mail.gmail.com> <6fc9e65a-709a-4923-b0b3-7c460199417a@quicinc.com>
-Message-ID: <1552D7D8-2D1B-4236-A5BF-02B68DC919CB@linaro.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E1076D1AA
+	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 16:25:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=naccy.de
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=naccy.de
+Received: from ex4.mail.ovh.net (unknown [10.110.168.145])
+	by mo511.mail-out.ovh.net (Postfix) with ESMTPS id 5D0B32AEE0;
+	Fri, 12 Jan 2024 14:00:12 +0000 (UTC)
+Received: from bf-dev-miffies.localdomain (130.93.52.54) by
+ DAG10EX1.indiv4.local (172.16.2.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Fri, 12 Jan 2024 15:00:11 +0100
+From: Quentin Deslandes <qde@naccy.de>
+To: <netdev@vger.kernel.org>
+CC: David Ahern <dsahern@gmail.com>, Martin KaFai Lau <martin.lau@kernel.org>,
+	Quentin Deslandes <qde@naccy.de>, <kernel-team@meta.com>
+Subject: [PATCH v4 0/3] ss: pretty-printing BPF socket-local storage
+Date: Fri, 12 Jan 2024 15:04:26 +0100
+Message-ID: <20240112140429.183344-1-qde@naccy.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: CAS13.indiv4.local (172.16.1.13) To DAG10EX1.indiv4.local
+ (172.16.2.91)
+X-Ovh-Tracer-Id: 5038402083867389692
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvkedrvdeihedgheekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefufffkofgggfgtihesthekredtredttdenucfhrhhomhepsfhuvghnthhinhcuffgvshhlrghnuggvshcuoehquggvsehnrggttgihrdguvgeqnecuggftrfgrthhtvghrnhepfeduteevveeluedvvedtieegleefveetjeeukeeigefgtdekudeuheduudegfeefnecukfhppeduvdejrddtrddtrddupddufedtrdelfedrhedvrdehgeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeduvdejrddtrddtrddupdhmrghilhhfrhhomhepoehquggvsehnrggttgihrdguvgeqpdhnsggprhgtphhtthhopedupdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdgushgrhhgvrhhnsehgmhgrihhlrdgtohhmpdhmrghrthhinhdrlhgruheskhgvrhhnvghlrdhorhhgpdhkvghrnhgvlhdqthgvrghmsehmvghtrgdrtghomhdpoffvtefjohhsthepmhhoheduuddpmhhouggvpehsmhhtphhouhht
 
-On 12 January 2024 16:40:02 EET, Jie Luo <quic_luoj@quicinc=2Ecom> wrote:
->
->
->On 1/12/2024 12:06 AM, Dmitry Baryshkov wrote:
->> On Thu, 11 Jan 2024 at 17:31, Jie Luo <quic_luoj@quicinc=2Ecom> wrote:
->
->>>=20
->>>>=20
->>>>> +                    reg =3D <0x3a000000 0xb00000>;
->>>>> +                    #address-cells =3D <1>;
->>>>> +                    #size-cells =3D <1>;
->>>>> +                    ranges;
->>>>=20
->>>> Put after reg=2E
->>> Ok=2E
->>>=20
->>>>=20
->>>>> +                    status =3D "okay";
->>>>=20
->>>> Drop
->>> Ok=2E
->>>=20
->>>>=20
->>>> All of above comments apply to your entire patchset and all places=2E
->>>>=20
->>>> Looking at code further, it does not look like suitable for mainline,
->>>> but copy of downstream code=2E That's not what we expect upstream=2E =
-Please
->>>> go back to your bindings first=2E Also, I really insist you reaching =
-out
->>>> to other folks to help you in this process=2E
->>>>=20
->>>> Best regards,
->>>> Krzysztof
->>>>=20
->>> We will do internal review of the gaps and update the patches as per
->>> your comments=2E
->>>=20
->>> Thanks for the review comments=2E
->>=20
->>  From the first glance, the bindings do not follow upstream principles=
-=2E
->> You have all the settings (tdm, port config, etc) in the DT, while
->> they should instead go to the driver=2E Well, unless you expect that th=
-e
->> board might need to override them=2E
->>=20
->Hi Dmitry,
->The TDM configuration varies per SoC type, since the ethernet port capabi=
-lities of the SoCs vary=2E So we will have two different TDM configurations=
- for IPQ5332 and IPQ9574 SoC=2E The driver also will
->need to support future SoC, so we choose to configure this from the DTSI=
-=2E The same reason applies to the port scheduler config as well=2E
+BPF allows programs to store socket-specific data using
+BPF_MAP_TYPE_SK_STORAGE maps. The data is attached to the socket itself,
+and Martin added INET_DIAG_REQ_SK_BPF_STORAGES, so it can be fetched
+using the INET_DIAG mechanism.
 
-If it differs from SoC to SoC only, it goes to the driver=2E Point=2E No o=
-ther options=2E Thank you=2E
+Currently, ss doesn't request the socket-local data, this patch aims to
+fix this.
 
->
->Thanks for review comments=2E
+The first patch requests the socket-local data for the requested map ID
+(--bpf-map-id=) or all the maps (--bpf-maps). It then prints the map_id
+in a dedicated column.
+
+Patch #2 uses libbpf and BTF to pretty print the map's content, like
+`bpftool map dump` would do.
+
+Patch #3 updates ss' man page to explain new options.
+
+While I think it makes sense for ss to provide the socket-local storage
+content for the sockets, it's difficult to conciliate the column-based
+output of ss and having readable socket-local data. Hence, the
+socket-local data is printed in a readable fashion over multiple lines
+under its socket statistics, independently of the column-based approach.
+
+Here is an example of ss' output with --bpf-maps:
+[...]
+ESTAB                  340116             0 [...]
+    map_id: 114 [
+        (struct my_sk_storage){
+            .field_hh = (char)3,
+            (union){
+                .a = (int)17,
+                .b = (int)17,
+            },
+        }
+    ]
+
+Changes from v3:
+* Minor refactoring to reduce number of HAVE_LIBBF usage.
+* Update ss' man page.
+* btf_dump structure created to print the socket-local data is cached
+  in bpf_map_opts. Creation of the btf_dump structure is performed if
+  needed, before printing the data.
+* If a map can't be pretty-printed, print its ID and a message instead
+  of skipping it.
+* If show_all=true, send an empty message to the kernel to retrieve all
+  the maps (as Martin suggested).
+Changes from v2:
+* bpf_map_opts_is_enabled is not inline anymore.
+* Add more #ifdef HAVE_LIBBPF to prevent compilation error if
+  libbpf support is disabled.
+* Fix erroneous usage of args instead of _args in vout().
+* Add missing btf__free() and close(fd).
+Changes from v1:
+* Remove the first patch from the series (fix) and submit it separately.
+* Remove double allocation of struct rtattr.
+* Close BPF map FDs on exit.
+* If bpf_map_get_fd_by_id() fails with ENOENT, print an error message
+  and continue to the next map ID.
+* Fix typo in new command line option documentation.
+* Only use bpf_map_info.btf_value_type_id and ignore
+  bpf_map_info.btf_vmlinux_value_type_id (unused for socket-local storage).
+* Use btf_dump__dump_type_data() instead of manually using BTF to
+  pretty-print socket-local storage data. This change alone divides the size
+  of the patch series by 2.
+
+Quentin Deslandes (3):
+  ss: add support for BPF socket-local storage
+  ss: pretty-print BPF socket-local storage
+  ss: update man page to document --bpf-maps and --bpf-map-id=
+
+ man/man8/ss.8 |   6 +
+ misc/ss.c     | 390 ++++++++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 387 insertions(+), 9 deletions(-)
+
+--
+2.43.0
 
 
