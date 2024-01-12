@@ -1,73 +1,72 @@
-Return-Path: <netdev+bounces-63263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 054E882C02D
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 13:56:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A95082C04B
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 14:00:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 946C41F21859
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 12:56:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2C651F25952
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 13:00:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F5C559B64;
-	Fri, 12 Jan 2024 12:56:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAEB36A34F;
+	Fri, 12 Jan 2024 13:00:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="O5qQm374"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="23tu3wUs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB55B59B4E
-	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 12:56:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24A876A34D
+	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 13:00:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a28b1095064so712090166b.2
-        for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 04:56:22 -0800 (PST)
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a28f66dc7ffso1358279366b.0
+        for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 05:00:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1705064181; x=1705668981; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1705064438; x=1705669238; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xBU27MlZTqHSaK+9/DPt2UFYW7bDObb/k/9gGJLMPrg=;
-        b=O5qQm374NVsuLP81ChDSX3i0slk0AY+IGa6tQKfb51rsy244fuilpRVmAwBAtkgDiL
-         44LPM2daVtOkpftsVlS6a370BPG/FVpwuOBbA+i5ERyz4Yaycmr/BDOw5/5RW7Hfz9zj
-         JNc4pC3BBoSvdyKBk6EohBXsZQ+G1SxEnq1GOgNeuKQY0pcvUolsZEAMT8Ns3EzVoCo/
-         NZY8/IT1mfBAKcOAj+p48qrTTdMl2Uvb74hpi8qNNMNQQoXi6xGjnqUorvE7Te5b69he
-         peXBn7TD6QJJtr6TmA/1MUAytREK07W3IMcJ5dqWseQC3V2I8Ff+a08S0uEFjKKU44MX
-         2dYA==
+        bh=Jo/+uwcv6M9RCVLWBTh3+lxGJkmyBn9pvaZy82W6zuc=;
+        b=23tu3wUs5e8gPw2LCNvCH8R4kMKtBI2KUZpek+MqIPxCq9mOQHZEm0DpgkqFgIt5tx
+         h6eXHZPF6WbUYTBHKuBqaOVQi/k6COQqs637dy5ZrGfeGMh8Ni22VPSvsgm47xtROpv2
+         G/lkWurUfbaJ8aqfjS6PmGQToDpGfsrWkpumr4JF8ezdSGN5ziyXHinWCWCa6hZQzApr
+         e66C9Sw2utryoA9SoQ7UKv9m5/BjRwHzeYDGS1D6IPEnq3pXxMUEU8evL5rWPQsDFoc2
+         HFo88CLhx4XBMkTYSm06gyjKNltXsq9hHeaetb6y+ZjsqjQrJdEObz652Q34+lbcKSLo
+         isNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705064181; x=1705668981;
+        d=1e100.net; s=20230601; t=1705064438; x=1705669238;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xBU27MlZTqHSaK+9/DPt2UFYW7bDObb/k/9gGJLMPrg=;
-        b=L8l3GUnX/Msu81vsFnKq2nUT2O2n2qq2iQEHDClsSejVZ4HIFmjjtK8b8VPOFFZa54
-         vWq37NdtIDyzPJxQerpbmGdaxTMbDr/RmAu6c4jRTyOsEyHqI8Wl0PjtZVKue0nK6dng
-         6OqNVso3s8WzoLCG2nTLgwUo7y1p0MkACFe3QGWF8x229O27qqJGRqRCP1U8AIVL9iOx
-         WS/miJV8TmRRTDB/mVc7eeA5nDWNauU+K4+yCXCUBYe6wOBc6y0uFrYWY4Sfc3owGsbP
-         JHXVpf7xPWMuNsu2MNwCpPh02f7Z4B4YBQegmbuZVx2185cKkTg8Zoo/e8+0/K4wg3go
-         /JLw==
-X-Gm-Message-State: AOJu0YzFNDMwBnVPV8i0rVOp5wdUAa5aenDSCy5Sbx5GBZJ7khDNkuYN
-	P84nCxluOG4Le97TmI93oGo7Q8FqQmXGgg==
-X-Google-Smtp-Source: AGHT+IFi3Xi8S8VOkUT686qJLuycjNVr+AkQBJHqrhrYDUCFIhQDogT0K0tvurM9Itkv5Zy3hAM33w==
-X-Received: by 2002:a17:907:20e3:b0:a2b:2615:25d1 with SMTP id rh3-20020a17090720e300b00a2b261525d1mr297878ejb.90.1705064181034;
-        Fri, 12 Jan 2024 04:56:21 -0800 (PST)
+        bh=Jo/+uwcv6M9RCVLWBTh3+lxGJkmyBn9pvaZy82W6zuc=;
+        b=fbk/RoeCvl2ng+G0omXsSfU6py00lY40EfWm5sCOgTOOwzSdwEwJvo0jTJ3OaryYKD
+         00Jx2jrCpUhR7pMP83iIIc+lJauCPLqkCPjx9Mzq3TrCJ1RRHEySxiVlTv4I45b8haF5
+         sjv8YR2vYOelP88F9bpQceJFt3H86r+L0e+3EgQUSw/P3617eTLUWfFzheAiHwNbQMB4
+         AvLX/3mYAhupvfA95I6GMKCFyjM1Z9Pr5hbJMQ8PInD3XvK4fYcyN6yF5cearaZwMKPC
+         MhLyst1jmcEiWGKrxQlVHKdNLU+pfsFZs6yEry/VSr94LP5pw6ReFjfmwNVI3RWK++UP
+         aTCQ==
+X-Gm-Message-State: AOJu0YxRCldqt3Fx4/uJFQnpZlvGh/Zjt5kFOVzC0Ln+xN8bi1folD4d
+	q/MGPxpgz2bqg0Iz62/33raMCevOQ+Hv7w==
+X-Google-Smtp-Source: AGHT+IEVmdcu02Kn4wyT9byVJpmuMRo5OM6g9mhxHGY1kQywPLqgFovkJK+cZVV78GKwRE8oYSQS2g==
+X-Received: by 2002:a17:906:7105:b0:a28:d32f:14d2 with SMTP id x5-20020a170906710500b00a28d32f14d2mr1395428ejj.72.1705064437939;
+        Fri, 12 Jan 2024 05:00:37 -0800 (PST)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id y23-20020a170906559700b00a269357c2e7sm1764202ejp.36.2024.01.12.04.56.20
+        by smtp.gmail.com with ESMTPSA id w14-20020a17090652ce00b00a19afc16d23sm1778646ejn.104.2024.01.12.05.00.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jan 2024 04:56:20 -0800 (PST)
-Date: Fri, 12 Jan 2024 13:56:19 +0100
+        Fri, 12 Jan 2024 05:00:37 -0800 (PST)
+Date: Fri, 12 Jan 2024 14:00:36 +0100
 From: Jiri Pirko <jiri@resnulli.us>
 To: Eric Dumazet <edumazet@google.com>
 Cc: "David S . Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>,
 	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org,
 	eric.dumazet@gmail.com,
-	syzbot+8d482d0e407f665d9d10@syzkaller.appspotmail.com
-Subject: Re: [PATCH net] udp: annotate data-races around up->pending
-Message-ID: <ZaE28zQdlP0hhWOD@nanopsycho>
-References: <20240112104427.324983-1-edumazet@google.com>
+	syzbot+7f4d0ea3df4d4fa9a65f@syzkaller.appspotmail.com
+Subject: Re: [PATCH net] net: add more sanity check in virtio_net_hdr_to_skb()
+Message-ID: <ZaE39F93nKy4NKqj@nanopsycho>
+References: <20240112122816.450197-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,56 +75,137 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240112104427.324983-1-edumazet@google.com>
+In-Reply-To: <20240112122816.450197-1-edumazet@google.com>
 
-Fri, Jan 12, 2024 at 11:44:27AM CET, edumazet@google.com wrote:
->up->pending can be read without holding the socket lock,
->as pointed out by syzbot [1]
+Fri, Jan 12, 2024 at 01:28:16PM CET, edumazet@google.com wrote:
+>syzbot/KMSAN reports access to uninitialized data from gso_features_check() [1]
 >
->Add READ_ONCE() in lockless contexts, and WRITE_ONCE()
->on write side.
+>The repro use af_packet, injecting a gso packet and hdrlen == 0.
+>
+>We could fix the issue making gso_features_check() more careful
+>while dealing with NETIF_F_TSO_MANGLEID in fast path.
+>
+>Or we can make sure virtio_net_hdr_to_skb() pulls minimal network and
+>transport headers as intended.
+
+You describe "either or", but don't really say what to do. Bit
+confusing :/
+
+
+>
+>Note that for GSO packets coming from untrusted sources, SKB_GSO_DODGY
+>bit forces a proper header validation (and pull) before the packet can
+>hit any device ndo_start_xmit(), thus we do not need a precise disection
+>at virtio_net_hdr_to_skb() stage.
 >
 >[1]
->BUG: KCSAN: data-race in udpv6_sendmsg / udpv6_sendmsg
->
->write to 0xffff88814e5eadf0 of 4 bytes by task 15547 on cpu 1:
-> udpv6_sendmsg+0x1405/0x1530 net/ipv6/udp.c:1596
-> inet6_sendmsg+0x63/0x80 net/ipv6/af_inet6.c:657
+>BUG: KMSAN: uninit-value in skb_gso_segment include/net/gso.h:83 [inline]
+>BUG: KMSAN: uninit-value in validate_xmit_skb+0x10f2/0x1930 net/core/dev.c:3629
+> skb_gso_segment include/net/gso.h:83 [inline]
+> validate_xmit_skb+0x10f2/0x1930 net/core/dev.c:3629
+> __dev_queue_xmit+0x1eac/0x5130 net/core/dev.c:4341
+> dev_queue_xmit include/linux/netdevice.h:3134 [inline]
+> packet_xmit+0x9c/0x6b0 net/packet/af_packet.c:276
+> packet_snd net/packet/af_packet.c:3087 [inline]
+> packet_sendmsg+0x8b1d/0x9f30 net/packet/af_packet.c:3119
 > sock_sendmsg_nosec net/socket.c:730 [inline]
 > __sock_sendmsg net/socket.c:745 [inline]
-> __sys_sendto+0x257/0x310 net/socket.c:2192
-> __do_sys_sendto net/socket.c:2204 [inline]
-> __se_sys_sendto net/socket.c:2200 [inline]
-> __x64_sys_sendto+0x78/0x90 net/socket.c:2200
+> ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
+> ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
+> __sys_sendmsg net/socket.c:2667 [inline]
+> __do_sys_sendmsg net/socket.c:2676 [inline]
+> __se_sys_sendmsg net/socket.c:2674 [inline]
+> __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
 > do_syscall_x64 arch/x86/entry/common.c:52 [inline]
 > do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
 > entry_SYSCALL_64_after_hwframe+0x63/0x6b
 >
->read to 0xffff88814e5eadf0 of 4 bytes by task 15551 on cpu 0:
-> udpv6_sendmsg+0x22c/0x1530 net/ipv6/udp.c:1373
-> inet6_sendmsg+0x63/0x80 net/ipv6/af_inet6.c:657
+>Uninit was created at:
+> slab_post_alloc_hook+0x129/0xa70 mm/slab.h:768
+> slab_alloc_node mm/slub.c:3478 [inline]
+> kmem_cache_alloc_node+0x5e9/0xb10 mm/slub.c:3523
+> kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:560
+> __alloc_skb+0x318/0x740 net/core/skbuff.c:651
+> alloc_skb include/linux/skbuff.h:1286 [inline]
+> alloc_skb_with_frags+0xc8/0xbd0 net/core/skbuff.c:6334
+> sock_alloc_send_pskb+0xa80/0xbf0 net/core/sock.c:2780
+> packet_alloc_skb net/packet/af_packet.c:2936 [inline]
+> packet_snd net/packet/af_packet.c:3030 [inline]
+> packet_sendmsg+0x70e8/0x9f30 net/packet/af_packet.c:3119
 > sock_sendmsg_nosec net/socket.c:730 [inline]
 > __sock_sendmsg net/socket.c:745 [inline]
-> ____sys_sendmsg+0x37c/0x4d0 net/socket.c:2586
-> ___sys_sendmsg net/socket.c:2640 [inline]
-> __sys_sendmmsg+0x269/0x500 net/socket.c:2726
-> __do_sys_sendmmsg net/socket.c:2755 [inline]
-> __se_sys_sendmmsg net/socket.c:2752 [inline]
-> __x64_sys_sendmmsg+0x57/0x60 net/socket.c:2752
+> ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
+> ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
+> __sys_sendmsg net/socket.c:2667 [inline]
+> __do_sys_sendmsg net/socket.c:2676 [inline]
+> __se_sys_sendmsg net/socket.c:2674 [inline]
+> __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
 > do_syscall_x64 arch/x86/entry/common.c:52 [inline]
 > do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
 > entry_SYSCALL_64_after_hwframe+0x63/0x6b
 >
->value changed: 0x00000000 -> 0x0000000a
->
->Reported by Kernel Concurrency Sanitizer on:
->CPU: 0 PID: 15551 Comm: syz-executor.1 Tainted: G        W          6.7.0-syzkaller #0
+>CPU: 0 PID: 5025 Comm: syz-executor279 Not tainted 6.7.0-rc7-syzkaller-00003-gfbafc3e621c3 #0
 >Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
 >
->Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
->Reported-by: syzbot+8d482d0e407f665d9d10@syzkaller.appspotmail.com
->Link: https://lore.kernel.org/netdev/0000000000009e46c3060ebcdffd@google.com/
+>Reported-by: syzbot+7f4d0ea3df4d4fa9a65f@syzkaller.appspotmail.com
+>Link: https://lore.kernel.org/netdev/0000000000005abd7b060eb160cd@google.com/
+>Fixes: 9274124f023b ("net: stricter validation of untrusted gso packets")
 >Signed-off-by: Eric Dumazet <edumazet@google.com>
-
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+>Cc: Willem de Bruijn <willemb@google.com>
+>---
+> include/linux/virtio_net.h | 9 +++++++--
+> 1 file changed, 7 insertions(+), 2 deletions(-)
+>
+>diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
+>index 27cc1d4643219a44c01a2404124cd45ef46f7f3d..4dfa9b69ca8d95d43e44831bc166eadbe5715d3c 100644
+>--- a/include/linux/virtio_net.h
+>+++ b/include/linux/virtio_net.h
+>@@ -3,6 +3,8 @@
+> #define _LINUX_VIRTIO_NET_H
+> 
+> #include <linux/if_vlan.h>
+>+#include <linux/ip.h>
+>+#include <linux/ipv6.h>
+> #include <linux/udp.h>
+> #include <uapi/linux/tcp.h>
+> #include <uapi/linux/virtio_net.h>
+>@@ -49,6 +51,7 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
+> 					const struct virtio_net_hdr *hdr,
+> 					bool little_endian)
+> {
+>+	unsigned int nh_min_len = sizeof(struct iphdr);
+> 	unsigned int gso_type = 0;
+> 	unsigned int thlen = 0;
+> 	unsigned int p_off = 0;
+>@@ -65,6 +68,7 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
+> 			gso_type = SKB_GSO_TCPV6;
+> 			ip_proto = IPPROTO_TCP;
+> 			thlen = sizeof(struct tcphdr);
+>+			nh_min_len = sizeof(struct ipv6hdr);
+> 			break;
+> 		case VIRTIO_NET_HDR_GSO_UDP:
+> 			gso_type = SKB_GSO_UDP;
+>@@ -100,7 +104,8 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
+> 		if (!skb_partial_csum_set(skb, start, off))
+> 			return -EINVAL;
+> 
+>-		p_off = skb_transport_offset(skb) + thlen;
+>+		nh_min_len = max_t(u32, nh_min_len, skb_transport_offset(skb));
+>+		p_off = nh_min_len + thlen;
+> 		if (!pskb_may_pull(skb, p_off))
+> 			return -EINVAL;
+> 	} else {
+>@@ -140,7 +145,7 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
+> 
+> 			skb_set_transport_header(skb, keys.control.thoff);
+> 		} else if (gso_type) {
+>-			p_off = thlen;
+>+			p_off = nh_min_len + thlen;
+> 			if (!pskb_may_pull(skb, p_off))
+> 				return -EINVAL;
+> 		}
+>-- 
+>2.43.0.275.g3460e3d667-goog
+>
+>
 
