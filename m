@@ -1,95 +1,162 @@
-Return-Path: <netdev+bounces-63366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60E8682C6DD
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 22:52:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECDB582C6FC
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 23:08:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BA759B22968
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 21:52:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D21C51C21D63
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 22:08:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49917171D7;
-	Fri, 12 Jan 2024 21:52:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0670417729;
+	Fri, 12 Jan 2024 22:08:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LqxizwqF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z/Hd5SsC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07FBF17722;
-	Fri, 12 Jan 2024 21:52:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F7D4171DC;
+	Fri, 12 Jan 2024 22:08:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1d3f8af8297so40975835ad.2;
-        Fri, 12 Jan 2024 13:52:46 -0800 (PST)
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-78313f4d149so648486485a.1;
+        Fri, 12 Jan 2024 14:08:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705096366; x=1705701166; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DFcO1qAhlKNYfKOckjMAtcijj/gB3q9a3sxD0aFfu2I=;
-        b=LqxizwqFw5aA8wLza328qXqfK/r1jz6XM/Z/dGEEtecc2U1IJmzlocIxhbdaFjUa8o
-         6PDbaPCMzzk83caMr3k08KwFz4aMdUI96WZEvxb4+sloubp/Z7sFm+INOvp0Vk3G4drR
-         6J4aoq3OSxyDNhi6XhXwAdqu16SWLxr3teUaBm2u3U/5NBKoLDyxHBA1YfvmMnOtflZU
-         QiQpxya9meZy+1vI+PT3smW6Rld4qx8bhylaGZL+PztzUFdwB9XPB5cyTsy+g1lvt2I7
-         JRItVJfKzByqiWvB5s7N6Jro+mfdLEPyX7O2yesiQt7vNv1au/LsqdloeQZUfLgql2UN
-         ZICA==
+        d=gmail.com; s=20230601; t=1705097292; x=1705702092; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=L+7rof0WGlCw1G9RYMZg6Un65fjMjn71sH8lI9OCckg=;
+        b=Z/Hd5SsC8hJoSqn1bBPk3BCewsKnbrtX4TLiG+sbOXGpqSGzxC2Y9LQlYqtHzNpLUS
+         7+THXT53qF2TPtHx7ufqfmtjhzdxBIbiCvtVt2ileWjG2dhyLiBw4SuH7UZCYIyRZ/hF
+         hEKF/VwSUaJVOsZ17EK+2bcr3wRs7+M1R8pbyrS+skXlEwHVMS9DgMy5KjS3fmLp65xU
+         Tmkbm5z+Lw5aiECBJ2y0MtunSNiTMGyDBSOBsI6AZO4ifH14AEo/kf/vswCwSdS0iesh
+         wPowlj1sxSv5rQk9r7tOopw7PTebAVhc4tQ6UJiUc1YDCpDq02DcdMNTRHhIdOKYdOTt
+         J8PQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705096366; x=1705701166;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=DFcO1qAhlKNYfKOckjMAtcijj/gB3q9a3sxD0aFfu2I=;
-        b=cStau5tpkwmvX2qxMRUFLOKPylKYPbt4eD+4PYuWkIjaM2SfEc4oXKtNnsfSoAFO9o
-         iTgQbOeAlarzQUk8UN65O0Me5GEUZNMkl7AyBeFAftf678+GL40cmCyVFGZv8tKFySqd
-         WPii3lvicrxwT9kiKiN7beT4dRqZDI4tqGzENOiJn6nIlg/DFBUgGn8BnpsM+rwANyM+
-         5lRodz1wRPRjC9LfbBBhZ62yX6pZ5lXJ3rPuufz/PoiMAX3zkhor7xxYwhtH3V6kl5d5
-         Z7I1tTly//nOlSd3RJycxZm8fS81RsI/87RAlFNu6eQWK4g6MwRWphhRUiCswkR9CJ4h
-         W41A==
-X-Gm-Message-State: AOJu0YzpY+Apa2rhy46jGy9NVGQZox+mYLtpDOmvTleSsTbzwLwVBxX0
-	FmqzidaUwq9MVNVT0SnanSBy0ARIGFY=
-X-Google-Smtp-Source: AGHT+IHdwp+QHlWw0aGwGr00q+zl/9Hdlv06Mc+QQ+m5LxF5ibXqxrsrhtkmUgS9jhj72fytjdm4VQ==
-X-Received: by 2002:a17:902:7209:b0:1d4:9c06:17ec with SMTP id ba9-20020a170902720900b001d49c0617ecmr1478792plb.47.1705096366272;
-        Fri, 12 Jan 2024 13:52:46 -0800 (PST)
-Received: from localhost ([98.97.116.126])
-        by smtp.gmail.com with ESMTPSA id w18-20020a170902c79200b001d0cfd7f6b9sm3642078pla.54.2024.01.12.13.52.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jan 2024 13:52:45 -0800 (PST)
-Date: Fri, 12 Jan 2024 13:52:42 -0800
-From: John Fastabend <john.fastabend@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- John Fastabend <john.fastabend@gmail.com>
-Cc: netdev@vger.kernel.org, 
- eadavis@qq.com, 
- bpf@vger.kernel.org, 
- borisp@nvidia.com
-Message-ID: <65a1b4aabc0ff_4054208c2@john.notmuch>
-In-Reply-To: <20240111170548.59d248f6@kernel.org>
-References: <20240110220124.452746-1-john.fastabend@gmail.com>
- <20240110220124.452746-3-john.fastabend@gmail.com>
- <20240111170548.59d248f6@kernel.org>
-Subject: Re: [PATCH net 2/2] net: tls, add test to capture error on large
- splice
+        d=1e100.net; s=20230601; t=1705097292; x=1705702092;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=L+7rof0WGlCw1G9RYMZg6Un65fjMjn71sH8lI9OCckg=;
+        b=rN75zFfViFNf6tpZclYAcoYToadpMsPpkxMPRQxLVLcDyCcWYi5ZoA/93b64a3munO
+         jHp0t9AbY14RnJja5RgNiynEsOH/v5I2BipRcUgL5yFQRBRp9LNHNE0UI28UJu0mODj4
+         neXMnswO3F73biQTeTTrN280XuNU/D/wz5MTh28HwDN0m+DPc/bnmnmZTurfy1gz673Y
+         SOdUUWxmheOhIicRj23VfiSD8xT0HC7hz2G4dqjb8f6BXqTMeKV6rwEjP28ddv+4Giog
+         3Zh9tNWjYJHiLs+a4Y41VxPWUYxrxgVnRSG3jFyu/sLcX0lAUP1entYyVrX0xLkm9f75
+         BhLg==
+X-Gm-Message-State: AOJu0YzmIJw8e5bkWZStMuUFZJ9YECK8R4eNGyeUNBO2kynzngp3KaTw
+	Wll3fibGkm9ntwaGututirU=
+X-Google-Smtp-Source: AGHT+IFMWkakS3L4QJvpofeuSpyOj3jN5og4vYpEA7zXTSj2qfQO35AsSgQitanirAcz/0rgJsgdDg==
+X-Received: by 2002:a37:e20d:0:b0:783:35c0:d912 with SMTP id g13-20020a37e20d000000b0078335c0d912mr2433654qki.107.1705097292268;
+        Fri, 12 Jan 2024 14:08:12 -0800 (PST)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id cn3-20020a05622a248300b00429c8ae9b94sm1417880qtb.85.2024.01.12.14.08.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 12 Jan 2024 14:08:11 -0800 (PST)
+Message-ID: <e1a9f5cf-d935-4754-9e8c-d34fcae000ed@gmail.com>
+Date: Fri, 12 Jan 2024 14:08:08 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: ethernet: ravb: fix dma mapping failure handling
+Content-Language: en-US
+To: Nikita Yushchenko <nikita.yoush@cogentembedded.com>,
+ Denis Kirjanov <dkirjanov@suse.de>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Sergey Shtylyov <s.shtylyov@omp.ru>,
+ Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+ Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+ Wolfram Sang <wsa+renesas@sang-engineering.com>,
+ =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+ netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240112050639.405784-1-nikita.yoush@cogentembedded.com>
+ <64deebbd-93d0-47dc-835e-f719655e076c@suse.de>
+ <804a4586-1909-44ee-a40c-d9cb615f75ad@cogentembedded.com>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <804a4586-1909-44ee-a40c-d9cb615f75ad@cogentembedded.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Jakub Kicinski wrote:
-> On Wed, 10 Jan 2024 14:01:24 -0800 John Fastabend wrote:
-> > +		EXPECT_EQ(splice(p[0], NULL, self->fd, NULL, send_pipe, 0xe), 1);
+On 1/12/24 01:04, Nikita Yushchenko wrote:
 > 
-> Any reason to use 0xe rather than the SPLICE_F_* defines for flags?
+> 
+> 12.01.2024 14:56, Denis Kirjanov wrote:
+>>
+>>
+>> On 1/12/24 08:06, Nikita Yushchenko wrote:
+>>> dma_mapping_error() depends on getting full 64-bit dma_addr_t and does
+>>> not work correctly if 32-bit value is passed instead.
+>>>
+>>> Fix handling of dma_map_single() failures on Rx ring entries:
+>>> - do not store return value of dma_map_signle() in 32-bit variable,
+>>> - do not use dma_mapping_error() against 32-bit descriptor field when
+>>>    checking if unmap is needed, check for zero size instead.
+>>
+>> Hmm, something is wrong here since you're mixing DMA api and forced 
+>> 32bit values.
+>> if dma uses 32bit addresses then dma_addr_t need only be 32 bits wide
+> 
+> dma_addr_t is arch-wide type and it is 64bit on arm64
 
-No reason I crafted the test first and then forgot to come back
-and tidy it much.
+Correct, does not mean all of the bits will be used, nor that there is 
+not an offset, see below.
 
-I'll send a v2 with readable names.
+> 
+> Still, some devices use 32-bit dma addresses.
+> Proper setting of dma masks and/of configuring iommu ensures that in no 
+> error case, dma address fits into 32 bits.
+
+Yes, because dma_addr_t must be sized to the maximum supportable DMA 
+address in any given system, hence it is 64-bit for a 64-bit 
+architecture. If someone had a system with 32-bit DMA addressing 
+limitation, they could technically introduce a Kconfig option to narrow 
+dma_addr_t, not that this should ever be done. Anyway, I digress.
+
+> Still, in error case dma_map_single() returns ~((dma_addr_t)0) which 
+> uses fill dma_addr_t width and gets corrupted if assigned to 32-bit 
+> value, then later call to dma_mapping_error() does not recognize it. The 
+> patch fixes exactly this issue.
+
+Your patch is actually fine, but you might have to write a lot more 
+about it to tell the reviewers that it is fine.
+
+At the very least you should explain that in case of DMA mapping failure 
+by ravb_rx_ring_format_gbeth() and ravb_rx_ring_format_rcar(), the 
+dsecriptor's ds_cc field is written to 0 to denote a mapping failure.
+
+Note that we will still write a dma_addr_t cookie that corresponds to an 
+error, but this may be OK, because the hardware looks for a ds_cc != 0 
+to determine whether to DMA the packet into memory or not.
+
+Because of the convention established in ravb_rx_ring_format_gbeth() and 
+ravb_rx_ring_format_rcar(), checking for ds_cc == 0 to denote a mapping 
+error in ravb_rx_ring_free_gbeth() and ravb_rx_ring_free_rcar() is an 
+acceptable way of checking for a valid mapping.
+
+What is however not valid, is that again, we use desc->dptr and pass 
+that to dma_unmap_single() which would expect the non-truncated 
+dma_addr_t. Again, probably works by design, chance, whatever, but is 
+not supposed to be done that way.
+
+It looks like the hardware is limited to 32-bit of DMA addressing, and 
+assumes that the dma_addr_t cookie is 0-indexed, which may very well be 
+the case, even with 64-bit SoCs thanks to an IOMMU.
+
+It would feel a lot more comfortable if there was an actual check on the 
+upper 32-bits of dma_addr_t being zero, and issue a big fat warning in 
+case they are not.
+
+Thanks!
+-- 
+Florian
+
 
