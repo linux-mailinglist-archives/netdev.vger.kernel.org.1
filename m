@@ -1,134 +1,103 @@
-Return-Path: <netdev+bounces-63293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D50BE82C298
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 16:13:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81E5E82C2AE
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 16:24:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0DB02B2185A
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 15:13:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30509285D2D
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 15:24:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E3CB6E2DE;
-	Fri, 12 Jan 2024 15:13:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 220A36EB46;
+	Fri, 12 Jan 2024 15:23:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="deWubXWy"
 X-Original-To: netdev@vger.kernel.org
-Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
+Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E91A66D1AA;
-	Fri, 12 Jan 2024 15:13:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proxmox.com
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
-	by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 619B5490C3;
-	Fri, 12 Jan 2024 16:13:23 +0100 (CET)
-Message-ID: <db8b9e19-ad75-44d3-bfb2-46590d426ff5@proxmox.com>
-Date: Fri, 12 Jan 2024 16:13:22 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 955786DD1D;
+	Fri, 12 Jan 2024 15:23:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 40CFNbBg107397;
+	Fri, 12 Jan 2024 09:23:37 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1705073017;
+	bh=rxeMIUBpYhhgJ+/7WsbHlekb5lAjPg91dYI2p3c+ziA=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=deWubXWy4RWejcfMEyjIIK8VCN1I8lNQMT2aPX/z50PUJY8k2eO/opMTyfe88jeDX
+	 cBAoV6xCRxbfFzlnpJAh0xNROGdc6ADdhMhNcCoPW+XjcxFDWYWPLhW9Pf/nSrX7HL
+	 hhWWSR7gaGP3y/ToA7iVcUZT3pkxckaX8LEzcbRY=
+Received: from DLEE102.ent.ti.com (dlee102.ent.ti.com [157.170.170.32])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 40CFNbPL049420
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Fri, 12 Jan 2024 09:23:37 -0600
+Received: from DLEE112.ent.ti.com (157.170.170.23) by DLEE102.ent.ti.com
+ (157.170.170.32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 12
+ Jan 2024 09:23:37 -0600
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE112.ent.ti.com
+ (157.170.170.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Fri, 12 Jan 2024 09:23:37 -0600
+Received: from [10.249.141.75] ([10.249.141.75])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 40CFNXtZ110652;
+	Fri, 12 Jan 2024 09:23:34 -0600
+Message-ID: <8dee1738-0bde-48fb-bd0e-b8d06b609677@ti.com>
+Date: Fri, 12 Jan 2024 20:53:32 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Content-Language: en-GB, de-AT
-To: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-From: Thomas Lamprecht <t.lamprecht@proxmox.com>
-Subject: vxlan: how to expose opt-in RFC conformity with unprocessed header
- flags
-Autocrypt: addr=t.lamprecht@proxmox.com; keydata=
- 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 DrEx
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: can: Add support for aliases in CAN
+To: Marc Kleine-Budde <mkl@pengutronix.de>, Bhavya Kapoor <b-kapoor@ti.com>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-can@vger.kernel.org>, <mailhol.vincent@wanadoo.fr>,
+        <rcsekar@samsung.com>, <pabeni@redhat.com>, <kuba@kernel.org>,
+        <edumazet@google.com>, <davem@davemloft.net>, <wg@grandegger.com>,
+        <vigneshr@ti.com>
+References: <20240102102949.138607-1-b-kapoor@ti.com>
+ <20240102-chop-extending-b7dc1acaf5db-mkl@pengutronix.de>
+Content-Language: en-US
+From: "Kumar, Udit" <u-kumar1@ti.com>
+In-Reply-To: <20240102-chop-extending-b7dc1acaf5db-mkl@pengutronix.de>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-Hi!
+Hi Marc
 
-We got a customer that reported an issue where the Linux VXLAN
-implementation diverges from the RFC, namely when any of the (reserved)
-flags other than the VNI one is set, the kernel just drops the package.
+On 1/2/2024 4:43 PM, Marc Kleine-Budde wrote:
+> On 02.01.2024 15:59:49, Bhavya Kapoor wrote:
+>> When multiple CAN's are present, then names that are getting assigned
+>> changes after every boot even after providing alias in the device tree.
+>> Thus, Add support for implementing CAN aliasing so that names or
+>> alias for CAN will now be provided from device tree.
+> NACK, please use udev or systemd-networkd to provide stable names for
+> CAN interfaces.
 
-According to the vxlan_rcv function in vxlan_core this is done by choice:
+Would you like to re-consider this NACK.
 
-if (unparsed.vx_flags || unparsed.vx_vni) {
-        /* If there are any unprocessed flags remaining treat
-         * this as a malformed packet. This behavior diverges from
-         * VXLAN RFC (RFC7348) which stipulates that bits in reserved
-         * in reserved fields are to be ignored. The approach here
-         * maintains compatibility with previous stack code, and also
-         * is more robust and provides a little more security in
-         * adding extensions to VXLAN.
-         */
-        goto drop;
-}
+ From kernel side,
 
-Normally this is not an issue, as the same RFC also dictates that the sender
-must have those reserved bits set to zero. But naturally, some devices are
-not following that side of the contract either, like some Juniper switches
-of said customers, which set the B-bit (like it would be a VXLAN-GPE) in the
-VXLAN packet, even though they have VXLAN-GPE explicitly disabled.
+IMO if aliasing is set in device tree then kernel should provide 
+consistent baseline names.
 
-So, while I asked the customer to open a support ticket with their switch
-vendor, as that one is breaking the RFC too, the kernel is just the simpler
-thing to "fix", especially for our side the only thing we can change at all.
+However, distributions may choose different or other stable naming,
 
-As just changing the code so that it would be always RFC conform (at least
-in this regard) seems to be a no-go, as some setups would then suddenly see
-extra (malicious) traffic go through, so to my actual question:
+Also, if some distribution want to rely on kernel naming they still can do.
 
-What would be the accepted way to add a switch of making this RFC conform in
-an opt-in way? A module parameter? A sysfs entry? Through netlink?
+Thanks
 
-As depending on the answer of that I'd like to prepare a patch implementing
-the opt-in RFC-conformance w.r.t. ignoring the reserved bits values of the
-VXLAN flags, this way setups with complementary broken HW in their network
-path can opt in to that behavior as a workaround.
-
-thanks!
- Thomas
-
+>
+> regards,
+> Marc
+>
 
