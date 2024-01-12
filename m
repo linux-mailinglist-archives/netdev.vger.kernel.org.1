@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-63183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1506582B8D3
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 02:00:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 315C182B8DA
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 02:01:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9BD028634B
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 01:00:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CB5828634F
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 01:01:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B02D5ED7;
-	Fri, 12 Jan 2024 01:00:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A94D915BD;
+	Fri, 12 Jan 2024 01:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZD7nJh3A"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BpuHGnit"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D304A3F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9108AA54;
 	Fri, 12 Jan 2024 01:00:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 27279C433B1;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 318DBC433B2;
 	Fri, 12 Jan 2024 01:00:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1705021228;
-	bh=QXQRz/JntJstTO+QAHrv2SpB3FI0qeWQbQKgojY5CPE=;
+	bh=6mUeJYB6GdEGzaR9k4n5cuuuVHeZpAroRaR/JgNly8Y=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ZD7nJh3AqHkVx8/0gqOJK7hsYAVbHovYQZWsgSLjnwYgOjg+bCJI8MONekh/k00dn
-	 eQ9UsfYDpQNPOL5Sk9mKoyiRodaNon+e9oxRQN+eGTvRHlMEWV2AFDgZWE4tZDd44R
-	 SPTfpyYTKGLkzyLaq+W1uH4ROhOB0OR0sp7ta3nP8CLcaYOdEaTU4YFwBNYgQeHfZv
-	 624I2mDR1W6hShwdt0F7brha79YdrKRGMUkblgVzwHLPjMh/vhqSGPKjqPl3ZUW7wq
-	 dbUeEd5+40mtSthSmGveOzda1lbFbEZp0PTGW8hrEpl3+6cux/p8MjFHyHSbYwr40k
-	 0jyt8F3Bd8cfw==
+	b=BpuHGnit0RIR0IwDwS65aHnhkantKjEQUtpNxMZj1YN09f4iigkbhmjxWp79LfK9N
+	 nf/gaxO+k1ZDv99xfK9VldrnOk4ntgSVoP0ixp+Gkb6tnznhMQ/HTFiu9MNUNkAVdW
+	 uZ4i/VOHG8kgFwCHoGvwgHRcCGCGrDjklU/AlDVtQ4WjTYcqcdsDwchy7lS8Npl9Y8
+	 gyH2FTM2wgrRnL8RLhpWUmADvIJlY7tPir3Mnlk9xOr6Rl9UDJ8OUSVBuEArV5B7JD
+	 RJxdw6TA8KYsq2ogfRjPiC3xEzB3rk45BMsyQoc6vMT+Oigq1pLtp6trGA9NhiayXx
+	 vu36TtsmT9moA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0F85CD8C975;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 19D34D8C974;
 	Fri, 12 Jan 2024 01:00:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,41 +43,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/2] selftests: net: Small fixes
+Subject: Re: [net PATCH v2] octeontx2-af: CN10KB: Fix FIFO length calculation for
+ RPM2
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170502122805.27071.156663258880842784.git-patchwork-notify@kernel.org>
+ <170502122810.27071.6970182954909965200.git-patchwork-notify@kernel.org>
 Date: Fri, 12 Jan 2024 01:00:28 +0000
-References: <20240110141436.157419-1-bpoirier@nvidia.com>
-In-Reply-To: <20240110141436.157419-1-bpoirier@nvidia.com>
-To: Benjamin Poirier <bpoirier@nvidia.com>
-Cc: netdev@vger.kernel.org, j.vosburgh@gmail.com, andy@greyhouse.net,
- shuah@kernel.org, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, petrm@nvidia.com, razor@blackwall.org,
- liuhangbin@gmail.com, idosch@nvidia.com, vladimir.oltean@nxp.com,
- jon.toppins+linux@gmail.com, troglobit@gmail.com,
- linux-kselftest@vger.kernel.org
+References: <20240108073036.8766-1-naveenm@marvell.com>
+In-Reply-To: <20240108073036.8766-1-naveenm@marvell.com>
+To: Naveen Mamindlapalli <naveenm@marvell.com>
+Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ sgoutham@marvell.com, ndabilpuram@marvell.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 10 Jan 2024 09:14:34 -0500 you wrote:
-> From: Benjamin Poirier <benjamin.poirier@gmail.com>
+On Mon, 8 Jan 2024 13:00:36 +0530 you wrote:
+> From: Nithin Dabilpuram <ndabilpuram@marvell.com>
 > 
-> Two small fixes for net selftests.
-> 
-> These patches were carved out of the following RFC series:
-> https://lore.kernel.org/netdev/20231222135836.992841-1-bpoirier@nvidia.com/
+> RPM0 and RPM1 on the CN10KB SoC have 8 LMACs each, whereas RPM2
+> has only 4 LMACs. Similarly, the RPM0 and RPM1 have 256KB FIFO,
+> whereas RPM2 has 128KB FIFO. This patch fixes an issue with
+> improper TX credit programming for the RPM2 link.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/2] selftests: bonding: Change script interpreter
-    (no matching commit)
-  - [net,2/2] selftests: forwarding: Remove executable bits from lib.sh
-    https://git.kernel.org/netdev/net/c/66cee759ffa3
+  - [net,v2] octeontx2-af: CN10KB: Fix FIFO length calculation for RPM2
+    https://git.kernel.org/netdev/net/c/a0cb76a77008
 
 You are awesome, thank you!
 -- 
