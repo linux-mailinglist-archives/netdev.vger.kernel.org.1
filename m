@@ -1,101 +1,114 @@
-Return-Path: <netdev+bounces-63212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F49382BC9E
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 10:01:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92BB082BCA0
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 10:04:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D60101F22A7B
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 09:01:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C7BD286510
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 09:04:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81F6E54273;
-	Fri, 12 Jan 2024 09:01:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF64A54273;
+	Fri, 12 Jan 2024 09:04:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="CuzGRTsw";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="uhIVYCUR"
+	dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b="J+QCA1+J"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9FFB14F66;
-	Fri, 12 Jan 2024 09:01:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Fri, 12 Jan 2024 10:01:40 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1705050102;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cYtWY9hDXkpJN3n4nxz2ZUDW4riO9eRN9qxUsjklYiE=;
-	b=CuzGRTswnalzZbMOffuEnmxQw7N8eG94OCB9DMMcd/yHLwwSkHiizA9uj2Wh8R7IDzbYRb
-	53+qCoZiqbpWFhBp3zRIOyD/Bq6YpVy39M2ssOHnCmQXwbGahKkb3/Nt0FLkul3VQCmnQ/
-	/arUdwpmpZGSLdkKkWGfvqfEA4HoF5EKrxv8Wjo/7haxNb9C8JEj6I6zt1S3LV37IA2a1L
-	SKHaCMD35rJvUopI7dEKXmG8UV4ltjyOhYe/zZZ80SSJpcnGcETzYlO+Md7w9uH3c1a2Kx
-	DU4iHR/q0u/rjRm5s29P7Ntq8h1apcEwhAX9k5oTqnmpgU2QiRD1ah65idA2gw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1705050102;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cYtWY9hDXkpJN3n4nxz2ZUDW4riO9eRN9qxUsjklYiE=;
-	b=uhIVYCURSTw9wJBjiY3yz2qpg2LnjrnOiCtlGBOUBjwOMmeyLS5bjCly/h4q2ivDmycAWV
-	ExgLPgVwEai9cgBw==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH net-next 03/24] net: Use __napi_alloc_frag_align()
- instead of open coding it.
-Message-ID: <20240112090140.u5Lac1X9@linutronix.de>
-References: <20231215171020.687342-1-bigeasy@linutronix.de>
- <20231215171020.687342-4-bigeasy@linutronix.de>
- <9d4e1a18e6402f5476ebaaafd4a40a925daf19e6.camel@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4768D56742
+	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 09:04:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cogentembedded.com
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2cd2f472665so67316791fa.2
+        for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 01:04:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cogentembedded-com.20230601.gappssmtp.com; s=20230601; t=1705050261; x=1705655061; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FMOEBUTyrxAFteCOdbuePmYjjamQBShc/8fenoo2NDg=;
+        b=J+QCA1+J4EIlik86ZsMQxwOCMJINQ3x7UWwiv2oNz9Mys+I0qE3JEPdzZ56W9Nhgle
+         ejOZeqq5gR1SDyBJimpQKODwoTWvvU/WBzXY0LY0qkOnSJSrkbHpx3/KgKxQszlEADwB
+         2364fw0E0ESQ27LrFnFR2wSoYE5LnlYAy2Mmh4kJpElCuFXbs87DmvRgXFPLRplNfJbZ
+         V10AtQ/+hALNf3RNC+/JpDr9Z5jaDuaIXMurEQLXCD7H7jJHKMD5dFXXYY82XXLSjdil
+         DNMMI81eTqvJ6vcVpBJBv89CaebJTyVnPbPZddCsTnXhRMpkLtPkn6jkao24UV/5VeVq
+         W59w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705050261; x=1705655061;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FMOEBUTyrxAFteCOdbuePmYjjamQBShc/8fenoo2NDg=;
+        b=EZ6GNECReoZ1TH14p9boda96Cky5wqUiT5Em6cHsBV9idtWnoAzyBkGi2mtZDfe7Vx
+         hCrZJF7XX2VWsTe6bXIWlt+aaSDJxGyQopEg/HgpSLPEfnSo9U5c9zYBTnV/JTLXi/aG
+         +xBjl416elBhwbppEY3NBpV6jpwSY1MeGZujZgodtBrL+L7uhruGY+G/cYogumrHbe7l
+         jPTwu3w/WSOG7I8gC2BNyO6EC4T9v76IAZtyQllMEJN9FkSjmiHsTgGlp7sv1N03/7fE
+         0HSFPHhq9zFk/MqZQJXvLnUSR3g+R4biYIuk14I2y2NEPJNtAY4e5rUtRpr8ZXKMMU5o
+         pByQ==
+X-Gm-Message-State: AOJu0YyzkHJ0tI+O/c/idlFQbVUN+kMWbyFJqlPU4Ym4+MSXZKcASEpy
+	23ejIZUbQCiLoHrOb/rJW1P5DX/+HzYrqA==
+X-Google-Smtp-Source: AGHT+IHdDV0zW9ct7lpVWRmoAkfRX62ksO05UlwuC1BnHaNkmnr0sx8vh+sbrHII1V73V2ewYYk8gA==
+X-Received: by 2002:a2e:6e03:0:b0:2cd:8ce7:71e1 with SMTP id j3-20020a2e6e03000000b002cd8ce771e1mr483215ljc.4.1705050260789;
+        Fri, 12 Jan 2024 01:04:20 -0800 (PST)
+Received: from [192.168.0.104] ([91.231.66.25])
+        by smtp.gmail.com with ESMTPSA id n26-20020a2e86da000000b002ccdb0a00bcsm403541ljj.54.2024.01.12.01.04.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 12 Jan 2024 01:04:20 -0800 (PST)
+Message-ID: <804a4586-1909-44ee-a40c-d9cb615f75ad@cogentembedded.com>
+Date: Fri, 12 Jan 2024 15:04:17 +0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <9d4e1a18e6402f5476ebaaafd4a40a925daf19e6.camel@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: ethernet: ravb: fix dma mapping failure handling
+Content-Language: en-US, ru-RU
+To: Denis Kirjanov <dkirjanov@suse.de>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Sergey Shtylyov <s.shtylyov@omp.ru>,
+ Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+ Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+ Wolfram Sang <wsa+renesas@sang-engineering.com>,
+ =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+ netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240112050639.405784-1-nikita.yoush@cogentembedded.com>
+ <64deebbd-93d0-47dc-835e-f719655e076c@suse.de>
+From: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+In-Reply-To: <64deebbd-93d0-47dc-835e-f719655e076c@suse.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 2023-12-18 08:48:56 [+0100], Paolo Abeni wrote:
-> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> > index b157efea5dea8..de9397e45718a 100644
-> > --- a/net/core/skbuff.c
-> > +++ b/net/core/skbuff.c
-> > @@ -311,11 +311,8 @@ void *__netdev_alloc_frag_align(unsigned int fragsz, unsigned int align_mask)
-> >  
-> >  		data = page_frag_alloc_align(nc, fragsz, GFP_ATOMIC, align_mask);
-> >  	} else {
-> > -		struct napi_alloc_cache *nc;
-> > -
-> >  		local_bh_disable();
-> > -		nc = this_cpu_ptr(&napi_alloc_cache);
-> > -		data = page_frag_alloc_align(&nc->page, fragsz, GFP_ATOMIC, align_mask);
-> 
-> There is a:
-> 
-> 	fragsz = SKB_DATA_ALIGN(fragsz);
-> 
-> statement just before the enclosing 'if'. I would consider moving such
-> assignment inside the 'then' branch - since __napi_alloc_frag_align()
-> already include that.
 
-Okay, moved.
 
-> /P
-Sebastian
+12.01.2024 14:56, Denis Kirjanov wrote:
+> 
+> 
+> On 1/12/24 08:06, Nikita Yushchenko wrote:
+>> dma_mapping_error() depends on getting full 64-bit dma_addr_t and does
+>> not work correctly if 32-bit value is passed instead.
+>>
+>> Fix handling of dma_map_single() failures on Rx ring entries:
+>> - do not store return value of dma_map_signle() in 32-bit variable,
+>> - do not use dma_mapping_error() against 32-bit descriptor field when
+>>    checking if unmap is needed, check for zero size instead.
+> 
+> Hmm, something is wrong here since you're mixing DMA api and forced 32bit values.
+> if dma uses 32bit addresses then dma_addr_t need only be 32 bits wide
+
+dma_addr_t is arch-wide type and it is 64bit on arm64
+
+Still, some devices use 32-bit dma addresses.
+Proper setting of dma masks and/of configuring iommu ensures that in no error case, dma address fits 
+into 32 bits.
+Still, in error case dma_map_single() returns ~((dma_addr_t)0) which uses fill dma_addr_t width and gets 
+corrupted if assigned to 32-bit value, then later call to dma_mapping_error() does not recognize it. The 
+patch fixes exactly this issue.
+
 
