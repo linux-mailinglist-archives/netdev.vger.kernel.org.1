@@ -1,176 +1,134 @@
-Return-Path: <netdev+bounces-63292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C22982C278
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 16:05:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D50BE82C298
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 16:13:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BECB6B22E16
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 15:05:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0DB02B2185A
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 15:13:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C723E6E2D6;
-	Fri, 12 Jan 2024 15:05:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LnfkXyM5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E3CB6E2DE;
+	Fri, 12 Jan 2024 15:13:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 285496DD12
-	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 15:05:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-50e835800adso6953933e87.0
-        for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 07:05:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1705071914; x=1705676714; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:user-agent:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=EGj9NLjeiH7VUkvZ1A9N/SV1ZE8ovwzqiFTpfpK/e/Y=;
-        b=LnfkXyM5kM+asycsaVdodJIOpTRRCPkunWsI3zOwZolvVW5wZWIjeCUfg0G7JzTz+W
-         W9WOuvETy6F38wvY6dqyxUe2lYGILqRAZgy8QY8PXlsJquBhYZN6MCUoDsJJ6orXZivO
-         ZP2UKOBnRcXyQmN4XMQlh7Y4TVubzjhJ4PFHB6Em9OiLGNpsggw0NBN2vPXJde1Fzw8a
-         qP51Px8IXGUh0U3p/+efVZWuXUT0jsIAaXDACsdmUqymx6G/ERJD5YO90nRWMpvB4jDI
-         mUmO3GST+moracvQcJkC0JhQTgc6S4/8vEgEsnpvouvluSoboHFE+A7Nd4f43+VIDWdG
-         nuaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705071914; x=1705676714;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:user-agent:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EGj9NLjeiH7VUkvZ1A9N/SV1ZE8ovwzqiFTpfpK/e/Y=;
-        b=ntysS580yOqLUYJz5zFDoTg7gZkPF3LQSLYmDd2fjDxm8Jt8uW9qApgSx8kwbH8kTv
-         SKki/3yijZZ9MMKh2WXJ5oaIBBgPZEdro++LqbljfG+Tt+TFq9K0k4/xu9j1FRUFniys
-         grUHyEvXrl6kdcRXiNDFVayfsYYJqWsfQ4d012KEHqHMZIoLF13oI/AQl+to/Ogd8gYG
-         Y/1amSWmLz1Ka0l5B6iw2VJrCRmMgTMo12WsRIxdWMm0F3n+rwXa3iZkXSB4Kl/DYL1j
-         SWqDhirVcc7mVN3Pi3+frRYCGdk7GNtQ8M9OVcwzsoM0PrZkQUSonbrwSXkfsh9YuCpf
-         8ucQ==
-X-Gm-Message-State: AOJu0YwO97wnYS8s5eXhEWNsNzKdamoDSvH4KixwCj2W2t+s9L+G9XTH
-	kaTcMVNuFIV12iKXq4H3vjWfNCcgHR1Fnw==
-X-Google-Smtp-Source: AGHT+IGzSDNM5chFAEAwD2aU3LCcin/thQulwDNGjU0qgujLYpAVeaGN8+isXxzVUSfraMXxDSdOFg==
-X-Received: by 2002:a05:6512:3f14:b0:50e:7dcc:ef51 with SMTP id y20-20020a0565123f1400b0050e7dccef51mr624188lfa.120.1705071914138;
-        Fri, 12 Jan 2024 07:05:14 -0800 (PST)
-Received: from [127.0.0.1] (85-76-114-160-nat.elisa-mobile.fi. [85.76.114.160])
-        by smtp.gmail.com with ESMTPSA id f5-20020ac251a5000000b0050e8cd014d7sm526840lfk.16.2024.01.12.07.05.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Jan 2024 07:05:13 -0800 (PST)
-Date: Fri, 12 Jan 2024 17:05:08 +0200
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-To: Luo Jie <quic_luoj@quicinc.com>, andersson@kernel.org,
- konrad.dybcio@linaro.org, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org
-CC: linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- quic_kkumarcs@quicinc.com, quic_suruchia@quicinc.com, quic_soni@quicinc.com,
- quic_pavir@quicinc.com, quic_souravp@quicinc.com, quic_linchen@quicinc.com,
- quic_leiwei@quicinc.com
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_6/6=5D_arm64=3A_dts=3A_qcom=3A_i?= =?US-ASCII?Q?pq9574=3A_Add_RDP433_board_device_tree?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <20240110112059.2498-7-quic_luoj@quicinc.com>
-References: <20240110112059.2498-1-quic_luoj@quicinc.com> <20240110112059.2498-7-quic_luoj@quicinc.com>
-Message-ID: <FC335E96-9DE2-4BC8-BE45-8DE77AB453AE@linaro.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E91A66D1AA;
+	Fri, 12 Jan 2024 15:13:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proxmox.com
+Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
+	by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 619B5490C3;
+	Fri, 12 Jan 2024 16:13:23 +0100 (CET)
+Message-ID: <db8b9e19-ad75-44d3-bfb2-46590d426ff5@proxmox.com>
+Date: Fri, 12 Jan 2024 16:13:22 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird Beta
+Content-Language: en-GB, de-AT
+To: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+From: Thomas Lamprecht <t.lamprecht@proxmox.com>
+Subject: vxlan: how to expose opt-in RFC conformity with unprocessed header
+ flags
+Autocrypt: addr=t.lamprecht@proxmox.com; keydata=
+ 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 DrEx
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 10 January 2024 13:20:59 EET, Luo Jie <quic_luoj@quicinc=2Ecom> wrote:
->From: Lei Wei <quic_leiwei@quicinc=2Ecom>
->
->RDP433 board has four QCA8075 PHYs and two Aquantia 10G PHY onboard=2E
->
->Signed-off-by: Lei Wei <quic_leiwei@quicinc=2Ecom>
->Signed-off-by: Luo Jie <quic_luoj@quicinc=2Ecom>
->---
-> arch/arm64/boot/dts/qcom/ipq9574-rdp433=2Edts | 66 +++++++++++++++++++++
-> 1 file changed, 66 insertions(+)
->
->diff --git a/arch/arm64/boot/dts/qcom/ipq9574-rdp433=2Edts b/arch/arm64/b=
-oot/dts/qcom/ipq9574-rdp433=2Edts
->index 1bb8d96c9a82=2E=2E298c0853b4d2 100644
->--- a/arch/arm64/boot/dts/qcom/ipq9574-rdp433=2Edts
->+++ b/arch/arm64/boot/dts/qcom/ipq9574-rdp433=2Edts
->@@ -60,3 +60,69 @@ rclk-pins {
-> 		};
-> 	};
-> };
->+
->+&qcom_ppe {
->+	qcom,port_phyinfo {
->+		ppe_port0: port@0 {
->+			port_id =3D <1>;
->+			phy-mode =3D "qsgmii";
->+			phy-handle =3D <&phy0>;
->+		};
->+		ppe_port1: port@1 {
->+			port_id =3D <2>;
->+			phy-mode =3D "qsgmii";
->+			phy-handle =3D <&phy1>;
->+		};
->+		ppe_port2: port@2 {
->+			port_id =3D <3>;
->+			phy-mode =3D "qsgmii";
->+			phy-handle =3D <&phy2>;
->+		};
->+		ppe_port3: port@3 {
->+			port_id =3D <4>;
->+			phy-mode =3D "qsgmii";
->+			phy-handle =3D <&phy3>;
->+		};
->+		ppe_port4: port@4 {
->+			port_id =3D <5>;
->+			phy-mode =3D "usxgmii";
->+			phy-handle =3D <&phy4>;
->+		};
->+		ppe_port5: port@5 {
->+			port_id =3D <6>;
->+			phy-mode =3D "usxgmii";
->+			phy-handle =3D <&phy5>;
->+		};
->+	};
->+};
->+
->+&mdio {
->+	reset-gpios =3D <&tlmm 60 GPIO_ACTIVE_LOW>;
->+	status =3D "okay";
->+
->+	phy0: ethernet-phy@0 {
->+		      reg =3D <16>;
->+	      };
+Hi!
 
-This part looks extremely wrong to me=2E If the reg is 16, then it should =
-be @16 as well=2E You should have got a warning here=2E
+We got a customer that reported an issue where the Linux VXLAN
+implementation diverges from the RFC, namely when any of the (reserved)
+flags other than the VNI one is set, the kernel just drops the package.
 
->+
->+	phy1: ethernet-phy@1 {
->+		      reg =3D <17>;
->+	      };
->+
->+	phy2: ethernet-phy@2 {
->+		      reg =3D <18>;
->+	      };
->+
->+	phy3: ethernet-phy@3 {
->+		      reg =3D <19>;
->+	      };
->+
->+	phy4: ethernet-phy@4 {
->+		      compatible =3D"ethernet-phy-ieee802=2E3-c45";
->+		      reg =3D <8>;
->+	      };
->+
->+	phy5: ethernet-phy@5 {
->+		      compatible =3D"ethernet-phy-ieee802=2E3-c45";
->+		      reg =3D <0>;
->+	      };
->+};
+According to the vxlan_rcv function in vxlan_core this is done by choice:
+
+if (unparsed.vx_flags || unparsed.vx_vni) {
+        /* If there are any unprocessed flags remaining treat
+         * this as a malformed packet. This behavior diverges from
+         * VXLAN RFC (RFC7348) which stipulates that bits in reserved
+         * in reserved fields are to be ignored. The approach here
+         * maintains compatibility with previous stack code, and also
+         * is more robust and provides a little more security in
+         * adding extensions to VXLAN.
+         */
+        goto drop;
+}
+
+Normally this is not an issue, as the same RFC also dictates that the sender
+must have those reserved bits set to zero. But naturally, some devices are
+not following that side of the contract either, like some Juniper switches
+of said customers, which set the B-bit (like it would be a VXLAN-GPE) in the
+VXLAN packet, even though they have VXLAN-GPE explicitly disabled.
+
+So, while I asked the customer to open a support ticket with their switch
+vendor, as that one is breaking the RFC too, the kernel is just the simpler
+thing to "fix", especially for our side the only thing we can change at all.
+
+As just changing the code so that it would be always RFC conform (at least
+in this regard) seems to be a no-go, as some setups would then suddenly see
+extra (malicious) traffic go through, so to my actual question:
+
+What would be the accepted way to add a switch of making this RFC conform in
+an opt-in way? A module parameter? A sysfs entry? Through netlink?
+
+As depending on the answer of that I'd like to prepare a patch implementing
+the opt-in RFC-conformance w.r.t. ignoring the reserved bits values of the
+VXLAN flags, this way setups with complementary broken HW in their network
+path can opt in to that behavior as a workaround.
+
+thanks!
+ Thomas
 
 
