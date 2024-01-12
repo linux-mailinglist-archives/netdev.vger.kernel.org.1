@@ -1,197 +1,167 @@
-Return-Path: <netdev+bounces-63323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D18A82C4C6
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 18:33:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62CBE82C4D9
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 18:41:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F339A286A9E
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 17:33:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BCD71C22342
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 17:41:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 380AC2262F;
-	Fri, 12 Jan 2024 17:33:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14B9817570;
+	Fri, 12 Jan 2024 17:41:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cgnhV+ny"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="hNvUKiVt";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="yhRGzsDZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABBAA175B7
-	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 17:33:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1705080806; x=1736616806;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=UrFjtTduFLnpC5IuubU4Rco447XtpFmIuKxQ1EkvqZY=;
-  b=cgnhV+nyrcjuHxY44G8rTMbdnkWDL7VOn1wNDeH+8/nZXeZHsjYXiO5u
-   m30RsLb2cTtnE/+5+8iAaV/K6T9xwCEpyEy6VC9PYTEevX/xVmTeaHY0G
-   FZ4UKGGqeLtXTMPOgmJiDAHEFChhgxZal9HPR6l9HNWZBRtO/BDSGj3Ji
-   wS27jM88tf3k8taVS5n5w14WojQy0SdXUg64m9QUp2iS8Hxf38YvEg8h/
-   QkRQQxaEVYm0mOOCaO05IPMaQKu7mvX+qHwDLrO2TLHs/V3FmddP2Sp9A
-   Ur3quwVRfwa/7yDL9oe5wsEeqHXGQuOCf2zr3ETXIwPHt83vgrs2mpj6x
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10951"; a="396373969"
-X-IronPort-AV: E=Sophos;i="6.04,190,1695711600"; 
-   d="scan'208";a="396373969"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2024 09:33:25 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10951"; a="783103832"
-X-IronPort-AV: E=Sophos;i="6.04,190,1695711600"; 
-   d="scan'208";a="783103832"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orsmga002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 12 Jan 2024 09:33:25 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 12 Jan 2024 09:33:24 -0800
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Fri, 12 Jan 2024 09:33:24 -0800
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 12 Jan 2024 09:33:23 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CDchK8YZmgBnwu+zF6Fd44cw3XQP2W/L9bRGZDKnzP5RPUKXRcpcUxGwIc/KqKkTLGJf8DSGeA4OUAMwVnl4ZDp3qD1wsAWIpnu9yjEzp0M/gKjAihA0ZJ6BNQRoTgZxCHZ/i0BYFY4D6qZZX78JWWdCOHUgKqzpy44Z0VPeMOlCiqoGSGDAZxe6b92JRRGL6sBmkk8OInMWjfALzeVaMlRz9Me07H6e4FD6pVcGMSEkml19HN7VelSaRlUzJEJ30WYFIE77v+OGifHWRuRjgoQdW4Uz0UeTjY03s0pVzU4DilPvU+5zuQJJqv/pWh1RdJCwlK5ZO/l4cUX/py9EjQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=VNDMoILoliMxXSOUPlXcVSvfhsgnqqhFTh1oyzeWH7w=;
- b=O0t2+FL3yi8amVkrXkfsjCrRMtEuwPEX7I2G3CkBWX+gAEO2zI/LbRp9HiQk0O4pupH1DVEespHPH5EiRJDyq6FP/kmgtZV2kXnqX2jHyTd9mdEa+0K4gmrc3k53juU8ICw/HfxsM8s9KJL4jVz9haA+FHgRD3MJS+Cemn+XJL8MYz+f1LB8LzquaOLIR42fHo3QivBP0Ikc5weh7TwyTVsCS15tiFRmoTsmfwTjk920K/RGy1e3wjZJhX6prY6w4q+5NKUHavaOr30h8yZJspMXcdP+xOliGcc1N+ECXrePX/FZMyX/p02jh6gUzQXuF/JqkQoILl3GgEGgO/pZtw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CYYPR11MB8429.namprd11.prod.outlook.com (2603:10b6:930:c2::15)
- by DM6PR11MB4707.namprd11.prod.outlook.com (2603:10b6:5:2a6::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.18; Fri, 12 Jan
- 2024 17:33:22 +0000
-Received: from CYYPR11MB8429.namprd11.prod.outlook.com
- ([fe80::5fa2:8779:8bd1:9bda]) by CYYPR11MB8429.namprd11.prod.outlook.com
- ([fe80::5fa2:8779:8bd1:9bda%3]) with mapi id 15.20.7181.018; Fri, 12 Jan 2024
- 17:33:22 +0000
-From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
-To: "Kolacinski, Karol" <karol.kolacinski@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "Keller, Jacob E" <jacob.e.keller@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "Kolacinski, Karol" <karol.kolacinski@intel.com>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Brandeburg, Jesse"
-	<jesse.brandeburg@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH v5 iwl-next 5/6] ice: factor out
- ice_ptp_rebuild_owner()
-Thread-Topic: [Intel-wired-lan] [PATCH v5 iwl-next 5/6] ice: factor out
- ice_ptp_rebuild_owner()
-Thread-Index: AQHaQjD9Wnk8p8cFJ0iadbiGVHlt1rDWdT2g
-Date: Fri, 12 Jan 2024 17:33:22 +0000
-Message-ID: <CYYPR11MB84295B5FDD0DE11F0C1C5151BD6F2@CYYPR11MB8429.namprd11.prod.outlook.com>
-References: <20240108124717.1845481-1-karol.kolacinski@intel.com>
- <20240108124717.1845481-6-karol.kolacinski@intel.com>
-In-Reply-To: <20240108124717.1845481-6-karol.kolacinski@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CYYPR11MB8429:EE_|DM6PR11MB4707:EE_
-x-ms-office365-filtering-correlation-id: 046bb88b-e4a2-426f-a362-08dc1394931e
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: wmbJShwWVfiHX9CnPexavFZTgCzdL329tUtYec+avmrRYUp+J9wrh08+g54pN6yDtzu2tMyJLmrPdKvkEZwwYbh3/3UnPcSjOTmiRMay96EsRzU7SuUP6+vrXyTVdr/JY6Z8W3TK0Mn0jCAUwPZ6IxwJ1v85crASM8riNbRqhgJbptJ7mEsw669DXcYssHf+MGVVKmT2CxEVIrDsHKBsEQEclreKZixcqFXM2GejVug8Indjy8I10Rl/clrkJtrkjroB4bI6yXGwBz0+OAq1cBUkcjzD9dL+7hiV8BUZGIq/gJkKYBDFICZEBAtNWT/jCMl7B+73rwotKer7YDqxtnNly6nFdwJBT5/v2E23whJ2fZIve5wt6MW+5n0oYcro/K/i0ufDr/1Q2JboybaaNSJSKCJCjbYulJK9c6fYQewltlvijaTpcaTkYUIWrO75lfomrofxQvgThDapD9ZZUi2XOMlafhc34KTp9dwMpD0rMkK1LNgDkL2n3Ju+mBMCzEkQtmSlr5XOX64NC03KCCCrj4CHeKgDfFedkcd94/1dmUT1UazKfKhuSbQWoC/EoIQBi+QOHC2Fo99UAyt3IHSK7IkMvJvk2BVMzao9Rv5pOCLnzPUnfmDHhyhkIPjW
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR11MB8429.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(346002)(366004)(39860400002)(136003)(230922051799003)(1800799012)(451199024)(186009)(64100799003)(82960400001)(26005)(33656002)(107886003)(86362001)(41300700001)(2906002)(66556008)(66946007)(66476007)(64756008)(76116006)(66446008)(8936002)(38100700002)(110136005)(54906003)(7696005)(478600001)(6506007)(8676002)(316002)(71200400001)(38070700009)(5660300002)(9686003)(122000001)(4326008)(53546011)(52536014)(83380400001)(55016003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Fr/YDSnqSibaqCKnIn/8lVmIvK0a93H9R1oW8tmrP12Q4AGrk4otvs+NmYBH?=
- =?us-ascii?Q?94lntNKzGv0EPiPzHN5GZx+mrGW4AlVT+nMgNj/r1gWRt6Vddlvi0QC2tdOy?=
- =?us-ascii?Q?7QAT1ao1/X2Fdr40Yzs7/OT1BgV9eBDxmEyh+ogty/e7y8QNKmvWA2FH79S/?=
- =?us-ascii?Q?e0S+0Xj94NZuK6kvpULlPz12B2cDVv151iXb7CpMuqPfr+ZVNUSaLvgT1MKY?=
- =?us-ascii?Q?m57ynjeJbZjWTYpGN6K77d0C9nEPE4VnsMPjUBaDcuYSUkd8CXtL0c4SnclS?=
- =?us-ascii?Q?HisrmSqkjPTZ4T8Vkd21yYq0W9zMtobb2f48vPSE7KIAdCYfU/ZWS5iHw64N?=
- =?us-ascii?Q?WwwVtltuyeZWsA33ual9hNPSsvoA+ESxdMfHzF3zExTOxs+lhUvHARhzC9if?=
- =?us-ascii?Q?n9Pk28cMvnRc171LyyKpl31/i4eQLhGRLACJnNsVlHPzHBO0WSAefsKAysg1?=
- =?us-ascii?Q?Td8uDMaD+ih7hXfAVWjIIOP37cO2ElUrrNJt4m7kcsDOwKSrTmGptJIKrmfM?=
- =?us-ascii?Q?fAOtNTVmkCmHbXIjkB0b/oKeS9d5A0NlI7qXYZbtOnD+wlJYcmiPCZgmPRfI?=
- =?us-ascii?Q?ZKOb7FWk35opP58LggoLDPZcuCNBhkK+SHKxYgoHQ7Zl9xyiePbEs71RvHuy?=
- =?us-ascii?Q?18/jUbU1NQuQ6aeyZK4uPAWaT3TFdgCYA2/49j1sARzQfs20wuHZDt7ibrgb?=
- =?us-ascii?Q?56oisiv1POV7/IeCY19QaZHx2/heYx1gfrQNlXEyj6UEAW+wJ1CXdKoYhnPi?=
- =?us-ascii?Q?pMYGG7dnvDgpGvuMl3+suimQlbkVEu3iTOq9xjHAccVArOLs9ClZ4QlWO0xu?=
- =?us-ascii?Q?aPjW5OkQkzd8EbdjF5b9sabDdS9i3bvsH8wLM5YJEvS9pNIjyVBqXCTcQWVj?=
- =?us-ascii?Q?PszW912qtisA/xQfz2DYzdzTfWbYIpvv3KvLsTL+5qSmO8ZRLdZRj1NMPUw1?=
- =?us-ascii?Q?Fc8bouaURqVuPRD5iwpHjNdNZEzrmPKn+QBK2+bd7Z4ubIwzHnnSPPFhGx+m?=
- =?us-ascii?Q?FmR9nwicjVWiyVr6Le3Wf2b/0eYSePBBzXVTE9xcEY5qgkU8U2C0mq4uV3Ev?=
- =?us-ascii?Q?m0VVZ9wzcQHKfpi+G0jEQjj/kRKsSUi8H+K/MLmXN8LZPdGdAOW3PUrXDQ3p?=
- =?us-ascii?Q?gR1ByNNRDX/4XLjhl09sgVHIemaRu5Z3T4QAEAY/DOoj6CmGSLSODK4/pmEN?=
- =?us-ascii?Q?usBO/7Lu5uGDMlJtvBH2ZWbBQXCCnboBqfXMPFcP0o13hZIIx9GXSJuXhR9h?=
- =?us-ascii?Q?IYn0FZb+AB0hfHdLIpO9yx+dzaCgjv+EvImqquV0LkZBDfK4RouDeNGhVjHj?=
- =?us-ascii?Q?i2UO//udLU8kRKOfVyWeFIX4o0RtEDTfPj8Y8P4PFABtrkDd1CeYvEOWUVYs?=
- =?us-ascii?Q?Nv6o8xIXiaZFomzoNTxOcnZfssRZU0O9hGxHa1kHM6SJRST9eSUl1DC/MK3E?=
- =?us-ascii?Q?EINsCsFVv0h3a/Mk25L77PmTmA/c1i18uJCtQZuuFM7T9paQ/nVA32arhvq7?=
- =?us-ascii?Q?UIq6o01LF9X5BvnMgShOkZ2ePpK3+gjCwq19YEOe3fiZC9LygWMAdoD9GzNP?=
- =?us-ascii?Q?uNSrAsXlWHCVsOU66YTM8w3eHktGy6vZhqJ1q1q3NSSOiGWyXBc3Gmf0xTg7?=
- =?us-ascii?Q?yg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A90E175A3;
+	Fri, 12 Jan 2024 17:41:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Fri, 12 Jan 2024 18:41:38 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1705081299;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MSerJ1jiXzUOejSZwcpJCzNYxLNjbdJRxkU6ajmn+qM=;
+	b=hNvUKiVtIx2Q8yYcInszUSrifOyzrx1yC7DMnctpPd1RCvkGGCe87JwyVd6Df1OCHJG3Jo
+	WKJcVpew98o7k6XsyhsU6Up9WopBVpBHCRsEueszlWbuxy6paLWKV07AjjU7PecUHogMU5
+	xsNi+qFd5KGXbU0uAaFzbVL94GYssifSnzLpBMCzARK2EMzzan98bxQjZy2a1Wu9D6jSGP
+	wc7RsQTbrIIiuZ+KDUrf7924KkROskmvQ57YP7Wu2jI8E8VFs2OUdWAwZZu3VMtw1/HFuU
+	PA0NUqhwLDlghjjJuTwc4vqpQ+b7f3NZFPk+k0mIi5Ijnt2Vc6LIl6DbLyhhGQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1705081299;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MSerJ1jiXzUOejSZwcpJCzNYxLNjbdJRxkU6ajmn+qM=;
+	b=yhRGzsDZ2lGrIgwoEKmPL7pgDjALimrtmgPXUY7K98e5nSXwOUzgXaLDYZAtD2grtVHq++
+	Q+A6E5QAfIWlXwCw==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Network Development <netdev@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Hao Luo <haoluo@google.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Jiri Olsa <jolsa@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Ronak Doshi <doshir@vmware.com>, Song Liu <song@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+	Yonghong Song <yonghong.song@linux.dev>, bpf <bpf@vger.kernel.org>
+Subject: Re: [PATCH net-next 15/24] net: Use nested-BH locking for XDP
+ redirect.
+Message-ID: <20240112174138.tMmUs11o@linutronix.de>
+References: <20231215171020.687342-1-bigeasy@linutronix.de>
+ <20231215171020.687342-16-bigeasy@linutronix.de>
+ <CAADnVQKJBpvfyvmgM29FLv+KpLwBBRggXWzwKzaCT9U-4bgxjA@mail.gmail.com>
+ <87r0iw524h.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CYYPR11MB8429.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 046bb88b-e4a2-426f-a362-08dc1394931e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jan 2024 17:33:22.3753
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 3TVK0I0VVPrBWu4MtJpzvFJ0m2/cEknbDKJapFbi1w8Zx6cfaPwJlH4KclGGF871VOwpsiSuQvx12eiPbJee5TIAlivXU1d+Q1+Fu6+s1tTBzpjBncqYNNR0xLchn/72
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4707
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <87r0iw524h.fsf@toke.dk>
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of K=
-arol Kolacinski
-> Sent: Monday, January 8, 2024 6:17 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: Keller, Jacob E <jacob.e.keller@intel.com>; netdev@vger.kernel.org; K=
-olacinski, Karol <karol.kolacinski@intel.com>; Nguyen, Anthony L <anthony.l=
-.nguyen@intel.com>; Brandeburg, Jesse <jesse.brandeburg@intel.com>
-> Subject: [Intel-wired-lan] [PATCH v5 iwl-next 5/6] ice: factor out ice_pt=
-p_rebuild_owner()
->
-> From: Jacob Keller <jacob.e.keller@intel.com>
->
-> The ice_ptp_reset() function uses a goto to skip past clock owner
-> operations if performing a PF reset or if the device is not the clock
-> owner. This is a bit confusing. Factor this out into
-> ice_ptp_rebuild_owner() instead.
->
-> The ice_ptp_reset() function is called by ice_rebuild() to restore PTP
-> functionality after a device reset. Follow the convention set by the
-> ice_main.c file and rename this function to ice_ptp_rebuild(), in the
-> same way that we have ice_prepare_for_reset() and
-> ice_ptp_prepare_for_reset().
->
-> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> ---
->  drivers/net/ethernet/intel/ice/ice_main.c |  2 +-
->  drivers/net/ethernet/intel/ice/ice_ptp.c  | 66 ++++++++++++++---------
->  drivers/net/ethernet/intel/ice/ice_ptp.h  |  6 +--
->  3 files changed, 44 insertions(+), 30 deletions(-)
->
+On 2024-01-04 20:29:02 [+0100], Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+> Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
+>=20
+> >> @@ -3925,6 +3926,7 @@ struct sk_buff *tcf_qevent_handle(struct tcf_qev=
+ent *qe, struct Qdisc *sch, stru
+> >>
+> >>         fl =3D rcu_dereference_bh(qe->filter_chain);
+> >>
+> >> +       guard(local_lock_nested_bh)(&bpf_run_lock.redirect_lock);
+> >>         switch (tcf_classify(skb, NULL, fl, &cl_res, false)) {
+> >>         case TC_ACT_SHOT:
+> >>                 qdisc_qstats_drop(sch);
+> >
+> > Here and in all other places this patch adds locks that
+> > will kill performance of XDP, tcx and everything else in networking.
+> >
+> > I'm surprised Jesper and other folks are not jumping in with nacks.
+> > We measure performance in nanoseconds here.
+> > Extra lock is no go.
+> > Please find a different way without ruining performance.
+>=20
+> I'll add that while all this compiles out as no-ops on !PREEMPT_RT, I do
+> believe there are people who are using XDP on PREEMPT_RT kernels and
+> still expect decent performance. And to achieve that it is absolutely
+> imperative that we can amortise expensive operations (such as locking)
+> over multiple packets.
+>=20
+> I realise there's a fundamental trade-off between the amount of
+> amortisation and the latency hit that we take from holding locks for
+> longer, but tuning the batch size (while still keeping some amount of
+> batching) may be a way forward? I suppose Jakub's suggestion in the
+> other part of the thread, of putting the locks around napi->poll(), is a
+> step towards something like this.
 
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
-ntingent worker at Intel)
+The RT requirements are usually different. Networking as in CAN might be
+important but Ethernet could only used for remote communication and so
+"not" important. People complained that they need to wait for Ethernet
+to be done until the CAN packet can be injected into the stack.
+With that expectation you would like to pause Ethernet immediately and
+switch over the CAN interrupt thread.
 
+But if someone managed to setup XDP then it is likely to be important.
+With RT traffic it is usually not the throughput that matters but the
+latency. You are likely in the position to receive a packet, say every
+1ms, and need to respond immediately. XDP would be used to inspect the
+packet and either hand it over to the stack or process it.
+
+I expected the lock operation (under RT) to always succeeds and not
+cause any delay because it should not be contended. It should only
+block if something with higher priority preempted the current interrupt
+thread _and_ also happen to use XDP on the same CPU. In that case (XDP
+is needed) it would flush the current user out of the locked section
+before the higher-prio thread could take over. Doing bulk and allowing
+the low-priority thread to complete would delay the high-priority
+thread. Maybe I am too pessimistic here and having two XDP programs on
+one CPU is unlikely to happen.
+
+Adding the lock on per-NAPI basis would allow to batch packets.
+Acquiring the lock only if XDP is supported would not block the CAN
+drivers since they dont't support XDP. But sounds like a hack.
+
+Daniel said netkit doesn't need this locking because it is not
+supporting this redirect and it made me think. Would it work to make
+the redirect structures part of the bpf_prog-structure instead of
+per-CPU? My understanding is that eBPF's programs data structures are
+part of it and contain locking allowing one eBPF program preempt
+another one.
+Having the redirect structures part of the program would obsolete
+locking. Do I miss anything?
+
+> -Toke
+
+Sebastian
 
