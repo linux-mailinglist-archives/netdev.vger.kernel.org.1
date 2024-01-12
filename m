@@ -1,199 +1,85 @@
-Return-Path: <netdev+bounces-63256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAF9682BF8B
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 13:02:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1059F82BFB0
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 13:20:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C06DE1C21D6F
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 12:02:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B46D92852B0
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 12:20:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 619646A019;
-	Fri, 12 Jan 2024 12:02:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5AC96A323;
+	Fri, 12 Jan 2024 12:20:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R8368RNu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tduj5pl7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC4E46A015
-	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 12:02:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5534180f0e9so7652a12.1
-        for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 04:02:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1705060928; x=1705665728; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9dAsdRRMNENTHmN3GFUI2+NQJszM6FWe9QJkear/o/c=;
-        b=R8368RNuoLGUQxQlwUvdu+LSu3HylKc1cwVUnocV+4s2/EGobg39udeDx44d3dwpDy
-         2WUtkkDCu2ZO1W8KiV3Z6IL1fPguWTxy8i1uR0cbbo22lrU84i7ewDAmC+I6cUQXhkab
-         Fn1aUfnwFd53u9SQGymU7KWA4ua41IMz1xZnK+O3W61ASkc8WgyWcxOk9VwyFjT0IeQh
-         tiGZELR92CMIoAzu3Y/3igWjZIWhiXBWLRUAVBBMcDAQwKvmzmkc3Qy3fYrYF0JN4/zC
-         jk02493SQH6PyO2PtRkKa1cMLlO1fwbgnsSxRT6yEOihsPR4qMglI9nCsCrS2Z7ntSSj
-         V5aA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705060928; x=1705665728;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9dAsdRRMNENTHmN3GFUI2+NQJszM6FWe9QJkear/o/c=;
-        b=FXhfYRNuLL00tPlmzL/Y5KHT9rILWl0EZCBHVGaY1k5wG81c8XetkvQ00y18fcywpk
-         KWMv4pSSKT7YSL1Xy0Hy3l81jLKRiqM5EPs0BIRT7KUG83gtRi16y70RBOk03hO2m3ZI
-         ezilXoHnDxQuu+eyWBJJTnOWs2M/ro3KGBbS1oP8dvEzsnI3UAn2WdLx3LHiKLQDd4vq
-         AlKfoeWZRUEaT94X/d13mNBDouDRdNA9pYT5aUVSAr6lvwhH+XIQxNFng3t/a1U/rMh3
-         9Hq1Th+xQbTelDScAp6ldDghP7TKHugSOofvBHY0rgHGbrUI6ABorauNjDG8jprN7Wv8
-         i49g==
-X-Gm-Message-State: AOJu0Yyng1185NypjsaTsccRl43h9T5mhfvrq1QEBNEpMy6bdZyehFAE
-	Kk05RjotJX8vfXQ9tZFDoFxP4BHz4ET4ht5+G+ofcVu4ZLq6
-X-Google-Smtp-Source: AGHT+IEhXeQEzFajWvgplZ8zKMplV6cTXaxn8qEDBxdXMX5lYoErm6IwzrWMAJjCCnBDIbUAmsWv3Nn9gbZAad2Mmo8=
-X-Received: by 2002:a05:6402:1d97:b0:558:c18b:6dcb with SMTP id
- dk23-20020a0564021d9700b00558c18b6dcbmr112818edb.2.1705060927680; Fri, 12 Jan
- 2024 04:02:07 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC9FF6A038
+	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 12:20:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 55A06C433F1;
+	Fri, 12 Jan 2024 12:20:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705062026;
+	bh=mjelHy6a6ncuG+KTycAHuM/EUt149WUDlqfoaB9rOLw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Tduj5pl75Q7PgcnhSGLIAZmifHcojMuvLpMbXMD4E3RlSi0OPdA9Tw8D8HbYNxSry
+	 yQ3VvQBmk/87B0Ir+zTtKWW7s4ADz1p9LHpfnWDPgqwIzRgThJE5K136rB4ImGCtgI
+	 B5jzB1MO9xNUVn3poLmIwPV3altqKp2/4V7lKiehqgWoQGaotKX4TFXt1EXot4E72O
+	 I50kbLYiwIX9wlbLWSoKHn8sHYNVHmqWhq0dpZjueP78kN6dw14llhZuqX4lsK84ge
+	 cUpcJ/5lh2KSQSPLkRCRvKZNhCjZ1Orx3WqzFtqA7K2kkhIqB9d8BavLeg1RrWAtDP
+	 DHH2Q4cP3P8LQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3B3C7DFC697;
+	Fri, 12 Jan 2024 12:20:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <000000000000994e09060ebcdffb@google.com>
-In-Reply-To: <000000000000994e09060ebcdffb@google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 12 Jan 2024 13:01:54 +0100
-Message-ID: <CANn89iKar6cuJAdQbL2n9vYWRL=yMQBEahfhXNVFNa0aax9OsQ@mail.gmail.com>
-Subject: Re: [syzbot] [net?] KCSAN: data-race in ipv6_mc_down / mld_ifc_work (2)
-To: syzbot <syzbot+a9400cabb1d784e49abf@syzkaller.appspotmail.com>, 
-	Taehee Yoo <ap420073@gmail.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: fill in MODULE_DESCRIPTION()s for wx_lib
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170506202623.29207.13864695075459061469.git-patchwork-notify@kernel.org>
+Date: Fri, 12 Jan 2024 12:20:26 +0000
+References: <20240111193311.4152859-1-kuba@kernel.org>
+In-Reply-To: <20240111193311.4152859-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, jiawenwu@trustnetic.com, mengyuanlou@net-swift.com,
+ duanqiangwen@net-swift.com
 
-On Fri, Jan 12, 2024 at 11:10=E2=80=AFAM syzbot
-<syzbot+a9400cabb1d784e49abf@syzkaller.appspotmail.com> wrote:
->
-> Hello,
->
-> syzbot found the following issue on:
->
-> HEAD commit:    8735c7c84d1b Merge tag '6.7rc7-smb3-srv-fix' of git://git=
-...
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=3D17948c9ae8000=
-0
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=3D4da1e2da456c3=
-a7d
-> dashboard link: https://syzkaller.appspot.com/bug?extid=3Da9400cabb1d784e=
-49abf
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Deb=
-ian) 2.40
->
-> Unfortunately, I don't have any reproducer for this issue yet.
->
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/f263d974af01/dis=
-k-8735c7c8.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/9faf34fc0b3e/vmlinu=
-x-8735c7c8.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/0b52a58ecd0e/b=
-zImage-8735c7c8.xz
->
-> IMPORTANT: if you fix the issue, please add the following tag to the comm=
-it:
-> Reported-by: syzbot+a9400cabb1d784e49abf@syzkaller.appspotmail.com
->
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> BUG: KCSAN: data-race in ipv6_mc_down / mld_ifc_work
->
-> write to 0xffff88813a80c832 of 1 bytes by task 3771 on cpu 0:
->  mld_ifc_stop_work net/ipv6/mcast.c:1080 [inline]
->  ipv6_mc_down+0x10a/0x280 net/ipv6/mcast.c:2725
->  addrconf_ifdown+0xe32/0xf10 net/ipv6/addrconf.c:3949
->  addrconf_notify+0x310/0x980
->  notifier_call_chain kernel/notifier.c:93 [inline]
->  raw_notifier_call_chain+0x6b/0x1c0 kernel/notifier.c:461
->  __dev_notify_flags+0x205/0x3d0
->  dev_change_flags+0xab/0xd0 net/core/dev.c:8685
->  do_setlink+0x9f6/0x2430 net/core/rtnetlink.c:2916
->  rtnl_group_changelink net/core/rtnetlink.c:3458 [inline]
->  __rtnl_newlink net/core/rtnetlink.c:3717 [inline]
->  rtnl_newlink+0xbb3/0x1670 net/core/rtnetlink.c:3754
->  rtnetlink_rcv_msg+0x807/0x8c0 net/core/rtnetlink.c:6558
->  netlink_rcv_skb+0x126/0x220 net/netlink/af_netlink.c:2545
->  rtnetlink_rcv+0x1c/0x20 net/core/rtnetlink.c:6576
->  netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
->  netlink_unicast+0x589/0x650 net/netlink/af_netlink.c:1368
->  netlink_sendmsg+0x66e/0x770 net/netlink/af_netlink.c:1910
->  sock_sendmsg_nosec net/socket.c:730 [inline]
->  __sock_sendmsg net/socket.c:745 [inline]
->  ____sys_sendmsg+0x37c/0x4d0 net/socket.c:2584
->  ___sys_sendmsg net/socket.c:2638 [inline]
->  __sys_sendmsg+0x1e9/0x270 net/socket.c:2667
->  __do_sys_sendmsg net/socket.c:2676 [inline]
->  __se_sys_sendmsg net/socket.c:2674 [inline]
->  __x64_sys_sendmsg+0x46/0x50 net/socket.c:2674
->  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->  do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x63/0x6b
->
-> write to 0xffff88813a80c832 of 1 bytes by task 22 on cpu 1:
->  mld_ifc_work+0x54c/0x7b0 net/ipv6/mcast.c:2653
->  process_one_work kernel/workqueue.c:2627 [inline]
->  process_scheduled_works+0x5b8/0xa30 kernel/workqueue.c:2700
->  worker_thread+0x525/0x730 kernel/workqueue.c:2781
->  kthread+0x1d7/0x210 kernel/kthread.c:388
->  ret_from_fork+0x48/0x60 arch/x86/kernel/process.c:147
->  ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
->
-> value changed: 0x02 -> 0x00
->
-> Reported by Kernel Concurrency Sanitizer on:
-> CPU: 1 PID: 22 Comm: kworker/1:0 Not tainted 6.7.0-rc7-syzkaller-00029-g8=
-735c7c84d1b #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
-oogle 11/17/2023
-> Workqueue: mld mld_ifc_work
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
->
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Thu, 11 Jan 2024 11:33:11 -0800 you wrote:
+> W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
+> Add a description to Wangxun's common code lib.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
->
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
->
-> If the report is already addressed, let syzbot know by replying with:
-> #syz fix: exact-commit-title
->
-> If you want to overwrite report's subsystems, reply with:
-> #syz set subsystems: new-subsystem
-> (See the list of subsystem names on the web dashboard)
->
-> If the report is a duplicate of another one, reply with:
-> #syz dup: exact-subject-of-another-report
->
-> If you want to undo deduplication, reply with:
-> #syz undup
+> CC: jiawenwu@trustnetic.com
+> CC: mengyuanlou@net-swift.com
+> CC: duanqiangwen@net-swift.com
+> 
+> [...]
 
-Bug added in
+Here is the summary with links:
+  - [net] net: fill in MODULE_DESCRIPTION()s for wx_lib
+    https://git.kernel.org/netdev/net/c/907ee6681788
 
-commit 63ed8de4be81b699ca727e9f8e3344bd487806d7
-Author: Taehee Yoo <ap420073@gmail.com>
-Date:   Thu Mar 25 16:16:57 2021 +0000
-
-    mld: add mc_lock for protecting per-interface mld data
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-ipv6_mc_down() calls mld_ifc_stop_work() while mc_lock is not held.
 
