@@ -1,197 +1,328 @@
-Return-Path: <netdev+bounces-63258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24F2E82BFC3
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 13:28:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3709982BFCD
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 13:32:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 76F41B23C3A
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 12:28:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CF781C23602
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 12:32:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 384A66BB31;
-	Fri, 12 Jan 2024 12:28:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MGFAaYgb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E06355917D;
+	Fri, 12 Jan 2024 12:32:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A51E96A02A
-	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 12:28:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5e617562a65so121141247b3.1
-        for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 04:28:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1705062497; x=1705667297; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=/Bga0YpPLMBHaia2rFV9M5TpJ+mq6cLrQmgk/RtvnSE=;
-        b=MGFAaYgbE5Fd1iMUkolt2DZJwNi7MXGbgDqcin2Ef/ks8WS7hilNolmLwYgu1qI490
-         l9ROOTtRGwaZhWgZDNPp8R7gwTpuW0AV9HxtcTT1+d4IqAmkL3dVF9b22ntmpRQPkJt8
-         57XplTYwj8EoJ+xM4ZxFfD10wmI+KWLhaKW/7PwCusH8X3SQvgmhwlS7HqaeOKoIeaeO
-         9Gnxu13olM+Ohik4ofP/uwVA2ODS09tIgQdmKOGwl4XupwVX4gqHIswZUM1fKdGXa8oc
-         uJi5QhYL11+ebYgiG41g/Bft9bdZN7wDJzDN98YKu2c42TzBz+ftpJW8Q158EBRe3Cnw
-         P9Yw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705062497; x=1705667297;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/Bga0YpPLMBHaia2rFV9M5TpJ+mq6cLrQmgk/RtvnSE=;
-        b=qwGkURDIdx76quTqgOMBEwILZ4QgJuNKWJoGrxAbzTfULK2DiQUPq63yecGw5sGMyR
-         M1I7P5hjLStOazPCpqAlYwSlZKzNhw2FIoRrBhcolDnPva0S17Xwca3SW3kikvqbfVZM
-         SmDGYG1S4dx3OxGERY7LYERpN8o4hR6Xtf4yRMIwyQtMywW8BmfHH4YNax7qn3q+hyM6
-         B2f5eLYGn4ht2ClTWzuT9Za12kkCOWjzVCMSkf1ALMyqSuANC2eHXPLOmyAe32Bb8I5A
-         ROugbhnWKxLStnNfMVpLqdwerOswT9vmz6jeVfAsp2KgQ8JjwE7+sGG8IXaH21dWQVM1
-         XJ7w==
-X-Gm-Message-State: AOJu0YyiehRyUNFNEkRc6eBTq0ZFTRGa0b/qB7ZMQKclBSqkf4UC6JBm
-	Yf5nuuLV5I/GWNTZwslPfvm4+v4yI2f+RDZpUnv8
-X-Google-Smtp-Source: AGHT+IE/7lKkl8rIZxmEPu6Rk0SzN7cB6jJgEcG2iXo8/3qOpzSr5w3p4fdhwc+lWRAvyYDIhCWcptZO9cLtiA==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:2286:b0:dbe:a31e:712d with SMTP
- id dn6-20020a056902228600b00dbea31e712dmr284792ybb.11.1705062497680; Fri, 12
- Jan 2024 04:28:17 -0800 (PST)
-Date: Fri, 12 Jan 2024 12:28:16 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C71C41C67;
+	Fri, 12 Jan 2024 12:32:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0W-T9dnj_1705062738;
+Received: from 30.221.130.160(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W-T9dnj_1705062738)
+          by smtp.aliyun-inc.com;
+          Fri, 12 Jan 2024 20:32:19 +0800
+Message-ID: <d7f9684e-4115-4b04-9e92-dbb841a52935@linux.alibaba.com>
+Date: Fri, 12 Jan 2024 20:32:14 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.43.0.275.g3460e3d667-goog
-Message-ID: <20240112122816.450197-1-edumazet@google.com>
-Subject: [PATCH net] net: add more sanity check in virtio_net_hdr_to_skb()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot+7f4d0ea3df4d4fa9a65f@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 00/15] net/smc: implement loopback-ism used by
+ SMC-D
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: wintera@linux.ibm.com, wenjia@linux.ibm.com, hca@linux.ibm.com,
+ gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, jaka@linux.ibm.com,
+ borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
+ tonylu@linux.alibaba.com, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240111120036.109903-1-guwen@linux.alibaba.com>
+ <ZaAAJDiQ3bPGGRFK@nanopsycho>
+ <2d8e7aeb-06da-434c-b7fe-6c1bd2e0674a@linux.alibaba.com>
+ <ZaEB-b-W9Jt77T98@nanopsycho>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <ZaEB-b-W9Jt77T98@nanopsycho>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-syzbot/KMSAN reports access to uninitialized data from gso_features_check() [1]
 
-The repro use af_packet, injecting a gso packet and hdrlen == 0.
 
-We could fix the issue making gso_features_check() more careful
-while dealing with NETIF_F_TSO_MANGLEID in fast path.
+On 2024/1/12 17:10, Jiri Pirko wrote:
+> Fri, Jan 12, 2024 at 09:29:35AM CET, guwen@linux.alibaba.com wrote:
+>>
+>>
 
-Or we can make sure virtio_net_hdr_to_skb() pulls minimal network and
-transport headers as intended.
+<...>
 
-Note that for GSO packets coming from untrusted sources, SKB_GSO_DODGY
-bit forces a proper header validation (and pull) before the packet can
-hit any device ndo_start_xmit(), thus we do not need a precise disection
-at virtio_net_hdr_to_skb() stage.
+>>>> inter-containers communication within the same OS instance.
+>>>>
+>>>> # Design
+>>>>
+>>>> This patch set includes 3 parts:
+>>>>
+>>>> - Patch #1-#2: some prepare work for loopback-ism.
+>>>> - Patch #3-#9: implement loopback-ism device.
+>>>> - Patch #10-#15: memory copy optimization for loopback scenario.
+>>>>
+>>>> The loopback-ism device is designed as a ISMv2 device and not be limited to
+>>>> a specific net namespace, ends of both inter-process connection (1/1' in diagram
+>>>> below) or inter-container connection (2/2' in diagram below) can find the same
+>>>> available loopback-ism and choose it during the CLC handshake.
+>>>>
+>>>> Container 1 (ns1)                              Container 2 (ns2)
+>>>> +-----------------------------------------+    +-------------------------+
+>>>> | +-------+      +-------+      +-------+ |    |        +-------+        |
+>>>> | | App A |      | App B |      | App C | |    |        | App D |<-+     |
+>>>> | +-------+      +---^---+      +-------+ |    |        +-------+  |(2') |
+>>>> |     |127.0.0.1 (1')|             |192.168.0.11       192.168.0.12|     |
+>>>> |  (1)|   +--------+ | +--------+  |(2)   |    | +--------+   +--------+ |
+>>>> |     `-->|   lo   |-` |  eth0  |<-`      |    | |   lo   |   |  eth0  | |
+>>>> +---------+--|---^-+---+-----|--+---------+    +-+--------+---+-^------+-+
+>>>>                |   |           |                                  |
+>>>> Kernel       |   |           |                                  |
+>>>> +----+-------v---+-----------v----------------------------------+---+----+
+>>>> |    |                            TCP                               |    |
+>>>> |    |                                                              |    |
+>>>> |    +--------------------------------------------------------------+    |
+>>>> |                                                                        |
+>>>> |                           +--------------+                             |
+>>>> |                           | smc loopback |                             |
+>>>> +---------------------------+--------------+-----------------------------+
+>>>>
+>>>> loopback-ism device creates DMBs (shared memory) for each connection peer.
+>>>> Since data transfer occurs within the same kernel, the sndbuf of each peer
+>>>> is only a descriptor and point to the same memory region as peer DMB, so that
+>>>> the data copy from sndbuf to peer DMB can be avoided in loopback-ism case.
+>>>>
+>>>> Container 1 (ns1)                              Container 2 (ns2)
+>>>> +-----------------------------------------+    +-------------------------+
+>>>> | +-------+                               |    |        +-------+        |
+>>>> | | App C |-----+                         |    |        | App D |        |
+>>>> | +-------+     |                         |    |        +-^-----+        |
+>>>> |               |                         |    |          |              |
+>>>> |           (2) |                         |    |     (2') |              |
+>>>> |               |                         |    |          |              |
+>>>> +---------------|-------------------------+    +----------|--------------+
+>>>>                   |                                         |
+>>>> Kernel          |                                         |
+>>>> +---------------|-----------------------------------------|--------------+
+>>>> | +--------+ +--v-----+                           +--------+ +--------+  |
+>>>> | |dmb_desc| |snd_desc|                           |dmb_desc| |snd_desc|  |
+>>>> | +-----|--+ +--|-----+                           +-----|--+ +--------+  |
+>>>> | +-----|--+    |                                 +-----|--+             |
+>>>> | | DMB C  |    +---------------------------------| DMB D  |             |
+>>>> | +--------+                                      +--------+             |
+>>>> |                                                                        |
+>>>> |                           +--------------+                             |
+>>>> |                           | smc loopback |                             |
+>>>> +---------------------------+--------------+-----------------------------+
+>>>>
+>>>> # Benchmark Test
+>>>>
+>>>> * Test environments:
+>>>>        - VM with Intel Xeon Platinum 8 core 2.50GHz, 16 GiB mem.
+>>>>        - SMC sndbuf/DMB size 1MB.
+>>>>        - /sys/devices/virtual/smc/loopback-ism/dmb_copy is set to default 0,
+>>>>          which means sndbuf and DMB are merged and no data copied between them.
+>>>>        - /sys/devices/virtual/smc/loopback-ism/dmb_type is set to default 0,
+>>>
+>>> Exposing any configuration knobs and statistics over sysfs for
+>>> softdevices does not look correct at all :/ Could you please avoid
+>>> sysfs?
+>>>
+>>
+>> In previous reviews and calls, we think loopback-ism needs to be more
+>> like a device and be visible under /sys/devices.
+>>
+>> Would you mind explaining why using sysfs for loopback-ism is not correct?
+>> since I saw some other configurations or statistics exists under /sys/devices,
+>> e.g. /sys/devices/virtual/net/lo. Thank you!
+> 
+> You have smc_netlink.c exposing clear netlink api for the subsystem.
+> Can't you extend it to contain the configuration knobs and expose stats
+> instead of sysfs?
+> 
 
-[1]
-BUG: KMSAN: uninit-value in skb_gso_segment include/net/gso.h:83 [inline]
-BUG: KMSAN: uninit-value in validate_xmit_skb+0x10f2/0x1930 net/core/dev.c:3629
- skb_gso_segment include/net/gso.h:83 [inline]
- validate_xmit_skb+0x10f2/0x1930 net/core/dev.c:3629
- __dev_queue_xmit+0x1eac/0x5130 net/core/dev.c:4341
- dev_queue_xmit include/linux/netdevice.h:3134 [inline]
- packet_xmit+0x9c/0x6b0 net/packet/af_packet.c:276
- packet_snd net/packet/af_packet.c:3087 [inline]
- packet_sendmsg+0x8b1d/0x9f30 net/packet/af_packet.c:3119
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg net/socket.c:745 [inline]
- ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
- ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
- __sys_sendmsg net/socket.c:2667 [inline]
- __do_sys_sendmsg net/socket.c:2676 [inline]
- __se_sys_sendmsg net/socket.c:2674 [inline]
- __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
+Thank you for the suggestion. I've also considered this approach.
 
-Uninit was created at:
- slab_post_alloc_hook+0x129/0xa70 mm/slab.h:768
- slab_alloc_node mm/slub.c:3478 [inline]
- kmem_cache_alloc_node+0x5e9/0xb10 mm/slub.c:3523
- kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:560
- __alloc_skb+0x318/0x740 net/core/skbuff.c:651
- alloc_skb include/linux/skbuff.h:1286 [inline]
- alloc_skb_with_frags+0xc8/0xbd0 net/core/skbuff.c:6334
- sock_alloc_send_pskb+0xa80/0xbf0 net/core/sock.c:2780
- packet_alloc_skb net/packet/af_packet.c:2936 [inline]
- packet_snd net/packet/af_packet.c:3030 [inline]
- packet_sendmsg+0x70e8/0x9f30 net/packet/af_packet.c:3119
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg net/socket.c:745 [inline]
- ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
- ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
- __sys_sendmsg net/socket.c:2667 [inline]
- __do_sys_sendmsg net/socket.c:2676 [inline]
- __se_sys_sendmsg net/socket.c:2674 [inline]
- __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
+But I didn't choose to extend the smc netlink because for now smc netlink
+are used for SMC protocol related attributes, for example:
 
-CPU: 0 PID: 5025 Comm: syz-executor279 Not tainted 6.7.0-rc7-syzkaller-00003-gfbafc3e621c3 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+SMC_NETLINK_GET_SYS_INFO:     SMC version, release, v2-capable..
+SMC_NETLINK_GET_LGR_SMC{R|D}: SMC-{R|D} link group inform (lgr id, lgr conn num, lgr role..)
+SMC_NETLINK_GET_LINK_SMCR:    SMC-R link inform (link id, link state, conn cnt..)
+SMC_NETLINK_GET_DEV_SMCD:     SMC-D device generic inform (user cnt, pci_fid, pci_chid, pci_vendor..)
+SMC_NETLINK_GET_DEV_SMCR:     SMC-R device generic inform (dev name, port pnet_id, port valid, port state..)
+SMC_NETLINK_GET_STATS:        SMC generic stats (RMB cnt, Tx size, Rx size, RMB size...)
 
-Reported-by: syzbot+7f4d0ea3df4d4fa9a65f@syzkaller.appspotmail.com
-Link: https://lore.kernel.org/netdev/0000000000005abd7b060eb160cd@google.com/
-Fixes: 9274124f023b ("net: stricter validation of untrusted gso packets")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Willem de Bruijn <willemb@google.com>
----
- include/linux/virtio_net.h | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+And the knobs and stats in this patchset are loopback-ism device specific
+attributes, for example:
 
-diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
-index 27cc1d4643219a44c01a2404124cd45ef46f7f3d..4dfa9b69ca8d95d43e44831bc166eadbe5715d3c 100644
---- a/include/linux/virtio_net.h
-+++ b/include/linux/virtio_net.h
-@@ -3,6 +3,8 @@
- #define _LINUX_VIRTIO_NET_H
- 
- #include <linux/if_vlan.h>
-+#include <linux/ip.h>
-+#include <linux/ipv6.h>
- #include <linux/udp.h>
- #include <uapi/linux/tcp.h>
- #include <uapi/linux/virtio_net.h>
-@@ -49,6 +51,7 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
- 					const struct virtio_net_hdr *hdr,
- 					bool little_endian)
- {
-+	unsigned int nh_min_len = sizeof(struct iphdr);
- 	unsigned int gso_type = 0;
- 	unsigned int thlen = 0;
- 	unsigned int p_off = 0;
-@@ -65,6 +68,7 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
- 			gso_type = SKB_GSO_TCPV6;
- 			ip_proto = IPPROTO_TCP;
- 			thlen = sizeof(struct tcphdr);
-+			nh_min_len = sizeof(struct ipv6hdr);
- 			break;
- 		case VIRTIO_NET_HDR_GSO_UDP:
- 			gso_type = SKB_GSO_UDP;
-@@ -100,7 +104,8 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
- 		if (!skb_partial_csum_set(skb, start, off))
- 			return -EINVAL;
- 
--		p_off = skb_transport_offset(skb) + thlen;
-+		nh_min_len = max_t(u32, nh_min_len, skb_transport_offset(skb));
-+		p_off = nh_min_len + thlen;
- 		if (!pskb_may_pull(skb, p_off))
- 			return -EINVAL;
- 	} else {
-@@ -140,7 +145,7 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
- 
- 			skb_set_transport_header(skb, keys.control.thoff);
- 		} else if (gso_type) {
--			p_off = thlen;
-+			p_off = nh_min_len + thlen;
- 			if (!pskb_may_pull(skb, p_off))
- 				return -EINVAL;
- 		}
--- 
-2.43.0.275.g3460e3d667-goog
+active:        loopback-ism runtime switch
+dmb_type:      type of DMB provided by loopback-ism
+dmb_copy:      support for DMB merge of loopback-ism
+xfer_bytes:    data transferred by loopback-ism
+dmbs_cnt:      DMB num provided by loopback-ism
 
+The layer will be:
+
+                +--------------------------------------+
+                |                                      |
+                |             SMC protocol             |
+                |  (attrs by netlink in smc_netlink.c) |
+                |                                      |
+                +--------------------------------------+
+              ------------------smcd_ops------------------
+      +---------------+  +---------------------+  +--------------+
+      | loopback-ism  |  |  s390 firmware ISM  |  | Possible     |
+      +---------------+  |                     |  | other        |
+      (attrs by sysfs    |                     |  | virtual ISM  |
+     in smc_loopback.c)  |                     |  |              |
+                         |                     |  |              |
+                         +---------------------+  +--------------+
+
+So I choose to use current way to provide this lower layer loopback-ism
+device's attributes, restrict loopback-ism specific code to smc_loopback.c
+and try to make a clear layer architecture.
+
+Thanks,
+Wen Gu
+> 
+>>
+>>
+>>
+>> Thanks again,
+>> Wen Gu
+>>
+>>>
+>>>>          which means DMB is physically contiguous buffer.
+>>>>
+>>>> * Test object:
+>>>>        - TCP: run on TCP loopback.
+>>>>        - SMC lo: run on SMC loopback device.
+>>>>
+>>>> 1. ipc-benchmark (see [3])
+>>>>
+>>>> - ./<foo> -c 1000000 -s 100
+>>>>
+>>>>                              TCP                  SMC-lo
+>>>> Message
+>>>> rate (msg/s)              80636                  149515(+85.42%)
+>>>>
+>>>> 2. sockperf
+>>>>
+>>>> - serv: <smc_run> taskset -c <cpu> sockperf sr --tcp
+>>>> - clnt: <smc_run> taskset -c <cpu> sockperf { tp | pp } --tcp --msg-size={ 64000 for tp | 14 for pp } -i 127.0.0.1 -t 30
+>>>>
+>>>>                              TCP                  SMC-lo
+>>>> Bandwidth(MBps)         4909.36                 8197.57(+66.98%)
+>>>> Latency(us)               6.098                   3.383(-44.52%)
+>>>>
+>>>> 3. nginx/wrk
+>>>>
+>>>> - serv: <smc_run> nginx
+>>>> - clnt: <smc_run> wrk -t 8 -c 1000 -d 30 http://127.0.0.1:80
+>>>>
+>>>>                             TCP                   SMC-lo
+>>>> Requests/s           181685.74                246447.77(+35.65%)
+>>>>
+>>>> 4. redis-benchmark
+>>>>
+>>>> - serv: <smc_run> redis-server
+>>>> - clnt: <smc_run> redis-benchmark -h 127.0.0.1 -q -t set,get -n 400000 -c 200 -d 1024
+>>>>
+>>>>                             TCP                   SMC-lo
+>>>> GET(Requests/s)       85855.34                118553.64(+38.09%)
+>>>> SET(Requests/s)       86824.40                125944.58(+45.06%)
+>>>>
+>>>>
+>>>> Change log:
+>>>>
+>>>> v1->RFC:
+>>>> - Patch #9: merge rx_bytes and tx_bytes as xfer_bytes statistics:
+>>>>    /sys/devices/virtual/smc/loopback-ism/xfer_bytes
+>>>> - Patch #10: add support_dmb_nocopy operation to check if SMC-D device supports
+>>>>    merging sndbuf with peer DMB.
+>>>> - Patch #13 & #14: introduce loopback-ism device control of DMB memory type and
+>>>>    control of whether to merge sndbuf and DMB. They can be respectively set by:
+>>>>    /sys/devices/virtual/smc/loopback-ism/dmb_type
+>>>>    /sys/devices/virtual/smc/loopback-ism/dmb_copy
+>>>>    The motivation for these two control is that a performance bottleneck was
+>>>>    found when using vzalloced DMB and sndbuf is merged with DMB, and there are
+>>>>    many CPUs and CONFIG_HARDENED_USERCOPY is set [4]. The bottleneck is caused
+>>>>    by the lock contention in vmap_area_lock [5] which is involved in memcpy_from_msg()
+>>>>    or memcpy_to_msg(). Currently, Uladzislau Rezki is working on mitigating the
+>>>>    vmap lock contention [6]. It has significant effects, but using virtual memory
+>>>>    still has additional overhead compared to using physical memory.
+>>>>    So this new version provides controls of dmb_type and dmb_copy to suit
+>>>>    different scenarios.
+>>>> - Some minor changes and comments improvements.
+>>>>
+>>>> RFC->old version([1]):
+>>>> Link: https://lore.kernel.org/netdev/1702214654-32069-1-git-send-email-guwen@linux.alibaba.com/
+>>>> - Patch #1: improve the loopback-ism dump, it shows as follows now:
+>>>>    # smcd d
+>>>>    FID  Type  PCI-ID        PCHID  InUse  #LGs  PNET-ID
+>>>>    0000 0     loopback-ism  ffff   No        0
+>>>> - Patch #3: introduce the smc_ism_set_v2_capable() helper and set
+>>>>    smc_ism_v2_capable when ISMv2 or virtual ISM is registered,
+>>>>    regardless of whether there is already a device in smcd device list.
+>>>> - Patch #3: loopback-ism will be added into /sys/devices/virtual/smc/loopback-ism/.
+>>>> - Patch #8: introduce the runtime switch /sys/devices/virtual/smc/loopback-ism/active
+>>>>    to activate or deactivate the loopback-ism.
+>>>> - Patch #9: introduce the statistics of loopback-ism by
+>>>>    /sys/devices/virtual/smc/loopback-ism/{{tx|rx}_tytes|dmbs_cnt}.
+>>>> - Some minor changes and comments improvements.
+>>>>
+>>>> [1] https://lore.kernel.org/netdev/1695568613-125057-1-git-send-email-guwen@linux.alibaba.com/
+>>>> [2] https://lore.kernel.org/netdev/20231219142616.80697-1-guwen@linux.alibaba.com/
+>>>> [3] https://github.com/goldsborough/ipc-bench
+>>>> [4] https://lore.kernel.org/all/3189e342-c38f-6076-b730-19a6efd732a5@linux.alibaba.com/
+>>>> [5] https://lore.kernel.org/all/238e63cd-e0e8-4fbf-852f-bc4d5bc35d5a@linux.alibaba.com/
+>>>> [6] https://lore.kernel.org/all/20240102184633.748113-1-urezki@gmail.com/
+>>>>
+>>>> Wen Gu (15):
+>>>>    net/smc: improve SMC-D device dump for virtual ISM
+>>>>    net/smc: decouple specialized struct from SMC-D DMB registration
+>>>>    net/smc: introduce virtual ISM device loopback-ism
+>>>>    net/smc: implement ID-related operations of loopback-ism
+>>>>    net/smc: implement some unsupported operations of loopback-ism
+>>>>    net/smc: implement DMB-related operations of loopback-ism
+>>>>    net/smc: register loopback-ism into SMC-D device list
+>>>>    net/smc: introduce loopback-ism runtime switch
+>>>>    net/smc: introduce loopback-ism statistics attributes
+>>>>    net/smc: add operations to merge sndbuf with peer DMB
+>>>>    net/smc: attach or detach ghost sndbuf to peer DMB
+>>>>    net/smc: adapt cursor update when sndbuf and peer DMB are merged
+>>>>    net/smc: introduce loopback-ism DMB type control
+>>>>    net/smc: introduce loopback-ism DMB data copy control
+>>>>    net/smc: implement DMB-merged operations of loopback-ism
+>>>>
+>>>> drivers/s390/net/ism_drv.c |   2 +-
+>>>> include/net/smc.h          |   7 +-
+>>>> net/smc/Kconfig            |  13 +
+>>>> net/smc/Makefile           |   2 +-
+>>>> net/smc/af_smc.c           |  28 +-
+>>>> net/smc/smc_cdc.c          |  58 ++-
+>>>> net/smc/smc_cdc.h          |   1 +
+>>>> net/smc/smc_core.c         |  61 +++-
+>>>> net/smc/smc_core.h         |   1 +
+>>>> net/smc/smc_ism.c          |  71 +++-
+>>>> net/smc/smc_ism.h          |   5 +
+>>>> net/smc/smc_loopback.c     | 718 +++++++++++++++++++++++++++++++++++++
+>>>> net/smc/smc_loopback.h     |  88 +++++
+>>>> 13 files changed, 1026 insertions(+), 29 deletions(-)
+>>>> create mode 100644 net/smc/smc_loopback.c
+>>>> create mode 100644 net/smc/smc_loopback.h
+>>>>
+>>>> -- 
+>>>> 2.32.0.3.g01195cf9f
+>>>>
+>>>>
 
