@@ -1,74 +1,52 @@
-Return-Path: <netdev+bounces-63188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2137382B907
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 02:15:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71F7382B91D
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 02:31:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C29F1287A98
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 01:15:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6AC42B23032
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 01:31:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2472139F;
-	Fri, 12 Jan 2024 01:15:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E948ED3;
+	Fri, 12 Jan 2024 01:30:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MrKALpHU"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="NBn7PWKs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31FD01116
-	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 01:15:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-3bbd6e3795eso4610741b6e.2
-        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 17:15:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705022124; x=1705626924; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MoI7C0uSr0imX4rZL1K/Jhft2w5h7qReGETmVV+3S1w=;
-        b=MrKALpHUDIeyeax3waI9RER5inVgYoGqvimsnUWTU98FGoOBO4YaHOSTpSeCnILDSk
-         WpSm+4cV8MNXgSuLSE1rz+10ToTlEd1ZVPNV8UY0gLc9JoTjGbSzX1hqmh0sn8fw3e69
-         7iV79uQBDu116pDI1TKUZCHqN+PVKqWTiHTKcXtJOGKRC+2nQBNjJUG7KDYP1YJwKnGN
-         n8zfAMysc/pHw6tSyDSRUeP7oHOQOz218K1znJOMIYwK0Us/kOuA7GdxO3i+1AXmpZjF
-         Rmc+ArGR6HcG+UbZvCMm/DrxCEtw1g2eDpcwdd4DsR5st12e+uGsiXWsPQ3eQFUZrLtF
-         aJWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705022124; x=1705626924;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MoI7C0uSr0imX4rZL1K/Jhft2w5h7qReGETmVV+3S1w=;
-        b=UHdBO1cWSFof+QpikJLEn9pkNXGYgaS445oN8I0O8oStJ4c69+bI+bq6LzA+zEs14X
-         VDShUPNCW/ugfAXYKd1YuakhjgfHUKG+zCUwAx518JdyVK0fliLvo/5Cz7bYqGimjE31
-         nVoTe5NAzJw9G6U7lWHnqJLg5QTQ+hKekOx10LgS2ri6jjV1xJhmCzPwVFI2l1E62u51
-         BorTpgM9uLl6YeoyjNoOj6UhTHMKTBQC8EklQwpa2xzzyFE7FPZVLgcfVRX33KQORniB
-         0csjzoyBGj5CYeMvxWFGqYg9A+eT6xxphTT/w92zxldf5dtlDhT11P2pWkTxu8yf5ZVg
-         HpGg==
-X-Gm-Message-State: AOJu0YzeJFBhOnrWd9FIbaYpjTFsVUyXEPo79i3Nl/DPEA7i/EpAOXGE
-	QVTcOhuUTrWAkeWDn6Fc5d9InvjcjmItDw==
-X-Google-Smtp-Source: AGHT+IHdQRWg6XTEMx7EyO+S47FV0X9de+E0Aby0HOFUKSON/m4WOVhvpJvhmWfvlBz40T0ugjqWpQ==
-X-Received: by 2002:a05:6808:3009:b0:3bd:4629:38a3 with SMTP id ay9-20020a056808300900b003bd462938a3mr228809oib.6.1705022124168;
-        Thu, 11 Jan 2024 17:15:24 -0800 (PST)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id ko20-20020a056a00461400b006da13bc46c0sm1943129pfb.171.2024.01.11.17.15.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Jan 2024 17:15:22 -0800 (PST)
-Date: Fri, 12 Jan 2024 09:15:14 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>, Phil Sutter <phil@nwl.cc>,
-	David Ahern <dsahern@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net v4 2/2] selftests: rtnetlink: check enslaving iface
- in a bond
-Message-ID: <ZaCSog00Bj8GmOZ4@Laptop-X1>
-References: <20240108094103.2001224-1-nicolas.dichtel@6wind.com>
- <20240108094103.2001224-3-nicolas.dichtel@6wind.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48B1BEBD;
+	Fri, 12 Jan 2024 01:30:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=EX4KvwsG+Ty7/y7ISF6vqjYHJpX/a8k4tDTQ2hUTWdw=; b=NBn7PWKsKBsAaLI5werka/g57w
+	egxhrciZSc0a4Z/nYxJpaXzXThfAcJOuW76lFXJXWaRKC8USchZYLei6mnqSmLiirStlsWh3+8ADU
+	QfGvqQNU4xpc+gFr9sBB/QlOSTevfDLycR4KAfcKFcUTaZnVhR8H/tBNnvL2mzyVMZJ8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rO6NS-0052Yy-K5; Fri, 12 Jan 2024 02:30:30 +0100
+Date: Fri, 12 Jan 2024 02:30:30 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: claudiu beznea <claudiu.beznea@tuxon.dev>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, hkallweit1@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, yuiko.oshino@microchip.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+Subject: Re: [PATCH net] net: phy: micrel: populate .soft_reset for KSZ9131
+Message-ID: <65d22ad5-4db2-4e7d-b314-7cd3cd387335@lunn.ch>
+References: <20240105085242.1471050-1-claudiu.beznea.uj@bp.renesas.com>
+ <ZZfPOky2p/ZJMKCQ@shell.armlinux.org.uk>
+ <a2651f98-b598-4a05-9e05-d2912eeb55d2@lunn.ch>
+ <c0b5ca41-c145-4adc-86c0-067e5043523b@tuxon.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,54 +55,77 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240108094103.2001224-3-nicolas.dichtel@6wind.com>
+In-Reply-To: <c0b5ca41-c145-4adc-86c0-067e5043523b@tuxon.dev>
 
-On Mon, Jan 08, 2024 at 10:41:03AM +0100, Nicolas Dichtel wrote:
-> The goal is to check the following two sequences:
-> > ip link set dummy0 up
-> > ip link set dummy0 master bond0 down
+On Wed, Jan 10, 2024 at 03:20:19PM +0200, claudiu beznea wrote:
+> Hi, Andrew, Russell,
 > 
-> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-> ---
->  tools/testing/selftests/net/rtnetlink.sh | 28 ++++++++++++++++++++++++
->  1 file changed, 28 insertions(+)
+> On 05.01.2024 16:36, Andrew Lunn wrote:
+> > On Fri, Jan 05, 2024 at 09:43:22AM +0000, Russell King (Oracle) wrote:
+> >> On Fri, Jan 05, 2024 at 10:52:42AM +0200, Claudiu wrote:
+> >>> The order of PHY-related operations in ravb_open() is as follows:
+> >>> ravb_open() ->
+> >>>   ravb_phy_start() ->
+> >>>     ravb_phy_init() ->
+> >>>       of_phy_connect() ->
+> >>>         phy_connect_direct() ->
+> >>> 	  phy_attach_direct() ->
+> >>> 	    phy_init_hw() ->
+> >>> 	      phydev->drv->soft_reset()
+> >>> 	      phydev->drv->config_init()
+> >>> 	      phydev->drv->config_intr()
+> >>> 	    phy_resume()
+> >>> 	      kszphy_resume()
+> >>>
+> >>> The order of PHY-related operations in ravb_close is as follows:
+> >>> ravb_close() ->
+> >>>   phy_stop() ->
+> >>>     phy_suspend() ->
+> >>>       kszphy_suspend() ->
+> >>>         genphy_suspend()
+> >>> 	  // set BMCR_PDOWN bit in MII_BMCR
+> >>
+> >> Andrew,
+> >>
+> >> This looks wrong to me - shouldn't we be resuming the PHY before
+> >> attempting to configure it?
+> > 
+> > Hummm. The opposite of phy_stop() is phy_start(). So it would be the
+> > logical order to perform the resume as the first action of
+> > phy_start(), not phy_attach_direct().
+> > 
+> > In phy_connect_direct(), we don't need the PHY to be operational
+> > yet. That happens with phy_start().
+> > 
+> > The standard says:
+> > 
+> >   22.2.4.1.5 Power down
+> > 
+> >   The PHY may be placed in a low-power consumption state by setting
+> >   bit 0.11 to a logic one. Clearing bit 0.11 to zero allows normal
+> >   operation. The specific behavior of a PHY in the power-down state is
+> >   implementation specific. While in the power-down state, the PHY
+> >   shall respond to management transactions.
+> > 
+> > So i would say this PHY is broken, its not responding to all
+> > management transactions. So in that respect, Claudiu fix is correct.
+> > 
+> > But i also somewhat agree with you, this looks wrong, but in a
+> > different way to how you see it. However, moving the phy_resume() to
+> > phy_start() seems a bit risky. So i'm not sure we should actually do
+> > that.
 > 
-> diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selftests/net/rtnetlink.sh
-> index 26827ea4e3e5..bbf9d2bd3d7b 100755
-> --- a/tools/testing/selftests/net/rtnetlink.sh
-> +++ b/tools/testing/selftests/net/rtnetlink.sh
-> @@ -28,6 +28,7 @@ ALL_TESTS="
->  	kci_test_neigh_get
->  	kci_test_bridge_parent_id
->  	kci_test_address_proto
-> +	kci_test_enslave_bonding
->  "
->  
->  devdummy="test-dummy0"
-> @@ -1239,6 +1240,33 @@ kci_test_address_proto()
->  	return $ret
->  }
->  
-> +kci_test_enslave_bonding()
-> +{
-> +	local testns="testns"
-> +	local bond="bond123"
-> +	local dummy="dummy123"
-> +	local ret=0
-> +
-> +	run_cmd ip netns add "$testns"
-> +	if [ $ret -ne 0 ]; then
-> +		end_test "SKIP bonding tests: cannot add net namespace $testns"
-> +		return $ksft_skip
-> +	fi
-> +
-> +	run_cmd ip -netns $testns link add dev $bond type bond mode balance-rr
+> It's not clear to me if you both agree with this fix. Could you please let
+> me know?
 
-Hi Nicolas,
+Hi Claudiu
 
-FYI, the selftests/net/lib.sh has been merged to net tree. Please remember
-send a following up update to create the netns with setup_ns.
+I think this is a valid workaround for the broken hardware.
 
-Thanks
-Hangbin
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+There might be further discussion about if suspend and resume are
+being done at the correct time, but i think that is orthogonal.
+
+    Andrew
 
