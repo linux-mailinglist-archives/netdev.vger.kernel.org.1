@@ -1,64 +1,39 @@
-Return-Path: <netdev+bounces-63339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E1D782C58C
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 19:38:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AB1D82C58F
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 19:39:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9FB581C22674
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 18:38:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 845F81F231B2
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 18:39:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D60461548E;
-	Fri, 12 Jan 2024 18:38:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78A5214F82;
+	Fri, 12 Jan 2024 18:39:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="N8zDztlp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s6O5Sl6y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE54415AC9
-	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 18:38:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-6da9c834646so5724013b3a.3
-        for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 10:38:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1705084723; x=1705689523; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fTNdMrIh2e+f0AHVj8Xvr+K1avBkltglLDidS0sWJtM=;
-        b=N8zDztlpEhNXxR79jBxcsZLJlNSbSVMB/J6ySIWk0ymotmPMynliP7CjI5KeL4Lct2
-         7nKqLIGqayF7En6qdoiZcc8gZP0dnBGz2ziBN4nu4ColFG6q8tW9KHv/VOwuspAjmsDy
-         bwk+fVMtu6MyE7UMrqycqeTlh6fmrgZOYL4qMflKIykq+Qc6uBgRHi/jVk8jiriCH3YL
-         IxYOA7PYmAFUMX8AlonGeZ5sEr10D1yZvBUYyvKw5GbV9sVXwDlxyWAVNTRPACjKOCsm
-         eSp/0ridwsjBc5hoTCGWQ36iAxnmB6smFsPSQV5g6ZdG5Iu+TVW4RLekZDWDMNru3ATH
-         eBOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705084723; x=1705689523;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fTNdMrIh2e+f0AHVj8Xvr+K1avBkltglLDidS0sWJtM=;
-        b=f0JM1eLclJspSh7oWiYKeoN8nq40EySGPlwswWQZ4rSjDKkDVp5UoS9U7jB7qWV2vC
-         eu/FAQHlLFrJFlCvUIE91b7K55XLfFx5FHjI8fdMke2yQr8qXEuRtjn/yVEVI1hKKt0N
-         alsvunQeIKd6XHOPmbWmNAgo4tC4Wo3o5fviGrAogNSzM6DQQGAU4iYHnYUEx6Qx3MUe
-         pT3y4mfNdYPtOX5GXiElCrKO9vl40k7QqpnIJVXk2nkVepz/8dfjcLkl/Sa+wTwYPPO5
-         YqZSHEwiQWteif9HBUQ8MKPwi2A58ihpc1h4bUPwIVQpwhakwU8iy1LfbaDpj6zLSG+u
-         nDkg==
-X-Gm-Message-State: AOJu0Yw1WNktZFPOZ4axuyK2pXx6kH4N2k+qmSKCy4k3iPt9qT4tWxte
-	rlIURtN3Y8VXJcIdYcsflyHomeG6folf
-X-Google-Smtp-Source: AGHT+IGYxf5ffPVISlwaQss8+r8rt9q5Vh4pegBqPGznQXzkKBuZOEftEHIe9ydgcPiTVPIbMp5Rsw==
-X-Received: by 2002:a05:6a00:1495:b0:6db:337f:2595 with SMTP id v21-20020a056a00149500b006db337f2595mr1711226pfu.0.1705084723008;
-        Fri, 12 Jan 2024 10:38:43 -0800 (PST)
-Received: from [192.168.50.25] ([201.17.86.134])
-        by smtp.gmail.com with ESMTPSA id t127-20020a628185000000b006d9e76be7cesm3587322pfd.73.2024.01.12.10.38.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Jan 2024 10:38:42 -0800 (PST)
-Message-ID: <d570871f-1b59-4d75-a473-b3b0a21fe6c2@mojatatu.com>
-Date: Fri, 12 Jan 2024 15:38:34 -0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54FF914F72
+	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 18:39:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 056EAC433C7;
+	Fri, 12 Jan 2024 18:39:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705084777;
+	bh=KGiNi3w1rQs6riuYo5jBWEXjyllo+QLbkmgl0caCbEc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=s6O5Sl6ySPwr0B2FCom0bs4env3sAtXPZH+XRGpOKK0hQRQ9VeZoi6WOob1vHUpfU
+	 xjgG2nFk604+9bZ3HrPMMbXgIiik7dLkLvtiuUyUEkoERIF4Oc/dWsrne0ltpSCH+8
+	 0s6aio9wkGk1LhIUdZ2aIfABPy+5GzKBpJy1tdH0DAybdLXR+wvOyQnddOMeg8iiKP
+	 Umukl2OiKFecJRsHvI7WCOcY1x5hcyD9oB+OOS/gl71YyBdtZ45fdyc3isTiBBWaPn
+	 dUpxKwYbuNy+mAs6p5kwwvRIQ8EkeVc1zsaBcaV31nBakRkRJEfW1OYO/lXJT4kRk3
+	 UZ8Igcww47RyQ==
+Message-ID: <f0abd655-0c10-4190-97bf-34ffb92f98ad@kernel.org>
+Date: Fri, 12 Jan 2024 19:39:20 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,98 +41,114 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/4] net/sched: Add helper macros with module names
-To: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- cake@lists.bufferbloat.net
-Cc: "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Jamal Hadi Salim <jhs@mojatatu.com>,
- Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
- <toke@toke.dk>, Vinicius Costa Gomes <vinicius.gomes@intel.com>,
- Stephen Hemminger <stephen@networkplumber.org>, Petr Pavlu <ppavlu@suse.cz>,
- Michal Kubecek <mkubecek@suse.cz>, Martin Wilck <mwilck@suse.com>
-References: <20240112180646.13232-1-mkoutny@suse.com>
- <20240112180646.13232-2-mkoutny@suse.com>
-Content-Language: en-US
-From: Pedro Tammela <pctammela@mojatatu.com>
-In-Reply-To: <20240112180646.13232-2-mkoutny@suse.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] ss: prevent "Process" column from being printed unless
+ requested
+Content-Language: en-GB, fr-BE
+To: Quentin Deslandes <qde@naccy.de>, netdev@vger.kernel.org
+Cc: David Ahern <dsahern@gmail.com>,
+ Stephen Hemminger <stephen@networkplumber.org>
+References: <20231206111444.191173-1-qde@naccy.de>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20231206111444.191173-1-qde@naccy.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 12/01/2024 15:06, Michal Koutný wrote:
-> The macros are preparation for adding module aliases en mass in a
-> separate commit.
-> Although it would be tempting to create aliases like cls-foo for name
-> cls_foo, this could not be used because modprobe utilities treat '-' and
-> '_' interchangeably.
-> In the end, the naming follows pattern of proto modules in linux/net.h.
+Hi Quentin,
+
+On 06/12/2023 12:14, Quentin Deslandes wrote:
+> Commit 5883c6eba517 ("ss: show header for --processes/-p") added
+> "Process" to the list of columns printed by ss. However, the "Process"
+> header is now printed even if --processes/-p is not used.
 > 
-> Signed-off-by: Michal Koutný <mkoutny@suse.com>
-> ---
->   include/net/act_api.h   | 1 +
->   include/net/pkt_cls.h   | 1 +
->   include/net/pkt_sched.h | 1 +
->   3 files changed, 3 insertions(+)
-> 
-> diff --git a/include/net/act_api.h b/include/net/act_api.h
-> index 4ae0580b63ca..ade63a9157f2 100644
-> --- a/include/net/act_api.h
-> +++ b/include/net/act_api.h
-> @@ -200,6 +200,7 @@ int tcf_idr_release(struct tc_action *a, bool bind);
->   int tcf_register_action(struct tc_action_ops *a, struct pernet_operations *ops);
->   int tcf_unregister_action(struct tc_action_ops *a,
->   			  struct pernet_operations *ops);
-> +#define MODULE_ALIAS_NET_ACT(kind)	MODULE_ALIAS("net-act-" __stringify(kind))
->   int tcf_action_destroy(struct tc_action *actions[], int bind);
->   int tcf_action_exec(struct sk_buff *skb, struct tc_action **actions,
->   		    int nr_actions, struct tcf_result *res);
-> diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
-> index a76c9171db0e..906ccfea81f2 100644
-> --- a/include/net/pkt_cls.h
-> +++ b/include/net/pkt_cls.h
-> @@ -24,6 +24,7 @@ struct tcf_walker {
->   
->   int register_tcf_proto_ops(struct tcf_proto_ops *ops);
->   void unregister_tcf_proto_ops(struct tcf_proto_ops *ops); > +#define MODULE_ALIAS_NET_CLS(kind)	MODULE_ALIAS("net-cls-" 
-__stringify(kind))
+> This change aims to fix this by moving the COL_PROC column ID to the same
+> index as the corresponding column structure in the columns array, and
+> enabling it if --processes/-p is used.
 
-I believe something like (untested):
+I recently noticed that some MPTCP selftests were broken after having
+upgraded IPRoute2 to the latest version: from v6.6 to v6.7.
 
-#define TC_CLS_ALIAS_PREFIX "tc-cls-"
-#define MODULE_ALIAS_TC_CLS(kind) MODULE_ALIAS(TC_CLS_ALIAS_PREFIX 
-__stringify(kind))
+It looks like this is due to this patch here:
 
-And then reuse the macro:
+  1607bf53 ("ss: prevent "Process" column from being printed unless
+requested")
 
-request_module(TC_CLS_ALIAS_PREFIX "%s", cls_name);
+If I revert it, MPTCP selftests are passing again.
 
-Would look better. In any case, net-next is currently closed. You will 
-need to repost once it reopens.
+From what I can see, the behaviour has changed recently: if '-i' is used
+without '-p', the extra line is no longer not displayed any more, e.g.
+'ss -tl' and 'ss -tli' gives the same output:
 
-It seems you are also missing a rebase. We recently removed act_ipt :).
+> $ ss -tl 
+> State            Recv-Q           Send-Q                       Local Address:Port                       Peer Address:Port           
+> LISTEN           0                1                                  0.0.0.0:4444                            0.0.0.0:*              
 
->   
->   struct tcf_block_ext_info {
->   	enum flow_block_binder_type binder_type;
-> diff --git a/include/net/pkt_sched.h b/include/net/pkt_sched.h
-> index 9fa1d0794dfa..88ab6d0ab08b 100644
-> --- a/include/net/pkt_sched.h
-> +++ b/include/net/pkt_sched.h
-> @@ -100,6 +100,7 @@ struct Qdisc *fifo_create_dflt(struct Qdisc *sch, struct Qdisc_ops *ops,
->   
->   int register_qdisc(struct Qdisc_ops *qops);
->   void unregister_qdisc(struct Qdisc_ops *qops);
-> +#define MODULE_ALIAS_NET_SCH(id)	MODULE_ALIAS("net-sch-" __stringify(id))
->   void qdisc_get_default(char *id, size_t len);
->   int qdisc_set_default(const char *id);
->   
+> $ ss -tli
+> State            Recv-Q           Send-Q                       Local Address:Port                       Peer Address:Port           
+> LISTEN           0                1                                  0.0.0.0:4444                            0.0.0.0:*              
 
+If '-p' is added, '-i' works as before:
+
+> $ ss -tlp
+> State          Recv-Q         Send-Q                 Local Address:Port                   Peer Address:Port         Process         
+> LISTEN         0              1                            0.0.0.0:4444                        0.0.0.0:*             users:(("netcat",pid=2668,fd=3))
+
+> $ ss -tlpi
+> State          Recv-Q         Send-Q                 Local Address:Port                   Peer Address:Port         Process         
+> LISTEN         0              1                            0.0.0.0:4444                        0.0.0.0:*             users:(("netcat",pid=2668,fd=3))
+>          cubic cwnd:10
+
+(we can see the extra line with 'cubic cwnd:10')
+
+I just noticed that you were working on other patches modifying 'ss',
+and even adding a new column. Are you aware of this issue? Are you
+already working -- or going to work -- on a fix for it?
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
