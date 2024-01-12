@@ -1,158 +1,160 @@
-Return-Path: <netdev+bounces-63204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AED782BB34
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 07:20:22 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E18782BBCB
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 08:31:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FEF41F2682A
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 06:20:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C1986B22C4B
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 07:31:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5631F5C8ED;
-	Fri, 12 Jan 2024 06:20:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="eGugH5Wn"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C50E85C918;
+	Fri, 12 Jan 2024 07:30:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1B4C5C8E1
-	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 06:20:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <a413b206-df50-4445-a4de-494339ea1ce6@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1705040411;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=F3CefQsNxnc4oyPR3RnCTgbsveJDAg5y8po7bcHYoXE=;
-	b=eGugH5WneMC3LUSY8pnvckG0sQRCSCeTE8Pl/bt2dIyyMk5x/VenzZHMHbycivuvE+S8jt
-	odwR6ppAtTpHHeXYzc1AB13H17MK4tejkjDd3JixZx7D4mMF1BWtkbHKYG+mCjTW7PAaD0
-	4SB4xhj6/PSTKQ6KnEpd2GFYMFyUqUs=
-Date: Thu, 11 Jan 2024 22:20:06 -0800
+Received: from zg8tmty3ljk5ljewns4xndka.icoremail.net (zg8tmty3ljk5ljewns4xndka.icoremail.net [167.99.105.149])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E906F5C8FD;
+	Fri, 12 Jan 2024 07:30:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from luzhipeng.223.5.5.5 (unknown [39.174.92.167])
+	by mail-app2 (Coremail) with SMTP id by_KCgBn+fCG6qBlmFQzAA--.25619S2;
+	Fri, 12 Jan 2024 15:30:16 +0800 (CST)
+From: Zhipeng Lu <alexious@zju.edu.cn>
+To: alexious@zju.edu.cn
+Cc: Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maor Gottlieb <maorg@mellanox.com>,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] [v3] net/mlx5e: fix a double-free in arfs_create_groups
+Date: Fri, 12 Jan 2024 15:29:16 +0800
+Message-Id: <20240112072916.3726945-1-alexious@zju.edu.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v7 bpf-next 0/6] bpf: tcp: Support arbitrary SYN Cookie at
- TC.
-Content-Language: en-US
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org,
- netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Yonghong Song <yonghong.song@linux.dev>
-References: <20231221012806.37137-1-kuniyu@amazon.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20231221012806.37137-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:by_KCgBn+fCG6qBlmFQzAA--.25619S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxZrWUGFWrJw1UGFWUWr1kGrg_yoW5Xr4DpF
+	47JryDtFs5A3WxX39Iy3y0qrn5Cw48Ka1UuFyI934Sqrsrtr4kGFy0g345ArWxCFy3AwnF
+	y34rZw1UCFnrCwUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26rxl
+	6s0DM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
+	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
+	n2IY04v7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrV
+	AFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCI
+	c40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267
+	AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_
+	Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbXdbU
+	UUUUU==
+X-CM-SenderInfo: qrsrjiarszq6lmxovvfxof0/
 
-On 12/20/23 5:28 PM, Kuniyuki Iwashima wrote:
-> Under SYN Flood, the TCP stack generates SYN Cookie to remain stateless
-> for the connection request until a valid ACK is responded to the SYN+ACK.
-> 
-> The cookie contains two kinds of host-specific bits, a timestamp and
-> secrets, so only can it be validated by the generator.  It means SYN
-> Cookie consumes network resources between the client and the server;
-> intermediate nodes must remember which nodes to route ACK for the cookie.
-> 
-> SYN Proxy reduces such unwanted resource allocation by handling 3WHS at
-> the edge network.  After SYN Proxy completes 3WHS, it forwards SYN to the
-> backend server and completes another 3WHS.  However, since the server's
-> ISN differs from the cookie, the proxy must manage the ISN mappings and
-> fix up SEQ/ACK numbers in every packet for each connection.  If a proxy
-> node goes down, all the connections through it are terminated.  Keeping
-> a state at proxy is painful from that perspective.
-> 
-> At AWS, we use a dirty hack to build truly stateless SYN Proxy at scale.
-> Our SYN Proxy consists of the front proxy layer and the backend kernel
-> module.  (See slides of LPC2023 [0], p37 - p48)
-> 
-> The cookie that SYN Proxy generates differs from the kernel's cookie in
-> that it contains a secret (called rolling salt) (i) shared by all the proxy
-> nodes so that any node can validate ACK and (ii) updated periodically so
-> that old cookies cannot be validated and we need not encode a timestamp for
-> the cookie.  Also, ISN contains WScale, SACK, and ECN, not in TS val.  This
-> is not to sacrifice any connection quality, where some customers turn off
-> TCP timestamps option due to retro CVE.
-> 
-> After 3WHS, the proxy restores SYN, encapsulates ACK into SYN, and forward
-> the TCP-in-TCP packet to the backend server.  Our kernel module works at
-> Netfilter input/output hooks and first feeds SYN to the TCP stack to
-> initiate 3WHS.  When the module is triggered for SYN+ACK, it looks up the
-> corresponding request socket and overwrites tcp_rsk(req)->snt_isn with the
-> proxy's cookie.  Then, the module can complete 3WHS with the original ACK
-> as is.
-> 
-> This way, our SYN Proxy does not manage the ISN mappings nor wait for
-> SYN+ACK from the backend thus can remain stateless.  It's working very
-> well for high-bandwidth services like multiple Tbps, but we are looking
-> for a way to drop the dirty hack and further optimise the sequences.
-> 
-> If we could validate an arbitrary SYN Cookie on the backend server with
-> BPF, the proxy would need not restore SYN nor pass it.  After validating
-> ACK, the proxy node just needs to forward it, and then the server can do
-> the lightweight validation (e.g. check if ACK came from proxy nodes, etc)
-> and create a connection from the ACK.
-> 
-> This series allows us to create a full sk from an arbitrary SYN Cookie,
-> which is done in 3 steps.
-> 
->    1) At tc, BPF prog calls a new kfunc to create a reqsk and configure
->       it based on the argument populated from SYN Cookie.  The reqsk has
->       its listener as req->rsk_listener and is passed to the TCP stack as
->       skb->sk.
-> 
->    2) During TCP socket lookup for the skb, skb_steal_sock() returns a
->       listener in the reuseport group that inet_reqsk(skb->sk)->rsk_listener
->       belongs to.
-> 
->    3) In cookie_v[46]_check(), the reqsk (skb->sk) is fully initialised and
->       a full sk is created.
-> 
-> The kfunc usage is as follows:
-> 
->      struct bpf_tcp_req_attrs attrs = {
->          .mss = mss,
->          .wscale_ok = wscale_ok,
->          .rcv_wscale = rcv_wscale, /* Server's WScale < 15 */
->          .snd_wscale = snd_wscale, /* Client's WScale < 15 */
->          .tstamp_ok = tstamp_ok,
->          .rcv_tsval = tsval,
->          .rcv_tsecr = tsecr, /* Server's Initial TSval */
->          .usec_ts_ok = usec_ts_ok,
->          .sack_ok = sack_ok,
->          .ecn_ok = ecn_ok,
->      }
-> 
->      skc = bpf_skc_lookup_tcp(...);
->      sk = (struct sock *)bpf_skc_to_tcp_sock(skc);
->      bpf_sk_assign_tcp_reqsk(skb, sk, attrs, sizeof(attrs));
->      bpf_sk_release(skc);
-> 
-> [0]: https://lpc.events/event/17/contributions/1645/attachments/1350/2701/SYN_Proxy_at_Scale_with_BPF.pdf
-> 
-> 
-> Changes:
->    v7:
->      * Patch 5 & 6
->        * Drop MPTCP support
+When `in` allocated by kvzalloc fails, arfs_create_groups will free
+ft->g and return an error. However, arfs_create_table, the only caller of
+arfs_create_groups, will hold this error and call to
+mlx5e_destroy_flow_table, in which the ft->g will be freed again.
 
-I think Yonghong's (thanks!) cpuv4 patch 
-(https://lore.kernel.org/bpf/20240110051348.2737007-1-yonghong.song@linux.dev/) 
-has addressed the issue that the selftest in patch 6 has encountered.
+Fixes: 1cabe6b0965e ("net/mlx5e: Create aRFS flow tables")
+Signed-off-by: Zhipeng Lu <alexious@zju.edu.cn>
+---
+Changelog:
 
-There are some minor comments in v7. Please respin v8 when the cpuv4 patch has 
-concluded so that it can kick off the CI also.
+v2: free ft->g just in arfs_create_groups with a unwind ladder.
+v3: split the allocation of ft->g and in. Rename the error label.
+    remove some refector change in v2.
+---
+ .../net/ethernet/mellanox/mlx5/core/en_arfs.c | 26 +++++++++++--------
+ 1 file changed, 15 insertions(+), 11 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_arfs.c b/drivers/net/ethernet/mellanox/mlx5/core/en_arfs.c
+index bb7f86c993e5..0424ae068a60 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_arfs.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_arfs.c
+@@ -254,11 +254,13 @@ static int arfs_create_groups(struct mlx5e_flow_table *ft,
+ 
+ 	ft->g = kcalloc(MLX5E_ARFS_NUM_GROUPS,
+ 			sizeof(*ft->g), GFP_KERNEL);
+-	in = kvzalloc(inlen, GFP_KERNEL);
+-	if  (!in || !ft->g) {
+-		kfree(ft->g);
+-		kvfree(in);
++	if(!ft->g)
+ 		return -ENOMEM;
++
++	in = kvzalloc(inlen, GFP_KERNEL);
++	if  (!in) {
++		err = -ENOMEM;
++		goto err_free_g;
+ 	}
+ 
+ 	mc = MLX5_ADDR_OF(create_flow_group_in, in, match_criteria);
+@@ -278,7 +280,7 @@ static int arfs_create_groups(struct mlx5e_flow_table *ft,
+ 		break;
+ 	default:
+ 		err = -EINVAL;
+-		goto out;
++		goto err_free_in;
+ 	}
+ 
+ 	switch (type) {
+@@ -300,7 +302,7 @@ static int arfs_create_groups(struct mlx5e_flow_table *ft,
+ 		break;
+ 	default:
+ 		err = -EINVAL;
+-		goto out;
++		goto err_free_in;
+ 	}
+ 
+ 	MLX5_SET_CFG(in, match_criteria_enable, MLX5_MATCH_OUTER_HEADERS);
+@@ -309,7 +311,7 @@ static int arfs_create_groups(struct mlx5e_flow_table *ft,
+ 	MLX5_SET_CFG(in, end_flow_index, ix - 1);
+ 	ft->g[ft->num_groups] = mlx5_create_flow_group(ft->t, in);
+ 	if (IS_ERR(ft->g[ft->num_groups]))
+-		goto err;
++		goto err_clean_group;
+ 	ft->num_groups++;
+ 
+ 	memset(in, 0, inlen);
+@@ -318,18 +320,20 @@ static int arfs_create_groups(struct mlx5e_flow_table *ft,
+ 	MLX5_SET_CFG(in, end_flow_index, ix - 1);
+ 	ft->g[ft->num_groups] = mlx5_create_flow_group(ft->t, in);
+ 	if (IS_ERR(ft->g[ft->num_groups]))
+-		goto err;
++		goto err_clean_group;
+ 	ft->num_groups++;
+ 
+ 	kvfree(in);
+ 	return 0;
+ 
+-err:
++err_clean_group:
+ 	err = PTR_ERR(ft->g[ft->num_groups]);
+ 	ft->g[ft->num_groups] = NULL;
+-out:
++err_free_in:
+ 	kvfree(in);
+-
++err_free_g:
++	kfree(ft->g);
++	ft->g = NULL;
+ 	return err;
+ }
+ 
+-- 
+2.34.1
 
 
