@@ -1,63 +1,103 @@
-Return-Path: <netdev+bounces-63296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 099A182C2B5
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 16:29:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D72D82C2C4
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 16:33:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85C4D286285
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 15:29:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 536A61C21B55
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 15:33:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34FDB6E2D4;
-	Fri, 12 Jan 2024 15:29:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B5F16EB56;
+	Fri, 12 Jan 2024 15:32:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ivr9tb81"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KOsCe2Ix"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BB766EB46
-	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 15:29:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71A20C433C7;
-	Fri, 12 Jan 2024 15:29:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705073346;
-	bh=+PGOXU1iU8R8zyFuy9K1uwajcygvsc791Z2T3zLpXBE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Ivr9tb817aF4GrRZJDSlDHAPFuFooCikv4sBHSayWfmyzpYZf2CimFoC76LShAxXm
-	 uzRZhXk7UmfEMGbx5Gj5JvKcjJ1ITNcmQtOucoTUvsX+Nkk40H7JuZl6+wqZ+tMsiO
-	 ERmmESWa1WcwYYeIioAXuheCVd9ZEACLB/YkWDfYUQ092gTeuKbI+dkCV3dkikY1X6
-	 EJCHJMbTF+zdkKXe+J8aCPDKFo23pOyx/r4uRfmRh6yyvdvrXq/MuoU+Bp7kQsNpHI
-	 IfUTmI00BO2jua1IzjyxzApKoRYHTGRmGdw+MMz8WYFEpVvTl5jhjP8ObMfCKqW0oq
-	 8RpCJ3O6aRhuQ==
-Message-ID: <25fa3854-927a-4040-9942-56f36141c39b@kernel.org>
-Date: Fri, 12 Jan 2024 08:29:05 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0313373178;
+	Fri, 12 Jan 2024 15:32:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=85qADMULPEZDkA2EsspL4/DXh5uWHSumVah5xCfPd2c=; b=KOsCe2IxmDGDyoQUwKb0peqW9f
+	kaGwxaLExgF6q2FNPLMh6Nkz8r3GYtx5n8L+6cNdYF23OTcBQGHASobbH3TAl0Gk3Ng/eAtyhyzyz
+	rEHJS9UHfOXg3SWSOTmXt7wWw0SuHWEWBZc/pFqqlmimPtCer+21e2e5dmH1goS93QyQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rOJW2-0055MK-GA; Fri, 12 Jan 2024 16:32:14 +0100
+Date: Fri, 12 Jan 2024 16:32:14 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Kunwu Chan <chentao@kylinos.cn>
+Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	f.fainelli@gmail.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: phy: Fix possible NULL pointer dereference
+ issues caused by phy_attached_info_irq
+Message-ID: <627c9558-04df-43a6-b6e4-a13f24a8bc1d@lunn.ch>
+References: <20240112095724.154197-1-chentao@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Kernel support for ipv4 route with ipv6 link local as nexthop.
-Content-Language: en-US
-To: "Udayshankar, Daksha" <daksha.udayshankar@hpe.com>,
- "davem@davemloft.net" <davem@davemloft.net>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "K, Praseetha" <praseetha.k@hpe.com>,
- "Natarajan, Venkatesh (HP-Networking)" <venkatesh.natarajan@hpe.com>
-References: <SJ0PR84MB14838465E04EE1E2A5C1AF12976F2@SJ0PR84MB1483.NAMPRD84.PROD.OUTLOOK.COM>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <SJ0PR84MB14838465E04EE1E2A5C1AF12976F2@SJ0PR84MB1483.NAMPRD84.PROD.OUTLOOK.COM>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240112095724.154197-1-chentao@kylinos.cn>
 
-On 1/11/24 9:57 PM, Udayshankar, Daksha wrote:
-> root@Ubuntu184368:~# ip route add 23.0.2.0/24 via
-> fe80::98f2:b301:4c68:507e dev eth1
+On Fri, Jan 12, 2024 at 05:57:24PM +0800, Kunwu Chan wrote:
+> kasprintf() returns a pointer to dynamically allocated memory
+> which can be NULL upon failure. Ensure the allocation was successful
+> by checking the pointer validity.
+> 
+> Fixes: e27f178793de ("net: phy: Added IRQ print to phylink_bringup_phy()")
+> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+> ---
+>  drivers/net/phy/phy_device.c | 3 +++
+>  drivers/net/phy/phylink.c    | 2 ++
+>  2 files changed, 5 insertions(+)
+> 
+> diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+> index 3611ea64875e..10fa99d957c0 100644
+> --- a/drivers/net/phy/phy_device.c
+> +++ b/drivers/net/phy/phy_device.c
+> @@ -1299,6 +1299,9 @@ void phy_attached_print(struct phy_device *phydev, const char *fmt, ...)
+>  	const char *unbound = phydev->drv ? "" : "[unbound] ";
+>  	char *irq_str = phy_attached_info_irq(phydev);
+>  
+> +	if (!irq_str)
+> +		return;
+> +
+>  	if (!fmt) {
+>  		phydev_info(phydev, ATTACHED_FMT "\n", unbound,
+>  			    phydev_name(phydev), irq_str);
 
-via inet6 fe80::98f2:b301:4c68:507e
+This part looks O.K.
 
+> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+> index ed0b4ccaa6a6..db0a545c9468 100644
+> --- a/drivers/net/phy/phylink.c
+> +++ b/drivers/net/phy/phylink.c
+> @@ -1884,6 +1884,8 @@ static int phylink_bringup_phy(struct phylink *pl, struct phy_device *phy,
+>  	phy->phy_link_change = phylink_phy_change;
+>  
+>  	irq_str = phy_attached_info_irq(phy);
+> +	if (!irq_str)
+> +		return -ENOMEM;
+
+Here, i would just skip the print and continue with the reset of the
+function. The print is just useful information, its not a big problem
+if its not printed. However, if this function does not complete, the
+network interface is likely to be dead.
+
+	Andrew
 
