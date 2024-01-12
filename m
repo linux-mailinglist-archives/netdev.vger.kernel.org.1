@@ -1,85 +1,91 @@
-Return-Path: <netdev+bounces-63167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63168-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D12782B858
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 00:57:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45E8282B866
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 01:04:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B547DB2313A
-	for <lists+netdev@lfdr.de>; Thu, 11 Jan 2024 23:57:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6426F1C2340B
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 00:04:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 266715A100;
-	Thu, 11 Jan 2024 23:57:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxonhyperv.com header.i=@linuxonhyperv.com header.b="sgJhtYqj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1B95B66A;
+	Fri, 12 Jan 2024 00:04:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B80275A0E9;
-	Thu, 11 Jan 2024 23:57:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxonhyperv.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1004)
-	id 56C0320B3CC5; Thu, 11 Jan 2024 15:57:36 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 56C0320B3CC5
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxonhyperv.com;
-	s=default; t=1705017456;
-	bh=NhxGRohCG2d8qbgwEKxLa5IMv9vQBy7R7+Z0UyLVSR0=;
-	h=From:To:Cc:Subject:Date:Reply-To:From;
-	b=sgJhtYqjRJRf3a9DQJGolmw7LPKGW3dkWjd328i1Xr7rMfF/cWj2T++bWgSbTlwbK
-	 iNwDzFAIOFP8IDEcOmxOKCI6UTcvblKET8W+xDuZ20hYSJwmc8sOI9s8mnsgEaz6wi
-	 7vqLswJISeg6GOES7G4Psw/vot1jZJrwa3uZjVvE=
-From: longli@linuxonhyperv.com
-To: Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>,
-	Ajay Sharma <sharmaajay@microsoft.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Long Li <longli@microsoft.com>
-Subject: [PATCH] MAINTAINERS: update maintainer for Microsoft MANA RDMA driver
-Date: Thu, 11 Jan 2024 15:57:18 -0800
-Message-Id: <1705017438-20417-1-git-send-email-longli@linuxonhyperv.com>
-X-Mailer: git-send-email 1.8.3.1
-Reply-To: longli@microsoft.com
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67FF7B649
+	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 00:04:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7bef6895f94so107076239f.0
+        for <netdev@vger.kernel.org>; Thu, 11 Jan 2024 16:04:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705017867; x=1705622667;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8xpDiqNEwArw50N7Lg2HZuMoMi1N+LpphpiDT2blddI=;
+        b=uKgF9hMNGMOIQblgkfOv5C8mwXFcS/YkUhATR6xX9Foj7jgA8TohUBCmevXvOP/fFO
+         puqdBLlwsZNZUNPPP9hE+NOrPHTCVGsVbDYoS8gfvRXqaSoJs/wSiLXpeeuWyKRsxCTS
+         T8AdepyvXmUGP27HHmZWXOa7tKA+EIc1q3xCNctV8QD2wXdwsYd8gX1nGDWUW+qTQhMy
+         /s8sUrFKQ6NaDse/g3L3FGt0Q19/3G4G2QxDb7hbG4vhPHwRUIhXGpALC9YZ9Mg3gHs8
+         VupyBSycL3df1heMmmZhA5r/hEDwIPdZlxjCKA4ykKIAwTjU2UXhYJ7JfC8FUzDeerOO
+         Kabw==
+X-Gm-Message-State: AOJu0YzL8mhQ3mRWk9DciGOx2FiXxqfh4jwCx07I7u2xtcDYuJd86HMb
+	WTkV1C9qAHlqAsJF67F9C0eBqqgyQedG9wI9OSbCVxttA51L
+X-Google-Smtp-Source: AGHT+IGChu8fGl9D+SA4BIa887LqB3kDIlxbCu5Ph+kisWPnmpq6voLkoaimmlGJZtFxYd1krdrvUSiHQ2qbOk1drakhziO+jjCy
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+X-Received: by 2002:a05:6638:1918:b0:46e:5dfe:42bc with SMTP id
+ p24-20020a056638191800b0046e5dfe42bcmr17819jal.0.1705017867308; Thu, 11 Jan
+ 2024 16:04:27 -0800 (PST)
+Date: Thu, 11 Jan 2024 16:04:27 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000511463060eb468d7@google.com>
+Subject: [syzbot] Monthly nfc report (Jan 2024)
+From: syzbot <syzbot+list2e368c73436f97eb5665@syzkaller.appspotmail.com>
+To: krzysztof.kozlowski@linaro.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: Long Li <longli@microsoft.com>
+Hello nfc maintainers/developers,
 
-Ajay is no longer working on the MANA RDMA driver.
+This is a 31-day syzbot report for the nfc subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/nfc
 
-Konstantin Taranov will take the responsibility of fixing bugs, reviewing
-patches and developing new features for MANA RDMA driver.
+During the period, 2 new issues were detected and 1 were fixed.
+In total, 11 issues are still open and 20 have been fixed so far.
 
-Signed-off-by: Long Li <longli@microsoft.com>
+Some of the still happening issues:
+
+Ref Crashes Repro Title
+<1> 715     Yes   INFO: task hung in rfkill_global_led_trigger_worker (2)
+                  https://syzkaller.appspot.com/bug?extid=2e39bc6569d281acbcfb
+<2> 110     Yes   INFO: task hung in nfc_rfkill_set_block
+                  https://syzkaller.appspot.com/bug?extid=3e3c2f8ca188e30b1427
+<3> 88      Yes   KMSAN: uninit-value in nci_rx_work
+                  https://syzkaller.appspot.com/bug?extid=d7b4dc6cd50410152534
+<4> 10      Yes   KMSAN: uninit-value in nci_ntf_packet
+                  https://syzkaller.appspot.com/bug?extid=29b5ca705d2e0f4a44d2
+
 ---
- MAINTAINERS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 463c097e01af..135471cbc144 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -14527,7 +14527,7 @@ F:	include/uapi/linux/cciss*.h
- 
- MICROSOFT MANA RDMA DRIVER
- M:	Long Li <longli@microsoft.com>
--M:	Ajay Sharma <sharmaajay@microsoft.com>
-+M:	Konstantin Taranov <kotaranov@microsoft.com>
- L:	linux-rdma@vger.kernel.org
- S:	Supported
- F:	drivers/infiniband/hw/mana/
--- 
-2.17.1
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
