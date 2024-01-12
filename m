@@ -1,83 +1,83 @@
-Return-Path: <netdev+bounces-63195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9355182B9B8
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 03:50:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4D2682B9C1
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 03:55:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B52031C24373
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 02:50:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6BCD7B2522B
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 02:55:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39B30111A;
-	Fri, 12 Jan 2024 02:50:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hyk9lYk2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6263F111B;
+	Fri, 12 Jan 2024 02:55:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E6D5EBD;
-	Fri, 12 Jan 2024 02:50:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7971BC43390;
-	Fri, 12 Jan 2024 02:50:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705027829;
-	bh=3odjx/yD9/fQgMq9jz/RyMQs9Xu4ltu9qq8siYucaN8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Hyk9lYk2J6u1/dssGHNjc6XwNBET6pSExwv5Ln1q8AmN8onAb6cYHofLglBAcdJhA
-	 q67z6Z9l08DeEWrgZnLMikecgX/8LaTe9/K85yqTd+feDheuUy+xgVLc04Kmo13z7b
-	 v6W1BMzPbXg6Ei9gEJhrjeydr8VfOuEedV7E8cPow0OerSoVqULl1Az95mcimS+7CQ
-	 KgHV9MBrguPLKYt/J6Piw8RowsIUWe6f9t/6wDJWMuAyH69RDvq2EBx4FSJNQ5PO8+
-	 hkhlyaitHhjy+RIsUNTx6waX+Jn+AJhFIGFUhbB0SIqgbXqOVChWK+M1FEM/4bZWwe
-	 KaXSP8w17bkeg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 65268D8C96C;
-	Fri, 12 Jan 2024 02:50:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A9A113AE9;
+	Fri, 12 Jan 2024 02:54:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0W-RM2W3_1705028095;
+Received: from 30.221.130.160(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W-RM2W3_1705028095)
+          by smtp.aliyun-inc.com;
+          Fri, 12 Jan 2024 10:54:56 +0800
+Message-ID: <44bda499-8bd7-4382-913e-6948d722bcd1@linux.alibaba.com>
+Date: Fri, 12 Jan 2024 10:54:54 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next v2] selftests/bpf: Update LLVM Phabricator links
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170502782940.19866.16464441843592001659.git-patchwork-notify@kernel.org>
-Date: Fri, 12 Jan 2024 02:50:29 +0000
-References: <20240111-bpf-update-llvm-phabricator-links-v2-1-9a7ae976bd64@kernel.org>
-In-Reply-To: <20240111-bpf-update-llvm-phabricator-links-v2-1-9a7ae976bd64@kernel.org>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: andrii@kernel.org, ast@kernel.org, daniel@iogearbox.net, mykolal@fb.com,
- bpf@vger.kernel.org, netdev@vger.kernel.org, patches@lists.linux.dev,
- llvm@lists.linux.dev, yonghong.song@linux.dev
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 00/15] net/smc: implement loopback-ism used by
+ SMC-D
+To: Simon Horman <horms@kernel.org>
+Cc: wintera@linux.ibm.com, wenjia@linux.ibm.com, hca@linux.ibm.com,
+ gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, jaka@linux.ibm.com,
+ borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
+ tonylu@linux.alibaba.com, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240111120036.109903-1-guwen@linux.alibaba.com>
+ <20240111133609.GC45291@kernel.org>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <20240111133609.GC45291@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello:
 
-This patch was applied to bpf/bpf-next.git (master)
-by Alexei Starovoitov <ast@kernel.org>:
 
-On Thu, 11 Jan 2024 13:16:48 -0700 you wrote:
-> reviews.llvm.org was LLVM's Phabricator instances for code review. It
-> has been abandoned in favor of GitHub pull requests. While the majority
-> of links in the kernel sources still work because of the work Fangrui
-> has done turning the dynamic Phabricator instance into a static archive,
-> there are some issues with that work, so preemptively convert all the
-> links in the kernel sources to point to the commit on GitHub.
+On 2024/1/11 21:36, Simon Horman wrote:
+> On Thu, Jan 11, 2024 at 08:00:21PM +0800, Wen Gu wrote:
+>> This patch set acts as the second part of the new version of [1] (The
+>> first part can be referred from [2]), the updated things of this version
+>> are listed at the end.
 > 
-> [...]
+> ...
+> 
+> Hi Wen Gu,
+> 
+> unfortunately net-next is currently closed.
+> 
+> [adapted from text by Jakub]
+> 
+> ## Form letter - net-next-closed
+> 
+> The merge window for v6.8 has begun and therefore net-next is closed
+> for new drivers, features, code refactoring and optimizations.
+> We are currently accepting bug fixes only.
+> 
+> Please repost when net-next reopens on or after 21st January.
+> 
+> RFC patches sent for review only are obviously welcome at any time.
+> 
+> See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+> --
+> pw-bot: defer
 
-Here is the summary with links:
-  - [bpf-next,v2] selftests/bpf: Update LLVM Phabricator links
-    https://git.kernel.org/bpf/bpf-next/c/32e14348077c
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Thank you for notifying, Simon. I will follow the development-cycle. Thanks again.
 
