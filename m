@@ -1,148 +1,204 @@
-Return-Path: <netdev+bounces-63311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C46C682C38A
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 17:24:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 658C182C3BF
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 17:38:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 35430B215CB
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 16:24:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D58DBB22B0D
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 16:38:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EB93745DD;
-	Fri, 12 Jan 2024 16:24:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6066377635;
+	Fri, 12 Jan 2024 16:37:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Kk2Kjk9g"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="HKBqY0TF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10olkn2070.outbound.protection.outlook.com [40.92.41.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2B5E59B48;
-	Fri, 12 Jan 2024 16:24:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40CG3EA8027416;
-	Fri, 12 Jan 2024 16:24:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=RxEHIg7DGFXOca2Mhz4kWUVWHKWrwumAGtar5WT3MDU=;
- b=Kk2Kjk9gzpHbMA2WzV9Yx6AcX5bk2xa3ukx95groP4+f/v+b56+A6UE0pzl91pZAtvxi
- wz2HxjYh2ITubGypU0iQNRVBg3Yz037S2yPFWWgTDrwNev1zn8dR2W+kEZOnFVBB7vik
- 9gRwDpKFUzfh2+UsQeaEEf7tFM6oOrSgCu7zmYhkgD4sBxML2fr+PhstHpjrWYqwV64n
- 1bAYP8grh8S+uf5sSZIjfxoUKGcQjDlCPNpHIAaMVHA9IhfuDdzz2HYOe1ByBZQ/gTJ8
- /9x7A2XDxb9GbnunGbYYCFT+NgJmPyQEVcsRDaD9lb+xImse7IG8Aobu8x/8+Al2bfN3 Bg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vk8kp8kyg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 12 Jan 2024 16:24:25 +0000
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40CG3YhY028319;
-	Fri, 12 Jan 2024 16:24:25 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vk8kp8ky8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 12 Jan 2024 16:24:25 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 40CDU8UE022933;
-	Fri, 12 Jan 2024 16:24:24 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3vfj6p31eq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 12 Jan 2024 16:24:24 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 40CGOLW548300446
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 12 Jan 2024 16:24:21 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2846520040;
-	Fri, 12 Jan 2024 16:24:21 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2884D20043;
-	Fri, 12 Jan 2024 16:24:20 +0000 (GMT)
-Received: from [9.171.30.215] (unknown [9.171.30.215])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 12 Jan 2024 16:24:20 +0000 (GMT)
-Message-ID: <e0b80a1680ccc693de3f29bfaa9fa654c3b7b4fa.camel@linux.ibm.com>
-Subject: Re: [PATCH net-next 14/15] net/smc: introduce loopback-ism DMB data
- copy control
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-To: Wen Gu <guwen@linux.alibaba.com>, wintera@linux.ibm.com,
-        wenjia@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
-        tonylu@linux.alibaba.com, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Fri, 12 Jan 2024 17:24:19 +0100
-In-Reply-To: <20240111120036.109903-15-guwen@linux.alibaba.com>
-References: <20240111120036.109903-1-guwen@linux.alibaba.com>
-	 <20240111120036.109903-15-guwen@linux.alibaba.com>
-Autocrypt: addr=schnelle@linux.ibm.com; prefer-encrypt=mutual;
- keydata=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
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.50.2 (3.50.2-1.fc39) 
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: yeP6eOhNQFbRSTF1gAsJbOO60ws2pGzz
-X-Proofpoint-ORIG-GUID: 9pUyUCtWd7FbuQRSnCoprbnp1IrvFBTv
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C884177620;
+	Fri, 12 Jan 2024 16:36:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iSgagJjV04HvxjO76vlAybuAKs4bqATkRgw3Eph9j89nmFSQIGEkZV5G8GBRy/ybvAax+3VzsYdQkcYl5GdrGBxJ4/2nbEbCQ6J9yX1OorUCLCMQCq8a4ro2u6JE5pl8MOBLAeHWZhZsztoEhC4AcxIPlapOfeT/cSdVc+bh52aNuyT9cIBEjXGRtSkPYxk/r7r6oK4A7sgqz7cP5Ii6BOP97ob18eNmFSgbBb6TbPqpKeS2y6TU3j34iHToAmleeak9tN0CkQh3kg7m4rNTDGgy6npxD2AVwWocq2MyDlfQv68V6ihatMk67djBWJQneTbu+gV11KM+h7i+Hf7fTA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=EXL8Sr4jA0Zci68m3RtcVCPJt4ph36iSEIUi5bDwbuI=;
+ b=DD4SiC7V/F6mqJaNQD8sD4Bkx3hESPpCVv/EAU5tE4pIJqqbKBJ3GklfOVxCffKqhtSeVGZjeilgwLkPgxfhbI6BCcsCRN/OJc587O62vpJ8HUQfrkqj44WSEttE52WpIS0GviSVQx1AIdYtzm6pGB5cmcSPLowvtTzAdx6Smc6VEjZaLLkIGgaU4RhbmvUAvN3QzQqu5de23spuz7nlGyZYIBzRSOUWUhMvBW2CjgURqz6tfo4IB5KRX5KoG19pVlhF1Rdpgz/nKPrhk8Dyo5HStTV2sxegXCWQhalIup2URe/npxQAuVYWUWyxT2UYKO+cP0wQNA0ZjaiAe5OfgQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EXL8Sr4jA0Zci68m3RtcVCPJt4ph36iSEIUi5bDwbuI=;
+ b=HKBqY0TFHymzEsFD6u+HEgHKCS8uEXQV3JhBr4GnpKT0sH1e9g7/TLEjeCrPCzGWgsl/fOwDT/Zq8F+QHupIGvTWIDDrSJpXm4jGSor6fPhvR1gLgRdjsogweluVloSOWb8DLwSqBlnoiLFopVOy6zmTiFUH+MJ8fNHqMSZ6gHLXditNgbYefuPrR7iKU0IwHb/ePNlaus1nedxCBW4UhB3HP8XFjcDkU71rkhQTC391A/LqZDKxEul1oNR4MlUE2rXdlqT9XIzha8yZLK3TJHafmUDAwDiZC1yjay1+tOILbhOJH4FQaH8zJsrBCcBlwCr0nszYYX5HYIzNXbLNjA==
+Received: from SN6PR02MB4157.namprd02.prod.outlook.com (2603:10b6:805:33::23)
+ by SA1PR02MB8429.namprd02.prod.outlook.com (2603:10b6:806:1f4::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.21; Fri, 12 Jan
+ 2024 16:36:57 +0000
+Received: from SN6PR02MB4157.namprd02.prod.outlook.com
+ ([fe80::3524:e4b3:632d:d8b2]) by SN6PR02MB4157.namprd02.prod.outlook.com
+ ([fe80::3524:e4b3:632d:d8b2%4]) with mapi id 15.20.7181.015; Fri, 12 Jan 2024
+ 16:36:57 +0000
+From: Michael Kelley <mhklinux@outlook.com>
+To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+CC: Yury Norov <yury.norov@gmail.com>, "kys@microsoft.com"
+	<kys@microsoft.com>, "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
+	"wei.liu@kernel.org" <wei.liu@kernel.org>, "decui@microsoft.com"
+	<decui@microsoft.com>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"longli@microsoft.com" <longli@microsoft.com>, "leon@kernel.org"
+	<leon@kernel.org>, "cai.huoqing@linux.dev" <cai.huoqing@linux.dev>,
+	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
+	"vkuznets@redhat.com" <vkuznets@redhat.com>, "tglx@linutronix.de"
+	<tglx@linutronix.de>, "linux-hyperv@vger.kernel.org"
+	<linux-hyperv@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-rdma@vger.kernel.org"
+	<linux-rdma@vger.kernel.org>, "schakrabarti@microsoft.com"
+	<schakrabarti@microsoft.com>, "paulros@microsoft.com" <paulros@microsoft.com>
+Subject: RE: [PATCH 3/4 net-next] net: mana: add a function to spread IRQs per
+ CPUs
+Thread-Topic: [PATCH 3/4 net-next] net: mana: add a function to spread IRQs
+ per CPUs
+Thread-Index: AQHaQuoWNi7Bv1N390Ch4p7DlTYrcLDR1sMggABKpoCAAAdtgIAB++CAgAI7qHA=
+Date: Fri, 12 Jan 2024 16:36:56 +0000
+Message-ID:
+ <SN6PR02MB4157234176238D6C1F35B90BD46F2@SN6PR02MB4157.namprd02.prod.outlook.com>
+References:
+ <1704797478-32377-1-git-send-email-schakrabarti@linux.microsoft.com>
+ <1704797478-32377-4-git-send-email-schakrabarti@linux.microsoft.com>
+ <SN6PR02MB4157CB3CB55A17255AE61BF6D46A2@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <ZZ3Wsxq8rHShTUdA@yury-ThinkPad>
+ <SN6PR02MB415704D36B82D5793CC4558FD4692@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <20240111061319.GC5436@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+In-Reply-To:
+ <20240111061319.GC5436@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-tmn: [VvSeSWuITgYk/xvP78DMF+dsKwkMrysa]
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SN6PR02MB4157:EE_|SA1PR02MB8429:EE_
+x-ms-office365-filtering-correlation-id: dd336f3a-36cc-4771-4df0-08dc138cb13e
+x-ms-exchange-slblob-mailprops:
+ znQPCv1HvwUFU4QVyvJMYbyB44ymHfgCnvC76qrtNdsVM/0pTQmDkEAIA75NGth0grn3L5xWqD5Rv/J4Y9mylMK6EL0AUlmNDsdQ0bG3fO4cfQtv4ua/4fXPuJORvPZ26bMAhBGLec/icJmdRWKMfUVslFAsVWgeHq1Mjy8Sme1gCp/9b5Wm0J/+7nSjfmRquIR+RQVxXMGdiFUbCNUg5gWxexLGE2MigiM+QsXmmFKRKPt7FQ1+SNssPTjbihUCK8p14EZ8F9V3S87Sk771JZDnem7eVgdkK6/uoAASxtfCln9uHoE7ExrciOgv5jQMFh3VKqcIbxKDhxWH5aVHpl6sNHYzTwyxZxTVL/wGwtnXxA1cl4mY4iQI8J9e+xoTjTPP1BYtrtwfBsreOrvv7Gn79E5INepAEMX9uNpHEcPBqt0UQOGRoREhavarV1OkyrnkqhiI8B6NgEy27Ww2f4fQco7+OpSKyFnhjonl37JnP+21Sdrfsx5S2Gb2iVOEvQJmnHnpnCfXTPni20jTr7yrCJlGkBe+Tacrji26ysOy1aJA+sH5ECcnzUiB9tTupVnarNYV81qHSnf/eZSDvZcLR71RnUoj8yFEtDBqYhKMujv9nRXftgoqhMjzqIvWWBIlOKLH+R6dgxVHD3MI46/KgAzPqNnmEIdCm5LrlfErsvhq9JWGrBrpFir0d2KfBRd6tvbPGYzKPy2dq3bBbqOultRcl6Y4LXBTBknmqJqz4ivNJhFzqvPV3KAtdD65a846nbUdU28=
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ C6+lY0K4YPreXep9ERmP/+Tzbbl2j1d+WsO0DqlBUQtMzatpN5Xvy4IJjebaloM/K3I4mwWcQKThXwZm5QiNwkOEH80iuWUfxPLUtt7j4Smmfb/UEsNR33kwLu4tKNu7zvn2fJUnylhtwBLRDii2cNXicnhS4njqqoI97aWUN8ImltoeZnCcE4mlUaKmlr3yT76zbJTQPnmuVDyM0BWr6FcDcTfUl48zsVojDQ/WXvYrSEHSukeCdMV00+Z0o+pKmvMhbviIujUNqyIIAkeMw55vyiVNyppZqbhKTaRDNW0V7dB9e93/XhP52cs9QvuW4hbylW4V+g3wjM1ZQocAKJPi6E/HQ602w197Ej/VzGp6FxmZhD/bJbcMbZaSfjT1bORpKMnKfARZVJkeOHVDkNXY6PnjsjBm9t1tWMG1mw1szXfhGSSeYISwpRq+biOdExAEyBsMM8rVeURJdFZprKB5I/RULKCillNiZ8SKyzvMobZuWG20MBEECZ+0GBWAIxnjG+pzyxiti5n/WwpVC22c3P0sQ4xgbNZH4NNpk+EiZe2J4aTuUIEBWzk49qHq
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?z9vWkSB48jTRN+uChEGF7/OQ5QGd8WUmKsBE9nMitFAQyQxLIlNsTbk649al?=
+ =?us-ascii?Q?Bmhge96MwjT1ViY1jp95eaP5mTiN5kuPvvZUX2C4MTs7PwtLt1APVl+gUPQc?=
+ =?us-ascii?Q?iWnm9Z0iefVEdJWI0ZTGaCyRtox1xByGJDFVLOYdr3BTRv40aypI4LAPhXRg?=
+ =?us-ascii?Q?saiU+xZMkIRKKmRPvvwXyaVV3UX+hLxuOck2/+0tvlZ8aDWfp4W5uEty8JwC?=
+ =?us-ascii?Q?UreXzMlPx54alPJhjMF2oQ1EQBFAKylQy+KCoodxVhrBT0NiJ0gPhoIEkxTi?=
+ =?us-ascii?Q?/Ny5CpV9yAub9kp1Hx/sGHsbQ+2bGZHgtnFvosT9t7mrCojuB02b60FyYjpd?=
+ =?us-ascii?Q?jcO0U1s+S+ij2IkY0T4D/qiSYwVeeGQbt4wnPMs7fWPt58tfhRFGRTW1cF8A?=
+ =?us-ascii?Q?kx5zC159AJQcH+M8Eb5Z/bNfTWrq4s7B4mADMHzqOp6Hebrnpx/Qss+C2lj5?=
+ =?us-ascii?Q?5NFHl9GzIYry8oinoRHOUtDv4QuR8OtS401qwoKs6Wcan47YyaX0DF9txfLr?=
+ =?us-ascii?Q?fxYpMhGfdlQSKFph2lSSxzG0ZITfGnqvhEL7uRGVms3Agka437N8D0dl0h4A?=
+ =?us-ascii?Q?ULiN/D9GEF9LzTVZkk+uFweEH6fKncjq6+J9FPRkBQjADLm5XoVKHJxjfMeO?=
+ =?us-ascii?Q?G06SnLjbWaZaTtZBOL4nkuL3Kvio4erwTOvTCDqxcqlHpeIzvRfPgAxuWA1C?=
+ =?us-ascii?Q?Ro/ul6NyOpAqVibtwlabr6fxK8G5rSoUCdMubD/Vssjlh5is2prHmuO0fso4?=
+ =?us-ascii?Q?XngT1sPYQbyPou8UdCrNs4aZgGhcva/Fk+nLjL39W06gkZX6cLOO75T2J+dO?=
+ =?us-ascii?Q?ebkdOyXRUToPRiVwZci3RIufYd6BCuxx6fU0nylkCmfavSSQE9wnf1jzh6Yw?=
+ =?us-ascii?Q?plw9IhCnelGMFThzFKpgUHoBeTLeUel6t4lX9+OYcDSxmBZUA3DMWjc33CIM?=
+ =?us-ascii?Q?pun0op4z5Gao4hcdsURtqFjiPZMUDSAJExSjtXLY0m4T0abZ8WZZFlnH9OZH?=
+ =?us-ascii?Q?KUof4TIo/kq3xMZzsqwC/NDhr+4rFne4PGGT25XKiV4ePkDXzIHgMFBm9M/g?=
+ =?us-ascii?Q?3wdx1DcUcDuRKfxlneAPpYB1+VZVNmWPtxGzPkL4vaqKTuMQjflvqCDUX3hu?=
+ =?us-ascii?Q?O/Io4c5FNKLMdI0kn/FMBUJkvIQmbcC0uLM6wAelNt9IzuQfikxEWQWJ3BHw?=
+ =?us-ascii?Q?G+nxF+JEOl+pP8NwGZdQIePfRP+ucHOCjtMThQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-12_08,2024-01-12_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- bulkscore=0 mlxlogscore=999 impostorscore=0 phishscore=0 spamscore=0
- clxscore=1011 malwarescore=0 suspectscore=0 adultscore=0 mlxscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2401120128
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR02MB4157.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: dd336f3a-36cc-4771-4df0-08dc138cb13e
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jan 2024 16:36:56.9753
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR02MB8429
 
-On Thu, 2024-01-11 at 20:00 +0800, Wen Gu wrote:
-> This provides a way to {get|set} whether loopback-ism device supports
-> merging sndbuf with peer DMB to eliminate data copies between them.
+From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com> Sent: Wednes=
+day, January 10, 2024 10:13 PM
 >=20
-> echo 0 > /sys/devices/virtual/smc/loopback-ism/dmb_copy # support
-> echo 1 > /sys/devices/virtual/smc/loopback-ism/dmb_copy # not support
+> The test topology was used to check the performance between
+> cpu_local_spread() and the new approach is :
+> Case 1
+> IRQ     Nodes  Cores CPUs
+> 0       1      0     0-1
+> 1       1      1     2-3
+> 2       1      2     4-5
+> 3       1      3     6-7
+>=20
+> and with existing cpu_local_spread()
+> Case 2
+> IRQ    Nodes  Cores CPUs
+> 0      1      0     0
+> 1      1      0     1
+> 2      1      1     2
+> 3      1      1     3
+>=20
+> Total 4 channels were used, which was set up by ethtool.
+> case 1 with ntttcp has given 15 percent better performance, than
+> case 2. During the test irqbalance was disabled as well.
+>=20
+> Also you are right, with 64CPU system this approach will spread
+> the irqs like the cpu_local_spread() but in the future we will offer
+> MANA nodes, with more than 64 CPUs. There it this new design will
+> give better performance.
+>=20
+> I will add this performance benefit details in commit message of
+> next version.
 
-The two support/no support remarks are a bit confusing because support
-here seems to mean "support no-copy mode" while the attribute is more
-like "force copy mode". How about:
+Here are my concerns:
 
-echo 0 > /sys/devices/virtual/smc/loopback-ism/dmb_copy # one DMB mode
-echo 1 > /sys/devices/virtual/smc/loopback-ism/dmb_copy # copy mode
+1.  The most commonly used VMs these days have 64 or fewer
+vCPUs and won't see any performance benefit.
 
->=20
-> The settings take effect after re-activating loopback-ism by:
->=20
-> echo 0 > /sys/devices/virtual/smc/loopback-ism/active
-> echo 1 > /sys/devices/virtual/smc/loopback-ism/active
->=20
-> After this, the link group related to loopback-ism will be flushed and
-> the sndbufs of subsequent connections will be merged or not merged with
-> peer DMB.
->=20
-> The motivation of this control is that the bandwidth will be highly
-> improved when sndbuf and DMB are merged, but when virtually contiguous
-> DMB is provided and merged with sndbuf, it will be concurrently accessed
-> on Tx and Rx, then there will be a bottleneck caused by lock contention
-> of find_vmap_area when there are many CPUs and CONFIG_HARDENED_USERCOPY
-> is set (see link below). So an option is provided.
->=20
-> Link: https://lore.kernel.org/all/238e63cd-e0e8-4fbf-852f-bc4d5bc35d5a@li=
-nux.alibaba.com/
-> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
----8<---
+2.  Larger VMs probably won't see the full 15% benefit because
+all vCPUs in the local NUMA node will be assigned IRQs.  For
+example, in a VM with 96 vCPUs and 2 NUMA nodes, all 48
+vCPUs in NUMA node 0 will all be assigned IRQs.  The remaining
+16 IRQs will be spread out on the 48 CPUs in NUMA node 1
+in a way that avoids sharing a core.  But overall the means
+that 75% of the IRQs will still be sharing a core and
+presumably not see any perf benefit.
+
+3.  Your experiment was on a relatively small scale:   4 IRQs
+spread across 2 cores vs. across 4 cores.  Have you run any
+experiments on VMs with 128 vCPUs (for example) where
+most of the IRQs are not sharing a core?  I'm wondering if
+the results with 4 IRQs really scale up to 64 IRQs.  A lot can
+be different in a VM with 64 cores and 2 NUMA nodes vs.
+4 cores in a single node.
+
+4.  The new algorithm prefers assigning to all vCPUs in
+each NUMA hop over assigning to separate cores.  Are there
+experiments showing that is the right tradeoff?  What
+are the results if assigning to separate cores is preferred?
+
+My bottom line:  The new algorithm adds complexity.  We
+should be really clear on where it adds performance benefit
+and where it doesn't, and be convinced that the benefit
+is worth the extra complexity.
+
+Michael
 
