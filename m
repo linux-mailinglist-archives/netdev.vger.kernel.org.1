@@ -1,109 +1,119 @@
-Return-Path: <netdev+bounces-63241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74EC482BF2A
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 12:23:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 892B182BF2B
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 12:24:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B0151C2201E
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 11:23:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B07B01C22DB1
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 11:24:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D45D967E72;
-	Fri, 12 Jan 2024 11:23:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6A4D67E80;
+	Fri, 12 Jan 2024 11:24:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ATGsi/5R"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="OWbqIxGY";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="JdeACgwt"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2323564CFF
-	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 11:23:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1705058631;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 693B064CFF;
+	Fri, 12 Jan 2024 11:23:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Fri, 12 Jan 2024 12:23:55 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1705058637;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=lebhBG0NQIVEZ9dzeH5C6khVucojmjN2MHAd4rsuJ8Q=;
-	b=ATGsi/5RLuHnKyF8YM4EXTcG4COPbc2dGcvxscfH9QKRmFNz6/4rCGyBwLgmtTn1tylASH
-	oMoRH1YRKVpd4wYRl2P9mY+l94yL1WYfD924i5AL9fdoyO/iOhWpqa1CmXtBwGYDb8Kshz
-	kk2mQl3cm+6Ue92oOZwxW8wI/5M6yrE=
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
- [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-610-_zkKpWGyOC21g7tT1FPekA-1; Fri, 12 Jan 2024 06:23:50 -0500
-X-MC-Unique: _zkKpWGyOC21g7tT1FPekA-1
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-1d542680c9cso40900575ad.2
-        for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 03:23:50 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705058629; x=1705663429;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lebhBG0NQIVEZ9dzeH5C6khVucojmjN2MHAd4rsuJ8Q=;
-        b=BuWCkYTNm1FLocHoJxc3QcEhtnn6WgLjKU788pJaX3yR3DBODjjvSaa2qPK1OwwvKI
-         Mu5I3zyefU7JwAOt5EEddMnBAp3zxiwad/vY5f/Q3aIPq7sp1QUMdkitOStjzHr4756b
-         1n6/RjzOylUw0Z717CR0Tg6ZOxc+6qqxODKsyBc/2R90vW4tW15U5Mm+cHxvCYTA+3mt
-         Apvkk9p7j09H1IY/WupFzpghBDkqaB1QsLOwlRP8hRzfgBcY0MVu/a/L8BBPBnTX9rBt
-         eGIUhI0R9xeo7LOrdlrr1D/4edFX1y2scSwh3458ZL2JhigTvwehxjKB2hj1IDNp4A1I
-         FRtQ==
-X-Gm-Message-State: AOJu0YzQDVGRGnkxqr6oMu8usgOwcTAfxJM5MxsSZrZp3TPOMdWZ2FJp
-	HRRudPoAiWe9qsq2+aWItFG+waDkL6y6la/rvaB3nMS4QFQrAOiUwAkNi4oUHD8vpgC+puxPn7H
-	JQUAWXR6IJDacgp5X8urWtRnXLmLZJe3B
-X-Received: by 2002:a17:902:c951:b0:1d5:a453:4145 with SMTP id i17-20020a170902c95100b001d5a4534145mr939747pla.66.1705058628974;
-        Fri, 12 Jan 2024 03:23:48 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEWCXyYl/hGYD7BdDmhEbc1jAwWbrXHu2atnttng0ucw7FIcNPE89FyPHbnVwYS9U+Xvxqqug==
-X-Received: by 2002:a17:902:c951:b0:1d5:a453:4145 with SMTP id i17-20020a170902c95100b001d5a4534145mr939738pla.66.1705058628722;
-        Fri, 12 Jan 2024 03:23:48 -0800 (PST)
-Received: from localhost ([78.209.94.35])
-        by smtp.gmail.com with ESMTPSA id n17-20020a170903111100b001d3ffb7c4c7sm2895029plh.40.2024.01.12.03.23.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jan 2024 03:23:48 -0800 (PST)
-Date: Fri, 12 Jan 2024 12:23:37 +0100
-From: Andrea Claudi <aclaudi@redhat.com>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org, Leon Romanovsky <leon@kernel.org>,
-	Jiri Pirko <jiri@resnulli.us>, Jon Maloy <jmaloy@redhat.com>,
-	David Ahern <dsahern@gmail.com>
-Subject: Re: [PATCH iproute2 2/2] treewide: fix typos in various comments
-Message-ID: <ZaEhOak-a16AWxnd@renaissance-vector>
-References: <cover.1704816744.git.aclaudi@redhat.com>
- <f384c3720a340ca5302ee0f97d5e2127e246ce01.1704816744.git.aclaudi@redhat.com>
- <20240111114035.4dc407dd@hermes.local>
+	bh=ipRmzQ27dl1DxnG+lFoUSErLcW1ZeSdEpT87MdBHov8=;
+	b=OWbqIxGYriukbUuN3UMPklkgruSimjDJSDUOwZ5gBcO0O0DDs0Yz/NMj3gNm5LDTT+M10q
+	uWTbxGDIWi2mAwtPP8Rxr0hIaAQTbwiDYy/T94L1MypdJ5dREUmbTKW+4L0BqzdmcYkBUg
+	QBzw0257rqdWGTtxj5YAP21j5ip+5sjCiEKNr/fAodeDFbtmOgJVYwwyo+vPanLrcJPztN
+	g/CmxWfcvyJ0qMlvxEzcxL+lH3sTMivUUcaQ1lf2ZHmAWRCg84u4Mts42BUPxCUk4eA+a9
+	zIuUvov5uKxL9FTkij35cgRyPKvGOkEMjZlFdTnvdDwIldEwv/nieuZJaMYJQw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1705058637;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ipRmzQ27dl1DxnG+lFoUSErLcW1ZeSdEpT87MdBHov8=;
+	b=JdeACgwtioEI2COU5SpvVfU1cwQPg/wWwhEkVp+hhJLmUw8TlVFHJ6c4tXwbBnjcQkd74r
+	GDlENmh/5R6pSSCw==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	David Ahern <dsahern@kernel.org>, Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	Yonghong Song <yonghong.song@linux.dev>, bpf@vger.kernel.org
+Subject: Re: [PATCH net-next 12/24] seg6: Use nested-BH locking for
+ seg6_bpf_srh_states.
+Message-ID: <20240112112355.k1vpvtth@linutronix.de>
+References: <20231215171020.687342-1-bigeasy@linutronix.de>
+ <20231215171020.687342-13-bigeasy@linutronix.de>
+ <a8d155ec7d43bf3308fcfa3387dc16d1723617c6.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240111114035.4dc407dd@hermes.local>
+In-Reply-To: <a8d155ec7d43bf3308fcfa3387dc16d1723617c6.camel@redhat.com>
 
-On Thu, Jan 11, 2024 at 11:40:35AM -0800, Stephen Hemminger wrote:
-> On Tue,  9 Jan 2024 17:32:35 +0100
-> Andrea Claudi <aclaudi@redhat.com> wrote:
-> 
-> > diff --git a/include/libiptc/libiptc.h b/include/libiptc/libiptc.h
-> > index 1bfe4e18..89dce2f9 100644
-> > --- a/include/libiptc/libiptc.h
-> > +++ b/include/libiptc/libiptc.h
-> > @@ -80,7 +80,7 @@ int iptc_append_entry(const xt_chainlabel chain,
-> >  		      const struct ipt_entry *e,
-> >  		      struct xtc_handle *handle);
+On 2023-12-18 09:33:39 [+0100], Paolo Abeni wrote:
+> > --- a/net/ipv6/seg6_local.c
+> > +++ b/net/ipv6/seg6_local.c
+> > @@ -1420,41 +1422,44 @@ static int input_action_end_bpf(struct sk_buff *skb,
+> >  	}
+> >  	advance_nextseg(srh, &ipv6_hdr(skb)->daddr);
 > >  
-> > -/* Check whether a mathching rule exists */
-> > +/* Check whether a matching rule exists */
-> >  int iptc_check_entry(const xt_chainlabel chain,
-> >  		      const struct ipt_entry *origfw,
-> >  		      unsigned char *matchmask,
+> > -	/* preempt_disable is needed to protect the per-CPU buffer srh_state,
+> > -	 * which is also accessed by the bpf_lwt_seg6_* helpers
+> > +	/* The access to the per-CPU buffer srh_state is protected by running
+> > +	 * always in softirq context (with disabled BH). On PREEMPT_RT the
+> > +	 * required locking is provided by the following local_lock_nested_bh()
+> > +	 * statement. It is also accessed by the bpf_lwt_seg6_* helpers via
+> > +	 * bpf_prog_run_save_cb().
+> >  	 */
+> > -	preempt_disable();
+> > -	srh_state->srh = srh;
+> > -	srh_state->hdrlen = srh->hdrlen << 3;
+> > -	srh_state->valid = true;
+> > +	scoped_guard(local_lock_nested_bh, &seg6_bpf_srh_states.bh_lock) {
+> > +		srh_state = this_cpu_ptr(&seg6_bpf_srh_states);
+> > +		srh_state->srh = srh;
+> > +		srh_state->hdrlen = srh->hdrlen << 3;
+> > +		srh_state->valid = true;
 > 
-> This is no longer in current code tree.
-> Please rebase and resubmit
+> Here the 'scoped_guard' usage adds a lot of noise to the patch, due to
+> the added indentation. What about using directly
+> local_lock_nested_bh()/local_unlock_nested_bh() ?
 
-Woops, sorry. Will do.
+If this is preferred, sure.
 
+> Cheers,
+> 
+> Paolo
+
+Sebastian
 
