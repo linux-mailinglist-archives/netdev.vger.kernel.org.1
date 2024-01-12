@@ -1,172 +1,206 @@
-Return-Path: <netdev+bounces-63189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2549482B919
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 02:26:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B537D82B936
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 02:45:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0D911F24F50
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 01:26:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 694CD1F269A2
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 01:45:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 977FFA54;
-	Fri, 12 Jan 2024 01:26:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF5DE10F1;
+	Fri, 12 Jan 2024 01:45:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pSn2CAz/"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2ACDA3F
-	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 01:26:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4TB3lZ020zzbbrb;
-	Fri, 12 Jan 2024 09:26:18 +0800 (CST)
-Received: from dggpeml500026.china.huawei.com (unknown [7.185.36.106])
-	by mail.maildlp.com (Postfix) with ESMTPS id 633CC1800BC;
-	Fri, 12 Jan 2024 09:26:35 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
- (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 12 Jan
- 2024 09:26:34 +0800
-From: Zhengchao Shao <shaozhengchao@huawei.com>
-To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <dsahern@kernel.org>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <weiyongjun1@huawei.com>, <yuehaibing@huawei.com>,
-	<shaozhengchao@huawei.com>
-Subject: [PATCH net-next] tcp: do not hold spinlock when sk state is not TCP_LISTEN
-Date: Fri, 12 Jan 2024 09:36:44 +0800
-Message-ID: <20240112013644.3079454-1-shaozhengchao@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 307F3EA6
+	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 01:45:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <aea7e756-9b3a-46b0-af27-207ba306b875@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1705023902;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Y7MYBGykbo+B7B7Y08PI4vamNAzIA5zfjIRY6lTBuws=;
+	b=pSn2CAz/EElnB7fJJRrtE8kRoLfDNbwFJNj7z2xfGflYckT7lQKJaXAO6/HhU/PeW6VXhV
+	MmLkvXYVdIqHBcv1O7+HCIuHx68bDUICAr5l0P5fDf+OknpR3r4oSMNVkpHfL02c2fjQdz
+	LS3y9dJU9GRd1kvRpmjV12taud4cw0M=
+Date: Thu, 11 Jan 2024 17:44:55 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpeml500026.china.huawei.com (7.185.36.106)
+Subject: Re: [PATCH v7 bpf-next 5/6] bpf: tcp: Support arbitrary SYN Cookie.
+Content-Language: en-US
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <20231221012806.37137-1-kuniyu@amazon.com>
+ <20231221012806.37137-6-kuniyu@amazon.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20231221012806.37137-6-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-When I run syz's reproduction C program locally, it causes the following
-issue:
-pvqspinlock: lock 0xffff9d181cd5c660 has corrupted value 0x0!
-WARNING: CPU: 19 PID: 21160 at __pv_queued_spin_unlock_slowpath (kernel/locking/qspinlock_paravirt.h:508)
-Hardware name: Red Hat KVM, BIOS 0.5.1 01/01/2011
-RIP: 0010:__pv_queued_spin_unlock_slowpath (kernel/locking/qspinlock_paravirt.h:508)
-Code: 73 56 3a ff 90 c3 cc cc cc cc 8b 05 bb 1f 48 01 85 c0 74 05 c3 cc cc cc cc 8b 17 48 89 fe 48 c7 c7
-30 20 ce 8f e8 ad 56 42 ff <0f> 0b c3 cc cc cc cc 0f 0b 0f 1f 40 00 90 90 90 90 90 90 90 90 90
-RSP: 0018:ffffa8d200604cb8 EFLAGS: 00010282
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff9d1ef60e0908
-RDX: 00000000ffffffd8 RSI: 0000000000000027 RDI: ffff9d1ef60e0900
-RBP: ffff9d181cd5c280 R08: 0000000000000000 R09: 00000000ffff7fff
-R10: ffffa8d200604b68 R11: ffffffff907dcdc8 R12: 0000000000000000
-R13: ffff9d181cd5c660 R14: ffff9d1813a3f330 R15: 0000000000001000
-FS:  00007fa110184640(0000) GS:ffff9d1ef60c0000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020000000 CR3: 000000011f65e000 CR4: 00000000000006f0
-Call Trace:
-<IRQ>
-  _raw_spin_unlock (kernel/locking/spinlock.c:186)
-  inet_csk_reqsk_queue_add (net/ipv4/inet_connection_sock.c:1321)
-  inet_csk_complete_hashdance (net/ipv4/inet_connection_sock.c:1358)
-  tcp_check_req (net/ipv4/tcp_minisocks.c:868)
-  tcp_v4_rcv (net/ipv4/tcp_ipv4.c:2260)
-  ip_protocol_deliver_rcu (net/ipv4/ip_input.c:205)
-  ip_local_deliver_finish (net/ipv4/ip_input.c:234)
-  __netif_receive_skb_one_core (net/core/dev.c:5529)
-  process_backlog (./include/linux/rcupdate.h:779)
-  __napi_poll (net/core/dev.c:6533)
-  net_rx_action (net/core/dev.c:6604)
-  __do_softirq (./arch/x86/include/asm/jump_label.h:27)
-  do_softirq (kernel/softirq.c:454 kernel/softirq.c:441)
-</IRQ>
-<TASK>
-  __local_bh_enable_ip (kernel/softirq.c:381)
-  __dev_queue_xmit (net/core/dev.c:4374)
-  ip_finish_output2 (./include/net/neighbour.h:540 net/ipv4/ip_output.c:235)
-  __ip_queue_xmit (net/ipv4/ip_output.c:535)
-  __tcp_transmit_skb (net/ipv4/tcp_output.c:1462)
-  tcp_rcv_synsent_state_process (net/ipv4/tcp_input.c:6469)
-  tcp_rcv_state_process (net/ipv4/tcp_input.c:6657)
-  tcp_v4_do_rcv (net/ipv4/tcp_ipv4.c:1929)
-  __release_sock (./include/net/sock.h:1121 net/core/sock.c:2968)
-  release_sock (net/core/sock.c:3536)
-  inet_wait_for_connect (net/ipv4/af_inet.c:609)
-  __inet_stream_connect (net/ipv4/af_inet.c:702)
-  inet_stream_connect (net/ipv4/af_inet.c:748)
-  __sys_connect (./include/linux/file.h:45 net/socket.c:2064)
-  __x64_sys_connect (net/socket.c:2073 net/socket.c:2070 net/socket.c:2070)
-  do_syscall_64 (arch/x86/entry/common.c:51 arch/x86/entry/common.c:82)
-  entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:129)
-  RIP: 0033:0x7fa10ff05a3d
-  Code: 5b 41 5c c3 66 0f 1f 84 00 00 00 00 00 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89
-  c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d ab a3 0e 00 f7 d8 64 89 01 48
-  RSP: 002b:00007fa110183de8 EFLAGS: 00000202 ORIG_RAX: 000000000000002a
-  RAX: ffffffffffffffda RBX: 0000000020000054 RCX: 00007fa10ff05a3d
-  RDX: 000000000000001c RSI: 0000000020000040 RDI: 0000000000000003
-  RBP: 00007fa110183e20 R08: 0000000000000000 R09: 0000000000000000
-  R10: 0000000000000000 R11: 0000000000000202 R12: 00007fa110184640
-  R13: 0000000000000000 R14: 00007fa10fe8b060 R15: 00007fff73e23b20
-</TASK>
+On 12/20/23 5:28 PM, Kuniyuki Iwashima wrote:
+> This patch adds a new kfunc available at TC hook to support arbitrary
+> SYN Cookie.
+> 
+> The basic usage is as follows:
+> 
+>      struct bpf_tcp_req_attrs attrs = {
+>          .mss = mss,
+>          .wscale_ok = wscale_ok,
+>          .rcv_wscale = rcv_wscale, /* Server's WScale < 15 */
+>          .snd_wscale = snd_wscale, /* Client's WScale < 15 */
+>          .tstamp_ok = tstamp_ok,
+>          .rcv_tsval = tsval,
+>          .rcv_tsecr = tsecr, /* Server's Initial TSval */
+>          .usec_ts_ok = usec_ts_ok,
+>          .sack_ok = sack_ok,
+>          .ecn_ok = ecn_ok,
+>      }
+> 
+>      skc = bpf_skc_lookup_tcp(...);
+>      sk = (struct sock *)bpf_skc_to_tcp_sock(skc);
+>      bpf_sk_assign_tcp_reqsk(skb, sk, attrs, sizeof(attrs));
+>      bpf_sk_release(skc);
+> 
+> bpf_sk_assign_tcp_reqsk() takes skb, a listener sk, and struct
+> bpf_tcp_req_attrs and allocates reqsk and configures it.  Then,
+> bpf_sk_assign_tcp_reqsk() links reqsk with skb and the listener.
+> 
+> The notable thing here is that we do not hold refcnt for both reqsk
+> and listener.  To differentiate that, we mark reqsk->syncookie, which
+> is only used in TX for now.  So, if reqsk->syncookie is 1 in RX, it
+> means that the reqsk is allocated by kfunc.
+> 
+> When skb is freed, sock_pfree() checks if reqsk->syncookie is 1,
+> and in that case, we set NULL to reqsk->rsk_listener before calling
+> reqsk_free() as reqsk does not hold a refcnt of the listener.
+> 
+> When the TCP stack looks up a socket from the skb, we steal the
+> listener from the reqsk in skb_steal_sock() and create a full sk
+> in cookie_v[46]_check().
+> 
+> The refcnt of reqsk will finally be set to 1 in tcp_get_cookie_sock()
+> after creating a full sk.
+> 
+> Note that we can extend struct bpf_tcp_req_attrs in the future when
+> we add a new attribute that is determined in 3WHS.
 
-The issue triggering process is analyzed as follows:
-Thread A                                       Thread B
-tcp_v4_rcv	//receive ack TCP packet       inet_shutdown
-  tcp_check_req                                  tcp_disconnect //disconnect sock
-  ...                                              tcp_set_state(sk, TCP_CLOSE)
-    inet_csk_complete_hashdance                ...
-      inet_csk_reqsk_queue_add                 inet_listen  //start listen
-        spin_lock(&queue->rskq_lock)             inet_csk_listen_start
-        ...                                        reqsk_queue_alloc
-        ...                                          spin_lock_init
-        spin_unlock(&queue->rskq_lock)	//warning
+Notice a few final details.
 
-When the socket receives the ACK packet during the three-way handshake,
-it will hold spinlock. And then the user actively shutdowns the socket
-and listens to the socket immediately, the spinlock will be initialized.
-When the socket is going to release the spinlock, a warning is generated.
+> 
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> ---
+>   include/net/tcp.h |  13 ++++++
+>   net/core/filter.c | 113 +++++++++++++++++++++++++++++++++++++++++++++-
+>   net/core/sock.c   |  14 +++++-
+>   3 files changed, 136 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/net/tcp.h b/include/net/tcp.h
+> index a63916f41f77..20619df8819e 100644
+> --- a/include/net/tcp.h
+> +++ b/include/net/tcp.h
+> @@ -600,6 +600,19 @@ static inline bool cookie_ecn_ok(const struct net *net, const struct dst_entry *
+>   }
+>   
+>   #if IS_ENABLED(CONFIG_BPF)
+> +struct bpf_tcp_req_attrs {
+> +	u32 rcv_tsval;
+> +	u32 rcv_tsecr;
+> +	u16 mss;
+> +	u8 rcv_wscale;
+> +	u8 snd_wscale;
+> +	u8 ecn_ok;
+> +	u8 wscale_ok;
+> +	u8 sack_ok;
+> +	u8 tstamp_ok;
+> +	u8 usec_ts_ok;
 
-The rskq_lock lock protects only the request_sock_queue structure.
-Therefore, the rskq_lock lock could be not used when the TCP state is
-not listen in inet_csk_reqsk_queue_add.
+Add "u8 reserved[3];" for the 3 bytes tail padding.
 
-Fixes: fff1f3001cc5 ("tcp: add a spinlock to protect struct request_sock_queue")
-Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
----
- net/ipv4/inet_connection_sock.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> +};
+> +
+>   static inline bool cookie_bpf_ok(struct sk_buff *skb)
+>   {
+>   	return skb->sk;
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index 24061f29c9dd..961c2d30bd72 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -11837,6 +11837,105 @@ __bpf_kfunc int bpf_sock_addr_set_sun_path(struct bpf_sock_addr_kern *sa_kern,
+>   
+>   	return 0;
+>   }
+> +
+> +__bpf_kfunc int bpf_sk_assign_tcp_reqsk(struct sk_buff *skb, struct sock *sk,
+> +					struct bpf_tcp_req_attrs *attrs, int attrs__sz)
+> +{
+> +#if IS_ENABLED(CONFIG_SYN_COOKIES)
+> +	const struct request_sock_ops *ops;
+> +	struct inet_request_sock *ireq;
+> +	struct tcp_request_sock *treq;
+> +	struct request_sock *req;
+> +	struct net *net;
+> +	__u16 min_mss;
+> +	u32 tsoff = 0;
+> +
+> +	if (attrs__sz != sizeof(*attrs))
+> +		return -EINVAL;
+> +
+> +	if (!sk)
+> +		return -EINVAL;
+> +
+> +	if (!skb_at_tc_ingress(skb))
+> +		return -EINVAL;
+> +
+> +	net = dev_net(skb->dev);
+> +	if (net != sock_net(sk))
+> +		return -ENETUNREACH;
+> +
+> +	switch (skb->protocol) {
+> +	case htons(ETH_P_IP):
+> +		ops = &tcp_request_sock_ops;
+> +		min_mss = 536;
+> +		break;
+> +#if IS_BUILTIN(CONFIG_IPV6)
+> +	case htons(ETH_P_IPV6):
+> +		ops = &tcp6_request_sock_ops;
+> +		min_mss = IPV6_MIN_MTU - 60;
+> +		break;
+> +#endif
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (sk->sk_type != SOCK_STREAM || sk->sk_state != TCP_LISTEN ||
+> +	    sk_is_mptcp(sk))
+> +		return -EINVAL;
+> +
 
-diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
-index 8e2eb1793685..b100a89c3d98 100644
---- a/net/ipv4/inet_connection_sock.c
-+++ b/net/ipv4/inet_connection_sock.c
-@@ -1295,11 +1295,11 @@ struct sock *inet_csk_reqsk_queue_add(struct sock *sk,
- {
- 	struct request_sock_queue *queue = &inet_csk(sk)->icsk_accept_queue;
- 
--	spin_lock(&queue->rskq_lock);
- 	if (unlikely(sk->sk_state != TCP_LISTEN)) {
- 		inet_child_forget(sk, req, child);
- 		child = NULL;
- 	} else {
-+		spin_lock(&queue->rskq_lock);
- 		req->sk = child;
- 		req->dl_next = NULL;
- 		if (queue->rskq_accept_head == NULL)
-@@ -1308,8 +1308,8 @@ struct sock *inet_csk_reqsk_queue_add(struct sock *sk,
- 			queue->rskq_accept_tail->dl_next = req;
- 		queue->rskq_accept_tail = req;
- 		sk_acceptq_added(sk);
-+		spin_unlock(&queue->rskq_lock);
- 	}
--	spin_unlock(&queue->rskq_lock);
- 	return child;
- }
- EXPORT_SYMBOL(inet_csk_reqsk_queue_add);
--- 
-2.34.1
+and check for:
+
+	if (attrs->reserved[0] || attrs->reserved[1] || attrs->reserved[2])
+		return -EINVAL;
+
+It will be safer if it needs to extend "struct bpf_tcp_req_attrs". There is an 
+existing example in __bpf_nf_ct_lookup() when checking the 'struct bpf_ct_opts 
+*opts'.
 
 
