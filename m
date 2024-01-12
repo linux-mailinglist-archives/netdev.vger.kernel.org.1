@@ -1,193 +1,327 @@
-Return-Path: <netdev+bounces-63282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FBAE82C1FF
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 15:40:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8848382C20A
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 15:47:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6873F1C21C53
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 14:40:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 594F21C21B25
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 14:47:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DF3E6DD13;
-	Fri, 12 Jan 2024 14:40:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CCB96DD0A;
+	Fri, 12 Jan 2024 14:47:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="oGSpI0Hc"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="ZT40FtMG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE3006DD05;
-	Fri, 12 Jan 2024 14:40:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40C6JMr5025394;
-	Fri, 12 Jan 2024 14:40:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=pwMDkgroSGYEImjOj0FjTPpXnnYl3fh4fHyLyRieYAM=; b=oG
-	SpI0HcHsMTEG0VPoQtYtVscmy4J/iVmN1JZIm9nkGOK/Ft9vyLi0ysZ+KazQWGTD
-	lLWpiK2k1d4OOLGwNe3brqQaCXctetRnWWDR+7VrvDEcH+XwtO69n2TWuE0wU1+U
-	sner9x7jLDV3DD9U7/yYdrliAekNpiVj4e0d+DJavFI9aORHYJ3PCi0oM/eF59I0
-	ehUGrYo1yKjess3duQ8VzJI2R47sEOHOIHTchiwjqMy/4vOXIM+XdC1MmJAu3Tkz
-	UiV98XMqY4UAMObv5yjLX++JcxO36fo+MwP+yb7+7qCEzKCXDTyu6DFt3tymdhz7
-	Y/sfCd9tjqrIT/G4yYlg==
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3vjymn99g4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 12 Jan 2024 14:40:11 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 40CEe9oU032191
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 12 Jan 2024 14:40:10 GMT
-Received: from [10.253.78.164] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Fri, 12 Jan
- 2024 06:40:05 -0800
-Message-ID: <6fc9e65a-709a-4923-b0b3-7c460199417a@quicinc.com>
-Date: Fri, 12 Jan 2024 22:40:02 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBF966A345
+	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 14:47:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-dbdb124491cso5154460276.1
+        for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 06:47:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1705070852; x=1705675652; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eNL0Tu00M787VBiq9YV3mVNCgZRg1vgmo7HdGJbj6k4=;
+        b=ZT40FtMGMdsdxI2rXmCzjGFhS0VTxZO6IE2MTe0XbM5N9kitqEvIEIJIxbXvrXvD2Q
+         qyQ0qPxKTOxqjpOZS0m6Ze62WbPzN6NbbIM/8LdtDAdCTdVuOn/d69G4kpuVJ3gFuZMe
+         bV3lu91+hjeFvlCIgqeZj86glXPCrKBfdrCJ5gAyZXm1YPuyhLV5M6TSozRgbm9EbD4M
+         WIuxv97sdKaloVc6I3mDYIeFb73SiSaFACC04xmDSHFUGfdVxqYzh72YijeiIn1Xnpta
+         BYASO3bl58l0gnQ0rbMGDrAiSFRxHA6cbX/lNih/252NXRZHeCmm0n+3G7Ak1f3NU1Wd
+         nqtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705070852; x=1705675652;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eNL0Tu00M787VBiq9YV3mVNCgZRg1vgmo7HdGJbj6k4=;
+        b=pk3kGjkUe8fU8uSAJh3ChBWVyOXtI5Kd1+Dbola4FFEJdvQIJekCkN15AKiLFQ9+dj
+         t4nbigIkJRCXG/fI+G7h+An1s2wvjpNf6ayZUJA+ZXd0bDkM5B38yg3MZ3EP6dypGV/U
+         2ZNgf4Ztx0r+b2FRO7fzXWF7ZFyTHmRH4Woyht23hpigt/nSWGJgQsT0bX8uA+cpqoAB
+         XwkoMwd0Bulw2ioNxif6bUNl85hGvDypoLicrzJ1SC15TYxmg4kjKoEzsTJNrn6VOe9S
+         LyytNc1ZyvMdekdBMBdy6zr9wo33IvcX43A5bPwZ4XFypTLJVWW4d3tCcneKLxsjVHYf
+         Uggg==
+X-Gm-Message-State: AOJu0YzSJkUd7N7Z0BACaX/QAXUNizKqxIrObpRPXLqbeLuiFinH6KRQ
+	FAhX2jWl2IKJZoV8wk2WzmGeLF4+eABtuQ+ta2hpLceqM1kC
+X-Google-Smtp-Source: AGHT+IFqDSe/qLcsQ+s4N9pbKdTXL6i3CWhBlqsSF2hmlotDryILCb20fh/O0+/QIR1hpcNmCLtwvIltU4FtHrpb4sc=
+X-Received: by 2002:a5b:888:0:b0:dbc:d059:c31b with SMTP id
+ e8-20020a5b0888000000b00dbcd059c31bmr574581ybq.8.1705070851687; Fri, 12 Jan
+ 2024 06:47:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/6] arm64: dts: qcom: ipq9574: Add PPE device tree node
-Content-Language: en-US
-To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-CC: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
-        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
-        <conor+dt@kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <quic_kkumarcs@quicinc.com>,
-        <quic_suruchia@quicinc.com>, <quic_soni@quicinc.com>,
-        <quic_pavir@quicinc.com>, <quic_souravp@quicinc.com>,
-        <quic_linchen@quicinc.com>, <quic_leiwei@quicinc.com>
-References: <20240110112059.2498-1-quic_luoj@quicinc.com>
- <20240110112059.2498-2-quic_luoj@quicinc.com>
- <a42718a9-d0f9-47d9-9ee8-fb520ed2a7a8@linaro.org>
- <de0ad768-05fa-4bb1-bcbc-0adb28cb2257@quicinc.com>
- <CAA8EJppeQdB4W8u0ux16pxBBwF_fpt1j-5aC0f849n9_iaaYtQ@mail.gmail.com>
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <CAA8EJppeQdB4W8u0ux16pxBBwF_fpt1j-5aC0f849n9_iaaYtQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: kjM5EZ7lijKxsSS_w7Rz57nu8buEP20m
-X-Proofpoint-GUID: kjM5EZ7lijKxsSS_w7Rz57nu8buEP20m
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
- clxscore=1015 lowpriorityscore=0 bulkscore=0 impostorscore=0 spamscore=0
- mlxscore=0 malwarescore=0 mlxlogscore=999 phishscore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2311290000
- definitions=main-2401120114
+References: <20240104125844.1522062-1-jiri@resnulli.us> <ZZ6JE0odnu1lLPtu@shredder>
+ <CAM0EoM=AGxO0gdeHPi7ST0+-YVuT20ysPbrFkYVXLqGv39oR7Q@mail.gmail.com>
+ <CAM0EoMkpzsEWXMw27xgsfzwA2g4CNeDYQ9niTJAkgu3=Kgp81g@mail.gmail.com>
+ <878r4volo0.fsf@nvidia.com> <CAM0EoMkFkJBGc5wsYec+1QZ_o6tEi6vm_KjAJV8SWB4EOPcppg@mail.gmail.com>
+ <87zfxbmp5i.fsf@nvidia.com>
+In-Reply-To: <87zfxbmp5i.fsf@nvidia.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Fri, 12 Jan 2024 09:47:20 -0500
+Message-ID: <CAM0EoMmC1z9SzF7zNtquPinBDr3Zu-wfKKRU0CMK3SP4ZobOsg@mail.gmail.com>
+Subject: Re: [patch net-next] net: sched: move block device tracking into tcf_block_get/put_ext()
+To: Petr Machata <me@pmachata.org>
+Cc: Petr Machata <petrm@nvidia.com>, Ido Schimmel <idosch@idosch.org>, Jiri Pirko <jiri@resnulli.us>, 
+	netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com, 
+	davem@davemloft.net, edumazet@google.com, xiyou.wangcong@gmail.com, 
+	victor@mojatatu.com, pctammela@mojatatu.com, mleitner@redhat.com, 
+	vladbu@nvidia.com, paulb@nvidia.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Jan 11, 2024 at 6:22=E2=80=AFPM Petr Machata <me@pmachata.org> wrot=
+e:
+>
+> Jamal Hadi Salim <jhs@mojatatu.com> writes:
+>
+> > On Thu, Jan 11, 2024 at 11:55=E2=80=AFAM Petr Machata <petrm@nvidia.com=
+> wrote:
+> >>
+> >>
+> >> Jamal Hadi Salim <jhs@mojatatu.com> writes:
+> >>
+> >> > On Thu, Jan 11, 2024 at 10:40=E2=80=AFAM Jamal Hadi Salim <jhs@mojat=
+atu.com> wrote:
+> >> >>
+> >> >> On Wed, Jan 10, 2024 at 7:10=E2=80=AFAM Ido Schimmel <idosch@idosch=
+.org> wrote:
+> >> >> >
+> >> >> > On Thu, Jan 04, 2024 at 01:58:44PM +0100, Jiri Pirko wrote:
+> >> >> > > diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+> >> >> > > index adf5de1ff773..253b26f2eddd 100644
+> >> >> > > --- a/net/sched/cls_api.c
+> >> >> > > +++ b/net/sched/cls_api.c
+> >> >> > > @@ -1428,6 +1428,7 @@ int tcf_block_get_ext(struct tcf_block **=
+p_block, struct Qdisc *q,
+> >> >> > >                     struct tcf_block_ext_info *ei,
+> >> >> > >                     struct netlink_ext_ack *extack)
+> >> >> > >  {
+> >> >> > > +     struct net_device *dev =3D qdisc_dev(q);
+> >> >> > >       struct net *net =3D qdisc_net(q);
+> >> >> > >       struct tcf_block *block =3D NULL;
+> >> >> > >       int err;
+> >> >> > > @@ -1461,9 +1462,18 @@ int tcf_block_get_ext(struct tcf_block *=
+*p_block, struct Qdisc *q,
+> >> >> > >       if (err)
+> >> >> > >               goto err_block_offload_bind;
+> >> >> > >
+> >> >> > > +     if (tcf_block_shared(block)) {
+> >> >> > > +             err =3D xa_insert(&block->ports, dev->ifindex, de=
+v, GFP_KERNEL);
+> >> >> > > +             if (err) {
+> >> >> > > +                     NL_SET_ERR_MSG(extack, "block dev insert =
+failed");
+> >> >> > > +                     goto err_dev_insert;
+> >> >> > > +             }
+> >> >> > > +     }
+> >> >> >
+> >> >> > While this patch fixes the original issue, it creates another one=
+:
+> >> >> >
+> >> >> > # ip link add name swp1 type dummy
+> >> >> > # tc qdisc replace dev swp1 root handle 10: prio bands 8 priomap =
+7 6 5 4 3 2 1
+> >> >> > # tc qdisc add dev swp1 parent 10:8 handle 108: red limit 1000000=
+ min 200000 max 200001 probability 1.0 avpkt 8000 burst 38 qevent early_dro=
+p block 10
+> >> >> > RED: set bandwidth to 10Mbit
+> >> >> > # tc qdisc add dev swp1 parent 10:7 handle 107: red limit 1000000=
+ min 500000 max 500001 probability 1.0 avpkt 8000 burst 63 qevent early_dro=
+p block 10
+> >> >> > RED: set bandwidth to 10Mbit
+> >> >> > Error: block dev insert failed.
+> >> >> >
+> >> >>
+> >> >>
+> >> >> +cc Petr
+> >> >> We'll add a testcase on tdc - it doesnt seem we have any for qevent=
+s.
+> >> >> If you have others that are related let us know.
+> >> >> But how does this work? I see no mention of block on red code and i
+> >>
+> >> Look for qe_early_drop and qe_mark in sch_red.c.
+> >>
+> >
+> > I see it...
+> >
+> >> >> see no mention of block on the reproducer above.
+> >> >
+> >> > Context: Yes, i see it on red setup but i dont see any block being s=
+etup.
+> >>
+> >> qevents are binding locations for blocks, similar in principle to
+> >> clsact's ingress_block / egress_block. So the way to create a block is
+> >> the same: just mention the block number for the first time.
+> >>
+> >> What qevents there are depends on the qdisc. They are supposed to
+> >> reflect events that are somehow interesting, from the point of view of
+> >> an skb within a qdisc. Thus RED has two qevents: early_drop for packet=
+s
+> >> that were chosen to be, well, dropped early, and mark for packets that
+> >> are ECN-marked. So when a packet is, say, early-dropped, the RED qdisc
+> >> passes it through the TC block bound at that qevent (if any).
+> >>
+> >
+> > Ok, the confusing part was the missing block command. I am assuming in
+> > addition to Ido's example one would need to create block 10 and then
+> > attach a filter to it?
+> > Something like:
+> > tc qdisc add dev swp1 parent 10:7 handle 107: red limit 1000000 min
+> > 500000 max 500001 probability 1.0 avpkt 8000 burst 63 qevent
+> > early_drop block 10
+> > tc filter add block 10 ...
+>
+> Yes, correct.
+>
+> > So a packet tagged for early drop will end up being processed in some
+> > filter chain with some specified actions. So in the case of offload,
+> > does it mean early drops will be sent to the kernel and land at the
+> > specific chain? Also trying to understand (in retrospect, not armchair
+>
+> For offload, the idea is that the silicon is configured to do the things
+> that the user configures at the qevent.
+>
 
+Ok, so none of these qevents related packets need to escape to s/w then.
 
-On 1/12/2024 12:06 AM, Dmitry Baryshkov wrote:
-> On Thu, 11 Jan 2024 at 17:31, Jie Luo <quic_luoj@quicinc.com> wrote:
->>
->>
->>
->>
->> Ok, will update to use a generic name in the link, Thanks for the
->> guidance and the link.
->>>
->>>
->>>> +                    compatible = "qcom,ipq9574-ppe";
->>>
->>> I don't see this documented. I don't see reference to posted bindings.
->>
->> The DT bindings patch was part of the driver series as below. This
->> property was documented in the DT bindings patch. Attaching it to DTSI
->> series should make it more clear. If this is fine, I will update the
->> DTSI series with the DT bindings patch.
->> https://lore.kernel.org/netdev/20240110142428.52026d9e@kernel.org/
->>
->>>
->>> Please run scripts/checkpatch.pl and fix reported warnings. Some
->>> warnings can be ignored, but the code here looks like it needs a fix.
->>> Feel free to get in touch if the warning is not clear.
->>>
->>> Ignoring this warning is a sign you don't really check your patches
->>> before sending.
->>
->> We have run the checkpatch.pl on the whole patch series including this
->> device tree patch set together with PPE driver patch set.
->> As mentioned above, I will add the DT bindings patch into the DTS
->> series. This should help with the checkpatch issue.
-> 
-> This will cause even more confusion, as there will be two instances of
-> the dt-bindings patch. One in the driver patchset, another one in the
-> DT changes. You just have to specify the dependencies in the cover
-> letter. Another option is to wait for the bindings + driver to be
-> accepted, then send the DTSI changes (and again, specify the
-> dependency).
-> 
+> In the particular case of mlxsw, we only permit adding one chain with
+> one filter, which has to be a matchall, and the action has to be either
+> a mirred or trap, plus it needs to have hw_stats disabled. Because the
+> HW is limited like that, it can't do much in that context.
+>
 
-Thanks Dmitry for the suggestions.
+Understood. The challenge right now is we depend on a human to know
+what the h/w constraints are and on misconfig you reject the bad
+config. The other model is you query for the h/w capabilities and then
+only allow valid config (in case of skip_sw)
 
+> > lawyering): why was a block necessary? feels like the goto chain
+> > action could have worked, no? i.e something like: qevent early_drop
+> > goto chain x.. Is the block perhaps tied to something in the h/w or is
+> > it just some clever metainfo that is used to jump to tc block when the
+> > exceptions happen?
+>
+> So yeah, blocks are super fancy compared to what the HW can actually do.
 
-As per the ongoing discussion on this series, we will hold off this DTS 
-patch series for some time. We will update the cover letter of the DTSI 
-series to point to the below driver series as a dependency, when we 
-resume the series.
+My curiosity on blocks was more if the ports added to a block are
+related somehow from a grouping perspective and in particular to the
+h/w. For example in P4TC, at a hardware level we are looking to use
+blocks to group devices that are under one PCI-dev (PF, VFs, etc) -
+mostly this is because the underlying ASIC has them related already
+(and if for example you said to mirror from one to the other it would
+work whether in s/w or h/w)
 
-https://lore.kernel.org/netdev/20240110154414.GH9296@kernel.org/
+> The initial idea was to have a single action, but then what if the HW
+> can do more than that? And qdiscs still exist as SW entitites obviously,
+> why limit ourselves to a single action in SW? OK, so maybe we can make
+> that one action a goto chain, where the real stuff is, but where would
+> it look the chain up? On ingress? Egress? So say that we know where to
+> look it up,
 
->>
->>>
->>>> +                    reg = <0x3a000000 0xb00000>;
->>>> +                    #address-cells = <1>;
->>>> +                    #size-cells = <1>;
->>>> +                    ranges;
->>>
->>> Put after reg.
->> Ok.
->>
->>>
->>>> +                    status = "okay";
->>>
->>> Drop
->> Ok.
->>
->>>
->>> All of above comments apply to your entire patchset and all places.
->>>
->>> Looking at code further, it does not look like suitable for mainline,
->>> but copy of downstream code. That's not what we expect upstream. Please
->>> go back to your bindings first. Also, I really insist you reaching out
->>> to other folks to help you in this process.
->>>
->>> Best regards,
->>> Krzysztof
->>>
->> We will do internal review of the gaps and update the patches as per
->> your comments.
->>
->> Thanks for the review comments.
-> 
->  From the first glance, the bindings do not follow upstream principles.
-> You have all the settings (tdm, port config, etc) in the DT, while
-> they should instead go to the driver. Well, unless you expect that the
-> board might need to override them.
-> 
-Hi Dmitry,
-The TDM configuration varies per SoC type, since the ethernet port 
-capabilities of the SoCs vary. So we will have two different TDM 
-configurations for IPQ5332 and IPQ9574 SoC. The driver also will
-need to support future SoC, so we choose to configure this from the 
-DTSI. The same reason applies to the port scheduler config as well.
+Note: At the NIC offloads i have seen - typically it is the driver
+that would maintain such state and would know where to jump to.
 
-Thanks for review comments.
+>but then also you'll end up with totally unhinged actions on
+> an ingress / egress qdisc that are there just as jump targets of some
+> qevent. Plus the set of actions permissible on ingress / egress can be
+> arbitrarily different from the set of actions permissible on a qevent,
+> which makes the validation in an offloading driver difficult. And chain
+> reuse is really not a thing in Linux TC, so keeping a chain on its own
+> seems wrong. Plus the goto chain is still unclear in that scenario.
+>
+
+It is a configuration/policy domain and requires human knowledge. The
+NIC guys do it today. There's some default assumptions of "missed"
+lookups - which end up as exceptions on chain 0 of the same qdisc
+where skip_sw is configured. But you are right on the ingress/egress
+issues: the NIC model at the moment assumes an ingress only approach
+(at least in the ASICs), whereas you as a switch have to deal with
+both. The good news is that TC can be taught to handle both.
+
+> Blocks have no such issues, they are self-contained. They are heavy
+> compared to what we need, true. But that's not really an issue -- the
+> driver can bounce invalid configuration just fine. And there's no risk
+> of making another driver or SW datapath user unhappy because their set
+> of constrants is something we didn't anticipate. Conceptually it's
+> cleaner than if we had just one action / one rule / one chain, because
+> you can point at e.g. ingress_block and say, this, it's the same as
+> this, except instead of all ingress packets, only those that are
+> early_dropped are passed through.
+>
+
+/nod
+
+> BTW, newer Spectrum chips actually allow (some?) ACL matching to run in
+> the qevent context, so we may end up relaxing the matchall requirement
+> in the future and do a more complex offload of qevents.
+>
+
+In P4 a lot of this could be modelled to one's liking really - but
+that's a different discussion.
+
+> > Important thing is we need tests so we can catch these regressions in
+> > the future.  If you can, point me to some (outside of the ones Ido
+> > posted) and we'll put them on tdc.
+>
+> We just have the followin. Pretty sure that's where Ido's come from:
+>
+>     https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tr=
+ee/tools/testing/selftests/drivers/net/mlxsw/sch_red_core.sh
+>     https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tr=
+ee/tools/testing/selftests/drivers/net/mlxsw/sch_red_root.sh
+>     https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tr=
+ee/tools/testing/selftests/drivers/net/mlxsw/sch_red_ets.sh
+>
+> Which is doing this (or s/early_drop/mark/ instead):
+>
+>     tc qdisc add dev $swp3 parent 1: handle 108: red \
+>             limit 1000000 min $BACKLOG max $((BACKLOG + 1)) \
+>             probability 1.0 avpkt 8000 burst 38 qevent early_drop block 1=
+0
+>
+> And then installing a rule like one of these:
+>
+>     tc filter add block 10 pref 1234 handle 102 matchall skip_sw \
+>             action mirred egress mirror dev $swp2 hw_stats disabled
+>     tc filter add block 10 pref 1234 handle 102 matchall skip_sw \
+>             action trap hw_stats disabled
+>     tc filter add block 10 pref 1234 handle 102 matchall skip_sw \
+>             action trap_fwd hw_stats disabled
+>
+> Then in runs traffic and checks the right amount gets mirrored or trapped=
+.
+>
+
+Makes sense. Is the Red piece offloaded as well?
+
+> >> > Also: Is it only Red or other qdiscs could behave this way?
+> >>
+> >> Currently only red supports any qevents at all, but in principle the
+> >> mechanism is reusable. With my mlxsw hat on, an obvious next candidate
+> >> would be tail_drop on FIFO qdisc.
+> >
+> > Sounds cool. I can see use even for s/w only dpath.
+>
+> FIFO is tricky to extend BTW. I wrote some patches way back before it
+> got backburner'd, and the only payloads that are currently bounced are
+> those that are <=3D3 bytes. Everything else is interpreted to mean
+> something, extra garbage is ignored, etc. Fun fun.
+
+FIFO may have undergone too many changes to be general purpose anymore
+(thinking of the attempts to make it lockless in particular) but I
+would think that all you need is to share the netlink attributes with
+the h/w, no? i.e you need a new attribute to enable qevents on fifo.
+
+cheers,
+jamal
 
