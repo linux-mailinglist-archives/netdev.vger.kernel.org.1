@@ -1,206 +1,147 @@
-Return-Path: <netdev+bounces-63191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B537D82B936
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 02:45:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2984082B96D
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 03:18:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 694CD1F269A2
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 01:45:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD1CE286631
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 02:18:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF5DE10F1;
-	Fri, 12 Jan 2024 01:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pSn2CAz/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CF3A1117;
+	Fri, 12 Jan 2024 02:18:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from smtp-usa2.onexmail.com (smtp-usa2.onexmail.com [35.173.142.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 307F3EA6
-	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 01:45:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <aea7e756-9b3a-46b0-af27-207ba306b875@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1705023902;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Y7MYBGykbo+B7B7Y08PI4vamNAzIA5zfjIRY6lTBuws=;
-	b=pSn2CAz/EElnB7fJJRrtE8kRoLfDNbwFJNj7z2xfGflYckT7lQKJaXAO6/HhU/PeW6VXhV
-	MmLkvXYVdIqHBcv1O7+HCIuHx68bDUICAr5l0P5fDf+OknpR3r4oSMNVkpHfL02c2fjQdz
-	LS3y9dJU9GRd1kvRpmjV12taud4cw0M=
-Date: Thu, 11 Jan 2024 17:44:55 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F98A136B
+	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 02:18:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+X-QQ-mid: bizesmtp89t1705025574tnmsr8zo
+Received: from localhost.localdomain ( [123.114.60.34])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Fri, 12 Jan 2024 10:12:52 +0800 (CST)
+X-QQ-SSF: 01400000000000D0L000000A0000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 11340837925048711146
+From: Qiang Ma <maqianga@uniontech.com>
+To: alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	mcoquelin.stm32@gmail.com
+Cc: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Qiang Ma <maqianga@uniontech.com>
+Subject: [PATCH] net: stmmac: ethtool: Fixed calltrace caused by unbalanced disable_irq_wake calls
+Date: Fri, 12 Jan 2024 10:12:49 +0800
+Message-Id: <20240112021249.24598-1-maqianga@uniontech.com>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v7 bpf-next 5/6] bpf: tcp: Support arbitrary SYN Cookie.
-Content-Language: en-US
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, bpf@vger.kernel.org,
- netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-References: <20231221012806.37137-1-kuniyu@amazon.com>
- <20231221012806.37137-6-kuniyu@amazon.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20231221012806.37137-6-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:uniontech.com:qybglogicsvrsz:qybglogicsvrsz4a-0
 
-On 12/20/23 5:28 PM, Kuniyuki Iwashima wrote:
-> This patch adds a new kfunc available at TC hook to support arbitrary
-> SYN Cookie.
-> 
-> The basic usage is as follows:
-> 
->      struct bpf_tcp_req_attrs attrs = {
->          .mss = mss,
->          .wscale_ok = wscale_ok,
->          .rcv_wscale = rcv_wscale, /* Server's WScale < 15 */
->          .snd_wscale = snd_wscale, /* Client's WScale < 15 */
->          .tstamp_ok = tstamp_ok,
->          .rcv_tsval = tsval,
->          .rcv_tsecr = tsecr, /* Server's Initial TSval */
->          .usec_ts_ok = usec_ts_ok,
->          .sack_ok = sack_ok,
->          .ecn_ok = ecn_ok,
->      }
-> 
->      skc = bpf_skc_lookup_tcp(...);
->      sk = (struct sock *)bpf_skc_to_tcp_sock(skc);
->      bpf_sk_assign_tcp_reqsk(skb, sk, attrs, sizeof(attrs));
->      bpf_sk_release(skc);
-> 
-> bpf_sk_assign_tcp_reqsk() takes skb, a listener sk, and struct
-> bpf_tcp_req_attrs and allocates reqsk and configures it.  Then,
-> bpf_sk_assign_tcp_reqsk() links reqsk with skb and the listener.
-> 
-> The notable thing here is that we do not hold refcnt for both reqsk
-> and listener.  To differentiate that, we mark reqsk->syncookie, which
-> is only used in TX for now.  So, if reqsk->syncookie is 1 in RX, it
-> means that the reqsk is allocated by kfunc.
-> 
-> When skb is freed, sock_pfree() checks if reqsk->syncookie is 1,
-> and in that case, we set NULL to reqsk->rsk_listener before calling
-> reqsk_free() as reqsk does not hold a refcnt of the listener.
-> 
-> When the TCP stack looks up a socket from the skb, we steal the
-> listener from the reqsk in skb_steal_sock() and create a full sk
-> in cookie_v[46]_check().
-> 
-> The refcnt of reqsk will finally be set to 1 in tcp_get_cookie_sock()
-> after creating a full sk.
-> 
-> Note that we can extend struct bpf_tcp_req_attrs in the future when
-> we add a new attribute that is determined in 3WHS.
+We found the following dmesg calltrace when testing the GMAC NIC notebook:
 
-Notice a few final details.
+[9.448656] ------------[ cut here ]------------
+[9.448658] Unbalanced IRQ 43 wake disable
+[9.448673] WARNING: CPU: 3 PID: 1083 at kernel/irq/manage.c:688 irq_set_irq_wake+0xe0/0x128
+[9.448717] CPU: 3 PID: 1083 Comm: ethtool Tainted: G           O      4.19 #1
+[9.448773]         ...
+[9.448774] Call Trace:
+[9.448781] [<9000000000209b5c>] show_stack+0x34/0x140
+[9.448788] [<9000000000d52700>] dump_stack+0x98/0xd0
+[9.448794] [<9000000000228610>] __warn+0xa8/0x120
+[9.448797] [<9000000000d2fb60>] report_bug+0x98/0x130
+[9.448800] [<900000000020a418>] do_bp+0x248/0x2f0
+[9.448805] [<90000000002035f4>] handle_bp_int+0x4c/0x78
+[9.448808] [<900000000029ea40>] irq_set_irq_wake+0xe0/0x128
+[9.448813] [<9000000000a96a7c>] stmmac_set_wol+0x134/0x150
+[9.448819] [<9000000000be6ed0>] dev_ethtool+0x1368/0x2440
+[9.448824] [<9000000000c08350>] dev_ioctl+0x1f8/0x3e0
+[9.448827] [<9000000000bb2a34>] sock_ioctl+0x2a4/0x450
+[9.448832] [<900000000046f044>] do_vfs_ioctl+0xa4/0x738
+[9.448834] [<900000000046f778>] ksys_ioctl+0xa0/0xe8
+[9.448837] [<900000000046f7d8>] sys_ioctl+0x18/0x28
+[9.448840] [<9000000000211ab4>] syscall_common+0x20/0x34
+[9.448842] ---[ end trace 40c18d9aec863c3e ]---
 
-> 
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> ---
->   include/net/tcp.h |  13 ++++++
->   net/core/filter.c | 113 +++++++++++++++++++++++++++++++++++++++++++++-
->   net/core/sock.c   |  14 +++++-
->   3 files changed, 136 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/net/tcp.h b/include/net/tcp.h
-> index a63916f41f77..20619df8819e 100644
-> --- a/include/net/tcp.h
-> +++ b/include/net/tcp.h
-> @@ -600,6 +600,19 @@ static inline bool cookie_ecn_ok(const struct net *net, const struct dst_entry *
->   }
->   
->   #if IS_ENABLED(CONFIG_BPF)
-> +struct bpf_tcp_req_attrs {
-> +	u32 rcv_tsval;
-> +	u32 rcv_tsecr;
-> +	u16 mss;
-> +	u8 rcv_wscale;
-> +	u8 snd_wscale;
-> +	u8 ecn_ok;
-> +	u8 wscale_ok;
-> +	u8 sack_ok;
-> +	u8 tstamp_ok;
-> +	u8 usec_ts_ok;
+Multiple disable_irq_wake() calls will keep decreasing the IRQ
+wake_depth, When wake_depth is 0, calling disable_irq_wake() again,
+will report the above calltrace.
 
-Add "u8 reserved[3];" for the 3 bytes tail padding.
+Due to the need to appear in pairs, we cannot call disable_irq_wake()
+without calling enable_irq_wake(). Fix this by making sure there are
+no unbalanced disable_irq_wake() calls.
 
-> +};
-> +
->   static inline bool cookie_bpf_ok(struct sk_buff *skb)
->   {
->   	return skb->sk;
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 24061f29c9dd..961c2d30bd72 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -11837,6 +11837,105 @@ __bpf_kfunc int bpf_sock_addr_set_sun_path(struct bpf_sock_addr_kern *sa_kern,
->   
->   	return 0;
->   }
-> +
-> +__bpf_kfunc int bpf_sk_assign_tcp_reqsk(struct sk_buff *skb, struct sock *sk,
-> +					struct bpf_tcp_req_attrs *attrs, int attrs__sz)
-> +{
-> +#if IS_ENABLED(CONFIG_SYN_COOKIES)
-> +	const struct request_sock_ops *ops;
-> +	struct inet_request_sock *ireq;
-> +	struct tcp_request_sock *treq;
-> +	struct request_sock *req;
-> +	struct net *net;
-> +	__u16 min_mss;
-> +	u32 tsoff = 0;
-> +
-> +	if (attrs__sz != sizeof(*attrs))
-> +		return -EINVAL;
-> +
-> +	if (!sk)
-> +		return -EINVAL;
-> +
-> +	if (!skb_at_tc_ingress(skb))
-> +		return -EINVAL;
-> +
-> +	net = dev_net(skb->dev);
-> +	if (net != sock_net(sk))
-> +		return -ENETUNREACH;
-> +
-> +	switch (skb->protocol) {
-> +	case htons(ETH_P_IP):
-> +		ops = &tcp_request_sock_ops;
-> +		min_mss = 536;
-> +		break;
-> +#if IS_BUILTIN(CONFIG_IPV6)
-> +	case htons(ETH_P_IPV6):
-> +		ops = &tcp6_request_sock_ops;
-> +		min_mss = IPV6_MIN_MTU - 60;
-> +		break;
-> +#endif
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +
-> +	if (sk->sk_type != SOCK_STREAM || sk->sk_state != TCP_LISTEN ||
-> +	    sk_is_mptcp(sk))
-> +		return -EINVAL;
-> +
+Signed-off-by: Qiang Ma <maqianga@uniontech.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h         |  1 +
+ drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c | 10 ++++++++--
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c    |  1 +
+ 3 files changed, 10 insertions(+), 2 deletions(-)
 
-and check for:
-
-	if (attrs->reserved[0] || attrs->reserved[1] || attrs->reserved[2])
-		return -EINVAL;
-
-It will be safer if it needs to extend "struct bpf_tcp_req_attrs". There is an 
-existing example in __bpf_nf_ct_lookup() when checking the 'struct bpf_ct_opts 
-*opts'.
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+index cd7a9768de5f..b8c93b881a65 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+@@ -255,6 +255,7 @@ struct stmmac_priv {
+ 	u32 msg_enable;
+ 	int wolopts;
+ 	int wol_irq;
++	bool wol_irq_disabled;
+ 	int clk_csr;
+ 	struct timer_list eee_ctrl_timer;
+ 	int lpi_irq;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+index f628411ae4ae..9a4d9492a781 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+@@ -825,10 +825,16 @@ static int stmmac_set_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
+ 	if (wol->wolopts) {
+ 		pr_info("stmmac: wakeup enable\n");
+ 		device_set_wakeup_enable(priv->device, 1);
+-		enable_irq_wake(priv->wol_irq);
++		/* Avoid unbalanced enable_irq_wake calls */
++		if (priv->wol_irq_disabled)
++			enable_irq_wake(priv->wol_irq);
++		priv->wol_irq_disabled = false;
+ 	} else {
+ 		device_set_wakeup_enable(priv->device, 0);
+-		disable_irq_wake(priv->wol_irq);
++		/* Avoid unbalanced disable_irq_wake calls */
++		if (!priv->wol_irq_disabled)
++			disable_irq_wake(priv->wol_irq);
++		priv->wol_irq_disabled = true;
+ 	}
+ 
+ 	mutex_lock(&priv->lock);
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 37e64283f910..baa396621ed8 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -3565,6 +3565,7 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+ 	/* Request the Wake IRQ in case of another line
+ 	 * is used for WoL
+ 	 */
++	priv->wol_irq_disabled = true;
+ 	if (priv->wol_irq > 0 && priv->wol_irq != dev->irq) {
+ 		int_name = priv->int_name_wol;
+ 		sprintf(int_name, "%s:%s", dev->name, "wol");
+-- 
+2.20.1
 
 
