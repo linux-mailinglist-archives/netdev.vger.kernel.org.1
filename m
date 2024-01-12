@@ -1,124 +1,127 @@
-Return-Path: <netdev+bounces-63300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6577D82C2E8
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 16:40:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A526182C36B
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 17:18:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 136252831DD
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 15:40:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56F23284FB1
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 16:18:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5701D67E95;
-	Fri, 12 Jan 2024 15:40:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="QqtHWams"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4938B7319F;
+	Fri, 12 Jan 2024 16:18:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E468E6EB4B
-	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 15:40:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a2cfb0196bcso29571866b.3
-        for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 07:40:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1705074023; x=1705678823; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=GUS/zWk7R/lJHGcfrM6/5naojXVMkStE3utaxE6oyKA=;
-        b=QqtHWams4JmeHlj+kVIEzoUBurSTXwE6R0v5pk49ysgaJr1MWaPSXrDwR+UMSabJKx
-         1PWem0GXACNtRFWSBg/E5UmiGFUPCA6qa7mZKFXOLbJGoxxcb3pvxPO0TEfiCk1vxDRv
-         XtBx2cmBcYAGaYp98MdkZ75g+MDUNDg6SR95E+K8u19InBkH3l8MVT3kAgaCgVmd6x3F
-         ABj2SYNi1pE7sKHJa4KGB22ctrgDqMJZPxKfpW600+sYImH0imDYVTlhPZajP4tBSJNy
-         II9SiWI1Xi24ORdic2ABNS/WhAf+fDlIwwO7EoaqNWqnUBZPjlEL/j3lPCvNx6ATp4QN
-         Lj4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705074023; x=1705678823;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GUS/zWk7R/lJHGcfrM6/5naojXVMkStE3utaxE6oyKA=;
-        b=tvdhNmeeE+Ow6MK5C7vVbvVrIoefEU05R+ewW3NFSUswxQ30sjdcS/+AQ8iQPmBRlm
-         IEFGUM+aAnxvI7GNeCE5H6sytAYMQDOlWpnEz6kATmGAM8O81RF+EJFLFuKboPqhaiCj
-         odtl+IA22o9OWs7NnmJ8jmMutdKjBmAQGyQrn6qMovpTifpniJq0s+7mLfm/c9jPbLny
-         bbpdtgTQYME783zZWRmmudTdWYfxGvLzTW/xoTFTzieZDFvN2xXvARHGNtr4OssNPIBV
-         eHtTfhqm+cNrBEG8hJSorVv3l3Cv5G7Tw60VGI8pneMzq6gRJPDu7TyyYIkb2Pv0eg+N
-         ecBQ==
-X-Gm-Message-State: AOJu0Yyz8Y1Ns2Usm8PK4AKcGoiKfz0l78DnE5zNW4pJHkLtVLV/qWzF
-	gDU6NO1fsW3BMeVSF3Ad9pZ4QF37q64QzJFp0A883UOVIz0=
-X-Google-Smtp-Source: AGHT+IGMhoRtdOdR9ePDSk95Aqs9Wu4nNqQ/V64fh7txv2dsN4Y+EhpMXeIwMcKBp5OQNMRipy0tXA==
-X-Received: by 2002:a17:906:c18a:b0:a1d:7792:cdbe with SMTP id g10-20020a170906c18a00b00a1d7792cdbemr704671ejz.146.1705074022823;
-        Fri, 12 Jan 2024 07:40:22 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id cw8-20020a170907160800b00a2cd72af9cesm585335ejd.146.2024.01.12.07.40.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jan 2024 07:40:21 -0800 (PST)
-Date: Fri, 12 Jan 2024 16:40:20 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org
-Subject: Re: [PATCH iproute2-next 1/4] man: get rid of
- doc/actions/mirred-usage
-Message-ID: <ZaFdZFA5ebCmwaNh@nanopsycho>
-References: <20240111184451.48227-1-stephen@networkplumber.org>
- <20240111184451.48227-2-stephen@networkplumber.org>
- <ZaEzpWaTLDG6Ofby@nanopsycho>
- <CAM0EoM=bAsbaNsQUbfO_yLHR2PFXBF9Zq3VXBGPhmKtWsMv5tA@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A221745FD
+	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 16:18:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1rOKEA-0000I6-2s; Fri, 12 Jan 2024 17:17:50 +0100
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1rOKE7-002Bnr-Ow; Fri, 12 Jan 2024 17:17:47 +0100
+Received: from pengutronix.de (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 7CBE82751CD;
+	Fri, 12 Jan 2024 15:43:16 +0000 (UTC)
+Date: Fri, 12 Jan 2024 16:43:16 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: "Kumar, Udit" <u-kumar1@ti.com>
+Cc: Bhavya Kapoor <b-kapoor@ti.com>, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-can@vger.kernel.org, mailhol.vincent@wanadoo.fr, 
+	rcsekar@samsung.com, pabeni@redhat.com, kuba@kernel.org, edumazet@google.com, 
+	davem@davemloft.net, wg@grandegger.com, vigneshr@ti.com
+Subject: Re: [PATCH] net: can: Add support for aliases in CAN
+Message-ID: <20240112-overreact-dwindling-2949267e8a02-mkl@pengutronix.de>
+References: <20240102102949.138607-1-b-kapoor@ti.com>
+ <20240102-chop-extending-b7dc1acaf5db-mkl@pengutronix.de>
+ <8dee1738-0bde-48fb-bd0e-b8d06b609677@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="uxczuahqgymwfz6l"
+Content-Disposition: inline
+In-Reply-To: <8dee1738-0bde-48fb-bd0e-b8d06b609677@ti.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+
+
+--uxczuahqgymwfz6l
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAM0EoM=bAsbaNsQUbfO_yLHR2PFXBF9Zq3VXBGPhmKtWsMv5tA@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
 
-Fri, Jan 12, 2024 at 03:55:46PM CET, jhs@mojatatu.com wrote:
->On Fri, Jan 12, 2024 at 7:42 AM Jiri Pirko <jiri@resnulli.us> wrote:
->>
->> Thu, Jan 11, 2024 at 07:44:08PM CET, stephen@networkplumber.org wrote:
->> >The only bit of information not already on the man page
->> >is some of the limitations.
->> >
->>
->> [...]
->>
->> >diff --git a/man/man8/tc-mirred.8 b/man/man8/tc-mirred.8
->> >index 38833b452d92..71f3c93df472 100644
->> >--- a/man/man8/tc-mirred.8
->> >+++ b/man/man8/tc-mirred.8
->> >@@ -94,6 +94,14 @@ interface, it is possible to send ingress traffic through an instance of
->> > .EE
->> > .RE
->> >
->> >+.SH LIMITIATIONS
->> >+It is possible to create loops which will cause the kernel to hang.
->>
->> Hmm, I think this is not true for many many years. Perhaps you can drop
->> it? Anyway, it was a kernel issue.
->
->Hmm back at you: why do you say it is not true anymore? It is still
+On 12.01.2024 20:53:32, Kumar, Udit wrote:
+> Hi Marc
+>=20
+> On 1/2/2024 4:43 PM, Marc Kleine-Budde wrote:
+> > On 02.01.2024 15:59:49, Bhavya Kapoor wrote:
+> > > When multiple CAN's are present, then names that are getting assigned
+> > > changes after every boot even after providing alias in the device tre=
+e.
+> > > Thus, Add support for implementing CAN aliasing so that names or
+> > > alias for CAN will now be provided from device tree.
+> > NACK, please use udev or systemd-networkd to provide stable names for
+> > CAN interfaces.
+>=20
+> Would you like to re-consider this NACK.
 
-Ah, I was falsely under impression this happens in reclassify loop.
-Nevermind then.
+This is not a CAN device specific problem. If you want to change this,
+talk/convince the networking people.
 
+> From kernel side,
+>=20
+> IMO if aliasing is set in device tree then kernel should provide consiste=
+nt
+> baseline names.
+>=20
+> However, distributions may choose different or other stable naming,
+>=20
+> Also, if some distribution want to rely on kernel naming they still can d=
+o.
 
->there - all in the marvelous name of saving 2 bits from the skb.
->If you want to be the hero, here's the last attempt to fix this issue:
->https://lore.kernel.org/netdev/20231215180827.3638838-1-victor@mojatatu.com/#t
->
->Stephen, please cc all the stakeholders when you make these changes.
->Some of us dont have the luxury to be able to scan every message in
->the list. I dont have time, at the moment, to review all the
->documentation you are removing - but if you had Cc me i would have
->made time.
->
->cheers,
->jamal
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--uxczuahqgymwfz6l
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmWhXhAACgkQvlAcSiqK
+BOjD0wgAriZqvA12Vu5nzdKCKAjSH8J55u83wid8H1TFwOTI44OzbAg0a6AakQua
+JRGAbYx0pivUuwNf8emVJ1FVJMxyPH1lMPwQep6ZYtTVqoWfhOFDWk2m14xBYTVj
+DguY9dlaK/uBU39GBDnk3b8dMd+l6QwSDJhymFTO5P5c87YLzVlpa4FkbSVE2Atz
+wQVQZdMzIUJK4FwFaymKkT2SjLsLb5kZPM8t80L7oknZruvsJKGEAm2KF9TJYnV0
+fjdBgfzdbdxFrJqJEd7YSOK5aN0mv2/gyb16rpGDYRsrWmBN2sffk4kIC1TmsSwS
+Do9pEjkihZ2wEpAShuxai2OdqVMBMQ==
+=709B
+-----END PGP SIGNATURE-----
+
+--uxczuahqgymwfz6l--
 
