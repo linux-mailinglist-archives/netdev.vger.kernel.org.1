@@ -1,113 +1,124 @@
-Return-Path: <netdev+bounces-63265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F64582C091
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 14:12:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FCEF82C0A7
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 14:16:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 295111C214C2
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 13:12:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01457283CFB
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 13:16:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58FB66A019;
-	Fri, 12 Jan 2024 13:12:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EXCOfspj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6C816BB4F;
+	Fri, 12 Jan 2024 13:16:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from exchange.fintech.ru (exchange.fintech.ru [195.54.195.159])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B69835917D
-	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 13:11:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-557bbcaa4c0so7866a12.1
-        for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 05:11:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1705065117; x=1705669917; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zCYb41/q7WFAPMZE12PFyfM/tISC9uBiVVmNnuRAK9E=;
-        b=EXCOfspjuoyVrmkioFc0ihX76A7xSR+lbwVfsaRAvzvIZePHDBToepC/V5nDZHEpPn
-         LNiH21odljty3rrLC3Q1px8p7eQZ/YtAIoh2/34HjlgUuANwVepPe009Xwgr3kYPJSe1
-         dC71qUf1OZkNK6wZH10IO0rXiAHvHLWnJZDr7GezkFvDfxWpjZf8XYoRWQ18RDLArnil
-         ncM0Kw7s5PegHqthSSua2Fr5uwzvMLPIcpo5ACjxwPaIij8pQWAxJyf8LfEbFrK9KYqW
-         E2xJUC/Mdnehlv0I249A8BNWm1ppRGLG9rPH4OCgTgWusOPYcI4U/3xwjHGsTEyDYD9a
-         sGHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705065117; x=1705669917;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zCYb41/q7WFAPMZE12PFyfM/tISC9uBiVVmNnuRAK9E=;
-        b=jCzFWiHKL7ui7sFCL7sNmy/PEgX0D4q7aY9KSzWbYwY/Loyk9ek2t482Eq3SbXAQTp
-         Nj2SGNAOabJcq7MIvTyVUxZoIMPNNMUMNeiCQnJn2KK5zpZhii1CYiAjblx0dWsFk/96
-         cftDX/KAkHk1dgEXrYzt+dBw79ymlv4bBEGJBqr+jzMnmYSWQhXkTkFMRKnSdIpHqoj2
-         8l0PF5XXROP6PdxQ/wv0+CeTLYpM59qjq0YHDz82grXzPBKkyJVTlbTdsCaVXYKwafCT
-         LnUyAyCD4PTOH+KNuGEu3+1ehBMHfbDg51xPNQlykXX9TnS358ALVUpWTTN0Qrhqxhyb
-         6roA==
-X-Gm-Message-State: AOJu0YyFrXqt4E6ZpwSguKK2cpeIzxOLAwv8HZJCdVMDoF6O7PPcq4Xw
-	LMc6RQeimJYB/0k3zyCTuL84E22ICiV6fvBcHEiw1ocjngd1
-X-Google-Smtp-Source: AGHT+IEPoGo6mEL2Wmd3WrwtwlBysLzEZOB6azKEPl1j4qLLgIcqXx4kXJcW0oQmA0iFh5OIeBEaK6pPhozX4axb5Q4=
-X-Received: by 2002:a05:6402:350e:b0:558:c7cb:49c with SMTP id
- b14-20020a056402350e00b00558c7cb049cmr119268edd.0.1705065116720; Fri, 12 Jan
- 2024 05:11:56 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84A3A2AEEC;
+	Fri, 12 Jan 2024 13:16:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fintech.ru
+Received: from Ex16-01.fintech.ru (10.0.10.18) by exchange.fintech.ru
+ (195.54.195.159) with Microsoft SMTP Server (TLS) id 14.3.498.0; Fri, 12 Jan
+ 2024 16:16:06 +0300
+Received: from localhost (10.0.253.138) by Ex16-01.fintech.ru (10.0.10.18)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Fri, 12 Jan
+ 2024 16:16:06 +0300
+From: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+To: Alexander Aring <aahringo@redhat.com>
+CC: Nikita Zhandarovich <n.zhandarovich@fintech.ru>, Zhang Shurong
+	<zhang_shurong@foxmail.com>, <alex.aring@gmail.com>,
+	<stefan@datenfreihafen.org>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <linux-wpan@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<harperchen1110@gmail.com>
+Subject: Re: [PATCH RESEND] mac802154: Fix uninit-value access in ieee802154_hdr_push_sechdr
+Date: Fri, 12 Jan 2024 05:15:54 -0800
+Message-ID: <20240112131554.10352-1-n.zhandarovich@fintech.ru>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <CAK-6q+jsZ13Cs9iuk_WjFeYFCEnnj-dJ9QYkWaw4fh6Gi=JtHA@mail.gmail.com>
+References:
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240112122816.450197-1-edumazet@google.com> <ZaE39F93nKy4NKqj@nanopsycho>
-In-Reply-To: <ZaE39F93nKy4NKqj@nanopsycho>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 12 Jan 2024 14:11:43 +0100
-Message-ID: <CANn89iLam6JDbJ3NJ3cRs1fnDz2HAN_gMhAn0SewoYbqBLbW4w@mail.gmail.com>
-Subject: Re: [PATCH net] net: add more sanity check in virtio_net_hdr_to_skb()
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, syzbot+7f4d0ea3df4d4fa9a65f@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: Ex16-02.fintech.ru (10.0.10.19) To Ex16-01.fintech.ru
+ (10.0.10.18)
 
-On Fri, Jan 12, 2024 at 2:00=E2=80=AFPM Jiri Pirko <jiri@resnulli.us> wrote=
-:
->
-> Fri, Jan 12, 2024 at 01:28:16PM CET, edumazet@google.com wrote:
-> >syzbot/KMSAN reports access to uninitialized data from gso_features_chec=
-k() [1]
-> >
-> >The repro use af_packet, injecting a gso packet and hdrlen =3D=3D 0.
-> >
-> >We could fix the issue making gso_features_check() more careful
-> >while dealing with NETIF_F_TSO_MANGLEID in fast path.
-> >
-> >Or we can make sure virtio_net_hdr_to_skb() pulls minimal network and
-> >transport headers as intended.
->
-> You describe "either or", but don't really say what to do. Bit
-> confusing :/
+>> > >
+>> > > BUG: KMSAN: uninit-value in ieee802154_hdr_push_sechdr net/ieee802154=
+> /header_ops.c:54 [inline]
+>> > > BUG: KMSAN: uninit-value in ieee802154_hdr_push+0x971/0xb90 net/ieee8=
+> 02154/header_ops.c:108
+>> > >  ieee802154_hdr_push_sechdr net/ieee802154/header_ops.c:54 [inline]
+>> > >  ieee802154_hdr_push+0x971/0xb90 net/ieee802154/header_ops.c:108
+>> > >  ieee802154_header_create+0x9c0/0xc00 net/mac802154/iface.c:396
+>> > >  wpan_dev_hard_header include/net/cfg802154.h:494 [inline]
+>> > >  dgram_sendmsg+0xd1d/0x1500 net/ieee802154/socket.c:677
+>> > >  ieee802154_sock_sendmsg+0x91/0xc0 net/ieee802154/socket.c:96
+>> > >  sock_sendmsg_nosec net/socket.c:725 [inline]
+>> > >  sock_sendmsg net/socket.c:748 [inline]
+>> > >  ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2494
+>> > >  ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2548
+>> > >  __sys_sendmsg+0x225/0x3c0 net/socket.c:2577
+>> > >  __compat_sys_sendmsg net/compat.c:346 [inline]
+>> > >  __do_compat_sys_sendmsg net/compat.c:353 [inline]
+>> > >  __se_compat_sys_sendmsg net/compat.c:350 [inline]
+>> > >
+>> > > We found hdr->key_id_mode is uninitialized in mac802154_set_header_se=
+> curity()
+>> > > which indicates hdr.fc.security_enabled should be 0. However, it is s=
+> et to be cb->secen before.
+>> > > Later, ieee802154_hdr_push_sechdr is invoked, causing KMSAN complains=
+>  uninit-value issue.
+>> >
+>> > I am not too deeply involved in the security header but for me it feels
+>> > like your patch does the opposite of what's needed. We should maybe
+>> > initialize hdr->key_id_mode based on the value in cb->secen, no? (maybe
+>> > Alexander will have a better understanding than I have).
+>>
+>> I can't help yet with a better answer why syzkaller reports it but it
+>> will break things as we using skb->cb to pass additional parameters
+>> through header_ops->create()... in this case it is some sockopts of
+>> af802154, I guess.
+>>
+> 
+> Maybe we just need to init some "more" defaults in [0]
+> 
+> - Alex
+> 
+> [0] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree=
+> /net/ieee802154/socket.c?h=3Dv6.7-rc5#n474
 
-Not sure I understand your point?
+Hello,
 
- Patch title is " net: add more sanity check in virtio_net_hdr_to_skb() ",
-and the change is implementing that option.
+I was looking into the same issue (now present in syzbot [1]) and since it has a
+C-repro, the error is easy to recreate. Apparently, despite cb->secen (and
+hdr.fc.security_enabled accordingly) being equal 1, mac802154_set_header_security()
+finishes with 0 in:
 
-I am saying I prefer not touching gso_features_check(), even if we
-could just do this.
+	if (!params.enabled ||
+	    (cb->secen_override && !cb->secen) ||
+	    !params.out_level)
+	    return 0;
 
-Had I been silent about that option, I am sure some reviewers would
-have raised the question,
-given the stack trace ?
+Not presuming to understand the issue fully but if we do end up leaving
+mac802154_set_header_security() early, should we init hdr->key_id_mode
+with IEEE802154_SCF_KEY_IMPLICIT before returning with 0?
+I imagine that reseting hdr.fc.security_enabled to 0 ourselves in this
+case is a wrong way to go too.
 
-Apparently you are saying these kinds of things should not be ever mentione=
-d,
-because of some "imperative mood" request that you often raise with my patc=
-hes.
+[1] https://syzkaller.appspot.com/bug?extid=60a66d44892b66b56545
 
-I have not written a novel, only one sentence, admittedly not written
-in perfect English.
+Hoping not to have spewed too much nonsense here...
+
+With regards,
+Nikita
 
