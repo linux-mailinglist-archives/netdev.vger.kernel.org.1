@@ -1,123 +1,194 @@
-Return-Path: <netdev+bounces-63210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F05E782BC7A
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 09:47:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F3F682BC8A
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 09:56:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FC2F1F26915
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 08:47:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1FA6289AB4
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 08:56:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17D724F60B;
-	Fri, 12 Jan 2024 08:47:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24D92537E5;
+	Fri, 12 Jan 2024 08:56:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="hlVwruvH";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="jrx+ewXj";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="hlVwruvH";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="jrx+ewXj"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [20.231.56.155])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C220255776;
-	Fri, 12 Jan 2024 08:46:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from luzhipeng.223.5.5.5 (unknown [39.174.92.167])
-	by mail-app4 (Coremail) with SMTP id cS_KCgD3Wd1M_KBlIPG4AA--.22411S2;
-	Fri, 12 Jan 2024 16:46:05 +0800 (CST)
-From: Zhipeng Lu <alexious@zju.edu.cn>
-To: alexious@zju.edu.cn
-Cc: Chuck Lever <chuck.lever@oracle.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>,
-	Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>,
-	Trond Myklebust <trond.myklebust@hammerspace.com>,
-	Anna Schumaker <anna@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simo Sorce <simo@redhat.com>,
-	Steve Dickson <steved@redhat.com>,
-	Kevin Coffman <kwc@citi.umich.edu>,
-	linux-nfs@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] [v2] SUNRPC: fix a memleak in gss_import_v2_context
-Date: Fri, 12 Jan 2024 16:45:38 +0800
-Message-Id: <20240112084540.3729001-1-alexious@zju.edu.cn>
-X-Mailer: git-send-email 2.34.1
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E3E854BC8;
+	Fri, 12 Jan 2024 08:56:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 551CA1FC0D;
+	Fri, 12 Jan 2024 08:56:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1705049784; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LkFGgBjC8CczIMntbkU12Hx1gXyfHUmfQ8gaFQ0MS70=;
+	b=hlVwruvHF2eeUcJIqClHm4wu0Sr7OPH/Jl4rhDlQXXVvpYN0RhZOaHEAN8PduqmbSIUGR5
+	whUjmhBbeXI0Bvo8nlzIRVWeJgTvZl4M6Xu1nRf2Y6kgDoe3q8P3TTC+beDYCB6yY4Uz98
+	6qzf9DnnL33uoTMHCsHtyYqmV7e2i4o=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1705049784;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LkFGgBjC8CczIMntbkU12Hx1gXyfHUmfQ8gaFQ0MS70=;
+	b=jrx+ewXjCJjxbL6cuRz+bpCe0N52FpY0X3jXRyL1rA1U2JdZoh11Ziq6KPeqzpLNC6XFBB
+	o4iR0OmFpKhIXpDQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1705049784; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LkFGgBjC8CczIMntbkU12Hx1gXyfHUmfQ8gaFQ0MS70=;
+	b=hlVwruvHF2eeUcJIqClHm4wu0Sr7OPH/Jl4rhDlQXXVvpYN0RhZOaHEAN8PduqmbSIUGR5
+	whUjmhBbeXI0Bvo8nlzIRVWeJgTvZl4M6Xu1nRf2Y6kgDoe3q8P3TTC+beDYCB6yY4Uz98
+	6qzf9DnnL33uoTMHCsHtyYqmV7e2i4o=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1705049784;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LkFGgBjC8CczIMntbkU12Hx1gXyfHUmfQ8gaFQ0MS70=;
+	b=jrx+ewXjCJjxbL6cuRz+bpCe0N52FpY0X3jXRyL1rA1U2JdZoh11Ziq6KPeqzpLNC6XFBB
+	o4iR0OmFpKhIXpDQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9449B136A4;
+	Fri, 12 Jan 2024 08:56:23 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id iUxkILf+oGXaKwAAD6G6ig
+	(envelope-from <dkirjanov@suse.de>); Fri, 12 Jan 2024 08:56:23 +0000
+Message-ID: <64deebbd-93d0-47dc-835e-f719655e076c@suse.de>
+Date: Fri, 12 Jan 2024 11:56:18 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cS_KCgD3Wd1M_KBlIPG4AA--.22411S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7CFWkGFWxKrW7tr17uFW3KFg_yoW8XryUpF
-	Z8Z347trZ8WFWIyF9akFyUZ3W3Aw4kJryUWanFqw43ZrnaqFyUKF1qkryj9FWrZr4rXF1U
-	CF1UGF98Z3WDuwUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvG14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4U
-	JVW0owA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwCY02Avz4vE14v_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr
-	0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY
-	17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcV
-	C0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY
-	6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa
-	73UjIFyTuYvjfUYv38UUUUU
-X-CM-SenderInfo: qrsrjiarszq6lmxovvfxof0/
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: ethernet: ravb: fix dma mapping failure handling
+Content-Language: en-US
+To: Nikita Yushchenko <nikita.yoush@cogentembedded.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Sergey Shtylyov <s.shtylyov@omp.ru>,
+ Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+ Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+ Wolfram Sang <wsa+renesas@sang-engineering.com>,
+ =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+ netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240112050639.405784-1-nikita.yoush@cogentembedded.com>
+From: Denis Kirjanov <dkirjanov@suse.de>
+In-Reply-To: <20240112050639.405784-1-nikita.yoush@cogentembedded.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Level: 
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=hlVwruvH;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=jrx+ewXj
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-2.00 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 XM_UA_NO_VERSION(0.01)[];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 MID_RHS_MATCH_FROM(0.00)[];
+	 TAGGED_RCPT(0.00)[renesas];
+	 MIME_GOOD(-0.10)[text/plain];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 DWL_DNSWL_MED(-2.00)[suse.de:dkim];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 DKIM_TRACE(0.00)[suse.de:+];
+	 MX_GOOD(-0.01)[];
+	 RCPT_COUNT_TWELVE(0.00)[12];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 NEURAL_HAM_SHORT(-0.20)[-1.000];
+	 RCVD_TLS_ALL(0.00)[];
+	 SUSPICIOUS_RECIPS(1.50)[]
+X-Spam-Score: -2.00
+X-Rspamd-Queue-Id: 551CA1FC0D
+X-Spam-Flag: NO
 
-The ctx->mech_used.data allocated by kmemdup is not freed in neither
-gss_import_v2_context nor it only caller radeon_driver_open_kms.
-Thus, this patch reform the last call of gss_import_v2_context to the
-gss_krb5_import_ctx_v2, preventing the memleak while keepping the return
-formation.
 
-Fixes: 47d848077629 ("gss_krb5: handle new context format from gssd")
-Signed-off-by: Zhipeng Lu <alexious@zju.edu.cn>
----
-Changelog:
 
-v2: add non-error case
----
- net/sunrpc/auth_gss/gss_krb5_mech.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+On 1/12/24 08:06, Nikita Yushchenko wrote:
+> dma_mapping_error() depends on getting full 64-bit dma_addr_t and does
+> not work correctly if 32-bit value is passed instead.
+> 
+> Fix handling of dma_map_single() failures on Rx ring entries:
+> - do not store return value of dma_map_signle() in 32-bit variable,
+> - do not use dma_mapping_error() against 32-bit descriptor field when
+>   checking if unmap is needed, check for zero size instead.
 
-diff --git a/net/sunrpc/auth_gss/gss_krb5_mech.c b/net/sunrpc/auth_gss/gss_krb5_mech.c
-index e31cfdf7eadc..5e6f90d73858 100644
---- a/net/sunrpc/auth_gss/gss_krb5_mech.c
-+++ b/net/sunrpc/auth_gss/gss_krb5_mech.c
-@@ -398,6 +398,7 @@ gss_import_v2_context(const void *p, const void *end, struct krb5_ctx *ctx,
- 	u64 seq_send64;
- 	int keylen;
- 	u32 time32;
-+	int ret;
- 
- 	p = simple_get_bytes(p, end, &ctx->flags, sizeof(ctx->flags));
- 	if (IS_ERR(p))
-@@ -450,8 +451,16 @@ gss_import_v2_context(const void *p, const void *end, struct krb5_ctx *ctx,
- 	}
- 	ctx->mech_used.len = gss_kerberos_mech.gm_oid.len;
- 
--	return gss_krb5_import_ctx_v2(ctx, gfp_mask);
-+	ret = gss_krb5_import_ctx_v2(ctx, gfp_mask);
-+	if (ret) {
-+		p = ERR_PTR(ret);
-+		goto out_free;
-+	};
- 
-+	return 0;
-+
-+out_free:
-+	kfree(ctx->mech_used.data);
- out_err:
- 	return PTR_ERR(p);
- }
--- 
-2.34.1
+Hmm, something is wrong here since you're mixing DMA api and forced 32bit values.
+if dma uses 32bit addresses then dma_addr_t need only be 32 bits wide
 
+
+> 
+> Signed-off-by: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+> ---
+>  drivers/net/ethernet/renesas/ravb_main.c | 8 +++-----
+>  1 file changed, 3 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index 8649b3e90edb..4d4b5d44c4e7 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> @@ -256,8 +256,7 @@ static void ravb_rx_ring_free_gbeth(struct net_device *ndev, int q)
+>  	for (i = 0; i < priv->num_rx_ring[q]; i++) {
+>  		struct ravb_rx_desc *desc = &priv->gbeth_rx_ring[i];
+>  
+> -		if (!dma_mapping_error(ndev->dev.parent,
+> -				       le32_to_cpu(desc->dptr)))
+> +		if (le16_to_cpu(desc->ds_cc) != 0)
+>  			dma_unmap_single(ndev->dev.parent,
+>  					 le32_to_cpu(desc->dptr),
+>  					 GBETH_RX_BUFF_MAX,
+> @@ -281,8 +280,7 @@ static void ravb_rx_ring_free_rcar(struct net_device *ndev, int q)
+>  	for (i = 0; i < priv->num_rx_ring[q]; i++) {
+>  		struct ravb_ex_rx_desc *desc = &priv->rx_ring[q][i];
+>  
+> -		if (!dma_mapping_error(ndev->dev.parent,
+> -				       le32_to_cpu(desc->dptr)))
+> +		if (le16_to_cpu(desc->ds_cc) != 0)
+>  			dma_unmap_single(ndev->dev.parent,
+>  					 le32_to_cpu(desc->dptr),
+>  					 RX_BUF_SZ,
+> @@ -1949,7 +1947,7 @@ static netdev_tx_t ravb_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+>  	struct ravb_tstamp_skb *ts_skb;
+>  	struct ravb_tx_desc *desc;
+>  	unsigned long flags;
+> -	u32 dma_addr;
+> +	dma_addr_t dma_addr;
+>  	void *buffer;
+>  	u32 entry;
+>  	u32 len;
 
