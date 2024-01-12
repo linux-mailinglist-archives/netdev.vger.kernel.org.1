@@ -1,162 +1,154 @@
-Return-Path: <netdev+bounces-63367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECDB582C6FC
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 23:08:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 872AA82C76F
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 23:50:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D21C51C21D63
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 22:08:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F90B28398E
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 22:50:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0670417729;
-	Fri, 12 Jan 2024 22:08:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F36F518B0C;
+	Fri, 12 Jan 2024 22:50:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z/Hd5SsC"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UMx6ymTY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F7D4171DC;
-	Fri, 12 Jan 2024 22:08:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-78313f4d149so648486485a.1;
-        Fri, 12 Jan 2024 14:08:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705097292; x=1705702092; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=L+7rof0WGlCw1G9RYMZg6Un65fjMjn71sH8lI9OCckg=;
-        b=Z/Hd5SsC8hJoSqn1bBPk3BCewsKnbrtX4TLiG+sbOXGpqSGzxC2Y9LQlYqtHzNpLUS
-         7+THXT53qF2TPtHx7ufqfmtjhzdxBIbiCvtVt2ileWjG2dhyLiBw4SuH7UZCYIyRZ/hF
-         hEKF/VwSUaJVOsZ17EK+2bcr3wRs7+M1R8pbyrS+skXlEwHVMS9DgMy5KjS3fmLp65xU
-         Tmkbm5z+Lw5aiECBJ2y0MtunSNiTMGyDBSOBsI6AZO4ifH14AEo/kf/vswCwSdS0iesh
-         wPowlj1sxSv5rQk9r7tOopw7PTebAVhc4tQ6UJiUc1YDCpDq02DcdMNTRHhIdOKYdOTt
-         J8PQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705097292; x=1705702092;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=L+7rof0WGlCw1G9RYMZg6Un65fjMjn71sH8lI9OCckg=;
-        b=rN75zFfViFNf6tpZclYAcoYToadpMsPpkxMPRQxLVLcDyCcWYi5ZoA/93b64a3munO
-         jHp0t9AbY14RnJja5RgNiynEsOH/v5I2BipRcUgL5yFQRBRp9LNHNE0UI28UJu0mODj4
-         neXMnswO3F73biQTeTTrN280XuNU/D/wz5MTh28HwDN0m+DPc/bnmnmZTurfy1gz673Y
-         SOdUUWxmheOhIicRj23VfiSD8xT0HC7hz2G4dqjb8f6BXqTMeKV6rwEjP28ddv+4Giog
-         3Zh9tNWjYJHiLs+a4Y41VxPWUYxrxgVnRSG3jFyu/sLcX0lAUP1entYyVrX0xLkm9f75
-         BhLg==
-X-Gm-Message-State: AOJu0YzmIJw8e5bkWZStMuUFZJ9YECK8R4eNGyeUNBO2kynzngp3KaTw
-	Wll3fibGkm9ntwaGututirU=
-X-Google-Smtp-Source: AGHT+IFMWkakS3L4QJvpofeuSpyOj3jN5og4vYpEA7zXTSj2qfQO35AsSgQitanirAcz/0rgJsgdDg==
-X-Received: by 2002:a37:e20d:0:b0:783:35c0:d912 with SMTP id g13-20020a37e20d000000b0078335c0d912mr2433654qki.107.1705097292268;
-        Fri, 12 Jan 2024 14:08:12 -0800 (PST)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id cn3-20020a05622a248300b00429c8ae9b94sm1417880qtb.85.2024.01.12.14.08.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Jan 2024 14:08:11 -0800 (PST)
-Message-ID: <e1a9f5cf-d935-4754-9e8c-d34fcae000ed@gmail.com>
-Date: Fri, 12 Jan 2024 14:08:08 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48D3418B06
+	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 22:50:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <75243f6c-f316-47f5-89ae-f203174cd0ad@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1705099848;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7p5iISSMNnP3Z0sj/fzOFp1Qmq9AkIjImjGlrJuMPBk=;
+	b=UMx6ymTYFOZTTpXdFxF+j3GX+AEqc5o/IvRfJNdGHS29BokMAYqZ1NfLdS6BoC7zCtt3qb
+	ZOYyUCuZNBvgK4MaPSLTwP44CINRtyj6Zmi5FX6z3b8VOjM+U2ESR0r4OV/E2e8y3vUhc5
+	zIUZMCQ86IljNUIDLBOTSBPPr3mflQI=
+Date: Fri, 12 Jan 2024 14:50:41 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: ethernet: ravb: fix dma mapping failure handling
+Subject: Re: [PATCH v4 1/3] ss: add support for BPF socket-local storage
 Content-Language: en-US
-To: Nikita Yushchenko <nikita.yoush@cogentembedded.com>,
- Denis Kirjanov <dkirjanov@suse.de>, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Sergey Shtylyov <s.shtylyov@omp.ru>,
- Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
- Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
- Wolfram Sang <wsa+renesas@sang-engineering.com>,
- =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
- netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240112050639.405784-1-nikita.yoush@cogentembedded.com>
- <64deebbd-93d0-47dc-835e-f719655e076c@suse.de>
- <804a4586-1909-44ee-a40c-d9cb615f75ad@cogentembedded.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <804a4586-1909-44ee-a40c-d9cb615f75ad@cogentembedded.com>
+To: Quentin Deslandes <qde@naccy.de>
+Cc: David Ahern <dsahern@gmail.com>, Martin KaFai Lau
+ <martin.lau@kernel.org>, kernel-team@meta.com, netdev@vger.kernel.org
+References: <20240112140429.183344-1-qde@naccy.de>
+ <20240112140429.183344-2-qde@naccy.de>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20240112140429.183344-2-qde@naccy.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On 1/12/24 01:04, Nikita Yushchenko wrote:
-> 
-> 
-> 12.01.2024 14:56, Denis Kirjanov wrote:
->>
->>
->> On 1/12/24 08:06, Nikita Yushchenko wrote:
->>> dma_mapping_error() depends on getting full 64-bit dma_addr_t and does
->>> not work correctly if 32-bit value is passed instead.
->>>
->>> Fix handling of dma_map_single() failures on Rx ring entries:
->>> - do not store return value of dma_map_signle() in 32-bit variable,
->>> - do not use dma_mapping_error() against 32-bit descriptor field when
->>>    checking if unmap is needed, check for zero size instead.
->>
->> Hmm, something is wrong here since you're mixing DMA api and forced 
->> 32bit values.
->> if dma uses 32bit addresses then dma_addr_t need only be 32 bits wide
-> 
-> dma_addr_t is arch-wide type and it is 64bit on arm64
+On 1/12/24 6:04 AM, Quentin Deslandes wrote:
+> +static int bpf_map_opts_load_info(unsigned int map_id)
+> +{
+> +	struct bpf_map_info info = {};
+> +	uint32_t len = sizeof(info);
+> +	int fd;
+> +	int r;
+> +
+> +	if (bpf_map_opts.nr_maps == MAX_NR_BPF_MAP_ID_OPTS) {
+> +		fprintf(stderr, "ss: too many (> %u) BPF socket-local storage maps found, skipping map ID %u\n",
+> +			MAX_NR_BPF_MAP_ID_OPTS, map_id);
+> +		return 0;
+> +	}
+> +
+> +	fd = bpf_map_get_fd_by_id(map_id);
+> +	if (fd == -1) {
 
-Correct, does not mean all of the bits will be used, nor that there is 
-not an offset, see below.
+I also just noticed libbpf returns -errno (from libbpf_err_errno()), so better 
+check for < 0 here.
 
-> 
-> Still, some devices use 32-bit dma addresses.
-> Proper setting of dma masks and/of configuring iommu ensures that in no 
-> error case, dma address fits into 32 bits.
+> +		if (errno == -ENOENT)
+> +			return 0;
+> +
+> +		fprintf(stderr, "ss: cannot get fd for BPF map ID %u%s\n",
+> +			map_id, errno == EPERM ?
+> +			": missing root permissions, CAP_BPF, or CAP_SYS_ADMIN" : "");
+> +		return -1;
+> +	}
+> +
+> +	r = bpf_obj_get_info_by_fd(fd, &info, &len);
+> +	if (r) {
+> +		fprintf(stderr, "ss: failed to get info for BPF map ID %u\n",
+> +			map_id);
+> +		close(fd);
+> +		return -1;
+> +	}
+> +
+> +	if (info.type != BPF_MAP_TYPE_SK_STORAGE) {
+> +		fprintf(stderr, "ss: BPF map with ID %s has type '%s', expecting 'sk_storage'\n",
+> +			optarg, libbpf_bpf_map_type_str(info.type));
+> +		close(fd);
+> +		return -1;
+> +	}
+> +
+> +	bpf_map_opts.maps[bpf_map_opts.nr_maps].id = map_id;
+> +	bpf_map_opts.maps[bpf_map_opts.nr_maps++].fd = fd;
+> +
+> +	return 0;
+> +}
+> +
+> +static struct bpf_sk_storage_map_info *bpf_map_opts_get_info(
+> +	unsigned int map_id)
+> +{
+> +	unsigned int i;
+> +	int r;
+> +
+> +	for (i = 0; i < bpf_map_opts.nr_maps; ++i) {
+> +		if (bpf_map_opts.maps[i].id == map_id)
+> +			return &bpf_map_opts.maps[i];
+> +	}
+> +
+> +	r = bpf_map_opts_load_info(map_id);
+> +	if (r)
+> +		return NULL;
+> +
+> +	return &bpf_map_opts.maps[bpf_map_opts.nr_maps - 1];
+> +}
+> +
+> +static int bpf_map_opts_add_id(const char *optarg)
+> +{
+> +	size_t optarg_len;
+> +	unsigned long id;
+> +	char *end;
+> +
+> +	if (bpf_map_opts.show_all) {
+> +		bpf_map_opts_mixed_error();
+> +		return -1;
+> +	}
+> +
+> +	optarg_len = strlen(optarg);
+> +	id = strtoul(optarg, &end, 0);
+> +	if (end != optarg + optarg_len || id == 0 || id >= UINT32_MAX) {
+> +		fprintf(stderr, "ss: invalid BPF map ID %s\n", optarg);
+> +		return -1;
+> +	}
+> +
+> +	// Force lazy loading of the map's data.
+> +	if (!bpf_map_opts_get_info(id))
+> +		return -ENOENT;
 
-Yes, because dma_addr_t must be sized to the maximum supportable DMA 
-address in any given system, hence it is 64-bit for a 64-bit 
-architecture. If someone had a system with 32-bit DMA addressing 
-limitation, they could technically introduce a Kconfig option to narrow 
-dma_addr_t, not that this should ever be done. Anyway, I digress.
+nit. may be also "return -1;" here to be consistent with the above error returns.
 
-> Still, in error case dma_map_single() returns ~((dma_addr_t)0) which 
-> uses fill dma_addr_t width and gets corrupted if assigned to 32-bit 
-> value, then later call to dma_mapping_error() does not recognize it. The 
-> patch fixes exactly this issue.
+Other than the minor nits, lgtm, you can carry my ack in the next spin:
 
-Your patch is actually fine, but you might have to write a lot more 
-about it to tell the reviewers that it is fine.
+Acked-by: Martin KaFai Lau <martin.lau@kernel.org>
 
-At the very least you should explain that in case of DMA mapping failure 
-by ravb_rx_ring_format_gbeth() and ravb_rx_ring_format_rcar(), the 
-dsecriptor's ds_cc field is written to 0 to denote a mapping failure.
-
-Note that we will still write a dma_addr_t cookie that corresponds to an 
-error, but this may be OK, because the hardware looks for a ds_cc != 0 
-to determine whether to DMA the packet into memory or not.
-
-Because of the convention established in ravb_rx_ring_format_gbeth() and 
-ravb_rx_ring_format_rcar(), checking for ds_cc == 0 to denote a mapping 
-error in ravb_rx_ring_free_gbeth() and ravb_rx_ring_free_rcar() is an 
-acceptable way of checking for a valid mapping.
-
-What is however not valid, is that again, we use desc->dptr and pass 
-that to dma_unmap_single() which would expect the non-truncated 
-dma_addr_t. Again, probably works by design, chance, whatever, but is 
-not supposed to be done that way.
-
-It looks like the hardware is limited to 32-bit of DMA addressing, and 
-assumes that the dma_addr_t cookie is 0-indexed, which may very well be 
-the case, even with 64-bit SoCs thanks to an IOMMU.
-
-It would feel a lot more comfortable if there was an actual check on the 
-upper 32-bits of dma_addr_t being zero, and issue a big fat warning in 
-case they are not.
-
-Thanks!
--- 
-Florian
 
 
