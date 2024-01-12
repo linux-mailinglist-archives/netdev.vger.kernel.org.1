@@ -1,131 +1,119 @@
-Return-Path: <netdev+bounces-63228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 325EB82BE20
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 11:10:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E0AC82BE21
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 11:10:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C83DB1F21B59
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 10:10:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D123D1F21BE1
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 10:10:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 932105C8FE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0E485D8FB;
 	Fri, 12 Jan 2024 10:10:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FD695D73A
-	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 10:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B4D85D757
+	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 10:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-360a0a5a87dso37664395ab.0
-        for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 02:10:28 -0800 (PST)
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7bedda4c4dfso282097039f.0
+        for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 02:10:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1705054228; x=1705659028;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=wq/Neynlo7rd9EMdFfz+w2uSTNXBQrlV6BSSyVMmA8Q=;
-        b=WP0VYggQ/IIvAf0cgIxyNcUb0hypbssNnqaGqZx5CudocyXNSsnVA3Rvs/St3EoShm
-         nd6xG962CiniC88GCTRwFEhykWpRnd+37pp4vq6gRhxcmRtN6+un5/7Duv+nPwe6Rg6B
-         yIueRxpCJ3GVqCFmnWUvIMR/RhWSix2f1kilfHp2kB7igTBmqMFe1uUwMY9+oUPXpMoM
-         +UtxBE3DX9WL9nBvBO3FjfY8JK2ZXHQ76Vvc3cWhEOyThXw1NXLN2U6/ZDGY45v4mcwI
-         gmq4Zdr2QVP1FD3zkqdP7FDq7I8smxmJHBP//Gx3//TJAGWIlaZ9vUTleQTpMn09osQ2
-         U0Yw==
-X-Gm-Message-State: AOJu0YwQsF7PFjSSRfyO4Zm7oDq4wcfHikwhttfXfesuqFshgU8xFm8g
-	DzJ/boigEDsL8lcrpDj30H5t033vQZsjhk9MV45KwObXJTRA
-X-Google-Smtp-Source: AGHT+IGl20DykQgHikEGY9DrhP3cYgtQLM3BTHK1OM3/ZjSp1AaJonRlHFb8otrnOonC0bofGF4ls+S9ysIJU+N+zqF654IKs5Ax
+        bh=Euu7bu6YWRVOm3+DN9txsl6HaM+CK5i+lJP0EdvbHOw=;
+        b=MCR5qXWp0jxL11ngfjm0orifzTAZz2leZaX+SxEoggWoxe8mQYoy94vI5SO0lS+a76
+         8wh4SgjXWkdYOIt9gTmkfZEns2J9xX+fUUCzU27zvShFvEoU7C5+RcUduKEEbNgJrTop
+         40+uZ/JCf2iGiYQd2LTsOxMKPj8Sde0OgSwVGQ0O0sibsRnE52kD69UwHuNxuwJHIJtd
+         t4ZDW1QwhF2dBe1HjPy3m1lyal/p5zFAdoyYwjPCE59Mq2aATxLnSiro/7RaGWMFmc2r
+         B1DqrqVrGc2rZWCfKc2Up+1Ozkpj82FwJ64o6UGrDvyc3cdz5W5jWg6e39iegYw5gi6E
+         bFAQ==
+X-Gm-Message-State: AOJu0Yz/dIae5PamQKAXU+GmFd0I81OvyCeQgXG1XI3Urk6h42vaKLyb
+	A5Oaew/QOeaGsCjT6US6oww/j/cu54TVVoX0iuvxIwfH9Jf5
+X-Google-Smtp-Source: AGHT+IGodp0l2JaVAyCi7GqIrafB7tYlXZ/nL630GRF5+Es3ScU9XkkgNQwju2qzQzPDo4N+yaLP3hZpEZN3muYxgIlZVOr0/3wN
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:16cf:b0:35f:b1e7:cac with SMTP id
- 15-20020a056e0216cf00b0035fb1e70cacmr38175ilx.4.1705054228268; Fri, 12 Jan
+X-Received: by 2002:a05:6638:1345:b0:46e:5639:8eeb with SMTP id
+ u5-20020a056638134500b0046e56398eebmr81551jad.1.1705054228593; Fri, 12 Jan
  2024 02:10:28 -0800 (PST)
 Date: Fri, 12 Jan 2024 02:10:28 -0800
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000994e09060ebcdffb@google.com>
-Subject: [syzbot] [net?] KCSAN: data-race in ipv6_mc_down / mld_ifc_work (2)
-From: syzbot <syzbot+a9400cabb1d784e49abf@syzkaller.appspotmail.com>
+Message-ID: <0000000000009e46c3060ebcdffd@google.com>
+Subject: [syzbot] [net?] KCSAN: data-race in udpv6_sendmsg / udpv6_sendmsg (6)
+From: syzbot <syzbot+8d482d0e407f665d9d10@syzkaller.appspotmail.com>
 To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
 	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
+	willemdebruijn.kernel@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 
 Hello,
 
 syzbot found the following issue on:
 
-HEAD commit:    8735c7c84d1b Merge tag '6.7rc7-smb3-srv-fix' of git://git...
+HEAD commit:    0dd3ee311255 Linux 6.7
 git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17948c9ae80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=4da1e2da456c3a7d
-dashboard link: https://syzkaller.appspot.com/bug?extid=a9400cabb1d784e49abf
+console output: https://syzkaller.appspot.com/x/log.txt?x=1713a06de80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=1bb2daade28c90a5
+dashboard link: https://syzkaller.appspot.com/bug?extid=8d482d0e407f665d9d10
 compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
 Unfortunately, I don't have any reproducer for this issue yet.
 
 Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/f263d974af01/disk-8735c7c8.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/9faf34fc0b3e/vmlinux-8735c7c8.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/0b52a58ecd0e/bzImage-8735c7c8.xz
+disk image: https://storage.googleapis.com/syzbot-assets/b3bdaecbc4f5/disk-0dd3ee31.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/6656b77ef58a/vmlinux-0dd3ee31.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/85fa7f08c720/bzImage-0dd3ee31.xz
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+a9400cabb1d784e49abf@syzkaller.appspotmail.com
+Reported-by: syzbot+8d482d0e407f665d9d10@syzkaller.appspotmail.com
 
 ==================================================================
-BUG: KCSAN: data-race in ipv6_mc_down / mld_ifc_work
+BUG: KCSAN: data-race in udpv6_sendmsg / udpv6_sendmsg
 
-write to 0xffff88813a80c832 of 1 bytes by task 3771 on cpu 0:
- mld_ifc_stop_work net/ipv6/mcast.c:1080 [inline]
- ipv6_mc_down+0x10a/0x280 net/ipv6/mcast.c:2725
- addrconf_ifdown+0xe32/0xf10 net/ipv6/addrconf.c:3949
- addrconf_notify+0x310/0x980
- notifier_call_chain kernel/notifier.c:93 [inline]
- raw_notifier_call_chain+0x6b/0x1c0 kernel/notifier.c:461
- __dev_notify_flags+0x205/0x3d0
- dev_change_flags+0xab/0xd0 net/core/dev.c:8685
- do_setlink+0x9f6/0x2430 net/core/rtnetlink.c:2916
- rtnl_group_changelink net/core/rtnetlink.c:3458 [inline]
- __rtnl_newlink net/core/rtnetlink.c:3717 [inline]
- rtnl_newlink+0xbb3/0x1670 net/core/rtnetlink.c:3754
- rtnetlink_rcv_msg+0x807/0x8c0 net/core/rtnetlink.c:6558
- netlink_rcv_skb+0x126/0x220 net/netlink/af_netlink.c:2545
- rtnetlink_rcv+0x1c/0x20 net/core/rtnetlink.c:6576
- netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
- netlink_unicast+0x589/0x650 net/netlink/af_netlink.c:1368
- netlink_sendmsg+0x66e/0x770 net/netlink/af_netlink.c:1910
+write to 0xffff88814e5eadf0 of 4 bytes by task 15547 on cpu 1:
+ udpv6_sendmsg+0x1405/0x1530 net/ipv6/udp.c:1596
+ inet6_sendmsg+0x63/0x80 net/ipv6/af_inet6.c:657
  sock_sendmsg_nosec net/socket.c:730 [inline]
  __sock_sendmsg net/socket.c:745 [inline]
- ____sys_sendmsg+0x37c/0x4d0 net/socket.c:2584
- ___sys_sendmsg net/socket.c:2638 [inline]
- __sys_sendmsg+0x1e9/0x270 net/socket.c:2667
- __do_sys_sendmsg net/socket.c:2676 [inline]
- __se_sys_sendmsg net/socket.c:2674 [inline]
- __x64_sys_sendmsg+0x46/0x50 net/socket.c:2674
+ __sys_sendto+0x257/0x310 net/socket.c:2192
+ __do_sys_sendto net/socket.c:2204 [inline]
+ __se_sys_sendto net/socket.c:2200 [inline]
+ __x64_sys_sendto+0x78/0x90 net/socket.c:2200
  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
  do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
  entry_SYSCALL_64_after_hwframe+0x63/0x6b
 
-write to 0xffff88813a80c832 of 1 bytes by task 22 on cpu 1:
- mld_ifc_work+0x54c/0x7b0 net/ipv6/mcast.c:2653
- process_one_work kernel/workqueue.c:2627 [inline]
- process_scheduled_works+0x5b8/0xa30 kernel/workqueue.c:2700
- worker_thread+0x525/0x730 kernel/workqueue.c:2781
- kthread+0x1d7/0x210 kernel/kthread.c:388
- ret_from_fork+0x48/0x60 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+read to 0xffff88814e5eadf0 of 4 bytes by task 15551 on cpu 0:
+ udpv6_sendmsg+0x22c/0x1530 net/ipv6/udp.c:1373
+ inet6_sendmsg+0x63/0x80 net/ipv6/af_inet6.c:657
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg net/socket.c:745 [inline]
+ ____sys_sendmsg+0x37c/0x4d0 net/socket.c:2586
+ ___sys_sendmsg net/socket.c:2640 [inline]
+ __sys_sendmmsg+0x269/0x500 net/socket.c:2726
+ __do_sys_sendmmsg net/socket.c:2755 [inline]
+ __se_sys_sendmmsg net/socket.c:2752 [inline]
+ __x64_sys_sendmmsg+0x57/0x60 net/socket.c:2752
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
 
-value changed: 0x02 -> 0x00
+value changed: 0x00000000 -> 0x0000000a
 
 Reported by Kernel Concurrency Sanitizer on:
-CPU: 1 PID: 22 Comm: kworker/1:0 Not tainted 6.7.0-rc7-syzkaller-00029-g8735c7c84d1b #0
+CPU: 0 PID: 15551 Comm: syz-executor.1 Tainted: G        W          6.7.0-syzkaller #0
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-Workqueue: mld mld_ifc_work
 ==================================================================
 
 
