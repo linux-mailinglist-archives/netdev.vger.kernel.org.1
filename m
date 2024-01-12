@@ -1,384 +1,118 @@
-Return-Path: <netdev+bounces-63334-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F14482C540
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 19:10:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B3C5D82C555
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 19:21:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D508B286982
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 18:10:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2C3A283A00
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 18:21:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96D4C25605;
-	Fri, 12 Jan 2024 18:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D11932560E;
+	Fri, 12 Jan 2024 18:21:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MuHtLzoo"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="VliK7r02"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6C5625600
-	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 18:10:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <f8eb6938-a59b-4bd0-b40c-ae08ca15b461@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1705083020;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fh0t9ki4HKGtSw3nksSkGLoPBFn73fGFe3w1R8ocLDw=;
-	b=MuHtLzoo22wFxg9Ha9N/eU831witnyVo7kChxFKvgQsW2hLif3w5Y/pjFOKSlm8yLt8WhE
-	Y+0qvl3d5/UpEOl7xkovLiJOwKOyXTOajwQEzidm11N7jB0SmUy1XrC3+n50ZTwkNW3HJd
-	c5orN531rB0djHCyWz5GY+wHMXl1fvE=
-Date: Fri, 12 Jan 2024 10:10:11 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5231C2560B
+	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 18:21:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a28d61ba65eso797159566b.3
+        for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 10:21:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1705083696; x=1705688496; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=14b9T7PZxdbFdXGn+MH2oJNUOLJxpmLpLYeM7eBbetg=;
+        b=VliK7r02DTk7i5kuVWvuEDn4KmavBw4zFW9efbDwnj7MVmtQFEloEm0tJ5XufJ3syh
+         EddCQOcCcxiQj2UXZYGjAoEu98m7Kc5wbwWp2PgcNnaKpi35yoiXlPAWVQtwaOiYNfXT
+         es2wqpkETDH4utOSo4mBTjUmPntV50UWr5lbs9PkKbJYTW4/6AMmYPQdNZov8G80LT9m
+         ujV+ryU6N7cLCx2HkItx6A/IEu2FeJDdZTbPTj+Dyv/yIAfM/CbdXvB0V4N2HznmhsEJ
+         jF4Ll/B/ePbI6Uu3RsaRHy1UB/MCY8rCnY8Q+nSOWQ8W2Jcv4JGgNUYmfGVAwfgFbza0
+         B8CA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705083696; x=1705688496;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=14b9T7PZxdbFdXGn+MH2oJNUOLJxpmLpLYeM7eBbetg=;
+        b=FhwT+7M1ErY+jOm8qSQTJyIB9CVPLHowq9aanvd0FUuA6+wf/RdLDHtC7tQCGvHURO
+         GM6uRgq7UZCSZrcjaPnunEUD6jVnmpqA0qDkc6kJBGzEDDlXhZGIf62exjB6lmH1Zetp
+         PUjmDlhyw5jHdChW2vzKOlL0U4SHTrhmmEpJFMdNSfTQKWacW9UB83kQRR6y9pw4g1fu
+         FWq2rqIVF30IR6C0oTY/p/aIyYdQqXbXGnX0T9O7isNdFycZEcZxzLez0zoyImeD2Fg2
+         gayxcYNcV9T2nGzEGmjoL6eKwC9THbYl+G0C4/E++7iqgb4Jr0NMIDGCP7eq98AYAYMY
+         bv1Q==
+X-Gm-Message-State: AOJu0Ywp748TJrIjyx4okIrULDwm4abXMkmx6Fi4HWceJcqwlxI77RrL
+	sRIlIP85SvQbhsO9BaXpKKzD6tV5QBNzs3ny0UUVemoKI48=
+X-Google-Smtp-Source: AGHT+IHpgwGIw8umLV4iSqXUyQlN61/mtX485Bwjt10Z9Q23eBzb6XOV6Y00ForC0kzRNQBR75eDqQ==
+X-Received: by 2002:a17:906:615:b0:a2c:8872:60d4 with SMTP id s21-20020a170906061500b00a2c887260d4mr653064ejb.22.1705083696336;
+        Fri, 12 Jan 2024 10:21:36 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id i4-20020a17090639c400b00a27a766c6c8sm2047440eje.218.2024.01.12.10.21.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Jan 2024 10:21:35 -0800 (PST)
+Date: Fri, 12 Jan 2024 19:21:34 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH iproute2] man/tc-mirred: don't recommend modprobe
+Message-ID: <ZaGDLociGHMaumZY@nanopsycho>
+References: <20240111193451.48833-1-stephen@networkplumber.org>
+ <ZaE0PxX_NjxNyMEA@nanopsycho>
+ <20240112090915.67f2417a@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 bpf 3/3] selftests/bpf: Test udp and tcp iter batching
-Content-Language: en-US
-To: Yonghong Song <yonghong.song@linux.dev>
-Cc: 'Alexei Starovoitov ' <ast@kernel.org>,
- 'Andrii Nakryiko ' <andrii@kernel.org>,
- 'Daniel Borkmann ' <daniel@iogearbox.net>, netdev@vger.kernel.org,
- kernel-team@meta.com, bpf@vger.kernel.org
-References: <20240110175743.2220907-1-martin.lau@linux.dev>
- <20240110175743.2220907-4-martin.lau@linux.dev>
- <e69f86ff-9751-4d06-a2d7-778d23b79fe1@linux.dev>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <e69f86ff-9751-4d06-a2d7-778d23b79fe1@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240112090915.67f2417a@hermes.local>
 
-On 1/12/24 9:50 AM, Yonghong Song wrote:
->> diff --git a/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c 
->> b/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c
->> new file mode 100644
->> index 000000000000..55b1f3f3d862
->> --- /dev/null
->> +++ b/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c
->> @@ -0,0 +1,130 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +// Copyright (c) 2024 Meta
->> +
->> +#include <test_progs.h>
->> +#include "network_helpers.h"
->> +#include "sock_iter_batch.skel.h"
->> +
->> +#define TEST_NS "sock_iter_batch_netns"
->> +
->> +static const int nr_soreuse = 4;
->> +
->> +static void do_test(int sock_type, bool onebyone)
->> +{
->> +    int err, i, nread, to_read, total_read, iter_fd = -1;
->> +    int first_idx, second_idx, indices[nr_soreuse];
->> +    struct bpf_link *link = NULL;
->> +    struct sock_iter_batch *skel;
->> +    int *fds[2] = {};
->> +
->> +    skel = sock_iter_batch__open();
->> +    if (!ASSERT_OK_PTR(skel, "sock_iter_batch__open"))
->> +        return;
->> +
->> +    /* Prepare 2 buckets of sockets in the kernel hashtable */
->> +    for (i = 0; i < ARRAY_SIZE(fds); i++) {
->> +        fds[i] = start_reuseport_server(AF_INET6, sock_type, "::1", 0, 0,
->> +                        nr_soreuse);
->> +        if (!ASSERT_OK_PTR(fds[i], "start_reuseport_server"))
->> +            goto done;
->> +        skel->rodata->ports[i] = ntohs(get_socket_local_port(*fds[i]));
-> 
-> should we ASSERT whether get_socket_local_port() returns a valid port or not?
-> cgroup_tcp_skb.c and sock_destroy.c have similar usage of get_socket_local_port()
-> and they all have ASSERT on the return value.
+Fri, Jan 12, 2024 at 06:09:15PM CET, stephen@networkplumber.org wrote:
+>On Fri, 12 Jan 2024 13:44:47 +0100
+>Jiri Pirko <jiri@resnulli.us> wrote:
+>
+>> Thu, Jan 11, 2024 at 08:34:44PM CET, stephen@networkplumber.org wrote:
+>> >Use ip link add instead of explicit modprobe.
+>> >Kernel will do correct module loading if necessary.
+>> >
+>> >Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+>> >---
+>> > man/man8/tc-mirred.8 | 3 +--
+>> > 1 file changed, 1 insertion(+), 2 deletions(-)
+>> >
+>> >diff --git a/man/man8/tc-mirred.8 b/man/man8/tc-mirred.8
+>> >index 38833b452d92..2d9795b1b16f 100644
+>> >--- a/man/man8/tc-mirred.8
+>> >+++ b/man/man8/tc-mirred.8
+>> >@@ -84,8 +84,7 @@ interface, it is possible to send ingress traffic through an instance of
+>> > 
+>> > .RS
+>> > .EX
+>> >-# modprobe ifb
+>> >-# ip link set ifb0 up
+>> >+# ip link add dev ifb0 type ifb  
+>> 
+>> RTNETLINK answers: File exists
+>> 
+>> You can't add "ifb0" like this, it is created implicitly on module probe
+>> time. Pick a different name.
+>
+>Right.
+>Looks like ifb is behaving differently than other devices.
+>For example, doing modprobe of dummy creates no device.
 
-Ack.
+Older drivers did do this. Bonding modprobe also created bond0 in
+the past. Now it does not. I guess ifb behaviour could be changed as
+well.
 
-> 
->> +    }
->> +
->> +    err = sock_iter_batch__load(skel);
->> +    if (!ASSERT_OK(err, "sock_iter_batch__load"))
->> +        goto done;
->> +
->> +    link = bpf_program__attach_iter(sock_type == SOCK_STREAM ?
->> +                    skel->progs.iter_tcp_soreuse :
->> +                    skel->progs.iter_udp_soreuse,
->> +                    NULL);
->> +    if (!ASSERT_OK_PTR(link, "bpf_program__attach_iter"))
->> +        goto done;
->> +
->> +    iter_fd = bpf_iter_create(bpf_link__fd(link));
->> +    if (!ASSERT_GE(iter_fd, 0, "bpf_iter_create"))
->> +        goto done;
->> +
->> +    /* Test reading a bucket (either from fds[0] or fds[1]).
->> +     * Only read "nr_soreuse - 1" number of sockets
->> +     * from a bucket and leave one socket out from
->> +     * that bucket on purpose.
->> +     */
->> +    to_read = (nr_soreuse - 1) * sizeof(*indices);
->> +    total_read = 0;
->> +    first_idx = -1;
->> +    do {
->> +        nread = read(iter_fd, indices, onebyone ? sizeof(*indices) : to_read);
->> +        if (nread <= 0 || nread % sizeof(*indices))
->> +            break;
->> +        total_read += nread;
->> +
->> +        if (first_idx == -1)
->> +            first_idx = indices[0];
->> +        for (i = 0; i < nread / sizeof(*indices); i++)
->> +            ASSERT_EQ(indices[i], first_idx, "first_idx");
->> +    } while (total_read < to_read);
->> +    ASSERT_EQ(nread, onebyone ? sizeof(*indices) : to_read, "nread");
->> +    ASSERT_EQ(total_read, to_read, "total_read");
->> +
->> +    free_fds(fds[first_idx], nr_soreuse);
->> +    fds[first_idx] = NULL;
->> +
->> +    /* Read the "whole" second bucket */
->> +    to_read = nr_soreuse * sizeof(*indices);
->> +    total_read = 0;
->> +    second_idx = !first_idx;
->> +    do {
->> +        nread = read(iter_fd, indices, onebyone ? sizeof(*indices) : to_read);
->> +        if (nread <= 0 || nread % sizeof(*indices))
->> +            break;
->> +        total_read += nread;
->> +
->> +        for (i = 0; i < nread / sizeof(*indices); i++)
->> +            ASSERT_EQ(indices[i], second_idx, "second_idx");
->> +    } while (total_read <= to_read);
->> +    ASSERT_EQ(nread, 0, "nread");
->> +    /* Both so_reuseport ports should be in different buckets, so
->> +     * total_read must equal to the expected to_read.
->> +     *
->> +     * For a very unlikely case, both ports collide at the same bucket,
->> +     * the bucket offset (i.e. 3) will be skipped and it cannot
->> +     * expect the to_read number of bytes.
->> +     */
->> +    if (skel->bss->bucket[0] != skel->bss->bucket[1])
->> +        ASSERT_EQ(total_read, to_read, "total_read");
->> +
->> +done:
->> +    for (i = 0; i < ARRAY_SIZE(fds); i++)
->> +        free_fds(fds[i], nr_soreuse);
->> +    if (iter_fd != -1)
-> 
-> iter_fd < 0?
-> bpf_iter_create() returns libbpf_err_errno(fd) and
-> libbpf_err_errno() returns -errno in case of error.
-
-Good catch. will fix.
-
-> 
->> +        close(iter_fd);
->> +    bpf_link__destroy(link);
->> +    sock_iter_batch__destroy(skel);
->> +}
->> +
-> [...]
->> diff --git a/tools/testing/selftests/bpf/progs/bpf_tracing_net.h 
->> b/tools/testing/selftests/bpf/progs/bpf_tracing_net.h
->> index 0b793a102791..8cc2e869b34b 100644
->> --- a/tools/testing/selftests/bpf/progs/bpf_tracing_net.h
->> +++ b/tools/testing/selftests/bpf/progs/bpf_tracing_net.h
->> @@ -71,6 +71,8 @@
->>   #define inet_rcv_saddr        sk.__sk_common.skc_rcv_saddr
->>   #define inet_dport        sk.__sk_common.skc_dport
->> +#define udp_portaddr_hash    inet.sk.__sk_common.skc_u16hashes[1]
->> +
->>   #define ir_loc_addr        req.__req_common.skc_rcv_saddr
->>   #define ir_num            req.__req_common.skc_num
->>   #define ir_rmt_addr        req.__req_common.skc_daddr
->> @@ -84,6 +86,7 @@
->>   #define sk_rmem_alloc        sk_backlog.rmem_alloc
->>   #define sk_refcnt        __sk_common.skc_refcnt
->>   #define sk_state        __sk_common.skc_state
->> +#define sk_net            __sk_common.skc_net
->>   #define sk_v6_daddr        __sk_common.skc_v6_daddr
->>   #define sk_v6_rcv_saddr        __sk_common.skc_v6_rcv_saddr
->>   #define sk_flags        __sk_common.skc_flags
->> diff --git a/tools/testing/selftests/bpf/progs/sock_iter_batch.c 
->> b/tools/testing/selftests/bpf/progs/sock_iter_batch.c
->> new file mode 100644
->> index 000000000000..cc2181f95046
->> --- /dev/null
->> +++ b/tools/testing/selftests/bpf/progs/sock_iter_batch.c
->> @@ -0,0 +1,121 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +// Copyright (c) 2024 Meta
->> +
->> +#include "vmlinux.h"
->> +#include <bpf/bpf_helpers.h>
->> +#include <bpf/bpf_core_read.h>
->> +#include <bpf/bpf_endian.h>
->> +#include "bpf_tracing_net.h"
->> +#include "bpf_kfuncs.h"
->> +
->> +/* __always_inline to avoid the unused function warning for jhash() */
-> 
-> The above comments are not precise. Without below define ATTR,
-> the compilation error message:
-> 
-> In file included from progs/sock_iter_batch.c:13:
-> progs/test_jhash.h:35:8: error: unknown type name 'ATTR'
->     35 | static ATTR
->        |        ^
-> progs/test_jhash.h:36:4: error: expected ';' after top level declarator
->     36 | u32 jhash(const void *key, u32 length, u32 initval)
->        |    ^
->        |    ;
-> 2 errors generated.
-> 
-> I think the comment is not needed. It will be self-explanary
-> if people look at test_jhash.h. Or you could add
-
-The intention is to explain why "#define ATTR __attribute__((noinline))" was not 
-used instead.
-
-> 
->> +#define ATTR __always_inline
->> +#include "test_jhash.h"
->> +
->> +static u32 jhash2(const u32 *k, u32 length, u32 initval)
->> +{
->> +    u32 a, b, c;
->> +
->> +    /* Set up the internal state */
->> +    a = b = c = JHASH_INITVAL + (length<<2) + initval;
->> +
->> +    /* Handle most of the key */
->> +    while (length > 3) {
->> +        a += k[0];
->> +        b += k[1];
->> +        c += k[2];
->> +        __jhash_mix(a, b, c);
->> +        length -= 3;
->> +        k += 3;
->> +    }
->> +
->> +    /* Handle the last 3 u32's */
->> +    switch (length) {
->> +    case 3: c += k[2];
->> +    case 2: b += k[1];
->> +    case 1: a += k[0];
->> +        __jhash_final(a, b, c);
->> +        break;
->> +    case 0:    /* Nothing left to add */
->> +        break;
->> +    }
->> +
->> +    return c;
->> +}
-> 
-> You could add the above function to test_jhash.h as well
-> for future reuse. But I am also okay not moving it since
-> this is the only usage for now.
-
-Yep, it could be moved to test_jhash.h but other existing *.c (e.g. 
-test_verif_scale1.c) using test_jhash.h will have the unused function compiler 
-warning, so I put it here instead.
-
-I will move it test_jhash.h and stay with __always_inline for jhash"2" instead 
-of ATTR in v3.
-
-> 
->> +
->> +static bool ipv6_addr_loopback(const struct in6_addr *a)
->> +{
->> +    return (a->s6_addr32[0] | a->s6_addr32[1] |
->> +        a->s6_addr32[2] | (a->s6_addr32[3] ^ bpf_htonl(1))) == 0;
->> +}
->> +
->> +volatile const __u16 ports[2];
->> +unsigned int bucket[2];
->> +
->> +SEC("iter/tcp")
->> +int iter_tcp_soreuse(struct bpf_iter__tcp *ctx)
->> +{
->> +    struct sock *sk = (struct sock *)ctx->sk_common;
->> +    struct inet_hashinfo *hinfo;
->> +    unsigned int hash;
->> +    struct net *net;
->> +    int idx;
->> +
->> +    if (!sk)
->> +        return 0;
->> +
->> +    sk = bpf_rdonly_cast(sk, bpf_core_type_id_kernel(struct sock));
->> +    if (sk->sk_family != AF_INET6 ||
->> +        sk->sk_state != TCP_LISTEN ||
->> +        !ipv6_addr_loopback(&sk->sk_v6_rcv_saddr))
->> +        return 0;
->> +
->> +    if (sk->sk_num == ports[0])
->> +        idx = 0;
->> +    else if (sk->sk_num == ports[1])
->> +        idx = 1;
->> +    else
->> +        return 0;
->> +
->> +    net = sk->sk_net.net;
->> +    hash = jhash2(sk->sk_v6_rcv_saddr.s6_addr32, 4, net->hash_mix);
->> +    hash ^= sk->sk_num;
->> +    hinfo = net->ipv4.tcp_death_row.hashinfo;
->> +    bucket[idx] = hash & hinfo->lhash2_mask;
->> +    bpf_seq_write(ctx->meta->seq, &idx, sizeof(idx));
-> 
-> Maybe add a little bit comments to refer to the corresponding
-> kernel implementation of computing the hash? This will make
-> cross-checking easier. The same for below udp hash computation.
-
-Ack.
-
-Thanks for the review!
-
-> 
->> +
->> +    return 0;
->> +}
->> +
->> +#define udp_sk(ptr) container_of(ptr, struct udp_sock, inet.sk)
->> +
->> +SEC("iter/udp")
->> +int iter_udp_soreuse(struct bpf_iter__udp *ctx)
->> +{
->> +    struct sock *sk = (struct sock *)ctx->udp_sk;
->> +    struct udp_table *udptable;
->> +    int idx;
->> +
->> +    if (!sk)
->> +        return 0;
->> +
->> +    sk = bpf_rdonly_cast(sk, bpf_core_type_id_kernel(struct sock));
->> +    if (sk->sk_family != AF_INET6 ||
->> +        !ipv6_addr_loopback(&sk->sk_v6_rcv_saddr))
->> +        return 0;
->> +
->> +    if (sk->sk_num == ports[0])
->> +        idx = 0;
->> +    else if (sk->sk_num == ports[1])
->> +        idx = 1;
->> +    else
->> +        return 0;
->> +
->> +    udptable = sk->sk_net.net->ipv4.udp_table;
->> +    bucket[idx] = udp_sk(sk)->udp_portaddr_hash & udptable->mask;
->> +    bpf_seq_write(ctx->meta->seq, &idx, sizeof(idx));
->> +
->> +    return 0;
->> +}
->> +
->> +char _license[] SEC("license") = "GPL";
-
+>
+>
 
