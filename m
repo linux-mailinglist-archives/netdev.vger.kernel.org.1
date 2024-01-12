@@ -1,71 +1,73 @@
-Return-Path: <netdev+bounces-63262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A973482BFF8
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 13:49:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 054E882C02D
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 13:56:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EEB81F24ADD
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 12:49:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 946C41F21859
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 12:56:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D07A86A34B;
-	Fri, 12 Jan 2024 12:49:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F5C559B64;
+	Fri, 12 Jan 2024 12:56:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="D8oHWZ+a"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="O5qQm374"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6729859B5C
-	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 12:49:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB55B59B4E
+	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 12:56:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-55817a12ad8so4172008a12.2
-        for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 04:49:12 -0800 (PST)
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a28b1095064so712090166b.2
+        for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 04:56:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1705063751; x=1705668551; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1705064181; x=1705668981; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WdAL1zvj3PJjg4O7JY3bfPCKfGnZforu7n0vE87MDuk=;
-        b=D8oHWZ+arIEIEzfh9XxfgHMz3g0kdveaqeqo1olqxD1L6tR+6XISyxgsuA+1dF2TDG
-         0ZoJ/EiA8i6YZ8NZvZxO0HxBLND/vOVmqRJV/JdzuSRwCouIWvus0P1F0GGwCkeCP6YW
-         QDcI4f81i/imLCSKlwyyEMLaN/qM81+T7u9wnW8b5SYW76k9FADi+DNz7WPqxyj16WAn
-         QObJw3jE2V2wNEj7REQPuilHYs5/Y8Vd+RG1U9hpzCXF1bXkxVacaBj7pL3IadyIw2AR
-         X7/IE2OPoYK3yZ3PmLixvAmiPVmWiKzjw14p8ykpWt683yAF6AaBuFlHQWYzEbEc5Azx
-         9f7Q==
+        bh=xBU27MlZTqHSaK+9/DPt2UFYW7bDObb/k/9gGJLMPrg=;
+        b=O5qQm374NVsuLP81ChDSX3i0slk0AY+IGa6tQKfb51rsy244fuilpRVmAwBAtkgDiL
+         44LPM2daVtOkpftsVlS6a370BPG/FVpwuOBbA+i5ERyz4Yaycmr/BDOw5/5RW7Hfz9zj
+         JNc4pC3BBoSvdyKBk6EohBXsZQ+G1SxEnq1GOgNeuKQY0pcvUolsZEAMT8Ns3EzVoCo/
+         NZY8/IT1mfBAKcOAj+p48qrTTdMl2Uvb74hpi8qNNMNQQoXi6xGjnqUorvE7Te5b69he
+         peXBn7TD6QJJtr6TmA/1MUAytREK07W3IMcJ5dqWseQC3V2I8Ff+a08S0uEFjKKU44MX
+         2dYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705063751; x=1705668551;
+        d=1e100.net; s=20230601; t=1705064181; x=1705668981;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WdAL1zvj3PJjg4O7JY3bfPCKfGnZforu7n0vE87MDuk=;
-        b=oZn0iscU4hsdQ3ZTomX5e9vSdetU6Iri7xtviXCU0+IR+2Zq+WYjPpizuzbMNoZ9tj
-         3+UJA9Y9Ip4KIZphnK1IILy8i6T8Tg8KX17vCybx3MpebVMgPBBmyzamGaa7++QmnvU5
-         xqJ99c//IOfTBzijWYfanD21p1noob/YpkSrDsHV9oXSWcc5jT9Cx5xrm2V4OyYw8IO9
-         kwUJ7VnKZLxlN4dML7f1qcfnIPgj8F7Vcd59UPDj9O435lgYVK6HaYwtB96VLtPPb+6V
-         cj4N0UiFMYdNDLUqqlnGXY3w9ncSN8xtVca/+XFwQSI9IVmPR3Xfl3JDppbExFUrYFZA
-         uZGg==
-X-Gm-Message-State: AOJu0YyDKcgXorfsRdsz/rz1CNOpS1dAyp65FGo20hBlDf+UUUTozcaL
-	mvaL81uuyGR7xQUvJTEwka8NMfQAWQUABayyhkqvELOyJHc=
-X-Google-Smtp-Source: AGHT+IG2PJyT+YYuGiK7VUFhWoSoaiD+o4PXnQRvazHmTSb9/opKtMvaHm+NYI2TrbYkMviuWKIB0Q==
-X-Received: by 2002:a05:6402:5214:b0:558:c366:f010 with SMTP id s20-20020a056402521400b00558c366f010mr642520edd.24.1705063751364;
-        Fri, 12 Jan 2024 04:49:11 -0800 (PST)
+        bh=xBU27MlZTqHSaK+9/DPt2UFYW7bDObb/k/9gGJLMPrg=;
+        b=L8l3GUnX/Msu81vsFnKq2nUT2O2n2qq2iQEHDClsSejVZ4HIFmjjtK8b8VPOFFZa54
+         vWq37NdtIDyzPJxQerpbmGdaxTMbDr/RmAu6c4jRTyOsEyHqI8Wl0PjtZVKue0nK6dng
+         6OqNVso3s8WzoLCG2nTLgwUo7y1p0MkACFe3QGWF8x229O27qqJGRqRCP1U8AIVL9iOx
+         WS/miJV8TmRRTDB/mVc7eeA5nDWNauU+K4+yCXCUBYe6wOBc6y0uFrYWY4Sfc3owGsbP
+         JHXVpf7xPWMuNsu2MNwCpPh02f7Z4B4YBQegmbuZVx2185cKkTg8Zoo/e8+0/K4wg3go
+         /JLw==
+X-Gm-Message-State: AOJu0YzFNDMwBnVPV8i0rVOp5wdUAa5aenDSCy5Sbx5GBZJ7khDNkuYN
+	P84nCxluOG4Le97TmI93oGo7Q8FqQmXGgg==
+X-Google-Smtp-Source: AGHT+IFi3Xi8S8VOkUT686qJLuycjNVr+AkQBJHqrhrYDUCFIhQDogT0K0tvurM9Itkv5Zy3hAM33w==
+X-Received: by 2002:a17:907:20e3:b0:a2b:2615:25d1 with SMTP id rh3-20020a17090720e300b00a2b261525d1mr297878ejb.90.1705064181034;
+        Fri, 12 Jan 2024 04:56:21 -0800 (PST)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id fe7-20020a056402390700b0055668ccd9a3sm1754184edb.17.2024.01.12.04.49.10
+        by smtp.gmail.com with ESMTPSA id y23-20020a170906559700b00a269357c2e7sm1764202ejp.36.2024.01.12.04.56.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jan 2024 04:49:10 -0800 (PST)
-Date: Fri, 12 Jan 2024 13:49:09 +0100
+        Fri, 12 Jan 2024 04:56:20 -0800 (PST)
+Date: Fri, 12 Jan 2024 13:56:19 +0100
 From: Jiri Pirko <jiri@resnulli.us>
-To: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
-	netdev@vger.kernel.org, Jan Sokolowski <jan.sokolowski@intel.com>
-Subject: Re: [PATCH iwl-next v1 2/2] i40e-linux: Add support for reading
- Trace Buffer
-Message-ID: <ZaE1Ra8JQY4RoTTu@nanopsycho>
-References: <20240112095945.450590-1-jedrzej.jagielski@intel.com>
- <20240112095945.450590-3-jedrzej.jagielski@intel.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>,
+	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com,
+	syzbot+8d482d0e407f665d9d10@syzkaller.appspotmail.com
+Subject: Re: [PATCH net] udp: annotate data-races around up->pending
+Message-ID: <ZaE28zQdlP0hhWOD@nanopsycho>
+References: <20240112104427.324983-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,128 +76,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240112095945.450590-3-jedrzej.jagielski@intel.com>
+In-Reply-To: <20240112104427.324983-1-edumazet@google.com>
 
-Fri, Jan 12, 2024 at 10:59:45AM CET, jedrzej.jagielski@intel.com wrote:
->Currently after entering FW Recovery Mode we have no info in logs
->regarding current FW state.
+Fri, Jan 12, 2024 at 11:44:27AM CET, edumazet@google.com wrote:
+>up->pending can be read without holding the socket lock,
+>as pointed out by syzbot [1]
 >
->Add function reading content of the alternate RAM storing that info and
->print it into the log. Additionally print state of CSR register.
+>Add READ_ONCE() in lockless contexts, and WRITE_ONCE()
+>on write side.
 >
->Reviewed-by: Jan Sokolowski <jan.sokolowski@intel.com>
->Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
->---
-> drivers/net/ethernet/intel/i40e/i40e.h        |  2 ++
-> drivers/net/ethernet/intel/i40e/i40e_main.c   | 35 +++++++++++++++++++
-> .../net/ethernet/intel/i40e/i40e_register.h   |  2 ++
-> drivers/net/ethernet/intel/i40e/i40e_type.h   |  5 +++
-> 4 files changed, 44 insertions(+)
+>[1]
+>BUG: KCSAN: data-race in udpv6_sendmsg / udpv6_sendmsg
 >
->diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
->index ba24f3fa92c3..6ebd2fd15e0e 100644
->--- a/drivers/net/ethernet/intel/i40e/i40e.h
->+++ b/drivers/net/ethernet/intel/i40e/i40e.h
->@@ -23,6 +23,8 @@
-> /* Useful i40e defaults */
-> #define I40E_MAX_VEB			16
-> 
->+#define I40_BYTES_PER_WORD		2
->+
-> #define I40E_MAX_NUM_DESCRIPTORS	4096
-> #define I40E_MAX_NUM_DESCRIPTORS_XL710	8160
-> #define I40E_MAX_CSR_SPACE		(4 * 1024 * 1024 - 64 * 1024)
->diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
->index 4977ff391fed..f5abe8c9a88d 100644
->--- a/drivers/net/ethernet/intel/i40e/i40e_main.c
->+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
->@@ -15414,6 +15414,39 @@ static int i40e_handle_resets(struct i40e_pf *pf)
-> 	return is_empr ? -EIO : pfr;
-> }
-> 
->+/**
->+ * i40e_log_fw_recovery_mode - log current FW state in Recovery Mode
->+ * @pf: board private structure
->+ *
->+ * Read alternate RAM and CSR registers and print them to the log
->+ **/
->+static void i40e_log_fw_recovery_mode(struct i40e_pf *pf)
->+{
->+	u8 buf[I40E_FW_STATE_BUFF_SIZE] = {0};
->+	struct i40e_hw *hw = &pf->hw;
->+	u8 fws0b, fws1b;
->+	u32 fwsts;
->+	int ret;
->+
->+	ret = i40e_aq_alternate_read_indirect(hw, I40E_ALT_CANARY,
->+					      I40E_ALT_BUFF_DWORD_SIZE, buf);
->+	if (ret) {
->+		dev_warn(&pf->pdev->dev,
->+			 "Cannot get FW trace buffer due to FW err %d aq_err %s\n",
->+			 ret, i40e_aq_str(hw, hw->aq.asq_last_status));
->+		return;
->+	}
->+
->+	fwsts = rd32(&pf->hw, I40E_GL_FWSTS);
->+	fws0b = FIELD_GET(I40E_GL_FWSTS_FWS0B_MASK, fwsts);
->+	fws1b = FIELD_GET(I40E_GL_FWSTS_FWS1B_MASK, fwsts);
->+
->+	print_hex_dump(KERN_DEBUG, "Trace Buffer: ", DUMP_PREFIX_NONE,
->+		       BITS_PER_BYTE * I40_BYTES_PER_WORD, 1, buf,
->+		       I40E_FW_STATE_BUFF_SIZE, true);
+>write to 0xffff88814e5eadf0 of 4 bytes by task 15547 on cpu 1:
+> udpv6_sendmsg+0x1405/0x1530 net/ipv6/udp.c:1596
+> inet6_sendmsg+0x63/0x80 net/ipv6/af_inet6.c:657
+> sock_sendmsg_nosec net/socket.c:730 [inline]
+> __sock_sendmsg net/socket.c:745 [inline]
+> __sys_sendto+0x257/0x310 net/socket.c:2192
+> __do_sys_sendto net/socket.c:2204 [inline]
+> __se_sys_sendto net/socket.c:2200 [inline]
+> __x64_sys_sendto+0x78/0x90 net/socket.c:2200
+> do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+> do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
+> entry_SYSCALL_64_after_hwframe+0x63/0x6b
+>
+>read to 0xffff88814e5eadf0 of 4 bytes by task 15551 on cpu 0:
+> udpv6_sendmsg+0x22c/0x1530 net/ipv6/udp.c:1373
+> inet6_sendmsg+0x63/0x80 net/ipv6/af_inet6.c:657
+> sock_sendmsg_nosec net/socket.c:730 [inline]
+> __sock_sendmsg net/socket.c:745 [inline]
+> ____sys_sendmsg+0x37c/0x4d0 net/socket.c:2586
+> ___sys_sendmsg net/socket.c:2640 [inline]
+> __sys_sendmmsg+0x269/0x500 net/socket.c:2726
+> __do_sys_sendmmsg net/socket.c:2755 [inline]
+> __se_sys_sendmmsg net/socket.c:2752 [inline]
+> __x64_sys_sendmmsg+0x57/0x60 net/socket.c:2752
+> do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+> do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
+> entry_SYSCALL_64_after_hwframe+0x63/0x6b
+>
+>value changed: 0x00000000 -> 0x0000000a
+>
+>Reported by Kernel Concurrency Sanitizer on:
+>CPU: 0 PID: 15551 Comm: syz-executor.1 Tainted: G        W          6.7.0-syzkaller #0
+>Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+>
+>Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+>Reported-by: syzbot+8d482d0e407f665d9d10@syzkaller.appspotmail.com
+>Link: https://lore.kernel.org/netdev/0000000000009e46c3060ebcdffd@google.com/
+>Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-I don't follow. Why exactly you want to pollute dmesg with another
-messages? Can't you use some other interface? Devlink health reporter
-looks like a suitable alternative for this kind of operations.
-
-
-
->+	dev_dbg(&pf->pdev->dev, "FWS0B=0x%x, FWS1B=0x%x\n", fws0b, fws1b);
->+}
->+
-> /**
->  * i40e_init_recovery_mode - initialize subsystems needed in recovery mode
->  * @pf: board private structure
->@@ -15497,6 +15530,8 @@ static int i40e_init_recovery_mode(struct i40e_pf *pf, struct i40e_hw *hw)
-> 	mod_timer(&pf->service_timer,
-> 		  round_jiffies(jiffies + pf->service_timer_period));
-> 
->+	i40e_log_fw_recovery_mode(pf);
->+
-> 	return 0;
-> 
-> err_switch_setup:
->diff --git a/drivers/net/ethernet/intel/i40e/i40e_register.h b/drivers/net/ethernet/intel/i40e/i40e_register.h
->index 14ab642cafdb..8e254ff9c035 100644
->--- a/drivers/net/ethernet/intel/i40e/i40e_register.h
->+++ b/drivers/net/ethernet/intel/i40e/i40e_register.h
->@@ -169,6 +169,8 @@
-> #define I40E_PRTDCB_TPFCTS_PFCTIMER_SHIFT 0
-> #define I40E_PRTDCB_TPFCTS_PFCTIMER_MASK I40E_MASK(0x3FFF, I40E_PRTDCB_TPFCTS_PFCTIMER_SHIFT)
-> #define I40E_GL_FWSTS 0x00083048 /* Reset: POR */
->+#define I40E_GL_FWSTS_FWS0B_SHIFT 0
->+#define I40E_GL_FWSTS_FWS0B_MASK  I40E_MASK(0xFF, I40E_GL_FWSTS_FWS0B_SHIFT)
-> #define I40E_GL_FWSTS_FWS1B_SHIFT 16
-> #define I40E_GL_FWSTS_FWS1B_MASK I40E_MASK(0xFF, I40E_GL_FWSTS_FWS1B_SHIFT)
-> #define I40E_GL_FWSTS_FWS1B_EMPR_0 I40E_MASK(0x20, I40E_GL_FWSTS_FWS1B_SHIFT)
->diff --git a/drivers/net/ethernet/intel/i40e/i40e_type.h b/drivers/net/ethernet/intel/i40e/i40e_type.h
->index 725da7edbca3..0372a8d519ad 100644
->--- a/drivers/net/ethernet/intel/i40e/i40e_type.h
->+++ b/drivers/net/ethernet/intel/i40e/i40e_type.h
->@@ -1372,6 +1372,11 @@ struct i40e_lldp_variables {
-> #define I40E_ALT_BW_VALUE_MASK		0xFF
-> #define I40E_ALT_BW_VALID_MASK		0x80000000
-> 
->+/* Alternate Ram Trace Buffer*/
->+#define I40E_ALT_CANARY				0xABCDEFAB
->+#define I40E_ALT_BUFF_DWORD_SIZE		0x14 /* in dwords */
->+#define I40E_FW_STATE_BUFF_SIZE			80
->+
-> /* RSS Hash Table Size */
-> #define I40E_PFQF_CTL_0_HASHLUTSIZE_512	0x00010000
-> 
->-- 
->2.31.1
->
->
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
