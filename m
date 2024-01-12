@@ -1,65 +1,41 @@
-Return-Path: <netdev+bounces-63197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63198-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E287882B9C9
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 03:59:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BCEFB82B9CE
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 04:00:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A5591C2244D
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 02:59:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 881191C2148C
+	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 03:00:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B863111B;
-	Fri, 12 Jan 2024 02:59:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A436E139F;
+	Fri, 12 Jan 2024 03:00:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="my31i/Z4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 930BF10783;
-	Fri, 12 Jan 2024 02:59:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: ae53ff116344415d96418585a4d93d84-20240112
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.35,REQID:6a2b0c87-dd81-4c55-9f0b-66abea040b8a,IP:10,
-	URL:0,TC:0,Content:-25,EDM:25,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,A
-	CTION:release,TS:-5
-X-CID-INFO: VERSION:1.1.35,REQID:6a2b0c87-dd81-4c55-9f0b-66abea040b8a,IP:10,UR
-	L:0,TC:0,Content:-25,EDM:25,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACT
-	ION:release,TS:-5
-X-CID-META: VersionHash:5d391d7,CLOUDID:676b437f-4f93-4875-95e7-8c66ea833d57,B
-	ulkID:2401121059378NCKGCC4,BulkQuantity:0,Recheck:0,SF:66|38|24|17|19|44|1
-	02,TC:nil,Content:0,EDM:5,IP:-2,URL:1,File:nil,Bulk:nil,QS:nil,BEC:nil,COL
-	:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,TF_CID_SPAM_ULS,
-	TF_CID_SPAM_SNR
-X-UUID: ae53ff116344415d96418585a4d93d84-20240112
-X-User: chentao@kylinos.cn
-Received: from kernel.. [(116.128.244.171)] by mailgw
-	(envelope-from <chentao@kylinos.cn>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 544651348; Fri, 12 Jan 2024 10:59:34 +0800
-From: Kunwu Chan <chentao@kylinos.cn>
-To: jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: jacob.e.keller@intel.com,
-	przemyslaw.kitszel@intel.com,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Kunwu Chan <chentao@kylinos.cn>,
-	Kunwu Chan <kunwu.chan@hotmail.com>
-Subject: [PATCH v2] igb: Fix string truncation warnings in igb_set_fw_version
-Date: Fri, 12 Jan 2024 10:58:53 +0800
-Message-Id: <20240112025853.123048-1-chentao@kylinos.cn>
-X-Mailer: git-send-email 2.39.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F5A3136B;
+	Fri, 12 Jan 2024 03:00:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E8E72C433C7;
+	Fri, 12 Jan 2024 03:00:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705028447;
+	bh=zXeYoAgg1Gny/6BTNUuxDse5agMCghbKe4l+4jpUdX0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=my31i/Z4TsqIpo+UxhKr4Mar/ykDjndLkCJNNFzc+3f9fAGZer0iCEY87ygReLLWb
+	 RH9KtNbiZcUJwxpc5ckkSxJXe31YUPLSj9KPhgNwV0jTirHUlFo6jJ6Jqt8jykdciH
+	 lta4Chs7UW5bT7BmvoB9z34BkQSwPk2CX2hAvvEy1ecalGfBArro7BuhixKNYsP4uj
+	 a5k7tLeYTYNLi2TBZigD8IbA9UPbQzd7PqCT3QDGYuO4DG4/t/tAMtgUv0AcOnPS9R
+	 sI9pBPJ5EP76OBudEQMzpHuGCuEHboTKBdrD6kzvKG310b5vnRfyLAcquBKdyvlJx+
+	 Iu5qK1OYSkC2g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D0605D8C96E;
+	Fri, 12 Jan 2024 03:00:46 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,108 +43,77 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next v2 00/15] Improvements for tracking scalars in the
+ BPF verifier
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170502844684.24601.17326225284234857035.git-patchwork-notify@kernel.org>
+Date: Fri, 12 Jan 2024 03:00:46 +0000
+References: <20240108205209.838365-1-maxtram95@gmail.com>
+In-Reply-To: <20240108205209.838365-1-maxtram95@gmail.com>
+To: Maxim Mikityanskiy <maxtram95@gmail.com>
+Cc: eddyz87@gmail.com, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, shung-hsi.yu@suse.com, john.fastabend@gmail.com,
+ martin.lau@linux.dev, song@kernel.org, yonghong.song@linux.dev,
+ kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org,
+ mykolal@fb.com, shuah@kernel.org, davem@davemloft.net, kuba@kernel.org,
+ hawk@kernel.org, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ netdev@vger.kernel.org, maxim@isovalent.com
 
-'commit 1978d3ead82c ("intel: fix string truncation warnings")'
-fix '-Wformat-truncation=' warnings in igb_main.c by using kasprintf.
+Hello:
 
-kasprintf() returns a pointer to dynamically allocated memory
-which can be NULL upon failure.
+This series was applied to bpf/bpf-next.git (master)
+by Alexei Starovoitov <ast@kernel.org>:
 
-Fix this warning by using a larger space for adapter->fw_version,
-and then fall back and continue to use snprintf.
+On Mon,  8 Jan 2024 22:51:54 +0200 you wrote:
+> From: Maxim Mikityanskiy <maxim@isovalent.com>
+> 
+> The goal of this series is to extend the verifier's capabilities of
+> tracking scalars when they are spilled to stack, especially when the
+> spill or fill is narrowing. It also contains a fix by Eduard for
+> infinite loop detection and a state pruning optimization by Eduard that
+> compensates for a verification complexity regression introduced by
+> tracking unbounded scalars. These improvements reduce the surface of
+> false rejections that I saw while working on Cilium codebase.
+> 
+> [...]
 
-Fixes: 1978d3ead82c ("intel: fix string truncation warnings")
-Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
-Cc: Kunwu Chan <kunwu.chan@hotmail.com>
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Here is the summary with links:
+  - [bpf-next,v2,01/15] selftests/bpf: Fix the u64_offset_to_skb_data test
+    https://git.kernel.org/bpf/bpf-next/c/02fb00d34de1
+  - [bpf-next,v2,02/15] bpf: make infinite loop detection in is_state_visited() exact
+    https://git.kernel.org/bpf/bpf-next/c/3a96c705f48a
+  - [bpf-next,v2,03/15] selftests/bpf: check if imprecise stack spills confuse infinite loop detection
+    https://git.kernel.org/bpf/bpf-next/c/723909ae6496
+  - [bpf-next,v2,04/15] bpf: Make bpf_for_each_spilled_reg consider narrow spills
+    https://git.kernel.org/bpf/bpf-next/c/0e00a9551c61
+  - [bpf-next,v2,05/15] selftests/bpf: Add a test case for 32-bit spill tracking
+    https://git.kernel.org/bpf/bpf-next/c/221dffec93e8
+  - [bpf-next,v2,06/15] bpf: Add the assign_scalar_id_before_mov function
+    https://git.kernel.org/bpf/bpf-next/c/85b6e9d75c8e
+  - [bpf-next,v2,07/15] bpf: Add the get_reg_width function
+    https://git.kernel.org/bpf/bpf-next/c/b08973e4d9c4
+  - [bpf-next,v2,08/15] bpf: Assign ID to scalars on spill
+    https://git.kernel.org/bpf/bpf-next/c/26b560765e67
+  - [bpf-next,v2,09/15] selftests/bpf: Test assigning ID to scalars on spill
+    https://git.kernel.org/bpf/bpf-next/c/5a052eb509e9
+  - [bpf-next,v2,10/15] bpf: Track spilled unbounded scalars
+    https://git.kernel.org/bpf/bpf-next/c/53ac20c9e0dd
+  - [bpf-next,v2,11/15] selftests/bpf: Test tracking spilled unbounded scalars
+    https://git.kernel.org/bpf/bpf-next/c/9ba80a06cabb
+  - [bpf-next,v2,12/15] bpf: Preserve boundaries and track scalars on narrowing fill
+    (no matching commit)
+  - [bpf-next,v2,13/15] selftests/bpf: Add test cases for narrowing fill
+    (no matching commit)
+  - [bpf-next,v2,14/15] bpf: Optimize state pruning for spilled scalars
+    (no matching commit)
+  - [bpf-next,v2,15/15] selftests/bpf: states pruning checks for scalar vs STACK_{MISC,ZERO}
+    (no matching commit)
 
----
-v2: Fall back to use snprintf and a larger space,as suggested by
-https://lore.kernel.org/all/20231212132637.1b0fb8aa@kernel.org/
----
- drivers/net/ethernet/intel/igb/igb.h      |  2 +-
- drivers/net/ethernet/intel/igb/igb_main.c | 35 ++++++++++++-----------
- 2 files changed, 19 insertions(+), 18 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/igb/igb.h b/drivers/net/ethernet/intel/igb/igb.h
-index a2b759531cb7..3c2dc7bdebb5 100644
---- a/drivers/net/ethernet/intel/igb/igb.h
-+++ b/drivers/net/ethernet/intel/igb/igb.h
-@@ -637,7 +637,7 @@ struct igb_adapter {
- 		struct timespec64 period;
- 	} perout[IGB_N_PEROUT];
- 
--	char fw_version[32];
-+	char fw_version[48];
- #ifdef CONFIG_IGB_HWMON
- 	struct hwmon_buff *igb_hwmon_buff;
- 	bool ets;
-diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
-index b2295caa2f0a..ce762d77d2c1 100644
---- a/drivers/net/ethernet/intel/igb/igb_main.c
-+++ b/drivers/net/ethernet/intel/igb/igb_main.c
-@@ -3069,7 +3069,6 @@ void igb_set_fw_version(struct igb_adapter *adapter)
- {
- 	struct e1000_hw *hw = &adapter->hw;
- 	struct e1000_fw_version fw;
--	char *lbuf;
- 
- 	igb_get_fw_version(hw, &fw);
- 
-@@ -3077,34 +3076,36 @@ void igb_set_fw_version(struct igb_adapter *adapter)
- 	case e1000_i210:
- 	case e1000_i211:
- 		if (!(igb_get_flash_presence_i210(hw))) {
--			lbuf = kasprintf(GFP_KERNEL, "%2d.%2d-%d",
--					 fw.invm_major, fw.invm_minor,
--					 fw.invm_img_type);
-+			snprintf(adapter->fw_version,
-+				 sizeof(adapter->fw_version),
-+				 "%2d.%2d-%d",
-+				 fw.invm_major, fw.invm_minor,
-+				 fw.invm_img_type);
- 			break;
- 		}
- 		fallthrough;
- 	default:
- 		/* if option rom is valid, display its version too */
- 		if (fw.or_valid) {
--			lbuf = kasprintf(GFP_KERNEL, "%d.%d, 0x%08x, %d.%d.%d",
--					 fw.eep_major, fw.eep_minor,
--					 fw.etrack_id, fw.or_major, fw.or_build,
--					 fw.or_patch);
-+			snprintf(adapter->fw_version,
-+				 sizeof(adapter->fw_version),
-+				 "%d.%d, 0x%08x, %d.%d.%d",
-+				 fw.eep_major, fw.eep_minor, fw.etrack_id,
-+				 fw.or_major, fw.or_build, fw.or_patch);
- 		/* no option rom */
- 		} else if (fw.etrack_id != 0X0000) {
--			lbuf = kasprintf(GFP_KERNEL, "%d.%d, 0x%08x",
--					 fw.eep_major, fw.eep_minor,
--					 fw.etrack_id);
-+			snprintf(adapter->fw_version,
-+				 sizeof(adapter->fw_version),
-+				 "%d.%d, 0x%08x",
-+				 fw.eep_major, fw.eep_minor, fw.etrack_id);
- 		} else {
--			lbuf = kasprintf(GFP_KERNEL, "%d.%d.%d", fw.eep_major,
--					 fw.eep_minor, fw.eep_build);
-+			snprintf(adapter->fw_version,
-+				 sizeof(adapter->fw_version),
-+				 "%d.%d.%d",
-+				 fw.eep_major, fw.eep_minor, fw.eep_build);
- 		}
- 		break;
- 	}
--
--	/* the truncate happens here if it doesn't fit */
--	strscpy(adapter->fw_version, lbuf, sizeof(adapter->fw_version));
--	kfree(lbuf);
- }
- 
- /**
+You are awesome, thank you!
 -- 
-2.39.2
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
