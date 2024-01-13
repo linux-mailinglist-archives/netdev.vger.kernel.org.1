@@ -1,112 +1,164 @@
-Return-Path: <netdev+bounces-63432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F244B82CDC7
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 17:55:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BF1382CDD6
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 18:11:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87C3A283E71
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 16:55:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7BCAB22558
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 17:11:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 702941865;
-	Sat, 13 Jan 2024 16:55:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D32034C7D;
+	Sat, 13 Jan 2024 17:11:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="aWKrjmel"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PCF85/IM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B4331FA1
-	for <netdev@vger.kernel.org>; Sat, 13 Jan 2024 16:55:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-5955a4a9b23so4000204eaf.1
-        for <netdev@vger.kernel.org>; Sat, 13 Jan 2024 08:55:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1705164909; x=1705769709; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Eznmaaz1qWTcAfMUBfsMkdpl8f0Cq0KheUm1c23Ti3w=;
-        b=aWKrjmelFqVd2IPzcyRUdUYCWvKhhKSw+Hns8tCNxDPmAnGklJoOb/qR+6l39my6/l
-         f/VlqBXKTWKwlH0fjzJQu7abaRg6FMlYCj1oEpqJQ2MORwXGerH+s5WrWIPyBi2r/EEl
-         XljHJiZTcnw2/wB9Rz8GBfgV+IvWnvjAdXhqfkMosoo8FFiKAzroNkX3gbJaPG2ufSY9
-         GMIgoxPF8TKGgvuKdJYxcrHjnIyXeLuXOAYmPm3gyvgGBr/tcgZYLICcT3jmAwIpnk/D
-         MospbUpEyb9VPi6WqSXRkXvlwhGQKF03S1+ywjkXyPb/DQxQDVLEGGMeJXXzsIY1srzQ
-         2YDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705164909; x=1705769709;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Eznmaaz1qWTcAfMUBfsMkdpl8f0Cq0KheUm1c23Ti3w=;
-        b=moVRZ+73m4JEXtbq7c9ulaodD0cSTtfSMTDdDQkkZH9U3AKsF3q3g+Km48oRZSuHsI
-         529SZzC/hFAmGFd8rv2LvMEbQJxzW27/kKS+7zzOuXM0CPIprnnvIOOp5V2g4JFjg3jo
-         ictSOptezhrD5UJ5qvM1oZEdxx0Q6yLsqQls5VFI28HEu6qKgWDuewqaznIAV+K4xAk1
-         v1NLEhSls1WZrUeKE1F+/kFWsAOIEDRE6uyL7YH4FOU6vyBU2SUcmjDHdiSfbyMz4JaR
-         /tqZgAC7UCuIKfFHtVwrAmM/HvPmz7IxFzoDCuF+aQo+TtKXkasktwrnoHkKnldnHKlU
-         ZmOA==
-X-Gm-Message-State: AOJu0YwDji7RbBglS0UFSp9JHUOUsDDhwNMW/PA6KP2tE84q2sPQmUqr
-	QmTy60jy7mXhreTtwbvNy6yOuiSmrRihFNKabSYucOJ3XleCfw==
-X-Google-Smtp-Source: AGHT+IEAFV6aMRkkjMof7pI6uhL8p9h97nsOGiIapA4Y4xpcC2jyOWOpd0/ObP0kuuUPtHKNn8HCsw==
-X-Received: by 2002:a05:6870:4599:b0:203:73bc:69e3 with SMTP id y25-20020a056870459900b0020373bc69e3mr3997595oao.71.1705164909073;
-        Sat, 13 Jan 2024 08:55:09 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id sv7-20020a17090b538700b0028bf0b91f6bsm8653232pjb.21.2024.01.13.08.55.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 13 Jan 2024 08:55:08 -0800 (PST)
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Quentin Deslandes <qde@naccy.de>
-Cc: netdev@vger.kernel.org,
-	Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH iproute2] Revert "ss: prevent "Process" column from being printed unless requested"
-Date: Sat, 13 Jan 2024 08:54:10 -0800
-Message-ID: <20240113165458.22935-1-stephen@networkplumber.org>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA3EE5221
+	for <netdev@vger.kernel.org>; Sat, 13 Jan 2024 17:11:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56F4AC433F1;
+	Sat, 13 Jan 2024 17:11:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705165870;
+	bh=ot2YVVEqK8HFfiOpxBgx2WaTCe/MDy52aGOPEwMCNAY=;
+	h=From:Date:Subject:To:Cc:From;
+	b=PCF85/IM5BPXJTabvgJkef/COvwCI7y+nzR6PwvnnwOLjiuOBmIs1VspFDN8kirRC
+	 B+w/8wbh33y/CkQuK6DumMhX9a/a+IEFcCMCRZRiyAkKNRi0To2qIZPb1TY5eYuKUD
+	 Gdoa0HPmuHw4nK9bKeYKPbIU1m2d1WEMVVhvFxnUxC8YM+tmm5IOKewcwYe9SIr7Z5
+	 HL3+P4zoyV1bwjpeYmeQXYmx+SwHYlU6lf7Ff+M+U0K4w0g5L+4KzFvUZWtyyQo//J
+	 ck4ykCM7W7vBGP7/JB3T4a2oz7l+cYQx5i6URwi78xqsbSfi0qTV4UVAAzgj7OUn4u
+	 Dy6xz+EdrkfIw==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Date: Sat, 13 Jan 2024 18:10:21 +0100
+Subject: [PATCH iproute2] ss: show extra info when '--processes' is not
+ used
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240113-ss-fix-ext-col-disabled-v1-1-cf99a7381dec@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAPzDomUC/x2MwQqDMBAFf0X27IJJbG39Fekhmme7IEayKoL47
+ w0eB2bmJEUSKLXFSQm7qMQ5gykLGn5+/oIlZCZb2boyxrEqj3IwjpWHOHEQ9f2EwG6sX2/3bPw
+ DDeV6Scjefe5IlhS3FZY+1/UHb45FeXMAAAA=
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org, Quentin Deslandes <qde@naccy.de>, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+X-Mailer: b4 0.12.4
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2964; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=ot2YVVEqK8HFfiOpxBgx2WaTCe/MDy52aGOPEwMCNAY=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBlosQsi3X4tj0JQcDgiK7S2fi+I0czeAJdLw5HP
+ iBM5K1dX0GJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZaLELAAKCRD2t4JPQmmg
+ c1YuEADfx9LBvnJ8Dbkg23/ggEVIwfIhn1+LWSRHDgyBC6CLxJ2Y/3SzfgAh/5RgT7uzIilD2QB
+ F9Pb8RlIWoBjn06LEJX8wSaqtZkoJ6+WK7lo6bS8uAkUYQtHzDe3nN8i/1RScdUifBJViN7QF00
+ ofIs9dONWmdi7QQsjom5f1MfZ3pFY6RJtYMssjNLQL8FX/0dju9zLAH4QbbkJ9ePfitc7kJpdlU
+ sQ9zikhbfoLmfYtuHUOZ+EZKInR6BW8EVPhvmYKzqc/89v0/I9vF7y7JECU/UmH7VaGPcSY0Mkk
+ aXuorV6WUyC+MrhdbWGltin+RV3qvHEicwrdMSa0M8V29Q5yn05ivZ4nApraLURV1ZE/IcBLLHl
+ eIl/baNNApraq0UeARCeVDLGsIYdmaOnwsDJ0E2neT6zJ77Jxylyn5mYoH2Pci9LcH+qP3pPV0E
+ JtDVEASaE26zeDuroNe5LWv8aI/sygyiuFET6tK4eBc0Z1+qwWDqVG3FIq8hJcURK8Xicn9z6B9
+ cUvg5ur6TR5zROLx5T8ItKoe56Y1f8KK/RZQ0YUtXghrlEsVjP2fNwQ6XuVLPc/rpOZsVKGwlP1
+ vNkxO/LkKDFwzyWgr+3TjAlYgtqlwzoaHu53unWEomvtm7P/zuWA26UntBwCNJP67K+ow2BD/Dq
+ UrLce/bp8srzC4Q==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-This reverts commit 1607bf531fd2f984438d227ea97312df80e7cf56.
+A recent modification broke "extra" options for all protocols showing
+info about the processes when '-p' / '--processes' option was not used
+as well. In other words, all the additional bits displayed at the end or
+at the next line were no longer printed if the user didn't ask to show
+info about processes as well.
 
-This commit is being reverted because it breaks output of tcp info.
+The reason is that, the "current_field" pointer never switched to the
+"Ext" column. If the user didn't ask to display the processes, nothing
+happened when trying to print extra bits using the "out()" function,
+because the current field was still pointing to the "Process" one, now
+marked as disabled.
 
-Bug: https://bugzilla.kernel.org/show_bug.cgi?id=218372
-Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+Before the commit mentioned below, it was not an issue not to switch to
+the "Ext" or "Process" columns because they were never marked as
+"disabled".
+
+Here is a quick list of options that were no longer displayed if '-p' /
+'--processes' was not set:
+
+- AF_INET(6):
+  -o, --options
+  -e, --extended
+  --tos
+  --cgroup
+  --inet-sockopt
+  -m, --memory
+  -i, --info
+
+- AF_PACKET:
+  -e, --extended
+
+- AF_XDP:
+  -e, --extended
+
+- AF_UNIX:
+  -m, --memory
+  -e, --extended
+
+- TIPC:
+  --tipcinfo
+
+That was just by quickly reading the code, I probably missed some. But
+this shows that the impact can be quite important for all scripts using
+'ss' to monitor connections or to report info.
+
+Fixes: 1607bf53 ("ss: prevent "Process" column from being printed unless requested")
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
- misc/ss.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+
+Notes:
+    Note that this issue has quite an annoying impact on our side with
+    the MPTCP subsystem: because '-p' is not used with 'ss', this commit
+    broke 2 selftests (13 subtests). Also, 'ss' is used in case of
+    errors to help better understanding issues, and it is not so useful
+    if it is missing the most important bits: MPTCP info.
+
+    I know that typically there is no bug-fix version with IPRoute2, but
+    could you please consider one in this case? That would avoid
+    troubles for those relying on 'ss' for the monitoring or the
+    reporting when this specific version of IPRoute2 is used.
+
+    In our case, it means we have to patch our selftests in 20+ places
+    to support this "broken" version. Plus making sure this is
+    backported correctly, resolving conflicts if needed, etc. It would
+    be really nice if we could avoid that by making a v6.7.1 version
+    including this fix :)
+---
+ misc/ss.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/misc/ss.c b/misc/ss.c
-index 900fefa42015..c220a0758cb1 100644
+index 900fefa4..5296cabe 100644
 --- a/misc/ss.c
 +++ b/misc/ss.c
-@@ -100,8 +100,8 @@ enum col_id {
- 	COL_SERV,
- 	COL_RADDR,
- 	COL_RSERV,
--	COL_PROC,
- 	COL_EXT,
-+	COL_PROC,
- 	COL_MAX
- };
+@@ -2427,6 +2427,8 @@ static void proc_ctx_print(struct sockstat *s)
+ 			free(buf);
+ 		}
+ 	}
++
++	field_next();
+ }
  
-@@ -5819,9 +5819,6 @@ int main(int argc, char *argv[])
- 	if (ssfilter_parse(&current_filter.f, argc, argv, filter_fp))
- 		usage();
- 
--	if (!show_processes)
--		columns[COL_PROC].disabled = 1;
--
- 	if (!(current_filter.dbs & (current_filter.dbs - 1)))
- 		columns[COL_NETID].disabled = 1;
- 
+ static void inet_stats_print(struct sockstat *s, bool v6only)
+
+---
+base-commit: 05a4fc72587fed4ad5a0a93c59394b3e39f30381
+change-id: 20240113-ss-fix-ext-col-disabled-3f489367a5e7
+
+Best regards,
 -- 
-2.43.0
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
