@@ -1,41 +1,65 @@
-Return-Path: <netdev+bounces-63415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C21E82CCB9
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 13:50:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88F6B82CCC4
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 14:17:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFDA928408F
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 12:50:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03B99284A4D
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 13:17:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C2532110B;
-	Sat, 13 Jan 2024 12:50:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E062210FD;
+	Sat, 13 Jan 2024 13:17:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZBShBegL"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="v5HYG+Ks"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54D7717BD3;
-	Sat, 13 Jan 2024 12:50:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BACB9C43390;
-	Sat, 13 Jan 2024 12:50:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705150224;
-	bh=yY2rSlGkjZflGrirYZMdUgFNa1m+E+eJl0XsX5awu5Q=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ZBShBegLwtLPNOhPak1h3TWRx4ILNmarEXhzGj9vxyIaHFHIbTCdZm8naNEKCFG2y
-	 FWqMxqPNIVID1gOcaHEpjn3hCBME0kDxn6jb3chMBoPD26l+p9/rt65efjy0Rxscsa
-	 QSkFNpAaIBs2fSOd02lGlNxfEUPBB+yIJFfuE7p0kTstJ+wcT4B2R+3ZvkdAfIxB0A
-	 cIK0DjDBu5buLBzNccT1JP6cNq8JX0refs41OPWQsV0IP7aEb+O6XcJVaXxcD23Vyi
-	 8D2UX0ta/oafo4Q71SJq/mKSmt9JbHPm3f4qFf2I28hqnQx+NvGxvb33y7+qdwg9Ck
-	 K60u/vPSvtJow==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A12E4D8C972;
-	Sat, 13 Jan 2024 12:50:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30753F500;
+	Sat, 13 Jan 2024 13:17:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1705151834; x=1736687834;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Nbm89IVPwSbs+XUOYfVbDyLJJ83rqgMv2JmnBE8fqic=;
+  b=v5HYG+KsQMaS5OXTbiirFtaDb4wUKzk6g5GOVpdt9nQznzcPjZJSQgt4
+   goMUvXcJ6ZouT5VnWLDvllgmwb+rOuDgA6GI+qfYRCtW0ls1NTUm+MQlB
+   cR+M+RBBuIUR+MBiG/eBuyO+kGM+F4TDGiwmfqQ/iYL09L4OGtmA8sOeY
+   8EKzlG+CFFaNYaDqHSs16MSbTZF/ZcU2i9kCO8mw6FlFuz2IhydYPI3wK
+   xlmcUInei2J9P6RFN3Xhh5bzI0wIWmEITweN/srPHI6OaPgbmxf59croe
+   mv2kQ0JTNg6sZtbEQlHU92cK5YDEAgbruPC5nslxNLH4hoIOFM0hKgfLF
+   Q==;
+X-CSE-ConnectionGUID: XyTF/spfTOquMExVK+Xxwg==
+X-CSE-MsgGUID: pd9Sgua7S4+9kq9oS414rw==
+X-IronPort-AV: E=Sophos;i="6.04,192,1695711600"; 
+   d="scan'208";a="14724191"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 Jan 2024 06:17:06 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Sat, 13 Jan 2024 06:17:04 -0700
+Received: from DEN-DL-M31836.microsemi.net (10.10.85.11) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Sat, 13 Jan 2024 06:17:01 -0700
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <richardcochran@gmail.com>,
+	<Divya.Koppera@microchip.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<UNGLinuxDriver@microchip.com>, Horatiu Vultur <horatiu.vultur@microchip.com>
+Subject: [PATCH net 0/2] net: micrel: Fixes for PHC for lan8814
+Date: Sat, 13 Jan 2024 14:15:19 +0100
+Message-ID: <20240113131521.1051921-1-horatiu.vultur@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -43,47 +67,23 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3] net: stmmac: Fix ethool link settings ops for
- integrated PCS
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170515022465.6254.17374650237895775131.git-patchwork-notify@kernel.org>
-Date: Sat, 13 Jan 2024 12:50:24 +0000
-References: <20240109144729.26102-1-quic_snehshah@quicinc.com>
-In-Reply-To: <20240109144729.26102-1-quic_snehshah@quicinc.com>
-To: Sneh Shah <quic_snehshah@quicinc.com>
-Cc: vkoul@kernel.org, bhupesh.sharma@linaro.org, alexandre.torgue@foss.st.com,
- joabreu@synopsys.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
- netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- kernel@quicinc.com, ahalaney@redhat.com
+Content-Type: text/plain
 
-Hello:
+There are different issues with the PHC of lan8814.
+First issue is similar with the one on lan8841 which it has enabled by
+default the check regarding minorVersionPTP in the PTP header frame.
+So all the frames compliant to 8021AS will not be timestamped.
+The second issue is with setting and getting the time of the PHC. The
+issue is seen only when setting a time which is bigger than 2^32.
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+Horatiu Vultur (2):
+  net: micrel: Fix PTP frame parsing for lan8814
+  net: micrel: Fix set/get PHC time for lan8814
 
-On Tue,  9 Jan 2024 20:17:29 +0530 you wrote:
-> Currently get/set_link_ksettings ethtool ops are dependent on PCS.
-> When PCS is integrated, it will not have separate link config.
-> Bypass configuring and checking PCS for integrated PCS.
-> 
-> Fixes: aa571b6275fb ("net: stmmac: add new switch to struct plat_stmmacenet_data")
-> Tested-by: Andrew Halaney <ahalaney@redhat.com> # sa8775p-ride
-> Signed-off-by: Sneh Shah <quic_snehshah@quicinc.com>
-> 
-> [...]
+ drivers/net/phy/micrel.c | 68 +++++++++++++++++++++-------------------
+ 1 file changed, 36 insertions(+), 32 deletions(-)
 
-Here is the summary with links:
-  - [net,v3] net: stmmac: Fix ethool link settings ops for integrated PCS
-    https://git.kernel.org/netdev/net/c/08300adac3b8
-
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.34.1
 
 
