@@ -1,107 +1,87 @@
-Return-Path: <netdev+bounces-63439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26CC082CE41
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 20:17:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6775882CE47
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 20:20:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B335283F52
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 19:17:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1556282C95
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 19:20:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F23D6123;
-	Sat, 13 Jan 2024 19:17:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 589DF63A9;
+	Sat, 13 Jan 2024 19:20:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="de4QuNMr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R0wAltPC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 615B363A9;
-	Sat, 13 Jan 2024 19:17:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1705173440; x=1736709440;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=l/RpQNj4gP732f2vHKYAlKSTUzjcPoYeEZirHy/RBPw=;
-  b=de4QuNMrVdp7LiFl3xnsx7VH54E5hymuG/uptzDe6rHv9oWNzSXkWoei
-   IWMltDP5P6/21ZIM1cc531s1kwM/qMIhIL/digKIScvQcLwmtpNsAayJU
-   b9lYYv1LtftKjalzPsFiASrYG95qqH574GTDbKNVwJyv/Gz2YHfKNwB/f
-   ovGGOvl+h4xveLnxHcDAd4L3l57ugwfpIDvQBCgkz5k9/32lOmhk7pLpE
-   K2LoBHZAcaF5ShtsqIyXXLL3MacATmLqb8ggAmZ48Ore867+LUz43K3oZ
-   Y6E5SbcLH8iFDVS3OA8Y3oK0eravvxlxPdo8lP623ObW6ry9XCFvQ5d+V
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10952"; a="430573453"
-X-IronPort-AV: E=Sophos;i="6.04,192,1695711600"; 
-   d="scan'208";a="430573453"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2024 11:17:19 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10952"; a="776334957"
-X-IronPort-AV: E=Sophos;i="6.04,192,1695711600"; 
-   d="scan'208";a="776334957"
-Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
-  by orsmga007.jf.intel.com with ESMTP; 13 Jan 2024 11:17:15 -0800
-Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rOjVJ-000Aq4-0Q;
-	Sat, 13 Jan 2024 19:17:13 +0000
-Date: Sun, 14 Jan 2024 03:16:52 +0800
-From: kernel test robot <lkp@intel.com>
-To: Catalin Popescu <catalin.popescu@leica-geosystems.com>,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, afd@ti.com,
-	andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Catalin Popescu <catalin.popescu@leica-geosystems.com>
-Subject: Re: [PATCH 2/3] dt-bindings: net: dp83826: add ti,cfg-dac-plus
- binding
-Message-ID: <202401140357.ZT1pEydN-lkp@intel.com>
-References: <20240111161927.3689084-2-catalin.popescu@leica-geosystems.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38A3763A7;
+	Sat, 13 Jan 2024 19:20:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E35DDC433F1;
+	Sat, 13 Jan 2024 19:20:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705173626;
+	bh=WbWG2IiZZYGplfQqyzGwNMVETfJ4+WScuj2euCEwZL0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=R0wAltPCLv3ywoSnmFJ7VL/I67zA2t2dc05mFqRKn37/9x9xL49E/ll5ldo1hQJc/
+	 ors5aNYRSYp+toXSzT37jFzZ1vBV22RYCF4w8xZyed2cZEOzK52QeTVrt0ZVpl3Phy
+	 RjXP6YzVUqsacxO+x0OzQo6G2qUCNk+t9711sGkA53ZwAIVU5H5UD5Ety99V7haCDG
+	 CROcKn06T+Tkfp2rrCIAyGW/DBKyGz+CS8Nnz8wdnuaQL7aI5CmTDzNiMnIZOXsbtF
+	 KwifzFaszdF/2K6akPJS0zRF14DKAvap5grPcfHGCpnir3YIvXhBgDRpRE4P1hzul0
+	 ufqTSOmxHs6lw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C7B83DFC697;
+	Sat, 13 Jan 2024 19:20:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240111161927.3689084-2-catalin.popescu@leica-geosystems.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3 bpf 0/3] bpf: Fix backward progress bug in bpf_iter_udp
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170517362581.27258.5049998565327508436.git-patchwork-notify@kernel.org>
+Date: Sat, 13 Jan 2024 19:20:25 +0000
+References: <20240112190530.3751661-1-martin.lau@linux.dev>
+In-Reply-To: <20240112190530.3751661-1-martin.lau@linux.dev>
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: bpf@vger.kernel.org, ast@kernel.org, andrii@kernel.org,
+ daniel@iogearbox.net, netdev@vger.kernel.org, kernel-team@meta.com
 
-Hi Catalin,
+Hello:
 
-kernel test robot noticed the following build warnings:
+This series was applied to bpf/bpf.git (master)
+by Alexei Starovoitov <ast@kernel.org>:
 
-[auto build test WARNING on robh/for-next]
-[also build test WARNING on net-next/main net/main linus/master v6.7 next-20240112]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+On Fri, 12 Jan 2024 11:05:27 -0800 you wrote:
+> From: Martin KaFai Lau <martin.lau@kernel.org>
+> 
+> This patch set fixes an issue in bpf_iter_udp that makes backward
+> progress and prevents the user space process from finishing. There is
+> a test at the end to reproduce the bug.
+> 
+> Please see individual patches for details.
+> 
+> [...]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Catalin-Popescu/dt-bindings-net-dp83826-add-ti-cfg-dac-plus-binding/20240112-002701
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git for-next
-patch link:    https://lore.kernel.org/r/20240111161927.3689084-2-catalin.popescu%40leica-geosystems.com
-patch subject: [PATCH 2/3] dt-bindings: net: dp83826: add ti,cfg-dac-plus binding
-compiler: loongarch64-linux-gcc (GCC) 13.2.0
-reproduce: (https://download.01.org/0day-ci/archive/20240114/202401140357.ZT1pEydN-lkp@intel.com/reproduce)
+Here is the summary with links:
+  - [v3,bpf,1/3] bpf: iter_udp: Retry with a larger batch size without going back to the previous bucket
+    https://git.kernel.org/bpf/bpf/c/19ca0823f6ea
+  - [v3,bpf,2/3] bpf: Avoid iter->offset making backward progress in bpf_iter_udp
+    https://git.kernel.org/bpf/bpf/c/2242fd537fab
+  - [v3,bpf,3/3] selftests/bpf: Test udp and tcp iter batching
+    https://git.kernel.org/bpf/bpf/c/dbd7db7787ba
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202401140357.ZT1pEydN-lkp@intel.com/
-
-dtcheck warnings: (new ones prefixed by >>)
-   Documentation/devicetree/bindings/net/ti,dp83822.yaml: ti,cfg-dac-minus: missing type definition
->> Documentation/devicetree/bindings/net/ti,dp83822.yaml: ti,cfg-dac-plus: missing type definition
-   Documentation/devicetree/bindings/net/snps,dwmac.yaml: mac-mode: missing type definition
-
+You are awesome, thank you!
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
