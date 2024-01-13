@@ -1,184 +1,114 @@
-Return-Path: <netdev+bounces-63402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E379E82CAD4
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 10:32:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8F0A82CAE8
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 10:43:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D69528405D
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 09:32:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF0B91C21669
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 09:43:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB39FA38;
-	Sat, 13 Jan 2024 09:32:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="Aj872vFT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CEB6A48;
+	Sat, 13 Jan 2024 09:43:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCD557FF;
-	Sat, 13 Jan 2024 09:32:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 83DA4C0002;
-	Sat, 13 Jan 2024 09:32:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1705138349;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=uTfZ42YMdPsc//kAzPHZ2G81y8NgAM6Sfpnm9pJXkZE=;
-	b=Aj872vFTK+K4/JTWrCU6DEE/lK2ElJNHEfPdF0aCeV0q0v6Ulr9HVnwqswPw+yo7uLyUaB
-	GplVrG3ENZDb+IgDKCP2AUPw6RB38CXZLWk2N7jshRa9yGUQ5SSxA8iH6ctEFz6BhSbhxV
-	ufN5MRbfPd4C8uFp1VXHpZPdylHSspFpQy4uLD9Bs2lm4qny3DmvnJab1yy5EW9/UxeK3z
-	Uzc4nNojGRv5Ai+e0odsaMMv9yP7Tzr4OsENVWls8CUD5Xo/vh4HGbJXSBmovU8v0AhV41
-	bieR6CADy+1fV8mYimtpd0TmQnqLu76bYl+FMp4QO3l/ZkgTOFopuTWyLRGODA==
-From: =?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>
-To: =?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: David Bauer <mail@david-bauer.net>,
-	mithat.guner@xeront.com,
-	erkin.bozoglu@xeront.com,
-	Luiz Angelo Daros de Luca <luizluca@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [RFC PATCH net-next] net: dsa: mt7530: support OF-based registration of switch MDIO bus
-Date: Sat, 13 Jan 2024 12:32:16 +0300
-Message-Id: <20240113093216.42391-1-arinc.unal@arinc9.com>
-X-Mailer: git-send-email 2.40.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0646715AF;
+	Sat, 13 Jan 2024 09:43:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.105] (31.173.83.83) by msexch01.omp.ru (10.188.4.12)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Sat, 13 Jan
+ 2024 12:43:04 +0300
+Subject: Re: [PATCH] net: ravb: Fix dma_addr_t truncation in error case
+To: Nikita Yushchenko <nikita.yoush@cogentembedded.com>, "David S. Miller"
+	<davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>, Yoshihiro Shimoda
+	<yoshihiro.shimoda.uh@renesas.com>, Wolfram Sang
+	<wsa+renesas@sang-engineering.com>, =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?=
+	<u.kleine-koenig@pengutronix.de>, <netdev@vger.kernel.org>,
+	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20240113042221.480650-1-nikita.yoush@cogentembedded.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <bc89d250-0a08-e98c-588f-49c96e8e5474@omp.ru>
+Date: Sat, 13 Jan 2024 12:43:03 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
+In-Reply-To: <20240113042221.480650-1-nikita.yoush@cogentembedded.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 01/13/2024 09:25:44
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 182619 [Jan 13 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.83.83 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.83.83
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 01/13/2024 09:30:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 1/13/2024 6:00:00 AM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Currently the MDIO bus of the switches the MT7530 DSA subdriver controls
-can only be registered as non-OF-based. Bring support for registering the
-bus OF-based.
+On 1/13/24 7:22 AM, Nikita Yushchenko wrote:
 
-The subdrivers that control switches [with MDIO bus] probed on OF must
-follow this logic to support all cases properly:
+> In ravb_start_xmit(), ravb driver uses u32 variable to store result of
+> dma_map_single() call. Since ravb hardware has 32-bit address fields in
+> descriptors, this works properly when mapping is successful - it is
+> platform's job to provide mapping addresses that fit into hardware
+> limitations.
+> 
+> However, in failure case dma_map_single() returns DMA_MAPPING_ERROR
+> constant that is 64-bit when dma_addr_t is 64-bit. Storing this constant
+> in u32 leads to truncation, and further call to dma_mapping_error()
+> fails to notice the error.
+> 
+> Fix that by storing result of dma_map_single() in a dma_addr_t
+> variable.
+> 
+> Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
+> Signed-off-by: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
 
-No switch MDIO bus defined: Populate ds->user_mii_bus, register the MDIO
-bus, set the interrupts for PHYs if "interrupt-controller" is defined at
-the switch node. This case should only be covered for the switches which
-their dt-bindings documentation didn't document the MDIO bus from the
-start. This is to keep supporting the device trees that do not describe the
-MDIO bus on the device tree but the MDIO bus is being used nonetheless.
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 
-Switch MDIO bus defined: Don't populate ds->user_mii_bus, register the MDIO
-bus, set the interrupts for PHYs if ["interrupt-controller" is defined at
-the switch node and "interrupts" is defined at the PHY nodes under the
-switch MDIO bus node].
+[...]
 
-Switch MDIO bus defined but explicitly disabled: If the device tree says
-status = "disabled" for the MDIO bus, we shouldn't need an MDIO bus at all.
-Instead, just exit as early as possible and do not call any MDIO API.
-
-The use of ds->user_mii_bus is inappropriate when the MDIO bus of the
-switch is described on the device tree [1], which is why we don't populate
-ds->user_mii_bus in that case.
-
-Link: https://lore.kernel.org/netdev/20231213120656.x46fyad6ls7sqyzv@skbuf/ [1]
-Suggested-by: David Bauer <mail@david-bauer.net>
-Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
----
- drivers/net/dsa/mt7530.c | 34 ++++++++++++++++++++++++++--------
- 1 file changed, 26 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-index 391c4dbdff42..cf2ff7680c15 100644
---- a/drivers/net/dsa/mt7530.c
-+++ b/drivers/net/dsa/mt7530.c
-@@ -2146,24 +2146,40 @@ mt7530_free_irq_common(struct mt7530_priv *priv)
- static void
- mt7530_free_irq(struct mt7530_priv *priv)
- {
--	mt7530_free_mdio_irq(priv);
-+	struct device_node *mnp, *np = priv->dev->of_node;
-+
-+	mnp = of_get_child_by_name(np, "mdio");
-+	if (!mnp)
-+		mt7530_free_mdio_irq(priv);
-+	of_node_put(mnp);
-+
- 	mt7530_free_irq_common(priv);
- }
- 
- static int
- mt7530_setup_mdio(struct mt7530_priv *priv)
- {
-+	struct device_node *mnp, *np = priv->dev->of_node;
- 	struct dsa_switch *ds = priv->ds;
- 	struct device *dev = priv->dev;
- 	struct mii_bus *bus;
- 	static int idx;
--	int ret;
-+	int ret = 0;
-+
-+	mnp = of_get_child_by_name(np, "mdio");
-+
-+	if (mnp && !of_device_is_available(mnp))
-+		goto out;
- 
- 	bus = devm_mdiobus_alloc(dev);
--	if (!bus)
--		return -ENOMEM;
-+	if (!bus) {
-+		ret = -ENOMEM;
-+		goto out;
-+	}
-+
-+	if (!mnp)
-+		ds->user_mii_bus = bus;
- 
--	ds->user_mii_bus = bus;
- 	bus->priv = priv;
- 	bus->name = KBUILD_MODNAME "-mii";
- 	snprintf(bus->id, MII_BUS_ID_SIZE, KBUILD_MODNAME "-%d", idx++);
-@@ -2174,16 +2190,18 @@ mt7530_setup_mdio(struct mt7530_priv *priv)
- 	bus->parent = dev;
- 	bus->phy_mask = ~ds->phys_mii_mask;
- 
--	if (priv->irq)
-+	if (priv->irq && !mnp)
- 		mt7530_setup_mdio_irq(priv);
- 
--	ret = devm_mdiobus_register(dev, bus);
-+	ret = devm_of_mdiobus_register(dev, bus, mnp);
- 	if (ret) {
- 		dev_err(dev, "failed to register MDIO bus: %d\n", ret);
--		if (priv->irq)
-+		if (priv->irq && !mnp)
- 			mt7530_free_mdio_irq(priv);
- 	}
- 
-+out:
-+	of_node_put(mnp);
- 	return ret;
- }
- 
--- 
-2.40.1
-
+MBR, Sergey
 
