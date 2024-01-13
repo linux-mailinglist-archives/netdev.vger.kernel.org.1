@@ -1,116 +1,105 @@
-Return-Path: <netdev+bounces-63376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63377-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 158CF82C8A3
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 02:22:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42C5C82C8BB
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 02:29:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EBBD1C22A9A
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 01:22:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9DBE287408
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 01:29:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4E33111B4;
-	Sat, 13 Jan 2024 01:22:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EDCF12E64;
+	Sat, 13 Jan 2024 01:29:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pappasbrent.com header.i=@pappasbrent.com header.b="QcbN3/tm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jZ2H2lYC"
 X-Original-To: netdev@vger.kernel.org
-Received: from h5.fbrelay.privateemail.com (h5.fbrelay.privateemail.com [162.0.218.228])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98D41134C2;
-	Sat, 13 Jan 2024 01:22:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pappasbrent.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pappasbrent.com
-Received: from MTA-10-4.privateemail.com (mta-10.privateemail.com [198.54.118.218])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits))
-	(No client certificate requested)
-	by h5.fbrelay.privateemail.com (Postfix) with ESMTPSA id B138B60562;
-	Sat, 13 Jan 2024 01:14:49 +0000 (UTC)
-Received: from mta-10.privateemail.com (localhost [127.0.0.1])
-	by mta-10.privateemail.com (Postfix) with ESMTP id E443E180020E;
-	Fri, 12 Jan 2024 20:14:40 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=pappasbrent.com;
-	s=default; t=1705108481;
-	bh=5tLeUjD4Wuj2pnMpbrqMQhIri6Cryus27QrLloXWnoE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=QcbN3/tm2Mzp1wE86PFCzJsLp8ocsCOFrvclQrhYXpGSYMFuMcvh5Hcl7VqAZ7Cc+
-	 aAel++fm523ubqNQ3B13GH33fzD4tydNS3woLkLuvXHjYQZOMyzdhxXuIUKUPncqhV
-	 jEz4pHOSNjWR5LYlJOIXMmDTz6bCNOkDdmNXm6L6UoD41wC0BB7xbs4KHFgJDtUXBX
-	 BrizwHfnjtfM3m7rD3k+WrsSWsf7q4R62lOGrWaKZfCt/FLidHWkdme37WDtGhhQea
-	 QtH7sXMOlNVFfbOCFD/KmB/t9CPXKKF5HkVv3RBlafVAfH9/2Ev3m+LGItkigT2Rv6
-	 tSCasZnAe62EQ==
-Received: from bpappas-XPS-13-9310.cfl.rr.com (050-088-208-203.res.spectrum.com [50.88.208.203])
-	by mta-10.privateemail.com (Postfix) with ESMTPA;
-	Fri, 12 Jan 2024 20:14:30 -0500 (EST)
-From: Brent Pappas <bpappas@pappasbrent.com>
-To: Johannes Berg <johannes@sipsolutions.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 367AE18E0F;
+	Sat, 13 Jan 2024 01:29:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C7C3C433C7;
+	Sat, 13 Jan 2024 01:29:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705109358;
+	bh=3gfJsBCOj95iGvlfeaMcYo6PaAxu7sDaTS+k0H9585s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jZ2H2lYC3WdyBqBjE/fndSo8j0bRYU8r17RvS+62ATm/UOXEVY1CMwgGtAsHTXJkE
+	 QndEsSMVPn35VPcC5HNKtUFUU5c7zXFSTh8CKVMnPcktXfCp41220wr+aQ0yULSIj5
+	 GXjStD13/wSc7tTpF+MLiNUmjU66HEptfh67W4S7sp658vAHHFhw7uR86MkMwAkRUN
+	 KXQ6pv7w8KtwayBNAZBpKnJ2v2q6J3X/Cr525enlKGZHZdXzm8BslncFhNrsLcyJgC
+	 ajbYvMZpEkXgPWM30x4KQxZTw2H3M7hSieCQEo+DkUSAe6Y5KbB8I8r121z7Z6qLJ/
+	 hQofdf5OZO5IA==
+Date: Fri, 12 Jan 2024 19:29:16 -0600
+From: Rob Herring <robh@kernel.org>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Rob Herring <robh+dt@kernel.org>, Russell King <linux@armlinux.org.uk>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Brent Pappas <bpappas@pappasbrent.com>,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] wifi: mac80211: tx: Add __must_hold() annotation
-Date: Fri, 12 Jan 2024 20:11:45 -0500
-Message-ID: <20240113011145.10888-2-bpappas@pappasbrent.com>
-X-Mailer: git-send-email 2.43.0
+	"David S. Miller" <davem@davemloft.net>, Lee Jones <lee@kernel.org>,
+	Jacek Anaszewski <jacek.anaszewski@gmail.com>,
+	William Zhang <william.zhang@broadcom.com>,
+	Pavel Machek <pavel@ucw.cz>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Kursad Oney <kursad.oney@broadcom.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-leds@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+	linux-kernel@vger.kernel.org,
+	Sven Schwermer <sven.schwermer@disruptive-technologies.com>,
+	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
+	Anand Gore <anand.gore@broadcom.com>,
+	=?iso-8859-1?Q?Fern=E1ndez?= Rojas <noltari@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org
+Subject: Re: [net-next PATCH v9 1/5] dt-bindings: net: phy: Make LED
+ active-low property common
+Message-ID: <170510935584.3795106.4060460999461861209.robh@kernel.org>
+References: <20240105142719.11042-1-ansuelsmth@gmail.com>
+ <20240105142719.11042-2-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: ClamAV using ClamSMTP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240105142719.11042-2-ansuelsmth@gmail.com>
 
-Annotates ieee80211_set_beacon_cntdwn() with a __must_hold() annotation to
-make it clear that ieee80211_set_beacon_cntdwn() is only intended to be
-called when the caller has a lock on the argument "link."
 
-Signed-off-by: Brent Pappas <bpappas@pappasbrent.com>
----
+On Fri, 05 Jan 2024 15:27:13 +0100, Christian Marangi wrote:
+> Move LED active-low property to common.yaml. This property is currently
+> defined multiple times by bcm LEDs. This property will now be supported
+> in a generic way for PHY LEDs with the use of a generic function.
+> 
+> With active-low bool property not defined, active-high is always
+> assumed.
+> 
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> ---
+> Changes v5:
+> - Make active-low generic
+> Changes v4:
+> - Drop support for global active-low
+> - Rework to polarity option (for marvell10g series support)
+> Changes v3:
+> - Out of RFC
+> Changes v2:
+> - Add this patch
+> 
+>  Documentation/devicetree/bindings/leds/common.yaml          | 6 ++++++
+>  Documentation/devicetree/bindings/leds/leds-bcm63138.yaml   | 4 ----
+>  Documentation/devicetree/bindings/leds/leds-bcm6328.yaml    | 4 ----
+>  Documentation/devicetree/bindings/leds/leds-bcm6358.txt     | 2 --
+>  .../devicetree/bindings/leds/leds-pwm-multicolor.yaml       | 4 ----
+>  Documentation/devicetree/bindings/leds/leds-pwm.yaml        | 5 -----
+>  6 files changed, 6 insertions(+), 19 deletions(-)
+> 
 
-Currently, ieee80211_set_beacon_cntdwn() calls rcu_dereference(), but
-without calling rcu_read_lock() beforehand and rcu_read_unlock()
-afterward.  At first I thought this was a bug, since (if I understand the
-RCU API correctly) rcu_dereference() should only be called in RCU
-read-side critical sections. However, upon closer inspection of the code,
-I realized that ieee80211_set_beacon_cntdwn() is only ever called inside
-critical sections. Therefore it seems appropriate to me to annotate
-ieee80211_set_beacon_cntdwn() with a __must_hold() annotation to make this
-apparent precondition explicit.
-
-This is my first time submitting an RCU-related patch so please tell me if
-I am misunderstanding the RCU API.
-
- net/mac80211/tx.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/net/mac80211/tx.c b/net/mac80211/tx.c
-index 314998fdb1a5..7245f2e641ba 100644
---- a/net/mac80211/tx.c
-+++ b/net/mac80211/tx.c
-@@ -10,6 +10,7 @@
-  * Transmit and frame generation functions.
-  */
- 
-+#include "linux/compiler_types.h"
- #include <linux/kernel.h>
- #include <linux/slab.h>
- #include <linux/skbuff.h>
-@@ -4974,6 +4975,7 @@ static int ieee80211_beacon_add_tim(struct ieee80211_sub_if_data *sdata,
- static void ieee80211_set_beacon_cntdwn(struct ieee80211_sub_if_data *sdata,
- 					struct beacon_data *beacon,
- 					struct ieee80211_link_data *link)
-+	__must_hold(link)
- {
- 	u8 *beacon_data, count, max_count = 1;
- 	struct probe_resp *resp;
--- 
-2.43.0
+Reviewed-by: Rob Herring <robh@kernel.org>
 
 
