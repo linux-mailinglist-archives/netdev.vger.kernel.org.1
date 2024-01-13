@@ -1,49 +1,46 @@
-Return-Path: <netdev+bounces-63424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 064F482CD7F
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 16:33:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C37C082CD95
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 16:46:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 616821F22038
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 15:33:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62CD31F226AF
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 15:46:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B03051849;
-	Sat, 13 Jan 2024 15:33:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5657B1FA4;
+	Sat, 13 Jan 2024 15:46:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l8dSd36e"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nB/qdP6B"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ACA31C16;
-	Sat, 13 Jan 2024 15:33:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B3BEC433F1;
-	Sat, 13 Jan 2024 15:33:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3719B23A3;
+	Sat, 13 Jan 2024 15:46:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0987C433F1;
+	Sat, 13 Jan 2024 15:46:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705159998;
-	bh=a6Ra8/vW20LqIUs9s37sHdzXHXZxogXvoS1zUc0El3w=;
+	s=k20201202; t=1705160796;
+	bh=EwpXUO2qQlx0+NhiF121g0hPSk+y48HTkprp0ywhANc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=l8dSd36ej497TKceU3Qsy8VxpLEUAfUPXC6n1FJE54MokQT4OwMUHEYC/czQFaZQw
-	 uTbccaH3L+xnx114iixt7ab12pWgT5tiaSi9A4iNY77nQmbdROGYbjU+rDkOjIV+qM
-	 uSqd/vN9YJDuPo7sRpNjU6nWK+eg+Hxz7Z5jbSOjZ0g7AqZzDl+o/hHNkjbpgnYePJ
-	 QtVzy5c5/94vJhSZK5wYRlFWqZYWh66LlRBBWSmh39KWPdcOvSyrJD/WC9T2k/uzdi
-	 eAw1txfsm4R3d71W6NXI4E7mOXLjUl5/w/YV0ThY02uCFj4zX5fC+EVUZfCCtqE2dz
-	 lbnSzMwZot9bg==
-Date: Sat, 13 Jan 2024 15:33:13 +0000
+	b=nB/qdP6BYQwTS+d/rR+LT5AYHEGK7Iy9SSMILJtCusm9O4CQ+qaHAtm3VJzcnRMIf
+	 2C6ilutl9SfTMbRvE7gEzi7MpaeMAIYMVbCIhG4jfwukLw6uvAegKMNtNldBtqrPje
+	 x4eh0aA1RCtbneTEzoEjzgU16rD1tcw8GG+CHpK2PMVqWKdmyQJKedXe0cHAPNiwTa
+	 Kco51N0FkwbuJgUH3AXlMOO5yADhUTR8uV5EV7jjFLyJeQ67I0QmmCFMAdgsjCFuBD
+	 lk41c/BurIKLYYI95mHRrp9kVJXr0ZcPylCYTts44HQ8cWxDeCOwf4oFmJQzAeTKrM
+	 +8ZXyW2wfS+hA==
+Date: Sat, 13 Jan 2024 15:46:32 +0000
 From: Simon Horman <horms@kernel.org>
-To: Zhipeng Lu <alexious@zju.edu.cn>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maor Gottlieb <maorg@mellanox.com>, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] [v3] net/mlx5e: fix a double-free in arfs_create_groups
-Message-ID: <20240113153313.GH392144@kernel.org>
-References: <20240112072916.3726945-1-alexious@zju.edu.cn>
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: edumazet@google.com, davem@davemloft.net, dsahern@kernel.org,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH net-next v2] net: tcp: accept old ack during closing
+Message-ID: <20240113154632.GI392144@kernel.org>
+References: <20240112094603.23706-1-menglong8.dong@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,64 +49,89 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240112072916.3726945-1-alexious@zju.edu.cn>
+In-Reply-To: <20240112094603.23706-1-menglong8.dong@gmail.com>
 
-On Fri, Jan 12, 2024 at 03:29:16PM +0800, Zhipeng Lu wrote:
-> When `in` allocated by kvzalloc fails, arfs_create_groups will free
-> ft->g and return an error. However, arfs_create_table, the only caller of
-> arfs_create_groups, will hold this error and call to
-> mlx5e_destroy_flow_table, in which the ft->g will be freed again.
+On Fri, Jan 12, 2024 at 05:46:03PM +0800, Menglong Dong wrote:
+> For now, the packet with an old ack is not accepted if we are in
+> FIN_WAIT1 state, which can cause retransmission. Taking the following
+> case as an example:
 > 
-> Fixes: 1cabe6b0965e ("net/mlx5e: Create aRFS flow tables")
-> Signed-off-by: Zhipeng Lu <alexious@zju.edu.cn>
-
-Thanks, I think this is getting close.
-
-Can you please prepare a v4 with the nits below fixed?
-And please target at the 'net' tree, by making sure it
-is based on the main branch of that tree, and marking
-the subject as follows:
-
-	Subject: [PATCH net v3] ...
-
+>     Client                               Server
+>       |                                    |
+>   FIN_WAIT1(Send FIN, seq=10)          FIN_WAIT1(Send FIN, seq=20, ack=10)
+>       |                                    |
+>       |                                Send ACK(seq=21, ack=11)
+>    Recv ACK(seq=21, ack=11)
+>       |
+>    Recv FIN(seq=20, ack=10)
+> 
+> In the case above, simultaneous close is happening, and the FIN and ACK
+> packet that send from the server is out of order. Then, the FIN will be
+> dropped by the client, as it has an old ack. Then, the server has to
+> retransmit the FIN, which can cause delay if the server has set the
+> SO_LINGER on the socket.
+> 
+> Old ack is accepted in the ESTABLISHED and TIME_WAIT state, and I think
+> it should be better to keep the same logic.
+> 
+> In this commit, we accept old ack in FIN_WAIT1/FIN_WAIT2/CLOSING/LAST_ACK
+> states. Maybe we should limit it to FIN_WAIT1 for now?
+> 
+> Signed-off-by: Menglong Dong <menglong8.dong@gmail.com>
 > ---
-> Changelog:
-> 
-> v2: free ft->g just in arfs_create_groups with a unwind ladder.
-> v3: split the allocation of ft->g and in. Rename the error label.
->     remove some refector change in v2.
+> v2:
+> - fix the compiling error
 > ---
->  .../net/ethernet/mellanox/mlx5/core/en_arfs.c | 26 +++++++++++--------
->  1 file changed, 15 insertions(+), 11 deletions(-)
+>  net/ipv4/tcp_input.c | 18 +++++++++++-------
+>  1 file changed, 11 insertions(+), 7 deletions(-)
 > 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_arfs.c b/drivers/net/ethernet/mellanox/mlx5/core/en_arfs.c
-> index bb7f86c993e5..0424ae068a60 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_arfs.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_arfs.c
-> @@ -254,11 +254,13 @@ static int arfs_create_groups(struct mlx5e_flow_table *ft,
+> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> index df7b13f0e5e0..70642bb08f3a 100644
+> --- a/net/ipv4/tcp_input.c
+> +++ b/net/ipv4/tcp_input.c
+> @@ -6699,17 +6699,21 @@ int tcp_rcv_state_process(struct sock *sk, struct sk_buff *skb)
+>  		return 0;
 >  
->  	ft->g = kcalloc(MLX5E_ARFS_NUM_GROUPS,
->  			sizeof(*ft->g), GFP_KERNEL);
-> -	in = kvzalloc(inlen, GFP_KERNEL);
-> -	if  (!in || !ft->g) {
-> -		kfree(ft->g);
-> -		kvfree(in);
-> +	if(!ft->g)
+>  	/* step 5: check the ACK field */
+> -	acceptable = tcp_ack(sk, skb, FLAG_SLOWPATH |
+> -				      FLAG_UPDATE_TS_RECENT |
+> -				      FLAG_NO_CHALLENGE_ACK) > 0;
+> +	reason = tcp_ack(sk, skb, FLAG_SLOWPATH |
+> +				  FLAG_UPDATE_TS_RECENT |
+> +				  FLAG_NO_CHALLENGE_ACK);
 
-nit: (one) space after if, please
+Hi Menglong Dong,
 
->  		return -ENOMEM;
-> +
-> +	in = kvzalloc(inlen, GFP_KERNEL);
-> +	if  (!in) {
+Probably I am missing something terribly obvious,
+but I am confused about the types used here.
 
-nit: one space is enough after if
+The type of reason is enum skb_drop_reason.
+For which, which on my system, the compiler uses an unsigned entity.
+i.e. it is an unsigned integer.
 
-> +		err = -ENOMEM;
-> +		goto err_free_g;
+But tcp_ack returns a (signed) int. And below reason is checked
+for values less than zero, and negated. This doesn't seem right.
+
+>  
+> -	if (!acceptable) {
+> +	if (reason <= 0) {
+>  		if (sk->sk_state == TCP_SYN_RECV)
+>  			return 1;	/* send one RST */
+> -		tcp_send_challenge_ack(sk);
+> -		SKB_DR_SET(reason, TCP_OLD_ACK);
+> -		goto discard;
+> +		/* accept old ack during closing */
+> +		if (reason < 0) {
+> +			tcp_send_challenge_ack(sk);
+> +			reason = -reason;
+> +			goto discard;
+> +		}
 >  	}
->  
->  	mc = MLX5_ADDR_OF(create_flow_group_in, in, match_criteria);
-
-...
+> +	SKB_DR_SET(reason, NOT_SPECIFIED);
+>  	switch (sk->sk_state) {
+>  	case TCP_SYN_RECV:
+>  		tp->delivered++; /* SYN-ACK delivery isn't tracked in tcp_ack */
+> -- 
+> 2.39.2
+> 
 
