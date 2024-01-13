@@ -1,138 +1,112 @@
-Return-Path: <netdev+bounces-63372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92A3E82C82C
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 00:59:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 128A182C864
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 01:33:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2ACE61F225C0
-	for <lists+netdev@lfdr.de>; Fri, 12 Jan 2024 23:59:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 386491C208F4
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 00:33:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 086471A5B9;
-	Fri, 12 Jan 2024 23:59:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F1E281D;
+	Sat, 13 Jan 2024 00:33:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=isovalent.com header.i=@isovalent.com header.b="SWNjFXaW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lY/IWkEe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4A7F1A5B5
-	for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 23:59:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=isovalent.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=isovalent.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1d50d0c98c3so50483915ad.1
-        for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 15:59:46 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED118632;
+	Sat, 13 Jan 2024 00:33:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3bc09844f29so5731924b6e.0;
+        Fri, 12 Jan 2024 16:33:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=isovalent.com; s=google; t=1705103986; x=1705708786; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5TRaqxeQ1knfJ48NiTaHAP/znF2dJmrqJVcUw5XhGAU=;
-        b=SWNjFXaWQIiJ0tHuefD4vTncgpA410G/ofcFDfcHvqxUMGZWLkmRsPzxJyFNWIE4lL
-         NEoU9WSmqcI24PXSdIMX7rImKlB9518BUu4AiGKu0ZpViIFRcYuXA7JG4+8b6ccDqP/T
-         e3Rhbh7vCQw5YhOa7HEB9xuC9X/a/4//UBjpW/O40uKfsLa6JBor725QHlaBxVULEKcS
-         9CZWuagupeqws+bWeU9xNYpUAAcpwKgrW5OwcJLQR6g4mjxkNsPcJ4pu2swqyD75pEOn
-         urPIW3ryPjxgiwq6Ta30U0i4AJ4rZRxdu47erCovIxi2ovZkl5+JuKRyQLlQF5CWvD5b
-         F0sw==
+        d=gmail.com; s=20230601; t=1705105980; x=1705710780; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rls0NJXtE5bHEdodmC082HfHwfpwWqgL9nu0PMicgUo=;
+        b=lY/IWkEeJI4y+ZDwka9KPxsR0eVU3qPh8whXtQ6ug/FRCcu59xQWUlAUwHZQeqdHWg
+         aTKwEGXE8HXUGy1lsFyeKTKrFo5xdUWJslrxLPYFMLLiY569XCNVuECUaYIY357BWaIZ
+         80kmelUxj7d4hvA+8t4cVt7eMkvIt6ZBYohzaqRy6RJb1gVRa1BnhNKmhKoLXBZt3Xvs
+         NzMEKMJsjebdQohJtYvmT23wdrgypEktw5TlnVeYKRffiQ/zIV7f3B+sIhKeNQoZQzHR
+         Dir7KzEHMICq1Ro92sxLo9ZdkScEt69DvfiiCh1g0tCI0nk+rAZv3X4gfrcnax6uw4az
+         l02w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705103986; x=1705708786;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5TRaqxeQ1knfJ48NiTaHAP/znF2dJmrqJVcUw5XhGAU=;
-        b=e0RlZsvLC5MzLaeSh+c09WDkY5oKhUjM+i2uHiQilcvKhP3cnjP7doeGLOWOeKesKX
-         sS16yY14hUgn/XolFmgi3lRZO/HbIEj0e07X+pMmeti/GpcoNyuXV9F2Wi8zohyU7ZTh
-         zEzLynkYBqWc2pHHYhx/IfpjoWYfK2uF9qLjkRRCyQ5ZJn73G8lkYl7SrvEfw6FShQlo
-         rxI2JSFSPRKSWlWtQ/ibmiHtusN/matdsaph+2fkwrC0jC8gm+UnpKT6dE9N1E8xtG8+
-         3MYYhjrEcx6yqvbYlxrQlDvswrROinfM4+tGMIuAA0A0uRa5qwm5cS9O+87COuwsLgm5
-         zq8A==
-X-Gm-Message-State: AOJu0YzneJ/M4Z2viafntlmr0qvDgwaTCCWJadiKGd9xgtRgmaU1GsIY
-	WT/4fK6E1kRG07BLcFwOrPjtwMRKjER0ag==
-X-Google-Smtp-Source: AGHT+IHew3qS2+FJv17RtU3KpQXgd7uTCoFOR2/OUak+sLzgJnxpxkbLd28CrNOnlEwKgIxwnk+ulA==
-X-Received: by 2002:a17:903:1104:b0:1d5:63c5:e107 with SMTP id n4-20020a170903110400b001d563c5e107mr2736857plh.3.1705103985882;
-        Fri, 12 Jan 2024 15:59:45 -0800 (PST)
-Received: from ?IPv6:2601:647:4900:1fbb:1985:323f:332f:3b61? ([2601:647:4900:1fbb:1985:323f:332f:3b61])
-        by smtp.gmail.com with ESMTPSA id b14-20020a6567ce000000b005ce979b861dsm3271908pgs.84.2024.01.12.15.59.45
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 12 Jan 2024 15:59:45 -0800 (PST)
-Content-Type: text/plain;
-	charset=us-ascii
+        d=1e100.net; s=20230601; t=1705105980; x=1705710780;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rls0NJXtE5bHEdodmC082HfHwfpwWqgL9nu0PMicgUo=;
+        b=q/jDygPyTz1GkO0qSNHXVieAWPkU1AgRl3ZE54jkt2b8uAuK8o3pOX+veuiFkDOiY7
+         4nw7BhVPxe2p22NuG5zPTAR4Lu4eHISNWSRCKi+W7mhqAFZ04IJR7qBDL9ezRGyFCZj5
+         nw1myzeOqTg0Znmn7DRxMh7bo19UX9tmAQPOrB/EX0ECQWJBUxTeHbRbcggQ9T4NyQPf
+         L1CLw4KE8i5biby/l9rk5/EgW5cLeGrPl4tCu/eG4CIqhrjQyFwQg2/Tog9xRoFMax63
+         p2UpQlQ/emsxZVqx9y3onWwmo2slh5mYomdhah6LxiYVZH17m6yOU3PjNACAoEHH+sHQ
+         wnHQ==
+X-Gm-Message-State: AOJu0YxOjZgoDL85E9DM86svxQYi7YVhFeZNBS1+kXcx7R41eGRDcCzw
+	VCP0MsM3D4wuTC9msbo5fbHHGizgrg4=
+X-Google-Smtp-Source: AGHT+IFd+S/EtOTDcY4VnhCH4ApoymbIBV6raBHUsF9r2Gno0z0I63eBH8jockeZavaz4SMgflB0jQ==
+X-Received: by 2002:a05:6808:3a14:b0:3bd:5f84:b599 with SMTP id gr20-20020a0568083a1400b003bd5f84b599mr2761152oib.109.1705105980470;
+        Fri, 12 Jan 2024 16:33:00 -0800 (PST)
+Received: from john.. ([98.97.116.126])
+        by smtp.gmail.com with ESMTPSA id x8-20020aa79a48000000b006d9b35b2602sm3707914pfj.3.2024.01.12.16.32.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Jan 2024 16:32:59 -0800 (PST)
+From: John Fastabend <john.fastabend@gmail.com>
+To: netdev@vger.kernel.org,
+	eadavis@qq.com,
+	kuba@kernel.org
+Cc: john.fastabend@gmail.com,
+	bpf@vger.kernel.org,
+	borisp@nvidia.com
+Subject: [PATCH net v2 0/2] tls fixes for SPLICE with more hint 
+Date: Fri, 12 Jan 2024 16:32:56 -0800
+Message-Id: <20240113003258.67899-1-john.fastabend@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.7\))
-Subject: Re: [PATCH v3 bpf 1/3] bpf: iter_udp: Retry with a larger batch size
- without going back to the previous bucket
-From: Aditi Ghag <aditi.ghag@isovalent.com>
-In-Reply-To: <20240112190530.3751661-2-martin.lau@linux.dev>
-Date: Fri, 12 Jan 2024 15:59:44 -0800
-Cc: bpf@vger.kernel.org,
- Alexei Starovoitov <ast@kernel.org>,
- Andrii Nakryiko <andrii@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- netdev@vger.kernel.org,
- kernel-team@meta.com,
- Yonghong Song <yonghong.song@linux.dev>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <48FE07AD-06AA-4D01-88D8-FAE628AF281B@isovalent.com>
-References: <20240112190530.3751661-1-martin.lau@linux.dev>
- <20240112190530.3751661-2-martin.lau@linux.dev>
-To: Martin KaFai Lau <martin.lau@linux.dev>
-X-Mailer: Apple Mail (2.3608.120.23.2.7)
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
+Syzbot found a splat where it tried to splice data over a tls socket
+with the more hint and sending greater than the number of frags that
+fit in a msg scatterlist. This resulted in an error where we do not
+correctly send the data when the msg sg is full. The more flag being
+just a hint not a strict contract. This then results in the syzbot
+warning on the next send.
 
+Edward generated an initial patch for this which checked for a full
+msg on entry to the sendmsg hook.  This fixed the WARNING, but didn't
+fully resolve the issue because the full msg_pl scatterlist was never
+sent resulting in a stuck socket. In this series instead avoid the
+situation by forcing the send on the splice that fills the scatterlist.
 
-> On Jan 12, 2024, at 11:05 AM, Martin KaFai Lau <martin.lau@linux.dev> =
-wrote:
->=20
-> From: Martin KaFai Lau <martin.lau@kernel.org>
->=20
-> The current logic is to use a default size 16 to batch the whole =
-bucket.
-> If it is too small, it will retry with a larger batch size.
->=20
-> The current code accidentally does a state->bucket-- before retrying.
-> This goes back to retry with the previous bucket which has already
-> been done. This patch fixed it.
->=20
-> It is hard to create a selftest. I added a WARN_ON(state->bucket < 0),
-> forced a particular port to be hashed to the first bucket,
-> created >16 sockets, and observed the for-loop went back
-> to the "-1" bucket.
->=20
-> Cc: Aditi Ghag <aditi.ghag@isovalent.com>
-> Fixes: c96dac8d369f ("bpf: udp: Implement batching for sockets =
-iterator")
-> Acked-by: Yonghong Song <yonghong.song@linux.dev>
-> Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
+Also in original thread I mentioned it didn't seem to be enough to
+simply fix the send on full sg problem. That was incorrect and was
+really a bug in my test program that was hanging the test program.
+I had setup a repair socket and wasn't handling it correctly so my
+tester got stuck.
 
-Reviewed-by: Aditi Ghag <aditi.ghag@isovalent.com>
-LGTM!
+Thanks. Please review. Fix in patch 1 and test in patch 2.
 
-> ---
-> net/ipv4/udp.c | 1 -
-> 1 file changed, 1 deletion(-)
->=20
-> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> index 89e5a806b82e..978b83d3c094 100644
-> --- a/net/ipv4/udp.c
-> +++ b/net/ipv4/udp.c
-> @@ -3213,7 +3213,6 @@ static struct sock *bpf_iter_udp_batch(struct =
-seq_file *seq)
-> 		/* After allocating a larger batch, retry one more time =
-to grab
-> 		 * the whole bucket.
-> 		 */
-> -		state->bucket--;
-> 		goto again;
-> 	}
-> done:
-> --=20
-> 2.34.1
->=20
+v2: use SPLICE_F_ flag names instead of cryptic 0xe
+
+John Fastabend (2):
+  net: tls, fix WARNIING in __sk_msg_free
+  net: tls, add test to capture error on large splice
+
+ net/tls/tls_sw.c                  |  6 +++++-
+ tools/testing/selftests/net/tls.c | 14 ++++++++++++++
+ 2 files changed, 19 insertions(+), 1 deletion(-)
+
+-- 
+2.33.0
 
 
