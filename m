@@ -1,135 +1,149 @@
-Return-Path: <netdev+bounces-63398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89FDD82CA82
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 09:31:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7B8582CA9B
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 09:59:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC8DC1F22D06
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 08:31:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4AE71C2203A
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 08:59:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AACA5364;
-	Sat, 13 Jan 2024 08:31:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="Acm24Q4k"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23A817E8;
+	Sat, 13 Jan 2024 08:59:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB44436F
-	for <netdev@vger.kernel.org>; Sat, 13 Jan 2024 08:31:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-50e5a9bcec9so8833865e87.3
-        for <netdev@vger.kernel.org>; Sat, 13 Jan 2024 00:31:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ragnatech.se; s=google; t=1705134680; x=1705739480; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=0gF3sw/Ea39zWxuD0gLzKFUce26V5brwlX/JeoC/CYQ=;
-        b=Acm24Q4k027vz2xM+HhYdbmskOzawnZ2RHCM/5Yr7kdOSHZkEthTSDtiMl3IvuqpSI
-         S+7b5YJZ6FsrBQNvQLCuwxjDBOAJsidCbMWm9hgFVl9cEHKCT/1uSesVOWuAcKTt9UhV
-         wDHLbzX94KH2Tolvn6Lp87OHLrOCx+K6XCF3xRFnpZfUPKI+H+6R/BTG1U57b0rMBxCz
-         FzW9ULLg7YVGAJVJzCde6c/Pjd4luIhmNC52QgXyA02hYxJVWP7oxHd/y1vO2aQxG1qx
-         +tEogBfsWosntcMyCDiE+NmUjhCmZcwrWGiOQdjIaWhkvSXx7w2bIn/eME4x3qJ78o5I
-         CwWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705134680; x=1705739480;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0gF3sw/Ea39zWxuD0gLzKFUce26V5brwlX/JeoC/CYQ=;
-        b=lALO7uCfzBn2P04VIeCTN4Qv6eVzGbDkxFsl+YVbFlaJPlU7BiEnAGCibVpG/gpTk3
-         F7j3FV3s5R20jbY0oOUUiVlOSMzDv4cF/rfS3W38moxVa1zdN2rZLwu3MHjQqsFtPPW4
-         k4PUvMWRjWhWEAfcWEs5jbpe4SpO/3bkxTPloFWjQpZyW2fBE8sqE3Ywyv86Z00Xs9kg
-         R4yxm2/5L2LRuHVA4TcOUY4L1C0msII4LmSBF3NjBMyZklT2m7vejFmclI1LK91T77zW
-         +o+vjfyJ2Bqj3XlT9vBg/4nl06sg3d6Wac/EATxslRZglIfTpZg81FbMksy8u3A6lwgN
-         Z7XQ==
-X-Gm-Message-State: AOJu0Yz/lViJXAfJQJlslHbXfJQr8y9V3uib0m4I+LN6pSAEa9/z4BBw
-	X500GfXR43WhkQUXW6qiZjYV/ehnizH2pQ==
-X-Google-Smtp-Source: AGHT+IFclI/5HicsKwUTEr7skf591nEgQRXaAa9kiQQu/l4k9zf0rvOYj4zDXmS1hH+xO3HBGCxOkw==
-X-Received: by 2002:a05:6512:390e:b0:50e:74ec:75f6 with SMTP id a14-20020a056512390e00b0050e74ec75f6mr1161110lfu.136.1705134679578;
-        Sat, 13 Jan 2024 00:31:19 -0800 (PST)
-Received: from localhost (h-46-59-36-113.A463.priv.bahnhof.se. [46.59.36.113])
-        by smtp.gmail.com with ESMTPSA id x26-20020a19f61a000000b0050e7e21b338sm773810lfe.14.2024.01.13.00.31.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 13 Jan 2024 00:31:18 -0800 (PST)
-Date: Sat, 13 Jan 2024 09:31:17 +0100
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>
-To: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>,
-	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Wolfram Sang <wsa+renesas@sang-engineering.com>,
-	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: ravb: Fix dma_addr_t truncation in error case
-Message-ID: <20240113083117.GI1643864@ragnatech.se>
-References: <20240113042221.480650-1-nikita.yoush@cogentembedded.com>
+Received: from mx10.didiglobal.com (mx10.didiglobal.com [111.202.70.125])
+	by smtp.subspace.kernel.org (Postfix) with SMTP id 0133964B;
+	Sat, 13 Jan 2024 08:59:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=didiglobal.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=didiglobal.com
+Received: from mail.didiglobal.com (unknown [10.79.71.32])
+	by mx10.didiglobal.com (MailData Gateway V2.8.8) with ESMTPS id 67B1B184730DB8;
+	Sat, 13 Jan 2024 16:56:16 +0800 (CST)
+Received: from ZJY02-ACTMBX-04.didichuxing.com (10.79.65.14) by
+ ZJY03-ACTMBX-03.didichuxing.com (10.79.71.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Sat, 13 Jan 2024 16:56:16 +0800
+Received: from ZJY02-ACTMBX-04.didichuxing.com ([fe80::35e6:a40:1a5b:87b2]) by
+ ZJY02-ACTMBX-04.didichuxing.com ([fe80::35e6:a40:1a5b:87b2%4]) with mapi id
+ 15.01.2507.032; Sat, 13 Jan 2024 16:56:16 +0800
+X-MD-Sfrom: wangkeqiwang@didiglobal.com
+X-MD-SrcIP: 10.79.71.32
+From: =?utf-8?B?546L54+C55CmIEtlcWkgV2FuZyBXYW5n?=
+	<wangkeqiwang@didiglobal.com>
+To: "Yin, Fengwei" <fengwei.yin@intel.com>, kernel test robot
+	<oliver.sang@intel.com>
+CC: "oe-lkp@lists.linux.dev" <oe-lkp@lists.linux.dev>, "lkp@intel.com"
+	<lkp@intel.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "ying.huang@intel.com"
+	<ying.huang@intel.com>, "feng.tang@intel.com" <feng.tang@intel.com>
+Subject: Re: [linus:master] [connector] c46bfba133:
+ stress-ng.netlink-proc.ops_per_sec -97.2% regression
+Thread-Topic: [linus:master] [connector] c46bfba133:
+ stress-ng.netlink-proc.ops_per_sec -97.2% regression
+Thread-Index: AQHaRUqHG1AdNrsDpE+sPh1PDQd947DXciWA
+Date: Sat, 13 Jan 2024 08:56:15 +0000
+Message-ID: <E0375D03-BC1E-4F78-8D44-83F4E98307BC@didiglobal.com>
+In-Reply-To: <5838205f-41ba-4666-9786-11181552a738@intel.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <9C45B2D478ECAE469B04C7D4023F7213@didichuxing.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240113042221.480650-1-nikita.yoush@cogentembedded.com>
 
-Hello Nikita,
-
-Thanks for your patch.
-
-On 2024-01-13 10:22:21 +0600, Nikita Yushchenko wrote:
-> In ravb_start_xmit(), ravb driver uses u32 variable to store result of
-> dma_map_single() call. Since ravb hardware has 32-bit address fields in
-> descriptors, this works properly when mapping is successful - it is
-> platform's job to provide mapping addresses that fit into hardware
-> limitations.
-> 
-> However, in failure case dma_map_single() returns DMA_MAPPING_ERROR
-> constant that is 64-bit when dma_addr_t is 64-bit. Storing this constant
-> in u32 leads to truncation, and further call to dma_mapping_error()
-> fails to notice the error.
-> 
-> Fix that by storing result of dma_map_single() in a dma_addr_t
-> variable.
-> 
-> Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
-> Signed-off-by: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-
-Reviewed-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
-
-> ---
->  drivers/net/ethernet/renesas/ravb_main.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-> index 8649b3e90edb..0e3731f50fc2 100644
-> --- a/drivers/net/ethernet/renesas/ravb_main.c
-> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> @@ -1949,7 +1949,7 @@ static netdev_tx_t ravb_start_xmit(struct sk_buff *skb, struct net_device *ndev)
->  	struct ravb_tstamp_skb *ts_skb;
->  	struct ravb_tx_desc *desc;
->  	unsigned long flags;
-> -	u32 dma_addr;
-> +	dma_addr_t dma_addr;
->  	void *buffer;
->  	u32 entry;
->  	u32 len;
-> -- 
-> 2.39.2
-> 
-> 
-
--- 
-Kind Regards,
-Niklas Söderlund
+SGkgRmVuZ3dlaQ0KCVNvcnJ5LCByZXBseSBzbyBsYXRlLg0KCUkgZG9uJ3QgdGhpbmsgdGhpcyB3
+aWxsIGNhdXNlIGEgZHJhc3RpYyBkcm9wIGluIHN0cmVzcy1uZyBuZXRsaW5rLXByb2MgcGVyZm9y
+bWFuY2UuIEJlY2F1c2UgYWZ0ZXIgcmV0dXJuaW5nIC1FU1JDSCwgcHJvY19ldmVudF9udW1fbGlz
+dGVuZXJzIGlzIGNsZWFyZWQgYW5kIHRoZSBzZW5kX21zZyBmdW5jdGlvbiB3aWxsIG5vdCBiZSBj
+YWxsZWQuDQpIb3dldmVyLCB0aGVyZSBpcyBhIHByb2JsZW0gd2l0aCBqdWRnaW5nIGNsZWFyaW5n
+IGJhc2VkIG9uIHdoZXRoZXIgdGhlIHJldHVybiB2YWx1ZSBpcyAtRVNSQ0guIEJlY2F1c2UgbmV0
+bGlua19icm9hZGNhc3Qgd2lsbCByZXR1cm4gLUVTUkNIIGluIHRoaXMgY2FzZS4gQ2FuIHlvdSB0
+cnkgdGhlIGZvbGxvd2luZyBwYXRjaCB0byBzb2x2ZSB5b3VyIHByb2JsZW0/DQoNCkZyb20gNmU2
+YzM2YWVkMTU2YmJiMTg1ZjU0ZDBjMGZlZjJmNjY4M2RmMzI4OCBNb24gU2VwIDE3IDAwOjAwOjAw
+IDIwMDENCkZyb206IHdhbmdrZXFpIDx3YW5na2VxaXdhbmdAZGlkaWdsb2JhbC5jb20+DQpEYXRl
+OiBTYXQsIDIzIERlYyAyMDIzIDEzOjIxOjE3ICswODAwDQpTdWJqZWN0OiBbUEFUQ0hdIGNvbm5l
+Y3RvcjogRml4IHByb2NfZXZlbnRfbnVtX2xpc3RlbmVycyBjb3VudCBub3QgY2xlYXJlZA0KDQpX
+aGVuIHdlIHJlZ2lzdGVyIGEgY25fcHJvYyBsaXN0ZW5pbmcgZXZlbnQsIHRoZSBwcm9jX2V2ZW50
+X251bV9saXN0ZW5lcg0KdmFyaWFibGUgd2lsbCBiZSBpbmNyZW1lbnRlZCBieSBvbmUsIGJ1dCBp
+ZiBQUk9DX0NOX01DQVNUX0lHTk9SRSBpcw0Kbm90IGNhbGxlZCwgdGhlIGNvdW50IHdpbGwgbm90
+IGRlY3JlYXNlLg0KVGhpcyB3aWxsIGNhdXNlIHRoZSBwcm9jXypfY29ubmVjdG9yIGZ1bmN0aW9u
+IHRvIHRha2UgdGhlIHdyb25nIHBhdGguDQpJdCB3aWxsIHJlYXBwZWFyIHdoZW4gdGhlIGZvcmtz
+dGF0IHRvb2wgZXhpdHMgdmlhIGN0cmwgKyBjLg0KV2Ugc29sdmUgdGhpcyBwcm9ibGVtIGJ5IGRl
+dGVybWluaW5nIHdoZXRoZXINCnRoZXJlIGFyZSBzdGlsbCBsaXN0ZW5lcnMgdG8gY2xlYXIgcHJv
+Y19ldmVudF9udW1fbGlzdGVuZXIuDQoNClNpZ25lZC1vZmYtYnk6IHdhbmdrZXFpIDx3YW5na2Vx
+aXdhbmdAZGlkaWdsb2JhbC5jb20+DQotLS0NCiBkcml2ZXJzL2Nvbm5lY3Rvci9jbl9wcm9jLmMg
+ICB8IDUgKysrKy0NCiBkcml2ZXJzL2Nvbm5lY3Rvci9jb25uZWN0b3IuYyB8IDYgKysrKysrDQog
+aW5jbHVkZS9saW51eC9jb25uZWN0b3IuaCAgICAgfCAxICsNCiAzIGZpbGVzIGNoYW5nZWQsIDEx
+IGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkNCg0KZGlmZiAtLWdpdCBhL2RyaXZlcnMvY29u
+bmVjdG9yL2NuX3Byb2MuYyBiL2RyaXZlcnMvY29ubmVjdG9yL2NuX3Byb2MuYw0KaW5kZXggNDRi
+MTllNjk2Li5iMDlmNzRlZDMgMTAwNjQ0DQotLS0gYS9kcml2ZXJzL2Nvbm5lY3Rvci9jbl9wcm9j
+LmMNCisrKyBiL2RyaXZlcnMvY29ubmVjdG9yL2NuX3Byb2MuYw0KQEAgLTEwOCw4ICsxMDgsMTEg
+QEAgc3RhdGljIGlubGluZSB2b2lkIHNlbmRfbXNnKHN0cnVjdCBjbl9tc2cgKm1zZykNCiAJCWZp
+bHRlcl9kYXRhWzFdID0gMDsNCiAJfQ0KDQotCWNuX25ldGxpbmtfc2VuZF9tdWx0KG1zZywgbXNn
+LT5sZW4sIDAsIENOX0lEWF9QUk9DLCBHRlBfTk9XQUlULA0KKwlpZiAobmV0bGlua19oYXNfbGlz
+dGVuZXJzKGdldF9jZGV2X25scygpLCBDTl9JRFhfUFJPQykpDQorCQljbl9uZXRsaW5rX3NlbmRf
+bXVsdChtc2csIG1zZy0+bGVuLCAwLCBDTl9JRFhfUFJPQywgR0ZQX05PV0FJVCwNCiAJCQkgICAg
+IGNuX2ZpbHRlciwgKHZvaWQgKilmaWx0ZXJfZGF0YSk7DQorCWVsc2UNCisJCWF0b21pY19zZXQo
+JnByb2NfZXZlbnRfbnVtX2xpc3RlbmVycywgMCk7DQoNCiAJbG9jYWxfdW5sb2NrKCZsb2NhbF9l
+dmVudC5sb2NrKTsNCiB9DQpkaWZmIC0tZ2l0IGEvZHJpdmVycy9jb25uZWN0b3IvY29ubmVjdG9y
+LmMgYi9kcml2ZXJzL2Nvbm5lY3Rvci9jb25uZWN0b3IuYw0KaW5kZXggN2Y3Yjk0ZjYxLi5jZWQy
+NjU1YzYgMTAwNjQ0DQotLS0gYS9kcml2ZXJzL2Nvbm5lY3Rvci9jb25uZWN0b3IuYw0KKysrIGIv
+ZHJpdmVycy9jb25uZWN0b3IvY29ubmVjdG9yLmMNCkBAIC0xMjAsNiArMTIwLDEyIEBAIGludCBj
+bl9uZXRsaW5rX3NlbmRfbXVsdChzdHJ1Y3QgY25fbXNnICptc2csIHUxNiBsZW4sIHUzMiBwb3J0
+aWQsIHUzMiBfX2dyb3VwLA0KIH0NCiBFWFBPUlRfU1lNQk9MX0dQTChjbl9uZXRsaW5rX3NlbmRf
+bXVsdCk7DQoNCitzdHJ1Y3Qgc29jayAqZ2V0X2NkZXZfbmxzKHZvaWQpDQorew0KKwlyZXR1cm4g
+Y2Rldi5ubHM7DQorfQ0KK0VYUE9SVF9TWU1CT0xfR1BMKGdldF9jZGV2X25scyk7DQorDQogLyog
+c2FtZSBhcyBjbl9uZXRsaW5rX3NlbmRfbXVsdCBleGNlcHQgbXNnLT5sZW4gaXMgdXNlZCBmb3Ig
+bGVuICovDQogaW50IGNuX25ldGxpbmtfc2VuZChzdHJ1Y3QgY25fbXNnICptc2csIHUzMiBwb3J0
+aWQsIHUzMiBfX2dyb3VwLA0KIAlnZnBfdCBnZnBfbWFzaykNCmRpZmYgLS1naXQgYS9pbmNsdWRl
+L2xpbnV4L2Nvbm5lY3Rvci5oIGIvaW5jbHVkZS9saW51eC9jb25uZWN0b3IuaA0KaW5kZXggY2Vj
+MmQ5OWFlLi5jNjAxZWI5OWIgMTAwNjQ0DQotLS0gYS9pbmNsdWRlL2xpbnV4L2Nvbm5lY3Rvci5o
+DQorKysgYi9pbmNsdWRlL2xpbnV4L2Nvbm5lY3Rvci5oDQpAQCAtMTI2LDYgKzEyNiw3IEBAIGlu
+dCBjbl9uZXRsaW5rX3NlbmRfbXVsdChzdHJ1Y3QgY25fbXNnICptc2csIHUxNiBsZW4sIHUzMiBw
+b3J0aWQsDQogICogSWYgdGhlcmUgYXJlIG5vIGxpc3RlbmVycyBmb3IgZ2l2ZW4gZ3JvdXAgJS1F
+U1JDSCBjYW4gYmUgcmV0dXJuZWQuDQogICovDQogaW50IGNuX25ldGxpbmtfc2VuZChzdHJ1Y3Qg
+Y25fbXNnICptc2csIHUzMiBwb3J0aWQsIHUzMiBncm91cCwgZ2ZwX3QgZ2ZwX21hc2spOw0KK3N0
+cnVjdCBzb2NrICpnZXRfY2Rldl9ubHModm9pZCk7DQoNCiBpbnQgY25fcXVldWVfYWRkX2NhbGxi
+YWNrKHN0cnVjdCBjbl9xdWV1ZV9kZXYgKmRldiwgY29uc3QgY2hhciAqbmFtZSwNCiAJCQkgIGNv
+bnN0IHN0cnVjdCBjYl9pZCAqaWQsDQotLQ0KMi4yNy4wDQoNCu+7v+WcqCAyMDI0LzEvMTIgMTk6
+MjjvvIzigJxZaW4sIEZlbmd3ZWnigJ08ZmVuZ3dlaS55aW5AaW50ZWwuY29tIDxtYWlsdG86ZmVu
+Z3dlaS55aW5AaW50ZWwuY29tPj4g5YaZ5YWlOg0KDQoNCg0KDQoNCg0KT24gMS8xMS8yMDI0IDEx
+OjE5IFBNLCBrZXJuZWwgdGVzdCByb2JvdCB3cm90ZToNCj4gDQo+IA0KPiBIZWxsbywNCj4gDQo+
+IHdlIHJldmlld2VkIHRoaXMgcmVwb3J0IGFuZCBGZW5nd2VpIChDY2VkKSBwb2ludGVkIG91dCBp
+dCBjb3VsZCBiZSB0aGUgcGF0Y2gNCj4gYnJlYWtzIGZ1bmN0aW9uYWxpdHksIHRoZW4gY2F1c2Vz
+IHN0cmVzcy1uZyBuZXRsaW5rLXByb2MgcGVyZm9ybWFuY2UgZHJvcHMNCj4gZHJhbWF0aWNhbGx5
+Lg0KPiANCkp1c3QgRllJLiBIZXJlIGlzIHdoYXQgSSBvYnNlcnZlZCB3aGVuIHJ1bm5pbmcNCnN0
+cmVzcy1uZy5uZXRsaW5rLXByb2MgdGVzdGluZzoNCg0KDQpXaGF0ZXZlciB3aXRoL3dpdGhvdXQg
+dGhlIHBhdGNoLCBjbl9uZXRsaW5rX3NlbmRfbXVsdCgpIHJldHVybnMNCi1FU1JDSCBpbiBtb3N0
+IGNhc2UuDQoNCg0KVGhlIGZvbGxvd2luZyBpcyB3aGF0IHRoZSBjbl9uZXRsaW5rX3NlbmRfbXVs
+dCgpIHJldHVybnMgd2hlbg0Kc3RyZXNzLW5nLm5ldGxpbmstcHJvYyBpcyBydW5uaW5nOg0KDQoN
+Ci4uLg0KMjEzODAxIDIxMzgwMSBzdHJlc3MtbmctMyBjbl9uZXRsaW5rX3NlbmRfbXVsdCAtMw0K
+MjEzODAxIDIxMzgwMSBzdHJlc3Mtbmctc3Bhd24gY25fbmV0bGlua19zZW5kX211bHQgLTMNCjIx
+MzgwMSAyMTM4MDEgc3RyZXNzLW5nLXNwYXduIGNuX25ldGxpbmtfc2VuZF9tdWx0IC0zDQoyMTM4
+MDEgMjEzODAxIHN0cmVzcy1uZy13YWl0IGNuX25ldGxpbmtfc2VuZF9tdWx0IC0zDQoyMTM4MDIg
+MjEzODAyIHN0cmVzcy1uZy00IGNuX25ldGxpbmtfc2VuZF9tdWx0IC0zDQoyMTM4MDIgMjEzODAy
+IHN0cmVzcy1uZy1zcGF3biBjbl9uZXRsaW5rX3NlbmRfbXVsdCAtMw0KMjEzODAyIDIxMzgwMiBz
+dHJlc3Mtbmctc3Bhd24gY25fbmV0bGlua19zZW5kX211bHQgLTMNCjIxMzgwMiAyMTM4MDIgc3Ry
+ZXNzLW5nLXdhaXQgY25fbmV0bGlua19zZW5kX211bHQgLTMNCjIxMzgwMyAyMTM4MDMgc3RyZXNz
+LW5nLTUgY25fbmV0bGlua19zZW5kX211bHQgLTMNCjIxMzgwMyAyMTM4MDMgc3RyZXNzLW5nLWRl
+YWQgY25fbmV0bGlua19zZW5kX211bHQgLTMNCjIxMzgwMyAyMTM4MDMgc3RyZXNzLW5nLWRlYWQg
+Y25fbmV0bGlua19zZW5kX211bHQgLTMNCjIxMzgwMiAyMTM4MDIgc3RyZXNzLW5nLXdhaXQgY25f
+bmV0bGlua19zZW5kX211bHQgLTMNCjIxMzgwMSAyMTM4MDEgc3RyZXNzLW5nLXdhaXQgY25fbmV0
+bGlua19zZW5kX211bHQgLTMNCjIxMzgwMCAyMTM4MDAgc3RyZXNzLW5nLXdhaXQgY25fbmV0bGlu
+a19zZW5kX211bHQgLTMNCjIxMzc5OSAyMTM3OTkgc3RyZXNzLW5nLXdhaXQgY25fbmV0bGlua19z
+ZW5kX211bHQgLTMNCjIxMzc5OCAyMTM3OTggc3RyZXNzLW5nLXdhaXQgY25fbmV0bGlua19zZW5k
+X211bHQgLTMNCjE1NDY5NyAxNTQ2OTcgc3RyZXNzLW5nIGNuX25ldGxpbmtfc2VuZF9tdWx0IC0z
+DQouLi4NCg0KDQoNCg0KTG9va3MgbGlrZSBpdCdzIG5vdCBhY2N1cmF0ZSB0byByZXNldCBwcm9j
+X2V2ZW50X251bV9saXN0ZW5lcnMNCmFjY29yZGluZyB0byBjbl9uZXRsaW5rX3NlbmRfbXVsdCgp
+IHJldHVybiB2YWx1ZSAtMy4NCg0KDQoNCg0KUmVnYXJkcw0KWWluLCBGZW5nd2VpDQoNCg0KDQo=
 
