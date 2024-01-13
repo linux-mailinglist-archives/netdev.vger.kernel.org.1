@@ -1,49 +1,48 @@
-Return-Path: <netdev+bounces-63387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A09682C927
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 03:45:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE94A82C929
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 03:45:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 937801F23372
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 02:45:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C3781F237DF
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 02:45:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF1506139;
-	Sat, 13 Jan 2024 02:44:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43CFC63A0;
+	Sat, 13 Jan 2024 02:45:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="feGcgba9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Db6SZzaV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFAC21C2E;
-	Sat, 13 Jan 2024 02:44:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBF57C433F1;
-	Sat, 13 Jan 2024 02:44:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22E006139;
+	Sat, 13 Jan 2024 02:45:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5786FC433C7;
+	Sat, 13 Jan 2024 02:45:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705113898;
-	bh=BzT25cXi1cMZyRyCto2mcPnNVmM/UVdj5o9CdlbbAbE=;
+	s=k20201202; t=1705113933;
+	bh=WPXNIjwPEyUAkDq9R3BucYPvYuAfL7jmt++pnxeAdj8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=feGcgba9BKLJGGc2npBabHiVmw5NHLR+0ul8vA9DpZsrY2ffhdB6AqWvuY8Po5jYs
-	 jT08umgtShrLTuyZvY7YHOJWb5si/wW6LrYy5/ZmTG+54gFnwn+GKvWXLxI9zjluYZ
-	 1fbRkccoaRqv6oAetob/q3Jg+1wAEB8ABngOqL3AwtSVrW5AVem4nIacVNkNs8Gvek
-	 wztUGMGp7xeU9i+tW6u9cog9iysUb8+FPLeo0FcEMtCDBaMReJcBd4OdI6kYTXtbXr
-	 JZO5hUWIpg8IixFGnjoQaB5GNqBMchYcEJyh6oLGpUZpSLPQyXwVPP1+rXI+UBwihz
-	 Y3avb2F4/Zy2A==
-Date: Fri, 12 Jan 2024 18:44:56 -0800
+	b=Db6SZzaVP/go0D8hwVgyW9vUMX6p/j8RS7XGrtL/MCBs1tFF7vJfmwPZ8/zUY9HG7
+	 Gu1gVgGacmVzkcgrnKKX5BE/WGyudQPAjfrh6bQHPMkfBEHZC1zis8ua4S6Ipc0P/b
+	 gVpMg8QP6KYgb15XmBeHElqPTRnQa76ldjykKHEzKdM+b523BmmBg5HIVZSumqJ1VT
+	 5GIyRUMfS32GkugH7vdcQM91pRFqV+7HmyuZwuHSLO2UDlnRO6sowYW5eGswE6qaG5
+	 pAkBjpsG2nTg0NZ3VkB1qIU6v/rkl2Yw7NkXmBUA9GUSu7gbmkyUlmj2BOfF8L3HgF
+	 YTb+YtGr1u0Bw==
+Date: Fri, 12 Jan 2024 18:45:32 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Herbert Xu
- <herbert@gondor.apana.org.au>, kernel@pengutronix.de,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: netdev_queue: netdev_txq_completed_mb(): fix wake
- condition
-Message-ID: <20240112184456.107a3756@kernel.org>
-In-Reply-To: <20240112-netdev_queue-v1-1-102c2d57e20a@pengutronix.de>
-References: <20240112-netdev_queue-v1-1-102c2d57e20a@pengutronix.de>
+To: John Fastabend <john.fastabend@gmail.com>
+Cc: netdev@vger.kernel.org, eadavis@qq.com, bpf@vger.kernel.org,
+ borisp@nvidia.com
+Subject: Re: [PATCH net v2 2/2] net: tls, add test to capture error on large
+ splice
+Message-ID: <20240112184532.7eb22ca2@kernel.org>
+In-Reply-To: <20240113003258.67899-3-john.fastabend@gmail.com>
+References: <20240113003258.67899-1-john.fastabend@gmail.com>
+	<20240113003258.67899-3-john.fastabend@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,23 +52,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 12 Jan 2024 17:13:14 +0100 Marc Kleine-Budde wrote:
-> netif_txq_try_stop() uses "get_desc >= start_thrs" as the check for
-> the call to netif_tx_start_queue().
+On Fri, 12 Jan 2024 16:32:58 -0800 John Fastabend wrote:
+> syzbot found an error with how splice() is handled with a msg greater
+> than 32. This was fixed in previous patch, but lets add a test for
+> it to ensure it continues to work.
 > 
-> Use ">=" i netdev_txq_completed_mb(), too.
-> 
-> Fixes: c91c46de6bbc ("net: provide macros for commonly copied lockless queue stop/wake code")
-> Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-> ---
-> I'm currently converting a networking driver with a TX-FIFO depth of
-> 1 (CAN device with lots of errata :/) to the netdev_queue.h helpers
-> and stumbled over an off-by-one error on __netif_txq_completed_wake().
+> Signed-off-by: John Fastabend <john.fastabend@gmail.com>
 
-Makes sense, could be copy'n'paste from one of the drivers this is
-based on. A bit unsure if it deserves the Fixes tag and net as we don't
-know of any current user that would be suffering. start_thrs == ring size
-is a bit of an extreme use case indeed :) Either way:
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 
-Acked-by: Jakub Kicinski <kuba@kernel.org>
+tnx!
 
