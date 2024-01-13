@@ -1,133 +1,106 @@
-Return-Path: <netdev+bounces-63393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1F3A82C95B
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 05:47:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F258C82CA2D
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 07:10:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7CD5A1F22BC3
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 04:47:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C1531F238E3
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 06:10:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98702DF6D;
-	Sat, 13 Jan 2024 04:47:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6000FFC03;
+	Sat, 13 Jan 2024 06:10:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b="IuIcKNTX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WKF91vYX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFFEDE546
-	for <netdev@vger.kernel.org>; Sat, 13 Jan 2024 04:47:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cogentembedded.com
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2cd81b09e83so34211821fa.2
-        for <netdev@vger.kernel.org>; Fri, 12 Jan 2024 20:47:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cogentembedded-com.20230601.gappssmtp.com; s=20230601; t=1705121246; x=1705726046; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=pGYVtaOwn2aSZdpDm8ExTcOizp30qs5QNeu6pAO5dGc=;
-        b=IuIcKNTXczNI9k8KeaRHXYfqUWqH5d1wxijR7BEnN2tMLSJUW/T5dsc7hUrHaDsOYP
-         l0YcUhmdAj04ETe8mmxLoGyn1V8f+ekKhzJHH4aFQoMCjxEFPKn3IK/4zwJy6r8I8Q5x
-         tAf4QdMLANHgh4W9x+byup81xrlYP6uxF6GQhoV6WzLMQ8kA8hAaWUvtNcp0stv4lOKC
-         /+S4wgg0E66n/bgEhXJOk5O92PyTkFgT7owPg4Uh3py4IjOU39ywjOsQVF7qynUkEbLK
-         qkGScRO7K6bJtJzRtGdU6tCxYBIF66YJ5zpGLf2fOZmTaF4taD0ew4jaDpF2g7jj0WIn
-         /zTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705121246; x=1705726046;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pGYVtaOwn2aSZdpDm8ExTcOizp30qs5QNeu6pAO5dGc=;
-        b=WOJMArurDbq24wlx7Mkiqg/aRGqQCRRDVNsqBtIUvywBkMZAyisQ0TPhX6VQyt+u2y
-         FeUUandHrXVFBrR/gndvT+SqgEPsBIOF4hCvljVMSACJW+bOMnpGobRZa2EWFTzfWkQv
-         CbroqzgLEvNETfq1q+SxxboATOxPqXtr4F3jsGvWeqF2s1wy823CpsJsUQq7qiazQ8o7
-         0BM0KNZmav0p1SRPkNlw0G6op2HyrwOjAMMHuvBI0aRgcJgjSBeKvuxtIQXT2sw7cJ5b
-         AIBeUNUmL5JxoIVBDLpDBPLAVa1Xomowda5b46Wh/XTmCpkKZI0eUNoH77M8acvmDfw1
-         2afg==
-X-Gm-Message-State: AOJu0YwdOyQmuu7TGFdPBOd3QsAl4kTv7Vhb0OL20sOOgQB7l8T6hqgl
-	EaRQ9d2uspOiJ25FaKOEXa7R/fqYj+EPLg==
-X-Google-Smtp-Source: AGHT+IGcVGUMkbXDcfPGAey7BgeLwbvzqJqgd9ktQyfYfRz3bXNihChX1fFzblaMbL9tfUR7MW9VCw==
-X-Received: by 2002:a2e:9ccc:0:b0:2cd:4eb2:f19b with SMTP id g12-20020a2e9ccc000000b002cd4eb2f19bmr677700ljj.182.1705121246105;
-        Fri, 12 Jan 2024 20:47:26 -0800 (PST)
-Received: from cobook.home ([91.231.66.25])
-        by smtp.gmail.com with ESMTPSA id 5-20020a05651c00c500b002cca6703b16sm672190ljr.44.2024.01.12.20.47.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jan 2024 20:47:25 -0800 (PST)
-From: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Sergey Shtylyov <s.shtylyov@omp.ru>,
-	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Wolfram Sang <wsa+renesas@sang-engineering.com>,
-	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
-	netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-Subject: [PATCH] net: ravb: Fix wrong dma_unmap_single() calls in ring unmapping
-Date: Sat, 13 Jan 2024 10:47:21 +0600
-Message-Id: <20240113044721.481131-1-nikita.yoush@cogentembedded.com>
-X-Mailer: git-send-email 2.39.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B3FCFBE1;
+	Sat, 13 Jan 2024 06:10:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1705126240; x=1736662240;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Eld4MoQpbkUQ2AJhP3wOklAVBHkSsTYQWgcDlJwGMEo=;
+  b=WKF91vYXXfBwK7dbFj69h2eyzfTvOslUEiN6TPU1o5wYsr+iiyNSV2C5
+   L2H8FIkpyOCWJDw2PHP7ZljqJYxctinILX3rVo4TELvpYc/7htNYXGuls
+   s04sz0ro6RnbODD/xSCgE+HzZTSuckwlDk3z7rK9FwvZiBptv/pr5bwqT
+   wrPc6BuXkgTcl1yC5hivmjRVPG49foMBW3Ocgs58kgx0Oq+Q7Vck2eXBr
+   ppKlu0uQWcvOEla8NZP3FEafyOxxIyFf5QxF8oaHoD5WDb5xa9SLv4GZp
+   zxjhAVBfW/uA/dZGUTHc2IZaj9oRmtYzdI3ZGQB1KuIB29IPcyS3m6Ks4
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10951"; a="6074976"
+X-IronPort-AV: E=Sophos;i="6.04,191,1695711600"; 
+   d="scan'208";a="6074976"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2024 22:10:39 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10951"; a="783260272"
+X-IronPort-AV: E=Sophos;i="6.04,191,1695711600"; 
+   d="scan'208";a="783260272"
+Received: from lkp-server02.sh.intel.com (HELO b07ab15da5fe) ([10.239.97.151])
+  by orsmga002.jf.intel.com with ESMTP; 12 Jan 2024 22:10:35 -0800
+Received: from kbuild by b07ab15da5fe with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rOXE0-000A9q-1g;
+	Sat, 13 Jan 2024 06:10:32 +0000
+Date: Sat, 13 Jan 2024 14:10:02 +0800
+From: kernel test robot <lkp@intel.com>
+To: Catalin Popescu <catalin.popescu@leica-geosystems.com>,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, afd@ti.com,
+	andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Catalin Popescu <catalin.popescu@leica-geosystems.com>
+Subject: Re: [PATCH 1/3] dt-bindings: net: dp83826: add ti,cfg-dac-minus
+ binding
+Message-ID: <202401131320.WhWHSzeD-lkp@intel.com>
+References: <20240111161927.3689084-1-catalin.popescu@leica-geosystems.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240111161927.3689084-1-catalin.popescu@leica-geosystems.com>
 
-When unmapping ring entries on Rx ring release, ravb driver needs to
-unmap only those entries that have been mapped successfully.
+Hi Catalin,
 
-To check if an entry needs to be unmapped, currently the address stored
-inside descriptor is passed to dma_mapping_error() call. But, address
-field inside descriptor is 32-bit, while dma_mapping_error() is
-implemented by comparing it's argument with DMA_MAPPING_ERROR constant
-that is 64-bit when dma_addr_t is 64-bit. So the comparison gets wrong,
-resulting into ravb driver calling dma_unnmap_single() for 0xffffffff
-address.
+kernel test robot noticed the following build warnings:
 
-When the ring entries are mapped, in case of mapping failure the driver
-sets descriptor's size field to zero (which is a signal to hardware to
-not use this descriptor). Fix ring unmapping to detect if an entry needs
-to be unmapped by checking for zero size field.
+[auto build test WARNING on robh/for-next]
+[also build test WARNING on net-next/main net/main linus/master v6.7 next-20240112]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Fixes: a47b70ea86bd ("ravb: unmap descriptors when freeing rings")
-Signed-off-by: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
----
- drivers/net/ethernet/renesas/ravb_main.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+url:    https://github.com/intel-lab-lkp/linux/commits/Catalin-Popescu/dt-bindings-net-dp83826-add-ti-cfg-dac-plus-binding/20240112-002701
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git for-next
+patch link:    https://lore.kernel.org/r/20240111161927.3689084-1-catalin.popescu%40leica-geosystems.com
+patch subject: [PATCH 1/3] dt-bindings: net: dp83826: add ti,cfg-dac-minus binding
+compiler: loongarch64-linux-gcc (GCC) 13.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20240113/202401131320.WhWHSzeD-lkp@intel.com/reproduce)
 
-diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index 0e3731f50fc2..4d4b5d44c4e7 100644
---- a/drivers/net/ethernet/renesas/ravb_main.c
-+++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -256,8 +256,7 @@ static void ravb_rx_ring_free_gbeth(struct net_device *ndev, int q)
- 	for (i = 0; i < priv->num_rx_ring[q]; i++) {
- 		struct ravb_rx_desc *desc = &priv->gbeth_rx_ring[i];
- 
--		if (!dma_mapping_error(ndev->dev.parent,
--				       le32_to_cpu(desc->dptr)))
-+		if (le16_to_cpu(desc->ds_cc) != 0)
- 			dma_unmap_single(ndev->dev.parent,
- 					 le32_to_cpu(desc->dptr),
- 					 GBETH_RX_BUFF_MAX,
-@@ -281,8 +280,7 @@ static void ravb_rx_ring_free_rcar(struct net_device *ndev, int q)
- 	for (i = 0; i < priv->num_rx_ring[q]; i++) {
- 		struct ravb_ex_rx_desc *desc = &priv->rx_ring[q][i];
- 
--		if (!dma_mapping_error(ndev->dev.parent,
--				       le32_to_cpu(desc->dptr)))
-+		if (le16_to_cpu(desc->ds_cc) != 0)
- 			dma_unmap_single(ndev->dev.parent,
- 					 le32_to_cpu(desc->dptr),
- 					 RX_BUF_SZ,
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202401131320.WhWHSzeD-lkp@intel.com/
+
+dtcheck warnings: (new ones prefixed by >>)
+>> Documentation/devicetree/bindings/net/ti,dp83822.yaml: ti,cfg-dac-minus: missing type definition
+   Documentation/devicetree/bindings/net/snps,dwmac.yaml: mac-mode: missing type definition
+
 -- 
-2.39.2
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
