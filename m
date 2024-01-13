@@ -1,95 +1,135 @@
-Return-Path: <netdev+bounces-63397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63398-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 988EF82CA5A
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 08:12:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89FDD82CA82
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 09:31:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30DFC28455C
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 07:12:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC8DC1F22D06
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 08:31:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1400312E56;
-	Sat, 13 Jan 2024 07:12:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AACA5364;
+	Sat, 13 Jan 2024 08:31:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="Acm24Q4k"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 708D814262;
-	Sat, 13 Jan 2024 07:12:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R901e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0W-V4eFs_1705129921;
-Received: from 30.0.168.206(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W-V4eFs_1705129921)
-          by smtp.aliyun-inc.com;
-          Sat, 13 Jan 2024 15:12:03 +0800
-Message-ID: <c828acfe-412a-4555-85a9-573e78833ec9@linux.alibaba.com>
-Date: Sat, 13 Jan 2024 15:12:00 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB44436F
+	for <netdev@vger.kernel.org>; Sat, 13 Jan 2024 08:31:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-50e5a9bcec9so8833865e87.3
+        for <netdev@vger.kernel.org>; Sat, 13 Jan 2024 00:31:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ragnatech.se; s=google; t=1705134680; x=1705739480; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=0gF3sw/Ea39zWxuD0gLzKFUce26V5brwlX/JeoC/CYQ=;
+        b=Acm24Q4k027vz2xM+HhYdbmskOzawnZ2RHCM/5Yr7kdOSHZkEthTSDtiMl3IvuqpSI
+         S+7b5YJZ6FsrBQNvQLCuwxjDBOAJsidCbMWm9hgFVl9cEHKCT/1uSesVOWuAcKTt9UhV
+         wDHLbzX94KH2Tolvn6Lp87OHLrOCx+K6XCF3xRFnpZfUPKI+H+6R/BTG1U57b0rMBxCz
+         FzW9ULLg7YVGAJVJzCde6c/Pjd4luIhmNC52QgXyA02hYxJVWP7oxHd/y1vO2aQxG1qx
+         +tEogBfsWosntcMyCDiE+NmUjhCmZcwrWGiOQdjIaWhkvSXx7w2bIn/eME4x3qJ78o5I
+         CwWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705134680; x=1705739480;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0gF3sw/Ea39zWxuD0gLzKFUce26V5brwlX/JeoC/CYQ=;
+        b=lALO7uCfzBn2P04VIeCTN4Qv6eVzGbDkxFsl+YVbFlaJPlU7BiEnAGCibVpG/gpTk3
+         F7j3FV3s5R20jbY0oOUUiVlOSMzDv4cF/rfS3W38moxVa1zdN2rZLwu3MHjQqsFtPPW4
+         k4PUvMWRjWhWEAfcWEs5jbpe4SpO/3bkxTPloFWjQpZyW2fBE8sqE3Ywyv86Z00Xs9kg
+         R4yxm2/5L2LRuHVA4TcOUY4L1C0msII4LmSBF3NjBMyZklT2m7vejFmclI1LK91T77zW
+         +o+vjfyJ2Bqj3XlT9vBg/4nl06sg3d6Wac/EATxslRZglIfTpZg81FbMksy8u3A6lwgN
+         Z7XQ==
+X-Gm-Message-State: AOJu0Yz/lViJXAfJQJlslHbXfJQr8y9V3uib0m4I+LN6pSAEa9/z4BBw
+	X500GfXR43WhkQUXW6qiZjYV/ehnizH2pQ==
+X-Google-Smtp-Source: AGHT+IFclI/5HicsKwUTEr7skf591nEgQRXaAa9kiQQu/l4k9zf0rvOYj4zDXmS1hH+xO3HBGCxOkw==
+X-Received: by 2002:a05:6512:390e:b0:50e:74ec:75f6 with SMTP id a14-20020a056512390e00b0050e74ec75f6mr1161110lfu.136.1705134679578;
+        Sat, 13 Jan 2024 00:31:19 -0800 (PST)
+Received: from localhost (h-46-59-36-113.A463.priv.bahnhof.se. [46.59.36.113])
+        by smtp.gmail.com with ESMTPSA id x26-20020a19f61a000000b0050e7e21b338sm773810lfe.14.2024.01.13.00.31.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 13 Jan 2024 00:31:18 -0800 (PST)
+Date: Sat, 13 Jan 2024 09:31:17 +0100
+From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>
+To: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Sergey Shtylyov <s.shtylyov@omp.ru>,
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: ravb: Fix dma_addr_t truncation in error case
+Message-ID: <20240113083117.GI1643864@ragnatech.se>
+References: <20240113042221.480650-1-nikita.yoush@cogentembedded.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 14/15] net/smc: introduce loopback-ism DMB data
- copy control
-To: Niklas Schnelle <schnelle@linux.ibm.com>, wintera@linux.ibm.com,
- wenjia@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
- agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
- alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240111120036.109903-1-guwen@linux.alibaba.com>
- <20240111120036.109903-15-guwen@linux.alibaba.com>
- <e0b80a1680ccc693de3f29bfaa9fa654c3b7b4fa.camel@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <e0b80a1680ccc693de3f29bfaa9fa654c3b7b4fa.camel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240113042221.480650-1-nikita.yoush@cogentembedded.com>
 
+Hello Nikita,
 
+Thanks for your patch.
 
-On 2024/1/13 00:24, Niklas Schnelle wrote:
-> On Thu, 2024-01-11 at 20:00 +0800, Wen Gu wrote:
->> This provides a way to {get|set} whether loopback-ism device supports
->> merging sndbuf with peer DMB to eliminate data copies between them.
->>
->> echo 0 > /sys/devices/virtual/smc/loopback-ism/dmb_copy # support
->> echo 1 > /sys/devices/virtual/smc/loopback-ism/dmb_copy # not support
+On 2024-01-13 10:22:21 +0600, Nikita Yushchenko wrote:
+> In ravb_start_xmit(), ravb driver uses u32 variable to store result of
+> dma_map_single() call. Since ravb hardware has 32-bit address fields in
+> descriptors, this works properly when mapping is successful - it is
+> platform's job to provide mapping addresses that fit into hardware
+> limitations.
 > 
-> The two support/no support remarks are a bit confusing because support
-> here seems to mean "support no-copy mode" while the attribute is more
-> like "force copy mode". How about:
+> However, in failure case dma_map_single() returns DMA_MAPPING_ERROR
+> constant that is 64-bit when dma_addr_t is 64-bit. Storing this constant
+> in u32 leads to truncation, and further call to dma_mapping_error()
+> fails to notice the error.
 > 
-> echo 0 > /sys/devices/virtual/smc/loopback-ism/dmb_copy # one DMB mode
-> echo 1 > /sys/devices/virtual/smc/loopback-ism/dmb_copy # copy mode
+> Fix that by storing result of dma_map_single() in a dma_addr_t
+> variable.
+> 
+> Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
+> Signed-off-by: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+
+Reviewed-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+
+> ---
+>  drivers/net/ethernet/renesas/ravb_main.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index 8649b3e90edb..0e3731f50fc2 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> @@ -1949,7 +1949,7 @@ static netdev_tx_t ravb_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+>  	struct ravb_tstamp_skb *ts_skb;
+>  	struct ravb_tx_desc *desc;
+>  	unsigned long flags;
+> -	u32 dma_addr;
+> +	dma_addr_t dma_addr;
+>  	void *buffer;
+>  	u32 entry;
+>  	u32 len;
+> -- 
+> 2.39.2
+> 
 > 
 
-Thank you! Niklas.
-That makes it much clearer. It will be improved in next version.
-
->>
->> The settings take effect after re-activating loopback-ism by:
->>
->> echo 0 > /sys/devices/virtual/smc/loopback-ism/active
->> echo 1 > /sys/devices/virtual/smc/loopback-ism/active
->>
->> After this, the link group related to loopback-ism will be flushed and
->> the sndbufs of subsequent connections will be merged or not merged with
->> peer DMB.
->>
->> The motivation of this control is that the bandwidth will be highly
->> improved when sndbuf and DMB are merged, but when virtually contiguous
->> DMB is provided and merged with sndbuf, it will be concurrently accessed
->> on Tx and Rx, then there will be a bottleneck caused by lock contention
->> of find_vmap_area when there are many CPUs and CONFIG_HARDENED_USERCOPY
->> is set (see link below). So an option is provided.
->>
->> Link: https://lore.kernel.org/all/238e63cd-e0e8-4fbf-852f-bc4d5bc35d5a@linux.alibaba.com/
->> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
-> ---8<---
+-- 
+Kind Regards,
+Niklas Söderlund
 
