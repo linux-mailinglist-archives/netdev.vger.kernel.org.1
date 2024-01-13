@@ -1,89 +1,87 @@
-Return-Path: <netdev+bounces-63378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98D1B82C8C0
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 02:29:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B503182C8CC
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 02:33:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFEEB1C225D8
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 01:29:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A2171F233F3
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 01:33:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AED612E65;
-	Sat, 13 Jan 2024 01:29:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A21D13AE5;
+	Sat, 13 Jan 2024 01:33:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R4AQeqgs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cbH4SvXV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 640F01A5B9;
-	Sat, 13 Jan 2024 01:29:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0082C433C7;
-	Sat, 13 Jan 2024 01:29:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC6C51A594;
+	Sat, 13 Jan 2024 01:33:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C7D7C433C7;
+	Sat, 13 Jan 2024 01:33:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705109376;
-	bh=4159aUol2be32Rm/FKh9kOm2pfBIwydY2bGQPvRtmBc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=R4AQeqgsCooUB+nPotOSUsyOqjYIk4TKMkQgJD7r5BNKRw5DypK/PA6z4MGP90ide
-	 p64gp9MwRuXNydAJPHExHjxBjvNnz/2V+ksCy44rulyM8QwEciSyqKVg2BHjvmHV15
-	 7r/YQv6nYHqARkpOvrkv1qeIrQ1ue/03H8BFDmytRSyVvBgDWzU+4zqfkkD5brFGjf
-	 4vNGEyCqaJ48++tfqcnU1+LFJ5DyVQVVJVTrRjG+AZdojA7ucrsZUW0/yhiC7UlGay
-	 IFAAITOQw46OjEiW28GNNzmzKH/Cn9I9yw1LN3IfbJbwKREVOg861SNaUXO/RRXlzS
-	 EDtw0N1B5LCsQ==
-Date: Fri, 12 Jan 2024 19:29:34 -0600
-From: Rob Herring <robh@kernel.org>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Conor Dooley <conor+dt@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Eric Dumazet <edumazet@google.com>, Pavel Machek <pavel@ucw.cz>,
-	Kursad Oney <kursad.oney@broadcom.com>, Lee Jones <lee@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Sven Schwermer <sven.schwermer@disruptive-technologies.com>,
-	William Zhang <william.zhang@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
-	Jacek Anaszewski <jacek.anaszewski@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, linux-leds@vger.kernel.org,
-	Rob Herring <robh+dt@kernel.org>, linux-kernel@vger.kernel.org,
-	=?iso-8859-1?Q?Fern=E1ndez?= Rojas <noltari@gmail.com>,
-	netdev@vger.kernel.org, Anand Gore <anand.gore@broadcom.com>,
-	devicetree@vger.kernel.org,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
-Subject: Re: [net-next PATCH v9 2/5] dt-bindings: net: phy: Document LED
- inactive high impedance mode
-Message-ID: <170510937346.3795602.13542241905094505502.robh@kernel.org>
-References: <20240105142719.11042-1-ansuelsmth@gmail.com>
- <20240105142719.11042-3-ansuelsmth@gmail.com>
+	s=k20201202; t=1705109612;
+	bh=PHzx3gJ6hnCv3VfcEhNzHYMyKUNAcxT04KDHTrh9tAI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=cbH4SvXVjyY0LR+FiwUrFbH4h6iqSSMwz5QQJ9LYT7KxjHyJcqnG0MD4Oy5y127I7
+	 VHTWzDnCwihFwGfw6Gfzoyyp2s334edjiQavmppF7HSGv3NUvkiFQt/xBWqW2uGIim
+	 YFGuqmz16qH8q8bthOgFKn5ywYQbrr4shwbyZnF1ZoglLN2PK4glVBXrR3S4V3pBkW
+	 RdnNlCPLjpBCmEQ393uThtjVypEDb8CLkASrZrpbSFPt5x1SOcAPVjTzBhpz4fBqC9
+	 haYz95cdA/LunkoWpbGHxPSfF5KzR9s0Uz9I7XMWS6L2NqLAs/DlNCfJr9BvY0FHOE
+	 k2hvBCVsA0cSQ==
+Date: Fri, 12 Jan 2024 17:33:30 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Michal =?UTF-8?B?S291dG7DvQ==?= <mkoutny@suse.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org, cake@lists.bufferbloat.net, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
+ <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Song Liu <song@kernel.org>, Yonghong Song
+ <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, KP
+ Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
+ <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Toke =?UTF-8?B?SMO4?=
+ =?UTF-8?B?aWxhbmQtSsO4cmdlbnNlbg==?= <toke@toke.dk>, Vinicius Costa Gomes
+ <vinicius.gomes@intel.com>, Stephen Hemminger <stephen@networkplumber.org>,
+ Petr Pavlu <ppavlu@suse.cz>, Michal Kubecek <mkubecek@suse.cz>, Martin
+ Wilck <mwilck@suse.com>
+Subject: Re: [PATCH v3 0/4] net/sched: Load modules via alias
+Message-ID: <20240112173330.075e5969@kernel.org>
+In-Reply-To: <20240112180646.13232-1-mkoutny@suse.com>
+References: <20240112180646.13232-1-mkoutny@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240105142719.11042-3-ansuelsmth@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, 12 Jan 2024 19:06:42 +0100 Michal Koutn=C3=BD wrote:
+> These modules may be loaded lazily without user's awareness and
+> control. Add respective aliases to modules and request them under these
+> aliases so that modprobe's blacklisting mechanism (through aliases)
+> works for them. (The same pattern exists e.g. for filesystem
+> modules.)
 
-On Fri, 05 Jan 2024 15:27:14 +0100, Christian Marangi wrote:
-> Document LED inactive high impedance mode to set the LED to require high
-> impedance configuration to be turned OFF.
-> 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> ---
-> Changes v5:
-> - Add this patch
-> 
->  Documentation/devicetree/bindings/leds/common.yaml | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
+## Form letter - net-next-closed
 
-Reviewed-by: Rob Herring <robh@kernel.org>
+The merge window for v6.8 has begun and we have already posted our pull
+request. Therefore net-next is closed for new drivers, features, code
+refactoring and optimizations. We are currently accepting bug fixes only.
 
+Please repost when net-next reopens after January 22nd.
+
+RFC patches sent for review only are obviously welcome at any time.
+
+See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#de=
+velopment-cycle
+--=20
+pw-bot: defer
 
