@@ -1,144 +1,95 @@
-Return-Path: <netdev+bounces-63444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BB3482CEB7
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 22:13:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E6B582CECF
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 22:39:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61D3C1C21192
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 21:13:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 113F91C20EB4
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 21:38:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B96210796;
-	Sat, 13 Jan 2024 21:13:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8C4215AF9;
+	Sat, 13 Jan 2024 21:38:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KbolCwbt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LL2Pq1wo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B6462CA6;
-	Sat, 13 Jan 2024 21:13:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B8DD107A6
+	for <netdev@vger.kernel.org>; Sat, 13 Jan 2024 21:38:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-67fe0264dd2so49322856d6.0;
-        Sat, 13 Jan 2024 13:13:50 -0800 (PST)
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2cd5b467209so71718581fa.3
+        for <netdev@vger.kernel.org>; Sat, 13 Jan 2024 13:38:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705180430; x=1705785230; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LmVgSOgYUo8HP5jrE+8RTTvoKKQaWMMzD4Kt9s/iPcQ=;
-        b=KbolCwbta0h8vYuQhFPCS8FLsgHtAD06wJ11yow0V3/IGDAiTdu6EY3ObZmMLOGB6Z
-         HExt9U2jTIVTMqK2JLvtIw2i/5+/5kyioLg88caNjGYTJI7nuiB0T0n6m3YYzaRYTyeG
-         IuZt1DRIFNjxgZiRIXuTwB0CmeRjvVLZkPJTT331Cln36ww7jtS8poX2+DZorlqrRLj9
-         M7L/vxnMUbWk1geqOQ88Gek8AqdANXDv7h5cTBGtEB5neOzAIIjKzMlbRGRLEf1tAw0K
-         19L5ykZnNbofRgVoG1sVIypVK1EAjNbJSATOu+NISHxFxWpLWhAwULovuaoDJjfx2Pfi
-         HQWg==
+        d=gmail.com; s=20230601; t=1705181931; x=1705786731; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=H3ZgNqPzE+v53ejhGe7aIY/3aI392O4pxhX2WRd1M6Y=;
+        b=LL2Pq1woSLqLwFNPQf2N3k6kro+8/UKRi/Qt9eOd1v1igMTbCI3/XTRK3LBPeMBxUV
+         bGzJGVBWSoH5y/4NAbiDrWKT9atE3ZQDJxqvEs9U/yIVHwWBlXmsebbvdEd2B8cfa0nR
+         K565tHREOrYDJbQAI060vLYqF9fXEYvbx4Ztu/JqsFsemjLWb5uWSvcmxtsJpXQgXK8L
+         eSODwgYNFBAB1DV30t2eXBp3ylKJ5GWzrF30/NEvD7HqN99OzDsJxEv4TSy6NCEepgHE
+         lU72fuN/OxrAU6asPNTDI/UEgF2u6MTowveQm/gEfx0JWlqQkFDRSS7XwZVstdN+9Zpi
+         BSDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705180430; x=1705785230;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LmVgSOgYUo8HP5jrE+8RTTvoKKQaWMMzD4Kt9s/iPcQ=;
-        b=pGF/gz0v9fxCaNCRuhZw+NsF1FGAX43XMWzWkmnrVdA7GETkcoUzWsz7NfQASwUUgD
-         3p+WWYSAW8DfuXl6BxZgYnfvvZUjbPQ0/uiIoljQnrfAsbBZVZuf/JOVKM8GK4xxyQJz
-         HWPSFICCNUYnQ8ZlcbgBuV10lshhKqri6gwYadDKDOXQeXz98TiSyYP2peCeVXyGw1OZ
-         MYtBDTd7GVglA7f76oO+oO3TIMWiZSwux+TgI1hAsoq5acC+2WmAXcOM4if+0TecQA1R
-         x55qeaZevsyvZuHfeoiQqNNr690mzIpl3mNwE3ftutV8aELmph5FAQbCafLsmqRXPAEU
-         q/pQ==
-X-Gm-Message-State: AOJu0YyJOKzFJApXJa30rCjDqIfvm8FfTbH4d3JHbhdEHpy9HHVESrwL
-	vt7mC5E8Xd+H2pPJUiulQ6w=
-X-Google-Smtp-Source: AGHT+IFU7AiIjEFa+o309orShfUqjo5NtyeiJj8iZqf7xfLAP4vcJ1VRfvfurxReX86sJdMEietA8A==
-X-Received: by 2002:a05:6214:4113:b0:680:86d5:ecd5 with SMTP id kc19-20020a056214411300b0068086d5ecd5mr4322727qvb.85.1705180429816;
-        Sat, 13 Jan 2024 13:13:49 -0800 (PST)
-Received: from [192.168.1.3] (ip68-4-215-93.oc.oc.cox.net. [68.4.215.93])
-        by smtp.gmail.com with ESMTPSA id j22-20020a05620a147600b007832104bba9sm1944177qkl.23.2024.01.13.13.13.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 13 Jan 2024 13:13:49 -0800 (PST)
-Message-ID: <ad44b540-0b17-4d13-8c89-984e0432805d@gmail.com>
-Date: Sat, 13 Jan 2024 13:13:45 -0800
+        d=1e100.net; s=20230601; t=1705181931; x=1705786731;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=H3ZgNqPzE+v53ejhGe7aIY/3aI392O4pxhX2WRd1M6Y=;
+        b=XA6UB0wDSvAo8bvDM+aXr3QRl7IUkuuX2uaZ0nzMY0stvPpIr+u9eO84WidXsCObdE
+         spuBzYYqOH4SzPlGOCFZAY1fNnBEnImzfgQYfaRaIwrtZjSugqk+8Wu/V0UQx1G+IRHZ
+         Sw1JstrMdI/mtGEvJpA2BLYYtjEzsuRYd/RUJiGkWkpsEsr/Ho/ZH2QBeWkt+e65ZWu6
+         IhPOx31DKyrw5pPl2TLCyIMlkbyPiEFPoPqGcrMahQlTK4nXyLq6D3YD18+nDkgH2/bp
+         USTEAEl+9PRmgMDxr7C+Jz4bqWhn51UhMeQ86wIV9v7Jg1PLzdvW7M1EMHafIKJF+VqN
+         xRfA==
+X-Gm-Message-State: AOJu0YzaffIWUc5Hj85s/l5GFqhRHuQbF3+TGqvnnnETbgoy9ja83F7P
+	KLZXFFIlZTVhAV5sQ2msOoZQGjiTzgRfAHM1F2Y=
+X-Google-Smtp-Source: AGHT+IEUU1knMIjHVtbJpObgclBnISMaF7e7i8nkXlrAcM+CpmsApJTzwLfh9nFTbWyxij7X1jC2NDy49STkMqWmcUM=
+X-Received: by 2002:a2e:9f0a:0:b0:2cc:3793:5575 with SMTP id
+ u10-20020a2e9f0a000000b002cc37935575mr1527213ljk.93.1705181931077; Sat, 13
+ Jan 2024 13:38:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: ravb: Fix wrong dma_unmap_single() calls in ring
- unmapping
-Content-Language: en-US
-To: Nikita Yushchenko <nikita.yoush@cogentembedded.com>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Sergey Shtylyov <s.shtylyov@omp.ru>,
- Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
- Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
- Wolfram Sang <wsa+renesas@sang-engineering.com>,
- =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
- netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240113044721.481131-1-nikita.yoush@cogentembedded.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=f.fainelli@gmail.com; keydata=
- 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
- HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20240113044721.481131-1-nikita.yoush@cogentembedded.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20231223005253.17891-1-luizluca@gmail.com> <20231223005253.17891-4-luizluca@gmail.com>
+ <20240111095125.vtsjpzyj5rrag3sq@skbuf> <CAJq09z7rba+7LCrFSYk5FjJSPvfSS0gocRCTPiy4v8V5BxfW+A@mail.gmail.com>
+ <20240111200511.coe26yxqhcwiiy4y@skbuf>
+In-Reply-To: <20240111200511.coe26yxqhcwiiy4y@skbuf>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Sat, 13 Jan 2024 18:38:39 -0300
+Message-ID: <CAJq09z7YKKgCKgc_EeMrHy7ZYrWPP3x9aB9xto3ap8qc3gTG=w@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 3/8] net: dsa: realtek: common realtek-dsa module
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, alsi@bang-olufsen.dk, 
+	andrew@lunn.ch, f.fainelli@gmail.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	arinc.unal@arinc9.com
+Content-Type: text/plain; charset="UTF-8"
 
+> On Thu, Jan 11, 2024 at 04:53:01PM -0300, Luiz Angelo Daros de Luca wrote:
+> > What do you mean by dropping the "common"? Use "realtek_probe" or
+> > "realtek_dsa_probe"?
+>
+> Yes, I meant "realtek_probe()" etc. It's just that the word "common" has
+> no added value in function names, and I can't come up with something
+> good to replace it with.
 
+I didn't like realtek_probe() either. It is too generic, although now
+in a specific name space.
+How about replacing all realtek_common with rtl83xx? I guess all
+rtl83xx chips are switch controllers, even though some of them have an
+embedded mips core.
+Or we could include a prefix/suffix as well like rtl83xx_dsa or realtek_dsa..
 
-On 1/12/2024 8:47 PM, Nikita Yushchenko wrote:
-> When unmapping ring entries on Rx ring release, ravb driver needs to
-> unmap only those entries that have been mapped successfully.
-> 
-> To check if an entry needs to be unmapped, currently the address stored
-> inside descriptor is passed to dma_mapping_error() call. But, address
-> field inside descriptor is 32-bit, while dma_mapping_error() is
-> implemented by comparing it's argument with DMA_MAPPING_ERROR constant
-> that is 64-bit when dma_addr_t is 64-bit. So the comparison gets wrong,
-> resulting into ravb driver calling dma_unnmap_single() for 0xffffffff
-> address.
+Regards,
 
-I would still spell out explicitly that a failed mapping from 
-ravb_rx_ring_format_gbeth() and ravb_rx_ring_format_rcar() results in 
-writing the ds_cc descriptor field to 0.
-
-With that fixed and the typo spotted by Sergey, you may add:
-
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+Luiz
 
