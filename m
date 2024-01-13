@@ -1,81 +1,87 @@
-Return-Path: <netdev+bounces-63446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA45782CEE7
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 23:22:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E39282CF59
+	for <lists+netdev@lfdr.de>; Sun, 14 Jan 2024 00:10:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 248E1B2215C
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 22:22:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8D492831A8
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 23:10:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E7E416439;
-	Sat, 13 Jan 2024 22:22:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="anpB2pnz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7E7F15AF9;
+	Sat, 13 Jan 2024 23:10:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cx11.kasperd.dk (cx11.kasperd.dk [116.203.140.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85630168A2
-	for <netdev@vger.kernel.org>; Sat, 13 Jan 2024 22:22:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-40e69b3149fso14380045e9.3
-        for <netdev@vger.kernel.org>; Sat, 13 Jan 2024 14:22:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705184519; x=1705789319; darn=vger.kernel.org;
-        h=reply-to:date:from:to:subject:content-description
-         :content-transfer-encoding:mime-version:sender:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HIafZnX2HaaS3KcRFITD6MGDONWRf0gV6f4VdCyfFQI=;
-        b=anpB2pnzrK42mbvO/J5OHmLMkjswNqI8BzXCcyxXUaWWlKAaxPQBqoKAJj1LhYJX9L
-         9iPN791Fd++KxLoiVJhFrM/vhxOAk1lKtyF6IpKl4ONy5wqONzuH9i2QkwD+eRZt/1FR
-         CIPb6Qthj1bZZNwvFZYvArH4kuQWTw44yemIsgPybHKTI8lO40aX1n4SVA3oEqZQM7NQ
-         GmBt2C5tkZuPqujaCTL7a1B/tf6KAQj4H3sJDqHA13Ak1zuEBIdav4v1qhFrSLMW9VQ2
-         nhFGNw6MmEouyOm0MfmsgQBFKerUjylsevutyfDlHir20gEC3Oi5i5ft38jUbIw6u6pV
-         LQew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705184519; x=1705789319;
-        h=reply-to:date:from:to:subject:content-description
-         :content-transfer-encoding:mime-version:sender:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HIafZnX2HaaS3KcRFITD6MGDONWRf0gV6f4VdCyfFQI=;
-        b=i5uvN4H4TR+yYg+RUyaYeyXiV+KXxpKXV9Ti3uFOjGZseMb3IZx9EsvnzANYrcvxiu
-         ENwR9bSkYba8aoedeVyCGLzA+VVEOOunPuIV1ozOOkeYZU5tyrh0ZvWOk9ZuxRMes9tr
-         4jW5xBl1ZHuxw4uGwMF/9zpVzGwtOartPYJl3ZWFhoLaIEFm4e2YVaKAKecfrAcA3yge
-         0TDPZveZsG8FJ8iQyqiOC9sNQ04M7KBPjuSEgybJeerk93Dh9pQUGy+hqjjDpUtClc3N
-         Y2mYEyKj8dndJHETYBZruilMHgxJeBjQ6G3xQK9Gx/Ju0LABLORLOUgoM+mXVL8Yxfw5
-         YQXQ==
-X-Gm-Message-State: AOJu0YyS73SkiqChOZi5AOU9fJXukF74EcCymTt5M5KJL4eUX/g/FTSC
-	jicKuwV+RQWhjQ8hOoIOoMTOpWwCjIE=
-X-Google-Smtp-Source: AGHT+IHk1sIXU0VA4RhwYAWZ/gdTxgUm3prOTAIUOK/faveGgrnfnGZJgq0ceE3hAWLwBwJPBJ0tHQ==
-X-Received: by 2002:a05:600c:a47:b0:40e:52eb:2996 with SMTP id c7-20020a05600c0a4700b0040e52eb2996mr2037953wmq.8.1705184519609;
-        Sat, 13 Jan 2024 14:21:59 -0800 (PST)
-Received: from [192.168.1.71] ([102.64.213.238])
-        by smtp.gmail.com with ESMTPSA id d6-20020a170906c20600b00a28c8ab1342sm3324066ejz.96.2024.01.13.14.21.58
-        for <netdev@vger.kernel.org>
-        (version=TLS1 cipher=AES128-SHA bits=128/128);
-        Sat, 13 Jan 2024 14:21:59 -0800 (PST)
-Message-ID: <65a30d07.170a0220.1eb2d.e045@mx.google.com>
-Sender: Roberts Kevin <donemstg@gmail.com>
-Content-Type: text/plain; charset="iso-8859-1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D725168A7
+	for <netdev@vger.kernel.org>; Sat, 13 Jan 2024 23:10:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sgcrd.13.jan.2024.kasperd.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sgcrd.13.jan.2024.kasperd.net
+Received: from [127.0.0.1] (helo=sgcrd.13.jan.2024.kasperd.net)
+	by cx11.kasperd.dk with smtp (Exim 4.90_1)
+	(envelope-from <kasperd@sgcrd.13.jan.2024.kasperd.net>)
+	id 1rOmbH-0001TF-NY; Sat, 13 Jan 2024 23:35:35 +0100
+Date: Sat, 13 Jan 2024 23:35:33 +0100
+From: Kasper Dupont <kasperd@sgcrd.13.jan.2024.kasperd.net>
+To: netdev@vger.kernel.org
+Subject: Receiving GENEVE packets for one VNI in user mode
+Message-ID: <20240113223533.GA3929032@sniper.kasperd.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Description: Mail message body
-Subject: subject
-To: netdev@vger.kernel.org
-From: "Roberts Kevin" <rbkvtg@gmail.com>
-Date: Sat, 13 Jan 2024 22:21:57 +0000
-Reply-To: robertskevinesq@gmail.smtp.subspace.kernel.org,
-	com@web.codeaurora.org
+Content-Type: text/plain; charset=utf-7
+Content-Disposition: inline
+Accept-Language: en-GB, da-DK, en-US
 
-Moje meno je Roberts Kevin Esq. M=E1m z=E1ujem diskutovat s vami o obchode.=
- V pr=EDpade z=E1ujmu potvrdte
+Is there a way for a user mode program to receive GENEVE packets
+targeted at one specified VNI? None of the GENEVE related webpages I
+have been reading through have brought me closer to an answer.
+
+I can think of three different approaches, but each come with its
+own problems making it not look like a viable solution.
+
+
+Approach 1:
+
+The most straightforward approach I can think of is to open a UDP
+socket attach BPF rules to filter on VNI and bind it to port 6081.
+This should work as long as there is nothing else on the host using
+GENEVE.
+
+But I don't see any way to get this approach working if multiple
+programs are to receive GENEVE packets for different VNI and
+simultaneously use the kernel drivers to receive packets for other
+VNI.
+
+Approach 2:
+
+Use a raw socket to receive all UDP packets. Because there is a
+possibility that packets arrive fragmented it has to duplicate the
+reasembly work in user mode. And because the VNI will only be present
+in one fragment, filtering has to be done after reassembly. So I
+couldn't rely on BPF.
+
+This approach seems possible but very inefficient.
+
+Approach 3:
+
+Use ip-link(8) to create a tunnel device and bind a raw socket to that
+virtual interface. This will however only receive the encapsulated
+packets and not the GENEVE header, so it would be unsuitable for any
+use case that needs the actual GENEVE header. It would also lose all
+packets with critical options that aren't understood by the kernel but
+may be understood by the user mode program.
+
+
+Is there a way to make one of these approaches work or some other way
+to achieve it?
+
+If it is impossible to do in user mode do you think a kernel module to
+add the functionality would be possible with the current kernel code?
 
