@@ -1,95 +1,81 @@
-Return-Path: <netdev+bounces-63445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E6B582CECF
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 22:39:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA45782CEE7
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 23:22:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 113F91C20EB4
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 21:38:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 248E1B2215C
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 22:22:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8C4215AF9;
-	Sat, 13 Jan 2024 21:38:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E7E416439;
+	Sat, 13 Jan 2024 22:22:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LL2Pq1wo"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="anpB2pnz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B8DD107A6
-	for <netdev@vger.kernel.org>; Sat, 13 Jan 2024 21:38:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85630168A2
+	for <netdev@vger.kernel.org>; Sat, 13 Jan 2024 22:22:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2cd5b467209so71718581fa.3
-        for <netdev@vger.kernel.org>; Sat, 13 Jan 2024 13:38:53 -0800 (PST)
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-40e69b3149fso14380045e9.3
+        for <netdev@vger.kernel.org>; Sat, 13 Jan 2024 14:22:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705181931; x=1705786731; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=H3ZgNqPzE+v53ejhGe7aIY/3aI392O4pxhX2WRd1M6Y=;
-        b=LL2Pq1woSLqLwFNPQf2N3k6kro+8/UKRi/Qt9eOd1v1igMTbCI3/XTRK3LBPeMBxUV
-         bGzJGVBWSoH5y/4NAbiDrWKT9atE3ZQDJxqvEs9U/yIVHwWBlXmsebbvdEd2B8cfa0nR
-         K565tHREOrYDJbQAI060vLYqF9fXEYvbx4Ztu/JqsFsemjLWb5uWSvcmxtsJpXQgXK8L
-         eSODwgYNFBAB1DV30t2eXBp3ylKJ5GWzrF30/NEvD7HqN99OzDsJxEv4TSy6NCEepgHE
-         lU72fuN/OxrAU6asPNTDI/UEgF2u6MTowveQm/gEfx0JWlqQkFDRSS7XwZVstdN+9Zpi
-         BSDA==
+        d=gmail.com; s=20230601; t=1705184519; x=1705789319; darn=vger.kernel.org;
+        h=reply-to:date:from:to:subject:content-description
+         :content-transfer-encoding:mime-version:sender:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HIafZnX2HaaS3KcRFITD6MGDONWRf0gV6f4VdCyfFQI=;
+        b=anpB2pnzrK42mbvO/J5OHmLMkjswNqI8BzXCcyxXUaWWlKAaxPQBqoKAJj1LhYJX9L
+         9iPN791Fd++KxLoiVJhFrM/vhxOAk1lKtyF6IpKl4ONy5wqONzuH9i2QkwD+eRZt/1FR
+         CIPb6Qthj1bZZNwvFZYvArH4kuQWTw44yemIsgPybHKTI8lO40aX1n4SVA3oEqZQM7NQ
+         GmBt2C5tkZuPqujaCTL7a1B/tf6KAQj4H3sJDqHA13Ak1zuEBIdav4v1qhFrSLMW9VQ2
+         nhFGNw6MmEouyOm0MfmsgQBFKerUjylsevutyfDlHir20gEC3Oi5i5ft38jUbIw6u6pV
+         LQew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705181931; x=1705786731;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=H3ZgNqPzE+v53ejhGe7aIY/3aI392O4pxhX2WRd1M6Y=;
-        b=XA6UB0wDSvAo8bvDM+aXr3QRl7IUkuuX2uaZ0nzMY0stvPpIr+u9eO84WidXsCObdE
-         spuBzYYqOH4SzPlGOCFZAY1fNnBEnImzfgQYfaRaIwrtZjSugqk+8Wu/V0UQx1G+IRHZ
-         Sw1JstrMdI/mtGEvJpA2BLYYtjEzsuRYd/RUJiGkWkpsEsr/Ho/ZH2QBeWkt+e65ZWu6
-         IhPOx31DKyrw5pPl2TLCyIMlkbyPiEFPoPqGcrMahQlTK4nXyLq6D3YD18+nDkgH2/bp
-         USTEAEl+9PRmgMDxr7C+Jz4bqWhn51UhMeQ86wIV9v7Jg1PLzdvW7M1EMHafIKJF+VqN
-         xRfA==
-X-Gm-Message-State: AOJu0YzaffIWUc5Hj85s/l5GFqhRHuQbF3+TGqvnnnETbgoy9ja83F7P
-	KLZXFFIlZTVhAV5sQ2msOoZQGjiTzgRfAHM1F2Y=
-X-Google-Smtp-Source: AGHT+IEUU1knMIjHVtbJpObgclBnISMaF7e7i8nkXlrAcM+CpmsApJTzwLfh9nFTbWyxij7X1jC2NDy49STkMqWmcUM=
-X-Received: by 2002:a2e:9f0a:0:b0:2cc:3793:5575 with SMTP id
- u10-20020a2e9f0a000000b002cc37935575mr1527213ljk.93.1705181931077; Sat, 13
- Jan 2024 13:38:51 -0800 (PST)
+        d=1e100.net; s=20230601; t=1705184519; x=1705789319;
+        h=reply-to:date:from:to:subject:content-description
+         :content-transfer-encoding:mime-version:sender:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HIafZnX2HaaS3KcRFITD6MGDONWRf0gV6f4VdCyfFQI=;
+        b=i5uvN4H4TR+yYg+RUyaYeyXiV+KXxpKXV9Ti3uFOjGZseMb3IZx9EsvnzANYrcvxiu
+         ENwR9bSkYba8aoedeVyCGLzA+VVEOOunPuIV1ozOOkeYZU5tyrh0ZvWOk9ZuxRMes9tr
+         4jW5xBl1ZHuxw4uGwMF/9zpVzGwtOartPYJl3ZWFhoLaIEFm4e2YVaKAKecfrAcA3yge
+         0TDPZveZsG8FJ8iQyqiOC9sNQ04M7KBPjuSEgybJeerk93Dh9pQUGy+hqjjDpUtClc3N
+         Y2mYEyKj8dndJHETYBZruilMHgxJeBjQ6G3xQK9Gx/Ju0LABLORLOUgoM+mXVL8Yxfw5
+         YQXQ==
+X-Gm-Message-State: AOJu0YyS73SkiqChOZi5AOU9fJXukF74EcCymTt5M5KJL4eUX/g/FTSC
+	jicKuwV+RQWhjQ8hOoIOoMTOpWwCjIE=
+X-Google-Smtp-Source: AGHT+IHk1sIXU0VA4RhwYAWZ/gdTxgUm3prOTAIUOK/faveGgrnfnGZJgq0ceE3hAWLwBwJPBJ0tHQ==
+X-Received: by 2002:a05:600c:a47:b0:40e:52eb:2996 with SMTP id c7-20020a05600c0a4700b0040e52eb2996mr2037953wmq.8.1705184519609;
+        Sat, 13 Jan 2024 14:21:59 -0800 (PST)
+Received: from [192.168.1.71] ([102.64.213.238])
+        by smtp.gmail.com with ESMTPSA id d6-20020a170906c20600b00a28c8ab1342sm3324066ejz.96.2024.01.13.14.21.58
+        for <netdev@vger.kernel.org>
+        (version=TLS1 cipher=AES128-SHA bits=128/128);
+        Sat, 13 Jan 2024 14:21:59 -0800 (PST)
+Message-ID: <65a30d07.170a0220.1eb2d.e045@mx.google.com>
+Sender: Roberts Kevin <donemstg@gmail.com>
+Content-Type: text/plain; charset="iso-8859-1"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231223005253.17891-1-luizluca@gmail.com> <20231223005253.17891-4-luizluca@gmail.com>
- <20240111095125.vtsjpzyj5rrag3sq@skbuf> <CAJq09z7rba+7LCrFSYk5FjJSPvfSS0gocRCTPiy4v8V5BxfW+A@mail.gmail.com>
- <20240111200511.coe26yxqhcwiiy4y@skbuf>
-In-Reply-To: <20240111200511.coe26yxqhcwiiy4y@skbuf>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Sat, 13 Jan 2024 18:38:39 -0300
-Message-ID: <CAJq09z7YKKgCKgc_EeMrHy7ZYrWPP3x9aB9xto3ap8qc3gTG=w@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 3/8] net: dsa: realtek: common realtek-dsa module
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, alsi@bang-olufsen.dk, 
-	andrew@lunn.ch, f.fainelli@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	arinc.unal@arinc9.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Description: Mail message body
+Subject: subject
+To: netdev@vger.kernel.org
+From: "Roberts Kevin" <rbkvtg@gmail.com>
+Date: Sat, 13 Jan 2024 22:21:57 +0000
+Reply-To: robertskevinesq@gmail.smtp.subspace.kernel.org,
+	com@web.codeaurora.org
 
-> On Thu, Jan 11, 2024 at 04:53:01PM -0300, Luiz Angelo Daros de Luca wrote:
-> > What do you mean by dropping the "common"? Use "realtek_probe" or
-> > "realtek_dsa_probe"?
->
-> Yes, I meant "realtek_probe()" etc. It's just that the word "common" has
-> no added value in function names, and I can't come up with something
-> good to replace it with.
-
-I didn't like realtek_probe() either. It is too generic, although now
-in a specific name space.
-How about replacing all realtek_common with rtl83xx? I guess all
-rtl83xx chips are switch controllers, even though some of them have an
-embedded mips core.
-Or we could include a prefix/suffix as well like rtl83xx_dsa or realtek_dsa..
-
-Regards,
-
-Luiz
+Moje meno je Roberts Kevin Esq. M=E1m z=E1ujem diskutovat s vami o obchode.=
+ V pr=EDpade z=E1ujmu potvrdte
 
