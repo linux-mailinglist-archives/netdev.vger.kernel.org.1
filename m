@@ -1,46 +1,48 @@
-Return-Path: <netdev+bounces-63428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BDD282CD9F
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 16:56:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EF5B82CDA6
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 17:07:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3A2DBB2251C
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 15:56:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B38A2B228F8
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 16:07:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFA3C257A;
-	Sat, 13 Jan 2024 15:56:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83FBB1FA1;
+	Sat, 13 Jan 2024 16:07:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rHN4GkHY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kb7hxkxu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 949C72564
-	for <netdev@vger.kernel.org>; Sat, 13 Jan 2024 15:56:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D01E0C433C7;
-	Sat, 13 Jan 2024 15:56:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69FCE23A3
+	for <netdev@vger.kernel.org>; Sat, 13 Jan 2024 16:07:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87599C433F1;
+	Sat, 13 Jan 2024 16:07:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705161387;
-	bh=JP90HmKryrppomkNXTQg91TpcvYt4x4E+ciK3w5Ys74=;
+	s=k20201202; t=1705162034;
+	bh=5GQBHlI5NK+kObariSZGsmsDAQBcXLBxEc91wBGox/c=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rHN4GkHYTvuQW7YZNeYz+G8t2+SLyNuP2n8xqSlPCFldWYdHP+nbierDnUbVzcdXF
-	 rk8+eGJNDXEVKxf7jPUs9cwQgAcVjSIBkU9IGLl0wbSgSZrpuSw6H9/Rk8oioICm8W
-	 MlOLlzFoUVb1VPznlMl38RvzYffsNiUDPRUsE0Bb2GxI3BAW6/HD05dejhVm5e9nbn
-	 zsQVB/PZI77xAOeVUJIF8VE1GY8pl3O63Px7KAssR7QZYZSLf66bFv6DMtDpG3qo6j
-	 GJaNgyyQD51jsQmD4EPrS/8dOMOZt12v0VqEi/c/+I2+LR5H3ZPgtHvZLXdk6G2dAX
-	 KQ71yQLItohjw==
-Date: Sat, 13 Jan 2024 15:56:24 +0000
+	b=Kb7hxkxuwgVTEr4GOxbq8NLUrwbhDyUAU08vl35eeeK6b30ZMXZ2ZSIS0/bFn040l
+	 V3H559XWEV8EST9K2X1dCWfqJHhrJ27SXgvXtv1ROQajxV0BBbdnjJq3gmioBgfalt
+	 iqaFsVMW/RnL8LDTa+SLnzfWvcIRcHj6WDU8N4nq5e6JebkZsSYdJJDGAhYJ683LNq
+	 gIxdFHxnvwqx9t3NnKqABGs+Dyo+tsCYbN8eqvsDL1h4ZWjAw1uPr5J+RWAFZYHPJt
+	 9VlAGJGY91qD7FNLPcGhjC0lW8l4u4mmepc9zXFTEZaeeLAxI9fjshHHx839Gldzix
+	 h68sOcTOp4k7g==
+Date: Sat, 13 Jan 2024 16:07:11 +0000
 From: Simon Horman <horms@kernel.org>
-To: Dmitry Antipov <dmantipov@yandex.ru>
-Cc: Michael Chan <michael.chan@broadcom.com>,
-	Artem Chernyshev <artem.chernyshev@red-soft.ru>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH] net: b44: fix clang-specific fortify warning
-Message-ID: <20240113155624.GJ392144@kernel.org>
-References: <20240112103743.188072-1-dmantipov@yandex.ru>
+To: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org,
+	Przemyslaw R Karpinski <przemyslaw.r.karpinski@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: Re: [PATCH iwl-next v1 1/2] i40e: Add read alternate indirect command
+Message-ID: <20240113160711.GK392144@kernel.org>
+References: <20240112095945.450590-1-jedrzej.jagielski@intel.com>
+ <20240112095945.450590-2-jedrzej.jagielski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,59 +51,77 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240112103743.188072-1-dmantipov@yandex.ru>
+In-Reply-To: <20240112095945.450590-2-jedrzej.jagielski@intel.com>
 
-On Fri, Jan 12, 2024 at 01:37:33PM +0300, Dmitry Antipov wrote:
-> When compiling with clang 17.0.6 and CONFIG_FORTIFY_SOURCE=y, I've
-> noticed the following warning (somewhat confusing due to absence of
-> an actual source code location):
+On Fri, Jan 12, 2024 at 10:59:44AM +0100, Jedrzej Jagielski wrote:
+> From: Przemyslaw R Karpinski <przemyslaw.r.karpinski@intel.com>
 > 
-> In file included from ./drivers/net/ethernet/broadcom/b44.c:17:
-> In file included from ./include/linux/module.h:13:
-> In file included from ./include/linux/stat.h:6:
-> In file included from ./arch/arm64/include/asm/stat.h:12:
-> In file included from ./include/linux/time.h:60:
-> In file included from ./include/linux/time32.h:13:
-> In file included from ./include/linux/timex.h:67:
-> In file included from ./arch/arm64/include/asm/timex.h:8:
-> In file included from ./arch/arm64/include/asm/arch_timer.h:12:
-> In file included from ./arch/arm64/include/asm/hwcap.h:9:
-> In file included from ./arch/arm64/include/asm/cpufeature.h:26:
-> In file included from ./include/linux/cpumask.h:12:
-> In file included from ./include/linux/bitmap.h:12:
-> In file included from ./include/linux/string.h:295:
-> ./include/linux/fortify-string.h:588:4: warning: call to '__read_overflow2_field'
-> declared with 'warning' attribute: detected read beyond size of field (2nd parameter);
-> maybe use struct_group()? [-Wattribute-warning]
->   588 |                         __read_overflow2_field(q_size_field, size);
->       |                         ^
+> Introduce implementation of 0x0903 Admin Queue command.
+> This indirect command reads a block of data from the alternate structure
+> of memory. The command defines the number of Dwords to be read and the
+> starting address inside the alternate structure.
 > 
-> The compiler actually complains on 'b44_get_strings()' because the
-> fortification logic inteprets call to 'memcpy()' as an attempt to
-> copy the whole array from its first member and so issues an overread
-> warning. This warning may be silenced by passing an address of the
-> whole array and not the first member to 'memcpy()'.
-> 
-> Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Signed-off-by: Przemyslaw R Karpinski <przemyslaw.r.karpinski@intel.com>
+> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
 
-This patch is for net-next, when reposting please annotate this
-in the subject.
+...
 
-	Subject: [PATCH net-next v2] ...
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_common.c b/drivers/net/ethernet/intel/i40e/i40e_common.c
+> index de6ca6295742..93971c9c98cc 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_common.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_common.c
+> @@ -4375,6 +4375,46 @@ static int i40e_aq_alternate_read(struct i40e_hw *hw,
+>  	return status;
+>  }
+>  
+> +/**
+> + * i40e_aq_alternate_read_indirect
+> + * @hw: pointer to the hardware structure
+> + * @addr: address of the alternate structure field
+> + * @dw_count: number of alternate structure fields to read
+> + * @buffer: pointer to the command buffer
+> + *
+> + * Read 'dw_count' dwords from alternate structure starting at 'addr' and
+> + * place them in 'buffer'. The buffer should be allocated by caller.
+> + *
+> + **/
+> +int i40e_aq_alternate_read_indirect(struct i40e_hw *hw, u32 addr, u32 dw_count,
+> +				    void *buffer)
+> +{
+> +	struct i40e_aqc_alternate_ind_read_write *cmd_resp;
+> +	struct i40e_aq_desc desc;
+> +	int status;
+> +
+> +	if (!buffer)
+> +		return -EINVAL;
+> +
+> +	cmd_resp = (struct i40e_aqc_alternate_ind_read_write *)&desc.params.raw;
+> +
+> +	i40e_fill_default_direct_cmd_desc(&desc,
+> +					  i40e_aqc_opc_alternate_read_indirect);
+> +
+> +	desc.flags |= cpu_to_le16(I40E_AQ_FLAG_RD);
+> +	desc.flags |= cpu_to_le16(I40E_AQ_FLAG_BUF);
+> +	if (dw_count > I40E_AQ_LARGE_BUF / 4)
+> +		desc.flags |= cpu_to_le16((u16)I40E_AQ_FLAG_LB);
 
-[adapted from text by Jakub]
+nit: Maybe the cast to (u16) can be dropped?
+     It isn't present in usage of I40E_AQ_FLAG_LB a few lines further up.
 
-## Form letter - net-next-closed
+> +
+> +	cmd_resp->address = cpu_to_le32(addr);
+> +	cmd_resp->length = cpu_to_le32(dw_count);
+> +
+> +	status = i40e_asq_send_command(hw, &desc, buffer,
+> +				       lower_16_bits(4 * dw_count), NULL);
+> +
+> +	return status;
+> +}
+> +
+>  /**
+>   * i40e_aq_suspend_port_tx
+>   * @hw: pointer to the hardware structure
 
-The merge window for v6.8 has begun and therefore net-next is closed
-for new drivers, features, code refactoring and optimizations.
-We are currently accepting bug fixes only.
-
-Please repost when net-next reopens on or after 22nd January.
-
-RFC patches sent for review only are obviously welcome at any time.
-
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
---
-pw-bot: defer
+...
 
