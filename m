@@ -1,139 +1,119 @@
-Return-Path: <netdev+bounces-63441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BE5382CE57
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 20:49:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0857582CE6B
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 21:41:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F6381C20839
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 19:49:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 89849B2235A
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 20:41:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E5376AC2;
-	Sat, 13 Jan 2024 19:49:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AA26CA7D;
+	Sat, 13 Jan 2024 20:41:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WwoW5vCB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qn4xslFV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAE6B63CB;
-	Sat, 13 Jan 2024 19:49:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-40e72d26a40so474075e9.2;
-        Sat, 13 Jan 2024 11:49:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705175357; x=1705780157; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=1HammmbmKVZr2MOKZbNt/I1t0w3fHw/pSzTd2SPHXwE=;
-        b=WwoW5vCBL3h7lbECyKBVHtgbzwX8+k72jbjt8QU74bmUO1szbPbgdDO2fFvvSTRwk5
-         h2rVvPFaFrRji/ACDztJZT5LswOYqwPWe8wymYmtiIWMiK+NI/aSeLx1y8hdURHAnvrb
-         FNmxXQkmTwrvuiZhz/iieE7npT6qYW6fOoSFUga/2xaVHx0Jy+mG+6Sk32CvFn0DzxvF
-         XJ1ecKOR4SVW3wlwtBD28G8pzpZ3fKy64CA8Sro3Xd0/AA/lHFNzS2juL7lXIrW1T0VK
-         A6ast1EpGUSHvWqPhB0lC7A0ggroAGkpv+dWgIGji1BPEy2gZP3WgPy4GiIxi28Ta3xv
-         jHaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705175357; x=1705780157;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1HammmbmKVZr2MOKZbNt/I1t0w3fHw/pSzTd2SPHXwE=;
-        b=k9BaPTk8SaUyxVLcXhcaz6fRsC4/v34K2injmUrbNu9EJQBoJpqVsKOb76IrcaGAGy
-         xswuPk8J37Ja8CHreJF/hJyNs8TBq6vcGQbgpbodVaH66bGmL/WDCgFAkV6aa2ZxtWNu
-         RRwTrBgp6AQcY4gZt4VPnfITL4JSmJisPe1D1dBpp+LbJ0aGxutsX6W0PKfG3UWGtPjT
-         JvKHxTATIIiROoPCwvgLmKkY2HVJLcAu3i6b7LJQz3MaO8aT/65qtgXGO2UuTZTvJswH
-         GoBPiybL/B7n3mL+NfpR8BumsCEhNmAUKaMepUvjNwm2M0qQN+HJNLv/OC5txvKmsHq+
-         Qw0A==
-X-Gm-Message-State: AOJu0YzNTQ6x55Nk4ZEfkwC1BlhUPnX+k7juvmXuM9Z4qXIUVs9nNF3b
-	WyQ8+3c5l6pFHsKpkCcWTvQ=
-X-Google-Smtp-Source: AGHT+IGB6b1STgkpJhSgj3KuApjLbo2cpOqH+Lo8IF+ZLe2NNqtVVUnWy/HbRsbdtahuuLtgdZIrFQ==
-X-Received: by 2002:a1c:7510:0:b0:40e:50e9:9b0c with SMTP id o16-20020a1c7510000000b0040e50e99b0cmr1665802wmc.181.1705175356706;
-        Sat, 13 Jan 2024 11:49:16 -0800 (PST)
-Received: from krava (ip-94-113-247-30.net.vodafone.cz. [94.113.247.30])
-        by smtp.gmail.com with ESMTPSA id a22-20020a05600c349600b0040d83ab2ecdsm10412099wmq.21.2024.01.13.11.49.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 13 Jan 2024 11:49:16 -0800 (PST)
-From: Jiri Olsa <olsajiri@gmail.com>
-X-Google-Original-From: Jiri Olsa <jolsa@kernel.org>
-Date: Sat, 13 Jan 2024 20:49:14 +0100
-To: Daniel Xu <dxu@dxuuu.xyz>
-Cc: Jiri Olsa <olsajiri@gmail.com>, linux-input@vger.kernel.org,
-	coreteam@netfilter.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-	fsverity@lists.linux.dev, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	cgroups@vger.kernel.org, alexei.starovoitov@gmail.com,
-	quentin@isovalent.com, alan.maguire@oracle.com, memxor@gmail.com
-Subject: Re: [PATCH bpf-next v3 0/3] Annotate kfuncs in .BTF_ids section
-Message-ID: <ZaLpOoi9qu1f-u5B@krava>
-References: <cover.1704565248.git.dxu@dxuuu.xyz>
- <ZaFm13GyXUukcnkm@krava>
- <2dhmwvfnnqnlrui2qcr5fob54gdsuse5caievct42trvvia6qe@p24nymz3uttv>
- <ZaKW1AghwUnVz_c4@krava>
- <nhpt647n2djmthtdkqzrfbpeuqkhfy567rt7qyqtymxejncbgr@4tpiyxy2sbcm>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5134579E5;
+	Sat, 13 Jan 2024 20:41:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62DA4C433F1;
+	Sat, 13 Jan 2024 20:40:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705178460;
+	bh=c8BIQyP1H8lJObZSyl18dvJBZNh2pJY7zSNOX401RyQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qn4xslFVH3tcADj40i6pWVh6bZyn8WaSie6SIWR0WkQSXBtyJJJ9lUMuUJctrEXxM
+	 J0orl6gEIo61FRKwl2wq+Rbruo4hrelO5oD7OBsjGXsefe3ku26FyKy7gqh5Y8jVqL
+	 R9gRghwdeQRGyixCVKKVnaDGR78+pekJu6fwIn/LsY36kaLkWImdmUk4zAG5/ubgqI
+	 4pMqhjNxXMJsVoXEoD+EnZR7GoNBihD93TeMJyvvcCalZynDqiKmfTumxdEVJDZYVZ
+	 kB0uLDJ3o6Y4PgZcqvm77scHlMb2HGwUlkOirDnNc2N51LyKAyF4FU54Ow9cbZD61/
+	 Pcw6rICC9g1wg==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <nhpt647n2djmthtdkqzrfbpeuqkhfy567rt7qyqtymxejncbgr@4tpiyxy2sbcm>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Sat, 13 Jan 2024 22:40:54 +0200
+Message-Id: <CYDVBBKUZ314.1VU7WLWB1IMM3@kernel.org>
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+To: "David Howells" <dhowells@redhat.com>, "Linus Torvalds"
+ <torvalds@linux-foundation.org>, "Edward Adam Davis" <eadavis@qq.com>,
+ "Pengfei Xu" <pengfei.xu@intel.com>
+Cc: "Simon Horman" <horms@kernel.org>, "Markus Suvanto"
+ <markus.suvanto@gmail.com>, "Jeffrey E Altman" <jaltman@auristor.com>,
+ "Marc Dionne" <marc.dionne@auristor.com>, "Wang Lei"
+ <wang840925@gmail.com>, "Jeff Layton" <jlayton@redhat.com>, "Steve French"
+ <smfrench@gmail.com>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, <linux-afs@lists.infradead.org>,
+ <keyrings@vger.kernel.org>, <linux-cifs@vger.kernel.org>,
+ <linux-nfs@vger.kernel.org>, <ceph-devel@vger.kernel.org>,
+ <netdev@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] keys, dns: Fix size check of V1 server-list header
+X-Mailer: aerc 0.16.0
+References: <1850031.1704921100@warthog.procyon.org.uk>
+In-Reply-To: <1850031.1704921100@warthog.procyon.org.uk>
 
-On Sat, Jan 13, 2024 at 09:17:44AM -0700, Daniel Xu wrote:
-> Hi Jiri,
-> 
-> On Sat, Jan 13, 2024 at 02:57:40PM +0100, Jiri Olsa wrote:
-> > On Fri, Jan 12, 2024 at 01:03:59PM -0700, Daniel Xu wrote:
-> > > On Fri, Jan 12, 2024 at 05:20:39PM +0100, Jiri Olsa wrote:
-> > > > On Sat, Jan 06, 2024 at 11:24:07AM -0700, Daniel Xu wrote:
-> > > > > === Description ===
-> > > > > 
-> > > > > This is a bpf-treewide change that annotates all kfuncs as such inside
-> > > > > .BTF_ids. This annotation eventually allows us to automatically generate
-> > > > > kfunc prototypes from bpftool.
-> > > > > 
-> > > > > We store this metadata inside a yet-unused flags field inside struct
-> > > > > btf_id_set8 (thanks Kumar!). pahole will be taught where to look.
-> > > > > 
-> > > > > More details about the full chain of events are available in commit 3's
-> > > > > description.
-> > > > > 
-> > > > > The accompanying pahole changes (still needs some cleanup) can be viewed
-> > > > > here on this "frozen" branch [0].
-> > > > 
-> > > > so the plan is to have bpftool support to generate header file
-> > > > with detected kfuncs?
-> > > 
-> > > Yep, that's the major use case. But I see other use cases as well like
-> > 
-> > ok, any chance you could already include it in the patchset?
-> > would be a great way to test this.. maybe we could change
-> > selftests to use that
-> 
-> I haven't start working on that code yet, but I can.
-> 
-> Here is my plan FWIW:
-> 
-> 1. Bump minimum required pahole version up. Or feature probe for
->    kfunc decl tag support. Whatever is the standard practice here.
-> 
-> 2. Teach bpftool to dump kfunc prototypes, guarded behind a flag.
-> 
-> 3. Flip bpftool flag on in selftest build and remove all manual kfunc
->    prototypes atomically in 1 commit.
-> 
-> I thought it'd be nicer to do it incrementally given all the moving
-> pieces. But if we want to land it all at once that is ok by me too.
+On Wed Jan 10, 2024 at 11:11 PM EET, David Howells wrote:
+>    =20
+> Fix the size check added to dns_resolver_preparse() for the V1 server-lis=
+t
+> header so that it doesn't give EINVAL if the size supplied is the same as
+> the size of the header struct (which should be valid).
+>
+> This can be tested with:
+>
+>         echo -n -e '\0\0\01\xff\0\0' | keyctl padd dns_resolver desc @p
+>
+> which will give "add_key: Invalid argument" without this fix.
+>
+> Fixes: 1997b3cb4217 ("keys, dns: Fix missing size check of V1 server-list=
+ header")
+> Reported-by: Pengfei Xu <pengfei.xu@intel.com>
+> Link: https://lore.kernel.org/r/ZZ4fyY4r3rqgZL+4@xpf.sh.intel.com/
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Edward Adam Davis <eadavis@qq.com>
+> cc: Linus Torvalds <torvalds@linux-foundation.org>
+> cc: Simon Horman <horms@kernel.org>
+> Cc: Jarkko Sakkinen <jarkko@kernel.org>
+> Cc: Jeffrey E Altman <jaltman@auristor.com>
+> Cc: Wang Lei <wang840925@gmail.com>
+> Cc: Jeff Layton <jlayton@redhat.com>
+> Cc: Steve French <sfrench@us.ibm.com>
+> Cc: Marc Dionne <marc.dionne@auristor.com>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> ---
+>  net/dns_resolver/dns_key.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/dns_resolver/dns_key.c b/net/dns_resolver/dns_key.c
+> index f18ca02aa95a..c42ddd85ff1f 100644
+> --- a/net/dns_resolver/dns_key.c
+> +++ b/net/dns_resolver/dns_key.c
+> @@ -104,7 +104,7 @@ dns_resolver_preparse(struct key_preparsed_payload *p=
+rep)
+>  		const struct dns_server_list_v1_header *v1;
+> =20
+>  		/* It may be a server list. */
+> -		if (datalen <=3D sizeof(*v1))
+> +		if (datalen < sizeof(*v1))
+>  			return -EINVAL;
+> =20
+>  		v1 =3D (const struct dns_server_list_v1_header *)data;
 
-I think it'd be best to try the whole thing before we merge the change
-to pahole.. I guess the tests changes can come later, but would be great
-to try the kfunc dump and make sure it works as expected
+Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
 
-jirka
+BR, Jarkko
+
 
