@@ -1,149 +1,165 @@
-Return-Path: <netdev+bounces-63399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7B8582CA9B
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 09:59:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8C6D82CAC6
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 10:22:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4AE71C2203A
-	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 08:59:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 843B32838DE
+	for <lists+netdev@lfdr.de>; Sat, 13 Jan 2024 09:22:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23A817E8;
-	Sat, 13 Jan 2024 08:59:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 931B57F1;
+	Sat, 13 Jan 2024 09:22:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="TkrNwGzc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx10.didiglobal.com (mx10.didiglobal.com [111.202.70.125])
-	by smtp.subspace.kernel.org (Postfix) with SMTP id 0133964B;
-	Sat, 13 Jan 2024 08:59:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=didiglobal.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=didiglobal.com
-Received: from mail.didiglobal.com (unknown [10.79.71.32])
-	by mx10.didiglobal.com (MailData Gateway V2.8.8) with ESMTPS id 67B1B184730DB8;
-	Sat, 13 Jan 2024 16:56:16 +0800 (CST)
-Received: from ZJY02-ACTMBX-04.didichuxing.com (10.79.65.14) by
- ZJY03-ACTMBX-03.didichuxing.com (10.79.71.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Sat, 13 Jan 2024 16:56:16 +0800
-Received: from ZJY02-ACTMBX-04.didichuxing.com ([fe80::35e6:a40:1a5b:87b2]) by
- ZJY02-ACTMBX-04.didichuxing.com ([fe80::35e6:a40:1a5b:87b2%4]) with mapi id
- 15.01.2507.032; Sat, 13 Jan 2024 16:56:16 +0800
-X-MD-Sfrom: wangkeqiwang@didiglobal.com
-X-MD-SrcIP: 10.79.71.32
-From: =?utf-8?B?546L54+C55CmIEtlcWkgV2FuZyBXYW5n?=
-	<wangkeqiwang@didiglobal.com>
-To: "Yin, Fengwei" <fengwei.yin@intel.com>, kernel test robot
-	<oliver.sang@intel.com>
-CC: "oe-lkp@lists.linux.dev" <oe-lkp@lists.linux.dev>, "lkp@intel.com"
-	<lkp@intel.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "ying.huang@intel.com"
-	<ying.huang@intel.com>, "feng.tang@intel.com" <feng.tang@intel.com>
-Subject: Re: [linus:master] [connector] c46bfba133:
- stress-ng.netlink-proc.ops_per_sec -97.2% regression
-Thread-Topic: [linus:master] [connector] c46bfba133:
- stress-ng.netlink-proc.ops_per_sec -97.2% regression
-Thread-Index: AQHaRUqHG1AdNrsDpE+sPh1PDQd947DXciWA
-Date: Sat, 13 Jan 2024 08:56:15 +0000
-Message-ID: <E0375D03-BC1E-4F78-8D44-83F4E98307BC@didiglobal.com>
-In-Reply-To: <5838205f-41ba-4666-9786-11181552a738@intel.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <9C45B2D478ECAE469B04C7D4023F7213@didichuxing.com>
-Content-Transfer-Encoding: base64
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 583377E9;
+	Sat, 13 Jan 2024 09:22:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 43827C0004;
+	Sat, 13 Jan 2024 09:22:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1705137762;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=mB9WRD6UXawX/aZviJr/LqXnsIPoDNYg4d4Tt1YlqkY=;
+	b=TkrNwGzcmbBNqS3JFQynOg1MmHpaGT+zxUEG3+8ZUGv8+W33RLnTPlHp36SVlk95uDD+nk
+	XWc14sgNS8osRTteaSAPcGEXH8G3jjVCBhnO9mS2dyHhi1VJ0qovlwJ22f27ifdtlS3OON
+	RhpvdcCY+tIhT121P4MuV0oluLVEEu2tCX0nNOb2YfY0gcKC/3xKDEqO73tn9ZOKicohad
+	AVMUeqrACQ8wqPDZjIQaBAHDwNjAUojqXeD9dueDEYRLt5hU+JR4Yk266fgD3gtwBFJU4r
+	8oB2SmfQ6UeUWzjR0YYZi2O8uy7+mAQc5cyDzXz+UkNw84cn8jb5D6z6w20Uhg==
+From: =?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: =?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>,
+	Luiz Angelo Daros de Luca <luizluca@gmail.com>,
+	mithat.guner@xeront.com,
+	erkin.bozoglu@xeront.com,
+	=?UTF-8?q?Alvin=20=C5=A0ipraga?= <ALSI@bang-olufsen.dk>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [RFC PATCH net-next] net: dsa: remove OF-based MDIO bus registration from DSA core
+Date: Sat, 13 Jan 2024 12:22:11 +0300
+Message-Id: <20240113092211.36218-1-arinc.unal@arinc9.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
 
-SGkgRmVuZ3dlaQ0KCVNvcnJ5LCByZXBseSBzbyBsYXRlLg0KCUkgZG9uJ3QgdGhpbmsgdGhpcyB3
-aWxsIGNhdXNlIGEgZHJhc3RpYyBkcm9wIGluIHN0cmVzcy1uZyBuZXRsaW5rLXByb2MgcGVyZm9y
-bWFuY2UuIEJlY2F1c2UgYWZ0ZXIgcmV0dXJuaW5nIC1FU1JDSCwgcHJvY19ldmVudF9udW1fbGlz
-dGVuZXJzIGlzIGNsZWFyZWQgYW5kIHRoZSBzZW5kX21zZyBmdW5jdGlvbiB3aWxsIG5vdCBiZSBj
-YWxsZWQuDQpIb3dldmVyLCB0aGVyZSBpcyBhIHByb2JsZW0gd2l0aCBqdWRnaW5nIGNsZWFyaW5n
-IGJhc2VkIG9uIHdoZXRoZXIgdGhlIHJldHVybiB2YWx1ZSBpcyAtRVNSQ0guIEJlY2F1c2UgbmV0
-bGlua19icm9hZGNhc3Qgd2lsbCByZXR1cm4gLUVTUkNIIGluIHRoaXMgY2FzZS4gQ2FuIHlvdSB0
-cnkgdGhlIGZvbGxvd2luZyBwYXRjaCB0byBzb2x2ZSB5b3VyIHByb2JsZW0/DQoNCkZyb20gNmU2
-YzM2YWVkMTU2YmJiMTg1ZjU0ZDBjMGZlZjJmNjY4M2RmMzI4OCBNb24gU2VwIDE3IDAwOjAwOjAw
-IDIwMDENCkZyb206IHdhbmdrZXFpIDx3YW5na2VxaXdhbmdAZGlkaWdsb2JhbC5jb20+DQpEYXRl
-OiBTYXQsIDIzIERlYyAyMDIzIDEzOjIxOjE3ICswODAwDQpTdWJqZWN0OiBbUEFUQ0hdIGNvbm5l
-Y3RvcjogRml4IHByb2NfZXZlbnRfbnVtX2xpc3RlbmVycyBjb3VudCBub3QgY2xlYXJlZA0KDQpX
-aGVuIHdlIHJlZ2lzdGVyIGEgY25fcHJvYyBsaXN0ZW5pbmcgZXZlbnQsIHRoZSBwcm9jX2V2ZW50
-X251bV9saXN0ZW5lcg0KdmFyaWFibGUgd2lsbCBiZSBpbmNyZW1lbnRlZCBieSBvbmUsIGJ1dCBp
-ZiBQUk9DX0NOX01DQVNUX0lHTk9SRSBpcw0Kbm90IGNhbGxlZCwgdGhlIGNvdW50IHdpbGwgbm90
-IGRlY3JlYXNlLg0KVGhpcyB3aWxsIGNhdXNlIHRoZSBwcm9jXypfY29ubmVjdG9yIGZ1bmN0aW9u
-IHRvIHRha2UgdGhlIHdyb25nIHBhdGguDQpJdCB3aWxsIHJlYXBwZWFyIHdoZW4gdGhlIGZvcmtz
-dGF0IHRvb2wgZXhpdHMgdmlhIGN0cmwgKyBjLg0KV2Ugc29sdmUgdGhpcyBwcm9ibGVtIGJ5IGRl
-dGVybWluaW5nIHdoZXRoZXINCnRoZXJlIGFyZSBzdGlsbCBsaXN0ZW5lcnMgdG8gY2xlYXIgcHJv
-Y19ldmVudF9udW1fbGlzdGVuZXIuDQoNClNpZ25lZC1vZmYtYnk6IHdhbmdrZXFpIDx3YW5na2Vx
-aXdhbmdAZGlkaWdsb2JhbC5jb20+DQotLS0NCiBkcml2ZXJzL2Nvbm5lY3Rvci9jbl9wcm9jLmMg
-ICB8IDUgKysrKy0NCiBkcml2ZXJzL2Nvbm5lY3Rvci9jb25uZWN0b3IuYyB8IDYgKysrKysrDQog
-aW5jbHVkZS9saW51eC9jb25uZWN0b3IuaCAgICAgfCAxICsNCiAzIGZpbGVzIGNoYW5nZWQsIDEx
-IGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkNCg0KZGlmZiAtLWdpdCBhL2RyaXZlcnMvY29u
-bmVjdG9yL2NuX3Byb2MuYyBiL2RyaXZlcnMvY29ubmVjdG9yL2NuX3Byb2MuYw0KaW5kZXggNDRi
-MTllNjk2Li5iMDlmNzRlZDMgMTAwNjQ0DQotLS0gYS9kcml2ZXJzL2Nvbm5lY3Rvci9jbl9wcm9j
-LmMNCisrKyBiL2RyaXZlcnMvY29ubmVjdG9yL2NuX3Byb2MuYw0KQEAgLTEwOCw4ICsxMDgsMTEg
-QEAgc3RhdGljIGlubGluZSB2b2lkIHNlbmRfbXNnKHN0cnVjdCBjbl9tc2cgKm1zZykNCiAJCWZp
-bHRlcl9kYXRhWzFdID0gMDsNCiAJfQ0KDQotCWNuX25ldGxpbmtfc2VuZF9tdWx0KG1zZywgbXNn
-LT5sZW4sIDAsIENOX0lEWF9QUk9DLCBHRlBfTk9XQUlULA0KKwlpZiAobmV0bGlua19oYXNfbGlz
-dGVuZXJzKGdldF9jZGV2X25scygpLCBDTl9JRFhfUFJPQykpDQorCQljbl9uZXRsaW5rX3NlbmRf
-bXVsdChtc2csIG1zZy0+bGVuLCAwLCBDTl9JRFhfUFJPQywgR0ZQX05PV0FJVCwNCiAJCQkgICAg
-IGNuX2ZpbHRlciwgKHZvaWQgKilmaWx0ZXJfZGF0YSk7DQorCWVsc2UNCisJCWF0b21pY19zZXQo
-JnByb2NfZXZlbnRfbnVtX2xpc3RlbmVycywgMCk7DQoNCiAJbG9jYWxfdW5sb2NrKCZsb2NhbF9l
-dmVudC5sb2NrKTsNCiB9DQpkaWZmIC0tZ2l0IGEvZHJpdmVycy9jb25uZWN0b3IvY29ubmVjdG9y
-LmMgYi9kcml2ZXJzL2Nvbm5lY3Rvci9jb25uZWN0b3IuYw0KaW5kZXggN2Y3Yjk0ZjYxLi5jZWQy
-NjU1YzYgMTAwNjQ0DQotLS0gYS9kcml2ZXJzL2Nvbm5lY3Rvci9jb25uZWN0b3IuYw0KKysrIGIv
-ZHJpdmVycy9jb25uZWN0b3IvY29ubmVjdG9yLmMNCkBAIC0xMjAsNiArMTIwLDEyIEBAIGludCBj
-bl9uZXRsaW5rX3NlbmRfbXVsdChzdHJ1Y3QgY25fbXNnICptc2csIHUxNiBsZW4sIHUzMiBwb3J0
-aWQsIHUzMiBfX2dyb3VwLA0KIH0NCiBFWFBPUlRfU1lNQk9MX0dQTChjbl9uZXRsaW5rX3NlbmRf
-bXVsdCk7DQoNCitzdHJ1Y3Qgc29jayAqZ2V0X2NkZXZfbmxzKHZvaWQpDQorew0KKwlyZXR1cm4g
-Y2Rldi5ubHM7DQorfQ0KK0VYUE9SVF9TWU1CT0xfR1BMKGdldF9jZGV2X25scyk7DQorDQogLyog
-c2FtZSBhcyBjbl9uZXRsaW5rX3NlbmRfbXVsdCBleGNlcHQgbXNnLT5sZW4gaXMgdXNlZCBmb3Ig
-bGVuICovDQogaW50IGNuX25ldGxpbmtfc2VuZChzdHJ1Y3QgY25fbXNnICptc2csIHUzMiBwb3J0
-aWQsIHUzMiBfX2dyb3VwLA0KIAlnZnBfdCBnZnBfbWFzaykNCmRpZmYgLS1naXQgYS9pbmNsdWRl
-L2xpbnV4L2Nvbm5lY3Rvci5oIGIvaW5jbHVkZS9saW51eC9jb25uZWN0b3IuaA0KaW5kZXggY2Vj
-MmQ5OWFlLi5jNjAxZWI5OWIgMTAwNjQ0DQotLS0gYS9pbmNsdWRlL2xpbnV4L2Nvbm5lY3Rvci5o
-DQorKysgYi9pbmNsdWRlL2xpbnV4L2Nvbm5lY3Rvci5oDQpAQCAtMTI2LDYgKzEyNiw3IEBAIGlu
-dCBjbl9uZXRsaW5rX3NlbmRfbXVsdChzdHJ1Y3QgY25fbXNnICptc2csIHUxNiBsZW4sIHUzMiBw
-b3J0aWQsDQogICogSWYgdGhlcmUgYXJlIG5vIGxpc3RlbmVycyBmb3IgZ2l2ZW4gZ3JvdXAgJS1F
-U1JDSCBjYW4gYmUgcmV0dXJuZWQuDQogICovDQogaW50IGNuX25ldGxpbmtfc2VuZChzdHJ1Y3Qg
-Y25fbXNnICptc2csIHUzMiBwb3J0aWQsIHUzMiBncm91cCwgZ2ZwX3QgZ2ZwX21hc2spOw0KK3N0
-cnVjdCBzb2NrICpnZXRfY2Rldl9ubHModm9pZCk7DQoNCiBpbnQgY25fcXVldWVfYWRkX2NhbGxi
-YWNrKHN0cnVjdCBjbl9xdWV1ZV9kZXYgKmRldiwgY29uc3QgY2hhciAqbmFtZSwNCiAJCQkgIGNv
-bnN0IHN0cnVjdCBjYl9pZCAqaWQsDQotLQ0KMi4yNy4wDQoNCu+7v+WcqCAyMDI0LzEvMTIgMTk6
-MjjvvIzigJxZaW4sIEZlbmd3ZWnigJ08ZmVuZ3dlaS55aW5AaW50ZWwuY29tIDxtYWlsdG86ZmVu
-Z3dlaS55aW5AaW50ZWwuY29tPj4g5YaZ5YWlOg0KDQoNCg0KDQoNCg0KT24gMS8xMS8yMDI0IDEx
-OjE5IFBNLCBrZXJuZWwgdGVzdCByb2JvdCB3cm90ZToNCj4gDQo+IA0KPiBIZWxsbywNCj4gDQo+
-IHdlIHJldmlld2VkIHRoaXMgcmVwb3J0IGFuZCBGZW5nd2VpIChDY2VkKSBwb2ludGVkIG91dCBp
-dCBjb3VsZCBiZSB0aGUgcGF0Y2gNCj4gYnJlYWtzIGZ1bmN0aW9uYWxpdHksIHRoZW4gY2F1c2Vz
-IHN0cmVzcy1uZyBuZXRsaW5rLXByb2MgcGVyZm9ybWFuY2UgZHJvcHMNCj4gZHJhbWF0aWNhbGx5
-Lg0KPiANCkp1c3QgRllJLiBIZXJlIGlzIHdoYXQgSSBvYnNlcnZlZCB3aGVuIHJ1bm5pbmcNCnN0
-cmVzcy1uZy5uZXRsaW5rLXByb2MgdGVzdGluZzoNCg0KDQpXaGF0ZXZlciB3aXRoL3dpdGhvdXQg
-dGhlIHBhdGNoLCBjbl9uZXRsaW5rX3NlbmRfbXVsdCgpIHJldHVybnMNCi1FU1JDSCBpbiBtb3N0
-IGNhc2UuDQoNCg0KVGhlIGZvbGxvd2luZyBpcyB3aGF0IHRoZSBjbl9uZXRsaW5rX3NlbmRfbXVs
-dCgpIHJldHVybnMgd2hlbg0Kc3RyZXNzLW5nLm5ldGxpbmstcHJvYyBpcyBydW5uaW5nOg0KDQoN
-Ci4uLg0KMjEzODAxIDIxMzgwMSBzdHJlc3MtbmctMyBjbl9uZXRsaW5rX3NlbmRfbXVsdCAtMw0K
-MjEzODAxIDIxMzgwMSBzdHJlc3Mtbmctc3Bhd24gY25fbmV0bGlua19zZW5kX211bHQgLTMNCjIx
-MzgwMSAyMTM4MDEgc3RyZXNzLW5nLXNwYXduIGNuX25ldGxpbmtfc2VuZF9tdWx0IC0zDQoyMTM4
-MDEgMjEzODAxIHN0cmVzcy1uZy13YWl0IGNuX25ldGxpbmtfc2VuZF9tdWx0IC0zDQoyMTM4MDIg
-MjEzODAyIHN0cmVzcy1uZy00IGNuX25ldGxpbmtfc2VuZF9tdWx0IC0zDQoyMTM4MDIgMjEzODAy
-IHN0cmVzcy1uZy1zcGF3biBjbl9uZXRsaW5rX3NlbmRfbXVsdCAtMw0KMjEzODAyIDIxMzgwMiBz
-dHJlc3Mtbmctc3Bhd24gY25fbmV0bGlua19zZW5kX211bHQgLTMNCjIxMzgwMiAyMTM4MDIgc3Ry
-ZXNzLW5nLXdhaXQgY25fbmV0bGlua19zZW5kX211bHQgLTMNCjIxMzgwMyAyMTM4MDMgc3RyZXNz
-LW5nLTUgY25fbmV0bGlua19zZW5kX211bHQgLTMNCjIxMzgwMyAyMTM4MDMgc3RyZXNzLW5nLWRl
-YWQgY25fbmV0bGlua19zZW5kX211bHQgLTMNCjIxMzgwMyAyMTM4MDMgc3RyZXNzLW5nLWRlYWQg
-Y25fbmV0bGlua19zZW5kX211bHQgLTMNCjIxMzgwMiAyMTM4MDIgc3RyZXNzLW5nLXdhaXQgY25f
-bmV0bGlua19zZW5kX211bHQgLTMNCjIxMzgwMSAyMTM4MDEgc3RyZXNzLW5nLXdhaXQgY25fbmV0
-bGlua19zZW5kX211bHQgLTMNCjIxMzgwMCAyMTM4MDAgc3RyZXNzLW5nLXdhaXQgY25fbmV0bGlu
-a19zZW5kX211bHQgLTMNCjIxMzc5OSAyMTM3OTkgc3RyZXNzLW5nLXdhaXQgY25fbmV0bGlua19z
-ZW5kX211bHQgLTMNCjIxMzc5OCAyMTM3OTggc3RyZXNzLW5nLXdhaXQgY25fbmV0bGlua19zZW5k
-X211bHQgLTMNCjE1NDY5NyAxNTQ2OTcgc3RyZXNzLW5nIGNuX25ldGxpbmtfc2VuZF9tdWx0IC0z
-DQouLi4NCg0KDQoNCg0KTG9va3MgbGlrZSBpdCdzIG5vdCBhY2N1cmF0ZSB0byByZXNldCBwcm9j
-X2V2ZW50X251bV9saXN0ZW5lcnMNCmFjY29yZGluZyB0byBjbl9uZXRsaW5rX3NlbmRfbXVsdCgp
-IHJldHVybiB2YWx1ZSAtMy4NCg0KDQoNCg0KUmVnYXJkcw0KWWluLCBGZW5nd2VpDQoNCg0KDQo=
+The code block under the "!ds->user_mii_bus && ds->ops->phy_read" check
+under dsa_switch_setup() populates ds->user_mii_bus. The use of
+ds->user_mii_bus is inappropriate when the MDIO bus of the switch is
+described on the device tree [1].
+
+For this reason, use this code block only for switches [with MDIO bus]
+probed on platform_data, and OF which the switch MDIO bus isn't described
+on the device tree. Therefore, remove OF-based MDIO bus registration as
+it's useless for these cases.
+
+These subdrivers which control switches [with MDIO bus] probed on OF, will
+lose the ability to register the MDIO bus OF-based:
+
+drivers/net/dsa/b53/b53_common.c
+drivers/net/dsa/lan9303-core.c
+drivers/net/dsa/realtek/realtek-mdio.c
+drivers/net/dsa/vitesse-vsc73xx-core.c
+
+These subdrivers let the DSA core driver register the bus:
+- ds->ops->phy_read() and ds->ops->phy_write() are present.
+- ds->user_mii_bus is not populated.
+
+The commit fe7324b93222 ("net: dsa: OF-ware slave_mii_bus") which brought
+OF-based MDIO bus registration on the DSA core driver is reasonably recent
+and, in this time frame, there have been no device trees in the Linux
+repository that started describing the MDIO bus, or dt-bindings defining
+the MDIO bus for the switches these subdrivers control. So I don't expect
+any devices to be affected.
+
+The logic we encourage is that all subdrivers should register the switch
+MDIO bus on their own [2]. And, for subdrivers which control switches [with
+MDIO bus] probed on OF, this logic must be followed to support all cases
+properly:
+
+No switch MDIO bus defined: Populate ds->user_mii_bus, register the MDIO
+bus, set the interrupts for PHYs if "interrupt-controller" is defined at
+the switch node. This case should only be covered for the switches which
+their dt-bindings documentation didn't document the MDIO bus from the
+start. This is to keep supporting the device trees that do not describe the
+MDIO bus on the device tree but the MDIO bus is being used nonetheless.
+
+Switch MDIO bus defined: Don't populate ds->user_mii_bus, register the MDIO
+bus, set the interrupts for PHYs if ["interrupt-controller" is defined at
+the switch node and "interrupts" is defined at the PHY nodes under the
+switch MDIO bus node].
+
+Switch MDIO bus defined but explicitly disabled: If the device tree says
+status = "disabled" for the MDIO bus, we shouldn't need an MDIO bus at all.
+Instead, just exit as early as possible and do not call any MDIO API.
+
+After all subdrivers that control switches with MDIO buses are made to
+register the MDIO buses on their own, we will be able to get rid of
+dsa_switch_ops :: phy_read() and :: phy_write(), and the code block for
+registering the MDIO bus on the DSA core driver.
+
+Link: https://lore.kernel.org/netdev/20231213120656.x46fyad6ls7sqyzv@skbuf/ [1]
+Link: https://lore.kernel.org/netdev/20240103184459.dcbh57wdnlox6w7d@skbuf/ [2]
+Suggested-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+---
+ net/dsa/dsa.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+diff --git a/net/dsa/dsa.c b/net/dsa/dsa.c
+index ac7be864e80d..09d2f5d4b3dd 100644
+--- a/net/dsa/dsa.c
++++ b/net/dsa/dsa.c
+@@ -15,7 +15,6 @@
+ #include <linux/slab.h>
+ #include <linux/rtnetlink.h>
+ #include <linux/of.h>
+-#include <linux/of_mdio.h>
+ #include <linux/of_net.h>
+ #include <net/dsa_stubs.h>
+ #include <net/sch_generic.h>
+@@ -626,7 +625,6 @@ static void dsa_switch_teardown_tag_protocol(struct dsa_switch *ds)
+ 
+ static int dsa_switch_setup(struct dsa_switch *ds)
+ {
+-	struct device_node *dn;
+ 	int err;
+ 
+ 	if (ds->setup)
+@@ -666,10 +664,7 @@ static int dsa_switch_setup(struct dsa_switch *ds)
+ 
+ 		dsa_user_mii_bus_init(ds);
+ 
+-		dn = of_get_child_by_name(ds->dev->of_node, "mdio");
+-
+-		err = of_mdiobus_register(ds->user_mii_bus, dn);
+-		of_node_put(dn);
++		err = mdiobus_register(ds->user_mii_bus);
+ 		if (err < 0)
+ 			goto free_user_mii_bus;
+ 	}
+-- 
+2.40.1
+
 
