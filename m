@@ -1,156 +1,84 @@
-Return-Path: <netdev+bounces-63451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C645A82D01B
-	for <lists+netdev@lfdr.de>; Sun, 14 Jan 2024 10:24:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66F3882D07C
+	for <lists+netdev@lfdr.de>; Sun, 14 Jan 2024 13:20:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 56F6B1F215F8
-	for <lists+netdev@lfdr.de>; Sun, 14 Jan 2024 09:24:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECC7B281A99
+	for <lists+netdev@lfdr.de>; Sun, 14 Jan 2024 12:20:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0899F1C10;
-	Sun, 14 Jan 2024 09:24:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89EDD20EB;
+	Sun, 14 Jan 2024 12:20:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CIguNuli"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F2501FA3
-	for <netdev@vger.kernel.org>; Sun, 14 Jan 2024 09:24:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3605e854428so73039765ab.0
-        for <netdev@vger.kernel.org>; Sun, 14 Jan 2024 01:24:17 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705224256; x=1705829056;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HOoIxcWWcMnwwGejFcnJw4FD/99JQb0TmtH1xZvozv8=;
-        b=Ja8za72X20fdh7HQ/llE4Ce9kI2uvpHDEM/nIAKbD3u0/nnEPQsp1MzVSGPGb5v44O
-         7L10WhFC2G6L8NLXmAoe2fA0DnprkaBt27WsRpbc+pvwbj6vD+6SMZWaofTMSypUNsO+
-         KOsaxPse8SYv18C9C3lrgkUtRKjDnka1sohDZ7c6ZgNSk4Ltbt7g09g93aylcy1uym4u
-         sCopjWMMCuudbm4hE7jZt4TAoHfsNmJjs/d0o7CGfq7/1qpFU22VdbxSyuHyX13eShzD
-         PBsZ2muiAxUm8UP88SAFKZptMMZek8HZfIaT45cjEtUl4rp6UYipEaeFzTnTHwy7TMSO
-         u3Zw==
-X-Gm-Message-State: AOJu0YxcG7OgwYN+RQn9Qjw283RAICwMnbw+S1sOIStZzHFE9EIuMC9L
-	C4+kftJ0Rn0Ig1iSP9TrosQz106wzg09LHJLZLqH+VSLcR/O
-X-Google-Smtp-Source: AGHT+IEBek3M1poK2bEsLHHglq7c+hx1pOmHGAeTCgfQsfmGeP2qf0E43qUu9VLbsOZ2pmdqUG8UaAVw/0FJhURYytvCyzfIETlw
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C43520E6;
+	Sun, 14 Jan 2024 12:20:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D7583C43390;
+	Sun, 14 Jan 2024 12:20:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705234824;
+	bh=lQbD6Qa2k8PmsWRKY/NauPY86qM9T5apEyrjudWa0Ws=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=CIguNulikzIgh+8X16LQlOsEFpO3py3v+BKqjZpjQKqqFeTiBOuMYH4rmpO7pkZX6
+	 aEE+6krtcAf5L2EUu/rHRxOkOkNsRx+k8AeJCKh85b8yE+UZ+DkgxWPfgoHxWz/Et9
+	 ztAbQkdM7ZJ6iXleDpuFXvfllBN+pseZqDNpmm9X82nE+Fie+aOrq9z0SnYKHzlO/R
+	 GETkvaSwtkEKh43yeKnnN4qaANVlq9mSep2Q1BFzhKGVSelYcCYcf4TEXEasDtG8H8
+	 ouEc+oArH0N/M5ctIA7hioGlhOT0QcA7YuygrGCIR/CiOkmb0XN9bsMZGUFbJ7PdYl
+	 6JaO5i0CiWhhg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C53A2D8C96D;
+	Sun, 14 Jan 2024 12:20:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1c0c:b0:360:17a7:d897 with SMTP id
- l12-20020a056e021c0c00b0036017a7d897mr342352ilh.4.1705224256773; Sun, 14 Jan
- 2024 01:24:16 -0800 (PST)
-Date: Sun, 14 Jan 2024 01:24:16 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000001663ea060ee476ea@google.com>
-Subject: [syzbot] [net?] KMSAN: uninit-value in hsr_get_node (2)
-From: syzbot <syzbot+2ef3a8ce8e91b5a50098@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2 0/2] tls fixes for SPLICE with more hint 
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170523482480.13495.3024622886395212564.git-patchwork-notify@kernel.org>
+Date: Sun, 14 Jan 2024 12:20:24 +0000
+References: <20240113003258.67899-1-john.fastabend@gmail.com>
+In-Reply-To: <20240113003258.67899-1-john.fastabend@gmail.com>
+To: John Fastabend <john.fastabend@gmail.com>
+Cc: netdev@vger.kernel.org, eadavis@qq.com, kuba@kernel.org,
+ bpf@vger.kernel.org, borisp@nvidia.com
 
-Hello,
+Hello:
 
-syzbot found the following issue on:
+This series was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-HEAD commit:    9f8413c4a66f Merge tag 'cgroup-for-6.8' of git://git.kerne..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=16924083e80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=656820e61b758b15
-dashboard link: https://syzkaller.appspot.com/bug?extid=2ef3a8ce8e91b5a50098
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15793b23e80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=115215f3e80000
+On Fri, 12 Jan 2024 16:32:56 -0800 you wrote:
+> Syzbot found a splat where it tried to splice data over a tls socket
+> with the more hint and sending greater than the number of frags that
+> fit in a msg scatterlist. This resulted in an error where we do not
+> correctly send the data when the msg sg is full. The more flag being
+> just a hint not a strict contract. This then results in the syzbot
+> warning on the next send.
+> 
+> [...]
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/79d9f2f4b065/disk-9f8413c4.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/cbc68430d9c6/vmlinux-9f8413c4.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/9740ad9fc172/bzImage-9f8413c4.xz
+Here is the summary with links:
+  - [net,v2,1/2] net: tls, fix WARNIING in __sk_msg_free
+    https://git.kernel.org/netdev/net/c/dc9dfc8dc629
+  - [net,v2,2/2] net: tls, add test to capture error on large splice
+    https://git.kernel.org/netdev/net/c/034ea1305e65
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+2ef3a8ce8e91b5a50098@syzkaller.appspotmail.com
-
-=====================================================
-BUG: KMSAN: uninit-value in hsr_get_node+0xa2e/0xa40 net/hsr/hsr_framereg.c:246
- hsr_get_node+0xa2e/0xa40 net/hsr/hsr_framereg.c:246
- fill_frame_info net/hsr/hsr_forward.c:577 [inline]
- hsr_forward_skb+0xe12/0x30e0 net/hsr/hsr_forward.c:615
- hsr_dev_xmit+0x1a1/0x270 net/hsr/hsr_device.c:223
- __netdev_start_xmit include/linux/netdevice.h:4940 [inline]
- netdev_start_xmit include/linux/netdevice.h:4954 [inline]
- xmit_one net/core/dev.c:3548 [inline]
- dev_hard_start_xmit+0x247/0xa10 net/core/dev.c:3564
- __dev_queue_xmit+0x33b8/0x5130 net/core/dev.c:4349
- dev_queue_xmit include/linux/netdevice.h:3134 [inline]
- packet_xmit+0x9c/0x6b0 net/packet/af_packet.c:276
- packet_snd net/packet/af_packet.c:3087 [inline]
- packet_sendmsg+0x8b1d/0x9f30 net/packet/af_packet.c:3119
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg net/socket.c:745 [inline]
- __sys_sendto+0x735/0xa10 net/socket.c:2191
- __do_sys_sendto net/socket.c:2203 [inline]
- __se_sys_sendto net/socket.c:2199 [inline]
- __x64_sys_sendto+0x125/0x1c0 net/socket.c:2199
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0x6d/0x140 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-
-Uninit was created at:
- slab_post_alloc_hook+0x129/0xa70 mm/slab.h:768
- slab_alloc_node mm/slub.c:3478 [inline]
- kmem_cache_alloc_node+0x5e9/0xb10 mm/slub.c:3523
- kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:560
- __alloc_skb+0x318/0x740 net/core/skbuff.c:651
- alloc_skb include/linux/skbuff.h:1286 [inline]
- alloc_skb_with_frags+0xc8/0xbd0 net/core/skbuff.c:6334
- sock_alloc_send_pskb+0xa80/0xbf0 net/core/sock.c:2787
- packet_alloc_skb net/packet/af_packet.c:2936 [inline]
- packet_snd net/packet/af_packet.c:3030 [inline]
- packet_sendmsg+0x70e8/0x9f30 net/packet/af_packet.c:3119
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg net/socket.c:745 [inline]
- __sys_sendto+0x735/0xa10 net/socket.c:2191
- __do_sys_sendto net/socket.c:2203 [inline]
- __se_sys_sendto net/socket.c:2199 [inline]
- __x64_sys_sendto+0x125/0x1c0 net/socket.c:2199
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0x6d/0x140 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-
-CPU: 1 PID: 5033 Comm: syz-executor334 Not tainted 6.7.0-syzkaller-00562-g9f8413c4a66f #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-=====================================================
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
