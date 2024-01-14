@@ -1,100 +1,156 @@
-Return-Path: <netdev+bounces-63450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A234E82D00B
-	for <lists+netdev@lfdr.de>; Sun, 14 Jan 2024 09:57:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C645A82D01B
+	for <lists+netdev@lfdr.de>; Sun, 14 Jan 2024 10:24:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 391791F21AD9
-	for <lists+netdev@lfdr.de>; Sun, 14 Jan 2024 08:57:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 56F6B1F215F8
+	for <lists+netdev@lfdr.de>; Sun, 14 Jan 2024 09:24:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A8BE1876;
-	Sun, 14 Jan 2024 08:57:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j7LJba52"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0899F1C10;
+	Sun, 14 Jan 2024 09:24:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0649A1C10;
-	Sun, 14 Jan 2024 08:57:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92F75C433F1;
-	Sun, 14 Jan 2024 08:57:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705222624;
-	bh=IQq5LbRYSKg2z7BCFiFP8dBEZGJ2DR2mjUblMlQToUY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=j7LJba520T3tuPU61LFPCZjpBK6xLkjY1tNS2vQBT2y1dzGYlQaw5mInmtLSnNkVF
-	 TrKxza6st4n/QLGzEVz7u+2gzaq5vfWEsLfIoq8JP2Y94T5yUTi3Oc1SrJhTvQuC/i
-	 ynehVCb6gsp6lYITgWFV2siFn+RbBcdsKslqwXL86dea+dn9W2Xs+mcWLmO5Kl9U3z
-	 FsihdwRR6ODz9h3bzyyR55Tv9dhJqc5o2W6TtkpWgP+R0AnCbE10hd7HSoZFOgJY7n
-	 jz1b9gHT/A4KY+YLF/QITkMPLRcXSEeceWbPwyEuH2NGL4629R9GYNxYKzpSvZ+rE4
-	 hCM3O/PYzpeog==
-Date: Sun, 14 Jan 2024 10:56:59 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: longli@microsoft.com
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Ajay Sharma <sharmaajay@microsoft.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] MAINTAINERS: update maintainer for Microsoft MANA RDMA
- driver
-Message-ID: <20240114085659.GC6404@unreal>
-References: <1705017438-20417-1-git-send-email-longli@linuxonhyperv.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F2501FA3
+	for <netdev@vger.kernel.org>; Sun, 14 Jan 2024 09:24:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3605e854428so73039765ab.0
+        for <netdev@vger.kernel.org>; Sun, 14 Jan 2024 01:24:17 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705224256; x=1705829056;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HOoIxcWWcMnwwGejFcnJw4FD/99JQb0TmtH1xZvozv8=;
+        b=Ja8za72X20fdh7HQ/llE4Ce9kI2uvpHDEM/nIAKbD3u0/nnEPQsp1MzVSGPGb5v44O
+         7L10WhFC2G6L8NLXmAoe2fA0DnprkaBt27WsRpbc+pvwbj6vD+6SMZWaofTMSypUNsO+
+         KOsaxPse8SYv18C9C3lrgkUtRKjDnka1sohDZ7c6ZgNSk4Ltbt7g09g93aylcy1uym4u
+         sCopjWMMCuudbm4hE7jZt4TAoHfsNmJjs/d0o7CGfq7/1qpFU22VdbxSyuHyX13eShzD
+         PBsZ2muiAxUm8UP88SAFKZptMMZek8HZfIaT45cjEtUl4rp6UYipEaeFzTnTHwy7TMSO
+         u3Zw==
+X-Gm-Message-State: AOJu0YxcG7OgwYN+RQn9Qjw283RAICwMnbw+S1sOIStZzHFE9EIuMC9L
+	C4+kftJ0Rn0Ig1iSP9TrosQz106wzg09LHJLZLqH+VSLcR/O
+X-Google-Smtp-Source: AGHT+IEBek3M1poK2bEsLHHglq7c+hx1pOmHGAeTCgfQsfmGeP2qf0E43qUu9VLbsOZ2pmdqUG8UaAVw/0FJhURYytvCyzfIETlw
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1705017438-20417-1-git-send-email-longli@linuxonhyperv.com>
+X-Received: by 2002:a05:6e02:1c0c:b0:360:17a7:d897 with SMTP id
+ l12-20020a056e021c0c00b0036017a7d897mr342352ilh.4.1705224256773; Sun, 14 Jan
+ 2024 01:24:16 -0800 (PST)
+Date: Sun, 14 Jan 2024 01:24:16 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000001663ea060ee476ea@google.com>
+Subject: [syzbot] [net?] KMSAN: uninit-value in hsr_get_node (2)
+From: syzbot <syzbot+2ef3a8ce8e91b5a50098@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Jan 11, 2024 at 03:57:18PM -0800, longli@linuxonhyperv.com wrote:
-> From: Long Li <longli@microsoft.com>
-> 
-> Ajay is no longer working on the MANA RDMA driver.
-> 
-> Konstantin Taranov will take the responsibility of fixing bugs, reviewing
-> patches and developing new features for MANA RDMA driver.
+Hello,
 
-Let's do it gradually.
-1. Make sure that Konstantin configures his email to reply in plain-text.
-2. Stop top-posting replies.
-3. Make sure that his cleanup MANA RDMA patch is properly written
-and separated to series.
-4. Send RDMA patches with rdma-next/rdma-rc prefix in them.
+syzbot found the following issue on:
 
-Thanks
+HEAD commit:    9f8413c4a66f Merge tag 'cgroup-for-6.8' of git://git.kerne..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=16924083e80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=656820e61b758b15
+dashboard link: https://syzkaller.appspot.com/bug?extid=2ef3a8ce8e91b5a50098
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15793b23e80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=115215f3e80000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/79d9f2f4b065/disk-9f8413c4.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/cbc68430d9c6/vmlinux-9f8413c4.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/9740ad9fc172/bzImage-9f8413c4.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+2ef3a8ce8e91b5a50098@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in hsr_get_node+0xa2e/0xa40 net/hsr/hsr_framereg.c:246
+ hsr_get_node+0xa2e/0xa40 net/hsr/hsr_framereg.c:246
+ fill_frame_info net/hsr/hsr_forward.c:577 [inline]
+ hsr_forward_skb+0xe12/0x30e0 net/hsr/hsr_forward.c:615
+ hsr_dev_xmit+0x1a1/0x270 net/hsr/hsr_device.c:223
+ __netdev_start_xmit include/linux/netdevice.h:4940 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4954 [inline]
+ xmit_one net/core/dev.c:3548 [inline]
+ dev_hard_start_xmit+0x247/0xa10 net/core/dev.c:3564
+ __dev_queue_xmit+0x33b8/0x5130 net/core/dev.c:4349
+ dev_queue_xmit include/linux/netdevice.h:3134 [inline]
+ packet_xmit+0x9c/0x6b0 net/packet/af_packet.c:276
+ packet_snd net/packet/af_packet.c:3087 [inline]
+ packet_sendmsg+0x8b1d/0x9f30 net/packet/af_packet.c:3119
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg net/socket.c:745 [inline]
+ __sys_sendto+0x735/0xa10 net/socket.c:2191
+ __do_sys_sendto net/socket.c:2203 [inline]
+ __se_sys_sendto net/socket.c:2199 [inline]
+ __x64_sys_sendto+0x125/0x1c0 net/socket.c:2199
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x6d/0x140 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+Uninit was created at:
+ slab_post_alloc_hook+0x129/0xa70 mm/slab.h:768
+ slab_alloc_node mm/slub.c:3478 [inline]
+ kmem_cache_alloc_node+0x5e9/0xb10 mm/slub.c:3523
+ kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:560
+ __alloc_skb+0x318/0x740 net/core/skbuff.c:651
+ alloc_skb include/linux/skbuff.h:1286 [inline]
+ alloc_skb_with_frags+0xc8/0xbd0 net/core/skbuff.c:6334
+ sock_alloc_send_pskb+0xa80/0xbf0 net/core/sock.c:2787
+ packet_alloc_skb net/packet/af_packet.c:2936 [inline]
+ packet_snd net/packet/af_packet.c:3030 [inline]
+ packet_sendmsg+0x70e8/0x9f30 net/packet/af_packet.c:3119
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg net/socket.c:745 [inline]
+ __sys_sendto+0x735/0xa10 net/socket.c:2191
+ __do_sys_sendto net/socket.c:2203 [inline]
+ __se_sys_sendto net/socket.c:2199 [inline]
+ __x64_sys_sendto+0x125/0x1c0 net/socket.c:2199
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x6d/0x140 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+CPU: 1 PID: 5033 Comm: syz-executor334 Not tainted 6.7.0-syzkaller-00562-g9f8413c4a66f #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+=====================================================
 
 
-> 
-> Signed-off-by: Long Li <longli@microsoft.com>
-> ---
->  MAINTAINERS | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 463c097e01af..135471cbc144 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -14527,7 +14527,7 @@ F:	include/uapi/linux/cciss*.h
->  
->  MICROSOFT MANA RDMA DRIVER
->  M:	Long Li <longli@microsoft.com>
-> -M:	Ajay Sharma <sharmaajay@microsoft.com>
-> +M:	Konstantin Taranov <kotaranov@microsoft.com>
->  L:	linux-rdma@vger.kernel.org
->  S:	Supported
->  F:	drivers/infiniband/hw/mana/
-> -- 
-> 2.17.1
-> 
-> 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
