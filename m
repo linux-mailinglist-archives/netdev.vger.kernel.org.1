@@ -1,83 +1,89 @@
-Return-Path: <netdev+bounces-63457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 563E982D0ED
-	for <lists+netdev@lfdr.de>; Sun, 14 Jan 2024 15:37:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61D6482D17A
+	for <lists+netdev@lfdr.de>; Sun, 14 Jan 2024 17:50:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 025221F215ED
-	for <lists+netdev@lfdr.de>; Sun, 14 Jan 2024 14:37:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 03392B212E8
+	for <lists+netdev@lfdr.de>; Sun, 14 Jan 2024 16:50:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A40EF2109;
-	Sun, 14 Jan 2024 14:37:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6EFE523D;
+	Sun, 14 Jan 2024 16:50:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pDqC6zAi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 560A81C14
-	for <netdev@vger.kernel.org>; Sun, 14 Jan 2024 14:37:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7bf44da02c3so6748039f.1
-        for <netdev@vger.kernel.org>; Sun, 14 Jan 2024 06:37:05 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705243024; x=1705847824;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7wt6VIBHV5JomMb6G/SAzgkJ/CF86v9+FpIHEpcIi30=;
-        b=BuO6M/j45RKtlEelEvPMx/fkOoJRE1icn+WPa43gdLUH1V1iLEczJ+Exsg7H/3Pc6p
-         6Z9VC+l5iKXPgZRo0wGnt98tL/q8xmpPV2gz3v3C9x4+NXa4SipiGtRFHEFA951Vro8y
-         Sdjf3tfs791B0uRHSpvKWhIC43LeeKxt+uD+FgPdsu42odbTAONT+1weuFAazXntauV2
-         tkjc62fu1eALGmZ8qM1KU2p9KRZMblZp17HzzM4KQQ/mVuw94BQ8VsNBmaOJOI6qXjqe
-         Hli1NKjNzUhJqzGPcD8CrZi1SRtaqPFdz4jnqHDFGbOYx4cWV/KE8m4sDuofEgJD04Pe
-         KAAQ==
-X-Gm-Message-State: AOJu0Yyn0hs0O9gysXtzfTYSaxi8doq8Qvj/e+HnkbWuPlDYvPFARVln
-	F64fn6uNbAVJoySEt5KYEniGjeQq3keXmLpoYjfayuT9yMQ4
-X-Google-Smtp-Source: AGHT+IHZJp1y0/eT4Y5XcGEZHHluMb+1c3lYitvG1gsjKxbDv/arVmEig0IQH/tbT08VemxEN1ZaDQXwh5BN04ZeASt4LhxR5rpZ
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1F795231;
+	Sun, 14 Jan 2024 16:50:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2E975C43390;
+	Sun, 14 Jan 2024 16:50:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705251024;
+	bh=aajpuL0N1FoVPG1DOrmuwPFeTeocdCnnlU8c+Mc11tk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=pDqC6zAins4V9gxo86MlHsipGU6CoRoDy1yYSlZ4/rFYisLKf4/vww8JN3UOvNdk8
+	 HLOoq+WZCKm1lpmA27gvmPqJVS5C6Rx73ydDaP2kKaYZRf7xm5H+HoRNp3Iug4zpiT
+	 obQLLLW2YoPukwPQDSsAa80utgQmTSPE3oSMjpQzra2615D0WXCZ0evFprL6oMRTDO
+	 P34rBZDxJCRN/HZnKjWyTGXXpL/pc9Y7A9a/3wxAO6nJdEBDI6BIc1TIZG2pTdn0TJ
+	 xPc0MyXgeQTHahr6CiMjLeqXAZLe02Dy/C1WSpoJHz7sdiP40BhKiDHFXmPA9VucxR
+	 3SZXJFxIWyCwA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1571ED8C96D;
+	Sun, 14 Jan 2024 16:50:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a8a:b0:35f:d260:57b3 with SMTP id
- k10-20020a056e021a8a00b0035fd26057b3mr398021ilv.3.1705243024532; Sun, 14 Jan
- 2024 06:37:04 -0800 (PST)
-Date: Sun, 14 Jan 2024 06:37:04 -0800
-In-Reply-To: <0000000000005ab984060371583e@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000bbb70f060ee8d44b@google.com>
-Subject: Re: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in hci_send_acl
-From: syzbot <syzbot+a0c80b06ae2cb8895bc4@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, hdanton@sina.com, 
-	johan.hedberg@gmail.com, kuba@kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, luiz.von.dentz@intel.com, 
-	marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com, pav@iki.fi, 
-	syzkaller-bugs@googlegroups.com, william.xuanziyang@huawei.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] net: ravb: Fix dma_addr_t truncation in error case
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170525102408.11320.1615500877884972571.git-patchwork-notify@kernel.org>
+Date: Sun, 14 Jan 2024 16:50:24 +0000
+References: <20240113042221.480650-1-nikita.yoush@cogentembedded.com>
+In-Reply-To: <20240113042221.480650-1-nikita.yoush@cogentembedded.com>
+To: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ s.shtylyov@omp.ru, claudiu.beznea.uj@bp.renesas.com,
+ yoshihiro.shimoda.uh@renesas.com, wsa+renesas@sang-engineering.com,
+ u.kleine-koenig@pengutronix.de, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
 
-syzbot suspects this issue was fixed by commit:
+Hello:
 
-commit 181a42edddf51d5d9697ecdf365d72ebeab5afb0
-Author: Ziyang Xuan <william.xuanziyang@huawei.com>
-Date:   Wed Oct 11 09:57:31 2023 +0000
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-    Bluetooth: Make handle of hci_conn be unique
+On Sat, 13 Jan 2024 10:22:21 +0600 you wrote:
+> In ravb_start_xmit(), ravb driver uses u32 variable to store result of
+> dma_map_single() call. Since ravb hardware has 32-bit address fields in
+> descriptors, this works properly when mapping is successful - it is
+> platform's job to provide mapping addresses that fit into hardware
+> limitations.
+> 
+> However, in failure case dma_map_single() returns DMA_MAPPING_ERROR
+> constant that is 64-bit when dma_addr_t is 64-bit. Storing this constant
+> in u32 leads to truncation, and further call to dma_mapping_error()
+> fails to notice the error.
+> 
+> [...]
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=127944c1e80000
-start commit:   4b2b606075e5 ipv4/fib: send notify when delete source addr..
-git tree:       net
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d594086f139d167
-dashboard link: https://syzkaller.appspot.com/bug?extid=a0c80b06ae2cb8895bc4
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=138aad9e680000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=125e0b92680000
+Here is the summary with links:
+  - net: ravb: Fix dma_addr_t truncation in error case
+    https://git.kernel.org/netdev/net/c/e327b2372bc0
 
-If the result looks correct, please mark the issue as fixed by replying with:
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-#syz fix: Bluetooth: Make handle of hci_conn be unique
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
