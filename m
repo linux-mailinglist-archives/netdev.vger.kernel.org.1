@@ -1,276 +1,177 @@
-Return-Path: <netdev+bounces-63459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E61DC82D1BE
-	for <lists+netdev@lfdr.de>; Sun, 14 Jan 2024 18:42:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D60B782D1D2
+	for <lists+netdev@lfdr.de>; Sun, 14 Jan 2024 19:08:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C99D1C20A8B
-	for <lists+netdev@lfdr.de>; Sun, 14 Jan 2024 17:42:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 48751B21269
+	for <lists+netdev@lfdr.de>; Sun, 14 Jan 2024 18:08:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D0C1DF6D;
-	Sun, 14 Jan 2024 17:42:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Eyc2+g0L"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F7D6F504;
+	Sun, 14 Jan 2024 18:08:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2071.outbound.protection.outlook.com [40.107.237.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 505A7EAE3
-	for <netdev@vger.kernel.org>; Sun, 14 Jan 2024 17:42:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KvFY9InyeXhgPT3ZJ4F9Kk7wkiAavoT723np7W6TVa11bE/d5oF1j8TAY6xtgAJouVGzX2oqnhA3BtQufy7AGIh0aRG8aFCSSPbsisqySTBR24z+dKbPRiXgqPKpP6/5dw4p0lYGbI6eh/0/8itMudCdggznjNKcKbDvdmrCT2EEcJvgIl+F2/fFY0qxDEYDazpuwypoBz6ZMRqFLjPzXRr+u5BUdjLjSuOW3cwFlJ2am/d1GPdwFUUoq76GDEzp8UPy2OESD2M8WsoLUACa4wJ7LCOIFvmmhKBUe78HdmslbaTUGzVmR64BF7xa7qafpy/310d7mpFEnshYoR3Eeg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UEPQEwtrPmhmO5QPJfGVrPf4gTavAgAnzf6gEZ2M0pk=;
- b=n6ospd18TWJot4Jiiwy6r/OfTe2YTigEDomwHLpxMan3G13W6m0DyvaF4F1NJrmTN7bfEMlP85TmaYDuUuw1S4spAJSry5Hl7rSTnnlMW9bj7OfX3FRKK/0K76gtVhvSVCcYW9ZspdzERa+a9JnCreL2GWZQq/DoRa4O+4thdeFxbqJjGVWhGJpx10s0eVlCMHm1txDAWFyNCiDUuo6loSSM2+YCoXrN9qlJg/x3WdBihRyAuOh30rtRClaeR9MRwB32uIdwQ0D/am7sPcR18WgDgD3HJ9fbY+4mAw/8vsxOW48QjROXVhy2rfYxcSt/l3wqntd0vvWTpE+9ssg9Fw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UEPQEwtrPmhmO5QPJfGVrPf4gTavAgAnzf6gEZ2M0pk=;
- b=Eyc2+g0LZ+fUIu5cpaDyT9ph03KerZjFUHMcLldv1j+rzJTnDqTjEbGZlAS069ggX85vNODbTx/fKwGSc771Klb1vMJhTBLkrIV1txMiAzSeRcUeiLwzLHoc4zDBBH9ry6RrrcssTxvwfKxG20BYtn9Bg2mmJvb/DzlWmrnUy2g4WQDJOOowZkbRZq5M6k8dQZ5rnF3iR0QkbiSgBbnK18gcALSKu9dASvM09BTBSkIVGajeQDhgkS4V0cpQaUuFNyvrVnf9ZUSDQD9cRMZl5+KcSJRjUPrXoTKbWqLJq2q7lin50vtnC4/ZjmfnhAH3qFRxQmHjyS4F7FLAWKH4Ig==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
- by CH0PR12MB5233.namprd12.prod.outlook.com (2603:10b6:610:d0::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.18; Sun, 14 Jan
- 2024 17:42:27 +0000
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::ab86:edf7:348:d117]) by BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::ab86:edf7:348:d117%3]) with mapi id 15.20.7181.020; Sun, 14 Jan 2024
- 17:42:26 +0000
-From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-To: netdev@vger.kernel.org
-Cc: Gal Pressman <gal@nvidia.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
-	Radu Pirea <radu-nicolae.pirea@oss.nxp.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Sabrina Dubroca <sd@queasysnail.net>
-Subject: [PATCH net] Revert "net: macsec: use skb_ensure_writable_head_tail to expand the skb"
-Date: Sun, 14 Jan 2024 09:42:03 -0800
-Message-ID: <20240114174208.34330-2-rrameshbabu@nvidia.com>
-X-Mailer: git-send-email 2.42.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SJ0PR03CA0242.namprd03.prod.outlook.com
- (2603:10b6:a03:3a0::7) To BYAPR12MB2743.namprd12.prod.outlook.com
- (2603:10b6:a03:61::28)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29BE3EAF4;
+	Sun, 14 Jan 2024 18:08:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.105] (31.173.83.169) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Sun, 14 Jan
+ 2024 21:07:52 +0300
+Subject: Re: [PATCH net-next v3 08/19] net: ravb: Move the IRQs get and
+ request in the probe function
+To: claudiu beznea <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
+	<yoshihiro.shimoda.uh@renesas.com>, <wsa+renesas@sang-engineering.com>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <geert+renesas@glider.be>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20240105082339.1468817-1-claudiu.beznea.uj@bp.renesas.com>
+ <20240105082339.1468817-9-claudiu.beznea.uj@bp.renesas.com>
+ <02548b1b-d32c-78b1-f1b6-5fdb505d31bb@omp.ru>
+ <ee783b61-95fc-44ab-a311-0ca7d058ac39@tuxon.dev>
+ <dce944a1-9557-9ab0-d30d-7a51a47c6d96@omp.ru>
+ <3e430f8e-b327-485f-ae19-6f1938083dd3@tuxon.dev>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <0ef3553a-9a7d-d93a-7920-0bd4aa49e5cb@omp.ru>
+Date: Sun, 14 Jan 2024 21:07:51 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|CH0PR12MB5233:EE_
-X-MS-Office365-Filtering-Correlation-Id: 68ee6346-c970-40a4-8c72-08dc15282c5c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	2Pbs1OceZuyYPbutn2DdwEXlX9C6QYThegqiNq1rctP8gJKpE5uEITd/U0cZUlFhbR/H67+0H6PTFOEIAHetpVwqQDLAInpdggwr1G0s1aSrNJDl9Ihzqzd5DlQxS1JhZjSTQNn0/YwGWlArmiUOU0jW3l6AAdrNU0XPgEqUt1/y4/FhvosyHHEx7ngu5bXvfs5jza6Pfxs0BUNRLktChATNg1WCD+uPhywtPouptByKX9CFnDZ9lNVsiDnHh8J0g1zruWc4fzm0EgmoMCxIKLuhZeI8kivhsKDSmQfVGtQQ1/V6US2UaN0uBCcQEahF2N3lpRVifw+NztctgfanBk8EOnVMzqlnl3Pko1+RG4UWU+gXA0fajkZdVewSRcA675ZRGNscX7YH+GcR89Xz3NygJLBe3PnU41yYQTjZYUurZXuMVLwHDiT1PC8Xm82B3c4Sc6EiIMutQSRAAVd4uOR2OZL5v9wakWRr4Jg3iss9zzGulucBTajtq6LrEInLwbeRk19BBewFYCfjzjaUL4rOcgWL7RoE6FEQSO7I3qYhQmSYIelgNmIr0ixfWVJeqIotUeA7WgKvqiYxOFcq4mzDL9sDs5fldfHxMqlCjBwO1vlPZ6Ww/8mueuJX4tuY
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(136003)(346002)(39860400002)(366004)(230922051799003)(230273577357003)(230173577357003)(186009)(451199024)(1800799012)(64100799003)(2616005)(4326008)(38100700002)(478600001)(6506007)(26005)(1076003)(6666004)(8676002)(83380400001)(45080400002)(66946007)(2906002)(8936002)(41300700001)(5660300002)(6486002)(54906003)(66556008)(6916009)(316002)(66476007)(6512007)(36756003)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?e2LrPR7x76ATi9P9/0buNUyG58VCudQJnyohBGYN1T75l2bg3T+UuUZxslGa?=
- =?us-ascii?Q?Wluv5bys+kwhSbikzDuczdvrzYIwosM0hj548dts7f+iTUN0kABDchE68qdc?=
- =?us-ascii?Q?+PqFjKupN8S+LDTM1v++0WQ4gWJ0tQsbxXHq116e3PAR5rCIOAL5gj3PYfLM?=
- =?us-ascii?Q?CdOIEKUcxn57LSC/5UrOy7l5JC2H/58+CUtJUyOOFbff9FT7LmakTpSHRkQg?=
- =?us-ascii?Q?rjjMFrICir08nJk393zN8ckAyGEVpsNJMPCDA6KEMcI4R/8CpCjlaLOQwLC5?=
- =?us-ascii?Q?cPmJGrTwHNCQgf9eIcEth4Z9BRBeVanbp1+vzlC9CJNQntKcC0eYTae41MwE?=
- =?us-ascii?Q?XWDboMg+ldGpfHCNo2xt+Dthd7VDIWEx74eEWiHWeShnYS4EaJd+IExw4wEk?=
- =?us-ascii?Q?la2cvMsKPtVd70XTpKW5/nUVCt3vjVu8qIGvlw5aFfc1mb58/2WmOmESPHh+?=
- =?us-ascii?Q?WP+iJKTuRS4uixdr7oxpyRXZ0x4c7kkqDHRK/d63y1kkBrUSxn44XkGgRABT?=
- =?us-ascii?Q?2ZNi7QC2pRT31lTm68X8jkjMpaOA3f/dYqETmyq51JWmarvtWsFbnTKm6gJg?=
- =?us-ascii?Q?f/qGMbASDe2M8ZDApQ6sbnJQ6/v9Lk2FsGeqn/bcliQDdgRTupo9aFA6KjWK?=
- =?us-ascii?Q?VGe3zspPZgO+SAsTiF3ASdGAfhmcDnXwXdm1lJVYxrQBCdbxr2eeHnVr+xxD?=
- =?us-ascii?Q?tKcWYln//8OS4w2bZMMpKDiEfZ450dDx6Qzew5uplPitcJPRj65sfUJWiEE4?=
- =?us-ascii?Q?ZaAnEid/4OSsWGIzYhT7XJvGOTFGOr8Ikt3HKpRamvYK0diugC1l4nxMiya9?=
- =?us-ascii?Q?0ByRBR1aoXYoJ3UgimhADvt3HI8p7NI3+q94dku73AKkuDYBBAgk7BbC7PM0?=
- =?us-ascii?Q?9YXHieL4KZyVogT7zgxZxw9ZKV4yDjO82Gw51+O7OWDZfEvhzV4w1F94Yo23?=
- =?us-ascii?Q?Bidcjdji46ZHLmVwb5pOK4bz4cOEB+HfsN0XBINV0ykD9CytNW8tpyjtWbKS?=
- =?us-ascii?Q?ZI6DWNhCeAboOW1vlojnvg3SPi0ZmObR0kNKPOIzUaf7TR9V1N2i0+4k07lv?=
- =?us-ascii?Q?FZ5xc1kGOol2CcCEIAkh2YDXaoZSh0US2ISBNZF8G3yu3G/a8yZbLDZbVP+W?=
- =?us-ascii?Q?40i3JWUGOZHLQH+UixxVwfYGSLbGWdoGlJ28OFDMj5lehOCGYblw9WnB2u3n?=
- =?us-ascii?Q?jTOkVccub8dNmzWkNLu4MbYakeRZV/VlIP6IB5MjP/GJaAx7AGhfPTEvCTJa?=
- =?us-ascii?Q?/AIHhD8Yi54X7Jj6Ar/r8aUGmitK0fHppHpL8WqLjCWc724cSpISXC4NsJq2?=
- =?us-ascii?Q?YYYN+pALk7x302aKZLPxtrPXby2v6zgpcNJwpCtOEWoayAI7RZ3vnGHaT/oG?=
- =?us-ascii?Q?elIAVnTuk2jwdKS543GYS3TqSYyzab/JiABGADuTqRyiQLPCmB6PYcaFqteH?=
- =?us-ascii?Q?1Y31WFZygkgs1PVyZtP7lWCzQHJzciMWSq6UQnXCuuMGqePHRVl9mPltBX82?=
- =?us-ascii?Q?EUqJIc3ioshbWbybh/oBFgpc8p/Bh7+N4H8Ykiy7EP/THi7mitSwZHix8F2Y?=
- =?us-ascii?Q?SQuDenGnYO0lYT5HUTigXJBzNReoVN5ay1YKQj53pkmhw0Ehac/DZEtsqmc7?=
- =?us-ascii?Q?0w=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 68ee6346-c970-40a4-8c72-08dc15282c5c
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jan 2024 17:42:26.9117
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: cyE6S+M4LDMcPduiQ3LBPduPaZG4F7DM02EY65e50AWOtciTpc70xPTAAQdHBfYg+9TAMPcPQyXyKzsKKhOFNg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5233
+In-Reply-To: <3e430f8e-b327-485f-ae19-6f1938083dd3@tuxon.dev>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 01/14/2024 17:51:39
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 182622 [Jan 14 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.83.169 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.83.169
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 01/14/2024 17:56:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 1/14/2024 4:54:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-This reverts commit b34ab3527b9622ca4910df24ff5beed5aa66c6b5.
+On 1/10/24 2:55 PM, claudiu beznea wrote:
 
-Using skb_ensure_writable_head_tail without a call to skb_unshare causes
-the MACsec stack to operate on the original skb rather than a copy in the
-macsec_encrypt path. This causes the buffer to be exceeded in space, and
-leads to warnings generated by skb_put operations. Opting to revert this
-change since skb_copy_expand is more efficient than
-skb_ensure_writable_head_tail followed by a call to skb_unshare.
+[...]
 
-Log:
-  ------------[ cut here ]------------
-  kernel BUG at net/core/skbuff.c:2464!
-  invalid opcode: 0000 [#1] SMP KASAN
-  CPU: 21 PID: 61997 Comm: iperf3 Not tainted 6.7.0-rc8_for_upstream_debug_2024_01_07_17_05 #1
-  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
-  RIP: 0010:skb_put+0x113/0x190
-  Code: 03 0f b6 14 02 48 89 f8 83 e0 07 83 c0 03 38 d0 7c 04 84 d2 75 70 3b 9d bc 00 00 00 77 0e 48 83 c4 08 4c 89 e8 5b 5d 41 5d c3 <0f> 0b 4c 8b 6c 24 20 89 74 24 04 e8 6d b7 f0 fe 8b 74 24 04 48 c7
-  RSP: 0018:ffff8882694e7278 EFLAGS: 00010202
-  RAX: 0000000000000025 RBX: 0000000000000100 RCX: 0000000000000001
-  RDX: 0000000000000000 RSI: 0000000000000010 RDI: ffff88816ae0bad4
-  RBP: ffff88816ae0ba60 R08: 0000000000000004 R09: 0000000000000004
-  R10: 0000000000000001 R11: 0000000000000001 R12: ffff88811ba5abfa
-  R13: ffff8882bdecc100 R14: ffff88816ae0ba60 R15: ffff8882bdecc0ae
-  FS:  00007fe54df02740(0000) GS:ffff88881f080000(0000) knlGS:0000000000000000
-  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-  CR2: 00007fe54d92e320 CR3: 000000010a345003 CR4: 0000000000370eb0
-  DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-  DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-  Call Trace:
-   <TASK>
-   ? die+0x33/0x90
-   ? skb_put+0x113/0x190
-   ? do_trap+0x1b4/0x3b0
-   ? skb_put+0x113/0x190
-   ? do_error_trap+0xb6/0x180
-   ? skb_put+0x113/0x190
-   ? handle_invalid_op+0x2c/0x30
-   ? skb_put+0x113/0x190
-   ? exc_invalid_op+0x2b/0x40
-   ? asm_exc_invalid_op+0x16/0x20
-   ? skb_put+0x113/0x190
-   ? macsec_start_xmit+0x4e9/0x21d0
-   macsec_start_xmit+0x830/0x21d0
-   ? get_txsa_from_nl+0x400/0x400
-   ? lock_downgrade+0x690/0x690
-   ? dev_queue_xmit_nit+0x78b/0xae0
-   dev_hard_start_xmit+0x151/0x560
-   __dev_queue_xmit+0x1580/0x28f0
-   ? check_chain_key+0x1c5/0x490
-   ? netdev_core_pick_tx+0x2d0/0x2d0
-   ? __ip_queue_xmit+0x798/0x1e00
-   ? lock_downgrade+0x690/0x690
-   ? mark_held_locks+0x9f/0xe0
-   ip_finish_output2+0x11e4/0x2050
-   ? ip_mc_finish_output+0x520/0x520
-   ? ip_fragment.constprop.0+0x230/0x230
-   ? __ip_queue_xmit+0x798/0x1e00
-   __ip_queue_xmit+0x798/0x1e00
-   ? __skb_clone+0x57a/0x760
-   __tcp_transmit_skb+0x169d/0x3490
-   ? lock_downgrade+0x690/0x690
-   ? __tcp_select_window+0x1320/0x1320
-   ? mark_held_locks+0x9f/0xe0
-   ? lockdep_hardirqs_on_prepare+0x286/0x400
-   ? tcp_small_queue_check.isra.0+0x120/0x3d0
-   tcp_write_xmit+0x12b6/0x7100
-   ? skb_page_frag_refill+0x1e8/0x460
-   __tcp_push_pending_frames+0x92/0x320
-   tcp_sendmsg_locked+0x1ed4/0x3190
-   ? tcp_sendmsg_fastopen+0x650/0x650
-   ? tcp_sendmsg+0x1a/0x40
-   ? mark_held_locks+0x9f/0xe0
-   ? lockdep_hardirqs_on_prepare+0x286/0x400
-   tcp_sendmsg+0x28/0x40
-   ? inet_send_prepare+0x1b0/0x1b0
-   __sock_sendmsg+0xc5/0x190
-   sock_write_iter+0x222/0x380
-   ? __sock_sendmsg+0x190/0x190
-   ? kfree+0x96/0x130
-   vfs_write+0x842/0xbd0
-   ? kernel_write+0x530/0x530
-   ? __fget_light+0x51/0x220
-   ? __fget_light+0x51/0x220
-   ksys_write+0x172/0x1d0
-   ? update_socket_protocol+0x10/0x10
-   ? __x64_sys_read+0xb0/0xb0
-   ? lockdep_hardirqs_on_prepare+0x286/0x400
-   do_syscall_64+0x40/0xe0
-   entry_SYSCALL_64_after_hwframe+0x46/0x4e
-  RIP: 0033:0x7fe54d9018b7
-  Code: 0f 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
-  RSP: 002b:00007ffdbd4191d8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-  RAX: ffffffffffffffda RBX: 0000000000000025 RCX: 00007fe54d9018b7
-  RDX: 0000000000000025 RSI: 0000000000d9859c RDI: 0000000000000004
-  RBP: 0000000000d9859c R08: 0000000000000004 R09: 0000000000000000
-  R10: 00007fe54d80afe0 R11: 0000000000000246 R12: 0000000000000004
-  R13: 0000000000000025 R14: 00007fe54e00ec00 R15: 0000000000d982a0
-   </TASK>
-  Modules linked in: 8021q garp mrp iptable_raw bonding vfio_pci rdma_ucm ib_umad mlx5_vfio_pci mlx5_ib vfio_pci_core vfio_iommu_type1 ib_uverbs vfio mlx5_core ip_gre nf_tables ipip tunnel4 ib_ipoib ip6_gre gre ip6_tunnel tunnel6 geneve openvswitch nsh xt_conntrack xt_MASQUERADE nf_conntrack_netlink nfnetlink xt_addrtype iptable_nat nf_nat br_netfilter rpcsec_gss_krb5 auth_rpcgss oid_registry overlay rpcrdma ib_iser libiscsi scsi_transport_iscsi rdma_cm iw_cm ib_cm ib_core zram zsmalloc fuse [last unloaded: ib_uverbs]
-  ---[ end trace 0000000000000000 ]---
+>>>>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>>>>
+>>>>> The runtime PM implementation will disable clocks at the end of
+>>>>> ravb_probe(). As some IP variants switch to reset mode as a result of
+>>>>> setting module standby through clock disable APIs, to implement runtime PM
+>>>>> the resource parsing and requesting are moved in the probe function and IP
+>>>>> settings are moved in the open function. This is done because at the end of
+>>>>> the probe some IP variants will switch anyway to reset mode and the
+>>>>> registers content is lost. Also keeping only register specific operations
+>>>>> in the ravb_open()/ravb_close() functions will make them faster.
+>>>>>
+>>>>> Commit moves IRQ requests to ravb_probe() to have all the IRQs ready when
+>>>>> the interface is open. As now IRQs gets and requests are in a single place
+>>>>> there is no need to keep intermediary data (like ravb_rx_irqs[] and
+>>>>> ravb_tx_irqs[] arrays or IRQs in struct ravb_private).
+>>>>
+>>>>    There's one thing that you probably didn't take into account: after
+>>>> you call request_irq(), you should be able to handle your IRQ as it's
+>>>> automatically unmasked, unless you pass IRQF_NO_AUTOEN to request_irq().
+>>>> Your device may be held i reset or even powered off but if you pass
+>>>> IRQF_SHARED to request_irq() (you do in a single IRQ config), you must
+>>>> be prepared to get your device's registers read (in order to ascertain
+>>
+>>    And, at least on arm32, reading a powered off (or not clocked?) device's
+>> register causes an imprecise external abort exception -- which results in a
+>> kernel oops...
+>>
+>>>> whether it's your IRQ or not). And you can't even pass IRQF_NO_AUTOEN
+>>>> along with IRQF_SHARED, according to my reading of the IRQ code...
+>>>
+>>> Good point!
 
-Cc: Radu Pirea (NXP OSS) <radu-nicolae.pirea@oss.nxp.com>
-Cc: David S. Miller <davem@davemloft.net>
-Cc: Sabrina Dubroca <sd@queasysnail.net>
-Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
----
- drivers/net/macsec.c | 25 ++++++++++++++++++++-----
- 1 file changed, 20 insertions(+), 5 deletions(-)
+   Iff we can come up with a robust check whether the device is powered on,
+we can overcome even the IRQF_SHARED issue though...
+   I'm seeing pm_runtime_active() API and wondering whether we can use it
+from the IRQ context. Alternatively, we can add a is_opened flag, like
+sh_eth.c does...
 
-diff --git a/drivers/net/macsec.c b/drivers/net/macsec.c
-index e34816638569..7f5426285c61 100644
---- a/drivers/net/macsec.c
-+++ b/drivers/net/macsec.c
-@@ -607,11 +607,26 @@ static struct sk_buff *macsec_encrypt(struct sk_buff *skb,
- 		return ERR_PTR(-EINVAL);
- 	}
- 
--	ret = skb_ensure_writable_head_tail(skb, dev);
--	if (unlikely(ret < 0)) {
--		macsec_txsa_put(tx_sa);
--		kfree_skb(skb);
--		return ERR_PTR(ret);
-+	if (unlikely(skb_headroom(skb) < MACSEC_NEEDED_HEADROOM ||
-+		     skb_tailroom(skb) < MACSEC_NEEDED_TAILROOM)) {
-+		struct sk_buff *nskb = skb_copy_expand(skb,
-+						       MACSEC_NEEDED_HEADROOM,
-+						       MACSEC_NEEDED_TAILROOM,
-+						       GFP_ATOMIC);
-+		if (likely(nskb)) {
-+			consume_skb(skb);
-+			skb = nskb;
-+		} else {
-+			macsec_txsa_put(tx_sa);
-+			kfree_skb(skb);
-+			return ERR_PTR(-ENOMEM);
-+		}
-+	} else {
-+		skb = skb_unshare(skb, GFP_ATOMIC);
-+		if (!skb) {
-+			macsec_txsa_put(tx_sa);
-+			return ERR_PTR(-ENOMEM);
-+		}
- 	}
- 
- 	unprotected_len = skb->len;
--- 
-2.42.0
+>>>>> This is a preparatory change to add runtime PM support for all IP variants.
+>>>>
+>>>>   I don't readily see why this is necessary for the full-fledged RPM
+>>>> support...
+>>>
+>>> I tried to speed up the ravb_open()/ravb_close() but missed the IRQF_SHARED
+>>
+>>    I doubt that optimizing ravb_{open,close}() is worth pursuing, frankly...
 
+   OTOH, we'll get a simpler/cleaner code if we do this...
+   Previously, I was under an impression that it's common behavior of
+the networking drivers to call request_irq() from their ndo_open() methods.
+Apparently, it's not true anymore (probably with the introduction of the
+managed device API) -- the newer drivers often call devm_request_irq()
+from their probe() methods instead...
+
+>>> IRQ. As there is only one IRQ requested w/ IRQF_SHARED, are you OK with
+>>> still keeping the rest of IRQs handled as proposed by this patch?
+>>
+>>    I'm not, as this doesn't really seem necessary for your main goal.
+>> It's not clear in what state U-Boot leaves EtherAVB...
+
+   This still seems an issue though... My prior experience with the R-Car
+MMC driver tells me that U-Boot may leave interrupts enabled... :-/
+
+> Ok. One other reason I did this is, as commit message states, to keep
+> resource parsing and allocation/freeing in probe/remove and hardware
+> settings in open/close.
+>  
+> Anyway, I'll revert all the changes IRQ related.
+
+   Now I've changed my mind -- let's retain your patch! It needs some work
+though...
+
+> Thank you,
+> Claudiu Beznea
+
+[...]
+
+MBR, Sergey
 
