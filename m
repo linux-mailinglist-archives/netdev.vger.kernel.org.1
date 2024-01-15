@@ -1,200 +1,71 @@
-Return-Path: <netdev+bounces-63481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 342BD82D511
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 09:28:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E57C182D544
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 09:46:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C426E1F21A69
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 08:28:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8898AB210D2
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 08:46:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D11BF63AE;
-	Mon, 15 Jan 2024 08:28:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A6EC80A;
+	Mon, 15 Jan 2024 08:46:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=risemoderngrowth.com header.i=@risemoderngrowth.com header.b="QI6Hikxs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from mail.risemoderngrowth.com (mail.risemoderngrowth.com [89.40.118.110])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BDA06FC3;
-	Mon, 15 Jan 2024 08:28:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 31fcfcd4b01b40ad874ece7b38f63cfa-20240115
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.35,REQID:c198143f-5398-429d-a0b1-52b983a3fae0,IP:10,
-	URL:0,TC:0,Content:-25,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,AC
-	TION:release,TS:-30
-X-CID-INFO: VERSION:1.1.35,REQID:c198143f-5398-429d-a0b1-52b983a3fae0,IP:10,UR
-	L:0,TC:0,Content:-25,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-	ON:release,TS:-30
-X-CID-META: VersionHash:5d391d7,CLOUDID:bf175c7f-4f93-4875-95e7-8c66ea833d57,B
-	ulkID:240115162832CZL9Y6XZ,BulkQuantity:0,Recheck:0,SF:66|38|24|17|19|44|1
-	02,TC:nil,Content:0,EDM:-3,IP:-2,URL:1,File:nil,Bulk:nil,QS:nil,BEC:nil,CO
-	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,
-	TF_CID_SPAM_ULS
-X-UUID: 31fcfcd4b01b40ad874ece7b38f63cfa-20240115
-Received: from mail.kylinos.cn [(39.156.73.10)] by mailgw
-	(envelope-from <chentao@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 334138515; Mon, 15 Jan 2024 16:28:28 +0800
-Received: from mail.kylinos.cn (localhost [127.0.0.1])
-	by mail.kylinos.cn (NSMail) with SMTP id A2D93E000EB9;
-	Mon, 15 Jan 2024 16:28:28 +0800 (CST)
-X-ns-mid: postfix-65A4ECAC-547880103
-Received: from kernel.. (unknown [172.20.15.234])
-	by mail.kylinos.cn (NSMail) with ESMTPA id 8996AE000EB9;
-	Mon, 15 Jan 2024 16:28:26 +0800 (CST)
-From: Kunwu Chan <chentao@kylinos.cn>
-To: jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: jacob.e.keller@intel.com,
-	przemyslaw.kitszel@intel.com,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Kunwu Chan <chentao@kylinos.cn>,
-	Kunwu Chan <kunwu.chan@hotmail.com>
-Subject: [PATCH v3] igb: Fix string truncation warnings in igb_set_fw_version
-Date: Mon, 15 Jan 2024 16:28:25 +0800
-Message-Id: <20240115082825.28343-1-chentao@kylinos.cn>
-X-Mailer: git-send-email 2.39.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68DDD6FD5
+	for <netdev@vger.kernel.org>; Mon, 15 Jan 2024 08:46:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=risemoderngrowth.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=risemoderngrowth.com
+Received: by mail.risemoderngrowth.com (Postfix, from userid 1001)
+	id 52B0C82E19; Mon, 15 Jan 2024 08:45:55 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=risemoderngrowth.com;
+	s=mail; t=1705308357;
+	bh=Fw3I/tiVFA4xiVGx9go5+w3xuJ6WJbt/aBsGSeTmw+M=;
+	h=Date:From:To:Subject:From;
+	b=QI6Hikxs49SIFC0n2FMdjqXW2CzXNMG8z3UUGhjC54pwo7+ShS0HARkT3XgOYdQce
+	 xvuJqNCa69JjSTKvHupLW7zIxyk5meHFEEwooVFGzr5ZIU0W5Gw2vXYYG/JmG6rZxt
+	 4fPsiQwEh9xwc9lgrl7+n9y2DCTTsisANrEtQiL7uwupNTIJ2Py+YB/mgSlB3oNIRy
+	 XaT8wrHfSXpAwSbkYxDB0vy1cy+Y9fefYfQpGGfMW4NIsV1DNTIITwi4hiDG635014
+	 dBlkmsbYunSwa1o0Vt0tQ33BNukiMS5vWCCP6Z9afUJ7YsBFyosAprIzgAJ/yDvMUZ
+	 M3iUz7sSCyWmQ==
+Received: by mail.risemoderngrowth.com for <netdev@vger.kernel.org>; Mon, 15 Jan 2024 08:45:52 GMT
+Message-ID: <20240115074500-0.1.7z.bxzz.0.41ad8t79e2@risemoderngrowth.com>
+Date: Mon, 15 Jan 2024 08:45:52 GMT
+From: "Ramm Fenning" <ramm.fenning@risemoderngrowth.com>
+To: <netdev@vger.kernel.org>
+Subject: Spare parts for separation mills
+X-Mailer: mail.risemoderngrowth.com
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Commit 1978d3ead82c ("intel: fix string truncation warnings")
-fixes '-Wformat-truncation=3D' warnings in igb_main.c by using kasprintf.
+Hello.
 
-drivers/net/ethernet/intel/igb/igb_main.c:3092:53: warning=EF=BC=9A=E2=80=
-=98%d=E2=80=99 directive output may be truncated writing between 1 and 5 =
-bytes into a region of size between 1 and 13 [-Wformat-truncation=3D]
- 3092 |                                  "%d.%d, 0x%08x, %d.%d.%d",
-      |                                                     ^~
-drivers/net/ethernet/intel/igb/igb_main.c:3092:34: note=EF=BC=9Adirective=
- argument in the range [0, 65535]
- 3092 |                                  "%d.%d, 0x%08x, %d.%d.%d",
-      |                                  ^~~~~~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/igb/igb_main.c:3092:34: note=EF=BC=9Adirective=
- argument in the range [0, 65535]
-drivers/net/ethernet/intel/igb/igb_main.c:3090:25: note=EF=BC=9A=E2=80=98=
-snprintf=E2=80=99 output between 23 and 43 bytes into a destination of si=
-ze 32
+We offer professional solutions for industrial grinding systems.
 
-kasprintf() returns a pointer to dynamically allocated memory
-which can be NULL upon failure.
+We produce a wide range of high-quality parts for separation mills and ro=
+ller/pin mills, including separators, grinding discs, drives, grinding ri=
+ngs and pins.
 
-Fix this warning by using a larger space for adapter->fw_version,
-and then fall back and continue to use snprintf.
+As a recognized manufacturer of spare parts for mills, we guarantee that =
+the offered range will work in all conditions.
 
-Fixes: 1978d3ead82c ("intel: fix string truncation warnings")
-Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
-Cc: Kunwu Chan <kunwu.chan@hotmail.com>
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
----
-v2: Fall back to use snprintf and a larger space,as suggested by
-https://lore.kernel.org/all/20231212132637.1b0fb8aa@kernel.org/
-v3: Add detailed warnings to the commit msg ,no functional change
----
- drivers/net/ethernet/intel/igb/igb.h      |  2 +-
- drivers/net/ethernet/intel/igb/igb_main.c | 35 ++++++++++++-----------
- 2 files changed, 19 insertions(+), 18 deletions(-)
+We have extensive experience and offer only reliable products.
 
-diff --git a/drivers/net/ethernet/intel/igb/igb.h b/drivers/net/ethernet/=
-intel/igb/igb.h
-index a2b759531cb7..3c2dc7bdebb5 100644
---- a/drivers/net/ethernet/intel/igb/igb.h
-+++ b/drivers/net/ethernet/intel/igb/igb.h
-@@ -637,7 +637,7 @@ struct igb_adapter {
- 		struct timespec64 period;
- 	} perout[IGB_N_PEROUT];
-=20
--	char fw_version[32];
-+	char fw_version[48];
- #ifdef CONFIG_IGB_HWMON
- 	struct hwmon_buff *igb_hwmon_buff;
- 	bool ets;
-diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethe=
-rnet/intel/igb/igb_main.c
-index b2295caa2f0a..ce762d77d2c1 100644
---- a/drivers/net/ethernet/intel/igb/igb_main.c
-+++ b/drivers/net/ethernet/intel/igb/igb_main.c
-@@ -3069,7 +3069,6 @@ void igb_set_fw_version(struct igb_adapter *adapter=
-)
- {
- 	struct e1000_hw *hw =3D &adapter->hw;
- 	struct e1000_fw_version fw;
--	char *lbuf;
-=20
- 	igb_get_fw_version(hw, &fw);
-=20
-@@ -3077,34 +3076,36 @@ void igb_set_fw_version(struct igb_adapter *adapt=
-er)
- 	case e1000_i210:
- 	case e1000_i211:
- 		if (!(igb_get_flash_presence_i210(hw))) {
--			lbuf =3D kasprintf(GFP_KERNEL, "%2d.%2d-%d",
--					 fw.invm_major, fw.invm_minor,
--					 fw.invm_img_type);
-+			snprintf(adapter->fw_version,
-+				 sizeof(adapter->fw_version),
-+				 "%2d.%2d-%d",
-+				 fw.invm_major, fw.invm_minor,
-+				 fw.invm_img_type);
- 			break;
- 		}
- 		fallthrough;
- 	default:
- 		/* if option rom is valid, display its version too */
- 		if (fw.or_valid) {
--			lbuf =3D kasprintf(GFP_KERNEL, "%d.%d, 0x%08x, %d.%d.%d",
--					 fw.eep_major, fw.eep_minor,
--					 fw.etrack_id, fw.or_major, fw.or_build,
--					 fw.or_patch);
-+			snprintf(adapter->fw_version,
-+				 sizeof(adapter->fw_version),
-+				 "%d.%d, 0x%08x, %d.%d.%d",
-+				 fw.eep_major, fw.eep_minor, fw.etrack_id,
-+				 fw.or_major, fw.or_build, fw.or_patch);
- 		/* no option rom */
- 		} else if (fw.etrack_id !=3D 0X0000) {
--			lbuf =3D kasprintf(GFP_KERNEL, "%d.%d, 0x%08x",
--					 fw.eep_major, fw.eep_minor,
--					 fw.etrack_id);
-+			snprintf(adapter->fw_version,
-+				 sizeof(adapter->fw_version),
-+				 "%d.%d, 0x%08x",
-+				 fw.eep_major, fw.eep_minor, fw.etrack_id);
- 		} else {
--			lbuf =3D kasprintf(GFP_KERNEL, "%d.%d.%d", fw.eep_major,
--					 fw.eep_minor, fw.eep_build);
-+			snprintf(adapter->fw_version,
-+				 sizeof(adapter->fw_version),
-+				 "%d.%d.%d",
-+				 fw.eep_major, fw.eep_minor, fw.eep_build);
- 		}
- 		break;
- 	}
--
--	/* the truncate happens here if it doesn't fit */
--	strscpy(adapter->fw_version, lbuf, sizeof(adapter->fw_version));
--	kfree(lbuf);
- }
-=20
- /**
---=20
-2.39.2
+Would you like to check our offer?
 
+
+Best regards,
+Ramm Fenning
 
