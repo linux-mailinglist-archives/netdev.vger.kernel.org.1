@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-63576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4505082E22B
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 22:20:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0F7A82E22F
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 22:24:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FC311C22043
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 21:20:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 75A061F225F3
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 21:24:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABBA91B270;
-	Mon, 15 Jan 2024 21:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF3331B270;
+	Mon, 15 Jan 2024 21:24:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FPRx8b8m"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O5hhWBHC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C9BB1AADF;
-	Mon, 15 Jan 2024 21:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2857E1B580;
+	Mon, 15 Jan 2024 21:24:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-55783b7b47aso9696823a12.0;
-        Mon, 15 Jan 2024 13:20:24 -0800 (PST)
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-40e760e5b49so15809095e9.1;
+        Mon, 15 Jan 2024 13:24:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705353623; x=1705958423; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1705353860; x=1705958660; darn=vger.kernel.org;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=39ozkC0HqQZ+Edap3Ljm8Xvwn44jjjAD+L2Y5G1YxR4=;
-        b=FPRx8b8metkJYINl5JNHd7k+WMBSgfOrpipy4cSCnml4rlQtbxC93FMPc6hvSixIbj
-         jpswHTUPBZoZCTPsJS3iV5S0emPcwC7sZ5IfrvrfDrosso+pPTcknMm6aKC4Nvxp7dx7
-         QJzVugUOg8a10aUsu17qt+ml6VBySC26OVu3WfFPidvX0XgeSolV+yJLKNwFGowxSbzf
-         kzdrzUwtI6TIzdhj7EtSmChUb7k3G/aRaogNZfr0yirccY/pvxyZeXrgXM/xm+cK983o
-         L2cGLRd24DtJXT+oM2sKe4D4QwNDTwBKAvHc7OIAB9dRjis8loAvEKF9XNpDDq5FD88P
-         IHlA==
+        bh=g4BibwaX8MWABZKTTuvrQf1jMOqo1GohyvM0tbsIEuY=;
+        b=O5hhWBHCBTdIL8Ly6Y6tJWMKqQSoaa1EM5kv55ZPFwBvvpKfus/ve+aNZHCz8z5+VK
+         jkLxqmqfqEOim4GKZ4m1KcuqYP/MPDhDZ4cKNhDmGoqEXU5XavHFbgLxsqG9BNNM6C8h
+         Fv81gpFVdvFt52ThAu2CZxUASYwmaaM7bna0mP3X6XJlJm+KWA51lgwYY6M5XQWGd25H
+         /9slXW+BGBZLp2aZNZFBwZ8dseBT+ZegjDCwIwZfUJyILtcChERG62UDQg181FzbaZK0
+         oLX4V3MWmTd3eVX0kuLHAVsDuWue/wfL18xB+S0jxcNKQrBTVb5wQCzMJBOaVmAJdPO7
+         1HdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705353623; x=1705958423;
+        d=1e100.net; s=20230601; t=1705353860; x=1705958660;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=39ozkC0HqQZ+Edap3Ljm8Xvwn44jjjAD+L2Y5G1YxR4=;
-        b=OyN6yC42kTRzxAFIPCVsYruaioUsCgufHTbGfk6arZu43v6UJLvECErq0Aq9tHWj6S
-         39UsyspHmbry7UKod7bG+NyDWieho6dhyxV6XXiA0qF++WunOOwL82GfjSzBghbCG1sR
-         GLysGYqSA3TiijqCFHQ0XfReO8qSdMmKh4WbolCD3tx+p2zgFM3GZOSIl6lFOD0xXNz1
-         QAvVH2LM2vikPOQWN1OXosuI6wCi6WIvtqWgJBkQuTEjr2dIGWIwRh3ZEWkSyIaBFxga
-         xG9moBd8Bv/X6bfwUdCup8NVlPlax0GQMHmowtvyeoMnlVDeaJvfcU0hvJMF+SBBEnvU
-         1sLw==
-X-Gm-Message-State: AOJu0YxJEKaWIaUfneVohV/AHbUqLpfbtNHwtXLZecvA7/OTmG0cwYPD
-	tS2EXFRvNnuIbvCO/36PTQI=
-X-Google-Smtp-Source: AGHT+IHv3NyJLuT0FGCd+kbmIzXlKGmCwoOcQxRz6260TRiuR4kLFOFZNS/jjOerZLceilUQrzbFDw==
-X-Received: by 2002:a05:6402:b12:b0:54c:b24d:a3b6 with SMTP id bm18-20020a0564020b1200b0054cb24da3b6mr2793991edb.20.1705353623234;
-        Mon, 15 Jan 2024 13:20:23 -0800 (PST)
+        bh=g4BibwaX8MWABZKTTuvrQf1jMOqo1GohyvM0tbsIEuY=;
+        b=iQgYipZlvPF0CrK+d1WyR4aHcO7Z1YIP7aM3vtbEMwEzawXVWfex9fHD4JKwNT0P3w
+         Ehkt/LejKAXSn7l8mry+YyUca2P0aF+adWLC1aqqJL2jiyP5HtYZYw+eGIIgWzrj20ts
+         7V6/yqZF6wSxbpvC41opIy3Tw53vhtLxN1RwfyZvDFmZ83UTB+enVrGjHV9Lz1Gf1u2y
+         0liKFGAY6wfqY1OOolO3id3IP0Hgspr8dtzRFO4YHMBmTSgnUQosNn1tW5NcyPet6oPf
+         Ftzqz8x9sWvN5Vlem/k+e1CBDJyKOO9pfj7dFD6QM3qG31IRMRKQgUT5zomVs25xIu7L
+         C4DQ==
+X-Gm-Message-State: AOJu0Yxm7gnXbjAMSsWSOzEDxwY2B6gPFdrbn3+6g7M6fPJmyXCjDpe/
+	IGcq1PPCM2P/aaPhMf//wis=
+X-Google-Smtp-Source: AGHT+IGS2DleYsPDxFubSZWuGUfOFBEeJSJbvbS8UfWv276dj6fVdSeHn96g53WwPCorL+XvGdQWyw==
+X-Received: by 2002:a05:600c:3c8f:b0:40e:6ddb:2970 with SMTP id bg15-20020a05600c3c8f00b0040e6ddb2970mr1548393wmb.274.1705353860266;
+        Mon, 15 Jan 2024 13:24:20 -0800 (PST)
 Received: from skbuf ([188.25.255.36])
-        by smtp.gmail.com with ESMTPSA id c25-20020a50d659000000b00557c51910e4sm6104974edj.85.2024.01.15.13.20.22
+        by smtp.gmail.com with ESMTPSA id v21-20020a50a455000000b005527c02c1d6sm6108008edb.50.2024.01.15.13.24.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jan 2024 13:20:22 -0800 (PST)
-Date: Mon, 15 Jan 2024 23:20:20 +0200
+        Mon, 15 Jan 2024 13:24:20 -0800 (PST)
+Date: Mon, 15 Jan 2024 23:24:17 +0200
 From: Vladimir Oltean <olteanv@gmail.com>
 To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
 Cc: Daniel Golle <daniel@makrotopia.org>,
@@ -75,11 +75,11 @@ Cc: Daniel Golle <daniel@makrotopia.org>,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org
-Subject: Re: [RFC PATCH net-next 4/8] net: dsa: mt7530: move XTAL check to
- mt7530_setup()
-Message-ID: <20240115212020.oaw3hx65feetplve@skbuf>
+Subject: Re: [RFC PATCH net-next 5/8] net: dsa: mt7530: move enabling port 6
+ to mt7530_setup_port6()
+Message-ID: <20240115212417.egqyslsbrqw6jp3q@skbuf>
 References: <20240113102529.80371-1-arinc.unal@arinc9.com>
- <20240113102529.80371-5-arinc.unal@arinc9.com>
+ <20240113102529.80371-6-arinc.unal@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,17 +89,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240113102529.80371-5-arinc.unal@arinc9.com>
+In-Reply-To: <20240113102529.80371-6-arinc.unal@arinc9.com>
 
-On Sat, Jan 13, 2024 at 01:25:25PM +0300, Arınç ÜNAL wrote:
-> The crystal frequency concerns the switch core. The frequency should be
-> checked when the switch is being set up so the driver can reject the
-> unsupported hardware earlier and without requiring port 6 to be used.
-> 
-> Move it to mt7530_setup(). Drop the unnecessary function printing.
+On Sat, Jan 13, 2024 at 01:25:26PM +0300, Arınç ÜNAL wrote:
+> Enable port 6 only when port 6 is being used. Update the comment on
+> mt7530_setup() with a better explanation. Do not set MHWTRAP_MANUAL on
+> mt7530_setup_port5() as it's already done on mt7530_setup() beforehand.
 > 
 > Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 > ---
 
 Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
