@@ -1,141 +1,87 @@
-Return-Path: <netdev+bounces-63543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14D8F82DCA3
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 16:50:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D4AC82DCD5
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 16:58:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB5DF1F225B2
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 15:50:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 841901C21C18
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 15:58:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2951D17755;
-	Mon, 15 Jan 2024 15:49:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9513B17996;
+	Mon, 15 Jan 2024 15:58:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fdZAE68O"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="gFL5GVht"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB19717BA1;
-	Mon, 15 Jan 2024 15:49:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-dbd99c08cd6so7005346276.0;
-        Mon, 15 Jan 2024 07:49:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705333783; x=1705938583; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SL7TyLa6aUw4gCp8WNPrFTXBo1ubO4C/088ALvqvncI=;
-        b=fdZAE68OFBp4GPejeD3x4tZhnc1JCB1IhT3IFWQgiBrlL5h1VsHznBc7VBg+1ZeLH8
-         qrjbxPX7eZV1L1AD1qMJYQKjFqDETDjO61joQrfzwXuSKz/6ylxQdT4v+s4Nj6BJe/vn
-         E/porRuOMaujnqEmxYJU0Jvw8fR2Hnbnk7NXkYFY8SkZ2M2EcdijdS9XfVs5ax2pw8Ny
-         AbxIpKi+n3s1DdQTY7L/nTiTY/suC3AqOilH3ZjRhLISpya8DIo7dki2ryD9YjwGLqWR
-         iPEz003Si2ZzzAvWw2+tmcaitYraYuMKwxczuoXXOnUc+C5Oycf7hcWGHSAAw99Ozcmx
-         jygg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705333783; x=1705938583;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SL7TyLa6aUw4gCp8WNPrFTXBo1ubO4C/088ALvqvncI=;
-        b=CS83+SMrmENV0G2exeyJDYQ7WWT7OsqybnKrt3s8cTjK/W62jwwPhZe4KzjW7WeqOP
-         G7QsP52QgH7+Kx0IQYT4cUZbg1XIEgj5wVKJSYtEYf90xRO41rcrhQiVUbanSvYn4//N
-         idzG+QQf4wSW5bqZkX3D/DL22H9DBCF1tOx/XvgKZYmytgpF7+Mjl6dkLfjF9uV1EKWd
-         N3Am7d9Hi9PcHZobtbIJcYpJPix3nm3fXdK7659vrJfvMTa7RVCaeWDy25J8QlVDJKX1
-         IPneGuw2jNaaSWVaBvIa4q33YEWSBprINe3L0aqXDFkBh3BYcw/qcurmIOTnyvrmtr75
-         JcDA==
-X-Gm-Message-State: AOJu0YyqUUij0LaN+TQBjFmDq9ll32MDNi08+V+MvjMCIJgP4sHzdLpP
-	12tLPgiQqyED/tH/aZXo/9R4UdYAewEyeXD3Q4A=
-X-Google-Smtp-Source: AGHT+IHRvjvqz812fgPuK5VrHIBc03d7H7tW5k/POpwadt/5R3fqa0Hh1ZXXjPW5NBRtuM6eFswRhIcAM5+PcEeg3oo=
-X-Received: by 2002:a25:c503:0:b0:db7:dad0:76d2 with SMTP id
- v3-20020a25c503000000b00db7dad076d2mr2809380ybe.110.1705333783459; Mon, 15
- Jan 2024 07:49:43 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A6FC17980
+	for <netdev@vger.kernel.org>; Mon, 15 Jan 2024 15:58:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 87CC61BF20C;
+	Mon, 15 Jan 2024 15:58:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1705334330;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=v2s+j48ZaXgPUXaAjq8MYuqL1+p2AAMg2Z7Hh1x4Cp8=;
+	b=gFL5GVhtrrzs8HvciRc1ygotvqvIYlNXM0QUJCabHST6S5wIstH9duAy0kk/hyM1ky61NG
+	I85w7D/qOlyhA6BRvaMzvJO5LPYQ++0K2dkUnqJJFLjWTc1gy9Y3ywOs/as9B6sh0PjOZ0
+	M159/TfTg2yUoPmWSNDM+kOy2cYO2/3oXsB8fXMyAfKrte0M8Q1bp7W4nvlBxcCTNLaYJ2
+	bhVSquZkkeHjIGc/vyNOSJF/odMBfubtgv+pcICJQOOWEQWO8gntwDi8F0kMeDv14JDRXK
+	dlsccRxgJ7G1fIWQcuO7V5TNIepyCZXNiXTHlgDV5GOENr/QLpRjkhbm+RKEcw==
+Date: Mon, 15 Jan 2024 16:58:48 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: sfp-bus: fix SFP mode detect from bitrate
+Message-ID: <20240115165848.110ad8f9@device-28.home>
+In-Reply-To: <E1rPMJW-001Ahf-L0@rmk-PC.armlinux.org.uk>
+References: <E1rPMJW-001Ahf-L0@rmk-PC.armlinux.org.uk>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.39; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231228122411.3189-1-maimon.sagi@gmail.com> <f254c189-463e-43a3-bc09-9a8869ebf819@app.fastmail.com>
- <CAMuE1bF0Hho4VwO6w3f+9z3j5TtscYzuAjj10MFt2mZXG2P8dQ@mail.gmail.com>
- <84d8e9d7-09ce-4781-8dfa-a74bb0955ae8@app.fastmail.com> <ZZ-ZNHgDsZwg9CaW@hoboy.vegasvil.org>
-In-Reply-To: <ZZ-ZNHgDsZwg9CaW@hoboy.vegasvil.org>
-From: Sagi Maimon <maimon.sagi@gmail.com>
-Date: Mon, 15 Jan 2024 17:49:32 +0200
-Message-ID: <CAMuE1bF4sSeiDr-jyebF6F8oRxGs1b2gtT39fTJ2JeaFabr6Ng@mail.gmail.com>
-Subject: Re: [PATCH v3] posix-timers: add multi_clock_gettime system call
-To: Richard Cochran <richardcochran@gmail.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Andy Lutomirski <luto@kernel.org>, tglx@linutronix.de, 
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Geert Uytterhoeven <geert@linux-m68k.org>, 
-	Peter Zijlstra <peterz@infradead.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Sohil Mehta <sohil.mehta@intel.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
-	Nhat Pham <nphamcs@gmail.com>, Palmer Dabbelt <palmer@sifive.com>, Kees Cook <keescook@chromium.org>, 
-	Alexey Gladkov <legion@kernel.org>, Mark Rutland <mark.rutland@arm.com>, linux-kernel@vger.kernel.org, 
-	linux-api@vger.kernel.org, Linux-Arch <linux-arch@vger.kernel.org>, 
-	Netdev <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Thu, Jan 11, 2024 at 9:31=E2=80=AFAM Richard Cochran
-<richardcochran@gmail.com> wrote:
->
-> On Tue, Jan 02, 2024 at 12:29:59PM +0100, Arnd Bergmann wrote:
->
-> > I think Andy's suggestion of exposing time offsets instead
-> > of absolute times would actually achieve that: If the
-> > interface is changed to return the offset against
-> > CLOCK_MONOTONIC, CLOCK_MONOTONIC_RAW or CLOCK_BOOTTIME
-> > (not sure what is best here), then the new syscall can use
-> > getcrosststamp() where supported for the best results or
-> > fall back to gettimex64() or gettime64() otherwise to
-> > provide a consistent user interface.
->
-> Yes, it makes more sense to provide the offset, since that is what the
-> user needs in the end.
->
-Make sense will be made on the next patch.
-> Can we change the name of the system call to "clock compare"?
->
-> int clock_compare(clockid_t a, clockid_t b,
->                   int64_t *offset, int64_t *error);
->
-> returns: zero or error code,
->  offset =3D a - b
->  error  =3D maximum error due to asymmetry
->
-> If clocks a and b are both System-V clocks, then *error=3D0 and *offset
-> can be returned directly from the kernel's time keeping state.
->
-> If getcrosststamp() is supported on a or b, then invoke it.
->
-> otherwise do this:
->
->    t1 =3D gettime(a)
->    t2 =3D gettime(b)
->    t3 - gettime(c)
->
->    *offset =3D (t1 + t3)/2 - t2
->    *error  =3D (t3 - t1)/2
->
-> There is no need for repeated measurement, since user space can call
-> again when `error` is unacceptable.
->
-Thanks for your notes, all of them will be done on the next patch (it
-will take some time due to work overload).
-The only question that I have is: why not implement it as an IOCTL?
-It makes more sense to me since it is close to another IOCTL, the
-"PTP_SYS_OFFSET" family.
-Does it make sense to you?
+Hello Russell,
 
-> Thanks,
-> Richard
->
->
->
+On Mon, 15 Jan 2024 12:43:38 +0000
+"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk> wrote:
+
+> The referenced commit moved the setting of the Autoneg and pause bits
+> early in sfp_parse_support(). However, we check whether the modes are
+> empty before using the bitrate to set some modes. Setting these bits
+> so early causes that test to always be false, preventing this working,
+> and thus some modules that used to work no longer do.
+> 
+> Move them just before the call to the quirk.
+> 
+> Fixes: 8110633db49d ("net: sfp-bus: allow SFP quirks to override Autoneg and pause bits")
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+
+I don't have modules to trigger the bug, however the fix looks OK to me.
+
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+
+Thanks,
+
+Maxime
+
 
