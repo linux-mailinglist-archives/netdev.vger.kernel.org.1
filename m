@@ -1,64 +1,55 @@
-Return-Path: <netdev+bounces-63474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC4BC82D416
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 07:08:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F07582D440
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 07:38:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3EE51C20FE6
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 06:08:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EF362815D2
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 06:38:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71FE823DE;
-	Mon, 15 Jan 2024 06:08:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="of+JNQdv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E91B41FAE;
+	Mon, 15 Jan 2024 06:38:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BC6B23CC
-	for <netdev@vger.kernel.org>; Mon, 15 Jan 2024 06:08:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-40e7a9c527dso3788125e9.1
-        for <netdev@vger.kernel.org>; Sun, 14 Jan 2024 22:08:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1705298905; x=1705903705; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=psrO8ysP5KQkyXx2iDli7R9JaH/czE23JBWLZP2hF6Y=;
-        b=of+JNQdvV+y0T6efuQKInZXfrYeq7oRuwGXp+gPHSW94NGQvx71MxTNdP9F7mIccv/
-         Z8Awxe0BwJaRs7Tk2+ys4/dxesxHVOUgZBatiEA6iKM46AcUZasIBO9l4/0ME9+rXhZ+
-         KdAkCQnMCM77yTK6w34Au3bde3r7ap/Gmim8faC3ebSGuaknht2yWNS8gSfyT4kXg+5j
-         QilO9r8eL/5RgMpLreKpIiMdN2eWdWnkcQ9s9gxfM9PYbupmAxT1n0+ACS3Gn0Lle26A
-         CkcQ/h+YlrsTVZccFuVFsRSFCmq9LOdY5pyOxsWOG60zjIRNtWmMjy3ywDIu/+VBi8ri
-         oJ6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705298905; x=1705903705;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=psrO8ysP5KQkyXx2iDli7R9JaH/czE23JBWLZP2hF6Y=;
-        b=Vitg+g3keXPMiO60W1J8clC9u0WCKUy57nUwJQ0Ckt5nScOlOABG9vWtHlPu2kFYua
-         mUREFRHtgaq0Yr64A7mPibpgImgLEd5xK5IF1W8B/MHrsOYYfMWpB2Hrn5KoebY9pQBL
-         EN+Tu+uyHEPuephcxyymVW9mOkfBXpgIqQNkp6B/XoDPYbmTl2h2QAgqlDLNDB4iUTH0
-         S2+hHJ2NkUOE9DHWKJj2MDdKseLihH0l+dtKVJh4RJPhSCArJlFA4BXkU/RNrGfgUlL5
-         1IE17uAyV46EbWwvCgCLmI90t/HU1yJAWpdZKq7B9C6sSidwlqX8dO7KcaOWHTUBvmOP
-         nzQg==
-X-Gm-Message-State: AOJu0Yxgd4asmiG9uXdo78FoQULuDIWEr8Pyps/WUuk/fjvTDYAfjpsZ
-	fhVQAZ9nzBaS2Gnb28+wdUd6EIx2MCBJvQ==
-X-Google-Smtp-Source: AGHT+IH5OShb4hhtSROS3CploGhi1S8b/OCgr07G0OUJA+ZIGTCrkqbF2Da08w9/6IjxEf6TjbE5nA==
-X-Received: by 2002:a05:600c:3c84:b0:40d:8587:a781 with SMTP id bg4-20020a05600c3c8400b0040d8587a781mr1496032wmb.188.1705298904551;
-        Sun, 14 Jan 2024 22:08:24 -0800 (PST)
-Received: from [192.168.50.4] ([82.78.167.46])
-        by smtp.gmail.com with ESMTPSA id f6-20020a05600c4e8600b0040d6ffae526sm18649129wmq.39.2024.01.14.22.08.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 14 Jan 2024 22:08:24 -0800 (PST)
-Message-ID: <720e045a-1d5e-432e-9da8-5508eaa96720@tuxon.dev>
-Date: Mon, 15 Jan 2024 08:08:22 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56E2480A;
+	Mon, 15 Jan 2024 06:38:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 4c51953df3a6467e910868bb4a01e662-20240115
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.35,REQID:01acb116-89e3-42da-9916-1ce7e2a7c975,IP:10,
+	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:-5
+X-CID-INFO: VERSION:1.1.35,REQID:01acb116-89e3-42da-9916-1ce7e2a7c975,IP:10,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-5
+X-CID-META: VersionHash:5d391d7,CLOUDID:c1ad418e-e2c0-40b0-a8fe-7c7e47299109,B
+	ulkID:240112214822WA9UL4OY,BulkQuantity:6,Recheck:0,SF:44|64|66|24|17|19|1
+	02,TC:nil,Content:0,EDM:-3,IP:-2,URL:1,File:nil,Bulk:40,QS:nil,BEC:nil,COL
+	:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_FSI,TF_CID_SPAM_ULS,TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,
+	TF_CID_SPAM_FSD
+X-UUID: 4c51953df3a6467e910868bb4a01e662-20240115
+Received: from mail.kylinos.cn [(39.156.73.10)] by mailgw
+	(envelope-from <chentao@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 1482343332; Mon, 15 Jan 2024 14:38:13 +0800
+Received: from mail.kylinos.cn (localhost [127.0.0.1])
+	by mail.kylinos.cn (NSMail) with SMTP id 17269E000EBA;
+	Mon, 15 Jan 2024 14:38:13 +0800 (CST)
+X-ns-mid: postfix-65A4D2D4-971834282
+Received: from [172.20.15.234] (unknown [172.20.15.234])
+	by mail.kylinos.cn (NSMail) with ESMTPA id 44150E000EB9;
+	Mon, 15 Jan 2024 14:38:10 +0800 (CST)
+Message-ID: <50f1e711-12a2-432a-b571-c7b4f0e64ab1@kylinos.cn>
+Date: Mon, 15 Jan 2024 14:38:10 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,86 +57,200 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 17/19] net: ravb: Return cached statistics if
- the interface is down
-To: Sergey Shtylyov <s.shtylyov@omp.ru>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- richardcochran@gmail.com, p.zabel@pengutronix.de,
- yoshihiro.shimoda.uh@renesas.com, wsa+renesas@sang-engineering.com
-Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-kernel@vger.kernel.org, geert+renesas@glider.be,
- Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-References: <20240105082339.1468817-1-claudiu.beznea.uj@bp.renesas.com>
- <20240105082339.1468817-18-claudiu.beznea.uj@bp.renesas.com>
- <af5ab82e-5904-c33b-983e-b37844dab3f5@omp.ru>
- <aed6534b-ad5e-4f5c-9861-9a784968adcc@tuxon.dev>
- <28754087-8685-015e-7e8a-d8c3ed26930c@omp.ru>
-From: claudiu beznea <claudiu.beznea@tuxon.dev>
+Subject: Re: [Intel-wired-lan] [PATCH v2] igb: Fix string truncation warnings
+ in igb_set_fw_version
 Content-Language: en-US
-In-Reply-To: <28754087-8685-015e-7e8a-d8c3ed26930c@omp.ru>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, Kunwu Chan <kunwu.chan@hotmail.com>,
+ przemyslaw.kitszel@intel.com, linux-kernel@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ jacob.e.keller@intel.com
+References: <20240112025853.123048-1-chentao@kylinos.cn>
+ <2a58fed3-1fa9-47eb-b475-3f7c3b291376@molgen.mpg.de>
+From: Kunwu Chan <chentao@kylinos.cn>
+In-Reply-To: <2a58fed3-1fa9-47eb-b475-3f7c3b291376@molgen.mpg.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
+Hi Paul,
+Thanks for your reply.
 
+On 2024/1/12 21:46, Paul Menzel wrote:
+> Dear Kunwu,
+>=20
+>=20
+> Thank you for your patch. I have some minor nits.
+>=20
+> Am 12.01.24 um 03:58 schrieb Kunwu Chan:
+>> 'commit 1978d3ead82c ("intel: fix string truncation warnings")'
+>=20
+> Please don=E2=80=99t enclose it in '': Commit 1978d3ead82c ("intel: fix=
+ string=20
+> truncation warnings")
+>=20
+>> fix '-Wformat-truncation=3D' warnings in igb_main.c by using kasprintf=
+.
+>=20
+> fix*es*
 
-On 14.01.2024 14:22, Sergey Shtylyov wrote:
-> On 1/10/24 4:17 PM, claudiu beznea wrote:
-> 
-> [...]
-> 
->>>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->>>>
->>>> Return the cached statistics in case the interface is down. There should be
->>>> no drawback to this, as cached statistics are updated in ravb_close().
->>>>
->>>> The commit prepares the code for the addition of runtime PM support.
->>>>
->>>> Suggested-by: Sergey Shtylyov <s.shtylyov@omp.ru>
->>>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->>> [...]
->>>
->>>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
->>>> index 76035afd4054..168b6208db37 100644
->>>> --- a/drivers/net/ethernet/renesas/ravb_main.c
->>>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
->>>> @@ -2117,6 +2117,9 @@ static struct net_device_stats *ravb_get_stats(struct net_device *ndev)
->>>>  	const struct ravb_hw_info *info = priv->info;
->>>>  	struct net_device_stats *nstats, *stats0, *stats1;
->>>>  
->>>> +	if (!(ndev->flags & IFF_UP))
->>>
->>>    Well, I guess it's OK to read the counters in the reset mode... BUT
->>> won't this race with pm_runtime_put_autosuspend() when its call gets added
->>> to ravb_close()?
+Thanks i'll rewirte the commit msg and add some warnings.
+>=20
+>> kasprintf() returns a pointer to dynamically allocated memory
+>> which can be NULL upon failure.
+>=20
+> Maybe paste one warning message.
+
+Thanks again.
+>=20
+>> Fix this warning by using a larger space for adapter->fw_version,
+>> and then fall back and continue to use snprintf.
 >>
->> I re-checked it and, yes, this is true. A sync runtime suspend would be
->> better here. But, as of my current investigation, even with this
-> 
->    No, the sync form of the RPM call won't fix the race...
-> 
->> ravb_get_stats() can still race with ravb_open()/ravb_close() as they are
->> called though different locking scheme (ravb_open()/ravb_close() is called
->> with rtnl locked while ravb_get_stats() can be called only with
->> dev_base_lock rwlock locked for reading).
+>> Fixes: 1978d3ead82c ("intel: fix string truncation warnings")
+>> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+>> Cc: Kunwu Chan <kunwu.chan@hotmail.com>
+>> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+>=20
+>=20
+> Kind regards,
+>=20
+> Paul Menzel
+>=20
+>=20
+>> ---
+>> v2: Fall back to use snprintf and a larger space,as suggested by
+>> https://lore.kernel.org/all/20231212132637.1b0fb8aa@kernel.org/
+>> ---
+>> =C2=A0 drivers/net/ethernet/intel/igb/igb.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 |=C2=A0 2 +-
+>> =C2=A0 drivers/net/ethernet/intel/igb/igb_main.c | 35 ++++++++++++----=
+-------
+>> =C2=A0 2 files changed, 19 insertions(+), 18 deletions(-)
 >>
->> A mutex in the driver should to help with this.
-> 
->    Why don't you want to mimic what the sh_eth driver does?
+>> diff --git a/drivers/net/ethernet/intel/igb/igb.h=20
+>> b/drivers/net/ethernet/intel/igb/igb.h
+>> index a2b759531cb7..3c2dc7bdebb5 100644
+>> --- a/drivers/net/ethernet/intel/igb/igb.h
+>> +++ b/drivers/net/ethernet/intel/igb/igb.h
+>> @@ -637,7 +637,7 @@ struct igb_adapter {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct timespec=
+64 period;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } perout[IGB_N_PEROUT];
+>> -=C2=A0=C2=A0=C2=A0 char fw_version[32];
+>> +=C2=A0=C2=A0=C2=A0 char fw_version[48];
+>> =C2=A0 #ifdef CONFIG_IGB_HWMON
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct hwmon_buff *igb_hwmon_buff;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool ets;
+>> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c=20
+>> b/drivers/net/ethernet/intel/igb/igb_main.c
+>> index b2295caa2f0a..ce762d77d2c1 100644
+>> --- a/drivers/net/ethernet/intel/igb/igb_main.c
+>> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
+>> @@ -3069,7 +3069,6 @@ void igb_set_fw_version(struct igb_adapter=20
+>> *adapter)
+>> =C2=A0 {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct e1000_hw *hw =3D &adapter->hw;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct e1000_fw_version fw;
+>> -=C2=A0=C2=A0=C2=A0 char *lbuf;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 igb_get_fw_version(hw, &fw);
+>> @@ -3077,34 +3076,36 @@ void igb_set_fw_version(struct igb_adapter=20
+>> *adapter)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case e1000_i210:
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case e1000_i211:
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!(igb_get_f=
+lash_presence_i210(hw))) {
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 lb=
+uf =3D kasprintf(GFP_KERNEL, "%2d.%2d-%d",
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fw.invm_major, fw.inv=
+m_minor,
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fw.invm_img_type);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sn=
+printf(adapter->fw_version,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 sizeof(adapter->fw_version),
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 "%2d.%2d-%d",
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 fw.invm_major, fw.invm_minor,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 fw.invm_img_type);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 break;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fallthrough;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 default:
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* if option ro=
+m is valid, display its version too */
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (fw.or_valid=
+) {
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 lb=
+uf =3D kasprintf(GFP_KERNEL, "%d.%d, 0x%08x, %d.%d.%d",
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fw.eep_major, fw.eep_=
+minor,
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fw.etrack_id, fw.or_m=
+ajor, fw.or_build,
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fw.or_patch);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sn=
+printf(adapter->fw_version,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 sizeof(adapter->fw_version),
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 "%d.%d, 0x%08x, %d.%d.%d",
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 fw.eep_major, fw.eep_minor, fw.etrack_id,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 fw.or_major, fw.or_build, fw.or_patch);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* no option ro=
+m */
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else if (fw.e=
+track_id !=3D 0X0000) {
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 lb=
+uf =3D kasprintf(GFP_KERNEL, "%d.%d, 0x%08x",
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fw.eep_major, fw.eep_=
+minor,
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fw.etrack_id);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sn=
+printf(adapter->fw_version,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 sizeof(adapter->fw_version),
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 "%d.%d, 0x%08x",
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 fw.eep_major, fw.eep_minor, fw.etrack_id);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 lb=
+uf =3D kasprintf(GFP_KERNEL, "%d.%d.%d", fw.eep_major,
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fw.eep_minor, fw.eep_=
+build);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sn=
+printf(adapter->fw_version,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 sizeof(adapter->fw_version),
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 "%d.%d.%d",
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 fw.eep_major, fw.eep_minor, fw.eep_build);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> -
+>> -=C2=A0=C2=A0=C2=A0 /* the truncate happens here if it doesn't fit */
+>> -=C2=A0=C2=A0=C2=A0 strscpy(adapter->fw_version, lbuf, sizeof(adapter-=
+>fw_version));
+>> -=C2=A0=C2=A0=C2=A0 kfree(lbuf);
+>> =C2=A0 }
+>> =C2=A0 /**
+--=20
+Thanks,
+   Kunwu
 
-I thought it can be replaced by the already existing IFF_UP flag from
-ndev->flags.
-
-Investigating it further while trying to address this concurrency issue
-made me realize that it fits to address the issue you mentioned here.
-
-Thank you,
-Claudiu Beznea
-
-> 
->> Thank you,
->> Claudiu Beznea
-> 
-> [...]
-> 
-> MBR, Sergey
 
