@@ -1,261 +1,319 @@
-Return-Path: <netdev+bounces-63466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C005882D312
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 03:21:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C430382D316
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 03:22:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45B7A1F21288
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 02:21:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 288DAB20CB9
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 02:22:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F22D317CB;
-	Mon, 15 Jan 2024 02:20:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07DD017CF;
+	Mon, 15 Jan 2024 02:22:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fPOa0xm6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SV+rTRep"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D09F015D2
-	for <netdev@vger.kernel.org>; Mon, 15 Jan 2024 02:20:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1705285251;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PQbsY2p0vvMEFQ8tL67oqUBStmMtS98PgBQ9i81/tOM=;
-	b=fPOa0xm6PLePo0RQoKRGnJVSZhhDnwlY3eR6tgbQONYgFHcb6eGum+tGfCraFDlfOUmMOm
-	nfTNzIE7ULsfvi3PnqGLQwmu+eTnMiJpihtvYCQbs/CTfLqkA6wCVV8p8v+imTz90f4yn5
-	MmDUYKmKa18FT1xTcMVoT2WeJ3HeUyk=
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
- [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-625-Yj4s1H35PyOsJFEryqqj0A-1; Sun, 14 Jan 2024 21:20:49 -0500
-X-MC-Unique: Yj4s1H35PyOsJFEryqqj0A-1
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-6da18672335so5353458b3a.0
-        for <netdev@vger.kernel.org>; Sun, 14 Jan 2024 18:20:49 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705285249; x=1705890049;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PQbsY2p0vvMEFQ8tL67oqUBStmMtS98PgBQ9i81/tOM=;
-        b=Rr7AoyTmTVVwVNYoTesXC4r0r7efYFqTnThjFNMcIuXsQxqYQOoINcTYPJooqx9JqY
-         8f24IW2Dc1+sR7jbJmocuM0i7MNR6Eg10VpncoA0Q4e0KvZ2um1sQVaSqG2W1Agkhzgj
-         fYDMim8LaIGPqUMV7CVW2vrv/1jN0M2f8qxnsbOqdAoF9ElEBEtzAQau+xfQvmygHDwX
-         K0x0gKC5KQ3Qcbojw0f33InxLvKwNV0ed9qiX8wG/nNb3qVXS/x3WRxOi7HTAXWz9yih
-         YH/h9UlRivy4FWLK4o50gNgU/6Ql821et2ljzXd2hW38Uqb5FDaYno7YvY6SWZSRilY2
-         eLow==
-X-Gm-Message-State: AOJu0YyFlhRzUJuBDCUCi7II8zhTyYGpAwLIfF27dDQaXk8GETphZinE
-	U/Lr5aQhjjtveHwUFObIVxrvakP8MVNtfKFXRwl0mwAncI/yU6w2MINeq6C8f7nMbTkQZwSFm+V
-	JqgtTEfGmuaeJw+nA6uSfWg2x3NMP0JeTA4TnIjU9
-X-Received: by 2002:a05:6a00:2a07:b0:6d9:b06c:7357 with SMTP id ce7-20020a056a002a0700b006d9b06c7357mr2425690pfb.65.1705285248672;
-        Sun, 14 Jan 2024 18:20:48 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFIZQIrdXqjOxv9LjVSDDMzW9RyXUIYxygoNtESCH7mxZ2smNc4fzMfuzlLYEfSoo7DuBArEazWfjkYPfr3xUI=
-X-Received: by 2002:a05:6a00:2a07:b0:6d9:b06c:7357 with SMTP id
- ce7-20020a056a002a0700b006d9b06c7357mr2425682pfb.65.1705285248358; Sun, 14
- Jan 2024 18:20:48 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BE0C15D2;
+	Mon, 15 Jan 2024 02:22:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1705285336; x=1736821336;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=SARjb8Su8F8iEtUVYRU0TtNH8VSMjDI13MW1+oT9hCA=;
+  b=SV+rTRepNy/xlIMAzr4X2LHPwQ4trj77xnDH/JUbJEZuTU2x38J80BUS
+   xebxnqOEmbi/lDRZh0d/bWYtGmW7ZW473YMNC+bwtjzxAb6Rp0MjyH1X0
+   7zcIGrW5c86cFHzTIU7pr+//5ewhsAR10EXrrWTjehQ/4ohXZ+8hUDNR9
+   CZI1tRfq8CqKnwkx9st9ovQWIDi5y5fpm6kFi5gjyX3nOtOEcKJ8XS6iR
+   bYFch8EuibTCPTU7NsbQYUYHLSlw9MDDRoToJn7Ct07HrXeczoo2m2lDU
+   NI0mfQshpYlyP8e/GPrJfBkfPJnFrlU8kv0t2AQBOfSQkOyDCmc6W3RHQ
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10953"; a="389965467"
+X-IronPort-AV: E=Sophos;i="6.04,195,1695711600"; 
+   d="scan'208";a="389965467"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2024 18:22:15 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10953"; a="1114797111"
+X-IronPort-AV: E=Sophos;i="6.04,195,1695711600"; 
+   d="scan'208";a="1114797111"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmsmga005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Jan 2024 18:22:14 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Sun, 14 Jan 2024 18:22:14 -0800
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Sun, 14 Jan 2024 18:22:13 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Sun, 14 Jan 2024 18:22:13 -0800
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.168)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Sun, 14 Jan 2024 18:22:13 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Prs7d5Pdx7sUl4fdCHxv4eRpjMa4HmUVlMEByveOiq8rUoB4n7TndnMH5vFKJYuaqbtNyd4wUeLZfWvKfaw1UKGbNokFT/289I3pn0yKoJHGH8LkjvdjxlEACW5NYNqB5Yo9mpJSUfIvRCIWU3iCkH0NV2I/kbCAVcvxNrfnj3CpeeMjGom/JSn+IRsnf7PcaFB8Np4UvhlZ18kNq6xo9D6NX0wSmec5jZJLqkHUWyZakQG70MywwABbNBg362VnMh5xYRYuNvADsd9EetET1Jz7hdY2K8kzQPR5Nnuwb/fC4caZCdHf9efUc5rix3lL1hCM0CwLJ3Rmj9zzl+yhkg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mtqo56+dm9BvPqLDuJKROcGE4v0MQL5KGtdIdVRx+IA=;
+ b=lTT6l3LEjEHTFtXGCOpS9XMb3NORMNTMs4xl5NMxxTUL6fGmhmXNT5cG9pbBaxMkChCDi/oY5E0scRoxsBrVqUBKSXV/acKBfc6JciYSyc/4h9/ArWhMrhaQDTU+K3NAzo/JDEvkQn0CwpSx6Nf19ZXeuSrwPIdACj/jOBu3LqmPDl88/3BLcmFykr2bdhP+25mv9KBzfCpT0vec+s7HLLM5FsAyjBJh1hW+NH6+89/SVXVA9bKf7ChpqrY+HZBjLwW6kemYL6Td7xRQX7Cg/NV1nh9BN/n40iRD0m7bIgXBdke2eHo9jVckzwf/CbSH/u9SANUN9Kk95a928v7Rng==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB4820.namprd11.prod.outlook.com (2603:10b6:303:6f::8)
+ by SJ0PR11MB4928.namprd11.prod.outlook.com (2603:10b6:a03:2d2::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.26; Mon, 15 Jan
+ 2024 02:22:11 +0000
+Received: from CO1PR11MB4820.namprd11.prod.outlook.com
+ ([fe80::3d83:82ce:9f3b:7e20]) by CO1PR11MB4820.namprd11.prod.outlook.com
+ ([fe80::3d83:82ce:9f3b:7e20%5]) with mapi id 15.20.7181.015; Mon, 15 Jan 2024
+ 02:22:11 +0000
+Message-ID: <388ff39f-c4d5-4d71-8c5e-2a3d242d8bf1@intel.com>
+Date: Mon, 15 Jan 2024 10:22:03 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [linus:master] [connector] c46bfba133:
+ stress-ng.netlink-proc.ops_per_sec -97.2% regression
+To: =?UTF-8?B?546L54+C55CmIEtlcWkgV2FuZyBXYW5n?=
+	<wangkeqiwang@didiglobal.com>, kernel test robot <oliver.sang@intel.com>
+CC: "oe-lkp@lists.linux.dev" <oe-lkp@lists.linux.dev>, "lkp@intel.com"
+	<lkp@intel.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "ying.huang@intel.com"
+	<ying.huang@intel.com>, "feng.tang@intel.com" <feng.tang@intel.com>
+References: <E0375D03-BC1E-4F78-8D44-83F4E98307BC@didiglobal.com>
+Content-Language: en-US
+From: "Yin, Fengwei" <fengwei.yin@intel.com>
+In-Reply-To: <E0375D03-BC1E-4F78-8D44-83F4E98307BC@didiglobal.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SI1PR02CA0002.apcprd02.prod.outlook.com
+ (2603:1096:4:1f7::16) To CO1PR11MB4820.namprd11.prod.outlook.com
+ (2603:10b6:303:6f::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240115012918.3081203-1-yanjun.zhu@intel.com>
-In-Reply-To: <20240115012918.3081203-1-yanjun.zhu@intel.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 15 Jan 2024 10:20:37 +0800
-Message-ID: <CACGkMEtVQEZUR2iD_Xs2zhPMspqJvYbMTfrD=gQv660_DVRJsg@mail.gmail.com>
-Subject: Re: [PATCH 1/1] virtio_net: Add timeout handler to avoid kernel hang
-To: Zhu Yanjun <yanjun.zhu@intel.com>
-Cc: mst@redhat.com, xuanzhuo@linux.alibaba.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	Zhu Yanjun <yanjun.zhu@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB4820:EE_|SJ0PR11MB4928:EE_
+X-MS-Office365-Filtering-Correlation-Id: bd0edc8a-6852-4f9b-e31a-08dc1570c77d
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: KjiC/yOvTa1B3qhhBN6XupXb9x+5gsDShZPkcZoANPjTtd+CXaSJyEikbwLXjaz8FDbC02HXfV0zsvBGmUD9vf7NIDGsMV8MlbcslBOv+tr1hbPoBtmxEWwGUhCqDu6/A7HEm3gBoO7QvKRfkKDRu3aiygkrGX7vo2FaZD1hBLYYxUMKIfdrBL4ROAxQPAgNYJuf0skAf+DooAffYZJYQbMOR0gTCOx6VRpWRFPGclwLRiNAS+Tqe0l6iYpBkl3kyeu/2aebJkH+eeabtVLBfKphgpLFsWvXDImnI1graaocWl5xpGblzAweH2JT85lWaFIhNZPx3S3Xh98WpZEVSEYP2I0TZD3sXnXTtvMcEAlk7YrTZ8KGUuATMM4k1FoUBoRTrEXXFxFSUsmOiwSjudAOw/dkAIEfL0ANZEIrSe1WbSPu3N2KwvBeYIgQT3S5SyksU0gspBrLAdbDwxY8zfocfIkYhHS4zlyvoCvPWRy2XVDM++ER3sosJbMV+D5XtCtE02hcdaCp3egyOHOSHfrbqphQIzXoIjuSF7IBhhd28X7orWLuzPo00JvfMABNnp809zLBVBYI0Rwctrp5Y51RTKrM1OjBAYfVr6d+mTYx/uLxvda4lf7Hc51sU+bAHaoB4Z/uKRihm9g7i3clpA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB4820.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(366004)(346002)(396003)(39860400002)(376002)(230922051799003)(186009)(64100799003)(451199024)(1800799012)(86362001)(82960400001)(2616005)(26005)(83380400001)(36756003)(38100700002)(31696002)(31686004)(107886003)(6512007)(6506007)(6666004)(66946007)(66556008)(66476007)(110136005)(53546011)(6636002)(316002)(54906003)(2906002)(5660300002)(8676002)(8936002)(4326008)(478600001)(6486002)(41300700001)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?akl4LzFyNk5KZmVVSTR4cWdyN1NkdnhsUlhLdUNkaUZncmxaTStoSFk3MVVI?=
+ =?utf-8?B?MzZLZlVPNDhTQWRoYjkwNktUVXBTcUdURDlFYVJGNXNKVExZejVIU083YmdT?=
+ =?utf-8?B?dXRHVi9lVStkRGs0K1Z4Sm1DWi9iYkRyT3YzQnYrYmlCYnpBclhWcjdWazQx?=
+ =?utf-8?B?T3lXUmEzbXlKQmJicXlZeVJwd2ZmdEdXeDhOdFFucUxjamNRMW5ZaVI1bjVn?=
+ =?utf-8?B?eUplbGRqbTl5VHUvc2tLRktnUjVzcThtUHRPYkdVdGtUcE1OZ0JYSDdiVGN4?=
+ =?utf-8?B?aGdKQkZWdGlhSkt2UjlVTTNJZ0FSQzFTY2hlQTgrR0NhTjJIZHMzc3d1Nlh3?=
+ =?utf-8?B?OEJuSU8yVHgyNE9iQUZzaHVwcXVpMjhoRlk0amNWNFZKaVZaSFF2Yk5GVXJF?=
+ =?utf-8?B?NmlydTJIN1VkYVV4dG9aaVgxWkNOemhOLzE3T3NWU0hNR29ETUhheXN1UlNJ?=
+ =?utf-8?B?MitMNW5wbnZGT0gzNmUxWEhrazJCWkgzZEhFMnNCM2dTYVArZXZjbXhNbm83?=
+ =?utf-8?B?UUd6M2tOZ0d0TUdBMEREcXM3Y1RoQXV6YWc1NEtFNTJqMm9EcVUxSDc5ME5J?=
+ =?utf-8?B?TGFKZW00a2dmNTZKelVWalA2WDVTc0F6VHZ6WThCdEprREV3T2lnNUpCTzUy?=
+ =?utf-8?B?azBkNExTNWpaTURHWkFqMHpYN2Z0bXIyV1hLYVhWWkhEVHVsVGJQSlJ0T0hr?=
+ =?utf-8?B?aVo5TTFQWkZ5SHJsWE95YWxlSXJlRWd1L1RIRTZ1UU14bzhYRG9RaUdoVTla?=
+ =?utf-8?B?eEYvY2x6aWFXVE1qcXRkR1ZuY1FyeTBmMXJuUDI2RHhPaWlHSTFoSHJXQWRa?=
+ =?utf-8?B?U2QvOXN1SFR4c1Nmd1p1TlpuSSttekJmRXNPK1ZnQTJZMERPZlFWT25YMDNR?=
+ =?utf-8?B?THpoOEhFQjNCMHlLTUE1ZmcrVHVnZUpseXdDaGc5K1VqeGhsekxMcHBXT1N5?=
+ =?utf-8?B?T1NQZWRjdHVOblBnc2Vyd3FIRGFGSXM1YXVqQkpSVnljTlphTEh4OUViVTVT?=
+ =?utf-8?B?SmdVbGt1VzBaK004Wi9zeVpqWXlXT05TLzNQT1hBQmNGZ3gvdUVNdFFtSkNp?=
+ =?utf-8?B?YUZKeWh2WnRRWmtSZXhaVEN1d1Z0clh2VDZDNjVFY0ExNXlXTEtnblhudFJ4?=
+ =?utf-8?B?SktzQ0txK09lQ0lXa2JvcVJXWEZneGJkd2J1a1dTQ3QwY0ZySTExZFNEMGpX?=
+ =?utf-8?B?aXMrSWJNeDVpMmpGYVZSZVA3RlI4dXJWMXhjMHBZa2pRL2lFLzQ2bTVXanFR?=
+ =?utf-8?B?ZDdkYThuRzhLM2x0MUpuY3E5TTVMVEg1RSszZ0tRZTM3SE1NaWdTL1ZHRlI3?=
+ =?utf-8?B?S3FySSswMXk4akd0ZWVwQ3I0L3I4VGxpUHBuTHd0T0FYVVNtQmNNdDBFUDJV?=
+ =?utf-8?B?cWdLNlNKZXpEbVNIRmNvQm1FR2dxaFNJR3dmbFU1SWpxL2MveWdodnRJL2h1?=
+ =?utf-8?B?QlBLbng1MzZsczUxdWRvRnhXa215R25UNEt0emxOMHJRZGYwTnRFaVFQRktQ?=
+ =?utf-8?B?d1oraCtrcWVJaHlCZzlEZkExVmkvRHQ1Vlg5bWRyNEJjWVVFazdsVWR6NVVl?=
+ =?utf-8?B?N0RNcjdZTnF5Zm5wMC9CcTFVSTQ4SFlmZXBaN0RNTmpjV1crbVdZbG1uYkFN?=
+ =?utf-8?B?ZWYxSzlaelZDdW5wQTQyUjZ1bzF0Qjc3VU1TOXlnT3NUVTVFb0hEQ3dWUjgx?=
+ =?utf-8?B?NitVVS9DSlNkSFlIZHFsZXorbzc4TnRubjJ6VHQyREh0cEdmTDkxZTJIS0c4?=
+ =?utf-8?B?bVNjaWxJNSttZW5MWkdPeU9sVXVZaGlobkZNS3VJS0VwOHJrZWZEbitITktK?=
+ =?utf-8?B?NlF0L1lTeFdaak1zbWJoQURKSHdVVGZ4Vnpsb2F0ckIrQVFIa083OVBCc1V6?=
+ =?utf-8?B?S0RMVnR0V3JZRFJFREJNNmFuTUl2d2RxRzlwekpFcVQydFFWN2N5T1JQL3l4?=
+ =?utf-8?B?OTlvYjR3YUM5elpmTnEvdjlEcy9KOEZCM3VLUzBta214TmtyanZsWTYrL0ZQ?=
+ =?utf-8?B?Q2VMcCsrN0V6MVg0bVJVN1p4RmxMc21mZk5sb1hqVCtqNVhyWlZRSllWcUh1?=
+ =?utf-8?B?VHhqcnJiejBWMmhRTWxpV3Vyc2x2aTVlYzRzUDYyL0FpekQxUDhSV1FHWDlo?=
+ =?utf-8?B?SHdCQzJxUDJQZDYwWnRmTHU0ek5vWldrQ0Z6cjNad29mcjMvc0dqcjRESVhH?=
+ =?utf-8?B?SkE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: bd0edc8a-6852-4f9b-e31a-08dc1570c77d
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB4820.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jan 2024 02:22:11.0356
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: XkGEMrIfgWFrb1IjHblhTu/T1C7cvO1BsEYTf5K2EeXQRi92+EE42i5xXHTdbTxrtTbLoJ0pBb6B3Mpm+y5emQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB4928
+X-OriginatorOrg: intel.com
 
-On Mon, Jan 15, 2024 at 9:35=E2=80=AFAM Zhu Yanjun <yanjun.zhu@intel.com> w=
-rote:
->
-> From: Zhu Yanjun <yanjun.zhu@linux.dev>
->
-> Some devices emulate the virtio_net hardwares. When virtio_net
-> driver sends commands to the emulated hardware, normally the
-> hardware needs time to response. Sometimes the time is very
-> long. Thus, the following will appear. Then the whole system
-> will hang.
-> The similar problems also occur in Intel NICs and Mellanox NICs.
-> As such, the similar solution is borrowed from them. A timeout
-> value is added and the timeout value as large as possible is set
-> to ensure that the driver gets the maximum possible response from
-> the hardware.
->
-> "
-> [  213.795860] watchdog: BUG: soft lockup - CPU#108 stuck for 26s! [(udev=
--worker):3157]
-> [  213.796114] Modules linked in: virtio_net(+) net_failover failover qrt=
-r rfkill sunrpc intel_rapl_msr intel_rapl_common intel_uncore_frequency int=
-el_uncore_frequency_common intel_ifs i10nm_edac nfit libnvdimm x86_pkg_temp=
-_thermal intel_powerclamp coretemp iTCO_wdt rapl intel_pmc_bxt dax_hmem iTC=
-O_vendor_support vfat cxl_acpi intel_cstate pmt_telemetry pmt_class intel_s=
-dsi joydev intel_uncore cxl_core fat pcspkr mei_me isst_if_mbox_pci isst_if=
-_mmio idxd i2c_i801 isst_if_common mei intel_vsec idxd_bus i2c_smbus i2c_is=
-mt ipmi_ssif acpi_ipmi ipmi_si ipmi_devintf ipmi_msghandler acpi_pad acpi_p=
-ower_meter pfr_telemetry pfr_update fuse loop zram xfs crct10dif_pclmul crc=
-32_pclmul crc32c_intel polyval_clmulni polyval_generic ghash_clmulni_intel =
-sha512_ssse3 bnxt_en sha256_ssse3 sha1_ssse3 nvme ast nvme_core i2c_algo_bi=
-t wmi pinctrl_emmitsburg scsi_dh_rdac scsi_dh_emc scsi_dh_alua dm_multipath
-> [  213.796194] irq event stamp: 67740
-> [  213.796195] hardirqs last  enabled at (67739): [<ffffffff8c2015ca>] as=
-m_sysvec_apic_timer_interrupt+0x1a/0x20
-> [  213.796203] hardirqs last disabled at (67740): [<ffffffff8c14108e>] sy=
-svec_apic_timer_interrupt+0xe/0x90
-> [  213.796208] softirqs last  enabled at (67686): [<ffffffff8b12115e>] __=
-irq_exit_rcu+0xbe/0xe0
-> [  213.796214] softirqs last disabled at (67681): [<ffffffff8b12115e>] __=
-irq_exit_rcu+0xbe/0xe0
-> [  213.796217] CPU: 108 PID: 3157 Comm: (udev-worker) Kdump: loaded Not t=
-ainted 6.7.0+ #9
-> [  213.796220] Hardware name: Intel Corporation M50FCP2SBSTD/M50FCP2SBSTD=
-, BIOS SE5C741.86B.01.01.0001.2211140926 11/14/2022
-> [  213.796221] RIP: 0010:virtqueue_get_buf_ctx_split+0x8d/0x110
-> [  213.796228] Code: 89 df e8 26 fe ff ff 0f b7 43 50 83 c0 01 66 89 43 5=
-0 f6 43 78 01 75 12 80 7b 42 00 48 8b 4b 68 8b 53 58 74 0f 66 87 44 51 04 <=
-48> 89 e8 5b 5d c3 cc cc cc cc 66 89 44 51 04 0f ae f0 48 89 e8 5b
-> [  213.796230] RSP: 0018:ff4bbb362306f9b0 EFLAGS: 00000246
-> [  213.796233] RAX: 0000000000000000 RBX: ff2f15095896f000 RCX: 000000000=
-0000001
-> [  213.796235] RDX: 0000000000000000 RSI: ff4bbb362306f9cc RDI: ff2f15095=
-896f000
-> [  213.796236] RBP: 0000000000000000 R08: 0000000000000000 R09: 000000000=
-0000000
-> [  213.796237] R10: 0000000000000003 R11: ff2f15095893cc40 R12: 000000000=
-0000002
-> [  213.796239] R13: 0000000000000004 R14: 0000000000000000 R15: ff2f15095=
-34f3000
-> [  213.796240] FS:  00007f775847d0c0(0000) GS:ff2f1528bac00000(0000) knlG=
-S:0000000000000000
-> [  213.796242] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [  213.796243] CR2: 0000557f987b6e70 CR3: 0000002098602006 CR4: 000000000=
-0f71ef0
-> [  213.796245] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 000000000=
-0000000
-> [  213.796246] DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7: 000000000=
-0000400
-> [  213.796247] PKRU: 55555554
-> [  213.796249] Call Trace:
-> [  213.796250]  <IRQ>
-> [  213.796252]  ? watchdog_timer_fn+0x1c0/0x220
-> [  213.796258]  ? __pfx_watchdog_timer_fn+0x10/0x10
-> [  213.796261]  ? __hrtimer_run_queues+0x1af/0x380
-> [  213.796269]  ? hrtimer_interrupt+0xf8/0x230
-> [  213.796274]  ? __sysvec_apic_timer_interrupt+0x64/0x1a0
-> [  213.796279]  ? sysvec_apic_timer_interrupt+0x6d/0x90
-> [  213.796282]  </IRQ>
-> [  213.796284]  <TASK>
-> [  213.796285]  ? asm_sysvec_apic_timer_interrupt+0x1a/0x20
-> [  213.796293]  ? virtqueue_get_buf_ctx_split+0x8d/0x110
-> [  213.796297]  virtnet_send_command+0x18a/0x1f0 [virtio_net]
-> [  213.796310]  _virtnet_set_queues+0xc6/0x120 [virtio_net]
-> [  213.796319]  virtnet_probe+0xa06/0xd50 [virtio_net]
-> [  213.796328]  virtio_dev_probe+0x195/0x230
-> [  213.796333]  really_probe+0x19f/0x400
-> [  213.796338]  ? __pfx___driver_attach+0x10/0x10
-> [  213.796340]  __driver_probe_device+0x78/0x160
-> [  213.796343]  driver_probe_device+0x1f/0x90
-> [  213.796346]  __driver_attach+0xd6/0x1d0
-> [  213.796349]  bus_for_each_dev+0x8c/0xe0
-> [  213.796355]  bus_add_driver+0x119/0x220
-> [  213.796359]  driver_register+0x59/0x100
-> [  213.796362]  ? __pfx_virtio_net_driver_init+0x10/0x10 [virtio_net]
-> [  213.796369]  virtio_net_driver_init+0x8e/0xff0 [virtio_net]
-> [  213.796375]  do_one_initcall+0x6f/0x380
-> [  213.796384]  do_init_module+0x60/0x240
-> [  213.796388]  init_module_from_file+0x86/0xc0
-> [  213.796396]  idempotent_init_module+0x129/0x2c0
-> [  213.796406]  __x64_sys_finit_module+0x5e/0xb0
-> [  213.796409]  do_syscall_64+0x60/0xe0
-> [  213.796415]  ? do_syscall_64+0x6f/0xe0
-> [  213.796418]  ? lockdep_hardirqs_on_prepare+0xe4/0x1a0
-> [  213.796424]  ? do_syscall_64+0x6f/0xe0
-> [  213.796427]  ? do_syscall_64+0x6f/0xe0
-> [  213.796431]  entry_SYSCALL_64_after_hwframe+0x6e/0x76
-> [  213.796435] RIP: 0033:0x7f7758f279cd
-> [  213.796465] Code: 5d c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 4=
-8 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <=
-48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 33 e4 0c 00 f7 d8 64 89 01 48
-> [  213.796467] RSP: 002b:00007ffe2cad8738 EFLAGS: 00000246 ORIG_RAX: 0000=
-000000000139
-> [  213.796469] RAX: ffffffffffffffda RBX: 0000557f987a8180 RCX: 00007f775=
-8f279cd
-> [  213.796471] RDX: 0000000000000000 RSI: 00007f77593e5453 RDI: 000000000=
-000000f
-> [  213.796472] RBP: 00007f77593e5453 R08: 0000000000000000 R09: 00007ffe2=
-cad8860
-> [  213.796473] R10: 000000000000000f R11: 0000000000000246 R12: 000000000=
-0020000
-> [  213.796475] R13: 0000557f9879f8e0 R14: 0000000000000000 R15: 0000557f9=
-8783aa0
-> [  213.796482]  </TASK>
-> "
->
-> Signed-off-by: Zhu Yanjun <yanjun.zhu@linux.dev>
+
+
+On 1/13/2024 4:56 PM, 王珂琦 Keqi Wang Wang wrote:
+> Hi Fengwei
+> 	Sorry, reply so late.
+No problem.
+
+> 	I don't think this will cause a drastic drop in stress-ng netlink-proc performance. Because after returning -ESRCH, proc_event_num_listeners is cleared and the send_msg function will not be called.
+> However, there is a problem with judging clearing based on whether the return value is -ESRCH. Because netlink_broadcast will return -ESRCH in this case. Can you try the following patch to solve your problem?
+Yes. This patch can make the regression of stress-ng.netlink-proc gone.
+
+
+Regards
+Yin, Fengwei
+
+> 
+>  From 6e6c36aed156bbb185f54d0c0fef2f6683df3288 Mon Sep 17 00:00:00 2001
+> From: wangkeqi <wangkeqiwang@didiglobal.com>
+> Date: Sat, 23 Dec 2023 13:21:17 +0800
+> Subject: [PATCH] connector: Fix proc_event_num_listeners count not cleared
+> 
+> When we register a cn_proc listening event, the proc_event_num_listener
+> variable will be incremented by one, but if PROC_CN_MCAST_IGNORE is
+> not called, the count will not decrease.
+> This will cause the proc_*_connector function to take the wrong path.
+> It will reappear when the forkstat tool exits via ctrl + c.
+> We solve this problem by determining whether
+> there are still listeners to clear proc_event_num_listener.
+> 
+> Signed-off-by: wangkeqi <wangkeqiwang@didiglobal.com>
 > ---
->  drivers/net/virtio_net.c | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 51b1868d2f22..28b7dd917a43 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -2468,7 +2468,7 @@ static bool virtnet_send_command(struct virtnet_inf=
-o *vi, u8 class, u8 cmd,
->  {
->         struct scatterlist *sgs[4], hdr, stat;
->         unsigned out_num =3D 0, tmp;
-> -       int ret;
-> +       int ret, timeout =3D 200;
-
-Any reason we choose this value or how can we know it works for all
-types of devices?
-
-A more easy way is to use cond_resched() but it may have side effects
-as well[1]. But it seems less intrusive anyhow than the proposal here?
-
-Thanks
-
-[1] https://www.mail-archive.com/virtualization@lists.linux-foundation.org/=
-msg60297.html
-
->
->         /* Caller should know better */
->         BUG_ON(!virtio_has_feature(vi->vdev, VIRTIO_NET_F_CTRL_VQ));
-> @@ -2502,8 +2502,14 @@ static bool virtnet_send_command(struct virtnet_in=
-fo *vi, u8 class, u8 cmd,
->          * into the hypervisor, so the request should be handled immediat=
-ely.
->          */
->         while (!virtqueue_get_buf(vi->cvq, &tmp) &&
-> -              !virtqueue_is_broken(vi->cvq))
-> +              !virtqueue_is_broken(vi->cvq)) {
-> +               if (timeout)
-> +                       timeout--;
-> +               else
-> +                       return false; /* long time no response */
+>   drivers/connector/cn_proc.c   | 5 ++++-
+>   drivers/connector/connector.c | 6 ++++++
+>   include/linux/connector.h     | 1 +
+>   3 files changed, 11 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/connector/cn_proc.c b/drivers/connector/cn_proc.c
+> index 44b19e696..b09f74ed3 100644
+> --- a/drivers/connector/cn_proc.c
+> +++ b/drivers/connector/cn_proc.c
+> @@ -108,8 +108,11 @@ static inline void send_msg(struct cn_msg *msg)
+>   		filter_data[1] = 0;
+>   	}
+> 
+> -	cn_netlink_send_mult(msg, msg->len, 0, CN_IDX_PROC, GFP_NOWAIT,
+> +	if (netlink_has_listeners(get_cdev_nls(), CN_IDX_PROC))
+> +		cn_netlink_send_mult(msg, msg->len, 0, CN_IDX_PROC, GFP_NOWAIT,
+>   			     cn_filter, (void *)filter_data);
+> +	else
+> +		atomic_set(&proc_event_num_listeners, 0);
+> 
+>   	local_unlock(&local_event.lock);
+>   }
+> diff --git a/drivers/connector/connector.c b/drivers/connector/connector.c
+> index 7f7b94f61..ced2655c6 100644
+> --- a/drivers/connector/connector.c
+> +++ b/drivers/connector/connector.c
+> @@ -120,6 +120,12 @@ int cn_netlink_send_mult(struct cn_msg *msg, u16 len, u32 portid, u32 __group,
+>   }
+>   EXPORT_SYMBOL_GPL(cn_netlink_send_mult);
+> 
+> +struct sock *get_cdev_nls(void)
+> +{
+> +	return cdev.nls;
+> +}
+> +EXPORT_SYMBOL_GPL(get_cdev_nls);
 > +
->                 cpu_relax();
-> +       }
->
->         return vi->ctrl->status =3D=3D VIRTIO_NET_OK;
->  }
+>   /* same as cn_netlink_send_mult except msg->len is used for len */
+>   int cn_netlink_send(struct cn_msg *msg, u32 portid, u32 __group,
+>   	gfp_t gfp_mask)
+> diff --git a/include/linux/connector.h b/include/linux/connector.h
+> index cec2d99ae..c601eb99b 100644
+> --- a/include/linux/connector.h
+> +++ b/include/linux/connector.h
+> @@ -126,6 +126,7 @@ int cn_netlink_send_mult(struct cn_msg *msg, u16 len, u32 portid,
+>    * If there are no listeners for given group %-ESRCH can be returned.
+>    */
+>   int cn_netlink_send(struct cn_msg *msg, u32 portid, u32 group, gfp_t gfp_mask);
+> +struct sock *get_cdev_nls(void);
+> 
+>   int cn_queue_add_callback(struct cn_queue_dev *dev, const char *name,
+>   			  const struct cb_id *id,
 > --
-> 2.42.0
->
-
+> 2.27.0
+> 
+> ﻿在 2024/1/12 19:28，“Yin, Fengwei”<fengwei.yin@intel.com <mailto:fengwei.yin@intel.com>> 写入:
+> 
+> 
+> 
+> 
+> 
+> 
+> On 1/11/2024 11:19 PM, kernel test robot wrote:
+>>
+>>
+>> Hello,
+>>
+>> we reviewed this report and Fengwei (Cced) pointed out it could be the patch
+>> breaks functionality, then causes stress-ng netlink-proc performance drops
+>> dramatically.
+>>
+> Just FYI. Here is what I observed when running
+> stress-ng.netlink-proc testing:
+> 
+> 
+> Whatever with/without the patch, cn_netlink_send_mult() returns
+> -ESRCH in most case.
+> 
+> 
+> The following is what the cn_netlink_send_mult() returns when
+> stress-ng.netlink-proc is running:
+> 
+> 
+> ...
+> 213801 213801 stress-ng-3 cn_netlink_send_mult -3
+> 213801 213801 stress-ng-spawn cn_netlink_send_mult -3
+> 213801 213801 stress-ng-spawn cn_netlink_send_mult -3
+> 213801 213801 stress-ng-wait cn_netlink_send_mult -3
+> 213802 213802 stress-ng-4 cn_netlink_send_mult -3
+> 213802 213802 stress-ng-spawn cn_netlink_send_mult -3
+> 213802 213802 stress-ng-spawn cn_netlink_send_mult -3
+> 213802 213802 stress-ng-wait cn_netlink_send_mult -3
+> 213803 213803 stress-ng-5 cn_netlink_send_mult -3
+> 213803 213803 stress-ng-dead cn_netlink_send_mult -3
+> 213803 213803 stress-ng-dead cn_netlink_send_mult -3
+> 213802 213802 stress-ng-wait cn_netlink_send_mult -3
+> 213801 213801 stress-ng-wait cn_netlink_send_mult -3
+> 213800 213800 stress-ng-wait cn_netlink_send_mult -3
+> 213799 213799 stress-ng-wait cn_netlink_send_mult -3
+> 213798 213798 stress-ng-wait cn_netlink_send_mult -3
+> 154697 154697 stress-ng cn_netlink_send_mult -3
+> ...
+> 
+> 
+> 
+> 
+> Looks like it's not accurate to reset proc_event_num_listeners
+> according to cn_netlink_send_mult() return value -3.
+> 
+> 
+> 
+> 
+> Regards
+> Yin, Fengwei
+> 
+> 
+> 
 
