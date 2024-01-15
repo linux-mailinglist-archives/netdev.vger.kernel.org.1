@@ -1,133 +1,106 @@
-Return-Path: <netdev+bounces-63575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB2C882E214
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 22:05:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4505082E22B
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 22:20:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 308431F2264C
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 21:05:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FC311C22043
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 21:20:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D85711AADC;
-	Mon, 15 Jan 2024 21:04:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABBA91B270;
+	Mon, 15 Jan 2024 21:20:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="3S0muV/W"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FPRx8b8m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C06D17C9B
-	for <netdev@vger.kernel.org>; Mon, 15 Jan 2024 21:04:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-5f8cf76ef5bso79603967b3.0
-        for <netdev@vger.kernel.org>; Mon, 15 Jan 2024 13:04:56 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C9BB1AADF;
+	Mon, 15 Jan 2024 21:20:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-55783b7b47aso9696823a12.0;
+        Mon, 15 Jan 2024 13:20:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1705352696; x=1705957496; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5B5owQJhMGfq7E2l/8Q8+15zFGh01hwobONImQAKqFk=;
-        b=3S0muV/WyxbxU7uAM3WFqYWsKtCa2FhUJAKpunpkMHYXeoeH0NDLLy62ccoPSTojBE
-         e8m2RAsh8y2yIGfeNh7GVlrRkWF+gWppPq0DUwWNgQw01Zbrsk3x/z/ICBuEhAi9dSOv
-         f2+cnyyK9FSyU065zd/1xHdP5w/QJ3e/btAjb+LjSOdRa3N1i5261cHeGadsmkEo+QhI
-         hVACgnZqGEX29+cV/sDnECM+SU5ZhqZg0CGqV0miC7TTx25BLPYcJM6GYr1IyPkwvHzK
-         aLxGcZ+UT9F2DgQ210I1d8y5kPQ5xZrKFk8TJvGYEkBbVbURYKnyqBsUGDHT4xhxQN/l
-         eRBg==
+        d=gmail.com; s=20230601; t=1705353623; x=1705958423; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=39ozkC0HqQZ+Edap3Ljm8Xvwn44jjjAD+L2Y5G1YxR4=;
+        b=FPRx8b8metkJYINl5JNHd7k+WMBSgfOrpipy4cSCnml4rlQtbxC93FMPc6hvSixIbj
+         jpswHTUPBZoZCTPsJS3iV5S0emPcwC7sZ5IfrvrfDrosso+pPTcknMm6aKC4Nvxp7dx7
+         QJzVugUOg8a10aUsu17qt+ml6VBySC26OVu3WfFPidvX0XgeSolV+yJLKNwFGowxSbzf
+         kzdrzUwtI6TIzdhj7EtSmChUb7k3G/aRaogNZfr0yirccY/pvxyZeXrgXM/xm+cK983o
+         L2cGLRd24DtJXT+oM2sKe4D4QwNDTwBKAvHc7OIAB9dRjis8loAvEKF9XNpDDq5FD88P
+         IHlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705352696; x=1705957496;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5B5owQJhMGfq7E2l/8Q8+15zFGh01hwobONImQAKqFk=;
-        b=SLleb2Qd6TwHGtAwJJvwiqPOi1Mji8QepSbgZAaj1c3EqJCPxgLFxSZxTaufEX7YCu
-         7yeH8Zi4KzqZip8zEKrj63DY9d2/YVskVRvgzX9OuzDkxcOK6fMeZlBwYmYHrPQC9jLt
-         aV43MHPfZCc1RRuo3+pOO/CYRvoIceWvqIwgodRGnbX3C+gs6P9xRxi8fKx8j87C56Ix
-         3aLrskK2fn+prvtneT9zmlB27m/CHoAoJ1kbIyfywRP0yt2gGz3eHWEVacfn+FH3vYMh
-         Xaof+OoW9gMcffFvom0Z0s1xyPcrtlp0kyeHTCp5YwVsh6R/FgRsz8KIJDJDg6PcG5oj
-         gqIQ==
-X-Gm-Message-State: AOJu0YzuCNox1xIa9a85P2D8xwiCwOgKHitPm/MW7H4Os8l2UWaA7sXI
-	U/JltEkbTRkRSPGXeTPnUm28JE1pe6eCyuyaKWXbhPqz+j47mDmw5pwOong=
-X-Google-Smtp-Source: AGHT+IGZMR4VTRE+0aDm52H7d7ffs9czzXHDx8Tik/lgGcLvBHTE6nauzeak2B7wWIgnDNOed3URXjy0TqjRUNAF2FQ=
-X-Received: by 2002:a81:c74c:0:b0:5f7:f3dc:b050 with SMTP id
- i12-20020a81c74c000000b005f7f3dcb050mr3691314ywl.66.1705352696148; Mon, 15
- Jan 2024 13:04:56 -0800 (PST)
+        d=1e100.net; s=20230601; t=1705353623; x=1705958423;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=39ozkC0HqQZ+Edap3Ljm8Xvwn44jjjAD+L2Y5G1YxR4=;
+        b=OyN6yC42kTRzxAFIPCVsYruaioUsCgufHTbGfk6arZu43v6UJLvECErq0Aq9tHWj6S
+         39UsyspHmbry7UKod7bG+NyDWieho6dhyxV6XXiA0qF++WunOOwL82GfjSzBghbCG1sR
+         GLysGYqSA3TiijqCFHQ0XfReO8qSdMmKh4WbolCD3tx+p2zgFM3GZOSIl6lFOD0xXNz1
+         QAvVH2LM2vikPOQWN1OXosuI6wCi6WIvtqWgJBkQuTEjr2dIGWIwRh3ZEWkSyIaBFxga
+         xG9moBd8Bv/X6bfwUdCup8NVlPlax0GQMHmowtvyeoMnlVDeaJvfcU0hvJMF+SBBEnvU
+         1sLw==
+X-Gm-Message-State: AOJu0YxJEKaWIaUfneVohV/AHbUqLpfbtNHwtXLZecvA7/OTmG0cwYPD
+	tS2EXFRvNnuIbvCO/36PTQI=
+X-Google-Smtp-Source: AGHT+IHv3NyJLuT0FGCd+kbmIzXlKGmCwoOcQxRz6260TRiuR4kLFOFZNS/jjOerZLceilUQrzbFDw==
+X-Received: by 2002:a05:6402:b12:b0:54c:b24d:a3b6 with SMTP id bm18-20020a0564020b1200b0054cb24da3b6mr2793991edb.20.1705353623234;
+        Mon, 15 Jan 2024 13:20:23 -0800 (PST)
+Received: from skbuf ([188.25.255.36])
+        by smtp.gmail.com with ESMTPSA id c25-20020a50d659000000b00557c51910e4sm6104974edj.85.2024.01.15.13.20.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Jan 2024 13:20:22 -0800 (PST)
+Date: Mon, 15 Jan 2024 23:20:20 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	Luiz Angelo Daros de Luca <luizluca@gmail.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [RFC PATCH net-next 4/8] net: dsa: mt7530: move XTAL check to
+ mt7530_setup()
+Message-ID: <20240115212020.oaw3hx65feetplve@skbuf>
+References: <20240113102529.80371-1-arinc.unal@arinc9.com>
+ <20240113102529.80371-5-arinc.unal@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240111184451.48227-1-stephen@networkplumber.org>
- <20240111184451.48227-2-stephen@networkplumber.org> <ZaEzpWaTLDG6Ofby@nanopsycho>
- <CAM0EoM=bAsbaNsQUbfO_yLHR2PFXBF9Zq3VXBGPhmKtWsMv5tA@mail.gmail.com> <ZaFdZFA5ebCmwaNh@nanopsycho>
-In-Reply-To: <ZaFdZFA5ebCmwaNh@nanopsycho>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Mon, 15 Jan 2024 16:04:45 -0500
-Message-ID: <CAM0EoMmPWOPrw6OM7uAZMVvn+QHn6LiU91s39z9J4-2dXkKaXQ@mail.gmail.com>
-Subject: Re: [PATCH iproute2-next 1/4] man: get rid of doc/actions/mirred-usage
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240113102529.80371-5-arinc.unal@arinc9.com>
 
-On Fri, Jan 12, 2024 at 10:40=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wrot=
-e:
->
-> Fri, Jan 12, 2024 at 03:55:46PM CET, jhs@mojatatu.com wrote:
-> >On Fri, Jan 12, 2024 at 7:42=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wr=
-ote:
-> >>
-> >> Thu, Jan 11, 2024 at 07:44:08PM CET, stephen@networkplumber.org wrote:
-> >> >The only bit of information not already on the man page
-> >> >is some of the limitations.
-> >> >
-> >>
-> >> [...]
-> >>
-> >> >diff --git a/man/man8/tc-mirred.8 b/man/man8/tc-mirred.8
-> >> >index 38833b452d92..71f3c93df472 100644
-> >> >--- a/man/man8/tc-mirred.8
-> >> >+++ b/man/man8/tc-mirred.8
-> >> >@@ -94,6 +94,14 @@ interface, it is possible to send ingress traffic =
-through an instance of
-> >> > .EE
-> >> > .RE
-> >> >
-> >> >+.SH LIMITIATIONS
-> >> >+It is possible to create loops which will cause the kernel to hang.
-> >>
-> >> Hmm, I think this is not true for many many years. Perhaps you can dro=
-p
-> >> it? Anyway, it was a kernel issue.
-> >
-> >Hmm back at you: why do you say it is not true anymore? It is still
->
-> Ah, I was falsely under impression this happens in reclassify loop.
-> Nevermind then.
->
+On Sat, Jan 13, 2024 at 01:25:25PM +0300, Arınç ÜNAL wrote:
+> The crystal frequency concerns the switch core. The frequency should be
+> checked when the switch is being set up so the driver can reject the
+> unsupported hardware earlier and without requiring port 6 to be used.
+> 
+> Move it to mt7530_setup(). Drop the unnecessary function printing.
+> 
+> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> ---
 
-The burden got shifted to mirred with view that it is the only action
-that could cause a loop to happen.
-
-
-cheers,
-jamal
-
->
-> >there - all in the marvelous name of saving 2 bits from the skb.
-> >If you want to be the hero, here's the last attempt to fix this issue:
-> >https://lore.kernel.org/netdev/20231215180827.3638838-1-victor@mojatatu.=
-com/#t
-> >
-> >Stephen, please cc all the stakeholders when you make these changes.
-> >Some of us dont have the luxury to be able to scan every message in
-> >the list. I dont have time, at the moment, to review all the
-> >documentation you are removing - but if you had Cc me i would have
-> >made time.
-> >
-> >cheers,
-> >jamal
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
