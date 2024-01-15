@@ -1,138 +1,124 @@
-Return-Path: <netdev+bounces-63493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A30B82D693
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 11:00:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FD3F82D6C0
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 11:07:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B10431C21676
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 10:00:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E316B2821AE
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 10:07:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29818EAE7;
-	Mon, 15 Jan 2024 10:00:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37408F9D7;
+	Mon, 15 Jan 2024 10:06:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GMiQLrie"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="RfikiN2L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93D06E568;
-	Mon, 15 Jan 2024 10:00:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-557ad92cabbso8260318a12.0;
-        Mon, 15 Jan 2024 02:00:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705312848; x=1705917648; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uj2aalIqkRnKw3Jh+x0FJKzYvIfpX+EmzSwXfzkCeTY=;
-        b=GMiQLrie8T+/NorkXRvXNCL6+L6zqK8UDvek0QIzxB56r/SJoh8buCVxlY04yLMWqm
-         P9GP01KJO8IjOfuFlgT+1pCHInTgtf25+R+iAaRXs3wFq+RO6744cUV30SSkONVZTd6/
-         pUVwkvirzanQssf90Y7gKncn3ZcB1WJ1HRVbbrBLIWWLUxAP/jVMXVHg1H8rsnXRjIft
-         QWYevvhbXD8FMEovoW//IRJPKW3mgG5ZSWUfDRVut/9U1LeJ7OElqPWxyN4qgS3bPyi6
-         ExvWPYFoQH6EAtf58jssGyLxVuR7rol5rBdJYv/z5Z9uuBAOvemzvsQJRroCJzKAtgdX
-         fnfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705312848; x=1705917648;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uj2aalIqkRnKw3Jh+x0FJKzYvIfpX+EmzSwXfzkCeTY=;
-        b=i27JkXtFXKbrg6PD0dNXJDekVDZIix1WbjooYeDKxTLwRj7ra0Ro/qp9sYvR2VR+27
-         wbQ8WtiCCkkGKzhS1Zz5kCOGiq3eTtGAbS08CrhGFRVUbUNU2nvFGDrUtTu+api2hj3v
-         Io5X1d0sVEH+qosVJk5kC984sbdK60CXJdLWgio4hUKBb3dV90z6sPaq4OhJBktCAFhu
-         Rs03+EW1QMoGEenH9IBupPVptuDojN6xM+arFnY7drZ07EzuT4Mt4d8scVAcwXx/i13f
-         G2mT7rBpJLOugOGRscPWxzWYWMWvfijfVtqG79i/GBf8/zMar5hswr8snC5rOzsMAvi+
-         aKyg==
-X-Gm-Message-State: AOJu0YzevWzqtlOzJIX5SdnMKfX8HSPusNuzsNJkKRC/3dDt2kPKdO3T
-	zFrgBqg4TvVNZEBsCeP2W0ASOwG5ou13AQGB3pHE5NDZFaXMEA==
-X-Google-Smtp-Source: AGHT+IFpMD03zihIAykom+PB1F28jr/R2Z8Ne7OeKsZ9DBxxhU6mhLOe/tSuvReUc8HhKlgl9kTv6RZJ5nVcPQmhshM=
-X-Received: by 2002:a17:906:349a:b0:a2c:3380:d363 with SMTP id
- g26-20020a170906349a00b00a2c3380d363mr1285364ejb.258.1705312848097; Mon, 15
- Jan 2024 02:00:48 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 976DE2C694;
+	Mon, 15 Jan 2024 10:06:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 84DC72000B;
+	Mon, 15 Jan 2024 10:06:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1705313197;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2sURSIiRwE+VMw4pqfsGC2UVhFnlMv9fsKlnWFF3DNM=;
+	b=RfikiN2LGt9usO6Kr2immj7tGr4jK+B73EUyXm5DpAJY2tcHu0kTW6gdS3NKOXOnAYahTN
+	jxcMl0kTA7QOAKNYHdoL8Rn+xAROzgs7NueK6Cvk/ur0dPi0PtVYPBo4x9uyjGawo+/sS8
+	FuL0K/EDJzRjU8g3FnxzhjdEYPFRtKBHsiorAFrybGqWsXTsDi4HLwXUt0FnUDpK8fA65C
+	O/Ofp1bCZtQEXgOAgIop0bEr0BAsAiFeyMDtpcAMsYj2+L44yeTmlzsUSzzR16i5vLjDhM
+	bKuYavKnHHtIXCp1AzmNNR/1wdzI4YVxfMjo2PsfHxGHKhRIR+o+AfHE6qkG7A==
+Date: Mon, 15 Jan 2024 11:06:35 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>
+Cc: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+ <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+ <pabeni@redhat.com>, <richardcochran@gmail.com>,
+ <Divya.Koppera@microchip.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <UNGLinuxDriver@microchip.com>
+Subject: Re: [PATCH net 1/2] net: micrel: Fix PTP frame parsing for lan8814
+Message-ID: <20240115110635.60b1884c@device-28.home>
+In-Reply-To: <20240113131521.1051921-2-horatiu.vultur@microchip.com>
+References: <20240113131521.1051921-1-horatiu.vultur@microchip.com>
+	<20240113131521.1051921-2-horatiu.vultur@microchip.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.39; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAEmTpZHU5JBkQOVWvp4i2f02et2e0v9mTFzhmxhFOE47xPyqYg@mail.gmail.com>
- <2024011517-nursery-flinch-3101@gregkh>
-In-Reply-To: <2024011517-nursery-flinch-3101@gregkh>
-From: =?UTF-8?B?0JzQsNGA0Log0JrQvtGA0LXQvdCx0LXRgNCz?= <socketpair@gmail.com>
-Date: Mon, 15 Jan 2024 15:00:36 +0500
-Message-ID: <CAEmTpZHcXrPTC15KS9SvC6auK1G2nugny_wQA411+9CXrW0dgQ@mail.gmail.com>
-Subject: Re: kernel BUG on network namespace deletion
-To: netdev@vger.kernel.org
-Cc: stable@vger.kernel.org, Greg KH <gregkh@linuxfoundation.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Hi, netdev. I have found a bug in the Linux Kernel. Please take a look.
+Hello Horatiu,
 
-=D0=BF=D0=BD, 15 =D1=8F=D0=BD=D0=B2. 2024=E2=80=AF=D0=B3. =D0=B2 13:25, Gre=
-g KH <gregkh@linuxfoundation.org>:
->
-> On Mon, Jan 15, 2024 at 12:19:06PM +0500, =D0=9C=D0=B0=D1=80=D0=BA =D0=9A=
-=D0=BE=D1=80=D0=B5=D0=BD=D0=B1=D0=B5=D1=80=D0=B3 wrote:
-> > Kernel 6.6.9-200.fc39.x86_64
-> >
-> > The following bash script demonstrates the problem (run under root):
-> >
-> > ```
-> > #!/bin/bash
-> >
-> > set -e -u -x
-> >
-> > # Some cleanups
-> > ip netns delete myspace || :
-> > ip link del qweqwe1 || :
-> >
-> > # The bug happens only with physical interfaces, not with, say, dummy o=
-ne
-> > ip link property add dev enp0s20f0u2 altname myname
-> > ip netns add myspace
-> > ip link set enp0s20f0u2 netns myspace
-> >
-> > # add dummy interface + set the same altname as in background namespace=
-.
-> > ip link add name qweqwe1 type dummy
-> > ip link property add dev qweqwe1 altname myname
-> >
-> > # Trigger the bug. The kernel will try to return ethernet interface
-> > back to root namespace, but it can not, because of conflicting
-> > altnames.
-> > ip netns delete myspace
-> >
-> > # now `ip link` will hang forever !!!!!
-> > ```
-> >
-> > I think, the problem is obvious. Althougn I don't know how to fix.
-> > Remove conflicting altnames for interfaces that returns from killed
-> > namespaces ?
->
-> As this can only be triggered by root, not much for us to do here,
-> perhaps discuss it on the netdev mailing list for all network developers
-> to work on?
->
-> > On kernel 6.3.8 (at least) was another bug, that allows dulicate
-> > altnames, and it was fixed mainline somewhere. I have another script
-> > to trigger the bug on these old kernels. I did not bisect.
->
-> If this is an issue on 6.1.y, that would be good to know so that we can
-> try to fix the issue there if bisection can find it.  Care to share the
-> script so that I can test?
->
-> thanks,
->
-> greg k-h
+On Sat, 13 Jan 2024 14:15:20 +0100
+Horatiu Vultur <horatiu.vultur@microchip.com> wrote:
 
+> The HW has the capability to check each frame if it is a PTP frame,
+> which domain it is, which ptp frame type it is, different ip address in
+> the frame. And if one of these checks fail then the frame is not
+> timestamp. Most of these checks were disabled except checking the field
+> minorVersionPTP inside the PTP header. Meaning that once a partner sends
+> a frame compliant to 8021AS which has minorVersionPTP set to 1, then the
+> frame was not timestamp because the HW expected by default a value of 0
+> in minorVersionPTP. This is exactly the same issue as on lan8841.
+> Fix this issue by removing this check so the userspace can decide on this.
+> 
+> Fixes: ece19502834d ("net: phy: micrel: 1588 support for LAN8814 phy")
+> Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+> ---
+>  drivers/net/phy/micrel.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+> index bf4053431dcb3..1752eaeadc42e 100644
+> --- a/drivers/net/phy/micrel.c
+> +++ b/drivers/net/phy/micrel.c
+> @@ -120,6 +120,9 @@
+>   */
+>  #define LAN8814_1PPM_FORMAT			17179
+>  
+> +#define PTP_RX_VERSION				0x0248
+> +#define PTP_TX_VERSION				0x0288
+> +
+>  #define PTP_RX_MOD				0x024F
+>  #define PTP_RX_MOD_BAD_UDPV4_CHKSUM_FORCE_FCS_DIS_ BIT(3)
+>  #define PTP_RX_TIMESTAMP_EN			0x024D
+> @@ -3150,6 +3153,10 @@ static void lan8814_ptp_init(struct phy_device *phydev)
+>  	lanphy_write_page_reg(phydev, 5, PTP_TX_PARSE_IP_ADDR_EN, 0);
+>  	lanphy_write_page_reg(phydev, 5, PTP_RX_PARSE_IP_ADDR_EN, 0);
+>  
+> +	/* Disable checking for minorVersionPTP field */
+> +	lanphy_write_page_reg(phydev, 5, PTP_RX_VERSION, 0xff00);
+> +	lanphy_write_page_reg(phydev, 5, PTP_TX_VERSION, 0xff00);
 
+Small nit: This looks a bit like magic values, from the datasheet I
+understand the upper byte is the max supported version and the lower
+byte is the min supported version, maybe this could be wrapped in
+macros ?
 
---=20
-Segmentation fault
+> +
+>  	skb_queue_head_init(&ptp_priv->tx_queue);
+>  	skb_queue_head_init(&ptp_priv->rx_queue);
+>  	INIT_LIST_HEAD(&ptp_priv->rx_ts_list);
+
+Besides that,
+
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+
+Thanks,
+
+Maxime
 
