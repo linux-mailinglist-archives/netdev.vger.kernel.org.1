@@ -1,95 +1,210 @@
-Return-Path: <netdev+bounces-63496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 851EE82D74E
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 11:26:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 38E3E82D745
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 11:25:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 97E931C21413
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 10:26:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 413CF1C21806
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 10:25:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BA38101D0;
-	Mon, 15 Jan 2024 10:26:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1B03101C6;
+	Mon, 15 Jan 2024 10:25:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Y7q5/Ttb"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="k0tP2Eol"
 X-Original-To: netdev@vger.kernel.org
-Received: from mslow1.mail.gandi.net (mslow1.mail.gandi.net [217.70.178.240])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF703249E2;
-	Mon, 15 Jan 2024 10:26:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from relay3-d.mail.gandi.net (unknown [IPv6:2001:4b98:dc4:8::223])
-	by mslow1.mail.gandi.net (Postfix) with ESMTP id D3ACFC30D0;
-	Mon, 15 Jan 2024 10:23:05 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 6EC9C60008;
-	Mon, 15 Jan 2024 10:22:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1705314177;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 211BC101C2
+	for <netdev@vger.kernel.org>; Mon, 15 Jan 2024 10:25:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <e2e2d956-b0cd-419c-b967-23f92b37548a@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1705314317;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=37RG/l7y/QlP+BRyRVRXMag0rOrfgpLAB0aLP6thvQk=;
-	b=Y7q5/Ttbht1UxhlrwLk9i5ViBEAmqgX9NsxIPM1f1R4KPeIiUMCuApH9kQZdBzRc8AKABL
-	ixtk6QTf6z3hDrXdUkUTw2Wi0cO1F4OPUOvRlDeCRAWvmHeFpcoHaB/Khk9IQ8VOhHpeCD
-	WeL/dMxM48zTK6LJZ3/L/sF6nrMNg1BFZKIGZ34a4gKaPtwRz+bnnIO5DUcKA7RNGOZGwQ
-	TcKRhPklqQaCLhLJ4GwAl7z7Ba3h+Zov6BFUBACQeWql3FY7OWE7HjFkbgPj13jz8uSmkw
-	3jp2wn1rphp8G0uKD/tg209RI7UHgujQ2Ofueo+lN7G3ZVDIq5v606Di4gaTWQ==
-Date: Mon, 15 Jan 2024 11:22:55 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Horatiu Vultur <horatiu.vultur@microchip.com>
-Cc: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
- <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
- <pabeni@redhat.com>, <richardcochran@gmail.com>,
- <Divya.Koppera@microchip.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <UNGLinuxDriver@microchip.com>
-Subject: Re: [PATCH net 2/2] net: micrel: Fix set/get PHC time for lan8814
-Message-ID: <20240115112255.53d5bb85@device-28.home>
-In-Reply-To: <20240113131521.1051921-3-horatiu.vultur@microchip.com>
-References: <20240113131521.1051921-1-horatiu.vultur@microchip.com>
-	<20240113131521.1051921-3-horatiu.vultur@microchip.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.39; x86_64-redhat-linux-gnu)
+	bh=d32TZgD6bD8liwT7IY7mNxiXbX0Laivg+lFjBhi8Qqc=;
+	b=k0tP2Eol1fG3upred8TkBDln958GKTVyP7BnHlKvuT4vkHSSYnsA9D3ovZ2do2naHQ6stQ
+	b/AsPT55XHzSsUue88pB8LFF60UBaBDvFYYVTOKOnMJIooxdRBybLsaDcxEf0aecnJ4ogA
+	kk/Wg+SXlvNmitlCqTU+54/64B6Z7Cg=
+Date: Mon, 15 Jan 2024 18:25:12 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Subject: Re: [PATCH 1/1] virtio_net: Add timeout handler to avoid kernel hang
+To: Jason Wang <jasowang@redhat.com>, Zhu Yanjun <yanjun.zhu@intel.com>
+Cc: mst@redhat.com, xuanzhuo@linux.alibaba.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ virtualization@lists.linux.dev, netdev@vger.kernel.org
+References: <20240115012918.3081203-1-yanjun.zhu@intel.com>
+ <CACGkMEtVQEZUR2iD_Xs2zhPMspqJvYbMTfrD=gQv660_DVRJsg@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <CACGkMEtVQEZUR2iD_Xs2zhPMspqJvYbMTfrD=gQv660_DVRJsg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hello Horatiu,
 
-On Sat, 13 Jan 2024 14:15:21 +0100
-Horatiu Vultur <horatiu.vultur@microchip.com> wrote:
+在 2024/1/15 10:20, Jason Wang 写道:
+> On Mon, Jan 15, 2024 at 9:35 AM Zhu Yanjun <yanjun.zhu@intel.com> wrote:
+>> From: Zhu Yanjun <yanjun.zhu@linux.dev>
+>>
+>> Some devices emulate the virtio_net hardwares. When virtio_net
+>> driver sends commands to the emulated hardware, normally the
+>> hardware needs time to response. Sometimes the time is very
+>> long. Thus, the following will appear. Then the whole system
+>> will hang.
+>> The similar problems also occur in Intel NICs and Mellanox NICs.
+>> As such, the similar solution is borrowed from them. A timeout
+>> value is added and the timeout value as large as possible is set
+>> to ensure that the driver gets the maximum possible response from
+>> the hardware.
+>>
+>> "
+>> [  213.795860] watchdog: BUG: soft lockup - CPU#108 stuck for 26s! [(udev-worker):3157]
+>> [  213.796114] Modules linked in: virtio_net(+) net_failover failover qrtr rfkill sunrpc intel_rapl_msr intel_rapl_common intel_uncore_frequency intel_uncore_frequency_common intel_ifs i10nm_edac nfit libnvdimm x86_pkg_temp_thermal intel_powerclamp coretemp iTCO_wdt rapl intel_pmc_bxt dax_hmem iTCO_vendor_support vfat cxl_acpi intel_cstate pmt_telemetry pmt_class intel_sdsi joydev intel_uncore cxl_core fat pcspkr mei_me isst_if_mbox_pci isst_if_mmio idxd i2c_i801 isst_if_common mei intel_vsec idxd_bus i2c_smbus i2c_ismt ipmi_ssif acpi_ipmi ipmi_si ipmi_devintf ipmi_msghandler acpi_pad acpi_power_meter pfr_telemetry pfr_update fuse loop zram xfs crct10dif_pclmul crc32_pclmul crc32c_intel polyval_clmulni polyval_generic ghash_clmulni_intel sha512_ssse3 bnxt_en sha256_ssse3 sha1_ssse3 nvme ast nvme_core i2c_algo_bit wmi pinctrl_emmitsburg scsi_dh_rdac scsi_dh_emc scsi_dh_alua dm_multipath
+>> [  213.796194] irq event stamp: 67740
+>> [  213.796195] hardirqs last  enabled at (67739): [<ffffffff8c2015ca>] asm_sysvec_apic_timer_interrupt+0x1a/0x20
+>> [  213.796203] hardirqs last disabled at (67740): [<ffffffff8c14108e>] sysvec_apic_timer_interrupt+0xe/0x90
+>> [  213.796208] softirqs last  enabled at (67686): [<ffffffff8b12115e>] __irq_exit_rcu+0xbe/0xe0
+>> [  213.796214] softirqs last disabled at (67681): [<ffffffff8b12115e>] __irq_exit_rcu+0xbe/0xe0
+>> [  213.796217] CPU: 108 PID: 3157 Comm: (udev-worker) Kdump: loaded Not tainted 6.7.0+ #9
+>> [  213.796220] Hardware name: Intel Corporation M50FCP2SBSTD/M50FCP2SBSTD, BIOS SE5C741.86B.01.01.0001.2211140926 11/14/2022
+>> [  213.796221] RIP: 0010:virtqueue_get_buf_ctx_split+0x8d/0x110
+>> [  213.796228] Code: 89 df e8 26 fe ff ff 0f b7 43 50 83 c0 01 66 89 43 50 f6 43 78 01 75 12 80 7b 42 00 48 8b 4b 68 8b 53 58 74 0f 66 87 44 51 04 <48> 89 e8 5b 5d c3 cc cc cc cc 66 89 44 51 04 0f ae f0 48 89 e8 5b
+>> [  213.796230] RSP: 0018:ff4bbb362306f9b0 EFLAGS: 00000246
+>> [  213.796233] RAX: 0000000000000000 RBX: ff2f15095896f000 RCX: 0000000000000001
+>> [  213.796235] RDX: 0000000000000000 RSI: ff4bbb362306f9cc RDI: ff2f15095896f000
+>> [  213.796236] RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+>> [  213.796237] R10: 0000000000000003 R11: ff2f15095893cc40 R12: 0000000000000002
+>> [  213.796239] R13: 0000000000000004 R14: 0000000000000000 R15: ff2f1509534f3000
+>> [  213.796240] FS:  00007f775847d0c0(0000) GS:ff2f1528bac00000(0000) knlGS:0000000000000000
+>> [  213.796242] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>> [  213.796243] CR2: 0000557f987b6e70 CR3: 0000002098602006 CR4: 0000000000f71ef0
+>> [  213.796245] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>> [  213.796246] DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7: 0000000000000400
+>> [  213.796247] PKRU: 55555554
+>> [  213.796249] Call Trace:
+>> [  213.796250]  <IRQ>
+>> [  213.796252]  ? watchdog_timer_fn+0x1c0/0x220
+>> [  213.796258]  ? __pfx_watchdog_timer_fn+0x10/0x10
+>> [  213.796261]  ? __hrtimer_run_queues+0x1af/0x380
+>> [  213.796269]  ? hrtimer_interrupt+0xf8/0x230
+>> [  213.796274]  ? __sysvec_apic_timer_interrupt+0x64/0x1a0
+>> [  213.796279]  ? sysvec_apic_timer_interrupt+0x6d/0x90
+>> [  213.796282]  </IRQ>
+>> [  213.796284]  <TASK>
+>> [  213.796285]  ? asm_sysvec_apic_timer_interrupt+0x1a/0x20
+>> [  213.796293]  ? virtqueue_get_buf_ctx_split+0x8d/0x110
+>> [  213.796297]  virtnet_send_command+0x18a/0x1f0 [virtio_net]
+>> [  213.796310]  _virtnet_set_queues+0xc6/0x120 [virtio_net]
+>> [  213.796319]  virtnet_probe+0xa06/0xd50 [virtio_net]
+>> [  213.796328]  virtio_dev_probe+0x195/0x230
+>> [  213.796333]  really_probe+0x19f/0x400
+>> [  213.796338]  ? __pfx___driver_attach+0x10/0x10
+>> [  213.796340]  __driver_probe_device+0x78/0x160
+>> [  213.796343]  driver_probe_device+0x1f/0x90
+>> [  213.796346]  __driver_attach+0xd6/0x1d0
+>> [  213.796349]  bus_for_each_dev+0x8c/0xe0
+>> [  213.796355]  bus_add_driver+0x119/0x220
+>> [  213.796359]  driver_register+0x59/0x100
+>> [  213.796362]  ? __pfx_virtio_net_driver_init+0x10/0x10 [virtio_net]
+>> [  213.796369]  virtio_net_driver_init+0x8e/0xff0 [virtio_net]
+>> [  213.796375]  do_one_initcall+0x6f/0x380
+>> [  213.796384]  do_init_module+0x60/0x240
+>> [  213.796388]  init_module_from_file+0x86/0xc0
+>> [  213.796396]  idempotent_init_module+0x129/0x2c0
+>> [  213.796406]  __x64_sys_finit_module+0x5e/0xb0
+>> [  213.796409]  do_syscall_64+0x60/0xe0
+>> [  213.796415]  ? do_syscall_64+0x6f/0xe0
+>> [  213.796418]  ? lockdep_hardirqs_on_prepare+0xe4/0x1a0
+>> [  213.796424]  ? do_syscall_64+0x6f/0xe0
+>> [  213.796427]  ? do_syscall_64+0x6f/0xe0
+>> [  213.796431]  entry_SYSCALL_64_after_hwframe+0x6e/0x76
+>> [  213.796435] RIP: 0033:0x7f7758f279cd
+>> [  213.796465] Code: 5d c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 33 e4 0c 00 f7 d8 64 89 01 48
+>> [  213.796467] RSP: 002b:00007ffe2cad8738 EFLAGS: 00000246 ORIG_RAX: 0000000000000139
+>> [  213.796469] RAX: ffffffffffffffda RBX: 0000557f987a8180 RCX: 00007f7758f279cd
+>> [  213.796471] RDX: 0000000000000000 RSI: 00007f77593e5453 RDI: 000000000000000f
+>> [  213.796472] RBP: 00007f77593e5453 R08: 0000000000000000 R09: 00007ffe2cad8860
+>> [  213.796473] R10: 000000000000000f R11: 0000000000000246 R12: 0000000000020000
+>> [  213.796475] R13: 0000557f9879f8e0 R14: 0000000000000000 R15: 0000557f98783aa0
+>> [  213.796482]  </TASK>
+>> "
+>>
+>> Signed-off-by: Zhu Yanjun <yanjun.zhu@linux.dev>
+>> ---
+>>   drivers/net/virtio_net.c | 10 ++++++++--
+>>   1 file changed, 8 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+>> index 51b1868d2f22..28b7dd917a43 100644
+>> --- a/drivers/net/virtio_net.c
+>> +++ b/drivers/net/virtio_net.c
+>> @@ -2468,7 +2468,7 @@ static bool virtnet_send_command(struct virtnet_info *vi, u8 class, u8 cmd,
+>>   {
+>>          struct scatterlist *sgs[4], hdr, stat;
+>>          unsigned out_num = 0, tmp;
+>> -       int ret;
+>> +       int ret, timeout = 200;
+> Any reason we choose this value or how can we know it works for all
+> types of devices?
 
-> When setting or getting PHC time, the higher bits of the second time (>32
-> bits) they were ignored. Meaning that setting some time in the future like
-> year 2150, it was failing to set this.
-> 
-> The issue can be reproduced like this:
-> 
->  # phc_ctl /dev/ptp1 set 10000000000
->  phc_ctl[118.619]: set clock time to 4294967295.000000000 or Sun Feb  7 06:28:15 2106
-> 
->  # phc_ctl /dev/ptp1 get
->  phc_ctl[120.858]: clock time is 1.238620924 or Thu Jan  1 00:00:01 1970
-> 
-> Fixes: ece19502834d ("net: phy: micrel: 1588 support for LAN8814 phy")
-> Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+Sorry. Resend it again because it is rejected by netdev.
 
-This looks fine to me,
+As I mentioned in the commit log, the similar problem also occurs in 
+Intel NIC driver and Mellanox NIC driver.
 
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-Thanks,
+This commit is borrowed from the solution of Intel NIC driver. So the 
+value is also from Intel NIC driver solution.
 
-Maxime
+>
+> A more easy way is to use cond_resched() but it may have side effects
+> as well[1]. But it seems less intrusive anyhow than the proposal here?
+Thanks a lot for your suggestions. I have made tests with the commits in 
+the link 
+https://www.mail-archive.com/virtualization@lists.linux-foundation.org/msg60297.html.
 
+Because virtio_net driver spins waiting for the response of hardware, 
+virtio_net driver can not be unloaded and kernel hang still occurs when 
+running "ip link" or unloading virtio_net module.
+
+Zhu Yanjun
+>
+> Thanks
+>
+> [1] https://www.mail-archive.com/virtualization@lists.linux-foundation.org/msg60297.html
+>
+>>          /* Caller should know better */
+>>          BUG_ON(!virtio_has_feature(vi->vdev, VIRTIO_NET_F_CTRL_VQ));
+>> @@ -2502,8 +2502,14 @@ static bool virtnet_send_command(struct virtnet_info *vi, u8 class, u8 cmd,
+>>           * into the hypervisor, so the request should be handled immediately.
+>>           */
+>>          while (!virtqueue_get_buf(vi->cvq, &tmp) &&
+>> -              !virtqueue_is_broken(vi->cvq))
+>> +              !virtqueue_is_broken(vi->cvq)) {
+>> +               if (timeout)
+>> +                       timeout--;
+>> +               else
+>> +                       return false; /* long time no response */
+>> +
+>>                  cpu_relax();
+>> +       }
+>>
+>>          return vi->ctrl->status == VIRTIO_NET_OK;
+>>   }
+>> --
+>> 2.42.0
+>>
 
