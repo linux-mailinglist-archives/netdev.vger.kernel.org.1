@@ -1,118 +1,174 @@
-Return-Path: <netdev+bounces-63545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05EB782DCFF
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 17:08:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC74982DDD5
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 17:46:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8375E282CE3
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 16:08:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B8B11F2234F
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 16:46:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05331179A7;
-	Mon, 15 Jan 2024 16:07:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3A5617BC7;
+	Mon, 15 Jan 2024 16:46:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="0oDtFnne"
+	dkim=pass (2048-bit key) header.d=naccy.de header.i=@naccy.de header.b="bvCaCorh";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="qrYLs+lO"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from new1-smtp.messagingengine.com (new1-smtp.messagingengine.com [66.111.4.221])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D793F18E08
-	for <netdev@vger.kernel.org>; Mon, 15 Jan 2024 16:07:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ARkUFJSHHpgTPbgdcxb88NAqZDa/XREoLWqmWYp5MTM=; b=0oDtFnnetPFI3tMN61QoYObsm/
-	/peeQYyTUcLg3UVk7i0qBRmgCyP0cvxWwM7zC4LYxYdedFFE1b2nD9lkbrh9ZclZqv6OqYV9IyqVS
-	H3lK5kk76URAeTV3gzYuVav7NzcjHp3sVxaHCG6+6i0c6O7EPO2JUHVVL2ukdyvmpq8auqVVTPpim
-	3+ZqSvuXNM5Y/H7vKDELEsJnsTcwdO31bHZ0iO9ilTxlwqEDX0Yait4wZtxEaz5gCl1zxnYsGbqAq
-	l4YInpKFey7rtGC0Cqixvz070//bELxXo2BOkU4EGeIbxJQQ0JhVlNbzG1Yj6gaUf7OzhtQXkcd8a
-	e6s0CCcw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41372)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rPPUS-0002Xi-19;
-	Mon, 15 Jan 2024 16:07:08 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rPPUQ-00034V-Lt; Mon, 15 Jan 2024 16:07:06 +0000
-Date: Mon, 15 Jan 2024 16:07:06 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: sfp-bus: fix SFP mode detect from bitrate
-Message-ID: <ZaVYKgCPZaidGimU@shell.armlinux.org.uk>
-References: <E1rPMJW-001Ahf-L0@rmk-PC.armlinux.org.uk>
- <20240115165848.110ad8f9@device-28.home>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0F0517BC4
+	for <netdev@vger.kernel.org>; Mon, 15 Jan 2024 16:46:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=naccy.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=naccy.de
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+	by mailnew.nyi.internal (Postfix) with ESMTP id 76752580143;
+	Mon, 15 Jan 2024 11:46:12 -0500 (EST)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute3.internal (MEProxy); Mon, 15 Jan 2024 11:46:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=naccy.de; h=cc
+	:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm1; t=1705337172; x=1705340772; bh=Mk4lPUaXWzN5fqfpUMU+m
+	tKlNWiKjs7t8Qar7tTWT0c=; b=bvCaCorh0Ag62f+wPLIJmT9gafdumSMqkXfwH
+	freljHAP5v6bej7skvbjb45AAqrI9dD4yBYDklY4ryOQiI6+MsbdItBqTuRCYY/h
+	N0qIjNYxIsaWV7S+ANSv8FoPek3Y4Mt70h60DZwTV25vbR8tTLO5fzLBQDod5+6+
+	7QUpeKie6cYcxvByTD3jevokSEGRGbmeAuc1u1GDCuvOaHKuoTIu++ZwbmLtxqw5
+	Ub59tRMeWiRWYh3+CGb2xVLzaqqWRJbUzGbs5V2IOecwzgQpDmG+XThNlJGW2hgU
+	kP66FDxl1fGugFXRrPwW6RSnxxzCBqA/mRSfU5pUT9qUIIY6w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	i14194934.fm3; t=1705337172; x=1705340772; bh=Mk4lPUaXWzN5fqfpUM
+	U+mtKlNWiKjs7t8Qar7tTWT0c=; b=qrYLs+lO6fNCBsTZeYDL3+YCTk6fBschNp
+	bbXNOv2DxIicxgk/A1SFN9RbwW9FPABKtzUrlVbfIdNMkIV23zokfPUXmrLeANhz
+	Wvw8ktHHCfadnQ5CgPjIno8QHelY+RfYpKGnOhmL5pY64S1a1IhbV2TdMmZLE9rx
+	nsn2VY7RO3RVjgHqb8UBtT8fhBUkZoKNv2mVuOlK0gRIAyvbktgbpXbW9bMz9Z8e
+	i22Kk0spuIKCjAavXhka75gRnOc14Lo6qbAcWQRgdOa6TouqsFT557zsicCjbM6Y
+	ujK160vjBBNiUhn+0aid11bKySBcaeNBkvW0ym71w+1uAeZOgIEg==
+X-ME-Sender: <xms:VGGlZS7IFUyElgcpwBEj3ugCR8u7C-EWFxBlyZUbIYgU30x8i5OkOg>
+    <xme:VGGlZb6rfa2eEFEA-27EuGrafpHCoDQnbqjiLdwXl5nOfRxANWcgIKSWncppoCtmd
+    EKn6wuQT7F-WZJ9qcg>
+X-ME-Received: <xmr:VGGlZRcsV9WroVkzOtF8arjTZmqxSck5MnIyA5zml970mXRhdYwsTDJJoaPhqyHouyewwiALsfI6-hvM4K5EWBLRiiTNtGUCURb6-6iqlg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdejuddgleefucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomhepsfhuvghnthhi
+    nhcuffgvshhlrghnuggvshcuoehquggvsehnrggttgihrdguvgeqnecuggftrfgrthhtvg
+    hrnhephfffieeivdeiheegleejtdeuieejlefgffejfeehhefhheffieefgeduhfehiefh
+    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepqhguvg
+    esnhgrtggthidruggv
+X-ME-Proxy: <xmx:VGGlZfLb0QOFRmN9Dr3mbHBLrv_-DzJtXptihkxbG85nEO5lPfW1DA>
+    <xmx:VGGlZWLWUQfdJtCZZiXdiORL-WQtSxyBaxJotBLlCD_hYxbAkQ5o1Q>
+    <xmx:VGGlZQzwssP-GbrYySWHZRQnJ69yCMfMsJX8H9VnrfmTobvRlqQXBg>
+    <xmx:VGGlZS3LjGj-gvt-mlWCbaGSgVWHvdEQ406jwRY5D6RmizcfH5hLOQ>
+Feedback-ID: i14194934:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 15 Jan 2024 11:46:11 -0500 (EST)
+From: Quentin Deslandes <qde@naccy.de>
+To: netdev@vger.kernel.org
+Cc: David Ahern <dsahern@gmail.com>,
+	Martin KaFai Lau <martin.lau@kernel.org>,
+	Quentin Deslandes <qde@naccy.de>,
+	kernel-team@meta.com
+Subject: [RFC iproute2 v5 0/3] ss: pretty-printing BPF socket-local storage
+Date: Mon, 15 Jan 2024 17:46:02 +0100
+Message-ID: <20240115164605.377690-1-qde@naccy.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240115165848.110ad8f9@device-28.home>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jan 15, 2024 at 04:58:48PM +0100, Maxime Chevallier wrote:
-> Hello Russell,
-> 
-> On Mon, 15 Jan 2024 12:43:38 +0000
-> "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk> wrote:
-> 
-> > The referenced commit moved the setting of the Autoneg and pause bits
-> > early in sfp_parse_support(). However, we check whether the modes are
-> > empty before using the bitrate to set some modes. Setting these bits
-> > so early causes that test to always be false, preventing this working,
-> > and thus some modules that used to work no longer do.
-> > 
-> > Move them just before the call to the quirk.
-> > 
-> > Fixes: 8110633db49d ("net: sfp-bus: allow SFP quirks to override Autoneg and pause bits")
-> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> 
-> I don't have modules to trigger the bug, however the fix looks OK to me.
-> 
-> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+BPF allows programs to store socket-specific data using
+BPF_MAP_TYPE_SK_STORAGE maps. The data is attached to the socket itself,
+and Martin added INET_DIAG_REQ_SK_BPF_STORAGES, so it can be fetched
+using the INET_DIAG mechanism.
 
-In case there's interest:
+Currently, ss doesn't request the socket-local data, this patch aims to
+fix this.
 
-        Identifier                                : 0x03 (SFP)
-        Extended identifier                       : 0x04 (GBIC/SFP defined by 2-
-wire interface ID)
-        Connector                                 : 0x07 (LC)
-        Transceiver codes                         : 0x00 0x00 0x00 0x00 0x20 0x1
-0 0x01 0x00 0x00
-        Transceiver type                          : FC: intermediate distance (I
-)
-        Transceiver type                          : FC: Longwave laser (LL)
-        Transceiver type                          : FC: Single Mode (SM)
-        Encoding                                  : 0x01 (8B/10B)
-        BR, Nominal                               : 1300MBd
-...
-        Laser wavelength                          : 1550nm
-        Vendor name                               : FiberStore
-        Vendor OUI                                : 00:00:00
-        Vendor PN                                 : SFP-GE-BX
-        Vendor rev                                : A0
+The first patch requests the socket-local data for the requested map ID
+(--bpf-map-id=) or all the maps (--bpf-maps). It then prints the map_id
+in a dedicated column.
 
-which is the module I use for my internet connectivity between the
-critical internal systems and the rest of the planet... so the regression
-got noticed when I upgraded the kernel on Friday!
+Patch #2 uses libbpf and BTF to pretty print the map's content, like
+`bpftool map dump` would do.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Patch #3 updates ss' man page to explain new options.
+
+While I think it makes sense for ss to provide the socket-local storage
+content for the sockets, it's difficult to conciliate the column-based
+output of ss and having readable socket-local data. Hence, the
+socket-local data is printed in a readable fashion over multiple lines
+under its socket statistics, independently of the column-based approach.
+
+Here is an example of ss' output with --bpf-maps:
+[...]
+ESTAB                  340116             0 [...]
+    map_id: 114 [
+        (struct my_sk_storage){
+            .field_hh = (char)3,
+            (union){
+                .a = (int)17,
+                .b = (int)17,
+            },
+        }
+    ]
+
+Changed this series to an RFC as the merging window for net-next is
+closed.
+
+Changes from v4:
+* Fix return code for 2 calls.
+* Fix issue when inet_show_netlink() retries a request.
+* BPF dump object is created in bpf_map_opts_load_info().
+Changes from v3:
+* Minor refactoring to reduce number of HAVE_LIBBF usage.
+* Update ss' man page.
+* btf_dump structure created to print the socket-local data is cached
+  in bpf_map_opts. Creation of the btf_dump structure is performed if
+  needed, before printing the data.
+* If a map can't be pretty-printed, print its ID and a message instead
+  of skipping it.
+* If show_all=true, send an empty message to the kernel to retrieve all
+  the maps (as Martin suggested).
+Changes from v2:
+* bpf_map_opts_is_enabled is not inline anymore.
+* Add more #ifdef HAVE_LIBBPF to prevent compilation error if
+  libbpf support is disabled.
+* Fix erroneous usage of args instead of _args in vout().
+* Add missing btf__free() and close(fd).
+Changes from v1:
+* Remove the first patch from the series (fix) and submit it separately.
+* Remove double allocation of struct rtattr.
+* Close BPF map FDs on exit.
+* If bpf_map_get_fd_by_id() fails with ENOENT, print an error message
+  and continue to the next map ID.
+* Fix typo in new command line option documentation.
+* Only use bpf_map_info.btf_value_type_id and ignore
+  bpf_map_info.btf_vmlinux_value_type_id (unused for socket-local storage).
+* Use btf_dump__dump_type_data() instead of manually using BTF to
+  pretty-print socket-local storage data. This change alone divides the size
+  of the patch series by 2.
+
+Quentin Deslandes (3):
+  ss: add support for BPF socket-local storage
+  ss: pretty-print BPF socket-local storage
+  ss: update man page to document --bpf-maps and --bpf-map-id=
+
+ man/man8/ss.8 |   6 +
+ misc/ss.c     | 392 ++++++++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 389 insertions(+), 9 deletions(-)
+
+--
+2.43.0
+
 
