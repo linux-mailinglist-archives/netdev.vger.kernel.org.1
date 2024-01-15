@@ -1,107 +1,125 @@
-Return-Path: <netdev+bounces-63477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBF9382D4A7
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 08:35:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99B5E82D4DE
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 09:07:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 395F5B20DF0
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 07:35:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 333432819FE
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 08:07:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C92FA566E;
-	Mon, 15 Jan 2024 07:33:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 826C3441B;
+	Mon, 15 Jan 2024 08:07:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="GtoD99W/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB141D26B;
-	Mon, 15 Jan 2024 07:33:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 1ebb06023fd549a6846b4547b4fa3ddd-20240115
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.35,REQID:59943a68-9114-4ba3-a1e3-8f89d6ee0ae5,IP:10,
-	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-	ON:release,TS:-5
-X-CID-INFO: VERSION:1.1.35,REQID:59943a68-9114-4ba3-a1e3-8f89d6ee0ae5,IP:10,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:-5
-X-CID-META: VersionHash:5d391d7,CLOUDID:d046db82-8d4f-477b-89d2-1e3bdbef96d1,B
-	ulkID:240112233230SFMXI8SS,BulkQuantity:18,Recheck:0,SF:64|66|24|17|19|44|
-	102,TC:nil,Content:0,EDM:-3,IP:-2,URL:11|1,File:nil,Bulk:40,QS:nil,BEC:nil
-	,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,TF_CID_SPAM_OBB,
-	TF_CID_SPAM_ULN,TF_CID_SPAM_SNR
-X-UUID: 1ebb06023fd549a6846b4547b4fa3ddd-20240115
-Received: from mail.kylinos.cn [(39.156.73.10)] by mailgw
-	(envelope-from <chentao@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 294264333; Mon, 15 Jan 2024 15:28:07 +0800
-Received: from mail.kylinos.cn (localhost [127.0.0.1])
-	by mail.kylinos.cn (NSMail) with SMTP id B15EAE000EB9;
-	Mon, 15 Jan 2024 15:28:05 +0800 (CST)
-X-ns-mid: postfix-65A4DE85-59623665
-Received: from [172.20.15.234] (unknown [172.20.15.234])
-	by mail.kylinos.cn (NSMail) with ESMTPA id ACB00E000EB9;
-	Mon, 15 Jan 2024 15:28:03 +0800 (CST)
-Message-ID: <4127e24d-e78c-40da-80b7-96d3e789c489@kylinos.cn>
-Date: Mon, 15 Jan 2024 15:28:03 +0800
+Received: from m12.mail.163.com (m12.mail.163.com [220.181.12.196])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25DEF523E;
+	Mon, 15 Jan 2024 08:07:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=6x0i2
+	OanomF9vsvQJWNEaBqZTF2xF6GLaqqodnh9+BU=; b=GtoD99W/3rN2eXK42ZagL
+	HtYOWKso+r4YIc5YiGO2k4qwHnDTjNXWtySWUEAKTTsqiI+FTf7NkrKYAKx5YxH/
+	A4V/ArYXqlm2JoBqgUT79/RLwoiKIlViicD/QgMvpGhPvTOFu2C6AtOGEvig/pRF
+	HeWnt3GAvyF1Go6bnj8Q5A=
+Received: from localhost.localdomain (unknown [111.202.47.2])
+	by zwqz-smtp-mta-g3-3 (Coremail) with SMTP id _____wDXPzkE5KRl9ludBA--.33852S2;
+	Mon, 15 Jan 2024 15:51:32 +0800 (CST)
+From: wangkeqi <wangkeqi_chris@163.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	fengwei.yin@intel.com,
+	wangkeqi <wangkeqiwang@didiglobal.com>
+Subject: [PATCH] connector: Change the judgment conditions for clearing proc_event_num_listeners
+Date: Mon, 15 Jan 2024 15:51:20 +0800
+Message-Id: <20240115075120.186143-1-wangkeqi_chris@163.com>
+X-Mailer: git-send-email 2.27.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: phy: Fix possible NULL pointer dereference
- issues caused by phy_attached_info_irq
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- f.fainelli@gmail.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240112095724.154197-1-chentao@kylinos.cn>
- <627c9558-04df-43a6-b6e4-a13f24a8bc1d@lunn.ch>
- <b71c5e28-2dbe-48c8-ab92-e1dad9d6f2e4@kylinos.cn>
- <bd80fc69-d334-4b69-8ba3-3b2b86e1fd84@lunn.ch>
-From: Kunwu Chan <chentao@kylinos.cn>
-In-Reply-To: <bd80fc69-d334-4b69-8ba3-3b2b86e1fd84@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wDXPzkE5KRl9ludBA--.33852S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7KF13tFW3Cw4kJrW5Ar4fXwb_yoW5JrWDpF
+	WqvFZYvF4kGF1fuw1DJ3W29F13Z34kWF1UCrWxK34DurZxGrykAF48tFs2vF9xA3sYkr12
+	qwnFgFW3uFs8C3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jYeHDUUUUU=
+X-CM-SenderInfo: 5zdqwy5htlsupkul2qqrwthudrp/1tbiQAdm3GVOBCkrCQAAsZ
 
-On 2024/1/15 11:45, Andrew Lunn wrote:
->>> Here, i would just skip the print and continue with the reset of the
->>> function. The print is just useful information, its not a big problem
->>> if its not printed. However, if this function does not complete, the
->>> network interface is likely to be dead.
->> Thanks for the reminder.
->> The second part doesn't look so perfect, can we just print an empty string
->> when the irq_str is empty?
->>
->> --- a/drivers/net/phy/phylink.c
->> +++ b/drivers/net/phy/phylink.c
->> @@ -1886,7 +1886,7 @@ static int phylink_bringup_phy(struct phylink *pl,
->> struct phy_device *phy,
->>          irq_str = phy_attached_info_irq(phy);
->>          phylink_info(pl,
->>                       "PHY [%s] driver [%s] (irq=%s)\n",
->> -                    dev_name(&phy->mdio.dev), phy->drv->name, irq_str);
->> +                    dev_name(&phy->mdio.dev), phy->drv->name, irq_str ?
->> irq_str : "");
->>          kfree(irq_str);
-> 
-> That is O.K, or skip the whole phylink_info().
-> 
->       Andrew
+From: wangkeqi <wangkeqiwang@didiglobal.com>
 
-Thanks, I will update it in v2 patch. Personal view, print a msg is good 
-for debug.
+It is inaccurate to judge whether proc_event_num_listeners is
+cleared by cn_netlink_send_mult returning -ESRCH.
+In the case of stress-ng netlink-proc, -ESRCH will always be returned,
+because netlink_broadcast_filtered will return -ESRCH,
+which may cause stress-ng netlink-proc performance degradation.
+Therefore, the judgment condition is modified to whether
+there is a listener.
+
+Signed-off-by: wangkeqi <wangkeqiwang@didiglobal.com>
+---
+ drivers/connector/cn_proc.c   | 6 ++++--
+ drivers/connector/connector.c | 6 ++++++
+ include/linux/connector.h     | 1 +
+ 3 files changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/connector/cn_proc.c b/drivers/connector/cn_proc.c
+index 3d5e6d705..b09f74ed3 100644
+--- a/drivers/connector/cn_proc.c
++++ b/drivers/connector/cn_proc.c
+@@ -108,8 +108,10 @@ static inline void send_msg(struct cn_msg *msg)
+ 		filter_data[1] = 0;
+ 	}
+ 
+-	if (cn_netlink_send_mult(msg, msg->len, 0, CN_IDX_PROC, GFP_NOWAIT,
+-			     cn_filter, (void *)filter_data) == -ESRCH)
++	if (netlink_has_listeners(get_cdev_nls(), CN_IDX_PROC))
++		cn_netlink_send_mult(msg, msg->len, 0, CN_IDX_PROC, GFP_NOWAIT,
++			     cn_filter, (void *)filter_data);
++	else
+ 		atomic_set(&proc_event_num_listeners, 0);
+ 
+ 	local_unlock(&local_event.lock);
+diff --git a/drivers/connector/connector.c b/drivers/connector/connector.c
+index 7f7b94f61..1b2cd410e 100644
+--- a/drivers/connector/connector.c
++++ b/drivers/connector/connector.c
+@@ -129,6 +129,12 @@ int cn_netlink_send(struct cn_msg *msg, u32 portid, u32 __group,
+ }
+ EXPORT_SYMBOL_GPL(cn_netlink_send);
+ 
++struct sock *get_cdev_nls(void)
++{
++	return cdev.nls;
++}
++EXPORT_SYMBOL_GPL(get_cdev_nls);
++
+ /*
+  * Callback helper - queues work and setup destructor for given data.
+  */
+diff --git a/include/linux/connector.h b/include/linux/connector.h
+index cec2d99ae..255466aea 100644
+--- a/include/linux/connector.h
++++ b/include/linux/connector.h
+@@ -127,6 +127,7 @@ int cn_netlink_send_mult(struct cn_msg *msg, u16 len, u32 portid,
+  */
+ int cn_netlink_send(struct cn_msg *msg, u32 portid, u32 group, gfp_t gfp_mask);
+ 
++struct sock *get_cdev_nls(void);
+ int cn_queue_add_callback(struct cn_queue_dev *dev, const char *name,
+ 			  const struct cb_id *id,
+ 			  void (*callback)(struct cn_msg *, struct netlink_skb_parms *));
 -- 
-Thanks,
-   Kunwu
+2.27.0
 
 
