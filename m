@@ -1,42 +1,45 @@
-Return-Path: <netdev+bounces-63494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FD3F82D6C0
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 11:07:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 851EE82D74E
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 11:26:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E316B2821AE
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 10:07:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 97E931C21413
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 10:26:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37408F9D7;
-	Mon, 15 Jan 2024 10:06:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BA38101D0;
+	Mon, 15 Jan 2024 10:26:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="RfikiN2L"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Y7q5/Ttb"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from mslow1.mail.gandi.net (mslow1.mail.gandi.net [217.70.178.240])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 976DE2C694;
-	Mon, 15 Jan 2024 10:06:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF703249E2;
+	Mon, 15 Jan 2024 10:26:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 84DC72000B;
-	Mon, 15 Jan 2024 10:06:36 +0000 (UTC)
+Received: from relay3-d.mail.gandi.net (unknown [IPv6:2001:4b98:dc4:8::223])
+	by mslow1.mail.gandi.net (Postfix) with ESMTP id D3ACFC30D0;
+	Mon, 15 Jan 2024 10:23:05 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 6EC9C60008;
+	Mon, 15 Jan 2024 10:22:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1705313197;
+	t=1705314177;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=2sURSIiRwE+VMw4pqfsGC2UVhFnlMv9fsKlnWFF3DNM=;
-	b=RfikiN2LGt9usO6Kr2immj7tGr4jK+B73EUyXm5DpAJY2tcHu0kTW6gdS3NKOXOnAYahTN
-	jxcMl0kTA7QOAKNYHdoL8Rn+xAROzgs7NueK6Cvk/ur0dPi0PtVYPBo4x9uyjGawo+/sS8
-	FuL0K/EDJzRjU8g3FnxzhjdEYPFRtKBHsiorAFrybGqWsXTsDi4HLwXUt0FnUDpK8fA65C
-	O/Ofp1bCZtQEXgOAgIop0bEr0BAsAiFeyMDtpcAMsYj2+L44yeTmlzsUSzzR16i5vLjDhM
-	bKuYavKnHHtIXCp1AzmNNR/1wdzI4YVxfMjo2PsfHxGHKhRIR+o+AfHE6qkG7A==
-Date: Mon, 15 Jan 2024 11:06:35 +0100
+	bh=37RG/l7y/QlP+BRyRVRXMag0rOrfgpLAB0aLP6thvQk=;
+	b=Y7q5/Ttbht1UxhlrwLk9i5ViBEAmqgX9NsxIPM1f1R4KPeIiUMCuApH9kQZdBzRc8AKABL
+	ixtk6QTf6z3hDrXdUkUTw2Wi0cO1F4OPUOvRlDeCRAWvmHeFpcoHaB/Khk9IQ8VOhHpeCD
+	WeL/dMxM48zTK6LJZ3/L/sF6nrMNg1BFZKIGZ34a4gKaPtwRz+bnnIO5DUcKA7RNGOZGwQ
+	TcKRhPklqQaCLhLJ4GwAl7z7Ba3h+Zov6BFUBACQeWql3FY7OWE7HjFkbgPj13jz8uSmkw
+	3jp2wn1rphp8G0uKD/tg209RI7UHgujQ2Ofueo+lN7G3ZVDIq5v606Di4gaTWQ==
+Date: Mon, 15 Jan 2024 11:22:55 +0100
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: Horatiu Vultur <horatiu.vultur@microchip.com>
 Cc: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
@@ -44,11 +47,11 @@ Cc: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
  <pabeni@redhat.com>, <richardcochran@gmail.com>,
  <Divya.Koppera@microchip.com>, <netdev@vger.kernel.org>,
  <linux-kernel@vger.kernel.org>, <UNGLinuxDriver@microchip.com>
-Subject: Re: [PATCH net 1/2] net: micrel: Fix PTP frame parsing for lan8814
-Message-ID: <20240115110635.60b1884c@device-28.home>
-In-Reply-To: <20240113131521.1051921-2-horatiu.vultur@microchip.com>
+Subject: Re: [PATCH net 2/2] net: micrel: Fix set/get PHC time for lan8814
+Message-ID: <20240115112255.53d5bb85@device-28.home>
+In-Reply-To: <20240113131521.1051921-3-horatiu.vultur@microchip.com>
 References: <20240113131521.1051921-1-horatiu.vultur@microchip.com>
-	<20240113131521.1051921-2-horatiu.vultur@microchip.com>
+	<20240113131521.1051921-3-horatiu.vultur@microchip.com>
 Organization: Bootlin
 X-Mailer: Claws Mail 4.2.0 (GTK 3.24.39; x86_64-redhat-linux-gnu)
 Precedence: bulk
@@ -63,62 +66,30 @@ X-GND-Sasl: maxime.chevallier@bootlin.com
 
 Hello Horatiu,
 
-On Sat, 13 Jan 2024 14:15:20 +0100
+On Sat, 13 Jan 2024 14:15:21 +0100
 Horatiu Vultur <horatiu.vultur@microchip.com> wrote:
 
-> The HW has the capability to check each frame if it is a PTP frame,
-> which domain it is, which ptp frame type it is, different ip address in
-> the frame. And if one of these checks fail then the frame is not
-> timestamp. Most of these checks were disabled except checking the field
-> minorVersionPTP inside the PTP header. Meaning that once a partner sends
-> a frame compliant to 8021AS which has minorVersionPTP set to 1, then the
-> frame was not timestamp because the HW expected by default a value of 0
-> in minorVersionPTP. This is exactly the same issue as on lan8841.
-> Fix this issue by removing this check so the userspace can decide on this.
+> When setting or getting PHC time, the higher bits of the second time (>32
+> bits) they were ignored. Meaning that setting some time in the future like
+> year 2150, it was failing to set this.
+> 
+> The issue can be reproduced like this:
+> 
+>  # phc_ctl /dev/ptp1 set 10000000000
+>  phc_ctl[118.619]: set clock time to 4294967295.000000000 or Sun Feb  7 06:28:15 2106
+> 
+>  # phc_ctl /dev/ptp1 get
+>  phc_ctl[120.858]: clock time is 1.238620924 or Thu Jan  1 00:00:01 1970
 > 
 > Fixes: ece19502834d ("net: phy: micrel: 1588 support for LAN8814 phy")
 > Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
-> ---
->  drivers/net/phy/micrel.c | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-> index bf4053431dcb3..1752eaeadc42e 100644
-> --- a/drivers/net/phy/micrel.c
-> +++ b/drivers/net/phy/micrel.c
-> @@ -120,6 +120,9 @@
->   */
->  #define LAN8814_1PPM_FORMAT			17179
->  
-> +#define PTP_RX_VERSION				0x0248
-> +#define PTP_TX_VERSION				0x0288
-> +
->  #define PTP_RX_MOD				0x024F
->  #define PTP_RX_MOD_BAD_UDPV4_CHKSUM_FORCE_FCS_DIS_ BIT(3)
->  #define PTP_RX_TIMESTAMP_EN			0x024D
-> @@ -3150,6 +3153,10 @@ static void lan8814_ptp_init(struct phy_device *phydev)
->  	lanphy_write_page_reg(phydev, 5, PTP_TX_PARSE_IP_ADDR_EN, 0);
->  	lanphy_write_page_reg(phydev, 5, PTP_RX_PARSE_IP_ADDR_EN, 0);
->  
-> +	/* Disable checking for minorVersionPTP field */
-> +	lanphy_write_page_reg(phydev, 5, PTP_RX_VERSION, 0xff00);
-> +	lanphy_write_page_reg(phydev, 5, PTP_TX_VERSION, 0xff00);
 
-Small nit: This looks a bit like magic values, from the datasheet I
-understand the upper byte is the max supported version and the lower
-byte is the min supported version, maybe this could be wrapped in
-macros ?
-
-> +
->  	skb_queue_head_init(&ptp_priv->tx_queue);
->  	skb_queue_head_init(&ptp_priv->rx_queue);
->  	INIT_LIST_HEAD(&ptp_priv->rx_ts_list);
-
-Besides that,
+This looks fine to me,
 
 Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
 Thanks,
 
 Maxime
+
 
