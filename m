@@ -1,177 +1,175 @@
-Return-Path: <netdev+bounces-63533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94B2982DA62
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 14:43:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B340E82DA5D
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 14:42:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CCDE9B21AD1
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 13:43:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DE711F221AA
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 13:42:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 250F117586;
-	Mon, 15 Jan 2024 13:42:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D65F5171BF;
+	Mon, 15 Jan 2024 13:42:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pcH3yYh8"
 X-Original-To: netdev@vger.kernel.org
-Received: from wp716.webpack.hosteurope.de (wp716.webpack.hosteurope.de [80.237.130.238])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1F7F1757D;
-	Mon, 15 Jan 2024 13:42:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=alumni.tu-berlin.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=alumni.tu-berlin.de
-Received: from dynamic-2a01-0c23-606a-b500-b981-1935-c9f7-1531.c23.pool.telefonica.de ([2a01:c23:606a:b500:b981:1935:c9f7:1531] helo=jt.fritz.box); authenticated
-	by wp716.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	id 1rPNEg-0006AL-4K; Mon, 15 Jan 2024 14:42:42 +0100
-From: =?UTF-8?q?J=C3=B6rn-Thorben=20Hinz?= <j-t.hinz@alumni.tu-berlin.de>
-To: bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Cc: =?UTF-8?q?J=C3=B6rn-Thorben=20Hinz?= <j-t.hinz@alumni.tu-berlin.de>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Deepa Dinamani <deepa.kernel@gmail.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Subject: [PATCH bpf-next] bpf: Allow setting SO_TIMESTAMPING* with bpf_setsockopt()
-Date: Mon, 15 Jan 2024 14:41:10 +0100
-Message-Id: <20240115134110.11624-1-j-t.hinz@alumni.tu-berlin.de>
-X-Mailer: git-send-email 2.39.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B081718625;
+	Mon, 15 Jan 2024 13:42:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83E9FC433F1;
+	Mon, 15 Jan 2024 13:42:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705326164;
+	bh=B6AZ1EUyCAneRia2lXu32aM3w0CF1GNXsC7SMPqT/Fc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pcH3yYh8sqk+63egc0J/m2eQ915+IQPVC487lb7VKPtvGIxKGSO8O5kPFIiZMJb5O
+	 EVWNYctiCAnLx+kgkDyCZYrA95D3/XX5OquSgva/Nt3MyyUfEnj3z5+fZkJCQkJ7Y4
+	 JB9fnXL6fuLPMHvv80+2kfGXLjlXls3EgtZ5fq6nQEHS8lKwpQJ3PdsrFQjvaZT053
+	 9MGmV41J9i/ATJAQ/aQHoRx0qgWzVvQJUw8rFN5rfAuvaXyw5K30kTKQxJTQOmnBID
+	 zguURX04XKKI1vVYglaeCc4XSM6iJw2efZ1HTt+SlCeSMhWWqLGlr+JL9l2YWX/+4A
+	 kM+iBvi6fFBzQ==
+Date: Mon, 15 Jan 2024 13:42:38 +0000
+From: Simon Horman <horms@kernel.org>
+To: Qiang Ma <maqianga@uniontech.com>
+Cc: alexandre.torgue@foss.st.com, joabreu@synopsys.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	mcoquelin.stm32@gmail.com, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Florian Fainelli <f.fainelli@gmail.com>
+Subject: Re: [PATCH] net: stmmac: ethtool: Fixed calltrace caused by
+ unbalanced disable_irq_wake calls
+Message-ID: <20240115134238.GA430968@kernel.org>
+References: <20240112021249.24598-1-maqianga@uniontech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;j-t.hinz@alumni.tu-berlin.de;1705326171;87aeb70d;
-X-HE-SMSGID: 1rPNEg-0006AL-4K
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240112021249.24598-1-maqianga@uniontech.com>
 
-A BPF application, e.g., a TCP congestion control, might benefit from or
-even require precise (=hardware) packet timestamps. These timestamps are
-already available through __sk_buff.hwtstamp and
-bpf_sock_ops.skb_hwtstamp, but could not be requested: BPF programs were
-not allowed to set SO_TIMESTAMPING* on sockets.
++ Florian Fainelli <f.fainelli@gmail.com>
 
-Enable BPF programs to actively request the generation of timestamps
-from a stream socket. The also required ioctl(SIOCSHWTSTAMP) on the
-network device must still be done separately, in user space.
+On Fri, Jan 12, 2024 at 10:12:49AM +0800, Qiang Ma wrote:
+> We found the following dmesg calltrace when testing the GMAC NIC notebook:
+> 
+> [9.448656] ------------[ cut here ]------------
+> [9.448658] Unbalanced IRQ 43 wake disable
+> [9.448673] WARNING: CPU: 3 PID: 1083 at kernel/irq/manage.c:688 irq_set_irq_wake+0xe0/0x128
+> [9.448717] CPU: 3 PID: 1083 Comm: ethtool Tainted: G           O      4.19 #1
+> [9.448773]         ...
+> [9.448774] Call Trace:
+> [9.448781] [<9000000000209b5c>] show_stack+0x34/0x140
+> [9.448788] [<9000000000d52700>] dump_stack+0x98/0xd0
+> [9.448794] [<9000000000228610>] __warn+0xa8/0x120
+> [9.448797] [<9000000000d2fb60>] report_bug+0x98/0x130
+> [9.448800] [<900000000020a418>] do_bp+0x248/0x2f0
+> [9.448805] [<90000000002035f4>] handle_bp_int+0x4c/0x78
+> [9.448808] [<900000000029ea40>] irq_set_irq_wake+0xe0/0x128
+> [9.448813] [<9000000000a96a7c>] stmmac_set_wol+0x134/0x150
+> [9.448819] [<9000000000be6ed0>] dev_ethtool+0x1368/0x2440
+> [9.448824] [<9000000000c08350>] dev_ioctl+0x1f8/0x3e0
+> [9.448827] [<9000000000bb2a34>] sock_ioctl+0x2a4/0x450
+> [9.448832] [<900000000046f044>] do_vfs_ioctl+0xa4/0x738
+> [9.448834] [<900000000046f778>] ksys_ioctl+0xa0/0xe8
+> [9.448837] [<900000000046f7d8>] sys_ioctl+0x18/0x28
+> [9.448840] [<9000000000211ab4>] syscall_common+0x20/0x34
+> [9.448842] ---[ end trace 40c18d9aec863c3e ]---
+> 
+> Multiple disable_irq_wake() calls will keep decreasing the IRQ
+> wake_depth, When wake_depth is 0, calling disable_irq_wake() again,
+> will report the above calltrace.
+> 
+> Due to the need to appear in pairs, we cannot call disable_irq_wake()
+> without calling enable_irq_wake(). Fix this by making sure there are
+> no unbalanced disable_irq_wake() calls.
 
-This patch had previously been submitted in a two-part series (first
-link below). The second patch has been independently applied in commit
-7f6ca95d16b9 ("net: Implement missing getsockopt(SO_TIMESTAMPING_NEW)")
-(second link below).
 
-On the earlier submission, there was the open question whether to only
-allow, thus enforce, SO_TIMESTAMPING_NEW in this patch:
+Hi Qiang Ma,
 
-For a BPF program, this won't make a difference: A timestamp, when
-accessed through the fields mentioned above, is directly read from
-skb_shared_info.hwtstamps, independent of the places where NEW/OLD is
-relevant. See bpf_convert_ctx_access() besides others.
+This seems to be a fix, so I think it should be targeted at net:
 
-I am unsure, though, when it comes to the interconnection of user space
-and BPF "space", when both are interested in the timestamps. I think it
-would cause an unsolvable conflict when user space is bound to use
-SO_TIMESTAMPING_OLD with a BPF program only allowed to set
-SO_TIMESTAMPING_NEW *on the same socket*? Please correct me if I'm
-mistaken.
+	Subject: [PATCH net] ...
 
-Link: https://lore.kernel.org/lkml/20230703175048.151683-1-jthinz@mailbox.tu-berlin.de/
-Link: https://lore.kernel.org/all/20231221231901.67003-1-jthinz@mailbox.tu-berlin.de/
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: Deepa Dinamani <deepa.kernel@gmail.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Signed-off-by: Jörn-Thorben Hinz <j-t.hinz@alumni.tu-berlin.de>
----
- include/uapi/linux/bpf.h                            | 3 ++-
- net/core/filter.c                                   | 2 ++
- tools/include/uapi/linux/bpf.h                      | 3 ++-
- tools/testing/selftests/bpf/progs/bpf_tracing_net.h | 2 ++
- tools/testing/selftests/bpf/progs/setget_sockopt.c  | 4 ++++
- 5 files changed, 12 insertions(+), 2 deletions(-)
+And have a fixes tag, perhaps:
 
-diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-index 754e68ca8744..8825d0648efe 100644
---- a/include/uapi/linux/bpf.h
-+++ b/include/uapi/linux/bpf.h
-@@ -2734,7 +2734,8 @@ union bpf_attr {
-  * 		  **SO_RCVBUF**, **SO_SNDBUF**, **SO_MAX_PACING_RATE**,
-  * 		  **SO_PRIORITY**, **SO_RCVLOWAT**, **SO_MARK**,
-  * 		  **SO_BINDTODEVICE**, **SO_KEEPALIVE**, **SO_REUSEADDR**,
-- * 		  **SO_REUSEPORT**, **SO_BINDTOIFINDEX**, **SO_TXREHASH**.
-+ * 		  **SO_REUSEPORT**, **SO_BINDTOIFINDEX**, **SO_TXREHASH**,
-+ * 		  **SO_TIMESTAMPING_NEW**, **SO_TIMESTAMPING_OLD**.
-  * 		* **IPPROTO_TCP**, which supports the following *optname*\ s:
-  * 		  **TCP_CONGESTION**, **TCP_BPF_IW**,
-  * 		  **TCP_BPF_SNDCWND_CLAMP**, **TCP_SAVE_SYN**,
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 8c9f67c81e22..4f5280874fd8 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -5144,6 +5144,8 @@ static int sol_socket_sockopt(struct sock *sk, int optname,
- 	case SO_MAX_PACING_RATE:
- 	case SO_BINDTOIFINDEX:
- 	case SO_TXREHASH:
-+	case SO_TIMESTAMPING_NEW:
-+	case SO_TIMESTAMPING_OLD:
- 		if (*optlen != sizeof(int))
- 			return -EINVAL;
- 		break;
-diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
-index 7f24d898efbb..09eaafa6ab43 100644
---- a/tools/include/uapi/linux/bpf.h
-+++ b/tools/include/uapi/linux/bpf.h
-@@ -2734,7 +2734,8 @@ union bpf_attr {
-  * 		  **SO_RCVBUF**, **SO_SNDBUF**, **SO_MAX_PACING_RATE**,
-  * 		  **SO_PRIORITY**, **SO_RCVLOWAT**, **SO_MARK**,
-  * 		  **SO_BINDTODEVICE**, **SO_KEEPALIVE**, **SO_REUSEADDR**,
-- * 		  **SO_REUSEPORT**, **SO_BINDTOIFINDEX**, **SO_TXREHASH**.
-+ * 		  **SO_REUSEPORT**, **SO_BINDTOIFINDEX**, **SO_TXREHASH**,
-+ * 		  **SO_TIMESTAMPING_NEW**, **SO_TIMESTAMPING_OLD**.
-  * 		* **IPPROTO_TCP**, which supports the following *optname*\ s:
-  * 		  **TCP_CONGESTION**, **TCP_BPF_IW**,
-  * 		  **TCP_BPF_SNDCWND_CLAMP**, **TCP_SAVE_SYN**,
-diff --git a/tools/testing/selftests/bpf/progs/bpf_tracing_net.h b/tools/testing/selftests/bpf/progs/bpf_tracing_net.h
-index 1bdc680b0e0e..95f5f169819e 100644
---- a/tools/testing/selftests/bpf/progs/bpf_tracing_net.h
-+++ b/tools/testing/selftests/bpf/progs/bpf_tracing_net.h
-@@ -15,8 +15,10 @@
- #define SO_RCVLOWAT		18
- #define SO_BINDTODEVICE		25
- #define SO_MARK			36
-+#define SO_TIMESTAMPING_OLD     37
- #define SO_MAX_PACING_RATE	47
- #define SO_BINDTOIFINDEX	62
-+#define SO_TIMESTAMPING_NEW     65
- #define SO_TXREHASH		74
- #define __SO_ACCEPTCON		(1 << 16)
- 
-diff --git a/tools/testing/selftests/bpf/progs/setget_sockopt.c b/tools/testing/selftests/bpf/progs/setget_sockopt.c
-index 7a438600ae98..54205d10793c 100644
---- a/tools/testing/selftests/bpf/progs/setget_sockopt.c
-+++ b/tools/testing/selftests/bpf/progs/setget_sockopt.c
-@@ -48,6 +48,10 @@ static const struct sockopt_test sol_socket_tests[] = {
- 	{ .opt = SO_MARK, .new = 0xeb9f, .expected = 0xeb9f, },
- 	{ .opt = SO_MAX_PACING_RATE, .new = 0xeb9f, .expected = 0xeb9f, },
- 	{ .opt = SO_TXREHASH, .flip = 1, },
-+	{ .opt = SO_TIMESTAMPING_NEW, .new = SOF_TIMESTAMPING_RX_HARDWARE,
-+		.expected = SOF_TIMESTAMPING_RX_HARDWARE, },
-+	{ .opt = SO_TIMESTAMPING_OLD, .new = SOF_TIMESTAMPING_RX_HARDWARE,
-+		.expected = SOF_TIMESTAMPING_RX_HARDWARE, },
- 	{ .opt = 0, },
- };
- 
--- 
-2.39.2
+	Fixes: 3172d3afa998 ("stmmac: support wake up irq from external sources (v3)")
 
+I don't think there is a need to repost this patch because of the above,
+but please keep it in mind for next time.
+
+> Signed-off-by: Qiang Ma <maqianga@uniontech.com>
+
+I see that the approach taken here is the same as that taken
+by bcm_sysport_set_wol() to what seems to be a similar problem [1].
+So the code change itself looks good to me.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+[1] 61b423a8a0bd ("net: systemport: avoid unbalanced enable_irq_wake calls")
+    https://git.kernel.org/torvalds/c/61b423a8a0bd
+
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/stmmac.h         |  1 +
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c | 10 ++++++++--
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c    |  1 +
+>  3 files changed, 10 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+> index cd7a9768de5f..b8c93b881a65 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+> @@ -255,6 +255,7 @@ struct stmmac_priv {
+>  	u32 msg_enable;
+>  	int wolopts;
+>  	int wol_irq;
+> +	bool wol_irq_disabled;
+>  	int clk_csr;
+>  	struct timer_list eee_ctrl_timer;
+>  	int lpi_irq;
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> index f628411ae4ae..9a4d9492a781 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> @@ -825,10 +825,16 @@ static int stmmac_set_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
+>  	if (wol->wolopts) {
+>  		pr_info("stmmac: wakeup enable\n");
+>  		device_set_wakeup_enable(priv->device, 1);
+> -		enable_irq_wake(priv->wol_irq);
+> +		/* Avoid unbalanced enable_irq_wake calls */
+> +		if (priv->wol_irq_disabled)
+> +			enable_irq_wake(priv->wol_irq);
+> +		priv->wol_irq_disabled = false;
+>  	} else {
+>  		device_set_wakeup_enable(priv->device, 0);
+> -		disable_irq_wake(priv->wol_irq);
+> +		/* Avoid unbalanced disable_irq_wake calls */
+> +		if (!priv->wol_irq_disabled)
+> +			disable_irq_wake(priv->wol_irq);
+> +		priv->wol_irq_disabled = true;
+>  	}
+>  
+>  	mutex_lock(&priv->lock);
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 37e64283f910..baa396621ed8 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -3565,6 +3565,7 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+>  	/* Request the Wake IRQ in case of another line
+>  	 * is used for WoL
+>  	 */
+> +	priv->wol_irq_disabled = true;
+>  	if (priv->wol_irq > 0 && priv->wol_irq != dev->irq) {
+>  		int_name = priv->int_name_wol;
+>  		sprintf(int_name, "%s:%s", dev->name, "wol");
+> -- 
+> 2.20.1
+> 
 
