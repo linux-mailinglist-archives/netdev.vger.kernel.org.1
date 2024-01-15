@@ -1,174 +1,171 @@
-Return-Path: <netdev+bounces-63490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19AE282D619
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 10:36:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 780EB82D677
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 10:55:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6C4B280D54
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 09:36:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 03366B21305
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 09:55:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFCEED275;
-	Mon, 15 Jan 2024 09:36:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vbSqpOVd"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80275E541;
+	Mon, 15 Jan 2024 09:55:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45F93C8EC
-	for <netdev@vger.kernel.org>; Mon, 15 Jan 2024 09:36:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a2e0be86878so50077166b.1
-        for <netdev@vger.kernel.org>; Mon, 15 Jan 2024 01:36:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1705311402; x=1705916202; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0zfFrzGkEkjVs+vBQqNVgPhaIJAOKB6xnM2oS7uCojw=;
-        b=vbSqpOVd1zSphtUQDGAjZsJ9mkb9aIQ5b/P3z+k24gLX4WZGRG+kgJ2eTtqfz7fkP8
-         EUC4smRubhgxInrWYhDXnRqKZkxTz2Rvm55qz6biHbHoBZN50vjZ1rLDqgFd4JMB116z
-         PeWGNa+Qdq1vbwboQIb/Q2oUnYWUYgaKyJtBsmOt3e8eSmf+x6xW2lKdFjPEsNrTBVjn
-         5Ph5t/O0bFS5rDRO3qvKStXvm7EyoijHH8fRJQ/49Kfm+gqgFAbZTfu79Fq4ej74MVDt
-         TVbTABziT7NTkq+5gwCiyQhA/2BLbynbiu6as9EkgPWf8XCcqVH3ONc4vzIBNNzaWah6
-         TuKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705311402; x=1705916202;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0zfFrzGkEkjVs+vBQqNVgPhaIJAOKB6xnM2oS7uCojw=;
-        b=W5WnEamE9qMOkO1GziJ93w2PKoUZt25aFvjTZpgSl7VfXNrka86uIkOufjCR5oroeQ
-         fOw1os2e4qkqPnFhlnvzq7t7o4kqp1MgupjSQDe9CwCxB44U6JBDKyaNWTGKCsJWAXRx
-         usjPfoawHEBSDSjvtQDPYf1whAI8o3q9lm1+WQh88pNK2TUsZ3S+iOmnKbRY201ePrRZ
-         20oHguzIJ9iStirqWw57YWJOpUVhXVTVysxwY6Hh8cEt1r3ygErky7AlQxOQANSYTTyn
-         wa10WSmrwIHiYZ6HGn6EquUD07RAlmf1ETXRY0LV0VauHdcl5T4SicVSWMiNpLm7kBHC
-         ezuQ==
-X-Gm-Message-State: AOJu0YyN3Rx9WzTai1et3LAtbJGfeT2BXNRdkbrKnfwFVgS/Rl1HO+mk
-	f4ebX351BruxjnQdB4C49xl+g02bdMrCWw==
-X-Google-Smtp-Source: AGHT+IF80nsXElA2a/IxQfXhgwpZ6A3XouKYDf73EnLBOR4xEW5PyFrUL7R2oOyXLYbzvgdHZ7/P5w==
-X-Received: by 2002:a17:906:b0d2:b0:a2a:dc24:849 with SMTP id bk18-20020a170906b0d200b00a2adc240849mr4704906ejb.43.1705311402529;
-        Mon, 15 Jan 2024 01:36:42 -0800 (PST)
-Received: from [192.168.1.20] ([178.197.215.66])
-        by smtp.gmail.com with ESMTPSA id f3-20020a170906048300b00a2a0212cfe1sm5045210eja.50.2024.01.15.01.36.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 15 Jan 2024 01:36:41 -0800 (PST)
-Message-ID: <10fa514a-7fa0-449f-a7fd-cd3bfb0180d7@linaro.org>
-Date: Mon, 15 Jan 2024 10:36:39 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 853D2F50E;
+	Mon, 15 Jan 2024 09:55:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4TD6Vp1Y5Tz1wn4x;
+	Mon, 15 Jan 2024 17:37:22 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id 650F31A0172;
+	Mon, 15 Jan 2024 17:37:40 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Mon, 15 Jan
+ 2024 17:37:39 +0800
+Subject: Re: [RFC PATCH net-next v5 2/2] net: add netmem to skb_frag_t
+To: Mina Almasry <almasrymina@google.com>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jason Gunthorpe
+	<jgg@nvidia.com>, =?UTF-8?Q?Christian_K=c3=b6nig?=
+	<christian.koenig@amd.com>, Shakeel Butt <shakeelb@google.com>, Willem de
+ Bruijn <willemdebruijn.kernel@gmail.com>
+References: <20240109011455.1061529-1-almasrymina@google.com>
+ <20240109011455.1061529-3-almasrymina@google.com>
+ <5219f2cd-6854-0134-560d-8ae3f363b53f@huawei.com>
+ <CAHS8izOtr+jfqQ6xCB3CoN-K_V1-4hPsB4-k5+1z-M3Qy2BbwA@mail.gmail.com>
+ <0711845b-c435-251f-0bbc-20b243721c06@huawei.com>
+ <CAHS8izOxvMVGXKpLBvVgyyS5_94WGG8Aca=O_zGMX+db-3gBXg@mail.gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <66bc7b8f-51b6-0d9e-db5b-47e7ee5e9029@huawei.com>
+Date: Mon, 15 Jan 2024 17:37:39 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] nfc/nci: fix task hung in nfc_targets_found
+In-Reply-To: <CAHS8izOxvMVGXKpLBvVgyyS5_94WGG8Aca=O_zGMX+db-3gBXg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-To: Edward Adam Davis <eadavis@qq.com>,
- syzbot+2b131f51bb4af224ab40@syzkaller.appspotmail.com
-Cc: davem@davemloft.net, edumazet@google.com, gregkh@linuxfoundation.org,
- hdanton@sina.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com,
- penguin-kernel@i-love.sakura.ne.jp, stern@rowland.harvard.edu,
- syzkaller-bugs@googlegroups.com, torvalds@linux-foundation.org
-References: <000000000000a041b0060eb045ec@google.com>
- <tencent_E44436084AA874977705670A3CDD37BE9609@qq.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <tencent_E44436084AA874977705670A3CDD37BE9609@qq.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
-On 14/01/2024 09:20, Edward Adam Davis wrote:
-> nci_start_poll() holds the dev->mutex required by the kworker of nci_close_device(),
-> and the related tasks are as follows:
-> |cpu0                          |cpu1                                           |cpu2                      |
-> |nci_close_device()            |                                               |                          |
-> |mutex_lock(&ndev->req_lock);  |                                               |                          |
-> |...                           |nfc_genl_start_poll()                          |                          |
-> |flush_workqueue(ndev->rx_wq)  |mutex_lock(&dev->genl_data.genl_data_mutex);   |                          |
-> |                              |nfc_start_poll()                               |                          |
-> |              	               |device_lock(&dev->dev);                        |process_one_work()        |
-> |                              |nci_start_poll()                               |nfc_targets_found()       |
-> |                              |nci_request()                                  |device_lock(&dev->dev);   |
-> |                              |mutex_lock(&ndev->req_lock);                   |                          |
+On 2024/1/12 23:35, Mina Almasry wrote:
+> On Fri, Jan 12, 2024 at 3:51 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
+>>
+>> On 2024/1/12 8:34, Mina Almasry wrote:
+>>> On Thu, Jan 11, 2024 at 4:45 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
+>>>>
+>>>> On 2024/1/9 9:14, Mina Almasry wrote:
+>>>>
+>>>> ...
+>>>>
+>>>>>
+>>>>> +             if (WARN_ON_ONCE(!skb_frag_page(&skb_shinfo(skb)->frags[0]))) {
+>>>>
+>>>> I am really hate to bring it up again.
+>>>> If you are not willing to introduce a new helper,
+>>>
+>>> I'm actually more than happy to add a new helper like:
+>>>
+>>> static inline netmem_ref skb_frag_netmem();
+>>>
+>>> For future callers to obtain frag->netmem to use the netmem_ref directly.
+>>>
+>>> What I'm hung up on is really your follow up request:
+>>>
+>>> "Is it possible to introduce something like skb_frag_netmem() for
+>>> netmem? so that we can keep most existing users of skb_frag_page()
+>>> unchanged and avoid adding additional checking overhead for existing
+>>> users."
+>>>
+>>> With this patchseries, skb_frag_t no longer has a page pointer inside
+>>> of it, it only has a netmem_ref. The netmem_ref is currently always a
+>>> page, but in the future may not be a page. Can you clarify how we keep
+>>> skb_frag_page() unchanged and without checks? What do you expect
+>>> skb_frag_page() and its callers to do? We can not assume netmem_ref is
+>>> always a struct page. I'm happy to implement a change but I need to
+>>> understand it a bit better.
 > 
-> Therefore, before applying for req_lock in nci_request(), it should be determined
-> whether the execution of nci_close_device() has already begun.
 > 
-> Reported-and-tested-by: syzbot+2b131f51bb4af224ab40@syzkaller.appspotmail.com
-> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
-> ---
->  net/nfc/nci/core.c | 2 ++
->  1 file changed, 2 insertions(+)
+> You did not answer my question that I asked here, and ignoring this
+> question is preventing us from making any forward progress on this
+> discussion. What do you expect or want skb_frag_page() to do when
+> there is no page in the frag?
+
+I would expect it to do nothing.
+IMHO, the caller is expected to only call skb_frag_page() for the frag
+with normal page, for example, doing some 'readable' checking before
+callingskb_frag_page(), or not doing any checking at all if it is called
+in some existing driver not support devmem.
+
 > 
-> diff --git a/net/nfc/nci/core.c b/net/nfc/nci/core.c
-> index 6c9592d05120..9a277228a875 100644
-> --- a/net/nfc/nci/core.c
-> +++ b/net/nfc/nci/core.c
-> @@ -145,6 +145,8 @@ inline int nci_request(struct nci_dev *ndev,
->  {
->  	int rc;
->  
-> +	if (test_bit(NCI_UNREG, &ndev->flags))
-> +		return -ENODEV;
+>>
+>> There are still many existing places still not expecting or handling
+>> skb_frag_page() returning NULL, mostly those are in the drivers not
+>> supporting devmem,
+> 
+> As of this series skb_frag_page() cannot return NULL.
+> 
+> In the devmem series, all core networking stack places where
+> skb_frag_page() may return NULL are audited.
+> 
+> skb_frag_page() returning NULL in a driver that doesn't support devmem
+> is not possible. The driver is the one that creates the devmem frags
 
-nci_close_device() clears the NCI_UP, which is tested here, just after
-acquiring mutex. And there is explicit comment about it just below your
-code. Why it is not relevant?
+Is it possible a netdev supporting devmen and a netdev not supporting
+devmen are put into the same bridge, and a rx skb from netdev supporting
+devmen is forwarded to netdev not supporting devmem?
 
-Your code looks really unnecessary, at least with that code flow from
-commit msg. Especially considering you do it outside of mutex, so how
-does it solve anything?
+br_forward() or ip_forward() may be the place that might do this kind
+of forwarding?
 
-Best regards,
-Krzysztof
+> in the first place. When the driver author adds devmem support, they
+> should also add support for skb_frag_page() returning NULL.
+> 
+>> what's the point of adding the extral overhead for
+>> those driver?
+>>
+> 
+> There is no overhead with static branches. The checks are no-op unless
+> the user enables devmem, at which point the devmem connections see no
+
+no-op is still some cpu instruction that will be replaced by some jumping
+instruction when devmem is enabled, right?
+
+Maybe Alexander had better words for those kinds of overhead:
+"The overhead may not seem like much, but when you are having to deal
+with it per page and you are processing pages at millions per second it
+can quickly start to add up."
+
+
+> overhead and non-devmem connections will see minimal overhead that I
+> suspect will not reproduce any perf issue. If the user is not fine
+> with that they can simply not enable devmem and continue to not
+> experience any overhead.
+> 
+>> The networking stack should forbid skb with devmem frag being forwarded
+>> to drivers not supporting devmem yet. I am sure if this is done properly
+>> in your patchset yet? if not, I think you might to audit every existing
+>> drivers handling skb_frag_page() returning NULL correctly.
+>>
+> 
+> There is no audit required. The devmem frags are generated by the
+> driver and forwarded to the TCP stack, not the other way around.
+> 
+>>
+>>>
 
 
