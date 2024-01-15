@@ -1,117 +1,109 @@
-Return-Path: <netdev+bounces-63581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 238AB82E243
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 22:44:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6DBC82E24D
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 22:46:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 492B71C2222D
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 21:44:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 554101F2303A
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 21:46:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6625E1B29A;
-	Mon, 15 Jan 2024 21:44:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AEB81B279;
+	Mon, 15 Jan 2024 21:46:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="fMVhFjid"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X5ufXqjY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF8D81B27A
-	for <netdev@vger.kernel.org>; Mon, 15 Jan 2024 21:44:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-50e67e37661so12612006e87.0
-        for <netdev@vger.kernel.org>; Mon, 15 Jan 2024 13:44:46 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A611C1AADB;
+	Mon, 15 Jan 2024 21:46:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a2821884a09so775981566b.2;
+        Mon, 15 Jan 2024 13:46:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1705355085; x=1705959885; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2dKtPTrWnoc6fMe3lLbkoCZ1Tu8sXcss1oKD1gcrdh4=;
-        b=fMVhFjid2D7Lz92OgvhmIi2wShwKnHmIrJW5CAZN6t5jjvMH59SuPnLn3w1S53aHZn
-         P8f7Ia0E3z45wjy92YZKXzvQguwLpekz3AEGB9Uix+9H3NE/qX+3SX9kP4xAlyjOxjkN
-         cZTZ2pG6XTNbSO0uZBTS3AoHkJJ15GX8K0juZoS8U9ucjKoWMid169yePGMyv1dFrUxI
-         8dt5tQkuyw7o7mPMb+lfDZnCSdvPwgC18HDbC9Drk9Uos+wtyxs95lY+ApchaS7+NrBy
-         8ALgb73DF8hdPe71E75jGXKVt3CTFs197TgasDV835++bJvir644jAtg+mY+NLGa9E3u
-         Yt+g==
+        d=gmail.com; s=20230601; t=1705355193; x=1705959993; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=xLysBvDenEQ28MTHoWPLscX8SqHGcwin+UvlB8fQgMk=;
+        b=X5ufXqjYFSZUHSyv9RMVhRfVF5boMLQesIpMjsadw1jdrwelsncVPUG99VaPFfSmhg
+         ymmR4rRp8FaemgHiKJ6MZ6S1d0hxBw8yUyXUycnGVe70vnxGu+rbl6mXtEJmuZ2p5WzG
+         /Boh9qb+zE8linr0+pGTpAm/twh7xxL7J7dZ5POfsA2vTzJ3YLgIlK7qL+VKB9W/9CU4
+         pruWlNPXjWWXFF7xZEp6DO/QR9kLx66T6k6PsMF0RjRIr/gpRIknzwyY5sQqAQOTlh4L
+         4wK736dI+CKdubSWX2qYQBrVf+15tf0GmSMhHenRIiq5eWniTRnXzRXevsdSVIi3VpG2
+         2wzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705355085; x=1705959885;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2dKtPTrWnoc6fMe3lLbkoCZ1Tu8sXcss1oKD1gcrdh4=;
-        b=ktRH03zSOAsZ8GF/VPiek1jbIj/7QRczNyY0fdJCy9kzmmb6lmtV0kxwE4OCQhW8WI
-         8XoV/Xkjw0/VAvUFEtg4CU/SJFsfEg2tOtyEv56kvx9eDLb7fTIPiPJtxSN/lNZjx2Or
-         oRoMVzBwgao1H0adogOi0vTpFrwIpxE6LtmI6A/WHL9gJwOjlP0bcPlJIlvIYDSJ12Cx
-         Voc/pyqcby851XCQbiEFJVuucjwYgLeli8bEPCNYTqAoDLA4DX4xbnxhkeeHif0My+l7
-         hFIY1pT16WqNmOx34FGaz1f2a0sOr/V+DcGR0ZiHc11KzPp5jNE2AEXD2avqiaq8lb65
-         RIpw==
-X-Gm-Message-State: AOJu0Yz3w+zBIoow943csEzeff0PQbX2HcL1LJpzOHmgNZ/rWS4YbY2h
-	8EFrrEtAdQfKmn3+Nw50eE8MvQp3UBNRrltZ052Sp0cPUKWabKEPGubhrzcQ3Hw=
-X-Google-Smtp-Source: AGHT+IHKiK8prqPQNKjM0sjGqQfOTCEmNaayIspi6IUCYFWmkjH19fSrGZkx3kzlTUFqZaeipvcci4afBS1SYzofu+c=
-X-Received: by 2002:a05:6512:1284:b0:50e:7b2c:6818 with SMTP id
- u4-20020a056512128400b0050e7b2c6818mr3603951lfs.26.1705355084857; Mon, 15 Jan
- 2024 13:44:44 -0800 (PST)
+        d=1e100.net; s=20230601; t=1705355193; x=1705959993;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xLysBvDenEQ28MTHoWPLscX8SqHGcwin+UvlB8fQgMk=;
+        b=TRihfy+ZPL6bw+EdgYbNZV5uwV2B72KRYeNeWeqwL5qfIQPXT2cnkzPE1LworcqL/5
+         bT+uCEpF6nRo0TXo+j+FEejVrf2x85avy5k1xsck+lqbcEuEbYQ9Ez7g4CCSQlpXNqLY
+         A+j5YAlH+4xnt2AvLpuo0oOrVZ+OMb4+Mneeyb1gsZ7wfj7Oh5E1uxiOQY7oTNM6xNb/
+         mbmmuo6dfO+I2oe+S1O4cFi6NxDgwHqFaRoO+1eMrz+dKV2Osf8b8Rp1a0azLNsjKM5W
+         vvwfrDa0USW8cyKbWPK+oEhuBXlpKnYbBaV5XjfyjmDYFfd5iFluuM1asqJYY/+m8PE2
+         ZsXQ==
+X-Gm-Message-State: AOJu0Yzrm6wC1sR4/QGehklZcwokSIiY3JMujSPOBulBhIL9Mc36Khrx
+	/qbgiImZX//CFbJ/5g8dFZQ=
+X-Google-Smtp-Source: AGHT+IEidDGhYUK34ndwyOKDjPlSGil8Zv56DjOYyVMr22Hkg7xq0uUI0WZPWjrIOhcsnJb4RGTMXg==
+X-Received: by 2002:a17:907:a689:b0:a2c:e323:b71 with SMTP id vv9-20020a170907a68900b00a2ce3230b71mr2737988ejc.0.1705355192600;
+        Mon, 15 Jan 2024 13:46:32 -0800 (PST)
+Received: from skbuf ([188.25.255.36])
+        by smtp.gmail.com with ESMTPSA id gw7-20020a170906f14700b00a27741ca951sm5678924ejb.108.2024.01.15.13.46.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Jan 2024 13:46:32 -0800 (PST)
+Date: Mon, 15 Jan 2024 23:46:29 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	Luiz Angelo Daros de Luca <luizluca@gmail.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [RFC PATCH net-next 8/8] net: dsa: mt7530: do not clear
+ config->supported_interfaces
+Message-ID: <20240115214629.ncdzoaawmw4gi7rk@skbuf>
+References: <20240113102529.80371-1-arinc.unal@arinc9.com>
+ <20240113102529.80371-9-arinc.unal@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240115194840.1183077-1-andrew@daynix.com>
-In-Reply-To: <20240115194840.1183077-1-andrew@daynix.com>
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
-Date: Mon, 15 Jan 2024 23:44:32 +0200
-Message-ID: <CAOEp5Ofk5NrKujDApLXT6RL=hD6b4NFxv9GZ-NSvkbJvRYtG8Q@mail.gmail.com>
-Subject: Re: [PATCH 1/1] vhost: Added pad cleanup if vnet_hdr is not present.
-To: linux-kernel@vger.kernel.org
-Cc: mst@redhat.com, jasowang@redhat.com, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, yan@daynix.com, 
-	Andrew Melnychenko <andrew@daynix.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240113102529.80371-9-arinc.unal@arinc9.com>
 
-See also https://issues.redhat.com/browse/RHEL-1303
-
-
-On Mon, Jan 15, 2024 at 9:48=E2=80=AFPM Andrew Melnychenko <andrew@daynix.c=
-om> wrote:
->
-> When the Qemu launched with vhost but without tap vnet_hdr,
-> vhost tries to copy vnet_hdr from socket iter with size 0
-> to the page that may contain some trash.
-> That trash can be interpreted as unpredictable values for
-> vnet_hdr.
-> That leads to dropping some packets and in some cases to
-> stalling vhost routine when the vhost_net tries to process
-> packets and fails in a loop.
->
-> Qemu options:
->   -netdev tap,vhost=3Don,vnet_hdr=3Doff,...
->
-> Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
+On Sat, Jan 13, 2024 at 01:25:29PM +0300, Arınç ÜNAL wrote:
+> There's no need to clear the config->supported_interfaces bitmap before
+> reporting the supported interfaces as all bits in the bitmap will already
+> be initialized to zero when the phylink_config structure is allocated.
+> There's no code that would change the bitmap beforehand. Remove it.
+> 
+> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+> Acked-by: Daniel Golle <daniel@makrotopia.org>
 > ---
->  drivers/vhost/net.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> index f2ed7167c848..57411ac2d08b 100644
-> --- a/drivers/vhost/net.c
-> +++ b/drivers/vhost/net.c
-> @@ -735,6 +735,9 @@ static int vhost_net_build_xdp(struct vhost_net_virtq=
-ueue *nvq,
->         hdr =3D buf;
->         gso =3D &hdr->gso;
->
-> +       if (!sock_hlen)
-> +               memset(buf, 0, pad);
-> +
->         if ((gso->flags & VIRTIO_NET_HDR_F_NEEDS_CSUM) &&
->             vhost16_to_cpu(vq, gso->csum_start) +
->             vhost16_to_cpu(vq, gso->csum_offset) + 2 >
-> --
-> 2.43.0
->
+
+Yes, the "config" pointer points to &dp->phylink_config, and "dp" is
+allocated by dsa_port_touch() with kzalloc(), so all its fields are
+filled with zeroes.
+
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
