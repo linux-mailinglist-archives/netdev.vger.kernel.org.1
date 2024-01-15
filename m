@@ -1,110 +1,574 @@
-Return-Path: <netdev+bounces-63585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5736B82E25C
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 22:54:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B297882E26F
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 23:08:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE0A21F22F00
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 21:54:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C97F01C20C73
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 22:08:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 128F21B295;
-	Mon, 15 Jan 2024 21:54:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 984CC1B5BA;
+	Mon, 15 Jan 2024 22:08:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kjcNIt0D"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="fQ9rvWKq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C80C1B581
-	for <netdev@vger.kernel.org>; Mon, 15 Jan 2024 21:54:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-558ac3407eeso5121078a12.0
-        for <netdev@vger.kernel.org>; Mon, 15 Jan 2024 13:54:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705355675; x=1705960475; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+jmOzMPzlo9pa5YkW6/VtxDUg2ecd/+H7Npg1caunVo=;
-        b=kjcNIt0DfI8pjttDVtGucdWWbjcjtL0FHMJcMK8bk7svc3glwH47pmWKiSHv3ZQYA8
-         VPAdB6vsSgzyqvk1S8gsOcYA6CZp18P8Nn0TqnxGlMkHoWkbqeQqe69UkgUciDJ9xEnG
-         DCcamVxktUHcYTTiPdr8jxHKkRj9lGMBdgCOcuGH8RFEMyzFlHcZNzC4kBO8R0392ZIr
-         dHZ4jTJwOwx+fLDY3VjkQsc5s07v3vFECB50JWUkFmKXVG6wZO6XN2IoUIsJLcU+j3Cv
-         rRICfcxEtgt+v/nhnPtVJNecqYc+nC1LdBvjpxBzNEu5WpZMRUeg6rNgih6xfFNkzoMp
-         LQ8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705355675; x=1705960475;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+jmOzMPzlo9pa5YkW6/VtxDUg2ecd/+H7Npg1caunVo=;
-        b=ngvip2bVvvd8/Zmxz4walpHSsCtkO2Xt4JXSzHmn23REVO43Rs59lNA8CyvfIOurPu
-         W1ql2hTYon8f1XMbGgB4nJUEounDq+jZl7XpJLDqX7/mwMr3iPwQoAAFF4kSZwb1tD9h
-         tr2YvlA8UtVNQ58Ag6VuyiP123fpwGwVwCW8haCivF9iQ2yLX33oGdmCDSr6tGShZnvV
-         E9cL7ss7oBvTU1lzC6gz7LTnqDRiZSz8ednb2Lmt2K5VfRoLH3LG7e3Wrz8ZohFGogc5
-         xU9TSGc1OHY12AmkfouIe/ooPP+bJK6tQa7KME4k4MHaLhxGYhqF2v8grhpuHuWutrC4
-         x7Gg==
-X-Gm-Message-State: AOJu0Ywj0a2F7P41hj+f2BDKWQZyrMUXA6BJn9Lqklr6pWhfDaz8x+De
-	q7JNRttHiyszzf53+QU8ZgQ=
-X-Google-Smtp-Source: AGHT+IHARCtpFqcgbnMJCumVR4VDapK3JwS7G4FAMEMlzvIpbxCk0a+mNZoAECFRBQZvFKGUYR8zPg==
-X-Received: by 2002:a17:907:a094:b0:a2b:5d55:c322 with SMTP id hu20-20020a170907a09400b00a2b5d55c322mr3081613ejc.25.1705355674657;
-        Mon, 15 Jan 2024 13:54:34 -0800 (PST)
-Received: from skbuf ([188.25.255.36])
-        by smtp.gmail.com with ESMTPSA id w17-20020a17090652d100b00a28116285e0sm1351336ejn.165.2024.01.15.13.54.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jan 2024 13:54:34 -0800 (PST)
-Date: Mon, 15 Jan 2024 23:54:32 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, alsi@bang-olufsen.dk,
-	andrew@lunn.ch, f.fainelli@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	arinc.unal@arinc9.com
-Subject: Re: [PATCH net-next v3 0/8] net: dsa: realtek: variants to drivers,
- interfaces to a common module
-Message-ID: <20240115215432.o3mfcyyfhooxbvt5@skbuf>
-References: <20231223005253.17891-1-luizluca@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB0EA1B596;
+	Mon, 15 Jan 2024 22:08:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40FEOQSs002602;
+	Mon, 15 Jan 2024 14:08:15 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=s2048-2021-q4;
+ bh=168IDPBiTcoUW8SKfBkkujyxEWMifF1n933AvjBRx5c=;
+ b=fQ9rvWKqR9l17HcBO+bevL1ANzOuQV2meJiXU5sLUqrG90K967+xw5l7REweejBDYlhf
+ bGxGlyPDV9FwRhM63wl7P29Qj6GZ0EwjSEfV2shYSj65tNAwqHsO2sxJob5rvDLqmbjr
+ 7oea9qwnHgL+J9YyGtb61J2cV4/vySStuC6sHTHzTYnBVFgxXY9p7bON/zu66yFMygOn
+ xjCeHG0N2QQ+RJH/rer53lnUurWyd8PszyTrlemW5Ow/iu7Q84g/El2A9Sw/Y+j8u1gH
+ jDobU7MyEydCjMYHXOPeBKtGSoZnsdfvhdA3/6KzMBdYOVfiLxyZoOoJs3mkDOlsh6kl WA== 
+Received: from mail.thefacebook.com ([163.114.132.120])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3vn5ve2fn7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Mon, 15 Jan 2024 14:08:15 -0800
+Received: from devvm4158.cln0.facebook.com (2620:10d:c085:208::11) by
+ mail.thefacebook.com (2620:10d:c085:21d::8) with Microsoft SMTP Server id
+ 15.1.2507.35; Mon, 15 Jan 2024 14:08:11 -0800
+From: Vadim Fedorenko <vadfed@meta.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+        Jakub Kicinski
+	<kuba@kernel.org>,
+        Martin KaFai Lau <martin.lau@linux.dev>,
+        Andrii Nakryiko
+	<andrii@kernel.org>,
+        Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko
+	<mykolal@fb.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+CC: Vadim Fedorenko <vadfed@meta.com>, <netdev@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <bpf@vger.kernel.org>,
+        Victor Stewart
+	<v@nametag.social>
+Subject: [PATCH bpf-next v8 1/3] bpf: make common crypto API for TC/XDP programs
+Date: Mon, 15 Jan 2024 14:08:01 -0800
+Message-ID: <20240115220803.1973440-1-vadfed@meta.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231223005253.17891-1-luizluca@gmail.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: TgyBaaR8feTtPZaCcbMoI9eoGRXYbomQ
+X-Proofpoint-ORIG-GUID: TgyBaaR8feTtPZaCcbMoI9eoGRXYbomQ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-15_15,2024-01-15_03,2023-05-22_02
 
-On Fri, Dec 22, 2023 at 09:46:28PM -0300, Luiz Angelo Daros de Luca wrote:
-> The series begins by removing an unused function pointer at
-> realtek_ops->cleanup.
-> 
-> Each variant module was converted into real drivers, serving as both a
-> platform driver (for switches connected using the SMI interface) and an
-> MDIO driver (for MDIO-connected switches). The relationship between the
-> variant and interface modules is reversed, with the variant module now
-> calling both interface functions (if not disabled at build time). While
-> in most devices only one interface is likely used, the interface code is
-> significantly smaller than a variant module, consuming fewer resources
-> than the previous code. With variant modules now functioning as real
-> drivers, compatible strings are published only in a single variant
-> module, preventing conflicts.
-> 
-> The patch series introduces a new common module for functions shared by
-> both variants. This module also absorbs the two previous interface
-> modules, as they would always be loaded anyway.
-> 
-> The series relocates the user MII driver from realtek-smi to common. It
-> is now used by MDIO-connected switches instead of the generic DSA
-> driver. There's a change in how this driver locates the MDIO node. It
-> now only searches for a child node named "mdio", which is required by
-> both interfaces in binding docs.
-> 
-> The dsa_switch in realtek_priv->ds is now embedded in the struct. It is
-> always in use and avoids dynamic memory allocation.
+Add crypto API support to BPF to be able to decrypt or encrypt packets
+in TC/XDP BPF programs. Special care should be taken for initialization
+part of crypto algo because crypto alloc) doesn't work with preemtion
+disabled, it can be run only in sleepable BPF program. Also async crypto
+is not supported because of the very same issue - TC/XDP BPF programs
+are not sleepable.
 
-git format-patch --cover-letter generates a nice patch series overview
-with a diffstat and the commit titles, you should include it next time.
+Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+---
+v7 -> v8:
+- add statesize ops to bpf crypto type as some ciphers are now stateful
+- improve error path in bpf_crypto_create
+v6 -> v7:
+- style fixes
+v5 -> v6:
+- replace lskcipher with infrastructure to provide pluggable cipher
+  types
+- add BPF skcipher as plug-in module in a separate patch
+v4 -> v5:
+- replace crypto API to use lskcipher (suggested by Herbert Xu)
+- remove SG list usage and provide raw buffers
+v3 -> v4:
+- reuse __bpf_dynptr_data and remove own implementation
+- use const __str to provide algorithm name
+- use kfunc macroses to avoid compilator warnings
+v2 -> v3:
+- fix kdoc issues
+v1 -> v2:
+- use kmalloc in sleepable func, suggested by Alexei
+- use __bpf_dynptr_is_rdonly() to check destination, suggested by Jakub
+- use __bpf_dynptr_data_ptr() for all dynptr accesses
+---
+ include/linux/bpf.h        |   1 +
+ include/linux/bpf_crypto.h |  24 +++
+ kernel/bpf/Makefile        |   3 +
+ kernel/bpf/crypto.c        | 366 +++++++++++++++++++++++++++++++++++++
+ kernel/bpf/helpers.c       |   2 +-
+ kernel/bpf/verifier.c      |   1 +
+ 6 files changed, 396 insertions(+), 1 deletion(-)
+ create mode 100644 include/linux/bpf_crypto.h
+ create mode 100644 kernel/bpf/crypto.c
+
+diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+index 377857b232c6..54fc30c64d19 100644
+--- a/include/linux/bpf.h
++++ b/include/linux/bpf.h
+@@ -1263,6 +1263,7 @@ int bpf_dynptr_check_size(u32 size);
+ u32 __bpf_dynptr_size(const struct bpf_dynptr_kern *ptr);
+ const void *__bpf_dynptr_data(const struct bpf_dynptr_kern *ptr, u32 len);
+ void *__bpf_dynptr_data_rw(const struct bpf_dynptr_kern *ptr, u32 len);
++bool __bpf_dynptr_is_rdonly(const struct bpf_dynptr_kern *ptr);
+ 
+ #ifdef CONFIG_BPF_JIT
+ int bpf_trampoline_link_prog(struct bpf_tramp_link *link, struct bpf_trampoline *tr);
+diff --git a/include/linux/bpf_crypto.h b/include/linux/bpf_crypto.h
+new file mode 100644
+index 000000000000..8456b7477e1d
+--- /dev/null
++++ b/include/linux/bpf_crypto.h
+@@ -0,0 +1,24 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/* Copyright (c) 2023 Meta Platforms, Inc. and affiliates. */
++#ifndef _BPF_CRYPTO_H
++#define _BPF_CRYPTO_H
++
++struct bpf_crypto_type {
++	void *(*alloc_tfm)(const char *algo);
++	void (*free_tfm)(void *tfm);
++	int (*has_algo)(const char *algo);
++	int (*setkey)(void *tfm, const u8 *key, unsigned int keylen);
++	int (*setauthsize)(void *tfm, unsigned int authsize);
++	int (*encrypt)(void *tfm, const u8 *src, u8 *dst, unsigned int len, u8 *iv);
++	int (*decrypt)(void *tfm, const u8 *src, u8 *dst, unsigned int len, u8 *iv);
++	unsigned int (*ivsize)(void *tfm);
++	unsigned int (*statesize)(void *tfm);
++	u32 (*get_flags)(void *tfm);
++	struct module *owner;
++	char name[14];
++};
++
++int bpf_crypto_register_type(const struct bpf_crypto_type *type);
++int bpf_crypto_unregister_type(const struct bpf_crypto_type *type);
++
++#endif /* _BPF_CRYPTO_H */
+diff --git a/kernel/bpf/Makefile b/kernel/bpf/Makefile
+index f526b7573e97..bcde762bb2c2 100644
+--- a/kernel/bpf/Makefile
++++ b/kernel/bpf/Makefile
+@@ -41,6 +41,9 @@ obj-$(CONFIG_BPF_SYSCALL) += bpf_struct_ops.o
+ obj-$(CONFIG_BPF_SYSCALL) += cpumask.o
+ obj-${CONFIG_BPF_LSM} += bpf_lsm.o
+ endif
++ifeq ($(CONFIG_CRYPTO),y)
++obj-$(CONFIG_BPF_SYSCALL) += crypto.o
++endif
+ obj-$(CONFIG_BPF_PRELOAD) += preload/
+ 
+ obj-$(CONFIG_BPF_SYSCALL) += relo_core.o
+diff --git a/kernel/bpf/crypto.c b/kernel/bpf/crypto.c
+new file mode 100644
+index 000000000000..74b06e7122d2
+--- /dev/null
++++ b/kernel/bpf/crypto.c
+@@ -0,0 +1,366 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/* Copyright (c) 2023 Meta, Inc */
++#include <linux/bpf.h>
++#include <linux/bpf_crypto.h>
++#include <linux/bpf_mem_alloc.h>
++#include <linux/btf.h>
++#include <linux/btf_ids.h>
++#include <linux/filter.h>
++#include <linux/scatterlist.h>
++#include <linux/skbuff.h>
++#include <crypto/skcipher.h>
++
++struct bpf_crypto_type_list {
++	const struct bpf_crypto_type *type;
++	struct list_head list;
++};
++
++static LIST_HEAD(bpf_crypto_types);
++static DECLARE_RWSEM(bpf_crypto_types_sem);
++
++/**
++ * struct bpf_crypto_ctx - refcounted BPF crypto context structure
++ * @type:	The pointer to bpf crypto type
++ * @tfm:	The pointer to instance of crypto API struct.
++ * @rcu:	The RCU head used to free the crypto context with RCU safety.
++ * @usage:	Object reference counter. When the refcount goes to 0, the
++ *		memory is released back to the BPF allocator, which provides
++ *		RCU safety.
++ */
++struct bpf_crypto_ctx {
++	const struct bpf_crypto_type *type;
++	void *tfm;
++	struct rcu_head rcu;
++	refcount_t usage;
++};
++
++int bpf_crypto_register_type(const struct bpf_crypto_type *type)
++{
++	struct bpf_crypto_type_list *node;
++	int err = -EEXIST;
++
++	down_write(&bpf_crypto_types_sem);
++	list_for_each_entry(node, &bpf_crypto_types, list) {
++		if (!strcmp(node->type->name, type->name))
++			goto unlock;
++	}
++
++	node = kmalloc(sizeof(*node), GFP_KERNEL);
++	err = -ENOMEM;
++	if (!node)
++		goto unlock;
++
++	node->type = type;
++	list_add(&node->list, &bpf_crypto_types);
++	err = 0;
++
++unlock:
++	up_write(&bpf_crypto_types_sem);
++
++	return err;
++}
++EXPORT_SYMBOL_GPL(bpf_crypto_register_type);
++
++int bpf_crypto_unregister_type(const struct bpf_crypto_type *type)
++{
++	struct bpf_crypto_type_list *node;
++	int err = -ENOENT;
++
++	down_write(&bpf_crypto_types_sem);
++	list_for_each_entry(node, &bpf_crypto_types, list) {
++		if (strcmp(node->type->name, type->name))
++			continue;
++
++		list_del(&node->list);
++		kfree(node);
++		err = 0;
++		break;
++	}
++	up_write(&bpf_crypto_types_sem);
++
++	return err;
++}
++EXPORT_SYMBOL_GPL(bpf_crypto_unregister_type);
++
++static const struct bpf_crypto_type *bpf_crypto_get_type(const char *name)
++{
++	const struct bpf_crypto_type *type = ERR_PTR(-ENOENT);
++	struct bpf_crypto_type_list *node;
++
++	down_read(&bpf_crypto_types_sem);
++	list_for_each_entry(node, &bpf_crypto_types, list) {
++		if (strcmp(node->type->name, name))
++			continue;
++
++		if (try_module_get(node->type->owner))
++			type = node->type;
++		break;
++	}
++	up_read(&bpf_crypto_types_sem);
++
++	return type;
++}
++
++__bpf_kfunc_start_defs();
++
++/**
++ * bpf_crypto_ctx_create() - Create a mutable BPF crypto context.
++ *
++ * Allocates a crypto context that can be used, acquired, and released by
++ * a BPF program. The crypto context returned by this function must either
++ * be embedded in a map as a kptr, or freed with bpf_crypto_ctx_release().
++ * As crypto API functions use GFP_KERNEL allocations, this function can
++ * only be used in sleepable BPF programs.
++ *
++ * bpf_crypto_ctx_create() allocates memory for crypto context.
++ * It may return NULL if no memory is available.
++ * @type__str: pointer to string representation of crypto type.
++ * @algo__str: pointer to string representation of algorithm.
++ * @pkey:      bpf_dynptr which holds cipher key to do crypto.
++ * @authsize:  the size of authentication data in case of AEAD transformation
++ * @err:       integer to store error code when NULL is returned
++ */
++__bpf_kfunc struct bpf_crypto_ctx *
++bpf_crypto_ctx_create(const char *type__str, const char *algo__str,
++		      const struct bpf_dynptr_kern *pkey,
++		      unsigned int authsize, int *err)
++{
++	const struct bpf_crypto_type *type = bpf_crypto_get_type(type__str);
++	struct bpf_crypto_ctx *ctx;
++	const u8 *key;
++	u32 key_len;
++
++	type = bpf_crypto_get_type(type__str);
++	if (IS_ERR(type)) {
++		*err = PTR_ERR(type);
++		return NULL;
++	}
++
++	if (!type->has_algo(algo__str)) {
++		*err = -EOPNOTSUPP;
++		goto err_module_put;
++	}
++
++	if (!authsize && type->setauthsize) {
++		*err = -EOPNOTSUPP;
++		goto err_module_put;
++	}
++
++	if (authsize && !type->setauthsize) {
++		*err = -EOPNOTSUPP;
++		goto err_module_put;
++	}
++
++	key_len = __bpf_dynptr_size(pkey);
++	if (!key_len) {
++		*err = -EINVAL;
++		goto err_module_put;
++	}
++	key = __bpf_dynptr_data(pkey, key_len);
++	if (!key) {
++		*err = -EINVAL;
++		goto err_module_put;
++	}
++
++	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
++	if (!ctx) {
++		*err = -ENOMEM;
++		goto err_module_put;
++	}
++
++	ctx->type = type;
++	ctx->tfm = type->alloc_tfm(algo__str);
++	if (IS_ERR(ctx->tfm)) {
++		*err = PTR_ERR(ctx->tfm);
++		goto err_free_ctx;
++	}
++
++	if (authsize) {
++		*err = type->setauthsize(ctx->tfm, authsize);
++		if (*err)
++			goto err_free_tfm;
++	}
++
++	*err = type->setkey(ctx->tfm, key, key_len);
++	if (*err)
++		goto err_free_tfm;
++
++	refcount_set(&ctx->usage, 1);
++
++	return ctx;
++
++err_free_tfm:
++	type->free_tfm(ctx->tfm);
++err_free_ctx:
++	kfree(ctx);
++err_module_put:
++	module_put(type->owner);
++
++	return NULL;
++}
++
++static void crypto_free_cb(struct rcu_head *head)
++{
++	struct bpf_crypto_ctx *ctx;
++
++	ctx = container_of(head, struct bpf_crypto_ctx, rcu);
++	ctx->type->free_tfm(ctx->tfm);
++	module_put(ctx->type->owner);
++	kfree(ctx);
++}
++
++/**
++ * bpf_crypto_ctx_acquire() - Acquire a reference to a BPF crypto context.
++ * @ctx: The BPF crypto context being acquired. The ctx must be a trusted
++ *	     pointer.
++ *
++ * Acquires a reference to a BPF crypto context. The context returned by this function
++ * must either be embedded in a map as a kptr, or freed with
++ * bpf_crypto_skcipher_ctx_release().
++ */
++__bpf_kfunc struct bpf_crypto_ctx *
++bpf_crypto_ctx_acquire(struct bpf_crypto_ctx *ctx)
++{
++	refcount_inc(&ctx->usage);
++	return ctx;
++}
++
++/**
++ * bpf_crypto_ctx_release() - Release a previously acquired BPF crypto context.
++ * @ctx: The crypto context being released.
++ *
++ * Releases a previously acquired reference to a BPF crypto context. When the final
++ * reference of the BPF crypto context has been released, it is subsequently freed in
++ * an RCU callback in the BPF memory allocator.
++ */
++__bpf_kfunc void bpf_crypto_ctx_release(struct bpf_crypto_ctx *ctx)
++{
++	if (refcount_dec_and_test(&ctx->usage))
++		call_rcu(&ctx->rcu, crypto_free_cb);
++}
++
++static int bpf_crypto_crypt(const struct bpf_crypto_ctx *ctx,
++			    const struct bpf_dynptr_kern *src,
++			    struct bpf_dynptr_kern *dst,
++			    const struct bpf_dynptr_kern *siv,
++			    bool decrypt)
++{
++	u32 src_len, dst_len, siv_len;
++	const u8 *psrc;
++	u8 *pdst, *piv;
++	int err;
++
++	if (ctx->type->get_flags(ctx->tfm) & CRYPTO_TFM_NEED_KEY)
++		return -EINVAL;
++
++	if (__bpf_dynptr_is_rdonly(dst))
++		return -EINVAL;
++
++	siv_len = __bpf_dynptr_size(siv);
++	src_len = __bpf_dynptr_size(src);
++	dst_len = __bpf_dynptr_size(dst);
++	if (!src_len || !dst_len)
++		return -EINVAL;
++
++	if (siv_len != (ctx->type->ivsize(ctx->tfm) + ctx->type->statesize(ctx->tfm)))
++		return -EINVAL;
++
++	psrc = __bpf_dynptr_data(src, src_len);
++	if (!psrc)
++		return -EINVAL;
++	pdst = __bpf_dynptr_data_rw(dst, dst_len);
++	if (!pdst)
++		return -EINVAL;
++
++	piv = siv_len ? __bpf_dynptr_data_rw(siv, siv_len) : NULL;
++	if (siv_len && !piv)
++		return -EINVAL;
++
++	err = decrypt ? ctx->type->decrypt(ctx->tfm, psrc, pdst, src_len, piv)
++		      : ctx->type->encrypt(ctx->tfm, psrc, pdst, src_len, piv);
++
++	return err;
++}
++
++/**
++ * bpf_crypto_decrypt() - Decrypt buffer using configured context and IV provided.
++ * @ctx:	The crypto context being used. The ctx must be a trusted pointer.
++ * @src:	bpf_dynptr to the encrypted data. Must be a trusted pointer.
++ * @dst:	bpf_dynptr to the buffer where to store the result. Must be a trusted pointer.
++ * @siv:	bpf_dynptr to IV data and state data to be used by decryptor.
++ *
++ * Decrypts provided buffer using IV data and the crypto context. Crypto context must be configured.
++ */
++__bpf_kfunc int bpf_crypto_decrypt(struct bpf_crypto_ctx *ctx,
++				   const struct bpf_dynptr_kern *src,
++				   struct bpf_dynptr_kern *dst,
++				   struct bpf_dynptr_kern *siv)
++{
++	return bpf_crypto_crypt(ctx, src, dst, siv, true);
++}
++
++/**
++ * bpf_crypto_encrypt() - Encrypt buffer using configured context and IV provided.
++ * @ctx:	The crypto context being used. The ctx must be a trusted pointer.
++ * @src:	bpf_dynptr to the plain data. Must be a trusted pointer.
++ * @dst:	bpf_dynptr to buffer where to store the result. Must be a trusted pointer.
++ * @siv:		bpf_dynptr to IV data and state data to be used by decryptor.
++ *
++ * Encrypts provided buffer using IV data and the crypto context. Crypto context must be configured.
++ */
++__bpf_kfunc int bpf_crypto_encrypt(struct bpf_crypto_ctx *ctx,
++				   const struct bpf_dynptr_kern *src,
++				   struct bpf_dynptr_kern *dst,
++				   struct bpf_dynptr_kern *siv)
++{
++	return bpf_crypto_crypt(ctx, src, dst, siv, false);
++}
++
++__bpf_kfunc_end_defs();
++
++BTF_SET8_START(crypt_init_kfunc_btf_ids)
++BTF_ID_FLAGS(func, bpf_crypto_ctx_create, KF_ACQUIRE | KF_RET_NULL | KF_SLEEPABLE)
++BTF_ID_FLAGS(func, bpf_crypto_ctx_release, KF_RELEASE)
++BTF_ID_FLAGS(func, bpf_crypto_ctx_acquire, KF_ACQUIRE | KF_RCU | KF_RET_NULL)
++BTF_SET8_END(crypt_init_kfunc_btf_ids)
++
++static const struct btf_kfunc_id_set crypt_init_kfunc_set = {
++	.owner = THIS_MODULE,
++	.set   = &crypt_init_kfunc_btf_ids,
++};
++
++BTF_SET8_START(crypt_kfunc_btf_ids)
++BTF_ID_FLAGS(func, bpf_crypto_decrypt, KF_RCU)
++BTF_ID_FLAGS(func, bpf_crypto_encrypt, KF_RCU)
++BTF_SET8_END(crypt_kfunc_btf_ids)
++
++static const struct btf_kfunc_id_set crypt_kfunc_set = {
++	.owner = THIS_MODULE,
++	.set   = &crypt_kfunc_btf_ids,
++};
++
++BTF_ID_LIST(bpf_crypto_dtor_ids)
++BTF_ID(struct, bpf_crypto_ctx)
++BTF_ID(func, bpf_crypto_ctx_release)
++
++static int __init crypto_kfunc_init(void)
++{
++	int ret;
++	const struct btf_id_dtor_kfunc bpf_crypto_dtors[] = {
++		{
++			.btf_id	      = bpf_crypto_dtor_ids[0],
++			.kfunc_btf_id = bpf_crypto_dtor_ids[1]
++		},
++	};
++
++	ret = register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, &crypt_kfunc_set);
++	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_ACT, &crypt_kfunc_set);
++	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_XDP, &crypt_kfunc_set);
++	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_UNSPEC,
++					       &crypt_init_kfunc_set);
++	return  ret ?: register_btf_id_dtor_kfuncs(bpf_crypto_dtors,
++						   ARRAY_SIZE(bpf_crypto_dtors),
++						   THIS_MODULE);
++}
++
++late_initcall(crypto_kfunc_init);
+diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
+index e04ca1af8927..593adf036ec0 100644
+--- a/kernel/bpf/helpers.c
++++ b/kernel/bpf/helpers.c
+@@ -1440,7 +1440,7 @@ static const struct bpf_func_proto bpf_kptr_xchg_proto = {
+ #define DYNPTR_SIZE_MASK	0xFFFFFF
+ #define DYNPTR_RDONLY_BIT	BIT(31)
+ 
+-static bool __bpf_dynptr_is_rdonly(const struct bpf_dynptr_kern *ptr)
++bool __bpf_dynptr_is_rdonly(const struct bpf_dynptr_kern *ptr)
+ {
+ 	return ptr->size & DYNPTR_RDONLY_BIT;
+ }
+diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+index 9507800026cf..74b24df05a3c 100644
+--- a/kernel/bpf/verifier.c
++++ b/kernel/bpf/verifier.c
+@@ -5265,6 +5265,7 @@ BTF_ID(struct, cgroup)
+ #endif
+ BTF_ID(struct, bpf_cpumask)
+ BTF_ID(struct, task_struct)
++BTF_ID(struct, bpf_crypto_ctx)
+ BTF_SET_END(rcu_protected_types)
+ 
+ static bool rcu_protected_object(const struct btf *btf, u32 btf_id)
+-- 
+2.39.3
+
 
