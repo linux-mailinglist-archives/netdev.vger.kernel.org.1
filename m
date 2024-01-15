@@ -1,256 +1,149 @@
-Return-Path: <netdev+bounces-63527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC6F782D9C7
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 14:14:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C68FC82D9D5
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 14:15:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5A811C214DE
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 13:14:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71C99281F14
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 13:15:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D49A21755C;
-	Mon, 15 Jan 2024 13:12:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3C941775F;
+	Mon, 15 Jan 2024 13:13:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="qd5dpkiS"
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2005171C9;
-	Mon, 15 Jan 2024 13:12:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4TDCGX5wlDz4f3l2k;
-	Mon, 15 Jan 2024 21:12:04 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 7FE311A0D1A;
-	Mon, 15 Jan 2024 21:12:08 +0800 (CST)
-Received: from ultra.huawei.com (unknown [10.90.53.71])
-	by APP4 (Coremail) with SMTP id gCh0CgBnu20iL6VlSeWtAw--.15591S8;
-	Mon, 15 Jan 2024 21:12:08 +0800 (CST)
-From: Pu Lehui <pulehui@huaweicloud.com>
-To: bpf@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	netdev@vger.kernel.org
-Cc: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yhs@fb.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Conor Dooley <conor@kernel.org>,
-	Luke Nelson <luke.r.nels@gmail.com>,
-	Pu Lehui <pulehui@huawei.com>,
-	Pu Lehui <pulehui@huaweicloud.com>
-Subject: [PATCH RESEND bpf-next v3 6/6] riscv, bpf: Optimize bswap insns with Zbb support
-Date: Mon, 15 Jan 2024 13:12:35 +0000
-Message-Id: <20240115131235.2914289-7-pulehui@huaweicloud.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240115131235.2914289-1-pulehui@huaweicloud.com>
-References: <20240115131235.2914289-1-pulehui@huaweicloud.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 000E81798C;
+	Mon, 15 Jan 2024 13:13:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=z3BzOmqIUzMO6UAJIUQ8GAcKK4W9P4/Fhk70+J3UgU0=;
+	t=1705324423; x=1706534023; b=qd5dpkiSzAphXJFZXmns78MO5/1IaI6mRTWuzzw/sjPLt/t
+	G2HGM0iw9v3bfHHZ3DUVNVVLCKuEbOK/JpUUA05fGBw3LyKMhOXiLolTg/tiDhBYIEqhVW6tpeI4Y
+	CDE3l/toHQFh7KEIQO5+/vFjzRrON0QrmT8K3P5qZ8pgduMzvCVMq81e4OT7Kx6G+2UFVfPLBnAUz
+	waF/1zLQhtY8ZpdyHNS9ts8pd7JCQywXVfl6ABsLJau5PUBFjfwH2CTE7WReuVBJgZzpa2d5iDVgw
+	V1S9BRaDlGjOFEnDe/YxQXj5nT0XtDjqjlEvqQR1OIY+RBwos6wCGsrBUhUqAJPg==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1rPMmT-00000003V7V-1PaZ;
+	Mon, 15 Jan 2024 14:13:33 +0100
+Message-ID: <26d364547d3bbb04800877e899cfebe0e1ec4dc0.camel@sipsolutions.net>
+Subject: Re: [PATCH] wifi: mac80211: tx: Add __must_hold() annotation
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Kalle Valo <kvalo@kernel.org>, Brent Pappas <bpappas@pappasbrent.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>,  linux-wireless@vger.kernel.org,
+ netdev@vger.kernel.org,  linux-kernel@vger.kernel.org
+Date: Mon, 15 Jan 2024 14:13:31 +0100
+In-Reply-To: <87sf31hhfp.fsf@kernel.org>
+References: <20240113011145.10888-2-bpappas@pappasbrent.com>
+	 <87sf31hhfp.fsf@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgBnu20iL6VlSeWtAw--.15591S8
-X-Coremail-Antispam: 1UD129KBjvJXoWxKFyrtFWkJF4UtFy3GF4xCrg_yoW7Gw4rpa
-	43Kr4ru3y8trsIy34kG3WDWw13GF1jyFnFvF1fJrZ5Xw4jv397G3WUtr4Fyry5G34fuay5
-	WF1DKr9rK3WUKFJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUPI14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
-	kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
-	z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F
-	4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq
-	3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7
-	IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4U
-	M4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2
-	kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
-	14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIx
-	kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAF
-	wI0_Gr1j6F4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr
-	0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUl
-	2NtUUUUU=
-X-CM-SenderInfo: psxovxtxl6x35dzhxuhorxvhhfrp/
+X-malware-bazaar: not-scanned
 
-From: Pu Lehui <pulehui@huawei.com>
+On Sat, 2024-01-13 at 08:32 +0200, Kalle Valo wrote:
+>=20
+> >  static void ieee80211_set_beacon_cntdwn(struct ieee80211_sub_if_data *=
+sdata,
+> >  					struct beacon_data *beacon,
+> >  					struct ieee80211_link_data *link)
+> > +	__must_hold(link)
+>=20
+> Oh, never seen __must_hold() before and looks very useful. So does this
+> work with RCU, mutexes and spinlocks?
+>=20
+> In case others are interested, here's the documentation I was able to fin=
+d:
+>=20
+> https://docs.kernel.org/dev-tools/sparse.html#using-sparse-for-lock-check=
+ing
+>=20
 
-Optimize bswap instructions by rev8 Zbb instruction conbined with srli
-instruction. And Optimize 16-bit zero-extension with Zbb support.
+Except it's not actually useful, and looks more useful than it is. IMHO
+it's actually more harmful than anything else.
 
-Signed-off-by: Pu Lehui <pulehui@huawei.com>
----
- arch/riscv/net/bpf_jit.h        | 69 +++++++++++++++++++++++++++++++++
- arch/riscv/net/bpf_jit_comp64.c | 50 +-----------------------
- 2 files changed, 71 insertions(+), 48 deletions(-)
+One might even consider this patch a good example! The function
+ieee80211_set_beacon_cntdwn() is called from a number of places in this
+file, some of which acquire RCU critical section, and some of which
+acquire no locks nor RCU critical section at all. Most of them nest and
+are called in RCU.
 
-diff --git a/arch/riscv/net/bpf_jit.h b/arch/riscv/net/bpf_jit.h
-index b00c5c0591d2..8b35f12a4452 100644
---- a/arch/riscv/net/bpf_jit.h
-+++ b/arch/riscv/net/bpf_jit.h
-@@ -1146,12 +1146,81 @@ static inline void emit_sextw(u8 rd, u8 rs, struct rv_jit_context *ctx)
- 	emit_addiw(rd, rs, 0, ctx);
- }
- 
-+static inline void emit_zexth(u8 rd, u8 rs, struct rv_jit_context *ctx)
-+{
-+	if (rvzbb_enabled()) {
-+		emit(rvzbb_zexth(rd, rs), ctx);
-+		return;
-+	}
-+
-+	emit_slli(rd, rs, 48, ctx);
-+	emit_srli(rd, rd, 48, ctx);
-+}
-+
- static inline void emit_zextw(u8 rd, u8 rs, struct rv_jit_context *ctx)
- {
- 	emit_slli(rd, rs, 32, ctx);
- 	emit_srli(rd, rd, 32, ctx);
- }
- 
-+static inline void emit_bswap(u8 rd, s32 imm, struct rv_jit_context *ctx)
-+{
-+	if (rvzbb_enabled()) {
-+		int bits = 64 - imm;
-+
-+		emit(rvzbb_rev8(rd, rd), ctx);
-+		if (bits)
-+			emit_srli(rd, rd, bits, ctx);
-+		return;
-+	}
-+
-+	emit_li(RV_REG_T2, 0, ctx);
-+
-+	emit_andi(RV_REG_T1, rd, 0xff, ctx);
-+	emit_add(RV_REG_T2, RV_REG_T2, RV_REG_T1, ctx);
-+	emit_slli(RV_REG_T2, RV_REG_T2, 8, ctx);
-+	emit_srli(rd, rd, 8, ctx);
-+	if (imm == 16)
-+		goto out_be;
-+
-+	emit_andi(RV_REG_T1, rd, 0xff, ctx);
-+	emit_add(RV_REG_T2, RV_REG_T2, RV_REG_T1, ctx);
-+	emit_slli(RV_REG_T2, RV_REG_T2, 8, ctx);
-+	emit_srli(rd, rd, 8, ctx);
-+
-+	emit_andi(RV_REG_T1, rd, 0xff, ctx);
-+	emit_add(RV_REG_T2, RV_REG_T2, RV_REG_T1, ctx);
-+	emit_slli(RV_REG_T2, RV_REG_T2, 8, ctx);
-+	emit_srli(rd, rd, 8, ctx);
-+	if (imm == 32)
-+		goto out_be;
-+
-+	emit_andi(RV_REG_T1, rd, 0xff, ctx);
-+	emit_add(RV_REG_T2, RV_REG_T2, RV_REG_T1, ctx);
-+	emit_slli(RV_REG_T2, RV_REG_T2, 8, ctx);
-+	emit_srli(rd, rd, 8, ctx);
-+
-+	emit_andi(RV_REG_T1, rd, 0xff, ctx);
-+	emit_add(RV_REG_T2, RV_REG_T2, RV_REG_T1, ctx);
-+	emit_slli(RV_REG_T2, RV_REG_T2, 8, ctx);
-+	emit_srli(rd, rd, 8, ctx);
-+
-+	emit_andi(RV_REG_T1, rd, 0xff, ctx);
-+	emit_add(RV_REG_T2, RV_REG_T2, RV_REG_T1, ctx);
-+	emit_slli(RV_REG_T2, RV_REG_T2, 8, ctx);
-+	emit_srli(rd, rd, 8, ctx);
-+
-+	emit_andi(RV_REG_T1, rd, 0xff, ctx);
-+	emit_add(RV_REG_T2, RV_REG_T2, RV_REG_T1, ctx);
-+	emit_slli(RV_REG_T2, RV_REG_T2, 8, ctx);
-+	emit_srli(rd, rd, 8, ctx);
-+out_be:
-+	emit_andi(RV_REG_T1, rd, 0xff, ctx);
-+	emit_add(RV_REG_T2, RV_REG_T2, RV_REG_T1, ctx);
-+
-+	emit_mv(rd, RV_REG_T2, ctx);
-+}
-+
- #endif /* __riscv_xlen == 64 */
- 
- void bpf_jit_build_prologue(struct rv_jit_context *ctx);
-diff --git a/arch/riscv/net/bpf_jit_comp64.c b/arch/riscv/net/bpf_jit_comp64.c
-index 18bbf8122eb3..e86e83649820 100644
---- a/arch/riscv/net/bpf_jit_comp64.c
-+++ b/arch/riscv/net/bpf_jit_comp64.c
-@@ -1176,8 +1176,7 @@ int bpf_jit_emit_insn(const struct bpf_insn *insn, struct rv_jit_context *ctx,
- 	case BPF_ALU | BPF_END | BPF_FROM_LE:
- 		switch (imm) {
- 		case 16:
--			emit_slli(rd, rd, 48, ctx);
--			emit_srli(rd, rd, 48, ctx);
-+			emit_zexth(rd, rd, ctx);
- 			break;
- 		case 32:
- 			if (!aux->verifier_zext)
-@@ -1188,54 +1187,9 @@ int bpf_jit_emit_insn(const struct bpf_insn *insn, struct rv_jit_context *ctx,
- 			break;
- 		}
- 		break;
--
- 	case BPF_ALU | BPF_END | BPF_FROM_BE:
- 	case BPF_ALU64 | BPF_END | BPF_FROM_LE:
--		emit_li(RV_REG_T2, 0, ctx);
--
--		emit_andi(RV_REG_T1, rd, 0xff, ctx);
--		emit_add(RV_REG_T2, RV_REG_T2, RV_REG_T1, ctx);
--		emit_slli(RV_REG_T2, RV_REG_T2, 8, ctx);
--		emit_srli(rd, rd, 8, ctx);
--		if (imm == 16)
--			goto out_be;
--
--		emit_andi(RV_REG_T1, rd, 0xff, ctx);
--		emit_add(RV_REG_T2, RV_REG_T2, RV_REG_T1, ctx);
--		emit_slli(RV_REG_T2, RV_REG_T2, 8, ctx);
--		emit_srli(rd, rd, 8, ctx);
--
--		emit_andi(RV_REG_T1, rd, 0xff, ctx);
--		emit_add(RV_REG_T2, RV_REG_T2, RV_REG_T1, ctx);
--		emit_slli(RV_REG_T2, RV_REG_T2, 8, ctx);
--		emit_srli(rd, rd, 8, ctx);
--		if (imm == 32)
--			goto out_be;
--
--		emit_andi(RV_REG_T1, rd, 0xff, ctx);
--		emit_add(RV_REG_T2, RV_REG_T2, RV_REG_T1, ctx);
--		emit_slli(RV_REG_T2, RV_REG_T2, 8, ctx);
--		emit_srli(rd, rd, 8, ctx);
--
--		emit_andi(RV_REG_T1, rd, 0xff, ctx);
--		emit_add(RV_REG_T2, RV_REG_T2, RV_REG_T1, ctx);
--		emit_slli(RV_REG_T2, RV_REG_T2, 8, ctx);
--		emit_srli(rd, rd, 8, ctx);
--
--		emit_andi(RV_REG_T1, rd, 0xff, ctx);
--		emit_add(RV_REG_T2, RV_REG_T2, RV_REG_T1, ctx);
--		emit_slli(RV_REG_T2, RV_REG_T2, 8, ctx);
--		emit_srli(rd, rd, 8, ctx);
--
--		emit_andi(RV_REG_T1, rd, 0xff, ctx);
--		emit_add(RV_REG_T2, RV_REG_T2, RV_REG_T1, ctx);
--		emit_slli(RV_REG_T2, RV_REG_T2, 8, ctx);
--		emit_srli(rd, rd, 8, ctx);
--out_be:
--		emit_andi(RV_REG_T1, rd, 0xff, ctx);
--		emit_add(RV_REG_T2, RV_REG_T2, RV_REG_T1, ctx);
--
--		emit_mv(rd, RV_REG_T2, ctx);
-+		emit_bswap(rd, imm, ctx);
- 		break;
- 
- 	/* dst = imm */
--- 
-2.34.1
+However, there's basically no way to get sparse to warn on this. Even
+inserting a function
 
+void test(void);
+void test(void)
+{
+        ieee80211_set_beacon_cntdwn(NULL, NULL, NULL);
+}
+
+will not cause sparse to complain, where this *clearly* doesn't hold an
+locks.
+
+
+Also, as we (should) all know, the argument to __acquires(),
+__releases() and __must_check() is pretty much ignored. I tried to fix
+this in sparse many years ago, some code even got merged (and then
+reverted), and if the experience tells me anything then that it's pretty
+much not fixable.
+
+__acquires() and __releases() at least are useful for tracking that you
+don't have a mismatch, e.g. a function that __acquires() but then takes
+a lock in most paths but forgot one, for example. With __must_hold(),
+this really isn't the case.
+
+And then we could argue that at least it has a documentation effect, but
+... what does it even mean to "hold 'link'"? There isn't even a lock,
+mutex or otherwise, in the link. You can't "own" a reference to it, or
+anything like that. The closest thing in current kernels would be to
+maybe see if you have the wiphy mutex, but that's likely not the case in
+these paths and RCU was used to get to the link struct ...
+
+
+IOW, I find this lacking from an implementation/validation point of
+view, and lacking if not outright confusing from a documentation point
+of view. Much better to put something lockdep_assert_held() or similar
+into the right places.
+
+As for your comment about RCU in ath11k (which points back to this
+thread): I don't find
+
+	RCU_LOCKDEP_WARN(!rcu_read_lock_held());
+or
+	WARN_ON_ONCE(!rcu_read_lock_held());
+
+very persuasive, it's much better to have it checked with
+rcu_dereference_protected(), rcu_dereference_check(), the condition
+argument to list_for_each_rcu(), or (in the case of wiphy) our wrappers
+around these like wiphy_dereference(). I cannot think of any case where
+you'd want to ensure that some code is in an RCU critical section
+without it actually using RCU - and if it does you have
+rcu_dereference() and all those things that (a) check anyway, and also
+(b) serve as their own documentation.
+
+
+Anyway, long story short: I don't see value in this patch and won't be
+applying it unless somebody here can convince me otherwise, ideally
+addressing the concerns stated above.
+
+johannes
 
