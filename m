@@ -1,109 +1,229 @@
-Return-Path: <netdev+bounces-63561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63559-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D267E82E1A2
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 21:22:02 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61DD182E161
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 21:13:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A057283A05
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 20:22:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1CBEB2218F
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 20:13:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E34A71A58C;
-	Mon, 15 Jan 2024 20:21:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A736819472;
+	Mon, 15 Jan 2024 20:13:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Id0pIQvM"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97FA81A289
-	for <netdev@vger.kernel.org>; Mon, 15 Jan 2024 20:21:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1rPTSG-0004lk-G7; Mon, 15 Jan 2024 21:21:08 +0100
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1rPTSF-0005gl-Md; Mon, 15 Jan 2024 21:21:07 +0100
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1rPTSF-000N7x-1x;
-	Mon, 15 Jan 2024 21:21:07 +0100
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To: Mark Brown <broonie@kernel.org>,
-	Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: linux-spi@vger.kernel.org,
-	kernel@pengutronix.de,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Ronald Wahl <ronald.wahl@raritan.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH 14/33] net: ks8851: Follow renaming of SPI "master" to "controller"
-Date: Mon, 15 Jan 2024 21:13:00 +0100
-Message-ID:  <9d509f1065bd6fdf673022b46cb3e7e7faabf38d.1705348269.git.u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1705348269.git.u.kleine-koenig@pengutronix.de>
-References: <cover.1705348269.git.u.kleine-koenig@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A06A199D0;
+	Mon, 15 Jan 2024 20:13:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1705349602; x=1736885602;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=EyZsQWag1Okc7cfmCCItZ6l0W8cgMueVfProkneQbSM=;
+  b=Id0pIQvMkbIq+QDmlttkS2SYjscZhPELj7rKk2WrhJKNd/u5MtUBmTdM
+   JULu8VH1fnE0DNIUCcJUDjqxie21RoAIdWdNgVsfZpg/4wjGWCjpk3FsW
+   Iw3g4TnZ6EEhCz8mkVqjXoWJrZOuXtrUIs09aSwuFxtV3WXE8gF3ywWqt
+   s=;
+X-IronPort-AV: E=Sophos;i="6.04,197,1695686400"; 
+   d="scan'208";a="321718437"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-d7759ebe.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2024 20:13:16 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
+	by email-inbound-relay-iad-1d-m6i4x-d7759ebe.us-east-1.amazon.com (Postfix) with ESMTPS id 324B44A3E1;
+	Mon, 15 Jan 2024 20:13:13 +0000 (UTC)
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:49016]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.61.210:2525] with esmtp (Farcaster)
+ id bcae45fc-5982-4853-aeb7-c864dc97260d; Mon, 15 Jan 2024 20:13:13 +0000 (UTC)
+X-Farcaster-Flow-ID: bcae45fc-5982-4853-aeb7-c864dc97260d
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Mon, 15 Jan 2024 20:13:13 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.187.170.32) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Mon, 15 Jan 2024 20:13:10 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <martin.lau@linux.dev>
+CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
+	<daniel@iogearbox.net>, <edumazet@google.com>, <kuni1840@gmail.com>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH v7 bpf-next 5/6] bpf: tcp: Support arbitrary SYN Cookie.
+Date: Mon, 15 Jan 2024 12:13:01 -0800
+Message-ID: <20240115201301.64265-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <aea7e756-9b3a-46b0-af27-207ba306b875@linux.dev>
+References: <aea7e756-9b3a-46b0-af27-207ba306b875@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1429; i=u.kleine-koenig@pengutronix.de; h=from:subject:message-id; bh=k1rHvw5+PEKWPibrhhwO8xQSNsQkvYQeLgzRB6ik/XM=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlpZHQfCmZmX7LyGzP9mGTWF9K4DvV4q7L3xV+Z hmlkCDkEWaJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZaWR0AAKCRCPgPtYfRL+ TjFSB/49fj4XcGmIxTfRFpi6mEnqKtt9lrQdk1JYq/xN3aJC8PRWtoRobAONiOFtqy2W68CNSde HX8i+x3RJs6Tun6P0ItJGLEMhPHv4uY9pgkpHB37f7aXImPEbAeXAFai87joqMfe0N5ijm2Jr7v MIiqpy/Bhf7Nybfny/Cx30pSZ5WKUxKhsxvrIit5pVBjALxzSeM/usbNXSMOPKVXTBuJC84cLcV 0ymPT9N9wwb95sc598lLFeFklr7U5K687XzbDQAxI4n0evGLUGk/evnHv/Vm/V9boBRB6US+bjb 45bMo5AmaxqFKQsevi4CEsno0SvCDFtcZYX4XWoU4ze4BHF9
-X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D044UWB002.ant.amazon.com (10.13.139.188) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
 
-In commit 8caab75fd2c2 ("spi: Generalize SPI "master" to "controller"")
-some functions and struct members were renamed. To not break all drivers
-compatibility macros were provided.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Date: Thu, 11 Jan 2024 17:44:55 -0800
+> On 12/20/23 5:28 PM, Kuniyuki Iwashima wrote:
+> > This patch adds a new kfunc available at TC hook to support arbitrary
+> > SYN Cookie.
+> > 
+> > The basic usage is as follows:
+> > 
+> >      struct bpf_tcp_req_attrs attrs = {
+> >          .mss = mss,
+> >          .wscale_ok = wscale_ok,
+> >          .rcv_wscale = rcv_wscale, /* Server's WScale < 15 */
+> >          .snd_wscale = snd_wscale, /* Client's WScale < 15 */
+> >          .tstamp_ok = tstamp_ok,
+> >          .rcv_tsval = tsval,
+> >          .rcv_tsecr = tsecr, /* Server's Initial TSval */
+> >          .usec_ts_ok = usec_ts_ok,
+> >          .sack_ok = sack_ok,
+> >          .ecn_ok = ecn_ok,
+> >      }
+> > 
+> >      skc = bpf_skc_lookup_tcp(...);
+> >      sk = (struct sock *)bpf_skc_to_tcp_sock(skc);
+> >      bpf_sk_assign_tcp_reqsk(skb, sk, attrs, sizeof(attrs));
+> >      bpf_sk_release(skc);
+> > 
+> > bpf_sk_assign_tcp_reqsk() takes skb, a listener sk, and struct
+> > bpf_tcp_req_attrs and allocates reqsk and configures it.  Then,
+> > bpf_sk_assign_tcp_reqsk() links reqsk with skb and the listener.
+> > 
+> > The notable thing here is that we do not hold refcnt for both reqsk
+> > and listener.  To differentiate that, we mark reqsk->syncookie, which
+> > is only used in TX for now.  So, if reqsk->syncookie is 1 in RX, it
+> > means that the reqsk is allocated by kfunc.
+> > 
+> > When skb is freed, sock_pfree() checks if reqsk->syncookie is 1,
+> > and in that case, we set NULL to reqsk->rsk_listener before calling
+> > reqsk_free() as reqsk does not hold a refcnt of the listener.
+> > 
+> > When the TCP stack looks up a socket from the skb, we steal the
+> > listener from the reqsk in skb_steal_sock() and create a full sk
+> > in cookie_v[46]_check().
+> > 
+> > The refcnt of reqsk will finally be set to 1 in tcp_get_cookie_sock()
+> > after creating a full sk.
+> > 
+> > Note that we can extend struct bpf_tcp_req_attrs in the future when
+> > we add a new attribute that is determined in 3WHS.
+> 
+> Notice a few final details.
+> 
+> > 
+> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > ---
+> >   include/net/tcp.h |  13 ++++++
+> >   net/core/filter.c | 113 +++++++++++++++++++++++++++++++++++++++++++++-
+> >   net/core/sock.c   |  14 +++++-
+> >   3 files changed, 136 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/include/net/tcp.h b/include/net/tcp.h
+> > index a63916f41f77..20619df8819e 100644
+> > --- a/include/net/tcp.h
+> > +++ b/include/net/tcp.h
+> > @@ -600,6 +600,19 @@ static inline bool cookie_ecn_ok(const struct net *net, const struct dst_entry *
+> >   }
+> >   
+> >   #if IS_ENABLED(CONFIG_BPF)
+> > +struct bpf_tcp_req_attrs {
+> > +	u32 rcv_tsval;
+> > +	u32 rcv_tsecr;
+> > +	u16 mss;
+> > +	u8 rcv_wscale;
+> > +	u8 snd_wscale;
+> > +	u8 ecn_ok;
+> > +	u8 wscale_ok;
+> > +	u8 sack_ok;
+> > +	u8 tstamp_ok;
+> > +	u8 usec_ts_ok;
+> 
+> Add "u8 reserved[3];" for the 3 bytes tail padding.
+> 
+> > +};
+> > +
+> >   static inline bool cookie_bpf_ok(struct sk_buff *skb)
+> >   {
+> >   	return skb->sk;
+> > diff --git a/net/core/filter.c b/net/core/filter.c
+> > index 24061f29c9dd..961c2d30bd72 100644
+> > --- a/net/core/filter.c
+> > +++ b/net/core/filter.c
+> > @@ -11837,6 +11837,105 @@ __bpf_kfunc int bpf_sock_addr_set_sun_path(struct bpf_sock_addr_kern *sa_kern,
+> >   
+> >   	return 0;
+> >   }
+> > +
+> > +__bpf_kfunc int bpf_sk_assign_tcp_reqsk(struct sk_buff *skb, struct sock *sk,
+> > +					struct bpf_tcp_req_attrs *attrs, int attrs__sz)
+> > +{
+> > +#if IS_ENABLED(CONFIG_SYN_COOKIES)
+> > +	const struct request_sock_ops *ops;
+> > +	struct inet_request_sock *ireq;
+> > +	struct tcp_request_sock *treq;
+> > +	struct request_sock *req;
+> > +	struct net *net;
+> > +	__u16 min_mss;
+> > +	u32 tsoff = 0;
+> > +
+> > +	if (attrs__sz != sizeof(*attrs))
+> > +		return -EINVAL;
+> > +
+> > +	if (!sk)
+> > +		return -EINVAL;
+> > +
+> > +	if (!skb_at_tc_ingress(skb))
+> > +		return -EINVAL;
+> > +
+> > +	net = dev_net(skb->dev);
+> > +	if (net != sock_net(sk))
+> > +		return -ENETUNREACH;
+> > +
+> > +	switch (skb->protocol) {
+> > +	case htons(ETH_P_IP):
+> > +		ops = &tcp_request_sock_ops;
+> > +		min_mss = 536;
+> > +		break;
+> > +#if IS_BUILTIN(CONFIG_IPV6)
+> > +	case htons(ETH_P_IPV6):
+> > +		ops = &tcp6_request_sock_ops;
+> > +		min_mss = IPV6_MIN_MTU - 60;
+> > +		break;
+> > +#endif
+> > +	default:
+> > +		return -EINVAL;
+> > +	}
+> > +
+> > +	if (sk->sk_type != SOCK_STREAM || sk->sk_state != TCP_LISTEN ||
+> > +	    sk_is_mptcp(sk))
+> > +		return -EINVAL;
+> > +
+> 
+> and check for:
+> 
+> 	if (attrs->reserved[0] || attrs->reserved[1] || attrs->reserved[2])
+> 		return -EINVAL;
+> 
+> It will be safer if it needs to extend "struct bpf_tcp_req_attrs". There is an 
+> existing example in __bpf_nf_ct_lookup() when checking the 'struct bpf_ct_opts 
+> *opts'.
 
-To be able to remove these compatibility macros push the renaming into
-this driver.
+I'll add that test in v8.
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
----
- drivers/net/ethernet/micrel/ks8851_spi.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/micrel/ks8851_spi.c b/drivers/net/ethernet/micrel/ks8851_spi.c
-index 54f2eac11a63..2f803377c9f9 100644
---- a/drivers/net/ethernet/micrel/ks8851_spi.c
-+++ b/drivers/net/ethernet/micrel/ks8851_spi.c
-@@ -156,7 +156,7 @@ static void ks8851_rdreg(struct ks8851_net *ks, unsigned int op,
- 
- 	txb[0] = cpu_to_le16(op | KS_SPIOP_RD);
- 
--	if (kss->spidev->master->flags & SPI_CONTROLLER_HALF_DUPLEX) {
-+	if (kss->spidev->controller->flags & SPI_CONTROLLER_HALF_DUPLEX) {
- 		msg = &kss->spi_msg2;
- 		xfer = kss->spi_xfer2;
- 
-@@ -180,7 +180,7 @@ static void ks8851_rdreg(struct ks8851_net *ks, unsigned int op,
- 	ret = spi_sync(kss->spidev, msg);
- 	if (ret < 0)
- 		netdev_err(ks->netdev, "read: spi_sync() failed\n");
--	else if (kss->spidev->master->flags & SPI_CONTROLLER_HALF_DUPLEX)
-+	else if (kss->spidev->controller->flags & SPI_CONTROLLER_HALF_DUPLEX)
- 		memcpy(rxb, trx, rxl);
- 	else
- 		memcpy(rxb, trx + 2, rxl);
--- 
-2.43.0
-
+Thank you!
 
