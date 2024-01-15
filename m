@@ -1,351 +1,212 @@
-Return-Path: <netdev+bounces-63540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F105282DB0E
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 15:11:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D6C1182DB30
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 15:24:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F11E41C218EE
-	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 14:11:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFB991C219D2
+	for <lists+netdev@lfdr.de>; Mon, 15 Jan 2024 14:24:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3127217589;
-	Mon, 15 Jan 2024 14:11:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFFB017590;
+	Mon, 15 Jan 2024 14:24:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="TjWB3v79"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="dmEZ9Ikh";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="bxgNaoii"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E690F17586
-	for <netdev@vger.kernel.org>; Mon, 15 Jan 2024 14:11:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-40e8004629bso3095205e9.2
-        for <netdev@vger.kernel.org>; Mon, 15 Jan 2024 06:11:20 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F21AE17586;
+	Mon, 15 Jan 2024 14:24:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40F9Dtif005110;
+	Mon, 15 Jan 2024 14:23:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-id : content-transfer-encoding : mime-version; s=corp-2023-11-20;
+ bh=yiasczbZxccF39D9hjFClAHrUgsE4TfZLI84Bou5K18=;
+ b=dmEZ9Ikh2BrOhiqRXim55aBvtp4mWfB9PYk5cHLaAG8EIds76ITYj7nImtHDZKhXv/Ek
+ S11ERTPjNwICw7gFXKNOO4IE5kfWJfHEzB8hrXThzntgtpdSqPureIiPczlyi4F3JSpt
+ /dDCk02osZE1SX8rU4iFviuIBR8/7PLUUBYxuClPc6wXv1jx6URedzlxUrk7q/zDeRDn
+ EsfHoMyklT7b4s+IpYQXBUt7qerpFzHgRZ4wqRHV44mkZVfXZJed83lsKZUggPMTPP4r
+ tOu/kgm/fGt2E5ybfm7cupz+CznN4M/yMUnOnXMniDS/kkK3bcJWmmpgGZpIrFRakm3E ng== 
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3vkjjeagvp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 15 Jan 2024 14:23:28 +0000
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 40FE26WK025679;
+	Mon, 15 Jan 2024 14:23:27 GMT
+Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2041.outbound.protection.outlook.com [104.47.66.41])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3vkgy675sc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 15 Jan 2024 14:23:27 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=F5JzhELF0P84U6ob2d1UpJ4yMhSvhzumxG7CwSy66EiTJzKiAesONsSopetr7HW3x6aGn6nYxARid8wwLf72gwwcNQ9k18jEN9Uq2jVLUrvFz0YKf0/1TFKZK1mmmp2UMm4pMyEMlL/rVPiNxKPgHAvKD+qvsmv1elLJosVPflNrVmh++r3D1usSrZtnJKXa+OVgMJD9SBnFenTdizyLut1dEfON/U0OvcwJKc3FQLtiA59UOy4vlPbYqk8fYQQXZb7HDHGjSJ723LRGstDBhOUQ7n62RZ1kGLc4Qwu48OqsMC8BqbBb/YILe5PWE2+gerdsoO7jQV4fMaL6kjxxTg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yiasczbZxccF39D9hjFClAHrUgsE4TfZLI84Bou5K18=;
+ b=XmaA7+MB5IA01LtV6avO/q85KmaS3vr2JARSPfhZ6MdDmRUiIyG/tdl8gcJ9D5k8pOU4QpVSxXmNwOP7rtAJs/VBVY00OZNyBcH4j5rpOnKIbabq57y5IKuLPvFO79ju6uYoUCxkSifLIIvonP6XGOpK1ZmyxXl3cLeu6gYrOD6msVRm95YWuO+vpG2uE0aXq8dLqEtmNVnfd+qeBdiqC33QwqLEbVQ1ADCiaUdwZZlmngqht8GVWXwjgCUGLMdzN4e6otRD6i9mwV5kE6KruBPsLxbgI1jWlubLSMdiuTiZOpVpSgoxaD0hMH2iLvuljhJ4GH0AUXgMGlG6xuJadg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1705327879; x=1705932679; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nEW8TVJOCkMKaJNej4PCDNmTXZ9hZKRmiCLW8yVU9wQ=;
-        b=TjWB3v79d0iF2khZv3pGateoaF8pV7aV+wk7Txx3g5r8um9oSyPx2nizdac0lB7xPT
-         hlrQznkjFaqmpBHAFkPVtk55S8ojcXtsEsmSOL+6Cp1SVEdTzeDIWuse36Cv3HCPDIoe
-         119Uw+lYGrkhL+oXzq+F5JSbhBG0ABjC2uml8+bnHFmLGXnCdRbVpRW8LIwlKGH/Mjne
-         nXCqYqeEDpxvSTuKPjBwvleiU71NW0YjomqunoBNLIGuyzQseQC3TLr5pLsTj78zYrAZ
-         dlpNYGr7UUKAatBgKClP0cjqdbMnSFMt5AGSIa4xORmCzP0FOBylBGeO9hkcm2Mkq28b
-         NW+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705327879; x=1705932679;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nEW8TVJOCkMKaJNej4PCDNmTXZ9hZKRmiCLW8yVU9wQ=;
-        b=XAFdJN/BGxX4rQ1CpIMWwQFFQvk8ftrkaPjXRP+9ZRmYYpMxR0rQtQD+jAcD4epp/b
-         g7A4idonlXcLn8UwraJcr1ZRn4LcNaWf2kWgO5rumrNsbppCeXiO/gB9OMfKrW2wpnK4
-         Gp3W9PFiTLKUdEFWf+IgV68RV6SwPoPj4Sr0acAMZ0NMvWYkBQbAmQfO/Rg1TCa/3r2o
-         ZhrjBoqfsAMJbZ5Ooo6zuPpEXfekJXIcpaU/8vXmY6umGQnHUUhqkCcQ9JFPnjk16UGs
-         lwjYP2GKAXbuAUeh8LXx0UAi8antZK+Y8YgSsURBEw4RuAdFsXxzwg5O/e5/4wI0SyhP
-         6b9w==
-X-Gm-Message-State: AOJu0Yx0bnSOTlVjtysvsdTvMa9zYaevAo5Gwpb4ri2R9rYFK+UgNugA
-	AwqaDM9xboxXiHGidVsUiWbp6b+fy/5oiA==
-X-Google-Smtp-Source: AGHT+IHgdm+FEizkBQyJf93SSgm63m+1k23E4qHyHe8hQeyjeC56JHw3VGDeceYoycaLqSb/oFji9Q==
-X-Received: by 2002:a7b:cd85:0:b0:40e:5b2d:cd5d with SMTP id y5-20020a7bcd85000000b0040e5b2dcd5dmr2018793wmj.35.1705327878797;
-        Mon, 15 Jan 2024 06:11:18 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id ay12-20020a05600c1e0c00b0040d802a7619sm20287679wmb.38.2024.01.15.06.11.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jan 2024 06:11:18 -0800 (PST)
-Date: Mon, 15 Jan 2024 15:11:16 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Wen Gu <guwen@linux.alibaba.com>
-Cc: wintera@linux.ibm.com, wenjia@linux.ibm.com, hca@linux.ibm.com,
-	gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	jaka@linux.ibm.com, borntraeger@linux.ibm.com, svens@linux.ibm.com,
-	alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 00/15] net/smc: implement loopback-ism used by
- SMC-D
-Message-ID: <ZaU9BGuVo6ru38sy@nanopsycho>
-References: <20240111120036.109903-1-guwen@linux.alibaba.com>
- <ZaAAJDiQ3bPGGRFK@nanopsycho>
- <2d8e7aeb-06da-434c-b7fe-6c1bd2e0674a@linux.alibaba.com>
- <ZaEB-b-W9Jt77T98@nanopsycho>
- <d7f9684e-4115-4b04-9e92-dbb841a52935@linux.alibaba.com>
- <ZaFfqZbgpVtVt4XM@nanopsycho>
- <895a0da3-bf6c-4e76-a672-d73481b4e58b@linux.alibaba.com>
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yiasczbZxccF39D9hjFClAHrUgsE4TfZLI84Bou5K18=;
+ b=bxgNaoiiUhZkKsEqic8uqn/zTaEMWmGyUxMRCE7d4Bu08zq0Pmuh9qObjFtinW8LpIogwc0gnzIBzrbsxcJ4LLduvyJirXadzf5r6u3aHNK6Ic1UNoQ6jNPRYh7LpnHX9tYyiMi7q+26Pu9ChYOLlqSHKgrcdroGi+Tmev+MKmM=
+Received: from BN0PR10MB5128.namprd10.prod.outlook.com (2603:10b6:408:117::24)
+ by MW5PR10MB5873.namprd10.prod.outlook.com (2603:10b6:303:19b::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.26; Mon, 15 Jan
+ 2024 14:23:19 +0000
+Received: from BN0PR10MB5128.namprd10.prod.outlook.com
+ ([fe80::7602:61fe:ec7f:2d6f]) by BN0PR10MB5128.namprd10.prod.outlook.com
+ ([fe80::7602:61fe:ec7f:2d6f%5]) with mapi id 15.20.7181.026; Mon, 15 Jan 2024
+ 14:23:19 +0000
+From: Chuck Lever III <chuck.lever@oracle.com>
+To: Simon Horman <horms@kernel.org>, Zhipeng Lu <alexious@zju.edu.cn>
+CC: Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>,
+        Olga
+ Kornievskaia <kolga@netapp.com>, Dai Ngo <dai.ngo@oracle.com>,
+        Tom Talpey
+	<tom@talpey.com>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna
+ Schumaker <anna@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>, Simo Sorce <simo@redhat.com>,
+        Steve Dickson
+	<steved@redhat.com>, Kevin Coffman <kwc@citi.umich.edu>,
+        Linux NFS Mailing
+ List <linux-nfs@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]"
+	<netdev@vger.kernel.org>,
+        Linux Kernel Mailing List
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] [v2] SUNRPC: fix a memleak in gss_import_v2_context
+Thread-Topic: [PATCH] [v2] SUNRPC: fix a memleak in gss_import_v2_context
+Thread-Index: AQHaRTPnoXVylAI9zUS0n79WCePwLbDavBmAgAA2OYA=
+Date: Mon, 15 Jan 2024 14:23:19 +0000
+Message-ID: <35F4C7FB-3337-4894-8AA2-C1F4ADCD99C9@oracle.com>
+References: <20240112084540.3729001-1-alexious@zju.edu.cn>
+ <20240115110905.GR392144@kernel.org>
+In-Reply-To: <20240115110905.GR392144@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-mailer: Apple Mail (2.3774.300.61.1.2)
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN0PR10MB5128:EE_|MW5PR10MB5873:EE_
+x-ms-office365-filtering-correlation-id: bda383c4-fb43-4f74-6714-08dc15d585e5
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 
+ SYSKMsFQrb7VcDGWGp/MBByVa0BmzDKwr+geFoH7Tgm0bSGXhn2rEjBTqzcqWeumYykEIpjo04dRD9Ae4PrUgE84jp/gzmcRH+DLlf70qrSUC0OMgGHF9J0AZaX9+zI9KI0rA1gBa/ykwjXK5oRVI4Z7HHewM7YjqWkUrLnXkv8YrY0xlxB1ckYLcE4O/uZXJCRdtOz9IlF1pw3qNDC5sYH79JMghENWn8w3FA8dpo8skxMk5TvhUeSQZDfYf0zpGyY68dQqZ6Jzbzuvfj0uJCNmjvtdsDykg6vAmPy8URtLvSQFgKrPfDTDMrWTnt1xC5OoJiwjkdUzSKaoOhBY76bHPYXTxbYQfenGxFMz/TmBAGUikBRFudT/EfeaVObC8TrK0xWpt1IASjtfy+SEcFjDLSYgqyZ35G2d0zX/WFEeXDpz+59kCc69+QwsEVoYU7jfQRQRZ8rn9fJps4UBouL6601gHFVTRuMj+4tWuJJ5D1mnAvpppVPSZe154eGIOUXMEj5IDuaG1CLwIF8dQJq8Fb1koOmH7Ly+FUHaHZYLvmqRsLUeDJDd7ZJ69zhyn1sSTTLGRNqNHMUvvPyvj4ImbcX+22yRtTX0Vw5YpmCWFqZbsr1bCCQuIw0/ivBEGF2q16/5e++PjeX6e2acng==
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR10MB5128.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(346002)(39860400002)(136003)(376002)(366004)(230922051799003)(1800799012)(186009)(64100799003)(451199024)(86362001)(36756003)(33656002)(38070700009)(8676002)(8936002)(4326008)(5660300002)(71200400001)(2616005)(26005)(38100700002)(122000001)(66946007)(76116006)(66476007)(66446008)(66556008)(64756008)(54906003)(316002)(110136005)(91956017)(2906002)(41300700001)(6486002)(7416002)(6512007)(6506007)(53546011)(478600001)(45980500001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?utf-8?B?aTBCdFZEV081MGR5MW5xa2pDNEFBYldub1hUNEpYUlpuMnM5TXpnVldTVU5Y?=
+ =?utf-8?B?Ylhnd3BvUUdzcjYxYWdwa1oxdmxKR1cxVjkzL0dtSFh1RGp6bW9iQWV2dVZm?=
+ =?utf-8?B?QWQ3eFZJVTVsYWxnN1YxNXFqdjcxNnMzLzR6MWMzNE1PM1VWakpYWHlWbzAw?=
+ =?utf-8?B?V3RCOGxtNWxwbXVESnlsVUJpOEhTZjc1QjFJZmxTVE1VTTVsUFNHZzVSSC9u?=
+ =?utf-8?B?UmZmd0VPdVYwY2FpakMwOUFMckpPSC9jaUkzRkhUZ0RKeWo5SVd0T0FkUTNN?=
+ =?utf-8?B?OWJwamtrWnQ0TmNzRWpMcnpXQXU1cGhhZzJOa1hSSkFqdXBPYkxhdkRqUlpQ?=
+ =?utf-8?B?ZjhXSHNOUkp3UzcyTnl4WmVoaTNkK2RESitON0h4UUp2WllPcU1ZNE1OTE53?=
+ =?utf-8?B?eGx6SWFsV1dVM3NNTU9ScFlCbjZFbjhmaE9Mek82OHEreHVMMkRDUGs0ZEFi?=
+ =?utf-8?B?bUQ5VWtQVklOY1ZzTzI3MUZPNVM1OWZWWFk1N0E1TEVmRmRxZlRDWGNkRmZV?=
+ =?utf-8?B?YXo0UmhzdnRsOHhIOVZ1QUdNMUtMZWZTSGtJRUpWQWZ1R0phOVpDZklzZzIy?=
+ =?utf-8?B?VHlwOUtBdzJVVWZ4Qk1vYjVhYlNKSUhtYXNZWjUyY1NCYm9nN3pqV2JwdDVT?=
+ =?utf-8?B?Z1dnTXRWSzlUOURLc0Rrb0dsczJGU293N2l0dlJNV08xQTlBMXpvdmxSRDFk?=
+ =?utf-8?B?TDNYdHJ6eWdBTEhnd1MvVUhlUi9JaGtJY3RDVVNmUER5SEtQdGdWUGk2eHk1?=
+ =?utf-8?B?cnBLSHlvcmk0TFdqSHVIbStiYUtpOWQ3dEtHNExiVlY4dHNnbW51eFpXMGdV?=
+ =?utf-8?B?VDYzaUlIbmxzL3hzeGs2SEN4UjkvTFlROWdmZ0g4ZTRsblVWWWQwdVhDRGw4?=
+ =?utf-8?B?b2diamlreTIyTDVQOHdqVk1jZHRrdXEvTkV1OWxQZkJEcDNBU3lQMzU0Tkor?=
+ =?utf-8?B?ay9jTzFOQ3ZVcFVyQkIwR1JFdDgvT1RmNmd3dFV1ZFBSR0QvVnptUmhhbDRv?=
+ =?utf-8?B?Q2wrRTlZbkl3MWlLcHhvVFlvTFdLL3pseVhmUWlFbmtWTitHT2I5bHg2U3A5?=
+ =?utf-8?B?c00yOU5vYW9DWXRnckJFTmp3ZlZGY0h3ZXJsd1lFdFNNbHRhUzU4bzVZUUJ6?=
+ =?utf-8?B?QWovOW1rRUljSXhENDVQS3RybEgxby9NTyt6M1ZxT1llRXJ5K0NXRGtDOEFv?=
+ =?utf-8?B?L1dtYktSd2NNSXpUSDNFeUV0bVU5bFU1WHB4aXlHbzBVTGwwMHJjNDNWNGo5?=
+ =?utf-8?B?QU40YkVESzd6VEN2NTV2QnBHZUdGZEIvZEFYYWdHWWY2NisvMm82OVdlcjZB?=
+ =?utf-8?B?T3hwcEhMNDVsUmpyUFlUNXVwaDVrOWhvU2xnZTB3NFQ5Sm1ROWRHMWJjRHBp?=
+ =?utf-8?B?S1ZXNVRLYWMwWlJRK0hzWkMyZ0VpUmp6QVRoblVHMVcxNmVrM1VSQUdQZXV3?=
+ =?utf-8?B?MGk2R0t1NzFqbzYxbVdDSVhVRjlJR2tOR1NCd1JSZjhiYzhnMlhkRGtxSXdY?=
+ =?utf-8?B?YndWOHJldzVma2FvTGpiWjFUMXR6ZlY1WHcrdEtqYytMZWlHbGJFSXZpSno0?=
+ =?utf-8?B?WFZzQnI1OGF6UUduRTlnSnlrRkREQnIzVkVzeHRKenpZNUVyYkZRQlhvek4y?=
+ =?utf-8?B?UDYzSFR3ZFJFMFJvcEtGMkl0ak85d09ya2Z5MGJKWmRmM1dRSU43cEh0Vzh1?=
+ =?utf-8?B?Y1NpbVZkNkYxOWZEbEZDeTlVWnMyWEw0NGRDcXFsRHJURFNRL0JHQWtxbG05?=
+ =?utf-8?B?NmRsVVYzQVdzS0NXTVB3aUw1K3dFTEFpWDdCb3I0cUQ2TndXaHlyaFFkU2R2?=
+ =?utf-8?B?YmNySHFaZiszNjNsT1RucVEyclBIb3lxcEdja2x1dm8veExNOVhzVWYzK2xG?=
+ =?utf-8?B?b1puNVNxcU81N21DUTlETnpENkF4MnZ2MTdHMEhRcnB3OExwMzRreU9IY2hp?=
+ =?utf-8?B?cmpmVVBoWHpvWUVScldBUFFSZ2hONHZtQWUyZVFrams0d2lqTERUNU9oUExR?=
+ =?utf-8?B?V2JSVlhzSUhRUjRzVEdHazJXdHNaSUxtTFpOUHQrWk5CbjQ1MUF4VDRUajcx?=
+ =?utf-8?B?VkFWSVhjYXJ5OXBCK3ZpV2x5SE1mbDJsbTdWRDJoS3BkL01WYXZnNDhMRis0?=
+ =?utf-8?B?aUt3bGpNSFp3WDBXNFNIa0VlOEE5dnY5cDZRU25RbzYvemhvb2dWOStQWU9O?=
+ =?utf-8?B?RXc9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <2383F287749F0048B62F1318AF6276C9@namprd10.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <895a0da3-bf6c-4e76-a672-d73481b4e58b@linux.alibaba.com>
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
+	crpRrZ4oUjWSLVgyJLvxFxQ/aKM4FjPpr56bJqZuH07GUUTpSY42aG6Z+VJQoHPENoTCoA2T0pLoKlkPMJyZxg/ibT+hKL11yKq0diY7RbxHhQiHYqVij613zEuGxITYi3o6XhwYBI4k47jdbLe709bgZYfalud2NzfboSKlaqUerL6w+BlRhoXUf/iPNvbtFFoC5x5VotzU9rQJveaYfwvU+g/rAWPEEiTJGf7bKl0fiHZIN0bbyKik2t5b8/PmpkgivbYglF7+a9naOAaojKXITPT/uwT44bud8zZeO05VTfWvD6FFxm1RQUNUC2lJ0komDmL+flWlRnAQIrDsmEHRTPi3VWGdRhjTxBtW8wkzhwK66opSVHqSwpQyp7XZSPO7nxEdNGDLhZh6zqw8Mi08nyCB2RKET5VJyv3jamu/xBpqTtv3PdH0aM8SZpgQfnA8Tl7nWa4m2rCXlLaJvXn+fnxuZQ6CkHh9cdlC+d+osKg+uWGxpXjCMY4zHoiRlBxEFr0fIgvQy4ZNs2EEa/N015bX8+wtILbxX5G1hZReL3o47Q3h6SFEOvpmAsQMaGIdzjI9TOaBcvPMAw5WWf9vLtwuxAJP3to3oCuF8HY=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN0PR10MB5128.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bda383c4-fb43-4f74-6714-08dc15d585e5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Jan 2024 14:23:19.8278
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: eQdvYBd7OSQ2RimAAYkgp9HqBluxWLA6xPQpnjFeITZ0GnLHBejyfWXWbN5aunAlvpAVDg7wBXZtjV+HKA+fPg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR10MB5873
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-15_09,2024-01-15_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0 bulkscore=0
+ malwarescore=0 spamscore=0 suspectscore=0 mlxlogscore=936 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2401150105
+X-Proofpoint-ORIG-GUID: QkOo_uWoV7wzSqf7k9t7KoYqt8-Nrq1U
+X-Proofpoint-GUID: QkOo_uWoV7wzSqf7k9t7KoYqt8-Nrq1U
 
-Sat, Jan 13, 2024 at 10:22:15AM CET, guwen@linux.alibaba.com wrote:
->
->
->On 2024/1/12 23:50, Jiri Pirko wrote:
->> Fri, Jan 12, 2024 at 01:32:14PM CET, guwen@linux.alibaba.com wrote:
->> > 
->> > 
->> > On 2024/1/12 17:10, Jiri Pirko wrote:
->> > > Fri, Jan 12, 2024 at 09:29:35AM CET, guwen@linux.alibaba.com wrote:
->> > > > 
->
-><...>
->
->> > > > > > # Benchmark Test
->> > > > > > 
->> > > > > > * Test environments:
->> > > > > >         - VM with Intel Xeon Platinum 8 core 2.50GHz, 16 GiB mem.
->> > > > > >         - SMC sndbuf/DMB size 1MB.
->> > > > > >         - /sys/devices/virtual/smc/loopback-ism/dmb_copy is set to default 0,
->> > > > > >           which means sndbuf and DMB are merged and no data copied between them.
->> > > > > >         - /sys/devices/virtual/smc/loopback-ism/dmb_type is set to default 0,
->> > > > > 
->> > > > > Exposing any configuration knobs and statistics over sysfs for
->> > > > > softdevices does not look correct at all :/ Could you please avoid
->> > > > > sysfs?
->> > > > > 
->> > > > 
->> > > > In previous reviews and calls, we think loopback-ism needs to be more
->> > > > like a device and be visible under /sys/devices.
->> > > > 
->> > > > Would you mind explaining why using sysfs for loopback-ism is not correct?
->> > > > since I saw some other configurations or statistics exists under /sys/devices,
->> > > > e.g. /sys/devices/virtual/net/lo. Thank you!
->> > > 
->> > > You have smc_netlink.c exposing clear netlink api for the subsystem.
->> > > Can't you extend it to contain the configuration knobs and expose stats
->> > > instead of sysfs?
->> > > 
->> > 
->> > Thank you for the suggestion. I've also considered this approach.
->> > 
->> > But I didn't choose to extend the smc netlink because for now smc netlink
->> > are used for SMC protocol related attributes, for example:
->> > 
->> > SMC_NETLINK_GET_SYS_INFO:     SMC version, release, v2-capable..
->> > SMC_NETLINK_GET_LGR_SMC{R|D}: SMC-{R|D} link group inform (lgr id, lgr conn num, lgr role..)
->> > SMC_NETLINK_GET_LINK_SMCR:    SMC-R link inform (link id, link state, conn cnt..)
->> > SMC_NETLINK_GET_DEV_SMCD:     SMC-D device generic inform (user cnt, pci_fid, pci_chid, pci_vendor..)
->> > SMC_NETLINK_GET_DEV_SMCR:     SMC-R device generic inform (dev name, port pnet_id, port valid, port state..)
->> > SMC_NETLINK_GET_STATS:        SMC generic stats (RMB cnt, Tx size, Rx size, RMB size...)
->> > 
->> > And the knobs and stats in this patchset are loopback-ism device specific
->> > attributes, for example:
->> > 
->> > active:        loopback-ism runtime switch
->> > dmb_type:      type of DMB provided by loopback-ism
->> > dmb_copy:      support for DMB merge of loopback-ism
->> > xfer_bytes:    data transferred by loopback-ism
->> > dmbs_cnt:      DMB num provided by loopback-ism
->> > 
->> > The layer will be:
->> > 
->> >                +--------------------------------------+
->> >                |                                      |
->> >                |             SMC protocol             |
->> >                |  (attrs by netlink in smc_netlink.c) |
->> >                |                                      |
->> >                +--------------------------------------+
->> >              ------------------smcd_ops------------------
->> >      +---------------+  +---------------------+  +--------------+
->> >      | loopback-ism  |  |  s390 firmware ISM  |  | Possible     |
->> >      +---------------+  |                     |  | other        |
->> >      (attrs by sysfs    |                     |  | virtual ISM  |
->> >     in smc_loopback.c)  |                     |  |              |
->> >                         |                     |  |              |
->> >                         +---------------------+  +--------------+
->> 
->> So nest it:
->> SMC_NETLINK_BACKEND_GET_INFO
->> SMC_NETLINK_BACKEND_GET_STATS
->> ?
->> I mean, isn't it better to have the backend knobs and stats in one place
->> under same netlink commands and attributes than random sysfs path ?
->> 
->Thank you for suggestion.
->
->I think it is not about nesting or gathering knobs and stats. It is
->about not coupling underlying device details to upper layer SMC stack.
->
->From SMC perspective, it cares about the abstract operations defined
->by smcd_ops, regardless of which underlying devices provide these
->functions and how they provide. So IMO the details or configurations
->of underlying devices shouldn't be involved in SMC.
-
-So you rather keep the device configuration and info exposed over random
-sysfs files? Sorry, that makes not sense to me.
-
-
->
->Besides, the knobs and stats here are specific for loopback-ism device,
->they include runtime switch, buffer type choice and mode choice of
->loopback-ism (basically they won't change after being set once). The
->other kinds of devices used by SMC-D, e.g. s390 firmware ISM or other
->virtual ISMs have no similar things.
-
-Okay, it is normal that different drivers implement different parts of
-UAPI. No problem.
-
-
->
->So I prefer to keep the current solution instead of expanding upper
->layer SMC netlink.
-
-Makes no sense to me. This is UAPI from 20 years ago. Is this a time
-machine?
-
-
->
->Thanks,
->Wen Gu
->
->> 
->> 
->> > 
->> > So I choose to use current way to provide this lower layer loopback-ism
->> > device's attributes, restrict loopback-ism specific code to smc_loopback.c
->> > and try to make a clear layer architecture.
->> > 
->> > Thanks,
->> > Wen Gu
->> > > 
->> > > > 
->> > > > 
->> > > > 
->> > > > Thanks again,
->> > > > Wen Gu
->> > > > 
->> > > > > 
->> > > > > >           which means DMB is physically contiguous buffer.
->> > > > > > 
->> > > > > > * Test object:
->> > > > > >         - TCP: run on TCP loopback.
->> > > > > >         - SMC lo: run on SMC loopback device.
->> > > > > > 
->> > > > > > 1. ipc-benchmark (see [3])
->> > > > > > 
->> > > > > > - ./<foo> -c 1000000 -s 100
->> > > > > > 
->> > > > > >                               TCP                  SMC-lo
->> > > > > > Message
->> > > > > > rate (msg/s)              80636                  149515(+85.42%)
->> > > > > > 
->> > > > > > 2. sockperf
->> > > > > > 
->> > > > > > - serv: <smc_run> taskset -c <cpu> sockperf sr --tcp
->> > > > > > - clnt: <smc_run> taskset -c <cpu> sockperf { tp | pp } --tcp --msg-size={ 64000 for tp | 14 for pp } -i 127.0.0.1 -t 30
->> > > > > > 
->> > > > > >                               TCP                  SMC-lo
->> > > > > > Bandwidth(MBps)         4909.36                 8197.57(+66.98%)
->> > > > > > Latency(us)               6.098                   3.383(-44.52%)
->> > > > > > 
->> > > > > > 3. nginx/wrk
->> > > > > > 
->> > > > > > - serv: <smc_run> nginx
->> > > > > > - clnt: <smc_run> wrk -t 8 -c 1000 -d 30 http://127.0.0.1:80
->> > > > > > 
->> > > > > >                              TCP                   SMC-lo
->> > > > > > Requests/s           181685.74                246447.77(+35.65%)
->> > > > > > 
->> > > > > > 4. redis-benchmark
->> > > > > > 
->> > > > > > - serv: <smc_run> redis-server
->> > > > > > - clnt: <smc_run> redis-benchmark -h 127.0.0.1 -q -t set,get -n 400000 -c 200 -d 1024
->> > > > > > 
->> > > > > >                              TCP                   SMC-lo
->> > > > > > GET(Requests/s)       85855.34                118553.64(+38.09%)
->> > > > > > SET(Requests/s)       86824.40                125944.58(+45.06%)
->> > > > > > 
->> > > > > > 
->> > > > > > Change log:
->> > > > > > 
->> > > > > > v1->RFC:
->> > > > > > - Patch #9: merge rx_bytes and tx_bytes as xfer_bytes statistics:
->> > > > > >     /sys/devices/virtual/smc/loopback-ism/xfer_bytes
->> > > > > > - Patch #10: add support_dmb_nocopy operation to check if SMC-D device supports
->> > > > > >     merging sndbuf with peer DMB.
->> > > > > > - Patch #13 & #14: introduce loopback-ism device control of DMB memory type and
->> > > > > >     control of whether to merge sndbuf and DMB. They can be respectively set by:
->> > > > > >     /sys/devices/virtual/smc/loopback-ism/dmb_type
->> > > > > >     /sys/devices/virtual/smc/loopback-ism/dmb_copy
->> > > > > >     The motivation for these two control is that a performance bottleneck was
->> > > > > >     found when using vzalloced DMB and sndbuf is merged with DMB, and there are
->> > > > > >     many CPUs and CONFIG_HARDENED_USERCOPY is set [4]. The bottleneck is caused
->> > > > > >     by the lock contention in vmap_area_lock [5] which is involved in memcpy_from_msg()
->> > > > > >     or memcpy_to_msg(). Currently, Uladzislau Rezki is working on mitigating the
->> > > > > >     vmap lock contention [6]. It has significant effects, but using virtual memory
->> > > > > >     still has additional overhead compared to using physical memory.
->> > > > > >     So this new version provides controls of dmb_type and dmb_copy to suit
->> > > > > >     different scenarios.
->> > > > > > - Some minor changes and comments improvements.
->> > > > > > 
->> > > > > > RFC->old version([1]):
->> > > > > > Link: https://lore.kernel.org/netdev/1702214654-32069-1-git-send-email-guwen@linux.alibaba.com/
->> > > > > > - Patch #1: improve the loopback-ism dump, it shows as follows now:
->> > > > > >     # smcd d
->> > > > > >     FID  Type  PCI-ID        PCHID  InUse  #LGs  PNET-ID
->> > > > > >     0000 0     loopback-ism  ffff   No        0
->> > > > > > - Patch #3: introduce the smc_ism_set_v2_capable() helper and set
->> > > > > >     smc_ism_v2_capable when ISMv2 or virtual ISM is registered,
->> > > > > >     regardless of whether there is already a device in smcd device list.
->> > > > > > - Patch #3: loopback-ism will be added into /sys/devices/virtual/smc/loopback-ism/.
->> > > > > > - Patch #8: introduce the runtime switch /sys/devices/virtual/smc/loopback-ism/active
->> > > > > >     to activate or deactivate the loopback-ism.
->> > > > > > - Patch #9: introduce the statistics of loopback-ism by
->> > > > > >     /sys/devices/virtual/smc/loopback-ism/{{tx|rx}_tytes|dmbs_cnt}.
->> > > > > > - Some minor changes and comments improvements.
->> > > > > > 
->> > > > > > [1] https://lore.kernel.org/netdev/1695568613-125057-1-git-send-email-guwen@linux.alibaba.com/
->> > > > > > [2] https://lore.kernel.org/netdev/20231219142616.80697-1-guwen@linux.alibaba.com/
->> > > > > > [3] https://github.com/goldsborough/ipc-bench
->> > > > > > [4] https://lore.kernel.org/all/3189e342-c38f-6076-b730-19a6efd732a5@linux.alibaba.com/
->> > > > > > [5] https://lore.kernel.org/all/238e63cd-e0e8-4fbf-852f-bc4d5bc35d5a@linux.alibaba.com/
->> > > > > > [6] https://lore.kernel.org/all/20240102184633.748113-1-urezki@gmail.com/
->> > > > > > 
->> > > > > > Wen Gu (15):
->> > > > > >     net/smc: improve SMC-D device dump for virtual ISM
->> > > > > >     net/smc: decouple specialized struct from SMC-D DMB registration
->> > > > > >     net/smc: introduce virtual ISM device loopback-ism
->> > > > > >     net/smc: implement ID-related operations of loopback-ism
->> > > > > >     net/smc: implement some unsupported operations of loopback-ism
->> > > > > >     net/smc: implement DMB-related operations of loopback-ism
->> > > > > >     net/smc: register loopback-ism into SMC-D device list
->> > > > > >     net/smc: introduce loopback-ism runtime switch
->> > > > > >     net/smc: introduce loopback-ism statistics attributes
->> > > > > >     net/smc: add operations to merge sndbuf with peer DMB
->> > > > > >     net/smc: attach or detach ghost sndbuf to peer DMB
->> > > > > >     net/smc: adapt cursor update when sndbuf and peer DMB are merged
->> > > > > >     net/smc: introduce loopback-ism DMB type control
->> > > > > >     net/smc: introduce loopback-ism DMB data copy control
->> > > > > >     net/smc: implement DMB-merged operations of loopback-ism
->> > > > > > 
->> > > > > > drivers/s390/net/ism_drv.c |   2 +-
->> > > > > > include/net/smc.h          |   7 +-
->> > > > > > net/smc/Kconfig            |  13 +
->> > > > > > net/smc/Makefile           |   2 +-
->> > > > > > net/smc/af_smc.c           |  28 +-
->> > > > > > net/smc/smc_cdc.c          |  58 ++-
->> > > > > > net/smc/smc_cdc.h          |   1 +
->> > > > > > net/smc/smc_core.c         |  61 +++-
->> > > > > > net/smc/smc_core.h         |   1 +
->> > > > > > net/smc/smc_ism.c          |  71 +++-
->> > > > > > net/smc/smc_ism.h          |   5 +
->> > > > > > net/smc/smc_loopback.c     | 718 +++++++++++++++++++++++++++++++++++++
->> > > > > > net/smc/smc_loopback.h     |  88 +++++
->> > > > > > 13 files changed, 1026 insertions(+), 29 deletions(-)
->> > > > > > create mode 100644 net/smc/smc_loopback.c
->> > > > > > create mode 100644 net/smc/smc_loopback.h
->> > > > > > 
->> > > > > > -- 
->> > > > > > 2.32.0.3.g01195cf9f
->> > > > > > 
->> > > > > > 
+DQoNCj4gT24gSmFuIDE1LCAyMDI0LCBhdCA2OjA54oCvQU0sIFNpbW9uIEhvcm1hbiA8aG9ybXNA
+a2VybmVsLm9yZz4gd3JvdGU6DQo+IA0KPiBPbiBGcmksIEphbiAxMiwgMjAyNCBhdCAwNDo0NToz
+OFBNICswODAwLCBaaGlwZW5nIEx1IHdyb3RlOg0KPj4gVGhlIGN0eC0+bWVjaF91c2VkLmRhdGEg
+YWxsb2NhdGVkIGJ5IGttZW1kdXAgaXMgbm90IGZyZWVkIGluIG5laXRoZXINCj4+IGdzc19pbXBv
+cnRfdjJfY29udGV4dCBub3IgaXQgb25seSBjYWxsZXIgcmFkZW9uX2RyaXZlcl9vcGVuX2ttcy4N
+Cj4gDQo+IFNob3VsZCByYWRlb25fZHJpdmVyX29wZW5fa21zIGJlIGdzc19rcmI1X2ltcG9ydF9z
+ZWNfY29udGV4dD8NCj4gDQo+IEFsc28sIHBlcmhhcHMgaXQgaXMgdXNlZnVsIHRvIHdyaXRlIHNv
+bWV0aGluZyBsaWtlIHRoaXM6DQo+IA0KPiAuLi4gZ3NzX2tyYjVfaW1wb3J0X3NlY19jb250ZXh0
+LCB3aGljaCBmcmVlcyBjdHggb24gZXJyb3IuDQoNCklmIFpoaXBlbmcgYWdyZWVzIHRvIHRoaXMg
+c3VnZ2VzdGlvbiwgSSBjYW4gY2hhbmdlIHRoZQ0KcGF0Y2ggZGVzY3JpcHRpb24gaW4gbXkgdHJl
+ZS4gQSB2MyBpcyBub3QgbmVjZXNzYXJ5Lg0KDQoNCj4+IFRodXMsIHRoaXMgcGF0Y2ggcmVmb3Jt
+IHRoZSBsYXN0IGNhbGwgb2YgZ3NzX2ltcG9ydF92Ml9jb250ZXh0IHRvIHRoZQ0KPj4gZ3NzX2ty
+YjVfaW1wb3J0X2N0eF92MiwgcHJldmVudGluZyB0aGUgbWVtbGVhayB3aGlsZSBrZWVwcGluZyB0
+aGUgcmV0dXJuDQo+PiBmb3JtYXRpb24uDQo+PiANCj4+IEZpeGVzOiA0N2Q4NDgwNzc2MjkgKCJn
+c3Nfa3JiNTogaGFuZGxlIG5ldyBjb250ZXh0IGZvcm1hdCBmcm9tIGdzc2QiKQ0KPj4gU2lnbmVk
+LW9mZi1ieTogWmhpcGVuZyBMdSA8YWxleGlvdXNAemp1LmVkdS5jbj4NCj4gDQo+IEhpIFpoaXBl
+bmcgTHUsDQo+IA0KPiBPdGhlciB0aGFuIHRoZSBjb21tZW50IGFib3ZlLCBJIGFncmVlIHdpdGgg
+eW91ciBhbmFseXNpcy4NCj4gQW5kIHRoYXQgYWx0aG91Z2ggdGhlIHByb2JsZW0gaGFzIGNoYW5n
+ZWQgZm9ybSBzbGlnaHRseSwNCj4gaXQgd2FzIG9yaWdpbmFsbHkgaW50cm9kdWNlZCBieSB0aGUg
+Y2l0ZWQgY29tbWl0Lg0KPiBJIGFsc28gYWdyZWUgdGhhdCB5b3VyIGZpeC4NCj4gDQo+IC4uLg0K
+DQotLQ0KQ2h1Y2sgTGV2ZXINCg0KDQo=
 
