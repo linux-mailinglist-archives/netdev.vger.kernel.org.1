@@ -1,115 +1,83 @@
-Return-Path: <netdev+bounces-63861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C10DA82FBEE
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 23:07:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A93C182FBF3
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 23:07:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6ACC11F2897D
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 22:07:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC05A1C27146
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 22:07:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0346416D89D;
-	Tue, 16 Jan 2024 20:05:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9900B67C6C;
+	Tue, 16 Jan 2024 20:05:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ubcZxb/V"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bZu6MsPG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA54916D897;
-	Tue, 16 Jan 2024 20:05:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7115067C67;
+	Tue, 16 Jan 2024 20:05:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705435516; cv=none; b=MA7rR8O0fek3JZWOYNycnwxC9PuzGeMNtq3893LJv+MjbZuDtaksba1XoAKj1aH/17ZKaMxdI/Eq7P3jh4AxLFOxj6sblC1JIbsusGUVTraC1pWzz94c9Ale6+rsqGEHVhwk7niS/peCzgxVFFAm0r2BEF/fE9Lz/dlpOJjZPDo=
+	t=1705435524; cv=none; b=UdYWHKYzRlmoA5nzaTDSSEO6xLVQ43FtBTK9wE3OIWFcyAUyWd3f8SfU4ly0dwaWB2PQw9C/oVf8TIp3YY8+056+ZowmrSsOrMQJUpk4BAwY1H8LlOd1rUrUJSPsuPnT9bxZJePD5va1iIsnD82j9OJW5C0yZV1SFXH08vGZ/10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705435516; c=relaxed/simple;
-	bh=JNUs/LQJo+qUNmb0T0rSBK5V7IO4R3L3oqT2O4dn6pE=;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
-	 X-Mailer:In-Reply-To:References:MIME-Version:X-stable:
-	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=C3ZYe7z8J8cXLzbBfM8RTGkBSr2MiSY7w/6bn+joSxizq2CWWCvNdFUsuM29i9usXXkFB9+e0AWxw3DBTp2HT/yOIzrgfRXLc29kSR4YDnNOKI7dTerD8/YfPnwNvAm8ZgCiyNSsfXFBzbhlnzxKzLhjDMvnxq2PBWqHupE1AB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ubcZxb/V; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DEDEC43394;
-	Tue, 16 Jan 2024 20:05:15 +0000 (UTC)
+	s=arc-20240116; t=1705435524; c=relaxed/simple;
+	bh=FRXMq8sEeMDB3f4/buWJMZgI4gfDtQb2e45HXr4pu3k=;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:
+	 Content-Transfer-Encoding:In-Reply-To; b=G9FYk126brnyYRwOQrKDNa6TcjFpzDMUpo63oMk9RjFz10Fc6G7GN6YlDWZdPsIzQilKBKlBREVug0os/Y333MFUrvuaYDSrdcza69xbNaYwf/S4JBclK9gFfvYIkBEWJQtUAaS5/kJMpDFxBoN4brjH7V6oGhcHE9V191dzyLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bZu6MsPG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0767C43390;
+	Tue, 16 Jan 2024 20:05:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705435516;
-	bh=JNUs/LQJo+qUNmb0T0rSBK5V7IO4R3L3oqT2O4dn6pE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ubcZxb/V3QrqR6eqheT+2G7PJfZ3rguO42pUMj4w0mpsbRm9PdAmnnc02REFLQHBC
-	 AFr/5QoCUVkAba2wnktOnXsekRaxzEl1Lq/c/6eDqIVaB1A+KJegjSGkS4gK7RjPJ9
-	 HwFk6hix4OjDVBw0yPhGY7bN4sMSZz67Wg8JKQBvUHxeBSoaPXx4bVMMln3wLl9Cq7
-	 4mAXCtcXikR9Uzgk12QZDNM4D4W6R4GGL2bu5IOpEK/BZhuAWGnDD30Vn3SFIpUhEs
-	 1y03gJbKmx3/tlEHQryyYRAEPDWqUunyA6S8Fw14R/h8CFgBXcQTdTrcWPeNq2qqRA
-	 uM2Zlgx3in4AA==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Benjamin Berg <benjamin.berg@intel.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
-	Sasha Levin <sashal@kernel.org>,
-	johannes@sipsolutions.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-wireless@vger.kernel.org,
+	s=k20201202; t=1705435523;
+	bh=FRXMq8sEeMDB3f4/buWJMZgI4gfDtQb2e45HXr4pu3k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bZu6MsPGvp3Is26EOKON44OXpqitaYROrAltLgRn/2XGmqJInlR+rR3ONd24Lkylu
+	 QBzq9kfieHgnALGxhOy6SARiq7RPEIRTfDz1hqpwKw3KcffYwwFxVvTBjaES7JSMNA
+	 hXmJJRhRvue0XTAM+XFEw6IJAhloNXz5CcDK370pwRdEcFUJ+YvpySp48yw2WPkJAt
+	 TRS/L7RoiJgfqX127hUHWVDgVwlnEl4klaCaKrqDWonC0D11grh/1AEGlxSa+V9aXY
+	 BFYNvwRE0EcTVWkGbaeQ7AkTohevjICOb6Aq9hhhEDf9Wrr1DvoBFYoyKQAduwi2BM
+	 5LMbHbAe1ycyg==
+Date: Tue, 16 Jan 2024 20:05:19 +0000
+From: Simon Horman <horms@kernel.org>
+To: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+Cc: Mark Brown <broonie@kernel.org>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	linux-spi@vger.kernel.org, kernel@pengutronix.de,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 22/22] wifi: cfg80211: free beacon_ies when overridden from hidden BSS
-Date: Tue, 16 Jan 2024 15:04:16 -0500
-Message-ID: <20240116200432.260016-22-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240116200432.260016-1-sashal@kernel.org>
-References: <20240116200432.260016-1-sashal@kernel.org>
+Subject: Re: [PATCH 15/33] net: vertexcom: mse102x: Follow renaming of SPI
+ "master" to "controller"
+Message-ID: <20240116200519.GG588419@kernel.org>
+References: <cover.1705348269.git.u.kleine-koenig@pengutronix.de>
+ <a7ca57cfa5b63e5c70824c24fb1bca1eba8cb087.1705348269.git.u.kleine-koenig@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 4.19.305
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <a7ca57cfa5b63e5c70824c24fb1bca1eba8cb087.1705348269.git.u.kleine-koenig@pengutronix.de>
 
-From: Benjamin Berg <benjamin.berg@intel.com>
+On Mon, Jan 15, 2024 at 09:13:01PM +0100, Uwe Kleine-König wrote:
+> In commit 8caab75fd2c2 ("spi: Generalize SPI "master" to "controller"")
+> some functions and struct members were renamed. To not break all drivers
+> compatibility macros were provided.
+> 
+> To be able to remove these compatibility macros push the renaming into
+> this driver.
+> 
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 
-[ Upstream commit 32af9a9e1069e55bc02741fb00ac9d0ca1a2eaef ]
-
-This is a more of a cosmetic fix. The branch will only be taken if
-proberesp_ies is set, which implies that beacon_ies is not set unless we
-are connected to an AP that just did a channel switch. And, in that case
-we should have found the BSS in the internal storage to begin with.
-
-Signed-off-by: Benjamin Berg <benjamin.berg@intel.com>
-Reviewed-by: Johannes Berg <johannes.berg@intel.com>
-Signed-off-by: Miri Korenblit <miriam.rachel.korenblit@intel.com>
-Link: https://msgid.link/20231220133549.b898e22dadff.Id8c4c10aedd176ef2e18a4cad747b299f150f9df@changeid
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- net/wireless/scan.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/net/wireless/scan.c b/net/wireless/scan.c
-index d871349036a5..7f1a4ba975dd 100644
---- a/net/wireless/scan.c
-+++ b/net/wireless/scan.c
-@@ -1018,8 +1018,12 @@ cfg80211_bss_update(struct cfg80211_registered_device *rdev,
- 				list_add(&new->hidden_list,
- 					 &hidden->hidden_list);
- 				hidden->refcount++;
-+
-+				ies = (void *)rcu_dereference(new->pub.beacon_ies);
- 				rcu_assign_pointer(new->pub.beacon_ies,
- 						   hidden->pub.beacon_ies);
-+				if (ies)
-+					kfree_rcu(ies, rcu_head);
- 			}
- 		} else {
- 			/*
--- 
-2.43.0
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
