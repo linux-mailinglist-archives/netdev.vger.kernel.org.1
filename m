@@ -1,133 +1,183 @@
-Return-Path: <netdev+bounces-63605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E32A182E663
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 02:15:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D41782E689
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 02:19:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F4751C210B3
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 01:15:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7E5A1F2123D
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 01:19:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 509C76FBF;
-	Tue, 16 Jan 2024 00:47:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5346A1AAAD;
+	Tue, 16 Jan 2024 01:04:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kBU/3av2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vQntaV71"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD66E6FA7
-	for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 00:47:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6db81c6287dso1122028b3a.0
-        for <netdev@vger.kernel.org>; Mon, 15 Jan 2024 16:47:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705366075; x=1705970875; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Mv2YBJpD9hIvqW37gYxiOp38ZAHvsrnrfAjC/BJlXNc=;
-        b=kBU/3av2tfuoebx27TYICN1nu1GniOzwgybc9f97Kw7dLPPF5dqCwe36Y5vxob535J
-         z6ul0p30pYBGiT5dgdOzkEF3lFoIs4zQwg4WaHMN0CZyoFZnglfD7523YPsnZ0lvbWoZ
-         lBtl4SGozAiOU5qwbw+gyjLv8rkGAW/Abu+XvgJehFU2cOmnJgh07cCo4PDEJsJGWWFl
-         2meKvevXZ9p/utEpqhWUknVOLCBZBTsTiE+TJZl5tIRJFvujRsBB6B/XCyk9vg7s3UPl
-         Zl2ck/WPSN8lNNz/rxWkMSnif9IagJwcinzMUGF/FMOPC9LXjSqb32JpK05pwKNM7/R9
-         Vwog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705366075; x=1705970875;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Mv2YBJpD9hIvqW37gYxiOp38ZAHvsrnrfAjC/BJlXNc=;
-        b=vuD17WASDQiwp0HrKLOysBrOveC7pBI7ZKh6Nkg9hAKeUK2COb8E6mjPzU1S+/Ej6w
-         H2G3hmAlDapgwXPWWdzgFCWLYkg1Ha7C12sWeCN0XfeaWK3lz24IhzifWdH1L/ua9vtt
-         LN43GuLzyC/UGIhwxhiOtpvQ/qlo2PF6MJlt4xiJXti/w7MPHOyXVbg4PGwjcpeDol8Z
-         J5kKS0rQKz+uO9HCUslCJbDm5SLEbUAtD8ykzWH630WVG/95n5P2Sy9hMX5mN8HXEwaU
-         Zvo4yRZIVfGj0aI/L/TtaHgNkjryDugAXf+hIIqQnPuMy3+JRKsiC6bIE9Ad5Wu3k4VZ
-         ty3Q==
-X-Gm-Message-State: AOJu0Yw7DXYfkBZGMmysbFjpKDpx48F28vJD5ddzX9UpsLVGURXt9Xk/
-	orPs39+J6jQM18D6Bis+Dpc=
-X-Google-Smtp-Source: AGHT+IGCTtQ6GjRFqJO+wnFzp+/mMdXKtkDdtl6DtuFHgyf8LgmaGtF72M7DQdPlNvMUhZH5b9DhqA==
-X-Received: by 2002:a05:6a20:b298:b0:19a:3774:c597 with SMTP id ei24-20020a056a20b29800b0019a3774c597mr7349822pzb.4.1705366075147;
-        Mon, 15 Jan 2024 16:47:55 -0800 (PST)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id x28-20020aa793bc000000b006daed66b540sm8149035pff.219.2024.01.15.16.47.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jan 2024 16:47:54 -0800 (PST)
-Date: Tue, 16 Jan 2024 08:47:49 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>, Phil Sutter <phil@nwl.cc>,
-	David Ahern <dsahern@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D7BA18B06;
+	Tue, 16 Jan 2024 01:04:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F836C43399;
+	Tue, 16 Jan 2024 01:04:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705367095;
+	bh=qCw/obSfdrfedHYw7O1ncLB9NBv974RlbpM8+nsmhgg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=vQntaV71cBtKpDpMfSi8uI2pp+JD8BYfWLpqogf3DLb/Xmb6sFydQMHyBL1C2MkKU
+	 7W0R462GsuA/bhxx18QSafUwYSoc6p/vaDq3ID+We8QV1tPjf2+dz8ejwllbbt6MZY
+	 SrBPW/NvJSYQ1+g4kBbhbrxy4hTpPVpwBBgllSQOmqULtUaDMtD3soFCBuUwESYhIT
+	 Y35xcS5K01T9eplotZMpvV7AjbOgflXk1958rA6lLA5VAt+VQm8Yiiqrm3GegfFDKm
+	 ehgdRiY9R+7pQBTtwiUSl3r9dyxUzGSJM0V+aNPl+eleEgAEOJJd5i2zCtpWSWLWvx
+	 JjHg9y6ev2GHA==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Anna Schumaker <Anna.Schumaker@Netapp.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
+	trond.myklebust@hammerspace.com,
+	anna@kernel.org,
+	chuck.lever@oracle.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-nfs@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: Re: [PATCH net] selftests: rtnetlink: use setup_ns in bonding test
-Message-ID: <ZaXSNR5NMAh-qaG8@Laptop-X1>
-References: <20240115135922.3662648-1-nicolas.dichtel@6wind.com>
+Subject: [PATCH AUTOSEL 6.7 10/21] SUNRPC: Fix a suspicious RCU usage warning
+Date: Mon, 15 Jan 2024 20:03:47 -0500
+Message-ID: <20240116010422.217925-10-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240116010422.217925-1-sashal@kernel.org>
+References: <20240116010422.217925-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240115135922.3662648-1-nicolas.dichtel@6wind.com>
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.7
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jan 15, 2024 at 02:59:22PM +0100, Nicolas Dichtel wrote:
-> This is a follow-up of commit a159cbe81d3b ("selftests: rtnetlink: check
-> enslaving iface in a bond") after the merge of net-next into net.
-> 
-> The goal is to follow the new convention,
-> see commit d3b6b1116127 ("selftests/net: convert rtnetlink.sh to run it in
-> unique namespace") for more details.
-> 
-> Let's use also the generic dummy name instead of defining a new one.
-> 
-> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-> ---
->  tools/testing/selftests/net/rtnetlink.sh | 12 +++++-------
->  1 file changed, 5 insertions(+), 7 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selftests/net/rtnetlink.sh
-> index a31be0eaaa50..4667d74579d1 100755
-> --- a/tools/testing/selftests/net/rtnetlink.sh
-> +++ b/tools/testing/selftests/net/rtnetlink.sh
-> @@ -1244,21 +1244,19 @@ kci_test_address_proto()
->  
->  kci_test_enslave_bonding()
->  {
-> -	local testns="testns"
->  	local bond="bond123"
-> -	local dummy="dummy123"
->  	local ret=0
->  
-> -	run_cmd ip netns add "$testns"
-> -	if [ $ret -ne 0 ]; then
-> +	setup_ns testns
-> +	if [ $? -ne 0 ]; then
->  		end_test "SKIP bonding tests: cannot add net namespace $testns"
->  		return $ksft_skip
->  	fi
->  
->  	run_cmd ip -netns $testns link add dev $bond type bond mode balance-rr
-> -	run_cmd ip -netns $testns link add dev $dummy type dummy
-> -	run_cmd ip -netns $testns link set dev $dummy up
-> -	run_cmd ip -netns $testns link set dev $dummy master $bond down
-> +	run_cmd ip -netns $testns link add dev $devdummy type dummy
-> +	run_cmd ip -netns $testns link set dev $devdummy up
-> +	run_cmd ip -netns $testns link set dev $devdummy master $bond down
->  	if [ $ret -ne 0 ]; then
->  		end_test "FAIL: initially up interface added to a bond and set down"
->  		ip netns del "$testns"
-> -- 
-> 2.39.2
-> 
+From: Anna Schumaker <Anna.Schumaker@Netapp.com>
 
-Thanks for the update.
+[ Upstream commit 31b62908693c90d4d07db597e685d9f25a120073 ]
 
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+I received the following warning while running cthon against an ontap
+server running pNFS:
+
+[   57.202521] =============================
+[   57.202522] WARNING: suspicious RCU usage
+[   57.202523] 6.7.0-rc3-g2cc14f52aeb7 #41492 Not tainted
+[   57.202525] -----------------------------
+[   57.202525] net/sunrpc/xprtmultipath.c:349 RCU-list traversed in non-reader section!!
+[   57.202527]
+               other info that might help us debug this:
+
+[   57.202528]
+               rcu_scheduler_active = 2, debug_locks = 1
+[   57.202529] no locks held by test5/3567.
+[   57.202530]
+               stack backtrace:
+[   57.202532] CPU: 0 PID: 3567 Comm: test5 Not tainted 6.7.0-rc3-g2cc14f52aeb7 #41492 5b09971b4965c0aceba19f3eea324a4a806e227e
+[   57.202534] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS unknown 2/2/2022
+[   57.202536] Call Trace:
+[   57.202537]  <TASK>
+[   57.202540]  dump_stack_lvl+0x77/0xb0
+[   57.202551]  lockdep_rcu_suspicious+0x154/0x1a0
+[   57.202556]  rpc_xprt_switch_has_addr+0x17c/0x190 [sunrpc ebe02571b9a8ceebf7d98e71675af20c19bdb1f6]
+[   57.202596]  rpc_clnt_setup_test_and_add_xprt+0x50/0x180 [sunrpc ebe02571b9a8ceebf7d98e71675af20c19bdb1f6]
+[   57.202621]  ? rpc_clnt_add_xprt+0x254/0x300 [sunrpc ebe02571b9a8ceebf7d98e71675af20c19bdb1f6]
+[   57.202646]  rpc_clnt_add_xprt+0x27a/0x300 [sunrpc ebe02571b9a8ceebf7d98e71675af20c19bdb1f6]
+[   57.202671]  ? __pfx_rpc_clnt_setup_test_and_add_xprt+0x10/0x10 [sunrpc ebe02571b9a8ceebf7d98e71675af20c19bdb1f6]
+[   57.202696]  nfs4_pnfs_ds_connect+0x345/0x760 [nfsv4 c716d88496ded0ea6d289bbea684fa996f9b57a9]
+[   57.202728]  ? __pfx_nfs4_test_session_trunk+0x10/0x10 [nfsv4 c716d88496ded0ea6d289bbea684fa996f9b57a9]
+[   57.202754]  nfs4_fl_prepare_ds+0x75/0xc0 [nfs_layout_nfsv41_files e3a4187f18ae8a27b630f9feae6831b584a9360a]
+[   57.202760]  filelayout_write_pagelist+0x4a/0x200 [nfs_layout_nfsv41_files e3a4187f18ae8a27b630f9feae6831b584a9360a]
+[   57.202765]  pnfs_generic_pg_writepages+0xbe/0x230 [nfsv4 c716d88496ded0ea6d289bbea684fa996f9b57a9]
+[   57.202788]  __nfs_pageio_add_request+0x3fd/0x520 [nfs 6c976fa593a7c2976f5a0aeb4965514a828e6902]
+[   57.202813]  nfs_pageio_add_request+0x18b/0x390 [nfs 6c976fa593a7c2976f5a0aeb4965514a828e6902]
+[   57.202831]  nfs_do_writepage+0x116/0x1e0 [nfs 6c976fa593a7c2976f5a0aeb4965514a828e6902]
+[   57.202849]  nfs_writepages_callback+0x13/0x30 [nfs 6c976fa593a7c2976f5a0aeb4965514a828e6902]
+[   57.202866]  write_cache_pages+0x265/0x450
+[   57.202870]  ? __pfx_nfs_writepages_callback+0x10/0x10 [nfs 6c976fa593a7c2976f5a0aeb4965514a828e6902]
+[   57.202891]  nfs_writepages+0x141/0x230 [nfs 6c976fa593a7c2976f5a0aeb4965514a828e6902]
+[   57.202913]  do_writepages+0xd2/0x230
+[   57.202917]  ? filemap_fdatawrite_wbc+0x5c/0x80
+[   57.202921]  filemap_fdatawrite_wbc+0x67/0x80
+[   57.202924]  filemap_write_and_wait_range+0xd9/0x170
+[   57.202930]  nfs_wb_all+0x49/0x180 [nfs 6c976fa593a7c2976f5a0aeb4965514a828e6902]
+[   57.202947]  nfs4_file_flush+0x72/0xb0 [nfsv4 c716d88496ded0ea6d289bbea684fa996f9b57a9]
+[   57.202969]  __se_sys_close+0x46/0xd0
+[   57.202972]  do_syscall_64+0x68/0x100
+[   57.202975]  ? do_syscall_64+0x77/0x100
+[   57.202976]  ? do_syscall_64+0x77/0x100
+[   57.202979]  entry_SYSCALL_64_after_hwframe+0x6e/0x76
+[   57.202982] RIP: 0033:0x7fe2b12e4a94
+[   57.202985] Code: 00 f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 80 3d d5 18 0e 00 00 74 13 b8 03 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 44 c3 0f 1f 00 48 83 ec 18 89 7c 24 0c e8 c3
+[   57.202987] RSP: 002b:00007ffe857ddb38 EFLAGS: 00000202 ORIG_RAX: 0000000000000003
+[   57.202989] RAX: ffffffffffffffda RBX: 00007ffe857dfd68 RCX: 00007fe2b12e4a94
+[   57.202991] RDX: 0000000000002000 RSI: 00007ffe857ddc40 RDI: 0000000000000003
+[   57.202992] RBP: 00007ffe857dfc50 R08: 7fffffffffffffff R09: 0000000065650f49
+[   57.202993] R10: 00007fe2b11f8300 R11: 0000000000000202 R12: 0000000000000000
+[   57.202994] R13: 00007ffe857dfd80 R14: 00007fe2b1445000 R15: 0000000000000000
+[   57.202999]  </TASK>
+
+The problem seems to be that two out of three callers aren't taking the
+rcu_read_lock() before calling the list_for_each_entry_rcu() function in
+rpc_xprt_switch_has_addr(). I fix this by having
+rpc_xprt_switch_has_addr() unconditionaly take the rcu_read_lock(),
+which is okay to do recursively in the case that the lock has already
+been taken by a caller.
+
+Reviewed-by: Jeff Layton <jlayton@kernel.org>
+Signed-off-by: Anna Schumaker <Anna.Schumaker@Netapp.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/sunrpc/xprtmultipath.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/net/sunrpc/xprtmultipath.c b/net/sunrpc/xprtmultipath.c
+index 701250b305db..0706575d9392 100644
+--- a/net/sunrpc/xprtmultipath.c
++++ b/net/sunrpc/xprtmultipath.c
+@@ -336,8 +336,9 @@ struct rpc_xprt *xprt_iter_current_entry_offline(struct rpc_xprt_iter *xpi)
+ 			xprt_switch_find_current_entry_offline);
+ }
+ 
+-bool rpc_xprt_switch_has_addr(struct rpc_xprt_switch *xps,
+-			      const struct sockaddr *sap)
++static
++bool __rpc_xprt_switch_has_addr(struct rpc_xprt_switch *xps,
++				const struct sockaddr *sap)
+ {
+ 	struct list_head *head;
+ 	struct rpc_xprt *pos;
+@@ -356,6 +357,18 @@ bool rpc_xprt_switch_has_addr(struct rpc_xprt_switch *xps,
+ 	return false;
+ }
+ 
++bool rpc_xprt_switch_has_addr(struct rpc_xprt_switch *xps,
++			      const struct sockaddr *sap)
++{
++	bool res;
++
++	rcu_read_lock();
++	res = __rpc_xprt_switch_has_addr(xps, sap);
++	rcu_read_unlock();
++
++	return res;
++}
++
+ static
+ struct rpc_xprt *xprt_switch_find_next_entry(struct list_head *head,
+ 		const struct rpc_xprt *cur, bool check_active)
+-- 
+2.43.0
+
 
