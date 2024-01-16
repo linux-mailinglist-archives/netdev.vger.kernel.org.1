@@ -1,43 +1,31 @@
-Return-Path: <netdev+bounces-63712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76CAC82EFC2
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 14:31:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5DAD82EFEC
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 14:46:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F33B0284633
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 13:31:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A48541C233B7
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 13:46:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A09B1BC55;
-	Tue, 16 Jan 2024 13:31:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="D1yNi7bo"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF59B1BDC6;
+	Tue, 16 Jan 2024 13:46:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CB351BC47;
-	Tue, 16 Jan 2024 13:31:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id F1C9760007;
-	Tue, 16 Jan 2024 13:31:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1705411903;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+GGfIWOZzoS5FI6VacxBhh6eflIWOIAfi24KVKKdHfY=;
-	b=D1yNi7boiHKa08RmzfZ6e2rsRmm1OFbabWijcNnT6H2ifQWwEn128b8yg4R7A8gA5WJpjE
-	DH8SgTCStZCT55yl2OIvuYFAzknW1ULVe2+Q91EpFHI8HUhx+ixb+2W/AuY+fI+sdTlSdS
-	WU4MWcG//90J9h9sA6a+x6qTkDuByO2rldOp7ilHMedD6Wo+EiWg5QczidTE3SeXJmwOFv
-	sEyJX6s8hd5sv+sOnng9NNXHn/5mJ5pU+f9P2O0N+SY9Vq0JDHkc+fFy/ehzs9B4Y/Ji5J
-	+6hM5dD0FmABHXb/voX6CWeOTK8kTgnIc4INpgmiNnaPKpO1sIVUD7yyfsbsUw==
-Message-ID: <656cf9e2-2ab9-48ea-9eea-7599f14f3a41@arinc9.com>
-Date: Tue, 16 Jan 2024 16:31:34 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 033711B944;
+	Tue, 16 Jan 2024 13:46:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0W-mKldk_1705412774;
+Received: from 30.221.145.228(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0W-mKldk_1705412774)
+          by smtp.aliyun-inc.com;
+          Tue, 16 Jan 2024 21:46:15 +0800
+Message-ID: <3a82adb1-c839-4e82-834f-a63f9910b28d@linux.alibaba.com>
+Date: Tue, 16 Jan 2024 21:46:14 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -45,55 +33,65 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next 7/8] net: dsa: mt7530: correct port
- capabilities of MT7988
+Subject: Re: [RFC nf-next v5 0/2] netfilter: bpf: support prog update
 Content-Language: en-US
-To: Daniel Golle <daniel@makrotopia.org>, Vladimir Oltean <olteanv@gmail.com>
-Cc: Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
- Florian Fainelli <f.fainelli@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
- Luiz Angelo Daros de Luca <luizluca@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20240113102529.80371-1-arinc.unal@arinc9.com>
- <20240113102529.80371-8-arinc.unal@arinc9.com>
- <20240115214238.bnlvomatududng6l@skbuf> <ZaWtIMC9zqwjVewO@makrotopia.org>
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <ZaWtIMC9zqwjVewO@makrotopia.org>
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+To: pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de
+Cc: bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, coreteam@netfilter.org,
+ netfilter-devel@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, ast@kernel.org
+References: <1704175877-28298-1-git-send-email-alibuda@linux.alibaba.com>
+In-Reply-To: <1704175877-28298-1-git-send-email-alibuda@linux.alibaba.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
 
-On 16.01.2024 01:09, Daniel Golle wrote:
-> On Mon, Jan 15, 2024 at 11:42:38PM +0200, Vladimir Oltean wrote:
->> On Sat, Jan 13, 2024 at 01:25:28PM +0300, Arınç ÜNAL wrote:
->>> On the switch on the MT7988 SoC, there are only 4 PHYs. That's port 0 to 3.
->>> Set the internal phy cases to '0 ... 3'.
->>>
->>> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
->>> Acked-by: Daniel Golle <daniel@makrotopia.org>
->>> ---
->>
->> For this patch to be obviously correct, please make a statement in the
->> commit message about port 4. It doesn't exist at all?
-> 
-> Correct. As shown in Block Diagram 8.1.1.3 on page 125 of
-> MT7988A Wi-Fi 7 Generation Router Platform: Datasheet (Open Version)
-> Version: 0.1
-> Release Date: 2023-10-18
-> which is available publicly on BananaPi's Wiki[1].
-> 
-> Port 0~3 are TP user ports, Port 6 is internally linked to XGMII of MAC 0.
-> Port 4 and 5 are not used at all in this design.
-> 
-> [1]: https://wiki.banana-pi.org/Banana_Pi_BPI-R4#Documents
 
-Thanks for chiming in Daniel, I will include this on the patch log.
 
-Arınç
+Just a reminder to avoid forgetting this patch by everyone. 🙂
+
+Best wishes,
+D. Wythe
+
+
+On 1/2/24 2:11 PM, D. Wythe wrote:
+> From: "D. Wythe" <alibuda@linux.alibaba.com>
+>
+> This patches attempt to implements updating of progs within
+> bpf netfilter link, allowing user update their ebpf netfilter
+> prog in hot update manner.
+>
+> Besides, a corresponding test case has been added to verify
+> whether the update works.
+> --
+> v1:
+> 1. remove unnecessary context, access the prog directly via rcu.
+> 2. remove synchronize_rcu(), dealloc the nf_link via kfree_rcu.
+> 3. check the dead flag during the update.
+> --
+> v1->v2:
+> 1. remove unnecessary nf_prog, accessing nf_link->link.prog in direct.
+> --
+> v2->v3:
+> 1. access nf_link->link.prog via rcu_dereference_raw to avoid warning.
+> --
+> v3->v4:
+> 1. remove mutex for link update, as it is unnecessary and can be replaced
+> by atomic operations.
+> --
+> v4->v5:
+> 1. fix error retval check on cmpxhcg
+>
+> D. Wythe (2):
+>    netfilter: bpf: support prog update
+>    selftests/bpf: Add netfilter link prog update test
+>
+>   net/netfilter/nf_bpf_link.c                        | 50 ++++++++-----
+>   .../bpf/prog_tests/netfilter_link_update_prog.c    | 83 ++++++++++++++++++++++
+>   .../bpf/progs/test_netfilter_link_update_prog.c    | 24 +++++++
+>   3 files changed, 141 insertions(+), 16 deletions(-)
+>   create mode 100644 tools/testing/selftests/bpf/prog_tests/netfilter_link_update_prog.c
+>   create mode 100644 tools/testing/selftests/bpf/progs/test_netfilter_link_update_prog.c
+>
+
 
