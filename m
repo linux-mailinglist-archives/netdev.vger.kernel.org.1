@@ -1,147 +1,164 @@
-Return-Path: <netdev+bounces-63718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E293B82F07A
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 15:21:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2E1782F09E
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 15:37:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E093B1C2350C
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 14:21:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42C101F23E5F
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 14:37:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4751F1BF26;
-	Tue, 16 Jan 2024 14:21:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55A8513AF3;
+	Tue, 16 Jan 2024 14:37:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="qpxtOZP2"
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2045.outbound.protection.outlook.com [40.107.94.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95F3C1BF21;
-	Tue, 16 Jan 2024 14:21:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4TDrlp0PMcz4f3kFK;
-	Tue, 16 Jan 2024 22:21:10 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id BE0101A0C48;
-	Tue, 16 Jan 2024 22:21:13 +0800 (CST)
-Received: from [10.67.109.184] (unknown [10.67.109.184])
-	by APP4 (Coremail) with SMTP id gCh0CgAXamzYkKZlxjsZBA--.56272S2;
-	Tue, 16 Jan 2024 22:21:13 +0800 (CST)
-Message-ID: <4e73b095-0c08-4a6f-b2ee-8f7a071b14ee@huaweicloud.com>
-Date: Tue, 16 Jan 2024 22:21:12 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF5851BF22;
+	Tue, 16 Jan 2024 14:37:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AUyMpwHM/PWY2oBvy9A+58qwhdKeHfNjVDm5kC+RubpWQdtWThFa/0kmfLslyzGQOQfg7czrwSRTPg9mI9MwQG0Wfli2tWZ5gfo7tSXcg5o0XJG6cdUk43T9qiapA/uSaN6G8blfauxhRaS6gAKTcuGkYC/NAAsSLAa639+1Docc721CC2A77HgWxpkDO8+7uQ8pFc3AM8sqIAA8Bv4OWdUXzDgT492GnyPwkzk8FwpHyKieXfVly/dOjgh6lvFMvVUI5CAiUc93L+9ZCZ8R9f+NW+gXfFC45mT1ec40+Kw+77qN2hK72H72bNTrbSielnboRNHfz57jbXuxcY236w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3/HLux5DV1PmRucAEgs7MNp+KnDjMIMtYpo1zVsah+c=;
+ b=a1kKBzcaf2y7CKaI0z4cCer+JK3RyK6ltymAK8459W5YIduCskQFyC3idNSvLFyKYZAzI7KClEqnVCBckxwYl4NdX8syYVAV8gUC5l1QkMNgYpmYEV8XYlvIej6wKNZfA2GGrdX1qfWOheJeSsWFwUeI5S4brYkWPve1eTVttGVipTAoIDgqm0mV5gbtaZ7O5ZIhsPPhelTDLtVImC1XGnNU/WcE6Sb4QJAMEo31fT67yKtFCuzQwpXdsm7mf1JjjT8uCHdLLVp4qnIU6vHJIxyzJCyT6jiaqlFeAAkZO8fERK34w2A6T7EM/m0krbz9nkh2040OCnUgQK9rzrPdsA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3/HLux5DV1PmRucAEgs7MNp+KnDjMIMtYpo1zVsah+c=;
+ b=qpxtOZP2QqzSx6Gr8PAJ6puH05c4U3UpzP0S80R2/w30e/urY68MQQ9TrG315XxufTeB2CSNjCHiIoG1vmdn24u5cH85RonhyvMj83ttZibnVJpXmfqIWR9or0K+hI7Qd2yWdMzxPXSYsnOBg0JWUA1jfWn9xLhM0ZOz8vdf0hTwfzPL0FjjkxlFobFCtotmJ2kT5+WolPdpp3dm2zEIQl/YVKIjKqNLk1g0r4OoX2jiCnuvqJym+tM4y7xMWviTD0Ma2t3SFSs1AFKFhc4sy6ltr2YEh6nWyM6LTeB9JgQqlnzwbkBP+RnJunDlBhsugOSF8leblODhXocygxglAw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4373.namprd12.prod.outlook.com (2603:10b6:208:261::8)
+ by BL1PR12MB5364.namprd12.prod.outlook.com (2603:10b6:208:314::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.26; Tue, 16 Jan
+ 2024 14:37:42 +0000
+Received: from MN2PR12MB4373.namprd12.prod.outlook.com
+ ([fe80::ff68:f81b:d451:9765]) by MN2PR12MB4373.namprd12.prod.outlook.com
+ ([fe80::ff68:f81b:d451:9765%4]) with mapi id 15.20.7181.029; Tue, 16 Jan 2024
+ 14:37:42 +0000
+Date: Tue, 16 Jan 2024 09:37:40 -0500
+From: Benjamin Poirier <bpoirier@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, j.vosburgh@gmail.com, andy@greyhouse.net,
+	shuah@kernel.org, jon.toppins+linux@gmail.com,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net] selftests: bonding: add missing build configs
+Message-ID: <ZaaUtIuKBQByp4j4@d3>
+References: <20240116020201.1883023-1-kuba@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240116020201.1883023-1-kuba@kernel.org>
+X-ClientProxiedBy: YQBPR0101CA0232.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:c01:66::13) To MN2PR12MB4373.namprd12.prod.outlook.com
+ (2603:10b6:208:261::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next 4/4] riscv, bpf: Mixing bpf2bpf and tailcalls
-Content-Language: en-US
-To: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, bpf@vger.kernel.org,
- linux-riscv@lists.infradead.org, netdev@vger.kernel.org
-Cc: Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>,
- KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- Palmer Dabbelt <palmer@dabbelt.com>, Conor Dooley <conor@kernel.org>,
- Luke Nelson <luke.r.nels@gmail.com>, Pu Lehui <pulehui@huawei.com>
-References: <20230919035711.3297256-1-pulehui@huaweicloud.com>
- <20230919035711.3297256-5-pulehui@huaweicloud.com>
- <87lecqobyb.fsf@all.your.base.are.belong.to.us>
-From: Pu Lehui <pulehui@huaweicloud.com>
-In-Reply-To: <87lecqobyb.fsf@all.your.base.are.belong.to.us>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgAXamzYkKZlxjsZBA--.56272S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxWw15ZF4UJrW8Gw4DAFW8Zwb_yoW5GFWrpF
-	Wak3W7Kw1vgr4Ikrn7AF48Xa95Cr4xA3W3Ar1Iqr1Fya1jkrZ2gr43GFWj9Fy8Zrn7Kw1Y
-	qr4jqanxCr4DZaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUyEb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxV
-	AFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2
-	j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7x
-	kEbVWUJVW8JwACjcxG0xvEwIxGrwACI402YVCY1x02628vn2kIc2xKxwCF04k20xvY0x0E
-	wIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E74
-	80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0
-	I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04
-	k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
-	1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU13rcDUUUUU==
-X-CM-SenderInfo: psxovxtxl6x35dzhxuhorxvhhfrp/
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN2PR12MB4373:EE_|BL1PR12MB5364:EE_
+X-MS-Office365-Filtering-Correlation-Id: e5effd5c-d680-4010-260c-08dc16a0b226
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	IX6y6Rg5udVD32VuD1ZkjhnsAfvdTOvTf0nGzi/0OcJB+RHCNTZdQ83rXoYr+EENNNW+lQaUluJ15ekCXZN9JKuyykvTOaBLwjPktiLvYMt78infh8QYYNqQ6gzAj10XUbNRak6clRnSuuDn9POvUhP6DEhIm+2XVRp7XP/WZZ7l62kXxwglApQ24QHSQFCs0Ao/kpTvZR7s8YtxV0irQbLko9M+jxuXcyHAH/v6LW1/USXD6WChDm5eew83jQYkGxnBah/4yqEz4Bdo5n7sBgoL2lia8wT6EilAE8k/VjnGzFEkhm7Kp8Ehk4kWUthjvWcrRzJm6zjqYrl+0BjEIsLXGe2v0VPxciVHf+KsyhLrrKsrsmsr0l9BIUGhOGztLPd5gZQ/FYWH/CR27+bzI70YyLGuERK3jICj03cr2X03RwdN9StKkPtbGoJRJnB17dlpIdF2sk6ke0YIq8QCWHzASi87TjJ7t2kxjgQKd/kZJwhP/637qc8dmRD+Lb75LFRkCUEKDNPbPCGz2DM/TbukaSuBBN6ou7VQkfLRyIxdCH6iPD6EoOZcgfQ+vlLN
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4373.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(136003)(376002)(346002)(396003)(39860400002)(230922051799003)(1800799012)(451199024)(64100799003)(186009)(9686003)(6512007)(38100700002)(6506007)(53546011)(26005)(5660300002)(7416002)(4326008)(8936002)(33716001)(41300700001)(8676002)(6486002)(316002)(478600001)(66556008)(66476007)(6916009)(66946007)(2906002)(86362001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?4U0qUsS0nnqZLb/QV6GM9DzXvA2+5w7FdQGkDaOWwhuDxgXPQdJRVXHduUII?=
+ =?us-ascii?Q?WEcSfuDkYudu8L8ZHHdnXHHpu4ScvepnFXZExtl16tto4/M8lTXFQpNDH2RW?=
+ =?us-ascii?Q?2yZdVwlUxeAde+tT0n61xjAcWo7+6FVh9YHNXpWaROR4FArT8eLaQr6O2iF8?=
+ =?us-ascii?Q?Pd+rVJ5Ix4bHjk3kDbyMNcYvNqGjP/vV63Yar734afeuOkSFPOUVQLK5ovY5?=
+ =?us-ascii?Q?SnLnQUdOcQzwpSng8FxxrQBdKyuJ10Ne8ochm6pHL0cTBRFiI+fKcCGzVIzO?=
+ =?us-ascii?Q?kUbt+PIwhiHfbV0pe0/zwtBbbIkZcj9EjPb4A0vahB0nttkRvJHSR6M25L4o?=
+ =?us-ascii?Q?r4hAiXgov06Nh27fGGWWpiFj/I78bR4mXly5OUPizMaHYnUMmAAl/roqz994?=
+ =?us-ascii?Q?Bv8SuDiCvJhCikN6P+dVdHPZfESXWSTxPeGKc4cJ+A8hzUSfLW1oalLeno+U?=
+ =?us-ascii?Q?ck2pwrh843XBEbdP6iDaH98RJ1oWqvtSAjq7ua10FVCqkOgLw/KNMrlCum9m?=
+ =?us-ascii?Q?jdttkssMk1Ogc8XiJFGiCKhl1m6jVTHEMEsOrC0ZaawtYxQGc8cb9pnwXe0w?=
+ =?us-ascii?Q?sczXfp7o8D8tdLzjIz08jw0ID9t/ftAM253R9l2zE1LaBhU+HjbclAsR6Cfq?=
+ =?us-ascii?Q?JxYt+aDHFHS2Gn2lRaQzmoeTbZ5wCgsIf3Z/L9sOI9muo92jxsl+Vwl72e3S?=
+ =?us-ascii?Q?55pLxb/VDVqO808MnVS5dd0fM+6iRwRs+XQ+dXa0EWBdhazVRjUWGMgFykD6?=
+ =?us-ascii?Q?MzNZk91RnRvkHkWqXt2dI/wXo0JUpWBeOPW2AlTmBwOL5w6aUGjPxdcEaExC?=
+ =?us-ascii?Q?a0hyAdh/usKuD18uQuaTz3UOkYbdkUznHnhxZ8mQLs4rNY5krXN5GgDjqZOl?=
+ =?us-ascii?Q?WATTmatcjwD5vE5ceA45BE6se2arNAuRY54uM06Q0tcmXm/8Oi5c4LGT2NYx?=
+ =?us-ascii?Q?oTEEpUDZlgxLdujlN+mq5NEm5gtyzHAkHb9373xI82PKBWpP/EpTQ6HhXP7G?=
+ =?us-ascii?Q?jnYz+HRKlrte6p1miJ4EiSs9k91s/ji/AIBXQpGd2EKKM4tqvuZPXRqCMwdH?=
+ =?us-ascii?Q?gr5bZSML/enSvEvmhkBM5Crv11QoDjYKv3eFHuCLFE2XeeTmKkgBYbPzlMOa?=
+ =?us-ascii?Q?W/mDT2cmrSmFIV9kbP/9IPrwnEBk89yNQT27ZLjo780NKR77fmDOawVPTAS9?=
+ =?us-ascii?Q?6Qy/ug5UWThV0j+h6SlsAp8ZqFqiyIdTcxi0Fg/+oVSpW0nfhRdZJcW2HRmw?=
+ =?us-ascii?Q?nbSctLuNqF1mohpwVcezbvBtrz2qhAYPVKCrzHJ4jyz872NWuH9Mk/8fpDVe?=
+ =?us-ascii?Q?cnnkYKnGKff/TUMFDvw1lSmMhb93bSlJq9TDM66w6u6JtCMXaCEAzQcf7CQu?=
+ =?us-ascii?Q?gVcogg6Gs/KxmD/AvNgm46EUvTEdjRShQHUXDyvZ5NFTaokR5uhwJvl/TQo9?=
+ =?us-ascii?Q?LRNUN15+zaBcDv8lWPtB6CwDbIPziUF+oZYF+9nPy5WsPQluLWTFAHoEdrHf?=
+ =?us-ascii?Q?P+dri4REHEKXaS4DHphNchBr7VkKikwDKZEeic6e/0n7yRMIku9DhJZDcwIs?=
+ =?us-ascii?Q?780MflvoDHNVcvYJhHq6en47+K1wtqA0tb6velZ6?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e5effd5c-d680-4010-260c-08dc16a0b226
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4373.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jan 2024 14:37:42.1460
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Wa6yP86kWX7Z+k3vi51LRA77wbbfgLkumxH2ORwOrwYOrVS00kqj7sG4ybIk3TFPmkoinbS0d4e9n/z0AspI6Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5364
 
+On 2024-01-15 18:02 -0800, Jakub Kicinski wrote:
+> bonding tests also try to create bridge, veth and dummy
+> interfaces. These are not currently listed in config.
+> 
+> Fixes: bbb774d921e2 ("net: Add tests for bonding and team address list management")
+> Fixes: c078290a2b76 ("selftests: include bonding tests into the kselftest infra")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: j.vosburgh@gmail.com
+> CC: andy@greyhouse.net
+> CC: shuah@kernel.org
+> CC: bpoirier@nvidia.com
+> CC: jon.toppins+linux@gmail.com
+> CC: linux-kselftest@vger.kernel.org
+> ---
+>  tools/testing/selftests/drivers/net/bonding/config | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/drivers/net/bonding/config b/tools/testing/selftests/drivers/net/bonding/config
+> index 70638fa50b2c..f85b16fc5128 100644
+> --- a/tools/testing/selftests/drivers/net/bonding/config
+> +++ b/tools/testing/selftests/drivers/net/bonding/config
+> @@ -1,2 +1,5 @@
+>  CONFIG_BONDING=y
+> +CONFIG_BRIDGE=y
+> +CONFIG_DUMMY=y
+>  CONFIG_MACVLAN=y
+> +CONFIG_VETH=y
+> -- 
 
+Hi,
 
-On 2023/9/28 17:59, Björn Töpel wrote:
-> Pu Lehui <pulehui@huaweicloud.com> writes:
-> 
->> From: Pu Lehui <pulehui@huawei.com>
->>
->> In the current RV64 JIT, if we just don't initialize the TCC in subprog,
->> the TCC can be propagated from the parent process to the subprocess, but
->> the TCC of the parent process cannot be restored when the subprocess
->> exits. Since the RV64 TCC is initialized before saving the callee saved
->> registers into the stack, we cannot use the callee saved register to
->> pass the TCC, otherwise the original value of the callee saved register
->> will be destroyed. So we implemented mixing bpf2bpf and tailcalls
->> similar to x86_64, i.e. using a non-callee saved register to transfer
->> the TCC between functions, and saving that register to the stack to
->> protect the TCC value. At the same time, we also consider the scenario
->> of mixing trampoline.
-> 
-> Hi!
-> 
-> The RISC-V JIT tries to minimize the stack usage, e.g. it doesn't have a
-> fixed pro/epilogue like some of the other JITs. I think we can do better
-> here, so that the pass-TCC-via-register can be used, and the additional
-> stack access can be avoided.
-> 
-> Today, the TCC is passed via a register (a6) and can be viewed as a
-> "state" variable/transparent argument/return value. As you point out, we
-> loose this when we do a call. On (any) calls we move the TCC to a
-> callee-saved register.
-> 
-> WDYT about the following scheme:
-> 
-> 1 Pickup the arm64 bpf2bpf/tailmix mechanism of just clearing the TCC
->    for the main program.
-> 2 For BPF helper calls, move TCC to s6, perform the call, and restore
->    a6. Dito for kfunc calls (BPF_PSEUDO_KFUNC_CALL).
-> 3 For all other calls, a6 is passed transparently.
-> 
-> For 2 bpf_jit_get_func_addr() can be used to determine if the callee is
-> a BPF helper or not.
-> 
-> In summary; Determine in the JIT if we're leaving BPF-land, and need to
-> move the TCC to a callee-saved reg, or not, and save us a bunch of stack
-> store/loads.
-> 
-
-Valuable scheme. But we need to consider TCC back propagation. Let me 
-show an example of calling subprog with TCC stored in A6:
-
-prog1(TCC==1){
-     subprog1(TCC==1)
-         -> tailcall1(TCC==0)
-             -> subprog2(TCC==0)
-     subprog3(TCC==0) <--- should be TCC==1
-         -\-> tailcall2 <--- can't be called
-}
-
-We call prog1 and TCC is 1. prog1 has two subprogs, subprog1 and 
-subprog3. subprog1 calls tailcall1 and TCC become to 0. tailcall1 call 
-subprog2 and then return to prog1 with TCC is 0. At this time, subprog3 
-cannot call tailcall2 because TCC is 0. But TCC should be 1 here.
-
-The question is A6 cannot be saved and restored, that is why I saved A6 
-in stack at prologue, and restored at epilogue.
-
-> 
-> Björn
-
+I tested using the minimal config generated by virtme-ng and the
+following additional config options need to be enabled for bonding
+tests:
+CONFIG_IPV6=y
+CONFIG_NET_ACT_GACT=y
+CONFIG_NET_CLS_FLOWER=y
+CONFIG_NET_SCH_INGRESS=y
+CONFIG_NLMON=y
 
