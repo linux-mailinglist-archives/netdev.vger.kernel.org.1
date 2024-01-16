@@ -1,104 +1,265 @@
-Return-Path: <netdev+bounces-63619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74FC082E8B3
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 05:55:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B350A82E903
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 06:07:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F234B284C57
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 04:55:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 18CCB1F21F5D
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 05:07:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E21D125CE;
-	Tue, 16 Jan 2024 04:52:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D804E10A30;
+	Tue, 16 Jan 2024 04:59:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ELyuJIjP"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa7.hc1455-7.c3s2.iphmx.com (esa7.hc1455-7.c3s2.iphmx.com [139.138.61.252])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68ADF11184;
-	Tue, 16 Jan 2024 04:52:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fujitsu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
-X-IronPort-AV: E=McAfee;i="6600,9927,10954"; a="125018769"
-X-IronPort-AV: E=Sophos;i="6.04,198,1695654000"; 
-   d="scan'208";a="125018769"
-Received: from unknown (HELO yto-r2.gw.nic.fujitsu.com) ([218.44.52.218])
-  by esa7.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2024 13:52:21 +0900
-Received: from yto-m3.gw.nic.fujitsu.com (yto-nat-yto-m3.gw.nic.fujitsu.com [192.168.83.66])
-	by yto-r2.gw.nic.fujitsu.com (Postfix) with ESMTP id 6865BD6186;
-	Tue, 16 Jan 2024 13:52:19 +0900 (JST)
-Received: from kws-ab4.gw.nic.fujitsu.com (kws-ab4.gw.nic.fujitsu.com [192.51.206.22])
-	by yto-m3.gw.nic.fujitsu.com (Postfix) with ESMTP id 9E067E399D;
-	Tue, 16 Jan 2024 13:52:18 +0900 (JST)
-Received: from edo.cn.fujitsu.com (edo.cn.fujitsu.com [10.167.33.5])
-	by kws-ab4.gw.nic.fujitsu.com (Postfix) with ESMTP id 3CAFC6B4C9;
-	Tue, 16 Jan 2024 13:52:18 +0900 (JST)
-Received: from localhost.localdomain (unknown [10.167.226.45])
-	by edo.cn.fujitsu.com (Postfix) with ESMTP id C83DE1A0160;
-	Tue, 16 Jan 2024 12:52:17 +0800 (CST)
-From: Li Zhijian <lizhijian@fujitsu.com>
-To: linux-kernel@vger.kernel.org
-Cc: Li Zhijian <lizhijian@fujitsu.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH 15/42] drivers/ptp: Convert snprintf to sysfs_emit
-Date: Tue, 16 Jan 2024 12:51:24 +0800
-Message-Id: <20240116045151.3940401-13-lizhijian@fujitsu.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20240116045151.3940401-1-lizhijian@fujitsu.com>
-References: <20240116041129.3937800-1-lizhijian@fujitsu.com>
- <20240116045151.3940401-1-lizhijian@fujitsu.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 130C010A2A
+	for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 04:59:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-40e7e2e04f0so10934985e9.1
+        for <netdev@vger.kernel.org>; Mon, 15 Jan 2024 20:59:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705381188; x=1705985988; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JEYXUkF6c3dJQhpvXNSNTROOzDueF2MPbWEc5j8RzLs=;
+        b=ELyuJIjPX34IlFG1B5eRqVJoMAsN+BDfezDqw3m3Zux9ND3AZYB6XbHoAkHMwFYPyz
+         8D8YTBWSnv/vbft8yzM3cKicxDI1Idy2R3sFkck4YuNtO+igjUjurovrkTBncjplczdO
+         CANVIc01tGfZDieYJWC4n9+lSnCpIziAVSqAiGB8gnaD6cPqqUZBdsk3fUR8wBOrxtCS
+         0fOJO05Bhab40oARG+UZk/Ur+zoHubzWKVtFVifj8Je/wmQqaR0wCAVl3jNbja04khRv
+         qiNqFEzkgIa7buTSOw8qBNrhriC8w6b9hXXl8+foCi5UPDMwtAreBRUqlDQ9b5HvtzUC
+         QF1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705381188; x=1705985988;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JEYXUkF6c3dJQhpvXNSNTROOzDueF2MPbWEc5j8RzLs=;
+        b=hxjup3E/dMaheUBmzICvs0XEBBWVKYEKOWlIkcz+gqZ543R7uf8JEsKYe9oySDcBUL
+         NiWOOBYa5dYDdzup+kKJ43RclxVqe+K67hBcje7FeWNEs9z/0+Iy2pI4ZlzV6Bma1tTA
+         5L/OdhwpU7aECUn8LYlRIut5YlfABk2UipJXMadCymazkv1Z+B3lnlIKZLSIX4skK9iK
+         ntQ/ayXcW9VrlHHqDxGmWjJ3OCoKCCx/bsL9vQLSme8364mUij3uc/bPlU6LfzG0m7Ac
+         3D+3JjPZWEN2fFMTLZd5p5SCDMykwxT8wRAO2yvkNTBjtgUctKc+EWBqiTL8+dygD/kz
+         EgvA==
+X-Gm-Message-State: AOJu0Yw5GnrSiVxzmxAjpdv7XDR0BIxM5cxQ7DaWtGg+SgmiWBYATW7a
+	f6H+5Syd6w6TuvsiMaA0aa2XtW96PbkcXw==
+X-Google-Smtp-Source: AGHT+IEPgqsc7xhQOt2E01zMSdnMxTL2OOgznjQ3ah2Qx4B33H8Y73YfS6W2uoPfUUol4hqX09ynbA==
+X-Received: by 2002:a05:600c:4c0a:b0:40e:7039:f265 with SMTP id d10-20020a05600c4c0a00b0040e7039f265mr2174292wmp.53.1705381188032;
+        Mon, 15 Jan 2024 20:59:48 -0800 (PST)
+Received: from smtpclient.apple ([178.254.237.20])
+        by smtp.gmail.com with ESMTPSA id j28-20020a05600c1c1c00b0040e6726befcsm14056645wms.10.2024.01.15.20.59.47
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 15 Jan 2024 20:59:47 -0800 (PST)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-TM-AS-Product-Ver: IMSS-9.1.0.1417-9.0.0.1002-28122.005
-X-TM-AS-User-Approved-Sender: Yes
-X-TMASE-Version: IMSS-9.1.0.1417-9.0.1002-28122.005
-X-TMASE-Result: 10--8.370000-10.000000
-X-TMASE-MatchedRID: 6SYb29c3rTQ4ibokZ3+Q0CoiRKlBVkYIBXngI6jFvpfvd49YGReckE1N
-	J2MN+nPkgxCMf8A0YpR5sRK06wHV4TBF7stuNMMxTuctSpiuWyUUi4Ehat05499RlPzeVuQQrI7
-	SkweN/esJ//Y+eUvH+c4WYLmQfXYmpoPHQXywp1dv+ggm5QAi4X0tCKdnhB58I/9UW5M5dRM+8F
-	JNGdxYq46HM5rqDwqtcqB4bMvgKHUVNZz2PtKgH4DCmzb1E89ZCX01fDM/ueYwzO0EhsSbLA==
-X-TMASE-SNAP-Result: 1.821001.0001-0-1-22:0,33:0,34:0-0
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.300.61.1.2\))
+Subject: Re: [RFC,net-next] tcp: add support for read with offset when using
+ MSG_PEEK
+From: Martin Zaharinov <micron10@gmail.com>
+In-Reply-To: <b17a1cda-2a3e-2a79-ff88-7f7fe3c30f37@redhat.com>
+Date: Tue, 16 Jan 2024 06:59:36 +0200
+Cc: netdev <netdev@vger.kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <BDDD81F3-146F-4DCB-9B47-3BF0618607CD@gmail.com>
+References: <F0655F8D-EBEB-403E-BA89-0C8AAAE56E1D@gmail.com>
+ <b17a1cda-2a3e-2a79-ff88-7f7fe3c30f37@redhat.com>
+To: Jon Maloy <jmaloy@redhat.com>
+X-Mailer: Apple Mail (2.3774.300.61.1.2)
 
-Per filesystems/sysfs.rst, show() should only use sysfs_emit()
-or sysfs_emit_at() when formatting the value to be returned to user space.
+Hi Jon,
 
-coccinelle complains that there are still a couple of functions that use
-snprintf(). Convert them to sysfs_emit().
+yes same here in our test lab where have one test user all is fine .
 
-> ./drivers/ptp/ptp_sysfs.c:27:8-16: WARNING: please use sysfs_emit
+But when install kernel on production server with 500 users (ppp) and =
+400-500mbit/s traffic machine crash with this bug log.
+Its run as isp router firewall + shapers =E2=80=A6
 
-No functional change intended
+m.
 
-CC: Richard Cochran <richardcochran@gmail.com>
-CC: netdev@vger.kernel.org
-Signed-off-by: Li Zhijian <lizhijian@fujitsu.com>
----
- drivers/ptp/ptp_sysfs.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/drivers/ptp/ptp_sysfs.c b/drivers/ptp/ptp_sysfs.c
-index f7a499a1bd39..49737ed6ef5f 100644
---- a/drivers/ptp/ptp_sysfs.c
-+++ b/drivers/ptp/ptp_sysfs.c
-@@ -24,8 +24,7 @@ static ssize_t max_phase_adjustment_show(struct device *dev,
- {
- 	struct ptp_clock *ptp = dev_get_drvdata(dev);
- 
--	return snprintf(page, PAGE_SIZE - 1, "%d\n",
--			ptp->info->getmaxphase(ptp->info));
-+	return sysfs_emit(page, "%d\n", ptp->info->getmaxphase(ptp->info));
- }
- static DEVICE_ATTR_RO(max_phase_adjustment);
- 
--- 
-2.29.2
+> On 16 Jan 2024, at 0:41, Jon Maloy <jmaloy@redhat.com> wrote:
+>=20
+>=20
+>=20
+> On 2024-01-15 16:51, Martin Zaharinov wrote:
+>> Hi Jon
+>>=20
+>> After apply the patch on kernel 6.7.0 system hang with this bug =
+report :
+> Hmm,
+> I have been running this for weeks without any problems, on x86_64 =
+with current net and net-next.
+> There must be some difference between our kernels.
+> Which configuration are you using?
+> It would also be interesting to see your test program.
+>=20
+> Regards
+> ///jon
+>=20
+>=20
+>>=20
+>> Jan 15 22:27:39 6.7.0,1,863,194879739,-,caller=3DT3523;BUG: unable to =
+handle page fault for address: 00007fff333174e0
+>> Jan 15 22:27:39 6.7.0,1,864,194879876,-,caller=3DT3523;#PF: =
+supervisor read access in kernel mode
+>> Jan 15 22:27:39 6.7.0,1,865,194879976,-,caller=3DT3523;#PF: =
+error_code(0x0001) - permissions violation
+>> Jan 15 22:27:39 6.7.0,6,866,194880075,-,caller=3DT3523;PGD 107cbd067 =
+P4D 107cbd067 PUD 22055d067 PMD 10a384067 PTE 8000000228b00067
+>> Jan 15 22:27:39 6.7.0,4,867,194880202,-,caller=3DT3523;Oops: 0001 =
+[#1] SMP
+>> Jan 15 22:27:39 6.7.0,4,868,194880297,-,caller=3DT3523;CPU: 12 PID: =
+3523 Comm: server-nft Tainted: G           O       6.7.0 #1
+>> Jan 15 22:27:39 6.7.0,4,869,194880420,-,caller=3DT3523;Hardware name: =
+To Be Filled By O.E.M. To Be Filled By O.E.M./EP2C612D8, BIOS P2.30 =
+04/30/2018
+>> Jan 15 22:27:39 6.7.0,4,870,194880547,-,caller=3DT3523;RIP: =
+0010:tcp_recvmsg_locked+0x498/0xea0
+>> Jan 15 22:27:39 6.7.0,4,871,194880709,-,caller=3DT3523;Code: a3 07 00 =
+00 80 fa 02 0f 84 88 07 00 00 84 d2 0f 84 f1 04 00 00 41 8b 8c 24 d8 05 =
+00 00 49 8b 53 20 4c 8d 7c 24 44 89 4c 24 44 <48> 83 3a 00 0f 85 e5 fb =
+ff ff 49 8b 73 30 48 83 fe 01 0f 86 c4 04
+>> Jan 15 22:27:39 6.7.0,4,872,194880876,-,caller=3DT3523;RSP: =
+0018:ffffa47b01307d00 EFLAGS: 00010202
+>> Jan 15 22:27:39 6.7.0,4,873,194880975,-,caller=3DT3523;RAX: =
+0000000000000002 RBX: ffff8cf8c3209800 RCX: 00000000a87ac03c
+>> Jan 15 22:27:39 6.7.0,4,874,194881096,-,caller=3DT3523;RDX: =
+00007fff333174e0 RSI: ffffa47b01307e18 RDI: ffff8cf8c3209800
+>> Jan 15 22:27:39 6.7.0,4,875,194881217,-,caller=3DT3523;RBP: =
+ffffa47b01307d78 R08: ffffa47b01307d90 R09: ffffa47b01307d8c
+>> Jan 15 22:27:39 6.7.0,4,876,194881338,-,caller=3DT3523;R10: =
+0000000000000002 R11: ffffa47b01307e18 R12: ffff8cf8c3209800
+>> Jan 15 22:27:39 6.7.0,4,877,194881458,-,caller=3DT3523;R13: =
+0000000000000000 R14: 0000000000000000 R15: ffffa47b01307d44
+>> Jan 15 22:27:39 6.7.0,4,878,194881579,-,caller=3DT3523;FS:  =
+00007f4941b0ad80(0000) GS:ffff8d001f900000(0000) knlGS:0000000000000000
+>> Jan 15 22:27:39 6.7.0,4,879,194881703,-,caller=3DT3523;CS:  0010 DS: =
+0000 ES: 0000 CR0: 0000000080050033
+>> Jan 15 22:27:39 6.7.0,4,880,194881802,-,caller=3DT3523;CR2: =
+00007fff333174e0 CR3: 000000010df04002 CR4: 00000000003706f0
+>> Jan 15 22:27:39 6.7.0,4,881,194881922,-,caller=3DT3523;DR0: =
+0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>> Jan 15 22:27:39 6.7.0,4,882,194882043,-,caller=3DT3523;DR3: =
+0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+>> Jan 15 22:27:39 6.7.0,4,883,194882164,-,caller=3DT3523;Call Trace:
+>> Jan 15 22:27:39 6.7.0,4,884,194882257,-,caller=3DT3523; <TASK>
+>> Jan 15 22:27:39 6.7.0,4,885,194882347,-,caller=3DT3523; ? =
+__die+0xe4/0xf0
+>> Jan 15 22:27:39 6.7.0,4,886,194882442,-,caller=3DT3523; ? =
+page_fault_oops+0x144/0x3e0
+>> Jan 15 22:27:39 6.7.0,4,887,194882539,-,caller=3DT3523; ? =
+zap_pte_range+0x6a4/0xdc0
+>> Jan 15 22:27:39 6.7.0,4,888,194882638,-,caller=3DT3523; ? =
+exc_page_fault+0x5d/0xa0
+>> Jan 15 22:27:39 6.7.0,4,889,194882736,-,caller=3DT3523; ? =
+asm_exc_page_fault+0x22/0x30
+>> Jan 15 22:27:39 6.7.0,4,890,194882834,-,caller=3DT3523; ? =
+tcp_recvmsg_locked+0x498/0xea0
+>> Jan 15 22:27:39 6.7.0,4,891,194882931,-,caller=3DT3523; ? =
+__call_rcu_common.constprop.0+0xbc/0x770
+>> Jan 15 22:27:39 6.7.0,4,892,194883031,-,caller=3DT3523; ? =
+rcu_nocb_flush_bypass.part.0+0xec/0x120
+>> Jan 15 22:27:39 6.7.0,4,893,194883133,-,caller=3DT3523; =
+tcp_recvmsg+0x5c/0x1e0
+>> Jan 15 22:27:39 6.7.0,4,894,194883228,-,caller=3DT3523; =
+inet_recvmsg+0x2a/0x90
+>> Jan 15 22:27:39 6.7.0,4,895,194883325,-,caller=3DT3523; =
+__sys_recvfrom+0x15e/0x200
+>> Jan 15 22:27:39 6.7.0,4,896,194883423,-,caller=3DT3523; ? =
+wait_task_zombie+0xee/0x410
+>> Jan 15 22:27:39 6.7.0,4,897,194883539,-,caller=3DT3523; ? =
+remove_wait_queue+0x1b/0x60
+>> Jan 15 22:27:39 6.7.0,4,898,194883635,-,caller=3DT3523; ? =
+do_wait+0x93/0xa0
+>> Jan 15 22:27:39 6.7.0,4,899,194883729,-,caller=3DT3523; ? =
+__x64_sys_poll+0xa7/0x170
+>> Jan 15 22:27:39 6.7.0,4,900,194883825,-,caller=3DT3523; =
+__x64_sys_recvfrom+0x1b/0x20
+>> Jan 15 22:27:39 6.7.0,4,901,194883921,-,caller=3DT3523; =
+do_syscall_64+0x2c/0xa0
+>> Jan 15 22:27:39 6.7.0,4,902,194884018,-,caller=3DT3523; =
+entry_SYSCALL_64_after_hwframe+0x46/0x4e
+>> Jan 15 22:27:39 6.7.0,4,903,194884116,-,caller=3DT3523;RIP: =
+0033:0x7f4941fe92a9
+>> Jan 15 22:27:39 6.7.0,4,904,194884210,-,caller=3DT3523;Code: 0c 00 64 =
+c7 02 02 00 00 00 eb bf 66 0f 1f 44 00 00 80 3d a9 e0 0c 00 00 41 89 ca =
+74 1c 45 31 c9 45 31 c0 b8 2d 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 67 =
+c3 66 0f 1f 44 00 00 55 48 83 ec 20 48 89
+>> Jan 15 22:27:39 6.7.0,4,905,194884377,-,caller=3DT3523;RSP: =
+002b:00007fff33317468 EFLAGS: 00000246 ORIG_RAX: 000000000000002d
+>> Jan 15 22:27:39 6.7.0,4,906,194884499,-,caller=3DT3523;RAX: =
+ffffffffffffffda RBX: 00007fff333174e0 RCX: 00007f4941fe92a9
+>> Jan 15 22:27:39 6.7.0,4,907,194884620,-,caller=3DT3523;RDX: =
+0000000000000001 RSI: 00007fff333174e0 RDI: 0000000000000005
+>> Jan 15 22:27:39 6.7.0,4,908,194884740,-,caller=3DT3523;RBP: =
+00007fff33317550 R08: 0000000000000000 R09: 0000000000000000
+>> Jan 15 22:27:39 6.7.0,4,909,194884860,-,caller=3DT3523;R10: =
+0000000000000002 R11: 0000000000000246 R12: 0000000000000000
+>> Jan 15 22:27:39 6.7.0,4,910,194884980,-,caller=3DT3523;R13: =
+0000000000000000 R14: 0000000000000000 R15: 00007f49418850a0
+>> Jan 15 22:27:39 6.7.0,4,911,194885101,-,caller=3DT3523; </TASK>
+>> Jan 15 22:27:39 6.7.0,4,912,194885191,-,caller=3DT3523;Modules linked =
+in: nft_limit pppoe pppox ppp_generic slhc nft_ct nft_nat nft_chain_nat =
+nf_tables netconsole coretemp bonding igb i2c_algo_bit i40e ixgbe mdio =
+nf_nat_sip nf_conntrack_sip nf_nat_pptp nf_conntrack_pptp nf_nat_tftp =
+nf_conntrack_tftp nf_nat_ftp nf_conntrack_ftp nf_nat nf_conntrack =
+nf_defrag_ipv6 nf_defrag_ipv4 ipmi_si ipmi_devintf ipmi_msghandler =
+rtc_cmos aesni_intel crypto_simd cryptd
+>> Jan 15 22:27:39 6.7.0,4,913,194885507,-,caller=3DT3523;CR2: =
+00007fff333174e0
+>> Jan 15 22:27:39 6.7.0,4,914,194885602,-,caller=3DT3523;---[ end trace =
+0000000000000000 ]---
+>> Jan 15 22:27:39 6.7.0,4,915,194885698,-,caller=3DT3523;RIP: =
+0010:tcp_recvmsg_locked+0x498/0xea0
+>> Jan 15 22:27:39 6.7.0,4,916,194885797,-,caller=3DT3523;Code: a3 07 00 =
+00 80 fa 02 0f 84 88 07 00 00 84 d2 0f 84 f1 04 00 00 41 8b 8c 24 d8 05 =
+00 00 49 8b 53 20 4c 8d 7c 24 44 89 4c 24 44 <48> 83 3a 00 0f 85 e5 fb =
+ff ff 49 8b 73 30 48 83 fe 01 0f 86 c4 04
+>> Jan 15 22:27:39 6.7.0,4,917,194887079,-,caller=3DT3523;RSP: =
+0018:ffffa47b01307d00 EFLAGS: 00010202
+>> Jan 15 22:27:39 6.7.0,4,918,194887177,-,caller=3DT3523;RAX: =
+0000000000000002 RBX: ffff8cf8c3209800 RCX: 00000000a87ac03c
+>> Jan 15 22:27:39 6.7.0,4,919,194887298,-,caller=3DT3523;RDX: =
+00007fff333174e0 RSI: ffffa47b01307e18 RDI: ffff8cf8c3209800
+>> Jan 15 22:27:39 6.7.0,4,920,194887418,-,caller=3DT3523;RBP: =
+ffffa47b01307d78 R08: ffffa47b01307d90 R09: ffffa47b01307d8c
+>> Jan 15 22:27:39 6.7.0,4,921,194887538,-,caller=3DT3523;R10: =
+0000000000000002 R11: ffffa47b01307e18 R12: ffff8cf8c3209800
+>> Jan 15 22:27:39 6.7.0,4,922,194887658,-,caller=3DT3523;R13: =
+0000000000000000 R14: 0000000000000000 R15: ffffa47b01307d44
+>> Jan 15 22:27:39 6.7.0,4,923,194887779,-,caller=3DT3523;FS:  =
+00007f4941b0ad80(0000) GS:ffff8d001f900000(0000) knlGS:0000000000000000
+>> Jan 15 22:27:39 6.7.0,4,924,194887901,-,caller=3DT3523;CS:  0010 DS: =
+0000 ES: 0000 CR0: 0000000080050033
+>> Jan 15 22:27:39 6.7.0,4,925,194888000,-,caller=3DT3523;CR2: =
+00007fff333174e0 CR3: 000000010df04002 CR4: 00000000003706f0
+>> Jan 15 22:27:39 6.7.0,4,926,194888120,-,caller=3DT3523;DR0: =
+0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>> Jan 15 22:27:39 6.7.0,4,927,194888240,-,caller=3DT3523;DR3: =
+0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+>> Jan 15 22:27:39 6.7.0,0,928,194888360,-,caller=3DT3523;Kernel panic - =
+not syncing: Fatal exception
+>> Jan 15 22:27:40 6.7.0,0,929,195391096,-,caller=3DT3523;Kernel Offset: =
+0x1f000000 from 0xffffffff81000000 (relocation range: =
+0xffffffff80000000-0xffffffffbfffffff)
+>> Jan 15 22:27:40 6.7.0,0,930,195391224,-,caller=3DT3523;Rebooting in =
+10 seconds..
+>>=20
+>>=20
+>>=20
+>> m.
+>>=20
+>=20
 
 
