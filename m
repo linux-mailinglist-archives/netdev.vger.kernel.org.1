@@ -1,69 +1,66 @@
-Return-Path: <netdev+bounces-63784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD38882F685
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 21:01:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CEF882F692
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 21:03:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F4A31F25F16
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 20:01:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FD9B1C23C80
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 20:03:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CB8820334;
-	Tue, 16 Jan 2024 19:45:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82BF441A88;
+	Tue, 16 Jan 2024 19:45:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JlyZy1al"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GIoP1hMU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13D461DA26;
-	Tue, 16 Jan 2024 19:45:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B2241778;
+	Tue, 16 Jan 2024 19:45:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705434321; cv=none; b=haCimAZU39wbObgcKjAG6R7BNPvE7waK4cP4Il6swsPQDfJKbwdhrBVUyYbJepxwE37TV75Ltgut1y26sysKbDTsTAvVpfo2xkz+dsMxCr9wtpe5qzjlb9RUt5jJRsZV0gHl2OoZk27BShDapWeuTNhQMFU2VbxCAG8oJjrqlXc=
+	t=1705434340; cv=none; b=tIeihrqOzby3Hi1d8DVpH0UQVq2IJ8b2CZAXnIo0MgY3Iwkn23imZxHO/TNkgYP4FD9zftlOZjKJT8K3UbaqqIPteHppHxm+QFCxoE6gazobEdm74jHXy5Ub/Ulp73OvCIbStM93LvQ34/96gT/K5qi5ZlJ2ZnRGbhwdJw/dNww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705434321; c=relaxed/simple;
-	bh=UAx8o4uieITWwemApbn071yaC0dHde0zkkm5N+ZPpHs=;
+	s=arc-20240116; t=1705434340; c=relaxed/simple;
+	bh=UJjrdwgJB6dEm9810nwT8dcuk2xsksgaiGtYCpqtQOE=;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:X-stable:
-	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=XTEKonmC/x1qb8x7ajkke5Ygy1Dur5NjT/ApG9FA1wl8lh7cIVvZlc39kHKIMOQ1fTtG3hzleCjDpjnAUEKGfIMWLysKqjYLot3dQ7DXHvCGz6M/NgH/w54IDkdhULvlAPH+5/h1c+u+WfMWaxrVAZCZgcQHsrvUgNVeccULjx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JlyZy1al; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED56EC433C7;
-	Tue, 16 Jan 2024 19:45:18 +0000 (UTC)
+	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=dKVHaAQJkD3OXrnqP5E4Ayf6dsq3VvpD6hCCzhFRf9I3RXt1ib3QACgyYyooDzFRjKN0JjdrJm91lFobU+QaPj4Yo0ZBeNC3gCSod3upqKlrb4VcGDWMmRtAkhvxTOX0lSCrIFDDRsbBHOaUMhokrve7iwHg0H+f11rlmn/Lc+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GIoP1hMU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82E40C433C7;
+	Tue, 16 Jan 2024 19:45:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705434320;
-	bh=UAx8o4uieITWwemApbn071yaC0dHde0zkkm5N+ZPpHs=;
+	s=k20201202; t=1705434340;
+	bh=UJjrdwgJB6dEm9810nwT8dcuk2xsksgaiGtYCpqtQOE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JlyZy1alLa719r7pAceS2PgFq/Qes11evFAk4FbeqfM4rdDgRiqtl9+jWiOvhxMMC
-	 NDXPEXKdjRVJQiNPbPGX6aQpk7MTJjTASUWh+s6fUa3o4mjvSJlPFx2BT5RRK+tQ75
-	 31BZ7r9RUGem+aUP1ucI5pE5sJa0vwohDQ8ecirIJpeAiVJ4d3JbnhAcR19kGV9NBb
-	 De9wktSr6H7+Brx5XRKgcIf13ZQBMy4g80BxDKPnRamX4Ye642Odbz8Fbd1zAEew0b
-	 2eXhUub2ibUbgu7giheLbIY9QmEt3EcVkjFpMqlpfjcZrUmyQgo3Aw4INmSeMpSWqT
-	 SQkI0MgWKqjjg==
+	b=GIoP1hMUxml6v0ahcMDfLKO3hN7LQrZ8zh6tS52+ulHI9iZhPLU5idAAUqR0kJEgL
+	 bEIDkWoC5bmqgFpolxmJGK4zIN3uDWDyU/GJKZ6Ugtz5bNuf0opApTZQxrRLpFUWj0
+	 ukc2u69E1uDrHjlaox3TTR+4taY53QD1QELChXwuY9JudnTpde/Uhg7WDuTTlAT/J6
+	 AWM66aFNxznqu5N47hSvc6GnAWZjar8e36awurX4XvwYJ1fWOH5JQ/N+WU0GBTVPoa
+	 fCRTNqhhA3sJ6OmfsA17Z7cVHIDcyg5SeUfENaVHOktVqEVNVSUBUed2CiDZYS+3zZ
+	 bbDoV3jvDswVg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Shannon Nelson <shannon.nelson@amd.com>,
-	Brett Creeley <brett.creeley@amd.com>,
-	"David S . Miller" <davem@davemloft.net>,
+Cc: Andrii Nakryiko <andrii@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	drivers@pensando.io,
-	edumazet@google.com,
+	daniel@iogearbox.net,
+	shuah@kernel.org,
+	davem@davemloft.net,
 	kuba@kernel.org,
-	pabeni@redhat.com,
-	cai.huoqing@linux.dev,
-	leon@kernel.org,
-	florian.fainelli@broadcom.com,
-	nitya.sunkad@amd.com,
-	allen.hubbe@amd.com,
-	Julia.Lawall@inria.fr,
-	justinstitt@google.com,
+	hawk@kernel.org,
+	bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.7 062/108] ionic: bypass firmware cmds when stuck in reset
-Date: Tue, 16 Jan 2024 14:39:28 -0500
-Message-ID: <20240116194225.250921-62-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.7 066/108] selftests/bpf: fix compiler warnings in RELEASE=1 mode
+Date: Tue, 16 Jan 2024 14:39:32 -0500
+Message-ID: <20240116194225.250921-66-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240116194225.250921-1-sashal@kernel.org>
 References: <20240116194225.250921-1-sashal@kernel.org>
@@ -78,98 +75,50 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.7
 Content-Transfer-Encoding: 8bit
 
-From: Shannon Nelson <shannon.nelson@amd.com>
+From: Andrii Nakryiko <andrii@kernel.org>
 
-[ Upstream commit ca5fdf9a7c5b65968c718f2be159cda4c13556a1 ]
+[ Upstream commit 62d9a969f4a95219c757831e9ad66cd4dd9edee5 ]
 
-If the driver or firmware is stuck in reset state, don't bother
-trying to use adminq commands.  This speeds up shutdown and
-prevents unnecessary timeouts and error messages.
+When compiling BPF selftests with RELEASE=1, we get two new
+warnings, which are treated as errors. Fix them.
 
-This includes a bit of rework on ionic_adminq_post_wait()
-and ionic_adminq_post_wait_nomsg() to both use
-__ionic_adminq_post_wait() which can do the checks needed in
-both cases.
-
-Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
-Reviewed-by: Brett Creeley <brett.creeley@amd.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
+Acked-by: Yonghong Song <yonghong.song@linux.dev>
+Acked-by: John Fastabend <john.fastabend@gmail.com>
+Link: https://lore.kernel.org/r/20231212225343.1723081-1-andrii@kernel.org
+Signed-off-by: Alexei Starovoitov <ast@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- .../ethernet/pensando/ionic/ionic_bus_pci.c   |  4 ++++
- .../net/ethernet/pensando/ionic/ionic_lif.c   |  3 +++
- .../net/ethernet/pensando/ionic/ionic_main.c  | 20 ++++++++++++-------
- 3 files changed, 20 insertions(+), 7 deletions(-)
+ tools/testing/selftests/bpf/veristat.c        | 2 +-
+ tools/testing/selftests/bpf/xdp_hw_metadata.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c b/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
-index d6ce113a4210..fa4237c27e06 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
-@@ -392,6 +392,10 @@ static void ionic_remove(struct pci_dev *pdev)
- 	del_timer_sync(&ionic->watchdog_timer);
- 
- 	if (ionic->lif) {
-+		/* prevent adminq cmds if already known as down */
-+		if (test_and_clear_bit(IONIC_LIF_F_FW_RESET, ionic->lif->state))
-+			set_bit(IONIC_LIF_F_FW_STOPPING, ionic->lif->state);
-+
- 		ionic_lif_unregister(ionic->lif);
- 		ionic_devlink_unregister(ionic);
- 		ionic_lif_deinit(ionic->lif);
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_lif.c b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-index bad919343180..075e0e3fc2ea 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-@@ -3238,6 +3238,9 @@ static void ionic_lif_reset(struct ionic_lif *lif)
+diff --git a/tools/testing/selftests/bpf/veristat.c b/tools/testing/selftests/bpf/veristat.c
+index 655095810d4a..0ad98b6a8e6e 100644
+--- a/tools/testing/selftests/bpf/veristat.c
++++ b/tools/testing/selftests/bpf/veristat.c
+@@ -1214,7 +1214,7 @@ static int cmp_join_stat(const struct verif_stats_join *s1,
+ 			 enum stat_id id, enum stat_variant var, bool asc)
  {
- 	struct ionic_dev *idev = &lif->ionic->idev;
+ 	const char *str1 = NULL, *str2 = NULL;
+-	double v1, v2;
++	double v1 = 0.0, v2 = 0.0;
+ 	int cmp = 0;
  
-+	if (!ionic_is_fw_running(idev))
-+		return;
-+
- 	mutex_lock(&lif->ionic->dev_cmd_lock);
- 	ionic_dev_cmd_lif_reset(idev, lif->index);
- 	ionic_dev_cmd_wait(lif->ionic, DEVCMD_TIMEOUT);
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_main.c b/drivers/net/ethernet/pensando/ionic/ionic_main.c
-index 1b547acfd8e9..83c413a10f79 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_main.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_main.c
-@@ -410,22 +410,28 @@ int ionic_adminq_wait(struct ionic_lif *lif, struct ionic_admin_ctx *ctx,
- 				      do_msg);
- }
- 
--int ionic_adminq_post_wait(struct ionic_lif *lif, struct ionic_admin_ctx *ctx)
-+static int __ionic_adminq_post_wait(struct ionic_lif *lif,
-+				    struct ionic_admin_ctx *ctx,
-+				    const bool do_msg)
- {
- 	int err;
- 
-+	if (!ionic_is_fw_running(&lif->ionic->idev))
-+		return 0;
-+
- 	err = ionic_adminq_post(lif, ctx);
- 
--	return ionic_adminq_wait(lif, ctx, err, true);
-+	return ionic_adminq_wait(lif, ctx, err, do_msg);
- }
- 
--int ionic_adminq_post_wait_nomsg(struct ionic_lif *lif, struct ionic_admin_ctx *ctx)
-+int ionic_adminq_post_wait(struct ionic_lif *lif, struct ionic_admin_ctx *ctx)
- {
--	int err;
--
--	err = ionic_adminq_post(lif, ctx);
-+	return __ionic_adminq_post_wait(lif, ctx, true);
-+}
- 
--	return ionic_adminq_wait(lif, ctx, err, false);
-+int ionic_adminq_post_wait_nomsg(struct ionic_lif *lif, struct ionic_admin_ctx *ctx)
-+{
-+	return __ionic_adminq_post_wait(lif, ctx, false);
- }
- 
- static void ionic_dev_cmd_clean(struct ionic *ionic)
+ 	fetch_join_stat_value(s1, id, var, &str1, &v1);
+diff --git a/tools/testing/selftests/bpf/xdp_hw_metadata.c b/tools/testing/selftests/bpf/xdp_hw_metadata.c
+index c3ba40d0b9de..c5e7937d7f63 100644
+--- a/tools/testing/selftests/bpf/xdp_hw_metadata.c
++++ b/tools/testing/selftests/bpf/xdp_hw_metadata.c
+@@ -70,7 +70,7 @@ static int open_xsk(int ifindex, struct xsk *xsk, __u32 queue_id)
+ 		.frame_size = XSK_UMEM__DEFAULT_FRAME_SIZE,
+ 		.flags = XDP_UMEM_UNALIGNED_CHUNK_FLAG,
+ 	};
+-	__u32 idx;
++	__u32 idx = 0;
+ 	u64 addr;
+ 	int ret;
+ 	int i;
 -- 
 2.43.0
 
