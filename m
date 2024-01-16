@@ -1,111 +1,113 @@
-Return-Path: <netdev+bounces-63745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E981582F243
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 17:18:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5710F82F246
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 17:18:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 089321C23699
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 16:18:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EADAC1F2420B
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 16:18:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A8081C69F;
-	Tue, 16 Jan 2024 16:18:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A2531C6A4;
+	Tue, 16 Jan 2024 16:18:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="HrWo1Won"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vvf0fhuu"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEFCA1CA92;
-	Tue, 16 Jan 2024 16:18:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id C9751E0009;
-	Tue, 16 Jan 2024 16:18:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1705421889;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bwW1R0N0aeihLh2IgYe6QDQbFMA5/uEI9u6zAxldBWw=;
-	b=HrWo1WonVjqjbbyKmQlqRqBSyB+lFhXvICHLHVV6FHLDeyhwtRDsKXYSf0EsXEWoX/DHTt
-	Ce2sZTI2UxiVQ9Aoy+f/QEkZqdsjIAgqdu6G036v2c44wK0JelNt3DDajvP6i0opdTyVPt
-	2vVfK9+DK4UY4yDJsKcrWYvLrTTf8P4iFcacYrpenP6vaF6dgCEPapvUxQfIBplnpJldw7
-	9OWoGvICzdumA9+Zz4IU5USG+hzsSnK/0kIOgFcEvaf7YQwviAOgR79qUXLa8Srnw7ihiW
-	46Tw3h4jyNZeEJWHSq6jYjKMDpROPghCIqMbZKApr/OQQ0BR8iOAoVn8RuY+aw==
-Date: Tue, 16 Jan 2024 17:18:30 +0100 (CET)
-From: Romain Gantois <romain.gantois@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
-cc: Romain Gantois <romain.gantois@bootlin.com>, 
-    Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-    Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-    Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-    Miquel Raynal <miquel.raynal@bootlin.com>, 
-    Maxime Chevallier <maxime.chevallier@bootlin.com>, 
-    Sylvain Girard <sylvain.girard@se.com>, 
-    Pascal EBERHARD <pascal.eberhard@se.com>, 
-    Richard Tresidder <rtresidd@electromag.com.au>, 
-    Linus Walleij <linus.walleij@linaro.org>, 
-    Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
-    Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
-    linux-stm32@st-md-mailman.stormreply.com, 
-    linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org, 
-    Vladimir Oltean <vladimir.oltean@nxp.com>
-Subject: Re: [PATCH net v5] net: stmmac: Prevent DSA tags from breaking COE
-In-Reply-To: <20240116072300.3a6e0dbe@kernel.org>
-Message-ID: <d844c643-16bd-6f9d-1d39-a4f93b3fcf87@bootlin.com>
-References: <20240111-prevent_dsa_tags-v5-1-63e795a4d129@bootlin.com> <20240112181327.505b424e@kernel.org> <fca39a53-743e-f79d-d2d1-f23d8e919f82@bootlin.com> <20240116072300.3a6e0dbe@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7683B1C69F;
+	Tue, 16 Jan 2024 16:18:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-337b8da1f49so595483f8f.0;
+        Tue, 16 Jan 2024 08:18:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705421929; x=1706026729; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=NMLlqCh2RRB/p799yyEGysccg2bTaRZ9dL/XaurTxmk=;
+        b=Vvf0fhuueBDBk582fkaIq6DpY8AWbl5jHLgyf4rmdaf+2voTdW7pvQGWsm4HFScWSx
+         RFYLpbenr0lwpTFWuIdtCRP+OWWZu2NE4d3aw1tnrcx9EfLtHte84LcrpRV6JqgZaY22
+         UbSxZyRz3Yy5FU/pI+erQQulfdsB4CSXYidz/7HN1lopfgstPNfIBfwsShTM4I1P1FmN
+         K0Zh+x34fc1c8DhZQe/jDWOQ+1bx7dUGmF9HzHCI76oYOzn53o5zdp/XCxBeMofeVPMa
+         PuAMN7TQmpPLGZNztDTs6rj28rFfwYK0a2199tHn4g2P39KnCDXB9/tWMOz+Rm+5x159
+         rcHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705421929; x=1706026729;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NMLlqCh2RRB/p799yyEGysccg2bTaRZ9dL/XaurTxmk=;
+        b=g2MFXKVP9wGZ10Q/Bd5eGCeuzeOxRlAvuDKTx1Rp+WKyLzkFjPhnSzkR5mNGl6T45N
+         7mR/t+Fi89ruJFCRWu/CcoOwGTplsEZ1I9bg7PRFehB7GXb+ahGwASCX4wQSdpc1t3ms
+         7FSIFqVupUIgmN7URyZQbh/ELmEdtdts3X6TZUBwsbutfEs8X7OicnPOWPZ4ZiDi7IxS
+         ZppNAEQ5OYMBE0k/2BT202+H/giJw8eVdcv19IfJTMQAy5Z74IfimK/speF49HCe0++H
+         bsZ765fzIvkRLvubNBwP4Mu8mVk0LNoH/IkAWlkcxDOLBEvV1OCrNv91zfovKUjM4vaW
+         qfPQ==
+X-Gm-Message-State: AOJu0Yw9V3xV5OmQELBpQ2HKlGqgZ9b1rnRG3m9B6Nv7MIwr66vKjlqS
+	2DnvLULoyeOsce0BuoRtXSc=
+X-Google-Smtp-Source: AGHT+IGg9HcrXY9tosc+ZAXKh6ex/tlbdaBnq5t7i6gTzwXtjgngrhgqq3KD6H+lk5AFWZXSNp++jg==
+X-Received: by 2002:a5d:6283:0:b0:337:4fa6:2306 with SMTP id k3-20020a5d6283000000b003374fa62306mr2602699wru.158.1705421928640;
+        Tue, 16 Jan 2024 08:18:48 -0800 (PST)
+Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
+        by smtp.gmail.com with ESMTPSA id r1-20020adfce81000000b0033667867a66sm14956225wrn.101.2024.01.16.08.18.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Jan 2024 08:18:47 -0800 (PST)
+From: Colin Ian King <colin.i.king@gmail.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH][next] net: microchip: sparx5: remove redundant store to variable clk_hz
+Date: Tue, 16 Jan 2024 16:18:47 +0000
+Message-Id: <20240116161847.2317011-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-GND-Sasl: romain.gantois@bootlin.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Tue, 16 Jan 2024, Jakub Kicinski wrote:
+The store to clk_hz is redundant since clk_hz goes out of scope on the
+return. Fix this by replacing the *= operator with just * to remove
+the store back to clk_hz.
 
-> Hm, the comment in enh_desc_coe_rdes0() says:
-> 
-> 	/* bits 5 7 0 | Frame status
-> 	 * ----------------------------------------------------------
-> 	 *      0 0 0 | IEEE 802.3 Type frame (length < 1536 octects)
-> 	 *      1 0 0 | IPv4/6 No CSUM errorS.
-> 	 *      1 0 1 | IPv4/6 CSUM PAYLOAD error
-> 	 *      1 1 0 | IPv4/6 CSUM IP HR error
-> 	 *      1 1 1 | IPv4/6 IP PAYLOAD AND HEADER errorS
-> 	 *      0 0 1 | IPv4/6 unsupported IP PAYLOAD
-> 	 *      0 1 1 | COE bypassed.. no IPv4/6 frame
-> 	 *      0 1 0 | Reserved.
-> 	 */
-> 
-> which makes it sound like bit 5 will not be set for a Ethernet II frame
-> with unsupported IP payload, or not an IP frame. Does the bit mean other
-> things in different descriptor formats?
+Cleans up clang scan build warning:
+warning: Although the value stored to 'clk_hz' is used in the enclosing
+expression, the value is never actually read from 'clk_hz'
+[deadcode.DeadStores]
 
-The description of this bit in my datasheet is:
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+---
+ drivers/net/ethernet/microchip/sparx5/sparx5_sdlb.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-```
-b5 FT Frame Type
-When set, this bit indicates that the Receive Frame is an Ethernet-type frame 
-(the Length/Type field is greater than or equal to 1,536). When this bit is 
-reset, it indicates that the received frame is an IEEE 802.3 frame. This bit is 
-not valid for Runt frames less than 14 bytes
-```
-
-There is no mention of a more subtle check to detect non-IP Ethernet II frames. 
-I ran some tests on my hardware and EDSA-tagged packets consistently come in 
-with status 0b100, so the MAC sets the frame type bit even for frames that don't 
-have an IP ethertype.
-
-Best Regards,
-
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_sdlb.c b/drivers/net/ethernet/microchip/sparx5/sparx5_sdlb.c
+index f5267218caeb..d8f49082dbe4 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_sdlb.c
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_sdlb.c
+@@ -31,7 +31,7 @@ int sparx5_sdlb_clk_hz_get(struct sparx5 *sparx5)
+ 		clk_per_100ps = SPX5_CLK_PER_100PS_DEFAULT;
+ 
+ 	clk_hz = (10 * 1000 * 1000) / clk_per_100ps;
+-	return clk_hz *= 1000;
++	return clk_hz * 1000;
+ }
+ 
+ static int sparx5_sdlb_pup_interval_get(struct sparx5 *sparx5, u32 max_token,
 -- 
-Romain Gantois, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+2.39.2
+
 
