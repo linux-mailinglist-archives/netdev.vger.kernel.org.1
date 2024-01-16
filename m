@@ -1,67 +1,70 @@
-Return-Path: <netdev+bounces-63723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69B1B82F0E0
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 15:57:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C54E82F0F0
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 16:01:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05CCD285A12
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 14:57:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF9C21F23E31
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 15:01:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EDDA1BF35;
-	Tue, 16 Jan 2024 14:57:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B15A1BF34;
+	Tue, 16 Jan 2024 15:01:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mbnDxN89"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uMzTT2gI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE0B31BF2D;
-	Tue, 16 Jan 2024 14:57:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BE64C433C7;
-	Tue, 16 Jan 2024 14:57:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D5CB1BF2C;
+	Tue, 16 Jan 2024 15:00:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4A3CC433F1;
+	Tue, 16 Jan 2024 15:00:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705417052;
-	bh=IDiQ8RIHrZHljn3Kz8/zVIVVFgI/X5qySiqO/mihRjc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mbnDxN89NnCKQf3N0/D0rX5XdcrPa4BtvSdaX+9/WXDUz6pSK2UUUIqVsaBVw/RAl
-	 d2ryEtDo1F+Cjd/LTfUHsgIJhwBYm2/cpvyqyQlJqsOXMpDu5UacXvqOyX5dX3x5tR
-	 ONsoIzei1KU+nW829AfT5Ba+1S3YjCZRgrVCdu+GT5DSWy2chjTRwux4XKLCucm7EI
-	 f18VfUqmq8Ja36FjBeVNwm30PUp9sgEvW+/zokcEkMfB9aHFjZX+Gp75Qpj+wubPbf
-	 SHkBEjXv3k0RJHGP9oG7B1rh1HXPxM6rullISIiqYSlw16YIdbtmgQ0ghDmANDFZVJ
-	 hn9QrUAOzEEsA==
-Date: Tue, 16 Jan 2024 14:57:27 +0000
-From: Simon Horman <horms@kernel.org>
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	kvm@vger.kernel.org, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH] vhost-vdpa: Remove usage of the deprecated
- ida_simple_xx() API
-Message-ID: <20240116145727.GT392144@kernel.org>
-References: <bd27d4066f7749997a75cf4111fbf51e11d5898d.1705350942.git.christophe.jaillet@wanadoo.fr>
+	s=k20201202; t=1705417259;
+	bh=1EeBNo9pvw4Odk9WuUgADZddX1V4NZ4IFPsYHyx6dIs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=uMzTT2gI/Pti7L2Lo9T0sijtIR0NxGELuOXzGaa8kuw9ikX3T7CUbJ+7V9AhGGpo1
+	 Q4cefqwtBhwid8v9X70hSr023m8UaO6TXDaApbvmTkG8OuTCfkMrIEGWsUWtBsAxc0
+	 O5xp4fpvda3vFtTgkAGZn8E0PQXHjAqJLwcV5w9gG5vCRZ892pSZYTWHEJfZ5mntsL
+	 Hx79LO+pKww1IsOkwR6i+TomeIxGBJY1/mOEiHdMYgTiXufR5bNd2zXXVXP+OcVxiS
+	 +z3mrSz/C1HMzHdwmGOeG/EIuwnkqSmb0TDolfetFGwgsz7g0vAs9JSnYTC+p4l4lb
+	 TZwBfuqKiIK9g==
+Date: Tue, 16 Jan 2024 07:00:57 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Benjamin Poirier <bpoirier@nvidia.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, j.vosburgh@gmail.com, andy@greyhouse.net,
+ shuah@kernel.org, jon.toppins+linux@gmail.com,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net] selftests: bonding: add missing build configs
+Message-ID: <20240116070057.3b8b4530@kernel.org>
+In-Reply-To: <ZaaUtIuKBQByp4j4@d3>
+References: <20240116020201.1883023-1-kuba@kernel.org>
+	<ZaaUtIuKBQByp4j4@d3>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bd27d4066f7749997a75cf4111fbf51e11d5898d.1705350942.git.christophe.jaillet@wanadoo.fr>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 15, 2024 at 09:35:50PM +0100, Christophe JAILLET wrote:
-> ida_alloc() and ida_free() should be preferred to the deprecated
-> ida_simple_get() and ida_simple_remove().
-> 
-> Note that the upper limit of ida_simple_get() is exclusive, buInputt the one of
-> ida_alloc_max() is inclusive. So a -1 has been added when needed.
-> 
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+On Tue, 16 Jan 2024 09:37:40 -0500 Benjamin Poirier wrote:
+> I tested using the minimal config generated by virtme-ng and the
+> following additional config options need to be enabled for bonding
+> tests:
+> CONFIG_IPV6=y
+> CONFIG_NET_ACT_GACT=y
+> CONFIG_NET_CLS_FLOWER=y
+> CONFIG_NET_SCH_INGRESS=y
+> CONFIG_NLMON=y
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-
+Perfect! Could you post a patch to add those?
+I'll apply this one right away to avoid conflicts.
+Fixes tags would be good to have, if you don't feel like
+finding each individual commit you can point at mine :)
 
