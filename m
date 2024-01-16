@@ -1,91 +1,102 @@
-Return-Path: <netdev+bounces-63731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A366582F148
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 16:20:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24D8582F163
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 16:23:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4128B1F246B2
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 15:20:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B1E51C20E5B
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 15:23:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 002DC1BF51;
-	Tue, 16 Jan 2024 15:19:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 147551BF4F;
+	Tue, 16 Jan 2024 15:23:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="gYsUl949"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nq4ggkoL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6D081BF4C
-	for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 15:19:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-6db05618c1fso7233008b3a.1
-        for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 07:19:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1705418396; x=1706023196; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=lAR5OCR7VVmVOA9xP+QBk0F9kMMvK4Rl/rRQgYb/Y/g=;
-        b=gYsUl949fAZs/FUGcUh4kKBh/f7UCEPznK5R7gsks9CyTgW4cr1ULzbLjed/xYOwPX
-         pO+udQknpO5kh0r/FTmNLdqmNh/PVxKZ36gZhn0HHXsY5j6GMsmEhZsXM0rclgDlAFOj
-         57+OT/Chl3WF645LdCDCbLJ9qbudDVrjzFqto=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705418396; x=1706023196;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lAR5OCR7VVmVOA9xP+QBk0F9kMMvK4Rl/rRQgYb/Y/g=;
-        b=AFvOMiKSnJu7mYsvASgaAk7/5wkjBzt0HKrGpYZpaq6mornmk/OdjmRmgMK30gvpDi
-         RIN52iMJt/dP9+bgnzKp77y5jz4GSslBkDjT0DcGCZkZIGB9qVzdo/pyW7brMMyEqSjt
-         i/y91eMEL5FoEnMc93IZ3mr9LiqNvOiemXSWkaP5eA0cBmQpNyZw/M+8+I0iCbmuvoMO
-         CWiXjqZWEanJ8qT2mEI0kOIcWef9Aq0F+46hIkCbABXRXw73RbsPVWAolAyHJmyQjgte
-         FPx+ITaPOBWPACWt45TDh2tTf/I4QwowCF7XeViadWPwViEFBBGEEKDx8UA/mFVBWYEB
-         lnXg==
-X-Gm-Message-State: AOJu0Yy8VquTTRmV1zS3ZD0xa4FzGe5wpVAFIyMlsDqdDXFDVgVXTrrJ
-	q7K3vuJRZYR0PCmBOJ1n9QS6sQqSKXbh
-X-Google-Smtp-Source: AGHT+IFVX3BC+BDHIH0Vec/KHk8hXT3W2pcVPYxE8901owm0F+Ufil1cSyCMXggp3yKG0jzk3R/FAg==
-X-Received: by 2002:a05:6a21:9189:b0:19a:daab:5409 with SMTP id tp9-20020a056a21918900b0019adaab5409mr5231717pzb.29.1705418395820;
-        Tue, 16 Jan 2024 07:19:55 -0800 (PST)
-Received: from C02YVCJELVCG ([136.54.24.230])
-        by smtp.gmail.com with ESMTPSA id a20-20020a170902b59400b001d052d1aaf2sm9376097pls.101.2024.01.16.07.19.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jan 2024 07:19:55 -0800 (PST)
-From: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-X-Google-Original-From: Andy Gospodarek <gospo@broadcom.com>
-Date: Tue, 16 Jan 2024 10:19:47 -0500
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
-Subject: Re: [ANN] netdev call - Jan 16th
-Message-ID: <Zaaek6U6DnVUk5OM@C02YVCJELVCG>
-References: <20240115175440.09839b84@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9D741C280;
+	Tue, 16 Jan 2024 15:23:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AF7FC433C7;
+	Tue, 16 Jan 2024 15:23:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705418582;
+	bh=AmZdj0eOvsIB/ujpQpyR8C/TssJ81P4jo/0LQq93d8Q=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nq4ggkoL4EWs4nhCK2iucl9MmiXNhmC6pgZ7TaIeIM/Lg6XVkB87rwndBWwYB4Q3P
+	 sPyclCXTudskQ8Je4/NNXPRb8KGgOGlHhnzqXHFAkDmizz2mLMlcGmeqwUlPapk5gl
+	 RLCNplQFOJ0ZQDPT6FrjflKizAYloysT3Vs9H/iNzKyyAAjXE2pw/nJlA2nTwPy4ZA
+	 /C5LT8PZweUUzWRPgiPlxupO9ja20RncG5jXUvGlDyjhPi35Fpn97B//GgvnA3u4sQ
+	 qIULyU8tFAdke8LtHCx1uT4gcbLSQLwP+4gTxyx+zk58r5haZpwFnpZEsdmvQ936HF
+	 fvrrmMX8KjY6g==
+Date: Tue, 16 Jan 2024 07:23:00 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Romain Gantois <romain.gantois@bootlin.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, Miquel Raynal
+ <miquel.raynal@bootlin.com>, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Sylvain Girard <sylvain.girard@se.com>,
+ Pascal EBERHARD <pascal.eberhard@se.com>, Richard Tresidder
+ <rtresidd@electromag.com.au>, Linus Walleij <linus.walleij@linaro.org>,
+ Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org, Vladimir
+ Oltean <vladimir.oltean@nxp.com>
+Subject: Re: [PATCH net v5] net: stmmac: Prevent DSA tags from breaking COE
+Message-ID: <20240116072300.3a6e0dbe@kernel.org>
+In-Reply-To: <fca39a53-743e-f79d-d2d1-f23d8e919f82@bootlin.com>
+References: <20240111-prevent_dsa_tags-v5-1-63e795a4d129@bootlin.com>
+	<20240112181327.505b424e@kernel.org>
+	<fca39a53-743e-f79d-d2d1-f23d8e919f82@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240115175440.09839b84@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 15, 2024 at 05:54:40PM -0800, Jakub Kicinski wrote:
-> Hi,
+On Tue, 16 Jan 2024 13:14:15 +0100 (CET) Romain Gantois wrote:
+> > > @@ -4997,7 +5020,7 @@ static void stmmac_dispatch_skb_zc(struct stmmac_priv *priv, u32 queue,
+> > >  	stmmac_rx_vlan(priv->dev, skb);
+> > >  	skb->protocol = eth_type_trans(skb, priv->dev);
+> > >  
+> > > -	if (unlikely(!coe))
+> > > +	if (unlikely(!coe) || !stmmac_has_ip_ethertype(skb))  
+> > 
+> > The lack of Rx side COE checking in this driver is kinda crazy.
+> > Looking at enh_desc_coe_rdes0() it seems like RDES0_FRAME_TYPE
+> > may be the indication we need here?   
 > 
-> The bi-weekly netdev call at https://bbb.lwn.net/b/jak-wkr-seg-hjn
-> is scheduled tomorrow at 8:30 am (PT) / 5:30 pm (~EU).
-> 
-> There's a minor CI update. Please suggest other topics.
-> 
+> I don't think that RDES0_FRAME_TYPE would be enough, at least not on its own. 
+> That bit is set by checking the length/ethertype field to see if is an 
+> Ethernet II frame or an IEEE802.3 frame. But even Ethernet II frames with non-IP 
+> ethertypes will not be checksummed. Also protocols with a non-fixed ethertype 
+> field such as DSA_TAG_PROTO could trigger the bit, or not, depending on what 
+> they put in the DSA tag.
 
-I would like to discuss a process question for posting a fix to a stable kernel
-that isn't needed in the latest upstream as it was fixed another way.
+Hm, the comment in enh_desc_coe_rdes0() says:
 
-This is related to this thread:
+	/* bits 5 7 0 | Frame status
+	 * ----------------------------------------------------------
+	 *      0 0 0 | IEEE 802.3 Type frame (length < 1536 octects)
+	 *      1 0 0 | IPv4/6 No CSUM errorS.
+	 *      1 0 1 | IPv4/6 CSUM PAYLOAD error
+	 *      1 1 0 | IPv4/6 CSUM IP HR error
+	 *      1 1 1 | IPv4/6 IP PAYLOAD AND HEADER errorS
+	 *      0 0 1 | IPv4/6 unsupported IP PAYLOAD
+	 *      0 1 1 | COE bypassed.. no IPv4/6 frame
+	 *      0 1 0 | Reserved.
+	 */
 
-https://lore.kernel.org/linux-patches/ZZQqGtYqN3X9EuWo@C02YVCJELVCG.dhcp.broadcom.net/
-
-Thanks.
+which makes it sound like bit 5 will not be set for a Ethernet II frame
+with unsupported IP payload, or not an IP frame. Does the bit mean other
+things in different descriptor formats?
 
