@@ -1,65 +1,62 @@
-Return-Path: <netdev+bounces-63808-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63809-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71A7282F854
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 21:43:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97E0B82F87D
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 21:46:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98A441C24EB6
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 20:43:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 498321F26651
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 20:46:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5419C1EB56;
-	Tue, 16 Jan 2024 19:51:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E8B31339BC;
+	Tue, 16 Jan 2024 19:51:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P3ivBYF8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W7LvYrTD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C37524B54;
-	Tue, 16 Jan 2024 19:51:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 650D21339B8;
+	Tue, 16 Jan 2024 19:51:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705434690; cv=none; b=SafSoQOcOS36AJdSXLrJ8/xZ0/ulPXWIY9TLdswwerXwRpHn4jP6V7Ah5maLn2huIc2q/WlUHrGgdBCiAstBGGhLDyF5DCXWPVbLMzAUmNCe7Fs3D98aVPzfL2YE+qFoxtIN54guGb/D/S5FNOi9RsQvS/QiECCnqtPnOebLRzY=
+	t=1705434706; cv=none; b=aqRZybOyuUPEc0JX6KBSosRpz00BbqSdSgyIVbKRj4WdQQ6Jnw3HEa4vQrOd9ds2Iipj2Fr/uMMOtBLWgHx9bJwmJXByNUD6DPbH0Ep7iD3kKvGwPteyhMFEfICP2Q3ypq5epCsIrjpx4qgJBvHYQ+fslAXs+m5+Kn+7v2PzkEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705434690; c=relaxed/simple;
-	bh=BtqA+sNM66b7KK6xY6BvU9nMAVkX1m27+Hn1UAJLH6I=;
+	s=arc-20240116; t=1705434706; c=relaxed/simple;
+	bh=Z+Z8WhzbRfBIX4GvAy/TPFGGNpBKFgKWsD0zKv/YjBU=;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:X-stable:
-	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=D087vg1AEstZRsCxh9mqWWCKAJdX66WRlrRFxHNJRHjymtPKsgLhd4qxFYp13o4c8DeWvX1VVtNzazjXdlPiEVxtMG2iAgukNmI/cKrUUG4VPDPbOdsgBOQ1Cqmk177H8DvnNBrOhjsiiWe0/BMOUOxn7LVVijvxGtzVONJ1xT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P3ivBYF8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B0A4C433C7;
-	Tue, 16 Jan 2024 19:51:28 +0000 (UTC)
+	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=t/yr9JnZS+jNNvJrFETbNLzU8FNMnFyfSRX5skd7roiYpjNO58TIL6Em79DJgVLmRNz+Y5h3uWUVapVvrPguQbRlumhzKgA31o2kfKDYDDUOGANzDTmfk71+0C/5SrDe62FiM87f9RKv9xKoFMaO9gZ0N5FUSYmZKZ/zk50lI+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W7LvYrTD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF13CC43390;
+	Tue, 16 Jan 2024 19:51:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705434690;
-	bh=BtqA+sNM66b7KK6xY6BvU9nMAVkX1m27+Hn1UAJLH6I=;
+	s=k20201202; t=1705434705;
+	bh=Z+Z8WhzbRfBIX4GvAy/TPFGGNpBKFgKWsD0zKv/YjBU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=P3ivBYF8+ZfglOggXQY6KJXkhCccMKNjJycz+oNjFXzZiljnbzf2LVmcfGnLOXE8s
-	 T9+n/IncH+Vwzjuginpv7ovLbrUBJ9SvU5/Ip22xj3cSLtJKDvTZYZZMHkdSslyYCY
-	 Wp3PcDMLhW6rUlqFnOjw3qH2zdbl+xaN9oinrIq9NHaRHgLWG9NPBCAFEudOybW3H+
-	 bdSRB3H1ogLWb2UdJvDdsuSaQNCz3HWaaLWOqIDGgFNtJCke8Zz/4UGSdWIndGSuZL
-	 lzI7Bh3guIpzssupWy1WTzd5SI51n1lCQ8O2YT9RzQDliR+quRbUFq27CkNdnVgUpJ
-	 8MvExmnFNCKUw==
+	b=W7LvYrTDKPkqTZmimLhnzkYG4iW7f9kG6PHaD34bQTsMa4BiXhSVEAbRFI7dbqrqY
+	 NOVWA6YcTetChO9QMw41/CgseVBIOyQOv4FylhNgD/u9hhi4qTC8t4DSxRcCnpDVre
+	 4XnFXT/sADmHSJ5f9tLkUyTUK5YdPHTWcxwOxKGUpGptjf+wPEqXJMCUhXcsP9Dl1o
+	 0vaXVCfeOoT9qmN4gDWinYnW2JTf82sQA1qIW7rl/Rch0NR2JlTSYdWMJU8M3CPayt
+	 LbgdMvuXht08eCBHC/Tisz/5KnZ83QQ03T/Np+Ea/zPN145vDpwmTA8PRhr6NRDZzr
+	 p9pNRuz8vWsHA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: duanqiangwen <duanqiangwen@net-swift.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Christian Marangi <ansuelsmth@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	jiawenwu@trustnetic.com,
-	mengyuanlou@net-swift.com,
-	davem@davemloft.net,
+	hkallweit1@gmail.com,
 	edumazet@google.com,
+	kuba@kernel.org,
 	pabeni@redhat.com,
-	horms@kernel.org,
-	bhelgaas@google.com,
-	maciej.fijalkowski@intel.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 049/104] net: wangxun: fix changing mac failed when running
-Date: Tue, 16 Jan 2024 14:46:15 -0500
-Message-ID: <20240116194908.253437-49-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 059/104] net: phy: at803x: fix passing the wrong reference for config_intr
+Date: Tue, 16 Jan 2024 14:46:25 -0500
+Message-ID: <20240116194908.253437-59-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240116194908.253437-1-sashal@kernel.org>
 References: <20240116194908.253437-1-sashal@kernel.org>
@@ -74,47 +71,52 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.12
 Content-Transfer-Encoding: 8bit
 
-From: duanqiangwen <duanqiangwen@net-swift.com>
+From: Christian Marangi <ansuelsmth@gmail.com>
 
-[ Upstream commit 87e839c82cc36346a2cd183ca941316902110716 ]
+[ Upstream commit f8fdbf3389f44c7026f16e36cb1f2ff017f7f5b2 ]
 
-in some bonding mode, service need to change mac when
-netif is running. Wangxun netdev add IFF_LIVE_ADDR_CHANGE
-priv_flag to support it.
+Fix passing the wrong reference for config_initr on passing the function
+pointer, drop the wrong & from at803x_config_intr in the PHY struct.
 
-Signed-off-by: duanqiangwen <duanqiangwen@net-swift.com>
-Link: https://lore.kernel.org/r/20231206095044.17844-1-duanqiangwen@net-swift.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/wangxun/ngbe/ngbe_main.c   | 1 +
- drivers/net/ethernet/wangxun/txgbe/txgbe_main.c | 1 +
- 2 files changed, 2 insertions(+)
+ drivers/net/phy/at803x.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-index a4d63d2f3c5b..2085b9c38a15 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-@@ -580,6 +580,7 @@ static int ngbe_probe(struct pci_dev *pdev,
- 
- 	netdev->priv_flags |= IFF_UNICAST_FLT;
- 	netdev->priv_flags |= IFF_SUPP_NOFCS;
-+	netdev->priv_flags |= IFF_LIVE_ADDR_CHANGE;
- 
- 	netdev->min_mtu = ETH_MIN_MTU;
- 	netdev->max_mtu = WX_MAX_JUMBO_FRAME_SIZE -
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index d60c26ba0ba4..2482b661bc99 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -637,6 +637,7 @@ static int txgbe_probe(struct pci_dev *pdev,
- 
- 	netdev->priv_flags |= IFF_UNICAST_FLT;
- 	netdev->priv_flags |= IFF_SUPP_NOFCS;
-+	netdev->priv_flags |= IFF_LIVE_ADDR_CHANGE;
- 
- 	netdev->min_mtu = ETH_MIN_MTU;
- 	netdev->max_mtu = WX_MAX_JUMBO_FRAME_SIZE -
+diff --git a/drivers/net/phy/at803x.c b/drivers/net/phy/at803x.c
+index 37fb033e1c29..ef203b0807e5 100644
+--- a/drivers/net/phy/at803x.c
++++ b/drivers/net/phy/at803x.c
+@@ -2104,7 +2104,7 @@ static struct phy_driver at803x_driver[] = {
+ 	.write_page		= at803x_write_page,
+ 	.get_features		= at803x_get_features,
+ 	.read_status		= at803x_read_status,
+-	.config_intr		= &at803x_config_intr,
++	.config_intr		= at803x_config_intr,
+ 	.handle_interrupt	= at803x_handle_interrupt,
+ 	.get_tunable		= at803x_get_tunable,
+ 	.set_tunable		= at803x_set_tunable,
+@@ -2134,7 +2134,7 @@ static struct phy_driver at803x_driver[] = {
+ 	.resume			= at803x_resume,
+ 	.flags			= PHY_POLL_CABLE_TEST,
+ 	/* PHY_BASIC_FEATURES */
+-	.config_intr		= &at803x_config_intr,
++	.config_intr		= at803x_config_intr,
+ 	.handle_interrupt	= at803x_handle_interrupt,
+ 	.cable_test_start	= at803x_cable_test_start,
+ 	.cable_test_get_status	= at803x_cable_test_get_status,
+@@ -2150,7 +2150,7 @@ static struct phy_driver at803x_driver[] = {
+ 	.resume			= at803x_resume,
+ 	.flags			= PHY_POLL_CABLE_TEST,
+ 	/* PHY_BASIC_FEATURES */
+-	.config_intr		= &at803x_config_intr,
++	.config_intr		= at803x_config_intr,
+ 	.handle_interrupt	= at803x_handle_interrupt,
+ 	.cable_test_start	= at803x_cable_test_start,
+ 	.cable_test_get_status	= at803x_cable_test_get_status,
 -- 
 2.43.0
 
