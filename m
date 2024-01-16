@@ -1,174 +1,129 @@
-Return-Path: <netdev+bounces-63764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE9B482F4EE
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 20:04:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BF4882F51C
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 20:14:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 793CC285B8B
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 19:04:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C3C41F21A34
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 19:14:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC9701CF9C;
-	Tue, 16 Jan 2024 19:03:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14C381CFA9;
+	Tue, 16 Jan 2024 19:14:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="a4G5Slez"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hNX4z+4Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90E5E1D528
-	for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 19:03:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E35C21CF9A
+	for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 19:14:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705431818; cv=none; b=uSyuf047uDLRUDHjrFVdQpaiY31xJFYRhMtQ3grDjYVP/HPdSen3y0u8CIURste+eh/06Sy8C4RDjGGKosWx6CfxYj2fJSqMyTsvf2i/EvR0BDKVWxFSfy8xoO+7oEZm3UWAIkQIChoIIvwFJLMX9RDSZrTDsSAGeqBP1dBdJfQ=
+	t=1705432444; cv=none; b=exk5MuzEnVQcuE8wQSP/PZvWmaRRfVEcbK73Nkz+eMS43nWuRuXe3HHOr1KxNAWggvZJ1UzFHzgk2OpRRbie9QhLYgbeORhgZnWnAqP1BLuWCw6dLF6hmVkcX+CkZE8WSs5v3ypEsy2EY6GwUOqcdfMdnfVbnj7zzuBXJ6s5FEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705431818; c=relaxed/simple;
-	bh=kXZnYT9M6pTQ/ff22VKcp9VBS+k+qXH8xX9DJMQcTSw=;
-	h=Received:DKIM-Signature:Received:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Received:X-Google-Smtp-Source:X-Received:
-	 Received:Received:Received:From:To:cc:Subject:In-reply-to:
-	 References:Comments:X-Mailer:MIME-Version:Content-Type:Content-ID:
-	 Content-Transfer-Encoding:Date:Message-ID; b=LLsgFMeUtiLcdCZyaDPxYr476UulkcK/SBJF7nXU0dB54aZVFjnY+ziRnGm4rd58EK9RW75/wCTckDRxSSx806zOYNNv4HtRlKaetjURvDJKZXZXGKDKKuihqZCqH811+f0WaABpUQYr3wqqKEwXWIxwNyAl63M1Tjh9YdxuVVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=a4G5Slez; arc=none smtp.client-ip=185.125.188.123
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com [209.85.216.69])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id C1E663F275
-	for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 19:03:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1705431813;
-	bh=h7Iqqen34z6UAzyzO0LtKXTf2uJ2NqVH/f9Nna3tT0s=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID;
-	b=a4G5SlezbjAV7/FmRCu7JlGunXeip+Kw9KJ+MxME/Wgptcw4ufiukElCGurJuQ+O7
-	 3QdlFwT1tG5EgeTdZJCorhEF8ORS+9l1+8ZHngB41NmbZkDOGsngGxXvPi8dfbykJT
-	 7JCBXPv9XT0vHfUK8ibw+mhZQczKS+jxt6xF+KgZekLzi2XvawIATXTdZMrEwo/EO6
-	 i/RvlEAwlcFrCVVMkDe975mESG3/YiAml/JBH9qOKMfJKnjLNoupF784D4wjh7If7u
-	 VdrQKVfg2T7Gh6sCtEIvqCYKh3eZCXBIIsC3VDpghbuYaJVkSPYUO+nKGSbZw7lXBm
-	 V0vGr1QhSw8iw==
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-28c5c622a3cso6634310a91.0
-        for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 11:03:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705431812; x=1706036612;
-        h=message-id:date:content-transfer-encoding:content-id:mime-version
-         :comments:references:in-reply-to:subject:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=h7Iqqen34z6UAzyzO0LtKXTf2uJ2NqVH/f9Nna3tT0s=;
-        b=ioLrQkhBuRJL8CT5LAsrsGXidEB87jRKJ3+ZSOoFGgjTh4JMNslVE1mpjnjIniFkFz
-         MNtevaujXszOASzKbcp3hfKKvrZKxln1Cv0mEW0Gk1xD//ejtd1iC6ZX8dfJa+hy2ynx
-         a1kYrvM+Esbl1mR7kkGnFocF9Sh3Nvl3wsQWwTNfTpu9Y+jedcyaZmZo5xQTLmzz+aEN
-         9VYx5e2228OqylqWkh/3kk6sBTQlQLhYrYzM7TLmazc6BGia+8Uf5fMMhCSkOsMY2PZl
-         T9Rmt4Cx+IFZerTR42lQXmCoSKJFOmwTFpbGTzK6w2aXENLHRFTsXr/xffux2GWRanIh
-         54nA==
-X-Gm-Message-State: AOJu0YxaC78G351raA8cFtWFdUD3PtKVFzV2I1QYJXX6ygFLGrjVy39K
-	PVwEIZMaB/VpdUx6blMGknNdqRogP09ZJfTBIItzB1WJBd+y0p3qBszEx1bPoXijSTZaRA/BVBh
-	aZKDUGzARygCZpaSf5O8rVFLyDxE+sR+SqPh/IaDU
-X-Received: by 2002:a17:90a:da03:b0:28e:778:2d6f with SMTP id e3-20020a17090ada0300b0028e07782d6fmr3655410pjv.61.1705431812148;
-        Tue, 16 Jan 2024 11:03:32 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHyMzLYVzlxwbri+kkV0gv6IcCE1p132lzgl7dLhWQYQQbs4xeeHBqdmZsW4mJReftjAzU72A==
-X-Received: by 2002:a17:90a:da03:b0:28e:778:2d6f with SMTP id e3-20020a17090ada0300b0028e07782d6fmr3655398pjv.61.1705431811832;
-        Tue, 16 Jan 2024 11:03:31 -0800 (PST)
-Received: from vermin.localdomain ([209.121.128.189])
-        by smtp.gmail.com with ESMTPSA id jy11-20020a17090342cb00b001d5e1353693sm1787423plb.266.2024.01.16.11.03.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jan 2024 11:03:31 -0800 (PST)
-Received: by vermin.localdomain (Postfix, from userid 1000)
-	id B93EF1C3BB8; Tue, 16 Jan 2024 11:03:30 -0800 (PST)
-Received: from vermin (localhost [127.0.0.1])
-	by vermin.localdomain (Postfix) with ESMTP id B73711C3BB7;
-	Tue, 16 Jan 2024 11:03:30 -0800 (PST)
-From: Jay Vosburgh <jay.vosburgh@canonical.com>
-To: Jakub Kicinski <kuba@kernel.org>
-cc: Benjamin Poirier <bpoirier@nvidia.com>,
-    Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org,
-    Andy Gospodarek <andy@greyhouse.net>, Shuah Khan <shuah@kernel.org>,
-    "David S. Miller" <davem@davemloft.net>,
-    Jonathan Toppins <jon.toppins+linux@gmail.com>,
-    Nikolay Aleksandrov <razor@blackwall.org>,
-    Michal Kubiak <michal.kubiak@intel.com>,
-    linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net] selftests: bonding: Add more missing config options
-In-reply-to: <20240116104402.1203850a@kernel.org>
-References: <20240116154926.202164-1-bpoirier@nvidia.com> <20240116104402.1203850a@kernel.org>
-Comments: In-reply-to Jakub Kicinski <kuba@kernel.org>
-   message dated "Tue, 16 Jan 2024 10:44:02 -0800."
-X-Mailer: MH-E 8.6+git; nmh 1.7+dev; Emacs 29.0.50
+	s=arc-20240116; t=1705432444; c=relaxed/simple;
+	bh=ZUmIxi/797W1LKgMdqkXCyaSk1XIZJQbQMaWh4HR6kU=;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:MIME-Version:Content-Transfer-Encoding; b=oY66Bmy6lF6qA+WhMwOwC/WTaBOmnlweXCyksIzmjALQnloQcr9Nep3OOqarX3gGaqC1twchD/4IfnACOSVyEB9JgEbrfia7HyxmZTvDpFJNGNKm6t1gQY+SHreJPvSfB5WvWYm93D9+wGXSM0Kcg/B3J+LzvYHNnFx4MwWqqng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hNX4z+4Z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19CC9C433C7;
+	Tue, 16 Jan 2024 19:14:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705432443;
+	bh=ZUmIxi/797W1LKgMdqkXCyaSk1XIZJQbQMaWh4HR6kU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=hNX4z+4ZlssK0oIGx4PiswPiN09Qyec2Suc6jI7xDrEERck9oH6G3jTGt+YhEgCN4
+	 /TrgmvbKCcAc0ZL+gQxvHMTTvPK6iXqmZsoiXWGyxCA+iYDCiFrCM4BTIhJXtvXITV
+	 bjyL/LP6DGtn2PsSoYJnS1IdlTuINYY4Y+CQ4Dxp69HSxUCLoZJRTw4uEyX3FuQSDi
+	 LhZqYEydb+6y/vLcmH60HwylL3KwSybk3cwE5+PNKyXbpqRC+Wi57//Jo64HQAs20P
+	 zCxCe/RQuANgZgIZgnFdJngfT966LuOSx2ONBtNflPHUmC6ow2aEAdOfGDLA7yZf+q
+	 meGs/eANp6HTQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	vladimir.oltean@nxp.com
+Subject: [PATCH net] net: netdevsim: don't try to destroy PHC on VFs
+Date: Tue, 16 Jan 2024 11:14:00 -0800
+Message-ID: <20240116191400.2098848-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <78105.1705431810.1@vermin>
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 16 Jan 2024 11:03:30 -0800
-Message-ID: <78106.1705431810@vermin>
+Content-Transfer-Encoding: 8bit
 
-Jakub Kicinski <kuba@kernel.org> wrote:
+PHC gets initialized in nsim_init_netdevsim(), which
+is only called if (nsim_dev_port_is_pf()).
 
->On Tue, 16 Jan 2024 10:49:26 -0500 Benjamin Poirier wrote:
->> As a followup to commit 03fb8565c880 ("selftests: bonding: add missing
->> build configs"), add more networking-specific config options which are
->> needed for bonding tests.
->> =
+Create a counterpart of nsim_init_netdevsim() and
+move the mock_phc_destroy() there.
 
->> For testing, I used the minimal config generated by virtme-ng and I add=
-ed
->> the options in the config file. All bonding tests passed.
->> =
+This fixes a crash trying to destroy netdevsim with
+VFs instantiated, as caught by running the devlink.sh test:
 
->> Fixes: bbb774d921e2 ("net: Add tests for bonding and team address list =
-management") # for ipv6
->> Fixes: 6cbe791c0f4e ("kselftest: bonding: add num_grat_arp test") # for=
- tc options
->> Fixes: 222c94ec0ad4 ("selftests: bonding: add tests for ether type chan=
-ges") # for nlmon
->> Suggested-by: Jakub Kicinski <kuba@kernel.org>
->> Signed-off-by: Benjamin Poirier <bpoirier@nvidia.com>
->
->With this applied the only remaining bonding test which fails in our CI
->is bond-options [1], good progress! :) Looks like it doesn't finish in
->time:
->
->not ok 7 selftests: drivers/net/bonding: bond_options.sh # TIMEOUT 120 se=
-conds
->
->The tests run in a VM without HW virtualization support. Any opinions
->about bumping the timeout for bonding? If we enable KASAN etc. things
->will get even slower.
+    BUG: kernel NULL pointer dereference, address: 00000000000000b8
+    RIP: 0010:mock_phc_destroy+0xd/0x30
+    Call Trace:
+     <TASK>
+     nsim_destroy+0x4a/0x70 [netdevsim]
+     __nsim_dev_port_del+0x47/0x70 [netdevsim]
+     nsim_dev_reload_destroy+0x105/0x120 [netdevsim]
+     nsim_drv_remove+0x2f/0xb0 [netdevsim]
+     device_release_driver_internal+0x1a1/0x210
+     bus_remove_device+0xd5/0x120
+     device_del+0x159/0x490
+     device_unregister+0x12/0x30
+     del_device_store+0x11a/0x1a0 [netdevsim]
+     kernfs_fop_write_iter+0x130/0x1d0
+     vfs_write+0x30b/0x4b0
+     ksys_write+0x69/0xf0
+     do_syscall_64+0xcc/0x1e0
+     entry_SYSCALL_64_after_hwframe+0x6f/0x77
 
-	Reading the grat_arp test, it looks like it has long sleep times
-built into it:
-
-garp_test()
-{
-[...]
-	exp_num=3D$(echo "${param}" | cut -f6 -d ' ')
-	sleep $((exp_num + 2))
-
-num_grat_arp()
-{
-	local val
-	for val in 10 20 30 50; do
-		garp_test "mode active-backup miimon 100 num_grat_arp $val peer_notify_d=
-elay 1000"
-
-	If I'm reading it right, this will sleep for 12, 22, 32 and 52
-seconds for the passes through the loop in num_grat_arp(), so that would
-be 118 seconds just for that.
-
-	-J
-
->[1]
->https://netdev-2.bots.linux.dev/vmksft-bonding/results/423800/7-bond-opti=
-ons-sh
-
+Fixes: b63e78fca889 ("net: netdevsim: use mock PHC driver")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-	-Jay Vosburgh, jay.vosburgh@canonical.com
+CC: vladimir.oltean@nxp.com
+---
+ drivers/net/netdevsim/netdev.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+index aecaf5f44374..77e8250282a5 100644
+--- a/drivers/net/netdevsim/netdev.c
++++ b/drivers/net/netdevsim/netdev.c
+@@ -369,6 +369,12 @@ static int nsim_init_netdevsim_vf(struct netdevsim *ns)
+ 	return err;
+ }
+ 
++static void nsim_exit_netdevsim(struct netdevsim *ns)
++{
++	nsim_udp_tunnels_info_destroy(ns->netdev);
++	mock_phc_destroy(ns->phc);
++}
++
+ struct netdevsim *
+ nsim_create(struct nsim_dev *nsim_dev, struct nsim_dev_port *nsim_dev_port)
+ {
+@@ -417,8 +423,7 @@ void nsim_destroy(struct netdevsim *ns)
+ 	}
+ 	rtnl_unlock();
+ 	if (nsim_dev_port_is_pf(ns->nsim_dev_port))
+-		nsim_udp_tunnels_info_destroy(dev);
+-	mock_phc_destroy(ns->phc);
++		nsim_exit_netdevsim(ns);
+ 	free_netdev(dev);
+ }
+ 
+-- 
+2.43.0
+
 
