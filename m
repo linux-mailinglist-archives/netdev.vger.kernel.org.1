@@ -1,158 +1,116 @@
-Return-Path: <netdev+bounces-63870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B25982FD1E
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 23:43:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 779A082FD28
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 23:44:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0448C1C289F5
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 22:43:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2BF0B1F29CA9
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 22:44:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 191E02376E;
-	Tue, 16 Jan 2024 22:25:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C40F24A0E;
+	Tue, 16 Jan 2024 22:27:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="GNcNqQGI"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="eb/gCtr6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 310B2200C4
-	for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 22:25:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6404A24A0C;
+	Tue, 16 Jan 2024 22:27:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705443912; cv=none; b=oRm/kByql7sYMJoeB2XsOU+jRxWFmpcsu2hggwXItrahwHgLB3tbmkD0FpgReBWcRPLCGGOUOjbvApHs1S8TG97z5HtiqiJSy09ts8XaxrW+Ra7KMmgEQgsnJjXsyeeaf4R/ZFGjaXtNBdIuIO2QQLazz1neKtw6RRr9UB5++Ec=
+	t=1705444078; cv=none; b=MHTZzVnuwWPXnW7yPXTmh3p1mqzZmkBlJTPYZfAL8WGUs5ROb1h+GViHUKLr9oIRXRrRKuWLNRWPye44tegBI4Ra0GHY2a97D9Pvs0nnM1GrniMJzs599pEfeP+PKCUNBzvcLMtytz/oQAD8G84AUMJ3KPDrp4fh0PesKTAPBwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705443912; c=relaxed/simple;
-	bh=iJ39MH4mqeyNt9Nv3baKzqxKkS+WUtb/vJwlljcnfSY=;
-	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:MIME-Version:
-	 References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:
-	 Content-Type:Content-Transfer-Encoding; b=LtClZY2r5QyWfVsuxDjqx4b/hqEM8BU/SRcs8RP+TGYpSUfGIW+NYFEpKqqz55HHUOlVD6po4XQNCCWfBwfAClmbdHtn4et2Pli6uqwvSDr1VlJ8lefqgs4v7115/OTyTTLYxhVUvpbLSBRJZlPo1oqfFUaxskJ7FJRiaVitwZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=GNcNqQGI; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2cd82d7f607so16876421fa.1
-        for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 14:25:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1705443908; x=1706048708; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nv0E2bFJC3bwFCY7TgFvWMFZeHrdBHqDiGwtffKOX+s=;
-        b=GNcNqQGIyJ2j7ULNXl8Ld8x+umUNp9eDtDOZ65BvoCOrZfiLgtycKCrkuyRLPUSFfc
-         HMckU8xaStYYv/C2n+kpQSU7+El6EzlKmXDDlDbqGCSsxPUJgzsDg7z9CwHa7AFuGXzO
-         EnE7rS2x2cWth7nQrLE4Dp94tPUfkr/SLViws+aZ75s5lEuKIhYW0irKdEaUi6Ijo6xG
-         veElBOQPMH1KDCaR7uB+vOEZDctlQ2WFqxGw2+49ThhV6uXV4Hg3NWMo7SoFeYE2NJ4V
-         Yd2sCKA7xaJRz+lV5rP7Nd8G27lGUr2SWKEcvCqgta9YbDhIQGYWRlKYqTkZuHS9oJRs
-         2GcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705443908; x=1706048708;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nv0E2bFJC3bwFCY7TgFvWMFZeHrdBHqDiGwtffKOX+s=;
-        b=QU2LhRAlnhT2/MMHxiaED7ZmHJgiN/AcaXyZXAhj3kqmywXK28s/iEtK8Y0dEU1Vgq
-         n6I4ttSZFUgmRAUNFgMK65jg4k8pxC7n5fU8llQcLuGjOqxAMAWA6zjUT7LotSBbI8K2
-         8ev4sB0b33A4wGpt5xVt07feTplEr0T/5WZn36fxzc1fpzgFK5STF3ozkyf/DXTcyYV3
-         GQz/F9I/ETXhuDWinlgfL/0wlSxABmbL4n/dtKyPOeTrJc+iQxjYedMYgyvxyDQMKyJF
-         nm4xumrMRnqc4DNNC5+dVArHs2rcN3hArFMRxNwcB99l8gS+xguwK95qyMMaU/G+HjCd
-         U4lA==
-X-Gm-Message-State: AOJu0YyCdcWR7VQCwvjjmzMUM5hM283EWhpThdZGrL0WqtnGH5LWsO3X
-	p4NnuunAhcznIjljJ7eiava91SapJr7it3nCn6HCZN44SUo79g==
-X-Google-Smtp-Source: AGHT+IHPxnArc1i1NEtO+g7RKhOk+DOBD0hl7PQzbEjRxh5BnDk5Ic97VuxcaFO1JrX6VJqebbfiMiPHOjvd42/cTx8=
-X-Received: by 2002:a2e:2f06:0:b0:2cc:f5b9:bbf7 with SMTP id
- v6-20020a2e2f06000000b002ccf5b9bbf7mr7638928ljv.3.1705443908133; Tue, 16 Jan
- 2024 14:25:08 -0800 (PST)
+	s=arc-20240116; t=1705444078; c=relaxed/simple;
+	bh=EBVwvwUv/VwgNMWmJPq1SrptRX4FtcU9FHl/QzqZTns=;
+	h=DKIM-Signature:Received:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To; b=Rb/oaP5VWn2tw8Swf86dkeqZK6SG+fK2NM5jTOT9+LbgbO58UaOOQdbf0r9J4By1b4Ci8L13HXhEbHTKBFOaPZh6x0wpkWDZNAPngkGI5KZBu7DRk81uQRMLteSLzSzuAX89vRjm4wgniVmHtbJT5mQl9YQXDPb774CxRIiBtto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=eb/gCtr6; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=WPnBskU8T0/6q6mbWR8WDhb87Ftyu+YnEGXBTVNd/No=; b=eb/gCtr6kJXTzgbcIjj2Zw0tBf
+	rVmsycKsJYFU+AQ8f+J4zQ2ENVN6swpyB/CZ02FoOi3WrujIkidQPUNa8IjJeTeOcI+Wpq/KR+okV
+	Ad2zQh+6QMilKkaPqhs+ojrRFLs+UjdkUV9xLk8e37NdvQ0MImqXIjSeUPq5R3NgVQG4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rPruF-005MQ2-7v; Tue, 16 Jan 2024 23:27:39 +0100
+Date: Tue, 16 Jan 2024 23:27:39 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Qiang Ma <maqianga@uniontech.com>
+Cc: alexandre.torgue@foss.st.com, joabreu@synopsys.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	mcoquelin.stm32@gmail.com, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: stmmac: ethtool: Fixed calltrace caused by
+ unbalanced disable_irq_wake calls
+Message-ID: <97106e8a-df9a-429a-a4ff-c47277de70d9@lunn.ch>
+References: <20240112021249.24598-1-maqianga@uniontech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240116193542.711482-1-tmenninger@purestorage.com> <04d22048-737a-4281-a43f-b125ebe0c896@lunn.ch>
-In-Reply-To: <04d22048-737a-4281-a43f-b125ebe0c896@lunn.ch>
-From: Tim Menninger <tmenninger@purestorage.com>
-Date: Tue, 16 Jan 2024 14:24:55 -0800
-Message-ID: <CAO-L_44YVi0HDk4gC9QijMZrYNGoKtfH7qsXOwtDwM4VrFRDHw@mail.gmail.com>
-Subject: Re: [PATCH] net: dsa: mv88e6xxx: Make *_c45 callbacks agree with
- phy_*_c45 callbacks
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240112021249.24598-1-maqianga@uniontech.com>
 
-On Tue, Jan 16, 2024 at 11:59=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote=
-:
->
-> On Tue, Jan 16, 2024 at 07:35:42PM +0000, Tim Menninger wrote:
-> > Set the read_c45 callback in the mii_bus struct in mv88e6xxx only if th=
-ere
-> > is a non-NULL phy_read_c45 callback on the chip mv88e6xxx_ops. Similarl=
-y
-> > for write_c45 and phy_write_c45.
-> >
-> > In commit 743a19e38d02 ("net: dsa: mv88e6xxx: Separate C22 and C45 tran=
-sactions")
-> > the MDIO bus driver split its API to separate C22 and C45 transfers.
-> >
-> > In commit 1a136ca2e089 ("net: mdio: scan bus based on bus capabilities =
-for C22 and C45")
-> > we do a C45 mdio bus scan based on existence of the read_c45 callback
-> > rather than checking MDIO bus capabilities then in
-> > commit da099a7fb13d ("net: phy: Remove probe_capabilities") we remove t=
-he
-> > probe_capabilities from the mii_bus struct.
-> >
-> > The combination of the above results in a scenario (e.g. mv88e6185)
-> > where we take a non-NULL read_c45 callback on the mii_bus struct to mea=
-n
-> > we can perform a C45 read and proceed with a C45 MDIO bus scan. The sca=
-n
-> > encounters a NULL phy_read_c45 callback in the mv88e6xxx_ops which impl=
-ies
-> > we can NOT perform a C45 read and fails with EOPNOTSUPP. The read_c45
-> > callback should be NULL if phy_read_c45 is NULL, and similarly for
-> > write_c45 and phy_write_c45.
->
-> Hi Tim
->
-> What does phylib do with the return of -EOPNOTSUPP? I've not tested
-> it, but i would expect it just keeps going with the scan? It treats it
-> as if there is no device there? And since it never accesses the
-> hardware, this should be fast?
->
-> Or is my assumption wrong? Do you see the EPOPNOTSUPP getting reported
-> back to user space, and the probe failing?
->
->      Andrew
->
+On Fri, Jan 12, 2024 at 10:12:49AM +0800, Qiang Ma wrote:
+> We found the following dmesg calltrace when testing the GMAC NIC notebook:
+> 
+> [9.448656] ------------[ cut here ]------------
+> [9.448658] Unbalanced IRQ 43 wake disable
+> [9.448673] WARNING: CPU: 3 PID: 1083 at kernel/irq/manage.c:688 irq_set_irq_wake+0xe0/0x128
+> [9.448717] CPU: 3 PID: 1083 Comm: ethtool Tainted: G           O      4.19 #1
+> [9.448773]         ...
+> [9.448774] Call Trace:
+> [9.448781] [<9000000000209b5c>] show_stack+0x34/0x140
+> [9.448788] [<9000000000d52700>] dump_stack+0x98/0xd0
+> [9.448794] [<9000000000228610>] __warn+0xa8/0x120
+> [9.448797] [<9000000000d2fb60>] report_bug+0x98/0x130
+> [9.448800] [<900000000020a418>] do_bp+0x248/0x2f0
+> [9.448805] [<90000000002035f4>] handle_bp_int+0x4c/0x78
+> [9.448808] [<900000000029ea40>] irq_set_irq_wake+0xe0/0x128
+> [9.448813] [<9000000000a96a7c>] stmmac_set_wol+0x134/0x150
+> [9.448819] [<9000000000be6ed0>] dev_ethtool+0x1368/0x2440
+> [9.448824] [<9000000000c08350>] dev_ioctl+0x1f8/0x3e0
+> [9.448827] [<9000000000bb2a34>] sock_ioctl+0x2a4/0x450
+> [9.448832] [<900000000046f044>] do_vfs_ioctl+0xa4/0x738
+> [9.448834] [<900000000046f778>] ksys_ioctl+0xa0/0xe8
+> [9.448837] [<900000000046f7d8>] sys_ioctl+0x18/0x28
+> [9.448840] [<9000000000211ab4>] syscall_common+0x20/0x34
+> [9.448842] ---[ end trace 40c18d9aec863c3e ]---
+> 
+> Multiple disable_irq_wake() calls will keep decreasing the IRQ
+> wake_depth, When wake_depth is 0, calling disable_irq_wake() again,
+> will report the above calltrace.
+> 
+> Due to the need to appear in pairs, we cannot call disable_irq_wake()
+> without calling enable_irq_wake(). Fix this by making sure there are
+> no unbalanced disable_irq_wake() calls.
 
-Hi Andrew,
+Just for my understanding. You trigger this by doing lots of
 
-It bubbles up as EIO (the translation happens in get_phy_c45_ids when
-get_phy_c45_devs_in_pkg fails) and ultimately causes the probe to fail.
+ethtool -s eth42 wol g
 
-The EIO causes the scan to stop and fail immediately - the way I read
-mdiobus_scan_bus_c45, only ENODEV is permissible.
+or similar without doing a matching
 
-From logs:
-$ dmesg | grep mv88e6
-[   12.951149] mv88e6085 ixgbe-mdio-0000:05:00.0:00: switch 0x1a70
-detected: Marvell 88E6185, revision 2
-[   13.272812] mv88e6085 ixgbe-mdio-0000:05:00.0:00: Cannot register
-MDIO bus (-5)
-[   13.401140] mv88e6085: probe of ixgbe-mdio-0000:05:00.0:00 failed
-with error -5
-[   13.413105] mv88e6085 ixgbe-mdio-0000:05:00.1:00: switch 0x1a70
-detected: Marvell 88E6185, revision 2
-[   13.730227] mv88e6085 ixgbe-mdio-0000:05:00.1:00: Cannot register
-MDIO bus (-5)
-[   13.858336] mv88e6085: probe of ixgbe-mdio-0000:05:00.1:00 failed
-with error -5
+ethtool -s eth42 wol d
 
-Tim
+to disable wol?
+
+Its a bit late now, but its good to give instructions how to reproduce
+the issue in the commit message.
+
+    Andrew
 
