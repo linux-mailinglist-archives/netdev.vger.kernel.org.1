@@ -1,131 +1,206 @@
-Return-Path: <netdev+bounces-63625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2402382E945
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 06:58:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12F3A82E96C
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 07:13:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48CFD1C228CD
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 05:58:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E4871F23849
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 06:13:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1F7E8832;
-	Tue, 16 Jan 2024 05:58:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8C52F9F6;
+	Tue, 16 Jan 2024 06:13:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="HbBmnQeu"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="EyUib51X"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4303C79F6;
-	Tue, 16 Jan 2024 05:58:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40G2RIBU023505;
-	Mon, 15 Jan 2024 21:57:58 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding:content-type; s=pfpt0220; bh=c4fyR23j
-	INK7GjvY0sE+jgHH/I2Qe4PuJT+pvmXxyMY=; b=HbBmnQeuiwzZPOpsgwfeqF7t
-	K8eFhA3seL0zPHAL7uOuPI+ljkxG/eAi4uhkyy8W8TZvRSBXCR3NzUHGuVJ6IXID
-	H+S4P/oo5dCtf/1wa7Lxjg1jsHLLLBu4jGD0Qe1EIfwLslHUJipq+au7Zb47i0JH
-	EtZSx9yntnH2zRt+ekk191vx/qRP8rjVezDqnP9ik/4qch3E6A8X6cpPPxfgjrXy
-	E0TEg4ziSN59vSt8U4WfeXmzWf2u2dFviFHY26aN79ut3y2pPSqkxNUYFVXYdUxc
-	LsvL66CuccgH9ZU2sJ5E4fLZdwoM7cVUm17ox5MuBKf1fjQS/rgI+QjZ9RcdtQ==
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3vnh1e8ex9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Mon, 15 Jan 2024 21:57:58 -0800 (PST)
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 15 Jan
- 2024 21:57:56 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Mon, 15 Jan 2024 21:57:56 -0800
-Received: from localhost.localdomain (unknown [10.111.135.16])
-	by maili.marvell.com (Postfix) with ESMTP id 7DB9E3F704F;
-	Mon, 15 Jan 2024 21:57:56 -0800 (PST)
-From: Jenishkumar Maheshbhai Patel <jpatel2@marvell.com>
-To: <marcin.s.wojtas@gmail.com>, <linux@armlinux.org.uk>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: Jenishkumar Maheshbhai Patel <jpatel2@marvell.com>
-Subject: [PATCH 1/1] net: mvpp2: clear BM pool before initialization
-Date: Mon, 15 Jan 2024 21:57:54 -0800
-Message-ID: <20240116055754.279560-1-jpatel2@marvell.com>
-X-Mailer: git-send-email 2.25.1
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 698DBD524;
+	Tue, 16 Jan 2024 06:13:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1099)
+	id D700B20DEEA1; Mon, 15 Jan 2024 22:13:43 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com D700B20DEEA1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1705385623;
+	bh=5ClNWrdqiymwS8WaekmLGaesEdlzKLamfgXZ/1HrL9s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=EyUib51Xay3y7x0HFYZ+7k3pLh3rxBVlSFUnvPx+rIwFiR5QRjJ3XXbmPKXd1OotS
+	 KaFdK/p+mNtsFTOpBK6ERkkjBz8VSuAugAoBoUCu6y5kszyHcF9H2FimjDsfqMqAjU
+	 FlCgJrLHIjDz/55qwrimfy2a8HnmZ3KWka+N4Igg=
+Date: Mon, 15 Jan 2024 22:13:43 -0800
+From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+To: Yury Norov <yury.norov@gmail.com>
+Cc: Michael Kelley <mhklinux@outlook.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	KY Srinivasan <kys@microsoft.com>,
+	"wei.liu@kernel.org" <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	Long Li <longli@microsoft.com>, "leon@kernel.org" <leon@kernel.org>,
+	"cai.huoqing@linux.dev" <cai.huoqing@linux.dev>,
+	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
+	"vkuznets@redhat.com" <vkuznets@redhat.com>,
+	"tglx@linutronix.de" <tglx@linutronix.de>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	Souradeep Chakrabarti <schakrabarti@microsoft.com>,
+	Paul Rosswurm <paulros@microsoft.com>
+Subject: Re: [PATCH 3/4 net-next] net: mana: add a function to spread IRQs
+ per CPUs
+Message-ID: <20240116061343.GA24925@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1704797478-32377-4-git-send-email-schakrabarti@linux.microsoft.com>
+ <SN6PR02MB4157CB3CB55A17255AE61BF6D46A2@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <ZZ3Wsxq8rHShTUdA@yury-ThinkPad>
+ <SN6PR02MB415704D36B82D5793CC4558FD4692@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <20240111061319.GC5436@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <SN6PR02MB4157234176238D6C1F35B90BD46F2@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <DS1PEPF00012A5F513F916690B9F94D3262CA6F2@DS1PEPF00012A5F.namprd21.prod.outlook.com>
+ <20240113063038.GD5436@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <SN6PR02MB4157372CF70059E8E35D5545D46E2@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <ZaLgdn53bBoYyT/h@yury-ThinkPad>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: KjhZX0HiiR33q8KWJCS2visk0UNU2jtm
-X-Proofpoint-ORIG-GUID: KjhZX0HiiR33q8KWJCS2visk0UNU2jtm
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZaLgdn53bBoYyT/h@yury-ThinkPad>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-Register value persisted after booting the kernel using
-kexec which resulted in kernel panic. Thus cleared the
-BM pool registers before initialisation to fix the issue.
+On Sat, Jan 13, 2024 at 11:11:50AM -0800, Yury Norov wrote:
+> On Sat, Jan 13, 2024 at 04:20:31PM +0000, Michael Kelley wrote:
+> > From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com> Sent: Friday, January 12, 2024 10:31 PM
+> > 
+> > > On Fri, Jan 12, 2024 at 06:30:44PM +0000, Haiyang Zhang wrote:
+> > > >
+> > > > > -----Original Message-----
+> > > > From: Michael Kelley <mhklinux@outlook.com> Sent: Friday, January 12, 2024 11:37 AM
+> > > > >
+> > > > > From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com> Sent:
+> > > > > Wednesday, January 10, 2024 10:13 PM
+> > > > > >
+> > > > > > The test topology was used to check the performance between
+> > > > > > cpu_local_spread() and the new approach is :
+> > > > > > Case 1
+> > > > > > IRQ     Nodes  Cores CPUs
+> > > > > > 0       1      0     0-1
+> > > > > > 1       1      1     2-3
+> > > > > > 2       1      2     4-5
+> > > > > > 3       1      3     6-7
+> > > > > >
+> > > > > > and with existing cpu_local_spread()
+> > > > > > Case 2
+> > > > > > IRQ    Nodes  Cores CPUs
+> > > > > > 0      1      0     0
+> > > > > > 1      1      0     1
+> > > > > > 2      1      1     2
+> > > > > > 3      1      1     3
+> > > > > >
+> > > > > > Total 4 channels were used, which was set up by ethtool.
+> > > > > > case 1 with ntttcp has given 15 percent better performance, than
+> > > > > > case 2. During the test irqbalance was disabled as well.
+> > > > > >
+> > > > > > Also you are right, with 64CPU system this approach will spread
+> > > > > > the irqs like the cpu_local_spread() but in the future we will offer
+> > > > > > MANA nodes, with more than 64 CPUs. There it this new design will
+> > > > > > give better performance.
+> > > > > >
+> > > > > > I will add this performance benefit details in commit message of
+> > > > > > next version.
+> > > > >
+> > > > > Here are my concerns:
+> > > > >
+> > > > > 1.  The most commonly used VMs these days have 64 or fewer
+> > > > > vCPUs and won't see any performance benefit.
+> > > > >
+> > > > > 2.  Larger VMs probably won't see the full 15% benefit because
+> > > > > all vCPUs in the local NUMA node will be assigned IRQs.  For
+> > > > > example, in a VM with 96 vCPUs and 2 NUMA nodes, all 48
+> > > > > vCPUs in NUMA node 0 will all be assigned IRQs.  The remaining
+> > > > > 16 IRQs will be spread out on the 48 CPUs in NUMA node 1
+> > > > > in a way that avoids sharing a core.  But overall the means
+> > > > > that 75% of the IRQs will still be sharing a core and
+> > > > > presumably not see any perf benefit.
+> > > > >
+> > > > > 3.  Your experiment was on a relatively small scale:   4 IRQs
+> > > > > spread across 2 cores vs. across 4 cores.  Have you run any
+> > > > > experiments on VMs with 128 vCPUs (for example) where
+> > > > > most of the IRQs are not sharing a core?  I'm wondering if
+> > > > > the results with 4 IRQs really scale up to 64 IRQs.  A lot can
+> > > > > be different in a VM with 64 cores and 2 NUMA nodes vs.
+> > > > > 4 cores in a single node.
+> > > > >
+> > > > > 4.  The new algorithm prefers assigning to all vCPUs in
+> > > > > each NUMA hop over assigning to separate cores.  Are there
+> > > > > experiments showing that is the right tradeoff?  What
+> > > > > are the results if assigning to separate cores is preferred?
+> > > >
+> > > > I remember in a customer case, putting the IRQs on the same
+> > > > NUMA node has better perf. But I agree, this should be re-tested
+> > > > on MANA nic.
+> > >
+> > > 1) and 2) The change will not decrease the existing performance, but for
+> > > system with high number of CPU, will be benefited after this.
+> > > 
+> > > 3) The result has shown around 6 percent improvement.
+> > > 
+> > > 4)The test result has shown around 10 percent difference when IRQs are
+> > > spread on multiple numa nodes.
+> > 
+> > OK, this looks pretty good.  Make clear in the commit messages what
+> > the tradeoffs are, and what the real-world benefits are expected to be.
+> > Some future developer who wants to understand why IRQs are assigned
+> > this way will thank you. :-)
+> 
+> I agree with Michael, this needs to be spoken aloud.
+> 
+> >From the above, is that correct that the best performance is achieved
+> when the # of IRQs is half the nubmer of CPUs in the 1st node, because
+> this configuration allows to spread IRQs across cores the most optimal
+> way?  And if we have more or less than that, it hurts performance, at
+> least for MANA networking?
+It does not decrease the performance from current cpu_local_spread(),
+but optimum performance comes when node has CPUs double that of number
+of IRQs (considering SMT==2). 
 
-Signed-off-by: Jenishkumar Maheshbhai Patel <jpatel2@marvell.com>
----
- .../net/ethernet/marvell/mvpp2/mvpp2_main.c   | 28 +++++++++++++++++++
- 1 file changed, 28 insertions(+)
+Now only if the number of CPUs are same that of number of IRQs,
+(that is num of CPUs <= 64) then, we see same performance like existing
+design with cpu_local_spread().
 
-diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-index 820b1fabe297..8223c00d1f91 100644
---- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-+++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-@@ -614,12 +614,40 @@ static void mvpp23_bm_set_8pool_mode(struct mvpp2 *priv)
- 	mvpp2_write(priv, MVPP22_BM_POOL_BASE_ADDR_HIGH_REG, val);
- }
- 
-+/* Cleanup pool before actual initialization in the OS */
-+static void mvpp2_bm_pool_cleanup(struct mvpp2 *priv, int pool_id)
-+{
-+	u32 val;
-+	int i;
-+	/* Drain the BM from all possible residues left by firmware */
-+	for (i = 0; i < MVPP2_BM_POOL_SIZE_MAX; i++)
-+		mvpp2_read(priv, MVPP2_BM_PHY_ALLOC_REG(pool_id));
-+	/* Stop the BM pool */
-+	val = mvpp2_read(priv, MVPP2_BM_POOL_CTRL_REG(pool_id));
-+	val |= MVPP2_BM_STOP_MASK;
-+	mvpp2_write(priv, MVPP2_BM_POOL_CTRL_REG(pool_id), val);
-+	/* Mask BM all interrupts */
-+	mvpp2_write(priv, MVPP2_BM_INTR_MASK_REG(pool_id), 0);
-+	/* Clear BM cause register */
-+	mvpp2_write(priv, MVPP2_BM_INTR_CAUSE_REG(pool_id), 0);
-+}
-+
- static int mvpp2_bm_init(struct device *dev, struct mvpp2 *priv)
- {
- 	enum dma_data_direction dma_dir = DMA_FROM_DEVICE;
- 	int i, err, poolnum = MVPP2_BM_POOLS_NUM;
- 	struct mvpp2_port *port;
- 
-+	if (priv->percpu_pools)
-+		poolnum = mvpp2_get_nrxqs(priv) * 2;
-+
-+	for (i = 0; i < poolnum; i++) {
-+		/* Make sure about the pool state in case it was
-+		 * used by firmware.
-+		 */
-+		mvpp2_bm_pool_cleanup(priv, i);
-+	}
-+
- 	if (priv->percpu_pools) {
- 		for (i = 0; i < priv->port_count; i++) {
- 			port = priv->port_list[i];
--- 
-2.25.1
-
+If node has more CPUs than 64, then we get better performance than 
+cpu_local_spread().
+> 
+> So, the B|A performance chart may look like this, right?
+> 
+>   irq     nodes     cores     cpus      perf
+>   0       1 | 1     0 | 0     0 | 0-1      0%
+>   1       1 | 1     0 | 1     1 | 2-3     +5%
+>   2       1 | 1     1 | 2     2 | 4-5    +10%
+>   3       1 | 1     1 | 3     3 | 6-7    +15%
+>   4       1 | 1     0 | 4     3 | 0-1    +12%
+>   ...       |         |         |
+>   7       1 | 1     1 | 7     3 | 6-7      0%
+>   ...
+>  15       2 | 2     3 | 3    15 | 14-15    0%
+> 
+> Souradeep, can you please confirm that my understanding is correct?
+> 
+> In v5, can you add a table like the above with real performance
+> numbers for your driver? I think that it would help people to
+> configure their VMs better when networking is a bottleneck.
+> 
+I will share a chart on next version of patch 3.
+Thanks for the suggestion.
+> Thanks,
+> Yury
 
