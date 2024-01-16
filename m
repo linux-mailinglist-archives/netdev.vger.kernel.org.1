@@ -1,65 +1,66 @@
-Return-Path: <netdev+bounces-63780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63781-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B82D82F642
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 20:55:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3CCB82F660
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 20:58:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D9B91C23E27
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 19:55:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6BF8EB25106
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 19:58:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73B2A1F939;
-	Tue, 16 Jan 2024 19:44:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 150452E852;
+	Tue, 16 Jan 2024 19:44:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nYcNBn4P"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jMfMvhYU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A61B2D05C;
-	Tue, 16 Jan 2024 19:44:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1755200DB;
+	Tue, 16 Jan 2024 19:44:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705434252; cv=none; b=BV/tAkW2W3ufA/9/AZUhaS+0U1OcrmkS9wHsSnTfE/j13QbDZJjXNpVhUzGYMFLC0uDqzxwaEbnUd3YLe2z8Rbxba8KygU/wRbQ1hRvRiIMamCk3TlR9tvhe+4f+byH1M0xieWSjVJbW3ToWFY47qFmrSEKxOE8EGhZwSI5sm4Y=
+	t=1705434286; cv=none; b=LgHwA0Sny8n54Oy5uUI46voi1Y/4N3cKWZDiS9RYCXFhGPirJdi1L8hZvsbxJehJ5l75sir62z6+pN6ztBMR3UphQXJcFV4wjptCjPRg3harMMaXEHnHx4agxD5l/knQ56wDDaHuHyaHwH9Pknvr/f7Qv4zkhoiQYxdqA7j8FNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705434252; c=relaxed/simple;
-	bh=VtJF6R3jnzdnDLusu0c8DS8DNEylnVXk65G3k6SKdVU=;
+	s=arc-20240116; t=1705434286; c=relaxed/simple;
+	bh=B6vfzVnC/GrAGTLt3GQNzuN97eOxeLSK0sZPBZpGPhE=;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:X-stable:
-	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=QpQO257Cx16xpTnuX3oc//rnkbLhVruBv13ON3Bl30pn4VHy0GFZUPpSzJvHqsE2dAB6/c5dx5IkJoTfL/QYscjUGqSSuE7cqM2cymm4RlIqjUB4XvT/1ED2P3ZK0DLQYrg3YuFfsVYFuG88XHuzCkNV/p80Rt+0cXiNbfwWB2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nYcNBn4P; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F6AAC433C7;
-	Tue, 16 Jan 2024 19:44:10 +0000 (UTC)
+	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=TjNetgvWQux61MqKppJXw5CNSR/qiN/V4BgpZFlTybWOrp0IAcJzKoPuxVlgxbqj8SqjuoBCxbvL6Os1NiK2288rF6lcGciDHJOeHUN1YFiWfVNc3iEy+Lm+nel/oPybUMIoABqdWj5uEZEWG4kP1f6zTIaRufTBS9bf3O8gGnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jMfMvhYU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EA43C433C7;
+	Tue, 16 Jan 2024 19:44:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705434251;
-	bh=VtJF6R3jnzdnDLusu0c8DS8DNEylnVXk65G3k6SKdVU=;
+	s=k20201202; t=1705434285;
+	bh=B6vfzVnC/GrAGTLt3GQNzuN97eOxeLSK0sZPBZpGPhE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nYcNBn4P4AZX0FaZACXCJemgahV4cn8MkZf1KR3Ho+Gff2QM+3Uui7F+XD3BPVyq+
-	 dHLoQogWxx1pGzjZcNEjGJVgCOCdJzd9wQewOW4krm+bL6BW0c5U7gY7zfuI/qSikQ
-	 3doUaJ7liJtg2Y+mDcvDE6b6zsIOztKmwRsp48Tt738YQXxjvUlroZ8kdkssCdudNT
-	 7lnnSiYfY6k9bkMvkwYs3vLe7A+pmJXnwZZgo2nrv0dCHKoW21Sn1d3M9NQJq/7TET
-	 q5qrqxBXLwDMdAEa1iskNz2ctyPBf3tMAx+bDMoCifDpCDExjuWBayoMKzdimtxk1u
-	 KkxafEbvQHtgg==
+	b=jMfMvhYUQuDF09qA5lCQwLh/geRyqLrcuTN4uiZ8ZxzVQUfmfiP1gIetkDCo9UpL5
+	 x+sDbz3ZqcBLwxd/6wexOhe8zLD9wUIB8koaWQbuaU7xW73laLFn4yNyQBuhYPPl5Q
+	 0rIkUQicAIV1uQ7rqQM+rzW0d69OEwLeVdDcBHlsifeYMXzmHyV+uv5tTxgN/0M/by
+	 AbUzoDU3FzRPNyZRrNDMzMkBwHFinpO/fQ1LMdC74YL7tuHmSMy0pjMW4iQk5gbkyR
+	 ukdi9n+DCDKEbLlfhzzgm6jy0SpcilmqIxkzvP3o0gZ2E6T39BaJm4EIVd40SH4zkJ
+	 8E4fy4131lgYQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Tobias Waldekranz <tobias@waldekranz.com>,
-	Andrew Lunn <andrew@lunn.ch>,
+Cc: duanqiangwen <duanqiangwen@net-swift.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
+	jiawenwu@trustnetic.com,
+	mengyuanlou@net-swift.com,
 	davem@davemloft.net,
 	edumazet@google.com,
 	pabeni@redhat.com,
+	andrew@lunn.ch,
+	bhelgaas@google.com,
+	maciej.fijalkowski@intel.com,
 	horms@kernel.org,
-	krzysztof.kozlowski@linaro.org,
-	robh@kernel.org,
-	u.kleine-koenig@pengutronix.de,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.7 043/108] net: mvmdio: Avoid excessive sleeps in polled mode
-Date: Tue, 16 Jan 2024 14:39:09 -0500
-Message-ID: <20240116194225.250921-43-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.7 050/108] net: wangxun: fix changing mac failed when running
+Date: Tue, 16 Jan 2024 14:39:16 -0500
+Message-ID: <20240116194225.250921-50-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240116194225.250921-1-sashal@kernel.org>
 References: <20240116194225.250921-1-sashal@kernel.org>
@@ -74,137 +75,47 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.7
 Content-Transfer-Encoding: 8bit
 
-From: Tobias Waldekranz <tobias@waldekranz.com>
+From: duanqiangwen <duanqiangwen@net-swift.com>
 
-[ Upstream commit 7dd12fe34686d89c332b1a05104d18d728591f0a ]
+[ Upstream commit 87e839c82cc36346a2cd183ca941316902110716 ]
 
-Before this change, when operating in polled mode, i.e. no IRQ is
-available, every individual C45 access would be hit with a 150us sleep
-after the bus access.
+in some bonding mode, service need to change mac when
+netif is running. Wangxun netdev add IFF_LIVE_ADDR_CHANGE
+priv_flag to support it.
 
-For example, on a board with a CN9130 SoC connected to an MV88X3310
-PHY, a single C45 read would take around 165us:
-
-    root@infix:~$ mdio f212a600.mdio-mii mmd 4:1 bench 0xc003
-    Performed 1000 reads in 165ms
-
-By replacing the long sleep with a tighter poll loop, we observe a 10x
-increase in bus throughput:
-
-    root@infix:~$ mdio f212a600.mdio-mii mmd 4:1 bench 0xc003
-    Performed 1000 reads in 15ms
-
-Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Tested-by: Andrew Lunn <andrew@lunn.ch>
-Link: https://lore.kernel.org/r/20231204100811.2708884-3-tobias@waldekranz.com
+Signed-off-by: duanqiangwen <duanqiangwen@net-swift.com>
+Link: https://lore.kernel.org/r/20231206095044.17844-1-duanqiangwen@net-swift.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/marvell/mvmdio.c | 53 ++++++++-------------------
- 1 file changed, 16 insertions(+), 37 deletions(-)
+ drivers/net/ethernet/wangxun/ngbe/ngbe_main.c   | 1 +
+ drivers/net/ethernet/wangxun/txgbe/txgbe_main.c | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/drivers/net/ethernet/marvell/mvmdio.c b/drivers/net/ethernet/marvell/mvmdio.c
-index 89f26402f8fb..5f66f779e56f 100644
---- a/drivers/net/ethernet/marvell/mvmdio.c
-+++ b/drivers/net/ethernet/marvell/mvmdio.c
-@@ -23,6 +23,7 @@
- #include <linux/delay.h>
- #include <linux/interrupt.h>
- #include <linux/io.h>
-+#include <linux/iopoll.h>
- #include <linux/kernel.h>
- #include <linux/mod_devicetable.h>
- #include <linux/module.h>
-@@ -58,11 +59,6 @@
-  * - Armada 370       (Globalscale Mirabox):   41us to 43us (Polled)
-  */
- #define MVMDIO_SMI_TIMEOUT		1000 /* 1000us = 1ms */
--#define MVMDIO_SMI_POLL_INTERVAL_MIN	45
--#define MVMDIO_SMI_POLL_INTERVAL_MAX	55
--
--#define MVMDIO_XSMI_POLL_INTERVAL_MIN	150
--#define MVMDIO_XSMI_POLL_INTERVAL_MAX	160
+diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+index 8db804543e66..a5c623fd023e 100644
+--- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
++++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+@@ -582,6 +582,7 @@ static int ngbe_probe(struct pci_dev *pdev,
  
- struct orion_mdio_dev {
- 	void __iomem *regs;
-@@ -84,8 +80,6 @@ enum orion_mdio_bus_type {
+ 	netdev->priv_flags |= IFF_UNICAST_FLT;
+ 	netdev->priv_flags |= IFF_SUPP_NOFCS;
++	netdev->priv_flags |= IFF_LIVE_ADDR_CHANGE;
  
- struct orion_mdio_ops {
- 	int (*is_done)(struct orion_mdio_dev *);
--	unsigned int poll_interval_min;
--	unsigned int poll_interval_max;
- };
+ 	netdev->min_mtu = ETH_MIN_MTU;
+ 	netdev->max_mtu = WX_MAX_JUMBO_FRAME_SIZE -
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+index 526250102db2..a78da2309db5 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+@@ -638,6 +638,7 @@ static int txgbe_probe(struct pci_dev *pdev,
  
- /* Wait for the SMI unit to be ready for another operation
-@@ -94,34 +88,23 @@ static int orion_mdio_wait_ready(const struct orion_mdio_ops *ops,
- 				 struct mii_bus *bus)
- {
- 	struct orion_mdio_dev *dev = bus->priv;
--	unsigned long timeout = usecs_to_jiffies(MVMDIO_SMI_TIMEOUT);
--	unsigned long end = jiffies + timeout;
--	int timedout = 0;
-+	unsigned long timeout;
-+	int done;
+ 	netdev->priv_flags |= IFF_UNICAST_FLT;
+ 	netdev->priv_flags |= IFF_SUPP_NOFCS;
++	netdev->priv_flags |= IFF_LIVE_ADDR_CHANGE;
  
--	while (1) {
--	        if (ops->is_done(dev))
-+	if (dev->err_interrupt <= 0) {
-+		if (!read_poll_timeout_atomic(ops->is_done, done, done, 2,
-+					      MVMDIO_SMI_TIMEOUT, false, dev))
-+			return 0;
-+	} else {
-+		/* wait_event_timeout does not guarantee a delay of at
-+		 * least one whole jiffie, so timeout must be no less
-+		 * than two.
-+		 */
-+		timeout = max(usecs_to_jiffies(MVMDIO_SMI_TIMEOUT), 2);
-+
-+		if (wait_event_timeout(dev->smi_busy_wait,
-+				       ops->is_done(dev), timeout))
- 			return 0;
--	        else if (timedout)
--			break;
--
--	        if (dev->err_interrupt <= 0) {
--			usleep_range(ops->poll_interval_min,
--				     ops->poll_interval_max);
--
--			if (time_is_before_jiffies(end))
--				++timedout;
--	        } else {
--			/* wait_event_timeout does not guarantee a delay of at
--			 * least one whole jiffie, so timeout must be no less
--			 * than two.
--			 */
--			if (timeout < 2)
--				timeout = 2;
--			wait_event_timeout(dev->smi_busy_wait,
--				           ops->is_done(dev), timeout);
--
--			++timedout;
--	        }
- 	}
- 
- 	dev_err(bus->parent, "Timeout: SMI busy for too long\n");
-@@ -135,8 +118,6 @@ static int orion_mdio_smi_is_done(struct orion_mdio_dev *dev)
- 
- static const struct orion_mdio_ops orion_mdio_smi_ops = {
- 	.is_done = orion_mdio_smi_is_done,
--	.poll_interval_min = MVMDIO_SMI_POLL_INTERVAL_MIN,
--	.poll_interval_max = MVMDIO_SMI_POLL_INTERVAL_MAX,
- };
- 
- static int orion_mdio_smi_read(struct mii_bus *bus, int mii_id,
-@@ -194,8 +175,6 @@ static int orion_mdio_xsmi_is_done(struct orion_mdio_dev *dev)
- 
- static const struct orion_mdio_ops orion_mdio_xsmi_ops = {
- 	.is_done = orion_mdio_xsmi_is_done,
--	.poll_interval_min = MVMDIO_XSMI_POLL_INTERVAL_MIN,
--	.poll_interval_max = MVMDIO_XSMI_POLL_INTERVAL_MAX,
- };
- 
- static int orion_mdio_xsmi_read_c45(struct mii_bus *bus, int mii_id,
+ 	netdev->min_mtu = ETH_MIN_MTU;
+ 	netdev->max_mtu = WX_MAX_JUMBO_FRAME_SIZE -
 -- 
 2.43.0
 
