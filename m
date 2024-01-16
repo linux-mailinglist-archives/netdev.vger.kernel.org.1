@@ -1,97 +1,129 @@
-Return-Path: <netdev+bounces-63713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5DAD82EFEC
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 14:46:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AD4B82EFF4
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 14:47:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A48541C233B7
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 13:46:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24DDB1C2338F
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 13:47:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF59B1BDC6;
-	Tue, 16 Jan 2024 13:46:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE44E1BC47;
+	Tue, 16 Jan 2024 13:47:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZonI7C3R"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 033711B944;
-	Tue, 16 Jan 2024 13:46:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0W-mKldk_1705412774;
-Received: from 30.221.145.228(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0W-mKldk_1705412774)
-          by smtp.aliyun-inc.com;
-          Tue, 16 Jan 2024 21:46:15 +0800
-Message-ID: <3a82adb1-c839-4e82-834f-a63f9910b28d@linux.alibaba.com>
-Date: Tue, 16 Jan 2024 21:46:14 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 261C51BDC4;
+	Tue, 16 Jan 2024 13:47:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-50e7e55c0f6so11838005e87.0;
+        Tue, 16 Jan 2024 05:47:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705412829; x=1706017629; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=dW5FNf3SVxNKeXJ6KjqfCxnz6/Fif4OHJfNExviaSBU=;
+        b=ZonI7C3R5ztUXUG92m9VEAubzLZG5yNsJmuaIKwW8a/AxyqCWOKyd/JoNqZr43eB33
+         Em3ceWgHZG/uDISQr8rCLGHnBYP/9EK3f8zTefvXHz36QIy2OZWRzXjFBiaHDVT3xtA6
+         JU7T3iUn9Di7KwCU1dlahLy2Sr69THsqiywsuIXTASr0VFezB6S7gD3w6hluKf9GP6M5
+         Xs1q6h4WeYmf5a/JLbdfk4NZdSrTqivoGU1c9J8UW6EMJP9ziJ8Paq6v5E7pSQOLGf8U
+         U2UcmEu2NkhFrEPZstjDYFw7QUzb8gBgmEn0kNCB5Cugjd2jU8kNvjUFs98KU5yoPFKe
+         IYZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705412829; x=1706017629;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dW5FNf3SVxNKeXJ6KjqfCxnz6/Fif4OHJfNExviaSBU=;
+        b=aFfFUlXg1D/AQ5UjnnkXI9rJelNkIH1qgC3t25hfUdk6Zj2b8VnLnAfWHxsRChyCBM
+         iAGorfLUvlbLMTCaB8b+V79PuH0Ry9DgazJik7HVBcc2HZoU2wA/S65vJmTTFBT3GkYY
+         P2dZk0jwQ3gbOoMUHlHAAMjTM3dZpkXK9Fn6hUp0NLhgJXjAy9oelZSmotFmWgKnFr2x
+         veLNvKlnKxe/a68GPWNo883NCWx+POueuQ008PI5Nnd0bjxsh3UuG7bWOo3DDEsDq9cl
+         jTEFjekXC9HhDvBLDWyf0I1YRTRxlJyCqkUx9Qs4j3kf57kslNqS2VonY/D+lB+KBkxZ
+         AN9A==
+X-Gm-Message-State: AOJu0YwDL/6Yw570DK9HwK3A6YnX3BjMYSM5o5CfffQ3Zfjs9OEJ/RVF
+	wX4tvnK/nWH56GWIP4f5Fyw=
+X-Google-Smtp-Source: AGHT+IHKRlj+eXp66CDmv5XZ+8z5Yxa8Fx1bURNMREH+HS2jVniBejbf0RJ6hAQJU1DNZXvvI/xejw==
+X-Received: by 2002:a05:6512:3f2a:b0:50e:b2ac:829a with SMTP id y42-20020a0565123f2a00b0050eb2ac829amr2482333lfa.32.1705412828757;
+        Tue, 16 Jan 2024 05:47:08 -0800 (PST)
+Received: from skbuf ([188.25.255.36])
+        by smtp.gmail.com with ESMTPSA id ca13-20020a170906a3cd00b00a2c869be22dsm6192739ejb.143.2024.01.16.05.47.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Jan 2024 05:47:08 -0800 (PST)
+Date: Tue, 16 Jan 2024 15:47:05 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	Luiz Angelo Daros de Luca <luizluca@gmail.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [RFC PATCH net-next 6/8] net: dsa: mt7530: simplify
+ mt7530_setup_port6() and change to void
+Message-ID: <20240116134705.mw2a2twoakw5b7jq@skbuf>
+References: <20240113102529.80371-1-arinc.unal@arinc9.com>
+ <20240113102529.80371-7-arinc.unal@arinc9.com>
+ <20240115213720.vxlumsjwrjdkqxsl@skbuf>
+ <7f59d9e6-1653-4a8d-910d-5922452bb9e8@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC nf-next v5 0/2] netfilter: bpf: support prog update
-Content-Language: en-US
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-To: pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de
-Cc: bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, coreteam@netfilter.org,
- netfilter-devel@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, ast@kernel.org
-References: <1704175877-28298-1-git-send-email-alibuda@linux.alibaba.com>
-In-Reply-To: <1704175877-28298-1-git-send-email-alibuda@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <7f59d9e6-1653-4a8d-910d-5922452bb9e8@arinc9.com>
 
+On Tue, Jan 16, 2024 at 04:09:18PM +0300, Arınç ÜNAL wrote:
+> Do you mean by internal port that the port does not have MII pinout? Port 6
+> of the MT7530 switch do. It is possible to have an external PHY wired to it.
 
+Yes, this is what I meant by internal port. It seems I was wrong to
+assume it is always connected to GMAC0.
 
-Just a reminder to avoid forgetting this patch by everyone. 🙂
+How is the selection done between internal and external wiring?
 
-Best wishes,
-D. Wythe
+If external wiring to a PHY is possible, shouldn't the driver accept all
+4 RGMII variants with phy_interface_mode_is_rgmii(), because the delays
+specified in "rgmii-txid", "rgmii-rxid", "rgmii-id" always pertain to
+the PHY, and thus it doesn't make sense for the MAC to not allow the use
+of the full spectrum?
 
+> So it would make sense to design mt7530_setup_port6() in the sense that
+> dynamic reconfiguration is possible.
 
-On 1/2/24 2:11 PM, D. Wythe wrote:
-> From: "D. Wythe" <alibuda@linux.alibaba.com>
->
-> This patches attempt to implements updating of progs within
-> bpf netfilter link, allowing user update their ebpf netfilter
-> prog in hot update manner.
->
-> Besides, a corresponding test case has been added to verify
-> whether the update works.
-> --
-> v1:
-> 1. remove unnecessary context, access the prog directly via rcu.
-> 2. remove synchronize_rcu(), dealloc the nf_link via kfree_rcu.
-> 3. check the dead flag during the update.
-> --
-> v1->v2:
-> 1. remove unnecessary nf_prog, accessing nf_link->link.prog in direct.
-> --
-> v2->v3:
-> 1. access nf_link->link.prog via rcu_dereference_raw to avoid warning.
-> --
-> v3->v4:
-> 1. remove mutex for link update, as it is unnecessary and can be replaced
-> by atomic operations.
-> --
-> v4->v5:
-> 1. fix error retval check on cmpxhcg
->
-> D. Wythe (2):
->    netfilter: bpf: support prog update
->    selftests/bpf: Add netfilter link prog update test
->
->   net/netfilter/nf_bpf_link.c                        | 50 ++++++++-----
->   .../bpf/prog_tests/netfilter_link_update_prog.c    | 83 ++++++++++++++++++++++
->   .../bpf/progs/test_netfilter_link_update_prog.c    | 24 +++++++
->   3 files changed, 141 insertions(+), 16 deletions(-)
->   create mode 100644 tools/testing/selftests/bpf/prog_tests/netfilter_link_update_prog.c
->   create mode 100644 tools/testing/selftests/bpf/progs/test_netfilter_link_update_prog.c
->
+Ok, you mean to keep the dynamic reconfiguration possible rather than
+redesign to disallow it.
 
+> I've tested to see that the core operations for TRGMII does not interfere
+> so no need to undo them when the interface changes from TRGMII to RGMII.
+> 
+> I'll do below on this patch:
+> 
+> 	if (interface == PHY_INTERFACE_MODE_RGMII) {
+> 		mt7530_rmw(priv, MT7530_P6ECR, P6_INTF_MODE_MASK,
+> 			   P6_INTF_MODE(0));
+> 		return;
+> 	}
+
+Ok.
 
