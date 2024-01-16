@@ -1,103 +1,128 @@
-Return-Path: <netdev+bounces-63702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7D1D82EF42
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 13:57:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6E3482EF49
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 13:59:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E30AD1C23325
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 12:57:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52FA41F24453
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 12:59:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25A741BC30;
-	Tue, 16 Jan 2024 12:57:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07FC91BC3E;
+	Tue, 16 Jan 2024 12:59:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from exchange.fintech.ru (exchange.fintech.ru [195.54.195.159])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 058061BC2B;
-	Tue, 16 Jan 2024 12:57:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4TDptn39CPzGpql;
-	Tue, 16 Jan 2024 20:57:05 +0800 (CST)
-Received: from dggpemm500008.china.huawei.com (unknown [7.185.36.136])
-	by mail.maildlp.com (Postfix) with ESMTPS id DC3C7140518;
-	Tue, 16 Jan 2024 20:57:09 +0800 (CST)
-Received: from localhost (10.174.242.157) by dggpemm500008.china.huawei.com
- (7.185.36.136) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 16 Jan
- 2024 20:57:09 +0800
-From: Yunjian Wang <wangyunjian@huawei.com>
-To: <willemdebruijn.kernel@gmail.com>, <jasowang@redhat.com>,
-	<kuba@kernel.org>, <davem@davemloft.net>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<xudingke@huawei.com>, Yunjian Wang <wangyunjian@huawei.com>
-Subject: [PATCH net v2] tun: add missing rx stats accounting in tun_xdp_act
-Date: Tue, 16 Jan 2024 20:56:58 +0800
-Message-ID: <1705409818-28292-1-git-send-email-wangyunjian@huawei.com>
-X-Mailer: git-send-email 1.9.5.msysgit.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C2921BC5D;
+	Tue, 16 Jan 2024 12:59:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fintech.ru
+Received: from Ex16-01.fintech.ru (10.0.10.18) by exchange.fintech.ru
+ (195.54.195.169) with Microsoft SMTP Server (TLS) id 14.3.498.0; Tue, 16 Jan
+ 2024 15:59:21 +0300
+Received: from localhost (10.0.253.138) by Ex16-01.fintech.ru (10.0.10.18)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Tue, 16 Jan
+ 2024 15:59:19 +0300
+From: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
+CC: Nikita Zhandarovich <n.zhandarovich@fintech.ru>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<wireguard@lists.zx2c4.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, syzbot <syzkaller@googlegroups.com>,
+	<syzbot+d1de830e4ecdaac83d89@syzkaller.appspotmail.com>
+Subject: [PATCH net v2] wireguard: receive: annotate data-race around receiving_counter.counter
+Date: Tue, 16 Jan 2024 04:59:11 -0800
+Message-ID: <20240116125911.6176-1-n.zhandarovich@fintech.ru>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemm500008.china.huawei.com (7.185.36.136)
+X-ClientProxiedBy: Ex16-02.fintech.ru (10.0.10.19) To Ex16-01.fintech.ru
+ (10.0.10.18)
 
-There are few places on the receive path where packet receives and packet
-drops were not accounted for. This patch fixes that issue.
+Syzkaller with KCSAN identified a data-race issue [1] when accessing
+keypair->receiving_counter.counter.
 
-Fixes: 8ae1aff0b331 ("tuntap: split out XDP logic")
-Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
+This patch uses READ_ONCE() and WRITE_ONCE() annotations to fix the
+problem.
+
+[1]
+BUG: KCSAN: data-race in wg_packet_decrypt_worker / wg_packet_rx_poll
+
+write to 0xffff888107765888 of 8 bytes by interrupt on cpu 0:
+ counter_validate drivers/net/wireguard/receive.c:321 [inline]
+ wg_packet_rx_poll+0x3ac/0xf00 drivers/net/wireguard/receive.c:461
+ __napi_poll+0x60/0x3b0 net/core/dev.c:6536
+ napi_poll net/core/dev.c:6605 [inline]
+ net_rx_action+0x32b/0x750 net/core/dev.c:6738
+ __do_softirq+0xc4/0x279 kernel/softirq.c:553
+ do_softirq+0x5e/0x90 kernel/softirq.c:454
+ __local_bh_enable_ip+0x64/0x70 kernel/softirq.c:381
+ __raw_spin_unlock_bh include/linux/spinlock_api_smp.h:167 [inline]
+ _raw_spin_unlock_bh+0x36/0x40 kernel/locking/spinlock.c:210
+ spin_unlock_bh include/linux/spinlock.h:396 [inline]
+ ptr_ring_consume_bh include/linux/ptr_ring.h:367 [inline]
+ wg_packet_decrypt_worker+0x6c5/0x700 drivers/net/wireguard/receive.c:499
+ process_one_work kernel/workqueue.c:2633 [inline]
+ ...
+
+read to 0xffff888107765888 of 8 bytes by task 3196 on cpu 1:
+ decrypt_packet drivers/net/wireguard/receive.c:252 [inline]
+ wg_packet_decrypt_worker+0x220/0x700 drivers/net/wireguard/receive.c:501
+ process_one_work kernel/workqueue.c:2633 [inline]
+ process_scheduled_works+0x5b8/0xa30 kernel/workqueue.c:2706
+ worker_thread+0x525/0x730 kernel/workqueue.c:2787
+ ...
+
+Fixes: a9e90d9931f3 ("wireguard: noise: separate receive counter from send counter")
+Reported-by: syzbot+d1de830e4ecdaac83d89@syzkaller.appspotmail.com
+Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
 ---
-v2: add Fixes tag
----
- drivers/net/tun.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+v2: add missing annotation in wg_packet_rx_poll() per Eric Duzamet's
+<edumazet@google.com> helpful suggestion.
 
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index afa5497f7c35..232e5319ac77 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -1626,17 +1626,14 @@ static int tun_xdp_act(struct tun_struct *tun, struct bpf_prog *xdp_prog,
- 		       struct xdp_buff *xdp, u32 act)
- {
- 	int err;
-+	unsigned int datasize = xdp->data_end - xdp->data;
+ drivers/net/wireguard/receive.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/wireguard/receive.c b/drivers/net/wireguard/receive.c
+index a176653c8861..db01ec03bda0 100644
+--- a/drivers/net/wireguard/receive.c
++++ b/drivers/net/wireguard/receive.c
+@@ -251,7 +251,7 @@ static bool decrypt_packet(struct sk_buff *skb, struct noise_keypair *keypair)
  
- 	switch (act) {
- 	case XDP_REDIRECT:
- 		err = xdp_do_redirect(tun->dev, xdp, xdp_prog);
--		if (err)
--			return err;
- 		break;
- 	case XDP_TX:
- 		err = tun_xdp_tx(tun->dev, xdp);
--		if (err < 0)
--			return err;
- 		break;
- 	case XDP_PASS:
- 		break;
-@@ -1651,6 +1648,13 @@ static int tun_xdp_act(struct tun_struct *tun, struct bpf_prog *xdp_prog,
- 		break;
+ 	if (unlikely(!READ_ONCE(keypair->receiving.is_valid) ||
+ 		  wg_birthdate_has_expired(keypair->receiving.birthdate, REJECT_AFTER_TIME) ||
+-		  keypair->receiving_counter.counter >= REJECT_AFTER_MESSAGES)) {
++		  READ_ONCE(keypair->receiving_counter.counter) >= REJECT_AFTER_MESSAGES)) {
+ 		WRITE_ONCE(keypair->receiving.is_valid, false);
+ 		return false;
+ 	}
+@@ -318,7 +318,7 @@ static bool counter_validate(struct noise_replay_counter *counter, u64 their_cou
+ 		for (i = 1; i <= top; ++i)
+ 			counter->backtrack[(i + index_current) &
+ 				((COUNTER_BITS_TOTAL / BITS_PER_LONG) - 1)] = 0;
+-		counter->counter = their_counter;
++		WRITE_ONCE(counter->counter, their_counter);
  	}
  
-+	if (err < 0) {
-+		act = err;
-+		dev_core_stats_rx_dropped_inc(tun->dev);
-+	} else if (act == XDP_REDIRECT || act == XDP_TX) {
-+		dev_sw_netstats_rx_add(tun->dev, datasize);
-+	}
-+
- 	return act;
- }
+ 	index &= (COUNTER_BITS_TOTAL / BITS_PER_LONG) - 1;
+@@ -463,7 +463,7 @@ int wg_packet_rx_poll(struct napi_struct *napi, int budget)
+ 			net_dbg_ratelimited("%s: Packet has invalid nonce %llu (max %llu)\n",
+ 					    peer->device->dev->name,
+ 					    PACKET_CB(skb)->nonce,
+-					    keypair->receiving_counter.counter);
++					    READ_ONCE(keypair->receiving_counter.counter));
+ 			goto next;
+ 		}
  
--- 
-2.41.0
-
 
