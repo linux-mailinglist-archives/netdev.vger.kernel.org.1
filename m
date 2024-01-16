@@ -1,68 +1,65 @@
-Return-Path: <netdev+bounces-63854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08F9282FAFB
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 22:45:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D888C82FB0F
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 22:47:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 993F11F29E8C
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 21:45:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7669028C0BA
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 21:47:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A96920335;
-	Tue, 16 Jan 2024 20:01:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F49015EA86;
+	Tue, 16 Jan 2024 20:02:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bAn6Rq/1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ErUOUjQv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60F1B2032B;
-	Tue, 16 Jan 2024 20:01:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0663015EA81;
+	Tue, 16 Jan 2024 20:02:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705435314; cv=none; b=uVLGkUtX44BLj7xkf2dKEwM8HwTnEHVjHHacZY5Vgw6WYXb4Ped9Dzv7QkRKn9plXmNPnuDj8es37Fr65uefiiWXFBTvOYDqK/FpNv0Re/wmxMvrEW7qNNJBoRezIPOSoXnas5LP7h2Zq4WMI9S6Hg9Y2TCjjLxIHQC8v5rIs7o=
+	t=1705435330; cv=none; b=SYBIUPselS1LHp5aXAeEgVeI/A6sOTiOURIhC40f2Yst7Qcam4jp3DSRtLTjMGTbY/J/BA4Lngcufrva1KWymxgj2AHNj8ypPpHaK77qXbGBYktQ5RrdRD1W6MD/WQFnlXY5Dms4EjmK2spK8+FA2NzdzqVondoV7c8XX3TTGyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705435314; c=relaxed/simple;
-	bh=jy1p6ywFMR7kkdFtIwAUEx/6OTZPztTtL/Zk00n+ZmI=;
+	s=arc-20240116; t=1705435330; c=relaxed/simple;
+	bh=inDxCjU24F7wXu72KQvtYSa9mAs4oxNNLBkA6PUjkS4=;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:X-stable:
-	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=cFNaSi1tnfsCvbpUYX1lNpJ5dlc7sLtUF9qoFE2Mf4PpsIG7MbA1XfuXpufiliWQRQQsz74FzdUP2CmSVp0kosP+1+Xu51zbLjFZTF8Qc7PXHs5AJ1hVRjNvJTfDCkCLtaowJbVUCZrBD1JgeDGgikAwm0ud8rB3c3W0USob3Zs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bAn6Rq/1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60C14C433F1;
-	Tue, 16 Jan 2024 20:01:52 +0000 (UTC)
+	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=dCX4xeXNOPJj5A/0ucuFtl7kfcMubi5MwAWfFrc2a4tfzfGaRU6EWIZFqE0aVZf2ntB6IRGTCWY51xjGW/LlCQ6CsX/odR6VFJBWJ6peNCb1C0KhMmr35WD0yKYzQ+SgR3McyGVqAzeMV86D8r6uKMvpuZf2sACRO3yH+HSFYuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ErUOUjQv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C3B3C433F1;
+	Tue, 16 Jan 2024 20:02:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705435314;
-	bh=jy1p6ywFMR7kkdFtIwAUEx/6OTZPztTtL/Zk00n+ZmI=;
+	s=k20201202; t=1705435329;
+	bh=inDxCjU24F7wXu72KQvtYSa9mAs4oxNNLBkA6PUjkS4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bAn6Rq/1rNpSVDE2DK2qYwho8ndb5+Eg3xQa+JUWojMMiP5PxJ359cMGb+iAvueJ3
-	 NdvKLMA8C+E6doExhUD5c0Aapm30QqFEOcE5IsVhmUIlpc1yq+piU3+Wobi4g6WYyR
-	 HTUyWYNqWFxJxdOOHUai3zMo3LS5ez2ugs60LyWSV/HNV6Vyle0G5kzppNbgjqF0WE
-	 +wL/ZvImd+fAaBT13aYraP/CJgr5rxZ4sKQp6g/DHL6UkSbkkkXYB2yaa6sRNPVYdX
-	 FIxLf9uUEb6scdGbWP4zGsXvwPzrGZdatECeRIgcUyru/DBzOsidI4nbEz1XShFoGP
-	 0jsbBBeokNPRA==
+	b=ErUOUjQvIw4QCNFegwcN2a7dANJc31cqH11Qr0q84Vvf3q4WJf2poF+AdqL2iDSuO
+	 rnlZA3lCkh3FrfUgDPep5JN+6EXKSNP+qIPFch+2BBy656sSM8RBqcCf8Qsbpia/fr
+	 RBJ1PrtlAv7IMP1a7d5ILoWAIvIMgkXjp8dQZ69erGR7lR5eF+I78Bs0G2krlIjhW8
+	 XdT3Ai1vJM8xhacIYft0aVl9n5/oO5OMtvaozdKaYf6kTXYty/u6Y4AzEK3savN4G0
+	 /pwZ8ktIQ/JjfloEB8shh4nPytvWPWQQbXriIo4Bc6GpIYVo2opXGJwwXfuSVMqB2w
+	 vldg/qHFJm+BQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Shannon Nelson <shannon.nelson@amd.com>,
-	Brett Creeley <brett.creeley@amd.com>,
+Cc: Tobias Waldekranz <tobias@waldekranz.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
 	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	drivers@pensando.io,
+	andrew@lunn.ch,
+	f.fainelli@gmail.com,
+	olteanv@gmail.com,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	florian.fainelli@broadcom.com,
-	allen.hubbe@amd.com,
-	drc@linux.vnet.ibm.com,
-	yuehaibing@huawei.com,
-	keescook@chromium.org,
-	justinstitt@google.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 25/44] ionic: pass opcode to devcmd_wait
-Date: Tue, 16 Jan 2024 14:59:54 -0500
-Message-ID: <20240116200044.258335-25-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 32/44] net: dsa: mv88e6xxx: Fix mv88e6352_serdes_get_stats error path
+Date: Tue, 16 Jan 2024 15:00:01 -0500
+Message-ID: <20240116200044.258335-32-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240116200044.258335-1-sashal@kernel.org>
 References: <20240116200044.258335-1-sashal@kernel.org>
@@ -77,61 +74,91 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.10.208
 Content-Transfer-Encoding: 8bit
 
-From: Shannon Nelson <shannon.nelson@amd.com>
+From: Tobias Waldekranz <tobias@waldekranz.com>
 
-[ Upstream commit 24f110240c03c6b5368f1203bac72883d511e606 ]
+[ Upstream commit fc82a08ae795ee6b73fb6b50785f7be248bec7b5 ]
 
-Don't rely on the PCI memory for the devcmd opcode because we
-read a 0xff value if the PCI bus is broken, which can cause us
-to report a bogus dev_cmd opcode later.
+mv88e6xxx_get_stats, which collects stats from various sources,
+expects all callees to return the number of stats read. If an error
+occurs, 0 should be returned.
 
-Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
-Reviewed-by: Brett Creeley <brett.creeley@amd.com>
+Prevent future mishaps of this kind by updating the return type to
+reflect this contract.
+
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
 Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/pensando/ionic/ionic_dev.c  | 1 +
- drivers/net/ethernet/pensando/ionic/ionic_dev.h  | 1 +
- drivers/net/ethernet/pensando/ionic/ionic_main.c | 2 +-
- 3 files changed, 3 insertions(+), 1 deletion(-)
+ drivers/net/dsa/mv88e6xxx/chip.h   | 4 ++--
+ drivers/net/dsa/mv88e6xxx/serdes.c | 8 ++++----
+ drivers/net/dsa/mv88e6xxx/serdes.h | 8 ++++----
+ 3 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_dev.c b/drivers/net/ethernet/pensando/ionic/ionic_dev.c
-index dc5fbc2704f3..b5f681918f6e 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_dev.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_dev.c
-@@ -200,6 +200,7 @@ void ionic_dev_cmd_comp(struct ionic_dev *idev, union ionic_dev_cmd_comp *comp)
+diff --git a/drivers/net/dsa/mv88e6xxx/chip.h b/drivers/net/dsa/mv88e6xxx/chip.h
+index 51a7ff44478e..67e52c481504 100644
+--- a/drivers/net/dsa/mv88e6xxx/chip.h
++++ b/drivers/net/dsa/mv88e6xxx/chip.h
+@@ -536,8 +536,8 @@ struct mv88e6xxx_ops {
+ 	int (*serdes_get_sset_count)(struct mv88e6xxx_chip *chip, int port);
+ 	int (*serdes_get_strings)(struct mv88e6xxx_chip *chip,  int port,
+ 				  uint8_t *data);
+-	int (*serdes_get_stats)(struct mv88e6xxx_chip *chip,  int port,
+-				uint64_t *data);
++	size_t (*serdes_get_stats)(struct mv88e6xxx_chip *chip, int port,
++				   uint64_t *data);
  
- void ionic_dev_cmd_go(struct ionic_dev *idev, union ionic_dev_cmd *cmd)
+ 	/* SERDES registers for ethtool */
+ 	int (*serdes_get_regs_len)(struct mv88e6xxx_chip *chip,  int port);
+diff --git a/drivers/net/dsa/mv88e6xxx/serdes.c b/drivers/net/dsa/mv88e6xxx/serdes.c
+index 6920e62c864d..9494d75eec62 100644
+--- a/drivers/net/dsa/mv88e6xxx/serdes.c
++++ b/drivers/net/dsa/mv88e6xxx/serdes.c
+@@ -314,8 +314,8 @@ static uint64_t mv88e6352_serdes_get_stat(struct mv88e6xxx_chip *chip,
+ 	return val;
+ }
+ 
+-int mv88e6352_serdes_get_stats(struct mv88e6xxx_chip *chip, int port,
+-			       uint64_t *data)
++size_t mv88e6352_serdes_get_stats(struct mv88e6xxx_chip *chip, int port,
++				  uint64_t *data)
  {
-+	idev->opcode = cmd->cmd.opcode;
- 	memcpy_toio(&idev->dev_cmd_regs->cmd, cmd, sizeof(*cmd));
- 	iowrite32(0, &idev->dev_cmd_regs->done);
- 	iowrite32(1, &idev->dev_cmd_regs->doorbell);
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_dev.h b/drivers/net/ethernet/pensando/ionic/ionic_dev.h
-index 64d27e8e0772..1ce0d307a9d0 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_dev.h
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_dev.h
-@@ -136,6 +136,7 @@ struct ionic_dev {
- 	unsigned long last_hb_time;
- 	u32 last_hb;
- 	u8 last_fw_status;
-+	u8 opcode;
+ 	struct mv88e6xxx_port *mv88e6xxx_port = &chip->ports[port];
+ 	struct mv88e6352_serdes_hw_stat *stat;
+@@ -631,8 +631,8 @@ static uint64_t mv88e6390_serdes_get_stat(struct mv88e6xxx_chip *chip, int lane,
+ 	return reg[0] | ((u64)reg[1] << 16) | ((u64)reg[2] << 32);
+ }
  
- 	u64 __iomem *db_pages;
- 	dma_addr_t phy_db_pages;
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_main.c b/drivers/net/ethernet/pensando/ionic/ionic_main.c
-index 00b6985edea0..694e710244e6 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_main.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_main.c
-@@ -333,7 +333,7 @@ int ionic_dev_cmd_wait(struct ionic *ionic, unsigned long max_seconds)
- 	 */
- 	max_wait = jiffies + (max_seconds * HZ);
- try_again:
--	opcode = readb(&idev->dev_cmd_regs->cmd.cmd.opcode);
-+	opcode = idev->opcode;
- 	start_time = jiffies;
- 	do {
- 		done = ionic_dev_cmd_done(idev);
+-int mv88e6390_serdes_get_stats(struct mv88e6xxx_chip *chip, int port,
+-			       uint64_t *data)
++size_t mv88e6390_serdes_get_stats(struct mv88e6xxx_chip *chip, int port,
++				  uint64_t *data)
+ {
+ 	struct mv88e6390_serdes_hw_stat *stat;
+ 	int lane;
+diff --git a/drivers/net/dsa/mv88e6xxx/serdes.h b/drivers/net/dsa/mv88e6xxx/serdes.h
+index 14315f26228a..035688659b50 100644
+--- a/drivers/net/dsa/mv88e6xxx/serdes.h
++++ b/drivers/net/dsa/mv88e6xxx/serdes.h
+@@ -116,13 +116,13 @@ irqreturn_t mv88e6390_serdes_irq_status(struct mv88e6xxx_chip *chip, int port,
+ int mv88e6352_serdes_get_sset_count(struct mv88e6xxx_chip *chip, int port);
+ int mv88e6352_serdes_get_strings(struct mv88e6xxx_chip *chip,
+ 				 int port, uint8_t *data);
+-int mv88e6352_serdes_get_stats(struct mv88e6xxx_chip *chip, int port,
+-			       uint64_t *data);
++size_t mv88e6352_serdes_get_stats(struct mv88e6xxx_chip *chip, int port,
++				  uint64_t *data);
+ int mv88e6390_serdes_get_sset_count(struct mv88e6xxx_chip *chip, int port);
+ int mv88e6390_serdes_get_strings(struct mv88e6xxx_chip *chip,
+ 				 int port, uint8_t *data);
+-int mv88e6390_serdes_get_stats(struct mv88e6xxx_chip *chip, int port,
+-			       uint64_t *data);
++size_t mv88e6390_serdes_get_stats(struct mv88e6xxx_chip *chip, int port,
++				  uint64_t *data);
+ 
+ int mv88e6352_serdes_get_regs_len(struct mv88e6xxx_chip *chip, int port);
+ void mv88e6352_serdes_get_regs(struct mv88e6xxx_chip *chip, int port, void *_p);
 -- 
 2.43.0
 
