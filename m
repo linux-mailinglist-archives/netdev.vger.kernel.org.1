@@ -1,162 +1,90 @@
-Return-Path: <netdev+bounces-63720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C47D782F0AE
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 15:41:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1013B82F0CE
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 15:47:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB0031C2350B
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 14:41:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1DFA1F22502
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 14:47:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA0271BF38;
-	Tue, 16 Jan 2024 14:41:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D214E1BDEC;
+	Tue, 16 Jan 2024 14:47:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eoW8PYM2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S3SJ/Fop"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 433D01BF2A;
-	Tue, 16 Jan 2024 14:41:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82385C433F1;
-	Tue, 16 Jan 2024 14:40:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705416062;
-	bh=pi9f5n7aCz4k4GcDtHhDD5lv5OgeZ4ucYdJWw/uz8rU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eoW8PYM2MfAuIBhKaoTZlWZwOEH64nrarWgh8smz385NHA2AvWbxhu44TZid6guIO
-	 ztdPcokve4KGk/P0r48xP9LXjdlp+nfRggeFVeFp1EKUfQh1HSmalAz393OHzBH8yx
-	 HITZr7gQr/eVgLSaMXJ0zK/Hypf/9tgOSbSJiXzjxDaUW1d3OgO9S7G4+/H4mw666+
-	 L5PksNx2fvrD/Q9/Cn2uOjt9fv52HRvN58krYPnsggJ/tW1Mam7cV3tInWEBTcjzIV
-	 QhTlg/jUO4g8ofnL8rKCTYV2n5vBGWNCAEmw7Luoyo7bgDS5dKI4oEy8rewQcDvB/c
-	 CCz+OFltnyGUA==
-Date: Tue, 16 Jan 2024 14:40:39 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>
-Cc: Geert Uytterhoeven <geert+renesas@glider.be>, linux-spi@vger.kernel.org,
-	kernel@pengutronix.de, Moritz Fischer <mdf@kernel.org>,
-	Wu Hao <hao.wu@intel.com>, Xu Yilun <yilun.xu@intel.com>,
-	Tom Rix <trix@redhat.com>, linux-fpga@vger.kernel.org,
-	Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
-	Lars-Peter Clausen <lars@metafoo.de>,
-	Michael Hennerich <Michael.Hennerich@analog.com>,
-	Jonathan Cameron <jic23@kernel.org>, linux-iio@vger.kernel.org,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	linux-input@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Rayyan Ansari <rayyan@ansari.sh>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Martin Tuma <martin.tuma@digiteqautomotive.com>,
-	Mauro Carvalho Chehab <mchehab@kernel.org>,
-	linux-media@vger.kernel.org, Sergey Kozlov <serjk@netup.ru>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Yang Yingliang <yangyingliang@huawei.com>,
-	linux-mmc@vger.kernel.org, Richard Weinberger <richard@nod.at>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Amit Kumar Mahapatra via Alsa-devel <alsa-devel@alsa-project.org>,
-	Rob Herring <robh@kernel.org>, linux-mtd@lists.infradead.org,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>,
-	Ronald Wahl <ronald.wahl@raritan.com>,
-	Benson Leung <bleung@chromium.org>,
-	Tzung-Bi Shih <tzungbi@kernel.org>,
-	Guenter Roeck <groeck@chromium.org>,
-	chrome-platform@lists.linux.dev,
-	Michal Simek <michal.simek@amd.com>,
-	Max Filippov <jcmvbkbc@gmail.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	linux-arm-msm@vger.kernel.org,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-mediatek@lists.infradead.org,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Javier Martinez Canillas <javierm@redhat.com>,
-	Sam Ravnborg <sam@ravnborg.org>,
-	Amit Kumar Mahapatra <amit.kumar-mahapatra@amd.com>,
-	dri-devel@lists.freedesktop.org, linux-fbdev@vger.kernel.org,
-	linux-staging@lists.linux.dev, Rui Miguel Silva <rmfrfs@gmail.com>,
-	Viresh Kumar <vireshk@kernel.org>, Johan Hovold <johan@kernel.org>,
-	Alex Elder <elder@kernel.org>, greybus-dev@lists.linaro.org,
-	Peter Huewe <peterhuewe@gmx.de>,
-	Jarkko Sakkinen <jarkko@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
-	linux-integrity@vger.kernel.org,
-	Herve Codina <herve.codina@bootlin.com>,
-	Aaro Koskinen <aaro.koskinen@iki.fi>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	linux-usb@vger.kernel.org, Helge Deller <deller@gmx.de>,
-	Dario Binacchi <dario.binacchi@amarulasolutions.com>,
-	Kalle Valo <kvalo@kernel.org>, Dmitry Antipov <dmantipov@yandex.ru>,
-	libertas-dev@lists.infradead.org, linux-wireless@vger.kernel.org,
-	Jonathan Corbet <corbet@lwn.net>, James Clark <james.clark@arm.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-doc@vger.kernel.org
-Subject: Re: [PATCH 00/33] spi: get rid of some legacy macros
-Message-ID: <3404c9af-6c11-45d7-9ba4-a120e21e407e@sirena.org.uk>
-References: <cover.1705348269.git.u.kleine-koenig@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E681BF2A;
+	Tue, 16 Jan 2024 14:47:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-559c6b833b0so74879a12.1;
+        Tue, 16 Jan 2024 06:47:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705416435; x=1706021235; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=UQDU3E1p1osKPCGDqpYMZ1iYLawK5EwnUnBYY4juRVc=;
+        b=S3SJ/FopZ0dnO0SMLSZ9jIaPpPc9sl4BFkkPN7RR0pQ8QSUJDRUKIqV9X1bNw7yCJc
+         7Lst5RJWMpe30rF91zRSdIYIibazQBSFOIz0NUTvW22X/cjC/CsYyLfY7c5cKvmyxIA4
+         cFsD6z3xr8qXttiB0wrmrrIVUN39+YbJ7OlB18jBPP/ho7sABW4AZVblXmmd91a6oab5
+         tZvpdgm2HEt6pBL+gkUtpVVFqrmPMkmRbPuriYxKUoguj71DbLkFN3kWYyf8FVQ+aeOC
+         sgFsMdTZvy0fpzsqdRt0bSZ4k7g0kpTx7vv3M5+tz6uzTdgPP6bzl4p5f0Ih5gpyZ/01
+         ZdkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705416435; x=1706021235;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UQDU3E1p1osKPCGDqpYMZ1iYLawK5EwnUnBYY4juRVc=;
+        b=C3qe35hl7RV+X3v10D/PSpq2yyIxo7UzPnpOEScgdLVCLeuLvBBPBRiVXJFiUrDn8E
+         FFEWu5ubnXMzCS30Y2bNyQ6AwlmqtWiRXHpPJApZN3F5YRxMDMqU6ml1RDfG1ZjzZBgA
+         asZxXxCY2XCe6XcjFxS81wuk0Ml/5vh7hhtrNItmHlx+tB6+YqUtWVmqfcgbY2Mys4KG
+         6OhLsM7evjjv3ly783ftitNpauWIJ5SMW4OLCooib3cmQBpLFg2zV2rnobNEPrbqI+Yi
+         QNcYE8xQtYU1ysb9yjkPX45pFPRRt9tYkw/5XJdG4jknAJUFpU1pfCSOeKIQ1mEj47Si
+         THlg==
+X-Gm-Message-State: AOJu0Yy5+tz1OGO9ml08I5WUR/LcvCOOfuaHIoJQz8YwADNTivGKlj/g
+	FCsKe2iqc8OjRGkmYegiKSCehpsBiT1zMQ==
+X-Google-Smtp-Source: AGHT+IEabsXGUeZRUV9gUXrqMMO5LSPAqVQooevyyIbe9XsJNDr5iRadStep4DBK1o2oqLwvVHV19Q==
+X-Received: by 2002:a17:906:3ac2:b0:a23:6dd6:7eed with SMTP id z2-20020a1709063ac200b00a236dd67eedmr3215379ejd.77.1705416435327;
+        Tue, 16 Jan 2024 06:47:15 -0800 (PST)
+Received: from skbuf ([188.25.255.36])
+        by smtp.gmail.com with ESMTPSA id cx6-20020a170907168600b00a2d5ef80043sm3788703ejd.129.2024.01.16.06.47.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Jan 2024 06:47:15 -0800 (PST)
+Date: Tue, 16 Jan 2024 16:47:12 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: syzbot <syzbot+7ec955e36bb239bd720f@syzkaller.appspotmail.com>
+Cc: andrew@lunn.ch, daniel@iogearbox.net, davem@davemloft.net,
+	edumazet@google.com, f.fainelli@gmail.com, hkallweit1@gmail.com,
+	kuba@kernel.org, linux-kernel@vger.kernel.org,
+	linux@armlinux.org.uk, maxime.chevallier@bootlin.com,
+	netdev@vger.kernel.org, pabeni@redhat.com, sd@queasysnail.net,
+	syzkaller-bugs@googlegroups.com, vladimir.oltean@nxp.com,
+	Edward Adam Davis <eadavis@qq.com>, Hillf Danton <hdanton@sina.com>
+Subject: Re: [syzbot] [net?] KASAN: slab-out-of-bounds Read in
+ dsa_user_prechangeupper
+Message-ID: <20240116144712.lxiw4pfjklidnrck@skbuf>
+References: <00000000000002faa2060f02e766@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="c8yli56mmI+gJGEV"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1705348269.git.u.kleine-koenig@pengutronix.de>
-X-Cookie: Programmers do it bit by bit.
+In-Reply-To: <00000000000002faa2060f02e766@google.com>
 
+On Mon, Jan 15, 2024 at 01:43:20PM -0800, syzbot wrote:
+> If the report is a duplicate of another one, reply with:
+> #syz dup: exact-subject-of-another-report
 
---c8yli56mmI+gJGEV
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+#syz dup: KASAN: slab-out-of-bounds Read in dsa_user_changeupper
 
-On Mon, Jan 15, 2024 at 09:12:46PM +0100, Uwe Kleine-K=F6nig wrote:
-
-> In commit 8caab75fd2c2 ("spi: Generalize SPI "master" to "controller"")
-> some functions were renamed. Further some compat defines were introduced
-> to map the old names to the new ones.
-
-> Patch #18 and #19 touch the same driver, otherwise the patches #1 - #31
-> are pairwise independent and could be applied by their respective
-> maintainers. The alternative is to let all patches go via the spi tree.
-> Mark, what's your preference here?
-
-I don't have a strong preference here, I'm happy to take all the patches
-if the maintainers for the other subsystem are OK with that - ideally
-I'd apply things at -rc1 but the timeline is a bit tight there.  I think
-my plan here unless anyone objects (or I notice something myself) will
-be to queue things at -rc3, please shout if that doesn't seem
-reasonable.
-
---c8yli56mmI+gJGEV
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmWmlVwACgkQJNaLcl1U
-h9AImgf/YhrOsj57KBdfXCGkJi2n+rTwU/YN3Vvfy2fP+4gmJoFGfjk1o+luXQwi
-q3+RNetq9JicN07DE0eggUdY7EqvLtghmHnQWYraw+gEPT7PwkiFuKZgDEy79tmH
-pNpJuEKTeDipvLkXCVMzD0T+NrW2BXshkACyxLpBrh+ewGJpmmgJEH8LEo52dxrk
-uLfK3YjSYco5zXw8Dzak8Ea9Hb57dnySjT6aQf8GRXZMjNYAPqMC27Pzd5pWHnD1
-am4raQY/1ji5yjiVs38+2RB0EnWlFJyj0VvC9vL5PEhkz0XiW3OTTedLKcxKKoYv
-H+d+5ZwIRVx3bl+qcRRzH8EMyJW7pA==
-=Umm1
------END PGP SIGNATURE-----
-
---c8yli56mmI+gJGEV--
+[1] https://lore.kernel.org/netdev/0000000000001d4255060e87545c@google.com/
 
