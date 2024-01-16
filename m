@@ -1,287 +1,132 @@
-Return-Path: <netdev+bounces-63646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38D9882EA8F
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 09:00:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE70D82EAA7
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 09:05:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3D4728508F
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 08:00:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2EAA1C22BB3
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 08:05:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 730B811701;
-	Tue, 16 Jan 2024 07:59:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CB9911703;
+	Tue, 16 Jan 2024 08:05:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3627812B80;
-	Tue, 16 Jan 2024 07:59:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R371e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0W-lNYPz_1705391970;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W-lNYPz_1705391970)
-          by smtp.aliyun-inc.com;
-          Tue, 16 Jan 2024 15:59:31 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: netdev@vger.kernel.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	virtualization@lists.linux.dev,
-	bpf@vger.kernel.org
-Subject: [PATCH net-next 5/5] virtio_net: sq support premapped mode
-Date: Tue, 16 Jan 2024 15:59:24 +0800
-Message-Id: <20240116075924.42798-6-xuanzhuo@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20240116075924.42798-1-xuanzhuo@linux.alibaba.com>
-References: <20240116075924.42798-1-xuanzhuo@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D00D0125AF
+	for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 08:05:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-360a49993dfso58390075ab.3
+        for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 00:05:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705392322; x=1705997122;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XRJjfQnPLTBgxpKiiBjqe0Wn3Mav+RvkhMaMKCvAxdc=;
+        b=Qr5biYm3qZ62Ft6AL2/vZMrIShDe1QYeZ1q0uuXalrs6G8VNUELgSfvTPENRYH1vgq
+         sCTnRYw2B4WUltrrIhW3HWa2Tjyz6my7wWAksEaVl66l6Fx815Rrn9FL6eLM0qrXg0ob
+         1up31xhRCkobS7+pOklo2lxZeEhugeRDwhiExazFJuW9TKf3NtQJc8Ry5+3kogWKekyq
+         2T2fmjwNHCEq/Sk1Sf0e75JoUx6YenMsqkHN7+zdqArzVP+Qqf1V78r8cDYp02U0tOOv
+         9pPS4p2ajLsYBNOfS4R+XVHukPlmXwsa5JP0L8X1lpaA5KnzaS+1XWo2AbGQDrpfVCgM
+         3qUA==
+X-Gm-Message-State: AOJu0YwswE5HQanEl42XcwIm1fyMJ9F5qPXC3pLh8Hs9m13sopRpU18K
+	Xnq2m9Mnt/QrZszVoL/1yOvWmdS5f7rf7nBQil7ld3sOGQOt
+X-Google-Smtp-Source: AGHT+IF7wz3ASbidj8tbeNxztPcS5M5jMBiWRt+3G8NchKbnGwMLXkuw3hCCLciBPEyEWc1SkDLerJotzSeGStzR2jQ/nv2lkAzl
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Git-Hash: e56718642c76
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:1aa6:b0:35f:d9cc:1c9b with SMTP id
+ l6-20020a056e021aa600b0035fd9cc1c9bmr1014379ilv.0.1705392322110; Tue, 16 Jan
+ 2024 00:05:22 -0800 (PST)
+Date: Tue, 16 Jan 2024 00:05:22 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000008fef0b060f0b97cf@google.com>
+Subject: [syzbot] [wireless?] WARNING in cfg80211_chandef_dfs_required
+From: syzbot <syzbot+6939539b3929b3f8d8c3@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-If the xsk is enabling, the xsk tx will share the send queue.
-But the xsk requires that the send queue use the premapped mode.
-So the send queue must support premapped mode.
+Hello,
 
-command: pktgen_sample01_simple.sh -i eth0 -s 16/1400 -d 10.0.0.123 -m 00:16:3e:12:e1:3e -n 0 -p 100
-machine:  ecs.ebmg6e.26xlarge of Aliyun
-cpu: Intel(R) Xeon(R) Platinum 8269CY CPU @ 2.50GHz
-iommu mode: intel_iommu=on iommu.strict=1 iommu=nopt
+syzbot found the following issue on:
 
-                      |        iommu off           |        iommu on
-----------------------|-----------------------------------------------------
-                      | 16         |  1400         | 16         | 1400
-----------------------|-----------------------------------------------------
-Before:               |1716796.00  |  1581829.00   | 390756.00  | 374493.00
-After(premapped off): |1733794.00  |  1576259.00   | 390189.00  | 378128.00
-After(premapped on):  |1707107.00  |  1562917.00   | 385667.00  | 373584.00
+HEAD commit:    052d534373b7 Merge tag 'exfat-for-6.8-rc1' of git://git.ke..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=11cc88a5e80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=878a2a4af11180a7
+dashboard link: https://syzkaller.appspot.com/bug?extid=6939539b3929b3f8d8c3
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
-Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/9085b1d0af36/disk-052d5343.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/dff804edb473/vmlinux-052d5343.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/2a5cd81d366a/bzImage-052d5343.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+6939539b3929b3f8d8c3@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 18619 at net/wireless/chan.c:623 cfg80211_chandef_dfs_required+0x2f4/0x350 net/wireless/chan.c:623
+Modules linked in:
+CPU: 1 PID: 18619 Comm: kworker/1:1 Not tainted 6.7.0-syzkaller-09928-g052d534373b7 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+Workqueue: events_power_efficient reg_check_chans_work
+RIP: 0010:cfg80211_chandef_dfs_required+0x2f4/0x350 net/wireless/chan.c:623
+Code: ee e8 40 b6 9b f7 83 fd 3f 0f 87 a7 36 9e 00 e8 c2 ba 9b f7 41 bc 01 00 00 00 89 e9 49 d3 e4 e9 86 fd ff ff e8 ad ba 9b f7 90 <0f> 0b 90 41 bc ea ff ff ff e9 72 fd ff ff e8 19 31 f3 f7 e9 84 fe
+RSP: 0018:ffffc9000367fb88 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: ffffc9000367fc58 RCX: ffffffff89ec532f
+RDX: ffff888054c70000 RSI: ffffffff89ec55f3 RDI: 0000000000000001
+RBP: 0000000000000001 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
+R13: ffff88807d7c8700 R14: 0000000000000001 R15: 0000000000000001
+FS:  0000000000000000(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f65d08d56c6 CR3: 000000004bbf4000 CR4: 0000000000350ef0
+Call Trace:
+ <TASK>
+ _cfg80211_reg_can_beacon+0xaa/0x660 net/wireless/chan.c:1424
+ reg_wdev_chan_valid net/wireless/reg.c:2442 [inline]
+ reg_leave_invalid_chans net/wireless/reg.c:2469 [inline]
+ reg_check_chans_work+0x602/0x1050 net/wireless/reg.c:2482
+ process_one_work+0x886/0x15d0 kernel/workqueue.c:2633
+ process_scheduled_works kernel/workqueue.c:2706 [inline]
+ worker_thread+0x8b9/0x1290 kernel/workqueue.c:2787
+ kthread+0x2c6/0x3a0 kernel/kthread.c:388
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+ </TASK>
+
+
 ---
- drivers/net/virtio/main.c       | 119 ++++++++++++++++++++++++++++----
- drivers/net/virtio/virtio_net.h |  10 ++-
- 2 files changed, 116 insertions(+), 13 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/net/virtio/main.c b/drivers/net/virtio/main.c
-index 4fbf612da235..53143f95a3a0 100644
---- a/drivers/net/virtio/main.c
-+++ b/drivers/net/virtio/main.c
-@@ -168,13 +168,39 @@ static struct xdp_frame *ptr_to_xdp(void *ptr)
- 	return (struct xdp_frame *)((unsigned long)ptr & ~VIRTIO_XDP_FLAG);
- }
- 
-+static void virtnet_sq_unmap_buf(struct virtnet_sq *sq, struct virtio_dma_head *dma)
-+{
-+	int i;
-+
-+	if (!dma)
-+		return;
-+
-+	for (i = 0; i < dma->next; ++i)
-+		virtqueue_dma_unmap_single_attrs(sq->vq,
-+						 dma->items[i].addr,
-+						 dma->items[i].length,
-+						 DMA_TO_DEVICE, 0);
-+	dma->next = 0;
-+}
-+
- static void __free_old_xmit(struct virtnet_sq *sq, bool in_napi,
- 			    u64 *bytes, u64 *packets)
- {
-+	struct virtio_dma_head *dma;
- 	unsigned int len;
- 	void *ptr;
- 
--	while ((ptr = virtqueue_get_buf(sq->vq, &len)) != NULL) {
-+	if (virtqueue_get_dma_premapped(sq->vq)) {
-+		dma = &sq->dma.head;
-+		dma->num = ARRAY_SIZE(sq->dma.items);
-+		dma->next = 0;
-+	} else {
-+		dma = NULL;
-+	}
-+
-+	while ((ptr = virtqueue_get_buf_ctx_dma(sq->vq, &len, dma, NULL)) != NULL) {
-+		virtnet_sq_unmap_buf(sq, dma);
-+
- 		if (!is_xdp_frame(ptr)) {
- 			struct sk_buff *skb = ptr;
- 
-@@ -572,16 +598,70 @@ static void *virtnet_rq_alloc(struct virtnet_rq *rq, u32 size, gfp_t gfp)
- 	return buf;
- }
- 
--static void virtnet_rq_set_premapped(struct virtnet_info *vi)
-+static void virtnet_set_premapped(struct virtnet_info *vi)
- {
- 	int i;
- 
--	/* disable for big mode */
--	if (!vi->mergeable_rx_bufs && vi->big_packets)
--		return;
-+	for (i = 0; i < vi->max_queue_pairs; i++) {
-+		virtqueue_set_dma_premapped(vi->sq[i].vq);
- 
--	for (i = 0; i < vi->max_queue_pairs; i++)
--		virtqueue_set_dma_premapped(vi->rq[i].vq);
-+		/* TODO for big mode */
-+		if (vi->mergeable_rx_bufs || !vi->big_packets)
-+			virtqueue_set_dma_premapped(vi->rq[i].vq);
-+	}
-+}
-+
-+static void virtnet_sq_unmap_sg(struct virtnet_sq *sq, u32 num)
-+{
-+	struct scatterlist *sg;
-+	u32 i;
-+
-+	for (i = 0; i < num; ++i) {
-+		sg = &sq->sg[i];
-+
-+		virtqueue_dma_unmap_single_attrs(sq->vq,
-+						 sg->dma_address,
-+						 sg->length,
-+						 DMA_TO_DEVICE, 0);
-+	}
-+}
-+
-+static int virtnet_sq_map_sg(struct virtnet_sq *sq, u32 num)
-+{
-+	struct scatterlist *sg;
-+	u32 i;
-+
-+	for (i = 0; i < num; ++i) {
-+		sg = &sq->sg[i];
-+		sg->dma_address = virtqueue_dma_map_single_attrs(sq->vq, sg_virt(sg),
-+								 sg->length,
-+								 DMA_TO_DEVICE, 0);
-+		if (virtqueue_dma_mapping_error(sq->vq, sg->dma_address))
-+			goto err;
-+	}
-+
-+	return 0;
-+
-+err:
-+	virtnet_sq_unmap_sg(sq, i);
-+	return -ENOMEM;
-+}
-+
-+static int virtnet_add_outbuf(struct virtnet_sq *sq, u32 num, void *data)
-+{
-+	int ret;
-+
-+	if (virtqueue_get_dma_premapped(sq->vq)) {
-+		ret = virtnet_sq_map_sg(sq, num);
-+		if (ret)
-+			return -ENOMEM;
-+	}
-+
-+	ret = virtqueue_add_outbuf(sq->vq, sq->sg, num, data, GFP_ATOMIC);
-+	if (ret && virtqueue_get_dma_premapped(sq->vq))
-+		virtnet_sq_unmap_sg(sq, num);
-+
-+	return ret;
- }
- 
- static void free_old_xmit(struct virtnet_sq *sq, bool in_napi)
-@@ -687,8 +767,7 @@ static int __virtnet_xdp_xmit_one(struct virtnet_info *vi,
- 			    skb_frag_size(frag), skb_frag_off(frag));
- 	}
- 
--	err = virtqueue_add_outbuf(sq->vq, sq->sg, nr_frags + 1,
--				   xdp_to_ptr(xdpf), GFP_ATOMIC);
-+	err = virtnet_add_outbuf(sq, nr_frags + 1, xdp_to_ptr(xdpf));
- 	if (unlikely(err))
- 		return -ENOSPC; /* Caller handle free/refcnt */
- 
-@@ -2154,7 +2233,7 @@ static int xmit_skb(struct virtnet_sq *sq, struct sk_buff *skb)
- 			return num_sg;
- 		num_sg++;
- 	}
--	return virtqueue_add_outbuf(sq->vq, sq->sg, num_sg, skb, GFP_ATOMIC);
-+	return virtnet_add_outbuf(sq, num_sg, skb);
- }
- 
- static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
-@@ -4011,9 +4090,25 @@ static void free_receive_page_frags(struct virtnet_info *vi)
- 
- static void virtnet_sq_free_unused_bufs(struct virtqueue *vq)
- {
-+	struct virtnet_info *vi = vq->vdev->priv;
-+	struct virtio_dma_head *dma;
-+	struct virtnet_sq *sq;
-+	int i = vq2txq(vq);
- 	void *buf;
- 
--	while ((buf = virtqueue_detach_unused_buf(vq)) != NULL) {
-+	sq = &vi->sq[i];
-+
-+	if (virtqueue_get_dma_premapped(sq->vq)) {
-+		dma = &sq->dma.head;
-+		dma->num = ARRAY_SIZE(sq->dma.items);
-+		dma->next = 0;
-+	} else {
-+		dma = NULL;
-+	}
-+
-+	while ((buf = virtqueue_detach_unused_buf_dma(vq, dma)) != NULL) {
-+		virtnet_sq_unmap_buf(sq, dma);
-+
- 		if (!is_xdp_frame(buf))
- 			dev_kfree_skb(buf);
- 		else
-@@ -4228,7 +4323,7 @@ static int init_vqs(struct virtnet_info *vi)
- 	if (ret)
- 		goto err_free;
- 
--	virtnet_rq_set_premapped(vi);
-+	virtnet_set_premapped(vi);
- 
- 	cpus_read_lock();
- 	virtnet_set_affinity(vi);
-diff --git a/drivers/net/virtio/virtio_net.h b/drivers/net/virtio/virtio_net.h
-index 066a2b9d2b3c..dda144cc91c7 100644
---- a/drivers/net/virtio/virtio_net.h
-+++ b/drivers/net/virtio/virtio_net.h
-@@ -48,13 +48,21 @@ struct virtnet_rq_dma {
- 	u16 need_sync;
- };
- 
-+struct virtnet_sq_dma {
-+	struct virtio_dma_head head;
-+	struct virtio_dma_item items[MAX_SKB_FRAGS + 2];
-+};
-+
- /* Internal representation of a send virtqueue */
- struct virtnet_sq {
- 	/* Virtqueue associated with this virtnet_sq */
- 	struct virtqueue *vq;
- 
- 	/* TX: fragments + linear part + virtio header */
--	struct scatterlist sg[MAX_SKB_FRAGS + 2];
-+	union {
-+		struct scatterlist sg[MAX_SKB_FRAGS + 2];
-+		struct virtnet_sq_dma dma;
-+	};
- 
- 	/* Name of the send queue: output.$index */
- 	char name[16];
--- 
-2.32.0.3.g01195cf9f
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
