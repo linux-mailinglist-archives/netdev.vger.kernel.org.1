@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-63639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63640-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04E5682EA61
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 08:55:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 011F782EA66
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 08:56:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2ADC1C2272E
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 07:55:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B31321F23B01
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 07:56:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02711111A9;
-	Tue, 16 Jan 2024 07:55:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6314B111AE;
+	Tue, 16 Jan 2024 07:56:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A438C1119E
-	for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 07:55:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 184F9111A4
+	for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 07:56:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-35fffb6fe5bso95058625ab.2
-        for <netdev@vger.kernel.org>; Mon, 15 Jan 2024 23:55:19 -0800 (PST)
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3618e0060d1so555835ab.1
+        for <netdev@vger.kernel.org>; Mon, 15 Jan 2024 23:56:17 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705391719; x=1705996519;
+        d=1e100.net; s=20230601; t=1705391777; x=1705996577;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=LMsQsTLKvb1FkzCsH1qgj8RoFtThY6wbiVssNEiJIdI=;
-        b=hVLyXdbL+qq4Tn7M4/dFwVnq44k+987kFldSqiTbrw/qcpZtgHKTroIZK9WKHUNX+g
-         e+3PYXUb+1B0h2EhIc7Zj+r37ETDTBYHOuqvvDQC5vvizJ3Hv0DYWPFzM5O0MHKR/F2k
-         xkf2BZvjK03CvF1Ps68oxzDU8TGhyY0lQfxgqXJbeW0cIcvfRQr0ozHY/Cbrczm5L+X9
-         7zoDGDDGAsySGIX4kKOO5ReRjUz7tLwQCsIevwg3hdS56HpzrvX5c3Ls4TYhCdxhKZcq
-         1qrqp7xw1lo6rf4txwplGNYCyYZdE+ltUQJK/AKoeD1NRvvtMPSWlTGpTfdRheau3nLn
-         yhGQ==
-X-Gm-Message-State: AOJu0Yz6hQoUTiYfo25Ln7cq7kYqMpX4kxRmEobOgpzy++3tOOx54EzG
-	Rr34DYsKXNOSJdvI0DtdTAg+kf/JEKRZPS7SdH//oDONiwo6
-X-Google-Smtp-Source: AGHT+IE1/dlZSSnwqrw3wDBdBH6sno/GbfNX3CSQeTqoOyA14hD0utDfgkPDDN41N7bzUCs/G1ayGkH5PEhPbfuCH4QVc+9PEeGW
+        bh=J7GshgTWBC/O7D9m77niat5ipmKRovvawMUZYhZfFyw=;
+        b=NZqnHAp1q+qx6hS94q+6BDDy6pT4NkIT2V/47c0C9Rk9/YAU3sSKqlTmW4o/hrNtA8
+         5E+4nBq1fVNjgi96IAldZPCoS1eIw5rMySUI+V7GE67ZmZueQ8nTQ+lFav4IJ1TCqIre
+         8pFrgXAQpvgqhV5gkE10lXmD5WTYgfHoxErBOhfOb1fpGGWuxWfBRxVHx1pmY/OUJoe7
+         OsPmRFmEpzF19Vs2vjAE2mxWYFagtYAYMvMa8x9cApqFhzdm0HY7je9vrunqC92OFpvw
+         C5yKfA9viktXl4HXwIUIn4/SV0S8YxeEaYJGNtum5BJL/B9Kx27QN4UdpEj3MeAuB047
+         TfkQ==
+X-Gm-Message-State: AOJu0YxIp/DehpozFSZYltbMp5pN2FUyQ3Fyi98ePi5pSlv/O2BlZ8+r
+	whPN5l04P2nXABjqD/9l74OWi0BwBkh3eh6BWjY47+elQund
+X-Google-Smtp-Source: AGHT+IHTuwpsmrMCoqdqeAExs5Xq/9SU9ozk1yVMr5fWlgv/Xm/93W8TmhZPwd6QskksFQY41oDV/eHlSYYvte6yky9pgfmorjjN
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d87:b0:35d:61b6:c776 with SMTP id
- h7-20020a056e021d8700b0035d61b6c776mr1014004ila.0.1705391718973; Mon, 15 Jan
- 2024 23:55:18 -0800 (PST)
-Date: Mon, 15 Jan 2024 23:55:18 -0800
+X-Received: by 2002:a05:6e02:20c8:b0:35f:eb20:3599 with SMTP id
+ 8-20020a056e0220c800b0035feb203599mr969906ilq.2.1705391777202; Mon, 15 Jan
+ 2024 23:56:17 -0800 (PST)
+Date: Mon, 15 Jan 2024 23:56:17 -0800
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000009cc698060f0b7364@google.com>
-Subject: [syzbot] Monthly can report (Jan 2024)
-From: syzbot <syzbot+list73e9230888c286ba3102@syzkaller.appspotmail.com>
-To: linux-can@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	mkl@pengutronix.de, netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Message-ID: <000000000000154990060f0b773a@google.com>
+Subject: [syzbot] Monthly dccp report (Jan 2024)
+From: syzbot <syzbot+list276a372ea6a0fdcb466b@syzkaller.appspotmail.com>
+To: dccp@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 
-Hello can maintainers/developers,
+Hello dccp maintainers/developers,
 
-This is a 31-day syzbot report for the can subsystem.
+This is a 31-day syzbot report for the dccp subsystem.
 All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/can
+https://syzkaller.appspot.com/upstream/s/dccp
 
-During the period, 1 new issues were detected and 0 were fixed.
-In total, 8 issues are still open and 47 have been fixed so far.
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 4 issues are still open and 7 have been fixed so far.
 
 Some of the still happening issues:
 
 Ref Crashes Repro Title
-<1> 159     No    KMSAN: uninit-value in bpf_prog_run_generic_xdp
-                  https://syzkaller.appspot.com/bug?extid=0e6ddb1ef80986bdfe64
-<2> 9       Yes   possible deadlock in j1939_sk_errqueue (2)
-                  https://syzkaller.appspot.com/bug?extid=1591462f226d9cbf0564
-<3> 1       Yes   memory leak in can_create (2)
-                  https://syzkaller.appspot.com/bug?extid=521ac15269e89d8546e8
+<1> 102     Yes   KASAN: use-after-free Read in ccid2_hc_tx_packet_recv
+                  https://syzkaller.appspot.com/bug?extid=554ccde221001ab5479a
+<2> 51      Yes   BUG: "hc->tx_t_ipi == NUM" holds (exception!) at net/dccp/ccids/ccid3.c:LINE/ccid3_update_send_interval()
+                  https://syzkaller.appspot.com/bug?extid=94641ba6c1d768b1e35e
+<3> 17      Yes   BUG: stored value of X_recv is zero at net/dccp/ccids/ccid3.c:LINE/ccid3_first_li() (3)
+                  https://syzkaller.appspot.com/bug?extid=2ad8ef335371014d4dc7
 
 ---
 This report is generated by a bot. It may contain errors.
