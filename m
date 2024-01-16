@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-63872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B05DF82FD37
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 23:45:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5735082FD53
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 23:57:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64FCE1F2A502
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 22:45:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D341FB23D19
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 22:57:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA647208BB;
-	Tue, 16 Jan 2024 22:35:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D0E367C51;
+	Tue, 16 Jan 2024 22:56:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="W4QtaqR7"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="cfY2OqOC"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B7601DA2C;
-	Tue, 16 Jan 2024 22:35:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A71F01D68B;
+	Tue, 16 Jan 2024 22:56:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705444535; cv=none; b=K8pUXTsXWe+4eH5kTc+RaM8265Tb6e2+dOwFhx+8bDu3uYPWSiCymerG+MadktsnO7WXyvzHedFYU+ykW7rYSuPYaKUr9DU/sl3rdawJMfd+0ggg1LD/368QRsmWHKBsLwNduArA7NMcbkMXdgS0jTz86eWmYKX8MyOlq8YqRGM=
+	t=1705445819; cv=none; b=FM/6J73LQZYruPzSHvGmfe5rsqt2vWeKx+0l1LNxzO29WO7adoc0KBmRB8ozhn5mfVHRK0uWhmZ23o3/uvj88HW1N7v4u4ZhkEmhOtYS9m0BcdfeHn5cKmaGAGKU+mszln5qQ/RLaCDSfH1RWA7bhNB7yTCTjzjwgMUeQml8CX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705444535; c=relaxed/simple;
-	bh=ins1IDJZ4lyx0ENQCIEAJzl9MLbVaW2Mn2TyaG9gBUk=;
+	s=arc-20240116; t=1705445819; c=relaxed/simple;
+	bh=plU7Fyl05aYaKwdG/SP/6ie/ejtRdcYCuh2yJUj64x8=;
 	h=DKIM-Signature:Received:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To; b=RkAuIsnsIYdmGz0T/10Wgla8HRqYWhtFGIleudFeZMHH2FuhzumNojP4tqUOJZZBRo9qgZYRR5AhfWiVIngNuvi3eDhmzE/KyFg276JySFgPgD3zNSiiMBRYNBAUx1klAtBh9Kf1Oh5Wut90vH9hyvstQVAepWJnMX1vC3xHD5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=W4QtaqR7; arc=none smtp.client-ip=156.67.10.101
+	 In-Reply-To; b=ZNSWklHRnyQP3UhtoIBbJwR4DP9gnuiccG3eqUreDDJYucjlQdFfGSoBWu+eGJMpc2Ws5lqcAaKPnrpieYfqfqUglmYZzqdg9psEmuVVz9YDZcrQAc51QPd07g4Ohoa/KQ0SWM9qz+pksaNmk51b8s27GhqHaD9d3TFVjm3cwgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=cfY2OqOC; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -37,30 +37,31 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=RdhTevdQVBdb8wlxJd7xNXUyeRnkCEOfn9WkZe/WJWg=; b=W4QtaqR7NHIOIWimMjGhfOWFsm
-	PKzYCRa3+vm+SUCtszEcpa18+cQMWn8Ejkyd5cqqhgi1CABB5bYt/tfUAaef97tbwOiDzLu/Snc/8
-	0lCmYOUU+tGPH4RRI+IvLjzC/LbYe7R7yW5ch1462y3MpeZSzi3H/L2Bf/SozwnqO3UA=;
+	bh=8mVrgl5xMNMm3WZOrIWhZNDZHloqaD1XFaFbuzdsviM=; b=cfY2OqOCFRcI1e3AOkEb5pDgSI
+	iYgrk6FIHj2duCg0p3VQP/3DuAf5Ocz273VHzNCGbmWA585dW9wPwlj4i8fBGqzcClfUnP2C1Zdid
+	LFfgC8uRLttGJjLtHzwCab7cyze7pd+Kw/7RoHf6HpN1iKia0rjV+CVnwdR0auZstPoo=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rPs1e-005MRS-8j; Tue, 16 Jan 2024 23:35:18 +0100
-Date: Tue, 16 Jan 2024 23:35:18 +0100
+	id 1rPsMW-005MUt-Sm; Tue, 16 Jan 2024 23:56:52 +0100
+Date: Tue, 16 Jan 2024 23:56:52 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Bernd Edlinger <bernd.edlinger@hotmail.de>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Jiri Pirko <jiri@nvidia.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v2] net: stmmac: Wait a bit for the reset to take effect
-Message-ID: <6e33c038-45a7-4941-b5d9-ce5704e13d48@lunn.ch>
-References: <AS8P193MB1285DECD77863E02EF45828BE4A1A@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
- <AS8P193MB1285EEAFE30C0DE7B201D33CE46C2@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
+To: Jie Luo <quic_luoj@quicinc.com>
+Cc: andersson@kernel.org, konrad.dybcio@linaro.org, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	quic_kkumarcs@quicinc.com, quic_suruchia@quicinc.com,
+	quic_soni@quicinc.com, quic_pavir@quicinc.com,
+	quic_souravp@quicinc.com, quic_linchen@quicinc.com,
+	quic_leiwei@quicinc.com
+Subject: Re: [PATCH 3/6] arm64: dts: qcom: ipq5332: Add MDIO device tree
+Message-ID: <6975e79a-67eb-46d7-8445-92610b8b5198@lunn.ch>
+References: <20240110112059.2498-1-quic_luoj@quicinc.com>
+ <20240110112059.2498-4-quic_luoj@quicinc.com>
+ <4bc0aff5-8a1c-44a6-89d8-460961a61310@lunn.ch>
+ <e893c298-fbfa-4ae4-9b76-72a5030a5530@quicinc.com>
+ <61973012-3f74-4b58-9575-3bc5199f61d9@lunn.ch>
+ <5c88945b-4a80-4346-a77c-82a68ae02047@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,30 +70,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <AS8P193MB1285EEAFE30C0DE7B201D33CE46C2@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
+In-Reply-To: <5c88945b-4a80-4346-a77c-82a68ae02047@quicinc.com>
 
-On Mon, Jan 15, 2024 at 08:21:42PM +0100, Bernd Edlinger wrote:
-> otherwise the synopsys_id value may be read out wrong,
-> because the GMAC_VERSION register might still be in reset
-> state, for at least 1 us after the reset is de-asserted.
+> Another one is the MDIO slave(gpio25, 26), which is dedicated
+> for receiving the back pressure signal from the connected Ethernet switch
+> device QCA8386.
 > 
-> Add a wait for 10 us before continuing to be on the safe side.
+> There is a MDIO master block integrated in QCA8386 switch device, this
+> integrated MDIO master is dedicated for generating the back
+> pressure signal to IPQ5332 SoC.
 > 
-> > From what have you got that delay value?
-> 
-> Just try and error, with very old linux versions and old gcc versions
-> the synopsys_id was read out correctly most of the time (but not always),
-> with recent linux versions and recnet gcc versions it was read out
-> wrongly most of the time, but again not always.
-> I don't have access to the VHDL code in question, so I cannot
-> tell why it takes so long to get the correct values, I also do not
-> have more than a few hardware samples, so I cannot tell how long
-> this timeout must be in worst case.
-> Experimentally I can tell that the register is read several times
-> as zero immediately after the reset is de-asserted
+> This MDIO slave block of IPQ5322 just needs to configure these PIN
+> mux for MDC and MDIO PINs. No additional driver is needed for this MDIO
+> slave block of IPQ5332.
 
-Is zero a valid synopsys_id? If its not, maybe do the wait conditional
-on the first read returning 0?
+So there is a proprietary protocol running over the MDIO bus? And its
+completely implemented in hardware in the slave block? Is this even
+MDIO? Does it use c22 or c45 bus transactions? How is the slave
+address configured, or is that also hard coded?
 
-   Andrew
+	Andrew
 
