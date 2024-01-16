@@ -1,242 +1,150 @@
-Return-Path: <netdev+bounces-63697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9B0E82EED1
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 13:19:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EED5182EED9
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 13:22:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09EFA1C227CF
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 12:19:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6266DB2291B
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 12:22:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38DCA1B976;
-	Tue, 16 Jan 2024 12:19:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 601FE1BC21;
+	Tue, 16 Jan 2024 12:22:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="O1W8IfyF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZG0DKIKU"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4E031B80B;
-	Tue, 16 Jan 2024 12:19:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 3D8FD60002;
-	Tue, 16 Jan 2024 12:18:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1705407538;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D592F1B97B
+	for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 12:22:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1705407751;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=z8eiggSZ60rlf2uUj/3zwjpRu+iDhvHMyX3+FABqZqM=;
-	b=O1W8IfyFEUweEwpFcMN1IDn0KxTkR0EpjN2zXpri1+OyfpGPAbTrJIDJ34+ueWTOlp6ENu
-	sKesn7odpFwGHJiZla6vFQfU0ByuDN6kuESTsgpgwI/7W9OJbu5a9qY1DmGCmH3UIYX4dE
-	2w+UcGULfmjMBUUGPtBhN7adJ5I1win9+qW87B3t2ClNSStFYL6zMGEx6FyLh5a2ZAWH6c
-	8dv8pZ0c3dsUFlh5hHNxekf2o5oRfPN2AHiADlpDbeljmEwlCphT21zkGT+XK5lNENKs5L
-	DploQq7sLv97I8Uh0qS3JSj1OTnbcyOPqHmk44mwWdNQXL8Fah24LZeC4ZFI1w==
-From: Romain Gantois <romain.gantois@bootlin.com>
-Date: Tue, 16 Jan 2024 13:19:17 +0100
-Subject: [PATCH net v6] net: stmmac: Prevent DSA tags from breaking COE
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=aKkRlw+9qItJOdXpLdHpbQMWwrj04Yup3l2felUeUNk=;
+	b=ZG0DKIKUH52YwqnwpSmS14jnz3DLagEExAW0RsQ1U0u0qwf/H1Cka3rpcw4y5nCWWYAc3Q
+	p3KNPd+55EvrWcux/+60C+/MzXH2lq97WBtVKdo3keegtPRv+NHe+wpgf7+mLLcOQxaUmO
+	rkNiq2njRCDDGM3I60sEgKDh/oeLKsM=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-158-ko8r7j2kO9Oyrx_YdvoP_g-1; Tue, 16 Jan 2024 07:22:30 -0500
+X-MC-Unique: ko8r7j2kO9Oyrx_YdvoP_g-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-33686327968so1282016f8f.1
+        for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 04:22:30 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705407749; x=1706012549;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aKkRlw+9qItJOdXpLdHpbQMWwrj04Yup3l2felUeUNk=;
+        b=u/3C7iCwGn48eEPxqj4A/hZwf80orwvKklxPTZn+aCpvZZL/OpgwAkmJKpi4Z9d49u
+         5JcFeEn/W7JJuzZtdGsV7HIVEhMeJ0CE9FXH1DPHTaErFWhv4W0zyPu/3laAKsOxnPpr
+         5zuwcRbSFTreSY0dsm1AoS9EiRisATqzY6CdpNYLukzp1Uq3aDZD9yMuyph4dDt7fJJl
+         1NQwyGtpl7Qzl0pz9LEBQ03qdMH8P/IxlOjsMktdRB5jEC+x41HGAMG7d5Dk100MiTum
+         DW2se11OAoAN81ASl/fYIiuGZRljxbyIPrXq/8pfGBaKJM0FerUipwLbkZdLwXNT7Afp
+         IRIg==
+X-Gm-Message-State: AOJu0YxGUFrzluPOft9dF3ivNvzkon53IL/AcaHlMZAwYuFPrh0wrHmI
+	ucbfJAEUUTJ9J+laK5ewWNiqJA6hRVHHfen+/p399ygRuHa3cWs9c/iHaUz1wZy3vVQnxvksgdv
+	MlOJnYVWhxsRQkDyDowS0JB7d
+X-Received: by 2002:a05:6000:923:b0:337:2a0b:a7f3 with SMTP id cx3-20020a056000092300b003372a0ba7f3mr8374807wrb.2.1705407749133;
+        Tue, 16 Jan 2024 04:22:29 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHd84/6POBkg40gVazCg+aIvqbtGccXWaCSo4YRcVhkOits6w9IubBrdoqZfFW8xNwdG2wL7g==
+X-Received: by 2002:a05:6000:923:b0:337:2a0b:a7f3 with SMTP id cx3-20020a056000092300b003372a0ba7f3mr8374798wrb.2.1705407748759;
+        Tue, 16 Jan 2024 04:22:28 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-241-126.dyn.eolo.it. [146.241.241.126])
+        by smtp.gmail.com with ESMTPSA id q20-20020a05600c46d400b0040e395cd20bsm22981924wmo.7.2024.01.16.04.22.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Jan 2024 04:22:28 -0800 (PST)
+Message-ID: <f5ddf800df95cdce32637d41bc1539aed0a7b6f3.camel@redhat.com>
+Subject: Re: [PATCH v2] net: stmmac: Wait a bit for the reset to take effect
+From: Paolo Abeni <pabeni@redhat.com>
+To: Bernd Edlinger <bernd.edlinger@hotmail.de>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,  Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+ linux-arm-kernel@lists.infradead.org, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, Jiri Pirko <jiri@nvidia.com>, Andrew Morton
+ <akpm@linux-foundation.org>
+Date: Tue, 16 Jan 2024 13:22:26 +0100
+In-Reply-To: <AS8P193MB1285EEAFE30C0DE7B201D33CE46C2@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
+References: 
+	<AS8P193MB1285DECD77863E02EF45828BE4A1A@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
+	 <AS8P193MB1285EEAFE30C0DE7B201D33CE46C2@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240116-prevent_dsa_tags-v6-1-ec44ed59744b@bootlin.com>
-X-B4-Tracking: v=1; b=H4sIAEV0pmUC/23O0YrDIBAF0F8pPq/FsSaaPu1/LKWYOibCVotK6
- BLy7zsJ+7ChfbzDncOdWcEcsLDzYWYZp1BCihTajwO7jTYOyIOjzKSQSoAw/EEtjPXqir1WOxS
- u+1449ML1Bhi9UcGH50Z+sYiVXejoc7rzOma0Ow0AtNJHfTJacsmpZEM8DjbWFMpnn1L9pnxL9
- xUeQ6kp/2xTJ7Xxf073umpSHLg3xmgN3krf7rR10tT8IwDeEA0R7Ql111jlQHZ7YlmWX8+n/dY
- +AQAA
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Miquel Raynal <miquel.raynal@bootlin.com>, 
- Maxime Chevallier <maxime.chevallier@bootlin.com>, 
- Sylvain Girard <sylvain.girard@se.com>, 
- Pascal EBERHARD <pascal.eberhard@se.com>, 
- Richard Tresidder <rtresidd@electromag.com.au>, 
- Linus Walleij <linus.walleij@linaro.org>, 
- Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
- linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org, 
- Romain Gantois <romain.gantois@bootlin.com>, 
- Vladimir Oltean <vladimir.oltean@nxp.com>
-X-Mailer: b4 0.12.4
-X-GND-Sasl: romain.gantois@bootlin.com
 
-Some DSA tagging protocols change the EtherType field in the MAC header
-e.g.  DSA_TAG_PROTO_(DSA/EDSA/BRCM/MTK/RTL4C_A/SJA1105). On TX these tagged
-frames are ignored by the checksum offload engine and IP header checker of
-some stmmac cores.
+On Mon, 2024-01-15 at 20:21 +0100, Bernd Edlinger wrote:
+> otherwise the synopsys_id value may be read out wrong,
+> because the GMAC_VERSION register might still be in reset
+> state, for at least 1 us after the reset is de-asserted.
+>=20
+> Add a wait for 10 us before continuing to be on the safe side.
+>=20
+> > From what have you got that delay value?
+>=20
+> Just try and error, with very old linux versions and old gcc versions
+> the synopsys_id was read out correctly most of the time (but not always),
+> with recent linux versions and recnet gcc versions it was read out
+> wrongly most of the time, but again not always.
+> I don't have access to the VHDL code in question, so I cannot
+> tell why it takes so long to get the correct values, I also do not
+> have more than a few hardware samples, so I cannot tell how long
+> this timeout must be in worst case.
+> Experimentally I can tell that the register is read several times
+> as zero immediately after the reset is de-asserted, also adding several
+> no-ops is not enough, adding a printk is enough, also udelay(1) seems to
+> be enough but I tried that not very often, and I have not access to many
+> hardware samples to be 100% sure about the necessary delay.
+> And since the udelay here is only executed once per device instance,
+> it seems acceptable to delay the boot for 10 us.
+>=20
+> BTW: my hardware's synopsys id is 0x37.
+>=20
+> Signed-off-by: Bernd Edlinger <bernd.edlinger@hotmail.de>
+>=20
+> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
-On RX, the stmmac driver wrongly assumes that checksums have been computed
-for these tagged packets, and sets CHECKSUM_UNNECESSARY.
+Please have a better look at the process documentation.
 
-Add an additional check in the stmmac TX and RX hotpaths so that COE is
-deactivated for packets with ethertypes that will not trigger the COE and
-IP header checks.
+No empty lines are allowed in the tag area.
 
-Fixes: 6b2c6e4a938f ("net: stmmac: propagate feature flags to vlan")
-Cc:  <stable@vger.kernel.org>
-Reported-by: Richard Tresidder <rtresidd@electromag.com.au>
-Link: https://lore.kernel.org/netdev/e5c6c75f-2dfa-4e50-a1fb-6bf4cdb617c2@electromag.com.au/
-Reported-by: Romain Gantois <romain.gantois@bootlin.com>
-Link: https://lore.kernel.org/netdev/c57283ed-6b9b-b0e6-ee12-5655c1c54495@bootlin.com/
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-Signed-off-by: Romain Gantois <romain.gantois@bootlin.com>
----
-Hello everyone,
+A fixes tag is requires, something alike:
 
-This is the sixth version of my proposed fix for the stmmac checksum
-offloading issue that has recently been reported.
+Fixes: <blamed commit hash> ("<blamed commit title>")
 
-significant changes in v4:
-- Removed "inline" from declaration of stmmac_has_ip_ethertype
+A bisection is not strictly required, you just need to be reasonably
+confident about the the culprit.
 
-significant changes in v3:
-- Use __vlan_get_protocol to make sure that 8021Q-encapsulated
-  traffic is checked correctly.
+You need to include the relevant target tree into the subj prefix (in
+this case 'net').
 
-significant changes in v2:
-- Replaced the stmmac_link_up-based fix with an ethertype check in the TX
-  and RX hotpaths.
+Please include in the recipients list the persons that provided
+feedback on previous release (Serge is missing).
 
-The Checksum Offloading Engine of some stmmac cores (e.g. DWMAC1000)
-computes an incorrect checksum when presented with DSA-tagged packets. This
-causes all TCP/UDP transfers to break when the stmmac device is connected
-to the CPU port of a DSA switch.
+I'm unsure why/how Andrew landed in the recipients list!?!
 
-I ran some tests using different tagging protocols with DSA_LOOP, and all
-of the protocols that set a custom ethertype field in the MAC header caused
-the checksum offload engine to ignore the tagged packets. On TX, this
-caused packets to egress with incorrect checksums. On RX, these packets
-were similarly ignored by the COE, yet the stmmac driver set
-CHECKSUM_UNNECESSARY, wrongly assuming that their checksums had been
-verified in hardware.
+Cheers,
 
-Version 2 of this patch series fixes this issue by checking ethertype
-fields in both the TX and RX hotpaths of the stmmac driver. On TX, if a
-non-IP ethertype is detected, the packet is checksummed in software.  On
-RX, the same condition causes stmmac to avoid setting CHECKSUM_UNNECESSARY.
-
-To measure the performance degradation to the TX/RX hotpaths, I did some
-iperf3 runs with 512-byte unfragmented UDP packets.
-
-measured degradation on TX: -466 pps (-0.2%) on RX: -338 pps (-1.2%)
-original performances on TX: 22kpps on RX: 27kpps
-
-The performance hit on the RX path can be partly explained by the fact that
-the stmmac driver doesn't set CHECKSUM_UNNECESSARY anymore.
-
-The TX performance degradation observed in v2 seems to have improved.
-It's not entirely clear to me why that is.
-
-Best Regards,
-
-Romain
-
-Romain Gantois (1):
-  net: stmmac: Prevent DSA tags from breaking COE
-
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 23 ++++++++++++++++---
- 1 file changed, 20 insertions(+), 3 deletions(-)
-
---
-2.43.0
----
-Changes in v6:
-- Style fixes
-- Link to v5: https://lore.kernel.org/r/20240111-prevent_dsa_tags-v5-1-63e795a4d129@bootlin.com
-
-Changes in v5:
-- Added missing "net" tag to subject of patch series
-- Link to v4: https://lore.kernel.org/r/20240109-prevent_dsa_tags-v4-1-f888771fa2f6@bootlin.com
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 32 ++++++++++++++++++++---
- 1 file changed, 29 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index c78a96b8eb64..a0e46369ae15 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -4435,6 +4435,28 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
- 	return NETDEV_TX_OK;
- }
- 
-+/**
-+ * stmmac_has_ip_ethertype() - Check if packet has IP ethertype
-+ * @skb: socket buffer to check
-+ *
-+ * Check if a packet has an ethertype that will trigger the IP header checks
-+ * and IP/TCP checksum engine of the stmmac core.
-+ *
-+ * Return: true if the ethertype can trigger the checksum engine, false
-+ * otherwise
-+ */
-+static bool stmmac_has_ip_ethertype(struct sk_buff *skb)
-+{
-+	int depth = 0;
-+	__be16 proto;
-+
-+	proto = __vlan_get_protocol(skb, eth_header_parse_protocol(skb),
-+				    &depth);
-+
-+	return (depth <= ETH_HLEN) &&
-+		(proto == htons(ETH_P_IP) || proto == htons(ETH_P_IPV6));
-+}
-+
- /**
-  *  stmmac_xmit - Tx entry point of the driver
-  *  @skb : the socket buffer
-@@ -4499,9 +4521,13 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
- 	/* DWMAC IPs can be synthesized to support tx coe only for a few tx
- 	 * queues. In that case, checksum offloading for those queues that don't
- 	 * support tx coe needs to fallback to software checksum calculation.
-+	 *
-+	 * Packets that won't trigger the COE e.g. most DSA-tagged packets will
-+	 * also have to be checksummed in software.
- 	 */
- 	if (csum_insertion &&
--	    priv->plat->tx_queues_cfg[queue].coe_unsupported) {
-+	    (priv->plat->tx_queues_cfg[queue].coe_unsupported ||
-+	     !stmmac_has_ip_ethertype(skb))) {
- 		if (unlikely(skb_checksum_help(skb)))
- 			goto dma_map_err;
- 		csum_insertion = !csum_insertion;
-@@ -5066,7 +5092,7 @@ static void stmmac_dispatch_skb_zc(struct stmmac_priv *priv, u32 queue,
- 		stmmac_rx_vlan(priv->dev, skb);
- 	skb->protocol = eth_type_trans(skb, priv->dev);
- 
--	if (unlikely(!coe))
-+	if (unlikely(!coe) || !stmmac_has_ip_ethertype(skb))
- 		skb_checksum_none_assert(skb);
- 	else
- 		skb->ip_summed = CHECKSUM_UNNECESSARY;
-@@ -5589,7 +5615,7 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
- 
- 		skb->protocol = eth_type_trans(skb, priv->dev);
- 
--		if (unlikely(!coe))
-+		if (unlikely(!coe) || !stmmac_has_ip_ethertype(skb))
- 			skb_checksum_none_assert(skb);
- 		else
- 			skb->ip_summed = CHECKSUM_UNNECESSARY;
-
----
-base-commit: a23aa04042187cbde16f470b49d4ad60d32e9206
-change-id: 20240108-prevent_dsa_tags-7bb0def0db81
-
-Best regards,
--- 
-Romain Gantois <romain.gantois@bootlin.com>
+Paolo
 
 
