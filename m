@@ -1,64 +1,69 @@
-Return-Path: <netdev+bounces-63777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E33482F5FD
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 20:49:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8EC882F619
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 20:51:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E3B42860CF
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 19:49:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0692BB249D5
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 19:51:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93FFB1D694;
-	Tue, 16 Jan 2024 19:43:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F11D324B4F;
+	Tue, 16 Jan 2024 19:43:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OrcmEIFp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uW9iiJiq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65E9923742;
-	Tue, 16 Jan 2024 19:43:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C21752510C;
+	Tue, 16 Jan 2024 19:43:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705434210; cv=none; b=jcdmm0bZI9Jsb+xzHHyxAB1Le6iFYVOgE74qv2FudnXOSO4k1MbIp3OnIjkoWQjVkDPsPTKNL+wMWRNIrQaqAK7dTKAzaBvEOhLvgmIPNQ9Au1jSK9ctptGYdvnarQjdDtkhS6ke5mdJrD74ZOvJg9Orxoin6iKfPNF12xxYXLk=
+	t=1705434229; cv=none; b=F9oVrXjYDiW+a/rhJOberFZxJjtHicC2Q0VgeoFPFBjxOLy9ZQHCkoVJOqMu3JXHka1PuWGGjN982RZ9shbjme43aK6feQLoLzkpwX6lt/DmxHc2Cps6r2ZvwWm7SWfzN5ghdCPMhHgHStmNaHPag811H4QFiAZRalhua927rF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705434210; c=relaxed/simple;
-	bh=ACQuwnrHOOPZAyDz3qTaDrzWugOxk+sx/8S41lB1OVI=;
+	s=arc-20240116; t=1705434229; c=relaxed/simple;
+	bh=mUAolhT90PS6HB4l7OMtqRqj16CKTUGvgr60pwrce5I=;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:X-stable:
-	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=HAzKxziwfIdPTbK2Ge25plxUPHZn5L1I1LlLgXuPO4ScbqGHgXqmwrL0ni7iI3w4LWz5PRKSPrbO+JnnxSNTHC+5HU6xqr5RjO3igrNxplhSk1FHcrxPq/Px+IUoZD1mynkE7fXnB6lczwR5TfiVh29NUV1lHab+9ELvs02XfIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OrcmEIFp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4A70C43399;
-	Tue, 16 Jan 2024 19:43:28 +0000 (UTC)
+	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=WFWS9H+qdmcaqnM9HtJ0pVNPFk/Qp34C/FJEZfIRvMVjaBURBNGlevBmy1g09BpPsU/QxIeriHa8DKtIOtl83RnO7w7TiOLp8HneOQvfn4ZmFLqsdOtFi665vVZ1BaMp4Oo9ge07rLnAI/L6lLe6PzsITVdD0liL59MD/xEjyWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uW9iiJiq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83F91C433F1;
+	Tue, 16 Jan 2024 19:43:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705434210;
-	bh=ACQuwnrHOOPZAyDz3qTaDrzWugOxk+sx/8S41lB1OVI=;
+	s=k20201202; t=1705434229;
+	bh=mUAolhT90PS6HB4l7OMtqRqj16CKTUGvgr60pwrce5I=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OrcmEIFpaWKjGjypDVvSWD5bNsQ+9dba1cq/Qby0b/28rNGA00T9jX02FYtgPR++M
-	 vnHzcVG1kZyDmUaNNgYYdTxGZNpQuyPJxqHdPuwUN48KzEsc0eIKxrV7zH04S0jrg6
-	 j0yENBr/Iag6lLjbS9GTW6LAKL5phxLxdVbzzqy6pkU6YmdXkU8sotO7gSyFIzRNzo
-	 Jko0Ih83RHFx3ZoN8jbvOxFklAAFS60+xtNrNK8tYLYYnPg8+lnGwgYTiKTKKGCExy
-	 QTb/9UVFZmyno+Lg8WtCRJ8MijxJYXI+CBy5xXJFTMiKaJK2bDI08GUb2Si2gy5rY0
-	 2+aFg89El7NtA==
+	b=uW9iiJiqkajnVfvFtgsT74ahpKdkUhm+kse2tT/lrRRzWAYBtjbrCoEZJdFEt1z9w
+	 ZY03P9mhiNT0MV8tjFoClR2Fs6YVcXZFeaBBz2TQM7Vo1WgeF4FaMxeXunmCFCBpxq
+	 P+gLVxorzk7r6NMMqJd8L96e6IwpHuqLsNRL+1ksakpgHUH6+wAu9ME3mZ0V7YJTk7
+	 ZyqSm3FAI0vzpawu6Q7ob0N32z3cNcw42hsLO79oP7uf3Ki79vxln5Kyich418xXuQ
+	 NrAW0K21wAApvjK9FQiY3T7lOs2gO/4dmqk24BpmhDF8h6h6m3UqArvB9VdlFYmOlx
+	 0zKDu6LWi+nXA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>,
-	Herb Wei <weihao.bj@ieisystem.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Yonghong Song <yonghong.song@linux.dev>,
+	Daniel Borkmann <daniel@iogearbox.net>,
 	Sasha Levin <sashal@kernel.org>,
+	ast@kernel.org,
+	andrii@kernel.org,
 	davem@davemloft.net,
 	edumazet@google.com,
+	kuba@kernel.org,
 	pabeni@redhat.com,
-	gregkh@linuxfoundation.org,
-	stern@rowland.harvard.edu,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.7 023/108] net: usb: ax88179_178a: avoid two consecutive device resets
-Date: Tue, 16 Jan 2024 14:38:49 -0500
-Message-ID: <20240116194225.250921-23-sashal@kernel.org>
+	shuah@kernel.org,
+	nathan@kernel.org,
+	sdf@google.com,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	llvm@lists.linux.dev
+Subject: [PATCH AUTOSEL 6.7 031/108] bpf: Fix a few selftest failures due to llvm18 change
+Date: Tue, 16 Jan 2024 14:38:57 -0500
+Message-ID: <20240116194225.250921-31-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240116194225.250921-1-sashal@kernel.org>
 References: <20240116194225.250921-1-sashal@kernel.org>
@@ -73,39 +78,95 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.7
 Content-Transfer-Encoding: 8bit
 
-From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+From: Yonghong Song <yonghong.song@linux.dev>
 
-[ Upstream commit d2689b6a86b9d23574bd4b654bf770b6034e2c7e ]
+[ Upstream commit b16904fd9f01b580db357ef2b1cc9e86d89576c2 ]
 
-The device is always reset two consecutive times (ax88179_reset is called
-twice), one from usbnet_probe during the device binding and the other from
-usbnet_open.
+With latest upstream llvm18, the following test cases failed:
 
-Remove the non-necessary reset during the device binding and let the reset
-operation from open to keep the normal behavior (tested with generic ASIX
-Electronics Corp. AX88179 Gigabit Ethernet device).
+  $ ./test_progs -j
+  #13/2    bpf_cookie/multi_kprobe_link_api:FAIL
+  #13/3    bpf_cookie/multi_kprobe_attach_api:FAIL
+  #13      bpf_cookie:FAIL
+  #77      fentry_fexit:FAIL
+  #78/1    fentry_test/fentry:FAIL
+  #78      fentry_test:FAIL
+  #82/1    fexit_test/fexit:FAIL
+  #82      fexit_test:FAIL
+  #112/1   kprobe_multi_test/skel_api:FAIL
+  #112/2   kprobe_multi_test/link_api_addrs:FAIL
+  [...]
+  #112     kprobe_multi_test:FAIL
+  #356/17  test_global_funcs/global_func17:FAIL
+  #356     test_global_funcs:FAIL
 
-Reported-by: Herb Wei <weihao.bj@ieisystem.com>
-Tested-by: Herb Wei <weihao.bj@ieisystem.com>
-Signed-off-by: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-Link: https://lore.kernel.org/r/20231120121239.54504-1-jtornosm@redhat.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Further analysis shows llvm upstream patch [1] is responsible for the above
+failures. For example, for function bpf_fentry_test7() in net/bpf/test_run.c,
+without [1], the asm code is:
+
+  0000000000000400 <bpf_fentry_test7>:
+     400: f3 0f 1e fa                   endbr64
+     404: e8 00 00 00 00                callq   0x409 <bpf_fentry_test7+0x9>
+     409: 48 89 f8                      movq    %rdi, %rax
+     40c: c3                            retq
+     40d: 0f 1f 00                      nopl    (%rax)
+
+... and with [1], the asm code is:
+
+  0000000000005d20 <bpf_fentry_test7.specialized.1>:
+    5d20: e8 00 00 00 00                callq   0x5d25 <bpf_fentry_test7.specialized.1+0x5>
+    5d25: c3                            retq
+
+... and <bpf_fentry_test7.specialized.1> is called instead of <bpf_fentry_test7>
+and this caused test failures for #13/#77 etc. except #356.
+
+For test case #356/17, with [1] (progs/test_global_func17.c)), the main prog
+looks like:
+
+  0000000000000000 <global_func17>:
+       0:       b4 00 00 00 2a 00 00 00 w0 = 0x2a
+       1:       95 00 00 00 00 00 00 00 exit
+
+... which passed verification while the test itself expects a verification
+failure.
+
+Let us add 'barrier_var' style asm code in both places to prevent function
+specialization which caused selftests failure.
+
+  [1] https://github.com/llvm/llvm-project/pull/72903
+
+Signed-off-by: Yonghong Song <yonghong.song@linux.dev>
+Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+Link: https://lore.kernel.org/bpf/20231127050342.1945270-1-yonghong.song@linux.dev
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/usb/ax88179_178a.c | 2 --
- 1 file changed, 2 deletions(-)
+ net/bpf/test_run.c                                     | 2 +-
+ tools/testing/selftests/bpf/progs/test_global_func17.c | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/usb/ax88179_178a.c b/drivers/net/usb/ax88179_178a.c
-index 5a1bf42ce156..d837c1887416 100644
---- a/drivers/net/usb/ax88179_178a.c
-+++ b/drivers/net/usb/ax88179_178a.c
-@@ -1315,8 +1315,6 @@ static int ax88179_bind(struct usbnet *dev, struct usb_interface *intf)
+diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
+index c9fdcc5cdce1..711cf5d59816 100644
+--- a/net/bpf/test_run.c
++++ b/net/bpf/test_run.c
+@@ -542,7 +542,7 @@ struct bpf_fentry_test_t {
  
- 	netif_set_tso_max_size(dev->net, 16384);
+ int noinline bpf_fentry_test7(struct bpf_fentry_test_t *arg)
+ {
+-	asm volatile ("");
++	asm volatile ("": "+r"(arg));
+ 	return (long)arg;
+ }
  
--	ax88179_reset(dev);
--
- 	return 0;
+diff --git a/tools/testing/selftests/bpf/progs/test_global_func17.c b/tools/testing/selftests/bpf/progs/test_global_func17.c
+index a32e11c7d933..5de44b09e8ec 100644
+--- a/tools/testing/selftests/bpf/progs/test_global_func17.c
++++ b/tools/testing/selftests/bpf/progs/test_global_func17.c
+@@ -5,6 +5,7 @@
+ 
+ __noinline int foo(int *p)
+ {
++	barrier_var(p);
+ 	return p ? (*p = 42) : 0;
  }
  
 -- 
