@@ -1,66 +1,64 @@
-Return-Path: <netdev+bounces-63812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9BF282F893
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 21:48:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A6D082F8AF
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 21:50:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E53C3B22613
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 20:48:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85BBB1C245CB
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 20:50:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A72731350E7;
-	Tue, 16 Jan 2024 19:52:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA1141353EC;
+	Tue, 16 Jan 2024 19:52:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J7hIVzAM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fV2ex7eT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79EE825571;
-	Tue, 16 Jan 2024 19:52:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 917C21353E8;
+	Tue, 16 Jan 2024 19:52:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705434737; cv=none; b=kgOpoU9dTRon91+G6HsZn2F1434ywGSMVS55tRJWgnlqG46Gj7d4uiKSpVs0JG8d+FiuSTx9TKQzyS1YmF5oX1fFagalqhangc8jAHKs+53HrYRmM3P11FDJkqG5YZd/6nT2LT2s/qaLFsbUkzErdprrA6HZsT2gute0Y3cnGcU=
+	t=1705434763; cv=none; b=LgiTCGmIN16WjYJxDnHKsOYJIU7qZrKjNQ6puZy/o3VFELD8LnyaYqbD236qCJ5oVha1GTcwGy7LbS25xxb/4Skwr10+q5Nz3MTTr2YrcmrtdkyFVPiyL8cNmf/0x3MAeeveBfLvvnYnhrM+tQGI89qScrn3eH6X40g3bCrBaoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705434737; c=relaxed/simple;
-	bh=05L/uzPbJ7wRSbnpKAg1qZm8m6Vca+gadFeO8ZPGfJM=;
+	s=arc-20240116; t=1705434763; c=relaxed/simple;
+	bh=ui90FwlGfZao1reJhg4CM3xRrOLD+afhMmeA+c7zqC0=;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:X-stable:
-	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=ALMshZ702x7IxKz+ZwW61m5NBWzgDHShphjaroKjIkkAv9X7w0puTh9f029IbcSvC9Xudv0JfrD96hk2kEnwb6y+FGirfq1fpFVXfB2yUl3o+iUewoD69uRaWgEcv8bp/0HRIIbvev2wdKpscSpMz888TfrTosjZgB1LLK2Yqmw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J7hIVzAM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54F03C433A6;
-	Tue, 16 Jan 2024 19:52:15 +0000 (UTC)
+	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=nfqbiBx15XZo6ejz+IIDfWlaHWALJIj8QcpLJXqjh5ZFmnjk6Jnyzjat9d9v58gxUfsoXjET3RgCaW6H9B5Zi/AUXXZKUpMCJFGqcHfi/z6azGjSZ6xkov9nHs++9/FxGj6AW3EgwZNVI4Ki+9Nb3iWixTu9WWknkL22uSLlWgA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fV2ex7eT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79BF3C433C7;
+	Tue, 16 Jan 2024 19:52:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705434736;
-	bh=05L/uzPbJ7wRSbnpKAg1qZm8m6Vca+gadFeO8ZPGfJM=;
+	s=k20201202; t=1705434763;
+	bh=ui90FwlGfZao1reJhg4CM3xRrOLD+afhMmeA+c7zqC0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=J7hIVzAMluV840uHW1cAxJfgTPuSAU5P0+dGRRXf55aP50T4qiJWRFS3r4EizMNiM
-	 f+KtUEm5DSPlcAfIXjzXNGkmbVkQg/16fn4qvYXU7eb3yw8+VXsUPyDgFcwd+JuEuB
-	 otVcYVuVTfIDbsifKTY50KuETSqP/GKqT2QPs2ZRlQjxbH9ttTsHqa+WCktZPTyImr
-	 JGR7hAL20HEw4B0NEkJp68xvsguDhnrLw2DavjBoCdmbSbv1RjT82mzClWE3ZHsrm9
-	 x1/ni2hjmVbKGZrHc0F22D+D29cePoXiCmPeuF/82QK/sGBZp40qo2+uAeqtr8PPXJ
-	 tgR5fNvhKb6gw==
+	b=fV2ex7eTMHiae1V+vJ5pZNQudP42PbLwXmZlEKTbRmr+hUoG+aftm8NC4ShJN3rtm
+	 axZAJxNs+Tg2fFg7sT/WdJrPjilsUz14BjA3Q6owL4g93Ef01fDtFLtTuRDkPdYQ8T
+	 gxMNbm9yoR4RAlvBp2JKBn2hHpo2MaZXtkUpr0TTu5uuvbN3iIU4HapzGVgBfgvJ6c
+	 FOgdoQWFhZlPFfRFdb7NRqM+A6DEtIWHr7LQwuZLgnQQxeVmh+FYvvCooArVQIaK5C
+	 bu2PEEN7EAiIkpHn7/NgfM10kBfCaLYmtF/h3XcjC0N+lag3LPQttBbnwxw6F46GxM
+	 3utcp7dz9W9PQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Andrii Nakryiko <andrii@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>,
+Cc: Ahmed Zaki <ahmed.zaki@intel.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Wojciech Drewek <wojciech.drewek@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	daniel@iogearbox.net,
-	shuah@kernel.org,
+	anthony.l.nguyen@intel.com,
 	davem@davemloft.net,
-	kuba@kernel.org,
-	hawk@kernel.org,
-	bpf@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	intel-wired-lan@lists.osuosl.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 065/104] selftests/bpf: fix compiler warnings in RELEASE=1 mode
-Date: Tue, 16 Jan 2024 14:46:31 -0500
-Message-ID: <20240116194908.253437-65-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 074/104] ice: fix ICE_AQ_VSI_Q_OPT_RSS_* register values
+Date: Tue, 16 Jan 2024 14:46:40 -0500
+Message-ID: <20240116194908.253437-74-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240116194908.253437-1-sashal@kernel.org>
 References: <20240116194908.253437-1-sashal@kernel.org>
@@ -75,50 +73,99 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.12
 Content-Transfer-Encoding: 8bit
 
-From: Andrii Nakryiko <andrii@kernel.org>
+From: Ahmed Zaki <ahmed.zaki@intel.com>
 
-[ Upstream commit 62d9a969f4a95219c757831e9ad66cd4dd9edee5 ]
+[ Upstream commit 20f73b60bb5c276cee9b1a530f100c677bc74af8 ]
 
-When compiling BPF selftests with RELEASE=1, we get two new
-warnings, which are treated as errors. Fix them.
+Fix the values of the ICE_AQ_VSI_Q_OPT_RSS_* registers. Shifting is
+already done when the values are used, no need to double shift. Bug was
+not discovered earlier since only ICE_AQ_VSI_Q_OPT_RSS_TPLZ (Zero) is
+currently used.
 
-Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
-Acked-by: Yonghong Song <yonghong.song@linux.dev>
-Acked-by: John Fastabend <john.fastabend@gmail.com>
-Link: https://lore.kernel.org/r/20231212225343.1723081-1-andrii@kernel.org
-Signed-off-by: Alexei Starovoitov <ast@kernel.org>
+Also, rename ICE_AQ_VSI_Q_OPT_RSS_XXX to ICE_AQ_VSI_Q_OPT_RSS_HASH_XXX
+for consistency.
+
+Co-developed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
+Link: https://lore.kernel.org/r/20231213003321.605376-5-ahmed.zaki@intel.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- tools/testing/selftests/bpf/veristat.c        | 2 +-
- tools/testing/selftests/bpf/xdp_hw_metadata.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_adminq_cmd.h |  8 ++++----
+ drivers/net/ethernet/intel/ice/ice_lib.c        |  4 ++--
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c   | 12 +++++-------
+ 3 files changed, 11 insertions(+), 13 deletions(-)
 
-diff --git a/tools/testing/selftests/bpf/veristat.c b/tools/testing/selftests/bpf/veristat.c
-index 655095810d4a..0ad98b6a8e6e 100644
---- a/tools/testing/selftests/bpf/veristat.c
-+++ b/tools/testing/selftests/bpf/veristat.c
-@@ -1214,7 +1214,7 @@ static int cmp_join_stat(const struct verif_stats_join *s1,
- 			 enum stat_id id, enum stat_variant var, bool asc)
- {
- 	const char *str1 = NULL, *str2 = NULL;
--	double v1, v2;
-+	double v1 = 0.0, v2 = 0.0;
- 	int cmp = 0;
+diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+index 29f7a9852aec..fafe083d1446 100644
+--- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
++++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+@@ -491,10 +491,10 @@ struct ice_aqc_vsi_props {
+ #define ICE_AQ_VSI_Q_OPT_RSS_GBL_LUT_M		(0xF << ICE_AQ_VSI_Q_OPT_RSS_GBL_LUT_S)
+ #define ICE_AQ_VSI_Q_OPT_RSS_HASH_S		6
+ #define ICE_AQ_VSI_Q_OPT_RSS_HASH_M		(0x3 << ICE_AQ_VSI_Q_OPT_RSS_HASH_S)
+-#define ICE_AQ_VSI_Q_OPT_RSS_TPLZ		(0x0 << ICE_AQ_VSI_Q_OPT_RSS_HASH_S)
+-#define ICE_AQ_VSI_Q_OPT_RSS_SYM_TPLZ		(0x1 << ICE_AQ_VSI_Q_OPT_RSS_HASH_S)
+-#define ICE_AQ_VSI_Q_OPT_RSS_XOR		(0x2 << ICE_AQ_VSI_Q_OPT_RSS_HASH_S)
+-#define ICE_AQ_VSI_Q_OPT_RSS_JHASH		(0x3 << ICE_AQ_VSI_Q_OPT_RSS_HASH_S)
++#define ICE_AQ_VSI_Q_OPT_RSS_HASH_TPLZ		0x0U
++#define ICE_AQ_VSI_Q_OPT_RSS_HASH_SYM_TPLZ	0x1U
++#define ICE_AQ_VSI_Q_OPT_RSS_HASH_XOR		0x2U
++#define ICE_AQ_VSI_Q_OPT_RSS_HASH_JHASH		0x3U
+ 	u8 q_opt_tc;
+ #define ICE_AQ_VSI_Q_OPT_TC_OVR_S		0
+ #define ICE_AQ_VSI_Q_OPT_TC_OVR_M		(0x1F << ICE_AQ_VSI_Q_OPT_TC_OVR_S)
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+index a66c3b6ccec1..4e7f67f54f1c 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+@@ -1186,12 +1186,12 @@ static void ice_set_rss_vsi_ctx(struct ice_vsi_ctx *ctxt, struct ice_vsi *vsi)
+ 	case ICE_VSI_PF:
+ 		/* PF VSI will inherit RSS instance of PF */
+ 		lut_type = ICE_AQ_VSI_Q_OPT_RSS_LUT_PF;
+-		hash_type = ICE_AQ_VSI_Q_OPT_RSS_TPLZ;
++		hash_type = ICE_AQ_VSI_Q_OPT_RSS_HASH_TPLZ;
+ 		break;
+ 	case ICE_VSI_VF:
+ 		/* VF VSI will gets a small RSS table which is a VSI LUT type */
+ 		lut_type = ICE_AQ_VSI_Q_OPT_RSS_LUT_VSI;
+-		hash_type = ICE_AQ_VSI_Q_OPT_RSS_TPLZ;
++		hash_type = ICE_AQ_VSI_Q_OPT_RSS_HASH_TPLZ;
+ 		break;
+ 	default:
+ 		dev_dbg(dev, "Unsupported VSI type %s\n",
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.c b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
+index 62337e6569b2..e7ab78bb0f86 100644
+--- a/drivers/net/ethernet/intel/ice/ice_virtchnl.c
++++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
+@@ -820,8 +820,8 @@ static int ice_vc_handle_rss_cfg(struct ice_vf *vf, u8 *msg, bool add)
+ 		int status;
  
- 	fetch_join_stat_value(s1, id, var, &str1, &v1);
-diff --git a/tools/testing/selftests/bpf/xdp_hw_metadata.c b/tools/testing/selftests/bpf/xdp_hw_metadata.c
-index 613321eb84c1..adb77c1a6a74 100644
---- a/tools/testing/selftests/bpf/xdp_hw_metadata.c
-+++ b/tools/testing/selftests/bpf/xdp_hw_metadata.c
-@@ -68,7 +68,7 @@ static int open_xsk(int ifindex, struct xsk *xsk, __u32 queue_id)
- 		.frame_size = XSK_UMEM__DEFAULT_FRAME_SIZE,
- 		.flags = XDP_UMEM_UNALIGNED_CHUNK_FLAG,
- 	};
--	__u32 idx;
-+	__u32 idx = 0;
- 	u64 addr;
- 	int ret;
- 	int i;
+ 		lut_type = ICE_AQ_VSI_Q_OPT_RSS_LUT_VSI;
+-		hash_type = add ? ICE_AQ_VSI_Q_OPT_RSS_XOR :
+-				ICE_AQ_VSI_Q_OPT_RSS_TPLZ;
++		hash_type = add ? ICE_AQ_VSI_Q_OPT_RSS_HASH_XOR :
++				ICE_AQ_VSI_Q_OPT_RSS_HASH_TPLZ;
+ 
+ 		ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
+ 		if (!ctx) {
+@@ -829,11 +829,9 @@ static int ice_vc_handle_rss_cfg(struct ice_vf *vf, u8 *msg, bool add)
+ 			goto error_param;
+ 		}
+ 
+-		ctx->info.q_opt_rss = ((lut_type <<
+-					ICE_AQ_VSI_Q_OPT_RSS_LUT_S) &
+-				       ICE_AQ_VSI_Q_OPT_RSS_LUT_M) |
+-				       (hash_type &
+-					ICE_AQ_VSI_Q_OPT_RSS_HASH_M);
++		ctx->info.q_opt_rss =
++			FIELD_PREP(ICE_AQ_VSI_Q_OPT_RSS_LUT_M, lut_type) |
++			FIELD_PREP(ICE_AQ_VSI_Q_OPT_RSS_HASH_M, hash_type);
+ 
+ 		/* Preserve existing queueing option setting */
+ 		ctx->info.q_opt_rss |= (vsi->info.q_opt_rss &
 -- 
 2.43.0
 
