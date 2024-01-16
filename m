@@ -1,71 +1,66 @@
-Return-Path: <netdev+bounces-63857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63858-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CEF282FB39
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 22:51:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BE5F82FB4E
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 22:53:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA95D28883B
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 21:51:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2AEDD1F27FA4
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 21:53:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D02516276E;
-	Tue, 16 Jan 2024 20:02:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1A10664D7;
+	Tue, 16 Jan 2024 20:03:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pQ2QXEaS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UzgBC6R7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03205162769;
-	Tue, 16 Jan 2024 20:02:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87179664D1;
+	Tue, 16 Jan 2024 20:03:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705435359; cv=none; b=ib1IeR8rlU7bMveAIMK5jSz3LhqTYRYNpNeIxwNXjHu+I7yrng9oRcUnzWXRTHeX3rBnyS45QbJQkIWoveQ5uUDJM8BUwbz+3n6PxFu8/zKQVFCQ9zjdFLNbb4ZGy6pytFqnHeZQfYzLuXF92P+gzwzDvNS730iXP4D1Po6hYp4=
+	t=1705435405; cv=none; b=A8OJwo05tYSuXLkk8WUr1shNIusf7gOCmZxQ6ic/HDEp9J4ALWHUQRPXFYhOnF16dRVbRVvJxkZASsQFtDT+aWa13Cpa69wH9Xw5uaO18ds6ZcLqXeyxRAtb4uv7VAX7wOCvYXdV7XzFarS2UnPNlJwT2g+Ymwd4N68izkNYPfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705435359; c=relaxed/simple;
-	bh=gJKiIBBbDy53AjLvncnJKbuQ+GetRLTkRmFZqpRLLdY=;
+	s=arc-20240116; t=1705435405; c=relaxed/simple;
+	bh=//aelGAg/QeIYKJGkfnYoGgJ5tLzJm/CkJm3mCuyLYU=;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:X-stable:
-	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=HqMTG2t0FC9l7mrpxg1cQ6xZU4ZifDyAL2kiKom1Oek0Lb0+2Bb7csfzoSrqHOKTtIkV7rRSyGipl1a46ptQSSEby/YmhgzgRdASfFofZ/Scf4Ve0TrSkpkOptcmykNjBYTPfdnGnYify4cVtNqpIk3Cosw2DgkFf1wxPUTCffY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pQ2QXEaS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F35AAC433C7;
-	Tue, 16 Jan 2024 20:02:36 +0000 (UTC)
+	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=e5XHNGV5LQ/kasCxCGjwjBob6Z+zEeZeDy9qU0KrXLYzTTUH8WBRUpjtArzbUSvnvGCG4NCHmy16jr2+/m6+UAahpIXQ7SyV1dZjKv1X2laB/pfrcTQ4TGsmc/qvJHosT/uX5lU1tg3WeBtYW9sLqrBDE8MxsLR+BQRPf0ubY4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UzgBC6R7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 205A5C43394;
+	Tue, 16 Jan 2024 20:03:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705435358;
-	bh=gJKiIBBbDy53AjLvncnJKbuQ+GetRLTkRmFZqpRLLdY=;
+	s=k20201202; t=1705435405;
+	bh=//aelGAg/QeIYKJGkfnYoGgJ5tLzJm/CkJm3mCuyLYU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pQ2QXEaSm1qsOFRzziFk+eI9icNbTH0w2xlJbpnLCVUwlPo7kWq59hZUG9yi+Gjhu
-	 0AsBJsMC9Wx/lRDzGys3CWJSfrc2MCo0AezH25XlncT8mSlPnB+KoGTX0T5F+PUit8
-	 EALPff/eJQcv1w/mRppUOZHNCJeBhiRxGHUeclj8CH8aTuuXUpMy8l3goHAebevBWq
-	 0VHHVYWur+bzP4fjqmZSoYSjvFWsOYoPIU7kh6temPsmOVwP5KK6H0YTKGz6V02hnu
-	 4XzFPzoWZUSJ7Q1AvW3yaEO4ecHTIHh7FeixZ3uVQlb2axq5B0ltQZJHb82AoOCzje
-	 UxPQNkd2A8yQw==
+	b=UzgBC6R7syfdts3ySayhrdei04A8+PDmvgOd0ZHl/F5dKuqpiFPWcxwgfwHabrxWU
+	 8QgEIw8/yE+LtYMCo80FgrRtsdZcjjSi7iAKOhCyrj9dSc72nQg+ps5+95SbF17PJc
+	 /LXHrlzRd+0BdUce4UBxiS3lRZ++iTMFoTB5J1FXj274fKf3/R2s9KDcwLQk8I9vtI
+	 Vwofy75nR2UtJCVFakJ1PrNwF3Vac2Ib2WRDa+qPnWZm72KnUXMX/xRUJ/QCHYyp0K
+	 Bv5Hiq2Ew05f5iHKeqIF4KPlQErGZPiZZYCcUnxTKCoW0LL30AiZrdKvZm0gQV8tlM
+	 e5GHJMt1WC/pQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Andrii Staikov <andrii.staikov@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Jan Sokolowski <jan.sokolowski@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Rafal Romanowski <rafal.romanowski@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
+Cc: Zhengchao Shao <shaozhengchao@huawei.com>,
+	Jay Vosburgh <jay.vosburgh@canonical.com>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
-	jesse.brandeburg@intel.com,
+	j.vosburgh@gmail.com,
+	andy@greyhouse.net,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
-	pabeni@redhat.com,
-	intel-wired-lan@lists.osuosl.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 44/44] i40e: Fix VF disable behavior to block all traffic
-Date: Tue, 16 Jan 2024 15:00:13 -0500
-Message-ID: <20240116200044.258335-44-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 06/31] bonding: return -ENOMEM instead of BUG in alb_upper_dev_walk
+Date: Tue, 16 Jan 2024 15:02:15 -0500
+Message-ID: <20240116200310.259340-6-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240116200044.258335-1-sashal@kernel.org>
-References: <20240116200044.258335-1-sashal@kernel.org>
+In-Reply-To: <20240116200310.259340-1-sashal@kernel.org>
+References: <20240116200310.259340-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,124 +69,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.10.208
+X-stable-base: Linux 5.4.267
 Content-Transfer-Encoding: 8bit
 
-From: Andrii Staikov <andrii.staikov@intel.com>
+From: Zhengchao Shao <shaozhengchao@huawei.com>
 
-[ Upstream commit 31deb12e85c35ddd2c037f0107d05d8674cab2c0 ]
+[ Upstream commit d6b83f1e3707c4d60acfa58afd3515e17e5d5384 ]
 
-Currently, if a VF is disabled using the
-'ip link set dev $ETHX vf $VF_NUM state disable' command, the VF is still
-able to receive traffic.
+If failed to allocate "tags" or could not find the final upper device from
+start_dev's upper list in bond_verify_device_path(), only the loopback
+detection of the current upper device should be affected, and the system is
+no need to be panic.
+So return -ENOMEM in alb_upper_dev_walk to stop walking, print some warn
+information when failed to allocate memory for vlan tags in
+bond_verify_device_path.
 
-Fix the behavior of the 'ip link set dev $ETHX vf $VF_NUM state disable'
-to completely shutdown the VF's queues making it entirely disabled and
-not able to receive or send any traffic.
+I also think that the following function calls
+netdev_walk_all_upper_dev_rcu
+---->>>alb_upper_dev_walk
+---------->>>bond_verify_device_path
+From this way, "end device" can eventually be obtained from "start device"
+in bond_verify_device_path, IS_ERR(tags) could be instead of
+IS_ERR_OR_NULL(tags) in alb_upper_dev_walk.
 
-Modify the behavior of the 'ip link set $ETHX vf $VF_NUM state enable'
-command to make a VF do reinitialization bringing the queues back up.
-
-Co-developed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Jan Sokolowski <jan.sokolowski@intel.com>
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Andrii Staikov <andrii.staikov@intel.com>
-Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+Acked-by: Jay Vosburgh <jay.vosburgh@canonical.com>
+Link: https://lore.kernel.org/r/20231118081653.1481260-1-shaozhengchao@huawei.com
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- .../ethernet/intel/i40e/i40e_virtchnl_pf.c    | 32 +++++++++++++++++++
- .../ethernet/intel/i40e/i40e_virtchnl_pf.h    |  1 +
- 2 files changed, 33 insertions(+)
+ drivers/net/bonding/bond_alb.c  | 3 ++-
+ drivers/net/bonding/bond_main.c | 5 ++++-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-index dfaa34f2473a..91892d07124f 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-@@ -2519,6 +2519,14 @@ static int i40e_vc_enable_queues_msg(struct i40e_vf *vf, u8 *msg)
- 	i40e_status aq_ret = 0;
- 	int i;
+diff --git a/drivers/net/bonding/bond_alb.c b/drivers/net/bonding/bond_alb.c
+index 6df78a36bafd..342e23e56192 100644
+--- a/drivers/net/bonding/bond_alb.c
++++ b/drivers/net/bonding/bond_alb.c
+@@ -970,7 +970,8 @@ static int alb_upper_dev_walk(struct net_device *upper, void *_data)
+ 	if (netif_is_macvlan(upper) && !strict_match) {
+ 		tags = bond_verify_device_path(bond->dev, upper, 0);
+ 		if (IS_ERR_OR_NULL(tags))
+-			BUG();
++			return -ENOMEM;
++
+ 		alb_send_lp_vid(slave, upper->dev_addr,
+ 				tags[0].vlan_proto, tags[0].vlan_id);
+ 		kfree(tags);
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index bb1c6743222e..352afabf8571 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -2482,8 +2482,11 @@ struct bond_vlan_tag *bond_verify_device_path(struct net_device *start_dev,
  
-+	if (vf->is_disabled_from_host) {
-+		aq_ret = -EPERM;
-+		dev_info(&pf->pdev->dev,
-+			 "Admin has disabled VF %d, will not enable queues\n",
-+			 vf->vf_id);
-+		goto error_param;
-+	}
-+
- 	if (!test_bit(I40E_VF_STATE_ACTIVE, &vf->vf_states)) {
- 		aq_ret = I40E_ERR_PARAM;
- 		goto error_param;
-@@ -4561,9 +4569,12 @@ int i40e_ndo_set_vf_link_state(struct net_device *netdev, int vf_id, int link)
- 	struct i40e_pf *pf = np->vsi->back;
- 	struct virtchnl_pf_event pfe;
- 	struct i40e_hw *hw = &pf->hw;
-+	struct i40e_vsi *vsi;
-+	unsigned long q_map;
- 	struct i40e_vf *vf;
- 	int abs_vf_id;
- 	int ret = 0;
-+	int tmp;
- 
- 	if (test_and_set_bit(__I40E_VIRTCHNL_OP_PENDING, pf->state)) {
- 		dev_warn(&pf->pdev->dev, "Unable to configure VFs, other operation is pending.\n");
-@@ -4586,6 +4597,9 @@ int i40e_ndo_set_vf_link_state(struct net_device *netdev, int vf_id, int link)
- 	switch (link) {
- 	case IFLA_VF_LINK_STATE_AUTO:
- 		vf->link_forced = false;
-+		vf->is_disabled_from_host = false;
-+		/* reset needed to reinit VF resources */
-+		i40e_vc_reset_vf(vf, true);
- 		pfe.event_data.link_event.link_status =
- 			pf->hw.phy.link_info.link_info & I40E_AQ_LINK_UP;
- 		pfe.event_data.link_event.link_speed =
-@@ -4595,6 +4609,9 @@ int i40e_ndo_set_vf_link_state(struct net_device *netdev, int vf_id, int link)
- 	case IFLA_VF_LINK_STATE_ENABLE:
- 		vf->link_forced = true;
- 		vf->link_up = true;
-+		vf->is_disabled_from_host = false;
-+		/* reset needed to reinit VF resources */
-+		i40e_vc_reset_vf(vf, true);
- 		pfe.event_data.link_event.link_status = true;
- 		pfe.event_data.link_event.link_speed = VIRTCHNL_LINK_SPEED_40GB;
- 		break;
-@@ -4603,6 +4620,21 @@ int i40e_ndo_set_vf_link_state(struct net_device *netdev, int vf_id, int link)
- 		vf->link_up = false;
- 		pfe.event_data.link_event.link_status = false;
- 		pfe.event_data.link_event.link_speed = 0;
-+
-+		vsi = pf->vsi[vf->lan_vsi_idx];
-+		q_map = BIT(vsi->num_queue_pairs) - 1;
-+
-+		vf->is_disabled_from_host = true;
-+
-+		/* Try to stop both Tx&Rx rings even if one of the calls fails
-+		 * to ensure we stop the rings even in case of errors.
-+		 * If any of them returns with an error then the first
-+		 * error that occurred will be returned.
-+		 */
-+		tmp = i40e_ctrl_vf_tx_rings(vsi, q_map, false);
-+		ret = i40e_ctrl_vf_rx_rings(vsi, q_map, false);
-+
-+		ret = tmp ? tmp : ret;
- 		break;
- 	default:
- 		ret = -EINVAL;
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.h b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.h
-index 358bbdb58795..010e5730465e 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.h
-@@ -98,6 +98,7 @@ struct i40e_vf {
- 	bool link_forced;
- 	bool link_up;		/* only valid if VF link is forced */
- 	bool spoofchk;
-+	bool is_disabled_from_host; /* PF ctrl of VF enable/disable */
- 	u16 num_vlan;
- 
- 	/* ADq related variables */
+ 	if (start_dev == end_dev) {
+ 		tags = kcalloc(level + 1, sizeof(*tags), GFP_ATOMIC);
+-		if (!tags)
++		if (!tags) {
++			net_err_ratelimited("%s: %s: Failed to allocate tags\n",
++					    __func__, start_dev->name);
+ 			return ERR_PTR(-ENOMEM);
++		}
+ 		tags[level].vlan_proto = VLAN_N_VID;
+ 		return tags;
+ 	}
 -- 
 2.43.0
 
