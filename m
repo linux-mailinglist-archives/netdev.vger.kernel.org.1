@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-63599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E441B82E5BA
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 01:52:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 060EE82E5DC
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 01:57:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2733AB234C0
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 00:52:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8AEC8B24161
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 00:57:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD5CE2E3F9;
-	Tue, 16 Jan 2024 00:24:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46C923EA8A;
+	Tue, 16 Jan 2024 00:25:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W8WBtpDz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JB5xit8C"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EED52E3F1;
-	Tue, 16 Jan 2024 00:24:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30D0CC433C7;
-	Tue, 16 Jan 2024 00:24:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 273173E49C;
+	Tue, 16 Jan 2024 00:25:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68F0AC43390;
+	Tue, 16 Jan 2024 00:25:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705364692;
-	bh=JQAoC7EV7qWGl/rEHl8BcqZGhvjAK/8oXnEOwAcrnbg=;
+	s=k20201202; t=1705364745;
+	bh=IkdXY+UPsgDOiOizHGzU0enGFtgK5KM0NhgAAcHfq6M=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=W8WBtpDzG66h3htQEqe3ShFvoGtDFuZ/VxtqhnqzGk+JmYkrqolV5cA//q6YyAx2k
-	 VK1tziwtWKZfTv06+B9H+gbd+ZU6q9rMtEOF26TADoZxTlalsqaUdyB8EbTsokMMKc
-	 fQg2hgPo72R+7RsH1Nsi68JKvTjU30YKkwrodBQAxp6aj3Z3a/vmPdIIUtuk/apiS1
-	 A3isiGZwnmCxsw/sCqiaD8j7CQBLE6ddjw10cJhSb8UItJF9n6pp3MEJuuAxMKTADC
-	 RB9ZJnHnqFWS/vXkee5MG6J05PMiBs9VQFRG2DKfHyBYfDywllWeuKF0yzgEB532Q2
-	 dp0r08M8H3GFg==
+	b=JB5xit8CFEgv+AQGZv1jAgGdx4Z8ww3kbaiMwViaW3Ul4pUHhz1cJwxYtyFQyJpZW
+	 eAlDCAMpfVY0hQ/LqYVt4W1kgJin1Px/LI0+OcqJQWpTlOvTRrDdrILumOfoYEhJ7M
+	 F6TePbUiapAKUIeC9YqgX3/JfCB/5n97ZOrfCmtssZfNEpRgh0ojaNhFZZGhJ2o7pG
+	 yUrMxJTYrIkJ8+ublBZ1ctpDhY8ECOzAXXV5xQSX1m/yks3Gr/U1dhHJScDrXGcVoT
+	 O5pxWwCiQ+ra8JN/IsyfiH0qaEy9CAONlQH3RVwNYd0cSyHC91wnQxLUMUn0o/QbZ8
+	 VLgMCtI7gptmQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -45,12 +45,12 @@ Cc: Oleg Nesterov <oleg@redhat.com>,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 17/19] rxrpc_find_service_conn_rcu: fix the usage of read_seqbegin_or_lock()
-Date: Mon, 15 Jan 2024 19:23:52 -0500
-Message-ID: <20240116002413.215163-17-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 13/14] rxrpc_find_service_conn_rcu: fix the usage of read_seqbegin_or_lock()
+Date: Mon, 15 Jan 2024 19:24:55 -0500
+Message-ID: <20240116002512.215607-13-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240116002413.215163-1-sashal@kernel.org>
-References: <20240116002413.215163-1-sashal@kernel.org>
+In-Reply-To: <20240116002512.215607-1-sashal@kernel.org>
+References: <20240116002512.215607-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,7 +59,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.12
+X-stable-base: Linux 6.1.73
 Content-Transfer-Encoding: 8bit
 
 From: Oleg Nesterov <oleg@redhat.com>
@@ -80,10 +80,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/net/rxrpc/conn_service.c b/net/rxrpc/conn_service.c
-index 89ac05a711a4..39c908a3ca6e 100644
+index 6e6aa02c6f9e..249353417a18 100644
 --- a/net/rxrpc/conn_service.c
 +++ b/net/rxrpc/conn_service.c
-@@ -25,7 +25,7 @@ struct rxrpc_connection *rxrpc_find_service_conn_rcu(struct rxrpc_peer *peer,
+@@ -31,7 +31,7 @@ struct rxrpc_connection *rxrpc_find_service_conn_rcu(struct rxrpc_peer *peer,
  	struct rxrpc_conn_proto k;
  	struct rxrpc_skb_priv *sp = rxrpc_skb(skb);
  	struct rb_node *p;
@@ -92,7 +92,7 @@ index 89ac05a711a4..39c908a3ca6e 100644
  
  	k.epoch	= sp->hdr.epoch;
  	k.cid	= sp->hdr.cid & RXRPC_CIDMASK;
-@@ -35,6 +35,7 @@ struct rxrpc_connection *rxrpc_find_service_conn_rcu(struct rxrpc_peer *peer,
+@@ -41,6 +41,7 @@ struct rxrpc_connection *rxrpc_find_service_conn_rcu(struct rxrpc_peer *peer,
  		 * under just the RCU read lock, so we have to check for
  		 * changes.
  		 */
