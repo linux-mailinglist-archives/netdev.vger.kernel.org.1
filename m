@@ -1,197 +1,117 @@
-Return-Path: <netdev+bounces-63689-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63690-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50C4C82EDFC
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 12:42:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FD8082EE0C
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 12:45:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 686631C22C0B
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 11:42:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D01521F23B04
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 11:45:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB09E1B81F;
-	Tue, 16 Jan 2024 11:42:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37D711B94E;
+	Tue, 16 Jan 2024 11:44:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=marvell.onmicrosoft.com header.i=@marvell.onmicrosoft.com header.b="axvu1pDV"
+	dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b="J5MWO03g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E7BA1B80E;
-	Tue, 16 Jan 2024 11:42:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40FMhAC9013579;
-	Tue, 16 Jan 2024 03:42:07 -0800
-Received: from nam02-sn1-obe.outbound.protection.outlook.com (mail-sn1nam02lp2040.outbound.protection.outlook.com [104.47.57.40])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3vn1gc4648-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 16 Jan 2024 03:42:06 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fYBuEAMiH79+PqMTTRHP1+eA64B/3zjywYtx+j3YLcgf5HdZDk+BNIRIBwHbyYMG9bAf+zVg6HlhGo4GHA/feuvhxuVOMKf9xsVWbmGfeZW1jGlyCeraGqQfCk9IahKiSDIQL2f4tCq6qUlk86oa+kSyRumSq4yNa8LO3ce3vJ2oSXTJLBqvbVTHyBNKBSLl5nrDRQt2lWQwm0bcJ2AgFZx6ry47Q7AoiWCRrSBf/SttTZDwkSU9/qf/MPG2X8Nn6ETshriwVgXw8E6w+eVxM5Tb9xipEjKC0EsDgEEOpCh2BECFGH/m9SKRX7eMsxjdRz5mz66pGk0G9myx0egPAA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TxVoP4ONPGVl4AaOfOvOOf1C+pL7hChM7oZSl1oWv0Y=;
- b=P+qLfGbXCTogLAl59RBnd1Y1oY0S7JjZb7kz5RPeyXitpJ+3dY5aeB9tB+UQwegxYTlBjcNcBd93Z+VfONZ1qkJCXonpV9ig3c1x6GdajIAZzFRfj1QVyoGVLUJb8mKqdlLC/QI4ocs3AOt+sGE07XHeBoz7zbAHD6S2akSWq4JcDGEkS6k9MwEnolGHn0zuUWnuJ8Fmgpw0+XLWXQmJB77dj9gua0SPQhBxvgFbFimAbril+ypw8YcEX1iJHGUxBuyfLZadaI9jytmv4UBFC9R6VrZU0QFiDOb6rc2Zf9jlH84nwdwrYMrhScJKBe5dQfhSAQbAiDgBsizLOAU2xQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12AF91BC21
+	for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 11:44:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ieee.org
+Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3606e69ec67so65578015ab.2
+        for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 03:44:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TxVoP4ONPGVl4AaOfOvOOf1C+pL7hChM7oZSl1oWv0Y=;
- b=axvu1pDV5h8O2BNxjGK+5FsswcAeybOjNEa6dLDaT46xTERrM3NB39vXxsOXNk5UuVbdAOg2cAomhWRVkKHX5z54f3eck5LWy+n9qRKVT1rLTqF1Gn8Hu8W4EmQGnEbcoLYDny/eLDIDaiEphj3bneNgvuPgWNE09DXRRaLkoE0=
-Received: from PH0PR18MB4543.namprd18.prod.outlook.com (2603:10b6:510:ac::22)
- by SN7PR18MB4031.namprd18.prod.outlook.com (2603:10b6:806:105::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.22; Tue, 16 Jan
- 2024 11:42:05 +0000
-Received: from PH0PR18MB4543.namprd18.prod.outlook.com
- ([fe80::f8e5:bce7:49c8:f0f9]) by PH0PR18MB4543.namprd18.prod.outlook.com
- ([fe80::f8e5:bce7:49c8:f0f9%4]) with mapi id 15.20.7202.017; Tue, 16 Jan 2024
- 11:42:04 +0000
-From: "Jenishkumar Patel [C]" <jpatel2@marvell.com>
-To: 'Russell King' <linux@armlinux.org.uk>
-CC: "marcin.s.wojtas@gmail.com" <marcin.s.wojtas@gmail.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com"
-	<edumazet@google.com>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: RE: [EXT] Re: [PATCH 1/1] net: mvpp2: clear BM pool before
- initialization
-Thread-Topic: [EXT] Re: [PATCH 1/1] net: mvpp2: clear BM pool before
- initialization
-Thread-Index: AQHaSED3tkBbnIbaJEakXSpW8Z3u47DcK5oAgAAlRCA=
-Date: Tue, 16 Jan 2024 11:42:04 +0000
-Message-ID: 
- <PH0PR18MB4543D1F967616763C27EBB2EEC732@PH0PR18MB4543.namprd18.prod.outlook.com>
-References: <20240116055754.279560-1-jpatel2@marvell.com>
- <ZaZLuPyRa5QhRrmH@shell.armlinux.org.uk>
-In-Reply-To: <ZaZLuPyRa5QhRrmH@shell.armlinux.org.uk>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-dg-rorf: true
-x-dg-ref: 
- PG1ldGE+PGF0IG5tPSJib2R5LnR4dCIgcD0iYzpcdXNlcnNcanBhdGVsMlxhcHBkYXRhXHJvYW1pbmdcMDlkODQ5YjYtMzJkMy00YTQwLTg1ZWUtNmI4NGJhMjllMzViXG1zZ3NcbXNnLTNmNDI3Nzc2LWI0NjQtMTFlZS1iYTJlLTAwMjI0ODZiODBmOVxhbWUtdGVzdFwzZjQyNzc3OC1iNDY0LTExZWUtYmEyZS0wMDIyNDg2YjgwZjlib2R5LnR4dCIgc3o9IjE3MzQiIHQ9IjEzMzQ5ODc4OTE5Njg0MzkwMCIgaD0ib0d6SXpFTldWT3J2N3grN3BFSDdpb0UwK29vPSIgaWQ9IiIgYmw9IjAiIGJvPSIxIiBjaT0iY0FBQUFFUkhVMVJTUlVGTkNnVUFBSEFBQUFCOHl3VUVjVWphQWVyaVZtL3c3WFJtNnVKV2IvRHRkR1lBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUVBQUFBQkFBQUF2REJPdWdBQUFBQUFBQUFBQUFBQUFBPT0iLz48L21ldGE+
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR18MB4543:EE_|SN7PR18MB4031:EE_
-x-ms-office365-filtering-correlation-id: 7926a54e-bed1-4e4d-ab9f-08dc16882990
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 
- rpq111DWWQft1o+nx8ZFk61jR0ezTJz9oTHRCM5RTH2nKkSFOyNGcB9rvCXrJVdtru5lL2apuR9/iQU0C0wUuLru2/V0g8W/NiR+ElZTdNogsKWfuRz2ziCvTc6hkUWbDOFPBsJrk6K16txOuwwa1FhKEawXaXJnOdMkiNEpOQ+LRY9FZuuo1sdHOlV7DhBUs9H6gcrGGBLTXm50hc9hYYcs2Zg6wV1LGzxvOBZ7bbfg+0nMKl7AG1DQMAvvGoz/O2Qo+g25E9mYgPJlBGLKAQfApCfqajA6Bx+0b5tdXgceHRb8qVF9pp0x7miXT52cka5qSDoJWYOu41AbLuPwTRtFQdYuZ+Byz1H/PGeGvlbxc8ujIuzp6645+fbDDLYev2OQTEXX10EjhYxBHOQxe6w8B2R8CAB6PVdYoQAQrVCl0H0garlgbImMT9d/+onErx/Ozk2jgZ6FGF2gukX2FgkGIYZO5Vhb+dJlURxrR0FLDZqj57JjS7UAs4eadGfJxKAJLRKJXc67yy5tf08+IjSYB4KPp/HejhxCzYvYv0XYrSGqySxgy+WYzQA1ir3ML+ALw6X+oyp159yDp74d5J81Ym2LctaIdLPhFursEZ0LxGDi+BMLualdphxg+0y1cxP3Bf2nMssLHhADo/2+Lw==
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR18MB4543.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(136003)(366004)(396003)(376002)(39860400002)(230173577357003)(230922051799003)(230273577357003)(64100799003)(186009)(1800799012)(451199024)(52536014)(4326008)(5660300002)(2906002)(9686003)(53546011)(71200400001)(6506007)(7696005)(26005)(64756008)(66446008)(66476007)(66556008)(6916009)(66946007)(316002)(76116006)(8936002)(8676002)(966005)(478600001)(41300700001)(86362001)(38070700009)(33656002)(38100700002)(122000001)(83380400001)(54906003)(55016003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?us-ascii?Q?KdwBH/oDI2sWyTfKsNbe0Sf5dWUK065X0zgxI/IB71Kdtoi9vN5F24Vruea6?=
- =?us-ascii?Q?Q/lYQEkY5i7KKjlxMhCXrRMVstzcWLonXOrRawaX37UArxpt9UNlM5ZeFfY3?=
- =?us-ascii?Q?nyfKlh4/z1sozw/U0CQMpQPt95mEGy/yOZtyXcDrEjE0Ad1HksECmStcn1U2?=
- =?us-ascii?Q?loF5TZP1sQ1UDbE5TElOSIpDFNC5hov8qM1+6jtQZSE4w1scEB7RyFl8W8t6?=
- =?us-ascii?Q?5q6nWJAfeYZnytsOgR35JQEaheS1bqFOvpxjUW7/RkM6u9O+/VtlbUCTkafX?=
- =?us-ascii?Q?9B83MKqSoiW+GMdqOZsgbb1jj2dDAgmF++kf85MXVUlJ5i8VsF1NsPtUQpS6?=
- =?us-ascii?Q?Qf3bX32AJbwznpyxJGNfB/ZbpNM4wTla0S1KXNrUuxRGcXIitWzJ9sMgroKW?=
- =?us-ascii?Q?lTi7ue/0ZHHj4r6ii/n2NU62WOy9g4Ppp4GU1NsgcnKV0HG7eeVuhD5/9MT0?=
- =?us-ascii?Q?sUTVCynKCCm9v9QTt1z+Jov1eBs4j2snEuxI81M2mMwGtCM7DPbOxakLpFZj?=
- =?us-ascii?Q?KHkAbVHTXj/QNYl0eSsB7hpktyy8DyY+UNN8qpb6zM7vQaueXB7UpTQOGhR0?=
- =?us-ascii?Q?mFphw0g0QxDkkIoikCI1na2VdZyNaoi2IImCbvfbxxY6M1w+0vU4K+briViu?=
- =?us-ascii?Q?8rR5N5CjVzWtCa+9fw4gyn7FY61fkhdrwwZX75W3pJ9yyc39ebTjfjdkeIad?=
- =?us-ascii?Q?9SBfu5+MYVzcXOIAnNf/mKaOkB6L55x9n9zzrX+Yv30Rf6/DLduosYCYGzH4?=
- =?us-ascii?Q?kA9QIzR/liN+uu3jdlqar87Klbv9WHACqahN1MmMRTPcoh2ReA5kquCJTkTO?=
- =?us-ascii?Q?fGdQrRY1rc3cPgpcUcuYzfPyHcbCG5QHXXiOjJ+AQzpxdTdrxHcbhhPxH0UP?=
- =?us-ascii?Q?8YpbMySxw5Pg0trAkLberv23BO8pmV32uIh/Mmjk39LPCflUFU3oMPiXcGWK?=
- =?us-ascii?Q?PIWdA9kuCAhP/djjMi6/lTkRoDDkLqxtFG2i0QFYPYojxP+bA70Xui4GlK29?=
- =?us-ascii?Q?LDkTkdrALWynwiFUaYx3FdhvibI1tVSwOU3AgVKrHsdlxtVAkdc8GXgDJer5?=
- =?us-ascii?Q?vJbs/RZ+Q5zBLQJr2P1SlJliHER1tbcQM4MsdUd2KE49rsCnk7km3qlC1zkm?=
- =?us-ascii?Q?T8nlBQqaIRW3Tfydpv+7ghaQ6QNCSGkZacluJd9O+91mpGKyRFnGcb07dWTf?=
- =?us-ascii?Q?mNHzghx7aPGTSmQAEjVOKh1gJXXMxkI+qmILdl09FgNvaBOXk36jLijzrOMz?=
- =?us-ascii?Q?+XnAg2AO6Lp9TJmaFyFB1N7iiLHsLJlWWXVnhy2siDTldJaBZa/Np/o69rrX?=
- =?us-ascii?Q?4eAbgUy6bqVt5Fm2oKlosl56PhkvfsK2KxD2akNYEuPnRJX6nvqJ7BBtcBP6?=
- =?us-ascii?Q?jBwNSJ2z3C3VC/8RQHm7hWUpkRUVMH/7ICVzVSlC2Z8i4JHDUd484GK55gA8?=
- =?us-ascii?Q?yx2AeG7YoXphqCGov1zg7+VzQkUSPQFDXf7h56RVK3NjZSuYG6VnfzPy4tO/?=
- =?us-ascii?Q?ixwlDwpsz+UaV2FaTMFGjgf2QfEL/yyTb8GTqTpLvlSK6EcOl34HKuuQWgZn?=
- =?us-ascii?Q?yQK58MHb0/gotZlNLiI=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=ieee.org; s=google; t=1705405490; x=1706010290; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=82O4LLMvvZQSOIR03ZK1ZHOCta6qzNNSpbUP83yxRKg=;
+        b=J5MWO03gkVZLZZG9GhcXLT6/CP+jCJvKGD/0XVjzUGWYUC1ub/07lT/EDFVvo0+vQk
+         NWuUMIagKr0Td5N/FbpJQbpYYZZGjMGEJoVXrVt7CO6rVWROPF/uUAEh2zb3zxPlTxXM
+         1Bo/ta1GcDGr8cykFRZM/7OSvdRpB50qv6cpE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705405490; x=1706010290;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=82O4LLMvvZQSOIR03ZK1ZHOCta6qzNNSpbUP83yxRKg=;
+        b=BluKu1EvqU1X1+IXR16dXMBdMqvMX0Cn32k39orgHaCuX8iT8T6ERmgd+LY/ahi2wl
+         ggHYFEABH023c5m88rETMladIlRwDAC8Qz7d6hp8jn2AR5yDUlKs59jy6VwvS7XT5ju1
+         JQVdp2tTi5wHYMFYbgw98rWtTpr2mmHLK7zQhwSGNax0zMg/BrnEBmmYJu+P63TzPNbu
+         XRF0TOgCLXN1u8YC8qGVSAa+NkTZBNGGr7H9ftHq00cAE3LmpXumwmJAypiS6yb0OwaJ
+         /NKFbN8g9gyovBU08wmAmVrJCf6Na5AzoRWG4h91o/EMlSKJMYNpoVcoHZ9k+10K0FF0
+         Fm3A==
+X-Gm-Message-State: AOJu0YyDQNWKapR1u4AH0ih0tyLjfG/d+ESGV4AsqI/JcWOU/wMlfPzY
+	4kHq9u0GQ1sy1FWQ29L0eKfLbg8BtrVo
+X-Google-Smtp-Source: AGHT+IExKL8eb+NEQah+KUXQe8TLYefHOat3TNlc6xHDt0chTP1l2cR0IV/yZj9etX1oe+OTovZLtQ==
+X-Received: by 2002:a92:c9c5:0:b0:360:d9d9:a8a3 with SMTP id k5-20020a92c9c5000000b00360d9d9a8a3mr3693194ilq.117.1705405490139;
+        Tue, 16 Jan 2024 03:44:50 -0800 (PST)
+Received: from [172.22.22.28] (c-98-61-227-136.hsd1.mn.comcast.net. [98.61.227.136])
+        by smtp.googlemail.com with ESMTPSA id 14-20020a92130e000000b0035fadef5006sm3504193ilt.26.2024.01.16.03.44.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 16 Jan 2024 03:44:49 -0800 (PST)
+Message-ID: <51e73530-7c65-4e2f-9749-7dbbe9098fde@ieee.org>
+Date: Tue, 16 Jan 2024 05:44:48 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: marvell.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR18MB4543.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7926a54e-bed1-4e4d-ab9f-08dc16882990
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jan 2024 11:42:04.7981
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: uBPfpEU+g/fe31/kbf0nSbgEer7meJmhHWgQoegpXvLZ+8R47iWqeCKJvRGIUrdWLVwZm9NM/zmBYF0Nr0KBIA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR18MB4031
-X-Proofpoint-ORIG-GUID: Ze_tEQE3jd-gUxZQAvakRhmP9gTojz2j
-X-Proofpoint-GUID: Ze_tEQE3jd-gUxZQAvakRhmP9gTojz2j
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-12-09_02,2023-12-07_01,2023-05-22_02
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH][next] net: ipa: remove the redundant assignment to
+ variable trans_id
+Content-Language: en-US
+To: Colin Ian King <colin.i.king@gmail.com>, Alex Elder <elder@kernel.org>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240116114025.2264839-1-colin.i.king@gmail.com>
+From: Alex Elder <elder@ieee.org>
+In-Reply-To: <20240116114025.2264839-1-colin.i.king@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 1/16/24 5:40 AM, Colin Ian King wrote:
+> The variable trans_id is being modulo'd by channel->tre_count and
+> the value is being re-assigned back to trans_id even though the
+> variable is not used after this operation. The assignment is
+> redundant. Remove the assignment and just replace it with the modulo
+> operator.
+> 
+> Cleans up clang scan build warning:
+> warning: Although the value stored to 'trans_id' is used in the
+> enclosing expression, the value is never actually read from
+> 'trans_id' [deadcode.DeadStores]
+> 
+> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
 
+This looks good.  I saw this before but hadn't gotten around to
+fixing it yet.  Thank you!
 
------Original Message-----
-From: Russell King <linux@armlinux.org.uk>=20
-Sent: Tuesday, January 16, 2024 2:56 PM
-To: Jenishkumar Patel [C] <jpatel2@marvell.com>
-Cc: marcin.s.wojtas@gmail.com; davem@davemloft.net; edumazet@google.com; ku=
-ba@kernel.org; pabeni@redhat.com; netdev@vger.kernel.org; linux-kernel@vger=
-.kernel.org
-Subject: [EXT] Re: [PATCH 1/1] net: mvpp2: clear BM pool before initializat=
-ion
+Reviewed-by: Alex Elder <elder@linaro.org>
 
-External Email
+> ---
+>   drivers/net/ipa/gsi_trans.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ipa/gsi_trans.c b/drivers/net/ipa/gsi_trans.c
+> index ee6fb00b71eb..f5dafc2f53ab 100644
+> --- a/drivers/net/ipa/gsi_trans.c
+> +++ b/drivers/net/ipa/gsi_trans.c
+> @@ -247,7 +247,7 @@ struct gsi_trans *gsi_channel_trans_complete(struct gsi_channel *channel)
+>   			return NULL;
+>   	}
+>   
+> -	return &trans_info->trans[trans_id %= channel->tre_count];
+> +	return &trans_info->trans[trans_id % channel->tre_count];
+>   }
+>   
+>   /* Move a transaction from allocated to committed state */
 
-----------------------------------------------------------------------
-On Mon, Jan 15, 2024 at 09:57:54PM -0800, Jenishkumar Maheshbhai Patel wrot=
-e:
->  static int mvpp2_bm_init(struct device *dev, struct mvpp2 *priv)  {
->  	enum dma_data_direction dma_dir =3D DMA_FROM_DEVICE;
->  	int i, err, poolnum =3D MVPP2_BM_POOLS_NUM;
->  	struct mvpp2_port *port;
-> =20
-> +	if (priv->percpu_pools)
-> +		poolnum =3D mvpp2_get_nrxqs(priv) * 2;
-> +
-> +	for (i =3D 0; i < poolnum; i++) {
-> +		/* Make sure about the pool state in case it was
-> +		 * used by firmware.
-> +		 */
-> +		mvpp2_bm_pool_cleanup(priv, i);
-> +	}
-
-	/* Clean up the pool state in case it contains stale state */
-	for (i =3D 0; i < poolnum; i++)
-		mvpp2_bm_pool_cleanup(priv, i);
-
-Doesn't need quite as many lines!
-
-I will address the comments in v2
-
---
-RMK's Patch system: https://urldefense.proofpoint.com/v2/url?u=3Dhttps-3A__=
-www.armlinux.org.uk_developer_patches_&d=3DDwIBAg&c=3DnKjWec2b6R0mOyPaz7xtf=
-Q&r=3DweFk2fYEO0yNIZAlSXwm82u5QM08YlNJaQ39RhfTtUo&m=3D2U4cWAQSanajVfFvpZbZd=
-hHMcQ4rsCILgPZ1Nk_k-CE3HMuIv3y5IPWQ4KgdJgAG&s=3DIbrApY-e2TWgCw8YQJc7W48jpUG=
-y29BTy_MfcTkwQ8I&e=3D
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
