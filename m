@@ -1,61 +1,65 @@
-Return-Path: <netdev+bounces-63826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00C0C82F966
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 22:06:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0430882F97B
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 22:08:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 82FACB25913
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 21:06:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E63E285529
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 21:08:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 246561420BA;
-	Tue, 16 Jan 2024 19:55:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BFA114460F;
+	Tue, 16 Jan 2024 19:56:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TEKlK1as"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g9ItLq17"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0BFA1420B5;
-	Tue, 16 Jan 2024 19:55:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D63F014460C;
+	Tue, 16 Jan 2024 19:56:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705434957; cv=none; b=JIk+Klyhb7lczBzq3HwwzEneuPsX1F7ijfQQWGNwmfudw1rk6L0+Qkk3AQ53Cv12xnU1UBGVKBrmOSSA6vvy8vgIRqz8QShXxrWIhD24RAMGFhuFZljH18nPSAE5d7btOCRvN2CpDVCNX3LjUsxaq1S60pvaomopgq4z65Od+u8=
+	t=1705434969; cv=none; b=tw+Ym906i6TuxXWDGty0VQS/5lAnL8OYSxNqzF8+GxFVTvxSUQP+0752VC2rX5+B/lN8zkfuCkN1Obn4OCJirp6zeE0EUMbXMkSs7kUcNs1c+ol/XWLY+w5LmfawPDhHwrSpZzDo1fPRd0R9yCKze82C/TxXqrBJ0mRqU1fB5m4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705434957; c=relaxed/simple;
-	bh=2RXEokfNRXpXQhkgrp6ngX7HyIcxybH5QKePibPX4c0=;
+	s=arc-20240116; t=1705434969; c=relaxed/simple;
+	bh=jg6VgF/EuOdf/AZ8IrPRAm/o2oDTU1Re8n9z1HgWtrI=;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:X-stable:
-	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=p7SsvEb3c2ZiuFWQBiynUOxyh93k1eAaaKMxqx/aP8oxO+0eaha066l4uYXaAKKHMM/JfRnTcwmWtp2142y80R/LPKJ8HBVv5PN4ejn2WQbgrNNks0BAiWud2HtPSmyyNbMK/WlZuKe92hZpO+cYqvCSXFtd2HtXNFQhj1sJRUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TEKlK1as; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7731C433F1;
-	Tue, 16 Jan 2024 19:55:55 +0000 (UTC)
+	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=HH4RVGy/xjmxHuMgu7BPpm+3tsVT/1KaB4jIMzNXlVextnNBwHB/MW7dCoBXjywZXls31zCaWSchfe02X/z+5IxXKzzlmydpUaOndsrjc78qhCZhwQHaR0oQkd75472u+s/Hjy2WUxhAIx4c9DR9RqwKloCzLKb90BYll9RPyzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g9ItLq17; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9D56C433C7;
+	Tue, 16 Jan 2024 19:56:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705434956;
-	bh=2RXEokfNRXpXQhkgrp6ngX7HyIcxybH5QKePibPX4c0=;
+	s=k20201202; t=1705434969;
+	bh=jg6VgF/EuOdf/AZ8IrPRAm/o2oDTU1Re8n9z1HgWtrI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TEKlK1asKf4fI/UDy2bo8v2fsvkIOgUSTpyDf9pbgrbOF4FxO2U9xoOWVWe4aU4J/
-	 J5g/CwuaHFhDkJSFTWwLL0ZSI/yPCPfKqdYNo1TzwCYXZ6QgIjWcfRrDI8QXXfIhay
-	 MemotzrYy25INDpDFs+jpyovlDPHz/0GdMioU3qjVXz4iewfrd9k+3LcL29G1rHaH1
-	 1OMv/2K17+B5zLS7+mnQ1IYGKpx5dobeLOJqn7SiBVyHjLofhNKLVa9MKvyG6XN7KO
-	 Sz+Y6gQGcpD/TYf5yLQGfYKUKDAkreMuF4G+0Yx6GW3M5LTOCtyeqrEKIY9WiRo7bL
-	 WGnjRX3YZ8LNw==
+	b=g9ItLq17nfv+2vrPCictRNtxGJ59B1Z2qEHyPBXI0XHpcWnytHdFrD0KsKY8F1w0Q
+	 KA6OJnB74O1dKKhaSn23C4ZbuVItdT3QuAf9sRf/lNr3bmsz5PJe5dRSvBMlGe6mrh
+	 dttxy9UBFfoTT0fXqrBhniiaveyEiLwScGkYhXAw6klVN5UFfYJWYn2Ip2hDVQvQhh
+	 YB6L7GdPzKyPlbK91y2wTOKsE8nxR2yMJQMLH0fvgMs4aKbLQjBSHr0GHQOdG1wbnU
+	 TfApekrIVKFGgFQ7VLuw/ibsiHvL66skuVTwcDfIhZW3Ot5ZkKMMriMwnMYUwaqT+u
+	 p0CqMQdi0v8kg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Michael Chan <michael.chan@broadcom.com>,
-	Andy Gospodarek <gospo@broadcom.com>,
+Cc: Tobias Waldekranz <tobias@waldekranz.com>,
+	Andrew Lunn <andrew@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	davem@davemloft.net,
 	edumazet@google.com,
 	pabeni@redhat.com,
+	horms@kernel.org,
+	robh@kernel.org,
+	u.kleine-koenig@pengutronix.de,
+	krzysztof.kozlowski@linaro.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 20/68] bnxt_en: Add 5760X (P7) PCI IDs
-Date: Tue, 16 Jan 2024 14:53:19 -0500
-Message-ID: <20240116195511.255854-20-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 26/68] net: mvmdio: Avoid excessive sleeps in polled mode
+Date: Tue, 16 Jan 2024 14:53:25 -0500
+Message-ID: <20240116195511.255854-26-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240116195511.255854-1-sashal@kernel.org>
 References: <20240116195511.255854-1-sashal@kernel.org>
@@ -70,64 +74,137 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.1.73
 Content-Transfer-Encoding: 8bit
 
-From: Michael Chan <michael.chan@broadcom.com>
+From: Tobias Waldekranz <tobias@waldekranz.com>
 
-[ Upstream commit 2012a6abc87657c6c8171bb5ff13dd9bafb241bf ]
+[ Upstream commit 7dd12fe34686d89c332b1a05104d18d728591f0a ]
 
-Now with basic support for the new chip family, add the PCI IDs of the
-new devices.
+Before this change, when operating in polled mode, i.e. no IRQ is
+available, every individual C45 access would be hit with a 150us sleep
+after the bus access.
 
-Reviewed-by: Andy Gospodarek <gospo@broadcom.com>
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
-Link: https://lore.kernel.org/r/20231201223924.26955-16-michael.chan@broadcom.com
+For example, on a board with a CN9130 SoC connected to an MV88X3310
+PHY, a single C45 read would take around 165us:
+
+    root@infix:~$ mdio f212a600.mdio-mii mmd 4:1 bench 0xc003
+    Performed 1000 reads in 165ms
+
+By replacing the long sleep with a tighter poll loop, we observe a 10x
+increase in bus throughput:
+
+    root@infix:~$ mdio f212a600.mdio-mii mmd 4:1 bench 0xc003
+    Performed 1000 reads in 15ms
+
+Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Tested-by: Andrew Lunn <andrew@lunn.ch>
+Link: https://lore.kernel.org/r/20231204100811.2708884-3-tobias@waldekranz.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 8 ++++++++
- drivers/net/ethernet/broadcom/bnxt/bnxt.h | 4 ++++
- 2 files changed, 12 insertions(+)
+ drivers/net/ethernet/marvell/mvmdio.c | 53 ++++++++-------------------
+ 1 file changed, 16 insertions(+), 37 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 623cdeb29ed9..3ab465e3cccf 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -121,6 +121,10 @@ static const struct {
- 	[BCM57508] = { "Broadcom BCM57508 NetXtreme-E 10Gb/25Gb/50Gb/100Gb/200Gb Ethernet" },
- 	[BCM57504] = { "Broadcom BCM57504 NetXtreme-E 10Gb/25Gb/50Gb/100Gb/200Gb Ethernet" },
- 	[BCM57502] = { "Broadcom BCM57502 NetXtreme-E 10Gb/25Gb/50Gb Ethernet" },
-+	[BCM57608] = { "Broadcom BCM57608 NetXtreme-E 10Gb/25Gb/50Gb/100Gb/200Gb/400Gb Ethernet" },
-+	[BCM57604] = { "Broadcom BCM57604 NetXtreme-E 10Gb/25Gb/50Gb/100Gb/200Gb Ethernet" },
-+	[BCM57602] = { "Broadcom BCM57602 NetXtreme-E 10Gb/25Gb/50Gb/100Gb Ethernet" },
-+	[BCM57601] = { "Broadcom BCM57601 NetXtreme-E 10Gb/25Gb/50Gb/100Gb/200Gb/400Gb Ethernet" },
- 	[BCM57508_NPAR] = { "Broadcom BCM57508 NetXtreme-E Ethernet Partition" },
- 	[BCM57504_NPAR] = { "Broadcom BCM57504 NetXtreme-E Ethernet Partition" },
- 	[BCM57502_NPAR] = { "Broadcom BCM57502 NetXtreme-E Ethernet Partition" },
-@@ -175,6 +179,10 @@ static const struct pci_device_id bnxt_pci_tbl[] = {
- 	{ PCI_VDEVICE(BROADCOM, 0x1750), .driver_data = BCM57508 },
- 	{ PCI_VDEVICE(BROADCOM, 0x1751), .driver_data = BCM57504 },
- 	{ PCI_VDEVICE(BROADCOM, 0x1752), .driver_data = BCM57502 },
-+	{ PCI_VDEVICE(BROADCOM, 0x1760), .driver_data = BCM57608 },
-+	{ PCI_VDEVICE(BROADCOM, 0x1761), .driver_data = BCM57604 },
-+	{ PCI_VDEVICE(BROADCOM, 0x1762), .driver_data = BCM57602 },
-+	{ PCI_VDEVICE(BROADCOM, 0x1763), .driver_data = BCM57601 },
- 	{ PCI_VDEVICE(BROADCOM, 0x1800), .driver_data = BCM57502_NPAR },
- 	{ PCI_VDEVICE(BROADCOM, 0x1801), .driver_data = BCM57504_NPAR },
- 	{ PCI_VDEVICE(BROADCOM, 0x1802), .driver_data = BCM57508_NPAR },
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 111098b4b606..0b3d93ad1190 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -1685,6 +1685,10 @@ enum board_idx {
- 	BCM57508_NPAR,
- 	BCM57504_NPAR,
- 	BCM57502_NPAR,
-+	BCM57608,
-+	BCM57604,
-+	BCM57602,
-+	BCM57601,
- 	BCM58802,
- 	BCM58804,
- 	BCM58808,
+diff --git a/drivers/net/ethernet/marvell/mvmdio.c b/drivers/net/ethernet/marvell/mvmdio.c
+index ef878973b859..b4c576e79a95 100644
+--- a/drivers/net/ethernet/marvell/mvmdio.c
++++ b/drivers/net/ethernet/marvell/mvmdio.c
+@@ -23,6 +23,7 @@
+ #include <linux/delay.h>
+ #include <linux/interrupt.h>
+ #include <linux/io.h>
++#include <linux/iopoll.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/of_device.h>
+@@ -58,11 +59,6 @@
+  * - Armada 370       (Globalscale Mirabox):   41us to 43us (Polled)
+  */
+ #define MVMDIO_SMI_TIMEOUT		1000 /* 1000us = 1ms */
+-#define MVMDIO_SMI_POLL_INTERVAL_MIN	45
+-#define MVMDIO_SMI_POLL_INTERVAL_MAX	55
+-
+-#define MVMDIO_XSMI_POLL_INTERVAL_MIN	150
+-#define MVMDIO_XSMI_POLL_INTERVAL_MAX	160
+ 
+ struct orion_mdio_dev {
+ 	void __iomem *regs;
+@@ -84,8 +80,6 @@ enum orion_mdio_bus_type {
+ 
+ struct orion_mdio_ops {
+ 	int (*is_done)(struct orion_mdio_dev *);
+-	unsigned int poll_interval_min;
+-	unsigned int poll_interval_max;
+ };
+ 
+ /* Wait for the SMI unit to be ready for another operation
+@@ -94,34 +88,23 @@ static int orion_mdio_wait_ready(const struct orion_mdio_ops *ops,
+ 				 struct mii_bus *bus)
+ {
+ 	struct orion_mdio_dev *dev = bus->priv;
+-	unsigned long timeout = usecs_to_jiffies(MVMDIO_SMI_TIMEOUT);
+-	unsigned long end = jiffies + timeout;
+-	int timedout = 0;
++	unsigned long timeout;
++	int done;
+ 
+-	while (1) {
+-	        if (ops->is_done(dev))
++	if (dev->err_interrupt <= 0) {
++		if (!read_poll_timeout_atomic(ops->is_done, done, done, 2,
++					      MVMDIO_SMI_TIMEOUT, false, dev))
++			return 0;
++	} else {
++		/* wait_event_timeout does not guarantee a delay of at
++		 * least one whole jiffie, so timeout must be no less
++		 * than two.
++		 */
++		timeout = max(usecs_to_jiffies(MVMDIO_SMI_TIMEOUT), 2);
++
++		if (wait_event_timeout(dev->smi_busy_wait,
++				       ops->is_done(dev), timeout))
+ 			return 0;
+-	        else if (timedout)
+-			break;
+-
+-	        if (dev->err_interrupt <= 0) {
+-			usleep_range(ops->poll_interval_min,
+-				     ops->poll_interval_max);
+-
+-			if (time_is_before_jiffies(end))
+-				++timedout;
+-	        } else {
+-			/* wait_event_timeout does not guarantee a delay of at
+-			 * least one whole jiffie, so timeout must be no less
+-			 * than two.
+-			 */
+-			if (timeout < 2)
+-				timeout = 2;
+-			wait_event_timeout(dev->smi_busy_wait,
+-				           ops->is_done(dev), timeout);
+-
+-			++timedout;
+-	        }
+ 	}
+ 
+ 	dev_err(bus->parent, "Timeout: SMI busy for too long\n");
+@@ -135,8 +118,6 @@ static int orion_mdio_smi_is_done(struct orion_mdio_dev *dev)
+ 
+ static const struct orion_mdio_ops orion_mdio_smi_ops = {
+ 	.is_done = orion_mdio_smi_is_done,
+-	.poll_interval_min = MVMDIO_SMI_POLL_INTERVAL_MIN,
+-	.poll_interval_max = MVMDIO_SMI_POLL_INTERVAL_MAX,
+ };
+ 
+ static int orion_mdio_smi_read(struct mii_bus *bus, int mii_id,
+@@ -200,8 +181,6 @@ static int orion_mdio_xsmi_is_done(struct orion_mdio_dev *dev)
+ 
+ static const struct orion_mdio_ops orion_mdio_xsmi_ops = {
+ 	.is_done = orion_mdio_xsmi_is_done,
+-	.poll_interval_min = MVMDIO_XSMI_POLL_INTERVAL_MIN,
+-	.poll_interval_max = MVMDIO_XSMI_POLL_INTERVAL_MAX,
+ };
+ 
+ static int orion_mdio_xsmi_read(struct mii_bus *bus, int mii_id,
 -- 
 2.43.0
 
