@@ -1,139 +1,99 @@
-Return-Path: <netdev+bounces-63711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A47E82EF9E
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 14:18:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76CAC82EFC2
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 14:31:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B82021F244EE
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 13:18:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F33B0284633
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 13:31:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEFA21BC4F;
-	Tue, 16 Jan 2024 13:18:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A09B1BC55;
+	Tue, 16 Jan 2024 13:31:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="m8HblPnD"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="D1yNi7bo"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 040D31BC47;
-	Tue, 16 Jan 2024 13:18:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ej944qWFIi9COYJbBb09o9QKP8cZyiOYwsc2orhfIt4=; b=m8HblPnDO5qXLUMnufSJwanb4X
-	F3UWBnF9h5JHQPP6F2CVRMfVGd1oUv+3UTePhOAYP6ijcN/Ososc7qvjsV96EJyuybBb41vV4RN/W
-	YTsYGrpry9JlBgTaTzCcGdl9oYsjsebtXRIcsqCtq6b61DufTx9LVzNB+id/fg2RFOug=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rPjKO-005JiB-Id; Tue, 16 Jan 2024 14:18:04 +0100
-Date: Tue, 16 Jan 2024 14:18:04 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: =?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
-	Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v2 8/8] net: pse-pd: Add PD692x0 PSE controller
- driver
-Message-ID: <64f30166-58cc-409d-ba5b-9ea3fb8ead88@lunn.ch>
-References: <20231201-feature_poe-v2-0-56d8cac607fa@bootlin.com>
- <20231201-feature_poe-v2-8-56d8cac607fa@bootlin.com>
- <639c5222-043f-4e27-9efa-ce2a1d73eaba@lunn.ch>
- <20240116104949.12708cd5@kmaincent-XPS-13-7390>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CB351BC47;
+	Tue, 16 Jan 2024 13:31:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id F1C9760007;
+	Tue, 16 Jan 2024 13:31:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1705411903;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+GGfIWOZzoS5FI6VacxBhh6eflIWOIAfi24KVKKdHfY=;
+	b=D1yNi7boiHKa08RmzfZ6e2rsRmm1OFbabWijcNnT6H2ifQWwEn128b8yg4R7A8gA5WJpjE
+	DH8SgTCStZCT55yl2OIvuYFAzknW1ULVe2+Q91EpFHI8HUhx+ixb+2W/AuY+fI+sdTlSdS
+	WU4MWcG//90J9h9sA6a+x6qTkDuByO2rldOp7ilHMedD6Wo+EiWg5QczidTE3SeXJmwOFv
+	sEyJX6s8hd5sv+sOnng9NNXHn/5mJ5pU+f9P2O0N+SY9Vq0JDHkc+fFy/ehzs9B4Y/Ji5J
+	+6hM5dD0FmABHXb/voX6CWeOTK8kTgnIc4INpgmiNnaPKpO1sIVUD7yyfsbsUw==
+Message-ID: <656cf9e2-2ab9-48ea-9eea-7599f14f3a41@arinc9.com>
+Date: Tue, 16 Jan 2024 16:31:34 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240116104949.12708cd5@kmaincent-XPS-13-7390>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net-next 7/8] net: dsa: mt7530: correct port
+ capabilities of MT7988
+Content-Language: en-US
+To: Daniel Golle <daniel@makrotopia.org>, Vladimir Oltean <olteanv@gmail.com>
+Cc: Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+ Luiz Angelo Daros de Luca <luizluca@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <20240113102529.80371-1-arinc.unal@arinc9.com>
+ <20240113102529.80371-8-arinc.unal@arinc9.com>
+ <20240115214238.bnlvomatududng6l@skbuf> <ZaWtIMC9zqwjVewO@makrotopia.org>
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <ZaWtIMC9zqwjVewO@makrotopia.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
 
+On 16.01.2024 01:09, Daniel Golle wrote:
+> On Mon, Jan 15, 2024 at 11:42:38PM +0200, Vladimir Oltean wrote:
+>> On Sat, Jan 13, 2024 at 01:25:28PM +0300, Arınç ÜNAL wrote:
+>>> On the switch on the MT7988 SoC, there are only 4 PHYs. That's port 0 to 3.
+>>> Set the internal phy cases to '0 ... 3'.
+>>>
+>>> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+>>> Acked-by: Daniel Golle <daniel@makrotopia.org>
+>>> ---
+>>
+>> For this patch to be obviously correct, please make a statement in the
+>> commit message about port 4. It doesn't exist at all?
 > 
-> > > +static int pd692x0_fw_get_next_line(const u8 *data,
-> > > +				    char *line, size_t size)
-> > > +{
-> > > +	size_t line_size;
-> > > +	int i;
-> > > +
-> > > +	line_size = min_t(size_t, size, (size_t)PD692X0_FW_LINE_MAX_SZ);
-> > > +
-> > > +	memset(line, 0, PD692X0_FW_LINE_MAX_SZ);
-> > > +	for (i = 0; i < line_size - 1; i++) {
-> > > +		if (*data == '\r' && *(data + 1) == '\n') {
-> > > +			line[i] = '\r';
-> > > +			line[i + 1] = '\n';
-> > > +			return i + 2;
-> > > +		}  
-> > 
-> > Does the Vendor Documentation indicate Windoze line endings will
-> > always be used? Motorola SREC allow both Windows or rest of the world
-> > line endings to be used. 
+> Correct. As shown in Block Diagram 8.1.1.3 on page 125 of
+> MT7988A Wi-Fi 7 Generation Router Platform: Datasheet (Open Version)
+> Version: 0.1
+> Release Date: 2023-10-18
+> which is available publicly on BananaPi's Wiki[1].
 > 
-> All the firmware lines end with "\r\n" but indeed it is not specifically
-> written that the firmware content would follow this. IMHO it is implicit that
-> it would be the case as all i2c messages use this line termination.
-> Do you prefer that I add support to the world line endings possibility? 
-
-No need, just hack an SREC file, and test the parser does not explode
-with an opps, and you get an sensible error message about the firmware
-being corrupt. I would not be too surprised if there are some mail
-systems still out there which might convert the line ending.
-
-> > > +static enum fw_upload_err pd692x0_fw_poll_complete(struct fw_upload *fwl)
-> > > +{
-> > > +	struct pd692x0_priv *priv = fwl->dd_handle;
-> > > +	const struct i2c_client *client = priv->client;
-> > > +	struct pd692x0_msg_ver ver;
-> > > +	int ret;
-> > > +
-> > > +	priv->fw_state = PD692X0_FW_COMPLETE;
-> > > +
-> > > +	ret = pd692x0_fw_reset(client);
-> > > +	if (ret)
-> > > +		return ret;
-> > > +
-> > > +	ver = pd692x0_get_sw_version(priv);
-> > > +	if (ver.maj_sw_ver != PD692X0_FW_MAJ_VER) {  
-> > 
-> > That is probably too strong a condition. You need to allow firmware
-> > upgrades, etc. Does it need to be an exact match, or would < be
-> > enough?
+> Port 0~3 are TP user ports, Port 6 is internally linked to XGMII of MAC 0.
+> Port 4 and 5 are not used at all in this design.
 > 
-> The major version is not compatible with the last one, the i2c messages
-> content changed. I supposed a change in major version would imply a change in
-> the i2c messages content and would need a driver update that's why I used this
-> strong condition.
+> [1]: https://wiki.banana-pi.org/Banana_Pi_BPI-R4#Documents
 
-Do you know the next major version will change the message contents?
-Is this documented somewhere? If so add a comment. Otherwise, i would
-allow higher major versions. When the vendor breaks backwards
-compatibility, its going to need code changes anyway, and at that
-point the test can be made more strict.
+Thanks for chiming in Daniel, I will include this on the patch log.
 
-We try to make vendors not make firmware ABI breaking changes, and we
-have pushed back against a number of vendors who do. So i think its
-best we assume they won't break the ABI.
-
-      Andrew
+Arınç
 
