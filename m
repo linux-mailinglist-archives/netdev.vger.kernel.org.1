@@ -1,181 +1,146 @@
-Return-Path: <netdev+bounces-63799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E79882F796
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 21:26:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8047982F7A6
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 21:27:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 110FE282A40
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 20:25:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9315A1C24ABE
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 20:27:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 981053CF6C;
-	Tue, 16 Jan 2024 19:48:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A262622F04;
+	Tue, 16 Jan 2024 19:49:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="A4rTom+0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SplWXPA6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3F60224D6
-	for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 19:48:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B6E122F03;
+	Tue, 16 Jan 2024 19:49:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705434494; cv=none; b=e5lRc2g6JLGSjaQnlTDLG5zERvDfdbmU5qDL+ePBcpdeIGnhVeoKoYj7zgH2k/L0AsBG9M39ySRCcsX26oL45y8vuxQST5Zk8ddQu3CX4z4t4CIb3w0fZcxBU2uAI/peWVDHC3rCNiX06RVwoaXpwBSh4nam59ltXsQMrphXNls=
+	t=1705434557; cv=none; b=YH7BjzOLQYuazT6X4oWrd8U3clES7+br9y0W/F03rzoZ2JHja4TmlbN6Nl62SC9OtaW74lndkvc9JEhEI/jUEBQnhFRsfoRkmCZDR6P1n0uCjv0hepzsc3fjpVmY3bm7SFhKe7TklrgErTIlIlZMBQPVggyhjk/qG7gY/sHD8LM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705434494; c=relaxed/simple;
-	bh=LnTl7IBREzLYqWvQ8pCIW/E+RgTu2/SUgmhcI3MTL3w=;
-	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:MIME-Version:
-	 References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:
-	 Content-Type; b=XUkWUzI4DAjqL+9tDSOFBp59LCsRbtSg2bz4BARdL0eVfgreRZoA+bAOG9YuMwpFEHQpHjXyo+oYuOTcoR+ZrIK+W2NwnW6QN57Cws3xAWtOPHRaEzfWPmbCU46071FybhxkpnEKVhqJDGK77pptGYXF/Iqu2hCA42Otl3Zt4L8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=A4rTom+0; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-559d0ef3fb5so14806a12.3
-        for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 11:48:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1705434491; x=1706039291; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=K192r/sW27aluB5zE6J8vSYtnaAC9bBZ6Zsp1tXgBtU=;
-        b=A4rTom+0kYj0ipB+ofMteyrgKQiOU3GLgbroHsgWAUmHd15R58Ty1lrB9TlKH/hMJQ
-         Tz7zm8nOXDsfEGzXXXAdmWI4qMPCMsDJX4smiG6XO+kCHla+00prsak/Z4/8Pz317qb3
-         o6o7syV/YdURtk5ywrfqarIqn6BOSpKGet8/4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705434491; x=1706039291;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=K192r/sW27aluB5zE6J8vSYtnaAC9bBZ6Zsp1tXgBtU=;
-        b=f4kERjR3jm2MNInJZOoYVMzdgWKRWXonlAJePF616ivvxVPcbPdcVC2lgV9n/ztPdH
-         NPcGcQ47DgXlm65uK1Nu68uh8K7zaRJj5Bchcc0zDqQSVzFFK8B0D78dh2w3884ATASp
-         szEBY8Pg3uduvtsuGRpTFH0YKXxDjEbUOrs0vPfndIKssM6dBsLkgNdLgsL8nRFGshBe
-         OXCjn/4WvBsUkcsc3p+j8G/Q2xHp54VCHCenPHrazANlPDjRl3Ib4jD+PvWPEXY/3jXh
-         uEngWJ3GlIIHaHijxuL0WB0W3mT8G18WiLaujy/2DpFUfUn34pdKH+KMjOZRLzYcoTBL
-         vNjw==
-X-Gm-Message-State: AOJu0YxMZEUzMLh4KgfLUil2X3W//LX1KhdlnH5i7rr1AiQY0uaAg+/D
-	pealKukmESYjVoichB3bXROg69gpKaVc4f51swjq19w2a9Zx
-X-Google-Smtp-Source: AGHT+IHkutDzdajgVUlT+vjQNJkSLoc6mTgRhvUodOq5EaChNS1cHru8tUvbnwGDGr8S1XLhR8j0ouPnJVb5fFDiD0s=
-X-Received: by 2002:a05:6402:312c:b0:559:715d:1b07 with SMTP id
- dd12-20020a056402312c00b00559715d1b07mr1260342edb.74.1705434491093; Tue, 16
- Jan 2024 11:48:11 -0800 (PST)
+	s=arc-20240116; t=1705434557; c=relaxed/simple;
+	bh=UlR1vzAunUYAVA7h0+hGXquiBWPvzaB/M+M2k4Oo93Y=;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To; b=QshZe+jzmPrT/I7DHwOz//IVuKtpcM855tl4z3w7SH24E3HotoEQJNZ9tiIQFf4N/2Jf986Eayg5PTVbDmFpCGb4wKi5C/NZq90l87EDGPOUo7smp2Opo7Ohhgm29O57grSm2y8XNLK5/6HJLrzLvUmJ23xPNxyzYpIN8UUPqdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SplWXPA6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3AA1C433C7;
+	Tue, 16 Jan 2024 19:49:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705434557;
+	bh=UlR1vzAunUYAVA7h0+hGXquiBWPvzaB/M+M2k4Oo93Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SplWXPA6IGc3JIiEWpBLpIBZ/IkVf1GiZDX7uK07GZqVFCZ1CikouJjhZQLNqjiJE
+	 4Ewxv5BnctuxPUXi91HkCBo8Z9GzYr3f/i6cuhswv95RYDock3JPwsa0AX//8bEI/0
+	 NpP+Udx6kTEhAxVG4SdjQpgYI6i2UrcyP4LKCx44RwFVKpjuBpp5M9y3AtgvP/PXR+
+	 em1uXYIYHoiSPS1B1rgnt2nDKvrRbaEXI3bycENqtcmND0vVnflqQaGGGDUSVcCIt/
+	 iyOI/TOlCKTe13OASuKFV9q1Z8CbNmriRJ1wEvToCgWMOkTYEMOYyqBK3msdcpa2h6
+	 oDJgbvKetgvzw==
+Date: Tue, 16 Jan 2024 19:49:12 +0000
+From: Simon Horman <horms@kernel.org>
+To: Heng Qi <hengqi@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
+	Jason Wang <jasowang@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next 2/3] virtio-net: batch dim request
+Message-ID: <20240116194912.GE588419@kernel.org>
+References: <1705410693-118895-1-git-send-email-hengqi@linux.alibaba.com>
+ <1705410693-118895-3-git-send-email-hengqi@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240116194225.250921-1-sashal@kernel.org> <20240116194225.250921-36-sashal@kernel.org>
-In-Reply-To: <20240116194225.250921-36-sashal@kernel.org>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Tue, 16 Jan 2024 11:47:59 -0800
-Message-ID: <CACKFLinMgFcKzKv8=n0MM7XZGhDO1=NFmFAu=pKsj0+BNCqKOQ@mail.gmail.com>
-Subject: Re: [PATCH AUTOSEL 6.7 036/108] bnxt_en: Add 5760X (P7) PCI IDs
-To: Sasha Levin <sashal@kernel.org>
-Cc: linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
-	Andy Gospodarek <gospo@broadcom.com>, Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, 
-	edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000000d7d2d060f156937"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1705410693-118895-3-git-send-email-hengqi@linux.alibaba.com>
 
---0000000000000d7d2d060f156937
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Tue, Jan 16, 2024 at 09:11:32PM +0800, Heng Qi wrote:
+> Currently, when each time the driver attempts to update the coalescing
+> parameters for a vq, it needs to kick the device.
+> The following path is observed:
+>   1. Driver kicks the device;
+>   2. After the device receives the kick, CPU scheduling occurs and DMA
+>      multiple buffers multiple times;
+>   3. The device completes processing and replies with a response.
+> 
+> When large-queue devices issue multiple requests and kick the device
+> frequently, this often interrupt the work of the device-side CPU.
+> In addition, each vq request is processed separately, causing more
+> delays for the CPU to wait for the DMA request to complete.
+> 
+> These interruptions and overhead will strain the CPU responsible for
+> controlling the path of the DPU, especially in multi-device and
+> large-queue scenarios.
+> 
+> To solve the above problems, we internally tried batch request,
+> which merges requests from multiple queues and sends them at once.
+> We conservatively tested 8 queue commands and sent them together.
+> The DPU processing efficiency can be improved by 8 times, which
+> greatly eases the DPU's support for multi-device and multi-queue DIM.
+> 
+> Suggested-by: Xiaoming Zhao <zxm377917@alibaba-inc.com>
+> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
 
-On Tue, Jan 16, 2024 at 11:44=E2=80=AFAM Sasha Levin <sashal@kernel.org> wr=
-ote:
->
-> From: Michael Chan <michael.chan@broadcom.com>
->
-> [ Upstream commit 2012a6abc87657c6c8171bb5ff13dd9bafb241bf ]
->
-> Now with basic support for the new chip family, add the PCI IDs of the
-> new devices.
+...
 
-This should not be backported to 6.7.  It won't work without all the
-driver changes required to support this new chip.
+> @@ -3546,16 +3552,32 @@ static void virtnet_rx_dim_work(struct work_struct *work)
+>  		update_moder = net_dim_get_rx_moderation(dim->mode, dim->profile_ix);
+>  		if (update_moder.usec != rq->intr_coal.max_usecs ||
+>  		    update_moder.pkts != rq->intr_coal.max_packets) {
+> -			err = virtnet_send_rx_ctrl_coal_vq_cmd(vi, qnum,
+> -							       update_moder.usec,
+> -							       update_moder.pkts);
+> -			if (err)
+> -				pr_debug("%s: Failed to send dim parameters on rxq%d\n",
+> -					 dev->name, qnum);
+> -			dim->state = DIM_START_MEASURE;
+> +			coal->coal_vqs[j].vqn = cpu_to_le16(rxq2vq(i));
+> +			coal->coal_vqs[j].coal.max_usecs = cpu_to_le32(update_moder.usec);
+> +			coal->coal_vqs[j].coal.max_packets = cpu_to_le32(update_moder.pkts);
+> +			rq->intr_coal.max_usecs = update_moder.usec;
+> +			rq->intr_coal.max_packets = update_moder.pkts;
+> +			j++;
+>  		}
+>  	}
+>  
+> +	if (!j)
+> +		goto ret;
+> +
+> +	coal->num_entries = cpu_to_le32(j);
+> +	sg_init_one(&sgs, coal, sizeof(struct virtnet_batch_coal) +
+> +		    j * sizeof(struct virtio_net_ctrl_coal_vq));
+> +	if (!virtnet_send_command(vi, VIRTIO_NET_CTRL_NOTF_COAL,
+> +				  VIRTIO_NET_CTRL_NOTF_COAL_VQS_SET,
+> +				  &sgs))
+> +		dev_warn(&vi->vdev->dev, "Failed to add dim command\n.");
+> +
+> +	for (i = 0; i < j; i++) {
+> +		rq = &vi->rq[(coal->coal_vqs[i].vqn) / 2];
 
---0000000000000d7d2d060f156937
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+Hi Heng Qi,
 
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIERRbIuHU49rlpRBTCWEQgtztJ11p8Rq
-KK7g9qGZQhOEMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDEx
-NjE5NDgxMVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQC1eVxeuGrRYyFpVZsGSKXDArsV+GNsaJ1l0FHudNZGJxw9F7ga
-Qc873qRTEwnm0U0iAPHOGJGQ71jB6l0ztlONUPDiwAog5+7TCtQ1eA80FrM+yN+F0n//+UXM3QXS
-uL9DO04XQe6DZQIKPeejqiw0RtoGnJna/vlHi8hDQLqoG+laYiG2c7ucLTZJRIOjJFfqsP+x/6C+
-Wnpf7a8LipyJatvT/AC1DZFAwnTPi8WzYEoeeHPPxgv1pk9WchOwFQJe9HSEqPyCFJaQwjf4ITUv
-XaUY1MKYisUElnKEzqSFG4I5NDjamSQE7dtXKscrYpXYrQ1fDGhMniT0fq5y2YYs
---0000000000000d7d2d060f156937--
+The type of .vqn is __le16, but here it is used as an
+integer in host byte order. Perhaps this should be (completely untested!):
+
+		rq = &vi->rq[le16_to_cpu(coal->coal_vqs[i].vqn) / 2];
+
+> +		rq->dim.state = DIM_START_MEASURE;
+> +	}
+> +
+> +ret:
+>  	rtnl_unlock();
+>  }
+>  
 
