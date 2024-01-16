@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-63598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63599-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC5F682E58C
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 01:46:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E441B82E5BA
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 01:52:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 420E31F2239E
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 00:46:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2733AB234C0
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 00:52:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 206A31BF4B;
-	Tue, 16 Jan 2024 00:23:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD5CE2E3F9;
+	Tue, 16 Jan 2024 00:24:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WPsYsdvz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W8WBtpDz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2C6F1BF46;
-	Tue, 16 Jan 2024 00:23:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B5B7C43399;
-	Tue, 16 Jan 2024 00:23:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EED52E3F1;
+	Tue, 16 Jan 2024 00:24:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30D0CC433C7;
+	Tue, 16 Jan 2024 00:24:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705364629;
+	s=k20201202; t=1705364692;
 	bh=JQAoC7EV7qWGl/rEHl8BcqZGhvjAK/8oXnEOwAcrnbg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WPsYsdvzGnjqIeh769rnurdH7PRZwWs3B11babgnsYHeG32/dKC9dtwnZoOHsW5Mg
-	 ICg0i38BEX8nIhMEJ4MEIIL69G/sDOw675zC8pwGEHubvAHsLRmZtd5Yb/P5ff5o8t
-	 c0lR1hl4QtzcDywg0s9he1t/7pTJK/Qiv0dx1NrsscVGnuKG20WlGTBQAX6F4oF/E+
-	 XzXZiN3R51tOVPP45LLZEPCh3wSneBkyX8OBVL8qs3bkKKyr6SeQ+XG1e/71Cu/nZ3
-	 K9tkIMzUjDb9TXvTHZKRSORAQn+Q3dH2XjsKRWvpQRA1FXBjLWgfMOZzAtjMWWOgMO
-	 i5+TL2YRsv7Wg==
+	b=W8WBtpDzG66h3htQEqe3ShFvoGtDFuZ/VxtqhnqzGk+JmYkrqolV5cA//q6YyAx2k
+	 VK1tziwtWKZfTv06+B9H+gbd+ZU6q9rMtEOF26TADoZxTlalsqaUdyB8EbTsokMMKc
+	 fQg2hgPo72R+7RsH1Nsi68JKvTjU30YKkwrodBQAxp6aj3Z3a/vmPdIIUtuk/apiS1
+	 A3isiGZwnmCxsw/sCqiaD8j7CQBLE6ddjw10cJhSb8UItJF9n6pp3MEJuuAxMKTADC
+	 RB9ZJnHnqFWS/vXkee5MG6J05PMiBs9VQFRG2DKfHyBYfDywllWeuKF0yzgEB532Q2
+	 dp0r08M8H3GFg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -45,12 +45,12 @@ Cc: Oleg Nesterov <oleg@redhat.com>,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.7 17/19] rxrpc_find_service_conn_rcu: fix the usage of read_seqbegin_or_lock()
-Date: Mon, 15 Jan 2024 19:22:53 -0500
-Message-ID: <20240116002311.214705-17-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 17/19] rxrpc_find_service_conn_rcu: fix the usage of read_seqbegin_or_lock()
+Date: Mon, 15 Jan 2024 19:23:52 -0500
+Message-ID: <20240116002413.215163-17-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240116002311.214705-1-sashal@kernel.org>
-References: <20240116002311.214705-1-sashal@kernel.org>
+In-Reply-To: <20240116002413.215163-1-sashal@kernel.org>
+References: <20240116002413.215163-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,7 +59,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.7
+X-stable-base: Linux 6.6.12
 Content-Transfer-Encoding: 8bit
 
 From: Oleg Nesterov <oleg@redhat.com>
