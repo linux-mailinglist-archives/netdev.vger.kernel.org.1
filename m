@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-63873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5735082FD53
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 23:57:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C99082FDBA
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 00:21:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D341FB23D19
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 22:57:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 488E21C23E97
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 23:21:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D0E367C51;
-	Tue, 16 Jan 2024 22:56:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B403067C58;
+	Tue, 16 Jan 2024 23:21:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="cfY2OqOC"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="vv+0GgSa"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A71F01D68B;
-	Tue, 16 Jan 2024 22:56:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 115FF67C54;
+	Tue, 16 Jan 2024 23:21:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705445819; cv=none; b=FM/6J73LQZYruPzSHvGmfe5rsqt2vWeKx+0l1LNxzO29WO7adoc0KBmRB8ozhn5mfVHRK0uWhmZ23o3/uvj88HW1N7v4u4ZhkEmhOtYS9m0BcdfeHn5cKmaGAGKU+mszln5qQ/RLaCDSfH1RWA7bhNB7yTCTjzjwgMUeQml8CX4=
+	t=1705447298; cv=none; b=NFg7aJZTidNZ2zcgYAI4fOZDtYyIZWmqIrARA4/FRkiVCP9wUTPu+i+Ttn/vZZazLanGXfqrVF/qKT2LfxVmcFL2Ix+E7c3aa/Egf12iBMYThPirzjP2cbVMiXxOa+E1ze3yF4MaDEhP4LX8o+KEWH2gxt7p0OZqj/hMfWE20IM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705445819; c=relaxed/simple;
-	bh=plU7Fyl05aYaKwdG/SP/6ie/ejtRdcYCuh2yJUj64x8=;
+	s=arc-20240116; t=1705447298; c=relaxed/simple;
+	bh=dqVyFBZEyz6eyoIIxKAAeMr8tIwXW4vzy/OcdF9P470=;
 	h=DKIM-Signature:Received:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To; b=ZNSWklHRnyQP3UhtoIBbJwR4DP9gnuiccG3eqUreDDJYucjlQdFfGSoBWu+eGJMpc2Ws5lqcAaKPnrpieYfqfqUglmYZzqdg9psEmuVVz9YDZcrQAc51QPd07g4Ohoa/KQ0SWM9qz+pksaNmk51b8s27GhqHaD9d3TFVjm3cwgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=cfY2OqOC; arc=none smtp.client-ip=156.67.10.101
+	 In-Reply-To; b=Mtp2RiAmebjqZvDvDzMUZcoksIIQ2HlYlMJIwWPgxvMkMycXFa20G9ro61M0UPBAbEoJhQZ19qAQJ9B0MJRn+YphrrK5rEGfzLnJQHGA+btaO6oDZXtztbWPaEDA9PX9XVPwWcx4wvruEDt63Vm+QM0JaxIo0dmVcy6+3a0Av0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=vv+0GgSa; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -37,31 +37,24 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=8mVrgl5xMNMm3WZOrIWhZNDZHloqaD1XFaFbuzdsviM=; b=cfY2OqOCFRcI1e3AOkEb5pDgSI
-	iYgrk6FIHj2duCg0p3VQP/3DuAf5Ocz273VHzNCGbmWA585dW9wPwlj4i8fBGqzcClfUnP2C1Zdid
-	LFfgC8uRLttGJjLtHzwCab7cyze7pd+Kw/7RoHf6HpN1iKia0rjV+CVnwdR0auZstPoo=;
+	bh=Ys+BRocRaSfqSlTq8ygwsRyVjvYBvlkbZzx4GJg0Guo=; b=vv+0GgSaEPVrB7KP9yAoX/g8Ip
+	d4TksbqqwZd2Y45PSAh1mSF9gI11uSIWDhhAQVLYxLPsX1kbnLCIb1q3Ik5Op5CqFJjCtt9IE7VYM
+	+Zuo28wEXINBKHipCWC8Ut/6Il27kD4jHZzohxoFbLJl4BhK/RZkQ2FVi1EpR0nJi6CM=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rPsMW-005MUt-Sm; Tue, 16 Jan 2024 23:56:52 +0100
-Date: Tue, 16 Jan 2024 23:56:52 +0100
+	id 1rPskJ-005MZE-KR; Wed, 17 Jan 2024 00:21:27 +0100
+Date: Wed, 17 Jan 2024 00:21:27 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Jie Luo <quic_luoj@quicinc.com>
-Cc: andersson@kernel.org, konrad.dybcio@linaro.org, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	quic_kkumarcs@quicinc.com, quic_suruchia@quicinc.com,
-	quic_soni@quicinc.com, quic_pavir@quicinc.com,
-	quic_souravp@quicinc.com, quic_linchen@quicinc.com,
-	quic_leiwei@quicinc.com
-Subject: Re: [PATCH 3/6] arm64: dts: qcom: ipq5332: Add MDIO device tree
-Message-ID: <6975e79a-67eb-46d7-8445-92610b8b5198@lunn.ch>
-References: <20240110112059.2498-1-quic_luoj@quicinc.com>
- <20240110112059.2498-4-quic_luoj@quicinc.com>
- <4bc0aff5-8a1c-44a6-89d8-460961a61310@lunn.ch>
- <e893c298-fbfa-4ae4-9b76-72a5030a5530@quicinc.com>
- <61973012-3f74-4b58-9575-3bc5199f61d9@lunn.ch>
- <5c88945b-4a80-4346-a77c-82a68ae02047@quicinc.com>
+To: Tim Menninger <tmenninger@purestorage.com>
+Cc: f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: dsa: mv88e6xxx: Make *_c45 callbacks agree with
+ phy_*_c45 callbacks
+Message-ID: <da87ce82-7337-4be4-a2af-bd2136626c56@lunn.ch>
+References: <20240116193542.711482-1-tmenninger@purestorage.com>
+ <04d22048-737a-4281-a43f-b125ebe0c896@lunn.ch>
+ <CAO-L_44YVi0HDk4gC9QijMZrYNGoKtfH7qsXOwtDwM4VrFRDHw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,24 +63,23 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5c88945b-4a80-4346-a77c-82a68ae02047@quicinc.com>
+In-Reply-To: <CAO-L_44YVi0HDk4gC9QijMZrYNGoKtfH7qsXOwtDwM4VrFRDHw@mail.gmail.com>
 
-> Another one is the MDIO slave(gpio25, 26), which is dedicated
-> for receiving the back pressure signal from the connected Ethernet switch
-> device QCA8386.
+> Hi Andrew,
 > 
-> There is a MDIO master block integrated in QCA8386 switch device, this
-> integrated MDIO master is dedicated for generating the back
-> pressure signal to IPQ5332 SoC.
+> It bubbles up as EIO (the translation happens in get_phy_c45_ids when
+> get_phy_c45_devs_in_pkg fails) and ultimately causes the probe to fail.
 > 
-> This MDIO slave block of IPQ5322 just needs to configure these PIN
-> mux for MDC and MDIO PINs. No additional driver is needed for this MDIO
-> slave block of IPQ5332.
+> The EIO causes the scan to stop and fail immediately - the way I read
+> mdiobus_scan_bus_c45, only ENODEV is permissible.
 
-So there is a proprietary protocol running over the MDIO bus? And its
-completely implemented in hardware in the slave block? Is this even
-MDIO? Does it use c22 or c45 bus transactions? How is the slave
-address configured, or is that also hard coded?
+O.K. At minimum, this should be added to the commit message.
 
-	Andrew
+However, i'm wondering if this is the correct fix. I would prefer that
+the scan code just acts on the -EOPNOTSUPP the same was as
+-ENODEV. Maybe the error code from phy_c45_probe_present() should be
+returned as is. And mdiobus_scan_bus_c45() is extended to handle
+-EOPNOTSUPP ?
+
+	    Andrew
 
