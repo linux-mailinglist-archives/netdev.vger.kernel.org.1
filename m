@@ -1,65 +1,64 @@
-Return-Path: <netdev+bounces-63855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D888C82FB0F
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 22:47:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38FEC82FB2F
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 22:50:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7669028C0BA
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 21:47:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF04D1F2AF0D
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 21:50:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F49015EA86;
-	Tue, 16 Jan 2024 20:02:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A935405F5;
+	Tue, 16 Jan 2024 20:02:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ErUOUjQv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Necg0rEE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0663015EA81;
-	Tue, 16 Jan 2024 20:02:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1178405E6;
+	Tue, 16 Jan 2024 20:02:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705435330; cv=none; b=SYBIUPselS1LHp5aXAeEgVeI/A6sOTiOURIhC40f2Yst7Qcam4jp3DSRtLTjMGTbY/J/BA4Lngcufrva1KWymxgj2AHNj8ypPpHaK77qXbGBYktQ5RrdRD1W6MD/WQFnlXY5Dms4EjmK2spK8+FA2NzdzqVondoV7c8XX3TTGyo=
+	t=1705435352; cv=none; b=uWRpBd4C3WsDvVtuFgZtKpg5oNgziQ3ieE023mwLCPmUCwOCreKrHYZXjxHdp4cetKSyxKf7xAa17xjX954nZtmkuZ6OZpJc86MPaZ/73MJl6tstkAR/y7XD75g70Gu3pJeDlVMaleUh7dgAQvhzUlOo7FOlKpYAK7B1SiMkPaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705435330; c=relaxed/simple;
-	bh=inDxCjU24F7wXu72KQvtYSa9mAs4oxNNLBkA6PUjkS4=;
+	s=arc-20240116; t=1705435352; c=relaxed/simple;
+	bh=egSa5tJ2mSWuFOSUJP5Qu6ngNzkm6171tTfglGZlplo=;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:X-stable:
-	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=dCX4xeXNOPJj5A/0ucuFtl7kfcMubi5MwAWfFrc2a4tfzfGaRU6EWIZFqE0aVZf2ntB6IRGTCWY51xjGW/LlCQ6CsX/odR6VFJBWJ6peNCb1C0KhMmr35WD0yKYzQ+SgR3McyGVqAzeMV86D8r6uKMvpuZf2sACRO3yH+HSFYuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ErUOUjQv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C3B3C433F1;
-	Tue, 16 Jan 2024 20:02:08 +0000 (UTC)
+	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=HN/i7AxFPlA0R9Fs1ponf7IUm8TGpUcE2RCQCoAiGlhde8ckw5dRSrWIL0EPeQ8lKg4M42QOBgUMz1yRVFcUSudXm1Ja3XY4Tgdl/FYhIjUJb3UaYcieyQ8ZTBWmQvj38+aip6CvNj1ZovHkR3YBetO95Maghqzr78AAQO4Uiz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Necg0rEE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05237C433C7;
+	Tue, 16 Jan 2024 20:02:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705435329;
-	bh=inDxCjU24F7wXu72KQvtYSa9mAs4oxNNLBkA6PUjkS4=;
+	s=k20201202; t=1705435352;
+	bh=egSa5tJ2mSWuFOSUJP5Qu6ngNzkm6171tTfglGZlplo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ErUOUjQvIw4QCNFegwcN2a7dANJc31cqH11Qr0q84Vvf3q4WJf2poF+AdqL2iDSuO
-	 rnlZA3lCkh3FrfUgDPep5JN+6EXKSNP+qIPFch+2BBy656sSM8RBqcCf8Qsbpia/fr
-	 RBJ1PrtlAv7IMP1a7d5ILoWAIvIMgkXjp8dQZ69erGR7lR5eF+I78Bs0G2krlIjhW8
-	 XdT3Ai1vJM8xhacIYft0aVl9n5/oO5OMtvaozdKaYf6kTXYty/u6Y4AzEK3savN4G0
-	 /pwZ8ktIQ/JjfloEB8shh4nPytvWPWQQbXriIo4Bc6GpIYVo2opXGJwwXfuSVMqB2w
-	 vldg/qHFJm+BQ==
+	b=Necg0rEEpALv60xUxFkjfKrnTD6lagutPIfdNXaQ+DVWSqDDz0dZ6IGbexj0G/lpM
+	 f1EFRxxtbX/sBx82Jo0R4OkCk133zRVEbU/sGW2opihT/OZ/Gdrds201T+nZ/S3QdE
+	 ZynBJ9W8TupZ+xy2jzdH9uTVwiP+JU9BwYwnoyGPGMe9U7dTZ9M6367BUxa74sczZ8
+	 8ncc9/KUUl3v0mQEr9AY7+/R6LTQsRgGjdZ1KwhgyJxBSXBxhno128Lya4/OAyfVU8
+	 1Mmg714Ypk5s7cuRajujzG45bP9DqovwtHD8zYNThmvokvU09NTOXArxar7eLYURRO
+	 Javd1V5tn04pw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Tobias Waldekranz <tobias@waldekranz.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	"David S . Miller" <davem@davemloft.net>,
+Cc: Benjamin Berg <benjamin.berg@intel.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
-	andrew@lunn.ch,
-	f.fainelli@gmail.com,
-	olteanv@gmail.com,
+	johannes@sipsolutions.net,
+	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
+	linux-wireless@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 32/44] net: dsa: mv88e6xxx: Fix mv88e6352_serdes_get_stats error path
-Date: Tue, 16 Jan 2024 15:00:01 -0500
-Message-ID: <20240116200044.258335-32-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 41/44] wifi: cfg80211: free beacon_ies when overridden from hidden BSS
+Date: Tue, 16 Jan 2024 15:00:10 -0500
+Message-ID: <20240116200044.258335-41-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240116200044.258335-1-sashal@kernel.org>
 References: <20240116200044.258335-1-sashal@kernel.org>
@@ -74,91 +73,42 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.10.208
 Content-Transfer-Encoding: 8bit
 
-From: Tobias Waldekranz <tobias@waldekranz.com>
+From: Benjamin Berg <benjamin.berg@intel.com>
 
-[ Upstream commit fc82a08ae795ee6b73fb6b50785f7be248bec7b5 ]
+[ Upstream commit 32af9a9e1069e55bc02741fb00ac9d0ca1a2eaef ]
 
-mv88e6xxx_get_stats, which collects stats from various sources,
-expects all callees to return the number of stats read. If an error
-occurs, 0 should be returned.
+This is a more of a cosmetic fix. The branch will only be taken if
+proberesp_ies is set, which implies that beacon_ies is not set unless we
+are connected to an AP that just did a channel switch. And, in that case
+we should have found the BSS in the internal storage to begin with.
 
-Prevent future mishaps of this kind by updating the return type to
-reflect this contract.
-
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
-Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Benjamin Berg <benjamin.berg@intel.com>
+Reviewed-by: Johannes Berg <johannes.berg@intel.com>
+Signed-off-by: Miri Korenblit <miriam.rachel.korenblit@intel.com>
+Link: https://msgid.link/20231220133549.b898e22dadff.Id8c4c10aedd176ef2e18a4cad747b299f150f9df@changeid
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/dsa/mv88e6xxx/chip.h   | 4 ++--
- drivers/net/dsa/mv88e6xxx/serdes.c | 8 ++++----
- drivers/net/dsa/mv88e6xxx/serdes.h | 8 ++++----
- 3 files changed, 10 insertions(+), 10 deletions(-)
+ net/wireless/scan.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.h b/drivers/net/dsa/mv88e6xxx/chip.h
-index 51a7ff44478e..67e52c481504 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.h
-+++ b/drivers/net/dsa/mv88e6xxx/chip.h
-@@ -536,8 +536,8 @@ struct mv88e6xxx_ops {
- 	int (*serdes_get_sset_count)(struct mv88e6xxx_chip *chip, int port);
- 	int (*serdes_get_strings)(struct mv88e6xxx_chip *chip,  int port,
- 				  uint8_t *data);
--	int (*serdes_get_stats)(struct mv88e6xxx_chip *chip,  int port,
--				uint64_t *data);
-+	size_t (*serdes_get_stats)(struct mv88e6xxx_chip *chip, int port,
-+				   uint64_t *data);
- 
- 	/* SERDES registers for ethtool */
- 	int (*serdes_get_regs_len)(struct mv88e6xxx_chip *chip,  int port);
-diff --git a/drivers/net/dsa/mv88e6xxx/serdes.c b/drivers/net/dsa/mv88e6xxx/serdes.c
-index 6920e62c864d..9494d75eec62 100644
---- a/drivers/net/dsa/mv88e6xxx/serdes.c
-+++ b/drivers/net/dsa/mv88e6xxx/serdes.c
-@@ -314,8 +314,8 @@ static uint64_t mv88e6352_serdes_get_stat(struct mv88e6xxx_chip *chip,
- 	return val;
- }
- 
--int mv88e6352_serdes_get_stats(struct mv88e6xxx_chip *chip, int port,
--			       uint64_t *data)
-+size_t mv88e6352_serdes_get_stats(struct mv88e6xxx_chip *chip, int port,
-+				  uint64_t *data)
- {
- 	struct mv88e6xxx_port *mv88e6xxx_port = &chip->ports[port];
- 	struct mv88e6352_serdes_hw_stat *stat;
-@@ -631,8 +631,8 @@ static uint64_t mv88e6390_serdes_get_stat(struct mv88e6xxx_chip *chip, int lane,
- 	return reg[0] | ((u64)reg[1] << 16) | ((u64)reg[2] << 32);
- }
- 
--int mv88e6390_serdes_get_stats(struct mv88e6xxx_chip *chip, int port,
--			       uint64_t *data)
-+size_t mv88e6390_serdes_get_stats(struct mv88e6xxx_chip *chip, int port,
-+				  uint64_t *data)
- {
- 	struct mv88e6390_serdes_hw_stat *stat;
- 	int lane;
-diff --git a/drivers/net/dsa/mv88e6xxx/serdes.h b/drivers/net/dsa/mv88e6xxx/serdes.h
-index 14315f26228a..035688659b50 100644
---- a/drivers/net/dsa/mv88e6xxx/serdes.h
-+++ b/drivers/net/dsa/mv88e6xxx/serdes.h
-@@ -116,13 +116,13 @@ irqreturn_t mv88e6390_serdes_irq_status(struct mv88e6xxx_chip *chip, int port,
- int mv88e6352_serdes_get_sset_count(struct mv88e6xxx_chip *chip, int port);
- int mv88e6352_serdes_get_strings(struct mv88e6xxx_chip *chip,
- 				 int port, uint8_t *data);
--int mv88e6352_serdes_get_stats(struct mv88e6xxx_chip *chip, int port,
--			       uint64_t *data);
-+size_t mv88e6352_serdes_get_stats(struct mv88e6xxx_chip *chip, int port,
-+				  uint64_t *data);
- int mv88e6390_serdes_get_sset_count(struct mv88e6xxx_chip *chip, int port);
- int mv88e6390_serdes_get_strings(struct mv88e6xxx_chip *chip,
- 				 int port, uint8_t *data);
--int mv88e6390_serdes_get_stats(struct mv88e6xxx_chip *chip, int port,
--			       uint64_t *data);
-+size_t mv88e6390_serdes_get_stats(struct mv88e6xxx_chip *chip, int port,
-+				  uint64_t *data);
- 
- int mv88e6352_serdes_get_regs_len(struct mv88e6xxx_chip *chip, int port);
- void mv88e6352_serdes_get_regs(struct mv88e6xxx_chip *chip, int port, void *_p);
+diff --git a/net/wireless/scan.c b/net/wireless/scan.c
+index 1e6dfe204ff3..6f0a01038db1 100644
+--- a/net/wireless/scan.c
++++ b/net/wireless/scan.c
+@@ -1801,8 +1801,12 @@ cfg80211_bss_update(struct cfg80211_registered_device *rdev,
+ 				list_add(&new->hidden_list,
+ 					 &hidden->hidden_list);
+ 				hidden->refcount++;
++
++				ies = (void *)rcu_dereference(new->pub.beacon_ies);
+ 				rcu_assign_pointer(new->pub.beacon_ies,
+ 						   hidden->pub.beacon_ies);
++				if (ies)
++					kfree_rcu(ies, rcu_head);
+ 			}
+ 		} else {
+ 			/*
 -- 
 2.43.0
 
