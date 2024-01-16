@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-63871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 779A082FD28
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 23:44:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B05DF82FD37
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 23:45:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2BF0B1F29CA9
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 22:44:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64FCE1F2A502
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 22:45:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C40F24A0E;
-	Tue, 16 Jan 2024 22:27:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA647208BB;
+	Tue, 16 Jan 2024 22:35:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="eb/gCtr6"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="W4QtaqR7"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6404A24A0C;
-	Tue, 16 Jan 2024 22:27:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B7601DA2C;
+	Tue, 16 Jan 2024 22:35:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705444078; cv=none; b=MHTZzVnuwWPXnW7yPXTmh3p1mqzZmkBlJTPYZfAL8WGUs5ROb1h+GViHUKLr9oIRXRrRKuWLNRWPye44tegBI4Ra0GHY2a97D9Pvs0nnM1GrniMJzs599pEfeP+PKCUNBzvcLMtytz/oQAD8G84AUMJ3KPDrp4fh0PesKTAPBwQ=
+	t=1705444535; cv=none; b=K8pUXTsXWe+4eH5kTc+RaM8265Tb6e2+dOwFhx+8bDu3uYPWSiCymerG+MadktsnO7WXyvzHedFYU+ykW7rYSuPYaKUr9DU/sl3rdawJMfd+0ggg1LD/368QRsmWHKBsLwNduArA7NMcbkMXdgS0jTz86eWmYKX8MyOlq8YqRGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705444078; c=relaxed/simple;
-	bh=EBVwvwUv/VwgNMWmJPq1SrptRX4FtcU9FHl/QzqZTns=;
+	s=arc-20240116; t=1705444535; c=relaxed/simple;
+	bh=ins1IDJZ4lyx0ENQCIEAJzl9MLbVaW2Mn2TyaG9gBUk=;
 	h=DKIM-Signature:Received:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To; b=Rb/oaP5VWn2tw8Swf86dkeqZK6SG+fK2NM5jTOT9+LbgbO58UaOOQdbf0r9J4By1b4Ci8L13HXhEbHTKBFOaPZh6x0wpkWDZNAPngkGI5KZBu7DRk81uQRMLteSLzSzuAX89vRjm4wgniVmHtbJT5mQl9YQXDPb774CxRIiBtto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=eb/gCtr6; arc=none smtp.client-ip=156.67.10.101
+	 In-Reply-To; b=RkAuIsnsIYdmGz0T/10Wgla8HRqYWhtFGIleudFeZMHH2FuhzumNojP4tqUOJZZBRo9qgZYRR5AhfWiVIngNuvi3eDhmzE/KyFg276JySFgPgD3zNSiiMBRYNBAUx1klAtBh9Kf1Oh5Wut90vH9hyvstQVAepWJnMX1vC3xHD5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=W4QtaqR7; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -37,24 +37,30 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=WPnBskU8T0/6q6mbWR8WDhb87Ftyu+YnEGXBTVNd/No=; b=eb/gCtr6kJXTzgbcIjj2Zw0tBf
-	rVmsycKsJYFU+AQ8f+J4zQ2ENVN6swpyB/CZ02FoOi3WrujIkidQPUNa8IjJeTeOcI+Wpq/KR+okV
-	Ad2zQh+6QMilKkaPqhs+ojrRFLs+UjdkUV9xLk8e37NdvQ0MImqXIjSeUPq5R3NgVQG4=;
+	bh=RdhTevdQVBdb8wlxJd7xNXUyeRnkCEOfn9WkZe/WJWg=; b=W4QtaqR7NHIOIWimMjGhfOWFsm
+	PKzYCRa3+vm+SUCtszEcpa18+cQMWn8Ejkyd5cqqhgi1CABB5bYt/tfUAaef97tbwOiDzLu/Snc/8
+	0lCmYOUU+tGPH4RRI+IvLjzC/LbYe7R7yW5ch1462y3MpeZSzi3H/L2Bf/SozwnqO3UA=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rPruF-005MQ2-7v; Tue, 16 Jan 2024 23:27:39 +0100
-Date: Tue, 16 Jan 2024 23:27:39 +0100
+	id 1rPs1e-005MRS-8j; Tue, 16 Jan 2024 23:35:18 +0100
+Date: Tue, 16 Jan 2024 23:35:18 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Qiang Ma <maqianga@uniontech.com>
-Cc: alexandre.torgue@foss.st.com, joabreu@synopsys.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	mcoquelin.stm32@gmail.com, netdev@vger.kernel.org,
+To: Bernd Edlinger <bernd.edlinger@hotmail.de>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
 	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: stmmac: ethtool: Fixed calltrace caused by
- unbalanced disable_irq_wake calls
-Message-ID: <97106e8a-df9a-429a-a4ff-c47277de70d9@lunn.ch>
-References: <20240112021249.24598-1-maqianga@uniontech.com>
+	linux-arm-kernel@lists.infradead.org,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Jiri Pirko <jiri@nvidia.com>,
+	Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v2] net: stmmac: Wait a bit for the reset to take effect
+Message-ID: <6e33c038-45a7-4941-b5d9-ce5704e13d48@lunn.ch>
+References: <AS8P193MB1285DECD77863E02EF45828BE4A1A@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
+ <AS8P193MB1285EEAFE30C0DE7B201D33CE46C2@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,54 +69,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240112021249.24598-1-maqianga@uniontech.com>
+In-Reply-To: <AS8P193MB1285EEAFE30C0DE7B201D33CE46C2@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
 
-On Fri, Jan 12, 2024 at 10:12:49AM +0800, Qiang Ma wrote:
-> We found the following dmesg calltrace when testing the GMAC NIC notebook:
+On Mon, Jan 15, 2024 at 08:21:42PM +0100, Bernd Edlinger wrote:
+> otherwise the synopsys_id value may be read out wrong,
+> because the GMAC_VERSION register might still be in reset
+> state, for at least 1 us after the reset is de-asserted.
 > 
-> [9.448656] ------------[ cut here ]------------
-> [9.448658] Unbalanced IRQ 43 wake disable
-> [9.448673] WARNING: CPU: 3 PID: 1083 at kernel/irq/manage.c:688 irq_set_irq_wake+0xe0/0x128
-> [9.448717] CPU: 3 PID: 1083 Comm: ethtool Tainted: G           O      4.19 #1
-> [9.448773]         ...
-> [9.448774] Call Trace:
-> [9.448781] [<9000000000209b5c>] show_stack+0x34/0x140
-> [9.448788] [<9000000000d52700>] dump_stack+0x98/0xd0
-> [9.448794] [<9000000000228610>] __warn+0xa8/0x120
-> [9.448797] [<9000000000d2fb60>] report_bug+0x98/0x130
-> [9.448800] [<900000000020a418>] do_bp+0x248/0x2f0
-> [9.448805] [<90000000002035f4>] handle_bp_int+0x4c/0x78
-> [9.448808] [<900000000029ea40>] irq_set_irq_wake+0xe0/0x128
-> [9.448813] [<9000000000a96a7c>] stmmac_set_wol+0x134/0x150
-> [9.448819] [<9000000000be6ed0>] dev_ethtool+0x1368/0x2440
-> [9.448824] [<9000000000c08350>] dev_ioctl+0x1f8/0x3e0
-> [9.448827] [<9000000000bb2a34>] sock_ioctl+0x2a4/0x450
-> [9.448832] [<900000000046f044>] do_vfs_ioctl+0xa4/0x738
-> [9.448834] [<900000000046f778>] ksys_ioctl+0xa0/0xe8
-> [9.448837] [<900000000046f7d8>] sys_ioctl+0x18/0x28
-> [9.448840] [<9000000000211ab4>] syscall_common+0x20/0x34
-> [9.448842] ---[ end trace 40c18d9aec863c3e ]---
+> Add a wait for 10 us before continuing to be on the safe side.
 > 
-> Multiple disable_irq_wake() calls will keep decreasing the IRQ
-> wake_depth, When wake_depth is 0, calling disable_irq_wake() again,
-> will report the above calltrace.
+> > From what have you got that delay value?
 > 
-> Due to the need to appear in pairs, we cannot call disable_irq_wake()
-> without calling enable_irq_wake(). Fix this by making sure there are
-> no unbalanced disable_irq_wake() calls.
+> Just try and error, with very old linux versions and old gcc versions
+> the synopsys_id was read out correctly most of the time (but not always),
+> with recent linux versions and recnet gcc versions it was read out
+> wrongly most of the time, but again not always.
+> I don't have access to the VHDL code in question, so I cannot
+> tell why it takes so long to get the correct values, I also do not
+> have more than a few hardware samples, so I cannot tell how long
+> this timeout must be in worst case.
+> Experimentally I can tell that the register is read several times
+> as zero immediately after the reset is de-asserted
 
-Just for my understanding. You trigger this by doing lots of
+Is zero a valid synopsys_id? If its not, maybe do the wait conditional
+on the first read returning 0?
 
-ethtool -s eth42 wol g
-
-or similar without doing a matching
-
-ethtool -s eth42 wol d
-
-to disable wol?
-
-Its a bit late now, but its good to give instructions how to reproduce
-the issue in the commit message.
-
-    Andrew
+   Andrew
 
