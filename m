@@ -1,82 +1,98 @@
-Return-Path: <netdev+bounces-63770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76BDE82F55B
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 20:29:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2663782F562
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 20:32:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DBCAC286411
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 19:29:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCBA41F2497E
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 19:32:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 324A61D524;
-	Tue, 16 Jan 2024 19:29:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C6221D526;
+	Tue, 16 Jan 2024 19:31:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aqgA/t6B"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j/FP32qA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0704C1D522;
-	Tue, 16 Jan 2024 19:29:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DEA81D521;
+	Tue, 16 Jan 2024 19:31:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705433368; cv=none; b=pyh3VQtLiBYPoG3eZ1Vmoy7jS/mlYVu6C/Z6An++tOEbkUt8a7+/L2CTAPBi0KkVWZoJ5sVgmAb73I+LvZbnoyfKvsAT8ZeVKNhfX92WIkp4iIU66LV+hqCmSOavqr+KKJMKt3K0CXjwtlas0sN9OH/3h6gFRfHXM6TWG8dgMfo=
+	t=1705433517; cv=none; b=JpSD9tOAKzWmb+bKR0oaiNI25CX9i4EX/8nlAgsHpbz3/ofp6KPUpa7EEZtG0b9E4w3/KovEUr6J6RD2VDbZ9OMwrPc7iihyWf/CaDYUttR9iC0YNpo5Y+nMZfkZJuott4YA2rtyH5rSBdZjyt8dL1z8eolLpl3LRXvygaG/kkM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705433368; c=relaxed/simple;
-	bh=iVy6Hab3XrRSqgzzXtSQGCRl4q3R1LvYO/aANjwkr5o=;
+	s=arc-20240116; t=1705433517; c=relaxed/simple;
+	bh=B8rlXf1IueqTuTpDml4lMwGNJ5SQRj3OuuWeFvVrO8M=;
 	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 In-Reply-To:References:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding; b=SbjqL3lXhKrlDWmWkGaeJ2iwqHGeVASZfHsPIt0nSxcIv/2GfjVx/mCa+AAnsjUV3k6sRaRTBQkR8g0/id4TA1z3mbS+D0f5Gb/UG5LnWhU8M1bX+keUm256Ap/PWFUJ51bdz//RaL3t5QJ1rRnm3zUPx3ScByPcY25iqTKsaww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aqgA/t6B; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57DFEC433C7;
-	Tue, 16 Jan 2024 19:29:27 +0000 (UTC)
+	 References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To; b=c3c2PNyfbvSrmpJnQwfNeUlqLRDAtiOO/r5vAnyG9yoZimjCbBkky5vG1OGBDK246UEHKPU4LhkAmL+xMXcsRqRFRWmyvINKJFZbvBJ5QM6f4bQ62X4QCSVhGfe773BFSGUNW/hVtlcwhYZdIBvcpAV6bK1fcaNG2aYN+oE4Lgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j/FP32qA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0A1DC433F1;
+	Tue, 16 Jan 2024 19:31:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705433367;
-	bh=iVy6Hab3XrRSqgzzXtSQGCRl4q3R1LvYO/aANjwkr5o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aqgA/t6BDrC8zZIp3keWLo/qMlxWZr7PPpKdtBlEqziYH7yMF3Y1vr+pgeODBlyjm
-	 p5nuOXl+0sWYKK86vCDSuVinyY37f8vC++NLh9T816ZsTBXXVSLkWsXQroHi7crU4k
-	 DdsnFvHvJmyWxtTNamug1ZYqlKkvu1Ul/Mflq/cSthe1AQzBYDhkK99OTpCfbPjFii
-	 4VJ+NEs1q+iU0BgpOh+LKqUBYe209AEVFtSLU3R1das7ghA6LJa3D/XymnmrmwMh5a
-	 OSvBGXdPoZks6wQYT2rfhebBWud9qlPKqmFv/q/4NriCLABSIpIMyjtVQs4qkiASIv
-	 xgK+2UhXXS/Fw==
-Date: Tue, 16 Jan 2024 11:29:26 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Benjamin Poirier <bpoirier@nvidia.com>
-Cc: Jay Vosburgh <jay.vosburgh@canonical.com>, Hangbin Liu
- <liuhangbin@gmail.com>, netdev@vger.kernel.org, Andy Gospodarek
- <andy@greyhouse.net>, Shuah Khan <shuah@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Jonathan Toppins <jon.toppins+linux@gmail.com>,
- Nikolay Aleksandrov <razor@blackwall.org>, Michal Kubiak
- <michal.kubiak@intel.com>, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net] selftests: bonding: Add more missing config options
-Message-ID: <20240116112926.541e0651@kernel.org>
-In-Reply-To: <ZabXT2ZepMuinE50@d3>
-References: <20240116154926.202164-1-bpoirier@nvidia.com>
-	<20240116104402.1203850a@kernel.org>
-	<78106.1705431810@vermin>
-	<20240116112012.026e44d9@kernel.org>
-	<ZabXT2ZepMuinE50@d3>
+	s=k20201202; t=1705433516;
+	bh=B8rlXf1IueqTuTpDml4lMwGNJ5SQRj3OuuWeFvVrO8M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=j/FP32qARru7jIWYpaWws6d0A/ohcBaw+U8YExv9z7BRlQmCwdEs1ugEp7GUctQN7
+	 /tINuOed8BV8acqKGR23Ijl6F/U9UmbSaos5YDbgKJgs+U0R5AOJjqqMw0I92iaSk5
+	 y72k1k6EaJPhDRw0W2j/YxgOC707IZ73kmhmPOe9DOmDMqyZAo01HuRnWae1UNTGs+
+	 QAm/0nYvpPHMi6wpQUEuQmXbTz9WwwfUbbeGfxzYF/m6j0oyO0/EHraXr7taR+zUI4
+	 uYxDUppBnlemRLOszfa4XBqH0j4ysXUXCLg5AN3HUYtdphNVk9S7R/MSMshsfUHd0b
+	 IVVyagNi/KY3Q==
+Date: Tue, 16 Jan 2024 19:31:52 +0000
+From: Simon Horman <horms@kernel.org>
+To: Colin Ian King <colin.i.king@gmail.com>
+Cc: Alex Elder <elder@kernel.org>, "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH][next] net: ipa: remove the redundant assignment to
+ variable trans_id
+Message-ID: <20240116193152.GD588419@kernel.org>
+References: <20240116114025.2264839-1-colin.i.king@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240116114025.2264839-1-colin.i.king@gmail.com>
 
-On Tue, 16 Jan 2024 14:21:51 -0500 Benjamin Poirier wrote:
-> real    13m35.065s
-> user    0m1.657s
-> sys     0m27.918s
+On Tue, Jan 16, 2024 at 11:40:25AM +0000, Colin Ian King wrote:
+> The variable trans_id is being modulo'd by channel->tre_count and
+> the value is being re-assigned back to trans_id even though the
+> variable is not used after this operation. The assignment is
+> redundant. Remove the assignment and just replace it with the modulo
+> operator.
 > 
-> The test is not cpu bound; as Jay pointed out, it spends most of its
-> time sleeping.
+> Cleans up clang scan build warning:
+> warning: Although the value stored to 'trans_id' is used in the
+> enclosing expression, the value is never actually read from
+> 'trans_id' [deadcode.DeadStores]
+> 
+> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
 
-Ugh, so it does multiple iterations of 118 sec?
+## Form letter - net-next-closed
 
-Could you send a patch to bump the timeout to 900 or 1200 in this case?
+[adapted from text by Jakub]
+
+Hi Colin,
+
+The merge window for v6.8 has begun and therefore net-next is closed
+for new drivers, features, code refactoring and optimizations.
+We are currently accepting bug fixes only.
+
+Please repost when net-next reopens on or after 22nd January.
+
+RFC patches sent for review only are obviously welcome at any time.
+
+See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+--
+pw-bot: defer
 
