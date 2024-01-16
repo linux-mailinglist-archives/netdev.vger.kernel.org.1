@@ -1,86 +1,113 @@
-Return-Path: <netdev+bounces-63722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 472FE82F0D4
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 15:49:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D29A82F0F1
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 16:02:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF4EC1F22106
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 14:49:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF12C281BE9
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 15:02:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5AC61BF30;
-	Tue, 16 Jan 2024 14:49:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF4521BF34;
+	Tue, 16 Jan 2024 15:02:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NqTc2wzK"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="VB6iYHwV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out162-62-58-216.mail.qq.com (out162-62-58-216.mail.qq.com [162.62.58.216])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FEEB1BF2C;
-	Tue, 16 Jan 2024 14:49:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a2a17f3217aso1091292166b.2;
-        Tue, 16 Jan 2024 06:49:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705416548; x=1706021348; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y02z/tmpib1XgZeXA6m85lQ1dUIeX8FSLuICjkJTAVU=;
-        b=NqTc2wzK9kx9nHJQ3yLwoyRBJzhDkvJJ8Se5BdGbEdMtmEU+UxiHAYIMAZkoSEHgHr
-         mHF/v2E7e8YgzyIqlkjSq24VfzSKqMhrk6nKkc1SOlpUiBZljbx5FnnQFtDWk5jLLvSD
-         +R7c+ESFSbu+dNcJIuB6akoj2NL2ljrMerdEVNeJpl7QLyXpSRnJxXpu4esfYFIyJCrw
-         JQqrTF9UbdEjf9ins9MYBIEtiR01rIaJkZt1eW45568dn8YaZtMtbMhd3oT2xXzuCBrk
-         IjlfLZZdOB0den01quuqgSxVCYpjWX4/oIWcgRcoCSDbNuleZpvliO5dWXj0alUoI8Nw
-         ojaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705416548; x=1706021348;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y02z/tmpib1XgZeXA6m85lQ1dUIeX8FSLuICjkJTAVU=;
-        b=xPWZlxDiKy2LcNc6bvn2wUss3Rn1AhamkY9eRUDxu1dBp/U8i0t5AAMC0HaZ0XzI3o
-         F4OdZkwvhSAwhmaAi6MP44v8A/BwLbSdSiKyrEu6S/++XfZYcWpGPtgLASUpayzKn4Eo
-         ABRQLPDSrMvis+emZFazat/MBFpQG1g9gn04eGMdA/eP+jOSNQVhmv4HPWMEF8zDGtsv
-         gveaGItww6vevgz3ZcFmhu6v+bwSxocMkMUteYl/xErAXOu4tq9RoI1v4ivuGkAP7M4u
-         DEKvzZwsHPbS89W2/ASWYBRJ32PCrR0TUREyOvlrUWPd86c93p9Ilj6jj1P3xobXSKzI
-         15ZA==
-X-Gm-Message-State: AOJu0YxarN4RbyaGZAXOYjPXWRW7A6H8YzPZfAyC482OPFo0/A4y4JIg
-	wP13f9/PsKEFEnPi7tBINbo=
-X-Google-Smtp-Source: AGHT+IGC8kIEOXqFqmsUSyhC7Aw8MEjmqXQzeERthvTZRJpSk14GnNKa9UPeMaCllcrNpRJlFaH/Hw==
-X-Received: by 2002:a17:907:1b08:b0:a2c:baae:ce1e with SMTP id mp8-20020a1709071b0800b00a2cbaaece1emr4365126ejc.54.1705416548226;
-        Tue, 16 Jan 2024 06:49:08 -0800 (PST)
-Received: from skbuf ([188.25.255.36])
-        by smtp.gmail.com with ESMTPSA id tl7-20020a170907c30700b00a2de58581f6sm2273770ejc.74.2024.01.16.06.49.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jan 2024 06:49:07 -0800 (PST)
-Date: Tue, 16 Jan 2024 16:49:05 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: syzbot <syzbot+d81bcd883824180500c8@syzkaller.appspotmail.com>
-Cc: andrew@lunn.ch, davem@davemloft.net, dsahern@kernel.org,
-	edumazet@google.com, f.fainelli@gmail.com, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, lixiaoyan@google.com,
-	netdev@vger.kernel.org, pabeni@redhat.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [net?] KASAN: slab-out-of-bounds Read in
- dsa_user_changeupper
-Message-ID: <20240116144905.3otl4j3i3xjgzogo@skbuf>
-References: <0000000000001d4255060e87545c@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D24A31BC31
+	for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 15:02:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1705417359; bh=qjcLg5ms9S47F00EB6wAMEe0GkzvYo0BfBYr/994CQc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=VB6iYHwVqanxA+YNk3NiwkaoLyFZtwthCrL4EMnGODF4BNXBZQV7intpojrg3Cwxr
+	 gFuhLdjm4Fh4XU3Ip42c/2njq+Uw0TFVWuYOlIkIP3hSrRPy/opqEYocOAcqRUbaHQ
+	 6HggVLhz6jwnkATv/0Yzrmux24ZfRV6R5WNlbhF4=
+Received: from pek-lxu-l1.wrs.com ([111.198.225.215])
+	by newxmesmtplogicsvrsza7-0.qq.com (NewEsmtp) with SMTP
+	id E1992011; Tue, 16 Jan 2024 22:56:25 +0800
+X-QQ-mid: xmsmtpt1705416985taran815z
+Message-ID: <tencent_293767377D86CBF3726365497A43BD445205@qq.com>
+X-QQ-XMAILINFO: Nu+mFq/+qLTW6J1GszGKKMTR/InK/Fvy2NNiFYYAucHx9hFcoWmMvR7JHZMQMf
+	 c8/RnwufjcfaXFEVBxwPWX8kFott6/6re8FQggruEDjTySyrITPffpe2xAqzthCp/eZm4Jcd4Qjd
+	 8FeFe/rLoUx42wxdfd5WiO0mc+MvC9u1iYoczuUfLcqk+hPxNNRGaBEkgYIxBAIJma+I0ax4VG+x
+	 zKUjChCiJiCq9wbuBNj8xK6U12zYfS/IerODRuCPx4VagwfjxBDOYiNdnPD2G6jdC5UtuwM/4mZg
+	 qseaBdLpoLeJcnRPZTmLIzWnp6J77BvUom6IdX3bTsfDaifJFzOfTUKhG/SF0sTDqvpvM6k2DF6l
+	 k1KcLdiTQkzruW+1TbEP4jfq4k36MQvRL+DVnsEjPRHnurxD/+WZG7xArF20dY72JxkIRT82UYZd
+	 AYbpLaxyKEwCiAeoXB6X0jyT0hhlo1FtJ0MwgMw9x6csCZYnmlJQxooQ15a3tncLSXxYRoAWZ/S/
+	 jTaOuIz6fS9ieuw55ITMRJf0W4O7dNbBfAwOrv3PYR4GJF7wizwFXsQkurXzhVM5PL0HZWuSp+Nh
+	 5rVAeFpNNDhqpF2tmUZ4WvUoaDKZDuVZ/PU0U0+8vhld/0Y+L2+dMdQWo6CaKq3Ezb3VIVc1quPq
+	 bTX17yitdp8aSvbZnhhMpd6rAxCteFlJU3hV0XecdaN00fLktIA2SYAOO/jidjKIDRtq7sJehFGv
+	 BCb7Zcnzqw0+NNllbRxUw1hftKXmTNpe6pa23UXfrcQNhQt98o4l49k+TpTpKxrPZzt9F3oXVM81
+	 Q77SSpUgeML2AQDFeqhQVJFU7UDvPp+RuUiWUo7e5ySfvws71GvTooxDKWw5rD7BB0aL+CymgUJa
+	 Y+ZVlET6B0IZ9Cl5RsHE2zfW0sXsJJkAw7w6nDy5h+/EGGvu/P2LI4jJz6kfV9dE8cEaC4Wh1zIz
+	 phRf5Hwq8=
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+From: Edward Adam Davis <eadavis@qq.com>
+To: syzbot+7ec955e36bb239bd720f@syzkaller.appspotmail.com
+Cc: andrew@lunn.ch,
+	daniel@iogearbox.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	f.fainelli@gmail.com,
+	hkallweit1@gmail.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux@armlinux.org.uk,
+	maxime.chevallier@bootlin.com,
+	netdev@vger.kernel.org,
+	olteanv@gmail.com,
+	pabeni@redhat.com,
+	sd@queasysnail.net,
+	syzkaller-bugs@googlegroups.com,
+	vladimir.oltean@nxp.com
+Subject: [PATCH] net/dsa: fix oob in dsa_user_prechangeupper
+Date: Tue, 16 Jan 2024 22:56:26 +0800
+X-OQ-MSGID: <20240116145625.996134-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <00000000000002faa2060f02e766@google.com>
+References: <00000000000002faa2060f02e766@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0000000000001d4255060e87545c@google.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 09, 2024 at 10:17:34AM -0800, syzbot wrote:
-> If the report is already addressed, let syzbot know by replying with:
-> #syz fix: exact-commit-title
+If the private data is not allocated memory when generating an instance of 
+struct net_device, i.e. priv_size is too small, then its corresponding private
+data should not be accessed.
 
-#syz fix: net: dsa: fix netdev_priv() dereference before check on non-DSA netdevice events
+Reported-and-tested-by: syzbot+7ec955e36bb239bd720f@syzkaller.appspotmail.com
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+ net/dsa/user.h | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/net/dsa/user.h b/net/dsa/user.h
+index 996069130bea..9a40918ee7fc 100644
+--- a/net/dsa/user.h
++++ b/net/dsa/user.h
+@@ -53,7 +53,11 @@ int dsa_user_manage_vlan_filtering(struct net_device *dev,
+ 
+ static inline struct dsa_port *dsa_user_to_port(const struct net_device *dev)
+ {
+-	struct dsa_user_priv *p = netdev_priv(dev);
++	const struct rtnl_link_ops *ops = dev->rtnl_link_ops;
++	struct dsa_user_priv *p = ops->priv_size >= sizeof(*p) ? 
++		netdev_priv(dev) : NULL;
++	if (!p)
++		return NULL;
+ 
+ 	return p->dp;
+ }
+-- 
+2.43.0
+
 
