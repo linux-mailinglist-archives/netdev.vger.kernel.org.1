@@ -1,190 +1,136 @@
-Return-Path: <netdev+bounces-63750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03B3B82F27B
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 17:38:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D636382F2B6
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 17:58:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82612284FC8
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 16:38:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 752B91F2542A
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 16:58:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3B7D748D;
-	Tue, 16 Jan 2024 16:37:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78F4C1CA88;
+	Tue, 16 Jan 2024 16:58:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qo/1JOmo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iJ4pRd6x"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77C451CA83;
-	Tue, 16 Jan 2024 16:37:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85C53C433F1;
-	Tue, 16 Jan 2024 16:37:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705423065;
-	bh=jre5ipGlkss5zAu1aIdBqL+hSwB+mdQlTFI/dlhzA6c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qo/1JOmobPmFtak/7HKTx0XejNptaXUIipjwln1OdfT3drLtS0ju3ZCDZ8sbscoY3
-	 4w4l/W4KVXVwszFTlZlVW6GiSdpXfV8m2kdN2LXG/LWTRktlE1nXOiKWKVMehdMgq/
-	 YSCXgjMlSkfUewRXwJhrywSfxDJPTmgTlXrgty2B2R4paYEzJt9t8abuG6BVMWRbcQ
-	 VahL2b5MDPJ3rrb6XOVsaS6+Lz6ihmZIC0J83Hxq6cSQwnTmonnERgAypkCcgBWhY+
-	 YG408WTKIX6WfbU2m4LVeQyQnNixVSn84OGSHw8OczrSxWtNm28O0rPGIy/gdCxoq1
-	 hwfo9TCSBIXqg==
-Date: Tue, 16 Jan 2024 17:37:39 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: Linus Torvalds <torvalds@linuxfoundation.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org, paul@paul-moore.com, 
-	linux-fsdevel@vger.kernel.org, linux-security-module@vger.kernel.org, kernel-team@meta.com
-Subject: Re: [PATCH bpf-next 03/29] bpf: introduce BPF token object
-Message-ID: <20240116-gradmesser-labeln-9a1d9918c92e@brauner>
-References: <20240109-tausend-tropenhelm-2a9914326249@brauner>
- <CAEf4BzaAoXYb=qnj6rvDw8VewhvYNrs5oxe=q7VBe0jjWXivhg@mail.gmail.com>
- <20240110-nervt-monopol-6d307e2518f4@brauner>
- <CAEf4BzYOU5ZVqnTDTEmrHL-+tYY76kz4LO_0XauWibnhtzCFXg@mail.gmail.com>
- <20240111-amten-stiefel-043027f9520f@brauner>
- <CAEf4BzYcec97posh6N3LM8tJLsxrSLiFYq9csRWcy8=VnTJ23A@mail.gmail.com>
- <20240112-unpraktisch-kuraufenthalt-4fef655deab2@brauner>
- <CAEf4Bza7UKjv1Hh_kcyBVJw22LDv4ZNA5uV7+WBdnhsM9O7uGQ@mail.gmail.com>
- <20240112-hetzt-gepard-5110cf759a34@brauner>
- <CAEf4BzYNRNbaNNGRSUCaY3OQrzXPAdR6gGB0PmXhwsn8rUAs0Q@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA381C6A1;
+	Tue, 16 Jan 2024 16:58:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-3366ddd1eddso8211063f8f.0;
+        Tue, 16 Jan 2024 08:58:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705424283; x=1706029083; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hWIMOxwPuwlyypi9mGRlB1wNl0jlfrKw1ScuZdtPpAE=;
+        b=iJ4pRd6xT/iZA0xUDuiNyKnNuxPjyrb+y0dg1DUodjolwttlJibv05ZLkLL6+3gKD3
+         0zpkPkM+3JvxcVNrqIvpY5V5eOYK/2nrKPxQf83UIBkxMRebE89lvbcKsSn6TwyCzhXh
+         NiuPFXkVTIZ9APRuDOrJOVWWQnwdrC5z/1yFImsAxNpYCcbtt16zBxjIhsLCFx5XMF0W
+         lKP4f7WHj50jjsr4r92UHwYgOsOYCrqdJDY1paSfS6p3YCrx8HDA3nFkxrMS6aLqv/p7
+         PVQ7tR6g5VQZXfoIOazul/LAqAFhDl+tNk2QOgvyJSXrxLsD/ctQpEmOF0mTFCmSnHkN
+         2YTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705424283; x=1706029083;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hWIMOxwPuwlyypi9mGRlB1wNl0jlfrKw1ScuZdtPpAE=;
+        b=Pn0GM/BnPhjvmGoo7LTZFwfqkPNI2QZ7NJylHmOEYw5BE8kDvwDPbDtJ265lkrIY63
+         rDcnM+CzNFLRqhSwEyLCcn4OwBLCzgVjoVnaMoUCaxH3VwFNRwqrlkGu7y362xKKxaiK
+         /RJzC/SYu8qb79nKqR7l4Q5b77xYsXmhT9Yaih6CDdumIvWqkLw1zR4b8WhFJXJG+52a
+         fyZk/WhexuWFdhettmt6OZo7rl503/vwd35zXcWzzcjREvr+sndkM7a4mRWsjzrGcEd5
+         W8eHzKhyF6xKXTVDbXqe7EJq04h0WULoRI2v/8LoEd4BF3U2nT6PV06TpxAlqULBgK4F
+         oNoA==
+X-Gm-Message-State: AOJu0Yy/oNVHxiswgEBPJIrqc2WWX+xWzsGvBg9BTyG4x/d6Kf9QLGSn
+	LJVAz7S0MH1AYNI6dxFMH6U=
+X-Google-Smtp-Source: AGHT+IEzI3h4gWrHRgRIUCmkOWf7L17Yh04pMYuuDkCdMR3c+TIBaC98FCnb6ejWkKylpXq7lzn3Qw==
+X-Received: by 2002:a5d:5943:0:b0:336:608f:91eb with SMTP id e3-20020a5d5943000000b00336608f91ebmr2017052wri.95.1705424282738;
+        Tue, 16 Jan 2024 08:58:02 -0800 (PST)
+Received: from krava ([83.240.60.213])
+        by smtp.gmail.com with ESMTPSA id co8-20020a0560000a0800b00336755f15b0sm15100243wrb.68.2024.01.16.08.58.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Jan 2024 08:58:02 -0800 (PST)
+From: Jiri Olsa <olsajiri@gmail.com>
+X-Google-Original-From: Jiri Olsa <jolsa@kernel.org>
+Date: Tue, 16 Jan 2024 17:58:01 +0100
+To: Artem Savkov <asavkov@redhat.com>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Yonghong Song <yonghong.song@linux.dev>
+Subject: Re: [PATCH bpf-next v2] selftests/bpf: fix potential premature
+ unload in bpf_testmod
+Message-ID: <ZaajJVrGLakTmtH1@krava>
+References: <82f55c0e-0ec8-4fe1-8d8c-b1de07558ad9@linux.dev>
+ <20240110085737.8895-1-asavkov@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAEf4BzYNRNbaNNGRSUCaY3OQrzXPAdR6gGB0PmXhwsn8rUAs0Q@mail.gmail.com>
+In-Reply-To: <20240110085737.8895-1-asavkov@redhat.com>
 
-On Sat, Jan 13, 2024 at 06:29:33PM -0800, Andrii Nakryiko wrote:
-> On Fri, Jan 12, 2024 at 11:17 AM Christian Brauner <brauner@kernel.org> wrote:
-> >
-> > > > My point is that the capable logic will walk upwards the user namespace
-> > > > hierarchy from the token->userns until the user namespace of the caller
-> > > > and terminate when it reached the init_user_ns.
-> > > >
-> > > > A caller is located in some namespace at the point where they call this
-> > > > function. They provided a token. The caller isn't capable in the
-> > > > namespace of the token so the function falls back to init_user_ns. Two
-> > > > interesting cases:
-> > > >
-> > > > (1) The caller wasn't in an ancestor userns of the token. If that's the
-> > > >     case then it follows that the caller also wasn't in the init_user_ns
-> > > >     because the init_user_ns is a descendant of all other user
-> > > >     namespaces. So falling back will fail.
-> > >
-> > > agreed
-> > >
-> > > >
-> > > > (2) The caller was in the same or an ancestor user namespace of the
-> > > >     token but didn't have the capability in that user namespace:
-> > > >
-> > > >      (i) They were in a non-init_user_ns. Therefore they can't be
-> > > >          privileged in init_user_ns.
-> > > >     (ii) They were in init_user_ns. Therefore, they lacked privileges in
-> > > >          the init_user_ns.
-> > > >
-> > > > In both cases your fallback will do nothing iiuc.
-> > >
-> > > agreed as well
-> > >
-> > > And I agree in general that there isn't a *practically useful* case
-> > > where this would matter much. But there is still (at least one) case
-> > > where there could be a regression: if token is created in
-> > > init_user_ns, caller has CAP_BPF in init_user_ns, caller passes that
-> > > token to BPF_PROG_LOAD, and LSM policy rejects that token in
-> > > security_bpf_token_capable(). Without the above implementation such
-> > > operation will be rejected, even though if there was no token passed
-> > > it would succeed. With my implementation above it will succeed as
-> > > expected.
-> >
-> > If that's the case then prevent the creation of tokens in the
-> > init_user_ns and be done with it. If you fallback anyway then this is
-> > the correct solution.
-> >
-> > Make this change, please. I'm not willing to support this weird fallback
-> > stuff which is even hard to reason about.
+On Wed, Jan 10, 2024 at 09:57:37AM +0100, Artem Savkov wrote:
+> It is possible for bpf_kfunc_call_test_release() to be called from
+> bpf_map_free_deferred() when bpf_testmod is already unloaded and
+> perf_test_stuct.cnt which it tries to decrease is no longer in memory.
+> This patch tries to fix the issue by waiting for all references to be
+> dropped in bpf_testmod_exit().
 > 
-> Alright, added an extra check. Ok, so in summary I have the changes
-> below compared to v1 (plus a few extra LSM-related test cases added):
+> The issue can be triggered by running 'test_progs -t map_kptr' in 6.5,
+> but is obscured in 6.6 by d119357d07435 ("rcu-tasks: Treat only
+> synchronous grace periods urgently").
 > 
-> diff --git a/kernel/bpf/token.c b/kernel/bpf/token.c
-> index a86fccd57e2d..7d04378560fd 100644
-> --- a/kernel/bpf/token.c
-> +++ b/kernel/bpf/token.c
-> @@ -9,18 +9,22 @@
->  #include <linux/user_namespace.h>
->  #include <linux/security.h>
+> Fixes: 65eb006d85a2a ("bpf: Move kernel test kfuncs to bpf_testmod")
+> Signed-off-by: Artem Savkov <asavkov@redhat.com>
+> Acked-by: Yonghong Song <yonghong.song@linux.dev>
+
+Acked-by: Jiri Olsa <jolsa@kernel.org>
+
+jirka
+
+> ---
+>  tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
 > 
-> +static bool bpf_ns_capable(struct user_namespace *ns, int cap)
-> +{
-> +       return ns_capable(ns, cap) || (cap != CAP_SYS_ADMIN &&
-> ns_capable(ns, CAP_SYS_ADMIN));
-> +}
-> +
->  bool bpf_token_capable(const struct bpf_token *token, int cap)
+> diff --git a/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c b/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
+> index 91907b321f913..e7c9e1c7fde04 100644
+> --- a/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
+> +++ b/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
+> @@ -2,6 +2,7 @@
+>  /* Copyright (c) 2020 Facebook */
+>  #include <linux/btf.h>
+>  #include <linux/btf_ids.h>
+> +#include <linux/delay.h>
+>  #include <linux/error-injection.h>
+>  #include <linux/init.h>
+>  #include <linux/module.h>
+> @@ -544,6 +545,14 @@ static int bpf_testmod_init(void)
+>  
+>  static void bpf_testmod_exit(void)
 >  {
-> -       /* BPF token allows ns_capable() level of capabilities, but only if
-> -        * token's userns is *exactly* the same as current user's userns
-> -        */
-> -       if (token && current_user_ns() == token->userns) {
-> -               if (ns_capable(token->userns, cap) ||
-> -                   (cap != CAP_SYS_ADMIN && ns_capable(token->userns,
-> CAP_SYS_ADMIN)))
-> -                       return security_bpf_token_capable(token, cap) == 0;
-> -       }
-> -       /* otherwise fallback to capable() checks */
-> -       return capable(cap) || (cap != CAP_SYS_ADMIN && capable(CAP_SYS_ADMIN));
-> +       struct user_namespace *userns;
+> +        /* Need to wait for all references to be dropped because
+> +         * bpf_kfunc_call_test_release() which currently resides in kernel can
+> +         * be called after bpf_testmod is unloaded. Once release function is
+> +         * moved into the module this wait can be removed.
+> +         */
+> +	while (refcount_read(&prog_test_struct.cnt) > 1)
+> +		msleep(20);
 > +
-> +       /* BPF token allows ns_capable() level of capabilities */
-> +       userns = token ? token->userns : &init_user_ns;
-> +       if (!bpf_ns_capable(userns, cap))
-> +               return false;
-> +       if (token && security_bpf_token_capable(token, cap) < 0)
-> +               return false;
-> +       return true;
+>  	return sysfs_remove_bin_file(kernel_kobj, &bin_attr_bpf_testmod_file);
 >  }
+>  
+> -- 
+> 2.43.0
 > 
->  void bpf_token_inc(struct bpf_token *token)
-> @@ -32,7 +36,7 @@ static void bpf_token_free(struct bpf_token *token)
->  {
->         security_bpf_token_free(token);
->         put_user_ns(token->userns);
-> -       kvfree(token);
-> +       kfree(token);
->  }
-> 
->  static void bpf_token_put_deferred(struct work_struct *work)
-> @@ -152,6 +156,12 @@ int bpf_token_create(union bpf_attr *attr)
->                 goto out_path;
->         }
-> 
-> +       /* Creating BPF token in init_user_ns doesn't make much sense. */
-> +       if (current_user_ns() == &init_user_ns) {
-> +               err = -EOPNOTSUPP;
-> +               goto out_path;
-> +       }
-> +
->         mnt_opts = path.dentry->d_sb->s_fs_info;
->         if (mnt_opts->delegate_cmds == 0 &&
->             mnt_opts->delegate_maps == 0 &&
-> @@ -179,7 +189,7 @@ int bpf_token_create(union bpf_attr *attr)
->                 goto out_path;
->         }
-> 
-> -       token = kvzalloc(sizeof(*token), GFP_USER);
-> +       token = kzalloc(sizeof(*token), GFP_USER);
->         if (!token) {
->                 err = -ENOMEM;
->                 goto out_file;
-
-Thank you! Looks good,
-
-Acked-by: Christian Brauner <brauner@kernel.org>
 
