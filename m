@@ -1,161 +1,194 @@
-Return-Path: <netdev+bounces-63676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9359782EC3D
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 10:54:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EC8782EC1C
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 10:50:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41E4B281086
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 09:54:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9ECFA28574D
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 09:50:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2469C134B1;
-	Tue, 16 Jan 2024 09:54:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BA83134A4;
+	Tue, 16 Jan 2024 09:49:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b="E0X/tHWC"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="jj8uWuf3"
 X-Original-To: netdev@vger.kernel.org
-Received: from dvalin.narfation.org (dvalin.narfation.org [213.160.73.56])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EC2A134A1;
-	Tue, 16 Jan 2024 09:54:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=narfation.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
-	s=20121; t=1705398486;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E57A134A1;
+	Tue, 16 Jan 2024 09:49:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 8298960008;
+	Tue, 16 Jan 2024 09:49:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1705398592;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/VCLSujzzlDwuQlHwmx12Nj9mX+R3Jv83uQp+uToPts=;
-	b=E0X/tHWCKP+I7eyjg29dLJkauXq79JyGU0MK8In7XKzm4VDEmrdqTc7dxx6so8eYcL53gf
-	Nwhgz0OCj2RZ4EMqm4cBJVv+cwNETy7TDwSefwODFUXjgDw6u+HYRWMZ5BDqzU9veqE+FB
-	MnYtekoPtvzsXOZZa7VducunC5Fbg8s=
-From: Sven Eckelmann <sven@narfation.org>
-To: linus.luessing@c0d3.blue
-Cc: b.a.t.m.a.n@lists.open-mesh.org, clm@fb.com, davem@davemloft.net,
- dsterba@suse.com, edumazet@google.com, josef@toxicpanda.com, kuba@kernel.org,
- linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- syzkaller-bugs@googlegroups.com,
- syzbot <syzbot+ebe64cc5950868e77358@syzkaller.appspotmail.com>
-Subject: Re: [syzbot] [btrfs?] memory leak in corrupted
-Date: Tue, 16 Jan 2024 10:48:03 +0100
-Message-ID: <23660052.EfDdHjke4D@ripper>
-In-Reply-To: <000000000000beadc4060f0cbc23@google.com>
-References: <000000000000beadc4060f0cbc23@google.com>
+	bh=DNLdp9OGT7c+u1pDg4x54qzMqUrUFue68oAXfluzQf8=;
+	b=jj8uWuf3K5Xess1XfSDF0tFuHfWoDK9MVLNU8+7NpsL4xMJCjG5w0z9GRxsz65rEnvnJCL
+	iebfqOgabeh0/fxq5jjO831LiWI+XaXAtxZNd/iLDUsC3MuDUlOZC5/hTcfNRUZyhXi8h6
+	C3ERJoUPzPHXKbvTWGhNA7MterclVbej9jrhqFI12rfbWoYqOJQL9q6Va0v4yiuvrpikY+
+	RhkkiWZp71gkItHSgd7OfIMUKBTPKrc6G770jOHDSVyHIZxtlwC+KnBi76bPIFafJvRjBT
+	sGkpn92LHh/3Q/MMGlsRDhh51PnCgKWciErinnXMYldLJLVJCRTdmkp3FY84Cg==
+Date: Tue, 16 Jan 2024 10:49:49 +0100
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
+ <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
+ <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v2 8/8] net: pse-pd: Add PD692x0 PSE controller
+ driver
+Message-ID: <20240116104949.12708cd5@kmaincent-XPS-13-7390>
+In-Reply-To: <639c5222-043f-4e27-9efa-ce2a1d73eaba@lunn.ch>
+References: <20231201-feature_poe-v2-0-56d8cac607fa@bootlin.com>
+	<20231201-feature_poe-v2-8-56d8cac607fa@bootlin.com>
+	<639c5222-043f-4e27-9efa-ce2a1d73eaba@lunn.ch>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart9125406.EvYhyI6sBW";
- micalg="pgp-sha512"; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
---nextPart9125406.EvYhyI6sBW
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"; protected-headers="v1"
-From: Sven Eckelmann <sven@narfation.org>
-To: linus.luessing@c0d3.blue
-Subject: Re: [syzbot] [btrfs?] memory leak in corrupted
-Date: Tue, 16 Jan 2024 10:48:03 +0100
-Message-ID: <23660052.EfDdHjke4D@ripper>
-In-Reply-To: <000000000000beadc4060f0cbc23@google.com>
-References: <000000000000beadc4060f0cbc23@google.com>
-MIME-Version: 1.0
+Hell Andrew,
 
-@Linus, this looks like something for you.
+Thanks for your reviews and sorry for replying so late, I was working on the
+core to fit the new bindings and requirements lifted by Oleksij.
 
-On Tuesday, 16 January 2024 10:27:20 CET syzbot wrote:
-> syzbot found the following issue on:
-> 
-> HEAD commit:    052d534373b7 Merge tag 'exfat-for-6.8-rc1' of git://git.ke..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=14620debe80000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=a7031f9e71583b4a
-> dashboard link: https://syzkaller.appspot.com/bug?extid=ebe64cc5950868e77358
-> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16a344c1e80000
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/82a7201eef4c/disk-052d5343.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/ca12b4c31826/vmlinux-052d5343.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/3f07360ba5a8/bzImage-052d5343.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+ebe64cc5950868e77358@syzkaller.appspotmail.com
+On Sun, 3 Dec 2023 20:34:54 +0100
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-The relevant line is the batadv_mcast_forw_tracker_tvlv_handler registration 
-in batadv_mcast_init() which was introduced in
-commit 07afe1ba288c ("batman-adv: mcast: implement multicast packet reception and forwarding")
+> > +static int pd692x0_try_recv_msg(const struct i2c_client *client,
+> > +				struct pd692x0_msg *msg,
+> > +				struct pd692x0_msg *buf)
+> > +{
+> > +	msleep(30);
+> > +
+> > +	memset(buf, 0, sizeof(*buf));
+> > +	i2c_master_recv(client, (u8 *)buf, sizeof(*buf));
+> > +	if (buf->key)
+> > +		return 1;
+> > +
+> > +	msleep(100);
+> > +
+> > +	memset(buf, 0, sizeof(*buf));
+> > +	i2c_master_recv(client, (u8 *)buf, sizeof(*buf));
+> > +	if (buf->key)
+> > +		return 1;
+> > +
+> > +	return 0; =20
+>=20
+> Maybe make this function return a bool? Or 0 on success, -EIO on
+> error?
 
-And I can't find the batadv_tvlv_handler_unregister for 
-BATADV_TVLV_MCAST_TRACKER in batadv_mcast_free()
+Indeed, I will move on to bool.
 
-Kind regards,
-	Sven
+> > +static int pd692x0_update_matrix(struct pd692x0_priv *priv)
+> > +{
+> > +	struct matrix port_matrix[PD692X0_MAX_LOGICAL_PORTS];
+> > +	struct device *dev =3D &priv->client->dev;
+> > +	int ret;
+> > +
+> > +	ret =3D pd692x0_get_of_matrix(dev, port_matrix);
+> > +	if (ret < 0) {
+> > +		dev_warn(dev,
+> > +			 "Unable to parse port-matrix, saved matrix will
+> > be used\n");
+> > +		return 0;
+> > +	}
+> > +
+> > +	ret =3D pd692x0_set_ports_matrix(priv, port_matrix);
+> > +	if (ret < 0)
+> > +		return ret;
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +#define PD692X0_FW_LINE_MAX_SZ 0xff =20
+>=20
+> That probably works. Most linkers producing SREC output do limit
+> themselves to lines of 80 charactors max. But the SREC format actually
+> allows longer lines.
 
-> 
-> BUG: memory leak
-> unreferenced object 0xffff88811c71a980 (size 64):
->   comm "syz-executor.7", pid 5063, jiffies 4294953937
->   hex dump (first 32 bytes):
->     00 00 00 00 00 00 00 00 20 8e 7e 1c 81 88 ff ff  ........ .~.....
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->   backtrace (crc 9f8721dd):
->     [<ffffffff815f7d53>] kmemleak_alloc_recursive include/linux/kmemleak.h:42 [inline]
->     [<ffffffff815f7d53>] slab_post_alloc_hook mm/slub.c:3817 [inline]
->     [<ffffffff815f7d53>] slab_alloc_node mm/slub.c:3860 [inline]
->     [<ffffffff815f7d53>] kmalloc_trace+0x283/0x330 mm/slub.c:4007
->     [<ffffffff84aae617>] kmalloc include/linux/slab.h:590 [inline]
->     [<ffffffff84aae617>] kzalloc include/linux/slab.h:711 [inline]
->     [<ffffffff84aae617>] batadv_tvlv_handler_register+0xf7/0x2a0 net/batman-adv/tvlv.c:560
->     [<ffffffff84a8d09f>] batadv_mcast_init+0x4f/0xc0 net/batman-adv/multicast.c:1926
->     [<ffffffff84a895b9>] batadv_mesh_init+0x209/0x2f0 net/batman-adv/main.c:231
->     [<ffffffff84a9fa88>] batadv_softif_init_late+0x1f8/0x280 net/batman-adv/soft-interface.c:812
->     [<ffffffff83f48559>] register_netdevice+0x189/0xca0 net/core/dev.c:10188
->     [<ffffffff84a9f255>] batadv_softif_newlink+0x55/0x70 net/batman-adv/soft-interface.c:1088
->     [<ffffffff83f61dc0>] rtnl_newlink_create net/core/rtnetlink.c:3515 [inline]
->     [<ffffffff83f61dc0>] __rtnl_newlink+0xb10/0xec0 net/core/rtnetlink.c:3735
->     [<ffffffff83f621bc>] rtnl_newlink+0x4c/0x70 net/core/rtnetlink.c:3748
->     [<ffffffff83f5cd1f>] rtnetlink_rcv_msg+0x22f/0x5b0 net/core/rtnetlink.c:6615
->     [<ffffffff84093291>] netlink_rcv_skb+0x91/0x1d0 net/netlink/af_netlink.c:2543
->     [<ffffffff84092242>] netlink_unicast_kernel net/netlink/af_netlink.c:1341 [inline]
->     [<ffffffff84092242>] netlink_unicast+0x2c2/0x440 net/netlink/af_netlink.c:1367
->     [<ffffffff84092701>] netlink_sendmsg+0x341/0x690 net/netlink/af_netlink.c:1908
->     [<ffffffff83ef2912>] sock_sendmsg_nosec net/socket.c:730 [inline]
->     [<ffffffff83ef2912>] __sock_sendmsg+0x52/0xa0 net/socket.c:745
->     [<ffffffff83ef5af4>] __sys_sendto+0x164/0x1e0 net/socket.c:2191
->     [<ffffffff83ef5b98>] __do_sys_sendto net/socket.c:2203 [inline]
->     [<ffffffff83ef5b98>] __se_sys_sendto net/socket.c:2199 [inline]
->     [<ffffffff83ef5b98>] __x64_sys_sendto+0x28/0x30 net/socket.c:2199
+I set it to SREC limit but indeed the firmware lines does not exceed 80
+characters except the comments. 0xff line size limit won't break anything
+though.
 
+> > +static int pd692x0_fw_get_next_line(const u8 *data,
+> > +				    char *line, size_t size)
+> > +{
+> > +	size_t line_size;
+> > +	int i;
+> > +
+> > +	line_size =3D min_t(size_t, size, (size_t)PD692X0_FW_LINE_MAX_SZ);
+> > +
+> > +	memset(line, 0, PD692X0_FW_LINE_MAX_SZ);
+> > +	for (i =3D 0; i < line_size - 1; i++) {
+> > +		if (*data =3D=3D '\r' && *(data + 1) =3D=3D '\n') {
+> > +			line[i] =3D '\r';
+> > +			line[i + 1] =3D '\n';
+> > +			return i + 2;
+> > +		} =20
+>=20
+> Does the Vendor Documentation indicate Windoze line endings will
+> always be used? Motorola SREC allow both Windows or rest of the world
+> line endings to be used.=20
 
---nextPart9125406.EvYhyI6sBW
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
+All the firmware lines end with "\r\n" but indeed it is not specifically
+written that the firmware content would follow this. IMHO it is implicit th=
+at
+it would be the case as all i2c messages use this line termination.
+Do you prefer that I add support to the world line endings possibility?=20
 
------BEGIN PGP SIGNATURE-----
+> > +static enum fw_upload_err pd692x0_fw_poll_complete(struct fw_upload *f=
+wl)
+> > +{
+> > +	struct pd692x0_priv *priv =3D fwl->dd_handle;
+> > +	const struct i2c_client *client =3D priv->client;
+> > +	struct pd692x0_msg_ver ver;
+> > +	int ret;
+> > +
+> > +	priv->fw_state =3D PD692X0_FW_COMPLETE;
+> > +
+> > +	ret =3D pd692x0_fw_reset(client);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	ver =3D pd692x0_get_sw_version(priv);
+> > +	if (ver.maj_sw_ver !=3D PD692X0_FW_MAJ_VER) { =20
+>=20
+> That is probably too strong a condition. You need to allow firmware
+> upgrades, etc. Does it need to be an exact match, or would < be
+> enough?
 
-iQIzBAABCgAdFiEEF10rh2Elc9zjMuACXYcKB8Eme0YFAmWmUNMACgkQXYcKB8Em
-e0ak3w//d9HRSZJiTWYrWkiOMLEoDd7oWa9shGcdm9qS+bmJ4RWkqyLQKWiLl6yz
-CcGxtbDBUXvVgMUHX9BuctKnigZ7VA+7wMY1ZLVE0KUPOlqkvlW9GvkOutwa2f1d
-hwFa2uPCSXqWbIaU6JjxNvHM0sEJou392MebhV5n9M9zJlS8/v5t7lwgKa3tnLL2
-vhyqSKKs7BESIvUhI399nPr2AfOhw+qqndV35B5gAJVeHC+iSWBycKolP/LstaJq
-Z7JE1eusP50i3vrSVIglwiefF7kUq1Y088F1nq2ommuVXFfPAxss5bwUupG7Jmtf
-gIYIslX/eLNpahJvVIKNTMPBjfcaeEbT8e87xIzhT1H4quv2oApKfWTM5u0XryDK
-29ICqroEH4DCv+gEYF4Miip40m982YtZlB1wnShFK3icFZaEGipgqxJ67/XJNkfP
-GXdNnzWlEl6PXsS388TYLkQlxWdFNsSM08IPZjolOEgIDhZaM3AUCDUe22BWiN5Z
-BdbeU3sWmiy3BaZ2fUh6M0Cawd1Oz4QneJl3rPce1jeDI4ee9CtTdgWd1/ziG8yH
-0QhMTljzGz5WEaPBT9L7PsKf33/s/IY1GwXzB/maObFi10G6nn+743btOlCodOb3
-i4lTc8Z3Vl+4CCl78CUfQemr/nd8irtzCJk/OJuUlOSmepgs+J4=
-=A35g
------END PGP SIGNATURE-----
+The major version is not compatible with the last one, the i2c messages
+content changed. I supposed a change in major version would imply a change =
+in
+the i2c messages content and would need a driver update that's why I used t=
+his
+strong condition.
 
---nextPart9125406.EvYhyI6sBW--
-
-
-
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
