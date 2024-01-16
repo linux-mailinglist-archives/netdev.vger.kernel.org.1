@@ -1,67 +1,66 @@
-Return-Path: <netdev+bounces-63859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B31F82FBA7
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 23:00:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88E0A82FBB1
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 23:01:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD22D1F280CB
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 22:00:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6C04AB28469
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 22:01:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17A781690BB;
-	Tue, 16 Jan 2024 20:04:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42BB1169B63;
+	Tue, 16 Jan 2024 20:04:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="co+SQyGC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YLKhVZTb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD7131690B7;
-	Tue, 16 Jan 2024 20:04:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1685E165F92;
+	Tue, 16 Jan 2024 20:04:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705435456; cv=none; b=DTZ7sBAwg0XspmIhjjZ7EjvBPG3iPyJPe3mWWZSN8svdaxRbPUBwU06aSOIrcIHJONvzmEj1OVguh3q2p/panLgPGAA1wvKDtsYYSuk5768yhmxdyKsXOq4xjCiFLhES4/PhCfM9VMpbBaTAyyfuiebiF7iF5dmvFXPT2i5d+Zo=
+	t=1705435480; cv=none; b=SAV0afuYUX5sz7n7oidhmDRVwsAXFvccb9SNBp87vvhbLd0oUv4BgwlB+K0ZI3PQMrQpfyQ26RhfeHf/AHjMTXzMlSU10gokNLHa6rb3NXvcliXFa1981sfVgOHuF5S+hVcuzzRbX9jTiVpi0keO3zTvnRgxArIpxgK2WqwZ5uI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705435456; c=relaxed/simple;
-	bh=ZacWzLCDX992GlzXe6YpXKHBw5JHUXKwxy/FO9FQ0JQ=;
+	s=arc-20240116; t=1705435480; c=relaxed/simple;
+	bh=MV8HnOw5PC35GnGAsXoFDqVoDo2oWp7vBPe/Q6VxG3U=;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:X-stable:
-	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=Hzs716nCqdKHECrcvuR1B2UgtoFM03EUR+8MU+5lHTDPPKjEeQLXGfAVx7lGluCJhCCUV0wbr5+v1sJLkmBAsZ2Kn2BKeROhIVHSiR2WBP6YjnW/LdGeqCNZRiPZnP814OOjRwmzdnxJXdlJTeTl1vuSfDr6atJ0lca3biI6ASE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=co+SQyGC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69582C433F1;
-	Tue, 16 Jan 2024 20:04:14 +0000 (UTC)
+	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=SVugxBkFK7Ld70wW4xR2S5ebpG62ELpzcMLUVbA4L4yTs1jaMO/Dzx0gYJNXWoKphwTXvzal15zaiXR2hDbQkIxCZDxJVrsdS+awWj8N2p2RX8iR11WIhZ6SXzDDacKK4VxGB3sNq7l37qNRNBCMgqAf0OTAuL5zvZypMwIcdxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YLKhVZTb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A91F1C433B1;
+	Tue, 16 Jan 2024 20:04:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705435455;
-	bh=ZacWzLCDX992GlzXe6YpXKHBw5JHUXKwxy/FO9FQ0JQ=;
+	s=k20201202; t=1705435479;
+	bh=MV8HnOw5PC35GnGAsXoFDqVoDo2oWp7vBPe/Q6VxG3U=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=co+SQyGC0Sq9vYIaE+6VKYvmUNjW+REajGpbD/co2qCg1dTJXD8DeYC8ZP62Y8ZVc
-	 c6A2LhkhjmXfT4zOnK2BZp/C58nw7CoYX7dry/DbXNfngR3MByVGyjMb0fHCEmx0Eq
-	 5tvNRi+bcv9KNIPN/sftKLIoVk0xMAA91aXKG2k78I9Xk80KBk2gAPp4fLVviuvOSX
-	 rf5lBPFmWpQQ607wYZ3s7Olvk6eo9C58Zndr2UACOa/4UW0g6KzITjb7owFl/j+doC
-	 t3jqW+v3OyR3okfx0FsV42q9W3wtIH3BmxqmQZYgLKVfY/R+RUQK9XIZq5zxPx6poR
-	 vMderklFrZ3+w==
+	b=YLKhVZTbzlP9RVOSMoBFHN/w2KSF0h8Fnke7WldPL/ZaVwbWvBV9ZTeQgOH0vQJR3
+	 SYEdswFUyKUysEH4u4MtH9r/QZmfWvuhE6I1+TIvC1jJQWF2OaM2X4mWjYSmFZACLT
+	 9mQv38LSsAfRlKzDDHMV0dLbEu6cHwoi2pQGtQ/+inEqkg3Dug5uJV3pRTQs/K5Nck
+	 7cfZqFXz5XJTt2k+5yotCDDD7gDg1LV27nCxE6/ZbGmDk75xXQK0H1Zzc1z+8y3s4L
+	 E7mnSH8rGt48sDIFz2b2kOzlKGIIjU5Rpad4J/Wo+gJ0J3+9yRG63SKsAcLRvzd+nB
+	 DXh/H9Bh3j9hg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Benjamin Berg <benjamin.berg@intel.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+Cc: Zhengchao Shao <shaozhengchao@huawei.com>,
+	Jay Vosburgh <jay.vosburgh@canonical.com>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
-	johannes@sipsolutions.net,
+	j.vosburgh@gmail.com,
+	andy@greyhouse.net,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-wireless@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 31/31] wifi: cfg80211: free beacon_ies when overridden from hidden BSS
-Date: Tue, 16 Jan 2024 15:02:40 -0500
-Message-ID: <20240116200310.259340-31-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 03/22] bonding: return -ENOMEM instead of BUG in alb_upper_dev_walk
+Date: Tue, 16 Jan 2024 15:03:57 -0500
+Message-ID: <20240116200432.260016-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240116200310.259340-1-sashal@kernel.org>
-References: <20240116200310.259340-1-sashal@kernel.org>
+In-Reply-To: <20240116200432.260016-1-sashal@kernel.org>
+References: <20240116200432.260016-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,45 +69,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.4.267
+X-stable-base: Linux 4.19.305
 Content-Transfer-Encoding: 8bit
 
-From: Benjamin Berg <benjamin.berg@intel.com>
+From: Zhengchao Shao <shaozhengchao@huawei.com>
 
-[ Upstream commit 32af9a9e1069e55bc02741fb00ac9d0ca1a2eaef ]
+[ Upstream commit d6b83f1e3707c4d60acfa58afd3515e17e5d5384 ]
 
-This is a more of a cosmetic fix. The branch will only be taken if
-proberesp_ies is set, which implies that beacon_ies is not set unless we
-are connected to an AP that just did a channel switch. And, in that case
-we should have found the BSS in the internal storage to begin with.
+If failed to allocate "tags" or could not find the final upper device from
+start_dev's upper list in bond_verify_device_path(), only the loopback
+detection of the current upper device should be affected, and the system is
+no need to be panic.
+So return -ENOMEM in alb_upper_dev_walk to stop walking, print some warn
+information when failed to allocate memory for vlan tags in
+bond_verify_device_path.
 
-Signed-off-by: Benjamin Berg <benjamin.berg@intel.com>
-Reviewed-by: Johannes Berg <johannes.berg@intel.com>
-Signed-off-by: Miri Korenblit <miriam.rachel.korenblit@intel.com>
-Link: https://msgid.link/20231220133549.b898e22dadff.Id8c4c10aedd176ef2e18a4cad747b299f150f9df@changeid
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+I also think that the following function calls
+netdev_walk_all_upper_dev_rcu
+---->>>alb_upper_dev_walk
+---------->>>bond_verify_device_path
+From this way, "end device" can eventually be obtained from "start device"
+in bond_verify_device_path, IS_ERR(tags) could be instead of
+IS_ERR_OR_NULL(tags) in alb_upper_dev_walk.
+
+Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+Acked-by: Jay Vosburgh <jay.vosburgh@canonical.com>
+Link: https://lore.kernel.org/r/20231118081653.1481260-1-shaozhengchao@huawei.com
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/wireless/scan.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/net/bonding/bond_alb.c  | 3 ++-
+ drivers/net/bonding/bond_main.c | 5 ++++-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/net/wireless/scan.c b/net/wireless/scan.c
-index e35c54ba2fd5..f3a957f2bc49 100644
---- a/net/wireless/scan.c
-+++ b/net/wireless/scan.c
-@@ -1294,8 +1294,12 @@ cfg80211_bss_update(struct cfg80211_registered_device *rdev,
- 				list_add(&new->hidden_list,
- 					 &hidden->hidden_list);
- 				hidden->refcount++;
+diff --git a/drivers/net/bonding/bond_alb.c b/drivers/net/bonding/bond_alb.c
+index e03f4883858a..5947c1305527 100644
+--- a/drivers/net/bonding/bond_alb.c
++++ b/drivers/net/bonding/bond_alb.c
+@@ -984,7 +984,8 @@ static int alb_upper_dev_walk(struct net_device *upper, void *_data)
+ 	if (netif_is_macvlan(upper) && !strict_match) {
+ 		tags = bond_verify_device_path(bond->dev, upper, 0);
+ 		if (IS_ERR_OR_NULL(tags))
+-			BUG();
++			return -ENOMEM;
 +
-+				ies = (void *)rcu_dereference(new->pub.beacon_ies);
- 				rcu_assign_pointer(new->pub.beacon_ies,
- 						   hidden->pub.beacon_ies);
-+				if (ies)
-+					kfree_rcu(ies, rcu_head);
- 			}
- 		} else {
- 			/*
+ 		alb_send_lp_vid(slave, upper->dev_addr,
+ 				tags[0].vlan_proto, tags[0].vlan_id);
+ 		kfree(tags);
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 79b36f1c50ae..920b491bd4cd 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -2460,8 +2460,11 @@ struct bond_vlan_tag *bond_verify_device_path(struct net_device *start_dev,
+ 
+ 	if (start_dev == end_dev) {
+ 		tags = kcalloc(level + 1, sizeof(*tags), GFP_ATOMIC);
+-		if (!tags)
++		if (!tags) {
++			net_err_ratelimited("%s: %s: Failed to allocate tags\n",
++					    __func__, start_dev->name);
+ 			return ERR_PTR(-ENOMEM);
++		}
+ 		tags[level].vlan_proto = VLAN_N_VID;
+ 		return tags;
+ 	}
 -- 
 2.43.0
 
