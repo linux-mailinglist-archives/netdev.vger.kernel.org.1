@@ -1,64 +1,63 @@
-Return-Path: <netdev+bounces-63837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63838-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F28882F9E6
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 22:19:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 84FF682F9F2
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 22:21:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F6251F24478
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 21:19:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 23E991F2559F
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 21:21:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DA2014C583;
-	Tue, 16 Jan 2024 19:57:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 057EB14D43A;
+	Tue, 16 Jan 2024 19:57:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XItjDzgM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VdF+agkc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 412092E648;
-	Tue, 16 Jan 2024 19:57:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAE3914D437;
+	Tue, 16 Jan 2024 19:57:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705435052; cv=none; b=D5NNqO5jfLSB2EtUnJrAPG/zbpaCACPZkuPgq8NupflNoRugif/C5V+7LudTEkeigqQifDFhixDPnzTeLDN+BZct2sZJgoYzYHvusXOZcxOI7FfpK7eUOTK25pRhFJ7DQrqJw6Xpr1Pd5BvccmD4sF2L65BxD2Q0KRGsTcQOIUk=
+	t=1705435058; cv=none; b=IIJoqy9gklivyyhDHVkKBs6S1txdPUYVeyoyN1V5iY+oGGKEAvnfJRH6jRoAF+C1qqjf0UPkzZk7XFbhkyt/sNlKJ9UmUU6Y9+8Ugr1INNljIWyVpBKgitjIUNuY57W7khSogaAV9fPz/LtnqMWUZSvbh/JGhurO1BHk3mDZ+10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705435052; c=relaxed/simple;
-	bh=VdmSXmsWNXxAdpawkiLaR4bgZsOc/F9dyghybrvjGU0=;
+	s=arc-20240116; t=1705435058; c=relaxed/simple;
+	bh=/gMVPpshVnXDT4Hl9MxjYdPCX+HMzCF4YpZaxjvFO2k=;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:X-stable:
-	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=BAdMUVtVmZdTF65s0TGGjIM2rMuNAOZr640uAleYQJOT5QXksRrQdxscpopZrOT0Pind+gASLOvSQ6MyrawReLEQcmzKBbaU6rU9mN1XynKkf9mWV3CdDykCzZMy3/zjFUKrBcWLehgl3ItoXgzCqGzYKHw+LKU1TVp0CclEKbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XItjDzgM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1693C433C7;
-	Tue, 16 Jan 2024 19:57:30 +0000 (UTC)
+	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=qrNQNj6wP1PW3lpO0S7i6/iy+rIszq4dckA22XMb4NPRt2dGmYaznfMt5bns+HWZ1AYSUGv5HRXm8H1q4ZxLkHayX2nIcc2y5ThRigpba2zBj5rXWW77CQUzXmx67yqVPmnOrtYtAF9/o6fYBYVuZgEOqj/eobWDsFbE9hUdF1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VdF+agkc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13C06C433F1;
+	Tue, 16 Jan 2024 19:57:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705435052;
-	bh=VdmSXmsWNXxAdpawkiLaR4bgZsOc/F9dyghybrvjGU0=;
+	s=k20201202; t=1705435058;
+	bh=/gMVPpshVnXDT4Hl9MxjYdPCX+HMzCF4YpZaxjvFO2k=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XItjDzgMZtXAYj8dTqujsfIr4u83kyq4wGAtLNBStpYbnX9xdusmWLESALdI9XMq5
-	 Va8JGvHCqCHr+2y6eS8L9/CdmunRx/slERXhtd1UIm5XWZHMZ98BcjEl+33gqPDstK
-	 wJc9iQDm7b77XvbhXd1Di65XTjZ9wvffMJjTh8BhKUr1b4Q/kWj0JpEkyi52yjLUVt
-	 a7L59aB1GFyDZx5SKLxsPzGGEgA3EIMqWeXlEYjpCcn0DjOBvrjEdq8CcRx9XZ1kZE
-	 6dYbUV61Nxs98RlEpfUt0aog80jF/q6G5Ox3qQNLvsfsOxsk7RQDx0xK1f3qdyPh0+
-	 gbuT5cH2gI82A==
+	b=VdF+agkcqACT9Zx4NUXbDCNQrMIZ2/iKYUzNIzuXZ/DX9aPeF7XVkwAv+DC/RiIwx
+	 EbI0EIIP92jTL5h+WiyPwNyeZaVTz9jEYeuXSKpepuOAFl/2yPwrr4uM1BAnWkFJyG
+	 S/ONdYN/oJqj+vRhoPyTr3vYIYsGU0npDSwJCjyE635YY5Iv8J+3z/PB+8IBaxel6W
+	 G/RHGud/v3dpYOWdKlY4RpiiCcGIUTJElF3tgJx4isd0enYORZZHugS9IUJRh09/q8
+	 xWkuVjd3Qfvem+x8/auF+CXuiSwtv7ZFRmfoj5FN5S82pBIqe9kzrgzziIQ54vI3KT
+	 cvFgocGkF6oVQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Benjamin Berg <benjamin.berg@intel.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+Cc: Wen Gu <guwen@linux.alibaba.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	johannes@sipsolutions.net,
-	davem@davemloft.net,
+	jaka@linux.ibm.com,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	linux-wireless@vger.kernel.org,
+	linux-s390@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 60/68] wifi: cfg80211: free beacon_ies when overridden from hidden BSS
-Date: Tue, 16 Jan 2024 14:53:59 -0500
-Message-ID: <20240116195511.255854-60-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 64/68] net/smc: disable SEID on non-s390 archs where virtual ISM may be used
+Date: Tue, 16 Jan 2024 14:54:03 -0500
+Message-ID: <20240116195511.255854-64-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240116195511.255854-1-sashal@kernel.org>
 References: <20240116195511.255854-1-sashal@kernel.org>
@@ -73,42 +72,89 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.1.73
 Content-Transfer-Encoding: 8bit
 
-From: Benjamin Berg <benjamin.berg@intel.com>
+From: Wen Gu <guwen@linux.alibaba.com>
 
-[ Upstream commit 32af9a9e1069e55bc02741fb00ac9d0ca1a2eaef ]
+[ Upstream commit c6b8b8eb49904018e22e4e4b1fa502e57dc747d9 ]
 
-This is a more of a cosmetic fix. The branch will only be taken if
-proberesp_ies is set, which implies that beacon_ies is not set unless we
-are connected to an AP that just did a channel switch. And, in that case
-we should have found the BSS in the internal storage to begin with.
+The system EID (SEID) is an internal EID used by SMC-D to represent the
+s390 physical machine that OS is executing on. On s390 architecture, it
+predefined by fixed string and part of cpuid and is enabled regardless
+of whether underlay device is virtual ISM or platform firmware ISM.
 
-Signed-off-by: Benjamin Berg <benjamin.berg@intel.com>
-Reviewed-by: Johannes Berg <johannes.berg@intel.com>
-Signed-off-by: Miri Korenblit <miriam.rachel.korenblit@intel.com>
-Link: https://msgid.link/20231220133549.b898e22dadff.Id8c4c10aedd176ef2e18a4cad747b299f150f9df@changeid
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+However on non-s390 architectures where SMC-D can be used with virtual
+ISM devices, there is no similar information to identify physical
+machines, especially in virtualization scenarios. So in such cases, SEID
+is forcibly disabled and the user-defined UEID will be used to represent
+the communicable space.
+
+Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+Reviewed-and-tested-by: Wenjia Zhang <wenjia@linux.ibm.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/wireless/scan.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ net/smc/smc_clc.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/net/wireless/scan.c b/net/wireless/scan.c
-index b7e1631b3d80..86906557a04e 100644
---- a/net/wireless/scan.c
-+++ b/net/wireless/scan.c
-@@ -1810,8 +1810,12 @@ cfg80211_bss_update(struct cfg80211_registered_device *rdev,
- 				list_add(&new->hidden_list,
- 					 &hidden->hidden_list);
- 				hidden->refcount++;
-+
-+				ies = (void *)rcu_dereference(new->pub.beacon_ies);
- 				rcu_assign_pointer(new->pub.beacon_ies,
- 						   hidden->pub.beacon_ies);
-+				if (ies)
-+					kfree_rcu(ies, rcu_head);
- 			}
- 		} else {
- 			/*
+diff --git a/net/smc/smc_clc.c b/net/smc/smc_clc.c
+index 9b8999e2afca..867df4522815 100644
+--- a/net/smc/smc_clc.c
++++ b/net/smc/smc_clc.c
+@@ -155,10 +155,12 @@ static int smc_clc_ueid_remove(char *ueid)
+ 			rc = 0;
+ 		}
+ 	}
++#if IS_ENABLED(CONFIG_S390)
+ 	if (!rc && !smc_clc_eid_table.ueid_cnt) {
+ 		smc_clc_eid_table.seid_enabled = 1;
+ 		rc = -EAGAIN;	/* indicate success and enabling of seid */
+ 	}
++#endif
+ 	write_unlock(&smc_clc_eid_table.lock);
+ 	return rc;
+ }
+@@ -273,22 +275,30 @@ int smc_nl_dump_seid(struct sk_buff *skb, struct netlink_callback *cb)
+ 
+ int smc_nl_enable_seid(struct sk_buff *skb, struct genl_info *info)
+ {
++#if IS_ENABLED(CONFIG_S390)
+ 	write_lock(&smc_clc_eid_table.lock);
+ 	smc_clc_eid_table.seid_enabled = 1;
+ 	write_unlock(&smc_clc_eid_table.lock);
+ 	return 0;
++#else
++	return -EOPNOTSUPP;
++#endif
+ }
+ 
+ int smc_nl_disable_seid(struct sk_buff *skb, struct genl_info *info)
+ {
+ 	int rc = 0;
+ 
++#if IS_ENABLED(CONFIG_S390)
+ 	write_lock(&smc_clc_eid_table.lock);
+ 	if (!smc_clc_eid_table.ueid_cnt)
+ 		rc = -ENOENT;
+ 	else
+ 		smc_clc_eid_table.seid_enabled = 0;
+ 	write_unlock(&smc_clc_eid_table.lock);
++#else
++	rc = -EOPNOTSUPP;
++#endif
+ 	return rc;
+ }
+ 
+@@ -1168,7 +1178,11 @@ void __init smc_clc_init(void)
+ 	INIT_LIST_HEAD(&smc_clc_eid_table.list);
+ 	rwlock_init(&smc_clc_eid_table.lock);
+ 	smc_clc_eid_table.ueid_cnt = 0;
++#if IS_ENABLED(CONFIG_S390)
+ 	smc_clc_eid_table.seid_enabled = 1;
++#else
++	smc_clc_eid_table.seid_enabled = 0;
++#endif
+ }
+ 
+ void smc_clc_exit(void)
 -- 
 2.43.0
 
