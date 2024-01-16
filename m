@@ -1,100 +1,183 @@
-Return-Path: <netdev+bounces-63656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78D3982EBAA
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 10:36:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EDB782EBCA
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 10:43:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F0355B216C5
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 09:36:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17E9528407D
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 09:43:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AED5F12B90;
-	Tue, 16 Jan 2024 09:36:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEEB312E40;
+	Tue, 16 Jan 2024 09:43:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E89812B72;
-	Tue, 16 Jan 2024 09:36:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4TDkQq5CPpz1wnCL;
-	Tue, 16 Jan 2024 17:36:03 +0800 (CST)
-Received: from dggpemm500008.china.huawei.com (unknown [7.185.36.136])
-	by mail.maildlp.com (Postfix) with ESMTPS id 578A914011F;
-	Tue, 16 Jan 2024 17:36:22 +0800 (CST)
-Received: from localhost (10.174.242.157) by dggpemm500008.china.huawei.com
- (7.185.36.136) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 16 Jan
- 2024 17:36:21 +0800
-From: Yunjian Wang <wangyunjian@huawei.com>
-To: <willemdebruijn.kernel@gmail.com>, <jasowang@redhat.com>,
-	<kuba@kernel.org>, <davem@davemloft.net>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<xudingke@huawei.com>, Yunjian Wang <wangyunjian@huawei.com>
-Subject: [PATCH net] tun: add missing rx stats accounting in tun_xdp_act
-Date: Tue, 16 Jan 2024 17:36:20 +0800
-Message-ID: <1705397780-11364-1-git-send-email-wangyunjian@huawei.com>
-X-Mailer: git-send-email 1.9.5.msysgit.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D701012B90;
+	Tue, 16 Jan 2024 09:43:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R781e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0W-lmFMW_1705398193;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W-lmFMW_1705398193)
+          by smtp.aliyun-inc.com;
+          Tue, 16 Jan 2024 17:43:13 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: netdev@vger.kernel.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	virtualization@lists.linux.dev,
+	bpf@vger.kernel.org
+Subject: [PATCH net-next 00/17] virtio-net: support AF_XDP zero copy (3/3)
+Date: Tue, 16 Jan 2024 17:42:56 +0800
+Message-Id: <20240116094313.119939-1-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemm500008.china.huawei.com (7.185.36.136)
+X-Git-Hash: 1913ebd4ae28
+Content-Transfer-Encoding: 8bit
 
-There are few places on the receive path where packet receives and packet
-drops were not accounted for. This patch fixes that issue.
+This is the third part of virtio-net support AF_XDP zero copy.
 
-Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
----
- drivers/net/tun.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+The whole patch set
+http://lore.kernel.org/all/20231229073108.57778-1-xuanzhuo@linux.alibaba.com
 
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index afa5497f7c35..232e5319ac77 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -1626,17 +1626,14 @@ static int tun_xdp_act(struct tun_struct *tun, struct bpf_prog *xdp_prog,
- 		       struct xdp_buff *xdp, u32 act)
- {
- 	int err;
-+	unsigned int datasize = xdp->data_end - xdp->data;
- 
- 	switch (act) {
- 	case XDP_REDIRECT:
- 		err = xdp_do_redirect(tun->dev, xdp, xdp_prog);
--		if (err)
--			return err;
- 		break;
- 	case XDP_TX:
- 		err = tun_xdp_tx(tun->dev, xdp);
--		if (err < 0)
--			return err;
- 		break;
- 	case XDP_PASS:
- 		break;
-@@ -1651,6 +1648,13 @@ static int tun_xdp_act(struct tun_struct *tun, struct bpf_prog *xdp_prog,
- 		break;
- 	}
- 
-+	if (err < 0) {
-+		act = err;
-+		dev_core_stats_rx_dropped_inc(tun->dev);
-+	} else if (act == XDP_REDIRECT || act == XDP_TX) {
-+		dev_sw_netstats_rx_add(tun->dev, datasize);
-+	}
-+
- 	return act;
- }
- 
--- 
-2.41.0
+## AF_XDP
+
+XDP socket(AF_XDP) is an excellent bypass kernel network framework. The zero
+copy feature of xsk (XDP socket) needs to be supported by the driver. The
+performance of zero copy is very good. mlx5 and intel ixgbe already support
+this feature, This patch set allows virtio-net to support xsk's zerocopy xmit
+feature.
+
+At present, we have completed some preparation:
+
+1. vq-reset (virtio spec and kernel code)
+2. virtio-core premapped dma
+3. virtio-net xdp refactor
+
+So it is time for Virtio-Net to complete the support for the XDP Socket
+Zerocopy.
+
+Virtio-net can not increase the queue num at will, so xsk shares the queue with
+kernel.
+
+On the other hand, Virtio-Net does not support generate interrupt from driver
+manually, so when we wakeup tx xmit, we used some tips. If the CPU run by TX
+NAPI last time is other CPUs, use IPI to wake up NAPI on the remote CPU. If it
+is also the local CPU, then we wake up napi directly.
+
+This patch set includes some refactor to the virtio-net to let that to support
+AF_XDP.
+
+## performance
+
+ENV: Qemu with vhost-user(polling mode).
+Host CPU: Intel(R) Xeon(R) Platinum 8163 CPU @ 2.50GHz
+
+### virtio PMD in guest with testpmd
+
+testpmd> show port stats all
+
+ ######################## NIC statistics for port 0 ########################
+ RX-packets: 19531092064 RX-missed: 0     RX-bytes: 1093741155584
+ RX-errors: 0
+ RX-nombuf: 0
+ TX-packets: 5959955552 TX-errors: 0     TX-bytes: 371030645664
+
+
+ Throughput (since last show)
+ Rx-pps:   8861574     Rx-bps:  3969985208
+ Tx-pps:   8861493     Tx-bps:  3969962736
+ ############################################################################
+
+### AF_XDP PMD in guest with testpmd
+
+testpmd> show port stats all
+
+  ######################## NIC statistics for port 0  ########################
+  RX-packets: 68152727   RX-missed: 0          RX-bytes:  3816552712
+  RX-errors: 0
+  RX-nombuf:  0
+  TX-packets: 68114967   TX-errors: 33216      TX-bytes:  3814438152
+
+  Throughput (since last show)
+  Rx-pps:      6333196          Rx-bps:   2837272088
+  Tx-pps:      6333227          Tx-bps:   2837285936
+  ############################################################################
+
+But AF_XDP consumes more CPU for tx and rx napi(100% and 86%).
+
+## maintain
+
+I am currently a reviewer for virtio-net. I commit to maintain AF_XDP support in
+virtio-net.
+
+Please review.
+
+Thanks.
+
+v3
+    1. virtio introduces helpers for virtio-net sq using premapped dma
+    2. xsk has more complete support for merge mode
+    3. fix some problems
+
+v2
+    1. wakeup uses the way of GVE. No send ipi to wakeup napi on remote cpu.
+    2. remove rcu. Because we synchronize all operat, so the rcu is not needed.
+    3. split the commit "move to virtio_net.h" in last patch set. Just move the
+       struct/api to header when we use them.
+    4. add comments for some code
+
+v1:
+    1. remove two virtio commits. Push this patchset to net-next
+    2. squash "virtio_net: virtnet_poll_tx support rescheduled" to xsk: support tx
+    3. fix some warnings
+
+Xuan Zhuo (17):
+  virtio_net: separate virtnet_rx_resize()
+  virtio_net: separate virtnet_tx_resize()
+  virtio_net: xsk: bind/unbind xsk
+  virtio_net: xsk: prevent disable tx napi
+  virtio_net: move some api to header
+  virtio_net: xsk: tx: support xmit xsk buffer
+  virtio_net: xsk: tx: support wakeup
+  virtio_net: xsk: tx: handle the transmitted xsk buffer
+  virtio_net: xsk: tx: free the unused xsk buffer
+  virtio_net: separate receive_mergeable
+  virtio_net: separate receive_buf
+  virtio_net: xsk: rx: support fill with xsk buffer
+  virtio_net: xsk: rx: support recv merge mode
+  virtio_net: xsk: rx: support recv small mode
+  virtio_net: xsk: rx: free the unused xsk buffer
+  virtio_net: update tx timeout record
+  virtio_net: xdp_features add NETDEV_XDP_ACT_XSK_ZEROCOPY
+
+ drivers/net/virtio/Makefile     |   2 +-
+ drivers/net/virtio/main.c       | 409 +++++++++++----------
+ drivers/net/virtio/virtio_net.h | 140 +++++++
+ drivers/net/virtio/xsk.c        | 622 ++++++++++++++++++++++++++++++++
+ drivers/net/virtio/xsk.h        |  32 ++
+ 5 files changed, 1014 insertions(+), 191 deletions(-)
+ create mode 100644 drivers/net/virtio/xsk.c
+ create mode 100644 drivers/net/virtio/xsk.h
+
+--
+2.32.0.3.g01195cf9f
 
 
