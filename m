@@ -1,66 +1,84 @@
-Return-Path: <netdev+bounces-63727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EC1E82F10A
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 16:07:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A06EF82F115
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 16:10:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 72CE1B23C2D
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 15:07:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E08A8B2380B
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 15:10:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D4831BF3E;
-	Tue, 16 Jan 2024 15:07:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F0141BF42;
+	Tue, 16 Jan 2024 15:10:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nLA1UlUf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bKTjPLVy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 287011C288;
-	Tue, 16 Jan 2024 15:07:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6C61C433C7;
-	Tue, 16 Jan 2024 15:07:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31D4E1C2AC;
+	Tue, 16 Jan 2024 15:10:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id F3577C43390;
+	Tue, 16 Jan 2024 15:10:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705417627;
-	bh=kIRKUcVcxVmMhpLMvIkQ7L2DwolBSjPtJAMcKi5awzs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nLA1UlUfbz+ZX/uZtX0RUoGBhCISq84R2AfMdZsgVBv9C0TlTz9rapxUrIxfAcu1h
-	 OGzzjYsnLTSAS3Hub931XuJbST2ZxgO1Lp7xNdyRR6UVVIaJSLH+dpNKCmK9YDoFlu
-	 tsN5hIpD7hof7m79y7Lu6XOTyUOhw7rfz06bm1tr+P8xJRpxXRTCBE0LiXHBdHzaQ8
-	 Vj8JEyqc5oZXAdYncaY3sRPi2ShlcLGjERgPdx2yfQIeux3KlN1A8OJn5zD9EeN8hT
-	 kdpgPFbHlJItwS42pUMBph5MUXsBuYqMoJVZCTm5iAhEXyceKDGbfrCzqe68iZTEqU
-	 AtmGrWF0QbeNg==
-Date: Tue, 16 Jan 2024 07:07:05 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, "Michael S.
- Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>, virtualization@lists.linux.dev,
- bpf@vger.kernel.org
-Subject: Re: [PATCH net-next 00/17] virtio-net: support AF_XDP zero copy
- (3/3)
-Message-ID: <20240116070705.1cbfc042@kernel.org>
-In-Reply-To: <e19024b42c8f72e2b09c819ff1a4118f4b73da78.camel@redhat.com>
-References: <20240116094313.119939-1-xuanzhuo@linux.alibaba.com>
-	<e19024b42c8f72e2b09c819ff1a4118f4b73da78.camel@redhat.com>
+	s=k20201202; t=1705417825;
+	bh=mSr98lR4INmhtPkYRjcJH/JNnUo/5xOgX03o2Vhas4A=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=bKTjPLVyz98VZuCRkbi11N0HpOqeyVdjBuomZJacAzO5pR7dslzICYzk6v7/QkXle
+	 /Zl/EsgIXo0coyEbUbpXB7Q5GwEhtUlx1Pw1ek0SxIkRsPgilSx7eTqvsCXP1m0qBN
+	 SwVFI2Y+0CkGc+7LXq5UDx4xSGzZ4uevDIgNanKI/wUvZHC6E7XWicMqgJmHHCX3bk
+	 OdPMwkpjhDOl5lbv0T5Rj331Xtgh3bFLzJp6dguhiePApMm5FF+zUfZZEU6x3UfE9E
+	 vpbKwDmRPHDPgFM9WF6OTfv2sRta6Pj6wbp472DJcJZ1j6+IbTzb9ocRyPwKgKnFLd
+	 awGVd/2rj0Sgg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D92AFD8C984;
+	Tue, 16 Jan 2024 15:10:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] selftests: bonding: add missing build configs
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170541782488.27924.3496922518125230270.git-patchwork-notify@kernel.org>
+Date: Tue, 16 Jan 2024 15:10:24 +0000
+References: <20240116020201.1883023-1-kuba@kernel.org>
+In-Reply-To: <20240116020201.1883023-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, j.vosburgh@gmail.com, andy@greyhouse.net,
+ shuah@kernel.org, bpoirier@nvidia.com, jon.toppins+linux@gmail.com,
+ linux-kselftest@vger.kernel.org
 
-On Tue, 16 Jan 2024 13:37:30 +0100 Paolo Abeni wrote:
-> For future submission it would be better if you split this series in
-> smaller chunks: the maximum size allowed is 15 patches.
+Hello:
 
-Which does not mean you can split it up and post them all at the same
-time, FWIW.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 15 Jan 2024 18:02:01 -0800 you wrote:
+> bonding tests also try to create bridge, veth and dummy
+> interfaces. These are not currently listed in config.
+> 
+> Fixes: bbb774d921e2 ("net: Add tests for bonding and team address list management")
+> Fixes: c078290a2b76 ("selftests: include bonding tests into the kselftest infra")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] selftests: bonding: add missing build configs
+    https://git.kernel.org/netdev/net/c/03fb8565c880
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
