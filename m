@@ -1,104 +1,144 @@
-Return-Path: <netdev+bounces-63755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FB8E82F363
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 18:43:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D95582F3C3
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 19:11:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A9F01C23758
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 17:43:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1CC421F23166
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 18:11:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D90681CD01;
-	Tue, 16 Jan 2024 17:43:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 835071CD23;
+	Tue, 16 Jan 2024 18:11:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g//5JxH4"
+	dkim=pass (2048-bit key) header.d=fris.de header.i=@fris.de header.b="ZwV73gzm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.fris.de (unknown [116.203.77.234])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44BC81CAA0
-	for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 17:43:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A75431CF80;
+	Tue, 16 Jan 2024 18:11:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fris.de
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=fris.de
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.77.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705427018; cv=none; b=e/mW/Q2EoG7Tlce2I1CqLn+RleypjhXhMc0HCOGRZ/n5MNHBetvhz/mfMdI42mjgExB9fAgVRqE9ZuJpM6t+GWTefZmSx0cUJ4QDDt5zdCLEFai+P3JFPBT8WYrXvVmfudFBigZ21BWcvvnhPPdSteUQcgvyj5VZDgRkDi5kZvY=
+	t=1705428694; cv=none; b=SKbCJHJuMn/5s+xjiMqCPfX3Smo9oa8ZDgc1sch6VkkolbQAIfL5dV3RXvW1uldAk6ftn6YPlCNBGsX9bbcdpPIGVTIZOiITwWs5F+cwZilJbBuHST6AnvIixHP5cq1MpmscZSIEPIfcsUymuUUP0WSq6S6d5VN8xf9iVxNzON4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705427018; c=relaxed/simple;
-	bh=LcH8SpaKXSuzmvpIr5OOQ94gPXvSL776wVHpa/ElBjs=;
-	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:MIME-Version:
-	 References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:
-	 Content-Type:Content-Transfer-Encoding; b=BAkmgFVWbZzX8Hu52nOfhEqNoVQvyw3bom78nuAjUawxLZyN4hRMti7vH0/IbaX2ff/sN3PQ5gfCZv4qhSGkcoJNaVHdMTmgg5/u8tFgYKvej+sBvE0fWKcsYdKsEZ/sQW3umac6f5Xw3+ZeVuh05WMZXx7RWbhqV2m1PboOh5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g//5JxH4; arc=none smtp.client-ip=209.85.208.49
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5534180f0e9so28261a12.1
-        for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 09:43:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1705427015; x=1706031815; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LcH8SpaKXSuzmvpIr5OOQ94gPXvSL776wVHpa/ElBjs=;
-        b=g//5JxH4IFZazcBkg39EY5/Z2Xj0+thGkl6N5L/goBBdR5ic5JHY2REITK/W1Yfv6G
-         FeyDKqHtz198sHPcM5xVGl3NR2fyuSZ8eHe6EEVUkIW+qFGDW3mlxTW8/WIp9MabbyAW
-         zFbD8OPsNt+PPd4lJ/4rGhwSmNeBrCYbvK6TgdYRQZWt8MpurLQrkIzmVTD6SHH1UBU6
-         LP+8HWGtRazeWPRq4c2Rs2RFU6QbvuiUU3AMFuHQMZYBoN+Hqx7XgLz+vLS3S9ytma6t
-         zSyOx+G0Fk9EUF2zBegSuaV5MuQdXgIAznW2Ezyc2mKTOHnlIViVbjPsyKRKWQ4ajc+0
-         5xiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705427015; x=1706031815;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LcH8SpaKXSuzmvpIr5OOQ94gPXvSL776wVHpa/ElBjs=;
-        b=FUiqJ8OhISxCF9LR8E86yjYijrWuaWlfNEHx6vfTnvQa3Dbx2Bn0+K19lx08KIM3OU
-         yD2bXzBOKWHFWhka2N79M3X00R1SzKSM/bZaZIe6gBCJALdsuUwYodufycAMmcq3NbDd
-         GH5mkjtfS94k5+Urh0n8m+CIkRU7vEIyYzmBgz5a+8fhqCh7sr+aTi9Wk4YPJ3oZkvow
-         2eWNOGREQesD0TNNBb/BalI1YPMfTyGknvjxEFVkQuHVc27qEC7SZpEEDM72jVllzFF0
-         IJvYlm1WL4+yKC3BKW+aTvfOJ+/AlZyXufiuH2Tn4I9Z7sLkRCLtEKQ9gxi/Trwc0225
-         O9/A==
-X-Gm-Message-State: AOJu0Yzje4pOhgwYMQuZU4BKzY12KgCVrmY2I4a1VDfLvfK/FLOWH59A
-	SAFly4A1rH6zQ4onwss6rqu+ADDwxvGUQuG1US6Q+8bbyT0v
-X-Google-Smtp-Source: AGHT+IEqCH2+QVFUNxmp6JfimiNRnUG5eO7uirPh1kn9mq5KJ9/hSimv+N938mCVYV4dQ0aiYfzp+UCiroQPnzNfxFs=
-X-Received: by 2002:a05:6402:3098:b0:559:b56a:cc6f with SMTP id
- de24-20020a056402309800b00559b56acc6fmr26446edb.4.1705427015377; Tue, 16 Jan
- 2024 09:43:35 -0800 (PST)
+	s=arc-20240116; t=1705428694; c=relaxed/simple;
+	bh=GXTCt2puEC8n4+KVjswTePXCWATNvAVVWhSqZSB21Qo=;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
+	 MIME-Version:Content-Transfer-Encoding:X-Last-TLS-Session-Version;
+	b=hANarosFW1zRrR3KGWRmfiyZk0r5mzk+NwyRLA65J+pEUuso8Wiglz5LA3U2xc5DhacoYw3itboSWa0oPI1SFktNIqbrMf1m4QYOYQHu2tBB3T+xhymW488ZuMvTUozqTLMKzz/KeinPfZFZJjxD5FmSBLwSRQRK+YMfLhfuf5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=fris.de header.i=@fris.de header.b=ZwV73gzm; arc=none smtp.client-ip=116.203.77.234
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 55B54C0354;
+	Tue, 16 Jan 2024 19:11:23 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fris.de; s=dkim;
+	t=1705428688; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding; bh=8F+jBEwJoQNU4CLdgGATObLnvkE7jK0zgOw0cTlpNEM=;
+	b=ZwV73gzmZ1RhRnjO0kp4qkFsvxRqrX9mOe0piUCiPEDu/AF5mMv+ScRHfSmgnGI3Uyp0mH
+	hSLtiCKHrjohrIx3PGgNg5nPG+P3s2Rfv2jf1dxrRv5inE6CrTH/oAuMjbIldTxaw6hgZU
+	aJ1NG/+GjcuoRN76bmxeRrJ6T6YOAURkUU0yhNHhFXmxK/eaSwbCd0TSE0+1j+ewUvBIEv
+	MMHJfdplajEs4gxiny8fU89Pw6a5onltdH1INn00Ntusd8Ol7BYhRKoI6LPQ9Nr127Vvbi
+	TheONUNZ9e9UrURkQ/Gw0rmAFXYHo7TImGUckDVaEql99VLkVlh2dspXszOU+w==
+From: Frieder Schrempf <frieder@fris.de>
+To: Conor Dooley <conor+dt@kernel.org>,
+	devicetree@vger.kernel.org,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Li Yang <leoyang.li@nxp.com>,
+	netdev@vger.kernel.org,
+	Richard Cochran <richardcochran@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Shawn Guo <shawnguo@kernel.org>
+Cc: Frieder Schrempf <frieder.schrempf@kontron.de>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Chris Morgan <macromorgan@hotmail.com>,
+	Christoph Niedermaier <cniedermaier@dh-electronics.com>,
+	Conor Dooley <conor.dooley@microchip.com>,
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+	Fabio Estevam <festevam@gmail.com>,
+	Gregor Herburger <gregor.herburger@ew.tq-group.com>,
+	Gregory CLEMENT <gregory.clement@bootlin.com>,
+	Heiko Stuebner <heiko@sntech.de>,
+	James Hilliard <james.hilliard1@gmail.com>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Jisheng Zhang <jszhang@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Marcel Ziswiler <marcel.ziswiler@toradex.com>,
+	Marco Felsch <m.felsch@pengutronix.de>,
+	Marek Vasut <marex@denx.de>,
+	Markus Niebel <Markus.Niebel@ew.tq-group.com>,
+	=?UTF-8?q?Michal=20Vok=C3=A1=C4=8D?= <michal.vokac@ysoft.com>,
+	NXP Linux Team <linux-imx@nxp.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Rob Herring <robh@kernel.org>,
+	Sebastian Reichel <sre@kernel.org>,
+	Stefan Wahren <stefan.wahren@chargebyte.com>,
+	Tim Harvey <tharvey@gateworks.com>,
+	Yang Xiwen <forbidden405@foxmail.com>,
+	Yannic Moog <y.moog@phytec.de>
+Subject: [PATCH v2 0/3] ARM: dts: imx6dl: Add support for Sielaff i.MX6 Solo board
+Date: Tue, 16 Jan 2024 19:10:25 +0100
+Message-ID: <20240116181100.382388-1-frieder@fris.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ddfc9eec6981880271d0293d05369b3385fb9e86.1705425136.git.pabeni@redhat.com>
-In-Reply-To: <ddfc9eec6981880271d0293d05369b3385fb9e86.1705425136.git.pabeni@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 16 Jan 2024 18:43:21 +0100
-Message-ID: <CANn89i+nbXMuLpB11s9rr3L0PV26UwkSPdNXDijoX89NOJ=V-w@mail.gmail.com>
-Subject: Re: [PATCH net] mptcp: relax check on MPC passive fallback
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Matthieu Baerts <matttbe@kernel.org>, 
-	Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang.tang@linux.dev>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
-	mptcp@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Tue, Jan 16, 2024 at 6:19=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> While testing the blamed commit below, I was able to miss (!)
-> packetdrill failures in the fastopen test-cases.
->
-> On passive fastopen the child socket is created by incoming TCP MPC syn,
-> allow for both MPC_SYN and MPC_ACK header.
->
-> Fixes: 724b00c12957 ("mptcp: refine opt_mp_capable determination")
-> Reviewed-by: Matthieu Baerts <matttbe@kernel.org>
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+From: Frieder Schrempf <frieder.schrempf@kontron.de>
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+This series adds upstream support for the Sielaff i.MX6 Solo board.
+It is used as controller and user interface in vending machines. It
+is based on the i.MX6 Solo SoC and features the following
+peripherals and interfaces:
 
-Thanks.
+* 512 MB DDR3 RAM
+* 512 MB NAND Flash
+* 1 MB NOR Flash
+* SD card
+* Debug LED
+* Debug UART
+* Key Inputs
+* RTC
+* RS232
+* 100 MBit Ethernet
+* USB Hub
+* USB OTG
+* HDMI
+* 7" LVDS IPS panel
+* PWM Backlight
+* Optional Extension Board with USB Ethernet NIC
+
+Patch 1 adds the vendor prefix, patch 2 adds the DT bindings and
+patch 3 adds the DT.
+
+Changes in v2:
+* Add Acked-by from Conor (Thanks!)
+* Fix touchscreen node names (Thanks Fabio!)
+
+Frieder Schrempf (3):
+  dt-bindings: vendor-prefixes: Add Sielaff
+  dt-bindings: arm: fsl: Add Sielaff i.MX6 Solo board
+  ARM: dts: imx6dl: Add support for Sielaff i.MX6 Solo board
+
+ .../devicetree/bindings/arm/fsl.yaml          |   1 +
+ .../devicetree/bindings/vendor-prefixes.yaml  |   2 +
+ arch/arm/boot/dts/nxp/imx/Makefile            |   1 +
+ arch/arm/boot/dts/nxp/imx/imx6dl-sielaff.dts  | 533 ++++++++++++++++++
+ 4 files changed, 537 insertions(+)
+ create mode 100644 arch/arm/boot/dts/nxp/imx/imx6dl-sielaff.dts
+
+-- 
+2.43.0
+
 
