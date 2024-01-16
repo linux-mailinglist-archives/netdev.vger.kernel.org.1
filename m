@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-63835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63836-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9164D82F9BE
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 22:15:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 378B982F9D3
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 22:17:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4024A284F2B
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 21:15:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D127928A1D6
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 21:17:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 373DF149013;
-	Tue, 16 Jan 2024 19:57:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1935F14AD33;
+	Tue, 16 Jan 2024 19:57:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IID1deDH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J/bgnOXt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F4F6149010;
-	Tue, 16 Jan 2024 19:57:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5C2014AD2F;
+	Tue, 16 Jan 2024 19:57:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705435027; cv=none; b=mLP618nuRQhKeMyPsNzjZh7Zqi4Jw8EBSllHEZXYe+cg/lPp5CGFmoNMsjtAg50YqvKQfqdCt78zRZnEiZTpq+P5eP/XXGQkunOARi7s/eB0KGu97jpibWp9Kly0w6KBNKZXhtMQV5y2BpmBMNXhq2Wr4ISiG1fYTwzZTeZwNG0=
+	t=1705435039; cv=none; b=PY5B4BqctJm8hNhIwgiSTAPWQVZUmgkWOXfouCzWmWqHgTx45ZKU9jVKT0awbV8l1yUYCjG+PISBIzJXgSm1T1+MzWghXbHt1r51+Uw9AnKYXxwuXZ4P7LV8ZzroVwpLn4sxRZ3tHaeFC1ikhv125qM8W5u4wfv1geDWAPdylN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705435027; c=relaxed/simple;
-	bh=U+o0dBwzS1LSPjIz54v/SRc5kkuEOe7kfucgDlTWjoQ=;
+	s=arc-20240116; t=1705435039; c=relaxed/simple;
+	bh=pjHNh/JFRD/3JuNNrrZ4PkJHHTn2aBqDsYUtyxgWrPM=;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:X-stable:
-	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=l7vTgYbU1DrSmcpowY0U2fg3mO6b5dvbQgu0aNdkDgGiFB1D9L+/J/uY4C3K4hv/a7yCOXt19k55EZ1TCVLMWDHzYold2GkoCer25UYV4u2S95EXk8HLfaI00Y9BiZR5mTFnNY3BYpL/YeNpKNsLSAikv+wlj4WIUZzruDb3U+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IID1deDH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15BD7C43399;
-	Tue, 16 Jan 2024 19:57:04 +0000 (UTC)
+	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=CAMcLhFpl1ZXbKWnw7Ccy1J+rmFm5MlW7vJ08g+YoVaUAcZwzU8Fu/vhEcidETc0w0bc01vbIqT2DqMQXRcEwcJ1WbDj8LGFHxRehN+nIJ4s0KT1agwZicSIEyjGT+U9Jfqd6guWPc1bUolvRNB37PSFph/m30X0sjKVM7gXd90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J/bgnOXt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41AB7C433C7;
+	Tue, 16 Jan 2024 19:57:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705435026;
-	bh=U+o0dBwzS1LSPjIz54v/SRc5kkuEOe7kfucgDlTWjoQ=;
+	s=k20201202; t=1705435038;
+	bh=pjHNh/JFRD/3JuNNrrZ4PkJHHTn2aBqDsYUtyxgWrPM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IID1deDHbg3i/w4zUiilLzzdEp+0aOWl7gGU0Z+ygdJ/b7J5nU+dB9dPs7mc01sFE
-	 7huQOtZO83sly2yuTexwAywl6FeQvg1bcXHh9XUIq8/nYNg9E+tssuxRWaF3mRl2d7
-	 YVkNFPBlf5ddTCBB/HO5KYR+fwySdrFYhmgVC+Emshanaid/Rdtl0awk+JCl9GRGIL
-	 V3B246WQyn9PtgVDty1vAj0U91EkJnRXZPsK+GDYMJ/dHwudjJ0kBbY827E6PpYWbP
-	 wIgljatp5ODxdk52Ft2NFoJX+4RUthNLgJ3pD71Rm1NuTnbFYD9UiDF6Po6UUm6KPm
-	 2MNYpAyS1/1HA==
+	b=J/bgnOXtcMbwjpha00jb43EGVpkIfYzNyXO1dbzSzR+cheQfD+RNW6NEdE9hvc8il
+	 Qstq597xNRNcZqAyZ0JOHTpJwe+2u8KWBAF25o2XuMP1/4PUEJJ7NLRoaMsHp7IHfn
+	 DTZJXTd38ivH6dV8b+k6K4xYbAVnV3o2xUj2Nkv8JkSUmU0grPJv0+J7TqrbdezZke
+	 V9p8y9cKcEpbqFGRw8IVGx8o6zzYU+7OmlRiPaqQCwkwIgBW5vWalh3vAGMKiKsAgg
+	 VWW6UuzgdUsMD8vfIxCEg/SzIl56y6MvpqQ9LHJ2R3iW6khbDwVpBOP85BRtGk1+gu
+	 jnXwoDnHNkLpg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Tobias Waldekranz <tobias@waldekranz.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	"David S . Miller" <davem@davemloft.net>,
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Marcin Szycik <marcin.szycik@linux.intel.com>,
+	Simon Horman <horms@kernel.org>,
+	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
-	andrew@lunn.ch,
-	f.fainelli@gmail.com,
-	olteanv@gmail.com,
+	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
+	intel-wired-lan@lists.osuosl.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 48/68] net: dsa: mv88e6xxx: Fix mv88e6352_serdes_get_stats error path
-Date: Tue, 16 Jan 2024 14:53:47 -0500
-Message-ID: <20240116195511.255854-48-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 54/68] ice: fix pre-shifted bit usage
+Date: Tue, 16 Jan 2024 14:53:53 -0500
+Message-ID: <20240116195511.255854-54-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240116195511.255854-1-sashal@kernel.org>
 References: <20240116195511.255854-1-sashal@kernel.org>
@@ -74,100 +74,119 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.1.73
 Content-Transfer-Encoding: 8bit
 
-From: Tobias Waldekranz <tobias@waldekranz.com>
+From: Jesse Brandeburg <jesse.brandeburg@intel.com>
 
-[ Upstream commit fc82a08ae795ee6b73fb6b50785f7be248bec7b5 ]
+[ Upstream commit 7173be21ae29ef50ada42fd4464056a9d3f55bb3 ]
 
-mv88e6xxx_get_stats, which collects stats from various sources,
-expects all callees to return the number of stats read. If an error
-occurs, 0 should be returned.
+While converting to FIELD_PREP() and FIELD_GET(), it was noticed that
+some of the RSS defines had *included* the shift in their definitions.
+This is completely outside of normal, such that a developer could easily
+make a mistake and shift at the usage site (like when using
+FIELD_PREP()).
 
-Prevent future mishaps of this kind by updating the return type to
-reflect this contract.
+Rename the defines and set them to the "pre-shifted values" so they
+match the template the driver normally uses for masks and the member
+bits of the mask, which also allows the driver to use FIELD_PREP
+correctly with these values. Use GENMASK() for this changed MASK value.
 
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
-Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
+Do the same for the VLAN EMODE defines as well.
+
+Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/dsa/mv88e6xxx/chip.h   |  4 ++--
- drivers/net/dsa/mv88e6xxx/serdes.c | 10 +++++-----
- drivers/net/dsa/mv88e6xxx/serdes.h |  8 ++++----
- 3 files changed, 11 insertions(+), 11 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_adminq_cmd.h  | 10 +++++-----
+ drivers/net/ethernet/intel/ice/ice_lib.c         |  3 ++-
+ .../net/ethernet/intel/ice/ice_vsi_vlan_lib.c    | 16 +++++++++++-----
+ 3 files changed, 18 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.h b/drivers/net/dsa/mv88e6xxx/chip.h
-index e693154cf803..97a47d8743fd 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.h
-+++ b/drivers/net/dsa/mv88e6xxx/chip.h
-@@ -601,8 +601,8 @@ struct mv88e6xxx_ops {
- 	int (*serdes_get_sset_count)(struct mv88e6xxx_chip *chip, int port);
- 	int (*serdes_get_strings)(struct mv88e6xxx_chip *chip,  int port,
- 				  uint8_t *data);
--	int (*serdes_get_stats)(struct mv88e6xxx_chip *chip,  int port,
--				uint64_t *data);
-+	size_t (*serdes_get_stats)(struct mv88e6xxx_chip *chip, int port,
-+				   uint64_t *data);
- 
- 	/* SERDES registers for ethtool */
- 	int (*serdes_get_regs_len)(struct mv88e6xxx_chip *chip,  int port);
-diff --git a/drivers/net/dsa/mv88e6xxx/serdes.c b/drivers/net/dsa/mv88e6xxx/serdes.c
-index d94150d8f3f4..4c38df4982bf 100644
---- a/drivers/net/dsa/mv88e6xxx/serdes.c
-+++ b/drivers/net/dsa/mv88e6xxx/serdes.c
-@@ -342,8 +342,8 @@ static uint64_t mv88e6352_serdes_get_stat(struct mv88e6xxx_chip *chip,
- 	return val;
- }
- 
--int mv88e6352_serdes_get_stats(struct mv88e6xxx_chip *chip, int port,
--			       uint64_t *data)
-+size_t mv88e6352_serdes_get_stats(struct mv88e6xxx_chip *chip, int port,
-+				  uint64_t *data)
+diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+index a141680f3c1c..fe48164dce1e 100644
+--- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
++++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+@@ -413,10 +413,10 @@ struct ice_aqc_vsi_props {
+ #define ICE_AQ_VSI_INNER_VLAN_INSERT_PVID	BIT(2)
+ #define ICE_AQ_VSI_INNER_VLAN_EMODE_S		3
+ #define ICE_AQ_VSI_INNER_VLAN_EMODE_M		(0x3 << ICE_AQ_VSI_INNER_VLAN_EMODE_S)
+-#define ICE_AQ_VSI_INNER_VLAN_EMODE_STR_BOTH	(0x0 << ICE_AQ_VSI_INNER_VLAN_EMODE_S)
+-#define ICE_AQ_VSI_INNER_VLAN_EMODE_STR_UP	(0x1 << ICE_AQ_VSI_INNER_VLAN_EMODE_S)
+-#define ICE_AQ_VSI_INNER_VLAN_EMODE_STR		(0x2 << ICE_AQ_VSI_INNER_VLAN_EMODE_S)
+-#define ICE_AQ_VSI_INNER_VLAN_EMODE_NOTHING	(0x3 << ICE_AQ_VSI_INNER_VLAN_EMODE_S)
++#define ICE_AQ_VSI_INNER_VLAN_EMODE_STR_BOTH	0x0U
++#define ICE_AQ_VSI_INNER_VLAN_EMODE_STR_UP	0x1U
++#define ICE_AQ_VSI_INNER_VLAN_EMODE_STR		0x2U
++#define ICE_AQ_VSI_INNER_VLAN_EMODE_NOTHING	0x3U
+ 	u8 inner_vlan_reserved2[3];
+ 	/* ingress egress up sections */
+ 	__le32 ingress_table; /* bitmap, 3 bits per up */
+@@ -482,7 +482,7 @@ struct ice_aqc_vsi_props {
+ #define ICE_AQ_VSI_Q_OPT_RSS_GBL_LUT_S		2
+ #define ICE_AQ_VSI_Q_OPT_RSS_GBL_LUT_M		(0xF << ICE_AQ_VSI_Q_OPT_RSS_GBL_LUT_S)
+ #define ICE_AQ_VSI_Q_OPT_RSS_HASH_S		6
+-#define ICE_AQ_VSI_Q_OPT_RSS_HASH_M		(0x3 << ICE_AQ_VSI_Q_OPT_RSS_HASH_S)
++#define ICE_AQ_VSI_Q_OPT_RSS_HASH_M		GENMASK(7, 6)
+ #define ICE_AQ_VSI_Q_OPT_RSS_HASH_TPLZ		0x0U
+ #define ICE_AQ_VSI_Q_OPT_RSS_HASH_SYM_TPLZ	0x1U
+ #define ICE_AQ_VSI_Q_OPT_RSS_HASH_XOR		0x2U
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+index f074a1cf7166..cc6c04a69b28 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+@@ -878,7 +878,8 @@ static void ice_set_dflt_vsi_ctx(struct ice_hw *hw, struct ice_vsi_ctx *ctxt)
+ 	 */
+ 	if (ice_is_dvm_ena(hw)) {
+ 		ctxt->info.inner_vlan_flags |=
+-			ICE_AQ_VSI_INNER_VLAN_EMODE_NOTHING;
++			FIELD_PREP(ICE_AQ_VSI_INNER_VLAN_EMODE_M,
++				   ICE_AQ_VSI_INNER_VLAN_EMODE_NOTHING);
+ 		ctxt->info.outer_vlan_flags =
+ 			(ICE_AQ_VSI_OUTER_VLAN_TX_MODE_ALL <<
+ 			 ICE_AQ_VSI_OUTER_VLAN_TX_MODE_S) &
+diff --git a/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.c b/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.c
+index 5b4a0abb4607..239266e9d5f1 100644
+--- a/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.c
+@@ -131,6 +131,7 @@ static int ice_vsi_manage_vlan_stripping(struct ice_vsi *vsi, bool ena)
  {
- 	struct mv88e6xxx_port *mv88e6xxx_port = &chip->ports[port];
- 	struct mv88e6352_serdes_hw_stat *stat;
-@@ -352,7 +352,7 @@ int mv88e6352_serdes_get_stats(struct mv88e6xxx_chip *chip, int port,
+ 	struct ice_hw *hw = &vsi->back->hw;
+ 	struct ice_vsi_ctx *ctxt;
++	u8 *ivf;
+ 	int err;
  
- 	err = mv88e6352_g2_scratch_port_has_serdes(chip, port);
- 	if (err <= 0)
--		return err;
-+		return 0;
+ 	/* do not allow modifying VLAN stripping when a port VLAN is configured
+@@ -143,19 +144,24 @@ static int ice_vsi_manage_vlan_stripping(struct ice_vsi *vsi, bool ena)
+ 	if (!ctxt)
+ 		return -ENOMEM;
  
- 	BUILD_BUG_ON(ARRAY_SIZE(mv88e6352_serdes_hw_stats) >
- 		     ARRAY_SIZE(mv88e6xxx_port->serdes_stats));
-@@ -798,8 +798,8 @@ static uint64_t mv88e6390_serdes_get_stat(struct mv88e6xxx_chip *chip, int lane,
- 	return reg[0] | ((u64)reg[1] << 16) | ((u64)reg[2] << 32);
- }
++	ivf = &ctxt->info.inner_vlan_flags;
++
+ 	/* Here we are configuring what the VSI should do with the VLAN tag in
+ 	 * the Rx packet. We can either leave the tag in the packet or put it in
+ 	 * the Rx descriptor.
+ 	 */
+-	if (ena)
++	if (ena) {
+ 		/* Strip VLAN tag from Rx packet and put it in the desc */
+-		ctxt->info.inner_vlan_flags = ICE_AQ_VSI_INNER_VLAN_EMODE_STR_BOTH;
+-	else
++		*ivf = FIELD_PREP(ICE_AQ_VSI_INNER_VLAN_EMODE_M,
++				  ICE_AQ_VSI_INNER_VLAN_EMODE_STR_BOTH);
++	} else {
+ 		/* Disable stripping. Leave tag in packet */
+-		ctxt->info.inner_vlan_flags = ICE_AQ_VSI_INNER_VLAN_EMODE_NOTHING;
++		*ivf = FIELD_PREP(ICE_AQ_VSI_INNER_VLAN_EMODE_M,
++				  ICE_AQ_VSI_INNER_VLAN_EMODE_NOTHING);
++	}
  
--int mv88e6390_serdes_get_stats(struct mv88e6xxx_chip *chip, int port,
--			       uint64_t *data)
-+size_t mv88e6390_serdes_get_stats(struct mv88e6xxx_chip *chip, int port,
-+				  uint64_t *data)
- {
- 	struct mv88e6390_serdes_hw_stat *stat;
- 	int lane;
-diff --git a/drivers/net/dsa/mv88e6xxx/serdes.h b/drivers/net/dsa/mv88e6xxx/serdes.h
-index 29bb4e91e2f6..67369054951f 100644
---- a/drivers/net/dsa/mv88e6xxx/serdes.h
-+++ b/drivers/net/dsa/mv88e6xxx/serdes.h
-@@ -165,13 +165,13 @@ irqreturn_t mv88e6393x_serdes_irq_status(struct mv88e6xxx_chip *chip, int port,
- int mv88e6352_serdes_get_sset_count(struct mv88e6xxx_chip *chip, int port);
- int mv88e6352_serdes_get_strings(struct mv88e6xxx_chip *chip,
- 				 int port, uint8_t *data);
--int mv88e6352_serdes_get_stats(struct mv88e6xxx_chip *chip, int port,
--			       uint64_t *data);
-+size_t mv88e6352_serdes_get_stats(struct mv88e6xxx_chip *chip, int port,
-+				  uint64_t *data);
- int mv88e6390_serdes_get_sset_count(struct mv88e6xxx_chip *chip, int port);
- int mv88e6390_serdes_get_strings(struct mv88e6xxx_chip *chip,
- 				 int port, uint8_t *data);
--int mv88e6390_serdes_get_stats(struct mv88e6xxx_chip *chip, int port,
--			       uint64_t *data);
-+size_t mv88e6390_serdes_get_stats(struct mv88e6xxx_chip *chip, int port,
-+				  uint64_t *data);
+ 	/* Allow all packets untagged/tagged */
+-	ctxt->info.inner_vlan_flags |= ICE_AQ_VSI_INNER_VLAN_TX_MODE_ALL;
++	*ivf |= ICE_AQ_VSI_INNER_VLAN_TX_MODE_ALL;
  
- int mv88e6352_serdes_get_regs_len(struct mv88e6xxx_chip *chip, int port);
- void mv88e6352_serdes_get_regs(struct mv88e6xxx_chip *chip, int port, void *_p);
+ 	ctxt->info.valid_sections = cpu_to_le16(ICE_AQ_VSI_PROP_VLAN_VALID);
+ 
 -- 
 2.43.0
 
