@@ -1,89 +1,160 @@
-Return-Path: <netdev+bounces-63640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 011F782EA66
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 08:56:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D34F82EA80
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 08:59:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B31321F23B01
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 07:56:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4377E1C23173
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 07:59:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6314B111AE;
-	Tue, 16 Jan 2024 07:56:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4DE8111BA;
+	Tue, 16 Jan 2024 07:59:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 184F9111A4
-	for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 07:56:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3618e0060d1so555835ab.1
-        for <netdev@vger.kernel.org>; Mon, 15 Jan 2024 23:56:17 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705391777; x=1705996577;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=J7GshgTWBC/O7D9m77niat5ipmKRovvawMUZYhZfFyw=;
-        b=NZqnHAp1q+qx6hS94q+6BDDy6pT4NkIT2V/47c0C9Rk9/YAU3sSKqlTmW4o/hrNtA8
-         5E+4nBq1fVNjgi96IAldZPCoS1eIw5rMySUI+V7GE67ZmZueQ8nTQ+lFav4IJ1TCqIre
-         8pFrgXAQpvgqhV5gkE10lXmD5WTYgfHoxErBOhfOb1fpGGWuxWfBRxVHx1pmY/OUJoe7
-         OsPmRFmEpzF19Vs2vjAE2mxWYFagtYAYMvMa8x9cApqFhzdm0HY7je9vrunqC92OFpvw
-         C5yKfA9viktXl4HXwIUIn4/SV0S8YxeEaYJGNtum5BJL/B9Kx27QN4UdpEj3MeAuB047
-         TfkQ==
-X-Gm-Message-State: AOJu0YxIp/DehpozFSZYltbMp5pN2FUyQ3Fyi98ePi5pSlv/O2BlZ8+r
-	whPN5l04P2nXABjqD/9l74OWi0BwBkh3eh6BWjY47+elQund
-X-Google-Smtp-Source: AGHT+IHTuwpsmrMCoqdqeAExs5Xq/9SU9ozk1yVMr5fWlgv/Xm/93W8TmhZPwd6QskksFQY41oDV/eHlSYYvte6yky9pgfmorjjN
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93E4B111A9;
+	Tue, 16 Jan 2024 07:59:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0W-lSOZH_1705391964;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W-lSOZH_1705391964)
+          by smtp.aliyun-inc.com;
+          Tue, 16 Jan 2024 15:59:25 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: netdev@vger.kernel.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	virtualization@lists.linux.dev,
+	bpf@vger.kernel.org
+Subject: [PATCH net-next 0/5] virtio-net: sq support premapped mode
+Date: Tue, 16 Jan 2024 15:59:19 +0800
+Message-Id: <20240116075924.42798-1-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:20c8:b0:35f:eb20:3599 with SMTP id
- 8-20020a056e0220c800b0035feb203599mr969906ilq.2.1705391777202; Mon, 15 Jan
- 2024 23:56:17 -0800 (PST)
-Date: Mon, 15 Jan 2024 23:56:17 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000154990060f0b773a@google.com>
-Subject: [syzbot] Monthly dccp report (Jan 2024)
-From: syzbot <syzbot+list276a372ea6a0fdcb466b@syzkaller.appspotmail.com>
-To: dccp@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-Git-Hash: e56718642c76
+Content-Transfer-Encoding: 8bit
 
-Hello dccp maintainers/developers,
+This is the second part of virtio-net support AF_XDP zero copy.
 
-This is a 31-day syzbot report for the dccp subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/dccp
+The whole patch set
+http://lore.kernel.org/all/20231229073108.57778-1-xuanzhuo@linux.alibaba.com
 
-During the period, 0 new issues were detected and 0 were fixed.
-In total, 4 issues are still open and 7 have been fixed so far.
+## About the branch
 
-Some of the still happening issues:
+This patch set is pushed to the net-next branch, but some patches are about
+virtio core. Because the entire patch set for virtio-net to support AF_XDP
+should be pushed to net-next, I hope these patches will be merged into net-next
+with the virtio core maintains's Acked-by.
 
-Ref Crashes Repro Title
-<1> 102     Yes   KASAN: use-after-free Read in ccid2_hc_tx_packet_recv
-                  https://syzkaller.appspot.com/bug?extid=554ccde221001ab5479a
-<2> 51      Yes   BUG: "hc->tx_t_ipi == NUM" holds (exception!) at net/dccp/ccids/ccid3.c:LINE/ccid3_update_send_interval()
-                  https://syzkaller.appspot.com/bug?extid=94641ba6c1d768b1e35e
-<3> 17      Yes   BUG: stored value of X_recv is zero at net/dccp/ccids/ccid3.c:LINE/ccid3_first_li() (3)
-                  https://syzkaller.appspot.com/bug?extid=2ad8ef335371014d4dc7
+============================================================================
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+## AF_XDP
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+XDP socket(AF_XDP) is an excellent bypass kernel network framework. The zero
+copy feature of xsk (XDP socket) needs to be supported by the driver. The
+performance of zero copy is very good. mlx5 and intel ixgbe already support
+this feature, This patch set allows virtio-net to support xsk's zerocopy xmit
+feature.
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
+At present, we have completed some preparation:
 
-You may send multiple commands in a single email message.
+1. vq-reset (virtio spec and kernel code)
+2. virtio-core premapped dma
+3. virtio-net xdp refactor
+
+So it is time for Virtio-Net to complete the support for the XDP Socket
+Zerocopy.
+
+Virtio-net can not increase the queue num at will, so xsk shares the queue with
+kernel.
+
+On the other hand, Virtio-Net does not support generate interrupt from driver
+manually, so when we wakeup tx xmit, we used some tips. If the CPU run by TX
+NAPI last time is other CPUs, use IPI to wake up NAPI on the remote CPU. If it
+is also the local CPU, then we wake up napi directly.
+
+This patch set includes some refactor to the virtio-net to let that to support
+AF_XDP.
+
+## performance
+
+ENV: Qemu with vhost-user(polling mode).
+Host CPU: Intel(R) Xeon(R) Platinum 8163 CPU @ 2.50GHz
+
+### virtio PMD in guest with testpmd
+
+testpmd> show port stats all
+
+ ######################## NIC statistics for port 0 ########################
+ RX-packets: 19531092064 RX-missed: 0     RX-bytes: 1093741155584
+ RX-errors: 0
+ RX-nombuf: 0
+ TX-packets: 5959955552 TX-errors: 0     TX-bytes: 371030645664
+
+
+ Throughput (since last show)
+ Rx-pps:   8861574     Rx-bps:  3969985208
+ Tx-pps:   8861493     Tx-bps:  3969962736
+ ############################################################################
+
+### AF_XDP PMD in guest with testpmd
+
+testpmd> show port stats all
+
+  ######################## NIC statistics for port 0  ########################
+  RX-packets: 68152727   RX-missed: 0          RX-bytes:  3816552712
+  RX-errors: 0
+  RX-nombuf:  0
+  TX-packets: 68114967   TX-errors: 33216      TX-bytes:  3814438152
+
+  Throughput (since last show)
+  Rx-pps:      6333196          Rx-bps:   2837272088
+  Tx-pps:      6333227          Tx-bps:   2837285936
+  ############################################################################
+
+But AF_XDP consumes more CPU for tx and rx napi(100% and 86%).
+
+## maintain
+
+I am currently a reviewer for virtio-net. I commit to maintain AF_XDP support in
+virtio-net.
+
+Please review.
+
+Thanks.
+Xuan Zhuo (5):
+  virtio_ring: introduce virtqueue_get_buf_ctx_dma()
+  virtio_ring: virtqueue_disable_and_recycle let the callback detach
+    bufs
+  virtio_ring: introduce virtqueue_detach_unused_buf_dma()
+  virtio_ring: introduce virtqueue_get_dma_premapped()
+  virtio_net: sq support premapped mode
+
+ drivers/net/virtio/main.c       | 177 ++++++++++++++++++------
+ drivers/net/virtio/virtio_net.h |  13 +-
+ drivers/virtio/virtio_ring.c    | 235 ++++++++++++++++++++++++--------
+ include/linux/virtio.h          |  22 ++-
+ 4 files changed, 340 insertions(+), 107 deletions(-)
+
+--
+2.32.0.3.g01195cf9f
+
 
