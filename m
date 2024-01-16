@@ -1,132 +1,109 @@
-Return-Path: <netdev+bounces-63647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE70D82EAA7
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 09:05:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E891582EAE5
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 09:32:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2EAA1C22BB3
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 08:05:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94AB828529D
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 08:32:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CB9911703;
-	Tue, 16 Jan 2024 08:05:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B010911C8B;
+	Tue, 16 Jan 2024 08:32:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X4H7v6K3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D00D0125AF
-	for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 08:05:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-360a49993dfso58390075ab.3
-        for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 00:05:22 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5576911720
+	for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 08:32:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1705393958;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=5krZAD0Q9w6GFB2lWMdBYDwORdv2o6A2s9TDEMxGcAM=;
+	b=X4H7v6K3um3oGlpnRfPY3uSRByMfgy0+zXULaaL/GaylI6XbR7peDOwkI3PdhogwLTUDco
+	4CD/w2kKLMA6knyYuFqkAA6gvv2/m6hnqdsTtmd/F4lOHoSf75ksFQ1dBvRFCKacK5wlUL
+	hQBpWXaoADTx2sZyIENfeU/i/cHpx5s=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-437-fpX2n6OlNGytBCrgQ08xDQ-1; Tue, 16 Jan 2024 03:32:31 -0500
+X-MC-Unique: fpX2n6OlNGytBCrgQ08xDQ-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40e476c518eso12359965e9.0
+        for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 00:32:31 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705392322; x=1705997122;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XRJjfQnPLTBgxpKiiBjqe0Wn3Mav+RvkhMaMKCvAxdc=;
-        b=Qr5biYm3qZ62Ft6AL2/vZMrIShDe1QYeZ1q0uuXalrs6G8VNUELgSfvTPENRYH1vgq
-         sCTnRYw2B4WUltrrIhW3HWa2Tjyz6my7wWAksEaVl66l6Fx815Rrn9FL6eLM0qrXg0ob
-         1up31xhRCkobS7+pOklo2lxZeEhugeRDwhiExazFJuW9TKf3NtQJc8Ry5+3kogWKekyq
-         2T2fmjwNHCEq/Sk1Sf0e75JoUx6YenMsqkHN7+zdqArzVP+Qqf1V78r8cDYp02U0tOOv
-         9pPS4p2ajLsYBNOfS4R+XVHukPlmXwsa5JP0L8X1lpaA5KnzaS+1XWo2AbGQDrpfVCgM
-         3qUA==
-X-Gm-Message-State: AOJu0YwswE5HQanEl42XcwIm1fyMJ9F5qPXC3pLh8Hs9m13sopRpU18K
-	Xnq2m9Mnt/QrZszVoL/1yOvWmdS5f7rf7nBQil7ld3sOGQOt
-X-Google-Smtp-Source: AGHT+IF7wz3ASbidj8tbeNxztPcS5M5jMBiWRt+3G8NchKbnGwMLXkuw3hCCLciBPEyEWc1SkDLerJotzSeGStzR2jQ/nv2lkAzl
+        d=1e100.net; s=20230601; t=1705393947; x=1705998747;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5krZAD0Q9w6GFB2lWMdBYDwORdv2o6A2s9TDEMxGcAM=;
+        b=nqLmTFHuR2uHIy0gy9sJsQKeP+2L+tV5IWbLncKNz49hLN0LvErDny+QeiFVWVLzma
+         PkvqckeTa0PXzFv2uriq+DYBKB49IDm0eXADGGpRGc+o+Y7DWb/2UlLsDhGj1nGwfIcT
+         KvK1mDunKvPG5lJOnYHBI+bGVrUmYF2HDkvjDYmcpxiif6tejUqepDnGDinL0YKJVqWG
+         78nCMkqrc4/F1aLfrR9/3kNo6XUf5sB7Lp+aNobFIipp5doC8pA/t9v0ad+avwJr48dp
+         oVPNfCDIinpwP1YYexF/EOESYgcxhdam2JrZsgDdETOc5bB66p/x4pZcMpfEZ967O3Ay
+         MYAw==
+X-Gm-Message-State: AOJu0Yw7XlsejKbJ82SRJXevymQtJoRDIx/9Xml45DhDlvxpCxspjXj7
+	2xskOTlRCeI14N8oCYOLE2j/nUWiC8heiY/4ioZcRC+m0hmaNQs3gnUOrkHpwdMxlzrL6F66YgQ
+	jFYNQpVH4pIhk8L2gzvSDp7m7ODR1iT0/
+X-Received: by 2002:a05:600c:1c28:b0:40e:433c:5627 with SMTP id j40-20020a05600c1c2800b0040e433c5627mr8221039wms.2.1705393947742;
+        Tue, 16 Jan 2024 00:32:27 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFRxnkoDjmIGtU5tFX1KN/dpKwN/+CY+M7lFpkqjESljZiX4oOgjUaWw9o/pklfhqOPEbAvFQ==
+X-Received: by 2002:a05:600c:3b0e:b0:40e:4912:1df3 with SMTP id m14-20020a05600c3b0e00b0040e49121df3mr8220482wms.3.1705393926513;
+        Tue, 16 Jan 2024 00:32:06 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-241-126.dyn.eolo.it. [146.241.241.126])
+        by smtp.gmail.com with ESMTPSA id r20-20020a05600c35d400b0040d8eca092esm22485680wmq.47.2024.01.16.00.32.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Jan 2024 00:32:06 -0800 (PST)
+Message-ID: <ad0a8b8b04a6c767942cf0d89e8048c349175995.camel@redhat.com>
+Subject: Re: [PATCH net 2/2] selftests: forwarding: Remove executable bits
+ from lib.sh
+From: Paolo Abeni <pabeni@redhat.com>
+To: Benjamin Poirier <bpoirier@nvidia.com>, netdev@vger.kernel.org
+Cc: Jay Vosburgh <j.vosburgh@gmail.com>, Andy Gospodarek
+ <andy@greyhouse.net>,  Shuah Khan <shuah@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,  Jakub Kicinski
+ <kuba@kernel.org>, Petr Machata <petrm@nvidia.com>, Nikolay Aleksandrov
+ <razor@blackwall.org>, Hangbin Liu <liuhangbin@gmail.com>, Ido Schimmel
+ <idosch@nvidia.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, Jonathan
+ Toppins <jon.toppins+linux@gmail.com>, Joachim Wiberg
+ <troglobit@gmail.com>,  linux-kselftest@vger.kernel.org
+Date: Tue, 16 Jan 2024 09:32:04 +0100
+In-Reply-To: <20240110141436.157419-3-bpoirier@nvidia.com>
+References: <20240110141436.157419-1-bpoirier@nvidia.com>
+	 <20240110141436.157419-3-bpoirier@nvidia.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1aa6:b0:35f:d9cc:1c9b with SMTP id
- l6-20020a056e021aa600b0035fd9cc1c9bmr1014379ilv.0.1705392322110; Tue, 16 Jan
- 2024 00:05:22 -0800 (PST)
-Date: Tue, 16 Jan 2024 00:05:22 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000008fef0b060f0b97cf@google.com>
-Subject: [syzbot] [wireless?] WARNING in cfg80211_chandef_dfs_required
-From: syzbot <syzbot+6939539b3929b3f8d8c3@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+On Wed, 2024-01-10 at 09:14 -0500, Benjamin Poirier wrote:
+> The lib.sh script is meant to be sourced from other scripts, not executed
+> directly. Therefore, remove the executable bits from lib.sh's permissions=
+.
 
-syzbot found the following issue on:
+LGTM, but there is any special reason to not fix the permissions of
+other *lib.sh files in the same directory? Could be a follow-up.
 
-HEAD commit:    052d534373b7 Merge tag 'exfat-for-6.8-rc1' of git://git.ke..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11cc88a5e80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=878a2a4af11180a7
-dashboard link: https://syzkaller.appspot.com/bug?extid=6939539b3929b3f8d8c3
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+Thanks!
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Paolo
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/9085b1d0af36/disk-052d5343.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/dff804edb473/vmlinux-052d5343.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/2a5cd81d366a/bzImage-052d5343.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+6939539b3929b3f8d8c3@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 18619 at net/wireless/chan.c:623 cfg80211_chandef_dfs_required+0x2f4/0x350 net/wireless/chan.c:623
-Modules linked in:
-CPU: 1 PID: 18619 Comm: kworker/1:1 Not tainted 6.7.0-syzkaller-09928-g052d534373b7 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-Workqueue: events_power_efficient reg_check_chans_work
-RIP: 0010:cfg80211_chandef_dfs_required+0x2f4/0x350 net/wireless/chan.c:623
-Code: ee e8 40 b6 9b f7 83 fd 3f 0f 87 a7 36 9e 00 e8 c2 ba 9b f7 41 bc 01 00 00 00 89 e9 49 d3 e4 e9 86 fd ff ff e8 ad ba 9b f7 90 <0f> 0b 90 41 bc ea ff ff ff e9 72 fd ff ff e8 19 31 f3 f7 e9 84 fe
-RSP: 0018:ffffc9000367fb88 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: ffffc9000367fc58 RCX: ffffffff89ec532f
-RDX: ffff888054c70000 RSI: ffffffff89ec55f3 RDI: 0000000000000001
-RBP: 0000000000000001 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
-R13: ffff88807d7c8700 R14: 0000000000000001 R15: 0000000000000001
-FS:  0000000000000000(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f65d08d56c6 CR3: 000000004bbf4000 CR4: 0000000000350ef0
-Call Trace:
- <TASK>
- _cfg80211_reg_can_beacon+0xaa/0x660 net/wireless/chan.c:1424
- reg_wdev_chan_valid net/wireless/reg.c:2442 [inline]
- reg_leave_invalid_chans net/wireless/reg.c:2469 [inline]
- reg_check_chans_work+0x602/0x1050 net/wireless/reg.c:2482
- process_one_work+0x886/0x15d0 kernel/workqueue.c:2633
- process_scheduled_works kernel/workqueue.c:2706 [inline]
- worker_thread+0x8b9/0x1290 kernel/workqueue.c:2787
- kthread+0x2c6/0x3a0 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
