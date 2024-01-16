@@ -1,65 +1,64 @@
-Return-Path: <netdev+bounces-63836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 378B982F9D3
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 22:17:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F28882F9E6
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 22:19:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D127928A1D6
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 21:17:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F6251F24478
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 21:19:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1935F14AD33;
-	Tue, 16 Jan 2024 19:57:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DA2014C583;
+	Tue, 16 Jan 2024 19:57:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J/bgnOXt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XItjDzgM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5C2014AD2F;
-	Tue, 16 Jan 2024 19:57:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 412092E648;
+	Tue, 16 Jan 2024 19:57:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705435039; cv=none; b=PY5B4BqctJm8hNhIwgiSTAPWQVZUmgkWOXfouCzWmWqHgTx45ZKU9jVKT0awbV8l1yUYCjG+PISBIzJXgSm1T1+MzWghXbHt1r51+Uw9AnKYXxwuXZ4P7LV8ZzroVwpLn4sxRZ3tHaeFC1ikhv125qM8W5u4wfv1geDWAPdylN8=
+	t=1705435052; cv=none; b=D5NNqO5jfLSB2EtUnJrAPG/zbpaCACPZkuPgq8NupflNoRugif/C5V+7LudTEkeigqQifDFhixDPnzTeLDN+BZct2sZJgoYzYHvusXOZcxOI7FfpK7eUOTK25pRhFJ7DQrqJw6Xpr1Pd5BvccmD4sF2L65BxD2Q0KRGsTcQOIUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705435039; c=relaxed/simple;
-	bh=pjHNh/JFRD/3JuNNrrZ4PkJHHTn2aBqDsYUtyxgWrPM=;
+	s=arc-20240116; t=1705435052; c=relaxed/simple;
+	bh=VdmSXmsWNXxAdpawkiLaR4bgZsOc/F9dyghybrvjGU0=;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:X-stable:
-	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=CAMcLhFpl1ZXbKWnw7Ccy1J+rmFm5MlW7vJ08g+YoVaUAcZwzU8Fu/vhEcidETc0w0bc01vbIqT2DqMQXRcEwcJ1WbDj8LGFHxRehN+nIJ4s0KT1agwZicSIEyjGT+U9Jfqd6guWPc1bUolvRNB37PSFph/m30X0sjKVM7gXd90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J/bgnOXt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41AB7C433C7;
-	Tue, 16 Jan 2024 19:57:17 +0000 (UTC)
+	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=BAdMUVtVmZdTF65s0TGGjIM2rMuNAOZr640uAleYQJOT5QXksRrQdxscpopZrOT0Pind+gASLOvSQ6MyrawReLEQcmzKBbaU6rU9mN1XynKkf9mWV3CdDykCzZMy3/zjFUKrBcWLehgl3ItoXgzCqGzYKHw+LKU1TVp0CclEKbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XItjDzgM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1693C433C7;
+	Tue, 16 Jan 2024 19:57:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705435038;
-	bh=pjHNh/JFRD/3JuNNrrZ4PkJHHTn2aBqDsYUtyxgWrPM=;
+	s=k20201202; t=1705435052;
+	bh=VdmSXmsWNXxAdpawkiLaR4bgZsOc/F9dyghybrvjGU0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=J/bgnOXtcMbwjpha00jb43EGVpkIfYzNyXO1dbzSzR+cheQfD+RNW6NEdE9hvc8il
-	 Qstq597xNRNcZqAyZ0JOHTpJwe+2u8KWBAF25o2XuMP1/4PUEJJ7NLRoaMsHp7IHfn
-	 DTZJXTd38ivH6dV8b+k6K4xYbAVnV3o2xUj2Nkv8JkSUmU0grPJv0+J7TqrbdezZke
-	 V9p8y9cKcEpbqFGRw8IVGx8o6zzYU+7OmlRiPaqQCwkwIgBW5vWalh3vAGMKiKsAgg
-	 VWW6UuzgdUsMD8vfIxCEg/SzIl56y6MvpqQ9LHJ2R3iW6khbDwVpBOP85BRtGk1+gu
-	 jnXwoDnHNkLpg==
+	b=XItjDzgMZtXAYj8dTqujsfIr4u83kyq4wGAtLNBStpYbnX9xdusmWLESALdI9XMq5
+	 Va8JGvHCqCHr+2y6eS8L9/CdmunRx/slERXhtd1UIm5XWZHMZ98BcjEl+33gqPDstK
+	 wJc9iQDm7b77XvbhXd1Di65XTjZ9wvffMJjTh8BhKUr1b4Q/kWj0JpEkyi52yjLUVt
+	 a7L59aB1GFyDZx5SKLxsPzGGEgA3EIMqWeXlEYjpCcn0DjOBvrjEdq8CcRx9XZ1kZE
+	 6dYbUV61Nxs98RlEpfUt0aog80jF/q6G5Ox3qQNLvsfsOxsk7RQDx0xK1f3qdyPh0+
+	 gbuT5cH2gI82A==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Marcin Szycik <marcin.szycik@linux.intel.com>,
-	Simon Horman <horms@kernel.org>,
-	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
+Cc: Benjamin Berg <benjamin.berg@intel.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
+	johannes@sipsolutions.net,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	intel-wired-lan@lists.osuosl.org,
+	linux-wireless@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 54/68] ice: fix pre-shifted bit usage
-Date: Tue, 16 Jan 2024 14:53:53 -0500
-Message-ID: <20240116195511.255854-54-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 60/68] wifi: cfg80211: free beacon_ies when overridden from hidden BSS
+Date: Tue, 16 Jan 2024 14:53:59 -0500
+Message-ID: <20240116195511.255854-60-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240116195511.255854-1-sashal@kernel.org>
 References: <20240116195511.255854-1-sashal@kernel.org>
@@ -74,119 +73,42 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.1.73
 Content-Transfer-Encoding: 8bit
 
-From: Jesse Brandeburg <jesse.brandeburg@intel.com>
+From: Benjamin Berg <benjamin.berg@intel.com>
 
-[ Upstream commit 7173be21ae29ef50ada42fd4464056a9d3f55bb3 ]
+[ Upstream commit 32af9a9e1069e55bc02741fb00ac9d0ca1a2eaef ]
 
-While converting to FIELD_PREP() and FIELD_GET(), it was noticed that
-some of the RSS defines had *included* the shift in their definitions.
-This is completely outside of normal, such that a developer could easily
-make a mistake and shift at the usage site (like when using
-FIELD_PREP()).
+This is a more of a cosmetic fix. The branch will only be taken if
+proberesp_ies is set, which implies that beacon_ies is not set unless we
+are connected to an AP that just did a channel switch. And, in that case
+we should have found the BSS in the internal storage to begin with.
 
-Rename the defines and set them to the "pre-shifted values" so they
-match the template the driver normally uses for masks and the member
-bits of the mask, which also allows the driver to use FIELD_PREP
-correctly with these values. Use GENMASK() for this changed MASK value.
-
-Do the same for the VLAN EMODE defines as well.
-
-Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Benjamin Berg <benjamin.berg@intel.com>
+Reviewed-by: Johannes Berg <johannes.berg@intel.com>
+Signed-off-by: Miri Korenblit <miriam.rachel.korenblit@intel.com>
+Link: https://msgid.link/20231220133549.b898e22dadff.Id8c4c10aedd176ef2e18a4cad747b299f150f9df@changeid
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/intel/ice/ice_adminq_cmd.h  | 10 +++++-----
- drivers/net/ethernet/intel/ice/ice_lib.c         |  3 ++-
- .../net/ethernet/intel/ice/ice_vsi_vlan_lib.c    | 16 +++++++++++-----
- 3 files changed, 18 insertions(+), 11 deletions(-)
+ net/wireless/scan.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-index a141680f3c1c..fe48164dce1e 100644
---- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-+++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-@@ -413,10 +413,10 @@ struct ice_aqc_vsi_props {
- #define ICE_AQ_VSI_INNER_VLAN_INSERT_PVID	BIT(2)
- #define ICE_AQ_VSI_INNER_VLAN_EMODE_S		3
- #define ICE_AQ_VSI_INNER_VLAN_EMODE_M		(0x3 << ICE_AQ_VSI_INNER_VLAN_EMODE_S)
--#define ICE_AQ_VSI_INNER_VLAN_EMODE_STR_BOTH	(0x0 << ICE_AQ_VSI_INNER_VLAN_EMODE_S)
--#define ICE_AQ_VSI_INNER_VLAN_EMODE_STR_UP	(0x1 << ICE_AQ_VSI_INNER_VLAN_EMODE_S)
--#define ICE_AQ_VSI_INNER_VLAN_EMODE_STR		(0x2 << ICE_AQ_VSI_INNER_VLAN_EMODE_S)
--#define ICE_AQ_VSI_INNER_VLAN_EMODE_NOTHING	(0x3 << ICE_AQ_VSI_INNER_VLAN_EMODE_S)
-+#define ICE_AQ_VSI_INNER_VLAN_EMODE_STR_BOTH	0x0U
-+#define ICE_AQ_VSI_INNER_VLAN_EMODE_STR_UP	0x1U
-+#define ICE_AQ_VSI_INNER_VLAN_EMODE_STR		0x2U
-+#define ICE_AQ_VSI_INNER_VLAN_EMODE_NOTHING	0x3U
- 	u8 inner_vlan_reserved2[3];
- 	/* ingress egress up sections */
- 	__le32 ingress_table; /* bitmap, 3 bits per up */
-@@ -482,7 +482,7 @@ struct ice_aqc_vsi_props {
- #define ICE_AQ_VSI_Q_OPT_RSS_GBL_LUT_S		2
- #define ICE_AQ_VSI_Q_OPT_RSS_GBL_LUT_M		(0xF << ICE_AQ_VSI_Q_OPT_RSS_GBL_LUT_S)
- #define ICE_AQ_VSI_Q_OPT_RSS_HASH_S		6
--#define ICE_AQ_VSI_Q_OPT_RSS_HASH_M		(0x3 << ICE_AQ_VSI_Q_OPT_RSS_HASH_S)
-+#define ICE_AQ_VSI_Q_OPT_RSS_HASH_M		GENMASK(7, 6)
- #define ICE_AQ_VSI_Q_OPT_RSS_HASH_TPLZ		0x0U
- #define ICE_AQ_VSI_Q_OPT_RSS_HASH_SYM_TPLZ	0x1U
- #define ICE_AQ_VSI_Q_OPT_RSS_HASH_XOR		0x2U
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index f074a1cf7166..cc6c04a69b28 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -878,7 +878,8 @@ static void ice_set_dflt_vsi_ctx(struct ice_hw *hw, struct ice_vsi_ctx *ctxt)
- 	 */
- 	if (ice_is_dvm_ena(hw)) {
- 		ctxt->info.inner_vlan_flags |=
--			ICE_AQ_VSI_INNER_VLAN_EMODE_NOTHING;
-+			FIELD_PREP(ICE_AQ_VSI_INNER_VLAN_EMODE_M,
-+				   ICE_AQ_VSI_INNER_VLAN_EMODE_NOTHING);
- 		ctxt->info.outer_vlan_flags =
- 			(ICE_AQ_VSI_OUTER_VLAN_TX_MODE_ALL <<
- 			 ICE_AQ_VSI_OUTER_VLAN_TX_MODE_S) &
-diff --git a/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.c b/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.c
-index 5b4a0abb4607..239266e9d5f1 100644
---- a/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.c
-@@ -131,6 +131,7 @@ static int ice_vsi_manage_vlan_stripping(struct ice_vsi *vsi, bool ena)
- {
- 	struct ice_hw *hw = &vsi->back->hw;
- 	struct ice_vsi_ctx *ctxt;
-+	u8 *ivf;
- 	int err;
- 
- 	/* do not allow modifying VLAN stripping when a port VLAN is configured
-@@ -143,19 +144,24 @@ static int ice_vsi_manage_vlan_stripping(struct ice_vsi *vsi, bool ena)
- 	if (!ctxt)
- 		return -ENOMEM;
- 
-+	ivf = &ctxt->info.inner_vlan_flags;
+diff --git a/net/wireless/scan.c b/net/wireless/scan.c
+index b7e1631b3d80..86906557a04e 100644
+--- a/net/wireless/scan.c
++++ b/net/wireless/scan.c
+@@ -1810,8 +1810,12 @@ cfg80211_bss_update(struct cfg80211_registered_device *rdev,
+ 				list_add(&new->hidden_list,
+ 					 &hidden->hidden_list);
+ 				hidden->refcount++;
 +
- 	/* Here we are configuring what the VSI should do with the VLAN tag in
- 	 * the Rx packet. We can either leave the tag in the packet or put it in
- 	 * the Rx descriptor.
- 	 */
--	if (ena)
-+	if (ena) {
- 		/* Strip VLAN tag from Rx packet and put it in the desc */
--		ctxt->info.inner_vlan_flags = ICE_AQ_VSI_INNER_VLAN_EMODE_STR_BOTH;
--	else
-+		*ivf = FIELD_PREP(ICE_AQ_VSI_INNER_VLAN_EMODE_M,
-+				  ICE_AQ_VSI_INNER_VLAN_EMODE_STR_BOTH);
-+	} else {
- 		/* Disable stripping. Leave tag in packet */
--		ctxt->info.inner_vlan_flags = ICE_AQ_VSI_INNER_VLAN_EMODE_NOTHING;
-+		*ivf = FIELD_PREP(ICE_AQ_VSI_INNER_VLAN_EMODE_M,
-+				  ICE_AQ_VSI_INNER_VLAN_EMODE_NOTHING);
-+	}
- 
- 	/* Allow all packets untagged/tagged */
--	ctxt->info.inner_vlan_flags |= ICE_AQ_VSI_INNER_VLAN_TX_MODE_ALL;
-+	*ivf |= ICE_AQ_VSI_INNER_VLAN_TX_MODE_ALL;
- 
- 	ctxt->info.valid_sections = cpu_to_le16(ICE_AQ_VSI_PROP_VLAN_VALID);
- 
++				ies = (void *)rcu_dereference(new->pub.beacon_ies);
+ 				rcu_assign_pointer(new->pub.beacon_ies,
+ 						   hidden->pub.beacon_ies);
++				if (ies)
++					kfree_rcu(ies, rcu_head);
+ 			}
+ 		} else {
+ 			/*
 -- 
 2.43.0
 
