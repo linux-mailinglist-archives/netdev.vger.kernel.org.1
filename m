@@ -1,668 +1,180 @@
-Return-Path: <netdev+bounces-63757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4CD382F3CE
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 19:12:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDDE882F428
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 19:23:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC7081C238A5
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 18:12:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0D741C238D8
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 18:23:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C82BD1CD22;
-	Tue, 16 Jan 2024 18:11:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC9E91CD32;
+	Tue, 16 Jan 2024 18:23:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fris.de header.i=@fris.de header.b="s7gnRscm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VYxPjFJ6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.fris.de (unknown [116.203.77.234])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EBE16ABA;
-	Tue, 16 Jan 2024 18:11:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fris.de
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=fris.de
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.77.234
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C1381CA8C
+	for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 18:23:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705428706; cv=none; b=UXJLh/7C9gzwtHObGl8mLSg0nsvkU/M/HAg0oNy88K2AxdfY0y4pi/AyUVdFpFXmm/IaYAGyjrLyBpONJTJWwtjOVLEdlFSF0s7t5AJlYw+XLNXh6JjBhhiF9V5oq83Q/7MdKbvHVnruNZ+9bP9kLkX7Ok1kPKbVb1rOJ6rotVE=
+	t=1705429415; cv=none; b=GHIy+/hgYLCVFxWgZuMwHfkRdavMyKTArR3BXyPRYavHCUTP2t6jAvfz/i1Uk8N9kMfAnRO0AEiwkjleUYBDbYmXFhTj4TpXh1lnEmFpMuLhpo7A6SEwP26GjVbBeS/FVqnSsxrPf4Vv9n4CMOMi71LQZ9HUPTSqSReAWXr71H8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705428706; c=relaxed/simple;
-	bh=VG+5J65uM2x4ZN6opSHjUFKakDLs1meFCchQBsRiHsM=;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
-	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:
-	 X-Last-TLS-Session-Version; b=hohJOSB3ulLB9NwmztNpmKthn2H/6YWyComWzqY/X5rQzX2LKPh2F5yn3S49nBD0+uMm/jT3zJfO9y0t/H10LaCtBHJnwHlrD3x6CesQHEES7WqQrkGGiSczLKikWYdNUE84Uk+YtTpqeqjYT+S6sZv5gb4v7hnCN+YZNlV+ADg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=fris.de header.i=@fris.de header.b=s7gnRscm; arc=none smtp.client-ip=116.203.77.234
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D558CC0185;
-	Tue, 16 Jan 2024 19:11:41 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fris.de; s=dkim;
-	t=1705428702; h=from:subject:date:message-id:to:cc:mime-version:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=TXOfhMjxippBCK8Y1f2CKJBA65fvckCSHCwVRv5OWiQ=;
-	b=s7gnRscm/u3VRQY+Z1j4iDye9jVkxQ2EgU3GTm2XKdfYkYT2/CRdUWJYDeqcpdNqItpdXG
-	qI+SEqlgMe2edkOdeSSXRASTWxiEKVuZIvcX4/AjucuD2zIPCLEFKAJQzGDYFD1NkgnnbO
-	l1fjKMYeX/uWVv7QUD4Z3Xdek5k13g1wTbE6chLuJs96uKmyVNX04+VdWT+vD/H3V5jTtm
-	rRlVIK6rZXSk+95WkN8TrQDb5OiKG2jaYLv0BdN0GuyA5vwMxfUqUi3IsGFhJiEpAQkxyS
-	F4vbePM/d9O4+HZVlHZcNDFxjJKEDHff8d+5vw8NkVW1IdJ4a8+f7dR80QxBLw==
-From: Frieder Schrempf <frieder@fris.de>
-To: Conor Dooley <conor+dt@kernel.org>,
-	devicetree@vger.kernel.org,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Richard Cochran <richardcochran@gmail.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Shawn Guo <shawnguo@kernel.org>
-Cc: Frieder Schrempf <frieder.schrempf@kontron.de>,
-	Andre Przywara <andre.przywara@arm.com>,
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-	Fabio Estevam <festevam@gmail.com>,
-	Gregory CLEMENT <gregory.clement@bootlin.com>,
-	Heiko Stuebner <heiko@sntech.de>,
-	James Hilliard <james.hilliard1@gmail.com>,
-	NXP Linux Team <linux-imx@nxp.com>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Rob Herring <robh@kernel.org>
-Subject: [PATCH v2 3/3] ARM: dts: imx6dl: Add support for Sielaff i.MX6 Solo board
-Date: Tue, 16 Jan 2024 19:10:28 +0100
-Message-ID: <20240116181100.382388-4-frieder@fris.de>
-In-Reply-To: <20240116181100.382388-1-frieder@fris.de>
-References: <20240116181100.382388-1-frieder@fris.de>
+	s=arc-20240116; t=1705429415; c=relaxed/simple;
+	bh=X3pYoRAFgAE0wsB6vNzzBNSBpdT7/LUTTEsdnzfxD0U=;
+	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:
+	 Message-ID:Date:MIME-Version:User-Agent:Subject:Content-Language:
+	 To:Cc:References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding; b=CTJpj7C+WvAiVfuxH5VxU14pYYLFzaKub8ZbVZPZB+XgRlXU2a1e5gHYAWRduN8ZFZsd/svHolnfVElu7CxiI1mr9aDxLkvnYi5N3jpqVVNS80ww+1WGDZz9iJkjbym/azL3b7dADNF7x9SKyvQAlXbrGjz7cLnVMaee1lfvk1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VYxPjFJ6; arc=none smtp.client-ip=209.85.215.182
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-5cda3e35b26so3713788a12.1
+        for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 10:23:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705429413; x=1706034213; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wxO2mm1zelewrbCAsswGvpu2BIlCOXHw7k1DV0oLoqA=;
+        b=VYxPjFJ6k1zrZ/Nj5XXTcSPSvGYit7DGFQtrILGcIutKXGnDUkO9IzcDYLW+5quIaq
+         UwTHtoKxmkxKDXRkt+H3vGNZ4UPFqQZ1bspgBFWl2DCKrtRtpAAFzfniB3J5kuwvbMF3
+         vQRJdNvqd56cJSWbnYm+xc5h+leNWI9vi9BVu1RIBxdVksTl04SNyKDCTPBEVuD9KdM+
+         mFwdd+CoOwClDfvn3MfzQZ0OR7wxucVW0bVoYt6/q/cTtXvXGSxu/0I2ngxxUIM0OWK1
+         /B3PrJaPZegMvo/qF5KjQ4OVZ4Ect95YkKEcCNPj7PVSyPrQ4cME8VM5zHqBVtov5b13
+         blFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705429413; x=1706034213;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wxO2mm1zelewrbCAsswGvpu2BIlCOXHw7k1DV0oLoqA=;
+        b=q+cxxnqtddUXQZ5wQFU2nEj+DEPLtIbxqoW4Zmyi2D14aLvHn6GpBmHJgxBJoTWuKV
+         DeUE/LOBYfY/rSU+NdI5DeTUtM8fn8S8CXF2GOwi6UtL3pjQor+xsMNOvk9f06+Aa/rp
+         7Jm1abYGytyJnJhZGun/wXBADb0is5WJu/twhm2lK9Aw9G/4BZyVN3WP/LmZe5KqsAg2
+         zwEuPxhvlDqP4AxCsmLpqBVyUxaX1uDlF4zDvaADXRqwcXLs/SMa2y4+jc3o5AnrJVyn
+         QyxJ/DjCM6Cel3iw3XZmdUzoPwZlMsqWeF2qoGkK5x8WQJjD26JsgR5Fm8iXeFx2Lx4T
+         +5iQ==
+X-Gm-Message-State: AOJu0Yx2kj/nROAr3fuvvTEftAhzmIB+F/rj0m2IJiXOWx7TEVnzDgmt
+	U5zTX7j2F65K5qLR5rot5MY=
+X-Google-Smtp-Source: AGHT+IHqhHgvhPiGVDVqtEuNzZfqh0AbQE5uFnqslbmcIznpuR2PFmT2dqxP5bZmO+kH1YoMh+dl7g==
+X-Received: by 2002:a17:90a:dd84:b0:28b:a14:8172 with SMTP id l4-20020a17090add8400b0028b0a148172mr4424013pjv.19.1705429413460;
+        Tue, 16 Jan 2024 10:23:33 -0800 (PST)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id dj6-20020a17090ad2c600b0028dd3ac24a6sm13308532pjb.9.2024.01.16.10.23.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 16 Jan 2024 10:23:33 -0800 (PST)
+Message-ID: <526bf36a-f0e6-4149-90c9-16f91ff039ce@gmail.com>
+Date: Tue, 16 Jan 2024 10:23:30 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+User-Agent: Mozilla Thunderbird
+Subject: Re: DSA switch: VLAN tag not added on packets directed to a
+ PVID,untagged switchport
+Content-Language: en-US
+To: Vladimir Oltean <olteanv@gmail.com>,
+ Simon Waterer <simon.waterer@gmail.com>
+Cc: Arun Ramadoss <arun.ramadoss@microchip.com>, Andrew Lunn
+ <andrew@lunn.ch>, netdev@vger.kernel.org
+References: <CABumfLzJmXDN_W-8Z=p9KyKUVi_HhS7o_poBkeKHS2BkAiyYpw@mail.gmail.com>
+ <20240115181545.ixme3ao4z4gyn5qq@skbuf>
+ <CABumfLwA5xMiag2+2Rjj6r12uqvnsTjrNGfp4HDp+pZ7vw-HLg@mail.gmail.com>
+ <20240116131019.wmonfumccn25kig3@skbuf>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <20240116131019.wmonfumccn25kig3@skbuf>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Frieder Schrempf <frieder.schrempf@kontron.de>
+On 1/16/24 05:10, Vladimir Oltean wrote:
+> On Tue, Jan 16, 2024 at 05:32:57PM +1300, Simon Waterer wrote:
+>> So a similar fix to ksz9477.c would be as follows?
+>>
+>> int ksz9477_port_vlan_del(struct ksz_device *dev, int port,
+>> const struct switchdev_obj_port_vlan *vlan)
+>> {
+>> - bool untagged = vlan->flags & BRIDGE_VLAN_INFO_UNTAGGED;
+>> u32 vlan_table[3];
+>> u16 pvid;
+>>
+>> ksz_pread16(dev, port, REG_PORT_DEFAULT_VID, &pvid);
+>> pvid = pvid & 0xFFF;
+>>
+>> if (ksz9477_get_vlan_table(dev, vlan->vid, vlan_table)) {
+>> dev_dbg(dev->dev, "Failed to get vlan table\n");
+>> return -ETIMEDOUT;
+>> }
+>>
+>> vlan_table[2] &= ~BIT(port);
+>>
+>> if (pvid == vlan->vid)
+>> pvid = 1;
+>>
+>> - if (untagged)
+>> - vlan_table[1] &= ~BIT(port);
+>> -
+>> if (ksz9477_set_vlan_table(dev, vlan->vid, vlan_table)) {
+>> dev_dbg(dev->dev, "Failed to set vlan table\n");
+>> return -ETIMEDOUT;
+>> }
+>>
+>> ksz_pwrite16(dev, port, REG_PORT_DEFAULT_VID, pvid);
+>>
+>> return 0;
+>> }
+>>
+>> I've applied this change to my version of the driver and will test to
+>> see if any issues result.
+> 
+> Something like this, yes. It is clearer ("do nothing simpler"), and
+> should not result in any behavior change.
+> 
+> int br_switchdev_port_vlan_del(struct net_device *dev, u16 vid)
+> {
+> 	struct switchdev_obj_port_vlan v = {
+> 		.obj.orig_dev = dev,
+> 		.obj.id = SWITCHDEV_OBJ_ID_PORT_VLAN,
+> 		.vid = vid,
+> 		/* .flags implicitly zero */
+> 	};
+> 
+> 	return switchdev_port_obj_del(dev, &v.obj);
+> }
+> 
+> If you take care of the ksz driver, I can take care of lantiq_gswip,
+> b53 and dsa_loop once net-next reopens, which also have this kind of
+> bogus logic.
 
-The Sielaff i.MX6 Solo board is used as controller and user interface
-in vending machines. It is based on the i.MX6 Solo SoC and features
-the following peripherals and interfaces:
+Since the proposed changes were not in an unified diff format, it was 
+not clear to me what was being proposed, but what you are suggesting is 
+that the following should be applied to b53?
 
-* 512 MB DDR3 RAM
-* 512 MB NAND Flash
-* 1 MB NOR Flash
-* SD card
-* Debug LED
-* Debug UART
-* Key Inputs
-* RTC
-* RS232
-* 100 MBit Ethernet
-* USB Hub
-* USB OTG
-* HDMI
-* 7" LVDS IPS panel
-* PWM Backlight
-* Optional Extension Board with USB Ethernet NIC
+diff --git a/drivers/net/dsa/b53/b53_common.c 
+b/drivers/net/dsa/b53/b53_common.c
+index 0d628b35fd5c..354dcfd23da8 100644
+--- a/drivers/net/dsa/b53/b53_common.c
++++ b/drivers/net/dsa/b53/b53_common.c
+@@ -1556,9 +1556,6 @@ int b53_vlan_del(struct dsa_switch *ds, int port,
+         if (pvid == vlan->vid)
+                 pvid = b53_default_pvid(dev);
 
-Signed-off-by: Frieder Schrempf <frieder.schrempf@kontron.de>
----
-Changes in v2:
-* Fix touchscreen node names (Thanks Fabio!)
----
- arch/arm/boot/dts/nxp/imx/Makefile           |   1 +
- arch/arm/boot/dts/nxp/imx/imx6dl-sielaff.dts | 533 +++++++++++++++++++
- 2 files changed, 534 insertions(+)
- create mode 100644 arch/arm/boot/dts/nxp/imx/imx6dl-sielaff.dts
+-       if (untagged && !b53_vlan_port_needs_forced_tagged(ds, port))
+-               vl->untag &= ~(BIT(port));
+-
+         b53_set_vlan_entry(dev, vlan->vid, vl);
+         b53_fast_age_vlan(dev, vlan->vid);
 
-diff --git a/arch/arm/boot/dts/nxp/imx/Makefile b/arch/arm/boot/dts/nxp/imx/Makefile
-index a724d1a7a9a07..c32e004e7610c 100644
---- a/arch/arm/boot/dts/nxp/imx/Makefile
-+++ b/arch/arm/boot/dts/nxp/imx/Makefile
-@@ -118,6 +118,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
- 	imx6dl-sabrelite.dtb \
- 	imx6dl-sabresd.dtb \
- 	imx6dl-savageboard.dtb \
-+	imx6dl-sielaff.dtb \
- 	imx6dl-skov-revc-lt2.dtb \
- 	imx6dl-skov-revc-lt6.dtb \
- 	imx6dl-solidsense.dtb \
-diff --git a/arch/arm/boot/dts/nxp/imx/imx6dl-sielaff.dts b/arch/arm/boot/dts/nxp/imx/imx6dl-sielaff.dts
-new file mode 100644
-index 0000000000000..7de8d5f265187
---- /dev/null
-+++ b/arch/arm/boot/dts/nxp/imx/imx6dl-sielaff.dts
-@@ -0,0 +1,533 @@
-+// SPDX-License-Identifier: GPL-2.0+ OR MIT
-+/*
-+ * Copyright (C) 2022 Kontron Electronics GmbH
-+ */
-+
-+/dts-v1/;
-+
-+#include "imx6dl.dtsi"
-+#include <dt-bindings/clock/imx6qdl-clock.h>
-+#include <dt-bindings/gpio/gpio.h>
-+#include <dt-bindings/input/input.h>
-+
-+/ {
-+	model = "Sielaff i.MX6 Solo";
-+	compatible = "sielaff,imx6dl-board", "fsl,imx6dl";
-+
-+	chosen {
-+		stdout-path = &uart2;
-+	};
-+
-+	backlight: pwm-backlight {
-+		compatible = "pwm-backlight";
-+		pinctrl-names = "default";
-+		pinctrl-0 = <&pinctrl_backlight>;
-+		pwms = <&pwm3 0 50000 0>;
-+		brightness-levels = <0 0 64 88 112 136 184 232 255>;
-+		default-brightness-level = <4>;
-+		enable-gpios = <&gpio6 16 GPIO_ACTIVE_HIGH>;
-+		power-supply = <&reg_backlight>;
-+	};
-+
-+	cec {
-+		compatible = "cec-gpio";
-+		pinctrl-names = "default";
-+		pinctrl-0 = <&pinctrl_hdmi_cec>;
-+		cec-gpios = <&gpio2 7 GPIO_ACTIVE_HIGH>;
-+		hdmi-phandle = <&hdmi>;
-+	};
-+
-+	enet_ref: clock-enet-ref {
-+		compatible = "fixed-clock";
-+		#clock-cells = <0>;
-+		clock-frequency = <50000000>;
-+		clock-output-names = "enet-ref";
-+	};
-+
-+	gpio-keys {
-+		compatible = "gpio-keys";
-+		pinctrl-names = "default";
-+		pinctrl-0 = <&pinctrl_gpio_keys>;
-+
-+		key-0 {
-+			gpios = <&gpio2 16 0>;
-+			debounce-interval = <10>;
-+			linux,code = <1>;
-+		};
-+
-+		key-1 {
-+			gpios = <&gpio3 27 0>;
-+			debounce-interval = <10>;
-+			linux,code = <2>;
-+		};
-+
-+		key-2 {
-+			gpios = <&gpio5 4 0>;
-+			debounce-interval = <10>;
-+			linux,code = <3>;
-+		};
-+	};
-+
-+	leds {
-+		compatible = "gpio-leds";
-+		pinctrl-names = "default";
-+		pinctrl-0 = <&pinctrl_gpio_leds>;
-+
-+		led-debug {
-+			label = "debug-led";
-+			gpios = <&gpio5 21 GPIO_ACTIVE_HIGH>;
-+			default-state = "off";
-+			linux,default-trigger = "heartbeat";
-+		};
-+	};
-+
-+	memory@80000000 {
-+		reg = <0x80000000 0x20000000>;
-+		device_type = "memory";
-+	};
-+
-+	osc_eth_phy: clock-osc-eth-phy {
-+		compatible = "fixed-clock";
-+		#clock-cells = <0>;
-+		clock-frequency = <25000000>;
-+		clock-output-names = "osc-eth-phy";
-+	};
-+
-+	panel {
-+		compatible = "lg,lb070wv8";
-+		backlight = <&backlight>;
-+		power-supply = <&reg_3v3>;
-+
-+		port {
-+			panel_in_lvds: endpoint {
-+				remote-endpoint = <&lvds_out>;
-+			};
-+		};
-+	};
-+
-+	reg_3v3: regulator-3v3 {
-+		compatible = "regulator-fixed";
-+		regulator-name = "3v3";
-+		regulator-min-microvolt = <3300000>;
-+		regulator-max-microvolt = <3300000>;
-+	};
-+
-+	reg_backlight: regulator-backlight {
-+		compatible = "regulator-fixed";
-+		pinctrl-names = "default";
-+		pinctrl-0 = <&pinctrl_reg_backlight>;
-+		enable-active-high;
-+		gpio = <&gpio1 23 GPIO_ACTIVE_HIGH>;
-+		regulator-name = "backlight";
-+		regulator-min-microvolt = <12000000>;
-+		regulator-max-microvolt = <12000000>;
-+	};
-+
-+	reg_usb_otg_vbus: regulator-usb-otg-vbus {
-+		compatible = "regulator-fixed";
-+		pinctrl-names = "default";
-+		pinctrl-0 = <&pinctrl_reg_usbotg_vbus>;
-+		enable-active-high;
-+		gpio = <&gpio4 15 GPIO_ACTIVE_HIGH>;
-+		regulator-name = "usb_otg_vbus";
-+		regulator-min-microvolt = <5000000>;
-+		regulator-max-microvolt = <5000000>;
-+	};
-+};
-+
-+&ecspi2 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pinctrl_ecspi2>;
-+	cs-gpios = <&gpio5 29 GPIO_ACTIVE_LOW>;
-+	status = "okay";
-+
-+	flash@0 {
-+		compatible = "jedec,spi-nor";
-+		reg = <0>;
-+		spi-max-frequency = <20000000>;
-+	};
-+};
-+
-+&fec {
-+	/*
-+	 * Set PTP clock to external instead of internal reference, as the
-+	 * REF_CLK from the PHY is fed back into the i.MX6 and the GPR
-+	 * register needs to be set accordingly (see mach-imx6q.c).
-+	 */
-+	clocks = <&clks IMX6QDL_CLK_ENET>,
-+		 <&clks IMX6QDL_CLK_ENET>,
-+		 <&enet_ref>,
-+		 <&clks IMX6QDL_CLK_ENET_REF>;
-+	clock-names = "ipg", "ahb", "ptp", "enet_out";
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pinctrl_enet>;
-+	phy-connection-type = "rmii";
-+	phy-handle = <&ethphy>;
-+	status = "okay";
-+
-+	mdio {
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+
-+		ethphy: ethernet-phy@1 {
-+			reg = <1>;
-+			clocks = <&osc_eth_phy>;
-+			clock-names = "rmii-ref";
-+			micrel,led-mode = <1>;
-+			reset-assert-us = <500>;
-+			reset-deassert-us = <100>;
-+			reset-gpios = <&gpio5 2 GPIO_ACTIVE_LOW>;
-+		};
-+	};
-+};
-+
-+&gpio1 {
-+	gpio-line-names =
-+		"", "", "", "", "", "", "", "",
-+		"", "", "", "", "", "", "key-out", "key-in",
-+		"", "", "", "", "", "", "", "",
-+		"", "", "", "", "", "", "", "";
-+};
-+
-+&gpio2 {
-+	gpio-line-names =
-+		"", "", "", "", "", "", "", "",
-+		"lan9500a-rst", "", "", "", "", "", "", "",
-+		"", "", "", "", "", "", "", "",
-+		"", "", "", "", "", "", "", "";
-+};
-+
-+&gpmi {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pinctrl_gpmi_nand>;
-+	status = "okay";
-+};
-+
-+&hdmi {
-+	ddc-i2c-bus = <&i2c4>;
-+	status = "okay";
-+};
-+
-+&i2c2 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pinctrl_i2c2>;
-+	clock-frequency = <100000>;
-+	status = "okay";
-+
-+	rtc@51 {
-+		compatible = "nxp,pcf8563";
-+		reg = <0x51>;
-+	};
-+};
-+
-+&i2c3 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pinctrl_i2c3>;
-+	clock-frequency = <100000>;
-+	status = "okay";
-+
-+	touchscreen@55 {
-+		compatible = "sitronix,st1633";
-+		reg = <0x55>;
-+		pinctrl-names = "default";
-+		pinctrl-0 = <&pinctrl_touch>;
-+		interrupts = <18 IRQ_TYPE_EDGE_FALLING>;
-+		interrupt-parent = <&gpio5>;
-+		gpios = <&gpio1 2 GPIO_ACTIVE_LOW>;
-+		status = "disabled";
-+	};
-+
-+	touchscreen@5d {
-+		compatible = "goodix,gt928";
-+		reg = <0x5d>;
-+		pinctrl-names = "default";
-+		pinctrl-0 = <&pinctrl_touch>;
-+		interrupts = <18 IRQ_TYPE_LEVEL_LOW>;
-+		interrupt-parent = <&gpio5>;
-+		irq-gpios = <&gpio5 18 GPIO_ACTIVE_HIGH>;
-+		reset-gpios = <&gpio1 2 GPIO_ACTIVE_HIGH>;
-+		status = "disabled";
-+	};
-+};
-+
-+&i2c4 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pinctrl_i2c4>;
-+	clock-frequency = <100000>;
-+	status = "okay";
-+};
-+
-+&ldb {
-+	status = "okay";
-+
-+	lvds: lvds-channel@0 {
-+		fsl,data-mapping = "spwg";
-+		fsl,data-width = <24>;
-+		status = "okay";
-+
-+		port@4 {
-+			reg = <4>;
-+
-+			lvds_out: endpoint {
-+				remote-endpoint = <&panel_in_lvds>;
-+			};
-+		};
-+	};
-+};
-+
-+&pwm3 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pinctrl_pwm3>;
-+	status = "okay";
-+};
-+
-+&uart1 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pinctrl_uart1>;
-+	status = "okay";
-+};
-+
-+&uart2 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pinctrl_uart2>;
-+	status = "okay";
-+};
-+
-+&uart3 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pinctrl_uart3>;
-+	status = "okay";
-+};
-+
-+&usbh1 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pinctrl_usbh1>;
-+	disable-over-current;
-+	status = "okay";
-+
-+	#address-cells = <1>;
-+	#size-cells = <0>;
-+
-+	usb1@1 {
-+		compatible = "usb4b4,6570";
-+		reg = <1>;
-+		clocks = <&clks IMX6QDL_CLK_CKO>;
-+
-+		assigned-clocks = <&clks IMX6QDL_CLK_CKO>,
-+				  <&clks IMX6QDL_CLK_CKO2_SEL>;
-+		assigned-clock-parents = <&clks IMX6QDL_CLK_CKO2>,
-+					 <&clks IMX6QDL_CLK_OSC>;
-+		assigned-clock-rates = <12000000 0>;
-+	};
-+};
-+
-+&usbotg {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pinctrl_usbotg>;
-+	dr_mode = "host";
-+	over-current-active-low;
-+	vbus-supply = <&reg_usb_otg_vbus>;
-+	status = "okay";
-+};
-+
-+&usdhc3 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pinctrl_usdhc3>;
-+	cd-gpios = <&gpio1 4 GPIO_ACTIVE_LOW>;
-+	vmmc-supply = <&reg_3v3>;
-+	voltage-ranges = <3300 3300>;
-+	no-1-8-v;
-+	status = "okay";
-+};
-+
-+&wdog1 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pinctrl_wdog>;
-+	fsl,ext-reset-output;
-+	status = "okay";
-+};
-+
-+&iomuxc {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pinctrl_hog>;
-+
-+	pinctrl_hog: hoggrp {
-+		fsl,pins = <
-+			MX6QDL_PAD_RGMII_RD0__GPIO6_IO25	0x1b0b0	/* PMIC_IRQ */
-+			MX6QDL_PAD_SD2_DAT3__GPIO1_IO12		0x1b0b0
-+			MX6QDL_PAD_SD2_DAT1__GPIO1_IO14		0x1b0b0
-+			MX6QDL_PAD_SD2_DAT0__GPIO1_IO15		0x1b0b0
-+			MX6QDL_PAD_SD4_DAT0__GPIO2_IO08		0x1b0b0
-+			MX6QDL_PAD_EIM_D29__GPIO3_IO29		0x1b0b0
-+		>;
-+	};
-+
-+	pinctrl_backlight: backlightgrp {
-+		fsl,pins = <
-+			MX6QDL_PAD_NANDF_CS3__GPIO6_IO16	0x100b1
-+		>;
-+	};
-+
-+	pinctrl_ecspi2: ecspi2grp {
-+		fsl,pins = <
-+			MX6QDL_PAD_CSI0_DAT10__ECSPI2_MISO	0x100b1
-+			MX6QDL_PAD_CSI0_DAT9__ECSPI2_MOSI	0x100b1
-+			MX6QDL_PAD_CSI0_DAT8__ECSPI2_SCLK	0x100b1
-+			MX6QDL_PAD_CSI0_DAT11__GPIO5_IO29	0x100b1
-+		>;
-+	};
-+
-+	pinctrl_enet: enetgrp {
-+		fsl,pins = <
-+			MX6QDL_PAD_ENET_MDIO__ENET_MDIO		0x1b0b0
-+			MX6QDL_PAD_ENET_MDC__ENET_MDC		0x1b0b0
-+			MX6QDL_PAD_ENET_RXD0__ENET_RX_DATA0	0x1b0b0
-+			MX6QDL_PAD_ENET_RXD1__ENET_RX_DATA1	0x1b0b0
-+			MX6QDL_PAD_ENET_CRS_DV__ENET_RX_EN	0x1b0b0
-+			MX6QDL_PAD_ENET_RX_ER__ENET_RX_ER	0x1b0b0
-+			MX6QDL_PAD_ENET_TXD0__ENET_TX_DATA0	0x1b0b0
-+			MX6QDL_PAD_ENET_TXD1__ENET_TX_DATA1	0x1b0b0
-+			MX6QDL_PAD_ENET_TX_EN__ENET_TX_EN	0x1b0b0
-+			MX6QDL_PAD_GPIO_16__ENET_REF_CLK	0x4001b0a8
-+			MX6QDL_PAD_EIM_A25__GPIO5_IO02		0x100b1
-+		>;
-+	};
-+
-+	pinctrl_gpio_keys: gpiokeysgrp {
-+		fsl,pins = <
-+			MX6QDL_PAD_EIM_A22__GPIO2_IO16		0x1b080
-+			MX6QDL_PAD_EIM_D27__GPIO3_IO27		0x1b080
-+			MX6QDL_PAD_EIM_A24__GPIO5_IO04		0x1b080
-+		>;
-+	};
-+
-+	pinctrl_gpio_leds: gpioledsgrp {
-+		fsl,pins = <
-+			MX6QDL_PAD_CSI0_VSYNC__GPIO5_IO21	0x1b0b0
-+		>;
-+	};
-+
-+	pinctrl_gpmi_nand: gpminandgrp {
-+		fsl,pins = <
-+			MX6QDL_PAD_NANDF_CLE__NAND_CLE		0xb0b1
-+			MX6QDL_PAD_NANDF_ALE__NAND_ALE		0xb0b1
-+			MX6QDL_PAD_NANDF_WP_B__NAND_WP_B	0xb0b1
-+			MX6QDL_PAD_NANDF_RB0__NAND_READY_B	0xb000
-+			MX6QDL_PAD_NANDF_CS0__NAND_CE0_B	0xb0b1
-+			MX6QDL_PAD_SD4_CMD__NAND_RE_B		0xb0b1
-+			MX6QDL_PAD_SD4_CLK__NAND_WE_B		0xb0b1
-+			MX6QDL_PAD_NANDF_D0__NAND_DATA00	0xb0b1
-+			MX6QDL_PAD_NANDF_D1__NAND_DATA01	0xb0b1
-+			MX6QDL_PAD_NANDF_D2__NAND_DATA02	0xb0b1
-+			MX6QDL_PAD_NANDF_D3__NAND_DATA03	0xb0b1
-+			MX6QDL_PAD_NANDF_D4__NAND_DATA04	0xb0b1
-+			MX6QDL_PAD_NANDF_D5__NAND_DATA05	0xb0b1
-+			MX6QDL_PAD_NANDF_D6__NAND_DATA06	0xb0b1
-+			MX6QDL_PAD_NANDF_D7__NAND_DATA07	0xb0b1
-+		>;
-+	};
-+
-+	pinctrl_hdmi_cec: hdmicecgrp {
-+		fsl,pins = <
-+			MX6QDL_PAD_EIM_A21__GPIO2_IO17		0x1b8b1
-+		>;
-+	};
-+
-+	pinctrl_i2c2: i2c2grp {
-+		fsl,pins = <
-+			MX6QDL_PAD_KEY_COL3__I2C2_SCL		0x4001b8b1
-+			MX6QDL_PAD_KEY_ROW3__I2C2_SDA		0x4001b8b1
-+		>;
-+	};
-+
-+	pinctrl_i2c3: i2c3grp {
-+		fsl,pins = <
-+			MX6QDL_PAD_GPIO_5__I2C3_SCL		0x4001f8b1
-+			MX6QDL_PAD_GPIO_6__I2C3_SDA		0x4001f8b1
-+		>;
-+	};
-+
-+	pinctrl_i2c4: i2c4grp {
-+		fsl,pins = <
-+			MX6QDL_PAD_GPIO_7__I2C4_SCL		0x4001b8b1
-+			MX6QDL_PAD_GPIO_8__I2C4_SDA		0x4001b8b1
-+		>;
-+	};
-+
-+	pinctrl_pwm3: pwm3grp {
-+		fsl,pins = <
-+			MX6QDL_PAD_SD4_DAT1__PWM3_OUT		0x1b0b1
-+		>;
-+	};
-+
-+	pinctrl_reg_backlight: regbacklightgrp {
-+		fsl,pins = <
-+			MX6QDL_PAD_ENET_REF_CLK__GPIO1_IO23	0x1b0b1
-+		>;
-+	};
-+
-+	pinctrl_reg_usbotg_vbus: regusbotgvbusgrp {
-+		fsl,pins = <
-+			MX6QDL_PAD_KEY_ROW4__GPIO4_IO15		0x1b0b1
-+		>;
-+	};
-+
-+	pinctrl_touch: touchgrp {
-+		fsl,pins = <
-+			MX6QDL_PAD_GPIO_2__GPIO1_IO02		0x1b0b0
-+			MX6QDL_PAD_CSI0_PIXCLK__GPIO5_IO18	0x1b0b0
-+		>;
-+	};
-+
-+	pinctrl_uart1: uart1grp {
-+		fsl,pins = <
-+			MX6QDL_PAD_SD3_DAT7__UART1_TX_DATA 	0x1b0b1
-+			MX6QDL_PAD_SD3_DAT6__UART1_RX_DATA 	0x1b0b1
-+		>;
-+	};
-+
-+	pinctrl_uart2: uart2grp {
-+		fsl,pins = <
-+			MX6QDL_PAD_SD4_DAT7__UART2_TX_DATA	0x1b0b1
-+			MX6QDL_PAD_SD4_DAT4__UART2_RX_DATA	0x1b0b1
-+		>;
-+	};
-+
-+	pinctrl_uart3: uart3grp {
-+		fsl,pins = <
-+			MX6QDL_PAD_EIM_D24__UART3_TX_DATA	0x1b0b0
-+			MX6QDL_PAD_EIM_D25__UART3_RX_DATA	0x1b0b0
-+		>;
-+	};
-+
-+	pinctrl_usbh1: usbh1grp {
-+		fsl,pins = <
-+			MX6QDL_PAD_GPIO_3__USB_H1_OC		0x1b0b1
-+			MX6QDL_PAD_CSI0_MCLK__CCM_CLKO1		0x1b0b0
-+		>;
-+	};
-+
-+	pinctrl_usbotg: usbotggrp {
-+		fsl,pins = <
-+			MX6QDL_PAD_KEY_COL4__USB_OTG_OC		0x1b0b1
-+		>;
-+	};
-+
-+	pinctrl_usdhc3: usdhc3grp {
-+		fsl,pins = <
-+			MX6QDL_PAD_SD3_CMD__SD3_CMD		0x17059
-+			MX6QDL_PAD_SD3_CLK__SD3_CLK		0x10059
-+			MX6QDL_PAD_SD3_DAT0__SD3_DATA0		0x17059
-+			MX6QDL_PAD_SD3_DAT1__SD3_DATA1		0x17059
-+			MX6QDL_PAD_SD3_DAT2__SD3_DATA2		0x17059
-+			MX6QDL_PAD_SD3_DAT3__SD3_DATA3		0x17059
-+			MX6QDL_PAD_GPIO_4__GPIO1_IO04		0x100b1
-+		>;
-+	};
-+
-+	pinctrl_wdog: wdoggrp {
-+		fsl,pins = <
-+			MX6QDL_PAD_GPIO_9__WDOG1_B		0x1b0b0
-+		>;
-+	};
-+};
+
+or did I completely miss what was being changed?
 -- 
-2.43.0
+Florian
 
 
