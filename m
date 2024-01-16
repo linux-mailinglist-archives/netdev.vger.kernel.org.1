@@ -1,140 +1,139 @@
-Return-Path: <netdev+bounces-63832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63843-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 225B882F9A6
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 22:13:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5505A82FA26
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 22:25:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8874C289CC8
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 21:13:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3CF59B22125
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 21:25:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 279361474CA;
-	Tue, 16 Jan 2024 19:56:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8310214FD0E;
+	Tue, 16 Jan 2024 19:58:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YmWa/MAq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EK9Rj+W3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F038E1474C4;
-	Tue, 16 Jan 2024 19:56:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58D8714FD09;
+	Tue, 16 Jan 2024 19:58:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705435012; cv=none; b=dJMK0MV8S1cpc4C5qf6b9izeBK0UC5DIFHjTur6qJH5s/jpGffycjzP6N81oZY2xOfExizBavwnQwg3kiPMAznK101A+GoDK7nJlKAyQkZ2uuwewapvNuUP/jkrvyz+Q89sxpVOYAda6eNNTOeeZ4vziVATptHwh2RsA+E9BoeE=
+	t=1705435131; cv=none; b=CLZcu1Hk32AfUv5M+yO4cZRFOANV8lz0kxuhKOk2PdXStZn/SujfIjfVC3OyghfoyC1PO+vxXzAULy3/K4Rf7wKEuDPRAleRb45cj7U2zbEdLUnqncsxud0arV8qfbasc+ryWh74+/YRv225SokwEE6EOpoeJOY1ot94O0P2ZZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705435012; c=relaxed/simple;
-	bh=y4eTy0OYL3qe1YUIm7vwjJt/28mMWOkdOb6hBk3Qpyo=;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To; b=jgxBf+PATc1yvJghKLVhNcDkPDYNSDRX7uoHEzWV6OwH3dV/IX3d9Tc56ut/xAeo+BqdAwFxI3QVBsPQ9gUKb5qF6NHq2w0+BdPbTWFWm9N7OUUtakD/Gr62+TuSaXwiWt/ciEKqkfCrfQaSOyjjy6QVOi7x0je8pdDtnY9Zm4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YmWa/MAq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F217C433C7;
-	Tue, 16 Jan 2024 19:56:49 +0000 (UTC)
+	s=arc-20240116; t=1705435131; c=relaxed/simple;
+	bh=maqe8tnXGVV5elTannQEiivW4O+i88YHa8LnQjbwlI4=;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:In-Reply-To:References:MIME-Version:X-stable:
+	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=gJW93XPCtz3+5fYPoyzNPUw/ERaE7wtymnLmDJeQSeqMKYwsz5Hm2CUYQKlHt8pTVBZ0h8iAk0/BFgZymQzywf5B2jduxrI+qai6JfxGXQGkZJc30c5ne1yA9ur8mA0OEwF1IJwhjU/k8e4CtK0engs4iYLxxDQ6jXBeSPqsv6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EK9Rj+W3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0F44C433A6;
+	Tue, 16 Jan 2024 19:58:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705435011;
-	bh=y4eTy0OYL3qe1YUIm7vwjJt/28mMWOkdOb6hBk3Qpyo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YmWa/MAqMeTXtxBaEfWJov7N5/pwhRtiiBzKryCv0P4OzT3imln9bX7Ltv/WwURIs
-	 1vQNSHYzny51Kymb5TNuurB7ByV05gkZqzAVrIpKbe04rV3vf3kTTdkWjrMiutty6L
-	 CL+lED9FEeDh5URDXVygIuILLLTp6d7a2nz2SMV+GFRUf78nLQWlomYa+UUeb0/jHd
-	 gY0zugl+NIyysd0Yr8Y934H0ooN4ScNv1Xh8PyVL+0StwH3Nlb2/nkWTff0kaam/xg
-	 B5O2mDTuKo38H4krkmtroxyhX39zrLftqoe/a4QDUm+5bSzRnfWPHef17a5i3z5u7l
-	 vdZCSs7tAPcRw==
-Date: Tue, 16 Jan 2024 19:56:46 +0000
-From: Simon Horman <horms@kernel.org>
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
-	Jason Wang <jasowang@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next 3/3] virtio-net: reduce the CPU consumption of
- dim worker
-Message-ID: <20240116195646.GF588419@kernel.org>
-References: <1705410693-118895-1-git-send-email-hengqi@linux.alibaba.com>
- <1705410693-118895-4-git-send-email-hengqi@linux.alibaba.com>
+	s=k20201202; t=1705435131;
+	bh=maqe8tnXGVV5elTannQEiivW4O+i88YHa8LnQjbwlI4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=EK9Rj+W3Ed9ALlxtAVycv1W87WFjN+XJN9aX++e3q8AMce8+Gx/G0EW//GVNs+Wzw
+	 fh1lEEsvabsid3FSFE1sO7oCMYpaJBtVRnsbXBVI5AZPfJ4xqeptlBGowu1smmxvie
+	 BdeyTB3oGy9EIAMALCS5PAhbZ3qHFtLvlTaWfaaPiOuFoJLs4cJ13ode/+gmDPgSSZ
+	 JV6NhVaASeXJUaBiHdw72KSLn6TR+Cy1sylFI+Cr9Uk44jwwnH7i7m5k28SOsqswiE
+	 71b94HFfqqTNMB+b2mbEKJglf15vsfsW0WalutH/mBVnwyuGHgFZPSvyaqF+C14N5L
+	 tDJyjTh5PZhVg==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Zhengchao Shao <shaozhengchao@huawei.com>,
+	Jay Vosburgh <jay.vosburgh@canonical.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sasha Levin <sashal@kernel.org>,
+	j.vosburgh@gmail.com,
+	andy@greyhouse.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.15 07/47] bonding: return -ENOMEM instead of BUG in alb_upper_dev_walk
+Date: Tue, 16 Jan 2024 14:57:10 -0500
+Message-ID: <20240116195834.257313-7-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240116195834.257313-1-sashal@kernel.org>
+References: <20240116195834.257313-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1705410693-118895-4-git-send-email-hengqi@linux.alibaba.com>
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 5.15.147
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 16, 2024 at 09:11:33PM +0800, Heng Qi wrote:
-> Accumulate multiple request commands to kick the device once,
-> and obtain the processing results of the corresponding commands
-> asynchronously. The batch command method is used to optimize the
-> CPU overhead of the DIM worker caused by the guest being busy
-> waiting for the command response result.
-> 
-> On an 8-queue device, without this patch, the guest cpu overhead
-> due to waiting for cvq could be 10+% and above. With this patch,
-> the corresponding overhead is basically invisible.
-> 
-> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+From: Zhengchao Shao <shaozhengchao@huawei.com>
 
-...
+[ Upstream commit d6b83f1e3707c4d60acfa58afd3515e17e5d5384 ]
 
-> @@ -3520,22 +3568,99 @@ static int virtnet_send_notf_coal_vq_cmds(struct virtnet_info *vi,
->  	return 0;
->  }
->  
-> +static bool virtnet_add_dim_command(struct virtnet_info *vi,
-> +				    struct virtnet_batch_coal *ctrl)
-> +{
-> +	struct scatterlist *sgs[4], hdr, stat, out;
-> +	unsigned out_num = 0;
-> +	int ret;
-> +
-> +	/* Caller should know better */
-> +	BUG_ON(!virtio_has_feature(vi->vdev, VIRTIO_NET_F_CTRL_VQ));
-> +
-> +	ctrl->hdr.class = VIRTIO_NET_CTRL_NOTF_COAL;
-> +	ctrl->hdr.cmd = VIRTIO_NET_CTRL_NOTF_COAL_VQS_SET;
-> +
-> +	/* Add header */
-> +	sg_init_one(&hdr, &ctrl->hdr, sizeof(ctrl->hdr));
-> +	sgs[out_num++] = &hdr;
-> +
-> +	/* Add body */
-> +	sg_init_one(&out, &ctrl->num_entries, sizeof(ctrl->num_entries) +
-> +		    ctrl->num_entries * sizeof(struct virtnet_coal_entry));
+If failed to allocate "tags" or could not find the final upper device from
+start_dev's upper list in bond_verify_device_path(), only the loopback
+detection of the current upper device should be affected, and the system is
+no need to be panic.
+So return -ENOMEM in alb_upper_dev_walk to stop walking, print some warn
+information when failed to allocate memory for vlan tags in
+bond_verify_device_path.
 
-Hi Heng Qi,
+I also think that the following function calls
+netdev_walk_all_upper_dev_rcu
+---->>>alb_upper_dev_walk
+---------->>>bond_verify_device_path
+From this way, "end device" can eventually be obtained from "start device"
+in bond_verify_device_path, IS_ERR(tags) could be instead of
+IS_ERR_OR_NULL(tags) in alb_upper_dev_walk.
 
-I am a bit confused.
-With this series applied on top of net-next
-struct virtnet_coal_entry doesn't seem to exist.
+Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+Acked-by: Jay Vosburgh <jay.vosburgh@canonical.com>
+Link: https://lore.kernel.org/r/20231118081653.1481260-1-shaozhengchao@huawei.com
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/bonding/bond_alb.c  | 3 ++-
+ drivers/net/bonding/bond_main.c | 5 ++++-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/net/bonding/bond_alb.c b/drivers/net/bonding/bond_alb.c
+index b29393831a30..7091b018078b 100644
+--- a/drivers/net/bonding/bond_alb.c
++++ b/drivers/net/bonding/bond_alb.c
+@@ -973,7 +973,8 @@ static int alb_upper_dev_walk(struct net_device *upper,
+ 	if (netif_is_macvlan(upper) && !strict_match) {
+ 		tags = bond_verify_device_path(bond->dev, upper, 0);
+ 		if (IS_ERR_OR_NULL(tags))
+-			BUG();
++			return -ENOMEM;
++
+ 		alb_send_lp_vid(slave, upper->dev_addr,
+ 				tags[0].vlan_proto, tags[0].vlan_id);
+ 		kfree(tags);
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 9aed194d308d..1ecd0c136fc6 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -2893,8 +2893,11 @@ struct bond_vlan_tag *bond_verify_device_path(struct net_device *start_dev,
+ 
+ 	if (start_dev == end_dev) {
+ 		tags = kcalloc(level + 1, sizeof(*tags), GFP_ATOMIC);
+-		if (!tags)
++		if (!tags) {
++			net_err_ratelimited("%s: %s: Failed to allocate tags\n",
++					    __func__, start_dev->name);
+ 			return ERR_PTR(-ENOMEM);
++		}
+ 		tags[level].vlan_proto = VLAN_N_VID;
+ 		return tags;
+ 	}
+-- 
+2.43.0
 
-> +	sgs[out_num++] = &out;
-> +
-> +	/* Add return status. */
-> +	ctrl->status = VIRTIO_NET_OK;
-> +	sg_init_one(&stat, &ctrl->status, sizeof(ctrl->status));
-> +	sgs[out_num] = &stat;
-> +
-> +	BUG_ON(out_num + 1 > ARRAY_SIZE(sgs));
-> +	ret = virtqueue_add_sgs(vi->cvq, sgs, out_num, 1, ctrl, GFP_ATOMIC);
-> +	if (ret < 0) {
-> +		dev_warn(&vi->vdev->dev, "Failed to add sgs for command vq: %d\n.", ret);
-> +		return false;
-> +	}
-> +
-> +	virtqueue_kick(vi->cvq);
-> +
-> +	ctrl->usable = false;
-> +	vi->cvq_cmd_nums++;
-> +
-> +	return true;
-> +}
-
-...
 
