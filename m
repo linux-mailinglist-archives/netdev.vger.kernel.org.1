@@ -1,155 +1,99 @@
-Return-Path: <netdev+bounces-63683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63684-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B25F82ED90
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 12:19:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E22D82ED95
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 12:21:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9AAFDB22BEF
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 11:19:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ECFFEB22FC4
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 11:21:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C68E61B7FA;
-	Tue, 16 Jan 2024 11:19:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D0C71B7F6;
+	Tue, 16 Jan 2024 11:21:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="wnFGUlym"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SAAAm80K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D78B1B7F3;
-	Tue, 16 Jan 2024 11:19:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ssi.bg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
-Received: from mg.bb.i.ssi.bg (localhost [127.0.0.1])
-	by mg.bb.i.ssi.bg (Proxmox) with ESMTP id BEE3424590;
-	Tue, 16 Jan 2024 13:12:06 +0200 (EET)
-Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
-	by mg.bb.i.ssi.bg (Proxmox) with ESMTPS id A020424588;
-	Tue, 16 Jan 2024 13:12:06 +0200 (EET)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by ink.ssi.bg (Postfix) with ESMTPSA id 413883C043D;
-	Tue, 16 Jan 2024 13:11:59 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
-	t=1705403520; bh=UxqN8goLJo6H6a7nMjf8r0aorH2j0H/0oPA9ij7vGs8=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References;
-	b=wnFGUlymIz1ag50Nx7oh8FaocUejgNj/GfPnORiHfTvVAwGn2G8y+kBE1JnNnpmtT
-	 iY5ALZ8AHHmg63lIQOHsfp/f6Rf5e7bUeXsixbVP917ZXCUnTEoObTYuxl0ntcUNnK
-	 UJIsB5lHZJhvSC2feK1i5LAxAwtfTNSW1G7tgMrE=
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.17.1/8.17.1) with ESMTP id 40GBBn3L041664;
-	Tue, 16 Jan 2024 13:11:50 +0200
-Date: Tue, 16 Jan 2024 13:11:49 +0200 (EET)
-From: Julian Anastasov <ja@ssi.bg>
-To: Fedor Pchelkin <pchelkin@ispras.ru>
-cc: Simon Horman <horms@verge.net.au>, Pablo Neira Ayuso <pablo@netfilter.org>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        Florian Westphal <fw@strlen.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Dwip Banerjee <dwip@linux.vnet.ibm.com>, netdev@vger.kernel.org,
-        lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
-        coreteam@netfilter.org, linux-kernel@vger.kernel.org,
-        Alexey Khoroshilov <khoroshilov@ispras.ru>,
-        lvc-project@linuxtesting.org
-Subject: Re: [PATCH net] net: ipvs: avoid stat macros calls from preemptible
- context
-In-Reply-To: <20240115143923.31243-1-pchelkin@ispras.ru>
-Message-ID: <3964ec81-c8d2-c4c6-8ca8-2e2b50dc4240@ssi.bg>
-References: <20240115143923.31243-1-pchelkin@ispras.ru>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 332C61B7F2;
+	Tue, 16 Jan 2024 11:21:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-5c6910e93e3so1311060a12.1;
+        Tue, 16 Jan 2024 03:21:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705404087; x=1706008887; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2frdD80csrQQUHGsaueDexralzHnoTFsGiRETYFj+P8=;
+        b=SAAAm80Ktvql/9N2c0PBTPSM1dK6+Z7WG4GSJ+R56Z4d0z7lPmkxG4iZ8u24k3i0SS
+         kQHHqQweCBTfjEP18ZmbLqLaoLIpHhc5JJ00gU5nGOZ9nmB7ItQJFZAOlkxjPDrE6ytZ
+         gXWWeAw4a7nB+WjY/EAEc1SONMwEGXxwZXNQlAfWO63/Ss/91bkzHIFIk6RD+eo5/ewg
+         HHoTvdKR6bD0CkxejOtvatnczOg41wHKBqBEzw/O7fVoSwalli2wrMifJoE6QSfc1tov
+         ZOdrhlza4g9rMtmQWAZlS+LI7lLvnVL9AiUXTvbS0lET5yOqWR+s+rHucg+Uwc/hm66Z
+         E4XQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705404087; x=1706008887;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2frdD80csrQQUHGsaueDexralzHnoTFsGiRETYFj+P8=;
+        b=Eo6ojdNm3UUWDg6EdZDKxgtaAQS1xe/9vj358K4dE5+GzqdDhZBiqYmG+TfOg6qY2J
+         jobu/bJxVENpWyjvhL+NQun5MQ+UJy5reaCxykswJPjvt2x0N/7AIPN+4UmC9GmKSy4f
+         dcvms3M790AdIPD4JG1yK3XClsAtFqtHTdoWLR3ugSMKt1Qi0mIPXYBATAItZXk/6XX7
+         gcGqYco9mT05oReEx+H5Helqvqn/kiYvM1RYaZmLSp1iA98BEcZ1LQUeJca+sye3ZFcN
+         QlOMwjBE7JPMEUpyS6X9zSetEC6K40Q1vRC9fD8OuJ2Dn/PcTE3tfGXxdv/YlbNPIyPR
+         UQ4Q==
+X-Gm-Message-State: AOJu0Yymn9RTppmqVihyA71yT8hdv+/suk0qtNIYeFJyG3ClkMEg8snB
+	Pf8UVMFkovYeMx6Qh+853TeodZqXxhWYNslXCPM=
+X-Google-Smtp-Source: AGHT+IE9fyCX5XxM744+q1T3mzQxH5LsqLALOlIAytz20SCY3uCcOSDSx1KLO7eSCKJWzlsheKRM3B1TBv+GewOLKtw=
+X-Received: by 2002:a05:6a21:9218:b0:19b:20e9:90da with SMTP id
+ tl24-20020a056a21921800b0019b20e990damr3250632pzb.5.1705404087498; Tue, 16
+ Jan 2024 03:21:27 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+References: <20240116105317.267525-1-frieder@fris.de> <20240116105317.267525-4-frieder@fris.de>
+In-Reply-To: <20240116105317.267525-4-frieder@fris.de>
+From: Fabio Estevam <festevam@gmail.com>
+Date: Tue, 16 Jan 2024 08:21:16 -0300
+Message-ID: <CAOMZO5DONvb8GpH0PrBaa_EW+br6jWeMC=Jx_y_Etz1EUg11mw@mail.gmail.com>
+Subject: Re: [PATCH 3/3] ARM: dts: imx6dl: Add support for Sielaff i.MX6 Solo board
+To: Frieder Schrempf <frieder@fris.de>
+Cc: Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	Richard Cochran <richardcochran@gmail.com>, Rob Herring <robh+dt@kernel.org>, 
+	Sascha Hauer <s.hauer@pengutronix.de>, Shawn Guo <shawnguo@kernel.org>, 
+	Frieder Schrempf <frieder.schrempf@kontron.de>, Andre Przywara <andre.przywara@arm.com>, 
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, Gregory CLEMENT <gregory.clement@bootlin.com>, 
+	James Hilliard <james.hilliard1@gmail.com>, 
+	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>, NXP Linux Team <linux-imx@nxp.com>, 
+	Pengutronix Kernel Team <kernel@pengutronix.de>, Rob Herring <robh@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Jan 16, 2024 at 7:54=E2=80=AFAM Frieder Schrempf <frieder@fris.de> =
+wrote:
 
-	Hello,
+> +&i2c3 {
+> +       pinctrl-names =3D "default";
+> +       pinctrl-0 =3D <&pinctrl_i2c3>;
+> +       clock-frequency =3D <100000>;
+> +       status =3D "okay";
+> +
+> +       st1633@55 {
 
-On Mon, 15 Jan 2024, Fedor Pchelkin wrote:
+Please use a generic node name.
 
-> Inside decrement_ttl() upon discovering that the packet ttl has exceeded,
-> __IP_INC_STATS and __IP6_INC_STATS macros can be called from preemptible
-> context having the following backtrace:
-> 
-> check_preemption_disabled: 48 callbacks suppressed
-> BUG: using __this_cpu_add() in preemptible [00000000] code: curl/1177
-> caller is decrement_ttl+0x217/0x830
-> CPU: 5 PID: 1177 Comm: curl Not tainted 6.7.0+ #34
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 04/01/2014
-> Call Trace:
->  <TASK>
->  dump_stack_lvl+0xbd/0xe0
->  check_preemption_disabled+0xd1/0xe0
->  decrement_ttl+0x217/0x830
->  __ip_vs_get_out_rt+0x4e0/0x1ef0
->  ip_vs_nat_xmit+0x205/0xcd0
->  ip_vs_in_hook+0x9b1/0x26a0
->  nf_hook_slow+0xc2/0x210
->  nf_hook+0x1fb/0x770
->  __ip_local_out+0x33b/0x640
->  ip_local_out+0x2a/0x490
->  __ip_queue_xmit+0x990/0x1d10
->  __tcp_transmit_skb+0x288b/0x3d10
->  tcp_connect+0x3466/0x5180
->  tcp_v4_connect+0x1535/0x1bb0
->  __inet_stream_connect+0x40d/0x1040
->  inet_stream_connect+0x57/0xa0
->  __sys_connect_file+0x162/0x1a0
->  __sys_connect+0x137/0x160
->  __x64_sys_connect+0x72/0xb0
->  do_syscall_64+0x6f/0x140
->  entry_SYSCALL_64_after_hwframe+0x6e/0x76
-> RIP: 0033:0x7fe6dbbc34e0
-> 
-> Use the corresponding preemption-aware variants: IP_INC_STATS and
-> IP6_INC_STATS.
-> 
-> Found by Linux Verification Center (linuxtesting.org).
-> 
-> Fixes: 8d8e20e2d7bb ("ipvs: Decrement ttl")
-> Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
+> +       gt911@5d {
 
-	Looks good to me, thanks!
-
-Acked-by: Julian Anastasov <ja@ssi.bg>
-
-> ---
->  net/netfilter/ipvs/ip_vs_xmit.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/netfilter/ipvs/ip_vs_xmit.c b/net/netfilter/ipvs/ip_vs_xmit.c
-> index 9193e109e6b3..65e0259178da 100644
-> --- a/net/netfilter/ipvs/ip_vs_xmit.c
-> +++ b/net/netfilter/ipvs/ip_vs_xmit.c
-> @@ -271,7 +271,7 @@ static inline bool decrement_ttl(struct netns_ipvs *ipvs,
->  			skb->dev = dst->dev;
->  			icmpv6_send(skb, ICMPV6_TIME_EXCEED,
->  				    ICMPV6_EXC_HOPLIMIT, 0);
-> -			__IP6_INC_STATS(net, idev, IPSTATS_MIB_INHDRERRORS);
-> +			IP6_INC_STATS(net, idev, IPSTATS_MIB_INHDRERRORS);
->  
->  			return false;
->  		}
-> @@ -286,7 +286,7 @@ static inline bool decrement_ttl(struct netns_ipvs *ipvs,
->  	{
->  		if (ip_hdr(skb)->ttl <= 1) {
->  			/* Tell the sender its packet died... */
-> -			__IP_INC_STATS(net, IPSTATS_MIB_INHDRERRORS);
-> +			IP_INC_STATS(net, IPSTATS_MIB_INHDRERRORS);
->  			icmp_send(skb, ICMP_TIME_EXCEEDED, ICMP_EXC_TTL, 0);
->  			return false;
->  		}
-> -- 
-> 2.43.0
-
-Regards
-
---
-Julian Anastasov <ja@ssi.bg>
-
+Ditto.
 
