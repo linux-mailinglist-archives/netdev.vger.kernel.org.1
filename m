@@ -1,75 +1,73 @@
-Return-Path: <netdev+bounces-63721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1013B82F0CE
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 15:47:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 472FE82F0D4
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 15:49:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1DFA1F22502
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 14:47:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF4EC1F22106
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 14:49:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D214E1BDEC;
-	Tue, 16 Jan 2024 14:47:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5AC61BF30;
+	Tue, 16 Jan 2024 14:49:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S3SJ/Fop"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NqTc2wzK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E681BF2A;
-	Tue, 16 Jan 2024 14:47:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FEEB1BF2C;
+	Tue, 16 Jan 2024 14:49:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-559c6b833b0so74879a12.1;
-        Tue, 16 Jan 2024 06:47:17 -0800 (PST)
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a2a17f3217aso1091292166b.2;
+        Tue, 16 Jan 2024 06:49:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705416435; x=1706021235; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1705416548; x=1706021348; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UQDU3E1p1osKPCGDqpYMZ1iYLawK5EwnUnBYY4juRVc=;
-        b=S3SJ/FopZ0dnO0SMLSZ9jIaPpPc9sl4BFkkPN7RR0pQ8QSUJDRUKIqV9X1bNw7yCJc
-         7Lst5RJWMpe30rF91zRSdIYIibazQBSFOIz0NUTvW22X/cjC/CsYyLfY7c5cKvmyxIA4
-         cFsD6z3xr8qXttiB0wrmrrIVUN39+YbJ7OlB18jBPP/ho7sABW4AZVblXmmd91a6oab5
-         tZvpdgm2HEt6pBL+gkUtpVVFqrmPMkmRbPuriYxKUoguj71DbLkFN3kWYyf8FVQ+aeOC
-         sgFsMdTZvy0fpzsqdRt0bSZ4k7g0kpTx7vv3M5+tz6uzTdgPP6bzl4p5f0Ih5gpyZ/01
-         ZdkQ==
+        bh=Y02z/tmpib1XgZeXA6m85lQ1dUIeX8FSLuICjkJTAVU=;
+        b=NqTc2wzK9kx9nHJQ3yLwoyRBJzhDkvJJ8Se5BdGbEdMtmEU+UxiHAYIMAZkoSEHgHr
+         mHF/v2E7e8YgzyIqlkjSq24VfzSKqMhrk6nKkc1SOlpUiBZljbx5FnnQFtDWk5jLLvSD
+         +R7c+ESFSbu+dNcJIuB6akoj2NL2ljrMerdEVNeJpl7QLyXpSRnJxXpu4esfYFIyJCrw
+         JQqrTF9UbdEjf9ins9MYBIEtiR01rIaJkZt1eW45568dn8YaZtMtbMhd3oT2xXzuCBrk
+         IjlfLZZdOB0den01quuqgSxVCYpjWX4/oIWcgRcoCSDbNuleZpvliO5dWXj0alUoI8Nw
+         ojaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705416435; x=1706021235;
+        d=1e100.net; s=20230601; t=1705416548; x=1706021348;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UQDU3E1p1osKPCGDqpYMZ1iYLawK5EwnUnBYY4juRVc=;
-        b=C3qe35hl7RV+X3v10D/PSpq2yyIxo7UzPnpOEScgdLVCLeuLvBBPBRiVXJFiUrDn8E
-         FFEWu5ubnXMzCS30Y2bNyQ6AwlmqtWiRXHpPJApZN3F5YRxMDMqU6ml1RDfG1ZjzZBgA
-         asZxXxCY2XCe6XcjFxS81wuk0Ml/5vh7hhtrNItmHlx+tB6+YqUtWVmqfcgbY2Mys4KG
-         6OhLsM7evjjv3ly783ftitNpauWIJ5SMW4OLCooib3cmQBpLFg2zV2rnobNEPrbqI+Yi
-         QNcYE8xQtYU1ysb9yjkPX45pFPRRt9tYkw/5XJdG4jknAJUFpU1pfCSOeKIQ1mEj47Si
-         THlg==
-X-Gm-Message-State: AOJu0Yy5+tz1OGO9ml08I5WUR/LcvCOOfuaHIoJQz8YwADNTivGKlj/g
-	FCsKe2iqc8OjRGkmYegiKSCehpsBiT1zMQ==
-X-Google-Smtp-Source: AGHT+IEabsXGUeZRUV9gUXrqMMO5LSPAqVQooevyyIbe9XsJNDr5iRadStep4DBK1o2oqLwvVHV19Q==
-X-Received: by 2002:a17:906:3ac2:b0:a23:6dd6:7eed with SMTP id z2-20020a1709063ac200b00a236dd67eedmr3215379ejd.77.1705416435327;
-        Tue, 16 Jan 2024 06:47:15 -0800 (PST)
+        bh=Y02z/tmpib1XgZeXA6m85lQ1dUIeX8FSLuICjkJTAVU=;
+        b=xPWZlxDiKy2LcNc6bvn2wUss3Rn1AhamkY9eRUDxu1dBp/U8i0t5AAMC0HaZ0XzI3o
+         F4OdZkwvhSAwhmaAi6MP44v8A/BwLbSdSiKyrEu6S/++XfZYcWpGPtgLASUpayzKn4Eo
+         ABRQLPDSrMvis+emZFazat/MBFpQG1g9gn04eGMdA/eP+jOSNQVhmv4HPWMEF8zDGtsv
+         gveaGItww6vevgz3ZcFmhu6v+bwSxocMkMUteYl/xErAXOu4tq9RoI1v4ivuGkAP7M4u
+         DEKvzZwsHPbS89W2/ASWYBRJ32PCrR0TUREyOvlrUWPd86c93p9Ilj6jj1P3xobXSKzI
+         15ZA==
+X-Gm-Message-State: AOJu0YxarN4RbyaGZAXOYjPXWRW7A6H8YzPZfAyC482OPFo0/A4y4JIg
+	wP13f9/PsKEFEnPi7tBINbo=
+X-Google-Smtp-Source: AGHT+IGC8kIEOXqFqmsUSyhC7Aw8MEjmqXQzeERthvTZRJpSk14GnNKa9UPeMaCllcrNpRJlFaH/Hw==
+X-Received: by 2002:a17:907:1b08:b0:a2c:baae:ce1e with SMTP id mp8-20020a1709071b0800b00a2cbaaece1emr4365126ejc.54.1705416548226;
+        Tue, 16 Jan 2024 06:49:08 -0800 (PST)
 Received: from skbuf ([188.25.255.36])
-        by smtp.gmail.com with ESMTPSA id cx6-20020a170907168600b00a2d5ef80043sm3788703ejd.129.2024.01.16.06.47.14
+        by smtp.gmail.com with ESMTPSA id tl7-20020a170907c30700b00a2de58581f6sm2273770ejc.74.2024.01.16.06.49.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jan 2024 06:47:15 -0800 (PST)
-Date: Tue, 16 Jan 2024 16:47:12 +0200
+        Tue, 16 Jan 2024 06:49:07 -0800 (PST)
+Date: Tue, 16 Jan 2024 16:49:05 +0200
 From: Vladimir Oltean <olteanv@gmail.com>
-To: syzbot <syzbot+7ec955e36bb239bd720f@syzkaller.appspotmail.com>
-Cc: andrew@lunn.ch, daniel@iogearbox.net, davem@davemloft.net,
-	edumazet@google.com, f.fainelli@gmail.com, hkallweit1@gmail.com,
-	kuba@kernel.org, linux-kernel@vger.kernel.org,
-	linux@armlinux.org.uk, maxime.chevallier@bootlin.com,
-	netdev@vger.kernel.org, pabeni@redhat.com, sd@queasysnail.net,
-	syzkaller-bugs@googlegroups.com, vladimir.oltean@nxp.com,
-	Edward Adam Davis <eadavis@qq.com>, Hillf Danton <hdanton@sina.com>
+To: syzbot <syzbot+d81bcd883824180500c8@syzkaller.appspotmail.com>
+Cc: andrew@lunn.ch, davem@davemloft.net, dsahern@kernel.org,
+	edumazet@google.com, f.fainelli@gmail.com, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, lixiaoyan@google.com,
+	netdev@vger.kernel.org, pabeni@redhat.com,
+	syzkaller-bugs@googlegroups.com
 Subject: Re: [syzbot] [net?] KASAN: slab-out-of-bounds Read in
- dsa_user_prechangeupper
-Message-ID: <20240116144712.lxiw4pfjklidnrck@skbuf>
-References: <00000000000002faa2060f02e766@google.com>
+ dsa_user_changeupper
+Message-ID: <20240116144905.3otl4j3i3xjgzogo@skbuf>
+References: <0000000000001d4255060e87545c@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,13 +76,11 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <00000000000002faa2060f02e766@google.com>
+In-Reply-To: <0000000000001d4255060e87545c@google.com>
 
-On Mon, Jan 15, 2024 at 01:43:20PM -0800, syzbot wrote:
-> If the report is a duplicate of another one, reply with:
-> #syz dup: exact-subject-of-another-report
+On Tue, Jan 09, 2024 at 10:17:34AM -0800, syzbot wrote:
+> If the report is already addressed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
 
-#syz dup: KASAN: slab-out-of-bounds Read in dsa_user_changeupper
-
-[1] https://lore.kernel.org/netdev/0000000000001d4255060e87545c@google.com/
+#syz fix: net: dsa: fix netdev_priv() dereference before check on non-DSA netdevice events
 
