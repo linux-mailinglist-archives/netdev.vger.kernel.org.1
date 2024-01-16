@@ -1,210 +1,103 @@
-Return-Path: <netdev+bounces-63701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 676B082EF1D
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 13:37:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7D1D82EF42
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 13:57:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ABC25B21D0E
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 12:37:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E30AD1C23325
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 12:57:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B865B1BC2C;
-	Tue, 16 Jan 2024 12:37:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XXYKK/ra"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25A741BC30;
+	Tue, 16 Jan 2024 12:57:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22EDC1BC53
-	for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 12:37:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1705408656;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=53w7LonEBZKCeh61gp68ScXBNGyFCvN7H8ZoXu/fyRc=;
-	b=XXYKK/raRtTRC20m0IxhB393CcYRtNzA9GzSRhLn9HrnImYQQStsq56gWgsSZYc5PMi0PF
-	iU8qMt2ZwUM+UxyYMGNXPx7vZyuWo2d2EicKQQ6FZpe3KsCGIsrq+3+ouH2LFkU53kihNI
-	potpAw5fRRVKDjEJqPDAh5nWGcaEcx0=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-470-2-09bV4tPx6FzWp6TKVy-w-1; Tue, 16 Jan 2024 07:37:34 -0500
-X-MC-Unique: 2-09bV4tPx6FzWp6TKVy-w-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-33764587bccso1391547f8f.1
-        for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 04:37:34 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705408653; x=1706013453;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=53w7LonEBZKCeh61gp68ScXBNGyFCvN7H8ZoXu/fyRc=;
-        b=g24byRVwqXVnUeCp+t90P865+0GcLqqQimzkFJIhIHLtsmel+6VSxQUq9EQZGserij
-         iqtQFzZHqtIP4uZhiYwwskQDcQbPdwbUOsnbhJyxWAerbKRaUqeZjaLu+h43Gch4LUWr
-         QnimtOVVR84dMrt7c2S9Q1JZaJqpIXNyVL57K3gb5hTY9Bfsr3t3ZlFzu2sFfuC5MG8k
-         FhQS6dVG6euGsyT4kFlgSnkBkVAZ8lUpA8/evVqWx+c5AjtIjppWo1ykrqCxeKIWGdlq
-         Su6v+BGgOVjb9wE6SWrMnGucYG4+HEme1kvXQxNbh7Xa4TlS6Mw+weShOjyTPdEdufKe
-         RySQ==
-X-Gm-Message-State: AOJu0YwgdxrvPEokG0NgxR8oFlv3nYASPNh7GR1BRJ8941DPVP9bmYoK
-	+MhM8GM/V9RV9SFO8H8AO1aLRg0B58r8ICETSpeOu55uxV7qGjMht8fI9FRK4BkS6B5x13Izavj
-	5IDzJzxA14vW+/OrqdmeTuw9P
-X-Received: by 2002:adf:e345:0:b0:337:7598:87ae with SMTP id n5-20020adfe345000000b00337759887aemr8273860wrj.2.1705408652871;
-        Tue, 16 Jan 2024 04:37:32 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGoa1zeFDc96CwhJfIDnJO/5o1tiBKoN+j3yrUF25TSg8aaWyDolK6TAqWNY7cKtH1x7/zxxQ==
-X-Received: by 2002:adf:e345:0:b0:337:7598:87ae with SMTP id n5-20020adfe345000000b00337759887aemr8273840wrj.2.1705408652527;
-        Tue, 16 Jan 2024 04:37:32 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-241-126.dyn.eolo.it. [146.241.241.126])
-        by smtp.gmail.com with ESMTPSA id u6-20020adff886000000b00337bdd43e35sm976963wrp.39.2024.01.16.04.37.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jan 2024 04:37:32 -0800 (PST)
-Message-ID: <e19024b42c8f72e2b09c819ff1a4118f4b73da78.camel@redhat.com>
-Subject: Re: [PATCH net-next 00/17] virtio-net: support AF_XDP zero copy
- (3/3)
-From: Paolo Abeni <pabeni@redhat.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-  "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,  Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>,  virtualization@lists.linux.dev,
- bpf@vger.kernel.org
-Date: Tue, 16 Jan 2024 13:37:30 +0100
-In-Reply-To: <20240116094313.119939-1-xuanzhuo@linux.alibaba.com>
-References: <20240116094313.119939-1-xuanzhuo@linux.alibaba.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 058061BC2B;
+	Tue, 16 Jan 2024 12:57:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4TDptn39CPzGpql;
+	Tue, 16 Jan 2024 20:57:05 +0800 (CST)
+Received: from dggpemm500008.china.huawei.com (unknown [7.185.36.136])
+	by mail.maildlp.com (Postfix) with ESMTPS id DC3C7140518;
+	Tue, 16 Jan 2024 20:57:09 +0800 (CST)
+Received: from localhost (10.174.242.157) by dggpemm500008.china.huawei.com
+ (7.185.36.136) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 16 Jan
+ 2024 20:57:09 +0800
+From: Yunjian Wang <wangyunjian@huawei.com>
+To: <willemdebruijn.kernel@gmail.com>, <jasowang@redhat.com>,
+	<kuba@kernel.org>, <davem@davemloft.net>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<xudingke@huawei.com>, Yunjian Wang <wangyunjian@huawei.com>
+Subject: [PATCH net v2] tun: add missing rx stats accounting in tun_xdp_act
+Date: Tue, 16 Jan 2024 20:56:58 +0800
+Message-ID: <1705409818-28292-1-git-send-email-wangyunjian@huawei.com>
+X-Mailer: git-send-email 1.9.5.msysgit.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemm500008.china.huawei.com (7.185.36.136)
 
-          On Tue, 2024-01-16 at 17:42 +0800, Xuan Zhuo wrote:
-> This is the third part of virtio-net support AF_XDP zero copy.
->=20
-> The whole patch set
-> http://lore.kernel.org/all/20231229073108.57778-1-xuanzhuo@linux.alibaba.=
-com
->=20
-> ## AF_XDP
->=20
-> XDP socket(AF_XDP) is an excellent bypass kernel network framework. The z=
-ero
-> copy feature of xsk (XDP socket) needs to be supported by the driver. The
-> performance of zero copy is very good. mlx5 and intel ixgbe already suppo=
-rt
-> this feature, This patch set allows virtio-net to support xsk's zerocopy =
-xmit
-> feature.
->=20
-> At present, we have completed some preparation:
->=20
-> 1. vq-reset (virtio spec and kernel code)
-> 2. virtio-core premapped dma
-> 3. virtio-net xdp refactor
->=20
-> So it is time for Virtio-Net to complete the support for the XDP Socket
-> Zerocopy.
->=20
-> Virtio-net can not increase the queue num at will, so xsk shares the queu=
-e with
-> kernel.
->=20
-> On the other hand, Virtio-Net does not support generate interrupt from dr=
-iver
-> manually, so when we wakeup tx xmit, we used some tips. If the CPU run by=
- TX
-> NAPI last time is other CPUs, use IPI to wake up NAPI on the remote CPU. =
-If it
-> is also the local CPU, then we wake up napi directly.
->=20
-> This patch set includes some refactor to the virtio-net to let that to su=
-pport
-> AF_XDP.
->=20
-> ## performance
->=20
-> ENV: Qemu with vhost-user(polling mode).
-> Host CPU: Intel(R) Xeon(R) Platinum 8163 CPU @ 2.50GHz
->=20
-> ### virtio PMD in guest with testpmd
->=20
-> testpmd> show port stats all
->=20
->  ######################## NIC statistics for port 0 #####################=
-###
->  RX-packets: 19531092064 RX-missed: 0     RX-bytes: 1093741155584
->  RX-errors: 0
->  RX-nombuf: 0
->  TX-packets: 5959955552 TX-errors: 0     TX-bytes: 371030645664
->=20
->=20
->  Throughput (since last show)
->  Rx-pps:   8861574     Rx-bps:  3969985208
->  Tx-pps:   8861493     Tx-bps:  3969962736
->  ########################################################################=
-####
->=20
-> ### AF_XDP PMD in guest with testpmd
->=20
-> testpmd> show port stats all
->=20
->   ######################## NIC statistics for port 0  ###################=
-#####
->   RX-packets: 68152727   RX-missed: 0          RX-bytes:  3816552712
->   RX-errors: 0
->   RX-nombuf:  0
->   TX-packets: 68114967   TX-errors: 33216      TX-bytes:  3814438152
->=20
->   Throughput (since last show)
->   Rx-pps:      6333196          Rx-bps:   2837272088
->   Tx-pps:      6333227          Tx-bps:   2837285936
->   #######################################################################=
-#####
->=20
-> But AF_XDP consumes more CPU for tx and rx napi(100% and 86%).
->=20
-> ## maintain
->=20
-> I am currently a reviewer for virtio-net. I commit to maintain AF_XDP sup=
-port in
-> virtio-net.
->=20
-> Please review.
->=20
-> Thanks.
+There are few places on the receive path where packet receives and packet
+drops were not accounted for. This patch fixes that issue.
 
-For future submission it would be better if you split this series in
-smaller chunks: the maximum size allowed is 15 patches.
+Fixes: 8ae1aff0b331 ("tuntap: split out XDP logic")
+Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
+---
+v2: add Fixes tag
+---
+ drivers/net/tun.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-## Form letter - net-next-closed
-
-The merge window for v6.8 has begun and we have already posted our pull
-request. Therefore net-next is closed for new drivers, features, code
-refactoring and optimizations. We are currently accepting bug fixes
-only.
-
-Please repost when net-next reopens after January 22nd.
-
-RFC patches sent for review only are obviously welcome at any time.
-
-See:
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#develop=
-ment-cycle
---
-pw-bot: defer
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index afa5497f7c35..232e5319ac77 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -1626,17 +1626,14 @@ static int tun_xdp_act(struct tun_struct *tun, struct bpf_prog *xdp_prog,
+ 		       struct xdp_buff *xdp, u32 act)
+ {
+ 	int err;
++	unsigned int datasize = xdp->data_end - xdp->data;
+ 
+ 	switch (act) {
+ 	case XDP_REDIRECT:
+ 		err = xdp_do_redirect(tun->dev, xdp, xdp_prog);
+-		if (err)
+-			return err;
+ 		break;
+ 	case XDP_TX:
+ 		err = tun_xdp_tx(tun->dev, xdp);
+-		if (err < 0)
+-			return err;
+ 		break;
+ 	case XDP_PASS:
+ 		break;
+@@ -1651,6 +1648,13 @@ static int tun_xdp_act(struct tun_struct *tun, struct bpf_prog *xdp_prog,
+ 		break;
+ 	}
+ 
++	if (err < 0) {
++		act = err;
++		dev_core_stats_rx_dropped_inc(tun->dev);
++	} else if (act == XDP_REDIRECT || act == XDP_TX) {
++		dev_sw_netstats_rx_add(tun->dev, datasize);
++	}
++
+ 	return act;
+ }
+ 
+-- 
+2.41.0
 
 
