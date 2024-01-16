@@ -1,159 +1,190 @@
-Return-Path: <netdev+bounces-63749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AB9E82F25E
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 17:28:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03B3B82F27B
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 17:38:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA7F0285BB6
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 16:28:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82612284FC8
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 16:38:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F93D1C6B6;
-	Tue, 16 Jan 2024 16:28:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3B7D748D;
+	Tue, 16 Jan 2024 16:37:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DpXHgey0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qo/1JOmo"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83F6D1C6A8
-	for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 16:28:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1705422516;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=OF/f9SqDfQjcSElQnS0yY6s/dBYlZKzDcj9s0+Wh2f8=;
-	b=DpXHgey0AfAHNExgYlU/kEGeY7tfz3NKmvSD7aVZMnrvVbuhsyuit4tEg1WmXyXXkLxcSh
-	nqsSRDclrNKpyoelrIu4//1JIWMz/eEg1tXFQwID7Jqx2rT9lwGlpm3Pan5gLiVABaqCCQ
-	k22zS10an4goLn3tcIr/2rbb6auA8bw=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-57-0afhEgPsMUae5ke7QgHshg-1; Tue, 16 Jan 2024 11:28:33 -0500
-X-MC-Unique: 0afhEgPsMUae5ke7QgHshg-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-40e863cb806so4132145e9.2
-        for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 08:28:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705422513; x=1706027313;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OF/f9SqDfQjcSElQnS0yY6s/dBYlZKzDcj9s0+Wh2f8=;
-        b=chOq4nLobCYeOUL0C2/HBAVXKX28CT7RewaqyHrd9Cfuaz6uaUqW5N09g7Nd4Dk1gM
-         Ia7K+/iml3mScmTWPbCn0aUXuh9ORaBf83dje8m2mlq7U4RNE5Rqp3x0ik9gHbWnbKVi
-         9LSlUOOsUfY0AUrQd+LYqtF+Qc39R2G+n438tv1plmFo5nBdiWw7nfRXD9SD7G3Lv0DL
-         2hHiIitxyAO6yzNtibuyGdkSBoUXKpM90ddUAtCBPGarx5CVVeNBIMLa4v2anrz3gWtf
-         pxpy76i4YCEhsE2EUUfgXLfGdyhXsFDXVBWnfMpIhk6wqlueaBmeapCMuZIC+qF7TraR
-         Occw==
-X-Gm-Message-State: AOJu0YztN23dkNZaEJ99aIXdJcwYhsTBr+JpbEhc0zxR3h9d978bXOAS
-	dlRVORV+tq3e5r/v5mn+OT7dUN43VpOPsB8p9wd21/b3PGvo9p8p+5hI7/XgJMu/EC0lvtjv0z7
-	zqwIIIT/7PvSICaA52AsA3QrJ
-X-Received: by 2002:a05:600c:257:b0:40e:7e40:10c6 with SMTP id 23-20020a05600c025700b0040e7e4010c6mr739597wmj.182.1705422512704;
-        Tue, 16 Jan 2024 08:28:32 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG4EwY4rnvc1dXkvUnzrtlQb0sW9f8GFlzYKtabODe5zsH9sA7U7cGUZRKyhXjVGQXqLCiWCQ==
-X-Received: by 2002:a05:600c:257:b0:40e:7e40:10c6 with SMTP id 23-20020a05600c025700b0040e7e4010c6mr739594wmj.182.1705422512444;
-        Tue, 16 Jan 2024 08:28:32 -0800 (PST)
-Received: from redhat.com ([2.52.29.192])
-        by smtp.gmail.com with ESMTPSA id bg42-20020a05600c3caa00b0040e3733a32bsm23560519wmb.41.2024.01.16.08.28.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jan 2024 08:28:31 -0800 (PST)
-Date: Tue, 16 Jan 2024 11:28:28 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	changyuanl@google.com, christophe.jaillet@wanadoo.fr,
-	dtatulea@nvidia.com, eperezma@redhat.com, jasowang@redhat.com,
-	michael.christie@oracle.com, mst@redhat.com,
-	pasha.tatashin@soleen.com, rientjes@google.com,
-	stevensd@chromium.org, tytso@mit.edu, xuanzhuo@linux.alibaba.com
-Subject: [GIT PULL] virtio: features, fixes
-Message-ID: <20240116112828-mutt-send-email-mst@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77C451CA83;
+	Tue, 16 Jan 2024 16:37:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85C53C433F1;
+	Tue, 16 Jan 2024 16:37:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705423065;
+	bh=jre5ipGlkss5zAu1aIdBqL+hSwB+mdQlTFI/dlhzA6c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qo/1JOmobPmFtak/7HKTx0XejNptaXUIipjwln1OdfT3drLtS0ju3ZCDZ8sbscoY3
+	 4w4l/W4KVXVwszFTlZlVW6GiSdpXfV8m2kdN2LXG/LWTRktlE1nXOiKWKVMehdMgq/
+	 YSCXgjMlSkfUewRXwJhrywSfxDJPTmgTlXrgty2B2R4paYEzJt9t8abuG6BVMWRbcQ
+	 VahL2b5MDPJ3rrb6XOVsaS6+Lz6ihmZIC0J83Hxq6cSQwnTmonnERgAypkCcgBWhY+
+	 YG408WTKIX6WfbU2m4LVeQyQnNixVSn84OGSHw8OczrSxWtNm28O0rPGIy/gdCxoq1
+	 hwfo9TCSBIXqg==
+Date: Tue, 16 Jan 2024 17:37:39 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: Linus Torvalds <torvalds@linuxfoundation.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org, paul@paul-moore.com, 
+	linux-fsdevel@vger.kernel.org, linux-security-module@vger.kernel.org, kernel-team@meta.com
+Subject: Re: [PATCH bpf-next 03/29] bpf: introduce BPF token object
+Message-ID: <20240116-gradmesser-labeln-9a1d9918c92e@brauner>
+References: <20240109-tausend-tropenhelm-2a9914326249@brauner>
+ <CAEf4BzaAoXYb=qnj6rvDw8VewhvYNrs5oxe=q7VBe0jjWXivhg@mail.gmail.com>
+ <20240110-nervt-monopol-6d307e2518f4@brauner>
+ <CAEf4BzYOU5ZVqnTDTEmrHL-+tYY76kz4LO_0XauWibnhtzCFXg@mail.gmail.com>
+ <20240111-amten-stiefel-043027f9520f@brauner>
+ <CAEf4BzYcec97posh6N3LM8tJLsxrSLiFYq9csRWcy8=VnTJ23A@mail.gmail.com>
+ <20240112-unpraktisch-kuraufenthalt-4fef655deab2@brauner>
+ <CAEf4Bza7UKjv1Hh_kcyBVJw22LDv4ZNA5uV7+WBdnhsM9O7uGQ@mail.gmail.com>
+ <20240112-hetzt-gepard-5110cf759a34@brauner>
+ <CAEf4BzYNRNbaNNGRSUCaY3OQrzXPAdR6gGB0PmXhwsn8rUAs0Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-X-Mutt-Fcc: =sent
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAEf4BzYNRNbaNNGRSUCaY3OQrzXPAdR6gGB0PmXhwsn8rUAs0Q@mail.gmail.com>
 
-The following changes since commit b8e0792449928943c15d1af9f63816911d139267:
+On Sat, Jan 13, 2024 at 06:29:33PM -0800, Andrii Nakryiko wrote:
+> On Fri, Jan 12, 2024 at 11:17 AM Christian Brauner <brauner@kernel.org> wrote:
+> >
+> > > > My point is that the capable logic will walk upwards the user namespace
+> > > > hierarchy from the token->userns until the user namespace of the caller
+> > > > and terminate when it reached the init_user_ns.
+> > > >
+> > > > A caller is located in some namespace at the point where they call this
+> > > > function. They provided a token. The caller isn't capable in the
+> > > > namespace of the token so the function falls back to init_user_ns. Two
+> > > > interesting cases:
+> > > >
+> > > > (1) The caller wasn't in an ancestor userns of the token. If that's the
+> > > >     case then it follows that the caller also wasn't in the init_user_ns
+> > > >     because the init_user_ns is a descendant of all other user
+> > > >     namespaces. So falling back will fail.
+> > >
+> > > agreed
+> > >
+> > > >
+> > > > (2) The caller was in the same or an ancestor user namespace of the
+> > > >     token but didn't have the capability in that user namespace:
+> > > >
+> > > >      (i) They were in a non-init_user_ns. Therefore they can't be
+> > > >          privileged in init_user_ns.
+> > > >     (ii) They were in init_user_ns. Therefore, they lacked privileges in
+> > > >          the init_user_ns.
+> > > >
+> > > > In both cases your fallback will do nothing iiuc.
+> > >
+> > > agreed as well
+> > >
+> > > And I agree in general that there isn't a *practically useful* case
+> > > where this would matter much. But there is still (at least one) case
+> > > where there could be a regression: if token is created in
+> > > init_user_ns, caller has CAP_BPF in init_user_ns, caller passes that
+> > > token to BPF_PROG_LOAD, and LSM policy rejects that token in
+> > > security_bpf_token_capable(). Without the above implementation such
+> > > operation will be rejected, even though if there was no token passed
+> > > it would succeed. With my implementation above it will succeed as
+> > > expected.
+> >
+> > If that's the case then prevent the creation of tokens in the
+> > init_user_ns and be done with it. If you fallback anyway then this is
+> > the correct solution.
+> >
+> > Make this change, please. I'm not willing to support this weird fallback
+> > stuff which is even hard to reason about.
+> 
+> Alright, added an extra check. Ok, so in summary I have the changes
+> below compared to v1 (plus a few extra LSM-related test cases added):
+> 
+> diff --git a/kernel/bpf/token.c b/kernel/bpf/token.c
+> index a86fccd57e2d..7d04378560fd 100644
+> --- a/kernel/bpf/token.c
+> +++ b/kernel/bpf/token.c
+> @@ -9,18 +9,22 @@
+>  #include <linux/user_namespace.h>
+>  #include <linux/security.h>
+> 
+> +static bool bpf_ns_capable(struct user_namespace *ns, int cap)
+> +{
+> +       return ns_capable(ns, cap) || (cap != CAP_SYS_ADMIN &&
+> ns_capable(ns, CAP_SYS_ADMIN));
+> +}
+> +
+>  bool bpf_token_capable(const struct bpf_token *token, int cap)
+>  {
+> -       /* BPF token allows ns_capable() level of capabilities, but only if
+> -        * token's userns is *exactly* the same as current user's userns
+> -        */
+> -       if (token && current_user_ns() == token->userns) {
+> -               if (ns_capable(token->userns, cap) ||
+> -                   (cap != CAP_SYS_ADMIN && ns_capable(token->userns,
+> CAP_SYS_ADMIN)))
+> -                       return security_bpf_token_capable(token, cap) == 0;
+> -       }
+> -       /* otherwise fallback to capable() checks */
+> -       return capable(cap) || (cap != CAP_SYS_ADMIN && capable(CAP_SYS_ADMIN));
+> +       struct user_namespace *userns;
+> +
+> +       /* BPF token allows ns_capable() level of capabilities */
+> +       userns = token ? token->userns : &init_user_ns;
+> +       if (!bpf_ns_capable(userns, cap))
+> +               return false;
+> +       if (token && security_bpf_token_capable(token, cap) < 0)
+> +               return false;
+> +       return true;
+>  }
+> 
+>  void bpf_token_inc(struct bpf_token *token)
+> @@ -32,7 +36,7 @@ static void bpf_token_free(struct bpf_token *token)
+>  {
+>         security_bpf_token_free(token);
+>         put_user_ns(token->userns);
+> -       kvfree(token);
+> +       kfree(token);
+>  }
+> 
+>  static void bpf_token_put_deferred(struct work_struct *work)
+> @@ -152,6 +156,12 @@ int bpf_token_create(union bpf_attr *attr)
+>                 goto out_path;
+>         }
+> 
+> +       /* Creating BPF token in init_user_ns doesn't make much sense. */
+> +       if (current_user_ns() == &init_user_ns) {
+> +               err = -EOPNOTSUPP;
+> +               goto out_path;
+> +       }
+> +
+>         mnt_opts = path.dentry->d_sb->s_fs_info;
+>         if (mnt_opts->delegate_cmds == 0 &&
+>             mnt_opts->delegate_maps == 0 &&
+> @@ -179,7 +189,7 @@ int bpf_token_create(union bpf_attr *attr)
+>                 goto out_path;
+>         }
+> 
+> -       token = kvzalloc(sizeof(*token), GFP_USER);
+> +       token = kzalloc(sizeof(*token), GFP_USER);
+>         if (!token) {
+>                 err = -ENOMEM;
+>                 goto out_file;
 
-  virtio_blk: fix snprintf truncation compiler warning (2023-12-04 09:43:53 -0500)
+Thank you! Looks good,
 
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-
-for you to fetch changes up to f16d65124380ac6de8055c4a8e5373a1043bb09b:
-
-  vdpa/mlx5: Add mkey leak detection (2024-01-10 13:01:38 -0500)
-
-----------------------------------------------------------------
-virtio: features, fixes
-
-vdpa/mlx5: support for resumable vqs
-virtio_scsi: mq_poll support
-3virtio_pmem: support SHMEM_REGION
-virtio_balloon: stay awake while adjusting balloon
-virtio: support for no-reset virtio PCI PM
-
-Fixes, cleanups.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Changyuan Lyu (1):
-      virtio_pmem: support feature SHMEM_REGION
-
-Christophe JAILLET (2):
-      vdpa: Fix an error handling path in eni_vdpa_probe()
-      vdpa: Remove usage of the deprecated ida_simple_xx() API
-
-David Stevens (2):
-      virtio: Add support for no-reset virtio PCI PM
-      virtio_balloon: stay awake while adjusting balloon
-
-Dragos Tatulea (10):
-      vdpa: Track device suspended state
-      vdpa: Block vq property changes in DRIVER_OK
-      vdpa/mlx5: Expose resumable vq capability
-      vdpa/mlx5: Allow modifying multiple vq fields in one modify command
-      vdpa/mlx5: Introduce per vq and device resume
-      vdpa/mlx5: Mark vq addrs for modification in hw vq
-      vdpa/mlx5: Mark vq state for modification in hw vq
-      vdpa/mlx5: Use vq suspend/resume during .set_map
-      vdpa/mlx5: Introduce reference counting to mrs
-      vdpa/mlx5: Add mkey leak detection
-
-Mike Christie (1):
-      scsi: virtio_scsi: Add mq_poll support
-
-Pasha Tatashin (1):
-      vhost-vdpa: account iommu allocations
-
-Xuan Zhuo (1):
-      virtio_net: fix missing dma unmap for resize
-
- drivers/net/virtio_net.c           |  60 +++++------
- drivers/nvdimm/virtio_pmem.c       |  36 ++++++-
- drivers/scsi/virtio_scsi.c         |  78 +++++++++++++-
- drivers/vdpa/alibaba/eni_vdpa.c    |   6 +-
- drivers/vdpa/mlx5/core/mlx5_vdpa.h |  10 +-
- drivers/vdpa/mlx5/core/mr.c        |  73 ++++++++++---
- drivers/vdpa/mlx5/net/mlx5_vnet.c  | 209 +++++++++++++++++++++++++++++++++----
- drivers/vdpa/vdpa.c                |   4 +-
- drivers/vhost/vdpa.c               |  26 ++++-
- drivers/virtio/virtio_balloon.c    |  57 ++++++++--
- drivers/virtio/virtio_pci_common.c |  34 +++++-
- include/linux/mlx5/mlx5_ifc.h      |   3 +-
- include/linux/mlx5/mlx5_ifc_vdpa.h |   4 +
- include/uapi/linux/virtio_pmem.h   |   7 ++
- 14 files changed, 510 insertions(+), 97 deletions(-)
-
+Acked-by: Christian Brauner <brauner@kernel.org>
 
