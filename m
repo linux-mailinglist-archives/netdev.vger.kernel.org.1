@@ -1,117 +1,155 @@
-Return-Path: <netdev+bounces-63685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF6B982ED9B
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 12:23:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B25F82ED90
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 12:19:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7ED66285962
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 11:23:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9AAFDB22BEF
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 11:19:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A32C21B7F9;
-	Tue, 16 Jan 2024 11:23:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C68E61B7FA;
+	Tue, 16 Jan 2024 11:19:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="wnFGUlym"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F0181B802;
-	Tue, 16 Jan 2024 11:23:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4TDmHj4hkgz1FJL4;
-	Tue, 16 Jan 2024 19:00:01 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id 93F751A0172;
-	Tue, 16 Jan 2024 19:04:14 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 16 Jan
- 2024 19:04:14 +0800
-Subject: Re: [RFC PATCH net-next v5 2/2] net: add netmem to skb_frag_t
-To: Jason Gunthorpe <jgg@nvidia.com>, Mina Almasry <almasrymina@google.com>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	=?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>, Shakeel Butt
-	<shakeelb@google.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-References: <20240109011455.1061529-1-almasrymina@google.com>
- <20240109011455.1061529-3-almasrymina@google.com>
- <5219f2cd-6854-0134-560d-8ae3f363b53f@huawei.com>
- <CAHS8izOtr+jfqQ6xCB3CoN-K_V1-4hPsB4-k5+1z-M3Qy2BbwA@mail.gmail.com>
- <0711845b-c435-251f-0bbc-20b243721c06@huawei.com>
- <CAHS8izOxvMVGXKpLBvVgyyS5_94WGG8Aca=O_zGMX+db-3gBXg@mail.gmail.com>
- <66bc7b8f-51b6-0d9e-db5b-47e7ee5e9029@huawei.com>
- <CAHS8izOnhtQGeQ-EFmYjZyZ0eW2LqO0Rrm73eAB2su=UA34yTw@mail.gmail.com>
- <20240116000129.GX734935@nvidia.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <9c1a6725-c4c3-2bb1-344f-5e71f8ce7e63@huawei.com>
-Date: Tue, 16 Jan 2024 19:04:13 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D78B1B7F3;
+	Tue, 16 Jan 2024 11:19:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ssi.bg
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
+Received: from mg.bb.i.ssi.bg (localhost [127.0.0.1])
+	by mg.bb.i.ssi.bg (Proxmox) with ESMTP id BEE3424590;
+	Tue, 16 Jan 2024 13:12:06 +0200 (EET)
+Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
+	by mg.bb.i.ssi.bg (Proxmox) with ESMTPS id A020424588;
+	Tue, 16 Jan 2024 13:12:06 +0200 (EET)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by ink.ssi.bg (Postfix) with ESMTPSA id 413883C043D;
+	Tue, 16 Jan 2024 13:11:59 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
+	t=1705403520; bh=UxqN8goLJo6H6a7nMjf8r0aorH2j0H/0oPA9ij7vGs8=;
+	h=Date:From:To:cc:Subject:In-Reply-To:References;
+	b=wnFGUlymIz1ag50Nx7oh8FaocUejgNj/GfPnORiHfTvVAwGn2G8y+kBE1JnNnpmtT
+	 iY5ALZ8AHHmg63lIQOHsfp/f6Rf5e7bUeXsixbVP917ZXCUnTEoObTYuxl0ntcUNnK
+	 UJIsB5lHZJhvSC2feK1i5LAxAwtfTNSW1G7tgMrE=
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.17.1/8.17.1) with ESMTP id 40GBBn3L041664;
+	Tue, 16 Jan 2024 13:11:50 +0200
+Date: Tue, 16 Jan 2024 13:11:49 +0200 (EET)
+From: Julian Anastasov <ja@ssi.bg>
+To: Fedor Pchelkin <pchelkin@ispras.ru>
+cc: Simon Horman <horms@verge.net.au>, Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        Florian Westphal <fw@strlen.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Dwip Banerjee <dwip@linux.vnet.ibm.com>, netdev@vger.kernel.org,
+        lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        coreteam@netfilter.org, linux-kernel@vger.kernel.org,
+        Alexey Khoroshilov <khoroshilov@ispras.ru>,
+        lvc-project@linuxtesting.org
+Subject: Re: [PATCH net] net: ipvs: avoid stat macros calls from preemptible
+ context
+In-Reply-To: <20240115143923.31243-1-pchelkin@ispras.ru>
+Message-ID: <3964ec81-c8d2-c4c6-8ca8-2e2b50dc4240@ssi.bg>
+References: <20240115143923.31243-1-pchelkin@ispras.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240116000129.GX734935@nvidia.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpemm500005.china.huawei.com (7.185.36.74)
+Content-Type: text/plain; charset=US-ASCII
 
-On 2024/1/16 8:01, Jason Gunthorpe wrote:
-> On Mon, Jan 15, 2024 at 03:23:33PM -0800, Mina Almasry wrote:
->>>> You did not answer my question that I asked here, and ignoring this
->>>> question is preventing us from making any forward progress on this
->>>> discussion. What do you expect or want skb_frag_page() to do when
->>>> there is no page in the frag?
->>>
->>> I would expect it to do nothing.
->>
->> I don't understand. skb_frag_page() with an empty implementation just
->> results in a compiler error as the function needs to return a page
->> pointer. Do you actually expect skb_frag_page() to unconditionally
->> cast frag->netmem to a page pointer? That was explained as
->> unacceptable over and over again by Jason and Christian as it risks
->> casting devmem to page; completely unacceptable and will get nacked.
->> Do you have a suggestion of what skb_frag_page() should do that will
->> not get nacked by mm?
+
+	Hello,
+
+On Mon, 15 Jan 2024, Fedor Pchelkin wrote:
+
+> Inside decrement_ttl() upon discovering that the packet ttl has exceeded,
+> __IP_INC_STATS and __IP6_INC_STATS macros can be called from preemptible
+> context having the following backtrace:
 > 
-> WARN_ON and return NULL seems reasonable?
-
-While I am agreed that it may be a nightmare to debug the case of passing
-a false page into the mm system, but I am not sure what's the point of
-returning NULL to caller if the caller is not expecting or handling the
-NULL returning[for example, most of mm API called by the networking does not
-seems to handling NULL as input page], isn't the NULL returning will make
-the kernel panic anyway? Doesn't it make more sense to just add a BUG_ON()
-depending on some configuration like CONFIG_DEBUG_NET or CONFIG_DEVMEM?
-As returning NULL seems to be causing a confusion for the caller of
-skb_frag_page() as whether to or how to handle the NULL returning case.
-
-For existing cases, the skb_frag_page() is mostly called with below pattern,
-it means there may be up to 17 checkings for each skb:
-for (i = 0; i < shinfo->nr_frags; i++) {
-	skb_frag_t *frag = &sinfo->frags[i];
-	....
-	calling some function with skb_frag_page(frag);
-	.....
-}
-
-IMHO, we should avoid this kind of problem at API level, I am not able to
-come up with an idea how to do that for now, is there any idea to do that in
-your mind?
-Even if we can not come up with an idea for now, doesn't it make sense to avoid
-this kind of overhead as much as possible even if we have marked the checking
-as unlikely() cases?
-
+> check_preemption_disabled: 48 callbacks suppressed
+> BUG: using __this_cpu_add() in preemptible [00000000] code: curl/1177
+> caller is decrement_ttl+0x217/0x830
+> CPU: 5 PID: 1177 Comm: curl Not tainted 6.7.0+ #34
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 04/01/2014
+> Call Trace:
+>  <TASK>
+>  dump_stack_lvl+0xbd/0xe0
+>  check_preemption_disabled+0xd1/0xe0
+>  decrement_ttl+0x217/0x830
+>  __ip_vs_get_out_rt+0x4e0/0x1ef0
+>  ip_vs_nat_xmit+0x205/0xcd0
+>  ip_vs_in_hook+0x9b1/0x26a0
+>  nf_hook_slow+0xc2/0x210
+>  nf_hook+0x1fb/0x770
+>  __ip_local_out+0x33b/0x640
+>  ip_local_out+0x2a/0x490
+>  __ip_queue_xmit+0x990/0x1d10
+>  __tcp_transmit_skb+0x288b/0x3d10
+>  tcp_connect+0x3466/0x5180
+>  tcp_v4_connect+0x1535/0x1bb0
+>  __inet_stream_connect+0x40d/0x1040
+>  inet_stream_connect+0x57/0xa0
+>  __sys_connect_file+0x162/0x1a0
+>  __sys_connect+0x137/0x160
+>  __x64_sys_connect+0x72/0xb0
+>  do_syscall_64+0x6f/0x140
+>  entry_SYSCALL_64_after_hwframe+0x6e/0x76
+> RIP: 0033:0x7fe6dbbc34e0
 > 
-> Jason
-> .
+> Use the corresponding preemption-aware variants: IP_INC_STATS and
+> IP6_INC_STATS.
 > 
+> Found by Linux Verification Center (linuxtesting.org).
+> 
+> Fixes: 8d8e20e2d7bb ("ipvs: Decrement ttl")
+> Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
+
+	Looks good to me, thanks!
+
+Acked-by: Julian Anastasov <ja@ssi.bg>
+
+> ---
+>  net/netfilter/ipvs/ip_vs_xmit.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/netfilter/ipvs/ip_vs_xmit.c b/net/netfilter/ipvs/ip_vs_xmit.c
+> index 9193e109e6b3..65e0259178da 100644
+> --- a/net/netfilter/ipvs/ip_vs_xmit.c
+> +++ b/net/netfilter/ipvs/ip_vs_xmit.c
+> @@ -271,7 +271,7 @@ static inline bool decrement_ttl(struct netns_ipvs *ipvs,
+>  			skb->dev = dst->dev;
+>  			icmpv6_send(skb, ICMPV6_TIME_EXCEED,
+>  				    ICMPV6_EXC_HOPLIMIT, 0);
+> -			__IP6_INC_STATS(net, idev, IPSTATS_MIB_INHDRERRORS);
+> +			IP6_INC_STATS(net, idev, IPSTATS_MIB_INHDRERRORS);
+>  
+>  			return false;
+>  		}
+> @@ -286,7 +286,7 @@ static inline bool decrement_ttl(struct netns_ipvs *ipvs,
+>  	{
+>  		if (ip_hdr(skb)->ttl <= 1) {
+>  			/* Tell the sender its packet died... */
+> -			__IP_INC_STATS(net, IPSTATS_MIB_INHDRERRORS);
+> +			IP_INC_STATS(net, IPSTATS_MIB_INHDRERRORS);
+>  			icmp_send(skb, ICMP_TIME_EXCEEDED, ICMP_EXC_TTL, 0);
+>  			return false;
+>  		}
+> -- 
+> 2.43.0
+
+Regards
+
+--
+Julian Anastasov <ja@ssi.bg>
+
 
