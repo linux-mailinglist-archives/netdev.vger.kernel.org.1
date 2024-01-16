@@ -1,100 +1,139 @@
-Return-Path: <netdev+bounces-63846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8A9B82FA67
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 22:32:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 896F382FABD
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 22:39:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69C9F28B24B
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 21:32:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 901241C26478
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 21:39:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15F65154C1C;
-	Tue, 16 Jan 2024 19:59:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B86FF15A498;
+	Tue, 16 Jan 2024 20:01:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="BJOmr6bI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NKXMuW0S"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EABAD154BF4;
-	Tue, 16 Jan 2024 19:59:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CAB015A493;
+	Tue, 16 Jan 2024 20:01:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705435181; cv=none; b=p5uH+655HJ7xc5jl9fLGDoXGvsDwu9uvBwmL2XhKO7ltXK6HwzNVxRxdd3dqy6p6Whvwn5PV9NoKXrr6vFaKvML/i03vWdoxDw0yRrenUlZu/rdie5JV/Wg84o/UXsluZGXHESHucHS/t0jHHCbaoGYxrFRJJN4jSOcFq+sAJrw=
+	t=1705435260; cv=none; b=GZZ13/0hWycSgpaiByGubue20K2bpsmYNgJbmLXvAb/gXBzjPqpRnR2HokfxmSKsywMl7H4JlrUAVrHxZjHPzFzWlGW/a79gZ5VcOPCk5f2HrNi0GBMWAhMKkNXzun2xk1qFdXnQmKewLoY8rUQ8v1kncKQNsm/UOOprgB6KIWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705435181; c=relaxed/simple;
-	bh=JPlHMBUhUwT7tKuxqJxvPrreTY+vcwsiULPGR0PWxf8=;
-	h=DKIM-Signature:Received:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To; b=iNLKS0d2i/oKnS5/v0UV1RXjOqjMtvZRJtST3pnHzrKAl+jlv/y23OjbQn7wX8LI+DWI42ZlS3TLmgDgQwH+oWSlgwDj4M1Pda8bfD746S8WaMKkopYK8JAmUEdpRg8W96Yk+/YOEsKBbw3icjl3L4vK/EFTeKG+XR2PDr61oHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=BJOmr6bI; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=QOrbjSeg+FOA9pqS7cPB6dtob5KTxlC45EjTRB0DpCc=; b=BJOmr6bIkh2IDeTbIhp0UzgwLu
-	gx5JPFpdn526aCakeC23REpDuV+5AqtqTGju1OCirbriR/EPL6G6SLLWbhlH2ZAtm3KB+1jnq47Tw
-	OkgsJUwK6iaguqtEgg788dbAFbdbfIA869/6OW+WFtaMh1jm510ZadsetMNQ+6+s+7+8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rPpaq-005Lc7-Rj; Tue, 16 Jan 2024 20:59:28 +0100
-Date: Tue, 16 Jan 2024 20:59:28 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Tim Menninger <tmenninger@purestorage.com>
-Cc: f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: dsa: mv88e6xxx: Make *_c45 callbacks agree with
- phy_*_c45 callbacks
-Message-ID: <04d22048-737a-4281-a43f-b125ebe0c896@lunn.ch>
-References: <20240116193542.711482-1-tmenninger@purestorage.com>
+	s=arc-20240116; t=1705435260; c=relaxed/simple;
+	bh=Qls9ZxlTaEFzdflbK4KVew4CfKTH7ZKTxFOXjhHdDe0=;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
+	 X-Mailer:In-Reply-To:References:MIME-Version:X-stable:
+	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=iZCF5jqqEgH5Ap+SHy/uEvPhqstOoWBb+75lJMJ7RQcr/4dRHh1dMKFZ65JcP5D0GI2IxrV1uU1+V+rV4TswxxQWwY69ptiGpyiOaRb3mhjhXpX6ujXiEenFrlpZVm4zaybo8FgSmHmDLWEAKDVI5SpUntNcg5TT8rjaCxVN3o0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NKXMuW0S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8DA3C433C7;
+	Tue, 16 Jan 2024 20:00:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705435260;
+	bh=Qls9ZxlTaEFzdflbK4KVew4CfKTH7ZKTxFOXjhHdDe0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=NKXMuW0SOvHq6ElgrMBtQNOKdVhRfGmhbxeyjwWR/8WqPP3mRm8OLROLnSbcIglI5
+	 i/56u60yplcGj5lyvHh2Flluz1NhRwj2OrpPc+TyozEj2nrfuFyabaMb/36LZuwvkS
+	 JJYwq6IPOC0Rvr8jlNu8DEzuNjsVVEAri9oMajnSRsNfTiIn5w+bSCCk1HPeJDTZ+t
+	 vG9Rv6wG71ah0sEislLCf30HZ0G25hWJRHzG+XCu886PW2tJMhkH0fqNjJLLUsTqmR
+	 O1/NifIHurANsrZakMeNj8DSRMz5iIPO0sY6c42Pi+e4Rrc95R004VGbC2Qnmi9eQN
+	 xAyp6yRZitEYA==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Zhengchao Shao <shaozhengchao@huawei.com>,
+	Jay Vosburgh <jay.vosburgh@canonical.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sasha Levin <sashal@kernel.org>,
+	j.vosburgh@gmail.com,
+	andy@greyhouse.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.10 06/44] bonding: return -ENOMEM instead of BUG in alb_upper_dev_walk
+Date: Tue, 16 Jan 2024 14:59:35 -0500
+Message-ID: <20240116200044.258335-6-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240116200044.258335-1-sashal@kernel.org>
+References: <20240116200044.258335-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240116193542.711482-1-tmenninger@purestorage.com>
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 5.10.208
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 16, 2024 at 07:35:42PM +0000, Tim Menninger wrote:
-> Set the read_c45 callback in the mii_bus struct in mv88e6xxx only if there
-> is a non-NULL phy_read_c45 callback on the chip mv88e6xxx_ops. Similarly
-> for write_c45 and phy_write_c45.
-> 
-> In commit 743a19e38d02 ("net: dsa: mv88e6xxx: Separate C22 and C45 transactions")
-> the MDIO bus driver split its API to separate C22 and C45 transfers.
-> 
-> In commit 1a136ca2e089 ("net: mdio: scan bus based on bus capabilities for C22 and C45")
-> we do a C45 mdio bus scan based on existence of the read_c45 callback
-> rather than checking MDIO bus capabilities then in
-> commit da099a7fb13d ("net: phy: Remove probe_capabilities") we remove the
-> probe_capabilities from the mii_bus struct.
-> 
-> The combination of the above results in a scenario (e.g. mv88e6185)
-> where we take a non-NULL read_c45 callback on the mii_bus struct to mean
-> we can perform a C45 read and proceed with a C45 MDIO bus scan. The scan
-> encounters a NULL phy_read_c45 callback in the mv88e6xxx_ops which implies
-> we can NOT perform a C45 read and fails with EOPNOTSUPP. The read_c45
-> callback should be NULL if phy_read_c45 is NULL, and similarly for
-> write_c45 and phy_write_c45.
+From: Zhengchao Shao <shaozhengchao@huawei.com>
 
-Hi Tim
+[ Upstream commit d6b83f1e3707c4d60acfa58afd3515e17e5d5384 ]
 
-What does phylib do with the return of -EOPNOTSUPP? I've not tested
-it, but i would expect it just keeps going with the scan? It treats it
-as if there is no device there? And since it never accesses the
-hardware, this should be fast?
+If failed to allocate "tags" or could not find the final upper device from
+start_dev's upper list in bond_verify_device_path(), only the loopback
+detection of the current upper device should be affected, and the system is
+no need to be panic.
+So return -ENOMEM in alb_upper_dev_walk to stop walking, print some warn
+information when failed to allocate memory for vlan tags in
+bond_verify_device_path.
 
-Or is my assumption wrong? Do you see the EPOPNOTSUPP getting reported
-back to user space, and the probe failing?
+I also think that the following function calls
+netdev_walk_all_upper_dev_rcu
+---->>>alb_upper_dev_walk
+---------->>>bond_verify_device_path
+From this way, "end device" can eventually be obtained from "start device"
+in bond_verify_device_path, IS_ERR(tags) could be instead of
+IS_ERR_OR_NULL(tags) in alb_upper_dev_walk.
 
-     Andrew
+Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+Acked-by: Jay Vosburgh <jay.vosburgh@canonical.com>
+Link: https://lore.kernel.org/r/20231118081653.1481260-1-shaozhengchao@huawei.com
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/bonding/bond_alb.c  | 3 ++-
+ drivers/net/bonding/bond_main.c | 5 ++++-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/bonding/bond_alb.c b/drivers/net/bonding/bond_alb.c
+index 64ba465741a7..81a5e7622ea7 100644
+--- a/drivers/net/bonding/bond_alb.c
++++ b/drivers/net/bonding/bond_alb.c
+@@ -971,7 +971,8 @@ static int alb_upper_dev_walk(struct net_device *upper,
+ 	if (netif_is_macvlan(upper) && !strict_match) {
+ 		tags = bond_verify_device_path(bond->dev, upper, 0);
+ 		if (IS_ERR_OR_NULL(tags))
+-			BUG();
++			return -ENOMEM;
++
+ 		alb_send_lp_vid(slave, upper->dev_addr,
+ 				tags[0].vlan_proto, tags[0].vlan_id);
+ 		kfree(tags);
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 50fabba04248..506d6fdbfacc 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -2777,8 +2777,11 @@ struct bond_vlan_tag *bond_verify_device_path(struct net_device *start_dev,
+ 
+ 	if (start_dev == end_dev) {
+ 		tags = kcalloc(level + 1, sizeof(*tags), GFP_ATOMIC);
+-		if (!tags)
++		if (!tags) {
++			net_err_ratelimited("%s: %s: Failed to allocate tags\n",
++					    __func__, start_dev->name);
+ 			return ERR_PTR(-ENOMEM);
++		}
+ 		tags[level].vlan_proto = VLAN_N_VID;
+ 		return tags;
+ 	}
+-- 
+2.43.0
 
 
