@@ -1,64 +1,63 @@
-Return-Path: <netdev+bounces-63817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83FFC82F8EE
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 21:56:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B6D382F8FF
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 21:57:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1829B243C0
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 20:56:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D0EDF1F260CF
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 20:57:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79DA013BEB9;
-	Tue, 16 Jan 2024 19:53:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8AB613D515;
+	Tue, 16 Jan 2024 19:53:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gENFSvfk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PLxoNuvH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BE9E28DD0;
-	Tue, 16 Jan 2024 19:53:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 995F413D510;
+	Tue, 16 Jan 2024 19:53:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705434820; cv=none; b=j5s8gjj21T/2gMYt5AHmXTvEnjyJui9GCmuBcj6xrJzT6APcZWbzQzywhb8UjArPYlJpa7YcWnUI0OVw360d8wrSz4MAMQDrMJoSdZl2tgITX7yOqb6cM9ID+fOjh6nghdgP3coYXknLy9CGhpqW70emwYKipTrKfkkCRyNhBMg=
+	t=1705434828; cv=none; b=PQajbYUZInNJALh/lzZfKaEylK8vXgE/wJ3sbcxjPP8xV2RbkXfo3ez4d595qwqYxT0f9xYHp4gzKArwtCr5EAYTEJj+Mi0k6Y3M90Tt8vTA8hSuY2rkGy+rl5wXAnFZ44krVmzKvHxdq3dllgSIAGmRewrcWZx+JqIQoSISlPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705434820; c=relaxed/simple;
-	bh=dNcP4OJVsNDmpycZn9j0ikf2VFArhZwzhvoPZmuu0IQ=;
+	s=arc-20240116; t=1705434828; c=relaxed/simple;
+	bh=mcZomUmBofZwrv5P/gxQDWjBxvcbEOUulhgq96eGZ9o=;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
 	 X-Mailer:In-Reply-To:References:MIME-Version:X-stable:
-	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=p8pXnLStkk+RKSdYPFRsj1A/bjYz9yu0Zoq6AYbAwOz6e3/wl5Nl11RemmRDfPbHYuIcTMc2ZLLa4phbJptjbCnSuaTRieB6OYJ2I61JwYnpJh+ru0O+eVlzeQdksDumNN0CL4aoa7VUr/aSYKFpg1BMcghZwW0rOud8ug4LOxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gENFSvfk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBEDAC43330;
-	Tue, 16 Jan 2024 19:53:38 +0000 (UTC)
+	 X-Patchwork-Hint:X-stable-base:Content-Transfer-Encoding; b=tJDCnsTWMDdw8fWbrKcDn5X7SmJ2ARHcsG5YIkV3O7kzfV8ExNS5AeEBzQFcRuUZmW35rXFBoPjpDMNWUX9OA/n5x+OF4KziKzzrsldlvVL/q2MsiiOSGo3+97dssyoZQG1iyaGDzjULaUKuMIMxrcYI3CJemEJxXs3aTk7CJv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PLxoNuvH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C055DC43394;
+	Tue, 16 Jan 2024 19:53:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705434820;
-	bh=dNcP4OJVsNDmpycZn9j0ikf2VFArhZwzhvoPZmuu0IQ=;
+	s=k20201202; t=1705434828;
+	bh=mcZomUmBofZwrv5P/gxQDWjBxvcbEOUulhgq96eGZ9o=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gENFSvfkaxNh9VWBWBInTFpYNWn5PYIiPmdD4DnvJp/tGUkmZKpu4RmKN3vBvWT12
-	 +hO7tAGB00NEL5//LDItIg1USuH/wpSsf0JmNTELXYGVDqdTul8BUPFWxKEKHMPMD2
-	 a7dZDOWNjTMT7gO1FgW4tVe/QQShmF6CNSy6DWk7vBUfH8DQLdZZdIkhI8aQkR8VNM
-	 nht7HaKiEUJborWpr608YcqH9yJX+iBktF7F1CFOcYPWOH2HLcVXrv4qSH8vOZW607
-	 rNiqutAfDND+aXwjKv9/kjt5Imo31L/0d4rzKUbtCbLeLEf0K2Pag/U5O0TnZOqlDY
-	 iwvR5G1N4AOdA==
+	b=PLxoNuvHFZLVaPYkWHRLGhhPSY8hWPuGBrurANWrqwvLE3j6FHi511G7yFnZhhxwD
+	 J5kSmcFvEnXaNOzhRYEH6Oqe1jEqQrGQ3t8mRJI2+SjaX2sJ28TyaAdDrVGGA04Kg5
+	 6zh65AsQrltRVXZqe4RB5Wppb/UhSFcNPDWtx3oU7+IXAi8aXvGjmJSnTcLOn+XdRs
+	 hP9IW99zrKmCJiW5mboD7H67ldusCKDZtdrEKDTqt/XZ/2sw8IMgWF0ZvlYCQVmOxD
+	 Gv5Zb6kKuE3EUeIbRlLv8q8+/zyCFYwNmRB7H1HKf4MbEOCwRZ4vEwnAnW5DtYzBjL
+	 x0EaLiqF/8i/w==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Benjamin Berg <benjamin.berg@intel.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+Cc: Wen Gu <guwen@linux.alibaba.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	johannes@sipsolutions.net,
-	davem@davemloft.net,
+	jaka@linux.ibm.com,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	linux-wireless@vger.kernel.org,
+	linux-s390@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 092/104] wifi: cfg80211: free beacon_ies when overridden from hidden BSS
-Date: Tue, 16 Jan 2024 14:46:58 -0500
-Message-ID: <20240116194908.253437-92-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 097/104] net/smc: disable SEID on non-s390 archs where virtual ISM may be used
+Date: Tue, 16 Jan 2024 14:47:03 -0500
+Message-ID: <20240116194908.253437-97-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240116194908.253437-1-sashal@kernel.org>
 References: <20240116194908.253437-1-sashal@kernel.org>
@@ -73,42 +72,89 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.12
 Content-Transfer-Encoding: 8bit
 
-From: Benjamin Berg <benjamin.berg@intel.com>
+From: Wen Gu <guwen@linux.alibaba.com>
 
-[ Upstream commit 32af9a9e1069e55bc02741fb00ac9d0ca1a2eaef ]
+[ Upstream commit c6b8b8eb49904018e22e4e4b1fa502e57dc747d9 ]
 
-This is a more of a cosmetic fix. The branch will only be taken if
-proberesp_ies is set, which implies that beacon_ies is not set unless we
-are connected to an AP that just did a channel switch. And, in that case
-we should have found the BSS in the internal storage to begin with.
+The system EID (SEID) is an internal EID used by SMC-D to represent the
+s390 physical machine that OS is executing on. On s390 architecture, it
+predefined by fixed string and part of cpuid and is enabled regardless
+of whether underlay device is virtual ISM or platform firmware ISM.
 
-Signed-off-by: Benjamin Berg <benjamin.berg@intel.com>
-Reviewed-by: Johannes Berg <johannes.berg@intel.com>
-Signed-off-by: Miri Korenblit <miriam.rachel.korenblit@intel.com>
-Link: https://msgid.link/20231220133549.b898e22dadff.Id8c4c10aedd176ef2e18a4cad747b299f150f9df@changeid
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+However on non-s390 architectures where SMC-D can be used with virtual
+ISM devices, there is no similar information to identify physical
+machines, especially in virtualization scenarios. So in such cases, SEID
+is forcibly disabled and the user-defined UEID will be used to represent
+the communicable space.
+
+Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+Reviewed-and-tested-by: Wenjia Zhang <wenjia@linux.ibm.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/wireless/scan.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ net/smc/smc_clc.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/net/wireless/scan.c b/net/wireless/scan.c
-index e4cc6209c7b9..8ea7a8b4d64b 100644
---- a/net/wireless/scan.c
-+++ b/net/wireless/scan.c
-@@ -1829,8 +1829,12 @@ __cfg80211_bss_update(struct cfg80211_registered_device *rdev,
- 				list_add(&new->hidden_list,
- 					 &hidden->hidden_list);
- 				hidden->refcount++;
-+
-+				ies = (void *)rcu_dereference(new->pub.beacon_ies);
- 				rcu_assign_pointer(new->pub.beacon_ies,
- 						   hidden->pub.beacon_ies);
-+				if (ies)
-+					kfree_rcu(ies, rcu_head);
- 			}
- 		} else {
- 			/*
+diff --git a/net/smc/smc_clc.c b/net/smc/smc_clc.c
+index 72f4d81a3f41..1489a8421d78 100644
+--- a/net/smc/smc_clc.c
++++ b/net/smc/smc_clc.c
+@@ -155,10 +155,12 @@ static int smc_clc_ueid_remove(char *ueid)
+ 			rc = 0;
+ 		}
+ 	}
++#if IS_ENABLED(CONFIG_S390)
+ 	if (!rc && !smc_clc_eid_table.ueid_cnt) {
+ 		smc_clc_eid_table.seid_enabled = 1;
+ 		rc = -EAGAIN;	/* indicate success and enabling of seid */
+ 	}
++#endif
+ 	write_unlock(&smc_clc_eid_table.lock);
+ 	return rc;
+ }
+@@ -273,22 +275,30 @@ int smc_nl_dump_seid(struct sk_buff *skb, struct netlink_callback *cb)
+ 
+ int smc_nl_enable_seid(struct sk_buff *skb, struct genl_info *info)
+ {
++#if IS_ENABLED(CONFIG_S390)
+ 	write_lock(&smc_clc_eid_table.lock);
+ 	smc_clc_eid_table.seid_enabled = 1;
+ 	write_unlock(&smc_clc_eid_table.lock);
+ 	return 0;
++#else
++	return -EOPNOTSUPP;
++#endif
+ }
+ 
+ int smc_nl_disable_seid(struct sk_buff *skb, struct genl_info *info)
+ {
+ 	int rc = 0;
+ 
++#if IS_ENABLED(CONFIG_S390)
+ 	write_lock(&smc_clc_eid_table.lock);
+ 	if (!smc_clc_eid_table.ueid_cnt)
+ 		rc = -ENOENT;
+ 	else
+ 		smc_clc_eid_table.seid_enabled = 0;
+ 	write_unlock(&smc_clc_eid_table.lock);
++#else
++	rc = -EOPNOTSUPP;
++#endif
+ 	return rc;
+ }
+ 
+@@ -1269,7 +1279,11 @@ void __init smc_clc_init(void)
+ 	INIT_LIST_HEAD(&smc_clc_eid_table.list);
+ 	rwlock_init(&smc_clc_eid_table.lock);
+ 	smc_clc_eid_table.ueid_cnt = 0;
++#if IS_ENABLED(CONFIG_S390)
+ 	smc_clc_eid_table.seid_enabled = 1;
++#else
++	smc_clc_eid_table.seid_enabled = 0;
++#endif
+ }
+ 
+ void smc_clc_exit(void)
 -- 
 2.43.0
 
