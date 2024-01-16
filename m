@@ -1,84 +1,79 @@
-Return-Path: <netdev+bounces-63698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EED5182EED9
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 13:22:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B506C82EEE8
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 13:26:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6266DB2291B
-	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 12:22:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8DD11C23368
+	for <lists+netdev@lfdr.de>; Tue, 16 Jan 2024 12:26:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 601FE1BC21;
-	Tue, 16 Jan 2024 12:22:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C8591BC2E;
+	Tue, 16 Jan 2024 12:26:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZG0DKIKU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fsWoV3Xa"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D592F1B97B
-	for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 12:22:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BD501B972
+	for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 12:26:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1705407751;
+	s=mimecast20190719; t=1705407997;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=aKkRlw+9qItJOdXpLdHpbQMWwrj04Yup3l2felUeUNk=;
-	b=ZG0DKIKUH52YwqnwpSmS14jnz3DLagEExAW0RsQ1U0u0qwf/H1Cka3rpcw4y5nCWWYAc3Q
-	p3KNPd+55EvrWcux/+60C+/MzXH2lq97WBtVKdo3keegtPRv+NHe+wpgf7+mLLcOQxaUmO
-	rkNiq2njRCDDGM3I60sEgKDh/oeLKsM=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=OARinRv8ZpM6G4J/Z9xB9OYJrYpe6kWstyNE/wplyAg=;
+	b=fsWoV3Xaa49J4e2GzMR/zlF7yMZ2yCQB4aWKHY6hZjErbcrcaru5qSYYqvtPcK7Migwu0z
+	EsGk4W2pju0sAWxcHAcT8X6mSbGpPO1+hZNZiV0CY1LiOo8husx4nPA22+UamslMVUm49T
+	VwLGsBWWoFT0FU07XS8s2LlMVE8dB5Q=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-158-ko8r7j2kO9Oyrx_YdvoP_g-1; Tue, 16 Jan 2024 07:22:30 -0500
-X-MC-Unique: ko8r7j2kO9Oyrx_YdvoP_g-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-33686327968so1282016f8f.1
-        for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 04:22:30 -0800 (PST)
+ us-mta-50-G6sWGTA-PTC1NCo5i3jG2w-1; Tue, 16 Jan 2024 07:26:36 -0500
+X-MC-Unique: G6sWGTA-PTC1NCo5i3jG2w-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-40e703adab9so3622525e9.1
+        for <netdev@vger.kernel.org>; Tue, 16 Jan 2024 04:26:35 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705407749; x=1706012549;
+        d=1e100.net; s=20230601; t=1705407995; x=1706012795;
         h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:to:from:subject:message-id
+         :references:in-reply-to:date:cc:to:from:subject:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aKkRlw+9qItJOdXpLdHpbQMWwrj04Yup3l2felUeUNk=;
-        b=u/3C7iCwGn48eEPxqj4A/hZwf80orwvKklxPTZn+aCpvZZL/OpgwAkmJKpi4Z9d49u
-         5JcFeEn/W7JJuzZtdGsV7HIVEhMeJ0CE9FXH1DPHTaErFWhv4W0zyPu/3laAKsOxnPpr
-         5zuwcRbSFTreSY0dsm1AoS9EiRisATqzY6CdpNYLukzp1Uq3aDZD9yMuyph4dDt7fJJl
-         1NQwyGtpl7Qzl0pz9LEBQ03qdMH8P/IxlOjsMktdRB5jEC+x41HGAMG7d5Dk100MiTum
-         DW2se11OAoAN81ASl/fYIiuGZRljxbyIPrXq/8pfGBaKJM0FerUipwLbkZdLwXNT7Afp
-         IRIg==
-X-Gm-Message-State: AOJu0YxGUFrzluPOft9dF3ivNvzkon53IL/AcaHlMZAwYuFPrh0wrHmI
-	ucbfJAEUUTJ9J+laK5ewWNiqJA6hRVHHfen+/p399ygRuHa3cWs9c/iHaUz1wZy3vVQnxvksgdv
-	MlOJnYVWhxsRQkDyDowS0JB7d
-X-Received: by 2002:a05:6000:923:b0:337:2a0b:a7f3 with SMTP id cx3-20020a056000092300b003372a0ba7f3mr8374807wrb.2.1705407749133;
-        Tue, 16 Jan 2024 04:22:29 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHd84/6POBkg40gVazCg+aIvqbtGccXWaCSo4YRcVhkOits6w9IubBrdoqZfFW8xNwdG2wL7g==
-X-Received: by 2002:a05:6000:923:b0:337:2a0b:a7f3 with SMTP id cx3-20020a056000092300b003372a0ba7f3mr8374798wrb.2.1705407748759;
-        Tue, 16 Jan 2024 04:22:28 -0800 (PST)
+        bh=OARinRv8ZpM6G4J/Z9xB9OYJrYpe6kWstyNE/wplyAg=;
+        b=abpqmx68YW7laeGVAPG54jrs4hUhZ2eYe1POZEiqXmFS4O9wSNj9ei5slSW08o42Ov
+         6YeLBVJ0KxJZ7LkKsDC+GvZpT55/s7u6Oe/GaPlKRKUsswuZVEJxTeuB+OoRSFtbtLwP
+         Bt73umxN2DsLZDrnXw6+UV17S9rgh4hkqNsimr1hBsKmF4DIz6vdFGSy860477Od6PhP
+         leTgNrxLZv+u4bsMZh1gtSIe1XO+4i5KS5JQeNlJKFMFmIGsMbzdiY4srfTsRxwNnT/7
+         L1oDSQ7vOoZYbVzmZti0Uo3YsmBuLUqAcMfOkdNsFFiyCIft9SLFWoVojZ0LpuG//RaK
+         JHfQ==
+X-Gm-Message-State: AOJu0YxIt0OTfx3E+5fDRyrBSAnJGAlD/7B2BzS8HZYNMCyDMieDIvP7
+	rAlJmrz/ytrJYfAHnLN4u1Ghsqo32TJgWTUSislAO9a9bo+bjgqe7F0dDPC0dQ5tDKQsIKPE4aW
+	zoFyS79oJb2cQ9pHqQasGwm9L
+X-Received: by 2002:a05:600c:3b0e:b0:40e:4912:1df3 with SMTP id m14-20020a05600c3b0e00b0040e49121df3mr8660442wms.3.1705407995067;
+        Tue, 16 Jan 2024 04:26:35 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF+Hw9DHn1/zo1SI4UlKH8mB0IQB7tG/sBeun5sUfQLQ4szXyMTL/YwQIegW7YLC8zSk2sucA==
+X-Received: by 2002:a05:600c:3b0e:b0:40e:4912:1df3 with SMTP id m14-20020a05600c3b0e00b0040e49121df3mr8660432wms.3.1705407994739;
+        Tue, 16 Jan 2024 04:26:34 -0800 (PST)
 Received: from gerbillo.redhat.com (146-241-241-126.dyn.eolo.it. [146.241.241.126])
-        by smtp.gmail.com with ESMTPSA id q20-20020a05600c46d400b0040e395cd20bsm22981924wmo.7.2024.01.16.04.22.27
+        by smtp.gmail.com with ESMTPSA id g7-20020a7bc4c7000000b0040d5c58c41dsm18670059wmk.24.2024.01.16.04.26.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jan 2024 04:22:28 -0800 (PST)
-Message-ID: <f5ddf800df95cdce32637d41bc1539aed0a7b6f3.camel@redhat.com>
-Subject: Re: [PATCH v2] net: stmmac: Wait a bit for the reset to take effect
+        Tue, 16 Jan 2024 04:26:34 -0800 (PST)
+Message-ID: <4cefad9649becf08ecdf4639ceb3244a1860ee12.camel@redhat.com>
+Subject: Re: [PATCH net-next v8 1/2] ptp: introduce PTP_CLOCK_EXTOFF event
+ for the measured external offset
 From: Paolo Abeni <pabeni@redhat.com>
-To: Bernd Edlinger <bernd.edlinger@hotmail.de>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>,  Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, Jiri Pirko <jiri@nvidia.com>, Andrew Morton
- <akpm@linux-foundation.org>
-Date: Tue, 16 Jan 2024 13:22:26 +0100
-In-Reply-To: <AS8P193MB1285EEAFE30C0DE7B201D33CE46C2@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
+To: Min Li <lnimi@hotmail.com>, richardcochran@gmail.com, lee@kernel.org
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Min Li
+	 <min.li.xe@renesas.com>
+Date: Tue, 16 Jan 2024 13:26:33 +0100
+In-Reply-To: <PH7PR03MB706459AD0927264AA9590626A06C2@PH7PR03MB7064.namprd03.prod.outlook.com>
 References: 
-	<AS8P193MB1285DECD77863E02EF45828BE4A1A@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
-	 <AS8P193MB1285EEAFE30C0DE7B201D33CE46C2@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
+	<PH7PR03MB706459AD0927264AA9590626A06C2@PH7PR03MB7064.namprd03.prod.outlook.com>
 Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
@@ -93,58 +88,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-On Mon, 2024-01-15 at 20:21 +0100, Bernd Edlinger wrote:
-> otherwise the synopsys_id value may be read out wrong,
-> because the GMAC_VERSION register might still be in reset
-> state, for at least 1 us after the reset is de-asserted.
+On Mon, 2024-01-15 at 15:21 -0500, Min Li wrote:
+> From: Min Li <min.li.xe@renesas.com>
 >=20
-> Add a wait for 10 us before continuing to be on the safe side.
+> This change is for the PHC devices that can measure the phase offset
+> between PHC signal and the external signal, such as the 1PPS signal of
+> GNSS. Reporting PTP_CLOCK_EXTOFF to user space will be piggy-backed to
+> the existing ptp_extts_event so that application such as ts2phc can
+> poll the external offset the same way as extts. Hence, ts2phc can use
+> the offset to achieve the alignment between PHC and the external signal
+> by the help of either SW or HW filters.
 >=20
-> > From what have you got that delay value?
->=20
-> Just try and error, with very old linux versions and old gcc versions
-> the synopsys_id was read out correctly most of the time (but not always),
-> with recent linux versions and recnet gcc versions it was read out
-> wrongly most of the time, but again not always.
-> I don't have access to the VHDL code in question, so I cannot
-> tell why it takes so long to get the correct values, I also do not
-> have more than a few hardware samples, so I cannot tell how long
-> this timeout must be in worst case.
-> Experimentally I can tell that the register is read several times
-> as zero immediately after the reset is de-asserted, also adding several
-> no-ops is not enough, adding a printk is enough, also udelay(1) seems to
-> be enough but I tried that not very often, and I have not access to many
-> hardware samples to be 100% sure about the necessary delay.
-> And since the udelay here is only executed once per device instance,
-> it seems acceptable to delay the boot for 10 us.
->=20
-> BTW: my hardware's synopsys id is 0x37.
->=20
-> Signed-off-by: Bernd Edlinger <bernd.edlinger@hotmail.de>
->=20
-> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+> Signed-off-by: Min Li <min.li.xe@renesas.com>
+> Acked-by: Richard Cochran <richardcochran@gmail.com>
 
-Please have a better look at the process documentation.
+## Form letter - net-next-closed
 
-No empty lines are allowed in the tag area.
+The merge window for v6.8 has begun and we have already posted our pull
+request. Therefore net-next is closed for new drivers, features, code
+refactoring and optimizations. We are currently accepting bug fixes
+only.
 
-A fixes tag is requires, something alike:
+Please repost when net-next reopens after January 22nd.
 
-Fixes: <blamed commit hash> ("<blamed commit title>")
+RFC patches sent for review only are obviously welcome at any time.
 
-A bisection is not strictly required, you just need to be reasonably
-confident about the the culprit.
-
-You need to include the relevant target tree into the subj prefix (in
-this case 'net').
-
-Please include in the recipients list the persons that provided
-feedback on previous release (Serge is missing).
-
-I'm unsure why/how Andrew landed in the recipients list!?!
-
-Cheers,
-
-Paolo
+See:
+https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#develop=
+ment-cycle
+--
+pw-bot: defer
 
 
