@@ -1,201 +1,201 @@
-Return-Path: <netdev+bounces-63953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E3B18304C7
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 12:53:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B01C8304DE
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 13:03:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 943361C213AA
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 11:53:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 74B091F24F41
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 12:03:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B01B51DFCA;
-	Wed, 17 Jan 2024 11:53:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 169CD1DFCF;
+	Wed, 17 Jan 2024 12:03:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="CQnGMhrf"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2064.outbound.protection.outlook.com [40.107.20.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EAB71DFC8
-	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 11:52:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705492383; cv=none; b=e2gWJUGSHmhGw6EbZ8xXeYSu+ESxSeXfTzSGuhltqyRyyiAQoqUl4l9eBvvi4nt9ppJYXQ2NpnejxrJNtFkK/QN9sHywq2U7o2T3GvTkQTE7M73T4E0STigEaACUd5hecd4YmaCiCWiySHoawdFtCB1K2egK6KfpAz8HZ62NhV4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705492383; c=relaxed/simple;
-	bh=9dlU2yvjrOhkBQJnrZhu8gPJGuUtV1z75kJ8q8dI6xU=;
-	h=Received:Received:Received:Message-ID:Date:MIME-Version:
-	 User-Agent:Subject:To:CC:References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:X-Originating-IP:X-ClientProxiedBy; b=UAqGIoXbqPsyZTShjs2ZrmZ5A9toy0RNVraiMwKMPM/cJ6mjr1CHKatiA0PWRsa7xGHlkReruFPfUsgEe/9n3nUtTRsKxcU3uvF7u78FZrXQuDbIJ+wzCXI0TlvP4zhTM+7seAG/lr/LLCZXDR/iw34yVbytK5Z39TOo1DlKZyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4TFPP65VmGzWmcd;
-	Wed, 17 Jan 2024 19:51:54 +0800 (CST)
-Received: from dggpeml500026.china.huawei.com (unknown [7.185.36.106])
-	by mail.maildlp.com (Postfix) with ESMTPS id 9C60F1800BF;
-	Wed, 17 Jan 2024 19:52:56 +0800 (CST)
-Received: from [10.174.178.66] (10.174.178.66) by
- dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 17 Jan 2024 19:52:56 +0800
-Message-ID: <a4a29064-e0f5-69b8-b690-911d155fec86@huawei.com>
-Date: Wed, 17 Jan 2024 19:52:55 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D2741DFC8;
+	Wed, 17 Jan 2024 12:03:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.64
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705493012; cv=fail; b=Y72/9hOT3MrlDKPHhA88XQqswxZToRiyToMXKLZ4AtZBSfAu2h2LHLQBNZtFbAVq3/IM0w547vqzRTGYvq+yqrBKY1FbI5Df9LBXmt7VriuLy4PVTWbTaWQksctoGYFPtgjaIdzIWw6ZPS5UdpUv2SA8IboVJ5c9STkciN1mF+0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705493012; c=relaxed/simple;
+	bh=hnbQpFysn4Yku2xcjGs7E/r9j6QrAl4CEsCWG13KSpk=;
+	h=ARC-Message-Signature:ARC-Authentication-Results:DKIM-Signature:
+	 Received:Received:X-MS-Exchange-Authentication-Results:
+	 Received-SPF:Received:Received:Received:Received:Received:From:
+	 Date:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	 Message-ID:X-B4-Tracking:To:CC:X-Mailer:X-EOPAttributedMessage:
+	 X-MS-PublicTrafficType:X-MS-TrafficTypeDiagnostic:
+	 X-MS-Office365-Filtering-Correlation-Id:
+	 X-MS-Exchange-SenderADCheck:X-MS-Exchange-AntiSpam-Relay:
+	 X-Microsoft-Antispam:X-Microsoft-Antispam-Message-Info:
+	 X-Forefront-Antispam-Report:X-OriginatorOrg:
+	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
+	 X-MS-Exchange-CrossTenant-Network-Message-Id:
+	 X-MS-Exchange-CrossTenant-Id:
+	 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp:
+	 X-MS-Exchange-CrossTenant-AuthSource:
+	 X-MS-Exchange-CrossTenant-AuthAs:
+	 X-MS-Exchange-CrossTenant-FromEntityHeader:
+	 X-MS-Exchange-Transport-CrossTenantHeadersStamped; b=Q/zZW3w458gToZZ7pcAL9AEyR58KexihWbG4eOqnWy1GI4DA1IiQ1Z3WBGijVTQznApt7oZZgqjfV+b8llWlDvZ5UgcInfcCZNJtB3ym1k/58hBNJG/AhVKwq3J40+tZpBx6gRhjsiN64st8CpKyJNyWqzkY6p05Ly5Sn3ASq3c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=axis.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=CQnGMhrf; arc=fail smtp.client-ip=40.107.20.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=axis.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Q0Xd+BmOUfgBuSHWsqBkpG0QPxUOLMLGlS8KqYMiCBkil9j4wZ6iJr9bC71yGCgKoYDflUlwTQCzZu3fEU774d8ydAOK0vyggu59qKRMmHLZL4WrVU0pKqQKuvRHZD+qpdX9KKMbDlKYVwKLtzxkhPTiXfqFQulQuMphK2ee8cUPITMIotnGYJFp4KJP7FKqKcGgpY0Sb9boIweVrwxCZYOBNpUHngUyKvEkedZVJTHim9zNDSxZRuVmIyf93nplTG2CLQhZuAjhlvwQttSEa7WetCVeZwu7MXTEJZwd+uZIYfiVJeuBI/y3FZUULYqYSlmXwl+M+mKWtctnpJV3nw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0TlkXZOeV/7BChg+MIZ3Sw1YERTLBQiWXUotyxy4Av0=;
+ b=DQX5aKhWMlviWuN9vl6qdwzL6hXYR04wS0pAUWLakoYD+F7/h8wcee3eRZZGFncxGtG64QxzH6o//A151+gIGV51oMHjrtozfC6siekalzKbklO5eYfq/V23o9dDwngdI3crO8M1d6avwAwYIn3cHkpXbhj4j7FuO78zBSnz4l81cm8lv/hGG2m7d8qTb8L9+u9FB7PPO42G5IPesNpWPKqZhxabzyEbwpE00sGYHNDHi3EIvUeZ7XmCzr35BsDPm97tMQ3xC6MHdE2M7XSECrlGiA737um+z+m+EMojkPHm+e6lin00lCiVjnKes83enxC/np7CfGyGYrHtKsJAeg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
+ 195.60.68.100) smtp.rcpttodomain=davemloft.net smtp.mailfrom=axis.com;
+ dmarc=fail (p=none sp=none pct=100) action=none header.from=axis.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=axis.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0TlkXZOeV/7BChg+MIZ3Sw1YERTLBQiWXUotyxy4Av0=;
+ b=CQnGMhrfmLXDqQ8RMblAaRgfNQxQzipusvF/LCEQ5SIuqubg3h65ZC6NenSzrH91k+QdUdDNczHkROQhkzQGjRSYlTg1221whxc+RH7b7f5MBx22/RqXl+Lhd2MSGLk12EW1yeisjSYCd/T+peLqQlOPbDFuU1pxqmGu4OjywiI=
+Received: from AS9PR04CA0125.eurprd04.prod.outlook.com (2603:10a6:20b:531::16)
+ by DB4PR02MB9600.eurprd02.prod.outlook.com (2603:10a6:10:3f0::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.23; Wed, 17 Jan
+ 2024 12:03:26 +0000
+Received: from AMS0EPF0000019D.eurprd05.prod.outlook.com
+ (2603:10a6:20b:531:cafe::50) by AS9PR04CA0125.outlook.office365.com
+ (2603:10a6:20b:531::16) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.23 via Frontend
+ Transport; Wed, 17 Jan 2024 12:03:26 +0000
+X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 195.60.68.100)
+ smtp.mailfrom=axis.com; dkim=none (message not signed)
+ header.d=none;dmarc=fail action=none header.from=axis.com;
+Received-SPF: Fail (protection.outlook.com: domain of axis.com does not
+ designate 195.60.68.100 as permitted sender) receiver=protection.outlook.com;
+ client-ip=195.60.68.100; helo=mail.axis.com;
+Received: from mail.axis.com (195.60.68.100) by
+ AMS0EPF0000019D.mail.protection.outlook.com (10.167.16.249) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7202.16 via Frontend Transport; Wed, 17 Jan 2024 12:03:25 +0000
+Received: from se-mail01w.axis.com (10.20.40.7) by se-mail01w.axis.com
+ (10.20.40.7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Wed, 17 Jan
+ 2024 13:03:25 +0100
+Received: from se-intmail01x.se.axis.com (10.0.5.60) by se-mail01w.axis.com
+ (10.20.40.7) with Microsoft SMTP Server id 15.1.2375.34 via Frontend
+ Transport; Wed, 17 Jan 2024 13:03:25 +0100
+Received: from pc44637-2125.se.axis.com (pc44637-2125.se.axis.com [10.92.125.2])
+	by se-intmail01x.se.axis.com (Postfix) with ESMTP id 7D3B912529;
+	Wed, 17 Jan 2024 13:03:25 +0100 (CET)
+Received: by pc44637-2125.se.axis.com (Postfix, from userid 15765)
+	id 772064128B9B; Wed, 17 Jan 2024 13:03:25 +0100 (CET)
+From: =?utf-8?q?Ludvig_P=C3=A4rsson?= <ludvig.parsson@axis.com>
+Date: Wed, 17 Jan 2024 13:03:14 +0100
+Subject: [PATCH net v2] ethtool: netlink: Add missing
+ ethnl_ops_begin/complete
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.0.2
-Subject: Re: [PATCH net,v3] tcp: make sure init the accept_queue's spinlocks
- once
-To: Eric Dumazet <edumazet@google.com>
-CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <dsahern@kernel.org>, <sming56@aliyun.com>,
-	<weiyongjun1@huawei.com>, <yuehaibing@huawei.com>
-References: <20240117063152.1046210-1-shaozhengchao@huawei.com>
- <CANn89iKhWyw9YvS_cgfuym0sK4O-FS2xXyWgU=MjZ0g=wesYjg@mail.gmail.com>
-From: shaozhengchao <shaozhengchao@huawei.com>
-In-Reply-To: <CANn89iKhWyw9YvS_cgfuym0sK4O-FS2xXyWgU=MjZ0g=wesYjg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml500026.china.huawei.com (7.185.36.106)
+Message-ID: <20240117-etht2-v2-1-1a96b6e8c650@axis.com>
+X-B4-Tracking: v=1; b=H4sIAALCp2UC/12MwQ7CIBAFf6XZsxhAGtCT/2F6gLqVPQgGCKlp+
+ HcJR4/z3mQOyJgIM9ymAxJWyhRDB3maYPU2vJDRszNILhUX3DAsvkgmnVSzQnPRqKG7n4Qb7aP
+ zgIAFlj56yiWm72hXMa6/TBVMMIfWXWc0fNN4tzvl8xrfsLTWfutZgjeeAAAA
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<kernel@axis.com>, =?utf-8?q?Ludvig_P=C3=A4rsson?= <ludvig.parsson@axis.com>
+X-Mailer: b4 0.12.4
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AMS0EPF0000019D:EE_|DB4PR02MB9600:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7f93a61d-c7fb-4bfd-8118-08dc17544f91
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	4poczvKIBYzggpEHRkgt/WLSlYVBVeJQQmHWfEEjEwrMF/mXFeWLKZX+j9uwEe/UJZsbV3YxXa48pQl+QV40g9EMe4C4tDVmXvBY2t6Sht2eFeevoWWZXUvudlRy3KRwHqMobdtBtV2tlCwIFgGOD0aBtyfePucXPC+AzNLUFFXT2V72/1wVUzKvEBxxi4pt/TW60z1D1CSIuOre0o4ucMnUc4e8qyiczgltfTfptXtOwIhzDFRpbMgjIhBfUV8cSMJWg/TiyH3AC22Y3c2xkoP+xvaNXvKlP6egTaCdUAcFJcEaUOz5N/ByR5ojIw/V3zIuFSJgSYVsGuZGj/3874fzC1tDnD5obfFqHYagtCV5xaTJhbJLgawJgF+R69sQLIv3f26etsa0ZdvzmewdS1wTRSA4+btgt30LXSv2zLXiueHNhMaPXZ9FQeHHcsjtX2wmq+Fb43dbPbB3QG9Nlh+r73gThineDgAHEnHyj/gKtfo7SMLnyjSLEk2cjeWzaEHOse6Q8n1kwFifItrZfn4VyJYVlY9Vo/uqFAotwGbtgeKe5jgojyvN8Ybz5aO80KRw6XxsQQRW2UHqFy9+JsAul7MmBQtNilS4i4K3v08pLzBuh2UNrUZ13GFbJw0NEbeIEfvLooGfIhpeZrlbP2VilUjVApUxmf/AOJz5f3V8uf0phwAYlod1aR9tf9V70JMRDwR4RWFArJAX4v4unLfQCPm8ZicMMIv3tt0PyjpptmyaQRzEhTP2WSyHz8Jw7K24nM3AFJj0UsM4HBPrzQ==
+X-Forefront-Antispam-Report:
+	CIP:195.60.68.100;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.axis.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(346002)(396003)(136003)(376002)(39860400002)(230922051799003)(64100799003)(186009)(1800799012)(451199024)(82310400011)(36840700001)(40470700004)(46966006)(8676002)(4326008)(8936002)(2906002)(5660300002)(6666004)(316002)(42186006)(54906003)(70586007)(70206006)(966005)(478600001)(41300700001)(36860700001)(47076005)(86362001)(356005)(82740400003)(110136005)(81166007)(40480700001)(40460700003)(66574015)(107886003)(26005)(2616005)(426003)(336012)(6266002)(36756003)(83380400001)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: axis.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jan 2024 12:03:25.9082
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7f93a61d-c7fb-4bfd-8118-08dc17544f91
+X-MS-Exchange-CrossTenant-Id: 78703d3c-b907-432f-b066-88f7af9ca3af
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=78703d3c-b907-432f-b066-88f7af9ca3af;Ip=[195.60.68.100];Helo=[mail.axis.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	AMS0EPF0000019D.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB4PR02MB9600
 
+Accessing an ethernet device that is powered off or clock gated might
+cause the CPU to hang. Add ethnl_ops_begin/complete in
+ethnl_set_features() to protect against this.
 
+Fixes: 0980bfcd6954 ("ethtool: set netdev features with FEATURES_SET request")
+Signed-off-by: Ludvig Pärsson <ludvig.parsson@axis.com>
+---
+Changes in v2:
+- Add Fixes tag.
+- Link to v1: https://lore.kernel.org/r/20240108-etht2-v1-1-beab95e80f7e@axis.com
+---
+ net/ethtool/features.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-On 2024/1/17 19:28, Eric Dumazet wrote:
-> On Wed, Jan 17, 2024 at 7:22 AM Zhengchao Shao <shaozhengchao@huawei.com> wrote:
->>
->> When I run syz's reproduction C program locally, it causes the following
->> </TASK>
->>
->> The issue triggering process is analyzed as follows:
->> Thread A                                       Thread B
->> tcp_v4_rcv      //receive ack TCP packet       inet_shutdown
->>    tcp_check_req                                  tcp_disconnect //disconnect sock
->>    ...                                              tcp_set_state(sk, TCP_CLOSE)
->>      inet_csk_complete_hashdance                ...
->>        inet_csk_reqsk_queue_add                 inet_listen  //start listen
->>          spin_lock(&queue->rskq_lock)             inet_csk_listen_start
->>          ...                                        reqsk_queue_alloc
->>          ...                                          spin_lock_init
->>          spin_unlock(&queue->rskq_lock)  //warning
->>
->> When the socket receives the ACK packet during the three-way handshake,
->> it will hold spinlock. And then the user actively shutdowns the socket
->> and listens to the socket immediately, the spinlock will be initialized.
->> When the socket is going to release the spinlock, a warning is generated.
->> Also the same issue to fastopenq.lock.
->>
->> Move init spinlock to inet_create and inet_accept to make sure init the
->> accept_queue's spinlocks once.
->>
->> Fixes: fff1f3001cc5 ("tcp: add a spinlock to protect struct request_sock_queue")
->> Fixes: 168a8f58059a ("tcp: TCP Fast Open Server - main code path")
->> Reported-by: Ming Shu <sming56@aliyun.com>
->> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
->> ---
->> v3: Move init spinlock to inet_create and inet_accept.
->> v2: Add 'init_done' to make sure init the accept_queue's spinlocks once.
->> ---
->>   net/core/request_sock.c         |  3 ---
->>   net/ipv4/af_inet.c              | 11 +++++++++++
->>   net/ipv4/inet_connection_sock.c |  8 ++++++++
->>   3 files changed, 19 insertions(+), 3 deletions(-)
->>
->> diff --git a/net/core/request_sock.c b/net/core/request_sock.c
->> index f35c2e998406..63de5c635842 100644
->> --- a/net/core/request_sock.c
->> +++ b/net/core/request_sock.c
->> @@ -33,9 +33,6 @@
->>
->>   void reqsk_queue_alloc(struct request_sock_queue *queue)
->>   {
->> -       spin_lock_init(&queue->rskq_lock);
->> -
->> -       spin_lock_init(&queue->fastopenq.lock);
->>          queue->fastopenq.rskq_rst_head = NULL;
->>          queue->fastopenq.rskq_rst_tail = NULL;
->>          queue->fastopenq.qlen = 0;
->> diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
->> index 835f4f9d98d2..6589741157a4 100644
->> --- a/net/ipv4/af_inet.c
->> +++ b/net/ipv4/af_inet.c
->> @@ -244,6 +244,14 @@ int inet_listen(struct socket *sock, int backlog)
->>   }
->>   EXPORT_SYMBOL(inet_listen);
->>
->> +static void __inet_init_csk_lock(struct sock *sk)
->> +{
->> +       struct inet_connection_sock *icsk = inet_csk(sk);
->> +
->> +       spin_lock_init(&icsk->icsk_accept_queue.rskq_lock);
->> +       spin_lock_init(&icsk->icsk_accept_queue.fastopenq.lock);
->> +}
-> 
-> This probably could be an inline helper in a suitable include file.
-> No need for __prefix btw.
-> 
-> static void inline inet_init_csk_locks(struct sock *sk)
-> {
->         struct inet_connection_sock *icsk = inet_csk(sk);
-> 
->         spin_lock_init(&icsk->icsk_accept_queue.rskq_lock);
->         spin_lock_init(&icsk->icsk_accept_queue.fastopenq.lock);
-> }
-> 
-> 
->> +
->>   /*
->>    *     Create an inet socket.
->>    */
->> @@ -330,6 +338,9 @@ static int inet_create(struct net *net, struct socket *sock, int protocol,
->>          if (INET_PROTOSW_REUSE & answer_flags)
->>                  sk->sk_reuse = SK_CAN_REUSE;
->>
->> +       if (INET_PROTOSW_ICSK & answer_flags)
->> +               __inet_init_csk_lock(sk);
->> +
->>          inet = inet_sk(sk);
->>          inet_assign_bit(IS_ICSK, sk, INET_PROTOSW_ICSK & answer_flags);
->>
->> diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
->> index 8e2eb1793685..5d3277ab9954 100644
->> --- a/net/ipv4/inet_connection_sock.c
->> +++ b/net/ipv4/inet_connection_sock.c
->> @@ -655,6 +655,7 @@ struct sock *inet_csk_accept(struct sock *sk, int flags, int *err, bool kern)
->>   {
->>          struct inet_connection_sock *icsk = inet_csk(sk);
->>          struct request_sock_queue *queue = &icsk->icsk_accept_queue;
->> +       struct request_sock_queue *newqueue;
->>          struct request_sock *req;
->>          struct sock *newsk;
->>          int error;
->> @@ -727,6 +728,13 @@ struct sock *inet_csk_accept(struct sock *sk, int flags, int *err, bool kern)
->>          }
->>          if (req)
->>                  reqsk_put(req);
->> +
->> +       if (newsk) {
->> +               newqueue = &inet_csk(newsk)->icsk_accept_queue;
->> +               spin_lock_init(&newqueue->rskq_lock);
->> +               spin_lock_init(&newqueue->fastopenq.lock);
->> +       }
-> 
-> So that we could here use a common helper
-> 
-> if (newsk)
->       inet_init_csk_locks(newsk);
-> 
-> 
-> Thanks, this is looking quite nice.
-> 
-Hi Eric:
-	Thank you for your review. I will send V4 later.
+diff --git a/net/ethtool/features.c b/net/ethtool/features.c
+index a79af8c25a07..b6cb101d7f19 100644
+--- a/net/ethtool/features.c
++++ b/net/ethtool/features.c
+@@ -234,17 +234,20 @@ int ethnl_set_features(struct sk_buff *skb, struct genl_info *info)
+ 	dev = req_info.dev;
+ 
+ 	rtnl_lock();
++	ret = ethnl_ops_begin(dev);
++	if (ret < 0)
++		goto out_rtnl;
+ 	ethnl_features_to_bitmap(old_active, dev->features);
+ 	ethnl_features_to_bitmap(old_wanted, dev->wanted_features);
+ 	ret = ethnl_parse_bitset(req_wanted, req_mask, NETDEV_FEATURE_COUNT,
+ 				 tb[ETHTOOL_A_FEATURES_WANTED],
+ 				 netdev_features_strings, info->extack);
+ 	if (ret < 0)
+-		goto out_rtnl;
++		goto out_ops;
+ 	if (ethnl_bitmap_to_features(req_mask) & ~NETIF_F_ETHTOOL_BITS) {
+ 		GENL_SET_ERR_MSG(info, "attempt to change non-ethtool features");
+ 		ret = -EINVAL;
+-		goto out_rtnl;
++		goto out_ops;
+ 	}
+ 
+ 	/* set req_wanted bits not in req_mask from old_wanted */
+@@ -281,6 +284,8 @@ int ethnl_set_features(struct sk_buff *skb, struct genl_info *info)
+ 	if (mod)
+ 		netdev_features_change(dev);
+ 
++out_ops:
++	ethnl_ops_complete(dev);
+ out_rtnl:
+ 	rtnl_unlock();
+ 	ethnl_parse_header_dev_put(&req_info);
 
-Zhengchao Shao
+---
+base-commit: 0dd3ee31125508cd67f7e7172247f05b7fd1753a
+change-id: 20240108-etht2-2b2454e837e7
+
+Best regards,
+-- 
+Ludvig Pärsson <ludvig.parsson@axis.com>
+
 
