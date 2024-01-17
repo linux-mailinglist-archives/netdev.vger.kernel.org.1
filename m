@@ -1,445 +1,124 @@
-Return-Path: <netdev+bounces-64010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41380830AA8
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 17:13:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85D5D830A64
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 17:08:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A42871F297B8
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 16:13:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A1281C23B4C
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 16:08:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 843A9288DC;
-	Wed, 17 Jan 2024 16:08:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E964B2230A;
+	Wed, 17 Jan 2024 16:08:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="CKTeIh6F"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i0+yau41"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEB5D25558
-	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 16:08:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EA8B22307
+	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 16:08:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705507725; cv=none; b=bzp69CijkbKw88yfPRewYvXH62XEWxpz02noWTcf5incqe9HA274qEu/KDS5iD/xHAFCdn/B9YZVW6pmTJCOv6TOB4mcFjpDzcAx9IpXVRayDq/3SQL3d7gGZ4i/6hqW9P+RTGV1QRRFjHxInldD/MtEAg4HfBRw0oNru5jJR2Q=
+	t=1705507708; cv=none; b=t5NWGI10aMNflmiG456cPBHPtmyLcsp/z0DxbPYaBA2yDciE1/szMSStqOLjmf4YZyw6WsXOLCLeJGkbLwIp8H05olmG4VhKZsv9VGpPki2pazjqOygeIt1McZkfUJd+uJFh3WeFhunq2MVoU8SPUNI6QB6Bn4C70QoWXZaQhHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705507725; c=relaxed/simple;
-	bh=WFyrJs1id+9YZIOtZ6FpABayALnwskaiuM+TVLg1sSM=;
+	s=arc-20240116; t=1705507708; c=relaxed/simple;
+	bh=H6F34XKiq3lLfPvqxg6QnsQlOx+GScvSZqxl2/wrgLw=;
 	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:From:
-	 To:Cc:Subject:Date:Message-Id:X-Mailer:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding; b=W0ByVB9jbMidiSs7oOsyJFZqkaldKS9rc8MImeYMLBf/9H54ROpsNPugjZ7MgX+gWThrJ2LICJa2BAqbM+3mhVmmlbvygEhlxxyTAIulHExfsAeqLMbQJ96w7O3XuXCxCdyrMfkwhaLkyc/NiNHumzg4g7ohIUbN57m1R89LLuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=CKTeIh6F; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-336c5b5c163so6704611f8f.1
-        for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 08:08:42 -0800 (PST)
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:MIME-Version:
+	 References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:
+	 Content-Type:Content-Transfer-Encoding; b=FB9hPPGHK31uiCzdhLw7Tu+kJ+ymlqKVL7iEY/2beMQQO8RZH0XyH07gqV7FUF2WNyDrdEFn71jJS8Mn0D+7QkqbA3+ej6Wxt1Wi2BICaCkY7hpUQcCBqPn3px23syN407qZTHG1D82b8OchA+Mpbkk97PD17CvIVGD0v8ivJ/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i0+yau41; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-55818b7053eso16408a12.0
+        for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 08:08:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1705507721; x=1706112521; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1705507705; x=1706112505; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=csdPOquKgbyta51Uec8uuMPVMGRbxtZFd+25sTlPk8k=;
-        b=CKTeIh6FgfS8dDceOOxEBjqu3PRAv17lJIOP54BEuwvcxXccpqnOLWxOdzt+YDtDG8
-         wWuTkW1p5J/6jBLzu3E2d1gvi2+C1RwvW/DPuCOW/9gUGW1Wyvz3gJ8N+o3x1yV5OCjf
-         jRUcdN4kfjKmjFz+l+B80tyaLZ4A4rVOy2o35bDf0udWi1E5GAa6ePzCNwI0IIDxdlyJ
-         4V2Wf0+mH5BWdGsyDnHKFalAGUWCh0Xr9km5ZzV64RP6uwr4kmpB0ORuSRmrW+MEYzLn
-         feTz4qru4FCDL5M9Em21tWR+fPqH6J7pmHvwQiHbz2GHR4rD6qEWg4+lBlhPhoZ+ILEl
-         PpuQ==
+        bh=9gVsnehQLkD3XfpuYGLfg/mVGzgx+4d4kVL88pDZKO8=;
+        b=i0+yau41+mbU2kcA5muH70nQo4Lnr3KeL+qLwgKRhMxny1ucBVI+IYcD+iz6yUVtlA
+         r53MkzKjXTH9oVxgfevwcq52x3/DUTdmv2ZvxePC3hPvvf7nhiHI6y+vj4VHVn35J7P5
+         cNybkeoKB1DrLZEP4LhJogk3r59+BZP+oAXketEzaQ0QE1XRZnz78d00WBIkQo2AZleo
+         DvZmJDKAYBiOoHncMb61xYm1UXKegDVhKrH8jLalHc/cxFnuvTETj4A90Xk8ustLsyVk
+         IB+nWA75kunvsIiOLaWADe3Ej/yLFzGmwuYxmZ/8F78KH1ldLc701WwwAQbblm2yo9I3
+         Ch5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705507721; x=1706112521;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1705507705; x=1706112505;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=csdPOquKgbyta51Uec8uuMPVMGRbxtZFd+25sTlPk8k=;
-        b=rM7p8A5uQrz2gJ4SCxRrvmenHTAEiQFfCv81fxKA+T8ylNgB8Na30VYSKajwUa4AWp
-         qB7ngyrSFvBAWsui+8nekugKn0mxiYNpBdVLl3VvMHqJhJaBs1SG+g3qNry4LzONqHWN
-         WI1lMDEvlQNBvqVaeVPk5LCh6THtW3NPD5lKt1RgW3ErZjlm3CeH/1ujYdqE4zeEtrmH
-         1NXPz1L3hEiZetGfVLqhKEOVdMWs4p/mrtmqytjs5aNpQqkKadZn0KUNyzeIjTmIF/yw
-         OhwIfbvgCO6cvvJk6YGRRcLg5qHVOnea3aX8EhG36K3ocpObBkZHHcTX7rL56zTVNkCP
-         0+/w==
-X-Gm-Message-State: AOJu0YyjXfpIQNWNFsLAf9NRN2BmJW/K+9yNpu/kgLtkGsStkvOQM3dJ
-	MbB9QmTbeRwWkFdxlmsalAlwTjzpmfdd18dfBxYy3pgCkkOp6BQuy1wf0ZZhcUc=
-X-Google-Smtp-Source: AGHT+IE8hEEtpTYbJU01ZoUcCZSKPg5Q30PyVE7OMBk7WjjvUlXJokzoqSuozUEKiQC6pE+bjmyMZA==
-X-Received: by 2002:adf:ab09:0:b0:337:7b7a:6540 with SMTP id q9-20020adfab09000000b003377b7a6540mr591631wrc.5.1705507721046;
-        Wed, 17 Jan 2024 08:08:41 -0800 (PST)
-Received: from brgl-uxlite.home ([2a01:cb1d:334:ac00:d0b5:43ec:48:baad])
-        by smtp.gmail.com with ESMTPSA id t10-20020a5d6a4a000000b00337b0374a3dsm1972092wrw.57.2024.01.17.08.08.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Jan 2024 08:08:40 -0800 (PST)
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-To: Kalle Valo <kvalo@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Chris Morgan <macromorgan@hotmail.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	=?UTF-8?q?N=C3=ADcolas=20F=20=2E=20R=20=2E=20A=20=2E=20Prado?= <nfraprado@collabora.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Peng Fan <peng.fan@nxp.com>,
-	Robert Richter <rrichter@amd.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Terry Bowman <terry.bowman@amd.com>,
-	Lukas Wunner <lukas@wunner.de>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Alex Elder <elder@linaro.org>,
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Abel Vesa <abel.vesa@linaro.org>
-Cc: linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-pci@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: [PATCH 9/9] PCI/pwrseq: add a pwrseq driver for QCA6390
-Date: Wed, 17 Jan 2024 17:07:48 +0100
-Message-Id: <20240117160748.37682-10-brgl@bgdev.pl>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240117160748.37682-1-brgl@bgdev.pl>
-References: <20240117160748.37682-1-brgl@bgdev.pl>
+        bh=9gVsnehQLkD3XfpuYGLfg/mVGzgx+4d4kVL88pDZKO8=;
+        b=pGaj+X8vP1bQOGTakfm4ttpZVhymWGvLh90ihWJXOu2mmyUEgAgBb5ep8k5lDeK+1q
+         OacESJiYzjfnVV7lhfieOge/Xm5CRA1CC++ygiafP9VzxolFu1lg3uCMg36ZwXyijwOH
+         iC9CnxU5JR14yBMjYIgVelXVsgxkSAP3WZLRMRZgUJppG2Dc0E5BgaYhFq8qasNJmLdJ
+         1Gz7t7aWzc58TQJ+lxWC/MOuxEo9gUw42KkmvjZNhy6E5ufcchCVobFb4VFoyzvXF4s5
+         ZjrNx5kUqBgdlW9rQqgNKFlM3dnfnyCNFrslO8UnMdPhfuXdOR2/14MAk6gDVzM38i6k
+         7hYQ==
+X-Gm-Message-State: AOJu0YwiGC5ojDGNjPk5ERzpTPzPwxnzA8M+LWscPunxYZBR3aZGKBsz
+	aSvpNn2cK33zuu1e53BTVntG3kc26OPjjTAa/rzo5RRKBPYWvlVTBHxIamEBFinB1oc/WGz1daL
+	WQNF1DOScwa9pKodX5uwqfvlJ0FWr6f6YcVDp
+X-Google-Smtp-Source: AGHT+IGefZFkdb+yUuXFJw40KsJN6J5lh2G3F74Tw88Y/QrsC2fSpvReuos/PQMsWgAB8l0jtdPITqSKn/v0k/hdP9o=
+X-Received: by 2002:a05:6402:3551:b0:557:15d:b784 with SMTP id
+ f17-20020a056402355100b00557015db784mr219578edd.2.1705507705227; Wed, 17 Jan
+ 2024 08:08:25 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240117160030.140264-1-pablo@netfilter.org> <20240117160030.140264-15-pablo@netfilter.org>
+In-Reply-To: <20240117160030.140264-15-pablo@netfilter.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 17 Jan 2024 17:08:11 +0100
+Message-ID: <CANn89i+jS11sC6cXXFA+_ZVr9Oy6Hn1e3_5P_d4kSR2fWtisBA@mail.gmail.com>
+Subject: Re: [PATCH net 14/14] netfilter: ipset: fix performance regression in
+ swap operation
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net, 
+	netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com, fw@strlen.de
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+On Wed, Jan 17, 2024 at 5:00=E2=80=AFPM Pablo Neira Ayuso <pablo@netfilter.=
+org> wrote:
+>
+> From: Jozsef Kadlecsik <kadlec@netfilter.org>
+>
+> The patch "netfilter: ipset: fix race condition between swap/destroy
+> and kernel side add/del/test", commit 28628fa9 fixes a race condition.
+> But the synchronize_rcu() added to the swap function unnecessarily slows
+> it down: it can safely be moved to destroy and use call_rcu() instead.
+> Thus we can get back the same performance and preventing the race conditi=
+on
+> at the same time.
 
-Add a PCI power sequencing driver that's capable of correctly powering
-up the ath11k module on QCA6390 and WCN7850 using the PCI pwrseq
-functionality.
+...
 
-Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-[Neil: add support for WCN7850]
-Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
----
- drivers/pci/pwrseq/Kconfig              |   8 +
- drivers/pci/pwrseq/Makefile             |   1 +
- drivers/pci/pwrseq/pci-pwrseq-qca6390.c | 267 ++++++++++++++++++++++++
- 3 files changed, 276 insertions(+)
- create mode 100644 drivers/pci/pwrseq/pci-pwrseq-qca6390.c
+>
+> @@ -2357,6 +2369,9 @@ ip_set_net_exit(struct net *net)
+>
+>         inst->is_deleted =3D true; /* flag for ip_set_nfnl_put */
+>
+> +       /* Wait for call_rcu() in destroy */
+> +       rcu_barrier();
+> +
+>         nfnl_lock(NFNL_SUBSYS_IPSET);
+>         for (i =3D 0; i < inst->ip_set_max; i++) {
+>                 set =3D ip_set(inst, i);
+> --
+> 2.30.2
+>
 
-diff --git a/drivers/pci/pwrseq/Kconfig b/drivers/pci/pwrseq/Kconfig
-index a721a8a955c3..667c9c121f34 100644
---- a/drivers/pci/pwrseq/Kconfig
-+++ b/drivers/pci/pwrseq/Kconfig
-@@ -5,4 +5,12 @@ menu "PCI Power sequencing drivers"
- config PCI_PWRSEQ
- 	bool
- 
-+config PCI_PWRSEQ_QCA6390
-+	tristate "PCI Power Sequencing driver for QCA6390"
-+	select PCI_PWRSEQ
-+	default (ATH11K_PCI && ARCH_QCOM)
-+	help
-+	  Enable support for the PCI power sequencing driver for the
-+	  ath11k module of the QCA6390 WLAN/BT chip.
-+
- endmenu
-diff --git a/drivers/pci/pwrseq/Makefile b/drivers/pci/pwrseq/Makefile
-index 4052b6bb5aa5..5cf8cce01e82 100644
---- a/drivers/pci/pwrseq/Makefile
-+++ b/drivers/pci/pwrseq/Makefile
-@@ -1,3 +1,4 @@
- # SPDX-License-Identifier: GPL-2.0
- 
- obj-$(CONFIG_PCI_PWRSEQ)		+= pwrseq.o
-+obj-$(CONFIG_PCI_PWRSEQ_QCA6390)	+= pci-pwrseq-qca6390.o
-diff --git a/drivers/pci/pwrseq/pci-pwrseq-qca6390.c b/drivers/pci/pwrseq/pci-pwrseq-qca6390.c
-new file mode 100644
-index 000000000000..cdf3639ea29f
---- /dev/null
-+++ b/drivers/pci/pwrseq/pci-pwrseq-qca6390.c
-@@ -0,0 +1,267 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * Copyright (C) 2023 Linaro Ltd.
-+ */
-+
-+#include <linux/bitmap.h>
-+#include <linux/clk.h>
-+#include <linux/gpio/consumer.h>
-+#include <linux/delay.h>
-+#include <linux/device.h>
-+#include <linux/mod_devicetable.h>
-+#include <linux/module.h>
-+#include <linux/of.h>
-+#include <linux/pci-pwrseq.h>
-+#include <linux/platform_device.h>
-+#include <linux/regulator/consumer.h>
-+#include <linux/slab.h>
-+#include <linux/types.h>
-+
-+struct pci_pwrseq_qca6390_vreg {
-+	const char *name;
-+	unsigned int load_uA;
-+};
-+
-+struct pci_pwrseq_qca6390_pdata {
-+	struct pci_pwrseq_qca6390_vreg *vregs;
-+	size_t num_vregs;
-+	unsigned int delay_msec;
-+};
-+
-+struct pci_pwrseq_qca6390_ctx {
-+	struct pci_pwrseq pwrseq;
-+	const struct pci_pwrseq_qca6390_pdata *pdata;
-+	struct regulator_bulk_data *regs;
-+	struct gpio_descs *en_gpios;
-+	unsigned long *en_gpios_values;
-+	struct clk *clk;
-+};
-+
-+static struct pci_pwrseq_qca6390_vreg pci_pwrseq_qca6390_vregs[] = {
-+	{
-+		.name = "vddio",
-+		.load_uA = 20000,
-+	},
-+	{
-+		.name = "vddaon",
-+		.load_uA = 100000,
-+	},
-+	{
-+		.name = "vddpmu",
-+		.load_uA = 1250000,
-+	},
-+	{
-+		.name = "vddpcie1",
-+		.load_uA = 35000,
-+	},
-+	{
-+		.name = "vddpcie2",
-+		.load_uA = 15000,
-+	},
-+	{
-+		.name = "vddrfa1",
-+		.load_uA = 200000,
-+	},
-+	{
-+		.name = "vddrfa2",
-+		.load_uA = 400000,
-+	},
-+	{
-+		.name = "vddrfa3",
-+		.load_uA = 400000,
-+	},
-+};
-+
-+static struct pci_pwrseq_qca6390_pdata pci_pwrseq_qca6390_of_data = {
-+	.vregs = pci_pwrseq_qca6390_vregs,
-+	.num_vregs = ARRAY_SIZE(pci_pwrseq_qca6390_vregs),
-+	.delay_msec = 16,
-+};
-+
-+static struct pci_pwrseq_qca6390_vreg pci_pwrseq_wcn7850_vregs[] = {
-+	{
-+		.name = "vdd",
-+	},
-+	{
-+		.name = "vddio",
-+	},
-+	{
-+		.name = "vddio12",
-+	},
-+	{
-+		.name = "vddaon",
-+	},
-+	{
-+		.name = "vdddig",
-+	},
-+	{
-+		.name = "vddrfa1",
-+	},
-+	{
-+		.name = "vddrfa2",
-+	},
-+};
-+
-+static struct pci_pwrseq_qca6390_pdata pci_pwrseq_wcn7850_of_data = {
-+	.vregs = pci_pwrseq_wcn7850_vregs,
-+	.num_vregs = ARRAY_SIZE(pci_pwrseq_wcn7850_vregs),
-+	.delay_msec = 50,
-+};
-+
-+static int pci_pwrseq_qca6390_power_on(struct pci_pwrseq_qca6390_ctx *ctx)
-+{
-+	int ret;
-+
-+	ret = regulator_bulk_enable(ctx->pdata->num_vregs, ctx->regs);
-+	if (ret)
-+		return ret;
-+
-+	ret = clk_prepare_enable(ctx->clk);
-+	if (ret)
-+		return ret;
-+
-+	bitmap_fill(ctx->en_gpios_values, ctx->en_gpios->ndescs);
-+
-+	ret = gpiod_set_array_value_cansleep(ctx->en_gpios->ndescs,
-+					     ctx->en_gpios->desc,
-+					     ctx->en_gpios->info,
-+					     ctx->en_gpios_values);
-+	if (ret) {
-+		regulator_bulk_disable(ctx->pdata->num_vregs, ctx->regs);
-+		return ret;
-+	}
-+
-+	if (ctx->pdata->delay_msec)
-+		msleep(ctx->pdata->delay_msec);
-+
-+	return 0;
-+}
-+
-+static int pci_pwrseq_qca6390_power_off(struct pci_pwrseq_qca6390_ctx *ctx)
-+{
-+	int ret;
-+
-+	bitmap_zero(ctx->en_gpios_values, ctx->en_gpios->ndescs);
-+
-+	ret = gpiod_set_array_value_cansleep(ctx->en_gpios->ndescs,
-+					     ctx->en_gpios->desc,
-+					     ctx->en_gpios->info,
-+					     ctx->en_gpios_values);
-+	if (ret)
-+		return ret;
-+
-+	clk_disable_unprepare(ctx->clk);
-+
-+	return regulator_bulk_disable(ctx->pdata->num_vregs, ctx->regs);
-+}
-+
-+static void devm_pci_pwrseq_qca6390_power_off(void *data)
-+{
-+	struct pci_pwrseq_qca6390_ctx *ctx = data;
-+
-+	pci_pwrseq_qca6390_power_off(ctx);
-+}
-+
-+static int pci_pwrseq_qca6390_probe(struct platform_device *pdev)
-+{
-+	struct pci_pwrseq_qca6390_ctx *ctx;
-+	struct device *dev = &pdev->dev;
-+	int ret, i;
-+
-+	ctx = devm_kzalloc(dev, sizeof(*ctx), GFP_KERNEL);
-+	if (!ctx)
-+		return -ENOMEM;
-+
-+	ctx->pdata = of_device_get_match_data(dev);
-+	if (!ctx->pdata)
-+		return dev_err_probe(dev, -ENODEV,
-+				     "Failed to obtain platform data\n");
-+
-+	if (ctx->pdata->vregs) {
-+		ctx->regs = devm_kcalloc(dev, ctx->pdata->num_vregs,
-+					 sizeof(*ctx->regs), GFP_KERNEL);
-+		if (!ctx->regs)
-+			return -ENOMEM;
-+
-+		for (i = 0; i < ctx->pdata->num_vregs; i++)
-+			ctx->regs[i].supply = ctx->pdata->vregs[i].name;
-+
-+		ret = devm_regulator_bulk_get(dev, ctx->pdata->num_vregs,
-+					      ctx->regs);
-+		if (ret < 0)
-+			return dev_err_probe(dev, ret,
-+					     "Failed to get all regulators\n");
-+
-+		for (i = 0; i < ctx->pdata->num_vregs; i++) {
-+			if (!ctx->pdata->vregs[1].load_uA)
-+				continue;
-+
-+			ret = regulator_set_load(ctx->regs[i].consumer,
-+						 ctx->pdata->vregs[i].load_uA);
-+			if (ret)
-+				return dev_err_probe(dev, ret,
-+						     "Failed to set vreg load\n");
-+		}
-+	}
-+
-+	ctx->clk = devm_clk_get_optional(dev, NULL);
-+	if (IS_ERR(ctx->clk))
-+		return dev_err_probe(dev, PTR_ERR(ctx->clk),
-+				     "Failed to get clock\n");
-+
-+	ctx->en_gpios = devm_gpiod_get_array_optional(dev, "enable",
-+						      GPIOD_OUT_LOW);
-+	if (IS_ERR(ctx->en_gpios))
-+		return dev_err_probe(dev, PTR_ERR(ctx->en_gpios),
-+				     "Failed to get enable GPIOs\n");
-+
-+	ctx->en_gpios_values = devm_bitmap_zalloc(dev, ctx->en_gpios->ndescs,
-+						  GFP_KERNEL);
-+	if (!ctx->en_gpios_values)
-+		return -ENOMEM;
-+
-+	ret = pci_pwrseq_qca6390_power_on(ctx);
-+	if (ret)
-+		return dev_err_probe(dev, ret,
-+				     "Failed to power on the device\n");
-+
-+	ret = devm_add_action_or_reset(dev, devm_pci_pwrseq_qca6390_power_off,
-+				       ctx);
-+	if (ret)
-+		return ret;
-+
-+	ctx->pwrseq.dev = dev;
-+
-+	ret = devm_pci_pwrseq_device_enable(dev, &ctx->pwrseq);
-+	if (ret)
-+		return dev_err_probe(dev, ret,
-+				     "Failed to register the pwrseq wrapper\n");
-+
-+	return 0;
-+}
-+
-+static const struct of_device_id pci_pwrseq_qca6390_of_match[] = {
-+	{
-+		.compatible = "pci17cb,1101",
-+		.data = &pci_pwrseq_qca6390_of_data,
-+	},
-+	{
-+		.compatible = "pci17cb,1107",
-+		.data = &pci_pwrseq_wcn7850_of_data,
-+	},
-+	{ }
-+};
-+MODULE_DEVICE_TABLE(of, pci_pwrseq_qca6390_of_match);
-+
-+static struct platform_driver pci_pwrseq_qca6390_driver = {
-+	.driver = {
-+		.name = "pci-pwrseq-qca6390",
-+		.of_match_table = pci_pwrseq_qca6390_of_match,
-+	},
-+	.probe = pci_pwrseq_qca6390_probe,
-+};
-+module_platform_driver(pci_pwrseq_qca6390_driver);
-+
-+MODULE_AUTHOR("Bartosz Golaszewski <bartosz.golaszewski@linaro.org>");
-+MODULE_DESCRIPTION("PCI Power Sequencing module for QCA6390");
-+MODULE_LICENSE("GPL");
--- 
-2.40.1
+If I am reading this right, time for netns dismantles will increase,
+even for netns not using ipset
 
+If there is no other option, please convert "struct pernet_operations
+ip_set_net_ops".exit to an exit_batch() handler,
+to at least have a factorized  rcu_barrier();
 
