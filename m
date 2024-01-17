@@ -1,187 +1,113 @@
-Return-Path: <netdev+bounces-63979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD17A8309B1
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 16:26:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B32568309DC
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 16:38:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40F88286E54
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 15:26:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B5CE2865D4
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 15:38:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7EFF219F7;
-	Wed, 17 Jan 2024 15:26:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="aXHsUFqu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 976F821A02;
+	Wed, 17 Jan 2024 15:38:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65C68219F1;
-	Wed, 17 Jan 2024 15:26:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+Received: from sgoci-sdnproxy-4.icoremail.net (sgoci-sdnproxy-4.icoremail.net [129.150.39.64])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36C7D21379;
+	Wed, 17 Jan 2024 15:38:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.150.39.64
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705505199; cv=none; b=dcGezV75UKZVOndlE/gdUJ/zu0Eg1RNEyue+j/0yK0rOQ/wQvRWHDnBaDW3ho4ndn7rx1gVlZb5HSkyGSsIdH81lrPhfEuwioiKyMi96VSfSfk/fbOUl6CttXciDODMOg5tXeBhgBijQa74LvZDWQkQJ/yPeUb59l/82LCv20wg=
+	t=1705505908; cv=none; b=hXmDIgtSZOUMomCAdM09adKj6khfDcaukTCKC8QMPw5u6YMJGjexTMfbzY51EnhVqqGftgLA5MrEklPUX8BnSYpYs4Y6AwMirv0mZy3az/m1ix8AwXoMAMd2IXiwO59aemHk1/ptJGuFl+e7eJmgkBBe795m3jRYcqc7mg4iybY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705505199; c=relaxed/simple;
-	bh=xAKMrhuiOukQEKS5pJ7/xw71Z9SHcT0YAv7W09qM11Q=;
-	h=Received:DKIM-Signature:Received:Received:Received:Message-ID:
-	 Date:MIME-Version:User-Agent:From:Subject:To:CC:References:
-	 Content-Language:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:X-Originating-IP:X-ClientProxiedBy:
-	 X-QCInternal:X-Proofpoint-Virus-Version:X-Proofpoint-GUID:
-	 X-Proofpoint-ORIG-GUID:X-Proofpoint-Virus-Version:
-	 X-Proofpoint-Spam-Details; b=AQO4cTMKOBalrqL6jWvR5MGTlT51kmciqevtUEbgdZEH4gPZ8h+hrL3mTkjlyHbdAWH28JyEqLE/iKlq0bvmcaSMiA+OT6/ocTZA3eBEyFFCqRGBwUlSvEASxvdjajAkCYPB/RvYq/Cu5nlT81sXx3Yqtos2ZyAVD9qB7raKp9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=aXHsUFqu; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40H8m6Yw010290;
-	Wed, 17 Jan 2024 15:25:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:from:subject:to:cc:references
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=lqcZoRCRAGlCFSFZQ18HYf55C6lUN1QWW7BD4CzZ8SA=; b=aX
-	HsUFquQ7zWim5EAjjnief79OxjVFjrnAbErXMVPMst4Vspq7dZVjFvi3ny7HvNRL
-	YS1dIviKZqwzNGI7bUM+QkR3QVGDBSz673dJMP4ojMhXyudDy6hzMexflckWA7Ab
-	laOnAzB1WFbOg26vG29g13O5cRmAh4Lta4tuxcMouACqQJ1bLbKaVxCgrFV5cHqh
-	je6NDNBfVDwaeb01k5XhGzsfWwEoLfVMuZUlBAxo+MAJPTcMl3F9jfK1IZQOb3XA
-	aG4nZiQ6l2RJ8wWk+Bm2FA9iiY02ymvMBJF29of78DsHM/eyF7r8Izv58PK1xk2N
-	vGgr5MawQGDkGAKO4K4A==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3vp6qxhdeg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 17 Jan 2024 15:25:53 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 40HFPqss004679
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 17 Jan 2024 15:25:52 GMT
-Received: from [10.253.79.191] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Wed, 17 Jan
- 2024 07:25:41 -0800
-Message-ID: <a7356a9b-fc55-4efc-9266-0cef21730d97@quicinc.com>
-Date: Wed, 17 Jan 2024 23:25:38 +0800
+	s=arc-20240116; t=1705505908; c=relaxed/simple;
+	bh=QlbmZ4ud6YNtdBK9dZFHWL3ew6WArzBT1tdPfKW9s+U=;
+	h=Received:From:To:Subject:Date:Message-Id:X-Mailer:X-CM-TRANSID:
+	 X-Coremail-Antispam:X-CM-SenderInfo; b=duOyIQSR3n/b1OJeTFU982N247KDNVFhTQKfAENHOwjOfYtqwXYgBWBdcQD60aCBRYu86gky+XaqL52L6czA+87sveNHpN4FK9sgQ0sb808a4peczUDm0koZ+RcncTm5QD5OKjoP1WQf+d/AE1WYiYEbtTaUGHULOXJMrbieXx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=129.150.39.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from localhost.localdomain (unknown [36.24.98.148])
+	by mail-app2 (Coremail) with SMTP id by_KCgDHdqVi9Kdlv61AAA--.11252S4;
+	Wed, 17 Jan 2024 23:38:10 +0800 (CST)
+From: Lin Ma <linma@zju.edu.cn>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linma@zju.edu.cn,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v1] vlan: skip nested type that is not IFLA_VLAN_QOS_MAPPING
+Date: Wed, 17 Jan 2024 23:38:10 +0800
+Message-Id: <20240117153810.1197794-1-linma@zju.edu.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:by_KCgDHdqVi9Kdlv61AAA--.11252S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7Kr47ZrWrZF17Kw1xtF43Jrb_yoW8AFW8pF
+	y5GFy7GwsrJF9agFWIqF48XayxZFnrJr18uF1rKa1Fkrn8Kr9rtFWUGFnF9r17ZFZ5Aa43
+	tF1avF4j934DWrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvv14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_
+	JF0_Jw1lc2xSY4AK67AK6ryrMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r
+	4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF
+	67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2I
+	x0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2
+	z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73Uj
+	IFyTuYvjfU8KZXUUUUU
+X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Jie Luo <quic_luoj@quicinc.com>
-Subject: Re: [PATCH net-next 00/20] net: ethernet: Add qcom PPE driver
-To: Christian Marangi <ansuelsmth@gmail.com>
-CC: Jakub Kicinski <kuba@kernel.org>, <agross@kernel.org>,
-        <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
-        <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
-        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
-        <conor+dt@kernel.org>, <corbet@lwn.net>, <catalin.marinas@arm.com>,
-        <will@kernel.org>, <p.zabel@pengutronix.de>, <linux@armlinux.org.uk>,
-        <shannon.nelson@amd.com>, <anthony.l.nguyen@intel.com>,
-        <jasowang@redhat.com>, <brett.creeley@amd.com>,
-        <rrameshbabu@nvidia.com>, <joshua.a.hay@intel.com>, <arnd@arndb.de>,
-        <geert+renesas@glider.be>, <neil.armstrong@linaro.org>,
-        <dmitry.baryshkov@linaro.org>, <nfraprado@collabora.com>,
-        <m.szyprowski@samsung.com>, <u-kumar1@ti.com>,
-        <jacob.e.keller@intel.com>, <andrew@lunn.ch>, <netdev@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <ryazanov.s.a@gmail.com>,
-        <quic_kkumarcs@quicinc.com>, <quic_suruchia@quicinc.com>,
-        <quic_soni@quicinc.com>, <quic_pavir@quicinc.com>,
-        <quic_souravp@quicinc.com>, <quic_linchen@quicinc.com>,
-        <quic_leiwei@quicinc.com>
-References: <20240110114033.32575-1-quic_luoj@quicinc.com>
- <20240110142428.52026d9e@kernel.org>
- <5ec26378-a5ff-4de3-b69e-806e36907db6@quicinc.com>
- <65a17d68.050a0220.cf6ea.e78b@mx.google.com>
-Content-Language: en-US
-In-Reply-To: <65a17d68.050a0220.cf6ea.e78b@mx.google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: 2qgt36U1wFrD4gIUJ3HcrKsz2ZtWJbOK
-X-Proofpoint-ORIG-GUID: 2qgt36U1wFrD4gIUJ3HcrKsz2ZtWJbOK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-17_09,2024-01-17_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxscore=0
- malwarescore=0 lowpriorityscore=0 priorityscore=1501 mlxlogscore=715
- adultscore=0 impostorscore=0 suspectscore=0 phishscore=0 bulkscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2311290000 definitions=main-2401170111
 
+In the vlan_changelink function, a loop is used to parse the nested
+attributes IFLA_VLAN_EGRESS_QOS and IFLA_VLAN_INGRESS_QOS in order to
+obtain the struct ifla_vlan_qos_mapping. These two nested attributes are
+checked in the vlan_validate_qos_map function, which calls
+nla_validate_nested_deprecated with the vlan_map_policy.
 
+However, this deprecated validator applies a LIBERAL strictness, allowing
+the presence of an attribute with the type IFLA_VLAN_QOS_UNSPEC.
+Consequently, the loop in vlan_changelink may parse an attribute of type
+IFLA_VLAN_QOS_UNSPEC and believe it carries a payload of
+struct ifla_vlan_qos_mapping, which is not necessarily true.
 
-On 1/13/2024 1:56 AM, Christian Marangi wrote:
-> On Thu, Jan 11, 2024 at 11:49:53PM +0800, Jie Luo wrote:
->>
->>
->> On 1/11/2024 6:24 AM, Jakub Kicinski wrote:
->>> On Wed, 10 Jan 2024 19:40:12 +0800 Luo Jie wrote:
->>>> The PPE(packet process engine) hardware block is available in Qualcomm
->>>> IPQ chipsets that support PPE architecture, such as IPQ9574 and IPQ5332.
->>>
->>> What's the relationship between this driver and QCA8084?
->>
->> The PPE (packet processing engine) is the network processing hardware block
->> in QCOM IPQ SoC. It includes the ethernet MAC and UNIPHY(PCS). This driver
->> is the base PPE driver which brings up the PPE and handles MAC/UNIPHY
->> operations. QCA8084 is the external 2.5Gbps 4-port PHY device, which can be
->> connected with PPE integrated MAC by UNIPHY(PCS).
->>
->> Here is the relationship.
->> PPE integrated MAC --- PPE integrated UNIPHY(PCS) --- (PCS)QCA8084.
->>
->>>
->>> In the last month I see separate changes from you for mdio-ipq4019.c,
->>> phy/at803x.c and now this driver (none of which got merged, AFAICT.)
->>> Are you actually the author of this code, or are you just trying
->>> to upstream bunch of vendor code?
->>
->> Yes, Jakub, there are two authors in these patch series, Lei Wei and me.
->> The patches are already ready for some time, the code has been verified
->> on the Qualcomm reference design board. These are not downstream drivers
->> but drivers re-written for upstream.
->>
->>>
->>> Now you're dumping another 10kLoC on the list, and even though this is
->>> hardly your first posting you're apparently not aware of our most basic
->>> posting rules:
->>> https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#tl-dr
->>>
->>> The reviewers are getting frustrated. Please, help us help you.
->>> Stop throwing code at the list and work out a plan with Andrew
->>> and others on how to get something merged...
->>
->> Sorry for trouble caused, will learn about the guidance provided by
->> the review comments, and follow up on the guidance and have the full
->> internal review of the patch updates before pushing the patch series.
-> 
-> I renew my will of helping in any kind of manner in this, I love the
-> intention for EDMAv2 to have an upstream driver instead of SSDK, hoping
-> in the future to also have the same treatement for EDMAv1 (it's really a
-> pitty to have a support hole with ipq807x not supported)
-> 
-> Feel free to send an email or anything, considering this is massive, an
-> extra eye before sending might make things better than reaching (I can
-> already see this) a massive series with at least 20 revision given the
-> complexity of this thing.
-> 
+To address this issue and ensure compatibility, this patch introduces two
+type checks that skip attributes whose type is not IFLA_VLAN_QOS_MAPPING.
 
-Thanks Christian for the help. Yes, the EDMAV2 driver will be posted 
-some time after net-next is reopen and after this PPE driver patch 
-series resumes. The EDMAv2 driver will be posted as separate driver 
-series, which depends on this PPE driver. Currently we plan to post the 
-EDMAv2 driver support for IPQ5332 and IPQ9574 firstly. For IPQ807x, it 
-is a driver for an older architecture as you can see, but we will 
-consider this for the future.
+Signed-off-by: Lin Ma <linma@zju.edu.cn>
+---
+ net/8021q/vlan_netlink.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-We will certainly review it internally before publishing it later for 
-upstream review.
+diff --git a/net/8021q/vlan_netlink.c b/net/8021q/vlan_netlink.c
+index 214532173536..a3b68243fd4b 100644
+--- a/net/8021q/vlan_netlink.c
++++ b/net/8021q/vlan_netlink.c
+@@ -118,12 +118,16 @@ static int vlan_changelink(struct net_device *dev, struct nlattr *tb[],
+ 	}
+ 	if (data[IFLA_VLAN_INGRESS_QOS]) {
+ 		nla_for_each_nested(attr, data[IFLA_VLAN_INGRESS_QOS], rem) {
++			if (nla_type(attr) != IFLA_VLAN_QOS_MAPPING)
++				continue;
+ 			m = nla_data(attr);
+ 			vlan_dev_set_ingress_priority(dev, m->to, m->from);
+ 		}
+ 	}
+ 	if (data[IFLA_VLAN_EGRESS_QOS]) {
+ 		nla_for_each_nested(attr, data[IFLA_VLAN_EGRESS_QOS], rem) {
++			if (nla_type(attr) != IFLA_VLAN_QOS_MAPPING)
++				continue;
+ 			m = nla_data(attr);
+ 			err = vlan_dev_set_egress_priority(dev, m->from, m->to);
+ 			if (err)
+-- 
+2.17.1
+
 
