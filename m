@@ -1,53 +1,51 @@
-Return-Path: <netdev+bounces-63902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63904-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCDBF830012
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 07:22:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7741883006A
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 08:19:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A70F28805F
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 06:22:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 887AC1C23011
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 07:19:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 293AA79F4;
-	Wed, 17 Jan 2024 06:22:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29F1D8F59;
+	Wed, 17 Jan 2024 07:19:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC55945A
-	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 06:21:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+Received: from zg8tmtu5ljg5lje1ms4xmtka.icoremail.net (zg8tmtu5ljg5lje1ms4xmtka.icoremail.net [159.89.151.119])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAE46BE4B;
+	Wed, 17 Jan 2024 07:18:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.89.151.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705472524; cv=none; b=e6u1lq5Wg9ucJCtXFEMPFxuwXTPZrCEvrL8Gu8fi8tm6u6kerb34/8Li2Aflnb0nViTCLFxzxfs6JqJX0me6W/6LSD2v6WixRP4NzFgHZZ9fLymgtxZKUCdrMsZgRJpNWZZpG0iRSr5sNbxnGpMowYSxBJ9kJ7R0Czuy84rCEpE=
+	t=1705475943; cv=none; b=d4rdt5YLSSvJmZ5+6wramdRkshhoTra64ge0axC98qoRL+/JKV0emrm/Yjw1kupow1a+t8rq3F6M4FbT29dGPkGTdnAsqG8s0dmnwCzccscUjSt7Az6tyhdBMMnIw0qx50lvYZl9xEd4y0OIA0LCSnKJTLOak5PoapINlnKxZIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705472524; c=relaxed/simple;
-	bh=x8gN/rsJnvCNnGvj/8vGsD0X0JyYfwknu+s0xLy1dCs=;
-	h=Received:Received:Received:From:To:CC:Subject:Date:Message-ID:
-	 X-Mailer:MIME-Version:Content-Transfer-Encoding:Content-Type:
-	 X-Originating-IP:X-ClientProxiedBy; b=tT/LleyocqKv4+ZveNf1NQaWb3tn3YBxJIaLpY7zAO6/5e8xC9obD6zmW2gdDJdKqvJ/iE4yPo74xX8aYI8TPkIFXRdc8Y4X8WFINX2s/4j50xXoFp+bk7l9witKkD7ao6juEYhlHOR8Tp8XgwTyHaWZxsjoIZaIE7IA9zkDUn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4TFG3M24LbzsW9F;
-	Wed, 17 Jan 2024 14:21:03 +0800 (CST)
-Received: from dggpeml500026.china.huawei.com (unknown [7.185.36.106])
-	by mail.maildlp.com (Postfix) with ESMTPS id BAAFE1402E2;
-	Wed, 17 Jan 2024 14:21:56 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
- (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 17 Jan
- 2024 14:21:56 +0800
-From: Zhengchao Shao <shaozhengchao@huawei.com>
-To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <dsahern@kernel.org>
-CC: <sming56@aliyun.com>, <hkchu@google.com>, <weiyongjun1@huawei.com>,
-	<yuehaibing@huawei.com>, <shaozhengchao@huawei.com>
-Subject: [PATCH net,v3] tcp: make sure init the accept_queue's spinlocks once
-Date: Wed, 17 Jan 2024 14:31:52 +0800
-Message-ID: <20240117063152.1046210-1-shaozhengchao@huawei.com>
+	s=arc-20240116; t=1705475943; c=relaxed/simple;
+	bh=hZ88PNWUGoAAdWlQDB8eDVUHlouB8wVqbz1xnNHCSVM=;
+	h=Received:From:To:Cc:Subject:Date:Message-Id:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding:X-CM-TRANSID:X-Coremail-Antispam:
+	 X-CM-SenderInfo; b=AfAPnn+Omft4O8ThcytFcMfwAyN475iG4qH63C5XYPHX7oQXZZeP+/6nQNIT7GCoRS8CT1wTE6Bb2cXwNMKCKWRN7KTxJ/PpI7DBCVrgQz5osNtvoz6DB9AM6XDM8ODQXOe0N38MB/IMwA+4IGWItBjjmI3Xi5a3t15S9i4U/3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=159.89.151.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from luzhipeng.223.5.5.5 (unknown [183.159.170.179])
+	by mail-app2 (Coremail) with SMTP id by_KCgDHCalVf6dl3xE6AA--.28076S2;
+	Wed, 17 Jan 2024 15:18:45 +0800 (CST)
+From: Zhipeng Lu <alexious@zju.edu.cn>
+To: alexious@zju.edu.cn
+Cc: Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maor Gottlieb <maorg@mellanox.com>,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v4] net/mlx5e: fix a double-free in arfs_create_groups
+Date: Wed, 17 Jan 2024 15:17:36 +0800
+Message-Id: <20240117071736.3813981-1-alexious@zju.edu.cn>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -56,175 +54,117 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml500026.china.huawei.com (7.185.36.106)
+X-CM-TRANSID:by_KCgDHCalVf6dl3xE6AA--.28076S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxZrWUGFW5urWDAw4xKrWDCFg_yoW5XF1rpF
+	47JryDtFs5A3WxX39Iy3yvqrn5Cw48Ka1UuFyI934SqrsFyr4kGFyFg345AFWxCFy3A3sF
+	yasYvw1UCFnrCwUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9C14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26rxl
+	6s0DM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+	jxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
+	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
+	n2IY04v7MxkF7I0En4kS14v26r1q6r43MxkIecxEwVAFwVW8CwCF04k20xvY0x0EwIxGrw
+	CFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE
+	14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2
+	IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxK
+	x2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI
+	0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUGFAJUUUUU=
+X-CM-SenderInfo: qrsrjiarszq6lmxovvfxof0/
 
-When I run syz's reproduction C program locally, it causes the following
-issue:
-pvqspinlock: lock 0xffff9d181cd5c660 has corrupted value 0x0!
-WARNING: CPU: 19 PID: 21160 at __pv_queued_spin_unlock_slowpath (kernel/locking/qspinlock_paravirt.h:508)
-Hardware name: Red Hat KVM, BIOS 0.5.1 01/01/2011
-RIP: 0010:__pv_queued_spin_unlock_slowpath (kernel/locking/qspinlock_paravirt.h:508)
-Code: 73 56 3a ff 90 c3 cc cc cc cc 8b 05 bb 1f 48 01 85 c0 74 05 c3 cc cc cc cc 8b 17 48 89 fe 48 c7 c7
-30 20 ce 8f e8 ad 56 42 ff <0f> 0b c3 cc cc cc cc 0f 0b 0f 1f 40 00 90 90 90 90 90 90 90 90 90
-RSP: 0018:ffffa8d200604cb8 EFLAGS: 00010282
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff9d1ef60e0908
-RDX: 00000000ffffffd8 RSI: 0000000000000027 RDI: ffff9d1ef60e0900
-RBP: ffff9d181cd5c280 R08: 0000000000000000 R09: 00000000ffff7fff
-R10: ffffa8d200604b68 R11: ffffffff907dcdc8 R12: 0000000000000000
-R13: ffff9d181cd5c660 R14: ffff9d1813a3f330 R15: 0000000000001000
-FS:  00007fa110184640(0000) GS:ffff9d1ef60c0000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020000000 CR3: 000000011f65e000 CR4: 00000000000006f0
-Call Trace:
-<IRQ>
-  _raw_spin_unlock (kernel/locking/spinlock.c:186)
-  inet_csk_reqsk_queue_add (net/ipv4/inet_connection_sock.c:1321)
-  inet_csk_complete_hashdance (net/ipv4/inet_connection_sock.c:1358)
-  tcp_check_req (net/ipv4/tcp_minisocks.c:868)
-  tcp_v4_rcv (net/ipv4/tcp_ipv4.c:2260)
-  ip_protocol_deliver_rcu (net/ipv4/ip_input.c:205)
-  ip_local_deliver_finish (net/ipv4/ip_input.c:234)
-  __netif_receive_skb_one_core (net/core/dev.c:5529)
-  process_backlog (./include/linux/rcupdate.h:779)
-  __napi_poll (net/core/dev.c:6533)
-  net_rx_action (net/core/dev.c:6604)
-  __do_softirq (./arch/x86/include/asm/jump_label.h:27)
-  do_softirq (kernel/softirq.c:454 kernel/softirq.c:441)
-</IRQ>
-<TASK>
-  __local_bh_enable_ip (kernel/softirq.c:381)
-  __dev_queue_xmit (net/core/dev.c:4374)
-  ip_finish_output2 (./include/net/neighbour.h:540 net/ipv4/ip_output.c:235)
-  __ip_queue_xmit (net/ipv4/ip_output.c:535)
-  __tcp_transmit_skb (net/ipv4/tcp_output.c:1462)
-  tcp_rcv_synsent_state_process (net/ipv4/tcp_input.c:6469)
-  tcp_rcv_state_process (net/ipv4/tcp_input.c:6657)
-  tcp_v4_do_rcv (net/ipv4/tcp_ipv4.c:1929)
-  __release_sock (./include/net/sock.h:1121 net/core/sock.c:2968)
-  release_sock (net/core/sock.c:3536)
-  inet_wait_for_connect (net/ipv4/af_inet.c:609)
-  __inet_stream_connect (net/ipv4/af_inet.c:702)
-  inet_stream_connect (net/ipv4/af_inet.c:748)
-  __sys_connect (./include/linux/file.h:45 net/socket.c:2064)
-  __x64_sys_connect (net/socket.c:2073 net/socket.c:2070 net/socket.c:2070)
-  do_syscall_64 (arch/x86/entry/common.c:51 arch/x86/entry/common.c:82)
-  entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:129)
-  RIP: 0033:0x7fa10ff05a3d
-  Code: 5b 41 5c c3 66 0f 1f 84 00 00 00 00 00 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89
-  c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d ab a3 0e 00 f7 d8 64 89 01 48
-  RSP: 002b:00007fa110183de8 EFLAGS: 00000202 ORIG_RAX: 000000000000002a
-  RAX: ffffffffffffffda RBX: 0000000020000054 RCX: 00007fa10ff05a3d
-  RDX: 000000000000001c RSI: 0000000020000040 RDI: 0000000000000003
-  RBP: 00007fa110183e20 R08: 0000000000000000 R09: 0000000000000000
-  R10: 0000000000000000 R11: 0000000000000202 R12: 00007fa110184640
-  R13: 0000000000000000 R14: 00007fa10fe8b060 R15: 00007fff73e23b20
-</TASK>
+When `in` allocated by kvzalloc fails, arfs_create_groups will free
+ft->g and return an error. However, arfs_create_table, the only caller of
+arfs_create_groups, will hold this error and call to
+mlx5e_destroy_flow_table, in which the ft->g will be freed again.
 
-The issue triggering process is analyzed as follows:
-Thread A                                       Thread B
-tcp_v4_rcv	//receive ack TCP packet       inet_shutdown
-  tcp_check_req                                  tcp_disconnect //disconnect sock
-  ...                                              tcp_set_state(sk, TCP_CLOSE)
-    inet_csk_complete_hashdance                ...
-      inet_csk_reqsk_queue_add                 inet_listen  //start listen
-        spin_lock(&queue->rskq_lock)             inet_csk_listen_start
-        ...                                        reqsk_queue_alloc
-        ...                                          spin_lock_init
-        spin_unlock(&queue->rskq_lock)	//warning
-
-When the socket receives the ACK packet during the three-way handshake,
-it will hold spinlock. And then the user actively shutdowns the socket
-and listens to the socket immediately, the spinlock will be initialized.
-When the socket is going to release the spinlock, a warning is generated.
-Also the same issue to fastopenq.lock.
-
-Move init spinlock to inet_create and inet_accept to make sure init the
-accept_queue's spinlocks once.
-
-Fixes: fff1f3001cc5 ("tcp: add a spinlock to protect struct request_sock_queue")
-Fixes: 168a8f58059a ("tcp: TCP Fast Open Server - main code path")
-Reported-by: Ming Shu <sming56@aliyun.com>
-Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+Fixes: 1cabe6b0965e ("net/mlx5e: Create aRFS flow tables")
+Signed-off-by: Zhipeng Lu <alexious@zju.edu.cn>
 ---
-v3: Move init spinlock to inet_create and inet_accept.
-v2: Add 'init_done' to make sure init the accept_queue's spinlocks once.
----
- net/core/request_sock.c         |  3 ---
- net/ipv4/af_inet.c              | 11 +++++++++++
- net/ipv4/inet_connection_sock.c |  8 ++++++++
- 3 files changed, 19 insertions(+), 3 deletions(-)
+Changelog:
 
-diff --git a/net/core/request_sock.c b/net/core/request_sock.c
-index f35c2e998406..63de5c635842 100644
---- a/net/core/request_sock.c
-+++ b/net/core/request_sock.c
-@@ -33,9 +33,6 @@
+v2: free ft->g just in arfs_create_groups with a unwind ladder.
+v3: split the allocation of ft->g and in. Rename the error label.
+    remove some refector change in v2.
+v4: correct some space issue.
+---
+ .../net/ethernet/mellanox/mlx5/core/en_arfs.c | 26 +++++++++++--------
+ 1 file changed, 15 insertions(+), 11 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_arfs.c b/drivers/net/ethernet/mellanox/mlx5/core/en_arfs.c
+index bb7f86c993e5..e66f486faafe 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_arfs.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_arfs.c
+@@ -254,11 +254,13 @@ static int arfs_create_groups(struct mlx5e_flow_table *ft,
  
- void reqsk_queue_alloc(struct request_sock_queue *queue)
- {
--	spin_lock_init(&queue->rskq_lock);
--
--	spin_lock_init(&queue->fastopenq.lock);
- 	queue->fastopenq.rskq_rst_head = NULL;
- 	queue->fastopenq.rskq_rst_tail = NULL;
- 	queue->fastopenq.qlen = 0;
-diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
-index 835f4f9d98d2..6589741157a4 100644
---- a/net/ipv4/af_inet.c
-+++ b/net/ipv4/af_inet.c
-@@ -244,6 +244,14 @@ int inet_listen(struct socket *sock, int backlog)
- }
- EXPORT_SYMBOL(inet_listen);
- 
-+static void __inet_init_csk_lock(struct sock *sk)
-+{
-+	struct inet_connection_sock *icsk = inet_csk(sk);
+ 	ft->g = kcalloc(MLX5E_ARFS_NUM_GROUPS,
+ 			sizeof(*ft->g), GFP_KERNEL);
+-	in = kvzalloc(inlen, GFP_KERNEL);
+-	if  (!in || !ft->g) {
+-		kfree(ft->g);
+-		kvfree(in);
++	if (!ft->g)
+ 		return -ENOMEM;
 +
-+	spin_lock_init(&icsk->icsk_accept_queue.rskq_lock);
-+	spin_lock_init(&icsk->icsk_accept_queue.fastopenq.lock);
-+}
-+
- /*
-  *	Create an inet socket.
-  */
-@@ -330,6 +338,9 @@ static int inet_create(struct net *net, struct socket *sock, int protocol,
- 	if (INET_PROTOSW_REUSE & answer_flags)
- 		sk->sk_reuse = SK_CAN_REUSE;
- 
-+	if (INET_PROTOSW_ICSK & answer_flags)
-+		__inet_init_csk_lock(sk);
-+
- 	inet = inet_sk(sk);
- 	inet_assign_bit(IS_ICSK, sk, INET_PROTOSW_ICSK & answer_flags);
- 
-diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
-index 8e2eb1793685..5d3277ab9954 100644
---- a/net/ipv4/inet_connection_sock.c
-+++ b/net/ipv4/inet_connection_sock.c
-@@ -655,6 +655,7 @@ struct sock *inet_csk_accept(struct sock *sk, int flags, int *err, bool kern)
- {
- 	struct inet_connection_sock *icsk = inet_csk(sk);
- 	struct request_sock_queue *queue = &icsk->icsk_accept_queue;
-+	struct request_sock_queue *newqueue;
- 	struct request_sock *req;
- 	struct sock *newsk;
- 	int error;
-@@ -727,6 +728,13 @@ struct sock *inet_csk_accept(struct sock *sk, int flags, int *err, bool kern)
++	in = kvzalloc(inlen, GFP_KERNEL);
++	if (!in) {
++		err = -ENOMEM;
++		goto err_free_g;
  	}
- 	if (req)
- 		reqsk_put(req);
-+
-+	if (newsk) {
-+		newqueue = &inet_csk(newsk)->icsk_accept_queue;
-+		spin_lock_init(&newqueue->rskq_lock);
-+		spin_lock_init(&newqueue->fastopenq.lock);
-+	}
-+
- 	return newsk;
- out_err:
- 	newsk = NULL;
+ 
+ 	mc = MLX5_ADDR_OF(create_flow_group_in, in, match_criteria);
+@@ -278,7 +280,7 @@ static int arfs_create_groups(struct mlx5e_flow_table *ft,
+ 		break;
+ 	default:
+ 		err = -EINVAL;
+-		goto out;
++		goto err_free_in;
+ 	}
+ 
+ 	switch (type) {
+@@ -300,7 +302,7 @@ static int arfs_create_groups(struct mlx5e_flow_table *ft,
+ 		break;
+ 	default:
+ 		err = -EINVAL;
+-		goto out;
++		goto err_free_in;
+ 	}
+ 
+ 	MLX5_SET_CFG(in, match_criteria_enable, MLX5_MATCH_OUTER_HEADERS);
+@@ -309,7 +311,7 @@ static int arfs_create_groups(struct mlx5e_flow_table *ft,
+ 	MLX5_SET_CFG(in, end_flow_index, ix - 1);
+ 	ft->g[ft->num_groups] = mlx5_create_flow_group(ft->t, in);
+ 	if (IS_ERR(ft->g[ft->num_groups]))
+-		goto err;
++		goto err_clean_group;
+ 	ft->num_groups++;
+ 
+ 	memset(in, 0, inlen);
+@@ -318,18 +320,20 @@ static int arfs_create_groups(struct mlx5e_flow_table *ft,
+ 	MLX5_SET_CFG(in, end_flow_index, ix - 1);
+ 	ft->g[ft->num_groups] = mlx5_create_flow_group(ft->t, in);
+ 	if (IS_ERR(ft->g[ft->num_groups]))
+-		goto err;
++		goto err_clean_group;
+ 	ft->num_groups++;
+ 
+ 	kvfree(in);
+ 	return 0;
+ 
+-err:
++err_clean_group:
+ 	err = PTR_ERR(ft->g[ft->num_groups]);
+ 	ft->g[ft->num_groups] = NULL;
+-out:
++err_free_in:
+ 	kvfree(in);
+-
++err_free_g:
++	kfree(ft->g);
++	ft->g = NULL;
+ 	return err;
+ }
+ 
 -- 
 2.34.1
 
