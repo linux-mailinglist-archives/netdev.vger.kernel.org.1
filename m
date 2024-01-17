@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-63881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6FCF82FE8A
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 02:50:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3912982FE8B
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 02:50:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C9651F2486D
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 01:50:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FEBA1C243CB
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 01:50:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 060F6138C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4283B17E9;
 	Wed, 17 Jan 2024 01:50:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DhbSBOPe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fe+J+1fQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC1D1385;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18F42138E;
 	Wed, 17 Jan 2024 01:50:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705456226; cv=none; b=nGY3oyaz7T/P9jVZTcfCcqdudvKCZ/XPfkxqab3LAO2i+WFF5cMvGPwihMIlnimXc9P6bdEW3oDAqJxvUYA/OIrIep0b5IfTiUJoVV9vrsDQKS8HUQX6YL1ZhfDfbuvolwpY/t3Wt4fSdb86rsOhubdac57klRMMLJxfXg5NX+U=
+	t=1705456227; cv=none; b=PQfka2S+m+3bNWuC6qaZWMUhB7nsaPFYXAZMwS5sBtkuJfNr+e0R3QrxkWsVHlq9Cko6auk/6HPsS6C7e64GNMtWbl3ITdm2cu7C2L66Yo5VGD6+m8jwz38/hW3ONgza1BnlOBull0ujN3n14De2xfpOQfES0yacwth1WQKDgpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705456226; c=relaxed/simple;
-	bh=ZuJ/C2BNvb5acMxZ+Ac6bCq09yuZUqZ0t/BaYBL2um8=;
+	s=arc-20240116; t=1705456227; c=relaxed/simple;
+	bh=v0QaZYpEZ3EFQmzffLDj90LOeySkJ3srG0m9pc8pkIg=;
 	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
 	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=TxxaETtJ1v1LLv2lnDyzN795D8qad+Cn3nEOR9Larajmg3XgnVrDArw5mHAse0KTfxlFVGmsWyiOZXXnOe0QE82LlYunSJQnM4Jnc5n/ZeDqGmdAhlSM1Hxfd7jsk09IdSk+BezU9aIQA1ClyHdCC+K4t1tJvuz1rKF9e88JGJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DhbSBOPe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3E54CC433C7;
+	 In-Reply-To:To:Cc; b=lX9GniebjwsoYpSd5SRCQNbfna0yUb25pKGV2QNEwvSR8khRFNPMS+TbboIxjVClwIW9quV7XKj/gtJjJLXoDXOS0M0zZ7NNBpiINjRBhQirLKs46V+VWDf9WAFXz1Sp1iTegjrZZY5WTRY9GDJQd2LSmiWRd9a77D/imKPOVYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fe+J+1fQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 77D5FC433B1;
 	Wed, 17 Jan 2024 01:50:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1705456226;
-	bh=ZuJ/C2BNvb5acMxZ+Ac6bCq09yuZUqZ0t/BaYBL2um8=;
+	bh=v0QaZYpEZ3EFQmzffLDj90LOeySkJ3srG0m9pc8pkIg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=DhbSBOPenRuAM/3rkg+i7I0Y5+9MPOlTitg2lF9Lpj3kpEinEEg32xVAfUwcxE+EH
-	 tFZO3/rqv3H+p0ts0ANUUFZ3pUfBh1cOBywEc45Zd/XEzH5YG5o3lURBeCQGV9+1md
-	 9BxKGR+LGC8Md5HEI1GeN74YuGn9zsTU9FDjlT0dR+mhyTN0LDUwYT0COJGs1StVOi
-	 GIE8Hhhmu6udl3EB2dLY2wE5vkq6pElnkihPv3Edy4Z2sCpqrJJVNbhN++XXB66Tzs
-	 /F323qqw2jzENXUKdKytSvtzWIsuU4Odch62ZNNvjbOWznBO4nXaH3XfSH8J1wpa6C
-	 RcnVnVezh7h9g==
+	b=fe+J+1fQeEeBbQf9b95iompFPFXp2s81IkS6RA7zGHpStFWC4UbxMNEVreMWYCgvQ
+	 Yd/omDU82ALi8Lzmn3R8JpNXajnARFcOT7hU8ypz3c03u+z77X6lUfuUoGGsAX+cyw
+	 yff/HHU4ZMwwk4W08s0LJdMxvm+VrjrarKv45rdVWhDEljur/rjGNCU607uLtJIQUB
+	 v6Lf/DElaKO+lYQpWVaXzKMPGvogaCRsl5jTyNoytKVLhRvnUnN7LE+hbh70Sx4Wn8
+	 D65B5qINCNp436ZbVN9qmbDqc4h9dVupGNvs2XJsHV03Yz+npnWqMnamzqE+bbWYQS
+	 tWNvSKpnPbgmA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 25BBDD8C985;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 64D20D8C985;
 	Wed, 17 Jan 2024 01:50:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -53,47 +53,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v8 bpf-next 0/6] bpf: tcp: Support arbitrary SYN Cookie at TC.
+Subject: Re: [PATCH v2] net: dsa: vsc73xx: Add null pointer check to
+ vsc73xx_gpio_probe
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170545622615.24208.8311280954771361156.git-patchwork-notify@kernel.org>
+ <170545622640.24208.16006278091291103156.git-patchwork-notify@kernel.org>
 Date: Wed, 17 Jan 2024 01:50:26 +0000
-References: <20240115205514.68364-1-kuniyu@amazon.com>
-In-Reply-To: <20240115205514.68364-1-kuniyu@amazon.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: edumazet@google.com, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, martin.lau@linux.dev, pabeni@redhat.com,
- kuni1840@gmail.com, bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20240111072018.75971-1-chentao@kylinos.cn>
+In-Reply-To: <20240111072018.75971-1-chentao@kylinos.cn>
+To: Kunwu Chan <chentao@kylinos.cn>
+Cc: andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kunwu.chan@hotmail.com
 
 Hello:
 
-This series was applied to bpf/bpf-next.git (master)
-by Martin KaFai Lau <martin.lau@kernel.org>:
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 15 Jan 2024 12:55:08 -0800 you wrote:
-> Under SYN Flood, the TCP stack generates SYN Cookie to remain stateless
-> for the connection request until a valid ACK is responded to the SYN+ACK.
+On Thu, 11 Jan 2024 15:20:18 +0800 you wrote:
+> devm_kasprintf() returns a pointer to dynamically allocated memory
+> which can be NULL upon failure.
 > 
-> The cookie contains two kinds of host-specific bits, a timestamp and
-> secrets, so only can it be validated by the generator.  It means SYN
-> Cookie consumes network resources between the client and the server;
-> intermediate nodes must remember which nodes to route ACK for the cookie.
+> Cc: Kunwu Chan <kunwu.chan@hotmail.com>
+> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
 > 
 > [...]
 
 Here is the summary with links:
-  - [v8,bpf-next,1/6] tcp: Move tcp_ns_to_ts() to tcp.h
-    https://git.kernel.org/bpf/bpf-next/c/e8a7ea899527
-  - [v8,bpf-next,2/6] tcp: Move skb_steal_sock() to request_sock.h
-    https://git.kernel.org/bpf/bpf-next/c/2d1ee30a3b07
-  - [v8,bpf-next,3/6] bpf: tcp: Handle BPF SYN Cookie in skb_steal_sock().
-    https://git.kernel.org/bpf/bpf-next/c/5f8b96b9b391
-  - [v8,bpf-next,4/6] bpf: tcp: Handle BPF SYN Cookie in cookie_v[46]_check().
-    https://git.kernel.org/bpf/bpf-next/c/311ef79955d3
-  - [v8,bpf-next,5/6] bpf: tcp: Support arbitrary SYN Cookie.
-    https://git.kernel.org/bpf/bpf-next/c/b9c3eca5c086
-  - [v8,bpf-next,6/6] selftest: bpf: Test bpf_sk_assign_tcp_reqsk().
-    https://git.kernel.org/bpf/bpf-next/c/98af7dca1e0d
+  - [v2] net: dsa: vsc73xx: Add null pointer check to vsc73xx_gpio_probe
+    https://git.kernel.org/netdev/net/c/776dac5a6627
 
 You are awesome, thank you!
 -- 
