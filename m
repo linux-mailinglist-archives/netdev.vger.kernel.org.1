@@ -1,115 +1,140 @@
-Return-Path: <netdev+bounces-63960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A82F88305F0
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 13:49:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E963B8306AE
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 14:10:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F42928A376
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 12:49:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85526287ECE
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 13:10:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D4911DFEB;
-	Wed, 17 Jan 2024 12:49:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42A3F1EB37;
+	Wed, 17 Jan 2024 13:10:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BuvkPdym"
+	dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="rmNjp1+J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E02A1EB27
-	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 12:49:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D2171EB38;
+	Wed, 17 Jan 2024 13:10:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705495746; cv=none; b=DrEUISJt+Ef86OsPp05gQ9QEUf5l/EMQJiV4g3Y3xyCDfbvnDXdGBkq5hpLqukxOMEHqKcVPVI6S2ZUkN4gbKfYuIaneIeuqKQrk0lhQnyFZk/PlIVoyvpw1bfLMHZIiVDZlk/XHpSrXgRNYiXnM5fHgzFxvfVYEAyAZhxSldnA=
+	t=1705497019; cv=none; b=Vo7rog6npiD4tGjp8DwNC+NuERgF4PBtPXIDYIkZmDGRvyaEgDsV6l5w86B5xJzefVlkBZBG0dHDgeeVDsLSmJVgDjEcDgXRkZvFhW0sIV0C5Vh5wKei+BOvgo6lb85O+GjHjSEqYuiyfn+SEdrG2nTdSussNijQ/UK26HQImMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705495746; c=relaxed/simple;
-	bh=V7uM71LtiV0FvnWZkwqSrNkKCNxE2zFVllc4GULWNZ8=;
-	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:MIME-Version:
-	 References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:
-	 Content-Type:Content-Transfer-Encoding; b=J4ALiwOJlaEgIYB3itl9MCsWLHYSQSqcSLAM+ofNvIT4oOggyr/y0rfmc+7SHaNvHaRT/Z8PabyBF/bKeaP5Lws1OoBtBRdH5GL1/19h5IEM5TtGKGwyd0+4x/jy11Dvi6ZC7GhLcH8ciRQjCi/IcHX9bZCDGr1cdhAH2NZT2/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=BuvkPdym; arc=none smtp.client-ip=209.85.219.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-dc236729a2bso891780276.0
-        for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 04:49:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1705495743; x=1706100543; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=V7uM71LtiV0FvnWZkwqSrNkKCNxE2zFVllc4GULWNZ8=;
-        b=BuvkPdymrqfJ0se9mB9oxLBaYBTdMkm3VZHZsnVz1Q8fnHZ4EqV2GdH96DG1q4xz+T
-         yN4ZxqVntOabZwwuD7tzaqyrDBdqMuP57z0gL4Qsf1R2h24pxQJQDwl3Z+cf7AAx5Aa7
-         W01U3eAfVr7BZAdnZtMPqj7DyunFDcq+6/q3JkI9yGg6w1fBkl1m/AXG9Zp5gC7Vn6ey
-         RJcqwVv0l6zQZ2BfZ3InLXNL0dg8G/nFAQhYQMgRReHLjEDAu8J9YTJi03yY5BBwtFQk
-         yL+fdBQ8LiY53zs8WD/2RAx3Zfp8VISoxgmMNzzj7QJSeHiqTXT3RpWTXXT+2Sg19GmM
-         Qgig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705495743; x=1706100543;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=V7uM71LtiV0FvnWZkwqSrNkKCNxE2zFVllc4GULWNZ8=;
-        b=rlZnhFoGeJQxHGAKwoStUG4HHB/ysMHNyWXMBYDvFSuCAEyKjzUvSuSKVTPvJaMfuR
-         DzzLrtunrQKj355BK6r/QruitkMLurlve7gw8LWsNVNsC3C6ERyMyvSkPW83zdTIlx4N
-         7c+5ggyZB8sEA3FvqubrqWqTlugBzEZl2s45O5xQo3yLmaNuJoyLUkpWHI/IpQHHKxt5
-         6fWQKYfQrhujRsCH2p48N2SedvrKDP9O7oIcUUEC6vEGqL/vzZ7vhMd6EjFuhNC4rIht
-         RnYtk+p/c4bEJxoi8UTGYCobF639x6ayAoCCO9c+MjbdgLZNwBzA/zWhaOhchjwmayvl
-         VX1g==
-X-Gm-Message-State: AOJu0YxKQHRt9sVV7EAsGE1+tzMsD6IlR88HAx83RDMR3olP0zDNeZMg
-	Rgur3iS3G/ulG91cAGNh/NX1a4KAFFVFCWQBVoZPlFScjknBkA==
-X-Google-Smtp-Source: AGHT+IG2dllBzfhsVjYnc/b62YEqjDxH7GaVFQPHWADCMzoFjHIZ8BE/8gITahGufq8QfJ5m7PbKmGRb34mRpsO4mno=
-X-Received: by 2002:a05:6902:49:b0:dbe:3257:f23b with SMTP id
- m9-20020a056902004900b00dbe3257f23bmr4487022ybh.108.1705495743488; Wed, 17
- Jan 2024 04:49:03 -0800 (PST)
+	s=arc-20240116; t=1705497019; c=relaxed/simple;
+	bh=8P3sdX8zEukcO5RPDL7AQWykI6njoWUvywMnDkNIGRo=;
+	h=Received:Received:Received:DKIM-Signature:Received:Date:From:To:
+	 cc:Subject:In-Reply-To:Message-ID:References:MIME-Version:
+	 Content-Type; b=cmMShzKdqUoM/n3Bx87hTU9CkEdTxX7a8gNHN9srlZbmqLbzZfgDqMYDWGRBNHWLeTx+LoxL2MhHKP83DW898oHvNw2AhcGWbQtFqL2g/XIAfhtpeo+hhguhdzaLHbQrVgmiEwA8xPA4fYOPVj/bz3OLir5YB2RblkX334ULoY8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=rmNjp1+J; arc=none smtp.client-ip=193.238.174.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ssi.bg
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
+Received: from mg.bb.i.ssi.bg (localhost [127.0.0.1])
+	by mg.bb.i.ssi.bg (Proxmox) with ESMTP id EF7B62D1AF;
+	Wed, 17 Jan 2024 15:10:06 +0200 (EET)
+Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
+	by mg.bb.i.ssi.bg (Proxmox) with ESMTPS id C9B702D1AE;
+	Wed, 17 Jan 2024 15:10:06 +0200 (EET)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by ink.ssi.bg (Postfix) with ESMTPSA id C8FFF3C043A;
+	Wed, 17 Jan 2024 15:10:03 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
+	t=1705497004; bh=8P3sdX8zEukcO5RPDL7AQWykI6njoWUvywMnDkNIGRo=;
+	h=Date:From:To:cc:Subject:In-Reply-To:References;
+	b=rmNjp1+JMszlht1Uc8re+VRCtM+Ke29vqn4vYM5Pw1AGQaNGMZVacm7JSliZKeUZh
+	 lBhiaYUd4Npp8H7HeQBmRQ3/duUHl2UbN7wxPBdLgm2rEw/vNzjnDA7HG5Xki8Lbn+
+	 8yFuMFc3zAlUmSTm+IBOlyUMshJEGdTGLz9z7N7g=
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.17.1/8.17.1) with ESMTP id 40HD9t74033355;
+	Wed, 17 Jan 2024 15:09:56 +0200
+Date: Wed, 17 Jan 2024 15:09:55 +0200 (EET)
+From: Julian Anastasov <ja@ssi.bg>
+To: Simon Horman <horms@kernel.org>
+cc: lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        netdev@vger.kernel.org, Dust Li <dust.li@linux.alibaba.com>,
+        Jiejian Wu <jiejian@linux.alibaba.com>,
+        Jiri Wiesner <jwiesner@suse.de>
+Subject: Re: [PATCHv2 RFC net-next 08/14] ipvs: use resizable hash table for
+ services
+In-Reply-To: <20240117095414.GL588419@kernel.org>
+Message-ID: <31a84455-86e7-c99f-7011-5385bbe0179d@ssi.bg>
+References: <20231212162444.93801-1-ja@ssi.bg> <20231212162444.93801-9-ja@ssi.bg> <20240117095414.GL588419@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231223005253.17891-1-luizluca@gmail.com> <20240115215432.o3mfcyyfhooxbvt5@skbuf>
- <9183aa21-6efb-4e90-96f8-bc1fedf5ceab@arinc9.com>
-In-Reply-To: <9183aa21-6efb-4e90-96f8-bc1fedf5ceab@arinc9.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Wed, 17 Jan 2024 13:48:52 +0100
-Message-ID: <CACRpkdaXV=P7NZZpS8YC67eQ2BDvR+oMzgJcjJ+GW9vFhy+3iQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 0/8] net: dsa: realtek: variants to drivers,
- interfaces to a common module
-To: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: Vladimir Oltean <olteanv@gmail.com>, Luiz Angelo Daros de Luca <luizluca@gmail.com>, netdev@vger.kernel.org, 
-	alsi@bang-olufsen.dk, andrew@lunn.ch, f.fainelli@gmail.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
 
-On Wed, Jan 17, 2024 at 11:26=E2=80=AFAM Ar=C4=B1n=C3=A7 =C3=9CNAL <arinc.u=
-nal@arinc9.com> wrote:
-> On 16.01.2024 00:54, Vladimir Oltean wrote:
 
-> > git format-patch --cover-letter generates a nice patch series overview
-> > with a diffstat and the commit titles, you should include it next time.
->
-> Thanks a lot for mentioning this. I didn't know this and now that I use i=
-t,
-> it helps a lot.
+	Hello,
 
-There are some even nicer tools you can use on top, i.e. "b4":
-https://people.kernel.org/monsieuricon/sending-a-kernel-patch-with-b4-part-=
-1
+On Wed, 17 Jan 2024, Simon Horman wrote:
 
-This blog post doesn't mention the magic trick:
-b4 prep --set-prefixes net-next
+> On Tue, Dec 12, 2023 at 06:24:38PM +0200, Julian Anastasov wrote:
+> > Make the hash table for services resizable in the bit range of 4-20.
+> > Table is attached only while services are present. Resizing is done
+> > by delayed work based on load (the number of hashed services).
+> > Table grows when load increases 2+ times (above 12.5% with factor=3)
+> > and shrinks 8+ times when load decreases 16+ times (below 0.78%).
+> > 
+> > Switch to jhash hashing to reduce the collisions for multiple
+> > services.
+> > 
+> > Add a hash_key field into the service that includes table ID and
+> > bucket ID. This helps the lookup and delete operations.
+> > 
+> > Signed-off-by: Julian Anastasov <ja@ssi.bg>
+> 
+> ...
+> 
+> > @@ -391,18 +440,29 @@ static inline struct ip_vs_service *
+> >  __ip_vs_service_find(struct netns_ipvs *ipvs, int af, __u16 protocol,
+> >  		     const union nf_inet_addr *vaddr, __be16 vport)
+> >  {
+> > -	unsigned int hash;
+> > +	DECLARE_IP_VS_RHT_WALK_BUCKET_RCU();
+> > +	struct hlist_bl_head *head;
+> >  	struct ip_vs_service *svc;
+> > -
+> > -	/* Check for "full" addressed entries */
+> > -	hash = ip_vs_svc_hashkey(ipvs, af, protocol, vaddr, vport);
+> > -
+> > -	hlist_for_each_entry_rcu(svc, &ipvs->svc_table[hash], s_list) {
+> > -		if (svc->af == af && ip_vs_addr_equal(af, &svc->addr, vaddr) &&
+> > -		    svc->port == vport && svc->protocol == protocol &&
+> > -		    !svc->fwmark) {
+> > -			/* HIT */
+> > -			return svc;
+> > +	struct ip_vs_rht *t, *p;
+> > +	struct hlist_bl_node *e;
+> > +	u32 hash, hash_key;
+> > +
+> > +	ip_vs_rht_for_each_table_rcu(ipvs->svc_table, t, p) {
+> > +		/* Check for "full" addressed entries */
+> > +		hash = ip_vs_svc_hashval(t, af, protocol, vaddr, vport);
+> > +
+> > +		hash_key = ip_vs_rht_build_hash_key(t, hash);
+> > +		ip_vs_rht_walk_bucket_rcu(t, hash_key, head) {
+> > +			hlist_bl_for_each_entry_rcu(svc, e, head, s_list) {
+> 
+> Hi Julian,
+> 
+> Smatch thinks that head is used uninitialised here.
+> This does seem to be the case to me too.
 
-And
-b4 trailers -u
+	It would crash and not find svc if that was true. May be it is 
+caused by the complex 'if (INIT then FAIL) {} else ANYTHING' 
+construct used in ip_vs_rht_walk_bucket_rcu() which allows
+'if () {} else for () for () for () ...'.
 
-Which is what you need to make it an awesome net contribution
-patch series tool.
+Regards
 
-Yours,
-Linus Walleij
+--
+Julian Anastasov <ja@ssi.bg>
+
 
