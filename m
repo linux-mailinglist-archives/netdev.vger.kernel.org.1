@@ -1,198 +1,226 @@
-Return-Path: <netdev+bounces-64040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C930830C8B
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 19:17:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C2180830CC2
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 19:34:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F10F3B20ECE
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 18:17:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CAFE9B20E60
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 18:34:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39E1322F02;
-	Wed, 17 Jan 2024 18:17:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A03322F0D;
+	Wed, 17 Jan 2024 18:34:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dNQUQPyK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="11awUl92"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D3FC2263A
-	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 18:16:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D69BB23748
+	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 18:34:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705515420; cv=none; b=eWKeo3VBLd5ZUdGxCyXnV1zQljHtRzwvnB3u+dHvIqMfnhWCJe3plu8Z7tQ4s4oFbczbqwI3cOOOMx8DMENYK4FD8k7gh9+ZrFCEynVcXBiy7zD8Pne+R4Nu24P8lycMr1mFrkxpibm1x2KDt/WC7ZD1HnYe71Ilup+A//pbgE4=
+	t=1705516458; cv=none; b=KljS+WRJKjxzjAVEBKxScAdZmo/p+J5Weh90rxeKXNp8V6P5nsLzZzCAyj95smq5tlUGzvQj10sBB7CPIj01B4JMfI3fHfE/lFAzmW226X0DTExTLdhPQHPzgqduMQ5v1ZNF4qSkH2GpgUSoGR0jW1419lIsLVBIcWKwhlDo4KA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705515420; c=relaxed/simple;
-	bh=PGA5XF8apgvFZl5vCFekKzJo49ntitv3Oa87Rh9Ojwc=;
+	s=arc-20240116; t=1705516458; c=relaxed/simple;
+	bh=c8I7hLlPxVU2IM8/g6DP0m0OB/IX+cD2ENTTl8RyhTk=;
 	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:MIME-Version:
 	 References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:
-	 Content-Type; b=hgHHS/9/cO+qA69L3CQzTBVGbm8LQClxgbNHRFySORdIvVcMPWhLcLGewKfAWQPEr/tQJ8D7STlxsqAVbXgzuPQNNh1izOQ0omL7af1jcwSWvUv+oIVZM5feW9745sqWzYzUBoHEH8vii5zcy3Tg1k+QrS60lVX4+uXFZiOyHgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=dNQUQPyK; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-5ec7a5a4b34so119710447b3.0
-        for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 10:16:58 -0800 (PST)
+	 Content-Type:Content-Transfer-Encoding; b=MU2FcuMtH6QpI6rxAls6sX0EaNWT5T17VPWKczKI/39OXbtaMpFCZvTTiLVDdrzWJGeTyWJ17pTb1m8tKQl3hU7zxisAoWwxdS2FlXlYvryifxyrtGItCjEuRgs27PSo75hn31eRg/qDpTBaiwBhdYQTiG4glGiHBZsDFTRPC9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=11awUl92; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-55969c01168so5096803a12.1
+        for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 10:34:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1705515417; x=1706120217; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=IYLeQC5slfCvWFFzPxrebDUGGj/LueNwDEYL/EBPrAo=;
-        b=dNQUQPyK+W6ldPQveER0dtG/y4QgWv/W5nHYMKVIRW4PjU4JL4MR4andbSP2PrkEpe
-         0ZGYkzaVJWRRWu+O39ArH+4NIPEIFBpnZIENsKBBgTI01EVjDu442++OubPRG3u6xOkZ
-         3GQRGzo1AdYiUuaaCv8ive2F68LzA/NgIY0ONN4/TsHT5waVyABGQ50sfE8z3DXunpXd
-         tPN49YpdALI8rPMk3RkiRU4QfaMy4JhyBM3vV/5qcca4LU7ECG46ypfatrRJwjQK/0Np
-         VcRn4ML1fxEvSTBHL/7CZK/oGumOTpzQMy0G2CIVwnpR3SmBm4wzOukz4yWmV9qGlEfo
-         VLnw==
+        d=google.com; s=20230601; t=1705516455; x=1706121255; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=34+4xtu/2qC20G1bx3utIMpaFqGA2iDoy/irY93Em2U=;
+        b=11awUl92BzFSIsSaqqw06UOkr+1n+IGmvuKENQQeUtocKz+2Tbd6ZKhJ0SVyTq3e7D
+         kIHFlng2B40xxkNFbKl3BTaimX2dcml/nPMI/4XP7AY0WfUiTU7ZsR8LqVFKrVMop9rl
+         h9arVRkdMrmsrXlMkGqYIgDehefArJ51Sl6oGOD2c/bgLVjyTH5Q89l8jMvb91G+3Uuq
+         J9AdHT5/CvSHkpfMxGaGtt6Lk7G6t/j1zAKmjIe6phV1uAX9d55gC8L+U5O62TZENYBn
+         lDn028w0XaPU/l2kHbsDeQ/rFrnTjXo4IFmkEbLpmD0tdoeVzxSKeamv9ut0tkQpzM+q
+         tl3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705515417; x=1706120217;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IYLeQC5slfCvWFFzPxrebDUGGj/LueNwDEYL/EBPrAo=;
-        b=hske5gm+h3OA88sNvBdskSy/b924l/0dfEAVAyODQcZS18zr2cchZXR0gFEe/ZXtKo
-         Rxa+5k00qHnMUoleg3w1gnt+fmfoRkjd/Ybg6GuiSc0+LbHv57+/RkktiQQ4xTVvcZQF
-         EFljmLzP0Sg61wOr5KsngDHE2+HoncOiJsg5n51jUsGxzuquOM296Hi/0bwNx+Z+qH7/
-         IfHLiS6u1U+JrQo+XzMkYhr4RO+PolHbthTC6KTEJhCaor0AOrWZR4NIv4VpKPbEKZx8
-         f+SP45PHrrSKcY7Bk8AiNRbDSOryyfvSHSoxmpLseUVjPyrc5ugy6C2xZUPm+wh2ef7C
-         1h2w==
-X-Gm-Message-State: AOJu0YyL/Uteu9/61MkVGQdv3RIraLZhHOMI663eaMVQL2Wi2jOyfsjK
-	alOEfj/6/DWhM8E1zZxiozlLVsb+IKJqcVignykJtwzdvJDtlg==
-X-Google-Smtp-Source: AGHT+IEiU4sgOHiDuc04/q9jECuMRdLjA17jYKeAeJ4piEglYPHw18T3b/PpQlqA7gfF1SOpcxOh16zWc3G/Lxu8Esg=
-X-Received: by 2002:a0d:cc4e:0:b0:5ff:5d7e:54af with SMTP id
- o75-20020a0dcc4e000000b005ff5d7e54afmr1969991ywd.105.1705515417633; Wed, 17
- Jan 2024 10:16:57 -0800 (PST)
+        d=1e100.net; s=20230601; t=1705516455; x=1706121255;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=34+4xtu/2qC20G1bx3utIMpaFqGA2iDoy/irY93Em2U=;
+        b=ghyhJoKJB0gblbLPpTnDk9tei5rA8vBfHr9dOU6UqcYd9mrPolroCkS2d+PS327qxM
+         ZzZOqeNJOITySpvfSB1z4swY7/CIl9ujc+Uojmo1hqbkBtwhuBTI/3Od9MeNVvwJTafl
+         D4Q7UV0cQ9NCcnUIfrmLZZxzgNFTauYu/InB8KGwNrQLCY/W9sDIuUihDOKUvFBvWjA0
+         ycFR2ImHwcw7TGieNp+YDZ4uyugi9r61kRU82M0X3/VLxEjjXy1wBGXADNsVReZHlxvf
+         qHYGpFVaiTJjDvEAti90Qwy9PjDlCDfdrC1W7cyj4vBjgwsZP3Lf2ODzbgDy7eDVes2X
+         ztrA==
+X-Gm-Message-State: AOJu0YwcVgs+3JHhZP9BVoenN3lO8rrIvVj/YjpZmUQbPJLW/xd4uaD6
+	jVKxjy6Hoi7Twif6AEfNYLWiGrCPcnOScM4dQm49e8BWs+rS
+X-Google-Smtp-Source: AGHT+IGKoOCccm7DaHUHwBB88Rt5iXeUxF1kAsQunFZU0vnFSUR+Edsx5gq8XaAWs3mn03O70WJLlErUMbi3uenj71I=
+X-Received: by 2002:a17:906:e0e:b0:a2e:ac2a:9064 with SMTP id
+ l14-20020a1709060e0e00b00a2eac2a9064mr1150919eji.36.1705516454884; Wed, 17
+ Jan 2024 10:34:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240117160748.37682-1-brgl@bgdev.pl>
-In-Reply-To: <20240117160748.37682-1-brgl@bgdev.pl>
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Date: Wed, 17 Jan 2024 20:16:46 +0200
-Message-ID: <CAA8EJpoQfPqoMVyTmUjPs4c1Uc-p4n7zNcG+USNjXX0Svp362w@mail.gmail.com>
-Subject: Re: [PATCH 0/9] PCI: introduce the concept of power sequencing of
- PCIe devices
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Kalle Valo <kvalo@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+References: <20240109011455.1061529-1-almasrymina@google.com>
+ <20240109011455.1061529-3-almasrymina@google.com> <5219f2cd-6854-0134-560d-8ae3f363b53f@huawei.com>
+ <CAHS8izOtr+jfqQ6xCB3CoN-K_V1-4hPsB4-k5+1z-M3Qy2BbwA@mail.gmail.com>
+ <0711845b-c435-251f-0bbc-20b243721c06@huawei.com> <CAHS8izOxvMVGXKpLBvVgyyS5_94WGG8Aca=O_zGMX+db-3gBXg@mail.gmail.com>
+ <66bc7b8f-51b6-0d9e-db5b-47e7ee5e9029@huawei.com> <CAHS8izOnhtQGeQ-EFmYjZyZ0eW2LqO0Rrm73eAB2su=UA34yTw@mail.gmail.com>
+ <20240116000129.GX734935@nvidia.com> <9c1a6725-c4c3-2bb1-344f-5e71f8ce7e63@huawei.com>
+ <20240116121611.GY734935@nvidia.com> <CAHS8izPa6ostY7qZUAmm4g8N3rfWoVBK6r5z0_MycxfsEVH4jw@mail.gmail.com>
+In-Reply-To: <CAHS8izPa6ostY7qZUAmm4g8N3rfWoVBK6r5z0_MycxfsEVH4jw@mail.gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 17 Jan 2024 10:34:03 -0800
+Message-ID: <CAHS8izO1-+MczzFw_R80uv=aK5A9bUNcKroY=H9Euk+ZPnnGPw@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next v5 2/2] net: add netmem to skb_frag_t
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Yunsheng Lin <linyunsheng@huawei.com>, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Heiko Stuebner <heiko@sntech.de>, 
-	Jernej Skrabec <jernej.skrabec@gmail.com>, Chris Morgan <macromorgan@hotmail.com>, 
-	Linus Walleij <linus.walleij@linaro.org>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Arnd Bergmann <arnd@arndb.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
-	=?UTF-8?B?TsOtY29sYXMgRiAuIFIgLiBBIC4gUHJhZG8=?= <nfraprado@collabora.com>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Peng Fan <peng.fan@nxp.com>, 
-	Robert Richter <rrichter@amd.com>, Dan Williams <dan.j.williams@intel.com>, 
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>, Terry Bowman <terry.bowman@amd.com>, 
-	Lukas Wunner <lukas@wunner.de>, Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>, 
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-pci@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Shakeel Butt <shakeelb@google.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 17 Jan 2024 at 18:08, Bartosz Golaszewski <brgl@bgdev.pl> wrote:
+On Wed, Jan 17, 2024 at 10:00=E2=80=AFAM Mina Almasry <almasrymina@google.c=
+om> wrote:
 >
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> On Tue, Jan 16, 2024 at 4:16=E2=80=AFAM Jason Gunthorpe <jgg@nvidia.com> =
+wrote:
+> >
+> > On Tue, Jan 16, 2024 at 07:04:13PM +0800, Yunsheng Lin wrote:
+> > > On 2024/1/16 8:01, Jason Gunthorpe wrote:
+> > > > On Mon, Jan 15, 2024 at 03:23:33PM -0800, Mina Almasry wrote:
+> > > >>>> You did not answer my question that I asked here, and ignoring t=
+his
+> > > >>>> question is preventing us from making any forward progress on th=
+is
+> > > >>>> discussion. What do you expect or want skb_frag_page() to do whe=
+n
+> > > >>>> there is no page in the frag?
+> > > >>>
+> > > >>> I would expect it to do nothing.
+> > > >>
+> > > >> I don't understand. skb_frag_page() with an empty implementation j=
+ust
+> > > >> results in a compiler error as the function needs to return a page
+> > > >> pointer. Do you actually expect skb_frag_page() to unconditionally
+> > > >> cast frag->netmem to a page pointer? That was explained as
+> > > >> unacceptable over and over again by Jason and Christian as it risk=
+s
+> > > >> casting devmem to page; completely unacceptable and will get nacke=
+d.
+> > > >> Do you have a suggestion of what skb_frag_page() should do that wi=
+ll
+> > > >> not get nacked by mm?
+> > > >
+> > > > WARN_ON and return NULL seems reasonable?
+> > >
 >
-> The responses to the RFC were rather positive so here's a proper series.
+> That's more or less what I'm thinking.
 >
-> During last year's Linux Plumbers we had several discussions centered
-> around the need to power-on PCI devices before they can be detected on
-> the bus.
+> > > While I am agreed that it may be a nightmare to debug the case of pas=
+sing
+> > > a false page into the mm system, but I am not sure what's the point o=
+f
+> > > returning NULL to caller if the caller is not expecting or handling
+> > > the
+> >
+> > You have to return something and NULL will largely reliably crash the
+> > thread. The WARN_ON explains in detail why your thread just crashed.
+> >
 >
-> The consensus during the conference was that we need to introduce a
-> class of "PCI slot drivers" that would handle the power-sequencing.
+> Agreed.
 >
-> After some additional brain-storming with Manivannan and the realization
-> that DT maintainers won't like adding any "fake" nodes not representing
-> actual devices, we decided to reuse existing PCI infrastructure.
+> > > NULL returning[for example, most of mm API called by the networking d=
+oes not
+> > > seems to handling NULL as input page], isn't the NULL returning will =
+make
+> > > the kernel panic anyway? Doesn't it make more sense to just add a BUG=
+_ON()
+> > > depending on some configuration like CONFIG_DEBUG_NET or CONFIG_DEVME=
+M?
+> > > As returning NULL seems to be causing a confusion for the caller of
+> > > skb_frag_page() as whether to or how to handle the NULL returning cas=
+e.
+> >
+> > Possibly, though Linus doesn't like BUG_ON on principle..
+> >
+> > I think the bigger challenge is convincing people that this devmem
+> > stuff doesn't just open a bunch of holes in the kernel where userspace
+> > can crash it.
+> >
 >
-> The general idea is to instantiate platform devices for child nodes of
-> the PCIe port DT node. For those nodes for which a power-sequencing
-> driver exists, we bind it and let it probe. The driver then triggers a
-> rescan of the PCI bus with the aim of detecting the now powered-on
-> device. The device will consume the same DT node as the platform,
-> power-sequencing device. We use device links to make the latter become
-> the parent of the former.
+> It does not, and as of right now there are no pending concerns from
+> any netdev maintainers regarding mishandled devmem checks at least.
+> This is because the devmem series comes with a full audit of
+> skb_frag_page() callers [1] and all areas in the net stack attempting
+> to access the skb [2].
 >
-> The main advantage of this approach is not modifying the existing DT in
-> any way and especially not adding any "fake" platform devices.
+> [1] https://patchwork.kernel.org/project/netdevbpf/patch/20231218024024.3=
+516870-10-almasrymina@google.com/
+> [2] https://patchwork.kernel.org/project/netdevbpf/patch/20231218024024.3=
+516870-11-almasrymina@google.com/
+>
+> > The fact you all are debating what to do with skb_frag_page() suggests
+> > to me there isn't confidence...
+> >
+>
+> The debate raging on is related to the performance of skb_frag_page(),
+> not correctness (and even then, I don't think it's related to
+> perf...). Yunsheng would like us to optimize skb_frag_page() using an
+> unconditional cast from netmem to page. This in Yunsheng's mind is a
+> performance optimization as we don't need to add an if statement
+> checking if the netmem is a page. I'm resistant to implement that
+> change so far because:
+>
+> (a) unconditionally casting from netmem to page negates the compiler
+> type safety that you and Christian are laying out as a requirement for
+> the devmem stuff.
+> (b) With likely/unlikely or static branches the check to make sure
+> netmem is page is a no-op for existing use cases anyway, so AFAIU,
+> there is no perf gain from optimizing it out anyway.
+>
 
-I'd still like to see how this can be extended to handle BT power up,
-having a single entity driving both of the BT and WiFI.
+Another thought, if anyone else is concerned about the devmem checks
+performance,  potentially we could introduce CONFIG_NET_DEVMEM which
+when disabled prevents the user from using devmem at all (disables the
+netlink API).
 
-The device tree changes behave in exactly the opposite way: they
-define regulators for the WiFi device, while the WiFi is not being
-powered by these regulators. Both WiFi and BT are powered by the PMU,
-which in turn consumes all specified regulators.
+When that is disabled, skb_frag_page(), netmem_to_page() & friends can
+assume netmem is always a page and do a straight cast between netmem &
+page. When it's enabled, it will check that netmem =3D=3D page before
+doing a cast, and return NULL if it is not a page.
 
->
-> Changes since RFC:
-> - move the pwrseq functionality out of the port driver and into PCI core
-> - add support for WCN7850 to the first pwrseq driver (and update bindings)
-> - describe the WLAN modules in sm8550-qrd and sm8650-qrd
-> - rework Kconfig options, drop the defconfig changes from the series as
->   they are no longer needed
-> - drop the dt-binding changes for PCI vendor codes
-> - extend the DT bindings for ath11k_pci with strict property checking
-> - various minor tweaks and fixes
->
-> Bartosz Golaszewski (7):
->   arm64: dts: qcom: qrb5165-rb5: describe the WLAN module of QCA6390
->   PCI: create platform devices for child OF nodes of the port node
->   PCI: hold the rescan mutex when scanning for the first time
->   PCI/pwrseq: add pwrseq core code
->   dt-bindings: wireless: ath11k: describe QCA6390
->   dt-bindings: wireless: ath11k: describe WCN7850
->   PCI/pwrseq: add a pwrseq driver for QCA6390
->
-> Neil Armstrong (2):
->   arm64: dts: qcom: sm8550-qrd: add Wifi nodes
->   arm64: dts: qcom: sm8650-qrd: add Wifi nodes
->
->  .../net/wireless/qcom,ath11k-pci.yaml         |  89 ++++++
->  arch/arm64/boot/dts/qcom/qrb5165-rb5.dts      |  29 ++
->  arch/arm64/boot/dts/qcom/sm8250.dtsi          |  10 +
->  arch/arm64/boot/dts/qcom/sm8550-qrd.dts       |  37 +++
->  arch/arm64/boot/dts/qcom/sm8550.dtsi          |  10 +
->  arch/arm64/boot/dts/qcom/sm8650-qrd.dts       |  29 ++
->  arch/arm64/boot/dts/qcom/sm8650.dtsi          |  10 +
->  drivers/pci/Kconfig                           |   1 +
->  drivers/pci/Makefile                          |   1 +
->  drivers/pci/bus.c                             |   9 +-
->  drivers/pci/probe.c                           |   2 +
->  drivers/pci/pwrseq/Kconfig                    |  16 ++
->  drivers/pci/pwrseq/Makefile                   |   4 +
->  drivers/pci/pwrseq/pci-pwrseq-qca6390.c       | 267 ++++++++++++++++++
->  drivers/pci/pwrseq/pwrseq.c                   |  82 ++++++
->  drivers/pci/remove.c                          |   3 +-
->  include/linux/pci-pwrseq.h                    |  24 ++
->  17 files changed, 621 insertions(+), 2 deletions(-)
->  create mode 100644 drivers/pci/pwrseq/Kconfig
->  create mode 100644 drivers/pci/pwrseq/Makefile
->  create mode 100644 drivers/pci/pwrseq/pci-pwrseq-qca6390.c
->  create mode 100644 drivers/pci/pwrseq/pwrseq.c
->  create mode 100644 include/linux/pci-pwrseq.h
+I think this is technically viable and I think preserves the compiler
+type safety requirements set by mm folks. From my POV though, bloating
+the kernel with a a new CONFIG just to optimize out no-op checks seems
+unnecessary, but if there is agreement that the checks are a concern,
+adding CONFIG_NET_DEVMEM should address it while being acceptable to
+mm maintainers.
+
+> But none of this is related to correctness. Code calling
+> skb_frag_page() will fail or crash if it's not handled correctly
+> regardless of the implementation details of skb_frag_page(). In the
+> devmem series we add support to handle it correctly via [1] & [2].
 >
 > --
-> 2.40.1
->
->
+> Thanks,
+> Mina
 
 
--- 
-With best wishes
-Dmitry
+
+--=20
+Thanks,
+Mina
 
