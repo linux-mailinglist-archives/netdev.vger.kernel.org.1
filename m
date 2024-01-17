@@ -1,136 +1,144 @@
-Return-Path: <netdev+bounces-64054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 535EC830E90
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 22:23:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D0A6830E92
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 22:24:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 868541C24C2D
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 21:23:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD7041C24CA5
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 21:24:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 967B82562D;
-	Wed, 17 Jan 2024 21:23:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26FB425572;
+	Wed, 17 Jan 2024 21:23:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PJkoipQW"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="h6m3Cvnd"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82BE425577
-	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 21:23:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 887A22556B
+	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 21:23:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705526608; cv=none; b=lgF25loGz07brfVHCOQkgzJmIitToTaqeGir3ReM8xwrRM5qL0Hhm8oEg8SqLjwDQqymIwZfAuORoBVE51JfI0a5Llfe3+sEJxeLL4zn6uwyyaxPvkuWHF14TzR7kZe+OsxBeb4LRff7oT+It5l5TX9Lpi+Pb9z05sSzUn1pqwo=
+	t=1705526617; cv=none; b=imZ+V6vi3ybPMOTtE9GXC0JOsAEMkei4w12cM+h1eJPWaIB0njwiGG8uJmrVW0Wqjuvi9TQTMCW+v7H6obr4mDIeOQrz6GiaElZTPYNzXc78uMfmkbWqn7MMn2drN0KXiLvZDUeuQGDLfY+f3Fq+1CvaFJIAnqd+5q74YXlLh1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705526608; c=relaxed/simple;
-	bh=kaH9a9Hkr2U67UKTfEUbe2RJ6wXoXhdTorzk0Et6RZU=;
+	s=arc-20240116; t=1705526617; c=relaxed/simple;
+	bh=93LlwyHyTkQO2KrqYA5lB0CVoPPZAC3B0Z1WLjl1+Ww=;
 	h=Message-ID:DKIM-Signature:Date:MIME-Version:Subject:
 	 Content-Language:To:Cc:References:X-Report-Abuse:From:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:X-Migadu-Flow; b=ZLFQ5getovPVir4xUdQHpfINOa+ClLKn7L5aGjSEt/GuqvaiRC1lX9HQzJFSeCOcFCMf+kAOrob7GuTYISzggzXTJaswo+YlKi1JjDgmImrQ8G5PuWVZJVPFCpbPgyz/lJJ/W+1a9roWgDeFwUqnf8kFrvFwdTUemtroNZtPv+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PJkoipQW; arc=none smtp.client-ip=91.218.175.185
+	 Content-Type:Content-Transfer-Encoding:X-Migadu-Flow; b=ZKcN2w7nFP0G2ClptLw1tKyuPLdhug7/aEqeFe54/ZjtgcwXdRaJFZA9qhOyLr6XGbh1nNZpym0Sm2Lve4SNWOPiGYJRBCEOf5Zt4F5AWchgesgQfhRvRYTPY0FtkmLJ+kb8l1KwDhIw75jkzo2xdKlscGEMNRGr/RHApHpo4Jg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=h6m3Cvnd; arc=none smtp.client-ip=95.215.58.186
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <8a6c5297-6e86-4f0d-a85e-1a93b2215d68@linux.dev>
+Message-ID: <73235f05-8474-4341-b70b-34bd0e6dfac5@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1705526604;
+	t=1705526613;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=nk4PnGFoII20WorTY8XPDUyENB4Rwy8FvWCgKEj2dRQ=;
-	b=PJkoipQWE81phR1YEm2bC199QlluF2n9wF8zN9x+YvsVDQktC/Q3hZe9S5CFC2H58mS1wP
-	O8O1vhvjSwAvfOIyRgKu+JCG1Bvd4AeGioh6nssHPmEXfkLr3OgwyH6fSk1+ixw+kVKdpZ
-	r+1hjmg5xsS9FayjZhG7AKbbHz0pQpU=
-Date: Wed, 17 Jan 2024 21:23:20 +0000
+	bh=ct5ToPw3LUaNOoDO1thQP66v+Llmlbh3AXHo2CAPhSc=;
+	b=h6m3CvndLIJ5uzrmzBqR1nJWilSirVxV4yW+4QLzpTzKLqgIyNSmf14X7yh2YdXJREN8jX
+	i/xsrAeU6zEK0x6m8rcAy1E4gxL0gxMcC6UGQXrSJUXqewmGBjkv8WNuBSNwmJLVk5Ceuf
+	eWkXKO6Nc2SIe0RB69QFBga8uc1sZK0=
+Date: Wed, 17 Jan 2024 13:23:25 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v5] ptp: ocp: add Adva timecard support
+Subject: Re: [PATCH bpf-next] bpf: Allow setting SO_TIMESTAMPING* with
+ bpf_setsockopt()
 Content-Language: en-US
-To: Sagi Maimon <maimon.sagi@gmail.com>, richardcochran@gmail.com,
- jonathan.lemon@gmail.com, vadfed@fb.com
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kuba@kernel.org
-References: <20240117114350.3105-1-maimon.sagi@gmail.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ =?UTF-8?Q?J=C3=B6rn-Thorben_Hinz?= <j-t.hinz@alumni.tu-berlin.de>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+ Deepa Dinamani <deepa.kernel@gmail.com>, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20240115134110.11624-1-j-t.hinz@alumni.tu-berlin.de>
+ <65a69e1be51ef_380df0294d9@willemb.c.googlers.com.notmuch>
+ <51fd5249-140a-4f1b-b20e-703f159e88a3@linux.dev>
+ <65a7f855821cc_6d500294d0@willemb.c.googlers.com.notmuch>
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20240117114350.3105-1-maimon.sagi@gmail.com>
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <65a7f855821cc_6d500294d0@willemb.c.googlers.com.notmuch>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-On 17/01/2024 11:43, Sagi Maimon wrote:
-> Adding support for the Adva timecard.
-> The card uses different drivers to provide access to the
-> firmware SPI flash (Altera based).
-> Other parts of the code are the same and could be reused.
+On 1/17/24 7:55 AM, Willem de Bruijn wrote:
+> Martin KaFai Lau wrote:
+>> On 1/16/24 7:17 AM, Willem de Bruijn wrote:
+>>> Jörn-Thorben Hinz wrote:
+>>>> A BPF application, e.g., a TCP congestion control, might benefit from or
+>>>> even require precise (=hardware) packet timestamps. These timestamps are
+>>>> already available through __sk_buff.hwtstamp and
+>>>> bpf_sock_ops.skb_hwtstamp, but could not be requested: BPF programs were
+>>>> not allowed to set SO_TIMESTAMPING* on sockets.
+>>
+>> This patch only uses the SOF_TIMESTAMPING_RX_HARDWARE in the selftest. How about
+>> others? e.g. the SOF_TIMESTAMPING_TX_* that will affect the sk->sk_error_queue
+>> which seems not good. If rx tstamp is useful, tx tstamp should be useful also?
 > 
-
-Hi Sagi,
-
-Thanks for adjusting the code. One signle still have to be
-adjusted, see comments below. And this is treated as net-next
-material, but net-next is closed now until merge window ends,
-you will have to submit new version next week.
-
-Please, also use '[PATCH net-next v6] ...' prefix for it.
-
-> Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
-> ---
->   Changes since version 4:
->   - alignment fix.
+> Good point. Or should not be allowed to be set from BPF.
 > 
-
-Please, preserve changes from all previous versions for next submissions.
-
->   drivers/ptp/ptp_ocp.c | 302 ++++++++++++++++++++++++++++++++++++++++--
->   1 file changed, 293 insertions(+), 9 deletions(-)
-> 
-
-[ ..skip.. ]
-
-> @@ -2603,7 +2819,44 @@ ptp_ocp_art_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
->   	if (err)
->   		return err;
+> That significantly changes process behavior, e.g., by returning POLLERR.
 >   
-> -	return ptp_ocp_init_clock(bp);
-> +	return ptp_ocp_init_clock(bp, r->extra);
-> +}
-> +
-> +/* ADVA specific board initializers; last "resource" registered. */
-> +static int
-> +ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
-> +{
-> +	int err;
-> +	u32 version;
-> +
-> +	bp->flash_start = 0xA00000;
-> +	bp->eeprom_map = fb_eeprom_map;
-> +	bp->sma_op = &ocp_adva_sma_op;
-> +
-> +	version = ioread32(&bp->image->version);
-> +	/* if lower 16 bits are empty, this is the fw loader. */
-> +	if ((version & 0xffff) == 0) {
-> +		version = version >> 16;
-> +		bp->fw_loader = true;
-> +	}
-> +	bp->fw_tag = 1;
+>>>>
+>>>> Enable BPF programs to actively request the generation of timestamps
+>>>> from a stream socket. The also required ioctl(SIOCSHWTSTAMP) on the
+>>>> network device must still be done separately, in user space.
+>>
+>> hmm... so both ioctl(SIOCSHWTSTAMP) of the netdevice and the
+>> SOF_TIMESTAMPING_RX_HARDWARE of the sk must be done?
+>>
+>> I likely miss something. When skb is created  in the driver rx path, the sk is
+>> not known yet though. How the SOF_TIMESTAMPING_RX_HARDWARE of the sk affects the
+>> skb_shinfo(skb)->hwtstamps?
+> 
+> Indeed it does not seem to do anything in the datapath.
+> 
+> Requesting SOF_TIMESTAMPING_RX_SOFTWARE will call net_enable_timestamp
+> to start timestamping packets.
+> 
+> But SOF_TIMESTAMPING_RX_HARDWARE does not so thing.
+> 
+> Drivers do use it in ethtool get_ts_info to signal hardware
+> capabilities. But those must be configured using the ioctl.
+> 
+> It is there more for consistency with the other timestamp recording
+> options, I suppose.
+> 
 
-Please, use fw_tag = 3 here, other tags are for other vendors.
+Thanks for the explanation on the SOF_TIMESTAMPING_RX_{HARDWARE,SOFTWARE}.
 
-Thanks,
-Vadim
+__sk_buff.hwtstamp should have the NIC rx timestamp then as long as the NIC is 
+ioctl configured.
 
-> +	bp->fw_version = version & 0xffff;
-> +	bp->fw_cap = OCP_CAP_BASIC | OCP_CAP_SIGNAL | OCP_CAP_FREQ;
-> +
-> +	ptp_ocp_tod_init(bp);
-> +	ptp_ocp_nmea_out_init(bp);
-> +	ptp_ocp_signal_init(bp);
-> +
+Jorn, do you need RX_SOFTWARE? From looking at net_timestamp_set(), any socket 
+requested RX_SOFTWARE should be enough to get a skb->tstamp for all skbs. A 
+workaround is to manually create a socket and turn on RX_SOFTWARE.
+
+It will still be nice to get proper bpf_setsockopt() support for RX_SOFTWARE but 
+it should be considered together with how SO_TIMESTAMPING_TX_* should work in 
+bpf prog considering the TX tstamping does not have a workaround solution like 
+RX_SOFTWARE.
+
+It is probably cleaner to have a separate bit in sk->sk_tsflags for bpf such 
+that the bpf prog won't be affected by the userspace turning it on/off and it 
+won't change the userspace's expectation also (e.g. sk_error_queue and POLLERR).
+
+The part that needs more thoughts in the tx tstamp is how to notify the bpf prog 
+to consume it. Potentially the kernel can involve a bpf prog to collect the tx 
+timestamp when the bpf bit in sk->sk_tsflags is set. An example on how TCP-CC is 
+using it will help to think of the approach here.
 
 
