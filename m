@@ -1,241 +1,86 @@
-Return-Path: <netdev+bounces-63957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63958-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CC26830552
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 13:32:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 927D88305C5
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 13:44:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 280AF1F24CB7
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 12:32:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B76391C21867
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 12:44:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03E1E323C;
-	Wed, 17 Jan 2024 12:32:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i4Za+M5F"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D4721DDDB;
+	Wed, 17 Jan 2024 12:44:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F96C1EA66
-	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 12:32:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705494734; cv=fail; b=bSyNbNGelwbEMzfddj77pvoS8CTfcfl/NlTb9AUMFHqJeOABPBj2hQavaSr8LHAIbFu8MSK4YzSiWSJiM3frYmO4Q15RF56qhgx3NroFN7lqAwzaaQVqoHbN3yqHEkw0Pv6iY+63VA39Itp8o9SM7r4jK9tsNa/pThjuRVw1oCE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705494734; c=relaxed/simple;
-	bh=KbC7DrEmed5GvMZPqv9Z2kZjz1OIM7XGA/bDdI3obPg=;
-	h=DKIM-Signature:X-IronPort-AV:X-IronPort-AV:Received:X-ExtLoop1:
-	 X-IronPort-AV:Received:Received:Received:Received:
-	 ARC-Message-Signature:ARC-Authentication-Results:Received:Received:
-	 From:To:CC:Subject:Thread-Topic:Thread-Index:Date:Message-ID:
-	 References:In-Reply-To:Accept-Language:Content-Language:
-	 X-MS-Has-Attach:X-MS-TNEF-Correlator:x-ms-publictraffictype:
-	 x-ms-traffictypediagnostic:x-ms-office365-filtering-correlation-id:
-	 x-ld-processed:x-ms-exchange-senderadcheck:
-	 x-ms-exchange-antispam-relay:x-microsoft-antispam:
-	 x-microsoft-antispam-message-info:x-forefront-antispam-report:
-	 x-ms-exchange-antispam-messagedata-chunkcount:
-	 x-ms-exchange-antispam-messagedata-0:Content-Type:
-	 Content-Transfer-Encoding:MIME-Version:
-	 X-MS-Exchange-CrossTenant-AuthAs:
-	 X-MS-Exchange-CrossTenant-AuthSource:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-originalarrivaltime:
-	 X-MS-Exchange-CrossTenant-fromentityheader:
-	 X-MS-Exchange-CrossTenant-id:X-MS-Exchange-CrossTenant-mailboxtype:
-	 X-MS-Exchange-CrossTenant-userprincipalname:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped:X-OriginatorOrg;
-	b=sLzHaRQ/yULj92yNj01EpLlNfo8Qn2yAqA+9lHskX8PG3uaFoUJpKiqGhgT0F56LZ2dHdQIR61aDnt5T7U+0FAedb485DDL6fUml15i/H8yA+xkshbmmiRI/0G1nfq/rJaU3MrVs2Fgi6NyEiXOeZ0QIsWUlT4AUcAuBYicXIAo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i4Za+M5F; arc=fail smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1705494733; x=1737030733;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=KbC7DrEmed5GvMZPqv9Z2kZjz1OIM7XGA/bDdI3obPg=;
-  b=i4Za+M5FRSqP0quGrPAroLkwzrJS9R7MfGsKuCZIUp/N2MQV/43LPKm3
-   BwncWuDZhftTYCou4fMvYKZCTOYcQzoZU+5FQoD6n+mKtfNY1wdreVEnA
-   4S2oka8ynpBur7kXsYzi1p/CTMOJYd0DgH9kqXRFJHndC3Laa9bO6ZL/o
-   HTthCfBqE5k0Bb+mIwIY2CVx54mknAwbilUdLXw5oEFySvA88wa0jaNDE
-   N/npJDooKnT/Yo0me53Ucn3uGcLCaWRpSPQWz4VlptaaTHI780O+DUW1g
-   6+wLyj7ERSU5gFRQR5IV4SoiIeEDl0kmJRdnl3gMTgk9f9N+jU3A3cbvU
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10955"; a="41497"
-X-IronPort-AV: E=Sophos;i="6.05,200,1701158400"; 
-   d="scan'208";a="41497"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jan 2024 04:32:12 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,200,1701158400"; 
-   d="scan'208";a="18828315"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 17 Jan 2024 04:32:12 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 17 Jan 2024 04:32:12 -0800
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Wed, 17 Jan 2024 04:32:12 -0800
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Wed, 17 Jan 2024 04:32:11 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=W+18IwZnoNhWB82YU1w3Mx9J8m4x/mljxY2UgkEBoRmPgGbLu+Sm0MTVO+t8GBYI7zNqSFp1ZKYi4HL5FD1yifN7YEmcQeOvjs5oPJzxg7G70+Hv8L5QhRyLEHJ87Cw0nT5glcfqlruBJjppYGs+I60iAEyO8u/80HH16sR4dM74urhrfeFVqVfWhCPll43sSEQHY5CP8a1H+WSSICfIoPrEyNrLlFu3VHuLLIx66FeSHn4/eg015aRtjvYx4OfXeVN4iT+LqC3jiwZyXvdZPUjcBLS0sSm6v96b1uUQ4QcSAcMuth57Nth2YUl4vM92TGaU8nIEP6aYoCljbHmiKA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nDXeO+cfd0OyUJQu6UTxY0rPAHnmRRQ/TrWWWRcnaVQ=;
- b=K6cGEiLw+7P7sWditvsjsNHoemlI2e9Cpu5yAQFPR030FpeUydYxlxbycJlZ8Vh5h0F0Q0JzbAWll3EP/JF0LErNYLqnAU8mGKXzYSGqKCFnkMS3Rr+KGW/Odt0AN+vUo44tYgfUwTDbCx4A7n0btv3H+05IfdOD5yb3fIDMkTknwB8AKCBsgTEAMBbw7U1+gqHyHle/vfGHk9GBOYiWQ+WcJ8i2kvlbcGiNfbDUIcsrv/T2ziL4LJe6tN5FYaVd5ae7nL3etO7bYZqj2flthdhehuX60AIIHs6TvD0NuchIL3cmU43pi4h/UKj6wju3AMZx2KJg6JR4Uye7TeO4jQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5354.namprd11.prod.outlook.com (2603:10b6:408:11b::7)
- by PH8PR11MB8257.namprd11.prod.outlook.com (2603:10b6:510:1c0::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.24; Wed, 17 Jan
- 2024 12:32:05 +0000
-Received: from BN9PR11MB5354.namprd11.prod.outlook.com
- ([fe80::1ad4:b061:90b9:61c5]) by BN9PR11MB5354.namprd11.prod.outlook.com
- ([fe80::1ad4:b061:90b9:61c5%4]) with mapi id 15.20.7202.020; Wed, 17 Jan 2024
- 12:32:05 +0000
-From: "Arland, ArpanaX" <arpanax.arland@intel.com>
-To: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: ivecera <ivecera@redhat.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-	Martin Zaharinov <micron10@gmail.com>, "Brandeburg, Jesse"
-	<jesse.brandeburg@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-net] i40e: Include types.h to some
- headers
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-net] i40e: Include types.h to some
- headers
-Thread-Index: AQHaRCawDIeiaLOCokGmzEUqlur5tbDd+Dyw
-Date: Wed, 17 Jan 2024 12:32:05 +0000
-Message-ID: <BN9PR11MB535445495CBA35161775FD3080722@BN9PR11MB5354.namprd11.prod.outlook.com>
-References: <20240111003927.2362752-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20240111003927.2362752-1-anthony.l.nguyen@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5354:EE_|PH8PR11MB8257:EE_
-x-ms-office365-filtering-correlation-id: 803fc405-8dbf-4a3f-adb2-08dc17585053
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: gptKRiYm8o8hvb/qTluniGOGl54TD93g3qXsvM+9NvkQfSJte9/AM9w9X4Dj4DiU7w6mWkoj0pJtRurV+spvvgUWVJ9Cw7o7vF/K1W7jQfIiAEDtBZ64sPBYSW91kI2TYsJp+xRTQaTSxMFk0Ss/ujHs4hC2Jh2m+KhX48Gooo6s1FqAxQKYd+UrZksuJ+IyOOyL9E0tlcERAnGP/9nwkTQw0vOuxgRWjPAvOFTNyvoo/1UdGIcLJBsYQVteqmukrelYn7r4RfuYVkIycrWbCuU2BkJduVo848VpL979UuHPXsuzabW2tOV3bDU4YwmC8vW3f1a+gFe9VshXPdeFFsysIulQXCpM9Vx/xxjcYnT6iuQHnseXyRDmSExCtH1WOXI7ZC3rc+1nv1bZcezutRaSmEEJxtqFjTcIlIU2FjHfHkktTy3gug0kjFqdOw6dTs1kSm/K+kIDO5S2Y5CD53VjQk2WmXl5zhqlKfATMbIdbKhXov7BvSRVUx7e1xFs1js6HYXhzPKPsxxiuIjtG09+OpEq6uDQQFcEFEZSG+zaXjJHwpKRup+gTMe0fSab9S2TRcqIb4GhWDXNSfM3kBdZ/JyY36HzYjwQYU977/s=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5354.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(376002)(136003)(346002)(396003)(39860400002)(230922051799003)(451199024)(1800799012)(186009)(64100799003)(107886003)(7696005)(71200400001)(6506007)(9686003)(53546011)(122000001)(83380400001)(5660300002)(52536014)(4326008)(2906002)(8936002)(41300700001)(966005)(478600001)(316002)(76116006)(110136005)(66946007)(54906003)(64756008)(66446008)(66476007)(66556008)(8676002)(33656002)(82960400001)(86362001)(38100700002)(38070700009)(55016003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?XicN9Q0lR5MqbisxqDRUXoa8Q9MVmQo8QVspZhd89ZPRG6evV+x5Ql9tDiOj?=
- =?us-ascii?Q?JT7G2m+EbsBdSZUBHn/Sn8KEB1ECQLS68cEBMf7A+lSoWRoZk7zRjq2X4zCe?=
- =?us-ascii?Q?mPIjg4y9wD5BMrxXRO9BbVmFc0aZhMCFmpr9jzj2B2xmi74qTLLXCqrQ7EV+?=
- =?us-ascii?Q?CFuScLiCfCuspbkyrahcbpz+VdBTNAd1tWRrjhIVLQMWKc/jGsrSTKjsjmAS?=
- =?us-ascii?Q?KcJATiBVEpUwY7WSfKR2ta62/DnHKNQ0gOMQinUIhAEv35BFcrlKtJOqHsGM?=
- =?us-ascii?Q?8IJxWPDIp5qyBNsZZMs6KIf/oSoOUnMoKTaX5C6qEbuNeMzYErzhmc6dG9oQ?=
- =?us-ascii?Q?/MKFoTuKAQShcAt8/CnVuwdZb7Yt1iBGPHnzJntL23bEtd9XPnz7gEXFd5g3?=
- =?us-ascii?Q?UrCisLf17y3pNwqw+xPw0WvIj7fccbDZfY8eNoWnvLTSdeSFHYB6aQ+t6aOV?=
- =?us-ascii?Q?gNEuBYpnvdE8uJ8XYHA2ZflMzy1T31x5ziZnzqsPqSk5x7BLUiIhV5uoU+yh?=
- =?us-ascii?Q?tKBc6o0ivHCJ5X8DmvoTROFOJSwEg4oLTN+y0GWu/vWX3oW0+mB6m0UL60ex?=
- =?us-ascii?Q?fFM+RChjnvKyW/LsI7vzvHCU1nNdQ6D3edMTrwOyyst0GL+HEbpPJzBFJo5L?=
- =?us-ascii?Q?b6zLCbEYdQilfwTCMTa0lKCINsbxv+fme9YhFcysg7OwwdOrtIEvbVOdQu2f?=
- =?us-ascii?Q?MVYrOUipAzAZkz+Dm9hA/ZYHWEpnhKAHyU8i0nRe+jvTSuOVZta4upNdlz1n?=
- =?us-ascii?Q?pig1E+S3jk3ZOGryEVqAY9E6lyJo4MjbzJdHj6GwE0KpNXWiVKy5in/FKpXi?=
- =?us-ascii?Q?+dZq7oMbbh/q4h8oNA2+hIioaqIYIXLJQruaoSVInfEQQk0Mw8oatUZ8FMLj?=
- =?us-ascii?Q?AINMp4MkQgNMWBFOCkqWjrFQomIEAN09G6Z/ToZhbvoLUArYUVRzr5+0bNoS?=
- =?us-ascii?Q?0yLWGKsucp09LAF2F1nG9Ivt/iIzQSAhtqYQzf8CQ+x+BSxA7A1H5DhcOvQv?=
- =?us-ascii?Q?cgxkK/nmWvcfQMaQpRZJeWS6alVobEPxmTDYUu8iZGmNanYMifOINuURH2o8?=
- =?us-ascii?Q?lFpaUmWiTNY8XKbkO5LvKyxAcwTI6y2MRwuRO86Mf/WSl4050OupqimdMzMY?=
- =?us-ascii?Q?jVFPWL3F44ld6x/ekkxoz8MLzmS5iLSYXn1HiRpyWOQYOdBpMJPzowlEQ3BD?=
- =?us-ascii?Q?LslWngVs2Z3H/rYkFSkO6aUGHhdZlsfTcJT7olA0aj5IARCYRlk0i1XaOP6Y?=
- =?us-ascii?Q?oj3yn7tGgMgwEc4wvVi+Jf1XkKvW+REpCQbXgEJncW+g9TOYSGNPAuaDtHhl?=
- =?us-ascii?Q?LiJ31ctsRx4PP4JfTMDFKPRKZnCpm63I7hNfGG0p9dkvN9/Jb0jqxNslkIi/?=
- =?us-ascii?Q?twx1TVhF2/d82y61CXtrgIjs3sdO+hcjwiKORlEx/fEEZRBbJEXQUPBbMGqD?=
- =?us-ascii?Q?YJGfj10GXGlGKI3DHeCS3YBq+jVwFvunTDeZBmOJAmmDQchD8KBuBGz2EW1e?=
- =?us-ascii?Q?YcGD7jHRXRxeLdSpfMdOJr57jMDd7C972v9Tz9xBDlGHt4qFUxzcO7/QJXva?=
- =?us-ascii?Q?gbK+3FL6VJixOZofdcM=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D8B1DFE6;
+	Wed, 17 Jan 2024 12:44:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705495446; cv=none; b=I03z3ochrIAiUzd8ocqUcRbGGsFUL0BbrH0wUDzvbQFkf9b5Qx97ibwogW1FlrQwXkU/KwDthleqiKGl4o4wFGOAmx9EVkrWhNXibqRE7KIZPBmSLQfrm9MEiAMPxusFUk1LVszK9toH4abjmyLBT/qZhNmCNWxIZJou/k8Nc3A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705495446; c=relaxed/simple;
+	bh=giAza7e6lB0scwLEi7BWSLsTb0Ii7ZIpXI4+tJX8w1o=;
+	h=Received:Date:From:To:Cc:Subject:Message-ID:References:
+	 MIME-Version:Content-Type:Content-Disposition:In-Reply-To:
+	 X-Spam-Score; b=OR/MHIhr3ujF3esGy0kGO1rF5qDoPv5LaorJSrHGvjbX3FfAzl/9K4SOoZ6nKxU9hTn+xrS8IzH6Y70vJPHkBHK+eACAydxtYjlz2Oq/c0f3tMcsOPpd9Sr43v9J8zVcyH8mzacge5oJ5cGsBmbaloac5dPEjpUDDZEzloe9sTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.41.52] (port=34294 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1rQ5Gn-00DsBF-Fq; Wed, 17 Jan 2024 13:43:51 +0100
+Date: Wed, 17 Jan 2024 13:43:48 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Pavel Tikhomirov <ptikhomirov@virtuozzo.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Florian Westphal <fw@strlen.de>, David Ahern <dsahern@kernel.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Kees Cook <keescook@chromium.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Roopa Prabhu <roopa@nvidia.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, bridge@lists.linux.dev, kernel@openvz.org
+Subject: Re: [PATCH v3 0/4] netlink: bridge: fix nf_bridge->physindev use
+ after free
+Message-ID: <ZafLhL9U3f/i07BU@calendula>
+References: <20240111150645.85637-1-ptikhomirov@virtuozzo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5354.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 803fc405-8dbf-4a3f-adb2-08dc17585053
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jan 2024 12:32:05.1864
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: NxxxlIye+dJD7XeSCGUC8B+SNDHfDnGX7dxxdzCzoShKnajbc3cO6Bzo0Ht1SRLQbSzRz58IOsdPGwRwlnIj/f7q7DsvWGSUENwU//9h9/E=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB8257
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240111150645.85637-1-ptikhomirov@virtuozzo.com>
+X-Spam-Score: -1.9 (-)
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of T=
-ony Nguyen
-> Sent: Thursday, January 11, 2024 6:09 AM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: ivecera <ivecera@redhat.com>; netdev@vger.kernel.org; Nguyen, Anthony=
- L <anthony.l.nguyen@intel.com>; Martin Zaharinov <micron10@gmail.com>; Bra=
-ndeburg, Jesse <jesse.brandeburg@intel.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-net] i40e: Include types.h to some =
-headers
->
-> Commit 56df345917c0 ("i40e: Remove circular header dependencies and fix
-headers") redistributed a number of includes from one large header file to =
-the locations they were needed. In some environments, types.h is not includ=
-ed and causing compile issues. The driver should not rely on implicit inclu=
-sion from other locations; explicitly include it to these files.
->
-> Snippet of issue. Entire log can be seen through the Closes: link.
->
-> In file included from drivers/net/ethernet/intel/i40e/i40e_diag.h:7,
->                  from drivers/net/ethernet/intel/i40e/i40e_diag.c:4:
-> drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h:33:9: error: unknown ty=
-pe name '__le16'
->    33 |         __le16 flags;
->       |         ^~~~~~
-> drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h:34:9: error: unknown ty=
-pe name '__le16'
->    34 |         __le16 opcode;
->       |         ^~~~~~
-> ...
-> drivers/net/ethernet/intel/i40e/i40e_diag.h:22:9: error: unknown type nam=
-e 'u32'
->    22 |         u32 elements;   /* number of elements if array */
->       |         ^~~
-> drivers/net/ethernet/intel/i40e/i40e_diag.h:23:9: error: unknown type nam=
-e 'u32'
->    23 |         u32 stride;     /* bytes between each element */
->
-> Reported-by: Martin Zaharinov <micron10@gmail.com>
-> Closes: https://lore.kernel.org/netdev/21BBD62A-F874-4E42-B347-93087EEA81=
-26@gmail.com/
-> Fixes: 56df345917c0 ("i40e: Remove circular header dependencies and fix h=
-eaders")
-> Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
-> ---
->  drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h | 1 +
->  drivers/net/ethernet/intel/i40e/i40e_diag.h       | 1 +
->  2 files changed, 2 insertions(+)
->
+On Thu, Jan 11, 2024 at 11:06:36PM +0800, Pavel Tikhomirov wrote:
+> Code processing skb from neigh->arp_queue can access its
+> nf_bridge->physindev, which can already be freed, leading to crash.
+> 
+> So, as Florian suggests, we can put physinif on nf_bridge and peek into
+> the original device with dev_get_by_index_rcu(), so that we can be sure
+> that device is not freed under us.
+> 
+> This is a second attempt to fix this issue, first attempt:
+> 
+> "neighbour: purge nf_bridged skb from foreign device neigh"
+> https://lore.kernel.org/netdev/20240108085232.95437-1-ptikhomirov@virtuozzo.com/
 
-Tested-by: Arpana Arland <arpanax.arland@intel.com> (A Contingent worker at=
- Intel)
+I have applied this series to nf.git
 
+I have added a Fixed: tag sufficiently old to the patch fix so it can
+reach -stable at some point.
+
+My understanding is that this problem has been always there for
+br_netfilter.
 
