@@ -1,93 +1,125 @@
-Return-Path: <netdev+bounces-63888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63889-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C22D82FEAE
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 03:01:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7586782FEEE
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 03:49:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D180B26AD8
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 02:01:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 179791F25A3F
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 02:49:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FBD41C05;
-	Wed, 17 Jan 2024 02:00:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t3iz3ywp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FF5FEBE;
+	Wed, 17 Jan 2024 02:48:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE9587491
-	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 02:00:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 663817F5
+	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 02:48:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705456825; cv=none; b=IJSalWOClgIeKCI0/0fwKPH1T7pxz1/gkuazNKCRR0WFSAP3FyyofWtvuU4INEspczeDMD86qyshjBtBmXoW+h/05onIeddURlFIrbOEFGYhQmyoJ6rjHZE/n55YCRcQBx64ra8Fmz8CMnuRJVD0jSjcUdp+Kia7EVLEypJmwPA=
+	t=1705459739; cv=none; b=lmSuYXnZaxtKqmxPZ1ilhibM27xCrBiDlUvib/z9UrYk6r+okp7M+bez7izvTkqPxnagFuhsSXkkkCg/Nex6KP6Tgu/lfApUAJYvYqbD4BOLRuIG6bUMSXsFNgEHb94D1TA1jRphldoUTAaLnJJoQqrQgrki5/HZB1/kVwtAyb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705456825; c=relaxed/simple;
-	bh=txRq6YANOsTkSmngmhXwTpwHW0RobWuxiEOpBu7fick=;
-	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
-	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=VB5byygRQHQUm72vyI1Dz2YJiEQtPheOHJd1Q9Dhnjmnk+++3bkBa8OE0HPeGY6EquNT7MQAyflp+twjHfzvbV9mYLMVADifp+bgq5NOuuGkiVcqprZ3QyNzb7bXfjarmP9aiKnkXqLhNPlW9R8VjWnTp/T/iv+45IcqVa48WjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t3iz3ywp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 79716C433C7;
-	Wed, 17 Jan 2024 02:00:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705456824;
-	bh=txRq6YANOsTkSmngmhXwTpwHW0RobWuxiEOpBu7fick=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=t3iz3ywpCQeLvQGN9G5DzvDyivFlxAtRsKF6e/VXPm2MQmvK53qVbanzN2PVWtE6M
-	 3ZYfpcjJh6aAEaNL5n47uirJItRz+8EfdqzwNwN/LXEMOhO5+Ckgf0qn0RT0wpYC12
-	 2Gx6YcO7OZduk8gCiamVSfwQjBliLLflrcdNoktqrtkP8mWHvndCXadfglXBG0q0gm
-	 8mowwWuEtVC06w5Zmmfvh1vNAVZB2C+xHK2oXcRv22u3hy9hiwy1BTl3SawsJZMYry
-	 uJgZfz1djlJ4kGnJcIP/zkQlYir093xk62gAi2L7bwzu16CUMeW2MbUHmtD2ckrGA5
-	 LJTXL+44BZf0w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 582A0D8C985;
-	Wed, 17 Jan 2024 02:00:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1705459739; c=relaxed/simple;
+	bh=n6Jb3ozWTbJqkOaAaCMbRWrZPHdd0Aa6g8/BVN69Rco=;
+	h=Received:Received:Received:Message-ID:Date:MIME-Version:
+	 User-Agent:Subject:To:CC:References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:X-Originating-IP:X-ClientProxiedBy; b=IwZEJx2HLTjVl0wFBt1wRnASw+RaA3/ATZHSnBSO0/Us4iZzjtm6H003QZyvp1OXGRHGNCra2Uzf65zCDQYjpmWF1X9Aqs+/wIZ/Pxm1u9g9jhll97xg8FGxwNlxVSrhhe29tgBdOFjYAM2+nrk7D3Qtojhoc/WCfJUnFhbtnU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4TF9Fh5KrSz1FJQG;
+	Wed, 17 Jan 2024 10:44:40 +0800 (CST)
+Received: from dggpeml500026.china.huawei.com (unknown [7.185.36.106])
+	by mail.maildlp.com (Postfix) with ESMTPS id 626C71800A9;
+	Wed, 17 Jan 2024 10:48:54 +0800 (CST)
+Received: from [10.174.178.66] (10.174.178.66) by
+ dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 17 Jan 2024 10:48:53 +0800
+Message-ID: <a0adea69-aea1-d35a-6a34-e1544a7ce1a5@huawei.com>
+Date: Wed, 17 Jan 2024 10:48:53 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.2
+Subject: Re: [PATCH net,v2] tcp: make sure init the accept_queue's spinlocks
+ once
+To: Eric Dumazet <edumazet@google.com>
+CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <dsahern@kernel.org>, <hkchu@google.com>,
+	<weiyongjun1@huawei.com>, <yuehaibing@huawei.com>
+References: <20240113030739.3446338-1-shaozhengchao@huawei.com>
+ <CANn89i+nmdm5aRNC0mvuVufyRq+fzvKMU9KtSdBMXjMBosgxTA@mail.gmail.com>
+From: shaozhengchao <shaozhengchao@huawei.com>
+In-Reply-To: <CANn89i+nmdm5aRNC0mvuVufyRq+fzvKMU9KtSdBMXjMBosgxTA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] selftests: rtnetlink: use setup_ns in bonding test
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170545682435.28743.16266298970149259484.git-patchwork-notify@kernel.org>
-Date: Wed, 17 Jan 2024 02:00:24 +0000
-References: <20240115135922.3662648-1-nicolas.dichtel@6wind.com>
-In-Reply-To: <20240115135922.3662648-1-nicolas.dichtel@6wind.com>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, phil@nwl.cc, dsahern@kernel.org, jiri@resnulli.us,
- liuhangbin@gmail.com, netdev@vger.kernel.org
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
 
-Hello:
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 15 Jan 2024 14:59:22 +0100 you wrote:
-> This is a follow-up of commit a159cbe81d3b ("selftests: rtnetlink: check
-> enslaving iface in a bond") after the merge of net-next into net.
+On 2024/1/16 18:38, Eric Dumazet wrote:
+> On Sat, Jan 13, 2024 at 3:57 AM Zhengchao Shao <shaozhengchao@huawei.com> wrote:
+>>
+>> When I run syz's reproduction C program locally, it causes the following
+>> issue:
+>> pvqspinlock: lock 0xffff9d181cd5c660 has corrupted value 0x0!
+>> WARNING: CPU: 19 PID: 21160 at __pv_queued_spin_unlock_slowpath (kernel/locking/qspinlock_paravirt.h:508)
+>> Ha
 > 
-> The goal is to follow the new convention,
-> see commit d3b6b1116127 ("selftests/net: convert rtnetlink.sh to run it in
-> unique namespace") for more details.
 > 
-> [...]
+>> When the socket receives the ACK packet during the three-way handshake,
+>> it will hold spinlock. And then the user actively shutdowns the socket
+>> and listens to the socket immediately, the spinlock will be initialized.
+>> When the socket is going to release the spinlock, a warning is generated.
+>> Also the same issue to fastopenq.lock.
+>>
+>> Add 'init_done' to make sure init the accept_queue's spinlocks once.
+>>
+>> Fixes: fff1f3001cc5 ("tcp: add a spinlock to protect struct request_sock_queue")
+>> Fixes: 168a8f58059a ("tcp: TCP Fast Open Server - main code path")
+>> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+>> ---
+>> v2: Add 'init_done' to make sure init the accept_queue's spinlocks once.
+>> ---
+>>   include/net/request_sock.h | 1 +
+>>   net/core/request_sock.c    | 7 +++++--
+>>   net/ipv4/tcp.c             | 1 +
+>>   3 files changed, 7 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/include/net/request_sock.h b/include/net/request_sock.h
+>> index 144c39db9898..0054746fe92d 100644
+>> --- a/include/net/request_sock.h
+>> +++ b/include/net/request_sock.h
+>> @@ -175,6 +175,7 @@ struct fastopen_queue {
+>>   struct request_sock_queue {
+>>          spinlock_t              rskq_lock;
+>>          u8                      rskq_defer_accept;
+>> +       bool                    init_done;
+>>
+> 
+> No, we should not add a new field for this.
+> The idea of having a conditional  spin_lock_init() is not very nice
+> for code readability.
+> 
+> Just always init request_sock_queue spinlocks for all inet sockets at
+> socket() and accept() time,
+> not at listen() time.
+> 
+> This structure is not dynamically allocated, and part of 'struct
+> inet_connection_sock'...
+Hi Eric:
+	It looks good to me. I will send V3.
+Thank you.
 
-Here is the summary with links:
-  - [net] selftests: rtnetlink: use setup_ns in bonding test
-    https://git.kernel.org/netdev/net/c/e9ce7ededf14
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Zhengchao Shao
 
