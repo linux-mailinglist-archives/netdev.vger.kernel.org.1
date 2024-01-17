@@ -1,137 +1,241 @@
-Return-Path: <netdev+bounces-63956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A88D830545
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 13:29:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CC26830552
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 13:32:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 373CC1F25E45
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 12:29:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 280AF1F24CB7
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 12:32:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 459891DFFB;
-	Wed, 17 Jan 2024 12:28:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03E1E323C;
+	Wed, 17 Jan 2024 12:32:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i4Za+M5F"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 164121DFF8;
-	Wed, 17 Jan 2024 12:28:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705494502; cv=none; b=pWLRfvIHBEz9pqIb7xSDigqBZFr10HRah+GZB7s22hIYHYwYtkk3TmRx1f5a/F5OjivlNediKq3iXmmPYnQ//B2ql2b7VbqzlJ4HZ05QCrPS0WZ6aLCsmX/6UN/P3Nfecy82V0DiYEXudDoJvn/f8FkSsOMxuMgiz4fLbI0gjaY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705494502; c=relaxed/simple;
-	bh=IAZtHNeINjkNdxYoN1+J/qhcbxursZX0lY55FYaAUuw=;
-	h=X-Alimail-AntiSpam:Received:From:To:Cc:Subject:Date:Message-Id:
-	 X-Mailer:MIME-Version:Content-Transfer-Encoding; b=E6oz9mX13JD4kHLxXpbM005zPve2Q+VXeA6wq4m60LHN2FJBpDJl1b9Fv7Dqs0x7YRim7HtdtZwO3bWhs8v+c61TstXgYX8eMMUcX6ydywL4yazJFmLYCHFyEjIbSIhdj2WuygmT3RQLg3AsmzsPi5n2FJSi5VbrjKrXEwBSZos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; arc=none smtp.client-ip=115.124.30.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R391e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0W-pO-Ke_1705494469;
-Received: from localhost(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W-pO-Ke_1705494469)
-          by smtp.aliyun-inc.com;
-          Wed, 17 Jan 2024 20:28:16 +0800
-From: Wen Gu <guwen@linux.alibaba.com>
-To: wenjia@linux.ibm.com,
-	jaka@linux.ibm.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: alibuda@linux.alibaba.com,
-	tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com,
-	yepeilin.cs@gmail.com,
-	ubraun@linux.ibm.com,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] net/smc: fix illegal rmb_desc access in SMC-D connection dump
-Date: Wed, 17 Jan 2024 20:27:49 +0800
-Message-Id: <20240117122749.63785-1-guwen@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F96C1EA66
+	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 12:32:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705494734; cv=fail; b=bSyNbNGelwbEMzfddj77pvoS8CTfcfl/NlTb9AUMFHqJeOABPBj2hQavaSr8LHAIbFu8MSK4YzSiWSJiM3frYmO4Q15RF56qhgx3NroFN7lqAwzaaQVqoHbN3yqHEkw0Pv6iY+63VA39Itp8o9SM7r4jK9tsNa/pThjuRVw1oCE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705494734; c=relaxed/simple;
+	bh=KbC7DrEmed5GvMZPqv9Z2kZjz1OIM7XGA/bDdI3obPg=;
+	h=DKIM-Signature:X-IronPort-AV:X-IronPort-AV:Received:X-ExtLoop1:
+	 X-IronPort-AV:Received:Received:Received:Received:
+	 ARC-Message-Signature:ARC-Authentication-Results:Received:Received:
+	 From:To:CC:Subject:Thread-Topic:Thread-Index:Date:Message-ID:
+	 References:In-Reply-To:Accept-Language:Content-Language:
+	 X-MS-Has-Attach:X-MS-TNEF-Correlator:x-ms-publictraffictype:
+	 x-ms-traffictypediagnostic:x-ms-office365-filtering-correlation-id:
+	 x-ld-processed:x-ms-exchange-senderadcheck:
+	 x-ms-exchange-antispam-relay:x-microsoft-antispam:
+	 x-microsoft-antispam-message-info:x-forefront-antispam-report:
+	 x-ms-exchange-antispam-messagedata-chunkcount:
+	 x-ms-exchange-antispam-messagedata-0:Content-Type:
+	 Content-Transfer-Encoding:MIME-Version:
+	 X-MS-Exchange-CrossTenant-AuthAs:
+	 X-MS-Exchange-CrossTenant-AuthSource:
+	 X-MS-Exchange-CrossTenant-Network-Message-Id:
+	 X-MS-Exchange-CrossTenant-originalarrivaltime:
+	 X-MS-Exchange-CrossTenant-fromentityheader:
+	 X-MS-Exchange-CrossTenant-id:X-MS-Exchange-CrossTenant-mailboxtype:
+	 X-MS-Exchange-CrossTenant-userprincipalname:
+	 X-MS-Exchange-Transport-CrossTenantHeadersStamped:X-OriginatorOrg;
+	b=sLzHaRQ/yULj92yNj01EpLlNfo8Qn2yAqA+9lHskX8PG3uaFoUJpKiqGhgT0F56LZ2dHdQIR61aDnt5T7U+0FAedb485DDL6fUml15i/H8yA+xkshbmmiRI/0G1nfq/rJaU3MrVs2Fgi6NyEiXOeZ0QIsWUlT4AUcAuBYicXIAo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i4Za+M5F; arc=fail smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1705494733; x=1737030733;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=KbC7DrEmed5GvMZPqv9Z2kZjz1OIM7XGA/bDdI3obPg=;
+  b=i4Za+M5FRSqP0quGrPAroLkwzrJS9R7MfGsKuCZIUp/N2MQV/43LPKm3
+   BwncWuDZhftTYCou4fMvYKZCTOYcQzoZU+5FQoD6n+mKtfNY1wdreVEnA
+   4S2oka8ynpBur7kXsYzi1p/CTMOJYd0DgH9kqXRFJHndC3Laa9bO6ZL/o
+   HTthCfBqE5k0Bb+mIwIY2CVx54mknAwbilUdLXw5oEFySvA88wa0jaNDE
+   N/npJDooKnT/Yo0me53Ucn3uGcLCaWRpSPQWz4VlptaaTHI780O+DUW1g
+   6+wLyj7ERSU5gFRQR5IV4SoiIeEDl0kmJRdnl3gMTgk9f9N+jU3A3cbvU
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10955"; a="41497"
+X-IronPort-AV: E=Sophos;i="6.05,200,1701158400"; 
+   d="scan'208";a="41497"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jan 2024 04:32:12 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,200,1701158400"; 
+   d="scan'208";a="18828315"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 17 Jan 2024 04:32:12 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 17 Jan 2024 04:32:12 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 17 Jan 2024 04:32:12 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 17 Jan 2024 04:32:11 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=W+18IwZnoNhWB82YU1w3Mx9J8m4x/mljxY2UgkEBoRmPgGbLu+Sm0MTVO+t8GBYI7zNqSFp1ZKYi4HL5FD1yifN7YEmcQeOvjs5oPJzxg7G70+Hv8L5QhRyLEHJ87Cw0nT5glcfqlruBJjppYGs+I60iAEyO8u/80HH16sR4dM74urhrfeFVqVfWhCPll43sSEQHY5CP8a1H+WSSICfIoPrEyNrLlFu3VHuLLIx66FeSHn4/eg015aRtjvYx4OfXeVN4iT+LqC3jiwZyXvdZPUjcBLS0sSm6v96b1uUQ4QcSAcMuth57Nth2YUl4vM92TGaU8nIEP6aYoCljbHmiKA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nDXeO+cfd0OyUJQu6UTxY0rPAHnmRRQ/TrWWWRcnaVQ=;
+ b=K6cGEiLw+7P7sWditvsjsNHoemlI2e9Cpu5yAQFPR030FpeUydYxlxbycJlZ8Vh5h0F0Q0JzbAWll3EP/JF0LErNYLqnAU8mGKXzYSGqKCFnkMS3Rr+KGW/Odt0AN+vUo44tYgfUwTDbCx4A7n0btv3H+05IfdOD5yb3fIDMkTknwB8AKCBsgTEAMBbw7U1+gqHyHle/vfGHk9GBOYiWQ+WcJ8i2kvlbcGiNfbDUIcsrv/T2ziL4LJe6tN5FYaVd5ae7nL3etO7bYZqj2flthdhehuX60AIIHs6TvD0NuchIL3cmU43pi4h/UKj6wju3AMZx2KJg6JR4Uye7TeO4jQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5354.namprd11.prod.outlook.com (2603:10b6:408:11b::7)
+ by PH8PR11MB8257.namprd11.prod.outlook.com (2603:10b6:510:1c0::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.24; Wed, 17 Jan
+ 2024 12:32:05 +0000
+Received: from BN9PR11MB5354.namprd11.prod.outlook.com
+ ([fe80::1ad4:b061:90b9:61c5]) by BN9PR11MB5354.namprd11.prod.outlook.com
+ ([fe80::1ad4:b061:90b9:61c5%4]) with mapi id 15.20.7202.020; Wed, 17 Jan 2024
+ 12:32:05 +0000
+From: "Arland, ArpanaX" <arpanax.arland@intel.com>
+To: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: ivecera <ivecera@redhat.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	Martin Zaharinov <micron10@gmail.com>, "Brandeburg, Jesse"
+	<jesse.brandeburg@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-net] i40e: Include types.h to some
+ headers
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-net] i40e: Include types.h to some
+ headers
+Thread-Index: AQHaRCawDIeiaLOCokGmzEUqlur5tbDd+Dyw
+Date: Wed, 17 Jan 2024 12:32:05 +0000
+Message-ID: <BN9PR11MB535445495CBA35161775FD3080722@BN9PR11MB5354.namprd11.prod.outlook.com>
+References: <20240111003927.2362752-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20240111003927.2362752-1-anthony.l.nguyen@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5354:EE_|PH8PR11MB8257:EE_
+x-ms-office365-filtering-correlation-id: 803fc405-8dbf-4a3f-adb2-08dc17585053
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: gptKRiYm8o8hvb/qTluniGOGl54TD93g3qXsvM+9NvkQfSJte9/AM9w9X4Dj4DiU7w6mWkoj0pJtRurV+spvvgUWVJ9Cw7o7vF/K1W7jQfIiAEDtBZ64sPBYSW91kI2TYsJp+xRTQaTSxMFk0Ss/ujHs4hC2Jh2m+KhX48Gooo6s1FqAxQKYd+UrZksuJ+IyOOyL9E0tlcERAnGP/9nwkTQw0vOuxgRWjPAvOFTNyvoo/1UdGIcLJBsYQVteqmukrelYn7r4RfuYVkIycrWbCuU2BkJduVo848VpL979UuHPXsuzabW2tOV3bDU4YwmC8vW3f1a+gFe9VshXPdeFFsysIulQXCpM9Vx/xxjcYnT6iuQHnseXyRDmSExCtH1WOXI7ZC3rc+1nv1bZcezutRaSmEEJxtqFjTcIlIU2FjHfHkktTy3gug0kjFqdOw6dTs1kSm/K+kIDO5S2Y5CD53VjQk2WmXl5zhqlKfATMbIdbKhXov7BvSRVUx7e1xFs1js6HYXhzPKPsxxiuIjtG09+OpEq6uDQQFcEFEZSG+zaXjJHwpKRup+gTMe0fSab9S2TRcqIb4GhWDXNSfM3kBdZ/JyY36HzYjwQYU977/s=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5354.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(376002)(136003)(346002)(396003)(39860400002)(230922051799003)(451199024)(1800799012)(186009)(64100799003)(107886003)(7696005)(71200400001)(6506007)(9686003)(53546011)(122000001)(83380400001)(5660300002)(52536014)(4326008)(2906002)(8936002)(41300700001)(966005)(478600001)(316002)(76116006)(110136005)(66946007)(54906003)(64756008)(66446008)(66476007)(66556008)(8676002)(33656002)(82960400001)(86362001)(38100700002)(38070700009)(55016003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?XicN9Q0lR5MqbisxqDRUXoa8Q9MVmQo8QVspZhd89ZPRG6evV+x5Ql9tDiOj?=
+ =?us-ascii?Q?JT7G2m+EbsBdSZUBHn/Sn8KEB1ECQLS68cEBMf7A+lSoWRoZk7zRjq2X4zCe?=
+ =?us-ascii?Q?mPIjg4y9wD5BMrxXRO9BbVmFc0aZhMCFmpr9jzj2B2xmi74qTLLXCqrQ7EV+?=
+ =?us-ascii?Q?CFuScLiCfCuspbkyrahcbpz+VdBTNAd1tWRrjhIVLQMWKc/jGsrSTKjsjmAS?=
+ =?us-ascii?Q?KcJATiBVEpUwY7WSfKR2ta62/DnHKNQ0gOMQinUIhAEv35BFcrlKtJOqHsGM?=
+ =?us-ascii?Q?8IJxWPDIp5qyBNsZZMs6KIf/oSoOUnMoKTaX5C6qEbuNeMzYErzhmc6dG9oQ?=
+ =?us-ascii?Q?/MKFoTuKAQShcAt8/CnVuwdZb7Yt1iBGPHnzJntL23bEtd9XPnz7gEXFd5g3?=
+ =?us-ascii?Q?UrCisLf17y3pNwqw+xPw0WvIj7fccbDZfY8eNoWnvLTSdeSFHYB6aQ+t6aOV?=
+ =?us-ascii?Q?gNEuBYpnvdE8uJ8XYHA2ZflMzy1T31x5ziZnzqsPqSk5x7BLUiIhV5uoU+yh?=
+ =?us-ascii?Q?tKBc6o0ivHCJ5X8DmvoTROFOJSwEg4oLTN+y0GWu/vWX3oW0+mB6m0UL60ex?=
+ =?us-ascii?Q?fFM+RChjnvKyW/LsI7vzvHCU1nNdQ6D3edMTrwOyyst0GL+HEbpPJzBFJo5L?=
+ =?us-ascii?Q?b6zLCbEYdQilfwTCMTa0lKCINsbxv+fme9YhFcysg7OwwdOrtIEvbVOdQu2f?=
+ =?us-ascii?Q?MVYrOUipAzAZkz+Dm9hA/ZYHWEpnhKAHyU8i0nRe+jvTSuOVZta4upNdlz1n?=
+ =?us-ascii?Q?pig1E+S3jk3ZOGryEVqAY9E6lyJo4MjbzJdHj6GwE0KpNXWiVKy5in/FKpXi?=
+ =?us-ascii?Q?+dZq7oMbbh/q4h8oNA2+hIioaqIYIXLJQruaoSVInfEQQk0Mw8oatUZ8FMLj?=
+ =?us-ascii?Q?AINMp4MkQgNMWBFOCkqWjrFQomIEAN09G6Z/ToZhbvoLUArYUVRzr5+0bNoS?=
+ =?us-ascii?Q?0yLWGKsucp09LAF2F1nG9Ivt/iIzQSAhtqYQzf8CQ+x+BSxA7A1H5DhcOvQv?=
+ =?us-ascii?Q?cgxkK/nmWvcfQMaQpRZJeWS6alVobEPxmTDYUu8iZGmNanYMifOINuURH2o8?=
+ =?us-ascii?Q?lFpaUmWiTNY8XKbkO5LvKyxAcwTI6y2MRwuRO86Mf/WSl4050OupqimdMzMY?=
+ =?us-ascii?Q?jVFPWL3F44ld6x/ekkxoz8MLzmS5iLSYXn1HiRpyWOQYOdBpMJPzowlEQ3BD?=
+ =?us-ascii?Q?LslWngVs2Z3H/rYkFSkO6aUGHhdZlsfTcJT7olA0aj5IARCYRlk0i1XaOP6Y?=
+ =?us-ascii?Q?oj3yn7tGgMgwEc4wvVi+Jf1XkKvW+REpCQbXgEJncW+g9TOYSGNPAuaDtHhl?=
+ =?us-ascii?Q?LiJ31ctsRx4PP4JfTMDFKPRKZnCpm63I7hNfGG0p9dkvN9/Jb0jqxNslkIi/?=
+ =?us-ascii?Q?twx1TVhF2/d82y61CXtrgIjs3sdO+hcjwiKORlEx/fEEZRBbJEXQUPBbMGqD?=
+ =?us-ascii?Q?YJGfj10GXGlGKI3DHeCS3YBq+jVwFvunTDeZBmOJAmmDQchD8KBuBGz2EW1e?=
+ =?us-ascii?Q?YcGD7jHRXRxeLdSpfMdOJr57jMDd7C972v9Tz9xBDlGHt4qFUxzcO7/QJXva?=
+ =?us-ascii?Q?gbK+3FL6VJixOZofdcM=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5354.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 803fc405-8dbf-4a3f-adb2-08dc17585053
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jan 2024 12:32:05.1864
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: NxxxlIye+dJD7XeSCGUC8B+SNDHfDnGX7dxxdzCzoShKnajbc3cO6Bzo0Ht1SRLQbSzRz58IOsdPGwRwlnIj/f7q7DsvWGSUENwU//9h9/E=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB8257
+X-OriginatorOrg: intel.com
 
-A crash was found when dumping SMC-D connections. It can be reproduced
-by following steps:
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of T=
+ony Nguyen
+> Sent: Thursday, January 11, 2024 6:09 AM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: ivecera <ivecera@redhat.com>; netdev@vger.kernel.org; Nguyen, Anthony=
+ L <anthony.l.nguyen@intel.com>; Martin Zaharinov <micron10@gmail.com>; Bra=
+ndeburg, Jesse <jesse.brandeburg@intel.com>
+> Subject: [Intel-wired-lan] [PATCH iwl-net] i40e: Include types.h to some =
+headers
+>
+> Commit 56df345917c0 ("i40e: Remove circular header dependencies and fix
+headers") redistributed a number of includes from one large header file to =
+the locations they were needed. In some environments, types.h is not includ=
+ed and causing compile issues. The driver should not rely on implicit inclu=
+sion from other locations; explicitly include it to these files.
+>
+> Snippet of issue. Entire log can be seen through the Closes: link.
+>
+> In file included from drivers/net/ethernet/intel/i40e/i40e_diag.h:7,
+>                  from drivers/net/ethernet/intel/i40e/i40e_diag.c:4:
+> drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h:33:9: error: unknown ty=
+pe name '__le16'
+>    33 |         __le16 flags;
+>       |         ^~~~~~
+> drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h:34:9: error: unknown ty=
+pe name '__le16'
+>    34 |         __le16 opcode;
+>       |         ^~~~~~
+> ...
+> drivers/net/ethernet/intel/i40e/i40e_diag.h:22:9: error: unknown type nam=
+e 'u32'
+>    22 |         u32 elements;   /* number of elements if array */
+>       |         ^~~
+> drivers/net/ethernet/intel/i40e/i40e_diag.h:23:9: error: unknown type nam=
+e 'u32'
+>    23 |         u32 stride;     /* bytes between each element */
+>
+> Reported-by: Martin Zaharinov <micron10@gmail.com>
+> Closes: https://lore.kernel.org/netdev/21BBD62A-F874-4E42-B347-93087EEA81=
+26@gmail.com/
+> Fixes: 56df345917c0 ("i40e: Remove circular header dependencies and fix h=
+eaders")
+> Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+> ---
+>  drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h | 1 +
+>  drivers/net/ethernet/intel/i40e/i40e_diag.h       | 1 +
+>  2 files changed, 2 insertions(+)
+>
 
-- run nginx/wrk test:
-  smc_run nginx
-  smc_run wrk -t 16 -c 1000 -d <duration> -H 'Connection: Close' <URL>
-
-- continuously dump SMC-D connections in parallel:
-  watch -n 1 'smcss -D'
-
- BUG: kernel NULL pointer dereference, address: 0000000000000030
- CPU: 2 PID: 7204 Comm: smcss Kdump: loaded Tainted: G	E      6.7.0+ #55
- RIP: 0010:__smc_diag_dump.constprop.0+0x5e5/0x620 [smc_diag]
- Call Trace:
-  <TASK>
-  ? __die+0x24/0x70
-  ? page_fault_oops+0x66/0x150
-  ? exc_page_fault+0x69/0x140
-  ? asm_exc_page_fault+0x26/0x30
-  ? __smc_diag_dump.constprop.0+0x5e5/0x620 [smc_diag]
-  ? __kmalloc_node_track_caller+0x35d/0x430
-  ? __alloc_skb+0x77/0x170
-  smc_diag_dump_proto+0xd0/0xf0 [smc_diag]
-  smc_diag_dump+0x26/0x60 [smc_diag]
-  netlink_dump+0x19f/0x320
-  __netlink_dump_start+0x1dc/0x300
-  smc_diag_handler_dump+0x6a/0x80 [smc_diag]
-  ? __pfx_smc_diag_dump+0x10/0x10 [smc_diag]
-  sock_diag_rcv_msg+0x121/0x140
-  ? __pfx_sock_diag_rcv_msg+0x10/0x10
-  netlink_rcv_skb+0x5a/0x110
-  sock_diag_rcv+0x28/0x40
-  netlink_unicast+0x22a/0x330
-  netlink_sendmsg+0x1f8/0x420
-  __sock_sendmsg+0xb0/0xc0
-  ____sys_sendmsg+0x24e/0x300
-  ? copy_msghdr_from_user+0x62/0x80
-  ___sys_sendmsg+0x7c/0xd0
-  ? __do_fault+0x34/0x160
-  ? do_read_fault+0x5f/0x100
-  ? do_fault+0xb0/0x110
-  ? __handle_mm_fault+0x2b0/0x6c0
-  __sys_sendmsg+0x4d/0x80
-  do_syscall_64+0x69/0x180
-  entry_SYSCALL_64_after_hwframe+0x6e/0x76
-
-It is possible that the connection is in process of being established
-when we dump it. Assumed that the connection has been registered in a
-link group by smc_conn_create() but the rmb_desc has not yet been
-initialized by smc_buf_create(), thus causing the illegal access to
-conn->rmb_desc. So fix it by checking before dump.
-
-Fixes: ce51f63e63c5 ("net/smc: Prevent kernel-infoleak in __smc_diag_dump()")
-Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
----
- net/smc/smc_diag.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/smc/smc_diag.c b/net/smc/smc_diag.c
-index 52f7c4f1e767..5a33908015f3 100644
---- a/net/smc/smc_diag.c
-+++ b/net/smc/smc_diag.c
-@@ -164,7 +164,7 @@ static int __smc_diag_dump(struct sock *sk, struct sk_buff *skb,
- 	}
- 	if (smc_conn_lgr_valid(&smc->conn) && smc->conn.lgr->is_smcd &&
- 	    (req->diag_ext & (1 << (SMC_DIAG_DMBINFO - 1))) &&
--	    !list_empty(&smc->conn.lgr->list)) {
-+	    !list_empty(&smc->conn.lgr->list) && smc->conn.rmb_desc) {
- 		struct smc_connection *conn = &smc->conn;
- 		struct smcd_diag_dmbinfo dinfo;
- 		struct smcd_dev *smcd = conn->lgr->smcd;
--- 
-2.43.0
+Tested-by: Arpana Arland <arpanax.arland@intel.com> (A Contingent worker at=
+ Intel)
 
 
