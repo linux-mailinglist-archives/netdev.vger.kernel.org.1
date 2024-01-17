@@ -1,54 +1,76 @@
-Return-Path: <netdev+bounces-64032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12F90830BD8
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 18:21:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72D51830BDF
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 18:25:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90A08B21ED3
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 17:21:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81DB11C21AF5
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 17:25:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 360CE225D8;
-	Wed, 17 Jan 2024 17:21:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3FE2225DD;
+	Wed, 17 Jan 2024 17:25:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nUso5K2q"
 X-Original-To: netdev@vger.kernel.org
-Received: from exchange.fintech.ru (exchange.fintech.ru [195.54.195.159])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A34E22609;
-	Wed, 17 Jan 2024 17:21:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.54.195.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C71081E48C
+	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 17:25:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705512077; cv=none; b=Tofq8vTlyfcSolZNLejYRBNNadpcvJ/RNPYJnQQQQxzP0mEZN01N9mSC+cfEBB2bYtdpVhaPDBCSOuAHhVCkWEUUA0zt8GszX6Idxe79dONAdkgih/5ZhRXPiyCAEyPUHugP0wsGZK+tD424HXRu0/BVC8ymf/qoP9vEnJUG3Lc=
+	t=1705512343; cv=none; b=s4d2w9C9vU77G7uOZk+OgbmICNWnhCH18vu/R3GgUyNVljNj8RsbZlxvogdpjGv7tb19TuSySL1Wg+YqPwKkmd7D7aGccvpv8kaIHAFWmQpfwWcH1kKSkxskANvRmBMpzTKRDTpf5qojmEA1m/H/sHd6/A5fkvingpyrDWbP8sA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705512077; c=relaxed/simple;
-	bh=0tQpzSPcwZV/BAp/SszbaUM/7gsBsP/zQckGbH5ilbA=;
-	h=Received:Received:From:To:CC:Subject:Date:Message-ID:X-Mailer:
-	 MIME-Version:Content-Transfer-Encoding:Content-Type:
-	 X-Originating-IP:X-ClientProxiedBy; b=EfURtiXllForlDwdIpDDilZD5gMlTxfDbkLvAfuUxKop7jx8jercFEmMRyKZdgfU+rSfWkab5xno2KYJHOWEZ1U1WZBFg0q2wsG6ODpknzdZ1ncFfM5/41ElzsMwWGrJULR6Urjauj6FmyEOBMx5jMRQgXLu+iS8ij2yPcW2ZdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru; spf=pass smtp.mailfrom=fintech.ru; arc=none smtp.client-ip=195.54.195.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fintech.ru
-Received: from Ex16-01.fintech.ru (10.0.10.18) by exchange.fintech.ru
- (195.54.195.169) with Microsoft SMTP Server (TLS) id 14.3.498.0; Wed, 17 Jan
- 2024 20:21:07 +0300
-Received: from localhost (10.0.253.138) by Ex16-01.fintech.ru (10.0.10.18)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Wed, 17 Jan
- 2024 20:21:07 +0300
-From: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
-To: "David S. Miller" <davem@davemloft.net>
-CC: Nikita Zhandarovich <n.zhandarovich@fintech.ru>, David Ahern
-	<dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Taehee Yoo
-	<ap420073@gmail.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>,
-	<syzbot+a9400cabb1d784e49abf@syzkaller.appspotmail.com>
-Subject: [PATCH net] ipv6: mcast: fix data-race in ipv6_mc_down / mld_ifc_work
-Date: Wed, 17 Jan 2024 09:21:02 -0800
-Message-ID: <20240117172102.12001-1-n.zhandarovich@fintech.ru>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1705512343; c=relaxed/simple;
+	bh=uLyl+WkOUixIeLO1fA5FuCRzCq3+Q0c9gEWAfKYEBiY=;
+	h=DKIM-Signature:X-IronPort-AV:X-IronPort-AV:Received:X-ExtLoop1:
+	 X-IronPort-AV:Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 MIME-Version:Content-Transfer-Encoding; b=Z4NLxdmyMLaHa8kNXxNAq/jnBIVQh4l0aIMxYRCNvFfM0T4gxtBo4JkynfMwcUjF3k7BogDynSYhXbmLxOW9BaL80F3DA1GZDa3wqPrElZwyIcq/LBoVQjEuH99iXb/NEZUE3/DfcWpNUd9RiBPBUzvzgMpG7xm6YLzI2UyPDos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nUso5K2q; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1705512342; x=1737048342;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=uLyl+WkOUixIeLO1fA5FuCRzCq3+Q0c9gEWAfKYEBiY=;
+  b=nUso5K2q+PHSh/LnqC76R4nEhUXF6ocY5hBR0kVyEQi02g7MaUovhLtr
+   7R9zpa1wyRISYPQEvn+81VFIBVJunk6Ifco6Iq9gqX7FPbx93eQP0n9xX
+   8ODOBU9LuzeHGTf19qtFBHGnyne1yIrXfOhRrwHkdMVRlv2SNSItF5YLv
+   fTUOQJQA0qON8j+Wxd1CY2epBjfC1DrkLaj7l497nF/BnxeijjSs/eEl6
+   GTeFAsPG8Dbbyp2MLSHR09j/kyYBiNBVEJvMaFuQr8kSaXYnM1reB6rmJ
+   mMOcmSddhzbqy9HtJyKZjcGUAgKbt38mN/ZgnUzqsaCLVE+0aXeYPE278
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10956"; a="117702"
+X-IronPort-AV: E=Sophos;i="6.05,200,1701158400"; 
+   d="scan'208";a="117702"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jan 2024 09:25:42 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,200,1701158400"; 
+   d="scan'208";a="32864755"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orviesa001.jf.intel.com with ESMTP; 17 Jan 2024 09:25:41 -0800
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	ivecera@redhat.com,
+	Martin Zaharinov <micron10@gmail.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Simon Horman <horms@kernel.org>,
+	Arpana Arland <arpanax.arland@intel.com>
+Subject: [PATCH net] i40e: Include types.h to some headers
+Date: Wed, 17 Jan 2024 09:25:32 -0800
+Message-ID: <20240117172534.3555162-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,71 +78,68 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: Ex16-02.fintech.ru (10.0.10.19) To Ex16-01.fintech.ru
- (10.0.10.18)
 
-idev->mc_ifc_count can be written over without proper locking.
+Commit 56df345917c0 ("i40e: Remove circular header dependencies and fix
+headers") redistributed a number of includes from one large header file
+to the locations they were needed. In some environments, types.h is not
+included and causing compile issues. The driver should not rely on
+implicit inclusion from other locations; explicitly include it to these
+files.
 
-Originally found by syzbot [1], fix this issue by encapsulating calls
-to mld_ifc_stop_work() (and mld_gq_stop_work() for good measure) with
-mutex_lock() and mutex_unlock() accordingly as these functions
-should only be called with mc_lock per their declarations.
+Snippet of issue. Entire log can be seen through the Closes: link.
 
-[1]
-BUG: KCSAN: data-race in ipv6_mc_down / mld_ifc_work
+In file included from drivers/net/ethernet/intel/i40e/i40e_diag.h:7,
+                 from drivers/net/ethernet/intel/i40e/i40e_diag.c:4:
+drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h:33:9: error: unknown type name '__le16'
+   33 |         __le16 flags;
+      |         ^~~~~~
+drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h:34:9: error: unknown type name '__le16'
+   34 |         __le16 opcode;
+      |         ^~~~~~
+...
+drivers/net/ethernet/intel/i40e/i40e_diag.h:22:9: error: unknown type name 'u32'
+   22 |         u32 elements;   /* number of elements if array */
+      |         ^~~
+drivers/net/ethernet/intel/i40e/i40e_diag.h:23:9: error: unknown type name 'u32'
+   23 |         u32 stride;     /* bytes between each element */
 
-write to 0xffff88813a80c832 of 1 bytes by task 3771 on cpu 0:
- mld_ifc_stop_work net/ipv6/mcast.c:1080 [inline]
- ipv6_mc_down+0x10a/0x280 net/ipv6/mcast.c:2725
- addrconf_ifdown+0xe32/0xf10 net/ipv6/addrconf.c:3949
- addrconf_notify+0x310/0x980
- notifier_call_chain kernel/notifier.c:93 [inline]
- raw_notifier_call_chain+0x6b/0x1c0 kernel/notifier.c:461
- __dev_notify_flags+0x205/0x3d0
- dev_change_flags+0xab/0xd0 net/core/dev.c:8685
- do_setlink+0x9f6/0x2430 net/core/rtnetlink.c:2916
- rtnl_group_changelink net/core/rtnetlink.c:3458 [inline]
- __rtnl_newlink net/core/rtnetlink.c:3717 [inline]
- rtnl_newlink+0xbb3/0x1670 net/core/rtnetlink.c:3754
- rtnetlink_rcv_msg+0x807/0x8c0 net/core/rtnetlink.c:6558
- netlink_rcv_skb+0x126/0x220 net/netlink/af_netlink.c:2545
- rtnetlink_rcv+0x1c/0x20 net/core/rtnetlink.c:6576
- netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
- netlink_unicast+0x589/0x650 net/netlink/af_netlink.c:1368
- netlink_sendmsg+0x66e/0x770 net/netlink/af_netlink.c:1910
- ...
-
-write to 0xffff88813a80c832 of 1 bytes by task 22 on cpu 1:
- mld_ifc_work+0x54c/0x7b0 net/ipv6/mcast.c:2653
- process_one_work kernel/workqueue.c:2627 [inline]
- process_scheduled_works+0x5b8/0xa30 kernel/workqueue.c:2700
- worker_thread+0x525/0x730 kernel/workqueue.c:2781
- ...
-
-Fixes: 2d9a93b4902b ("mld: convert from timer to delayed work")
-Reported-by: syzbot+a9400cabb1d784e49abf@syzkaller.appspotmail.com
-Link: https://lore.kernel.org/all/000000000000994e09060ebcdffb@google.com/
-Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+Reported-by: Martin Zaharinov <micron10@gmail.com>
+Closes: https://lore.kernel.org/netdev/21BBD62A-F874-4E42-B347-93087EEA8126@gmail.com/
+Fixes: 56df345917c0 ("i40e: Remove circular header dependencies and fix headers")
+Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Tested-by: Arpana Arland <arpanax.arland@intel.com> (A Contingent worker at Intel)
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- net/ipv6/mcast.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h | 1 +
+ drivers/net/ethernet/intel/i40e/i40e_diag.h       | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
-index b75d3c9d41bb..bc6e0a0bad3c 100644
---- a/net/ipv6/mcast.c
-+++ b/net/ipv6/mcast.c
-@@ -2722,8 +2722,12 @@ void ipv6_mc_down(struct inet6_dev *idev)
- 	synchronize_net();
- 	mld_query_stop_work(idev);
- 	mld_report_stop_work(idev);
-+
-+	mutex_lock(&idev->mc_lock);
- 	mld_ifc_stop_work(idev);
- 	mld_gq_stop_work(idev);
-+	mutex_unlock(&idev->mc_lock);
-+
- 	mld_dad_stop_work(idev);
- }
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h b/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h
+index 18a1c3b6d72c..c8f35d4de271 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h
++++ b/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h
+@@ -5,6 +5,7 @@
+ #define _I40E_ADMINQ_CMD_H_
  
+ #include <linux/bits.h>
++#include <linux/types.h>
+ 
+ /* This header file defines the i40e Admin Queue commands and is shared between
+  * i40e Firmware and Software.
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_diag.h b/drivers/net/ethernet/intel/i40e/i40e_diag.h
+index ece3a6b9a5c6..ab20202a3da3 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_diag.h
++++ b/drivers/net/ethernet/intel/i40e/i40e_diag.h
+@@ -4,6 +4,7 @@
+ #ifndef _I40E_DIAG_H_
+ #define _I40E_DIAG_H_
+ 
++#include <linux/types.h>
+ #include "i40e_adminq_cmd.h"
+ 
+ /* forward-declare the HW struct for the compiler */
+-- 
+2.41.0
+
 
