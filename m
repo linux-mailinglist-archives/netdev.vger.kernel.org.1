@@ -1,164 +1,225 @@
-Return-Path: <netdev+bounces-64035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B02D830C1F
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 18:37:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FD23830C41
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 18:54:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 147D3280A9A
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 17:37:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 537B0B244F7
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 17:54:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BD9622EE0;
-	Wed, 17 Jan 2024 17:36:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B12C22EEC;
+	Wed, 17 Jan 2024 17:54:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HuvRmuWh"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="t9VKz8Jp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3412422627;
-	Wed, 17 Jan 2024 17:36:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9E6F22EE0
+	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 17:53:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705512989; cv=none; b=A8+4tK1zmbv758espabBlq9kpSEe4RZs0hmcuyCCpg4ZhhSAl9YM/BPluVm9AmQkIxf8qcUc11k7khbST2GdhFr1PGsg3wCO31Lqq3DK5kGxjzG8pksE++IONPtVT1ncFMJ8GaqiDqp20IwGaTjLKDantrNPMShdqqyRO8CfzUQ=
+	t=1705514040; cv=none; b=kdEWMHGYeoB0y0RwkJEhiIpjhrEeKz0yUjT3Mbadhs8a5lFOCvhcNXytiEPPTvDKbhQBM03qNym+OBwdC6Ue4a6emez3Wdl5jZ+q6Bo2y+fxI2qRRrEGGHv6hw4iD267AwGfgJDsH2WFMXju2XJOYxwFRkpk8sev9wznmWqS29s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705512989; c=relaxed/simple;
-	bh=wjgCd2jcqo8gZcQ6efUyJqoTMhZvFPsWN3t2C5TYdmE=;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To; b=lVk66F8Z9656PE0iQYF69/7kLGjoyqtcUzKZAy90fMwFSVGZUiTQ4oqHsSRzuc8V4P0ETIkFmvHjG14/6RAxZFiU5cKdukZSjikP3BDAgL3Q6NB5ePG1CrySTncdzJ2WCBj8KBkSdSG69rVD9IEwBLJBl6EKwaadae3oPTpd0Kg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HuvRmuWh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DE3CC433F1;
-	Wed, 17 Jan 2024 17:36:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705512988;
-	bh=wjgCd2jcqo8gZcQ6efUyJqoTMhZvFPsWN3t2C5TYdmE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HuvRmuWhiwpHij+QB828uuIClciG2jn1uGSiAnx0MhWYtd9haWO4R5Ck1oCJwg/fI
-	 3F+Js+i43j0jW625tRmwQPCt0xaUoRRMdJSkvh01AL/FKOaICYXPFRL+laAoG+s7lN
-	 LJtdze9+ldMg7uucqz11L9vIay3lVtRhEdTi7vxO8SAdnpXWen5DZiTKQj9n0AhXQt
-	 8P92n90Ayb0xmu5noIZploMGSJuVDju2bBTIUf5zAkxGilAH7p5PaU5FUy+O+Sol7i
-	 cZMWb0y7jPgJGVWdCHXzGKb+PTLlOpNH5N0GWY+v+WhYOhks35gdqr50mlAtt39ywB
-	 OJvQEr9gy/SJQ==
-Date: Wed, 17 Jan 2024 18:36:25 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jesper Dangaard Brouer <hawk@kernel.org>, kuba@kernel.org
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	netdev@vger.kernel.org,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	willemdebruijn.kernel@gmail.com, toke@redhat.com,
-	davem@davemloft.net, edumazet@google.com, bpf@vger.kernel.org,
-	lorenzo.bianconi@redhat.com, sdf@google.com, jasowang@redhat.com
-Subject: Re: [PATCH v5 net-next 1/3] net: introduce page_pool pointer in
- softnet_data percpu struct
-Message-ID: <ZagQGZ5CM3vEH2RP@lore-desk>
-References: <cover.1702563810.git.lorenzo@kernel.org>
- <b1432fc51c694f1be8daabb19773744fcee13cf1.1702563810.git.lorenzo@kernel.org>
- <c49124012f186e06a4a379b060c85e4cca1a9d53.camel@redhat.com>
- <33bbb170-afdd-477f-9296-a9cede9bc2f2@kernel.org>
+	s=arc-20240116; t=1705514040; c=relaxed/simple;
+	bh=JjfVt3N71j4YPkrlh+5PUtWAmKzZVN5cdfHnZnYczp0=;
+	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:
+	 Message-ID:Date:MIME-Version:User-Agent:From:Reply-To:Subject:
+	 Content-Language:To:Cc:References:Autocrypt:Organization:
+	 In-Reply-To:Content-Type:Content-Transfer-Encoding; b=qF8DTxO4BzM2TyDRMiJ6MPzhsRiREVhqnQOa1H12oKtQQjVjF+9b/HpKTBcMM6+jhxilxY1e1rV5Zh3mSKmCJukza6l0YLIyPwsd9WOzKLz/Kk9XEjMjfwcxkmF0yDqGqaG3uL/PqZZK8hQQUWEuEHkdMjhWcrvhUw7bfBDjLnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=t9VKz8Jp; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-40e884ac5c8so11477175e9.2
+        for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 09:53:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1705514037; x=1706118837; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :references:cc:to:content-language:subject:reply-to:from:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eW5dEglpjib4OhaJPnLBXWIaNV1VhhWKpxCN1epSIBk=;
+        b=t9VKz8Jpk6GgEJeeeIG0oKqauKJ/Ika+8YJmknIiD/MPQEZ+CoaA8J0+zL2ln0amZb
+         CPx80YB5tm3TjvOS+ku+jbt736Z3b4kSlAaCyn8iYLJxrYthoZ07PD+pWm4VhH4V3+qe
+         vecrD2LuJqj7pCPkT80EqU2xT04dg1p2eun+X2Xi4iicoHQTFS4d43CaUzyklN1y6rK/
+         qhNV3TqodNl0j04DwJhGhisKzvYlCB1MeDQq+33YE0pvk9BnReOyDNWJKQa7IdoHlCjN
+         pKHTTtL7Kpgd5u1HC2ytatHqub1K3D+5+Xgqdemuv+qEIDPVZyt2YXT+VrbuyHxVwuPP
+         VZGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705514037; x=1706118837;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :references:cc:to:content-language:subject:reply-to:from:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=eW5dEglpjib4OhaJPnLBXWIaNV1VhhWKpxCN1epSIBk=;
+        b=Sdontva7Ax/TV30hxaJKEALlDoKbTLbOriorBfACJ3CPt5NO7TGFZBLg8Zx+f4X3u3
+         S+JOJWzaeFXVIGEoU0CehupYZkrFIa8KsUm8T26vSpCiWGlDJm1+qVCU5xA2kUMCP/ao
+         59nQ/e9pOr7WSx+9E3isYHK07JxdNi7oH01UDoi6bRTw4OUCw9jhkzay69eez75AB7kH
+         FkDnivg790bK3MjhDjGHJSVzcXludgicdMn+gFB6NGD4ugqWV5eXuquxHwZl5Xb+CTgQ
+         ALE+CRw9K/rXFGtuYZmqvwBoNiUsf0RYXuT6lincqJkIIKR32fX8qb0KbKyHDoz7YBbz
+         iSSg==
+X-Gm-Message-State: AOJu0Yz3K24Wqp3HDoALNckE7LCIqTS6AeXoBjoQaTRr5W8DOAPaA7Fr
+	DcjEZL/pmAtLfpMVraN20+3zvg4UWycTPg==
+X-Google-Smtp-Source: AGHT+IF9x4mzdWYcyOfkG+g6M+1NIbBX7DCz1g2FkPEH84IOqSkzdWWBeewh4OkOtgYis9oLLtkJWg==
+X-Received: by 2002:a05:600c:a41:b0:40e:38a3:70f2 with SMTP id c1-20020a05600c0a4100b0040e38a370f2mr2358767wmq.65.1705514037014;
+        Wed, 17 Jan 2024 09:53:57 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:982:cbb0:de9a:cd03:1fa1:d6f1? ([2a01:e0a:982:cbb0:de9a:cd03:1fa1:d6f1])
+        by smtp.gmail.com with ESMTPSA id fa6-20020a05600c518600b0040e861ad5d2sm5252331wmb.0.2024.01.17.09.53.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 Jan 2024 09:53:56 -0800 (PST)
+Message-ID: <105a6adb-bef3-4c89-a6db-7f27bcd46200@linaro.org>
+Date: Wed, 17 Jan 2024 18:53:54 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="1UCwbyeSi2aR2x7c"
-Content-Disposition: inline
-In-Reply-To: <33bbb170-afdd-477f-9296-a9cede9bc2f2@kernel.org>
+User-Agent: Mozilla Thunderbird
+From: Neil Armstrong <neil.armstrong@linaro.org>
+Reply-To: neil.armstrong@linaro.org
+Subject: Re: [PATCH 0/9] PCI: introduce the concept of power sequencing of
+ PCIe devices
+Content-Language: en-US, fr
+To: Bartosz Golaszewski <brgl@bgdev.pl>, Kalle Valo <kvalo@kernel.org>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konrad.dybcio@linaro.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Bjorn Helgaas <bhelgaas@google.com>, Heiko Stuebner <heiko@sntech.de>,
+ Jernej Skrabec <jernej.skrabec@gmail.com>,
+ Chris Morgan <macromorgan@hotmail.com>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ Geert Uytterhoeven <geert+renesas@glider.be>, Arnd Bergmann <arnd@arndb.de>,
+ =?UTF-8?Q?N=C3=ADcolas_F_=2E_R_=2E_A_=2E_Prado?= <nfraprado@collabora.com>,
+ Marek Szyprowski <m.szyprowski@samsung.com>, Peng Fan <peng.fan@nxp.com>,
+ Robert Richter <rrichter@amd.com>, Dan Williams <dan.j.williams@intel.com>,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ Terry Bowman <terry.bowman@amd.com>, Lukas Wunner <lukas@wunner.de>,
+ Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>,
+ Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Abel Vesa <abel.vesa@linaro.org>
+Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-pci@vger.kernel.org,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+References: <20240117160748.37682-1-brgl@bgdev.pl>
+Autocrypt: addr=neil.armstrong@linaro.org; keydata=
+ xsBNBE1ZBs8BCAD78xVLsXPwV/2qQx2FaO/7mhWL0Qodw8UcQJnkrWmgTFRobtTWxuRx8WWP
+ GTjuhvbleoQ5Cxjr+v+1ARGCH46MxFP5DwauzPekwJUD5QKZlaw/bURTLmS2id5wWi3lqVH4
+ BVF2WzvGyyeV1o4RTCYDnZ9VLLylJ9bneEaIs/7cjCEbipGGFlfIML3sfqnIvMAxIMZrvcl9
+ qPV2k+KQ7q+aXavU5W+yLNn7QtXUB530Zlk/d2ETgzQ5FLYYnUDAaRl+8JUTjc0CNOTpCeik
+ 80TZcE6f8M76Xa6yU8VcNko94Ck7iB4vj70q76P/J7kt98hklrr85/3NU3oti3nrIHmHABEB
+ AAHNKk5laWwgQXJtc3Ryb25nIDxuZWlsLmFybXN0cm9uZ0BsaW5hcm8ub3JnPsLAkQQTAQoA
+ OwIbIwULCQgHAwUVCgkICwUWAgMBAAIeAQIXgBYhBInsPQWERiF0UPIoSBaat7Gkz/iuBQJk
+ Q5wSAhkBAAoJEBaat7Gkz/iuyhMIANiD94qDtUTJRfEW6GwXmtKWwl/mvqQtaTtZID2dos04
+ YqBbshiJbejgVJjy+HODcNUIKBB3PSLaln4ltdsV73SBcwUNdzebfKspAQunCM22Mn6FBIxQ
+ GizsMLcP/0FX4en9NaKGfK6ZdKK6kN1GR9YffMJd2P08EO8mHowmSRe/ExAODhAs9W7XXExw
+ UNCY4pVJyRPpEhv373vvff60bHxc1k/FF9WaPscMt7hlkbFLUs85kHtQAmr8pV5Hy9ezsSRa
+ GzJmiVclkPc2BY592IGBXRDQ38urXeM4nfhhvqA50b/nAEXc6FzqgXqDkEIwR66/Gbp0t3+r
+ yQzpKRyQif3OwE0ETVkGzwEIALyKDN/OGURaHBVzwjgYq+ZtifvekdrSNl8TIDH8g1xicBYp
+ QTbPn6bbSZbdvfeQPNCcD4/EhXZuhQXMcoJsQQQnO4vwVULmPGgtGf8PVc7dxKOeta+qUh6+
+ SRh3vIcAUFHDT3f/Zdspz+e2E0hPV2hiSvICLk11qO6cyJE13zeNFoeY3ggrKY+IzbFomIZY
+ 4yG6xI99NIPEVE9lNBXBKIlewIyVlkOaYvJWSV+p5gdJXOvScNN1epm5YHmf9aE2ZjnqZGoM
+ Mtsyw18YoX9BqMFInxqYQQ3j/HpVgTSvmo5ea5qQDDUaCsaTf8UeDcwYOtgI8iL4oHcsGtUX
+ oUk33HEAEQEAAcLAXwQYAQIACQUCTVkGzwIbDAAKCRAWmrexpM/4rrXiB/sGbkQ6itMrAIfn
+ M7IbRuiSZS1unlySUVYu3SD6YBYnNi3G5EpbwfBNuT3H8//rVvtOFK4OD8cRYkxXRQmTvqa3
+ 3eDIHu/zr1HMKErm+2SD6PO9umRef8V82o2oaCLvf4WeIssFjwB0b6a12opuRP7yo3E3gTCS
+ KmbUuLv1CtxKQF+fUV1cVaTPMyT25Od+RC1K+iOR0F54oUJvJeq7fUzbn/KdlhA8XPGzwGRy
+ 4zcsPWvwnXgfe5tk680fEKZVwOZKIEuJC3v+/yZpQzDvGYJvbyix0lHnrCzq43WefRHI5XTT
+ QbM0WUIBIcGmq38+OgUsMYu4NzLu7uZFAcmp6h8g
+Organization: Linaro Developer Services
+In-Reply-To: <20240117160748.37682-1-brgl@bgdev.pl>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 17/01/2024 17:07, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> 
+> The responses to the RFC were rather positive so here's a proper series.
+> 
+> During last year's Linux Plumbers we had several discussions centered
+> around the need to power-on PCI devices before they can be detected on
+> the bus.
+> 
+> The consensus during the conference was that we need to introduce a
+> class of "PCI slot drivers" that would handle the power-sequencing.
+> 
+> After some additional brain-storming with Manivannan and the realization
+> that DT maintainers won't like adding any "fake" nodes not representing
+> actual devices, we decided to reuse existing PCI infrastructure.
+> 
+> The general idea is to instantiate platform devices for child nodes of
+> the PCIe port DT node. For those nodes for which a power-sequencing
+> driver exists, we bind it and let it probe. The driver then triggers a
+> rescan of the PCI bus with the aim of detecting the now powered-on
+> device. The device will consume the same DT node as the platform,
+> power-sequencing device. We use device links to make the latter become
+> the parent of the former.
+> 
+> The main advantage of this approach is not modifying the existing DT in
+> any way and especially not adding any "fake" platform devices.
+> 
+> Changes since RFC:
+> - move the pwrseq functionality out of the port driver and into PCI core
+> - add support for WCN7850 to the first pwrseq driver (and update bindings)
+> - describe the WLAN modules in sm8550-qrd and sm8650-qrd
+> - rework Kconfig options, drop the defconfig changes from the series as
+>    they are no longer needed
+> - drop the dt-binding changes for PCI vendor codes
+> - extend the DT bindings for ath11k_pci with strict property checking
+> - various minor tweaks and fixes
+> 
+> Bartosz Golaszewski (7):
+>    arm64: dts: qcom: qrb5165-rb5: describe the WLAN module of QCA6390
+>    PCI: create platform devices for child OF nodes of the port node
+>    PCI: hold the rescan mutex when scanning for the first time
+>    PCI/pwrseq: add pwrseq core code
+>    dt-bindings: wireless: ath11k: describe QCA6390
+>    dt-bindings: wireless: ath11k: describe WCN7850
+>    PCI/pwrseq: add a pwrseq driver for QCA6390
+> 
+> Neil Armstrong (2):
+>    arm64: dts: qcom: sm8550-qrd: add Wifi nodes
+>    arm64: dts: qcom: sm8650-qrd: add Wifi nodes
+> 
+>   .../net/wireless/qcom,ath11k-pci.yaml         |  89 ++++++
+>   arch/arm64/boot/dts/qcom/qrb5165-rb5.dts      |  29 ++
+>   arch/arm64/boot/dts/qcom/sm8250.dtsi          |  10 +
+>   arch/arm64/boot/dts/qcom/sm8550-qrd.dts       |  37 +++
+>   arch/arm64/boot/dts/qcom/sm8550.dtsi          |  10 +
+>   arch/arm64/boot/dts/qcom/sm8650-qrd.dts       |  29 ++
+>   arch/arm64/boot/dts/qcom/sm8650.dtsi          |  10 +
+>   drivers/pci/Kconfig                           |   1 +
+>   drivers/pci/Makefile                          |   1 +
+>   drivers/pci/bus.c                             |   9 +-
+>   drivers/pci/probe.c                           |   2 +
+>   drivers/pci/pwrseq/Kconfig                    |  16 ++
+>   drivers/pci/pwrseq/Makefile                   |   4 +
+>   drivers/pci/pwrseq/pci-pwrseq-qca6390.c       | 267 ++++++++++++++++++
+>   drivers/pci/pwrseq/pwrseq.c                   |  82 ++++++
+>   drivers/pci/remove.c                          |   3 +-
+>   include/linux/pci-pwrseq.h                    |  24 ++
+>   17 files changed, 621 insertions(+), 2 deletions(-)
+>   create mode 100644 drivers/pci/pwrseq/Kconfig
+>   create mode 100644 drivers/pci/pwrseq/Makefile
+>   create mode 100644 drivers/pci/pwrseq/pci-pwrseq-qca6390.c
+>   create mode 100644 drivers/pci/pwrseq/pwrseq.c
+>   create mode 100644 include/linux/pci-pwrseq.h
+> 
 
---1UCwbyeSi2aR2x7c
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Tested-by: Neil Armstrong <neil.armstrong@linaro.org> # on SM8550-QRD
+Tested-by: Neil Armstrong <neil.armstrong@linaro.org> # on SM8650-QRD
 
->=20
->=20
-> On 19/12/2023 16.23, Paolo Abeni wrote:
-> > On Thu, 2023-12-14 at 15:29 +0100, Lorenzo Bianconi wrote:
-> > > Allocate percpu page_pools in softnet_data.
-> > > Moreover add cpuid filed in page_pool struct in order to recycle the
-> > > page in the page_pool "hot" cache if napi_pp_put_page() is running on
-> > > the same cpu.
-> > > This is a preliminary patch to add xdp multi-buff support for xdp run=
-ning
-> > > in generic mode.
-> > >=20
-> > > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> > > ---
-> > >   include/linux/netdevice.h       |  1 +
-> > >   include/net/page_pool/helpers.h |  5 +++++
-> > >   include/net/page_pool/types.h   |  1 +
-> > >   net/core/dev.c                  | 39 ++++++++++++++++++++++++++++++=
-++-
-> > >   net/core/page_pool.c            |  5 +++++
-> > >   net/core/skbuff.c               |  5 +++--
-> > >   6 files changed, 53 insertions(+), 3 deletions(-)
-> >=20
-> > @Jesper, @Ilias: could you please have a look at the pp bits?
-> >=20
->=20
-> I have some concerns... I'm still entertaining the idea, but we need to
-> be aware of the tradeoffs we are making.
->=20
-> (1)
-> Adding PP to softnet_data means per CPU caching 256 pages in the
-> ptr_ring (plus likely 64 in the alloc-cache).   Fortunately, PP starts
-> out empty, so as long as this PP isn't used they don't get cached. But
-> if used, then PP don't have a MM shrinker that removes these cached
-> pages, in case system is under MM pressure.  I guess, you can argue that
-> keeping this per netdev rx-queue would make memory usage even higher.
-> This is a tradeoff, we are trading memory (waste) for speed.
->=20
->=20
-> (2) (Question to Jakub I guess)
-> How does this connect with Jakub's PP netlink stats interface?
-> E.g. I find it very practical that this allow us get PP stats per
-> netdev, but in this case there isn't a netdev.
->=20
->=20
-> (3) (Implicit locking)
-> PP have lockless "alloc" because it it relies on drivers NAPI context.
-> The places where netstack access softnet_data provide similar protection
-> that we can rely on for PP, so this is likely correct implementation
-> wise.  But it will give people like Sebastian (Cc) more gray hair when
-> figuring out how PREEMPT_RT handle these cases.
->=20
-> (4)
-> The optimization is needed for the case where we need to re-allocate and
-> copy SKB fragments.  I think we should focus on avoiding this code path,
-> instead of optimizing it.  For UDP it should be fairly easy, but for TCP
-> this is harder.
-
-Hi all,
-
-I would resume this activity and it seems to me there is no a clear directi=
-on
-about where we should add the page_pool (in a per_cpu pointer or in
-netdev_rx_queue struct) or if we can rely on page_frag_cache instead.
-
-@Jakub: what do you think? Should we add a page_pool in a per_cpu pointer?
-
-Regards,
-Lorenzo
-
->=20
-> --Jesper
-
---1UCwbyeSi2aR2x7c
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZagQGQAKCRA6cBh0uS2t
-rNoaAP9t9LZotrbqc4WqbGm0jzEm2FElQUWUAdQ1KSTL6uCXBQEA1cTXDVFiv7Hl
-mMTtCEySyRtJQhKFjM7DtPDcF6a93QM=
-=IOpa
------END PGP SIGNATURE-----
-
---1UCwbyeSi2aR2x7c--
+Thanks,
+Neil
 
