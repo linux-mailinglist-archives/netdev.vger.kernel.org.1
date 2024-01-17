@@ -1,171 +1,136 @@
-Return-Path: <netdev+bounces-63904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63905-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7741883006A
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 08:19:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24D73830070
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 08:20:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 887AC1C23011
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 07:19:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6924283F91
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 07:20:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29F1D8F59;
-	Wed, 17 Jan 2024 07:19:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A507D8BF3;
+	Wed, 17 Jan 2024 07:20:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmtu5ljg5lje1ms4xmtka.icoremail.net (zg8tmtu5ljg5lje1ms4xmtka.icoremail.net [159.89.151.119])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAE46BE4B;
-	Wed, 17 Jan 2024 07:18:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.89.151.119
+Received: from smtpbgbr1.qq.com (smtpbgbr1.qq.com [54.207.19.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85BFCBE49
+	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 07:20:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.19.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705475943; cv=none; b=d4rdt5YLSSvJmZ5+6wramdRkshhoTra64ge0axC98qoRL+/JKV0emrm/Yjw1kupow1a+t8rq3F6M4FbT29dGPkGTdnAsqG8s0dmnwCzccscUjSt7Az6tyhdBMMnIw0qx50lvYZl9xEd4y0OIA0LCSnKJTLOak5PoapINlnKxZIc=
+	t=1705476043; cv=none; b=d7jn/c+1IYZdsZMedziwSzztgoRFgIE1s8wnOhkMqmOW/sl3xVop1S9ImfoMFyxYMdPUy9j6/YFNULmw4BuCze/hb4ACjp0kUlpNXCxHQoXl4//jjtV4FZ9F07uNDTyfAsr59yRA4PcslsDOnHPQghO1IUTbbIv9nAvJLkJbxNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705475943; c=relaxed/simple;
-	bh=hZ88PNWUGoAAdWlQDB8eDVUHlouB8wVqbz1xnNHCSVM=;
-	h=Received:From:To:Cc:Subject:Date:Message-Id:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding:X-CM-TRANSID:X-Coremail-Antispam:
-	 X-CM-SenderInfo; b=AfAPnn+Omft4O8ThcytFcMfwAyN475iG4qH63C5XYPHX7oQXZZeP+/6nQNIT7GCoRS8CT1wTE6Bb2cXwNMKCKWRN7KTxJ/PpI7DBCVrgQz5osNtvoz6DB9AM6XDM8ODQXOe0N38MB/IMwA+4IGWItBjjmI3Xi5a3t15S9i4U/3w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=159.89.151.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from luzhipeng.223.5.5.5 (unknown [183.159.170.179])
-	by mail-app2 (Coremail) with SMTP id by_KCgDHCalVf6dl3xE6AA--.28076S2;
-	Wed, 17 Jan 2024 15:18:45 +0800 (CST)
-From: Zhipeng Lu <alexious@zju.edu.cn>
-To: alexious@zju.edu.cn
-Cc: Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maor Gottlieb <maorg@mellanox.com>,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v4] net/mlx5e: fix a double-free in arfs_create_groups
-Date: Wed, 17 Jan 2024 15:17:36 +0800
-Message-Id: <20240117071736.3813981-1-alexious@zju.edu.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1705476043; c=relaxed/simple;
+	bh=qM90Qm6GzX5DRGWoTEAV8hrji5cSEZonLw4Htb7itYU=;
+	h=X-QQ-mid:X-QQ-Originating-IP:Received:X-QQ-SSF:X-QQ-FEAT:
+	 X-QQ-GoodBg:X-BIZMAIL-ID:Date:From:To:Cc:Subject:Message-ID:
+	 In-Reply-To:References:Organization:X-Mailer:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:X-QQ-SENDSIZE:Feedback-ID;
+	b=szgaF2Vo6MQwLLzTZwiw9meQh2VIjAjqmnEmARx+BD5LJ2vkrrTET2L5/Joa6pQt4xWjECiDtrFjEqrcP/jB9+MugYOqdlDkqG4H5O6b/9mf1O1WYBGYejkvp3tYEsp41+NAESPaIkxo6KwAlPgdTEp310Z5XCOqD0hk6TftbzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; arc=none smtp.client-ip=54.207.19.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+X-QQ-mid: bizesmtp73t1705475881tkpi85e2
+X-QQ-Originating-IP: FYn/tP70RTD9loVdowaM081VuTJVAfGriLwvRblxkgg=
+Received: from john-PC ( [123.114.60.34])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 17 Jan 2024 15:17:59 +0800 (CST)
+X-QQ-SSF: 01400000000000E0L000000A0000000
+X-QQ-FEAT: eSZ1CZgv+JDSNC9R2Ts4bQ0s1IO7bzp2HpCI/alvnKdhK2ce+ScKIRclelfo3
+	i51jCIHNe3Uj0pPQHcTQ95pOKWuRXyWDW3I9EGM/2puBgCYmHjq/2LsRwKbvE8rv6M5YShX
+	+RNX5hNAQwHK5GlakP/+rmSaZPV4Jze6Hh7zG0jGrCC3kwxNTeRiFJYGCNKwUr99q3dVr8t
+	f+0cmctmjGHstn0Ykxofmi0OZOsisfjMKTq/Vw9O+J/1J7ablmQ+b8WymrCzYFhREA+LddF
+	fiKyVAcNfB0IeKrlBRtrroOyZIeNv3DOE7Ku78ZkHncoEnEqd5a3HQFjmmAuCq989imHmoP
+	5S2bya1XPNgQKhDPSAPYfRuBj5e+cYxdQ42NnVXpxG1xk254xAu7hSsHPwT9nenjC5nq8yA
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 10667195349907418171
+Date: Wed, 17 Jan 2024 15:17:59 +0800
+From: Qiang Ma <maqianga@uniontech.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: alexandre.torgue@foss.st.com, joabreu@synopsys.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ mcoquelin.stm32@gmail.com, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: stmmac: ethtool: Fixed calltrace caused by
+ unbalanced disable_irq_wake calls
+Message-ID: <264E2933B2545567+20240117151759.0dc40c3d@john-PC>
+In-Reply-To: <97106e8a-df9a-429a-a4ff-c47277de70d9@lunn.ch>
+References: <20240112021249.24598-1-maqianga@uniontech.com>
+	<97106e8a-df9a-429a-a4ff-c47277de70d9@lunn.ch>
+Organization: UOS
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:by_KCgDHCalVf6dl3xE6AA--.28076S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxZrWUGFW5urWDAw4xKrWDCFg_yoW5XF1rpF
-	47JryDtFs5A3WxX39Iy3yvqrn5Cw48Ka1UuFyI934SqrsFyr4kGFyFg345AFWxCFy3A3sF
-	yasYvw1UCFnrCwUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9C14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26rxl
-	6s0DM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
-	n2IY04v7MxkF7I0En4kS14v26r1q6r43MxkIecxEwVAFwVW8CwCF04k20xvY0x0EwIxGrw
-	CFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE
-	14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2
-	IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxK
-	x2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI
-	0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUGFAJUUUUU=
-X-CM-SenderInfo: qrsrjiarszq6lmxovvfxof0/
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:uniontech.com:qybglogicsvrsz:qybglogicsvrsz4a-0
 
-When `in` allocated by kvzalloc fails, arfs_create_groups will free
-ft->g and return an error. However, arfs_create_table, the only caller of
-arfs_create_groups, will hold this error and call to
-mlx5e_destroy_flow_table, in which the ft->g will be freed again.
+On Tue, 16 Jan 2024 23:27:39 +0100
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-Fixes: 1cabe6b0965e ("net/mlx5e: Create aRFS flow tables")
-Signed-off-by: Zhipeng Lu <alexious@zju.edu.cn>
----
-Changelog:
+> On Fri, Jan 12, 2024 at 10:12:49AM +0800, Qiang Ma wrote:
+> > We found the following dmesg calltrace when testing the GMAC NIC
+> > notebook:
+> > 
+> > [9.448656] ------------[ cut here ]------------
+> > [9.448658] Unbalanced IRQ 43 wake disable
+> > [9.448673] WARNING: CPU: 3 PID: 1083 at kernel/irq/manage.c:688
+> > irq_set_irq_wake+0xe0/0x128 [9.448717] CPU: 3 PID: 1083 Comm:
+> > ethtool Tainted: G           O      4.19 #1 [9.448773]         ...
+> > [9.448774] Call Trace:
+> > [9.448781] [<9000000000209b5c>] show_stack+0x34/0x140
+> > [9.448788] [<9000000000d52700>] dump_stack+0x98/0xd0
+> > [9.448794] [<9000000000228610>] __warn+0xa8/0x120
+> > [9.448797] [<9000000000d2fb60>] report_bug+0x98/0x130
+> > [9.448800] [<900000000020a418>] do_bp+0x248/0x2f0
+> > [9.448805] [<90000000002035f4>] handle_bp_int+0x4c/0x78
+> > [9.448808] [<900000000029ea40>] irq_set_irq_wake+0xe0/0x128
+> > [9.448813] [<9000000000a96a7c>] stmmac_set_wol+0x134/0x150
+> > [9.448819] [<9000000000be6ed0>] dev_ethtool+0x1368/0x2440
+> > [9.448824] [<9000000000c08350>] dev_ioctl+0x1f8/0x3e0
+> > [9.448827] [<9000000000bb2a34>] sock_ioctl+0x2a4/0x450
+> > [9.448832] [<900000000046f044>] do_vfs_ioctl+0xa4/0x738
+> > [9.448834] [<900000000046f778>] ksys_ioctl+0xa0/0xe8
+> > [9.448837] [<900000000046f7d8>] sys_ioctl+0x18/0x28
+> > [9.448840] [<9000000000211ab4>] syscall_common+0x20/0x34
+> > [9.448842] ---[ end trace 40c18d9aec863c3e ]---
+> > 
+> > Multiple disable_irq_wake() calls will keep decreasing the IRQ
+> > wake_depth, When wake_depth is 0, calling disable_irq_wake() again,
+> > will report the above calltrace.
+> > 
+> > Due to the need to appear in pairs, we cannot call
+> > disable_irq_wake() without calling enable_irq_wake(). Fix this by
+> > making sure there are no unbalanced disable_irq_wake() calls.  
+> 
+> Just for my understanding. You trigger this by doing lots of
+> 
+> ethtool -s eth42 wol g
+> 
+> or similar without doing a matching
+> 
+> ethtool -s eth42 wol d
+> 
+> to disable wol?
+> 
+> Its a bit late now, but its good to give instructions how to reproduce
+> the issue in the commit message.
+> 
+>     Andrew
+> 
 
-v2: free ft->g just in arfs_create_groups with a unwind ladder.
-v3: split the allocation of ft->g and in. Rename the error label.
-    remove some refector change in v2.
-v4: correct some space issue.
----
- .../net/ethernet/mellanox/mlx5/core/en_arfs.c | 26 +++++++++++--------
- 1 file changed, 15 insertions(+), 11 deletions(-)
+yes, my environment has not call enable_irq_wake(), so calling
+disable_irq_wake() directly through the "ethtool -s ethxx wol d"
+command will cause this problem.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_arfs.c b/drivers/net/ethernet/mellanox/mlx5/core/en_arfs.c
-index bb7f86c993e5..e66f486faafe 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_arfs.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_arfs.c
-@@ -254,11 +254,13 @@ static int arfs_create_groups(struct mlx5e_flow_table *ft,
- 
- 	ft->g = kcalloc(MLX5E_ARFS_NUM_GROUPS,
- 			sizeof(*ft->g), GFP_KERNEL);
--	in = kvzalloc(inlen, GFP_KERNEL);
--	if  (!in || !ft->g) {
--		kfree(ft->g);
--		kvfree(in);
-+	if (!ft->g)
- 		return -ENOMEM;
-+
-+	in = kvzalloc(inlen, GFP_KERNEL);
-+	if (!in) {
-+		err = -ENOMEM;
-+		goto err_free_g;
- 	}
- 
- 	mc = MLX5_ADDR_OF(create_flow_group_in, in, match_criteria);
-@@ -278,7 +280,7 @@ static int arfs_create_groups(struct mlx5e_flow_table *ft,
- 		break;
- 	default:
- 		err = -EINVAL;
--		goto out;
-+		goto err_free_in;
- 	}
- 
- 	switch (type) {
-@@ -300,7 +302,7 @@ static int arfs_create_groups(struct mlx5e_flow_table *ft,
- 		break;
- 	default:
- 		err = -EINVAL;
--		goto out;
-+		goto err_free_in;
- 	}
- 
- 	MLX5_SET_CFG(in, match_criteria_enable, MLX5_MATCH_OUTER_HEADERS);
-@@ -309,7 +311,7 @@ static int arfs_create_groups(struct mlx5e_flow_table *ft,
- 	MLX5_SET_CFG(in, end_flow_index, ix - 1);
- 	ft->g[ft->num_groups] = mlx5_create_flow_group(ft->t, in);
- 	if (IS_ERR(ft->g[ft->num_groups]))
--		goto err;
-+		goto err_clean_group;
- 	ft->num_groups++;
- 
- 	memset(in, 0, inlen);
-@@ -318,18 +320,20 @@ static int arfs_create_groups(struct mlx5e_flow_table *ft,
- 	MLX5_SET_CFG(in, end_flow_index, ix - 1);
- 	ft->g[ft->num_groups] = mlx5_create_flow_group(ft->t, in);
- 	if (IS_ERR(ft->g[ft->num_groups]))
--		goto err;
-+		goto err_clean_group;
- 	ft->num_groups++;
- 
- 	kvfree(in);
- 	return 0;
- 
--err:
-+err_clean_group:
- 	err = PTR_ERR(ft->g[ft->num_groups]);
- 	ft->g[ft->num_groups] = NULL;
--out:
-+err_free_in:
- 	kvfree(in);
--
-+err_free_g:
-+	kfree(ft->g);
-+	ft->g = NULL;
- 	return err;
- }
- 
--- 
-2.34.1
+    Qiang Ma
 
 
