@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-63950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B531983049C
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 12:35:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D206F8304AE
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 12:44:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE1FA1C21718
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 11:35:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 597F11F21771
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 11:44:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC3021DDFA;
-	Wed, 17 Jan 2024 11:35:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8728D1DDFF;
+	Wed, 17 Jan 2024 11:43:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WAPuvlur"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PiLqB/51"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D52E81D553;
-	Wed, 17 Jan 2024 11:35:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 914CA1DFC7;
+	Wed, 17 Jan 2024 11:43:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705491344; cv=none; b=aVcCkEEzSUvsgcazA2LhTRN62tg/IzlcXif9DZHSvSw3c4qiR90hKN0nh2+XSlkDtGvYl9a7z3OCRD9ruJF8RODFuV+zfmKcG9KYP/0YCOlEGa6Lu2uc0lFpyj+NE5w2LS9t8TECNSunjDN8xJ9liJjoZ1doPgGPuFRBjS6Cd24=
+	t=1705491838; cv=none; b=uPM2ji7MzeSTO253dcGQ8wXSMYfcXJLAiVUy0CTplfXi4LVMHLEqLAoLZNivlLCFV9o9oKhxjAYJ4cPjWcGk2WRWJQ4GkPkST5+dzGUNLp5DJ/G3Yi6j8W2AjgzAxLS5Fun86F297Yq04d2YcMuHXhfEXV93qZRv5fQ5ySAVpKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705491344; c=relaxed/simple;
-	bh=cGVn5nGKU6295YOEeT1bunPSed8dfV5dlF10LiiNIv4=;
+	s=arc-20240116; t=1705491838; c=relaxed/simple;
+	bh=DEYWRFDI9oB+23vF6sVpjzjVegsn6KPJjB/QfIr2XNU=;
 	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:From:
 	 To:Cc:Subject:Date:Message-Id:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding; b=ZBvzjVMsEWp1aZbsA3rFTIyrPMog3Hy6VpXYhGWIVF+Zx1c2v1BSc/c8zhmDuL1aWkqx5uhd1B5/xwhyaenYIvawnP4aBsr5dykIIbB8L3qrE2DAPWTj/3ZEYxEeYhrUDGz8upeUhrfvnIX8ysJ3nL2/XG1VQlwiVsqa5RJJIzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WAPuvlur; arc=none smtp.client-ip=209.85.221.44
+	 Content-Transfer-Encoding; b=YYiiM0kQ7Fu1McvY84eVlY7/sTLBCHQFqXgVCbU+srH6WmF6u1Fzyy2ayWgwWm8p/Yssja475/S5a/swIJVpXJFrf1IlF0oWp8O+LooVusi5w1o4WEcvw1ali6dGS0beN7uvptLkboPObnmEOBi2tuM5mhXHooMBVCgY+Z+Tgb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PiLqB/51; arc=none smtp.client-ip=209.85.128.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-337b71a0240so1384589f8f.0;
-        Wed, 17 Jan 2024 03:35:42 -0800 (PST)
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-40b5155e154so131831265e9.3;
+        Wed, 17 Jan 2024 03:43:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705491341; x=1706096141; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1705491835; x=1706096635; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=rlN6ktNqZqlESmFt/Q5ERUw4tTnRFjyWqNJgs9EIDOU=;
-        b=WAPuvlurwnVNhD1GbxJ+T2qiYVYDw34SiTxFAmFoY1iMi3TDQJOZeBxStVIQ6j+IdI
-         PTbhFwJ9nL12eT5iy9MV3oyskuqZBrsm3XmQtEz+cVpvgh3MI9Q1aGVdUtUv8yzBdNIV
-         ZZ7DgHaUg3/w+AxaP7ETg4I02xJTD9GjRQ7nKu7PebJkSq26Ht2WuGhJecMGbxWs+LQV
-         lX1Mf/NbPz+BgoA8WGFlHU2Dv47uFUEf0tTmf9J67xV46SYoAe5q0ES3XBWBdD+jdUfo
-         Id7Jvy5/sztv5uSuK92Zu3ySuIh+8jkC07unNTsg5lNUWIkbstLiqqQ+uUpASvwKBe0W
-         4j5g==
+        bh=UIMlf/X59EjBRtC/jkII3ikXVNTWokkV4Q53C3Jv90s=;
+        b=PiLqB/51Utoxp3vBraK4h6ygcewhxwf0riNrH1RCk30rw4TC9nXDRP6Xecgdn9NSzg
+         ceN1EwqhiSq9WqN7+XS9Pnhwi6PD6aDshIeunjO5FBui8jjUTwcYwgTgivyLth2HDiio
+         2mZNeXcT2G91C1gglNCzItGUZsm5CZwYsP2cMA1QnUpNMR3iEAm8j4X2bryyULkeAiDP
+         NaNcX77L+PzW9yFF83NLFtcyEC5PMVNhIwiK974d0wo1yCBzEUp5UGDoHTp/AuhbtR/0
+         JoLaG3gZ9Ey0OtAHnreMQenm5re0BVaX5z0Wiidk/9HK/clAi9zEtz33BPivXWTWZvWF
+         LA7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705491341; x=1706096141;
+        d=1e100.net; s=20230601; t=1705491835; x=1706096635;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=rlN6ktNqZqlESmFt/Q5ERUw4tTnRFjyWqNJgs9EIDOU=;
-        b=OeTasXTsgiDRnlgiIDfuJytnENbAXfgHMlPKXGrEoxCf2iFEbYf8IsTu9bzDkC5FZx
-         ViGgQSN2usSRMGUbBreOm35PP1MD3sUnc6bVeBzVR4RqnRO/OHz2J4LW76JSoX78Wgz1
-         2G+UH+6deanFIUusO6+XSkyqk+GpaAnHeeQYecio5FNW7tnzYDZDQwOWY5g4AFMjkYdH
-         f0krSZbANUpJKtw306Tj6naZ1qgoLlrRpQld7ShfyRcXH0RaZBVn7np2RUa0cIO7/qrk
-         d01KMG4ZplNABeViDUuUDlqym0B7ZKDICDxoNv8L9dx3Cm+bK+pJ3czWigdNWRP334na
-         1soQ==
-X-Gm-Message-State: AOJu0YyGNvDl+lGDo1t6AhPL74qWQUnF8GMNB1vhdhgHSzwdE8PmlMYK
-	a5FnG/fQxv6EA9oAPYdQoDA=
-X-Google-Smtp-Source: AGHT+IF8xWULn/5ZymiXJYjCyz9QaV6Tu9o4kcTTnRDvwNuvDUFkvnVxemCFrwokZb+L9hdahgg4zA==
-X-Received: by 2002:a05:6000:1b0a:b0:337:bdcf:9d8b with SMTP id f10-20020a0560001b0a00b00337bdcf9d8bmr1360328wrz.76.1705491340740;
-        Wed, 17 Jan 2024 03:35:40 -0800 (PST)
+        bh=UIMlf/X59EjBRtC/jkII3ikXVNTWokkV4Q53C3Jv90s=;
+        b=myXO+Akz7HYZFb8uiF/WcfqJ/eOh6fmfsplX0B95nJdKSbEoqPDxI/umE4igptcKiO
+         6nkmIBHqmQ3HvdKBcISAQk5sHnMDd8MWjaYnfIgQi8i+Gxkw8SZ5y4PjjfEWp3CgfUXR
+         Bc0740GXklzkI/H+AKdZ4YDu+Lns0OuctlnU3l+G6p3/r/B1slA550VObiPrQlfzLu8c
+         trbxLjPxUioNyhVgfpvUlP/JPxapwZxrW+k/cWtporlysVgxywffAOMkIg82mA8099bI
+         eSzeKTkF6bbOcgofbieIE8ECcKoY6S00IMZ4QdP+UW00/LG/R63v6heo2xWkRyxxO771
+         wWuQ==
+X-Gm-Message-State: AOJu0YzVzTUjCnh5xH5Ecv57eZfv8cSICqdBdKjqSwfzZWEPn/GrN3bI
+	wV0u7cWAcF10bgTdexB/hf8=
+X-Google-Smtp-Source: AGHT+IHKNygigzlht7ZV31sPhoqgrvN9rhWBxw88IiJQSx+aMrk5Mi8kL0Fi44F940cFf2ypaHtb5w==
+X-Received: by 2002:a7b:c7c5:0:b0:40e:73fb:15 with SMTP id z5-20020a7bc7c5000000b0040e73fb0015mr2753215wmk.47.1705491834554;
+        Wed, 17 Jan 2024 03:43:54 -0800 (PST)
 Received: from ran.advaoptical.com ([82.166.23.19])
-        by smtp.gmail.com with ESMTPSA id g15-20020a5d64ef000000b00336f43fa654sm1493288wri.22.2024.01.17.03.35.39
+        by smtp.gmail.com with ESMTPSA id u6-20020a05600c138600b0040d5a9d6b68sm26352733wmf.6.2024.01.17.03.43.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Jan 2024 03:35:40 -0800 (PST)
+        Wed, 17 Jan 2024 03:43:54 -0800 (PST)
 From: Sagi Maimon <maimon.sagi@gmail.com>
 To: richardcochran@gmail.com,
 	jonathan.lemon@gmail.com,
@@ -75,9 +75,9 @@ Cc: linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	kuba@kernel.org,
 	Sagi Maimon <maimon.sagi@gmail.com>
-Subject: [PATCH v4] ptp: ocp: add Adva timecard support
-Date: Wed, 17 Jan 2024 13:35:36 +0200
-Message-Id: <20240117113536.2829-1-maimon.sagi@gmail.com>
+Subject: [PATCH v5] ptp: ocp: add Adva timecard support
+Date: Wed, 17 Jan 2024 13:43:50 +0200
+Message-Id: <20240117114350.3105-1-maimon.sagi@gmail.com>
 X-Mailer: git-send-email 2.26.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -94,20 +94,14 @@ Other parts of the code are the same and could be reused.
 
 Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
 ---
+ Changes since version 4:
+ - alignment fix.
 
- Addressed comments from:
- - Vadim Fedorenko : https://www.spinics.net/lists/netdev/msg962933.html
-          
- Changes since version 3:
- - Initialize fw information for ADVA board.
- - Adding serialnum and board ID attribute support for ADVA board.
- - Adding signal generators and frequency counters. 
- 
  drivers/ptp/ptp_ocp.c | 302 ++++++++++++++++++++++++++++++++++++++++--
  1 file changed, 293 insertions(+), 9 deletions(-)
 
 diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
-index 4021d3d325f9..39dbf58ca360 100644
+index 4021d3d325f9..c066d2743836 100644
 --- a/drivers/ptp/ptp_ocp.c
 +++ b/drivers/ptp/ptp_ocp.c
 @@ -34,6 +34,9 @@
@@ -279,8 +273,8 @@ index 4021d3d325f9..39dbf58ca360 100644
 +		},
 +	},
 +	{
-+			OCP_MEM_RESOURCE(freq_in[0]),
-+			.offset = 0x01200000, .size = 0x10000,
++		OCP_MEM_RESOURCE(freq_in[0]),
++		.offset = 0x01200000, .size = 0x10000,
 +	},
 +	{
 +		OCP_MEM_RESOURCE(freq_in[1]),
