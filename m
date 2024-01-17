@@ -1,90 +1,76 @@
-Return-Path: <netdev+bounces-63911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48E87830164
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 09:38:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26E28830208
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 10:17:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D208528716E
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 08:38:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A08DD1F21446
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 09:17:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6DAD111BD;
-	Wed, 17 Jan 2024 08:38:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C48312E7D;
+	Wed, 17 Jan 2024 09:17:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SwpjjwbL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="McoAt0l9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DBCC12B68;
-	Wed, 17 Jan 2024 08:38:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D481F13FF5;
+	Wed, 17 Jan 2024 09:17:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705480695; cv=none; b=XJeoizpxWcEJUcVfXmecxiq82+AljflgGjTc8wmJNwDMPZC7qVoAhiZEgGQlSpBJ7hKDdrw7Pd1ozur9l9VkhBA/dfKVdA6B8ZKDbEfnC91jCyLxBJDSBp1MFf/DD/aUCHTqiaq8mw/9ToPSwuz9cMYdAkQG6jisdm79sIlW4Bc=
+	t=1705483050; cv=none; b=fXCmfT6Y2Z339l23I6X/Ek3VxTeKLsOieXZwSRD8g47RBSrTXVqVBAj/3VAZAwzDm1dbgDCTvTaN0vUvFqcYhYVSxwzgg14yJTSamGA0w42113TKb2ONeYTSSCDM+7jZdwkJAcFhpT6C9Vu13E32Pez/06u8liz5vy3z9Re6jKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705480695; c=relaxed/simple;
-	bh=VtsiPGfRjMnW7iyF/uQYtjNk+z7EmslfrGX+3dSxVGA=;
-	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:From:
-	 To:Cc:Subject:Date:Message-Id:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding; b=U/YeUqfd50joSIaZua156lgLfADmdChFVdMy7zTHhMLxQ0qCwQ9gZTYNa+l5UF+VixlWSJsl4iijD/YWSI30z6Z/+ibwr1+gSZVphbjeugegO4AFOhl6eGCz9ptPuIy59peJbZB2497Wc8uZWCQ7KqAL3scLU1+v3EpfLDGwRtI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SwpjjwbL; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1d5dfda4319so12639455ad.0;
-        Wed, 17 Jan 2024 00:38:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705480693; x=1706085493; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jSOMGuUHrQxjLGHgZ49LUYPYZXjRbYJLosFfB3nja5M=;
-        b=SwpjjwbLiD8OcWUkVHCz96i767ZURWlCM/52FGohPpELIEKlppVQWuBl/6wwfEAxQX
-         Sy9+62L90qpyVvGBsy1f/CoX/SC7cmgGMsE6IxX47actBkIFM1LDysRr9d+1cWgcuZiA
-         cmDxp4Gs5zMfNDbAOiOL5dG2YPY6wXfdg7ED2YSkHf2i37c55zJYpGOSiQrNh8P2l+f3
-         Etnd3+i18Owp0PQWJXUmm1kY5Hd1m2GTunUgoSpQ5Gw2/mEYdfqtarqAzNbkM0e4Ih83
-         C9y0RmImX8wK8Qa+QbG/4LstTwYxF5J6zKfGRkJMN1S5v3tFNszs6pDH9TnRrnphBEvv
-         C55Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705480693; x=1706085493;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jSOMGuUHrQxjLGHgZ49LUYPYZXjRbYJLosFfB3nja5M=;
-        b=TioX3msOkDotW+X9nFdtPhMGslN1Tcj5zgvipiV4H24XKyjzba9bX3zuvU5CaTVJ7y
-         SxcaPMTyngq77j+D1DnB8PWbcZqIJc4q3xz3Fu+4dYmRYZxErYROFkCqs5kVd2bghIRU
-         mt+4vSxZgQhXpxKmE0iSOZ/spnx1GxhRpdakcAEhxVQZgyHvFcT03TneTDLNHhx/wzP7
-         lWoMUtm1s59lu6JdZtflo99scXIE/IZ3X8ds4QSolkOOuIRZeZQIIHxX8xZLRWoIpDXV
-         XBgSB/PWIyRQ1owtjXvaBPrSMX2I7HaTotRh0IcrWYo3rxfsykwEJ5ciaeXX1xoSEx+e
-         ixlA==
-X-Gm-Message-State: AOJu0Yw6+0dZaFyN+2GIQa1PVWJuu3XLtjmloZIAKWZYkf2oCvO6lboB
-	j6GRrz+8a7z7m8thNCaMCTsQj/f2d1eCYMIqqOs=
-X-Google-Smtp-Source: AGHT+IGF32Idn6WvEOYbmK6PJaSkBAoafsAJF85+7k2nFlGNaRGBxUZXUh5p5xDnV68gDxhKX4qDZA==
-X-Received: by 2002:a17:903:11c3:b0:1d6:96b:5dd with SMTP id q3-20020a17090311c300b001d6096b05ddmr1440184plh.82.1705480693494;
-        Wed, 17 Jan 2024 00:38:13 -0800 (PST)
-Received: from localhost ([104.192.108.9])
-        by smtp.gmail.com with ESMTPSA id k5-20020a170902ba8500b001d5b87ee67bsm6658912pls.186.2024.01.17.00.38.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Jan 2024 00:38:13 -0800 (PST)
-From: nai lin <ayano2023th@gmail.com>
+	s=arc-20240116; t=1705483050; c=relaxed/simple;
+	bh=lTtpvG5RRasjRGxk9EDfE+1dfmbyo1rp6JY9W4QBujg=;
+	h=DKIM-Signature:X-IronPort-AV:X-IronPort-AV:Received:X-ExtLoop1:
+	 X-IronPort-AV:X-IronPort-AV:Received:From:To:Cc:Subject:Date:
+	 Message-Id:X-Mailer:MIME-Version:Content-Transfer-Encoding; b=R6PpUi6RbkOWd5gMJcHP04lVX5Bv3+ZjbewkPDmfwF5h152TBC+bUXwtPLD6PYDcTXAWCUT5x2eByqF404axEGnHJ+oLonQRUtMHplwSu1lcttlAdGwhb6skn68h2G2X5qa/37/fK0t/IZygEdAEdJIf6gZ8yv5sq7Rnkuw/AI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=McoAt0l9; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1705483049; x=1737019049;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=lTtpvG5RRasjRGxk9EDfE+1dfmbyo1rp6JY9W4QBujg=;
+  b=McoAt0l9YWSAlUGCa+9qoUkj+fLjhjK+OOxCegcc5DEDUVOWhYYAqG6E
+   9SwoJC2Nj+Y5V6zwyeVIZhH0h4vbPTKVKVdAK/3q90cMTg/nE+6cgPjmO
+   VMCeD8cIV3A1F9P6Ply2RdrE7jZeJqX33gNUsdC5iT+QoP6vCBtvvqPlm
+   JMH80YCf6b7Rkh3YKsDVQQvzGMZHGrEARdmK1BUcrDZ99sXcm4LhzlrVx
+   Ou4MVqS6v6c5l3rgXv4Kr7Zg+uD1uWvR1KYurvxpzPsAu5W/o5l1OYKT6
+   9oz74c6+QDye50mhIiN++JZ0bC017RrgJyoHi2eN2vUZW/+pMxW9jKBMO
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10955"; a="13474494"
+X-IronPort-AV: E=Sophos;i="6.05,200,1701158400"; 
+   d="scan'208";a="13474494"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jan 2024 01:17:27 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10955"; a="957489731"
+X-IronPort-AV: E=Sophos;i="6.05,200,1701158400"; 
+   d="scan'208";a="957489731"
+Received: from amlin-018-114.igk.intel.com ([10.102.18.114])
+  by orsmga005.jf.intel.com with ESMTP; 17 Jan 2024 01:17:23 -0800
+From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 To: netdev@vger.kernel.org
-Cc: nai lin <ayano2023th@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Anjali Kulkarni <anjali.k.kulkarni@oracle.com>,
-	Li RongQing <lirongqing@baidu.com>,
-	David Howells <dhowells@redhat.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] netlink: fix potential race issue in netlink_native_seq_show()
-Date: Wed, 17 Jan 2024 16:37:13 +0800
-Message-Id: <20240117083715.7800-1-ayano2023th@gmail.com>
-X-Mailer: git-send-email 2.25.1
+Cc: vadim.fedorenko@linux.dev,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	milena.olech@intel.com,
+	linux-kernel@vger.kernel.org,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	mschmidt@redhat.com,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Subject: [PATCH net v4 0/4] dpll: fix unordered unbind/bind registerer issues
+Date: Wed, 17 Jan 2024 10:14:12 +0100
+Message-Id: <20240117091416.504096-1-arkadiusz.kubalewski@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,37 +79,100 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Access to the nlk group should be protected by netlink_lock_table() like
-commit <f773608026ee> ("netlink: access nlk groups safely in netlink bind
-and getname"), otherwise there will be potential race conditions.
+Fix issues when performing unordered unbind/bind of a kernel modules
+which are using a dpll device with DPLL_PIN_TYPE_MUX pins.
+Currently only serialized bind/unbind of such use case works, fix
+the issues and allow for unserialized kernel module bind order.
 
-Signed-off-by: nai lin <ayano2023th@gmail.com>
----
- net/netlink/af_netlink.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+The issues are observed on the ice driver, i.e.,
 
-diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-index 4ed8ffd58ff3..61ad81fb80f5 100644
---- a/net/netlink/af_netlink.c
-+++ b/net/netlink/af_netlink.c
-@@ -2693,6 +2693,7 @@ static int netlink_native_seq_show(struct seq_file *seq, void *v)
- 		struct sock *s = v;
- 		struct netlink_sock *nlk = nlk_sk(s);
- 
-+		netlink_lock_table();
- 		seq_printf(seq, "%pK %-3d %-10u %08x %-8d %-8d %-5d %-8d %-8u %-8lu\n",
- 			   s,
- 			   s->sk_protocol,
-@@ -2705,7 +2706,7 @@ static int netlink_native_seq_show(struct seq_file *seq, void *v)
- 			   atomic_read(&s->sk_drops),
- 			   sock_i_ino(s)
- 			);
--
-+		netlink_unlock_table();
- 	}
- 	return 0;
- }
+$ echo 0000:af:00.0 > /sys/bus/pci/drivers/ice/unbind
+$ echo 0000:af:00.1 > /sys/bus/pci/drivers/ice/unbind
+
+results in:
+
+ice 0000:af:00.0: Removed PTP clock
+BUG: kernel NULL pointer dereference, address: 0000000000000010
+PF: supervisor read access in kernel mode
+PF: error_code(0x0000) - not-present page
+PGD 0 P4D 0 
+Oops: 0000 [#1] PREEMPT SMP PTI
+CPU: 7 PID: 71848 Comm: bash Kdump: loaded Not tainted 6.6.0-rc5_next-queue_19th-Oct-2023-01625-g039e5d15e451 #1
+Hardware name: Intel Corporation S2600STB/S2600STB, BIOS SE5C620.86B.02.01.0008.031920191559 03/19/2019
+RIP: 0010:ice_dpll_rclk_state_on_pin_get+0x2f/0x90 [ice]
+Code: 41 57 4d 89 cf 41 56 41 55 4d 89 c5 41 54 55 48 89 f5 53 4c 8b 66 08 48 89 cb 4d 8d b4 24 f0 49 00 00 4c 89 f7 e8 71 ec 1f c5 <0f> b6 5b 10 41 0f b6 84 24 30 4b 00 00 29 c3 41 0f b6 84 24 28 4b
+RSP: 0018:ffffc902b179fb60 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
+RDX: ffff8882c1398000 RSI: ffff888c7435cc60 RDI: ffff888c7435cb90
+RBP: ffff888c7435cc60 R08: ffffc902b179fbb0 R09: 0000000000000000
+R10: ffff888ef1fc8050 R11: fffffffffff82700 R12: ffff888c743581a0
+R13: ffffc902b179fbb0 R14: ffff888c7435cb90 R15: 0000000000000000
+FS:  00007fdc7dae0740(0000) GS:ffff888c105c0000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000010 CR3: 0000000132c24002 CR4: 00000000007706e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+PKRU: 55555554
+Call Trace:
+ <TASK>
+ ? __die+0x20/0x70
+ ? page_fault_oops+0x76/0x170
+ ? exc_page_fault+0x65/0x150
+ ? asm_exc_page_fault+0x22/0x30
+ ? ice_dpll_rclk_state_on_pin_get+0x2f/0x90 [ice]
+ ? __pfx_ice_dpll_rclk_state_on_pin_get+0x10/0x10 [ice]
+ dpll_msg_add_pin_parents+0x142/0x1d0
+ dpll_pin_event_send+0x7d/0x150
+ dpll_pin_on_pin_unregister+0x3f/0x100
+ ice_dpll_deinit_pins+0xa1/0x230 [ice]
+ ice_dpll_deinit+0x29/0xe0 [ice]
+ ice_remove+0xcd/0x200 [ice]
+ pci_device_remove+0x33/0xa0
+ device_release_driver_internal+0x193/0x200
+ unbind_store+0x9d/0xb0
+ kernfs_fop_write_iter+0x128/0x1c0
+ vfs_write+0x2bb/0x3e0
+ ksys_write+0x5f/0xe0
+ do_syscall_64+0x59/0x90
+ ? filp_close+0x1b/0x30
+ ? do_dup2+0x7d/0xd0
+ ? syscall_exit_work+0x103/0x130
+ ? syscall_exit_to_user_mode+0x22/0x40
+ ? do_syscall_64+0x69/0x90
+ ? syscall_exit_work+0x103/0x130
+ ? syscall_exit_to_user_mode+0x22/0x40
+ ? do_syscall_64+0x69/0x90
+ entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+RIP: 0033:0x7fdc7d93eb97
+Code: 0b 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
+RSP: 002b:00007fff2aa91028 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 000000000000000d RCX: 00007fdc7d93eb97
+RDX: 000000000000000d RSI: 00005644814ec9b0 RDI: 0000000000000001
+RBP: 00005644814ec9b0 R08: 0000000000000000 R09: 00007fdc7d9b14e0
+R10: 00007fdc7d9b13e0 R11: 0000000000000246 R12: 000000000000000d
+R13: 00007fdc7d9fb780 R14: 000000000000000d R15: 00007fdc7d9f69e0
+ </TASK>
+Modules linked in: uinput vfio_pci vfio_pci_core vfio_iommu_type1 vfio irqbypass ixgbevf snd_seq_dummy snd_hrtimer snd_seq snd_timer snd_seq_device snd soundcore overlay qrtr rfkill vfat fat xfs libcrc32c rpcrdma sunrpc rdma_ucm ib_srpt ib_isert iscsi_target_mod target_core_mod ib_iser libiscsi scsi_transport_iscsi rdma_cm iw_cm ib_cm intel_rapl_msr intel_rapl_common intel_uncore_frequency intel_uncore_frequency_common isst_if_common skx_edac nfit libnvdimm ipmi_ssif x86_pkg_temp_thermal intel_powerclamp coretemp irdma rapl intel_cstate ib_uverbs iTCO_wdt iTCO_vendor_support acpi_ipmi intel_uncore mei_me ipmi_si pcspkr i2c_i801 ib_core mei ipmi_devintf intel_pch_thermal ioatdma i2c_smbus ipmi_msghandler lpc_ich joydev acpi_power_meter acpi_pad ext4 mbcache jbd2 sd_mod t10_pi sg ast i2c_algo_bit drm_shmem_helper drm_kms_helper ice crct10dif_pclmul ixgbe crc32_pclmul drm crc32c_intel ahci i40e libahci ghash_clmulni_intel libata mdio dca gnss wmi fuse [last unloaded: iavf]
+CR2: 0000000000000010
+
+v4:
+- fix order of patches: [v3 2/3] <-> [v3 3/3]
+- separate fix patch for unwind on error path in dpll_pin_alloc(..)
+
+Arkadiusz Kubalewski (4):
+  dpll: fix pin dump crash for rebound module
+  dpll: fix userspace availability of pins
+  dpll: fix register pin with unregistered parent pin
+  dpll: fix broken error path in dpll_pin_alloc(..)
+
+ drivers/dpll/dpll_core.c    | 67 +++++++++++++++++++++++++++++++------
+ drivers/dpll/dpll_core.h    |  4 +--
+ drivers/dpll/dpll_netlink.c | 57 ++++++++++++++++++++++---------
+ 3 files changed, 99 insertions(+), 29 deletions(-)
+
+
+base-commit: e9ce7ededf14af3396312f02d1622f4889d676ca
 -- 
-2.25.1
+2.38.1
 
 
