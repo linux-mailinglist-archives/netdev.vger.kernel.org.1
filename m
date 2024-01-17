@@ -1,51 +1,54 @@
-Return-Path: <netdev+bounces-64031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DF0E830BD5
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 18:20:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 12F90830BD8
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 18:21:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 32040B21DD7
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 17:20:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90A08B21ED3
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 17:21:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBC38225D1;
-	Wed, 17 Jan 2024 17:20:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UFRS8YHV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 360CE225D8;
+	Wed, 17 Jan 2024 17:21:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from exchange.fintech.ru (exchange.fintech.ru [195.54.195.159])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A87E92030D
-	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 17:20:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A34E22609;
+	Wed, 17 Jan 2024 17:21:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.54.195.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705512026; cv=none; b=Xwpgwi6i3BKq9hRQHfEbd1Z8eajyKAkKVJ5NWA+FRRYRQnaQ3LjZ/6D3eINU9pbGxvF42iz8yPRrtBYLZHQHBOaK7aOWtY3boxEhiCh2u64Y3O6/hL9A+WoLQyj8HFkjN2MmdJCwgvRNGyUnp1hln+sdnug54qJ8iY1D/QLpdKs=
+	t=1705512077; cv=none; b=Tofq8vTlyfcSolZNLejYRBNNadpcvJ/RNPYJnQQQQxzP0mEZN01N9mSC+cfEBB2bYtdpVhaPDBCSOuAHhVCkWEUUA0zt8GszX6Idxe79dONAdkgih/5ZhRXPiyCAEyPUHugP0wsGZK+tD424HXRu0/BVC8ymf/qoP9vEnJUG3Lc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705512026; c=relaxed/simple;
-	bh=AHqgc5lsOR1IxRMY/9RH9uEYs4OmkldCjl1YKIsODFo=;
-	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
-	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=BzqdbZ3sDEHD8AOCoXyNoakzKU66cLesnSEVjyuUnhPtRCP9/r6i/N+ZLzY3tF1kl3166DNcbh5IMtJFizDmoyZDmlNyP3uR1DX3pE9c3U84//Qxvkz56TJLkIC09PTyUHK8eQl79TJrCMdcOdBjUZoBsiyGDRA0famPCVYRBww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UFRS8YHV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1F33DC43390;
-	Wed, 17 Jan 2024 17:20:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705512026;
-	bh=AHqgc5lsOR1IxRMY/9RH9uEYs4OmkldCjl1YKIsODFo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=UFRS8YHVKk0Wf2+fLvKWjhANpC5rMTrbrWIlE/0tdUT2uGmp5u+VzcznDOPip/7X0
-	 19yWcnf5eCo05lOaufRcmjsrYL6dUm2MxPo81xB4h27Jzws4OJPB9QzTuKl0WK29qa
-	 QoZwCMqXa7RZ/2gKtHQarmXVds60Zkr51+A+OGQj1yo7lZ1mo2Kg6He0bp9SFlK0EK
-	 2mFnLGdkxNaOPd6bQqodI7DGWbBsHn7Ah44/g5CtQHUoZvGGUhteDnP+aR8eYoD30D
-	 uQF4cfhMP2wBEf5FSEpftE0rwpUbHxhV9d79rGQmr6hMg7o7bVMyzu0st6bODPPSnP
-	 2XztcnNu6975g==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F3C43D8C97D;
-	Wed, 17 Jan 2024 17:20:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1705512077; c=relaxed/simple;
+	bh=0tQpzSPcwZV/BAp/SszbaUM/7gsBsP/zQckGbH5ilbA=;
+	h=Received:Received:From:To:CC:Subject:Date:Message-ID:X-Mailer:
+	 MIME-Version:Content-Transfer-Encoding:Content-Type:
+	 X-Originating-IP:X-ClientProxiedBy; b=EfURtiXllForlDwdIpDDilZD5gMlTxfDbkLvAfuUxKop7jx8jercFEmMRyKZdgfU+rSfWkab5xno2KYJHOWEZ1U1WZBFg0q2wsG6ODpknzdZ1ncFfM5/41ElzsMwWGrJULR6Urjauj6FmyEOBMx5jMRQgXLu+iS8ij2yPcW2ZdQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru; spf=pass smtp.mailfrom=fintech.ru; arc=none smtp.client-ip=195.54.195.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fintech.ru
+Received: from Ex16-01.fintech.ru (10.0.10.18) by exchange.fintech.ru
+ (195.54.195.169) with Microsoft SMTP Server (TLS) id 14.3.498.0; Wed, 17 Jan
+ 2024 20:21:07 +0300
+Received: from localhost (10.0.253.138) by Ex16-01.fintech.ru (10.0.10.18)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Wed, 17 Jan
+ 2024 20:21:07 +0300
+From: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+To: "David S. Miller" <davem@davemloft.net>
+CC: Nikita Zhandarovich <n.zhandarovich@fintech.ru>, David Ahern
+	<dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Taehee Yoo
+	<ap420073@gmail.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>,
+	<syzbot+a9400cabb1d784e49abf@syzkaller.appspotmail.com>
+Subject: [PATCH net] ipv6: mcast: fix data-race in ipv6_mc_down / mld_ifc_work
+Date: Wed, 17 Jan 2024 09:21:02 -0800
+Message-ID: <20240117172102.12001-1-n.zhandarovich@fintech.ru>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,45 +56,71 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2] ss: show extra info when '--processes' is not
- used
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170551202599.9915.18061579827470063001.git-patchwork-notify@kernel.org>
-Date: Wed, 17 Jan 2024 17:20:25 +0000
-References: <20240113-ss-fix-ext-col-disabled-v1-1-cf99a7381dec@kernel.org>
-In-Reply-To: <20240113-ss-fix-ext-col-disabled-v1-1-cf99a7381dec@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: stephen@networkplumber.org, netdev@vger.kernel.org, qde@naccy.de
+Content-Type: text/plain
+X-ClientProxiedBy: Ex16-02.fintech.ru (10.0.10.19) To Ex16-01.fintech.ru
+ (10.0.10.18)
 
-Hello:
+idev->mc_ifc_count can be written over without proper locking.
 
-This patch was applied to iproute2/iproute2.git (main)
-by Stephen Hemminger <stephen@networkplumber.org>:
+Originally found by syzbot [1], fix this issue by encapsulating calls
+to mld_ifc_stop_work() (and mld_gq_stop_work() for good measure) with
+mutex_lock() and mutex_unlock() accordingly as these functions
+should only be called with mc_lock per their declarations.
 
-On Sat, 13 Jan 2024 18:10:21 +0100 you wrote:
-> A recent modification broke "extra" options for all protocols showing
-> info about the processes when '-p' / '--processes' option was not used
-> as well. In other words, all the additional bits displayed at the end or
-> at the next line were no longer printed if the user didn't ask to show
-> info about processes as well.
-> 
-> The reason is that, the "current_field" pointer never switched to the
-> "Ext" column. If the user didn't ask to display the processes, nothing
-> happened when trying to print extra bits using the "out()" function,
-> because the current field was still pointing to the "Process" one, now
-> marked as disabled.
-> 
-> [...]
+[1]
+BUG: KCSAN: data-race in ipv6_mc_down / mld_ifc_work
 
-Here is the summary with links:
-  - [iproute2] ss: show extra info when '--processes' is not used
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=87d804ca0854
+write to 0xffff88813a80c832 of 1 bytes by task 3771 on cpu 0:
+ mld_ifc_stop_work net/ipv6/mcast.c:1080 [inline]
+ ipv6_mc_down+0x10a/0x280 net/ipv6/mcast.c:2725
+ addrconf_ifdown+0xe32/0xf10 net/ipv6/addrconf.c:3949
+ addrconf_notify+0x310/0x980
+ notifier_call_chain kernel/notifier.c:93 [inline]
+ raw_notifier_call_chain+0x6b/0x1c0 kernel/notifier.c:461
+ __dev_notify_flags+0x205/0x3d0
+ dev_change_flags+0xab/0xd0 net/core/dev.c:8685
+ do_setlink+0x9f6/0x2430 net/core/rtnetlink.c:2916
+ rtnl_group_changelink net/core/rtnetlink.c:3458 [inline]
+ __rtnl_newlink net/core/rtnetlink.c:3717 [inline]
+ rtnl_newlink+0xbb3/0x1670 net/core/rtnetlink.c:3754
+ rtnetlink_rcv_msg+0x807/0x8c0 net/core/rtnetlink.c:6558
+ netlink_rcv_skb+0x126/0x220 net/netlink/af_netlink.c:2545
+ rtnetlink_rcv+0x1c/0x20 net/core/rtnetlink.c:6576
+ netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
+ netlink_unicast+0x589/0x650 net/netlink/af_netlink.c:1368
+ netlink_sendmsg+0x66e/0x770 net/netlink/af_netlink.c:1910
+ ...
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+write to 0xffff88813a80c832 of 1 bytes by task 22 on cpu 1:
+ mld_ifc_work+0x54c/0x7b0 net/ipv6/mcast.c:2653
+ process_one_work kernel/workqueue.c:2627 [inline]
+ process_scheduled_works+0x5b8/0xa30 kernel/workqueue.c:2700
+ worker_thread+0x525/0x730 kernel/workqueue.c:2781
+ ...
 
+Fixes: 2d9a93b4902b ("mld: convert from timer to delayed work")
+Reported-by: syzbot+a9400cabb1d784e49abf@syzkaller.appspotmail.com
+Link: https://lore.kernel.org/all/000000000000994e09060ebcdffb@google.com/
+Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+---
+ net/ipv6/mcast.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
+diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
+index b75d3c9d41bb..bc6e0a0bad3c 100644
+--- a/net/ipv6/mcast.c
++++ b/net/ipv6/mcast.c
+@@ -2722,8 +2722,12 @@ void ipv6_mc_down(struct inet6_dev *idev)
+ 	synchronize_net();
+ 	mld_query_stop_work(idev);
+ 	mld_report_stop_work(idev);
++
++	mutex_lock(&idev->mc_lock);
+ 	mld_ifc_stop_work(idev);
+ 	mld_gq_stop_work(idev);
++	mutex_unlock(&idev->mc_lock);
++
+ 	mld_dad_stop_work(idev);
+ }
+ 
 
