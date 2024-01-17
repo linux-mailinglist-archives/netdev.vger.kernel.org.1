@@ -1,104 +1,124 @@
-Return-Path: <netdev+bounces-63925-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63926-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C519083024C
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 10:29:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C8D0830253
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 10:31:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F4FA285D60
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 09:29:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D12D2850EB
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 09:31:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 629CE13FF5;
-	Wed, 17 Jan 2024 09:29:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 351BF13FFB;
+	Wed, 17 Jan 2024 09:31:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ceF6A+5x"
+	dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b="p5xUY96l"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dvalin.narfation.org (dvalin.narfation.org [213.160.73.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 308665CB0;
-	Wed, 17 Jan 2024 09:29:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 370BD13FEB;
+	Wed, 17 Jan 2024 09:30:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.73.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705483774; cv=none; b=tNVv7CFNdoBBH4lIp1AluejhdBVDVkAbsJqdcXq2bLmIzWHjmbmT9HIuIb/idVIKMbgkNDlP0svoPs7SaHwlmT7uUWFjnBMhW8wwbErdKuN6ly6F9vj1/ZKsX9cteQihDqteXFvXgsHAXV73O+D5R/mL3hxq0oOLL6j77CGjttk=
+	t=1705483863; cv=none; b=q2I2Mg8286TV76vKp3hDZvFesdw+ma1co2vmZm4pm+m/ov1XhZxtA4vrEmXJ963fDNX2SnyVPUk5zxdNBigb6iKyiRtkL8vaQv8Zd4yJJAND9gTyBqloxXYUHAmBYVVV4rEw4tDts03FUWJ3tUF1wP0kjHRoGcp9+DUgePzQFnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705483774; c=relaxed/simple;
-	bh=ezgzhxmzgqDVyuNbjOenp2QEaN5lS6ynx4hz58XBGfs=;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To; b=jfVnvPGlc6CjxTVnDeU1yzHVSAvF6D/ToyQR2XYL6g6W/sfK4zUmpWH/X9B8zRfzj6pblcjOyh7sA/UwoStJ/i7OSh/RgdrP3R9onIGQkaEGapkb6pnWO2asRl/+ND3wZLVrRHQMGmi2NFOiYJlORg3Hopvn8hUiXf8+zhLQCkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ceF6A+5x; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA534C433F1;
-	Wed, 17 Jan 2024 09:29:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705483773;
-	bh=ezgzhxmzgqDVyuNbjOenp2QEaN5lS6ynx4hz58XBGfs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ceF6A+5xa/2LS66d38fu+hdQrLWrlFhrsrTUfv7JPzA1muRn1y1ItHXhWYTvCZzRN
-	 Diqs+zXxaATOjf430AhTAt3vnV9tR7FCAm6y19tCNedNomwjNkNHIv7mUbd7kBvJ8l
-	 QNAV6LQFwX4L9XyoJ2DnuSh3sD04rg0xWSz8/sMs0VKohXULpBMDOMwaUM2ci5HMV1
-	 P40IwKIgsR6vTp3dNKYcs6F9iVF36HmWCg74CXvmaRav3NoYNROadaaE4rkQl76Iri
-	 CMxMM9UxaU2VbM8VFkJcAKuv4xyoXLApo5eQcFkMDWhVOnair8fxjMpd7a/y+WseqV
-	 BhbqoFFUsOReQ==
-Date: Wed, 17 Jan 2024 09:29:28 +0000
-From: Simon Horman <horms@kernel.org>
-To: Kunwu Chan <chentao@kylinos.cn>
-Cc: ja@ssi.bg, pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] ipvs: Simplify the allocation of ip_vs_conn slab
- caches
-Message-ID: <20240117092928.GA618956@kernel.org>
-References: <20240117072045.142215-1-chentao@kylinos.cn>
+	s=arc-20240116; t=1705483863; c=relaxed/simple;
+	bh=/NmyKlfJ6650BeNPMAL+O91r4ewLVwM+eDR87dQnzac=;
+	h=DKIM-Signature:From:To:Subject:Date:Message-ID:In-Reply-To:
+	 References:MIME-Version:Content-Type; b=grdBvKR3AR62T1phSdJHbB9dzdLvY1pOL60SDme9+PrJv9paXREV6ymdHuf9K+hnXAKpqE2K9jIcr7FKROlV/hKCtCTH8ODDzjfwN8n5VpVw1cOkTg8YnBKc+C8iZlj+k8rsxsFSvCmCf0x43zSBcGkJZzl61TGnroDONJNDZ3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org; spf=pass smtp.mailfrom=narfation.org; dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b=p5xUY96l; arc=none smtp.client-ip=213.160.73.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=narfation.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
+	s=20121; t=1705483857;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Tk4LN5O9pnCWEgZ+hxmp9V07AVwi66XGTPjDMnz4TZI=;
+	b=p5xUY96lfFeFeJhxsbwHcRYD+mU0iiTWWayJr9+pflXvgduJMa0MUabV9ucUhctV0tnxyb
+	G/J88rnnDt+mJy6D4JcoB1fCb1Ylw/QqdCO+vd5NSlCRYzk6QrTGdqYMCc/pW4ORw7+Zn5
+	ypeyCcmwW36MTBpTR3Zu5AIR5LTx3To=
+From: Sven Eckelmann <sven@narfation.org>
+To: b.a.t.m.a.n@lists.open-mesh.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+ syzbot <syzbot+ebe64cc5950868e77358@syzkaller.appspotmail.com>
+Subject: Re: [syzbot] [btrfs?] memory leak in corrupted
+Date: Wed, 17 Jan 2024 10:30:55 +0100
+Message-ID: <5746181.DvuYhMxLoT@ripper>
+In-Reply-To: <000000000000beadc4060f0cbc23@google.com>
+References: <000000000000beadc4060f0cbc23@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240117072045.142215-1-chentao@kylinos.cn>
+Content-Type: multipart/signed; boundary="nextPart6009036.lOV4Wx5bFT";
+ micalg="pgp-sha512"; protocol="application/pgp-signature"
 
-On Wed, Jan 17, 2024 at 03:20:45PM +0800, Kunwu Chan wrote:
-> Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
-> to simplify the creation of SLAB caches.
+--nextPart6009036.lOV4Wx5bFT
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"; protected-headers="v1"
+From: Sven Eckelmann <sven@narfation.org>
+Subject: Re: [syzbot] [btrfs?] memory leak in corrupted
+Date: Wed, 17 Jan 2024 10:30:55 +0100
+Message-ID: <5746181.DvuYhMxLoT@ripper>
+In-Reply-To: <000000000000beadc4060f0cbc23@google.com>
+References: <000000000000beadc4060f0cbc23@google.com>
+MIME-Version: 1.0
+
+On Tuesday, 16 January 2024 10:27:20 CET syzbot wrote:
+> Hello,
 > 
-> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
-
-Hi Kunwu Chan,
-
-I think this is more of a cleanup than a fix,
-so it should probably be targeted at 'nf-next' rather than 'net'.
-
-If it is a fix, then I would suggest targeting it at 'nf'
-and providing a Fixes tag.
-
-The above notwithstanding, this looks good to me.
-
-Acked-by: Simon Horman <horms@kernel.org>
-
-> ---
->  net/netfilter/ipvs/ip_vs_conn.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
+> syzbot found the following issue on:
 > 
-> diff --git a/net/netfilter/ipvs/ip_vs_conn.c b/net/netfilter/ipvs/ip_vs_conn.c
-> index a743db073887..98d7dbe3d787 100644
-> --- a/net/netfilter/ipvs/ip_vs_conn.c
-> +++ b/net/netfilter/ipvs/ip_vs_conn.c
-> @@ -1511,9 +1511,7 @@ int __init ip_vs_conn_init(void)
->  		return -ENOMEM;
->  
->  	/* Allocate ip_vs_conn slab cache */
-> -	ip_vs_conn_cachep = kmem_cache_create("ip_vs_conn",
-> -					      sizeof(struct ip_vs_conn), 0,
-> -					      SLAB_HWCACHE_ALIGN, NULL);
-> +	ip_vs_conn_cachep = KMEM_CACHE(ip_vs_conn, SLAB_HWCACHE_ALIGN);
->  	if (!ip_vs_conn_cachep) {
->  		kvfree(ip_vs_conn_tab);
->  		return -ENOMEM;
+> HEAD commit:    052d534373b7 Merge tag 'exfat-for-6.8-rc1' of git://git.ke..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=14620debe80000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=a7031f9e71583b4a
+> dashboard link: https://syzkaller.appspot.com/bug?extid=ebe64cc5950868e77358
+> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16a344c1e80000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/82a7201eef4c/disk-052d5343.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/ca12b4c31826/vmlinux-052d5343.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/3f07360ba5a8/bzImage-052d5343.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+ebe64cc5950868e77358@syzkaller.appspotmail.com
+
+
+#syz test git://git.open-mesh.org/linux-merge.git a67d6793286ffab46b72b1afff5fb1f0ca55f2e1
+
+Kind regards,
+	Sven
+--nextPart6009036.lOV4Wx5bFT
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEF10rh2Elc9zjMuACXYcKB8Eme0YFAmWnnk8ACgkQXYcKB8Em
+e0bcbBAAr5gtssx/V1po0W1ajwPIxK80mbSHo+Ch0/ZBvbJGsOcFGc83+vFBoEj8
+2UE42Cqv/1PUM73gCOeyOItIBJ4Nr0FW7YmddfWORjvNpnG8s5v0Q5DAOpkTjGBq
+RewEg1uWVerXh9RS5k/V6W0ZRDnnZnqT6EqOm/zd04XRnihgTME1xF6zPwctkIrM
+2cudZhgkGDWKYI5GSPR5/hfkxXB/DK9tpS3LtJ73bSb+QJyd5WR/WPcPTY3+hpU+
+IW+cwtCYCxR0GzCAtBvFQDQ+XeKu78A26QbWTXCJ4tQn1KwRKh+VZIHS5oyAEKgc
+tdA6fmQioEpm4NZkpsRl1x09iR4xYeSn5oMR56XNrsxWhg7IhXL+HnHxMKP6oGOS
+GlG54yTgfIvUz3jzlJqTRP8s/OhDnYdhacRSSOFZ53lRlNIlL8SNROPiie5gLqKW
+gjkZagplFhLNf139twREGp5h8HE3VNuPb/2TFYClcSj/HTbVOKbyKD37JWuqlCi0
+eVO269tCpIYdUOwA/4kAwnQMeAXu1/rIO8GkCfgbYok94wuGqbNzslHUUC7JrEf+
+DkIeLCtnuvdo1AHt65r75hF+lQ7TSd4r4HD2j/Z2ssVvCVBiFJkCvvExh0Nz4FHr
+3kq4Q1cnTb+4evLeqpWyjvSKwp1+wmgrgwbYP/5B81aT0d3KMeE=
+=UkN8
+-----END PGP SIGNATURE-----
+
+--nextPart6009036.lOV4Wx5bFT--
+
+
+
 
