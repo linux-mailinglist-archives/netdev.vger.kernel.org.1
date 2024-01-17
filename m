@@ -1,353 +1,248 @@
-Return-Path: <netdev+bounces-63875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63880-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC59B82FE07
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 01:36:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F63182FE87
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 02:45:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6665028A077
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 00:36:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 984811F294CD
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 01:45:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 601F95660;
-	Wed, 17 Jan 2024 00:36:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA06410E9;
+	Wed, 17 Jan 2024 01:45:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mHG1b+kE"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="LSAoquwy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2074.outbound.protection.outlook.com [40.107.237.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65A0B5247;
-	Wed, 17 Jan 2024 00:36:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705451796; cv=none; b=d0kEt5UdR5In2PLcCUiva5IxtqmOV4cBpMKCGt+g7J7lhWguAipjd4oQ0EItp8Z89mDtne546MBt8uiB81B+oXIIYuLROh9FXOOtlr8EeA53eC1UvxEW1xAGsswovGkQX8f5NyeuzYHYKEyVrhbzLeXwNXTUzuqv+OzMAORl1a8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705451796; c=relaxed/simple;
-	bh=o4POb72ml8BP2sSwXjmCv/XaBq2X0kq0mmVRl+iVTKA=;
-	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:
-	 Message-ID:X-Google-Original-Message-ID:Date:From:To:Cc:Subject:
-	 References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To; b=oy8iVERhJWjFOigbU2aGJ2ns1xS6NNkKhKIGHpaHvq3lDKjgI8Fmo+56xPuWaiJ0P3Z9McLHbaFcj/fexqN9qmX3qX9AjUwklYNYXXiau/nWRIUshkWGaGPqpC5k4v1fWX4ObpA0uL+U8pJ66KzYfFDrMHYHMEzHJ5oPPAAYsYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mHG1b+kE; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3377d45c178so5182556f8f.2;
-        Tue, 16 Jan 2024 16:36:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705451792; x=1706056592; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=KIn0gCmXZ0lxMlQGGnzRf82yHu6dGB0sxsIjteoQakg=;
-        b=mHG1b+kERZS1G6izZBVwpXyzjfZCXakP23Tr/p1KG2A/qXMBMLdvtK+9iaHEkZdZoC
-         VslN0HMbVNk+XDAjWn/6AfkSkh1Z61vGzACl7t/ruU3tnRVxMjejygKB8n6I8tFROjTC
-         423dNjhxQQLq9Vg4AmgtfALGfo0WEztoHVgo/sPt2iM3oGLrayELDD2xjzYnBDYiofYF
-         sEdSDKWZFHCEcmSE7oPy7xG4gXSlSwBlHUs53bHOM2JVti3UVZdFRspC20bU0/zjJTve
-         VftqPjrcg/3DSWM0fKW2ndzGr0+3AAfFKj5O9NJHc2I7Ed5M70qia1Cl07Ig6If9JsfG
-         yUaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705451792; x=1706056592;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KIn0gCmXZ0lxMlQGGnzRf82yHu6dGB0sxsIjteoQakg=;
-        b=ckXtPb/PUXJRFcaRccTkVMKKRGmzDxX80HLd2o9ACp1xJSqQ/NZLYurbDa6v7InzBp
-         hYF71VWS+7F8saEgyYA+8pr24kgbQMaxLGLAB1KI4HW+jeVnasRZgfZMhbi5fwmCmvi0
-         BEi1bc5omSfCj6f24EMQGfusbdSAPKLf3EntX6/FxRJbYAwHucF1egZE+F5/AmxVsDiP
-         buo+BRYyPJ+ANUHxh5kTZdBID4o4vODP7pzo0I6BfANcSBSW/ODJXQChFaTATP1WNsl0
-         q2eRYT9kmMQpcC7kLTjkxGgfRTDMoUGc0u6byONOvVx22A43mh+X6FYmcDjiF+RC4CmA
-         tTGg==
-X-Gm-Message-State: AOJu0YxywgNqHxGcr9KpR/OZtWOYvgoEpFkTVtKRduE9auVMAQLQHsAp
-	vliGZrMKOtaMGJvmLhUhai4=
-X-Google-Smtp-Source: AGHT+IGZXiVBSI9rEk4Tdqko5QtIpx9MEPXVIIgt/eTZP2+LCMfjt7M0UWwZE6xsruV8+nQfO4NwGw==
-X-Received: by 2002:adf:fa0e:0:b0:337:5b60:dca9 with SMTP id m14-20020adffa0e000000b003375b60dca9mr4353405wrr.94.1705451792219;
-        Tue, 16 Jan 2024 16:36:32 -0800 (PST)
-Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id l14-20020adffe8e000000b00336755f15b0sm310897wrr.68.2024.01.16.16.36.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Jan 2024 16:36:31 -0800 (PST)
-Message-ID: <65a7210f.df0a0220.d10b2.1162@mx.google.com>
-X-Google-Original-Message-ID: <ZachDLzFEWQV8lhl@Ansuel-xps.>
-Date: Wed, 17 Jan 2024 01:36:28 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-Cc: Robert Marko <robert.marko@sartura.hr>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Rob Herring <robh+dt@kernel.org>, Luo Jie <quic_luoj@quicinc.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [net-next PATCH RFC v3 1/8] dt-bindings: net: document ethernet
- PHY package nodes
-References: <20231126015346.25208-1-ansuelsmth@gmail.com>
- <20231126015346.25208-2-ansuelsmth@gmail.com>
- <0926ea46-1ce4-4118-a04c-b6badc0b9e15@gmail.com>
- <659aedb1.df0a0220.35691.1853@mx.google.com>
- <0f4ec2ff-4ef7-4667-adef-d065cfbc0a91@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0303079C2
+	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 01:45:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.74
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705455941; cv=fail; b=Bb8xc8AnvXargI//t86sXSVq0TFBhxjz19Y4Qc20rByf8opvg7J4cOnVpLAUerOor3jx9LodKRKknivybQFxvOr/IY7/Ote/cAQWBcGRSxvlCYjhgLrncZ17nYKc9LR04vO4KitMMw2WOv8Ukt2qC/VZHsa+IaltGMINwZ3ng8U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705455941; c=relaxed/simple;
+	bh=AzTVdqxtNDV+DSBT1oINnXI2zRw2pV7G4kDozp5Nvl4=;
+	h=ARC-Message-Signature:ARC-Authentication-Results:DKIM-Signature:
+	 Received:Received:References:User-agent:From:To:Cc:Subject:Date:
+	 In-reply-to:Message-ID:Content-Type:Content-Transfer-Encoding:
+	 X-ClientProxiedBy:MIME-Version:X-MS-PublicTrafficType:
+	 X-MS-TrafficTypeDiagnostic:X-MS-Office365-Filtering-Correlation-Id:
+	 X-MS-Exchange-SenderADCheck:X-MS-Exchange-AntiSpam-Relay:
+	 X-Microsoft-Antispam:X-Microsoft-Antispam-Message-Info:
+	 X-Forefront-Antispam-Report:
+	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
+	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
+	 X-MS-Exchange-CrossTenant-Network-Message-Id:
+	 X-MS-Exchange-CrossTenant-AuthSource:
+	 X-MS-Exchange-CrossTenant-AuthAs:
+	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
+	 X-MS-Exchange-CrossTenant-FromEntityHeader:
+	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
+	 X-MS-Exchange-CrossTenant-UserPrincipalName:
+	 X-MS-Exchange-Transport-CrossTenantHeadersStamped; b=RvaOPVMbwvRhCr8pCnXv4wY0z2QvP6Y1KeOF7N0kmS5CAetahSBSb++t1U5Z62bCjE+8ju9XhoUL1T7gxbIMp0GW/lL+Q5Ch/437GQtyfBlAHOXgUHSMQtvElvanW04/Q6Btcimj2aCk4fChQfMCmge+75iot+x+HthFrzOrpFM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=LSAoquwy; arc=fail smtp.client-ip=40.107.237.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nSB9azQd+Y/vMUd2ziFZXZ6/yMI8TdmUFyHE8SSmtrUcl+7/SG+en1Td6W0nIKaCCZRVLEECqPPw2Ox9PtS9I9VtyJ/Kj31LSxCkIey9F5QTagcb4sbZpKbAM4WLgGzMLp8dDMioi6Zv7YTShxMWMrJGmpL3Mxx0+wIZu+H6VmhpPelN//KHcnWDeKmD+rxc4ZFDBa0SYEU8zbhZ98VgUmJBWIeUOLf9YLPeKmmleJmrxGNR3s45ck+PVFuvziolhuLpF9V986yVNh5Y5sVOiQlvHcTcoGSxOSIuHIdconQBz7McNIQkQgiUN1lCZCAuyloQ8grGNf2rlp54hUA4ZQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=lyZ/Fjv7YWG/4BL7YuoN7Sfa+p2dyfKPSMcUmwklbqg=;
+ b=Jk9f42/KUJkvAEIFfzCuIlatNHf7hmDQ8snCSNwsomwIwgKg6M4LKUFa+DehPpKEBk2HBq0noIHyg45BHYuCQA+7n4o7efegWXo9IILWd6JSQDdYxUvzC5g9LXUHLmY9WueWeYRgP6W9c75OZkQ/fkHtMgOHdQbRFVgLlmkHWhOsQQ6J5Zenzu7iRhyLPs5V+y/2mpGIzwFgoFlBo2EZt+5AnB8YpAddeuKYyU2InDV9hB9adJkupubUdZQZK65zcJZ+Xrq6lx4B9zmSZOE7KepQ7rKsiqbXaTfY1HQWJlyVMRseL7eyosxTLGVxofxG+fzvts0jSHF/I/b/pmdL0Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lyZ/Fjv7YWG/4BL7YuoN7Sfa+p2dyfKPSMcUmwklbqg=;
+ b=LSAoquwyPmY8PNpj85zxOJ83PZYsHsazhUYkABjti1cS/3S1j+7fgzwJek1fatyFhyxOEm/VfIxcDVRTWKEJ1MGF6ZZhgC6i8GL8HhF1BQdsxF7hFBCqyJPIc2a9vlInMilaXQ72DFVaP/L4Us0/8BSbmpTdAaQCOSEkznZtNpYSWFeY0HgptGs1wOdPHNFCL1sNj1ccxFdULf5XpjCD9iZVemU86uPx25DKGy6mZ7G9SyX1/98RYKe4aZEtvaEkRkoYCiJJMswsX9n5/QM16Rh7IiB0KasPf/9Fo/CZMb8+gq4r6WssTKc7L2hsKSAJiC5DlQfDanyepMYJrT870w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
+ by DM4PR12MB8498.namprd12.prod.outlook.com (2603:10b6:8:183::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.23; Wed, 17 Jan
+ 2024 01:45:35 +0000
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::ab86:edf7:348:d117]) by BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::ab86:edf7:348:d117%3]) with mapi id 15.20.7202.020; Wed, 17 Jan 2024
+ 01:45:35 +0000
+References: <20240114174208.34330-2-rrameshbabu@nvidia.com>
+ <9b1d136c156b33759a0323e988b73839d5920acc.camel@redhat.com>
+ <ZaaJ17btw2PtW-Sd@hog> <878r4pov1b.fsf@nvidia.com>
+User-agent: mu4e 1.10.8; emacs 28.2
+From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+To: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Cc: Sabrina Dubroca <sd@queasysnail.net>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, Gal Pressman <gal@nvidia.com>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Radu Pirea
+ <radu-nicolae.pirea@oss.nxp.com>, "David S .  Miller"
+ <davem@davemloft.net>
+Subject: Re: [PATCH net] Revert "net: macsec: use
+ skb_ensure_writable_head_tail to expand the skb"
+Date: Tue, 16 Jan 2024 17:22:58 -0800
+In-reply-to: <878r4pov1b.fsf@nvidia.com>
+Message-ID: <87y1coohq9.fsf@nvidia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: BYAPR04CA0005.namprd04.prod.outlook.com
+ (2603:10b6:a03:40::18) To BYAPR12MB2743.namprd12.prod.outlook.com
+ (2603:10b6:a03:61::28)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0f4ec2ff-4ef7-4667-adef-d065cfbc0a91@gmail.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|DM4PR12MB8498:EE_
+X-MS-Office365-Filtering-Correlation-Id: a3779971-f74b-481c-e352-08dc16fdff8e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	vUtevC63oWcwdsgd0BeZDHaCO9rJCCDe1GzVhDCLGErlNssZp5hsFsZ/Q6ljO7DkS1/r8RRqUyFv7Xv04Rknx0xAxXF1SsiZZuIVpKIQZKE+fWQlWlkLT0IV+g++hXjRqew3oVtz1ubaLmwvwGwg75Hv4s0BRPCMtygOmJgb6mmSJ36G1qoe9sjIJRC6nGU3wzL2kYSRmKlwGNzEIsVmMWcVzkGqGja5liA3oMcu3ujU47VvPBSaGwAODt9t6QtusGg6pbXN7BGs6Ewn45eD7meEtw4SFSv/qE9GDdvW2lQv3dO9dTN4QFVoA9f/w3dT38DPseSnrDKyZvaHMFNlLUfDK0vmUjgsZRN+fB0AeE9YqVYVu7DxSiyrDSHkqKyVmPzgqPW/SJ+uhFRAjVHP8qfejFwoqRbnE5IYzgFxwFZV7EqHaZ7gsx+MymVWXXdvb+31pVQLfh5r46c0yMLSqz34lUxlq1EbPvY5H6HAOtG+ctD/HJQBMA3MICcVmOWQsZ6ozR1GQQMTMzN4jx+o5No4D32qppdMCdPqEzXZLww6WDKiZGZC4TBNUarBJ6yEw+R68n1h1tM14iBT0GepOOg4YHTyRkes1gDqgIC9OolwEBGdrK5XjhdgTYykseMy
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(136003)(396003)(376002)(39860400002)(366004)(230922051799003)(230273577357003)(230173577357003)(186009)(451199024)(1800799012)(64100799003)(83380400001)(36756003)(86362001)(41300700001)(5660300002)(2616005)(6512007)(26005)(66946007)(478600001)(6486002)(37006003)(66476007)(8936002)(54906003)(66556008)(6666004)(6506007)(38100700002)(8676002)(6200100001)(6862004)(4326008)(316002)(2906002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?VjQrdEtRSWdsVGJBVnNPV2FPclFkaUF2QUVKL1RZekppRE11Nko2eTAzeCtz?=
+ =?utf-8?B?bjcyOGEyR1c3VnFscmdpc1g1T3RnMkFTSjBra01ONmxuM1NGWW5FSjdScmdy?=
+ =?utf-8?B?ZFJMcm8wWXkzM0lqMWp2d1g4b0poWWIvUStaOUtYVzN4bkhNamJhUVZ0N0FF?=
+ =?utf-8?B?ZXdnR29lcFRPWStBMTI2VlA4TnVCNlhxYWVVeXJvNkhLaDE1b1JpNEQrak1t?=
+ =?utf-8?B?RGhOb3U2YTlvSmdMNWdZL1NJV1l0TkxiVWhKSTZJSmtYZlNubHlUdlNIbjla?=
+ =?utf-8?B?aEZJK3dSRnFjOG11QlMxVmRBZDVuZnlsZitnL2RCNVZHVFk3SjBCYktNelZh?=
+ =?utf-8?B?ZzBzSmtpeTN0MVl5OHlEMWdoZXRjZG9VRkk0WDJnWE84TmVHRmNBZVJVcitD?=
+ =?utf-8?B?YmtWT1VHZ1NRL3lFLzRqYmpLMjBXRmNkYkdhMWhCNktSRGhueGp6NXRxQ3FE?=
+ =?utf-8?B?cEdWMjNWUnRvb3M2K0w0bXRZM3NJUjRXaHd1R3N6NXgzT0VxTmlaWGdhaVhZ?=
+ =?utf-8?B?V2VmUDFkVkZOaFBWS0ZrWTJuNjdEMmYyUTlmd045TmZXb3NxWWxHQ1ZodE1F?=
+ =?utf-8?B?VjJFYm56VG5tUHVEandGV3lqZ0JiZGVZbjFDSUZTT295L0ZZOU9UVE9lbUxm?=
+ =?utf-8?B?andsczNhWWV5eEtqSS9wZCswREJkWFVTeHpWY09mY2hlSGJDQ2xROFNYa0dQ?=
+ =?utf-8?B?VFpRZHNFbGk0V0NWbkdIcVgyQ0dpT2NlRlpKVXVKNE15bm9qaVRUcnROSXNt?=
+ =?utf-8?B?Q3E1Zk5QZE1HUnZXZXJ1RitxRXA5R1lNOXBDNWFZZ1dRME5vbUNWVC9peVla?=
+ =?utf-8?B?czhRTllmTEJON0xqa28vN2hQRDROYk0vbktVVjYvM05XLzIyMnNndVFzeFRM?=
+ =?utf-8?B?TDZxdGZObVMwb1pVU0xIQVJCRzhKWVNyTHdJYWZza1F6SmJWb0c0YzdmbnlY?=
+ =?utf-8?B?S09rVkgrU2ZpUWlHd1NtMFpGdEMzTVhkcVo1bGdLZU9la21NNUtyQ1BZdmhr?=
+ =?utf-8?B?YVhaT05iNCs3R0VZT2ViZGtzYStCQWlzMlRvREViSTJZM0phYjdPWmxXN3o0?=
+ =?utf-8?B?WVhYcDlyVzBQWUdpc1ZaNFJHZVhqU0JDd0tZeDRscmhhYjFjNHZpMzNMakJh?=
+ =?utf-8?B?a1laenk3ZTVmZzVaTGxOWlFBS1o4VFZxcGVCSXBucS9yMUswdUltYWNrZTZw?=
+ =?utf-8?B?d3dIb1BuUFZYeGZKbnJHSHIrOHlFcEluM1RINGZ3WU5uZFc4RlJMTUVSMEFm?=
+ =?utf-8?B?Wm00ckFlOFd4ZkJtd1ByWW1rRXpCZUVwK29wUWlPMWdNK3FaVC9tL1MwSjZ0?=
+ =?utf-8?B?K1JzbXFaMXVKUU9pTEtJSDE1NmR5MUJWemxhNXRWL2VYVnF5S3ZyaVFQYUhK?=
+ =?utf-8?B?Z2tJaG5Dc1VwQWgrZkpHQWdKamVNalpvbU9RRTNSRjJpR0pnVkJLRTJkQ2ZN?=
+ =?utf-8?B?aXp5T2gxTm5UU1VyMTdDSUozWlh5eTNWNmJidk5zTHBsOFduRzJoZlNRVFN3?=
+ =?utf-8?B?Rk9lekZDbWdsWUpFOXhaZElWVFBKMjN4WkFxTGtRRENzTjlIT01CSTZVUEMw?=
+ =?utf-8?B?c0ZNemNpNk4yUVUrWjZGZ3hOTTA1UzRweExoaDh6TzFlWUZraEI5eTdLaWRj?=
+ =?utf-8?B?V1ZrMDdOTVV1dCtxcWNta3J0anVEdjdhNURRRG12aG1iUGk3bk4vVGx4VUpu?=
+ =?utf-8?B?KzNtR1hzOHFVVWlhSHR0Tlp2VlBzeDJObUZzQ2tpR285V1o2VWZralFGZzc4?=
+ =?utf-8?B?aDJZQjNNUUpuSWRRZnFlcEhzejNZeUNZUEgvcUJNYjUzNHRGT3NpVkJveFly?=
+ =?utf-8?B?bVYyY3dIaVRSZzZsdk1wNXZUOW1kT3dta2xBQjMxamQvQXdUaVZibkpSMlNL?=
+ =?utf-8?B?RzRvaEtGM0h3SEZFSzlSWkVXYmtnWlprSm01NmJRNHBSSkljaHpNU2NxQXFJ?=
+ =?utf-8?B?QkRseEpaQ0VEcWZMSXhtSkVOOTJtSEVkZDNpZUpFWTJTZ0loSXhDQlZ0c1dk?=
+ =?utf-8?B?bFZTS1RRK2YveDZkcndCbm5KWTUwV0cxNDYralFCd2g4cnA4VXVrZFg0ZEhH?=
+ =?utf-8?B?aThDTDVLVkFKbjRjcHNYb3ZwakVldFIvTngvRnY0cDBvN3dzNkJqMWUvbkRq?=
+ =?utf-8?B?Z0pPK05hQzRaMkdoNStkczdnY2dRYWdTdnZMeXJqK1ZSb0wvdnpEYWlqNFlS?=
+ =?utf-8?B?cEE9PQ==?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a3779971-f74b-481c-e352-08dc16fdff8e
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jan 2024 01:45:35.1407
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: yqq8ftZqfYm5zLUepZvkwHcGFyIMPFkwXV7y0B9hjR1DT+9vmivKcGD6xH3y+Eqnz/SexhUdVxe0aKcIg3iiEQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB8498
 
-On Sun, Jan 07, 2024 at 11:49:12PM +0200, Sergey Ryazanov wrote:
-> Hi Christian,
-> 
-> On 07.01.2024 20:30, Christian Marangi wrote:
-> > On Sun, Jan 07, 2024 at 08:00:33PM +0200, Sergey Ryazanov wrote:
-> > > On 26.11.2023 03:53, Christian Marangi wrote:
-> > > > Document ethernet PHY package nodes used to describe PHY shipped in
-> > > > bundle of 4-5 PHY. The special node describe a container of PHY that
-> > > > share common properties. This is a generic schema and PHY package
-> > > > should create specialized version with the required additional shared
-> > > > properties.
-> > > > 
-> > > > Example are PHY package that have some regs only in one PHY of the
-> > > > package and will affect every other PHY in the package, for example
-> > > > related to PHY interface mode calibration or global PHY mode selection.
-> > > > 
-> > > > The PHY package node MUST declare the base address used by the PHY driver
-> > > > for global configuration by calculating the offsets of the global PHY
-> > > > based on the base address of the PHY package and declare the
-> > > > "ethrnet-phy-package" compatible.
-> > > > 
-> > > > Each reg of the PHY defined in the PHY package node is absolute and will
-> > > > reference the real address of the PHY on the bus.
-> > > > 
-> > > > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> > > > ---
-> > > >    .../bindings/net/ethernet-phy-package.yaml    | 75 +++++++++++++++++++
-> > > >    1 file changed, 75 insertions(+)
-> > > >    create mode 100644 Documentation/devicetree/bindings/net/ethernet-phy-package.yaml
-> > > > 
-> > > > diff --git a/Documentation/devicetree/bindings/net/ethernet-phy-package.yaml b/Documentation/devicetree/bindings/net/ethernet-phy-package.yaml
-> > > > new file mode 100644
-> > > > index 000000000000..244d4bc29164
-> > > > --- /dev/null
-> > > > +++ b/Documentation/devicetree/bindings/net/ethernet-phy-package.yaml
-> > > > @@ -0,0 +1,75 @@
-> > > > +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-> > > > +%YAML 1.2
-> > > > +---
-> > > > +$id: http://devicetree.org/schemas/net/ethernet-phy-package.yaml#
-> > > > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > > > +
-> > > > +title: Ethernet PHY Package Common Properties
-> > > > +
-> > > > +maintainers:
-> > > > +  - Christian Marangi <ansuelsmth@gmail.com>
-> > > > +
-> > > > +description:
-> > > > +  This schema describe PHY package as simple container for
-> > > > +  a bundle of PHYs that share the same properties and
-> > > > +  contains the PHYs of the package themself.
-> > > > +
-> > > > +  Each reg of the PHYs defined in the PHY package node is
-> > > > +  absolute and describe the real address of the PHY on the bus.
-> > > > +
-> > > > +properties:
-> > > > +  $nodename:
-> > > > +    pattern: "^ethernet-phy-package(@[a-f0-9]+)?$"
-> > > > +
-> > > > +  compatible:
-> > > > +    const: ethernet-phy-package
-> > > > +
-> > > > +  reg:
-> > > > +    minimum: 0
-> > > > +    maximum: 31
-> > > > +    description:
-> > > > +      The base ID number for the PHY package.
-> > > > +      Commonly the ID of the first PHY in the PHY package.
-> > > > +
-> > > > +      Some PHY in the PHY package might be not defined but
-> > > > +      still exist on the device (just not attached to anything).
-> > > > +      The reg defined in the PHY package node might differ and
-> > > > +      the related PHY might be not defined.
-> > > > +
-> > > > +  '#address-cells':
-> > > > +    const: 1
-> > > > +
-> > > > +  '#size-cells':
-> > > > +    const: 0
-> > > > +
-> > > > +patternProperties:
-> > > > +  ^ethernet-phy(@[a-f0-9]+)?$:
-> > > > +    $ref: ethernet-phy.yaml#
-> > > > +
-> > > > +required:
-> > > > +  - compatible
-> > > > +  - reg
-> > > > +
-> > > > +additionalProperties: true
-> > > > +
-> > > > +examples:
-> > > > +  - |
-> > > > +    mdio {
-> > > > +        #address-cells = <1>;
-> > > > +        #size-cells = <0>;
-> > > > +
-> > > > +        ethernet-phy-package@16 {
-> > > > +            #address-cells = <1>;
-> > > > +            #size-cells = <0>;
-> > > > +            compatible = "ethernet-phy-package";
-> > > > +            reg = <0x16>;
-> > > > +
-> > > > +            ethernet-phy@16 {
-> > > > +              reg = <0x16>;
-> > > > +            };
-> > > > +
-> > > > +            phy4: ethernet-phy@1a {
-> > > > +              reg = <0x1a>;
-> > > > +            };
-> > > > +        };
-> > > > +    };
-> > > 
-> > > So, we ended up on a design where we use the predefined compatible string
-> > > 'ethernet-phy-package' to recognize a phy package inside the
-> > > of_mdiobus_register() function. During the V1 discussion, Vladimir came up
-> > > with the idea of 'ranges' property usage [1]. Can we use 'ranges' to
-> > > recognize a phy package in of_mdiobus_register()? IMHO this will give us a
-> > > clear DT solution. I mean 'ranges' clearly indicates that child nodes are in
-> > > the same address range as the parent node. Also we can list all child
-> > > addresses in 'reg' to mark them occupied.
-> > > 
-> > >    mdio {
-> > >      ...
-> > > 
-> > >      ethernet-phy-package@16 {
-> > >        compatible = "qcom,qca8075";
-> > >        reg = <0x16>, <0x17>, <0x18>, <0x19>, <0x1a>;
-> > >        ranges;
-> > >        ...
-> > > 
-> > >        ethernet-phy@16 {
-> > >          reg = <0x16>;
-> > >        };
-> > > 
-> > >        ethernet-phy@1a {
-> > >          reg = <0x1a>;
-> > >        };
-> > >      };
-> > >    };
-> > > 
-> > > Did you find some issues with the 'ranges' conception?
-> > 
-> > Nope it's ok but it might pose some confusion with the idea that the
-> > very first element MUST be THE STARTING ADDR of the PHY package. (people
-> > might think that it's just the list of the PHYs in the package and
-> > remove the hardware unconnected ones... but that would be fault of who
-> > write the DT anyway.)
-> 
-> Make sense. I do not insist on addresses listing. Mainly I'm thinking of a
-> proper way to show that child nodes are accessible directly on the parent
-> bus, and introducing the special compatibility string, while we already have
-> the 'ranges' property.
-> 
-> But it's good to know Rob's opinion on whether it is conceptually right to
-> use 'ranges' here.
+On Tue, 16 Jan, 2024 12:45:46 -0800 Rahul Rameshbabu <rrameshbabu@nvidia.co=
+m> wrote:
+> On Tue, 16 Jan, 2024 14:51:19 +0100 Sabrina Dubroca <sd@queasysnail.net> =
+wrote:
+>> 2024-01-16, 11:39:35 +0100, Paolo Abeni wrote:
+>>> On Sun, 2024-01-14 at 09:42 -0800, Rahul Rameshbabu wrote:
+>>> > This reverts commit b34ab3527b9622ca4910df24ff5beed5aa66c6b5.
+>>> >=20
+>>> > Using skb_ensure_writable_head_tail without a call to skb_unshare cau=
+ses
+>>> > the MACsec stack to operate on the original skb rather than a copy in=
+ the
+>>> > macsec_encrypt path. This causes the buffer to be exceeded in space, =
+and
+>>> > leads to warnings generated by skb_put operations.=C2=A0
+>>>=20
+>>> This part of the changelog is confusing to me. It looks like the skb
+>>> should be uncloned under the same conditions before and after this
+>>> patch (and/or the reverted)??!
+>>
+>> I don't think so. The old code was doing unshare +
+>> expand. skb_ensure_writable_head_tail calls pskb_expand_head without
+>> unshare, which doesn't give us a fresh sk_buff, only takes care of the
+>> headroom/tailroom. Or do I need more coffee? :/
 >
+> Sabrina's analysis is correct. We no longer get a fresh sk_buff with
+> this commit.
+>
+>>
+>>> Possibly dev->needed_headroom/needed_tailroom values are incorrect?!?
+>>
+>> That's also possible following commit a73d8779d61a ("net: macsec:
+>> introduce mdo_insert_tx_tag"). Then this revert would only be hiding
+>> the issue.
+>
+> Ah, I think that is an interesting point.
+>
+>     static void macsec_set_head_tail_room(struct net_device *dev)
+>     {
+>     	struct macsec_dev *macsec =3D macsec_priv(dev);
+>     	struct net_device *real_dev =3D macsec->real_dev;
+>     	int needed_headroom, needed_tailroom;
+>     	const struct macsec_ops *ops;
+>
+>     	ops =3D macsec_get_ops(macsec, NULL);
+>     	if (ops) {
+>
+> This condition should really be ops && ops->mdo_insert_tx_tags. Let me
+> retest with this change and post back. That said, I am wondering if we
+> still need a fresh skb in the macsec stack or not as was done previously
+> with skb_unshare/skb_copy_expand or not.
 
-I wonder if something like this might make sense... Thing is that with
-the ranges property we would have the define the address in the PHY
-Package node as offsets...
+Both fixing the headroom/tailroom management in this commit,
+a73d8779d61a ("net: macsec: introduce mdo_insert_tx_tag"), as well as
+simply reverting this commit does not resolve the issue. I also end up
+needing to revert b34ab3527b96 ("net: macsec: use
+skb_ensure_writable_head_tail to expand the skb"), so that a fresh
+sk_buff is created to avoid the panic mentioned in this commit.
 
-An example would be
+I think we can do one of two things.
 
-    mdio {
-        #address-cells = <1>;
-        #size-cells = <0>;
+1. We merge this patch, and I send a follow-up fix with regards to the
+   issues in b34ab3527b96.
+2. I send a v2 where I add an additional patch for fixing the issues in
+   b34ab3527b96.
 
-        ethernet-phy-package@10 {
-            #address-cells = <1>;
-            #size-cells = <0>;
-            compatible = "qcom,qca807x-package";
-            reg = <0x10>; 
-            ranges = <0x0 0x10 0x5>;
+>
+>     		needed_headroom =3D ops->needed_headroom;
+>     		needed_tailroom =3D ops->needed_tailroom;
+>     	} else {
+>     		needed_headroom =3D MACSEC_NEEDED_HEADROOM;
+>     		needed_tailroom =3D MACSEC_NEEDED_TAILROOM;
+>     	}
+>
+>     	dev->needed_headroom =3D real_dev->needed_headroom + needed_headroom=
+;
+>     	dev->needed_tailroom =3D real_dev->needed_tailroom + needed_tailroom=
+;
+>     }
 
-            qcom,package-mode = "qsgmii";
+--
+Thanks,
 
-            ethernet-phy@0 {
-                reg = <0>;
-
-                leds {
-
-		...
-
-With a PHY Package at 0x10, that span 5 address and the child starts at
-0x0 offset.
-
-This way we would be very precise on describing the amount of address
-used by the PHY Package without having to define the PHY not actually
-connected.
-
-PHY needs to be at an offset to make sense of the ranges first element
-property (0x0). With a non offset way we would have to have something
-like
-
-ranges = <0x10 0x10 0x5>;
-
-With the child and tha parent always matching.
-
-(this is easy to handle in the parsing and probe as we will just
-calculate the real address based on the base address of the PHY package
-+ offset)
-
-I hope Rob can give more feedback about this, is this what you were
-thinking with the usage of ranges property?
-
-(this has also the bonus point of introducing some validation in the PHY
-core code to make sure the right amount of PHY are defined in the
-package by checking if the number of PHY doesn't exceed the value set in
-ranges.)
-
-> > > And I would like to ask you about another issue raised by Vladimir [1].
-> > > These phy chips become SoC with all these built-in PHYs, PCSs, clocks,
-> > > interrupt controllers, etc. Should we address this now? Or should we go with
-> > > the proposed solution for now and postpone modeling of other peripherals
-> > > until we get a real hardware, as Andrew suggested?
-> > 
-> > Honestly I would postpone untile we have a clear idea of what is
-> > actually part of the PHY and what can be handled externally... Example
-> > setting the clock in gcc, writing a specific driver...
-> > 
-> > It's a random idea but maybe most of the stuff required for that PHY is
-> > just when it's connected to a switch... In that case it would all be
-> > handled in the switch driver (tobe extended qca8k) and all these extra
-> > stuff would be placed in that node instead of bloating phy nodes with
-> > all kind of clk and other stuff.
-> > 
-> > This series still require 2 more series (at803x splint and cleanup) to be
-> > actually proposed so we have some time to better define this.
-> > 
-> > What do you think?
-> 
-> Fair enough! Let's postpone until we really need it. I noticed this
-> PHY-like-SoC discussion in the V1 comments, and it was not finished there
-> neither addressed in the latest patch comment. So I asked just to be sure
-> that we were finished with this. Thank you for the clarification.
-> 
-> --
-> Sergey
-> 
-
--- 
-	Ansuel
+Rahul Rameshbabu
 
