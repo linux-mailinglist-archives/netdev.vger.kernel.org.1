@@ -1,260 +1,140 @@
-Return-Path: <netdev+bounces-64024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64025-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95CD2830B4C
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 17:38:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD60B830B60
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 17:45:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01446290E00
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 16:38:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0170D1C245BF
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 16:45:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99F1E21A01;
-	Wed, 17 Jan 2024 16:37:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9534225AF;
+	Wed, 17 Jan 2024 16:45:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MIFeBT5n"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="kM7tz1pD"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04B331E875
-	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 16:37:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E0D9225A4;
+	Wed, 17 Jan 2024 16:45:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705509455; cv=none; b=fMFrqrU7sMV1JbRonUX8/4055eod8xBD9iXQ3d/SvtwaiTLE0drU9jh2Oh+OXM7du0oipDce6Q6LuV3r+qsJHWVo3VSKFrUhZ/lMDhYfrWnGcv/AAd91hZNay++SXYf2p+IBz9hrV8eNTJ9PtRfqGhBDdJFlkGcO0Zatz3VkXZM=
+	t=1705509940; cv=none; b=YtXqddKbOowCt+SG0bd0oA3zUjjpunGTjBQj1D5E09XdKiBEseC+HYxuhAUpUF3m0GNu/k2RgWbQc8XKiRKKmBdPMa/wMHY5KuHpeQvC9Ah0CUKvquJIdEPmW2E0Fr6tUe8l6bKaZVsX/K7QHmwGweErYIzVW+MBEvCzlhJse/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705509455; c=relaxed/simple;
-	bh=quxqBlELDmx/23WoH7bvn2sOo+t/7W8a40DpmJUSCWU=;
-	h=DKIM-Signature:Received:X-MC-Unique:Received:
-	 X-Google-DKIM-Signature:X-Gm-Message-State:X-Received:
-	 X-Google-Smtp-Source:X-Received:Received:Received:From:To:Cc:
-	 Subject:In-Reply-To:References:X-Clacks-Overhead:Date:Message-ID:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding; b=uQqY+jCgbRZN4rj9LRy86H7Nc2H0r7E/4htEtVHBpMWtAqs0MIIJi/6LaS3upfZMZHf515feBh9gIRtjanoDrJfOYNC2e7rWUnnfGYc2fOtfCLYmKxYDadLIZlCurpwWBR2bDrnzgaI4ffEJxHLQPD1WfknBe2tU4btqn8HiDTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MIFeBT5n; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1705509453;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=se4elMsGJU9EC+SNklZxwLpVdn5NqIm93z2voyeARIM=;
-	b=MIFeBT5npyxCyXklulyqUmAopxWJ7MudZyHFKjKkyJwK3Sh2prDN7x2MAJkUAFq0uT7U+W
-	781LDs3g3XQ7p+xFESyHuDu3zk85o2xeEVEE6SSegf6UKg032IYfTmUeNY27ctfQVEvgF6
-	YzxlBgAED3aZch9svmbFWyzQ1HM4XgA=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-93--2ZjdyYePa28e0AZYGBVwQ-1; Wed, 17 Jan 2024 11:37:31 -0500
-X-MC-Unique: -2ZjdyYePa28e0AZYGBVwQ-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-558b96568easo3083967a12.0
-        for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 08:37:31 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705509450; x=1706114250;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=se4elMsGJU9EC+SNklZxwLpVdn5NqIm93z2voyeARIM=;
-        b=o51ufUGO+/axb+CqCZ2qZwF2FHFxdcgwAGL48ty6vCvajEJduABxZb6vq7k9reV/Y3
-         uUYWFOTj0Lou03lxLw9t2hagwZdzxpTKQVZX1RGj+Fng4bEfNpXCh8h1jPDfXNdl5nMn
-         0sexFGijCwYxSaQ1fkk/HCI9RzNFxYqBL6iBVrtR80OyW0EqYAoyJQZiv30GnDZevqQO
-         DFvSFOl0LgqrDyVt4Qd3iJARAUMJOOpwigIkMUled5gwPKt0wQdhobv9Bh1cQajca7Ui
-         q0SSt4F08sFuwdloqlo3j9WPGIS9jKQF0lSIm7/UKaQaLFemza/8wHJ4ofzWLvkH9KI/
-         QFAQ==
-X-Gm-Message-State: AOJu0YwhVGp6YXDLvjdbn3lCZNTWa7E6MAJjY0enGgYcj96ERZMTSGca
-	gDspI91zR4Jj43KEJCLP/n3zdV2R18DPWLociol/gYTBe2WIuomM/WpThBY+cabh5yOwx49dhUU
-	iMH1xWVLc5cKVncUrkKMI3KZV
-X-Received: by 2002:a05:6402:1247:b0:559:edce:d10c with SMTP id l7-20020a056402124700b00559edced10cmr288411edw.18.1705509450569;
-        Wed, 17 Jan 2024 08:37:30 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEOfrMcGpH3jIhyrQhRuVToqnLSPcbgcfmgpIm4KZwzvqpYdTEe2SVKL/BvprDvAeyDQw9uOQ==
-X-Received: by 2002:a05:6402:1247:b0:559:edce:d10c with SMTP id l7-20020a056402124700b00559edced10cmr288393edw.18.1705509450147;
-        Wed, 17 Jan 2024 08:37:30 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id x9-20020aa7cd89000000b00558e0481b2fsm6868305edv.47.2024.01.17.08.37.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Jan 2024 08:37:29 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 4701F1088A04; Wed, 17 Jan 2024 17:37:29 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, LKML
- <linux-kernel@vger.kernel.org>, Network Development
- <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Boqun
- Feng <boqun.feng@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>, Eric
- Dumazet <edumazet@google.com>, Frederic Weisbecker <frederic@kernel.org>,
- Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Thomas
- Gleixner <tglx@linutronix.de>, Waiman Long <longman@redhat.com>, Will
- Deacon <will@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Andrii
- Nakryiko <andrii@kernel.org>, Cong Wang <xiyou.wangcong@gmail.com>, Hao
- Luo <haoluo@google.com>, Jamal Hadi Salim <jhs@mojatatu.com>, Jesper
- Dangaard Brouer <hawk@kernel.org>, Jiri Olsa <jolsa@kernel.org>, Jiri
- Pirko <jiri@resnulli.us>, John Fastabend <john.fastabend@gmail.com>, KP
- Singh <kpsingh@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Ronak
- Doshi <doshir@vmware.com>, Song Liu <song@kernel.org>, Stanislav Fomichev
- <sdf@google.com>, VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
- Yonghong Song <yonghong.song@linux.dev>, bpf <bpf@vger.kernel.org>
-Subject: Re: [PATCH net-next 15/24] net: Use nested-BH locking for XDP
- redirect.
-In-Reply-To: <20240112174138.tMmUs11o@linutronix.de>
-References: <20231215171020.687342-1-bigeasy@linutronix.de>
- <20231215171020.687342-16-bigeasy@linutronix.de>
- <CAADnVQKJBpvfyvmgM29FLv+KpLwBBRggXWzwKzaCT9U-4bgxjA@mail.gmail.com>
- <87r0iw524h.fsf@toke.dk> <20240112174138.tMmUs11o@linutronix.de>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Wed, 17 Jan 2024 17:37:29 +0100
-Message-ID: <87ttnb6hme.fsf@toke.dk>
+	s=arc-20240116; t=1705509940; c=relaxed/simple;
+	bh=hVbWnNSrHPz6xmHHdaijIuBxcIYaNIZiLi6H6j9b2J8=;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To; b=Pn9TlKFYlC2VoL6UcUnQprMtoqEr5D1a/5SDuLf9PFOlOTmGSUOk7NbXyP/vTFa+8OBDqgs+GWacxMEftU5YOMC45lNjvEAUM2HWQ69ELBlJLz7l9j0uaBWEoOf8C4FS2XmReTvNUyuAVI/9CF9HqxKlU8pIiMMhNtbGNXNayJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=kM7tz1pD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 836F9C433F1;
+	Wed, 17 Jan 2024 16:45:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1705509940;
+	bh=hVbWnNSrHPz6xmHHdaijIuBxcIYaNIZiLi6H6j9b2J8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kM7tz1pDpbypmhPtl655KElT8jZAi+laLUKl4QYPvddIPRavpQM/a0i+LU6Qszs+j
+	 EFdz379WU3S/6+gee09gcNF54Sl1uznjojKmOK5BL8nRBXxYoDnQEHOqvIRtpV9i42
+	 DSWx2hFRx4cewa515Or2c+bJxRSarzDFcJB1/3To=
+Date: Wed, 17 Jan 2024 17:45:37 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Kalle Valo <kvalo@kernel.org>, "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Chris Morgan <macromorgan@hotmail.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	=?iso-8859-1?Q?N=EDcolas_F_=2E_R_=2E_A_=2E?= Prado <nfraprado@collabora.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Peng Fan <peng.fan@nxp.com>, Robert Richter <rrichter@amd.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Terry Bowman <terry.bowman@amd.com>, Lukas Wunner <lukas@wunner.de>,
+	Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>,
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+	Abel Vesa <abel.vesa@linaro.org>, linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH 4/9] PCI: create platform devices for child OF nodes of
+ the port node
+Message-ID: <2024011707-alibi-pregnancy-a64b@gregkh>
+References: <20240117160748.37682-1-brgl@bgdev.pl>
+ <20240117160748.37682-5-brgl@bgdev.pl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240117160748.37682-5-brgl@bgdev.pl>
 
-Sebastian Andrzej Siewior <bigeasy@linutronix.de> writes:
+On Wed, Jan 17, 2024 at 05:07:43PM +0100, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> 
+> In order to introduce PCI power-sequencing, we need to create platform
+> devices for child nodes of the port node.
 
-> On 2024-01-04 20:29:02 [+0100], Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->> Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
->>=20
->> >> @@ -3925,6 +3926,7 @@ struct sk_buff *tcf_qevent_handle(struct tcf_qe=
-vent *qe, struct Qdisc *sch, stru
->> >>
->> >>         fl =3D rcu_dereference_bh(qe->filter_chain);
->> >>
->> >> +       guard(local_lock_nested_bh)(&bpf_run_lock.redirect_lock);
->> >>         switch (tcf_classify(skb, NULL, fl, &cl_res, false)) {
->> >>         case TC_ACT_SHOT:
->> >>                 qdisc_qstats_drop(sch);
->> >
->> > Here and in all other places this patch adds locks that
->> > will kill performance of XDP, tcx and everything else in networking.
->> >
->> > I'm surprised Jesper and other folks are not jumping in with nacks.
->> > We measure performance in nanoseconds here.
->> > Extra lock is no go.
->> > Please find a different way without ruining performance.
->>=20
->> I'll add that while all this compiles out as no-ops on !PREEMPT_RT, I do
->> believe there are people who are using XDP on PREEMPT_RT kernels and
->> still expect decent performance. And to achieve that it is absolutely
->> imperative that we can amortise expensive operations (such as locking)
->> over multiple packets.
->>=20
->> I realise there's a fundamental trade-off between the amount of
->> amortisation and the latency hit that we take from holding locks for
->> longer, but tuning the batch size (while still keeping some amount of
->> batching) may be a way forward? I suppose Jakub's suggestion in the
->> other part of the thread, of putting the locks around napi->poll(), is a
->> step towards something like this.
->
-> The RT requirements are usually different. Networking as in CAN might be
-> important but Ethernet could only used for remote communication and so
-> "not" important. People complained that they need to wait for Ethernet
-> to be done until the CAN packet can be injected into the stack.
-> With that expectation you would like to pause Ethernet immediately and
-> switch over the CAN interrupt thread.
->
-> But if someone managed to setup XDP then it is likely to be important.
-> With RT traffic it is usually not the throughput that matters but the
-> latency. You are likely in the position to receive a packet, say every
-> 1ms, and need to respond immediately. XDP would be used to inspect the
-> packet and either hand it over to the stack or process it.
+Ick, why a platform device?  What is the parent of this device, a PCI
+device?  If so, then this can't be a platform device, as that's not what
+it is, it's something else so make it a device of that type,.
 
-I am not contesting that latency is important, but it's a pretty
-fundamental trade-off and we don't want to kill throughput entirely
-either. Especially since this is global to the whole kernel; and there
-are definitely people who want to use XDP on an RT kernel and still
-achieve high PPS rates.
+> They will get matched against
+> the pwrseq drivers (if one exists) and then the actual PCI device will
+> reuse the node once it's detected on the bus.
 
-(Whether those people really strictly speaking need to be running an RT
-kernel is maybe debatable, but it does happen).
+Reuse it how?
 
-> I expected the lock operation (under RT) to always succeeds and not
-> cause any delay because it should not be contended.
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> ---
+>  drivers/pci/bus.c    | 9 ++++++++-
+>  drivers/pci/remove.c | 3 ++-
+>  2 files changed, 10 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/pci/bus.c b/drivers/pci/bus.c
+> index 9c2137dae429..8ab07f711834 100644
+> --- a/drivers/pci/bus.c
+> +++ b/drivers/pci/bus.c
+> @@ -12,6 +12,7 @@
+>  #include <linux/errno.h>
+>  #include <linux/ioport.h>
+>  #include <linux/of.h>
+> +#include <linux/of_platform.h>
+>  #include <linux/proc_fs.h>
+>  #include <linux/slab.h>
+>  
+> @@ -342,8 +343,14 @@ void pci_bus_add_device(struct pci_dev *dev)
+>  	 */
+>  	pcibios_bus_add_device(dev);
+>  	pci_fixup_device(pci_fixup_final, dev);
+> -	if (pci_is_bridge(dev))
+> +	if (pci_is_bridge(dev)) {
+>  		of_pci_make_dev_node(dev);
+> +		retval = of_platform_populate(dev->dev.of_node, NULL, NULL,
+> +					      &dev->dev);
 
-A lock does cause delay even when it's not contended. Bear in mind that
-at 10 Gbps line rate, we have a budget of 64 nanoseconds to process each
-packet (for 64-byte packets). So just the atomic op to figure out
-whether there's any contention (around 10ns on the Intel processors I
-usually test on) will blow a huge chunk of the total processing budget.
-We can't actually do the full processing needed in those 64 nanoseconds
-(not to mention the 6.4 nanoseconds we have available at 100Gbps), which
-is why it's essential to amortise as much as we can over multiple
-packets.
+So this is a pci bridge device, not a platform device, please don't do
+this, make it a real device of a new type.
 
-This is all back-of-the-envelope calculations, of course. Having some
-actual numbers to look at would be great; I don't suppose you have a
-setup where you can run xdp-bench and see how your patches affect the
-throughput?
+thanks,
 
-> It should only block if something with higher priority preempted the
-> current interrupt thread _and_ also happen to use XDP on the same CPU.
-> In that case (XDP is needed) it would flush the current user out of
-> the locked section before the higher-prio thread could take over.
-> Doing bulk and allowing the low-priority thread to complete would
-> delay the high-priority thread. Maybe I am too pessimistic here and
-> having two XDP programs on one CPU is unlikely to happen.
->
-> Adding the lock on per-NAPI basis would allow to batch packets.
-> Acquiring the lock only if XDP is supported would not block the CAN
-> drivers since they dont't support XDP. But sounds like a hack.
-
-I chatted with Jesper about this, and he had an idea not too far from
-this: split up the XDP and regular stack processing in two stages, each
-with their individual batching. So whereas right now we're doing
-something like:
-
-run_napi()
-  bh_disable()
-  for pkt in budget:
-    act =3D run_xdp(pkt)
-    if (act =3D=3D XDP_PASS)
-      run_netstack(pkt)  // this is the expensive bit
-  bh_enable()
-
-We could instead do:
-
-run_napi()
-  bh_disable()
-  for pkt in budget:
-    act =3D run_xdp(pkt)
-    if (act =3D=3D XDP_PASS)
-      add_to_list(pkt, to_stack_list)
-  bh_enable()
-  // sched point
-  bh_disable()
-  for pkt in to_stack_list:
-    run_netstack(pkt)
-  bh_enable()
-
-
-This would limit the batching that blocks everything to only the XDP
-processing itself, which should limit the maximum time spent in the
-blocking state significantly compared to what we have today. The caveat
-being that rearranging things like this is potentially a pretty major
-refactoring task that needs to touch all the drivers (even if some of
-the logic can be moved into the core code in the process). So not really
-sure if this approach is feasible, TBH.
-
-> Daniel said netkit doesn't need this locking because it is not
-> supporting this redirect and it made me think. Would it work to make
-> the redirect structures part of the bpf_prog-structure instead of
-> per-CPU? My understanding is that eBPF's programs data structures are
-> part of it and contain locking allowing one eBPF program preempt
-> another one.
-> Having the redirect structures part of the program would obsolete
-> locking. Do I miss anything?
-
-This won't work, unfortunately: the same XDP program can be attached to
-multiple interfaces simultaneously, and for hardware with multiple
-receive queues (which is most of the hardware that supports XDP), it can
-even run simultaneously on multiple CPUs on the same interface. This is
-the reason why this is all being kept in per-CPU variables today.
-
--Toke
-
+greg k-h
 
