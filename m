@@ -1,125 +1,145 @@
-Return-Path: <netdev+bounces-63923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59641830245
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 10:26:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A1EA830249
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 10:28:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B4B41F24AB6
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 09:26:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 030F428615E
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 09:28:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F81A134BD;
-	Wed, 17 Jan 2024 09:26:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AATQ0vj+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A87213FEB;
+	Wed, 17 Jan 2024 09:28:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 582448821;
-	Wed, 17 Jan 2024 09:26:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAF73134BC;
+	Wed, 17 Jan 2024 09:28:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705483589; cv=none; b=lUB+Yhmah55RH8nva0ff3OhUNbSlBkHMULyAm85177Cl0L1RQeN5sTr8ZTADS+STVOQEtLLn4K1AMtqqLbzSCJHS4Milej44DuH/JoHB1zFpojx2OMQtqCuFLIp/QEGdoaPWikFUaoj5UdJvDdgSKq+tEeUkexVuI+y4pGbNlPA=
+	t=1705483732; cv=none; b=fj4skzRAqEuoxAwhbpdMJrzrHMaIiFdjuxCppODq861DIHam3jcOLQRQFQBiSwHvxNCoIfg1kRV3p05aPA8OLsoxbEwx/Z2xvBtCd2UDEOXvPhNVU/+A1rp5CiqYhQO67f1yGjHoTB3Yc3e9bMuQQ8G2s6+UB0nF1Oti92HrZlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705483589; c=relaxed/simple;
-	bh=vgcI4Men/K8+E+y+e//121JlNpWLzGmTMhkjUwvr3yE=;
-	h=Received:DKIM-Signature:Content-Type:MIME-Version:
-	 Content-Transfer-Encoding:In-Reply-To:References:Subject:From:Cc:
-	 To:Date:Message-ID; b=hbofxCs80j1pn+VJO8wQ9TLA4DwOgHC/YYBwKPJauJCQoUNx2Ymi0IQpwi0ICtBKJYh46w0Cn26c5rilwWvo38+8WRP91eQjkVoWJjjT5NwnArTjkhskS/ElRcD2L0Mh7lAV7EehlgN67IgTAzXJ+ajV6jIN6DXHTTq+kD/KZrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AATQ0vj+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54277C433C7;
-	Wed, 17 Jan 2024 09:26:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705483588;
-	bh=vgcI4Men/K8+E+y+e//121JlNpWLzGmTMhkjUwvr3yE=;
-	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
-	b=AATQ0vj+Nn/ctm8p6xCejQ5lNjjOzWwOCQt1aqbFdHLxbF53kDv+MVt94PMix8WX1
-	 pgmffLJ+KUiXWcRvkbtaqqpfd8s2sLsor0TMBVq5UFWjxQysliMEPtyLZS00tI1o+A
-	 8YneAY5GRxsOSBewp88QH1us53weN6CsTrdldj1CSieG2NFGFeIVh8cWnugjoZ2fc1
-	 UmrgruRr4ACaCPTLrCWjwqV5YGjg8pNqrCA0dtwTh3vXQHzrcCPkhIYMhLGISAisMX
-	 JcrXnujrwZzZD1GLn04MiIvJzMj0wu/0b0gXSWD9VJicuMu/EJgP6VE82CE49hZeS/
-	 LgDZbVJtpwmIA==
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1705483732; c=relaxed/simple;
+	bh=NcNSf0ou3mS+jAxjJNMBEqlWVVYIJ0hZkHc/m8i1jRU=;
+	h=Received:Received:Received:Subject:To:CC:References:From:
+	 Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:Content-Type:
+	 Content-Language:Content-Transfer-Encoding:X-Originating-IP:
+	 X-ClientProxiedBy; b=fGK7EurT02YmDMeQAxNQI56tCNEK0PnogKDG8UvB9GAXhy1abzx4OpNWKNOpMms1oND/wr4wK4Ka2PHvqukk7BjelRBeA8IIMh9wgMOa+sNuqcmV+zd70Vdl9G491H5IfvHiPnR5md0IozVnUPSBE6xBj0hgIrWlOuCM8xF0D3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4TFLC35hY2zNlGP;
+	Wed, 17 Jan 2024 17:27:59 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id 10CAC180073;
+	Wed, 17 Jan 2024 17:28:45 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 17 Jan
+ 2024 17:28:44 +0800
+Subject: Re: [RFC PATCH net-next v5 2/2] net: add netmem to skb_frag_t
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: Mina Almasry <almasrymina@google.com>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, =?UTF-8?Q?Christian_K=c3=b6nig?=
+	<christian.koenig@amd.com>, Shakeel Butt <shakeelb@google.com>, Willem de
+ Bruijn <willemdebruijn.kernel@gmail.com>
+References: <20240109011455.1061529-1-almasrymina@google.com>
+ <20240109011455.1061529-3-almasrymina@google.com>
+ <5219f2cd-6854-0134-560d-8ae3f363b53f@huawei.com>
+ <CAHS8izOtr+jfqQ6xCB3CoN-K_V1-4hPsB4-k5+1z-M3Qy2BbwA@mail.gmail.com>
+ <0711845b-c435-251f-0bbc-20b243721c06@huawei.com>
+ <CAHS8izOxvMVGXKpLBvVgyyS5_94WGG8Aca=O_zGMX+db-3gBXg@mail.gmail.com>
+ <66bc7b8f-51b6-0d9e-db5b-47e7ee5e9029@huawei.com>
+ <CAHS8izOnhtQGeQ-EFmYjZyZ0eW2LqO0Rrm73eAB2su=UA34yTw@mail.gmail.com>
+ <20240116000129.GX734935@nvidia.com>
+ <9c1a6725-c4c3-2bb1-344f-5e71f8ce7e63@huawei.com>
+ <20240116121611.GY734935@nvidia.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <5828bc7d-c876-0cad-5739-fabc436df397@huawei.com>
+Date: Wed, 17 Jan 2024 17:28:44 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20240117062310.2030408-1-jpatel2@marvell.com>
-References: <20240117062310.2030408-1-jpatel2@marvell.com>
-Subject: Re: [net v2 PATCH 1/1] net: mvpp2: clear BM pool before initialization
-From: Antoine Tenart <atenart@kernel.org>
-Cc: Jenishkumar Maheshbhai Patel <jpatel2@marvell.com>
-To: Jenishkumar Maheshbhai Patel <jpatel2@marvell.com>, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org, linux@armlinux.org.uk, marcin.s.wojtas@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com
-Date: Wed, 17 Jan 2024 10:26:25 +0100
-Message-ID: <170548358563.6043.512179791104422697@kwain>
+In-Reply-To: <20240116121611.GY734935@nvidia.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
-Hello,
+On 2024/1/16 20:16, Jason Gunthorpe wrote:
+> On Tue, Jan 16, 2024 at 07:04:13PM +0800, Yunsheng Lin wrote:
+>> On 2024/1/16 8:01, Jason Gunthorpe wrote:
+>>> On Mon, Jan 15, 2024 at 03:23:33PM -0800, Mina Almasry wrote:
+>>>>>> You did not answer my question that I asked here, and ignoring this
+>>>>>> question is preventing us from making any forward progress on this
+>>>>>> discussion. What do you expect or want skb_frag_page() to do when
+>>>>>> there is no page in the frag?
+>>>>>
+>>>>> I would expect it to do nothing.
+>>>>
+>>>> I don't understand. skb_frag_page() with an empty implementation just
+>>>> results in a compiler error as the function needs to return a page
+>>>> pointer. Do you actually expect skb_frag_page() to unconditionally
+>>>> cast frag->netmem to a page pointer? That was explained as
+>>>> unacceptable over and over again by Jason and Christian as it risks
+>>>> casting devmem to page; completely unacceptable and will get nacked.
+>>>> Do you have a suggestion of what skb_frag_page() should do that will
+>>>> not get nacked by mm?
+>>>
+>>> WARN_ON and return NULL seems reasonable?
+>>
+>> While I am agreed that it may be a nightmare to debug the case of passing
+>> a false page into the mm system, but I am not sure what's the point of
+>> returning NULL to caller if the caller is not expecting or handling
+>> the
+> 
+> You have to return something and NULL will largely reliably crash the
+> thread. The WARN_ON explains in detail why your thread just crashed.
+> 
+>> NULL returning[for example, most of mm API called by the networking does not
+>> seems to handling NULL as input page], isn't the NULL returning will make
+>> the kernel panic anyway? Doesn't it make more sense to just add a BUG_ON()
+>> depending on some configuration like CONFIG_DEBUG_NET or CONFIG_DEVMEM?
+>> As returning NULL seems to be causing a confusion for the caller of
+>> skb_frag_page() as whether to or how to handle the NULL returning case.
+> 
+> Possibly, though Linus doesn't like BUG_ON on principle..
 
-Quoting Jenishkumar Maheshbhai Patel (2024-01-17 07:23:10)
-> +/* Cleanup pool before actual initialization in the OS */
-> +static void mvpp2_bm_pool_cleanup(struct mvpp2 *priv, int pool_id)
-> +{
-> +       u32 val;
-> +       int i;
+From the below discussion, it seems the BUG_ON belonging to something
+like below:
+(a) development code where it replaces error handling that you just
+haven't written yet, and you haven't really thought through all the
+possibilities, so you're saying "this can't happen, I'll fix it
+later".
 
-Please add an empty line here. (You might as well add some below to
-improve readability).
+https://linux.kernel.narkive.com/WPFYQ9d4/bug-on-in-workingset-node-shadows-dec-triggers#post6
 
-> +       /* Drain the BM from all possible residues left by firmware */
-> +       for (i =3D 0; i < MVPP2_BM_POOL_SIZE_MAX; i++)
-> +               mvpp2_read(priv, MVPP2_BM_PHY_ALLOC_REG(pool_id));
+Anyway, it would be fine for me if skb_frag_page() is not used to decide
+if a normal page or a devmem is in a frag. As for the overhead of catching
+the calling of skb_frag_page() for devmem frag, it would be better to avoid
+it using some configuration like CONFIG_DEBUG_NET or CONFIG_DEVMEM.
 
-Not sure about the above, but I don't have the datasheet. Looks like
-MVPP2_BM_PHY_ALLOC_REG contains the buffer dma addr, and is read
-multiple times in a loop. Also the driver's comments says:
-
-"""
-- global registers that must be accessed through a specific thread
-  window, because they are related to an access to a per-thread
-  register
-
-  MVPP2_BM_PHY_ALLOC_REG    (related to MVPP2_BM_VIRT_ALLOC_REG)
-"""
-
-If that's intended, maybe add a comment about what this does and why
-mvpp2_thread_read isn't used?
-
-> +       /* Stop the BM pool */
-> +       val =3D mvpp2_read(priv, MVPP2_BM_POOL_CTRL_REG(pool_id));
-> +       val |=3D MVPP2_BM_STOP_MASK;
-> +       mvpp2_write(priv, MVPP2_BM_POOL_CTRL_REG(pool_id), val);
-> +       /* Mask BM all interrupts */
-> +       mvpp2_write(priv, MVPP2_BM_INTR_MASK_REG(pool_id), 0);
-> +       /* Clear BM cause register */
-> +       mvpp2_write(priv, MVPP2_BM_INTR_CAUSE_REG(pool_id), 0);
-> +}
-> +
->  static int mvpp2_bm_init(struct device *dev, struct mvpp2 *priv)
->  {
->         enum dma_data_direction dma_dir =3D DMA_FROM_DEVICE;
->         int i, err, poolnum =3D MVPP2_BM_POOLS_NUM;
->         struct mvpp2_port *port;
-> =20
-> +       if (priv->percpu_pools)
-> +               poolnum =3D mvpp2_get_nrxqs(priv) * 2;
-
-Since poolnum is now set here, you can remove the one below in the same
-function (not shown in the context).
-
-> +
-> +       /* Clean up the pool state in case it contains stale state */
-> +       for (i =3D 0; i < poolnum; i++)
-> +               mvpp2_bm_pool_cleanup(priv, i);
-> +
->         if (priv->percpu_pools) {
->                 for (i =3D 0; i < priv->port_count; i++) {
->                         port =3D priv->port_list[i];
-
-Thanks.
+> 
+> I think the bigger challenge is convincing people that this devmem
+> stuff doesn't just open a bunch of holes in the kernel where userspace
+> can crash it.
+> 
+> The fact you all are debating what to do with skb_frag_page() suggests
+> to me there isn't confidence...
+> 
+> Jason
+> .
+> 
 
