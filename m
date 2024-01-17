@@ -1,150 +1,255 @@
-Return-Path: <netdev+bounces-64067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90E65830EED
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 22:57:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DC12830EE6
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 22:57:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4DD5B21850
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 21:57:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7A55BB2241D
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 21:57:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78E3C25634;
-	Wed, 17 Jan 2024 21:56:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E885128DD3;
+	Wed, 17 Jan 2024 21:56:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="dm7YOvbZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Oy5iLNhq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D70025569
-	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 21:56:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D3BD28DB4;
+	Wed, 17 Jan 2024 21:56:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705528614; cv=none; b=NjzhuPUgUxsc6+lZ+G46S8qemzVznNzo/L/8HFiKNxUdB2HJF6VNL7MsoJKl27fnnOb98imWAZfLKQYBz/1LzAL50hUXbtGqnXrhlcgK/JjCFo1/QH5oKmeWQl21a6vufHRdICcGYVWZ1fAtvNNAKSK84/wgpfreX95xSy6bisw=
+	t=1705528592; cv=none; b=TsIYpMclDvMAWEXA2+cBjzmvwOe0KWQe7jY43sLgYMTWSn4vBcu/SH+QjnCklAyRP1YHI86znzdmgpXwHIQfNJxaaKAepGPtoreru51fER9Ck7Gy8sjj9U2xG8ML0GdAS4BOIFei5M7J+IIup4uqUXZJYMH9qO+3+0KmNnrZLC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705528614; c=relaxed/simple;
-	bh=PA3Lx9dVsk8fYGzyNljC3QpZLQpaSbWDsEUCSvKZELc=;
-	h=Received:DKIM-Signature:Received:Received:Received:Received:
-	 Received:Received:Received:Received:Received:Message-ID:Date:
-	 User-Agent:Subject:To:Cc:References:From:Content-Language:
-	 In-Reply-To:Content-Type:X-TM-AS-GCONF:X-Proofpoint-GUID:
-	 X-Proofpoint-ORIG-GUID:Content-Transfer-Encoding:
-	 X-Proofpoint-UnRewURL:MIME-Version:X-Proofpoint-Virus-Version:
-	 X-Proofpoint-Spam-Details; b=U70bZKxEEdz4YR7s5yPdABwFHM/dQIXDldWen52An7e9AqWKemolgu6WiDKra8I0U3AYZK85YLWtGbaPVjERSsw/wOwdzdbosajt1iDiW9KJSs7Ydpw0lY0YjHqyFrEfYdBveM686b3aUTGQF06TOBylBYnx06NcsyVz2nFFUFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com; spf=none smtp.mailfrom=linux.vnet.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=dm7YOvbZ; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.vnet.ibm.com
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40HJpKiN027137;
-	Wed, 17 Jan 2024 21:56:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=OooOu1pXd5FkcNuRvX5UfzCNwLThT1FRoaAzBxl3BLs=;
- b=dm7YOvbZUxr0YMKYfcxHMXQDrgYVDjpMBPahK/OpivBEIocPUzu0W+ugsX+vsQtYBFkk
- Qjw9aBn5hw3xxBlQEzqkw9TGDDc1WSLqBwc67tHyNWiECOXa6PHFyUW6/d0C6NRTiFUj
- 5YFGy+LayPgcL9tw62W22c5kvqKqOFoOzyrvfRf/O4aILTn35gWwDGKJLnx4l7+V0vuH
- pCJy5jCf6trhNxvomMQ7t9aauHBdqZLgCdgJyZWagIP2gcBd4dinOiYymSX4hWlPNzqC
- q/Qgjy6OBGWi8Ymmv5sqd/kxaN0vYhbvXiGsPj/SPKFDcUR9aCyuymvV39YVFHYNf+hG mg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vpmsd3wg9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 17 Jan 2024 21:56:26 +0000
-Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40HKRosQ023954;
-	Wed, 17 Jan 2024 21:56:25 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vpmsd3wfv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 17 Jan 2024 21:56:25 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 40HJXuc0011131;
-	Wed, 17 Jan 2024 21:56:24 GMT
-Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3vm57yr19p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 17 Jan 2024 21:56:24 +0000
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 40HLuMMb20447844
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 17 Jan 2024 21:56:22 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0889F58053;
-	Wed, 17 Jan 2024 21:56:22 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5259058043;
-	Wed, 17 Jan 2024 21:56:21 +0000 (GMT)
-Received: from [9.41.99.4] (unknown [9.41.99.4])
-	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 17 Jan 2024 21:56:21 +0000 (GMT)
-Message-ID: <dd4d42ef-4c49-46fb-8e90-9b80c1315e92@linux.vnet.ibm.com>
-Date: Wed, 17 Jan 2024 15:56:21 -0600
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Patch v6 0/4] bnx2x: Fix error recovering in switch
- configuration
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: aelior@marvell.com, davem@davemloft.net, edumazet@google.com,
-        manishc@marvell.com, netdev@vger.kernel.org, pabeni@redhat.com,
-        skalluru@marvell.com, VENKATA.SAI.DUGGI@ibm.com,
-        Abdul Haleem <abdhalee@in.ibm.com>,
-        David Christensen <drc@linux.vnet.ibm.com>,
-        Simon Horman <simon.horman@corigine.com>
-References: <4bc40774-eae9-4134-be51-af23ad0b6f84@linux.vnet.ibm.com>
-From: Thinh Tran <thinhtr@linux.vnet.ibm.com>
-Content-Language: en-US
-In-Reply-To: <4bc40774-eae9-4134-be51-af23ad0b6f84@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: BgqU5Cy2yfa2jUe-oOgSgJv9ZhlwQOHD
-X-Proofpoint-ORIG-GUID: 7JroUt_6wqvX7izqO8dCMlxI7pU47ql3
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	s=arc-20240116; t=1705528592; c=relaxed/simple;
+	bh=1mboDMZbXhjjGyMIZ10jie1E1Pz+G7KhgTRa+lPl1Ok=;
+	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:From:
+	 X-Google-Original-From:To:Cc:Subject:Date:Message-Id:X-Mailer:
+	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding; b=SpkBZ6rHFFpsZnGBc8XJJXa9KZSv0ks6jj7Ym5mgErTlElGGoz8Z9/ObQPiHQFdG+jXvwki0g0CA2r1+YImRnxFtuHVA6g4HaFT28QGb1YU/M+nUuT5w9SK4nn6FPe+IylJoHdu6zmFVf4lTxUrJoSxgALzDV5uOmV+4/h2rx8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Oy5iLNhq; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-429f53f0b0bso15746611cf.2;
+        Wed, 17 Jan 2024 13:56:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705528590; x=1706133390; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FmSbpF5HJNRokADpjS/NeLmhwvKGKlpdziz8GFiM6W8=;
+        b=Oy5iLNhqGoltgBhYZHJkEHNMJWjpsCY6QNGMA/+WfMOs2LhHfPFu+AS7x7Z49B/7Qe
+         h09Ki/Z+AI2PihGxsKqxqphnKNuBOVJwgz3AUPcpMtgE0ekaRQlv43ZAwxstJmrxcWre
+         3Vi3fmelp9m6Ct2OdMjjtR9CP5KePSrRyohyiYXevrCKi2jlHQ6iUFIKLEBalA1Rxv2A
+         1jtKnT2Qc//1oBJCEIeEQJJe0a1crNWXtrieUkNmv5P3lNJ0KG24+p0DZzlPTgYPvcNL
+         G64z/1SeHxWKblxZUP6S7WIlLoeN3YClgRDHPrS42mSIiWgfRJArzLSzupairUKydkWO
+         BUiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705528590; x=1706133390;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FmSbpF5HJNRokADpjS/NeLmhwvKGKlpdziz8GFiM6W8=;
+        b=ONBJyrv/9SO8Rf6S1j0RZzQb5+zATdaj77PqPmK2BUOqNMs4J3UAu20TWDUuyXOQCt
+         lPkt7ynak6c6g2KMeC5Y8lkkkj81Wabwya1SwAg+JqWiPfCPuHesG26/7UOHMJNJeXv1
+         STsIO+RKH9YUjNL/9N67VlDtaYszJ4lu0rWJAh1214ncUuPhGaN+cjRaLF6OmvgrPtqn
+         uFCsC54airPTK3pmZn178D50Iu1TqlDqO/d511OcZXIt2+7RQHhg47C8U0DyVk7s/++2
+         1Fg+hvHNEAomullaItbAqd9YUnR1ycVpn/aC2Z4ekA/n1CFVhWcsGXXU8Km052JfUTI8
+         sg6A==
+X-Gm-Message-State: AOJu0YxkIy2UVkgOw0ZlW06KnFfiB2L4lTkfUT3D2f6Ha+3k23ham/8h
+	n/067ERhYHRmW5ZNmzzX6NwoTiIEOF0=
+X-Google-Smtp-Source: AGHT+IEgfeoXyRC3XW1dp7hql3R63zkkvDoF83z3VsGpjmGg3G8d6h29e5GL4dVhujHvkH2dskuwgg==
+X-Received: by 2002:a05:622a:189:b0:429:c957:708c with SMTP id s9-20020a05622a018900b00429c957708cmr12220811qtw.130.1705528590029;
+        Wed, 17 Jan 2024 13:56:30 -0800 (PST)
+Received: from n36-183-057.byted.org ([147.160.184.91])
+        by smtp.gmail.com with ESMTPSA id hj11-20020a05622a620b00b00428346b88bfsm6105263qtb.65.2024.01.17.13.56.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Jan 2024 13:56:29 -0800 (PST)
+From: Amery Hung <ameryhung@gmail.com>
+X-Google-Original-From: Amery Hung <amery.hung@bytedance.com>
+To: netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org,
+	yangpeihao@sjtu.edu.cn,
+	toke@redhat.com,
+	jhs@mojatatu.com,
+	jiri@resnulli.us,
+	sdf@google.com,
+	xiyou.wangcong@gmail.com,
+	yepeilin.cs@gmail.com
+Subject: [RFC PATCH v7 5/8] net_sched: Add init program
+Date: Wed, 17 Jan 2024 21:56:21 +0000
+Message-Id: <dcb5fcc21f7a905279744898415fb9942c7fd1ed.1705432850.git.amery.hung@bytedance.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <cover.1705432850.git.amery.hung@bytedance.com>
+References: <cover.1705432850.git.amery.hung@bytedance.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-17_12,2024-01-17_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 clxscore=1011
- mlxlogscore=999 malwarescore=0 lowpriorityscore=0 suspectscore=0
- mlxscore=0 adultscore=0 priorityscore=1501 bulkscore=0 phishscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2401170156
+Content-Transfer-Encoding: 8bit
 
-Hi all,
+This patch adds another optional program to be called during
+the creation of a qdisc for initializating data in the bpf world.
+The program takes bpf_qdisc_ctx as context, but cannot not access
+any field.
 
-I hope this message finds you well. I'm reaching out to move forward 
-with these patches.  If there are any remaining concerns or if 
-additional information is needed from my side, please let me know.
-Your guidance on the next steps would be greatly appreciated.
+Signed-off-by: Amery Hung <amery.hung@bytedance.com>
+---
+ include/uapi/linux/bpf.h       |  1 +
+ include/uapi/linux/pkt_sched.h |  4 ++++
+ kernel/bpf/syscall.c           |  1 +
+ net/core/filter.c              |  3 ++-
+ net/sched/sch_bpf.c            | 23 ++++++++++++++++++++++-
+ tools/include/uapi/linux/bpf.h |  1 +
+ 6 files changed, 31 insertions(+), 2 deletions(-)
 
-Best regards,
-Thinh Tran
+diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+index 84669886a493..cad0788bef99 100644
+--- a/include/uapi/linux/bpf.h
++++ b/include/uapi/linux/bpf.h
+@@ -1060,6 +1060,7 @@ enum bpf_attach_type {
+ 	BPF_QDISC_ENQUEUE,
+ 	BPF_QDISC_DEQUEUE,
+ 	BPF_QDISC_RESET,
++	BPF_QDISC_INIT,
+ 	__MAX_BPF_ATTACH_TYPE
+ };
+ 
+diff --git a/include/uapi/linux/pkt_sched.h b/include/uapi/linux/pkt_sched.h
+index e9e1a83c22f7..61f0cf4a088c 100644
+--- a/include/uapi/linux/pkt_sched.h
++++ b/include/uapi/linux/pkt_sched.h
+@@ -1332,6 +1332,10 @@ enum {
+ 	TCA_SCH_BPF_RESET_PROG_FD,	/* u32 */
+ 	TCA_SCH_BPF_RESET_PROG_ID,	/* u32 */
+ 	TCA_SCH_BPF_RESET_PROG_TAG,	/* data */
++	TCA_SCH_BPF_INIT_PROG_NAME,	/* string */
++	TCA_SCH_BPF_INIT_PROG_FD,	/* u32 */
++	TCA_SCH_BPF_INIT_PROG_ID,	/* u32 */
++	TCA_SCH_BPF_INIT_PROG_TAG,	/* data */
+ 	__TCA_SCH_BPF_MAX,
+ };
+ 
+diff --git a/kernel/bpf/syscall.c b/kernel/bpf/syscall.c
+index 9af6fa542f2e..0959905044b9 100644
+--- a/kernel/bpf/syscall.c
++++ b/kernel/bpf/syscall.c
+@@ -2507,6 +2507,7 @@ bpf_prog_load_check_attach(enum bpf_prog_type prog_type,
+ 		case BPF_QDISC_ENQUEUE:
+ 		case BPF_QDISC_DEQUEUE:
+ 		case BPF_QDISC_RESET:
++		case BPF_QDISC_INIT:
+ 			return 0;
+ 		default:
+ 			return -EINVAL;
+diff --git a/net/core/filter.c b/net/core/filter.c
+index f8e17465377f..5619a12c0d06 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -8905,7 +8905,8 @@ static bool tc_qdisc_is_valid_access(int off, int size,
+ {
+ 	struct btf *btf;
+ 
+-	if (prog->expected_attach_type == BPF_QDISC_RESET)
++	if (prog->expected_attach_type == BPF_QDISC_RESET ||
++	    prog->expected_attach_type == BPF_QDISC_INIT)
+ 		return false;
+ 
+ 	if (off < 0 || off >= sizeof(struct bpf_qdisc_ctx))
+diff --git a/net/sched/sch_bpf.c b/net/sched/sch_bpf.c
+index 3f0f809dced6..925a131016f0 100644
+--- a/net/sched/sch_bpf.c
++++ b/net/sched/sch_bpf.c
+@@ -43,6 +43,7 @@ struct bpf_sched_data {
+ 	struct sch_bpf_prog __rcu enqueue_prog;
+ 	struct sch_bpf_prog __rcu dequeue_prog;
+ 	struct sch_bpf_prog __rcu reset_prog;
++	struct sch_bpf_prog __rcu init_prog;
+ 
+ 	struct qdisc_watchdog watchdog;
+ };
+@@ -88,6 +89,9 @@ static int sch_bpf_dump(struct Qdisc *sch, struct sk_buff *skb)
+ 	if (sch_bpf_dump_prog(&q->reset_prog, skb, TCA_SCH_BPF_RESET_PROG_NAME,
+ 			      TCA_SCH_BPF_RESET_PROG_ID, TCA_SCH_BPF_RESET_PROG_TAG))
+ 		goto nla_put_failure;
++	if (sch_bpf_dump_prog(&q->init_prog, skb, TCA_SCH_BPF_INIT_PROG_NAME,
++			      TCA_SCH_BPF_INIT_PROG_ID, TCA_SCH_BPF_INIT_PROG_TAG))
++		goto nla_put_failure;
+ 
+ 	return nla_nest_end(skb, opts);
+ 
+@@ -269,6 +273,9 @@ static const struct nla_policy sch_bpf_policy[TCA_SCH_BPF_MAX + 1] = {
+ 	[TCA_SCH_BPF_RESET_PROG_FD]	= { .type = NLA_U32 },
+ 	[TCA_SCH_BPF_RESET_PROG_NAME]	= { .type = NLA_NUL_STRING,
+ 					    .len = ACT_BPF_NAME_LEN },
++	[TCA_SCH_BPF_INIT_PROG_FD]	= { .type = NLA_U32 },
++	[TCA_SCH_BPF_INIT_PROG_NAME]	= { .type = NLA_NUL_STRING,
++					    .len = ACT_BPF_NAME_LEN },
+ };
+ 
+ static int bpf_init_prog(struct nlattr *fd, struct nlattr *name,
+@@ -348,6 +355,10 @@ static int sch_bpf_change(struct Qdisc *sch, struct nlattr *opt,
+ 		goto failure;
+ 	err = bpf_init_prog(tb[TCA_SCH_BPF_RESET_PROG_FD],
+ 			    tb[TCA_SCH_BPF_RESET_PROG_NAME], &q->reset_prog, true);
++	if (err)
++		goto failure;
++	err = bpf_init_prog(tb[TCA_SCH_BPF_INIT_PROG_FD],
++			    tb[TCA_SCH_BPF_INIT_PROG_NAME], &q->init_prog, true);
+ failure:
+ 	sch_tree_unlock(sch);
+ 	return err;
+@@ -357,6 +368,8 @@ static int sch_bpf_init(struct Qdisc *sch, struct nlattr *opt,
+ 			struct netlink_ext_ack *extack)
+ {
+ 	struct bpf_sched_data *q = qdisc_priv(sch);
++	struct bpf_qdisc_ctx ctx = {};
++	struct bpf_prog *init;
+ 	int err;
+ 
+ 	qdisc_watchdog_init(&q->watchdog, sch);
+@@ -370,7 +383,14 @@ static int sch_bpf_init(struct Qdisc *sch, struct nlattr *opt,
+ 	if (err)
+ 		return err;
+ 
+-	return qdisc_class_hash_init(&q->clhash);
++	err = qdisc_class_hash_init(&q->clhash);
++	if (err < 0)
++		return err;
++
++	init = rcu_dereference(q->init_prog.prog);
++	if (init)
++		bpf_prog_run(init, &ctx);
++	return 0;
+ }
+ 
+ static void sch_bpf_reset(struct Qdisc *sch)
+@@ -420,6 +440,7 @@ static void sch_bpf_destroy(struct Qdisc *sch)
+ 	bpf_cleanup_prog(&q->enqueue_prog);
+ 	bpf_cleanup_prog(&q->dequeue_prog);
+ 	bpf_cleanup_prog(&q->reset_prog);
++	bpf_cleanup_prog(&q->init_prog);
+ 	sch_tree_unlock(sch);
+ }
+ 
+diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
+index 84669886a493..cad0788bef99 100644
+--- a/tools/include/uapi/linux/bpf.h
++++ b/tools/include/uapi/linux/bpf.h
+@@ -1060,6 +1060,7 @@ enum bpf_attach_type {
+ 	BPF_QDISC_ENQUEUE,
+ 	BPF_QDISC_DEQUEUE,
+ 	BPF_QDISC_RESET,
++	BPF_QDISC_INIT,
+ 	__MAX_BPF_ATTACH_TYPE
+ };
+ 
+-- 
+2.20.1
 
-On 11/16/2023 10:08 AM, Thinh Tran wrote:
-> Hi,
-> 
-> Could we proceed with advancing these patches? They've been in the 
-> "Awaiting Upstream" state for a while now. Notably, one of them has 
-> successfully made it to the mainline kernel:
->   [v6,1/4] bnx2x: new flag for tracking HW resource
-> 
-> https://github.com/torvalds/linux/commit/bf23ffc8a9a777dfdeb04232e0946b803adbb6a9
-> 
-> As testing the latest kernel, we are still encountering crashes due to 
-> the absence of one of the patches:
->    [v6,3/4] bnx2x: Prevent access to a freed page in page_pool.
-> 
-> Is there anything specific I need to do to help moving these patches 
-> forward?
-> We would greatly appreciate if they could be incorporated into the 
-> mainline kernel.
-> 
-> Thank you,
-> Thinh Tran
 
