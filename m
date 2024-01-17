@@ -1,134 +1,97 @@
-Return-Path: <netdev+bounces-63918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BED28830215
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 10:19:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDE418301F7
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 10:15:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D9681F23ACF
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 09:19:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78C48284F36
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 09:15:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A9D9134BD;
-	Wed, 17 Jan 2024 09:17:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D00914003;
+	Wed, 17 Jan 2024 09:15:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZBBcy6wn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oks2QhI8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFCA21D552;
-	Wed, 17 Jan 2024 09:17:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 285B013FF9
+	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 09:15:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705483062; cv=none; b=iKe3k3hGyPMKBbgTH+4BGoHut02lNGJBg/LdaO/evh4uR7zISdXFOv8ZgWvzRwuOPZRJ2vIXxC26fAtQikVuqHu2CR4RzFehXZeJuNxsEzM7su+M/3eKYgAI61PrCXabn4ptQ3BBBDjFHsI8enaRRWzmpzZn+8NN+CBHtmjjG4E=
+	t=1705482907; cv=none; b=QjiDL/s6tq5p4ayO187JcfAdBIP5KlFSUMyP/zPdcohyFcy7FH0dQSpmLjQM+SXBmCgebqtfKk2OUyE14q5nLGNI68dHkCq5BYCEEaX/+LhU6GVNFAkoiub7Ss51ejG1MfXtVyR49cMMnIeIfc550NDoTUoC61+AQgai3EEuiaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705483062; c=relaxed/simple;
-	bh=fDdyhPSiCGUYtF8wAWV+g2nVIffg0T992GjChQ9yGQs=;
-	h=DKIM-Signature:X-IronPort-AV:X-IronPort-AV:Received:X-ExtLoop1:
-	 X-IronPort-AV:X-IronPort-AV:Received:From:To:Cc:Subject:Date:
-	 Message-Id:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding; b=NX2vaBby0Xwu0nXCZq/5EDbzgToxy/8QD9BggDuWQcYrugeQtPi/QO/Jf61Hef20e1BnshtAQkMmI6+1HcEPl29nJSc9WLRH7NEDgBATe8PNL7yeXHPSR1JH37ncnYzlqdx2tRiIWrTqRex/tGC3GlKtdWBC7D67BsysBOOsDa0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZBBcy6wn; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1705483061; x=1737019061;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=fDdyhPSiCGUYtF8wAWV+g2nVIffg0T992GjChQ9yGQs=;
-  b=ZBBcy6wn/3WAKvmuMhSXEutFJO+fDXAoe7gQYYBqbffRi9Y7AzvQGzRE
-   Bh7TRnCHl5cXYQ22+dJyD0WTyAuSx3M9kNXzJtp5GqvwKc8uaS4f7A00f
-   qaMIxC8x1zVCET93rGPxnB9zgMMaB/FgLJMtNGDk21BXmViTaQIREXOqo
-   VZOKZcfIRFjbtvbjCsuzoYSOwyMdOJgIPPLjOOVJe+ewZ0cbtsN48XdBC
-   9BdrZS1Q0uN+f39Vz/YDjmJ3cU0AxGtozhw9LiS50153SCWQSHzSB2rMf
-   U5MFxCzdsZ72YeS7LQtGzI3XS+jv0ydGMg+GPIFN6ZskY9icgbSsSFuit
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10955"; a="13474586"
-X-IronPort-AV: E=Sophos;i="6.05,200,1701158400"; 
-   d="scan'208";a="13474586"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jan 2024 01:17:41 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10955"; a="957489837"
-X-IronPort-AV: E=Sophos;i="6.05,200,1701158400"; 
-   d="scan'208";a="957489837"
-Received: from amlin-018-114.igk.intel.com ([10.102.18.114])
-  by orsmga005.jf.intel.com with ESMTP; 17 Jan 2024 01:17:37 -0800
-From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-To: netdev@vger.kernel.org
-Cc: vadim.fedorenko@linux.dev,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	milena.olech@intel.com,
-	linux-kernel@vger.kernel.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	mschmidt@redhat.com,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Subject: [PATCH net v4 4/4] dpll: fix broken error path in dpll_pin_alloc(..)
-Date: Wed, 17 Jan 2024 10:14:16 +0100
-Message-Id: <20240117091416.504096-5-arkadiusz.kubalewski@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20240117091416.504096-1-arkadiusz.kubalewski@intel.com>
-References: <20240117091416.504096-1-arkadiusz.kubalewski@intel.com>
+	s=arc-20240116; t=1705482907; c=relaxed/simple;
+	bh=UXWsvKC5Ik05m7M/0JlSdizVyiSyYUfxefm/9W3I0MY=;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To; b=I5Pz/4fDOy38FKg8Kn278OJmUfcXUIMgikVbjnhPzLZLgfeO8KthimPH+SAOp10EBKGgF5YICSQCuSk2dqVjGXk4yybLQj0pxIjhDNqGQHZ7Go5HhV0ZJqqO94fB5lwlsW86YbEYogwJf+y4ohDBp5URarsQ+A+PHqDq72/hF/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oks2QhI8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 425A6C433B1;
+	Wed, 17 Jan 2024 09:15:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705482906;
+	bh=UXWsvKC5Ik05m7M/0JlSdizVyiSyYUfxefm/9W3I0MY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Oks2QhI8e1Z7tWng1z43t8KMvlYGTUo5Zzn9r0NzgQECyiIv7YTaAaVwub8rUTUuk
+	 S0erVvQ8D7FsJwyHVqepxOmg4nz6wqL+6iOUTATqa0ETABbsW/lxXS8PqA9QuNlAMc
+	 nApgOmlFDUK6WR+/WCQ3j3X5d15KQjrF5Cmap5Tw81F8R6zQMidZBjh0KYnHxP5JB5
+	 QAMT1WyVWvs9NXAAzhPnl6kGKE0TWZYW6Ci7ZEp3atPQNm8S3U1VbzOz8IOlKhNVR6
+	 fyNcV9/kYAeDc5vPsZnkwhFh2oyRGNTmkMXL2+Xg5KpWkyRgmVk/CnFTAPJFVgliox
+	 LtPlROWOdvF0w==
+Date: Wed, 17 Jan 2024 09:15:02 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, vladimir.oltean@nxp.com
+Subject: Re: [PATCH net] net: netdevsim: don't try to destroy PHC on VFs
+Message-ID: <20240117091502.GJ588419@kernel.org>
+References: <20240116191400.2098848-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240116191400.2098848-1-kuba@kernel.org>
 
-If pin type is not expected, or dpll_pin_prop_dup(..) failed to
-allocate memory, the unwind error path shall not destroy pin's xarrays,
-which were not yet initialized.
-Add new goto label and use it to fix broken error path.
+On Tue, Jan 16, 2024 at 11:14:00AM -0800, Jakub Kicinski wrote:
+> PHC gets initialized in nsim_init_netdevsim(), which
+> is only called if (nsim_dev_port_is_pf()).
+> 
+> Create a counterpart of nsim_init_netdevsim() and
+> move the mock_phc_destroy() there.
+> 
+> This fixes a crash trying to destroy netdevsim with
+> VFs instantiated, as caught by running the devlink.sh test:
+> 
+>     BUG: kernel NULL pointer dereference, address: 00000000000000b8
+>     RIP: 0010:mock_phc_destroy+0xd/0x30
+>     Call Trace:
+>      <TASK>
+>      nsim_destroy+0x4a/0x70 [netdevsim]
+>      __nsim_dev_port_del+0x47/0x70 [netdevsim]
+>      nsim_dev_reload_destroy+0x105/0x120 [netdevsim]
+>      nsim_drv_remove+0x2f/0xb0 [netdevsim]
+>      device_release_driver_internal+0x1a1/0x210
+>      bus_remove_device+0xd5/0x120
+>      device_del+0x159/0x490
+>      device_unregister+0x12/0x30
+>      del_device_store+0x11a/0x1a0 [netdevsim]
+>      kernfs_fop_write_iter+0x130/0x1d0
+>      vfs_write+0x30b/0x4b0
+>      ksys_write+0x69/0xf0
+>      do_syscall_64+0xcc/0x1e0
+>      entry_SYSCALL_64_after_hwframe+0x6f/0x77
+> 
+> Fixes: b63e78fca889 ("net: netdevsim: use mock PHC driver")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Fixes: 9431063ad323 ("dpll: core: Add DPLL framework base functions")
-Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
----
-v4:
-- this change was part of [v3 1/3], separate it
-
- drivers/dpll/dpll_core.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
-index 4ddb33462fff..ac426a9be072 100644
---- a/drivers/dpll/dpll_core.c
-+++ b/drivers/dpll/dpll_core.c
-@@ -486,22 +486,23 @@ dpll_pin_alloc(u64 clock_id, u32 pin_idx, struct module *module,
- 	if (WARN_ON(prop->type < DPLL_PIN_TYPE_MUX ||
- 		    prop->type > DPLL_PIN_TYPE_MAX)) {
- 		ret = -EINVAL;
--		goto err;
-+		goto err_pin_prop;
- 	}
- 	ret = dpll_pin_prop_dup(prop, &pin->prop);
- 	if (ret)
--		goto pin_free;
-+		goto err_pin_prop;
- 	refcount_set(&pin->refcount, 1);
- 	xa_init_flags(&pin->dpll_refs, XA_FLAGS_ALLOC);
- 	xa_init_flags(&pin->parent_refs, XA_FLAGS_ALLOC);
- 	ret = xa_alloc_cyclic(&dpll_pin_xa, &pin->id, pin, xa_limit_32b,
- 			      &dpll_pin_xa_id, GFP_KERNEL);
- 	if (ret)
--		goto err;
-+		goto err_xa_alloc;
- 	return pin;
--err:
-+err_xa_alloc:
- 	xa_destroy(&pin->dpll_refs);
- 	xa_destroy(&pin->parent_refs);
-+err_pin_prop:
- 	kfree(pin);
- 	return ERR_PTR(ret);
- }
--- 
-2.38.1
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
