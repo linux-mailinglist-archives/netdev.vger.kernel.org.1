@@ -1,196 +1,260 @@
-Return-Path: <netdev+bounces-64023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49AD1830B26
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 17:35:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95CD2830B4C
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 17:38:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D790F285A6F
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 16:35:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01446290E00
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 16:38:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA5A41E49B;
-	Wed, 17 Jan 2024 16:35:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99F1E21A01;
+	Wed, 17 Jan 2024 16:37:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MIFeBT5n"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02olkn2061.outbound.protection.outlook.com [40.92.48.61])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14617225A4;
-	Wed, 17 Jan 2024 16:35:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.48.61
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705509337; cv=fail; b=cvft3RvZh0uIv36IbtpJcTz2g6pwxcnItCsSFa20Glssu36rdmGHBxEkPvFryh+UH0c+iwnx20ra520o84d5Enh7zk0sMJcMV+HPo+Nfx9Y98Vo6eVK9gaj9CX7bWCXX+uEgWoNjLH1GMG8g7VGFsXZy2ki8N+G86dyxSEbvmFA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705509337; c=relaxed/simple;
-	bh=+D4tWsEoM2OrzLOfxrR+M5scNxOUB9PiqhrItWR9E1k=;
-	h=ARC-Message-Signature:ARC-Authentication-Results:Received:
-	 Received:Message-ID:Date:User-Agent:Subject:To:References:
-	 Content-Language:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:X-TMN:X-ClientProxiedBy:
-	 X-Microsoft-Original-Message-ID:MIME-Version:
-	 X-MS-Exchange-MessageSentRepresentingType:X-MS-PublicTrafficType:
-	 X-MS-TrafficTypeDiagnostic:X-MS-Office365-Filtering-Correlation-Id:
-	 X-MS-Exchange-SLBlob-MailProps:X-Microsoft-Antispam:
-	 X-Microsoft-Antispam-Message-Info:
-	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
-	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-AuthSource:
-	 X-MS-Exchange-CrossTenant-AuthAs:
-	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
-	 X-MS-Exchange-CrossTenant-FromEntityHeader:
-	 X-MS-Exchange-CrossTenant-Id:
-	 X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped; b=WDeTwsbMbNSoTDDSo4o5ANpUNlJ0xaxlQib1msBoO3HeIH939JrrEM92aery8tcgQzsY92zvvghrqsas15PUdTp3CThbA0HM34yBWqXldyQG3wIaH8lQhRK8YXdigyTHtkztTrtedfbQ7ND8vkm9zt+Trxqv/9SD5j5mKapM9AY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.de; spf=pass smtp.mailfrom=hotmail.de; arc=fail smtp.client-ip=40.92.48.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hotmail.de
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Z4kN4EALZyLD4Vl/KBT0rksi53wc78xDsgiHEMISoKWrd2OhZ9BLK3cPNZiFFEERUIwKmyD8gXk1/B94K8+SmKPTrg8ZXh4M+p/rZDhGvBMSC40NX7DP04I/bAZiRrrxA9vsuFyiSMxHOhk+aVWJAFesYBWuzRXHfPgab3bIR5e+orVr/V38dMUsuc45gxjbNXeSG/ZnkaFaADjysnQ+1rQ+joJM7K+JJAz9pefHTUDW5F3yRZvO98ohmWempizGZig3+HeEI+HLgt4EiVUnetBunTh0ts7zD7iNQxe2HMLAYz3K2hJH6rPS66SyXFWmR5G3g7lavIUIoDPcmPnocA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ouXI60Rff+AQzOcciXLsiM5+c5RZDDUoHWczm7qxC4k=;
- b=LxKZWEmNaAm4VxozAo/nKuc6g/Yh+xCXPj6j03DFwNFf4D4fsuvK2aWwL5dqHvQLd9bMYnlQNRPpdTZEsrlj2mphkQiOAtZjxZypyKYiG5S4pvxJyhbpUL8Npe5SMBubaOSEH/u4CynGsJFPvZnY9Lw7X0Y3TZv9a0wGmfWSX792xdu71B2Hq664eapRqvYZeqreEGKDjCz/piYcIVdSa5fHtpLJOr1e6SXh9M+3CKdeodW04vrzYsN8GsNTWsg20LSQ83aDP3k2eUsCF0bbn3ZARGic3AKkETlETIS9zKtEJHAXi+skTEBUnJVwIN1QaUGaSYvwkgGxD3HJvwRWGQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-Received: from AS8P193MB1285.EURP193.PROD.OUTLOOK.COM (2603:10a6:20b:333::21)
- by PAXP193MB2042.EURP193.PROD.OUTLOOK.COM (2603:10a6:102:233::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.28; Wed, 17 Jan
- 2024 16:35:33 +0000
-Received: from AS8P193MB1285.EURP193.PROD.OUTLOOK.COM
- ([fe80::897e:cfd5:b29b:c611]) by AS8P193MB1285.EURP193.PROD.OUTLOOK.COM
- ([fe80::897e:cfd5:b29b:c611%6]) with mapi id 15.20.7202.020; Wed, 17 Jan 2024
- 16:35:33 +0000
-Message-ID:
- <AS8P193MB1285F065377246F347231567E4722@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
-Date: Wed, 17 Jan 2024 17:36:29 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] net: stmmac: Wait a bit for the reset to take effect
-To: Paolo Abeni <pabeni@redhat.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Jiri Pirko <jiri@nvidia.com>, Andrew Morton <akpm@linux-foundation.org>
-References: <AS8P193MB1285DECD77863E02EF45828BE4A1A@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
- <AS8P193MB1285EEAFE30C0DE7B201D33CE46C2@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
- <f5ddf800df95cdce32637d41bc1539aed0a7b6f3.camel@redhat.com>
-Content-Language: en-US
-From: Bernd Edlinger <bernd.edlinger@hotmail.de>
-In-Reply-To: <f5ddf800df95cdce32637d41bc1539aed0a7b6f3.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TMN: [hddFFBG+zeoc7G3cKArf9Nqq0weg2ODvoDbEj5En5uZSxhWtH2vUDb18lANsQW+I]
-X-ClientProxiedBy: FR4P281CA0213.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:e4::13) To AS8P193MB1285.EURP193.PROD.OUTLOOK.COM
- (2603:10a6:20b:333::21)
-X-Microsoft-Original-Message-ID:
- <023b9ecf-0c53-4376-8bbe-231c41b844fb@hotmail.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04B331E875
+	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 16:37:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705509455; cv=none; b=fMFrqrU7sMV1JbRonUX8/4055eod8xBD9iXQ3d/SvtwaiTLE0drU9jh2Oh+OXM7du0oipDce6Q6LuV3r+qsJHWVo3VSKFrUhZ/lMDhYfrWnGcv/AAd91hZNay++SXYf2p+IBz9hrV8eNTJ9PtRfqGhBDdJFlkGcO0Zatz3VkXZM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705509455; c=relaxed/simple;
+	bh=quxqBlELDmx/23WoH7bvn2sOo+t/7W8a40DpmJUSCWU=;
+	h=DKIM-Signature:Received:X-MC-Unique:Received:
+	 X-Google-DKIM-Signature:X-Gm-Message-State:X-Received:
+	 X-Google-Smtp-Source:X-Received:Received:Received:From:To:Cc:
+	 Subject:In-Reply-To:References:X-Clacks-Overhead:Date:Message-ID:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding; b=uQqY+jCgbRZN4rj9LRy86H7Nc2H0r7E/4htEtVHBpMWtAqs0MIIJi/6LaS3upfZMZHf515feBh9gIRtjanoDrJfOYNC2e7rWUnnfGYc2fOtfCLYmKxYDadLIZlCurpwWBR2bDrnzgaI4ffEJxHLQPD1WfknBe2tU4btqn8HiDTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MIFeBT5n; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1705509453;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=se4elMsGJU9EC+SNklZxwLpVdn5NqIm93z2voyeARIM=;
+	b=MIFeBT5npyxCyXklulyqUmAopxWJ7MudZyHFKjKkyJwK3Sh2prDN7x2MAJkUAFq0uT7U+W
+	781LDs3g3XQ7p+xFESyHuDu3zk85o2xeEVEE6SSegf6UKg032IYfTmUeNY27ctfQVEvgF6
+	YzxlBgAED3aZch9svmbFWyzQ1HM4XgA=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-93--2ZjdyYePa28e0AZYGBVwQ-1; Wed, 17 Jan 2024 11:37:31 -0500
+X-MC-Unique: -2ZjdyYePa28e0AZYGBVwQ-1
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-558b96568easo3083967a12.0
+        for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 08:37:31 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705509450; x=1706114250;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=se4elMsGJU9EC+SNklZxwLpVdn5NqIm93z2voyeARIM=;
+        b=o51ufUGO+/axb+CqCZ2qZwF2FHFxdcgwAGL48ty6vCvajEJduABxZb6vq7k9reV/Y3
+         uUYWFOTj0Lou03lxLw9t2hagwZdzxpTKQVZX1RGj+Fng4bEfNpXCh8h1jPDfXNdl5nMn
+         0sexFGijCwYxSaQ1fkk/HCI9RzNFxYqBL6iBVrtR80OyW0EqYAoyJQZiv30GnDZevqQO
+         DFvSFOl0LgqrDyVt4Qd3iJARAUMJOOpwigIkMUled5gwPKt0wQdhobv9Bh1cQajca7Ui
+         q0SSt4F08sFuwdloqlo3j9WPGIS9jKQF0lSIm7/UKaQaLFemza/8wHJ4ofzWLvkH9KI/
+         QFAQ==
+X-Gm-Message-State: AOJu0YwhVGp6YXDLvjdbn3lCZNTWa7E6MAJjY0enGgYcj96ERZMTSGca
+	gDspI91zR4Jj43KEJCLP/n3zdV2R18DPWLociol/gYTBe2WIuomM/WpThBY+cabh5yOwx49dhUU
+	iMH1xWVLc5cKVncUrkKMI3KZV
+X-Received: by 2002:a05:6402:1247:b0:559:edce:d10c with SMTP id l7-20020a056402124700b00559edced10cmr288411edw.18.1705509450569;
+        Wed, 17 Jan 2024 08:37:30 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEOfrMcGpH3jIhyrQhRuVToqnLSPcbgcfmgpIm4KZwzvqpYdTEe2SVKL/BvprDvAeyDQw9uOQ==
+X-Received: by 2002:a05:6402:1247:b0:559:edce:d10c with SMTP id l7-20020a056402124700b00559edced10cmr288393edw.18.1705509450147;
+        Wed, 17 Jan 2024 08:37:30 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id x9-20020aa7cd89000000b00558e0481b2fsm6868305edv.47.2024.01.17.08.37.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Jan 2024 08:37:29 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 4701F1088A04; Wed, 17 Jan 2024 17:37:29 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, LKML
+ <linux-kernel@vger.kernel.org>, Network Development
+ <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Boqun
+ Feng <boqun.feng@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>, Eric
+ Dumazet <edumazet@google.com>, Frederic Weisbecker <frederic@kernel.org>,
+ Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Thomas
+ Gleixner <tglx@linutronix.de>, Waiman Long <longman@redhat.com>, Will
+ Deacon <will@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Andrii
+ Nakryiko <andrii@kernel.org>, Cong Wang <xiyou.wangcong@gmail.com>, Hao
+ Luo <haoluo@google.com>, Jamal Hadi Salim <jhs@mojatatu.com>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, Jiri Olsa <jolsa@kernel.org>, Jiri
+ Pirko <jiri@resnulli.us>, John Fastabend <john.fastabend@gmail.com>, KP
+ Singh <kpsingh@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Ronak
+ Doshi <doshir@vmware.com>, Song Liu <song@kernel.org>, Stanislav Fomichev
+ <sdf@google.com>, VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+ Yonghong Song <yonghong.song@linux.dev>, bpf <bpf@vger.kernel.org>
+Subject: Re: [PATCH net-next 15/24] net: Use nested-BH locking for XDP
+ redirect.
+In-Reply-To: <20240112174138.tMmUs11o@linutronix.de>
+References: <20231215171020.687342-1-bigeasy@linutronix.de>
+ <20231215171020.687342-16-bigeasy@linutronix.de>
+ <CAADnVQKJBpvfyvmgM29FLv+KpLwBBRggXWzwKzaCT9U-4bgxjA@mail.gmail.com>
+ <87r0iw524h.fsf@toke.dk> <20240112174138.tMmUs11o@linutronix.de>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Wed, 17 Jan 2024 17:37:29 +0100
+Message-ID: <87ttnb6hme.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS8P193MB1285:EE_|PAXP193MB2042:EE_
-X-MS-Office365-Filtering-Correlation-Id: 54380be5-0921-43ec-a8d1-08dc177a52fb
-X-MS-Exchange-SLBlob-MailProps:
-	feAVlmA1hHUZZmI+UTsz2TlcID54zgy25WkyCZRWecTk5rYFuVB3uflnSjqT5MdgM5bnqIEWJMcXyko8/fTOE1N7rU7VRZL1vnMB0LYJbgDYG2QXbnRBXN2X3usLu6cMQUk8NKCYU9PhJoCB0KXeWNcIx3YzQVI40P9g674Dr3JINpKaFNMWW+Ol7Jb3YnJfcmNduN9lQXe4t0TUa3WIa6KQF4LQoiC5cHi6V3a+WcC7Sfa3oRK2rPOhZ3PtwugxzIXm1UbIzcmu/wdw3+XMlYuIcwP8YSopWVPOQA3K/zgOCs69OBvEYt4kt//xfB2cLSfMDkSfph/1AmiqCQnwWoT4ENUiJYeKf7PVW8pkWZWSwF+AvjOPbC+B7jkfXrrr3o2ErnpdFXnjCHxGY6Fwv2KXosJE0O2odeFGsi48YGI7HMNfzlfQEDqGJPOOcoNLJmpIvyzvNYTmmL4zY3CZrDeSFtlPaZPu0wlnkRuESbu5hsfsxCg7fqFA/vCY0T2UAvfAl4AP9pMvd3IZiUIzC63hf30rzKLDMwUieW016eUl8uowHUXPDH9xXxoTnz1pxM+R6ffMAXFIx1nbLNGxJOToew4akJeNvvBAxLlVTd5yKuujJ1hIZtd4c5WJn6Slz1JujlinVLgvM5uc+nanQURx9y6o1Aj0ZKoUsSLIgzQf3GGvsYhm4mRv+0crNLX419bA+pVhBSsOTAg+jjidAA==
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	yrRXuL/1JdTk2RKDOt0HPGxr1poO67UBHEnNBS8ZrGCgvaw3h1ef4mX1Pn8GKkTW+r9RfQva3jPlf6ajhc/3FLB0mniy/wBavHhgmOhu/SBxNMas16aIW9NOBb5SeEsz3QpykMUF71Q2PxnFsn/jKEUpmGYQV84Jg6aGzpWIwXOwKREmHSikCQ7puv2Yt9NSO7TuSBMvSo07Uqg1laRdPlLCyHjvvNE1JSVZHxAZHZ/Utv/N2wcJwrylArn9Zs4/T7VolIInV6eX3bOU2CVhehTNtZBkcHyxjx6yOcio/w6Jn3S91mU7V3t1DLuqqULvbtBLfACVxIws4kws76n1ggQ0jC/CIRqh+UZ85UZHlr/cAFfYsUXbOBgmTtV2F8hY3LaqGQVpJDUQdPlT6u5L4NZIvSsTVx6W2MjoFwz8rBC3uPiYO8dz/wp+ECv3Cr6R0K6UVNfYMFq18VnYFicsk8hHTf88AdNSEFIUEQO5qByNc0zMWek+eVUdwo4vuGjhQ4Mq8+lc4O4ylDN9kXhLG+I7BaXQm8q5SodTpKOaSxRbuQBb6LtCknCmmcXoucNt
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?S1Y1TUVNc28zSCt0aU0vNVZrdUVDQkcxVGhXN0Rvamo2cUJBZ2NacWNJUVps?=
- =?utf-8?B?MGNLUnBEejVFYVY4ejVBYUFpTDVzY0ZpTXd0c3NLbk9CTmZmY0FHcjJwM2Nn?=
- =?utf-8?B?dGZsaXFZT0JGS3JiM3Fqcmc0SHlqcWcwOFAvVzkxQm0rUG8vN09objgvaVpi?=
- =?utf-8?B?MXNxb0dxbWxod3VwZDRNUmFkZG50VDNkbWNxN01VTjZlT2dCVS9ncmRoN0wv?=
- =?utf-8?B?TUxKQmc4Tm0zWXplT2JsdEdReFBrU1lkR0Rjb1ZJd1hnUFpiZ0svQXlaRWtp?=
- =?utf-8?B?Nkx1bXRqeXdtRjAwalU3b0c3ZWZUSk45OXVtMVY0M0Z6Q2lWM0dwbHVjTFcw?=
- =?utf-8?B?N3crck84TEEwSnIzU3J5Y2VxanpnUHVGMUJsa0p0U1lRTTQ4N1NPcmJFeTJG?=
- =?utf-8?B?dC9pQU1xOW5KdHlORzdqVHJNanNwczlGZTArTG5wdlkvaXBmd0VCSW45aitU?=
- =?utf-8?B?aDh0WEdJUi9FOXNQNnozR0tQLzJkZDRJZWozdldyUkRSc3d1dWVxelZiYlp2?=
- =?utf-8?B?c0NaZzdXSGVUZlVQbER3MGRXQWxwbzlYM3BJVlZYUXFleWFuckl1WjBDYmU5?=
- =?utf-8?B?Q1V2V0paVjFjbUZ2UVNJSk5WRUVoTmZMdkEzTnVDc2JzaUYzd24wK1UrZzR4?=
- =?utf-8?B?eFMzTStvdHRLWExiMy9WUmZHbVNYclMwZzFOQmlhaDJ2di9aVHNvcjdNVERp?=
- =?utf-8?B?V3N3STlsVDliYXpIbVhMVVpUNkVES3FPNmFJbjRPdkNkQmhZd0xYOVZsOE1T?=
- =?utf-8?B?bTNIazBOUEJnQkVoS3lhVXN4WHFwS0ZhNHNZbHVYZkJLR0dwNFZqcTNvYkVk?=
- =?utf-8?B?cjhyd2ZXUDF2aG9GMUp4d2lvZ0E4Vjdkak9lZ3h0b3JFZmN6RDNGUFhubXJh?=
- =?utf-8?B?eFJJcmxoUFNlNWxFajZqT1ZFcUpDdFVpV2tlalN4SnEyYytxR0ZDS2ZEeTB6?=
- =?utf-8?B?czBWL3JJdWNjWlRVWFhiYjZHVS8rSnJ6VHVMNk8xOFFBN1V2ODlFUDdBWUNN?=
- =?utf-8?B?RUNta0ppb1UxTHFTQXZJVmZOdlFtRFgxQzNrdjBLTlBmN1BzZWtDa2s1Rklx?=
- =?utf-8?B?dnE2bDFkYlN2Y3NVSjRZVEFJSDVwUVJnb2JHOGRWdXBvcDhIaFd2ZkVoOXBy?=
- =?utf-8?B?eXpPVFZWWk0xMXlKbFhvYm45NDBndzdnT0N2dUdHbktnOWRsdmErL2wvZGEw?=
- =?utf-8?B?amIxNHh2OWk5Rk9UaWdZSk1BVlBYY3N2OHpObG4wU0dEN1BqWjhEeDFibG5S?=
- =?utf-8?B?SXE0SGx2VURiRUx2cTlyZGQzbDI0QzF4ZEJHRnlDV200cjVsUmNSSDRtcFkv?=
- =?utf-8?B?WmVDTE9CQzh3UjVlMTBDVklseVhCQUhJcjFrRUdQemVsZ0ZFc2ZlQjZXSTgv?=
- =?utf-8?B?QTlDNnQwRVB5YlVMcTRLSjlFZ0tyMURyWitKZGRpMnFBY21obUo0VEJ1Wk8v?=
- =?utf-8?B?ZnVlTDl3dHlGaSszSG05VGx1N0hLZWQvcWtCYnJKL09Ma0FMNkhVUndPMXBU?=
- =?utf-8?B?azNUTXU2am01aDZGaXlZTENrTForOUh1VEpBckhDdkRocFF1c29CZzBhdGtM?=
- =?utf-8?B?bjdaOStlbWdQVGtwZkVUS04rN0tXWlFLMzZMZlJJRjAzVC9ld0h2V3dKMi91?=
- =?utf-8?B?TU40RVdneHpjdk1RVFIrYmJPam1nMjdYLzN6S3dlRWJ5VUNhb2l3OTU5Vkl0?=
- =?utf-8?B?NlpMbjhXSWVIVmFtZVV6d3graDVMTk91VGxQRXFVRXhmeldzUTNYMjFQZ3RU?=
- =?utf-8?Q?oMkd+/SXYiWJ3wpvVE=3D?=
-X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-80ceb.templateTenant
-X-MS-Exchange-CrossTenant-Network-Message-Id: 54380be5-0921-43ec-a8d1-08dc177a52fb
-X-MS-Exchange-CrossTenant-AuthSource: AS8P193MB1285.EURP193.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jan 2024 16:35:32.9647
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXP193MB2042
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 1/16/24 13:22, Paolo Abeni wrote:
->>
->> Signed-off-by: Bernd Edlinger <bernd.edlinger@hotmail.de>
->>
->> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-> 
-> Please have a better look at the process documentation.
-> 
+Sebastian Andrzej Siewior <bigeasy@linutronix.de> writes:
 
-Yeah, I'm still new here.  Thanks for your patience...
+> On 2024-01-04 20:29:02 [+0100], Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>> Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
+>>=20
+>> >> @@ -3925,6 +3926,7 @@ struct sk_buff *tcf_qevent_handle(struct tcf_qe=
+vent *qe, struct Qdisc *sch, stru
+>> >>
+>> >>         fl =3D rcu_dereference_bh(qe->filter_chain);
+>> >>
+>> >> +       guard(local_lock_nested_bh)(&bpf_run_lock.redirect_lock);
+>> >>         switch (tcf_classify(skb, NULL, fl, &cl_res, false)) {
+>> >>         case TC_ACT_SHOT:
+>> >>                 qdisc_qstats_drop(sch);
+>> >
+>> > Here and in all other places this patch adds locks that
+>> > will kill performance of XDP, tcx and everything else in networking.
+>> >
+>> > I'm surprised Jesper and other folks are not jumping in with nacks.
+>> > We measure performance in nanoseconds here.
+>> > Extra lock is no go.
+>> > Please find a different way without ruining performance.
+>>=20
+>> I'll add that while all this compiles out as no-ops on !PREEMPT_RT, I do
+>> believe there are people who are using XDP on PREEMPT_RT kernels and
+>> still expect decent performance. And to achieve that it is absolutely
+>> imperative that we can amortise expensive operations (such as locking)
+>> over multiple packets.
+>>=20
+>> I realise there's a fundamental trade-off between the amount of
+>> amortisation and the latency hit that we take from holding locks for
+>> longer, but tuning the batch size (while still keeping some amount of
+>> batching) may be a way forward? I suppose Jakub's suggestion in the
+>> other part of the thread, of putting the locks around napi->poll(), is a
+>> step towards something like this.
+>
+> The RT requirements are usually different. Networking as in CAN might be
+> important but Ethernet could only used for remote communication and so
+> "not" important. People complained that they need to wait for Ethernet
+> to be done until the CAN packet can be injected into the stack.
+> With that expectation you would like to pause Ethernet immediately and
+> switch over the CAN interrupt thread.
+>
+> But if someone managed to setup XDP then it is likely to be important.
+> With RT traffic it is usually not the throughput that matters but the
+> latency. You are likely in the position to receive a packet, say every
+> 1ms, and need to respond immediately. XDP would be used to inspect the
+> packet and either hand it over to the stack or process it.
 
-> No empty lines are allowed in the tag area.
-> 
+I am not contesting that latency is important, but it's a pretty
+fundamental trade-off and we don't want to kill throughput entirely
+either. Especially since this is global to the whole kernel; and there
+are definitely people who want to use XDP on an RT kernel and still
+achieve high PPS rates.
 
-Ah, okay, understood.
+(Whether those people really strictly speaking need to be running an RT
+kernel is maybe debatable, but it does happen).
 
-> A fixes tag is requires, something alike:
-> 
-> Fixes: <blamed commit hash> ("<blamed commit title>")
-> 
-> A bisection is not strictly required, you just need to be reasonably
-> confident about the the culprit.
-> 
-> You need to include the relevant target tree into the subj prefix (in
-> this case 'net').
-> 
+> I expected the lock operation (under RT) to always succeeds and not
+> cause any delay because it should not be contended.
 
-The subject line is now:
-"net: stmmac: Wait a bit for the reset to take effect"
+A lock does cause delay even when it's not contended. Bear in mind that
+at 10 Gbps line rate, we have a budget of 64 nanoseconds to process each
+packet (for 64-byte packets). So just the atomic op to figure out
+whether there's any contention (around 10ns on the Intel processors I
+usually test on) will blow a huge chunk of the total processing budget.
+We can't actually do the full processing needed in those 64 nanoseconds
+(not to mention the 6.4 nanoseconds we have available at 100Gbps), which
+is why it's essential to amortise as much as we can over multiple
+packets.
 
-So what exactly should I use here, next time?
+This is all back-of-the-envelope calculations, of course. Having some
+actual numbers to look at would be great; I don't suppose you have a
+setup where you can run xdp-bench and see how your patches affect the
+throughput?
 
-> Please include in the recipients list the persons that provided
-> feedback on previous release (Serge is missing).
-> 
-> I'm unsure why/how Andrew landed in the recipients list!?!
-> 
+> It should only block if something with higher priority preempted the
+> current interrupt thread _and_ also happen to use XDP on the same CPU.
+> In that case (XDP is needed) it would flush the current user out of
+> the locked section before the higher-prio thread could take over.
+> Doing bulk and allowing the low-priority thread to complete would
+> delay the high-priority thread. Maybe I am too pessimistic here and
+> having two XDP programs on one CPU is unlikely to happen.
+>
+> Adding the lock on per-NAPI basis would allow to batch packets.
+> Acquiring the lock only if XDP is supported would not block the CAN
+> drivers since they dont't support XDP. But sounds like a hack.
 
-My mistake, sorry for the spam, Andrew.
+I chatted with Jesper about this, and he had an idea not too far from
+this: split up the XDP and regular stack processing in two stages, each
+with their individual batching. So whereas right now we're doing
+something like:
+
+run_napi()
+  bh_disable()
+  for pkt in budget:
+    act =3D run_xdp(pkt)
+    if (act =3D=3D XDP_PASS)
+      run_netstack(pkt)  // this is the expensive bit
+  bh_enable()
+
+We could instead do:
+
+run_napi()
+  bh_disable()
+  for pkt in budget:
+    act =3D run_xdp(pkt)
+    if (act =3D=3D XDP_PASS)
+      add_to_list(pkt, to_stack_list)
+  bh_enable()
+  // sched point
+  bh_disable()
+  for pkt in to_stack_list:
+    run_netstack(pkt)
+  bh_enable()
 
 
-Bernd.
+This would limit the batching that blocks everything to only the XDP
+processing itself, which should limit the maximum time spent in the
+blocking state significantly compared to what we have today. The caveat
+being that rearranging things like this is potentially a pretty major
+refactoring task that needs to touch all the drivers (even if some of
+the logic can be moved into the core code in the process). So not really
+sure if this approach is feasible, TBH.
+
+> Daniel said netkit doesn't need this locking because it is not
+> supporting this redirect and it made me think. Would it work to make
+> the redirect structures part of the bpf_prog-structure instead of
+> per-CPU? My understanding is that eBPF's programs data structures are
+> part of it and contain locking allowing one eBPF program preempt
+> another one.
+> Having the redirect structures part of the program would obsolete
+> locking. Do I miss anything?
+
+This won't work, unfortunately: the same XDP program can be attached to
+multiple interfaces simultaneously, and for hardware with multiple
+receive queues (which is most of the hardware that supports XDP), it can
+even run simultaneously on multiple CPUs on the same interface. This is
+the reason why this is all being kept in per-CPU variables today.
+
+-Toke
+
 
