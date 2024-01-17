@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-64011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DFDE830AD2
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 17:17:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA8BE830AD3
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 17:17:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4049F1F2A1A8
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 642A128C84F
 	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 16:17:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88F112231C;
-	Wed, 17 Jan 2024 16:16:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E673224D6;
+	Wed, 17 Jan 2024 16:16:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b="Wwmy/zx7"
+	dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b="RB4sQcLS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-64-227.siemens.flowmailer.net (mta-64-227.siemens.flowmailer.net [185.136.64.227])
+Received: from mta-64-225.siemens.flowmailer.net (mta-64-225.siemens.flowmailer.net [185.136.64.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A5C9224F0
-	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 16:16:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74049225CB
+	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 16:16:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705508179; cv=none; b=SVjOTtRt+6u/T1pqaw5HNGi0kfPIfockcFXk9fczwzcCQeHxVbg1WlytKBj61YuZLdAAt03l09eU6g497Ka/S3v2kylwRMElE/3TKTbA9CQPTyPBu3P6TUr/UvrYIy0qVlvjQUx8588A3uhkgEgiErZnfiH8UzRl13C9IC+r3Fk=
+	t=1705508180; cv=none; b=mk6PFOGJqszmBhE1qOLXC9yIjqZ6ZpXxmmVA92TumLb39RvJaGZzWmDn6fQ2XYhs3xTOHQoaUtduMO98nEPjm62wg45KCUSozl3dJ2d8qWx+wXHQKiD1dJT7GuuV7ckGZegChMZ3NRtJY1/Nf/xUyeADOEqc5WySRiHlmqWjG1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705508179; c=relaxed/simple;
-	bh=v1D4C3wuCnMmeD4yJhRO76R/sJ+MPO5PS9ndWkWExzg=;
+	s=arc-20240116; t=1705508180; c=relaxed/simple;
+	bh=rMSakArWwe6ZD4iNvq+Rg+LYemlJwio3LiX4UzdjqAI=;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
-	 MIME-Version:Content-Transfer-Encoding:X-Flowmailer-Platform:
-	 Feedback-ID; b=BuUU5P7os4TOznOfNBW5ZjG1i5xZWp4A8Ec5bsnzvAYIBaLKmjJjOO/tmfWHDwKC3ChVfbCqbc0kGNjlfDIU+pskfBrYeKiuuTOw/UOnkQN9m65ri8Enw7yyXE2KoPAjarL0iISUhQ3tZUTlWibZEI7Nv+qipBNG1xq6KnIyvpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b=Wwmy/zx7; arc=none smtp.client-ip=185.136.64.227
+	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:
+	 X-Flowmailer-Platform:Feedback-ID; b=lbmANgnE3h1f6ytzl0DYpr3pyIy2YTp/NK5XzhlVHJ/rg+JqFBYk+vy4jfU4OIaJk8/bQQTFoiMhY7/vhfOg9Vcct+jKQo+Yto3O+HFvE5pxidP4//3WOc7Jej3x0vmlv8SkD2fwLag76psoiqVssbCyWEREYPPo15dd3RKONcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b=RB4sQcLS; arc=none smtp.client-ip=185.136.64.225
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
-Received: by mta-64-227.siemens.flowmailer.net with ESMTPSA id 20240117161612c12f8bf11f6e9d5106
+Received: by mta-64-225.siemens.flowmailer.net with ESMTPSA id 20240117161614c87781d20ba16840da
         for <netdev@vger.kernel.org>;
-        Wed, 17 Jan 2024 17:16:12 +0100
+        Wed, 17 Jan 2024 17:16:14 +0100
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
  d=siemens.com; i=diogo.ivo@siemens.com;
- h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc;
- bh=2itPv06mgmfT1qp2nK3pOwEj8EUh1SNrKsJPJoi2pIg=;
- b=Wwmy/zx7FKTuEfSB3h3G/zQwPgllsGOni9i6Qe82CYUVzRPXX3rnH7nBvQS7rBQnEPn6Vj
- 2CHv4DFxCpHHrogGasy0sGQumWDTk3SAHKZ5rii1k8H8KyZ3R2hEpz29zjwIC4IyFa3xx19K
- yuzc7OfTzNOz34RRNeKLUnIjXMI5o=;
+ h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
+ bh=V3s9GK0OAb3raYOYAIncj1wCgS57eQxkjBGUikPp6W0=;
+ b=RB4sQcLSvKLe8EBRQL3S8i2ZZjm5pTE+r05xsWSijLbO0i4/k8v+bl4TkMe6T67cBAkQ12
+ u9f9/jTJdrW5nPd0YwJ7LTl1U04OYJ0JlUa6mOkNaUgDgPFoNN1diKnupv9HOWtu0Tji3yTl
+ ONJfs9/tv/BSNEqbFbXMU+/BCgzwI=;
 From: Diogo Ivo <diogo.ivo@siemens.com>
 To: danishanwar@ti.com,
 	rogerq@kernel.org,
@@ -49,11 +49,6 @@ To: danishanwar@ti.com,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	andrew@lunn.ch,
-	dan.carpenter@linaro.org,
-	grygorii.strashko@ti.com,
-	jacob.e.keller@intel.com,
-	robh@kernel.org,
 	robh+dt@kernel.org,
 	krzysztof.kozlowski+dt@linaro.org,
 	conor+dt@kernel.org,
@@ -61,10 +56,12 @@ To: danishanwar@ti.com,
 	netdev@vger.kernel.org,
 	devicetree@vger.kernel.org
 Cc: Diogo Ivo <diogo.ivo@siemens.com>,
-	jan.kiszka@siemens.com
-Subject: [PATCH v2 0/8] Add support for ICSSG-based Ethernet on SR1.0 devices
-Date: Wed, 17 Jan 2024 16:14:54 +0000
-Message-ID: <20240117161602.153233-1-diogo.ivo@siemens.com>
+	Jan Kiszka <jan.kiszka@siemens.com>
+Subject: [PATCH v2 1/8] dt-bindings: net: Add support for AM65x SR1.0 in ICSSG
+Date: Wed, 17 Jan 2024 16:14:55 +0000
+Message-ID: <20240117161602.153233-2-diogo.ivo@siemens.com>
+In-Reply-To: <20240117161602.153233-1-diogo.ivo@siemens.com>
+References: <20240117161602.153233-1-diogo.ivo@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,52 +72,84 @@ Content-Transfer-Encoding: 8bit
 X-Flowmailer-Platform: Siemens
 Feedback-ID: 519:519-1320519:519-21489:flowmailer
 
-Hello,
+Silicon Revision 1.0 of the AM65x came with a slightly different ICSSG
+support: Only 2 PRUs per slice are available and instead 2 additional
+DMA channels are used for management purposes. We have no restrictions
+on specified PRUs, but the DMA channels need to be adjusted.
 
-This series extends the current ICSSG-based Ethernet driver to support
-Silicon Revision 1.0 devices.
-
-Notable differences between the Silicon Revisions are that there is
-no TX core in SR1.0 with this being handled by the firmware, requiring
-extra DMA channels to communicate commands to the firmware (with the
-firmware being different as well) and in the packet classifier.
-
-The motivation behind it is that a significant number of Siemens
-devices containing SR1.0 silicon have been deployed in the field
-and need to be supported and updated to newer kernel versions
-without losing functionality.
-
-This series is based on TI's 5.10 SDK [1].
-
-The first version of this patch series can be found in [2].
-
-[1]: https://git.ti.com/cgit/ti-linux-kernel/ti-linux-kernel/tree/?h=ti-linux-5.10.y
-[2]: https://lore.kernel.org/all/20231219174548.3481-1-diogo.ivo@siemens.com/
-
+Co-developed-by: Jan Kiszka <jan.kiszka@siemens.com>
+Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+Signed-off-by: Diogo Ivo <diogo.ivo@siemens.com>
+---
 Changes in v2:
- - Addressed Krzysztof's comments on the dt-binding
- - Removed explicit references to SR2.0
- - Added static keyword as indicated by the kernel test robot
+ - Removed explicit reference to SR2.0
+ - Moved sr1 to the SoC name
+ - Expand dma-names list and adjust min/maxItems depending on SR1.0/2.0
 
-Diogo Ivo (8):
-  dt-bindings: net: Add support for AM65x SR1.0 in ICSSG
-  net: ti: icssg-config: add SR1.0-specific configuration bits
-  net: ti: icssg-prueth: add SR1.0-specific configuration bits
-  net: ti: icssg-classifier: Add support for SR1.0
-  net: ti: icssg-config: Add SR1.0 configuration functions
-  net: ti: icssg-ethtool: Adjust channel count for SR1.0
-  net: ti: iccsg-prueth: Add necessary functions for SR1.0 support
-  net: ti: icssg-prueth: Wire up support for SR1.0
+ .../bindings/net/ti,icssg-prueth.yaml         | 29 ++++++++++++++++---
+ 1 file changed, 25 insertions(+), 4 deletions(-)
 
- .../bindings/net/ti,icssg-prueth.yaml         |  29 +-
- .../net/ethernet/ti/icssg/icssg_classifier.c  | 113 +++-
- drivers/net/ethernet/ti/icssg/icssg_config.c  |  86 ++-
- drivers/net/ethernet/ti/icssg/icssg_config.h  |  55 ++
- drivers/net/ethernet/ti/icssg/icssg_ethtool.c |  10 +-
- drivers/net/ethernet/ti/icssg/icssg_prueth.c  | 556 ++++++++++++++++--
- drivers/net/ethernet/ti/icssg/icssg_prueth.h  |  21 +-
- 7 files changed, 788 insertions(+), 82 deletions(-)
-
+diff --git a/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml b/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
+index 229c8f32019f..59a3292191d9 100644
+--- a/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
++++ b/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
+@@ -19,8 +19,9 @@ allOf:
+ properties:
+   compatible:
+     enum:
+-      - ti,am642-icssg-prueth  # for AM64x SoC family
+-      - ti,am654-icssg-prueth  # for AM65x SoC family
++      - ti,am642-icssg-prueth      # for AM64x SoC family
++      - ti,am654-icssg-prueth      # for AM65x SoC family
++      - ti,am654-sr1-icssg-prueth  # for AM65x SoC family, SR1.0
+ 
+   sram:
+     $ref: /schemas/types.yaml#/definitions/phandle
+@@ -28,8 +29,7 @@ properties:
+       phandle to MSMC SRAM node
+ 
+   dmas:
+-    maxItems: 10
+-
++    minItems: 10
+   dma-names:
+     items:
+       - const: tx0-0
+@@ -42,6 +42,8 @@ properties:
+       - const: tx1-3
+       - const: rx0
+       - const: rx1
++      - const: rxmgm0
++      - const: rxmgm1
+ 
+   ti,mii-g-rt:
+     $ref: /schemas/types.yaml#/definitions/phandle
+@@ -132,6 +134,25 @@ required:
+   - interrupts
+   - interrupt-names
+ 
++allOf:
++  - if:
++      properties:
++        compatible:
++          contains:
++            const: ti,am654-sr1-icssg-prueth
++    then:
++      properties:
++        dmas:
++          minItems: 12
++        dma-names:
++          minItems: 12
++    else:
++      properties:
++        dmas:
++          maxItems: 10
++        dma-names:
++          maxItems: 10
++
+ unevaluatedProperties: false
+ 
+ examples:
 -- 
 2.43.0
 
