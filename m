@@ -1,219 +1,147 @@
-Return-Path: <netdev+bounces-63974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32C91830920
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 16:06:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DB1D830939
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 16:10:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6C5DAB22363
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 15:05:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E01EA1F2591B
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 15:10:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1B722111A;
-	Wed, 17 Jan 2024 15:05:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D0D82134E;
+	Wed, 17 Jan 2024 15:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="hrOBWr54"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="dDVFeukT"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2074.outbound.protection.outlook.com [40.107.244.74])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8031220DD9;
-	Wed, 17 Jan 2024 15:05:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.74
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705503954; cv=fail; b=KCCZPt13tCknEXhNo8gXtQFeHxn8RgnUwfxrHOY0XJwg8uRDxPqv2WWVjcp9mOrM5nabLGHPlQRraMr5ZoQ1AysIs3gD3abAwwlv1RnWaU6DG93jRUQYHWWJ0MjK2G6vCgHYmKzwE8/mhE0F51PPSUYeVlcnVT3oQZB8q2E2s7E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705503954; c=relaxed/simple;
-	bh=GgSwrFtJrTYot7ZpgRCJNi9bnD1HUCv4GzPEo/mcWLg=;
-	h=ARC-Message-Signature:ARC-Authentication-Results:DKIM-Signature:
-	 Received:Received:X-MS-Exchange-Authentication-Results:
-	 Received-SPF:Received:Received:Received:From:To:CC:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding:Content-Type:X-Originating-IP:
-	 X-ClientProxiedBy:X-EOPAttributedMessage:X-MS-PublicTrafficType:
-	 X-MS-TrafficTypeDiagnostic:X-MS-Office365-Filtering-Correlation-Id:
-	 X-MS-Exchange-SenderADCheck:X-MS-Exchange-AntiSpam-Relay:
-	 X-Microsoft-Antispam:X-Microsoft-Antispam-Message-Info:
-	 X-Forefront-Antispam-Report:X-OriginatorOrg:
-	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
-	 X-MS-Exchange-CrossTenant-Network-Message-Id:
-	 X-MS-Exchange-CrossTenant-Id:
-	 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp:
-	 X-MS-Exchange-CrossTenant-AuthSource:
-	 X-MS-Exchange-CrossTenant-AuthAs:
-	 X-MS-Exchange-CrossTenant-FromEntityHeader:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped; b=iC+iLKKeNRBoMKQH8obPPw/Pk0MFiyMGCFEXoFmd8I0VfGJ2guj62sI1CSiMcIcMa779+Vx+Cb79Ce26pCCZdMGIIt3cry/OO9c795tu+NJQlFGXOem3B3N19XHdB3X/kd3gDnVvwxVe00v/EBqOcVPKd6ed3SBdvSQXFDw3ilI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=hrOBWr54; arc=fail smtp.client-ip=40.107.244.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Z9CxKDeOrX5ETt3FBPS7tx2J9Pp9/T9jGGo4hTJJxUROZreD1xIxMH7u3R70miRgUoi+zEM37s3SDp8buiF/Of8mK/2YtbZQnRxvHoc4VDTiHGPxofuK3juMKjH6vgpVYQPbcl9gMJd47dCoqzFLN7xd7ooUE1eSC3CsmxqSlF/UCKzNCm0wpLsLtBPbvm0g5ZlWOG8YHbPUiydhMmLzas8nS0UjHTQc7fHhY2AaZT509H7WqKGy6g6bNcdkyBIJZkiPV/oEJCcM6+tenXJIvXs6OCf++EZ9VgCfn9VwWpzXnXnhgu/5QDi8DRh7MGVecWnL1pwrrtS4+zAhkogsdA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dqQQUfeOr20GLsiO1xqvRI4+QuBU/PlOhiGjUuQi1XM=;
- b=a6sc/YHprUR24qJfedNBG66Dx1n5uz5VbxdiosRYmUh+ECot2BpIHZhWas5f518au+FAD5hjZM73Cyhu1L5dk2agHL6LpI1vj0u5McaBR4LmBT00aRykbGwDkMsTZtWx2IlvAIvAtzC8jC4VVsdQHhmFT6LxZiiyFlKeDxJ4MJcPubbjoBVLA5XvRn6QSIRJRUffy2Vn5s+tU0t6to5P2hat/xNmfTY6mZ7OOGR1UPbDFkUZVB7DvIxCf68L0xfoRfG36g4muVWgFTyn+T9sCtRKlg9EnKWwj8ZW5mw9A3V+NbDR/Gt1/CzeziLItYxqiP/CYfLnR4Sb6fiYnXzEmg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dqQQUfeOr20GLsiO1xqvRI4+QuBU/PlOhiGjUuQi1XM=;
- b=hrOBWr54ejndwc5Xujhy5dJpPCMdfhhQfIlbkhZQAz9S7n0xJ1Qt0X9iy/Lj5gPpeHAeo5YD3GoJEzT+06Cm912LKYuZAyYp48iUATtfI7SRWNScffhXqdchA0QPXfItogLag8TA8JfDx4s8bpcwJPTGsnJ77t1vVAHHz96zpxCCy3x5A1jT0011znLnUNZwl6AwMM9+AtlIyQLNVlwdmQ5AjUJn0Rg+OVV1AG4VWivUgaLYjibs+KCjogBa5uPUQXPromFE5HOBQ7zgKp+RR2Z7EytckunIaOqeZmXfs/YAETgeTXLk7KatO8TZOynOxxP2cu0VvfjGMbERLslQPw==
-Received: from BYAPR03CA0029.namprd03.prod.outlook.com (2603:10b6:a02:a8::42)
- by SJ1PR12MB6169.namprd12.prod.outlook.com (2603:10b6:a03:45c::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7181.26; Wed, 17 Jan
- 2024 15:05:50 +0000
-Received: from DS3PEPF000099DD.namprd04.prod.outlook.com
- (2603:10b6:a02:a8:cafe::71) by BYAPR03CA0029.outlook.office365.com
- (2603:10b6:a02:a8::42) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.23 via Frontend
- Transport; Wed, 17 Jan 2024 15:05:50 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- DS3PEPF000099DD.mail.protection.outlook.com (10.167.17.199) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7202.16 via Frontend Transport; Wed, 17 Jan 2024 15:05:49 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 17 Jan
- 2024 07:05:20 -0800
-Received: from yaviefel.vdiclient.nvidia.com (10.126.230.35) by
- rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.41; Wed, 17 Jan 2024 07:05:16 -0800
-From: Petr Machata <petrm@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>
-CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
-	Danielle Ratson <danieller@nvidia.com>, Amit Cohen <amcohen@nvidia.com>,
-	"Jiri Pirko" <jiri@resnulli.us>, <mlxsw@nvidia.com>, Shuah Khan
-	<shuah@kernel.org>, <linux-kselftest@vger.kernel.org>
-Subject: [PATCH net 6/6] selftests: mlxsw: qos_pfc: Adjust the test to support 8 lanes
-Date: Wed, 17 Jan 2024 16:04:21 +0100
-Message-ID: <23ff11b7dff031eb04a41c0f5254a2b636cd8ebb.1705502064.git.petrm@nvidia.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1705502064.git.petrm@nvidia.com>
-References: <cover.1705502064.git.petrm@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65E3320DE5;
+	Wed, 17 Jan 2024 15:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705504229; cv=none; b=NSMwWbUn2/QYvPlFK2XEzp8Io3yxPclnxf8QXUYSs3i1X/MDf+nUI3QVEvpgkqybNViDjtmEAzvOawIUpCaqXfomu5bk+gcq/7TjW9S4M1IJdhpznwcwUUbWVxpoiUkIpkdqDHyuX/0zKBbJ8EV62Gy3MSkj1QfwVdXr0S8/jlk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705504229; c=relaxed/simple;
+	bh=zGRFJrEbFry3zxAMuxyIrn8e15iLX/mAR0sIiHyeias=;
+	h=Received:DKIM-Signature:Received:Received:Received:Message-ID:
+	 Date:MIME-Version:User-Agent:Subject:To:CC:References:
+	 Content-Language:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:X-Originating-IP:X-ClientProxiedBy:
+	 X-QCInternal:X-Proofpoint-Virus-Version:X-Proofpoint-ORIG-GUID:
+	 X-Proofpoint-GUID:X-Proofpoint-Virus-Version:
+	 X-Proofpoint-Spam-Details; b=ChXI+ZzRJzIVCZU6HAzGQMBeAVZ5fcvZGQxc5NyASnUTwfB1ADw458jOfHreZLlH4diKeVy33yWf0LeYEfPcXB7Ob1TVPe6y52EOF8YZeIyr8Oun/CJ3G2ox4xOJP928tc8pV+ri4ZU57g/wJZzad/kGwSU2jVpnvolmnAEzcUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=dDVFeukT; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40HEWJdn013589;
+	Wed, 17 Jan 2024 15:10:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=XmbM1Ia5snyMUN+x/M4UwlFkuM1aPLiJeDDKEFNsN8Y=; b=dD
+	VFeukTh5sLMNefzDKoVB2IWkEENH8lV2lI1VfSMylyAhsydILtqYxWB4kwTzp+IS
+	9b30OzRX6CEdq4o+sGcGVLaqh+6cQgOB2duUc48tXOyUzPoDM9FKsbssAwAIZpke
+	TEiq0hrOb2XgdHJw4rSabQ/vIOtYQ2ZDXUfJAejwGe3+KS2OAm3tQ6h+rb5pbIMt
+	h//jHblBsLDzclT0sZvLk1RxZnwrBPawr59HsldZ3UbzZOwduGk9iMvaM/zsr/sO
+	VOfUXibe05WBYudRO4veMELnMyfQdDiJfEBIHUdv52GYl4I/rFUZ7GmQIvee46UO
+	fsPzHGUrIAj6MXGakJfQ==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3vp4ak1mxw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 17 Jan 2024 15:10:15 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 40HFAEbp017623
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 17 Jan 2024 15:10:14 GMT
+Received: from [10.253.79.191] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Wed, 17 Jan
+ 2024 07:10:10 -0800
+Message-ID: <efe398ff-825b-4959-bcfc-ff0870d1932b@quicinc.com>
+Date: Wed, 17 Jan 2024 23:10:07 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF000099DD:EE_|SJ1PR12MB6169:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1b5f2255-c4fd-4c49-fb61-08dc176dca9b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	c0Zw7pOqNkOBZrqqEGh/L9Ts9ZyHfUgfPB0+ck5JrEH2RGi8D6DWlNSH3bV7qc+9u/8V3MErL1obWBKWjU5tDgPWwJsl4smz1lT2I8ZiB5cT3XuGwUBGkYi2m5N2u2KcS4y5kcmCWB7b4pKCYIm07htM7Vn2AzLhkfi3ADrJT+Zkn+GN9LzzBMRAjha/s4KI4hgSgq1IVZvVqgw2ZSzDfRSVVHLdUShTGj5AfRFK52FWzIz+SYf7LB62YgoitplHrN1ocuUNH51r3577fp7Y4H4jmwYBchT2WAayTHPQ2/zudCcOqh1YNvkzfBK9urG0Zu7U8J5ArSuydCt59KsQfBXibU4HHvMwpitkPXYK/ZvaQUYl02zlVd7yrlD2Eeii8XWger4qktlr4DcndCX2ZrQxZh6QJ10Bq94nJhm73zFaWskpTw8QAGDY9AF0p+SAIdrtIEvPGuTjcTCDhFq8F4INGtOVBu6celnC1MMSNSc+E/bFzEoIVATQxfARwLvZXx5Ra7Wi8IymLDcnu5Gs6avMHQ0epSJTVljfoRv2tV7HnnncklHrPymnvoLK5SX6jydaml+WV62B0X1rg1ZSiO/hCwCLz2Q0647cfcYugw5P469Ti2qjj+LqRRp6CIDNI2VCGW8vThfNY7dMLq88wNxiRuOaMygiKLCiy1j4lRwNDYDzWImgnQ5GbX3edCYMYSyl3ologVm9RNBP/QAQqLPth4THpu9clwYfCfFcOsmDVeTT12cG0y6GHocV6QhB
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(376002)(136003)(39860400002)(346002)(396003)(230922051799003)(82310400011)(1800799012)(64100799003)(451199024)(186009)(36840700001)(46966006)(40470700004)(7696005)(6666004)(16526019)(426003)(356005)(336012)(26005)(5660300002)(83380400001)(4326008)(8936002)(41300700001)(47076005)(8676002)(110136005)(54906003)(70586007)(478600001)(316002)(2906002)(70206006)(7636003)(36756003)(82740400003)(86362001)(36860700001)(2616005)(40480700001)(40460700003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jan 2024 15:05:49.6455
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1b5f2255-c4fd-4c49-fb61-08dc176dca9b
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS3PEPF000099DD.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6169
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/6] arm64: dts: qcom: ipq5332: Add MDIO device tree
+To: Andrew Lunn <andrew@lunn.ch>
+CC: <andersson@kernel.org>, <konrad.dybcio@linaro.org>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <quic_kkumarcs@quicinc.com>, <quic_suruchia@quicinc.com>,
+        <quic_soni@quicinc.com>, <quic_pavir@quicinc.com>,
+        <quic_souravp@quicinc.com>, <quic_linchen@quicinc.com>,
+        <quic_leiwei@quicinc.com>
+References: <20240110112059.2498-1-quic_luoj@quicinc.com>
+ <20240110112059.2498-4-quic_luoj@quicinc.com>
+ <4bc0aff5-8a1c-44a6-89d8-460961a61310@lunn.ch>
+ <e893c298-fbfa-4ae4-9b76-72a5030a5530@quicinc.com>
+ <61973012-3f74-4b58-9575-3bc5199f61d9@lunn.ch>
+ <5c88945b-4a80-4346-a77c-82a68ae02047@quicinc.com>
+ <6975e79a-67eb-46d7-8445-92610b8b5198@lunn.ch>
+Content-Language: en-US
+From: Jie Luo <quic_luoj@quicinc.com>
+In-Reply-To: <6975e79a-67eb-46d7-8445-92610b8b5198@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: EthOji6xAPZbL2nJE2QuW4h2Y10JP8N0
+X-Proofpoint-GUID: EthOji6xAPZbL2nJE2QuW4h2Y10JP8N0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-17_08,2024-01-17_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
+ mlxlogscore=369 mlxscore=0 impostorscore=0 phishscore=0 adultscore=0
+ malwarescore=0 suspectscore=0 lowpriorityscore=0 priorityscore=1501
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2311290000 definitions=main-2401170110
 
-From: Amit Cohen <amcohen@nvidia.com>
 
-'qos_pfc' test checks PFC behavior. The idea is to limit the traffic
-using a shaper somewhere in the flow of the packets. In this area, the
-buffer is smaller than the buffer at the beginning of the flow, so it fills
-up until there is no more space left. The test configures there PFC
-which is supposed to notice that the headroom is filling up and send PFC
-Xoff to indicate the transmitter to stop sending traffic for the priorities
-sharing this PG.
 
-The Xon/Xoff threshold is auto-configured and always equal to
-2*(MTU rounded up to cell size). Even after sending the PFC Xoff packet,
-traffic will keep arriving until the transmitter receives and processes
-the PFC packet. This amount of traffic is known as the PFC delay allowance.
+On 1/17/2024 6:56 AM, Andrew Lunn wrote:
+>> Another one is the MDIO slave(gpio25, 26), which is dedicated
+>> for receiving the back pressure signal from the connected Ethernet switch
+>> device QCA8386.
+>>
+>> There is a MDIO master block integrated in QCA8386 switch device, this
+>> integrated MDIO master is dedicated for generating the back
+>> pressure signal to IPQ5332 SoC.
+>>
+>> This MDIO slave block of IPQ5322 just needs to configure these PIN
+>> mux for MDC and MDIO PINs. No additional driver is needed for this MDIO
+>> slave block of IPQ5332.
+> 
+> So there is a proprietary protocol running over the MDIO bus? And its
+> completely implemented in hardware in the slave block? Is this even
+> MDIO? Does it use c22 or c45 bus transactions? How is the slave
+> address configured, or is that also hard coded?
+> 
+> 	Andrew
+> 
 
-Currently the buffer for the delay traffic is configured as 100KB. The
-MTU in the test is 10KB, therefore the threshold for Xoff is about 20KB.
-This allows 80KB extra to be stored in this buffer.
+Hi Andrew,
+Yes, this is a custom HW mechanism using the MDIO C22 frame, to enable 
+back pressure from the QCA8386 switch to the IPQ5332 SoC. The slave 
+block in the IPQ5332 SoC implements the back pressure function. There is 
+no configuration for the MDIO slave address of IPQ5332 required, since 
+the connection is one to one between slave and master.
 
-8-lane ports use two buffers among which the configured buffer is split,
-the Xoff threshold then applies to each buffer in parallel.
+However upon further review, we believe this node definition belongs to
+the board DTS file, since the switch configuration is a board property.
+We will move out this MDIO slave config from the patch series to
+avoid the confusion. We will also rename the node from 'mdio0-state' to 
+'backpressure-state' to make this clear.
 
-The test does not take into account the behavior of 8-lane ports, when the
-ports are configured to 400Gbps with 8 lanes or 800Gbps with 8 lanes,
-packets are dropped and the test fails.
-
-Check if the relevant ports use 8 lanes, in such case double the size of
-the buffer, as the headroom is split half-half.
-
-Cc: Shuah Khan <shuah@kernel.org>
-Cc: linux-kselftest@vger.kernel.org
-Fixes: bfa804784e32 ("selftests: mlxsw: Add a PFC test")
-Signed-off-by: Amit Cohen <amcohen@nvidia.com>
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-Signed-off-by: Petr Machata <petrm@nvidia.com>
----
- .../selftests/drivers/net/mlxsw/qos_pfc.sh     | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/drivers/net/mlxsw/qos_pfc.sh b/tools/testing/selftests/drivers/net/mlxsw/qos_pfc.sh
-index 49bef76083b8..0f0f4f05807c 100755
---- a/tools/testing/selftests/drivers/net/mlxsw/qos_pfc.sh
-+++ b/tools/testing/selftests/drivers/net/mlxsw/qos_pfc.sh
-@@ -119,6 +119,9 @@ h2_destroy()
- 
- switch_create()
- {
-+	local lanes_swp4
-+	local pg1_size
-+
- 	# pools
- 	# -----
- 
-@@ -228,7 +231,20 @@ switch_create()
- 	dcb pfc set dev $swp4 prio-pfc all:off 1:on
- 	# PG0 will get autoconfigured to Xoff, give PG1 arbitrarily 100K, which
- 	# is (-2*MTU) about 80K of delay provision.
--	dcb buffer set dev $swp4 buffer-size all:0 1:$_100KB
-+	pg1_size=$_100KB
-+
-+	setup_wait_dev_with_timeout $swp4
-+
-+	lanes_swp4=$(ethtool $swp4 | grep 'Lanes:')
-+	lanes_swp4=${lanes_swp4#*"Lanes: "}
-+
-+	# 8-lane ports use two buffers among which the configured buffer
-+	# is split, so double the size to get twice (20K + 80K).
-+	if [[ $lanes_swp4 -eq 8 ]]; then
-+		pg1_size=$((pg1_size * 2))
-+	fi
-+
-+	dcb buffer set dev $swp4 buffer-size all:0 1:$pg1_size
- 
- 	# bridges
- 	# -------
--- 
-2.42.0
-
+Thanks.
 
