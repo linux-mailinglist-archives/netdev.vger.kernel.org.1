@@ -1,152 +1,339 @@
-Return-Path: <netdev+bounces-64044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 549EC830D2F
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 20:15:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EDE3830D59
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 20:39:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66BED1C20F4B
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 19:15:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7793D2819D6
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 19:39:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D40F824208;
-	Wed, 17 Jan 2024 19:15:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E657249F3;
+	Wed, 17 Jan 2024 19:39:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WlUqDEhB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A5RrOCHq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C7E249E0
-	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 19:15:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4999024200;
+	Wed, 17 Jan 2024 19:39:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705518952; cv=none; b=BSUOtyHUGdJas4Y3mxNNYNNsTU7Mijn0Bg3RhNlpVwAaRoWhKBv0rlDw9OEW+dRQrQiaZyrW9Eoi8zfHVR36TvRh3o9oxf47BwT60IHyX3XTb+QhbmzC16LhP6Y/+tyqGVoTuEvgBKqNf3FB3ReqlKHyUeWBYU3qVpHw0SZc65Q=
+	t=1705520373; cv=none; b=aBaaqjt7X2H/t9AzkP2bTzVnzwiJ/d87OhRt45Nc7MoFyeeUhZ0FpXgkKZnepAyk1qWMj32TFkqcnfXje9eP2+IRabnvSxJsRgUGukLbsmok3U/LbX8SENrR5FqCMIrHuMvUlO2fvcIwkJ4xZUSSCMazJlSeXya07ezp7UiRUBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705518952; c=relaxed/simple;
-	bh=ndeVmTSympbvoFP9PtZ3+RePaSKFZ1ZgOfmAi+k5FB8=;
+	s=arc-20240116; t=1705520373; c=relaxed/simple;
+	bh=xUW41l+F6yt3WPTcJFmF0WlaMMfrGbYszW2gpGLTF7c=;
 	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:MIME-Version:
-	 References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:
-	 Content-Type:Content-Transfer-Encoding; b=MnBKMWu+vKmuHKsNRjR+V3ThJISYVKe8QCeh8s7GHwT+0A7J4HizcZLpvtTSkQiOt7eLOG1IjV8X3R4hJ6IhPuY5/BjdmxovgDDHZm9LdtxCvKhKo3Vl9ATxPz6IMorIFAETPpfCo9+0qJPlBdp7qJUJB0zipnP5k3m8JmGEtTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WlUqDEhB; arc=none smtp.client-ip=209.85.221.178
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:
+	 Message-ID:Date:MIME-Version:User-Agent:Subject:Content-Language:
+	 To:Cc:References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding; b=MNLEzl73a6xofdvX88jOZW0OPQomJ+vwAoi/OnQw0YIwJHr2Rx3Sr1YEkZY7ItshZxRzqNCfw4rFHVAfCkiqYY2ZWFQkbw7WONwRfHIa9Jbe7ZdL2FCwhjgjAHgaYByWMKab4FThRbe0B8xC59gDG0e4SukC6NM54I50HgwP2gk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A5RrOCHq; arc=none smtp.client-ip=209.85.128.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-4b7a3189d47so2856424e0c.0
-        for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 11:15:51 -0800 (PST)
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-40e86a9fc4bso20710575e9.2;
+        Wed, 17 Jan 2024 11:39:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705518950; x=1706123750; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8u7/YUYi6X+124aNRigORl9P3Y9dhPfI5XUwuqBIIfk=;
-        b=WlUqDEhBnliHV/0H+wZwKg5TDpmQCRXqnuD4QXmVXKhOI+MvFjbxS0KpHBJ/wxmTlS
-         qmHR5oFSl6Mii+MEccKAAiIEw3hMvvEUS4WRfax+hHcYsv1H60LNpnkJ59Px9Js1w81O
-         mA3NZ1C639Q2JMf+LTt6zsGn9Sri7vw7z9mibFr7P3/5CSPH2Rgu7r0ZmNDtNJIojDAX
-         Qju39Ed/M4+36ko4qH5dZlyRgCNFYkDwTMA9UoeFEwAvoJIYLXBU9FpSe5b3qhlDHF/Z
-         iR0WHvNX9Cvb7Qra/28Yjt6HqndUD8v21FqNOz2OHSwq41Nx+Q//Cz+fCh70yGixL1FV
-         BAYQ==
+        d=gmail.com; s=20230601; t=1705520369; x=1706125169; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QeuTafQX40/bhE79jlyyxN484RLluokaSda2KNrJ6KI=;
+        b=A5RrOCHqwbhK1AVWjGXTAZruAEXNsic6HA4NbDW9qbxr2arqlruaTzbYaf/HJFI5PW
+         iazMMoxeUwYldJauBXtXSnapYe+Ha2G/8jxjyII9/EF4IoT/HOJXZI6/Lew5uIWqyLBK
+         lI0njmR4Iv7RlfwH7NQi2UtWnAuR5WlrTTu5NLRw7GSUMut5xhtEk+z5RgbnSFtmEsDo
+         gy1ri7SyF+Zb5HUV66KBmpEzU9BC91nZogtC/zpvsfRW97or0bI4nSlkkOH9LerrQPEW
+         OM8eGw2+WvxEXeCEG8IBi7wbPOjB9k+FprT6kB03aUx5t+9oCLRTuhE4QSELxP8UaN9W
+         qudw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705518950; x=1706123750;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8u7/YUYi6X+124aNRigORl9P3Y9dhPfI5XUwuqBIIfk=;
-        b=UkLUX36wqAd0pqYw5r/lpnS71lYL4GQN9+p2ngkcbo4TMek3H37dZzttT27sLxnXQJ
-         d3cx1bi6+ECr+mXqXIgzSvZCGrz0IH4g+M+mr2D3p2/7iaK735vC4IAsKL/nkSkb9Ro9
-         6pEeCnbVHmSfm7sbMYSY0GAUtVpyrI/Wwsrgv4pZFQs7Qi1NKgCWbt0MS8JE5KJmbEvo
-         euBvJXzrdyEht55e5yg0te99g2CPFOJpEjviAziqrCnwE2zSXP3GNAeMZCbzDyioPz5X
-         OaCPhMq5eFtg0kjnOwA4sTPpCYxDyJ7Y4x9g1zpW53xFBjfYmYLvLj99sqfmPkHUJBkX
-         VOhQ==
-X-Gm-Message-State: AOJu0YyRjXxVvhFLiLj/qxmX0hmKjdQYcJy74Mb1gv0NriuHfvtklNSB
-	Az/AQ9Ti2OlcuPPnzx8sHQKfYP11fcy1/Okh0uA=
-X-Google-Smtp-Source: AGHT+IG+5f0xumCQdR+iMOuk5gHknkxNPe7A/uosT+T189qCthxbfb4XTMwBx6hhfKtBNNaR965c8S+qpprzfHO6wLI=
-X-Received: by 2002:a05:6122:45a2:b0:4b7:e07c:57b6 with SMTP id
- de34-20020a05612245a200b004b7e07c57b6mr5464179vkb.7.1705518950189; Wed, 17
- Jan 2024 11:15:50 -0800 (PST)
+        d=1e100.net; s=20230601; t=1705520369; x=1706125169;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QeuTafQX40/bhE79jlyyxN484RLluokaSda2KNrJ6KI=;
+        b=q6Kkt8vXWqpXSuBhRSzbxsfKCSGUPUg7NEnmxDzQpw4Jy549ljoeWOYqXlXveOvebM
+         f9oMZ2Ts0v2f7fNI6MALVa+aQBA44UUGs/qh8e+G9AOYR0Dncm7sLeBwQCVvL5bkphXz
+         SrFOnzncwfGMTlW9nxjbuk0G1qORxmA95YvwBT3s0YGq46GoiozFokwS8uwGuodniI3S
+         x+Pb9Woybsx6OxJYE3tlYxpQI1A5IysHgaHySC0bG/ubJZSj45SLKVZ0TXwmfKOsrh+j
+         zTWcqOly4+9PAV+G0i63++Zyv8q1Qby+//uhBBZOay/by4IBoc7NwTuyihMM7fwLoTWS
+         e11g==
+X-Gm-Message-State: AOJu0YxmHi9K2HdAaYVylU85TAKoL4TEURo1GRLsYtNy0q1nLI0CBWmy
+	OgUpuP/yhqVJRYQSva24MHc=
+X-Google-Smtp-Source: AGHT+IGQ/vgsgMyVvJJZEFczZQRj1bkOBQgeDCIkSAsQdn9ihyhpR1zcD1iO3JBmHov+nZGsYZZC1Q==
+X-Received: by 2002:a05:600c:1392:b0:40e:479d:ce47 with SMTP id u18-20020a05600c139200b0040e479dce47mr4893168wmf.181.1705520369096;
+        Wed, 17 Jan 2024 11:39:29 -0800 (PST)
+Received: from [192.168.0.3] ([69.6.8.124])
+        by smtp.gmail.com with ESMTPSA id y8-20020a5d4ac8000000b00337af95c1d2sm2325448wrs.14.2024.01.17.11.39.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 Jan 2024 11:39:28 -0800 (PST)
+Message-ID: <c81af808-d836-4054-b596-4a53b05f4c78@gmail.com>
+Date: Wed, 17 Jan 2024 21:39:25 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAOid5F-mJn+vnC6x885Ykq8_OckMeVkZjqqvFQv4CxAxUT1kxg@mail.gmail.com>
- <SJ0PR18MB5216A0508C53C5D669C07F72DB6B2@SJ0PR18MB5216.namprd18.prod.outlook.com>
- <SJ0PR18MB5216EBC3753D319B00613E79DB6B2@SJ0PR18MB5216.namprd18.prod.outlook.com>
-In-Reply-To: <SJ0PR18MB5216EBC3753D319B00613E79DB6B2@SJ0PR18MB5216.namprd18.prod.outlook.com>
-From: Vikas Aggarwal <vik.reck@gmail.com>
-Date: Thu, 18 Jan 2024 00:45:41 +0530
-Message-ID: <CAOid5F8TV=LbN_UZzmGfOrq1kh8hak7jrivHm2U9pQSuioJP6g@mail.gmail.com>
-Subject: Re: [EXT] tc-mirred : Redirect Broadcast (like ARP) pkts rcvd on eth1
- towards eth0
-To: Suman Ghosh <sumang@marvell.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "jhs@mojatatu.com" <jhs@mojatatu.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next PATCH RFC v3 1/8] dt-bindings: net: document ethernet
+ PHY package nodes
+Content-Language: en-US
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Robert Marko <robert.marko@sartura.hr>, Andrew Lunn <andrew@lunn.ch>,
+ Vladimir Oltean <olteanv@gmail.com>, Rob Herring <robh+dt@kernel.org>,
+ Luo Jie <quic_luoj@quicinc.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Andy Gross <agross@kernel.org>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konrad.dybcio@linaro.org>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+References: <20231126015346.25208-1-ansuelsmth@gmail.com>
+ <20231126015346.25208-2-ansuelsmth@gmail.com>
+ <0926ea46-1ce4-4118-a04c-b6badc0b9e15@gmail.com>
+ <659aedb1.df0a0220.35691.1853@mx.google.com>
+ <0f4ec2ff-4ef7-4667-adef-d065cfbc0a91@gmail.com>
+ <65a7210f.df0a0220.d10b2.1162@mx.google.com>
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+In-Reply-To: <65a7210f.df0a0220.d10b2.1162@mx.google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Thanks Suman that works.
-I need similar "redirect rule" on egress side.  Suppose if i do udhcpc
--i eth1  then I want  DHCP to resolve via eth0.
-Syntax on egress (root) side is different and more complicated and I
-need to learn egress syntax.
-I am trying to tc filter + mirror  based on udp and DHCP port 67-68 .
-Can you please help with this  egress side DHCP redirect too.
-Thanks Again
-Vikas
+Hi Christian,
 
-On Mon, Jan 8, 2024 at 12:19=E2=80=AFPM Suman Ghosh <sumang@marvell.com> wr=
-ote:
->
-> Sorry for the typo on the last netdev interface
->
-> tc filter add dev eth1 ingress protocol ip flower dst_mac <DMAC> m <MASK>=
- action mirred ingress mirror dev eth0
->
-> Regards,
-> Suman
->
-> >-----Original Message-----
-> >From: Suman Ghosh <sumang@marvell.com>
-> >Sent: Monday, January 8, 2024 12:17 PM
-> >To: Vikas Aggarwal <vik.reck@gmail.com>; netdev@vger.kernel.org;
-> >jhs@mojatatu.com
-> >Subject: RE: [EXT] tc-mirred : Redirect Broadcast (like ARP) pkts rcvd o=
-n
-> >eth1 towards eth0
-> >
-> >Hi Vikas,
-> >
-> >As I understand, tc mirror is an action and can be applied with any filt=
-er
-> >rules. So, something below you can try
-> >
-> >tc filter add dev eth1 ingress protocol ip flower dst_mac <DMAC> m <MASK=
->
-> >action mirred ingress mirror dev eth1
-> >
-> >Regards,
-> >Suman
-> >
-> >>-----Original Message-----
-> >>From: Vikas Aggarwal <vik.reck@gmail.com>
-> >>Sent: Monday, January 8, 2024 11:36 AM
-> >>To: netdev@vger.kernel.org; jhs@mojatatu.com
-> >>Subject: [EXT] tc-mirred : Redirect Broadcast (like ARP) pkts rcvd on
-> >>eth1 towards eth0
-> >>
-> >>External Email
-> >>
-> >>----------------------------------------------------------------------
-> >>Hello "tc" experts,
-> >>
-> >>I have questions regarding  tc-mirred.
-> >>
-> >>Can tc-mirred tool  match on ethernet destination MAC address as I want
-> >>to redirect all broadcast pkts recvd on my ETH1 interface from external
-> >>network  to appear on ETH0 ingress interface.
-> >>
-> >>Thanks & Regards
-> >>-vik.reck
->
+On 17.01.2024 02:36, Christian Marangi wrote:
+> On Sun, Jan 07, 2024 at 11:49:12PM +0200, Sergey Ryazanov wrote:
+>> Hi Christian,
+>>
+>> On 07.01.2024 20:30, Christian Marangi wrote:
+>>> On Sun, Jan 07, 2024 at 08:00:33PM +0200, Sergey Ryazanov wrote:
+>>>> On 26.11.2023 03:53, Christian Marangi wrote:
+>>>>> Document ethernet PHY package nodes used to describe PHY shipped in
+>>>>> bundle of 4-5 PHY. The special node describe a container of PHY that
+>>>>> share common properties. This is a generic schema and PHY package
+>>>>> should create specialized version with the required additional shared
+>>>>> properties.
+>>>>>
+>>>>> Example are PHY package that have some regs only in one PHY of the
+>>>>> package and will affect every other PHY in the package, for example
+>>>>> related to PHY interface mode calibration or global PHY mode selection.
+>>>>>
+>>>>> The PHY package node MUST declare the base address used by the PHY driver
+>>>>> for global configuration by calculating the offsets of the global PHY
+>>>>> based on the base address of the PHY package and declare the
+>>>>> "ethrnet-phy-package" compatible.
+>>>>>
+>>>>> Each reg of the PHY defined in the PHY package node is absolute and will
+>>>>> reference the real address of the PHY on the bus.
+>>>>>
+>>>>> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+>>>>> ---
+>>>>>     .../bindings/net/ethernet-phy-package.yaml    | 75 +++++++++++++++++++
+>>>>>     1 file changed, 75 insertions(+)
+>>>>>     create mode 100644 Documentation/devicetree/bindings/net/ethernet-phy-package.yaml
+>>>>>
+>>>>> diff --git a/Documentation/devicetree/bindings/net/ethernet-phy-package.yaml b/Documentation/devicetree/bindings/net/ethernet-phy-package.yaml
+>>>>> new file mode 100644
+>>>>> index 000000000000..244d4bc29164
+>>>>> --- /dev/null
+>>>>> +++ b/Documentation/devicetree/bindings/net/ethernet-phy-package.yaml
+>>>>> @@ -0,0 +1,75 @@
+>>>>> +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+>>>>> +%YAML 1.2
+>>>>> +---
+>>>>> +$id: http://devicetree.org/schemas/net/ethernet-phy-package.yaml#
+>>>>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>>>>> +
+>>>>> +title: Ethernet PHY Package Common Properties
+>>>>> +
+>>>>> +maintainers:
+>>>>> +  - Christian Marangi <ansuelsmth@gmail.com>
+>>>>> +
+>>>>> +description:
+>>>>> +  This schema describe PHY package as simple container for
+>>>>> +  a bundle of PHYs that share the same properties and
+>>>>> +  contains the PHYs of the package themself.
+>>>>> +
+>>>>> +  Each reg of the PHYs defined in the PHY package node is
+>>>>> +  absolute and describe the real address of the PHY on the bus.
+>>>>> +
+>>>>> +properties:
+>>>>> +  $nodename:
+>>>>> +    pattern: "^ethernet-phy-package(@[a-f0-9]+)?$"
+>>>>> +
+>>>>> +  compatible:
+>>>>> +    const: ethernet-phy-package
+>>>>> +
+>>>>> +  reg:
+>>>>> +    minimum: 0
+>>>>> +    maximum: 31
+>>>>> +    description:
+>>>>> +      The base ID number for the PHY package.
+>>>>> +      Commonly the ID of the first PHY in the PHY package.
+>>>>> +
+>>>>> +      Some PHY in the PHY package might be not defined but
+>>>>> +      still exist on the device (just not attached to anything).
+>>>>> +      The reg defined in the PHY package node might differ and
+>>>>> +      the related PHY might be not defined.
+>>>>> +
+>>>>> +  '#address-cells':
+>>>>> +    const: 1
+>>>>> +
+>>>>> +  '#size-cells':
+>>>>> +    const: 0
+>>>>> +
+>>>>> +patternProperties:
+>>>>> +  ^ethernet-phy(@[a-f0-9]+)?$:
+>>>>> +    $ref: ethernet-phy.yaml#
+>>>>> +
+>>>>> +required:
+>>>>> +  - compatible
+>>>>> +  - reg
+>>>>> +
+>>>>> +additionalProperties: true
+>>>>> +
+>>>>> +examples:
+>>>>> +  - |
+>>>>> +    mdio {
+>>>>> +        #address-cells = <1>;
+>>>>> +        #size-cells = <0>;
+>>>>> +
+>>>>> +        ethernet-phy-package@16 {
+>>>>> +            #address-cells = <1>;
+>>>>> +            #size-cells = <0>;
+>>>>> +            compatible = "ethernet-phy-package";
+>>>>> +            reg = <0x16>;
+>>>>> +
+>>>>> +            ethernet-phy@16 {
+>>>>> +              reg = <0x16>;
+>>>>> +            };
+>>>>> +
+>>>>> +            phy4: ethernet-phy@1a {
+>>>>> +              reg = <0x1a>;
+>>>>> +            };
+>>>>> +        };
+>>>>> +    };
+>>>>
+>>>> So, we ended up on a design where we use the predefined compatible string
+>>>> 'ethernet-phy-package' to recognize a phy package inside the
+>>>> of_mdiobus_register() function. During the V1 discussion, Vladimir came up
+>>>> with the idea of 'ranges' property usage [1]. Can we use 'ranges' to
+>>>> recognize a phy package in of_mdiobus_register()? IMHO this will give us a
+>>>> clear DT solution. I mean 'ranges' clearly indicates that child nodes are in
+>>>> the same address range as the parent node. Also we can list all child
+>>>> addresses in 'reg' to mark them occupied.
+>>>>
+>>>>     mdio {
+>>>>       ...
+>>>>
+>>>>       ethernet-phy-package@16 {
+>>>>         compatible = "qcom,qca8075";
+>>>>         reg = <0x16>, <0x17>, <0x18>, <0x19>, <0x1a>;
+>>>>         ranges;
+>>>>         ...
+>>>>
+>>>>         ethernet-phy@16 {
+>>>>           reg = <0x16>;
+>>>>         };
+>>>>
+>>>>         ethernet-phy@1a {
+>>>>           reg = <0x1a>;
+>>>>         };
+>>>>       };
+>>>>     };
+>>>>
+>>>> Did you find some issues with the 'ranges' conception?
+>>>
+>>> Nope it's ok but it might pose some confusion with the idea that the
+>>> very first element MUST be THE STARTING ADDR of the PHY package. (people
+>>> might think that it's just the list of the PHYs in the package and
+>>> remove the hardware unconnected ones... but that would be fault of who
+>>> write the DT anyway.)
+>>
+>> Make sense. I do not insist on addresses listing. Mainly I'm thinking of a
+>> proper way to show that child nodes are accessible directly on the parent
+>> bus, and introducing the special compatibility string, while we already have
+>> the 'ranges' property.
+>>
+>> But it's good to know Rob's opinion on whether it is conceptually right to
+>> use 'ranges' here.
+>>
+> 
+> I wonder if something like this might make sense... Thing is that with
+> the ranges property we would have the define the address in the PHY
+> Package node as offsets...
+> 
+> An example would be
+> 
+>      mdio {
+>          #address-cells = <1>;
+>          #size-cells = <0>;
+> 
+>          ethernet-phy-package@10 {
+>              #address-cells = <1>;
+>              #size-cells = <0>;
+>              compatible = "qcom,qca807x-package";
+>              reg = <0x10>;
+>              ranges = <0x0 0x10 0x5>;
+> 
+>              qcom,package-mode = "qsgmii";
+> 
+>              ethernet-phy@0 {
+>                  reg = <0>;
+> 
+>                  leds {
+> 
+> 		...
+> 
+> With a PHY Package at 0x10, that span 5 address and the child starts at
+> 0x0 offset.
+> 
+> This way we would be very precise on describing the amount of address
+> used by the PHY Package without having to define the PHY not actually
+> connected.
+> 
+> PHY needs to be at an offset to make sense of the ranges first element
+> property (0x0). With a non offset way we would have to have something
+> like
+> 
+> ranges = <0x10 0x10 0x5>;
+> 
+> With the child and tha parent always matching.
+> 
+> (this is easy to handle in the parsing and probe as we will just
+> calculate the real address based on the base address of the PHY package
+> + offset)
+
+On one hand it makes sense and looks useful for software development. On 
+another, it looks like a violation of the main DT designing rule, when 
+DT should be used to describe that hardware properties, which can not be 
+learnt from other sources.
+
+As far as I understand this specific chip, each of embedded PHYs has its 
+own MDIO bus address and not an offset from a main common address. 
+Correct me please, if I am got it wrong.
+
+> I hope Rob can give more feedback about this, is this what you were
+> thinking with the usage of ranges property?
+> 
+> (this has also the bonus point of introducing some validation in the PHY
+> core code to make sure the right amount of PHY are defined in the
+> package by checking if the number of PHY doesn't exceed the value set in
+> ranges.)
+
+Yep, I am also would like to hear some clarification from Rob regarding 
+acceptable 'range' property usage and may be some advice on how to 
+specify the size of occupied addresses. Rob?
+
+--
+Sergey
 
