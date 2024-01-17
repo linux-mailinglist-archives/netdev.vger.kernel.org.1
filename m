@@ -1,107 +1,129 @@
-Return-Path: <netdev+bounces-63910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63911-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EE138300D1
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 08:54:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48E87830164
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 09:38:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1E691F2508A
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 07:54:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D208528716E
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 08:38:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F961BE7D;
-	Wed, 17 Jan 2024 07:54:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6DAD111BD;
+	Wed, 17 Jan 2024 08:38:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SwpjjwbL"
 X-Original-To: netdev@vger.kernel.org
-Received: from zju.edu.cn (mail.zju.edu.cn [61.164.42.155])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEB9BBE4C;
-	Wed, 17 Jan 2024 07:54:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=61.164.42.155
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DBCC12B68;
+	Wed, 17 Jan 2024 08:38:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705478086; cv=none; b=Y7zVyIswoqBQ/TTeqbI1pBvdwJORSSm7uR03x069+R97NoHm4seJCnH2C4ZMMx8GSnsnkNz3v3liSUEHZosi6JH+tJ09xnPfpAnFQXTEQhLfWgAhl98YBhrbMhYMmnQhgUf5f384XrGgL34rxN5QtQ3BqHBFZCVcK8HbQKOMtOk=
+	t=1705480695; cv=none; b=XJeoizpxWcEJUcVfXmecxiq82+AljflgGjTc8wmJNwDMPZC7qVoAhiZEgGQlSpBJ7hKDdrw7Pd1ozur9l9VkhBA/dfKVdA6B8ZKDbEfnC91jCyLxBJDSBp1MFf/DD/aUCHTqiaq8mw/9ToPSwuz9cMYdAkQG6jisdm79sIlW4Bc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705478086; c=relaxed/simple;
-	bh=bft6uYbqYzVjjoyHDm8/hguW0uSZtqXMt+NzZgBgLAg=;
-	h=Received:X-Originating-IP:Date:X-CM-HeaderCharset:From:To:Cc:
-	 Subject:X-Priority:X-Mailer:In-Reply-To:References:
-	 Content-Transfer-Encoding:Content-Type:MIME-Version:Message-ID:
-	 X-Coremail-Locale:X-CM-TRANSID:X-CM-SenderInfo:
-	 X-Coremail-Antispam; b=taoDVzeKU9w3qHUDeLVkS3/7vQcHV8UDORJFHmTksffnXL6tD2uYNhIp+jL1WKNr1mG1eedniA8QBYUDfYmZ88x/vV9TmMt9tWjlyoPJN6w8/TnCLkS2lKY7I2vBwM7WjBnLgPbxLWPMAfiVA9MPSIPcF8AMpnmHAc7th6szBFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=61.164.42.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from alexious$zju.edu.cn ( [10.190.68.184] ) by
- ajax-webmail-mail-app3 (Coremail) ; Wed, 17 Jan 2024 15:44:45 +0800
- (GMT+08:00)
-Date: Wed, 17 Jan 2024 15:44:45 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: alexious@zju.edu.cn
-To: "Chuck Lever III" <chuck.lever@oracle.com>
-Cc: "Simon Horman" <horms@kernel.org>, "Jeff Layton" <jlayton@kernel.org>,
-	"Neil Brown" <neilb@suse.de>, "Olga Kornievskaia" <kolga@netapp.com>,
-	"Dai Ngo" <dai.ngo@oracle.com>, "Tom Talpey" <tom@talpey.com>,
-	"Trond Myklebust" <trond.myklebust@hammerspace.com>,
-	"Anna Schumaker" <anna@kernel.org>,
+	s=arc-20240116; t=1705480695; c=relaxed/simple;
+	bh=VtsiPGfRjMnW7iyF/uQYtjNk+z7EmslfrGX+3dSxVGA=;
+	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:From:
+	 To:Cc:Subject:Date:Message-Id:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding; b=U/YeUqfd50joSIaZua156lgLfADmdChFVdMy7zTHhMLxQ0qCwQ9gZTYNa+l5UF+VixlWSJsl4iijD/YWSI30z6Z/+ibwr1+gSZVphbjeugegO4AFOhl6eGCz9ptPuIy59peJbZB2497Wc8uZWCQ7KqAL3scLU1+v3EpfLDGwRtI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SwpjjwbL; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1d5dfda4319so12639455ad.0;
+        Wed, 17 Jan 2024 00:38:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705480693; x=1706085493; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=jSOMGuUHrQxjLGHgZ49LUYPYZXjRbYJLosFfB3nja5M=;
+        b=SwpjjwbLiD8OcWUkVHCz96i767ZURWlCM/52FGohPpELIEKlppVQWuBl/6wwfEAxQX
+         Sy9+62L90qpyVvGBsy1f/CoX/SC7cmgGMsE6IxX47actBkIFM1LDysRr9d+1cWgcuZiA
+         cmDxp4Gs5zMfNDbAOiOL5dG2YPY6wXfdg7ED2YSkHf2i37c55zJYpGOSiQrNh8P2l+f3
+         Etnd3+i18Owp0PQWJXUmm1kY5Hd1m2GTunUgoSpQ5Gw2/mEYdfqtarqAzNbkM0e4Ih83
+         C9y0RmImX8wK8Qa+QbG/4LstTwYxF5J6zKfGRkJMN1S5v3tFNszs6pDH9TnRrnphBEvv
+         C55Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705480693; x=1706085493;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jSOMGuUHrQxjLGHgZ49LUYPYZXjRbYJLosFfB3nja5M=;
+        b=TioX3msOkDotW+X9nFdtPhMGslN1Tcj5zgvipiV4H24XKyjzba9bX3zuvU5CaTVJ7y
+         SxcaPMTyngq77j+D1DnB8PWbcZqIJc4q3xz3Fu+4dYmRYZxErYROFkCqs5kVd2bghIRU
+         mt+4vSxZgQhXpxKmE0iSOZ/spnx1GxhRpdakcAEhxVQZgyHvFcT03TneTDLNHhx/wzP7
+         lWoMUtm1s59lu6JdZtflo99scXIE/IZ3X8ds4QSolkOOuIRZeZQIIHxX8xZLRWoIpDXV
+         XBgSB/PWIyRQ1owtjXvaBPrSMX2I7HaTotRh0IcrWYo3rxfsykwEJ5ciaeXX1xoSEx+e
+         ixlA==
+X-Gm-Message-State: AOJu0Yw6+0dZaFyN+2GIQa1PVWJuu3XLtjmloZIAKWZYkf2oCvO6lboB
+	j6GRrz+8a7z7m8thNCaMCTsQj/f2d1eCYMIqqOs=
+X-Google-Smtp-Source: AGHT+IGF32Idn6WvEOYbmK6PJaSkBAoafsAJF85+7k2nFlGNaRGBxUZXUh5p5xDnV68gDxhKX4qDZA==
+X-Received: by 2002:a17:903:11c3:b0:1d6:96b:5dd with SMTP id q3-20020a17090311c300b001d6096b05ddmr1440184plh.82.1705480693494;
+        Wed, 17 Jan 2024 00:38:13 -0800 (PST)
+Received: from localhost ([104.192.108.9])
+        by smtp.gmail.com with ESMTPSA id k5-20020a170902ba8500b001d5b87ee67bsm6658912pls.186.2024.01.17.00.38.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Jan 2024 00:38:13 -0800 (PST)
+From: nai lin <ayano2023th@gmail.com>
+To: netdev@vger.kernel.org
+Cc: nai lin <ayano2023th@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	"Eric Dumazet" <edumazet@google.com>,
-	"Jakub Kicinski" <kuba@kernel.org>,
-	"Paolo Abeni" <pabeni@redhat.com>, "Simo Sorce" <simo@redhat.com>,
-	"Steve Dickson" <steved@redhat.com>,
-	"Kevin Coffman" <kwc@citi.umich.edu>,
-	"Linux NFS Mailing List" <linux-nfs@vger.kernel.org>,
-	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-	"Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>
-Subject: Re: Re: [PATCH] [v2] SUNRPC: fix a memleak in gss_import_v2_context
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.4-cmXT5 build
- 20231205(37e20f0e) Copyright (c) 2002-2024 www.mailtech.cn
- mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
-In-Reply-To: <35F4C7FB-3337-4894-8AA2-C1F4ADCD99C9@oracle.com>
-References: <20240112084540.3729001-1-alexious@zju.edu.cn>
- <20240115110905.GR392144@kernel.org>
- <35F4C7FB-3337-4894-8AA2-C1F4ADCD99C9@oracle.com>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
+	Anjali Kulkarni <anjali.k.kulkarni@oracle.com>,
+	Li RongQing <lirongqing@baidu.com>,
+	David Howells <dhowells@redhat.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] netlink: fix potential race issue in netlink_native_seq_show()
+Date: Wed, 17 Jan 2024 16:37:13 +0800
+Message-Id: <20240117083715.7800-1-ayano2023th@gmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <7e31d32d.4b14.18d16613364.Coremail.alexious@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:cC_KCgC3LThuhadl66IuAA--.5834W
-X-CM-SenderInfo: qrsrjiarszq6lmxovvfxof0/1tbiAgIDAGWmzmEYZAAAsT
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+Content-Transfer-Encoding: 8bit
 
-Cj4gPiBPbiBKYW4gMTUsIDIwMjQsIGF0IDY6MDnigK9BTSwgU2ltb24gSG9ybWFuIDxob3Jtc0Br
-ZXJuZWwub3JnPiB3cm90ZToKPiA+IAo+ID4gT24gRnJpLCBKYW4gMTIsIDIwMjQgYXQgMDQ6NDU6
-MzhQTSArMDgwMCwgWmhpcGVuZyBMdSB3cm90ZToKPiA+PiBUaGUgY3R4LT5tZWNoX3VzZWQuZGF0
-YSBhbGxvY2F0ZWQgYnkga21lbWR1cCBpcyBub3QgZnJlZWQgaW4gbmVpdGhlcgo+ID4+IGdzc19p
-bXBvcnRfdjJfY29udGV4dCBub3IgaXQgb25seSBjYWxsZXIgcmFkZW9uX2RyaXZlcl9vcGVuX2tt
-cy4KPiA+IAo+ID4gU2hvdWxkIHJhZGVvbl9kcml2ZXJfb3Blbl9rbXMgYmUgZ3NzX2tyYjVfaW1w
-b3J0X3NlY19jb250ZXh0Pwo+ID4gCj4gPiBBbHNvLCBwZXJoYXBzIGl0IGlzIHVzZWZ1bCB0byB3
-cml0ZSBzb21ldGhpbmcgbGlrZSB0aGlzOgo+ID4gCj4gPiAuLi4gZ3NzX2tyYjVfaW1wb3J0X3Nl
-Y19jb250ZXh0LCB3aGljaCBmcmVlcyBjdHggb24gZXJyb3IuCgpZZXMsIHlvdSBhcmUgcmlnaHQs
-IEkgcHJvYmVybHkgbWl4ZWQgdXAgaXQgdG8gYW5vdGhlciBwYXRjaCA6KC4KQW5kIHRoZSBmaXJz
-dCBzZW50ZW5jZSBvZiB0aGUgcGF0Y2ggZGVzY3JpcHRpb24gc2hvdWxkIGJlOgoKVGhlIGN0eC0+
-bWVjaF91c2VkLmRhdGEgYWxsb2NhdGVkIGJ5IGttZW1kdXAgaXMgbm90IGZyZWVkIGluIG5laXRo
-ZXIKZ3NzX2ltcG9ydF92Ml9jb250ZXh0IG5vciBpdCBvbmx5IGNhbGxlciBnc3Nfa3JiNV9pbXBv
-cnRfc2VjX2NvbnRleHQsIAp3aGljaCBmcmVlcyBjdHggb24gZXJyb3IuCgo+IAo+IElmIFpoaXBl
-bmcgYWdyZWVzIHRvIHRoaXMgc3VnZ2VzdGlvbiwgSSBjYW4gY2hhbmdlIHRoZQo+IHBhdGNoIGRl
-c2NyaXB0aW9uIGluIG15IHRyZWUuIEEgdjMgaXMgbm90IG5lY2Vzc2FyeS4KClllcywgSSBhZ3Jl
-ZSB3aXRoIFNpbW9uJ3Mgc3VnZ2VzdGlvbiBhbmQgSSBnaXZlIHRoZSBjb3JyZWN0ZWQgZGVzY3Jp
-cHRpb24gCmFib3ZlLgoKPiAKPiA+PiBUaHVzLCB0aGlzIHBhdGNoIHJlZm9ybSB0aGUgbGFzdCBj
-YWxsIG9mIGdzc19pbXBvcnRfdjJfY29udGV4dCB0byB0aGUKPiA+PiBnc3Nfa3JiNV9pbXBvcnRf
-Y3R4X3YyLCBwcmV2ZW50aW5nIHRoZSBtZW1sZWFrIHdoaWxlIGtlZXBwaW5nIHRoZSByZXR1cm4K
-PiA+PiBmb3JtYXRpb24uCj4gPj4gCj4gPj4gRml4ZXM6IDQ3ZDg0ODA3NzYyOSAoImdzc19rcmI1
-OiBoYW5kbGUgbmV3IGNvbnRleHQgZm9ybWF0IGZyb20gZ3NzZCIpCj4gPj4gU2lnbmVkLW9mZi1i
-eTogWmhpcGVuZyBMdSA8YWxleGlvdXNAemp1LmVkdS5jbj4KPiA+IAo+ID4gSGkgWmhpcGVuZyBM
-dSwKPiA+IAo+ID4gT3RoZXIgdGhhbiB0aGUgY29tbWVudCBhYm92ZSwgSSBhZ3JlZSB3aXRoIHlv
-dXIgYW5hbHlzaXMuCj4gPiBBbmQgdGhhdCBhbHRob3VnaCB0aGUgcHJvYmxlbSBoYXMgY2hhbmdl
-ZCBmb3JtIHNsaWdodGx5LAo+ID4gaXQgd2FzIG9yaWdpbmFsbHkgaW50cm9kdWNlZCBieSB0aGUg
-Y2l0ZWQgY29tbWl0Lgo+ID4gSSBhbHNvIGFncmVlIHRoYXQgeW91ciBmaXguCj4gPiAKPiA+IC4u
-Lgo+IAo+IC0tCj4gQ2h1Y2sgTGV2ZXIKPiAKPiAK
+Access to the nlk group should be protected by netlink_lock_table() like
+commit <f773608026ee> ("netlink: access nlk groups safely in netlink bind
+and getname"), otherwise there will be potential race conditions.
+
+Signed-off-by: nai lin <ayano2023th@gmail.com>
+---
+ net/netlink/af_netlink.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
+index 4ed8ffd58ff3..61ad81fb80f5 100644
+--- a/net/netlink/af_netlink.c
++++ b/net/netlink/af_netlink.c
+@@ -2693,6 +2693,7 @@ static int netlink_native_seq_show(struct seq_file *seq, void *v)
+ 		struct sock *s = v;
+ 		struct netlink_sock *nlk = nlk_sk(s);
+ 
++		netlink_lock_table();
+ 		seq_printf(seq, "%pK %-3d %-10u %08x %-8d %-8d %-5d %-8d %-8u %-8lu\n",
+ 			   s,
+ 			   s->sk_protocol,
+@@ -2705,7 +2706,7 @@ static int netlink_native_seq_show(struct seq_file *seq, void *v)
+ 			   atomic_read(&s->sk_drops),
+ 			   sock_i_ino(s)
+ 			);
+-
++		netlink_unlock_table();
+ 	}
+ 	return 0;
+ }
+-- 
+2.25.1
+
 
