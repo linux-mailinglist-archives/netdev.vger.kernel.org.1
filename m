@@ -1,167 +1,163 @@
-Return-Path: <netdev+bounces-63984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17A17830A1A
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 16:55:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B417E830A2F
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 17:00:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9888EB24999
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 15:55:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 690C61F229EE
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 16:00:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C44B622308;
-	Wed, 17 Jan 2024 15:55:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dvk8/f8/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DD0E22305;
+	Wed, 17 Jan 2024 16:00:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42F3321A16;
-	Wed, 17 Jan 2024 15:55:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F7DA210E3;
+	Wed, 17 Jan 2024 16:00:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705506904; cv=none; b=ci2eReWfEnlpfOxRwYCqtU9OvOB4vc6PE4IX4CaelxH3hPLQe1WVwIQ3J/whNY14G0sVmeL+pfl3A9NKHcq6iZ8Q0rjp9grWDA6Wvn1i/sQheoXkGC0emu1wjE4vv4IfdTCb1cpUzcao2eqbbg7JkZiVx7gYG/bRQt5G9CayfL0=
+	t=1705507249; cv=none; b=CkXyqPYoiqeibdgnPNhkQME39nb08HMnpToWIztsjpm47601wrUPhOtRAWTwMZK0JMm+0HGqNNCB3bqAHNq7DJdDnrw0j0cr3PBNxRrSTtm0FHYPZDEhWHVWsDrzTSeHH4HqtNCjU/i/vhxRyBchhmrK9uDKYzaHxM/fmhmujuo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705506904; c=relaxed/simple;
-	bh=ttGJe8J4pcxRkey779Yd+cZv874UqM4wsN7cskxubio=;
-	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:Date:
-	 From:To:Cc:Message-ID:In-Reply-To:References:Subject:Mime-Version:
-	 Content-Type:Content-Transfer-Encoding; b=ajkBXDmtS7H1Aeo9qSlleNT4HpF/k3t2gUJEsoSuXfZvSWyDb1ws88+Jzn5U3hyAg3RrA0RxYOOqSLb6YGatWOziav9SP444p1Y8oRNfz7VRhpZufQaCkHdlv0SsznfrWdOWmtGaAi9uQSSaFVCHc7SMQhGpqernvnDtiDy6OqQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dvk8/f8/; arc=none smtp.client-ip=209.85.219.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-680b1335af6so93855216d6.1;
-        Wed, 17 Jan 2024 07:55:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705506902; x=1706111702; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ttGJe8J4pcxRkey779Yd+cZv874UqM4wsN7cskxubio=;
-        b=dvk8/f8/2jB5aZe7zNFkQZ/ejUppjaKbdR/8nxkSG79U+tturBRm51To2SWPC9sHGe
-         aLpDeRpPDva5Q0oYTZnGS54EcmdZDVfhAUXyYfrs8vhfOoQbNKX4q5c+9GonWpsJjcM2
-         +CWJicwLzn7dYvNLztnqu3Njwrf4isYiAvnReX0FvhvZDV16bUDb4CtKS3zTEKC9Lbvb
-         rSrZmPAZLxwDqrGU1TZZiT7geGb3b2DSTtO1NTPXSyzigj7uq7MNmv1P6OM8RhsCPbsk
-         qkwTdM0ojsgQ/dTXVn2p2AG+F7UCvQqAOP4TVkyFyMZB7LvuW1eTkKTVGAK5vF85Vrqh
-         0T1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705506902; x=1706111702;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ttGJe8J4pcxRkey779Yd+cZv874UqM4wsN7cskxubio=;
-        b=jFebSC/WUErS27Edax5RA+EhrAF0vwHYVek/+QFQAKaIZaWCF3H8XBPWdsbQoo3rvy
-         +ZM0c1RxlXtSL/83PqDXRER20WQ7hYPlhtcrxGR48p46HRlO3fvNaknK2gaghfqhCWdj
-         J/DBwc6ZAH85hlfYtnUPpUjkQnT1efgzNSof26kdtXBm+g1azd+FfSsjwd7BO6rG7mS2
-         BOOg0KOMrTwjVktGwvP9woVzb+kMWeng4I5R+1Cpr2SnFcwW9/RtOp58lThKC3tJVeh8
-         +JlTu9yM+NuQtg/GBkhG8Rn0YoBYiISNxkJJabPJ1v8CCMuLbwp8Yex+RJUD2Gns2R+Y
-         7Q4A==
-X-Gm-Message-State: AOJu0YxKCxIrLyS4IzAwpKXJXaIo3n3gnLAf7ZgNUZowLjG/ngnGAYBz
-	xVsIcbAWrVDihVWYWgjlEiA=
-X-Google-Smtp-Source: AGHT+IFUKgLAXPaJ1GM7ZGPSYyL9MUqnyevX9UQH1PtY6537DD4fa9EPrz350Q+gOCYQG6L2WQwC/w==
-X-Received: by 2002:a0c:dd11:0:b0:681:698e:17d8 with SMTP id u17-20020a0cdd11000000b00681698e17d8mr1348439qvk.52.1705506902051;
-        Wed, 17 Jan 2024 07:55:02 -0800 (PST)
-Received: from localhost (48.230.85.34.bc.googleusercontent.com. [34.85.230.48])
-        by smtp.gmail.com with ESMTPSA id v20-20020ad448d4000000b006817069492bsm1407241qvx.70.2024.01.17.07.55.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Jan 2024 07:55:01 -0800 (PST)
-Date: Wed, 17 Jan 2024 10:55:01 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Martin KaFai Lau <martin.lau@linux.dev>, 
- =?UTF-8?B?SsO2cm4tVGhvcmJlbiBIaW56?= <j-t.hinz@alumni.tu-berlin.de>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Shuah Khan <shuah@kernel.org>, 
- Arnd Bergmann <arnd@arndb.de>, 
- Deepa Dinamani <deepa.kernel@gmail.com>, 
- bpf@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, 
- linux-kselftest@vger.kernel.org
-Message-ID: <65a7f855821cc_6d500294d0@willemb.c.googlers.com.notmuch>
-In-Reply-To: <51fd5249-140a-4f1b-b20e-703f159e88a3@linux.dev>
-References: <20240115134110.11624-1-j-t.hinz@alumni.tu-berlin.de>
- <65a69e1be51ef_380df0294d9@willemb.c.googlers.com.notmuch>
- <51fd5249-140a-4f1b-b20e-703f159e88a3@linux.dev>
-Subject: Re: [PATCH bpf-next] bpf: Allow setting SO_TIMESTAMPING* with
- bpf_setsockopt()
+	s=arc-20240116; t=1705507249; c=relaxed/simple;
+	bh=cTNDdHH6V1G0jQMFGRVtyP30a7wQ1dA/sZVBC4n4+VM=;
+	h=From:To:Cc:Subject:Date:Message-Id:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding; b=aMEW/FIQU7aLO8uTAuJd5XYVPyYqRWDTfyPqqwKnRSSP3oAzvyCO2s9KnfO3PDOALtyRhBdtfl9VKDL/WcpVSXfsSNT8DnjVgn69lgTj7vKeLjnj/ZrmuvMsg0Hzol8UiZl7LKTR7LrZ1wM10DsK6M3xSGlTdcYPvTvjMxtZq1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de
+Subject: [PATCH net 00/14] Netfilter fixes for net
+Date: Wed, 17 Jan 2024 17:00:16 +0100
+Message-Id: <20240117160030.140264-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Martin KaFai Lau wrote:
-> On 1/16/24 7:17 AM, Willem de Bruijn wrote:
-> > J=C3=B6rn-Thorben Hinz wrote:
-> >> A BPF application, e.g., a TCP congestion control, might benefit fro=
-m or
-> >> even require precise (=3Dhardware) packet timestamps. These timestam=
-ps are
-> >> already available through __sk_buff.hwtstamp and
-> >> bpf_sock_ops.skb_hwtstamp, but could not be requested: BPF programs =
-were
-> >> not allowed to set SO_TIMESTAMPING* on sockets.
-> =
+Hi,
 
-> This patch only uses the SOF_TIMESTAMPING_RX_HARDWARE in the selftest. =
-How about =
+The following batch contains Netfilter fixes for net. Slightly larger
+than usual because this batch includes several patches to tighten the
+nf_tables control plane to reject inconsistent configuration:
 
-> others? e.g. the SOF_TIMESTAMPING_TX_* that will affect the sk->sk_erro=
-r_queue =
+1) Restrict NFTA_SET_POLICY to NFT_SET_POL_PERFORMANCE and
+   NFT_SET_POL_MEMORY.
 
-> which seems not good. If rx tstamp is useful, tx tstamp should be usefu=
-l also?
+2) Bail out if a nf_tables expression registers more than 16 netlink
+   attributes which is what struct nft_expr_info allows.
 
-Good point. Or should not be allowed to be set from BPF.
+3) Bail out if NFT_EXPR_STATEFUL provides no .clone interface, remove
+   existing fallback to memcpy() when cloning which might accidentally
+   duplicate memory reference to the same object.
 
-That significantly changes process behavior, e.g., by returning POLLERR.
- =
+4) Fix br_netfilter interaction with neighbour layer. This requires
+   three preparation patches:
 
-> >>
-> >> Enable BPF programs to actively request the generation of timestamps=
+   - Use nf_bridge_get_physinif() in nfnetlink_log
+   - Use nf_bridge_info_exists() to check in br_netfilter context
+     is available in nf_queue.
+   - Pass net to nf_bridge_get_physindev()
 
-> >> from a stream socket. The also required ioctl(SIOCSHWTSTAMP) on the
-> >> network device must still be done separately, in user space.
-> =
+   And finally, the fix which replaces physindev with physinif
+   in nf_bridge_info.
 
-> hmm... so both ioctl(SIOCSHWTSTAMP) of the netdevice and the =
+   Patches from Pavel Tikhomirov.
 
-> SOF_TIMESTAMPING_RX_HARDWARE of the sk must be done?
-> =
+5) Catch-all deactivation happens in the transaction, hence this
+   oneliner to check for the next generation. This bug uncovered after
+   the removal of the _BUSY bit, which happened in set elements back in
+   summer 2023.
 
-> I likely miss something. When skb is created in the driver rx path, the=
- sk is =
+6) Ensure set (total) key length size and concat field length description
+   is consistent, otherwise bail out.
 
-> not known yet though. How the SOF_TIMESTAMPING_RX_HARDWARE of the sk af=
-fects the =
+7) Skip set element with the _DEAD flag on from the netlink dump path.
+   A tests occasionally shows that dump is mismatching because GC might
+   lose race to get rid of this element while a netlink dump is in
+   progress.
 
-> skb_shinfo(skb)->hwtstamps?
+8) Reject NFT_SET_CONCAT for field_count < 1, from Pavel Tikhomirov.
 
-Indeed it does not seem to do anything in the datapath.
+9) Use IP6_INC_STATS in ipvs to fix preemption BUG splat, patch
+   from Fedor Pchelkin.
 
-Requesting SOF_TIMESTAMPING_RX_SOFTWARE will call net_enable_timestamp
-to start timestamping packets.
+10) Fix a slow down due to synchronize_rcu() in ipset netlink interface
+    with swap/destroy and kernel side add/del/test, from Jozsef Kadlecsik.
 
-But SOF_TIMESTAMPING_RX_HARDWARE does not so thing.
+Please, pull these changes from:
 
-Drivers do use it in ethtool get_ts_info to signal hardware
-capabilities. But those must be configured using the ioctl.
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-24-01-17
 
-It is there more for consistency with the other timestamp recording
-options, I suppose.
+Thanks.
 
+----------------------------------------------------------------
+
+The following changes since commit ea937f77208323d35ffe2f8d8fc81b00118bfcda:
+
+  net: netdevsim: don't try to destroy PHC on VFs (2024-01-17 10:56:44 +0000)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-24-01-17
+
+for you to fetch changes up to 080898f8e782734987f127c73a69ebeab7b5f5e8:
+
+  netfilter: ipset: fix performance regression in swap operation (2024-01-17 12:02:52 +0100)
+
+----------------------------------------------------------------
+netfilter pull request 24-01-17
+
+----------------------------------------------------------------
+Fedor Pchelkin (1):
+      ipvs: avoid stat macros calls from preemptible context
+
+Jozsef Kadlecsik (1):
+      netfilter: ipset: fix performance regression in swap operation
+
+Pablo Neira Ayuso (8):
+      netfilter: nf_tables: reject invalid set policy
+      netfilter: nf_tables: validate .maxattr at expression registration
+      netfilter: nf_tables: bail out if stateful expression provides no .clone
+      netfilter: nft_limit: do not ignore unsupported flags
+      netfilter: nf_tables: check if catch-all set element is active in next generation
+      netfilter: nf_tables: do not allow mismatch field size and set key length
+      netfilter: nf_tables: skip dead set elements in netlink dump
+      netfilter: nf_tables: reject NFT_SET_CONCAT with not field length description
+
+Pavel Tikhomirov (4):
+      netfilter: nfnetlink_log: use proper helper for fetching physinif
+      netfilter: nf_queue: remove excess nf_bridge variable
+      netfilter: propagate net to nf_bridge_get_physindev
+      netfilter: bridge: replace physindev with physinif in nf_bridge_info
+
+ include/linux/netfilter/ipset/ip_set.h     |  2 ++
+ include/linux/netfilter_bridge.h           |  6 ++--
+ include/linux/skbuff.h                     |  2 +-
+ net/bridge/br_netfilter_hooks.c            | 42 ++++++++++++++++++++++------
+ net/bridge/br_netfilter_ipv6.c             | 14 +++++++---
+ net/ipv4/netfilter/nf_reject_ipv4.c        |  9 ++++--
+ net/ipv6/netfilter/nf_reject_ipv6.c        | 11 ++++++--
+ net/netfilter/ipset/ip_set_core.c          | 31 +++++++++++++++------
+ net/netfilter/ipset/ip_set_hash_netiface.c |  8 +++---
+ net/netfilter/ipvs/ip_vs_xmit.c            |  4 +--
+ net/netfilter/nf_log_syslog.c              | 13 +++++----
+ net/netfilter/nf_queue.c                   |  6 ++--
+ net/netfilter/nf_tables_api.c              | 44 +++++++++++++++++++++---------
+ net/netfilter/nfnetlink_log.c              |  8 +++---
+ net/netfilter/nft_limit.c                  | 19 ++++++++-----
+ net/netfilter/xt_physdev.c                 |  2 +-
+ 16 files changed, 150 insertions(+), 71 deletions(-)
 
