@@ -1,73 +1,54 @@
-Return-Path: <netdev+bounces-63903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43B85830013
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 07:23:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCDBF830012
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 07:22:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D67371F24D11
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 06:23:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A70F28805F
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 06:22:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAD588BEB;
-	Wed, 17 Jan 2024 06:23:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="BCbHnMm1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 293AA79F4;
+	Wed, 17 Jan 2024 06:22:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3445D28FC;
-	Wed, 17 Jan 2024 06:23:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC55945A
+	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 06:21:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705472608; cv=none; b=FoLkzFl0gQxNShaGL+Gyzc1uAS/zkMoJoSfpbtPTq7KpJh1JV4ZTtS3lxE8gW0anD1kO4Ww3wv7LivvssaW1FFtLI08kjhfUlDlT+CtiAF+kxmtrebUUn1jQk6ctoIOuYP1JPdby/DiPDGtilktXilpYixUsWKChWeRsl8VMAgA=
+	t=1705472524; cv=none; b=e6u1lq5Wg9ucJCtXFEMPFxuwXTPZrCEvrL8Gu8fi8tm6u6kerb34/8Li2Aflnb0nViTCLFxzxfs6JqJX0me6W/6LSD2v6WixRP4NzFgHZZ9fLymgtxZKUCdrMsZgRJpNWZZpG0iRSr5sNbxnGpMowYSxBJ9kJ7R0Czuy84rCEpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705472608; c=relaxed/simple;
-	bh=YmgAmQESRGyO7hObIG4VdMuhpU1Rmm5n8BlSEhK+Ci0=;
-	h=Received:DKIM-Signature:Received:Received:Received:Received:From:
-	 To:CC:Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding:Content-Type:X-Proofpoint-GUID:
-	 X-Proofpoint-ORIG-GUID:X-Proofpoint-Virus-Version; b=fGh6V9v0qtafcOhVWZAjiJPLUQTcquJgXazybkmgo+eUSs28u/bhljSaG/BX9Kej+yA+tHJO9VGlK87q3BdFZlvA4BhZaj1HqMVQjnKrNf39tkhB5E67KUeS1l7kixeNUTIScqtbqawzjEVTVuMkJk1XqsolLkJ4NTguKsW62WY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=BCbHnMm1; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40GI9O2R002942;
-	Tue, 16 Jan 2024 22:23:15 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding:content-type; s=pfpt0220; bh=VjLXAwL3
-	3gDx/5/BzSqYEdBdLVkV4tNSMniS7zSywuI=; b=BCbHnMm1caokDrn29icWtAcD
-	ZvqvHUzs5RUy+dUbOGFvXd6zTEgBl5pCXinu0R7yE6qO9cOBjQo3ZWM9rRZDzOq8
-	KHMaGF+TyZFO1Ru8wvU3HKD7SjIypd8s7ysSTX9oFU88aklCM5x3b0i9r/o8kofJ
-	0xpNl4M0oDsnHL3tt8pP6efYVpSw8STLkNgVimkMOCJaM1Qp9dNmWtmt97V6ePb/
-	mqoOrvugzdfa8aK8zZxWIfvq95K72rj0F1iF1l2EyyjT4CVRLknsjA6vZ/23yx3y
-	D1praCRRcIpv8FEarZmWPJYEmhhYMhK5Ro61xtcambSwFQjoxRlwSmrrXG7oYA==
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3vnxu1jd6g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Tue, 16 Jan 2024 22:23:14 -0800 (PST)
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 16 Jan
- 2024 22:23:13 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Tue, 16 Jan 2024 22:23:13 -0800
-Received: from localhost.localdomain (unknown [10.111.135.16])
-	by maili.marvell.com (Postfix) with ESMTP id A6A803F7044;
-	Tue, 16 Jan 2024 22:23:12 -0800 (PST)
-From: Jenishkumar Maheshbhai Patel <jpatel2@marvell.com>
-To: <marcin.s.wojtas@gmail.com>, <linux@armlinux.org.uk>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: Jenishkumar Maheshbhai Patel <jpatel2@marvell.com>
-Subject: [net v2 PATCH 1/1] net: mvpp2: clear BM pool before initialization
-Date: Tue, 16 Jan 2024 22:23:10 -0800
-Message-ID: <20240117062310.2030408-1-jpatel2@marvell.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1705472524; c=relaxed/simple;
+	bh=x8gN/rsJnvCNnGvj/8vGsD0X0JyYfwknu+s0xLy1dCs=;
+	h=Received:Received:Received:From:To:CC:Subject:Date:Message-ID:
+	 X-Mailer:MIME-Version:Content-Transfer-Encoding:Content-Type:
+	 X-Originating-IP:X-ClientProxiedBy; b=tT/LleyocqKv4+ZveNf1NQaWb3tn3YBxJIaLpY7zAO6/5e8xC9obD6zmW2gdDJdKqvJ/iE4yPo74xX8aYI8TPkIFXRdc8Y4X8WFINX2s/4j50xXoFp+bk7l9witKkD7ao6juEYhlHOR8Tp8XgwTyHaWZxsjoIZaIE7IA9zkDUn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4TFG3M24LbzsW9F;
+	Wed, 17 Jan 2024 14:21:03 +0800 (CST)
+Received: from dggpeml500026.china.huawei.com (unknown [7.185.36.106])
+	by mail.maildlp.com (Postfix) with ESMTPS id BAAFE1402E2;
+	Wed, 17 Jan 2024 14:21:56 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
+ (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 17 Jan
+ 2024 14:21:56 +0800
+From: Zhengchao Shao <shaozhengchao@huawei.com>
+To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <dsahern@kernel.org>
+CC: <sming56@aliyun.com>, <hkchu@google.com>, <weiyongjun1@huawei.com>,
+	<yuehaibing@huawei.com>, <shaozhengchao@huawei.com>
+Subject: [PATCH net,v3] tcp: make sure init the accept_queue's spinlocks once
+Date: Wed, 17 Jan 2024 14:31:52 +0800
+Message-ID: <20240117063152.1046210-1-shaozhengchao@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,69 +57,175 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Proofpoint-GUID: j9pVR1av0e7_aP6TpQx_f3QT-tsmk5w3
-X-Proofpoint-ORIG-GUID: j9pVR1av0e7_aP6TpQx_f3QT-tsmk5w3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-17_02,2024-01-16_01,2023-05-22_02
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
 
-Register value persist after booting the kernel using
-kexec which results in kernel panic. Thus clear the
-BM pool registers before initialisation to fix the issue.
+When I run syz's reproduction C program locally, it causes the following
+issue:
+pvqspinlock: lock 0xffff9d181cd5c660 has corrupted value 0x0!
+WARNING: CPU: 19 PID: 21160 at __pv_queued_spin_unlock_slowpath (kernel/locking/qspinlock_paravirt.h:508)
+Hardware name: Red Hat KVM, BIOS 0.5.1 01/01/2011
+RIP: 0010:__pv_queued_spin_unlock_slowpath (kernel/locking/qspinlock_paravirt.h:508)
+Code: 73 56 3a ff 90 c3 cc cc cc cc 8b 05 bb 1f 48 01 85 c0 74 05 c3 cc cc cc cc 8b 17 48 89 fe 48 c7 c7
+30 20 ce 8f e8 ad 56 42 ff <0f> 0b c3 cc cc cc cc 0f 0b 0f 1f 40 00 90 90 90 90 90 90 90 90 90
+RSP: 0018:ffffa8d200604cb8 EFLAGS: 00010282
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff9d1ef60e0908
+RDX: 00000000ffffffd8 RSI: 0000000000000027 RDI: ffff9d1ef60e0900
+RBP: ffff9d181cd5c280 R08: 0000000000000000 R09: 00000000ffff7fff
+R10: ffffa8d200604b68 R11: ffffffff907dcdc8 R12: 0000000000000000
+R13: ffff9d181cd5c660 R14: ffff9d1813a3f330 R15: 0000000000001000
+FS:  00007fa110184640(0000) GS:ffff9d1ef60c0000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020000000 CR3: 000000011f65e000 CR4: 00000000000006f0
+Call Trace:
+<IRQ>
+  _raw_spin_unlock (kernel/locking/spinlock.c:186)
+  inet_csk_reqsk_queue_add (net/ipv4/inet_connection_sock.c:1321)
+  inet_csk_complete_hashdance (net/ipv4/inet_connection_sock.c:1358)
+  tcp_check_req (net/ipv4/tcp_minisocks.c:868)
+  tcp_v4_rcv (net/ipv4/tcp_ipv4.c:2260)
+  ip_protocol_deliver_rcu (net/ipv4/ip_input.c:205)
+  ip_local_deliver_finish (net/ipv4/ip_input.c:234)
+  __netif_receive_skb_one_core (net/core/dev.c:5529)
+  process_backlog (./include/linux/rcupdate.h:779)
+  __napi_poll (net/core/dev.c:6533)
+  net_rx_action (net/core/dev.c:6604)
+  __do_softirq (./arch/x86/include/asm/jump_label.h:27)
+  do_softirq (kernel/softirq.c:454 kernel/softirq.c:441)
+</IRQ>
+<TASK>
+  __local_bh_enable_ip (kernel/softirq.c:381)
+  __dev_queue_xmit (net/core/dev.c:4374)
+  ip_finish_output2 (./include/net/neighbour.h:540 net/ipv4/ip_output.c:235)
+  __ip_queue_xmit (net/ipv4/ip_output.c:535)
+  __tcp_transmit_skb (net/ipv4/tcp_output.c:1462)
+  tcp_rcv_synsent_state_process (net/ipv4/tcp_input.c:6469)
+  tcp_rcv_state_process (net/ipv4/tcp_input.c:6657)
+  tcp_v4_do_rcv (net/ipv4/tcp_ipv4.c:1929)
+  __release_sock (./include/net/sock.h:1121 net/core/sock.c:2968)
+  release_sock (net/core/sock.c:3536)
+  inet_wait_for_connect (net/ipv4/af_inet.c:609)
+  __inet_stream_connect (net/ipv4/af_inet.c:702)
+  inet_stream_connect (net/ipv4/af_inet.c:748)
+  __sys_connect (./include/linux/file.h:45 net/socket.c:2064)
+  __x64_sys_connect (net/socket.c:2073 net/socket.c:2070 net/socket.c:2070)
+  do_syscall_64 (arch/x86/entry/common.c:51 arch/x86/entry/common.c:82)
+  entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:129)
+  RIP: 0033:0x7fa10ff05a3d
+  Code: 5b 41 5c c3 66 0f 1f 84 00 00 00 00 00 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89
+  c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d ab a3 0e 00 f7 d8 64 89 01 48
+  RSP: 002b:00007fa110183de8 EFLAGS: 00000202 ORIG_RAX: 000000000000002a
+  RAX: ffffffffffffffda RBX: 0000000020000054 RCX: 00007fa10ff05a3d
+  RDX: 000000000000001c RSI: 0000000020000040 RDI: 0000000000000003
+  RBP: 00007fa110183e20 R08: 0000000000000000 R09: 0000000000000000
+  R10: 0000000000000000 R11: 0000000000000202 R12: 00007fa110184640
+  R13: 0000000000000000 R14: 00007fa10fe8b060 R15: 00007fff73e23b20
+</TASK>
 
-Fixes: 3f518509dedc ("ethernet: Add new driver for Marvell Armada 375 network unit")
-Signed-off-by: Jenishkumar Maheshbhai Patel <jpatel2@marvell.com>
+The issue triggering process is analyzed as follows:
+Thread A                                       Thread B
+tcp_v4_rcv	//receive ack TCP packet       inet_shutdown
+  tcp_check_req                                  tcp_disconnect //disconnect sock
+  ...                                              tcp_set_state(sk, TCP_CLOSE)
+    inet_csk_complete_hashdance                ...
+      inet_csk_reqsk_queue_add                 inet_listen  //start listen
+        spin_lock(&queue->rskq_lock)             inet_csk_listen_start
+        ...                                        reqsk_queue_alloc
+        ...                                          spin_lock_init
+        spin_unlock(&queue->rskq_lock)	//warning
+
+When the socket receives the ACK packet during the three-way handshake,
+it will hold spinlock. And then the user actively shutdowns the socket
+and listens to the socket immediately, the spinlock will be initialized.
+When the socket is going to release the spinlock, a warning is generated.
+Also the same issue to fastopenq.lock.
+
+Move init spinlock to inet_create and inet_accept to make sure init the
+accept_queue's spinlocks once.
+
+Fixes: fff1f3001cc5 ("tcp: add a spinlock to protect struct request_sock_queue")
+Fixes: 168a8f58059a ("tcp: TCP Fast Open Server - main code path")
+Reported-by: Ming Shu <sming56@aliyun.com>
+Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
 ---
-v1-v2:
--Move comments outside the loop
--remove unrequired brances.
+v3: Move init spinlock to inet_create and inet_accept.
+v2: Add 'init_done' to make sure init the accept_queue's spinlocks once.
+---
+ net/core/request_sock.c         |  3 ---
+ net/ipv4/af_inet.c              | 11 +++++++++++
+ net/ipv4/inet_connection_sock.c |  8 ++++++++
+ 3 files changed, 19 insertions(+), 3 deletions(-)
 
- .../net/ethernet/marvell/mvpp2/mvpp2_main.c   | 25 +++++++++++++++++++
- 1 file changed, 25 insertions(+)
-
-diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-index 820b1fabe297..49d9960f9ce8 100644
---- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-+++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-@@ -614,12 +614,37 @@ static void mvpp23_bm_set_8pool_mode(struct mvpp2 *priv)
- 	mvpp2_write(priv, MVPP22_BM_POOL_BASE_ADDR_HIGH_REG, val);
- }
+diff --git a/net/core/request_sock.c b/net/core/request_sock.c
+index f35c2e998406..63de5c635842 100644
+--- a/net/core/request_sock.c
++++ b/net/core/request_sock.c
+@@ -33,9 +33,6 @@
  
-+/* Cleanup pool before actual initialization in the OS */
-+static void mvpp2_bm_pool_cleanup(struct mvpp2 *priv, int pool_id)
+ void reqsk_queue_alloc(struct request_sock_queue *queue)
+ {
+-	spin_lock_init(&queue->rskq_lock);
+-
+-	spin_lock_init(&queue->fastopenq.lock);
+ 	queue->fastopenq.rskq_rst_head = NULL;
+ 	queue->fastopenq.rskq_rst_tail = NULL;
+ 	queue->fastopenq.qlen = 0;
+diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
+index 835f4f9d98d2..6589741157a4 100644
+--- a/net/ipv4/af_inet.c
++++ b/net/ipv4/af_inet.c
+@@ -244,6 +244,14 @@ int inet_listen(struct socket *sock, int backlog)
+ }
+ EXPORT_SYMBOL(inet_listen);
+ 
++static void __inet_init_csk_lock(struct sock *sk)
 +{
-+	u32 val;
-+	int i;
-+	/* Drain the BM from all possible residues left by firmware */
-+	for (i = 0; i < MVPP2_BM_POOL_SIZE_MAX; i++)
-+		mvpp2_read(priv, MVPP2_BM_PHY_ALLOC_REG(pool_id));
-+	/* Stop the BM pool */
-+	val = mvpp2_read(priv, MVPP2_BM_POOL_CTRL_REG(pool_id));
-+	val |= MVPP2_BM_STOP_MASK;
-+	mvpp2_write(priv, MVPP2_BM_POOL_CTRL_REG(pool_id), val);
-+	/* Mask BM all interrupts */
-+	mvpp2_write(priv, MVPP2_BM_INTR_MASK_REG(pool_id), 0);
-+	/* Clear BM cause register */
-+	mvpp2_write(priv, MVPP2_BM_INTR_CAUSE_REG(pool_id), 0);
++	struct inet_connection_sock *icsk = inet_csk(sk);
++
++	spin_lock_init(&icsk->icsk_accept_queue.rskq_lock);
++	spin_lock_init(&icsk->icsk_accept_queue.fastopenq.lock);
 +}
 +
- static int mvpp2_bm_init(struct device *dev, struct mvpp2 *priv)
- {
- 	enum dma_data_direction dma_dir = DMA_FROM_DEVICE;
- 	int i, err, poolnum = MVPP2_BM_POOLS_NUM;
- 	struct mvpp2_port *port;
+ /*
+  *	Create an inet socket.
+  */
+@@ -330,6 +338,9 @@ static int inet_create(struct net *net, struct socket *sock, int protocol,
+ 	if (INET_PROTOSW_REUSE & answer_flags)
+ 		sk->sk_reuse = SK_CAN_REUSE;
  
-+	if (priv->percpu_pools)
-+		poolnum = mvpp2_get_nrxqs(priv) * 2;
++	if (INET_PROTOSW_ICSK & answer_flags)
++		__inet_init_csk_lock(sk);
 +
-+	/* Clean up the pool state in case it contains stale state */
-+	for (i = 0; i < poolnum; i++)
-+		mvpp2_bm_pool_cleanup(priv, i);
+ 	inet = inet_sk(sk);
+ 	inet_assign_bit(IS_ICSK, sk, INET_PROTOSW_ICSK & answer_flags);
+ 
+diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
+index 8e2eb1793685..5d3277ab9954 100644
+--- a/net/ipv4/inet_connection_sock.c
++++ b/net/ipv4/inet_connection_sock.c
+@@ -655,6 +655,7 @@ struct sock *inet_csk_accept(struct sock *sk, int flags, int *err, bool kern)
+ {
+ 	struct inet_connection_sock *icsk = inet_csk(sk);
+ 	struct request_sock_queue *queue = &icsk->icsk_accept_queue;
++	struct request_sock_queue *newqueue;
+ 	struct request_sock *req;
+ 	struct sock *newsk;
+ 	int error;
+@@ -727,6 +728,13 @@ struct sock *inet_csk_accept(struct sock *sk, int flags, int *err, bool kern)
+ 	}
+ 	if (req)
+ 		reqsk_put(req);
 +
- 	if (priv->percpu_pools) {
- 		for (i = 0; i < priv->port_count; i++) {
- 			port = priv->port_list[i];
++	if (newsk) {
++		newqueue = &inet_csk(newsk)->icsk_accept_queue;
++		spin_lock_init(&newqueue->rskq_lock);
++		spin_lock_init(&newqueue->fastopenq.lock);
++	}
++
+ 	return newsk;
+ out_err:
+ 	newsk = NULL;
 -- 
-2.25.1
+2.34.1
 
 
