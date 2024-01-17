@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-63972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 403BB83091B
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 16:05:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90E3283091D
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 16:05:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 401B81C20F70
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 15:05:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1BB2F1F2655B
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 15:05:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55F2C2110F;
-	Wed, 17 Jan 2024 15:05:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83F0F2110F;
+	Wed, 17 Jan 2024 15:05:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="FDHIq6U9"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="IZakDPCg"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2050.outbound.protection.outlook.com [40.107.223.50])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C441C1F602
-	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 15:05:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E82421118;
+	Wed, 17 Jan 2024 15:05:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.41
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705503938; cv=fail; b=EKdkrR4bKAcnqmd7osYRYOdAskI3dxAQ+l8y30uIl0k47A2kzDfxDjxHjUv1ZXSVzaH+PyG61DXroe1QaRBDt5q1BXCKEQk8LafH7PDj3+TU4sNB1DOuH7SG4aKHwRgzmU9y4GU9TVNnRydZGgbUdb5H3vPidtJgBFzf34hMDbA=
+	t=1705503944; cv=fail; b=kA0URNCYObDmGflWSC7K+GYtva1JWOxLCISLrWJMwkGCjP8F/UKo6Qu5K3b35abBQYmvvyfxKdFkrUr8pKtE3iLUHMp+EvkxxIu3aQJbIproRgX1Lem+cYx2+hPwIqqc0KOuvhh3BaatxLDarh58UtKDJQ25kOGkHSVq5gMZccY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705503938; c=relaxed/simple;
-	bh=qDKF9fKWKXG56CEBrp2xaIW6oTi3j2obXyJoV+yx574=;
+	s=arc-20240116; t=1705503944; c=relaxed/simple;
+	bh=WMfjTjMwL7H27ofDAeTjbVZ2XAF6ytriF06T28C3WRg=;
 	h=ARC-Message-Signature:ARC-Authentication-Results:DKIM-Signature:
 	 Received:Received:X-MS-Exchange-Authentication-Results:
 	 Received-SPF:Received:Received:Received:From:To:CC:Subject:Date:
@@ -43,17 +43,17 @@ ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	 X-MS-Exchange-CrossTenant-AuthSource:
 	 X-MS-Exchange-CrossTenant-AuthAs:
 	 X-MS-Exchange-CrossTenant-FromEntityHeader:
-	 X-MS-Exchange-Transport-CrossTenantHeadersStamped; b=jx7tu7ZxZntEESxcdztu5wcuOw7UOCaoLXjkPJ/alzjvorWwTFd1L97s4QJoTc6uvMO7dpPEdGuEuaQ1MXyDvWzMCts8Yy2gBZCdlH4XzbAA+ZkTlhgwoLDDUSfhVHpsY+4zymqS3M9yHZ2ZGsX41CTVzIH0mOPp54u3XcDpLjw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=FDHIq6U9; arc=fail smtp.client-ip=40.107.223.50
+	 X-MS-Exchange-Transport-CrossTenantHeadersStamped; b=q/o99Cz5T6zXmTvXTEGCT1bJvwa7eDAKnWstydAfPBHUFBGSDCK1R02oWSRGtkhCB2zGZpsfZ9vfPtl1vGnirRG/BxYkhl+2CCvFZtcY+uWG/A+UoXOtnF1k64z4ka+mXQdwwgLoehnb64WeisEGsjLFALGUQG6gxzm42HnuvXQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=IZakDPCg; arc=fail smtp.client-ip=40.107.236.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=C/T1mdoP8z8wf8Dr9QBFVU8khFIYDx0nO8ijCWKVIaXs1kZH/9SMI1vAhb4Kt0SNn87kY+5Wre/yDSQzZhXecmgKiQfCMYlc2OwpD6l7sXGyzyoyZsAop12MKVWzXk8IStAGz0/trLNotlV2zBw91E0myACg5FzeebIWBHx+dT9z4a3rzmHeLzQ8IMKNU0xX+njfQxf81K7sJUCsiC88ZvxFSVHa5OrEmlNSGgBPCOX0WnWeEShmU+09PvwyhzlFUZ9LrHNK6MMEQL+rpySdfuQG2J9wwG0UxMsW14hqobws8FQiwLLpfnIO+S6HBw06SYbh22r25LqVSICAFLzneg==
+ b=EptxNnyrJpTNsITCdNEr22B8DjoRJFbPtT/tPCYNZsYHwFzbv0b7VXKhAr/7OfXPIzGjfg+AxklGNJJmsu8PXTZ/gJWJ2yBNZFDUE6XKz2cz+zqR4C1mFaWDtZDRmDkjHdnzHbknrbPpUvadlcxe7/Lj+SFlNSiaTNSdk26yUfz1ybqDcsOwm7ryqaa0xoHi7Q6MEelV0AvRWfdgANQIQKlpCTv31fNXnC5qPrqpif2nLpG/vvN1AmIwMRmVyY91AhQRDFZmzzIlR1DOBbisGrx8N0qBeLrzkhliR0fCxlMAxil1VL6UfdhsqtGKep7jy8dMCLz1+JHROTyaYKLDLg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SevkloSzkgc8QFqNbvWsXuQqdl/t0+q7j1ThfO8oEw4=;
- b=dMhm2AClRLDlvU4N9m4LHglgOMueS5Qz8Gs3z7DR7PRJIRy22Yl3AmWnoEEFQQkrbg1N8ntq8s45jvbwWy3Y3gBfFW+zjE3JEk9CWDDWa0i44d+/lgujR5c0+8o8gbJ24gyaROVvAd1v3oIdIljhEt8pDZOddxSb/+JWb5QSaML/J9SMzCX82XYIhGX1yLums7Ys1t0uPwz2WdRAC1NCAWCOOUsj2j9eyEFij/GHKUK8ge7fJ20JfeBIC//xY7kUB0vo0U8SeDUIc7OvHgwZN/hNscWFm//fzAlU3YjOioymp2/4O/+rqUYO1x18Wx11WIav22jZeF+DzYY8pr/FcA==
+ bh=KT+lDRneeybLpA8vH/YNgOJ3I7raKjOsdrzyZ1BPKJI=;
+ b=jdSUBpJm1+Y2AuefVEFCSxtuwNlZoPIC09mJl+ONZDQavfekJtlSbivYNyUAs+EvWnnAe8O7eY6VAvfSivUItaUFANDMvY+gU2UgL6CEYHxTEFEz1J3tJPA92MXRZtlPsdyhRnJynj2Eyd4GVD12xcbmv+VpO5OfJdEkePNOB39mr/dlQRuJhHQAt6JjCXmslSbY64U511ueTo5iEg1AI+Qh7OFID9ZmTXLwsAAaILtcPpvWwBOnbixFxwI2M1rbc5vNKBY0N22/d8w7EOm3S2RQLcjM1aoFty57aZllw3WRZpFhovEvvIHYo+2wHErG15NLnuqsv2W2RjGbuV7Udg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -61,18 +61,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SevkloSzkgc8QFqNbvWsXuQqdl/t0+q7j1ThfO8oEw4=;
- b=FDHIq6U9tiKP3zdGVwS7rrpx8sxjremCUm2jk2bNTjqhXiaqz3I3wLTiFErdHmRwnn7zPHB3H990Pr7PKL+fyZRCzLD0p7MwoeghwDoRHW9HqDd2vExIEclQE+6GoXuuv+VkrSEizo77dWGuxpnsvEhQ0dbZoc9WCufDwyfyhWCRttr3mjb2RErSpInmwLeIolkgDslpfVeEwFSIQadGj0nO2OUBvQTOz47hSSrpO8ae/gA/A/WI+MNp1aUYF2pqq2sjUq7fwp2Aa/0Mq5rKrz1Ug0GFKut5qydUlE1Y5zlL5zkpzaUsdNphPAVNz2VxgYw2XaSF0cBQ5zJ11egt/g==
-Received: from PA7P264CA0245.FRAP264.PROD.OUTLOOK.COM (2603:10a6:102:371::6)
- by DM4PR12MB5215.namprd12.prod.outlook.com (2603:10b6:5:397::21) with
+ bh=KT+lDRneeybLpA8vH/YNgOJ3I7raKjOsdrzyZ1BPKJI=;
+ b=IZakDPCguvwCCcgPkK0kx0UTHXALXpyGW+H0cJCpMbVwHyF85F0kIuUXSuH/qehHRScl6HP2cNDvqQAlnY6K/7wtMnfbJhfsPBOTrbat/hMbtg8a+38S1U0q0w4n/GSuKwXvuSozsCNndBY0fhtnlOxDT7V0A+ucwZNfbHgc3PCeTgIRVSfoPQQvL1A2huVWL+iP7u8Ep/xrf7U3dMUb5UTjUNNRPcmH1YoozTo1znHzhDCYbARjotJZYU7kFv+wSXilDkpCvtA5Kl+ye0b09jMjNb5g3qoVVBxhaWX8NQZrE9cukvO6cPT6uESnrrCXU3HNrw8Qvpf708iDS3T+2w==
+Received: from SA1P222CA0042.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:2d0::16)
+ by SA1PR12MB7151.namprd12.prod.outlook.com (2603:10b6:806:2b1::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.24; Wed, 17 Jan
- 2024 15:05:32 +0000
-Received: from SN1PEPF0002636D.namprd02.prod.outlook.com
- (2603:10a6:102:371:cafe::38) by PA7P264CA0245.outlook.office365.com
- (2603:10a6:102:371::6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.23 via Frontend
- Transport; Wed, 17 Jan 2024 15:05:31 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.23; Wed, 17 Jan
+ 2024 15:05:39 +0000
+Received: from SN1PEPF0002636C.namprd02.prod.outlook.com
+ (2603:10b6:806:2d0:cafe::d) by SA1P222CA0042.outlook.office365.com
+ (2603:10b6:806:2d0::16) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.24 via Frontend
+ Transport; Wed, 17 Jan 2024 15:05:37 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -80,28 +80,28 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.161 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.161) by
- SN1PEPF0002636D.mail.protection.outlook.com (10.167.241.138) with Microsoft
+ SN1PEPF0002636C.mail.protection.outlook.com (10.167.241.137) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7202.16 via Frontend Transport; Wed, 17 Jan 2024 15:05:30 +0000
+ 15.20.7202.16 via Frontend Transport; Wed, 17 Jan 2024 15:05:37 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 17 Jan
- 2024 07:05:09 -0800
+ 2024 07:05:15 -0800
 Received: from yaviefel.vdiclient.nvidia.com (10.126.230.35) by
  rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.41; Wed, 17 Jan 2024 07:05:05 -0800
+ 15.2.986.41; Wed, 17 Jan 2024 07:05:10 -0800
 From: Petr Machata <petrm@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, <netdev@vger.kernel.org>
 CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
 	Danielle Ratson <danieller@nvidia.com>, Amit Cohen <amcohen@nvidia.com>,
-	"Jiri Pirko" <jiri@resnulli.us>, <mlxsw@nvidia.com>, Maksym Yaremchuk
-	<maksymy@nvidia.com>
-Subject: [PATCH net 4/6] mlxsw: spectrum_router: Register netdevice notifier before nexthop
-Date: Wed, 17 Jan 2024 16:04:19 +0100
-Message-ID: <74edb8d45d004e8d8f5318eede6ccc3d786d8ba9.1705502064.git.petrm@nvidia.com>
+	"Jiri Pirko" <jiri@resnulli.us>, <mlxsw@nvidia.com>, Shuah Khan
+	<shuah@kernel.org>, <linux-kselftest@vger.kernel.org>
+Subject: [PATCH net 5/6] selftests: mlxsw: qos_pfc: Remove wrong description
+Date: Wed, 17 Jan 2024 16:04:20 +0100
+Message-ID: <0087e2d416aff7e444d15f7c2958fc1d438dc27e.1705502064.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1705502064.git.petrm@nvidia.com>
 References: <cover.1705502064.git.petrm@nvidia.com>
@@ -117,125 +117,54 @@ X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF0002636D:EE_|DM4PR12MB5215:EE_
-X-MS-Office365-Filtering-Correlation-Id: 54e381cd-eb9a-4388-ca38-08dc176dbf7b
+X-MS-TrafficTypeDiagnostic: SN1PEPF0002636C:EE_|SA1PR12MB7151:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8db216f5-27e3-4b0d-ea98-08dc176dc34d
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	HcD5IcxcCmOmvi+TDJOag5L3v6Fl/LEkZXYmwDbn4XbwNPKRYJHycagy6SwlFk+7iYalybhC7jH4+KhqYzZgHbcwW/xWMd2k0mG8XgN5iXmihKY4V3absaQImXhAHADCs4dLVCNjnPuXfaGX3T6dAUDsd/MeymjhE34zrjx9SQYnD9QLp4bF2t4omE0fN8ptnbAtwhPDUtTiXyKq+Jlp9cGMtsTvmYBXG+mvrGYCY6Q1jv6N+k6Z526IH7LQtzdrIr2sQQjH80l/MMoOonhb1N7zY8pLst5G9lWCBdPKEeon9774TlzHtNDsS1hs4L8zdm7CRhiQqUOuIj/QzkvG9l+LJcsLPGrOGRMYfVHI8EtRAEjTNTH+sjF+K0M++BKxrfk2gzSeOEhGPmJ7UpLY4gKCnUTOgoCZ5LJ3SHaQAPWnGWgPAzyxqGjH6xECh7AgSqqxfKzKC7xovH9i5h73xjH+1BvWzzxRKeb0IV+HhJ25+ytWzL70R5UJv3wIBv8onfceolaCF7n05e74PlAgU5qvNSFmq4Z0yOTLaWYj0CNPPK315ucpxMRMSxQezhs4mYxat5gF/5Pcm48L/OOtB6piGpcSRMQk62KIzitENEfK/xpqCsm86bApoNRma1XWOBjfK2PCX40ybbw03UXK/MKuW+CKZ4LIfYN5fMLRSSvviEN8nY5CviQotqj5SL9JPCDDj5axpxSLiDVWUWlPWJ4vPZ2o3k/Ab0ee82hq3/CGKeFOuudoXATNQeyH4LhcvQnFPvp2m4EUjCCV+vn/rg==
+	XfJPiae3KyTeu8rYRSFeqQbmq0tqPluQswGsGb//yUS0NCk7fcyBfBGgbXsbMfhsIVTZspF/47+/87oWXSxy9AddVynOJlu8b/HK1yzkuEa57pyzrMy3qCj5BBcq6uiY4ikb5kDmLumWIQfN8k6bF5OT4ZmKabTAx8AKczmHYvbc8n+wbXPuqjFh+J8YbKuwbU5lARQSCwToPuk4nsoSGhMESC26HCNZy9w2GFEoia/fwc0F5yWjB2QQL5mjC/6P81+hK9fFLvMxZSEGB+Zcus+z6iUcyJj7o32mziAP4qS3f0PooPW4SXAKo7Mo1RWNkG17QCyEmnXxLMRrpLP35YTcflpM+S4tBa8NssTy/upjnBQqdOhweWGH+1MBN5lh/rQzVskCjM3aqbca342Oom/54gfNBhPg1jSmbyfN/3oOVpiJs4q+pevh6CBIHOu2nLVPbZH8Nz4s2VHniUg7OOQAv8HzCbEnfwXIyHWUTxhRMJsRRhfHOz9KQa1s7mkIKU+PGJgDNH7gpgtDcWQ+gmT8PLxCNrt81J9qjsy/vzxlaJP+l8RdvrKzzfxNW1GvEts7JHDS5B0PauohCHlUsFj+UTfCdiqJyW3uUG3sBUkcA2qPLzuDh98f5mXcu/2K3nreddUeQ0z1YwklTL7sEw0hMHuFm5lGtGhzWBggbDej3W63Xhkd8Wwp70x0FsK/ZJly3KZUESq+UvwKTpborVU5Bh5JEzbGWO2H3Ocw9RHQeLjaKEAMyiHtfem6Mzy7
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(376002)(136003)(346002)(39860400002)(396003)(230173577357003)(230273577357003)(230922051799003)(82310400011)(1800799012)(451199024)(64100799003)(186009)(36840700001)(40470700004)(46966006)(4326008)(8936002)(426003)(2616005)(336012)(26005)(54906003)(110136005)(70586007)(70206006)(5660300002)(2906002)(66574015)(16526019)(107886003)(86362001)(36756003)(316002)(8676002)(478600001)(6666004)(7696005)(40480700001)(40460700003)(41300700001)(7636003)(356005)(82740400003)(83380400001)(47076005)(36860700001);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(376002)(136003)(396003)(346002)(230922051799003)(186009)(64100799003)(451199024)(82310400011)(1800799012)(40470700004)(36840700001)(46966006)(41300700001)(82740400003)(47076005)(83380400001)(36860700001)(36756003)(86362001)(356005)(7636003)(110136005)(70586007)(316002)(54906003)(8936002)(2906002)(4326008)(8676002)(5660300002)(16526019)(2616005)(336012)(426003)(26005)(70206006)(478600001)(6666004)(40460700003)(40480700001)(7696005);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jan 2024 15:05:30.9796
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jan 2024 15:05:37.3899
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 54e381cd-eb9a-4388-ca38-08dc176dbf7b
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8db216f5-27e3-4b0d-ea98-08dc176dc34d
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF0002636D.namprd02.prod.outlook.com
+	SN1PEPF0002636C.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5215
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7151
 
-If there are IPIP nexthops at the time when the driver is loaded (or the
-devlink instance reloaded), the driver looks up the corresponding IPIP
-entry. But IPIP entries are only created as a result of netdevice
-notifications. Since the netdevice notifier is registered after the nexthop
-notifier, mlxsw_sp_nexthop_type_init() never finds the IPIP entry,
-registers the nexthop MLXSW_SP_NEXTHOP_TYPE_ETH, and fails to assign a CRIF
-to the nexthop. Later on when the CRIF is necessary, the WARN_ON in
-mlxsw_sp_nexthop_rif() triggers, causing the splat [1].
+From: Amit Cohen <amcohen@nvidia.com>
 
-In order to fix the issue, reorder the netdevice notifier to be registered
-before the nexthop one.
+In the diagram of the topology, $swp3 and $swp4 are described as 1Gbps
+ports. This is wrong information, the test does not configure such speed.
 
-[1] (edited for clarity):
-
-    WARNING: CPU: 1 PID: 1364 at drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c:3245 mlxsw_sp_nexthop_rif (drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c:3246 (discriminator 1)) mlxsw_spectrum
-    Hardware name: Mellanox Technologies Ltd. MSN4410/VMOD0010, BIOS 5.11 01/06/2019
-    Call Trace:
-    ? mlxsw_sp_nexthop_rif (drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c:3246 (discriminator 1)) mlxsw_spectrum
-    __mlxsw_sp_nexthop_eth_update (drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c:3637) mlxsw_spectrum
-    mlxsw_sp_nexthop_update (drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c:3679 drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c:3727) mlxsw_spectrum
-    mlxsw_sp_nexthop_group_update (drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c:3757) mlxsw_spectrum
-    mlxsw_sp_nexthop_group_refresh (drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c:4112) mlxsw_spectrum
-    mlxsw_sp_nexthop_obj_event (drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c:5118 drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c:5191 drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c:5315 drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c:5500) mlxsw_spectrum
-    nexthops_dump (net/ipv4/nexthop.c:217 net/ipv4/nexthop.c:440 net/ipv4/nexthop.c:3609)
-    register_nexthop_notifier (net/ipv4/nexthop.c:3624)
-    mlxsw_sp_router_init (drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c:11486) mlxsw_spectrum
-    mlxsw_sp_init (drivers/net/ethernet/mellanox/mlxsw/spectrum.c:3267) mlxsw_spectrum
-    __mlxsw_core_bus_device_register (drivers/net/ethernet/mellanox/mlxsw/core.c:2202) mlxsw_core
-    mlxsw_devlink_core_bus_device_reload_up (drivers/net/ethernet/mellanox/mlxsw/core.c:2265 drivers/net/ethernet/mellanox/mlxsw/core.c:1603) mlxsw_core
-    devlink_reload (net/devlink/dev.c:314 net/devlink/dev.c:475)
-    [...]
-
-Fixes: 9464a3d68ea9 ("mlxsw: spectrum_router: Track next hops at CRIFs")
-Reported-by: Maksym Yaremchuk <maksymy@nvidia.com>
-Signed-off-by: Petr Machata <petrm@nvidia.com>
+Cc: Shuah Khan <shuah@kernel.org>
+Cc: linux-kselftest@vger.kernel.org
+Fixes: bfa804784e32 ("selftests: mlxsw: Add a PFC test")
+Signed-off-by: Amit Cohen <amcohen@nvidia.com>
 Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Signed-off-by: Petr Machata <petrm@nvidia.com>
 ---
- .../ethernet/mellanox/mlxsw/spectrum_router.c | 24 +++++++++----------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+ tools/testing/selftests/drivers/net/mlxsw/qos_pfc.sh | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c
-index 2c255ed9b8a9..7164f9e6370f 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c
-@@ -11472,6 +11472,13 @@ int mlxsw_sp_router_init(struct mlxsw_sp *mlxsw_sp,
- 	if (err)
- 		goto err_register_netevent_notifier;
- 
-+	mlxsw_sp->router->netdevice_nb.notifier_call =
-+		mlxsw_sp_router_netdevice_event;
-+	err = register_netdevice_notifier_net(mlxsw_sp_net(mlxsw_sp),
-+					      &mlxsw_sp->router->netdevice_nb);
-+	if (err)
-+		goto err_register_netdev_notifier;
-+
- 	mlxsw_sp->router->nexthop_nb.notifier_call =
- 		mlxsw_sp_nexthop_obj_event;
- 	err = register_nexthop_notifier(mlxsw_sp_net(mlxsw_sp),
-@@ -11487,22 +11494,15 @@ int mlxsw_sp_router_init(struct mlxsw_sp *mlxsw_sp,
- 	if (err)
- 		goto err_register_fib_notifier;
- 
--	mlxsw_sp->router->netdevice_nb.notifier_call =
--		mlxsw_sp_router_netdevice_event;
--	err = register_netdevice_notifier_net(mlxsw_sp_net(mlxsw_sp),
--					      &mlxsw_sp->router->netdevice_nb);
--	if (err)
--		goto err_register_netdev_notifier;
--
- 	return 0;
- 
--err_register_netdev_notifier:
--	unregister_fib_notifier(mlxsw_sp_net(mlxsw_sp),
--				&mlxsw_sp->router->fib_nb);
- err_register_fib_notifier:
- 	unregister_nexthop_notifier(mlxsw_sp_net(mlxsw_sp),
- 				    &mlxsw_sp->router->nexthop_nb);
- err_register_nexthop_notifier:
-+	unregister_netdevice_notifier_net(mlxsw_sp_net(mlxsw_sp),
-+					  &router->netdevice_nb);
-+err_register_netdev_notifier:
- 	unregister_netevent_notifier(&mlxsw_sp->router->netevent_nb);
- err_register_netevent_notifier:
- 	unregister_inet6addr_validator_notifier(&router->inet6addr_valid_nb);
-@@ -11550,11 +11550,11 @@ void mlxsw_sp_router_fini(struct mlxsw_sp *mlxsw_sp)
- {
- 	struct mlxsw_sp_router *router = mlxsw_sp->router;
- 
--	unregister_netdevice_notifier_net(mlxsw_sp_net(mlxsw_sp),
--					  &router->netdevice_nb);
- 	unregister_fib_notifier(mlxsw_sp_net(mlxsw_sp), &router->fib_nb);
- 	unregister_nexthop_notifier(mlxsw_sp_net(mlxsw_sp),
- 				    &router->nexthop_nb);
-+	unregister_netdevice_notifier_net(mlxsw_sp_net(mlxsw_sp),
-+					  &router->netdevice_nb);
- 	unregister_netevent_notifier(&router->netevent_nb);
- 	unregister_inet6addr_validator_notifier(&router->inet6addr_valid_nb);
- 	unregister_inetaddr_validator_notifier(&router->inetaddr_valid_nb);
+diff --git a/tools/testing/selftests/drivers/net/mlxsw/qos_pfc.sh b/tools/testing/selftests/drivers/net/mlxsw/qos_pfc.sh
+index 42ce602d8d49..49bef76083b8 100755
+--- a/tools/testing/selftests/drivers/net/mlxsw/qos_pfc.sh
++++ b/tools/testing/selftests/drivers/net/mlxsw/qos_pfc.sh
+@@ -40,7 +40,6 @@
+ # |   + $swp1          $swp3 +                    + $swp4                     |
+ # |   | iPOOL1        iPOOL0 |                    | iPOOL2                    |
+ # |   | ePOOL4        ePOOL5 |                    | ePOOL4                    |
+-# |   |                1Gbps |                    | 1Gbps                     |
+ # |   |        PFC:enabled=1 |                    | PFC:enabled=1             |
+ # | +-|----------------------|-+                +-|------------------------+  |
+ # | | + $swp1.111  $swp3.111 + |                | + $swp4.111              |  |
 -- 
 2.42.0
 
