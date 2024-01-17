@@ -1,218 +1,168 @@
-Return-Path: <netdev+bounces-63943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 900AB8303A5
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 11:31:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64C538303AA
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 11:32:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AD18286485
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 10:31:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A7B8FB2114D
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 10:32:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 969CD1D553;
-	Wed, 17 Jan 2024 10:29:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4BB61BF31;
+	Wed, 17 Jan 2024 10:31:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="odZPxLwN"
+	dkim=pass (2048-bit key) header.d=alu.hr header.i=@alu.hr header.b="EqerjZEj";
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="UCZ2W8OW"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84DC81F5E4;
-	Wed, 17 Jan 2024 10:29:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D00C41DDC8;
+	Wed, 17 Jan 2024 10:31:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=161.53.235.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705487370; cv=none; b=LxS0++HTPFpRaivkMto1/2ZWiC46LOWw2mzx8Q/xWjieLNCMh1MSzE13TuSA+9fWLFU6U069BkNzQ6uK6MSkOJV/aDD0YJxq7J479uca189UTKh9kWkgWN2QvAnwIdI3d5uPbNLPl/8OHP3jONA61VIy3aPm7+Gu3c7RAfMCiVI=
+	t=1705487473; cv=none; b=qBwVbZXnJo3Rug8zrqxEYxHNzrWFlj1Y3aO1d9YtVP7MwscPa1vrFt4hSB1Q4UIyYHwjp+bU0L9NjHEJsAnCKKvrjXetEGoZ6/yXU+f1mro4OdDUEugQe1mItLqiO8Y2S8QdEew6MPLsmhFGzIU493empeNXZRPvHdmTg94aJrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705487370; c=relaxed/simple;
-	bh=zibi+CeC2wCZfnWMWFljfdRRLPyrlidazTLAzNP54qg=;
-	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-Id:
-	 X-Mailer:In-Reply-To:References:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding:X-GND-Sasl; b=WH9Lj/GU/QwpC0h/OddOU6/YTidu8VnABwl8B+qcRDzaOBDvaVDoy6qbsASZUvptpf2eW5MgktChIAOeF0OzeU/x3LlY0HiQmgGhlqnY9bylim4aSn5rd+2Iwp4UW3FONCoKcHc4ah/kxWc04Edj0q0x4k5QojgFUaZu1ug3cTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=odZPxLwN; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A70BF40013;
-	Wed, 17 Jan 2024 10:29:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1705487366;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yjRrjFO9xzMYnUQXRfFaph+4p0OC+506r/Lr0Ehs5Xc=;
-	b=odZPxLwNS/O8C6jXnSxhhJ60JjgkngWQQ/eY5wexZSegMJ5Nx0yav2PY8coodDxnMs/Eq2
-	47HXYcrYmnjjuFkHXKRn7TOsXmFldfzWWGkYqoEH7WUp+If83CbHWjCvqBmSiwKaOSU0LR
-	msuhE0QcwhVqkFxGViwLveh6Iy8JyanXNXbotbGuuDXFeywUBpZwYLWXjzOoe2mzRFoEz0
-	OrCziaahxCiGyGuKYpsbP9jqSSyh7LY/FepZEIZeyG1+fT6g7N7FtUrJBTar4/AnAAhUzx
-	71u4tLme7PHMS8TFXl5L1QBCKyzFk89cy13IH+gjH5AtJh07Ei1ik2mesgOLzA==
-From: =?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>
-To: Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Russell King <linux@armlinux.org.uk>
-Cc: =?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>,
-	mithat.guner@xeront.com,
-	erkin.bozoglu@xeront.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [RFC PATCH net-next 8/8] net: dsa: mt7530: simplify link operations and force link down on all ports
-Date: Wed, 17 Jan 2024 13:28:38 +0300
-Message-Id: <20240117102838.57445-9-arinc.unal@arinc9.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240117102838.57445-1-arinc.unal@arinc9.com>
-References: <20240117102838.57445-1-arinc.unal@arinc9.com>
+	s=arc-20240116; t=1705487473; c=relaxed/simple;
+	bh=iwSt0dX080YAZAjn6l0J2DH9z0NHNrOKDfSGJeVuk2Q=;
+	h=Received:DKIM-Signature:X-Virus-Scanned:Received:Received:
+	 DKIM-Signature:Message-ID:Date:MIME-Version:User-Agent:Subject:
+	 Content-Language:To:Cc:References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding; b=AsYpUik46Eyk7zrBXocw9UkQ+Rd6SqEbcBJMy4ej/T6Oy+fz2qkVcGZ2wgb1e8mYjxt+p+PwrOJxLh1j4Ct6tbV5RCzmUzqSp1g0rtiR7TJAuk9yrm2biOlLbGfIBs/Jtx1WmGUXuOY84o9PSANjChd8DmYQWg5+HCbcW+OWGYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alu.hr; spf=pass smtp.mailfrom=alu.hr; dkim=pass (2048-bit key) header.d=alu.hr header.i=@alu.hr header.b=EqerjZEj; dkim=fail (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b=UCZ2W8OW reason="signature verification failed"; arc=none smtp.client-ip=161.53.235.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alu.hr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alu.hr
+Received: from localhost (localhost [127.0.0.1])
+	by domac.alu.hr (Postfix) with ESMTP id C14606017C;
+	Wed, 17 Jan 2024 11:30:58 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.hr; s=mail;
+	t=1705487458; bh=iwSt0dX080YAZAjn6l0J2DH9z0NHNrOKDfSGJeVuk2Q=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=EqerjZEjtm+TYGTrkvZPBdK3LDNPyshZ60TIZ4IrfuBJQp27noPbojxqjy2OSfC8m
+	 JEh6pqhDqa3TqL/NofyF4qkdH2S3WCm6ALq/QjCpfsm/1r0MLkYxGC4TCdTQzMiAqX
+	 dAAkh+M/oUMY44Z6J1ExB8aPRRnKBZCCGMPqzbKn66MUMWHcZbTu+1Ig8JP9D5B/aS
+	 O6CnZkk/uQTQh9zmBmKahW3zcZiTK9fJWQJ2QbN/bPa61+qJ8QxGjLoSbdwWOFrQ8j
+	 +OxFp3ia/qOTQDAYXhseMBW9A0Q8GZNU5sY0qxC3sWLuzMPYERid1gyGC07ZgjwRbD
+	 HHQoWq4WaOhIQ==
+X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
+Received: from domac.alu.hr ([127.0.0.1])
+	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id eKV4VozrfsID; Wed, 17 Jan 2024 11:30:56 +0100 (CET)
+Received: from [10.0.1.190] (unknown [161.53.83.23])
+	by domac.alu.hr (Postfix) with ESMTPSA id 3681860177;
+	Wed, 17 Jan 2024 11:30:55 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1705487456; bh=iwSt0dX080YAZAjn6l0J2DH9z0NHNrOKDfSGJeVuk2Q=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=UCZ2W8OWe6R7kIOQORPkPRTQEi4uf3Ss1maQsrE0OcNLWMYJbGVY1S2+JxcnaQtaA
+	 2Dk0gsR4EhZp5UXV+qjyj4Z3w1wtPHOcZ5isE+fPLlRveY2R+IuoQXF9ZR6nTF02a5
+	 41z4NCbpfCr7qVugG3F2JQ8XAw556XGtER+dKO1gJ5vXwV1qBcVMeHjJXp8731lmb/
+	 ate34pEnVTz4Po8vQwNrtVkXb3fOGsHhj6EiwYmNCzsvd6IJW/VyPWQn949ExMCsPs
+	 4HkL8OFm0fff45WNsQA9Z0uio/4meJ4LWTKH2/EwxNc+JZjq7VN6o+O9zmEal1DY2Z
+	 ScsjErwWMm3Xg==
+Message-ID: <4523ad21-d06a-4ba2-9b46-974a6093b189@alu.unizg.hr>
+Date: Wed, 17 Jan 2024 11:30:53 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH AUTOSEL 6.7 021/108] r8169: improve RTL8411b phy-down
+ fixup
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>, Sasha Levin <sashal@kernel.org>
+Cc: linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>,
+ Simon Horman <horms@kernel.org>, "David S . Miller" <davem@davemloft.net>,
+ nic_swsd@realtek.com, edumazet@google.com, pabeni@redhat.com,
+ netdev@vger.kernel.org
+References: <20240116194225.250921-1-sashal@kernel.org>
+ <20240116194225.250921-21-sashal@kernel.org>
+ <20240116174315.2629f21c@kernel.org>
+From: Mirsad Todorovac <mirsad.todorovac@alu.hr>
+In-Reply-To: <20240116174315.2629f21c@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
 
-Currently, the link operations for switch MACs are scattered across
-port_enable, port_disable, phylink_mac_config, phylink_mac_link_up, and
-phylink_mac_link_down.
+On 1/17/24 02:43, Jakub Kicinski wrote:
+> On Tue, 16 Jan 2024 14:38:47 -0500 Sasha Levin wrote:
+>> Mirsad proposed a patch to reduce the number of spinlock lock/unlock
+>> operations and the function code size. This can be further improved
+>> because the function sets a consecutive register block.
+> 
+> Clearly a noop and a lot of LoC changed. I vote to drop this from
+> the backport.
 
-port_enable and port_disable clears the link settings. Move that to
-mt7530_setup() and mt7531_setup_common() which set up the switches. This
-way, the link settings are cleared on all ports at setup, and then only
-once with phylink_mac_link_down() when a link goes down.
+Dear Jakub,
 
-Force link down on all ports at setup as well. This ensures that only
-active ports will have their link up.
+I will not argue with a senior developer, but please let me plead for the
+cause.
 
-Now that the bit for setting the port on force mode is done on
-mt7530_setup() and mt7531_setup_common(), get rid of PMCR_FORCE_MODE_ID()
-which helped determine which bit to use for the switch model.
+There are a couple of issues here:
 
-The "MT7621 Giga Switch Programming Guide v0.3", "MT7531 Reference Manual
-for Development Board v1.0", and "MT7988A Wi-Fi 7 Generation Router
-Platform: Datasheet (Open Version) v0.1" documents show that these bits are
-enabled at reset:
+1. Heiner's patch generates smaller and faster code, with 100+
+spin_lock_irqsave()/spin_unlock_restore() pairs less.
 
-PMCR_IFG_XMIT(1) (not part of PMCR_LINK_SETTINGS_MASK)
-PMCR_MAC_MODE (not part of PMCR_LINK_SETTINGS_MASK)
-PMCR_TX_EN
-PMCR_RX_EN
-PMCR_BACKOFF_EN (not part of PMCR_LINK_SETTINGS_MASK)
-PMCR_BACKPR_EN (not part of PMCR_LINK_SETTINGS_MASK)
-PMCR_TX_FC_EN
-PMCR_RX_FC_EN
+According to this table:
 
-Remove the setting of the bits not part of PMCR_LINK_SETTINGS_MASK on
-phylink_mac_config as they're already set.
+[1] https://mirrors.edge.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook-1c.2023.06.11a.pdf#table.3.1
 
-Suggested-by: Vladimir Oltean <olteanv@gmail.com>
-Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
----
- drivers/net/dsa/mt7530.c | 30 +++++++++++++++++-------------
- drivers/net/dsa/mt7530.h |  2 --
- 2 files changed, 17 insertions(+), 15 deletions(-)
+The cost of single lock can be 15.4 - 101.9 ns (for the example CPU),
+so total savings would be 1709 - 11310 ns. But as the event of PHY power
+down is not frequent, this might be a insignificant saving indeed.
 
-diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-index e565406d3314..53a9210513e2 100644
---- a/drivers/net/dsa/mt7530.c
-+++ b/drivers/net/dsa/mt7530.c
-@@ -1017,7 +1017,6 @@ mt7530_port_enable(struct dsa_switch *ds, int port,
- 	priv->ports[port].enable = true;
- 	mt7530_rmw(priv, MT7530_PCR_P(port), PCR_MATRIX_MASK,
- 		   priv->ports[port].pm);
--	mt7530_clear(priv, MT7530_PMCR_P(port), PMCR_LINK_SETTINGS_MASK);
- 
- 	mutex_unlock(&priv->reg_mutex);
- 
-@@ -1037,7 +1036,6 @@ mt7530_port_disable(struct dsa_switch *ds, int port)
- 	priv->ports[port].enable = false;
- 	mt7530_rmw(priv, MT7530_PCR_P(port), PCR_MATRIX_MASK,
- 		   PCR_MATRIX_CLR);
--	mt7530_clear(priv, MT7530_PMCR_P(port), PMCR_LINK_SETTINGS_MASK);
- 
- 	mutex_unlock(&priv->reg_mutex);
- }
-@@ -2240,6 +2238,14 @@ mt7530_setup(struct dsa_switch *ds)
- 	mt7530_mib_reset(ds);
- 
- 	for (i = 0; i < MT7530_NUM_PORTS; i++) {
-+		/* Clear link settings, make all ports operate in force mode,
-+		 * and force link down on all ports. PMCR_FORCE_LNK must be
-+		 * unset to force link down. It is not modified here as it comes
-+		 * unset after reset.
-+		 */
-+		mt7530_clear(priv, MT7530_PMCR_P(i), PMCR_LINK_SETTINGS_MASK);
-+		mt7530_set(priv, MT7530_PMCR_P(i), PMCR_FORCE_MODE);
-+
- 		/* Disable forwarding by default on all ports */
- 		mt7530_rmw(priv, MT7530_PCR_P(i), PCR_MATRIX_MASK,
- 			   PCR_MATRIX_CLR);
-@@ -2342,6 +2348,14 @@ mt7531_setup_common(struct dsa_switch *ds)
- 		     UNU_FFP_MASK);
- 
- 	for (i = 0; i < MT7530_NUM_PORTS; i++) {
-+		/* Clear link settings, make all ports operate in force mode,
-+		 * and force link down on all ports. PMCR_FORCE_LNK must be
-+		 * unset to force link down. It is not modified here as it comes
-+		 * unset after reset.
-+		 */
-+		mt7530_clear(priv, MT7530_PMCR_P(i), PMCR_LINK_SETTINGS_MASK);
-+		mt7530_set(priv, MT7530_PMCR_P(i), MT7531_FORCE_MODE);
-+
- 		/* Disable forwarding by default on all ports */
- 		mt7530_rmw(priv, MT7530_PCR_P(i), PCR_MATRIX_MASK,
- 			   PCR_MATRIX_CLR);
-@@ -2640,23 +2654,13 @@ mt753x_phylink_mac_config(struct dsa_switch *ds, int port, unsigned int mode,
- 			  const struct phylink_link_state *state)
- {
- 	struct mt7530_priv *priv = ds->priv;
--	u32 mcr_cur, mcr_new;
- 
- 	if ((port == 5 || port == 6) && priv->info->mac_port_config)
- 		priv->info->mac_port_config(ds, port, mode, state->interface);
- 
--	mcr_cur = mt7530_read(priv, MT7530_PMCR_P(port));
--	mcr_new = mcr_cur;
--	mcr_new &= ~PMCR_LINK_SETTINGS_MASK;
--	mcr_new |= PMCR_IFG_XMIT(1) | PMCR_MAC_MODE | PMCR_BACKOFF_EN |
--		   PMCR_BACKPR_EN | PMCR_FORCE_MODE_ID(priv->id);
--
- 	/* Are we connected to external phy */
- 	if (port == 5 && dsa_is_user_port(ds, 5))
--		mcr_new |= PMCR_EXT_PHY;
--
--	if (mcr_new != mcr_cur)
--		mt7530_write(priv, MT7530_PMCR_P(port), mcr_new);
-+		mt7530_set(priv, MT7530_PMCR_P(port), PMCR_EXT_PHY);
- }
- 
- static void mt753x_phylink_mac_link_down(struct dsa_switch *ds, int port,
-diff --git a/drivers/net/dsa/mt7530.h b/drivers/net/dsa/mt7530.h
-index caae48703547..beda61263e0d 100644
---- a/drivers/net/dsa/mt7530.h
-+++ b/drivers/net/dsa/mt7530.h
-@@ -304,8 +304,6 @@ enum mt7530_vlan_port_acc_frm {
- 					 MT7531_FORCE_DPX | \
- 					 MT7531_FORCE_RX_FC | \
- 					 MT7531_FORCE_TX_FC)
--#define  PMCR_FORCE_MODE_ID(id)		((((id) == ID_MT7531) || ((id) == ID_MT7988)) ?	\
--					 MT7531_FORCE_MODE : PMCR_FORCE_MODE)
- #define  PMCR_LINK_SETTINGS_MASK	(PMCR_TX_EN | PMCR_FORCE_SPEED_1000 | \
- 					 PMCR_RX_EN | PMCR_FORCE_SPEED_100 | \
- 					 PMCR_TX_FC_EN | PMCR_RX_FC_EN | \
+2. Why I had advertised atomic programming of RTL registers in the first
+place?
+
+The mac_ocp_lock was introduced recently:
+
+commit 91c8643578a21e435c412ffbe902bb4b4773e262
+Author: Heiner Kallweit <hkallweit1@gmail.com>
+Date:   Mon Mar 6 22:23:15 2023 +0100
+
+     r8169: use spinlock to protect mac ocp register access
+
+     For disabling ASPM during NAPI poll we'll have to access mac ocp
+     registers in atomic context. This could result in races because
+     a mac ocp read consists of a write to register OCPDR, followed
+     by a read from the same register. Therefore add a spinlock to
+     protect access to mac ocp registers.
+
+     Reviewed-by: Simon Horman <simon.horman@corigine.com>
+     Tested-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+     Tested-by: Holger Hoffstätte <holger@applied-asynchrony.com>
+     Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+     Signed-off-by: David S. Miller <davem@davemloft.net>
+
+Well, the answer is in the question - the very need for protecting the access
+to RTL_W(8|16|32) with locks comes from the fact that something was accessing
+the RTL card asynchronously.
+
+Forgive me if this is a stupid question ...
+
+Now - do we have a guarantee that the card will not be used asynchronously
+half-programmed from something else in that case, leading to another spurious
+lockup?
+
+IMHO, shouldn't the entire reprogramming of PHY down recovery of the RTL 8411b
+be done atomically, under a single spin_lock_irqsave()/spin_unlock_irqrestore()
+pair?
+
+Best regards,
+Mirsad Todorovac
+
 -- 
-2.40.1
+CARNet system engineer
+Faculty of Graphic Arts | Academy of Fine Arts
+University of Zagreb
+
+CARNet sistem inženjer
+Grafički fakultet | Akademija likovnih umjetnosti
+Sveučilište u Zagrebu
 
 
