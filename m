@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-64013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64017-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A34D1830AD4
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 17:17:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41000830ADB
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 17:17:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FA961F2A1B1
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 16:17:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFDF228E91A
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 16:17:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E739E22627;
-	Wed, 17 Jan 2024 16:16:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77A9323746;
+	Wed, 17 Jan 2024 16:16:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b="D+xPTTq+"
+	dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b="mNgbX6Yu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-64-226.siemens.flowmailer.net (mta-64-226.siemens.flowmailer.net [185.136.64.226])
+Received: from mta-64-228.siemens.flowmailer.net (mta-64-228.siemens.flowmailer.net [185.136.64.228])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C632A2261F
-	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 16:16:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D136322F17
+	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 16:16:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.228
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705508182; cv=none; b=m0nF2n+jJS0hMWhuJTwHnHvK6OPeYQjwM7Dsf+O0ByueRdoj3iAHqtnCEIAeXFMobmSGi5MScH5Oii8rvlyDeN4UmaJ8jwZOWbat3f2VXVnmwkyqsEjOoo7S/sefhnLhFO5j/fJd4lPKxAHtOSFR666OHDK6zC+TBavSOsExPM8=
+	t=1705508189; cv=none; b=KnEYn59UIH+FRWtXjiF7XtT7s9UwjtSA8pEIADbuW4rBN48Ax4EnALYc8D7D4yZpGH83z4JBKEMdeypGpg9Eh7+0VfHnCwk+v5IJdT45zEiCwizvXhazkkhNqVbQrYMjkcRC4jzS3o8uPL4UkbVpMxYx7V6dfmBq6mvR0VjGhuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705508182; c=relaxed/simple;
-	bh=J3au/2qdURmFt1LdWjQhvh59l0TLId2dpn1yD/BHtqo=;
+	s=arc-20240116; t=1705508189; c=relaxed/simple;
+	bh=Qf/Y8qADE56r41RuvVzh1HYReDeBr+ZtZHTwvW/OiGo=;
 	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
 	 In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:
-	 X-Flowmailer-Platform:Feedback-ID; b=U+V/R+PIIfjc3rzqu02vCuth035brzz0m272mu111vHnwjHqyzzoX+r2XFExkEVpz6yVMex8bSuKK6KkuOQ0lM2li7TD4FgLwcD2/6Um2gn3bVTe01wiQu4fCDLPHjGmcUFkQkn8sGzG2acmIyTkXdh60pENR0+VYHpKxuIND4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b=D+xPTTq+; arc=none smtp.client-ip=185.136.64.226
+	 X-Flowmailer-Platform:Feedback-ID; b=MujYeH/9h8J/8LNjx/Ncf15kcnfxeY5I6vVpg2ygT/x+Sz6vRKWBREpz/CqEAHG/4HlE0bySfOOh6qd+bkkhRmbJNQezpWPcD59zJi7b4ME38eghCAuhrZzXBoSleTMTnDMec7TlddOJqZUqsfnDUm5AoiA+TwdO0BEz0SlR5S8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b=mNgbX6Yu; arc=none smtp.client-ip=185.136.64.228
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
-Received: by mta-64-226.siemens.flowmailer.net with ESMTPSA id 2024011716161824050fb63bb0690b03
+Received: by mta-64-228.siemens.flowmailer.net with ESMTPSA id 202401171616195df9daf4c1447576eb
         for <netdev@vger.kernel.org>;
-        Wed, 17 Jan 2024 17:16:18 +0100
+        Wed, 17 Jan 2024 17:16:20 +0100
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
  d=siemens.com; i=diogo.ivo@siemens.com;
  h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
- bh=8sQbeCmWiLFomVY+kxivPzriHLrsmhcfUL/M14qU9XY=;
- b=D+xPTTq+kJgdiDaBd/RCyNFUCHCybBewfRG1z/fBApLFIhTmLhoXZm4c3v5Mzle0BA0VW5
- hNRQ2J8IRR/MmLAtI5Ud/WdRBb6cTB70Tjs/VS8meckoXIHRwzv+/8C25oVE+obsBz1gpRfP
- 8b69oi04Ot4vHol2GolTqyP4tU9eM=;
+ bh=FfaY2isOcT5G3JXOnrGsX+gaw/DEMT/l1TS+2QrUgVE=;
+ b=mNgbX6YuN2+q7lWAmrfE3Jn5yBnGTzwGWnoFrLrHEBO76y0W/5MxuXkPBh8FgPu3oCRRf7
+ 8+Wpm8E0BqvbaaA1+HoySx6WkRaBwM/C5PDoeOaXsjhtzhiA6B5HYEHeLIttASaSVI6wXOlu
+ vt2//7sWeOqMur6U1MW789wmwMQE8=;
 From: Diogo Ivo <diogo.ivo@siemens.com>
 To: danishanwar@ti.com,
 	rogerq@kernel.org,
@@ -50,14 +50,16 @@ To: danishanwar@ti.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	andrew@lunn.ch,
+	dan.carpenter@linaro.org,
+	robh@kernel.org,
 	grygorii.strashko@ti.com,
 	linux-arm-kernel@lists.infradead.org,
 	netdev@vger.kernel.org
 Cc: Diogo Ivo <diogo.ivo@siemens.com>,
 	Jan Kiszka <jan.kiszka@siemens.com>
-Subject: [PATCH v2 3/8] net: ti: icssg-prueth: add SR1.0-specific configuration bits
-Date: Wed, 17 Jan 2024 16:14:57 +0000
-Message-ID: <20240117161602.153233-4-diogo.ivo@siemens.com>
+Subject: [PATCH v2 4/8] net: ti: icssg-classifier: Add support for SR1.0
+Date: Wed, 17 Jan 2024 16:14:58 +0000
+Message-ID: <20240117161602.153233-5-diogo.ivo@siemens.com>
 In-Reply-To: <20240117161602.153233-1-diogo.ivo@siemens.com>
 References: <20240117161602.153233-1-diogo.ivo@siemens.com>
 Precedence: bulk
@@ -70,8 +72,7 @@ Content-Transfer-Encoding: 8bit
 X-Flowmailer-Platform: Siemens
 Feedback-ID: 519:519-1320519:519-21489:flowmailer
 
-Add fields to differentiate between SR1.0 and SR2.0 in the driver
-as well as the structures necessary to program SR1.0.
+Add the functions to program the SR1.0 packet classifier.
 
 Based on the work of Roger Quadros in TI's 5.10 SDK [1].
 
@@ -81,67 +82,194 @@ Co-developed-by: Jan Kiszka <jan.kiszka@siemens.com>
 Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
 Signed-off-by: Diogo Ivo <diogo.ivo@siemens.com>
 ---
- drivers/net/ethernet/ti/icssg/icssg_prueth.h | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ .../net/ethernet/ti/icssg/icssg_classifier.c  | 113 ++++++++++++++++--
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c  |   2 +-
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h  |   6 +-
+ 3 files changed, 110 insertions(+), 11 deletions(-)
 
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_classifier.c b/drivers/net/ethernet/ti/icssg/icssg_classifier.c
+index 6df53ab17fbc..d7288eb6c0fd 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_classifier.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_classifier.c
+@@ -274,6 +274,16 @@ static void rx_class_set_or(struct regmap *miig_rt, int slice, int n,
+ 	regmap_write(miig_rt, offset, data);
+ }
+ 
++static u32 rx_class_get_or(struct regmap *miig_rt, int slice, int n)
++{
++	u32 offset, val;
++
++	offset = RX_CLASS_N_REG(slice, n, RX_CLASS_OR_EN);
++	regmap_read(miig_rt, offset, &val);
++
++	return val;
++}
++
+ void icssg_class_set_host_mac_addr(struct regmap *miig_rt, const u8 *mac)
+ {
+ 	regmap_write(miig_rt, MAC_INTERFACE_0, (u32)(mac[0] | mac[1] << 8 |
+@@ -288,6 +298,26 @@ void icssg_class_set_mac_addr(struct regmap *miig_rt, int slice, u8 *mac)
+ 	regmap_write(miig_rt, offs[slice].mac1, (u32)(mac[4] | mac[5] << 8));
+ }
+ 
++static void icssg_class_ft1_add_mcast(struct regmap *miig_rt, int slice,
++				      int slot, const u8 *addr, const u8 *mask)
++{
++	int i;
++	u32 val;
++
++	WARN(slot >= FT1_NUM_SLOTS, "invalid slot: %d\n", slot);
++
++	rx_class_ft1_set_da(miig_rt, slice, slot, addr);
++	rx_class_ft1_set_da_mask(miig_rt, slice, slot, mask);
++	rx_class_ft1_cfg_set_type(miig_rt, slice, slot, FT1_CFG_TYPE_EQ);
++
++	/* Enable the FT1 slot in OR enable for all classifiers */
++	for (i = 0; i < ICSSG_NUM_CLASSIFIERS_IN_USE; i++) {
++		val = rx_class_get_or(miig_rt, slice, i);
++		val |= RX_CLASS_FT_FT1_MATCH(slot);
++		rx_class_set_or(miig_rt, slice, i, val);
++	}
++}
++
+ /* disable all RX traffic */
+ void icssg_class_disable(struct regmap *miig_rt, int slice)
+ {
+@@ -331,30 +361,95 @@ void icssg_class_disable(struct regmap *miig_rt, int slice)
+ 	regmap_write(miig_rt, offs[slice].rx_class_cfg2, 0);
+ }
+ 
+-void icssg_class_default(struct regmap *miig_rt, int slice, bool allmulti)
++void icssg_class_default(struct regmap *miig_rt, int slice, bool allmulti,
++			 bool is_sr1)
+ {
++	int classifiers_in_use = is_sr1 ? ICSSG_NUM_CLASSIFIERS_IN_USE : 1;
+ 	u32 data;
++	int n;
+ 
+ 	/* defaults */
+ 	icssg_class_disable(miig_rt, slice);
+ 
+ 	/* Setup Classifier */
+-	/* match on Broadcast or MAC_PRU address */
+-	data = RX_CLASS_FT_BC | RX_CLASS_FT_DA_P;
++	for (n = 0; n < classifiers_in_use; n++) {
++		/* match on Broadcast or MAC_PRU address */
++		data = RX_CLASS_FT_BC | RX_CLASS_FT_DA_P;
+ 
+-	/* multicast */
+-	if (allmulti)
+-		data |= RX_CLASS_FT_MC;
++		/* multicast */
++		if (allmulti)
++			data |= RX_CLASS_FT_MC;
+ 
+-	rx_class_set_or(miig_rt, slice, 0, data);
++		rx_class_set_or(miig_rt, slice, n, data);
+ 
+-	/* set CFG1 for OR_OR_AND for classifier */
+-	rx_class_sel_set_type(miig_rt, slice, 0, RX_CLASS_SEL_TYPE_OR_OR_AND);
++		/* set CFG1 for OR_OR_AND for classifier */
++		rx_class_sel_set_type(miig_rt, slice, n,
++				      RX_CLASS_SEL_TYPE_OR_OR_AND);
++	}
+ 
+ 	/* clear CFG2 */
+ 	regmap_write(miig_rt, offs[slice].rx_class_cfg2, 0);
+ }
+ 
++void icssg_class_promiscuous_sr1(struct regmap *miig_rt, int slice)
++{
++	u32 data, offset;
++	int n;
++
++	/* defaults */
++	icssg_class_disable(miig_rt, slice);
++
++	/* Setup Classifier */
++	for (n = 0; n < ICSSG_NUM_CLASSIFIERS_IN_USE; n++) {
++		/* set RAW_MASK to bypass filters */
++		offset = RX_CLASS_GATES_N_REG(slice, n);
++		regmap_read(miig_rt, offset, &data);
++		data |= RX_CLASS_GATES_RAW_MASK;
++		regmap_write(miig_rt, offset, data);
++	}
++}
++
++void icssg_class_add_mcast_sr1(struct regmap *miig_rt, int slice,
++			       struct net_device *ndev)
++{
++	u8 sr_addr[6] = { 0x01, 0x80, 0xc2, 0, 0, 0 };
++	u8 cb_addr[6] = { 0x01, 0x00, 0x5e, 0, 0, 0 };
++	u8 mask_addr[6] = { 0, 0, 0, 0, 0, 0xff };
++	struct netdev_hw_addr *ha;
++	int slot = 2;
++
++	rx_class_ft1_set_start_len(miig_rt, slice, 0, 6);
++	/* reserve first 2 slots for
++	 *	1) 01-80-C2-00-00-XX Known Service Ethernet Multicast addresses
++	 *	2) 01-00-5e-00-00-XX Local Network Control Block
++	 *			      (224.0.0.0 - 224.0.0.255  (224.0.0/24))
++	 */
++	icssg_class_ft1_add_mcast(miig_rt, slice, 0, sr_addr, mask_addr);
++	icssg_class_ft1_add_mcast(miig_rt, slice, 1, cb_addr, mask_addr);
++	mask_addr[5] = 0;
++	netdev_for_each_mc_addr(ha, ndev) {
++		/* skip addresses matching reserved slots */
++		if (!memcmp(sr_addr, ha->addr, 5) ||
++		    !memcmp(cb_addr, ha->addr, 5)) {
++			netdev_dbg(ndev, "mcast skip %pM\n", ha->addr);
++			continue;
++		}
++
++		if (slot >= FT1_NUM_SLOTS) {
++			netdev_dbg(ndev,
++				   "can't add more than %d MC addresses, enabling allmulti\n",
++				   FT1_NUM_SLOTS);
++			icssg_class_default(miig_rt, slice, 1, true);
++			break;
++		}
++
++		netdev_dbg(ndev, "mcast add %pM\n", ha->addr);
++		icssg_class_ft1_add_mcast(miig_rt, slice, slot,
++					  ha->addr, mask_addr);
++		slot++;
++	}
++}
++
+ /* required for SAV check */
+ void icssg_ft1_set_mac_addr(struct regmap *miig_rt, int slice, u8 *mac_addr)
+ {
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+index 411898a4f38c..5ec2cdc16c51 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+@@ -1329,7 +1329,7 @@ static int emac_ndo_open(struct net_device *ndev)
+ 	icssg_class_set_mac_addr(prueth->miig_rt, slice, emac->mac_addr);
+ 	icssg_ft1_set_mac_addr(prueth->miig_rt, slice, emac->mac_addr);
+ 
+-	icssg_class_default(prueth->miig_rt, slice, 0);
++	icssg_class_default(prueth->miig_rt, slice, 0, emac->is_sr1);
+ 
+ 	/* Notify the stack of the actual queue counts. */
+ 	ret = netif_set_real_num_tx_queues(ndev, num_data_chn);
 diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-index 8b6d6b497010..1bdd3d301fde 100644
+index 1bdd3d301fde..c2221db25950 100644
 --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
 +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-@@ -127,6 +127,7 @@ struct prueth_rx_chn {
+@@ -277,7 +277,11 @@ extern const struct ethtool_ops icssg_ethtool_ops;
+ void icssg_class_set_mac_addr(struct regmap *miig_rt, int slice, u8 *mac);
+ void icssg_class_set_host_mac_addr(struct regmap *miig_rt, const u8 *mac);
+ void icssg_class_disable(struct regmap *miig_rt, int slice);
+-void icssg_class_default(struct regmap *miig_rt, int slice, bool allmulti);
++void icssg_class_default(struct regmap *miig_rt, int slice, bool allmulti,
++			 bool is_sr1);
++void icssg_class_promiscuous_sr1(struct regmap *miig_rt, int slice);
++void icssg_class_add_mcast_sr1(struct regmap *miig_rt, int slice,
++			       struct net_device *ndev);
+ void icssg_ft1_set_mac_addr(struct regmap *miig_rt, int slice, u8 *mac_addr);
  
- /* data for each emac port */
- struct prueth_emac {
-+	bool is_sr1;
- 	bool fw_running;
- 	struct prueth *prueth;
- 	struct net_device *ndev;
-@@ -155,6 +156,10 @@ struct prueth_emac {
- 	int rx_flow_id_base;
- 	int tx_ch_num;
- 
-+	/* SR1.0 Management channel */
-+	struct prueth_rx_chn rx_mgm_chn;
-+	int rx_mgm_flow_id_base;
-+
- 	spinlock_t lock;	/* serialize access */
- 
- 	/* TX HW Timestamping */
-@@ -182,10 +187,12 @@ struct prueth_emac {
-  * struct prueth_pdata - PRUeth platform data
-  * @fdqring_mode: Free desc queue mode
-  * @quirk_10m_link_issue: 10M link detect errata
-+ * @is_sr1: device is SR1.0
-  */
- struct prueth_pdata {
- 	enum k3_ring_mode fdqring_mode;
- 	u32	quirk_10m_link_issue:1;
-+	u32	is_sr1:1;
- };
- 
- /**
-@@ -224,6 +231,7 @@ struct prueth {
- 	struct device_node *eth_node[PRUETH_NUM_MACS];
- 	struct prueth_emac *emac[PRUETH_NUM_MACS];
- 	struct net_device *registered_netdevs[PRUETH_NUM_MACS];
-+	struct icssg_config_sr1 config[PRUSS_NUM_PRUS];
- 	struct regmap *miig_rt;
- 	struct regmap *mii_rt;
- 
-@@ -236,6 +244,13 @@ struct prueth {
- 	struct icss_iep *iep1;
- };
- 
-+struct emac_tx_ts_response_sr1 {
-+	u32 lo_ts;
-+	u32 hi_ts;
-+	u32 reserved;
-+	u32 cookie;
-+};
-+
- struct emac_tx_ts_response {
- 	u32 reserved[2];
- 	u32 cookie;
+ /* config helpers */
 -- 
 2.43.0
 
