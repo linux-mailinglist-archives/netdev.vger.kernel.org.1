@@ -1,111 +1,101 @@
-Return-Path: <netdev+bounces-63907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 349A6830087
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 08:31:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B413983008F
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 08:34:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E2ECB24286
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 07:30:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 507A71F24C67
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 07:34:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 438D6B676;
-	Wed, 17 Jan 2024 07:30:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C3A9BA4B;
+	Wed, 17 Jan 2024 07:33:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="fLeek/PA"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aQdvwjzu"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D7E59467
-	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 07:30:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02C70C121
+	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 07:33:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705476650; cv=none; b=kyWO5g1R7Rfcri+eJIkJr48DvO+N2FzD1OzXbWM4jPOPsZNLDGTwDXAVJbVTE6MApSl81SUnYUX7MSh/Isdnvt9JhDEC045ZnWRyJGyKiWF2lXZ1KUzXqQfffkXq5TtvbNUylztkeDuMB3Fn9oB7knIENSiCY90ZW2Hp/Oj3rzc=
+	t=1705476833; cv=none; b=pzVAamohicUFdGSWu8QCuj8GOK6f/c8/oAm6zhYBv/Wm2ZT5cC89l/SrxiGDRPGQETHB+SmdCNxgrl1mNHBXgacKKqt1rsCh/TNSxTeuPdVz4z2KOLc+bsDj0OqfX4Jq9tvluH06+etpt9iLg6Sn6fMmwjzVr9f5nYwyPx9vEeo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705476650; c=relaxed/simple;
-	bh=gqh8zaPPpa66hDrB75+WefGcuZsR/+/vIoRI55+7Sj4=;
-	h=Received:X-Virus-Scanned:Received:Received:DKIM-Filter:
-	 DKIM-Signature:Received:Received:Received:Received:Date:From:To:CC:
-	 Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To:X-ClientProxiedBy:
-	 X-EXCLAIMER-MD-CONFIG; b=eXb/cW0vAPv0fJK5wz6nj5PddTi5GWqOXjnzWL+maM92s1QPDPwtLTuLbTolzCcjGDINC8aolMRxA7SRb+PcJy5PVpd4bvh3rhaUZsOMKB25FNMdpIDXRENlQl3TxphwkUmNXMhPPuJG3aUovX8eQNkntqaTJcyUjPdgyjBKdwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=fLeek/PA; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 9E39920519;
-	Wed, 17 Jan 2024 08:22:02 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3McMXiSq70to; Wed, 17 Jan 2024 08:22:02 +0100 (CET)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 265A520520;
-	Wed, 17 Jan 2024 08:22:02 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 265A520520
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1705476122;
-	bh=cNWTrGAPIcZ70z7LIWlSYDAFNCkyEpU02pHXNPZLQN0=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=fLeek/PASIVNxlPg/iY+ABmmLSvJxUQu/8rD4+IQQu/UTzjyjFNM0S8LohoRJfLNW
-	 SM/pMUfYD+KqEsAeNAISw0hbpXRxHpdfngc3JEsk/C3is4oSnwRpYz7ilrLkPO/CM5
-	 1Hr28/SHufEH/p/9ivNlg8OpxD0oIO2SjK8Zj0LHrnWD58qQ1kP+6mX/J3bU830BvB
-	 F2NOHQRXj3TR7VIXXkC40DeagZ7/+GqqoW1XO/hdGeAfVUSdQuzqib9AlQd/l+tEKR
-	 LKRtVGx1ykxhV7RCK88edPTJlzy21CGk/0QnW0ozjyadENxNuV4R6j2sc17aOA0u+T
-	 9cZ7+z8FJ1HoQ==
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout2.secunet.com (Postfix) with ESMTP id 21D0380004A;
-	Wed, 17 Jan 2024 08:22:02 +0100 (CET)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 17 Jan 2024 08:22:01 +0100
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 17 Jan
- 2024 08:22:01 +0100
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 5BB43318033A; Wed, 17 Jan 2024 08:22:01 +0100 (CET)
-Date: Wed, 17 Jan 2024 08:22:01 +0100
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Guillaume Nault <gnault@redhat.com>
-CC: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	<netdev@vger.kernel.org>, Florian Westphal <fw@strlen.de>, Simon Horman
-	<horms@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH net] xfrm: Clear low order bits of ->flowi4_tos in
- decode_session4().
-Message-ID: <ZaeAGc4AORHQuBGM@gauss3.secunet.de>
-References: <73ad04e0f34b17b02d1eca263e4008440cf3b8e4.1704294322.git.gnault@redhat.com>
+	s=arc-20240116; t=1705476833; c=relaxed/simple;
+	bh=3YX7pDoceQX+E+TvVPVvV9f2P0ODXQ1tsjMOk7kPRaE=;
+	h=Message-ID:DKIM-Signature:Date:MIME-Version:Subject:
+	 Content-Language:To:Cc:References:X-Report-Abuse:From:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:X-Migadu-Flow; b=b4tSdTJJGhbjAtDQhL5+LrjMNCyCRmS4mL/BHYgSXeua5IMvEEdPKQNezs1C2NX975TBXgtmli4PeQemty0AT6YsNbq1DkR1aj9M7ntHRmtYUxNa0vm3g86OXpuI0IWjYVDT2kjJKEpbGSKmANjOnn958+w3/267+PrHr4WCgYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aQdvwjzu; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <51fd5249-140a-4f1b-b20e-703f159e88a3@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1705476829;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oceJQDqoX4I7y29qmqcV6++w314V1TBOmZ9jW9CBGiQ=;
+	b=aQdvwjzuKH4Mw5ibWflyGPsS2g6+/CnLCjfdWOoPu0k8znSNt+CmydaGi3uV2EL0WxLGIj
+	HOh40RCMoLdQ5nCvicBMUfyAcwmxm+kSVLSCdG3nstmn6gvvdTFHBlB5ZxjM1kHTX/1RBu
+	BRRVKyn3CHDDArGpEzjoYJHSW7U+2oc=
+Date: Tue, 16 Jan 2024 23:33:39 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <73ad04e0f34b17b02d1eca263e4008440cf3b8e4.1704294322.git.gnault@redhat.com>
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+Subject: Re: [PATCH bpf-next] bpf: Allow setting SO_TIMESTAMPING* with
+ bpf_setsockopt()
+Content-Language: en-US
+To: =?UTF-8?Q?J=C3=B6rn-Thorben_Hinz?= <j-t.hinz@alumni.tu-berlin.de>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+ Deepa Dinamani <deepa.kernel@gmail.com>, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20240115134110.11624-1-j-t.hinz@alumni.tu-berlin.de>
+ <65a69e1be51ef_380df0294d9@willemb.c.googlers.com.notmuch>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <65a69e1be51ef_380df0294d9@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jan 03, 2024 at 04:06:32PM +0100, Guillaume Nault wrote:
-> Commit 23e7b1bfed61 ("xfrm: Don't accidentally set RTO_ONLINK in
-> decode_session4()") fixed a problem where decode_session4() could
-> erroneously set the RTO_ONLINK flag for IPv4 route lookups. This
-> problem was reintroduced when decode_session4() was modified to
-> use the flow dissector.
-> 
-> Fix this by clearing again the two low order bits of ->flowi4_tos.
-> Found by code inspection, compile tested only.
-> 
-> Fixes: 7a0207094f1b ("xfrm: policy: replace session decode with flow dissector")
-> Signed-off-by: Guillaume Nault <gnault@redhat.com>
+On 1/16/24 7:17 AM, Willem de Bruijn wrote:
+> Jörn-Thorben Hinz wrote:
+>> A BPF application, e.g., a TCP congestion control, might benefit from or
+>> even require precise (=hardware) packet timestamps. These timestamps are
+>> already available through __sk_buff.hwtstamp and
+>> bpf_sock_ops.skb_hwtstamp, but could not be requested: BPF programs were
+>> not allowed to set SO_TIMESTAMPING* on sockets.
 
-Applied, thanks a lot!
+This patch only uses the SOF_TIMESTAMPING_RX_HARDWARE in the selftest. How about 
+others? e.g. the SOF_TIMESTAMPING_TX_* that will affect the sk->sk_error_queue 
+which seems not good. If rx tstamp is useful, tx tstamp should be useful also?
+
+>>
+>> Enable BPF programs to actively request the generation of timestamps
+>> from a stream socket. The also required ioctl(SIOCSHWTSTAMP) on the
+>> network device must still be done separately, in user space.
+
+hmm... so both ioctl(SIOCSHWTSTAMP) of the netdevice and the 
+SOF_TIMESTAMPING_RX_HARDWARE of the sk must be done?
+
+I likely miss something. When skb is created in the driver rx path, the sk is 
+not known yet though. How the SOF_TIMESTAMPING_RX_HARDWARE of the sk affects the 
+skb_shinfo(skb)->hwtstamps?
+
+
+
 
