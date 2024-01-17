@@ -1,191 +1,154 @@
-Return-Path: <netdev+bounces-64037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51812830C5D
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 19:01:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D35E0830C6E
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 19:07:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A97EB247C9
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 18:01:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECFBD1C2155F
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 18:07:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 870F122EEF;
-	Wed, 17 Jan 2024 18:01:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4zGpkU9b"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A684522EE4;
+	Wed, 17 Jan 2024 18:07:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE26222EE4
-	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 18:01:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3674E23748
+	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 18:07:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705514473; cv=none; b=dOHoL7doTscLmMWdJgBo9Qu7JkfqO1rNfzuGY43MM6brX+UNf389rQqvFn/FjEV3TM/Z1gNs0gD0/5IMdZCrEH9P8Ng3Hx496Vhv3zY5ge4eJnwc1TMoDPsMYZ8cIioLmBXNZ4NemAex2rfg/5d/f1rADGmjXewX572oht7X5f4=
+	t=1705514841; cv=none; b=Rm7EbzIM4nxLJ3Q1/bK7LpKvDL8Ai20crLyaxMbQKha4XbUgg1LgO/TMvktOCVyMgXSmbNsbHE42W4WxOomLpq44RTfhRairNZ7Eh8XliadddMl9foa/V/8orW0XmE+C6/+GT1sgfGjbuI7sJZQFx2slHVT4psgfYGdsEMvV7JM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705514473; c=relaxed/simple;
-	bh=s9T8+huYkQV4LX5MAw4WwWh3qTHDPgPe4dZl313Xxoo=;
-	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:MIME-Version:
-	 References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:
-	 Content-Type:Content-Transfer-Encoding; b=irbW8RqJBahnVegyyhw8iVCBwy8qYTC5lXtCaRK+4F59lfXnJvY+Je46EALh1wOdNxPWW+v/8Nk7pdlRHLxirzTw3GyrC6v3J13FNJyZjz2jh4xuKaE1islSd0N1N9Kj/v7R3cAAKWXHGFpb6/LbyCjFQk3xSNkN11iD9bDvr2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4zGpkU9b; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a2bdc3a3c84so771255466b.0
-        for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 10:01:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1705514470; x=1706119270; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s9T8+huYkQV4LX5MAw4WwWh3qTHDPgPe4dZl313Xxoo=;
-        b=4zGpkU9bG3lEpd84ydZjgq3jM59SZtoU67E1nTPEahah5SAyUR4je9VLa7iNvnaN7B
-         IC9a76mZnd4TVpLDO0oP/MHcCoOq2Be8SwF4MyT6PqwWrDHu/qKZ7LFopLPzRcDaWaHp
-         NdieO/Bu1x34xgTnLVypQ7F52E5hgfLLMl7g3Kjarv6PZ4FdACFjcDz/LP7hydwXrOGV
-         Ghy8Ipy6xJpip2a6LW2nauCEtWmsheC3qEVeLp9vBVvrdWCQll/H18lW5nBTlRIDjyc2
-         LbJRzOOf74H/KsRJ9DuXvTG2UgXKdopzCy/3eyIo6J3CRaWgBaF6jtPXOgEJTwclmCt0
-         LLDQ==
+	s=arc-20240116; t=1705514841; c=relaxed/simple;
+	bh=CmW2TWDbj+sd+IIAyfwHA+Ex1l7cZLJcHPWJPr9uD8Y=;
+	h=Received:X-Google-DKIM-Signature:X-Gm-Message-State:
+	 X-Google-Smtp-Source:MIME-Version:X-Received:Date:
+	 X-Google-Appengine-App-Id:X-Google-Appengine-App-Id-Alias:
+	 Message-ID:Subject:From:To:Content-Type; b=F6MBU22twTeUK+HFkldneyDCnryn6W/bqBCy4q6zCi4QgRJaLNsue6J1zQ5E90t6ZQABE4xw7I/0UY4VcKAMEalvHOawo7X1Q86o7bywcgm6ozp1ixjmSQ176Pi3uJYU5DPQXBxz9zjUyG1B4+YpYdn7tJ14pX47a9Mlv+SVeAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-36192835cafso8654035ab.0
+        for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 10:07:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705514470; x=1706119270;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=s9T8+huYkQV4LX5MAw4WwWh3qTHDPgPe4dZl313Xxoo=;
-        b=kFmo4B2iHureywsU3fK2baxmDuwMWIa1PAzBdaQbapsDtMP7HiK+mquqSpe3nXTTYH
-         /fN9bEZ+k/E1UITKH9yckM43+XaN5DTHReRCNNICrr5gvDnnlDSNs4QupqGBvKMjg9WI
-         grk/iaNOM5jhlYXWRsv0LCQNBQJjGtGrxQThz7ZKEdgJzZGP6R+CHfi8fFfcHkpO3cxk
-         uIvUcPq+DFAHRC/il6zesohEplomSIhl/oUnPgiSRF2atnPw+1Gk1wb7CtX80Ez3Er/a
-         PORxzEFBexdGl0jMIax4QNtOmomKXZyfncvulfvdONE6WBDTHTy9sUupK3zXF2OftDRY
-         5e2w==
-X-Gm-Message-State: AOJu0Yz1xgBdrrvv5zoPf0+fwPzcLypsQT//VSH4l3U4N2Ns/0LmNINx
-	1skpeWpZbyy6NfUu134rvJyILegNOuPo6OGbANWum6WdWFbB
-X-Google-Smtp-Source: AGHT+IEcgCFYTo3gSzkKKENWZKwhHSBuhNQViC2TEVlkeUZf94TJjfVYDN08i1bt0NB8RRmuTUfa8jV0G/UE1wVbXWo=
-X-Received: by 2002:a17:907:74b:b0:a2a:b777:b357 with SMTP id
- xc11-20020a170907074b00b00a2ab777b357mr4902988ejb.23.1705514469943; Wed, 17
- Jan 2024 10:01:09 -0800 (PST)
+        d=1e100.net; s=20230601; t=1705514839; x=1706119639;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=d6MXMgMiGYzsFjMUMCx6V1kOmEjQ4JWh3wRvu/GOMLU=;
+        b=VwGfse81QKQ83UH1+JQgHLDekHd1fLZ9TS4kGtl8ctXS0V7q7Yjxm0iONJYP2kM8n+
+         HUpzRTqM7ILJAMmFGexjq26M34+vjS5vz7oiA4tpp2ldculhj4QeoVamTwohrRprCnRE
+         hZPXvgTbYAH7eUXto/mmbkpQ6ooS8RhrgrLWNcE/Yn2xdX4HhA7tbHy8XJmEHPVmRlCV
+         8j0ObWpGa+mbjNck2OR+CwJ0b8Fv45q+YEQca95nQK67Buc8n6ye11m5PfUp2H0bjbkR
+         lsXIeVdES00P+SzoZD8KSt4yBruSGiY4YuWuja3U+LeY9mTG/K2V4er5nMqNkD7dq3t6
+         SjQw==
+X-Gm-Message-State: AOJu0YwwJie2a6QgjpppD6rrAebEd+zHTvw0AsQ3GVAYp1e6TOn8VGTh
+	2rVqx97nAw6dm0cqxWjfGJF+VDkMAC5V2NUufQXixyWuPyeY
+X-Google-Smtp-Source: AGHT+IFPgX/DJ+6CmPwDKhbwx0Xxde7H7An/97c9QfJ5pPOMb0oAzhW+EEn7geoFWioKtFK13s3dpBQc0kV80W4b408U1JGM2Hvo
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240109011455.1061529-1-almasrymina@google.com>
- <20240109011455.1061529-3-almasrymina@google.com> <5219f2cd-6854-0134-560d-8ae3f363b53f@huawei.com>
- <CAHS8izOtr+jfqQ6xCB3CoN-K_V1-4hPsB4-k5+1z-M3Qy2BbwA@mail.gmail.com>
- <0711845b-c435-251f-0bbc-20b243721c06@huawei.com> <CAHS8izOxvMVGXKpLBvVgyyS5_94WGG8Aca=O_zGMX+db-3gBXg@mail.gmail.com>
- <66bc7b8f-51b6-0d9e-db5b-47e7ee5e9029@huawei.com> <CAHS8izOnhtQGeQ-EFmYjZyZ0eW2LqO0Rrm73eAB2su=UA34yTw@mail.gmail.com>
- <20240116000129.GX734935@nvidia.com> <9c1a6725-c4c3-2bb1-344f-5e71f8ce7e63@huawei.com>
- <20240116121611.GY734935@nvidia.com>
-In-Reply-To: <20240116121611.GY734935@nvidia.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 17 Jan 2024 10:00:55 -0800
-Message-ID: <CAHS8izPa6ostY7qZUAmm4g8N3rfWoVBK6r5z0_MycxfsEVH4jw@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v5 2/2] net: add netmem to skb_frag_t
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Yunsheng Lin <linyunsheng@huawei.com>, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Shakeel Butt <shakeelb@google.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+X-Received: by 2002:a92:ca0c:0:b0:360:290:902d with SMTP id
+ j12-20020a92ca0c000000b003600290902dmr183444ils.3.1705514839457; Wed, 17 Jan
+ 2024 10:07:19 -0800 (PST)
+Date: Wed, 17 Jan 2024 10:07:19 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000002a4924060f281e0a@google.com>
+Subject: [syzbot] [netfilter?] WARNING in nf_hook_entry_head
+From: syzbot <syzbot+ea8f0147cde55bfa62e9@syzkaller.appspotmail.com>
+To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
+	fw@strlen.de, kadlec@netfilter.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 16, 2024 at 4:16=E2=80=AFAM Jason Gunthorpe <jgg@nvidia.com> wr=
-ote:
->
-> On Tue, Jan 16, 2024 at 07:04:13PM +0800, Yunsheng Lin wrote:
-> > On 2024/1/16 8:01, Jason Gunthorpe wrote:
-> > > On Mon, Jan 15, 2024 at 03:23:33PM -0800, Mina Almasry wrote:
-> > >>>> You did not answer my question that I asked here, and ignoring thi=
-s
-> > >>>> question is preventing us from making any forward progress on this
-> > >>>> discussion. What do you expect or want skb_frag_page() to do when
-> > >>>> there is no page in the frag?
-> > >>>
-> > >>> I would expect it to do nothing.
-> > >>
-> > >> I don't understand. skb_frag_page() with an empty implementation jus=
-t
-> > >> results in a compiler error as the function needs to return a page
-> > >> pointer. Do you actually expect skb_frag_page() to unconditionally
-> > >> cast frag->netmem to a page pointer? That was explained as
-> > >> unacceptable over and over again by Jason and Christian as it risks
-> > >> casting devmem to page; completely unacceptable and will get nacked.
-> > >> Do you have a suggestion of what skb_frag_page() should do that will
-> > >> not get nacked by mm?
-> > >
-> > > WARN_ON and return NULL seems reasonable?
-> >
+Hello,
 
-That's more or less what I'm thinking.
+syzbot found the following issue on:
 
-> > While I am agreed that it may be a nightmare to debug the case of passi=
-ng
-> > a false page into the mm system, but I am not sure what's the point of
-> > returning NULL to caller if the caller is not expecting or handling
-> > the
->
-> You have to return something and NULL will largely reliably crash the
-> thread. The WARN_ON explains in detail why your thread just crashed.
->
+HEAD commit:    052d534373b7 Merge tag 'exfat-for-6.8-rc1' of git://git.ke..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=111ec0fbe80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=7c8840a4a09eab8
+dashboard link: https://syzkaller.appspot.com/bug?extid=ea8f0147cde55bfa62e9
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
-Agreed.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-> > NULL returning[for example, most of mm API called by the networking doe=
-s not
-> > seems to handling NULL as input page], isn't the NULL returning will ma=
-ke
-> > the kernel panic anyway? Doesn't it make more sense to just add a BUG_O=
-N()
-> > depending on some configuration like CONFIG_DEBUG_NET or CONFIG_DEVMEM?
-> > As returning NULL seems to be causing a confusion for the caller of
-> > skb_frag_page() as whether to or how to handle the NULL returning case.
->
-> Possibly, though Linus doesn't like BUG_ON on principle..
->
-> I think the bigger challenge is convincing people that this devmem
-> stuff doesn't just open a bunch of holes in the kernel where userspace
-> can crash it.
->
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-052d5343.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/a58a0f0eb33d/vmlinux-052d5343.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/019e6b0bba7a/bzImage-052d5343.xz
 
-It does not, and as of right now there are no pending concerns from
-any netdev maintainers regarding mishandled devmem checks at least.
-This is because the devmem series comes with a full audit of
-skb_frag_page() callers [1] and all areas in the net stack attempting
-to access the skb [2].
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+ea8f0147cde55bfa62e9@syzkaller.appspotmail.com
 
-[1] https://patchwork.kernel.org/project/netdevbpf/patch/20231218024024.351=
-6870-10-almasrymina@google.com/
-[2] https://patchwork.kernel.org/project/netdevbpf/patch/20231218024024.351=
-6870-11-almasrymina@google.com/
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 4052 at net/netfilter/core.c:302 nf_hook_entry_head+0x289/0x300 net/netfilter/core.c:302
+Modules linked in:
+CPU: 1 PID: 4052 Comm: kworker/u16:32 Not tainted 6.7.0-syzkaller-09928-g052d534373b7 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Workqueue: netns cleanup_net
+RIP: 0010:nf_hook_entry_head+0x289/0x300 net/netfilter/core.c:302
+Code: 80 3c 02 00 0f 85 82 00 00 00 4d 3b a5 08 01 00 00 75 a0 e8 c9 c0 cf f8 49 81 c5 90 00 00 00 e9 ae fe ff ff e8 b8 c0 cf f8 90 <0f> 0b 90 e9 24 ff ff ff e8 aa c0 cf f8 90 0f 0b 90 e9 16 ff ff ff
+RSP: 0018:ffffc9000c417ac0 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: 0000000000000001 RCX: ffffffff88b736e5
+RDX: ffff88803a6c2400 RSI: ffffffff88b73898 RDI: ffff888029572108
+RBP: 0000000000000005 R08: 0000000000000005 R09: 0000000000000005
+R10: 0000000000000005 R11: ffffffff8ace21e0 R12: ffff888064b59cc0
+R13: ffff888029572000 R14: ffff88810a331c28 R15: ffff888035da3dec
+FS:  0000000000000000(0000) GS:ffff88806b700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00005569f03ef238 CR3: 000000002d4cc000 CR4: 0000000000350ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __nf_unregister_net_hook+0x81/0x680 net/netfilter/core.c:494
+ nf_unregister_net_hook net/netfilter/core.c:533 [inline]
+ nf_unregister_net_hook+0xf3/0x110 net/netfilter/core.c:529
+ nft_netdev_unregister_hooks+0xaf/0x270 net/netfilter/nf_tables_api.c:309
+ __nf_tables_unregister_hook net/netfilter/nf_tables_api.c:358 [inline]
+ __nf_tables_unregister_hook net/netfilter/nf_tables_api.c:340 [inline]
+ __nft_release_hook+0x446/0x560 net/netfilter/nf_tables_api.c:11218
+ __nft_release_hooks net/netfilter/nf_tables_api.c:11233 [inline]
+ nf_tables_pre_exit_net+0xc5/0x120 net/netfilter/nf_tables_api.c:11379
+ ops_pre_exit_list net/core/net_namespace.c:160 [inline]
+ cleanup_net+0x46c/0xb20 net/core/net_namespace.c:606
+ process_one_work+0x886/0x15d0 kernel/workqueue.c:2633
+ process_scheduled_works kernel/workqueue.c:2706 [inline]
+ worker_thread+0x8b9/0x1290 kernel/workqueue.c:2787
+ kthread+0x2c6/0x3a0 kernel/kthread.c:388
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+ </TASK>
 
-> The fact you all are debating what to do with skb_frag_page() suggests
-> to me there isn't confidence...
->
 
-The debate raging on is related to the performance of skb_frag_page(),
-not correctness (and even then, I don't think it's related to
-perf...). Yunsheng would like us to optimize skb_frag_page() using an
-unconditional cast from netmem to page. This in Yunsheng's mind is a
-performance optimization as we don't need to add an if statement
-checking if the netmem is a page. I'm resistant to implement that
-change so far because:
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-(a) unconditionally casting from netmem to page negates the compiler
-type safety that you and Christian are laying out as a requirement for
-the devmem stuff.
-(b) With likely/unlikely or static branches the check to make sure
-netmem is page is a no-op for existing use cases anyway, so AFAIU,
-there is no perf gain from optimizing it out anyway.
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-But none of this is related to correctness. Code calling
-skb_frag_page() will fail or crash if it's not handled correctly
-regardless of the implementation details of skb_frag_page(). In the
-devmem series we add support to handle it correctly via [1] & [2].
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
---=20
-Thanks,
-Mina
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
