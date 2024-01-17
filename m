@@ -1,222 +1,513 @@
-Return-Path: <netdev+bounces-63949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-63950-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D66D7830487
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 12:29:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B531983049C
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 12:35:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E3EB2881A5
-	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 11:29:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE1FA1C21718
+	for <lists+netdev@lfdr.de>; Wed, 17 Jan 2024 11:35:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A845A1DDEC;
-	Wed, 17 Jan 2024 11:28:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC3021DDFA;
+	Wed, 17 Jan 2024 11:35:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iyjOixz1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WAPuvlur"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E68C41DDEA
-	for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 11:28:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D52E81D553;
+	Wed, 17 Jan 2024 11:35:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705490937; cv=none; b=dwGyHdAcOCNZoCXek3lrwut4v1f9ott1M3oT3RP5hJmpEIlxDv3JL/7FVkKUDaV7r6gK/ffn4r8u9B/y8HEDfIQ/EaYQln2yfVxco86QAKwY2p38o4nlx2G6A43ipkHNsS8lVxQoFFLmWf6RMyJgHsGW/+EFUqMj+2sArcdSOIM=
+	t=1705491344; cv=none; b=aVcCkEEzSUvsgcazA2LhTRN62tg/IzlcXif9DZHSvSw3c4qiR90hKN0nh2+XSlkDtGvYl9a7z3OCRD9ruJF8RODFuV+zfmKcG9KYP/0YCOlEGa6Lu2uc0lFpyj+NE5w2LS9t8TECNSunjDN8xJ9liJjoZ1doPgGPuFRBjS6Cd24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705490937; c=relaxed/simple;
-	bh=9UxLq6JE3tFvB3xncH++AmjBezySZHBIlAOhRzA5sGM=;
+	s=arc-20240116; t=1705491344; c=relaxed/simple;
+	bh=cGVn5nGKU6295YOEeT1bunPSed8dfV5dlF10LiiNIv4=;
 	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:MIME-Version:
-	 References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:
-	 Content-Type:Content-Transfer-Encoding; b=o6SAprdtgS+qAl/qiZQXSLhR5IcSXcIZcPcSlx3Kt+NkpfIHQoIZrgNKNg3kRaCNMhyax1UCte/xL5ybXeB7Arii+yPzv1AzVpB+hdRiK2uyNJzQ6qjRE49mLTD5elFy01/A3URPww651nQYA6ICAK2v5XB82ZPjEPqZmuxzUyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iyjOixz1; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-559e809aae5so2988a12.1
-        for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 03:28:55 -0800 (PST)
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:From:
+	 To:Cc:Subject:Date:Message-Id:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding; b=ZBvzjVMsEWp1aZbsA3rFTIyrPMog3Hy6VpXYhGWIVF+Zx1c2v1BSc/c8zhmDuL1aWkqx5uhd1B5/xwhyaenYIvawnP4aBsr5dykIIbB8L3qrE2DAPWTj/3ZEYxEeYhrUDGz8upeUhrfvnIX8ysJ3nL2/XG1VQlwiVsqa5RJJIzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WAPuvlur; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-337b71a0240so1384589f8f.0;
+        Wed, 17 Jan 2024 03:35:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1705490934; x=1706095734; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rUTqwmaaaMo0qiplmJ0oCra8yqBQ6MPVJFihIeTbC4I=;
-        b=iyjOixz1yu8LdVY4cFVBoZ6OAOIq+7eZNJr/N5r2Rhxu04rU6mEr/XTIM/TIdqrQ65
-         nR3Q5ZGe/Kd9HrCQTt70Y+d73R9Mss324J3afIq+xFu64fFRVrqsxII5XQQu4yCOMpUm
-         yyXCJniH/By7cMv5Mo2xN03k9uWlEXX1xxiZW6P3+e4NXgbxvYW1ADfGVfq/r5mPg2LP
-         CSHvP0K+skFreh4EyleBzFww8OnDZzsQFAElLzBjLL0VgJwqxNneue1DryZrx6alSq3C
-         8h5XGZL9sz5568wRCd967v8vMrSkNPMFUTGSGB1Iecvh6Q4vER2DrT7+Z2uciZUa6aMl
-         eo6w==
+        d=gmail.com; s=20230601; t=1705491341; x=1706096141; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rlN6ktNqZqlESmFt/Q5ERUw4tTnRFjyWqNJgs9EIDOU=;
+        b=WAPuvlurwnVNhD1GbxJ+T2qiYVYDw34SiTxFAmFoY1iMi3TDQJOZeBxStVIQ6j+IdI
+         PTbhFwJ9nL12eT5iy9MV3oyskuqZBrsm3XmQtEz+cVpvgh3MI9Q1aGVdUtUv8yzBdNIV
+         ZZ7DgHaUg3/w+AxaP7ETg4I02xJTD9GjRQ7nKu7PebJkSq26Ht2WuGhJecMGbxWs+LQV
+         lX1Mf/NbPz+BgoA8WGFlHU2Dv47uFUEf0tTmf9J67xV46SYoAe5q0ES3XBWBdD+jdUfo
+         Id7Jvy5/sztv5uSuK92Zu3ySuIh+8jkC07unNTsg5lNUWIkbstLiqqQ+uUpASvwKBe0W
+         4j5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705490934; x=1706095734;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rUTqwmaaaMo0qiplmJ0oCra8yqBQ6MPVJFihIeTbC4I=;
-        b=Vd3v5XvLQ0ZPPfvJOzyB5x1iyaGlwFDV1ICtWNCh6d/q/OlN8+7t5c6u6YEVyT+wpy
-         gdLsJR45JxAxdZISxiERZQSypbLlAaBIe5eNnRqsTMnx8dclY0OMmcpjfoZwoIXYjcM6
-         ouAo2WlW/cR7/DfPUI/zM2/ubUfqGwLUI5dhauw7sUl++9HT137FZrZMmY4ZmHRl0OGk
-         2llI2zXxiZBvm9Y/IA2vJfhXePWkiP3p+mP4enfpT3BfBosh8QwjmHbRTiCx2k6h2nH9
-         gVFHIyKcuIVcsimxHs3gnVl365iIrUbGVtzGCbq5d/Hx1iKkbcS3LQSU1mRHtQbC/ArX
-         HOPw==
-X-Gm-Message-State: AOJu0Yz48KmKbcu3Bc6gzSufz57XdZsj+z0IgI3stgS1hmV6XK2H6Ilx
-	qGH3OLa723KYj1FRykD8mjBYeDbu4AC1NUFo4itXJA898DqZbjOT5HaT424iucW53IL6pZoXsVq
-	UvOP3ogZDqdV4HtOoGb5asHxcixME6gg5zABI
-X-Google-Smtp-Source: AGHT+IGSBvaHRGI/UZX7877PvgdggGOX159hATjt0sbm23iEulVKNprg+bgEbiTj8Rq7jypHZjIgN7N9t3W/oGJDtB0=
-X-Received: by 2002:a05:6402:2904:b0:559:c381:2084 with SMTP id
- ee4-20020a056402290400b00559c3812084mr89422edb.3.1705490933875; Wed, 17 Jan
- 2024 03:28:53 -0800 (PST)
+        d=1e100.net; s=20230601; t=1705491341; x=1706096141;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rlN6ktNqZqlESmFt/Q5ERUw4tTnRFjyWqNJgs9EIDOU=;
+        b=OeTasXTsgiDRnlgiIDfuJytnENbAXfgHMlPKXGrEoxCf2iFEbYf8IsTu9bzDkC5FZx
+         ViGgQSN2usSRMGUbBreOm35PP1MD3sUnc6bVeBzVR4RqnRO/OHz2J4LW76JSoX78Wgz1
+         2G+UH+6deanFIUusO6+XSkyqk+GpaAnHeeQYecio5FNW7tnzYDZDQwOWY5g4AFMjkYdH
+         f0krSZbANUpJKtw306Tj6naZ1qgoLlrRpQld7ShfyRcXH0RaZBVn7np2RUa0cIO7/qrk
+         d01KMG4ZplNABeViDUuUDlqym0B7ZKDICDxoNv8L9dx3Cm+bK+pJ3czWigdNWRP334na
+         1soQ==
+X-Gm-Message-State: AOJu0YyGNvDl+lGDo1t6AhPL74qWQUnF8GMNB1vhdhgHSzwdE8PmlMYK
+	a5FnG/fQxv6EA9oAPYdQoDA=
+X-Google-Smtp-Source: AGHT+IF8xWULn/5ZymiXJYjCyz9QaV6Tu9o4kcTTnRDvwNuvDUFkvnVxemCFrwokZb+L9hdahgg4zA==
+X-Received: by 2002:a05:6000:1b0a:b0:337:bdcf:9d8b with SMTP id f10-20020a0560001b0a00b00337bdcf9d8bmr1360328wrz.76.1705491340740;
+        Wed, 17 Jan 2024 03:35:40 -0800 (PST)
+Received: from ran.advaoptical.com ([82.166.23.19])
+        by smtp.gmail.com with ESMTPSA id g15-20020a5d64ef000000b00336f43fa654sm1493288wri.22.2024.01.17.03.35.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Jan 2024 03:35:40 -0800 (PST)
+From: Sagi Maimon <maimon.sagi@gmail.com>
+To: richardcochran@gmail.com,
+	jonathan.lemon@gmail.com,
+	vadfed@fb.com
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	Sagi Maimon <maimon.sagi@gmail.com>
+Subject: [PATCH v4] ptp: ocp: add Adva timecard support
+Date: Wed, 17 Jan 2024 13:35:36 +0200
+Message-Id: <20240117113536.2829-1-maimon.sagi@gmail.com>
+X-Mailer: git-send-email 2.26.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240117063152.1046210-1-shaozhengchao@huawei.com>
-In-Reply-To: <20240117063152.1046210-1-shaozhengchao@huawei.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 17 Jan 2024 12:28:40 +0100
-Message-ID: <CANn89iKhWyw9YvS_cgfuym0sK4O-FS2xXyWgU=MjZ0g=wesYjg@mail.gmail.com>
-Subject: Re: [PATCH net,v3] tcp: make sure init the accept_queue's spinlocks once
-To: Zhengchao Shao <shaozhengchao@huawei.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, sming56@aliyun.com, 
-	weiyongjun1@huawei.com, yuehaibing@huawei.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jan 17, 2024 at 7:22=E2=80=AFAM Zhengchao Shao <shaozhengchao@huawe=
-i.com> wrote:
->
-> When I run syz's reproduction C program locally, it causes the following
-> </TASK>
->
-> The issue triggering process is analyzed as follows:
-> Thread A                                       Thread B
-> tcp_v4_rcv      //receive ack TCP packet       inet_shutdown
->   tcp_check_req                                  tcp_disconnect //disconn=
-ect sock
->   ...                                              tcp_set_state(sk, TCP_=
-CLOSE)
->     inet_csk_complete_hashdance                ...
->       inet_csk_reqsk_queue_add                 inet_listen  //start liste=
-n
->         spin_lock(&queue->rskq_lock)             inet_csk_listen_start
->         ...                                        reqsk_queue_alloc
->         ...                                          spin_lock_init
->         spin_unlock(&queue->rskq_lock)  //warning
->
-> When the socket receives the ACK packet during the three-way handshake,
-> it will hold spinlock. And then the user actively shutdowns the socket
-> and listens to the socket immediately, the spinlock will be initialized.
-> When the socket is going to release the spinlock, a warning is generated.
-> Also the same issue to fastopenq.lock.
->
-> Move init spinlock to inet_create and inet_accept to make sure init the
-> accept_queue's spinlocks once.
->
-> Fixes: fff1f3001cc5 ("tcp: add a spinlock to protect struct request_sock_=
-queue")
-> Fixes: 168a8f58059a ("tcp: TCP Fast Open Server - main code path")
-> Reported-by: Ming Shu <sming56@aliyun.com>
-> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
-> ---
-> v3: Move init spinlock to inet_create and inet_accept.
-> v2: Add 'init_done' to make sure init the accept_queue's spinlocks once.
-> ---
->  net/core/request_sock.c         |  3 ---
->  net/ipv4/af_inet.c              | 11 +++++++++++
->  net/ipv4/inet_connection_sock.c |  8 ++++++++
->  3 files changed, 19 insertions(+), 3 deletions(-)
->
-> diff --git a/net/core/request_sock.c b/net/core/request_sock.c
-> index f35c2e998406..63de5c635842 100644
-> --- a/net/core/request_sock.c
-> +++ b/net/core/request_sock.c
-> @@ -33,9 +33,6 @@
->
->  void reqsk_queue_alloc(struct request_sock_queue *queue)
->  {
-> -       spin_lock_init(&queue->rskq_lock);
-> -
-> -       spin_lock_init(&queue->fastopenq.lock);
->         queue->fastopenq.rskq_rst_head =3D NULL;
->         queue->fastopenq.rskq_rst_tail =3D NULL;
->         queue->fastopenq.qlen =3D 0;
-> diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
-> index 835f4f9d98d2..6589741157a4 100644
-> --- a/net/ipv4/af_inet.c
-> +++ b/net/ipv4/af_inet.c
-> @@ -244,6 +244,14 @@ int inet_listen(struct socket *sock, int backlog)
->  }
->  EXPORT_SYMBOL(inet_listen);
->
-> +static void __inet_init_csk_lock(struct sock *sk)
-> +{
-> +       struct inet_connection_sock *icsk =3D inet_csk(sk);
-> +
-> +       spin_lock_init(&icsk->icsk_accept_queue.rskq_lock);
-> +       spin_lock_init(&icsk->icsk_accept_queue.fastopenq.lock);
-> +}
+Adding support for the Adva timecard.
+The card uses different drivers to provide access to the
+firmware SPI flash (Altera based).
+Other parts of the code are the same and could be reused.
 
-This probably could be an inline helper in a suitable include file.
-No need for __prefix btw.
+Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
+---
 
-static void inline inet_init_csk_locks(struct sock *sk)
-{
-       struct inet_connection_sock *icsk =3D inet_csk(sk);
+ Addressed comments from:
+ - Vadim Fedorenko : https://www.spinics.net/lists/netdev/msg962933.html
+          
+ Changes since version 3:
+ - Initialize fw information for ADVA board.
+ - Adding serialnum and board ID attribute support for ADVA board.
+ - Adding signal generators and frequency counters. 
+ 
+ drivers/ptp/ptp_ocp.c | 302 ++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 293 insertions(+), 9 deletions(-)
 
-       spin_lock_init(&icsk->icsk_accept_queue.rskq_lock);
-       spin_lock_init(&icsk->icsk_accept_queue.fastopenq.lock);
-}
+diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
+index 4021d3d325f9..39dbf58ca360 100644
+--- a/drivers/ptp/ptp_ocp.c
++++ b/drivers/ptp/ptp_ocp.c
+@@ -34,6 +34,9 @@
+ #define PCI_VENDOR_ID_OROLIA			0x1ad7
+ #define PCI_DEVICE_ID_OROLIA_ARTCARD		0xa000
+ 
++#define PCI_VENDOR_ID_ADVA			0xad5a
++#define PCI_DEVICE_ID_ADVA_TIMECARD		0x0400
++
+ static struct class timecard_class = {
+ 	.name		= "timecard",
+ };
+@@ -63,6 +66,13 @@ struct ocp_reg {
+ 	u32	status_drift;
+ };
+ 
++struct ptp_ocp_servo_conf {
++	u32	servo_offset_p;
++	u32	servo_offset_i;
++	u32	servo_drift_p;
++	u32	servo_drift_i;
++};
++
+ #define OCP_CTRL_ENABLE		BIT(0)
+ #define OCP_CTRL_ADJUST_TIME	BIT(1)
+ #define OCP_CTRL_ADJUST_OFFSET	BIT(2)
+@@ -397,10 +407,14 @@ static int ptp_ocp_sma_store(struct ptp_ocp *bp, const char *buf, int sma_nr);
+ 
+ static int ptp_ocp_art_board_init(struct ptp_ocp *bp, struct ocp_resource *r);
+ 
++static int ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r);
++
+ static const struct ocp_attr_group fb_timecard_groups[];
+ 
+ static const struct ocp_attr_group art_timecard_groups[];
+ 
++static const struct ocp_attr_group adva_timecard_groups[];
++
+ struct ptp_ocp_eeprom_map {
+ 	u16	off;
+ 	u16	len;
+@@ -700,6 +714,12 @@ static struct ocp_resource ocp_fb_resource[] = {
+ 	},
+ 	{
+ 		.setup = ptp_ocp_fb_board_init,
++		.extra = &(struct ptp_ocp_servo_conf) {
++			.servo_offset_p = 0x2000,
++			.servo_offset_i = 0x1000,
++			.servo_drift_p = 0,
++			.servo_drift_i = 0,
++		},
+ 	},
+ 	{ }
+ };
+@@ -831,6 +851,170 @@ static struct ocp_resource ocp_art_resource[] = {
+ 	},
+ 	{
+ 		.setup = ptp_ocp_art_board_init,
++		.extra = &(struct ptp_ocp_servo_conf) {
++			.servo_offset_p = 0x2000,
++			.servo_offset_i = 0x1000,
++			.servo_drift_p = 0,
++			.servo_drift_i = 0,
++		},
++	},
++	{ }
++};
++
++static struct ocp_resource ocp_adva_resource[] = {
++	{
++		OCP_MEM_RESOURCE(reg),
++		.offset = 0x01000000, .size = 0x10000,
++	},
++	{
++		OCP_EXT_RESOURCE(ts0),
++		.offset = 0x01010000, .size = 0x10000, .irq_vec = 1,
++		.extra = &(struct ptp_ocp_ext_info) {
++			.index = 0,
++			.irq_fcn = ptp_ocp_ts_irq,
++			.enable = ptp_ocp_ts_enable,
++		},
++	},
++	{
++		OCP_EXT_RESOURCE(ts1),
++		.offset = 0x01020000, .size = 0x10000, .irq_vec = 2,
++		.extra = &(struct ptp_ocp_ext_info) {
++			.index = 1,
++			.irq_fcn = ptp_ocp_ts_irq,
++			.enable = ptp_ocp_ts_enable,
++		},
++	},
++	{
++		OCP_EXT_RESOURCE(ts2),
++		.offset = 0x01060000, .size = 0x10000, .irq_vec = 6,
++		.extra = &(struct ptp_ocp_ext_info) {
++			.index = 2,
++			.irq_fcn = ptp_ocp_ts_irq,
++			.enable = ptp_ocp_ts_enable,
++		},
++	},
++	/* Timestamp for PHC and/or PPS generator */
++	{
++		OCP_EXT_RESOURCE(pps),
++		.offset = 0x010C0000, .size = 0x10000, .irq_vec = 0,
++		.extra = &(struct ptp_ocp_ext_info) {
++			.index = 5,
++			.irq_fcn = ptp_ocp_ts_irq,
++			.enable = ptp_ocp_ts_enable,
++		},
++	},
++	{
++		OCP_EXT_RESOURCE(signal_out[0]),
++		.offset = 0x010D0000, .size = 0x10000, .irq_vec = 11,
++		.extra = &(struct ptp_ocp_ext_info) {
++			.index = 1,
++			.irq_fcn = ptp_ocp_signal_irq,
++			.enable = ptp_ocp_signal_enable,
++		},
++	},
++	{
++		OCP_EXT_RESOURCE(signal_out[1]),
++		.offset = 0x010E0000, .size = 0x10000, .irq_vec = 12,
++		.extra = &(struct ptp_ocp_ext_info) {
++			.index = 2,
++			.irq_fcn = ptp_ocp_signal_irq,
++			.enable = ptp_ocp_signal_enable,
++		},
++	},
++	{
++		OCP_MEM_RESOURCE(pps_to_ext),
++		.offset = 0x01030000, .size = 0x10000,
++	},
++	{
++		OCP_MEM_RESOURCE(pps_to_clk),
++		.offset = 0x01040000, .size = 0x10000,
++	},
++	{
++		OCP_MEM_RESOURCE(tod),
++		.offset = 0x01050000, .size = 0x10000,
++	},
++	{
++		OCP_MEM_RESOURCE(image),
++		.offset = 0x00020000, .size = 0x1000,
++	},
++	{
++		OCP_MEM_RESOURCE(pps_select),
++		.offset = 0x00130000, .size = 0x1000,
++	},
++	{
++		OCP_MEM_RESOURCE(sma_map1),
++		.offset = 0x00140000, .size = 0x1000,
++	},
++	{
++		OCP_MEM_RESOURCE(sma_map2),
++		.offset = 0x00220000, .size = 0x1000,
++	},
++	{
++		OCP_SERIAL_RESOURCE(gnss_port),
++		.offset = 0x00160000 + 0x1000, .irq_vec = 3,
++		.extra = &(struct ptp_ocp_serial_port) {
++			.baud = 9600,
++		},
++	},
++	{
++		OCP_SERIAL_RESOURCE(mac_port),
++		.offset = 0x00180000 + 0x1000, .irq_vec = 5,
++		.extra = &(struct ptp_ocp_serial_port) {
++			.baud = 115200,
++		},
++	},
++	{
++			OCP_MEM_RESOURCE(freq_in[0]),
++			.offset = 0x01200000, .size = 0x10000,
++	},
++	{
++		OCP_MEM_RESOURCE(freq_in[1]),
++		.offset = 0x01210000, .size = 0x10000,
++	},
++	{
++		OCP_SPI_RESOURCE(spi_flash),
++		.offset = 0x00310400, .size = 0x10000, .irq_vec = 9,
++		.extra = &(struct ptp_ocp_flash_info) {
++			.name = "spi_altera", .pci_offset = 0,
++			.data_size = sizeof(struct altera_spi_platform_data),
++			.data = &(struct altera_spi_platform_data) {
++				.num_chipselect = 1,
++				.num_devices = 1,
++				.devices = &(struct spi_board_info) {
++					.modalias = "spi-nor",
++				},
++			},
++		},
++	},
++	{
++		OCP_I2C_RESOURCE(i2c_ctrl),
++		.offset = 0x150000, .size = 0x100, .irq_vec = 7,
++		.extra = &(struct ptp_ocp_i2c_info) {
++			.name = "ocores-i2c",
++			.fixed_rate = 50000000,
++			.data_size = sizeof(struct ocores_i2c_platform_data),
++			.data = &(struct ocores_i2c_platform_data) {
++				.clock_khz = 50000,
++				.bus_khz = 100,
++				.reg_io_width = 4, // 32-bit/4-byte
++				.reg_shift = 2, // 32-bit addressing
++				.num_devices = 2,
++				.devices = (struct i2c_board_info[]) {
++					{ I2C_BOARD_INFO("24c02", 0x50) },
++					{ I2C_BOARD_INFO("24mac402", 0x58),
++					 .platform_data = "mac" },
++				},
++			},
++		},
++	},
++	{
++		.setup = ptp_ocp_adva_board_init,
++		.extra = &(struct ptp_ocp_servo_conf) {
++			.servo_offset_p = 0xc000,
++			.servo_offset_i = 0x1000,
++			.servo_drift_p = 0,
++			.servo_drift_i = 0,
++		},
+ 	},
+ 	{ }
+ };
+@@ -839,6 +1023,7 @@ static const struct pci_device_id ptp_ocp_pcidev_id[] = {
+ 	{ PCI_DEVICE_DATA(FACEBOOK, TIMECARD, &ocp_fb_resource) },
+ 	{ PCI_DEVICE_DATA(CELESTICA, TIMECARD, &ocp_fb_resource) },
+ 	{ PCI_DEVICE_DATA(OROLIA, ARTCARD, &ocp_art_resource) },
++	{ PCI_DEVICE_DATA(ADVA, TIMECARD, &ocp_adva_resource) },
+ 	{ }
+ };
+ MODULE_DEVICE_TABLE(pci, ptp_ocp_pcidev_id);
+@@ -917,6 +1102,30 @@ static const struct ocp_selector ptp_ocp_art_sma_out[] = {
+ 	{ }
+ };
+ 
++static const struct ocp_selector ptp_ocp_adva_sma_in[] = {
++	{ .name = "10Mhz",	.value = 0x0000,      .frequency = 10000000},
++	{ .name = "PPS1",	.value = 0x0001,      .frequency = 1 },
++	{ .name = "PPS2",	.value = 0x0002,      .frequency = 1 },
++	{ .name = "TS1",	.value = 0x0004,      .frequency = 0 },
++	{ .name = "TS2",	.value = 0x0008,      .frequency = 0 },
++	{ .name = "FREQ1",	.value = 0x0100,      .frequency = 0 },
++	{ .name = "FREQ2",	.value = 0x0200,      .frequency = 0 },
++	{ .name = "None",	.value = SMA_DISABLE, .frequency = 0 },
++	{ }
++};
++
++static const struct ocp_selector ptp_ocp_adva_sma_out[] = {
++	{ .name = "10Mhz",	.value = 0x0000,  .frequency = 10000000},
++	{ .name = "PHC",	.value = 0x0001,  .frequency = 1 },
++	{ .name = "MAC",	.value = 0x0002,  .frequency = 1 },
++	{ .name = "GNSS1",	.value = 0x0004,  .frequency = 1 },
++	{ .name = "GEN1",	.value = 0x0040 },
++	{ .name = "GEN2",	.value = 0x0080 },
++	{ .name = "GND",	.value = 0x2000 },
++	{ .name = "VCC",	.value = 0x4000 },
++	{ }
++};
++
+ struct ocp_sma_op {
+ 	const struct ocp_selector *tbl[2];
+ 	void (*init)(struct ptp_ocp *bp);
+@@ -1363,7 +1572,7 @@ ptp_ocp_estimate_pci_timing(struct ptp_ocp *bp)
+ }
+ 
+ static int
+-ptp_ocp_init_clock(struct ptp_ocp *bp)
++ptp_ocp_init_clock(struct ptp_ocp *bp, struct ptp_ocp_servo_conf *servo_conf)
+ {
+ 	struct timespec64 ts;
+ 	u32 ctrl;
+@@ -1371,12 +1580,11 @@ ptp_ocp_init_clock(struct ptp_ocp *bp)
+ 	ctrl = OCP_CTRL_ENABLE;
+ 	iowrite32(ctrl, &bp->reg->ctrl);
+ 
+-	/* NO DRIFT Correction */
+-	/* offset_p:i 1/8, offset_i: 1/16, drift_p: 0, drift_i: 0 */
+-	iowrite32(0x2000, &bp->reg->servo_offset_p);
+-	iowrite32(0x1000, &bp->reg->servo_offset_i);
+-	iowrite32(0,	  &bp->reg->servo_drift_p);
+-	iowrite32(0,	  &bp->reg->servo_drift_i);
++	/* servo configuration */
++	iowrite32(servo_conf->servo_offset_p, &bp->reg->servo_offset_p);
++	iowrite32(servo_conf->servo_offset_i, &bp->reg->servo_offset_i);
++	iowrite32(servo_conf->servo_drift_p, &bp->reg->servo_drift_p);
++	iowrite32(servo_conf->servo_drift_p, &bp->reg->servo_drift_i);
+ 
+ 	/* latch servo values */
+ 	ctrl |= OCP_CTRL_ADJUST_SERVO;
+@@ -2362,6 +2570,14 @@ static const struct ocp_sma_op ocp_fb_sma_op = {
+ 	.set_output	= ptp_ocp_sma_fb_set_output,
+ };
+ 
++static const struct ocp_sma_op ocp_adva_sma_op = {
++	.tbl		= { ptp_ocp_adva_sma_in, ptp_ocp_adva_sma_out },
++	.init		= ptp_ocp_sma_fb_init,
++	.get		= ptp_ocp_sma_fb_get,
++	.set_inputs	= ptp_ocp_sma_fb_set_inputs,
++	.set_output	= ptp_ocp_sma_fb_set_output,
++};
++
+ static int
+ ptp_ocp_set_pins(struct ptp_ocp *bp)
+ {
+@@ -2441,7 +2657,7 @@ ptp_ocp_fb_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
+ 		return err;
+ 	ptp_ocp_sma_init(bp);
+ 
+-	return ptp_ocp_init_clock(bp);
++	return ptp_ocp_init_clock(bp, r->extra);
+ }
+ 
+ static bool
+@@ -2603,7 +2819,44 @@ ptp_ocp_art_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
+ 	if (err)
+ 		return err;
+ 
+-	return ptp_ocp_init_clock(bp);
++	return ptp_ocp_init_clock(bp, r->extra);
++}
++
++/* ADVA specific board initializers; last "resource" registered. */
++static int
++ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
++{
++	int err;
++	u32 version;
++
++	bp->flash_start = 0xA00000;
++	bp->eeprom_map = fb_eeprom_map;
++	bp->sma_op = &ocp_adva_sma_op;
++
++	version = ioread32(&bp->image->version);
++	/* if lower 16 bits are empty, this is the fw loader. */
++	if ((version & 0xffff) == 0) {
++		version = version >> 16;
++		bp->fw_loader = true;
++	}
++	bp->fw_tag = 1;
++	bp->fw_version = version & 0xffff;
++	bp->fw_cap = OCP_CAP_BASIC | OCP_CAP_SIGNAL | OCP_CAP_FREQ;
++
++	ptp_ocp_tod_init(bp);
++	ptp_ocp_nmea_out_init(bp);
++	ptp_ocp_signal_init(bp);
++
++	err = ptp_ocp_attr_group_add(bp, adva_timecard_groups);
++	if (err)
++		return err;
++
++	err = ptp_ocp_set_pins(bp);
++	if (err)
++		return err;
++	ptp_ocp_sma_init(bp);
++
++	return ptp_ocp_init_clock(bp, r->extra);
+ }
+ 
+ static ssize_t
+@@ -3578,6 +3831,37 @@ static const struct ocp_attr_group art_timecard_groups[] = {
+ 	{ },
+ };
+ 
++static struct attribute *adva_timecard_attrs[] = {
++	&dev_attr_serialnum.attr,
++	&dev_attr_gnss_sync.attr,
++	&dev_attr_clock_source.attr,
++	&dev_attr_available_clock_sources.attr,
++	&dev_attr_sma1.attr,
++	&dev_attr_sma2.attr,
++	&dev_attr_sma3.attr,
++	&dev_attr_sma4.attr,
++	&dev_attr_available_sma_inputs.attr,
++	&dev_attr_available_sma_outputs.attr,
++	&dev_attr_clock_status_drift.attr,
++	&dev_attr_clock_status_offset.attr,
++	&dev_attr_ts_window_adjust.attr,
++	&dev_attr_tod_correction.attr,
++	NULL,
++};
++
++static const struct attribute_group adva_timecard_group = {
++	.attrs = adva_timecard_attrs,
++};
++
++static const struct ocp_attr_group adva_timecard_groups[] = {
++	{ .cap = OCP_CAP_BASIC,	    .group = &adva_timecard_group },
++	{ .cap = OCP_CAP_SIGNAL,    .group = &fb_timecard_signal0_group },
++	{ .cap = OCP_CAP_SIGNAL,    .group = &fb_timecard_signal1_group },
++	{ .cap = OCP_CAP_FREQ,	    .group = &fb_timecard_freq0_group },
++	{ .cap = OCP_CAP_FREQ,	    .group = &fb_timecard_freq1_group },
++	{ },
++};
++
+ static void
+ gpio_input_map(char *buf, struct ptp_ocp *bp, u16 map[][2], u16 bit,
+ 	       const char *def)
+-- 
+2.26.3
 
-
-> +
->  /*
->   *     Create an inet socket.
->   */
-> @@ -330,6 +338,9 @@ static int inet_create(struct net *net, struct socket=
- *sock, int protocol,
->         if (INET_PROTOSW_REUSE & answer_flags)
->                 sk->sk_reuse =3D SK_CAN_REUSE;
->
-> +       if (INET_PROTOSW_ICSK & answer_flags)
-> +               __inet_init_csk_lock(sk);
-> +
->         inet =3D inet_sk(sk);
->         inet_assign_bit(IS_ICSK, sk, INET_PROTOSW_ICSK & answer_flags);
->
-> diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_s=
-ock.c
-> index 8e2eb1793685..5d3277ab9954 100644
-> --- a/net/ipv4/inet_connection_sock.c
-> +++ b/net/ipv4/inet_connection_sock.c
-> @@ -655,6 +655,7 @@ struct sock *inet_csk_accept(struct sock *sk, int fla=
-gs, int *err, bool kern)
->  {
->         struct inet_connection_sock *icsk =3D inet_csk(sk);
->         struct request_sock_queue *queue =3D &icsk->icsk_accept_queue;
-> +       struct request_sock_queue *newqueue;
->         struct request_sock *req;
->         struct sock *newsk;
->         int error;
-> @@ -727,6 +728,13 @@ struct sock *inet_csk_accept(struct sock *sk, int fl=
-ags, int *err, bool kern)
->         }
->         if (req)
->                 reqsk_put(req);
-> +
-> +       if (newsk) {
-> +               newqueue =3D &inet_csk(newsk)->icsk_accept_queue;
-> +               spin_lock_init(&newqueue->rskq_lock);
-> +               spin_lock_init(&newqueue->fastopenq.lock);
-> +       }
-
-So that we could here use a common helper
-
-if (newsk)
-     inet_init_csk_locks(newsk);
-
-
-Thanks, this is looking quite nice.
 
