@@ -1,76 +1,67 @@
-Return-Path: <netdev+bounces-64102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64103-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 956B2831158
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 03:18:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12E0C83115C
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 03:22:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 35582B23D8B
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 02:18:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A87121F24473
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 02:22:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BD905390;
-	Thu, 18 Jan 2024 02:18:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="MrYHicRD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E210323D8;
+	Thu, 18 Jan 2024 02:22:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 641284688
-	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 02:18:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0034612E;
+	Thu, 18 Jan 2024 02:22:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705544294; cv=none; b=scIUn9V4UCKhapbMoIehwRyyLFO8E3z8vnAaKxoNjjMVupPN1lORkWeQB6yqspa9U3ewCw44U0uumlzV16joFHXOYl3Qf08Wju1hOFYicZHhPBMtvruC+7JUWhOSmxdipYcS74Z7iYjMOtRYrF3S2bWP9APOzKxtTCI1qKDlPEo=
+	t=1705544541; cv=none; b=Oy7v4VJ3bjMN4DYDY45HNqWzbQnrWzWZlzyoK8BWxC3EWJKI4DEVIAT2Hsr5l5mq4tB4viue5NoH+5xW7Drp9jj9tsIjJNFvQCNx/uuxu8LYXGr0qvLaRAWO99ckGNsNRZ0HBMe7cM3KjNApUR2+ChHucZ6x7i0v2qBRaUDMRBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705544294; c=relaxed/simple;
-	bh=7voOXuhfPnskEJZAZbR01eqyMrcXZoKXlc+v/f6hkOw=;
-	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:
+	s=arc-20240116; t=1705544541; c=relaxed/simple;
+	bh=8JHXmYF/SbfhncSbdmAV1mZFnmszoqM2xbG/FA913qo=;
+	h=X-UUID:X-CID-P-RULE:X-CID-O-INFO:X-CID-INFO:X-CID-META:X-CID-BVR:
+	 X-CID-BAS:X-CID-FACTOR:X-UUID:Received:Received:X-ns-mid:Received:
 	 Message-ID:Date:MIME-Version:User-Agent:Subject:Content-Language:
 	 To:Cc:References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding; b=PGGTLvHl1tif/+reutfxFnQTqM0JX2c82C+I3hKIj45PSpxLRE7iUuJhI7qXBmgWHaAUHMmdKvgLP7uhfhQexavsD+IW9VFkD0C/S4qJBedpmoY3CxuPouSasSvYffbyWMbXQSpRZ44BvZrdt4eGkfQRhMwrJLXTkgeYhSNLJos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=MrYHicRD; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-336990fb8fbso9248364f8f.1
-        for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 18:18:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1705544291; x=1706149091; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=O8IhQQZ/ZBIwA5q7sDNoEOtDesWDe9PHB37CJuOhzdI=;
-        b=MrYHicRDANyv5yjhAwL5Pi5P5XNFDL1EuFV/k1uoSnRBbrUeZh4XACCGgFAQwTd3te
-         64q88ZShwuA0Pvlt2Z1zRyp8bCqOvYFULgGVKGi+cfbtuRbHyh6zNBoh0vWz2h0f2sPb
-         iARrH9zbZ5MlJI9+tiyrD0H37nLsZYyFdPl1SOTSB+BCwtyq4GzSRAtL1XruOUoRpMwP
-         Hnjd15+sJ1ZKuZVf/itUerPB2F412yQrOTSXCGAM9EGLmpJLEK6GQY4JmgAwq8VoDpOu
-         vnm5UxdzM5oGgBJejeUYMQfNMgR5QSLKh1Dpmk5p0YBWEYsWht0yp4SsOR5kkgqaZCRy
-         Nw9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705544291; x=1706149091;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=O8IhQQZ/ZBIwA5q7sDNoEOtDesWDe9PHB37CJuOhzdI=;
-        b=GkO7/sJv1vH6RjfghB93RD/p8R42Nsp9sK16Oylb37g5q2EwuevTmyXjlmYJAjuwrV
-         6ejuNIGzmAj7/+sAGlNsJ2LJL1EuyIroWRKYRWg3yoXwQomoIpJtS5XICNNHkf1BSbGp
-         6q8rBspAvI7HodqvC+L1/dbPps5IzchvcsyeFAw9gngkpLVDeSzGxRoPxSNW2596z58e
-         qr6xD2MmKbM8hhceYCFq156aAPdhZQ6TAr3+RoGxye1rEJBaNkvLHn6z3Z1DBioVf1cT
-         Ar3w0slQ5aYJA0CO/eoH3oyelCwy+iVWVloEqB6TvuZz4xXOqRWOtxXhqP6hJqTdG/7w
-         13HA==
-X-Gm-Message-State: AOJu0Yyqg11LVip5oaKzAO8AaKVPibR5ZJDfp79aGVdW7VSx/S4q3lo6
-	DvCWqqPUQqGmEYJRhDUxTTbvuSSfMLOqaf5ycW9LqIt/7zs0ykRbFElXISmCTA==
-X-Google-Smtp-Source: AGHT+IHtXYNC47SOSfQFb4kwiq1nGngPEhY8zTv36muO/vJ1sWAEb6kf6o+6aHmK9LIN/ylM4JYarw==
-X-Received: by 2002:adf:b319:0:b0:337:c155:d130 with SMTP id j25-20020adfb319000000b00337c155d130mr59418wrd.41.1705544290754;
-        Wed, 17 Jan 2024 18:18:10 -0800 (PST)
-Received: from [10.83.37.178] ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id n3-20020adffe03000000b003364a0e6983sm2829647wrr.62.2024.01.17.18.18.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Jan 2024 18:18:10 -0800 (PST)
-Message-ID: <fe3d5804-706e-40fc-a4e0-819df06f83ff@arista.com>
-Date: Thu, 18 Jan 2024 02:18:08 +0000
+	 Content-Transfer-Encoding; b=mRLDG4VmpPBA1OndezO0AKKY1g/OymkVN6ncycnXmza1TnjATUmJdRfrTaOjWgUk1ra0dof3fdsUle4+vZMFeOqycumLpiywn76EQRfV8sCbWOpY8x+Z3bk3gRo9CRhXXee2cYRt13hH385LIVobJPU7ft+wvWapGf6wAwJLC8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 357999929ba04da58da2de338c6a80bb-20240118
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.35,REQID:f9c5ad19-ce8d-4590-8d0f-425d94764a99,IP:10,
+	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:-5
+X-CID-INFO: VERSION:1.1.35,REQID:f9c5ad19-ce8d-4590-8d0f-425d94764a99,IP:10,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-5
+X-CID-META: VersionHash:5d391d7,CLOUDID:b26a5f8e-e2c0-40b0-a8fe-7c7e47299109,B
+	ulkID:240117171645NSDDJDUY,BulkQuantity:12,Recheck:0,SF:64|66|24|17|19|44|
+	102,TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:40,QS:nil,BEC:nil,CO
+	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,TF_CID_SPAM_OBB,TF_CID_SPAM_SNR,
+	TF_CID_SPAM_FAS
+X-UUID: 357999929ba04da58da2de338c6a80bb-20240118
+Received: from mail.kylinos.cn [(39.156.73.10)] by mailgw
+	(envelope-from <chentao@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 2100225134; Thu, 18 Jan 2024 10:22:10 +0800
+Received: from mail.kylinos.cn (localhost [127.0.0.1])
+	by mail.kylinos.cn (NSMail) with SMTP id 1773FE000EB9;
+	Thu, 18 Jan 2024 10:22:10 +0800 (CST)
+X-ns-mid: postfix-65A88B51-553218459
+Received: from [172.20.15.234] (unknown [172.20.15.234])
+	by mail.kylinos.cn (NSMail) with ESMTPA id 035EEE000EB9;
+	Thu, 18 Jan 2024 10:22:05 +0800 (CST)
+Message-ID: <ba5b4e70-365f-476a-9969-6f9a891221a7@kylinos.cn>
+Date: Thu, 18 Jan 2024 10:22:05 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,59 +69,71 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] selftests/net: argument value mismatch when calling
- verify_counters()
+Subject: Re: [PATCH net] ipvs: Simplify the allocation of ip_vs_conn slab
+ caches
 Content-Language: en-US
-To: Mohammad Nassiri <mnassiri@ciena.com>
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- shuah@kernel.org, 0x7f454c46@gmail.com, mohammad.nassiri78@gmail.com,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+To: Simon Horman <horms@kernel.org>
+Cc: ja@ssi.bg, pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org, lvs-devel@vger.kernel.org,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
  linux-kernel@vger.kernel.org
-References: <20240116214826.10754-1-mnassiri@ciena.com>
-From: Dmitry Safonov <dima@arista.com>
-In-Reply-To: <20240116214826.10754-1-mnassiri@ciena.com>
-Content-Type: text/plain; charset=UTF-8
+References: <20240117072045.142215-1-chentao@kylinos.cn>
+ <20240117092928.GA618956@kernel.org>
+From: Kunwu Chan <chentao@kylinos.cn>
+In-Reply-To: <20240117092928.GA618956@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Mohammad,
+Hi Simon,
 
-On 1/16/24 21:48, Mohammad Nassiri wrote:
-> The end_server() function only operates in the server thread
-> and always takes an accept socket instead of a listen socket as
-> its input argument. To align with this, invert the boolean values
-> used when calling verify_counters() within the end_server() function.
+Thanks for your reply.
+
+On 2024/1/17 17:29, Simon Horman wrote:
+> On Wed, Jan 17, 2024 at 03:20:45PM +0800, Kunwu Chan wrote:
+>> Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
+>> to simplify the creation of SLAB caches.
+>>
+>> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
 > 
-> Fixes: ("3c3ead555648 selftests/net: Add TCP-AO key-management test")
-> Signed-off-by: Mohammad Nassiri <mnassiri@ciena.com>
-> Link: https://lore.kernel.org/all/934627c5-eebb-4626-be23-cfb134c01d1a@arista.com/
-
-
-As I've written you off-list, the patch probably was not delivered to
-mailing lists due to SPF check not passing. Please, fix the send-email
-setup when/if you want to send more patches.
-
-Related to this patch: I'm going to carry and resend it together with 2
-more patches, as this fix made 3 selftests fail and I've looked into that.
-
-> ---
->  tools/testing/selftests/net/tcp_ao/key-management.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Hi Kunwu Chan,
 > 
-> diff --git a/tools/testing/selftests/net/tcp_ao/key-management.c b/tools/testing/selftests/net/tcp_ao/key-management.c
-> index c48b4970ca17..f6a9395e3cd7 100644
-> --- a/tools/testing/selftests/net/tcp_ao/key-management.c
-> +++ b/tools/testing/selftests/net/tcp_ao/key-management.c
-> @@ -843,7 +843,7 @@ static void end_server(const char *tst_name, int sk,
->  	synchronize_threads(); /* 4: verified => closed */
->  	close(sk);
->  
-> -	verify_counters(tst_name, true, false, begin, &end);
-> +	verify_counters(tst_name, false, true, begin, &end);
->  	synchronize_threads(); /* 5: counters */
->  }
->  
+> I think this is more of a cleanup than a fix,
+> so it should probably be targeted at 'nf-next' rather than 'net'.
+Thanks, I'm confused about when to use "nf-next" or "net" or "net-next".
+"nf-next" means fixing errors for linux-next.git and linux-stable.git, 
+while "nf" or "next" just means linux-next.git?
 
+> 
+> If it is a fix, then I would suggest targeting it at 'nf'
+> and providing a Fixes tag.
+I'll keep it in mind in the future.
+> 
+> The above notwithstanding, this looks good to me.
+> 
+> Acked-by: Simon Horman <horms@kernel.org>
+> 
+>> ---
+>>   net/netfilter/ipvs/ip_vs_conn.c | 4 +---
+>>   1 file changed, 1 insertion(+), 3 deletions(-)
+>>
+>> diff --git a/net/netfilter/ipvs/ip_vs_conn.c b/net/netfilter/ipvs/ip_vs_conn.c
+>> index a743db073887..98d7dbe3d787 100644
+>> --- a/net/netfilter/ipvs/ip_vs_conn.c
+>> +++ b/net/netfilter/ipvs/ip_vs_conn.c
+>> @@ -1511,9 +1511,7 @@ int __init ip_vs_conn_init(void)
+>>   		return -ENOMEM;
+>>   
+>>   	/* Allocate ip_vs_conn slab cache */
+>> -	ip_vs_conn_cachep = kmem_cache_create("ip_vs_conn",
+>> -					      sizeof(struct ip_vs_conn), 0,
+>> -					      SLAB_HWCACHE_ALIGN, NULL);
+>> +	ip_vs_conn_cachep = KMEM_CACHE(ip_vs_conn, SLAB_HWCACHE_ALIGN);
+>>   	if (!ip_vs_conn_cachep) {
+>>   		kvfree(ip_vs_conn_tab);
+>>   		return -ENOMEM;
+-- 
 Thanks,
-            Dmitry
+   Kunwu
 
 
