@@ -1,99 +1,116 @@
-Return-Path: <netdev+bounces-64283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD5658320A2
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 21:56:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A32B88320B6
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 22:10:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 478801F24B15
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 20:56:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C106289A90
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 21:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D8312E652;
-	Thu, 18 Jan 2024 20:56:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95E372E857;
+	Thu, 18 Jan 2024 21:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IVCOjyrM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lycadVcw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A770D2E83F
-	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 20:56:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656672E850;
+	Thu, 18 Jan 2024 21:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705611380; cv=none; b=JnQC7E9ZKA9P/PwDsedITcZ7l6fAOcUCx0zs4hBgGPJM4yfQs/lyv0/u76M5gpAtQWg7RoSAHBzFKlU5qF3JBDhZ3MBrpzeSjjsIyw/bitbrwhMxQ4Y0eQdkOwUoGiFyInFpXUKoYFFRlhoOVm3pCYJrNqnQXJv3DsluH5U6Eyc=
+	t=1705612228; cv=none; b=mYOjmvt8QKcaIEzO7R/tKXHbqpFGKEnY6hQMexL/Rg7CM/Iv7zkVzgQ+jkgOr6tUoEVCpUe97jyzbtiINyCUJYh2x/SqQg1Pktnpf6v0MA/iSBcOMUKjBt54s0q0fX28jqC+byrfRiVZ/cEj85LgsAl4FFJHJEHOYwm6AOfwUQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705611380; c=relaxed/simple;
-	bh=T/Nrim81j05FhYXQoyD1H5QDhK4/U7M9KJVAQg+Yb2k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bmqYu2j3I082pnoYl6pjBgNnkkdpJquxIPy+6qk1LgtMZL2MK659BgCpIV9aYCjIDAIBdHi75l8HXUumdJyaUu9eYQYvGeUWqkhqf75Lfk9uZuQ7newOgzD+3jrATV3gy7CtG4AaTmPFfKkOtXNaHjGdUrmpFdk2knUSnUkrsQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IVCOjyrM; arc=none smtp.client-ip=209.85.222.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-7cbe98278f8so14491241.1
-        for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 12:56:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705611378; x=1706216178; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=T/Nrim81j05FhYXQoyD1H5QDhK4/U7M9KJVAQg+Yb2k=;
-        b=IVCOjyrMsuMlrhOuotlL4Nz1IZmKRYDqgmwWNBbphfln66DcD6p8bNanvCSaIwT/fe
-         yiiDYMoZeWXb/JPe+GcNekMK/Gkvw1QlakBH2YJb/IoT9Zz676bULrMlV70mHehC7Ecu
-         DdYrqrrDRYpSLceptoDODEEJzbfYml8FnQxRjYzWeBFCZXnpypBnYFLOZhKmiO2lZ4dJ
-         frvWyThRHgY96M8RmEg9sdcS1eCRSUUGmQixeJ1psmdQ4RpYxtuf3xlBjrN0/5Huw3q4
-         wgUTFPUDebUZZ5JKsykoUm3SzEODtpzEwBHcUolp1n58cEYbeKmJMkPsc9P0dQrzfFaI
-         1/gA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705611378; x=1706216178;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=T/Nrim81j05FhYXQoyD1H5QDhK4/U7M9KJVAQg+Yb2k=;
-        b=Gn3zZmOj5RLQ0mw56ui3kwcJl3Bp/YlgXhhA/2KF4LNzbaGab75As5J9j+wXclzGQw
-         M+zmuIyrGg4sZtL/TrZHprWanp1J+6ep16mYHXxc0/K6nOyUf1Uiownaoaxel+cmk4cx
-         ZbwUHyKAcv/HzckSAa52uEj5ixMyX9bWUOTLZhLlW7gyuN2ismq4O07hKGsqWSfBa2kj
-         yzz20uvWQ4wA+0T3/D6Ky2GfRA+jHQVeTk8v7fSHVTyB4L2+nWaWsfO62hGM8S3GNr6h
-         jbUJE7fxr0AbD2i9Ctv0yG9Da+NFZrTWvaMYcmp2oBinks7xxAS9GUQxO4cMQrcSmuq5
-         Dw3w==
-X-Gm-Message-State: AOJu0YwaPCcmYjnlNKlb2DyAHSKs7zNVyjtYtN5uLMaxpHHhzLas8M8g
-	n7YGujPRm0y0BtlqIIb72LZKZD1vjdKUuIUrq0AVj5mf9XBJPwGCKAIi7V5jc3y18PGhT0SJGH5
-	A7m4pEz6mS1qiJADnBloLYrS5z3E=
-X-Google-Smtp-Source: AGHT+IFYIrNY+882qWpNgHSG+4/03uTCh+RD/zrbKYlrjrxs8sNX3jZqNq3Yhr3E4tEirBdwi3UsmAwp6eNKV4iLmjA=
-X-Received: by 2002:a05:6102:a91:b0:467:9f70:e137 with SMTP id
- n17-20020a0561020a9100b004679f70e137mr1755700vsg.34.1705611378453; Thu, 18
- Jan 2024 12:56:18 -0800 (PST)
+	s=arc-20240116; t=1705612228; c=relaxed/simple;
+	bh=ugmveVURm0JPowUavmPnm4X9QnKoq39xWC6H0InSvKU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Lfgy6vb5VGPzHs9Ff0E2Ah2h5vgYm+UJgjYIN2Om3UZpmNabjSoyty8nxvL9ekcyGdzvoKKRAV88fUt+xe9chtiMCeVCCusB/2ahZ9N8lrur5iDbKeIA6qwPoMbQIZIQDjHSXMhPpdPLgtKYVgD1T/OgQ2MyMhXHo3nupvpMoPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lycadVcw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 232B8C43390;
+	Thu, 18 Jan 2024 21:10:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705612228;
+	bh=ugmveVURm0JPowUavmPnm4X9QnKoq39xWC6H0InSvKU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=lycadVcwBTziZ9gNiy85oY0eDpbEJOXaO5sQqA6OTiM5NdAXvUnNY+3rFgrqX6pvj
+	 aLCBdBIXQyfR8ldoGqmFnezguPQqTwXyyWEMBug/fOvQjB8JsIVqQ/ciZQVfMUW39l
+	 C52rE/mcX2f9MPKD0TcsZeynnUStZlnea30KIupZUO8Kb2RZ8EUQULKYSqxBg6yi9v
+	 iHB8PzGwtc5OoEbDZtL9rj7TYQZsDTQN6feDgSwv1PxqAd2WElAJsGxV+W/amoyqFy
+	 rxcIa1vS0EZUwc2iZmjeEtXk1zh1QVVTINK+ITHCEgutVH3nwGlwtGl92DOexHMUe2
+	 j8pi70nmSd/pg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 08934D8C97A;
+	Thu, 18 Jan 2024 21:10:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAA85sZvvHtrpTQRqdaOx6gd55zPAVsqMYk_Lwh4Md5knTq7AyA@mail.gmail.com>
- <CAA85sZtZ9cL4g-SFSS-pTL11JocoOc4BAU7b4uj26MNckp41wQ@mail.gmail.com> <20240118082150.53a4d4b9@kernel.org>
-In-Reply-To: <20240118082150.53a4d4b9@kernel.org>
-From: Ian Kumlien <ian.kumlien@gmail.com>
-Date: Thu, 18 Jan 2024 21:56:07 +0100
-Message-ID: <CAA85sZsC3z0HNurp=xBUZmp9zVLYG42TCNJR3BzvioehY=dspA@mail.gmail.com>
-Subject: Re: [mlx5e] FYI dmesg is filled with mlx5e_page_release_fragmented.isra
- warnings in 6.6.12
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Linux Kernel Network Developers <netdev@vger.kernel.org>, saeedm@nvidia.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 01/13] netfilter: nf_tables: reject invalid set policy
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170561222803.18735.2435431936867197137.git-patchwork-notify@kernel.org>
+Date: Thu, 18 Jan 2024 21:10:28 +0000
+References: <20240118161726.14838-2-pablo@netfilter.org>
+In-Reply-To: <20240118161726.14838-2-pablo@netfilter.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, fw@strlen.de
 
-On Thu, Jan 18, 2024 at 5:21=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Thu, 18 Jan 2024 16:27:13 +0100 Ian Kumlien wrote:
-> > > [ 1068.937977] WARNING: CPU: 0 PID: 0 at
-> > > include/net/page_pool/helpers.h:130
-> > > mlx5e_page_release_fragmented.isra.0+0x46/0x50 [mlx5_core]
->
-> Is this one time or repeating / reproducible?
-> What's the most recent kernel that did work?
+Hello:
 
-Unknown, the dist kernel seems fine (5.14.x - frankenstein) - i wanted
-a newer one to enable some offloads to improve UDP performance...
+This series was applied to netdev/net.git (main)
+by Pablo Neira Ayuso <pablo@netfilter.org>:
+
+On Thu, 18 Jan 2024 17:17:14 +0100 you wrote:
+> Report -EINVAL in case userspace provides a unsupported set backend
+> policy.
+> 
+> Fixes: c50b960ccc59 ("netfilter: nf_tables: implement proper set selection")
+> Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+> ---
+>  net/netfilter/nf_tables_api.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+
+Here is the summary with links:
+  - [net,01/13] netfilter: nf_tables: reject invalid set policy
+    https://git.kernel.org/netdev/net/c/0617c3de9b40
+  - [net,02/13] netfilter: nf_tables: validate .maxattr at expression registration
+    https://git.kernel.org/netdev/net/c/65b3bd600e15
+  - [net,03/13] netfilter: nf_tables: bail out if stateful expression provides no .clone
+    https://git.kernel.org/netdev/net/c/3c13725f43dc
+  - [net,04/13] netfilter: nft_limit: do not ignore unsupported flags
+    https://git.kernel.org/netdev/net/c/91a139cee120
+  - [net,05/13] netfilter: nfnetlink_log: use proper helper for fetching physinif
+    https://git.kernel.org/netdev/net/c/c3f9fd54cd87
+  - [net,06/13] netfilter: nf_queue: remove excess nf_bridge variable
+    https://git.kernel.org/netdev/net/c/aeaa44075f8e
+  - [net,07/13] netfilter: propagate net to nf_bridge_get_physindev
+    https://git.kernel.org/netdev/net/c/a54e72197037
+  - [net,08/13] netfilter: bridge: replace physindev with physinif in nf_bridge_info
+    https://git.kernel.org/netdev/net/c/9874808878d9
+  - [net,09/13] netfilter: nf_tables: check if catch-all set element is active in next generation
+    https://git.kernel.org/netdev/net/c/b1db244ffd04
+  - [net,10/13] netfilter: nf_tables: do not allow mismatch field size and set key length
+    https://git.kernel.org/netdev/net/c/3ce67e3793f4
+  - [net,11/13] netfilter: nf_tables: skip dead set elements in netlink dump
+    https://git.kernel.org/netdev/net/c/6b1ca88e4bb6
+  - [net,12/13] netfilter: nf_tables: reject NFT_SET_CONCAT with not field length description
+    https://git.kernel.org/netdev/net/c/113661e07460
+  - [net,13/13] ipvs: avoid stat macros calls from preemptible context
+    https://git.kernel.org/netdev/net/c/d6938c1c76c6
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
