@@ -1,167 +1,248 @@
-Return-Path: <netdev+bounces-64200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19666831B6C
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 15:35:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 450CE831BAB
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 15:44:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C64AA281917
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 14:35:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9AB88B20A80
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 14:44:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69CC7375;
-	Thu, 18 Jan 2024 14:35:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0AD4647;
+	Thu, 18 Jan 2024 14:44:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Puw+xXCi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZepYRH9l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6053631
-	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 14:35:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B1571DDC3;
+	Thu, 18 Jan 2024 14:44:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705588508; cv=none; b=UghRSn6RQ7tsK2+M9dfA0ipUbwgKgvZAu1L4qMHC5X24RW1NYXuLMhLvIY+Fj1pIyCpKx4i7Ksto9kqKh82XWT5EwoyuTrFzEHnZYOYX4wEOEgov4o7wjZCG3RWI/v0p7QLc0eMWoGs/PrFkCVkiVrE51VK3VZYKH+Ny7PFXIp0=
+	t=1705589056; cv=none; b=WW4z4L5T4KM8X0JA0XuqxYXWQ49FUT3jt5kVpyiGnfpL/QHQDbRg4yoO5t5cmhSQGuPl9jgUOGE1v7YTkqwR6SV6uondW9CGGX6Ek5B3ZWAemkHvpSzr5WqRQ4zsCEZmL/Gy3wZzGZMNYJPQCfVeMgS9Jiq0vCgH7Ke1PnKPCyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705588508; c=relaxed/simple;
-	bh=VBle0F+IQyCrsIV7oe4Zx4LMZb73zXvQz0RTKucQqEo=;
+	s=arc-20240116; t=1705589056; c=relaxed/simple;
+	bh=WCFGPbYkiQVLbhVotzaLYbYZTWEoJCeuU36QUwXEvMs=;
 	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Date:
-	 Mime-Version:X-Mailer:Message-ID:Subject:From:To:Cc:Content-Type;
-	b=A0Qe7Jn+UNjhogT0n4TKiBIXCG3VhpMDvAOaYzMy+95ltGA3YAG20V7Wh0QLA+fAUREMxSRjGl54Evx4lyTq5XOanspUqKNUMUQA6XMPPe/aVAq94PjviQxV1xEZ+fj/eyA11+OIMTUowdWKwfvS/dMHFpdycoaNwI+uXFn/xH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Puw+xXCi; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc221ed88d9so4655637276.3
-        for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 06:35:06 -0800 (PST)
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:Date:
+	 From:To:Cc:Message-ID:In-Reply-To:References:Subject:Mime-Version:
+	 Content-Type:Content-Transfer-Encoding; b=JZUtYwCXFZCvS52DG4J/mEy+GM69mz7SixftLvrtE/vSvIHGKJgnHukSO8p9H+niNZ6iZTnTSq4r9gp7vjExwk8BdJge8brPyG3Pz4GUuOLCmkVZYE54ENpgTIzwjOvkEr0GeE5lXU4sDzAs5+8Dd8Q16AtniBDIpumIC4iuL0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZepYRH9l; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-78339210979so767687485a.1;
+        Thu, 18 Jan 2024 06:44:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1705588506; x=1706193306; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=kg1FCUzShZpaA3L2oq597U467/68fYyKDNiGJd7f51k=;
-        b=Puw+xXCiPzQSu3yRbEa4X9cA5I7vgiOqI7qpl6xgCKc2c5o4VEDFck1Fw0EWsDHvgO
-         jQqCGUAjvMdJX3bK4H4bsiPtOhlT7hrjwNQPBdLC07WdhVpZsgbRCkJu33ugLXfjbD+1
-         xn0RgC/YX1nJuflyPEXTUOtZFvSoAr6fs8el7tKVRfoJqkqShrroCiZLul2vk8KMP+Nv
-         13P5WfLoEEGDknRHs9A1GOF68HoPBckKrz7hd3tiEzcoe34j8u12p2v8VG6alYRv/DPp
-         iGvJFrMpwclYZR1auieVAM1pb3rf5TEDJWV6QITM4LUQE5t3In5G/6+fYGPZacDHRuad
-         fbPw==
+        d=gmail.com; s=20230601; t=1705589054; x=1706193854; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YoZ+SlkruvUdNkH7eZxjFcDuia7cqhFoQuvvT1OXvIY=;
+        b=ZepYRH9lKAtqoFPXa/7Lka4xSlLEpq5qPJcAi0HrqSHVbNQomh2U+f7MO90Fb1Np8R
+         I6OKEHYP63okJhz2fnL267g8Ku5NO7OgG9S/KrlJKWkdysebiBloY4aj+t5mX9lewifq
+         tSST8eV4M+7JE//Nsws07ZLRL8tHkXzxmtJMBE2FAFYFw98etO2OcAXM2+Uxo5y31089
+         mT2ESHZ3smREOOQ37PuS78UFR7lOfXmTtciQEip+9MdT7KJ+JcjUBD/QcbNK9515EplM
+         aAjLuo5adjEyRWcPOsbTjem0f4w3zT1A6QY8VK3Q4NhTmYTaE8EkrikvvUECDdNbFmtv
+         8N0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705588506; x=1706193306;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kg1FCUzShZpaA3L2oq597U467/68fYyKDNiGJd7f51k=;
-        b=HClKfPMVZ3Hn8KQGbzyaLffy1MmJhg1z3qgqoVPNDpHdtlLjEzt60sQMDy8KyQdaGd
-         AOEhxD3mUt86Cgr294GFW58N2tmJxW2yxhG9jKwcjXKwmjwz6jJ+hUoIDAJOql9J6fJn
-         71iMUB9o53kWMa61yOerivuMq+LFzRgWAYMwdDKR+B0h4aSotslVm7E5dJFmD2brbKQw
-         AkHjIkDlzBfoZH40BV+EcBRQ11ScTO3+UYIsFZzzNmy38CSrzm2uPEeGAqSEmd2KiV+c
-         vD18U3Ay7ECBeKBheTG6Cb4qS70RPOlvjz3zeVCMI8yKzzCjKJ9sj0qCfgdvbCtLZ+cn
-         Z8aw==
-X-Gm-Message-State: AOJu0YyE+0g+d8p2erm5jbePaFPvS0xsLP2I2SC5AVCpTKJLrtrDi7FW
-	KI887fKcDRdDUYvi0hZ7S8dclHrCAvdfIpoUNPzbKvCrjRmQ246oK0mT2+dh/0tDCh1ljuzpcMq
-	FDMN1TpL8RA==
-X-Google-Smtp-Source: AGHT+IET0jet/PF78pGDmwAeyFo1ZFwpFHdc2ye+6c4uCS/2kmodLv58FnrfYOpNYO44mCHLdApHsT0Dfv7RKA==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:1827:b0:dc2:3426:c9ee with SMTP
- id cf39-20020a056902182700b00dc23426c9eemr40868ybb.11.1705588505915; Thu, 18
- Jan 2024 06:35:05 -0800 (PST)
-Date: Thu, 18 Jan 2024 14:35:04 +0000
+        d=1e100.net; s=20230601; t=1705589054; x=1706193854;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=YoZ+SlkruvUdNkH7eZxjFcDuia7cqhFoQuvvT1OXvIY=;
+        b=mm76E2fmc23jnRIJJAHTq7xlXnOA+7OhB5G2Zpfc89ZoH6NYdRwdpnIIcQOerXBKwP
+         vjqafnbRFT25VazlXFR019GvMIP25OI2g/TWtFjxgs2U8QyGybMXfrc3qfRg12Cu26lx
+         z1exJmTdiDfCaT5zXA2igg+jHMZkFQqSUJpFxqqkzlSs7k+K+KS9B+WFWrM8TR+xVJK9
+         su9q4eS6DkDs6USQibJh9r+QFxZOESQVWY3c7TGSc2xfb9vYexPrAaTfzul5N2TO44hI
+         oICOu2Y+p/2zvM3FY5L3hW4yjw9smC9QaoTZCal5c3Ob31+QBYxMIzW3lxll3gJ+iTZD
+         3zng==
+X-Gm-Message-State: AOJu0Ywon46VmidXaI9RUt3E4VdRh7SgKvUIjx6DkUnAC8jOPDnhoaqm
+	bUo/MK9EMxerv3FzSGM+B1ohKoDJBkHsvFizSTDM/tH+mQ+VXAqazoMB3D0W
+X-Google-Smtp-Source: AGHT+IEzw5yCRzR2VREpYP1zk6hUvPux7J9JLpCfOheCUlMPLJnyZiI+suikwj2sbgt4VUO4d0h4Kg==
+X-Received: by 2002:a05:620a:134b:b0:783:148f:a691 with SMTP id c11-20020a05620a134b00b00783148fa691mr948410qkl.71.1705589053991;
+        Thu, 18 Jan 2024 06:44:13 -0800 (PST)
+Received: from localhost (131.65.194.35.bc.googleusercontent.com. [35.194.65.131])
+        by smtp.gmail.com with ESMTPSA id q27-20020a05620a0c9b00b00781663f3161sm5350246qki.85.2024.01.18.06.44.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Jan 2024 06:44:13 -0800 (PST)
+Date: Thu, 18 Jan 2024 09:44:13 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: wangyunjian <wangyunjian@huawei.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ "jasowang@redhat.com" <jasowang@redhat.com>, 
+ "kuba@kernel.org" <kuba@kernel.org>, 
+ "davem@davemloft.net" <davem@davemloft.net>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+ xudingke <xudingke@huawei.com>
+Message-ID: <65a9393d75353_1c8cde294e2@willemb.c.googlers.com.notmuch>
+In-Reply-To: <ed6fd9c514ae4a449580d11c9c6ba8e7@huawei.com>
+References: <1705490503-28844-1-git-send-email-wangyunjian@huawei.com>
+ <65a7f560a4643_6ba59294a7@willemb.c.googlers.com.notmuch>
+ <ed6fd9c514ae4a449580d11c9c6ba8e7@huawei.com>
+Subject: RE: [PATCH net v3] tun: add missing rx stats accounting in
+ tun_xdp_act
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.43.0.381.gb435a96ce8-goog
-Message-ID: <20240118143504.3466830-1-edumazet@google.com>
-Subject: [PATCH net] udp: fix busy polling
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Generic sk_busy_loop_end() only looks at sk->sk_receive_queue
-for presence of packets.
+wangyunjian wrote:
+> > -----Original Message-----
+> > From: Willem de Bruijn [mailto:willemdebruijn.kernel@gmail.com]
+> > Sent: Wednesday, January 17, 2024 11:42 PM
+> > To: wangyunjian <wangyunjian@huawei.com>;
+> > willemdebruijn.kernel@gmail.com; jasowang@redhat.com; kuba@kernel.org;
+> > davem@davemloft.net
+> > Cc: netdev@vger.kernel.org; linux-kernel@vger.kernel.org; xudingke
+> > <xudingke@huawei.com>; wangyunjian <wangyunjian@huawei.com>
+> > Subject: Re: [PATCH net v3] tun: add missing rx stats accounting in tun_xdp_act
+> > 
+> > Yunjian Wang wrote:
+> > > The TUN can be used as vhost-net backend, and it is necessary to count
+> > > the packets transmitted from TUN to vhost-net/virtio-net. However,
+> > > there are some places in the receive path that were not taken into
+> > > account when using XDP. The commit 8ae1aff0b331 ("tuntap: split out
+> > > XDP logic") only includes dropped counter for XDP_DROP, XDP_ABORTED,
+> > > and invalid XDP actions. It would be beneficial to also include new
+> > > accounting for successfully received bytes using
+> > > dev_sw_netstats_rx_add and introduce new dropped counter for XDP errors
+> > on XDP_TX and XDP_REDIRECT.
+> > 
+> > From the description it is clear that these are two separate changes wrapped
+> > into one patch. I should have flagged this previously.
+> 
+> Do I need to split these two modifications into 2 patches?
+> 1. only fix dropped counter
+> 2. add new accounting for successfully received bytes
+> Or:
+> Only fix dropped counter?
 
-Problem is that for UDP sockets after blamed commit, some packets
-could be present in another queue: udp_sk(sk)->reader_queue
+It's definitely good to fix both.
 
-In some cases, a busy poller could spin until timeout expiration,
-even if some packets are available in udp_sk(sk)->reader_queue.
+It might be a bit pedantic, but two separate patches is more correct.
 
-Fixes: 2276f58ac589 ("udp: use a separate rx queue for packet reception")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/linux/skmsg.h |  6 ------
- include/net/sock.h    |  5 +++++
- net/core/sock.c       | 10 +++++++++-
- 3 files changed, 14 insertions(+), 7 deletions(-)
+The second fix, add missing byte counter, goes back to the original
+introduction of XDP for tun, so has a different tag:
 
-diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
-index 888a4b217829fd4d6baf52f784ce35e9ad6bd0ed..e65ec3fd27998a5b82fc2c4597c575125e653056 100644
---- a/include/linux/skmsg.h
-+++ b/include/linux/skmsg.h
-@@ -505,12 +505,6 @@ static inline bool sk_psock_strp_enabled(struct sk_psock *psock)
- 	return !!psock->saved_data_ready;
- }
- 
--static inline bool sk_is_udp(const struct sock *sk)
--{
--	return sk->sk_type == SOCK_DGRAM &&
--	       sk->sk_protocol == IPPROTO_UDP;
--}
--
- #if IS_ENABLED(CONFIG_NET_SOCK_MSG)
- 
- #define BPF_F_STRPARSER	(1UL << 1)
-diff --git a/include/net/sock.h b/include/net/sock.h
-index a7f815c7cfdfdf1296be2967fd100efdb10cdd63..b1ceba8e179aa5cc4c90e98d353551b3a3e1ab86 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -2770,6 +2770,11 @@ static inline bool sk_is_tcp(const struct sock *sk)
- 	return sk->sk_type == SOCK_STREAM && sk->sk_protocol == IPPROTO_TCP;
- }
- 
-+static inline bool sk_is_udp(const struct sock *sk)
-+{
-+	return sk->sk_type == SOCK_DGRAM && sk->sk_protocol == IPPROTO_UDP;
-+}
-+
- static inline bool sk_is_stream_unix(const struct sock *sk)
- {
- 	return sk->sk_family == AF_UNIX && sk->sk_type == SOCK_STREAM;
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 158dbdebce6a3693deb63e557e856d9cdd7500ae..e7e2435ed28681772bf3637b96ddd9334e6a639e 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -107,6 +107,7 @@
- #include <linux/interrupt.h>
- #include <linux/poll.h>
- #include <linux/tcp.h>
-+#include <linux/udp.h>
- #include <linux/init.h>
- #include <linux/highmem.h>
- #include <linux/user_namespace.h>
-@@ -4143,8 +4144,15 @@ subsys_initcall(proto_init);
- bool sk_busy_loop_end(void *p, unsigned long start_time)
- {
- 	struct sock *sk = p;
-+	bool packet_ready;
- 
--	return !skb_queue_empty_lockless(&sk->sk_receive_queue) ||
-+	packet_ready = !skb_queue_empty_lockless(&sk->sk_receive_queue);
-+	if (!packet_ready && sk_is_udp(sk)) {
-+		struct sk_buff_head *reader_queue = &udp_sk(sk)->reader_queue;
-+
-+		packet_ready = !skb_queue_empty_lockless(reader_queue);
-+	}
-+	return packet_ready ||
- 	       sk_busy_loop_timeout(sk, start_time);
- }
- EXPORT_SYMBOL(sk_busy_loop_end);
--- 
-2.43.0.381.gb435a96ce8-goog
+Fixes: 761876c857cb ("tap: XDP support")
+
+> 
+> > 
+> > Ack on returning the error counter that was previously present and matches
+> > the Fixes tag.
+> > 
+> > For the second change, I had to check a few other XDP capable drivers to verify
+> > that it is indeed common to count such packets.
+> > 
+> > > Fixes: 8ae1aff0b331 ("tuntap: split out XDP logic")
+> > > Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
+> > > ---
+> > > v3: update commit log and code
+> > > v2: add Fixes tag
+> > > ---
+> > >  drivers/net/tun.c | 14 +++++++++-----
+> > >  1 file changed, 9 insertions(+), 5 deletions(-)
+> > >
+> > > diff --git a/drivers/net/tun.c b/drivers/net/tun.c index
+> > > afa5497f7c35..0704a17e74e1 100644
+> > > --- a/drivers/net/tun.c
+> > > +++ b/drivers/net/tun.c
+> > > @@ -1625,18 +1625,15 @@ static struct sk_buff *__tun_build_skb(struct
+> > > tun_file *tfile,  static int tun_xdp_act(struct tun_struct *tun, struct
+> > bpf_prog *xdp_prog,
+> > >  		       struct xdp_buff *xdp, u32 act)  {
+> > > -	int err;
+> > > +	unsigned int datasize = xdp->data_end - xdp->data;
+> > > +	int err = 0;
+> > >
+> > >  	switch (act) {
+> > >  	case XDP_REDIRECT:
+> > >  		err = xdp_do_redirect(tun->dev, xdp, xdp_prog);
+> > > -		if (err)
+> > > -			return err;
+> > >  		break;
+> > >  	case XDP_TX:
+> > >  		err = tun_xdp_tx(tun->dev, xdp);
+> > > -		if (err < 0)
+> > > -			return err;
+> > >  		break;
+> > >  	case XDP_PASS:
+> > >  		break;
+> > > @@ -1651,6 +1648,13 @@ static int tun_xdp_act(struct tun_struct *tun,
+> > struct bpf_prog *xdp_prog,
+> > >  		break;
+> > >  	}
+> > >
+> > > +	if (err < 0) {
+> > > +		act = err;
+> > > +		dev_core_stats_rx_dropped_inc(tun->dev);
+> > > +	} else if (act == XDP_REDIRECT || act == XDP_TX) {
+> > > +		dev_sw_netstats_rx_add(tun->dev, datasize);
+> > > +	}
+> > > +
+> > 
+> > Let's avoid adding yet another branch and just do these operations in the case
+> > statements, like XDP_DROP.
+> 
+> Fix it like this?
+
+Perhaps avoid computing datasize is all paths, when it is not used
+in common XDP_PASS, high performance XDP_DROP and a few others. Not
+sure whether (all) compilers would optimze that.
+
+        dev_core_stats_rx_dropped_inc(tun->dev, xdp,
+                                      xdp->data_end - xdp->data);
+
+
+> --- a/drivers/net/tun.c
+> +++ b/drivers/net/tun.c
+> @@ -1625,18 +1625,25 @@ static struct sk_buff *__tun_build_skb(struct tun_file *tfile,
+>  static int tun_xdp_act(struct tun_struct *tun, struct bpf_prog *xdp_prog,
+>                        struct xdp_buff *xdp, u32 act)
+>  {
+> +       unsigned int datasize = xdp->data_end - xdp->data;
+>         int err;
+>  
+>         switch (act) {
+>         case XDP_REDIRECT:
+>                 err = xdp_do_redirect(tun->dev, xdp, xdp_prog);
+> -               if (err)
+> +               if (err) {
+> +                       dev_core_stats_rx_dropped_inc(tun->dev);
+>                         return err;
+> +               }
+> +               dev_sw_netstats_rx_add(tun->dev, datasize);
+>                 break;
+>         case XDP_TX:
+>                 err = tun_xdp_tx(tun->dev, xdp);
+> -               if (err < 0)
+> +               if (err < 0) {
+> +                       dev_core_stats_rx_dropped_inc(tun->dev);
+>                         return err;
+> +               }
+> +               dev_sw_netstats_rx_add(tun->dev, datasize);
+>                 break;
+>         case XDP_PASS:
+> 
+> > 
+> > >  	return act;
+> > >  }
+> > >
+> > > --
+> > > 2.41.0
+> > >
+> > 
+> > 
+> 
+
 
 
