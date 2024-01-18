@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-64255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDFE2831EDA
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 19:00:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69BC4831EDB
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 19:00:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0BBE1C20C58
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 18:00:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1CBFB1F217FD
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 18:00:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B49962D60E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B49D62D60F;
 	Thu, 18 Jan 2024 18:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SA6GaiMe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M9xLIz6i"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F7632D608
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F78E2D609
 	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 18:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705600828; cv=none; b=gAWx7VhXia2NTykN8XcS8m1b/fb2qbQTMTts2WcA0foVv9IEldktiPhxVuVxrocDR9uc+3P+1cs4ETvvJyUSmsHIxobJjXXLR1aGYf5kvpwb+FlsVZs+wuxy3Gya16Ie0SHT2blctZLrX1cc4q6e9BecUXKhH6lvDvZaTsjPN/E=
+	t=1705600828; cv=none; b=fET0d+IrEwMf7nCwOfosUx8y7C4D2+SM3e2nY96Bv8pAiwQJoahW1XJHelcGxRhn+TmU7PizpwKNO3XjVvxry7XGYO89qY6VJDhPQMu2bi/qj4Jyf6pVZG/Fnp39NA45eRJNiGuJ1LODc1QcpKJcRnpvUIN3xbma1m8cFbvPewg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1705600828; c=relaxed/simple;
-	bh=rAcq0tMeIpsPq/nSiRX9MTPJ2LcdTKw8cB5YhhRL1nQ=;
+	bh=+oLt0gxwfodE4nSYk0/2cQsoAvlwFfiyBnGATSbnTB4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=pVjfrj8ZTnBTUEP3XbjocDMihc0PnaT4Jo4yYOvjq6pH1Bwnp5kb8FaP3DrZ8KnjWsSrhh0Ln6DcG8meJ4wKtt/obqO9t6yYGN9M8cyLOF2UecgQ1Z/TYutnhrFUGrRhryU6+3WtpuxptLzyG++Wm0LC7zi1bMzwal2oOBbApzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SA6GaiMe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2D637C43399;
+	 In-Reply-To:To:Cc; b=FOvtx9tLfokyDqPpxwxl6kRNHKWp2zwlQEFKEaEnxPb6ZaDPwwlChh384CIwTg95YoX6VqXds0cE8hg0aRMEEoP2u2A31mPBMss3d94EWAdKa7xNyVH19xvBPG6vhT1/VlDnXV1yIxYXcHP4JsMM+IjkOfPPPM2h0cCROyETr7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M9xLIz6i; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1E280C43390;
 	Thu, 18 Jan 2024 18:00:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1705600828;
-	bh=rAcq0tMeIpsPq/nSiRX9MTPJ2LcdTKw8cB5YhhRL1nQ=;
+	bh=+oLt0gxwfodE4nSYk0/2cQsoAvlwFfiyBnGATSbnTB4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=SA6GaiMesFzITYf1V2FspcC4qNwgAWPn/45Tjrsx7TnSWAKGQc88hm2CDUgeeYpS1
-	 STv4eEnkKPSJFbqn5o9PTVBtwm1aCvhT69U9gE3kqwTxNiBA1GIzFp4gAGKPsDrR84
-	 lm0PUBPA26JJc1Xp3A704LZd+LbzYlw819iMd5QA0Sz4xdDfC2zFBlLcMYuL4SWCzf
-	 ZVleYNM0BMwWp5wkb6XVSbHqkQOBUcs0gY4CFD5+6pWgsR+QXKHUjM8qqyDWc5zGWG
-	 4SFNxOr6lrUUu0BJPGPZTZrxfzSr9T6rADIZOyaTtwqJqkyj/scJkruRZjnDZNU5FM
-	 BjMEm1kZvtcZg==
+	b=M9xLIz6iWgU/abjkvLgSkNJUezyakIV2q11aYFrkFA9FolP7FrOFFUs+xML8O2OAz
+	 UwSm6xHdzQOljWllHksKJT4FGht5NcJYlkKdZ/fTGgR7LxWRroT039FaMfcFIB9Qn6
+	 o9tExcQDW7qSo4JLMaNQ81peBJP1A3cMrvaD2Iy5Rl9P2akARtwdUBmiLfpSh1Tlx0
+	 I3E8uqNkdzrTnhrDgwuapTW0n3wJnBNRRz97SyeUoymFz9TspUqtoPLAgOQxwm+Gqy
+	 yDZdyfbqpgVOa2p4/22uq8hHHYnEMjipSy0uqYQpi0vAeEZoKeCx1ObfJ+htdzw9eU
+	 ZpI0B39J4qKcg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 17265D8C97A;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 086ECDFC697;
 	Thu, 18 Jan 2024 18:00:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,37 +52,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] i40e: Include types.h to some headers
+Subject: Re: [PATCH net 0/6] mlxsw: Miscellaneous fixes
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170560082809.5819.7901962173523145524.git-patchwork-notify@kernel.org>
+ <170560082803.5819.17603252019346279398.git-patchwork-notify@kernel.org>
 Date: Thu, 18 Jan 2024 18:00:28 +0000
-References: <20240117172534.3555162-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20240117172534.3555162-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, ivecera@redhat.com,
- micron10@gmail.com, jesse.brandeburg@intel.com, horms@kernel.org,
- arpanax.arland@intel.com
+References: <cover.1705502064.git.petrm@nvidia.com>
+In-Reply-To: <cover.1705502064.git.petrm@nvidia.com>
+To: Petr Machata <petrm@nvidia.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org, idosch@nvidia.com,
+ danieller@nvidia.com, amcohen@nvidia.com, jiri@resnulli.us, mlxsw@nvidia.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 17 Jan 2024 09:25:32 -0800 you wrote:
-> Commit 56df345917c0 ("i40e: Remove circular header dependencies and fix
-> headers") redistributed a number of includes from one large header file
-> to the locations they were needed. In some environments, types.h is not
-> included and causing compile issues. The driver should not rely on
-> implicit inclusion from other locations; explicitly include it to these
-> files.
+On Wed, 17 Jan 2024 16:04:15 +0100 you wrote:
+> This patchset is a bric-a-brac of fixes for bugs impacting mlxsw.
+> 
+> - Patches #1 and #2 fix issues in ACL handling error paths.
+> - Patch #3 fixes stack corruption in ACL code that a recent FW update
+>   has uncovered.
+> 
+> - Patch #4 fixes an issue in handling of IPIP next hops.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] i40e: Include types.h to some headers
-    https://git.kernel.org/netdev/net/c/9cfd3b502153
+  - [net,1/6] mlxsw: spectrum_acl_erp: Fix error flow of pool allocation failure
+    https://git.kernel.org/netdev/net/c/6d6eeabcfaba
+  - [net,2/6] mlxsw: spectrum_acl_tcam: Fix NULL pointer dereference in error path
+    https://git.kernel.org/netdev/net/c/efeb7dfea8ee
+  - [net,3/6] mlxsw: spectrum_acl_tcam: Fix stack corruption
+    https://git.kernel.org/netdev/net/c/483ae90d8f97
+  - [net,4/6] mlxsw: spectrum_router: Register netdevice notifier before nexthop
+    https://git.kernel.org/netdev/net/c/62bef63646c1
+  - [net,5/6] selftests: mlxsw: qos_pfc: Remove wrong description
+    https://git.kernel.org/netdev/net/c/40cc674bafd5
+  - [net,6/6] selftests: mlxsw: qos_pfc: Adjust the test to support 8 lanes
+    https://git.kernel.org/netdev/net/c/b34f4de6d30c
 
 You are awesome, thank you!
 -- 
