@@ -1,224 +1,282 @@
-Return-Path: <netdev+bounces-64087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 171F28310BA
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 02:10:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9EF78310DC
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 02:27:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6B2C1C21F7A
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 01:10:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AC551C21E18
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 01:27:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 889EA17D3;
-	Thu, 18 Jan 2024 01:10:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68DE8185D;
+	Thu, 18 Jan 2024 01:27:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="Jfv1rg4C"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2059.outbound.protection.outlook.com [40.107.105.59])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1DA717C3
-	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 01:10:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705540238; cv=none; b=FuDwkZEAqbliR5cRXQQ3NyGlI69xl6zAzr+YDhL+u5TQuyfMsJ5M8O+OVXnvWI8Lkmf3z3F1Y2e5uiy3jghSptWt7xWdFH72yPhs4JwvW4FDeBkZyyRMHLLW6hz/R9OWh1xNGbMPQu7g1im9HSRJCeSwefxAqn0OkED7KR+iSWE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705540238; c=relaxed/simple;
-	bh=mcM1SLwdbVtM5s9cZFlY9r8rj1gOEV9OmFjH3Wh/y5k=;
-	h=Received:Received:Received:From:To:CC:Subject:Date:Message-ID:
-	 X-Mailer:MIME-Version:Content-Transfer-Encoding:Content-Type:
-	 X-Originating-IP:X-ClientProxiedBy; b=Faf+Z69iASZQg2Z2M9QJqWZ5KrBltaomjBXgNxOes8pu3PO0f0t4PFWAX6c+y8AcvDxSgVNFKjnLYOaf6aockNHsLzrp7+59qqQlYmEJqnSfmgmwnXf0GnopbrEyYkSQKHFDHzZsA6nSs/ufkIhjNhNGxibHnMGGtaPydKj0AwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4TFl5R5rk5zsWDQ;
-	Thu, 18 Jan 2024 09:09:31 +0800 (CST)
-Received: from dggpeml500026.china.huawei.com (unknown [7.185.36.106])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4EAC81400FD;
-	Thu, 18 Jan 2024 09:10:26 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
- (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 18 Jan
- 2024 09:10:25 +0800
-From: Zhengchao Shao <shaozhengchao@huawei.com>
-To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <dsahern@kernel.org>
-CC: <sming56@aliyun.com>, <hkchu@google.com>, <weiyongjun1@huawei.com>,
-	<yuehaibing@huawei.com>, <shaozhengchao@huawei.com>
-Subject: [PATCH net,v4] tcp: make sure init the accept_queue's spinlocks once
-Date: Thu, 18 Jan 2024 09:20:19 +0800
-Message-ID: <20240118012019.1751966-1-shaozhengchao@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 204643FFF;
+	Thu, 18 Jan 2024 01:27:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.105.59
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705541244; cv=fail; b=We7WUdn79Ju7XFDvVNNAov8kBv2ymVW5k+V2tkI+zu2xeCtRbCiDsSW5k4F+ZzUGVKcMjhhvGtg7Y5dNbJGDWn6IfKST0g7wrLbFehJyX3YE8PElTTv5g2sYmI8lhQ8D+mdGNG8qGmgCzPgdoK1fB7mglhktjrdRSsTz2m4C6+w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705541244; c=relaxed/simple;
+	bh=k2ep/By8VyZLhkkqwwHYRGSTfm8EyH2AJsjJJEkjqIs=;
+	h=ARC-Message-Signature:ARC-Authentication-Results:DKIM-Signature:
+	 Received:Received:Date:From:To:Cc:Subject:Message-ID:References:
+	 Content-Type:Content-Disposition:In-Reply-To:X-ClientProxiedBy:
+	 MIME-Version:X-MS-PublicTrafficType:X-MS-TrafficTypeDiagnostic:
+	 X-MS-Office365-Filtering-Correlation-Id:
+	 X-MS-Exchange-SenderADCheck:X-MS-Exchange-AntiSpam-Relay:
+	 X-Microsoft-Antispam:X-Microsoft-Antispam-Message-Info:
+	 X-Forefront-Antispam-Report:
+	 X-MS-Exchange-AntiSpam-MessageData-ChunkCount:
+	 X-MS-Exchange-AntiSpam-MessageData-0:X-OriginatorOrg:
+	 X-MS-Exchange-CrossTenant-Network-Message-Id:
+	 X-MS-Exchange-CrossTenant-AuthSource:
+	 X-MS-Exchange-CrossTenant-AuthAs:
+	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
+	 X-MS-Exchange-CrossTenant-FromEntityHeader:
+	 X-MS-Exchange-CrossTenant-Id:X-MS-Exchange-CrossTenant-MailboxType:
+	 X-MS-Exchange-CrossTenant-UserPrincipalName:
+	 X-MS-Exchange-Transport-CrossTenantHeadersStamped; b=Kx4mS0C3bomTwI4oNy1qZ0sS4s9rLP5zEAPySmmG2r63d6LWpxB9lhmbiC4QI3qKRuEmBfAZaxcfBeHmTukH13VaPynOPTynsym1Lw7X2finCwBSecCRYtiRrWbl7B+ch83JoqAOYhIcSiYlGyoYcbxTi1DLBZ2h3OcRdb0m0io=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=Jfv1rg4C; arc=fail smtp.client-ip=40.107.105.59
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TLrQxQ0DQuERYJlx85ioHl9ERTdO/X+zvK6F0YOMF94yKX1DLyWepUZIeR3mzyQAAdPKLV7IIowSIYkdqxXUQ9ssW8dg9xtHllvbXdxtOW/4EoByT6lz8f8eSOjjWK5Dcc8rmnYKgUDUok76xhgCtwxqot2LsGAjfDi9QZhVKRmU//EOBqQhwcRbYUUXPL3O8NFlOZf4i9XCn+bJ7vGfn5iWTCbL8v0KDjtyThvCCs71RP9Bg5Uvvp7T5ZXt05GLxlo9bdP6n0r5y3kLLSZhMeOB5X1FrWLR91dzbksy6bM0FKg7SlmM1wAaOw25TZJPhBnrFluQs5nVdpi5lNakHg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dNr39vLLvGg6YzYeuxd9LdbAXOoMm27RlSRglmMh0VQ=;
+ b=Tv9JMyrhss90C99+3nNnnrFSnJduvdCc4nKf8dITZlZF/N1bkCoyOv5o2vPb1BDdOi5dqe+XdknnoP1LxDgoilCiT6mhN9I5T/fM/NHDigT5ndAmylSt00mfPzimS6zNQqFgm26STG3z3XAp5ORadXHShz31oMFjmXygxavjGZgPuuDaZmCAuG3BbIQ1IrYOpVqPD6+V+Y1PD96dkk9BuJ8+zi2fAMFPkVL1B2O+4n7Jiib9P6q0848jVh6F9oRmBgVHhvZm5IBzGmKFf1raHsKCNpnI2UDT7sbrC7vkG1fh5DAvLbFwpW2IX5UKke3oa5wfhrxC07kVMFp4/i9mmg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dNr39vLLvGg6YzYeuxd9LdbAXOoMm27RlSRglmMh0VQ=;
+ b=Jfv1rg4CdkbgW9NlX/ml67KUG4DulK3jN6Cv30SLtP5GsJPHNVvJxiJFYy7O204xg57sfvGFXjnZAcuzqn5OMpgxJlIgEzjMYbp40VjyOVUMOg0i1ykCUxFus9tlHU3bo1eECULSCAujH4jxJHqkFFZjN0WNBg4Nt/mJLsRbAJo=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from VE1PR04MB7374.eurprd04.prod.outlook.com (2603:10a6:800:1ac::11)
+ by AS8PR04MB8900.eurprd04.prod.outlook.com (2603:10a6:20b:42f::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.24; Thu, 18 Jan
+ 2024 01:27:18 +0000
+Received: from VE1PR04MB7374.eurprd04.prod.outlook.com
+ ([fe80::62cb:e6bf:a1ad:ba34]) by VE1PR04MB7374.eurprd04.prod.outlook.com
+ ([fe80::62cb:e6bf:a1ad:ba34%6]) with mapi id 15.20.7202.020; Thu, 18 Jan 2024
+ 01:27:18 +0000
+Date: Thu, 18 Jan 2024 03:27:14 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: MD Danish Anwar <danishanwar@ti.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Roger Quadros <rogerq@kernel.org>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, srk@ti.com, r-gunasekaran@ti.com,
+	linux-arm-kernel@lists.infradead.org, Roger Quadros <rogerq@ti.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Subject: Re: [PATCH net-next v4] net: ti: icssg_prueth: add TAPRIO offload
+ support
+Message-ID: <20240118012714.gzgmfwzb6tuuyofs@skbuf>
+References: <20231006102028.3831341-1-danishanwar@ti.com>
+ <20231011102536.r65xyzmh5kap2cf2@skbuf>
+ <20231006102028.3831341-1-danishanwar@ti.com>
+ <20231011102536.r65xyzmh5kap2cf2@skbuf>
+ <cfb5edf6-90ac-4d2a-a138-981c276e24bb@ti.com>
+ <cfb5edf6-90ac-4d2a-a138-981c276e24bb@ti.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cfb5edf6-90ac-4d2a-a138-981c276e24bb@ti.com>
+ <cfb5edf6-90ac-4d2a-a138-981c276e24bb@ti.com>
+X-ClientProxiedBy: FR0P281CA0009.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:15::14) To VE1PR04MB7374.eurprd04.prod.outlook.com
+ (2603:10a6:800:1ac::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpeml500026.china.huawei.com (7.185.36.106)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: VE1PR04MB7374:EE_|AS8PR04MB8900:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4738f4fd-a85d-4673-26e8-08dc17c49c1a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	1ooUODay2BqJbTdTAbWjT0W0STFaNZAZOr9zLTyBLCTXocRoPjrmk3NOZ+8VyXK5ZYfaPYB8dAxJS/4WtujXsapgnz9tDx3iapAZUmRd2E4lJbs/ufIxl6HtCmiFmvrm/a0+MG8OUTjF9EhD4xDa0GSGMDkXuSHNfKsdFPACzPyHr+DkK/VRNb0+Va/4uaUiTZxXblfc2/w+cxzTz6t1zlQNx+m4N7mtK19c6LSAYiDY0kGfm+45WFZr8U61Vdk7Vo/UVfiwjfvhSdOvIujuRyIYbhF16BS8FvzGgP4X0y1mwvTjHzV0pscR/+C3uKYBdKms0lNVpGQYpHRAWKFCAFbVKjxKLyndVdT/x3sMi8gI4apVD/O8SoD3K565v4zA4WJqLM0p+CWuIrDKfPlKbW0i3FTWliacLcJeEg8U5tRvXjY5Nm4GSEspqvFkSbap/u/VNQufXiKgkiolV1yxXIc97MoZceCYD4UncKu7P86K3VArNlfXZRIVDTZbmNWyAsKAEbr3D7IRdIn0kSCU0h/FXjuR4czvXX/6ekjfSS2xrNRQXTn+xzMcDKu8rOZo
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VE1PR04MB7374.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(396003)(136003)(346002)(376002)(39860400002)(230922051799003)(1800799012)(64100799003)(451199024)(186009)(83380400001)(6486002)(38100700002)(478600001)(1076003)(26005)(6512007)(9686003)(6666004)(6506007)(33716001)(54906003)(4326008)(6916009)(66946007)(66556008)(66476007)(316002)(44832011)(8936002)(8676002)(5660300002)(2906002)(7416002)(41300700001)(86362001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?7g8ejC8FkgSGrWtaYnzVIfyBBaiecWGmZboy7iYJTnRaTLXiNUgz7h+Bn1in?=
+ =?us-ascii?Q?CTk8zB2V7aVc91u3JlMG8KZ6NCzW++Cs5Egcw0dhELWu2ZY4tdn5ZAHu0NNo?=
+ =?us-ascii?Q?EFUg2iVMQTc0XAAVcfTphn+chA67SlMFkfauXdIIlSk7FD6FbhGz4JLYgG1I?=
+ =?us-ascii?Q?z1QMYcXdq6uBZ6p9hJPrI+PZ5//byZmgi4RQTmA7ffGw5svvcCiaKe9SVrfZ?=
+ =?us-ascii?Q?qp+fMorUzin6FpdWUYPduLWWT8B7+D2Sn+TgIFXZOk1h4e5joaeyLulhC5hs?=
+ =?us-ascii?Q?HkAX1nxXqb6zNqnVRcH3OSQUgTg3fPdcv/U43YidEjf/w+Sqiu6iMXV6YQnS?=
+ =?us-ascii?Q?HAtj/oIRyTi6DCH4mTLGw3sNnXauZau3GwoyLfWchtRn1Pyie80/muZeWVP0?=
+ =?us-ascii?Q?8OG29mp/MV6NYEvtSy+BeoYy7WIdfdoLSB0ya+r/YWj2O0ZMA/X9rcxnfKXG?=
+ =?us-ascii?Q?qnVqzkUV2QPlIBjRnMDNQ4HUQ8g5+EF9EtfhpoqCgL9KPVevxVh0geGmIVZh?=
+ =?us-ascii?Q?tJ/e/WB7zJn6QRiumwF8wpcVzcP9Endmg1w9YmjpXU+w6X8BKCPH9EtSFHdt?=
+ =?us-ascii?Q?JHH6FucXp+wT8Jmy4klIk//vz00HJ+d1w3liT6NtwNY2mJyNbYe1BJluzJhK?=
+ =?us-ascii?Q?++nhpOlK6V2kil8CnxumDIHJUYlt56HPrfpP4Q3v0tF7c3C5SbSXS0opJ9Rj?=
+ =?us-ascii?Q?4aDS6lcEklng/O+oG5yugkLY7zCqFkHPaxVcFmskjmF8Zw8cjkYRc9atTfZO?=
+ =?us-ascii?Q?BGdJEFdAwHsunMdtAEpelDaKk7VmoFcYIeOD5Pvjuv+X6ri5ntAYqqauKcm6?=
+ =?us-ascii?Q?h2mtrwN08PL64yNJPtDao8Rc4Z6GZs6l3XkxZ1LQWsPdxxwf0badL0LdmTs+?=
+ =?us-ascii?Q?C7MYiTCIR6C4ZSVWuM/KoqS5LwAghfl3yE/Ls1PINBXMVSp7Ov0h9b9MMhwo?=
+ =?us-ascii?Q?E92LVZavNoeK/dXhKcy5T6nybTBQeJbMjSIcYeCpOqsvyo6aXcQk8EDqEzD0?=
+ =?us-ascii?Q?H7FPWit2rt5y/XtWNgmtFr7U9dFrvqA2bhH9lvIToK9HkXaqg0h3SILXDUup?=
+ =?us-ascii?Q?a/RSRqzxkHqMELC3wZW0dSM2i0zrlZFv1/sBRNlXdS1iQ5P7r7fIqcveO9fY?=
+ =?us-ascii?Q?LGPX+R4scjm20sAXrwybez9vfzOF7Omf7EAX7wQh5LcjxcwR0qxhm7x6i8sr?=
+ =?us-ascii?Q?2GNxs1d0kZpe4UYjw6hKzjj4R4oijMG6fFD9qj5r1aUE51Nx9t4wVUQ5xHbU?=
+ =?us-ascii?Q?N8Dpukx6azoH6MLgMkFOCWn2I9rrbLckUtWCL1v54pLbIHVzOC3qnw8NItHm?=
+ =?us-ascii?Q?CIOROO4Ph3WtXBR/dbmomCyA170scgK5Vt+OXhZEd/T2nnc+soxpyYtCYyaI?=
+ =?us-ascii?Q?ddvT/jB3yAfYB8jj9y1etioZblftvK88dd7KsvXtJzw+9iuSwjWA8kOxc3tb?=
+ =?us-ascii?Q?diz9Znb2hLoDs0t4V9K60FEJWBtI6gceqvjpjZ6iZc0gYHOKpcClZJmaoexv?=
+ =?us-ascii?Q?UCWySUbNh0WfRGi7igBhkIMvYK1ohaSDxbkVC5Mga8ttWshhyicG9pj6tGSL?=
+ =?us-ascii?Q?R/MOh2z+lQmRZ9ow53xG000PgA5WddapauVIf6K0EFqDcngVPx+4VZS0eFTr?=
+ =?us-ascii?Q?+w=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4738f4fd-a85d-4673-26e8-08dc17c49c1a
+X-MS-Exchange-CrossTenant-AuthSource: VE1PR04MB7374.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jan 2024 01:27:18.2279
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NyORTdSe2tvRqWgQowLjuZxCdBYLwAvP1w+EbGw8stH13g9YGf/1Jt6wrXnE15xcwZXieMNIURAjSvnDL8j33g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8900
 
-When I run syz's reproduction C program locally, it causes the following
-issue:
-pvqspinlock: lock 0xffff9d181cd5c660 has corrupted value 0x0!
-WARNING: CPU: 19 PID: 21160 at __pv_queued_spin_unlock_slowpath (kernel/locking/qspinlock_paravirt.h:508)
-Hardware name: Red Hat KVM, BIOS 0.5.1 01/01/2011
-RIP: 0010:__pv_queued_spin_unlock_slowpath (kernel/locking/qspinlock_paravirt.h:508)
-Code: 73 56 3a ff 90 c3 cc cc cc cc 8b 05 bb 1f 48 01 85 c0 74 05 c3 cc cc cc cc 8b 17 48 89 fe 48 c7 c7
-30 20 ce 8f e8 ad 56 42 ff <0f> 0b c3 cc cc cc cc 0f 0b 0f 1f 40 00 90 90 90 90 90 90 90 90 90
-RSP: 0018:ffffa8d200604cb8 EFLAGS: 00010282
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff9d1ef60e0908
-RDX: 00000000ffffffd8 RSI: 0000000000000027 RDI: ffff9d1ef60e0900
-RBP: ffff9d181cd5c280 R08: 0000000000000000 R09: 00000000ffff7fff
-R10: ffffa8d200604b68 R11: ffffffff907dcdc8 R12: 0000000000000000
-R13: ffff9d181cd5c660 R14: ffff9d1813a3f330 R15: 0000000000001000
-FS:  00007fa110184640(0000) GS:ffff9d1ef60c0000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020000000 CR3: 000000011f65e000 CR4: 00000000000006f0
-Call Trace:
-<IRQ>
-  _raw_spin_unlock (kernel/locking/spinlock.c:186)
-  inet_csk_reqsk_queue_add (net/ipv4/inet_connection_sock.c:1321)
-  inet_csk_complete_hashdance (net/ipv4/inet_connection_sock.c:1358)
-  tcp_check_req (net/ipv4/tcp_minisocks.c:868)
-  tcp_v4_rcv (net/ipv4/tcp_ipv4.c:2260)
-  ip_protocol_deliver_rcu (net/ipv4/ip_input.c:205)
-  ip_local_deliver_finish (net/ipv4/ip_input.c:234)
-  __netif_receive_skb_one_core (net/core/dev.c:5529)
-  process_backlog (./include/linux/rcupdate.h:779)
-  __napi_poll (net/core/dev.c:6533)
-  net_rx_action (net/core/dev.c:6604)
-  __do_softirq (./arch/x86/include/asm/jump_label.h:27)
-  do_softirq (kernel/softirq.c:454 kernel/softirq.c:441)
-</IRQ>
-<TASK>
-  __local_bh_enable_ip (kernel/softirq.c:381)
-  __dev_queue_xmit (net/core/dev.c:4374)
-  ip_finish_output2 (./include/net/neighbour.h:540 net/ipv4/ip_output.c:235)
-  __ip_queue_xmit (net/ipv4/ip_output.c:535)
-  __tcp_transmit_skb (net/ipv4/tcp_output.c:1462)
-  tcp_rcv_synsent_state_process (net/ipv4/tcp_input.c:6469)
-  tcp_rcv_state_process (net/ipv4/tcp_input.c:6657)
-  tcp_v4_do_rcv (net/ipv4/tcp_ipv4.c:1929)
-  __release_sock (./include/net/sock.h:1121 net/core/sock.c:2968)
-  release_sock (net/core/sock.c:3536)
-  inet_wait_for_connect (net/ipv4/af_inet.c:609)
-  __inet_stream_connect (net/ipv4/af_inet.c:702)
-  inet_stream_connect (net/ipv4/af_inet.c:748)
-  __sys_connect (./include/linux/file.h:45 net/socket.c:2064)
-  __x64_sys_connect (net/socket.c:2073 net/socket.c:2070 net/socket.c:2070)
-  do_syscall_64 (arch/x86/entry/common.c:51 arch/x86/entry/common.c:82)
-  entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:129)
-  RIP: 0033:0x7fa10ff05a3d
-  Code: 5b 41 5c c3 66 0f 1f 84 00 00 00 00 00 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89
-  c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d ab a3 0e 00 f7 d8 64 89 01 48
-  RSP: 002b:00007fa110183de8 EFLAGS: 00000202 ORIG_RAX: 000000000000002a
-  RAX: ffffffffffffffda RBX: 0000000020000054 RCX: 00007fa10ff05a3d
-  RDX: 000000000000001c RSI: 0000000020000040 RDI: 0000000000000003
-  RBP: 00007fa110183e20 R08: 0000000000000000 R09: 0000000000000000
-  R10: 0000000000000000 R11: 0000000000000202 R12: 00007fa110184640
-  R13: 0000000000000000 R14: 00007fa10fe8b060 R15: 00007fff73e23b20
-</TASK>
+On Mon, Jan 15, 2024 at 12:24:12PM +0530, MD Danish Anwar wrote:
+> > I believe the intention is for this code to be run before any taprio
+> > offload is added, correct? But it is possible for the user to add an
+> 
+> Yes, the intention here is to run this code before any taprio offload is
+> added.
 
-The issue triggering process is analyzed as follows:
-Thread A                                       Thread B
-tcp_v4_rcv	//receive ack TCP packet       inet_shutdown
-  tcp_check_req                                  tcp_disconnect //disconnect sock
-  ...                                              tcp_set_state(sk, TCP_CLOSE)
-    inet_csk_complete_hashdance                ...
-      inet_csk_reqsk_queue_add                 inet_listen  //start listen
-        spin_lock(&queue->rskq_lock)             inet_csk_listen_start
-        ...                                        reqsk_queue_alloc
-        ...                                          spin_lock_init
-        spin_unlock(&queue->rskq_lock)	//warning
+Then it is misplaced?
 
-When the socket receives the ACK packet during the three-way handshake,
-it will hold spinlock. And then the user actively shutdowns the socket
-and listens to the socket immediately, the spinlock will be initialized.
-When the socket is going to release the spinlock, a warning is generated.
-Also the same issue to fastopenq.lock.
+> > offloaded Qdisc even while the netdev has not yet been brought up.
+> > Is that case handled correctly, or will it simply result in NULL pointer
+> > dereferences (tas->config_list)?
+> > 
+> 
+> In that case, it will eventually result in NULL pointer dereference as
+> tas->config_list will be pointing to NULL. To handle this correctly we
+> can add the below check in emac_taprio_replace().
+> 
+> if (!ndev_running(ndev)) {
+> 	netdev_err(ndev, "Device is not running");
+> 	return -EINVAL;
+> }
 
-Move init spinlock to inet_create and inet_accept to make sure init the
-accept_queue's spinlocks once.
+What is the reason for which the device has to be running, other than
+your placement of icssg_qos_tas_init()?
 
-Fixes: fff1f3001cc5 ("tcp: add a spinlock to protect struct request_sock_queue")
-Fixes: 168a8f58059a ("tcp: TCP Fast Open Server - main code path")
-Reported-by: Ming Shu <sming56@aliyun.com>
-Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
----
-v4: Add a helper to init accept_queue's spinlocks.
-v3: Move init spinlock to inet_create and inet_accept.
-v2: Add 'init_done' to make sure init the accept_queue's spinlocks once.
----
- include/net/inet_connection_sock.h | 8 ++++++++
- net/core/request_sock.c            | 3 ---
- net/ipv4/af_inet.c                 | 3 +++
- net/ipv4/inet_connection_sock.c    | 4 ++++
- 4 files changed, 15 insertions(+), 3 deletions(-)
+> >> +
+> >> +	cycle_time = admin_list->cycle_time - 4; /* -4ns to compensate for IEP wraparound time */
+> > 
+> > Details? Doesn't this make the phase alignment of the schedule diverge
+> > from what the user expects?
+> 
+> 4ns is needed to compensate for IEP wraparound time. IEP is the clock
+> used by ICSSG driver. IEP tick is 4ns and we adjust this 4ns whenever
+> calculating cycle_time. You may refer to [1] for details on IEP driver.
 
-diff --git a/include/net/inet_connection_sock.h b/include/net/inet_connection_sock.h
-index d0a2f827d5f2..9ab4bf704e86 100644
---- a/include/net/inet_connection_sock.h
-+++ b/include/net/inet_connection_sock.h
-@@ -357,4 +357,12 @@ static inline bool inet_csk_has_ulp(const struct sock *sk)
- 	return inet_test_bit(IS_ICSK, sk) && !!inet_csk(sk)->icsk_ulp_ops;
- }
- 
-+static inline void inet_init_csk_locks(struct sock *sk)
-+{
-+	struct inet_connection_sock *icsk = inet_csk(sk);
-+
-+	spin_lock_init(&icsk->icsk_accept_queue.rskq_lock);
-+	spin_lock_init(&icsk->icsk_accept_queue.fastopenq.lock);
-+}
-+
- #endif /* _INET_CONNECTION_SOCK_H */
-diff --git a/net/core/request_sock.c b/net/core/request_sock.c
-index f35c2e998406..63de5c635842 100644
---- a/net/core/request_sock.c
-+++ b/net/core/request_sock.c
-@@ -33,9 +33,6 @@
- 
- void reqsk_queue_alloc(struct request_sock_queue *queue)
- {
--	spin_lock_init(&queue->rskq_lock);
--
--	spin_lock_init(&queue->fastopenq.lock);
- 	queue->fastopenq.rskq_rst_head = NULL;
- 	queue->fastopenq.rskq_rst_tail = NULL;
- 	queue->fastopenq.qlen = 0;
-diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
-index 835f4f9d98d2..4e635dd3d3c8 100644
---- a/net/ipv4/af_inet.c
-+++ b/net/ipv4/af_inet.c
-@@ -330,6 +330,9 @@ static int inet_create(struct net *net, struct socket *sock, int protocol,
- 	if (INET_PROTOSW_REUSE & answer_flags)
- 		sk->sk_reuse = SK_CAN_REUSE;
- 
-+	if (INET_PROTOSW_ICSK & answer_flags)
-+		inet_init_csk_locks(sk);
-+
- 	inet = inet_sk(sk);
- 	inet_assign_bit(IS_ICSK, sk, INET_PROTOSW_ICSK & answer_flags);
- 
-diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
-index 8e2eb1793685..459af1f89739 100644
---- a/net/ipv4/inet_connection_sock.c
-+++ b/net/ipv4/inet_connection_sock.c
-@@ -727,6 +727,10 @@ struct sock *inet_csk_accept(struct sock *sk, int flags, int *err, bool kern)
- 	}
- 	if (req)
- 		reqsk_put(req);
-+
-+	if (newsk)
-+		inet_init_csk_locks(newsk);
-+
- 	return newsk;
- out_err:
- 	newsk = NULL;
--- 
-2.34.1
+What is understood by "IEP wraparound time"? Its time wraps around what?
+It wraps around exactly once every taprio cycle of each port and that's
+why the cycle-time is compensated, or how does that work?
 
+> > 
+> >> +	base_time = admin_list->base_time;
+> >> +	cur_time = prueth_iep_gettime(emac, &sts);
+> >> +
+> >> +	if (base_time > cur_time)
+> >> +		change_cycle_count = DIV_ROUND_UP_ULL(base_time - cur_time, cycle_time);
+> >> +	else
+> >> +		change_cycle_count = 1;
+> > 
+> > I see that the base_time is only used to calculate the number of cycles
+> > relative to cur_time. Taprio users want to specify a basetime value
+> > which indicates the phase alignment of the schedule. This is important
+> > when the device is synchronized over PTP with other switches in the
+> > network. Can you explain how is the basetime taken into consideration in
+> > your implementation?
+> > 
+> 
+> In this implementation base_time is used only to obtain the
+> change_cycle_count and to write it to TAS_CONFIG_CHANGE_CYCLE_COUNT. In
+> this implementation base_time is not used for anything else.
+
+So there is zero granularity in the base-time beyond the number of cycles?
+That is very bad, because it means the hardware cannot be used in a
+practical TSN network where schedules are offset in phase to each other.
+It needs to be able to be told when the schedule begins, with precision.
+Not just how many cycles from now (what does 'now' even mean?).
+
+> > Better to say what's the hardware maximum, than to report back num_entries
+> > as being not supported.
+> > 
+> 
+> Sure, I'll change it to below,
+> 
+> if (taprio->num_entries > TAS_MAX_CMD_LISTS) {
+> 	NL_SET_ERR_MSG_FMT_MOD(taprio->extack, "num_entries %ld is more than maximum supported entries %ld in taprio config\n",
+> 				       taprio->num_entries, TAS_MAX_CMD_LISTS);
+> 	return -EINVAL;
+> }
+
+Keep in mind that NETLINK_MAX_FMTMSG_LEN is only 80 characters. Also, \n
+is not needed in netlink extack messages. And indentation also looks off.
+
+> >> +
+> >> +	emac_cp_taprio(taprio, est_new);
+> >> +	emac->qos.tas.taprio_admin = est_new;
+> >> +	ret = tas_update_oper_list(emac);
+> >> +	if (ret)
+> >> +		return ret;
+> >> +
+> >> +	ret =  tas_set_state(emac, TAS_STATE_ENABLE);
+> >> +	if (ret)
+> >> +		devm_kfree(&ndev->dev, est_new);
+> >> +
+> >> +	return ret;
+> >> +}
+> 
+> Below is how the code will look like.
+> 
+> 	emac->qos.tas.taprio_admin = taprio_offload_get(taprio);
+
+emac->qos.tas.taprio_admin can also hold an old offload, which is leaked
+here when assigning the new one ("tc qdisc replace dev eth0 root taprio").
+
+> 	ret = tas_update_oper_list(emac);
+> 	if (ret)
+> 		return ret;
+> 
+> 	ret = tas_set_state(emac, TAS_STATE_ENABLE);
+> 	if (ret) {
+> 		emac->qos.tas.taprio_admin = NULL;
+> 		taprio_offload_free(taprio);
+> 	}
+> 
+> 	return ret;
+> 
+> Please let me know if all of these changes looks ok, I'll resend the
+> patch once you confirm. Thanks for reviewing.
+
+Hard to say from this snippet. taprio_offload_free() will be needed from
+emac_taprio_destroy() as well.
 
