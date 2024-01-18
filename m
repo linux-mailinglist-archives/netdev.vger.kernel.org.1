@@ -1,67 +1,82 @@
-Return-Path: <netdev+bounces-64194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D57A8831B03
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 15:02:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D311E831B05
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 15:02:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C82C1F2577A
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 14:02:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1236B1C20A72
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 14:02:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB8EC25639;
-	Thu, 18 Jan 2024 14:02:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3B1725756;
+	Thu, 18 Jan 2024 14:02:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Brv+xSJA"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GzLLYuZ3"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 359FE25579;
-	Thu, 18 Jan 2024 14:02:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 260A025579
+	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 14:02:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705586532; cv=none; b=kzhtHgo2iagSxgGQUqmbF67wPYEDtvBt9Iec3JU9+i9YPyqWjB0jmQvyGrNPHwAi2/LViZDZghlY9tdlKTz3Hr9SXHbie3iQGH47E2C4vm7JHs06zqOjTbDLB/FCYrXPajOa892SVSytU+L9pOPBl1VMfIzJ/H7vPhsjWGBUcUM=
+	t=1705586563; cv=none; b=MU1KnHa6xisXdtPMl/TC4Aa9RVtaIE7QMXGkm+kvdvryWXzS62WNBO8gk+qk5BR6u+ox1u0h7hsFiwFArSgYorMjAGpn7aR9HIv+sIGIUd97dWBtMHaZCApGiwRm6DpeUJrvQa8TDs9IWNpJF4Qav9zY3+GzT1cc9/3VfPONSws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705586532; c=relaxed/simple;
-	bh=0ZpTOxtF+JNwHEzDyAK3SuignG468h3k05SLchlkRsI=;
-	h=DKIM-Signature:Received:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To; b=ffgV1UJHBGPedQ0etsiv37lX3F1hVIopE0r23ncQ0E19d2AHxuot86lOHcKNwMUv9cD6M7DH5LdLjv/ti9jiGBxWpE0v1TJQGUs13kOmHvlpDXgIyws4PdeZmfUt8jK3TSeyelIUVRJ4aPTqdk0G0kGp6ehPnEHCXyp/dIKMSus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Brv+xSJA; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=5xUMVOdWXR28LTjgi8INzdf5V0YNKbloTOUqIvRdyT4=; b=Brv+xSJAJkRLFEaaPkeJ5MarNg
-	irsTXhPRhnZr/cBDlI30GAeY2ZC9pTgFOeh9gEpT1kTPzY4PwUvm9H62TLCvt98PKxD9spEU3Ni97
-	HmgQCKiwclfVd2cKoq646LVS2y/He6n9bntFgEuW3RWaod8cVCQrV6mQ9mIqUYI3+dEw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rQSxv-005Txr-Jh; Thu, 18 Jan 2024 15:01:55 +0100
-Date: Thu, 18 Jan 2024 15:01:55 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: Rob Herring <robh@kernel.org>, Dan Carpenter <dan.carpenter@linaro.org>,
-	Jan Kiszka <jan.kiszka@siemens.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Wolfram Sang <wsa+renesas@sang-engineering.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Grygorii Strashko <grygorii.strashko@ti.com>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Roger Quadros <rogerq@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, srk@ti.com, r-gunasekaran@ti.com
-Subject: Re: [RFC PATCH v2 0/3] Introduce switch mode support for ICSSG driver
-Message-ID: <f3d75103-c1ca-448d-b5aa-736496d00342@lunn.ch>
-References: <20240118071005.1514498-1-danishanwar@ti.com>
+	s=arc-20240116; t=1705586563; c=relaxed/simple;
+	bh=XwFPnCD3pVIp4nOoRB+Uc7ghygah+08p/DypU6fuYjo=;
+	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:Date:
+	 From:To:Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=A2pBfbKlW1cJxiCpWWhFQe2HZkRfl/A2XeDShaGtacNliXQofN/f82Flan6n4ATlhmwnVLei4YZ+tjkHwQkfcs938YYg7h6RVrcETsa8Cuufptgmeqgeo0/xqMdMvGjYj90+WbPRXOpYiK+sdmK8+nvw2VIJsEp6eq3x/FPnTeo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=GzLLYuZ3; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-40e913e3f03so7147075e9.3
+        for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 06:02:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1705586560; x=1706191360; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=20bX/XFWinF8o/RfO/KBZGAkxhlss84UAKlLhQSztPg=;
+        b=GzLLYuZ32qlTqrIVfUVp/YWhcyJ/jmCKY9I+fKZGA8bzp44VBlHoet08HyhtjQ3UFu
+         pkyFzO0eJxFk3IImR0Hcas42saBlj0L58EIhFRaEnVynT5iKCtk8BFq2rEACGhQKZeyC
+         hRaz1c0sK9VHTGB4PRnqK/wm1Bbfanz+E/N0ODYyecKxNbkgUflRoPpUSPGejlZGcd4y
+         tUrZKihDvBuX6sPcBAk5BYjbEM4aIgeUl1Kh81GsrBbXnjsGWuuu7Jhv2vt63D3Gvc/w
+         p2OgYtFFR0oKgN+ZMoUyCy5HVxXNoZcImsgg484I1OBf/xc5tGPbpzcZgp3wmPUAlBP4
+         lW+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705586560; x=1706191360;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=20bX/XFWinF8o/RfO/KBZGAkxhlss84UAKlLhQSztPg=;
+        b=fFnmLZo/QvsTqiJKMXeel12CS5Zjh0l/726N04lIsfHfmKFpN8tUPNtjrsSJezn3do
+         qcqSamXf/sxCWPhrdPZeu/0QcSdSXMFEfePuSDRsTZCE63Mj/Va8N+EOnS2M6BvBjxV0
+         hWLAHyHSzFiqyBZa/4A0zmGKYHEgxb0PID6XUwGoqqmeB05Eb71M0PwwaUUIR3pfRj9e
+         Mz+4a5Bh7cLoNBGF3i/gWgw5V9Qv3Fdi7mLXXmItI+lmJbmXmLJUYk4naUShz5D0m/o3
+         Lagf/Vpi3oUp4dNpwDDWu4/nLulGLbXx6XHnLYhB/qx6KtrstxYsfmo/TcHo1sxQMov6
+         Sxtw==
+X-Gm-Message-State: AOJu0YwymCuJKFgYAMIh08gXmJXN1nyHtHOivfs94/W2pj4kAhRQMju8
+	fseeG2J/7a/8kcCUzn59NBKR4P4LfLdKLV0djUTx6TT8+cR6z77O4IMwSyMPA8Y=
+X-Google-Smtp-Source: AGHT+IHWI//6laMgHdYMGjsOTaEMH9f1zk20uprry/MLMWjdw5OyhiMBKxMuHGUcyVloSb3CWRNThw==
+X-Received: by 2002:a05:600c:ac5:b0:40e:9007:5cf1 with SMTP id c5-20020a05600c0ac500b0040e90075cf1mr613691wmr.19.1705586560394;
+        Thu, 18 Jan 2024 06:02:40 -0800 (PST)
+Received: from localhost ([102.140.209.237])
+        by smtp.gmail.com with ESMTPSA id j28-20020a05600c1c1c00b0040e6726befcsm22212876wms.10.2024.01.18.06.02.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Jan 2024 06:02:40 -0800 (PST)
+Date: Thu, 18 Jan 2024 17:02:36 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org, kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH iwl-next v3 2/3] ixgbe: Fix smatch warnings after type
+ convertion
+Message-ID: <1a2bbad4-f5c6-4a46-8dc1-ff853987bd59@moroto.mountain>
+References: <20240118134332.470907-1-jedrzej.jagielski@intel.com>
+ <20240118134332.470907-2-jedrzej.jagielski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,66 +85,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240118071005.1514498-1-danishanwar@ti.com>
+In-Reply-To: <20240118134332.470907-2-jedrzej.jagielski@intel.com>
 
-On Thu, Jan 18, 2024 at 12:40:02PM +0530, MD Danish Anwar wrote:
-> This series adds support for switch-mode for ICSSG driver. This series
-> also introduces helper APIs to configure firmware maintained FDB
-> (Forwarding Database) and VLAN tables. These APIs are later used by ICSSG
-> driver in switch mode.
-> 
-> Now the driver will boot by default in dual EMAC mode. When first ICSSG
-> interface is added to bridge driver will still be in EMAC mode. As soon as
-> second ICSSG interface is added to same bridge, switch-mode will be
-> enabled and switch firmwares will be loaded to PRU cores. The driver will
-> remain in dual EMAC mode if ICSSG interfaces are added to two different
-> bridges or if two differnet interfaces (One ICSSG, one other) is added to
-> the same bridge. We'll only enable is_switch_mode flag when two ICSSG
-> interfaces are added to same bridge.
-> 
-> We start in dual MAC mode. Let's say lan0 and lan1 are ICSSG interfaces
-> 
-> ip link add name br0 type bridge
-> ip link set lan0 master br0
-> 
-> At this point, we get a CHANGEUPPER event. Only one port is a member of
-> the bridge, so we will still be in dual MAC mode.
-> 
-> ip link set lan1 master br0
-> 
-> We get a second CHANGEUPPER event, the secind interface lan1 is also ICSSG
-> interface so we will set the is_switch_mode flag and when interfaces are
-> brought up again, ICSSG switch firmwares will be loaded to PRU Cores.
-> 
-> There are some other cases to consider as well. 
-> 
-> ip link add name br0 type bridge
-> ip link add name br1 type bridge
-> 
-> ip link set lan0 master br0
-> ip link set ppp0 master br0
-> 
-> Here we are adding lan0 (ICSSG) and ppp0 (non ICSSG) to same bridge, as
-> they both are not ICSSG, we will still be running in dual EMAC mode.
-> 
-> ip link set lan1 master br1
-> ip link set vpn0 master br1
-> 
-> Here we are adding lan1 (ICSSG) and vpn0 (non ICSSG) to same bridge, as
-> they both are not ICSSG, we will still be running in dual EMAC mode.
+Thanks for this patch!
 
-This is going in the right direction, thanks for the changes.
+On Thu, Jan 18, 2024 at 02:43:31PM +0100, Jedrzej Jagielski wrote:
+> Converting s32 functions to regular int in the patch 8035560dbfaf caused
+> trigerring smatch warnings about missing error code. The bug predates
+> the mentioned patch.
 
-What features does the dual EMAC firmware support which the switch
-firmware does not?
+It's not really a bug, just some suspicous code.  Especially the
+"If 10G disabled for LPLU via NVM D10GMP, then return no valid LCD"
+return.  But it's actually all fine so this patch is really just a
+cleanup.
 
-If such features are in use, you should not reload firmware to the
-switch firmware, since it will break whatever has been
-configured. Keep with bridging in software.
+> 
+> New smatch warnings:
+> drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c:2884 ixgbe_get_lcd_t_x550em() warn: missing error code? 'status'
+> drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c:3130 ixgbe_enter_lplu_t_x550em() warn: missing error code? 'status'
+> 
+> Old smatch warnings:
+> drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c:2890 ixgbe_get_lcd_t_x550em() warn: missing error code? 'status'
+> 
+> Fix it by clearly stating returning error code as 0.
+> 
+> Reported-by: kernel test robot <lkp@intel.com>
+> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Closes: https://lore.kernel.org/r/202401041701.6QKTsZmx-lkp@intel.com/
+> Fixes: 6ac743945960 ("ixgbe: Add support for entering low power link up state")
 
-Similarly, what features are supported by both firmwares? Does feature
-configuration survive a firmware reload? Or is it necessary to pass
-all the configuration to the firmware again?
+No need for a Fixes tag.
 
-    Andrew
+> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+
+Thanks, again.  I do think this makes it a lot more clear.
+
+regards,
+dan carpenter
+
 
