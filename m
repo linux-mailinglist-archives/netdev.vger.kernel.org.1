@@ -1,127 +1,72 @@
-Return-Path: <netdev+bounces-64227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3524A831D78
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 17:19:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98919831D7F
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 17:22:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 963B2B225A4
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 16:19:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBF7B1C2243A
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 16:22:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E9512D61C;
-	Thu, 18 Jan 2024 16:17:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A1852C1AA;
+	Thu, 18 Jan 2024 16:21:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UrgG8Zhf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6125A2C84C;
-	Thu, 18 Jan 2024 16:17:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 658C22C1A2
+	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 16:21:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705594666; cv=none; b=FicQoCngerRG4fXDI1f8EmO1cJb/3lw5Z4fbgwaf/1ZINBHYCxn0JIs+eLSws9pVxoN/Oes4EP6HoM0IRzVVKPJpX+0o4V5/BM1hgnit8uJQ1ONQOpsQmdFqpsvLgWlzmzl4tCThsVL/lSk+Xh9oPB6uZmceBYJhL5XpsBP1Wzc=
+	t=1705594912; cv=none; b=G5zgs5Acs7zB1VslRCBVe99K/muyrhBd+IfT2KXUO26vgsCNssbtAAFr8F+KvP+1hI76u3sy9Kt1Be94y/wiOUMy7lf/sV8zPd/eJoJBDtH6zpHDI4EqpQ5DaMBQ3D+D8BlyKYaUFsWMuyBTpj+ksg9A6SCfUYCbaE4wNvDc7+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705594666; c=relaxed/simple;
-	bh=i+g1c9MzBrdk6gCX13L1vqVGvEmrX/fbeR/nfR4gh10=;
-	h=From:To:Cc:Subject:Date:Message-Id:X-Mailer:In-Reply-To:
-	 References:MIME-Version:Content-Transfer-Encoding; b=a+aPziM6P4DDEH2BxrX7rC4A0NkEyKHXt7xIhE3Usvu9bACQcgbyOVCeD7uNRr/9UTIhxg7QQDdZ57QljqOhu06+mcVXPeXihb1I+8tEgYprqG4+Y2K9kSDNWP2q4Sgxrzk2Ao82QYohfmti1oeRTviqGlWQzEb39X0StbScwlw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	fw@strlen.de
-Subject: [PATCH net 13/13] ipvs: avoid stat macros calls from preemptible context
-Date: Thu, 18 Jan 2024 17:17:26 +0100
-Message-Id: <20240118161726.14838-14-pablo@netfilter.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240118161726.14838-1-pablo@netfilter.org>
-References: <20240118161726.14838-1-pablo@netfilter.org>
+	s=arc-20240116; t=1705594912; c=relaxed/simple;
+	bh=97g0l376Kv+TXTpj+CdU4cfEsPQZ2Rz1btM/w6hJawg=;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 In-Reply-To:References:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding; b=Aowdmw9/7Jx2EbfPHPDnTy2eHQ46++0a3FfveNndGZgy2yxH/DF3ZlivVOvvDzfwXoO515hqMFOhw9Fw5Xe7ZMWEn/PMKreb1XlfYUZKvMLg89fBZVSoDuJe335jdkCX1be+INgtumtbf+3ytY8vO+9CazO8NTZfxL2oDXWxq3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UrgG8Zhf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A59A2C43394;
+	Thu, 18 Jan 2024 16:21:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705594911;
+	bh=97g0l376Kv+TXTpj+CdU4cfEsPQZ2Rz1btM/w6hJawg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=UrgG8Zhfp6QZRJywHJTwzzdHEM3gEEECUl3Ki2iaAGq8WXBsDZalVKaVktj57uezs
+	 QDwvPtwUq+k3TKpffxuSCyXPLgwhVo+WfAoZgC5A7pxrAO2B0/MZMbIBOTtOP34BCG
+	 ozebQ9WKHxWHNqhfrY0/u3i9DnIy4UgD2JJjg8ym0wnqWRYrQ6rqodezMP745YFHtK
+	 DPITQ6Qw6GzGV9OZyg9ueT7L3qlQ4I4ZLScZqWAJN1wo07Be5/bRdYKaG3BQzkgcJT
+	 H+qdSKk/fw6b/uCEXLLVsCQc1ijiH0UgBcRXWZIAMlRNY2nGnUGFwrj5HFMoMY7EhC
+	 WO/jJnkEIypOg==
+Date: Thu, 18 Jan 2024 08:21:50 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Ian Kumlien <ian.kumlien@gmail.com>
+Cc: Linux Kernel Network Developers <netdev@vger.kernel.org>,
+ saeedm@nvidia.com
+Subject: Re: [mlx5e] FYI dmesg is filled with
+ mlx5e_page_release_fragmented.isra warnings in 6.6.12
+Message-ID: <20240118082150.53a4d4b9@kernel.org>
+In-Reply-To: <CAA85sZtZ9cL4g-SFSS-pTL11JocoOc4BAU7b4uj26MNckp41wQ@mail.gmail.com>
+References: <CAA85sZvvHtrpTQRqdaOx6gd55zPAVsqMYk_Lwh4Md5knTq7AyA@mail.gmail.com>
+	<CAA85sZtZ9cL4g-SFSS-pTL11JocoOc4BAU7b4uj26MNckp41wQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Fedor Pchelkin <pchelkin@ispras.ru>
+On Thu, 18 Jan 2024 16:27:13 +0100 Ian Kumlien wrote:
+> > [ 1068.937977] WARNING: CPU: 0 PID: 0 at
+> > include/net/page_pool/helpers.h:130
+> > mlx5e_page_release_fragmented.isra.0+0x46/0x50 [mlx5_core]
 
-Inside decrement_ttl() upon discovering that the packet ttl has exceeded,
-__IP_INC_STATS and __IP6_INC_STATS macros can be called from preemptible
-context having the following backtrace:
-
-check_preemption_disabled: 48 callbacks suppressed
-BUG: using __this_cpu_add() in preemptible [00000000] code: curl/1177
-caller is decrement_ttl+0x217/0x830
-CPU: 5 PID: 1177 Comm: curl Not tainted 6.7.0+ #34
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0xbd/0xe0
- check_preemption_disabled+0xd1/0xe0
- decrement_ttl+0x217/0x830
- __ip_vs_get_out_rt+0x4e0/0x1ef0
- ip_vs_nat_xmit+0x205/0xcd0
- ip_vs_in_hook+0x9b1/0x26a0
- nf_hook_slow+0xc2/0x210
- nf_hook+0x1fb/0x770
- __ip_local_out+0x33b/0x640
- ip_local_out+0x2a/0x490
- __ip_queue_xmit+0x990/0x1d10
- __tcp_transmit_skb+0x288b/0x3d10
- tcp_connect+0x3466/0x5180
- tcp_v4_connect+0x1535/0x1bb0
- __inet_stream_connect+0x40d/0x1040
- inet_stream_connect+0x57/0xa0
- __sys_connect_file+0x162/0x1a0
- __sys_connect+0x137/0x160
- __x64_sys_connect+0x72/0xb0
- do_syscall_64+0x6f/0x140
- entry_SYSCALL_64_after_hwframe+0x6e/0x76
-RIP: 0033:0x7fe6dbbc34e0
-
-Use the corresponding preemption-aware variants: IP_INC_STATS and
-IP6_INC_STATS.
-
-Found by Linux Verification Center (linuxtesting.org).
-
-Fixes: 8d8e20e2d7bb ("ipvs: Decrement ttl")
-Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
-Acked-by: Julian Anastasov <ja@ssi.bg>
-Acked-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- net/netfilter/ipvs/ip_vs_xmit.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/net/netfilter/ipvs/ip_vs_xmit.c b/net/netfilter/ipvs/ip_vs_xmit.c
-index 9193e109e6b3..65e0259178da 100644
---- a/net/netfilter/ipvs/ip_vs_xmit.c
-+++ b/net/netfilter/ipvs/ip_vs_xmit.c
-@@ -271,7 +271,7 @@ static inline bool decrement_ttl(struct netns_ipvs *ipvs,
- 			skb->dev = dst->dev;
- 			icmpv6_send(skb, ICMPV6_TIME_EXCEED,
- 				    ICMPV6_EXC_HOPLIMIT, 0);
--			__IP6_INC_STATS(net, idev, IPSTATS_MIB_INHDRERRORS);
-+			IP6_INC_STATS(net, idev, IPSTATS_MIB_INHDRERRORS);
- 
- 			return false;
- 		}
-@@ -286,7 +286,7 @@ static inline bool decrement_ttl(struct netns_ipvs *ipvs,
- 	{
- 		if (ip_hdr(skb)->ttl <= 1) {
- 			/* Tell the sender its packet died... */
--			__IP_INC_STATS(net, IPSTATS_MIB_INHDRERRORS);
-+			IP_INC_STATS(net, IPSTATS_MIB_INHDRERRORS);
- 			icmp_send(skb, ICMP_TIME_EXCEEDED, ICMP_EXC_TTL, 0);
- 			return false;
- 		}
--- 
-2.30.2
-
+Is this one time or repeating / reproducible?
+What's the most recent kernel that did work?
 
