@@ -1,237 +1,186 @@
-Return-Path: <netdev+bounces-64141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64138-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F1DC831555
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 10:01:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9679083154C
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 10:00:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FC8B1F25B99
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 09:01:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 225781F238C0
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 09:00:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D79361D6A2;
-	Thu, 18 Jan 2024 09:01:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B41B512B6B;
+	Thu, 18 Jan 2024 09:00:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="u6f2gNnR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MUOSOcoJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 249BA13FF8;
-	Thu, 18 Jan 2024 09:01:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1732C125D3
+	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 09:00:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705568474; cv=none; b=LMkwAnjcxzLuXaCCj462b4GvBpYNdAe1nEgfgQWmpDR2SkdXI75NVuNmap7/dyfQTOBfwsbYIEMhVeR+uuvP3yLPIh1b8D1yUA7w5r27/gpdk68mu74LwMxTz/FeUa+AbhXmhYZfsryD8rMm/HYXWaYaA0L5hDlSo8shcBh3Ycg=
+	t=1705568411; cv=none; b=iW00OYMYYRB9JrdwdtwV5EaIknBtopXoCHFmH2cnP827zJ4UsLzHiRFpT/JQ5lMYtt2GThwH1ODrZXlAsK1ymc+crDW0rElYIReUQy34iJZ3atzlHqhoSXzRyZ0DHMk01TPhWJPtRlA7+PhTLN5EW+0dfCMKMR6kFoeDzKB9PQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705568474; c=relaxed/simple;
-	bh=rg0HRkH5KtaQfeP6dJiUbwincfDYNp3b51Q+xE76eA4=;
-	h=DKIM-Signature:X-CSE-ConnectionGUID:X-CSE-MsgGUID:X-IronPort-AV:
-	 X-Amp-Result:Received:Received:Received:From:To:CC:Subject:Date:
-	 Message-ID:X-Mailer:In-Reply-To:References:MIME-Version:
-	 Content-Transfer-Encoding:Content-Type; b=QEpGc4W65W20P8PtCNjNqMTy8xAMRvC6gY9GplTJ/pJwxB5pv5XLFTa6KbD3lB/+MBMyRAKX2qZAkNhwVNn9jjlBzNS9J5ScxNkVgekm+YZOCXXCte0w7EgSwPPeiys0dki1JmDH4q7b9fbLcnCc3fBLQQ5s/ML323jrR3Rewgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=u6f2gNnR; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1705568474; x=1737104474;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=rg0HRkH5KtaQfeP6dJiUbwincfDYNp3b51Q+xE76eA4=;
-  b=u6f2gNnRF4l9dKnciegJa76EhqiKl0yiFSrudGWvJaCtxR38rbTYfBMV
-   yH0QEj5Q2mbPDjz/9P6kumT44+d8YVAdfUuN/dozecZFGk/kaHGgbpREx
-   u3Tzot30unkTgoPygeoNZ7QpS3WJYhMmep7m2gcTEk2wwMBV5lU0gCABG
-   LpK0flVnS0s1SuoFul87nCD4bhXnUdPQUKZhgaxaEAoSHE+C084LRvxBJ
-   057a6rWmqxdJcX4rCjMCZOahbEilCItVYqKSxWGYKi1mRpvCC5V1Vmt9y
-   AjMQqMNoTFGeLNeqv/rnHpCZzTWoml44G1ytDibdDvr/q8lj57Iv2C2ty
-   g==;
-X-CSE-ConnectionGUID: n0a0VLI/Teas7dS+uYillw==
-X-CSE-MsgGUID: U0L06ipIQY6qkOd+1L3c1Q==
-X-IronPort-AV: E=Sophos;i="6.05,201,1701154800"; 
-   d="scan'208";a="245650043"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 18 Jan 2024 02:01:05 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 18 Jan 2024 02:00:53 -0700
-Received: from DEN-DL-M31836.microsemi.net (10.10.85.11) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Thu, 18 Jan 2024 02:00:50 -0700
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <richardcochran@gmail.com>,
-	<Divya.Koppera@microchip.com>, <maxime.chevallier@bootlin.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<UNGLinuxDriver@microchip.com>, Horatiu Vultur
-	<horatiu.vultur@microchip.com>, Divya Koppera <divya.koppera@microchip.com>
-Subject: [PATCH net v2 2/2] net: micrel: Fix set/get PHC time for lan8814
-Date: Thu, 18 Jan 2024 09:59:16 +0100
-Message-ID: <20240118085916.1204354-3-horatiu.vultur@microchip.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240118085916.1204354-1-horatiu.vultur@microchip.com>
-References: <20240118085916.1204354-1-horatiu.vultur@microchip.com>
+	s=arc-20240116; t=1705568411; c=relaxed/simple;
+	bh=Ee++RzyWaZqKpEGaQJTEGJGLJXGhyrNxNX86PnHxRO8=;
+	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:MIME-Version:
+	 References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:
+	 Content-Type:Content-Transfer-Encoding; b=jqZmtUbIHECbvkia5DoQMwm3BYbWgFTKv/p25ozYD3KKIZDtgcBRfjvCfcPs46Ouyv9eBJCJ7NzK2nkfi3wDwsWlrjDUULJQqLhAjgBHW/m+K9BNo8KC0cMPIcJlVYbl6n+BivByes0L/74jxdwkPqsVRt8ZwiXpbvtqY20Nudg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MUOSOcoJ; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-559f5db8f58so2622a12.1
+        for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 01:00:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1705568408; x=1706173208; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KOizo9qlxqmuV1ASAUNV3HnBSGfcb5fdtsTh+nwhzCM=;
+        b=MUOSOcoJ48KrICayXSo6MFJB4+njCsi7WsFDp7IgzmLD+C0A7EjZgcLZ44RnrgqFLK
+         +9tT+l+JECtt+HT1MQvU1nurZMwMxT5DRt75YRiJrPa6QZtzuG9IaAsxILCcBh9tpSVa
+         DdyQ+5IG3mQ8R+e5rSBg0+RWRwdDBQgJxkUHamesAyIKaEEizWm8M8PVTcWBl5uR+d8s
+         CJx5ETps4iBaLjPyN+spZw9AK5LmtQrPHBlrAwo9/ic1NWBhbUHO1qRLgkz7DXpb1qwt
+         fCuVqQtWoyrZG63yUsQSXEFaoaDIbQhAsv1o8shveRvQ+/AeU5FTSHigJezb7EjnIGSU
+         rYOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705568408; x=1706173208;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KOizo9qlxqmuV1ASAUNV3HnBSGfcb5fdtsTh+nwhzCM=;
+        b=L5if4bBklEbLzSVcL3/SCj0+j0RcntszZMwjpiazPGQ4lPuWWJdPndx85X8h9WIlS+
+         R8e/J0TFJYTtsMAnejR7sAw4p49HtBMI/xuE5+eW/zzhssLpSaj4AdT4LcPuf9B4rx0k
+         yreAejiKNClF3w9O3mU//jEwNcghfEly/8s0ycwbrUpR8X0MkbINf9LkR5QLu0xAl5kv
+         t7OStYe1MWOCMw0p2RMciIQbxKAgZtn4gorfLGut9UbHwnQA/A6kT3/J3Kgy7qQtDHtG
+         fj63k3NhZwNB9vNE3YcDl/IMLBPFQrBFGOypazGj2lyjdrW4pZANaIT4360T2BAzJAb2
+         9yDw==
+X-Gm-Message-State: AOJu0YxqmUWlti8qBnfn54vPGA8Zo855WZMVOZRBBSCMsDHCEl8H8gB0
+	oL6qAsL6TbILpevL4R4mjhacFqLVrqpp4EB5j1S5OVh01Vzu6fUsGnWdG+/pVby6Hv633XjZo+8
+	PLqOhb7h5fnk+fT4pqXfrswMNWQ5DEFjRNNQ8
+X-Google-Smtp-Source: AGHT+IHlq5ITUQeKYYyo1QmMJ1zERrctH4pLBQAY898y5D8PZPaM6oKYzMw/nmN/gpjkGXB8ejUbkWVAROn8RJqfL4Q=
+X-Received: by 2002:a05:6402:1750:b0:559:b9be:4143 with SMTP id
+ v16-20020a056402175000b00559b9be4143mr25269edx.6.1705568408058; Thu, 18 Jan
+ 2024 01:00:08 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+References: <20240117172102.12001-1-n.zhandarovich@fintech.ru>
+In-Reply-To: <20240117172102.12001-1-n.zhandarovich@fintech.ru>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 18 Jan 2024 09:59:54 +0100
+Message-ID: <CANn89iLUxP_YGLD1mrCmAr9qSg7wPWDjWPhJHNa_X4QVyNWqBQ@mail.gmail.com>
+Subject: Re: [PATCH net] ipv6: mcast: fix data-race in ipv6_mc_down / mld_ifc_work
+To: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Taehee Yoo <ap420073@gmail.com>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzbot+a9400cabb1d784e49abf@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-When setting or getting PHC time, the higher bits of the second time (>32
-bits) they were ignored. Meaning that setting some time in the future like
-year 2150, it was failing to set this.
+On Wed, Jan 17, 2024 at 6:21=E2=80=AFPM Nikita Zhandarovich
+<n.zhandarovich@fintech.ru> wrote:
+>
+> idev->mc_ifc_count can be written over without proper locking.
+>
+> Originally found by syzbot [1], fix this issue by encapsulating calls
+> to mld_ifc_stop_work() (and mld_gq_stop_work() for good measure) with
+> mutex_lock() and mutex_unlock() accordingly as these functions
+> should only be called with mc_lock per their declarations.
+>
+> [1]
+> BUG: KCSAN: data-race in ipv6_mc_down / mld_ifc_work
+>
+> Fixes: 2d9a93b4902b ("mld: convert from timer to delayed work")
+> Reported-by: syzbot+a9400cabb1d784e49abf@syzkaller.appspotmail.com
+> Link: https://lore.kernel.org/all/000000000000994e09060ebcdffb@google.com=
+/
+> Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+> ---
+>  net/ipv6/mcast.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
+> index b75d3c9d41bb..bc6e0a0bad3c 100644
+> --- a/net/ipv6/mcast.c
+> +++ b/net/ipv6/mcast.c
+> @@ -2722,8 +2722,12 @@ void ipv6_mc_down(struct inet6_dev *idev)
+>         synchronize_net();
+>         mld_query_stop_work(idev);
+>         mld_report_stop_work(idev);
+> +
+> +       mutex_lock(&idev->mc_lock);
+>         mld_ifc_stop_work(idev);
+>         mld_gq_stop_work(idev);
+> +       mutex_unlock(&idev->mc_lock);
+> +
+>         mld_dad_stop_work(idev);
+>  }
+>
 
-The issue can be reproduced like this:
+Thanks for the fix.
 
- # phc_ctl /dev/ptp1 set 10000000000
- phc_ctl[118.619]: set clock time to 4294967295.000000000 or Sun Feb  7 06:28:15 2106
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
- # phc_ctl /dev/ptp1 get
- phc_ctl[120.858]: clock time is 1.238620924 or Thu Jan  1 00:00:01 1970
+I would also add some lockdep_assert_held() to make sure assumptions are me=
+t.
+Trading a comment for a runtime check is better.
 
-Fixes: ece19502834d ("net: phy: micrel: 1588 support for LAN8814 phy")
-Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Reviewed-by: Divya Koppera <divya.koppera@microchip.com>
----
- drivers/net/phy/micrel.c | 61 +++++++++++++++++++---------------------
- 1 file changed, 29 insertions(+), 32 deletions(-)
-
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index 43520ac0f4e00..0ceba62d55c08 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -154,11 +154,13 @@
- #define PTP_CMD_CTL_PTP_LTC_STEP_SEC_		BIT(5)
- #define PTP_CMD_CTL_PTP_LTC_STEP_NSEC_		BIT(6)
- 
-+#define PTP_CLOCK_SET_SEC_HI			0x0205
- #define PTP_CLOCK_SET_SEC_MID			0x0206
- #define PTP_CLOCK_SET_SEC_LO			0x0207
- #define PTP_CLOCK_SET_NS_HI			0x0208
- #define PTP_CLOCK_SET_NS_LO			0x0209
- 
-+#define PTP_CLOCK_READ_SEC_HI			0x0229
- #define PTP_CLOCK_READ_SEC_MID			0x022A
- #define PTP_CLOCK_READ_SEC_LO			0x022B
- #define PTP_CLOCK_READ_NS_HI			0x022C
-@@ -2592,35 +2594,31 @@ static bool lan8814_rxtstamp(struct mii_timestamper *mii_ts, struct sk_buff *skb
+diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
+index b75d3c9d41bb5005af2d4e10fab58f157e9ea4fa..b256362d3b5d5111f649ebfee4f=
+1557d8c063d92
+100644
+--- a/net/ipv6/mcast.c
++++ b/net/ipv6/mcast.c
+@@ -1047,36 +1047,36 @@ bool ipv6_chk_mcast_addr(struct net_device
+*dev, const struct in6_addr *group,
+        return rv;
  }
- 
- static void lan8814_ptp_clock_set(struct phy_device *phydev,
--				  u32 seconds, u32 nano_seconds)
-+				  time64_t sec, u32 nsec)
- {
--	u32 sec_low, sec_high, nsec_low, nsec_high;
--
--	sec_low = seconds & 0xffff;
--	sec_high = (seconds >> 16) & 0xffff;
--	nsec_low = nano_seconds & 0xffff;
--	nsec_high = (nano_seconds >> 16) & 0x3fff;
--
--	lanphy_write_page_reg(phydev, 4, PTP_CLOCK_SET_SEC_LO, sec_low);
--	lanphy_write_page_reg(phydev, 4, PTP_CLOCK_SET_SEC_MID, sec_high);
--	lanphy_write_page_reg(phydev, 4, PTP_CLOCK_SET_NS_LO, nsec_low);
--	lanphy_write_page_reg(phydev, 4, PTP_CLOCK_SET_NS_HI, nsec_high);
-+	lanphy_write_page_reg(phydev, 4, PTP_CLOCK_SET_SEC_LO, lower_16_bits(sec));
-+	lanphy_write_page_reg(phydev, 4, PTP_CLOCK_SET_SEC_MID, upper_16_bits(sec));
-+	lanphy_write_page_reg(phydev, 4, PTP_CLOCK_SET_SEC_HI, upper_32_bits(sec));
-+	lanphy_write_page_reg(phydev, 4, PTP_CLOCK_SET_NS_LO, lower_16_bits(nsec));
-+	lanphy_write_page_reg(phydev, 4, PTP_CLOCK_SET_NS_HI, upper_16_bits(nsec));
- 
- 	lanphy_write_page_reg(phydev, 4, PTP_CMD_CTL, PTP_CMD_CTL_PTP_CLOCK_LOAD_);
- }
- 
- static void lan8814_ptp_clock_get(struct phy_device *phydev,
--				  u32 *seconds, u32 *nano_seconds)
-+				  time64_t *sec, u32 *nsec)
- {
- 	lanphy_write_page_reg(phydev, 4, PTP_CMD_CTL, PTP_CMD_CTL_PTP_CLOCK_READ_);
- 
--	*seconds = lanphy_read_page_reg(phydev, 4, PTP_CLOCK_READ_SEC_MID);
--	*seconds = (*seconds << 16) |
--		   lanphy_read_page_reg(phydev, 4, PTP_CLOCK_READ_SEC_LO);
-+	*sec = lanphy_read_page_reg(phydev, 4, PTP_CLOCK_READ_SEC_HI);
-+	*sec <<= 16;
-+	*sec |= lanphy_read_page_reg(phydev, 4, PTP_CLOCK_READ_SEC_MID);
-+	*sec <<= 16;
-+	*sec |= lanphy_read_page_reg(phydev, 4, PTP_CLOCK_READ_SEC_LO);
- 
--	*nano_seconds = lanphy_read_page_reg(phydev, 4, PTP_CLOCK_READ_NS_HI);
--	*nano_seconds = ((*nano_seconds & 0x3fff) << 16) |
--			lanphy_read_page_reg(phydev, 4, PTP_CLOCK_READ_NS_LO);
-+	*nsec = lanphy_read_page_reg(phydev, 4, PTP_CLOCK_READ_NS_HI);
-+	*nsec <<= 16;
-+	*nsec |= lanphy_read_page_reg(phydev, 4, PTP_CLOCK_READ_NS_LO);
- }
- 
- static int lan8814_ptpci_gettime64(struct ptp_clock_info *ptpci,
-@@ -2630,7 +2628,7 @@ static int lan8814_ptpci_gettime64(struct ptp_clock_info *ptpci,
- 							  ptp_clock_info);
- 	struct phy_device *phydev = shared->phydev;
- 	u32 nano_seconds;
--	u32 seconds;
-+	time64_t seconds;
- 
- 	mutex_lock(&shared->shared_lock);
- 	lan8814_ptp_clock_get(phydev, &seconds, &nano_seconds);
-@@ -2660,38 +2658,37 @@ static void lan8814_ptp_clock_step(struct phy_device *phydev,
- {
- 	u32 nano_seconds_step;
- 	u64 abs_time_step_ns;
--	u32 unsigned_seconds;
-+	time64_t set_seconds;
- 	u32 nano_seconds;
- 	u32 remainder;
- 	s32 seconds;
- 
- 	if (time_step_ns >  15000000000LL) {
- 		/* convert to clock set */
--		lan8814_ptp_clock_get(phydev, &unsigned_seconds, &nano_seconds);
--		unsigned_seconds += div_u64_rem(time_step_ns, 1000000000LL,
--						&remainder);
-+		lan8814_ptp_clock_get(phydev, &set_seconds, &nano_seconds);
-+		set_seconds += div_u64_rem(time_step_ns, 1000000000LL,
-+					   &remainder);
- 		nano_seconds += remainder;
- 		if (nano_seconds >= 1000000000) {
--			unsigned_seconds++;
-+			set_seconds++;
- 			nano_seconds -= 1000000000;
- 		}
--		lan8814_ptp_clock_set(phydev, unsigned_seconds, nano_seconds);
-+		lan8814_ptp_clock_set(phydev, set_seconds, nano_seconds);
- 		return;
- 	} else if (time_step_ns < -15000000000LL) {
- 		/* convert to clock set */
- 		time_step_ns = -time_step_ns;
- 
--		lan8814_ptp_clock_get(phydev, &unsigned_seconds, &nano_seconds);
--		unsigned_seconds -= div_u64_rem(time_step_ns, 1000000000LL,
--						&remainder);
-+		lan8814_ptp_clock_get(phydev, &set_seconds, &nano_seconds);
-+		set_seconds -= div_u64_rem(time_step_ns, 1000000000LL,
-+					   &remainder);
- 		nano_seconds_step = remainder;
- 		if (nano_seconds < nano_seconds_step) {
--			unsigned_seconds--;
-+			set_seconds--;
- 			nano_seconds += 1000000000;
- 		}
- 		nano_seconds -= nano_seconds_step;
--		lan8814_ptp_clock_set(phydev, unsigned_seconds,
--				      nano_seconds);
-+		lan8814_ptp_clock_set(phydev, set_seconds, nano_seconds);
- 		return;
- 	}
- 
--- 
-2.34.1
 
+-/* called with mc_lock */
+ static void mld_gq_start_work(struct inet6_dev *idev)
+ {
+        unsigned long tv =3D get_random_u32_below(idev->mc_maxdelay);
+
++       lockdep_assert_held(&idev->mc_lock);
+        idev->mc_gq_running =3D 1;
+        if (!mod_delayed_work(mld_wq, &idev->mc_gq_work, tv + 2))
+                in6_dev_hold(idev);
+ }
+
+-/* called with mc_lock */
+ static void mld_gq_stop_work(struct inet6_dev *idev)
+ {
++       lockdep_assert_held(&idev->mc_lock);
+        idev->mc_gq_running =3D 0;
+        if (cancel_delayed_work(&idev->mc_gq_work))
+                __in6_dev_put(idev);
+ }
+
+-/* called with mc_lock */
+ static void mld_ifc_start_work(struct inet6_dev *idev, unsigned long delay=
+)
+ {
+        unsigned long tv =3D get_random_u32_below(delay);
+
++       lockdep_assert_held(&idev->mc_lock);
+        if (!mod_delayed_work(mld_wq, &idev->mc_ifc_work, tv + 2))
+                in6_dev_hold(idev);
+ }
+
+-/* called with mc_lock */
+ static void mld_ifc_stop_work(struct inet6_dev *idev)
+ {
++       lockdep_assert_held(&idev->mc_lock);
+        idev->mc_ifc_count =3D 0;
+        if (cancel_delayed_work(&idev->mc_ifc_work))
+                __in6_dev_put(idev);
 
