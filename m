@@ -1,56 +1,101 @@
-Return-Path: <netdev+bounces-64109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64110-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 872CA831226
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 05:32:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0BB5831253
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 06:22:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E7E61F228D3
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 04:32:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 589FC284ED1
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 05:22:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B722C2F3A;
-	Thu, 18 Jan 2024 04:32:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ED525686;
+	Thu, 18 Jan 2024 05:22:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wiwynn.com header.i=@wiwynn.com header.b="iJvo62KA"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+Received: from APC01-TYZ-obe.outbound.protection.outlook.com (mail-tyzapc01on2064.outbound.protection.outlook.com [40.107.117.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43ACCA41;
-	Thu, 18 Jan 2024 04:32:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705552359; cv=none; b=fnR8OXaS4j3Ta3F9qD4/mKXNWh+xmY++3UaO9E8D8h2i289RKH33AFY5ot5j2za4GugDUckW5BbYgcLjAKzUHNDPwoCGb/GAZ0Nhp6BGODCgXd8l71XAfC9swF1e/fm2DhwCPBUX9ZFlAtlycHiUPvdZPBtu3ZUZo78TOpNjEfM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705552359; c=relaxed/simple;
-	bh=L2R//kp2TZYjI88M/hmHTS7NxUGrsSRm1/69OpIek1A=;
-	h=X-Alimail-AntiSpam:Received:From:To:Cc:Subject:Date:Message-Id:
-	 X-Mailer:MIME-Version:Content-Transfer-Encoding; b=RbN84TzfTM0X/8M118BdpXJ9QiQBqQNAxctlsR6mjDke422HTR//+KBAWl0ZMWOoq9InJULKDvSDmkVe1ky68mLmeVrctJGVomAUXTPj5BaCvzGyI3cU4tbWTnb0s+2AM7LrVpovM7GAnInhFVdn0+Ew16CJ5u5WCPG9101mmNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; arc=none smtp.client-ip=115.124.30.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0W-rRrfZ_1705552330;
-Received: from localhost(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W-rRrfZ_1705552330)
-          by smtp.aliyun-inc.com;
-          Thu, 18 Jan 2024 12:32:29 +0800
-From: Wen Gu <guwen@linux.alibaba.com>
-To: wenjia@linux.ibm.com,
-	jaka@linux.ibm.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: alibuda@linux.alibaba.com,
-	tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com,
-	ubraun@linux.ibm.com,
-	linux-s390@vger.kernel.org,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FB7753A8;
+	Thu, 18 Jan 2024 05:22:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.117.64
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705555351; cv=fail; b=KLhcLkWvtKKLh+yelhW2B0nuBTD00aJlict0pq6dIZyjnubwHUUajT5+rLgMfw8YBbAUWHXQf8aIUPGZthg7teL/TIIXtPyeoXiMFjrVc1OZp3tL9IMpaVhQ9CRYOKOrpb3BiNaUGBaQVjvuEAw0+jUGQMq6VojfHo7M85m0JC0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705555351; c=relaxed/simple;
+	bh=iBeygL9hk7iSNyr50yFQ98ozkkcOtBhgdMMORRfhoYc=;
+	h=ARC-Message-Signature:ARC-Authentication-Results:DKIM-Signature:
+	 Received:Received:X-MS-Exchange-Authentication-Results:
+	 Received-SPF:Received:From:To:Cc:Subject:Date:Message-Id:X-Mailer:
+	 MIME-Version:Content-Transfer-Encoding:X-EOPAttributedMessage:
+	 X-MS-PublicTrafficType:X-MS-TrafficTypeDiagnostic:Content-Type:
+	 X-MS-Office365-Filtering-Correlation-Id:
+	 X-MS-Exchange-SenderADCheck:X-MS-Exchange-AntiSpam-Relay:
+	 X-Microsoft-Antispam:X-Microsoft-Antispam-Message-Info:
+	 X-Forefront-Antispam-Report:X-OriginatorOrg:
+	 X-MS-Exchange-CrossTenant-OriginalArrivalTime:
+	 X-MS-Exchange-CrossTenant-Network-Message-Id:
+	 X-MS-Exchange-CrossTenant-Id:
+	 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp:
+	 X-MS-Exchange-CrossTenant-AuthSource:
+	 X-MS-Exchange-CrossTenant-AuthAs:
+	 X-MS-Exchange-CrossTenant-FromEntityHeader:
+	 X-MS-Exchange-Transport-CrossTenantHeadersStamped; b=f8xwSQrOujYGrk+N62BjR4Bl4E8c1OUFuw7XV4tgka7v2nrrZ6z0WUC9BlPOWBVKY4rf5jppBly1G/fKpNqWlx3UJrLPxb8J9Gm1dyLV8iS3bbEMbsw1AmRC4AcQePFsZMjH7crej4lRrNw9AikBVUum8PyQqVLG4EHnFIUkxWs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wiwynn.com; spf=pass smtp.mailfrom=wiwynn.com; dkim=pass (2048-bit key) header.d=wiwynn.com header.i=@wiwynn.com header.b=iJvo62KA; arc=fail smtp.client-ip=40.107.117.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wiwynn.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wiwynn.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hizz01/m0guGbMq5g+OJSftneRPZ7lyqGh5A/OjXys84L9/hC0UQr+RQn0P0tFVeTuSbvrFA8QBnKARUZJLp1KqVOmRfd/FCI+T+YcvSrFSORU/jDX5gCF5EqOz+UpeYa9qOUC+HLbvEjQF3niA7EVyVMLvirlW+/XPlceOa71hUrtpIYE5TPrlQo1KkfjazGnfW4tzdotg8gbLXpfghj6QUNTf/7DTvGAo87qnhH8GUHYTKp+kqU6reTDG0vUQGOC9ClEG3xBgqvSY3gfrwnw9HApFE3TSop68X8GFsi05szna0WbCDTPL3/53QebDqkKcMZJ2tV84Uf35Vm61sFw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=MS5PSOJsuj2MzX08hFUsBUhDuZi4V4KWE+DnawiBK08=;
+ b=a+okxdtc4X3Um/RH4LKAnpeEo37g4iHw2tvK5P/YRyYwZ7yq9/2WPwCBpTciS5BIk5bAcbK4hcyyZr1ANeK8Rss2jRVy5Y7aW7JLwM95E5rd6vTwUbXmBAAb5d0/aI+7yKEZcWm6NLFf17sHzo3liHNqWnnJhhpMZJSInqVZUdAG1QE6qjyGGzs1xoI+PS0EczYGSV3y8fOhsj/Fwgmd/+DAu+b8S/+VTg47BVW0A0DUgtDjj9nD6LjOpNBDDvwl4Nb14cB3XVKvzF1n+HSGAOP7xxHpASRGnKGgyhy5G/oTyWR5f10J9m5lmZyANtq2fagjOyymOUqyrbqBaJjNdw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
+ 211.20.1.79) smtp.rcpttodomain=stwcx.xyz smtp.mailfrom=wiwynn.com; dmarc=fail
+ (p=quarantine sp=quarantine pct=100) action=quarantine
+ header.from=wiwynn.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wiwynn.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MS5PSOJsuj2MzX08hFUsBUhDuZi4V4KWE+DnawiBK08=;
+ b=iJvo62KAA+HBSyRN8XMdLcVyMSY4xpPqtg+dK41g8cwN30l9MAdR6QWrUOxVkUe6JjZcpub4lSBf8AUONqYiGPsXCBk58syUyHVT1TBzWFF9m+sc9IQzSHCdcMzRFRXhZASqkcuXl9NPFWrhp3w3a5QrVemb1m7mlKaBIv1MtXd46HiZlU5NyBlPTAaEwSZ1sFzKMRvmDKt4D1Gtc2hxjU6QYxOFc3LPro+lL6TxaJYXFQ2mbZRpakb1oiMhIaYgxWEkwj1bYp5NZuFiopjHFPVqLLKgT3T2LXQAfPyduLjS5eDFiasUigU/ZW11foedq7jGITU3XDqodHoHTpQP2g==
+Received: from SI2PR01CA0015.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:191::15) by TYZPR04MB4174.apcprd04.prod.outlook.com
+ (2603:1096:400:2d::5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.24; Thu, 18 Jan
+ 2024 05:22:24 +0000
+Received: from HK3PEPF0000021B.apcprd03.prod.outlook.com
+ (2603:1096:4:191:cafe::4f) by SI2PR01CA0015.outlook.office365.com
+ (2603:1096:4:191::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.24 via Frontend
+ Transport; Thu, 18 Jan 2024 05:22:24 +0000
+X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 211.20.1.79)
+ smtp.mailfrom=wiwynn.com; dkim=none (message not signed)
+ header.d=none;dmarc=fail action=quarantine header.from=wiwynn.com;
+Received-SPF: Fail (protection.outlook.com: domain of wiwynn.com does not
+ designate 211.20.1.79 as permitted sender) receiver=protection.outlook.com;
+ client-ip=211.20.1.79; helo=localhost.localdomain;
+Received: from localhost.localdomain (211.20.1.79) by
+ HK3PEPF0000021B.mail.protection.outlook.com (10.167.8.37) with Microsoft SMTP
+ Server id 15.20.7181.14 via Frontend Transport; Thu, 18 Jan 2024 05:22:23
+ +0000
+From: Delphine CC Chiu <Delphine_CC_Chiu@wiwynn.com>
+To: patrick@stwcx.xyz
+Cc: Delphine CC Chiu <Delphine_CC_Chiu@wiwynn.com>,
+	Samuel Mendoza-Jonas <sam@mendozajonas.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net v2] net/smc: fix illegal rmb_desc access in SMC-D connection dump
-Date: Thu, 18 Jan 2024 12:32:10 +0800
-Message-Id: <20240118043210.47618-1-guwen@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
+Subject: [PATCH v1] NCSI: Add propety : no-channel-monitor and start-redo-probe
+Date: Thu, 18 Jan 2024 13:22:20 +0800
+Message-Id: <20240118052220.1906721-1-Delphine_CC_Chiu@wiwynn.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,82 +103,130 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: HK3PEPF0000021B:EE_|TYZPR04MB4174:EE_
+Content-Type: text/plain
+X-MS-Office365-Filtering-Correlation-Id: 1439d3e7-e7e4-41d8-fe43-08dc17e573d5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	e18XHtmTjqmu9zBm7wCB9B3MGuYQAijqH0/8X9eweyze371p6Yf2Qzp73qMRxngIVfDCSev77DeXUQ2fPfAhLpcjiQ3N8vP+xCy+N0GJBbQDVm85Xm2uViLl6RC8f5IcPVGUdHEiHWXUfyXXEG42SHWj9sGc/RQZWIwY6gVmSPGb6raa1EIB/hCsda7Vl2bRzCvnGDx9RS8IvJI9GG4uZS2kscE+CHY6bUXq3JW/+4TTFbbgt0gMisMtCBHegwqOKjtnGHQ1khDnOk02tT6MEVqSSU+SR2XqCC8v+uuOwwUHOXh2eB37M1+mr/JE6GFNxLQ1x7QWmXaspm08lUUxxYjhbOoyKap6DjbcePQb9G9bxp/vNSEtaLND6D4vHQ+j+mYHjzgwy1oIUHI3hMzTa5swplxrgp/9akvvi7CS5zgn1Zi9W8OzmxlRzuE+1ju+MXksONOHp6SW4hiZx9dl9JiSxlYL8oUfvDdcLSfrYr1/X9WZQ/jm7VhK1gM/iXalm2euVJd/9ymrbh8yFOIqEoRIbHOulStAw5g4uMdaPilrd5CEnkEm2EQzcuMceWCqWyAYJg4zXn/6fA3iAKZPL9iL6WyCNIh7omxryv3VRZl73g2tEa/uIC9Ze8uAUwAUiJxytb8C24mhkegkTvfA/RE2N/BOGKblj5/9s5prhI6pyBaN6hIpJLHWINgwR8P23iZXpWN1ZS2g0eHzufcwlg==
+X-Forefront-Antispam-Report:
+	CIP:211.20.1.79;CTRY:TW;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:localhost.localdomain;PTR:211-20-1-79.hinet-ip.hinet.net;CAT:NONE;SFS:(13230031)(6069001)(4636009)(39850400004)(136003)(376002)(396003)(346002)(230922051799003)(1800799012)(451199024)(82310400011)(186009)(64100799003)(46966006)(36840700001)(2906002)(9316004)(4326008)(5660300002)(41300700001)(81166007)(86362001)(356005)(82740400003)(478600001)(6486002)(36756003)(83380400001)(6512007)(6506007)(26005)(336012)(956004)(1076003)(2616005)(47076005)(36860700001)(6916009)(316002)(8676002)(8936002)(70586007)(70206006)(54906003)(36736006)(40480700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: wiwynn.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jan 2024 05:22:23.6246
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1439d3e7-e7e4-41d8-fe43-08dc17e573d5
+X-MS-Exchange-CrossTenant-Id: da6e0628-fc83-4caf-9dd2-73061cbab167
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=da6e0628-fc83-4caf-9dd2-73061cbab167;Ip=[211.20.1.79];Helo=[localhost.localdomain]
+X-MS-Exchange-CrossTenant-AuthSource:
+	HK3PEPF0000021B.apcprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYZPR04MB4174
 
-A crash was found when dumping SMC-D connections. It can be reproduced
-by following steps:
+Add property start-redo-probe to redo probe, because Mellanox cx7 nic card
+cannot't get mac address after nic card hot-plug.
+Setup start-redo-probe property so that nic card can get MAC address again.
+Also setup no-channel-monitor property so that the log won't keep
+popping up when nic card host-plug.
 
-- run nginx/wrk test:
-  smc_run nginx
-  smc_run wrk -t 16 -c 1000 -d <duration> -H 'Connection: Close' <URL>
-
-- continuously dump SMC-D connections in parallel:
-  watch -n 1 'smcss -D'
-
- BUG: kernel NULL pointer dereference, address: 0000000000000030
- CPU: 2 PID: 7204 Comm: smcss Kdump: loaded Tainted: G	E      6.7.0+ #55
- RIP: 0010:__smc_diag_dump.constprop.0+0x5e5/0x620 [smc_diag]
- Call Trace:
-  <TASK>
-  ? __die+0x24/0x70
-  ? page_fault_oops+0x66/0x150
-  ? exc_page_fault+0x69/0x140
-  ? asm_exc_page_fault+0x26/0x30
-  ? __smc_diag_dump.constprop.0+0x5e5/0x620 [smc_diag]
-  ? __kmalloc_node_track_caller+0x35d/0x430
-  ? __alloc_skb+0x77/0x170
-  smc_diag_dump_proto+0xd0/0xf0 [smc_diag]
-  smc_diag_dump+0x26/0x60 [smc_diag]
-  netlink_dump+0x19f/0x320
-  __netlink_dump_start+0x1dc/0x300
-  smc_diag_handler_dump+0x6a/0x80 [smc_diag]
-  ? __pfx_smc_diag_dump+0x10/0x10 [smc_diag]
-  sock_diag_rcv_msg+0x121/0x140
-  ? __pfx_sock_diag_rcv_msg+0x10/0x10
-  netlink_rcv_skb+0x5a/0x110
-  sock_diag_rcv+0x28/0x40
-  netlink_unicast+0x22a/0x330
-  netlink_sendmsg+0x1f8/0x420
-  __sock_sendmsg+0xb0/0xc0
-  ____sys_sendmsg+0x24e/0x300
-  ? copy_msghdr_from_user+0x62/0x80
-  ___sys_sendmsg+0x7c/0xd0
-  ? __do_fault+0x34/0x160
-  ? do_read_fault+0x5f/0x100
-  ? do_fault+0xb0/0x110
-  ? __handle_mm_fault+0x2b0/0x6c0
-  __sys_sendmsg+0x4d/0x80
-  do_syscall_64+0x69/0x180
-  entry_SYSCALL_64_after_hwframe+0x6e/0x76
-
-It is possible that the connection is in process of being established
-when we dump it. Assumed that the connection has been registered in a
-link group by smc_conn_create() but the rmb_desc has not yet been
-initialized by smc_buf_create(), thus causing the illegal access to
-conn->rmb_desc. So fix it by checking before dump.
-
-Fixes: 4b1b7d3b30a6 ("net/smc: add SMC-D diag support")
-Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+Signed-off-by: Delphine CC Chiu <Delphine_CC_Chiu@wiwynn.com>
 ---
-v2->v1: corrected the commit in Fixes tag.
-(https://lore.kernel.org/netdev/20240117122749.63785-1-guwen@linux.alibaba.com/)
+ net/ncsi/internal.h    |  6 ++++++
+ net/ncsi/ncsi-manage.c | 25 +++++++++++++++++++++++--
+ 2 files changed, 29 insertions(+), 2 deletions(-)
 
- net/smc/smc_diag.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/smc/smc_diag.c b/net/smc/smc_diag.c
-index 52f7c4f1e767..5a33908015f3 100644
---- a/net/smc/smc_diag.c
-+++ b/net/smc/smc_diag.c
-@@ -164,7 +164,7 @@ static int __smc_diag_dump(struct sock *sk, struct sk_buff *skb,
+diff --git a/net/ncsi/internal.h b/net/ncsi/internal.h
+index 03757e76bb6b..a605271e04b4 100644
+--- a/net/ncsi/internal.h
++++ b/net/ncsi/internal.h
+@@ -199,6 +199,11 @@ struct ncsi_channel_stats {
+ 	u32 pt_rx_os_err;	/* Rx oversize errors         */
+ };
+ 
++enum {
++	NCSI_CTRL_FLAG_NO_CHANNEL_MONITOR	= 0x0001,
++	NCSI_CTRL_FLAG_START_REDO_PROBE		= 0x0002,
++};
++
+ struct ncsi_dev_priv;
+ struct ncsi_package;
+ 
+@@ -340,6 +345,7 @@ struct ncsi_dev_priv {
+ 	bool                multi_package;   /* Enable multiple packages   */
+ 	bool                mlx_multi_host;  /* Enable multi host Mellanox */
+ 	u32                 package_whitelist; /* Packages to configure    */
++	unsigned int        ctrl_flags;      /* NCSI control flags */
+ };
+ 
+ struct ncsi_cmd_arg {
+diff --git a/net/ncsi/ncsi-manage.c b/net/ncsi/ncsi-manage.c
+index d9da942ad53d..21a4b4db3cdc 100644
+--- a/net/ncsi/ncsi-manage.c
++++ b/net/ncsi/ncsi-manage.c
+@@ -1211,7 +1211,8 @@ static void ncsi_configure_channel(struct ncsi_dev_priv *ndp)
+ 		ndp->hot_channel = hot_nc;
+ 		spin_unlock_irqrestore(&ndp->lock, flags);
+ 
+-		ncsi_start_channel_monitor(nc);
++		if (!(ndp->ctrl_flags & NCSI_CTRL_FLAG_NO_CHANNEL_MONITOR))
++			ncsi_start_channel_monitor(nc);
+ 		ncsi_process_next_channel(ndp);
+ 		break;
+ 	default:
+@@ -1779,6 +1780,7 @@ struct ncsi_dev *ncsi_register_dev(struct net_device *dev,
+ 	INIT_LIST_HEAD(&ndp->vlan_vids);
+ 	INIT_WORK(&ndp->work, ncsi_dev_work);
+ 	ndp->package_whitelist = UINT_MAX;
++	ndp->ctrl_flags = 0;
+ 
+ 	/* Initialize private NCSI device */
+ 	spin_lock_init(&ndp->lock);
+@@ -1804,8 +1806,14 @@ struct ncsi_dev *ncsi_register_dev(struct net_device *dev,
+ 	if (pdev) {
+ 		np = pdev->dev.of_node;
+ 		if (np && (of_property_read_bool(np, "mellanox,multi-host") ||
+-			   of_property_read_bool(np, "mlx,multi-host")))
++			of_property_read_bool(np, "mlx,multi-host")))
+ 			ndp->mlx_multi_host = true;
++
++		if (np && of_get_property(np, "ncsi-ctrl,no-channel-monitor", NULL))
++			ndp->ctrl_flags |= NCSI_CTRL_FLAG_NO_CHANNEL_MONITOR;
++
++		if (np && of_get_property(np, "ncsi-ctrl,start-redo-probe", NULL))
++			ndp->ctrl_flags |= NCSI_CTRL_FLAG_START_REDO_PROBE;
  	}
- 	if (smc_conn_lgr_valid(&smc->conn) && smc->conn.lgr->is_smcd &&
- 	    (req->diag_ext & (1 << (SMC_DIAG_DMBINFO - 1))) &&
--	    !list_empty(&smc->conn.lgr->list)) {
-+	    !list_empty(&smc->conn.lgr->list) && smc->conn.rmb_desc) {
- 		struct smc_connection *conn = &smc->conn;
- 		struct smcd_diag_dmbinfo dinfo;
- 		struct smcd_dev *smcd = conn->lgr->smcd;
+ 
+ 	return nd;
+@@ -1815,11 +1823,24 @@ EXPORT_SYMBOL_GPL(ncsi_register_dev);
+ int ncsi_start_dev(struct ncsi_dev *nd)
+ {
+ 	struct ncsi_dev_priv *ndp = TO_NCSI_DEV_PRIV(nd);
++	struct ncsi_package *np, *tmp;
++	unsigned long flags;
+ 
+ 	if (nd->state != ncsi_dev_state_registered &&
+ 	    nd->state != ncsi_dev_state_functional)
+ 		return -ENOTTY;
+ 
++	if (ndp->ctrl_flags & NCSI_CTRL_FLAG_START_REDO_PROBE) {
++		nd->state = ncsi_dev_state_probe;
++		spin_lock_irqsave(&ndp->lock, flags);
++		ndp->flags &= ~NCSI_DEV_PROBED;
++		ndp->gma_flag = 0;
++		spin_unlock_irqrestore(&ndp->lock, flags);
++
++		list_for_each_entry_safe(np, tmp, &ndp->packages, node)
++			ncsi_remove_package(np);
++	}
++
+ 	if (!(ndp->flags & NCSI_DEV_PROBED)) {
+ 		ndp->package_probe_id = 0;
+ 		nd->state = ncsi_dev_state_probe;
 -- 
-2.32.0.3.g01195cf9f
+2.25.1
 
 
