@@ -1,82 +1,287 @@
-Return-Path: <netdev+bounces-64188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64192-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9F8F831AD4
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 14:52:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC065831AEE
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 14:57:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49BB5B2262C
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 13:52:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BAF81F276EC
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 13:57:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3ADD25605;
-	Thu, 18 Jan 2024 13:52:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCFAD25756;
+	Thu, 18 Jan 2024 13:57:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="E4vw31DH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1VOpneTI"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8BB71D55A;
-	Thu, 18 Jan 2024 13:52:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC7B8250EF
+	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 13:57:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705585943; cv=none; b=qrGdDHHBudHR8dolr30Pra63eM+TRx3iOEwm8fesuN4m1D3AvtxPqIy4uT26raCZxfLvEh3qImX/tc0Wzz+XFMc8ees6CcvtEEuffKdcjvEABYMO2et7+L1dPHkIPXM0s0wHqIptKbIM9n61uZZSJ3EzHNkztXEE8Rthe015Qco=
+	t=1705586230; cv=none; b=OIlEGRxbbKUCgQuO6RW7cBP9aWt1i68m7E+jOcxkUbL+OfQAcT/qVETqSSsGosq8asvRLEt8Xqfa1Pljd3Xjo1Y9cS0Ik2Mx2R6ZdpiqJekJmxKcV3Xi21W803PlkTE27nNWKSHG3WehsGH2JDwyHJZ7TuKWrR1os+AnVUOkLgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705585943; c=relaxed/simple;
-	bh=Jfm8rH6Vu4OXBlLEiOeoDMc8nZWMiaF12XmjmX2naBY=;
-	h=DKIM-Signature:Received:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To; b=pVMTozEwOoTBJsofYS76Lhmd122pT9cCDBTF7vpVkTuWAGoK1+HweEgpovF0PvMMNj+L67WHOmRiGYj30D3rTXOKIUTwFbIkSH8EtNcvjDZ11uHs4dVSZkv9bZDI8e5wH89i5f9dZSNYDo21uspg7hVRD3QRZf1jX8/4qfxWLHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=E4vw31DH; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=jTLMNO6QLs7Mk2LMJXLb6RpI1xo7VaBuKpCA3y9deRU=; b=E4vw31DHixYXzd+QaIPGeT4V93
-	AUUOzbIVLZ+EdxGfOXp28QD6LNV8z/Tb5pw6Wgl8P8Z2MsJFj55bJBINECdMWXVkYz1V9MgFiB1JE
-	aH+1UfjS+wSqAn6jlNcPQjFPnZNm+KqW8qU+h4BOxXm61Xx+tCdiFefL+Gwa/MN1PuCs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rQSoO-005TuC-1O; Thu, 18 Jan 2024 14:52:04 +0100
-Date: Thu, 18 Jan 2024 14:52:04 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Horatiu Vultur <horatiu.vultur@microchip.com>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	richardcochran@gmail.com, Divya.Koppera@microchip.com,
-	maxime.chevallier@bootlin.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net v2 2/2] net: micrel: Fix set/get PHC time for lan8814
-Message-ID: <6fa37dfd-3c92-4842-9785-1b17bbbedc9d@lunn.ch>
-References: <20240118085916.1204354-1-horatiu.vultur@microchip.com>
- <20240118085916.1204354-3-horatiu.vultur@microchip.com>
+	s=arc-20240116; t=1705586230; c=relaxed/simple;
+	bh=rmDgETvZzgz0Wy+BlvQmxNiaIXplxxgYOnwqePWgsyY=;
+	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:MIME-Version:
+	 References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:
+	 Content-Type:Content-Transfer-Encoding; b=WRh6WHhEU9RXy5eertffgpo9ZC1YwwOllU541Au24x/RO61sqaYfwy4MNCI/NaXyLxDwJJqBzz0OO/5QD6DMPFFg+U+U0RHIlDCS5ifCYAF/O8IbIMTN8yQNMvLvry1HSeXA99/5Q9D9Bar5mcLUIkzl3jugmx8AFea6u7GEusk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1VOpneTI; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-50e67f70f34so13073037e87.0
+        for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 05:57:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1705586226; x=1706191026; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PwSnx95cO6mFrsPU26AYVuo3uyLppp+SMC5NBDN3TyU=;
+        b=1VOpneTIXzicXapRjDe4SG46H4PffWiCHRFzJgiKDXLJCJp+V7OkN/Q8DI5V2fQxEu
+         +G42AJeRqBK37Nd6cpcOG/0h0oHQxpZYwgtZ2kyb8BE4pHItGgZEf8kee9ZGJxvFwnhw
+         IGamptLkR8sWya67ujpjToN1ZS1oHR/CN0aVeNuU5ZWM3E0GDtiYSuCItMZFnMe6VuRn
+         QjlDl38XsqM7n8Oat3JzuxqChND1un5p7LHvQD40473hlVI8VIsQENfLyvIzxKbHUCLJ
+         BPjJrsN8JYvGNOKwJ74J9aXsTwC2dP38wdj8Ew7ykb34KHgR1LSF+qM8MZLZHqf6VCIV
+         o+mA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705586226; x=1706191026;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PwSnx95cO6mFrsPU26AYVuo3uyLppp+SMC5NBDN3TyU=;
+        b=KAC1ImVcV47On9MQ2MOB3Ix3eHrYgmqXfgBJUg6O7374PzaBY/hTO/Eq1WUj+jZH4G
+         LqbKwmCyJTVD4aITYsuofXXyTw0cG9uDWLJStRq3XPPqzsKOgwjT8KXn3JN+3L9yfkL/
+         pFWQeFf9Og5A+8MbjdjeAHgmKSDltselOfDOUh5JyjkXp4E431epbKuIh4jZCniOezUu
+         iR5z/G/TvwIzL7fWImr8VYcxS4QHk5fiAOncBkpz2ua8UCGkY8BsAbAzSvlHXtB3xAAi
+         pvM2nQEHdN3NMiFX92V8F9VaxCw/UdqV55Ux+VtG+icaaMVOlyKA6p48h/DES0dpgcn4
+         On0g==
+X-Gm-Message-State: AOJu0YwDKWV4d/QMaAUW7HsQ5a4EJKlRTR4QFOmD4I+eHMCl+0L4hkoP
+	XFQqjXuTAIHx1Q+531qdhasSKCG1QdwNpft6xEnF/Cf8wB4LVV40q2oZz7bxZEus3XWoiQec25z
+	sgkDkEAw2Vav+eeN9Fwzp+dBqpQRtz9W0mGWI
+X-Google-Smtp-Source: AGHT+IHl3eRLQirJ+Tzq8N9tnWQ9WTOjiBOJ2n2gTX0lzr9VJme9YPiGICdk8wHM+SayPFCAc2kPvVUfvyWrMi611qs=
+X-Received: by 2002:a05:6512:2382:b0:50e:4389:12c5 with SMTP id
+ c2-20020a056512238200b0050e438912c5mr549814lfv.14.1705586225480; Thu, 18 Jan
+ 2024 05:57:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240118085916.1204354-3-horatiu.vultur@microchip.com>
+References: <20240109011455.1061529-1-almasrymina@google.com>
+ <20240109011455.1061529-3-almasrymina@google.com> <5219f2cd-6854-0134-560d-8ae3f363b53f@huawei.com>
+ <CAHS8izOtr+jfqQ6xCB3CoN-K_V1-4hPsB4-k5+1z-M3Qy2BbwA@mail.gmail.com>
+ <0711845b-c435-251f-0bbc-20b243721c06@huawei.com> <CAHS8izOxvMVGXKpLBvVgyyS5_94WGG8Aca=O_zGMX+db-3gBXg@mail.gmail.com>
+ <66bc7b8f-51b6-0d9e-db5b-47e7ee5e9029@huawei.com> <CAHS8izOnhtQGeQ-EFmYjZyZ0eW2LqO0Rrm73eAB2su=UA34yTw@mail.gmail.com>
+ <20240116000129.GX734935@nvidia.com> <9c1a6725-c4c3-2bb1-344f-5e71f8ce7e63@huawei.com>
+ <20240116121611.GY734935@nvidia.com> <CAHS8izPa6ostY7qZUAmm4g8N3rfWoVBK6r5z0_MycxfsEVH4jw@mail.gmail.com>
+ <CAHS8izO1-+MczzFw_R80uv=aK5A9bUNcKroY=H9Euk+ZPnnGPw@mail.gmail.com> <65a8225348b92_11eb12942c@willemb.c.googlers.com.notmuch>
+In-Reply-To: <65a8225348b92_11eb12942c@willemb.c.googlers.com.notmuch>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 18 Jan 2024 05:56:51 -0800
+Message-ID: <CAHS8izOiR3zvqCyRdBJchqGe-tYnoCpyYvwxroVFA6-_-i+EyQ@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next v5 2/2] net: add netmem to skb_frag_t
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, Yunsheng Lin <linyunsheng@huawei.com>, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Shakeel Butt <shakeelb@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 18, 2024 at 09:59:16AM +0100, Horatiu Vultur wrote:
-> When setting or getting PHC time, the higher bits of the second time (>32
-> bits) they were ignored. Meaning that setting some time in the future like
-> year 2150, it was failing to set this.
+On Wed, Jan 17, 2024 at 10:54=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Mina Almasry wrote:
+> > On Wed, Jan 17, 2024 at 10:00=E2=80=AFAM Mina Almasry <almasrymina@goog=
+le.com> wrote:
+> > >
+> > > On Tue, Jan 16, 2024 at 4:16=E2=80=AFAM Jason Gunthorpe <jgg@nvidia.c=
+om> wrote:
+> > > >
+> > > > On Tue, Jan 16, 2024 at 07:04:13PM +0800, Yunsheng Lin wrote:
+> > > > > On 2024/1/16 8:01, Jason Gunthorpe wrote:
+> > > > > > On Mon, Jan 15, 2024 at 03:23:33PM -0800, Mina Almasry wrote:
+> > > > > >>>> You did not answer my question that I asked here, and ignori=
+ng this
+> > > > > >>>> question is preventing us from making any forward progress o=
+n this
+> > > > > >>>> discussion. What do you expect or want skb_frag_page() to do=
+ when
+> > > > > >>>> there is no page in the frag?
+> > > > > >>>
+> > > > > >>> I would expect it to do nothing.
+> > > > > >>
+> > > > > >> I don't understand. skb_frag_page() with an empty implementati=
+on just
+> > > > > >> results in a compiler error as the function needs to return a =
+page
+> > > > > >> pointer. Do you actually expect skb_frag_page() to uncondition=
+ally
+> > > > > >> cast frag->netmem to a page pointer? That was explained as
+> > > > > >> unacceptable over and over again by Jason and Christian as it =
+risks
+> > > > > >> casting devmem to page; completely unacceptable and will get n=
+acked.
+> > > > > >> Do you have a suggestion of what skb_frag_page() should do tha=
+t will
+> > > > > >> not get nacked by mm?
+> > > > > >
+> > > > > > WARN_ON and return NULL seems reasonable?
+> > > > >
+> > >
+> > > That's more or less what I'm thinking.
+> > >
+> > > > > While I am agreed that it may be a nightmare to debug the case of=
+ passing
+> > > > > a false page into the mm system, but I am not sure what's the poi=
+nt of
+> > > > > returning NULL to caller if the caller is not expecting or handli=
+ng
+> > > > > the
+> > > >
+> > > > You have to return something and NULL will largely reliably crash t=
+he
+> > > > thread. The WARN_ON explains in detail why your thread just crashed=
+.
+> > > >
+> > >
+> > > Agreed.
+> > >
+> > > > > NULL returning[for example, most of mm API called by the networki=
+ng does not
+> > > > > seems to handling NULL as input page], isn't the NULL returning w=
+ill make
+> > > > > the kernel panic anyway? Doesn't it make more sense to just add a=
+ BUG_ON()
+> > > > > depending on some configuration like CONFIG_DEBUG_NET or CONFIG_D=
+EVMEM?
+> > > > > As returning NULL seems to be causing a confusion for the caller =
+of
+> > > > > skb_frag_page() as whether to or how to handle the NULL returning=
+ case.
+> > > >
+> > > > Possibly, though Linus doesn't like BUG_ON on principle..
+> > > >
+> > > > I think the bigger challenge is convincing people that this devmem
+> > > > stuff doesn't just open a bunch of holes in the kernel where usersp=
+ace
+> > > > can crash it.
+> > > >
+> > >
+> > > It does not, and as of right now there are no pending concerns from
+> > > any netdev maintainers regarding mishandled devmem checks at least.
+> > > This is because the devmem series comes with a full audit of
+> > > skb_frag_page() callers [1] and all areas in the net stack attempting
+> > > to access the skb [2].
+> > >
+> > > [1] https://patchwork.kernel.org/project/netdevbpf/patch/202312180240=
+24.3516870-10-almasrymina@google.com/
+> > > [2] https://patchwork.kernel.org/project/netdevbpf/patch/202312180240=
+24.3516870-11-almasrymina@google.com/
+> > >
+> > > > The fact you all are debating what to do with skb_frag_page() sugge=
+sts
+> > > > to me there isn't confidence...
+> > > >
+> > >
+> > > The debate raging on is related to the performance of skb_frag_page()=
+,
+> > > not correctness (and even then, I don't think it's related to
+> > > perf...). Yunsheng would like us to optimize skb_frag_page() using an
+> > > unconditional cast from netmem to page. This in Yunsheng's mind is a
+> > > performance optimization as we don't need to add an if statement
+> > > checking if the netmem is a page. I'm resistant to implement that
+> > > change so far because:
+> > >
+> > > (a) unconditionally casting from netmem to page negates the compiler
+> > > type safety that you and Christian are laying out as a requirement fo=
+r
+> > > the devmem stuff.
+> > > (b) With likely/unlikely or static branches the check to make sure
+> > > netmem is page is a no-op for existing use cases anyway, so AFAIU,
+> > > there is no perf gain from optimizing it out anyway.
+> > >
+> >
+> > Another thought, if anyone else is concerned about the devmem checks
+> > performance,  potentially we could introduce CONFIG_NET_DEVMEM which
+> > when disabled prevents the user from using devmem at all (disables the
+> > netlink API).
+> >
+> > When that is disabled, skb_frag_page(), netmem_to_page() & friends can
+> > assume netmem is always a page and do a straight cast between netmem &
+> > page. When it's enabled, it will check that netmem =3D=3D page before
+> > doing a cast, and return NULL if it is not a page.
+> >
+> > I think this is technically viable and I think preserves the compiler
+> > type safety requirements set by mm folks. From my POV though, bloating
+> > the kernel with a a new CONFIG just to optimize out no-op checks seems
+> > unnecessary, but if there is agreement that the checks are a concern,
+> > adding CONFIG_NET_DEVMEM should address it while being acceptable to
+> > mm maintainers.
+>
+> I agree. A concern with CONFIGs is that what matters in practice is
+> which default the distros compile with. In this case, adding hurdles
+> to using the feature likely for no real reason.
+>
+> Static branches are used throughout the kernel in performance
+> sensitive paths, exactly because they allow optional paths effectively
+> for free. I'm quite surprised that this issue is being raised so
+> strongly here, as they are hardly new or controversial.
+>
+> But perhaps best is to show with data. Is there a representative page
+> pool benchmark that exercises the most sensitive case (XDP_DROP?) that
+> we can run with and without a static branch to demonstrate that any
+> diff is within the noise?
+>
 
-Stable rules say:
+Yes, Jesper has a page_pool benchmark that he pointed me to in RFC v2:
 
-It must either fix a real bug that bothers people...
+https://github.com/netoptimizer/prototype-kernel/blob/master/kernel/lib/ben=
+ch_page_pool_simple.c
 
-Do we have users of this device in 2150?
+When running the results on RFCv2, the results were:
 
-Maybe submit this for net-next?
+net-next @ b44693495af8
+https://pastebin.com/raw/JuU7UQXe
 
-      Andrew
++ devmem TCP changes:
+https://pastebin.com/raw/mY1L6U4r
+
+On RFC v2 the benchmark showed only a single instruction regression in
+the page_pool fast path & the change deemed acceptable to Jesper from
+a performance POV [1].
+
+I have not run the benchmark continually on follow up iterations of
+the RFC, but I think I'll start doing so in the future.
+
+[1] https://lore.kernel.org/netdev/7aedc5d5-0daf-63be-21bc-3b724cc1cab9@red=
+hat.com/
+
+> > > But none of this is related to correctness. Code calling
+> > > skb_frag_page() will fail or crash if it's not handled correctly
+> > > regardless of the implementation details of skb_frag_page(). In the
+> > > devmem series we add support to handle it correctly via [1] & [2].
+> > >
+> > > --
+> > > Thanks,
+> > > Mina
+> >
+> >
+> >
+> > --
+> > Thanks,
+> > Mina
+>
+>
+
+
+--=20
+Thanks,
+Mina
 
