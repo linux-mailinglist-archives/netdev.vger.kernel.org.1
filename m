@@ -1,140 +1,140 @@
-Return-Path: <netdev+bounces-64096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACA3F831119
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 02:51:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E3D483112D
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 02:58:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6456D2840F9
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 01:51:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB0682830C6
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 01:58:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76A8723D9;
-	Thu, 18 Jan 2024 01:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB5BE2907;
+	Thu, 18 Jan 2024 01:58:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="vsbyOaWa"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C73523D8;
-	Thu, 18 Jan 2024 01:50:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAA381FAF
+	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 01:58:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705542631; cv=none; b=Rq9wl1LriHC2J17YtiHe839XJBNauTJTxL7eG6wXyS4FLQAHiA+7rG6fiYM0lgJlYalm+EDmdA6NufM27avF7DML+9xM29xAj4+Ckdc6EDD60s8KE7E+3c76qLJeO4USafzx6I/hyh4cypRrGHZOyi9bbcLCj/Ciklb7bysHQI8=
+	t=1705543097; cv=none; b=dBVsftnT/eQm9PZI3ah2sfaTRtQeJoU7W6Dz1rciTNoIqyu1MbNYUeNrlyUGCVoVNAoK6ELxUTXv5dC70tgK3Ec0Zfvr0v+A9BMcmUWoPn7ti9y4eSiiORJ6k7Gv4QnY+LcvqGZB4Op/tC9HQPPZUVu6YR8ycc5qM2IfOFvUWWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705542631; c=relaxed/simple;
-	bh=YdX5G24CXnDLogY+5UtvR6u9a94ZuekG0rXEedpL2tU=;
-	h=X-Alimail-AntiSpam:Received:Date:From:To:Cc:Subject:Message-ID:
-	 Reply-To:References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To; b=QqWxUw23/TaOWXstNUjSHQg48aMDJ31dlfnGGYMrx46POSLCJT+i8kDE7QpXipwvdANqBR1YQmfD8n3vbO7/nWAPi/N9wjrXFCaAYhlAy8udISAflPyQOJxIMe+XspkKsNJ8KRodoWcx31278C08oAw/KC+SxvFTT6cBJJP/iH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; arc=none smtp.client-ip=115.124.30.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R751e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0W-qr2Zh_1705542618;
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0W-qr2Zh_1705542618)
-          by smtp.aliyun-inc.com;
-          Thu, 18 Jan 2024 09:50:19 +0800
-Date: Thu, 18 Jan 2024 09:50:18 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Wen Gu <guwen@linux.alibaba.com>, wenjia@linux.ibm.com,
-	jaka@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com
-Cc: alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
-	yepeilin.cs@gmail.com, ubraun@linux.ibm.com,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net/smc: fix illegal rmb_desc access in SMC-D
- connection dump
-Message-ID: <20240118015018.GB89692@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20240117122749.63785-1-guwen@linux.alibaba.com>
+	s=arc-20240116; t=1705543097; c=relaxed/simple;
+	bh=/yNQMgTpmIQvXJcDMi+7SFnmZY+Cg5CYOixjsHZIBto=;
+	h=Received:DKIM-Signature:Received:Received:Received:From:To:Cc:
+	 Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding:X-SEG-SpamProfiler-Analysis:
+	 X-SEG-SpamProfiler-Score:x-atlnz-ls; b=TqcacmToA7qxOx4DXHb7qmE+a3LHw/ni9QNtg54bSIGhz53gFdU+aNa1ExmIoSKryIC0dMzvBgHl4xz2lcWhQnZ9Df0PoX5Mtcie/LkIVzoTvkkKzqnTsagSbx501OTq2zoQhODE7EqfEASSrFSUTw8QLDrOstW5/K5a+aAECf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=vsbyOaWa; arc=none smtp.client-ip=202.36.163.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
+Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 4A6642C04EA;
+	Thu, 18 Jan 2024 14:58:11 +1300 (NZDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
+	s=mail181024; t=1705543091;
+	bh=FRzy5TWNR9TvahVng24nBv5nswqp/8FBQOCzVf4vOhM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=vsbyOaWazyBCp8HGmXGkzaNiOsLCqKIa247JVUYZ9S+pYaguL5RRwECnskeZKWUNG
+	 3TdHBJNggjTDmJOpWvPdhJQ/6XW4y2JfobhTIElkkS6X5QMvPdf/LzfWDQ6O3Hm0+S
+	 gGHffGOwQLoxzHQqDtBMSycIK/Yc8E67oe/ZfgG0Sl3USWYxb9Ei8w9ezJJrqtgxN4
+	 yX7h950dzU2kbTrZE8D3DQ1ny5o0KXmGlWvJ+uElTmN7yTTFHHbD70GGdOUzEcrKb5
+	 S3QA/9MfFeEAwhrDZRkOmR6eSsU8GtY6pcqgbLIZgcLFTR8DAJcHadDcuqkQS9UJJW
+	 Y1+pqeysWqmvQ==
+Received: from pat.atlnz.lc (Not Verified[10.32.16.33]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
+	id <B65a885b30000>; Thu, 18 Jan 2024 14:58:11 +1300
+Received: from elliota2-dl.ws.atlnz.lc (elliota-dl.ws.atlnz.lc [10.33.23.28])
+	by pat.atlnz.lc (Postfix) with ESMTP id 158C013ED7B;
+	Thu, 18 Jan 2024 14:58:11 +1300 (NZDT)
+Received: by elliota2-dl.ws.atlnz.lc (Postfix, from userid 1775)
+	id 0EF9F3C0F25; Thu, 18 Jan 2024 14:58:11 +1300 (NZDT)
+From: Elliot Ayrey <elliot.ayrey@alliedtelesis.co.nz>
+To: Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+	Russell King <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Elliot Ayrey <elliot.ayrey@alliedtelesis.co.nz>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH] net: mvpp2: Add EEE get/set to mvpp2 driver
+Date: Thu, 18 Jan 2024 14:57:48 +1300
+Message-ID: <20240118015748.3507954-1-elliot.ayrey@alliedtelesis.co.nz>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240117122749.63785-1-guwen@linux.alibaba.com>
+Content-Transfer-Encoding: quoted-printable
+X-SEG-SpamProfiler-Analysis: v=2.3 cv=LZFCFQXi c=1 sm=1 tr=0 a=KLBiSEs5mFS1a/PbTCJxuA==:117 a=dEuoMetlWLkA:10 a=uUW33zXHdHhOziz9OLUA:9
+X-SEG-SpamProfiler-Score: 0
+x-atlnz-ls: pat
 
-On Wed, Jan 17, 2024 at 08:27:49PM +0800, Wen Gu wrote:
->A crash was found when dumping SMC-D connections. It can be reproduced
->by following steps:
->
->- run nginx/wrk test:
->  smc_run nginx
->  smc_run wrk -t 16 -c 1000 -d <duration> -H 'Connection: Close' <URL>
->
->- continuously dump SMC-D connections in parallel:
->  watch -n 1 'smcss -D'
->
-> BUG: kernel NULL pointer dereference, address: 0000000000000030
-> CPU: 2 PID: 7204 Comm: smcss Kdump: loaded Tainted: G	E      6.7.0+ #55
-> RIP: 0010:__smc_diag_dump.constprop.0+0x5e5/0x620 [smc_diag]
-> Call Trace:
->  <TASK>
->  ? __die+0x24/0x70
->  ? page_fault_oops+0x66/0x150
->  ? exc_page_fault+0x69/0x140
->  ? asm_exc_page_fault+0x26/0x30
->  ? __smc_diag_dump.constprop.0+0x5e5/0x620 [smc_diag]
->  ? __kmalloc_node_track_caller+0x35d/0x430
->  ? __alloc_skb+0x77/0x170
->  smc_diag_dump_proto+0xd0/0xf0 [smc_diag]
->  smc_diag_dump+0x26/0x60 [smc_diag]
->  netlink_dump+0x19f/0x320
->  __netlink_dump_start+0x1dc/0x300
->  smc_diag_handler_dump+0x6a/0x80 [smc_diag]
->  ? __pfx_smc_diag_dump+0x10/0x10 [smc_diag]
->  sock_diag_rcv_msg+0x121/0x140
->  ? __pfx_sock_diag_rcv_msg+0x10/0x10
->  netlink_rcv_skb+0x5a/0x110
->  sock_diag_rcv+0x28/0x40
->  netlink_unicast+0x22a/0x330
->  netlink_sendmsg+0x1f8/0x420
->  __sock_sendmsg+0xb0/0xc0
->  ____sys_sendmsg+0x24e/0x300
->  ? copy_msghdr_from_user+0x62/0x80
->  ___sys_sendmsg+0x7c/0xd0
->  ? __do_fault+0x34/0x160
->  ? do_read_fault+0x5f/0x100
->  ? do_fault+0xb0/0x110
->  ? __handle_mm_fault+0x2b0/0x6c0
->  __sys_sendmsg+0x4d/0x80
->  do_syscall_64+0x69/0x180
->  entry_SYSCALL_64_after_hwframe+0x6e/0x76
->
->It is possible that the connection is in process of being established
->when we dump it. Assumed that the connection has been registered in a
->link group by smc_conn_create() but the rmb_desc has not yet been
->initialized by smc_buf_create(), thus causing the illegal access to
->conn->rmb_desc. So fix it by checking before dump.
->
->Fixes: ce51f63e63c5 ("net/smc: Prevent kernel-infoleak in __smc_diag_dump()")
+Fill in the missing .get_eee and .set_eee functions for the mvpp2
+driver.
 
-ce51f63e63c5 ("net/smc: Prevent kernel-infoleak in __smc_diag_dump()")
-only add a memset() of 'struct smcd_diag_dmbinfo dinfo', which I don't
-think is not the real cause of the bug.
+Signed-off-by: Elliot Ayrey <elliot.ayrey@alliedtelesis.co.nz>
+---
+ .../net/ethernet/marvell/mvpp2/mvpp2_main.c   | 22 +++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
->Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
->---
-> net/smc/smc_diag.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
->
->diff --git a/net/smc/smc_diag.c b/net/smc/smc_diag.c
->index 52f7c4f1e767..5a33908015f3 100644
->--- a/net/smc/smc_diag.c
->+++ b/net/smc/smc_diag.c
->@@ -164,7 +164,7 @@ static int __smc_diag_dump(struct sock *sk, struct sk_buff *skb,
-> 	}
-> 	if (smc_conn_lgr_valid(&smc->conn) && smc->conn.lgr->is_smcd &&
-> 	    (req->diag_ext & (1 << (SMC_DIAG_DMBINFO - 1))) &&
->-	    !list_empty(&smc->conn.lgr->list)) {
->+	    !list_empty(&smc->conn.lgr->list) && smc->conn.rmb_desc) {
-> 		struct smc_connection *conn = &smc->conn;
-> 		struct smcd_diag_dmbinfo dinfo;
-> 		struct smcd_dev *smcd = conn->lgr->smcd;
->-- 
->2.43.0
+diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/ne=
+t/ethernet/marvell/mvpp2/mvpp2_main.c
+index 820b1fabe297..85dc06c85b31 100644
+--- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
++++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+@@ -5701,6 +5701,26 @@ static int mvpp2_ethtool_set_rxfh(struct net_devic=
+e *dev,
+ 	return ret;
+ }
+=20
++static int mvpp2_get_eee(struct net_device *dev, struct ethtool_eee *eda=
+ta)
++{
++	int ret =3D -EOPNOTSUPP;
++
++	if (dev->phydev)
++		ret =3D phy_ethtool_get_eee(dev->phydev, edata);
++
++	return ret;
++}
++
++static int mvpp2_set_eee(struct net_device *dev, struct ethtool_eee *eda=
+ta)
++{
++	int ret =3D -EOPNOTSUPP;
++
++	if (dev->phydev)
++		ret =3D phy_ethtool_set_eee(dev->phydev, edata);
++
++	return ret;
++}
++
+ /* Device ops */
+=20
+ static const struct net_device_ops mvpp2_netdev_ops =3D {
+@@ -5743,6 +5763,8 @@ static const struct ethtool_ops mvpp2_eth_tool_ops =
+=3D {
+ 	.get_rxfh_indir_size	=3D mvpp2_ethtool_get_rxfh_indir_size,
+ 	.get_rxfh		=3D mvpp2_ethtool_get_rxfh,
+ 	.set_rxfh		=3D mvpp2_ethtool_set_rxfh,
++	.get_eee		=3D mvpp2_get_eee,
++	.set_eee		=3D mvpp2_set_eee,
+ };
+=20
+ /* Used for PPv2.1, or PPv2.2 with the old Device Tree binding that
+--=20
+2.43.0
+
 
