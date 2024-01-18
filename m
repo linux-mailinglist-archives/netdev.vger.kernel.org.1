@@ -1,403 +1,210 @@
-Return-Path: <netdev+bounces-64289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70606832140
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 23:01:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D657F832168
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 23:10:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CD9F1C211AF
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 22:01:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F97D286C6E
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 22:10:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD27431755;
-	Thu, 18 Jan 2024 22:01:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E6BD31759;
+	Thu, 18 Jan 2024 22:09:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TuL8k02S"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LlacaRM4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F4B92E85F;
-	Thu, 18 Jan 2024 22:01:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705615278; cv=none; b=o080EOQXUGt1r8QsLpOyUUXSSKlkGhWfldo+n1FDyoapa9i/eM64FctftNXhvU6vAR/098YD8Cpp8jkpHx6XneIKtw01yEZqPiaZUQyXwYdsbKiH4JIzWtQtyk1CEpWpG8a3wrh4kpQEle7nKApLEmJYi428Du6MOA5lkg+qI8Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705615278; c=relaxed/simple;
-	bh=Efm+PXJ7N7sLa7pTKfa3U4klPY4k63z8iTuAYJQsFRk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lpDTr6UYeDYLuxmuhoXBzhiDX4tqrRGjSjyC/0CcoHsqgOg+v8sWPJak8x99GauwEVAd8wBp8piDiMA8mbbTlPEJgKsMvpCbt1YxAX8R8wZBJhYeG5kT8NCWRZdsbVxDC5uXfhuf8TXT+9xN9cxyYcGND8iT3IZy7nCo69yrMN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TuL8k02S; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAF6AC433F1;
-	Thu, 18 Jan 2024 22:01:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705615278;
-	bh=Efm+PXJ7N7sLa7pTKfa3U4klPY4k63z8iTuAYJQsFRk=;
-	h=From:To:Cc:Subject:Date:From;
-	b=TuL8k02S+rhHlOBqjRv0Smavss9EBk3xoM4T/tR2ORZvxXEhLahbpQ/dmGul9PWrq
-	 A9RdD2Z1J6BgiVqvTnRZurwFUT0p+OlEk2OJCQ14WJiP3naQpyi8HSLWVohkplLmb0
-	 v/O3d3YhWOHlTHgf2wgf8zYm2fyGK4bA7IiHIYsNCdJ/PVSi3AS+QF9zc5sJfzT3jp
-	 kNGy+Tb9AfAmD/cnsgRHPwl13/DE9hrMX1N1qyRienua8B33vCkeXeHRJsWHZirCFa
-	 flaZ7mjACUh0377u6gOTtZmBvU1lYF4k/RxUYBbsiWNyyrj4DcTuFz/JfSizGD0cUc
-	 BvFvE3ZMkVQBg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: torvalds@linux-foundation.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	pabeni@redhat.com,
-	bpf@vger.kernel.org
-Subject: [GIT PULL] Networking for v6.8-rc1
-Date: Thu, 18 Jan 2024 14:01:16 -0800
-Message-ID: <20240118220116.2146136-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 940A21E486;
+	Thu, 18 Jan 2024 22:09:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.55.52.120
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705615796; cv=fail; b=IGpYvETxOXBtNuP+62brjyQAanAy0jDCSQKQfkHy92fnT5mWLrzVpDoPqdFnvx6l7fxCE51XuUHHm288OpJk3NEr/g2qmkhNONbCoC4nBEv035wFgH91JpdI0UPDtA7d2oni5M7uZD5kRfVAfQ742OkicUI54kMLDZ8tFlwsiDk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705615796; c=relaxed/simple;
+	bh=4CpqMylrV9fb8OTMBdGZv4ZeaHiN9lA2LU2beliCpuE=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=dmYpAME+wOzzHbTUhPHfOX4LycQ5ixlNkKNOmlxWGbFsEHYBFVqtiTYD/zdsGgVhwbFD3xvjze/CuLXVLfKhXfb3PV95Aj0Ji2zBZ11fYFJZEvNWQZlRR+s7aEyLvXD0IXZzqGjt4Rzt6RaE+JfC80SWZ4cwT6UUw62SAkv5va0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LlacaRM4; arc=fail smtp.client-ip=192.55.52.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1705615794; x=1737151794;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=4CpqMylrV9fb8OTMBdGZv4ZeaHiN9lA2LU2beliCpuE=;
+  b=LlacaRM4Ju2IpHkYujiQSqUFaFuYZqEVDCscWQDKD+OXe+W1G6LJvk3H
+   hBh5Sj3Nb1QFXwoQvSusuaZ26nfuutv0YMMJE0D8wjg/pbe3PeY06gZRK
+   spIOoa4rNAKdYJaPlzuulo1g6Mj3m0LIFq7DxXbtdk+pEer/M+USEokB0
+   frBO2NvF0m0hOn40yKzA76YvbCRkgxLlBnAWBAnKpE2W6NSBXflbgk0aM
+   z3bN3HfDwiTD+wVFN9Xht7YJ2g2BrTf/V+LaR+WbXupCZ+sXfPxQJC23c
+   CrYxux1y0P+BL9OeyMqrDZKS0L8bnCg60fAp9NJt8Hr7Y0QI15ZqEm0fI
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10956"; a="399467697"
+X-IronPort-AV: E=Sophos;i="6.05,203,1701158400"; 
+   d="scan'208";a="399467697"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jan 2024 14:09:53 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10956"; a="1116080330"
+X-IronPort-AV: E=Sophos;i="6.05,203,1701158400"; 
+   d="scan'208";a="1116080330"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmsmga005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Jan 2024 14:09:53 -0800
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 18 Jan 2024 14:09:53 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 18 Jan 2024 14:09:53 -0800
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.169)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 18 Jan 2024 14:09:52 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GDdUGe8NpuEOKbxwHwLRddAoX3iDm+gV5QCYsRGQa9g6mFrvR6rJtBsi9vqy9wvG/ZZo8JsBcUCodDwsLH2YQg2uEu9uBHRFQBve8tWXJB85sY/PMUNRjFXswqiMoewD3Rsq/504NZ7ViK1i69vaYsaT5bqPyFAqy6mfnfCDDLD65uX2kns8GmRzvL8PND+0/PUbuVvYRKEhx+pnrKJf0sTR9rPTalCIkEcxakF99NGuRSpPl71l7rusQfq4qvlYBBevK0xqC2ndGASIHKtDQAscJHLBBaq05mYHUNT3h8MtilK5xJR4FhXzxJUnCIuIulcIqlYu4utgPTRTnql/FQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=pNKCsP00OwseNybl4l5P6otfIDRAOb/BaFb/qnVQJ40=;
+ b=juBdFmCKUJG4Cu0ysFXtGzqnNBAheeyPF67alY2GaCt2kULHde0D3rCpRZAACP6gemf71Cbdg6ISyKSAfmI0XaPY5TOzMtOy8uK4ewtlVLgGqfxYOAnUy0xCqgE9SKmq+b2do6zjIF/v+L4u7AtfT/kL44vz8sAqCgIbqtXoU0J84KJ08ABRKYF8l5OinaFf7G7BZwrq2sVxp2/UStnXy5kbLugm1lrHXA8VdOfG7EuC/f2zgHTloR7yOteFMvk99QPy9wW56TNKBTo/2Tr/+zk3WgEyMNeC+GLIMRoExCnxhE/xGldBZEfcLUTR/liMi9gzjsrMsTxU9uUsg/nUjg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by PH7PR11MB8479.namprd11.prod.outlook.com (2603:10b6:510:30c::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.23; Thu, 18 Jan
+ 2024 22:09:51 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::4069:eb50:16b6:a80d]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::4069:eb50:16b6:a80d%4]) with mapi id 15.20.7202.024; Thu, 18 Jan 2024
+ 22:09:51 +0000
+Message-ID: <9a613177-de20-49ac-88ce-421c37fe0c15@intel.com>
+Date: Thu, 18 Jan 2024 14:09:48 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next v4 00/12] Add E800 live migration driver
+To: Yahui Cao <yahui.cao@intel.com>, <intel-wired-lan@lists.osuosl.org>
+CC: <kvm@vger.kernel.org>, <netdev@vger.kernel.org>, <lingyu.liu@intel.com>,
+	<kevin.tian@intel.com>, <madhu.chittim@intel.com>,
+	<sridhar.samudrala@intel.com>, <alex.williamson@redhat.com>,
+	<jgg@nvidia.com>, <yishaih@nvidia.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <brett.creeley@amd.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+References: <20231121025111.257597-1-yahui.cao@intel.com>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <20231121025111.257597-1-yahui.cao@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0301.namprd03.prod.outlook.com
+ (2603:10b6:303:dd::6) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-
-Hi Linus!
-
-The following changes since commit 3e7aeb78ab01c2c2f0e1f784e5ddec88fcd3d106:
-
-  Merge tag 'net-next-6.8' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next (2024-01-11 10:07:29 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.8-rc1
-
-for you to fetch changes up to 925781a471d8156011e8f8c1baf61bbe020dac55:
-
-  Merge tag 'nf-24-01-18' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf (2024-01-18 12:45:05 -0800)
-
-----------------------------------------------------------------
-Including fixes from bpf and netfilter.
-
-Previous releases - regressions:
-
- - Revert "net: rtnetlink: Enslave device before bringing it up",
-   breaks the case inverse to the one it was trying to fix
-
- - net: dsa: fix oob access in DSA's netdevice event handler
-   dereference netdev_priv() before check its a DSA port
-
- - sched: track device in tcf_block_get/put_ext() only for clsact
-   binder types
-
- - net: tls, fix WARNING in __sk_msg_free when record becomes full
-   during splice and MORE hint set
-
- - sfp-bus: fix SFP mode detect from bitrate
-
- - drv: stmmac: prevent DSA tags from breaking COE
-
-Previous releases - always broken:
-
- - bpf: fix no forward progress in in bpf_iter_udp if output
-   buffer is too small
-
- - bpf: reject variable offset alu on registers with a type
-   of PTR_TO_FLOW_KEYS to prevent oob access
-
- - netfilter: tighten input validation
-
- - net: add more sanity check in virtio_net_hdr_to_skb()
-
- - rxrpc: fix use of Don't Fragment flag on RESPONSE packets,
-   avoid infinite loop
-
- - amt: do not use the portion of skb->cb area which may get clobbered
-
- - mptcp: improve validation of the MPTCPOPT_MP_JOIN MCTCP option
-
-Misc:
-
- - spring cleanup of inactive maintainers
-
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-
-----------------------------------------------------------------
-Alexei Starovoitov (2):
-      Merge branch 'bpf-fix-backward-progress-bug-in-bpf_iter_udp'
-      Merge branch 'tighten-up-arg-ctx-type-enforcement'
-
-Amit Cohen (3):
-      mlxsw: spectrum_acl_erp: Fix error flow of pool allocation failure
-      selftests: mlxsw: qos_pfc: Remove wrong description
-      selftests: mlxsw: qos_pfc: Adjust the test to support 8 lanes
-
-Andrii Nakryiko (5):
-      libbpf: feature-detect arg:ctx tag support in kernel
-      bpf: extract bpf_ctx_convert_map logic and make it more reusable
-      bpf: enforce types for __arg_ctx-tagged arguments in global subprogs
-      selftests/bpf: add tests confirming type logic in kernel for __arg_ctx
-      libbpf: warn on unexpected __arg_ctx type when rewriting BTF
-
-Arnd Bergmann (1):
-      wangxunx: select CONFIG_PHYLINK where needed
-
-Benjamin Poirier (3):
-      selftests: bonding: Change script interpreter
-      selftests: forwarding: Remove executable bits from lib.sh
-      selftests: bonding: Add more missing config options
-
-Breno Leitao (6):
-      net: fill in MODULE_DESCRIPTION()s for SLIP
-      net: fill in MODULE_DESCRIPTION()s for HSR
-      net: fill in MODULE_DESCRIPTION()s for NFC
-      net: fill in MODULE_DESCRIPTION()s for Sun RPC
-      net: fill in MODULE_DESCRIPTION()s for ds26522 module
-      net: fill in MODULE_DESCRIPTION()s for s2io
-
-Claudiu Beznea (1):
-      net: phy: micrel: populate .soft_reset for KSZ9131
-
-David Howells (1):
-      rxrpc: Fix use of Don't Fragment flag
-
-David S. Miller (1):
-      Merge branch 'tls-splice-hint-fixes'
-
-Dmitry Antipov (1):
-      net: liquidio: fix clang-specific W=1 build warnings
-
-Dmitry Safonov (1):
-      selftests/net/tcp-ao: Use LDLIBS instead of LDFLAGS
-
-Eric Dumazet (7):
-      mptcp: mptcp_parse_option() fix for MPTCPOPT_MP_JOIN
-      mptcp: strict validation before using mp_opt->hmac
-      mptcp: use OPTION_MPTCP_MPJ_SYNACK in subflow_finish_connect()
-      mptcp: use OPTION_MPTCP_MPJ_SYN in subflow_check_req()
-      mptcp: refine opt_mp_capable determination
-      udp: annotate data-races around up->pending
-      net: add more sanity check in virtio_net_hdr_to_skb()
-
-Fedor Pchelkin (1):
-      ipvs: avoid stat macros calls from preemptible context
-
-Hao Sun (2):
-      bpf: Reject variable offset alu on PTR_TO_FLOW_KEYS
-      selftests/bpf: Add test for alu on PTR_TO_FLOW_KEYS
-
-Horatiu Vultur (1):
-      net: micrel: Fix PTP frame parsing for lan8841
-
-Ido Schimmel (2):
-      mlxsw: spectrum_acl_tcam: Fix NULL pointer dereference in error path
-      mlxsw: spectrum_acl_tcam: Fix stack corruption
-
-Jakub Kicinski (20):
-      Merge branch 'fix-module_description-for-net-p1'
-      MAINTAINERS: eth: mtk: move John to CREDITS
-      MAINTAINERS: eth: mt7530: move Landen Chao to CREDITS
-      MAINTAINERS: eth: mvneta: move Thomas to CREDITS
-      MAINTAINERS: eth: mark Cavium liquidio as an Orphan
-      MAINTAINERS: Bluetooth: retire Johan (for now?)
-      MAINTAINERS: mark ax25 as Orphan
-      MAINTAINERS: ibmvnic: drop Dany from reviewers
-      Merge branch 'rtnetlink-allow-to-enslave-with-one-msg-an-up-interface'
-      Merge branch 'net-ethernet-ti-am65-cpsw-allow-for-mtu-values'
-      net: fill in MODULE_DESCRIPTION()s for wx_lib
-      Merge branch 'mptcp-better-validation-of-mptcpopt_mp_join-option'
-      selftests: netdevsim: sprinkle more udevadm settle
-      selftests: netdevsim: correct expected FEC strings
-      selftests: bonding: add missing build configs
-      net: netdevsim: don't try to destroy PHC on VFs
-      selftests: netdevsim: add a config file
-      Merge branch 'mlxsw-miscellaneous-fixes'
-      Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf
-      Merge tag 'nf-24-01-18' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
-
-Jiri Pirko (1):
-      net: sched: track device in tcf_block_get/put_ext() only for clsact binder types
-
-John Fastabend (2):
-      net: tls, fix WARNIING in __sk_msg_free
-      net: tls, add test to capture error on large splice
-
-Kunwu Chan (1):
-      net: dsa: vsc73xx: Add null pointer check to vsc73xx_gpio_probe
-
-Lin Ma (1):
-      net: qualcomm: rmnet: fix global oob in rmnet_policy
-
-Ludvig Pärsson (1):
-      ethtool: netlink: Add missing ethnl_ops_begin/complete
-
-Marc Kleine-Budde (1):
-      net: netdev_queue: netdev_txq_completed_mb(): fix wake condition
-
-Marcin Wojtas (1):
-      MAINTAINERS: eth: mvneta: update entry
-
-Martin KaFai Lau (3):
-      bpf: iter_udp: Retry with a larger batch size without going back to the previous bucket
-      bpf: Avoid iter->offset making backward progress in bpf_iter_udp
-      selftests/bpf: Test udp and tcp iter batching
-
-Nicolas Dichtel (3):
-      Revert "net: rtnetlink: Enslave device before bringing it up"
-      selftests: rtnetlink: check enslaving iface in a bond
-      selftests: rtnetlink: use setup_ns in bonding test
-
-Nikita Yushchenko (1):
-      net: ravb: Fix dma_addr_t truncation in error case
-
-Nikita Zhandarovich (1):
-      ipv6: mcast: fix data-race in ipv6_mc_down / mld_ifc_work
-
-Nithin Dabilpuram (1):
-      octeontx2-af: CN10KB: Fix FIFO length calculation for RPM2
-
-Pablo Neira Ayuso (8):
-      netfilter: nf_tables: reject invalid set policy
-      netfilter: nf_tables: validate .maxattr at expression registration
-      netfilter: nf_tables: bail out if stateful expression provides no .clone
-      netfilter: nft_limit: do not ignore unsupported flags
-      netfilter: nf_tables: check if catch-all set element is active in next generation
-      netfilter: nf_tables: do not allow mismatch field size and set key length
-      netfilter: nf_tables: skip dead set elements in netlink dump
-      netfilter: nf_tables: reject NFT_SET_CONCAT with not field length description
-
-Paolo Abeni (2):
-      Merge branch 'selftests-net-small-fixes'
-      mptcp: relax check on MPC passive fallback
-
-Pavel Tikhomirov (4):
-      netfilter: nfnetlink_log: use proper helper for fetching physinif
-      netfilter: nf_queue: remove excess nf_bridge variable
-      netfilter: propagate net to nf_bridge_get_physindev
-      netfilter: bridge: replace physindev with physinif in nf_bridge_info
-
-Petr Machata (1):
-      mlxsw: spectrum_router: Register netdevice notifier before nexthop
-
-Qiang Ma (1):
-      net: stmmac: ethtool: Fixed calltrace caused by unbalanced disable_irq_wake calls
-
-Romain Gantois (1):
-      net: stmmac: Prevent DSA tags from breaking COE
-
-Russell King (Oracle) (1):
-      net: sfp-bus: fix SFP mode detect from bitrate
-
-Sanjuán García, Jorge (1):
-      net: ethernet: ti: am65-cpsw: Fix max mtu to fit ethernet frames
-
-Sneh Shah (1):
-      net: stmmac: Fix ethool link settings ops for integrated PCS
-
-Taehee Yoo (1):
-      amt: do not use overwrapped cb area
-
-Tony Nguyen (1):
-      i40e: Include types.h to some headers
-
-Vladimir Oltean (1):
-      net: dsa: fix netdev_priv() dereference before check on non-DSA netdevice events
-
-Zhu Yanjun (1):
-      virtio_net: Fix "‘%d’ directive writing between 1 and 11 bytes into a region of size 10" warnings
-
- CREDITS                                            |  17 ++
- MAINTAINERS                                        |  16 +-
- drivers/net/amt.c                                  |   6 +-
- drivers/net/dsa/vitesse-vsc73xx-core.c             |   2 +
- .../ethernet/cavium/liquidio/cn23xx_pf_device.c    |   2 +-
- .../ethernet/cavium/liquidio/cn23xx_vf_device.c    |   2 +-
- .../net/ethernet/cavium/liquidio/octeon_mailbox.h  |   5 +-
- drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h  |   1 +
- drivers/net/ethernet/intel/i40e/i40e_diag.h        |   1 +
- drivers/net/ethernet/marvell/octeontx2/af/rpm.c    |   7 +-
- .../net/ethernet/mellanox/mlxsw/spectrum_acl_erp.c |   8 +-
- .../ethernet/mellanox/mlxsw/spectrum_acl_tcam.c    |   6 +-
- .../net/ethernet/mellanox/mlxsw/spectrum_router.c  |  24 +--
- drivers/net/ethernet/neterion/s2io.c               |   1 +
- drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c |   2 +-
- drivers/net/ethernet/renesas/ravb_main.c           |   2 +-
- drivers/net/ethernet/stmicro/stmmac/stmmac.h       |   1 +
- .../net/ethernet/stmicro/stmmac/stmmac_ethtool.c   |  20 +-
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |  33 ++-
- drivers/net/ethernet/ti/am65-cpsw-nuss.c           |   5 +-
- drivers/net/ethernet/wangxun/Kconfig               |   2 +-
- drivers/net/ethernet/wangxun/libwx/wx_lib.c        |   1 +
- drivers/net/netdevsim/netdev.c                     |   9 +-
- drivers/net/phy/micrel.c                           |   9 +
- drivers/net/phy/sfp-bus.c                          |   8 +-
- drivers/net/slip/slhc.c                            |   1 +
- drivers/net/slip/slip.c                            |   1 +
- drivers/net/virtio_net.c                           |   9 +-
- drivers/net/wan/slic_ds26522.c                     |   1 +
- include/linux/btf.h                                |   2 +-
- include/linux/netfilter_bridge.h                   |   6 +-
- include/linux/skbuff.h                             |   2 +-
- include/linux/virtio_net.h                         |   9 +-
- include/net/netdev_queues.h                        |   2 +-
- kernel/bpf/btf.c                                   | 231 ++++++++++++++++++---
- kernel/bpf/verifier.c                              |   4 +
- net/bridge/br_netfilter_hooks.c                    |  42 +++-
- net/bridge/br_netfilter_ipv6.c                     |  14 +-
- net/core/rtnetlink.c                               |  14 +-
- net/dsa/user.c                                     |   7 +-
- net/ethtool/features.c                             |   9 +-
- net/hsr/hsr_main.c                                 |   1 +
- net/ipv4/netfilter/nf_reject_ipv4.c                |   9 +-
- net/ipv4/udp.c                                     |  34 ++-
- net/ipv6/mcast.c                                   |   4 +
- net/ipv6/netfilter/nf_reject_ipv6.c                |  11 +-
- net/ipv6/udp.c                                     |  16 +-
- net/mptcp/options.c                                |   6 +-
- net/mptcp/subflow.c                                |  17 +-
- net/netfilter/ipset/ip_set_hash_netiface.c         |   8 +-
- net/netfilter/ipvs/ip_vs_xmit.c                    |   4 +-
- net/netfilter/nf_log_syslog.c                      |  13 +-
- net/netfilter/nf_queue.c                           |   6 +-
- net/netfilter/nf_tables_api.c                      |  44 ++--
- net/netfilter/nfnetlink_log.c                      |   8 +-
- net/netfilter/nft_limit.c                          |  19 +-
- net/netfilter/xt_physdev.c                         |   2 +-
- net/nfc/digital_core.c                             |   1 +
- net/nfc/nci/core.c                                 |   1 +
- net/nfc/nci/spi.c                                  |   1 +
- net/rxrpc/ar-internal.h                            |   1 +
- net/rxrpc/local_object.c                           |  13 +-
- net/rxrpc/output.c                                 |   6 +-
- net/rxrpc/rxkad.c                                  |   2 +
- net/sched/cls_api.c                                |  12 +-
- net/sunrpc/auth_gss/auth_gss.c                     |   1 +
- net/sunrpc/auth_gss/gss_krb5_mech.c                |   1 +
- net/sunrpc/sunrpc_syms.c                           |   1 +
- net/tls/tls_sw.c                                   |   6 +-
- tools/lib/bpf/libbpf.c                             | 142 ++++++++++++-
- .../selftests/bpf/prog_tests/sock_iter_batch.c     | 135 ++++++++++++
- .../selftests/bpf/prog_tests/test_global_funcs.c   |  13 ++
- .../testing/selftests/bpf/progs/bpf_tracing_net.h  |   3 +
- .../testing/selftests/bpf/progs/sock_iter_batch.c  |  91 ++++++++
- tools/testing/selftests/bpf/progs/test_jhash.h     |  31 +++
- .../selftests/bpf/progs/verifier_global_subprogs.c | 164 ++++++++++++++-
- .../bpf/progs/verifier_value_illegal_alu.c         |  19 ++
- tools/testing/selftests/drivers/net/bonding/config |   8 +
- .../drivers/net/bonding/mode-1-recovery-updelay.sh |   2 +-
- .../drivers/net/bonding/mode-2-recovery-updelay.sh |   2 +-
- .../testing/selftests/drivers/net/mlxsw/qos_pfc.sh |  19 +-
- .../drivers/net/mlxsw/spectrum-2/tc_flower.sh      | 106 +++++++++-
- .../testing/selftests/drivers/net/netdevsim/config |  10 +
- .../drivers/net/netdevsim/ethtool-common.sh        |   1 +
- .../selftests/drivers/net/netdevsim/ethtool-fec.sh |  18 +-
- .../drivers/net/netdevsim/udp_tunnel_nic.sh        |   1 +
- tools/testing/selftests/net/forwarding/lib.sh      |   0
- tools/testing/selftests/net/rtnetlink.sh           |  26 +++
- tools/testing/selftests/net/tcp_ao/Makefile        |   4 +-
- tools/testing/selftests/net/tls.c                  |  14 ++
- 90 files changed, 1366 insertions(+), 235 deletions(-)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c
- create mode 100644 tools/testing/selftests/bpf/progs/sock_iter_batch.c
- create mode 100644 tools/testing/selftests/drivers/net/netdevsim/config
- mode change 100755 => 100644 tools/testing/selftests/net/forwarding/lib.sh
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|PH7PR11MB8479:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1dad2024-7b94-417a-4869-08dc1872310e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: IkJ1OPKWZrFif63esgyE7kwkFWBKjxKPDFAWQnH0I9X6RaIlfsMDlHRE72nfdSKaJMM2/JefftKFfG/hFQvS/q8ahxVN6Th5KQ4fw1Lmap1Sf9/mc9mjRAX4QkT1BtAPNzBLMY0mbwdVSPZoBkNTNHcXgDefO0IkmSYGcgkp5jcolt8NdZ0epCkm8UxwWMIuMnr5DSOzuAp3hv381BzDKGkCKVl2l38BB4U8rdVX+uAk6Xr8pessZo5YQueQSJEEBe+mIDQFIQvmOKX3JZv1Jx5iGZHZzElaGUOLJHFe+49IBrwhLV08f1vJvx9bLHWF39AdKw1CSu9oZODk9A9GYONRjt186ch7YAiTZ3kJXC2gGc3DVMx2gw7VEhkDJC65OI/Ges2cif+lgM15z72jCeSptTvF640r8Fsd6VytcyYW9NK+PufS5k6uKNXYfRM1Gc5qqO7YLOuXJUU63TO3nBMrA6RKWW9Wzi8ZMX1VTD4oHo/Rc5l/n3j8H3Y0dasGmY+524HMlW0nFvM1LZwrs1fO2S/v6mPVUwURLScAs1jF2Z05cPtD++LTdvC3fRnT0ESE/kx4IcWhd5TioO90bYFmdlOYnfkH+RFJ/OnX0VXgdbateOXNmPOVNhiu3lx8sBoUvWeRIMGPEGycAA/xYZ3Zu8MbJRrSuoj+G2sv1GbvVnfGgqYArDhbZSDDFds7
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(376002)(396003)(39860400002)(366004)(346002)(230922051799003)(64100799003)(1800799012)(451199024)(186009)(31686004)(966005)(478600001)(8936002)(4326008)(5660300002)(7416002)(316002)(66556008)(6512007)(6506007)(66476007)(53546011)(6486002)(66946007)(26005)(2616005)(6666004)(2906002)(38100700002)(82960400001)(36756003)(86362001)(41300700001)(31696002)(8676002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?c25wWGNOVGR4VmRDSEptQm4ySitFRUFtZ25Wd3V0QVhqY2k0dkszb0RSejl3?=
+ =?utf-8?B?VjhmbEt6WnZ2d3hmMTQ0cU4zUCtrUjBGc0xITVdqRnhYcE5DOEpWTDcwZ3ll?=
+ =?utf-8?B?Yk1EbVFJbFQyZTJIQmk0OUcvTE91Wm5TaDJWNFpuVUZLc3VOU1VocGtmZTNW?=
+ =?utf-8?B?NUQ3SFFrZFkvUUlKaW1jN055ejU1bVJ4eDlMYkI3N0FYU0JpQjRGdDNLYWlT?=
+ =?utf-8?B?YlpSVjdvWDdCS3lhQzdwZFVFUkI3SGF0TXR0V2FpRXZmQS81VmVrKzM3dk5S?=
+ =?utf-8?B?NWJZL2NHSnZ0bGlTVlIwQXFwd2ZoZmY4RTJsbnNFS0s5em1lZ2xGbUV0Q3hx?=
+ =?utf-8?B?RE1ubXV2bFFGVlU2MURBa0xYa1picmtUZHRwYit0TCtzMmpVUWtIU1paaHpN?=
+ =?utf-8?B?OW5maEZsSXM4UXYrZHFpMnRGejJtRDNjd09VTWF4aklMMnl0Yk1LdGpiOVI5?=
+ =?utf-8?B?Q2RGQUxMN1pwUTF3Ymc4bEZoU21iTW41OGFERVJ2WFR1QXdUSURyeTNNdURJ?=
+ =?utf-8?B?akxOL0hqTnp5SUo0emlveFkxNTRxTlNEcW1kbFFTamNQQXVvM1A2K3hTcmRD?=
+ =?utf-8?B?bndMeHBSdVZrdTlCcVNGUzNWVmd2eW1LYSt1VWRMMUk3MHRhTldtQldEVkRV?=
+ =?utf-8?B?cE9PMHpGSDNQbVBkUUlJeTBReldPSi9oWnhPVlNORktyUjV1ZVB3SG5WOUo4?=
+ =?utf-8?B?N0ppWDJpWlVPU2xVV01WbUliamhYc1B6UHFOOXdaY0ZVcnJad1l0dFRuOHNt?=
+ =?utf-8?B?QmJHOG9UdVZhMjZGbmUvbXQ0ZW5RS2FVa0xWYk54MVo3VDh5YVlXS05ZeXg0?=
+ =?utf-8?B?RTUyT2FpNituejJoVTJFMHc2VFVwR05aOUJhWmQ4SXBxdkovWUMrd3RyTUZt?=
+ =?utf-8?B?TWVpaHNYdkJoRGQxbmtXY0RhRzRwOUFFU1RiN0tldWEra3duWnJhRUtvNU5q?=
+ =?utf-8?B?ZUtHR0RJL2FNQVgxRUpOQ0cvb2krZEgzdXp1OEM1VXRqWTRVUW9IN1lCS1c1?=
+ =?utf-8?B?TzRMMjdwSmZ2bTJMY0tFK20vbUlkdUxsWFlnaHJVdmh0UmJlQkMzOFBLNjlz?=
+ =?utf-8?B?OUFteFN0MDF0R3kzSnQ4NmtWbmNLVDhjWjNrcFB5UEFpY0hPRmJBdTI2NXFK?=
+ =?utf-8?B?ZnU2bnF6TE9RSi9mbHh2QmZ4QTN5eXRCRVVYZHBQU2t0ai9rVVhZa0wxQkhH?=
+ =?utf-8?B?aUdPTTF2MjY5ckVNcmhyQzB0dEsrMWhwc0x1S2dka0orbWZTMDhzUUkrUW4r?=
+ =?utf-8?B?RmdBS29CTDdoVkpWRDdTMXQxcDhwSExhYXBHRlJrNFhzQW0yWFJaZTJuSGU3?=
+ =?utf-8?B?eHFNV0o0NU9OUEh3eGJIRGRuYm5LTWFzYzNOWktscStWbDB1a0ZTWGozMWJI?=
+ =?utf-8?B?MTJaL0pvenczQmFxc3dEZFJuTGlENFF1aW5kSlJBNmpKVDA1SEpJWWJZb29I?=
+ =?utf-8?B?TkJIVUdIM2NQcFBWWlZnUTk4NGtZeE0yMG1xRnFHSTBWM0NndUNVM295V2Jy?=
+ =?utf-8?B?NW1CRTBvdU5nSGFETXVGaDVTVmRqeVBoN0JFaUpRMjZqcVpkNUdxQ2Z1eS9Q?=
+ =?utf-8?B?ZHN5ZlBsdCttSlk5UEZhVFdTWlBYcUhOQldyUGxrTWVKakYzOE9BREJxU0JY?=
+ =?utf-8?B?L0g2L21oWjdaTmlETmIvbkJVeUxIVnBLT2dNNjMrNHdLek5nSHVPSGlRWi95?=
+ =?utf-8?B?ejhvTTZNQkxCTytyYmZZc0ZpZU0zWXJkMHNueEFXVEY0SDk3MnpZUWNKQ0hT?=
+ =?utf-8?B?TUdvbTdseDBZd1pkK0hzKzZxOW1FTzJabzErQ2lrenVXSldaeWhyQzV2MW53?=
+ =?utf-8?B?Z2VhWDAwNG85S0Q2ZFhNNzlEbkNLMG9YVFlvWEFrY2lpSlhsbUNlTTRUQlZr?=
+ =?utf-8?B?T2NCK1REM2JxTStZYlpwVWJOS2R3dE5RS0ZmbWxhTFJiNlRVU2dMWDc1NWZt?=
+ =?utf-8?B?U29aRkRXUWlXOVZHTGpaTmxtU2M1c2FBV3ZQeTB5a09BdTNSMTFTUTlteWN1?=
+ =?utf-8?B?SlJQNWZiMHppbkFMUzM1bzVnSE9xYUJHU2xua2R2UkJzWWwyS3R2R3lVb09E?=
+ =?utf-8?B?c1R4ZWZ4RjBPZnhndWVvQUhwYTJGRnF3cU5vVXVORG5qdHQ2TjFCcnkycFJN?=
+ =?utf-8?B?N2p1MDg0Q2sxeGFsdjhJaEgvSHZweVFXNEFFU0VOZ1RCYTdQZlFQUVNwbUpE?=
+ =?utf-8?B?UkE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1dad2024-7b94-417a-4869-08dc1872310e
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jan 2024 22:09:51.0601
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mRNufmB4OizOHzKlsv3boeHws408mSMLHXlVZQdrIaZug/HOt/ExjegV4p5uALyFxskif808fLjnGC7bm8pegiR9ZWBsVhbDQpygyMwytxs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB8479
+X-OriginatorOrg: intel.com
+
+
+
+On 11/20/2023 6:50 PM, Yahui Cao wrote:
+> This series adds vfio live migration support for Intel E810 VF devices
+> based on the v2 migration protocol definition series discussed here[0].
+> 
+> Steps to test:
+> 1. Bind one or more E810 VF devices to the module ice-vfio-pci.ko
+> 2. Assign the VFs to the virtual machine and enable device live migration
+> 3. Run a workload using IAVF inside the VM, for example, iperf.
+> 4. Migrate the VM from the source node to a destination node.
+> 
+> The series is also available for review here[1].
+> 
+> Thanks,
+> Yahui
+> [0] https://lore.kernel.org/kvm/20220224142024.147653-1-yishaih@nvidia.com/
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/tnguy/linux.git/log/?h=ice_live_migration
+> 
+> Change log:
+> 
+
+Hi,
+
+As a heads up to the reviewers of the previous versions, starting with
+v5 and going forward, I'm taking over this series from Yahui and Lingyu
+Liu. I'm currently catching up on the code and going over the v4 review
+comments before I begin working on v5.
+
+It is probable v5 may be delayed as I take some time to get familiar
+with the code and feature.
+
+Thanks,
+Jake
 
