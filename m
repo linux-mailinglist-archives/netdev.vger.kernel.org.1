@@ -1,100 +1,88 @@
-Return-Path: <netdev+bounces-64121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 436A083130A
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 08:15:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEE028312F7
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 08:10:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFF3C283FDE
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 07:15:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69CD5283A03
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 07:10:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A2069475;
-	Thu, 18 Jan 2024 07:14:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72CCB947B;
+	Thu, 18 Jan 2024 07:10:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=naccy.de header.i=@naccy.de header.b="UTBwnTsZ";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="jrXty0Ei"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="BRVFcYNr"
 X-Original-To: netdev@vger.kernel.org
-Received: from wflow2-smtp.messagingengine.com (wflow2-smtp.messagingengine.com [64.147.123.137])
+Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 682C6BA22
-	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 07:14:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.137
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D233B8F60;
+	Thu, 18 Jan 2024 07:10:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705562097; cv=none; b=qOVCPLlJJaPnqAXPCAq1VAIIGmOZMIg+aIHPeUpACYhY0HJ5e2l761AGhDCAUUUry01/xa3XsCT+S2f6ZL98SvpUsVO9UuOcRDACkxGyAvZFqZzbOl/mH6NDiwiklkZWQ7xfMpl3gedK4YEQBJhTno0fbpmsGj6jWF8jgxkmqVU=
+	t=1705561844; cv=none; b=XHApRpKPWbWs447KjNZ3asWzvM6hqQqAHXe7yxKx0xhrDKiif0T/15erN+Jmw9zvPBdCFeWKwFtxzCb6Xp5piuwcFP8H0hlnaw+C/Jcu6CwtO8ASZL7HgM4efdy9JtJhPxvKmts9dZxu85nLELllnRSsspaAltVSqmbsUtkW9H4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705562097; c=relaxed/simple;
-	bh=yzGd2DE8vejAu+fAQpL+9t8gQmz5fwSogpfMgdsMDPE=;
-	h=Received:Received:DKIM-Signature:DKIM-Signature:X-ME-Sender:
-	 X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:Received:
-	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding; b=bThYBRc0LYtrUo0TotLk8fFja7CW2KrqPE8naEbDbrHlyt7UckCT5DSbxZl9Clw96h+lYVVSB+k+e+OMKryNez/c/w5ZpAl/lxBw1FzWwMYOKpZR01sNkjcNIqiIDIYYLm/Cz94tMF9sxTU87sUZSmq4rUKolPuvdlMlMxPYjqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=naccy.de; spf=pass smtp.mailfrom=naccy.de; dkim=pass (2048-bit key) header.d=naccy.de header.i=@naccy.de header.b=UTBwnTsZ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=jrXty0Ei; arc=none smtp.client-ip=64.147.123.137
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=naccy.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=naccy.de
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-	by mailflow.west.internal (Postfix) with ESMTP id 3150B2CC006F;
-	Thu, 18 Jan 2024 02:14:54 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute4.internal (MEProxy); Thu, 18 Jan 2024 02:14:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=naccy.de; h=cc
-	:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1705562093; x=
-	1705565693; bh=i64UbA6XEuCyrCBY5sa8M6iJyXjvSYKXnF1fyPI6Bx0=; b=U
-	TBwnTsZ2Z2XBqhUakzIM5CZ3TeCRoIPUVR6f79ed1Fp1Y5fs3pwGbRO3oPOK/euu
-	+atFnIwOt+07YNB7vkQNoSpLZXOLaRrRgLvfbbSgOdm2DFoqrDbuOqs5QGcTQF5u
-	MovwaMi8YMz/xgUu6XfZm4Cb3qvJCX/m/zt04KhTt6QeWc44QPq7wMCZAleopzf8
-	iDcqtzeVXzridKEB2j4kcveKwwFm2QT+3Kqg2X6/4ZK1EfMV/1//Ji7aEcHLed3o
-	okwRcHqRnjd5EXR8y0VVEqy32FdzcZl35xcf293OcgSzYSvANAqvXqJk5RenDRhF
-	iOhSQbUUR7Rmcl64sJefA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1705562093; x=
-	1705565693; bh=i64UbA6XEuCyrCBY5sa8M6iJyXjvSYKXnF1fyPI6Bx0=; b=j
-	rXty0EixAcd2FFgOkTmzNZYSSFxCxBuasWnUWVdEb/EdyHNYsxTNjYSkGFKFpM6X
-	YAfyNcWkjnY++izg26NQiZjBYplM/1ol8nvFUCp2w8SmVEjt7oxL2Ztj4h5nxlLq
-	hO80+v7sE6nsSv80RUc8pmWyjZTQNfJ9ocNXKDUYVlSTV88cmPCjyQNxpCGl8V3h
-	fDiUatAX/aRL6uWOspnYOi67Ll8040YvhXCZn/8D5cY3uh2yF6WluMCK+4oBIFgJ
-	tQA6JChMZG0uyicYLj47QYqkJnu8DfrByICrjanA8JMaeWhrGRT02SU62WC9/KY3
-	OYe3tzuxYdpmFJpl/uSWQ==
-X-ME-Sender: <xms:7c-oZfP3jh9s3xKFeosaqOhXe4dgOOm4qtsOMR5Wt9J1MtvN7jdGmg>
-    <xme:7c-oZZ8AnngvldGVZlztGBDYUuzX1xMnMlEKZ-W9C9eSJRr3ETIrxjh26mxXzQqcT
-    FdjcFY66NUeJplQQHA>
-X-ME-Received: <xmr:7c-oZeR1ybvmRcXpV7aRMlerxJjNmaly7JOs_ylLhaI6clO0wUX-pJ4rS-WpZUV-DbGgAGaTnrpDc04DORZfi_PeAmiHbzl2QtyTM7YM5A>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdejiedguddtgecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpefhvfevufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpefsuhgv
-    nhhtihhnucffvghslhgrnhguvghsuceoqhguvgesnhgrtggthidruggvqeenucggtffrrg
-    htthgvrhhnpeevieehjedtveevueeujedtveehtddugfeukeeffeettddttddtleehudeh
-    feetleenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    hquggvsehnrggttgihrdguvg
-X-ME-Proxy: <xmx:7c-oZTt2xZ9obIkY8Lk2CJ4UZvMnh2wrnDdSLVzAzMxe6HFG9heo6A>
-    <xmx:7c-oZXcd9NOOafIudcWaZZuYz_-zcfNk1q3GLkbp0zQmqGTTwtojjg>
-    <xmx:7c-oZf0RBG5MaQ3pjHRjnL8bQWVcBUIchI2s8_UjGs1qhobXqPXZTg>
-    <xmx:7c-oZYECW8P88Vv1MeSApyGIAOZyRb0umynw1JjTFZ5d6FcK3KyavnJ8UKeFzf-l>
-Feedback-ID: i14194934:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 18 Jan 2024 02:14:52 -0500 (EST)
-From: Quentin Deslandes <qde@naccy.de>
-To: netdev@vger.kernel.org
-Cc: Stephen Hemminger <stephen@networkplumber.org>,
-	David Ahern <dsahern@gmail.com>,
-	Martin KaFai Lau <martin.lau@kernel.org>,
-	Quentin Deslandes <qde@naccy.de>,
-	kernel-team@meta.com
-Subject: [RFC iproute2 v6 3/3] ss: update man page to document --bpf-maps and --bpf-map-id=
-Date: Thu, 18 Jan 2024 04:15:12 +0100
-Message-ID: <20240118031512.298971-4-qde@naccy.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240118031512.298971-1-qde@naccy.de>
-References: <20240118031512.298971-1-qde@naccy.de>
+	s=arc-20240116; t=1705561844; c=relaxed/simple;
+	bh=J8zc81nhbkLlTLipfew74s88Z8Cv2qw0+nFpchu13Uw=;
+	h=Received:DKIM-Signature:Received:Received:Received:Received:
+	 Received:From:To:CC:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type:X-EXCLAIMER-MD-CONFIG; b=nvv0neM1zvgzdMbkuwAjSoT2yB0kF6sJYpePh8yKW9y6TFV0ENbDnEzldbv0Uu2LR1t9MYznU8gwwzS7kX3umoS6HbynnRN4t4npS8zKbiWayJ9Wx1octloaNhE8VRag7Lc1Nvom31/YIFPcRfMZXwQRJIZG4McWIN/k7azlSss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=BRVFcYNr; arc=none smtp.client-ip=198.47.19.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 40I7AAqr057376;
+	Thu, 18 Jan 2024 01:10:10 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1705561810;
+	bh=6de9bFeDnbDOTZiEP3LK+M5NI1s1zpjMrH0ph0gxBLY=;
+	h=From:To:CC:Subject:Date;
+	b=BRVFcYNrfB98znpVWWxOZqcgiArrwlvs88K4tSOxJdf8Z5o+iFwfzBX3MwIV+vR4G
+	 3PQ92Wg22nfTdGOYzQiSdEwMYoa40wgGFO1vgUNkKtqPgXxTo6ZJw88VnGwJRBwt3a
+	 CrCEYe7jkN4YhsEvtEAWhlilEXJm3pPdxzKmT5ss=
+Received: from DFLE101.ent.ti.com (dfle101.ent.ti.com [10.64.6.22])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 40I7AAph011337
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 18 Jan 2024 01:10:10 -0600
+Received: from DFLE104.ent.ti.com (10.64.6.25) by DFLE101.ent.ti.com
+ (10.64.6.22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 18
+ Jan 2024 01:10:09 -0600
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE104.ent.ti.com
+ (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Thu, 18 Jan 2024 01:10:09 -0600
+Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 40I7A9dD046844;
+	Thu, 18 Jan 2024 01:10:09 -0600
+Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 40I7A8qb021965;
+	Thu, 18 Jan 2024 01:10:09 -0600
+From: MD Danish Anwar <danishanwar@ti.com>
+To: Rob Herring <robh@kernel.org>, Dan Carpenter <dan.carpenter@linaro.org>,
+        Jan Kiszka <jan.kiszka@siemens.com>, Andrew Lunn <andrew@lunn.ch>,
+        "Vladimir
+ Oltean" <vladimir.oltean@nxp.com>,
+        Wolfram Sang
+	<wsa+renesas@sang-engineering.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "Grygorii
+ Strashko" <grygorii.strashko@ti.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Roger Quadros <rogerq@kernel.org>,
+        MD Danish Anwar <danishanwar@ti.com>, Paolo Abeni <pabeni@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "Eric
+ Dumazet" <edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>
+CC: <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <srk@ti.com>, <r-gunasekaran@ti.com>
+Subject: [RFC PATCH v2 0/3] Introduce switch mode support for ICSSG driver
+Date: Thu, 18 Jan 2024 12:40:02 +0530
+Message-ID: <20240118071005.1514498-1-danishanwar@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,33 +90,86 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-Document new --bpf-maps and --bpf-map-id= options.
+This series adds support for switch-mode for ICSSG driver. This series
+also introduces helper APIs to configure firmware maintained FDB
+(Forwarding Database) and VLAN tables. These APIs are later used by ICSSG
+driver in switch mode.
 
-Signed-off-by: Quentin Deslandes <qde@naccy.de>
-Acked-by: Martin KaFai Lau <martin.lau@kernel.org>
----
- man/man8/ss.8 | 6 ++++++
- 1 file changed, 6 insertions(+)
+Now the driver will boot by default in dual EMAC mode. When first ICSSG
+interface is added to bridge driver will still be in EMAC mode. As soon as
+second ICSSG interface is added to same bridge, switch-mode will be
+enabled and switch firmwares will be loaded to PRU cores. The driver will
+remain in dual EMAC mode if ICSSG interfaces are added to two different
+bridges or if two differnet interfaces (One ICSSG, one other) is added to
+the same bridge. We'll only enable is_switch_mode flag when two ICSSG
+interfaces are added to same bridge.
 
-diff --git a/man/man8/ss.8 b/man/man8/ss.8
-index 4ece41fa..0ab212d0 100644
---- a/man/man8/ss.8
-+++ b/man/man8/ss.8
-@@ -423,6 +423,12 @@ to FILE after applying filters. If FILE is - stdout is used.
- Read filter information from FILE.  Each line of FILE is interpreted
- like single command line option. If FILE is - stdin is used.
- .TP
-+.B \-\-bpf-maps
-+Pretty-print all the BPF socket-local data entries for each socket.
-+.TP
-+.B \-\-bpf-map-id=MAP_ID
-+Pretty-print the BPF socket-local data entries for the requested map ID. Can be used more than once.
-+.TP
- .B FILTER := [ state STATE-FILTER ] [ EXPRESSION ]
- Please take a look at the official documentation for details regarding filters.
- 
+We start in dual MAC mode. Let's say lan0 and lan1 are ICSSG interfaces
+
+ip link add name br0 type bridge
+ip link set lan0 master br0
+
+At this point, we get a CHANGEUPPER event. Only one port is a member of
+the bridge, so we will still be in dual MAC mode.
+
+ip link set lan1 master br0
+
+We get a second CHANGEUPPER event, the secind interface lan1 is also ICSSG
+interface so we will set the is_switch_mode flag and when interfaces are
+brought up again, ICSSG switch firmwares will be loaded to PRU Cores.
+
+There are some other cases to consider as well. 
+
+ip link add name br0 type bridge
+ip link add name br1 type bridge
+
+ip link set lan0 master br0
+ip link set ppp0 master br0
+
+Here we are adding lan0 (ICSSG) and ppp0 (non ICSSG) to same bridge, as
+they both are not ICSSG, we will still be running in dual EMAC mode.
+
+ip link set lan1 master br1
+ip link set vpn0 master br1
+
+Here we are adding lan1 (ICSSG) and vpn0 (non ICSSG) to same bridge, as
+they both are not ICSSG, we will still be running in dual EMAC mode.
+
+
+This is v2 of the series [1]. It addresses commenst made on v1 [1].
+
+Changes from v1 to v2:
+*) Removed TAPRIO support patch from this series.
+*) Stopped using devlink for enabling switch-mode as suggested by Andrew L
+*) Added read_poll_timeout() in patch 1 / 3 as suggested by Andrew L.
+
+[1] https://lore.kernel.org/all/20230830110847.1219515-4-danishanwar@ti.com/
+
+Thanks and Regards,
+Md Danish Anwar
+
+MD Danish Anwar (3):
+  net: ti: icssg-prueth: Add helper functions to configure FDB
+  net: ti: icssg-switch: Add switchdev based driver for ethernet switch
+    support
+  net: ti: icssg-prueth: Add support for ICSSG switch firmware
+
+ drivers/net/ethernet/ti/Kconfig               |   1 +
+ drivers/net/ethernet/ti/Makefile              |   3 +-
+ drivers/net/ethernet/ti/icssg/icssg_config.c  | 324 +++++++++++-
+ drivers/net/ethernet/ti/icssg/icssg_config.h  |  26 +
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c  | 199 +++++++-
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h  |  36 ++
+ .../net/ethernet/ti/icssg/icssg_switchdev.c   | 478 ++++++++++++++++++
+ .../net/ethernet/ti/icssg/icssg_switchdev.h   |  13 +
+ 8 files changed, 1067 insertions(+), 13 deletions(-)
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_switchdev.c
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_switchdev.h
+
 -- 
-2.43.0
+2.34.1
 
 
