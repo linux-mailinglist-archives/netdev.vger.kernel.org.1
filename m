@@ -1,164 +1,122 @@
-Return-Path: <netdev+bounces-64104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64105-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6149483117C
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 03:45:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9386F831186
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 03:51:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A51A0286C4E
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 02:45:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF1B11C20CD8
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 02:51:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8554A28F5;
-	Thu, 18 Jan 2024 02:45:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A04DE28F5;
+	Thu, 18 Jan 2024 02:51:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TPhbhmBk"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="PHPfExvq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25D4C5395;
-	Thu, 18 Jan 2024 02:45:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1889A53B5
+	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 02:51:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705545916; cv=none; b=AK8cPJ19dSB9kEu9/mYl+KJ5RePEv2DNLbhyLjiZtUkjNiK+BDN8p3q/tyQ6vMLguPWkYuiEvv9Y45V91F8v3Rq2fPZhBfxCBE09f8unQ61e5grdyOOGdhJJ5JdQNAxTS3ABR+V258mFYrlm7671bWWA8Bw9/jP7rgoR2MwtPvs=
+	t=1705546306; cv=none; b=a1/SnyNqhI1fEoHJs2XQ2m2axGe/MWt4i0s3Ynbos/E3SIhWmmVEHoo8nfi3tbplts8oFN+clRdAiNKvbjHAGtrSKcCRQBjuAFs7ai4FMlnWvfpYOe36J55W3cD0UpS9ti9rCseHKpPPVuedTgLEqU/xygiGq6EeSSJWvafKZaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705545916; c=relaxed/simple;
-	bh=HQvFAPJRf2J5GkozGHLateTg7jJKgrg4DLcVjXxGFOI=;
+	s=arc-20240116; t=1705546306; c=relaxed/simple;
+	bh=YHhFdreFP9ZE/+rucVuzbm04/JKcvfDc6wo5uMXaSX8=;
 	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:Date:
-	 From:To:Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=BpyP6ZqGpdU/fVby89Bj+xovh0moFapy8Ert7bAk2WD4+gSN/JZE9vIBuG+zrFmfwfnO5j1qylu0oAII8HHjeYFSj0TtEJ/To+Bm2L9Afr/H4asB5B7DGtBOnAx1Ia97zyayyiPmIpvedtT/r30xD6aQRAOK5gIsrEain7LV7fU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TPhbhmBk; arc=none smtp.client-ip=209.85.215.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-5cda3e35b26so4570147a12.1;
-        Wed, 17 Jan 2024 18:45:14 -0800 (PST)
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:From:
+	 To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:Content-Type:
+	 X-Mailer:X-Developer-Signature:X-Developer-Key:
+	 Content-Transfer-Encoding; b=FEWtufvE27t+HmV79tetgDCLOY/0JoGzX7pc3VSi9b8wJsQMyRjnbxmYLUnoplJpcA0MdEBNcOIabUBvzxoQb4wmduySiiWwOiMSd6nVMo9mxXpPAHbQ1DFy5KPJBnE8PqqWr9+tlDkHjZ10mZ+0Z/utHnlXvXbHV1Vgbdnn4Ig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=PHPfExvq; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-337b38d6568so2513302f8f.1
+        for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 18:51:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705545914; x=1706150714; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7yUIrD3c+Qm4qwrdDSHm5IZk2SaKgPsurwWj69dMasY=;
-        b=TPhbhmBkCu0PX68EDquIao3Bl+6K3FD/N3pSchEzfY0Yga9hdzAySO1oYV/xE/+Rey
-         mIZL8Ou/9kJZ7VX+9ailrkE5pffbnEEvxwZnk0/8L7p7iSc6t9n515MoaRqXNNkrqccN
-         +OCvsUy7L6dHgt+RL3AX3zhlxJCfpC6Fsfla98U7d6zpf9LdoaOZPHKb4djB+hW6y4jJ
-         Mso1t1Vkx/OOvpU0BH6knildx2AdYwxKlJFd93dusfm9kX0mvTs2WjmpVXhuD94F+6nk
-         11e1kAoBZEoAeJd0pdJTaetyeXfDHW5I4NC9rzDe6ph7qa+wG3Bm+vfYpE7yEM6AIjAJ
-         8TOw==
+        d=arista.com; s=google; t=1705546303; x=1706151103; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=H5JsUOgz+DPxJOOyNlG1B9EN9snqbFszTDtDaVe5HBM=;
+        b=PHPfExvqFP9dNkw/o1LSkVNxh6G6osL4+UztZaPS6M0NUeISe5flKcZVRQz+UKZbVW
+         oARqCfAPr6CwtY7/naIvTKlrEGSe8pfSmeWSIEE40dcrWIQbuERvvrGEBd1jlGLA+XBA
+         0iEMeDvqlD9WrkZtuA5HFhzlH+OyYaXe+sBgWo0aNsrdHQTjjfUJkJpgaPJxvcuViza3
+         U4d122bRIWi8OtteFp87ekFHFOkw2nCY5vDX2LAiDrHT/Jeg03xaLA5S4Zh4SZ+hOsOL
+         EWB1sxcXlXH1cGAIGs2DeOW9Aa8a8sTZaWoN5S89l9kmZ7NUYqgz5ZxXrAFT3gun6z0G
+         qo1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705545914; x=1706150714;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7yUIrD3c+Qm4qwrdDSHm5IZk2SaKgPsurwWj69dMasY=;
-        b=vusnxx3BJVV0+75FHXEdnIw53jiLHE2vMo92jaKzJtk+eEbRSINCdqR77yglVKOJ/U
-         rSR/9Ntw4PXZ0Rg5cnD+5fXpgYKaAapLXmRTRaE6g9XodTj0fkR2B+F5jColhtOnUlV1
-         +7/sBkvfIdYvHUCaP6rDO+O/LkyNzTPF45OzJHAK40iZe9xNPBAsHkL+8Am49FMoX16B
-         9KAdplI6hqzn1cMFa6MaTUOUvvpKRuYDef4BaPJ71bkF08433ZfoGnD3CX0oF5P99YlO
-         w4BTtP3AjW8i4r8F+7U4KMAh+/RskzV0VgnsLqGvBvpwHg4Ry6FRf640Brf15vDqKRBS
-         8JUw==
-X-Gm-Message-State: AOJu0YzJPpLh+zX/eJdqIfPsuA82k4wlCewpIBlkIvE0xQkq98mXDz1t
-	It/zcT04Ehvbfme77nblKQTrZkEV7anlxiVnRXSaWBtXNRhuOuxY
-X-Google-Smtp-Source: AGHT+IFlYN1Cvo4UoXhKIYlQ6sad+gJnzhI+R/1bdcxn8TcQpb0YIIt3gf5Ryo0si14bBeN+TrQYtg==
-X-Received: by 2002:a17:90a:ea04:b0:28f:fac1:b76b with SMTP id w4-20020a17090aea0400b0028ffac1b76bmr165660pjy.59.1705545914363;
-        Wed, 17 Jan 2024 18:45:14 -0800 (PST)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id si6-20020a17090b528600b0028df5c748e4sm423268pjb.44.2024.01.17.18.45.10
+        d=1e100.net; s=20230601; t=1705546303; x=1706151103;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=H5JsUOgz+DPxJOOyNlG1B9EN9snqbFszTDtDaVe5HBM=;
+        b=jPszeTLw8vS4g2ewuVq7PSyInu2TkjrtLcePUL23Daabb3P7xon/BId9oR6SV5Radx
+         ELL+WrI2STvRutJLJv5W5lRXL/Y+tWzMCj2eujnwRHdppK5AdfG1Ngt7Wfny9dN6MOUB
+         xJVvog5v/9kySyYwd0SsRqw7S+bcHLiT2L76mHWXyzXv70jjd5QL4/c1GHw9EGdr553i
+         JkuLMClJVHbIUzQ+P6lZpnIortm2l+g0Jn5T1B2LeNWEF2wqRho2PwCaPcBLEFlhElUQ
+         ecg1rVIEOrK9CQSAHUNEV/3Ah7sVVkEE5MMaefMA6jHjty8CDTpDQQoHroGL0LHl31Ya
+         7YwQ==
+X-Gm-Message-State: AOJu0YwfBwlfXFqB9FmIlM3wSvRhAXv4ig1POBbVZJ5apm9T+6i+Rw36
+	P5SPbAx+MZ/7RVyjjnz02n3xfBSuvCmd/P/8KmYr1ErGMx2zRLBxhHThMUpEuA==
+X-Google-Smtp-Source: AGHT+IGuu+Qi2Tx2cCYMGpPYN+O0khIiJHE3lWN6J6IrC2aFuK1G0SyFIM92LO01t3+UwG9sk29NlA==
+X-Received: by 2002:a5d:400b:0:b0:333:44e2:16b7 with SMTP id n11-20020a5d400b000000b0033344e216b7mr79098wrp.49.1705546303326;
+        Wed, 17 Jan 2024 18:51:43 -0800 (PST)
+Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id z15-20020a5d440f000000b0033664ffaf5dsm2868219wrq.37.2024.01.17.18.51.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Jan 2024 18:45:12 -0800 (PST)
-Date: Thu, 18 Jan 2024 10:45:07 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
+        Wed, 17 Jan 2024 18:51:42 -0800 (PST)
+From: Dmitry Safonov <dima@arista.com>
+To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Taehee Yoo <ap420073@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+a9400cabb1d784e49abf@syzkaller.appspotmail.com
-Subject: Re: [PATCH net] ipv6: mcast: fix data-race in ipv6_mc_down /
- mld_ifc_work
-Message-ID: <ZaiQs6yTY7XuS06i@Laptop-X1>
-References: <20240117172102.12001-1-n.zhandarovich@fintech.ru>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Dmitry Safonov <0x7f454c46@gmail.com>
+Cc: Dmitry Safonov <dima@arista.com>,
+	Mohammad Nassiri <mnassiri@ciena.com>,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/3] selftests/net: A couple of typos fixes in key-management test
+Date: Thu, 18 Jan 2024 02:51:33 +0000
+Message-ID: <20240118-tcp-ao-test-key-mgmt-v1-0-3583ca147113@arista.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240117172102.12001-1-n.zhandarovich@fintech.ru>
+Content-Type: text/plain; charset="utf-8"
+X-Mailer: b4 0.13-dev-b6b4b
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1705546294; l=736; i=dima@arista.com; s=20231212; h=from:subject:message-id; bh=YHhFdreFP9ZE/+rucVuzbm04/JKcvfDc6wo5uMXaSX8=; b=E1xkCdz0M9XB7LOyp1foBBxJnUvlo7QXSIQqLpKlLQB377ZXUXuwOvQUCG4cuseiQQNIU4E6N RodDkay3j8aAB5yco4ZxHozCAOJCI4dCrc0vyqgUf83CsOC7UR+yKr3
+X-Developer-Key: i=dima@arista.com; a=ed25519; pk=hXINUhX25b0D/zWBKvd6zkvH7W2rcwh/CH6cjEa3OTk=
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jan 17, 2024 at 09:21:02AM -0800, Nikita Zhandarovich wrote:
-> idev->mc_ifc_count can be written over without proper locking.
-> 
-> Originally found by syzbot [1], fix this issue by encapsulating calls
-> to mld_ifc_stop_work() (and mld_gq_stop_work() for good measure) with
-> mutex_lock() and mutex_unlock() accordingly as these functions
-> should only be called with mc_lock per their declarations.
-> 
-> [1]
-> BUG: KCSAN: data-race in ipv6_mc_down / mld_ifc_work
-> 
-> write to 0xffff88813a80c832 of 1 bytes by task 3771 on cpu 0:
->  mld_ifc_stop_work net/ipv6/mcast.c:1080 [inline]
->  ipv6_mc_down+0x10a/0x280 net/ipv6/mcast.c:2725
->  addrconf_ifdown+0xe32/0xf10 net/ipv6/addrconf.c:3949
->  addrconf_notify+0x310/0x980
->  notifier_call_chain kernel/notifier.c:93 [inline]
->  raw_notifier_call_chain+0x6b/0x1c0 kernel/notifier.c:461
->  __dev_notify_flags+0x205/0x3d0
->  dev_change_flags+0xab/0xd0 net/core/dev.c:8685
->  do_setlink+0x9f6/0x2430 net/core/rtnetlink.c:2916
->  rtnl_group_changelink net/core/rtnetlink.c:3458 [inline]
->  __rtnl_newlink net/core/rtnetlink.c:3717 [inline]
->  rtnl_newlink+0xbb3/0x1670 net/core/rtnetlink.c:3754
->  rtnetlink_rcv_msg+0x807/0x8c0 net/core/rtnetlink.c:6558
->  netlink_rcv_skb+0x126/0x220 net/netlink/af_netlink.c:2545
->  rtnetlink_rcv+0x1c/0x20 net/core/rtnetlink.c:6576
->  netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
->  netlink_unicast+0x589/0x650 net/netlink/af_netlink.c:1368
->  netlink_sendmsg+0x66e/0x770 net/netlink/af_netlink.c:1910
->  ...
-> 
-> write to 0xffff88813a80c832 of 1 bytes by task 22 on cpu 1:
->  mld_ifc_work+0x54c/0x7b0 net/ipv6/mcast.c:2653
->  process_one_work kernel/workqueue.c:2627 [inline]
->  process_scheduled_works+0x5b8/0xa30 kernel/workqueue.c:2700
->  worker_thread+0x525/0x730 kernel/workqueue.c:2781
->  ...
-> 
-> Fixes: 2d9a93b4902b ("mld: convert from timer to delayed work")
-> Reported-by: syzbot+a9400cabb1d784e49abf@syzkaller.appspotmail.com
-> Link: https://lore.kernel.org/all/000000000000994e09060ebcdffb@google.com/
-> Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
-> ---
->  net/ipv6/mcast.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
-> index b75d3c9d41bb..bc6e0a0bad3c 100644
-> --- a/net/ipv6/mcast.c
-> +++ b/net/ipv6/mcast.c
-> @@ -2722,8 +2722,12 @@ void ipv6_mc_down(struct inet6_dev *idev)
->  	synchronize_net();
->  	mld_query_stop_work(idev);
->  	mld_report_stop_work(idev);
-> +
-> +	mutex_lock(&idev->mc_lock);
->  	mld_ifc_stop_work(idev);
->  	mld_gq_stop_work(idev);
-> +	mutex_unlock(&idev->mc_lock);
-> +
->  	mld_dad_stop_work(idev);
->  }
->  
+Two typo fixes, noticed by Mohammad's review.
+And a fix for an issue that got uncovered.
 
-I saw mld_process_v1() also cancel these works when changing to v1 mode.
-Should we also add lock there?
+Signed-off-by: Dmitry Safonov <dima@arista.com>
+---
+Dmitry Safonov (2):
+      selftests/net: Rectify key counters checks
+      selftests/net: Clean-up double assignment
 
-Thanks
-Hangbin
+Mohammad Nassiri (1):
+      selftests/net: Argument value mismatch when calling verify_counters()
+
+ .../testing/selftests/net/tcp_ao/key-management.c  | 46 ++++++++++++----------
+ tools/testing/selftests/net/tcp_ao/lib/sock.c      |  1 -
+ 2 files changed, 26 insertions(+), 21 deletions(-)
+---
+base-commit: 296455ade1fdcf5f8f8c033201633b60946c589a
+change-id: 20240118-tcp-ao-test-key-mgmt-bb51a5fe15a2
+
+Best regards,
+-- 
+Dmitry Safonov <dima@arista.com>
+
 
