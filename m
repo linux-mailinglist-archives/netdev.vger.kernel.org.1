@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-64238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1A48831DE7
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 17:54:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DBA0831E11
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 18:00:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71AFC286A61
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 16:54:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD7051C2585C
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 17:00:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B49402C1BD;
-	Thu, 18 Jan 2024 16:54:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3D312C6A4;
+	Thu, 18 Jan 2024 17:00:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4IVJv5pT"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Pmo5tso8"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BACC02C1A0;
-	Thu, 18 Jan 2024 16:54:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 363952D02B;
+	Thu, 18 Jan 2024 17:00:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705596856; cv=none; b=l70qJd0ugzTDDK8rY7dq+QDThPZ3UL9CkJLlew/T0czCZ+QkTI27kARnUqM55LyMenNhLzC+0/f+w2of+vuuGbrGjdDWAziply9rXuawVTO7QxgLgPGR2nIcsnbNeaZ9nx44h5RCnnREDQ1kH8foCq5AuIgOT3nClfrzT3eYMgs=
+	t=1705597220; cv=none; b=n9tnq8PZ1WDteWui05kpE6bNizW+Vm+EovOYy1Wj5wIW/IEuRA5SMJvpuYzuLyLZegXh+XOEqm0F1KYn1ZwVaPYlj8zgoegS1FtF8sgaQVava2vl23Z04gZ1oXidmwBSP0uHqd444rkz8SXBqmlQA6fMYHPlDW+URz6hS+JXcGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705596856; c=relaxed/simple;
-	bh=crJwJ8X/wzPlvScgIcXHTUknQHUelOOysLDVlUFds9k=;
+	s=arc-20240116; t=1705597220; c=relaxed/simple;
+	bh=ZQkTj7v3P3b8slVfFVO0LEhYN51N22sIpr/cgL8WBSg=;
 	h=DKIM-Signature:Received:Date:From:To:Cc:Subject:Message-ID:
 	 References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To; b=IL6ATNP6z7IDyC9j4swL+pTVSYD/0wcxP5lHkxlXNL5z6fhYMkxqsmt5eGqIHcYB0oRocwDu3SoH9FsLuVBrfs6XuhsTNzSzpk7LiJlpge1P5EIENNAbdtMKJZmtle9V95cHjkqlvSmAqfrKqFJZ5OTDr+kWu5kZFhpdYRX4+Ic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4IVJv5pT; arc=none smtp.client-ip=156.67.10.101
+	 In-Reply-To; b=Z1OIKdNHih8W9WEPFM2aRQodQXOih/IUuN/O1yLZk/EBm6gwB+gEtKUeWKPDukCSQO8qZe8EVGDBNlVgBY7Nn/Ae0dyeKt3KsmePNXQ0qb01W4IeEFLpU97Qvdhg8fGyLo7ETLrb5I3tvf4pDnxLIXXqRX46tTwAegURxn0SUwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Pmo5tso8; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -37,22 +37,26 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=jHGZBZk6Jjgp+pfdwPf2DTLVgfHtKK0y+HPwY/B39uE=; b=4IVJv5pTb0iY61RpsCsMhhL01N
-	5zSwfq5bMPtgMyVp2gKNwMCOUBzt6HjqtZEAd11XWRhi/q+dKhzT7S4/Wutcu2/AJYnEXPMKI2aE/
-	Lgs6vjWwiylS+0Xn4md/7EY7wpfwCFYQbaIldPtHOX0zzyixSmJnS8IR3PSEQHHFAkP8=;
+	bh=0tuU5//Jtkk4REo0lwHCqrHwmxJPEkKkKcI8xTrY0ts=; b=Pmo5tso8M37VzKsnub2PaUM2i/
+	KTG/bCFboCVTfbvP87Gk6zFJwzphCJsWVihUJuzNDyho9s5F5Nh/F5Xfqrctk2FV8G36iDvat+T2A
+	tbzyFHV5I6+ih8DTPTMQJxoL9QQnWf1lhcnCQBLfNeaJ29XANT9Ity7oIvbebs34Nw5s=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rQVeQ-005UkO-ND; Thu, 18 Jan 2024 17:53:58 +0100
-Date: Thu, 18 Jan 2024 17:53:58 +0100
+	id 1rQVkP-005UmY-SR; Thu, 18 Jan 2024 18:00:09 +0100
+Date: Thu, 18 Jan 2024 18:00:09 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Andre Werner <andre.werner@systec-electronic.com>
-Cc: hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: phy: adin1100: Fix nullptr exception for phy
- interrupts
-Message-ID: <322d5543-4d13-48a7-af58-daa8cc840f05@lunn.ch>
-References: <20240118104341.10832-1-andre.werner@systec-electronic.com>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>
+Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	richardcochran@gmail.com, Divya.Koppera@microchip.com,
+	maxime.chevallier@bootlin.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net v2 2/2] net: micrel: Fix set/get PHC time for lan8814
+Message-ID: <139fe4c1-6a3e-4ef3-a178-ebbe09652966@lunn.ch>
+References: <20240118085916.1204354-1-horatiu.vultur@microchip.com>
+ <20240118085916.1204354-3-horatiu.vultur@microchip.com>
+ <6fa37dfd-3c92-4842-9785-1b17bbbedc9d@lunn.ch>
+ <20240118152353.syk3v7kgf3mutqpp@DEN-DL-M31836.microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,48 +65,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240118104341.10832-1-andre.werner@systec-electronic.com>
+In-Reply-To: <20240118152353.syk3v7kgf3mutqpp@DEN-DL-M31836.microchip.com>
 
-On Thu, Jan 18, 2024 at 11:43:41AM +0100, Andre Werner wrote:
-> If using ADIN1100 as an external phy, e.g. in combination with
-> "smsc95xx", we ran into nullptr exception by creating a link.
+> > Maybe submit this for net-next?
 > 
-> In our case the "smsc95xx" does not check for an available interrupt handler
-> on external phy driver to use poll instead of interrupts if no handler is
-> available. So we decide to implement a small handler in the phy driver
-> to support other MACs as well.
-> 
-> I update the driver to add an interrupt handler because libphy
-> does not check if their is a interrupt handler available either.
-> 
-> There are several interrupts maskable at the phy, but only link change interrupts
-> are handled by the driver yet.
-> 
-> We tested the combination "smsc95xx" and "adin1100" with Linux Kernel 6.6.9
-> and Linux Kernel 6.1.0, respectively.
+> Anyway, I don't have strong feelings about this, if it goes to net or
+> net-next, I just want to fix this at some point :)
 
-Hi Andre
+Please submit to net-next. I think the ML bot which picks out patches
+to backport is likely to see the work Fix in the subject and decided
+to backport it anyway. But its not our problem if the bot breaks the
+stable rules.
 
-A few different things....
-
-Please could you give more details of the null pointer
-exception. phylib should test if the needed methods have been
-implemented in the PHY driver, and not tried to use interrupts when
-they are missing. It should of polled the PHY. So i would like to
-understand what went wrong. Maybe we have a phylib core bug we should
-be fixing. Or a bug in the smsc95xx driver.
-
-Please take a read of
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
-
-Patches like this should be against net-next, not 6.6.9 etc. Also,
-net-next is currently closed due to the merge window being open. Its
-fine to post patches, but please mark them RFC until the merge window
-is over.
-
-The patch itself looks O.K, but i would make the commit message more
-formal. You can add additional comments under the --- which will not
-become part of the git history.
+Is there any danger of regressions? Could the higher word actually
+have a value for some reason today, which is being ignored. Would this
+change then jump the time forward?
 
        Andrew
 
