@@ -1,116 +1,131 @@
-Return-Path: <netdev+bounces-64241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFE40831E36
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 18:13:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F14FF831E4B
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 18:21:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1ED401C229E0
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 17:13:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 30A751C25F68
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 17:21:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4D772C6B8;
-	Thu, 18 Jan 2024 17:13:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C20912C6BF;
+	Thu, 18 Jan 2024 17:20:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qpJ1rKat"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="DQ1+FQXx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA25B2C6AA;
-	Thu, 18 Jan 2024 17:13:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87FB62C841;
+	Thu, 18 Jan 2024 17:20:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705598009; cv=none; b=GoMyrZN01LDsSnF8+iNv91sNzNsecm8kKeec+UH3jMx3Q8CE3PkcyFHdhMnbdaEdbtOWDwJhyJyVXgvGiQcxrxxU8elRzaSc7tIe5ewQeLgA1Q2TVUjw/6HVDh8MzbYkObPLghrlDoHxd6d95MU0oiC8lEQcrHhe+z19cNQNqTM=
+	t=1705598458; cv=none; b=Oa+FtIv+Cqx3Z+ZQA9rerdEGR/FtVsfpyyD0rA6EBWZoxKqznxsgxENnyBvO4c7jHbAK8/1hg9WO/I++DJbSzUrA2mpK+t2eBC4ianYs9hyeqlBYzE9G3Ef261NTix8b4QUAcBWJVkDSfj/OHlopr1CU0UJJLQ8UqJE700wnWCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705598009; c=relaxed/simple;
-	bh=9o2lBDYb6ONkZXbvFSTfGbBBwuoSI9hZAcZPwVUMhj8=;
-	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
-	 In-Reply-To:References:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding; b=AkfwyZJBv++k4SdoEReaE9BSNZBHLEy87L6gi8mmaAvRCgoIzKJiMy6gpJQcktFqozgMCFMqrDRrKCU8UwF5pU6tU2VBh/LkxBEHRK1ojSz11iPg5W9XUMFkrb/d5UKDuydJQKpcTVu1+om43wQ67gdpjfKF3oCO3PN+1B3+Bhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qpJ1rKat; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A12C4C433C7;
-	Thu, 18 Jan 2024 17:13:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705598009;
-	bh=9o2lBDYb6ONkZXbvFSTfGbBBwuoSI9hZAcZPwVUMhj8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qpJ1rKat2pQCVwGvZ/btu/r8GZ0oaiCCoUGQFc+7uD9oWlqNj0OMpHuBLkZsthefT
-	 uwAe7UjQKBcLP7T1amEiQOtOdSQCcR+0pxc/OnE/PBGgnFmzi85rcFC/dnxEZwGkrn
-	 B3irrORZ+7yhoye7DAkaBEGHMMGqXjQi2XlWhPDSUw8drcHNRlhtBHe9SdH07hwApP
-	 W6uHEAEV5bvPsbwefMSgzsLjrwtWcHokvyxxisz9HwOOGugbV4DvCboutAniNKYNXr
-	 QX5dncX8aOcwa7YhyLon+WGK64SIhvS9fgSxc5EHtfqiyJBhh6mEqC0rSuImqXNxk+
-	 VHH7SLk8X9OxA==
-Date: Thu, 18 Jan 2024 09:13:27 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Dmitry Safonov <dima@arista.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
- <shuah@kernel.org>, Dmitry Safonov <0x7f454c46@gmail.com>, Mohammad Nassiri
- <mnassiri@ciena.com>, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/3] selftests/net: A couple of typos fixes in
- key-management test
-Message-ID: <20240118091327.173f3cb0@kernel.org>
-In-Reply-To: <358faa27-3ea3-4e63-a76f-7b5deeed756d@arista.com>
-References: <20240118-tcp-ao-test-key-mgmt-v1-0-3583ca147113@arista.com>
-	<20240118085129.6313054b@kernel.org>
-	<358faa27-3ea3-4e63-a76f-7b5deeed756d@arista.com>
+	s=arc-20240116; t=1705598458; c=relaxed/simple;
+	bh=QCi0NAejhSMBU6bIleU7dVTM/9bEmhooAzEn3eRNGV0=;
+	h=DKIM-Signature:Received:Received:Date:From:To:Cc:Subject:
+	 Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To:Sender; b=UVCEAElghKM6jNCs9g9SSaF7yX0Hrw0ESAVx4c/P9NHYsjooNUxAPfg8biVKvmLz+TWjjaJZPv7UvOwi8jCDgyST+qUDbJePeo26/1rX2LgHwxcVJroSHZCj8id9vkE9PxB9jkp72tSNOIq1Vr0Tc3uWGIT2P1dVAfklCoWgU3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=DQ1+FQXx; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=QW5QZVtvDMrqM5iqjOSP4enaNWSUCJ1eFOycJjQ34Lc=; b=DQ1+FQXxKz/5UT2gG/qY9Nm63q
+	ZnbqqtX0YlzE7kngEfJ7zhTkO0PCVEWPazi8mnmvmRDi7kwQAzAkEpLJRd+0FH9YbCl1aXTnUxllk
+	TYEXLaC69tAaw7A+UVOnWlA6CEuHYlR/ZrxyXANoPo1a44rGOWYolIIEZcD7o1uh19LW8yAH/goFX
+	0oygVnl4cQ38/l1IWT1L4HUR0Ckg+bCR3C0fHCiDenl3mT6rB1dDXAhatdye8KAvc8Hb7+haGVDpb
+	I4DamBIEeoPvBGAzooYMLzEQpOY4d3MhRwhGdcRXfYAmspaHBo7UEKlR+19UxZji1jwltZC3PCOmg
+	+pf3tZjA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58808)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rQW4O-0005vR-0C;
+	Thu, 18 Jan 2024 17:20:48 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rQW4M-0005tn-E5; Thu, 18 Jan 2024 17:20:46 +0000
+Date: Thu, 18 Jan 2024 17:20:46 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andre Werner <andre.werner@systec-electronic.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: phy: adin1100: Fix nullptr exception for phy
+ interrupts
+Message-ID: <Zald7u8B+uKzCn42@shell.armlinux.org.uk>
+References: <20240118104341.10832-1-andre.werner@systec-electronic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240118104341.10832-1-andre.werner@systec-electronic.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, 18 Jan 2024 17:04:25 +0000 Dmitry Safonov wrote:
-> > Somewhat unrelated to these fixes but related to the tcp_ao selftests
-> > in general - could you please also add a config file so that it's
-> > easy to build a minimal kernel for running the tests?
-> > 
-> > Something like:
-> > 
-> >   make defconfig
-> >   make kvm_guest.config
-> >   make tools/testing/selftests/net/tcp_ao/config  
-> 
-> Yep, sounds good to me.
-> I'll take as a base tools/testing/selftests/net/config and add any
-> needed config options on the top.
+In addition to Andrew's comments:
 
-You probably want something smaller to be honest.
-tools/testing/selftests/net/config has a lot of stuff in it 
-and it's actually missing a lot more. I'm working thru adding
-the missing options to tools/testing/selftests/net/config 
-right now so far I got:
+On Thu, Jan 18, 2024 at 11:43:41AM +0100, Andre Werner wrote:
+> +static int adin_config_intr(struct phy_device *phydev)
+> +{
+> +	int ret, regval;
+> +
+> +	ret = adin_phy_ack_intr(phydev);
+> +
+> +	if (ret)
+> +		return ret;
+> +
+> +	regval = phy_read_mmd(phydev, MDIO_MMD_VEND2, ADIN_PHY_SUBSYS_IRQ_MASK);
+> +	if (regval < 0)
+> +		return regval;
+> +
+> +	if (phydev->interrupts == PHY_INTERRUPT_ENABLED)
+> +		regval |= ADIN_LINK_STAT_CHNG_IRQ_EN;
+> +	else
+> +		regval &= ~ADIN_LINK_STAT_CHNG_IRQ_EN;
+> +
+> +	ret = phy_write_mmd(phydev, MDIO_MMD_VEND2,
+> +			    ADIN_PHY_SUBSYS_IRQ_MASK,
+> +			    regval);
+> +	return ret;
 
-# tun / tap
-+CONFIG_TUN=y
-+CONFIG_MACVLAN=y
-+CONFIG_MACVTAP=y
-+CONFIG_NET_SCH_FQ_CODEL=m
-+# l2tp
-+CONFIG_L2TP=m
-+CONFIG_L2TP_V3=y
-+CONFIG_L2TP_IP=m
-+CONFIG_L2TP_ETH=m
-+# sctp-vrf (need SCTP_DIAG to appear)
-+CONFIG_INET_DIAG=y
-+# txtimestamp
-+CONFIG_NET_CLS_U32=m
-+# test-vxlan-mdb-sh etc.
-+CONFIG_BRIDGE_VLAN_FILTERING=y
-+# gre_gso.sh etc.
-+CONFIG_NET_IPGRE_DEMUX=m
-+CONFIG_IP_GRE=m
-+CONFIG_IPV6_GRE=m
-+# ./srv6_end_dt*_l3vpn_test.sh
-+CONFIG_IPV6_SEG6_LWTUNNEL=y
-+# local port something..
-+CONFIG_MPTCP=y
-+# fib_test.sh
-+CONFIG_NET_CLS_BASIC=m
+	u16 irq_mask;
+
+	if (phydev->interrupts == PHY_INTERRUPT_ENABLED)
+		irq_mask = ADIN_LINK_STAT_CHNG_IRQ_EN;
+	else
+		irq_mask = 0;
+
+	return phy_modify_mmd(phydev, MDIO_MMD_VEND2,
+			      ADIN_PHY_SUBSYS_IRQ_MASK,
+			      ADIN_LINK_STAT_CHNG_IRQ_EN, irq_mask);
+
+> +}
+> +
+> +static irqreturn_t adin_phy_handle_interrupt(struct phy_device *phydev)
+> +{
+> +	int irq_status;
+> +
+> +	irq_status = phy_read_mmd(phydev, MDIO_MMD_VEND2, ADIN_PHY_SUBSYS_IRQ_STATUS);
+
+Probably want to wrap this - if you're going to bother wrapping your
+phy_write_mmd() above because it overflows 80 columns, then please do
+so consistently.
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
