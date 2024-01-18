@@ -1,189 +1,179 @@
-Return-Path: <netdev+bounces-64122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64123-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0920F831312
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 08:25:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3509F831324
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 08:35:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 769E71F22AA6
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 07:25:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A6431C226AF
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 07:35:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A17BB947A;
-	Thu, 18 Jan 2024 07:24:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D5BFB664;
+	Thu, 18 Jan 2024 07:35:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FzJ+o+Br"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Xb8xY9VP";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Skp4jtKn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 280F9944D;
-	Thu, 18 Jan 2024 07:24:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A4FC947A;
+	Thu, 18 Jan 2024 07:35:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705562699; cv=none; b=sCVAFCvGfylFJvZP5zXlO10OFfyA7En5drJpitVIh6MyKoj/9Pwv7zFy/a6Bs40uHumNHCPpc6zjCyrCmAPL7FPaUzvYy1zJTeqGVjkcitbPOOE2aZZ1c1GW60msM5pC/NZghWze2BQ8TncFlqZH/BS3jO4DaiqeRJFBWiWuOfE=
+	t=1705563346; cv=none; b=ixkR6/7ZK1Y1nT7lm3YsyjJuG0f41iylbEU84v7wU8kODf00NikKRS3tEqYaZujoBkrDFJ3QfC2MgAszmOVzBwFwsxznT9HxKynKn8mX3UG3zNhuv3n1MPTQztYchlTJ96VdvZOuZjISYxlrf13sWbmpT4LI2S3cBejbxLNSUgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705562699; c=relaxed/simple;
-	bh=cw/DUQpgxBkbK5fNpBuUe09CPPbuuP8Kb4vqkUhP3ug=;
-	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:
-	 Message-ID:Date:MIME-Version:User-Agent:Subject:Content-Language:
-	 To:Cc:References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding; b=hyeQGIhBdl7hx42JB80WTaF8oInQMYYf2v3te9tl6zXPUmjMtb7By2GDcJUCVNXmB0y6hyqCQepwCJdclLwsQD48kByE2okygWT1UEvHn0cm5vi9dbPe9s31YzVgX8w5eEJsNDGps13EW9vbyLwjKMWUeLladrgfV7RIRoMattI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FzJ+o+Br; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6d9bec20980so6623174b3a.2;
-        Wed, 17 Jan 2024 23:24:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705562697; x=1706167497; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cnqK7NJlnkgLKg2e9dDqbONSyx6zKQfOIk2cR4ZCvvU=;
-        b=FzJ+o+Br80R1vF7ZSB3uKrNzlzu6OnWJ8bpI/lpj+nJurZYW9n5WZtHIPnp6+LFERh
-         uZRw1WDkWVgHn1uKsBLWSf026RAaX2MSJ93SRIu+Ie07hpSqL5Llho93qDNkJuPuxj2Q
-         3B+Fg+rfzXshbv3CEV4oN1zn6DoUvauRiIUXTB7dU3Q/55A8YgovuSgDAx5DbLcwVwXv
-         8XhaZSlJC3m4kjYMcCJBIb+Ifmj7Dl/qEBk5VkIMOXA+Z3INweFCNswgMevnVe5s1Loz
-         cZj+3i4AKOyZYMvgURySOSt0lq7x6FPTCgEEKuNZLdLBPREC0T3ajzVxaN0PTu2huPk9
-         B2ZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705562697; x=1706167497;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cnqK7NJlnkgLKg2e9dDqbONSyx6zKQfOIk2cR4ZCvvU=;
-        b=h2+7c2pZ33kemWs3hPlO9mX+RUPbl2pfoY4NNZD02IxxjlFnkVhxVuLVCGnTSYYqGm
-         8ruEgkCaND3WDj8WmpVgo5nO85P9E/X5XTFRz8jdRRnmIYCZePoCFBRJpQ/K1WeHm71y
-         abd4TY382PKRZpKiSZaHyoXlgLWoz2+Lt9Zxl9GM+mGESoDYhVNP2Snuf984TdyWnxbV
-         PIO+EAlyQEdEz9oY4Sa//z/ja81VFBUpIyWXD7ehlyjz8Tt0Cv0XkIIZjs9zzyJgyU84
-         EcBIOauCK8NSH3UDHH86huM+obbnsI8031EeQ+lzbCKoQ7y3yQvimA0QyGT0C91Ne9wl
-         zA8A==
-X-Gm-Message-State: AOJu0YxPxMBhKQznRexrA+WCIhVFBPo1HpMhyNeGkC2fyZFlzMRhCm6B
-	Rd1QMW2lRFzu9CBFW93AfaNF9p+IoEdtKdiOa26PWilGjPtATVQB
-X-Google-Smtp-Source: AGHT+IGHMur5P7YcB7ee/RW1xLtwBbnGhhSeo71er2JxU5SxBsIG833DQcu4VH/HFF+RFmAFHZVvHA==
-X-Received: by 2002:a05:6a00:238f:b0:6db:7228:ec with SMTP id f15-20020a056a00238f00b006db722800ecmr423686pfc.17.1705562697357;
-        Wed, 17 Jan 2024 23:24:57 -0800 (PST)
-Received: from [192.168.0.4] ([182.213.254.91])
-        by smtp.gmail.com with ESMTPSA id fm9-20020a056a002f8900b006d9b2d86bcasm2623451pfb.46.2024.01.17.23.24.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Jan 2024 23:24:56 -0800 (PST)
-Message-ID: <bac390f1-ef6d-317f-a5e1-1c0c5e4e4535@gmail.com>
-Date: Thu, 18 Jan 2024 16:24:52 +0900
+	s=arc-20240116; t=1705563346; c=relaxed/simple;
+	bh=8hmAdEIcfL0v9wcLZ0431SoMcuZUtlch/gTPUp8R8qQ=;
+	h=Date:DKIM-Signature:DKIM-Signature:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:
+	 Content-Transfer-Encoding:In-Reply-To; b=Gymn8v1P0TqlW1rru0GuLDZKFP1LVntw38RhqcD2sutr1YFf+e68VcAwUAW35BFUsoMKlUgs4bjxUhloqL6uTd8Uy7Q4wL4gMbUSNlpjSxMduOo8uWAWvVQiL0gcySgYsOFp/EHfqaMZDBs7VNbr73H+Kbtmg25cQc8KN0ywwn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Xb8xY9VP; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Skp4jtKn; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Thu, 18 Jan 2024 08:35:40 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1705563341;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=x/SrWGWqFAeh0Q4NXPXuSzxRFfe/0QLjn7iAVq/bzjE=;
+	b=Xb8xY9VPVGlZC+0QyCX3HfuFBe5M9F+tz0pdkLj3oZTgqR4tmZ9n4s9e21IQVo5tK8RFPB
+	/FAZt+62WyFkD+HgJvOrcbZAsgpc7IHfUk1S76Iwo6ICt5bt+DrVU7de6cy+pgZUQ0MP7n
+	NeehovYW/jpCoyeP/j3v9cxSBhcTvMSFYE3kxatMPiUx8nZY+cV+mvhp4jkHIlEIg7WWg8
+	Yt0CWDmppz+3oxeBAidkP+VT2U5UcO3aYLIMXi3z9QJAGs6EciAZ+pEF3FgSCT7eWJZ5wi
+	AH3aY702oiSHc1DIZies6lkRUmCtoBw9J7ofrWmyGNaoL08eUJyxmmKQFbzKhA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1705563341;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=x/SrWGWqFAeh0Q4NXPXuSzxRFfe/0QLjn7iAVq/bzjE=;
+	b=Skp4jtKnot55gcSMtLq/UrWu7lTfXeGcP1L+cK7QA43cdiWiuT4Z/sY+SwkBPZf1FZLnAu
+	dQU730Md1RqVgfCg==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Network Development <netdev@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Hao Luo <haoluo@google.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Jiri Olsa <jolsa@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Ronak Doshi <doshir@vmware.com>, Song Liu <song@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+	Yonghong Song <yonghong.song@linux.dev>, bpf <bpf@vger.kernel.org>
+Subject: Re: [PATCH net-next 15/24] net: Use nested-BH locking for XDP
+ redirect.
+Message-ID: <20240118073540.GIobmYpD@linutronix.de>
+References: <20231215171020.687342-1-bigeasy@linutronix.de>
+ <20231215171020.687342-16-bigeasy@linutronix.de>
+ <CAADnVQKJBpvfyvmgM29FLv+KpLwBBRggXWzwKzaCT9U-4bgxjA@mail.gmail.com>
+ <87r0iw524h.fsf@toke.dk>
+ <20240112174138.tMmUs11o@linutronix.de>
+ <87ttnb6hme.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH net] ipv6: mcast: fix data-race in ipv6_mc_down /
- mld_ifc_work
-Content-Language: en-US
-To: Hangbin Liu <liuhangbin@gmail.com>,
- Nikita Zhandarovich <n.zhandarovich@fintech.ru>
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern
- <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzbot+a9400cabb1d784e49abf@syzkaller.appspotmail.com
-References: <20240117172102.12001-1-n.zhandarovich@fintech.ru>
- <ZaiQs6yTY7XuS06i@Laptop-X1>
-From: Taehee Yoo <ap420073@gmail.com>
-In-Reply-To: <ZaiQs6yTY7XuS06i@Laptop-X1>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <87ttnb6hme.fsf@toke.dk>
 
+On 2024-01-17 17:37:29 [+0100], Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+> This is all back-of-the-envelope calculations, of course. Having some
+> actual numbers to look at would be great; I don't suppose you have a
+> setup where you can run xdp-bench and see how your patches affect the
+> throughput?
 
+No but I probably could set it up.
 
-On 1/18/24 11:45, Hangbin Liu wrote:
+> I chatted with Jesper about this, and he had an idea not too far from
+> this: split up the XDP and regular stack processing in two stages, each
+> with their individual batching. So whereas right now we're doing
+> something like:
+>=20
+> run_napi()
+>   bh_disable()
+>   for pkt in budget:
+>     act =3D run_xdp(pkt)
+>     if (act =3D=3D XDP_PASS)
+>       run_netstack(pkt)  // this is the expensive bit
+>   bh_enable()
+>=20
+> We could instead do:
+>=20
+> run_napi()
+>   bh_disable()
+>   for pkt in budget:
+>     act =3D run_xdp(pkt)
+>     if (act =3D=3D XDP_PASS)
+>       add_to_list(pkt, to_stack_list)
+>   bh_enable()
+>   // sched point
+>   bh_disable()
+>   for pkt in to_stack_list:
+>     run_netstack(pkt)
+>   bh_enable()
+>=20
+>=20
+> This would limit the batching that blocks everything to only the XDP
+> processing itself, which should limit the maximum time spent in the
+> blocking state significantly compared to what we have today. The caveat
+> being that rearranging things like this is potentially a pretty major
+> refactoring task that needs to touch all the drivers (even if some of
+> the logic can be moved into the core code in the process). So not really
+> sure if this approach is feasible, TBH.
 
-Hi Hangbin,
+This does not work because bh_disable() does not disable scheduling.
+Scheduling may happen. bh_disable() acquires a lock which is currently
+the only synchronisation point between two say network driver doing
+NAPI. And this what I want to get rid of.
+Regarding expensive bit as in XDP_PASS: This doesn't need locking as per
+proposal, just the REDIRECT piece.
 
- > On Wed, Jan 17, 2024 at 09:21:02AM -0800, Nikita Zhandarovich wrote:
- >> idev->mc_ifc_count can be written over without proper locking.
- >>
- >> Originally found by syzbot [1], fix this issue by encapsulating calls
- >> to mld_ifc_stop_work() (and mld_gq_stop_work() for good measure) with
- >> mutex_lock() and mutex_unlock() accordingly as these functions
- >> should only be called with mc_lock per their declarations.
- >>
- >> [1]
- >> BUG: KCSAN: data-race in ipv6_mc_down / mld_ifc_work
- >>
- >> write to 0xffff88813a80c832 of 1 bytes by task 3771 on cpu 0:
- >> mld_ifc_stop_work net/ipv6/mcast.c:1080 [inline]
- >> ipv6_mc_down+0x10a/0x280 net/ipv6/mcast.c:2725
- >> addrconf_ifdown+0xe32/0xf10 net/ipv6/addrconf.c:3949
- >> addrconf_notify+0x310/0x980
- >> notifier_call_chain kernel/notifier.c:93 [inline]
- >> raw_notifier_call_chain+0x6b/0x1c0 kernel/notifier.c:461
- >> __dev_notify_flags+0x205/0x3d0
- >> dev_change_flags+0xab/0xd0 net/core/dev.c:8685
- >> do_setlink+0x9f6/0x2430 net/core/rtnetlink.c:2916
- >> rtnl_group_changelink net/core/rtnetlink.c:3458 [inline]
- >> __rtnl_newlink net/core/rtnetlink.c:3717 [inline]
- >> rtnl_newlink+0xbb3/0x1670 net/core/rtnetlink.c:3754
- >> rtnetlink_rcv_msg+0x807/0x8c0 net/core/rtnetlink.c:6558
- >> netlink_rcv_skb+0x126/0x220 net/netlink/af_netlink.c:2545
- >> rtnetlink_rcv+0x1c/0x20 net/core/rtnetlink.c:6576
- >> netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
- >> netlink_unicast+0x589/0x650 net/netlink/af_netlink.c:1368
- >> netlink_sendmsg+0x66e/0x770 net/netlink/af_netlink.c:1910
- >> ...
- >>
- >> write to 0xffff88813a80c832 of 1 bytes by task 22 on cpu 1:
- >> mld_ifc_work+0x54c/0x7b0 net/ipv6/mcast.c:2653
- >> process_one_work kernel/workqueue.c:2627 [inline]
- >> process_scheduled_works+0x5b8/0xa30 kernel/workqueue.c:2700
- >> worker_thread+0x525/0x730 kernel/workqueue.c:2781
- >> ...
- >>
- >> Fixes: 2d9a93b4902b ("mld: convert from timer to delayed work")
- >> Reported-by: syzbot+a9400cabb1d784e49abf@syzkaller.appspotmail.com
- >> Link: 
-https://lore.kernel.org/all/000000000000994e09060ebcdffb@google.com/
- >> Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
- >> ---
- >> net/ipv6/mcast.c | 4 ++++
- >> 1 file changed, 4 insertions(+)
- >>
- >> diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
- >> index b75d3c9d41bb..bc6e0a0bad3c 100644
- >> --- a/net/ipv6/mcast.c
- >> +++ b/net/ipv6/mcast.c
- >> @@ -2722,8 +2722,12 @@ void ipv6_mc_down(struct inet6_dev *idev)
- >> synchronize_net();
- >> mld_query_stop_work(idev);
- >> mld_report_stop_work(idev);
- >> +
- >> + mutex_lock(&idev->mc_lock);
- >> mld_ifc_stop_work(idev);
- >> mld_gq_stop_work(idev);
- >> + mutex_unlock(&idev->mc_lock);
- >> +
- >> mld_dad_stop_work(idev);
- >> }
- >>
- >
- > I saw mld_process_v1() also cancel these works when changing to v1 mode.
- > Should we also add lock there?
+> > Daniel said netkit doesn't need this locking because it is not
+> > supporting this redirect and it made me think. Would it work to make
+> > the redirect structures part of the bpf_prog-structure instead of
+> > per-CPU? My understanding is that eBPF's programs data structures are
+> > part of it and contain locking allowing one eBPF program preempt
+> > another one.
+> > Having the redirect structures part of the program would obsolete
+> > locking. Do I miss anything?
+>=20
+> This won't work, unfortunately: the same XDP program can be attached to
+> multiple interfaces simultaneously, and for hardware with multiple
+> receive queues (which is most of the hardware that supports XDP), it can
+> even run simultaneously on multiple CPUs on the same interface. This is
+> the reason why this is all being kept in per-CPU variables today.
 
-I think mld_process_v1() doesn't have a problem.
-Because mld_process_v1() is always called under mc_lock by mld_query_work().
+So I started hacking this and noticed yesterday and noticed that you can
+run multiple bpf programs. This is how I learned that it won't work.
+My plan B is now to move it into task_struct.=20
 
-mld_query_work()
-    mutex_lock(&idev->mc_lock);
-     __mld_query_work();
-        mld_process_v1();
-    mutex_unlock(&idev->mc_lock);
-
- >
- > Thanks
- > Hangbin
-
-Thanks a lot,
-Taehee Yoo
+> -Toke
+Sebastian
 
