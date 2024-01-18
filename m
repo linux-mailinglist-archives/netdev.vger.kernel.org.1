@@ -1,199 +1,94 @@
-Return-Path: <netdev+bounces-64155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54CD98317A0
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 11:59:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 835188317CA
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 12:01:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1ABF728898E
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 10:59:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B60641C212EF
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 11:01:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B362B23776;
-	Thu, 18 Jan 2024 10:59:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F52B241E9;
+	Thu, 18 Jan 2024 11:00:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="aQ7O6UoN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F+A1p7xa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA89B23754
-	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 10:59:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E920F23757;
+	Thu, 18 Jan 2024 11:00:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705575545; cv=none; b=AgQnwgtHAbTX41p7y5nSPNeI9mF1Rv1DnetJ4VgmQjSVJ2DGDopH1l2nD3YAqzgaal73Kk3Ne5LAwgDiJyMrZBTr7QghHsMf7z8111O7C80W2kIfcF5YtdPfKFxR3WHWVyu8HISRl7GKZSw3VICQlsH2CDtEUzdAjQLqK6I1o3A=
+	t=1705575626; cv=none; b=ppa8dyV9buN1bMAHCUkUsTieq21Qmfpb/FyvzhXWF+DFQ+RsSm8PS8oZLfk6/6VZvpTK4ox6wd8jvS3992zSlfAN/NsKruqbt0rmtp2AD70fxpdVVZ6/lBNzOeaz8DW70Pnh1wDUypU+lO7A0GgbBuTvPZB96GTdy05XFZHNyFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705575545; c=relaxed/simple;
-	bh=XAezkMl8AMyv2duDx8KtemVoTiY3JEudvQLd/3+rctQ=;
-	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:MIME-Version:
-	 References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:
-	 Content-Type:Content-Transfer-Encoding; b=lM1lEVINniX+mBzGpm3/kwutiXpuIgX+2Ds0M7Nn1FEHMw/KvBhXm1NTJ17UNYj85MiYQIvaAQabUXO3bFtov/0MNVGFoMqOW4ilyH4bdajrWlpTUQJLgEAaBZEusueZZwhpNVAkaJXowhLf2GufLD3BZnBaaMveymYCuWcacrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=aQ7O6UoN; arc=none smtp.client-ip=209.85.217.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-46776ec433eso2612763137.3
-        for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 02:59:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1705575541; x=1706180341; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5kKGm3Yb15Ds8SRKMOgK2sjBctiic0JJzDM70AH8Db0=;
-        b=aQ7O6UoNqmzc2cKpHkK2ZRyyOJkrA8Je2CWKJiihaMI4+R48ADOGrw4wYaVKpHFFxJ
-         IUKHCUdSv1JNigRvl+evdCz6dl/8BVFHsqBb3xtycSRK3YTlJ2PcIaxBFfdTW650Foa+
-         +KhO4G+I0EYvH2IOoEAf41CJAPcM384cpEsYY2o3qS9Y3GlMA0VSvbsv1gVIVPkPPNLg
-         rLZq91PkAnJ2zT8GQy0V6IXgVingNu/QsB7UAnRd34xOFGuHUTO+jk6Z6lCWts0UCkSh
-         6UGDSOkh6lOcgQOF7HDnZK78rHap2aHIOAD3WufjqaZOTeS/scQwL9+Bh6Ur0FevruQQ
-         EXgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705575541; x=1706180341;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5kKGm3Yb15Ds8SRKMOgK2sjBctiic0JJzDM70AH8Db0=;
-        b=TKGMOWFv0vESFgxOtbOb6YYZZp6i+/jiuTHiEXp3S8fNdTlJBSxcFOHJPtAACmVKGR
-         POJ7qqzmj0EHmLiFAVe+SADFL52GcRjdCkjZ1hb//7cQEnTmx3sGMIhfNIPj1y+ME3qs
-         eIGyPQHZxtj/3Uq2Tt25ZXOLMSsEAJZjabProiVHaX4YrYD0MRJAgkVNn9eVaZjjdhry
-         5Z//aZOXnNGU6Y6azLjoHysZ8r13sXwA7asJznbdPahVfThe9qlJ3kMCjOSRTcRYwVYf
-         gx8vTT8Ij9Xy5fuKoqJAuMWn2Mzs+m5h4oScvsMbQ1hLHMtMNbpVcsXG9cPJlC/CCtWQ
-         dp+g==
-X-Gm-Message-State: AOJu0YxARh7LW9bWXfJ3zDdpAyIT4F+/R/JdWVIHi4QFU7A6UuqQVQ/o
-	1cOslcS5AzelihNuJLJ+D8wtkkuegLtbb2FIgHBAOQjGiimAtW08lf2TlXIlrwLhNz6iWPjE9Ev
-	MIy3vqxM+UWwzrTdLJIHk2lLTCpOjManfRfvOhg==
-X-Google-Smtp-Source: AGHT+IErNYi3bFXEg7C3n/Klc9CkVbXd1qVuTyh7DRA66+TJldDEJ7m4oEy9GWfbxO/EHLmuHiKQcKdlVYw+jqqEvk0=
-X-Received: by 2002:a67:fbcf:0:b0:468:633:aabb with SMTP id
- o15-20020a67fbcf000000b004680633aabbmr669252vsr.1.1705575541672; Thu, 18 Jan
- 2024 02:59:01 -0800 (PST)
+	s=arc-20240116; t=1705575626; c=relaxed/simple;
+	bh=cRYFExc6WC+tiYLcPkfNYEjhiR8+sS9NYHHJeCzHzMY=;
+	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
+	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Q9Kz6MizanLO6wL/LgrtFi+Tt5PLsS1WArp9tWf4BjfBNteaP9pPlQdr18deDPyoSYyYxP07Bq+TVooEbZq8sM4sbvuGERbRyFK2SR1q6EXKDvgVoMyicycOWpfIyeijpaigZEEZdSttRDkr+DbNBiW7g14EjuYDOWz0/ZkeSH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F+A1p7xa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9FCF4C433C7;
+	Thu, 18 Jan 2024 11:00:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705575625;
+	bh=cRYFExc6WC+tiYLcPkfNYEjhiR8+sS9NYHHJeCzHzMY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=F+A1p7xa1VUcZCcxOPKBMNsEqK+dpbD240JCkFErbzzkVAVArdBjcecYImja2ETUt
+	 wWUhD3L8v6V4EBGaRzlK9PpHYn1vBl3opMj+LTlQ2OfeMZOXll1Xr9+SUTCVBxHn5C
+	 jAzISiemLLHPetrKE1O8uK8jx5WA2ogwnuk30JX5ZPRVaHa0/zlMDHvvV9iodq1Fpv
+	 X2jNPik5YVUfIZmO4cRXHoJbMT/ml6Mp/d1UKa7X1fzpDqlKARZDaB8D0lku/rhzTE
+	 2ykTjn5ZhFORqz/xQWp3xsNcRCtTpsE/EirXjVQx+5NOkLlxQGhTV4AC8I+At21gro
+	 ReL6WazBsPUBQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 88C12DFC697;
+	Thu, 18 Jan 2024 11:00:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240117160748.37682-1-brgl@bgdev.pl> <20240117160748.37682-5-brgl@bgdev.pl>
- <2024011707-alibi-pregnancy-a64b@gregkh>
-In-Reply-To: <2024011707-alibi-pregnancy-a64b@gregkh>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Thu, 18 Jan 2024 11:58:50 +0100
-Message-ID: <CAMRc=Mef7wxRccnfQ=EDLckpb1YN4DNLoC=AYL8v1LLJ=uFH2Q@mail.gmail.com>
-Subject: Re: [PATCH 4/9] PCI: create platform devices for child OF nodes of
- the port node
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Kalle Valo <kvalo@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Heiko Stuebner <heiko@sntech.de>, 
-	Jernej Skrabec <jernej.skrabec@gmail.com>, Chris Morgan <macromorgan@hotmail.com>, 
-	Linus Walleij <linus.walleij@linaro.org>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Arnd Bergmann <arnd@arndb.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
-	=?UTF-8?B?TsOtY29sYXMgRiAuIFIgLiBBIC4gUHJhZG8=?= <nfraprado@collabora.com>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Peng Fan <peng.fan@nxp.com>, 
-	Robert Richter <rrichter@amd.com>, Dan Williams <dan.j.williams@intel.com>, 
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>, Terry Bowman <terry.bowman@amd.com>, 
-	Lukas Wunner <lukas@wunner.de>, Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>, 
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>, Abel Vesa <abel.vesa@linaro.org>, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-pci@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] selftests: netdevsim: add a config file
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170557562555.29568.10174791710118557642.git-patchwork-notify@kernel.org>
+Date: Thu, 18 Jan 2024 11:00:25 +0000
+References: <20240116154311.1945801-1-kuba@kernel.org>
+In-Reply-To: <20240116154311.1945801-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, shuah@kernel.org, jiri@resnulli.us,
+ linux-kselftest@vger.kernel.org
 
-On Wed, Jan 17, 2024 at 5:45=E2=80=AFPM Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
->
-> On Wed, Jan 17, 2024 at 05:07:43PM +0100, Bartosz Golaszewski wrote:
-> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> >
-> > In order to introduce PCI power-sequencing, we need to create platform
-> > devices for child nodes of the port node.
->
-> Ick, why a platform device?  What is the parent of this device, a PCI
-> device?  If so, then this can't be a platform device, as that's not what
-> it is, it's something else so make it a device of that type,.
->
+Hello:
 
-Greg,
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-This is literally what we agreed on at LPC. In fact: during one of the
-hall track discussions I said that you typically NAK any attempts at
-using the platform bus for "fake" devices but you responded that this
-is what the USB on-board HUB does and while it's not pretty, this is
-what we need to do.
+On Tue, 16 Jan 2024 07:43:11 -0800 you wrote:
+> netdevsim tests aren't very well integrated with kselftest,
+> which has its advantages and disadvantages. But regardless
+> of the intended integration - a config file to know what kernel
+> to build is very useful, add one.
+> 
+> Fixes: fc4c93f145d7 ("selftests: add basic netdevsim devlink flash testing")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> 
+> [...]
 
-Now as for the implementation, the way I see it we have two solutions:
-either we introduce a fake, top-level PCI slot platform device device
-that will reference the PCI host controller by phandle or we will live
-with a secondary, "virtual" platform device for power sequencing that
-is tied to the actual PCI device. The former requires us to add DT
-bindings, add a totally fake DT node representing the "slot" which
-doesn't really exist (and Krzysztof already expressed his negative
-opinion of that) and then have code that will be more complex than it
-needs to be. The latter allows us to not change DT at all (other than
-adding regulators, clocks and GPIOs to already existing WLAN nodes),
-reuse the existing parent-child relationship between the port node and
-the instantiated platform device as well as result in simpler code.
+Here is the summary with links:
+  - [net] selftests: netdevsim: add a config file
+    https://git.kernel.org/netdev/net/c/39369c9a6e09
 
-Given that DT needs to be stable while the underlying C code can
-freely change if we find a better solution, I think that the second
-option is a no-brainer here.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-> > They will get matched against
-> > the pwrseq drivers (if one exists) and then the actual PCI device will
-> > reuse the node once it's detected on the bus.
->
-> Reuse it how?
->
 
-By consuming the same DT node using device_set_of_node_from_dev() when
-the PCI device is registered. This ensures we don't try to bind
-pinctrl twice etc.
-
-> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> > ---
-> >  drivers/pci/bus.c    | 9 ++++++++-
-> >  drivers/pci/remove.c | 3 ++-
-> >  2 files changed, 10 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/drivers/pci/bus.c b/drivers/pci/bus.c
-> > index 9c2137dae429..8ab07f711834 100644
-> > --- a/drivers/pci/bus.c
-> > +++ b/drivers/pci/bus.c
-> > @@ -12,6 +12,7 @@
-> >  #include <linux/errno.h>
-> >  #include <linux/ioport.h>
-> >  #include <linux/of.h>
-> > +#include <linux/of_platform.h>
-> >  #include <linux/proc_fs.h>
-> >  #include <linux/slab.h>
-> >
-> > @@ -342,8 +343,14 @@ void pci_bus_add_device(struct pci_dev *dev)
-> >        */
-> >       pcibios_bus_add_device(dev);
-> >       pci_fixup_device(pci_fixup_final, dev);
-> > -     if (pci_is_bridge(dev))
-> > +     if (pci_is_bridge(dev)) {
-> >               of_pci_make_dev_node(dev);
-> > +             retval =3D of_platform_populate(dev->dev.of_node, NULL, N=
-ULL,
-> > +                                           &dev->dev);
->
-> So this is a pci bridge device, not a platform device, please don't do
-> this, make it a real device of a new type.
->
-
-Not sure what you mean. Are you suggesting adding a new bus? Or do we
-already have a concept of PCI bridge devices in the kernel?
-
-Bartosz
-
-> thanks,
->
-> greg k-h
 
