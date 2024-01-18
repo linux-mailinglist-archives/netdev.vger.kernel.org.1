@@ -1,119 +1,190 @@
-Return-Path: <netdev+bounces-64112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A4F5831290
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 06:56:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC903831307
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 08:14:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 042D1281360
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 05:56:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CC3F2822B5
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 07:14:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 214D6749D;
-	Thu, 18 Jan 2024 05:56:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E22BE8F60;
+	Thu, 18 Jan 2024 07:14:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NRENaElS"
+	dkim=pass (2048-bit key) header.d=naccy.de header.i=@naccy.de header.b="Fdf6dnrI";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="tit2fNZ8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from wflow2-smtp.messagingengine.com (wflow2-smtp.messagingengine.com [64.147.123.137])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F0B5125A1
-	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 05:55:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A2EDBE50
+	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 07:14:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.137
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705557360; cv=none; b=iR5bIAojJMTI+FQgOokI3kYDhkj3rY+PZkG1La5EptnXZ3GiSB0KEAAaGJ0p1VZZUL5yGpa1V/LJLAl4xwsbD9wEmE2lWw7np2mp+ea99xR1f4mJOs9wtmm1xokbMndKajCiOV07XyN5fh6eKI+vVxuy78GERBVhnwMerJrLMIg=
+	t=1705562090; cv=none; b=UN4GeJT17I6gvUPD8QPlYDYNvjWePnct9F17zetZ3BY/1QhzBq9tdVKMH34pEoGw3s1W1jgt3hbi4PE6BmfLMX8xqYq0oP02dljccsnRIhmDcHxcGVoKZFaYGWaNbXfiSKgjHDtqGJYZt09cZ3yZmiMEPH12XJCUxqP/veeXvRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705557360; c=relaxed/simple;
-	bh=J51DROh2q9HcrktYaKvfGfWFdO2nlysGA+y50w6ncxo=;
-	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:MIME-Version:
-	 From:Date:Message-ID:Subject:To:Content-Type; b=uVTnhSAjFUEY4qvHcXUPxlXttRM4MPQEfNfhPeK4VxMDrh+2YBjfiGCgSvrJZUK4O8mf19a7uA+7/8W/ew4KvtLr6o772n/roH+vo7qLCpm47q1rX0nAqexfF8EZhhNCm5O9Rg7YDoWY3rLPNYD2YYj8oSyy5Vttn2jTtp3njb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NRENaElS; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-50e7b273352so13270699e87.1
-        for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 21:55:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705557356; x=1706162156; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=J51DROh2q9HcrktYaKvfGfWFdO2nlysGA+y50w6ncxo=;
-        b=NRENaElSvolTDyi2lxQAg21mYZKqyvRhxcCffsg+PNlounEHvysOxbZP3LanxpgjID
-         KoqyVNEB+QX6+djuzvixITQjaE6vD1929onHqUyOjEu/2DHpr+k1D14dYh0oPyV4kJHa
-         4NDz8hCN7qGvmPygWsM+rC4yFSYuv+jhwfvyn5SPoREjABBoEcdQ+4L9JHZrrGB5QMkM
-         B1DqDe8awArwFj1zQnPY77CSELhvB62/woaaddWwSktE9JyPl7PUjs2Jz6IEoRS6F95W
-         /GpfEcOAx1MTN7YeaQ7F35Bia8P+stDUpNd6R4pFoSp/6rvBKoSh0JMGiuhRH8Ln9IsR
-         AlWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705557356; x=1706162156;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=J51DROh2q9HcrktYaKvfGfWFdO2nlysGA+y50w6ncxo=;
-        b=AOj10JpR00mseT/9PpkbntnGZt75Nbqb9B3A2Uq+QrdORUw43VXvxi4hKUTucNxPFy
-         6h4VyjAeApzEC0XkY2ua/2nBOX5X2eoo9/RK8amgOkxXYxn0I9rfXhVoIZbHW6ZFnVYK
-         2XhmlmzvXO8nLaU/xuaDzup+s1OMFZ9vDtmGhQC3wQdBuZqASuiHGKyGeywhpV1Rw/IW
-         Vw6YNzmdbbRmmJgJCZ4CSVyHO9LKpEQWoujssz0eE4vcKnzPut6EbR894cIF0MFvBeNe
-         Y8Fj8Do/bQYPA+g3LenXz/ql3j1nMzSzrDjtYZwcMoRmP8dOQl/L825nmPy9S/8tgqXO
-         X5vQ==
-X-Gm-Message-State: AOJu0Yzv0s9Q3jiqqrFE1Pwf0nq7awEyiT8O2HjlxM6kh/P3gywZAU0C
-	yjO1WVoDtO8zNHml1H1bsDTegpQg98bQnbskMd7ADftpuEzUnORNPbyJ4MR2hICewAz1lBqsQJc
-	ZQxyRhkvIZK4Gn4iBkqUNRGE00SLm/vvWJJQ=
-X-Google-Smtp-Source: AGHT+IHXR3HpmZhyLz1SZZ+rmZvEEGtMKWaVW3ANmc4NXme8CjbvdOVUU1VYG4And3Rp+sk1XcsO0Td99A7/DmcJXLM=
-X-Received: by 2002:a19:6903:0:b0:50e:aa30:5ea1 with SMTP id
- e3-20020a196903000000b0050eaa305ea1mr117116lfc.61.1705557355828; Wed, 17 Jan
- 2024 21:55:55 -0800 (PST)
+	s=arc-20240116; t=1705562090; c=relaxed/simple;
+	bh=KUVgivdhZEzLCu5zo3/O9KTMEwC6WqkE2GfgkXjdxpo=;
+	h=Received:Received:DKIM-Signature:DKIM-Signature:X-ME-Sender:
+	 X-ME-Received:X-ME-Proxy-Cause:X-ME-Proxy:Feedback-ID:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding; b=HzyjXOYmV6/vfd1nBFgaYoC0qbQrdVKY2fpdJDbbPxE3HeNr3CPILCjdCgA/XWRSMAWQNz3HaZYSt2z8etYewpRBwQomuE0aEmJxwjdJaQD8NOAZWE19WqDvfiWYx/2QlQY5tqHNOj0UQ9AnjJGdWSk5L6zkvwv+fAnZXgN0dhg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=naccy.de; spf=pass smtp.mailfrom=naccy.de; dkim=pass (2048-bit key) header.d=naccy.de header.i=@naccy.de header.b=Fdf6dnrI; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=tit2fNZ8; arc=none smtp.client-ip=64.147.123.137
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=naccy.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=naccy.de
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+	by mailflow.west.internal (Postfix) with ESMTP id BBC882CC006E;
+	Thu, 18 Jan 2024 02:14:45 -0500 (EST)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute4.internal (MEProxy); Thu, 18 Jan 2024 02:14:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=naccy.de; h=cc
+	:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm1; t=1705562085; x=1705565685; bh=7aRTAYX5R94l0DBpUNpuo
+	R0w/jCr1r9T3n529OS2yX8=; b=Fdf6dnrInvAXZqr+FcVwtpXPTzlwhOSJSo0GQ
+	J5xLdE/vI7CH4lhCc0HK0h2Z/nAeYVMMCYQN09eye87Sxg2jAW1YO3GcnZFaFMPf
+	nZEshjhMp59HvUlVApxlENOyy5ufw+i5hWbW6YUTYpWJvvlLHvsnfpQrt5+gm2uG
+	M/b69u6taLqyi3bYJGbW4521ZHeJyeLJ7top8x6gHba8bOJY/NPbBsj+3tJyjx/X
+	Ws5KxtL3hJQA0iFXfewPAp7zB737Uf+kCmHdsshlKdvWdzVc0QCEPHb9LFwgkQJp
+	gY6zHMMOG4MaXe1w2A9tsDRUzIEm+oOwJ7gYNJpyWi/17Ct1Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm3; t=1705562085; x=1705565685; bh=7aRTAYX5R94l0DBpUNpuoR0w/jCr
+	1r9T3n529OS2yX8=; b=tit2fNZ8BgM1coY3HJb6ZIO0F4NR5JxR8r3BaWEsnp5O
+	i9zhV5CvRiM+syNoGB0NdgI4fTl64kQcMNBfKPyGdfhTXjqScQoUwvxDNqot3HzX
+	y6GZMOFIaFiV7rsIUJrWXrKVnraa9IixF22c9sSVVgvWurXFd8NENVnUYjS3G2xB
+	UNI1B5XCNRPKlwjndRQgovUXdNfc7YnqnP+OpLA8BNvKSyqQqGak238FxQfBgrf6
+	SL2lX+2un1Dc+x6yTi5EYaX9ygAKZHqMLUpiRilYxLTyGaJH31jCAr1NWMZYLkC3
+	NDHY3Csq7BY+aJLf4B7X9moVVg9AKTNMF6xIeAg64g==
+X-ME-Sender: <xms:5M-oZVQqMXz5cQoHQuWS5qxXjTULV0GiODqU7QY8jZk6uvO-cu_6uA>
+    <xme:5M-oZeyZXDJLWS3AhI9eWofC_R6IEfXm7mECaDrD-NIV6bsfXHsspMFKWz64Gk3a6
+    qneprIB1F5F6nNUI5o>
+X-ME-Received: <xmr:5M-oZa3ppygWrQcQs-nqi8hDDymVNYUjgRpl5q-P8vRd6uHJiRpGFX0-jUUYXKv6aPBSQ5tX5VMeLS_kYcAxfgSShlxc7oe0b8iLyETtYA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdejiedguddtgecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpefsuhgvnhht
+    ihhnucffvghslhgrnhguvghsuceoqhguvgesnhgrtggthidruggvqeenucggtffrrghtth
+    gvrhhnpefhffeiiedvieehgeeljedtueeijeelgfffjeefheehhfehffeifeegudfhheei
+    hfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehqug
+    gvsehnrggttgihrdguvg
+X-ME-Proxy: <xmx:5M-oZdBYz-F7gh8Ynn_9OXBYvtJBl4GGD1maORBdFp0PevJQkZmRyg>
+    <xmx:5M-oZeh0F-ubj06WlLRNYb3CiPK0_xYGFnhz86ovOH8d0OALRu7PJw>
+    <xmx:5M-oZRrTy6ID9VEGUw5Nx4eu1GzgiEL-2I6zW0YaFCcqYtTZ66cU8w>
+    <xmx:5c-oZQZx8JfV2kXpvrHS7423QiVJ5hYiyD7BJxaUGd-UqyOtczl8TIzQ8N9z32aj>
+Feedback-ID: i14194934:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 18 Jan 2024 02:14:43 -0500 (EST)
+From: Quentin Deslandes <qde@naccy.de>
+To: netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>,
+	David Ahern <dsahern@gmail.com>,
+	Martin KaFai Lau <martin.lau@kernel.org>,
+	Quentin Deslandes <qde@naccy.de>,
+	kernel-team@meta.com
+Subject: [RFC iproute2 v6 0/3] ss: pretty-printing BPF socket-local storage
+Date: Thu, 18 Jan 2024 04:15:09 +0100
+Message-ID: <20240118031512.298971-1-qde@naccy.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Thu, 18 Jan 2024 02:55:43 -0300
-Message-ID: <CAJq09z6u+=zHPQT05t5pdXCZdTuy=zLiT9N8Yayc+MoFb1L5iA@mail.gmail.com>
-Subject: DSA driver support for RTL8367R
-To: "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, =?UTF-8?Q?Alvin_=C5=A0ipraga?= <ALSI@bang-olufsen.dk>, 
-	Linus Walleij <linus.walleij@linaro.org>, =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>, 
-	Christian Lamparter <chunkeey@gmail.com>, Vladimir Oltean <olteanv@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+BPF allows programs to store socket-specific data using
+BPF_MAP_TYPE_SK_STORAGE maps. The data is attached to the socket itself,
+and Martin added INET_DIAG_REQ_SK_BPF_STORAGES, so it can be fetched
+using the INET_DIAG mechanism.
 
-While net-next is closed, I played with a device that uses RTL8367R.
-It might not be a popular version, as most next product iterations
-switched to RTL8367RB or something else.
+Currently, ss doesn't request the socket-local data, this patch aims to
+fix this.
 
-It looks pretty close to the registers rtl8365mb uses, and I could
-bring it up with some tweaks. It also reproduced the bug Christian
-reported last year
-(https://lore.kernel.org/netdev/802305c6-10b6-27e6-d154-83ee0abe3aeb@gmail.com/T/),
-which we still need to fix someday (no supported devices affected). My
-device also has LEDs that might help expand the LED support to
-rtl8365mb. However, I could not enable the CPU tagger. I played with
-two registers: RTL8365MB_CPU_PORT_MASK_REG 0x1219 (by default 0x0000)
-and RTL8365MB_CPU_CTRL_REG 0x121A (by default 0x0002), but nothing
-seems to be changing what I get in eth0: external packets never have
-the CPU tag, and the switch does not react to packets with a CPU tag.
+The first patch requests the socket-local data for the requested map ID
+(--bpf-map-id=) or all the maps (--bpf-maps). It then prints the map_id
+in a dedicated column.
 
-GPL packages from products that use the RTL8367R indicate that they
-use the rtl8365b "vendor API." That API does have the functions to
-enable the CPU tag touching the same registers I mentioned before. I
-wonder if that switch does support CPU tagging. Does anyone have a
-clue or access to docs/vendor support?
+Patch #2 uses libbpf and BTF to pretty print the map's content, like
+`bpftool map dump` would do.
 
-Even without the CPU tag, we could try the 802.1Q tagger. I didn't
-find what limitations that kind of tag would introduce, but it might
-be enough for some cases (or else ocelot-8021q wouldn't exist). An
-802.1Q tagger would also be interesting for those devices that cannot
-handle the checksum offload with an alien CPU tag.
+Patch #3 updates ss' man page to explain new options.
 
-Anyway, an 802.1Q tagger might require VLAN support, which rtl8365mb
-does not have. Before digging into that, we need to fix that
-limitation. Alvin, you were working on forward offloading/vlan
-support. Could you share how it is?
+While I think it makes sense for ss to provide the socket-local storage
+content for the sockets, it's difficult to conciliate the column-based
+output of ss and having readable socket-local data. Hence, the
+socket-local data is printed in a readable fashion over multiple lines
+under its socket statistics, independently of the column-based approach.
 
-Regards,
+Here is an example of ss' output with --bpf-maps:
+[...]
+ESTAB                  340116             0 [...]
+    map_id: 114 [
+        (struct my_sk_storage){
+            .field_hh = (char)3,
+            (union){
+                .a = (int)17,
+                .b = (int)17,
+            },
+        }
+    ]
 
-Luiz
+Changed this series to an RFC as the merging window for net-next is
+closed.
+
+Changes from v5:
+* Add support for --oneline when printing socket-local data.
+* Use \t to indent instead of "  " to be consistent with other columns.
+* Removed Martin's ack on patch #2 due to amount of lines changed.
+Changes from v4:
+* Fix return code for 2 calls.
+* Fix issue when inet_show_netlink() retries a request.
+* BPF dump object is created in bpf_map_opts_load_info().
+Changes from v3:
+* Minor refactoring to reduce number of HAVE_LIBBF usage.
+* Update ss' man page.
+* btf_dump structure created to print the socket-local data is cached
+  in bpf_map_opts. Creation of the btf_dump structure is performed if
+  needed, before printing the data.
+* If a map can't be pretty-printed, print its ID and a message instead
+  of skipping it.
+* If show_all=true, send an empty message to the kernel to retrieve all
+  the maps (as Martin suggested).
+Changes from v2:
+* bpf_map_opts_is_enabled is not inline anymore.
+* Add more #ifdef HAVE_LIBBPF to prevent compilation error if
+  libbpf support is disabled.
+* Fix erroneous usage of args instead of _args in vout().
+* Add missing btf__free() and close(fd).
+Changes from v1:
+* Remove the first patch from the series (fix) and submit it separately.
+* Remove double allocation of struct rtattr.
+* Close BPF map FDs on exit.
+* If bpf_map_get_fd_by_id() fails with ENOENT, print an error message
+  and continue to the next map ID.
+* Fix typo in new command line option documentation.
+* Only use bpf_map_info.btf_value_type_id and ignore
+  bpf_map_info.btf_vmlinux_value_type_id (unused for socket-local storage).
+* Use btf_dump__dump_type_data() instead of manually using BTF to
+  pretty-print socket-local storage data. This change alone divides the size
+  of the patch series by 2.
+
+Quentin Deslandes (3):
+  ss: add support for BPF socket-local storage
+  ss: pretty-print BPF socket-local storage
+  ss: update man page to document --bpf-maps and --bpf-map-id=
+
+ man/man8/ss.8 |   6 +
+ misc/ss.c     | 413 ++++++++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 410 insertions(+), 9 deletions(-)
+
+--
+2.43.0
+
 
