@@ -1,157 +1,157 @@
-Return-Path: <netdev+bounces-64212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2C50831CAE
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 16:39:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77DD0831CD2
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 16:52:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 159F31C22EFE
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 15:39:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C6BC1F21AB3
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 15:52:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E9E24B5D;
-	Thu, 18 Jan 2024 15:39:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8137A2554A;
+	Thu, 18 Jan 2024 15:52:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="HW8b1b/n"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LYU7To37"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32E6023741;
-	Thu, 18 Jan 2024 15:39:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14C6225639
+	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 15:52:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705592390; cv=none; b=IRUz4+1U5ry1S0+5PE+IHQ9zYT6yXj/6TMQ0niAci5jbOIHt77oySjpmgfnF/Ny9XzvCjLSbgwJfyTQPSKVI1+hne4H1+53qJ4kYoVooEWdVgeXkXE2yXtFByvVW9ytQNWBelF28s7F9JdaaNgO19m0GvXxdZYfnrs7qxWjThpI=
+	t=1705593160; cv=none; b=OZmGEsni32BSOgvB7sMhGzRGBsb7GEvloyRMomcy+R0zYwOEXHcF5aLr+3jEX31hMivE1ie77eRBgwbUsQ/ugQaQDiC9aLqQHJx6bggmOtzqLC5qAcXb8gWdgiZzfKuZAZHHjAiLj3Da0IjjqdWH09HFreo1vJBcd2eVZI6Vdrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705592390; c=relaxed/simple;
-	bh=t1ixpqNa0Al9bt5CBH49/fYjoBI39QDMqXsPj57Vcmw=;
-	h=DKIM-Signature:Received:From:To:Cc:Subject:Date:Message-Id:
-	 X-Mailer:MIME-Version:Content-Transfer-Encoding:
-	 X-Authenticated-Sender:X-Virus-Scanned; b=QuTPc4HU4lWkNOpr6mhD9S8ha78IfKfD3VMzf1w1Ki8tj5fC5TuT9GhXMTWK/oa30Tqanian9CKq7PCxCJUUtMiMUEerg5ArkVZm2/Qsq5VOPjdAMpKkCr3bTt6JXw5EFdlfOu0i0gAxsfkqBh19QKpgGwbQh4VDy+PTf4Pe76U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=HW8b1b/n; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=CtwVExvBIVDcDDaph/forOCRNFeXQfKZzFwu31o2+xU=; b=HW8b1b/nYlo8u+C/ewOn3AO9lp
-	MDTu4i/PYvz/sIq6VH5Dwu8gy03QPbOItH7H/Mv8h3acmOvKtxGkuQRXMculdtsOcrhEtkjoFry3d
-	RaxJHCb5+aiU9CSoEEJGxuNIJU6mA3y+0Vf9QIndV10jci1FiEsrs17NFG1E6kurljEMeZbJpl+J4
-	fooVQqHfFFYgdMNh8u1gQYBjLb/wlJvrEWAem5FN9y54clP2VLO8JK4tNW+j7c0WthjbHNZN+LSzo
-	6ijYueKzvRjjowXcGnyWmvdGHIzlCuheNJJjzf2OuDQ7J4pAYjk2d1nlLad5G+AObw4jiTf4Gab1/
-	toeMM8Ng==;
-Received: from 17.249.197.178.dynamic.dsl-lte-bonding.lssmb00p-msn.res.cust.swisscom.ch ([178.197.249.17] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rQUUT-000A5n-FV; Thu, 18 Jan 2024 16:39:37 +0100
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: davem@davemloft.net
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	daniel@iogearbox.net,
-	ast@kernel.org,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: pull-request: bpf 2024-01-18
-Date: Thu, 18 Jan 2024 16:39:36 +0100
-Message-Id: <20240118153936.11769-1-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.21.0
+	s=arc-20240116; t=1705593160; c=relaxed/simple;
+	bh=eoDSeQr8pVcS/FvAM2wMPsYiP72y86cV068knJPCB5g=;
+	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:MIME-Version:
+	 References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:
+	 Content-Type:Content-Transfer-Encoding; b=mYVIDtALF9aY/3UpV1Cneq/xEFdbbzDy4vTPUyPSYxNFLjLKZ7F2tTIK/m67U5YJK3XA4ckf1nWJl6G3zpmABDo9FM47gOQDAWkB+Na3y3b6iQMIMIxXVwSjLw5t24GzRYFXwh69+7Wbl9LLwmjQDOtkjVzJ0Yz0wQEqyATfS0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LYU7To37; arc=none smtp.client-ip=209.85.166.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3600b2c43a8so103795ab.0
+        for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 07:52:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1705593158; x=1706197958; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f5hc3tdZSax9kmNj7MqnH4qiYeZj7qOKUUj3kHm8TUA=;
+        b=LYU7To37tIa0ZtfYKrV4XmtOMkTaId70apCsw9v7jLkUKlXKP8WWOLS1D7J0BXMXp7
+         jLO6SFho1ybiJWX/G0znGYaZJBMIsyEcALPSyhQTpPitfocnhTTEJCyUKzPv7pu+MJZ/
+         si0loRm0xCWFKt05BCrkzlz0sIRinAAny+2hBsfiqNXqTJSbkteIZr2JiRmm4m8MlW53
+         Hxewf4RR9L42p4tKcF8a/yL3DImvpghjw4zX8s2Q3YAGhhSbvHA+7qwlJdkrX9VtxSrl
+         I2uxrx0Q0es7sRKJDyU0NGFtqeHlyIjP0oKsMStm3QvVUftRiQ+sMco6/OzazoWNjRA4
+         8FgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705593158; x=1706197958;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=f5hc3tdZSax9kmNj7MqnH4qiYeZj7qOKUUj3kHm8TUA=;
+        b=SeCLV1cjyladujLuF6KEGg2Appxu2d4Vvqq3fDlC7u7gf2epf/3GeEqF+/B8qVnhq5
+         007E3gYrK/oS7qMBGhyLCUPMajXGgETQdSR9W+R5nnt0aq9GdEV+dPRdhe8BQ8TBk6xi
+         PFLkWa8mHUiMBuztncKwK66zNP6Ee6GggyVp/uwtVmABTf1P2IKivR5UpMoQvDzGcBDC
+         pQv7fl/ojeCuIv2uVQK+CKESYLxo8oWkMWT16yUBHSDkfmbnbplOCQbocwSmYEJ7i5Zv
+         VOnqb9x4DClAoWMQIif5VIJ1fKFzz0w1mQiMOMwX+1e8faE6L2aXlxarm+WEV95lBL+6
+         8q2w==
+X-Gm-Message-State: AOJu0Yyrk/AcD35zZRxrz1WvCxBonE8/zQwOf/cco2duzDmSqEY0WWQQ
+	Kvpoj8oVlMVI4YjgWGNw1HtsEZftITrKenvp6MPhPgs8Hud75RmZGHy0uwOaSXDURheSy6JIqS5
+	BPTsaORx0iNCF5G8dtey/lJ2BFQVmsBLEZ0lC
+X-Google-Smtp-Source: AGHT+IGAwESndYfI1N1oc/qGEjaUnVS0eu9bq7GXdbocjvFCsczZHAScqEGAsOZ0ZdEl/vBm4LYjJTcsp0/Wt/i3QZM=
+X-Received: by 2002:a92:c5a5:0:b0:360:93a3:311d with SMTP id
+ r5-20020a92c5a5000000b0036093a3311dmr69315ilt.17.1705593157956; Thu, 18 Jan
+ 2024 07:52:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27158/Thu Jan 18 10:41:33 2024)
+References: <20240118143504.3466830-1-edumazet@google.com> <65a9407bd77fc_1caa3f29452@willemb.c.googlers.com.notmuch>
+In-Reply-To: <65a9407bd77fc_1caa3f29452@willemb.c.googlers.com.notmuch>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 18 Jan 2024 16:52:23 +0100
+Message-ID: <CANn89i+x9qKCaQVbaf+TO8TJWMaLcW-efhAuNtatFuyrza-UaQ@mail.gmail.com>
+Subject: Re: [PATCH net] udp: fix busy polling
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
+	netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi David, hi Jakub, hi Paolo, hi Eric,
+On Thu, Jan 18, 2024 at 4:15=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Eric Dumazet wrote:
+> > Generic sk_busy_loop_end() only looks at sk->sk_receive_queue
+> > for presence of packets.
+> >
+> > Problem is that for UDP sockets after blamed commit, some packets
+> > could be present in another queue: udp_sk(sk)->reader_queue
+> >
+> > In some cases, a busy poller could spin until timeout expiration,
+> > even if some packets are available in udp_sk(sk)->reader_queue.
+> >
+> > Fixes: 2276f58ac589 ("udp: use a separate rx queue for packet reception=
+")
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > ---
+> >  include/linux/skmsg.h |  6 ------
+> >  include/net/sock.h    |  5 +++++
+> >  net/core/sock.c       | 10 +++++++++-
+> >  3 files changed, 14 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
+> > index 888a4b217829fd4d6baf52f784ce35e9ad6bd0ed..e65ec3fd27998a5b82fc2c4=
+597c575125e653056 100644
+> > --- a/include/linux/skmsg.h
+> > +++ b/include/linux/skmsg.h
+> > @@ -505,12 +505,6 @@ static inline bool sk_psock_strp_enabled(struct sk=
+_psock *psock)
+> >       return !!psock->saved_data_ready;
+> >  }
+> >
+> > -static inline bool sk_is_udp(const struct sock *sk)
+> > -{
+> > -     return sk->sk_type =3D=3D SOCK_DGRAM &&
+> > -            sk->sk_protocol =3D=3D IPPROTO_UDP;
+> > -}
+> > -
+> >  #if IS_ENABLED(CONFIG_NET_SOCK_MSG)
+> >
+> >  #define BPF_F_STRPARSER      (1UL << 1)
+> > diff --git a/include/net/sock.h b/include/net/sock.h
+> > index a7f815c7cfdfdf1296be2967fd100efdb10cdd63..b1ceba8e179aa5cc4c90e98=
+d353551b3a3e1ab86 100644
+> > --- a/include/net/sock.h
+> > +++ b/include/net/sock.h
+> > @@ -2770,6 +2770,11 @@ static inline bool sk_is_tcp(const struct sock *=
+sk)
+> >       return sk->sk_type =3D=3D SOCK_STREAM && sk->sk_protocol =3D=3D I=
+PPROTO_TCP;
+> >  }
+> >
+> > +static inline bool sk_is_udp(const struct sock *sk)
+> > +{
+> > +     return sk->sk_type =3D=3D SOCK_DGRAM && sk->sk_protocol =3D=3D IP=
+PROTO_UDP;
+> > +}
+> > +
+>
+> Since busy polling code is protocol (family) independent, is it safe
+> to assume sk->sk_family =3D=3D PF_INET or PF_INET6 here?
 
-The following pull-request contains BPF updates for your *net* tree.
+Hmm. This is a valid point.
 
-We've added 10 non-merge commits during the last 5 day(s) which contain
-a total of 12 files changed, 806 insertions(+), 51 deletions(-).
+It seems the only current user of sk_is_udp(), bpf_sk_lookup_assign()
+can only be used from inet sockets,
 
-The main changes are:
-
-1) Fix an issue in bpf_iter_udp under backward progress which prevents user
-   space process from finishing iteration, from Martin KaFai Lau.
-
-2) Fix BPF verifier to reject variable offset alu on registers with a type
-   of PTR_TO_FLOW_KEYS to prevent oob access, from Hao Sun.
-
-3) Follow up fixes for kernel- and libbpf-side logic around handling arg:ctx
-   tagged arguments of BPF global subprogs, from Andrii Nakryiko.
-
-Please consider pulling these changes from:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
-
-Thanks a lot!
-
-Also thanks to reporters, reviewers and testers of commits in this pull-request:
-
-Aditi Ghag, Yonghong Song
-
-----------------------------------------------------------------
-
-The following changes since commit 894d7508316e7ad722df597d68b4b1797a9eee11:
-
-  net: netdev_queue: netdev_txq_completed_mb(): fix wake condition (2024-01-13 18:26:23 +0000)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
-
-for you to fetch changes up to 35ac085a94efe82d906d3a812612d432aa267cbe:
-
-  Merge branch 'tighten-up-arg-ctx-type-enforcement' (2024-01-17 20:20:06 -0800)
-
-----------------------------------------------------------------
-bpf-for-netdev
-
-----------------------------------------------------------------
-Alexei Starovoitov (2):
-      Merge branch 'bpf-fix-backward-progress-bug-in-bpf_iter_udp'
-      Merge branch 'tighten-up-arg-ctx-type-enforcement'
-
-Andrii Nakryiko (5):
-      libbpf: feature-detect arg:ctx tag support in kernel
-      bpf: extract bpf_ctx_convert_map logic and make it more reusable
-      bpf: enforce types for __arg_ctx-tagged arguments in global subprogs
-      selftests/bpf: add tests confirming type logic in kernel for __arg_ctx
-      libbpf: warn on unexpected __arg_ctx type when rewriting BTF
-
-Hao Sun (2):
-      bpf: Reject variable offset alu on PTR_TO_FLOW_KEYS
-      selftests/bpf: Add test for alu on PTR_TO_FLOW_KEYS
-
-Martin KaFai Lau (3):
-      bpf: iter_udp: Retry with a larger batch size without going back to the previous bucket
-      bpf: Avoid iter->offset making backward progress in bpf_iter_udp
-      selftests/bpf: Test udp and tcp iter batching
-
- include/linux/btf.h                                |   2 +-
- kernel/bpf/btf.c                                   | 231 ++++++++++++++++++---
- kernel/bpf/verifier.c                              |   4 +
- net/ipv4/udp.c                                     |  22 +-
- tools/lib/bpf/libbpf.c                             | 142 ++++++++++++-
- .../selftests/bpf/prog_tests/sock_iter_batch.c     | 135 ++++++++++++
- .../selftests/bpf/prog_tests/test_global_funcs.c   |  13 ++
- .../testing/selftests/bpf/progs/bpf_tracing_net.h  |   3 +
- .../testing/selftests/bpf/progs/sock_iter_batch.c  |  91 ++++++++
- tools/testing/selftests/bpf/progs/test_jhash.h     |  31 +++
- .../selftests/bpf/progs/verifier_global_subprogs.c | 164 ++++++++++++++-
- .../bpf/progs/verifier_value_illegal_alu.c         |  19 ++
- 12 files changed, 806 insertions(+), 51 deletions(-)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c
- create mode 100644 tools/testing/selftests/bpf/progs/sock_iter_batch.c
+But if we use sk_is_udp() in a core function like sk_busy_loop_end(),
+we need to be more careful...
 
