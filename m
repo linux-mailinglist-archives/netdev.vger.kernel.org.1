@@ -1,124 +1,83 @@
-Return-Path: <netdev+bounces-64235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96B5F831DD1
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 17:50:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8170B831DDA
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 17:51:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A3701F22240
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 16:50:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3BE10286782
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 16:51:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30BB92C1B1;
-	Thu, 18 Jan 2024 16:50:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 083AB2C1BB;
+	Thu, 18 Jan 2024 16:51:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="0SooyRW0";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="wTBlkSHL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iua8rT7j"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90F662C1B2;
-	Thu, 18 Jan 2024 16:50:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D41241E52C;
+	Thu, 18 Jan 2024 16:51:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705596612; cv=none; b=fgwpnzDsGhUCeNSPVnReAOr2BPEWUqTHT1bMEjAmlmnkQKo36Sx8MJ/1nzI15G6Fktgr6+u6h46mkPOyJRYSN57KogOTxcZ4Mt/U6omT5O2BGjd1LFHPrP6AWB++Xjk52IBogScKrAjmSvbVsylczJh790V4yRTst6f1/w7EPlI=
+	t=1705596691; cv=none; b=WG/qgc2gCHfIl2KUMKkZjvLSTPfBsGhu3LCQIcApZL7UvL+JiTjVr1cJ3G6/VIhuDzh4lOrFYP69v1UZwVLpIs19SD5orFzerGp3h72tZ4OpcIDf+mWMLPN/sOnCi7/O92g6WanM9/JIbeV3L8HANWPDMyiuImnUvEwgwxD43Mg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705596612; c=relaxed/simple;
-	bh=zdaadLxs4Ckkw6lRcG0g1ZosLJY36Mhsh/+4Lr+mqsc=;
-	h=Date:DKIM-Signature:DKIM-Signature:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:
-	 Content-Transfer-Encoding:In-Reply-To; b=UlT3Xco/r+nOytsv/iVY6vaBxxihBvb/39ko6pT8oBYSiJvHOUA4F0NeqaVHSlSGPcsLARdG7onV6QBcZjAVZIg3Lb22hrFjUNttU/HSYhc6Kk+PZ6hnp3Hc8jHBAJOfBY1CLjRWXUcK8aEeMNk1ILd3JhFzlr1MT+62LPmIoe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=0SooyRW0; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=wTBlkSHL; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Thu, 18 Jan 2024 17:50:06 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1705596607;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zdaadLxs4Ckkw6lRcG0g1ZosLJY36Mhsh/+4Lr+mqsc=;
-	b=0SooyRW0vfUQ0Ad9+s1FhK4/U4HK8JGgPj+4WpPNQwkEkDquPz1HV2In8y8/4qKYXDbcSv
-	fCi8Wi0EiD8JRYv88pNqCpaEFfenbDiDei95Hv8OXENgNRmd2A8EF8X87Kefr6WA+TMhNA
-	RKVNnC+NTeVzd5O82Ocrh0ulUtN/IKj0DxXZHkAZK9ccVqiKXqkjSelFrDuEwQpftGNcJQ
-	tN7EAvl+YbmRbN5GeOWsXmHWq4IZdu+w+gEv6AQV+yMvVa7ETs+gMe2gnecjVZq17Co1b3
-	S7fOFjgvnogY2hCVMCptzCkQGoEo15JRDRO3o87wRqKWpSPG56j0LGRjYjMmxw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1705596607;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zdaadLxs4Ckkw6lRcG0g1ZosLJY36Mhsh/+4Lr+mqsc=;
-	b=wTBlkSHLCsZKBgNRDbQ2CcK80b6axVIPWR1am1GIK42vzNe3az85EeOJNW48b36hCcl3AS
-	nbOQRJEHgQ+wYMCQ==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Network Development <netdev@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Ingo Molnar <mingo@redhat.com>, Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Hao Luo <haoluo@google.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Jiri Olsa <jolsa@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Ronak Doshi <doshir@vmware.com>, Song Liu <song@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
-	Yonghong Song <yonghong.song@linux.dev>, bpf <bpf@vger.kernel.org>
-Subject: Re: [PATCH net-next 15/24] net: Use nested-BH locking for XDP
- redirect.
-Message-ID: <20240118165006.5aWFm7Sv@linutronix.de>
-References: <20231215171020.687342-1-bigeasy@linutronix.de>
- <20231215171020.687342-16-bigeasy@linutronix.de>
- <CAADnVQKJBpvfyvmgM29FLv+KpLwBBRggXWzwKzaCT9U-4bgxjA@mail.gmail.com>
- <87r0iw524h.fsf@toke.dk>
- <20240112174138.tMmUs11o@linutronix.de>
- <87ttnb6hme.fsf@toke.dk>
- <20240117180447.2512335b@kernel.org>
- <20240118082754.9L_QFIgU@linutronix.de>
- <20240118083812.1b91ba88@kernel.org>
+	s=arc-20240116; t=1705596691; c=relaxed/simple;
+	bh=R6FcPnDT92v22HuM2bu0YUkieECXLxrnglbf24UlY9Y=;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 In-Reply-To:References:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding; b=IO0Pr5q1WyYtV9+4HLudsa+RZcAKn+mQef9W4kRUKGbFnaNW0/pWeMjorvGnsbnMcEpFT6Ok8Jo4yu+1JwcjCoaDXD/gRj7bOM16IJO/aZBtNWU85O5Qi/rnokmnOAOZbYKSueXo666GDPuIz8coQkb20oihLiqvD2J6utlMEng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iua8rT7j; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7D1CC433F1;
+	Thu, 18 Jan 2024 16:51:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705596691;
+	bh=R6FcPnDT92v22HuM2bu0YUkieECXLxrnglbf24UlY9Y=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=iua8rT7jUuux10YEw4HUYxD/UHDrjY3bFcCf7QzdmZrUAJmDMy83IIS4AClbfZVYE
+	 mEJ12y0SfTsMQtkXJ61i3EdzOF5qSRKbpUAbqWU6Do+pVtQkTnDY9f38CE8k80ohLY
+	 CGK4S/dTHa2yRjMXF/ESKU3XHpDzwI1XVtLoCUZovqMGXRCQl95SFivQoiMgNIKoMG
+	 0MZRhnNmhPb+IhOqysHLfSEVPyBVY8mlv2B7MfZBZr2Alo/96ZVu+APISN1/bN2O8Q
+	 CiG5Zg93329s2Hlog/NfR7go70ZdgrrnyLBAOQVkcvykNrQoI/Jop2pltfa2rwzttU
+	 tPINWZYmTAWxQ==
+Date: Thu, 18 Jan 2024 08:51:29 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Dmitry Safonov <dima@arista.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
+ <shuah@kernel.org>, Dmitry Safonov <0x7f454c46@gmail.com>, Mohammad Nassiri
+ <mnassiri@ciena.com>, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/3] selftests/net: A couple of typos fixes in
+ key-management test
+Message-ID: <20240118085129.6313054b@kernel.org>
+In-Reply-To: <20240118-tcp-ao-test-key-mgmt-v1-0-3583ca147113@arista.com>
+References: <20240118-tcp-ao-test-key-mgmt-v1-0-3583ca147113@arista.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20240118083812.1b91ba88@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 2024-01-18 08:38:12 [-0800], Jakub Kicinski wrote:
-> > If this is the per-CPU BH lock (which I want to remove) then it will
-> > continue until all softirqs complete.
->=20
-> So there's no way for a process to know on RT that someone with higher
-> prio is waiting for it to release its locks? :(
+On Thu, 18 Jan 2024 02:51:33 +0000 Dmitry Safonov wrote:
+> Two typo fixes, noticed by Mohammad's review.
+> And a fix for an issue that got uncovered.
 
-You could add a function to check if your current priority is inherited
-=66rom someone else and if so start dropping the locks you think are
-responsible for it.
-I made a PoC that appears to work for timer_list timer which is one of
-the softirqs. This made me realise that I need in more spots and I am
-doing it for the wrong reasons=E2=80=A6
+Somewhat unrelated to these fixes but related to the tcp_ao selftests
+in general - could you please also add a config file so that it's
+easy to build a minimal kernel for running the tests?
 
-Sebastian
+Something like:
+
+  make defconfig
+  make kvm_guest.config
+  make tools/testing/selftests/net/tcp_ao/config
+
+should give us a suitable config. Differently put it'd be great to have
+a config we can pass to vmtest or virtme-ng and run the tests.
 
