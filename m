@@ -1,200 +1,165 @@
-Return-Path: <netdev+bounces-64154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00D998316D1
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 11:50:26 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA8218316CA
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 11:49:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 736451F25EE3
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 10:50:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 23D70B22589
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 10:49:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CE0F23757;
-	Thu, 18 Jan 2024 10:50:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E940922F05;
+	Thu, 18 Jan 2024 10:49:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=systec-electronic.com header.i=@systec-electronic.com header.b="jweTdpNd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ijP6HBOB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.systec-electronic.com (mail.systec-electronic.com [77.220.239.22])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6218022F06;
-	Thu, 18 Jan 2024 10:50:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=77.220.239.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C56EDB65C
+	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 10:49:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705575022; cv=none; b=uePK3Mg5xV6eRNlUYBMi1bqFR9C5VFBC6pLfmBDqHu+9rB+UudS+cwEQMx45l+YSeNI255IKJtlydtymN4hJOk4p9j0G9l1K3uDmY17KPloki20Ri5wQZ7J9NcvpvGwJ4/bWhai8Q0tUUWLqPVgTzQUdtGWEr5cLlSqo5fACyqU=
+	t=1705574981; cv=none; b=McNYXRUibEKrXZN2BJTCn3yQGW49FdRegm5U/HXQdBytvgoiNXVUnjGg5zWW3S0OiTyfsmUH0JMmoh6BXXj3k6viIci62ooHF/FYBd3mcSivdRHKTx8CFkH3RXsbv0/daGA6ExNs7wrv4r8LnjlfB3E5O7qKXV8qN4iEEUMUKfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705575022; c=relaxed/simple;
-	bh=hDDXvdoNu8vOBXyjictCiicouiBYP0yBck+Nijapc7A=;
-	h=Received:Received:Received:DKIM-Filter:DKIM-Signature:
-	 X-Virus-Scanned:Received:Received:From:To:Cc:Subject:Date:
-	 Message-ID:X-Mailer:MIME-Version:Content-Transfer-Encoding; b=kTc/bUcpr5BBREXWoSNSZkHkIt6CwWiEMhA88OmVuBYdNIyWm0Av6aVMHsEtUHDrhLX/Sv0tDV6iQca/oC5OY+eDniuIQ+LzWrxZUTEv7H0vo5r3z+aN+igEnG0XOentxXCDG38id6EDkEMEaJpIEgePR7TRXQCtnW8eOSUqEKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=systec-electronic.com; spf=pass smtp.mailfrom=systec-electronic.com; dkim=pass (2048-bit key) header.d=systec-electronic.com header.i=@systec-electronic.com header.b=jweTdpNd; arc=none smtp.client-ip=77.220.239.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=systec-electronic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=systec-electronic.com
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.systec-electronic.com (Postfix) with ESMTP id 0935B9400107;
-	Thu, 18 Jan 2024 11:43:46 +0100 (CET)
-Received: from mail.systec-electronic.com ([127.0.0.1])
- by localhost (mail.systec-electronic.com [127.0.0.1]) (amavis, port 10032)
- with ESMTP id kmPasBcjk7Jn; Thu, 18 Jan 2024 11:43:45 +0100 (CET)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.systec-electronic.com (Postfix) with ESMTP id D50E0941A5CF;
-	Thu, 18 Jan 2024 11:43:45 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.systec-electronic.com D50E0941A5CF
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=systec-electronic.com; s=B34D3B04-5DC7-11EE-83E3-4D8CAB78E8CD;
-	t=1705574625; bh=WxeGf6vaj1r+8COYX0/cdjukb0tx7B8JYxC+WAtqHa0=;
-	h=From:To:Date:Message-ID:MIME-Version;
-	b=jweTdpNdDn+ajwP/fyZNxaw16T2I+A0f+HsXVCiLa0RmlDN5BV7ZKJJEojjIdF2i/
-	 3h9eSv7UAOOQmPSeCmz37EClt4Urbt8H/JKY8cLjL6+yxMuzBZ1aVXG+ZZ0cdgC7X+
-	 HvX0n+m0UtTlSq17Jb3IpZUUDWGFv+TnVmXdZRf+b7XCXvkN9EoYRRfsACnVJoIaUV
-	 +nblJVNJQ6QxuQ1GR0yt4WV0E4fjY8b279Gpfe1CYOSX4yUV0AuZ7pMpycUFf3adN0
-	 t5xsOZ8fzm/GJIPl8CB56tTlmm39Q8QzY+93gLz99AT68jFU6J+mVbB6JyObmCqyw0
-	 kgSv2fffF1GYQ==
-X-Virus-Scanned: amavis at systec-electronic.com
-Received: from mail.systec-electronic.com ([127.0.0.1])
- by localhost (mail.systec-electronic.com [127.0.0.1]) (amavis, port 10026)
- with ESMTP id km2frKiTSdy9; Thu, 18 Jan 2024 11:43:45 +0100 (CET)
-Received: from ws-565760.systec.local (unknown [212.185.67.148])
-	by mail.systec-electronic.com (Postfix) with ESMTPSA id 822909400107;
-	Thu, 18 Jan 2024 11:43:45 +0100 (CET)
-From: Andre Werner <andre.werner@systec-electronic.com>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: linux@armlinux.org.uk,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Andre Werner <andre.werner@systec-electronic.com>
-Subject: [PATCH] net: phy: adin1100: Fix nullptr exception for phy interrupts
-Date: Thu, 18 Jan 2024 11:43:41 +0100
-Message-ID: <20240118104341.10832-1-andre.werner@systec-electronic.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1705574981; c=relaxed/simple;
+	bh=kd8LgSZxirFhyh2ufxr1bCvtuZbcD/SJjtfA3iGtLKk=;
+	h=Received:DKIM-Signature:Message-ID:Date:MIME-Version:User-Agent:
+	 Subject:Content-Language:To:Cc:References:From:Autocrypt:
+	 Organization:In-Reply-To:Content-Type:Content-Transfer-Encoding;
+	b=o06I9aVzgF408Ct6PaDJu76/2R8w+R+/x4lR0z6V8Uk510Hm1JOHDguPiONNxBBIN7Ro4gYE/o0imYyo3mwY0M0ucWVNEgXOorGYRIy0vpOkPNZwUeA5jf5GggsoDOa8pOlpvoUa1EyuRL0JmZB3YIS0jKyEzxsDft2vbt3k5t4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ijP6HBOB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 543BFC433C7;
+	Thu, 18 Jan 2024 10:49:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705574981;
+	bh=kd8LgSZxirFhyh2ufxr1bCvtuZbcD/SJjtfA3iGtLKk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ijP6HBOBHicx12Q3XOUR0EhVUcLIJxF5HhcLOgIhu6eUGvuLLPERVzDUITCeWGet7
+	 KzjMyXJbIlGtOYlNd+J4nl4ByoBVS9cgjSWuHPxbjivZ4Itbjm4itWVHrZdWgHVkCV
+	 kDRr2yLfjAjkh5pQpIVD5lvnLvcqAlGmUyiX9AfXbujbBRgpqylLzQEE6K4MZ2KRho
+	 1F99DFtIzzX/OXmZtaar1/S1LzDhDmGdJZMyQvbv5GVtuV9sq6tfX0Ifu7Fb91Keau
+	 Ms4yYVSQnUlKzK0UoyTkEOeONYy1ypfozfa2bl73oic9oo+TMEdgScgOvhh7Zt3iwl
+	 4rGXyMYuLrpRA==
+Message-ID: <fcee4777-4e46-46c6-8ffd-938b00841958@kernel.org>
+Date: Thu, 18 Jan 2024 11:49:33 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC iproute2 v6 2/3] ss: pretty-print BPF socket-local storage
+Content-Language: en-GB, fr-BE
+To: Quentin Deslandes <qde@naccy.de>, netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>,
+ David Ahern <dsahern@gmail.com>, Martin KaFai Lau <martin.lau@kernel.org>,
+ kernel-team@meta.com
+References: <20240118031512.298971-1-qde@naccy.de>
+ <20240118031512.298971-3-qde@naccy.de>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20240118031512.298971-3-qde@naccy.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-If using ADIN1100 as an external phy, e.g. in combination with
-"smsc95xx", we ran into nullptr exception by creating a link.
+Hi Quentin,
 
-In our case the "smsc95xx" does not check for an available interrupt hand=
-ler
-on external phy driver to use poll instead of interrupts if no handler is
-available. So we decide to implement a small handler in the phy driver
-to support other MACs as well.
+Thank you for working on that!
 
-I update the driver to add an interrupt handler because libphy
-does not check if their is a interrupt handler available either.
+On 18/01/2024 04:15, Quentin Deslandes wrote:
+> ss is able to print the map ID(s) for which a given socket has BPF
+> socket-local storage defined (using --bpf-maps or --bpf-map-id=). However,
+> the actual content of the map remains hidden.
+> 
+> This change aims to pretty-print the socket-local storage content following
+> the socket details, similar to what `bpftool map dump` would do. The exact
+> output format is inspired by drgn, while the BTF data processing is similar
+> to bpftool's.
+> 
+> ss will use libbpf's btf_dump__dump_type_data() to ease pretty-printing
+> of binary data. This requires out_bpf_sk_storage_print_fn() as a print
+> callback function used by btf_dump__dump_type_data(). vout() is also
+> introduced, which is similar to out() but accepts a va_list as
+> parameter.
+> 
+> COL_SKSTOR's header is replaced with an empty string, as it doesn't need to
+> be printed anymore; it's used as a "virtual" column to refer to the
+> socket-local storage dump, which will be printed under the socket information.
+> The column's width is fixed to 1, so it doesn't mess up ss' output
+> (expect if --oneline is used).
 
-There are several interrupts maskable at the phy, but only link change in=
-terrupts
-are handled by the driver yet.
+Do you really need this new column, then?
 
-We tested the combination "smsc95xx" and "adin1100" with Linux Kernel 6.6=
-.9
-and Linux Kernel 6.1.0, respectively.
+Why not printing that "at the end", in the COL_EXT column, like many
+extra and optional bits: TCP Info, CGroups, memory, options, etc.
 
-Signed-off-by: Andre Werner <andre.werner@systec-electronic.com>
----
- drivers/net/phy/adin1100.c | 58 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 58 insertions(+)
+Here, it seems a bit confusing: if I understand correctly, these extra
+and optional bits are handled first, then back to the previous column
+you added (COL_SKSTOR) to always iterate over the BPF storages, and
+maybe print more stuff only if the new option is given, optionally on
+new lines. Would it not print errors even if we didn't ask to display
+them, e.g. if the size is different from the expected one?
+Would it not be simpler to extend the last column?
+If you do that, you will naturally only fetch and iterate over the BPF
+storages if it is asked to print something, no?
 
-diff --git a/drivers/net/phy/adin1100.c b/drivers/net/phy/adin1100.c
-index 7619d6185801..ed8a7e6250cf 100644
---- a/drivers/net/phy/adin1100.c
-+++ b/drivers/net/phy/adin1100.c
-@@ -18,6 +18,12 @@
- #define PHY_ID_ADIN1110				0x0283bc91
- #define PHY_ID_ADIN2111				0x0283bca1
-=20
-+#define ADIN_PHY_SUBSYS_IRQ_MASK		0x0021
-+#define   ADIN_LINK_STAT_CHNG_IRQ_EN		BIT(1)
-+
-+#define ADIN_PHY_SUBSYS_IRQ_STATUS		0x0011
-+#define   ADIN_LINK_STAT_CHNG			BIT(1)
-+
- #define ADIN_FORCED_MODE			0x8000
- #define   ADIN_FORCED_MODE_EN			BIT(0)
-=20
-@@ -136,6 +142,56 @@ static int adin_config_aneg(struct phy_device *phyde=
-v)
- 	return genphy_c45_config_aneg(phydev);
- }
-=20
-+static int adin_phy_ack_intr(struct phy_device *phydev)
-+{
-+	/* Clear pending interrupts */
-+	int rc =3D phy_read_mmd(phydev, MDIO_MMD_VEND2, ADIN_PHY_SUBSYS_IRQ_STA=
-TUS);
-+
-+	return rc < 0 ? rc : 0;
-+}
-+
-+static int adin_config_intr(struct phy_device *phydev)
-+{
-+	int ret, regval;
-+
-+	ret =3D adin_phy_ack_intr(phydev);
-+
-+	if (ret)
-+		return ret;
-+
-+	regval =3D phy_read_mmd(phydev, MDIO_MMD_VEND2, ADIN_PHY_SUBSYS_IRQ_MAS=
-K);
-+	if (regval < 0)
-+		return regval;
-+
-+	if (phydev->interrupts =3D=3D PHY_INTERRUPT_ENABLED)
-+		regval |=3D ADIN_LINK_STAT_CHNG_IRQ_EN;
-+	else
-+		regval &=3D ~ADIN_LINK_STAT_CHNG_IRQ_EN;
-+
-+	ret =3D phy_write_mmd(phydev, MDIO_MMD_VEND2,
-+			    ADIN_PHY_SUBSYS_IRQ_MASK,
-+			    regval);
-+	return ret;
-+}
-+
-+static irqreturn_t adin_phy_handle_interrupt(struct phy_device *phydev)
-+{
-+	int irq_status;
-+
-+	irq_status =3D phy_read_mmd(phydev, MDIO_MMD_VEND2, ADIN_PHY_SUBSYS_IRQ=
-_STATUS);
-+	if (irq_status < 0) {
-+		phy_error(phydev);
-+		return IRQ_NONE;
-+	}
-+
-+	if (!(irq_status & ADIN_LINK_STAT_CHNG))
-+		return IRQ_NONE;
-+
-+	phy_trigger_machine(phydev);
-+
-+	return IRQ_HANDLED;
-+}
-+
- static int adin_set_powerdown_mode(struct phy_device *phydev, bool en)
- {
- 	int ret;
-@@ -275,6 +331,8 @@ static struct phy_driver adin_driver[] =3D {
- 		.probe			=3D adin_probe,
- 		.config_aneg		=3D adin_config_aneg,
- 		.read_status		=3D adin_read_status,
-+		.config_intr		=3D adin_config_intr,
-+		.handle_interrupt	=3D adin_phy_handle_interrupt,
- 		.set_loopback		=3D adin_set_loopback,
- 		.suspend		=3D adin_suspend,
- 		.resume			=3D adin_resume,
---=20
-2.43.0
+To be honest, it looks like there are too many options that can be
+displayed, and there are probably already enough columns. That's
+certainly why no other columns have been added for years. I don't know
+why there was an exception for the "Process" one, but OK.
+I do think it would be better to have a new "--json" option to structure
+the output and ease the parsing, than having workarounds to improve the
+output and ease parsing of some options. But that's a more important task :)
 
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
