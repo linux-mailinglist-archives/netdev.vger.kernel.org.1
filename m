@@ -1,116 +1,138 @@
-Return-Path: <netdev+bounces-64136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A47008314FE
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 09:43:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DCA383151B
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 09:52:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF11DB272B3
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 08:43:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF3F61C21DF8
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 08:52:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7798611729;
-	Thu, 18 Jan 2024 08:43:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5625125A2;
+	Thu, 18 Jan 2024 08:52:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7DB41F5F7
-	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 08:42:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3D95C127;
+	Thu, 18 Jan 2024 08:52:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705567381; cv=none; b=FE+d7MfemAJ4vlGZTEyXyRKHSjH4po5YjDYRf88/fZ3vNqWBAxaKOXnSsxr+/D9paY8r51VIX8Esyc+i/0/0Y3DkRKXWiOkkarGNu+yedFurJBi+YXVPTHhnXR4nX2SOdh0MRFBFDmv670Znoosh06MNv1vgPFCsq13Sal5VFqc=
+	t=1705567932; cv=none; b=VAgPa5tlgvmKWifEevBScSf0zSslw7Lus6kELVjf9k4oZL8Hu0c5yvk+VatpZgkhgo6DCQySlVB4QFCZ0KB83V0TRhcELOfVtWzxDjeIfmU8bexyu09H1LCEd+QeUJ+pEa3oIUNYNpW7qAOF0pTJANvcrcKrtxzsHeXjNQ1IHPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705567381; c=relaxed/simple;
-	bh=tMU0E1Q78JCelu6nEjfXAqzABJfq+Qqbl14OCc6pEoU=;
-	h=Received:Message-ID:Subject:From:To:Cc:Date:In-Reply-To:
-	 References:Content-Type:Content-Transfer-Encoding:User-Agent:
-	 MIME-Version:X-SA-Exim-Connect-IP:X-SA-Exim-Mail-From:
-	 X-SA-Exim-Scanned:X-PTX-Original-Recipient; b=HvMiebIQNESiaAw3aFS2pd42etXhKhfEcVxCFq9grVanEQ6FqItRJ9G7IsWCq3U03LoY5J53euvE2rVPvwBnqwQijQ/wUYT4Ul6vpKDQIUM+JggujMe7JfkdR7EwfAAXKLvLAwSF6L/gKBbJbOYLL0s+QidqEd/MP5cNbphIrJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[IPv6:::1])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <l.stach@pengutronix.de>)
-	id 1rQNz2-0006qB-Ev; Thu, 18 Jan 2024 09:42:44 +0100
-Message-ID: <3b4b548b5d7ede4632a113304cab38002f4aa2e1.camel@pengutronix.de>
-Subject: Re: [PATCH] SUNRPC: use request size to initialize bio_vec in
- svc_udp_sendto()
-From: Lucas Stach <l.stach@pengutronix.de>
-To: Chuck Lever <chuck.lever@oracle.com>
-Cc: Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>, Olga
- Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey
- <tom@talpey.com>, Trond Myklebust <trond.myklebust@hammerspace.com>, Anna
- Schumaker <anna@kernel.org>,  linux-nfs@vger.kernel.org,
- netdev@vger.kernel.org, kernel@pengutronix.de,  patchwork-lst@pengutronix.de
-Date: Thu, 18 Jan 2024 09:42:42 +0100
-In-Reply-To: <ZahOmmMZxHcK8Amn@tissot.1015granger.net>
-References: <20240117210628.1534046-1-l.stach@pengutronix.de>
-	 <ZahOmmMZxHcK8Amn@tissot.1015granger.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	s=arc-20240116; t=1705567932; c=relaxed/simple;
+	bh=vQSPSERsnHNwWcVWo9MElcDWrIIeQkXtCXQfi4Nvayc=;
+	h=Received:Received:Received:Subject:To:CC:References:From:
+	 Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:Content-Type:
+	 Content-Language:Content-Transfer-Encoding:X-Originating-IP:
+	 X-ClientProxiedBy; b=j0A45+Ya2jhRGGojgV60Mq9SPr6Y5VN/zzsVZzDW1I02CXNf8XJEwM7lHBpK4F7mpByQ/43jvd5zp70Nk+v4pIdRiBy0q8O01jNBElTQAErF24jZiVbZkfTYrVVC/0i3jXtuQ6SKWSiNftSp9EwBHk4RT45WLUVrUdgutoQOUQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4TFxKx2r8nzWm6l;
+	Thu, 18 Jan 2024 16:51:01 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id 8E6FF140134;
+	Thu, 18 Jan 2024 16:52:04 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 18 Jan
+ 2024 16:52:04 +0800
+Subject: Re: [RFC PATCH net-next v5 2/2] net: add netmem to skb_frag_t
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Mina Almasry
+	<almasrymina@google.com>, Jason Gunthorpe <jgg@nvidia.com>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	=?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>, Shakeel Butt
+	<shakeelb@google.com>
+References: <20240109011455.1061529-1-almasrymina@google.com>
+ <20240109011455.1061529-3-almasrymina@google.com>
+ <5219f2cd-6854-0134-560d-8ae3f363b53f@huawei.com>
+ <CAHS8izOtr+jfqQ6xCB3CoN-K_V1-4hPsB4-k5+1z-M3Qy2BbwA@mail.gmail.com>
+ <0711845b-c435-251f-0bbc-20b243721c06@huawei.com>
+ <CAHS8izOxvMVGXKpLBvVgyyS5_94WGG8Aca=O_zGMX+db-3gBXg@mail.gmail.com>
+ <66bc7b8f-51b6-0d9e-db5b-47e7ee5e9029@huawei.com>
+ <CAHS8izOnhtQGeQ-EFmYjZyZ0eW2LqO0Rrm73eAB2su=UA34yTw@mail.gmail.com>
+ <20240116000129.GX734935@nvidia.com>
+ <9c1a6725-c4c3-2bb1-344f-5e71f8ce7e63@huawei.com>
+ <20240116121611.GY734935@nvidia.com>
+ <CAHS8izPa6ostY7qZUAmm4g8N3rfWoVBK6r5z0_MycxfsEVH4jw@mail.gmail.com>
+ <CAHS8izO1-+MczzFw_R80uv=aK5A9bUNcKroY=H9Euk+ZPnnGPw@mail.gmail.com>
+ <65a8225348b92_11eb12942c@willemb.c.googlers.com.notmuch>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <1a4ff438-581f-1e14-6dfb-051d26d752a2@huawei.com>
+Date: Thu, 18 Jan 2024 16:52:04 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: l.stach@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <65a8225348b92_11eb12942c@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
-Am Mittwoch, dem 17.01.2024 um 17:03 -0500 schrieb Chuck Lever:
-> On Wed, Jan 17, 2024 at 10:06:28PM +0100, Lucas Stach wrote:
-> > Use the proper size when setting up the bio_vec, as otherwise only
-> > zero-length UDP packets will be sent.
-> >=20
-> > Fixes: baabf59c2414 ("SUNRPC: Convert svc_udp_sendto() to use the per-s=
-ocket bio_vec array")
-> > Signed-off-by: Lucas Stach <l.stach@pengutronix.de>
-> > ---
-> >  net/sunrpc/svcsock.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-> > index 998687421fa6..e0ce4276274b 100644
-> > --- a/net/sunrpc/svcsock.c
-> > +++ b/net/sunrpc/svcsock.c
-> > @@ -717,12 +717,12 @@ static int svc_udp_sendto(struct svc_rqst *rqstp)
-> >  				ARRAY_SIZE(rqstp->rq_bvec), xdr);
-> > =20
-> >  	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, rqstp->rq_bvec,
-> > -		      count, 0);
-> > +		      count, rqstp->rq_res.len);
-> >  	err =3D sock_sendmsg(svsk->sk_sock, &msg);
-> >  	if (err =3D=3D -ECONNREFUSED) {
-> >  		/* ICMP error on earlier request. */
-> >  		iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, rqstp->rq_bvec,
-> > -			      count, 0);
-> > +			      count, rqstp->rq_res.len);
-> >  		err =3D sock_sendmsg(svsk->sk_sock, &msg);
-> >  	}
-> > =20
-> > --=20
-> > 2.43.0
-> >=20
->=20
-> I can't fathom why I would have chosen zero for the @count argument.
->=20
-> We currently have zero test coverage for UDP. I'll look into that.
->=20
-> I've applied this to the nfsd-fixes branch. It should appear in
-> v6.8-rc if I can get it tested.
+On 2024/1/18 2:54, Willem de Bruijn wrote:
+> 
+> I agree. A concern with CONFIGs is that what matters in practice is
+> which default the distros compile with. In this case, adding hurdles
+> to using the feature likely for no real reason.
+> 
+> Static branches are used throughout the kernel in performance
+> sensitive paths, exactly because they allow optional paths effectively
+> for free. I'm quite surprised that this issue is being raised so
+> strongly here, as they are hardly new or controversial.
 
-Thanks. For what it is worth, this fix didn't come out of pure code
-inspection, but fixes a real world setup for me. While I can't claim
-that I have any kind of comprehensive testing, this fix has at least
-shown to fix the issue introduced in the referenced commit in my setup.
+The new or controversial part about its usage in the devmem patchset as my
+understanding is:
+1. It is assumed the devmem and normal page processing in networking does
+   not have to be treated equally in the same system, either the performance
+   of devmem is favored or the performance of normal page is favored. I think
+   if distros is starting to worry about the CONFIG for devmem, devmem must be
+   quite popular that we might need the best performance of both. IMHO, static
+   branches might be just a convenient way to start supporting the devmem for
+   now as we seems to not have a clear idea of unified handling or proper API
+   for both devmem and normal page.
 
-Regards,
-Lucas
+2. Specifically to skb_frag_page(), if the returning NULL is to catch its misuse
+   for devmem, then I am agreed with this generally. But the NULL returning
+   handling in kcm_write_msgs() seems to suggest otherwise to me. Isn't it
+   reasonable to make the semantic obvious by using WARN_ON or BUG_ON directly in
+   skb_frag_page(), and returning NULL does not 100% reliably crash the thread as
+   suggested by jason?
+
+> 
+> But perhaps best is to show with data. Is there a representative page
+> pool benchmark that exercises the most sensitive case (XDP_DROP?) that
+> we can run with and without a static branch to demonstrate that any
+> diff is within the noise?
+> 
+>>> But none of this is related to correctness. Code calling
+>>> skb_frag_page() will fail or crash if it's not handled correctly
+>>> regardless of the implementation details of skb_frag_page(). In the
+>>> devmem series we add support to handle it correctly via [1] & [2].
+>>>
+>>> --
+>>> Thanks,
+>>> Mina
+>>
+>>
+>>
+>> -- 
+>> Thanks,
+>> Mina
+> 
+> 
+> 
+> .
+> 
 
