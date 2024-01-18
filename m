@@ -1,234 +1,262 @@
-Return-Path: <netdev+bounces-64132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27803831479
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 09:23:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 762E88314CC
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 09:36:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C2E01C2335F
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 08:23:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CFEBCB228D9
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 08:36:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22AA01F94C;
-	Thu, 18 Jan 2024 08:23:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A5KCACn9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E8541BF21;
+	Thu, 18 Jan 2024 08:27:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E79B81CFA4;
-	Thu, 18 Jan 2024 08:22:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5391C22EF1;
+	Thu, 18 Jan 2024 08:27:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705566180; cv=none; b=UOjnG4Dbi0TndEdABD2vnBV4+eW+Sw9RBK6KNY7Br9d4Kx2yqegoZgrar0dYwhTZboZCc4AkycRQW/IEU02rNWak4pz65hAhwRw7NMj487Qs1QDYetPBM2wHQxPf6lcdKGnyHQwycp5iRqugRh+MKLjN5lujvRDtxCOMn2YfxxQ=
+	t=1705566429; cv=none; b=vFAdNemE+224ko5y7YTpzvbzCM1TRc+vzZE2DV6g1j3H2RaBAU/7ZN/TsA9yWl+na/3ruJn18LbwGjSKSM975iciYd5PzeRK9xaoIaBQ/mHIq0bhzH+IIqq2KNyargeTLQYkqCarnChoF1El1e7gOvHS3j6nqfVVE6kIxIQvYfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705566180; c=relaxed/simple;
-	bh=IwsnoVL40Seia7ieHtkXTazSUMg+LsPrLcHHO9wOjQw=;
-	h=Received:DKIM-Signature:Received:From:Date:Subject:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding:Message-Id:References:
-	 In-Reply-To:To:Cc:X-Mailer:X-Developer-Signature:X-Developer-Key:
-	 X-Endpoint-Received:X-Original-From:Reply-To; b=uy0+WIeHp04f2Mkas6hh19qOL2iSIJ2ywp4Q4WEFc04JtC5Z5lmPG9IUVVTXEEUZOy2Qs/1xOFy1TF/fiitaG7jb6ZslEaCxWpzmRoCf/fVIdGmoASmqgl3WD1VffSVKCwuseeDaBinzTMLiWAZkVCpagkKY0bvLuuYA3syMy0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A5KCACn9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 85090C3278B;
-	Thu, 18 Jan 2024 08:22:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705566179;
-	bh=IwsnoVL40Seia7ieHtkXTazSUMg+LsPrLcHHO9wOjQw=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=A5KCACn9FlEE6w4rmYoiGi5pZHWKyEu1eEPaMbfQxq0CnrvdIzvwYyAa4zkmUfIvC
-	 IUiihBYrok5Ld1DDRBJedCXSJlUMTQqm8y1oi+6wJ2yALNTMHGtzaTcvByaVkTp4aQ
-	 ikdAGDCf6vXJPCvHMwXkYAWnHjydazKzTqXJha5XgpuZOcq8wkNcRJtqhUrqH2LTrN
-	 ujaQ9tvLRDGbrC9OHGWc4Bsnpjr3UAFUJn9yotA2UQE6x7tliXnpRD0cOKnzt5jJEW
-	 yjcOhM0kxfSUGWweyNHvirwDOFWrGGyklNXa+2AkXdwKgEp9M1sLqh1fI6Gfp62XoB
-	 xvyu2w6eQ6HcQ==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 753A4C47DB7;
-	Thu, 18 Jan 2024 08:22:59 +0000 (UTC)
-From:
- Nikita Shubin via B4 Relay <devnull+nikita.shubin.maquefel.me@kernel.org>
-Date: Thu, 18 Jan 2024 11:21:01 +0300
-Subject: [PATCH v7 18/39] net: cirrus: add DT support for Cirrus EP93xx
+	s=arc-20240116; t=1705566429; c=relaxed/simple;
+	bh=yw2POPVZxyPTMpYofGP36qsSK5kW5sLM6zlCXmmQEJQ=;
+	h=X-Alimail-AntiSpam:Received:Message-ID:Date:MIME-Version:
+	 User-Agent:Subject:To:Cc:References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding; b=Tc1c85b0Qo1yPFtXEIgVMvz81VWyIChZrmGT+/zNHhqRdZo7BSCAJQQoU5J+MJzLVO61ba6LkYU8JJIe/ckah3Ro1308mpWIrhDLvI7O/feCWokuWh92iBGwnjvpkXof1m+8SHHKHKlEMMTjnDb964pS3min16dzUSdRKJn2sG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; arc=none smtp.client-ip=115.124.30.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=17;SR=0;TI=SMTPD_---0W-s7IqN_1705566420;
+Received: from 30.221.131.86(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W-s7IqN_1705566420)
+          by smtp.aliyun-inc.com;
+          Thu, 18 Jan 2024 16:27:02 +0800
+Message-ID: <f98849a7-41e9-421b-97b7-36d720cc43ee@linux.alibaba.com>
+Date: Thu, 18 Jan 2024 16:27:00 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 00/15] net/smc: implement loopback-ism used by
+ SMC-D
+To: wintera@linux.ibm.com, wenjia@linux.ibm.com, hca@linux.ibm.com,
+ gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
+ alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240111120036.109903-1-guwen@linux.alibaba.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <20240111120036.109903-1-guwen@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240118-ep93xx-v7-18-d953846ae771@maquefel.me>
-References: <20240118-ep93xx-v7-0-d953846ae771@maquefel.me>
-In-Reply-To: <20240118-ep93xx-v7-0-d953846ae771@maquefel.me>
-To: Hartley Sweeten <hsweeten@visionengravers.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Arnd Bergmann <arnd@arndb.de>, Andrew Lunn <andrew@lunn.ch>
-X-Mailer: b4 0.13-dev-e3e53
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1705566176; l=4277;
- i=nikita.shubin@maquefel.me; s=20230718; h=from:subject:message-id;
- bh=x6ZnXV1oThsVaPrWIGHega7PwzPAvDvTbcixlLvrbzs=; =?utf-8?q?b=3DBqo6U53TLNfZ?=
- =?utf-8?q?A3grJiZLVc5Sbfh2Td6DcrWzKVcri77s/LKdgtDoK+UQXVgVMEhQiU0Th9zG/VXr?=
- TbdyXHBgDn/47bQi/QtmkPORvvk7ThWZZIs1HUPcR6qaQFlOnsl3
-X-Developer-Key: i=nikita.shubin@maquefel.me; a=ed25519;
- pk=vqf5YIUJ7BJv3EJFaNNxWZgGuMgDH6rwufTLflwU9ac=
-X-Endpoint-Received:
- by B4 Relay for nikita.shubin@maquefel.me/20230718 with auth_id=65
-X-Original-From: Nikita Shubin <nikita.shubin@maquefel.me>
-Reply-To: <nikita.shubin@maquefel.me>
 
-From: Nikita Shubin <nikita.shubin@maquefel.me>
 
-- add OF ID match table
-- get phy_id from the device tree, as part of mdio
-- copy_addr is now always used, as there is no SoC/board that aren't
-- dropped platform header
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Tested-by: Alexander Sverdlin <alexander.sverdlin@gmail.com>
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-Signed-off-by: Nikita Shubin <nikita.shubin@maquefel.me>
----
- drivers/net/ethernet/cirrus/ep93xx_eth.c | 63 ++++++++++++++++----------------
- 1 file changed, 32 insertions(+), 31 deletions(-)
+On 2024/1/11 20:00, Wen Gu wrote:
+> This patch set acts as the second part of the new version of [1] (The first
+> part can be referred from [2]), the updated things of this version are listed
+> at the end.
+> 
 
-diff --git a/drivers/net/ethernet/cirrus/ep93xx_eth.c b/drivers/net/ethernet/cirrus/ep93xx_eth.c
-index 1c2a540db13d..be0b11014af7 100644
---- a/drivers/net/ethernet/cirrus/ep93xx_eth.c
-+++ b/drivers/net/ethernet/cirrus/ep93xx_eth.c
-@@ -16,13 +16,12 @@
- #include <linux/ethtool.h>
- #include <linux/interrupt.h>
- #include <linux/moduleparam.h>
-+#include <linux/of.h>
- #include <linux/platform_device.h>
- #include <linux/delay.h>
- #include <linux/io.h>
- #include <linux/slab.h>
- 
--#include <linux/platform_data/eth-ep93xx.h>
--
- #define DRV_MODULE_NAME		"ep93xx-eth"
- 
- #define RX_QUEUE_ENTRIES	64
-@@ -738,25 +737,6 @@ static const struct net_device_ops ep93xx_netdev_ops = {
- 	.ndo_set_mac_address	= eth_mac_addr,
- };
- 
--static struct net_device *ep93xx_dev_alloc(struct ep93xx_eth_data *data)
--{
--	struct net_device *dev;
--
--	dev = alloc_etherdev(sizeof(struct ep93xx_priv));
--	if (dev == NULL)
--		return NULL;
--
--	eth_hw_addr_set(dev, data->dev_addr);
--
--	dev->ethtool_ops = &ep93xx_ethtool_ops;
--	dev->netdev_ops = &ep93xx_netdev_ops;
--
--	dev->features |= NETIF_F_SG | NETIF_F_HW_CSUM;
--
--	return dev;
--}
--
--
- static void ep93xx_eth_remove(struct platform_device *pdev)
- {
- 	struct net_device *dev;
-@@ -786,27 +766,47 @@ static void ep93xx_eth_remove(struct platform_device *pdev)
- 
- static int ep93xx_eth_probe(struct platform_device *pdev)
- {
--	struct ep93xx_eth_data *data;
- 	struct net_device *dev;
- 	struct ep93xx_priv *ep;
- 	struct resource *mem;
-+	void __iomem *base_addr;
-+	struct device_node *np;
-+	u32 phy_id;
- 	int irq;
- 	int err;
- 
- 	if (pdev == NULL)
- 		return -ENODEV;
--	data = dev_get_platdata(&pdev->dev);
- 
- 	mem = platform_get_resource(pdev, IORESOURCE_MEM, 0);
- 	irq = platform_get_irq(pdev, 0);
- 	if (!mem || irq < 0)
- 		return -ENXIO;
- 
--	dev = ep93xx_dev_alloc(data);
-+	base_addr = ioremap(mem->start, resource_size(mem));
-+	if (!base_addr)
-+		return dev_err_probe(&pdev->dev, -EIO, "Failed to ioremap ethernet registers\n");
-+
-+	np = of_parse_phandle(pdev->dev.of_node, "phy-handle", 0);
-+	if (!np)
-+		return dev_err_probe(&pdev->dev, -ENODEV, "Please provide \"phy-handle\"\n");
-+
-+	err = of_property_read_u32(np, "reg", &phy_id);
-+	of_node_put(np);
-+	if (err)
-+		return dev_err_probe(&pdev->dev, -ENOENT, "Failed to locate \"phy_id\"\n");
-+
-+	dev = alloc_etherdev(sizeof(struct ep93xx_priv));
- 	if (dev == NULL) {
- 		err = -ENOMEM;
- 		goto err_out;
- 	}
-+
-+	eth_hw_addr_set(dev, base_addr + 0x50);
-+	dev->ethtool_ops = &ep93xx_ethtool_ops;
-+	dev->netdev_ops = &ep93xx_netdev_ops;
-+	dev->features |= NETIF_F_SG | NETIF_F_HW_CSUM;
-+
- 	ep = netdev_priv(dev);
- 	ep->dev = dev;
- 	SET_NETDEV_DEV(dev, &pdev->dev);
-@@ -822,15 +822,10 @@ static int ep93xx_eth_probe(struct platform_device *pdev)
- 		goto err_out;
- 	}
- 
--	ep->base_addr = ioremap(mem->start, resource_size(mem));
--	if (ep->base_addr == NULL) {
--		dev_err(&pdev->dev, "Failed to ioremap ethernet registers\n");
--		err = -EIO;
--		goto err_out;
--	}
-+	ep->base_addr = base_addr;
- 	ep->irq = irq;
- 
--	ep->mii.phy_id = data->phy_id;
-+	ep->mii.phy_id = phy_id;
- 	ep->mii.phy_id_mask = 0x1f;
- 	ep->mii.reg_num_mask = 0x1f;
- 	ep->mii.dev = dev;
-@@ -857,12 +852,18 @@ static int ep93xx_eth_probe(struct platform_device *pdev)
- 	return err;
- }
- 
-+static const struct of_device_id ep93xx_eth_of_ids[] = {
-+	{ .compatible = "cirrus,ep9301-eth" },
-+	{ /* sentinel */ }
-+};
-+MODULE_DEVICE_TABLE(of, ep93xx_eth_of_ids);
- 
- static struct platform_driver ep93xx_eth_driver = {
- 	.probe		= ep93xx_eth_probe,
- 	.remove_new	= ep93xx_eth_remove,
- 	.driver		= {
- 		.name	= "ep93xx-eth",
-+		.of_match_table = ep93xx_eth_of_ids,
- 	},
- };
- 
+Hi Wenjia and Jan, I would appreciate any thoughts or comments you might have
+on this series. Thank you very much!
 
--- 
-2.41.0
-
+> 
+> # Design
+> 
+> This patch set includes 3 parts:
+> 
+>   - Patch #1-#2: some prepare work for loopback-ism.
+>   - Patch #3-#9: implement loopback-ism device.
+>   - Patch #10-#15: memory copy optimization for loopback scenario.
+> 
+> The loopback-ism device is designed as a ISMv2 device and not be limited to
+> a specific net namespace, ends of both inter-process connection (1/1' in diagram
+> below) or inter-container connection (2/2' in diagram below) can find the same
+> available loopback-ism and choose it during the CLC handshake.
+> 
+>   Container 1 (ns1)                              Container 2 (ns2)
+>   +-----------------------------------------+    +-------------------------+
+>   | +-------+      +-------+      +-------+ |    |        +-------+        |
+>   | | App A |      | App B |      | App C | |    |        | App D |<-+     |
+>   | +-------+      +---^---+      +-------+ |    |        +-------+  |(2') |
+>   |     |127.0.0.1 (1')|             |192.168.0.11       192.168.0.12|     |
+>   |  (1)|   +--------+ | +--------+  |(2)   |    | +--------+   +--------+ |
+>   |     `-->|   lo   |-` |  eth0  |<-`      |    | |   lo   |   |  eth0  | |
+>   +---------+--|---^-+---+-----|--+---------+    +-+--------+---+-^------+-+
+>                |   |           |                                  |
+>   Kernel       |   |           |                                  |
+>   +----+-------v---+-----------v----------------------------------+---+----+
+>   |    |                            TCP                               |    |
+>   |    |                                                              |    |
+>   |    +--------------------------------------------------------------+    |
+>   |                                                                        |
+>   |                           +--------------+                             |
+>   |                           | smc loopback |                             |
+>   +---------------------------+--------------+-----------------------------+
+> 
+> loopback-ism device creates DMBs (shared memory) for each connection peer.
+> Since data transfer occurs within the same kernel, the sndbuf of each peer
+> is only a descriptor and point to the same memory region as peer DMB, so that
+> the data copy from sndbuf to peer DMB can be avoided in loopback-ism case.
+> 
+>   Container 1 (ns1)                              Container 2 (ns2)
+>   +-----------------------------------------+    +-------------------------+
+>   | +-------+                               |    |        +-------+        |
+>   | | App C |-----+                         |    |        | App D |        |
+>   | +-------+     |                         |    |        +-^-----+        |
+>   |               |                         |    |          |              |
+>   |           (2) |                         |    |     (2') |              |
+>   |               |                         |    |          |              |
+>   +---------------|-------------------------+    +----------|--------------+
+>                   |                                         |
+>   Kernel          |                                         |
+>   +---------------|-----------------------------------------|--------------+
+>   | +--------+ +--v-----+                           +--------+ +--------+  |
+>   | |dmb_desc| |snd_desc|                           |dmb_desc| |snd_desc|  |
+>   | +-----|--+ +--|-----+                           +-----|--+ +--------+  |
+>   | +-----|--+    |                                 +-----|--+             |
+>   | | DMB C  |    +---------------------------------| DMB D  |             |
+>   | +--------+                                      +--------+             |
+>   |                                                                        |
+>   |                           +--------------+                             |
+>   |                           | smc loopback |                             |
+>   +---------------------------+--------------+-----------------------------+
+> 
+> # Benchmark Test
+> 
+>   * Test environments:
+>        - VM with Intel Xeon Platinum 8 core 2.50GHz, 16 GiB mem.
+>        - SMC sndbuf/DMB size 1MB.
+>        - /sys/devices/virtual/smc/loopback-ism/dmb_copy is set to default 0,
+>          which means sndbuf and DMB are merged and no data copied between them.
+>        - /sys/devices/virtual/smc/loopback-ism/dmb_type is set to default 0,
+>          which means DMB is physically contiguous buffer.
+> 
+>   * Test object:
+>        - TCP: run on TCP loopback.
+>        - SMC lo: run on SMC loopback device.
+> 
+> 1. ipc-benchmark (see [3])
+> 
+>   - ./<foo> -c 1000000 -s 100
+> 
+>                              TCP                  SMC-lo
+> Message
+> rate (msg/s)              80636                  149515(+85.42%)
+> 
+> 2. sockperf
+> 
+>   - serv: <smc_run> taskset -c <cpu> sockperf sr --tcp
+>   - clnt: <smc_run> taskset -c <cpu> sockperf { tp | pp } --tcp --msg-size={ 64000 for tp | 14 for pp } -i 127.0.0.1 -t 30
+> 
+>                              TCP                  SMC-lo
+> Bandwidth(MBps)         4909.36                 8197.57(+66.98%)
+> Latency(us)               6.098                   3.383(-44.52%)
+> 
+> 3. nginx/wrk
+> 
+>   - serv: <smc_run> nginx
+>   - clnt: <smc_run> wrk -t 8 -c 1000 -d 30 http://127.0.0.1:80
+> 
+>                             TCP                   SMC-lo
+> Requests/s           181685.74                246447.77(+35.65%)
+> 
+> 4. redis-benchmark
+> 
+>   - serv: <smc_run> redis-server
+>   - clnt: <smc_run> redis-benchmark -h 127.0.0.1 -q -t set,get -n 400000 -c 200 -d 1024
+> 
+>                             TCP                   SMC-lo
+> GET(Requests/s)       85855.34                118553.64(+38.09%)
+> SET(Requests/s)       86824.40                125944.58(+45.06%)
+> 
+> 
+> Change log:
+> 
+> v1->RFC:
+> - Patch #9: merge rx_bytes and tx_bytes as xfer_bytes statistics:
+>    /sys/devices/virtual/smc/loopback-ism/xfer_bytes
+> - Patch #10: add support_dmb_nocopy operation to check if SMC-D device supports
+>    merging sndbuf with peer DMB.
+> - Patch #13 & #14: introduce loopback-ism device control of DMB memory type and
+>    control of whether to merge sndbuf and DMB. They can be respectively set by:
+>    /sys/devices/virtual/smc/loopback-ism/dmb_type
+>    /sys/devices/virtual/smc/loopback-ism/dmb_copy
+>    The motivation for these two control is that a performance bottleneck was
+>    found when using vzalloced DMB and sndbuf is merged with DMB, and there are
+>    many CPUs and CONFIG_HARDENED_USERCOPY is set [4]. The bottleneck is caused
+>    by the lock contention in vmap_area_lock [5] which is involved in memcpy_from_msg()
+>    or memcpy_to_msg(). Currently, Uladzislau Rezki is working on mitigating the
+>    vmap lock contention [6]. It has significant effects, but using virtual memory
+>    still has additional overhead compared to using physical memory.
+>    So this new version provides controls of dmb_type and dmb_copy to suit
+>    different scenarios.
+> - Some minor changes and comments improvements.
+> 
+> RFC->old version([1]):
+> Link: https://lore.kernel.org/netdev/1702214654-32069-1-git-send-email-guwen@linux.alibaba.com/
+> - Patch #1: improve the loopback-ism dump, it shows as follows now:
+>    # smcd d
+>    FID  Type  PCI-ID        PCHID  InUse  #LGs  PNET-ID
+>    0000 0     loopback-ism  ffff   No        0
+> - Patch #3: introduce the smc_ism_set_v2_capable() helper and set
+>    smc_ism_v2_capable when ISMv2 or virtual ISM is registered,
+>    regardless of whether there is already a device in smcd device list.
+> - Patch #3: loopback-ism will be added into /sys/devices/virtual/smc/loopback-ism/.
+> - Patch #8: introduce the runtime switch /sys/devices/virtual/smc/loopback-ism/active
+>    to activate or deactivate the loopback-ism.
+> - Patch #9: introduce the statistics of loopback-ism by
+>    /sys/devices/virtual/smc/loopback-ism/{{tx|rx}_tytes|dmbs_cnt}.
+> - Some minor changes and comments improvements.
+> 
+> [1] https://lore.kernel.org/netdev/1695568613-125057-1-git-send-email-guwen@linux.alibaba.com/
+> [2] https://lore.kernel.org/netdev/20231219142616.80697-1-guwen@linux.alibaba.com/
+> [3] https://github.com/goldsborough/ipc-bench
+> [4] https://lore.kernel.org/all/3189e342-c38f-6076-b730-19a6efd732a5@linux.alibaba.com/
+> [5] https://lore.kernel.org/all/238e63cd-e0e8-4fbf-852f-bc4d5bc35d5a@linux.alibaba.com/
+> [6] https://lore.kernel.org/all/20240102184633.748113-1-urezki@gmail.com/
+> 
+> Wen Gu (15):
+>    net/smc: improve SMC-D device dump for virtual ISM
+>    net/smc: decouple specialized struct from SMC-D DMB registration
+>    net/smc: introduce virtual ISM device loopback-ism
+>    net/smc: implement ID-related operations of loopback-ism
+>    net/smc: implement some unsupported operations of loopback-ism
+>    net/smc: implement DMB-related operations of loopback-ism
+>    net/smc: register loopback-ism into SMC-D device list
+>    net/smc: introduce loopback-ism runtime switch
+>    net/smc: introduce loopback-ism statistics attributes
+>    net/smc: add operations to merge sndbuf with peer DMB
+>    net/smc: attach or detach ghost sndbuf to peer DMB
+>    net/smc: adapt cursor update when sndbuf and peer DMB are merged
+>    net/smc: introduce loopback-ism DMB type control
+>    net/smc: introduce loopback-ism DMB data copy control
+>    net/smc: implement DMB-merged operations of loopback-ism
+> 
+>   drivers/s390/net/ism_drv.c |   2 +-
+>   include/net/smc.h          |   7 +-
+>   net/smc/Kconfig            |  13 +
+>   net/smc/Makefile           |   2 +-
+>   net/smc/af_smc.c           |  28 +-
+>   net/smc/smc_cdc.c          |  58 ++-
+>   net/smc/smc_cdc.h          |   1 +
+>   net/smc/smc_core.c         |  61 +++-
+>   net/smc/smc_core.h         |   1 +
+>   net/smc/smc_ism.c          |  71 +++-
+>   net/smc/smc_ism.h          |   5 +
+>   net/smc/smc_loopback.c     | 718 +++++++++++++++++++++++++++++++++++++
+>   net/smc/smc_loopback.h     |  88 +++++
+>   13 files changed, 1026 insertions(+), 29 deletions(-)
+>   create mode 100644 net/smc/smc_loopback.c
+>   create mode 100644 net/smc/smc_loopback.h
+> 
 
