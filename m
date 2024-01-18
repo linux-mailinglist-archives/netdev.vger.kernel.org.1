@@ -1,212 +1,126 @@
-Return-Path: <netdev+bounces-64173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9734A8318F0
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 13:14:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89348831903
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 13:19:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05A7F1F24B78
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 12:14:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E27E3B228B0
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 12:19:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32B2924210;
-	Thu, 18 Jan 2024 12:14:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D32D924A0C;
+	Thu, 18 Jan 2024 12:19:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WYxR9tgZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PBZDZnji"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EF83241F0
-	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 12:14:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4405724218
+	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 12:19:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705580057; cv=none; b=the3QVgE0q2d3kBejtdP5BoIqvEPlveu7v+0m95inIFyMJjcirkm6jm2skXd1y2f/Et8d69ZN4JY0mgxfImTLEeyuu/7cYu3S0LcVg9LVr6Oeya3vu1cpJ+D4dauVhNsLIMlyFfC9oTAE8GZybWpNqDgliTlELg5SI92ekLmK38=
+	t=1705580386; cv=none; b=cA/xVmuO/5BFwOYdoBWScs07PaLwM002T1kOyMYtFdqafBWE+VmY4xl/4cWWUnqn8LnSBn2MR8GXloMlZI1I+6z45k7kTUTeSRS+9K3Q1fPCjhDJOJkgnDcXXncXZvyweQu52d3FRrB+NqkZKMRt1J4ePUL4qC335QGkNY3iGvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705580057; c=relaxed/simple;
-	bh=bkDtY6K6Ac2Ig3O9KOeOHxZVhC+cTLQ6M1Gb/h1pn2I=;
-	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:MIME-Version:
-	 References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:
-	 Content-Type:Content-Transfer-Encoding; b=e2yvRbwdxe7AJj9BexfuhCtSj0dW4dadcyiZ6oYMiSOgSLNNPiqWjcfs4jl/HSczhsFQI2Nhb6SXC3H5XT7CVY09QrwV/LRCVNaEP5VWzSy6bJTpdkzan3YCegIoSiAt48qmyPyjPnUEHNcjgFbgqraxgZLsQ7sba6LTXkXfZwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WYxR9tgZ; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-557bbcaa4c0so4862a12.1
-        for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 04:14:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1705580054; x=1706184854; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y0YkYRkvguoD3Qyt5U+lfVL2TVHTQ0UkOYEo52fT4WI=;
-        b=WYxR9tgZEkRWWlP4uqVQOD5pMOPSDhg1AisYdXK56zGFRSQ3IMdUPQovT6pR5huvZE
-         SHE07oTLnuXRr/Xg+HapmDcRZzd1Z12KW/886p3ZC+JQe+LlUIwxEmDI5TzQqU0GnMT4
-         Dc3Zu0Dvaqxgf9duIcDgVfiu+5rctCe/fmi3NnEUhj9OaOaofJX875GYsCQlA2QC8FRE
-         /ELAC/rz02BzHMb0dQ4CEC+GiMUcZmMYgPqHsbJMKIE0RHuJh9h4FzHrM/zV4Is2uBga
-         okRrjNEYKHGlcjZ7SPUT5AAO9IRBhr4jSy0vdtr5GYe+umxpx6kHr0aPqm30FY9UCIY1
-         4W4A==
+	s=arc-20240116; t=1705580386; c=relaxed/simple;
+	bh=AEevfr9XoEmXV7CtmjTt3x1naHbjv/B6KkwqHnPrMlA=;
+	h=DKIM-Signature:Received:X-MC-Unique:Received:
+	 X-Google-DKIM-Signature:X-Gm-Message-State:X-Received:
+	 X-Google-Smtp-Source:X-Received:Received:Message-ID:Subject:From:
+	 To:Date:In-Reply-To:References:Autocrypt:Content-Type:
+	 Content-Transfer-Encoding:User-Agent:MIME-Version; b=q3ca/Mbyl/ykyZ2m6AR2GZiBrzx+GVqc8UBadFi1/BftLt40OTAzzXJLIEF22f8Gq6LTSJSy3fuzHmUT9UGRPxRyNE+8sYYWPKSCXhK9BLbg9zzXpsPqBrlc+8p/zO0if3FMFgX6MYTJPKuJ5Ph6+1OwgZoXSI1IQ9CWBF0IiuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PBZDZnji; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1705580384;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=AEevfr9XoEmXV7CtmjTt3x1naHbjv/B6KkwqHnPrMlA=;
+	b=PBZDZnjiefxySi1LYFaLJenLryOvdIBJAk7fu+7qyvgOUMMPIYKjNwYnl5+f0cLLsb1RPw
+	NnT0rEkmTUC1UsTunNxWIMDxMs8X27hGp2Y8go7F2MVHlgyaSkARAtzIKxXiPfzfJmG1GC
+	4Hyx1p9pVyuywYCVt1RT+VmyRSL4j9s=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-43--2VImU6ZO5W90bGXmrsWMQ-1; Thu, 18 Jan 2024 07:19:42 -0500
+X-MC-Unique: -2VImU6ZO5W90bGXmrsWMQ-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40e4997b828so17098885e9.0
+        for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 04:19:42 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705580054; x=1706184854;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=y0YkYRkvguoD3Qyt5U+lfVL2TVHTQ0UkOYEo52fT4WI=;
-        b=S1j2elnat8l/VuNpy/dMdnjSDG/223bgn/uk0zzmWWPbN8dMSyPs+z9yJ/BblD2HAm
-         8JtrLk7kkBAIkk4XjqZFc5ELcNZU3KH9DctIyZgMLd6Ey3ozwMyVymPoMoHxkZ7xBXyn
-         fPNX7OxHz0suYa5VryRBWlbtUAI96k27eTJxCxDJXTDxYz2b4zzfrse9emxG1GOeJFYu
-         QmKwugM5FK+5inL5QxblxTFXrcUk9ZQT16t22G9IKB8InkWf8gTPyFEsnJrWArxFv2U3
-         miUAKZ9dczAKMpns814MgMnryh8zfGPWJsA51b7j/vyKTmazPZ7g44rXzfkMB1T64E1D
-         UIHQ==
-X-Gm-Message-State: AOJu0Yx4o2rfph5tpVgkXEoLYaaZYESBDV1ef5quAmaaotxfKYASK4xU
-	B0YqRGxUxSQ9zsDvdSyC8NnRdFGbZh2Tyg1hmmspLc8TyYdSdAl4Stc87/MWhkV426+X/mLkH/g
-	PalLy3IebYkCJ01ApJ4UMwP4X8TB1S0Gjri3e
-X-Google-Smtp-Source: AGHT+IG8BgszuE1QfQBfU2QpT6kuFAIaeLec4MYpFTHtcTsPZdCsAQ4niwquAVbhQOefcBHz7FsLVHAPBLESOmrSnLQ=
-X-Received: by 2002:a05:6402:30bc:b0:559:6594:cf2e with SMTP id
- df28-20020a05640230bc00b005596594cf2emr48229edb.7.1705580053448; Thu, 18 Jan
- 2024 04:14:13 -0800 (PST)
+        d=1e100.net; s=20230601; t=1705580381; x=1706185181;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AEevfr9XoEmXV7CtmjTt3x1naHbjv/B6KkwqHnPrMlA=;
+        b=QGS5a6yPEpeUTlCDvP2edheSDaYEnBayWqNiut1RNYGRUeThLIB+e7HbyTttQWaEmX
+         BjvXQLvjg14wdLDx/IktEOEJIxQb3Yp915AjmITc2f5IZTQ3Lt+xAwonVyJOPZdrAEiP
+         KzI1v72D3SGiP1IY+qZpCtW5/5OvZEdMmeEauu/4uwChCQa3qN9OMlSYJ8Ub+3eZ1et2
+         ZyWMEn5EXS5cH25UPPt1SwsVoQXgS+Tp3MJQR7UcgkAz+1SyetU0DPCgsnHdHfYKK/Rm
+         nAUgvPA39r3V2etG88ynr9NgjtpM7Wz0S/tBR/nwJF/io1T05l6x1k4NrgQpHC6+OKdj
+         YSug==
+X-Gm-Message-State: AOJu0YyN78ZkUzlw7yhGJ/lAj3GLjE6MdkuZ/m3Vxui/tsxTvYCJTq97
+	kg9msr8sKluY7i40ecXSyMn0d8I0vMchWYWfiksQezuvJdGUB3YZOoMtxdBLd8kcSIbr2+ODjWc
+	XRL0CH39FqA5Up7e5eCSRySKgksDMlTSsHVu+M6PpkXpJO/yoy6ESKg==
+X-Received: by 2002:a5d:508a:0:b0:337:c58a:ac91 with SMTP id a10-20020a5d508a000000b00337c58aac91mr898911wrt.1.1705580381460;
+        Thu, 18 Jan 2024 04:19:41 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHcJ8d42KXzo+C7TSGuKsXc6BQMfAYTM/431jeVFDg02NiLe+Zo64bFkUy1DHsrWVEHzzkdzQ==
+X-Received: by 2002:a5d:508a:0:b0:337:c58a:ac91 with SMTP id a10-20020a5d508a000000b00337c58aac91mr898901wrt.1.1705580381087;
+        Thu, 18 Jan 2024 04:19:41 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-241-180.dyn.eolo.it. [146.241.241.180])
+        by smtp.gmail.com with ESMTPSA id e40-20020a5d5968000000b00337bfd9bd47sm3908789wri.73.2024.01.18.04.19.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Jan 2024 04:19:40 -0800 (PST)
+Message-ID: <1137d26fb5fc1ca7070f8012ec588116a29a1c8a.camel@redhat.com>
+Subject: Re: [PATCH net-next v1] vlan: skip nested type that is not
+ IFLA_VLAN_QOS_MAPPING
+From: Paolo Abeni <pabeni@redhat.com>
+To: Lin Ma <linma@zju.edu.cn>, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Thu, 18 Jan 2024 13:19:39 +0100
+In-Reply-To: <20240117153810.1197794-1-linma@zju.edu.cn>
+References: <20240117153810.1197794-1-linma@zju.edu.cn>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=mQINBGISiDUBEAC5uMdJicjm3ZlWQJG4u2EU1EhWUSx8IZLUTmEE8zmjPJFSYDcjtfGcbzLPb63BvX7FADmTOkO7gwtDgm501XnQaZgBUnCOUT8qv5MkKsFH20h1XJyqjPeGM55YFAXc+a4WD0YyO5M0+KhDeRLoildeRna1ey944VlZ6Inf67zMYw9vfE5XozBtytFIrRyGEWkQwkjaYhr1cGM8ia24QQVQid3P7SPkR78kJmrT32sGk+TdR4YnZzBvVaojX4AroZrrAQVdOLQWR+w4w1mONfJvahNdjq73tKv51nIpu4SAC1Zmnm3x4u9r22mbMDr0uWqDqwhsvkanYmn4umDKc1ZkBnDIbbumd40x9CKgG6ogVlLYeJa9WyfVMOHDF6f0wRjFjxVoPO6p/ZDkuEa67KCpJnXNYipLJ3MYhdKWBZw0xc3LKiKc+nMfQlo76T/qHMDfRMaMhk+L8gWc3ZlRQFG0/Pd1pdQEiRuvfM5DUXDo/YOZLV0NfRFU9SmtIPhbdm9cV8Hf8mUwubihiJB/9zPvVq8xfiVbdT0sPzBtxW0fXwrbFxYAOFvT0UC2MjlIsukjmXOUJtdZqBE3v3Jf7VnjNVj9P58+MOx9iYo8jl3fNd7biyQWdPDfYk9ncK8km4skfZQIoUVqrWqGDJjHO1W9CQLAxkfOeHrmG29PK9tHIwARAQABtB9QYW9sbyBBYmVuaSA8cGFiZW5pQHJlZGhhdC5jb20+iQJSBBMBCAA8FiEEg1AjqC77wbdLX2LbKSR5jcyPE6QFAmISiDUCGwMFCwkIBwIDIgIBBhUKCQgLAgQWAgMBAh4HAheAAAoJECkkeY3MjxOkJSYQAJcc6MTsuFxYdYZkeWjW//zbD3ApRHzpNlHLVSuJqHr9/aDS+tyszgS8jj9MiqALzgq4iZbg
+ 7ZxN9ZsDL38qVIuFkSpgMZCiUHdxBC11J8nbBSLlpnc924UAyr5XrGA99 6Wl5I4Km3128GY6iAkH54pZpOmpoUyBjcxbJWHstzmvyiXrjA2sMzYjt3Xkqp0cJfIEekOi75wnNPofEEJg28XPcFrpkMUFFvB4Aqrdc2yyR8Y36rbw18sIX3dJdomIP3dL7LoJi9mfUKOnr86Z0xltgcLPGYoCiUZMlXyWgB2IPmmcMP2jLJrusICjZxLYJJLofEjznAJSUEwB/3rlvFrSYvkKkVmfnfro5XEr5nStVTECxfy7RTtltwih85LlZEHP8eJWMUDj3P4Q9CWNgz2pWr1t68QuPHWaA+PrXyasDlcRpRXHZCOcvsKhAaCOG8TzCrutOZ5NxdfXTe3f1jVIEab7lNgr+7HiNVS+UPRzmvBc73DAyToKQBn9kC4jh9HoWyYTepjdcxnio0crmara+/HEyRZDQeOzSexf85I4dwxcdPKXv0fmLtxrN57Ae82bHuRlfeTuDG3x3vl/Bjx4O7Lb+oN2BLTmgpYq7V1WJPUwikZg8M+nvDNcsOoWGbU417PbHHn3N7yS0lLGoCCWyrK1OY0QM4EVsL3TjOfUtCNQYW9sbyBBYmVuaSA8cGFvbG8uYWJlbmlAZ21haWwuY29tPokCUgQTAQgAPBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEoitAhsDBQsJCAcCAyICAQYVCgkICwIEFgIDAQIeBwIXgAAKCRApJHmNzI8TpBzHD/45pUctaCnhee1vkQnmStAYvHmwrWwIEH1lzDMDCpJQHTUQOOJWDAZOFnE/67bxSS81Wie0OKW2jvg1ylmpBA0gPpnzIExQmfP72cQ1TBoeVColVT6Io35BINn+ymM7c0Bn8RvngSEpr3jBtqvvWXjvtnJ5/HbOVQCg62NC6ewosoKJPWpGXMJ9SKsVIOUHsmoWK60spzeiJoSmAwm3zTJQnM5kRh2q
+ iWjoCy8L35zPqR5TV+f5WR5hTVCqmLHSgm1jxwKhPg9L+GfuE4d0SWd84y GeOB3sSxlhWsuTj1K6K3MO9srD9hr0puqjO9sAizd0BJP8ucf/AACfrgmzIqZXCfVS7jJ/M+0ic+j1Si3yY8wYPEi3dvbVC0zsoGj9n1R7B7L9c3g1pZ4L9ui428vnPiMnDN3jh9OsdaXeWLvSvTylYvw9q0DEXVQTv4/OkcoMrfEkfbXbtZ3PRlAiddSZA5BDEkkm6P9KA2YAuooi1OD9d4MW8LFAeEicvHG+TPO6jtKTacdXDRe611EfRwTjBs19HmabSUfFcumL6BlVyceIoSqXFe5jOfGpbBevTZtg4kTSHqymGb6ra6sKs+/9aJiONs5NXY7iacZ55qG3Ib1cpQTps9bQILnqpwL2VTaH9TPGWwMY3Nc2VEc08zsLrXnA/yZKqZ1YzSY9MGXWYLkCDQRiEog1ARAAyXMKL+x1lDvLZVQjSUIVlaWswc0nV5y2EzBdbdZZCP3ysGC+s+n7xtq0o1wOvSvaG9h5q7sYZs+AKbuUbeZPu0bPWKoO02i00yVoSgWnEqDbyNeiSW+vI+VdiXITV83lG6pS+pAoTZlRROkpb5xo0gQ5ZeYok8MrkEmJbsPjdoKUJDBFTwrRnaDOfb+Qx1D22PlAZpdKiNtwbNZWiwEQFm6mHkIVSTUe2zSemoqYX4QQRvbmuMyPIbwbdNWlItukjHsffuPivLF/XsI1gDV67S1cVnQbBgrpFDxN62USwewXkNl+ndwa+15wgJFyq4Sd+RSMTPDzDQPFovyDfA/jxN2SK1Lizam6o+LBmvhIxwZOfdYH8bdYCoSpqcKLJVG3qVcTwbhGJr3kpRcBRz39Ml6iZhJyI3pEoX3bJTlR5Pr1Kjpx13qGydSMos94CIYWAKhegI06aTdvvuiigBwjngo/Rk5S+iEGR5KmTqGyp27o6YxZy6D4NIc6PKUzhIUxfvuHNvfu
+ sD2W1U7eyLdm/jCgticGDsRtweytsgCSYfbz0gdgUuL3EBYN3JLbAU+UZpy v/fyD4cHDWaizNy/KmOI6FFjvVh4LRCpGTGDVPHsQXaqvzUybaMb7HSfmBBzZqqfVbq9n5FqPjAgD2lJ0rkzb9XnVXHgr6bmMRlaTlBMAEQEAAYkCNgQYAQgAIBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEog1AhsMAAoJECkkeY3MjxOkY1YQAKdGjHyIdOWSjM8DPLdGJaPgJdugHZowaoyCxffilMGXqc8axBtmYjUIoXurpl+f+a7S0tQhXjGUt09zKlNXxGcebL5TEPFqgJTHN/77ayLslMTtZVYHE2FiIxkvW48yDjZUlefmphGpfpoXe4nRBNto1mMB9Pb9vR47EjNBZCtWWbwJTIEUwHP2Z5fV9nMx9Zw2BhwrfnODnzI8xRWVqk7/5R+FJvl7s3nY4F+svKGD9QHYmxfd8Gx42PZc/qkeCjUORaOf1fsYyChTtJI4iNm6iWbD9HK5LTMzwl0n0lL7CEsBsCJ97i2swm1DQiY1ZJ95G2Nz5PjNRSiymIw9/neTvUT8VJJhzRl3Nb/EmO/qeahfiG7zTpqSn2dEl+AwbcwQrbAhTPzuHIcoLZYV0xDWzAibUnn7pSrQKja+b8kHD9WF+m7dPlRVY7soqEYXylyCOXr5516upH8vVBmqweCIxXSWqPAhQq8d3hB/Ww2A0H0PBTN1REVw8pRLNApEA7C2nX6RW0XmA53PIQvAP0EAakWsqHoKZ5WdpeOcH9iVlUQhRgemQSkhfNaP9LqR1XKujlTuUTpoyT3xwAzkmSxN1nABoutHEO/N87fpIbpbZaIdinF7b9srwUvDOKsywfs5HMiUZhLKoZzCcU/AEFjQsPTATACGsWf3JYPnWxL9
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240117160030.140264-1-pablo@netfilter.org> <20240117160030.140264-15-pablo@netfilter.org>
- <CANn89i+jS11sC6cXXFA+_ZVr9Oy6Hn1e3_5P_d4kSR2fWtisBA@mail.gmail.com>
- <54f00e7c-8628-1705-8600-e9ad3a0dc677@netfilter.org> <CANn89iK_oa5CzeJVbiNSmPYZ6K+4_2m9nLqtSdwNAc9BtcZNew@mail.gmail.com>
- <8834c825579a054d51be3d60405c0b204fa5c24b.camel@redhat.com>
-In-Reply-To: <8834c825579a054d51be3d60405c0b204fa5c24b.camel@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 18 Jan 2024 13:14:02 +0100
-Message-ID: <CANn89iKN6Bkm96UUvchq99vr1J_SbHWY7D0DFD3RXU4o74J7qA@mail.gmail.com>
-Subject: Re: [PATCH net 14/14] netfilter: ipset: fix performance regression in
- swap operation
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Jozsef Kadlecsik <kadlec@netfilter.org>, Pablo Neira Ayuso <pablo@netfilter.org>, 
-	netfilter-devel@vger.kernel.org, davem@davemloft.net, netdev@vger.kernel.org, 
-	kuba@kernel.org, fw@strlen.de
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 18, 2024 at 12:08=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wr=
-ote:
->
-> On Wed, 2024-01-17 at 17:28 +0100, Eric Dumazet wrote:
-> > On Wed, Jan 17, 2024 at 5:23=E2=80=AFPM Jozsef Kadlecsik <kadlec@netfil=
-ter.org> wrote:
-> > >
-> > > Hi,
-> > >
-> > > On Wed, 17 Jan 2024, Eric Dumazet wrote:
-> > >
-> > > > On Wed, Jan 17, 2024 at 5:00=E2=80=AFPM Pablo Neira Ayuso <pablo@ne=
-tfilter.org> wrote:
-> > > > >
-> > > > > From: Jozsef Kadlecsik <kadlec@netfilter.org>
-> > > > >
-> > > > > The patch "netfilter: ipset: fix race condition between swap/dest=
-roy
-> > > > > and kernel side add/del/test", commit 28628fa9 fixes a race condi=
-tion.
-> > > > > But the synchronize_rcu() added to the swap function unnecessaril=
-y slows
-> > > > > it down: it can safely be moved to destroy and use call_rcu() ins=
-tead.
-> > > > > Thus we can get back the same performance and preventing the race=
- condition
-> > > > > at the same time.
-> > > >
-> > > > ...
-> > > >
-> > > > >
-> > > > > @@ -2357,6 +2369,9 @@ ip_set_net_exit(struct net *net)
-> > > > >
-> > > > >         inst->is_deleted =3D true; /* flag for ip_set_nfnl_put */
-> > > > >
-> > > > > +       /* Wait for call_rcu() in destroy */
-> > > > > +       rcu_barrier();
-> > > > > +
-> > > > >         nfnl_lock(NFNL_SUBSYS_IPSET);
-> > > > >         for (i =3D 0; i < inst->ip_set_max; i++) {
-> > > > >                 set =3D ip_set(inst, i);
-> > > > > --
-> > > > > 2.30.2
-> > > > >
-> > > >
-> > > > If I am reading this right, time for netns dismantles will increase=
-,
-> > > > even for netns not using ipset
-> > > >
-> > > > If there is no other option, please convert "struct pernet_operatio=
-ns
-> > > > ip_set_net_ops".exit to an exit_batch() handler,
-> > > > to at least have a factorized  rcu_barrier();
-> > >
-> > > You are right, the call to rcu_barrier() can safely be moved to
-> > > ip_set_fini(). I'm going to prepare a new version of the patch.
-> > >
-> > > Thanks for catching it.
-> >
-> > I do not want to hold the series, your fix can be built as another
-> > patch on top of this one.
->
-> Given the timing, if we merge this series as is, it could go very soon
-> into Linus' tree. I think it would be better to avoid introducing known
-> regressions there.
->
-> Any strong opinions vs holding this series until the problems are
-> fixed? Likely a new PR will be required.
->
+On Wed, 2024-01-17 at 23:38 +0800, Lin Ma wrote:
+> In the vlan_changelink function, a loop is used to parse the nested
+> attributes IFLA_VLAN_EGRESS_QOS and IFLA_VLAN_INGRESS_QOS in order to
+> obtain the struct ifla_vlan_qos_mapping. These two nested attributes are
+> checked in the vlan_validate_qos_map function, which calls
+> nla_validate_nested_deprecated with the vlan_map_policy.
+>=20
+> However, this deprecated validator applies a LIBERAL strictness, allowing
+> the presence of an attribute with the type IFLA_VLAN_QOS_UNSPEC.
+> Consequently, the loop in vlan_changelink may parse an attribute of type
+> IFLA_VLAN_QOS_UNSPEC and believe it carries a payload of
+> struct ifla_vlan_qos_mapping, which is not necessarily true.
+>=20
+> To address this issue and ensure compatibility, this patch introduces two
+> type checks that skip attributes whose type is not IFLA_VLAN_QOS_MAPPING.
+>=20
+> Signed-off-by: Lin Ma <linma@zju.edu.cn>
 
-If this helps, here is one splat (using linux-next next-20240118)
+Why are you targeting net-next? this looks like a fix suitable for
+'net' - with a proper fixes tag.
 
-BUG: sleeping function called from invalid context at kernel/workqueue.c:33=
-48
-in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 22194, name:
-syz-executor.0
-preempt_count: 101, expected: 0
-RCU nest depth: 0, expected: 0
-3 locks held by syz-executor.0/22194:
-#0: ffff8880162a2420 (sb_writers#5){.+.+}-{0:0}, at:
-ksys_write+0x12f/0x260 fs/read_write.c:643
-#1: ffff888042b48960 (&sb->s_type->i_mutex_key#12){+.+.}-{3:3}, at:
-inode_lock include/linux/fs.h:802 [inline]
-#1: ffff888042b48960 (&sb->s_type->i_mutex_key#12){+.+.}-{3:3}, at:
-shmem_file_write_iter+0x8c/0x140 mm/shmem.c:2883
-#2: ffffffff8d5aeb00 (rcu_callback){....}-{0:0}, at: rcu_lock_acquire
-include/linux/rcupdate.h:298 [inline]
-#2: ffffffff8d5aeb00 (rcu_callback){....}-{0:0}, at: rcu_do_batch
-kernel/rcu/tree.c:2152 [inline]
-#2: ffffffff8d5aeb00 (rcu_callback){....}-{0:0}, at:
-rcu_core+0x7cc/0x16b0 kernel/rcu/tree.c:2433
-Preemption disabled at:
-[<ffffffff813c061e>] unwind_next_frame+0xce/0x2390
-arch/x86/kernel/unwind_orc.c:479
-CPU: 0 PID: 22194 Comm: syz-executor.0 Not tainted
-6.7.0-next-20240118-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine,
-BIOS Google 11/17/2023
-Call Trace:
-<IRQ>
-__dump_stack lib/dump_stack.c:88 [inline]
-dump_stack_lvl+0x125/0x1b0 lib/dump_stack.c:106
-__might_resched+0x3c0/0x5e0 kernel/sched/core.c:10176
-start_flush_work kernel/workqueue.c:3348 [inline]
-__flush_work+0x11f/0xa20 kernel/workqueue.c:3410
-__cancel_work_timer+0x3f3/0x590 kernel/workqueue.c:3498
-hash_ipmac6_destroy+0x337/0x420 net/netfilter/ipset/ip_set_hash_gen.h:454
-ip_set_destroy_set+0x65/0x100 net/netfilter/ipset/ip_set_core.c:1180
-rcu_do_batch kernel/rcu/tree.c:2158 [inline]
-rcu_core+0x828/0x16b0 kernel/rcu/tree.c:2433
-__do_softirq+0x218/0x8de kernel/softirq.c:553
-invoke_softirq kernel/softirq.c:427 [inline]
-__irq_exit_rcu kernel/softirq.c:632 [inline]
-irq_exit_rcu+0xb9/0x120 kernel/softirq.c:644
-sysvec_apic_timer_interrupt+0x95/0xb0 arch/x86/kernel/apic/apic.c:1076
-</IRQ>
-<TASK>
-asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:6=
-49
-RIP: 0010:on_stack arch/x86/include/asm/stacktrace.h:59 [inline]
+Cheers,
+
+Paolo
+
 
