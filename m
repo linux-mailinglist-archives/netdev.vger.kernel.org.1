@@ -1,130 +1,108 @@
-Return-Path: <netdev+bounces-64237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEECA831DE5
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 17:53:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1A48831DE7
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 17:54:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F21431C233DE
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 16:53:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71AFC286A61
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 16:54:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7624D2C1B1;
-	Thu, 18 Jan 2024 16:53:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B49402C1BD;
+	Thu, 18 Jan 2024 16:54:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BGITM14f"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4IVJv5pT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E43CC2D021
-	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 16:53:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BACC02C1A0;
+	Thu, 18 Jan 2024 16:54:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705596823; cv=none; b=L+ta0rV2ghj9GI4DsFBpF61uboKjo2o6h7M7jxrBvfAo2q+TaRC1lKXLkmtzrUq4OuXHBfW5HUhEzg02qbumkHHB8A+MAEAHTZHwdpHWpqBKQU6QiZIbmwdsM6lprn4slqVEo+qtD3F3g7gBSk5wJe0eQpVrTt0iSBvRSWmNex8=
+	t=1705596856; cv=none; b=l70qJd0ugzTDDK8rY7dq+QDThPZ3UL9CkJLlew/T0czCZ+QkTI27kARnUqM55LyMenNhLzC+0/f+w2of+vuuGbrGjdDWAziply9rXuawVTO7QxgLgPGR2nIcsnbNeaZ9nx44h5RCnnREDQ1kH8foCq5AuIgOT3nClfrzT3eYMgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705596823; c=relaxed/simple;
-	bh=9B2fRhEu03vjcuy7sMB3oHOAvIqRvSBd45bkR5FwFNY=;
-	h=Received:DKIM-Signature:Received:Received:Received:Received:
-	 Received:Received:Received:Received:Received:Message-ID:Date:
-	 MIME-Version:User-Agent:Subject:To:Cc:References:From:
-	 Content-Language:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:X-TM-AS-GCONF:X-Proofpoint-GUID:
-	 X-Proofpoint-ORIG-GUID:X-Proofpoint-Virus-Version:
-	 X-Proofpoint-Spam-Details; b=HYl1eYNVWRizFDoOSvng6i/bFSlTKA7b+QkrsA8RJfxluyxQHGWFhgETdi8iHup/r9juZYFCdKOas+Idm+QYI0n10IT7svNPADSplWfqcF9R67b678wiRXjqMSWM4ygRUG9Smfcx2jaIUN0wbP/NqiOo9kTkVhYqu7HyM+24M6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com; spf=none smtp.mailfrom=linux.vnet.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=BGITM14f; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.vnet.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40IGgMpE015238;
-	Thu, 18 Jan 2024 16:53:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=9B2fRhEu03vjcuy7sMB3oHOAvIqRvSBd45bkR5FwFNY=;
- b=BGITM14fjmfjexBpvyWLwQkRIic1HyELMDyxgCY2sz3panDJcw/ZQHc+4y4CJDgfne5F
- cvs0wuaJTiwtHyWkSe3dvJP4RtVnYmoB7CpvlUIBYnvK7zuzihaBz84/zPpHGSHaOEd1
- 41f0UQEm8QPksRofJMwFjI03AgkZdIP/h0EUJJNbkiEZyDaCRtKZq4aF2iRQw+8kWonc
- PWlAzmn6IpvUDOBH/z9lDRI1yaTEGUdbITIiDyilab1wSNBfp3wPihsUdUTh4+I2cnxK
- FZIIFYI1paMKM/06y6S5UUvFfF2nl86ltjzVTFTiG5FOdhxLJ5VDTJST1wXb9M24JKF7 yA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vq7r48ar2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 18 Jan 2024 16:53:37 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40IGgpEs016095;
-	Thu, 18 Jan 2024 16:53:36 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vq7r48app-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 18 Jan 2024 16:53:36 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 40IE3axL030430;
-	Thu, 18 Jan 2024 16:53:34 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vm72kc5ps-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 18 Jan 2024 16:53:34 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 40IGrUav63701494
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 18 Jan 2024 16:53:31 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A89695805C;
-	Thu, 18 Jan 2024 16:53:30 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0B28458059;
-	Thu, 18 Jan 2024 16:53:30 +0000 (GMT)
-Received: from [9.41.99.4] (unknown [9.41.99.4])
-	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 18 Jan 2024 16:53:29 +0000 (GMT)
-Message-ID: <35ccf649-60e9-4903-b066-a9d8f8785ea4@linux.vnet.ibm.com>
-Date: Thu, 18 Jan 2024 10:53:30 -0600
+	s=arc-20240116; t=1705596856; c=relaxed/simple;
+	bh=crJwJ8X/wzPlvScgIcXHTUknQHUelOOysLDVlUFds9k=;
+	h=DKIM-Signature:Received:Date:From:To:Cc:Subject:Message-ID:
+	 References:MIME-Version:Content-Type:Content-Disposition:
+	 In-Reply-To; b=IL6ATNP6z7IDyC9j4swL+pTVSYD/0wcxP5lHkxlXNL5z6fhYMkxqsmt5eGqIHcYB0oRocwDu3SoH9FsLuVBrfs6XuhsTNzSzpk7LiJlpge1P5EIENNAbdtMKJZmtle9V95cHjkqlvSmAqfrKqFJZ5OTDr+kWu5kZFhpdYRX4+Ic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4IVJv5pT; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=jHGZBZk6Jjgp+pfdwPf2DTLVgfHtKK0y+HPwY/B39uE=; b=4IVJv5pTb0iY61RpsCsMhhL01N
+	5zSwfq5bMPtgMyVp2gKNwMCOUBzt6HjqtZEAd11XWRhi/q+dKhzT7S4/Wutcu2/AJYnEXPMKI2aE/
+	Lgs6vjWwiylS+0Xn4md/7EY7wpfwCFYQbaIldPtHOX0zzyixSmJnS8IR3PSEQHHFAkP8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rQVeQ-005UkO-ND; Thu, 18 Jan 2024 17:53:58 +0100
+Date: Thu, 18 Jan 2024 17:53:58 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Andre Werner <andre.werner@systec-electronic.com>
+Cc: hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: phy: adin1100: Fix nullptr exception for phy
+ interrupts
+Message-ID: <322d5543-4d13-48a7-af58-daa8cc840f05@lunn.ch>
+References: <20240118104341.10832-1-andre.werner@systec-electronic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Patch v6 0/4] bnx2x: Fix error recovering in switch
- configuration
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: aelior@marvell.com, davem@davemloft.net, edumazet@google.com,
-        manishc@marvell.com, netdev@vger.kernel.org, pabeni@redhat.com,
-        skalluru@marvell.com, VENKATA.SAI.DUGGI@ibm.com,
-        Abdul Haleem <abdhalee@in.ibm.com>,
-        David Christensen <drc@linux.vnet.ibm.com>,
-        Simon Horman <simon.horman@corigine.com>
-References: <4bc40774-eae9-4134-be51-af23ad0b6f84@linux.vnet.ibm.com>
- <dd4d42ef-4c49-46fb-8e90-9b80c1315e92@linux.vnet.ibm.com>
- <20240117155544.225ae950@kernel.org>
-From: Thinh Tran <thinhtr@linux.vnet.ibm.com>
-Content-Language: en-US
-In-Reply-To: <20240117155544.225ae950@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: uy9iZRrzoTmiU3fvFXaoQtgJUyJb5Tqj
-X-Proofpoint-ORIG-GUID: 9evmKUCf8w8GlVKH7Ir9NNxLmW5l0or4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-18_08,2024-01-17_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 adultscore=0
- bulkscore=0 phishscore=0 impostorscore=0 mlxlogscore=604
- priorityscore=1501 spamscore=0 malwarescore=0 lowpriorityscore=0
- clxscore=1015 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2401180123
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240118104341.10832-1-andre.werner@systec-electronic.com>
 
+On Thu, Jan 18, 2024 at 11:43:41AM +0100, Andre Werner wrote:
+> If using ADIN1100 as an external phy, e.g. in combination with
+> "smsc95xx", we ran into nullptr exception by creating a link.
+> 
+> In our case the "smsc95xx" does not check for an available interrupt handler
+> on external phy driver to use poll instead of interrupts if no handler is
+> available. So we decide to implement a small handler in the phy driver
+> to support other MACs as well.
+> 
+> I update the driver to add an interrupt handler because libphy
+> does not check if their is a interrupt handler available either.
+> 
+> There are several interrupts maskable at the phy, but only link change interrupts
+> are handled by the driver yet.
+> 
+> We tested the combination "smsc95xx" and "adin1100" with Linux Kernel 6.6.9
+> and Linux Kernel 6.1.0, respectively.
 
-On 1/17/2024 5:55 PM, Jakub Kicinski wrote:
-> If there are any patches that got stuck in a limbo for a long time
-> please repost them in a new thread. If I'm looking this up right in
-> online archives the thread is 6 months old, I've deleted the old
-> messages already :(
+Hi Andre
 
-I will work on re-posting them in a new different thread.
-Thank you.
-Thinh Tran
+A few different things....
+
+Please could you give more details of the null pointer
+exception. phylib should test if the needed methods have been
+implemented in the PHY driver, and not tried to use interrupts when
+they are missing. It should of polled the PHY. So i would like to
+understand what went wrong. Maybe we have a phylib core bug we should
+be fixing. Or a bug in the smsc95xx driver.
+
+Please take a read of
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+
+Patches like this should be against net-next, not 6.6.9 etc. Also,
+net-next is currently closed due to the merge window being open. Its
+fine to post patches, but please mark them RFC until the merge window
+is over.
+
+The patch itself looks O.K, but i would make the commit message more
+formal. You can add additional comments under the --- which will not
+become part of the git history.
+
+       Andrew
 
