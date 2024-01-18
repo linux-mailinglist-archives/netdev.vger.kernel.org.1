@@ -1,90 +1,99 @@
-Return-Path: <netdev+bounces-64201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 450CE831BAB
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 15:44:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8EB0831BB1
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 15:46:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9AB88B20A80
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 14:44:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 47BFE1F22B8D
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 14:46:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0AD4647;
-	Thu, 18 Jan 2024 14:44:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A09C81DA31;
+	Thu, 18 Jan 2024 14:46:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZepYRH9l"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b2s3Dih+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B1571DDC3;
-	Thu, 18 Jan 2024 14:44:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22A63646;
+	Thu, 18 Jan 2024 14:46:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705589056; cv=none; b=WW4z4L5T4KM8X0JA0XuqxYXWQ49FUT3jt5kVpyiGnfpL/QHQDbRg4yoO5t5cmhSQGuPl9jgUOGE1v7YTkqwR6SV6uondW9CGGX6Ek5B3ZWAemkHvpSzr5WqRQ4zsCEZmL/Gy3wZzGZMNYJPQCfVeMgS9Jiq0vCgH7Ke1PnKPCyk=
+	t=1705589179; cv=none; b=Abf0YrfiSBgKV8ysXnu6Cab7IzPelj0TUC/oy/CTFbk0iChOtu/KX3JvJtzzJ9QSej8zv5JsBROnXI3PtPVLyuZEftdhx0oBuo9K/Oxv5WXiULwRDaGL8jcT85/l4Nuzq9fLVO1Q19ADBDaHrDmL74Qru+FzE2CEjItYdzBoPFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705589056; c=relaxed/simple;
-	bh=WCFGPbYkiQVLbhVotzaLYbYZTWEoJCeuU36QUwXEvMs=;
+	s=arc-20240116; t=1705589179; c=relaxed/simple;
+	bh=V/rb3e7RICwYcaa6sGQk5hX7onXeunnOrGGXPUjSP4s=;
 	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
 	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:Date:
 	 From:To:Cc:Message-ID:In-Reply-To:References:Subject:Mime-Version:
-	 Content-Type:Content-Transfer-Encoding; b=JZUtYwCXFZCvS52DG4J/mEy+GM69mz7SixftLvrtE/vSvIHGKJgnHukSO8p9H+niNZ6iZTnTSq4r9gp7vjExwk8BdJge8brPyG3Pz4GUuOLCmkVZYE54ENpgTIzwjOvkEr0GeE5lXU4sDzAs5+8Dd8Q16AtniBDIpumIC4iuL0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZepYRH9l; arc=none smtp.client-ip=209.85.222.174
+	 Content-Type:Content-Transfer-Encoding; b=JbI01cXbPwgIwxKVY3BcvNhB15Yrk76nvgh9GDAKJGUsrazDTU46bdMOOES6YI3QZlU+3amiA2qyGSLDk3L8RNXajmzr3MXepSbifd/HbSAnZUD7qFoRO5a4hozTez7E6893cvZ+cu2e63bBJEBziaovkW+GnE3uZ9O3f3OYtiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b2s3Dih+; arc=none smtp.client-ip=209.85.219.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-78339210979so767687485a.1;
-        Thu, 18 Jan 2024 06:44:14 -0800 (PST)
+Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-68192840641so2338746d6.1;
+        Thu, 18 Jan 2024 06:46:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705589054; x=1706193854; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1705589177; x=1706193977; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YoZ+SlkruvUdNkH7eZxjFcDuia7cqhFoQuvvT1OXvIY=;
-        b=ZepYRH9lKAtqoFPXa/7Lka4xSlLEpq5qPJcAi0HrqSHVbNQomh2U+f7MO90Fb1Np8R
-         I6OKEHYP63okJhz2fnL267g8Ku5NO7OgG9S/KrlJKWkdysebiBloY4aj+t5mX9lewifq
-         tSST8eV4M+7JE//Nsws07ZLRL8tHkXzxmtJMBE2FAFYFw98etO2OcAXM2+Uxo5y31089
-         mT2ESHZ3smREOOQ37PuS78UFR7lOfXmTtciQEip+9MdT7KJ+JcjUBD/QcbNK9515EplM
-         aAjLuo5adjEyRWcPOsbTjem0f4w3zT1A6QY8VK3Q4NhTmYTaE8EkrikvvUECDdNbFmtv
-         8N0A==
+        bh=V/rb3e7RICwYcaa6sGQk5hX7onXeunnOrGGXPUjSP4s=;
+        b=b2s3Dih+kRIgNm+BIW8vVCPxX42jWdNMQLlFDCtbcXwUZA9gS/B5PET0r40/8yIGQu
+         mm10HhoDzSj/cgqHMwuXoYQX853qJgiMEmSZ9vnQYFoainGHwQp2Pogre0zPjBAezzhk
+         90tqPPm0oIcT+LfdosPSfcwrkvv2+4NgNkejyqOqdW3o9lERHDLp1wF8iiZDPdMgAhD6
+         EQDtjG+rlyS00Czczv3q3efIHu0PODN2r0pdz7iqtFsrsVD3t8N0ArjHqAP1C6D6i2R7
+         +yRhLULldk1tN5GHUVzPzZOPBnc9ez/8vIvcs+HLZqBO66cKi2hMUj8LIML6q1eNlzKQ
+         8eIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705589054; x=1706193854;
+        d=1e100.net; s=20230601; t=1705589177; x=1706193977;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=YoZ+SlkruvUdNkH7eZxjFcDuia7cqhFoQuvvT1OXvIY=;
-        b=mm76E2fmc23jnRIJJAHTq7xlXnOA+7OhB5G2Zpfc89ZoH6NYdRwdpnIIcQOerXBKwP
-         vjqafnbRFT25VazlXFR019GvMIP25OI2g/TWtFjxgs2U8QyGybMXfrc3qfRg12Cu26lx
-         z1exJmTdiDfCaT5zXA2igg+jHMZkFQqSUJpFxqqkzlSs7k+K+KS9B+WFWrM8TR+xVJK9
-         su9q4eS6DkDs6USQibJh9r+QFxZOESQVWY3c7TGSc2xfb9vYexPrAaTfzul5N2TO44hI
-         oICOu2Y+p/2zvM3FY5L3hW4yjw9smC9QaoTZCal5c3Ob31+QBYxMIzW3lxll3gJ+iTZD
-         3zng==
-X-Gm-Message-State: AOJu0Ywon46VmidXaI9RUt3E4VdRh7SgKvUIjx6DkUnAC8jOPDnhoaqm
-	bUo/MK9EMxerv3FzSGM+B1ohKoDJBkHsvFizSTDM/tH+mQ+VXAqazoMB3D0W
-X-Google-Smtp-Source: AGHT+IEzw5yCRzR2VREpYP1zk6hUvPux7J9JLpCfOheCUlMPLJnyZiI+suikwj2sbgt4VUO4d0h4Kg==
-X-Received: by 2002:a05:620a:134b:b0:783:148f:a691 with SMTP id c11-20020a05620a134b00b00783148fa691mr948410qkl.71.1705589053991;
-        Thu, 18 Jan 2024 06:44:13 -0800 (PST)
+        bh=V/rb3e7RICwYcaa6sGQk5hX7onXeunnOrGGXPUjSP4s=;
+        b=MZrI4kbRyn9fPKmOklZQBlcEGRKr+HIsciEfrD2tQgGM7QFe03I5ZntHs4i+biFAWe
+         APwE6CH5EFSR8QCawJm805js1/wzbbElImSf3QapkR1VkvN++LANH5/0L7Q/5a9HMUUZ
+         J3WqjasnvuZRND352oGuQJzX6Nql3kyu8UYLmn6kezFd1vQ8i5OAmmYF6dVJAmKk2zrZ
+         TO6sOj4oPrsnRhHDk2eOPEfrokdDkb+k7IqpM0GxIcPZSDavqxcqYHey+DmKWJKnckV4
+         HKpxPSF16aGRCwsdvGs+EBgvZXGyZe3IgZ4jPutblNHVGm82D+MM3iL3Hruyto6gf5W8
+         F13g==
+X-Gm-Message-State: AOJu0YzfDlxnjOAT4Mqp9fMwNYsFQXLN2nY9d0D1qrU5Xz8tpthxXREU
+	4hPEPgbHgeNbRXFQoKsfnbFNcC7p/7J08vKFO1TyVTf+DvQYvcRV
+X-Google-Smtp-Source: AGHT+IH+TgHvABrEncSHKKQdsk7gG56NyZWGS0rBtCCs3JQZ1KTPsJYVteYbiXaQa404+RhgAHTUBw==
+X-Received: by 2002:a05:6214:d08:b0:681:8230:3136 with SMTP id 8-20020a0562140d0800b0068182303136mr831375qvh.78.1705589176859;
+        Thu, 18 Jan 2024 06:46:16 -0800 (PST)
 Received: from localhost (131.65.194.35.bc.googleusercontent.com. [35.194.65.131])
-        by smtp.gmail.com with ESMTPSA id q27-20020a05620a0c9b00b00781663f3161sm5350246qki.85.2024.01.18.06.44.13
+        by smtp.gmail.com with ESMTPSA id kh13-20020a056214514d00b006816b56e1desm2425026qvb.129.2024.01.18.06.46.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jan 2024 06:44:13 -0800 (PST)
-Date: Thu, 18 Jan 2024 09:44:13 -0500
+        Thu, 18 Jan 2024 06:46:16 -0800 (PST)
+Date: Thu, 18 Jan 2024 09:46:16 -0500
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: wangyunjian <wangyunjian@huawei.com>, 
+To: =?UTF-8?B?SsO2cm4tVGhvcmJlbiBIaW56?= <j-t.hinz@alumni.tu-berlin.de>, 
  Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- "jasowang@redhat.com" <jasowang@redhat.com>, 
- "kuba@kernel.org" <kuba@kernel.org>, 
- "davem@davemloft.net" <davem@davemloft.net>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
- xudingke <xudingke@huawei.com>
-Message-ID: <65a9393d75353_1c8cde294e2@willemb.c.googlers.com.notmuch>
-In-Reply-To: <ed6fd9c514ae4a449580d11c9c6ba8e7@huawei.com>
-References: <1705490503-28844-1-git-send-email-wangyunjian@huawei.com>
- <65a7f560a4643_6ba59294a7@willemb.c.googlers.com.notmuch>
- <ed6fd9c514ae4a449580d11c9c6ba8e7@huawei.com>
-Subject: RE: [PATCH net v3] tun: add missing rx stats accounting in
- tun_xdp_act
+ bpf@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Shuah Khan <shuah@kernel.org>, 
+ Arnd Bergmann <arnd@arndb.de>, 
+ Deepa Dinamani <deepa.kernel@gmail.com>
+Message-ID: <65a939b85a763_1c8cde29423@willemb.c.googlers.com.notmuch>
+In-Reply-To: <f4e27abc6741c175b4b1baf1331c30aaedeab290.camel@alumni.tu-berlin.de>
+References: <20240115134110.11624-1-j-t.hinz@alumni.tu-berlin.de>
+ <65a69e1be51ef_380df0294d9@willemb.c.googlers.com.notmuch>
+ <f4e27abc6741c175b4b1baf1331c30aaedeab290.camel@alumni.tu-berlin.de>
+Subject: Re: [PATCH bpf-next] bpf: Allow setting SO_TIMESTAMPING* with
+ bpf_setsockopt()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,156 +102,122 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain;
  charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-wangyunjian wrote:
-> > -----Original Message-----
-> > From: Willem de Bruijn [mailto:willemdebruijn.kernel@gmail.com]
-> > Sent: Wednesday, January 17, 2024 11:42 PM
-> > To: wangyunjian <wangyunjian@huawei.com>;
-> > willemdebruijn.kernel@gmail.com; jasowang@redhat.com; kuba@kernel.org;
-> > davem@davemloft.net
-> > Cc: netdev@vger.kernel.org; linux-kernel@vger.kernel.org; xudingke
-> > <xudingke@huawei.com>; wangyunjian <wangyunjian@huawei.com>
-> > Subject: Re: [PATCH net v3] tun: add missing rx stats accounting in tun_xdp_act
-> > 
-> > Yunjian Wang wrote:
-> > > The TUN can be used as vhost-net backend, and it is necessary to count
-> > > the packets transmitted from TUN to vhost-net/virtio-net. However,
-> > > there are some places in the receive path that were not taken into
-> > > account when using XDP. The commit 8ae1aff0b331 ("tuntap: split out
-> > > XDP logic") only includes dropped counter for XDP_DROP, XDP_ABORTED,
-> > > and invalid XDP actions. It would be beneficial to also include new
-> > > accounting for successfully received bytes using
-> > > dev_sw_netstats_rx_add and introduce new dropped counter for XDP errors
-> > on XDP_TX and XDP_REDIRECT.
-> > 
-> > From the description it is clear that these are two separate changes wrapped
-> > into one patch. I should have flagged this previously.
-> 
-> Do I need to split these two modifications into 2 patches?
-> 1. only fix dropped counter
-> 2. add new accounting for successfully received bytes
-> Or:
-> Only fix dropped counter?
+J=C3=B6rn-Thorben Hinz wrote:
+> On Tue, 2024-01-16 at 10:17 -0500, Willem de Bruijn wrote:
+> > J=C3=B6rn-Thorben Hinz wrote:
+> > > A BPF application, e.g., a TCP congestion control, might benefit
+> > > from or
+> > > even require precise (=3Dhardware) packet timestamps. These
+> > > timestamps are
+> > > already available through __sk_buff.hwtstamp and
+> > > bpf_sock_ops.skb_hwtstamp, but could not be requested: BPF programs=
 
-It's definitely good to fix both.
+> > > were
+> > > not allowed to set SO_TIMESTAMPING* on sockets.
+> > > =
 
-It might be a bit pedantic, but two separate patches is more correct.
+> > > Enable BPF programs to actively request the generation of
+> > > timestamps
+> > > from a stream socket. The also required ioctl(SIOCSHWTSTAMP) on the=
 
-The second fix, add missing byte counter, goes back to the original
-introduction of XDP for tun, so has a different tag:
+> > > network device must still be done separately, in user space.
+> > > =
 
-Fixes: 761876c857cb ("tap: XDP support")
+> > > This patch had previously been submitted in a two-part series
+> > > (first
+> > > link below). The second patch has been independently applied in
+> > > commit
+> > > 7f6ca95d16b9 ("net: Implement missing
+> > > getsockopt(SO_TIMESTAMPING_NEW)")
+> > > (second link below).
+> > > =
 
-> 
-> > 
-> > Ack on returning the error counter that was previously present and matches
-> > the Fixes tag.
-> > 
-> > For the second change, I had to check a few other XDP capable drivers to verify
-> > that it is indeed common to count such packets.
-> > 
-> > > Fixes: 8ae1aff0b331 ("tuntap: split out XDP logic")
-> > > Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
-> > > ---
-> > > v3: update commit log and code
-> > > v2: add Fixes tag
-> > > ---
-> > >  drivers/net/tun.c | 14 +++++++++-----
-> > >  1 file changed, 9 insertions(+), 5 deletions(-)
-> > >
-> > > diff --git a/drivers/net/tun.c b/drivers/net/tun.c index
-> > > afa5497f7c35..0704a17e74e1 100644
-> > > --- a/drivers/net/tun.c
-> > > +++ b/drivers/net/tun.c
-> > > @@ -1625,18 +1625,15 @@ static struct sk_buff *__tun_build_skb(struct
-> > > tun_file *tfile,  static int tun_xdp_act(struct tun_struct *tun, struct
-> > bpf_prog *xdp_prog,
-> > >  		       struct xdp_buff *xdp, u32 act)  {
-> > > -	int err;
-> > > +	unsigned int datasize = xdp->data_end - xdp->data;
-> > > +	int err = 0;
-> > >
-> > >  	switch (act) {
-> > >  	case XDP_REDIRECT:
-> > >  		err = xdp_do_redirect(tun->dev, xdp, xdp_prog);
-> > > -		if (err)
-> > > -			return err;
-> > >  		break;
-> > >  	case XDP_TX:
-> > >  		err = tun_xdp_tx(tun->dev, xdp);
-> > > -		if (err < 0)
-> > > -			return err;
-> > >  		break;
-> > >  	case XDP_PASS:
-> > >  		break;
-> > > @@ -1651,6 +1648,13 @@ static int tun_xdp_act(struct tun_struct *tun,
-> > struct bpf_prog *xdp_prog,
-> > >  		break;
-> > >  	}
-> > >
-> > > +	if (err < 0) {
-> > > +		act = err;
-> > > +		dev_core_stats_rx_dropped_inc(tun->dev);
-> > > +	} else if (act == XDP_REDIRECT || act == XDP_TX) {
-> > > +		dev_sw_netstats_rx_add(tun->dev, datasize);
-> > > +	}
-> > > +
-> > 
-> > Let's avoid adding yet another branch and just do these operations in the case
-> > statements, like XDP_DROP.
-> 
-> Fix it like this?
+> > > On the earlier submission, there was the open question whether to
+> > > only
+> > > allow, thus enforce, SO_TIMESTAMPING_NEW in this patch:
+> > > =
 
-Perhaps avoid computing datasize is all paths, when it is not used
-in common XDP_PASS, high performance XDP_DROP and a few others. Not
-sure whether (all) compilers would optimze that.
+> > > For a BPF program, this won't make a difference: A timestamp, when
+> > > accessed through the fields mentioned above, is directly read from
+> > > skb_shared_info.hwtstamps, independent of the places where NEW/OLD
+> > > is
+> > > relevant. See bpf_convert_ctx_access() besides others.
+> > > =
 
-        dev_core_stats_rx_dropped_inc(tun->dev, xdp,
-                                      xdp->data_end - xdp->data);
+> > > I am unsure, though, when it comes to the interconnection of user
+> > > space
+> > > and BPF "space", when both are interested in the timestamps. I
+> > > think it
+> > > would cause an unsolvable conflict when user space is bound to use
+> > > SO_TIMESTAMPING_OLD with a BPF program only allowed to set
+> > > SO_TIMESTAMPING_NEW *on the same socket*? Please correct me if I'm
+> > > mistaken.
+> > =
 
+> > The difference between OLD and NEW only affects the system calls. It
+> > is not reflected in how the data is stored in the skb, or how BPF can=
 
-> --- a/drivers/net/tun.c
-> +++ b/drivers/net/tun.c
-> @@ -1625,18 +1625,25 @@ static struct sk_buff *__tun_build_skb(struct tun_file *tfile,
->  static int tun_xdp_act(struct tun_struct *tun, struct bpf_prog *xdp_prog,
->                        struct xdp_buff *xdp, u32 act)
->  {
-> +       unsigned int datasize = xdp->data_end - xdp->data;
->         int err;
->  
->         switch (act) {
->         case XDP_REDIRECT:
->                 err = xdp_do_redirect(tun->dev, xdp, xdp_prog);
-> -               if (err)
-> +               if (err) {
-> +                       dev_core_stats_rx_dropped_inc(tun->dev);
->                         return err;
-> +               }
-> +               dev_sw_netstats_rx_add(tun->dev, datasize);
->                 break;
->         case XDP_TX:
->                 err = tun_xdp_tx(tun->dev, xdp);
-> -               if (err < 0)
-> +               if (err < 0) {
-> +                       dev_core_stats_rx_dropped_inc(tun->dev);
->                         return err;
-> +               }
-> +               dev_sw_netstats_rx_add(tun->dev, datasize);
->                 break;
->         case XDP_PASS:
-> 
-> > 
-> > >  	return act;
-> > >  }
-> > >
-> > > --
-> > > 2.41.0
-> > >
-> > 
-> > 
-> 
+> > read the data. A process setting SO_TIMESTAMPING_OLD will still allow=
 
+> > BPF to read data using SO_TIMESTAMPING_NEW.
+> > =
+
+> > But, he one place where I see a conflict is in setting sock_flag
+> > SOCK_TSTAMP_NEW. That affects what getsockopt returns and which cmsg
+> > is written:
+> > =
+
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 if (sock_flag(sk, SOCK_TSTAMP_NEW))
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 put=
+_cmsg_scm_timestamping64(msg, tss);
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 else
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 put=
+_cmsg_scm_timestamping(msg, tss);
+> > =
+
+> > So a process could issue setsockopt SO_TIMESTAMPING_OLD followed by
+> > a BPF program that issues setsockopt SO_TIMESTAMPING_NEW and this
+> > would flip SOCK_TSTAMP_NEW.
+> > =
+
+> > Just allowing BPF to set SO_TIMESTAMPING_OLD does not fix it, as it
+> > just adds the inverse case.
+> Thanks for elaborating on this. I see I only thought of half the
+> possible conflicting situations.
+> =
+
+> > =
+
+> > A related problem is how does the BPF program know which of the two
+> > variants to set. The BPF program is usually compiled and loaded
+> > independently of the running process.
+> True, that is an additional challenge. And with respect to CO-RE, I
+> think a really portable BPF program could (or at least should) not even=
+
+> decide on NEW or OLD at compile time.
+> =
+
+> > =
+
+> > Perhaps one option is to fail the setsockop if it would flip
+> > sock_flag SOCK_TSTAMP_NEW. But only if called from BPF, as else it
+> > changes existing ABI.
+> > =
+
+> > Then a BPF program can attempt to set SO_TIMESTAMPING NEW, be
+> > prepared to handle a particular errno, and retry with
+> > SO_TIMESTAMPING_OLD.
+> Hmm, would be possible, yes. But sounds like a weird and unexpected
+> special-case behavior to the occasional BPF user.
+
+Agreed. So perhaps we're back to where we say: this is a new feature
+for BPF, only support it on modern environments that use
+SO_TIMESTAMPING_NEW?
 
 
