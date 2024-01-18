@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-64287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B2C78320FA
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 22:44:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CF75832134
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 22:59:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EED5E285BBE
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 21:44:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE4FE1C24C8B
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 21:59:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCDE42E85E;
-	Thu, 18 Jan 2024 21:44:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 914CB2EAF9;
+	Thu, 18 Jan 2024 21:59:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ZCfkgdHT"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="u0EDWLb2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 162BA2C197
-	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 21:44:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD3112E848
+	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 21:59:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705614250; cv=none; b=p75Ht32hZC2a3nkYRkjq0nrZhfyiQSv28ulMCRcLExqa7LPN64ffU+y2LAs1H83k2Ez5SxdeVgEFDssAc/3IY36IBVtrp6KMXuegpT00WSGasmq+Z2Jx4LrfKP5LSme4eyxyHHiNtcO38xGLzbFdkCykqXW09Cm1huNiwGPCJkE=
+	t=1705615150; cv=none; b=NhiMfK+tKRjZJajRNTEJ9ydjXSIdj3cFinUlm0nBOFvCNHe7OM0+/mj/TcItUrN0O+a33xbN1koNrGDQMo03sKuNvP/AQoPVSOxNKYGPk5JkBZmQmpljpIXhB3Wm804OX8CFQf0uokgGOL7qvMSQqpoNsFssulQMcT55Az6FXAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705614250; c=relaxed/simple;
-	bh=LPwNAbt/bN23ehBUr8pH9DBi1tCGWAovoNhs9bw3308=;
+	s=arc-20240116; t=1705615150; c=relaxed/simple;
+	bh=EJhN+IqwWKCT23BLeF+6S4wEJCUV+Sfw0L7IeZlQVn8=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pnPHR4MHJ5jrgsKRa6MuA9ydHwNLJQo2oM+fyNcsDkPJtuZvd2QgfXYLJi397Obp7lOI9f3OCQSqHMNLn9kP18jEnWA5z1MwoEHYI3ey8epoGZp/u2QfmWGZTSgx5ekAgJtuIwP6j9XTSh8IKEQS6wk+t48FfBK9lN2PzOksqZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ZCfkgdHT; arc=none smtp.client-ip=52.119.213.154
+	 MIME-Version:Content-Type; b=nSQfdCn9StUBNRpUltXhmb5bmzZmja5Zs7a823Gk3D9fp8U3v+3hyCh5byoF8potEAvHcOF2GTp1K9i4mfZ4EvxGMqDcon74JcNFdm8BBvTSCj/BnA1XTozKGswIxaLu+Z7hIaeZ5p+enAPTfsh+Ms39Smgg13MBXaH3OKuEzos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=u0EDWLb2; arc=none smtp.client-ip=99.78.197.220
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1705614249; x=1737150249;
+  t=1705615148; x=1737151148;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=oDJbxFJYLYkzBYaucjpxhzStNLLyO7GujKxTGxIdMZI=;
-  b=ZCfkgdHT0Sh6V1Xvd4EnccWwIm0CLsQcMNcVXDBwgy3GhNrZikUZ/yVY
-   M2aW/P0h2F4wzmhgzKyKUyNeqIBYPOeBaI4+Tm4qpxUPICXP/u16dXYu+
-   uPnA529zX1KgWs1F66kqK7AqtUgjjEL/V3qwM94YxtSe2D9ajBeoxl8Au
-   Y=;
+  bh=aDSPsxEpYJ8L3zBHzNtHqrAwEpRufQoOKE9qkdal1QQ=;
+  b=u0EDWLb2sBHmRuQ5wsiffU+7o9DJ5WVz/kwFTbXdcn4WHNnHudxn7GIH
+   RutGfSFlz5G8ixkbomPioIedUdKfXM7A3TyTyoDLSqX9YFRRyc29hj7oY
+   ++TtabzPc82YGKoV2r2eUtCJT1+SEx+hwpqhbRR0OClAhmZfp4tpO0WeO
+   4=;
 X-IronPort-AV: E=Sophos;i="6.05,203,1701129600"; 
-   d="scan'208";a="178943624"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-b1c0e1d0.us-west-2.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jan 2024 21:44:06 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan3.pdx.amazon.com [10.39.38.70])
-	by email-inbound-relay-pdx-2c-m6i4x-b1c0e1d0.us-west-2.amazon.com (Postfix) with ESMTPS id 5B6AD8869D;
-	Thu, 18 Jan 2024 21:44:05 +0000 (UTC)
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:45730]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.23.111:2525] with esmtp (Farcaster)
- id 47183dcb-805b-4725-935f-0555fbc5f4a9; Thu, 18 Jan 2024 21:44:04 +0000 (UTC)
-X-Farcaster-Flow-ID: 47183dcb-805b-4725-935f-0555fbc5f4a9
+   d="scan'208";a="59368388"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-af372327.us-west-2.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jan 2024 21:59:06 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
+	by email-inbound-relay-pdx-2a-m6i4x-af372327.us-west-2.amazon.com (Postfix) with ESMTPS id AD85060D01;
+	Thu, 18 Jan 2024 21:59:05 +0000 (UTC)
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:15928]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.24.5:2525] with esmtp (Farcaster)
+ id 31194d1a-be10-4acd-82a5-49b1a7cd112f; Thu, 18 Jan 2024 21:59:05 +0000 (UTC)
+X-Farcaster-Flow-ID: 31194d1a-be10-4acd-82a5-49b1a7cd112f
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
  EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 18 Jan 2024 21:44:02 +0000
-Received: from 88665a182662.ant.amazon.com (10.88.183.204) by
+ 15.2.1118.40; Thu, 18 Jan 2024 21:59:04 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.88.183.204) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 18 Jan 2024 21:44:00 +0000
+ 15.2.1118.40; Thu, 18 Jan 2024 21:59:02 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: <edumazet@google.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <eric.dumazet@gmail.com>,
-	<kuba@kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<willemb@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>
-Subject: Re: [PATCH v3 net] udp: fix busy polling
-Date: Thu, 18 Jan 2024 13:43:47 -0800
-Message-ID: <20240118214347.36109-1-kuniyu@amazon.com>
+CC: <davem@davemloft.net>, <eric.dumazet@gmail.com>, <kuba@kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<syzbot+2a7024e9502df538e8ef@syzkaller.appspotmail.com>, <kuniyu@amazon.com>
+Subject: Re: [PATCH net] llc: make llc_ui_sendmsg() more robust against bonding changes
+Date: Thu, 18 Jan 2024 13:58:54 -0800
+Message-ID: <20240118215854.40268-1-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240118201749.4148681-1-edumazet@google.com>
-References: <20240118201749.4148681-1-edumazet@google.com>
+In-Reply-To: <20240118183625.4007013-1-edumazet@google.com>
+References: <20240118183625.4007013-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,140 +79,155 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D038UWB002.ant.amazon.com (10.13.139.185) To
+X-ClientProxiedBy: EX19D041UWA002.ant.amazon.com (10.13.139.121) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 Precedence: Bulk
 
 From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 18 Jan 2024 20:17:49 +0000
-> Generic sk_busy_loop_end() only looks at sk->sk_receive_queue
-> for presence of packets.
+Date: Thu, 18 Jan 2024 18:36:25 +0000
+> syzbot was able to trick llc_ui_sendmsg(), allocating an skb with no
+> headroom, but subsequently trying to push 14 bytes of Ethernet header [1]
 > 
-> Problem is that for UDP sockets after blamed commit, some packets
-> could be present in another queue: udp_sk(sk)->reader_queue
+> Like some others, llc_ui_sendmsg() releases the socket lock before
+> calling sock_alloc_send_skb().
+> Then it acquires it again, but does not redo all the sanity checks
+> that were performed.
 > 
-> In some cases, a busy poller could spin until timeout expiration,
-> even if some packets are available in udp_sk(sk)->reader_queue.
+> This fix:
 > 
-> v3: - make sk_busy_loop_end() nicer (Willem)
+> - Uses LL_RESERVED_SPACE() to reserve space.
+> - Check all conditions again after socket lock is held again.
+> - Do not account Ethernet header for mtu limitation.
 > 
-> v2: - add a READ_ONCE(sk->sk_family) in sk_is_inet() to avoid KCSAN splats.
->     - add a sk_is_inet() check in sk_is_udp() (Willem feedback)
->     - add a sk_is_inet() check in sk_is_tcp().
+> [1]
 > 
-> Fixes: 2276f58ac589 ("udp: use a separate rx queue for packet reception")
+> skbuff: skb_under_panic: text:ffff800088baa334 len:1514 put:14 head:ffff0000c9c37000 data:ffff0000c9c36ff2 tail:0x5dc end:0x6c0 dev:bond0
+> 
+>  kernel BUG at net/core/skbuff.c:193 !
+> Internal error: Oops - BUG: 00000000f2000800 [#1] PREEMPT SMP
+> Modules linked in:
+> CPU: 0 PID: 6875 Comm: syz-executor.0 Not tainted 6.7.0-rc8-syzkaller-00101-g0802e17d9aca-dirty #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+> pstate: 60400005 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+>  pc : skb_panic net/core/skbuff.c:189 [inline]
+>  pc : skb_under_panic+0x13c/0x140 net/core/skbuff.c:203
+>  lr : skb_panic net/core/skbuff.c:189 [inline]
+>  lr : skb_under_panic+0x13c/0x140 net/core/skbuff.c:203
+> sp : ffff800096f97000
+> x29: ffff800096f97010 x28: ffff80008cc8d668 x27: dfff800000000000
+> x26: ffff0000cb970c90 x25: 00000000000005dc x24: ffff0000c9c36ff2
+> x23: ffff0000c9c37000 x22: 00000000000005ea x21: 00000000000006c0
+> x20: 000000000000000e x19: ffff800088baa334 x18: 1fffe000368261ce
+> x17: ffff80008e4ed000 x16: ffff80008a8310f8 x15: 0000000000000001
+> x14: 1ffff00012df2d58 x13: 0000000000000000 x12: 0000000000000000
+> x11: 0000000000000001 x10: 0000000000ff0100 x9 : e28a51f1087e8400
+> x8 : e28a51f1087e8400 x7 : ffff80008028f8d0 x6 : 0000000000000000
+> x5 : 0000000000000001 x4 : 0000000000000001 x3 : ffff800082b78714
+> x2 : 0000000000000001 x1 : 0000000100000000 x0 : 0000000000000089
+> Call trace:
+>   skb_panic net/core/skbuff.c:189 [inline]
+>   skb_under_panic+0x13c/0x140 net/core/skbuff.c:203
+>   skb_push+0xf0/0x108 net/core/skbuff.c:2451
+>   eth_header+0x44/0x1f8 net/ethernet/eth.c:83
+>   dev_hard_header include/linux/netdevice.h:3188 [inline]
+>   llc_mac_hdr_init+0x110/0x17c net/llc/llc_output.c:33
+>   llc_sap_action_send_xid_c+0x170/0x344 net/llc/llc_s_ac.c:85
+>   llc_exec_sap_trans_actions net/llc/llc_sap.c:153 [inline]
+>   llc_sap_next_state net/llc/llc_sap.c:182 [inline]
+>   llc_sap_state_process+0x1ec/0x774 net/llc/llc_sap.c:209
+>   llc_build_and_send_xid_pkt+0x12c/0x1c0 net/llc/llc_sap.c:270
+>   llc_ui_sendmsg+0x7bc/0xb1c net/llc/af_llc.c:997
+>   sock_sendmsg_nosec net/socket.c:730 [inline]
+>   __sock_sendmsg net/socket.c:745 [inline]
+>   sock_sendmsg+0x194/0x274 net/socket.c:767
+>   splice_to_socket+0x7cc/0xd58 fs/splice.c:881
+>   do_splice_from fs/splice.c:933 [inline]
+>   direct_splice_actor+0xe4/0x1c0 fs/splice.c:1142
+>   splice_direct_to_actor+0x2a0/0x7e4 fs/splice.c:1088
+>   do_splice_direct+0x20c/0x348 fs/splice.c:1194
+>   do_sendfile+0x4bc/0xc70 fs/read_write.c:1254
+>   __do_sys_sendfile64 fs/read_write.c:1322 [inline]
+>   __se_sys_sendfile64 fs/read_write.c:1308 [inline]
+>   __arm64_sys_sendfile64+0x160/0x3b4 fs/read_write.c:1308
+>   __invoke_syscall arch/arm64/kernel/syscall.c:37 [inline]
+>   invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:51
+>   el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:136
+>   do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:155
+>   el0_svc+0x54/0x158 arch/arm64/kernel/entry-common.c:678
+>   el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:696
+>   el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:595
+> Code: aa1803e6 aa1903e7 a90023f5 94792f6a (d4210000)
+> 
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Reported-and-tested-by: syzbot+2a7024e9502df538e8ef@syzkaller.appspotmail.com
 > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Reviewed-by: Paolo Abeni <pabeni@redhat.com>
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
-
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-
-IPPROTO_UDPLITE will have the same issue but not worth
-adding sk_is_udp_or_udplite() for a single place given
-no one has complained about duplication notice.
-
-
 > ---
->  include/linux/skmsg.h   |  6 ------
->  include/net/inet_sock.h |  5 -----
->  include/net/sock.h      | 18 +++++++++++++++++-
->  net/core/sock.c         | 11 +++++++++--
->  4 files changed, 26 insertions(+), 14 deletions(-)
+>  net/llc/af_llc.c | 24 ++++++++++++++++--------
+>  1 file changed, 16 insertions(+), 8 deletions(-)
 > 
-> diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
-> index 888a4b217829fd4d6baf52f784ce35e9ad6bd0ed..e65ec3fd27998a5b82fc2c4597c575125e653056 100644
-> --- a/include/linux/skmsg.h
-> +++ b/include/linux/skmsg.h
-> @@ -505,12 +505,6 @@ static inline bool sk_psock_strp_enabled(struct sk_psock *psock)
->  	return !!psock->saved_data_ready;
->  }
->  
-> -static inline bool sk_is_udp(const struct sock *sk)
-> -{
-> -	return sk->sk_type == SOCK_DGRAM &&
-> -	       sk->sk_protocol == IPPROTO_UDP;
-> -}
-> -
->  #if IS_ENABLED(CONFIG_NET_SOCK_MSG)
->  
->  #define BPF_F_STRPARSER	(1UL << 1)
-> diff --git a/include/net/inet_sock.h b/include/net/inet_sock.h
-> index aa86453f6b9ba367f772570a7b783bb098be6236..d94c242eb3ed20b2c5b2e5ceea3953cf96341fb7 100644
-> --- a/include/net/inet_sock.h
-> +++ b/include/net/inet_sock.h
-> @@ -307,11 +307,6 @@ static inline unsigned long inet_cmsg_flags(const struct inet_sock *inet)
->  #define inet_assign_bit(nr, sk, val)		\
->  	assign_bit(INET_FLAGS_##nr, &inet_sk(sk)->inet_flags, val)
->  
-> -static inline bool sk_is_inet(struct sock *sk)
-> -{
-> -	return sk->sk_family == AF_INET || sk->sk_family == AF_INET6;
-> -}
-> -
->  /**
->   * sk_to_full_sk - Access to a full socket
->   * @sk: pointer to a socket
-> diff --git a/include/net/sock.h b/include/net/sock.h
-> index a7f815c7cfdfdf1296be2967fd100efdb10cdd63..54ca8dcbfb4335d657b5cea323aa7d8c4316d49e 100644
-> --- a/include/net/sock.h
-> +++ b/include/net/sock.h
-> @@ -2765,9 +2765,25 @@ static inline void skb_setup_tx_timestamp(struct sk_buff *skb, __u16 tsflags)
->  			   &skb_shinfo(skb)->tskey);
->  }
->  
-> +static inline bool sk_is_inet(const struct sock *sk)
-> +{
-> +	int family = READ_ONCE(sk->sk_family);
-> +
-> +	return family == AF_INET || family == AF_INET6;
-> +}
-> +
->  static inline bool sk_is_tcp(const struct sock *sk)
+> diff --git a/net/llc/af_llc.c b/net/llc/af_llc.c
+> index 9b06c380866b53bcb395bf255587279db025d11d..20551cfb7da6d8dd098c906477895e26c080fe32 100644
+> --- a/net/llc/af_llc.c
+> +++ b/net/llc/af_llc.c
+> @@ -928,14 +928,15 @@ static int llc_ui_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+>   */
+>  static int llc_ui_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
 >  {
-> -	return sk->sk_type == SOCK_STREAM && sk->sk_protocol == IPPROTO_TCP;
-> +	return sk_is_inet(sk) &&
-> +	       sk->sk_type == SOCK_STREAM &&
-> +	       sk->sk_protocol == IPPROTO_TCP;
-> +}
-> +
-> +static inline bool sk_is_udp(const struct sock *sk)
-> +{
-> +	return sk_is_inet(sk) &&
-> +	       sk->sk_type == SOCK_DGRAM &&
-> +	       sk->sk_protocol == IPPROTO_UDP;
->  }
+> +	DECLARE_SOCKADDR(struct sockaddr_llc *, addr, msg->msg_name);
+>  	struct sock *sk = sock->sk;
+>  	struct llc_sock *llc = llc_sk(sk);
+> -	DECLARE_SOCKADDR(struct sockaddr_llc *, addr, msg->msg_name);
+>  	int flags = msg->msg_flags;
+>  	int noblock = flags & MSG_DONTWAIT;
+> +	int rc = -EINVAL, copied = 0, hdrlen, hh_len;
+>  	struct sk_buff *skb = NULL;
+> +	struct net_device *dev;
+>  	size_t size = 0;
+> -	int rc = -EINVAL, copied = 0, hdrlen;
 >  
->  static inline bool sk_is_stream_unix(const struct sock *sk)
-> diff --git a/net/core/sock.c b/net/core/sock.c
-> index 158dbdebce6a3693deb63e557e856d9cdd7500ae..0a7f46c37f0cfc169e11377107c8342c229da0de 100644
-> --- a/net/core/sock.c
-> +++ b/net/core/sock.c
-> @@ -107,6 +107,7 @@
->  #include <linux/interrupt.h>
->  #include <linux/poll.h>
->  #include <linux/tcp.h>
-> +#include <linux/udp.h>
->  #include <linux/init.h>
->  #include <linux/highmem.h>
->  #include <linux/user_namespace.h>
-> @@ -4144,8 +4145,14 @@ bool sk_busy_loop_end(void *p, unsigned long start_time)
->  {
->  	struct sock *sk = p;
->  
-> -	return !skb_queue_empty_lockless(&sk->sk_receive_queue) ||
-> -	       sk_busy_loop_timeout(sk, start_time);
-> +	if (!skb_queue_empty_lockless(&sk->sk_receive_queue))
-> +		return true;
-> +
-> +	if (sk_is_udp(sk) &&
-> +	    !skb_queue_empty_lockless(&udp_sk(sk)->reader_queue))
-> +		return true;
-> +
-> +	return sk_busy_loop_timeout(sk, start_time);
->  }
->  EXPORT_SYMBOL(sk_busy_loop_end);
->  #endif /* CONFIG_NET_RX_BUSY_POLL */
+>  	dprintk("%s: sending from %02X to %02X\n", __func__,
+>  		llc->laddr.lsap, llc->daddr.lsap);
+> @@ -955,22 +956,29 @@ static int llc_ui_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
+>  		if (rc)
+>  			goto out;
+>  	}
+> -	hdrlen = llc->dev->hard_header_len + llc_ui_header_len(sk, addr);
+> +	dev = llc->dev;
+> +	hh_len = LL_RESERVED_SPACE(dev);
+> +	hdrlen = llc_ui_header_len(sk, addr);
+>  	size = hdrlen + len;
+> -	if (size > llc->dev->mtu)
+> -		size = llc->dev->mtu;
+> +	size = min_t(size_t, size, READ_ONCE(dev->mtu));
+>  	copied = size - hdrlen;
+>  	rc = -EINVAL;
+>  	if (copied < 0)
+>  		goto out;
+>  	release_sock(sk);
+> -	skb = sock_alloc_send_skb(sk, size, noblock, &rc);
+> +	skb = sock_alloc_send_skb(sk, hh_len + size, noblock, &rc);
+>  	lock_sock(sk);
+>  	if (!skb)
+>  		goto out;
+> -	skb->dev      = llc->dev;
+> +	if (sock_flag(sk, SOCK_ZAPPED) ||
+
+Probably we need not check SOCK_ZAPPED again after llc_ui_autobind() ?
+
+
+> +	    llc->dev != dev ||
+> +	    hdrlen != llc_ui_header_len(sk, addr) ||
+> +	    hh_len != LL_RESERVED_SPACE(dev) ||
+> +	    size > READ_ONCE(dev->mtu))
+> +		goto out;
+> +	skb->dev      = dev;
+>  	skb->protocol = llc_proto_type(addr->sllc_arphrd);
+> -	skb_reserve(skb, hdrlen);
+> +	skb_reserve(skb, hh_len + hdrlen);
+>  	rc = memcpy_from_msg(skb_put(skb, copied), msg, copied);
+>  	if (rc)
+>  		goto out;
 > -- 
 > 2.43.0.429.g432eaa2c6b-goog
-> 
+
 
