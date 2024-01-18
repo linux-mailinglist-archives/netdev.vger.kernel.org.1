@@ -1,117 +1,173 @@
-Return-Path: <netdev+bounces-64181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6B468319E0
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 14:03:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B9F78319E9
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 14:04:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 671A21F23EC9
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 13:03:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B89B6289FDE
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 13:04:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 832E724B57;
-	Thu, 18 Jan 2024 13:03:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 847B224B5F;
+	Thu, 18 Jan 2024 13:04:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmty3ljk5ljewns4xndka.icoremail.net (zg8tmty3ljk5ljewns4xndka.icoremail.net [167.99.105.149])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C77082C9D;
-	Thu, 18 Jan 2024 13:03:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.99.105.149
+Received: from exchange.fintech.ru (exchange.fintech.ru [195.54.195.159])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E352324B55;
+	Thu, 18 Jan 2024 13:04:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.54.195.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705583011; cv=none; b=ihBcy18nBkqEbCygG9PG96hQjXgu2ngMwKy3rDWhaEiJM32CJBvwsjHZW0niwjAVUs3cTcsC57u9hq9ly15MZu9cxPpNuFFXcaUqMfkRn1EVc4KwvNYP0xxsBOBlL4eN1dc/IAImqCRHyoLivjYJ9/BnGQldodyuVQnbRwXNG6Q=
+	t=1705583078; cv=none; b=M3qscZSFvajs+8/Y/TdVpn1/cJeAD2HpHf3PH0kk9ioJ2IUbR1pXafjqORHiqvQLvJDZ3FL49oeMg0jNIobDXSyOUsXKADnK+qQ7qCWWOmYmsuBnlzuCt14NdidQK/EUGvxIAH+SO2junKV9MGHQkbfeY+5Wl85yFopIKxiM8LI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705583011; c=relaxed/simple;
-	bh=b/kcvM1x17lzfUd+fGdYlf9PnRElI5xtL5KheTucpFg=;
-	h=Received:From:To:Subject:Date:Message-Id:X-Mailer:X-CM-TRANSID:
-	 X-Coremail-Antispam:X-CM-SenderInfo; b=Te4ToO0rUMtP11URIstnHkVSTHQ3OATlgcE/Kb1/FDDgOb+ofX40nJ+TvE9Hm1SZVVVfnHq/Y6SziFQvykX7CS2tDFbrm55F9BgL6+AivHj6nMRLrvS8WNY4AVn02gY64MFWgF1OqP7JKRiSKvKj8dE0IpguttI9xW1ei0VOHGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=167.99.105.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from localhost.localdomain (unknown [36.24.98.148])
-	by mail-app4 (Coremail) with SMTP id cS_KCgCXs4KQIally_c8AA--.46623S4;
-	Thu, 18 Jan 2024 21:03:13 +0800 (CST)
-From: Lin Ma <linma@zju.edu.cn>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linma@zju.edu.cn,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v2] vlan: skip nested type that is not IFLA_VLAN_QOS_MAPPING
-Date: Thu, 18 Jan 2024 21:03:06 +0800
-Message-Id: <20240118130306.1644001-1-linma@zju.edu.cn>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:cS_KCgCXs4KQIally_c8AA--.46623S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7Kr47ZrWrZF17Kw1xtF43Jrb_yoW8Cw18pF
-	y5Gry7Gw4DJF9YgFWIqF48XayxZFnrJr18uF1Fka1Fkrn8tF9rtFWUWFnF9r13ZFZ5Aa45
-	tFnIvF4j934DWrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_
-	JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67
-	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIY
-	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14
-	v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8
-	JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUYCJmUU
-	UUU
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
+	s=arc-20240116; t=1705583078; c=relaxed/simple;
+	bh=A2u/In+Ely0o9qIZsqtSMjnx7pYwOa9eMaospITnmZ8=;
+	h=Received:Received:Message-ID:Date:MIME-Version:User-Agent:Subject:
+	 Content-Language:To:CC:References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:X-Originating-IP:X-ClientProxiedBy; b=HFeQ3zAhpHfpzPF/xfKt1FWcWtPfGIv8LLARXVs0++M4wNLZHUGInDfIgHyCYzVYys4wS2JRUG0sCeyK4BDke3R43WVgsiEoBRdwr+l+6dJBQ9HWBWFoUqrqwtAKPa8zysT4N89rg2KVA3d7hm49+E7n0AFbQ3CZBSpLok2hGN0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru; spf=pass smtp.mailfrom=fintech.ru; arc=none smtp.client-ip=195.54.195.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fintech.ru
+Received: from Ex16-01.fintech.ru (10.0.10.18) by exchange.fintech.ru
+ (195.54.195.169) with Microsoft SMTP Server (TLS) id 14.3.498.0; Thu, 18 Jan
+ 2024 16:04:31 +0300
+Received: from [192.168.211.130] (10.0.253.138) by Ex16-01.fintech.ru
+ (10.0.10.18) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Thu, 18 Jan
+ 2024 16:04:31 +0300
+Message-ID: <549c658e-28a0-4e6c-be09-95ba748410b7@fintech.ru>
+Date: Thu, 18 Jan 2024 05:04:30 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] ipv6: mcast: fix data-race in ipv6_mc_down /
+ mld_ifc_work
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>
+CC: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Taehee Yoo
+	<ap420073@gmail.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>,
+	<syzbot+a9400cabb1d784e49abf@syzkaller.appspotmail.com>
+References: <20240117172102.12001-1-n.zhandarovich@fintech.ru>
+ <CANn89iLUxP_YGLD1mrCmAr9qSg7wPWDjWPhJHNa_X4QVyNWqBQ@mail.gmail.com>
+From: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+In-Reply-To: <CANn89iLUxP_YGLD1mrCmAr9qSg7wPWDjWPhJHNa_X4QVyNWqBQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: Ex16-02.fintech.ru (10.0.10.19) To Ex16-01.fintech.ru
+ (10.0.10.18)
 
-In the vlan_changelink function, a loop is used to parse the nested
-attributes IFLA_VLAN_EGRESS_QOS and IFLA_VLAN_INGRESS_QOS in order to
-obtain the struct ifla_vlan_qos_mapping. These two nested attributes are
-checked in the vlan_validate_qos_map function, which calls
-nla_validate_nested_deprecated with the vlan_map_policy.
+Hello,
 
-However, this deprecated validator applies a LIBERAL strictness, allowing
-the presence of an attribute with the type IFLA_VLAN_QOS_UNSPEC.
-Consequently, the loop in vlan_changelink may parse an attribute of type
-IFLA_VLAN_QOS_UNSPEC and believe it carries a payload of
-struct ifla_vlan_qos_mapping, which is not necessarily true.
+On 1/18/24 00:59, Eric Dumazet wrote:
+> On Wed, Jan 17, 2024 at 6:21 PM Nikita Zhandarovich
+> <n.zhandarovich@fintech.ru> wrote:
+>>
+>> idev->mc_ifc_count can be written over without proper locking.
+>>
+>> Originally found by syzbot [1], fix this issue by encapsulating calls
+>> to mld_ifc_stop_work() (and mld_gq_stop_work() for good measure) with
+>> mutex_lock() and mutex_unlock() accordingly as these functions
+>> should only be called with mc_lock per their declarations.
+>>
+>> [1]
+>> BUG: KCSAN: data-race in ipv6_mc_down / mld_ifc_work
+>>
+>> Fixes: 2d9a93b4902b ("mld: convert from timer to delayed work")
+>> Reported-by: syzbot+a9400cabb1d784e49abf@syzkaller.appspotmail.com
+>> Link: https://lore.kernel.org/all/000000000000994e09060ebcdffb@google.com/
+>> Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+>> ---
+>>  net/ipv6/mcast.c | 4 ++++
+>>  1 file changed, 4 insertions(+)
+>>
+>> diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
+>> index b75d3c9d41bb..bc6e0a0bad3c 100644
+>> --- a/net/ipv6/mcast.c
+>> +++ b/net/ipv6/mcast.c
+>> @@ -2722,8 +2722,12 @@ void ipv6_mc_down(struct inet6_dev *idev)
+>>         synchronize_net();
+>>         mld_query_stop_work(idev);
+>>         mld_report_stop_work(idev);
+>> +
+>> +       mutex_lock(&idev->mc_lock);
+>>         mld_ifc_stop_work(idev);
+>>         mld_gq_stop_work(idev);
+>> +       mutex_unlock(&idev->mc_lock);
+>> +
+>>         mld_dad_stop_work(idev);
+>>  }
+>>
+> 
+> Thanks for the fix.
+> 
+> Reviewed-by: Eric Dumazet <edumazet@google.com>
+> 
+> I would also add some lockdep_assert_held() to make sure assumptions are met.
+> Trading a comment for a runtime check is better.
+> 
+> diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
+> index b75d3c9d41bb5005af2d4e10fab58f157e9ea4fa..b256362d3b5d5111f649ebfee4f1557d8c063d92
+> 100644
+> --- a/net/ipv6/mcast.c
+> +++ b/net/ipv6/mcast.c
+> @@ -1047,36 +1047,36 @@ bool ipv6_chk_mcast_addr(struct net_device
+> *dev, const struct in6_addr *group,
+>         return rv;
+>  }
+> 
+> -/* called with mc_lock */
+>  static void mld_gq_start_work(struct inet6_dev *idev)
+>  {
+>         unsigned long tv = get_random_u32_below(idev->mc_maxdelay);
+> 
+> +       lockdep_assert_held(&idev->mc_lock);
+>         idev->mc_gq_running = 1;
+>         if (!mod_delayed_work(mld_wq, &idev->mc_gq_work, tv + 2))
+>                 in6_dev_hold(idev);
+>  }
+> 
+> -/* called with mc_lock */
+>  static void mld_gq_stop_work(struct inet6_dev *idev)
+>  {
+> +       lockdep_assert_held(&idev->mc_lock);
+>         idev->mc_gq_running = 0;
+>         if (cancel_delayed_work(&idev->mc_gq_work))
+>                 __in6_dev_put(idev);
+>  }
+> 
+> -/* called with mc_lock */
+>  static void mld_ifc_start_work(struct inet6_dev *idev, unsigned long delay)
+>  {
+>         unsigned long tv = get_random_u32_below(delay);
+> 
+> +       lockdep_assert_held(&idev->mc_lock);
+>         if (!mod_delayed_work(mld_wq, &idev->mc_ifc_work, tv + 2))
+>                 in6_dev_hold(idev);
+>  }
+> 
+> -/* called with mc_lock */
+>  static void mld_ifc_stop_work(struct inet6_dev *idev)
+>  {
+> +       lockdep_assert_held(&idev->mc_lock);
+>         idev->mc_ifc_count = 0;
+>         if (cancel_delayed_work(&idev->mc_ifc_work))
+>                 __in6_dev_put(idev);
 
-To address this issue and ensure compatibility, this patch introduces two
-type checks that skip attributes whose type is not IFLA_VLAN_QOS_MAPPING.
+Just to clarify: should I incorporate your change into v2 version of my
+original one and attach 'Reviewed-by' tags or should I send a different
+patch with your suggestion?
 
-Fixes: 07b5b17e157b ("[VLAN]: Use rtnl_link API")
-Signed-off-by: Lin Ma <linma@zju.edu.cn>
----
-V1 -> V2: make net-next to net as suggested by Paolo
-          and add Fixes tag for this one
+Apologies for the possibly silly question, got a little confused by
+signals from multiple maintainers.
 
- net/8021q/vlan_netlink.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/net/8021q/vlan_netlink.c b/net/8021q/vlan_netlink.c
-index 214532173536..a3b68243fd4b 100644
---- a/net/8021q/vlan_netlink.c
-+++ b/net/8021q/vlan_netlink.c
-@@ -118,12 +118,16 @@ static int vlan_changelink(struct net_device *dev, struct nlattr *tb[],
- 	}
- 	if (data[IFLA_VLAN_INGRESS_QOS]) {
- 		nla_for_each_nested(attr, data[IFLA_VLAN_INGRESS_QOS], rem) {
-+			if (nla_type(attr) != IFLA_VLAN_QOS_MAPPING)
-+				continue;
- 			m = nla_data(attr);
- 			vlan_dev_set_ingress_priority(dev, m->to, m->from);
- 		}
- 	}
- 	if (data[IFLA_VLAN_EGRESS_QOS]) {
- 		nla_for_each_nested(attr, data[IFLA_VLAN_EGRESS_QOS], rem) {
-+			if (nla_type(attr) != IFLA_VLAN_QOS_MAPPING)
-+				continue;
- 			m = nla_data(attr);
- 			err = vlan_dev_set_egress_priority(dev, m->from, m->to);
- 			if (err)
--- 
-2.17.1
-
+With regards,
+Nikita
 
