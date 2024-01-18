@@ -1,147 +1,138 @@
-Return-Path: <netdev+bounces-64292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DE5A832183
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 23:23:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 068D1832188
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 23:25:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A7C21C22F8F
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 22:23:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31DAF1C225A5
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 22:25:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 444C931755;
-	Thu, 18 Jan 2024 22:22:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AE8532197;
+	Thu, 18 Jan 2024 22:25:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gpZ5RSeK"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rqR6ifsU"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72E9D3218B
-	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 22:22:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13D4E31A97
+	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 22:25:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705616579; cv=none; b=BuWRBVOL45nAUHYOOINdu6APQkk4df0JpJgVVJoN178+AwQyjrQQs04qLy7y+vSe53zcCpydNBu76RR+8uANMk7+kFbzzF+H//+Zwncz/LACHMSjMYbLfNxshcv1UYFdpK0v/MMz2isnAsDDkjNDJsFuyHp1Zfmmv6HhGxFPua8=
+	t=1705616707; cv=none; b=TyPvqSd97Y+Ak4agxyyfuivwwe4CBdw/l8IsAYEbAYdL+0+JqfTWCgWUwXbH/hKCQv3r/fTLac7VkegEoAQsQYtYrEbE23EqjA7v8Mx8h/ueXhqfTtZ59saMVLhamuoTKWX9Qa0/IRdCdKdkYc3JIbvJYoihxJnEL/AOFGD0qSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705616579; c=relaxed/simple;
-	bh=526of4HqjOzwOIFCBibfrY1voNlM3Difc4c/rvJiVj4=;
+	s=arc-20240116; t=1705616707; c=relaxed/simple;
+	bh=TuUVNMDKnLOrknBJYR1NgHu5j86Z1Qzgu7HmiEZJyo8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HivxkJ6Pp59C8TqmHRR5CfVVn56KImN1SMxHuTBZcx8zcGhpSSBcvIzPzOg0dqmKWeUJxquUtfK2EHkJR2ePgU4ssT47vUCuo4jbJkKHqsDnFPakmK+m4vR2ow9qkBqOobt7gJQsARABJNrc0YoMp3MCK2aQkZHmXoiWjFPWbtQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gpZ5RSeK; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1705616576;
+	 In-Reply-To:Content-Type; b=XeSNld2wYQ63BXB2HSh1dHK1uW43th2WIOVIfpAOx3hHH+flmLAA+lyKgK1O/SRL8f4pCuMFld8dLIAWtom+hD8A73HPW5oBbTkEh+K3gCba/Fhg0yi3qs/XmVPNym0lW1KnsKhgBZDa/bcqMB53GSyR1yN0Q/Iebwl3FLV2zvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rqR6ifsU; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <be69cc3f-0ded-4c7e-8709-1602807d1914@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1705616704;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=QvxBCM7tLuOpwx8+wEAIw7J+J049pbv0MA/RJ2ja7ZE=;
-	b=gpZ5RSeKSP2LONzO2IYd7xDsrB++1cmbDvr3fvgLWQC48Rf/nOH8yLzQxIQl8IRl+eruiI
-	IQQ0CcA5J58216tipzDIwJ9NN03F2//8cgtJ/eGgcX+gpEkZr0pIpAKFXCgPjq6McnIQJ6
-	JZD0dzAhygPhOH1EvvVOKzAjKGaaYh0=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-199-og1wZPslMca7hME-9zI47g-1; Thu, 18 Jan 2024 17:22:54 -0500
-X-MC-Unique: og1wZPslMca7hME-9zI47g-1
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-429ca123301so21314391cf.1
-        for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 14:22:54 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705616574; x=1706221374;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QvxBCM7tLuOpwx8+wEAIw7J+J049pbv0MA/RJ2ja7ZE=;
-        b=QnTpVgjrVfQSoPqVKWRJUyOu+1zMH24Gu+Y/h+uXj78bP/I0muzUya1a29pDG+Ge2M
-         7RQOIpHGZDTvXUk4XKSyfgdfeaSQ8XucDGTgenoEy7ducQZsHcueOFUwmVSCaUn+Wv2X
-         D5va2xAqrKP5Cdpe+ENhycr4yWMMrtphDc24+n7BWZrZq3VxiwjCnJmEZnjQ9m8iQZD6
-         Z+PBzmDdrhtwivvTIfea6ZYIKUZPulF637gCjN3674TJCgldctJplf4rk3k5tTfaIiKJ
-         e6e9Y6TtZ2RqAIM5DspWrZunh8GNXgyHxOVmTYGf9FJK7iyGV4jeRQzPuEceS5vcMSCX
-         xxiw==
-X-Gm-Message-State: AOJu0Ywd7yOf5s44o7k7YEGI7glmwoUfcG2lbC0F5exQ/Mr+kZ/HPnPv
-	TosyL2ZuArAlMqWP0B4wo85aUoMzI6PNz8Xkl5ZdqVM8mhlY5Tn6kk2KLEs1C9ofUYSIyEgJJB0
-	ikY+4l2S10E9CSd2yWV96g/EVbZghE5YqMoJxDW8fcMRE7o5qUhAX8g==
-X-Received: by 2002:a05:622a:1b8c:b0:429:f36c:c3a8 with SMTP id bp12-20020a05622a1b8c00b00429f36cc3a8mr54380qtb.29.1705616574110;
-        Thu, 18 Jan 2024 14:22:54 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHIy/Q9lJrPxvZzjxVCIHrv8RLUIKR9E98DHv+c76z2bAYwxPzJ/nj7XOaWTLW+09+1TQQ/UA==
-X-Received: by 2002:a05:622a:1b8c:b0:429:f36c:c3a8 with SMTP id bp12-20020a05622a1b8c00b00429f36cc3a8mr54369qtb.29.1705616573815;
-        Thu, 18 Jan 2024 14:22:53 -0800 (PST)
-Received: from [10.0.0.97] ([24.225.234.80])
-        by smtp.gmail.com with ESMTPSA id cb27-20020a05622a1f9b00b00429bdb1d705sm7163417qtb.1.2024.01.18.14.22.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 Jan 2024 14:22:53 -0800 (PST)
-Message-ID: <595d89f1-15b1-537d-f876-0ac4627db535@redhat.com>
-Date: Thu, 18 Jan 2024 17:22:52 -0500
+	bh=rpunguM6elAo7lX2vjISkjRnz4HSLbCW0GHQPTUreMg=;
+	b=rqR6ifsUiZxcX1bTGNz6zBbz9lCMkHhQuvNNqDckCBzCx35jM8TOOD8TakuWOWNdGA/feJ
+	Z/3cjnjQjaxiStn9R/Ont8X0lZpIarB0BkAOpqXvn+KGzdglaYIwzx8Cg3bmYms1lE0V7D
+	/BlLP+v3+t1huEX9TwNbg8Z83DA0i2Q=
+Date: Thu, 18 Jan 2024 14:25:00 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [RFC net-next] tcp: add support for read with offset when using
- MSG_PEEK
+Subject: Re: [PATCH bpf-next v16 11/14] bpf, net: switch to dynamic
+ registration
 Content-Language: en-US
-To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- davem@davemloft.net
-Cc: kuba@kernel.org, passt-dev@passt.top, sbrivio@redhat.com,
- lvivier@redhat.com, dgibson@redhat.com
-References: <20240111230057.305672-1-jmaloy@redhat.com>
- <df3045c3ec7a4b3c417699ff4950d3d977a0a944.camel@redhat.com>
-From: Jon Maloy <jmaloy@redhat.com>
-In-Reply-To: <df3045c3ec7a4b3c417699ff4950d3d977a0a944.camel@redhat.com>
+To: thinker.li@gmail.com
+Cc: sinquersw@gmail.com, kuifeng@meta.com, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, ast@kernel.org, song@kernel.org, kernel-team@meta.com,
+ andrii@kernel.org, drosen@google.com
+References: <20240118014930.1992551-1-thinker.li@gmail.com>
+ <20240118014930.1992551-12-thinker.li@gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20240118014930.1992551-12-thinker.li@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
+On 1/17/24 5:49 PM, thinker.li@gmail.com wrote:
+> diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+> index 1cfbb89944c5..a2522fcfe57c 100644
+> --- a/include/linux/bpf.h
+> +++ b/include/linux/bpf.h
+> @@ -1700,10 +1700,22 @@ struct bpf_struct_ops_common_value {
+>   	enum bpf_struct_ops_state state;
+>   };
+>   
+> +/* This macro helps developer to register a struct_ops type and generate
+> + * type information correctly. Developers should use this macro to register
+> + * a struct_ops type instead of calling register_bpf_struct_ops() directly.
+> + */
+> +#define REGISTER_BPF_STRUCT_OPS(st_ops, type)				\
 
+One final nit on this macro. Rename this to register_bpf_struct_ops since it is 
+the one will be used a lot, so give it an easier typing name.
 
-On 2024-01-16 05:49, Paolo Abeni wrote:
-> On Thu, 2024-01-11 at 18:00 -0500, jmaloy@redhat.com wrote:
->> From: Jon Maloy <jmaloy@redhat.com>
->>
->> When reading received messages from a socket with MSG_PEEK, we may want
->> to read the contents with an offset, like we can do with pread/preadv()
->> when reading files. Currently, it is not possible to do that.
-[...]
->> +				err = -EINVAL;
->> +				goto out;
->> +			}
->> +			peek_offset = msg->msg_iter.__iov[0].iov_len;
->> +			msg->msg_iter.__iov = &msg->msg_iter.__iov[1];
->> +			msg->msg_iter.nr_segs -= 1;
->> +			msg->msg_iter.count -= peek_offset;
->> +			len -= peek_offset;
->> +			*seq += peek_offset;
->> +		}
-> IMHO this does not look like the correct interface to expose such
-> functionality. Doing the same with a different protocol should cause a
-> SIGSEG or the like, right?
-I would expect doing the same thing with a different protocol to cause 
-an EFAULT, as it should. But I haven't tried it.
-This is a change to TCP only, at least until somebody decides to 
-implement it elsewhere (why not?)
->
-> What about using/implementing SO_PEEK_OFF support instead?
-I looked at SO_PEEK_OFF, and it honestly looks both awkward and limited.
-We would have to make frequent calls to setsockopt(), something that 
-would beat much of the purpose of this feature.
-I stand by my opinion here.
-This feature is simple, non-intrusive, totally backwards compatible and 
-implies no changes to the API or BPI.
+> +	({								\
+> +		struct bpf_struct_ops_##type {				\
+> +			struct bpf_struct_ops_common_value common;	\
+> +			struct type data ____cacheline_aligned_in_smp;	\
+> +		};							\
+> +		BTF_TYPE_EMIT(struct bpf_struct_ops_##type);		\
+> +		register_bpf_struct_ops(st_ops);			\
 
-I would love to hear other opinions on this, though.
+and rename this to __register_bpf_struct_ops. Thanks.
 
-Regards
-/jon
+> +	})
+> +
+>   #if defined(CONFIG_BPF_JIT) && defined(CONFIG_BPF_SYSCALL)
+>   #define BPF_MODULE_OWNER ((void *)((0xeB9FUL << 2) + POISON_POINTER_DELTA))
+> -const struct bpf_struct_ops_desc *bpf_struct_ops_find(struct btf *btf, u32 type_id);
+> -void bpf_struct_ops_init(struct btf *btf, struct bpf_verifier_log *log);
+>   bool bpf_struct_ops_get(const void *kdata);
+>   void bpf_struct_ops_put(const void *kdata);
+>   int bpf_struct_ops_map_sys_lookup_elem(struct bpf_map *map, void *key,
+> @@ -1745,16 +1757,11 @@ struct bpf_dummy_ops {
+>   int bpf_struct_ops_test_run(struct bpf_prog *prog, const union bpf_attr *kattr,
+>   			    union bpf_attr __user *uattr);
+>   #endif
+> +int bpf_struct_ops_desc_init(struct bpf_struct_ops_desc *st_ops_desc,
+> +			     struct btf *btf,
+> +			     struct bpf_verifier_log *log);
+>   void bpf_map_struct_ops_info_fill(struct bpf_map_info *info, struct bpf_map *map);
+>   #else
+> -static inline const struct bpf_struct_ops_desc *bpf_struct_ops_find(struct btf *btf, u32 type_id)
+> -{
+> -	return NULL;
+> -}
+> -static inline void bpf_struct_ops_init(struct btf *btf,
+> -				       struct bpf_verifier_log *log)
+> -{
+> -}
+>   static inline bool bpf_try_module_get(const void *data, struct module *owner)
+>   {
+>   	return try_module_get(owner);
+> @@ -1769,6 +1776,10 @@ static inline int bpf_struct_ops_map_sys_lookup_elem(struct bpf_map *map,
+>   {
+>   	return -EINVAL;
+>   }
+> +static inline int bpf_struct_ops_link_create(union bpf_attr *attr)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
 
+This is added back here which was removed in patch 3...
 
->
-> Cheers,
->
-> Paolo
->
+Others lgtm.
 
 
