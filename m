@@ -1,156 +1,127 @@
-Return-Path: <netdev+bounces-64177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 386308319AA
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 13:55:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D92D8319B0
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 13:57:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC8C428A1E0
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 12:55:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8000B1C21BAC
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 12:57:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FF6624B4A;
-	Thu, 18 Jan 2024 12:55:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9781724B4E;
+	Thu, 18 Jan 2024 12:57:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08C9213AFB;
-	Thu, 18 Jan 2024 12:55:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCCB611CAF
+	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 12:57:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705582533; cv=none; b=dK47J+gNDnG+6GcQI8L+gmBqcAoilDqQVKf7lK6NRnUPBcHuqJG+sndLIVZYLe3xT/sKUjAdepY89OjWrRV2dBb8unVs59Pe3oK3MmWZptPHm2hht1ECrKZ31JRzy9+HHx3H+SE4WitWv+VFnxM3JmcDBF2UYUl8knEPUNNP2Hk=
+	t=1705582623; cv=none; b=JYrHmfUTybIRsH4suCBSK1L6fDXwHXChlBu/wIhcErzwTdDP19+iTDeMuzgz+pUoqY/cMiVtvJRBoCK51MADOGJVx5l23X5RUj+3NbHKO/BreZHNTfdVZnoF35HMrmGD/EbrN45/q9b6AxqOb3fjz7dgkfNv4+tX0ZMmivtFoNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705582533; c=relaxed/simple;
-	bh=JMIsJtQBX6kLyKtnYaMFEzQtsIApPm45z17ASci53Wo=;
-	h=Received:Received:Received:Received:From:To:CC:Subject:
-	 Thread-Topic:Thread-Index:Date:Message-ID:References:In-Reply-To:
-	 Accept-Language:Content-Language:X-MS-Has-Attach:
-	 X-MS-TNEF-Correlator:x-originating-ip:Content-Type:
-	 Content-Transfer-Encoding:MIME-Version; b=J2zHAmwzgzk+xUM6lYtNu4lsb0ZP37UAglJpazSImv8Zd/h5I+ehllMVks+BC6Erlleu794hHnLd/QrxjAfF/17C3yfiysSfMinWT6Dk+kK3qwmAoEtBNAGYhry3bJEzZPkN9p69m7WldwFVuOoxTcg5upCVDrqQoVCdIHfTWGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4TG2kw08YhzsVws;
-	Thu, 18 Jan 2024 20:54:32 +0800 (CST)
-Received: from kwepemd200003.china.huawei.com (unknown [7.221.188.150])
-	by mail.maildlp.com (Postfix) with ESMTPS id 231D318005B;
-	Thu, 18 Jan 2024 20:55:27 +0800 (CST)
-Received: from dggpemm500008.china.huawei.com (7.185.36.136) by
- kwepemd200003.china.huawei.com (7.221.188.150) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1258.28; Thu, 18 Jan 2024 20:55:26 +0800
-Received: from dggpemm500008.china.huawei.com ([7.185.36.136]) by
- dggpemm500008.china.huawei.com ([7.185.36.136]) with mapi id 15.01.2507.035;
- Thu, 18 Jan 2024 20:55:26 +0800
-From: wangyunjian <wangyunjian@huawei.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "jasowang@redhat.com"
-	<jasowang@redhat.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, xudingke
-	<xudingke@huawei.com>
-Subject: RE: [PATCH net v3] tun: add missing rx stats accounting in
- tun_xdp_act
-Thread-Topic: [PATCH net v3] tun: add missing rx stats accounting in
- tun_xdp_act
-Thread-Index: AQHaSTdaoh49U62FKkOqzRq1lENoTbDdnv0AgAHaJdA=
-Date: Thu, 18 Jan 2024 12:55:26 +0000
-Message-ID: <ed6fd9c514ae4a449580d11c9c6ba8e7@huawei.com>
-References: <1705490503-28844-1-git-send-email-wangyunjian@huawei.com>
- <65a7f560a4643_6ba59294a7@willemb.c.googlers.com.notmuch>
-In-Reply-To: <65a7f560a4643_6ba59294a7@willemb.c.googlers.com.notmuch>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1705582623; c=relaxed/simple;
+	bh=E6w2t2lkA3VRpDyQnNJbxVVBH0jclVguAgYbTSBVxRI=;
+	h=Received:Received:Message-ID:Date:MIME-Version:User-Agent:Subject:
+	 Content-Language:To:Cc:References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:X-CM-TRANSID:X-CM-SenderInfo:
+	 X-Coremail-Antispam; b=ZSxX+qRo9Br5dcqwCawKO+iurC9W7KceZcmAjvEcbl32Y5rBy94BhUZfwIvymbVi1Zwh0bHjGse3cMj9I33BAqb545b/lLE8GP0xeM97H0RqkOEq3gkyzoJZLsnz9MKmVCcb0LdK/ZgYy3eRQJM2fcGNBcCH0g4TUEQNO+AcNB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [112.20.108.41])
+	by gateway (Coremail) with SMTP id _____8CxifAaIKllqqYBAA--.8192S3;
+	Thu, 18 Jan 2024 20:56:58 +0800 (CST)
+Received: from [192.168.100.8] (unknown [112.20.108.41])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8Ax3c4XIKllRJAIAA--.43624S3;
+	Thu, 18 Jan 2024 20:56:57 +0800 (CST)
+Message-ID: <b9620173-637e-4a56-8db2-60e1e0c3835e@loongson.cn>
+Date: Thu, 18 Jan 2024 20:56:55 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 3/9] net: stmmac: dwmac-loongson: Add full PCI
+ support
+Content-Language: en-US
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, fancer.lancer@gmail.com,
+ Jose.Abreu@synopsys.com, chenhuacai@loongson.cn, guyinggang@loongson.cn,
+ netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
+References: <cover.1702990507.git.siyanteng@loongson.cn>
+ <b43293919f4ddb869a795e41266f7c3107f79faf.1702990507.git.siyanteng@loongson.cn>
+ <ZZPoKceXELZQU8cq@shell.armlinux.org.uk>
+From: Yanteng Si <siyanteng@loongson.cn>
+In-Reply-To: <ZZPoKceXELZQU8cq@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8Ax3c4XIKllRJAIAA--.43624S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj9xXoWrtw18AF4ktFWUCFy5XFykXrc_yoWkKFXEqF
+	W8ZF1kZF4rW3Wvyr43Wr1Yyr1SgF1qqrZ3Krn2vr10y3sxWay3Gr4Fgr1fZFW7uw4Iqw4r
+	tr15Gwsaqw48XosvyTuYvTs0mTUanT9S1TB71UUUUj7qnTZGkaVYY2UrUUUUj1kv1TuYvT
+	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
+	cSsGvfJTRUUUbfxYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
+	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+	W8JVWxJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6F4UJVW0owAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0c
+	Ia020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jw0_
+	WrylYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrw
+	CY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8
+	JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14
+	v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY
+	67AKxVW8JVW5JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2
+	IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_
+	Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jz5lbUUUUU=
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBXaWxsZW0gZGUgQnJ1aWpuIFtt
-YWlsdG86d2lsbGVtZGVicnVpam4ua2VybmVsQGdtYWlsLmNvbV0NCj4gU2VudDogV2VkbmVzZGF5
-LCBKYW51YXJ5IDE3LCAyMDI0IDExOjQyIFBNDQo+IFRvOiB3YW5neXVuamlhbiA8d2FuZ3l1bmpp
-YW5AaHVhd2VpLmNvbT47DQo+IHdpbGxlbWRlYnJ1aWpuLmtlcm5lbEBnbWFpbC5jb207IGphc293
-YW5nQHJlZGhhdC5jb207IGt1YmFAa2VybmVsLm9yZzsNCj4gZGF2ZW1AZGF2ZW1sb2Z0Lm5ldA0K
-PiBDYzogbmV0ZGV2QHZnZXIua2VybmVsLm9yZzsgbGludXgta2VybmVsQHZnZXIua2VybmVsLm9y
-ZzsgeHVkaW5na2UNCj4gPHh1ZGluZ2tlQGh1YXdlaS5jb20+OyB3YW5neXVuamlhbiA8d2FuZ3l1
-bmppYW5AaHVhd2VpLmNvbT4NCj4gU3ViamVjdDogUmU6IFtQQVRDSCBuZXQgdjNdIHR1bjogYWRk
-IG1pc3Npbmcgcnggc3RhdHMgYWNjb3VudGluZyBpbiB0dW5feGRwX2FjdA0KPiANCj4gWXVuamlh
-biBXYW5nIHdyb3RlOg0KPiA+IFRoZSBUVU4gY2FuIGJlIHVzZWQgYXMgdmhvc3QtbmV0IGJhY2tl
-bmQsIGFuZCBpdCBpcyBuZWNlc3NhcnkgdG8gY291bnQNCj4gPiB0aGUgcGFja2V0cyB0cmFuc21p
-dHRlZCBmcm9tIFRVTiB0byB2aG9zdC1uZXQvdmlydGlvLW5ldC4gSG93ZXZlciwNCj4gPiB0aGVy
-ZSBhcmUgc29tZSBwbGFjZXMgaW4gdGhlIHJlY2VpdmUgcGF0aCB0aGF0IHdlcmUgbm90IHRha2Vu
-IGludG8NCj4gPiBhY2NvdW50IHdoZW4gdXNpbmcgWERQLiBUaGUgY29tbWl0IDhhZTFhZmYwYjMz
-MSAoInR1bnRhcDogc3BsaXQgb3V0DQo+ID4gWERQIGxvZ2ljIikgb25seSBpbmNsdWRlcyBkcm9w
-cGVkIGNvdW50ZXIgZm9yIFhEUF9EUk9QLCBYRFBfQUJPUlRFRCwNCj4gPiBhbmQgaW52YWxpZCBY
-RFAgYWN0aW9ucy4gSXQgd291bGQgYmUgYmVuZWZpY2lhbCB0byBhbHNvIGluY2x1ZGUgbmV3DQo+
-ID4gYWNjb3VudGluZyBmb3Igc3VjY2Vzc2Z1bGx5IHJlY2VpdmVkIGJ5dGVzIHVzaW5nDQo+ID4g
-ZGV2X3N3X25ldHN0YXRzX3J4X2FkZCBhbmQgaW50cm9kdWNlIG5ldyBkcm9wcGVkIGNvdW50ZXIg
-Zm9yIFhEUCBlcnJvcnMNCj4gb24gWERQX1RYIGFuZCBYRFBfUkVESVJFQ1QuDQo+IA0KPiBGcm9t
-IHRoZSBkZXNjcmlwdGlvbiBpdCBpcyBjbGVhciB0aGF0IHRoZXNlIGFyZSB0d28gc2VwYXJhdGUg
-Y2hhbmdlcyB3cmFwcGVkDQo+IGludG8gb25lIHBhdGNoLiBJIHNob3VsZCBoYXZlIGZsYWdnZWQg
-dGhpcyBwcmV2aW91c2x5Lg0KDQpEbyBJIG5lZWQgdG8gc3BsaXQgdGhlc2UgdHdvIG1vZGlmaWNh
-dGlvbnMgaW50byAyIHBhdGNoZXM/DQoxLiBvbmx5IGZpeCBkcm9wcGVkIGNvdW50ZXINCjIuIGFk
-ZCBuZXcgYWNjb3VudGluZyBmb3Igc3VjY2Vzc2Z1bGx5IHJlY2VpdmVkIGJ5dGVzDQpPcjoNCk9u
-bHkgZml4IGRyb3BwZWQgY291bnRlcj8NCg0KPiANCj4gQWNrIG9uIHJldHVybmluZyB0aGUgZXJy
-b3IgY291bnRlciB0aGF0IHdhcyBwcmV2aW91c2x5IHByZXNlbnQgYW5kIG1hdGNoZXMNCj4gdGhl
-IEZpeGVzIHRhZy4NCj4gDQo+IEZvciB0aGUgc2Vjb25kIGNoYW5nZSwgSSBoYWQgdG8gY2hlY2sg
-YSBmZXcgb3RoZXIgWERQIGNhcGFibGUgZHJpdmVycyB0byB2ZXJpZnkNCj4gdGhhdCBpdCBpcyBp
-bmRlZWQgY29tbW9uIHRvIGNvdW50IHN1Y2ggcGFja2V0cy4NCj4gDQo+ID4gRml4ZXM6IDhhZTFh
-ZmYwYjMzMSAoInR1bnRhcDogc3BsaXQgb3V0IFhEUCBsb2dpYyIpDQo+ID4gU2lnbmVkLW9mZi1i
-eTogWXVuamlhbiBXYW5nIDx3YW5neXVuamlhbkBodWF3ZWkuY29tPg0KPiA+IC0tLQ0KPiA+IHYz
-OiB1cGRhdGUgY29tbWl0IGxvZyBhbmQgY29kZQ0KPiA+IHYyOiBhZGQgRml4ZXMgdGFnDQo+ID4g
-LS0tDQo+ID4gIGRyaXZlcnMvbmV0L3R1bi5jIHwgMTQgKysrKysrKysrLS0tLS0NCj4gPiAgMSBm
-aWxlIGNoYW5nZWQsIDkgaW5zZXJ0aW9ucygrKSwgNSBkZWxldGlvbnMoLSkNCj4gPg0KPiA+IGRp
-ZmYgLS1naXQgYS9kcml2ZXJzL25ldC90dW4uYyBiL2RyaXZlcnMvbmV0L3R1bi5jIGluZGV4DQo+
-ID4gYWZhNTQ5N2Y3YzM1Li4wNzA0YTE3ZTc0ZTEgMTAwNjQ0DQo+ID4gLS0tIGEvZHJpdmVycy9u
-ZXQvdHVuLmMNCj4gPiArKysgYi9kcml2ZXJzL25ldC90dW4uYw0KPiA+IEBAIC0xNjI1LDE4ICsx
-NjI1LDE1IEBAIHN0YXRpYyBzdHJ1Y3Qgc2tfYnVmZiAqX190dW5fYnVpbGRfc2tiKHN0cnVjdA0K
-PiA+IHR1bl9maWxlICp0ZmlsZSwgIHN0YXRpYyBpbnQgdHVuX3hkcF9hY3Qoc3RydWN0IHR1bl9z
-dHJ1Y3QgKnR1biwgc3RydWN0DQo+IGJwZl9wcm9nICp4ZHBfcHJvZywNCj4gPiAgCQkgICAgICAg
-c3RydWN0IHhkcF9idWZmICp4ZHAsIHUzMiBhY3QpICB7DQo+ID4gLQlpbnQgZXJyOw0KPiA+ICsJ
-dW5zaWduZWQgaW50IGRhdGFzaXplID0geGRwLT5kYXRhX2VuZCAtIHhkcC0+ZGF0YTsNCj4gPiAr
-CWludCBlcnIgPSAwOw0KPiA+DQo+ID4gIAlzd2l0Y2ggKGFjdCkgew0KPiA+ICAJY2FzZSBYRFBf
-UkVESVJFQ1Q6DQo+ID4gIAkJZXJyID0geGRwX2RvX3JlZGlyZWN0KHR1bi0+ZGV2LCB4ZHAsIHhk
-cF9wcm9nKTsNCj4gPiAtCQlpZiAoZXJyKQ0KPiA+IC0JCQlyZXR1cm4gZXJyOw0KPiA+ICAJCWJy
-ZWFrOw0KPiA+ICAJY2FzZSBYRFBfVFg6DQo+ID4gIAkJZXJyID0gdHVuX3hkcF90eCh0dW4tPmRl
-diwgeGRwKTsNCj4gPiAtCQlpZiAoZXJyIDwgMCkNCj4gPiAtCQkJcmV0dXJuIGVycjsNCj4gPiAg
-CQlicmVhazsNCj4gPiAgCWNhc2UgWERQX1BBU1M6DQo+ID4gIAkJYnJlYWs7DQo+ID4gQEAgLTE2
-NTEsNiArMTY0OCwxMyBAQCBzdGF0aWMgaW50IHR1bl94ZHBfYWN0KHN0cnVjdCB0dW5fc3RydWN0
-ICp0dW4sDQo+IHN0cnVjdCBicGZfcHJvZyAqeGRwX3Byb2csDQo+ID4gIAkJYnJlYWs7DQo+ID4g
-IAl9DQo+ID4NCj4gPiArCWlmIChlcnIgPCAwKSB7DQo+ID4gKwkJYWN0ID0gZXJyOw0KPiA+ICsJ
-CWRldl9jb3JlX3N0YXRzX3J4X2Ryb3BwZWRfaW5jKHR1bi0+ZGV2KTsNCj4gPiArCX0gZWxzZSBp
-ZiAoYWN0ID09IFhEUF9SRURJUkVDVCB8fCBhY3QgPT0gWERQX1RYKSB7DQo+ID4gKwkJZGV2X3N3
-X25ldHN0YXRzX3J4X2FkZCh0dW4tPmRldiwgZGF0YXNpemUpOw0KPiA+ICsJfQ0KPiA+ICsNCj4g
-DQo+IExldCdzIGF2b2lkIGFkZGluZyB5ZXQgYW5vdGhlciBicmFuY2ggYW5kIGp1c3QgZG8gdGhl
-c2Ugb3BlcmF0aW9ucyBpbiB0aGUgY2FzZQ0KPiBzdGF0ZW1lbnRzLCBsaWtlIFhEUF9EUk9QLg0K
-DQpGaXggaXQgbGlrZSB0aGlzPw0KLS0tIGEvZHJpdmVycy9uZXQvdHVuLmMNCisrKyBiL2RyaXZl
-cnMvbmV0L3R1bi5jDQpAQCAtMTYyNSwxOCArMTYyNSwyNSBAQCBzdGF0aWMgc3RydWN0IHNrX2J1
-ZmYgKl9fdHVuX2J1aWxkX3NrYihzdHJ1Y3QgdHVuX2ZpbGUgKnRmaWxlLA0KIHN0YXRpYyBpbnQg
-dHVuX3hkcF9hY3Qoc3RydWN0IHR1bl9zdHJ1Y3QgKnR1biwgc3RydWN0IGJwZl9wcm9nICp4ZHBf
-cHJvZywNCiAgICAgICAgICAgICAgICAgICAgICAgc3RydWN0IHhkcF9idWZmICp4ZHAsIHUzMiBh
-Y3QpDQogew0KKyAgICAgICB1bnNpZ25lZCBpbnQgZGF0YXNpemUgPSB4ZHAtPmRhdGFfZW5kIC0g
-eGRwLT5kYXRhOw0KICAgICAgICBpbnQgZXJyOw0KIA0KICAgICAgICBzd2l0Y2ggKGFjdCkgew0K
-ICAgICAgICBjYXNlIFhEUF9SRURJUkVDVDoNCiAgICAgICAgICAgICAgICBlcnIgPSB4ZHBfZG9f
-cmVkaXJlY3QodHVuLT5kZXYsIHhkcCwgeGRwX3Byb2cpOw0KLSAgICAgICAgICAgICAgIGlmIChl
-cnIpDQorICAgICAgICAgICAgICAgaWYgKGVycikgew0KKyAgICAgICAgICAgICAgICAgICAgICAg
-ZGV2X2NvcmVfc3RhdHNfcnhfZHJvcHBlZF9pbmModHVuLT5kZXYpOw0KICAgICAgICAgICAgICAg
-ICAgICAgICAgcmV0dXJuIGVycjsNCisgICAgICAgICAgICAgICB9DQorICAgICAgICAgICAgICAg
-ZGV2X3N3X25ldHN0YXRzX3J4X2FkZCh0dW4tPmRldiwgZGF0YXNpemUpOw0KICAgICAgICAgICAg
-ICAgIGJyZWFrOw0KICAgICAgICBjYXNlIFhEUF9UWDoNCiAgICAgICAgICAgICAgICBlcnIgPSB0
-dW5feGRwX3R4KHR1bi0+ZGV2LCB4ZHApOw0KLSAgICAgICAgICAgICAgIGlmIChlcnIgPCAwKQ0K
-KyAgICAgICAgICAgICAgIGlmIChlcnIgPCAwKSB7DQorICAgICAgICAgICAgICAgICAgICAgICBk
-ZXZfY29yZV9zdGF0c19yeF9kcm9wcGVkX2luYyh0dW4tPmRldik7DQogICAgICAgICAgICAgICAg
-ICAgICAgICByZXR1cm4gZXJyOw0KKyAgICAgICAgICAgICAgIH0NCisgICAgICAgICAgICAgICBk
-ZXZfc3dfbmV0c3RhdHNfcnhfYWRkKHR1bi0+ZGV2LCBkYXRhc2l6ZSk7DQogICAgICAgICAgICAg
-ICAgYnJlYWs7DQogICAgICAgIGNhc2UgWERQX1BBU1M6DQoNCj4gDQo+ID4gIAlyZXR1cm4gYWN0
-Ow0KPiA+ICB9DQo+ID4NCj4gPiAtLQ0KPiA+IDIuNDEuMA0KPiA+DQo+IA0KPiANCg0K
+
+在 2024/1/2 18:40, Russell King (Oracle) 写道:
+> On Tue, Dec 19, 2023 at 10:17:06PM +0800, Yanteng Si wrote:
+>> @@ -125,42 +126,48 @@ static int loongson_dwmac_probe(struct pci_dev *pdev,
+>>   	if (ret)
+>>   		goto err_disable_device;
+>>   
+>> -	bus_id = of_alias_get_id(np, "ethernet");
+>> -	if (bus_id >= 0)
+>> -		plat->bus_id = bus_id;
+>> +	if (np) {
+>> +		bus_id = of_alias_get_id(np, "ethernet");
+>> +		if (bus_id >= 0)
+>> +			plat->bus_id = bus_id;
+>>   
+>> -	phy_mode = device_get_phy_mode(&pdev->dev);
+>> -	if (phy_mode < 0) {
+>> -		dev_err(&pdev->dev, "phy_mode not found\n");
+>> -		ret = phy_mode;
+>> -		goto err_disable_device;
+>> +		phy_mode = device_get_phy_mode(&pdev->dev);
+>> +		if (phy_mode < 0) {
+>> +			dev_err(&pdev->dev, "phy_mode not found\n");
+>> +			ret = phy_mode;
+>> +			goto err_disable_device;
+>> +		}
+>> +		plat->phy_interface = phy_mode;
+>>   	}
+>>   
+>> -	plat->phy_interface = phy_mode;
+>> -
+> So this is why phy_interface changes in patch 2. It would have been good
+> to make a forward reference to this change to explain in patch 2 why the
+> "default" value has been set there. Or maybe move the setting of that
+> default value into this patch?
+
+This sounds great, I will try it.
+
+
+Thanks,
+
+Yanteng
+
+>
+
 
