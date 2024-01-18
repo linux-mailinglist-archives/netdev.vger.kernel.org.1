@@ -1,173 +1,161 @@
-Return-Path: <netdev+bounces-64182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B9F78319E9
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 14:04:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10DE6831A26
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 14:11:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B89B6289FDE
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 13:04:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D0C71F23725
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 13:11:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 847B224B5F;
-	Thu, 18 Jan 2024 13:04:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 194E12554D;
+	Thu, 18 Jan 2024 13:11:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="qRGqsq+1"
 X-Original-To: netdev@vger.kernel.org
-Received: from exchange.fintech.ru (exchange.fintech.ru [195.54.195.159])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E352324B55;
-	Thu, 18 Jan 2024 13:04:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.54.195.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BA9E24B42
+	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 13:11:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705583078; cv=none; b=M3qscZSFvajs+8/Y/TdVpn1/cJeAD2HpHf3PH0kk9ioJ2IUbR1pXafjqORHiqvQLvJDZ3FL49oeMg0jNIobDXSyOUsXKADnK+qQ7qCWWOmYmsuBnlzuCt14NdidQK/EUGvxIAH+SO2junKV9MGHQkbfeY+5Wl85yFopIKxiM8LI=
+	t=1705583505; cv=none; b=eeshjcF2wMjA5JIe6xILyfhg2iJW9xDVQvJ3l/nhshl0kyyIoqbk99f9Lxos1inmXgRuJkEAlr512fMIB18tTgNyCWd1FMSX7x5XrFOtikkoaKFo43YXNC49XbkDyBYFVy4OtX9wR/oGmTaUhJbXjWcfAHRL8YwUZuapxBbZAaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705583078; c=relaxed/simple;
-	bh=A2u/In+Ely0o9qIZsqtSMjnx7pYwOa9eMaospITnmZ8=;
-	h=Received:Received:Message-ID:Date:MIME-Version:User-Agent:Subject:
-	 Content-Language:To:CC:References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:X-Originating-IP:X-ClientProxiedBy; b=HFeQ3zAhpHfpzPF/xfKt1FWcWtPfGIv8LLARXVs0++M4wNLZHUGInDfIgHyCYzVYys4wS2JRUG0sCeyK4BDke3R43WVgsiEoBRdwr+l+6dJBQ9HWBWFoUqrqwtAKPa8zysT4N89rg2KVA3d7hm49+E7n0AFbQ3CZBSpLok2hGN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru; spf=pass smtp.mailfrom=fintech.ru; arc=none smtp.client-ip=195.54.195.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fintech.ru
-Received: from Ex16-01.fintech.ru (10.0.10.18) by exchange.fintech.ru
- (195.54.195.169) with Microsoft SMTP Server (TLS) id 14.3.498.0; Thu, 18 Jan
- 2024 16:04:31 +0300
-Received: from [192.168.211.130] (10.0.253.138) by Ex16-01.fintech.ru
- (10.0.10.18) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Thu, 18 Jan
- 2024 16:04:31 +0300
-Message-ID: <549c658e-28a0-4e6c-be09-95ba748410b7@fintech.ru>
-Date: Thu, 18 Jan 2024 05:04:30 -0800
+	s=arc-20240116; t=1705583505; c=relaxed/simple;
+	bh=n++XuhRB4EVG1dnVu6UFfzLPoEhlNslsnkhQrRbhM9k=;
+	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:MIME-Version:
+	 References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:
+	 Content-Type:Content-Transfer-Encoding; b=QupMpXw1Z5cI1pKvD4buc2tbAMA+ciXOeatwxP7I6viBXoUqhodjxk8GNbkfUdbI80xtv09AhXrDq+5p49r0OXb2tai4B6Qjm1UHOj1Nb+8fC2h8uM62gg8IhgpCVv5+WsVC3Q8zpfxXVHc85+UkUVielhSvjfv/dP6XhzSfKaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=qRGqsq+1; arc=none smtp.client-ip=209.85.221.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-4b7480a80ceso438214e0c.0
+        for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 05:11:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1705583501; x=1706188301; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MHW8mrwPYeD3SY8y17cH7gnw3XovI7cNYSvj0nnf3+8=;
+        b=qRGqsq+1bJuMzygpcPUnex5SggsPvLRZYTJseFdBGyl4S/GAZKSuc7bdKJ4EjIdPmO
+         hdJbXf83QFKgssHvoAAGG1ZyqA9VDp1iB5g/O1pI+5UQvDmBCffzWB9C4FkEJyXknb98
+         Ez0ibwxLiYz6GZ0QwMFqKfE0SPZlmRIKIZifWQ2sQrJ6buPgp1eHUrtQiUxRrKE0LXLf
+         zHVOuqd704GbXXI28ckuPnx5KtXwNCjiGA+Xo3bonHuN+rwkj+srZUVeG31S8zky+GxE
+         8OsymlU/9SdFKfojInsqMLnOYxQvE8J2YHnaNHmTl7QbL5IOG5UfKpFP2uT9RyllV1Ke
+         ilMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705583501; x=1706188301;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MHW8mrwPYeD3SY8y17cH7gnw3XovI7cNYSvj0nnf3+8=;
+        b=wd23NTdaO96tF2bqjzR5+6RF8YrcAXm5lr4+3tcVZuDbA8c29n0Z06xPHmKUzRtEmY
+         9H4T2aGuFXiy4kirDqh/ANKLzrv1A9z4dtVf5Ps0592tUplWDEp5skAcox66zeWf3+FJ
+         G2VWSi+Xr+TQSOeIgW+jpxBYup1IqDTH3vbToyccIEQcTomKHVzBpr2f/ogoWpJO4hao
+         Cv6+kpPSNCGhsjv4rGOzB43g1yfHvesIkmcXyWr4RexEh/pXLs9Swt7C8fNj+YAfYzr4
+         BGm4a5sQfaqdxN2Wzx4YuVNyYiKTksUmUVNqTUmPFLXAezoH6AoHnPN32kr63U6LnNrP
+         Js1g==
+X-Gm-Message-State: AOJu0Yw/q19HUbo2oUSeEXO4+Xu6kRa5hCRmfdBEQ2hTkKadLWfIoj8w
+	4TeLhnKyMppHyXl9dU9g9drRn6OVWAI+hDx8jNe4yVB9/3t1piXdmsMiranYJk59b+Z1OuOwWrv
+	NUPlidZiAwjAHXbfh8M2WIJVVyV12h38qq94Yxg==
+X-Google-Smtp-Source: AGHT+IGTGw8HnvT5D8+nH/KgquXG/RE7XEsMEneP3Lg56sqfViwsfnFVV4sR0gvqRyQwQNymy/UlduMSCG1+S/3he4Q=
+X-Received: by 2002:a05:6122:128b:b0:4b7:2c46:32bb with SMTP id
+ i11-20020a056122128b00b004b72c4632bbmr1337533vkp.13.1705583501195; Thu, 18
+ Jan 2024 05:11:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] ipv6: mcast: fix data-race in ipv6_mc_down /
- mld_ifc_work
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>
-CC: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Taehee Yoo
-	<ap420073@gmail.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>,
-	<syzbot+a9400cabb1d784e49abf@syzkaller.appspotmail.com>
-References: <20240117172102.12001-1-n.zhandarovich@fintech.ru>
- <CANn89iLUxP_YGLD1mrCmAr9qSg7wPWDjWPhJHNa_X4QVyNWqBQ@mail.gmail.com>
-From: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
-In-Reply-To: <CANn89iLUxP_YGLD1mrCmAr9qSg7wPWDjWPhJHNa_X4QVyNWqBQ@mail.gmail.com>
+References: <20240117160748.37682-1-brgl@bgdev.pl> <20240117160748.37682-5-brgl@bgdev.pl>
+ <65a7feb3ea48f_3b8e294bf@dwillia2-xfh.jf.intel.com.notmuch>
+In-Reply-To: <65a7feb3ea48f_3b8e294bf@dwillia2-xfh.jf.intel.com.notmuch>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Thu, 18 Jan 2024 14:11:30 +0100
+Message-ID: <CAMRc=McUdR5oVEpbwXF+Sc1OaEtYH-UCv0ScFwrbGyWtyh8W0A@mail.gmail.com>
+Subject: Re: [PATCH 4/9] PCI: create platform devices for child OF nodes of
+ the port node
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: Kalle Valo <kvalo@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Bjorn Helgaas <bhelgaas@google.com>, Heiko Stuebner <heiko@sntech.de>, 
+	Jernej Skrabec <jernej.skrabec@gmail.com>, Chris Morgan <macromorgan@hotmail.com>, 
+	Linus Walleij <linus.walleij@linaro.org>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Arnd Bergmann <arnd@arndb.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
+	=?UTF-8?B?TsOtY29sYXMgRiAuIFIgLiBBIC4gUHJhZG8=?= <nfraprado@collabora.com>, 
+	Marek Szyprowski <m.szyprowski@samsung.com>, Peng Fan <peng.fan@nxp.com>, 
+	Robert Richter <rrichter@amd.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
+	Terry Bowman <terry.bowman@amd.com>, Lukas Wunner <lukas@wunner.de>, 
+	Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>, 
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-pci@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: Ex16-02.fintech.ru (10.0.10.19) To Ex16-01.fintech.ru
- (10.0.10.18)
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Wed, Jan 17, 2024 at 5:22=E2=80=AFPM Dan Williams <dan.j.williams@intel.=
+com> wrote:
+>
+> Bartosz Golaszewski wrote:
+> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> >
+> > In order to introduce PCI power-sequencing, we need to create platform
+> > devices for child nodes of the port node. They will get matched against
+> > the pwrseq drivers (if one exists) and then the actual PCI device will
+> > reuse the node once it's detected on the bus.
+> >
+> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> [..]
+> > diff --git a/drivers/pci/remove.c b/drivers/pci/remove.c
+> > index d749ea8250d6..77be0630b7b3 100644
+> > --- a/drivers/pci/remove.c
+> > +++ b/drivers/pci/remove.c
+> > @@ -1,6 +1,7 @@
+> >  // SPDX-License-Identifier: GPL-2.0
+> >  #include <linux/pci.h>
+> >  #include <linux/module.h>
+> > +#include <linux/of_platform.h>
+> >  #include "pci.h"
+> >
+> >  static void pci_free_resources(struct pci_dev *dev)
+> > @@ -18,11 +19,11 @@ static void pci_stop_dev(struct pci_dev *dev)
+> >       pci_pme_active(dev, false);
+> >
+> >       if (pci_dev_is_added(dev)) {
+> > -
+> >               device_release_driver(&dev->dev);
+> >               pci_proc_detach_device(dev);
+> >               pci_remove_sysfs_dev_files(dev);
+> >               of_pci_remove_node(dev);
+> > +             of_platform_depopulate(&dev->dev);
+> >
+> >               pci_dev_assign_added(dev, false);
+>
+> Why is pci_stop_dev() not in strict reverse order of
+> pci_bus_add_device()? I see that pci_dev_assign_added() was already not
+> in reverse "add" order before your change, but I otherwise would have
+> expected of_platform_depopulate() before of_pci_remove_node() (assumed
+> paired with of_pci_make_dev_node()).
 
-On 1/18/24 00:59, Eric Dumazet wrote:
-> On Wed, Jan 17, 2024 at 6:21 PM Nikita Zhandarovich
-> <n.zhandarovich@fintech.ru> wrote:
->>
->> idev->mc_ifc_count can be written over without proper locking.
->>
->> Originally found by syzbot [1], fix this issue by encapsulating calls
->> to mld_ifc_stop_work() (and mld_gq_stop_work() for good measure) with
->> mutex_lock() and mutex_unlock() accordingly as these functions
->> should only be called with mc_lock per their declarations.
->>
->> [1]
->> BUG: KCSAN: data-race in ipv6_mc_down / mld_ifc_work
->>
->> Fixes: 2d9a93b4902b ("mld: convert from timer to delayed work")
->> Reported-by: syzbot+a9400cabb1d784e49abf@syzkaller.appspotmail.com
->> Link: https://lore.kernel.org/all/000000000000994e09060ebcdffb@google.com/
->> Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
->> ---
->>  net/ipv6/mcast.c | 4 ++++
->>  1 file changed, 4 insertions(+)
->>
->> diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
->> index b75d3c9d41bb..bc6e0a0bad3c 100644
->> --- a/net/ipv6/mcast.c
->> +++ b/net/ipv6/mcast.c
->> @@ -2722,8 +2722,12 @@ void ipv6_mc_down(struct inet6_dev *idev)
->>         synchronize_net();
->>         mld_query_stop_work(idev);
->>         mld_report_stop_work(idev);
->> +
->> +       mutex_lock(&idev->mc_lock);
->>         mld_ifc_stop_work(idev);
->>         mld_gq_stop_work(idev);
->> +       mutex_unlock(&idev->mc_lock);
->> +
->>         mld_dad_stop_work(idev);
->>  }
->>
-> 
-> Thanks for the fix.
-> 
-> Reviewed-by: Eric Dumazet <edumazet@google.com>
-> 
-> I would also add some lockdep_assert_held() to make sure assumptions are met.
-> Trading a comment for a runtime check is better.
-> 
-> diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
-> index b75d3c9d41bb5005af2d4e10fab58f157e9ea4fa..b256362d3b5d5111f649ebfee4f1557d8c063d92
-> 100644
-> --- a/net/ipv6/mcast.c
-> +++ b/net/ipv6/mcast.c
-> @@ -1047,36 +1047,36 @@ bool ipv6_chk_mcast_addr(struct net_device
-> *dev, const struct in6_addr *group,
->         return rv;
->  }
-> 
-> -/* called with mc_lock */
->  static void mld_gq_start_work(struct inet6_dev *idev)
->  {
->         unsigned long tv = get_random_u32_below(idev->mc_maxdelay);
-> 
-> +       lockdep_assert_held(&idev->mc_lock);
->         idev->mc_gq_running = 1;
->         if (!mod_delayed_work(mld_wq, &idev->mc_gq_work, tv + 2))
->                 in6_dev_hold(idev);
->  }
-> 
-> -/* called with mc_lock */
->  static void mld_gq_stop_work(struct inet6_dev *idev)
->  {
-> +       lockdep_assert_held(&idev->mc_lock);
->         idev->mc_gq_running = 0;
->         if (cancel_delayed_work(&idev->mc_gq_work))
->                 __in6_dev_put(idev);
->  }
-> 
-> -/* called with mc_lock */
->  static void mld_ifc_start_work(struct inet6_dev *idev, unsigned long delay)
->  {
->         unsigned long tv = get_random_u32_below(delay);
-> 
-> +       lockdep_assert_held(&idev->mc_lock);
->         if (!mod_delayed_work(mld_wq, &idev->mc_ifc_work, tv + 2))
->                 in6_dev_hold(idev);
->  }
-> 
-> -/* called with mc_lock */
->  static void mld_ifc_stop_work(struct inet6_dev *idev)
->  {
-> +       lockdep_assert_held(&idev->mc_lock);
->         idev->mc_ifc_count = 0;
->         if (cancel_delayed_work(&idev->mc_ifc_work))
->                 __in6_dev_put(idev);
+The naming here is confusing but the two have nothing in common. One
+is used by CONFIG_PCI_DYNAMIC_OF_NODES to *create* new DT nodes for
+detected PCI devices. The one I'm adding, creates power sequencing
+*devices* (no nodes) for *existing* DT nodes.
 
-Just to clarify: should I incorporate your change into v2 version of my
-original one and attach 'Reviewed-by' tags or should I send a different
-patch with your suggestion?
+So the order is not really relevant here but I can change in v2.
 
-Apologies for the possibly silly question, got a little confused by
-signals from multiple maintainers.
-
-With regards,
-Nikita
+Bartosz
 
