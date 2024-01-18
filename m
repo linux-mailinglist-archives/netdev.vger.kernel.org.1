@@ -1,160 +1,151 @@
-Return-Path: <netdev+bounces-64147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89D11831648
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 10:56:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54EE4831677
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 11:08:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4D581C20FBD
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 09:56:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2309828646B
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 10:08:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C85C200A5;
-	Thu, 18 Jan 2024 09:56:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BC21200DA;
+	Thu, 18 Jan 2024 10:08:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CZQWPCiL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ocGPD+nV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09C89200AC;
-	Thu, 18 Jan 2024 09:56:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C10462030E
+	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 10:08:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705571786; cv=none; b=sNAOAtGlKkl/BP+vMxrtnkxKJNpCDpb3qju82o92amsPu+jFL2PJ/NHxfn24U2S4KUlxOOSEYzF72S/M9rwpcA6zTBoVNh4WfE4pAUo/p+EPHx8M5L8+4NPhE3tICDuStClae/nudbN6WXG4EmHyYtiHE7/OCXF3ab9A1SdVLu4=
+	t=1705572501; cv=none; b=BPwCCvfN2dEfF7+/Rnwa9jP1eiorNOfOzDuAsEpO3df+bm71Vr4UiAcMLrfFQnKI4nukheMDOUu8tos+Rt4UuEF1diiA936JTiJld2EmiN1u5Rlx7bUjiP2bp5F9OriFpMnUqSss5kI3HaZ4LRGmNb5RZ/Z2XdspyqC2+7KH/Tw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705571786; c=relaxed/simple;
-	bh=hWuuTgxcPQhYy8iWEJv2hwI1bR5CzV0o5I3xGjHNOwY=;
+	s=arc-20240116; t=1705572501; c=relaxed/simple;
+	bh=OHu6eTrt/JUl/pchOcrO1mb6f5C+2xrSrZ6sAdVoRZY=;
 	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:Date:
-	 From:To:Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=pGgnE956J8c1Kyim1HO2/K1ZQWCuBSq8iMyANSHePqdy6O9B61G5Odo/60UMKHQxYwHHGXU2Igm0+5UwpMLFNERUPU4aL2yW1BsRLbhho0UBvoRUbM3I+VY/4+XFFty+QG8S3cIQaIrhNklABwUr/4DuqrJPE24LYI0bMWVbW9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CZQWPCiL; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1d4414ec9c7so62679915ad.0;
-        Thu, 18 Jan 2024 01:56:20 -0800 (PST)
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:MIME-Version:
+	 References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:
+	 Content-Type:Content-Transfer-Encoding; b=fo+laPLjgjp47814gR6YMr6U7BFVqv+3pPF6ByV1HGSzlreJoRodrpHbyY5ZYUFKrLsgija1XMw6Axr/UUr9k66+ItQbf0EXVO8GBmRtPVVoI96e8nMqloQyXabA4XXvYA7n3HFVqfRF73hZ8pZQpXAnplOdZMIZnqRkrZBVN/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ocGPD+nV; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-55818b7053eso5239a12.0
+        for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 02:08:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705571780; x=1706176580; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qh+wH52rq1O19pUhbRYFfC3OyLYjJldAfdQgu6VbbCk=;
-        b=CZQWPCiLmUlH1kW/Ru2Q+TW8z83dfsoCIoi/ynaC+1TCRQ3cBvBKodx/6RmlzD6r7i
-         KKZEzfZMVJ7HrtvgbTPUmxwO5h+xWfqAISCeWt/LtwcJIEWMjiElgwzBYqPQVGbm1hLR
-         ufIDdAs+HFS39yBacPWmaKR1pKqMCS4cwxWgh3GDu3wuSc0qNCROTmXcG6tZtSKyp5LY
-         onoCwKrXORLaXuWwvhkz1vPIOQ+e6Vo/Ah8TOmshhMoxQmI8YQrkJkfLEuwRcMayYvZx
-         EFZOsNw3o/hc0ubJ4ft5Mh5QGmq99uez74gnH7uKbrK9GCInNz/opzgDPRF/odL4tIWC
-         rP+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705571780; x=1706176580;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1705572494; x=1706177294; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qh+wH52rq1O19pUhbRYFfC3OyLYjJldAfdQgu6VbbCk=;
-        b=kn7CV21voxiYWUuEYNPHbgqpw37sf4oo3KBQjPSHs9gk5ZQCePxVCiXxWStubpnuZT
-         TDqpUI/Kn6++5uFiyGk3pk4pGpWFaR5LBl4ew/AzI74GeIiK4Y1XEjrkz2hBrg2WO0Lx
-         5FXcrFOf7bUWweUjvUvomEP+Xx4TeDMilmm/EhSidHzrpQ/vaVyTwbkI1b3HvGQJn2qT
-         Lw85sta96TD/bodLlBt4rbvoL0Z3H9TwLHjuZjoPwyZF5nJo7P4Vxs3f3fZf71WGvqug
-         SUw9bTxXRNgpqKmirLjr8FPiI+T5iBsgt85DL9H0M9bzoD1EiPAOhMCHQmMoq2Ld7yEt
-         M0wQ==
-X-Gm-Message-State: AOJu0Yy3IMEuhP8JrOCo0s9xOuXythA99CWn20szo38Z32mSIrmK/Bxm
-	PQHS6SkCUWVnb//Rcqee/bZenQft98jqb840g+FjGrHz1jdWwwUz
-X-Google-Smtp-Source: AGHT+IFbi904Qass+6FarhLrEOyIWehebMlhY5de+XmF3+ZUUb1r0tC1oXRW+8vZJ2FmjTwkab+7ow==
-X-Received: by 2002:a17:902:d4cf:b0:1d5:4b75:f2da with SMTP id o15-20020a170902d4cf00b001d54b75f2damr532208plg.108.1705571780257;
-        Thu, 18 Jan 2024 01:56:20 -0800 (PST)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id q11-20020a170902c9cb00b001d70eb36dd9sm385185pld.279.2024.01.18.01.56.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jan 2024 01:56:19 -0800 (PST)
-Date: Thu, 18 Jan 2024 17:56:15 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Taehee Yoo <ap420073@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+a9400cabb1d784e49abf@syzkaller.appspotmail.com
-Subject: Re: [PATCH net] ipv6: mcast: fix data-race in ipv6_mc_down /
- mld_ifc_work
-Message-ID: <Zaj1vyXpp_UvJIXX@Laptop-X1>
-References: <20240117172102.12001-1-n.zhandarovich@fintech.ru>
+        bh=ymalSlLO7RuhGoeHTMVtczq8xlUcreF5NbWPRyxCS+M=;
+        b=ocGPD+nVYJb3cK93/JigpIX+oMcl7P1fqFgCK1vqioa9A4JBBm9NYm8VgamgukfDWx
+         Rt9TMMsP8LxgXf3FEf3Miwueu9oUxC/cvs9JLjh9k3fGO5fu4kgMcW9AfKeSyce4ljyO
+         sRILNGF2sllFrCsNYH17d0AjaTZrRIn15vzUjJCgCA2kJqLqs5kUpIJ9gojs8BAn3Jsv
+         zFh4lPdyc2yfV+v+sJsjUQ6s8CNxgbqo3vYCOfq1cX5LYefU283HfyUw9S3creYalF83
+         d19IRdM9IqnuSHpISNodJpDPv0UY/YbbMWu2uo9m/QFkJu0CTx7vG88iwKFwhn5mfds+
+         6tfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705572494; x=1706177294;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ymalSlLO7RuhGoeHTMVtczq8xlUcreF5NbWPRyxCS+M=;
+        b=JyRjs8PuX/xGAU3440sHgCGXI6PJpVofFd6hNnZ0cGjfwSmT9MA+ur3Jld5BGsvQo/
+         vnsv/uU9SYjOKMO1O904Dkox4B6BzDmdRJ0qxxVgJSt3ggjrF6rlhyKWq+NzaYik8i+5
+         N/+31msqR21VvUei2U4IqL82StazS49Gx3me2mhSYoC+RUhe21rGl1mLNEUytInHb5uY
+         srLZp2sDq5ebUxXx1awDSgnC0wfKPlfynWojFLAVme7+6ZzrJVxoAy5rnL9XbEhbcKKt
+         ZcsWZ6VcgzBcdycvhj8aUS/kdNwgKejmNmlbEZzPJjykXlFn60YsV0ULGp52PpTady4O
+         jSOg==
+X-Gm-Message-State: AOJu0Yz8O24FBzXt/Q8rD4dL0c+EVuvmVr0BFLpyIjVbm1QCCNzcAgDh
+	i9uQrEyOq3rcR5cBOrk1eFJ/j/7ovFg6zBIHPDQTPak/rAOi99jra+CbGIPf5WO5ScTcDr8gBiA
+	n9vol0mPrDY69Jl4xCxXUqyCgs/zsSG55EIY0MtsunFm/vOcco+V4
+X-Google-Smtp-Source: AGHT+IGf6TjF1knTceWqeSYWuns8hLf9EYZ8ejkscjXQO7Tbqq0QgCjAmTEnocpf+hlg4qk93S+sVec3KD3YtNVmlFY=
+X-Received: by 2002:a05:6402:22d7:b0:557:15d:b784 with SMTP id
+ dm23-20020a05640222d700b00557015db784mr40541edb.2.1705572493817; Thu, 18 Jan
+ 2024 02:08:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240117172102.12001-1-n.zhandarovich@fintech.ru>
+References: <20240117160030.140264-1-pablo@netfilter.org> <20240117160030.140264-15-pablo@netfilter.org>
+In-Reply-To: <20240117160030.140264-15-pablo@netfilter.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 18 Jan 2024 11:08:00 +0100
+Message-ID: <CANn89iKtpVy1kSSuk_RSGN0R6L+roNJr81ED4+a2SZ2WKzGsng@mail.gmail.com>
+Subject: Re: [PATCH net 14/14] netfilter: ipset: fix performance regression in
+ swap operation
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net, 
+	netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com, fw@strlen.de
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 17, 2024 at 09:21:02AM -0800, Nikita Zhandarovich wrote:
-> idev->mc_ifc_count can be written over without proper locking.
-> 
-> Originally found by syzbot [1], fix this issue by encapsulating calls
-> to mld_ifc_stop_work() (and mld_gq_stop_work() for good measure) with
-> mutex_lock() and mutex_unlock() accordingly as these functions
-> should only be called with mc_lock per their declarations.
-> 
-> [1]
-> BUG: KCSAN: data-race in ipv6_mc_down / mld_ifc_work
-> 
-> write to 0xffff88813a80c832 of 1 bytes by task 3771 on cpu 0:
->  mld_ifc_stop_work net/ipv6/mcast.c:1080 [inline]
->  ipv6_mc_down+0x10a/0x280 net/ipv6/mcast.c:2725
->  addrconf_ifdown+0xe32/0xf10 net/ipv6/addrconf.c:3949
->  addrconf_notify+0x310/0x980
->  notifier_call_chain kernel/notifier.c:93 [inline]
->  raw_notifier_call_chain+0x6b/0x1c0 kernel/notifier.c:461
->  __dev_notify_flags+0x205/0x3d0
->  dev_change_flags+0xab/0xd0 net/core/dev.c:8685
->  do_setlink+0x9f6/0x2430 net/core/rtnetlink.c:2916
->  rtnl_group_changelink net/core/rtnetlink.c:3458 [inline]
->  __rtnl_newlink net/core/rtnetlink.c:3717 [inline]
->  rtnl_newlink+0xbb3/0x1670 net/core/rtnetlink.c:3754
->  rtnetlink_rcv_msg+0x807/0x8c0 net/core/rtnetlink.c:6558
->  netlink_rcv_skb+0x126/0x220 net/netlink/af_netlink.c:2545
->  rtnetlink_rcv+0x1c/0x20 net/core/rtnetlink.c:6576
->  netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
->  netlink_unicast+0x589/0x650 net/netlink/af_netlink.c:1368
->  netlink_sendmsg+0x66e/0x770 net/netlink/af_netlink.c:1910
->  ...
-> 
-> write to 0xffff88813a80c832 of 1 bytes by task 22 on cpu 1:
->  mld_ifc_work+0x54c/0x7b0 net/ipv6/mcast.c:2653
->  process_one_work kernel/workqueue.c:2627 [inline]
->  process_scheduled_works+0x5b8/0xa30 kernel/workqueue.c:2700
->  worker_thread+0x525/0x730 kernel/workqueue.c:2781
->  ...
-> 
-> Fixes: 2d9a93b4902b ("mld: convert from timer to delayed work")
-> Reported-by: syzbot+a9400cabb1d784e49abf@syzkaller.appspotmail.com
-> Link: https://lore.kernel.org/all/000000000000994e09060ebcdffb@google.com/
-> Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+On Wed, Jan 17, 2024 at 5:00=E2=80=AFPM Pablo Neira Ayuso <pablo@netfilter.=
+org> wrote:
+>
+> From: Jozsef Kadlecsik <kadlec@netfilter.org>
+>
+> The patch "netfilter: ipset: fix race condition between swap/destroy
+> and kernel side add/del/test", commit 28628fa9 fixes a race condition.
+> But the synchronize_rcu() added to the swap function unnecessarily slows
+> it down: it can safely be moved to destroy and use call_rcu() instead.
+> Thus we can get back the same performance and preventing the race conditi=
+on
+> at the same time.
+>
+> Fixes: 28628fa952fe ("netfilter: ipset: fix race condition between swap/d=
+estroy and kernel side add/del/test")
+> Link: https://lore.kernel.org/lkml/C0829B10-EAA6-4809-874E-E1E9C05A8D84@a=
+utomattic.com/
+> Reported-by: Ale Crismani <ale.crismani@automattic.com>
+> Reported-by: David Wang <00107082@163.com
+> Tested-by: Ale Crismani <ale.crismani@automattic.com>
+> Tested-by: David Wang <00107082@163.com
+> Signed-off-by: Jozsef Kadlecsik <kadlec@netfilter.org>
+> Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
 > ---
->  net/ipv6/mcast.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
-> index b75d3c9d41bb..bc6e0a0bad3c 100644
-> --- a/net/ipv6/mcast.c
-> +++ b/net/ipv6/mcast.c
-> @@ -2722,8 +2722,12 @@ void ipv6_mc_down(struct inet6_dev *idev)
->  	synchronize_net();
->  	mld_query_stop_work(idev);
->  	mld_report_stop_work(idev);
-> +
-> +	mutex_lock(&idev->mc_lock);
->  	mld_ifc_stop_work(idev);
->  	mld_gq_stop_work(idev);
-> +	mutex_unlock(&idev->mc_lock);
-> +
->  	mld_dad_stop_work(idev);
+>  include/linux/netfilter/ipset/ip_set.h |  2 ++
+>  net/netfilter/ipset/ip_set_core.c      | 31 +++++++++++++++++++-------
+>  2 files changed, 25 insertions(+), 8 deletions(-)
+>
+> diff --git a/include/linux/netfilter/ipset/ip_set.h b/include/linux/netfi=
+lter/ipset/ip_set.h
+> index e8c350a3ade1..912f750d0bea 100644
+> --- a/include/linux/netfilter/ipset/ip_set.h
+> +++ b/include/linux/netfilter/ipset/ip_set.h
+> @@ -242,6 +242,8 @@ extern void ip_set_type_unregister(struct ip_set_type=
+ *set_type);
+>
+>  /* A generic IP set */
+>  struct ip_set {
+> +       /* For call_cru in destroy */
+> +       struct rcu_head rcu;
+>         /* The name of the set */
+>         char name[IPSET_MAXNAMELEN];
+>         /* Lock protecting the set data */
+> diff --git a/net/netfilter/ipset/ip_set_core.c b/net/netfilter/ipset/ip_s=
+et_core.c
+> index 4c133e06be1d..3bf9bb345809 100644
+> --- a/net/netfilter/ipset/ip_set_core.c
+> +++ b/net/netfilter/ipset/ip_set_core.c
+> @@ -1182,6 +1182,14 @@ ip_set_destroy_set(struct ip_set *set)
+>         kfree(set);
 >  }
->  
+>
+> +static void
+> +ip_set_destroy_set_rcu(struct rcu_head *head)
+> +{
+> +       struct ip_set *set =3D container_of(head, struct ip_set, rcu);
+> +
+> +       ip_set_destroy_set(set);
 
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+Calling ip_set_destroy_set() from BH (rcu callbacks) is not working.
+
+I think you should test your patch with LOCKDEP enabled, and/or
+CONFIG_DEBUG_ATOMIC_SLEEP=3Dy
 
