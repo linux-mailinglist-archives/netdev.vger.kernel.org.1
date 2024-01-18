@@ -1,198 +1,212 @@
-Return-Path: <netdev+bounces-64172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEF968318CE
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 13:02:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9734A8318F0
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 13:14:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 33E29B23504
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 12:02:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05A7F1F24B78
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 12:14:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87F7324208;
-	Thu, 18 Jan 2024 12:02:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32B2924210;
+	Thu, 18 Jan 2024 12:14:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="e0E1eTpK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WYxR9tgZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD380241FD
-	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 12:02:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EF83241F0
+	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 12:14:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705579333; cv=none; b=lUkgcdyJ/3iUu9DP+b8naBLyGQ72vaxmkBGW1jy+L8IV45G0YjRUglVuvf1Dw+XpjyhlaLTurpKcjq+cj7JtJdQ0WvM47isg5hlYvg2PFtuLgOl5ntjXzOgWwwgXoVHAyGvqNLmuq/A5RH8XTKEc85rovRoeenZ9/E1h3RAN6nM=
+	t=1705580057; cv=none; b=the3QVgE0q2d3kBejtdP5BoIqvEPlveu7v+0m95inIFyMJjcirkm6jm2skXd1y2f/Et8d69ZN4JY0mgxfImTLEeyuu/7cYu3S0LcVg9LVr6Oeya3vu1cpJ+D4dauVhNsLIMlyFfC9oTAE8GZybWpNqDgliTlELg5SI92ekLmK38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705579333; c=relaxed/simple;
-	bh=JG3dOnWveDgBbMtq6e+xgfnvd2S0woGLZ5oF0CTrYUI=;
-	h=Message-ID:DKIM-Signature:Date:MIME-Version:Subject:To:References:
-	 X-Report-Abuse:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:X-Migadu-Flow; b=niUfSJJhwAiQRiOa5cUQJuMFPEGdE6LcLKkug0TZQa+clp8SWhWSedrxixmkhYv87z8ETqVASJ5b/Rt5IzGfYhrrQNQKCuE1pF85hy8LwVEIC5Z/eS0N2r/vbo32xqDYvPIg3kg/PigL3ArC31KtFLnhaCuufJhFx9IUZ7ADCEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=e0E1eTpK; arc=none smtp.client-ip=95.215.58.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <667a9520-a53f-40a2-810a-6c1e45146589@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1705579327;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=C6tihjWp7j+qQC5z+FL5Mbj6abTGxgN8o1VWm9O3rTk=;
-	b=e0E1eTpKc2UyxMvfQBviMIlUGVFOzDMzOD7z0sxwO1I2FCqxe1ZA1W2fbt2bj8Y41aTJG4
-	FrC+ucuYIbnEzH4ledmGgj+0SZgbEwTasCz60RsuIndyGRrXeQlDvZAEpie1RCZ7K/s7OM
-	mSbs5Ibl0DuDQwoXsaOP++Go4ONQgdg=
-Date: Thu, 18 Jan 2024 20:01:58 +0800
+	s=arc-20240116; t=1705580057; c=relaxed/simple;
+	bh=bkDtY6K6Ac2Ig3O9KOeOHxZVhC+cTLQ6M1Gb/h1pn2I=;
+	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:MIME-Version:
+	 References:In-Reply-To:From:Date:Message-ID:Subject:To:Cc:
+	 Content-Type:Content-Transfer-Encoding; b=e2yvRbwdxe7AJj9BexfuhCtSj0dW4dadcyiZ6oYMiSOgSLNNPiqWjcfs4jl/HSczhsFQI2Nhb6SXC3H5XT7CVY09QrwV/LRCVNaEP5VWzSy6bJTpdkzan3YCegIoSiAt48qmyPyjPnUEHNcjgFbgqraxgZLsQ7sba6LTXkXfZwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WYxR9tgZ; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-557bbcaa4c0so4862a12.1
+        for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 04:14:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1705580054; x=1706184854; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=y0YkYRkvguoD3Qyt5U+lfVL2TVHTQ0UkOYEo52fT4WI=;
+        b=WYxR9tgZEkRWWlP4uqVQOD5pMOPSDhg1AisYdXK56zGFRSQ3IMdUPQovT6pR5huvZE
+         SHE07oTLnuXRr/Xg+HapmDcRZzd1Z12KW/886p3ZC+JQe+LlUIwxEmDI5TzQqU0GnMT4
+         Dc3Zu0Dvaqxgf9duIcDgVfiu+5rctCe/fmi3NnEUhj9OaOaofJX875GYsCQlA2QC8FRE
+         /ELAC/rz02BzHMb0dQ4CEC+GiMUcZmMYgPqHsbJMKIE0RHuJh9h4FzHrM/zV4Is2uBga
+         okRrjNEYKHGlcjZ7SPUT5AAO9IRBhr4jSy0vdtr5GYe+umxpx6kHr0aPqm30FY9UCIY1
+         4W4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705580054; x=1706184854;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=y0YkYRkvguoD3Qyt5U+lfVL2TVHTQ0UkOYEo52fT4WI=;
+        b=S1j2elnat8l/VuNpy/dMdnjSDG/223bgn/uk0zzmWWPbN8dMSyPs+z9yJ/BblD2HAm
+         8JtrLk7kkBAIkk4XjqZFc5ELcNZU3KH9DctIyZgMLd6Ey3ozwMyVymPoMoHxkZ7xBXyn
+         fPNX7OxHz0suYa5VryRBWlbtUAI96k27eTJxCxDJXTDxYz2b4zzfrse9emxG1GOeJFYu
+         QmKwugM5FK+5inL5QxblxTFXrcUk9ZQT16t22G9IKB8InkWf8gTPyFEsnJrWArxFv2U3
+         miUAKZ9dczAKMpns814MgMnryh8zfGPWJsA51b7j/vyKTmazPZ7g44rXzfkMB1T64E1D
+         UIHQ==
+X-Gm-Message-State: AOJu0Yx4o2rfph5tpVgkXEoLYaaZYESBDV1ef5quAmaaotxfKYASK4xU
+	B0YqRGxUxSQ9zsDvdSyC8NnRdFGbZh2Tyg1hmmspLc8TyYdSdAl4Stc87/MWhkV426+X/mLkH/g
+	PalLy3IebYkCJ01ApJ4UMwP4X8TB1S0Gjri3e
+X-Google-Smtp-Source: AGHT+IG8BgszuE1QfQBfU2QpT6kuFAIaeLec4MYpFTHtcTsPZdCsAQ4niwquAVbhQOefcBHz7FsLVHAPBLESOmrSnLQ=
+X-Received: by 2002:a05:6402:30bc:b0:559:6594:cf2e with SMTP id
+ df28-20020a05640230bc00b005596594cf2emr48229edb.7.1705580053448; Thu, 18 Jan
+ 2024 04:14:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/1] virtio_net: Add timeout handler to avoid kernel hang
-To: Paolo Abeni <pabeni@redhat.com>, Zhu Yanjun <yanjun.zhu@intel.com>,
- mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- virtualization@lists.linux.dev, netdev@vger.kernel.org
-References: <20240115012918.3081203-1-yanjun.zhu@intel.com>
- <ea230712e27af2c8d2d77d1087e45ecfa86abb31.camel@redhat.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <ea230712e27af2c8d2d77d1087e45ecfa86abb31.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20240117160030.140264-1-pablo@netfilter.org> <20240117160030.140264-15-pablo@netfilter.org>
+ <CANn89i+jS11sC6cXXFA+_ZVr9Oy6Hn1e3_5P_d4kSR2fWtisBA@mail.gmail.com>
+ <54f00e7c-8628-1705-8600-e9ad3a0dc677@netfilter.org> <CANn89iK_oa5CzeJVbiNSmPYZ6K+4_2m9nLqtSdwNAc9BtcZNew@mail.gmail.com>
+ <8834c825579a054d51be3d60405c0b204fa5c24b.camel@redhat.com>
+In-Reply-To: <8834c825579a054d51be3d60405c0b204fa5c24b.camel@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 18 Jan 2024 13:14:02 +0100
+Message-ID: <CANn89iKN6Bkm96UUvchq99vr1J_SbHWY7D0DFD3RXU4o74J7qA@mail.gmail.com>
+Subject: Re: [PATCH net 14/14] netfilter: ipset: fix performance regression in
+ swap operation
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Jozsef Kadlecsik <kadlec@netfilter.org>, Pablo Neira Ayuso <pablo@netfilter.org>, 
+	netfilter-devel@vger.kernel.org, davem@davemloft.net, netdev@vger.kernel.org, 
+	kuba@kernel.org, fw@strlen.de
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-在 2024/1/16 20:04, Paolo Abeni 写道:
-> On Mon, 2024-01-15 at 09:29 +0800, Zhu Yanjun wrote:
->> From: Zhu Yanjun <yanjun.zhu@linux.dev>
->>
->> Some devices emulate the virtio_net hardwares. When virtio_net
->> driver sends commands to the emulated hardware, normally the
->> hardware needs time to response. Sometimes the time is very
->> long. Thus, the following will appear. Then the whole system
->> will hang.
->> The similar problems also occur in Intel NICs and Mellanox NICs.
->> As such, the similar solution is borrowed from them. A timeout
->> value is added and the timeout value as large as possible is set
->> to ensure that the driver gets the maximum possible response from
->> the hardware.
->>
->> "
->> [  213.795860] watchdog: BUG: soft lockup - CPU#108 stuck for 26s! [(udev-worker):3157]
->> [  213.796114] Modules linked in: virtio_net(+) net_failover failover qrtr rfkill sunrpc intel_rapl_msr intel_rapl_common intel_uncore_frequency intel_uncore_frequency_common intel_ifs i10nm_edac nfit libnvdimm x86_pkg_temp_thermal intel_powerclamp coretemp iTCO_wdt rapl intel_pmc_bxt dax_hmem iTCO_vendor_support vfat cxl_acpi intel_cstate pmt_telemetry pmt_class intel_sdsi joydev intel_uncore cxl_core fat pcspkr mei_me isst_if_mbox_pci isst_if_mmio idxd i2c_i801 isst_if_common mei intel_vsec idxd_bus i2c_smbus i2c_ismt ipmi_ssif acpi_ipmi ipmi_si ipmi_devintf ipmi_msghandler acpi_pad acpi_power_meter pfr_telemetry pfr_update fuse loop zram xfs crct10dif_pclmul crc32_pclmul crc32c_intel polyval_clmulni polyval_generic ghash_clmulni_intel sha512_ssse3 bnxt_en sha256_ssse3 sha1_ssse3 nvme ast nvme_core i2c_algo_bit wmi pinctrl_emmitsburg scsi_dh_rdac scsi_dh_emc scsi_dh_alua dm_multipath
->> [  213.796194] irq event stamp: 67740
->> [  213.796195] hardirqs last  enabled at (67739): [<ffffffff8c2015ca>] asm_sysvec_apic_timer_interrupt+0x1a/0x20
->> [  213.796203] hardirqs last disabled at (67740): [<ffffffff8c14108e>] sysvec_apic_timer_interrupt+0xe/0x90
->> [  213.796208] softirqs last  enabled at (67686): [<ffffffff8b12115e>] __irq_exit_rcu+0xbe/0xe0
->> [  213.796214] softirqs last disabled at (67681): [<ffffffff8b12115e>] __irq_exit_rcu+0xbe/0xe0
->> [  213.796217] CPU: 108 PID: 3157 Comm: (udev-worker) Kdump: loaded Not tainted 6.7.0+ #9
->> [  213.796220] Hardware name: Intel Corporation M50FCP2SBSTD/M50FCP2SBSTD, BIOS SE5C741.86B.01.01.0001.2211140926 11/14/2022
->> [  213.796221] RIP: 0010:virtqueue_get_buf_ctx_split+0x8d/0x110
->> [  213.796228] Code: 89 df e8 26 fe ff ff 0f b7 43 50 83 c0 01 66 89 43 50 f6 43 78 01 75 12 80 7b 42 00 48 8b 4b 68 8b 53 58 74 0f 66 87 44 51 04 <48> 89 e8 5b 5d c3 cc cc cc cc 66 89 44 51 04 0f ae f0 48 89 e8 5b
->> [  213.796230] RSP: 0018:ff4bbb362306f9b0 EFLAGS: 00000246
->> [  213.796233] RAX: 0000000000000000 RBX: ff2f15095896f000 RCX: 0000000000000001
->> [  213.796235] RDX: 0000000000000000 RSI: ff4bbb362306f9cc RDI: ff2f15095896f000
->> [  213.796236] RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
->> [  213.796237] R10: 0000000000000003 R11: ff2f15095893cc40 R12: 0000000000000002
->> [  213.796239] R13: 0000000000000004 R14: 0000000000000000 R15: ff2f1509534f3000
->> [  213.796240] FS:  00007f775847d0c0(0000) GS:ff2f1528bac00000(0000) knlGS:0000000000000000
->> [  213.796242] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->> [  213.796243] CR2: 0000557f987b6e70 CR3: 0000002098602006 CR4: 0000000000f71ef0
->> [  213.796245] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->> [  213.796246] DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7: 0000000000000400
->> [  213.796247] PKRU: 55555554
->> [  213.796249] Call Trace:
->> [  213.796250]  <IRQ>
->> [  213.796252]  ? watchdog_timer_fn+0x1c0/0x220
->> [  213.796258]  ? __pfx_watchdog_timer_fn+0x10/0x10
->> [  213.796261]  ? __hrtimer_run_queues+0x1af/0x380
->> [  213.796269]  ? hrtimer_interrupt+0xf8/0x230
->> [  213.796274]  ? __sysvec_apic_timer_interrupt+0x64/0x1a0
->> [  213.796279]  ? sysvec_apic_timer_interrupt+0x6d/0x90
->> [  213.796282]  </IRQ>
->> [  213.796284]  <TASK>
->> [  213.796285]  ? asm_sysvec_apic_timer_interrupt+0x1a/0x20
->> [  213.796293]  ? virtqueue_get_buf_ctx_split+0x8d/0x110
->> [  213.796297]  virtnet_send_command+0x18a/0x1f0 [virtio_net]
->> [  213.796310]  _virtnet_set_queues+0xc6/0x120 [virtio_net]
->> [  213.796319]  virtnet_probe+0xa06/0xd50 [virtio_net]
->> [  213.796328]  virtio_dev_probe+0x195/0x230
->> [  213.796333]  really_probe+0x19f/0x400
->> [  213.796338]  ? __pfx___driver_attach+0x10/0x10
->> [  213.796340]  __driver_probe_device+0x78/0x160
->> [  213.796343]  driver_probe_device+0x1f/0x90
->> [  213.796346]  __driver_attach+0xd6/0x1d0
->> [  213.796349]  bus_for_each_dev+0x8c/0xe0
->> [  213.796355]  bus_add_driver+0x119/0x220
->> [  213.796359]  driver_register+0x59/0x100
->> [  213.796362]  ? __pfx_virtio_net_driver_init+0x10/0x10 [virtio_net]
->> [  213.796369]  virtio_net_driver_init+0x8e/0xff0 [virtio_net]
->> [  213.796375]  do_one_initcall+0x6f/0x380
->> [  213.796384]  do_init_module+0x60/0x240
->> [  213.796388]  init_module_from_file+0x86/0xc0
->> [  213.796396]  idempotent_init_module+0x129/0x2c0
->> [  213.796406]  __x64_sys_finit_module+0x5e/0xb0
->> [  213.796409]  do_syscall_64+0x60/0xe0
->> [  213.796415]  ? do_syscall_64+0x6f/0xe0
->> [  213.796418]  ? lockdep_hardirqs_on_prepare+0xe4/0x1a0
->> [  213.796424]  ? do_syscall_64+0x6f/0xe0
->> [  213.796427]  ? do_syscall_64+0x6f/0xe0
->> [  213.796431]  entry_SYSCALL_64_after_hwframe+0x6e/0x76
->> [  213.796435] RIP: 0033:0x7f7758f279cd
->> [  213.796465] Code: 5d c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 33 e4 0c 00 f7 d8 64 89 01 48
->> [  213.796467] RSP: 002b:00007ffe2cad8738 EFLAGS: 00000246 ORIG_RAX: 0000000000000139
->> [  213.796469] RAX: ffffffffffffffda RBX: 0000557f987a8180 RCX: 00007f7758f279cd
->> [  213.796471] RDX: 0000000000000000 RSI: 00007f77593e5453 RDI: 000000000000000f
->> [  213.796472] RBP: 00007f77593e5453 R08: 0000000000000000 R09: 00007ffe2cad8860
->> [  213.796473] R10: 000000000000000f R11: 0000000000000246 R12: 0000000000020000
->> [  213.796475] R13: 0000557f9879f8e0 R14: 0000000000000000 R15: 0000557f98783aa0
->> [  213.796482]  </TASK>
->> "
->>
->> Signed-off-by: Zhu Yanjun <yanjun.zhu@linux.dev>
->> ---
->>   drivers/net/virtio_net.c | 10 ++++++++--
->>   1 file changed, 8 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
->> index 51b1868d2f22..28b7dd917a43 100644
->> --- a/drivers/net/virtio_net.c
->> +++ b/drivers/net/virtio_net.c
->> @@ -2468,7 +2468,7 @@ static bool virtnet_send_command(struct virtnet_info *vi, u8 class, u8 cmd,
->>   {
->>   	struct scatterlist *sgs[4], hdr, stat;
->>   	unsigned out_num = 0, tmp;
->> -	int ret;
->> +	int ret, timeout = 200;
->>   
->>   	/* Caller should know better */
->>   	BUG_ON(!virtio_has_feature(vi->vdev, VIRTIO_NET_F_CTRL_VQ));
->> @@ -2502,8 +2502,14 @@ static bool virtnet_send_command(struct virtnet_info *vi, u8 class, u8 cmd,
->>   	 * into the hypervisor, so the request should be handled immediately.
->>   	 */
->>   	while (!virtqueue_get_buf(vi->cvq, &tmp) &&
->> -	       !virtqueue_is_broken(vi->cvq))
->> +	       !virtqueue_is_broken(vi->cvq)) {
->> +		if (timeout)
->> +			timeout--;
-> This is not really a timeout, just a loop counter. 200 iterations could
-> be a very short time on reasonable H/W. I guess this avoid the soft
-> lockup, but possibly (likely?) breaks the functionality when we need to
-> loop for some non negligible time.
+On Thu, Jan 18, 2024 at 12:08=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wr=
+ote:
 >
-> I fear we need a more complex solution, as mentioned by Micheal in the
-> thread you quoted.
-
-Got it. I also look forward to the more complex solution to this problem.
-
-Zhu Yanjun
-
+> On Wed, 2024-01-17 at 17:28 +0100, Eric Dumazet wrote:
+> > On Wed, Jan 17, 2024 at 5:23=E2=80=AFPM Jozsef Kadlecsik <kadlec@netfil=
+ter.org> wrote:
+> > >
+> > > Hi,
+> > >
+> > > On Wed, 17 Jan 2024, Eric Dumazet wrote:
+> > >
+> > > > On Wed, Jan 17, 2024 at 5:00=E2=80=AFPM Pablo Neira Ayuso <pablo@ne=
+tfilter.org> wrote:
+> > > > >
+> > > > > From: Jozsef Kadlecsik <kadlec@netfilter.org>
+> > > > >
+> > > > > The patch "netfilter: ipset: fix race condition between swap/dest=
+roy
+> > > > > and kernel side add/del/test", commit 28628fa9 fixes a race condi=
+tion.
+> > > > > But the synchronize_rcu() added to the swap function unnecessaril=
+y slows
+> > > > > it down: it can safely be moved to destroy and use call_rcu() ins=
+tead.
+> > > > > Thus we can get back the same performance and preventing the race=
+ condition
+> > > > > at the same time.
+> > > >
+> > > > ...
+> > > >
+> > > > >
+> > > > > @@ -2357,6 +2369,9 @@ ip_set_net_exit(struct net *net)
+> > > > >
+> > > > >         inst->is_deleted =3D true; /* flag for ip_set_nfnl_put */
+> > > > >
+> > > > > +       /* Wait for call_rcu() in destroy */
+> > > > > +       rcu_barrier();
+> > > > > +
+> > > > >         nfnl_lock(NFNL_SUBSYS_IPSET);
+> > > > >         for (i =3D 0; i < inst->ip_set_max; i++) {
+> > > > >                 set =3D ip_set(inst, i);
+> > > > > --
+> > > > > 2.30.2
+> > > > >
+> > > >
+> > > > If I am reading this right, time for netns dismantles will increase=
+,
+> > > > even for netns not using ipset
+> > > >
+> > > > If there is no other option, please convert "struct pernet_operatio=
+ns
+> > > > ip_set_net_ops".exit to an exit_batch() handler,
+> > > > to at least have a factorized  rcu_barrier();
+> > >
+> > > You are right, the call to rcu_barrier() can safely be moved to
+> > > ip_set_fini(). I'm going to prepare a new version of the patch.
+> > >
+> > > Thanks for catching it.
+> >
+> > I do not want to hold the series, your fix can be built as another
+> > patch on top of this one.
 >
-> Cheers,
+> Given the timing, if we merge this series as is, it could go very soon
+> into Linus' tree. I think it would be better to avoid introducing known
+> regressions there.
 >
-> Paolo
+> Any strong opinions vs holding this series until the problems are
+> fixed? Likely a new PR will be required.
 >
+
+If this helps, here is one splat (using linux-next next-20240118)
+
+BUG: sleeping function called from invalid context at kernel/workqueue.c:33=
+48
+in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 22194, name:
+syz-executor.0
+preempt_count: 101, expected: 0
+RCU nest depth: 0, expected: 0
+3 locks held by syz-executor.0/22194:
+#0: ffff8880162a2420 (sb_writers#5){.+.+}-{0:0}, at:
+ksys_write+0x12f/0x260 fs/read_write.c:643
+#1: ffff888042b48960 (&sb->s_type->i_mutex_key#12){+.+.}-{3:3}, at:
+inode_lock include/linux/fs.h:802 [inline]
+#1: ffff888042b48960 (&sb->s_type->i_mutex_key#12){+.+.}-{3:3}, at:
+shmem_file_write_iter+0x8c/0x140 mm/shmem.c:2883
+#2: ffffffff8d5aeb00 (rcu_callback){....}-{0:0}, at: rcu_lock_acquire
+include/linux/rcupdate.h:298 [inline]
+#2: ffffffff8d5aeb00 (rcu_callback){....}-{0:0}, at: rcu_do_batch
+kernel/rcu/tree.c:2152 [inline]
+#2: ffffffff8d5aeb00 (rcu_callback){....}-{0:0}, at:
+rcu_core+0x7cc/0x16b0 kernel/rcu/tree.c:2433
+Preemption disabled at:
+[<ffffffff813c061e>] unwind_next_frame+0xce/0x2390
+arch/x86/kernel/unwind_orc.c:479
+CPU: 0 PID: 22194 Comm: syz-executor.0 Not tainted
+6.7.0-next-20240118-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine,
+BIOS Google 11/17/2023
+Call Trace:
+<IRQ>
+__dump_stack lib/dump_stack.c:88 [inline]
+dump_stack_lvl+0x125/0x1b0 lib/dump_stack.c:106
+__might_resched+0x3c0/0x5e0 kernel/sched/core.c:10176
+start_flush_work kernel/workqueue.c:3348 [inline]
+__flush_work+0x11f/0xa20 kernel/workqueue.c:3410
+__cancel_work_timer+0x3f3/0x590 kernel/workqueue.c:3498
+hash_ipmac6_destroy+0x337/0x420 net/netfilter/ipset/ip_set_hash_gen.h:454
+ip_set_destroy_set+0x65/0x100 net/netfilter/ipset/ip_set_core.c:1180
+rcu_do_batch kernel/rcu/tree.c:2158 [inline]
+rcu_core+0x828/0x16b0 kernel/rcu/tree.c:2433
+__do_softirq+0x218/0x8de kernel/softirq.c:553
+invoke_softirq kernel/softirq.c:427 [inline]
+__irq_exit_rcu kernel/softirq.c:632 [inline]
+irq_exit_rcu+0xb9/0x120 kernel/softirq.c:644
+sysvec_apic_timer_interrupt+0x95/0xb0 arch/x86/kernel/apic/apic.c:1076
+</IRQ>
+<TASK>
+asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:6=
+49
+RIP: 0010:on_stack arch/x86/include/asm/stacktrace.h:59 [inline]
 
