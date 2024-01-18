@@ -1,139 +1,164 @@
-Return-Path: <netdev+bounces-64103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12E0C83115C
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 03:22:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6149483117C
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 03:45:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A87121F24473
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 02:22:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A51A0286C4E
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 02:45:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E210323D8;
-	Thu, 18 Jan 2024 02:22:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8554A28F5;
+	Thu, 18 Jan 2024 02:45:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TPhbhmBk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0034612E;
-	Thu, 18 Jan 2024 02:22:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25D4C5395;
+	Thu, 18 Jan 2024 02:45:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705544541; cv=none; b=Oy7v4VJ3bjMN4DYDY45HNqWzbQnrWzWZlzyoK8BWxC3EWJKI4DEVIAT2Hsr5l5mq4tB4viue5NoH+5xW7Drp9jj9tsIjJNFvQCNx/uuxu8LYXGr0qvLaRAWO99ckGNsNRZ0HBMe7cM3KjNApUR2+ChHucZ6x7i0v2qBRaUDMRBA=
+	t=1705545916; cv=none; b=AK8cPJ19dSB9kEu9/mYl+KJ5RePEv2DNLbhyLjiZtUkjNiK+BDN8p3q/tyQ6vMLguPWkYuiEvv9Y45V91F8v3Rq2fPZhBfxCBE09f8unQ61e5grdyOOGdhJJ5JdQNAxTS3ABR+V258mFYrlm7671bWWA8Bw9/jP7rgoR2MwtPvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705544541; c=relaxed/simple;
-	bh=8JHXmYF/SbfhncSbdmAV1mZFnmszoqM2xbG/FA913qo=;
-	h=X-UUID:X-CID-P-RULE:X-CID-O-INFO:X-CID-INFO:X-CID-META:X-CID-BVR:
-	 X-CID-BAS:X-CID-FACTOR:X-UUID:Received:Received:X-ns-mid:Received:
-	 Message-ID:Date:MIME-Version:User-Agent:Subject:Content-Language:
-	 To:Cc:References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding; b=mRLDG4VmpPBA1OndezO0AKKY1g/OymkVN6ncycnXmza1TnjATUmJdRfrTaOjWgUk1ra0dof3fdsUle4+vZMFeOqycumLpiywn76EQRfV8sCbWOpY8x+Z3bk3gRo9CRhXXee2cYRt13hH385LIVobJPU7ft+wvWapGf6wAwJLC8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 357999929ba04da58da2de338c6a80bb-20240118
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.35,REQID:f9c5ad19-ce8d-4590-8d0f-425d94764a99,IP:10,
-	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-	ON:release,TS:-5
-X-CID-INFO: VERSION:1.1.35,REQID:f9c5ad19-ce8d-4590-8d0f-425d94764a99,IP:10,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:-5
-X-CID-META: VersionHash:5d391d7,CLOUDID:b26a5f8e-e2c0-40b0-a8fe-7c7e47299109,B
-	ulkID:240117171645NSDDJDUY,BulkQuantity:12,Recheck:0,SF:64|66|24|17|19|44|
-	102,TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:40,QS:nil,BEC:nil,CO
-	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,TF_CID_SPAM_OBB,TF_CID_SPAM_SNR,
-	TF_CID_SPAM_FAS
-X-UUID: 357999929ba04da58da2de338c6a80bb-20240118
-Received: from mail.kylinos.cn [(39.156.73.10)] by mailgw
-	(envelope-from <chentao@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 2100225134; Thu, 18 Jan 2024 10:22:10 +0800
-Received: from mail.kylinos.cn (localhost [127.0.0.1])
-	by mail.kylinos.cn (NSMail) with SMTP id 1773FE000EB9;
-	Thu, 18 Jan 2024 10:22:10 +0800 (CST)
-X-ns-mid: postfix-65A88B51-553218459
-Received: from [172.20.15.234] (unknown [172.20.15.234])
-	by mail.kylinos.cn (NSMail) with ESMTPA id 035EEE000EB9;
-	Thu, 18 Jan 2024 10:22:05 +0800 (CST)
-Message-ID: <ba5b4e70-365f-476a-9969-6f9a891221a7@kylinos.cn>
-Date: Thu, 18 Jan 2024 10:22:05 +0800
+	s=arc-20240116; t=1705545916; c=relaxed/simple;
+	bh=HQvFAPJRf2J5GkozGHLateTg7jJKgrg4DLcVjXxGFOI=;
+	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:Date:
+	 From:To:Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=BpyP6ZqGpdU/fVby89Bj+xovh0moFapy8Ert7bAk2WD4+gSN/JZE9vIBuG+zrFmfwfnO5j1qylu0oAII8HHjeYFSj0TtEJ/To+Bm2L9Afr/H4asB5B7DGtBOnAx1Ia97zyayyiPmIpvedtT/r30xD6aQRAOK5gIsrEain7LV7fU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TPhbhmBk; arc=none smtp.client-ip=209.85.215.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-5cda3e35b26so4570147a12.1;
+        Wed, 17 Jan 2024 18:45:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705545914; x=1706150714; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7yUIrD3c+Qm4qwrdDSHm5IZk2SaKgPsurwWj69dMasY=;
+        b=TPhbhmBkCu0PX68EDquIao3Bl+6K3FD/N3pSchEzfY0Yga9hdzAySO1oYV/xE/+Rey
+         mIZL8Ou/9kJZ7VX+9ailrkE5pffbnEEvxwZnk0/8L7p7iSc6t9n515MoaRqXNNkrqccN
+         +OCvsUy7L6dHgt+RL3AX3zhlxJCfpC6Fsfla98U7d6zpf9LdoaOZPHKb4djB+hW6y4jJ
+         Mso1t1Vkx/OOvpU0BH6knildx2AdYwxKlJFd93dusfm9kX0mvTs2WjmpVXhuD94F+6nk
+         11e1kAoBZEoAeJd0pdJTaetyeXfDHW5I4NC9rzDe6ph7qa+wG3Bm+vfYpE7yEM6AIjAJ
+         8TOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705545914; x=1706150714;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7yUIrD3c+Qm4qwrdDSHm5IZk2SaKgPsurwWj69dMasY=;
+        b=vusnxx3BJVV0+75FHXEdnIw53jiLHE2vMo92jaKzJtk+eEbRSINCdqR77yglVKOJ/U
+         rSR/9Ntw4PXZ0Rg5cnD+5fXpgYKaAapLXmRTRaE6g9XodTj0fkR2B+F5jColhtOnUlV1
+         +7/sBkvfIdYvHUCaP6rDO+O/LkyNzTPF45OzJHAK40iZe9xNPBAsHkL+8Am49FMoX16B
+         9KAdplI6hqzn1cMFa6MaTUOUvvpKRuYDef4BaPJ71bkF08433ZfoGnD3CX0oF5P99YlO
+         w4BTtP3AjW8i4r8F+7U4KMAh+/RskzV0VgnsLqGvBvpwHg4Ry6FRf640Brf15vDqKRBS
+         8JUw==
+X-Gm-Message-State: AOJu0YzJPpLh+zX/eJdqIfPsuA82k4wlCewpIBlkIvE0xQkq98mXDz1t
+	It/zcT04Ehvbfme77nblKQTrZkEV7anlxiVnRXSaWBtXNRhuOuxY
+X-Google-Smtp-Source: AGHT+IFlYN1Cvo4UoXhKIYlQ6sad+gJnzhI+R/1bdcxn8TcQpb0YIIt3gf5Ryo0si14bBeN+TrQYtg==
+X-Received: by 2002:a17:90a:ea04:b0:28f:fac1:b76b with SMTP id w4-20020a17090aea0400b0028ffac1b76bmr165660pjy.59.1705545914363;
+        Wed, 17 Jan 2024 18:45:14 -0800 (PST)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id si6-20020a17090b528600b0028df5c748e4sm423268pjb.44.2024.01.17.18.45.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Jan 2024 18:45:12 -0800 (PST)
+Date: Thu, 18 Jan 2024 10:45:07 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Taehee Yoo <ap420073@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	syzbot+a9400cabb1d784e49abf@syzkaller.appspotmail.com
+Subject: Re: [PATCH net] ipv6: mcast: fix data-race in ipv6_mc_down /
+ mld_ifc_work
+Message-ID: <ZaiQs6yTY7XuS06i@Laptop-X1>
+References: <20240117172102.12001-1-n.zhandarovich@fintech.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] ipvs: Simplify the allocation of ip_vs_conn slab
- caches
-Content-Language: en-US
-To: Simon Horman <horms@kernel.org>
-Cc: ja@ssi.bg, pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, lvs-devel@vger.kernel.org,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- linux-kernel@vger.kernel.org
-References: <20240117072045.142215-1-chentao@kylinos.cn>
- <20240117092928.GA618956@kernel.org>
-From: Kunwu Chan <chentao@kylinos.cn>
-In-Reply-To: <20240117092928.GA618956@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240117172102.12001-1-n.zhandarovich@fintech.ru>
 
-Hi Simon,
+On Wed, Jan 17, 2024 at 09:21:02AM -0800, Nikita Zhandarovich wrote:
+> idev->mc_ifc_count can be written over without proper locking.
+> 
+> Originally found by syzbot [1], fix this issue by encapsulating calls
+> to mld_ifc_stop_work() (and mld_gq_stop_work() for good measure) with
+> mutex_lock() and mutex_unlock() accordingly as these functions
+> should only be called with mc_lock per their declarations.
+> 
+> [1]
+> BUG: KCSAN: data-race in ipv6_mc_down / mld_ifc_work
+> 
+> write to 0xffff88813a80c832 of 1 bytes by task 3771 on cpu 0:
+>  mld_ifc_stop_work net/ipv6/mcast.c:1080 [inline]
+>  ipv6_mc_down+0x10a/0x280 net/ipv6/mcast.c:2725
+>  addrconf_ifdown+0xe32/0xf10 net/ipv6/addrconf.c:3949
+>  addrconf_notify+0x310/0x980
+>  notifier_call_chain kernel/notifier.c:93 [inline]
+>  raw_notifier_call_chain+0x6b/0x1c0 kernel/notifier.c:461
+>  __dev_notify_flags+0x205/0x3d0
+>  dev_change_flags+0xab/0xd0 net/core/dev.c:8685
+>  do_setlink+0x9f6/0x2430 net/core/rtnetlink.c:2916
+>  rtnl_group_changelink net/core/rtnetlink.c:3458 [inline]
+>  __rtnl_newlink net/core/rtnetlink.c:3717 [inline]
+>  rtnl_newlink+0xbb3/0x1670 net/core/rtnetlink.c:3754
+>  rtnetlink_rcv_msg+0x807/0x8c0 net/core/rtnetlink.c:6558
+>  netlink_rcv_skb+0x126/0x220 net/netlink/af_netlink.c:2545
+>  rtnetlink_rcv+0x1c/0x20 net/core/rtnetlink.c:6576
+>  netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
+>  netlink_unicast+0x589/0x650 net/netlink/af_netlink.c:1368
+>  netlink_sendmsg+0x66e/0x770 net/netlink/af_netlink.c:1910
+>  ...
+> 
+> write to 0xffff88813a80c832 of 1 bytes by task 22 on cpu 1:
+>  mld_ifc_work+0x54c/0x7b0 net/ipv6/mcast.c:2653
+>  process_one_work kernel/workqueue.c:2627 [inline]
+>  process_scheduled_works+0x5b8/0xa30 kernel/workqueue.c:2700
+>  worker_thread+0x525/0x730 kernel/workqueue.c:2781
+>  ...
+> 
+> Fixes: 2d9a93b4902b ("mld: convert from timer to delayed work")
+> Reported-by: syzbot+a9400cabb1d784e49abf@syzkaller.appspotmail.com
+> Link: https://lore.kernel.org/all/000000000000994e09060ebcdffb@google.com/
+> Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+> ---
+>  net/ipv6/mcast.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
+> index b75d3c9d41bb..bc6e0a0bad3c 100644
+> --- a/net/ipv6/mcast.c
+> +++ b/net/ipv6/mcast.c
+> @@ -2722,8 +2722,12 @@ void ipv6_mc_down(struct inet6_dev *idev)
+>  	synchronize_net();
+>  	mld_query_stop_work(idev);
+>  	mld_report_stop_work(idev);
+> +
+> +	mutex_lock(&idev->mc_lock);
+>  	mld_ifc_stop_work(idev);
+>  	mld_gq_stop_work(idev);
+> +	mutex_unlock(&idev->mc_lock);
+> +
+>  	mld_dad_stop_work(idev);
+>  }
+>  
 
-Thanks for your reply.
+I saw mld_process_v1() also cancel these works when changing to v1 mode.
+Should we also add lock there?
 
-On 2024/1/17 17:29, Simon Horman wrote:
-> On Wed, Jan 17, 2024 at 03:20:45PM +0800, Kunwu Chan wrote:
->> Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
->> to simplify the creation of SLAB caches.
->>
->> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
-> 
-> Hi Kunwu Chan,
-> 
-> I think this is more of a cleanup than a fix,
-> so it should probably be targeted at 'nf-next' rather than 'net'.
-Thanks, I'm confused about when to use "nf-next" or "net" or "net-next".
-"nf-next" means fixing errors for linux-next.git and linux-stable.git, 
-while "nf" or "next" just means linux-next.git?
-
-> 
-> If it is a fix, then I would suggest targeting it at 'nf'
-> and providing a Fixes tag.
-I'll keep it in mind in the future.
-> 
-> The above notwithstanding, this looks good to me.
-> 
-> Acked-by: Simon Horman <horms@kernel.org>
-> 
->> ---
->>   net/netfilter/ipvs/ip_vs_conn.c | 4 +---
->>   1 file changed, 1 insertion(+), 3 deletions(-)
->>
->> diff --git a/net/netfilter/ipvs/ip_vs_conn.c b/net/netfilter/ipvs/ip_vs_conn.c
->> index a743db073887..98d7dbe3d787 100644
->> --- a/net/netfilter/ipvs/ip_vs_conn.c
->> +++ b/net/netfilter/ipvs/ip_vs_conn.c
->> @@ -1511,9 +1511,7 @@ int __init ip_vs_conn_init(void)
->>   		return -ENOMEM;
->>   
->>   	/* Allocate ip_vs_conn slab cache */
->> -	ip_vs_conn_cachep = kmem_cache_create("ip_vs_conn",
->> -					      sizeof(struct ip_vs_conn), 0,
->> -					      SLAB_HWCACHE_ALIGN, NULL);
->> +	ip_vs_conn_cachep = KMEM_CACHE(ip_vs_conn, SLAB_HWCACHE_ALIGN);
->>   	if (!ip_vs_conn_cachep) {
->>   		kvfree(ip_vs_conn_tab);
->>   		return -ENOMEM;
--- 
-Thanks,
-   Kunwu
-
+Thanks
+Hangbin
 
