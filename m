@@ -1,183 +1,136 @@
-Return-Path: <netdev+bounces-64101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64102-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59C6D83114E
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 03:15:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 956B2831158
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 03:18:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 972C4B23351
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 02:15:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 35582B23D8B
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 02:18:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8EF58C09;
-	Thu, 18 Jan 2024 02:15:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BD905390;
+	Thu, 18 Jan 2024 02:18:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wu4use/V"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="MrYHicRD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D0768BF6;
-	Thu, 18 Jan 2024 02:15:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 641284688
+	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 02:18:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705544128; cv=none; b=j3fal/X0CzPWbWNL4Ga9xptRqXkql/AfacCKSTY0aFcFLwByGSHp34PEU4l2VnLO15dC85kLnditsmpMCfzzvbYV6505djz29uO/RZDISTqQpSzYsIsaeycJcIaKQi1HjQM5LiX+i4GfCFLCC7FiZoYcZxRulpV2dZApimY/qVQ=
+	t=1705544294; cv=none; b=scIUn9V4UCKhapbMoIehwRyyLFO8E3z8vnAaKxoNjjMVupPN1lORkWeQB6yqspa9U3ewCw44U0uumlzV16joFHXOYl3Qf08Wju1hOFYicZHhPBMtvruC+7JUWhOSmxdipYcS74Z7iYjMOtRYrF3S2bWP9APOzKxtTCI1qKDlPEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705544128; c=relaxed/simple;
-	bh=DmLnccCCoxyQwBpmEDQfi1onFlv4+6SD5xVpXzQjAg0=;
+	s=arc-20240116; t=1705544294; c=relaxed/simple;
+	bh=7voOXuhfPnskEJZAZbR01eqyMrcXZoKXlc+v/f6hkOw=;
 	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:Date:
-	 From:To:Cc:Subject:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Description:Content-Disposition:Content-Transfer-Encoding:
-	 In-Reply-To; b=UdXEksJKyOtSV+IQV18UyLhZGa3DoBRcXBBT4wJMyQXjVo9MTHl8Ebz4Gys83cDktCciK/8tzRfew+PtFV2rfzqnYjtUa++VMN4ZZH/Mn7S6Lo4EARvh/lX+HqLhjTZJspRDXtUCSCere7Xngq5Pj64bjg7AYrDVKJuyINbifKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wu4use/V; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1d480c6342dso89068995ad.2;
-        Wed, 17 Jan 2024 18:15:27 -0800 (PST)
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:
+	 Message-ID:Date:MIME-Version:User-Agent:Subject:Content-Language:
+	 To:Cc:References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding; b=PGGTLvHl1tif/+reutfxFnQTqM0JX2c82C+I3hKIj45PSpxLRE7iUuJhI7qXBmgWHaAUHMmdKvgLP7uhfhQexavsD+IW9VFkD0C/S4qJBedpmoY3CxuPouSasSvYffbyWMbXQSpRZ44BvZrdt4eGkfQRhMwrJLXTkgeYhSNLJos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=MrYHicRD; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-336990fb8fbso9248364f8f.1
+        for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 18:18:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705544127; x=1706148927; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-description:mime-version:references:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RlbOMoNm8u1JVd08G+KTTjYjGv5ptqZNhnHGA2jRKvo=;
-        b=Wu4use/VGrX3rzucCzoD/ZlG0rj70q0LMOybOwx+2RaDHxsOSmGczNr9mx60qpM9kh
-         J03swaX+lrgQHCGJLgmBGa6UonnYCX6lkqVZP4TiqlE3YWhtB5NUNhPwYks4Ytg++bYD
-         SESfyle9Mi8ly8yrF6TmSlNgDeS4D1NRdPvAaLk7f49ZA0Nd1RW9mk+zbSLvr9zlfuOA
-         uS/XiwwQqXQra/3KAd3/VuNGc2CFWmwdFvHRCL1/GYawinVeQ8+rgOsOLssWKm4Zyxtt
-         bngaBBckql7XkNouQ866FTGS3oACNkank+jR28v6qfPAowUAWr/Vl8EvGA5gy1cZBs18
-         TmQA==
+        d=arista.com; s=google; t=1705544291; x=1706149091; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=O8IhQQZ/ZBIwA5q7sDNoEOtDesWDe9PHB37CJuOhzdI=;
+        b=MrYHicRDANyv5yjhAwL5Pi5P5XNFDL1EuFV/k1uoSnRBbrUeZh4XACCGgFAQwTd3te
+         64q88ZShwuA0Pvlt2Z1zRyp8bCqOvYFULgGVKGi+cfbtuRbHyh6zNBoh0vWz2h0f2sPb
+         iARrH9zbZ5MlJI9+tiyrD0H37nLsZYyFdPl1SOTSB+BCwtyq4GzSRAtL1XruOUoRpMwP
+         Hnjd15+sJ1ZKuZVf/itUerPB2F412yQrOTSXCGAM9EGLmpJLEK6GQY4JmgAwq8VoDpOu
+         vnm5UxdzM5oGgBJejeUYMQfNMgR5QSLKh1Dpmk5p0YBWEYsWht0yp4SsOR5kkgqaZCRy
+         Nw9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705544127; x=1706148927;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :content-description:mime-version:references:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RlbOMoNm8u1JVd08G+KTTjYjGv5ptqZNhnHGA2jRKvo=;
-        b=dmkVLlsvk0NSbZMFqx5kVFg5JpY+KsB5BheWT2StjH7zV5HowUM85lxTYw8KuzVQgT
-         HYdLsVpM5ir8unx0tx1Fphq3+FdrAWlFaLZ7kRFNvEN3Cxwvet065UOfeUj5qBJBHwkO
-         npyVW/VIipafJAGd8K2RxAJiQTSxOnOgQ3jPKF5SkmVacCdLkewhRlGNwV4M2MlER1WF
-         W/P/abn4TZBGyUz9M0Xo7LbtVClXaObYyhTbOAwzmWElfia50ny46IgacEnLmgSVof5T
-         czEwDGp/IsZzEIthaFN8Ww8AoYXS6hwLOvZvVczcrIPmN2AsDyMjlVtGKGaEnm6ue3bv
-         55fw==
-X-Gm-Message-State: AOJu0Yyb/iS4u4xRYILmXWF3jQ7jZ9PSDV/5xVea7/Eoq/WCk4oihjy5
-	6jj+OP4luGFQT1L1c6CtUGJj6JO+zqDQqBM6mK6QcEd0KKa0wI6x
-X-Google-Smtp-Source: AGHT+IEV+yFCqU9E6FVphOhzgk2FRVyfvnc8yOD8KBsFYttVAxG0EkKOf/kaxPWijYQRrzbL0D6xPw==
-X-Received: by 2002:a17:902:654e:b0:1d0:acfc:a653 with SMTP id d14-20020a170902654e00b001d0acfca653mr232223pln.84.1705544126886;
-        Wed, 17 Jan 2024 18:15:26 -0800 (PST)
-Received: from pkf-toy ([104.192.108.9])
-        by smtp.gmail.com with ESMTPSA id o7-20020a1709026b0700b001d494f3d9d4sm293022plk.220.2024.01.17.18.15.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Jan 2024 18:15:26 -0800 (PST)
-Date: Thu, 18 Jan 2024 10:15:08 +0800
-From: nai lin <ayano2023th@gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Anjali Kulkarni <anjali.k.kulkarni@oracle.com>,
-	Li RongQing <lirongqing@baidu.com>,
-	David Howells <dhowells@redhat.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] netlink: fix potential race issue in
- netlink_native_seq_show()
-Message-ID: <20240118021508.GA18638@pkf-toy>
-References: <20240117083715.7800-1-ayano2023th@gmail.com>
- <CANn89iKjRpfDY=7CVdudHp8hMveqnq4zrQGw_AXhAcnPheOZBw@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1705544291; x=1706149091;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=O8IhQQZ/ZBIwA5q7sDNoEOtDesWDe9PHB37CJuOhzdI=;
+        b=GkO7/sJv1vH6RjfghB93RD/p8R42Nsp9sK16Oylb37g5q2EwuevTmyXjlmYJAjuwrV
+         6ejuNIGzmAj7/+sAGlNsJ2LJL1EuyIroWRKYRWg3yoXwQomoIpJtS5XICNNHkf1BSbGp
+         6q8rBspAvI7HodqvC+L1/dbPps5IzchvcsyeFAw9gngkpLVDeSzGxRoPxSNW2596z58e
+         qr6xD2MmKbM8hhceYCFq156aAPdhZQ6TAr3+RoGxye1rEJBaNkvLHn6z3Z1DBioVf1cT
+         Ar3w0slQ5aYJA0CO/eoH3oyelCwy+iVWVloEqB6TvuZz4xXOqRWOtxXhqP6hJqTdG/7w
+         13HA==
+X-Gm-Message-State: AOJu0Yyqg11LVip5oaKzAO8AaKVPibR5ZJDfp79aGVdW7VSx/S4q3lo6
+	DvCWqqPUQqGmEYJRhDUxTTbvuSSfMLOqaf5ycW9LqIt/7zs0ykRbFElXISmCTA==
+X-Google-Smtp-Source: AGHT+IHtXYNC47SOSfQFb4kwiq1nGngPEhY8zTv36muO/vJ1sWAEb6kf6o+6aHmK9LIN/ylM4JYarw==
+X-Received: by 2002:adf:b319:0:b0:337:c155:d130 with SMTP id j25-20020adfb319000000b00337c155d130mr59418wrd.41.1705544290754;
+        Wed, 17 Jan 2024 18:18:10 -0800 (PST)
+Received: from [10.83.37.178] ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id n3-20020adffe03000000b003364a0e6983sm2829647wrr.62.2024.01.17.18.18.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 Jan 2024 18:18:10 -0800 (PST)
+Message-ID: <fe3d5804-706e-40fc-a4e0-819df06f83ff@arista.com>
+Date: Thu, 18 Jan 2024 02:18:08 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Description: 
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iKjRpfDY=7CVdudHp8hMveqnq4zrQGw_AXhAcnPheOZBw@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] selftests/net: argument value mismatch when calling
+ verify_counters()
+Content-Language: en-US
+To: Mohammad Nassiri <mnassiri@ciena.com>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ shuah@kernel.org, 0x7f454c46@gmail.com, mohammad.nassiri78@gmail.com,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240116214826.10754-1-mnassiri@ciena.com>
+From: Dmitry Safonov <dima@arista.com>
+In-Reply-To: <20240116214826.10754-1-mnassiri@ciena.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 17, 2024 at 11:28:24AM +0100, Eric Dumazet wrote:
-> On Wed, Jan 17, 2024 at 9:38 AM nai lin <ayano2023th@gmail.com> wrote:
-> >
-> > Access to the nlk group should be protected by netlink_lock_table() like
-> > commit <f773608026ee> ("netlink: access nlk groups safely in netlink bind
-> > and getname"), otherwise there will be potential race conditions.
-> >
-> > Signed-off-by: nai lin <ayano2023th@gmail.com>
+Hi Mohammad,
+
+On 1/16/24 21:48, Mohammad Nassiri wrote:
+> The end_server() function only operates in the server thread
+> and always takes an accept socket instead of a listen socket as
+> its input argument. To align with this, invert the boolean values
+> used when calling verify_counters() within the end_server() function.
 > 
-> OK, I think you forgot to include this tag I suggested earlier to you.
+> Fixes: ("3c3ead555648 selftests/net: Add TCP-AO key-management test")
+> Signed-off-by: Mohammad Nassiri <mnassiri@ciena.com>
+> Link: https://lore.kernel.org/all/934627c5-eebb-4626-be23-cfb134c01d1a@arista.com/
+
+
+As I've written you off-list, the patch probably was not delivered to
+mailing lists due to SPF check not passing. Please, fix the send-email
+setup when/if you want to send more patches.
+
+Related to this patch: I'm going to carry and resend it together with 2
+more patches, as this fix made 3 selftests fail and I've looked into that.
+
+> ---
+>  tools/testing/selftests/net/tcp_ao/key-management.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Fixes: e341694e3eb5 ("netlink: Convert netlink_lookup() to use RCU
-> protected hash table")
-> 
-Sorry I forgot to include fix tag, thank you for pointing out my problem
-and thank you very much for your work.
-> > ---
-> >  net/netlink/af_netlink.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-> > index 4ed8ffd58ff3..61ad81fb80f5 100644
-> > --- a/net/netlink/af_netlink.c
-> > +++ b/net/netlink/af_netlink.c
-> > @@ -2693,6 +2693,7 @@ static int netlink_native_seq_show(struct seq_file *seq, void *v)
-> >                 struct sock *s = v;
-> >                 struct netlink_sock *nlk = nlk_sk(s);
-> >
-> > +               netlink_lock_table();
-> 
-> netlink_lock_table() is heavy weight, appropriate for contexts where
-> we might sleep.
-> 
-> We could instead use a helper to acquire the lock for a very small period.
-> 
-> diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-> index 4ed8ffd58ff375f3fa9f262e6f3b4d1a1aaf2731..c50ca0f5adfb9691e6df37b4ac518b95c2d7908f
-> 100644
-> --- a/net/netlink/af_netlink.c
-> +++ b/net/netlink/af_netlink.c
-> @@ -1136,6 +1136,18 @@ static int netlink_connect(struct socket *sock,
-> struct sockaddr *addr,
->         return err;
+> diff --git a/tools/testing/selftests/net/tcp_ao/key-management.c b/tools/testing/selftests/net/tcp_ao/key-management.c
+> index c48b4970ca17..f6a9395e3cd7 100644
+> --- a/tools/testing/selftests/net/tcp_ao/key-management.c
+> +++ b/tools/testing/selftests/net/tcp_ao/key-management.c
+> @@ -843,7 +843,7 @@ static void end_server(const char *tst_name, int sk,
+>  	synchronize_threads(); /* 4: verified => closed */
+>  	close(sk);
+>  
+> -	verify_counters(tst_name, true, false, begin, &end);
+> +	verify_counters(tst_name, false, true, begin, &end);
+>  	synchronize_threads(); /* 5: counters */
 >  }
-> 
-> +static u32 netlink_get_groups_mask(const struct netlink_sock *nlk)
-> +{
-> +       unsigned long flags;
-> +       u32 res;
-> +
-> +       read_lock_irqsave(&nl_table_lock, flags);
-> +       res = nlk->groups ? nlk->groups[0] : 0;
-> +       read_unlock_irqrestore(&nl_table_lock, flags);
-> +
-> +       return res;
-> +}
-> +
->  static int netlink_getname(struct socket *sock, struct sockaddr *addr,
->                            int peer)
->  {
-> @@ -1153,9 +1165,7 @@ static int netlink_getname(struct socket *sock,
-> struct sockaddr *addr,
->         } else {
->                 /* Paired with WRITE_ONCE() in netlink_insert() */
->                 nladdr->nl_pid = READ_ONCE(nlk->portid);
-> -               netlink_lock_table();
-> -               nladdr->nl_groups = nlk->groups ? nlk->groups[0] : 0;
-> -               netlink_unlock_table();
-> +               nladdr->nl_groups = netlink_get_groups_mask(nlk);
->         }
->         return sizeof(*nladdr);
->  }
-> @@ -2697,7 +2707,7 @@ static int netlink_native_seq_show(struct
-> seq_file *seq, void *v)
->                            s,
->                            s->sk_protocol,
->                            nlk->portid,
-> -                          nlk->groups ? (u32)nlk->groups[0] : 0,
-> +                          netlink_get_groups_mask(nlk),
->                            sk_rmem_alloc_get(s),
->                            sk_wmem_alloc_get(s),
->                            READ_ONCE(nlk->cb_running),
+>  
+
+Thanks,
+            Dmitry
+
 
