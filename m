@@ -1,140 +1,93 @@
-Return-Path: <netdev+bounces-64254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42C0A831EBF
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 18:50:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDFE2831EDA
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 19:00:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CED181F28B65
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 17:50:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0BBE1C20C58
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 18:00:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46CEB2D054;
-	Thu, 18 Jan 2024 17:50:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B49962D60E;
+	Thu, 18 Jan 2024 18:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LbJgbhEn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SA6GaiMe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B16242D603
-	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 17:50:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F7632D608
+	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 18:00:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705600249; cv=none; b=am7Yu5OTAht3KqV5L0RaLNjs1p6Lq19AaX8zXExeQVO3cgjK5iDcITR0degGd/bb16x2/vyJmFofMCZHwRkvQ0DPJNsmH0XcOG5Ij+qXIrRZeAdPoYZOCgqEuuXrg7h8F/kqbcynZ5jza4HGuuJgbugY6+/zbu9TcXZWMeuCrmw=
+	t=1705600828; cv=none; b=gAWx7VhXia2NTykN8XcS8m1b/fb2qbQTMTts2WcA0foVv9IEldktiPhxVuVxrocDR9uc+3P+1cs4ETvvJyUSmsHIxobJjXXLR1aGYf5kvpwb+FlsVZs+wuxy3Gya16Ie0SHT2blctZLrX1cc4q6e9BecUXKhH6lvDvZaTsjPN/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705600249; c=relaxed/simple;
-	bh=R83s/PyF4fXUdK67JiE75Dz9JrojGyAfOWEwxObSVV8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ObDo4g3ZiBVR7o5PqTTD7PFU4thdYoE5YnlUwpTiIAokHkMeKqr/s3bs+hpqEfDCrzIap/GB2vJeZd7tmrY8mUo2DC9Fj74lAGHUx2GKXcO0sHNIkPKrQjn9omoEyhlcJYte74gflP+vxIf9CiB5NhkgVPueI58r/UmyGUH5qBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=LbJgbhEn; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-50ed808db11so10432791e87.2
-        for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 09:50:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1705600246; x=1706205046; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BeOfVhu/YQjuPaBL7HLOFJxylUSZb5ghXwEj0tH+VbM=;
-        b=LbJgbhEneDdeNqOEmRiGt3riWuUBUuVlABZyUdAdZ8O0LkDxG+pAu7QNo5YAWMjpL3
-         eY6u86tWGvrLmk19X0D60CGMwpgspuFzxDdL+RbFND0sd11IavHXilYeBR1n/BWmS7QA
-         0obftDJl+9tRy7H2hcPydoykwQqlWTulXDus5CGoG3164YX20SfYCCS8VGrVFKeRega8
-         t4pXISDeLwMhi63Etq20aBuLQx+muYiJLWGJtutwJKIjANPa6R/YcMBqZ8PSCKs2nK8s
-         hc/mnuhYw9ADWkRf9LojrWc9shl2HeeJfJ+HaJY5D7AEri+CrT1SdGVGusGEMv+o/LY6
-         oxKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705600246; x=1706205046;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BeOfVhu/YQjuPaBL7HLOFJxylUSZb5ghXwEj0tH+VbM=;
-        b=C6b38i7SLrbJPUuyu1KLvlkG5ONMlrdsCs/TbjJdxo3vovTfVMiHLRAOgZ7Yoy9hQ/
-         4HiEGAdzzGjKRUn9eRDCVV4tf4qcfeL+lAlIbc5yCAqlPcWjRjfYBUHHiXjHNH33VW9+
-         2cDvWXskmgUVAxI0q/oWc8Iin7LDQk8Vbq2ZZPzgU5nHhKhx7Wnh9hOq78HGEYK0Vx9X
-         ej8xLQL+KJSZEK2Kcfz5ohaYpO/PwqsaMlzTjQM/1VXwRvJhv8GLGe1G93cp/yKKw1XX
-         e5pRl4tJXVon8mCN5ieganDNu11qWuW01TWkDZeRnbywLgz3JvplpgsjwRrd1Ba2HA3N
-         Q5hw==
-X-Gm-Message-State: AOJu0YxX9In53Msy2guIG2h+O3g6TNnMA1qFJVFbJDCDAtGSPZhZPu6/
-	TOhRMJ6a9a6Vf3gl5LQeuKtKaoitQTV9l1lWKFVHWiaSsTuQhwG4jrbhvQXNlcOCVOOtVz16tXf
-	h
-X-Google-Smtp-Source: AGHT+IHqhtxBqUtdwqkS5/LYHeL/ekXGtb2Jn3Eqr4OlemBLU7YUpfw9MOxkxxvtVnMVoEQW1MZhFA==
-X-Received: by 2002:a05:6512:31ca:b0:50e:6c1d:5dee with SMTP id j10-20020a05651231ca00b0050e6c1d5deemr7487lfe.33.1705600245837;
-        Thu, 18 Jan 2024 09:50:45 -0800 (PST)
-Received: from [172.30.205.26] (UNUSED.212-182-62-129.lubman.net.pl. [212.182.62.129])
-        by smtp.gmail.com with ESMTPSA id h23-20020a19ca57000000b0050ee3e540e4sm718900lfj.65.2024.01.18.09.50.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 Jan 2024 09:50:45 -0800 (PST)
-Message-ID: <ed2dddc6-6461-4a2b-8491-13955cbd80fd@linaro.org>
-Date: Thu, 18 Jan 2024 18:50:37 +0100
+	s=arc-20240116; t=1705600828; c=relaxed/simple;
+	bh=rAcq0tMeIpsPq/nSiRX9MTPJ2LcdTKw8cB5YhhRL1nQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=pVjfrj8ZTnBTUEP3XbjocDMihc0PnaT4Jo4yYOvjq6pH1Bwnp5kb8FaP3DrZ8KnjWsSrhh0Ln6DcG8meJ4wKtt/obqO9t6yYGN9M8cyLOF2UecgQ1Z/TYutnhrFUGrRhryU6+3WtpuxptLzyG++Wm0LC7zi1bMzwal2oOBbApzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SA6GaiMe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2D637C43399;
+	Thu, 18 Jan 2024 18:00:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705600828;
+	bh=rAcq0tMeIpsPq/nSiRX9MTPJ2LcdTKw8cB5YhhRL1nQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=SA6GaiMesFzITYf1V2FspcC4qNwgAWPn/45Tjrsx7TnSWAKGQc88hm2CDUgeeYpS1
+	 STv4eEnkKPSJFbqn5o9PTVBtwm1aCvhT69U9gE3kqwTxNiBA1GIzFp4gAGKPsDrR84
+	 lm0PUBPA26JJc1Xp3A704LZd+LbzYlw819iMd5QA0Sz4xdDfC2zFBlLcMYuL4SWCzf
+	 ZVleYNM0BMwWp5wkb6XVSbHqkQOBUcs0gY4CFD5+6pWgsR+QXKHUjM8qqyDWc5zGWG
+	 4SFNxOr6lrUUu0BJPGPZTZrxfzSr9T6rADIZOyaTtwqJqkyj/scJkruRZjnDZNU5FM
+	 BjMEm1kZvtcZg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 17265D8C97A;
+	Thu, 18 Jan 2024 18:00:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 9/9] PCI/pwrseq: add a pwrseq driver for QCA6390
-Content-Language: en-US
-To: Bartosz Golaszewski <brgl@bgdev.pl>, Kalle Valo <kvalo@kernel.org>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Bjorn Helgaas <bhelgaas@google.com>, Heiko Stuebner <heiko@sntech.de>,
- Jernej Skrabec <jernej.skrabec@gmail.com>,
- Chris Morgan <macromorgan@hotmail.com>,
- Linus Walleij <linus.walleij@linaro.org>,
- Geert Uytterhoeven <geert+renesas@glider.be>, Arnd Bergmann <arnd@arndb.de>,
- Neil Armstrong <neil.armstrong@linaro.org>,
- =?UTF-8?Q?N=C3=ADcolas_F_=2E_R_=2E_A_=2E_Prado?= <nfraprado@collabora.com>,
- Marek Szyprowski <m.szyprowski@samsung.com>, Peng Fan <peng.fan@nxp.com>,
- Robert Richter <rrichter@amd.com>, Dan Williams <dan.j.williams@intel.com>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- Terry Bowman <terry.bowman@amd.com>, Lukas Wunner <lukas@wunner.de>,
- Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>,
- Srini Kandagatla <srinivas.kandagatla@linaro.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Abel Vesa <abel.vesa@linaro.org>
-Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-pci@vger.kernel.org,
- Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-References: <20240117160748.37682-1-brgl@bgdev.pl>
- <20240117160748.37682-10-brgl@bgdev.pl>
-From: Konrad Dybcio <konrad.dybcio@linaro.org>
-In-Reply-To: <20240117160748.37682-10-brgl@bgdev.pl>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] i40e: Include types.h to some headers
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170560082809.5819.7901962173523145524.git-patchwork-notify@kernel.org>
+Date: Thu, 18 Jan 2024 18:00:28 +0000
+References: <20240117172534.3555162-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20240117172534.3555162-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, ivecera@redhat.com,
+ micron10@gmail.com, jesse.brandeburg@intel.com, horms@kernel.org,
+ arpanax.arland@intel.com
 
+Hello:
 
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On 1/17/24 17:07, Bartosz Golaszewski wrote:
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+On Wed, 17 Jan 2024 09:25:32 -0800 you wrote:
+> Commit 56df345917c0 ("i40e: Remove circular header dependencies and fix
+> headers") redistributed a number of includes from one large header file
+> to the locations they were needed. In some environments, types.h is not
+> included and causing compile issues. The driver should not rely on
+> implicit inclusion from other locations; explicitly include it to these
+> files.
 > 
-> Add a PCI power sequencing driver that's capable of correctly powering
-> up the ath11k module on QCA6390 and WCN7850 using the PCI pwrseq
-> functionality.
-> 
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> [Neil: add support for WCN7850]
-> Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
-> ---
+> [...]
 
-[...]
+Here is the summary with links:
+  - [net] i40e: Include types.h to some headers
+    https://git.kernel.org/netdev/net/c/9cfd3b502153
 
-> +static struct pci_pwrseq_qca6390_vreg pci_pwrseq_wcn7850_vregs[] = {
-> +	{
-> +		.name = "vdd",
-> +	},
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Weird there's no .load here.. On Qualcomm they're used for asking
-the regluators to enter the high power mode, so it'd be useful.
 
-Konrad
 
