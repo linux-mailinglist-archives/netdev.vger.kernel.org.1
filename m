@@ -1,85 +1,124 @@
-Return-Path: <netdev+bounces-64239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DBA0831E11
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 18:00:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A72C831E1B
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 18:04:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD7051C2585C
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 17:00:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 30FD61F26557
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 17:04:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3D312C6A4;
-	Thu, 18 Jan 2024 17:00:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EFBF2C6AC;
+	Thu, 18 Jan 2024 17:04:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Pmo5tso8"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="E91rWm+Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 363952D02B;
-	Thu, 18 Jan 2024 17:00:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C480E2C843
+	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 17:04:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705597220; cv=none; b=n9tnq8PZ1WDteWui05kpE6bNizW+Vm+EovOYy1Wj5wIW/IEuRA5SMJvpuYzuLyLZegXh+XOEqm0F1KYn1ZwVaPYlj8zgoegS1FtF8sgaQVava2vl23Z04gZ1oXidmwBSP0uHqd444rkz8SXBqmlQA6fMYHPlDW+URz6hS+JXcGc=
+	t=1705597471; cv=none; b=dcm89tiWeAcrVI/LL4AomAAdw3OwiZv0L9kStqdl9rE67zjZ5kOu3xiJjI69i1fml9kDGSLtyITwY2CcJepVKaoVhHhpwBqFGJlYokhAXaSyxtiW634Vfg0UzwD55Vc8CCPZUrqld/WJq2jPip+lFcWJ/tXM6Doj5ik9pcM03nU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705597220; c=relaxed/simple;
-	bh=ZQkTj7v3P3b8slVfFVO0LEhYN51N22sIpr/cgL8WBSg=;
-	h=DKIM-Signature:Received:Date:From:To:Cc:Subject:Message-ID:
-	 References:MIME-Version:Content-Type:Content-Disposition:
-	 In-Reply-To; b=Z1OIKdNHih8W9WEPFM2aRQodQXOih/IUuN/O1yLZk/EBm6gwB+gEtKUeWKPDukCSQO8qZe8EVGDBNlVgBY7Nn/Ae0dyeKt3KsmePNXQ0qb01W4IeEFLpU97Qvdhg8fGyLo7ETLrb5I3tvf4pDnxLIXXqRX46tTwAegURxn0SUwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Pmo5tso8; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=0tuU5//Jtkk4REo0lwHCqrHwmxJPEkKkKcI8xTrY0ts=; b=Pmo5tso8M37VzKsnub2PaUM2i/
-	KTG/bCFboCVTfbvP87Gk6zFJwzphCJsWVihUJuzNDyho9s5F5Nh/F5Xfqrctk2FV8G36iDvat+T2A
-	tbzyFHV5I6+ih8DTPTMQJxoL9QQnWf1lhcnCQBLfNeaJ29XANT9Ity7oIvbebs34Nw5s=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rQVkP-005UmY-SR; Thu, 18 Jan 2024 18:00:09 +0100
-Date: Thu, 18 Jan 2024 18:00:09 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Horatiu Vultur <horatiu.vultur@microchip.com>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	richardcochran@gmail.com, Divya.Koppera@microchip.com,
-	maxime.chevallier@bootlin.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net v2 2/2] net: micrel: Fix set/get PHC time for lan8814
-Message-ID: <139fe4c1-6a3e-4ef3-a178-ebbe09652966@lunn.ch>
-References: <20240118085916.1204354-1-horatiu.vultur@microchip.com>
- <20240118085916.1204354-3-horatiu.vultur@microchip.com>
- <6fa37dfd-3c92-4842-9785-1b17bbbedc9d@lunn.ch>
- <20240118152353.syk3v7kgf3mutqpp@DEN-DL-M31836.microchip.com>
+	s=arc-20240116; t=1705597471; c=relaxed/simple;
+	bh=g/rRRWlnTFqnEs2SFfwruUS/ClIg0NzA+8JMI1zfBgU=;
+	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:
+	 Message-ID:Date:MIME-Version:User-Agent:Subject:Content-Language:
+	 To:Cc:References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding; b=sBUaxxiRI8AOkpr2SSd6Dgg0vQbDuwBkY3tsVSIWFTWOe5BGi5wecIfz7XhQ3G7ax/TyyAbyilWDZreKYsPxgdEhJvhwQwO6V1ieJdFpoPQT4h66db2KKlOZnBTcEGJ6BSVrhVC2T3FqSA+ruqu5A6z8CT0d4xp3OWmCEppXWC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=E91rWm+Y; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-337b583453bso2766925f8f.2
+        for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 09:04:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=google; t=1705597468; x=1706202268; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Spf2iYyM2yyAQqYpbtyryjRjyyX6h/O61i58Cf5ljuM=;
+        b=E91rWm+YSP/bcx6/NlUa7zuWBMkAjpAEWdGYFu6Af5yqV4m8rAIxry8YlglUil0uxx
+         MYo39f/7mQwFeRZOpN+tMq/4ncpUN3RbaahUCesR/7OvHi/5QGMoPoXNngCCbDFJGaos
+         XvkteUP4JQVjtbJFZ3FlaYimXL4Xr/27Ue5PVvJuowQnmumggxdgelzgEPOYGCHUPQUJ
+         mMzu3C3o4cmCzORgMvTn9/4U+1ZsF3aj2x0Z5ifkE2eaZoFKWpIzAwyt6e8jmrm1Bxfb
+         eCULs6JOovXx/w5nDJyGMoAq0WBid3G/keE0ZyKfd4URbwdTNG/Olvz1zEe6B7cC9Fsv
+         gmVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705597468; x=1706202268;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Spf2iYyM2yyAQqYpbtyryjRjyyX6h/O61i58Cf5ljuM=;
+        b=H7RAOy5O9kp1V59rrQebNEqNc84Ujy36B09ob22o7JSZgq4CSaDc7U6E3PWXE2cX9m
+         QRg0KuB6tkQqNkLx2kLzsyS+na4yyu1MoQbBnmvamQtp5PZ06enzaqi85RtYl5sZWWAM
+         /jsgmu0WA303cDyB5p/dGt55a4jht1lLz3IeTJ2ajDOihC+eXHJbtMLZYlSSYAt7S0UZ
+         MEaXED/AuzrLqU2Oy6FQJ3mianTAaxPgRoC/OjFWhbiy/ikL1A+gAAIfsqN1DrkgesvY
+         WYXDu5y3LULoh8NzfPirAsv/SNzRQbpaAcT2jlEUKZOhJG2v2xXIiptR4Lc/RLcKuVfY
+         7OHA==
+X-Gm-Message-State: AOJu0YzlSoSSyMTN4pRdiae8q1gOIPqhNCebZnO4H82htBq3c0MYuHb6
+	jArQw8KB0xQipZ+e5Vm4AH8NtyINEh0iEw4pIY2YKsYahQ7x1ye76MfYL7w5FA==
+X-Google-Smtp-Source: AGHT+IH3FQC5AzBxXr/WrOnNom9+bRpYrvzb1p86jgCnhI7ov37Cf1NcCipvj61hKcTHgrF3bHv7XA==
+X-Received: by 2002:a05:6000:18a:b0:337:b057:c1d4 with SMTP id p10-20020a056000018a00b00337b057c1d4mr474170wrx.215.1705597468020;
+        Thu, 18 Jan 2024 09:04:28 -0800 (PST)
+Received: from [10.83.37.178] ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id q9-20020adff789000000b00337d6aa3912sm1021082wrp.10.2024.01.18.09.04.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 18 Jan 2024 09:04:27 -0800 (PST)
+Message-ID: <358faa27-3ea3-4e63-a76f-7b5deeed756d@arista.com>
+Date: Thu, 18 Jan 2024 17:04:25 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240118152353.syk3v7kgf3mutqpp@DEN-DL-M31836.microchip.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/3] selftests/net: A couple of typos fixes in
+ key-management test
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, Dmitry Safonov <0x7f454c46@gmail.com>,
+ Mohammad Nassiri <mnassiri@ciena.com>, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240118-tcp-ao-test-key-mgmt-v1-0-3583ca147113@arista.com>
+ <20240118085129.6313054b@kernel.org>
+From: Dmitry Safonov <dima@arista.com>
+In-Reply-To: <20240118085129.6313054b@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-> > Maybe submit this for net-next?
+On 1/18/24 16:51, Jakub Kicinski wrote:
+> On Thu, 18 Jan 2024 02:51:33 +0000 Dmitry Safonov wrote:
+>> Two typo fixes, noticed by Mohammad's review.
+>> And a fix for an issue that got uncovered.
 > 
-> Anyway, I don't have strong feelings about this, if it goes to net or
-> net-next, I just want to fix this at some point :)
+> Somewhat unrelated to these fixes but related to the tcp_ao selftests
+> in general - could you please also add a config file so that it's
+> easy to build a minimal kernel for running the tests?
+> 
+> Something like:
+> 
+>   make defconfig
+>   make kvm_guest.config
+>   make tools/testing/selftests/net/tcp_ao/config
 
-Please submit to net-next. I think the ML bot which picks out patches
-to backport is likely to see the work Fix in the subject and decided
-to backport it anyway. But its not our problem if the bot breaks the
-stable rules.
+Yep, sounds good to me.
+I'll take as a base tools/testing/selftests/net/config and add any
+needed config options on the top.
 
-Is there any danger of regressions? Could the higher word actually
-have a value for some reason today, which is being ignored. Would this
-change then jump the time forward?
+> should give us a suitable config. Differently put it'd be great to have
+> a config we can pass to vmtest or virtme-ng and run the tests.
 
-       Andrew
+Will check that it works with them.
+
+Thanks,
+             Dmitry
+
 
