@@ -1,201 +1,140 @@
-Return-Path: <netdev+bounces-64253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E011D831EB6
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 18:47:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42C0A831EBF
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 18:50:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A47528581C
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 17:47:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CED181F28B65
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 17:50:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 206C52D052;
-	Thu, 18 Jan 2024 17:46:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46CEB2D054;
+	Thu, 18 Jan 2024 17:50:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="vVO1lHil"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LbJgbhEn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C0802C848
-	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 17:46:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B16242D603
+	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 17:50:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705600000; cv=none; b=VHWd/+lI8KIgTWv/LfJNhPwrkKI4sQVft/oOAyS0IC4bR7EEK21nwFu9PDyfGnn/UEheMBcZINiw1pzoWLnNeErvoxW7Ub/SzeK15tIpXeJoHcofTOaXfba2rwFPiGX+p9DtRhan8S0KBQ7h/YIdKQ5UFjLpohQJXGfARpeoJZw=
+	t=1705600249; cv=none; b=am7Yu5OTAht3KqV5L0RaLNjs1p6Lq19AaX8zXExeQVO3cgjK5iDcITR0degGd/bb16x2/vyJmFofMCZHwRkvQ0DPJNsmH0XcOG5Ij+qXIrRZeAdPoYZOCgqEuuXrg7h8F/kqbcynZ5jza4HGuuJgbugY6+/zbu9TcXZWMeuCrmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705600000; c=relaxed/simple;
-	bh=TuSzzUMGtcolMkPRnJNo7RIo+b6y/9t6KbjGyRRzc90=;
-	h=Subject:Date:From:To:CC:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=u9XpXJBUszlHCIcu9l5YlZD9uEFqlMq0o4l58Bk/xmIwoUIHanhdUuYexPCgLBC0GHVU0+ZmrsOqFMAb2IMkV3xxr0ImzgBkb4RMzrxL8A2PCPD+LQVdMEI7CZoZI1hIb/py8LAsaaxUskYx4+sG++vf994hdeUeSR2R6Cc2fZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=vVO1lHil; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1705600249; c=relaxed/simple;
+	bh=R83s/PyF4fXUdK67JiE75Dz9JrojGyAfOWEwxObSVV8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ObDo4g3ZiBVR7o5PqTTD7PFU4thdYoE5YnlUwpTiIAokHkMeKqr/s3bs+hpqEfDCrzIap/GB2vJeZd7tmrY8mUo2DC9Fj74lAGHUx2GKXcO0sHNIkPKrQjn9omoEyhlcJYte74gflP+vxIf9CiB5NhkgVPueI58r/UmyGUH5qBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=LbJgbhEn; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-50ed808db11so10432791e87.2
+        for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 09:50:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1705599998; x=1737135998;
-  h=date:from:to:cc:in-reply-to:message-id:references:
-   mime-version:subject;
-  bh=AcbDdkJsAyI8g8bG3lHG/IWqtnWkjJBVY0ODfwOm4Ao=;
-  b=vVO1lHilrjjJqpRJamu6TDu+Ndo1f/b7CswYkgu37WPuJX9zM1PVrGPD
-   tOLKFiorzcw83meIHgdcapNcwPASBhEwCbFgRvGla+/xY6RRbOnJh5EhP
-   38Qek6Gw52wNNZA8mXHmm4iP9y9k0MRZopVyCFVccCzI7oVAtlng7XgiZ
-   0=;
-X-IronPort-AV: E=Sophos;i="6.05,203,1701129600"; 
-   d="scan'208";a="59302448"
-Subject: RE: [PATCH v3] tcp: Add memory barrier to tcp_push()
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-dc7c3f8b.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jan 2024 17:46:37 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
-	by email-inbound-relay-pdx-2c-m6i4x-dc7c3f8b.us-west-2.amazon.com (Postfix) with ESMTPS id 806FEA0137;
-	Thu, 18 Jan 2024 17:46:37 +0000 (UTC)
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:30697]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.41.57:2525] with esmtp (Farcaster)
- id 1f451131-02fe-4d8d-9706-a53d82aac51c; Thu, 18 Jan 2024 17:46:37 +0000 (UTC)
-X-Farcaster-Flow-ID: 1f451131-02fe-4d8d-9706-a53d82aac51c
-Received: from EX19D003UWC001.ant.amazon.com (10.13.138.144) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 18 Jan 2024 17:46:37 +0000
-Received: from lhr51-en-hct-f1c0-r1-vl--298.amazon.com (10.252.141.22) by
- EX19D003UWC001.ant.amazon.com (10.13.138.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 18 Jan 2024 17:46:35 +0000
-Date: Thu, 18 Jan 2024 11:46:27 -0600
-From: Geoff Blake <blakgeof@amazon.com>
-To: Paolo Abeni <pabeni@redhat.com>
-CC: Salvatore Dipietro <dipiets@amazon.com>, <edumazet@google.com>,
-	<alisaidi@amazon.com>, <benh@amazon.com>, <davem@davemloft.net>,
-	<dipietro.salvatore@gmail.com>, <dsahern@kernel.org>, <kuba@kernel.org>,
-	<netdev@vger.kernel.org>
-In-Reply-To: <e69835dd96eb2452b8d4a6b431c7d6100b582acd.camel@redhat.com>
-Message-ID: <1195cf45-9c73-3450-36de-df54224135b6@amazon.com>
-References: <CANn89i+XkcQV6_=ysKACN+JQM=P7SqbfTvhxF+jSwd=MJ6t0sw@mail.gmail.com>  <20240117231646.22853-1-dipiets@amazon.com> <e69835dd96eb2452b8d4a6b431c7d6100b582acd.camel@redhat.com>
+        d=linaro.org; s=google; t=1705600246; x=1706205046; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BeOfVhu/YQjuPaBL7HLOFJxylUSZb5ghXwEj0tH+VbM=;
+        b=LbJgbhEneDdeNqOEmRiGt3riWuUBUuVlABZyUdAdZ8O0LkDxG+pAu7QNo5YAWMjpL3
+         eY6u86tWGvrLmk19X0D60CGMwpgspuFzxDdL+RbFND0sd11IavHXilYeBR1n/BWmS7QA
+         0obftDJl+9tRy7H2hcPydoykwQqlWTulXDus5CGoG3164YX20SfYCCS8VGrVFKeRega8
+         t4pXISDeLwMhi63Etq20aBuLQx+muYiJLWGJtutwJKIjANPa6R/YcMBqZ8PSCKs2nK8s
+         hc/mnuhYw9ADWkRf9LojrWc9shl2HeeJfJ+HaJY5D7AEri+CrT1SdGVGusGEMv+o/LY6
+         oxKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705600246; x=1706205046;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BeOfVhu/YQjuPaBL7HLOFJxylUSZb5ghXwEj0tH+VbM=;
+        b=C6b38i7SLrbJPUuyu1KLvlkG5ONMlrdsCs/TbjJdxo3vovTfVMiHLRAOgZ7Yoy9hQ/
+         4HiEGAdzzGjKRUn9eRDCVV4tf4qcfeL+lAlIbc5yCAqlPcWjRjfYBUHHiXjHNH33VW9+
+         2cDvWXskmgUVAxI0q/oWc8Iin7LDQk8Vbq2ZZPzgU5nHhKhx7Wnh9hOq78HGEYK0Vx9X
+         ej8xLQL+KJSZEK2Kcfz5ohaYpO/PwqsaMlzTjQM/1VXwRvJhv8GLGe1G93cp/yKKw1XX
+         e5pRl4tJXVon8mCN5ieganDNu11qWuW01TWkDZeRnbywLgz3JvplpgsjwRrd1Ba2HA3N
+         Q5hw==
+X-Gm-Message-State: AOJu0YxX9In53Msy2guIG2h+O3g6TNnMA1qFJVFbJDCDAtGSPZhZPu6/
+	TOhRMJ6a9a6Vf3gl5LQeuKtKaoitQTV9l1lWKFVHWiaSsTuQhwG4jrbhvQXNlcOCVOOtVz16tXf
+	h
+X-Google-Smtp-Source: AGHT+IHqhtxBqUtdwqkS5/LYHeL/ekXGtb2Jn3Eqr4OlemBLU7YUpfw9MOxkxxvtVnMVoEQW1MZhFA==
+X-Received: by 2002:a05:6512:31ca:b0:50e:6c1d:5dee with SMTP id j10-20020a05651231ca00b0050e6c1d5deemr7487lfe.33.1705600245837;
+        Thu, 18 Jan 2024 09:50:45 -0800 (PST)
+Received: from [172.30.205.26] (UNUSED.212-182-62-129.lubman.net.pl. [212.182.62.129])
+        by smtp.gmail.com with ESMTPSA id h23-20020a19ca57000000b0050ee3e540e4sm718900lfj.65.2024.01.18.09.50.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 18 Jan 2024 09:50:45 -0800 (PST)
+Message-ID: <ed2dddc6-6461-4a2b-8491-13955cbd80fd@linaro.org>
+Date: Thu, 18 Jan 2024 18:50:37 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-X-ClientProxiedBy: EX19D039UWA003.ant.amazon.com (10.13.139.49) To
- EX19D003UWC001.ant.amazon.com (10.13.138.144)
-Precedence: Bulk
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 9/9] PCI/pwrseq: add a pwrseq driver for QCA6390
+Content-Language: en-US
+To: Bartosz Golaszewski <brgl@bgdev.pl>, Kalle Valo <kvalo@kernel.org>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Bjorn Helgaas <bhelgaas@google.com>, Heiko Stuebner <heiko@sntech.de>,
+ Jernej Skrabec <jernej.skrabec@gmail.com>,
+ Chris Morgan <macromorgan@hotmail.com>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ Geert Uytterhoeven <geert+renesas@glider.be>, Arnd Bergmann <arnd@arndb.de>,
+ Neil Armstrong <neil.armstrong@linaro.org>,
+ =?UTF-8?Q?N=C3=ADcolas_F_=2E_R_=2E_A_=2E_Prado?= <nfraprado@collabora.com>,
+ Marek Szyprowski <m.szyprowski@samsung.com>, Peng Fan <peng.fan@nxp.com>,
+ Robert Richter <rrichter@amd.com>, Dan Williams <dan.j.williams@intel.com>,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ Terry Bowman <terry.bowman@amd.com>, Lukas Wunner <lukas@wunner.de>,
+ Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>,
+ Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Abel Vesa <abel.vesa@linaro.org>
+Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-pci@vger.kernel.org,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+References: <20240117160748.37682-1-brgl@bgdev.pl>
+ <20240117160748.37682-10-brgl@bgdev.pl>
+From: Konrad Dybcio <konrad.dybcio@linaro.org>
+In-Reply-To: <20240117160748.37682-10-brgl@bgdev.pl>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
 
-On Thu, 18 Jan 2024, Paolo Abeni wrote:
+On 1/17/24 17:07, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> 
+> Add a PCI power sequencing driver that's capable of correctly powering
+> up the ath11k module on QCA6390 and WCN7850 using the PCI pwrseq
+> functionality.
+> 
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> [Neil: add support for WCN7850]
+> Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
+> ---
 
-> CAUTION: This email originated from outside of the organization. Do not click links or open attachments unless you can confirm the sender and know the content is safe.
-> 
-> 
-> 
-> On Wed, 2024-01-17 at 15:16 -0800, Salvatore Dipietro wrote:
-> > On CPUs with weak memory models, reads and updates performed by tcp_push to the
-> > sk variables can get reordered leaving the socket throttled when it should not.
-> > The tasklet running tcp_wfree() may also not observe the memory updates in time
-> > and will skip flushing any packets throttled by tcp_push(), delaying the sending.
-> > This can pathologically cause 40ms extra latency due to bad interactions with
-> > delayed acks.
-> >
-> > Adding a memory barrier in tcp_push before the sk_wmem_alloc read removes the
-> > bug, similarly to the previous commit bf06200e732d ("tcp: tsq: fix nonagle
-> > handling"). smp_mb__after_atomic() is used to not incur in unnecessary overhead
-> > on x86 since not affected.
-> >
-> > Patch has been tested using an AWS c7g.2xlarge instance with Ubuntu 22.04 and
-> > Apache Tomcat 9.0.83 running the basic servlet below:
-> >
-> > import java.io.IOException;
-> > import java.io.OutputStreamWriter;
-> > import java.io.PrintWriter;
-> > import javax.servlet.ServletException;
-> > import javax.servlet.http.HttpServlet;
-> > import javax.servlet.http.HttpServletRequest;
-> > import javax.servlet.http.HttpServletResponse;
-> >
-> > public class HelloWorldServlet extends HttpServlet {
-> >     @Override
-> >     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-> >       throws ServletException, IOException {
-> >         response.setContentType("text/html;charset=utf-8");
-> >         OutputStreamWriter osw = new OutputStreamWriter(response.getOutputStream(),"UTF-8");
-> >         String s = "a".repeat(3096);
-> >         osw.write(s,0,s.length());
-> >         osw.flush();
-> >     }
-> > }
-> >
-> > Load was applied using wrk2 (https://github.com/kinvolk/wrk2) from an AWS
-> > c6i.8xlarge instance. Before the patch an additional 40ms latency from P99.99+
-> > values is observed while, with the patch, the extra latency disappears.
-> >
-> > # No patch and tcp_autocorking=1
-> > ./wrk -t32 -c128 -d40s --latency -R10000  http://172.31.60.173:8080/hello/hello
-> >   ...
-> >  50.000%    0.91ms
-> >  75.000%    1.13ms
-> >  90.000%    1.46ms
-> >  99.000%    1.74ms
-> >  99.900%    1.89ms
-> >  99.990%   41.95ms  <<< 40+ ms extra latency
-> >  99.999%   48.32ms
-> > 100.000%   48.96ms
-> >
-> > # With patch and tcp_autocorking=1
-> > ./wrk -t32 -c128 -d40s --latency -R10000  http://172.31.60.173:8080/hello/hello
-> >   ...
-> >  50.000%    0.90ms
-> >  75.000%    1.13ms
-> >  90.000%    1.45ms
-> >  99.000%    1.72ms
-> >  99.900%    1.83ms
-> >  99.990%    2.11ms  <<< no 40+ ms extra latency
-> >  99.999%    2.53ms
-> > 100.000%    2.62ms
-> >
-> > Patch has been also tested on x86 (m7i.2xlarge instance) which it is not
-> > affected by this issue and the patch doesn't introduce any additional
-> > delay.
-> >
-> > Fixes: a181ceb501b3 ("tcp: autocork should not hold first packet in write
-> > queue")
-> 
-> Please read carefully the process documentation under
-> Documentation/process/ and specifically the netdev specific bits:
-> 
-> no resubmissions within the 24h grace period.
-> 
-> Please double-check your patch with checkpatch for formal errors: the
-> fixes tag must not be split across multiple lines.
-> 
-> And please do not sent new version in reply to a previous one: it will
-> confuse the bot.
-> 
-> > Signed-off-by: Salvatore Dipietro <dipiets@amazon.com>
-> > ---
-> >  net/ipv4/tcp.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> >
-> > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> > index ff6838ca2e58..ab9e3922393c 100644
-> > --- a/net/ipv4/tcp.c
-> > +++ b/net/ipv4/tcp.c
-> > @@ -726,6 +726,7 @@ void tcp_push(struct sock *sk, int flags, int mss_now,
-> >               /* It is possible TX completion already happened
-> >                * before we set TSQ_THROTTLED.
-> >                */
-> > +             smp_mb__after_atomic();
-> 
-> Out of sheer ignorance I'm wondering if moving such barrier inside the
-> above 'if' just after 'set_bit' would suffice?
+[...]
 
-According to the herd7 modeling tool, the answer is no for weak memory 
-models.  If we put the smp_mb inside the if, it allows the machine to 
-reorder the two reads to sk_wmem_alloc and we can get to the bad state 
-this patch is fixing.  Placing it outside the if ensures 
-the ordering between those two reads as well as ordering the write to the 
-flags variable.
+> +static struct pci_pwrseq_qca6390_vreg pci_pwrseq_wcn7850_vregs[] = {
+> +	{
+> +		.name = "vdd",
+> +	},
 
+Weird there's no .load here.. On Qualcomm they're used for asking
+the regluators to enter the high power mode, so it'd be useful.
 
+Konrad
 
