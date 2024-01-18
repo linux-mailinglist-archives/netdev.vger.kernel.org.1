@@ -1,128 +1,139 @@
-Return-Path: <netdev+bounces-64108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB2DA831192
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 03:52:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 872CA831226
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 05:32:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDA5C1C20FA5
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 02:52:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E7E61F228D3
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 04:32:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55A74B65F;
-	Thu, 18 Jan 2024 02:51:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="GCy8msPQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B722C2F3A;
+	Thu, 18 Jan 2024 04:32:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C38A59475
-	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 02:51:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43ACCA41;
+	Thu, 18 Jan 2024 04:32:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705546312; cv=none; b=r/Y5nKQXcOp9AdW3oQt9J9vI83ov5RUGBAiCocIZjyjYz/m0Uch8wBa3sUUZSoos3t0gpvg9+mX4oHL1Uo6YuaSlYGVRnDcdK6HauZ9nmJe0782BfD7m1YyKtMI2V/56Plkl0weMR/BtQxikImBPXRZ+D+mBRjs9kHK09t6sjKk=
+	t=1705552359; cv=none; b=fnR8OXaS4j3Ta3F9qD4/mKXNWh+xmY++3UaO9E8D8h2i289RKH33AFY5ot5j2za4GugDUckW5BbYgcLjAKzUHNDPwoCGb/GAZ0Nhp6BGODCgXd8l71XAfC9swF1e/fm2DhwCPBUX9ZFlAtlycHiUPvdZPBtu3ZUZo78TOpNjEfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705546312; c=relaxed/simple;
-	bh=qeZ3tY/o44baRhR6QAmQ3u7Ui4fQMK8qYGmLuQSHVR4=;
-	h=Received:DKIM-Signature:X-Google-DKIM-Signature:
-	 X-Gm-Message-State:X-Google-Smtp-Source:X-Received:Received:From:
-	 To:Cc:Subject:Date:Message-ID:X-Mailer:In-Reply-To:References:
-	 MIME-Version:Content-Type:X-Mailer:X-Developer-Signature:
-	 X-Developer-Key:Content-Transfer-Encoding; b=pLzXNz1dCWvvp6YYZSJK05sIjg0R5YIoAcii6tCGJtJ1N+/Y399jR89W8H5dAS8PDw3j950Vz6+t44KIcofzUlLu4UcWh1knrJ55fwi5W8py8BkOHSD1pdVpWwHQ2z+ow7y6mChwZcrb4VcQCyVJeqTtSdP7u8sDO/8zuGMDcGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=GCy8msPQ; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-40e800461baso30835075e9.3
-        for <netdev@vger.kernel.org>; Wed, 17 Jan 2024 18:51:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1705546309; x=1706151109; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3o3JIW0lMFFX9linU1Dr7QEV8ZT+tiEVZq+1/7eCMH8=;
-        b=GCy8msPQX4RwUoFlDWaO2h4HYSplkrqpQIvPaS5AgnuN38X+8ggV3Fl9JapMsW0ALt
-         4iNNlnkLpubt9kwLMmMM9Qwpx8NDO0cgNYhO44zv5ovoyxpK2OarrJbej3cPfSZA6kUd
-         1T/4/zexLh8ySXUtCSHxUK4M6hhj2AY5FbFJ6+Efn4mOi1Izg7veck6QecMLTBnDFPx6
-         8/mKFiHwXE+sG6jPEEWV5ziQkzmDMUtGIUEdQqVYSAJeP444PkhYWpe1E4Z/pxkt8/GN
-         vQbs/bEb6kcWXylE/QYeaoGhKX9S3xuFloH8hWpFS0l8E+183q7FW40eAq73PGLjr2ZW
-         CKyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705546309; x=1706151109;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3o3JIW0lMFFX9linU1Dr7QEV8ZT+tiEVZq+1/7eCMH8=;
-        b=ZkY86N1YFa/HgkVftlVVQ2dFYbXX1hPRJUDoylm3A49kg62KJI9hxZDR2/V/3milW3
-         cUjTXcpQFh4rQE/6mzKBkYb6QcTrnvT1VVQw9v/i9MPqUslXeM08bbnRAZlH3SFiujl0
-         SZ+q4xmGRAn0ucoXU3UqljKaxJ4rua0DuVSFtGjIbycy28bWwRr1UWc52KaR5wkWh97W
-         LrJUYkETHYTDdvK1Jj9vglt/7qo0wA7XHm0Bkogw7OlLaiSHezKJNP5gndCGcuzHQU5A
-         BI3lEAtTYHhPVSKCUIQejWChU4G/DSS49+zEo8tMbefblhp9iRiQvztNjSuFlWWxjoSQ
-         qbyQ==
-X-Gm-Message-State: AOJu0YxSKmpy3YsHKaKMZS3DMljrlvip8LLxa9eLo/B2xBm9dfhfnYDo
-	QYZIPMnyhZXo7E677HcV61MWXtitXZcFaZNtOpwvjf2R+uyc3fDnQnMN24nxCA==
-X-Google-Smtp-Source: AGHT+IGTP8bDonVO2FTMnOfmYmhTkXA7oZIjIWi56IdHYCM3+hcb2Gwh7mTQIsxRTHcK1mpkziqCEQ==
-X-Received: by 2002:a1c:4b14:0:b0:40e:47bf:f332 with SMTP id y20-20020a1c4b14000000b0040e47bff332mr41977wma.97.1705546309242;
-        Wed, 17 Jan 2024 18:51:49 -0800 (PST)
-Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id z15-20020a5d440f000000b0033664ffaf5dsm2868219wrq.37.2024.01.17.18.51.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Jan 2024 18:51:48 -0800 (PST)
-From: Dmitry Safonov <dima@arista.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Dmitry Safonov <0x7f454c46@gmail.com>
-Cc: Dmitry Safonov <dima@arista.com>,
-	Mohammad Nassiri <mnassiri@ciena.com>,
+	s=arc-20240116; t=1705552359; c=relaxed/simple;
+	bh=L2R//kp2TZYjI88M/hmHTS7NxUGrsSRm1/69OpIek1A=;
+	h=X-Alimail-AntiSpam:Received:From:To:Cc:Subject:Date:Message-Id:
+	 X-Mailer:MIME-Version:Content-Transfer-Encoding; b=RbN84TzfTM0X/8M118BdpXJ9QiQBqQNAxctlsR6mjDke422HTR//+KBAWl0ZMWOoq9InJULKDvSDmkVe1ky68mLmeVrctJGVomAUXTPj5BaCvzGyI3cU4tbWTnb0s+2AM7LrVpovM7GAnInhFVdn0+Ew16CJ5u5WCPG9101mmNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; arc=none smtp.client-ip=115.124.30.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0W-rRrfZ_1705552330;
+Received: from localhost(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W-rRrfZ_1705552330)
+          by smtp.aliyun-inc.com;
+          Thu, 18 Jan 2024 12:32:29 +0800
+From: Wen Gu <guwen@linux.alibaba.com>
+To: wenjia@linux.ibm.com,
+	jaka@linux.ibm.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: alibuda@linux.alibaba.com,
+	tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com,
+	ubraun@linux.ibm.com,
+	linux-s390@vger.kernel.org,
 	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 3/3] selftests/net: Clean-up double assignment
-Date: Thu, 18 Jan 2024 02:51:36 +0000
-Message-ID: <20240118-tcp-ao-test-key-mgmt-v1-3-3583ca147113@arista.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240118-tcp-ao-test-key-mgmt-v1-0-3583ca147113@arista.com>
-References: <20240118-tcp-ao-test-key-mgmt-v1-0-3583ca147113@arista.com>
+Subject: [PATCH net v2] net/smc: fix illegal rmb_desc access in SMC-D connection dump
+Date: Thu, 18 Jan 2024 12:32:10 +0800
+Message-Id: <20240118043210.47618-1-guwen@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Mailer: b4 0.13-dev-b6b4b
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1705546294; l=958; i=dima@arista.com; s=20231212; h=from:subject:message-id; bh=qeZ3tY/o44baRhR6QAmQ3u7Ui4fQMK8qYGmLuQSHVR4=; b=nB5WMfppjsBWtpYlDmqyc73zjVS9nEfgidteoRQ0/Rfb/dLrknlixH1oNA964bflYfHGG2n2a /PKkERTk0U/BI8T0dEMYZie22fblu4GxYKvI1gJlXBlW4Qmnysso9RP
-X-Developer-Key: i=dima@arista.com; a=ed25519; pk=hXINUhX25b0D/zWBKvd6zkvH7W2rcwh/CH6cjEa3OTk=
 Content-Transfer-Encoding: 8bit
 
-Yeah, copy'n'paste typo.
+A crash was found when dumping SMC-D connections. It can be reproduced
+by following steps:
 
-Fixes: 3c3ead555648 ("selftests/net: Add TCP-AO key-management test")
-Reported-by: Nassiri, Mohammad <mnassiri@ciena.com>
-Closes: https://lore.kernel.org/all/DM6PR04MB4202BC58A9FD5BDD24A16E8EC56F2@DM6PR04MB4202.namprd04.prod.outlook.com/
-Signed-off-by: Dmitry Safonov <dima@arista.com>
+- run nginx/wrk test:
+  smc_run nginx
+  smc_run wrk -t 16 -c 1000 -d <duration> -H 'Connection: Close' <URL>
+
+- continuously dump SMC-D connections in parallel:
+  watch -n 1 'smcss -D'
+
+ BUG: kernel NULL pointer dereference, address: 0000000000000030
+ CPU: 2 PID: 7204 Comm: smcss Kdump: loaded Tainted: G	E      6.7.0+ #55
+ RIP: 0010:__smc_diag_dump.constprop.0+0x5e5/0x620 [smc_diag]
+ Call Trace:
+  <TASK>
+  ? __die+0x24/0x70
+  ? page_fault_oops+0x66/0x150
+  ? exc_page_fault+0x69/0x140
+  ? asm_exc_page_fault+0x26/0x30
+  ? __smc_diag_dump.constprop.0+0x5e5/0x620 [smc_diag]
+  ? __kmalloc_node_track_caller+0x35d/0x430
+  ? __alloc_skb+0x77/0x170
+  smc_diag_dump_proto+0xd0/0xf0 [smc_diag]
+  smc_diag_dump+0x26/0x60 [smc_diag]
+  netlink_dump+0x19f/0x320
+  __netlink_dump_start+0x1dc/0x300
+  smc_diag_handler_dump+0x6a/0x80 [smc_diag]
+  ? __pfx_smc_diag_dump+0x10/0x10 [smc_diag]
+  sock_diag_rcv_msg+0x121/0x140
+  ? __pfx_sock_diag_rcv_msg+0x10/0x10
+  netlink_rcv_skb+0x5a/0x110
+  sock_diag_rcv+0x28/0x40
+  netlink_unicast+0x22a/0x330
+  netlink_sendmsg+0x1f8/0x420
+  __sock_sendmsg+0xb0/0xc0
+  ____sys_sendmsg+0x24e/0x300
+  ? copy_msghdr_from_user+0x62/0x80
+  ___sys_sendmsg+0x7c/0xd0
+  ? __do_fault+0x34/0x160
+  ? do_read_fault+0x5f/0x100
+  ? do_fault+0xb0/0x110
+  ? __handle_mm_fault+0x2b0/0x6c0
+  __sys_sendmsg+0x4d/0x80
+  do_syscall_64+0x69/0x180
+  entry_SYSCALL_64_after_hwframe+0x6e/0x76
+
+It is possible that the connection is in process of being established
+when we dump it. Assumed that the connection has been registered in a
+link group by smc_conn_create() but the rmb_desc has not yet been
+initialized by smc_buf_create(), thus causing the illegal access to
+conn->rmb_desc. So fix it by checking before dump.
+
+Fixes: 4b1b7d3b30a6 ("net/smc: add SMC-D diag support")
+Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
 ---
- tools/testing/selftests/net/tcp_ao/lib/sock.c | 1 -
- 1 file changed, 1 deletion(-)
+v2->v1: corrected the commit in Fixes tag.
+(https://lore.kernel.org/netdev/20240117122749.63785-1-guwen@linux.alibaba.com/)
 
-diff --git a/tools/testing/selftests/net/tcp_ao/lib/sock.c b/tools/testing/selftests/net/tcp_ao/lib/sock.c
-index c75d82885a2e..923a9bb4f1ca 100644
---- a/tools/testing/selftests/net/tcp_ao/lib/sock.c
-+++ b/tools/testing/selftests/net/tcp_ao/lib/sock.c
-@@ -377,7 +377,6 @@ int test_get_tcp_ao_counters(int sk, struct tcp_ao_counters *out)
- 
- 	key_dump[0].nkeys = nr_keys;
- 	key_dump[0].get_all = 1;
--	key_dump[0].get_all = 1;
- 	err = getsockopt(sk, IPPROTO_TCP, TCP_AO_GET_KEYS,
- 			 key_dump, &key_dump_sz);
- 	if (err) {
+ net/smc/smc_diag.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/net/smc/smc_diag.c b/net/smc/smc_diag.c
+index 52f7c4f1e767..5a33908015f3 100644
+--- a/net/smc/smc_diag.c
++++ b/net/smc/smc_diag.c
+@@ -164,7 +164,7 @@ static int __smc_diag_dump(struct sock *sk, struct sk_buff *skb,
+ 	}
+ 	if (smc_conn_lgr_valid(&smc->conn) && smc->conn.lgr->is_smcd &&
+ 	    (req->diag_ext & (1 << (SMC_DIAG_DMBINFO - 1))) &&
+-	    !list_empty(&smc->conn.lgr->list)) {
++	    !list_empty(&smc->conn.lgr->list) && smc->conn.rmb_desc) {
+ 		struct smc_connection *conn = &smc->conn;
+ 		struct smcd_diag_dmbinfo dinfo;
+ 		struct smcd_dev *smcd = conn->lgr->smcd;
 -- 
-2.43.0
+2.32.0.3.g01195cf9f
 
 
