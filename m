@@ -1,223 +1,232 @@
-Return-Path: <netdev+bounces-64261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B2FD831F27
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 19:36:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CD0E831F37
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 19:43:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B8B821F275EA
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 18:36:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8C1CB23FE4
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 18:43:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E26A2D058;
-	Thu, 18 Jan 2024 18:36:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B123D2DF68;
+	Thu, 18 Jan 2024 18:43:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hEIPhW93"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O6CcrDe6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FEF12D78A
-	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 18:36:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25C2E2E630
+	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 18:43:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705602989; cv=none; b=gCu5nxKpCkdLt0jhec/ONjUimwqdxgxfRPvRrceH+CWhShebpXPKEHCFTKZJu2FMqrmHB+qBal+J3w+5CTA1zuQjR2KGqVBCsQCBZ+RM5cWNL3AN85LoQh2LOFcZjO1oykx1Pnx1LSIDwp7hJyMByiAhNlV7fuyiYfMWH0EctSU=
+	t=1705603390; cv=none; b=twqZzv2aeDxEiVvDv36CfI2dKrwEK+s/Xs3XsM4XMK/zLQca/WLHcDSiXKKfOA9M40tPRqgskcaBnpJAETYkkQjI1LU2VsGg9SLMTOw6ktfvyFqvgmgiCijA1WX3YYNblU5QNo2V/3Ubj3jIVDVzo62FjnXGKPsBbCjkktfa8pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705602989; c=relaxed/simple;
-	bh=RFNfwEsJvbylNgRnN6/aIObtRSNXMPythkZb7onAXks=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=k9uhX45bJi3p/UAq7dpzUMoRJMMwDSdovhz5xC1qJClyA37/66SLTIZd17G7hgVt/WZoZMWTZ3t1v2qVGHb9fmWCoPxeTiltGvHCfSV+V60sHjx5HWb3y7mF4fibwgaN3C5Glf0LYej2/7E1xy/Pu66CA2GmkmDlReYHgyKypeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hEIPhW93; arc=none smtp.client-ip=209.85.219.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-681684ca881so48062236d6.2
-        for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 10:36:27 -0800 (PST)
+	s=arc-20240116; t=1705603390; c=relaxed/simple;
+	bh=Tij6JE4buTgfD46vED8au68xUgRD7c39f990Nf1wpUY=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=tL6zs24vX2Qa4u3Ce4YB/9RT3BZDwHN5Lzo5Jjx8Sx5Fq7NoiGFH2Tzkp6+ZtsmWOaOdBPJ+NrrgB7SBkGm80vjE+G28w9UxN74zBQyRObKen1iaPdTaDwAskhRZh5r/oMdbcy63TRKB3cYeU8FemzCltqXNlr55LPTXfOElw6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O6CcrDe6; arc=none smtp.client-ip=209.85.219.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-68183d4e403so84316d6.1
+        for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 10:43:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1705602986; x=1706207786; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=25MdXHON6j2NwO0BaoY9TcGqu9Z4Ggpqr593eNpu2a4=;
-        b=hEIPhW93ANVJTJRvx1upgxGFSejHPebgSU2tR8Z8zTBM6GiNaQCF3VZo27nWlbUxeW
-         FNk3/hYKi9VEpX1ev1s2VOjLsRk6M8SOFoP1kSSEZfnUDlS9OfboHhszBtHJ0Nvar3+a
-         x4SRcKshs1RLMMEgj5kMGs1kQiT20/xIib+WRPp0CaRBvFo9Lf0dB5hbNhRrlANTNb2N
-         PtS2vJA/GysbiaK4W/GQsbJDOHtHcZq2i6m271B2Cq+7rcdsuuNY6n4Wh3FjUnwPKhmF
-         zsM6sawPTX/nzZzmyhF2jnRd2lPymA6350tMAUlcSMuMae3WQ0HeoOOWazptlpSTlleo
-         59HQ==
+        d=gmail.com; s=20230601; t=1705603388; x=1706208188; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=biCHPMPRzh61Zoqo2TS1LoW3XecgNnatFmIlI8ms43k=;
+        b=O6CcrDe6/fW6+gn1yKUdg+ZC7cejdX+GywVOaH7yZI2KuoCxpSCYY13O7XrSnSQ0CB
+         U2Qik8HBZAxi6Y8kg3JKHViUAKVRrbXBZffNySJubDYFRtIXvdnuS+9J3HSEUTcy/Y1G
+         P9qoXQDvYf1GkHXD76YPGtmzigFLeMW9JygurfyCAFuw3xNZHW8TN+rmgFfibBeEvRwq
+         OcwOQbYXI+LjRZJajtsOZnTp9Pg5IvaMpE6wDI9oDEXMKJ3bbLJ/FpyPMDe6Ac3PDTs7
+         nnMDpXKbFuIGnrz+OgNDqRrG846vI7KsSM6XY/AmaWd6tQZI3SqedxEwom3EmHewWyA7
+         M3MA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705602986; x=1706207786;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=25MdXHON6j2NwO0BaoY9TcGqu9Z4Ggpqr593eNpu2a4=;
-        b=lvzJm9VXofM4WmWhiy69EJYMzVSOE6UZCqhSBHcAZzd9tCIyRU+fCy+dA8ts/0kTG4
-         jeVXU7F+SLVSojxibt+sEahXzyuqRLN8nSt3yi9voU7OMtmpk7r7z2CA7DcAVNWMn+jH
-         cf3K/ZqCSScAomK2E7cultfehhQTflJSsbmm6y/YIrqrgB4w6zBlyOnmho3EiPrPzqYG
-         y8IeOdUeK31uS2xdro7oaXfySmm0bU9bOyU+S4d3YkqEepuG4u4gCMnFZHiGfxDXbHBh
-         nbi5V4G4TAm+TygVGTIok/KY1V8aS9j8ERLQdGxfGfKwB/TGg7UsL+lmYvISYXx/dRLD
-         pVzA==
-X-Gm-Message-State: AOJu0YxnLUn6VMVPK/yaJ6ySIvPOKAEOUctg2rmmxub9epaeizeS500B
-	D7pjRoiCoUDC8Eb/aDfHN5WYWaY2Ad4Vd1lVrDK3au6EVQi1rdEoGETnxcwmApHG74jycrNfmJD
-	vU5i4m3eyIQ==
-X-Google-Smtp-Source: AGHT+IHh19cnk/darzEc3E39WxuE9OKGoS2V+Tv0rxm+SKD0cyLn2NzdCib+4iqypfExJeN1FcqO1dIpJNtypQ==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6214:1042:b0:681:7c2b:2791 with SMTP
- id l2-20020a056214104200b006817c2b2791mr28269qvr.12.1705602986549; Thu, 18
- Jan 2024 10:36:26 -0800 (PST)
-Date: Thu, 18 Jan 2024 18:36:25 +0000
+        d=1e100.net; s=20230601; t=1705603388; x=1706208188;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=biCHPMPRzh61Zoqo2TS1LoW3XecgNnatFmIlI8ms43k=;
+        b=jNMX7jDmseLBygt+ndfoDu+y0EPkJm8/KO9vIjZkx3I52ouQb8deVGa+q+VpAvAst1
+         PTI9ZZ/FKvuy2Hr9od5qbSQqH1fEDG8s/pbrnC8P7W1rb8R7YXKTHms04bBiE/lYMOLs
+         jhE+Ulwe0qeIwVVWhLg4ilEzPJfxE55ZpjPfcdh/BROpvKvrpvmhBzECV35iEntedZPS
+         C6TO7MDybGpRD2m0mWU6Q2/HpUNVq+ERI1s/4Z2IhGRhfs/wXdkvTmiCk2cK9wgk6X6E
+         m+TU0TfCCV6knbh1n9R2Bvp/8WlgFp7+kAoOOUS2ikmAr5C/z7kQQHetjUGhLxutLRvb
+         X3EQ==
+X-Gm-Message-State: AOJu0YwljbOMIQPgkHE4JMBYJFkTcBGjYpdx+pBnfoxnN0kNhKLml/FV
+	fN9I0FvO/AijJNo+paY5TJUP+Xum+PXoNtzm782vZ5PchYtAxmgM
+X-Google-Smtp-Source: AGHT+IEWKVoOHBl96x8lry1kzLPuov+hIPPL0v5P8yIcDBKywtR73y7c2hQB8BFDtbG4/eGgznXdwg==
+X-Received: by 2002:a05:6214:e64:b0:681:7a99:b1bf with SMTP id jz4-20020a0562140e6400b006817a99b1bfmr1147437qvb.130.1705603387855;
+        Thu, 18 Jan 2024 10:43:07 -0800 (PST)
+Received: from localhost (131.65.194.35.bc.googleusercontent.com. [35.194.65.131])
+        by smtp.gmail.com with ESMTPSA id mu3-20020a056214328300b006819adbc9f1sm197342qvb.43.2024.01.18.10.43.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Jan 2024 10:43:07 -0800 (PST)
+Date: Thu, 18 Jan 2024 13:43:07 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Eric Dumazet <edumazet@google.com>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Willem de Bruijn <willemb@google.com>, 
+ David Ahern <dsahern@kernel.org>, 
+ netdev@vger.kernel.org, 
+ eric.dumazet@gmail.com, 
+ Eric Dumazet <edumazet@google.com>
+Message-ID: <65a9713b2376e_1d399c294ab@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240118182835.4004788-1-edumazet@google.com>
+References: <20240118182835.4004788-1-edumazet@google.com>
+Subject: Re: [PATCH v2 net] udp: fix busy polling
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
-Message-ID: <20240118183625.4007013-1-edumazet@google.com>
-Subject: [PATCH net] llc: make llc_ui_sendmsg() more robust against bonding changes
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot+2a7024e9502df538e8ef@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-syzbot was able to trick llc_ui_sendmsg(), allocating an skb with no
-headroom, but subsequently trying to push 14 bytes of Ethernet header [1]
+Eric Dumazet wrote:
+> Generic sk_busy_loop_end() only looks at sk->sk_receive_queue
+> for presence of packets.
+> 
+> Problem is that for UDP sockets after blamed commit, some packets
+> could be present in another queue: udp_sk(sk)->reader_queue
+> 
+> In some cases, a busy poller could spin until timeout expiration,
+> even if some packets are available in udp_sk(sk)->reader_queue.
+> 
+> v2:
+>    - add a READ_ONCE(sk->sk_family) in sk_is_inet() to avoid KCSAN splats.
+>    - add a sk_is_inet() check in sk_is_udp() (Willem feedback)
+>    - add a sk_is_inet() check in sk_is_tcp().
+> 
+> Fixes: 2276f58ac589 ("udp: use a separate rx queue for packet reception")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Reviewed-by: Paolo Abeni <pabeni@redhat.com>
 
-Like some others, llc_ui_sendmsg() releases the socket lock before
-calling sock_alloc_send_skb().
-Then it acquires it again, but does not redo all the sanity checks
-that were performed.
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
-This fix:
+> ---
+>  include/linux/skmsg.h   |  6 ------
+>  include/net/inet_sock.h |  5 -----
+>  include/net/sock.h      | 18 +++++++++++++++++-
+>  net/core/sock.c         | 10 +++++++++-
+>  4 files changed, 26 insertions(+), 13 deletions(-)
+> 
+> diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
+> index 888a4b217829fd4d6baf52f784ce35e9ad6bd0ed..e65ec3fd27998a5b82fc2c4597c575125e653056 100644
+> --- a/include/linux/skmsg.h
+> +++ b/include/linux/skmsg.h
+> @@ -505,12 +505,6 @@ static inline bool sk_psock_strp_enabled(struct sk_psock *psock)
+>  	return !!psock->saved_data_ready;
+>  }
+>  
+> -static inline bool sk_is_udp(const struct sock *sk)
+> -{
+> -	return sk->sk_type == SOCK_DGRAM &&
+> -	       sk->sk_protocol == IPPROTO_UDP;
+> -}
+> -
+>  #if IS_ENABLED(CONFIG_NET_SOCK_MSG)
+>  
+>  #define BPF_F_STRPARSER	(1UL << 1)
+> diff --git a/include/net/inet_sock.h b/include/net/inet_sock.h
+> index aa86453f6b9ba367f772570a7b783bb098be6236..d94c242eb3ed20b2c5b2e5ceea3953cf96341fb7 100644
+> --- a/include/net/inet_sock.h
+> +++ b/include/net/inet_sock.h
+> @@ -307,11 +307,6 @@ static inline unsigned long inet_cmsg_flags(const struct inet_sock *inet)
+>  #define inet_assign_bit(nr, sk, val)		\
+>  	assign_bit(INET_FLAGS_##nr, &inet_sk(sk)->inet_flags, val)
+>  
+> -static inline bool sk_is_inet(struct sock *sk)
+> -{
+> -	return sk->sk_family == AF_INET || sk->sk_family == AF_INET6;
+> -}
+> -
+>  /**
+>   * sk_to_full_sk - Access to a full socket
+>   * @sk: pointer to a socket
+> diff --git a/include/net/sock.h b/include/net/sock.h
+> index a7f815c7cfdfdf1296be2967fd100efdb10cdd63..54ca8dcbfb4335d657b5cea323aa7d8c4316d49e 100644
+> --- a/include/net/sock.h
+> +++ b/include/net/sock.h
+> @@ -2765,9 +2765,25 @@ static inline void skb_setup_tx_timestamp(struct sk_buff *skb, __u16 tsflags)
+>  			   &skb_shinfo(skb)->tskey);
+>  }
+>  
+> +static inline bool sk_is_inet(const struct sock *sk)
+> +{
+> +	int family = READ_ONCE(sk->sk_family);
+> +
+> +	return family == AF_INET || family == AF_INET6;
+> +}
+> +
+>  static inline bool sk_is_tcp(const struct sock *sk)
+>  {
+> -	return sk->sk_type == SOCK_STREAM && sk->sk_protocol == IPPROTO_TCP;
+> +	return sk_is_inet(sk) &&
+> +	       sk->sk_type == SOCK_STREAM &&
+> +	       sk->sk_protocol == IPPROTO_TCP;
+> +}
+> +
+> +static inline bool sk_is_udp(const struct sock *sk)
+> +{
+> +	return sk_is_inet(sk) &&
+> +	       sk->sk_type == SOCK_DGRAM &&
+> +	       sk->sk_protocol == IPPROTO_UDP;
+>  }
+>  
+>  static inline bool sk_is_stream_unix(const struct sock *sk)
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index 158dbdebce6a3693deb63e557e856d9cdd7500ae..e7e2435ed28681772bf3637b96ddd9334e6a639e 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -107,6 +107,7 @@
+>  #include <linux/interrupt.h>
+>  #include <linux/poll.h>
+>  #include <linux/tcp.h>
+> +#include <linux/udp.h>
+>  #include <linux/init.h>
+>  #include <linux/highmem.h>
+>  #include <linux/user_namespace.h>
+> @@ -4143,8 +4144,15 @@ subsys_initcall(proto_init);
+>  bool sk_busy_loop_end(void *p, unsigned long start_time)
+>  {
+>  	struct sock *sk = p;
+> +	bool packet_ready;
+>  
+> -	return !skb_queue_empty_lockless(&sk->sk_receive_queue) ||
+> +	packet_ready = !skb_queue_empty_lockless(&sk->sk_receive_queue);
+> +	if (!packet_ready && sk_is_udp(sk)) {
+> +		struct sk_buff_head *reader_queue = &udp_sk(sk)->reader_queue;
+> +
+> +		packet_ready = !skb_queue_empty_lockless(reader_queue);
+> +	}
+> +	return packet_ready ||
+>  	       sk_busy_loop_timeout(sk, start_time);
 
-- Uses LL_RESERVED_SPACE() to reserve space.
-- Check all conditions again after socket lock is held again.
-- Do not account Ethernet header for mtu limitation.
+Perhaps simpler without a variable?
 
-[1]
+    if (!skb_queue_empty_lockless(&sk->sk_receive_queue))
+            return true;
 
-skbuff: skb_under_panic: text:ffff800088baa334 len:1514 put:14 head:ffff0000c9c37000 data:ffff0000c9c36ff2 tail:0x5dc end:0x6c0 dev:bond0
+    if (sk_is_udp(sk) &&
+        !skb_queue_empty_lockless(&udp_sk(sk)->reader_queue))
+            return true;
 
- kernel BUG at net/core/skbuff.c:193 !
-Internal error: Oops - BUG: 00000000f2000800 [#1] PREEMPT SMP
-Modules linked in:
-CPU: 0 PID: 6875 Comm: syz-executor.0 Not tainted 6.7.0-rc8-syzkaller-00101-g0802e17d9aca-dirty #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-pstate: 60400005 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
- pc : skb_panic net/core/skbuff.c:189 [inline]
- pc : skb_under_panic+0x13c/0x140 net/core/skbuff.c:203
- lr : skb_panic net/core/skbuff.c:189 [inline]
- lr : skb_under_panic+0x13c/0x140 net/core/skbuff.c:203
-sp : ffff800096f97000
-x29: ffff800096f97010 x28: ffff80008cc8d668 x27: dfff800000000000
-x26: ffff0000cb970c90 x25: 00000000000005dc x24: ffff0000c9c36ff2
-x23: ffff0000c9c37000 x22: 00000000000005ea x21: 00000000000006c0
-x20: 000000000000000e x19: ffff800088baa334 x18: 1fffe000368261ce
-x17: ffff80008e4ed000 x16: ffff80008a8310f8 x15: 0000000000000001
-x14: 1ffff00012df2d58 x13: 0000000000000000 x12: 0000000000000000
-x11: 0000000000000001 x10: 0000000000ff0100 x9 : e28a51f1087e8400
-x8 : e28a51f1087e8400 x7 : ffff80008028f8d0 x6 : 0000000000000000
-x5 : 0000000000000001 x4 : 0000000000000001 x3 : ffff800082b78714
-x2 : 0000000000000001 x1 : 0000000100000000 x0 : 0000000000000089
-Call trace:
-  skb_panic net/core/skbuff.c:189 [inline]
-  skb_under_panic+0x13c/0x140 net/core/skbuff.c:203
-  skb_push+0xf0/0x108 net/core/skbuff.c:2451
-  eth_header+0x44/0x1f8 net/ethernet/eth.c:83
-  dev_hard_header include/linux/netdevice.h:3188 [inline]
-  llc_mac_hdr_init+0x110/0x17c net/llc/llc_output.c:33
-  llc_sap_action_send_xid_c+0x170/0x344 net/llc/llc_s_ac.c:85
-  llc_exec_sap_trans_actions net/llc/llc_sap.c:153 [inline]
-  llc_sap_next_state net/llc/llc_sap.c:182 [inline]
-  llc_sap_state_process+0x1ec/0x774 net/llc/llc_sap.c:209
-  llc_build_and_send_xid_pkt+0x12c/0x1c0 net/llc/llc_sap.c:270
-  llc_ui_sendmsg+0x7bc/0xb1c net/llc/af_llc.c:997
-  sock_sendmsg_nosec net/socket.c:730 [inline]
-  __sock_sendmsg net/socket.c:745 [inline]
-  sock_sendmsg+0x194/0x274 net/socket.c:767
-  splice_to_socket+0x7cc/0xd58 fs/splice.c:881
-  do_splice_from fs/splice.c:933 [inline]
-  direct_splice_actor+0xe4/0x1c0 fs/splice.c:1142
-  splice_direct_to_actor+0x2a0/0x7e4 fs/splice.c:1088
-  do_splice_direct+0x20c/0x348 fs/splice.c:1194
-  do_sendfile+0x4bc/0xc70 fs/read_write.c:1254
-  __do_sys_sendfile64 fs/read_write.c:1322 [inline]
-  __se_sys_sendfile64 fs/read_write.c:1308 [inline]
-  __arm64_sys_sendfile64+0x160/0x3b4 fs/read_write.c:1308
-  __invoke_syscall arch/arm64/kernel/syscall.c:37 [inline]
-  invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:51
-  el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:136
-  do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:155
-  el0_svc+0x54/0x158 arch/arm64/kernel/entry-common.c:678
-  el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:696
-  el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:595
-Code: aa1803e6 aa1903e7 a90023f5 94792f6a (d4210000)
+    return sk_busy_loop_timeout(sk, start_time);
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-and-tested-by: syzbot+2a7024e9502df538e8ef@syzkaller.appspotmail.com
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/llc/af_llc.c | 24 ++++++++++++++++--------
- 1 file changed, 16 insertions(+), 8 deletions(-)
+>  }
+>  EXPORT_SYMBOL(sk_busy_loop_end);
+> -- 
+> 2.43.0.429.g432eaa2c6b-goog
+> 
 
-diff --git a/net/llc/af_llc.c b/net/llc/af_llc.c
-index 9b06c380866b53bcb395bf255587279db025d11d..20551cfb7da6d8dd098c906477895e26c080fe32 100644
---- a/net/llc/af_llc.c
-+++ b/net/llc/af_llc.c
-@@ -928,14 +928,15 @@ static int llc_ui_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
-  */
- static int llc_ui_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
- {
-+	DECLARE_SOCKADDR(struct sockaddr_llc *, addr, msg->msg_name);
- 	struct sock *sk = sock->sk;
- 	struct llc_sock *llc = llc_sk(sk);
--	DECLARE_SOCKADDR(struct sockaddr_llc *, addr, msg->msg_name);
- 	int flags = msg->msg_flags;
- 	int noblock = flags & MSG_DONTWAIT;
-+	int rc = -EINVAL, copied = 0, hdrlen, hh_len;
- 	struct sk_buff *skb = NULL;
-+	struct net_device *dev;
- 	size_t size = 0;
--	int rc = -EINVAL, copied = 0, hdrlen;
- 
- 	dprintk("%s: sending from %02X to %02X\n", __func__,
- 		llc->laddr.lsap, llc->daddr.lsap);
-@@ -955,22 +956,29 @@ static int llc_ui_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
- 		if (rc)
- 			goto out;
- 	}
--	hdrlen = llc->dev->hard_header_len + llc_ui_header_len(sk, addr);
-+	dev = llc->dev;
-+	hh_len = LL_RESERVED_SPACE(dev);
-+	hdrlen = llc_ui_header_len(sk, addr);
- 	size = hdrlen + len;
--	if (size > llc->dev->mtu)
--		size = llc->dev->mtu;
-+	size = min_t(size_t, size, READ_ONCE(dev->mtu));
- 	copied = size - hdrlen;
- 	rc = -EINVAL;
- 	if (copied < 0)
- 		goto out;
- 	release_sock(sk);
--	skb = sock_alloc_send_skb(sk, size, noblock, &rc);
-+	skb = sock_alloc_send_skb(sk, hh_len + size, noblock, &rc);
- 	lock_sock(sk);
- 	if (!skb)
- 		goto out;
--	skb->dev      = llc->dev;
-+	if (sock_flag(sk, SOCK_ZAPPED) ||
-+	    llc->dev != dev ||
-+	    hdrlen != llc_ui_header_len(sk, addr) ||
-+	    hh_len != LL_RESERVED_SPACE(dev) ||
-+	    size > READ_ONCE(dev->mtu))
-+		goto out;
-+	skb->dev      = dev;
- 	skb->protocol = llc_proto_type(addr->sllc_arphrd);
--	skb_reserve(skb, hdrlen);
-+	skb_reserve(skb, hh_len + hdrlen);
- 	rc = memcpy_from_msg(skb_put(skb, copied), msg, copied);
- 	if (rc)
- 		goto out;
--- 
-2.43.0.429.g432eaa2c6b-goog
 
 
