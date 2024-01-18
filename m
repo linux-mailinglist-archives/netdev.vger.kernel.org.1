@@ -1,233 +1,403 @@
-Return-Path: <netdev+bounces-64288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CF75832134
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 22:59:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70606832140
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 23:01:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE4FE1C24C8B
-	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 21:59:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CD9F1C211AF
+	for <lists+netdev@lfdr.de>; Thu, 18 Jan 2024 22:01:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 914CB2EAF9;
-	Thu, 18 Jan 2024 21:59:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD27431755;
+	Thu, 18 Jan 2024 22:01:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="u0EDWLb2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TuL8k02S"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD3112E848
-	for <netdev@vger.kernel.org>; Thu, 18 Jan 2024 21:59:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F4B92E85F;
+	Thu, 18 Jan 2024 22:01:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705615150; cv=none; b=NhiMfK+tKRjZJajRNTEJ9ydjXSIdj3cFinUlm0nBOFvCNHe7OM0+/mj/TcItUrN0O+a33xbN1koNrGDQMo03sKuNvP/AQoPVSOxNKYGPk5JkBZmQmpljpIXhB3Wm804OX8CFQf0uokgGOL7qvMSQqpoNsFssulQMcT55Az6FXAU=
+	t=1705615278; cv=none; b=o080EOQXUGt1r8QsLpOyUUXSSKlkGhWfldo+n1FDyoapa9i/eM64FctftNXhvU6vAR/098YD8Cpp8jkpHx6XneIKtw01yEZqPiaZUQyXwYdsbKiH4JIzWtQtyk1CEpWpG8a3wrh4kpQEle7nKApLEmJYi428Du6MOA5lkg+qI8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705615150; c=relaxed/simple;
-	bh=EJhN+IqwWKCT23BLeF+6S4wEJCUV+Sfw0L7IeZlQVn8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nSQfdCn9StUBNRpUltXhmb5bmzZmja5Zs7a823Gk3D9fp8U3v+3hyCh5byoF8potEAvHcOF2GTp1K9i4mfZ4EvxGMqDcon74JcNFdm8BBvTSCj/BnA1XTozKGswIxaLu+Z7hIaeZ5p+enAPTfsh+Ms39Smgg13MBXaH3OKuEzos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=u0EDWLb2; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1705615148; x=1737151148;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=aDSPsxEpYJ8L3zBHzNtHqrAwEpRufQoOKE9qkdal1QQ=;
-  b=u0EDWLb2sBHmRuQ5wsiffU+7o9DJ5WVz/kwFTbXdcn4WHNnHudxn7GIH
-   RutGfSFlz5G8ixkbomPioIedUdKfXM7A3TyTyoDLSqX9YFRRyc29hj7oY
-   ++TtabzPc82YGKoV2r2eUtCJT1+SEx+hwpqhbRR0OClAhmZfp4tpO0WeO
-   4=;
-X-IronPort-AV: E=Sophos;i="6.05,203,1701129600"; 
-   d="scan'208";a="59368388"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-af372327.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jan 2024 21:59:06 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
-	by email-inbound-relay-pdx-2a-m6i4x-af372327.us-west-2.amazon.com (Postfix) with ESMTPS id AD85060D01;
-	Thu, 18 Jan 2024 21:59:05 +0000 (UTC)
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:15928]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.24.5:2525] with esmtp (Farcaster)
- id 31194d1a-be10-4acd-82a5-49b1a7cd112f; Thu, 18 Jan 2024 21:59:05 +0000 (UTC)
-X-Farcaster-Flow-ID: 31194d1a-be10-4acd-82a5-49b1a7cd112f
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 18 Jan 2024 21:59:04 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.88.183.204) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 18 Jan 2024 21:59:02 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <edumazet@google.com>
-CC: <davem@davemloft.net>, <eric.dumazet@gmail.com>, <kuba@kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<syzbot+2a7024e9502df538e8ef@syzkaller.appspotmail.com>, <kuniyu@amazon.com>
-Subject: Re: [PATCH net] llc: make llc_ui_sendmsg() more robust against bonding changes
-Date: Thu, 18 Jan 2024 13:58:54 -0800
-Message-ID: <20240118215854.40268-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240118183625.4007013-1-edumazet@google.com>
-References: <20240118183625.4007013-1-edumazet@google.com>
+	s=arc-20240116; t=1705615278; c=relaxed/simple;
+	bh=Efm+PXJ7N7sLa7pTKfa3U4klPY4k63z8iTuAYJQsFRk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lpDTr6UYeDYLuxmuhoXBzhiDX4tqrRGjSjyC/0CcoHsqgOg+v8sWPJak8x99GauwEVAd8wBp8piDiMA8mbbTlPEJgKsMvpCbt1YxAX8R8wZBJhYeG5kT8NCWRZdsbVxDC5uXfhuf8TXT+9xN9cxyYcGND8iT3IZy7nCo69yrMN0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TuL8k02S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAF6AC433F1;
+	Thu, 18 Jan 2024 22:01:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705615278;
+	bh=Efm+PXJ7N7sLa7pTKfa3U4klPY4k63z8iTuAYJQsFRk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=TuL8k02S+rhHlOBqjRv0Smavss9EBk3xoM4T/tR2ORZvxXEhLahbpQ/dmGul9PWrq
+	 A9RdD2Z1J6BgiVqvTnRZurwFUT0p+OlEk2OJCQ14WJiP3naQpyi8HSLWVohkplLmb0
+	 v/O3d3YhWOHlTHgf2wgf8zYm2fyGK4bA7IiHIYsNCdJ/PVSi3AS+QF9zc5sJfzT3jp
+	 kNGy+Tb9AfAmD/cnsgRHPwl13/DE9hrMX1N1qyRienua8B33vCkeXeHRJsWHZirCFa
+	 flaZ7mjACUh0377u6gOTtZmBvU1lYF4k/RxUYBbsiWNyyrj4DcTuFz/JfSizGD0cUc
+	 BvFvE3ZMkVQBg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	pabeni@redhat.com,
+	bpf@vger.kernel.org
+Subject: [GIT PULL] Networking for v6.8-rc1
+Date: Thu, 18 Jan 2024 14:01:16 -0800
+Message-ID: <20240118220116.2146136-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWA002.ant.amazon.com (10.13.139.121) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
 
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 18 Jan 2024 18:36:25 +0000
-> syzbot was able to trick llc_ui_sendmsg(), allocating an skb with no
-> headroom, but subsequently trying to push 14 bytes of Ethernet header [1]
-> 
-> Like some others, llc_ui_sendmsg() releases the socket lock before
-> calling sock_alloc_send_skb().
-> Then it acquires it again, but does not redo all the sanity checks
-> that were performed.
-> 
-> This fix:
-> 
-> - Uses LL_RESERVED_SPACE() to reserve space.
-> - Check all conditions again after socket lock is held again.
-> - Do not account Ethernet header for mtu limitation.
-> 
-> [1]
-> 
-> skbuff: skb_under_panic: text:ffff800088baa334 len:1514 put:14 head:ffff0000c9c37000 data:ffff0000c9c36ff2 tail:0x5dc end:0x6c0 dev:bond0
-> 
->  kernel BUG at net/core/skbuff.c:193 !
-> Internal error: Oops - BUG: 00000000f2000800 [#1] PREEMPT SMP
-> Modules linked in:
-> CPU: 0 PID: 6875 Comm: syz-executor.0 Not tainted 6.7.0-rc8-syzkaller-00101-g0802e17d9aca-dirty #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-> pstate: 60400005 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
->  pc : skb_panic net/core/skbuff.c:189 [inline]
->  pc : skb_under_panic+0x13c/0x140 net/core/skbuff.c:203
->  lr : skb_panic net/core/skbuff.c:189 [inline]
->  lr : skb_under_panic+0x13c/0x140 net/core/skbuff.c:203
-> sp : ffff800096f97000
-> x29: ffff800096f97010 x28: ffff80008cc8d668 x27: dfff800000000000
-> x26: ffff0000cb970c90 x25: 00000000000005dc x24: ffff0000c9c36ff2
-> x23: ffff0000c9c37000 x22: 00000000000005ea x21: 00000000000006c0
-> x20: 000000000000000e x19: ffff800088baa334 x18: 1fffe000368261ce
-> x17: ffff80008e4ed000 x16: ffff80008a8310f8 x15: 0000000000000001
-> x14: 1ffff00012df2d58 x13: 0000000000000000 x12: 0000000000000000
-> x11: 0000000000000001 x10: 0000000000ff0100 x9 : e28a51f1087e8400
-> x8 : e28a51f1087e8400 x7 : ffff80008028f8d0 x6 : 0000000000000000
-> x5 : 0000000000000001 x4 : 0000000000000001 x3 : ffff800082b78714
-> x2 : 0000000000000001 x1 : 0000000100000000 x0 : 0000000000000089
-> Call trace:
->   skb_panic net/core/skbuff.c:189 [inline]
->   skb_under_panic+0x13c/0x140 net/core/skbuff.c:203
->   skb_push+0xf0/0x108 net/core/skbuff.c:2451
->   eth_header+0x44/0x1f8 net/ethernet/eth.c:83
->   dev_hard_header include/linux/netdevice.h:3188 [inline]
->   llc_mac_hdr_init+0x110/0x17c net/llc/llc_output.c:33
->   llc_sap_action_send_xid_c+0x170/0x344 net/llc/llc_s_ac.c:85
->   llc_exec_sap_trans_actions net/llc/llc_sap.c:153 [inline]
->   llc_sap_next_state net/llc/llc_sap.c:182 [inline]
->   llc_sap_state_process+0x1ec/0x774 net/llc/llc_sap.c:209
->   llc_build_and_send_xid_pkt+0x12c/0x1c0 net/llc/llc_sap.c:270
->   llc_ui_sendmsg+0x7bc/0xb1c net/llc/af_llc.c:997
->   sock_sendmsg_nosec net/socket.c:730 [inline]
->   __sock_sendmsg net/socket.c:745 [inline]
->   sock_sendmsg+0x194/0x274 net/socket.c:767
->   splice_to_socket+0x7cc/0xd58 fs/splice.c:881
->   do_splice_from fs/splice.c:933 [inline]
->   direct_splice_actor+0xe4/0x1c0 fs/splice.c:1142
->   splice_direct_to_actor+0x2a0/0x7e4 fs/splice.c:1088
->   do_splice_direct+0x20c/0x348 fs/splice.c:1194
->   do_sendfile+0x4bc/0xc70 fs/read_write.c:1254
->   __do_sys_sendfile64 fs/read_write.c:1322 [inline]
->   __se_sys_sendfile64 fs/read_write.c:1308 [inline]
->   __arm64_sys_sendfile64+0x160/0x3b4 fs/read_write.c:1308
->   __invoke_syscall arch/arm64/kernel/syscall.c:37 [inline]
->   invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:51
->   el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:136
->   do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:155
->   el0_svc+0x54/0x158 arch/arm64/kernel/entry-common.c:678
->   el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:696
->   el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:595
-> Code: aa1803e6 aa1903e7 a90023f5 94792f6a (d4210000)
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Reported-and-tested-by: syzbot+2a7024e9502df538e8ef@syzkaller.appspotmail.com
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
->  net/llc/af_llc.c | 24 ++++++++++++++++--------
->  1 file changed, 16 insertions(+), 8 deletions(-)
-> 
-> diff --git a/net/llc/af_llc.c b/net/llc/af_llc.c
-> index 9b06c380866b53bcb395bf255587279db025d11d..20551cfb7da6d8dd098c906477895e26c080fe32 100644
-> --- a/net/llc/af_llc.c
-> +++ b/net/llc/af_llc.c
-> @@ -928,14 +928,15 @@ static int llc_ui_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
->   */
->  static int llc_ui_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
->  {
-> +	DECLARE_SOCKADDR(struct sockaddr_llc *, addr, msg->msg_name);
->  	struct sock *sk = sock->sk;
->  	struct llc_sock *llc = llc_sk(sk);
-> -	DECLARE_SOCKADDR(struct sockaddr_llc *, addr, msg->msg_name);
->  	int flags = msg->msg_flags;
->  	int noblock = flags & MSG_DONTWAIT;
-> +	int rc = -EINVAL, copied = 0, hdrlen, hh_len;
->  	struct sk_buff *skb = NULL;
-> +	struct net_device *dev;
->  	size_t size = 0;
-> -	int rc = -EINVAL, copied = 0, hdrlen;
->  
->  	dprintk("%s: sending from %02X to %02X\n", __func__,
->  		llc->laddr.lsap, llc->daddr.lsap);
-> @@ -955,22 +956,29 @@ static int llc_ui_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
->  		if (rc)
->  			goto out;
->  	}
-> -	hdrlen = llc->dev->hard_header_len + llc_ui_header_len(sk, addr);
-> +	dev = llc->dev;
-> +	hh_len = LL_RESERVED_SPACE(dev);
-> +	hdrlen = llc_ui_header_len(sk, addr);
->  	size = hdrlen + len;
-> -	if (size > llc->dev->mtu)
-> -		size = llc->dev->mtu;
-> +	size = min_t(size_t, size, READ_ONCE(dev->mtu));
->  	copied = size - hdrlen;
->  	rc = -EINVAL;
->  	if (copied < 0)
->  		goto out;
->  	release_sock(sk);
-> -	skb = sock_alloc_send_skb(sk, size, noblock, &rc);
-> +	skb = sock_alloc_send_skb(sk, hh_len + size, noblock, &rc);
->  	lock_sock(sk);
->  	if (!skb)
->  		goto out;
-> -	skb->dev      = llc->dev;
-> +	if (sock_flag(sk, SOCK_ZAPPED) ||
+Hi Linus!
 
-Probably we need not check SOCK_ZAPPED again after llc_ui_autobind() ?
+The following changes since commit 3e7aeb78ab01c2c2f0e1f784e5ddec88fcd3d106:
 
+  Merge tag 'net-next-6.8' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next (2024-01-11 10:07:29 -0800)
 
-> +	    llc->dev != dev ||
-> +	    hdrlen != llc_ui_header_len(sk, addr) ||
-> +	    hh_len != LL_RESERVED_SPACE(dev) ||
-> +	    size > READ_ONCE(dev->mtu))
-> +		goto out;
-> +	skb->dev      = dev;
->  	skb->protocol = llc_proto_type(addr->sllc_arphrd);
-> -	skb_reserve(skb, hdrlen);
-> +	skb_reserve(skb, hh_len + hdrlen);
->  	rc = memcpy_from_msg(skb_put(skb, copied), msg, copied);
->  	if (rc)
->  		goto out;
-> -- 
-> 2.43.0.429.g432eaa2c6b-goog
+are available in the Git repository at:
 
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.8-rc1
+
+for you to fetch changes up to 925781a471d8156011e8f8c1baf61bbe020dac55:
+
+  Merge tag 'nf-24-01-18' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf (2024-01-18 12:45:05 -0800)
+
+----------------------------------------------------------------
+Including fixes from bpf and netfilter.
+
+Previous releases - regressions:
+
+ - Revert "net: rtnetlink: Enslave device before bringing it up",
+   breaks the case inverse to the one it was trying to fix
+
+ - net: dsa: fix oob access in DSA's netdevice event handler
+   dereference netdev_priv() before check its a DSA port
+
+ - sched: track device in tcf_block_get/put_ext() only for clsact
+   binder types
+
+ - net: tls, fix WARNING in __sk_msg_free when record becomes full
+   during splice and MORE hint set
+
+ - sfp-bus: fix SFP mode detect from bitrate
+
+ - drv: stmmac: prevent DSA tags from breaking COE
+
+Previous releases - always broken:
+
+ - bpf: fix no forward progress in in bpf_iter_udp if output
+   buffer is too small
+
+ - bpf: reject variable offset alu on registers with a type
+   of PTR_TO_FLOW_KEYS to prevent oob access
+
+ - netfilter: tighten input validation
+
+ - net: add more sanity check in virtio_net_hdr_to_skb()
+
+ - rxrpc: fix use of Don't Fragment flag on RESPONSE packets,
+   avoid infinite loop
+
+ - amt: do not use the portion of skb->cb area which may get clobbered
+
+ - mptcp: improve validation of the MPTCPOPT_MP_JOIN MCTCP option
+
+Misc:
+
+ - spring cleanup of inactive maintainers
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+----------------------------------------------------------------
+Alexei Starovoitov (2):
+      Merge branch 'bpf-fix-backward-progress-bug-in-bpf_iter_udp'
+      Merge branch 'tighten-up-arg-ctx-type-enforcement'
+
+Amit Cohen (3):
+      mlxsw: spectrum_acl_erp: Fix error flow of pool allocation failure
+      selftests: mlxsw: qos_pfc: Remove wrong description
+      selftests: mlxsw: qos_pfc: Adjust the test to support 8 lanes
+
+Andrii Nakryiko (5):
+      libbpf: feature-detect arg:ctx tag support in kernel
+      bpf: extract bpf_ctx_convert_map logic and make it more reusable
+      bpf: enforce types for __arg_ctx-tagged arguments in global subprogs
+      selftests/bpf: add tests confirming type logic in kernel for __arg_ctx
+      libbpf: warn on unexpected __arg_ctx type when rewriting BTF
+
+Arnd Bergmann (1):
+      wangxunx: select CONFIG_PHYLINK where needed
+
+Benjamin Poirier (3):
+      selftests: bonding: Change script interpreter
+      selftests: forwarding: Remove executable bits from lib.sh
+      selftests: bonding: Add more missing config options
+
+Breno Leitao (6):
+      net: fill in MODULE_DESCRIPTION()s for SLIP
+      net: fill in MODULE_DESCRIPTION()s for HSR
+      net: fill in MODULE_DESCRIPTION()s for NFC
+      net: fill in MODULE_DESCRIPTION()s for Sun RPC
+      net: fill in MODULE_DESCRIPTION()s for ds26522 module
+      net: fill in MODULE_DESCRIPTION()s for s2io
+
+Claudiu Beznea (1):
+      net: phy: micrel: populate .soft_reset for KSZ9131
+
+David Howells (1):
+      rxrpc: Fix use of Don't Fragment flag
+
+David S. Miller (1):
+      Merge branch 'tls-splice-hint-fixes'
+
+Dmitry Antipov (1):
+      net: liquidio: fix clang-specific W=1 build warnings
+
+Dmitry Safonov (1):
+      selftests/net/tcp-ao: Use LDLIBS instead of LDFLAGS
+
+Eric Dumazet (7):
+      mptcp: mptcp_parse_option() fix for MPTCPOPT_MP_JOIN
+      mptcp: strict validation before using mp_opt->hmac
+      mptcp: use OPTION_MPTCP_MPJ_SYNACK in subflow_finish_connect()
+      mptcp: use OPTION_MPTCP_MPJ_SYN in subflow_check_req()
+      mptcp: refine opt_mp_capable determination
+      udp: annotate data-races around up->pending
+      net: add more sanity check in virtio_net_hdr_to_skb()
+
+Fedor Pchelkin (1):
+      ipvs: avoid stat macros calls from preemptible context
+
+Hao Sun (2):
+      bpf: Reject variable offset alu on PTR_TO_FLOW_KEYS
+      selftests/bpf: Add test for alu on PTR_TO_FLOW_KEYS
+
+Horatiu Vultur (1):
+      net: micrel: Fix PTP frame parsing for lan8841
+
+Ido Schimmel (2):
+      mlxsw: spectrum_acl_tcam: Fix NULL pointer dereference in error path
+      mlxsw: spectrum_acl_tcam: Fix stack corruption
+
+Jakub Kicinski (20):
+      Merge branch 'fix-module_description-for-net-p1'
+      MAINTAINERS: eth: mtk: move John to CREDITS
+      MAINTAINERS: eth: mt7530: move Landen Chao to CREDITS
+      MAINTAINERS: eth: mvneta: move Thomas to CREDITS
+      MAINTAINERS: eth: mark Cavium liquidio as an Orphan
+      MAINTAINERS: Bluetooth: retire Johan (for now?)
+      MAINTAINERS: mark ax25 as Orphan
+      MAINTAINERS: ibmvnic: drop Dany from reviewers
+      Merge branch 'rtnetlink-allow-to-enslave-with-one-msg-an-up-interface'
+      Merge branch 'net-ethernet-ti-am65-cpsw-allow-for-mtu-values'
+      net: fill in MODULE_DESCRIPTION()s for wx_lib
+      Merge branch 'mptcp-better-validation-of-mptcpopt_mp_join-option'
+      selftests: netdevsim: sprinkle more udevadm settle
+      selftests: netdevsim: correct expected FEC strings
+      selftests: bonding: add missing build configs
+      net: netdevsim: don't try to destroy PHC on VFs
+      selftests: netdevsim: add a config file
+      Merge branch 'mlxsw-miscellaneous-fixes'
+      Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf
+      Merge tag 'nf-24-01-18' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
+
+Jiri Pirko (1):
+      net: sched: track device in tcf_block_get/put_ext() only for clsact binder types
+
+John Fastabend (2):
+      net: tls, fix WARNIING in __sk_msg_free
+      net: tls, add test to capture error on large splice
+
+Kunwu Chan (1):
+      net: dsa: vsc73xx: Add null pointer check to vsc73xx_gpio_probe
+
+Lin Ma (1):
+      net: qualcomm: rmnet: fix global oob in rmnet_policy
+
+Ludvig Pärsson (1):
+      ethtool: netlink: Add missing ethnl_ops_begin/complete
+
+Marc Kleine-Budde (1):
+      net: netdev_queue: netdev_txq_completed_mb(): fix wake condition
+
+Marcin Wojtas (1):
+      MAINTAINERS: eth: mvneta: update entry
+
+Martin KaFai Lau (3):
+      bpf: iter_udp: Retry with a larger batch size without going back to the previous bucket
+      bpf: Avoid iter->offset making backward progress in bpf_iter_udp
+      selftests/bpf: Test udp and tcp iter batching
+
+Nicolas Dichtel (3):
+      Revert "net: rtnetlink: Enslave device before bringing it up"
+      selftests: rtnetlink: check enslaving iface in a bond
+      selftests: rtnetlink: use setup_ns in bonding test
+
+Nikita Yushchenko (1):
+      net: ravb: Fix dma_addr_t truncation in error case
+
+Nikita Zhandarovich (1):
+      ipv6: mcast: fix data-race in ipv6_mc_down / mld_ifc_work
+
+Nithin Dabilpuram (1):
+      octeontx2-af: CN10KB: Fix FIFO length calculation for RPM2
+
+Pablo Neira Ayuso (8):
+      netfilter: nf_tables: reject invalid set policy
+      netfilter: nf_tables: validate .maxattr at expression registration
+      netfilter: nf_tables: bail out if stateful expression provides no .clone
+      netfilter: nft_limit: do not ignore unsupported flags
+      netfilter: nf_tables: check if catch-all set element is active in next generation
+      netfilter: nf_tables: do not allow mismatch field size and set key length
+      netfilter: nf_tables: skip dead set elements in netlink dump
+      netfilter: nf_tables: reject NFT_SET_CONCAT with not field length description
+
+Paolo Abeni (2):
+      Merge branch 'selftests-net-small-fixes'
+      mptcp: relax check on MPC passive fallback
+
+Pavel Tikhomirov (4):
+      netfilter: nfnetlink_log: use proper helper for fetching physinif
+      netfilter: nf_queue: remove excess nf_bridge variable
+      netfilter: propagate net to nf_bridge_get_physindev
+      netfilter: bridge: replace physindev with physinif in nf_bridge_info
+
+Petr Machata (1):
+      mlxsw: spectrum_router: Register netdevice notifier before nexthop
+
+Qiang Ma (1):
+      net: stmmac: ethtool: Fixed calltrace caused by unbalanced disable_irq_wake calls
+
+Romain Gantois (1):
+      net: stmmac: Prevent DSA tags from breaking COE
+
+Russell King (Oracle) (1):
+      net: sfp-bus: fix SFP mode detect from bitrate
+
+Sanjuán García, Jorge (1):
+      net: ethernet: ti: am65-cpsw: Fix max mtu to fit ethernet frames
+
+Sneh Shah (1):
+      net: stmmac: Fix ethool link settings ops for integrated PCS
+
+Taehee Yoo (1):
+      amt: do not use overwrapped cb area
+
+Tony Nguyen (1):
+      i40e: Include types.h to some headers
+
+Vladimir Oltean (1):
+      net: dsa: fix netdev_priv() dereference before check on non-DSA netdevice events
+
+Zhu Yanjun (1):
+      virtio_net: Fix "‘%d’ directive writing between 1 and 11 bytes into a region of size 10" warnings
+
+ CREDITS                                            |  17 ++
+ MAINTAINERS                                        |  16 +-
+ drivers/net/amt.c                                  |   6 +-
+ drivers/net/dsa/vitesse-vsc73xx-core.c             |   2 +
+ .../ethernet/cavium/liquidio/cn23xx_pf_device.c    |   2 +-
+ .../ethernet/cavium/liquidio/cn23xx_vf_device.c    |   2 +-
+ .../net/ethernet/cavium/liquidio/octeon_mailbox.h  |   5 +-
+ drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h  |   1 +
+ drivers/net/ethernet/intel/i40e/i40e_diag.h        |   1 +
+ drivers/net/ethernet/marvell/octeontx2/af/rpm.c    |   7 +-
+ .../net/ethernet/mellanox/mlxsw/spectrum_acl_erp.c |   8 +-
+ .../ethernet/mellanox/mlxsw/spectrum_acl_tcam.c    |   6 +-
+ .../net/ethernet/mellanox/mlxsw/spectrum_router.c  |  24 +--
+ drivers/net/ethernet/neterion/s2io.c               |   1 +
+ drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c |   2 +-
+ drivers/net/ethernet/renesas/ravb_main.c           |   2 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h       |   1 +
+ .../net/ethernet/stmicro/stmmac/stmmac_ethtool.c   |  20 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |  33 ++-
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c           |   5 +-
+ drivers/net/ethernet/wangxun/Kconfig               |   2 +-
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c        |   1 +
+ drivers/net/netdevsim/netdev.c                     |   9 +-
+ drivers/net/phy/micrel.c                           |   9 +
+ drivers/net/phy/sfp-bus.c                          |   8 +-
+ drivers/net/slip/slhc.c                            |   1 +
+ drivers/net/slip/slip.c                            |   1 +
+ drivers/net/virtio_net.c                           |   9 +-
+ drivers/net/wan/slic_ds26522.c                     |   1 +
+ include/linux/btf.h                                |   2 +-
+ include/linux/netfilter_bridge.h                   |   6 +-
+ include/linux/skbuff.h                             |   2 +-
+ include/linux/virtio_net.h                         |   9 +-
+ include/net/netdev_queues.h                        |   2 +-
+ kernel/bpf/btf.c                                   | 231 ++++++++++++++++++---
+ kernel/bpf/verifier.c                              |   4 +
+ net/bridge/br_netfilter_hooks.c                    |  42 +++-
+ net/bridge/br_netfilter_ipv6.c                     |  14 +-
+ net/core/rtnetlink.c                               |  14 +-
+ net/dsa/user.c                                     |   7 +-
+ net/ethtool/features.c                             |   9 +-
+ net/hsr/hsr_main.c                                 |   1 +
+ net/ipv4/netfilter/nf_reject_ipv4.c                |   9 +-
+ net/ipv4/udp.c                                     |  34 ++-
+ net/ipv6/mcast.c                                   |   4 +
+ net/ipv6/netfilter/nf_reject_ipv6.c                |  11 +-
+ net/ipv6/udp.c                                     |  16 +-
+ net/mptcp/options.c                                |   6 +-
+ net/mptcp/subflow.c                                |  17 +-
+ net/netfilter/ipset/ip_set_hash_netiface.c         |   8 +-
+ net/netfilter/ipvs/ip_vs_xmit.c                    |   4 +-
+ net/netfilter/nf_log_syslog.c                      |  13 +-
+ net/netfilter/nf_queue.c                           |   6 +-
+ net/netfilter/nf_tables_api.c                      |  44 ++--
+ net/netfilter/nfnetlink_log.c                      |   8 +-
+ net/netfilter/nft_limit.c                          |  19 +-
+ net/netfilter/xt_physdev.c                         |   2 +-
+ net/nfc/digital_core.c                             |   1 +
+ net/nfc/nci/core.c                                 |   1 +
+ net/nfc/nci/spi.c                                  |   1 +
+ net/rxrpc/ar-internal.h                            |   1 +
+ net/rxrpc/local_object.c                           |  13 +-
+ net/rxrpc/output.c                                 |   6 +-
+ net/rxrpc/rxkad.c                                  |   2 +
+ net/sched/cls_api.c                                |  12 +-
+ net/sunrpc/auth_gss/auth_gss.c                     |   1 +
+ net/sunrpc/auth_gss/gss_krb5_mech.c                |   1 +
+ net/sunrpc/sunrpc_syms.c                           |   1 +
+ net/tls/tls_sw.c                                   |   6 +-
+ tools/lib/bpf/libbpf.c                             | 142 ++++++++++++-
+ .../selftests/bpf/prog_tests/sock_iter_batch.c     | 135 ++++++++++++
+ .../selftests/bpf/prog_tests/test_global_funcs.c   |  13 ++
+ .../testing/selftests/bpf/progs/bpf_tracing_net.h  |   3 +
+ .../testing/selftests/bpf/progs/sock_iter_batch.c  |  91 ++++++++
+ tools/testing/selftests/bpf/progs/test_jhash.h     |  31 +++
+ .../selftests/bpf/progs/verifier_global_subprogs.c | 164 ++++++++++++++-
+ .../bpf/progs/verifier_value_illegal_alu.c         |  19 ++
+ tools/testing/selftests/drivers/net/bonding/config |   8 +
+ .../drivers/net/bonding/mode-1-recovery-updelay.sh |   2 +-
+ .../drivers/net/bonding/mode-2-recovery-updelay.sh |   2 +-
+ .../testing/selftests/drivers/net/mlxsw/qos_pfc.sh |  19 +-
+ .../drivers/net/mlxsw/spectrum-2/tc_flower.sh      | 106 +++++++++-
+ .../testing/selftests/drivers/net/netdevsim/config |  10 +
+ .../drivers/net/netdevsim/ethtool-common.sh        |   1 +
+ .../selftests/drivers/net/netdevsim/ethtool-fec.sh |  18 +-
+ .../drivers/net/netdevsim/udp_tunnel_nic.sh        |   1 +
+ tools/testing/selftests/net/forwarding/lib.sh      |   0
+ tools/testing/selftests/net/rtnetlink.sh           |  26 +++
+ tools/testing/selftests/net/tcp_ao/Makefile        |   4 +-
+ tools/testing/selftests/net/tls.c                  |  14 ++
+ 90 files changed, 1366 insertions(+), 235 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c
+ create mode 100644 tools/testing/selftests/bpf/progs/sock_iter_batch.c
+ create mode 100644 tools/testing/selftests/drivers/net/netdevsim/config
+ mode change 100755 => 100644 tools/testing/selftests/net/forwarding/lib.sh
 
