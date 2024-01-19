@@ -1,116 +1,93 @@
-Return-Path: <netdev+bounces-64373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64374-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34E0E832B9C
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 15:49:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D634832BF8
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 15:57:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 68A5E1C24924
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 14:49:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E1691F21B1F
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 14:57:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 096824EB5B;
-	Fri, 19 Jan 2024 14:49:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADB77537FC;
+	Fri, 19 Jan 2024 14:56:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CcUDEGoO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="saWR+B9B"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D47A753E24;
-	Fri, 19 Jan 2024 14:49:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 879835465D;
+	Fri, 19 Jan 2024 14:56:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705675771; cv=none; b=oFGsPLzW0UfZs5kvXHYKwXBgfi10TOPACmpF04B53LaHqlF5YIKg52ZGw/GwVFMPG4ODNZeSlrykJ+DmVsheWRyXQD9nQTnpr/Ydc9uKxxpB5/Jyvu06B45ahxndb9N+UOJJL9XyXrvM6M7Ta5PkX2kM3/dw5zM2/byexdS63q0=
+	t=1705676180; cv=none; b=fi9L+XotxtytZq+chlTr0aYHgDJri7VGiIR2IQnXW5ygLOmaNIcFCrjAWc4AbSyjA3VOZHYCK8RFFKRZFUUquktVCMmEEsJvAQsZbbtRvM59S4ociju5PtoPVCsLZDF6ByLJHb0YfABZ+1PDqwMJNXDMM6y0JLgel7dLfQlgrsI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705675771; c=relaxed/simple;
-	bh=hCsjv91Yj4g0mu9TcH2Xv3lssnwsCBwDQBHzNUt9fjU=;
+	s=arc-20240116; t=1705676180; c=relaxed/simple;
+	bh=qHs04bjtpQIRD5zTdGPu5IZXoDqL4hhRu+sEHgltQV0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bjO5kBsdCiVJo8WZ0YDWdMM8+S7NIH8DyDXSAJsB6XPq2aAKhutOQ6zbY6XgnMuC1NPyy3WZscIC4xpG9TqUIxYgSHwLlyTojbXYDJfA7HKy5dmAVJdHeZ6+Tm8rnvPMCbb5i8sxdjkNxP11bd5DYYgVZ7kcyA29DchJT1Q9roY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CcUDEGoO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FC55C433F1;
-	Fri, 19 Jan 2024 14:49:29 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=qKohVH54xS4uWzVznVROXMRVc+qkvlc9KMn+Fiq8C8dmGJVuKTER/2MZiwBMxgWxtcS2DB3VaUcYx9fTantYC5Ze24y6SJO90arZAvvD9CgjETDJCWQiNOo3id1tMjB4nJhwVw7H2sRg6gJvdIIGkDcWyhE05/IN8MkOUxUtF70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=saWR+B9B; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57FC9C433F1;
+	Fri, 19 Jan 2024 14:56:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705675771;
-	bh=hCsjv91Yj4g0mu9TcH2Xv3lssnwsCBwDQBHzNUt9fjU=;
+	s=k20201202; t=1705676180;
+	bh=qHs04bjtpQIRD5zTdGPu5IZXoDqL4hhRu+sEHgltQV0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CcUDEGoOFlcLo+0ZJN8vUz0TsUYBvRn2MSjEw9MRuxGor91adf5VbKu9ojYSgtNO4
-	 kId5csymMPuYgpMxvigwacpP1EHfXn+XdukEQs+mkq0FIXTlFiOO1vs70PVVgY6sBP
-	 GGmRWFZXPvqkdoMGzh2Zq02GXHL+G8ZRV6Zyv39U9YPCxOzr+WKZJTKOcvrkds3kOm
-	 kwIMCj6z2iAaOIoYCCyryl9oS6K8Xbk/UCmSauqVHq1SHavRCY17ETnyjN6xVAB1nB
-	 HPESE3H8wd6ihIoJrc7/u+BqXZSA5mue2NeWPiEE087Z13Oa1ZwvXoRYSi8mLwnekj
-	 +5iwZ2vt9T5Sw==
-Date: Fri, 19 Jan 2024 14:49:26 +0000
+	b=saWR+B9B9L6yDQk5YP+UwF5lhmfamU39f5eLZpY4n/aGzCzJoW/G8P2Fw5jVe5+g0
+	 nap8LyzoALjJzxEj93SZWbo3LY0K+/LAvi6bNICEO8qmOHzARNK+3PXIe8rMRa8Lri
+	 wekHJ1hP1AooS+spxD4UZXQiZdrYkgp/d5MoTvL5otdLzCT2H7DhpSgyfySb+wSNL7
+	 FcZq/a2zhkoZ+dujiddJpkvWUdVF0wTRSOVtpJc15aToPSerSjDpbeUiv99XpPmIsc
+	 AAdH4j/FftzPN30bzPfwuG8VJCsvTWf+S9L8707gM6uiA4dEZR3kH7gMgh91CEHe04
+	 ZCbQSLwkJscqQ==
+Date: Fri, 19 Jan 2024 14:56:14 +0000
 From: Simon Horman <horms@kernel.org>
-To: Suresh Kumar <suresh2514@gmail.com>
+To: Kunwu Chan <chentao@kylinos.cn>
 Cc: jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
 	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] i40e: print correct hw max rss count in kernel ring
- buffer
-Message-ID: <20240119144926.GA89683@kernel.org>
-References: <20240119131652.8050-1-suresh2514@gmail.com>
+	pabeni@redhat.com, jacob.e.keller@intel.com,
+	przemyslaw.kitszel@intel.com, intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Kunwu Chan <kunwu.chan@hotmail.com>
+Subject: Re: [PATCH v3] igb: Fix string truncation warnings in
+ igb_set_fw_version
+Message-ID: <20240119145614.GB89683@kernel.org>
+References: <20240115082825.28343-1-chentao@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240119131652.8050-1-suresh2514@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240115082825.28343-1-chentao@kylinos.cn>
 
-On Fri, Jan 19, 2024 at 06:46:52PM +0530, Suresh Kumar wrote:
-> The value printed for  "HW max RSS count" is wrong in kernel dmesg for i40e
-> NICs:
+On Mon, Jan 15, 2024 at 04:28:25PM +0800, Kunwu Chan wrote:
+> Commit 1978d3ead82c ("intel: fix string truncation warnings")
+> fixes '-Wformat-truncation=' warnings in igb_main.c by using kasprintf.
 > 
->   ... i40e 0000:63:00.0: User requested queue count/HW max RSS count: 48/64
+> drivers/net/ethernet/intel/igb/igb_main.c:3092:53: warning：‘%d’ directive output may be truncated writing between 1 and 5 bytes into a region of size between 1 and 13 [-Wformat-truncation=]
+>  3092 |                                  "%d.%d, 0x%08x, %d.%d.%d",
+>       |                                                     ^~
+> drivers/net/ethernet/intel/igb/igb_main.c:3092:34: note：directive argument in the range [0, 65535]
+>  3092 |                                  "%d.%d, 0x%08x, %d.%d.%d",
+>       |                                  ^~~~~~~~~~~~~~~~~~~~~~~~~
+> drivers/net/ethernet/intel/igb/igb_main.c:3092:34: note：directive argument in the range [0, 65535]
+> drivers/net/ethernet/intel/igb/igb_main.c:3090:25: note：‘snprintf’ output between 23 and 43 bytes into a destination of size 32
 > 
-> whereas  ethtool reports the correct value from "vsi->num_queue_pairs"
+> kasprintf() returns a pointer to dynamically allocated memory
+> which can be NULL upon failure.
 > 
-> Channel parameters for eno33:
-> Pre-set maximums:
-> RX:     n/a
-> TX:     n/a
-> Other:      1
-> Combined:   96
-> Current hardware settings:
-> RX:     n/a
-> TX:     n/a
-> Other:      1
-> Combined:   96  <-------
+> Fix this warning by using a larger space for adapter->fw_version,
+> and then fall back and continue to use snprintf.
 > 
-> and is misleading.
-> 
-> This value is printed from 'pf->rss_size_max' which seems hardcoded.
-> 
-> Below commit also removed this 64 limit:
-> 
-> Commit e56afa599609d3afe8b0ce24b553ab95e9782502
-> Author: Amritha Nambiar <amritha.nambiar@intel.com>
-> Date:   Wed Nov 8 16:38:43 2017 -0800
-> 
->     i40e: Remove limit of 64 max queues per channel
+> Fixes: 1978d3ead82c ("intel: fix string truncation warnings")
+> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+> Cc: Kunwu Chan <kunwu.chan@hotmail.com>
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
 
-Hi Suresh,
-
-I think it would be more normal to cite this commit something like this:
-
-The limit of 64 was removed by
-commit e56afa599609 ("i40e: Remove limit of 64 max queues per channel")
-
-Also, it's not clear to me if this should be considered a fix or not.
-If not, which I lean towards, then it should probably be targeted
-at iwl-next.
-
-	Subject: [PATCH iwl-next] ...
-
-If it is a fix, then it should have a Fixes tag and probably
-be targeted at iwl.
-
-	Subject: [PATCH iwl] ...
-
-...
+Reviewed-by: Simon Horman <horms@kernel.org>
 
