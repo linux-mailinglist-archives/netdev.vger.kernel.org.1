@@ -1,48 +1,78 @@
-Return-Path: <netdev+bounces-64379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE05E832C25
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 16:12:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E872832C23
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 16:12:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A71DA2810E7
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 15:12:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2713B283784
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 15:12:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D2D85466A;
-	Fri, 19 Jan 2024 15:12:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A765954667;
+	Fri, 19 Jan 2024 15:12:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CHSs1XFg"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmty3ljk5ljewns4xndka.icoremail.net (zg8tmty3ljk5ljewns4xndka.icoremail.net [167.99.105.149])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13DEC54667;
-	Fri, 19 Jan 2024 15:12:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.99.105.149
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA22053810
+	for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 15:12:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705677154; cv=none; b=q5Vg/I0PWRVjeVBU9vqvbzaf+/jGSxxtaki5n4mnpdr0gfU5Wr0Xld+Ys66nIDMlvQZagHmvtAYaxrAu+gsjXdiUWTCF3VixJlikBYB9J3dFStBz2lBA6scWeIMxeHmkMAUwxFJP1wqqQ3NCi3HfFK9JfFESr1iv5C0L/gWg7iQ=
+	t=1705677141; cv=none; b=taj6LdMIs8BpgySpyhryWcBqtc2eR6oFjEeOx9MbFPZbjjbuFgpatKWI0dXvBqhPc1z0RLqF1l4n6wu2FFyDp9B6hb3keofDAbUHa0HhUNMv1PikKL9RZXDsqAqlOq+OVnC8LJrALUjPLNDsR7pE4RLVvlJBjAo4AAW1FbQMoQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705677154; c=relaxed/simple;
-	bh=ZpHwMNKONZyX/hLikKcxxkbOYJIh65C3dQXqbsmkVjI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VvEZXRTeChrI1JAuTcNkJe5UmoH6zUN0X9aQq4ZJvkAnQNKyLAo4DsP+6b5g1eIxoUVsyWkjJYntPWs4cRhldNzhGRd0KSIr2frdXbRRpUtdYCiGH538237EVNPDL7PTiNsrGN/7Vw7kOsls4ATyZXwP5Uwr8VyGIhlML0czUcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=167.99.105.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from cmd.. (unknown [183.159.169.110])
-	by mail-app3 (Coremail) with SMTP id cC_KCgAnLjlNkaplpfZOAA--.43165S2;
-	Fri, 19 Jan 2024 23:12:14 +0800 (CST)
-From: Lin Ma <linma@zju.edu.cn>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kvalo@kernel.org
-Cc: Lin Ma <linma@zju.edu.cn>
-Subject: [PATCH wireless v2] nl80211/cfg80211: add nla_policy for S1G band
-Date: Fri, 19 Jan 2024 23:12:01 +0800
-Message-Id: <20240119151201.8670-1-linma@zju.edu.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1705677141; c=relaxed/simple;
+	bh=Wvdp8NwroEUnlOcyXYB6fhifFLEf86W+er2ratf6ib4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QJ9uL54r2baq0pa8o5EHsIETGyLqbYp4tpDtqTzsiYUrM8eEnRtLXwO18XzIDfhZU3BlqKCAHJjOAWBajJVURbr7L0CWhEW0nWBu+lB/yvnQFS6jLn/Djp5W7aZa3kuZv+Bu9osIfg9xxVfpJDv+ZUBDNBv+saZTIZfk3jodrGk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=devoogdt.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CHSs1XFg; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=devoogdt.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-40e76109cdeso9474505e9.0
+        for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 07:12:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705677137; x=1706281937; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=CVdx0XTXF9oMlbE/2BBUk3oy7mn9BIkXq8b5DHwfmHo=;
+        b=CHSs1XFgZy02MUwOsOemKrscOx4cAM1HulvaiKLSTHaOsoy3hdnOywjeP6TNixZc2U
+         HkCRwwOIzQMNJhR71XqYK1VxSBm29DA/iHzG3s/9A4e23zYFmEz2+cKjV+ScaULddQf8
+         L2g0BTBc7lC/fnvN3bNAlmjwRn75EjXyr6LdcTG1KMX4TBVecnAdImEueKjOJoPdAbLf
+         1jOgHsyFSroX0TJmAADXe+26br7na/G2FEMTY7n7c9ifbCzzehH7ZkYfZQXLPxXaks+w
+         Qsgxf7F2+QfhU7UjtHpBkCBV9YMzgcH7d2sWUILvOIvsm59f5wqEN6MLWR9B4otlGZ01
+         IqXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705677137; x=1706281937;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CVdx0XTXF9oMlbE/2BBUk3oy7mn9BIkXq8b5DHwfmHo=;
+        b=fn7Yj6N6hiDZXESEtavd3zjgmTozTgTTSQG7XsFKrNzsXAuiq/oskeKJSMUJRIHi1V
+         EO03geHN9EBuNCoT1dGVNi3wXSfT5bvVP/uBcxQL+FyKLYv91IgcKhrUtPeE9Ys5N9aD
+         n6ovIWsD5Accb9KNaVOviq1D6b8rrCd6a2316hb3XKjAqgK1lnxdqik6D2SniB/HfOPV
+         g8DBA0hf07Kj/N2PwsTxUQjN+hzEj5TZfTMsdpeYtPe76yrWJiG8V3kNYVFrMxVLVozH
+         nVtCoXZQMUFTm1e95jNkq441R5oVkBbLUZ1BBtdFp+P3sTFkaivD4Q66BMc5uerzZITR
+         1Mxg==
+X-Gm-Message-State: AOJu0YwuD6gVFO7aasIs01G7Hy2RkxYJvuWo7gGMo2uAceXPFNlIaNk7
+	npsUZaGVHkYKrDqmU79/bmqBtz4PPmsglCcsXPlai+pRVZQjQQ8XoFYCe4FYGJI=
+X-Google-Smtp-Source: AGHT+IFqswt8rr5eB+w3XbrpuQtmC48OsJhJXl5UedKOoGcTg/X+a1ET2OSVahz8a1Gfuy80ztbQJQ==
+X-Received: by 2002:a05:600c:6743:b0:40e:75d5:c267 with SMTP id ea3-20020a05600c674300b0040e75d5c267mr1720706wmb.180.1705677137282;
+        Fri, 19 Jan 2024 07:12:17 -0800 (PST)
+Received: from thomas-OptiPlex-7090.nmg.localnet (d528f5fc4.static.telenet.be. [82.143.95.196])
+        by smtp.gmail.com with ESMTPSA id i17-20020a05600c355100b0040d5f466deesm29221156wmq.38.2024.01.19.07.12.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Jan 2024 07:12:16 -0800 (PST)
+Sender: Thomas Devoogdt <thomas.devoogdt@gmail.com>
+From: Thomas Devoogdt <thomas@devoogdt.com>
+X-Google-Original-From: Thomas Devoogdt <thomas.devoogdt@barco.com>
+To: netdev@vger.kernel.org
+Cc: Thomas Devoogdt <thomas.devoogdt@barco.com>
+Subject: [PATCH iproute2 v1] tc: {m_gate,q_etf,q_taprio}.c: fix compilation with older glibc versions
+Date: Fri, 19 Jan 2024 16:12:11 +0100
+Message-ID: <20240119151211.3193876-1-thomas.devoogdt@barco.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,64 +80,69 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cC_KCgAnLjlNkaplpfZOAA--.43165S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Cw18tF1xZr4Utw1xCrykZrb_yoW8WFWkpr
-	WkJrWqyr17tw47JFWrCa1xXasrXa1DG34rur4YyFyxZ3Z09w1FqF1Y9a43tr1furs5t34r
-	XF4Dtw15t3ZI9a7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_
-	Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67
-	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
-	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14
-	v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8
-	JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUonmRUU
-	UUU
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
 
-Our detector has identified another case of an incomplete policy.
-Specifically, the commit df78a0c0b67d ("nl80211: S1G band and channel
-definitions") introduced the NL80211_BAND_S1GHZ attribute to
-nl80211_band, but it neglected to update the
-nl80211_match_band_rssi_policy accordingly.
+glibc < 2.14 does not define CLOCK_BOOTTIME
+glibc < 2.21 does not define CLOCK_TAI
 
-Similar commits that add new band types, such as the initial
-commit 1e1b11b6a111 ("nl80211/cfg80211: Specify band specific min RSSI
-thresholds with sched scan"), the commit e548a1c36b11 ("cfg80211: add 6GHz
-in code handling array with NUM_NL80211_BANDS entries"), and the
-commit 63fa04266629 ("nl80211: Add LC placeholder band definition to
-nl80211_band"), all require updates to the policy.
-Failure to do so could result in accessing an attribute of unexpected
-length in the function nl80211_parse_sched_scan_per_band_rssi.
-
-To resolve this issue, this commit adds the policy for the
-NL80211_BAND_S1GHZ attribute.
-
-Fixes: df78a0c0b67d ("nl80211: S1G band and channel definitions")
-Signed-off-by: Lin Ma <linma@zju.edu.cn>
+Signed-off-by: Thomas Devoogdt <thomas.devoogdt@barco.com>
 ---
-V1 -> V2: change net-next to wireless as suggested
+ tc/m_gate.c   | 4 ++++
+ tc/q_etf.c    | 4 ++++
+ tc/q_taprio.c | 4 ++++
+ 3 files changed, 12 insertions(+)
 
- net/wireless/nl80211.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
-index 60877b532993..980300621a60 100644
---- a/net/wireless/nl80211.c
-+++ b/net/wireless/nl80211.c
-@@ -911,6 +911,7 @@ nl80211_match_band_rssi_policy[NUM_NL80211_BANDS] = {
- 	[NL80211_BAND_5GHZ] = { .type = NLA_S32 },
- 	[NL80211_BAND_6GHZ] = { .type = NLA_S32 },
- 	[NL80211_BAND_60GHZ] = { .type = NLA_S32 },
-+	[NL80211_BAND_S1GHZ] = { .type = NLA_S32 },
- 	[NL80211_BAND_LC]    = { .type = NLA_S32 },
+diff --git a/tc/m_gate.c b/tc/m_gate.c
+index c091ae19..1dacd4b3 100644
+--- a/tc/m_gate.c
++++ b/tc/m_gate.c
+@@ -26,8 +26,12 @@ static const struct clockid_table {
+ 	clockid_t clockid;
+ } clockt_map[] = {
+ 	{ "REALTIME", CLOCK_REALTIME },
++#ifdef CLOCK_TAI
+ 	{ "TAI", CLOCK_TAI },
++#endif
++#ifdef CLOCK_BOOTTIME
+ 	{ "BOOTTIME", CLOCK_BOOTTIME },
++#endif
+ 	{ "MONOTONIC", CLOCK_MONOTONIC },
+ 	{ NULL }
  };
- 
+diff --git a/tc/q_etf.c b/tc/q_etf.c
+index 572e2bc8..041d72ce 100644
+--- a/tc/q_etf.c
++++ b/tc/q_etf.c
+@@ -25,8 +25,12 @@ static const struct static_clockid {
+ 	clockid_t clockid;
+ } clockids_sysv[] = {
+ 	{ "REALTIME", CLOCK_REALTIME },
++#ifdef CLOCK_TAI
+ 	{ "TAI", CLOCK_TAI },
++#endif
++#ifdef CLOCK_BOOTTIME
+ 	{ "BOOTTIME", CLOCK_BOOTTIME },
++#endif
+ 	{ "MONOTONIC", CLOCK_MONOTONIC },
+ 	{ NULL }
+ };
+diff --git a/tc/q_taprio.c b/tc/q_taprio.c
+index ef8fc7a0..c82bede1 100644
+--- a/tc/q_taprio.c
++++ b/tc/q_taprio.c
+@@ -35,8 +35,12 @@ static const struct static_clockid {
+ 	clockid_t clockid;
+ } clockids_sysv[] = {
+ 	{ "REALTIME", CLOCK_REALTIME },
++#ifdef CLOCK_TAI
+ 	{ "TAI", CLOCK_TAI },
++#endif
++#ifdef CLOCK_BOOTTIME
+ 	{ "BOOTTIME", CLOCK_BOOTTIME },
++#endif
+ 	{ "MONOTONIC", CLOCK_MONOTONIC },
+ 	{ NULL }
+ };
 -- 
-2.34.1
+2.43.0
 
 
