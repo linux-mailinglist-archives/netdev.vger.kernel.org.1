@@ -1,138 +1,112 @@
-Return-Path: <netdev+bounces-64350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46FD2832A83
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 14:29:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99EE0832A87
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 14:30:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00614282C81
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 13:29:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 50CBB1F22700
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 13:30:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6599A54674;
-	Fri, 19 Jan 2024 13:27:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4971951C5A;
+	Fri, 19 Jan 2024 13:30:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="b9x1nmu/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nul9RvPF"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C1D353E18;
-	Fri, 19 Jan 2024 13:27:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE97542053
+	for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 13:30:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705670832; cv=none; b=GjsK+JkhxYsxaOnZNzkRvE6oA5obahbrvh4ToPgpzsei8HMmROxn33y76qYc/nS+m4LRYAn+9uwGHpVXEh+VmKK9+6WpGPeeCojTQP+X/a80qkROatFVAf0rSP6tXDq/ywshqQTVPNU7UkPUsW88aQnSYS5EgBySanVBvvhIGOQ=
+	t=1705671042; cv=none; b=o3CDSjbOrQpf5tW0YB8ZUgV9vuCVwT/+DQuGH3peUi8BiUZG3JE2ZPMQo6qemYPLEFonc98WTozNve4koS0qRGyUgCUv4WMbfw7x1PoY6K5DM7nOhMnMNFlgKyl1F8DKHw5Rq3mn4DX77gSfxrE8yHZ7sIKaas/EJ5AQE44EAIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705670832; c=relaxed/simple;
-	bh=C9ZWVjgbefXWApSOG+jjr14zfL+3/NQPQVKowbPJEwk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uIk9q9LlDSGEISDMyJFhiXDJJLXXmWrDRTt7QvUVYgVM201ReWXeME4dmqpMxbrLCklHrcRe50/Zl0oO/HlJpP7OHTned+heTpePpiHEaS85Lvd58R4pTb5TnXmUpIuv8oIdXeULNLycXLAU8lW4vkeE8LvBfnpVBV/jHdUv7xw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=b9x1nmu/; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=oAX/SO+ppExiD053wec+IhSfmBvN9fcB5BYMFRjEhXg=; b=b9x1nmu/gvlmcdwUw+GMi3PwqM
-	2whYk+wzShzv/BCcxll9cEDkBSbu5kfw1r4OovmJTsAxlJio1dU8sB2OovPUYPHm/IqZm3X/kbBq/
-	ui8HCERJWRoD+vRoEtyfT00uVupxyxFJPww2dpeZ73kifGXfrWOKM1K99olA2og6x5SM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rQoth-005Yn4-1a; Fri, 19 Jan 2024 14:27:01 +0100
-Date: Fri, 19 Jan 2024 14:27:01 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Andre Werner <andre.werner@systec-electronic.com>
-Cc: hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC net-next v3 1/2] net: phy: phy_device Prevent nullptr
- exceptions on ISR
-Message-ID: <fa47c497-a831-4e11-bbb9-c3901b174d0d@lunn.ch>
-References: <20240119093503.6370-1-andre.werner@systec-electronic.com>
+	s=arc-20240116; t=1705671042; c=relaxed/simple;
+	bh=a0uoUAhE9Q/R8dAQmJXcJaB+JtxtGdoOYTSiiQFFVOc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SEKQHmrZGUOdrqTz2I25A/BBxhqxYHko56sl1fJS9sbRVDTJf6LgWC9SqMsGb3SWowW5BnFKi+Y35FsOnmflpw1DHVT+jcb40G24J/2o02rNNhz7IL5fUGNPk+bd2PvSDWIcE/5KAm4QB75pvHNWoZC1mMiygZQSkzr6JOb+RDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nul9RvPF; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-553e36acfbaso11661a12.0
+        for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 05:30:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1705671039; x=1706275839; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qlPKgk/fnxfuP9Q07OQUqP/M5AyA82LzstwsivBtf6g=;
+        b=nul9RvPFHF6EuLsGBAqKplKksdXbVLfav5JoH8sEWiZT14HzEbgUXSPIF02ghOfN+6
+         hi2qt/6dz6HZdJ4SVCJFOQDHFIEcoVWQkl+QI5TGAXtxzsDOOiIVuyDr37t5G6sOil/Y
+         HjcVrDnZ6kvm2N6C6V5s5Uh1uEtOKZCiZNmmv7MqkmQ54Q9NmC8cmWVemjnp+13H4nGI
+         WSkSc7keVQhdF89Judunh89nqMD75no/4ZyLwCjcRf2PxmA5GDxI9pC9s9rzqmJVY16Z
+         bQgcwwZPqW6YzTTgtnHYgZUiRR/xxqD199w3vWqcZycrX0mfdVaQQb2qeno3aVC6rFqG
+         qLIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705671039; x=1706275839;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qlPKgk/fnxfuP9Q07OQUqP/M5AyA82LzstwsivBtf6g=;
+        b=tHykEqNUZgj78ifkVKxjTUiU33BDwKgh6FiYHXgkiZu+feLBs2TH91HJOvVSGHTWux
+         IgFlBjD/m/ePGAeZdSxCc0R4HMIMQ3b8o62TOPh0dz3lE6RP/ptnpIgxll0RiOV35Jd9
+         +15+W7RzHNVyQLkUukTMHI9ZHt+M/mmMvS51znyTiTXMTxH0QxYDWFmFlVc1Kw86kpqV
+         q9r0bTwDmTL6Kffq6Qmpl/FN/W6TzeFtLzE0qyc9ocqFKQbOBgfIbJXTLV1vAFfaK19a
+         O9eWWqlFJmx1bMlZiDi1fBVTVMKBjVSWGlC9L8cpIb46EjLR08uAbjxcVRtopxZ5jrLk
+         mxDw==
+X-Gm-Message-State: AOJu0YyrB8h3KNea0e6GKIHvGJDnLkZQU8/VoInny4EZcqA2TbxJ26DQ
+	wHlJuP9jIsnhACRDjpQmk0NkrVQU8Vz3pU/ugD+iGbGqVthLL6+19Pd4FptfSM9wXrDR3RQ03XF
+	Ax3ptc/t2SvBxvuvSBD3itX7+754I+Wkn0Sup
+X-Google-Smtp-Source: AGHT+IEy618Y3/rnv27J0YKl6nteuEuaj1gr3/MtT4QpOm/YZFwymuXAqIXVg2+w9piaKntBDi5Xxra7C0Nh9D15xJE=
+X-Received: by 2002:a05:6402:3127:b0:55a:465a:45a5 with SMTP id
+ dd7-20020a056402312700b0055a465a45a5mr174471edb.4.1705671038644; Fri, 19 Jan
+ 2024 05:30:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240119093503.6370-1-andre.werner@systec-electronic.com>
+References: <20240119015515.61898-1-kuniyu@amazon.com>
+In-Reply-To: <20240119015515.61898-1-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 19 Jan 2024 14:30:27 +0100
+Message-ID: <CANn89i+uUWt6qMCW_x5u=Khgo=G64WMT0eSYMhGBn=90=ztW_Q@mail.gmail.com>
+Subject: Re: [PATCH v2 net] llc: Drop support for ETH_P_TR_802_2.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Paul Gortmaker <paul.gortmaker@windriver.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	syzbot+b5ad66046b913bc04c6f@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 19, 2024 at 10:32:25AM +0100, Andre Werner wrote:
-> If phydev->irq is set unconditionally by MAC drivers, check
-> for valid interrupt handler or fall back to polling mode to prevent
-> nullptr exceptions.
+On Fri, Jan 19, 2024 at 2:55=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
+m> wrote:
+>
+> syzbot reported an uninit-value bug below. [0]
+>
+> llc supports ETH_P_802_2 (0x0004) and used to support ETH_P_TR_802_2
+> (0x0011), and syzbot abused the latter to trigger the bug.
+>
+>   write$tun(r0, &(0x7f0000000040)=3D{@val=3D{0x0, 0x11}, @val, @mpls=3D{[=
+], @llc=3D{@snap=3D{0xaa, 0x1, ')', "90e5dd"}}}}, 0x16)
+>
+> llc_conn_handler() initialises local variables {saddr,daddr}.mac
+> based on skb in llc_pdu_decode_sa()/llc_pdu_decode_da() and passes
+> them to __llc_lookup().
+>
+> However, the initialisation is done only when skb->protocol is
+> htons(ETH_P_802_2), otherwise, __llc_lookup_established() and
+> __llc_lookup_listener() will read garbage.
+>
+> The missing initialisation existed prior to commit 211ed865108e
+> ("net: delete all instances of special processing for token ring").
 
-Hi Andre
+SGTM, thanks.
 
-A few more process things...
-
-Please don't post a new version within 24 hours. Reviews need time to
-review, and you could miss comments made on older versions of the
-patches.
-
-For a multi part patch set, its normal to include a clover
-letter. When using git format-patch add --cover-letter and than edit
-patch 0000-*.patch to describe the big picture of what the patchset
-does. The text will be used for the merge commit message.
- 
-> Signed-off-by: Andre Werner <andre.werner@systec-electronic.com>
-> ---
-> v3:
-> - No changes to v2. Just to complete the series.
-> ---
->  drivers/net/phy/phy_device.c | 22 +++++++++++++++++-----
->  1 file changed, 17 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-> index 3611ea64875e..3986e103d25e 100644
-> --- a/drivers/net/phy/phy_device.c
-> +++ b/drivers/net/phy/phy_device.c
-> @@ -1413,6 +1413,11 @@ int phy_sfp_probe(struct phy_device *phydev,
->  }
->  EXPORT_SYMBOL(phy_sfp_probe);
->  
-> +static bool phy_drv_supports_irq(struct phy_driver *phydrv)
-> +{
-> +	return phydrv->config_intr && phydrv->handle_interrupt;
-> +}
-> +
->  /**
->   * phy_attach_direct - attach a network device to a given PHY device pointer
->   * @dev: network device to attach
-> @@ -1527,6 +1532,18 @@ int phy_attach_direct(struct net_device *dev, struct phy_device *phydev,
->  	if (phydev->dev_flags & PHY_F_NO_IRQ)
->  		phydev->irq = PHY_POLL;
->  
-> +	/*
-> +	 * Some drivers may add IRQ numbers unconditionally to a phy device that does
-> +	 * not implement an interrupt handler after phy_probe is already done.
-> +	 * Reset to PHY_POLL to prevent nullptr exceptions in that case.
-> +	 */
-> +	if (!phy_drv_supports_irq(phydev->drv) && phy_interrupt_is_valid(phydev)) {
-> +		phydev_warn(phydev,
-> +			    "No handler for IRQ=%d available. Falling back to polling mode\n",
-> +			    phydev->irq);
-> +		phydev->irq = PHY_POLL;
-> +	}
-
-Please drop the phydev_warn(). Interrupt handling has always been
-optional, and we have always silently dropped back to polling if
-interrupts are not supported.
-
-The comment wording is also not great. The MAC driver is not supposed
-to have any idea what the PHY driver is. It just uses the phylib API,
-which is PHY driver independent. So the MAC driver cannot tell if the
-PHY driver supports interrupts or not.
-
-I don't think a comment is needed. The code is pretty readable as is.
-
-    Andrew
-
----
-pw-bot: cr
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
