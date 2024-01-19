@@ -1,73 +1,86 @@
-Return-Path: <netdev+bounces-64344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3FFC832995
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 13:37:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1D7A8329FB
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 14:03:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 562ED1F233DD
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 12:37:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7F181F23B0B
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 13:03:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD19B4EB5B;
-	Fri, 19 Jan 2024 12:37:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03AE652F79;
+	Fri, 19 Jan 2024 13:02:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from mail115-80.sinamail.sina.com.cn (mail115-80.sinamail.sina.com.cn [218.30.115.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 563C31D687;
-	Fri, 19 Jan 2024 12:37:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00E604F21F
+	for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 13:01:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=218.30.115.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705667842; cv=none; b=aoHFXYqM3fi5nIjypYsMQxRjdV439BkIGWfBKEOsZNrQM03SXXo6QuqOQnLswbV9chk5ZRG+1n8bV/AxMW8RI0qdkDS08DM2B+uxCb1QkrPOYvNqRtN0J04VOMBUMQ0XwdPyCpfxmafarYkjD6vy5Q7yLeRFN3QrXk8gst9309U=
+	t=1705669324; cv=none; b=ivH/4C+3lBcstcQFLnQsR9CdYx0AR6p6733XaD1YiRA1L6/+X0SO+AjkUA0EckPuSEFnDpc51Y5rqKqFjAkBxiNLkT77RarzJRPE05/AuPepscsN5qlLZBoiTKI3BfHKmKlNawP9H/phM/AnJ3qCqSfDKt1EpSMDxzSRygp62ZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705667842; c=relaxed/simple;
-	bh=ZwpSq93rbnovsdIDb5kZ0WFR8+aUX/dq0TsAxC9N25s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ag2Zw1iZ3sps2L+VHjf2mSVX3M51zD+Tb7zepiHI+nBTmKapFOS9+yjx5xMlSsrf/h53Vu7FD1wbu2qmfh377+9M4AXmlfw42tMybll9JOS2oTbRcor+BmhCJs3RQG8vJns1G6sfWVbpr3LqB8e04kCcYJaWtjpC7DUoW58DWRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1rQo7N-0007zr-9w; Fri, 19 Jan 2024 13:37:05 +0100
-Date: Fri, 19 Jan 2024 13:37:05 +0100
-From: Florian Westphal <fw@strlen.de>
-To: wangkeqi <wangkeqi_chris@163.com>
-Cc: Florian Westphal <fw@strlen.de>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	wangkeqi <wangkeqiwang@didiglobal.com>,
-	kernel test robot <oliver.sang@intel.com>, fengwei.yin@intel.com
-Subject: Re: Re: [PATCH net v2] connector: Change the judgment conditions for
- clearing proc_event_num_listeners
-Message-ID: <20240119123705.GB9015@breakpoint.cc>
-References: <20240116015753.209781-1-wangkeqi_chris@163.com>
- <20240117114713.GA11468@breakpoint.cc>
- <1adb8c68.a950.18d1d237182.Coremail.wangkeqi_chris@163.com>
+	s=arc-20240116; t=1705669324; c=relaxed/simple;
+	bh=eLBftNGSL1xLJR9++0mXZCIaxv96znkbq/QBETDJa9A=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=CC/4NMsJ34rUdti7+YoBMKHf3Dfp1ggPWkvfRVm6g9ye8qoHLzYSZn+v1iQ/74W5B9AXXy/ekPJn1Uhe72wGeaEYQ/fHQdiBXsRmDVrXRhCnXQScIxvPZBU6zZTVPwXF6znXlMdhfgRSzAKoVeYfGkLtj3jjuGko7deeoJXjRA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=218.30.115.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([116.24.10.220])
+	by sina.com (10.75.12.45) with ESMTP
+	id 65AA72BF00009B9F; Fri, 19 Jan 2024 21:01:55 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 11669731457895
+X-SMAIL-UIID: 95AE969CDE7F4D8481837C86F40B5358-20240119-210155-1
+From: Hillf Danton <hdanton@sina.com>
+To: Ubisectech Sirius <bugreport@ubisectech.com>
+Cc: Eric Dumazet <edumazet@google.com>,
+	Shigeru Yoshida <syoshida@redhat.com>,
+	Suman Ghosh <sumang@marvell.com>,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: BUG: unable to handle kernel paging request in __skb_flow_dissect
+Date: Fri, 19 Jan 2024 21:01:41 +0800
+Message-Id: <20240119130141.2160-1-hdanton@sina.com>
+In-Reply-To: <2c5794fb-c7cd-405a-8c63-f1820b8dbfaa.bugreport@ubisectech.com>
+References: <2c5794fb-c7cd-405a-8c63-f1820b8dbfaa.bugreport@ubisectech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <1adb8c68.a950.18d1d237182.Coremail.wangkeqi_chris@163.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 
-wangkeqi <wangkeqi_chris@163.com> wrote:
-> 
-> If cn_netlink_has_listeners() is used instead of proc_event_num_listeners, I think proc_event_num_listeners will be completely meaningless. 
-> I read the code and found that there is nothing wrong with cn_netlink_has_listeners as a judgment of whether to send msg. 
-> sock_close will update the listeners. The previous proc_event_num_listeners count was wrong, making it meaningless. 
-> But if I change it to cn_netlink_has_listeners, will it affect some low-probability scenarios?
+On Wed, 17 Jan 2024 15:32:28 +0800 Ubisectech Sirius <bugreport@ubisectech.com>
+> Hello.
+> We are Ubisectech Sirius Team, the vulnerability lab of China ValiantSec.
+> Recently, our team has discovered a issue in Linux kernel 6.7.0-g052d534373b7.
+> Attached to the email were a POC file of the issue.
+> Stack dump:
+> [ 185.664167][ T8332] BUG: unable to handle page fault for address: ffffed1029c40001
+> [ 185.665134][ T8332] #PF: supervisor read access in kernel mode
+> [ 185.665877][ T8332] #PF: error_code(0x0000) - not-present page
+> [ 185.666481][ T8332] PGD 7ffd0067 P4D 7ffd0067 PUD 3fff5067 PMD 0
+> [ 185.667129][ T8332] Oops: 0000 [#1] PREEMPT SMP KASAN
+> [ 185.667719][ T8332] CPU: 1 PID: 8332 Comm: poc Not tainted 6.7.0-g052d534373b7 #19
+> [ 185.668641][ T8332] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+> [ 185.669639][ T8332] RIP: 0010:__skb_flow_dissect (net/core/flow_dissector.c:1170 (discriminator 1))
 
-Please avoid top-posting on netdev mailing list.
+Looks like the syzbot report [1] on 01 Jan 2024, and decoding the test
+result of a debug patch [2] is welcome.
 
-Yes, thats what I meant, replace proc_event_num_listeners.
+Hillf
 
-I do not know what a 'low-probability scenarios' is.
+[1] https://lore.kernel.org/lkml/000000000000498a02060de59162@google.com/
+[2] https://lore.kernel.org/lkml/00000000000078d073060f4b51e7@google.com/
 
