@@ -1,142 +1,119 @@
-Return-Path: <netdev+bounces-64348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1215832A31
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 14:17:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D13B5832A45
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 14:23:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F9F61C22A91
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 13:17:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FF221C222D6
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 13:23:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E35551C35;
-	Fri, 19 Jan 2024 13:17:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93CEB51C4E;
+	Fri, 19 Jan 2024 13:23:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZrMcIBaj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="04KW5BjY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E9AD4CE13;
-	Fri, 19 Jan 2024 13:17:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D03C7524A8
+	for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 13:23:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705670233; cv=none; b=UihKuHiMs/MhGKX11OgaArIIpMj1UqPHn6mJwINU1Ii93pj+DRy/gbb9NnjyhcplyjBYL9vWbCJ8OSyjbbk1QINrCWSmf4+0JK8yWhswLlx66XUYb6tLeKowC/1NvdDg6YxyTXgwQWeHmlxaL5xcS1HBdo6oMX10QUNEO9wy9ZI=
+	t=1705670628; cv=none; b=IopqfVOoBBELO9/6AbEFBlffgckbJBZ6ZitlBz7eSVbQgqUyLSFov1aEfuC3L55Hw1HSwx5xTpOczjaJJ+6/BtuZzvVtndB03Trc9X8XqBsuCkwY1uHRPJG7tdRdMEW2uyOJNaMtWqu6En1L1CEUPX9ekn/D2CSoOyOCKU4kGPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705670233; c=relaxed/simple;
-	bh=4A8KGDG1QCCiYzpepfJ6zgGdEq66v8Pn9EM71Wi8SWA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qzlQpF2/FQJbkpe7j8PeFGlJ+DcqE7rii0c1pAo4yqEszOMSfVujgN7YAGmHSbioyJ1HxJVf8S6qpVFARdzgeaH4aB0By3yAo4yG73w3/wJajPnGYNUB6Up2/XQEmyWdFWjs3LOaxtREC8n6xtfpXxBk0vLXlO2eADuchwcdcv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZrMcIBaj; arc=none smtp.client-ip=209.85.166.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-7bf0f3bf331so28830039f.3;
-        Fri, 19 Jan 2024 05:17:11 -0800 (PST)
+	s=arc-20240116; t=1705670628; c=relaxed/simple;
+	bh=/6q7WmZN2QZiEFi7yw5AvxWnDQlQYQMX0HRzwUcZ0pU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TS/FCb2+sULbO5bc8dJqEG+RzUkWz2zBrbD82n8TuP9/pH8W8fymLKwZvYr8DaUvaLGgOJp1/8AV6KYrIdlhhismN6PsOIyxfaf9aCUH3DLxm7O0VFpGQyMzjnqLoG/2x1Oi1kqhPDxp/Bv/fox3FrGf03SPWoCmFnn4lIvOLgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=04KW5BjY; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-55818b7053eso12884a12.0
+        for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 05:23:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705670231; x=1706275031; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+R0RsDZSnfmoC203MVbI0UM8DaIKySut/O5wSq6tGBI=;
-        b=ZrMcIBaj8Y3nh9GA6qq92Em1ILBgnqRbRjCWjBuhw5nRJcGe9KSu290j4BrHQ7cER4
-         WblS9Ks5NJTLInRSLwOFoCi2yhTIKyKMs5AH16hmZnOtR7wKeNAA1K8EXgl46Ok5kx2/
-         yJ3M2DPx9SWKGuN5sz12FYIYMriOGwmaorrHt2nXD/IwPVpThKf7d56G/BnMHhtCA+Df
-         /Kh9x7TB3GrNla0yxtGZAJhv5F7Vxe5xZ49EkIitEP7TIwOBu06uEmRvvOSXaFqP3toI
-         P1pFEhkEwZtOumYR3AElxwkAu4JLDzHfrWNwpb3Yf5zGu76sg5bc8pd9hB3vSSLD2cUt
-         8TgA==
+        d=google.com; s=20230601; t=1705670625; x=1706275425; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j7wD20faGLko54A1TjsrLYIf5/QZlvwKZTeu3M7534k=;
+        b=04KW5BjYPFlcjfSt0QcgwacS3j8Y2yyn4sTfy79wATNocs1vcpzTKVfGdX4su22H2D
+         LFj8qjNHuWsoJRblK0joYYJbYCruJPZwht5zRnzaAEuXh18skPj9jLT/yd7skRG+yrtU
+         AaU+7hgx4Hd2rNfFTN5PKPNi4Riz1m2iAJZLgHqGNQDEOi4XzOwExgTIsknE58JLGfWT
+         dUNZtr6LCkV5XYSwiBxO1z7WK0qUuMP3NrHG+RlrNveOs3OqmPx/vHwn75Z6RBoY1xal
+         B9ogqbCt0pX95SMzh4WkibTP0YpvNtltThM48ZaoGF64S9/zVqYJgm8WJ0CcFzj7lyw7
+         8ghw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705670231; x=1706275031;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+R0RsDZSnfmoC203MVbI0UM8DaIKySut/O5wSq6tGBI=;
-        b=hcFiaojKIwujVw3XWOxHxQqpoby3QFYO0Nj3zRCZxf4fbpV2r6ymi+rmHFnNK30SoG
-         SvFO+VK8vupWePW982WQy1pvzN9BvWFIYvpfwlV8J91U/KPSZ6LqLpKLzZI1GgFnLuSN
-         g3J4CrZoi24e5oBe9ncTAvZOcYJdBcqC227UvfXz+9RSRdaK/DUHL1mJwfvBdqpFMGZh
-         T9N6HJ43jmVSL1hoFd6wCqOi3XNq5SgvAlA+M7iCtDuwiWnje6IjS7OUumQjGJR6LfIt
-         UXITq0RmjXa95KbhjBZzRpfxrhfrI7Wp0In5hPiq+1JFU8Qc/YCUPNJDanP0GodEruNp
-         3v2g==
-X-Gm-Message-State: AOJu0YxMDpTomVceao01uxFeNrs4hlQU1eBih8WUBe5Vnll4qwdCW2xl
-	5w1mG57nAQQaWxFHyz+EcIauR4jx+TdDE6KiE1LDUGxuI8mkdX81
-X-Google-Smtp-Source: AGHT+IF9ROGv7kTV+3XlHqLllyaOPt9wKeBA7Z45AQ19n+eX6sTpxEc1tatK5J2JpmjjbdkTXidQLA==
-X-Received: by 2002:a92:da51:0:b0:361:ae73:2c0 with SMTP id p17-20020a92da51000000b00361ae7302c0mr335091ilq.21.1705670231055;
-        Fri, 19 Jan 2024 05:17:11 -0800 (PST)
-Received: from fedora.. ([2402:e280:3e0d:606:d0c9:2a06:9cc6:18a3])
-        by smtp.gmail.com with ESMTPSA id 77-20020a630150000000b005cd8bf50c13sm3373442pgb.58.2024.01.19.05.17.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Jan 2024 05:17:10 -0800 (PST)
-From: Suresh Kumar <suresh2514@gmail.com>
-To: jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Suresh Kumar <suresh2514@gmail.com>
-Subject: [PATCH] i40e: print correct hw max rss count in kernel ring buffer
-Date: Fri, 19 Jan 2024 18:46:52 +0530
-Message-ID: <20240119131652.8050-1-suresh2514@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1705670625; x=1706275425;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=j7wD20faGLko54A1TjsrLYIf5/QZlvwKZTeu3M7534k=;
+        b=RwfcaflJqESyeYU+OvKQbSiE2ToRGYxYenQhrOTwiRJHHoga8eDsDj0HmfGbCUB5XC
+         isHWiGXUusUdP8N2CmPaz3k6gbcUb7D6kHCvRuESV4101PP6zFDF+b9V5+pt3co8qayF
+         kdpDTAFMs8Z+07S8FjDV60BhiukR2gkwz71gNd0RNWfEqQUuFIafxoeOZuSDOPjYlnx3
+         6EeUWZtlMD+YKngiTW1fmPsZCrmsTD0bJ5Brg1a9ZcgcYCO7MF4gEk5NScnybekBrTkp
+         pjbPWllsfKH+al0G/nvf+pMidEhysiIAA3bscJWndwvmphwS33DWdf5sbbhP3O1qW/ni
+         +9gw==
+X-Gm-Message-State: AOJu0YysiNIB5CBz94lKOrNGm+qeahye73Wh0aAymClIKz3crsTR+roz
+	wRA5hylYXwfE+g+vf/Yh+Ptt3WYUJtc4jDleAx1kWS/nCU054B4S4XHFfeiyjzGFK24yPmKxlAJ
+	6p/1+sNNk6h+ZGqzpT32IEH6EAFxIE305a4ZB
+X-Google-Smtp-Source: AGHT+IFPnpRV5CQ9+rlkKneQtcvkMvcqQluFqZiTLra/feVpzQdLNyACkkqPvTGWjhvU/7tGhxEeR+ZNfGP0SWEapHk=
+X-Received: by 2002:a05:6402:3134:b0:55a:5fe0:87e4 with SMTP id
+ dd20-20020a056402313400b0055a5fe087e4mr95152edb.0.1705670624833; Fri, 19 Jan
+ 2024 05:23:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240119005859.3274782-1-kuba@kernel.org>
+In-Reply-To: <20240119005859.3274782-1-kuba@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 19 Jan 2024 14:23:32 +0100
+Message-ID: <CANn89iL2Cfy6yfY5xF-n+4OEyzCVGm__nH_xo3t0jy8zL8KW+g@mail.gmail.com>
+Subject: Re: [PATCH net] net: fix removing a namespace with conflicting altnames
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
+	=?UTF-8?B?0JzQsNGA0Log0JrQvtGA0LXQvdCx0LXRgNCz?= <socketpair@gmail.com>, 
+	daniel@iogearbox.net, jiri@resnulli.us, lucien.xin@gmail.com, 
+	johannes.berg@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The value printed for  "HW max RSS count" is wrong in kernel dmesg for i40e
-NICs:
+On Fri, Jan 19, 2024 at 1:59=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> Mark reports a BUG() when a net namespace is removed.
+>
+>     kernel BUG at net/core/dev.c:11520!
+>
+> Physical interfaces moved outside of init_net get "refunded"
+> to init_net when that namespace disappears. The main interface
+> name may get overwritten in the process if it would have
+> conflicted. We need to also discard all conflicting altnames.
+> Recent fixes addressed ensuring that altnames get moved
+> with the main interface, which surfaced this problem.
+>
+> Reported-by: =D0=9C=D0=B0=D1=80=D0=BA =D0=9A=D0=BE=D1=80=D0=B5=D0=BD=D0=
+=B1=D0=B5=D1=80=D0=B3 <socketpair@gmail.com>
+> Link: https://lore.kernel.org/all/CAEmTpZFZ4Sv3KwqFOY2WKDHeZYdi0O7N5H1nTv=
+cGp=3DSAEavtDg@mail.gmail.com/
+> Fixes: 7663d522099e ("net: check for altname conflicts when changing netd=
+ev's netns")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: daniel@iogearbox.net
+> CC: jiri@resnulli.us
+> CC: lucien.xin@gmail.com
+> CC: johannes.berg@intel.com
+>
+> I'll follow up with a conversion to RCU freeing in -next.
 
-  ... i40e 0000:63:00.0: User requested queue count/HW max RSS count: 48/64
+Okay then...
 
-whereas  ethtool reports the correct value from "vsi->num_queue_pairs"
-
-Channel parameters for eno33:
-Pre-set maximums:
-RX:     n/a
-TX:     n/a
-Other:      1
-Combined:   96
-Current hardware settings:
-RX:     n/a
-TX:     n/a
-Other:      1
-Combined:   96  <-------
-
-and is misleading.
-
-This value is printed from 'pf->rss_size_max' which seems hardcoded.
-
-Below commit also removed this 64 limit:
-
-Commit e56afa599609d3afe8b0ce24b553ab95e9782502
-Author: Amritha Nambiar <amritha.nambiar@intel.com>
-Date:   Wed Nov 8 16:38:43 2017 -0800
-
-    i40e: Remove limit of 64 max queues per channel
-
-Signed-off-by: Suresh Kumar <suresh2514@gmail.com>
----
- drivers/net/ethernet/intel/i40e/i40e_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index d5519af34657..f5c1ec190f7e 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -12524,7 +12524,7 @@ int i40e_reconfig_rss_queues(struct i40e_pf *pf, int queue_count)
- 		i40e_pf_config_rss(pf);
- 	}
- 	dev_info(&pf->pdev->dev, "User requested queue count/HW max RSS count:  %d/%d\n",
--		 vsi->req_queue_pairs, pf->rss_size_max);
-+		 vsi->req_queue_pairs, vsi->num_queue_pairs);
- 	return pf->alloc_rss_size;
- }
- 
--- 
-2.43.0
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
