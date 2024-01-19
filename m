@@ -1,62 +1,59 @@
-Return-Path: <netdev+bounces-64410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64411-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77B59832F89
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 20:56:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2390832F8D
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 21:02:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 61E2CB22C71
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 19:56:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 81BC31F22EAB
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 20:02:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E883A55E7F;
-	Fri, 19 Jan 2024 19:56:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DA645646B;
+	Fri, 19 Jan 2024 20:01:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bjWx3A+T"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oG7l7u+v"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC1FB1E4A8
-	for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 19:56:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 752C852F62;
+	Fri, 19 Jan 2024 20:01:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705694186; cv=none; b=Kpp8DrPlgKjfnFI9vNDYQaN/RnvWDVvYFtuiruthZyLN4CvBpWa3zW2voBf9LASYVNHJtNoXDAkEphkLJGdCNsyK8Vmc2ttVqWUBg7lam1aZgvUDVEFhBiDDs2FTcE9qnjxuB+pfm5Ej/fkvbq8ICdEvLC9b2hlN8zjZH3ZKU4k=
+	t=1705694514; cv=none; b=J4nwl2qKNvq0JJSri2PfzEyoaujc2OHUP1AYyB9uV0lJdYCYco+qym3obgiHJunsSiapCP+bzTgI4iL/ElKeVrmDeDUW0I++zJmtf1XSCK5k9JqLx0YE0/g4MTpWH+o2c3LpLkjQa8yy9SmcwBCUAiI+f1EoHMPpxG494tfoTzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705694186; c=relaxed/simple;
-	bh=U0KGAPpcSLCR22uoEUE8ds/f8zbq4fWrKFWrJdOezQI=;
+	s=arc-20240116; t=1705694514; c=relaxed/simple;
+	bh=bZIjiq8CM3ELLDTwYTsAgCyXwGVxdbQzN3y6mzM9EjY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z0Vt9pG175VRpFYAk+pxM5ztmDfSXtFl8pc0Z3Kh3yevOReAzONTFi7/cp+9LQT3NDJ0SHTqYX1VTNQ/Xuotm1xT+2RxrBVfQeItM1TDgEeYnTlriRypbFxtYLMiBCGl6ymF2RbfrvJjE569/X/zmd+OGIsAHxdqstEZDozhoF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=bjWx3A+T; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=kt5RmijoJAHRRsVsPN38OT3BmY6xifAuT08bZuPFhYc=; b=bjWx3A+TN+RUsJEFNUEg1CrGTY
-	NosN8FdBclWZM40wzBb3GMWY3WtVRQvlr16BMRtFxjgvEfYVAKZ5edjMQzxxu2FeT7N00DRLFOUaY
-	cmD0vAwtQLuK073uM05InEOx2X1gQotYW6Os5qvHwvHEK58DpZy5KAVOVwMtJDEL0NRU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rQuyR-005aEF-1V; Fri, 19 Jan 2024 20:56:19 +0100
-Date: Fri, 19 Jan 2024 20:56:19 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Asmaa Mnebhi <asmaa@nvidia.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	David Thompson <davthompson@nvidia.com>
-Subject: Re: [PATCH v1 1/1] net: phy: micrel: Add workaround for incomplete
- autonegotiation
-Message-ID: <0b033860-16d4-405c-b197-b3fd068ef262@lunn.ch>
-References: <20231226141903.12040-1-asmaa@nvidia.com>
- <ZZRZvRKz6X61eUaH@shell.armlinux.org.uk>
- <99a49ad0-911b-4320-9222-198a12a1280e@lunn.ch>
- <PH7PR12MB7282DEEE85BE8A6F9E558339D7702@PH7PR12MB7282.namprd12.prod.outlook.com>
- <a6487dbc-8f86-447a-ba12-21652f3313e8@lunn.ch>
+	 Content-Type:Content-Disposition:In-Reply-To; b=PMq5xiKjDlFI5D3p/yPM/NmfuJkpcx+0/ljzsqlzoE33/Bcee9JJTfxwY+Sskc8DRUFLE/cKCVg4m9X06kAsNiBdUxzshAm5zgBV+MGSu5rNbz/VDEdPh9tyIB4F+jjb3Jl2rYtBEtXptiiCyXHL9/JE31eKSHXo57gwf+xPOjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oG7l7u+v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14332C433F1;
+	Fri, 19 Jan 2024 20:01:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705694513;
+	bh=bZIjiq8CM3ELLDTwYTsAgCyXwGVxdbQzN3y6mzM9EjY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=oG7l7u+vJdCE64PPER+4pcoT38wO9NLt4a9yjrKFjWb1LLHyY5f/l93veqNunx2xV
+	 m0kBO80H7jQziXnf2g/6gkivAsK11pcGHh7xv306QVprHc4QIeR1nFjNRCkAyVriIZ
+	 0kNve1Bs5Yf8XGL7vCzqAQwJcZpRWz1tA5DKDgtBhGOUzHlGi/c/080iILTRlac3ai
+	 veh8AdqnbdjTQpQHIXNvR5SAO+pl0uU5QwEVLUilltvEJg16YBXQ+SifxD4EmPZaga
+	 9zXgd++yDn8XD24i1DMiRiAWSuGz59OwkymwDc8CGvfy52jF8gVuaWmG7qcxzwVLvR
+	 tIDkNsJGuWh5A==
+Date: Fri, 19 Jan 2024 20:01:48 +0000
+From: Simon Horman <horms@kernel.org>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, richardcochran@gmail.com,
+	Divya.Koppera@microchip.com, maxime.chevallier@bootlin.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net v2 1/2] net: micrel: Fix PTP frame parsing for lan8814
+Message-ID: <20240119200148.GB105385@kernel.org>
+References: <20240118085916.1204354-1-horatiu.vultur@microchip.com>
+ <20240118085916.1204354-2-horatiu.vultur@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,15 +62,60 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a6487dbc-8f86-447a-ba12-21652f3313e8@lunn.ch>
+In-Reply-To: <20240118085916.1204354-2-horatiu.vultur@microchip.com>
 
-> What is the value of BMSR when it fails to report complete? You say
-> you are using interrupts, so i just want to make sure its not an
-> interrupt problem, you are using edge interrupts instead of level,
-> etc.
+On Thu, Jan 18, 2024 at 09:59:15AM +0100, Horatiu Vultur wrote:
+> The HW has the capability to check each frame if it is a PTP frame,
+> which domain it is, which ptp frame type it is, different ip address in
+> the frame. And if one of these checks fail then the frame is not
+> timestamp. Most of these checks were disabled except checking the field
+> minorVersionPTP inside the PTP header. Meaning that once a partner sends
+> a frame compliant to 8021AS which has minorVersionPTP set to 1, then the
+> frame was not timestamp because the HW expected by default a value of 0
+> in minorVersionPTP. This is exactly the same issue as on lan8841.
+> Fix this issue by removing this check so the userspace can decide on this.
+> 
+> Fixes: ece19502834d ("net: phy: micrel: 1588 support for LAN8814 phy")
+> Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> Reviewed-by: Divya Koppera <divya.koppera@microchip.com>
+> ---
+>  drivers/net/phy/micrel.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+> index bf4053431dcb3..43520ac0f4e00 100644
+> --- a/drivers/net/phy/micrel.c
+> +++ b/drivers/net/phy/micrel.c
+> @@ -120,6 +120,11 @@
+>   */
+>  #define LAN8814_1PPM_FORMAT			17179
+>  
+> +#define PTP_RX_VERSION				0x0248
+> +#define PTP_TX_VERSION				0x0288
+> +#define PTP_MAX_VERSION(x)			(((x) & GENMASK(7, 0)) << 8)
+> +#define PTP_MIN_VERSION(x)			((x) & GENMASK(7, 0))
 
-Please could you check that /proc/interrupts do show level interrupts
-are being used.
+FWIIW, these macros feel like open-coded versions of FIELD_PREP to me.
 
-       Andrew
+> +
+>  #define PTP_RX_MOD				0x024F
+>  #define PTP_RX_MOD_BAD_UDPV4_CHKSUM_FORCE_FCS_DIS_ BIT(3)
+>  #define PTP_RX_TIMESTAMP_EN			0x024D
+> @@ -3150,6 +3155,12 @@ static void lan8814_ptp_init(struct phy_device *phydev)
+>  	lanphy_write_page_reg(phydev, 5, PTP_TX_PARSE_IP_ADDR_EN, 0);
+>  	lanphy_write_page_reg(phydev, 5, PTP_RX_PARSE_IP_ADDR_EN, 0);
+>  
+> +	/* Disable checking for minorVersionPTP field */
+> +	lanphy_write_page_reg(phydev, 5, PTP_RX_VERSION,
+> +			      PTP_MAX_VERSION(0xff) | PTP_MIN_VERSION(0x0));
+> +	lanphy_write_page_reg(phydev, 5, PTP_TX_VERSION,
+> +			      PTP_MAX_VERSION(0xff) | PTP_MIN_VERSION(0x0));
+> +
+>  	skb_queue_head_init(&ptp_priv->tx_queue);
+>  	skb_queue_head_init(&ptp_priv->rx_queue);
+>  	INIT_LIST_HEAD(&ptp_priv->rx_ts_list);
+> -- 
+> 2.34.1
+> 
 
