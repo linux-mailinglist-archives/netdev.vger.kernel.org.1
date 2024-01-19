@@ -1,122 +1,201 @@
-Return-Path: <netdev+bounces-64339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7E0D83290D
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 12:42:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 02FDD832939
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 12:52:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96D4D28617D
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 11:42:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A5E412849C0
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 11:52:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E3014EB3E;
-	Fri, 19 Jan 2024 11:42:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD8094F1E9;
+	Fri, 19 Jan 2024 11:52:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GpDiNrMr"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="afNvk1oU"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f48.google.com (mail-vs1-f48.google.com [209.85.217.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F6C83C460
-	for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 11:42:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48F594EB4F
+	for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 11:52:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705664536; cv=none; b=YXJWbSDCt6naW7jJw5IpVOapLLcg8qeACdFDsESD6L+aLbEvWIrZI8DFWqUM9aodIYPkobHFzJrbC8tpbuhgZI0SxKDXBX7AF/Pl2S5WlPI2for6Ok2OryrnsnH8FIyFLVdjOaa+Z5EASmp8Vn+zP6JXq49Vb6vyi4uZgwEhsw0=
+	t=1705665134; cv=none; b=b1v1mItoLA3f14GUW8tAe4jcM56amlyJBz01f51kBQNP/SXVMC5xM0lIRJiJJeOb2/UiLd1RSQ2wULcg///K6U9MxbNOn52tO/b71ugbyOF5IAzS/PztCJDmSgStNUJQylJ1TMuFqiCGUgs/SE5a87BgqfhlBpojDjn0UD9EyAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705664536; c=relaxed/simple;
-	bh=xMOqSLBIyM2IZsbfPaN7LMfLSmGeIVV9PAZhUsjiD/E=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=R9XmNtfrANdx14ux6/Sa2Fhftf8WwGXMauB6dU2gV74FFbNf9Vjq196yA8tYiWP6QhwhUXQq8u5jbjDj+BgUvrLFzoK5/RE3+l8bgMAas5lHthVELiN7MaB8x4G9sJFBKAcLgIkUtpetnxi1XTfBUxPdmc7myRdAChXByedbCyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GpDiNrMr; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1705664533;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=xMOqSLBIyM2IZsbfPaN7LMfLSmGeIVV9PAZhUsjiD/E=;
-	b=GpDiNrMrWZg1ckcksCafGLlK50N7s1QXPOsFUrAc1ZjG87TZdr/tLC/A1VsA3hca6BaZST
-	O/3W/PYwu+xLRSMhULoXLE3bIhJL2jZEbrX1Aaf2trhk2e+bQ/u/zWd1HbdI7hB0FqOBhU
-	sVS/e4B+fpHTZ7jIvFwrs8fsorrnBTo=
-Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
- [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-593-Hh-7SzjBPo6LOoIDsNq3qw-1; Fri, 19 Jan 2024 06:42:11 -0500
-X-MC-Unique: Hh-7SzjBPo6LOoIDsNq3qw-1
-Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2cd13187886so1945391fa.1
-        for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 03:42:10 -0800 (PST)
+	s=arc-20240116; t=1705665134; c=relaxed/simple;
+	bh=L/Fc06LLs/rGZJoI3sRZIJrlufKv5PaKYitAV+6n9QY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JhciuOKORMPC9lvwUaxBEWX5dPx0Mu1r2RJHLSMDWARMgHpB3HqnlZKv71KFDycEcWA92ImBfphHrgOyoXAcofDc1CZYV+Ltf/7Vegxg+Kg3s3WFTNfsJnjMSTH9OqDcfyCXzIbSF7iurTG1SlcPnIc40DeHzMun7dNjvRu5mn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=afNvk1oU; arc=none smtp.client-ip=209.85.217.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-vs1-f48.google.com with SMTP id ada2fe7eead31-467ed334c40so169736137.0
+        for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 03:52:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1705665132; x=1706269932; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=scQQNQ5xR79QdIxgg95WyhVE0qz02vfpeEac+jED8n0=;
+        b=afNvk1oUnQ19qYmNfiBN0essEgUXat59gy72RjkVeS20wdU1gBqWOrEffQNMb2kswW
+         cMwBoAps3H3BLxBX0r/zfrw6sdlVAkn1ps6YTUpz0hP4VVfXJUyc5mahKpA1BRm9nYyY
+         7Mx9Rhe/cxicQ4YsF6KI10G1Ezcd+EajAHZBEa/ufPqgbqz/xv1lv4PNdVghiGkjHupm
+         aoIPlV3td+icGePMWUtXF4dj+UjP1icTn+1amOYEfjuDWqaa4vu9yTOTzmsa7AtG5mQ2
+         9oKvl2+QmQzD6rY0a5ZrU3wmVz/D4Ulctb07VURqpvZZRHr8Lhm3WWEmyS//g9PjQ1CH
+         1JzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705664530; x=1706269330;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xMOqSLBIyM2IZsbfPaN7LMfLSmGeIVV9PAZhUsjiD/E=;
-        b=Y8+/ykCHDpn7pO4fEB7/LDeOSS7jGmAVUU2vDAaM7XRMWEt5r6MKBXSXQ5gVjmdWpJ
-         vEFqb0kM7lqm1xFIYnUlUmIyjPlxaQw/NQsqBGMSq1Yd1DWkjvER4cgSOhPcJZ5f2Avy
-         exRfbj9wtgB3d7bbkHORArvfLZbpbuQ8DL75gkMDBrhmy4yq47MCLsN//qGmYpF+hRZX
-         el8uv0+uVByeTL8OA6MtvvUBxTWOM2UBu8N8fV8YLbSDaXQHaPEB3NBxvs7ivIQ25K3J
-         pWqEvWbC3okvseB8rg0GfGTXo62kewHCcZYlNrBawpzyR6yUFtyGpOF4qWwqhe5frdL2
-         mDGg==
-X-Gm-Message-State: AOJu0Yz8JVF+DbT6CBZTuSdZ61Ag4GDkIuu1gsePZthcfRQgATGN6Jb2
-	cQZDESZvWmvGQiPyX96x1r6U6IgcwLIRgEk3L4Bh3FN1vF0qJ1duqeFTfc+e54UqXRxHgccVNX9
-	2o7+sMVFayBxQBFhPd7vbTZa1wb2m3KG5zp4pgTxWSnOGIyVJDY0G9w==
-X-Received: by 2002:a2e:988f:0:b0:2cd:3731:9c5a with SMTP id b15-20020a2e988f000000b002cd37319c5amr1164538ljj.2.1705664529854;
-        Fri, 19 Jan 2024 03:42:09 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFvTGzEe5sslav7QIgyeBW3wqnWrYYzEtDSGVkjfflQdI2fiPPTNvOgQS3+BFd5R/O0T3/NJw==
-X-Received: by 2002:a2e:988f:0:b0:2cd:3731:9c5a with SMTP id b15-20020a2e988f000000b002cd37319c5amr1164520ljj.2.1705664529496;
-        Fri, 19 Jan 2024 03:42:09 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-241-180.dyn.eolo.it. [146.241.241.180])
-        by smtp.gmail.com with ESMTPSA id s15-20020a5d510f000000b00336aa190139sm6313332wrt.5.2024.01.19.03.42.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Jan 2024 03:42:09 -0800 (PST)
-Message-ID: <e667aa499be7a1ebc1267d30f502275d36bf1f04.camel@redhat.com>
-Subject: Re: [PATCH v2] net: stmmac: Wait a bit for the reset to take effect
-From: Paolo Abeni <pabeni@redhat.com>
-To: Bernd Edlinger <bernd.edlinger@hotmail.de>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>,  Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, Jiri Pirko <jiri@nvidia.com>, Andrew Morton
- <akpm@linux-foundation.org>
-Date: Fri, 19 Jan 2024 12:42:07 +0100
-In-Reply-To: <AS8P193MB1285C2DE6BCCDC8DD40E5A64E4702@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
-References: 
-	<AS8P193MB1285DECD77863E02EF45828BE4A1A@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
-	 <AS8P193MB1285EEAFE30C0DE7B201D33CE46C2@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
-	 <f5ddf800df95cdce32637d41bc1539aed0a7b6f3.camel@redhat.com>
-	 <AS8P193MB1285C2DE6BCCDC8DD40E5A64E4702@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+        d=1e100.net; s=20230601; t=1705665132; x=1706269932;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=scQQNQ5xR79QdIxgg95WyhVE0qz02vfpeEac+jED8n0=;
+        b=Ld54QQiWn5kf8I9ECFKDiGCHs/RMSDoGhwhu6GHAdUUeEilWr1M1vTYZxZa9CQ/aR8
+         it/PZAiUlDIDChIPp4KvEF7Pcjvhbtl3Uvpu+NNwLskWDpw1//HG8Dmj40wW7Es9wW9W
+         j76hxP9tQ1xHM6BdEC4DhTUb8QU5Dyz4qrM3NJrzhnO8tut8zl9xq11n6BYXwodQrpAu
+         3ZyQ3eNwMc/hOGf3PLhaUXkW42CKg8h0u7Sp7NbYJ4zXcLiLmwqlNCSGMBjc103wab37
+         YHMvMtnoYgGY0DoLvazbRtVvWdLTM1toGmsJDddZo8PLHcV+e8CRM/ylszINXXNOAQlE
+         wwPg==
+X-Gm-Message-State: AOJu0Yx45OXlXSy51o2mjC9AP/uX33znVqPCjd38URXU2ERsTS47JSLf
+	7q4003L496yRZkJEelKstyn+fpioN/zRL+dTCeQ0a1tZrX6at/KHmUitaJs7bwJbj8eDFWH18fv
+	/pPYpcTQeaosmrPDHfP+33vdilGu+N/va5ktzUg==
+X-Google-Smtp-Source: AGHT+IFiXIk+YOAa2fYWVkFEFaJXqh/QhAez3rJdhcrCmsvPK+NsvJEO/O+MaokryJjfgFi1QEfe5UKWEheWp/KRPaY=
+X-Received: by 2002:a67:f945:0:b0:468:90e:2c8e with SMTP id
+ u5-20020a67f945000000b00468090e2c8emr1903776vsq.35.1705665132098; Fri, 19 Jan
+ 2024 03:52:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20240117160748.37682-1-brgl@bgdev.pl> <CAA8EJpoQfPqoMVyTmUjPs4c1Uc-p4n7zNcG+USNjXX0Svp362w@mail.gmail.com>
+ <CAA8EJpqyK=pkjEofWV595tp29vjkCeWKYr-KOJh_hBiBbkVBew@mail.gmail.com>
+In-Reply-To: <CAA8EJpqyK=pkjEofWV595tp29vjkCeWKYr-KOJh_hBiBbkVBew@mail.gmail.com>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Fri, 19 Jan 2024 12:52:00 +0100
+Message-ID: <CAMRc=McUZh0jhjMW7H6aVKbw29WMCQ3wdkVAz=yOZVK5wc45OA@mail.gmail.com>
+Subject: Re: [PATCH 0/9] PCI: introduce the concept of power sequencing of
+ PCIe devices
+To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Cc: Kalle Valo <kvalo@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Bjorn Helgaas <bhelgaas@google.com>, Heiko Stuebner <heiko@sntech.de>, 
+	Jernej Skrabec <jernej.skrabec@gmail.com>, Chris Morgan <macromorgan@hotmail.com>, 
+	Linus Walleij <linus.walleij@linaro.org>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Arnd Bergmann <arnd@arndb.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
+	=?UTF-8?B?TsOtY29sYXMgRiAuIFIgLiBBIC4gUHJhZG8=?= <nfraprado@collabora.com>, 
+	Marek Szyprowski <m.szyprowski@samsung.com>, Peng Fan <peng.fan@nxp.com>, 
+	Robert Richter <rrichter@amd.com>, Dan Williams <dan.j.williams@intel.com>, 
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>, Terry Bowman <terry.bowman@amd.com>, 
+	Lukas Wunner <lukas@wunner.de>, Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>, 
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-pci@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2024-01-19 at 11:27 +0100, Bernd Edlinger wrote:
-> On 1/16/24 13:22, Paolo Abeni wrote:
->=20
-> > You need to include the relevant target tree into the subj prefix (in
-> > this case 'net').
->=20
-> Will do, but please clarify how exactly I need to change the subject line=
-.
+On Thu, Jan 18, 2024 at 7:53=E2=80=AFPM Dmitry Baryshkov
+<dmitry.baryshkov@linaro.org> wrote:
+>
 
-The prefix part should be alike: "[PATCH net v3]"
+[snip]
 
-Cheers,
+> >
+> > I'd still like to see how this can be extended to handle BT power up,
+> > having a single entity driving both of the BT and WiFI.
+> >
+> > The device tree changes behave in exactly the opposite way: they
+> > define regulators for the WiFi device, while the WiFi is not being
+> > powered by these regulators. Both WiFi and BT are powered by the PMU,
+> > which in turn consumes all specified regulators.
+>
+> Some additional justification, why I think that this should be
+> modelled as a single instance instead of two different items.
+>
+> This is from msm-5.10 kernel:
+>
+>
+> =3D=3D=3D=3D=3D CUT HERE =3D=3D=3D=3D=3D
+> /**
+>  * cnss_select_pinctrl_enable - select WLAN_GPIO for Active pinctrl statu=
+s
+>  * @plat_priv: Platform private data structure pointer
+>  *
+>  * For QCA6490, PMU requires minimum 100ms delay between BT_EN_GPIO off a=
+nd
+>  * WLAN_EN_GPIO on. This is done to avoid power up issues.
+>  *
+>  * Return: Status of pinctrl select operation. 0 - Success.
+>  */
+> static int cnss_select_pinctrl_enable(struct cnss_plat_data *plat_priv)
+> =3D=3D=3D=3D=3D CUT HERE =3D=3D=3D=3D=3D
+>
+>
+> Also see the bt_configure_gpios() function in the same kernel.
+>
 
-Paolo
+You are talking about a different problem. Unfortunately we're using
+similar naming here but I don't have a better alternative in mind.
 
+We have two separate issues: one is powering-up a PCI device so that
+it can be detected and the second is dealing with a device that has
+multiple modules in it which share a power sequence. The two are
+independent and this series isn't trying to solve the latter.
+
+But I am aware of this and so I actually have an idea for a
+generalized power sequencing framework. Let's call it pwrseq as
+opposed to pci_pwrseq.
+
+Krzysztof is telling me that there cannot be any power sequencing
+information contained in DT. Also: modelling the PMU in DT would just
+over complicate stuff for now reason. We'd end up having the PMU node
+consuming the regulators but it too would need to expose regulators
+for WLAN and BT or be otherwise referenced by their nodes.
+
+So I'm thinking that the DT representation should remain as it is:
+with separate WLAN and BT nodes consuming resources relevant to their
+functionality (BT does not need to enable PCIe regulators). Now how to
+handle the QCA6490 model you brought up? How about pwrseq drivers that
+would handle the sequence based on compatibles?
+
+We'd add a new subsystem at drivers/pwrseq/. Inside there would be:
+drivers/pwrseq/pwrseq-qca6490.c. The pwrseq framework would expose an
+API to "sub-drivers" (in this case: BT serdev driver and the qca6490
+power sequencing driver). Now the latter goes:
+
+struct pwrseq_desc *pwrseq =3D pwrseq_get(dev);
+
+And the pwrseq subsystem matches the device's compatible against the
+correct, *shared* sequence. The BT driver can do the same at any time.
+The pwrseq driver then gets regulators, GPIOs, clocks etc. and will be
+responsible for dealing with them.
+
+In sub-drivers we now do:
+
+ret =3D pwrseq_power_on(pwrseq);
+
+or
+
+ret =3D pwrseq_power_off(pwrseq);
+
+in the sub-device drivers and no longer interact with each regulator
+on our own. The pwrseq subsystem is now in charge of adding delays
+etc.
+
+That's only an idea and I haven't done any real work yet but I'm
+throwing it out there for discussion.
+
+Bartosz
+
+[snip]
 
