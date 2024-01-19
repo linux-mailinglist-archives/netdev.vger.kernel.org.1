@@ -1,111 +1,177 @@
-Return-Path: <netdev+bounces-64406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0E57832F52
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 20:13:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 321DB832F5C
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 20:30:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6B471B2145D
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 19:13:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 571D91C24763
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 19:30:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E56CE55E4A;
-	Fri, 19 Jan 2024 19:13:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E41F5644C;
+	Fri, 19 Jan 2024 19:29:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gKEvU2p/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RfE7hPVk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FD081E520
-	for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 19:13:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4D861E520;
+	Fri, 19 Jan 2024 19:29:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705691608; cv=none; b=VDtjxd+mq1wovsOb0Z8QCmw+4BCt9hg7QF2Jknzm9bqhIRUfwxf4pW2mWpfxy6LI3Pme46rgH/iqqCGKlurI/o3gyG44XCX4aSqrlLzV8R3GZF9YcaiSkA/L9+fMVDZh2sKoOePd7PDbV8/JYKcfzOmEwRGp42ZHBrvZlv5xdz8=
+	t=1705692599; cv=none; b=HHECrXKfsppgqr/08bMFql0+7Ecj4p9ZT/e27E5C1oouvL5RMUC68s2xsSquwQnSKYtWVBhXs8Ywb3U/sfpnqC9e2EyCHk8j49LjvptLrZZ6Qainz7CEgXZrt1p/oyW3FR15kjMghslXGAv2Vbo1oqqPgy3ZrWXU5Lk2U5/CsSg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705691608; c=relaxed/simple;
-	bh=SYKpAr56t2j6hX6wQtgOlIhtIZj/0iPcc98VDznfO9M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=N26McwRm4Gc6S5hDnj69Q33sO314xgZJKx+P/Qa5OdfqukqChBNP809rxDemgtXEEhdSDKL9n5GTJde9H8OWjgqsCXCOy121SHKBhcWA08BoTXR1slYRWSLD+f6S+yBxSXQ2f4FsjqOAKtqR6TdqdB3NXOkF7S1zd/xaie9hz3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gKEvU2p/; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-553e36acfbaso1463a12.0
-        for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 11:13:26 -0800 (PST)
+	s=arc-20240116; t=1705692599; c=relaxed/simple;
+	bh=gTGDNxoyScrvnexMWbEqoQPkglJfmbLIx7McK8bIdN8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rfCLI8fS5J0BIJus5xcxIxZhmJiY3yVF6J/3rpOw+4w1bUx6bx6vLeP6pcq2x+WEAluifbIqVngzl0bS7FlOel+tIxtNCY3SWuyjso7zgppOxOTJhpC+hdYWPlaGVbW3cBHWXi08JDGqof2gKDDoVm1nU4bxt7HFGokIeOHx3jQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RfE7hPVk; arc=none smtp.client-ip=209.85.128.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-5efb0e180f0so12157137b3.1;
+        Fri, 19 Jan 2024 11:29:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1705691605; x=1706296405; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SYKpAr56t2j6hX6wQtgOlIhtIZj/0iPcc98VDznfO9M=;
-        b=gKEvU2p/d+pLI/7/Xc2615w5FHf+5eCNg6NERlv5uYFmV7f5oqB97uLko1AxhAHpen
-         95BYXYCR8lIzF1x67vT6zzFFm25JkHZUOeKnR4xjcjAS2Xt7X3rYCLHD2auy9HGIzrHz
-         +JKEff9rmman0M7MyPNiTfpV99CHNVzLkEmWHy59Hjw9tzUrgfFrw9WCB607SpzskVV6
-         fkbFoeBXFLigTpnGsIl/Olp3XvDT1nIelaoQ6R2io2JMegRmCXVvBu0/l48jzjk5TA1x
-         HscA9B4gkDhfKYGZasdQ5x43TEmNK7GivITlNJNIEyK+BM6lPnTQYENNf5eiHBJWKh/G
-         8KhA==
+        d=gmail.com; s=20230601; t=1705692597; x=1706297397; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Z9qd90FPpe31NArK4/uWyoqQsQ3UqaQV97k6hPltHkU=;
+        b=RfE7hPVkgKBorhC4GkvZFu+HF6SdzArfkj3F0Y3xW9aFd7V8KwsKOxjW77H1AGzFrn
+         T3ttNymLgXGv9ye5EYPg4afrc6jnp6NC0kVlXBsqawWqcJ82Ate27LZUbeh5Fv+ngZD9
+         sAoNwcmLM9l0BxDD8AgRl45OsFyK+6yqxsikpqQ5etSRuZpw+zfhpyXuG0uMFRDSfjuz
+         Ep1w6QseADVhU4yuHlVgUXIfA/+BtR9CJJI4R9ElszTZsIm6ZXaWdF2jWY0chcou6i5V
+         g1zVg9KIn4MU8xR51t3Mt8EG4i3GzWSAl/ne9PcbgjyNqbMc3v3kc6fM2QfVnF4WYMIa
+         GQ9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705691605; x=1706296405;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SYKpAr56t2j6hX6wQtgOlIhtIZj/0iPcc98VDznfO9M=;
-        b=SkMePiBZMPbw41t27F7VMbEKADdHjwzVx1qBHgCyjnydrgj5qa1AP7HT3uCaUKKGlt
-         zdJszJQ8MlALkq9tR/++O8TK6uxJuK7NEGur7zMBJNUDwP6e8vkRc9EAW4AR40YFyiAk
-         Wi6jsDVsAC6JBYcLk32I0B93MGDlcDnSKOQerWrKIVeJnjZvcJ+grAN4zazJchAY5cMa
-         RUb3ac8vBbdo+MMznK/JKP7CcmDnEOzQHgUBpId+VAU+HHhMHZqfnbB6yiRHbbttnSm9
-         rrBJqknHEWA0BL00BpcWJz8LfKeTRw4N+u8cPUNu1kxJdP1FBgVFYijIoaaYV+MczSrB
-         Eqkg==
-X-Gm-Message-State: AOJu0YxYEOC1dLl74JuiFqwa1nyIPX6uLouHqkIev0A0GXzpDEKk916o
-	L6Y0vs6qB/Ip3CgDqskIaDeRThxTJfPudltTsvcnaK1qe+IHwHHJWP3b54pMjN2FynwKxTkMERW
-	4iIa/gP7NPxY96UWQsDXjWc2Vj3Rr3vXauBBw
-X-Google-Smtp-Source: AGHT+IHjAqk4NIHU+kSH+eG/dxFXMi83yxRtVgAm481tMcW8nL2z6JYGAZLgh9NAyvP+p5E1azRP6zQZ5Fg1Gtdn9PY=
-X-Received: by 2002:a05:6402:228b:b0:55a:47a0:d8ad with SMTP id
- cw11-20020a056402228b00b0055a47a0d8admr16030edb.3.1705691605308; Fri, 19 Jan
- 2024 11:13:25 -0800 (PST)
+        d=1e100.net; s=20230601; t=1705692597; x=1706297397;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z9qd90FPpe31NArK4/uWyoqQsQ3UqaQV97k6hPltHkU=;
+        b=u3B+RyOC///qkFAwqZvvVFWJTN4nyZiK0EXo+Lkem2TkOvUZsXLljhdaA1xtu6FmGs
+         +7/gsAGKROblkUlETkmuvesR3Gnc6PSG/9bai/cdaTIZiwYBuLnYe3O04mQ2QpatjO1t
+         F99dX1GsnWpksAeQa2AURIyBLnTxYMwYGkG9EHtUqB0cpP+6yi1NHvXTxJ+UGc4y7C3R
+         u2zobjp9AtTeLUPJVvpuZ1hhaDxWfC+xdAF1jvdGoMCe4tU8V/rmZeU6mKz2rIynYCho
+         19VAY6HAnOoDZ6y4s73BMViTvOjXKQpVNSlfzYpnPHZRy1yp/EaRvJjGTonReGu+uim6
+         FhJw==
+X-Gm-Message-State: AOJu0Yz8MIMWWH/ANXNwkk8ZNi5MzyxOYrSnoM/lXst6nfju1lji4sp+
+	u8ypt/pQhHgoGqark685rpEhrAjzKzgMh8X3U8M2+EQCGvferChW
+X-Google-Smtp-Source: AGHT+IH+WXnEW1MfCN+wdeesVLg1aY/GfEZvTjLejx7JA0jIT6B2Xf+Qp3Dncab44B9IdDr7w40bVA==
+X-Received: by 2002:a81:4951:0:b0:5ff:aafc:32c7 with SMTP id w78-20020a814951000000b005ffaafc32c7mr160910ywa.26.1705692596722;
+        Fri, 19 Jan 2024 11:29:56 -0800 (PST)
+Received: from ?IPV6:2600:1700:6cf8:1240:c63b:9436:82f0:e71a? ([2600:1700:6cf8:1240:c63b:9436:82f0:e71a])
+        by smtp.gmail.com with ESMTPSA id u65-20020a818444000000b005ff83ceb44fsm1594010ywf.108.2024.01.19.11.29.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 19 Jan 2024 11:29:56 -0800 (PST)
+Message-ID: <bcf6ac83-d1c7-412c-ad82-619c76375c63@gmail.com>
+Date: Fri, 19 Jan 2024 11:29:54 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240119190133.43698-1-dipiets@amazon.com>
-In-Reply-To: <20240119190133.43698-1-dipiets@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 19 Jan 2024 20:13:12 +0100
-Message-ID: <CANn89iL8JswXFmEBjNgvhbE9NTXXM1x0Faf8Wpjp+jXQ3eJehA@mail.gmail.com>
-Subject: Re: [PATCH v4] tcp: Add memory barrier to tcp_push()
-To: Salvatore Dipietro <dipiets@amazon.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org, blakgeof@amazon.com, 
-	alisaidi@amazon.com, benh@amazon.com, dipietro.salvatore@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next v16 11/14] bpf, net: switch to dynamic
+ registration
+Content-Language: en-US
+To: Martin KaFai Lau <martin.lau@linux.dev>, thinker.li@gmail.com
+Cc: kuifeng@meta.com, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ ast@kernel.org, song@kernel.org, kernel-team@meta.com, andrii@kernel.org,
+ drosen@google.com
+References: <20240118014930.1992551-1-thinker.li@gmail.com>
+ <20240118014930.1992551-12-thinker.li@gmail.com>
+ <be69cc3f-0ded-4c7e-8709-1602807d1914@linux.dev>
+From: Kui-Feng Lee <sinquersw@gmail.com>
+In-Reply-To: <be69cc3f-0ded-4c7e-8709-1602807d1914@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jan 19, 2024 at 8:03=E2=80=AFPM Salvatore Dipietro <dipiets@amazon.=
-com> wrote:
->
-> On CPUs with weak memory models, reads and updates performed by tcp_push
-> to the sk variables can get reordered leaving the socket throttled when
-> it should not. The tasklet running tcp_wfree() may also not observe the
-> memory updates in time and will skip flushing any packets throttled by
-> tcp_push(), delaying the sending. This can pathologically cause 40ms
-> extra latency due to bad interactions with delayed acks.
->
-> Adding a memory barrier in tcp_push removes the bug, similarly to the
-> previous commit bf06200e732d ("tcp: tsq: fix nonagle handling").
-> smp_mb__after_atomic() is used to not incur in unnecessary overhead
-> on x86 since not affected.
->
 
-> Patch has been also tested on x86 (m7i.2xlarge instance) which it is not
-> affected by this issue and the patch doesn't introduce any additional
-> delay.
->
-> Fixes: 7aa5470c2c09 ("tcp: tsq: move tsq_flags close to sk_wmem_alloc")
-> Signed-off-by: Salvatore Dipietro <dipiets@amazon.com>
 
-SGTM, thanks.
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+On 1/18/24 14:25, Martin KaFai Lau wrote:
+> On 1/17/24 5:49 PM, thinker.li@gmail.com wrote:
+>> diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+>> index 1cfbb89944c5..a2522fcfe57c 100644
+>> --- a/include/linux/bpf.h
+>> +++ b/include/linux/bpf.h
+>> @@ -1700,10 +1700,22 @@ struct bpf_struct_ops_common_value {
+>>       enum bpf_struct_ops_state state;
+>>   };
+>> +/* This macro helps developer to register a struct_ops type and generate
+>> + * type information correctly. Developers should use this macro to 
+>> register
+>> + * a struct_ops type instead of calling register_bpf_struct_ops() 
+>> directly.
+>> + */
+>> +#define REGISTER_BPF_STRUCT_OPS(st_ops, type)                \
+> 
+> One final nit on this macro. Rename this to register_bpf_struct_ops 
+> since it is the one will be used a lot, so give it an easier typing name.
+> 
+>> +    ({                                \
+>> +        struct bpf_struct_ops_##type {                \
+>> +            struct bpf_struct_ops_common_value common;    \
+>> +            struct type data ____cacheline_aligned_in_smp;    \
+>> +        };                            \
+>> +        BTF_TYPE_EMIT(struct bpf_struct_ops_##type);        \
+>> +        register_bpf_struct_ops(st_ops);            \
+> 
+> and rename this to __register_bpf_struct_ops. Thanks.
+
+Sure!
+
+> 
+>> +    })
+>> +
+>>   #if defined(CONFIG_BPF_JIT) && defined(CONFIG_BPF_SYSCALL)
+>>   #define BPF_MODULE_OWNER ((void *)((0xeB9FUL << 2) + 
+>> POISON_POINTER_DELTA))
+>> -const struct bpf_struct_ops_desc *bpf_struct_ops_find(struct btf 
+>> *btf, u32 type_id);
+>> -void bpf_struct_ops_init(struct btf *btf, struct bpf_verifier_log *log);
+>>   bool bpf_struct_ops_get(const void *kdata);
+>>   void bpf_struct_ops_put(const void *kdata);
+>>   int bpf_struct_ops_map_sys_lookup_elem(struct bpf_map *map, void *key,
+>> @@ -1745,16 +1757,11 @@ struct bpf_dummy_ops {
+>>   int bpf_struct_ops_test_run(struct bpf_prog *prog, const union 
+>> bpf_attr *kattr,
+>>                   union bpf_attr __user *uattr);
+>>   #endif
+>> +int bpf_struct_ops_desc_init(struct bpf_struct_ops_desc *st_ops_desc,
+>> +                 struct btf *btf,
+>> +                 struct bpf_verifier_log *log);
+>>   void bpf_map_struct_ops_info_fill(struct bpf_map_info *info, struct 
+>> bpf_map *map);
+>>   #else
+>> -static inline const struct bpf_struct_ops_desc 
+>> *bpf_struct_ops_find(struct btf *btf, u32 type_id)
+>> -{
+>> -    return NULL;
+>> -}
+>> -static inline void bpf_struct_ops_init(struct btf *btf,
+>> -                       struct bpf_verifier_log *log)
+>> -{
+>> -}
+>>   static inline bool bpf_try_module_get(const void *data, struct 
+>> module *owner)
+>>   {
+>>       return try_module_get(owner);
+>> @@ -1769,6 +1776,10 @@ static inline int 
+>> bpf_struct_ops_map_sys_lookup_elem(struct bpf_map *map,
+>>   {
+>>       return -EINVAL;
+>>   }
+>> +static inline int bpf_struct_ops_link_create(union bpf_attr *attr)
+>> +{
+>> +    return -EOPNOTSUPP;
+>> +}
+> 
+> This is added back here which was removed in patch 3...
+> 
+> Others lgtm.
+> 
 
