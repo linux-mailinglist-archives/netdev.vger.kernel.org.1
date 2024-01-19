@@ -1,95 +1,119 @@
-Return-Path: <netdev+bounces-64341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 406A1832962
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 13:10:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EF60A832978
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 13:28:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D6BD2B22223
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 12:10:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7FE78B23171
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 12:28:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BABF4F1F3;
-	Fri, 19 Jan 2024 12:10:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C806D4F201;
+	Fri, 19 Jan 2024 12:28:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FWIQWMhh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FEkilApz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DDD74C3D2;
-	Fri, 19 Jan 2024 12:10:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 381BC4F1F7
+	for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 12:28:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705666227; cv=none; b=ubG25/DEmYQFwXhRZSBPazU+AVP9CzE83hfRB/9Y1V8H047jRL2o761yaVZpUsUI3x92z4KnKZUr9FfsI5cfzyPMY8ldE7EoaGb4F6i6bb//GbAI5zSJ8+qBYqE0f+/6qorjOkkovV7nKzSXka2pkIlEJzS8sbjQERavuLUx8WI=
+	t=1705667307; cv=none; b=YxpYT8bpMQN5SLXesvsdg7aBH0y8WvwV5fjfM9iE01ZLdoafY+RM8D8vTubJoqfJf+NcRWMI957K4QiTS44R8i2vKtJLxdnJplwnGZFWN9NBeuhn5KEJSwGK8X8RWODbbzO4N5zXoWP7HUApb+UYnPmJ/K445CqwaTXl36kM/Cg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705666227; c=relaxed/simple;
-	bh=tbhDZNX8Hu0WJoh+0t2czyv5HCop/pdxeoCqFNMqCwQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=R8dEIW8raGYPDbah3MMBRgvjZEYcSlYh5GAPgtJHf6vRDNWY6/bFpPhGFc68cFngEkTO/IheXr0aGwtn2GsVG1Cl7JMwNc7gMjHRLiaxEqCq0DTu9YPaVhqNsKDOTD5kS8wZ/7gMGA7Jn/aaBEoCbyAAqK4VmBXbTeEtZGpkx2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FWIQWMhh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E4800C43390;
-	Fri, 19 Jan 2024 12:10:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705666227;
-	bh=tbhDZNX8Hu0WJoh+0t2czyv5HCop/pdxeoCqFNMqCwQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=FWIQWMhh3Was0aFykIiOLzL663VX+xXSRyIyKRA93uUkTwbLktgFH1v38bw2ZTExs
-	 DGnm74ONTTmnj25Oqw4FoFXZm6vi5FNrEWtL3jZ22xUA5ygnDAzzd9pwEEp1j98SaV
-	 WU7UvpKb1XQVtLvak7sltm1est4s0p3UT/+SRU58YchAXiXiOL/LDqwyjOXlUcQFRr
-	 BtTDBfCmI8wNRTZd8aRSNpe0c8BwsqT1VER8rFSTGngGvRYlxX/rkN0UmdNg155YM/
-	 21D4gbvH1fnlAQ37ZhHe8LPT7RZS9tOJ9fxJ0iAO0x7UFn1c5oLrdcX0p2dzgchAU3
-	 kAegBWMyMVg4A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CC8BFD8C96C;
-	Fri, 19 Jan 2024 12:10:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1705667307; c=relaxed/simple;
+	bh=1yd3vuegWAMTRKs3hhq9NTSKrABM16eTj4S5eR2+1EY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JWoiE05i3GldX87UmdcTcsSSjSVlV6d7InSq03DWNEcue06AZep2T0B0WGNdkvN+Ss18GDGXDISNn0mTpzqsd3OG97rs1HCbLe6k2NHVyKX5dWUJ9mE2yHitfwt3vj3AtRjkvafhTRf/2JRdlc67QyOXOComUoQUu9HJMIxtiok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FEkilApz; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1705667303;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Lu6PAuD3ioFybCYQzDmdkPHOFHjBT1D9Zj6epg1rV18=;
+	b=FEkilApzaH6KbVRB5fef997zFKjT+0Hha1i8ez9X4N8rCqF3PscwnW8ygmohDh3P2UtY1d
+	ThhjU9LLkht/Me3tzf/BV7EiNxzBqH9IjTmHbGVgOyAIOkOyxtYpXHcOnJn4n2SittwABV
+	n0eMX+JtvnCD4C96+nxR+gtB0iCBqZA=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-18-XZDHsGBgN6iJJGHhsVo7OQ-1; Fri, 19 Jan 2024 07:28:17 -0500
+X-MC-Unique: XZDHsGBgN6iJJGHhsVo7OQ-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40e5317c7a5so4564665e9.0
+        for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 04:28:17 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705667296; x=1706272096;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Lu6PAuD3ioFybCYQzDmdkPHOFHjBT1D9Zj6epg1rV18=;
+        b=ld2JBpm4gEIxb5j9CIY8YH+oFDmQGLX7it7Rt17ZljPYTjwZgjRE6u29fw0hISpYYS
+         VIEY2nEtOY6+kXVA2uOj4JN52CXgtdmkSAKarIajrXNHnaAhzgdePM1RxbrDsE6f3Mau
+         uzAbaYQ/92LND4TGoXDZSo9snvBviV9I0snEo2nzKzDUQokQ3KTWef9EBsJHxGJQ/u3b
+         WqBjoN7GgLuOkFL51PFZM0slB0drsu6XREAcJECwR6r9ijAP3o1zdjRsNYSjnPin30PK
+         wvKv9e/qE+bY/x3k6fyCc+GzggVB+a/PC8/naCSkAqkQwCIvZb3ommxiztfuJ635bQJt
+         GUVg==
+X-Gm-Message-State: AOJu0YzIbVV5zdksh8Jkr49FW+t2J2Q/bgqj07CcLlpilk3hhiIYzjQ2
+	doD/h7gPHxSngSwznrXLUXWVDohksxeo03ZHS3u5zbxX9izngjZMcGkyDBVA63GREN4D37ocFYP
+	N5Xt3pQJsSY3uMCcPqfKm5u8vlvwRIOkDdsXBn0BpkdXxlLM6R9CE7A==
+X-Received: by 2002:a7b:cb4e:0:b0:40e:5c0e:7dc0 with SMTP id v14-20020a7bcb4e000000b0040e5c0e7dc0mr1379244wmj.108.1705667296102;
+        Fri, 19 Jan 2024 04:28:16 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGRQ7q2eviABxb53dq9k0UI+qYO9BINyvJ+P81JZeeN70Ba5s+vjtIaNcbP8LhhKGkob4YTzg==
+X-Received: by 2002:a7b:cb4e:0:b0:40e:5c0e:7dc0 with SMTP id v14-20020a7bcb4e000000b0040e5c0e7dc0mr1379237wmj.108.1705667295747;
+        Fri, 19 Jan 2024 04:28:15 -0800 (PST)
+Received: from redhat.com ([2a02:14f:175:4aad:e256:6d9f:7a0b:7f5b])
+        by smtp.gmail.com with ESMTPSA id iw7-20020a05600c54c700b0040d604dea3bsm28406255wmb.4.2024.01.19.04.28.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Jan 2024 04:28:15 -0800 (PST)
+Date: Fri, 19 Jan 2024 07:28:10 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Heng Qi <hengqi@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
+	Jason Wang <jasowang@redhat.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next 0/3] virtio-net: a fix and some updates for
+ virtio dim
+Message-ID: <20240119072743-mutt-send-email-mst@kernel.org>
+References: <1705410693-118895-1-git-send-email-hengqi@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net/smc: fix illegal rmb_desc access in SMC-D
- connection dump
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170566622683.9014.7556475376411939888.git-patchwork-notify@kernel.org>
-Date: Fri, 19 Jan 2024 12:10:26 +0000
-References: <20240118043210.47618-1-guwen@linux.alibaba.com>
-In-Reply-To: <20240118043210.47618-1-guwen@linux.alibaba.com>
-To: Wen Gu <guwen@linux.alibaba.com>
-Cc: wenjia@linux.ibm.com, jaka@linux.ibm.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- alibuda@linux.alibaba.com, tonylu@linux.alibaba.com, ubraun@linux.ibm.com,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1705410693-118895-1-git-send-email-hengqi@linux.alibaba.com>
 
-Hello:
+On Tue, Jan 16, 2024 at 09:11:30PM +0800, Heng Qi wrote:
+> Patch 1 fixes an existing bug. Belongs to the net branch.
+> Patch 2 requires updating the virtio spec.
+> Patch 3 only attempts to modify the sending of dim cmd to an asynchronous way,
+> and does not affect the synchronization way of ethtool cmd.
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
 
-On Thu, 18 Jan 2024 12:32:10 +0800 you wrote:
-> A crash was found when dumping SMC-D connections. It can be reproduced
-> by following steps:
+Given this doesn't build, please document how was each patch tested.
+Thanks!
+
+> Heng Qi (3):
+>   virtio-net: fix possible dim status unrecoverable
+>   virtio-net: batch dim request
+>   virtio-net: reduce the CPU consumption of dim worker
 > 
-> - run nginx/wrk test:
->   smc_run nginx
->   smc_run wrk -t 16 -c 1000 -d <duration> -H 'Connection: Close' <URL>
+>  drivers/net/virtio_net.c        | 197 ++++++++++++++++++++++++++++++++++++----
+>  include/uapi/linux/virtio_net.h |   1 +
+>  2 files changed, 182 insertions(+), 16 deletions(-)
 > 
-> [...]
-
-Here is the summary with links:
-  - [net,v2] net/smc: fix illegal rmb_desc access in SMC-D connection dump
-    https://git.kernel.org/netdev/net/c/dbc153fd3c14
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+> -- 
+> 1.8.3.1
 
 
