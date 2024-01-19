@@ -1,79 +1,145 @@
-Return-Path: <netdev+bounces-64300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64301-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E2438322DB
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 02:09:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFA5F8322E7
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 02:18:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B97141C213E3
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 01:09:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 820C3285E0B
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 01:18:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5953BA59;
-	Fri, 19 Jan 2024 01:08:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YmDOijC+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CEFBECE;
+	Fri, 19 Jan 2024 01:18:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BFDA3C2F;
-	Fri, 19 Jan 2024 01:08:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C8F8EC7;
+	Fri, 19 Jan 2024 01:18:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705626526; cv=none; b=tusQwXnw0D8X7gNmPq1MEhQdB5aLre4Rcq5MPoI3nVc/9r5VUVsyH7yl5H72CNJ9YQjF+DmYgAqVWWWPW/pZxykHsOwAw2rHdMPiffu7kb1mI8CTr3UIa4OO51tWw4MzqxrAUQBJdCVYk3sRGoUBPB8VVPPJHtWZq3X0gJLp+eg=
+	t=1705627128; cv=none; b=BeTwCem5/C+vZBZNZ6eo7jAylUDKIt/1uKffWtRjkTGEq6ch8AFP6Rrv6SN/S+0AM4n01kv10u4EFjHFHFfpggyvXbMAMC03gVEx0J8feacj0tiYP53czIe5jtEYXhBkytRFODrc3ibQIMZAOIVulwcqustVrZFL/MoT1TtyJEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705626526; c=relaxed/simple;
-	bh=XDfbcGHP/y28g2YdfPBjeNCJEWD8ii8iInMWhyU8HZc=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=CJXh7e6CKS10iQ0fr5Yh7TIjjSt0yVOBTUi44Trnuls2xCKlAN0Pz1YElWRLcwS0NLXikpKBE67YpYAnZoannw19qRnQOqPw2qXAFoh7QDZu7k34XzXyTTj7F8peEWyK/62DtuD8HGUeH7S8EnSSF40QfNTts9hWSQCPJ4ekHOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YmDOijC+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F33B4C433C7;
-	Fri, 19 Jan 2024 01:08:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705626526;
-	bh=XDfbcGHP/y28g2YdfPBjeNCJEWD8ii8iInMWhyU8HZc=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=YmDOijC+fVw7SSodJcAPm23HxgXWdH/M2iMzUXbO1c60MZL33ALJJFtBQgrquF4Hj
-	 M24tFVXqmSJPR7gXs+CNwo6JWsHZB8QlyX7jfxsb6p0b8MBNXVU69pxHiu2ID6pyW2
-	 ousje6HK8REuNA/ZDFUToxfyt7gSUUnaewmBfgjSoOhEAQ0BTBllplk74N7/Cd4F7v
-	 TBi+gB1PvcUSKI+3fc6Vv7w3XEnFu7R6hcgHW6RCd+WpYF5pFfRuRd83gwayI0JrAc
-	 G82VGceqWDGiG+W6AqEBNfQqY9yad9n0afCqz1Jzv3UBayupAV7WxXzIgRgEzTa0lW
-	 plIHams2MI+gg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E1110D8C970;
-	Fri, 19 Jan 2024 01:08:45 +0000 (UTC)
-Subject: Re: [GIT PULL] virtio: features, fixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20240116112828-mutt-send-email-mst@kernel.org>
-References: <20240116112828-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20240116112828-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-X-PR-Tracked-Commit-Id: f16d65124380ac6de8055c4a8e5373a1043bb09b
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 0b7359ccddaaa844044c62000734f0cb92ab6310
-Message-Id: <170562652591.16604.2931669549259177440.pr-tracker-bot@kernel.org>
-Date: Fri, 19 Jan 2024 01:08:45 +0000
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, changyuanl@google.com, christophe.jaillet@wanadoo.fr, dtatulea@nvidia.com, eperezma@redhat.com, jasowang@redhat.com, michael.christie@oracle.com, mst@redhat.com, pasha.tatashin@soleen.com, rientjes@google.com, stevensd@chromium.org, tytso@mit.edu, xuanzhuo@linux.alibaba.com
+	s=arc-20240116; t=1705627128; c=relaxed/simple;
+	bh=ugkaUFaRo4cOIwX2UnpOfwNOVxesUGkcT5tyQhm4MA8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=JV4/HYbOd869tuwLipSfAsRj9x97eByFnQjT6En6jbEsmGCe0bl3CUzb5AzUC636qUmZc8PQSdI+Bw13vrtrQaJlG49Pdnh+VjasacTar83RvlNM/NdjUgwoXNzivHKHqkgdt/9vzKvoIBQXrpdl3I9+sGZaf5dvJKT0puMA2bE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4TGMCn5c5vzvV9l;
+	Fri, 19 Jan 2024 09:17:09 +0800 (CST)
+Received: from dggpeml500026.china.huawei.com (unknown [7.185.36.106])
+	by mail.maildlp.com (Postfix) with ESMTPS id 373FF1402DE;
+	Fri, 19 Jan 2024 09:18:36 +0800 (CST)
+Received: from [10.174.178.66] (10.174.178.66) by
+ dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 19 Jan 2024 09:18:35 +0800
+Message-ID: <4a41a867-ccfc-09e1-ebaa-9f0825bd153a@huawei.com>
+Date: Fri, 19 Jan 2024 09:18:35 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.2
+Subject: Re: [PATCH v2] ipc/mqueue: fix potential sleeping issue in
+ mqueue_flush_file
+To: Hillf Danton <hdanton@sina.com>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, Davidlohr Bueso
+	<dave@stgolabs.net>, Manfred Spraul <manfred@colorfullife.com>,
+	<jack@suse.cz>
+References: <20231220021208.2634523-1-shaozhengchao@huawei.com>
+ <20240118114631.1490-1-hdanton@sina.com>
+From: shaozhengchao <shaozhengchao@huawei.com>
+In-Reply-To: <20240118114631.1490-1-hdanton@sina.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
 
-The pull request you sent on Tue, 16 Jan 2024 11:28:28 -0500:
 
-> https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/0b7359ccddaaa844044c62000734f0cb92ab6310
+On 2024/1/18 19:46, Hillf Danton wrote:
+> On 2023/12/20 10:12, Zhengchao Shao wrote:
+>> I analyze the potential sleeping issue of the following processes:
+>> Thread A                                Thread B
+>> ...                                     netlink_create  //ref = 1
+>> do_mq_notify                            ...
+>>     sock = netlink_getsockbyfilp          ...     //ref = 2
+>>     info->notify_sock = sock;             ...
+>> ...                                     netlink_sendmsg
+>> ...                                       skb = netlink_alloc_large_skb  //skb->head is vmalloced
+>> ...                                       netlink_unicast
+>> ...                                         sk = netlink_getsockbyportid //ref = 3
+>> ...                                         netlink_sendskb
+>> ...                                           __netlink_sendskb
+>> ...                                             skb_queue_tail //put skb to sk_receive_queue
+>> ...                                         sock_put //ref = 2
+>> ...                                     ...
+>> ...                                     netlink_release
+>> ...                                       deferred_put_nlk_sk //ref = 1
+>> mqueue_flush_file
+>>     spin_lock
+>>     remove_notification
+>>       netlink_sendskb
+>>         sock_put  //ref = 0
+>>           sk_free
+>>             ...
+>>             __sk_destruct
+>>               netlink_sock_destruct
+>>                 skb_queue_purge  //get skb from sk_receive_queue
+>>                   ...
+>>                   __skb_queue_purge_reason
+>>                     kfree_skb_reason
+>>                       __kfree_skb
+>>                       ...
+>>                       skb_release_all
+>>                         skb_release_head_state
+>>                           netlink_skb_destructor
+>>                             vfree(skb->head)  //sleeping while holding spinlock
+>>
+>> In netlink_sendmsg, if the memory pointed to by skb->head is allocated by
+>> vmalloc, and is put to sk_receive_queue queue, also the skb is not freed.
+>> When the mqueue executes flush, the sleeping bug will occur. Use mutex
+>> lock instead of spin lock in mqueue_flush_file.
+> 
+> It makes no sense to replace spinlock with mutex just for putting sock.
+> 
+> Only for thoughts.
+> 
+> --- x/ipc/mqueue.c
+> +++ y/ipc/mqueue.c
+> @@ -663,12 +663,17 @@ static ssize_t mqueue_read_file(struct f
+>   static int mqueue_flush_file(struct file *filp, fl_owner_t id)
+>   {
+>   	struct mqueue_inode_info *info = MQUEUE_I(file_inode(filp));
+> +	struct sock *sk = NULL;
+>   
+>   	spin_lock(&info->lock);
+> -	if (task_tgid(current) == info->notify_owner)
+> +	if (task_tgid(current) == info->notify_owner) {
+> +		sk = info->notify_sock;
+> +		sock_hold(sk);
+>   		remove_notification(info);
+> -
+> +	}
+>   	spin_unlock(&info->lock);
+> +	if (sk)
+> +		sock_put(sk);
+>   	return 0;
+>   }
+>   
 
-Thank you!
+Hi Hillf:
+	Thank you for your review. Your changes are more concise and
+clear. I will send V3.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Zhengchao Shao
 
