@@ -1,113 +1,93 @@
-Return-Path: <netdev+bounces-64398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CD36832D8F
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 17:55:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E12B832E2E
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 18:30:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B43881C20F4F
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 16:55:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 44E631F22C00
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 17:30:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30C525576A;
-	Fri, 19 Jan 2024 16:55:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65F9B55E7C;
+	Fri, 19 Jan 2024 17:29:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l8nYkOMX"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="U/9xZHaQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D2F741C98
-	for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 16:55:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A870C55E70;
+	Fri, 19 Jan 2024 17:29:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705683339; cv=none; b=c6BzO9aib42+nXi/uwoWco51I/YmsNa77ogII6M879lM4KsbxZTP68g0vtgtCoBvWGGD6W96HvXcZTNnhq7Lsj9PyVxvkWNvTpa8S8znkdzhUemspQnVETfdye2dJOJscEpfTa0JRZwIBvjvOMi62fVTLWPrmY4ceHptQSi5IhY=
+	t=1705685397; cv=none; b=eU4HaYZPqimF3ZFK1B7YrNQxJ+Kzp2mWynq5P3hK3pHnIqT2T3TbFVPXK8CNMFluIP1kCXPBAJrpEumUtBMPKdrIKLQ+LEnZejeS6JH9E+5Mb0GTXXSXEtLnm3be/FM4LrA0RxeNnKBo9nZYeL5z74juM49UEdq15+JCZabhRmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705683339; c=relaxed/simple;
-	bh=zuZJZKU61xlL1EYFlogSl4Y/yFeVXu+b3DlM0oRVXpU=;
+	s=arc-20240116; t=1705685397; c=relaxed/simple;
+	bh=Upvyt/oAj+lccPbq8zyjj8LYO2UwaPzjMahikAPz8zE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Zu/fk1t+mSPul9eT0ej6typGoXSWqLIo+ukoQXCHfLUGtQf/+ZmQqz3+M5+g49dAjasHpJ9+uD8IYP1tY6KeGeh/tMZGWoF7F+RHB76BE0/UD4H7b0rjQIWVWdSvMkwDC+vzGeWpXUwd/dMBIwnoyl4ZeTtOO64OjsQGhyBHa6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l8nYkOMX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2062BC433C7;
-	Fri, 19 Jan 2024 16:55:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705683338;
-	bh=zuZJZKU61xlL1EYFlogSl4Y/yFeVXu+b3DlM0oRVXpU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=l8nYkOMXzmqavT++E3STkO2oLudpyFxMEKVL6E5xSgb+s+uKdG/25BACXS99GkWeY
-	 AXsB/CTSZzXzHpK4SsfdJsHxQQIMIhIPS5nXDnWlTY8+uMSB6pdk9B+Pe0fgCyA/3O
-	 7KBZ7XpmXk4528NzKbPyQgGQH8NkfDWs/ea1ngqlajBsPKmdKNdvwD/cjKzxhhZnNI
-	 g1XGgXgC0SvCiPv9C+HeSp46kUT6W84FleszYU/eKyiMWkFBRTxKIv6kZq/SjTxQrD
-	 0GBsFBbR8j684vlkQpssggm9nPrsXykoHo7KRI59/PUMDd8SnrZvCGVSIXeCXVLEVx
-	 Ts22fJF3HjxOg==
-Date: Fri, 19 Jan 2024 16:55:33 +0000
-From: Simon Horman <horms@kernel.org>
-To: "Keller, Jacob E" <jacob.e.keller@intel.com>
-Cc: "Kolacinski, Karol" <karol.kolacinski@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-	"Brandeburg, Jesse" <jesse.brandeburg@intel.com>
-Subject: Re: [PATCH v5 iwl-next 1/6] ice: introduce PTP state machine
-Message-ID: <20240119165533.GH89683@kernel.org>
-References: <20240108124717.1845481-1-karol.kolacinski@intel.com>
- <20240108124717.1845481-2-karol.kolacinski@intel.com>
- <20240115103240.GL392144@kernel.org>
- <CO1PR11MB50899045B5B747FC216134EAD6722@CO1PR11MB5089.namprd11.prod.outlook.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=eDu/MKvK56glT8Zmb6NIMt5MwsbNlPL3IlNFMwhfjqVjyoco7mkxn4jcylEujTQLmZaD9aKYQoqaWtLip5nMeplVbkypVXpJ/6CHA09Qhuj5D+8cqQInxjkm8+QYZ10RRk7NZLI2ANAAG02kO4kWThA0UbCJmmYnOruhZ7novWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=U/9xZHaQ; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=fmnFjcGqCcC7uuE7wYDHjW/TOHnvXy2QmQyU8wJSCgg=; b=U/
+	9xZHaQVb4l4p/gs3tqxkOlUtbHh9JN+bpXPHz9YlIMt2U+gLl/Ut5fnSvuqe5gGO7B22SUnek33bU
+	unR42VWf0cAfY3zv8ChJeowtKZPGtVr/gPDtLpP5PZI/ShFBi5PM4Bj2qTNKNnb0BTKM2syMh8ogy
+	T2AOfr+Blsdc6+s=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rQsgK-005Zs4-3P; Fri, 19 Jan 2024 18:29:28 +0100
+Date: Fri, 19 Jan 2024 18:29:28 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Heng Qi <hengqi@linux.alibaba.com>
+Cc: Zhu Yanjun <yanjun.zhu@linux.dev>, Paolo Abeni <pabeni@redhat.com>,
+	Zhu Yanjun <yanjun.zhu@intel.com>, mst@redhat.com,
+	jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: [PATCH 1/1] virtio_net: Add timeout handler to avoid kernel hang
+Message-ID: <430b899c-aed4-419d-8ae8-544bb9bec5d9@lunn.ch>
+References: <20240115012918.3081203-1-yanjun.zhu@intel.com>
+ <ea230712e27af2c8d2d77d1087e45ecfa86abb31.camel@redhat.com>
+ <667a9520-a53f-40a2-810a-6c1e45146589@linux.dev>
+ <7dd89fc0-f31e-4f83-9c02-58ee67c2d436@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CO1PR11MB50899045B5B747FC216134EAD6722@CO1PR11MB5089.namprd11.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <7dd89fc0-f31e-4f83-9c02-58ee67c2d436@linux.alibaba.com>
 
-On Wed, Jan 17, 2024 at 10:07:52PM +0000, Keller, Jacob E wrote:
+> > > >       while (!virtqueue_get_buf(vi->cvq, &tmp) &&
+> > > > -           !virtqueue_is_broken(vi->cvq))
+> > > > +           !virtqueue_is_broken(vi->cvq)) {
+> > > > +        if (timeout)
+> > > > +            timeout--;
+> > > This is not really a timeout, just a loop counter. 200 iterations could
+> > > be a very short time on reasonable H/W. I guess this avoid the soft
+> > > lockup, but possibly (likely?) breaks the functionality when we need to
+> > > loop for some non negligible time.
+> > > 
+> > > I fear we need a more complex solution, as mentioned by Micheal in the
+> > > thread you quoted.
+> > 
+> > Got it. I also look forward to the more complex solution to this problem.
 > 
-> 
-> > -----Original Message-----
-> > From: Simon Horman <horms@kernel.org>
-> > Sent: Monday, January 15, 2024 2:33 AM
-> > To: Kolacinski, Karol <karol.kolacinski@intel.com>
-> > Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; Nguyen, Anthony L
-> > <anthony.l.nguyen@intel.com>; Brandeburg, Jesse
-> > <jesse.brandeburg@intel.com>; Keller, Jacob E <jacob.e.keller@intel.com>
-> > Subject: Re: [PATCH v5 iwl-next 1/6] ice: introduce PTP state machine
-> > 
-> > On Mon, Jan 08, 2024 at 01:47:12PM +0100, Karol Kolacinski wrote:
-> > 
-> > Should there be a "From: Jacob" line here to
-> > match the Signed-off-by below?
-> > 
-> > > Add PTP state machine so that the driver can correctly identify PTP
-> > > state around resets.
-> > > When the driver got information about ungraceful reset, PTP was not
-> > > prepared for reset and it returned error. When this situation occurs,
-> > > prepare PTP before rebuilding its structures.
-> > >
-> > > Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-> > > Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-> > > Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> > 
-> > Hi Karol and Jacob,
-> > 
-> > FWIIW, The combination of both a Signed-off-by and Reviewed-by tag from
-> > Jacob seems a little odd to me. If he authored the patch then I would have
-> > gone with the following (along with the From line mentioned above):
-> > 
-> > Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-> > Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-> > 
-> > Otherwise, if he reviewed the patch I would have gone with:
-> > 
-> > Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> > Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-> > 
-> 
-> It's a bit odd, because I authored the initial code and patches some time ago, and Karol has been working to rebase and re-organize the code, so in some sense he authored part of this. I think a Co-authored would be suitable here. Additionally, I reviewed the result before it was published here.
+> Can we add a device capability (new feature bit) such as ctrq_wait_timeout
+> to get a reasonable timeout？
 
-Understood. I agree Co-authored might be useful here.
+The usual solution to this is include/linux/iopoll.h. If you can sleep
+read_poll_timeout() otherwise read_poll_timeout_atomic().
+
+	Andrew
 
