@@ -1,345 +1,122 @@
-Return-Path: <netdev+bounces-64338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64339-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 915BE8328C1
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 12:28:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7E0D83290D
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 12:42:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41C102855CA
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 11:28:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96D4D28617D
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 11:42:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10D113C6BF;
-	Fri, 19 Jan 2024 11:28:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E3014EB3E;
+	Fri, 19 Jan 2024 11:42:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="XqhFcORV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GpDiNrMr"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 198054CB21
-	for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 11:28:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F6C83C460
+	for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 11:42:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705663693; cv=none; b=MLZ34wkOuiEXnEWQeVEXDHXMN/mU8JSVRjSw/No8OcAB+v8kTHt7LORp45D5DUotbWX42aWJNBS1OFHeG/XRYqIGtzJZdfLJsh5G6AXnYPt6h2d1kUCJbA92AWXALP+2aHrB65toaVD+J6S6yszjmEQA4CPD8RCFt2gFTgE5xSw=
+	t=1705664536; cv=none; b=YXJWbSDCt6naW7jJw5IpVOapLLcg8qeACdFDsESD6L+aLbEvWIrZI8DFWqUM9aodIYPkobHFzJrbC8tpbuhgZI0SxKDXBX7AF/Pl2S5WlPI2for6Ok2OryrnsnH8FIyFLVdjOaa+Z5EASmp8Vn+zP6JXq49Vb6vyi4uZgwEhsw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705663693; c=relaxed/simple;
-	bh=9fXz7gcy3E3RK44jSOYWo0Q8r1kw3UMTZhB2Ma8XriE=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KhuGleKwcM0MsVkrb8USWOMsasNk362ZfzTKZanFUUWrq0Jja1iR75xzK8WzsfbUMFnw7GmE/aZeekQ/drOA7d2jXFZh2GD1MTD514YJcaxiwCwZnhmpnYGGaPiviYy+iV61QAZ5Xl9J2tdIINfQbsegtZyL6zWyl3dpFTBuGns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=XqhFcORV; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id E815A205E3;
-	Fri, 19 Jan 2024 12:28:01 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5JRUN9Fax3zQ; Fri, 19 Jan 2024 12:28:01 +0100 (CET)
-Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 2864920519;
-	Fri, 19 Jan 2024 12:28:01 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 2864920519
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1705663681;
-	bh=vQ1LHoVsWA05iZQFwdfuVvb9T4uYFK0iFhWMRFPVvTY=;
-	h=Date:From:To:CC:Subject:Reply-To:References:In-Reply-To:From;
-	b=XqhFcORVX0JO8sfCxyDc61cFuGuXcBAiKeUBAIdfjJ6eRh4V5zOyJlkhlebMtj0t6
-	 +ZCgCFqfU/ZyHiE/nEXRuuEikxmO8i7JPt/rV8a/SsV/tCN2x/MsZE6fd2Q13Gsfwd
-	 QLbTRIv5W2iOxvAnjGfyb4kxefMMytzYAdogVkI1K35RUjXuyyPqzFW/JPz+eFsheB
-	 /WqedqOMJnlytbl/iyQXpYLNC78k/PtkkFEIhEvzNwP/KzaKUTaQyaGHn4VY8UPJ8G
-	 piQwJF3hGd6hxWbKC8djbrFBrv8pC07HZKb8VUKKU826kKSjHqFpwSQbAueo/xvR8R
-	 qICmrAWv2+AJg==
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout1.secunet.com (Postfix) with ESMTP id 1C9C880004A;
-	Fri, 19 Jan 2024 12:28:01 +0100 (CET)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 19 Jan 2024 12:28:00 +0100
-Received: from moon.secunet.de (172.18.149.1) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 19 Jan
- 2024 12:28:00 +0100
-Date: Fri, 19 Jan 2024 12:27:42 +0100
-From: Antony Antony <antony.antony@secunet.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, Antony Antony
-	<antony.antony@secunet.com>, "David S. Miller" <davem@davemloft.net>,
-	<devel@linux-ipsec.org>, Jakub Kicinski <kuba@kernel.org>,
-	<netdev@vger.kernel.org>
-Subject: [PATCH v6 ipsec-next] xfrm: introduce forwarding of ICMP Error
- messages
-Message-ID: <1199c5a30dd3f73ac02b0ac00775354304b1e692.1705663529.git.antony.antony@secunet.com>
-Reply-To: <antony.antony@secunet.com>
-References: <e9b8e0f951662162cc761ee5473be7a3f54183a7.1639872656.git.antony.antony@secunet.com>
+	s=arc-20240116; t=1705664536; c=relaxed/simple;
+	bh=xMOqSLBIyM2IZsbfPaN7LMfLSmGeIVV9PAZhUsjiD/E=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=R9XmNtfrANdx14ux6/Sa2Fhftf8WwGXMauB6dU2gV74FFbNf9Vjq196yA8tYiWP6QhwhUXQq8u5jbjDj+BgUvrLFzoK5/RE3+l8bgMAas5lHthVELiN7MaB8x4G9sJFBKAcLgIkUtpetnxi1XTfBUxPdmc7myRdAChXByedbCyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GpDiNrMr; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1705664533;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=xMOqSLBIyM2IZsbfPaN7LMfLSmGeIVV9PAZhUsjiD/E=;
+	b=GpDiNrMrWZg1ckcksCafGLlK50N7s1QXPOsFUrAc1ZjG87TZdr/tLC/A1VsA3hca6BaZST
+	O/3W/PYwu+xLRSMhULoXLE3bIhJL2jZEbrX1Aaf2trhk2e+bQ/u/zWd1HbdI7hB0FqOBhU
+	sVS/e4B+fpHTZ7jIvFwrs8fsorrnBTo=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-593-Hh-7SzjBPo6LOoIDsNq3qw-1; Fri, 19 Jan 2024 06:42:11 -0500
+X-MC-Unique: Hh-7SzjBPo6LOoIDsNq3qw-1
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2cd13187886so1945391fa.1
+        for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 03:42:10 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705664530; x=1706269330;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xMOqSLBIyM2IZsbfPaN7LMfLSmGeIVV9PAZhUsjiD/E=;
+        b=Y8+/ykCHDpn7pO4fEB7/LDeOSS7jGmAVUU2vDAaM7XRMWEt5r6MKBXSXQ5gVjmdWpJ
+         vEFqb0kM7lqm1xFIYnUlUmIyjPlxaQw/NQsqBGMSq1Yd1DWkjvER4cgSOhPcJZ5f2Avy
+         exRfbj9wtgB3d7bbkHORArvfLZbpbuQ8DL75gkMDBrhmy4yq47MCLsN//qGmYpF+hRZX
+         el8uv0+uVByeTL8OA6MtvvUBxTWOM2UBu8N8fV8YLbSDaXQHaPEB3NBxvs7ivIQ25K3J
+         pWqEvWbC3okvseB8rg0GfGTXo62kewHCcZYlNrBawpzyR6yUFtyGpOF4qWwqhe5frdL2
+         mDGg==
+X-Gm-Message-State: AOJu0Yz8JVF+DbT6CBZTuSdZ61Ag4GDkIuu1gsePZthcfRQgATGN6Jb2
+	cQZDESZvWmvGQiPyX96x1r6U6IgcwLIRgEk3L4Bh3FN1vF0qJ1duqeFTfc+e54UqXRxHgccVNX9
+	2o7+sMVFayBxQBFhPd7vbTZa1wb2m3KG5zp4pgTxWSnOGIyVJDY0G9w==
+X-Received: by 2002:a2e:988f:0:b0:2cd:3731:9c5a with SMTP id b15-20020a2e988f000000b002cd37319c5amr1164538ljj.2.1705664529854;
+        Fri, 19 Jan 2024 03:42:09 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFvTGzEe5sslav7QIgyeBW3wqnWrYYzEtDSGVkjfflQdI2fiPPTNvOgQS3+BFd5R/O0T3/NJw==
+X-Received: by 2002:a2e:988f:0:b0:2cd:3731:9c5a with SMTP id b15-20020a2e988f000000b002cd37319c5amr1164520ljj.2.1705664529496;
+        Fri, 19 Jan 2024 03:42:09 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-241-180.dyn.eolo.it. [146.241.241.180])
+        by smtp.gmail.com with ESMTPSA id s15-20020a5d510f000000b00336aa190139sm6313332wrt.5.2024.01.19.03.42.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Jan 2024 03:42:09 -0800 (PST)
+Message-ID: <e667aa499be7a1ebc1267d30f502275d36bf1f04.camel@redhat.com>
+Subject: Re: [PATCH v2] net: stmmac: Wait a bit for the reset to take effect
+From: Paolo Abeni <pabeni@redhat.com>
+To: Bernd Edlinger <bernd.edlinger@hotmail.de>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,  Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+ linux-arm-kernel@lists.infradead.org, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, Jiri Pirko <jiri@nvidia.com>, Andrew Morton
+ <akpm@linux-foundation.org>
+Date: Fri, 19 Jan 2024 12:42:07 +0100
+In-Reply-To: <AS8P193MB1285C2DE6BCCDC8DD40E5A64E4702@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
+References: 
+	<AS8P193MB1285DECD77863E02EF45828BE4A1A@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
+	 <AS8P193MB1285EEAFE30C0DE7B201D33CE46C2@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
+	 <f5ddf800df95cdce32637d41bc1539aed0a7b6f3.camel@redhat.com>
+	 <AS8P193MB1285C2DE6BCCDC8DD40E5A64E4702@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <e9b8e0f951662162cc761ee5473be7a3f54183a7.1639872656.git.antony.antony@secunet.com>
-Precedence: first-class
-Priority: normal
-Organization: secunet
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-This commit aligns with RFC 4301, Section 6, and addresses the
-requirement to forward unauthenticated ICMP error messages that do not
-match any xfrm policies. It utilizes the ICMP payload as an skb and
-performs a reverse lookup. If a policy match is found, forward
-the packet.
+On Fri, 2024-01-19 at 11:27 +0100, Bernd Edlinger wrote:
+> On 1/16/24 13:22, Paolo Abeni wrote:
+>=20
+> > You need to include the relevant target tree into the subj prefix (in
+> > this case 'net').
+>=20
+> Will do, but please clarify how exactly I need to change the subject line=
+.
 
-The ICMP payload typically contains a partial IP packet that is likely
-responsible for the error message.
+The prefix part should be alike: "[PATCH net v3]"
 
-The following error types will be forwarded:
-- IPv4 ICMP error types: ICMP_DEST_UNREACH & ICMP_TIME_EXCEEDED
-- IPv6 ICMPv6 error types: ICMPV6_DEST_UNREACH, ICMPV6_PKT_TOOBIG,
-			   ICMPV6_TIME_EXCEED
+Cheers,
 
-To implement this feature, a reverse lookup has been added to the xfrm
-forward path, making use of the ICMP payload as the skb.
-
-To enable this functionality from user space, the XFRM_POLICY_ICMP flag
-should be added to the outgoing and forward policies, and the
-XFRM_STATE_ICMP flag should be set on incoming states.
-
-e.g.
-ip xfrm policy add flag icmp tmpl
-
-ip xfrm policy
-src 192.0.2.0/24 dst 192.0.1.0/25
-	dir out priority 2084302 ptype main flag icmp
-
-ip xfrm state add ...flag icmp
-
-ip xfrm state
-root@west:~#ip x s
-src 192.1.2.23 dst 192.1.2.45
-	proto esp spi 0xa7b76872 reqid 16389 mode tunnel
-	replay-window 32 flag icmp af-unspec
-
-Changes since v5:
-- fix return values bool->int, feedback from Steffen
-
-Changes since v4:
-- split the series to only ICMP erorr forwarding
-
-Changes since v3: no code chage
- - add missing white spaces detected by checkpatch.pl
-
-Changes since v2: reviewed by Steffen Klassert
- - user consume_skb instead of kfree_skb for the inner skb
- - fixed newskb leaks in error paths
- - free the newskb once inner flow is decoded with change due to
-   commit 7a0207094f1b ("xfrm: policy: replace session decode with flow dissector")
- - if xfrm_decode_session_reverse() on inner payload fails ignore.
-   do not increment error counter
-
-Changes since v1:
-- Move IPv6 variable declaration inside IS_ENABLED(CONFIG_IPV6)
-
-Changes since RFC:
-- Fix calculation of ICMPv6 header length
-
-Signed-off-by: Antony Antony <antony.antony@secunet.com>
----
- net/xfrm/xfrm_policy.c | 142 ++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 140 insertions(+), 2 deletions(-)
-
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index 1b7e75159727..b4850a8f14ad 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -29,6 +29,7 @@
- #include <linux/audit.h>
- #include <linux/rhashtable.h>
- #include <linux/if_tunnel.h>
-+#include <linux/icmp.h>
- #include <net/dst.h>
- #include <net/flow.h>
- #include <net/inet_ecn.h>
-@@ -3503,6 +3504,128 @@ static inline int secpath_has_nontransport(const struct sec_path *sp, int k, int
- 	return 0;
- }
- 
-+static bool icmp_err_packet(const struct flowi *fl, unsigned short family)
-+{
-+	const struct flowi4 *fl4 = &fl->u.ip4;
-+
-+	if (family == AF_INET &&
-+	    fl4->flowi4_proto == IPPROTO_ICMP &&
-+	    (fl4->fl4_icmp_type == ICMP_DEST_UNREACH ||
-+	     fl4->fl4_icmp_type == ICMP_TIME_EXCEEDED))
-+		return true;
-+
-+#if IS_ENABLED(CONFIG_IPV6)
-+	if (family == AF_INET6) {
-+		const struct flowi6 *fl6 = &fl->u.ip6;
-+
-+		if (fl6->flowi6_proto == IPPROTO_ICMPV6 &&
-+		    (fl6->fl6_icmp_type == ICMPV6_DEST_UNREACH ||
-+		    fl6->fl6_icmp_type == ICMPV6_PKT_TOOBIG ||
-+		    fl6->fl6_icmp_type == ICMPV6_TIME_EXCEED))
-+			return true;
-+	}
-+#endif
-+	return false;
-+}
-+
-+static bool xfrm_icmp_flow_decode(struct sk_buff *skb, unsigned short family,
-+				  const struct flowi *fl, struct flowi *fl1)
-+{
-+	bool ret = true;
-+	struct sk_buff *newskb = skb_clone(skb, GFP_ATOMIC);
-+	int hl = family == AF_INET ? (sizeof(struct iphdr) +  sizeof(struct icmphdr)) :
-+		 (sizeof(struct ipv6hdr) + sizeof(struct icmp6hdr));
-+
-+	if (!newskb)
-+		return true;
-+
-+	if (!pskb_pull(newskb, hl))
-+		goto out;
-+
-+	skb_reset_network_header(newskb);
-+
-+	if (xfrm_decode_session_reverse(dev_net(skb->dev), newskb, fl1, family) < 0)
-+		goto out;
-+
-+	fl1->flowi_oif = fl->flowi_oif;
-+	fl1->flowi_mark = fl->flowi_mark;
-+	fl1->flowi_tos = fl->flowi_tos;
-+	nf_nat_decode_session(newskb, fl1, family);
-+	ret = false;
-+
-+out:
-+	consume_skb(newskb);
-+	return ret;
-+}
-+
-+static bool xfrm_selector_inner_icmp_match(struct sk_buff *skb, unsigned short family,
-+					   const struct xfrm_selector *sel,
-+					   const struct flowi *fl)
-+{
-+	bool ret = false;
-+
-+	if (icmp_err_packet(fl, family)) {
-+		struct flowi fl1;
-+
-+		if (xfrm_icmp_flow_decode(skb, family, fl, &fl1))
-+			return ret;
-+
-+		ret = xfrm_selector_match(sel, &fl1, family);
-+	}
-+
-+	return ret;
-+}
-+
-+static inline struct
-+xfrm_policy *xfrm_in_fwd_icmp(struct sk_buff *skb,
-+			      const struct flowi *fl, unsigned short family,
-+			      u32 if_id)
-+{
-+	struct xfrm_policy *pol = NULL;
-+
-+	if (icmp_err_packet(fl, family)) {
-+		struct flowi fl1;
-+		struct net *net = dev_net(skb->dev);
-+
-+		if (xfrm_icmp_flow_decode(skb, family, fl, &fl1))
-+			return pol;
-+
-+		pol = xfrm_policy_lookup(net, &fl1, family, XFRM_POLICY_FWD, if_id);
-+	}
-+
-+	return pol;
-+}
-+
-+static inline struct
-+dst_entry *xfrm_out_fwd_icmp(struct sk_buff *skb, struct flowi *fl,
-+			     unsigned short family, struct dst_entry *dst)
-+{
-+	if (icmp_err_packet(fl, family)) {
-+		struct net *net = dev_net(skb->dev);
-+		struct dst_entry *dst2;
-+		struct flowi fl1;
-+
-+		if (xfrm_icmp_flow_decode(skb, family, fl, &fl1))
-+			return dst;
-+
-+		dst_hold(dst);
-+
-+		dst2 = xfrm_lookup(net, dst, &fl1, NULL, (XFRM_LOOKUP_QUEUE | XFRM_LOOKUP_ICMP));
-+
-+		if (IS_ERR(dst2))
-+			return dst;
-+
-+		if (dst2->xfrm) {
-+			dst_release(dst);
-+			dst = dst2;
-+		} else {
-+			dst_release(dst2);
-+		}
-+	}
-+
-+	return dst;
-+}
-+
- int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb,
- 			unsigned short family)
- {
-@@ -3549,9 +3672,17 @@ int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb,
- 
- 		for (i = sp->len - 1; i >= 0; i--) {
- 			struct xfrm_state *x = sp->xvec[i];
-+			int ret = 0;
-+
- 			if (!xfrm_selector_match(&x->sel, &fl, family)) {
--				XFRM_INC_STATS(net, LINUX_MIB_XFRMINSTATEMISMATCH);
--				return 0;
-+				ret = 1;
-+				if (x->props.flags & XFRM_STATE_ICMP &&
-+				    xfrm_selector_inner_icmp_match(skb, family, &x->sel, &fl))
-+					ret = 0;
-+				if (ret) {
-+					XFRM_INC_STATS(net, LINUX_MIB_XFRMINSTATEMISMATCH);
-+					return 0;
-+				}
- 			}
- 		}
- 	}
-@@ -3574,6 +3705,9 @@ int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb,
- 		return 0;
- 	}
- 
-+	if (!pol && dir == XFRM_POLICY_FWD)
-+		pol = xfrm_in_fwd_icmp(skb, &fl, family, if_id);
-+
- 	if (!pol) {
- 		if (net->xfrm.policy_default[dir] == XFRM_USERPOLICY_BLOCK) {
- 			XFRM_INC_STATS(net, LINUX_MIB_XFRMINNOPOLS);
-@@ -3707,6 +3841,10 @@ int __xfrm_route_forward(struct sk_buff *skb, unsigned short family)
- 		res = 0;
- 		dst = NULL;
- 	}
-+
-+	if (dst && !dst->xfrm)
-+		dst = xfrm_out_fwd_icmp(skb, &fl, family, dst);
-+
- 	skb_dst_set(skb, dst);
- 	return res;
- }
--- 
-2.30.2
+Paolo
 
 
