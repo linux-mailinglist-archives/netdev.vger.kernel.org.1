@@ -1,176 +1,183 @@
-Return-Path: <netdev+bounces-64333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64335-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E43378327A1
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 11:26:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 380D48327B3
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 11:32:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14DAC1C21DF4
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 10:26:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB76D1F2248B
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 10:32:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D10AF3C486;
-	Fri, 19 Jan 2024 10:26:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A897482C0;
+	Fri, 19 Jan 2024 10:32:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oEPE5F0t"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR01-VE1-obe.outbound.protection.outlook.com (mail-ve1eur01olkn2041.outbound.protection.outlook.com [40.92.66.41])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22AC71E89B;
-	Fri, 19 Jan 2024 10:26:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.66.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705660005; cv=fail; b=Gsuv5UAcNC1w7WnWWoK3CIu8QDDGQ8p4DqoTUsMX9NMno3deE+HReGywJAOeBWq6MtpfGekmWm0iUtfBQGViazi4pN6V0lmtYOmY0yByQVnZ9Psk/xbDcNwMOXCaUGLrw2UxWQACzTrVqO4xnb7rvsOMd7Yq1oElO2xfJ9pUC2U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705660005; c=relaxed/simple;
-	bh=4zdkACczKrYvDJr2+F1r9UEYGGzW7CRPRbONfv5j+Y4=;
-	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=MasAyvwn3q/zMsttH8TX9j+WpBonGSgylR2KKQydhx5RlYCczD3pmKqPmvoTdiFNBF8ac9qiOsalYU4K+PpK42FFbZ/R6VUBm6Lx5d3w+xWvtSd3lyzxRXSi1nPwMdLQk3bA/eqXvZp6rSkESINnVtv/Nn9c3+cYkjkpvaz/4kI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.de; spf=pass smtp.mailfrom=hotmail.de; arc=fail smtp.client-ip=40.92.66.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hotmail.de
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=G6cSfNkzg9JThoIC6hcp3ZUWglfmRJnEH+VAVQbKA9kl6HI5Pc1pbGJXPq7ucSh/CAe9oG4wCx1/U8NWUCzj8lUqfITbS8ixNhfvSrb7HyHcKY+WSb7Lytqzw3Rd77+yy0r+fh8WOfxwMygIpBJLY08fWTG3H7CZGjjZBqQPpz4HUatD1tABIgHzhWng9ZeJ30rnDFOY22cy095ug2R0LFfaSVUlooKIYtPfE7oXSJQkdwNIohotn6NaN27pbbgJJJTW0/uSgjACfTmdSxV7yaCeX77rW3U+TXBEQnRsw8SdRp2tCSbXXOotR3oXJTHZjds2pKgKsj7IJbEBNIkYfA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iUzY8vMARfevHJNGQZ/iOTXp7aRCBYwfC35ynE4v59g=;
- b=eo2sjA5I8hPjoPR5Na/NGFJU20C4rXTHh8gP7KlwBsaJbk8gjyBMEmtQFufbJWC5P3Mkrf/u2J3AbbFmkr50tlsX3FCyzgGj1cnhT88v8Azj6saMKxc3jsWvcZRJNL7Xuqz/dCf7dXsDJCfEdaIgbqonqBHyBEVB0endOJVA6vczA+6AW/iwpOtBCcvz56HKTsyWhaNDLF/dH7tAdOXGtkTVMEAWXVBoeNDAtqljg4VvgL9J/BCnAq/EDaVo/a6ASmluEPt37dT3VEfBiFdemyCcIvALQuYYn17eDSPNk0oZ7k9XeThEfQA2Vd9upj5Gc8STjNhee0kYW/LuNoD77g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-Received: from AS8P193MB1285.EURP193.PROD.OUTLOOK.COM (2603:10a6:20b:333::21)
- by AM9P193MB0936.EURP193.PROD.OUTLOOK.COM (2603:10a6:20b:1fd::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.24; Fri, 19 Jan
- 2024 10:26:41 +0000
-Received: from AS8P193MB1285.EURP193.PROD.OUTLOOK.COM
- ([fe80::897e:cfd5:b29b:c611]) by AS8P193MB1285.EURP193.PROD.OUTLOOK.COM
- ([fe80::897e:cfd5:b29b:c611%6]) with mapi id 15.20.7202.024; Fri, 19 Jan 2024
- 10:26:40 +0000
-Message-ID:
- <AS8P193MB1285C2DE6BCCDC8DD40E5A64E4702@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
-Date: Fri, 19 Jan 2024 11:27:38 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] net: stmmac: Wait a bit for the reset to take effect
-Content-Language: en-US
-To: Paolo Abeni <pabeni@redhat.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Jiri Pirko <jiri@nvidia.com>, Andrew Morton <akpm@linux-foundation.org>
-References: <AS8P193MB1285DECD77863E02EF45828BE4A1A@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
- <AS8P193MB1285EEAFE30C0DE7B201D33CE46C2@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
- <f5ddf800df95cdce32637d41bc1539aed0a7b6f3.camel@redhat.com>
-From: Bernd Edlinger <bernd.edlinger@hotmail.de>
-In-Reply-To: <f5ddf800df95cdce32637d41bc1539aed0a7b6f3.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TMN: [H42hYSkfusIgBzAtCP0ZV6/lSomDHaqEx20ukHiAv+PiVAVjSp2KU0KSPiHTY5iT]
-X-ClientProxiedBy: BEXP281CA0016.DEUP281.PROD.OUTLOOK.COM (2603:10a6:b10::26)
- To AS8P193MB1285.EURP193.PROD.OUTLOOK.COM (2603:10a6:20b:333::21)
-X-Microsoft-Original-Message-ID:
- <98a4b2bd-84d8-4fb6-8964-fe3a8eab2fd3@hotmail.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F19E481C6
+	for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 10:31:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705660321; cv=none; b=DzpSrm+HY3F/cUDc9iTrZl65UwBWN+3wDqeRlU9CpeSbA7GeXeJZqo9sdnwZSOHIZUUfe3u24QK+DBxYhoxq0JZID0KauEmXStySnQAuYtl+yOf4jmlhczSQl5AC5GWlXKORNy7/PCFOBSYM/zAByUyurjSPSmuwToS5Oa08OXI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705660321; c=relaxed/simple;
+	bh=ugbG3rsqUiWrBnnSNz7P6Oi4cdnkEG1z83KyGg6hLZc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ovCanD6HlFmoPflPJ76cwNWZGDN4ujOjXGIvvrvDIZ+BeG+HgK2wSJ36Lc6NakABfMeP4th5RYkDoORzfCRmcyvQ5UDfROmfMBO3msABxL3s3ezfEmF1y+KkFLnM4xwWYzUX894P9nsPdlyRYkcuhlfXoN+gSrnz6WYdfmu5RP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=oEPE5F0t; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1705660319; x=1737196319;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ugbG3rsqUiWrBnnSNz7P6Oi4cdnkEG1z83KyGg6hLZc=;
+  b=oEPE5F0tEsD7eRbWX0FPlPlbLqM2LTpk5/GIZKzzudxFgY020rwDqsQz
+   uRocyM7EFVUjDEbwPHrbuwXNpKO0CNHZCQON8Rx4BoeXxOkG/hXjL7WJn
+   OJwwdX7VFuVHUGvFMxMCndTuHOcHNYnS2ekALEcHyzMsdH0yZdZVLGja4
+   uCxzDBeFcoQZnqrsHkJ9yFC6fq62Egt77HuFRJgFTWjI1Ws02EQu1PKx3
+   /HFT8tjhWz4XLlTaTeekcSyQ1Atqmz2pWQh+F7BBlBVI3TzTxzrNJLjbT
+   zqpyFN2QjMIbUKxiMVULCoR8BS6j2EAl8z8BZbGAFmT85YPOsLb7U4JQq
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10956"; a="7407071"
+X-IronPort-AV: E=Sophos;i="6.05,204,1701158400"; 
+   d="scan'208";a="7407071"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2024 02:31:59 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10956"; a="908295072"
+X-IronPort-AV: E=Sophos;i="6.05,204,1701158400"; 
+   d="scan'208";a="908295072"
+Received: from lkp-server01.sh.intel.com (HELO 961aaaa5b03c) ([10.239.97.150])
+  by orsmga004.jf.intel.com with ESMTP; 19 Jan 2024 02:31:55 -0800
+Received: from kbuild by 961aaaa5b03c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rQmAC-0003uy-37;
+	Fri, 19 Jan 2024 10:31:52 +0000
+Date: Fri, 19 Jan 2024 18:31:18 +0800
+From: kernel test robot <lkp@intel.com>
+To: Heng Qi <hengqi@linux.alibaba.com>, netdev@vger.kernel.org,
+	virtualization@lists.linux.dev
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Jason Wang <jasowang@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next 3/3] virtio-net: reduce the CPU consumption of
+ dim worker
+Message-ID: <202401191807.RIhMHJ4U-lkp@intel.com>
+References: <1705410693-118895-4-git-send-email-hengqi@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS8P193MB1285:EE_|AM9P193MB0936:EE_
-X-MS-Office365-Filtering-Correlation-Id: 243c6f85-e25d-4aec-647f-08dc18d91ff9
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	rNfKZGVANuS1fqeKkZW4gAHUSEHZqAr0tarbDlOpYvAp+X+sDQitUPo9B7LaBvTv1Sfeb2/hRabiNjvT+C9Ctd6GRqoXH4AYUJ4s2pIFt2FHQMhSVNg/W7IoTliMZ8iDU5r5GewSF1mXt/rGfxWD/KvrtpfrHbeL/IFshhfH1LEx6HDFJx7fBLWEnQbtcllHWE3vqZo14p0ZFr2qCPrQyTUTDUEtqcbyU1KJHbfOVsI0HRoj9BoHiIwEvvwQrpZxsURQXjIbwSrwMC0vSs9pIoQbFnZoITgkJ5Zx07y0q0r4n70wk06aJbzVcNxy0nIW0ZQ6ziEqguxUoX01eA136atXaQzWxxrewm3onvkY0k6PbmDuoANVrCdDNfaoq9W+pw2f6+27qIU2hwmBcmONM4dr6avJNrMey3uelseStlwDRrh0niq9+QNC9jmPTwglKnJYu1UxQly4+1FysGLBtbHD4AGvey9OkmxwyM8pC7oT2ejdFm55vXypd2+7XHVxcwDp2pt3jEHAnAa4xMvNirKT3nZUfiXMWMHggZljBfSFXIqTCHlbMfIhIRttrw0S
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cXgwUkFva09ocW9oY0NTcE9FTmhzU3Y5WmgrRkpCc2VoOTgrYkFNNXhZU0FI?=
- =?utf-8?B?ZGdEejhacUVKWWh0bWl6UkxkSGVNWWZsVlphMDhiVzZqNGdZd3c5LzBGcnRH?=
- =?utf-8?B?aEM4STYwYnk3MEVYS0hiczZ5dmZmL1dOVkFydWprNnJndjIzV1V0dm9GaWJv?=
- =?utf-8?B?c3A0REhKY0xIY1R1VFVINGRQamV2Mnl5M1hHY1NEMC9hQ1hCbGtNeC95VUNZ?=
- =?utf-8?B?RkNLMXpvWkpEQkdXM0V4ajNibGRVQjZkcDBmYnJ2TnZHYTRBNDVnZEJnV2xB?=
- =?utf-8?B?YTJpakdVOEp6ZHcvK3lQSkdoYzA4THdxeDBDVU02VUlXLzZQejEveU5CSCty?=
- =?utf-8?B?SnJKUVBCQllWNGJZV01UWEFxd3QvdXBpSjRUY1hIUGdOcWRmWUZQeVBSWlJI?=
- =?utf-8?B?YVZDR01lSEQ0TE05ekNHTkxEejFsOGRkRDVERmlnVUZFSHBxdlF4Yzdqcm45?=
- =?utf-8?B?SE5mMDFmVzVpbm93MDc5NFIrTndvdS9oN05TY21FRklUbTZRQk9ydFFZNFo0?=
- =?utf-8?B?bmIrZkhTZjhrYW1LNlFTSWxWQVg2cnNTWWxHWHpQWEJ2YURnVXZFS2RyaldW?=
- =?utf-8?B?UHdSOC9BeEVyUWdaN1RFakhpc3VuSU5kUzh4T05NZ1dpNXVnR3JBMjFYTFVJ?=
- =?utf-8?B?NjdnMUlRN3E5d2szU0FGMTZJMVZBM0JBcGFQcnFYZVRjdHVFZ2NFU3RjL3dJ?=
- =?utf-8?B?QVJLRTFZSGwvUWQ4NnNFQ1ZMeVlNQUdIeENIcVZYSTB3NkhXVElxeE5XS2da?=
- =?utf-8?B?QnM5VEJPQmhZVWxTUHRQQld3aXFwcGtCUjcwWDFXR3E5MEswSGw5dmlESDN5?=
- =?utf-8?B?YTJxSUJZcnZZcjNPNG9qNlZKdXVOS0ZUZGREY1lPZDZDU2FVVVJoNzk1UGV4?=
- =?utf-8?B?SFVhR2lEeEpZRVhXRWY4K1drK0FyemFXRU1icHNoTVFIVWFhbk9yLy8vZS9h?=
- =?utf-8?B?dFlOWStmdkJvUWZJbGQwR2U5ZXZjV0lBV0dQRXR2SmQyZGdoczZMbEJOTXJR?=
- =?utf-8?B?M0MvZXAramd4YVNHdnFXbVZiSUM1Y1FJalM4SmhhOG9mbW1tcGQ1LzczVkVj?=
- =?utf-8?B?eTNveFY0ZHVjVVh1UnNSL09zODJHR2ZVYnkrS1B6NC80UkdXTXhpNUlYV0tn?=
- =?utf-8?B?WFBKWi9HdENBRHRMNU9lYmVKYTB0Tk4vSE5Lc3djQ1hheVd5YVRlY2xzNG9q?=
- =?utf-8?B?ajZLVUNRaDhuZkRaUVJXUEFlcW9Ia2pIMGJqUjIxejVIVkVHT05xQ0labEtJ?=
- =?utf-8?B?Q3lRNFg3UkM3bnE3MUxtNjdaOWVxSVhncVA5U1JMdDlzc0FGbWNjczFHVGFl?=
- =?utf-8?B?bkV1c0pId0l2K0l0OXYwU2xSdUphZjdybUdVSWplVEYyL1lYTnpaLzQrc2dh?=
- =?utf-8?B?UGFrdFIwNElRMVdCejhkS1hzZU9mOEJOcGVsSHhMbEU1WE9QZnhGc2JPOFIx?=
- =?utf-8?B?TEZuMXoxMUJSVWFPTHJXeXBESjBmS3Zpcm81OTBDL2x1anA5SzdZS3djUWdp?=
- =?utf-8?B?bE9od0YzQUJkenphYU9LM1BueXBkTGhySGYzM2duSWJIRE1mTXVZOFRPc0ND?=
- =?utf-8?B?ZlFkNDVrS2k4UVVuSDN3MUxEcU91VDRHbmlrRUMyY3FzQ1VaUUMwa3dUL0oz?=
- =?utf-8?B?djBlbGdGSzJKRjFTVUl0UllUUG9UQ0JLQkMyQ01IcHpGYWl1bHg2TTdocXFh?=
- =?utf-8?B?T3A3MkdWdk53S3l6ODFNUUFDaGkrL2tBcmpXclBMOUV0ME9EY1MzdFpLeTFC?=
- =?utf-8?Q?d30hszZ7jQjAktY4dA=3D?=
-X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-80ceb.templateTenant
-X-MS-Exchange-CrossTenant-Network-Message-Id: 243c6f85-e25d-4aec-647f-08dc18d91ff9
-X-MS-Exchange-CrossTenant-AuthSource: AS8P193MB1285.EURP193.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jan 2024 10:26:40.6664
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9P193MB0936
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1705410693-118895-4-git-send-email-hengqi@linux.alibaba.com>
 
-On 1/16/24 13:22, Paolo Abeni wrote:
-> 
-> A fixes tag is requires, something alike:
-> 
-> Fixes: <blamed commit hash> ("<blamed commit title>")
-> 
-> A bisection is not strictly required, you just need to be reasonably
-> confident about the the culprit.
-> 
+Hi Heng,
 
-Okay, I think finally I found the commit that introduced
-the broken reset logic:
+kernel test robot noticed the following build errors:
 
-commit c5e4ddbdfa1134a36589c1466ed4abb85fe6f976
-Author: Chen-Yu Tsai <wens@csie.org>
-Date:   Fri Jan 17 21:24:41 2014 +0800
+[auto build test ERROR on net-next/main]
 
-    net: stmmac: Add support for optional reset control
-    
-    The DWMAC has a reset assert line, which is used on some SoCs. Add an
-    optional reset control to stmmac driver core.
-    
-    To support reset control deferred probing, this patch changes the driver
-    probe function to return the actual error, instead of just -EINVAL.
-    
-    Signed-off-by: Chen-Yu Tsai <wens@csie.org>
-    Signed-off-by: David S. Miller <davem@davemloft.net>
+url:    https://github.com/intel-lab-lkp/linux/commits/Heng-Qi/virtio-net-fix-possible-dim-status-unrecoverable/20240116-211306
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/1705410693-118895-4-git-send-email-hengqi%40linux.alibaba.com
+patch subject: [PATCH net-next 3/3] virtio-net: reduce the CPU consumption of dim worker
+config: i386-randconfig-012-20240119 (https://download.01.org/0day-ci/archive/20240119/202401191807.RIhMHJ4U-lkp@intel.com/config)
+compiler: ClangBuiltLinux clang version 17.0.6 (https://github.com/llvm/llvm-project 6009708b4367171ccdbf4b5905cb6a803753fe18)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240119/202401191807.RIhMHJ4U-lkp@intel.com/reproduce)
 
-that commit moved the reset de-assert next to the stmmac_hw_init function,
-without any delay in between.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202401191807.RIhMHJ4U-lkp@intel.com/
 
-So I think I can now add
-Fixes c5e4ddbdfa11 ("net: stmmac: Add support for optional reset control")
+All errors (new ones prefixed by >>):
 
-> You need to include the relevant target tree into the subj prefix (in
-> this case 'net').
-
-Will do, but please clarify how exactly I need to change the subject line.
+>> drivers/net/virtio_net.c:3590:27: error: invalid application of 'sizeof' to an incomplete type 'struct virtnet_coal_entry'
+    3590 |                     ctrl->num_entries * sizeof(struct virtnet_coal_entry));
+         |                                         ^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/net/virtio_net.c:3590:41: note: forward declaration of 'struct virtnet_coal_entry'
+    3590 |                     ctrl->num_entries * sizeof(struct virtnet_coal_entry));
+         |                                                       ^
+   drivers/net/virtio_net.c:3658:27: error: invalid application of 'sizeof' to an incomplete type 'struct virtnet_coal_entry'
+    3658 |                                 vi->max_queue_pairs * sizeof(struct virtnet_coal_entry));
+         |                                                       ^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/net/virtio_net.c:3658:41: note: forward declaration of 'struct virtnet_coal_entry'
+    3658 |                                 vi->max_queue_pairs * sizeof(struct virtnet_coal_entry));
+         |                                                                     ^
+   drivers/net/virtio_net.c:4544:31: error: invalid application of 'sizeof' to an incomplete type 'struct virtnet_coal_entry'
+    4544 |                       vi->max_queue_pairs * sizeof(struct virtnet_coal_entry)), GFP_KERNEL);
+         |                                             ^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/net/virtio_net.c:4544:45: note: forward declaration of 'struct virtnet_coal_entry'
+    4544 |                       vi->max_queue_pairs * sizeof(struct virtnet_coal_entry)), GFP_KERNEL);
+         |                                                           ^
+   drivers/net/virtio_net.c:4551:27: error: invalid application of 'sizeof' to an incomplete type 'struct virtnet_coal_entry'
+    4551 |                                 vi->max_queue_pairs * sizeof(struct virtnet_coal_entry));
+         |                                                       ^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/net/virtio_net.c:4544:45: note: forward declaration of 'struct virtnet_coal_entry'
+    4544 |                       vi->max_queue_pairs * sizeof(struct virtnet_coal_entry)), GFP_KERNEL);
+         |                                                           ^
+   4 errors generated.
 
 
-Thanks
-Bernd.
+vim +3590 drivers/net/virtio_net.c
+
+  3570	
+  3571	static bool virtnet_add_dim_command(struct virtnet_info *vi,
+  3572					    struct virtnet_batch_coal *ctrl)
+  3573	{
+  3574		struct scatterlist *sgs[4], hdr, stat, out;
+  3575		unsigned out_num = 0;
+  3576		int ret;
+  3577	
+  3578		/* Caller should know better */
+  3579		BUG_ON(!virtio_has_feature(vi->vdev, VIRTIO_NET_F_CTRL_VQ));
+  3580	
+  3581		ctrl->hdr.class = VIRTIO_NET_CTRL_NOTF_COAL;
+  3582		ctrl->hdr.cmd = VIRTIO_NET_CTRL_NOTF_COAL_VQS_SET;
+  3583	
+  3584		/* Add header */
+  3585		sg_init_one(&hdr, &ctrl->hdr, sizeof(ctrl->hdr));
+  3586		sgs[out_num++] = &hdr;
+  3587	
+  3588		/* Add body */
+  3589		sg_init_one(&out, &ctrl->num_entries, sizeof(ctrl->num_entries) +
+> 3590			    ctrl->num_entries * sizeof(struct virtnet_coal_entry));
+  3591		sgs[out_num++] = &out;
+  3592	
+  3593		/* Add return status. */
+  3594		ctrl->status = VIRTIO_NET_OK;
+  3595		sg_init_one(&stat, &ctrl->status, sizeof(ctrl->status));
+  3596		sgs[out_num] = &stat;
+  3597	
+  3598		BUG_ON(out_num + 1 > ARRAY_SIZE(sgs));
+  3599		ret = virtqueue_add_sgs(vi->cvq, sgs, out_num, 1, ctrl, GFP_ATOMIC);
+  3600		if (ret < 0) {
+  3601			dev_warn(&vi->vdev->dev, "Failed to add sgs for command vq: %d\n.", ret);
+  3602			return false;
+  3603		}
+  3604	
+  3605		virtqueue_kick(vi->cvq);
+  3606	
+  3607		ctrl->usable = false;
+  3608		vi->cvq_cmd_nums++;
+  3609	
+  3610		return true;
+  3611	}
+  3612	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
