@@ -1,148 +1,78 @@
-Return-Path: <netdev+bounces-64376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64377-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF60E832C0A
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 16:03:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04CA3832C1C
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 16:10:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D1751F21BA3
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 15:03:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9D95286C00
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 15:10:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 210D252F8B;
-	Fri, 19 Jan 2024 15:03:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QoNk1q6n"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE92754675;
+	Fri, 19 Jan 2024 15:10:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 438441373
-	for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 15:02:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+Received: from zju.edu.cn (spam.zju.edu.cn [61.164.42.155])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C667D54667;
+	Fri, 19 Jan 2024 15:10:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=61.164.42.155
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705676580; cv=none; b=ild+jon6XVcjXYJTbpTevF55tj2A7NeeYHILkKzENbYU4VlbXVSu9IMrjIndzmo2GH8cHB5drnX7yfoTvYPVZ9EMFTndhOgZE3KdXbeG9AgYXOADjSPkA3oRlOU5H9NSC0/MfE7C88Y0W4rpsTYIyQuE2jWSfbpX9gCSWZssCEg=
+	t=1705677005; cv=none; b=vEZvtgZM0Y/qrEnN4kZXUeTyWUjSenCpjzMRamA90EM47JcxznCi46tGe2AC3nBBmRaNoqsumqQ0XS3q+8nUViab21X3xNCMEZUh2gqeerZdN612n7rcpVvjyiK8oXcVKCVkQntcGlIV8WJjBcNDWyKDDVMG87rCpEVVJR7R26w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705676580; c=relaxed/simple;
-	bh=Wvdp8NwroEUnlOcyXYB6fhifFLEf86W+er2ratf6ib4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SkDYPXtZkCgBSA2yXxV+W8TXMvbtfURsSiy+lISZ5G+FhAWkLXupUYiKAFA3lE6rzbyknH2rEdwrjLl9vEcSOqxJNvlvImsxHkDi1Iji2bXOitm4lTXTX/B0IKiZBAbLroHdVZuVTTmJkiexnqRhtfrcfiL5qlehVMe2pBlwpdY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=devoogdt.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QoNk1q6n; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=devoogdt.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3376555b756so537230f8f.0
-        for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 07:02:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705676576; x=1706281376; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=CVdx0XTXF9oMlbE/2BBUk3oy7mn9BIkXq8b5DHwfmHo=;
-        b=QoNk1q6nhdlk7GJHjN1/q+60U/VAjaseiNhtE9coTp8TswJaCO3FVXj+vGFP3YgmV3
-         EO9sJrdJ94F/hFCqKQsBJ0TK4tdWyGOTz9lYBz6Uvsd8d2e+s2MjCzr/Cy32GBVvTOTl
-         NgS4RS9AhGNawtwbsC2m25yw/zdvU6iMcwvQVLwNw/Z/iu5Q4igmVy+kIbhDQC6JKOoU
-         q23VAlIcj8+YDKoEzKshKDEXOeNHDI5maztAYF5rhZR2hTl/m1HR7tYcvNvNX/cWIEbN
-         WcXAayR0d4yZ7aVZja+FP2NtwFBLIqhqOhh/Aox7rMLN5nboce0PjRYf0RYh06mO+U6m
-         Psdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705676576; x=1706281376;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:sender:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CVdx0XTXF9oMlbE/2BBUk3oy7mn9BIkXq8b5DHwfmHo=;
-        b=iSGt02KBbUfh2K4A0qQrCxMGWk5h6NfnLq1aa8ws4C4SGJ3a2z1ZODeVdWKPykKUh0
-         U8CiCd5u+WKFT5g40GcLiDsvjs1OQUSPHHL/hWDU9rABWkSrQvoHs4ykJPaD+ONiQnxN
-         kQ4Xug16qKMjdlfmlWwajYKx3qpcM8boaPmY9OBOWzY35SHqqzOTpaS+51mx9L3GpIu/
-         Y1aHCrq7LahAG5Zm5da33XhFPFy0fU6fcmC8UaJeniCOCPxwq4zFUl6VOr5Cg/nfMI0W
-         4td3JYbgpSmGgh3D5WixzyhZRKrlcdtA9rNZ4vOSiOfKm81GVZSpbLtCJmRd44pHMo91
-         RHtQ==
-X-Gm-Message-State: AOJu0YyKmVwJN5TpvXR+764rTeMxhJw2sH8jNVwoqBeUaM7onQWbw+Fu
-	Q5INr6Cu8xw2WqiOQbIyrAJGmIXvo4OkpN1qQN4ZbkbhfzfF6/cUqAjxxchc5k8=
-X-Google-Smtp-Source: AGHT+IF/vX4ILC15vEGiQ1r6Q5nIWrSHqfcbd6u2tpOtdeR2TXTCFaPcl1wyvKUoT8i2WX515e22SA==
-X-Received: by 2002:adf:f489:0:b0:339:2374:ab55 with SMTP id l9-20020adff489000000b003392374ab55mr8242wro.8.1705676575654;
-        Fri, 19 Jan 2024 07:02:55 -0800 (PST)
-Received: from thomas-OptiPlex-7090.nmg.localnet (d528f5fc4.static.telenet.be. [82.143.95.196])
-        by smtp.gmail.com with ESMTPSA id i4-20020a5d5224000000b003374555d88esm6736748wra.56.2024.01.19.07.02.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Jan 2024 07:02:54 -0800 (PST)
-Sender: Thomas Devoogdt <thomas.devoogdt@gmail.com>
-From: Thomas Devoogdt <thomas@devoogdt.com>
-X-Google-Original-From: Thomas Devoogdt <thomas.devoogdt@barco.com>
-To: netdev@vger.kernel.org
-Cc: Thomas Devoogdt <thomas.devoogdt@barco.com>
-Subject: [PATCH] tc: {m_gate,q_etf,q_taprio}.c: fix compilation with older glibc versions
-Date: Fri, 19 Jan 2024 16:02:52 +0100
-Message-ID: <20240119150252.3062223-1-thomas.devoogdt@barco.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1705677005; c=relaxed/simple;
+	bh=ba5iFZrEZbK7GW0T551/0XRnIqmHqQJuldW3vSrTCjw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
+	 MIME-Version:Message-ID; b=itCyZPYyixEtNC/1inNFPpswPQ6usZEWH11AF0hmw/Di5aCUS/xqeeAUJRlnXtURJeEhL6hw2f2v7qPV+EzER1m0PlvAIN9iFx084umPOJoeOaKlDOp06lmvZtBEJD5ALM6BlIoQibDI/vIvHgoYsT4W5pcpF589hHodVrnfr1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=61.164.42.155
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from linma$zju.edu.cn ( [10.181.209.189] ) by
+ ajax-webmail-mail-app2 (Coremail) ; Fri, 19 Jan 2024 23:09:39 +0800
+ (GMT+08:00)
+Date: Fri, 19 Jan 2024 23:09:39 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: "Lin Ma" <linma@zju.edu.cn>
+To: "Kalle Valo" <kvalo@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v1] nl80211/cfg80211: add nla_policy for S1G
+ band
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2023.4-cmXT5 build
+ 20231205(37e20f0e) Copyright (c) 2002-2024 www.mailtech.cn
+ mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
+In-Reply-To: <87v87pe5hu.fsf@kernel.org>
+References: <20240119093724.7852-1-linma@zju.edu.cn>
+ <6acb79fc.79d3.18d211a170c.Coremail.linma@zju.edu.cn>
+ <87v87pe5hu.fsf@kernel.org>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Message-ID: <7d20b254.7e26.18d22453bd2.Coremail.linma@zju.edu.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:by_KCgA356WzkKplHXlmAA--.7489W
+X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/1tbiAwQFEmWpc04QogACsR
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWUCw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
 
-glibc < 2.14 does not define CLOCK_BOOTTIME
-glibc < 2.21 does not define CLOCK_TAI
-
-Signed-off-by: Thomas Devoogdt <thomas.devoogdt@barco.com>
----
- tc/m_gate.c   | 4 ++++
- tc/q_etf.c    | 4 ++++
- tc/q_taprio.c | 4 ++++
- 3 files changed, 12 insertions(+)
-
-diff --git a/tc/m_gate.c b/tc/m_gate.c
-index c091ae19..1dacd4b3 100644
---- a/tc/m_gate.c
-+++ b/tc/m_gate.c
-@@ -26,8 +26,12 @@ static const struct clockid_table {
- 	clockid_t clockid;
- } clockt_map[] = {
- 	{ "REALTIME", CLOCK_REALTIME },
-+#ifdef CLOCK_TAI
- 	{ "TAI", CLOCK_TAI },
-+#endif
-+#ifdef CLOCK_BOOTTIME
- 	{ "BOOTTIME", CLOCK_BOOTTIME },
-+#endif
- 	{ "MONOTONIC", CLOCK_MONOTONIC },
- 	{ NULL }
- };
-diff --git a/tc/q_etf.c b/tc/q_etf.c
-index 572e2bc8..041d72ce 100644
---- a/tc/q_etf.c
-+++ b/tc/q_etf.c
-@@ -25,8 +25,12 @@ static const struct static_clockid {
- 	clockid_t clockid;
- } clockids_sysv[] = {
- 	{ "REALTIME", CLOCK_REALTIME },
-+#ifdef CLOCK_TAI
- 	{ "TAI", CLOCK_TAI },
-+#endif
-+#ifdef CLOCK_BOOTTIME
- 	{ "BOOTTIME", CLOCK_BOOTTIME },
-+#endif
- 	{ "MONOTONIC", CLOCK_MONOTONIC },
- 	{ NULL }
- };
-diff --git a/tc/q_taprio.c b/tc/q_taprio.c
-index ef8fc7a0..c82bede1 100644
---- a/tc/q_taprio.c
-+++ b/tc/q_taprio.c
-@@ -35,8 +35,12 @@ static const struct static_clockid {
- 	clockid_t clockid;
- } clockids_sysv[] = {
- 	{ "REALTIME", CLOCK_REALTIME },
-+#ifdef CLOCK_TAI
- 	{ "TAI", CLOCK_TAI },
-+#endif
-+#ifdef CLOCK_BOOTTIME
- 	{ "BOOTTIME", CLOCK_BOOTTIME },
-+#endif
- 	{ "MONOTONIC", CLOCK_MONOTONIC },
- 	{ NULL }
- };
--- 
-2.43.0
-
+SGVsbG8gS2FsbGUsCgo+IAo+ICJMaW4gTWEiIDxsaW5tYUB6anUuZWR1LmNuPiB3cml0ZXM6Cj4g
+Cj4gPiBIZWxsbyB0aGVyZSwKPiA+Cj4gPj4gT3VyIGRldGVjdG9yIGhhcyBpZGVudGlmaWVkIGFu
+b3RoZXIgY2FzZSBvZiBhbiBpbmNvbXBsZXRlIHBvbGljeS4KPiA+PiAuLi4KPiA+Cj4gPiBJIG1h
+cmsgdGhlIG5ldC1uZXh0IHRhZyBmb3IgdGhpcyBvbmUgYW5kIGEgcHJldmlvdXMgc2VudCBvbmUg
+aW4gdGhpcwo+ID4gbW9ybmluZyAoW1BBVENIIG5ldC1uZXh0IHYxXSBuZWlnaGJvdXI6IGNvbXBs
+ZW1lbnQgbmxfbnRibF9wYXJtX3BvbGljeSkuCj4gPgo+ID4gUGxlYXNlIGxldCBtZSBrbm93IGlm
+IHN1Y2ggbmxhX3BvbGljeSBjb21wbGVtZW50aW5nIHNob3VsZCBnbyBuZXQgaW5zdGVhZC4KPiAK
+PiBubDgwMjExIHBhdGNoZXMgZ28gdG8gd2lyZWxlc3Mgb3Igd2lyZWxlc3MtbmV4dC4KPiAKPiAt
+LSAKPiBodHRwczovL3BhdGNod29yay5rZXJuZWwub3JnL3Byb2plY3QvbGludXgtd2lyZWxlc3Mv
+bGlzdC8KPiAKPiBodHRwczovL3dpcmVsZXNzLndpa2kua2VybmVsLm9yZy9lbi9kZXZlbG9wZXJz
+L2RvY3VtZW50YXRpb24vc3VibWl0dGluZ3BhdGNoZXMKCk9LIEkgd2lsbCByZXNlbmQgYSB2ZXJz
+aW9uIHdpdGggY29ycmVjdCBvbmUuCgpUaGFua3MKTGlu
 
