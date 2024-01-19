@@ -1,86 +1,90 @@
-Return-Path: <netdev+bounces-64345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1D7A8329FB
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 14:03:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68474832A12
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 14:07:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7F181F23B0B
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 13:03:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E779284D69
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 13:07:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03AE652F79;
-	Fri, 19 Jan 2024 13:02:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1610851C4A;
+	Fri, 19 Jan 2024 13:07:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="HUz7klK6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail115-80.sinamail.sina.com.cn (mail115-80.sinamail.sina.com.cn [218.30.115.80])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00E604F21F
-	for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 13:01:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=218.30.115.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D93C4F1F5;
+	Fri, 19 Jan 2024 13:07:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705669324; cv=none; b=ivH/4C+3lBcstcQFLnQsR9CdYx0AR6p6733XaD1YiRA1L6/+X0SO+AjkUA0EckPuSEFnDpc51Y5rqKqFjAkBxiNLkT77RarzJRPE05/AuPepscsN5qlLZBoiTKI3BfHKmKlNawP9H/phM/AnJ3qCqSfDKt1EpSMDxzSRygp62ZI=
+	t=1705669643; cv=none; b=R/E7qK3ClSuJnmkK6Z3bEgAF0P0fNQ4xhLO3mDnlBXin3M/ssHegiRjBT2Z2VowkaJJZtx2KenrJp6y11vmRmCFrgrbHI3psJAKexNonIEB5OIIWe7XIPEST7p2mB70SjsVzAfDeMjOS6TNymBSArVOBAKxN0LyYISRz07E0SkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705669324; c=relaxed/simple;
-	bh=eLBftNGSL1xLJR9++0mXZCIaxv96znkbq/QBETDJa9A=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CC/4NMsJ34rUdti7+YoBMKHf3Dfp1ggPWkvfRVm6g9ye8qoHLzYSZn+v1iQ/74W5B9AXXy/ekPJn1Uhe72wGeaEYQ/fHQdiBXsRmDVrXRhCnXQScIxvPZBU6zZTVPwXF6znXlMdhfgRSzAKoVeYfGkLtj3jjuGko7deeoJXjRA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=218.30.115.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([116.24.10.220])
-	by sina.com (10.75.12.45) with ESMTP
-	id 65AA72BF00009B9F; Fri, 19 Jan 2024 21:01:55 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 11669731457895
-X-SMAIL-UIID: 95AE969CDE7F4D8481837C86F40B5358-20240119-210155-1
-From: Hillf Danton <hdanton@sina.com>
-To: Ubisectech Sirius <bugreport@ubisectech.com>
-Cc: Eric Dumazet <edumazet@google.com>,
-	Shigeru Yoshida <syoshida@redhat.com>,
-	Suman Ghosh <sumang@marvell.com>,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: BUG: unable to handle kernel paging request in __skb_flow_dissect
-Date: Fri, 19 Jan 2024 21:01:41 +0800
-Message-Id: <20240119130141.2160-1-hdanton@sina.com>
-In-Reply-To: <2c5794fb-c7cd-405a-8c63-f1820b8dbfaa.bugreport@ubisectech.com>
-References: <2c5794fb-c7cd-405a-8c63-f1820b8dbfaa.bugreport@ubisectech.com>
+	s=arc-20240116; t=1705669643; c=relaxed/simple;
+	bh=kO/kgFk+pCRzTkAUtMoYWZs6f8duDTJeIKjeZZqGzAE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o5/HAa6jQMi5YbPpxbBGTkdnzdmga171Y+wp0gEVOs7TV3Be6FQcWB6nykD4Kc7qJhB1+CEUC7hwNdtcTzvI3jEte0M/xCSF0O5EGOckBhuUiOaCbm7mwarega7ns7ccdbqMUxD58wQx1fu6viQvrJ3BimeqslRN1fv7Gornof4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=HUz7klK6; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=gfNpdWS77kPbZpDPWIKUcioA/sdtAqPn9TD06jokSFM=; b=HUz7klK6f9YMLOFn8aVhwsoE5X
+	Djl1Xen3icTXUgV2iM+4HNic1Bx0C9Mj0Z1mHBN23WLWLrVG7+2EgHpTbRkwSORWCA+geVvKRvdc3
+	qjyV8ZWJZBnx3pdjfkIyYpKnpvhbXHA4hGR/lEv+4A9OsS52v0LZepO2uwcW3wH0135o=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rQoaR-005YeW-76; Fri, 19 Jan 2024 14:07:07 +0100
+Date: Fri, 19 Jan 2024 14:07:07 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>
+Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	richardcochran@gmail.com, Divya.Koppera@microchip.com,
+	maxime.chevallier@bootlin.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net v2 2/2] net: micrel: Fix set/get PHC time for lan8814
+Message-ID: <74772857-670e-4c9b-a6f8-2b59c3e20bcb@lunn.ch>
+References: <20240118085916.1204354-1-horatiu.vultur@microchip.com>
+ <20240118085916.1204354-3-horatiu.vultur@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240118085916.1204354-3-horatiu.vultur@microchip.com>
 
-On Wed, 17 Jan 2024 15:32:28 +0800 Ubisectech Sirius <bugreport@ubisectech.com>
-> Hello.
-> We are Ubisectech Sirius Team, the vulnerability lab of China ValiantSec.
-> Recently, our team has discovered a issue in Linux kernel 6.7.0-g052d534373b7.
-> Attached to the email were a POC file of the issue.
-> Stack dump:
-> [ 185.664167][ T8332] BUG: unable to handle page fault for address: ffffed1029c40001
-> [ 185.665134][ T8332] #PF: supervisor read access in kernel mode
-> [ 185.665877][ T8332] #PF: error_code(0x0000) - not-present page
-> [ 185.666481][ T8332] PGD 7ffd0067 P4D 7ffd0067 PUD 3fff5067 PMD 0
-> [ 185.667129][ T8332] Oops: 0000 [#1] PREEMPT SMP KASAN
-> [ 185.667719][ T8332] CPU: 1 PID: 8332 Comm: poc Not tainted 6.7.0-g052d534373b7 #19
-> [ 185.668641][ T8332] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
-> [ 185.669639][ T8332] RIP: 0010:__skb_flow_dissect (net/core/flow_dissector.c:1170 (discriminator 1))
+On Thu, Jan 18, 2024 at 09:59:16AM +0100, Horatiu Vultur wrote:
+> When setting or getting PHC time, the higher bits of the second time (>32
+> bits) they were ignored. Meaning that setting some time in the future like
+> year 2150, it was failing to set this.
+> 
+> The issue can be reproduced like this:
+> 
+>  # phc_ctl /dev/ptp1 set 10000000000
+>  phc_ctl[118.619]: set clock time to 4294967295.000000000 or Sun Feb  7 06:28:15 2106
+> 
+>  # phc_ctl /dev/ptp1 get
+>  phc_ctl[120.858]: clock time is 1.238620924 or Thu Jan  1 00:00:01 1970
+> 
+> Fixes: ece19502834d ("net: phy: micrel: 1588 support for LAN8814 phy")
+> Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> Reviewed-by: Divya Koppera <divya.koppera@microchip.com>
 
-Looks like the syzbot report [1] on 01 Jan 2024, and decoding the test
-result of a debug patch [2] is welcome.
+When submitted to net-next:
 
-Hillf
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-[1] https://lore.kernel.org/lkml/000000000000498a02060de59162@google.com/
-[2] https://lore.kernel.org/lkml/00000000000078d073060f4b51e7@google.com/
+    Andrew
 
