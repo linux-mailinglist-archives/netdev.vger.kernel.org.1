@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-64401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7E83832EFC
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 19:35:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 052B3832F02
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 19:37:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 32608B2296A
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 18:35:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C8451C24DD4
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 18:37:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F28DC2575D;
-	Fri, 19 Jan 2024 18:35:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD63129CF0;
+	Fri, 19 Jan 2024 18:37:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="NRPwmz8K"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="iXdP/QeK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54DA51D53A
-	for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 18:35:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 145A423B1
+	for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 18:37:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705689314; cv=none; b=q1RF/FBDeMKGhgMysAzHmP2k9RaZJqFt8N6s4aL21iSTYiQg8xtPUX1+mPdxhb8cIj2AARDbpXkTi1KvrZGkV20SeTXIW+xgrtd8e56bWx3RQPeoZfcBGLDJ7JoZD1imp0p77UzD4YNMZ8+WYYKcwYpvvXRgiQVCAkEq8SIvrpw=
+	t=1705689471; cv=none; b=Cat7sYKMcJR3/56rnB4AVo7wu6Rbei1xkKJg/0TmhWYjOfcdwcLsqHhrEEA4ndYDKx3q/TTjDPh6isbGQWBG0M4QxrtWVY0DKf47b4FQn00T4S9AplzZLm7zUJ19/eiatjBB2HGjAZUz36K5JGw1e/3sxI4uQ6t9EvWCklOcTOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705689314; c=relaxed/simple;
-	bh=xuCFgyn4cz0wIPZBSCrD3dL2scimn4xxXHNjvci2OOE=;
+	s=arc-20240116; t=1705689471; c=relaxed/simple;
+	bh=uXMy1n0JH4qt7XiFd4zzgMTGI/G2SpHNvq70Xpl60kI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nH/owwbm3yYw/Y9MCHeKetFhtnjykpBw1jKPDiBUBR0+g3fpnGHSqAnnFlNlZGpnfUbJTvz6fOGaCu3hvhxwudbeihfs9yXOF283tp+UbProorVh1XHRGdl3emVG4pLGXRBQqgP2CqtXV+vU5BZYQ9Y5T5m4OMFIFree5PlfGhA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=NRPwmz8K; arc=none smtp.client-ip=209.85.221.44
+	 In-Reply-To:Content-Type; b=D6gcR4rjscYwbXkcuEKBFjUJKJ4I0Le4BIvmximl89maHkvHmw9go3V/5HJ9/8Vv8fPC6Rldv51wGX+BzcZgXSUFku3Xmqh4O4QSKjMMWSxxfkM4UqB/4yxeMG6qITqWPZp5+Vp4zTjdFMlasNjnvtNUXS88hCg95drVU+dqe+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=iXdP/QeK; arc=none smtp.client-ip=209.85.128.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3367a304091so969789f8f.3
-        for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 10:35:13 -0800 (PST)
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-40e8d3b29f2so11693945e9.1
+        for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 10:37:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1705689311; x=1706294111; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=arista.com; s=google; t=1705689468; x=1706294268; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=0bAylKPD/2AUXEJVvzIJSovCcFzQteP7UpA1x2mx61w=;
-        b=NRPwmz8KWOGYdUHpGk74fx2fq9BfCUYTrQq/A3zT1adsIaHy0p1Nt2xBEp3V2XCq66
-         M9kp5FhgJ58/LorqW9IrGhk2pRnnLHwh5ontQq5sEcC0A7VxxkoR/H9qeXP6rWrsT1I4
-         HhFFP2PLjl3qSdrwW8XBgRuD0piEPjTlSl7dZ1+o49PuiLNPLcuIEyWr0YNW2W+gWxYZ
-         dX1SK7Mhw6PTaBj7izRtM77xgDkAnrVsmspsPdm0PsDQFpd7t4lBXeepLyLnpxzaNJQO
-         blWV9q2U+C1tWnzx3lQ2ngoby6vA8NUXEeWUGLDFug1A21I9Ar88eFcyPIOZQMQD9YnL
-         ZoUQ==
+        bh=u+1r/dahOeE8P7NrmGZ2J2uPqXQodmhqgoO/0IR34I0=;
+        b=iXdP/QeKo2TcYW18yATTj0/NNCUPlgJA985I+94I5l/MFIYK2aVT4acyQr+ZcFxUK7
+         1NW96c0JpTxOcaJCPTxKlvS6VdTwZN7wYEOuZ68PrQsCS58UhGviDSZ6x0qngB0jB9kh
+         zuVbYhiOTkBFtnjCfMUzy8DI/yMjvoFfKMMVq4FQPGYaZ5gkJxQgKwiZq9/bh/wfeFb/
+         QKhgv4AHl4mkAkg7Zxd/nkuAYLTZn7U08gGJqFuXh3djgbobxcBl65oaVJ3KQ75rJom3
+         WBTcZpIAFR9waJJCXk9iSc6K3ZwOQm2K55uETMmMFHgLSItTd8+Q7hHBb0kangzjdoCV
+         HsYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705689311; x=1706294111;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1705689468; x=1706294268;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0bAylKPD/2AUXEJVvzIJSovCcFzQteP7UpA1x2mx61w=;
-        b=kmUVQ45yE9tu4sVk0T5bKr4MK532ukcLiQ+u7KxX3awDhsqK3qabVQUR2hBavMap6C
-         6qOrIz1HEd2k+qHpBGYoqQx92Iboen9zxNFx2oCrpgDWissNvUgbfHjhgWaqYx47xkkB
-         aaYAITmwoJWfQUCX/C6lg3bhF0HzgutekktX/iPCe4Z2pOz2TxSnObEwVZp87mrmLHrK
-         aZVta1uJ0FKdB9Rvqj54LpJjsuhIcP4521WfpYxzgEi/U4F1AJsKKz2rGIbI/+Sckf4L
-         GVn2sTM8jVGVDm1aGzEb3/cCu4Hk0CJkvGq/WILQGnWyF+ztJvTF5snRdaxkX+ZFLM3C
-         B+cA==
-X-Gm-Message-State: AOJu0YwUfeSgvcELaTobklTrXyLT5bGqH4prtwpQzMOyJYrbJX0W1HpZ
-	3GFAoknSAsZ4WTSDxL94cxwDvI5qCflYNQvZGdMBwPSm+cpiXAQX9jOuan5hMA==
-X-Google-Smtp-Source: AGHT+IEmz4Ekqul2zRazQSdNgWFThds0DWXDzxgiZCKOmZLx0ze57Ay8hIE45e6h7me09fPjGggnIg==
-X-Received: by 2002:adf:f20e:0:b0:336:c4c1:2d7d with SMTP id p14-20020adff20e000000b00336c4c12d7dmr63401wro.60.1705689311453;
-        Fri, 19 Jan 2024 10:35:11 -0800 (PST)
+        bh=u+1r/dahOeE8P7NrmGZ2J2uPqXQodmhqgoO/0IR34I0=;
+        b=sQL46v1bCz6ar4UTPlqLzw8Ch22YpxTXV6wamRzx6igWfngzSEQmecNIuNKRzWTdY4
+         KxD7/xiJ9SmTa3CSRMlb3u0LJzMpyVO+vIu1gp65ri3r6unpj+AtH65lCxM5YERk6Rl+
+         RdWPfi+MKjN/NDosIM4jBZJWjmsI6sxYwF9ZFgALjKYC/KgwH+bchwnnph8pxI1ndjC4
+         jFlNIIviYxm3dviVW65E99auzDp1YazkqOxkzQC3ivF+1E4IHTgU8rw02oJXQCbcyLpP
+         YVKB5i38V9sLQftr/5C5Uf28LUvlDMMnI0fM9EaY+VZ9zJT9tb+iHkBk1AfHaFZ6zx7i
+         rhgg==
+X-Gm-Message-State: AOJu0YxEcTzVK1dFfnI0z6CifSppn6f2QY4mCdqxxQWOxeCXQdp3vuWh
+	spFUzv4LLNfvL4ZZ9wM+W4OTjFweYVsOXixqQogxlZV+5j2uPRAdvSbcpUENGw==
+X-Google-Smtp-Source: AGHT+IGTV33BFQ4quwL/xLL89bS64SKyLDdVok833PiG97Szn5n2sRugxrO/C21q3HmJZQJUt79rvA==
+X-Received: by 2002:a05:600c:26d2:b0:40e:4a0a:10b2 with SMTP id 18-20020a05600c26d200b0040e4a0a10b2mr73610wmv.170.1705689468291;
+        Fri, 19 Jan 2024 10:37:48 -0800 (PST)
 Received: from [10.83.37.178] ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id u11-20020adfa18b000000b00337d2d1e0ecsm4362582wru.104.2024.01.19.10.35.10
+        by smtp.gmail.com with ESMTPSA id t18-20020a05600c199200b0040e5951f199sm29697280wmq.34.2024.01.19.10.37.46
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 19 Jan 2024 10:35:10 -0800 (PST)
-Message-ID: <f66f4de0-8ed7-4c23-937b-fc29527835bf@arista.com>
-Date: Fri, 19 Jan 2024 18:35:08 +0000
+        Fri, 19 Jan 2024 10:37:47 -0800 (PST)
+Message-ID: <945fb211-e224-4d81-aa12-9cfd5c066751@arista.com>
+Date: Fri, 19 Jan 2024 18:37:46 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,8 +75,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] selftests/net: Argument value mismatch when calling
- verify_counters()
+Subject: Re: [PATCH 3/3] selftests/net: Clean-up double assignment
+Content-Language: en-US
 To: Simon Horman <horms@kernel.org>
 Cc: "David S. Miller" <davem@davemloft.net>,
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
@@ -85,45 +85,51 @@ Cc: "David S. Miller" <davem@davemloft.net>,
  <mnassiri@ciena.com>, netdev@vger.kernel.org,
  linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <20240118-tcp-ao-test-key-mgmt-v1-0-3583ca147113@arista.com>
- <20240118-tcp-ao-test-key-mgmt-v1-1-3583ca147113@arista.com>
- <20240119162652.GG89683@kernel.org>
-Content-Language: en-US
+ <20240118-tcp-ao-test-key-mgmt-v1-3-3583ca147113@arista.com>
+ <20240119162525.GF89683@kernel.org>
 From: Dmitry Safonov <dima@arista.com>
-In-Reply-To: <20240119162652.GG89683@kernel.org>
+In-Reply-To: <20240119162525.GF89683@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 Hi Simon,
 
-On 1/19/24 16:26, Simon Horman wrote:
-> On Thu, Jan 18, 2024 at 02:51:34AM +0000, Dmitry Safonov wrote:
->> From: Mohammad Nassiri <mnassiri@ciena.com>
+On 1/19/24 16:25, Simon Horman wrote:
+> On Thu, Jan 18, 2024 at 02:51:36AM +0000, Dmitry Safonov wrote:
+>> Yeah, copy'n'paste typo.
 >>
->> The end_server() function only operates in the server thread
->> and always takes an accept socket instead of a listen socket as
->> its input argument. To align with this, invert the boolean values
->> used when calling verify_counters() within the end_server() function.
+>> Fixes: 3c3ead555648 ("selftests/net: Add TCP-AO key-management test")
+>> Reported-by: Nassiri, Mohammad <mnassiri@ciena.com>
+>> Closes: https://lore.kernel.org/all/DM6PR04MB4202BC58A9FD5BDD24A16E8EC56F2@DM6PR04MB4202.namprd04.prod.outlook.com/
+>> Signed-off-by: Dmitry Safonov <dima@arista.com>
+>> ---
 > 
 > Hi Dmitry,
 > 
-> I see that this is correct, but I am wondering
-> if it fixes a user-visible bug. If so, could
-> some text about that go here?
+> This seems more like a clean-up than a fix.
 
-Yep. The test as the result doesn't correctly check tcp counters for
-non-symmetrical scenario, where peer-A uses a key <a:a2> to send data,
-but peer-B uses <b:b2> key to send its data. So, in simple terms,
-different keys for TX and RX on peers.
+Do you mean to remove the tag or that you'd prefer it rather go
+to net-next?
 
-I'll send v2 with an improved patch message.
-
->> Fixes: 3c3ead555648 ("selftests/net: Add TCP-AO key-management test")
->> Signed-off-by: Mohammad Nassiri <mnassiri@ciena.com>
->> Link: https://lore.kernel.org/all/934627c5-eebb-4626-be23-cfb134c01d1a@arista.com/
->> [amended 'Fixes' tag and carried-over to lkml]
->> Signed-off-by: Dmitry Safonov <dima@arista.com>
-> 
-> ...
+>>  tools/testing/selftests/net/tcp_ao/lib/sock.c | 1 -
+>>  1 file changed, 1 deletion(-)
+>>
+>> diff --git a/tools/testing/selftests/net/tcp_ao/lib/sock.c b/tools/testing/selftests/net/tcp_ao/lib/sock.c
+>> index c75d82885a2e..923a9bb4f1ca 100644
+>> --- a/tools/testing/selftests/net/tcp_ao/lib/sock.c
+>> +++ b/tools/testing/selftests/net/tcp_ao/lib/sock.c
+>> @@ -377,7 +377,6 @@ int test_get_tcp_ao_counters(int sk, struct tcp_ao_counters *out)
+>>  
+>>  	key_dump[0].nkeys = nr_keys;
+>>  	key_dump[0].get_all = 1;
+>> -	key_dump[0].get_all = 1;
+>>  	err = getsockopt(sk, IPPROTO_TCP, TCP_AO_GET_KEYS,
+>>  			 key_dump, &key_dump_sz);
+>>  	if (err) {
+>>
+>> -- 
+>> 2.43.0
+>>
 
 Thanks,
            Dmitry
