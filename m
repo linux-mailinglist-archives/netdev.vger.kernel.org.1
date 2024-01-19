@@ -1,77 +1,76 @@
-Return-Path: <netdev+bounces-64305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D4F9832328
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 02:52:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DAD6832330
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 02:55:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80B181C228EB
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 01:52:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B27501F22C04
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 01:55:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CA33ECE;
-	Fri, 19 Jan 2024 01:51:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B0C2ECE;
+	Fri, 19 Jan 2024 01:55:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="D7EYvuM/"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="vKdiB5JO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D86B6EDF
-	for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 01:51:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAD573C28
+	for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 01:55:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705629117; cv=none; b=ECPJvP0LMN8V/KrJJN1Bti6qHpktU6KVrIEgYlDLfYzVF5RlRP90W4D/3yhYlYx6w9FqnJl/mbswwMgAtzM4DwUo6FBnXO+TtSqmf97k9KxnVSYlIXG/yHbgtNti8z+4y5V6rZYI5J139kVTA0YySFZuR6zaQtN53G+CS1qlkYk=
+	t=1705629334; cv=none; b=VzZ7t7G9qukWfdJ6DE3gg3fU1fuUuJmxLFQ3lHOtrzrxloNWBTO0yXpHk4c1eG3rSMhRvhOdtK7Ud7rqtR0xz954WGlSwu614HNmTNtXgsgLMrERodtNFSI7keJ0u5nWFQ0cKmXlEdzZbdndvun3wDgLh6K0QKsno4s+KJFRYJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705629117; c=relaxed/simple;
-	bh=k6xxsz7v/s73K4yECEmouBgGV6ursdmMD2QW8V7L6g4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BofcSTpk5CjiEvfvbdqG/cYRQjCkhioNKQzBm9Z5zkunS3XaU+mgRZZwKlMG2lgXZAg6peTdeBRxpi1M9ijFmkeP4UrFekpyO3uAqa/zVNYOoAVd0VihrqwKs1BnSAOK5n2HXfewiEwsjqIoGsG70SbIeFVRP4P6/pos7HlLem0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=D7EYvuM/; arc=none smtp.client-ip=52.95.49.90
+	s=arc-20240116; t=1705629334; c=relaxed/simple;
+	bh=Qn/z7AK9skTK1jUDFD8gXrRREbyaQbpjyeATa5wung4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=H9A6r+dQoaCxvEDGq5tEQFv+RHN7GoOIj5BOOVqyeS586nwTHZUA5C/5jZ6jWlg+IlhgIn4F+eUSPX3pRXN8ypMLlkUC2hX99qJkmO/brQof7tHHj3/WgEebeKOhHO3Y97i8Dz+XSVHRZGKGp/4zPNrOTjrWgIq/uve2LNaiKPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=vKdiB5JO; arc=none smtp.client-ip=52.119.213.152
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1705629116; x=1737165116;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=k6xxsz7v/s73K4yECEmouBgGV6ursdmMD2QW8V7L6g4=;
-  b=D7EYvuM/ioSzW6LNC1AguBTby8UJ/xpERyUZ3Y89PSfEJ5oVQNREaLM0
-   9YkqvT8wUTlTKQQPc9A1sPQ4hkg5SR8nj4/r9O23CXNNWl7oPOCtcdVCj
-   akr+xLf1CJURzqT3VmDMQBkW9af8dNst654JTxHYpV/HgtsrkdsE3XhgO
-   M=;
+  t=1705629333; x=1737165333;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=BSM6VNDOlg2w7JCCVaB3kn8R1Ii3HX4Es0+UWQYBfZA=;
+  b=vKdiB5JOyFvQa4TjY2hjycM9X21katKx3y+CGGx7UEYF6y1YoJKSx04d
+   NSWpDjRRbm7RShU2HikPiHWzWwNRM18wyhxdiPKuhzC71DwbDOyl6Tn1e
+   axJhucRlg5qDnXunl/RadYBBO0ju9V326TN8zmOw/+IDM43XrIy3eYh2P
+   s=;
 X-IronPort-AV: E=Sophos;i="6.05,203,1701129600"; 
-   d="scan'208";a="380753584"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-617e30c2.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2024 01:51:55 +0000
+   d="scan'208";a="632148428"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-b538c141.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2024 01:55:31 +0000
 Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
-	by email-inbound-relay-iad-1a-m6i4x-617e30c2.us-east-1.amazon.com (Postfix) with ESMTPS id EF8C866E76;
-	Fri, 19 Jan 2024 01:51:52 +0000 (UTC)
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:52817]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.23.111:2525] with esmtp (Farcaster)
- id facefb15-06e8-469d-87f9-df3eb76fe4d3; Fri, 19 Jan 2024 01:51:52 +0000 (UTC)
-X-Farcaster-Flow-ID: facefb15-06e8-469d-87f9-df3eb76fe4d3
+	by email-inbound-relay-iad-1e-m6i4x-b538c141.us-east-1.amazon.com (Postfix) with ESMTPS id BEE34A0BA9;
+	Fri, 19 Jan 2024 01:55:28 +0000 (UTC)
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:7692]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.60.181:2525] with esmtp (Farcaster)
+ id 627f6fdd-63a6-4cbb-a267-7aee7ac27f3b; Fri, 19 Jan 2024 01:55:27 +0000 (UTC)
+X-Farcaster-Flow-ID: 627f6fdd-63a6-4cbb-a267-7aee7ac27f3b
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
  EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 19 Jan 2024 01:51:47 +0000
+ 15.2.1118.40; Fri, 19 Jan 2024 01:55:27 +0000
 Received: from 88665a182662.ant.amazon.com (10.88.183.204) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 19 Jan 2024 01:51:45 +0000
+ 15.2.1118.40; Fri, 19 Jan 2024 01:55:24 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kuniyu@amazon.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<paul.gortmaker@windriver.com>,
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Paul Gortmaker <paul.gortmaker@windriver.com>, Kuniyuki Iwashima
+	<kuniyu@amazon.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+	<netdev@vger.kernel.org>,
 	<syzbot+b5ad66046b913bc04c6f@syzkaller.appspotmail.com>
-Subject: Re: [PATCH v1 net] llc: Initialise addr before __llc_lookup().
-Date: Thu, 18 Jan 2024 17:51:37 -0800
-Message-ID: <20240119015137.61367-1-kuniyu@amazon.com>
+Subject: [PATCH v2 net] llc: Drop support for ETH_P_TR_802_2.
+Date: Thu, 18 Jan 2024 17:55:15 -0800
+Message-ID: <20240119015515.61898-1-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240119014149.60438-1-kuniyu@amazon.com>
-References: <20240119014149.60438-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,14 +79,125 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWA004.ant.amazon.com (10.13.139.76) To
+X-ClientProxiedBy: EX19D041UWB003.ant.amazon.com (10.13.139.176) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 Precedence: Bulk
 
-> llc: Initialise addr before __llc_lookup().
+syzbot reported an uninit-value bug below. [0]
 
-I just noticed after hitting Enter that I forgot to change Subject :/
-I'll post v2, sorry for the noise.
+llc supports ETH_P_802_2 (0x0004) and used to support ETH_P_TR_802_2
+(0x0011), and syzbot abused the latter to trigger the bug.
 
-pw-bot: cr
+  write$tun(r0, &(0x7f0000000040)={@val={0x0, 0x11}, @val, @mpls={[], @llc={@snap={0xaa, 0x1, ')', "90e5dd"}}}}, 0x16)
+
+llc_conn_handler() initialises local variables {saddr,daddr}.mac
+based on skb in llc_pdu_decode_sa()/llc_pdu_decode_da() and passes
+them to __llc_lookup().
+
+However, the initialisation is done only when skb->protocol is
+htons(ETH_P_802_2), otherwise, __llc_lookup_established() and
+__llc_lookup_listener() will read garbage.
+
+The missing initialisation existed prior to commit 211ed865108e
+("net: delete all instances of special processing for token ring").
+
+It removed the part to kick out the token ring stuff but forgot to
+close the door allowing ETH_P_TR_802_2 packets to sneak into llc_rcv().
+
+Let's remove llc_tr_packet_type and complete the deprecation.
+
+[0]:
+BUG: KMSAN: uninit-value in __llc_lookup_established+0xe9d/0xf90
+ __llc_lookup_established+0xe9d/0xf90
+ __llc_lookup net/llc/llc_conn.c:611 [inline]
+ llc_conn_handler+0x4bd/0x1360 net/llc/llc_conn.c:791
+ llc_rcv+0xfbb/0x14a0 net/llc/llc_input.c:206
+ __netif_receive_skb_one_core net/core/dev.c:5527 [inline]
+ __netif_receive_skb+0x1a6/0x5a0 net/core/dev.c:5641
+ netif_receive_skb_internal net/core/dev.c:5727 [inline]
+ netif_receive_skb+0x58/0x660 net/core/dev.c:5786
+ tun_rx_batched+0x3ee/0x980 drivers/net/tun.c:1555
+ tun_get_user+0x53af/0x66d0 drivers/net/tun.c:2002
+ tun_chr_write_iter+0x3af/0x5d0 drivers/net/tun.c:2048
+ call_write_iter include/linux/fs.h:2020 [inline]
+ new_sync_write fs/read_write.c:491 [inline]
+ vfs_write+0x8ef/0x1490 fs/read_write.c:584
+ ksys_write+0x20f/0x4c0 fs/read_write.c:637
+ __do_sys_write fs/read_write.c:649 [inline]
+ __se_sys_write fs/read_write.c:646 [inline]
+ __x64_sys_write+0x93/0xd0 fs/read_write.c:646
+ do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+ do_syscall_64+0x44/0x110 arch/x86/entry/common.c:82
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+Local variable daddr created at:
+ llc_conn_handler+0x53/0x1360 net/llc/llc_conn.c:783
+ llc_rcv+0xfbb/0x14a0 net/llc/llc_input.c:206
+
+CPU: 1 PID: 5004 Comm: syz-executor994 Not tainted 6.6.0-syzkaller-14500-g1c41041124bd #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/09/2023
+
+Fixes: 211ed865108e ("net: delete all instances of special processing for token ring")
+Reported-by: syzbot+b5ad66046b913bc04c6f@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=b5ad66046b913bc04c6f
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+---
+ include/net/llc_pdu.h | 6 ++----
+ net/llc/llc_core.c    | 7 -------
+ 2 files changed, 2 insertions(+), 11 deletions(-)
+
+diff --git a/include/net/llc_pdu.h b/include/net/llc_pdu.h
+index 7e73f8e5e497..1d55ba7c45be 100644
+--- a/include/net/llc_pdu.h
++++ b/include/net/llc_pdu.h
+@@ -262,8 +262,7 @@ static inline void llc_pdu_header_init(struct sk_buff *skb, u8 type,
+  */
+ static inline void llc_pdu_decode_sa(struct sk_buff *skb, u8 *sa)
+ {
+-	if (skb->protocol == htons(ETH_P_802_2))
+-		memcpy(sa, eth_hdr(skb)->h_source, ETH_ALEN);
++	memcpy(sa, eth_hdr(skb)->h_source, ETH_ALEN);
+ }
+ 
+ /**
+@@ -275,8 +274,7 @@ static inline void llc_pdu_decode_sa(struct sk_buff *skb, u8 *sa)
+  */
+ static inline void llc_pdu_decode_da(struct sk_buff *skb, u8 *da)
+ {
+-	if (skb->protocol == htons(ETH_P_802_2))
+-		memcpy(da, eth_hdr(skb)->h_dest, ETH_ALEN);
++	memcpy(da, eth_hdr(skb)->h_dest, ETH_ALEN);
+ }
+ 
+ /**
+diff --git a/net/llc/llc_core.c b/net/llc/llc_core.c
+index 6e387aadffce..4f16d9c88350 100644
+--- a/net/llc/llc_core.c
++++ b/net/llc/llc_core.c
+@@ -135,22 +135,15 @@ static struct packet_type llc_packet_type __read_mostly = {
+ 	.func = llc_rcv,
+ };
+ 
+-static struct packet_type llc_tr_packet_type __read_mostly = {
+-	.type = cpu_to_be16(ETH_P_TR_802_2),
+-	.func = llc_rcv,
+-};
+-
+ static int __init llc_init(void)
+ {
+ 	dev_add_pack(&llc_packet_type);
+-	dev_add_pack(&llc_tr_packet_type);
+ 	return 0;
+ }
+ 
+ static void __exit llc_exit(void)
+ {
+ 	dev_remove_pack(&llc_packet_type);
+-	dev_remove_pack(&llc_tr_packet_type);
+ }
+ 
+ module_init(llc_init);
+-- 
+2.30.2
+
 
