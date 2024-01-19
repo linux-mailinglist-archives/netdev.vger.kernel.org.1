@@ -1,145 +1,203 @@
-Return-Path: <netdev+bounces-64301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFA5F8322E7
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 02:18:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 87EC5832310
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 02:42:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 820C3285E0B
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 01:18:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA1F82841AE
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 01:42:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CEFBECE;
-	Fri, 19 Jan 2024 01:18:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 236DFECE;
+	Fri, 19 Jan 2024 01:42:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Rgd2Q1xP"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C8F8EC7;
-	Fri, 19 Jan 2024 01:18:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D47F10E4
+	for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 01:42:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705627128; cv=none; b=BeTwCem5/C+vZBZNZ6eo7jAylUDKIt/1uKffWtRjkTGEq6ch8AFP6Rrv6SN/S+0AM4n01kv10u4EFjHFHFfpggyvXbMAMC03gVEx0J8feacj0tiYP53czIe5jtEYXhBkytRFODrc3ibQIMZAOIVulwcqustVrZFL/MoT1TtyJEQ=
+	t=1705628530; cv=none; b=dN5kSRU0y7eBwL5iFR9N037IfboZ8ervvwViac0qi8op2vI/h6e8o/dqdV+HVk48KFlyWnXSbZTiZgfkQIve5kiwxMmMui1R6KUrLjNGBCjKQKKvWJbS5Kj+faLn25fu+vSnwTUFpclnGdgXlfAb2kgLIJSSIzmuaENK6I0ZpTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705627128; c=relaxed/simple;
-	bh=ugkaUFaRo4cOIwX2UnpOfwNOVxesUGkcT5tyQhm4MA8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=JV4/HYbOd869tuwLipSfAsRj9x97eByFnQjT6En6jbEsmGCe0bl3CUzb5AzUC636qUmZc8PQSdI+Bw13vrtrQaJlG49Pdnh+VjasacTar83RvlNM/NdjUgwoXNzivHKHqkgdt/9vzKvoIBQXrpdl3I9+sGZaf5dvJKT0puMA2bE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4TGMCn5c5vzvV9l;
-	Fri, 19 Jan 2024 09:17:09 +0800 (CST)
-Received: from dggpeml500026.china.huawei.com (unknown [7.185.36.106])
-	by mail.maildlp.com (Postfix) with ESMTPS id 373FF1402DE;
-	Fri, 19 Jan 2024 09:18:36 +0800 (CST)
-Received: from [10.174.178.66] (10.174.178.66) by
- dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 19 Jan 2024 09:18:35 +0800
-Message-ID: <4a41a867-ccfc-09e1-ebaa-9f0825bd153a@huawei.com>
-Date: Fri, 19 Jan 2024 09:18:35 +0800
+	s=arc-20240116; t=1705628530; c=relaxed/simple;
+	bh=Qn/z7AK9skTK1jUDFD8gXrRREbyaQbpjyeATa5wung4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=m9AxiQTV1uunrVhqYCpLBJlcKA63z77jX2qLhi/WAYtinb9GJoQVW6DeE2ebvztfOR8SD244+pBtfxi2S6AZ64wneTD57RGMG1LkNC1esoIhgvpxHzwhJyhhfSLtwnqseLV8oowihrw9JLzFWieBsEFH1eC9xYdLlLdMnQc0oJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Rgd2Q1xP; arc=none smtp.client-ip=52.95.49.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1705628528; x=1737164528;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=BSM6VNDOlg2w7JCCVaB3kn8R1Ii3HX4Es0+UWQYBfZA=;
+  b=Rgd2Q1xPFxMJQwwcopljMUDCY3Md2RrecD1JhXUxvZT05cyXx6fd2toA
+   8rYoHMaEzw9pfZwoezCb9B+CLq4Kaoh9/gr7UI7LXrVwNzjQ5/JiY4SHF
+   4rypWEtFCCZ1k9xGqy7CBT9DmmC/N/e/6UkWaOd0TUE0GwPpwKPOn9v7i
+   o=;
+X-IronPort-AV: E=Sophos;i="6.05,203,1701129600"; 
+   d="scan'208";a="380752560"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-f05d30a1.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2024 01:42:06 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan3.iad.amazon.com [10.32.235.38])
+	by email-inbound-relay-iad-1d-m6i4x-f05d30a1.us-east-1.amazon.com (Postfix) with ESMTPS id EEB5D8072B;
+	Fri, 19 Jan 2024 01:42:03 +0000 (UTC)
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.7.35:7497]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.23.164:2525] with esmtp (Farcaster)
+ id 0d0af359-c3cd-4377-b809-53eeeba2b308; Fri, 19 Jan 2024 01:42:03 +0000 (UTC)
+X-Farcaster-Flow-ID: 0d0af359-c3cd-4377-b809-53eeeba2b308
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Fri, 19 Jan 2024 01:42:02 +0000
+Received: from 88665a182662.ant.amazon.com (10.88.183.204) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Fri, 19 Jan 2024 01:42:00 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Paul Gortmaker <paul.gortmaker@windriver.com>, Kuniyuki Iwashima
+	<kuniyu@amazon.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+	<netdev@vger.kernel.org>,
+	<syzbot+b5ad66046b913bc04c6f@syzkaller.appspotmail.com>
+Subject: [PATCH v1 net] llc: Initialise addr before __llc_lookup().
+Date: Thu, 18 Jan 2024 17:41:49 -0800
+Message-ID: <20240119014149.60438-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.0.2
-Subject: Re: [PATCH v2] ipc/mqueue: fix potential sleeping issue in
- mqueue_flush_file
-To: Hillf Danton <hdanton@sina.com>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, Davidlohr Bueso
-	<dave@stgolabs.net>, Manfred Spraul <manfred@colorfullife.com>,
-	<jack@suse.cz>
-References: <20231220021208.2634523-1-shaozhengchao@huawei.com>
- <20240118114631.1490-1-hdanton@sina.com>
-From: shaozhengchao <shaozhengchao@huawei.com>
-In-Reply-To: <20240118114631.1490-1-hdanton@sina.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpeml500026.china.huawei.com (7.185.36.106)
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D043UWA004.ant.amazon.com (10.13.139.41) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
 
+syzbot reported an uninit-value bug below. [0]
 
+llc supports ETH_P_802_2 (0x0004) and used to support ETH_P_TR_802_2
+(0x0011), and syzbot abused the latter to trigger the bug.
 
-On 2024/1/18 19:46, Hillf Danton wrote:
-> On 2023/12/20 10:12, Zhengchao Shao wrote:
->> I analyze the potential sleeping issue of the following processes:
->> Thread A                                Thread B
->> ...                                     netlink_create  //ref = 1
->> do_mq_notify                            ...
->>     sock = netlink_getsockbyfilp          ...     //ref = 2
->>     info->notify_sock = sock;             ...
->> ...                                     netlink_sendmsg
->> ...                                       skb = netlink_alloc_large_skb  //skb->head is vmalloced
->> ...                                       netlink_unicast
->> ...                                         sk = netlink_getsockbyportid //ref = 3
->> ...                                         netlink_sendskb
->> ...                                           __netlink_sendskb
->> ...                                             skb_queue_tail //put skb to sk_receive_queue
->> ...                                         sock_put //ref = 2
->> ...                                     ...
->> ...                                     netlink_release
->> ...                                       deferred_put_nlk_sk //ref = 1
->> mqueue_flush_file
->>     spin_lock
->>     remove_notification
->>       netlink_sendskb
->>         sock_put  //ref = 0
->>           sk_free
->>             ...
->>             __sk_destruct
->>               netlink_sock_destruct
->>                 skb_queue_purge  //get skb from sk_receive_queue
->>                   ...
->>                   __skb_queue_purge_reason
->>                     kfree_skb_reason
->>                       __kfree_skb
->>                       ...
->>                       skb_release_all
->>                         skb_release_head_state
->>                           netlink_skb_destructor
->>                             vfree(skb->head)  //sleeping while holding spinlock
->>
->> In netlink_sendmsg, if the memory pointed to by skb->head is allocated by
->> vmalloc, and is put to sk_receive_queue queue, also the skb is not freed.
->> When the mqueue executes flush, the sleeping bug will occur. Use mutex
->> lock instead of spin lock in mqueue_flush_file.
-> 
-> It makes no sense to replace spinlock with mutex just for putting sock.
-> 
-> Only for thoughts.
-> 
-> --- x/ipc/mqueue.c
-> +++ y/ipc/mqueue.c
-> @@ -663,12 +663,17 @@ static ssize_t mqueue_read_file(struct f
->   static int mqueue_flush_file(struct file *filp, fl_owner_t id)
->   {
->   	struct mqueue_inode_info *info = MQUEUE_I(file_inode(filp));
-> +	struct sock *sk = NULL;
->   
->   	spin_lock(&info->lock);
-> -	if (task_tgid(current) == info->notify_owner)
-> +	if (task_tgid(current) == info->notify_owner) {
-> +		sk = info->notify_sock;
-> +		sock_hold(sk);
->   		remove_notification(info);
-> -
-> +	}
->   	spin_unlock(&info->lock);
-> +	if (sk)
-> +		sock_put(sk);
->   	return 0;
->   }
->   
+  write$tun(r0, &(0x7f0000000040)={@val={0x0, 0x11}, @val, @mpls={[], @llc={@snap={0xaa, 0x1, ')', "90e5dd"}}}}, 0x16)
 
-Hi Hillf:
-	Thank you for your review. Your changes are more concise and
-clear. I will send V3.
+llc_conn_handler() initialises local variables {saddr,daddr}.mac
+based on skb in llc_pdu_decode_sa()/llc_pdu_decode_da() and passes
+them to __llc_lookup().
 
-Zhengchao Shao
+However, the initialisation is done only when skb->protocol is
+htons(ETH_P_802_2), otherwise, __llc_lookup_established() and
+__llc_lookup_listener() will read garbage.
+
+The missing initialisation existed prior to commit 211ed865108e
+("net: delete all instances of special processing for token ring").
+
+It removed the part to kick out the token ring stuff but forgot to
+close the door allowing ETH_P_TR_802_2 packets to sneak into llc_rcv().
+
+Let's remove llc_tr_packet_type and complete the deprecation.
+
+[0]:
+BUG: KMSAN: uninit-value in __llc_lookup_established+0xe9d/0xf90
+ __llc_lookup_established+0xe9d/0xf90
+ __llc_lookup net/llc/llc_conn.c:611 [inline]
+ llc_conn_handler+0x4bd/0x1360 net/llc/llc_conn.c:791
+ llc_rcv+0xfbb/0x14a0 net/llc/llc_input.c:206
+ __netif_receive_skb_one_core net/core/dev.c:5527 [inline]
+ __netif_receive_skb+0x1a6/0x5a0 net/core/dev.c:5641
+ netif_receive_skb_internal net/core/dev.c:5727 [inline]
+ netif_receive_skb+0x58/0x660 net/core/dev.c:5786
+ tun_rx_batched+0x3ee/0x980 drivers/net/tun.c:1555
+ tun_get_user+0x53af/0x66d0 drivers/net/tun.c:2002
+ tun_chr_write_iter+0x3af/0x5d0 drivers/net/tun.c:2048
+ call_write_iter include/linux/fs.h:2020 [inline]
+ new_sync_write fs/read_write.c:491 [inline]
+ vfs_write+0x8ef/0x1490 fs/read_write.c:584
+ ksys_write+0x20f/0x4c0 fs/read_write.c:637
+ __do_sys_write fs/read_write.c:649 [inline]
+ __se_sys_write fs/read_write.c:646 [inline]
+ __x64_sys_write+0x93/0xd0 fs/read_write.c:646
+ do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+ do_syscall_64+0x44/0x110 arch/x86/entry/common.c:82
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+Local variable daddr created at:
+ llc_conn_handler+0x53/0x1360 net/llc/llc_conn.c:783
+ llc_rcv+0xfbb/0x14a0 net/llc/llc_input.c:206
+
+CPU: 1 PID: 5004 Comm: syz-executor994 Not tainted 6.6.0-syzkaller-14500-g1c41041124bd #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/09/2023
+
+Fixes: 211ed865108e ("net: delete all instances of special processing for token ring")
+Reported-by: syzbot+b5ad66046b913bc04c6f@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=b5ad66046b913bc04c6f
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+---
+ include/net/llc_pdu.h | 6 ++----
+ net/llc/llc_core.c    | 7 -------
+ 2 files changed, 2 insertions(+), 11 deletions(-)
+
+diff --git a/include/net/llc_pdu.h b/include/net/llc_pdu.h
+index 7e73f8e5e497..1d55ba7c45be 100644
+--- a/include/net/llc_pdu.h
++++ b/include/net/llc_pdu.h
+@@ -262,8 +262,7 @@ static inline void llc_pdu_header_init(struct sk_buff *skb, u8 type,
+  */
+ static inline void llc_pdu_decode_sa(struct sk_buff *skb, u8 *sa)
+ {
+-	if (skb->protocol == htons(ETH_P_802_2))
+-		memcpy(sa, eth_hdr(skb)->h_source, ETH_ALEN);
++	memcpy(sa, eth_hdr(skb)->h_source, ETH_ALEN);
+ }
+ 
+ /**
+@@ -275,8 +274,7 @@ static inline void llc_pdu_decode_sa(struct sk_buff *skb, u8 *sa)
+  */
+ static inline void llc_pdu_decode_da(struct sk_buff *skb, u8 *da)
+ {
+-	if (skb->protocol == htons(ETH_P_802_2))
+-		memcpy(da, eth_hdr(skb)->h_dest, ETH_ALEN);
++	memcpy(da, eth_hdr(skb)->h_dest, ETH_ALEN);
+ }
+ 
+ /**
+diff --git a/net/llc/llc_core.c b/net/llc/llc_core.c
+index 6e387aadffce..4f16d9c88350 100644
+--- a/net/llc/llc_core.c
++++ b/net/llc/llc_core.c
+@@ -135,22 +135,15 @@ static struct packet_type llc_packet_type __read_mostly = {
+ 	.func = llc_rcv,
+ };
+ 
+-static struct packet_type llc_tr_packet_type __read_mostly = {
+-	.type = cpu_to_be16(ETH_P_TR_802_2),
+-	.func = llc_rcv,
+-};
+-
+ static int __init llc_init(void)
+ {
+ 	dev_add_pack(&llc_packet_type);
+-	dev_add_pack(&llc_tr_packet_type);
+ 	return 0;
+ }
+ 
+ static void __exit llc_exit(void)
+ {
+ 	dev_remove_pack(&llc_packet_type);
+-	dev_remove_pack(&llc_tr_packet_type);
+ }
+ 
+ module_init(llc_init);
+-- 
+2.30.2
+
 
