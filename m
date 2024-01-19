@@ -1,62 +1,55 @@
-Return-Path: <netdev+bounces-64415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47A0B832FF5
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 21:45:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A336B833011
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 22:07:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 304511C21AB0
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 20:45:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E4501C2185A
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 21:07:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F8E556B90;
-	Fri, 19 Jan 2024 20:45:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78AEC57330;
+	Fri, 19 Jan 2024 21:07:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IBMK3ujj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oAdYHeVy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5548F57302;
-	Fri, 19 Jan 2024 20:45:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DFDC56B96;
+	Fri, 19 Jan 2024 21:07:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705697100; cv=none; b=V5QJZBUSfT8RMshRg1xolEzeVFgBe9es/H53jg2IKsWvUJIcrNw41JCpkc4P6ML8fO6yRj9mpTvgeLpyp4Rzzj3IJlsfnBmK/3glm6GdoRJ8vdiHMYNClBHD6ij5bVSW8uRaM6h5FjWmFq8lbv+QsmTzxPOzWgZcZGBAgNYZLKE=
+	t=1705698444; cv=none; b=P5RxhwpFZpfOS0+ZCPLB/2Z1UHv0JP/ePPEjlQC55rFfuDhjxWab9z6QXaBRkvOfBNx6UAZwu/gG57YiB9ClbrKTcVrvJPs517uIFZaQJN3AlS8owHGUZCiI7536s3pV0zFLgkUhooVmir/LayyPejunlvd2YChFeuZYJ4m26xY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705697100; c=relaxed/simple;
-	bh=WytaNQ4rbcL0OZG7yk4gPfx23IYscfMYaPkwb0fV7pE=;
+	s=arc-20240116; t=1705698444; c=relaxed/simple;
+	bh=tBYFUh0aub60E5WCvZz/nbFsqgKVQ6NbogwE6RsuFo0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QHxv2xVoGmcJaM7iz+mijaHS3dKTY1oNRp1+QLOuAp3vH4DLiMMu0aHcbiCcGH6rsKEtQtqrgl1yM9eRu/NxxyWbAkFtYg8cpcG9nDrJzZ4SHMCjhUcbDtFWc250ecQAthA4YKxQnbbeG004ZjzqCD7In02nX1VQFysveaK5DI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IBMK3ujj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85944C433F1;
-	Fri, 19 Jan 2024 20:44:57 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=tH8iSKLeKz4FtNd2z0+XDg1h2fgtTq2jpsMZWRbU4IMqzaltSLwOIDCcUsCQCPlBzc5waPN7XZEc+IwfAn4lCn7AnhM2oqkL9ifRssOxFnvgTrJh3MI/6DjIW6g2rjYT7RbpA6ImVFQcBSZE77e4bMWvmAemElwz3mg+JO+LGdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oAdYHeVy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33A2CC433C7;
+	Fri, 19 Jan 2024 21:07:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705697099;
-	bh=WytaNQ4rbcL0OZG7yk4gPfx23IYscfMYaPkwb0fV7pE=;
+	s=k20201202; t=1705698443;
+	bh=tBYFUh0aub60E5WCvZz/nbFsqgKVQ6NbogwE6RsuFo0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IBMK3ujjyy/kWli4bg/MX7oRWQeFjt0GWjhQ3YelQYR5T/OiDu/r58hzwR0LZcHLJ
-	 iO6bJ6trjHhW4aMxN4mCYrxuYpiIJGebqsnUuaqam9vK5KfLxxEDglWtmRC5ezpW1t
-	 pk4VGu66/atxkG5B0FtN8xXTeerRSYuJKTE4hBh20vyWf3S9EU5xm3s7MpnFK0wZXp
-	 ZZJQsLilVJco5rC2ycsUqs7MIsS6S7mbR6tH8Do1huK+IXw62adJVZQJySQpUbsq/D
-	 Rpy2AfLxCZUh6Bi69fOzLOiDM1ohFeDq7005mchc6NWkmanxpRb7gnh/F0HEeqqO4O
-	 +FvyHxb4IwzTw==
-Date: Fri, 19 Jan 2024 20:44:54 +0000
+	b=oAdYHeVyKHgPn0yL2ESfT3g7+scpLulgivhmGCIJRGwhZUWhro7d7k0Lu964cv4yY
+	 ZuximW5ihlBu7cMH58r1mDdYGJJx91dpk+/rtrsGMQjCD1ADjyPYpCXUvDO1/aL5PN
+	 4FgpoNhdl8BU+JxMAQyPzOSKxjeHTZJ9FSY4dAldjaqo9a3q2Un4GIiYwtBjdQxwol
+	 u6cNEU+3KJ0FR/KzKAwHNYN8wTNUsFSbTGfXwui+LsGx4Z+seRKszJAyXorvQQvoAO
+	 XuWf1byb1Xzvtc527TWqIJI8fKJQkFg92y7d1VgJE/uyOEPKScONOa0HxBcXFcWk7f
+	 wGMTxLA3IX0Xw==
+Date: Fri, 19 Jan 2024 21:07:19 +0000
 From: Simon Horman <horms@kernel.org>
-To: Dmitry Safonov <dima@arista.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Dmitry Safonov <0x7f454c46@gmail.com>,
-	Mohammad Nassiri <mnassiri@ciena.com>, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/3] selftests/net: Clean-up double assignment
-Message-ID: <20240119204454.GE105385@kernel.org>
-References: <20240118-tcp-ao-test-key-mgmt-v1-0-3583ca147113@arista.com>
- <20240118-tcp-ao-test-key-mgmt-v1-3-3583ca147113@arista.com>
- <20240119162525.GF89683@kernel.org>
- <945fb211-e224-4d81-aa12-9cfd5c066751@arista.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, shuah@kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net] selftests: net: fix rps_default_mask with >32 CPUs
+Message-ID: <20240119210719.GA110182@kernel.org>
+References: <20240119151248.3476897-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,29 +58,46 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <945fb211-e224-4d81-aa12-9cfd5c066751@arista.com>
+In-Reply-To: <20240119151248.3476897-1-kuba@kernel.org>
 
-On Fri, Jan 19, 2024 at 06:37:46PM +0000, Dmitry Safonov wrote:
-> Hi Simon,
+On Fri, Jan 19, 2024 at 07:12:48AM -0800, Jakub Kicinski wrote:
+> If there is more than 32 cpus the bitmask will start to contain
+> commas, leading to:
 > 
-> On 1/19/24 16:25, Simon Horman wrote:
-> > On Thu, Jan 18, 2024 at 02:51:36AM +0000, Dmitry Safonov wrote:
-> >> Yeah, copy'n'paste typo.
-> >>
-> >> Fixes: 3c3ead555648 ("selftests/net: Add TCP-AO key-management test")
-> >> Reported-by: Nassiri, Mohammad <mnassiri@ciena.com>
-> >> Closes: https://lore.kernel.org/all/DM6PR04MB4202BC58A9FD5BDD24A16E8EC56F2@DM6PR04MB4202.namprd04.prod.outlook.com/
-> >> Signed-off-by: Dmitry Safonov <dima@arista.com>
-> >> ---
-> > 
-> > Hi Dmitry,
-> > 
-> > This seems more like a clean-up than a fix.
+> ./rps_default_mask.sh: line 36: [: 00000000,00000000: integer expression expected
 > 
-> Do you mean to remove the tag or that you'd prefer it rather go
-> to net-next?
+> Remove the commas, bash doesn't interpret leading zeroes as oct
+> so that should be good enough.
+> 
+> Fixes: c12e0d5f267d ("self-tests: introduce self-tests for RPS default mask")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: shuah@kernel.org
+> CC: horms@kernel.org
+> CC: linux-kselftest@vger.kernel.org
+> ---
+>  tools/testing/selftests/net/rps_default_mask.sh | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/net/rps_default_mask.sh b/tools/testing/selftests/net/rps_default_mask.sh
+> index a26c5624429f..f8e786e220b6 100755
+> --- a/tools/testing/selftests/net/rps_default_mask.sh
+> +++ b/tools/testing/selftests/net/rps_default_mask.sh
+> @@ -33,6 +33,10 @@ chk_rps() {
+>  
+>  	rps_mask=$($cmd /sys/class/net/$dev_name/queues/rx-0/rps_cpus)
+>  	printf "%-60s" "$msg"
+> +
+> +	# In case there is more than 32 CPUs we need to remove commas from masks
+> +	rps_mask=${rps_mask/,}
+> +	expected_rps_mask=${expected_rps_mask/,}
 
-Both :)
+Hi Jakub,
 
-...
+AFAIK this will only remove the first incidence of a comma.
+So I'm assuming this breaks with >64 CPUs.
+
+>  	if [ $rps_mask -eq $expected_rps_mask ]; then
+>  		echo "[ ok ]"
+>  	else
 
