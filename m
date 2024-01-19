@@ -1,205 +1,142 @@
-Return-Path: <netdev+bounces-64347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56479832A15
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 14:09:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1215832A31
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 14:17:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7C571F2385E
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 13:09:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F9F61C22A91
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 13:17:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 730BD524B8;
-	Fri, 19 Jan 2024 13:09:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E35551C35;
+	Fri, 19 Jan 2024 13:17:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XSsmsqkN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZrMcIBaj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B675B51C35
-	for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 13:09:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E9AD4CE13;
+	Fri, 19 Jan 2024 13:17:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705669758; cv=none; b=bx5rGgrEr+4wDUL4RQaZRWLeZLgZw23iap5FlT45O+RKgU+YQBVBlsjL3HfkiIdeKUaMSQPvFFRhMljHzlRa5gN4ovgyLlIYiKrgIXj7SAf9j89wa1i3/oJwvNVcxiTv0cmopHHsjOmooC2So1gcAaMi6jX3ce3QAfW9VblffRw=
+	t=1705670233; cv=none; b=UihKuHiMs/MhGKX11OgaArIIpMj1UqPHn6mJwINU1Ii93pj+DRy/gbb9NnjyhcplyjBYL9vWbCJ8OSyjbbk1QINrCWSmf4+0JK8yWhswLlx66XUYb6tLeKowC/1NvdDg6YxyTXgwQWeHmlxaL5xcS1HBdo6oMX10QUNEO9wy9ZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705669758; c=relaxed/simple;
-	bh=qkPlfZks2P9Vh3T9iswpuiEjh3iO6aPo6+dZEDRfXCc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=b1hX8KRUjFhGbBPbtPhH9nVZdhA+wOAz9k8k6FQQIM2IDTt1pp24kcgJ5uaAbd2FZXEq01PURE7qN4ciDbMjbmcisFQLd1yL/3DORAGQJF4dEQBmO1U/RXA3o9xzs6zdViLtQ+CwGf0gQkBtQsISYMk9EcG3a1PGXWlC/knowz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XSsmsqkN; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-55818b7053eso12769a12.0
-        for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 05:09:16 -0800 (PST)
+	s=arc-20240116; t=1705670233; c=relaxed/simple;
+	bh=4A8KGDG1QCCiYzpepfJ6zgGdEq66v8Pn9EM71Wi8SWA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qzlQpF2/FQJbkpe7j8PeFGlJ+DcqE7rii0c1pAo4yqEszOMSfVujgN7YAGmHSbioyJ1HxJVf8S6qpVFARdzgeaH4aB0By3yAo4yG73w3/wJajPnGYNUB6Up2/XQEmyWdFWjs3LOaxtREC8n6xtfpXxBk0vLXlO2eADuchwcdcv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZrMcIBaj; arc=none smtp.client-ip=209.85.166.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-7bf0f3bf331so28830039f.3;
+        Fri, 19 Jan 2024 05:17:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1705669755; x=1706274555; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ig+jnJeNqQVWhFRm1hJm+CXzplL3yHV27d75fFwP10c=;
-        b=XSsmsqkNc5lp4ZdM/0dme+sOjV5URuBh1ygcHXEEVtGYMEm3y92PBot1yRYvZD3t3f
-         J6ecEHKrUkQ1YnCQ6EAmfBH/SSfvu9C4uXVXkwIEpPw6VKV50/OjKD38OiZwAxGJctIO
-         skMGyFxm8zn/n/LP7NQkNsugImntbC4acU34xeyBFyJmzH1qBzxzZXCt5ViyIUomgkNT
-         p+Zuwk9vAKfRECj8WXkNx/KwYpYNmfvWJt1tkEYSqlBk/SwQbz/g+qtLnz5ThygsEAoU
-         2VAOaQbJMvlryC0cJSGecbdfKJX+xno8eIw2zH1jHEjJndP5VsmViX9+MLFQmgCUR2xb
-         qMRw==
+        d=gmail.com; s=20230601; t=1705670231; x=1706275031; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+R0RsDZSnfmoC203MVbI0UM8DaIKySut/O5wSq6tGBI=;
+        b=ZrMcIBaj8Y3nh9GA6qq92Em1ILBgnqRbRjCWjBuhw5nRJcGe9KSu290j4BrHQ7cER4
+         WblS9Ks5NJTLInRSLwOFoCi2yhTIKyKMs5AH16hmZnOtR7wKeNAA1K8EXgl46Ok5kx2/
+         yJ3M2DPx9SWKGuN5sz12FYIYMriOGwmaorrHt2nXD/IwPVpThKf7d56G/BnMHhtCA+Df
+         /Kh9x7TB3GrNla0yxtGZAJhv5F7Vxe5xZ49EkIitEP7TIwOBu06uEmRvvOSXaFqP3toI
+         P1pFEhkEwZtOumYR3AElxwkAu4JLDzHfrWNwpb3Yf5zGu76sg5bc8pd9hB3vSSLD2cUt
+         8TgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705669755; x=1706274555;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ig+jnJeNqQVWhFRm1hJm+CXzplL3yHV27d75fFwP10c=;
-        b=RJLc1hXjRRVkkfkqR1ocwy/SN1NRDSTp2Iy8G3IhzD36ZdQmmN5JPSg7+ceIm2obu3
-         Q5Z42nCE4vCAEW399n4Iua+lIAaR9+EayNEyX3XmvpAJPquPEzZp24PrmF9mP/uYymSh
-         +KVYFa2Z/nPXzN7A1Uwp/gudfiKpkoNumaBG14Pjp8BPDgLTm5W28LklNDxdw0oDJibw
-         FzDyqRnZc9j8PToOreEDQqnHiGFnBPBgr8nevq8OPbVmwSxtnvJ5LRwozkMrOHSjuiGz
-         Txx7tkSf6gyGeTkd37A538cmnJ0t9thyA81kbT72K6Hf6eGrXJq/IF2TOtGfDjhuZ8sp
-         +2yg==
-X-Gm-Message-State: AOJu0YyLXXcC/p/SOE4opRLhEA+Nl2qFgzPT2RekwEotwPceGNJPWnRH
-	eHEBBx3say09nLeCfxHwvt842Yyj81KbCHTdVk4BvmtM7VfJgyM+5DpiJz57K3Hv6SwiETqL9A1
-	WV1Tan6wKc+8XoCeOG1tUzMCI2GlWstfQ36LC
-X-Google-Smtp-Source: AGHT+IF6d0dS5dvuUOQ5Omzry3Ygv9J0sIvDhZYFOttx9ZanEETUVTeIBFbfzUz5eGho2VAvZ3FdAal3lomFmDLSK+I=
-X-Received: by 2002:a05:6402:1c11:b0:55a:4959:4978 with SMTP id
- ck17-20020a0564021c1100b0055a49594978mr125024edb.7.1705669754755; Fri, 19 Jan
- 2024 05:09:14 -0800 (PST)
+        d=1e100.net; s=20230601; t=1705670231; x=1706275031;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+R0RsDZSnfmoC203MVbI0UM8DaIKySut/O5wSq6tGBI=;
+        b=hcFiaojKIwujVw3XWOxHxQqpoby3QFYO0Nj3zRCZxf4fbpV2r6ymi+rmHFnNK30SoG
+         SvFO+VK8vupWePW982WQy1pvzN9BvWFIYvpfwlV8J91U/KPSZ6LqLpKLzZI1GgFnLuSN
+         g3J4CrZoi24e5oBe9ncTAvZOcYJdBcqC227UvfXz+9RSRdaK/DUHL1mJwfvBdqpFMGZh
+         T9N6HJ43jmVSL1hoFd6wCqOi3XNq5SgvAlA+M7iCtDuwiWnje6IjS7OUumQjGJR6LfIt
+         UXITq0RmjXa95KbhjBZzRpfxrhfrI7Wp0In5hPiq+1JFU8Qc/YCUPNJDanP0GodEruNp
+         3v2g==
+X-Gm-Message-State: AOJu0YxMDpTomVceao01uxFeNrs4hlQU1eBih8WUBe5Vnll4qwdCW2xl
+	5w1mG57nAQQaWxFHyz+EcIauR4jx+TdDE6KiE1LDUGxuI8mkdX81
+X-Google-Smtp-Source: AGHT+IF9ROGv7kTV+3XlHqLllyaOPt9wKeBA7Z45AQ19n+eX6sTpxEc1tatK5J2JpmjjbdkTXidQLA==
+X-Received: by 2002:a92:da51:0:b0:361:ae73:2c0 with SMTP id p17-20020a92da51000000b00361ae7302c0mr335091ilq.21.1705670231055;
+        Fri, 19 Jan 2024 05:17:11 -0800 (PST)
+Received: from fedora.. ([2402:e280:3e0d:606:d0c9:2a06:9cc6:18a3])
+        by smtp.gmail.com with ESMTPSA id 77-20020a630150000000b005cd8bf50c13sm3373442pgb.58.2024.01.19.05.17.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Jan 2024 05:17:10 -0800 (PST)
+From: Suresh Kumar <suresh2514@gmail.com>
+To: jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Suresh Kumar <suresh2514@gmail.com>
+Subject: [PATCH] i40e: print correct hw max rss count in kernel ring buffer
+Date: Fri, 19 Jan 2024 18:46:52 +0530
+Message-ID: <20240119131652.8050-1-suresh2514@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240119103703.2004155-1-shaozhengchao@huawei.com>
-In-Reply-To: <20240119103703.2004155-1-shaozhengchao@huawei.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 19 Jan 2024 14:09:01 +0100
-Message-ID: <CANn89iLUW5HQQT=D2qnFho5egVxFur3ao+8akSXtMx6aEux9Sg@mail.gmail.com>
-Subject: Re: [PATCH v3] ipc/mqueue: fix potential sleeping issue in mqueue_flush_file
-To: Zhengchao Shao <shaozhengchao@huawei.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, davem@davemloft.net, 
-	dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, brauner@kernel.org, 
-	jlayton@kernel.org, riel@surriel.com, jack@suse.cz, viro@zeniv.linux.org.uk, 
-	hdanton@sina.com, yuehaibing@huawei.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jan 19, 2024 at 11:27=E2=80=AFAM Zhengchao Shao
-<shaozhengchao@huawei.com> wrote:
->
-> I analyze the potential sleeping issue of the following processes:
-> Thread A                                Thread B
-> ...                                     netlink_create  //ref =3D 1
-> do_mq_notify                            ...
->   sock =3D netlink_getsockbyfilp          ...     //ref =3D 2
->   info->notify_sock =3D sock;             ...
-> ...                                     netlink_sendmsg
-> ...                                       skb =3D netlink_alloc_large_skb=
-  //skb->head is vmalloced
-> ...                                       netlink_unicast
-> ...                                         sk =3D netlink_getsockbyporti=
-d //ref =3D 3
-> ...                                         netlink_sendskb
-> ...                                           __netlink_sendskb
-> ...                                             skb_queue_tail //put skb =
-to sk_receive_queue
-> ...                                         sock_put //ref =3D 2
-> ...                                     ...
-> ...                                     netlink_release
-> ...                                       deferred_put_nlk_sk //ref =3D 1
-> mqueue_flush_file
->   spin_lock
->   remove_notification
->     netlink_sendskb
->       sock_put  //ref =3D 0
->         sk_free
->           ...
->           __sk_destruct
->             netlink_sock_destruct
->               skb_queue_purge  //get skb from sk_receive_queue
->                 ...
->                 __skb_queue_purge_reason
->                   kfree_skb_reason
->                     __kfree_skb
->                     ...
->                     skb_release_all
->                       skb_release_head_state
->                         netlink_skb_destructor
->                           vfree(skb->head)  //sleeping while holding spin=
-lock
->
-> In netlink_sendmsg, if the memory pointed to by skb->head is allocated by
-> vmalloc, and is put to sk_receive_queue queue, also the skb is not freed.
-> When the mqueue executes flush, the sleeping bug will occur. Put sock
-> after releasing the spinlock.
->
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+The value printed for  "HW max RSS count" is wrong in kernel dmesg for i40e
+NICs:
 
-I think netlink started to use vmalloc() from commit c05cdb1b864f
-("netlink: allow large data transfers from user-space")
+  ... i40e 0000:63:00.0: User requested queue count/HW max RSS count: 48/64
 
-> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
-> ---
-> v3: Put sock after releasing the spinlock.
-> v2: CCed some networking maintainer & netdev list
-> ---
->  ipc/mqueue.c | 15 +++++++++++++--
->  1 file changed, 13 insertions(+), 2 deletions(-)
->
-> diff --git a/ipc/mqueue.c b/ipc/mqueue.c
-> index 5eea4dc0509e..4832343b7049 100644
-> --- a/ipc/mqueue.c
-> +++ b/ipc/mqueue.c
-> @@ -664,12 +664,23 @@ static ssize_t mqueue_read_file(struct file *filp, =
-char __user *u_data,
->  static int mqueue_flush_file(struct file *filp, fl_owner_t id)
->  {
->         struct mqueue_inode_info *info =3D MQUEUE_I(file_inode(filp));
-> +       struct sock *sk =3D NULL;
->
->         spin_lock(&info->lock);
-> -       if (task_tgid(current) =3D=3D info->notify_owner)
-> -               remove_notification(info);
-> +       if (task_tgid(current) =3D=3D info->notify_owner) {
-> +               if (info->notify_owner !=3D NULL &&
-> +                   info->notify.sigev_notify =3D=3D SIGEV_THREAD) {
-> +                       sk =3D info->notify_sock;
-> +                       sock_hold(sk);
-> +               }
->
-> +               remove_notification(info);
-> +       }
->         spin_unlock(&info->lock);
-> +
-> +       if (sk)
-> +               sock_put(sk);
-> +
->         return 0;
->  }
->
+whereas  ethtool reports the correct value from "vsi->num_queue_pairs"
 
+Channel parameters for eno33:
+Pre-set maximums:
+RX:     n/a
+TX:     n/a
+Other:      1
+Combined:   96
+Current hardware settings:
+RX:     n/a
+TX:     n/a
+Other:      1
+Combined:   96  <-------
 
-Note that we could instead call vfree_atomic() from netlink_skb_destructor(=
-)
+and is misleading.
 
-diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-index 4ed8ffd58ff375f3fa9f262e6f3b4d1a1aaf2731..9c962347cf859f16fc76e4d8a2f=
-d22cdb3d142d6
-100644
---- a/net/netlink/af_netlink.c
-+++ b/net/netlink/af_netlink.c
-@@ -374,7 +374,7 @@ static void netlink_skb_destructor(struct sk_buff *skb)
-        if (is_vmalloc_addr(skb->head)) {
-                if (!skb->cloned ||
-                    !atomic_dec_return(&(skb_shinfo(skb)->dataref)))
--                       vfree(skb->head);
-+                       vfree_atomic(skb->head);
+This value is printed from 'pf->rss_size_max' which seems hardcoded.
 
-                skb->head =3D NULL;
-        }
+Below commit also removed this 64 limit:
 
-These big skbs are quite rare IMO, and we also could attempt
-high-order allocations
-in netlink_alloc_large_skb(), using kvmalloc() instead of vmalloc()
-(next week when net-next opens)
+Commit e56afa599609d3afe8b0ce24b553ab95e9782502
+Author: Amritha Nambiar <amritha.nambiar@intel.com>
+Date:   Wed Nov 8 16:38:43 2017 -0800
+
+    i40e: Remove limit of 64 max queues per channel
+
+Signed-off-by: Suresh Kumar <suresh2514@gmail.com>
+---
+ drivers/net/ethernet/intel/i40e/i40e_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+index d5519af34657..f5c1ec190f7e 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_main.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+@@ -12524,7 +12524,7 @@ int i40e_reconfig_rss_queues(struct i40e_pf *pf, int queue_count)
+ 		i40e_pf_config_rss(pf);
+ 	}
+ 	dev_info(&pf->pdev->dev, "User requested queue count/HW max RSS count:  %d/%d\n",
+-		 vsi->req_queue_pairs, pf->rss_size_max);
++		 vsi->req_queue_pairs, vsi->num_queue_pairs);
+ 	return pf->alloc_rss_size;
+ }
+ 
+-- 
+2.43.0
+
 
