@@ -1,119 +1,238 @@
-Return-Path: <netdev+bounces-64342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64343-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF60A832978
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 13:28:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FC8183298A
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 13:32:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7FE78B23171
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 12:28:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C39C61C21300
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 12:32:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C806D4F201;
-	Fri, 19 Jan 2024 12:28:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB53751C33;
+	Fri, 19 Jan 2024 12:32:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FEkilApz"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="V1/LYnTw"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 381BC4F1F7
-	for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 12:28:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42D3F51020
+	for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 12:32:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705667307; cv=none; b=YxpYT8bpMQN5SLXesvsdg7aBH0y8WvwV5fjfM9iE01ZLdoafY+RM8D8vTubJoqfJf+NcRWMI957K4QiTS44R8i2vKtJLxdnJplwnGZFWN9NBeuhn5KEJSwGK8X8RWODbbzO4N5zXoWP7HUApb+UYnPmJ/K445CqwaTXl36kM/Cg=
+	t=1705667527; cv=none; b=bqmIcA4ppJ70ugh9EtCjFFZ6pLKrDPwYEGm0Q5u6K77Mu+rrRXRNrwfusEcOFNO5oUzAGgxywOM+8zvFuQJIXzl/MKraBfIU+XScyaFoIeACbgiJp5RWEBz8eakLPENLMGTTkAN9R+D+nQcG69OpB8qa9fi9siSLJDjSlGGip70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705667307; c=relaxed/simple;
-	bh=1yd3vuegWAMTRKs3hhq9NTSKrABM16eTj4S5eR2+1EY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JWoiE05i3GldX87UmdcTcsSSjSVlV6d7InSq03DWNEcue06AZep2T0B0WGNdkvN+Ss18GDGXDISNn0mTpzqsd3OG97rs1HCbLe6k2NHVyKX5dWUJ9mE2yHitfwt3vj3AtRjkvafhTRf/2JRdlc67QyOXOComUoQUu9HJMIxtiok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FEkilApz; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1705667303;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Lu6PAuD3ioFybCYQzDmdkPHOFHjBT1D9Zj6epg1rV18=;
-	b=FEkilApzaH6KbVRB5fef997zFKjT+0Hha1i8ez9X4N8rCqF3PscwnW8ygmohDh3P2UtY1d
-	ThhjU9LLkht/Me3tzf/BV7EiNxzBqH9IjTmHbGVgOyAIOkOyxtYpXHcOnJn4n2SittwABV
-	n0eMX+JtvnCD4C96+nxR+gtB0iCBqZA=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-18-XZDHsGBgN6iJJGHhsVo7OQ-1; Fri, 19 Jan 2024 07:28:17 -0500
-X-MC-Unique: XZDHsGBgN6iJJGHhsVo7OQ-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40e5317c7a5so4564665e9.0
-        for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 04:28:17 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705667296; x=1706272096;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1705667527; c=relaxed/simple;
+	bh=I0UZfjlfi2E6U7pmjX/HhVBMtbSsDUbWol5BCeCBZhs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=V2fFBzwHpEIri1joP76j2yCzMgm1h3MBXzrh5XjElHpwQwAEJm0fmEINLBM0jQ55xWeF6wsKuQ6co7g7y5KGAbZcOl0d5VRgIM7nwLybEdYapWPclu9OQ6DMlm/f7l2tjhEYf/SXMvth1BVjhvVFORir5k5Tj8aS89Fnu3/M0jc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=V1/LYnTw; arc=none smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-5ff84214fc7so7687717b3.0
+        for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 04:32:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1705667525; x=1706272325; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Lu6PAuD3ioFybCYQzDmdkPHOFHjBT1D9Zj6epg1rV18=;
-        b=ld2JBpm4gEIxb5j9CIY8YH+oFDmQGLX7it7Rt17ZljPYTjwZgjRE6u29fw0hISpYYS
-         VIEY2nEtOY6+kXVA2uOj4JN52CXgtdmkSAKarIajrXNHnaAhzgdePM1RxbrDsE6f3Mau
-         uzAbaYQ/92LND4TGoXDZSo9snvBviV9I0snEo2nzKzDUQokQ3KTWef9EBsJHxGJQ/u3b
-         WqBjoN7GgLuOkFL51PFZM0slB0drsu6XREAcJECwR6r9ijAP3o1zdjRsNYSjnPin30PK
-         wvKv9e/qE+bY/x3k6fyCc+GzggVB+a/PC8/naCSkAqkQwCIvZb3ommxiztfuJ635bQJt
-         GUVg==
-X-Gm-Message-State: AOJu0YzIbVV5zdksh8Jkr49FW+t2J2Q/bgqj07CcLlpilk3hhiIYzjQ2
-	doD/h7gPHxSngSwznrXLUXWVDohksxeo03ZHS3u5zbxX9izngjZMcGkyDBVA63GREN4D37ocFYP
-	N5Xt3pQJsSY3uMCcPqfKm5u8vlvwRIOkDdsXBn0BpkdXxlLM6R9CE7A==
-X-Received: by 2002:a7b:cb4e:0:b0:40e:5c0e:7dc0 with SMTP id v14-20020a7bcb4e000000b0040e5c0e7dc0mr1379244wmj.108.1705667296102;
-        Fri, 19 Jan 2024 04:28:16 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGRQ7q2eviABxb53dq9k0UI+qYO9BINyvJ+P81JZeeN70Ba5s+vjtIaNcbP8LhhKGkob4YTzg==
-X-Received: by 2002:a7b:cb4e:0:b0:40e:5c0e:7dc0 with SMTP id v14-20020a7bcb4e000000b0040e5c0e7dc0mr1379237wmj.108.1705667295747;
-        Fri, 19 Jan 2024 04:28:15 -0800 (PST)
-Received: from redhat.com ([2a02:14f:175:4aad:e256:6d9f:7a0b:7f5b])
-        by smtp.gmail.com with ESMTPSA id iw7-20020a05600c54c700b0040d604dea3bsm28406255wmb.4.2024.01.19.04.28.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Jan 2024 04:28:15 -0800 (PST)
-Date: Fri, 19 Jan 2024 07:28:10 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
-	Jason Wang <jasowang@redhat.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next 0/3] virtio-net: a fix and some updates for
- virtio dim
-Message-ID: <20240119072743-mutt-send-email-mst@kernel.org>
-References: <1705410693-118895-1-git-send-email-hengqi@linux.alibaba.com>
+        bh=Ffjuk5UUhf2ajhXazA1TZbNijQJTawfOkhzxR9sRdg0=;
+        b=V1/LYnTw529sx6xKDy+lxEaAzYcL+//TVJyrgv7aPGLAWtHTUx6SJzRmdjZJtH9DMG
+         K3tvZ7h5ggUhiWgn+V9ZsPkSmkAr1letpe0WpJbQM0fCeQ8Prs4Pn1KW2qLaipIIofLo
+         HZhpP5olkRUApDUpCQhig6SKYI45CLJJrR9lwbcRcV8Us7sisZBM+bTRomNJeL/fSSqK
+         3ATJtzS/wVsj32xzxEjaWEDn37cIUSKLUorLEX8vl2GjB1gd/wKVwrt0ns5tsWYQfi2a
+         NuQXgw+unAPNG7UrUS8MnL7Jtnmmzn/+EVBaJX/mtI9hhXSzhLHpwNKkAfXLE9ASjYVM
+         rzKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705667525; x=1706272325;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ffjuk5UUhf2ajhXazA1TZbNijQJTawfOkhzxR9sRdg0=;
+        b=VBbffzdfZH1Qsjf1bl/vc9KF9D8At4QdwFsDT/o6uYT6za9u08wvIhYRkVhoQLClKx
+         sNEKPgeS/5hDQ93Roqljx3/sZaKhecbVafYB8zOb2hysbnpkvA7Cn8GpBltzCROEQX2H
+         eKtuHh3FVdxotc+i/Il2xl1CcSy/i5c4Ht8J0F8M9yOek9scNYLVqnajwTamaMm0W/6F
+         VnO7QFEoA1mH+f39JbjeGZz9vXxWcDlANz8AzBbt9PWSNJqzw3mOZjHlubKKF98ffF0v
+         pQchkvzNIjovxLoEF8iZyY0e4mygq2/Vp+Ny6DLZTULP6ZvxfQHi6ZW1rdlkSJqo5NH8
+         1C5Q==
+X-Gm-Message-State: AOJu0YxDW4rPBpbXkv+udYuOf2qCZ+jLh0dMSo/ErAELcSraqjl1lRzH
+	C0xusxxbxlgxTOP6T1XJE0SyZikP9GmGI93EW8vnics4isMr6pXnD2N29HbVDUoNoNOMxCrtWl9
+	EhjSDhbYksrJ24kjz/B2AiZv2kHn2fpAg+bN+bA==
+X-Google-Smtp-Source: AGHT+IHzWY0Jg7Cbw032GIQItsk8GMJ1egjxjW1I4qO2drEBWMBFSWUWUH+O4Oj0Le9R6bky8UA9z26DkZt+clJZEBE=
+X-Received: by 2002:a81:4a83:0:b0:5fc:b5d4:f1cf with SMTP id
+ x125-20020a814a83000000b005fcb5d4f1cfmr2465344ywa.35.1705667525159; Fri, 19
+ Jan 2024 04:32:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1705410693-118895-1-git-send-email-hengqi@linux.alibaba.com>
+References: <20240117160748.37682-1-brgl@bgdev.pl> <CAA8EJpoQfPqoMVyTmUjPs4c1Uc-p4n7zNcG+USNjXX0Svp362w@mail.gmail.com>
+ <CAA8EJpqyK=pkjEofWV595tp29vjkCeWKYr-KOJh_hBiBbkVBew@mail.gmail.com> <CAMRc=McUZh0jhjMW7H6aVKbw29WMCQ3wdkVAz=yOZVK5wc45OA@mail.gmail.com>
+In-Reply-To: <CAMRc=McUZh0jhjMW7H6aVKbw29WMCQ3wdkVAz=yOZVK5wc45OA@mail.gmail.com>
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date: Fri, 19 Jan 2024 14:31:53 +0200
+Message-ID: <CAA8EJprFV6SS_dGF8tOHcBG+y8j74vO0B40Y=e7Kj1-ZThNqPA@mail.gmail.com>
+Subject: Re: [PATCH 0/9] PCI: introduce the concept of power sequencing of
+ PCIe devices
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Kalle Valo <kvalo@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Bjorn Helgaas <bhelgaas@google.com>, Heiko Stuebner <heiko@sntech.de>, 
+	Jernej Skrabec <jernej.skrabec@gmail.com>, Chris Morgan <macromorgan@hotmail.com>, 
+	Linus Walleij <linus.walleij@linaro.org>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Arnd Bergmann <arnd@arndb.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
+	=?UTF-8?B?TsOtY29sYXMgRiAuIFIgLiBBIC4gUHJhZG8=?= <nfraprado@collabora.com>, 
+	Marek Szyprowski <m.szyprowski@samsung.com>, Peng Fan <peng.fan@nxp.com>, 
+	Robert Richter <rrichter@amd.com>, Dan Williams <dan.j.williams@intel.com>, 
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>, Terry Bowman <terry.bowman@amd.com>, 
+	Lukas Wunner <lukas@wunner.de>, Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>, 
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-pci@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 16, 2024 at 09:11:30PM +0800, Heng Qi wrote:
-> Patch 1 fixes an existing bug. Belongs to the net branch.
-> Patch 2 requires updating the virtio spec.
-> Patch 3 only attempts to modify the sending of dim cmd to an asynchronous way,
-> and does not affect the synchronization way of ethtool cmd.
+On Fri, 19 Jan 2024 at 13:52, Bartosz Golaszewski <brgl@bgdev.pl> wrote:
+>
+> On Thu, Jan 18, 2024 at 7:53=E2=80=AFPM Dmitry Baryshkov
+> <dmitry.baryshkov@linaro.org> wrote:
+> >
+>
+> [snip]
+>
+> > >
+> > > I'd still like to see how this can be extended to handle BT power up,
+> > > having a single entity driving both of the BT and WiFI.
+> > >
+> > > The device tree changes behave in exactly the opposite way: they
+> > > define regulators for the WiFi device, while the WiFi is not being
+> > > powered by these regulators. Both WiFi and BT are powered by the PMU,
+> > > which in turn consumes all specified regulators.
+> >
+> > Some additional justification, why I think that this should be
+> > modelled as a single instance instead of two different items.
+> >
+> > This is from msm-5.10 kernel:
+> >
+> >
+> > =3D=3D=3D=3D=3D CUT HERE =3D=3D=3D=3D=3D
+> > /**
+> >  * cnss_select_pinctrl_enable - select WLAN_GPIO for Active pinctrl sta=
+tus
+> >  * @plat_priv: Platform private data structure pointer
+> >  *
+> >  * For QCA6490, PMU requires minimum 100ms delay between BT_EN_GPIO off=
+ and
+> >  * WLAN_EN_GPIO on. This is done to avoid power up issues.
+> >  *
+> >  * Return: Status of pinctrl select operation. 0 - Success.
+> >  */
+> > static int cnss_select_pinctrl_enable(struct cnss_plat_data *plat_priv)
+> > =3D=3D=3D=3D=3D CUT HERE =3D=3D=3D=3D=3D
+> >
+> >
+> > Also see the bt_configure_gpios() function in the same kernel.
+> >
+>
+> You are talking about a different problem. Unfortunately we're using
+> similar naming here but I don't have a better alternative in mind.
+>
+> We have two separate issues: one is powering-up a PCI device so that
+> it can be detected and the second is dealing with a device that has
+> multiple modules in it which share a power sequence. The two are
+> independent and this series isn't trying to solve the latter.
+
+I see it from a different angle: a power up of the WiFi+BT chips. This
+includes devices like wcn3990 (which have platform + serial parts) and
+qca6390 / qca6490 / wcn6750 / etc. (which have PCI and serial parts).
+
+From my point of view, the PCIe-only part was nice for an RFC, but for
+v1 I have expected to see a final solution that we can reuse for
+wcn3990.
+
+>
+> But I am aware of this and so I actually have an idea for a
+> generalized power sequencing framework. Let's call it pwrseq as
+> opposed to pci_pwrseq.
+>
+> Krzysztof is telling me that there cannot be any power sequencing
+> information contained in DT. Also: modelling the PMU in DT would just
+> over complicate stuff for now reason. We'd end up having the PMU node
+> consuming the regulators but it too would need to expose regulators
+> for WLAN and BT or be otherwise referenced by their nodes.
+
+Yes. And it is a correct representation of the device. The WiFi and BT
+parts are powered up by the outputs from PMU. We happen to have three
+different pieces (WiFi, BT and PMU) squashed on a single physical
+device.
+
+>
+> So I'm thinking that the DT representation should remain as it is:
+> with separate WLAN and BT nodes consuming resources relevant to their
+> functionality (BT does not need to enable PCIe regulators).
+
+Is it so? The QCA6390 docs clearly say that all regulators should be
+enabled before asserting BT_EN / WLAN_EN. See the powerup timing
+diagram and the t2 note to that diagram.
+
+> Now how to
+> handle the QCA6490 model you brought up? How about pwrseq drivers that
+> would handle the sequence based on compatibles?
+
+The QCA6490 is also known as WCN6855. So this problem applies to
+Qualcomm sm8350 / sm8450 platforms.
+
+And strictly speaking I don't see any significant difference between
+QCA6390 and WCN6855. The regulators might be different, but the
+implementation should be the same.
+
+>
+> We'd add a new subsystem at drivers/pwrseq/. Inside there would be:
+> drivers/pwrseq/pwrseq-qca6490.c. The pwrseq framework would expose an
+> API to "sub-drivers" (in this case: BT serdev driver and the qca6490
+> power sequencing driver). Now the latter goes:
+>
+> struct pwrseq_desc *pwrseq =3D pwrseq_get(dev);
+>
+> And the pwrseq subsystem matches the device's compatible against the
+> correct, *shared* sequence. The BT driver can do the same at any time.
+> The pwrseq driver then gets regulators, GPIOs, clocks etc. and will be
+> responsible for dealing with them.
+>
+> In sub-drivers we now do:
+>
+> ret =3D pwrseq_power_on(pwrseq);
+>
+> or
+>
+> ret =3D pwrseq_power_off(pwrseq);
+>
+> in the sub-device drivers and no longer interact with each regulator
+> on our own. The pwrseq subsystem is now in charge of adding delays
+> etc.
+>
+> That's only an idea and I haven't done any real work yet but I'm
+> throwing it out there for discussion.
+
+I've been there and I had implemented it in the same way, but rather
+having the pwrseq as a primary device in DT and parsing end-devices
+only as a fallback / compatibility case.
 
 
-Given this doesn't build, please document how was each patch tested.
-Thanks!
 
-> Heng Qi (3):
->   virtio-net: fix possible dim status unrecoverable
->   virtio-net: batch dim request
->   virtio-net: reduce the CPU consumption of dim worker
-> 
->  drivers/net/virtio_net.c        | 197 ++++++++++++++++++++++++++++++++++++----
->  include/uapi/linux/virtio_net.h |   1 +
->  2 files changed, 182 insertions(+), 16 deletions(-)
-> 
-> -- 
-> 1.8.3.1
-
+--=20
+With best wishes
+Dmitry
 
