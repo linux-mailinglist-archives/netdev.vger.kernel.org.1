@@ -1,140 +1,142 @@
-Return-Path: <netdev+bounces-64440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBEF583319B
-	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 00:38:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A039F8331AD
+	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 00:48:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF6711C220ED
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 23:38:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF9EE1C2116B
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 23:48:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB1815915B;
-	Fri, 19 Jan 2024 23:38:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF01159165;
+	Fri, 19 Jan 2024 23:48:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nNlwXZPQ"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="FVdItDo9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49BDF5914D;
-	Fri, 19 Jan 2024 23:38:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F34551C4B;
+	Fri, 19 Jan 2024 23:48:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705707503; cv=none; b=I8So90JwjIV/CZOE+0nAEjhQXecYvLN2dB8P5bIo9+UMjEOBbqch9uyfzemH+82bTzMZKe7Tazk//uN92S9ZOxEf804lBf9T5se7BjlG+kygS7rPwsEIMROn2/QmBx5MPGqnG23S0SeHSBbRhSfTPgvIZqwAHShstOMr2qascxs=
+	t=1705708088; cv=none; b=LBVW/DmE0YQQDRiPmJZlWps41KHz19lfjE4G9jEykTa6ut6X3I14oiNR+s8uzv98waetlaAs2634vcLCM4r3OHVIgd0N4aGEcUFbQ1ux39eTnlniHk8FmKB0OMII+3bZyTuHrn0RBI0S0x577u+eeRWSbiKgaKFPHB8i2cJ1284=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705707503; c=relaxed/simple;
-	bh=7+hMZpFmWpmV+mrB7PolbtyQ9ZwFs+8lmmyhfHO0Z3w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=erEMkH5S8/63VdF0JkwHGNPGPEMoixA0SYhL6euwdykc8a+R5Zc2E0mJpC8dP73+MLKUsdi79oVxAHmdjyJ+srVElZQUEmgdvTWsMPf2vthm7mj+dMr7ihzry5WiGycYEUi4LI5LvPW0r4vs1/Zj4QtPWdq43xKzbvnDC6OyWts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nNlwXZPQ; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1705707502; x=1737243502;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=7+hMZpFmWpmV+mrB7PolbtyQ9ZwFs+8lmmyhfHO0Z3w=;
-  b=nNlwXZPQOhwHJ1BZNHRTlqOawB+Fa3NoJUy2vsaLzqgwplMSR6eAivfV
-   c8UtPUiutYFBDgv14OYSyTnhXQt9q1PnmrKyobTTneg6KCiVAgMO5I9NM
-   eq97iUfRuuqNG0WR/qwCP7TAJy45rUcmijenNFrgm5SRogKGiFP6YBwdu
-   lU5ClKaj4guxHt2oydb3kkywSh6cFgPRNTSEdXl3d3xVmoj/+M4EUSKru
-   anqpXoIBM9Ab1TucDBHe6VbCVNDqq6E8Nbu+IV+85n8Cs/wNHuLYzITAy
-   aMiP7/3YxLIx0jjvCZIxPgWoAj5B7xfohemtnfl7CAWC5w9Ed69X/PAr8
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10957"; a="751691"
-X-IronPort-AV: E=Sophos;i="6.05,206,1701158400"; 
-   d="scan'208";a="751691"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2024 15:38:21 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10957"; a="855452102"
-X-IronPort-AV: E=Sophos;i="6.05,206,1701158400"; 
-   d="scan'208";a="855452102"
-Received: from lkp-server01.sh.intel.com (HELO 961aaaa5b03c) ([10.239.97.150])
-  by fmsmga004.fm.intel.com with ESMTP; 19 Jan 2024 15:38:17 -0800
-Received: from kbuild by 961aaaa5b03c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rQyRD-0004VG-1j;
-	Fri, 19 Jan 2024 23:38:15 +0000
-Date: Sat, 20 Jan 2024 07:37:34 +0800
-From: kernel test robot <lkp@intel.com>
-To: Lin Ma <linma@zju.edu.cn>, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org,
-	razor@blackwall.org, leon@kernel.org, haleyb.dev@gmail.com,
-	ja@ssi.bg, judyhsiao@chromium.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev
-Subject: Re: [PATCH net-next v1] neighbour: complement nl_ntbl_parm_policy
-Message-ID: <202401200717.gbJdfFML-lkp@intel.com>
-References: <20240119070847.5402-1-linma@zju.edu.cn>
+	s=arc-20240116; t=1705708088; c=relaxed/simple;
+	bh=PmzDnE+QmOepAVj/EtZNKea8NQzM9a3BI1a1+JJjs6w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Q+MkeLa3X26UJBGQ1F1//6MuzyfcEZ/ixyAwdmm14fL/zS9+GtzTWfSBfgNT/gsJ2SfKPPLSs1XGMfbQkjYGY2u3mAZOJu4TFcj7BKB2ni+qqupf1XKwulwBC8A3uGtIuGmib+Mg2DIhf5OZIGIEzAhmM8QsCzX4cD81nd5Ztq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=FVdItDo9; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40JNNKdA010923;
+	Fri, 19 Jan 2024 23:47:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=7OdlWbHAsWvuCUbuBHpHnDwMbx/eAJa3USyKbg8pm/Q=; b=FV
+	dItDo9EZ0RF5YXn2USHbafvh0oBa15QMHVYRyClmGznf6XKicP/cGvhh9hvcSCWK
+	hAv0QB0S//GNSjTpVRoODReehFcpeD7qlqSWT13MQvKAWw9sNqpv+GmmeleAWfc7
+	2Y2DtIl16k9nDmcvxGQQlesvqYi4BJGLktTZkDxTlcfYMhABXmFUweXyoo4xBS0m
+	K5+qQSrbcTHom24OCUtjBd+fLDG4Shtq4Xz31P5kwXkVaX9p4jZ8qLSivK+X5jWY
+	ZoVpABF7cQ2090smRa0ASN3AR7hKj93y2JdAJPPyP9mFic0h7848IZ6aB6rT5Txm
+	SeA11dP67rJnt1+y/YMw==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3vqn89hr21-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 19 Jan 2024 23:47:55 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 40JNlsRq019760
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 19 Jan 2024 23:47:54 GMT
+Received: from [10.110.26.199] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Fri, 19 Jan
+ 2024 15:47:53 -0800
+Message-ID: <9e1db7f3-fd18-4b3b-a912-3cf6efd96fed@quicinc.com>
+Date: Fri, 19 Jan 2024 15:47:53 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240119070847.5402-1-linma@zju.edu.cn>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH wireless v2] nl80211/cfg80211: add nla_policy for S1G band
+Content-Language: en-US
+To: Lin Ma <linma@zju.edu.cn>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>,
+        <linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <kvalo@kernel.org>
+References: <20240119151201.8670-1-linma@zju.edu.cn>
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+In-Reply-To: <20240119151201.8670-1-linma@zju.edu.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: sucXXr2AirEFxqH5hm5BGeFfrzOShU7o
+X-Proofpoint-ORIG-GUID: sucXXr2AirEFxqH5hm5BGeFfrzOShU7o
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-19_12,2024-01-19_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 clxscore=1011
+ suspectscore=0 phishscore=0 priorityscore=1501 lowpriorityscore=0
+ mlxscore=0 malwarescore=0 impostorscore=0 adultscore=0 bulkscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2311290000 definitions=main-2401190147
 
-Hi Lin,
+On 1/19/2024 7:12 AM, Lin Ma wrote:
+> Our detector has identified another case of an incomplete policy.
+> Specifically, the commit df78a0c0b67d ("nl80211: S1G band and channel
+> definitions") introduced the NL80211_BAND_S1GHZ attribute to
+> nl80211_band, but it neglected to update the
+> nl80211_match_band_rssi_policy accordingly.
+> 
+> Similar commits that add new band types, such as the initial
+> commit 1e1b11b6a111 ("nl80211/cfg80211: Specify band specific min RSSI
+> thresholds with sched scan"), the commit e548a1c36b11 ("cfg80211: add 6GHz
+> in code handling array with NUM_NL80211_BANDS entries"), and the
+> commit 63fa04266629 ("nl80211: Add LC placeholder band definition to
+> nl80211_band"), all require updates to the policy.
+> Failure to do so could result in accessing an attribute of unexpected
+> length in the function nl80211_parse_sched_scan_per_band_rssi.
+> 
+> To resolve this issue, this commit adds the policy for the
+> NL80211_BAND_S1GHZ attribute.
+> 
+> Fixes: df78a0c0b67d ("nl80211: S1G band and channel definitions")
+> Signed-off-by: Lin Ma <linma@zju.edu.cn>
+> ---
+> V1 -> V2: change net-next to wireless as suggested
+> 
+>  net/wireless/nl80211.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
+> index 60877b532993..980300621a60 100644
+> --- a/net/wireless/nl80211.c
+> +++ b/net/wireless/nl80211.c
+> @@ -911,6 +911,7 @@ nl80211_match_band_rssi_policy[NUM_NL80211_BANDS] = {
+>  	[NL80211_BAND_5GHZ] = { .type = NLA_S32 },
+>  	[NL80211_BAND_6GHZ] = { .type = NLA_S32 },
+>  	[NL80211_BAND_60GHZ] = { .type = NLA_S32 },
+> +	[NL80211_BAND_S1GHZ] = { .type = NLA_S32 },
+>  	[NL80211_BAND_LC]    = { .type = NLA_S32 },
+>  };
+>  
+something is really suspicious since the NL80211_BAND_* enums are
+*value* enums, not attribute ID enums, and hence they should never be
+used in an nla_policy.
 
-kernel test robot noticed the following build errors:
+what is actually using these as attribute IDs, noting that
+NL80211_BAND_2GHZ == 0 and hence cannot be used as an attribute ID
 
-[auto build test ERROR on net-next/main]
+seems the logic that introduced this policy needs to be revisited.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Lin-Ma/neighbour-complement-nl_ntbl_parm_policy/20240119-151255
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20240119070847.5402-1-linma%40zju.edu.cn
-patch subject: [PATCH net-next v1] neighbour: complement nl_ntbl_parm_policy
-config: arm-randconfig-001-20240120 (https://download.01.org/0day-ci/archive/20240120/202401200717.gbJdfFML-lkp@intel.com/config)
-compiler: clang version 18.0.0git (https://github.com/llvm/llvm-project d92ce344bf641e6bb025b41b3f1a77dd25e2b3e9)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240120/202401200717.gbJdfFML-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202401200717.gbJdfFML-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> net/core/neighbour.c:2296:3: error: use of undeclared identifier 'NPTPA_QUEUE_LEN_BYTES'; did you mean 'NDTPA_QUEUE_LENBYTES'?
-    2296 |         [NPTPA_QUEUE_LEN_BYTES]         = { .type = NLA_U32 },
-         |          ^~~~~~~~~~~~~~~~~~~~~
-         |          NDTPA_QUEUE_LENBYTES
-   include/uapi/linux/neighbour.h:160:2: note: 'NDTPA_QUEUE_LENBYTES' declared here
-     160 |         NDTPA_QUEUE_LENBYTES,           /* u32 */
-         |         ^
-   1 error generated.
-
-
-vim +2296 net/core/neighbour.c
-
-  2292	
-  2293	static const struct nla_policy nl_ntbl_parm_policy[NDTPA_MAX+1] = {
-  2294		[NDTPA_IFINDEX]			= { .type = NLA_U32 },
-  2295		[NDTPA_QUEUE_LEN]		= { .type = NLA_U32 },
-> 2296		[NPTPA_QUEUE_LEN_BYTES]         = { .type = NLA_U32 },
-  2297		[NDTPA_PROXY_QLEN]		= { .type = NLA_U32 },
-  2298		[NDTPA_APP_PROBES]		= { .type = NLA_U32 },
-  2299		[NDTPA_UCAST_PROBES]		= { .type = NLA_U32 },
-  2300		[NDTPA_MCAST_PROBES]		= { .type = NLA_U32 },
-  2301		[NDTPA_MCAST_REPROBES]		= { .type = NLA_U32 },
-  2302		[NDTPA_BASE_REACHABLE_TIME]	= { .type = NLA_U64 },
-  2303		[NDTPA_GC_STALETIME]		= { .type = NLA_U64 },
-  2304		[NDTPA_DELAY_PROBE_TIME]	= { .type = NLA_U64 },
-  2305		[NDTPA_RETRANS_TIME]		= { .type = NLA_U64 },
-  2306		[NDTPA_ANYCAST_DELAY]		= { .type = NLA_U64 },
-  2307		[NDTPA_PROXY_DELAY]		= { .type = NLA_U64 },
-  2308		[NDTPA_LOCKTIME]		= { .type = NLA_U64 },
-  2309		[NDTPA_INTERVAL_PROBE_TIME_MS]	= { .type = NLA_U64, .min = 1 },
-  2310	};
-  2311	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
