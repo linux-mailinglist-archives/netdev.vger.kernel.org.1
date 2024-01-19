@@ -1,93 +1,109 @@
-Return-Path: <netdev+bounces-64420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A2FE8330C2
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 23:32:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EE218330CB
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 23:38:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09A9F1C20EA5
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 22:32:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A153C1F22E3D
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 22:38:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD7F41E519;
-	Fri, 19 Jan 2024 22:32:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34DE755E76;
+	Fri, 19 Jan 2024 22:38:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="h2KMvRaW"
 X-Original-To: netdev@vger.kernel.org
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F298E1DA46
-	for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 22:32:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.86.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFA7B1E48E
+	for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 22:38:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705703559; cv=none; b=ulJDBNv8tJMbiu/ni7QVCO1+i7HJ269sN+WttLmiZHg819MMrN1MMJemBdH5KGhdHAGMeGg1fQc9omtBy37g2QRUXj4/YMLH0Fkt0wmRyoWxZJLO6viY3OiMt2UOZN6CMrFRsOAHEixpcza6f03KH1omT9oCzJhvhRZKPM4tT0A=
+	t=1705703896; cv=none; b=GGsURyoNa+brFhI/qGyfgyMGw/Gj35bsUN+tVmHQLJXkR4X0SaUQBpgX3b6ZL60D5WkfGI9XQCAaXr8mJoMpE6aXlAxMgCdhapenvT7QCk5DS2tLVGdigKDlzBzs5/bpzPvf7Dy69AujZAMV6nxZ3WZRLYuBaPoQTpUU3qfi8zk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705703559; c=relaxed/simple;
-	bh=MbW6HYUwrtZQllKOcUvm3R7LIQernrIPnyN1D4Iv5qE=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=CVj4Iu5Wv4lA8oL5UEtAW9ijYbmwZN5yQCgDaqt3kdP4Gk1xDmPkDmGSBulpdBIZKWNrN7vvinjTxaHz3AUxpXfrtQaasyzEgAz53AWJ6LE2xUEd4P++eOhCrUlOoxav6b7KsCAeQg1lh1JfiK6Ce11KX3QqE3muvxBuBgsK8MQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.86.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-311-rKtD4i7OMLafBvo47lSNfw-1; Fri, 19 Jan 2024 22:32:34 +0000
-X-MC-Unique: rKtD4i7OMLafBvo47lSNfw-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 19 Jan
- 2024 22:32:18 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Fri, 19 Jan 2024 22:32:18 +0000
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Eric Dumazet' <edumazet@google.com>, Willem de Bruijn
-	<willemdebruijn.kernel@gmail.com>
-CC: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn
-	<willemb@google.com>, David Ahern <dsahern@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "eric.dumazet@gmail.com"
-	<eric.dumazet@gmail.com>
-Subject: RE: [PATCH net] udp: fix busy polling
-Thread-Topic: [PATCH net] udp: fix busy polling
-Thread-Index: AQHaSiZXbeFp191/2EKhYpcmQaFF4rDhtzzA
-Date: Fri, 19 Jan 2024 22:32:18 +0000
-Message-ID: <e1bc19b4b246478ea32cb2631cb514e8@AcuMS.aculab.com>
-References: <20240118143504.3466830-1-edumazet@google.com>
- <65a9407bd77fc_1caa3f29452@willemb.c.googlers.com.notmuch>
- <CANn89i+x9qKCaQVbaf+TO8TJWMaLcW-efhAuNtatFuyrza-UaQ@mail.gmail.com>
-In-Reply-To: <CANn89i+x9qKCaQVbaf+TO8TJWMaLcW-efhAuNtatFuyrza-UaQ@mail.gmail.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+	s=arc-20240116; t=1705703896; c=relaxed/simple;
+	bh=9bWw7hfx7nkX0k3bYVdDdaaTpIaHSsD/aa7Nr2SLRRc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W1e82EHUHbf86Z98zhVV7u2RBHGWE20654q+FTsQFW4OhLgsE8cs5Eom6ildwdRx3nh7Qjxlg5u2aEF4T84ta2nARjvbEPEJ2hm/uFzFikrDpUIN95ITmdThglOhOsIWtIcjvA4ABSiBDAqWUldrvVnL+vGt7A6unZnuUgRfoB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=h2KMvRaW; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=5cYnU5+Ny7MURwxeXqcL4MDBQDJIQ3Gjz4Afm6s7do0=; b=h2
+	KMvRaWDQPecdgQpZUCXRuNt3Ip9fw/Rys37qX3HSN/g217SM/xDYzBFthfl9mcl7bGTL+P7nvpoZV
+	jySOALZ5AMTiEIiOpda2jeZLM9Gf3Qzh5t+d1okYUbJJayZfhrOtwi95E4Bs3g2SqQGzqmkUrbGaT
+	cyQ+7m07dA1RLV0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rQxV0-005af9-ID; Fri, 19 Jan 2024 23:38:06 +0100
+Date: Fri, 19 Jan 2024 23:38:06 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Asmaa Mnebhi <asmaa@nvidia.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	David Thompson <davthompson@nvidia.com>
+Subject: Re: [PATCH v1 1/1] net: phy: micrel: Add workaround for incomplete
+ autonegotiation
+Message-ID: <f35fa6b9-ed6f-461b-a62d-326fa401bc88@lunn.ch>
+References: <20231226141903.12040-1-asmaa@nvidia.com>
+ <ZZRZvRKz6X61eUaH@shell.armlinux.org.uk>
+ <99a49ad0-911b-4320-9222-198a12a1280e@lunn.ch>
+ <PH7PR12MB7282DEEE85BE8A6F9E558339D7702@PH7PR12MB7282.namprd12.prod.outlook.com>
+ <a6487dbc-8f86-447a-ba12-21652f3313e8@lunn.ch>
+ <PH7PR12MB7282617140D3D2F2F84869DBD7702@PH7PR12MB7282.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <PH7PR12MB7282617140D3D2F2F84869DBD7702@PH7PR12MB7282.namprd12.prod.outlook.com>
 
-Li4uDQo+ID4gPiArc3RhdGljIGlubGluZSBib29sIHNrX2lzX3VkcChjb25zdCBzdHJ1Y3Qgc29j
-ayAqc2spDQo+ID4gPiArew0KPiA+ID4gKyAgICAgcmV0dXJuIHNrLT5za190eXBlID09IFNPQ0tf
-REdSQU0gJiYgc2stPnNrX3Byb3RvY29sID09IElQUFJPVE9fVURQOw0KPiA+ID4gK30NCj4gPiA+
-ICsNCj4gPg0KPiA+IFNpbmNlIGJ1c3kgcG9sbGluZyBjb2RlIGlzIHByb3RvY29sIChmYW1pbHkp
-IGluZGVwZW5kZW50LCBpcyBpdCBzYWZlDQo+ID4gdG8gYXNzdW1lIHNrLT5za19mYW1pbHkgPT0g
-UEZfSU5FVCBvciBQRl9JTkVUNiBoZXJlPw0KPiANCj4gSG1tLiBUaGlzIGlzIGEgdmFsaWQgcG9p
-bnQuDQoNCkRvICd3ZScgbmVlZCBzZXBhcmF0ZSAxNmJpdCBza19mYW1pbHksIHNrX3R5cGUgYW5k
-IHNrX3Byb3RvY29sPw0KDQpTZWVtcyBhIGxvdCBvZiBiaXRzLg0KDQpJIHdhcyBzb3J0IG9mIHRo
-aW5raW5nIHRoYXQgdGhlIGFib3ZlIHRlc3QgY291bGQgYmUgYSBzaW5nbGUgY29tcGFyZQ0KKG9m
-IGEgY29tcG91bmQgdmFsdWUpLg0KQnV0IHNpbmNlIElQUFJPVE9fVURQID0+IFNPQ0tfREdSQU0g
-YW5kIEkgZG9uJ3QgdGhpbmsgeW91IGNhbg0KcG9zc2libHkgcnVuIFVEUCBvdmVyIGFueXRoaW5n
-IGVsc2UsIGdldHRpbmcgdGhlIHNrX3Byb3RvY29sIHZhbHVlcw0KdW5pcXVlIGFjcm9zcyBmYW1p
-bGllcyAoaG93IG11Y2ggbm9uLUlQIHN0dWZmIGlzIHRoZXJlIGFueXdheSkNCndvdWxkIHNpbXBs
-aWZ5IGFsbCBzaW1pbGFyIHRlc3RzLg0KTWlnaHQgaW1wYWN0IHRoZSBzb2NrZXQoKSBzeXN0ZW0g
-Y2FsbCBhIGJpdCAtIGJ1dCBub3QgbXVjaC4NCg0KCURhdmlkDQoNCi0NClJlZ2lzdGVyZWQgQWRk
-cmVzcyBMYWtlc2lkZSwgQnJhbWxleSBSb2FkLCBNb3VudCBGYXJtLCBNaWx0b24gS2V5bmVzLCBN
-SzEgMVBULCBVSw0KUmVnaXN0cmF0aW9uIE5vOiAxMzk3Mzg2IChXYWxlcykNCg==
+> The above prints proved that the micrel PHY started autonegotiation
+> but the result is that it failed to complete it. I also noticed that
+> the KSZ9031 PHY takes ~5 full seconds to complete aneg which is much
+> longer than other PHYs like VSC8221 (which we use with BlueField-3
+> systems).
 
+What is the link partner? From the datasheet
+
+MMD Address 1h, Register 5Ah – 1000BASE-T Link-Up Time Control
+
+When the link partner is another KSZ9031 device,
+the 1000BASE-T link-up time can be long. These
+three bits provide an optional setting to reduce the
+1000BASE-T link-up time.
+100 = Default power-up setting
+011 = Optional setting to reduce link-up time when
+the link partner is a KSZ9031 device.
+
+Might be worth setting it and see what happens.
+
+Have you tried playing with the prefer master/prefer slave options? If
+you have identical PHYs on each end, it could be they are generating
+the same 'random' number used to determine who should be master and
+who should be slave. If they both pick the same number, they are
+supposed to pick a different random number and try again. There have
+been some PHYs which are broken in this respect. prefer master/prefer
+slave should influence the random number, biasing it higher/lower.
+
+auto-neg should typically take a little over 1 second. 5 seconds is
+way too long, something is not correct. You might want to sniff the
+fast link pulses, try to decode the values and see what is going on.
+
+I would not be surprised if you find out this 5 second complete time
+is somehow related to it not completing at all.
+
+	Andrew
 
