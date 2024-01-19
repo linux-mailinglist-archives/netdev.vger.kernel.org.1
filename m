@@ -1,191 +1,106 @@
-Return-Path: <netdev+bounces-64317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 535748324CA
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 07:56:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 320E28324DA
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 08:09:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E91181F2157A
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 06:56:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54F2F1C23853
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 07:09:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 686A7944F;
-	Fri, 19 Jan 2024 06:55:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=systec-electronic.com header.i=@systec-electronic.com header.b="iM314C9W"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38BD7523A;
+	Fri, 19 Jan 2024 07:09:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.systec-electronic.com (mail.systec-electronic.com [77.220.239.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C37A6184E;
-	Fri, 19 Jan 2024 06:55:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=77.220.239.22
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [20.231.56.155])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD352186F;
+	Fri, 19 Jan 2024 07:09:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=20.231.56.155
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705647358; cv=none; b=Rsbm4lV0ZKtCxkCpZRC4i3w3nUogEkaX1t6wSvXbRBgL00F95TN1ZAvgbjjAxlEqeBgwkO/f83lxyFpTVhGpHCz0wpJakY6nUFFdZsHtZLQbE8owDwS9wRho1+fpqspEyUhSOyZ7i3TJhKsY505fXV7fMrGpJuQu58JJVBIhgjY=
+	t=1705648153; cv=none; b=dpVg5etD4A6FiPbjXvimtA3GDNwjF+RAOKMt6SVnUE/pXL0+r3a8Ock46z9KcSF4QYrIjmmdhc7h5lTZNNWGxtPVu+aUvAaVDMf735HR0MUaV30BNsLFOEDms10iIHDG8kKeexwK+EBLVLcXkudOqhFghOiFeVmqp7EpDdA4GWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705647358; c=relaxed/simple;
-	bh=fzZ9PqYrfw2bV7Rfs2G/n0BHJjQaonVjoKgOKh5vznc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=F0tAFVSkwtjziy0J5GR/R8prgUR5k+XMF10kFkQQFEuFhGZy0FYf+6dTsG5SXZW0/RjCjLobbZ41NxuN2ws1bEZEP//l9x9JivMR6hR44ri2sW7qE+8q/6m/j8ppvN4wSMAqpzhg2YHkL6X3FNX7NVtyCDBQ2GwYa4QyGCO24fI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=systec-electronic.com; spf=pass smtp.mailfrom=systec-electronic.com; dkim=pass (2048-bit key) header.d=systec-electronic.com header.i=@systec-electronic.com header.b=iM314C9W; arc=none smtp.client-ip=77.220.239.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=systec-electronic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=systec-electronic.com
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.systec-electronic.com (Postfix) with ESMTP id 01CCF940010D;
-	Fri, 19 Jan 2024 07:55:55 +0100 (CET)
-Received: from mail.systec-electronic.com ([127.0.0.1])
- by localhost (mail.systec-electronic.com [127.0.0.1]) (amavis, port 10032)
- with ESMTP id Q8OpYxjlMZbe; Fri, 19 Jan 2024 07:55:54 +0100 (CET)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.systec-electronic.com (Postfix) with ESMTP id BDA089400115;
-	Fri, 19 Jan 2024 07:55:54 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.systec-electronic.com BDA089400115
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=systec-electronic.com; s=B34D3B04-5DC7-11EE-83E3-4D8CAB78E8CD;
-	t=1705647354; bh=R2H+wxpHRJ7ij8BQv9/AjquxQAEYGY9PEXxh3X7nW18=;
-	h=From:To:Date:Message-ID:MIME-Version;
-	b=iM314C9WPLk/qprc7zek/T3vwG/ee4kK4VD4Q7avuTkfBvoHAFhH+3OSGE3ttQGxh
-	 zPj3QEh0pcNeBs5GUmVAO5lQff7Idtq+5Kv40kb5GFhJxsV5cDYh396OCgA8Ju8j1v
-	 UnJPVK9Qq4/L6reEqVhyd4SvbRVwMubpnZI0nfjWpxUqPGvtIzMel3587UzK6m12yY
-	 XmYAe033xaLMPNSAPRk+c5bdhtRecjEoPhC/2M0AhN+kJNEk4M8zUDHTZKEkjQ52uT
-	 d5XqJKhxMnKX4k9VpumoG3cRYsdfTcfGaDPQxrnt237MtZP6lASbQ+gzsmLsbyA4Zc
-	 x9bNEfRTSqzPg==
-X-Virus-Scanned: amavis at systec-electronic.com
-Received: from mail.systec-electronic.com ([127.0.0.1])
- by localhost (mail.systec-electronic.com [127.0.0.1]) (amavis, port 10026)
- with ESMTP id XjM1_v4EJDbj; Fri, 19 Jan 2024 07:55:54 +0100 (CET)
-Received: from ws-565760.systec.local (unknown [212.185.67.148])
-	by mail.systec-electronic.com (Postfix) with ESMTPSA id 724CF940010D;
-	Fri, 19 Jan 2024 07:55:54 +0100 (CET)
-From: Andre Werner <andre.werner@systec-electronic.com>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	davem@davemloft.net,
+	s=arc-20240116; t=1705648153; c=relaxed/simple;
+	bh=B4FqppSt2LDQB57hJ959RB88Rbm/8I/Enz2IwTTW/88=;
+	h=From:To:Subject:Date:Message-Id:MIME-Version; b=umaRovsyPI59M5DyakqWbUr1kaRlRxFbtz8T2amNXTcJsqFYcyX1DxyujwWvOO0WDti+UkmHJccoJ1WLtDZmbEmRqur6I7PDegakDJZ+7uD2th8RiSatDXVQdK32nDA3W2SENDay6h9AOKVc0XQkkWMwF+PbmfFGvNB/r9QgRd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=20.231.56.155
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from cmd.. (unknown [183.159.169.110])
+	by mail-app3 (Coremail) with SMTP id cC_KCgDnyjQAIKplWz1JAA--.63700S2;
+	Fri, 19 Jan 2024 15:08:48 +0800 (CST)
+From: Lin Ma <linma@zju.edu.cn>
+To: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: linux@armlinux.org.uk,
+	pabeni@redhat.com,
+	dsahern@kernel.org,
+	razor@blackwall.org,
+	leon@kernel.org,
+	linma@zju.edu.cn,
+	haleyb.dev@gmail.com,
+	ja@ssi.bg,
+	judyhsiao@chromium.org,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Andre Werner <andre.werner@systec-electronic.com>
-Subject: [RFC net-next v2 2/2] net: phy: adin1100: Add interrupt support for link change
-Date: Fri, 19 Jan 2024 07:51:14 +0100
-Message-ID: <20240119065542.30279-2-andre.werner@systec-electronic.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240119065542.30279-1-andre.werner@systec-electronic.com>
-References: <20240119065542.30279-1-andre.werner@systec-electronic.com>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v1] neighbour: complement nl_ntbl_parm_policy
+Date: Fri, 19 Jan 2024 15:08:47 +0800
+Message-Id: <20240119070847.5402-1-linma@zju.edu.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cC_KCgDnyjQAIKplWz1JAA--.63700S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Gr43JryUuF1rZF4UJF4DXFb_yoW8Jry5pa
+	yDu3429ayDZr47Aa9rXayv93WIgr1qqan8Xr17C34ay3s7tr1kC34Utry0vr1SyF4kJrya
+	qa15Ar43JFWIvwUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9K14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4U
+	JVW0owA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCY02Avz4vE14v_GF4l42xK82IYc2Ij64vIr4
+	1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK
+	67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI
+	8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAv
+	wI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14
+	v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUr4SrUUUUU
+X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
 
-An interrupt handler was added to the driver as well as functions
-to enable interrupts at the phy.
+In the neightbl_set function, the attributes array is parsed and validated
+using the nl_ntbl_parm_policy policy. However, this policy overlooks the
+NDTPA_QUEUE_LENBYTES attribute since the commit 6b3f8674bccb ("[NEIGH]:
+Convert neighbour table modification to new netlink api").
+As a result, no validation is performed when accessing the
+NDTPA_QUEUE_LENBYTES attribute.
 
-There are several interrupts maskable at the phy, but only link change
-interrupts are handled by the driver yet.
+This patch addresses this issue by complementing the policy to ensure that
+every attribute being accessed is properly validated.
 
-Signed-off-by: Andre Werner <andre.werner@systec-electronic.com>
+Signed-off-by: Lin Ma <linma@zju.edu.cn>
 ---
-v2:
-- Clean format and reword commit message as suggested by reviewer of
-  first patch submission
----
- drivers/net/phy/adin1100.c | 61 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 61 insertions(+)
+ net/core/neighbour.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/phy/adin1100.c b/drivers/net/phy/adin1100.c
-index 7619d6185801..fb1146cf881a 100644
---- a/drivers/net/phy/adin1100.c
-+++ b/drivers/net/phy/adin1100.c
-@@ -18,6 +18,12 @@
- #define PHY_ID_ADIN1110				0x0283bc91
- #define PHY_ID_ADIN2111				0x0283bca1
-=20
-+#define ADIN_PHY_SUBSYS_IRQ_MASK		0x0021
-+#define   ADIN_LINK_STAT_CHNG_IRQ_EN		BIT(1)
-+
-+#define ADIN_PHY_SUBSYS_IRQ_STATUS		0x0011
-+#define   ADIN_LINK_STAT_CHNG			BIT(1)
-+
- #define ADIN_FORCED_MODE			0x8000
- #define   ADIN_FORCED_MODE_EN			BIT(0)
-=20
-@@ -136,6 +142,59 @@ static int adin_config_aneg(struct phy_device *phyde=
-v)
- 	return genphy_c45_config_aneg(phydev);
- }
-=20
-+static int adin_phy_ack_intr(struct phy_device *phydev)
-+{
-+	/* Clear pending interrupts */
-+	int rc =3D phy_read_mmd(phydev, MDIO_MMD_VEND2,
-+			      ADIN_PHY_SUBSYS_IRQ_STATUS);
-+
-+	return rc < 0 ? rc : 0;
-+}
-+
-+static int adin_config_intr(struct phy_device *phydev)
-+{
-+	int ret, regval;
-+
-+	ret =3D adin_phy_ack_intr(phydev);
-+
-+	if (ret)
-+		return ret;
-+
-+	regval =3D phy_read_mmd(phydev, MDIO_MMD_VEND2,
-+			      ADIN_PHY_SUBSYS_IRQ_MASK);
-+	if (regval < 0)
-+		return regval;
-+
-+	if (phydev->interrupts =3D=3D PHY_INTERRUPT_ENABLED)
-+		regval |=3D ADIN_LINK_STAT_CHNG_IRQ_EN;
-+	else
-+		regval &=3D ~ADIN_LINK_STAT_CHNG_IRQ_EN;
-+
-+	ret =3D phy_write_mmd(phydev, MDIO_MMD_VEND2,
-+			    ADIN_PHY_SUBSYS_IRQ_MASK,
-+			    regval);
-+	return ret;
-+}
-+
-+static irqreturn_t adin_phy_handle_interrupt(struct phy_device *phydev)
-+{
-+	int irq_status;
-+
-+	irq_status =3D phy_read_mmd(phydev, MDIO_MMD_VEND2,
-+			          ADIN_PHY_SUBSYS_IRQ_STATUS);
-+	if (irq_status < 0) {
-+		phy_error(phydev);
-+		return IRQ_NONE;
-+	}
-+
-+	if (!(irq_status & ADIN_LINK_STAT_CHNG))
-+		return IRQ_NONE;
-+
-+	phy_trigger_machine(phydev);
-+
-+	return IRQ_HANDLED;
-+}
-+
- static int adin_set_powerdown_mode(struct phy_device *phydev, bool en)
- {
- 	int ret;
-@@ -275,6 +334,8 @@ static struct phy_driver adin_driver[] =3D {
- 		.probe			=3D adin_probe,
- 		.config_aneg		=3D adin_config_aneg,
- 		.read_status		=3D adin_read_status,
-+		.config_intr		=3D adin_config_intr,
-+		.handle_interrupt	=3D adin_phy_handle_interrupt,
- 		.set_loopback		=3D adin_set_loopback,
- 		.suspend		=3D adin_suspend,
- 		.resume			=3D adin_resume,
---=20
-2.43.0
+diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+index 552719c3bbc3..ece0447cf409 100644
+--- a/net/core/neighbour.c
++++ b/net/core/neighbour.c
+@@ -2293,6 +2293,7 @@ static const struct nla_policy nl_neightbl_policy[NDTA_MAX+1] = {
+ static const struct nla_policy nl_ntbl_parm_policy[NDTPA_MAX+1] = {
+ 	[NDTPA_IFINDEX]			= { .type = NLA_U32 },
+ 	[NDTPA_QUEUE_LEN]		= { .type = NLA_U32 },
++	[NPTPA_QUEUE_LEN_BYTES]         = { .type = NLA_U32 },
+ 	[NDTPA_PROXY_QLEN]		= { .type = NLA_U32 },
+ 	[NDTPA_APP_PROBES]		= { .type = NLA_U32 },
+ 	[NDTPA_UCAST_PROBES]		= { .type = NLA_U32 },
+-- 
+2.34.1
 
 
