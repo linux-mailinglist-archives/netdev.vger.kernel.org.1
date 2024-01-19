@@ -1,119 +1,140 @@
-Return-Path: <netdev+bounces-64439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C65BB833190
-	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 00:32:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBEF583319B
+	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 00:38:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 784DD1F238C5
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 23:32:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF6711C220ED
+	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 23:38:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDBC959B61;
-	Fri, 19 Jan 2024 23:31:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB1815915B;
+	Fri, 19 Jan 2024 23:38:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YAQA/Y09"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nNlwXZPQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E48759B4A;
-	Fri, 19 Jan 2024 23:31:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49BDF5914D;
+	Fri, 19 Jan 2024 23:38:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705707085; cv=none; b=ioyfGZMNip4Co8VVTd9HsRhIe/Sf6/kbUA1V/Q1W9HniamVKprIxLvPGDVT7Bn4FH/9tzcgqrl10ytc4DQdvY4uYCC3zD+TQBuonN9+qgC4ap1hEpB8WfvJ1qHgd5xZDF/wZjje7uKDFjCp984M4HW/XxoedL5YblJpEDpYWSKM=
+	t=1705707503; cv=none; b=I8So90JwjIV/CZOE+0nAEjhQXecYvLN2dB8P5bIo9+UMjEOBbqch9uyfzemH+82bTzMZKe7Tazk//uN92S9ZOxEf804lBf9T5se7BjlG+kygS7rPwsEIMROn2/QmBx5MPGqnG23S0SeHSBbRhSfTPgvIZqwAHShstOMr2qascxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705707085; c=relaxed/simple;
-	bh=9khkhqzvLIulNsCTS8jeOkWg0pFG1sYZYYrSbURPQmo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Of6P0Jo9zrIUqWuapOkG5meKEPnMqHuRhhK39zQAOxjaLlQwdVrpdjE5QeCqG6hpm2mJvntcD8KpUUyPvirmmGZ7ptYhaNISfwI/mPSlg+1Vz69WbDldikiAyIRV6jvWglaS3mPMbwKg9hUwzLFIY06Hq9c6bki+lOv7o2GjaBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YAQA/Y09; arc=none smtp.client-ip=198.175.65.14
+	s=arc-20240116; t=1705707503; c=relaxed/simple;
+	bh=7+hMZpFmWpmV+mrB7PolbtyQ9ZwFs+8lmmyhfHO0Z3w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=erEMkH5S8/63VdF0JkwHGNPGPEMoixA0SYhL6euwdykc8a+R5Zc2E0mJpC8dP73+MLKUsdi79oVxAHmdjyJ+srVElZQUEmgdvTWsMPf2vthm7mj+dMr7ihzry5WiGycYEUi4LI5LvPW0r4vs1/Zj4QtPWdq43xKzbvnDC6OyWts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nNlwXZPQ; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1705707084; x=1737243084;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=9khkhqzvLIulNsCTS8jeOkWg0pFG1sYZYYrSbURPQmo=;
-  b=YAQA/Y09rju7cjY4HojJ1JTpVzzs5zRRuS2kwXltlGdzDQa06yyPcDyQ
-   n5Zi1XBYVc5tWBGFpt7X9d+1pyIc8cRy1dbmwFuAeTg8IOnnJkH+H61vo
-   gqVJGStUyRWlimbvrWekjoDuxZkcu/khnT17U/6x6/9h9vVLDMNm5s1I0
-   xZMFjNCGULrzgX22bmTnapOZplRZsu1vHEY9b/hMkgqsw80kS+3aTLLV5
-   Mk/xWZfbE/pNPgi7d6Xr+PB0L3QSGBtpKgPJCxUgRNS3JJFnELSenJ20Q
-   S2s5RTO36ywlVaN/g6U1E0cKja/vcEIIPr/fhB34HGwKrIZFW2Z4bSVZB
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10957"; a="771713"
+  t=1705707502; x=1737243502;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=7+hMZpFmWpmV+mrB7PolbtyQ9ZwFs+8lmmyhfHO0Z3w=;
+  b=nNlwXZPQOhwHJ1BZNHRTlqOawB+Fa3NoJUy2vsaLzqgwplMSR6eAivfV
+   c8UtPUiutYFBDgv14OYSyTnhXQt9q1PnmrKyobTTneg6KCiVAgMO5I9NM
+   eq97iUfRuuqNG0WR/qwCP7TAJy45rUcmijenNFrgm5SRogKGiFP6YBwdu
+   lU5ClKaj4guxHt2oydb3kkywSh6cFgPRNTSEdXl3d3xVmoj/+M4EUSKru
+   anqpXoIBM9Ab1TucDBHe6VbCVNDqq6E8Nbu+IV+85n8Cs/wNHuLYzITAy
+   aMiP7/3YxLIx0jjvCZIxPgWoAj5B7xfohemtnfl7CAWC5w9Ed69X/PAr8
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10957"; a="751691"
 X-IronPort-AV: E=Sophos;i="6.05,206,1701158400"; 
-   d="scan'208";a="771713"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2024 15:31:24 -0800
+   d="scan'208";a="751691"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2024 15:38:21 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10957"; a="904277469"
+X-IronPort-AV: E=McAfee;i="6600,9927,10957"; a="855452102"
 X-IronPort-AV: E=Sophos;i="6.05,206,1701158400"; 
-   d="scan'208";a="904277469"
-Received: from boxer.igk.intel.com ([10.102.20.173])
-  by fmsmga002.fm.intel.com with ESMTP; 19 Jan 2024 15:31:21 -0800
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: bpf@vger.kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org
-Cc: netdev@vger.kernel.org,
-	magnus.karlsson@intel.com,
-	bjorn@kernel.org,
-	maciej.fijalkowski@intel.com,
-	echaudro@redhat.com,
-	lorenzo@kernel.org,
-	martin.lau@linux.dev,
-	tirthendu.sarkar@intel.com,
-	john.fastabend@gmail.com
-Subject: [PATCH v4 bpf 11/11] i40e: update xdp_rxq_info::frag_size for ZC enabled Rx queue
-Date: Sat, 20 Jan 2024 00:30:37 +0100
-Message-Id: <20240119233037.537084-12-maciej.fijalkowski@intel.com>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20240119233037.537084-1-maciej.fijalkowski@intel.com>
-References: <20240119233037.537084-1-maciej.fijalkowski@intel.com>
+   d="scan'208";a="855452102"
+Received: from lkp-server01.sh.intel.com (HELO 961aaaa5b03c) ([10.239.97.150])
+  by fmsmga004.fm.intel.com with ESMTP; 19 Jan 2024 15:38:17 -0800
+Received: from kbuild by 961aaaa5b03c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rQyRD-0004VG-1j;
+	Fri, 19 Jan 2024 23:38:15 +0000
+Date: Sat, 20 Jan 2024 07:37:34 +0800
+From: kernel test robot <lkp@intel.com>
+To: Lin Ma <linma@zju.edu.cn>, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org,
+	razor@blackwall.org, leon@kernel.org, haleyb.dev@gmail.com,
+	ja@ssi.bg, judyhsiao@chromium.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev
+Subject: Re: [PATCH net-next v1] neighbour: complement nl_ntbl_parm_policy
+Message-ID: <202401200717.gbJdfFML-lkp@intel.com>
+References: <20240119070847.5402-1-linma@zju.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240119070847.5402-1-linma@zju.edu.cn>
 
-Now that i40e driver correctly sets up frag_size in xdp_rxq_info, let us
-make it work for ZC multi-buffer as well. i40e_ring::rx_buf_len for ZC
-is being set via xsk_pool_get_rx_frame_size() and this needs to be
-propagated up to xdp_rxq_info.
+Hi Lin,
 
-Fixes: 1c9ba9c14658 ("i40e: xsk: add RX multi-buffer support")
-Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
----
- drivers/net/ethernet/intel/i40e/i40e_main.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+kernel test robot noticed the following build errors:
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index f8d513499607..7b091ce64cc7 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -3609,7 +3609,14 @@ static int i40e_configure_rx_ring(struct i40e_ring *ring)
- 
- 	ring->xsk_pool = i40e_xsk_pool(ring);
- 	if (ring->xsk_pool) {
-+		xdp_rxq_info_unreg(&ring->xdp_rxq);
- 		ring->rx_buf_len = xsk_pool_get_rx_frame_size(ring->xsk_pool);
-+		err = __xdp_rxq_info_reg(&ring->xdp_rxq, ring->netdev,
-+					 ring->queue_index,
-+					 ring->q_vector->napi.napi_id,
-+					 ring->rx_buf_len);
-+		if (err)
-+			return err;
- 		err = xdp_rxq_info_reg_mem_model(&ring->xdp_rxq,
- 						 MEM_TYPE_XSK_BUFF_POOL,
- 						 NULL);
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Lin-Ma/neighbour-complement-nl_ntbl_parm_policy/20240119-151255
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240119070847.5402-1-linma%40zju.edu.cn
+patch subject: [PATCH net-next v1] neighbour: complement nl_ntbl_parm_policy
+config: arm-randconfig-001-20240120 (https://download.01.org/0day-ci/archive/20240120/202401200717.gbJdfFML-lkp@intel.com/config)
+compiler: clang version 18.0.0git (https://github.com/llvm/llvm-project d92ce344bf641e6bb025b41b3f1a77dd25e2b3e9)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240120/202401200717.gbJdfFML-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202401200717.gbJdfFML-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> net/core/neighbour.c:2296:3: error: use of undeclared identifier 'NPTPA_QUEUE_LEN_BYTES'; did you mean 'NDTPA_QUEUE_LENBYTES'?
+    2296 |         [NPTPA_QUEUE_LEN_BYTES]         = { .type = NLA_U32 },
+         |          ^~~~~~~~~~~~~~~~~~~~~
+         |          NDTPA_QUEUE_LENBYTES
+   include/uapi/linux/neighbour.h:160:2: note: 'NDTPA_QUEUE_LENBYTES' declared here
+     160 |         NDTPA_QUEUE_LENBYTES,           /* u32 */
+         |         ^
+   1 error generated.
+
+
+vim +2296 net/core/neighbour.c
+
+  2292	
+  2293	static const struct nla_policy nl_ntbl_parm_policy[NDTPA_MAX+1] = {
+  2294		[NDTPA_IFINDEX]			= { .type = NLA_U32 },
+  2295		[NDTPA_QUEUE_LEN]		= { .type = NLA_U32 },
+> 2296		[NPTPA_QUEUE_LEN_BYTES]         = { .type = NLA_U32 },
+  2297		[NDTPA_PROXY_QLEN]		= { .type = NLA_U32 },
+  2298		[NDTPA_APP_PROBES]		= { .type = NLA_U32 },
+  2299		[NDTPA_UCAST_PROBES]		= { .type = NLA_U32 },
+  2300		[NDTPA_MCAST_PROBES]		= { .type = NLA_U32 },
+  2301		[NDTPA_MCAST_REPROBES]		= { .type = NLA_U32 },
+  2302		[NDTPA_BASE_REACHABLE_TIME]	= { .type = NLA_U64 },
+  2303		[NDTPA_GC_STALETIME]		= { .type = NLA_U64 },
+  2304		[NDTPA_DELAY_PROBE_TIME]	= { .type = NLA_U64 },
+  2305		[NDTPA_RETRANS_TIME]		= { .type = NLA_U64 },
+  2306		[NDTPA_ANYCAST_DELAY]		= { .type = NLA_U64 },
+  2307		[NDTPA_PROXY_DELAY]		= { .type = NLA_U64 },
+  2308		[NDTPA_LOCKTIME]		= { .type = NLA_U64 },
+  2309		[NDTPA_INTERVAL_PROBE_TIME_MS]	= { .type = NLA_U64, .min = 1 },
+  2310	};
+  2311	
+
 -- 
-2.34.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
