@@ -1,107 +1,147 @@
-Return-Path: <netdev+bounces-64462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9918083336F
-	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 10:56:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C98C48333E5
+	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 12:35:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BC8928147A
-	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 09:56:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B43DE1C21166
+	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 11:35:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAD5FBA41;
-	Sat, 20 Jan 2024 09:56:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AB02DDC1;
+	Sat, 20 Jan 2024 11:35:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="dlikXYNv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="osHl9MRt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-21.smtpout.orange.fr [80.12.242.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6E29C8C7
-	for <netdev@vger.kernel.org>; Sat, 20 Jan 2024 09:56:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E65A2D304;
+	Sat, 20 Jan 2024 11:35:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705744573; cv=none; b=UE0QQXipi8RPQ52fpwJz06TrEFjRI8U9LBzuHUevNWRtCnhC9OSDg7lOraxubAnezjTT4h3rSopW77cFrOqXIPDRHutaK8OdBBxFJ0BuiCfU+69ANJJq4Fcpr2Jw5B1hDMv0Vs8FsYArSrJdxng6/MlKQC9BmMiLSSsfCv+FxdM=
+	t=1705750548; cv=none; b=Nm0VmGHfhA+6PHybxbMmTBkqKRJiudynYtnQ4OZLCxHP+tRBbfFsLAetCzWE2vlwrhhgwDAWTcB5DATIZglEqAbwLHPiZzu7IgSOSwyfxrW4yA32luJt8dWyDrX6kEEY0at/blSxEi4PMWY3tCCMNOL96tnbMr1K4q520/Mw4Gw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705744573; c=relaxed/simple;
-	bh=BOcX8KWEnibygk4fjeA6ev0h6FDA5vSRBlJ1zvGoVtc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nT990wYiGnldQ9f2k+xvDXdwLavG8MTjfJQV7IUbthF6P9QcowvfD1/XgXFznV9dIDnoETwIzSsAjRLxTclz5S1joK3E3U78F8nApfAcYiyKvQ8eiHEwmRGFs0BmF/joP37SKmnZ4LFubo+T6zBrLekSXBoh62QCNs3RAxQn9xQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=dlikXYNv; arc=none smtp.client-ip=80.12.242.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from fedora.home ([92.140.202.140])
-	by smtp.orange.fr with ESMTPA
-	id R859rc6amXxngR859rqY8F; Sat, 20 Jan 2024 10:56:09 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1705744569;
-	bh=6/Q426ZzIQUJLm346t0hoGiEGD7EVC/MiQvvpwN1st0=;
-	h=From:To:Cc:Subject:Date;
-	b=dlikXYNvorCGCI/zMlw+kQotCzT38LYn+0/29+wiIY+D+2X0okIBuyhrqgbaTeGCE
-	 MLiREdT44J3NpJ91NyxVIJW5JAzfiezWkZW4GDFgFi821WNWYGUbNzWWzbCRr6ufYm
-	 nGRStL1OW06bVoduZxNUjOatbL1M7gBTMsquonPrYmJ8uiWol4sU8cEu5fBOY5BxSc
-	 CnCYtDo7by24j06iVPoUz84OMhcVsDts9s9FXWA6xOikHfBwJTEDzltFQsJGbcw/OD
-	 QV3w9sOphKFjXX8Jl8b7kqp5BChAZd90U2SLDORzsqRgQMon3hYjIng0NZ/wx1IDUs
-	 gSdpIxW6k/3Dw==
-X-ME-Helo: fedora.home
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Sat, 20 Jan 2024 10:56:09 +0100
-X-ME-IP: 92.140.202.140
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	netdev@vger.kernel.org
-Subject: [PATCH] nfc: hci: Save a few bytes of memory when registering a 'nfc_llc' engine
-Date: Sat, 20 Jan 2024 10:56:06 +0100
-Message-ID: <6d2b8c390907dcac2e4dc6e71f1b2db2ef8abef1.1705744530.git.christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1705750548; c=relaxed/simple;
+	bh=LNJG2a18OzwovkVmDgTSAY9tdBZP2+CP0aiTr6qY2MM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=deD0tq2s1xr/r16nvRKvNBurw4BmOOTHiLSHyawfDr5ouMGRF4Sdv6/TX1AJtWg+s7hgGWda3Kuj3I3SXznLAHs0UVZ/dGSh4AqFOjoxCvLQwqg0EzT8GcMnxKJ82NP6sZFornCKHbnFZtHDyk7wvHFOcE8kDCnobdyQ4mnV1dA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=osHl9MRt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86343C433F1;
+	Sat, 20 Jan 2024 11:35:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705750547;
+	bh=LNJG2a18OzwovkVmDgTSAY9tdBZP2+CP0aiTr6qY2MM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=osHl9MRt88D9MkriixCOAxqrY1dSXvCQ35tgm2Kkqf0lQZ5rPZPNKNwnQJ1+kc8KG
+	 OSS5lF6u7MVaUmuR7oVVSKF1KIVLXtRQmUCkSDSoIkaqGWyORHt6hPt4dZ+mGMyUxb
+	 27vi6cVHGCn69FQCDslIJnCvreJauPYBKeBHULL/VMu5mZrcfIUM/EORrSU3wxFr5u
+	 KTYx6nT31F48ylkcikPWXc9DmbDTG2TN+oOFREJIglkH1J5aKTLuXu7RjJFocDwsX1
+	 +ye6RHt3VI4v8pUiJCTGzG57DMiiHp8yOL+8xTHjaNQWVhcRrXJtbarzrHpXTRorPC
+	 3XMzVYWSsrLxw==
+Date: Sat, 20 Jan 2024 11:35:41 +0000
+From: Simon Horman <horms@kernel.org>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+	andrii@kernel.org, netdev@vger.kernel.org,
+	magnus.karlsson@intel.com, bjorn@kernel.org, echaudro@redhat.com,
+	lorenzo@kernel.org, martin.lau@linux.dev,
+	tirthendu.sarkar@intel.com, john.fastabend@gmail.com
+Subject: Re: [PATCH v4 bpf 05/11] i40e: handle multi-buffer packets that are
+ shrunk by xdp prog
+Message-ID: <20240120113541.GA110624@kernel.org>
+References: <20240119233037.537084-1-maciej.fijalkowski@intel.com>
+ <20240119233037.537084-6-maciej.fijalkowski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240119233037.537084-6-maciej.fijalkowski@intel.com>
 
-nfc_llc_register() calls pass a string literal as the 'name' parameter.
+On Sat, Jan 20, 2024 at 12:30:31AM +0100, Maciej Fijalkowski wrote:
+> From: Tirthendu Sarkar <tirthendu.sarkar@intel.com>
+> 
+> XDP programs can shrink packets by calling the bpf_xdp_adjust_tail()
+> helper function. For multi-buffer packets this may lead to reduction of
+> frag count stored in skb_shared_info area of the xdp_buff struct. This
+> results in issues with the current handling of XDP_PASS and XDP_DROP
+> cases.
+> 
+> For XDP_PASS, currently skb is being built using frag count of
+> xdp_buffer before it was processed by XDP prog and thus will result in
+> an inconsistent skb when frag count gets reduced by XDP prog. To fix
+> this, get correct frag count while building the skb instead of using
+> pre-obtained frag count.
+> 
+> For XDP_DROP, current page recycling logic will not reuse the page but
+> instead will adjust the pagecnt_bias so that the page can be freed. This
+> again results in inconsistent behavior as the page count has already
+> been changed by the helper while freeing the frag(s) as part of
+> shrinking the packet. To fix this, only adjust pagecnt_bias for buffers
+> that are stillpart of the packet post-xdp prog run.
+> 
+> Fixes: e213ced19bef ("i40e: add support for XDP multi-buffer Rx")
+> Reported-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> Tested-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> Signed-off-by: Tirthendu Sarkar <tirthendu.sarkar@intel.com>
 
-So kstrdup_const() can be used instead of kfree() to avoid a memory
-allocation in such cases.
+...
 
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
----
- net/nfc/hci/llc.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> @@ -2129,20 +2130,20 @@ static void i40e_process_rx_buffs(struct i40e_ring *rx_ring, int xdp_res,
+>   * i40e_construct_skb - Allocate skb and populate it
+>   * @rx_ring: rx descriptor ring to transact packets on
+>   * @xdp: xdp_buff pointing to the data
+> - * @nr_frags: number of buffers for the packet
+>   *
+>   * This function allocates an skb.  It then populates it with the page
+>   * data from the current receive descriptor, taking care to set up the
+>   * skb correctly.
+>   */
+>  static struct sk_buff *i40e_construct_skb(struct i40e_ring *rx_ring,
+> -					  struct xdp_buff *xdp,
+> -					  u32 nr_frags)
+> +					  struct xdp_buff *xdp)
+>  {
+>  	unsigned int size = xdp->data_end - xdp->data;
+>  	struct i40e_rx_buffer *rx_buffer;
+> +	struct skb_shared_info *sinfo;
+>  	unsigned int headlen;
+>  	struct sk_buff *skb;
+> +	u32 nr_frags;
+>  
+>  	/* prefetch first cache line of first page */
+>  	net_prefetch(xdp->data);
+> @@ -2180,6 +2181,10 @@ static struct sk_buff *i40e_construct_skb(struct i40e_ring *rx_ring,
+>  	memcpy(__skb_put(skb, headlen), xdp->data,
+>  	       ALIGN(headlen, sizeof(long)));
+>  
+> +	if (unlikely(xdp_buff_has_frags(xdp))) {
+> +		sinfo = xdp_get_shared_info_from_buff(xdp);
+> +		nr_frags = sinfo->nr_frags;
+> +	}
+>  	rx_buffer = i40e_rx_bi(rx_ring, rx_ring->next_to_clean);
+>  	/* update all of the pointers */
+>  	size -= headlen;
 
-diff --git a/net/nfc/hci/llc.c b/net/nfc/hci/llc.c
-index 2140f6724644..8c7b5a817b25 100644
---- a/net/nfc/hci/llc.c
-+++ b/net/nfc/hci/llc.c
-@@ -49,7 +49,7 @@ int nfc_llc_register(const char *name, const struct nfc_llc_ops *ops)
- 	if (llc_engine == NULL)
- 		return -ENOMEM;
- 
--	llc_engine->name = kstrdup(name, GFP_KERNEL);
-+	llc_engine->name = kstrdup_const(name, GFP_KERNEL);
- 	if (llc_engine->name == NULL) {
- 		kfree(llc_engine);
- 		return -ENOMEM;
-@@ -83,7 +83,7 @@ void nfc_llc_unregister(const char *name)
- 		return;
- 
- 	list_del(&llc_engine->entry);
--	kfree(llc_engine->name);
-+	kfree_const(llc_engine->name);
- 	kfree(llc_engine);
- }
- 
--- 
-2.43.0
+Hi Maciej,
 
+Above, nr_frags is initialised only if xdp_buff_has_frags(xdp) is true.
+The code immediately following this hunk is:
+
+	if (size) {
+		if (unlikely(nr_frags >= MAX_SKB_FRAGS)) {
+			...
+
+Can it be the case that nr_frags is used uninitialised here?
+
+Flagged by Smatch.
+
+...
 
