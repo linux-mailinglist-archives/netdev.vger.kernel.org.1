@@ -1,196 +1,115 @@
-Return-Path: <netdev+bounces-64468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 733F78334AB
-	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 14:00:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB75883350B
+	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 15:39:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DEFE8B215FD
-	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 13:00:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1CF161C20F1E
+	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 14:39:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2479DEAE5;
-	Sat, 20 Jan 2024 13:00:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E89EFC00;
+	Sat, 20 Jan 2024 14:39:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=lafranque.net header.i=@lafranque.net header.b="LpbD4rl9"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="DBc9w86D"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-bc0e.mail.infomaniak.ch (smtp-bc0e.mail.infomaniak.ch [45.157.188.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A4668F70
-	for <netdev@vger.kernel.org>; Sat, 20 Jan 2024 13:00:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E757DDD7
+	for <netdev@vger.kernel.org>; Sat, 20 Jan 2024 14:39:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705755626; cv=none; b=CCO1q4fpsxTMLxFaglm7NC1F5PueetGTQFj2Wi08lXlMyL0c8ZgcWM/YNf4syWuXvW/5tMVva3aUVbCQEYL4N/fmgmenjX+h5AY46/0YiajlS0OD+6QaIukEAkPivLN8PCGxzVBPUPXGFzxQnN4113ienWiU/uYg5ns5k90c55M=
+	t=1705761592; cv=none; b=CLkKFyYWo9vSCuiwDaKIyaMHrplGFBjrBraSA6yk6DRnRQKna+mRtC2WTDd6Jtz2VUOc/y4ao7JT6iA7eSGmhRVWleYX9IoA3LrhKFfxyRDDVfVovXn/omblLk0kWKTBp41+JXhdMutBMg4pk/UWQqdZVEOf9xnLOkB0lwmJP5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705755626; c=relaxed/simple;
-	bh=YzeFuMkMNZxDx2q+V5m5RV7sekMfXfc07JY8DxRNjEQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NmXKQDFbJlP16aUS8IqdiBvbQiq7wjX9SObCocAdDfVmpyGuMeT2li6VXxlXHnCi3hmtnbaozCko45cNGujZlb3r3B36zfVPs5PTRxrHxjM+ZCTI5A8s71cV9N4UBQwqYK5fcLsII8P9hQEdY6RfZtRUTO6gxCE3SMpf7x/gxDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lafranque.net; spf=pass smtp.mailfrom=lafranque.net; dkim=pass (2048-bit key) header.d=lafranque.net header.i=@lafranque.net header.b=LpbD4rl9; arc=none smtp.client-ip=45.157.188.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lafranque.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lafranque.net
-Received: from smtp-3-0001.mail.infomaniak.ch (unknown [10.4.36.108])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4THGQK5jSyzMqpYq;
-	Sat, 20 Jan 2024 13:44:25 +0100 (CET)
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4THGQK0f3kzMpnPd;
-	Sat, 20 Jan 2024 13:44:25 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=lafranque.net;
-	s=20240118; t=1705754665;
-	bh=YzeFuMkMNZxDx2q+V5m5RV7sekMfXfc07JY8DxRNjEQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=LpbD4rl9mkeHEVmshG6AiPb9KzkN5oft8mJEkhb1TneJvKhtfmNWu2Tx7neI+z8ZC
-	 uHPvm2G0iTzDt0azDMm/u90r8kMpU1Gfkp4woLw6O7/zxzBfPH69kaomHZbjoMFI2s
-	 IIwXut3YJRGqJE7TVynbzE/PHzT5l9GJWbh7lgGlxIy/pfGJd1wuQIOmr/wxvm2mjj
-	 00t5F09yUlBoK/ugHu81j9Y4hOJ0uTAQ/EB1eUQJ07ENP+iJv7TXwt7WzWzHdNnY2H
-	 8swyH/spsq7VhiqC23mxHUdSORq1WQTmptCw6b6xs07luf0il2+mpwX55UZ4nn/seR
-	 Qf3htsXDilkaw==
-From: Alce Lafranque <alce@lafranque.net>
-To: netdev@vger.kernel.org,
-	stephen@networkplumber.org
-Cc: Alce Lafranque <alce@lafranque.net>,
-	Vincent Bernat <vincent@bernat.ch>
-Subject: [PATCH iproute2] vxlan: add support for flowlab inherit
-Date: Sat, 20 Jan 2024 06:44:18 -0600
-Message-Id: <20240120124418.26117-1-alce@lafranque.net>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1705761592; c=relaxed/simple;
+	bh=CENnOEOf6vbNfEOvQGtiF5HmTuxz4m2ria+W+OXvjrc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=fnYRIC7KeNYM2s/UvmFxe83YC15d8HgB8B6780GL11oXPet4d2zwhXEy9BWZCCFIFnaeJFxw6CbDOdiQfjSCHKp84mOL43uDw/8dQd32tSjM3qHQrXVdl53NgJF4WOZujVNukJeF9oah0Ib6ztIgQ7wa65szQR0Q35mnB0/0gRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=DBc9w86D; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-6da9c834646so1805077b3a.3
+        for <netdev@vger.kernel.org>; Sat, 20 Jan 2024 06:39:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1705761589; x=1706366389; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:cc:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Uw7SRaYPf01ny9WGGA++FMJ8mrF1vYqV0t2q3qmpq/8=;
+        b=DBc9w86Dqsj9bpb6mWE0D9upeuXPoHaX7l30U2PnHO+MPEaPa9zY2Lp6UOvOcyUopf
+         ZjDXpcMLuoWM3Zv26ipFEuhxp9eKRmjrWKJO2F6IWrR+tL0vLSdBPSG7HUUaq8ZW26yO
+         dboEoi6kvHp3f+tENRv/72h/vsoGHbhbdiQCvt3OUdQs5GzvrZVFW1yrl7D2F4jw/gi7
+         dNNrq2EISjkrO2FIwOAgwVzOqvZLaymgCU8q6GevgTVg90DAf+ibnsB60Fye3DB7BgoF
+         C5NDFDaH1IivrRpoDb2dHUX2gjFltFWGxag5mZUxjMkoOnwxfoaljoa+op88ekBrmdxz
+         rkSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705761589; x=1706366389;
+        h=content-transfer-encoding:in-reply-to:from:cc:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Uw7SRaYPf01ny9WGGA++FMJ8mrF1vYqV0t2q3qmpq/8=;
+        b=kZIaiW/uZS9HX5A/Hce+nMIpeDRjWaLDCd+vMQ7hH5wljZum5nXNM1bLx4WXb9YPps
+         5LpyHgzNdA97zaV6Iy/Pybwq/aFO+bGGb07Fh2ngh/1bYpyigaItSwTgS5C4cBR7JRYf
+         PPXz6PvLujK+AgIvV7FOwpg85CT/RHxDXMJwYFYe/1Hx7TLePBgzpGZA/lGOfEZLswrT
+         MHN1XChNFOfOTz1yEnzRQshX6Ds/Md7LGy8XurNf19x3FbweHkrTTtn7yUV5sQVkeCV9
+         bOnBYJN+Fe9Bbi4iJoL1LLzyr40/RnXhs5AOWushtO0OmLQ7xdCDjoR9wo2ByHOfrbhi
+         +X1Q==
+X-Gm-Message-State: AOJu0Yzn9mdJILZL4olfBI4j9P7eI9mQL4Nl+1Ym5UETRXVafu/dPiwG
+	Ptjl016MczGD33kmPyG6/Kt2k5gHjMUDs6Jpw2L7oARZKV9IfRwmHmyPvHtHds5NVG+8eUg/zoP
+	frw==
+X-Google-Smtp-Source: AGHT+IFLLFwwtGUkq1sma5MRMhETOcroOwiREcruEWI8iPvX5aILcBdbCMr7oMPK9afwJ1/iKWpq5A==
+X-Received: by 2002:aa7:9f06:0:b0:6d9:bf73:6275 with SMTP id g6-20020aa79f06000000b006d9bf736275mr2273456pfr.2.1705761589253;
+        Sat, 20 Jan 2024 06:39:49 -0800 (PST)
+Received: from [192.168.50.25] ([201.17.86.134])
+        by smtp.gmail.com with ESMTPSA id d21-20020aa78695000000b006dbd3d7e242sm623173pfo.126.2024.01.20.06.39.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 20 Jan 2024 06:39:48 -0800 (PST)
+Message-ID: <9c6213b3-961f-4a74-a22f-143da42daf32@mojatatu.com>
+Date: Sat, 20 Jan 2024 11:39:46 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Infomaniak-Routing: alpha
+User-Agent: Mozilla Thunderbird
+Subject: Re: [EXT] tc-mirred : Redirect Broadcast (like ARP) pkts rcvd on eth1
+ towards eth0
+To: Vikas Aggarwal <vik.reck@gmail.com>
+References: <CAOid5F-mJn+vnC6x885Ykq8_OckMeVkZjqqvFQv4CxAxUT1kxg@mail.gmail.com>
+ <SJ0PR18MB5216A0508C53C5D669C07F72DB6B2@SJ0PR18MB5216.namprd18.prod.outlook.com>
+ <SJ0PR18MB5216EBC3753D319B00613E79DB6B2@SJ0PR18MB5216.namprd18.prod.outlook.com>
+ <CAOid5F8TV=LbN_UZzmGfOrq1kh8hak7jrivHm2U9pQSuioJP6g@mail.gmail.com>
+ <0b2bdc15-b76b-4003-ba1d-e16049c7809b@mojatatu.com>
+ <CAOid5F8L8enzhKfW46SGxoZBp8Sed6xBSpE4Hqt+cY02r_O1xA@mail.gmail.com>
+Content-Language: en-US
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+From: Pedro Tammela <pctammela@mojatatu.com>
+In-Reply-To: <CAOid5F8L8enzhKfW46SGxoZBp8Sed6xBSpE4Hqt+cY02r_O1xA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-By default, VXLAN encapsulation over IPv6 sets the flow label to 0, with
-an option for a fixed value. This commits add the ability to inherit the
-flow label from the inner packet, like for other tunnel implementations.
-This enables devices using only L3 headers for ECMP to correctly balance
-VXLAN-encapsulated IPv6 packets.
+On 20/01/2024 02:03, Vikas Aggarwal wrote:
+> Thanks so much  Pedro Tammela & Suman.
+> Getting bit greedy here with tc filter :)  -  Can i also use some
+> boolean  for example dst_mac != aa:bb:cc:dd:ee:ff
+> 
 
-In relation to the commit "c6e9dba3be5e" ('vxlan: add support for
-                                           flowlabel inherit)
+I don't think you can explicitly like you describe.
 
-```
-$ ./ip/ip link add dummy1 type dummy
-$ ./ip/ip addr add 2001:db8::2/64 dev dummy1
-$ ./ip/ip link set up dev dummy1
-$ ./ip/ip link add vxlan1 type vxlan id 100 flowlabel inherit remote 2001:db8::1 local 2001:db8::2
-$ ./ip/ip link set up dev vxlan1
-$ ./ip/ip addr add 2001:db8:1::2/64 dev vxlan1
-$ ./ip/ip link set arp off dev vxlan1
-$ ping -q 2001:db8:1::1 &
-$ tshark -d udp.port==8472,vxlan -Vpni dummy1 -c1
-[...]
-Internet Protocol Version 6, Src: 2001:db8::2, Dst: 2001:db8::1
-    0110 .... = Version: 6
-    .... 0000 0000 .... .... .... .... .... = Traffic Class: 0x00 (DSCP: CS0, ECN: Not-ECT)
-        .... 0000 00.. .... .... .... .... .... = Differentiated Services Codepoint: Default (0)
-        .... .... ..00 .... .... .... .... .... = Explicit Congestion Notification: Not ECN-Capable Transport (0)
-    .... 1011 0001 1010 1111 1011 = Flow Label: 0xb1afb
-[...]
-Virtual eXtensible Local Area Network
-    Flags: 0x0800, VXLAN Network ID (VNI)
-    Group Policy ID: 0
-    VXLAN Network Identifier (VNI): 100
-[...]
-Internet Protocol Version 6, Src: 2001:db8:1::2, Dst: 2001:db8:1::1
-    0110 .... = Version: 6
-    .... 0000 0000 .... .... .... .... .... = Traffic Class: 0x00 (DSCP: CS0, ECN: Not-ECT)
-        .... 0000 00.. .... .... .... .... .... = Differentiated Services Codepoint: Default (0)
-        .... .... ..00 .... .... .... .... .... = Explicit Congestion Notification: Not ECN-Capable Transport (0)
-    .... 1011 0001 1010 1111 1011 = Flow Label: 0xb1afb
-```
-```
-$ ./ip/ip -d l l vxlan1
-8: vxlan1: <BROADCAST,MULTICAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
-    link/ether 36:2c:83:91:53:9e brd ff:ff:ff:ff:ff:ff promiscuity 0 allmulti 0 minmtu 68 maxmtu 65535
-    vxlan id 100 remote 2001:db8::1 local 2001:db8::2 srcport 0 0 dstport 8472 ttl auto flowlabel inherit ageing 300 [...]
-```
+You could do something like:
 
-```
-$ ./ip/ip link set vxlan1 type vxlan flowlabel 10
-$ ./ip/ip -d l l vxlan1
-8: vxlan1: <BROADCAST,MULTICAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
-    link/ether 36:2c:83:91:53:9e brd ff:ff:ff:ff:ff:ff promiscuity 0 allmulti 0 minmtu 68 maxmtu 65535
-    vxlan id 100 remote 2001:db8::1 local 2001:db8::2 srcport 0 0 dstport 8472 ttl auto flowlabel 0xa ageing 300 [...]
-```
+tc qdisc add dev $ETH clsact
+tc filter add dev $ETH egress .. dst_mac aa:bb:cc:dd:ee:ff .. action ...
+tc filter add dev $ETH egress .. action ...
 
-Signed-off-by: Alce Lafranque <alce@lafranque.net>
-Co-developed-by: Vincent Bernat <vincent@bernat.ch>
-Signed-off-by: Vincent Bernat <vincent@bernat.ch>
----
- ip/iplink_vxlan.c | 41 ++++++++++++++++++++++++++++++-----------
- 1 file changed, 30 insertions(+), 11 deletions(-)
+The last filter is a fallback in case the dst_mac doesn't match.
+As long as you don't specify the dst_mac in the flower filter, the last 
+filter will match everything != aa:bb:cc:dd:ee:ff.
 
-diff --git a/ip/iplink_vxlan.c b/ip/iplink_vxlan.c
-index 7781d60b..0b72a545 100644
---- a/ip/iplink_vxlan.c
-+++ b/ip/iplink_vxlan.c
-@@ -72,7 +72,7 @@ static void print_explain(FILE *f)
- 		"	TOS	:= { NUMBER | inherit }\n"
- 		"	TTL	:= { 1..255 | auto | inherit }\n"
- 		"	DF	:= { unset | set | inherit }\n"
--		"	LABEL := 0-1048575\n"
-+		"	LABEL   := { 0-1048575 | inherit }\n"
- 	);
- }
- 
-@@ -214,10 +214,16 @@ static int vxlan_parse_opt(struct link_util *lu, int argc, char **argv,
- 			NEXT_ARG();
- 			check_duparg(&attrs, IFLA_VXLAN_LABEL, "flowlabel",
- 				     *argv);
--			if (get_u32(&uval, *argv, 0) ||
--			    (uval & ~LABEL_MAX_MASK))
--				invarg("invalid flowlabel", *argv);
--			addattr32(n, 1024, IFLA_VXLAN_LABEL, htonl(uval));
-+			if (strcmp(*argv, "inherit") == 0) {
-+				addattr32(n, 1024, IFLA_VXLAN_LABEL_POLICY, VXLAN_LABEL_INHERIT);
-+			} else {
-+				if (get_u32(&uval, *argv, 0) ||
-+				    (uval & ~LABEL_MAX_MASK))
-+					invarg("invalid flowlabel", *argv);
-+				addattr32(n, 1024, IFLA_VXLAN_LABEL_POLICY, VXLAN_LABEL_FIXED);
-+				addattr32(n, 1024, IFLA_VXLAN_LABEL,
-+					  htonl(uval));
-+			}
- 		} else if (!matches(*argv, "ageing")) {
- 			__u32 age;
- 
-@@ -580,12 +586,25 @@ static void vxlan_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- 			print_string(PRINT_ANY, "df", "df %s ", "inherit");
- 	}
- 
--	if (tb[IFLA_VXLAN_LABEL]) {
--		__u32 label = rta_getattr_u32(tb[IFLA_VXLAN_LABEL]);
--
--		if (label)
--			print_0xhex(PRINT_ANY, "label",
--				    "flowlabel %#llx ", ntohl(label));
-+	enum ifla_vxlan_label_policy policy = VXLAN_LABEL_FIXED;
-+	if (tb[IFLA_VXLAN_LABEL_POLICY]) {
-+		policy = rta_getattr_u32(tb[IFLA_VXLAN_LABEL_POLICY]);
-+	}
-+	switch (policy) {
-+	case VXLAN_LABEL_FIXED:
-+		if (tb[IFLA_VXLAN_LABEL]) {
-+			__u32 label = rta_getattr_u32(tb[IFLA_VXLAN_LABEL]);
-+
-+			if (label)
-+				print_0xhex(PRINT_ANY, "label",
-+					    "flowlabel %#llx ", ntohl(label));
-+		}
-+		break;
-+	case VXLAN_LABEL_INHERIT:
-+		print_string(PRINT_FP, NULL, "flowlabel %s ", "inherit");
-+		break;
-+	default:
-+		break;
- 	}
- 
- 	if (tb[IFLA_VXLAN_AGEING]) {
--- 
-2.39.2
+If the == case is a noop, then just say `action ok`.
 
 
