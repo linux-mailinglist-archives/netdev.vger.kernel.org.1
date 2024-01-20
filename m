@@ -1,105 +1,147 @@
-Return-Path: <netdev+bounces-64444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 171638331FA
-	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 01:54:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A25A833251
+	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 02:49:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A91631F22817
-	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 00:54:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D3D871F22870
+	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 01:49:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50E6517C6;
-	Sat, 20 Jan 2024 00:54:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5F8EA52;
+	Sat, 20 Jan 2024 01:49:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="J8KamuWl"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmtu5ljg5lje1ms4xmtka.icoremail.net (zg8tmtu5ljg5lje1ms4xmtka.icoremail.net [159.89.151.119])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C1FB17C1;
-	Sat, 20 Jan 2024 00:54:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.89.151.119
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3BCBA44;
+	Sat, 20 Jan 2024 01:49:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705712057; cv=none; b=eV23HTgSPlXy9tgiZO5lHKxQhq/icoXgAWhfX4mqxXF0M4u7X9cPfbCFm7ZTrddey887H5fxkBQFI+JD5Kdb/wAxubNPU5Xoort1RUJ8773yIqBKdtynxGAlwpLw7wHcCkIrAFsTPnORK1WGHD44txfZSFJLX+o1ByKDKLf3HmE=
+	t=1705715381; cv=none; b=XjqRKmHJXpla3CDBnA28yxSR3SVoct9p4sCCQUN0L8Y0XQFdd0+tw3GjYNj/sM57LNs4bKNcHSkVpu78XLJ5NPXBop+rJo4dwaNpAp/BzS/FbHp84TTQizPAvBRiOxoSvCq8FPeoJBX2JxezvdSqHtgbbz/4NZqCuOHpttGLaXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705712057; c=relaxed/simple;
-	bh=H0O5AZQsr7nxqSTjataz1x2Uq5qdVJnHuFKfvX+8w3I=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=pL/yrDVUgbb4k9NC7THPsgZOdCcr8CMWO8sk0Z+3N8NIfOKwBQm9Vw+2MraMcbk5E5xYXeMu7xO80b+FvAQkXf0dbs08ghcv6ESe5bcz4xg+2GuJLsZ8K2jjOtajnRQCskr3h6gEX+zN+E4/NRcQ/S1V1HR50UxVGQsaRukn8pk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=159.89.151.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from linma$zju.edu.cn ( [10.181.207.67] ) by
- ajax-webmail-mail-app3 (Coremail) ; Sat, 20 Jan 2024 08:53:50 +0800
- (GMT+08:00)
-Date: Sat, 20 Jan 2024 08:53:50 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: "Lin Ma" <linma@zju.edu.cn>
-To: "Simon Horman" <horms@kernel.org>
+	s=arc-20240116; t=1705715381; c=relaxed/simple;
+	bh=0Opo4SL7bQxZDZLjH3qX+DELHtWaX53I4hEh1smH2SU=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=PeF/2TcLklUiWjW+JeBCpoBI9vWYWQX2pwaFrgNRrdOgDuPCVnZPlFlB3J1RwZmszypaxyskFMHiv3R1evpH5bARnq4XHfEZQtr+K4/PXBx1ahLKJ3B01Z/1o7fdsyimET//87nrSZ9yflA2OVcEZet28yJk0bOqYKiGJ2zEv9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=J8KamuWl; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40K1VQOt009752;
+	Sat, 20 Jan 2024 01:49:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2023-11-20;
+ bh=pgN68BYYF10yd6IluPPxE/S8KnXRhW8sTjXIOoC6vyc=;
+ b=J8KamuWl6AHFnGw0bMv2NPX+cN6LxnYclf4JfHN2X2195MTWoHQn94RaJ7pPnXIP/Hb8
+ Al3uLXGdH6Oj+LvbzhWdo68Eu06sofKljWfcl607CJG87c6fzEPDvjqP6Dw8b/MyFEpq
+ YFweLkDQ0anchdGfnnoqGsJ4p+FVH/XLc4p8yyMmMUNyj8gInan3epIq1pGm/kYyMA6I
+ 8QPx+gNAWGGJDnrw1H5lWJhlIl3ogmH0kWTY9ttqv8nJEheamvGB67ehNFqBPuczUDSr
+ oQW2ZYn9vU6NfBku4lcMGPJyEdi53CaNhDo833udbdodLTX7L7llt7aO6lxfB3gbElh2 sw== 
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3vkm2hyqfj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sat, 20 Jan 2024 01:49:24 +0000
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 40K1XnmS018005;
+	Sat, 20 Jan 2024 01:49:23 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3vr4m9geya-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sat, 20 Jan 2024 01:49:23 +0000
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40K1nMRn010519;
+	Sat, 20 Jan 2024 01:49:22 GMT
+Received: from lenovo-x390.us.oracle.com (dhcp-10-65-142-245.vpn.oracle.com [10.65.142.245])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3vr4m9gexm-1;
+	Sat, 20 Jan 2024 01:49:22 +0000
+From: Sharath Srinivasan <sharath.srinivasan@oracle.com>
+To: santosh.shilimkar@oracle.com, netdev@vger.kernel.org,
+        linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com,
+        linux-kernel@vger.kernel.org
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, dsahern@kernel.org, razor@blackwall.org,
-	leon@kernel.org, haleyb.dev@gmail.com, ja@ssi.bg,
-	judyhsiao@chromium.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v1] neighbour: complement nl_ntbl_parm_policy
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.4-cmXT5 build
- 20231205(37e20f0e) Copyright (c) 2002-2024 www.mailtech.cn
- mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
-In-Reply-To: <20240119195058.GA105385@kernel.org>
-References: <20240119070847.5402-1-linma@zju.edu.cn>
- <20240119195058.GA105385@kernel.org>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+        pabeni@redhat.com, syzkaller@googlegroups.com, chenyuan0y@gmail.com,
+        zzjas98@gmail.com, gerd.rausch@oracle.com,
+        allison.henderson@oracle.com, aron.silverton@oracle.com
+Subject: [PATCH] net/rds: Fix UBSAN: array-index-out-of-bounds in rds_cmsg_recv
+Date: Fri, 19 Jan 2024 17:48:39 -0800
+Message-Id: <1705715319-19199-1-git-send-email-sharath.srinivasan@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-19_12,2024-01-19_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 malwarescore=0 mlxscore=0
+ spamscore=0 phishscore=0 suspectscore=0 mlxlogscore=823 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2401200013
+X-Proofpoint-GUID: HG9m4QeqPYlVDsjPAKG4ABpV7skwZK1D
+X-Proofpoint-ORIG-GUID: HG9m4QeqPYlVDsjPAKG4ABpV7skwZK1D
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Message-ID: <3ddbc728.7c83.18d245c1152.Coremail.linma@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:cC_KCgC3nzueGatlRxZUAA--.9394W
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/1tbiAwQFEmWpc04QogAKsZ
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
 
-SGVsbG8gU2ltb24sCgo+IE9uIEZyaSwgSmFuIDE5LCAyMDI0IGF0IDAzOjA4OjQ3UE0gKzA4MDAs
-IExpbiBNYSB3cm90ZToKPiA+IEluIHRoZSBuZWlnaHRibF9zZXQgZnVuY3Rpb24sIHRoZSBhdHRy
-aWJ1dGVzIGFycmF5IGlzIHBhcnNlZCBhbmQgdmFsaWRhdGVkCj4gPiB1c2luZyB0aGUgbmxfbnRi
-bF9wYXJtX3BvbGljeSBwb2xpY3kuIEhvd2V2ZXIsIHRoaXMgcG9saWN5IG92ZXJsb29rcyB0aGUK
-PiA+IE5EVFBBX1FVRVVFX0xFTkJZVEVTIGF0dHJpYnV0ZSBzaW5jZSB0aGUgY29tbWl0IDZiM2Y4
-Njc0YmNjYiAoIltORUlHSF06Cj4gPiBDb252ZXJ0IG5laWdoYm91ciB0YWJsZSBtb2RpZmljYXRp
-b24gdG8gbmV3IG5ldGxpbmsgYXBpIikuCj4gPiBBcyBhIHJlc3VsdCwgbm8gdmFsaWRhdGlvbiBp
-cyBwZXJmb3JtZWQgd2hlbiBhY2Nlc3NpbmcgdGhlCj4gPiBORFRQQV9RVUVVRV9MRU5CWVRFUyBh
-dHRyaWJ1dGUuCj4gPiAKPiA+IFRoaXMgcGF0Y2ggYWRkcmVzc2VzIHRoaXMgaXNzdWUgYnkgY29t
-cGxlbWVudGluZyB0aGUgcG9saWN5IHRvIGVuc3VyZSB0aGF0Cj4gPiBldmVyeSBhdHRyaWJ1dGUg
-YmVpbmcgYWNjZXNzZWQgaXMgcHJvcGVybHkgdmFsaWRhdGVkLgo+ID4gCj4gPiBTaWduZWQtb2Zm
-LWJ5OiBMaW4gTWEgPGxpbm1hQHpqdS5lZHUuY24+Cj4gPiAtLS0KPiA+ICBuZXQvY29yZS9uZWln
-aGJvdXIuYyB8IDEgKwo+ID4gIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKQo+ID4gCj4g
-PiBkaWZmIC0tZ2l0IGEvbmV0L2NvcmUvbmVpZ2hib3VyLmMgYi9uZXQvY29yZS9uZWlnaGJvdXIu
-Ywo+ID4gaW5kZXggNTUyNzE5YzNiYmMzLi5lY2UwNDQ3Y2Y0MDkgMTAwNjQ0Cj4gPiAtLS0gYS9u
-ZXQvY29yZS9uZWlnaGJvdXIuYwo+ID4gKysrIGIvbmV0L2NvcmUvbmVpZ2hib3VyLmMKPiA+IEBA
-IC0yMjkzLDYgKzIyOTMsNyBAQCBzdGF0aWMgY29uc3Qgc3RydWN0IG5sYV9wb2xpY3kgbmxfbmVp
-Z2h0YmxfcG9saWN5W05EVEFfTUFYKzFdID0gewo+ID4gIHN0YXRpYyBjb25zdCBzdHJ1Y3Qgbmxh
-X3BvbGljeSBubF9udGJsX3Bhcm1fcG9saWN5W05EVFBBX01BWCsxXSA9IHsKPiA+ICAJW05EVFBB
-X0lGSU5ERVhdCQkJPSB7IC50eXBlID0gTkxBX1UzMiB9LAo+ID4gIAlbTkRUUEFfUVVFVUVfTEVO
-XQkJPSB7IC50eXBlID0gTkxBX1UzMiB9LAo+ID4gKwlbTlBUUEFfUVVFVUVfTEVOX0JZVEVTXSAg
-ICAgICAgID0geyAudHlwZSA9IE5MQV9VMzIgfSwKPiAKPiBUaGlzIGRvZXMgbm90IGNvbXBpbGUg
-YmVjYXVzZSBOUFRQQV9RVUVVRV9MRU5fQllURVMgaXMKPiBub3QgcHJlc2VudCBpbiBuZXQtbmV4
-dC4KPiAKPiA+ICAJW05EVFBBX1BST1hZX1FMRU5dCQk9IHsgLnR5cGUgPSBOTEFfVTMyIH0sCj4g
-PiAgCVtORFRQQV9BUFBfUFJPQkVTXQkJPSB7IC50eXBlID0gTkxBX1UzMiB9LAo+ID4gIAlbTkRU
-UEFfVUNBU1RfUFJPQkVTXQkJPSB7IC50eXBlID0gTkxBX1UzMiB9LAo+IAo+IAo+ICMjIEZvcm0g
-bGV0dGVyIC0gbmV0LW5leHQtY2xvc2VkCj4gCj4gW2FkYXB0ZWQgZnJvbSB0ZXh0IGJ5IEpha3Vi
-XQo+IAo+IFRoZSBtZXJnZSB3aW5kb3cgZm9yIHY2LjggaGFzIGJlZ3VuIGFuZCB0aGVyZWZvcmUg
-bmV0LW5leHQgaXMgY2xvc2VkCj4gZm9yIG5ldyBkcml2ZXJzLCBmZWF0dXJlcywgY29kZSByZWZh
-Y3RvcmluZyBhbmQgb3B0aW1pemF0aW9ucy4KPiBXZSBhcmUgY3VycmVudGx5IGFjY2VwdGluZyBi
-dWcgZml4ZXMgb25seS4KPiAKPiBQbGVhc2UgcmVwb3N0IHdoZW4gbmV0LW5leHQgcmVvcGVucyBv
-biBvciBhZnRlciAyMm5kIEphbnVhcnkuCj4gCj4gUkZDIHBhdGNoZXMgc2VudCBmb3IgcmV2aWV3
-IG9ubHkgYXJlIG9idmlvdXNseSB3ZWxjb21lIGF0IGFueSB0aW1lLgo+IAo+IFNlZTogaHR0cHM6
-Ly93d3cua2VybmVsLm9yZy9kb2MvaHRtbC9uZXh0L3Byb2Nlc3MvbWFpbnRhaW5lci1uZXRkZXYu
-aHRtbCNkZXZlbG9wbWVudC1jeWNsZQo+IC0tCj4gcHctYm90OiBkZWZlcgoKTXkgYmFkLCBJIHBy
-ZXBhcmUgdGhpcyBwYXRjaCBvbiB0aGUgbGludXgtc3RhYmxlIHRyZWUgYW5kIG5ldmVyIHRob3Vn
-aHQgdGhpcyB3b3VsZCBoYXBwZW4uCldpbGwgYWxzbyBjb21waWxlIG9uIHRoZSByaWdodCB0cmVl
-IG5leHQgdGltZS4KClNvIHNob3VsZCBJIHNlbmQgdGhpcyB0byBuZXQgd2hpY2ggaGFzIHRoaXMg
-YXR0cmlidXRlIG9yIHNvbWV0aGluZz8KClRoYW5rcyBhcmUgcmVhbGx5IFNvcnJ5CkxpbgoK
+Syzcaller UBSAN crash occurs in rds_cmsg_recv(),
+which reads inc->i_rx_lat_trace[j + 1] with index 4 (3 + 1),
+but with array size of 4 (RDS_RX_MAX_TRACES).
+Here 'j' is assigned from rs->rs_rx_trace[i] and in-turn from
+trace.rx_trace_pos[i] in rds_recv_track_latency(),
+with both arrays sized 3 (RDS_MSG_RX_DGRAM_TRACE_MAX). So fix the
+off-by-one bounds check in rds_recv_track_latency() to prevent
+a potential crash in rds_cmsg_recv().
+
+Found by syzcaller:
+=================================================================
+UBSAN: array-index-out-of-bounds in net/rds/recv.c:585:39
+index 4 is out of range for type 'u64 [4]'
+CPU: 1 PID: 8058 Comm: syz-executor228 Not tainted 6.6.0-gd2f51b3516da #1
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
+BIOS 1.15.0-1 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x136/0x150 lib/dump_stack.c:106
+ ubsan_epilogue lib/ubsan.c:217 [inline]
+ __ubsan_handle_out_of_bounds+0xd5/0x130 lib/ubsan.c:348
+ rds_cmsg_recv+0x60d/0x700 net/rds/recv.c:585
+ rds_recvmsg+0x3fb/0x1610 net/rds/recv.c:716
+ sock_recvmsg_nosec net/socket.c:1044 [inline]
+ sock_recvmsg+0xe2/0x160 net/socket.c:1066
+ __sys_recvfrom+0x1b6/0x2f0 net/socket.c:2246
+ __do_sys_recvfrom net/socket.c:2264 [inline]
+ __se_sys_recvfrom net/socket.c:2260 [inline]
+ __x64_sys_recvfrom+0xe0/0x1b0 net/socket.c:2260
+ do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+ do_syscall_64+0x40/0x110 arch/x86/entry/common.c:82
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+==================================================================
+
+Fixes: 3289025aedc0 ("RDS: add receive message trace used by application")
+Reported-by: Chenyuan Yang <chenyuan0y@gmail.com>
+Closes: https://lore.kernel.org/linux-rdma/CALGdzuoVdq-wtQ4Az9iottBqC5cv9ZhcE5q8N7LfYFvkRsOVcw@mail.gmail.com/
+Signed-off-by: Sharath Srinivasan <sharath.srinivasan@oracle.com>
+---
+ net/rds/af_rds.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/rds/af_rds.c b/net/rds/af_rds.c
+index 01c4cdfef45d..8435a20968ef 100644
+--- a/net/rds/af_rds.c
++++ b/net/rds/af_rds.c
+@@ -419,7 +419,7 @@ static int rds_recv_track_latency(struct rds_sock *rs, sockptr_t optval,
+ 
+ 	rs->rs_rx_traces = trace.rx_traces;
+ 	for (i = 0; i < rs->rs_rx_traces; i++) {
+-		if (trace.rx_trace_pos[i] > RDS_MSG_RX_DGRAM_TRACE_MAX) {
++		if (trace.rx_trace_pos[i] >= RDS_MSG_RX_DGRAM_TRACE_MAX) {
+ 			rs->rs_rx_traces = 0;
+ 			return -EFAULT;
+ 		}
+-- 
+1.8.3.1
+
 
