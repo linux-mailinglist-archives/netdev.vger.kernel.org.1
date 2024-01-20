@@ -1,69 +1,57 @@
-Return-Path: <netdev+bounces-64473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39B9683357A
-	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 18:25:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ED38833583
+	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 18:34:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 27875B2210E
-	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 17:25:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 770D3B22213
+	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 17:34:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90BB610949;
-	Sat, 20 Jan 2024 17:25:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3940310961;
+	Sat, 20 Jan 2024 17:34:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="m47oR2wF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G//6unyP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-21.smtpout.orange.fr [80.12.242.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18C8D10A20
-	for <netdev@vger.kernel.org>; Sat, 20 Jan 2024 17:25:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C8551094E;
+	Sat, 20 Jan 2024 17:34:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705771549; cv=none; b=SAlXAK8To+JPD7Bj1+nWvvNn9intceHQuf+p/Gj8QnxAmcvrcDekot4Ln9niyD19Zu+drLRifCTxsj08Eo3Uojz8DxKwkupPZJOUs2KsADGEwdpcwyCm1TEG2xuiccNPy7XHaQIh81m/j92TEqi+M0yClIQJFLHMnHKkb53bKc0=
+	t=1705772043; cv=none; b=PF635nilEe8I/pRV0Jd348IxyhgMG0HnnLalDantI7c9VNQZFFMdcR+pUlOdTH8XFYSMwErc2WfLFC+CqL6U30NDGD8wMR6Z8Oz3+Ntb1RhlvYYsr+Tb0eEmW2pJX7TE6l2OaD+L0+/J1AFbr5HW46DPZT90lSKf2c66ScmsPsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705771549; c=relaxed/simple;
-	bh=IHy3yKUWKTLuOD8hN3UJHVbeSR7P1m1XoNYyPhd0+ec=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EjSPqk416K0Q2w43BQ/0aS8PBewCF3wHCYuPROzpNBNgotN2EIDxXTGxhw4VzSTJnFiLeXfurMZzlndGil7lMFkiy3LhiEVqLPbPr9c2b+nArYf+CakLDbiSFCjwRBayoOCeA+SmyLXVMGUDjPfHzdSgjnJeUgFQ9VkIEp/kOIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=m47oR2wF; arc=none smtp.client-ip=80.12.242.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from fedora.home ([92.140.202.140])
-	by smtp.orange.fr with ESMTPA
-	id RF6DrefClXxngRF6DrrUj2; Sat, 20 Jan 2024 18:25:44 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1705771544;
-	bh=wFri96r10IYTNO8+N94yIYZtcJHCQ7p90QlQKgXP2zQ=;
-	h=From:To:Cc:Subject:Date;
-	b=m47oR2wFqaPhS795diQSgtuX4Cry1l/u1GV8fdwbAzJKCPH2sO5yOU2uBSFK/sZw0
-	 WtqVMmILCibiJMHFb9G1XAXukYgkby0Qz0a2znFeu77RdNH3Vg2lRqIMr5q+pQNDsh
-	 4ZND9BAePxKXF0TK+RQMZwpst4WWC6lgIaSiGlBfJ0uph6p0iEcnI1jWy5CJUASCZA
-	 weMAHL4HFdfiy0tx9tJfjxAn+BwcZMSrwciEamrwCBgxJu+mRLbgBGNXXhzRzUqDS0
-	 FA+9pgNY9P8agJN9FOXVj4HcfcTcM+9hWujZkh6+00HqAIe1b320aV91k6xiDgQ+xu
-	 wx8zSB/kq4eQw==
-X-ME-Helo: fedora.home
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Sat, 20 Jan 2024 18:25:44 +0100
-X-ME-IP: 92.140.202.140
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jeff Kirsher <jeffrey.t.kirsher@intel.com>,
-	Mark Rustad <mark.d.rustad@intel.com>
-Cc: linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	intel-wired-lan@lists.osuosl.org,
+	s=arc-20240116; t=1705772043; c=relaxed/simple;
+	bh=7GgBh/qpAS9IH8JJ4QNVMuDWn+um6pf5lH+Qln2AaEU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=klr2iQ59r93H05JSZUOnHwnQ7EKwGgLZStibGWqdvfbAWUSlQQ45s9lGOPfpywYPtnSXwDyAaxtpVWLdS1YLV1BRfz4PkQB3pnieT2HZboG0ft+3R/PJE2C9EF9ggDfpKVRV3osIi9125BUuWitwWgcbX04Fty7os3yz/xn8vHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G//6unyP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBEEDC433C7;
+	Sat, 20 Jan 2024 17:34:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705772041;
+	bh=7GgBh/qpAS9IH8JJ4QNVMuDWn+um6pf5lH+Qln2AaEU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=G//6unyP9nLF3/WesvyMFgWyepUiwNRpOvga9Q/ZJiFbiyL6JiZqaDjLRIHJCLMlC
+	 MN4Iw2KtwF24Pbxu4vxhKHpY20JkWYe7h9IY2VhVFL3a6aMmB3s9rBQ6sEcPwO1GQX
+	 WR3Gq9WbTW1zrSn5DY0TGabxhZnZf9H4AfVrwVrc/q6YeQRO/eyaLDjcaEy/sxxnhV
+	 U88wev8aLzWCrAt02Pz7IYLeHAt1oLqvuXy10NY+5QShR2wxL3I7ZVK20RQ0l2v1qc
+	 sCYEKtG7+avK3XK9KuOI+Eb1TIk65kWeMZICQl35C7a7gWvTbUr/qX2sHiciyaJtem
+	 hXj1QLNFQTn0A==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: linux-nfs@vger.kernel.org
+Cc: lorenzo.bianconi@redhat.com,
+	neilb@suse.de,
+	jlayton@kernel.org,
+	kuba@kernel.org,
+	chuck.lever@oracle.com,
+	horms@kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH] ixgbe: Fix an error handling path in ixgbe_read_iosf_sb_reg_x550()
-Date: Sat, 20 Jan 2024 18:25:36 +0100
-Message-ID: <d39bbffb8817499cc2ae636cdef3b9c1eba59618.1705771534.git.christophe.jaillet@wanadoo.fr>
+Subject: [PATCH v6 0/3] convert write_threads, write_version and write_ports to netlink commands
+Date: Sat, 20 Jan 2024 18:33:29 +0100
+Message-ID: <cover.1705771400.git.lorenzo@kernel.org>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,36 +61,44 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-All error handling paths, except this one, go to 'out' where
-release_swfw_sync() is called.
-This call balances the acquire_swfw_sync() call done at the beginning of
-the function.
+Introduce write_threads, write_version and write_ports netlink
+commands similar to the ones available through the procfs.
 
-Branch to the error handling path in order to correctly release some
-resources in case of error.
+Changes since v5:
+- for write_ports and write_version commands, userspace is expected to provide
+  a NFS listeners/supported versions list it want to enable (all the other
+  ports/versions will be disabled).
+- fix comments
+- rebase on top of nfsd-next
+Changes since v4:
+- rebase on top of nfsd-next tree
+Changes since v3:
+- drop write_maxconn and write_maxblksize for the moment
+- add write_version and write_ports commands
+Changes since v2:
+- use u32 to store nthreads in nfsd_nl_threads_set_doit
+- rename server-attr in control-plane in nfsd.yaml specs
+Changes since v1:
+- remove write_v4_end_grace command
+- add write_maxblksize and write_maxconn netlink commands
 
-Fixes: ae14a1d8e104 ("ixgbe: Fix IOSF SB access issues")
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
----
-This patch is speculative, review with care.
----
- drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+This patch can be tested with user-space tool reported below:
+https://github.com/LorenzoBianconi/nfsd-netlink.git
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
-index 6208923e29a2..c1adc94a5a65 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
-@@ -716,7 +716,8 @@ static s32 ixgbe_read_iosf_sb_reg_x550(struct ixgbe_hw *hw, u32 reg_addr,
- 	if ((command & IXGBE_SB_IOSF_CTRL_RESP_STAT_MASK) != 0) {
- 		error = FIELD_GET(IXGBE_SB_IOSF_CTRL_CMPL_ERR_MASK, command);
- 		hw_dbg(hw, "Failed to read, error %x\n", error);
--		return -EIO;
-+		ret = -EIO;
-+		goto out;
- 	}
- 
- 	if (!ret)
+Lorenzo Bianconi (3):
+  NFSD: convert write_threads to netlink command
+  NFSD: add write_version to netlink command
+  NFSD: add write_ports to netlink command
+
+ Documentation/netlink/specs/nfsd.yaml |  94 ++++++
+ fs/nfsd/netlink.c                     |  63 ++++
+ fs/nfsd/netlink.h                     |  10 +
+ fs/nfsd/nfsctl.c                      | 396 ++++++++++++++++++++++
+ include/uapi/linux/nfsd_netlink.h     |  44 +++
+ tools/net/ynl/generated/nfsd-user.c   | 460 ++++++++++++++++++++++++++
+ tools/net/ynl/generated/nfsd-user.h   | 155 +++++++++
+ 7 files changed, 1222 insertions(+)
+
 -- 
 2.43.0
 
