@@ -1,69 +1,83 @@
-Return-Path: <netdev+bounces-64457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5199183330A
-	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 08:02:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23CB783331B
+	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 08:28:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 014BC284489
-	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 07:02:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C957F1F23BEF
+	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 07:28:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E722120E0;
-	Sat, 20 Jan 2024 07:02:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C3A020F8;
+	Sat, 20 Jan 2024 07:28:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="YiMuukR6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KmBIDEJN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-13.smtpout.orange.fr [80.12.242.13])
+Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BFC41FD8
-	for <netdev@vger.kernel.org>; Sat, 20 Jan 2024 07:02:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2B4B1FD8;
+	Sat, 20 Jan 2024 07:28:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705734147; cv=none; b=kozBreftmK9l+03TBlyJLgdHOS/dyfi4jzERzAThN9IBUzCOLmzaNELhoYbbiTZ+Hklks8OM72yenb3YoD3olN5nCdBO+vuSD5mC0AC6CS47tfoBDV7x6RSxP8tpFrvCGwGaQ5z/SkKetF+yydOcgRN+++DNJI+7ZJWkef2pzvI=
+	t=1705735726; cv=none; b=NyV8xBvqlfKhA9YpoaC5KsaMsbc4WJzHSrF4ogJhMR9+ZaWtlp8QYLVDLlwr3gnffSuPWOl2IXJY3kQL7YgiLwo/VUWJyEj36bgcZ2NhUWSBj8erhdvaHMiRnEKfC9MfnfMoZ0E+riyKWEQ9hblsYuq305EoJ7dnkbe0L0Nydm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705734147; c=relaxed/simple;
-	bh=+raE6lOGseWsvkEpBBecN/MtD9iAHPDNgahekW3q5GU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TtXx2OxAAawQjmVwPi6L8axoroMdJkangVuDDQ2txlrZCUFI9/bXZTVFF4PE2c4XaiGAoQZz35bzRgyYEJYk4jMOlQfs0fCBW9Fs5ReeQVxHrGC4UEnRgZp5BVYUFabmUYMLq8FZRpgmvN33Z6ZU8Dy4pSwqAFn4EwqGXHShPC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=YiMuukR6; arc=none smtp.client-ip=80.12.242.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from fedora.home ([92.140.202.140])
-	by smtp.orange.fr with ESMTPA
-	id R5N0rXUqwgeksR5N0rlBX4; Sat, 20 Jan 2024 08:02:24 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1705734144;
-	bh=18XLp0+EYYrAsuDVOy2pHg/nOe1su8/7QeJJlWWEvhU=;
-	h=From:To:Cc:Subject:Date;
-	b=YiMuukR6dGihg1Gp7l16Aam7/wZ7d2LC+OC01I779DK7RYfMMrugmalINYjN/lSWH
-	 hNYAqPISCeG8kZRyNAJW46GlAf0LOHCXOmvuITWTFRyC4qwHl+EI1PCyqYDWhDB0RE
-	 WMX99n5JDI8qDZgYxYPWIzP9SpphFKt3Dlnf6afAmm9i1ltQoWjgaE+SjhjB8cQVnu
-	 3h/rlrqEXkffCK3f3RWo4t34Ytk/qh07RQeDh6BOPaA43AYWKtlYvCFSkhxTcYCvEP
-	 QnBqFncfz+7iJ/RJ4NlLj9tEDNCyNdOYHE1ejbCOEOthmSwSzUahUVZc1axPngRjbh
-	 2+8MFBNdLsdWQ==
-X-ME-Helo: fedora.home
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Sat, 20 Jan 2024 08:02:24 +0100
-X-ME-IP: 92.140.202.140
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	s=arc-20240116; t=1705735726; c=relaxed/simple;
+	bh=kK0kpMYOxiXwLFnjo4FjmVUfSst12YqHg95SBLX5nzk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ahiMM1S5JzHvfz+cAL7YcOzUZ4H2/esxFxbC0TBh8T/bzjNvAl2izW+Ua2CQ/+eN3+0/iFU1CU1Qaq3MUijPFiPrprqbfdkvkH4RlWYy3Q8ndi6CbRRp16HWHbqRr+jGuQEBNeroJM311E45G7vqOlUyQ0i8fsXbFeaG7wL7p4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KmBIDEJN; arc=none smtp.client-ip=209.85.166.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3608cfa5ce6so5551055ab.0;
+        Fri, 19 Jan 2024 23:28:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705735724; x=1706340524; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=op8+puFUBQ0HGhLoj/M968f0BhKOR1Shj+6HmxTCqzA=;
+        b=KmBIDEJNh5R53SUpmcioVHZ/Xf0vXxry8p2YWbvdRiYb7N/gse6/9nGQL6CdRULGWp
+         gFOGwG92TssGymKNSyDW260EZuFbSb3bALiDHz4JzGd90BTA+DreqByZEK4kCy4r7Jy3
+         x2tLwMnLQrW3Vzi+y4OlaeuPtN2kmNRIBMPLTV6zkIMNSIVVUwUQAgHwBWcnky8LNXKw
+         OwzpJJkMZKO/9DxMLUrCmKKmRMo74MCUIRpb5pIeknbEkkETk+6RegB2+IYxh+SPWtxz
+         PBiK3Mr/c1tSGHDhY3wf7d3Crh+1GnclkqsJYXQvFx6+aMoNthSzFEJsY+LLuoD9808a
+         WiFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705735724; x=1706340524;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=op8+puFUBQ0HGhLoj/M968f0BhKOR1Shj+6HmxTCqzA=;
+        b=KTDyD1oYznksBf3nrMORi14fVvgxeeGlR345rhxT6EHW4spvRV4lJ3PjRlIX/ReoEI
+         X6lFXE3m7ZXZCmjFhzXSMpiuCmAJp4+cWVaqBptmi+tZuMzvdJfNU/mTt8f3ZflSGv1g
+         PrTUJRle+HKkfutqDXLWIKEkw24Fjh13tm5lc3QGhO0wG8QhQ5C7x/rAHN84LxQM9yY9
+         INY9OGc/R20PLKtFDWF4SVjdq3X3B8bbHC7F9KTc/kXloA/DwAwkS7/r2bt6tbHqEQ9o
+         xPMyTWfUXFKoseMIsrr0Yk2OHyFIA7J/6y0GCl8kyHFLASzzyWBsUA0sHaA5rp/NKeu2
+         cSog==
+X-Gm-Message-State: AOJu0YynN5i4SHcZ/fwm4PMb5y/JM6LctOEOmgF/d4ZwR0Gj5ks+ePwa
+	571adhBcajjjGHTz9jjbrKHWjhVZ03JZdcZv/VmRlUrT1hlIUqGw
+X-Google-Smtp-Source: AGHT+IFCRPs1/tBVCZVWysUDtfO6FYq2BkYpRS7ZbSw9HL6hXinF0O1vRTzqZ9rM73oHYIUU5tKG1Q==
+X-Received: by 2002:a92:d9c3:0:b0:361:ac32:5c7f with SMTP id n3-20020a92d9c3000000b00361ac325c7fmr1216491ilq.36.1705735723818;
+        Fri, 19 Jan 2024 23:28:43 -0800 (PST)
+Received: from fedora.. ([2402:e280:3e0d:606:d0c9:2a06:9cc6:18a3])
+        by smtp.gmail.com with ESMTPSA id s11-20020a170902ea0b00b001d50766546dsm4017809plg.184.2024.01.19.23.28.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Jan 2024 23:28:43 -0800 (PST)
+From: Suresh Kumar <suresh2514@gmail.com>
+To: jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	intel-wired-lan@lists.osuosl.org,
 	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: [PATCH net-next] xdp: Remove usage of the deprecated ida_simple_xx() API
-Date: Sat, 20 Jan 2024 08:02:20 +0100
-Message-ID: <8e889d18a6c881b09db4650d4b30a62d76f4fe77.1705734073.git.christophe.jaillet@wanadoo.fr>
+	linux-kernel@vger.kernel.org
+Cc: Suresh Kumar <suresh2514@gmail.com>
+Subject: [PATCH iwl v2] i40e: print correct hw max rss count in kernel ring buffer
+Date: Sat, 20 Jan 2024 12:58:06 +0530
+Message-ID: <20240120072806.8554-1-suresh2514@gmail.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,48 +87,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-ida_alloc() and ida_free() should be preferred to the deprecated
-ida_simple_get() and ida_simple_remove().
+pf->rss_size_max is hardcoded and always prints max rss count as 64.
 
-Note that the upper limit of ida_simple_get() is exclusive, but the one of
-ida_alloc_range() is inclusive. So a -1 has been added when needed.
+Eg:
+  kernel: i40e 0000:af:00.1: User requested queue count/HW max RSS count:  104/64
 
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+whereas  ethtool reports the correct value from "vsi->num_queue_pairs"
+
+Channel parameters for eno33:
+Pre-set maximums:
+RX:     n/a
+TX:     n/a
+Other:      1
+Combined:   104
+Current hardware settings:
+RX:     n/a
+TX:     n/a
+Other:      1
+Combined:   104  <-------
+
+and is misleading.
+
+Change it to vsi->num_queue_pairs
+
+Signed-off-by: Suresh Kumar <suresh2514@gmail.com>
 ---
- net/core/xdp.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/intel/i40e/i40e_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/core/xdp.c b/net/core/xdp.c
-index 4869c1c2d8f3..27b585f3fa81 100644
---- a/net/core/xdp.c
-+++ b/net/core/xdp.c
-@@ -75,7 +75,7 @@ static void __xdp_mem_allocator_rcu_free(struct rcu_head *rcu)
- 	xa = container_of(rcu, struct xdp_mem_allocator, rcu);
- 
- 	/* Allow this ID to be reused */
--	ida_simple_remove(&mem_id_pool, xa->mem.id);
-+	ida_free(&mem_id_pool, xa->mem.id);
- 
- 	kfree(xa);
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+index d5519af34657..f5c1ec190f7e 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_main.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+@@ -12524,7 +12524,7 @@ int i40e_reconfig_rss_queues(struct i40e_pf *pf, int queue_count)
+ 		i40e_pf_config_rss(pf);
+ 	}
+ 	dev_info(&pf->pdev->dev, "User requested queue count/HW max RSS count:  %d/%d\n",
+-		 vsi->req_queue_pairs, pf->rss_size_max);
++		 vsi->req_queue_pairs, vsi->num_queue_pairs);
+ 	return pf->alloc_rss_size;
  }
-@@ -242,7 +242,7 @@ static int __mem_id_cyclic_get(gfp_t gfp)
- 	int id;
  
- again:
--	id = ida_simple_get(&mem_id_pool, mem_id_next, MEM_ID_MAX, gfp);
-+	id = ida_alloc_range(&mem_id_pool, mem_id_next, MEM_ID_MAX - 1, gfp);
- 	if (id < 0) {
- 		if (id == -ENOSPC) {
- 			/* Cyclic allocator, reset next id */
-@@ -317,7 +317,7 @@ static struct xdp_mem_allocator *__xdp_reg_mem_model(struct xdp_mem_info *mem,
- 	/* Insert allocator into ID lookup table */
- 	ptr = rhashtable_insert_slow(mem_id_ht, &id, &xdp_alloc->node);
- 	if (IS_ERR(ptr)) {
--		ida_simple_remove(&mem_id_pool, mem->id);
-+		ida_free(&mem_id_pool, mem->id);
- 		mem->id = 0;
- 		errno = PTR_ERR(ptr);
- 		goto err;
 -- 
 2.43.0
 
