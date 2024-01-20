@@ -1,77 +1,92 @@
-Return-Path: <netdev+bounces-64451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A1BF8332DA
-	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 06:36:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A47BE8332DC
+	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 06:40:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5B841F22E43
-	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 05:36:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3CEF6B2308D
+	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 05:40:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0A1915CF;
-	Sat, 20 Jan 2024 05:36:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25FA915CF;
+	Sat, 20 Jan 2024 05:40:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aBUlywDe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LAgF4q/0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A7EE137D;
-	Sat, 20 Jan 2024 05:36:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02B4A1856
+	for <netdev@vger.kernel.org>; Sat, 20 Jan 2024 05:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705729002; cv=none; b=T5ZMvYP2MhW/csts5EtWlzUT6E+UHZQoBTGUMAuZ4Lz+Lg8cKywlQht2RQwaZrLDXahnFbQL65si8u/cYupnlsv7/lX7UUcGZ3F//6Rhss4IqXgYQQQefdTCGnBbug4SGRtdw/ChEj5/Lj5f5GIEdT7Q6RtvB0zI7Flv6McRg+8=
+	t=1705729232; cv=none; b=p9512C8QufBrkbW9fyiuGn/GmLFmpnlenGGHWFPDZ/31nzNOqVoCIs7oL4Gk6Yg+kN2+Mo/uXd9//Ai9cA9ez1xe+JgcQbjiRNQoHBTku0ZNob5fWOxlOpuTJSju/4f3SAYBBOtAZlJJIbXVRvH7FROjioEXz0xabs2X2IiEPa8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705729002; c=relaxed/simple;
-	bh=WWMrQcgQ19Jb6GYSSiSkyx3JOthmaTPXhUVWCPa+lTk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oEhrVvzOMNuxIO9gM7hS50dQHk1nvfH4N9mA0caUIiaeBQT4zZFvNtRL9JYaxAUT9xrPFo61ugwKoqGDdkVAcHeMhnTZMdZksKAF3bNqzr3DzSwrW9bntQADajdZTJDR3eaJvB9RobWObi0U5pml+xrCNJKgagr46EAevFHT790=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aBUlywDe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8653BC433F1;
-	Sat, 20 Jan 2024 05:36:41 +0000 (UTC)
+	s=arc-20240116; t=1705729232; c=relaxed/simple;
+	bh=RSJYmt7nODLkFyawkY4kKx4NkgKdl4OoKs16jp7GOJg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=CVIL3HwV14AksUb+28/JbKx2Xc1BwiRnu7TyrMr6kKbhJ0WP++hP2K8D//VKzZgAOO2spPeIa6GXhVQ3rUAxaLJjuAEiQMF3XkvoSJxJQErnCeZoRqR+wWeopcJKEkpHtk3woJnUJivWLyt5sXj/Vbty3fCA02YgzjqX7QtCtmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LAgF4q/0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 78150C43390;
+	Sat, 20 Jan 2024 05:40:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705729002;
-	bh=WWMrQcgQ19Jb6GYSSiSkyx3JOthmaTPXhUVWCPa+lTk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aBUlywDeifY2CTBrgfYUWMbWsQN6adcqI+OfGDtCWSrdw8ukljnt3X41nmMPrWiSo
-	 aQtdSEuaXw3vZainaE1CcNT/G0JTayDJAX2W1psRj6xnXKSuJCJmd9IYa94A3Eq002
-	 sgTuZGVqQ+GpaVZcg/ggWyxhzlftV12cTY79mmZ0Bmm5oZEQXQNpOJF13n4mfbVmTO
-	 sn8kxUAkhulq4L/Q1on4zWqVkDQ7u8H5HnGxS9zufd8Hr5kTkF/vJIVZ+Kmkocrwgd
-	 v6l6HTgQ8/ZOuDqaqqrIXcBToHSLLsAYSP9yAwinC+UAmp5SjWOrxSCLG6fcEu8OHg
-	 +U4SO5IL0AU/w==
-Date: Fri, 19 Jan 2024 21:36:40 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Delphine CC Chiu <Delphine_CC_Chiu@wiwynn.com>
-Cc: patrick@stwcx.xyz, Samuel Mendoza-Jonas <sam@mendozajonas.com>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1] NCSI: Add propety : no-channel-monitor and
- start-redo-probe
-Message-ID: <20240119213640.0b8efe12@kernel.org>
-In-Reply-To: <20240118052220.1906721-1-Delphine_CC_Chiu@wiwynn.com>
-References: <20240118052220.1906721-1-Delphine_CC_Chiu@wiwynn.com>
+	s=k20201202; t=1705729231;
+	bh=RSJYmt7nODLkFyawkY4kKx4NkgKdl4OoKs16jp7GOJg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=LAgF4q/0vBmulO3FXpPFwIJ5ZarGsZZs5OwUenW8M7epklwyoWlwpJ6/LfFjr9J8r
+	 xTv+yjKow8o2FlEN4K28ALI25Y+9SVAO8Mg0+avO4zchvJLwPD0xRpUHjyi7LXhvSo
+	 Zfdlrc1bNp7rVHa11SSRWPbWyEG111IwLP858GzI2Cm1kUlpy4HLhz5uUbN6uPUuXr
+	 posiUfTCpD9GNOQaXNQxBmkTgh6IvcT2oQg1DthilPyjZ1qgI/9WLEVcVx5dTo34eO
+	 H6zI6JlBzf/P2EO88cK9Q7wDypTSMJ7KGSFaMHwmBQl/K6W4CSj94N9m8wq5B6BwsX
+	 Zb2zScAnrI4Ng==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 61470D8C96C;
+	Sat, 20 Jan 2024 05:40:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net] llc: Drop support for ETH_P_TR_802_2.
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170572923139.12405.8069848446400899925.git-patchwork-notify@kernel.org>
+Date: Sat, 20 Jan 2024 05:40:31 +0000
+References: <20240119015515.61898-1-kuniyu@amazon.com>
+In-Reply-To: <20240119015515.61898-1-kuniyu@amazon.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, paul.gortmaker@windriver.com, kuni1840@gmail.com,
+ netdev@vger.kernel.org, syzbot+b5ad66046b913bc04c6f@syzkaller.appspotmail.com
 
-On Thu, 18 Jan 2024 13:22:20 +0800 Delphine CC Chiu wrote:
-> Add property start-redo-probe to redo probe, because Mellanox cx7 nic card
-> cannot't get mac address after nic card hot-plug.
-> Setup start-redo-probe property so that nic card can get MAC address again.
-> Also setup no-channel-monitor property so that the log won't keep
-> popping up when nic card host-plug.
+Hello:
 
-Device tree is supposed to describe the hardware (the BMC hardware)
-this seems to me like configuration which can potentially be done
-via the NCSI netlink, can it not?
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 18 Jan 2024 17:55:15 -0800 you wrote:
+> syzbot reported an uninit-value bug below. [0]
+> 
+> llc supports ETH_P_802_2 (0x0004) and used to support ETH_P_TR_802_2
+> (0x0011), and syzbot abused the latter to trigger the bug.
+> 
+>   write$tun(r0, &(0x7f0000000040)={@val={0x0, 0x11}, @val, @mpls={[], @llc={@snap={0xaa, 0x1, ')', "90e5dd"}}}}, 0x16)
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2,net] llc: Drop support for ETH_P_TR_802_2.
+    https://git.kernel.org/netdev/net/c/e3f9bed9bee2
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
