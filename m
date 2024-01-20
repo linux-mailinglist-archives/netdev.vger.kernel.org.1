@@ -1,132 +1,107 @@
-Return-Path: <netdev+bounces-64461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 723D5833359
-	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 10:31:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9918083336F
+	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 10:56:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BB9B9B21FDE
-	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 09:31:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BC8928147A
+	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 09:56:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5C1133D3;
-	Sat, 20 Jan 2024 09:31:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAD5FBA41;
+	Sat, 20 Jan 2024 09:56:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="dlikXYNv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail2.pod.cz (mail2.pod.cz [213.155.227.99])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.smtpout.orange.fr (smtp-21.smtpout.orange.fr [80.12.242.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A1BF5381
-	for <netdev@vger.kernel.org>; Sat, 20 Jan 2024 09:31:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.155.227.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6E29C8C7
+	for <netdev@vger.kernel.org>; Sat, 20 Jan 2024 09:56:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705743107; cv=none; b=Hr8BS0bmSSU+8VAwvWnF+wLWP+73Yj77oegJ7JGMw81KB5GzaKyXSPGqYqAJ0IaXOt8aU6mlIwn/bmZsUBzGFBEPFkxGugERRcU/nQvWsFe5R7eihk4ucfe6dAoNL9FQgbrPdDvjiMMH0kG1yeKhYttelDrRbmAR1xE5nICDgqA=
+	t=1705744573; cv=none; b=UE0QQXipi8RPQ52fpwJz06TrEFjRI8U9LBzuHUevNWRtCnhC9OSDg7lOraxubAnezjTT4h3rSopW77cFrOqXIPDRHutaK8OdBBxFJ0BuiCfU+69ANJJq4Fcpr2Jw5B1hDMv0Vs8FsYArSrJdxng6/MlKQC9BmMiLSSsfCv+FxdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705743107; c=relaxed/simple;
-	bh=Mw1gyeGuBK/bdkqBwfIF6ImIva0kGvOvZ/nQe6y8xTY=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=rxbLNQXtk3YtsOtJD6hs4+eZJCswk+TeFgxLSWuruTi7FmLEKeCW/coLmKEAc8U7BGK5gdih6kP/6Or3Hwp6C3vL2oSvyYuyKS2wM3ner9q0I8DCPitckBL78MRouUNnvlo7ywSSwZ8qHY73IUPJCGBFoHuttWx1gfNKpDFIBbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=samel.cz; spf=pass smtp.mailfrom=samel.cz; arc=none smtp.client-ip=213.155.227.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=samel.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samel.cz
-X-Envelope-From: vitezslav@samel.cz
-X-Envelope-To: netdev@vger.kernel.org
-X-Envelope-From: vitezslav@samel.cz
-X-Envelope-To: heng.guo@windriver.com
-Received: from pc11.op.pod.cz (pc11.op.pod.cz [IPv6:2001:718:1008:3::11])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-384) server-digest SHA384
-	 client-signature ECDSA (P-384) client-digest SHA384)
-	(Client CN "pc11.op.pod.cz", Issuer "Povodi Odry - mail CA" (verified OK))
-	by mail.ov.pod.cz (Postfix) with ESMTPS id 4TH9yG5sfszHnJY;
-	Sat, 20 Jan 2024 10:23:18 +0100 (CET)
-Received: by pc11.op.pod.cz (Postfix, from userid 475)
-	id 4TH9yG4PMnz6yYZ; Sat, 20 Jan 2024 10:23:18 +0100 (CET)
-Date: Sat, 20 Jan 2024 10:23:18 +0100
-From: Vitezslav Samel <vitezslav@samel.cz>
-To: Heng Guo <heng.guo@windriver.com>
-Cc: netdev@vger.kernel.org
-Subject: [6.6.x REGRESSION][BISECTED] dev_snmp6: broken Ip6OutOctets
- accounting for forwarded IPv6 packets
-Message-ID: <ZauRBl7zXWQRVZnl@pc11.op.pod.cz>
-Mail-Followup-To: Heng Guo <heng.guo@windriver.com>, netdev@vger.kernel.org
+	s=arc-20240116; t=1705744573; c=relaxed/simple;
+	bh=BOcX8KWEnibygk4fjeA6ev0h6FDA5vSRBlJ1zvGoVtc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nT990wYiGnldQ9f2k+xvDXdwLavG8MTjfJQV7IUbthF6P9QcowvfD1/XgXFznV9dIDnoETwIzSsAjRLxTclz5S1joK3E3U78F8nApfAcYiyKvQ8eiHEwmRGFs0BmF/joP37SKmnZ4LFubo+T6zBrLekSXBoh62QCNs3RAxQn9xQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=dlikXYNv; arc=none smtp.client-ip=80.12.242.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from fedora.home ([92.140.202.140])
+	by smtp.orange.fr with ESMTPA
+	id R859rc6amXxngR859rqY8F; Sat, 20 Jan 2024 10:56:09 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1705744569;
+	bh=6/Q426ZzIQUJLm346t0hoGiEGD7EVC/MiQvvpwN1st0=;
+	h=From:To:Cc:Subject:Date;
+	b=dlikXYNvorCGCI/zMlw+kQotCzT38LYn+0/29+wiIY+D+2X0okIBuyhrqgbaTeGCE
+	 MLiREdT44J3NpJ91NyxVIJW5JAzfiezWkZW4GDFgFi821WNWYGUbNzWWzbCRr6ufYm
+	 nGRStL1OW06bVoduZxNUjOatbL1M7gBTMsquonPrYmJ8uiWol4sU8cEu5fBOY5BxSc
+	 CnCYtDo7by24j06iVPoUz84OMhcVsDts9s9FXWA6xOikHfBwJTEDzltFQsJGbcw/OD
+	 QV3w9sOphKFjXX8Jl8b7kqp5BChAZd90U2SLDORzsqRgQMon3hYjIng0NZ/wx1IDUs
+	 gSdpIxW6k/3Dw==
+X-ME-Helo: fedora.home
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Sat, 20 Jan 2024 10:56:09 +0100
+X-ME-IP: 92.140.202.140
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	netdev@vger.kernel.org
+Subject: [PATCH] nfc: hci: Save a few bytes of memory when registering a 'nfc_llc' engine
+Date: Sat, 20 Jan 2024 10:56:06 +0100
+Message-ID: <6d2b8c390907dcac2e4dc6e71f1b2db2ef8abef1.1705744530.git.christophe.jaillet@wanadoo.fr>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-	Hi!
+nfc_llc_register() calls pass a string literal as the 'name' parameter.
 
-In short:
+So kstrdup_const() can be used instead of kfree() to avoid a memory
+allocation in such cases.
 
-  since commit e4da8c78973c ("net: ipv4, ipv6: fix IPSTATS_MIB_OUTOCTETS increment duplicated")
-the "Ip6OutOctets" entry of /proc/net/dev_snmp6/<interface> isn't
-incremented by packet size for outbound forwarded unicast IPv6 packets.
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+---
+ net/nfc/hci/llc.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-
-In more detail:
-
-  After move from kernel 6.1.y to 6.6.y I was surprised by very low IPv6 to
-IPv4 outgoing traffic ratio counted from /proc/net/... counters on our linux
-router. In this simple scenario:
-
-	NET1  <-->  ROUTER  <-->  NET2
-
-  the entry Ip6OutOctets of ROUTER's /proc/net/dev_snmp6/<interface> was
-surprisingly low although the IPv6 traffic between NET1 and NET2 is rather
-huge comparing to IPv4 traffic. The bisection led me to commit e4da8c78973c.
-After reverting it, the numbers went to expected values.
-
-  Numbers for local outbound IPv6 seems correct, as well as numbers for IPv4.
-
-  Since the commit patches both IPv4 and IPv6 reverting it doesn't seem like
-the right thing to do. Can you, please, look at it and cook some fix?
-
-	Thanks,
-
-		Vita
-
-#### git bisect log
-
-git bisect start '--' 'include' 'net'
-# status: waiting for both good and bad commits
-# good: [fb2635ac69abac0060cc2be2873dc4f524f12e66] Linux 6.1.62
-git bisect good fb2635ac69abac0060cc2be2873dc4f524f12e66
-# status: waiting for bad commit, 1 good commit known
-# bad: [5e9df83a705290c4d974693097df1da9cbe25854] Linux 6.6.9
-git bisect bad 5e9df83a705290c4d974693097df1da9cbe25854
-# good: [830b3c68c1fb1e9176028d02ef86f3cf76aa2476] Linux 6.1
-git bisect good 830b3c68c1fb1e9176028d02ef86f3cf76aa2476
-# good: [6e98b09da931a00bf4e0477d0fa52748bf28fcce] Merge tag 'net-next-6.4' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next
-git bisect good 6e98b09da931a00bf4e0477d0fa52748bf28fcce
-# good: [9b39f758974ff8dfa721e68c6cecfd37e6ddb206] Merge tag 'nf-23-07-20' of https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
-git bisect good 9b39f758974ff8dfa721e68c6cecfd37e6ddb206
-# good: [38663034491d00652ac599fa48866bcf2ebd7bc1] Merge tag 'fsnotify_for_v6.6-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/jack/linux-fs
-git bisect good 38663034491d00652ac599fa48866bcf2ebd7bc1
-# good: [7ba2090ca64ea1aa435744884124387db1fac70f] Merge tag 'ceph-for-6.6-rc1' of https://github.com/ceph/ceph-client
-git bisect good 7ba2090ca64ea1aa435744884124387db1fac70f
-# bad: [ea1cc20cd4ce55dd920a87a317c43da03ccea192] Merge tag 'v6.6-rc7.vfs.fixes' of git://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs
-git bisect bad ea1cc20cd4ce55dd920a87a317c43da03ccea192
-# bad: [b938790e70540bf4f2e653dcd74b232494d06c8f] Bluetooth: hci_codec: Fix leaking content of local_codecs
-git bisect bad b938790e70540bf4f2e653dcd74b232494d06c8f
-# bad: [6912e724832c47bb381eb1bd1e483ec8df0d0f0f] net/smc: bugfix for smcr v2 server connect success statistic
-git bisect bad 6912e724832c47bb381eb1bd1e483ec8df0d0f0f
-# bad: [c3b704d4a4a265660e665df51b129e8425216ed1] igmp: limit igmpv3_newpack() packet size to IP_MAX_MTU
-git bisect bad c3b704d4a4a265660e665df51b129e8425216ed1
-# bad: [82ba0ff7bf0483d962e592017bef659ae022d754] net/handshake: fix null-ptr-deref in handshake_nl_done_doit()
-git bisect bad 82ba0ff7bf0483d962e592017bef659ae022d754
-# bad: [dc9511dd6f37fe803f6b15b61b030728d7057417] sctp: annotate data-races around sk->sk_wmem_queued
-git bisect bad dc9511dd6f37fe803f6b15b61b030728d7057417
-# good: [7e9be1124dbe7888907e82cab20164578e3f9ab7] netfilter: nf_tables: Audit log setelem reset
-git bisect good 7e9be1124dbe7888907e82cab20164578e3f9ab7
-# bad: [4e60de1e4769066aa9956c83545c8fa21847f326] Merge tag 'nf-23-08-31' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
-git bisect bad 4e60de1e4769066aa9956c83545c8fa21847f326
-# bad: [e4da8c78973c1e307c0431e0b99a969ffb8aa3f1] net: ipv4, ipv6: fix IPSTATS_MIB_OUTOCTETS increment duplicated
-git bisect bad e4da8c78973c1e307c0431e0b99a969ffb8aa3f1
-# first bad commit: [e4da8c78973c1e307c0431e0b99a969ffb8aa3f1] net: ipv4, ipv6: fix IPSTATS_MIB_OUTOCTETS increment duplicated
+diff --git a/net/nfc/hci/llc.c b/net/nfc/hci/llc.c
+index 2140f6724644..8c7b5a817b25 100644
+--- a/net/nfc/hci/llc.c
++++ b/net/nfc/hci/llc.c
+@@ -49,7 +49,7 @@ int nfc_llc_register(const char *name, const struct nfc_llc_ops *ops)
+ 	if (llc_engine == NULL)
+ 		return -ENOMEM;
+ 
+-	llc_engine->name = kstrdup(name, GFP_KERNEL);
++	llc_engine->name = kstrdup_const(name, GFP_KERNEL);
+ 	if (llc_engine->name == NULL) {
+ 		kfree(llc_engine);
+ 		return -ENOMEM;
+@@ -83,7 +83,7 @@ void nfc_llc_unregister(const char *name)
+ 		return;
+ 
+ 	list_del(&llc_engine->entry);
+-	kfree(llc_engine->name);
++	kfree_const(llc_engine->name);
+ 	kfree(llc_engine);
+ }
+ 
+-- 
+2.43.0
 
 
