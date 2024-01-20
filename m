@@ -1,241 +1,302 @@
-Return-Path: <netdev+bounces-64446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0AA4833270
-	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 03:33:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3371C833297
+	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 04:17:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E56011C20F53
-	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 02:33:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 52A101C20FEC
+	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 03:17:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85DCA19B;
-	Sat, 20 Jan 2024 02:33:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A735ED6;
+	Sat, 20 Jan 2024 03:17:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="L0b1ryMP"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="uECDhwe+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F3C110E1
-	for <netdev@vger.kernel.org>; Sat, 20 Jan 2024 02:33:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=134.134.136.65
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705717986; cv=fail; b=tELvjFIjA97Zm6SJNyx6hTLxyD5XGjpDfmGW6QMTiTovzZMfMsii7UkR+H+g3/O7WlvWV11wdXQpz4YFGEEA23z7cv9bfqfVkEaCIdTN80IxfjnfReOm20H9ce+mYZJn7ROIopvgukGYy3OMXV46SDAzVG1FiuhQYWtu2ZXzGxc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705717986; c=relaxed/simple;
-	bh=i68YdzhvV/GeTwpeC071jhqsRstIIcsHj0l4Y7MjnB0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=X/g01YHRA8PAGqp83P+cTcXMoUbio34eWQTjNz2rA/wHjRIERKMdyXg9XvPmWposMm9wJHzFs5OggvSinYeguOubR5T0VDPSEsHYyWb37Ke6xn8WtxMYh8ataiAo7tgVFmGkIfI9Go2RpkSxM2nsmX4a2juXwFWkc+HTbgwcHRQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=L0b1ryMP; arc=fail smtp.client-ip=134.134.136.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1705717984; x=1737253984;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=i68YdzhvV/GeTwpeC071jhqsRstIIcsHj0l4Y7MjnB0=;
-  b=L0b1ryMPoGrncq8RAZYCaqa4mEBA0uNhWP7zQ3okoh0tiVWKuVo9hb/g
-   FLCADrxQ05HMyTuZd3HcEumv5O+LzATasPRkSsIgK12U3RCd/9zMwm+to
-   S3k2cu3Q8KW2C4cn8nNkn5oeOvf85r3VgLA949Os3gko8VUzFEi2nZPto
-   c/EUvB3WwxhPvRObGtriT2WnmAmGTH17AdOIVIY5em0sdcZFMUMcZPkeV
-   pYr/B+xjAH+mT3XRE8wXX71+38RAPiHaUHWi9HoqVPQeXtriodz+/VvgZ
-   DBSPG/g6opXDKo0ljHEsiYCfD2cmXjxpyNhlWcscmbEC0Cdnpwt6mRbOM
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10957"; a="404670632"
-X-IronPort-AV: E=Sophos;i="6.05,206,1701158400"; 
-   d="scan'208";a="404670632"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2024 18:33:03 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10957"; a="1032106389"
-X-IronPort-AV: E=Sophos;i="6.05,206,1701158400"; 
-   d="scan'208";a="1032106389"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmsmga006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 19 Jan 2024 18:33:03 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 19 Jan 2024 18:33:02 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Fri, 19 Jan 2024 18:33:02 -0800
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.169)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDD04ED4
+	for <netdev@vger.kernel.org>; Sat, 20 Jan 2024 03:17:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705720624; cv=none; b=G2zXLs1BCpTt4BsKdjszpIoesP9Deor0z96jWhuRFK8++tZdXuYu6IIW0qiva/yXzsF0fSKsmBmqqpU42M4Vpatb1ZooXSv85hNoxTAg9FKAI8R7NhlwG6jD5newaENmwr3f62EfajVPgnd7QIO2QBdPVqJIIq2Wl1VMevhvxuE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705720624; c=relaxed/simple;
+	bh=1S0jjY7jhpHpYKmXR+qxrH53rDiZXxvHRAn2HZEb0O0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PRwfYId4qK5rybX0e08HCCCnIlQCn42ZgN3ToB9xrjkwyLS/jtOBy8UYU0iRSxQz9xFqZLaO3giq7nXTwU1J4ERohemcOgjlVvXJfaC7QNXre7IELEcQp2h6EQsECexRmxEyK42yHVhk3vfXklekLCr6eFh4Mo2ag+vmN3f4s6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=uECDhwe+; arc=none smtp.client-ip=99.78.197.217
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1705720623; x=1737256623;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=7IG4AE0o14gMkbFRNrn4ELN9P3qUsp3aG6jOQpn9PsA=;
+  b=uECDhwe+cfPo75TwDBmW83RvutPuc/ltmsAAWVGHUHIiyGeuCZDNw1+5
+   /g0HmAvBqsKLitiF+EO9ASpb0gfASX6QF8tWiSFpiLVpSDvRmGu8WuC0A
+   +Mnms9eryh4/R40QGg/2TX9W55xDyzXugcAbHPUGTwWaaMn0cOAxk7bAO
+   U=;
+X-IronPort-AV: E=Sophos;i="6.05,206,1701129600"; 
+   d="scan'208";a="267343169"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-94edd59b.us-west-2.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2024 03:17:01 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan3.pdx.amazon.com [10.39.38.70])
+	by email-inbound-relay-pdx-2c-m6i4x-94edd59b.us-west-2.amazon.com (Postfix) with ESMTPS id 8B6C940D9E;
+	Sat, 20 Jan 2024 03:17:00 +0000 (UTC)
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:29791]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.60.181:2525] with esmtp (Farcaster)
+ id 7f4bb79f-6b4c-4a5c-b7a7-03a633cab2d8; Sat, 20 Jan 2024 03:16:59 +0000 (UTC)
+X-Farcaster-Flow-ID: 7f4bb79f-6b4c-4a5c-b7a7-03a633cab2d8
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 19 Jan 2024 18:33:02 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PxQD4mPzS+CyCsZMLTnuIOjUDnxteGA/xjzYQ3rCP2+eM5Gfmk0TlAQuYQHGhphTe9zItKEHUQV3W4Dm1HeuxknhBqJ9D/RjgQCVGy5UC9hDLZTqmjdrBrBWFVakKItmwXU8wTf9cGy5ZIIxj/T8i9kVgFj+zL2Zc8jZlnaOmQbSu5Y7NqBqGT5CTCmvEOyWim9vD2ev88NilQSmQjUHeLjGejSr5XuO96dzJVut0NUJv/GTav1JReRWRvdNp9RMtjAUgC/zyhdEtOdGTVa5P33zqdYnO1y3HVhtANV3Y846yeyo/KBFbxpPCSrTbLM8ldwMmSTQYPhASCj1QqM+RA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YOgWDOLur9oEHQIV3N4f7j+MpWx8bdp+zP3XQB5eqIA=;
- b=ICnFtE+gjVEcTuK5bETU6dyC1W/3TUy4GRjUdJlV/tZUn9URsiCHd+QoM35bgpCue9oGmEg3Mny5ZyIycF/4kmO3uCP7+GrrA4oEHUG4BoYzH4TxPTj5ySyBU29GWs0EOF2Y+EraQf4ZsNAF35H5VBoCZT694JE9DghVBQBJJQ/pjiJKzDIkLxQR6dzEEIxvMnNzAwO+EQTgD5L891uj8/v89Fh/L1zbplQ99qUiks0RJNdFdzAU7/yh+a5uOnH8mZgHl/X3VO11JLIZJ8CnztGZkitNUyqEB8ynZwQhCptR9Wt3roZmhoes7q0LHuLQY3A575pee2Kzt9mzunQNew==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MW4PR11MB5911.namprd11.prod.outlook.com (2603:10b6:303:16b::16)
- by PH0PR11MB4952.namprd11.prod.outlook.com (2603:10b6:510:40::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.26; Sat, 20 Jan
- 2024 02:32:58 +0000
-Received: from MW4PR11MB5911.namprd11.prod.outlook.com
- ([fe80::2333:81d6:ae67:6542]) by MW4PR11MB5911.namprd11.prod.outlook.com
- ([fe80::2333:81d6:ae67:6542%7]) with mapi id 15.20.7202.024; Sat, 20 Jan 2024
- 02:32:58 +0000
-From: "Singh, Krishneil K" <krishneil.k.singh@intel.com>
-To: "Linga, Pavan Kumar" <pavan.kumar.linga@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "pmenzel@molgen.mpg.de"
-	<pmenzel@molgen.mpg.de>, "Tantilov, Emil S" <emil.s.tantilov@intel.com>,
-	"horms@kernel.org" <horms@kernel.org>, "Linga, Pavan Kumar"
-	<pavan.kumar.linga@intel.com>, lkp <lkp@intel.com>
-Subject: RE: [PATCH iwl-net v3] idpf: avoid compiler padding in
- virtchnl2_ptype struct
-Thread-Topic: [PATCH iwl-net v3] idpf: avoid compiler padding in
- virtchnl2_ptype struct
-Thread-Index: AQHaQpvrSib07Bt1ukmiW6qR2+VomrDhyxNw
-Date: Sat, 20 Jan 2024 02:32:58 +0000
-Message-ID: <MW4PR11MB5911240C4556BAEE92867890BA772@MW4PR11MB5911.namprd11.prod.outlook.com>
-References: <20240109013229.773552-1-pavan.kumar.linga@intel.com>
-In-Reply-To: <20240109013229.773552-1-pavan.kumar.linga@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW4PR11MB5911:EE_|PH0PR11MB4952:EE_
-x-ms-office365-filtering-correlation-id: a586531e-1319-4504-b162-08dc19601d8c
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: XvttGbjqMP8Jr7Gdq+bTRxQkuqNXaWttWisO/bJNw0p0Hrz7dDpaD1OVvK4LNW+N4egdq5CY7HFACKub1PltQr+g3D9p0cvbTpzUmCYmzgesx6oKZQ8lD4S/0PDbcF0+X6DO65Gk81D7ChMoMbUba4FVFnPhiqtr1/4+5UvZrE5EDzVBIizrnd2a6DCnsboKBbVvNV4FVZMRAA+9HlP27gIfvZwkcsEIdzrP2ueNM9VGa2gH4x6pZf7Uwft+wDsLsLAkiFrDPAHlUnwpq0pqEwYro6Zu+IEB0RB8TKQzJzE+5IuMShcc9Gaj2ZE6p65sdJFuQZwtNw2RlMjA9/5y1lTr/6U0hK/Aqvukx2f/5FwvNpFCw4fZB8AcB6lK2j63ooyl9ljCs4MUddMrriBhmg++hK02rdftprsyZK7aLbEly7m6d3zppPTUp1I8oRmqaLpfE7cww4WbR33ZkKxusqoZ1ULrtokE3c3gL9SaOQOvSf4L6bO1JgiDB7tjrkNWmCxN2o9AoNC4qwcf1OWIie+kRrHm/OLdCpxTxdpkEAuAP5kSDG2J9obGfUttfZhHg6fxeHdnm81SxC/XNM/Fk2asUDRDTLpZxBqvkpiGSbo=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5911.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(346002)(376002)(396003)(366004)(136003)(230922051799003)(186009)(451199024)(1800799012)(64100799003)(26005)(107886003)(7696005)(6506007)(71200400001)(53546011)(9686003)(5660300002)(83380400001)(2906002)(8936002)(52536014)(4326008)(66946007)(66556008)(76116006)(966005)(110136005)(54906003)(66446008)(8676002)(66476007)(316002)(64756008)(478600001)(41300700001)(82960400001)(33656002)(38100700002)(122000001)(86362001)(38070700009)(55016003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?5Latl603NuEnHu0c+MyBlA9HrSaXJ7zHS9Ju8faXu61A78mM2BPP3N6qgGr/?=
- =?us-ascii?Q?zhbpv0d8/u/7SP81W8RBZWeDFz/fsv9o4hT2bTtB0+i0L0eBKOq+mPbLnZea?=
- =?us-ascii?Q?/Y3EMS6o3OMgCBenQg/9qpqR3zOWM5r4OI4FOLDyCmfc8Ok7q/GehV5jvExH?=
- =?us-ascii?Q?C7LvPlK2zPJfp4hZK7H6zuebl28G5E+8LODJWUXWgUOdfQ2KuxypQ8KNtZa+?=
- =?us-ascii?Q?Y15sIs+UY8JR6DrP1xRoEq062UflZbNawD3M7ZWqyd5KxN/llAY0KmyNtUPM?=
- =?us-ascii?Q?iCIMQKabueXJ+37tSTJInFA2J5I7VOg9LES42jYc2VsX9A+OpuWwRTmk5Nt6?=
- =?us-ascii?Q?STuAT1Mt/ZLxDMKxA+iX+IfRizMTcOj4My3XW2aPhl5z7MxCuJw0PR8esgpI?=
- =?us-ascii?Q?DADNzoQPdPqL1vf5+aL391NCX4F7L9X7VpTA4fbbinhOix8v0G6RGgBTjdga?=
- =?us-ascii?Q?SGJGVIFnfMLUUbReXh1qYIH6+ynAUmqhdwWOs/CAXbDn1Fuu3+bTS3Mdr9pl?=
- =?us-ascii?Q?MgkzGJXHhSgfNUxh1jFicAjEyRxGqseMq1iINKF4N8jFtzfxaupjgxgfCM51?=
- =?us-ascii?Q?RbOau37Ut3AjmyxnyUSYNNn7CFNf7q3grCf6CHxEAtx7Qd6RoEEtEQoCY1w+?=
- =?us-ascii?Q?oY0T3vvI0bo/meaJm5pf4VdCjK2WzqbwgZ0Nd6r/jM2kpiV+cWbrxMZK+YWl?=
- =?us-ascii?Q?n5lcFaECdOg6T7ECwPz8A+5E+/uhZwyOlz8hnGLt4RAyvJsI+9IS4JuGPzo7?=
- =?us-ascii?Q?i891jMXiL/LTaA6KSJex/RV9PwS4BSuNPfKgOJ5XYiFNZBZzFWWXj9kz80HF?=
- =?us-ascii?Q?JpVb6oCeK9t5mK6L4YmqzCuhGHL00NxT82vZ0jRnRxZk6ZMnoFDzQTOcbpZ4?=
- =?us-ascii?Q?4RuEUulFoCcgrv0dPbs7L03Omd1K+fzKbknE+rXaevqV6ImvnIrWvnSF1FTk?=
- =?us-ascii?Q?csZ9yFxqdtpnAe6kZwBQduhQWrA1KYSggw1lEbrY5kUeGfpNR1Zqt3r5T3FA?=
- =?us-ascii?Q?4h7hLv4gn6bhs/URKWU5He7Q4eSkCZ4Y8p5Kz/n1IocOW+f0R8XGH/mXf/6r?=
- =?us-ascii?Q?d+Gr6qbC5DrGE+MdEHk6bGak+iJ146QgfLFQGaILkYPINLqiui7pd6d4y+jQ?=
- =?us-ascii?Q?SCbYdODyyxGjHo9tyQZ9/4shjD19a18hA6bqb8AEgH16Sh/GfLKQQwRCLfiQ?=
- =?us-ascii?Q?wgrdJs2lt87MxZh4TOQCcdx7jh/1LijZjj4MZP0ebm7wlGZpvFoLjAmgi1kx?=
- =?us-ascii?Q?SrYBJrE+VqO4xMF+tn7BRVEl4T/amOM3ewSKSjjFXOOeNLwLzS4WNnZlm3+8?=
- =?us-ascii?Q?yJeH3l5oGKc6jPF5Aodj1bSDCF+PFdyT5wbGRH0eQvFC54fjNN6tx2O6Hprw?=
- =?us-ascii?Q?C2zQIPtXlNH58H7itE0vw6kTqt7mEQMlJ2o+FfU9/rFHhAtZnpycTbqNI0RH?=
- =?us-ascii?Q?Ia0QhCg9nSYYrD/pPa23cimi/AFJ6JElxL1QOoWy4B9LICmv5lsODq2hNwf9?=
- =?us-ascii?Q?MjMWlxK4JqhAVpQnzTTMTtfcaLPBY+q1KShXfzzkUyaYRKJklHDPMyi5lcTo?=
- =?us-ascii?Q?SF7+ig3KIipSm8zOzBOtuFfdB6AhgKUuNKpYLC2e5r7Y/wY+cwvGQYdPcAc4?=
- =?us-ascii?Q?Mw=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ 15.2.1118.40; Sat, 20 Jan 2024 03:16:59 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.171.18) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Sat, 20 Jan 2024 03:16:56 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v1 net] selftest: Don't reuse port for SO_INCOMING_CPU test.
+Date: Fri, 19 Jan 2024 19:16:42 -0800
+Message-ID: <20240120031642.67014-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5911.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a586531e-1319-4504-b162-08dc19601d8c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jan 2024 02:32:58.2540
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: CPrIbr5eCnofTTuUChIMwmvICTTUtJXCSoTwvMNwa6t0jcQscpNreZ787EqOqgLKFLQ2bh/d90Yi+X20pSCdqcpTguUqSs+A4HqXs3Humi4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4952
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D041UWA002.ant.amazon.com (10.13.139.121) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
 
+Jakub reported that ASSERT_EQ(cpu, i) in so_incoming_cpu.c seems to
+fire somewhat randomly.
 
-> -----Original Message-----
-> From: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
-> Sent: Monday, January 8, 2024 5:32 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: netdev@vger.kernel.org; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>; pmenzel@molgen.mpg.de; Tantilov, Emil S
-> <emil.s.tantilov@intel.com>; horms@kernel.org; Linga, Pavan Kumar
-> <pavan.kumar.linga@intel.com>; lkp <lkp@intel.com>
-> Subject: [PATCH iwl-net v3] idpf: avoid compiler padding in virtchnl2_pty=
-pe
-> struct
->=20
-> In the arm random config file, kconfig option 'CONFIG_AEABI' is
-> disabled which results in adding the compiler flag '-mabi=3Dapcs-gnu'.
-> This causes the compiler to add padding in virtchnl2_ptype
-> structure to align it to 8 bytes, resulting in the following
-> size check failure:
->=20
-> include/linux/build_bug.h:78:41: error: static assertion failed: "(6) =3D=
-=3D
-> sizeof(struct virtchnl2_ptype)"
->       78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, m=
-sg)
->          |                                         ^~~~~~~~~~~~~~
-> include/linux/build_bug.h:77:34: note: in expansion of macro '__static_as=
-sert'
->       77 | #define static_assert(expr, ...) __static_assert(expr, ##__VA_=
-ARGS__,
-> #expr)
->          |                                  ^~~~~~~~~~~~~~~
-> drivers/net/ethernet/intel/idpf/virtchnl2.h:26:9: note: in expansion of m=
-acro
-> 'static_assert'
->       26 |         static_assert((n) =3D=3D sizeof(struct X))
->          |         ^~~~~~~~~~~~~
-> drivers/net/ethernet/intel/idpf/virtchnl2.h:982:1: note: in expansion of
-> macro 'VIRTCHNL2_CHECK_STRUCT_LEN'
->      982 | VIRTCHNL2_CHECK_STRUCT_LEN(6, virtchnl2_ptype);
->          | ^~~~~~~~~~~~~~~~~~~~~~~~~~
->=20
-> Avoid the compiler padding by using "__packed" structure
-> attribute for the virtchnl2_ptype struct. Also align the
-> structure by using "__aligned(2)" for better code optimization.
->=20
-> Fixes: 0d7502a9b4a7 ("virtchnl: add virtchnl version 2 ops")
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202312220250.ufEm8doQ-
-> lkp@intel.com
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
->=20
-> ---
-> v3:
->  - add "__aligned(2)" structure attribute for better code optimization
->=20
-> v2:
->  - add the kconfig option causing the compile failure to the commit messa=
-ge
-> ---
->  drivers/net/ethernet/intel/idpf/virtchnl2.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/idpf/virtchnl2.h
-> b/drivers/net/ethernet/intel/idpf/virtchnl2.h
-> index 8dc83788972..4a3c4454d25 100644
-> --- a/drivers/net/ethernet/intel/idpf/virtchnl2.h
-> +++ b/drivers/net/ethernet/intel/idpf/virtchnl2.h
+  # #  RUN           so_incoming_cpu.before_reuseport.test3 ...
+  # # so_incoming_cpu.c:191:test3:Expected cpu (32) == i (0)
+  # # test3: Test terminated by assertion
+  # #          FAIL  so_incoming_cpu.before_reuseport.test3
+  # not ok 3 so_incoming_cpu.before_reuseport.test3
 
-Tested-by: Krishneil Singh  <krishneil.k.singh@intel.com>
+When the test failed, not-yet-accepted CLOSE_WAIT sockets received
+SYN with a "challenging" SEQ number, which was sent from an unexpected
+CPU that did not create the receiver.
+
+The test basically does:
+
+  1. for each cpu:
+    1-1. create a server
+    1-2. set SO_INCOMING_CPU
+
+  2. for each cpu:
+    2-1. set cpu affinity
+    2-2. create some clients
+    2-3. let clients connect() to the server on the same cpu
+    2-4. close() clients
+
+  3. for each server:
+    3-1. accept() all child sockets
+    3-2. check if all children have the same SO_INCOMING_CPU with the server
+
+The root cause was the close() in 2-4. and net.ipv4.tcp_tw_reuse.
+
+In a loop of 2., close() changed the client state to FIN_WAIT_2, and
+the peer transitioned to CLOSE_WAIT.
+
+In another loop of 2., connect() happened to select the same port of
+the FIN_WAIT_2 socket, and it was reused as the default value of
+net.ipv4.tcp_tw_reuse is 2.
+
+As a result, the new client sent SYN to the CLOSE_WAIT socket from
+a different CPU, and the receiver's sk_incoming_cpu was overwritten
+with unexpected CPU ID.
+
+Also, the SYN had a different SEQ number, so the CLOSE_WAIT socket
+responded with Challenge ACK.  The new client properly returned RST
+and effectively killed the CLOSE_WAIT socket.
+
+This way, all clients were created successfully, but the error was
+detected later by 3-2., ASSERT_EQ(cpu, i).
+
+To avoid the failure, let's make sure that (i) the number of clients
+is less than the number of available ports and (ii) such reuse never
+happens.
+
+Fixes: 6df96146b202 ("selftest: Add test for SO_INCOMING_CPU.")
+Reported-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+---
+ tools/testing/selftests/net/so_incoming_cpu.c | 68 ++++++++++++++-----
+ 1 file changed, 50 insertions(+), 18 deletions(-)
+
+diff --git a/tools/testing/selftests/net/so_incoming_cpu.c b/tools/testing/selftests/net/so_incoming_cpu.c
+index a14818164102..e9fa14e10732 100644
+--- a/tools/testing/selftests/net/so_incoming_cpu.c
++++ b/tools/testing/selftests/net/so_incoming_cpu.c
+@@ -3,19 +3,16 @@
+ #define _GNU_SOURCE
+ #include <sched.h>
+ 
++#include <fcntl.h>
++
+ #include <netinet/in.h>
+ #include <sys/socket.h>
+ #include <sys/sysinfo.h>
+ 
+ #include "../kselftest_harness.h"
+ 
+-#define CLIENT_PER_SERVER	32 /* More sockets, more reliable */
+-#define NR_SERVER		self->nproc
+-#define NR_CLIENT		(CLIENT_PER_SERVER * NR_SERVER)
+-
+ FIXTURE(so_incoming_cpu)
+ {
+-	int nproc;
+ 	int *servers;
+ 	union {
+ 		struct sockaddr addr;
+@@ -56,12 +53,47 @@ FIXTURE_VARIANT_ADD(so_incoming_cpu, after_all_listen)
+ 	.when_to_set = AFTER_ALL_LISTEN,
+ };
+ 
++static void write_sysctl(struct __test_metadata *_metadata,
++			 char *filename, char *string)
++{
++	int fd, len, ret;
++
++	fd = open(filename, O_WRONLY);
++	ASSERT_NE(fd, -1);
++
++	len = strlen(string);
++	ret = write(fd, string, len);
++	ASSERT_EQ(ret, len);
++}
++
++static void setup_netns(struct __test_metadata *_metadata)
++{
++	ASSERT_EQ(unshare(CLONE_NEWNET), 0);
++	ASSERT_EQ(system("ip link set lo up"), 0);
++
++	write_sysctl(_metadata, "/proc/sys/net/ipv4/ip_local_port_range", "10000 60001");
++	write_sysctl(_metadata, "/proc/sys/net/ipv4/tcp_tw_reuse", "0");
++}
++
++#define NR_PORT				(60001 - 10000 - 1)
++#define NR_CLIENT_PER_SERVER_DEFAULT	32
++static int nr_client_per_server, nr_server, nr_client;
++
+ FIXTURE_SETUP(so_incoming_cpu)
+ {
+-	self->nproc = get_nprocs();
+-	ASSERT_LE(2, self->nproc);
++	setup_netns(_metadata);
++
++	nr_server = get_nprocs();
++	ASSERT_LE(2, nr_server);
++
++	if (NR_CLIENT_PER_SERVER_DEFAULT * nr_server < NR_PORT)
++		nr_client_per_server = NR_CLIENT_PER_SERVER_DEFAULT;
++	else
++		nr_client_per_server = NR_PORT / nr_server;
++
++	nr_client = nr_client_per_server * nr_server;
+ 
+-	self->servers = malloc(sizeof(int) * NR_SERVER);
++	self->servers = malloc(sizeof(int) * nr_server);
+ 	ASSERT_NE(self->servers, NULL);
+ 
+ 	self->in_addr.sin_family = AF_INET;
+@@ -74,7 +106,7 @@ FIXTURE_TEARDOWN(so_incoming_cpu)
+ {
+ 	int i;
+ 
+-	for (i = 0; i < NR_SERVER; i++)
++	for (i = 0; i < nr_server; i++)
+ 		close(self->servers[i]);
+ 
+ 	free(self->servers);
+@@ -110,10 +142,10 @@ int create_server(struct __test_metadata *_metadata,
+ 	if (variant->when_to_set == BEFORE_LISTEN)
+ 		set_so_incoming_cpu(_metadata, fd, cpu);
+ 
+-	/* We don't use CLIENT_PER_SERVER here not to block
++	/* We don't use nr_client_per_server here not to block
+ 	 * this test at connect() if SO_INCOMING_CPU is broken.
+ 	 */
+-	ret = listen(fd, NR_CLIENT);
++	ret = listen(fd, nr_client);
+ 	ASSERT_EQ(ret, 0);
+ 
+ 	if (variant->when_to_set == AFTER_LISTEN)
+@@ -128,7 +160,7 @@ void create_servers(struct __test_metadata *_metadata,
+ {
+ 	int i, ret;
+ 
+-	for (i = 0; i < NR_SERVER; i++) {
++	for (i = 0; i < nr_server; i++) {
+ 		self->servers[i] = create_server(_metadata, self, variant, i);
+ 
+ 		if (i == 0) {
+@@ -138,7 +170,7 @@ void create_servers(struct __test_metadata *_metadata,
+ 	}
+ 
+ 	if (variant->when_to_set == AFTER_ALL_LISTEN) {
+-		for (i = 0; i < NR_SERVER; i++)
++		for (i = 0; i < nr_server; i++)
+ 			set_so_incoming_cpu(_metadata, self->servers[i], i);
+ 	}
+ }
+@@ -149,7 +181,7 @@ void create_clients(struct __test_metadata *_metadata,
+ 	cpu_set_t cpu_set;
+ 	int i, j, fd, ret;
+ 
+-	for (i = 0; i < NR_SERVER; i++) {
++	for (i = 0; i < nr_server; i++) {
+ 		CPU_ZERO(&cpu_set);
+ 
+ 		CPU_SET(i, &cpu_set);
+@@ -162,7 +194,7 @@ void create_clients(struct __test_metadata *_metadata,
+ 		ret = sched_setaffinity(0, sizeof(cpu_set), &cpu_set);
+ 		ASSERT_EQ(ret, 0);
+ 
+-		for (j = 0; j < CLIENT_PER_SERVER; j++) {
++		for (j = 0; j < nr_client_per_server; j++) {
+ 			fd  = socket(AF_INET, SOCK_STREAM, 0);
+ 			ASSERT_NE(fd, -1);
+ 
+@@ -180,8 +212,8 @@ void verify_incoming_cpu(struct __test_metadata *_metadata,
+ 	int i, j, fd, cpu, ret, total = 0;
+ 	socklen_t len = sizeof(int);
+ 
+-	for (i = 0; i < NR_SERVER; i++) {
+-		for (j = 0; j < CLIENT_PER_SERVER; j++) {
++	for (i = 0; i < nr_server; i++) {
++		for (j = 0; j < nr_client_per_server; j++) {
+ 			/* If we see -EAGAIN here, SO_INCOMING_CPU is broken */
+ 			fd = accept(self->servers[i], &self->addr, &self->addrlen);
+ 			ASSERT_NE(fd, -1);
+@@ -195,7 +227,7 @@ void verify_incoming_cpu(struct __test_metadata *_metadata,
+ 		}
+ 	}
+ 
+-	ASSERT_EQ(total, NR_CLIENT);
++	ASSERT_EQ(total, nr_client);
+ 	TH_LOG("SO_INCOMING_CPU is very likely to be "
+ 	       "working correctly with %d sockets.", total);
+ }
+-- 
+2.30.2
+
 
