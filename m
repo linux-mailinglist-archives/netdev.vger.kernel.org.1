@@ -1,101 +1,117 @@
-Return-Path: <netdev+bounces-64479-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64480-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B96F58335F1
-	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 20:22:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02713833613
+	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 21:27:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71E1E2828C2
-	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 19:22:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ABA5D1F21BEE
+	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 20:27:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B4491078D;
-	Sat, 20 Jan 2024 19:22:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E80D12B65;
+	Sat, 20 Jan 2024 20:27:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="RmXvNkCo"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="YRd4tKq2"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FB5810940;
-	Sat, 20 Jan 2024 19:22:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FDF6396;
+	Sat, 20 Jan 2024 20:27:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705778528; cv=none; b=Usl//JqgjwLzYfWX7nvrJS2GlNwfwbF9ZkfaGrk1UL9pm7eOo7JMAhwqNowv6pezYknAGAKy5C1zhjPidN3WUUD4IFUSuo1C4imLN/aPFbqXxX2Cd7BLXThDe0XYepYaQ7pEtwQG2sT4xkkI1YsT6iU5Hu3NBMlyauXDpiJt6V8=
+	t=1705782459; cv=none; b=andHK7L2BKjJWhxOCv/Bd/gComNF/vJZqey5M3IAv2C/8LrKEMSgVD+kudPXeoddSo2+Mqgg5xKy7Hks98izDZz72rUpeywtxctvPC+JgkSj7obndmGVeFgqiTODG/CaXOiNTMPW90bozIps5QCcHgkQfwjNwRWUbYBfw2pTiVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705778528; c=relaxed/simple;
-	bh=KOJQynuPNUuxMCnDQ2so7cOMmmM3iPmcFkmKx3QHt8w=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ji7v1s6p1Sj6xbUtnmrtSTxJzf4AqDfQ04FWZWSmeySze5bo7r2HHYtDPoIaH0c8ovx7Nj+Q+XV3kLiYAY7gG0e+qaiv1M/IQCv+PhRQueSAZkuTcJGFBDkKCyZKVEtdA6Ru04pjILbDkRy9bU9A9rLuAuvf3CO8qlsmPzt0e+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=RmXvNkCo; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:
-	Cc:To:From:From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:
-	Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
-	Content-Disposition:In-Reply-To:References;
-	bh=HD3Mb/M0xcfrIduVFRJvKQ8XdYWI1bJWyh2PimvxhbQ=; b=RmXvNkCoJWNYRQoJM1xOt0ugar
-	QpbwxG9SaVHJQsjOmpM9V74r9HbIu8QoEqeaFejXNmc9kjdUfs9duJewbp7jVduZwV1BaSnlgpd3D
-	p448ZgeVy3e1Qe2Ozgfdxya4iwLRIKV8HzcFLGYvfn45nIEI3gIBidywQt2y9Wt3xIfQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rRGuZ-005cou-KC; Sat, 20 Jan 2024 20:21:47 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: netdev-maintainers <edumazet@google.com>,
-	<kuba@kernel.org>,
-	<pabeni@redhat.com>,
-	<davem@davemloft.net>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>,
-	netdev <netdev@vger.kernel.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	stable@vger.kernel.org,
-	Tim Menninger <tmenninger@purestorage.com>
-Subject: [PATCH net v1] net: dsa: mv88e6xxx: Make unsupported C45 reads return 0xffff
-Date: Sat, 20 Jan 2024 20:21:25 +0100
-Message-Id: <20240120192125.1340857-1-andrew@lunn.ch>
-X-Mailer: git-send-email 2.37.2
+	s=arc-20240116; t=1705782459; c=relaxed/simple;
+	bh=lF/66FvKXAzZ7V3dWtaNTfnZNtgIynhOFGZ/MUB9phw=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=lHtEc99+jqSAHE0dHtVZ7LcZSIu/bcJ2WDj9cr0kClnAVCyKKvN53SoeIoxDgJUQCIlWFzAGsLuTpNnBgAfohI64ba2eoSM1paqfM8v/Z58Qa8fNBvSWerb2sr5zqbnS+7xI6mtgM2UaSvmmvZUWW2H1CrJSeY9ix4XrtZeyePY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=YRd4tKq2; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:To:From:Subject:Message-ID:Sender:
+	Reply-To:Cc:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=rkjhyoAITJExRooUi1ksbqNbsSRsxv+GppPIU6XBsUs=;
+	t=1705782456; x=1706992056; b=YRd4tKq2EkpUFXUi6TALLEg4tlmBSl3jNmf7TrUDhbPlwav
+	UPEc26C+4d45zwsmiJ6lhhFK15IZad2jCIB2t7RZNaJAZNdZBRfk/3HwvgDiZi29HRJq42Jk8Rxwf
+	HKlYVWK6RygIgUMx2yV1w0w4zQ9CIuGfvWwDDEuNxCrSiahiVdIJ6Fn9mzTZhwelS1XtTnVR0BgmZ
+	228MUV9CZ3CNu6WlPN5gGahTCVaqx/iDzWv7oYlvw4S3EkT9R06RINO6mR7q+gOcT2g0Mdq1/DGe0
+	SF5o9O3A3GrHZ9Lmlm3yNuERe9cEWAHw4PInOHrqwQfZqC+vcNUckaCe2iwY3/Uw==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1rRHw0-0000000BEZ7-23ve;
+	Sat, 20 Jan 2024 21:27:20 +0100
+Message-ID: <590fe2823d934af997c515640733eb8889b0560f.camel@sipsolutions.net>
+Subject: Re: [PATCH wireless v2] nl80211/cfg80211: add nla_policy for S1G
+ band
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Jeff Johnson <quic_jjohnson@quicinc.com>, Lin Ma <linma@zju.edu.cn>, 
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com,  linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+  linux-kernel@vger.kernel.org, kvalo@kernel.org
+Date: Sat, 20 Jan 2024 21:27:19 +0100
+In-Reply-To: <9e1db7f3-fd18-4b3b-a912-3cf6efd96fed@quicinc.com>
+References: <20240119151201.8670-1-linma@zju.edu.cn>
+	 <9e1db7f3-fd18-4b3b-a912-3cf6efd96fed@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-malware-bazaar: not-scanned
 
-When there is no device on the bus for a given address, the pull up
-resistor on the data line results in the read returning 0xffff. The
-phylib core code understands this when scanning for devices on the
-bus, and a number of MDIO bus masters make use of this as a way to
-indicate they cannot perform the read.
+On Fri, 2024-01-19 at 15:47 -0800, Jeff Johnson wrote:
+> > --- a/net/wireless/nl80211.c
+> > +++ b/net/wireless/nl80211.c
+> > @@ -911,6 +911,7 @@ nl80211_match_band_rssi_policy[NUM_NL80211_BANDS] =
+=3D {
+> >  	[NL80211_BAND_5GHZ] =3D { .type =3D NLA_S32 },
+> >  	[NL80211_BAND_6GHZ] =3D { .type =3D NLA_S32 },
+> >  	[NL80211_BAND_60GHZ] =3D { .type =3D NLA_S32 },
+> > +	[NL80211_BAND_S1GHZ] =3D { .type =3D NLA_S32 },
+> >  	[NL80211_BAND_LC]    =3D { .type =3D NLA_S32 },
+> >  };
+> > =20
+> something is really suspicious since the NL80211_BAND_* enums are
+> *value* enums, not attribute ID enums, and hence they should never be
+> used in an nla_policy.
 
-Make us of this as a minimal fix for stable where the mv88e6xxx
-returns EOPNOTSUPP when the hardware does not support C45, but phylib
-interprets this as a fatal error, which it should not be.
+Yeah, that's what it looks like first, but then they do get used
+anyway...
 
-Cc: stable@vger.kernel.org
-Reported-by: Tim Menninger <tmenninger@purestorage.com>
-Fixes: 1a136ca2e089 ("net: mdio: scan bus based on bus capabilities for C22 and C45")
-Fixes: da099a7fb13d ("net: phy: Remove probe_capabilities")
-Signed-off-by: Andrew Lunn <andrew@lunn.ch>
----
- drivers/net/dsa/mv88e6xxx/chip.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> what is actually using these as attribute IDs, noting that
+> NL80211_BAND_2GHZ =3D=3D 0 and hence cannot be used as an attribute ID
 
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index 383b3c4d6f59..614cabb5c1b0 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.c
-+++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -3659,7 +3659,7 @@ static int mv88e6xxx_mdio_read_c45(struct mii_bus *bus, int phy, int devad,
- 	int err;
- 
- 	if (!chip->info->ops->phy_read_c45)
--		return -EOPNOTSUPP;
-+		return 0xffff;
- 
- 	mv88e6xxx_reg_lock(chip);
- 	err = chip->info->ops->phy_read_c45(chip, bus, phy, devad, reg, &val);
--- 
-2.43.0
+Ohh. Good catch!
 
+> seems the logic that introduced this policy needs to be revisited.
+>=20
+
+Let's just remove it?
+
+commit 1e1b11b6a1111cd9e8af1fd6ccda270a9fa3eacf
+Author: vamsi krishna <vamsin@codeaurora.org>
+Date:   Fri Feb 1 18:34:51 2019 +0530
+
+    nl80211/cfg80211: Specify band specific min RSSI thresholds with sched =
+scan
+
+
+As far as I can tell nothing is using that in the first place ...
+Certainly not in the kernel, nor wpa_s, nor anything else I could find
+really ...
+
+We can't completely revert it since we need the attribute number to stay
+allocated, but that's all we cannot remove.
+
+johannes
 
