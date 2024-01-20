@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-64463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C98C48333E5
-	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 12:35:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 014B48333E7
+	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 12:41:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B43DE1C21166
-	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 11:35:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F2501C21126
+	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 11:41:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AB02DDC1;
-	Sat, 20 Jan 2024 11:35:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5D5DD28F;
+	Sat, 20 Jan 2024 11:41:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="osHl9MRt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fqUpZAJm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E65A2D304;
-	Sat, 20 Jan 2024 11:35:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87890D2F0;
+	Sat, 20 Jan 2024 11:41:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705750548; cv=none; b=Nm0VmGHfhA+6PHybxbMmTBkqKRJiudynYtnQ4OZLCxHP+tRBbfFsLAetCzWE2vlwrhhgwDAWTcB5DATIZglEqAbwLHPiZzu7IgSOSwyfxrW4yA32luJt8dWyDrX6kEEY0at/blSxEi4PMWY3tCCMNOL96tnbMr1K4q520/Mw4Gw=
+	t=1705750886; cv=none; b=bwQoi7KplKphyMqYl+ohe8aOvg2vNCnlID7YkDeOK8HF1B1RGqIR3Majzi1NqTYdbpZhm0kmQM9SzgM8EvucpZpVL30GSq1BBxq0DMTyJnUou/2GBs/vs4GlMNbOO8ALmb0W0n2QWtSDdi3mEJ20/aRNLjQk1iavdm4A3hnnsxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705750548; c=relaxed/simple;
-	bh=LNJG2a18OzwovkVmDgTSAY9tdBZP2+CP0aiTr6qY2MM=;
+	s=arc-20240116; t=1705750886; c=relaxed/simple;
+	bh=fEOJ/SLhFHP1Cs6MwAcKFJ3V5Nhrt3Muo0epX6IfEPo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=deD0tq2s1xr/r16nvRKvNBurw4BmOOTHiLSHyawfDr5ouMGRF4Sdv6/TX1AJtWg+s7hgGWda3Kuj3I3SXznLAHs0UVZ/dGSh4AqFOjoxCvLQwqg0EzT8GcMnxKJ82NP6sZFornCKHbnFZtHDyk7wvHFOcE8kDCnobdyQ4mnV1dA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=osHl9MRt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86343C433F1;
-	Sat, 20 Jan 2024 11:35:44 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=m5oeTkwNJrhSaZ+NUo2YWMTXhB2yxMP6JlKYcNOrn4cybuLU0aP1l3EwcRKK+YPZW1hF7u8Hj4M+fu5EVdGwOFLRZq1zeKDZ8nyhh84F6JPaNN/hGi9RQxJuxCIQyB5m9sAu4ngtlB4GlFYtKWFPeSH2mZSxRmao9sbo/L9l5eU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fqUpZAJm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD104C433C7;
+	Sat, 20 Jan 2024 11:41:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705750547;
-	bh=LNJG2a18OzwovkVmDgTSAY9tdBZP2+CP0aiTr6qY2MM=;
+	s=k20201202; t=1705750885;
+	bh=fEOJ/SLhFHP1Cs6MwAcKFJ3V5Nhrt3Muo0epX6IfEPo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=osHl9MRt88D9MkriixCOAxqrY1dSXvCQ35tgm2Kkqf0lQZ5rPZPNKNwnQJ1+kc8KG
-	 OSS5lF6u7MVaUmuR7oVVSKF1KIVLXtRQmUCkSDSoIkaqGWyORHt6hPt4dZ+mGMyUxb
-	 27vi6cVHGCn69FQCDslIJnCvreJauPYBKeBHULL/VMu5mZrcfIUM/EORrSU3wxFr5u
-	 KTYx6nT31F48ylkcikPWXc9DmbDTG2TN+oOFREJIglkH1J5aKTLuXu7RjJFocDwsX1
-	 +ye6RHt3VI4v8pUiJCTGzG57DMiiHp8yOL+8xTHjaNQWVhcRrXJtbarzrHpXTRorPC
-	 3XMzVYWSsrLxw==
-Date: Sat, 20 Jan 2024 11:35:41 +0000
+	b=fqUpZAJmj1Jg9FsTGsOly7juaAkWKZhbeS8vmvYE+YQ+GxYo1l6xe1ZoEzlm+YYXL
+	 H8LiXF1DzMbcIo+VD+DTgYLIDmd8yoy84pIgwGzuee5CEAmKmeuXv8IaPqgRiPRssF
+	 Tzf8Lb7Vlu5PA/S9BYGrHkJaUU8tv2MDnGJDvWHUTI2m4iteoS5mxnUB5UtKpvFn1S
+	 fFzFWNq7UFXyafCmcTDEk5CBxijsmEMvFQRgXZgdkOFriC7Gci4ud2N/M8Z3Yl4KTF
+	 um76L2mZpzmyoJALeGWrMVyErtvyskYAn6qcXm4oCBgtVmr5MzC/Y+O2ID9uaZN/4Y
+	 ZBFlrHqkaQ7jQ==
+Date: Sat, 20 Jan 2024 11:41:20 +0000
 From: Simon Horman <horms@kernel.org>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
-	andrii@kernel.org, netdev@vger.kernel.org,
-	magnus.karlsson@intel.com, bjorn@kernel.org, echaudro@redhat.com,
-	lorenzo@kernel.org, martin.lau@linux.dev,
-	tirthendu.sarkar@intel.com, john.fastabend@gmail.com
-Subject: Re: [PATCH v4 bpf 05/11] i40e: handle multi-buffer packets that are
- shrunk by xdp prog
-Message-ID: <20240120113541.GA110624@kernel.org>
-References: <20240119233037.537084-1-maciej.fijalkowski@intel.com>
- <20240119233037.537084-6-maciej.fijalkowski@intel.com>
+To: Lin Ma <linma@zju.edu.cn>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, dsahern@kernel.org, razor@blackwall.org,
+	leon@kernel.org, haleyb.dev@gmail.com, ja@ssi.bg,
+	judyhsiao@chromium.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v1] neighbour: complement nl_ntbl_parm_policy
+Message-ID: <20240120114120.GB110624@kernel.org>
+References: <20240119070847.5402-1-linma@zju.edu.cn>
+ <20240119195058.GA105385@kernel.org>
+ <3ddbc728.7c83.18d245c1152.Coremail.linma@zju.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,86 +62,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240119233037.537084-6-maciej.fijalkowski@intel.com>
+In-Reply-To: <3ddbc728.7c83.18d245c1152.Coremail.linma@zju.edu.cn>
 
-On Sat, Jan 20, 2024 at 12:30:31AM +0100, Maciej Fijalkowski wrote:
-> From: Tirthendu Sarkar <tirthendu.sarkar@intel.com>
-> 
-> XDP programs can shrink packets by calling the bpf_xdp_adjust_tail()
-> helper function. For multi-buffer packets this may lead to reduction of
-> frag count stored in skb_shared_info area of the xdp_buff struct. This
-> results in issues with the current handling of XDP_PASS and XDP_DROP
-> cases.
-> 
-> For XDP_PASS, currently skb is being built using frag count of
-> xdp_buffer before it was processed by XDP prog and thus will result in
-> an inconsistent skb when frag count gets reduced by XDP prog. To fix
-> this, get correct frag count while building the skb instead of using
-> pre-obtained frag count.
-> 
-> For XDP_DROP, current page recycling logic will not reuse the page but
-> instead will adjust the pagecnt_bias so that the page can be freed. This
-> again results in inconsistent behavior as the page count has already
-> been changed by the helper while freeing the frag(s) as part of
-> shrinking the packet. To fix this, only adjust pagecnt_bias for buffers
-> that are stillpart of the packet post-xdp prog run.
-> 
-> Fixes: e213ced19bef ("i40e: add support for XDP multi-buffer Rx")
-> Reported-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> Tested-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> Signed-off-by: Tirthendu Sarkar <tirthendu.sarkar@intel.com>
+On Sat, Jan 20, 2024 at 08:53:50AM +0800, Lin Ma wrote:
+> Hello Simon,
 
 ...
 
-> @@ -2129,20 +2130,20 @@ static void i40e_process_rx_buffs(struct i40e_ring *rx_ring, int xdp_res,
->   * i40e_construct_skb - Allocate skb and populate it
->   * @rx_ring: rx descriptor ring to transact packets on
->   * @xdp: xdp_buff pointing to the data
-> - * @nr_frags: number of buffers for the packet
->   *
->   * This function allocates an skb.  It then populates it with the page
->   * data from the current receive descriptor, taking care to set up the
->   * skb correctly.
->   */
->  static struct sk_buff *i40e_construct_skb(struct i40e_ring *rx_ring,
-> -					  struct xdp_buff *xdp,
-> -					  u32 nr_frags)
-> +					  struct xdp_buff *xdp)
->  {
->  	unsigned int size = xdp->data_end - xdp->data;
->  	struct i40e_rx_buffer *rx_buffer;
-> +	struct skb_shared_info *sinfo;
->  	unsigned int headlen;
->  	struct sk_buff *skb;
-> +	u32 nr_frags;
->  
->  	/* prefetch first cache line of first page */
->  	net_prefetch(xdp->data);
-> @@ -2180,6 +2181,10 @@ static struct sk_buff *i40e_construct_skb(struct i40e_ring *rx_ring,
->  	memcpy(__skb_put(skb, headlen), xdp->data,
->  	       ALIGN(headlen, sizeof(long)));
->  
-> +	if (unlikely(xdp_buff_has_frags(xdp))) {
-> +		sinfo = xdp_get_shared_info_from_buff(xdp);
-> +		nr_frags = sinfo->nr_frags;
-> +	}
->  	rx_buffer = i40e_rx_bi(rx_ring, rx_ring->next_to_clean);
->  	/* update all of the pointers */
->  	size -= headlen;
+> My bad, I prepare this patch on the linux-stable tree and never thought this would happen.
+> Will also compile on the right tree next time.
+> 
+> So should I send this to net which has this attribute or something?
 
-Hi Maciej,
+Hi Lin Ma,
 
-Above, nr_frags is initialised only if xdp_buff_has_frags(xdp) is true.
-The code immediately following this hunk is:
+If it is a fix for net, then it should be based on net and targeted at net.
 
-	if (size) {
-		if (unlikely(nr_frags >= MAX_SKB_FRAGS)) {
-			...
+	Subject: [PATCH net] ...
 
-Can it be the case that nr_frags is used uninitialised here?
+Else, it should be based on and targeted at net-next.
 
-Flagged by Smatch.
+Either way, I think reposting is a good idea.
+Although in the net-next case, please note that it is closed,
+so please wait for it to reopen before posting patches for it.
+It is likely to reopen next week.
 
-...
+Does that help?
 
