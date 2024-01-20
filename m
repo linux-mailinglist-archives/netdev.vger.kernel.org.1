@@ -1,142 +1,183 @@
-Return-Path: <netdev+bounces-64441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A039F8331AD
-	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 00:48:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 184968331E5
+	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 01:43:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF9EE1C2116B
-	for <lists+netdev@lfdr.de>; Fri, 19 Jan 2024 23:48:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC9DA284F3E
+	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 00:43:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF01159165;
-	Fri, 19 Jan 2024 23:48:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 455417F9;
+	Sat, 20 Jan 2024 00:43:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="FVdItDo9"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="PyAacvR1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F34551C4B;
-	Fri, 19 Jan 2024 23:48:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B030D39F
+	for <netdev@vger.kernel.org>; Sat, 20 Jan 2024 00:43:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705708088; cv=none; b=LBVW/DmE0YQQDRiPmJZlWps41KHz19lfjE4G9jEykTa6ut6X3I14oiNR+s8uzv98waetlaAs2634vcLCM4r3OHVIgd0N4aGEcUFbQ1ux39eTnlniHk8FmKB0OMII+3bZyTuHrn0RBI0S0x577u+eeRWSbiKgaKFPHB8i2cJ1284=
+	t=1705711431; cv=none; b=dndFV/CngtmOL0fZux4IPoIqbH6tb+hy+UoXDvNeFHLhAICD+mhJqIbaFzCBnBEG4l5lxAgbKEf8NIN0q1ti8pyy+r1UHD0Rdy9YKOjhqPq9coLXYuTmj7KtqNeuaP0WZlAvt+l8xjlE9Is2KDGVN8Jcz8cvNy4qDtTcpc3j9EQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705708088; c=relaxed/simple;
-	bh=PmzDnE+QmOepAVj/EtZNKea8NQzM9a3BI1a1+JJjs6w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Q+MkeLa3X26UJBGQ1F1//6MuzyfcEZ/ixyAwdmm14fL/zS9+GtzTWfSBfgNT/gsJ2SfKPPLSs1XGMfbQkjYGY2u3mAZOJu4TFcj7BKB2ni+qqupf1XKwulwBC8A3uGtIuGmib+Mg2DIhf5OZIGIEzAhmM8QsCzX4cD81nd5Ztq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=FVdItDo9; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40JNNKdA010923;
-	Fri, 19 Jan 2024 23:47:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=7OdlWbHAsWvuCUbuBHpHnDwMbx/eAJa3USyKbg8pm/Q=; b=FV
-	dItDo9EZ0RF5YXn2USHbafvh0oBa15QMHVYRyClmGznf6XKicP/cGvhh9hvcSCWK
-	hAv0QB0S//GNSjTpVRoODReehFcpeD7qlqSWT13MQvKAWw9sNqpv+GmmeleAWfc7
-	2Y2DtIl16k9nDmcvxGQQlesvqYi4BJGLktTZkDxTlcfYMhABXmFUweXyoo4xBS0m
-	K5+qQSrbcTHom24OCUtjBd+fLDG4Shtq4Xz31P5kwXkVaX9p4jZ8qLSivK+X5jWY
-	ZoVpABF7cQ2090smRa0ASN3AR7hKj93y2JdAJPPyP9mFic0h7848IZ6aB6rT5Txm
-	SeA11dP67rJnt1+y/YMw==
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3vqn89hr21-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 19 Jan 2024 23:47:55 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 40JNlsRq019760
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 19 Jan 2024 23:47:54 GMT
-Received: from [10.110.26.199] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Fri, 19 Jan
- 2024 15:47:53 -0800
-Message-ID: <9e1db7f3-fd18-4b3b-a912-3cf6efd96fed@quicinc.com>
-Date: Fri, 19 Jan 2024 15:47:53 -0800
+	s=arc-20240116; t=1705711431; c=relaxed/simple;
+	bh=5HG+b53C84Ypx7OXyBN4VTdPWHJvm6dijnFWhd1WFrg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=O34GvN7gVQtr5QabSU6QnTItUl7GkQNHTTNn4/TOGt3GVk9bSw9N+rdVB5jGWKDzbq1HE774a9F0TLZ1JsTuQe4I89Y8P/NHKA02dt/VX6C7A46qG683n1k7/uY1I6cDD7iSTpgnEfbtFcASqoWxz8RRH3YUdAMib04J8tNg4QU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=PyAacvR1; arc=none smtp.client-ip=209.85.166.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-361b0f0f971so1469015ab.2
+        for <netdev@vger.kernel.org>; Fri, 19 Jan 2024 16:43:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1705711428; x=1706316228; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xv/LIsX6DuyDvwhk5hVzMgJVITeYTPHNZOG4F7N98kE=;
+        b=PyAacvR10VPLnWGHhxp2x4+/1ssQGWgrkLUnRV6ENvii5KhjvVIuN9jCHjLWc01lc9
+         D7AL1vpVIDH/r7TEFCgP72YV9L3LrazZmtxFfAfePwmoDg0/Omk+9DJDMlV1+25e1XYC
+         7Iz4TaDJLrM2AOiC1bg6sd+SEMt3wPFKJhm8w=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705711428; x=1706316228;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xv/LIsX6DuyDvwhk5hVzMgJVITeYTPHNZOG4F7N98kE=;
+        b=V6LwZ9WBKV9xx9p2bn4WGvjvQmJ63fgeZmJ1K9UJdpNU8pVrqhO/pSMjGA4Tf13P9r
+         /koVZNbI4s65DjVdFkOCCywkQwYtlw1++iLypVotACgGIN+OuArK0HSFZwsSMoOwNbos
+         pMtP8KsU0K9xlqLTtrZw+T7aNLkOxkSt0yLB54H3vWWKuco0qXB1qETIJmqqA1VWQdKP
+         WoE4BhvFaqfoid0qR01G/DXCtjq7nBXxcpC8UblE+RKuFwetD9O2H5K4rAMnhBbHI7pV
+         mvK+Mb4Ckk7HIN6Dpn+CyMlm/Ra+T44dJHf/zFn+26LyI0JeKrojT6h/Of+LXOWVDcHb
+         sosw==
+X-Gm-Message-State: AOJu0YxlCKnA1akVpO8Tg+p720lgqVp7lsOxreYjVCaJNmnKH+8KxSpp
+	k35QeXRopRQTUzUUK/cKJvXaSd2IlIoKxImun61ZeH4mPoiWqKCI497HsLqZ+vrzsiW645HYmRf
+	VvRM2LkWHfqY4Vep45chMnBSbIJTLNP4PJfG9Om7QDtUW2l2x/9g7dyzcMQSIVMxySJtRBWUfv0
+	ZK4ATCPTZN4JVGeLJQidj/2A56DVh//bujqGGmZw==
+X-Google-Smtp-Source: AGHT+IEp6bm3kMMWG7JMnNa3IQl4FOHtl850x8XfQbXEPegYhoQX6NR2wf1qyz5d5x1ffoQr00MQcQ==
+X-Received: by 2002:a92:d1c7:0:b0:35f:e8a1:2b24 with SMTP id u7-20020a92d1c7000000b0035fe8a12b24mr757662ilg.61.1705711428053;
+        Fri, 19 Jan 2024 16:43:48 -0800 (PST)
+Received: from localhost.localdomain ([2620:11a:c018:0:ea8:be91:8d1:f59b])
+        by smtp.gmail.com with ESMTPSA id p7-20020a170903248700b001cf6783fd41sm3563800plw.17.2024.01.19.16.43.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Jan 2024 16:43:47 -0800 (PST)
+From: Joe Damato <jdamato@fastly.com>
+To: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: chuck.lever@oracle.com,
+	jlayton@kernel.org,
+	linux-api@vger.kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	alexander.duyck@gmail.com,
+	sridhar.samudrala@intel.com,
+	kuba@kernel.org,
+	Joe Damato <jdamato@fastly.com>
+Subject: [RFC 0/1] RFC: Allow busy poll to be set per epoll instance
+Date: Sat, 20 Jan 2024 00:42:46 +0000
+Message-Id: <20240120004247.42036-1-jdamato@fastly.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH wireless v2] nl80211/cfg80211: add nla_policy for S1G band
-Content-Language: en-US
-To: Lin Ma <linma@zju.edu.cn>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>,
-        <linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <kvalo@kernel.org>
-References: <20240119151201.8670-1-linma@zju.edu.cn>
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-In-Reply-To: <20240119151201.8670-1-linma@zju.edu.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: sucXXr2AirEFxqH5hm5BGeFfrzOShU7o
-X-Proofpoint-ORIG-GUID: sucXXr2AirEFxqH5hm5BGeFfrzOShU7o
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.997,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-19_12,2024-01-19_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 clxscore=1011
- suspectscore=0 phishscore=0 priorityscore=1501 lowpriorityscore=0
- mlxscore=0 malwarescore=0 impostorscore=0 adultscore=0 bulkscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2311290000 definitions=main-2401190147
+Content-Transfer-Encoding: 8bit
 
-On 1/19/2024 7:12 AM, Lin Ma wrote:
-> Our detector has identified another case of an incomplete policy.
-> Specifically, the commit df78a0c0b67d ("nl80211: S1G band and channel
-> definitions") introduced the NL80211_BAND_S1GHZ attribute to
-> nl80211_band, but it neglected to update the
-> nl80211_match_band_rssi_policy accordingly.
-> 
-> Similar commits that add new band types, such as the initial
-> commit 1e1b11b6a111 ("nl80211/cfg80211: Specify band specific min RSSI
-> thresholds with sched scan"), the commit e548a1c36b11 ("cfg80211: add 6GHz
-> in code handling array with NUM_NL80211_BANDS entries"), and the
-> commit 63fa04266629 ("nl80211: Add LC placeholder band definition to
-> nl80211_band"), all require updates to the policy.
-> Failure to do so could result in accessing an attribute of unexpected
-> length in the function nl80211_parse_sched_scan_per_band_rssi.
-> 
-> To resolve this issue, this commit adds the policy for the
-> NL80211_BAND_S1GHZ attribute.
-> 
-> Fixes: df78a0c0b67d ("nl80211: S1G band and channel definitions")
-> Signed-off-by: Lin Ma <linma@zju.edu.cn>
-> ---
-> V1 -> V2: change net-next to wireless as suggested
-> 
->  net/wireless/nl80211.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
-> index 60877b532993..980300621a60 100644
-> --- a/net/wireless/nl80211.c
-> +++ b/net/wireless/nl80211.c
-> @@ -911,6 +911,7 @@ nl80211_match_band_rssi_policy[NUM_NL80211_BANDS] = {
->  	[NL80211_BAND_5GHZ] = { .type = NLA_S32 },
->  	[NL80211_BAND_6GHZ] = { .type = NLA_S32 },
->  	[NL80211_BAND_60GHZ] = { .type = NLA_S32 },
-> +	[NL80211_BAND_S1GHZ] = { .type = NLA_S32 },
->  	[NL80211_BAND_LC]    = { .type = NLA_S32 },
->  };
->  
-something is really suspicious since the NL80211_BAND_* enums are
-*value* enums, not attribute ID enums, and hence they should never be
-used in an nla_policy.
+Greetings:
 
-what is actually using these as attribute IDs, noting that
-NL80211_BAND_2GHZ == 0 and hence cannot be used as an attribute ID
+TL;DR This RFC builds on bf3b9f6372c4 ("epoll: Add busy poll support to
+epoll with socket fds.") by adding two fcntl knobs for enabling
+epoll-based busy poll on a per epoll basis instead of the current
+system-wide sysctl. This change makes epoll-based busy poll much more
+usable.
 
-seems the logic that introduced this policy needs to be revisited.
+I have another implementation which uses epoll_ctl and adds a new
+EPOLL_CTL_BUSY_POLL_TIMEOUT knob instead of using fcntl, but fcntl
+seemed to be slightly cleaner.
+
+I am happy to use whatever interface is desired by the kernel community
+in order to allow for per-epoll instance busy poll to be supported.
+
+Longer explanation:
+
+Presently epoll has support for a very useful form of busy poll based on
+the incoming NAPI ID (see also: SO_INCOMING_NAPI_ID [1]).
+
+This form of busy poll allows epoll_wait to drive NAPI packet processing
+which can allow for user applications to decide when it is appropriate
+to process network data vs being pre-empted during less optimal times.
+
+For example, a network application might process an entire datagram and
+get better use of L2/L3 cache by deferring packet processing until all
+events are processed and epoll_wait is called.
+
+The documentation available on this is, IMHO, a bit confusing so please
+allow me to explain how to use this kernel feature.
+
+In order to use this feature, user applications must do three things:
+
+1. Ensure each application thread has its own epoll instance mapping
+1-to-1 with NIC RX queues. An n-tuple filter would likely be used to
+direct connections with specific dest ports to these queues.
+
+2. Ensure that all incoming connections added to an epoll instance
+have the same NAPI ID. This can be done with a BPF filter when
+SO_REUSEPORT is used or getsockopt + SO_INCOMING_NAPI_ID when a single
+accept thread is used which dispatches incoming connections to threads.
+
+3. Lastly, busy poll must be enabled via a sysctl
+(/proc/sys/net/core/busy_poll).
+
+The unfortunate part about step 3 above is that this enables busy poll
+system-wide which affects all user applications on the system.
+
+It is worth noting that setting /proc/sys/net/core/busy_poll has
+different effects on different system calls:
+
+- poll and select based applications would not be affected as busy
+  polling is only enabled when this sysctl is set *and* sockets have
+  SO_BUSY_POLL set.
+- All epoll based applications on the system, however, will busy poll
+  when this sysctl is set.
+
+If the user wants to run one low latency epoll-based server application with
+epoll-based busy poll, but would like to run the rest of the applications on
+the system (which may also use epoll) without busy poll, this
+system-wide sysctl presents a significant problem.
+
+This change preserves the system-wide sysctl, but adds a mechanism (via
+fcntl) to enable or disable busy poll for epoll instances as needed.
+
+This change is extremely useful for low latency network applications
+that need to run side-by-side with other network applications where
+latency is not a major concern.
+
+As mentioned above, the epoll_ctl approach I have (which works) seemed
+less clean than the fcntl approach in this RFC. I would be happy to use
+whatever interface the kernel maintainers prefer to make epoll based busy
+poll more convenient for user applications to use.
+
+Thanks,
+Joe
+
+[1]: https://lore.kernel.org/lkml/20170324170836.15226.87178.stgit@localhost.localdomain/
+
+Joe Damato (1):
+  eventpoll: support busy poll per epoll instance
+
+ fs/eventpoll.c                   | 71 ++++++++++++++++++++++++++++++--
+ fs/fcntl.c                       |  5 +++
+ include/linux/eventpoll.h        |  2 +
+ include/uapi/linux/fcntl.h       |  6 +++
+ tools/include/uapi/linux/fcntl.h |  6 +++
+ tools/perf/trace/beauty/fcntl.c  |  3 +-
+ 6 files changed, 88 insertions(+), 5 deletions(-)
+
+-- 
+2.25.1
 
 
