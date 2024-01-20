@@ -1,115 +1,136 @@
-Return-Path: <netdev+bounces-64469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64470-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB75883350B
-	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 15:39:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A525D833510
+	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 15:42:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1CF161C20F1E
-	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 14:39:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 626B41F224E4
+	for <lists+netdev@lfdr.de>; Sat, 20 Jan 2024 14:42:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E89EFC00;
-	Sat, 20 Jan 2024 14:39:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DC5C101F2;
+	Sat, 20 Jan 2024 14:41:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="DBc9w86D"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NMDJStZq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E757DDD7
-	for <netdev@vger.kernel.org>; Sat, 20 Jan 2024 14:39:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0C66FC05
+	for <netdev@vger.kernel.org>; Sat, 20 Jan 2024 14:41:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705761592; cv=none; b=CLkKFyYWo9vSCuiwDaKIyaMHrplGFBjrBraSA6yk6DRnRQKna+mRtC2WTDd6Jtz2VUOc/y4ao7JT6iA7eSGmhRVWleYX9IoA3LrhKFfxyRDDVfVovXn/omblLk0kWKTBp41+JXhdMutBMg4pk/UWQqdZVEOf9xnLOkB0lwmJP5A=
+	t=1705761712; cv=none; b=E3N5rXX4hP/j45Zx589mxYdpuvG0VX8bX6xTAB7Sa/oUEQfdpIGG+FNupJwaOH5q2sU22GU9ysbSaKKGxoGEyWP6TPYLvbmAuuYXwpAHgsTD5kWYBG4wrYdfObCpmGkNduQDX4pLhnyegkO2AF2u3L32EYPLkLdCrAL7prAn6mU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705761592; c=relaxed/simple;
-	bh=CENnOEOf6vbNfEOvQGtiF5HmTuxz4m2ria+W+OXvjrc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
-	 In-Reply-To:Content-Type; b=fnYRIC7KeNYM2s/UvmFxe83YC15d8HgB8B6780GL11oXPet4d2zwhXEy9BWZCCFIFnaeJFxw6CbDOdiQfjSCHKp84mOL43uDw/8dQd32tSjM3qHQrXVdl53NgJF4WOZujVNukJeF9oah0Ib6ztIgQ7wa65szQR0Q35mnB0/0gRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=DBc9w86D; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-6da9c834646so1805077b3a.3
-        for <netdev@vger.kernel.org>; Sat, 20 Jan 2024 06:39:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1705761589; x=1706366389; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:cc:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Uw7SRaYPf01ny9WGGA++FMJ8mrF1vYqV0t2q3qmpq/8=;
-        b=DBc9w86Dqsj9bpb6mWE0D9upeuXPoHaX7l30U2PnHO+MPEaPa9zY2Lp6UOvOcyUopf
-         ZjDXpcMLuoWM3Zv26ipFEuhxp9eKRmjrWKJO2F6IWrR+tL0vLSdBPSG7HUUaq8ZW26yO
-         dboEoi6kvHp3f+tENRv/72h/vsoGHbhbdiQCvt3OUdQs5GzvrZVFW1yrl7D2F4jw/gi7
-         dNNrq2EISjkrO2FIwOAgwVzOqvZLaymgCU8q6GevgTVg90DAf+ibnsB60Fye3DB7BgoF
-         C5NDFDaH1IivrRpoDb2dHUX2gjFltFWGxag5mZUxjMkoOnwxfoaljoa+op88ekBrmdxz
-         rkSQ==
+	s=arc-20240116; t=1705761712; c=relaxed/simple;
+	bh=S6BPwrXGE2thBcbHwFqMBAxcppB+4NWQZehPC54KYU4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=EMSQPci1eZ5e859XCKXTJY9Yi2fDmy4ihhafFmEx9bEwlnMSWbT8zjFuXLpfS5FT404DF49L5Y2ifErLqChw22tsgdAoWOHCVhR4tY358VfHuWeJu0YyTW0Z2mOTFFxzR0GTXYQTWoHtSjdThq0lRhFpEAzdeSC71DuE+fQBwLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NMDJStZq; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1705761709;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=S6BPwrXGE2thBcbHwFqMBAxcppB+4NWQZehPC54KYU4=;
+	b=NMDJStZqzhbz0RE4QgKkxrb9jnsjhOiKqZtjEolO/9cLNnh67mHrotCjbZBLpsQKCBeril
+	+K8jMDp3JNuOfJOQuGbi/YpL+MJ4qsBARDeTrMIUib7qeU2Mw2NBuN4zXhRNv/y/xQ0i10
+	6E9cMOMeGLuE+Lm3ZdK9VPFa7ke8vZI=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-510-4911XXObNemOUCJYdlVINA-1; Sat, 20 Jan 2024 09:41:46 -0500
+X-MC-Unique: 4911XXObNemOUCJYdlVINA-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a2bc65005feso96681366b.0
+        for <netdev@vger.kernel.org>; Sat, 20 Jan 2024 06:41:45 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705761589; x=1706366389;
-        h=content-transfer-encoding:in-reply-to:from:cc:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Uw7SRaYPf01ny9WGGA++FMJ8mrF1vYqV0t2q3qmpq/8=;
-        b=kZIaiW/uZS9HX5A/Hce+nMIpeDRjWaLDCd+vMQ7hH5wljZum5nXNM1bLx4WXb9YPps
-         5LpyHgzNdA97zaV6Iy/Pybwq/aFO+bGGb07Fh2ngh/1bYpyigaItSwTgS5C4cBR7JRYf
-         PPXz6PvLujK+AgIvV7FOwpg85CT/RHxDXMJwYFYe/1Hx7TLePBgzpGZA/lGOfEZLswrT
-         MHN1XChNFOfOTz1yEnzRQshX6Ds/Md7LGy8XurNf19x3FbweHkrTTtn7yUV5sQVkeCV9
-         bOnBYJN+Fe9Bbi4iJoL1LLzyr40/RnXhs5AOWushtO0OmLQ7xdCDjoR9wo2ByHOfrbhi
-         +X1Q==
-X-Gm-Message-State: AOJu0Yzn9mdJILZL4olfBI4j9P7eI9mQL4Nl+1Ym5UETRXVafu/dPiwG
-	Ptjl016MczGD33kmPyG6/Kt2k5gHjMUDs6Jpw2L7oARZKV9IfRwmHmyPvHtHds5NVG+8eUg/zoP
-	frw==
-X-Google-Smtp-Source: AGHT+IFLLFwwtGUkq1sma5MRMhETOcroOwiREcruEWI8iPvX5aILcBdbCMr7oMPK9afwJ1/iKWpq5A==
-X-Received: by 2002:aa7:9f06:0:b0:6d9:bf73:6275 with SMTP id g6-20020aa79f06000000b006d9bf736275mr2273456pfr.2.1705761589253;
-        Sat, 20 Jan 2024 06:39:49 -0800 (PST)
-Received: from [192.168.50.25] ([201.17.86.134])
-        by smtp.gmail.com with ESMTPSA id d21-20020aa78695000000b006dbd3d7e242sm623173pfo.126.2024.01.20.06.39.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 20 Jan 2024 06:39:48 -0800 (PST)
-Message-ID: <9c6213b3-961f-4a74-a22f-143da42daf32@mojatatu.com>
-Date: Sat, 20 Jan 2024 11:39:46 -0300
+        d=1e100.net; s=20230601; t=1705761705; x=1706366505;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=S6BPwrXGE2thBcbHwFqMBAxcppB+4NWQZehPC54KYU4=;
+        b=Myan/vEpgTKhZeBZoLCWnPlZkrbaHXm5VjIXmPOS4sNzRPALRF9HqNBMXhm9yiL+ko
+         9NlEsX1+O1n96JgqOCWmX0KeyiJ/qe3VJ+oJIK4zzMxbWQu0o5ipDEPXJpIbHg5B3Izd
+         gZgjgb8pZK4pnAveFeokGGur3R8kINWOPs+whGhkd4nnW/N3dGYaInH+0+tQFUyXlmUr
+         mhgCBIq7EJuWcNd03uySdTrE9QVOYioviWcAwjishevd4zfGYCPAhu/4KyBiHqholFUc
+         UibigdNTMSY/95b/1UsLD3Acp9dCsX6qgo4Cv0rA1wElh5ttIlO47u6m2zBp6SGc8oui
+         DihQ==
+X-Gm-Message-State: AOJu0YzSTLddJ2LNla7EO8q3JItLpdEUXKk5IJSHTbpG4Psb8PT/Db+d
+	Zn88QYUL2adB+9PyZ/3TZlmAZon+UmBxGOAlD0qn/tbC2DznaAPcd7EMJ6vAsgvvyh/XChy7WLG
+	8rSa2p4hJGYyoTZLUvo01V9P2Ky7Opx+j/U1Szk9dXwGmy1WUlHkbgg==
+X-Received: by 2002:a17:906:5a98:b0:a23:1163:24be with SMTP id l24-20020a1709065a9800b00a23116324bemr712752ejq.95.1705761705064;
+        Sat, 20 Jan 2024 06:41:45 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHuDY3A8O2vrfwcZAM0M1PYEeHPFP2ngva2JatE0cp7cV6iv0XZ5IXfV5wLy0eR3UWBYZ1gsg==
+X-Received: by 2002:a17:906:5a98:b0:a23:1163:24be with SMTP id l24-20020a1709065a9800b00a23116324bemr712749ejq.95.1705761704712;
+        Sat, 20 Jan 2024 06:41:44 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id vh3-20020a170907d38300b00a2e7d1b6042sm5542040ejc.196.2024.01.20.06.41.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 20 Jan 2024 06:41:44 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 827D01088FD4; Sat, 20 Jan 2024 15:41:43 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Alexei Starovoitov
+ <alexei.starovoitov@gmail.com>, LKML <linux-kernel@vger.kernel.org>,
+ Network Development <netdev@vger.kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Boqun Feng <boqun.feng@gmail.com>, Daniel Borkmann
+ <daniel@iogearbox.net>, Eric Dumazet <edumazet@google.com>, Frederic
+ Weisbecker <frederic@kernel.org>, Ingo Molnar <mingo@redhat.com>, Paolo
+ Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Thomas
+ Gleixner <tglx@linutronix.de>, Waiman Long <longman@redhat.com>, Will
+ Deacon <will@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Andrii
+ Nakryiko <andrii@kernel.org>, Cong Wang <xiyou.wangcong@gmail.com>, Hao
+ Luo <haoluo@google.com>, Jamal Hadi Salim <jhs@mojatatu.com>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, Jiri Olsa <jolsa@kernel.org>, Jiri
+ Pirko <jiri@resnulli.us>, John Fastabend <john.fastabend@gmail.com>, KP
+ Singh <kpsingh@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Ronak
+ Doshi <doshir@vmware.com>, Song Liu <song@kernel.org>, Stanislav Fomichev
+ <sdf@google.com>, VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+ Yonghong Song <yonghong.song@linux.dev>, bpf <bpf@vger.kernel.org>
+Subject: Re: [PATCH net-next 15/24] net: Use nested-BH locking for XDP
+ redirect.
+In-Reply-To: <20240118083730.5e0166aa@kernel.org>
+References: <20231215171020.687342-1-bigeasy@linutronix.de>
+ <20231215171020.687342-16-bigeasy@linutronix.de>
+ <CAADnVQKJBpvfyvmgM29FLv+KpLwBBRggXWzwKzaCT9U-4bgxjA@mail.gmail.com>
+ <87r0iw524h.fsf@toke.dk> <20240112174138.tMmUs11o@linutronix.de>
+ <87ttnb6hme.fsf@toke.dk> <20240117180447.2512335b@kernel.org>
+ <87bk9i6ert.fsf@toke.dk> <20240118083730.5e0166aa@kernel.org>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Sat, 20 Jan 2024 15:41:43 +0100
+Message-ID: <87o7dg3w48.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [EXT] tc-mirred : Redirect Broadcast (like ARP) pkts rcvd on eth1
- towards eth0
-To: Vikas Aggarwal <vik.reck@gmail.com>
-References: <CAOid5F-mJn+vnC6x885Ykq8_OckMeVkZjqqvFQv4CxAxUT1kxg@mail.gmail.com>
- <SJ0PR18MB5216A0508C53C5D669C07F72DB6B2@SJ0PR18MB5216.namprd18.prod.outlook.com>
- <SJ0PR18MB5216EBC3753D319B00613E79DB6B2@SJ0PR18MB5216.namprd18.prod.outlook.com>
- <CAOid5F8TV=LbN_UZzmGfOrq1kh8hak7jrivHm2U9pQSuioJP6g@mail.gmail.com>
- <0b2bdc15-b76b-4003-ba1d-e16049c7809b@mojatatu.com>
- <CAOid5F8L8enzhKfW46SGxoZBp8Sed6xBSpE4Hqt+cY02r_O1xA@mail.gmail.com>
-Content-Language: en-US
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-From: Pedro Tammela <pctammela@mojatatu.com>
-In-Reply-To: <CAOid5F8L8enzhKfW46SGxoZBp8Sed6xBSpE4Hqt+cY02r_O1xA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 20/01/2024 02:03, Vikas Aggarwal wrote:
-> Thanks so much  Pedro Tammela & Suman.
-> Getting bit greedy here with tc filter :)  -  Can i also use some
-> boolean  for example dst_mac != aa:bb:cc:dd:ee:ff
-> 
+Jakub Kicinski <kuba@kernel.org> writes:
 
-I don't think you can explicitly like you describe.
+> On Thu, 18 Jan 2024 12:51:18 +0100 Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>> I do agree that conceptually it makes a lot of sense to encapsulate the
+>> budget like this so drivers don't have to do all this state tracking
+>> themselves. It does appear that drivers are doing different things with
+>> the budget as it is today, though. For instance, the intel drivers seem
+>> to divide the budget over all the enabled RX rings(?); so I'm wondering
+>> if it'll be possible to unify drivers around a more opaque NAPI poll API?
+>
+> We can come up with APIs which would cater to multi-queue cases.
+> Bigger question is what is the sensible polling strategy for those,
+> just dividing the budget seems, hm, crude.
 
-You could do something like:
+Right, agreed, though I don't have a good answer for what else to do off
+the top of my head...
 
-tc qdisc add dev $ETH clsact
-tc filter add dev $ETH egress .. dst_mac aa:bb:cc:dd:ee:ff .. action ...
-tc filter add dev $ETH egress .. action ...
-
-The last filter is a fallback in case the dst_mac doesn't match.
-As long as you don't specify the dst_mac in the flower filter, the last 
-filter will match everything != aa:bb:cc:dd:ee:ff.
-
-If the == case is a noop, then just say `action ok`.
+-Toke
 
 
