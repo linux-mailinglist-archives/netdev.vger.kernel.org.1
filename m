@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-64498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64499-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDBC28356AD
-	for <lists+netdev@lfdr.de>; Sun, 21 Jan 2024 17:35:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F2778356B6
+	for <lists+netdev@lfdr.de>; Sun, 21 Jan 2024 17:46:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A600E2818F0
-	for <lists+netdev@lfdr.de>; Sun, 21 Jan 2024 16:35:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C0741C210D2
+	for <lists+netdev@lfdr.de>; Sun, 21 Jan 2024 16:46:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C903A364C7;
-	Sun, 21 Jan 2024 16:35:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E52636B02;
+	Sun, 21 Jan 2024 16:46:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="CiRXlYfV"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rJIjmPmD"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28A4F1D682;
-	Sun, 21 Jan 2024 16:35:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38637EC4;
+	Sun, 21 Jan 2024 16:46:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705854950; cv=none; b=R1M8CUeesO4xrIC2PA6PnWC1U39YD4/fjy/4UtyaYuQNkjBdasjHaHb3bVZhxA6FXu3hAWyAWlmxtU/J9FH3r47JffvUhlNnfKtnzF5Ez/FJyQ/CAycrqsSOqcPtwSpfB0r1yyrqqeBxOGYtYVjJWdXu3w34mXSlqqGhTWYEGiA=
+	t=1705855571; cv=none; b=QD8ZHewLVLD6i6NFTTB5Kdow4w28Be5CVOFydmqgUQnlu4jAyF0gUPseI1H5sDB0Jm7PBb8e26QgEnnuTvdypiKKHw+dFpbsS0BhFJzBVN4Zu9AZFmPG1/O4zYkJ3nfpRvn3Y1q3NrYA8h0wGA1y3uET4kurv0QV23ENOC+3bBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705854950; c=relaxed/simple;
-	bh=oXIDoCwWJnqHJqKehe0/596Q6ObG3BynFtSoQloYtpM=;
+	s=arc-20240116; t=1705855571; c=relaxed/simple;
+	bh=SXpGnpIGQfJuOVAZ0umiygpDbMYgAaWjCZV42ZZzXjM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IycD3xxgOqMep4GZQGvYvKCbqQkOEJxwV0pczxTgZcQNdiR7mAK41ihwkW6HNE3Phe0XYwJ0JzUEFqSvoxBptxo+yJDdMlNOjEmGaYOEKwXCSpmnLzuP2TLHR2xtrvdi893oobJ1gOf4M+z+e1jRgP9R5cwGHsKIx59wfu+bR1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=CiRXlYfV; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=GQUOoz+D2yaVkKYCzFh1217OsDGJJdL/V+JFXkdeB9tvrh1E1bDSNahMFrz7tG0+GYMe4QRkCqA3kRCs5T5CizG01vMkcf/6cqJg8kMwLaAEJvoozANkBJfpZepwBuEGnDRdxd9CqySIr2lsM11XyBAxWBqnFcB8boTtCowWq24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rJIjmPmD; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=+ee0LVJaO5xx5GZobgreq3QpintDB0kzQxoNG6Nuq/Q=; b=CiRXlYfVKNnCf62BxY//FksKhE
-	ATDCOxtIR1lSIREWhqcUtHK3cRqyog9XQ4GH772UTukXmojvgCobskeCeXZ5ZcY9fXK9MYVU8G7xW
-	8V5HvUAVz2B6iAb9lDZXB8BkOdb4nxFLuGXjeTy9xUMCOjfQ7EoPwCi4LpAxqYcLX6kM=;
+	bh=BHOFZcuTxHKtAFe+5SXsdTjosX9ZtBXP8Ft5m35WZew=; b=rJIjmPmDd+Ls+Hr9hu4nE6G5vU
+	P+4nn6S6zoEq1QaRKrNmnKbBQXlQey7L64fNlXwpar8zVrsIuvXfct4SNX8HYYHQAgtCRlWpTb3TX
+	Xz83hyOOws5wjAE37qqzF+/NYHSoLWQkvgf181YS+chDM4AVLVSjvgD9j5zGdoDcluZw=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rRanN-005f4P-HR; Sun, 21 Jan 2024 17:35:41 +0100
-Date: Sun, 21 Jan 2024 17:35:41 +0100
+	id 1rRaxL-005f5v-RN; Sun, 21 Jan 2024 17:45:59 +0100
+Date: Sun, 21 Jan 2024 17:45:59 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: Ziyang Huang <hzyitc@outlook.com>
 Cc: mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
@@ -52,10 +52,10 @@ Cc: mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
 	linux-stm32@st-md-mailman.stormreply.com,
 	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
 	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH 6/8] net: mdio: ipq4019: support reset control
-Message-ID: <9ac4b153-2318-4d69-9771-1b3365104904@lunn.ch>
+Subject: Re: [PATCH 7/8] arm64: dts: qcom: ipq5018: enable ethernet support
+Message-ID: <b8510b38-3669-4a04-9ca6-dbe937ecbec3@lunn.ch>
 References: <TYZPR01MB55563BD6A2B78402E4BB44D4C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
- <TYZPR01MB55568177805D79143E8CF4E2C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
+ <TYZPR01MB5556FA040B07F48AFE544680C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,25 +64,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <TYZPR01MB55568177805D79143E8CF4E2C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
+In-Reply-To: <TYZPR01MB5556FA040B07F48AFE544680C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
 
-On Sun, Jan 21, 2024 at 08:42:35PM +0800, Ziyang Huang wrote:
-
-In this case, you need to document why the MDIO core reset controller
-code does not work for you.
-
-You are also missing the device tree binding again.
-
-> @@ -248,6 +254,10 @@ static int ipq4019_mdio_probe(struct platform_device *pdev)
->  	if (IS_ERR(priv->membase))
->  		return PTR_ERR(priv->membase);
+On Sun, Jan 21, 2024 at 08:42:36PM +0800, Ziyang Huang wrote:
+> Signed-off-by: Ziyang Huang <hzyitc@outlook.com>
+> ---
+>  arch/arm64/boot/dts/qcom/ipq5018.dtsi | 120 +++++++++++++++++++++++++-
+>  1 file changed, 116 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/boot/dts/qcom/ipq5018.dtsi b/arch/arm64/boot/dts/qcom/ipq5018.dtsi
+> index e502a3ecf4b7..b36e5c2136b7 100644
+> --- a/arch/arm64/boot/dts/qcom/ipq5018.dtsi
+> +++ b/arch/arm64/boot/dts/qcom/ipq5018.dtsi
+> @@ -94,6 +94,63 @@ soc: soc@0 {
+>  		#size-cells = <1>;
+>  		ranges = <0 0 0 0xffffffff>;
 >  
-> +	priv->rst = devm_reset_control_array_get_optional_exclusive(&pdev->dev);
-> +	if (IS_ERR(priv->rst))
-> +		return PTR_ERR(priv->rst);
+> +		mdio0: mdio@88000 {
+> +			#address-cells = <1>;
+> +			#size-cells = <0>;
+> +			compatible = "qcom,ipq5018-mdio", "qcom,qca-mdio";
+> +			reg = <0x88000 0x64>;
+> +			resets = <&gcc GCC_GEPHY_MDC_SW_ARES>,
+> +				 <&gcc GCC_GEPHY_DSP_HW_ARES>;
 
-How many resets does this MDIO controller have? Would
-devm_reset_control_get_optional_exclusive() be sufficient.
+What do these two resets do? An MDIO bus controller is unlikely to
+have a DSP in it. That is something a PHY is more likely to have. An
+MDIO bus controller does have an MDC line, but why is it
+GCC_GEPHY_MDC_SW_ARES not GCC_MDIO_MDC_SW_ARES? So this again makes me
+think this is a PHY reset, so should be in the PHY node.
+
+A device tree binding will help sort this out.
 
 
     Andrew
