@@ -1,58 +1,59 @@
-Return-Path: <netdev+bounces-64486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED0108355B7
-	for <lists+netdev@lfdr.de>; Sun, 21 Jan 2024 13:41:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7D0F8355BD
+	for <lists+netdev@lfdr.de>; Sun, 21 Jan 2024 13:43:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73EB41F2141D
-	for <lists+netdev@lfdr.de>; Sun, 21 Jan 2024 12:41:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C148BB2277D
+	for <lists+netdev@lfdr.de>; Sun, 21 Jan 2024 12:43:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC517364DB;
-	Sun, 21 Jan 2024 12:41:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A42AF364DB;
+	Sun, 21 Jan 2024 12:43:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="Yt6tDlHv"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="dFInY6Zg"
 X-Original-To: netdev@vger.kernel.org
-Received: from APC01-TYZ-obe.outbound.protection.outlook.com (mail-tyzapc01olkn2095.outbound.protection.outlook.com [40.92.107.95])
+Received: from APC01-TYZ-obe.outbound.protection.outlook.com (mail-tyzapc01olkn2069.outbound.protection.outlook.com [40.92.107.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE9DE364A9;
-	Sun, 21 Jan 2024 12:41:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.107.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AABC737142;
+	Sun, 21 Jan 2024 12:42:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.107.69
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705840906; cv=fail; b=C+IyHUqEymcYtFji2OYqpAvh3WH6V402gt0lyIkqgLFdxkevKNlyJH4ylho3xDxP3fvpK+16heZQIemcbEaFpmOzDBDgxWflU3++Y9RUBHoaybJqkJQvwD0VEtLKnsUF67kGq3owH1GCQZUnRgFg8OLn6UnDRht4mV3zYEyZ4TY=
+	t=1705840981; cv=fail; b=FG6PGuJkiUqeWeQbL1vGTCmD7KGNcWtbnT7+wL8S2qg0MAxN8MxLdFBF3UXQpwGQmbm2gpLDvcGYnBMtd7bISafncnrasgN5MbdmCYgp8C/mHhRoiFx6ZQqBYCKvKR6FznwGl3UvNx5ynQXQejg0JJ7q/CET9pbFi91GmyHf9RI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705840906; c=relaxed/simple;
-	bh=GMJLZFym36h9jqm99/2yM7zrW5FLKAZCLY1KHQDEYHM=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=S/A+x2qYc5vp4aGjEc16jdQO2UraZ4WwdXdMq9nPkn2lUz0HOuktOAgUmsIhamSNcB2IR0nlQA5t15w6X+ToytzHHz+NCtxvd+MkhS2er3dzDmQmtMwQOhbx9YPe2Gf1Fjh8PxvWBC/m9JwO08d/OzVc1RI4maaAAVjNpeDmkEQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=Yt6tDlHv; arc=fail smtp.client-ip=40.92.107.95
+	s=arc-20240116; t=1705840981; c=relaxed/simple;
+	bh=1Nd1CHY7Rnm9JqCXDwQn+P7LNvhcbaVhb+tx4Vxsjw4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=KwBft0fD6LXgBH1aOnMcF4X8NAK1cHEuGc5Arvi0VI/wL33orLlVsZQ/qSkAmR+M3Ie4NKroo9yyFrhjjVSU4AlmLWqtWGE/1wgoffVu5snRZbURrmzIT6C0Dtu7zjD5aIcbDJKcofsj9iLqptX3mqpmBpHLxdemseDlsdErS3A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=dFInY6Zg; arc=fail smtp.client-ip=40.92.107.69
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=alnx7Nv66GqduNj04ccav/kWiWYcOXIhyUcQdyv+shqf4dfFiB0bSXI3gPSO0xnIj1X6OxTRzWb/sASzzdN9FYAMPW3IQrjXniF3xUGdRjV0SHtsO6PZb2avciTEt+xC6BkKU2ykWTMSjHwGRz6fF+gbgM25yALyX9QORFwwZ3juf0aNVEYO3SfPNx2VBxJAis1KxkXEDsD4b3Ra0HgUaRA1Omkz8vgMBN53ynrO+ezKQvoPRTwkw9nQQv2OMFM497JSdQHRJcV3furu+65LN4tCsJRl2RVf/4j7nQVFlLQ5Sga66Qq2AVaFSdLYhVpISOtlC0i42WETv5Zy1Cv5Pg==
+ b=FlX6zIOnbg3G2pFJVl7iUPuB6jICbsZpJoJj/rEgxyR99/V7FgfcpZ+9O2igxYycrV48/0DhRUNO7puDRYi7vXvrekqdd0g1uNNnaaJgmbOgHtB/9SS+c4EfymPIIZeF8uNR8HRcALHwPsUGh7mmBuvgN02Efl5BGlhvniu9lxjF4YqzDSmuWALjcmh7SQf5PlKwAIq2fLPwHSD8y/oBap4ilDIe/leAF5/Xm69BZJ8atiBqtj0q0H7qtrDj6F4RWKRhNElCSQOSHZcT0iWFBaJ5pf+AVxUp9yxfrMWK459JjJ2zTDuYDoJUSD2PI27W3GsAq+wbeA8TU0aB011MSQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rKndGcaFr+VI64e8Vu/mjV/lynKbFFTYkXoRG1OAVK4=;
- b=KIAEHkmAlANsfn4ZCm3quq+tRSF8qjMX1bwb2Aaj8c1ngDDBJ7Pgn2hDzts0DG50KdebS1LV4ScOn/nyAgvvQrlzIucPj3NOsArAMoz+4qtavoEHE9b6hEq4NM3TqrmgRzrnmSbeJb6fE3jJ04ju/AV+jnGhoqbTy0D1ScjWOPxZpFWxDw4ceaFrUW199HsTvk03a6F1aXpCwTEW7NWrV3tRcqyk0ic4coAIIF1LudLsAUpkGIiRuObpa2XmKt+fHXTJnoGFLciBNRODIH9gPdkOCYWkVN5bmH4q+XSKsXAb7TuzDLVov05yYbnLbZp0oZusZB2hP6m0GJFQwisJHA==
+ bh=dYYNimcnF3YqLTTNLWhrZAnb9da3v1uk3csr6SEAqU8=;
+ b=cfrLDaPlSWH0dBLoRM7fV2zeVwqezkeW6pD2Bw1zQQpJTGXtLEIWNjSMgPnRRkq4oiS/fOuNAl6xHG6d/+H6i+WE7ft1+G6GkfAXSybpJk10+RJxhOZVQSOX80H8j9LgmU/+191W0lmaiDrMKFgKAD6LAPvmbCa5C15SG4hfh4tZNAxisiB/eSUYgAsA3Hvkw6hwi4sNJRhyT6TQ5v7+4nmEXlBV4+rPS4hhDKwMdq+YVgHk8vgvTglh13cye4DUWzdbubP4o+H2spUMQ8YEjKPLFDxwgCnMALjVg20yEIBFc1Hd6NqCUsrsErmZ48WSMhobKPkusAYyHdvI3NQjhw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
  dkim=none; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rKndGcaFr+VI64e8Vu/mjV/lynKbFFTYkXoRG1OAVK4=;
- b=Yt6tDlHvb84ZJGL1HPx2Xu1tj40lgCkhwYfVyAdpPbxrFg10RGO7Upg2slibgjd9IlRAZyLRwRv1Ysk4zuc2YxWpJa5eAFq2PW86pIZ1YZDTCJa85bFZvLqVm/LaZ6UagBkfPmpGS0deiLX6oL77+1PZkTMzvxcsHG2J73jgWxSWk9btL9eULTQqXxSOi4ZdZyn5auXc3RMlXWYSCR07OupYShqrzCKaa0RNSI7ZxTMbemtq3QpCXEK8ScqsDd8DukmjER42n5fJH4eQuInJryaXyHOB3E/iEn8gxKoOTRtYrJrEiYGfO7H1Lh2zb5mDMVcrDDqH/ftjJZAEdD+IzA==
+ bh=dYYNimcnF3YqLTTNLWhrZAnb9da3v1uk3csr6SEAqU8=;
+ b=dFInY6Zg+AoAU750VowerFeTyk/1IA/bCtVWr7wBa63pxmsyg72LEZUYe3CwWPdbMGe8r/B545CZKtE5U9a0m8Phabk6doMtnai73OEIhF3wvngLdkqcXvv6kNez3ITAs/uYrl+kc627obGlNBsfERlPco3Gc8aGrpXEdCJzGQXDAHcblX4/oqhQchsJMNa433ZY5sfRr3eqWQQmj35T/b98l2Zd040Al1K0yWJ6JmxLKkW7f6iS4bnQv1edN4WXm4uGJud4d53akGjY77MNPcbEDXIGOHuegPjOruyRFpamfvM2OU3Hf/c1yN+iDUWlJeliEMTrd3abUKDi6l/wPg==
 Received: from TYZPR01MB5556.apcprd01.prod.exchangelabs.com
  (2603:1096:400:363::9) by OSQPR01MB6119.apcprd01.prod.exchangelabs.com
  (2603:1096:604:27b::11) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.30; Sun, 21 Jan
- 2024 12:41:41 +0000
+ 2024 12:42:55 +0000
 Received: from TYZPR01MB5556.apcprd01.prod.exchangelabs.com
  ([fe80::bcb7:50f4:7a16:4ec0]) by TYZPR01MB5556.apcprd01.prod.exchangelabs.com
  ([fe80::bcb7:50f4:7a16:4ec0%7]) with mapi id 15.20.7181.019; Sun, 21 Jan 2024
- 12:41:41 +0000
+ 12:42:55 +0000
 From: Ziyang Huang <hzyitc@outlook.com>
 To: mcoquelin.stm32@gmail.com
 Cc: alexandre.torgue@foss.st.com,
@@ -66,18 +67,20 @@ Cc: alexandre.torgue@foss.st.com,
 	netdev@vger.kernel.org,
 	linux-mediatek@lists.infradead.org,
 	Ziyang Huang <hzyitc@outlook.com>
-Subject: [PATCH 0/8] ipq5018: enable ethernet support
-Date: Sun, 21 Jan 2024 20:40:39 +0800
+Subject: [PATCH 1/8] net: phy: Introduce Qualcomm IPQ5018 internal PHY driver
+Date: Sun, 21 Jan 2024 20:42:30 +0800
 Message-ID:
- <TYZPR01MB55563BD6A2B78402E4BB44D4C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
+ <TYZPR01MB5556D5568546D6DA4313209EC9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
 X-Mailer: git-send-email 2.40.1
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <TYZPR01MB55563BD6A2B78402E4BB44D4C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
+References: <TYZPR01MB55563BD6A2B78402E4BB44D4C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
 Content-Transfer-Encoding: 8bit
-X-TMN: [ert9Mh57VppqbQ2FUxLhaMiZ3rYoe/qMQBXWesUVLUI+xdghwV9kEw==]
-X-ClientProxiedBy: PH8PR15CA0023.namprd15.prod.outlook.com
- (2603:10b6:510:2d2::22) To TYZPR01MB5556.apcprd01.prod.exchangelabs.com
+Content-Type: text/plain
+X-TMN: [nfEoGlwwp8/ShSyGEZ809gEznySqDSjYDALQWyLowDbaoJai5WxIrw==]
+X-ClientProxiedBy: PH8PR21CA0009.namprd21.prod.outlook.com
+ (2603:10b6:510:2ce::26) To TYZPR01MB5556.apcprd01.prod.exchangelabs.com
  (2603:1096:400:363::9)
-X-Microsoft-Original-Message-ID: <20240121124039.3328587-1-hzyitc@outlook.com>
+X-Microsoft-Original-Message-ID: <20240121124237.3328702-1-hzyitc@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,46 +90,39 @@ MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: TYZPR01MB5556:EE_|OSQPR01MB6119:EE_
-X-MS-Office365-Filtering-Correlation-Id: 085daddb-4539-429f-0f58-08dc1a7e50c5
+X-MS-Office365-Filtering-Correlation-Id: 980c753f-cf0a-4d35-0300-08dc1a7e7d91
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	kSfuwsfaLKSVFzAGt7VVfRCVyh5JN2bSPQGKTX67Ch5P/r5g7zXCdgOxDkBPE1iCuqg48/VBdYM2ksBukBxXDnxKGFX+yb2BlYE7UrWCUqd4nKuq0NseqlNxbbpixMA30TbOaN33zQ3TpReUW2qmRNzBDCU/gkDAi/8/dN5TR+deUsl/D2Ri7OJ3KY5VN5KA8qhz8g3jeXbYqW8etWjbJq9ZGe/ehuhZrReYWh6Gib+Od6XdisdJ6yp+WGOlBVaZQZku2beFqWHp8dYhB3k5acjjAiBRu9gyDSOl1bHDzbvV9C5fF8LMhLUp7F59feMHvwYGAPPPAG8fUi7LCayKGpyPxVXhgR6dh7HeYMiZwPapRG2SPzPNVwla7S2Lfcym29uXlzdKIjkDxBuPriSFEmp3lhgme5qcwnO2/xunoKrdwmY5sQBIYeYD4WSxS2Ka6uAuM44CvCy4pIj04eW/p2i2dIZBrpf704c9WJwzZkC2U4W1fjW6rAnsYOxhvSwUzcJW+IMjFy4Xprp7twcQMo1zkuOrzr/tmswXe0N4dNys7PbxwGeiIol0JCf/yQVPiJuj4+bSAExGICSlOkOV1Uf6A8vQMfrYvZW24lHQVr+3BQSpRAQsE61nObyc58W/
+	7Tcyqn8+gLjyoBqrZ8vnSkt/uFUACjcMSbgl/O2VTDiQj1z3ToG61wycj2N87BbWqJV8TwLr6L9PU86OYQcDLStIA1D0JRJpDwT36sG5t4ciVnmn6t9ev8/B+OSAFc8p+GWMssuORSOmXrNiDeMPmbEWSFitK/qfouGUAmO744Ol2Pu8wJB7i6HwrgNFZUpolszCx5DL9yzDP1KVsksMs1hbrLoazp2jwvtGLYa/qnyQvAgXgKJ4Pa5XYTe8hXescof49ezuHjgScwG3sXX7iHHhm8LEzUCjDEu4bguSWv0XwbRuRijEHCobJKYimJUc+cy0SukYhLbfQYBuixg48D6eHOAhvz5mIwDnEPRsoNkrBhRsdoLKMSMMFnWh24CK6trY2P/qezlmbvtYTDIQNa5AJfBXaNgn/DXnUA8S8M5OI4r6t56Xx80P47PqOVy2vmL2pGJT7Lj1ZlwNWq1y0o4LUaM5IBhCWniHKOSQ3cQ3FnOq9C+449RZ88cSNxKiugUCzUF7Lk5bwaJj8/KrWLPZHh1ehFBhAYyMeg/b0MxmBdunlQkYRLUVVBbf27OsloKHrbsEwMgnFby7gzA0ZcYnTaRkNWACqDp5cmsnFksbjpHhJHSIG/ey0V3myglk
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?aER6S0kzYko5UU5NVFhCd3YwT2lkNVkzd1NlVGJOeGg1b3g3RFc0QUYxOVRl?=
- =?utf-8?B?MDc0eXFvM1AvQ2JpN3hwbkpoeWNhclVoS3owT0lheVpraVY2bVZCbHdRNEl3?=
- =?utf-8?B?NVBTcld0RVVncWV5VlBvazRQQ3NIV3dEK0NZbll4VlJOV2U2MXhwekdRMXZ2?=
- =?utf-8?B?QVg0cHRHdk45ZG1JcnEyVHZGOGtsb2pvNEpNd2kvZXJvRkZUQjR0cU5DR0Ji?=
- =?utf-8?B?eEhVZW93Q0lEU0c2MjhDeUJHUHdHeXh6dUZSR1NsZEpVc1hHaytueVptNWJy?=
- =?utf-8?B?dXRzR0l6T3hjU2ZDaFNLZnZsQk1INzM3eVh2MTBWcGJtb2x5UCt5dEsvTlg1?=
- =?utf-8?B?ZDU3RzhVa3hmZEMvdWRDb01pRWNXKzNGTmV3eHRvcTR2Q0hDVmwrMXQ2ZE9r?=
- =?utf-8?B?NzJ5NWllUDRKOWJvRTFvSGVBSzFBeTRqam05SC9uV25VZ2JFcys1bHJodnRm?=
- =?utf-8?B?RzhLZGdjc1FHbHZ6eUhnRWRJaGpqa2RxSWNOUVVZNkdTTE1Ld3czNi9GbWFC?=
- =?utf-8?B?ZStJV3BsR2pwa0tuTXN6QjlpMHA2K2FqRkRxQUVjSE81TGdERHJpbCtyc1pY?=
- =?utf-8?B?VjM2VVhoYjRXUldMNzkxK2VNNHk5TFdUdllCc2hoQzdic2tjSjdvaHZNQkx2?=
- =?utf-8?B?NkttMDhXTVR0MmpEUElUN1RLK1hSTm13VTcxcGdnYnBvRituQ3ZpU0pXb044?=
- =?utf-8?B?dDJoZWU0VWh1dmJIKzdhM1NhZEZLQUJwK3NhL2ZsRDBwTHJ3MDJsdkZ3cU9h?=
- =?utf-8?B?NksycFlZRDNpcm12UXR3eGxRSHhWR2Z1cGpNbVRMbHNqT3p4NHJKOEhHUjdu?=
- =?utf-8?B?OWVQdWFyL2NoZ0MxK3hPdlZWMnVTVmlwOHpDMFFLcndIUjlWN28rUFJ0QXYz?=
- =?utf-8?B?ZmxiSklHWUcrTGxNZ1ZDOGFCYW5RbXNlMXZBWFpIQmpUWnI2c0tDUVViSG53?=
- =?utf-8?B?Ui8yMUxvUjY4eUx6QTJ1RWQ2ZDVob3FZa1dxZkM2SlZjV2t2VDhqNHVsR0Z4?=
- =?utf-8?B?TGhGbFRuc25JR3lPbkVTTWhpd3UzZ1Bsakh0NStPbm1qTWh4QjFQOVhwWEJM?=
- =?utf-8?B?QkhDTUM4L0ZjS1RmZndTK0xyMEhjZUZNSFdjMkZwS24zbldNSnBHVkJOV1p0?=
- =?utf-8?B?RC9nS3JhaFZpd2R4SkNrZ1NRWUp1aFpXVjByWjJnV0tZWTBuZ1ErTUhyL2hZ?=
- =?utf-8?B?Z01MaFBFRUZYdkR0TFpueUN0UGxyWkwrKzhxRUFHZW01UlV6WVpKWUFwZU1w?=
- =?utf-8?B?N2lDSk9wWTdxclB3TDFxQUt4S0hHOUEwcHI4SUZURG9EeXZ5a3ppZzhjc2Vh?=
- =?utf-8?B?dm9CWTdPTzZsMXJ3Y1Z0M1N2U2Z3UlorRWJMbVd2U0hJbEl5ZlVXM2xodFFC?=
- =?utf-8?B?UVJLcFlibnYwcDBhWVNnem9QMENJZUVKMnhlcG93alZHdmw2ZnZPdG5FMFYy?=
- =?utf-8?B?NXU3NlNkQUpxVGtRYWJRaFk4elBvaTQwbmptZlB3V1NWL1I4bHFTRm8ra0VB?=
- =?utf-8?B?N3JzU0hwUERFeFUwaGxGU0dJWTNac0RTWXFGMVp4a3BPSngzTGRldDhWK09D?=
- =?utf-8?B?U1lWVHhsR0FEczZXakpmZkJGcXo0SGFscWxqcklLMjBsSnhUNzlpUkM5NjBs?=
- =?utf-8?B?em9lSE0veThiZFpWalpyNmFTbUw4QlVQWjF5V2NOOGtpSU1JV2lPMDZxWTVn?=
- =?utf-8?Q?FXwKLDwSMFBF6Mm+fiKQ?=
+	=?us-ascii?Q?SA5czwzNvszwxRjUHPn0nLeZuLBn9wOwl2/Q3uPEJ4qH3f4dfRFwEmnL7d86?=
+ =?us-ascii?Q?Rf+9JzRXCmivzCweCA0fzPWeRW9/BzvTVAXD6rLDcuiubNca8xTP17GnUrU4?=
+ =?us-ascii?Q?oWWdb6X7cS1jHhl09B3gx7A9e+IcxPoljvzSxMXjz+oiJG3iq/hQEKpbgUmg?=
+ =?us-ascii?Q?rCCYGsW4zOAdk0goljP8Tg5AMkbDlqZu3amG90AzFaZIA8Jxugp2HWL6Bv6z?=
+ =?us-ascii?Q?gyaSNvgNWLBF4FFZFvAbjzJHW4/BIyj4u9pcUxwnVONzZCCFbei0a63yNro/?=
+ =?us-ascii?Q?RtrZ/JaIZZZwcZg8WBkkMp6KgEZgkZtyCYQpjv0+YQb82OslXnBt8vIosT0N?=
+ =?us-ascii?Q?lFWkuQTvVqJ1SG9bwMzcKY3EadkvVs7aUdFYSC1YC4NLVWk8mSQ0jtKDW5Qg?=
+ =?us-ascii?Q?G658k2Zwzjy0zejqAl7shzsdrWbZz13nZjbFCG7whZT7/32Bl5NH/mk/JBD7?=
+ =?us-ascii?Q?vEGDek0OKSh2eRvBYqb+JxFRsCTFkRFYzLgs8wXPESzVZtKQKS/lkeZ+mMwd?=
+ =?us-ascii?Q?SLyiLl/miSxvnF0l1IEY2BnoRuGzBIXA6NffyTWiFiimIKSg1ELeyWry6ShP?=
+ =?us-ascii?Q?yQ+NhLcrAT4XGfOClLbjerAzVCF4FIGLWsD7VtiNslWfliS+Be2dGoGHN2f0?=
+ =?us-ascii?Q?/gHB+lpXaie9prEgdyfEb5nm//8f/ixFfWk7fCbpE7RjKHx0RhS/Hg8nxDq9?=
+ =?us-ascii?Q?oFwHmAqGNEEMJdCIcHaKw5mu4Ipb2HoUI+uLYBoEKnF1VQEg65XxOiMopt/H?=
+ =?us-ascii?Q?0nXq+CxFZ32ZtKKeVA4THIy8CAXTRKwBAEftugtYkYh6cUxR4R2gUCZKhC8d?=
+ =?us-ascii?Q?KRYS1auT6uhJL4955ckVBvC9QfQWQXBXYWawSSia9bg4CQ4bhGD/ri6t1v7R?=
+ =?us-ascii?Q?WIQbgmCRbcyfaXbH8ILTX22OIUF6LiuAIKDM/zPYGOh1wEIAc61w6WTtJH47?=
+ =?us-ascii?Q?zGu9qYAYwDDsTGkXa+1On0vMFrUANwPvYl5fdtc+PgB7Mq4AFTsLhMdZjVAU?=
+ =?us-ascii?Q?5/HWuusdTd21EBtFv7kqQxVPHBIx1C5JXWub+Grw5u0IsO+M/bKgOZU74F8Y?=
+ =?us-ascii?Q?5hC+1hZ2IENERWH0SH4RSnA4SUj+C0Zen/qat4ZaYqqWGmIUYqVjNLbq9vaZ?=
+ =?us-ascii?Q?M0ofXbD4Rvcavb16BhTh8li7FJwXztrJXaSl7FBhjPRYFLoaL5DsC5boi49n?=
+ =?us-ascii?Q?ZSbNleR61vzb+F5fEwqwM12slwqlOhpgwcvR9qdwpgE2G7/tojXyxKMnWrC2?=
+ =?us-ascii?Q?8MhlJlX0mHxn3ESP5ZdE?=
 X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 085daddb-4539-429f-0f58-08dc1a7e50c5
+X-MS-Exchange-CrossTenant-Network-Message-Id: 980c753f-cf0a-4d35-0300-08dc1a7e7d91
 X-MS-Exchange-CrossTenant-AuthSource: TYZPR01MB5556.apcprd01.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jan 2024 12:41:40.7119
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jan 2024 12:42:55.7643
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
@@ -134,41 +130,173 @@ X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
 	00000000-0000-0000-0000-000000000000
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: OSQPR01MB6119
 
-Enable ethernet support for IPQ5018.
-
-Praveenkumar I (1):
-  clk: qcom: support for duplicate freq in RCG2 freq table
-
-Ziyang Huang (7):
-  net: phy: Introduce Qualcomm IPQ5018 internal PHY driver
-  phy: Introduce Qualcomm ethernet uniphy driver
-  net: stmmac: Introduce Qualcomm IPQ50xx DWMAC driver
-  clk: qcom: gcc-ipq5018: correct gcc_gmac0_sys_clk reg
-  net: mdio: ipq4019: support reset control
-  arm64: dts: qcom: ipq5018: enable ethernet support
-  arm64: dts: qcom: ipq5018-rdp432-c2: enable ethernet support
-
- .../arm64/boot/dts/qcom/ipq5018-rdp432-c2.dts |  52 ++
- arch/arm64/boot/dts/qcom/ipq5018.dtsi         | 120 ++++-
- drivers/clk/qcom/clk-rcg2.c                   |  86 ++-
- drivers/clk/qcom/gcc-ipq5018.c                |   2 +-
- drivers/net/ethernet/stmicro/stmmac/Kconfig   |   7 +
- drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
- .../ethernet/stmicro/stmmac/dwmac-ipq50xx.c   | 155 ++++++
- drivers/net/mdio/mdio-ipq4019.c               |  10 +
- drivers/net/phy/Kconfig                       |      +
- drivers/net/phy/Makefile                      |   1 +
- drivers/net/phy/ipq5018-internal.c            | 125 +++++
- drivers/phy/qualcomm/Kconfig                  |   7 +
- drivers/phy/qualcomm/Makefile                 |   2 +
- drivers/phy/qualcomm/phy-qcom-eth-uniphy.c    | 494 ++++++++++++++++++
- include/dt-bindings/phy/qcom-eth-uniphy.h     |  15 +
- 15 files changed, 1057 insertions(+), 25 deletions(-)
- create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-ipq50xx.c
+Signed-off-by: Ziyang Huang <hzyitc@outlook.com>
+---
+ drivers/net/phy/Kconfig            |   5 ++
+ drivers/net/phy/Makefile           |   1 +
+ drivers/net/phy/ipq5018-internal.c | 125 +++++++++++++++++++++++++++++
+ 3 files changed, 131 insertions(+)
  create mode 100644 drivers/net/phy/ipq5018-internal.c
- create mode 100644 drivers/phy/qualcomm/phy-qcom-eth-uniphy.c
- create mode 100644 include/dt-bindings/phy/qcom-eth-uniphy.h
 
+diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
+index 107880d13d21..2d068fea7008 100644
+--- a/drivers/net/phy/Kconfig
++++ b/drivers/net/phy/Kconfig
+@@ -202,6 +202,11 @@ config INTEL_XWAY_PHY
+ 	  PEF 7061, PEF 7071 and PEF 7072 or integrated into the Intel
+ 	  SoCs xRX200, xRX300, xRX330, xRX350 and xRX550.
+ 
++config IPQ5018_INTERNAL_PHY
++	tristate "Qualcomm IPQ5018 internal PHY"
++	help
++	  Supports for the Qualcomm IPQ5018 internal PHY.
++
+ config LSI_ET1011C_PHY
+ 	tristate "LSI ET1011C PHY"
+ 	help
+diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
+index c945ed9bd14b..16d65378ae34 100644
+--- a/drivers/net/phy/Makefile
++++ b/drivers/net/phy/Makefile
+@@ -64,6 +64,7 @@ obj-$(CONFIG_DP83TD510_PHY)	+= dp83td510.o
+ obj-$(CONFIG_FIXED_PHY)		+= fixed_phy.o
+ obj-$(CONFIG_ICPLUS_PHY)	+= icplus.o
+ obj-$(CONFIG_INTEL_XWAY_PHY)	+= intel-xway.o
++obj-$(CONFIG_IPQ5018_INTERNAL_PHY)	+= ipq5018-internal.o
+ obj-$(CONFIG_LSI_ET1011C_PHY)	+= et1011c.o
+ obj-$(CONFIG_LXT_PHY)		+= lxt.o
+ obj-$(CONFIG_MARVELL_10G_PHY)	+= marvell10g.o
+diff --git a/drivers/net/phy/ipq5018-internal.c b/drivers/net/phy/ipq5018-internal.c
+new file mode 100644
+index 000000000000..d1331951b4d8
+--- /dev/null
++++ b/drivers/net/phy/ipq5018-internal.c
+@@ -0,0 +1,125 @@
++#include <linux/bitfield.h>
++#include <linux/clk.h>
++#include <linux/clk-provider.h>
++#include <linux/phy.h>
++#include <linux/reset.h>
++
++#define IPQ5018_PHY_ID			0x004dd0c0
++
++#define TX_RX_CLK_RATE			125000000 /* 125M */
++
++#define IPQ5018_PHY_FIFO_CONTROL	0x19
++#define  IPQ5018_PHY_FIFO_RESET		GENMASK(1, 0)
++
++struct ipq5018_phy {
++	int num_clks;
++	struct clk_bulk_data *clks;
++	struct reset_control *rst;
++
++	struct clk_hw *clk_rx, *clk_tx;
++	struct clk_hw_onecell_data *clk_data;
++};
++
++static int ipq5018_probe(struct phy_device *phydev)
++{
++	struct ipq5018_phy *priv;
++	struct device *dev = &phydev->mdio.dev;
++	char name[64];
++	int ret;
++
++	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
++	if (!priv)
++		return dev_err_probe(dev, -ENOMEM,
++				     "failed to allocate priv\n");
++
++	priv->num_clks = devm_clk_bulk_get_all(dev, &priv->clks);
++	if (priv->num_clks < 0)
++		return dev_err_probe(dev, priv->num_clks,
++				     "failed to acquire clocks\n");
++
++	ret = clk_bulk_prepare_enable(priv->num_clks, priv->clks);
++	if (ret)
++		return dev_err_probe(dev, ret,
++				     "failed to enable clocks\n");
++
++	priv->rst = devm_reset_control_array_get_exclusive(dev);
++	if (IS_ERR_OR_NULL(priv->rst))
++		return dev_err_probe(dev, PTR_ERR(priv->rst),
++				     "failed to acquire reset\n");
++
++	ret = reset_control_reset(priv->rst);
++	if (ret)
++		return dev_err_probe(dev, ret,
++				     "failed to reset\n");
++
++	snprintf(name, sizeof(name), "%s#rx", dev_name(dev));
++	priv->clk_rx = clk_hw_register_fixed_rate(dev, name, NULL, 0,
++						  TX_RX_CLK_RATE);
++	if (IS_ERR_OR_NULL(priv->clk_rx))
++		return dev_err_probe(dev, PTR_ERR(priv->clk_rx),
++				     "failed to register rx clock\n");
++
++	snprintf(name, sizeof(name), "%s#tx", dev_name(dev));
++	priv->clk_tx = clk_hw_register_fixed_rate(dev, name, NULL, 0,
++						  TX_RX_CLK_RATE);
++	if (IS_ERR_OR_NULL(priv->clk_tx))
++		return dev_err_probe(dev, PTR_ERR(priv->clk_tx),
++				     "failed to register tx clock\n");
++
++	priv->clk_data = devm_kzalloc(dev,
++				      struct_size(priv->clk_data, hws, 2),
++				      GFP_KERNEL);
++	if (!priv->clk_data)
++		return dev_err_probe(dev, -ENOMEM,
++				     "failed to allocate clk_data\n");
++
++	priv->clk_data->num = 2;
++	priv->clk_data->hws[0] = priv->clk_rx;
++	priv->clk_data->hws[1] = priv->clk_tx;
++	ret = of_clk_add_hw_provider(dev->of_node, of_clk_hw_onecell_get,
++				     priv->clk_data);
++	if (ret)
++		return dev_err_probe(dev, ret,
++				     "fail to register clock provider\n");
++
++	return 0;
++}
++
++static int ipq5018_soft_reset(struct phy_device *phydev)
++{
++	int ret;
++
++	ret = phy_modify(phydev, IPQ5018_PHY_FIFO_CONTROL,
++			 IPQ5018_PHY_FIFO_RESET, 0);
++	if (ret < 0)
++		return ret;
++
++	msleep(50);
++
++	ret = phy_modify(phydev, IPQ5018_PHY_FIFO_CONTROL,
++			 IPQ5018_PHY_FIFO_RESET, IPQ5018_PHY_FIFO_RESET);
++	if (ret < 0)
++		return ret;
++
++	return 0;
++}
++
++static struct phy_driver ipq5018_internal_phy_driver[] = {
++	{
++		PHY_ID_MATCH_EXACT(IPQ5018_PHY_ID),
++		.name		= "Qualcomm IPQ5018 internal PHY",
++		.flags		= PHY_IS_INTERNAL,
++		.probe		= ipq5018_probe,
++		.soft_reset	= ipq5018_soft_reset,
++	},
++};
++module_phy_driver(ipq5018_internal_phy_driver);
++
++static struct mdio_device_id __maybe_unused ipq5018_internal_phy_ids[] = {
++	{ PHY_ID_MATCH_EXACT(IPQ5018_PHY_ID) },
++	{ }
++};
++MODULE_DEVICE_TABLE(mdio, ipq5018_internal_phy_ids);
++
++MODULE_DESCRIPTION("Qualcomm IPQ5018 internal PHY driver");
++MODULE_AUTHOR("Ziyang Huang <hzyitc@outlook.com>");
 -- 
 2.40.1
 
