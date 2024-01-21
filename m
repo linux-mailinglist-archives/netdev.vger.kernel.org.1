@@ -1,132 +1,130 @@
-Return-Path: <netdev+bounces-64515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA9F88357DF
-	for <lists+netdev@lfdr.de>; Sun, 21 Jan 2024 22:14:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0821D8357FD
+	for <lists+netdev@lfdr.de>; Sun, 21 Jan 2024 22:53:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A2FA2816E5
-	for <lists+netdev@lfdr.de>; Sun, 21 Jan 2024 21:14:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F2B82B211A6
+	for <lists+netdev@lfdr.de>; Sun, 21 Jan 2024 21:53:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF0A7381DC;
-	Sun, 21 Jan 2024 21:14:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0112A3839A;
+	Sun, 21 Jan 2024 21:53:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=pwaller.net header.i=@pwaller.net header.b="rRg8tP81"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2+TO9ZVw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.foo.to (mail.foo.to [144.76.29.196])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13E5F38DD4
-	for <netdev@vger.kernel.org>; Sun, 21 Jan 2024 21:14:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.29.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AA751E49E
+	for <netdev@vger.kernel.org>; Sun, 21 Jan 2024 21:53:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705871680; cv=none; b=R5GGwYtMDIo9WMK/7kIxB4kbqyey/LAP9krzGsovgT77NbMaxto2mjUDCg6jlh2hj0WmpC3ACOrp11HGKmaFHBU80jSenGCuhlj+yikA6i9Y7OGBYexID3t6z++gHtsATGQOdi62RIYitxYkT5WaEwqxlY9B3Mb544yHYU8p+a8=
+	t=1705874003; cv=none; b=gqPL/TrBTb20E/C90RFEnRoAHa1XaZNIj7CeiJPcM1JXQtYhXgcOk9Q/CHpeyTLmwHTYNZCNGPngBky0TDeiLjd7kINDS+6Lj7ubr1YCdQS6TX8DSLG7ct8rHMc4yY/PwudeNOQiXdrpc0h3ghKwVE3c5ZMNH+MMgo17Jd2o7bs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705871680; c=relaxed/simple;
-	bh=kQujN3tNXeutF412+A9QZPM0EE/ovHGgRVWYDcP/hHE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Wqs+uaAES4WOUhd6yJMtO03Yqe73ysjrxoflTNWa3anAAydHV8GtGdORKHKc00j1T30ues1XlTouK+Q/6cgkyaAzTuQTtkcLsGQVBNksEVpQt3IvI+Zz90H3IrUSjuXCNifhYOZ0K7eP2YAtEaEo8gebauGVhiJU02b1w6qrX9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=pwaller.net; spf=pass smtp.mailfrom=pwaller.net; dkim=pass (1024-bit key) header.d=pwaller.net header.i=@pwaller.net header.b=rRg8tP81; arc=none smtp.client-ip=144.76.29.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=pwaller.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pwaller.net
-Message-ID: <e98f7617-b0fe-4d2a-be68-f41fb371ba36@pwaller.net>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=pwaller.net; s=mail;
-	t=1705871110; bh=kQujN3tNXeutF412+A9QZPM0EE/ovHGgRVWYDcP/hHE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=rRg8tP81hhgFnGTEMJJbhwrtTcsU5FfAVyfv21Kphssy9RdcRKCIMlrbQSj1oJbmC
-	 vMh46fGTgYDWDUqLebSETAIOm7tY4s6ChqjzLormYr2Tbd2fkVLqPQbWyurugSFdHB
-	 51Dd5qIpu5qW6k1D/46hEUpKpLyjwAESjAYo3q3o=
-Date: Sun, 21 Jan 2024 21:05:09 +0000
+	s=arc-20240116; t=1705874003; c=relaxed/simple;
+	bh=+MPQBKX2wH1iIcNIu6z07/LM+PD07UATHk2JPtRRNW4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XUuWrIX6WqULqFJkBLO/cOfGdHwGS6FHghlS5jQSJAwStCGjKZp1tzL61NL8jnLmPGg+cSTRbJ1XZzESGO2yREkjUpdfZN2wsGkDbLS9yfXdOJdOllw36mogyzlnRrSQ6OI+WLrCxkrVw2AdKJQnr2BWQAzB3unCjFu2Wr8EXhU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2+TO9ZVw; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=SGgv4/xisAPYhJzOAV7QLIeOR29GRroUN5tKGW/32mM=; b=2+TO9ZVwmlJA0FmApg/e58MZCL
+	oiiUWGdLe62XiAj8wQfEN/JvkTsaSbWoxnRXaUvngH7t8GxZFoFjE2xLfob/gMRmegzSkp+G2oHu1
+	KCSEqvetxd28kIPr4t4sr1ea7X/9YPjSIi9Kk8Nife7Ji9tEItGMXP7n7tivDUULq22Q=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rRfkO-005fmn-5p; Sun, 21 Jan 2024 22:52:56 +0100
+Date: Sun, 21 Jan 2024 22:52:56 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Marc Haber <mh+netdev@zugschlus.de>
+Cc: alexandre.torgue@foss.st.com, Jose Abreu <joabreu@synopsys.com>,
+	Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
+	Jisheng Zhang <jszhang@kernel.org>, netdev@vger.kernel.org
+Subject: Re: stmmac on Banana PI CPU stalls since Linux 6.6
+Message-ID: <8efb36c2-a696-4de7-b3d7-2238d4ab5ebb@lunn.ch>
+References: <Za173PhviYg-1qIn@torres.zugschlus.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [EXT] Aquantia ethernet driver suspend/resume issues
-Content-Language: en-US
-To: Igor Russkikh <irusskikh@marvell.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Netdev <netdev@vger.kernel.org>
-References: <CAHk-=wiZZi7FcvqVSUirHBjx0bBUZ4dFrMDVLc3+3HCrtq0rBA@mail.gmail.com>
- <cf6e78b6-e4e2-faab-f8c6-19dc462b1d74@marvell.com>
- <20231127145945.0d8120fb@kernel.org>
- <9852ab3e-52ce-d55a-8227-c22f6294c61a@marvell.com>
- <20231128130951.577af80b@kernel.org>
- <262161b7-9ba9-a68c-845e-2373f58293be@marvell.com>
-From: Peter Waller <p@pwaller.net>
-In-Reply-To: <262161b7-9ba9-a68c-845e-2373f58293be@marvell.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Za173PhviYg-1qIn@torres.zugschlus.de>
 
-I see a fix for double free [0] landed in 6.7; I've been running that 
-for a few days and have hit a resume from suspend issue twice. Stack 
-trace looks a little different (via __iommu_dma_map instead of 
-__iommu_dma_free), provided below.
+On Sun, Jan 21, 2024 at 09:17:32PM +0100, Marc Haber wrote:
+> Hi,
+> 
+> I am running a bunch of Banana Pis with Debian stable and unstable but
+> with a bleeding edge kernel. Since kernel 6.6, especially the test
+> system running Debian unstable is plagued by self-detected stalls on
+> CPU. The system seems to continue running normally locally but doesn't
+> answer on the network any more. Sometimes, after a few hours, things
+> heal themselves.
+> 
+> Here is an example log output:
+> [73929.363030] rcu: INFO: rcu_sched self-detected stall on CPU
+> [73929.368653] rcu:     1-....: (5249 ticks this GP) idle=d15c/1/0x40000002 softirq=471343/471343 fqs=2625
+> [73929.377796] rcu:     (t=5250 jiffies g=851349 q=113 ncpus=2)
+> [73929.383205] CPU: 1 PID: 14512 Comm: atop Tainted: G             L     6.6.0-zgbpi-armmp-lpae+ #1
+> [73929.383222] Hardware name: Allwinner sun7i (A20) Family
+> [73929.383233] PC is at stmmac_get_stats64+0x64/0x20c [stmmac]
+> [73929.383363] LR is at dev_get_stats+0x44/0x144
+> [73929.383389] pc : [<bf126db0>]    lr : [<c09525e8>]    psr: 200f0013
+> [73929.383401] sp : f0c59c78  ip : f0c59df8  fp : c2bb8000
+> [73929.383412] r10: 00800001  r9 : c3443dd8  r8 : 00000143
+> [73929.383423] r7 : 00000001  r6 : 00000000  r5 : c2bbb000  r4 : 00000001
+> [73929.383434] r3 : 0004c891  r2 : c2bbae48  r1 : f0c59d30  r0 : c2bb8000
+> [73929.383447] Flags: nzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment none
+> [73929.383463] Control: 30c5387d  Table: 49b553c0  DAC: a7f66f60
+> [73929.383486]  stmmac_get_stats64 [stmmac] from dev_get_stats+0x44/0x144
 
-I've had resume issues with the atlantic driver since I've had this 
-hardware, but it went away for a while and seems as though it may have 
-come back with 6.7. (No crashes since logs begin on Dec 15 till Jan 12, 
-Upgrade to 6.7; crashes 20th and 21st, though my usage style of the 
-system has also varied, maybe crashes are associated with higher memory 
-usage?).
+Hi Marc
 
-Possibly unrelated but I also see fairly frequent (1 to ten times per 
-boot, since logs begin?) messages in my logs of the form "atlantic 
-0000:0c:00.0: AMD-Vi: Event logged [IO_PAGE_FAULT domain=0x0014 
-address=0xffce8000 flags=0x0020]".
+https://elixir.bootlin.com/linux/v6.7.1/source/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c#L6949
 
-[0] 
-https://github.com/torvalds/linux/commit/7bb26ea74aa86fdf894b7dbd8c5712c5b4187da7
+My _guess_ would be, its stuck in one of the loops which look like:
 
-- Peter
+		do {
+			start = u64_stats_fetch_begin(&txq_stats->syncp);
+			tx_packets = txq_stats->tx_packets;
+			tx_bytes   = txq_stats->tx_bytes;
+		} while (u64_stats_fetch_retry(&txq_stats->syncp, start));
 
-kworker/u65:2: page allocation failure: order:6, 
-mode:0x40d00(GFP_NOIO|__GFP_COMP|__GFP_ZERO), 
-nodemask=(null),cpuset=/,mems_allowed=0
-CPU: 18 PID: 166017 Comm: kworker/u65:2 Not tainted 6.7.0
-Hardware name: ASUS System Product [...] BIOS 1502 06/08/2023
-Workqueue: events_unbound async_run_entry_fn
-Call Trace:
-  <TASK>
-  dump_stack_lvl+0x47/0x60
-  warn_alloc+0x165/0x1e0
-  ? srso_alias_return_thunk+0x5/0xfbef5
-  ? __alloc_pages_direct_compact+0xb3/0x290
-  __alloc_pages+0x109e/0x1130
-  ? iommu_dma_alloc_iova+0xd4/0x120
-  ? srso_alias_return_thunk+0x5/0xfbef5
-  ? __iommu_dma_map+0x84/0xf0
-  ? aq_ring_alloc+0x22/0x80 [atlantic]
-  __kmalloc_large_node+0x77/0x130
-  __kmalloc+0xc6/0x150
-  aq_ring_alloc+0x22/0x80 [atlantic]
-  aq_vec_ring_alloc+0xee/0x1a0 [atlantic]
-  aq_nic_init+0x118/0x1d0 [atlantic]
-  atl_resume_common+0x40/0xd0 [atlantic]
+Next time you get a backtrace, could you do:
 
+make drivers/net/ethernet/stmicro/stmmac/stmmac_main.lst. You can then
+use whatever it is reporting for:
 
-On 30/11/2023 12:59, Igor Russkikh wrote:
->
-> On 11/28/2023 10:09 PM, Jakub Kicinski wrote:
->> For Rx under load larger rings are sometimes useful to avoid drops.
->> But your Tx rings are larger than Rx, which is a bit odd.
-> Agree. Just looked into the history, and it looks like this size was chosen
-> since the very first commit of this driver.
->
->> I was going to say that with BQL enabled you're very unlikely to ever
->> use much of the 4k Tx ring, anyway. But you don't have BQL support :S
->>
->> My free advice is to recheck you really need these sizes and implement
->> BQL :)
-> Thanks for the hint, will consider this.
->
-> Regards
->    Igor
+PC is at stmmac_get_stats64+0x64/0x20c [stmmac]
 
+to find where it is in the listing.
 
+Once we know if its the RX or the TX loop, we have a better idea where
+to look for an unbalanced u64_stats_update_begin() /
+u64_stats_update_end().
+
+> I am running a bisect attempt since before christmas, but since it takes
+> up to a day for the issue to show themselves on a "bad" kernel, I'll let
+> "good" kernels run for four days until I declare them good. That takes a
+> lot of wall clock (or better, wall calendar) time.
+
+You might be able to speed it up with:
+
+while true ; do cat /proc/net/dev > /dev/null ; done
+
+and iperf or similar to generate a lot of traffic.
+
+    Andrew
 
