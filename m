@@ -1,129 +1,91 @@
-Return-Path: <netdev+bounces-64500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A96B88356C7
-	for <lists+netdev@lfdr.de>; Sun, 21 Jan 2024 17:58:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED79F835718
+	for <lists+netdev@lfdr.de>; Sun, 21 Jan 2024 18:30:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6382B281A49
-	for <lists+netdev@lfdr.de>; Sun, 21 Jan 2024 16:58:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 817961F21722
+	for <lists+netdev@lfdr.de>; Sun, 21 Jan 2024 17:30:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E793374FA;
-	Sun, 21 Jan 2024 16:58:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E9B8381B9;
+	Sun, 21 Jan 2024 17:30:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Kznw0K80"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dZ9AP3vN"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E336376F2;
-	Sun, 21 Jan 2024 16:58:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF680381B7
+	for <netdev@vger.kernel.org>; Sun, 21 Jan 2024 17:30:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705856284; cv=none; b=EOkWpCsALGkEmss9FHsfEOKCX1eyCP4Z/jfjz0DFo7Kcn5E6bkBgKVdnD3nluX3e6xlWmaX+LvFw6T6Ovs+3okefOKm56Igwn/lkVwoeCiduXdCkuBe/kI2rTlYzErKyMajhyvRjHzB4g83LkDJdBlfyGv5oG4nC12lb+/P9Bk0=
+	t=1705858226; cv=none; b=BexHgSDBOuBjjOFpMVi+8hHcs5RlVTr8EzAZGEb5rgOLzc1/xw/AuqqtBgAgB2iwZ5ZVKcN6a+pfwh8hHVlKMwzKqI4W9dNW1YWFnjCsV9F+robAjd/ZzfGgv9cAae3OKApry+FlwsrfFVnJYjneO9pQmoa6jvzOphMpPeEGEqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705856284; c=relaxed/simple;
-	bh=ezyFbPn9T9HFOQqzU8/hFiYwVitfPmXG4/Dm9KACBKg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D03T21PP0gn6KU8ZZ3oQdYyMmm51mzFOhYGvkI/vU/PE/EsjA6pczB5AFAUctGgbn3kqqaLwRW15xrUUchDVe8QH2g2PVguwigfNy8w++f3RYzaBl/QzLepdEg0sB37gRn6OjK/whxjgdsziL4+gefY7YJIxIx8naaBGHJ5ikwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Kznw0K80; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=c37txM5AQBeipFKlwo48dwCVCZGCUaCC40m8RvSfo3M=; b=Kz
-	nw0K80g2wZux006JZCCdff6hpb+mbikxpe0BJ47nr3Ub3l4+FNQjrjZ9Qkq9xxLa+bv07C+l6P7YM
-	1H1mAl5X/KyV+M3X6Iscfv7nk3jyRleaH3PLEYzZTGp3Lu4KdnYrefSdKidAP2dIjfLJfgZxPd8B4
-	3FWUkaTEl6k5q2Q=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rRb8q-005f8u-VZ; Sun, 21 Jan 2024 17:57:52 +0100
-Date: Sun, 21 Jan 2024 17:57:52 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Ziyang Huang <hzyitc@outlook.com>
-Cc: mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
-	richardcochran@gmail.com, p.zabel@pengutronix.de,
-	matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-	linux-mediatek@lists.infradead.org,
-	Praveenkumar I <ipkumar@codeaurora.org>,
-	Abhishek Sahu <absahu@codeaurora.org>
-Subject: Re: [PATCH 5/8] clk: qcom: support for duplicate freq in RCG2 freq
- table
-Message-ID: <28cca132-d5bb-4cff-ba2f-9be241a5ce83@lunn.ch>
-References: <TYZPR01MB55563BD6A2B78402E4BB44D4C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
- <TYZPR01MB5556DEA3D4740441EC561414C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
+	s=arc-20240116; t=1705858226; c=relaxed/simple;
+	bh=grWm4aTLJWC2xD/oHwnk6GfD6cYc+Ps0rhJnwnVhlGs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=MDJCuhpRdnZC4UcMcjerhyLYbiK/PPgOJzP87tUQ7SwxrjB1GTW2d31MqwcebGTUirYEdh3IhgFEllU/sfnxL1tclt1imoMeW8NK4FZIC9oNlv+VJXoWSYoWjKSUAeMx4Mc2cTTl+mXnmSV8P+e1lwsunIbSiAA6ZlRxmA3f4VQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dZ9AP3vN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 73671C433C7;
+	Sun, 21 Jan 2024 17:30:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705858225;
+	bh=grWm4aTLJWC2xD/oHwnk6GfD6cYc+Ps0rhJnwnVhlGs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=dZ9AP3vNnmo1qI3isjGyEymS3PMf0BEJG/WRxlns+0y/vzGwxp5A700qHBfVp34pM
+	 uOM/tvdyZbc7AvRLz16iz7Qhywci2FXoREvn8cVm54BSRwXOHk8qSjAr+/NHa4VxA2
+	 hGFS3M6TV2yWWlf+60ICFyNJHy1Hu5qcuZSuCOAr5SEZ1uvshokOy4p7ZbCyHZwsdx
+	 NgozjM8/XfQH9KTd+vRGfY5x7CIorJ9e1RzrFdV07+eZNIK5Dj5oOjDtggITrAnjgy
+	 TvbsGmt7hljyLTL3miH+/2yblO2+CwlXeqCX4QvthDiuED2oGT2sp65byvy+H3NyS2
+	 N0EykNlAA/jZA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5F712D8C978;
+	Sun, 21 Jan 2024 17:30:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <TYZPR01MB5556DEA3D4740441EC561414C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
+Subject: Re: [PATCH iproute2] tc: unify clockid handling
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170585822538.21563.5730055248074683668.git-patchwork-notify@kernel.org>
+Date: Sun, 21 Jan 2024 17:30:25 +0000
+References: <20240119164019.63584-2-stephen@networkplumber.org>
+In-Reply-To: <20240119164019.63584-2-stephen@networkplumber.org>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org
 
-On Sun, Jan 21, 2024 at 08:42:34PM +0800, Ziyang Huang wrote:
-> From: Praveenkumar I <ipkumar@codeaurora.org>
-> 
-> Currently RCG code looks up the frequency table during set
-> rate and return the first available frequency greater than
-> requested rate. If CLK_SET_RATE_PARENT flag is set then the
-> set_rate request will go to its parent otherwise the clock
-> framework will configure pre-div, m and n according to the
-> returned frequency table entry. In this case, it is assuming
-> that parent clock will run in the same frequency with which
-> pre-div, m and n has been derived. But it may be possible
-> that the parent clock supports multiple frequency and the
-> same frequency can be derived with different pre-div, m and
-> n values depending upon current frequency.  Also, the same
-> frequency can be derived from different parent sources and
-> currently there is no option for having duplicate
-> frequencies in frequency table and choosing the best one
-> according to current rate.
-> 
-> Now this patch adds the support for having duplicate
-> frequencies in frequency table. During set rate, it will
-> compare the actual rate for each entry with requested rate
-> and will select the best entry in which the difference will
-> be less.
-> 
-> The existing functionality won’t be affected with this code
-> change since this code change will hit only if frequency
-> table has duplicate values.
+Hello:
 
-A good commit message for a change!
+This patch was applied to iproute2/iproute2.git (main)
+by Stephen Hemminger <stephen@networkplumber.org>:
 
+On Fri, 19 Jan 2024 08:40:20 -0800 you wrote:
+> There are three places in tc which all have same code for
+> handling clockid (copy/paste). Move it into tc_util.c.
 > 
-> Change-Id: I97d9e1b55d8f3ee095f6f01729af527ba90e50e5
-> Signed-off-by: Abhishek Sahu <absahu@codeaurora.org>
-> (cherry picked from commit 775e7d3b69ffc97afb5bd5a6c9c423f2f4d8a0b2)
-> Signed-off-by: Praveenkumar I <ipkumar@codeaurora.org>
+> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+> ---
+> Motivated by (rejected) pull request to deal with missing
+> clockid's on really old versions of glibc.
 > 
-> Change-Id: If10193fc79a3c1375ab73597813745ff1f4df0ad
-> 
-> Pick from https://git.codelinaro.org/clo/qsdk/oss/kernel/linux-ipq-5.4/-/commit/6dfb368bae130bee58e00ddf8330b55066e1c8c5
-> 
-> Signed-off-by: Ziyang Huang <hzyitc@outlook.com>
+> [...]
 
-Please clean up these tags. These Change-ID tags are meaningless in
-mainline. 775e7d3b69ffc97afb5bd5a6c9c423f2f4d8a0b2 is not in mainline
-either. The picked from might be interesting, but please put it into
-the body of the commit message, not mixed in with the tags.
+Here is the summary with links:
+  - [iproute2] tc: unify clockid handling
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=91cca2aee76b
 
-Who actually wrote this patch? The first Signed-off-by: is from
-Abhishek Sahu. But you have a From of Praveenkumar I ?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-    Andrew
 
----
-pw-bot: cr
 
