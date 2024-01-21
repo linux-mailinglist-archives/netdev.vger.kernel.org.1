@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-64502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F17D83573C
-	for <lists+netdev@lfdr.de>; Sun, 21 Jan 2024 19:21:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3271E83573D
+	for <lists+netdev@lfdr.de>; Sun, 21 Jan 2024 19:21:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 015891F21504
-	for <lists+netdev@lfdr.de>; Sun, 21 Jan 2024 18:21:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0B24281C24
+	for <lists+netdev@lfdr.de>; Sun, 21 Jan 2024 18:21:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C99D381DA;
-	Sun, 21 Jan 2024 18:21:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBCF13838B;
+	Sun, 21 Jan 2024 18:21:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sJKi79lp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RwbO0iKh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5920B38380
-	for <netdev@vger.kernel.org>; Sun, 21 Jan 2024 18:21:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8B9238380
+	for <netdev@vger.kernel.org>; Sun, 21 Jan 2024 18:21:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705861281; cv=none; b=OFH1E814SX//bovu1RBQVTd7sYII4MTude5XqHGIdYWuvi4eGblbEd/dB7F4l4F82Y6qexQfv26HDXAvXKIuUFZ7+RqxTCHF0TGglgbnctQfQXxYNOSM7jv/CaajlvTcfgMf1tp50qDtuyRdh51oU6FmIIGlDMnV44POirGP5Nc=
+	t=1705861283; cv=none; b=oyrMzos6h1aa6JjzQbwxNtRfN6g46JGvBGQdhbxEpdJk72JYqySM4als8re1rSnYrde8fFM5CVlKntB9TTe+FMtw/Qxn2cszQNIzUNZA3ppGtAg/oO/3JwsDa3/5QO+wuyoRXxw3/jDH/ptffrQ5qBPSy2sf5fIaHmXdCOGf9iA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705861281; c=relaxed/simple;
-	bh=CZJeid/ERACScUJhcXusaeijXLmvi6Ui+EZmAiq1T3E=;
+	s=arc-20240116; t=1705861283; c=relaxed/simple;
+	bh=pMjLSdDvZNyvUwDM5dr+/k9ky+gpYkg2n+u1mNpEqVI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=AWuaEwS05FaPmT+hJ9NCGsnX/VveyxDVF5IC6RRQKN7q4rB2xa0QW68TA3hQP0rQ7sSfmuMxSx9jT5QO5OD07p1ST858eoI3sBLl039W4JtjrQ8uhvC6WVrK8G0ZBL2X3PhspXk7YX57+hcIE35gXHH0TAOn3WDhMTxuTioGuOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sJKi79lp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DF5FFC433F1;
-	Sun, 21 Jan 2024 18:21:20 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=rPGTKOIkTTqiHGEjebsgA7mloUcJDTViKIZSP4hIJV8U5ULgmHIYOtfhMZkqs7oRlnUwJt4KEsWPOaJs5k5Cr6S/EgLdS1LKt1rYnomywv+tgOyCPZyDUIi2Wr4Z+5qKtgA2HFZxoDXOHx+uygPuvVH2loPcFPeufJB9b0aGrM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RwbO0iKh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4092EC433F1;
+	Sun, 21 Jan 2024 18:21:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705861280;
-	bh=CZJeid/ERACScUJhcXusaeijXLmvi6Ui+EZmAiq1T3E=;
+	s=k20201202; t=1705861283;
+	bh=pMjLSdDvZNyvUwDM5dr+/k9ky+gpYkg2n+u1mNpEqVI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=sJKi79lpHtUouniL+DY4ofzUlus3HqLffxNBZ2Kif2WUL3npOlCZSHn5B8qe0R2hB
-	 sqeXFrB/Oodlq+ABQPZfjCjXWWJ30xvS1XB3gTK1fpAlQGefAy0jfER7Dae/KXAirM
-	 aiZOzP9cWSZrPwYKdH/HVolpF0FjNB7ti91rKM8rz37+VM/tGz44ph4Z1IHxO1RybL
-	 VQiYt8Q+c44phgC0K8Cmdyj0U65yPzJHqOPHY70Eo1nCuQ4FLu5ksMIEo1TOzDzD2B
-	 A12Xst1qsBVe+WPl/ebYIrSnXld2P6eDSnGl556Vu/B6TrEfSv8irbVHkkHLkT2/Nr
-	 cyMewP94k/Knw==
+	b=RwbO0iKhyHW8lMiJSNEHidMfMpJax+5THX5OeP721g5YRwFTfCFDTKL6RETn9NYUr
+	 BKS3lcXfGVLYzeedlDAoVks3tVEVtQycltd5K19VC9kNzsfUP6FpoKZGLsJST9SXL3
+	 ySjJ/NbmRfCe4NIEKEOY+NQHf+nC1Vd5513TPbUwquK7Lb7LldfIuGt6OSq3ZWIM0F
+	 grUkH1UEYz6gU/+BbDm38Kk33ihXVEQcUVA5ipuEDciOfXcXbyCbqN2ydMSRclV1M/
+	 wXUi1TzaDs+CEnnftaGANSixLnEAR4H8jpPmB6U6Qb4Swwq7diaI/Lzi6whB8+dvz3
+	 OhAkJLvUdTDTQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CC036D8C970;
-	Sun, 21 Jan 2024 18:21:20 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2F804D8C978;
+	Sun, 21 Jan 2024 18:21:23 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 net] udp: fix busy polling
+Subject: Re: [PATCH net] idpf: distinguish vports by the dev_port attribute
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170586128083.13193.4887848149587793890.git-patchwork-notify@kernel.org>
-Date: Sun, 21 Jan 2024 18:21:20 +0000
-References: <20240118201749.4148681-1-edumazet@google.com>
-In-Reply-To: <20240118201749.4148681-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- dsahern@kernel.org, netdev@vger.kernel.org, eric.dumazet@gmail.com,
- willemb@google.com
+ <170586128319.13193.14696779543743835984.git-patchwork-notify@kernel.org>
+Date: Sun, 21 Jan 2024 18:21:23 +0000
+References: <20240118205040.346632-1-mschmidt@redhat.com>
+In-Reply-To: <20240118205040.346632-1-mschmidt@redhat.com>
+To: Michal Schmidt <mschmidt@redhat.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com, alan.brady@intel.com,
+ pavan.kumar.linga@intel.com, sridhar.samudrala@intel.com,
+ shailendra.bhatnagar@intel.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Thu, 18 Jan 2024 20:17:49 +0000 you wrote:
-> Generic sk_busy_loop_end() only looks at sk->sk_receive_queue
-> for presence of packets.
+On Thu, 18 Jan 2024 21:50:40 +0100 you wrote:
+> idpf registers multiple netdevs (virtual ports) for one PCI function,
+> but it does not provide a way for userspace to distinguish them with
+> sysfs attributes. Per Documentation/ABI/testing/sysfs-class-net, it is
+> a bug not to set dev_port for independent ports on the same PCI bus,
+> device and function.
 > 
-> Problem is that for UDP sockets after blamed commit, some packets
-> could be present in another queue: udp_sk(sk)->reader_queue
-> 
-> In some cases, a busy poller could spin until timeout expiration,
-> even if some packets are available in udp_sk(sk)->reader_queue.
+> Without dev_port set, systemd-udevd's default naming policy attempts
+> to assign the same name ("ens2f0") to all four idpf netdevs on my test
+> system and obviously fails, leaving three of them with the initial
+> eth<N> name.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3,net] udp: fix busy polling
-    https://git.kernel.org/netdev/net/c/a54d51fb2dfb
+  - [net] idpf: distinguish vports by the dev_port attribute
+    https://git.kernel.org/netdev/net/c/359724fa3ab7
 
 You are awesome, thank you!
 -- 
