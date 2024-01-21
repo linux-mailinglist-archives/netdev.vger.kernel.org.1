@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-64495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 248AF835683
-	for <lists+netdev@lfdr.de>; Sun, 21 Jan 2024 16:51:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF34783569C
+	for <lists+netdev@lfdr.de>; Sun, 21 Jan 2024 17:19:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5E4C1F21259
-	for <lists+netdev@lfdr.de>; Sun, 21 Jan 2024 15:51:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 726FCB20C88
+	for <lists+netdev@lfdr.de>; Sun, 21 Jan 2024 16:19:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3611A376F1;
-	Sun, 21 Jan 2024 15:51:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F05863770F;
+	Sun, 21 Jan 2024 16:19:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="gFfv8cCn"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="s8bZff+l"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5E3376EC;
-	Sun, 21 Jan 2024 15:51:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFBCA3770B;
+	Sun, 21 Jan 2024 16:19:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705852295; cv=none; b=Bqz9BXFRux2vqwDagXf6Vd64h+Oe4RL+/6YnRBAa+unXQ4/xK19Bzj+FwQqpOIoUcrLaSBN8tAcLbh6QVnKuWesq6DaspzzBbZ0v9X2Tdfo1l1z59GNjcg52Blr8MYoH/wxSiIZ2/MXIEaPDGCIVOWZWRFFUtsU1cmLjqjNDPxc=
+	t=1705853964; cv=none; b=TJ1MoarUDttVmB/l8Qir8a8NYnSIFpgOFEzvoGCCwZYZwBP1mH3Ta1dCrMTTcfIxhBqZcHZ8MFKcu5ConNnQK5oCNgHPx6gSwTk1CFRcnnpneOOwdUFFqER6/uGhJvr52r+YLY9+XRmaiVgV3aleUgOT7EfIM3HKbIwtVChRtJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705852295; c=relaxed/simple;
-	bh=LAFeba5psxn3wn60mOlpmb9xX3T5/Rf8R+4XFCVlniI=;
+	s=arc-20240116; t=1705853964; c=relaxed/simple;
+	bh=9RKNz8nLW9GGTiNspXerKEJTQVP110rltOMLVQCPHZA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U49QJMAD4QvsxxT9lDYDlSG/huWYuU2jFuwyJpxjf1IQt+UX4Bx+8UBRSaMn9SzomyDJiiv/AlRqT+kSkZUW1b8+HreyHAQZl52UdVzSOtm0fQh85Cw2xcii861uJXiq5ZXuDIIfNG2l9bDsRjQb4CvA+qxc7zrybR0ocXVF2xw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=gFfv8cCn; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=MmHWhFo7HBEVDrAkNsEtlYxz7DT2EinZOuICmAn+XhcojI33ceCLZ3F+CMXXFehWMgYOMUDpG6XnLxF0xOJ5npROPhIyOBAS6H71JqW3Uwn70CWRCZ81I5WAHukZ3Ktt+RQ2yAQGZIXtWZtAOtIEv44GrHq57ZxiER55RWhXg5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=s8bZff+l; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=oQG4nHZXopQxzqSol4cwnGcgn3VgAtdNUYmrjVuxWfE=; b=gFfv8cCnZ6CMIr6F5ugXpN8Clw
-	zx9Qh7kD7jkeJFfdlJu0flHDEqrqHw661qdrZdDEK8QVSgfledgmDer/kSHHQWJ6Wb8T64SWFje4+
-	hPvZMBJX69a1i+oMghbrSt8Rgnscl9OrTbOkttD81MvVx4ia4cErLy60BqIFWF316Ats=;
+	bh=qn4t+vas77bkDv8g3HdYzBVs/Lcv/nz47gDWrhkMoW0=; b=s8bZff+lnIy0w1E7iRjMwp/D5N
+	CviH96SZl4ruDUwl3yMGZnF+huZmenyU48MCOt6rZmO2g1ZK1RZTN1cmW9QI+0iS7pbwn1FX/1lnd
+	ywqOGEuwfb4Cj4Ue1dmv6ay3qiSExwDJq71IHBlCankDuAWJXiykbIHYoN4XtMtnOT6E=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rRa6Q-005exL-RX; Sun, 21 Jan 2024 16:51:18 +0100
-Date: Sun, 21 Jan 2024 16:51:18 +0100
+	id 1rRaXS-005f13-Ik; Sun, 21 Jan 2024 17:19:14 +0100
+Date: Sun, 21 Jan 2024 17:19:14 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: Ziyang Huang <hzyitc@outlook.com>
 Cc: mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
@@ -52,9 +52,11 @@ Cc: mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
 	linux-stm32@st-md-mailman.stormreply.com,
 	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
 	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH 0/8] ipq5018: enable ethernet support
-Message-ID: <830a2717-c7f5-4bec-83b2-be14ba59337d@lunn.ch>
+Subject: Re: [PATCH 1/8] net: phy: Introduce Qualcomm IPQ5018 internal PHY
+ driver
+Message-ID: <2c6c0d72-5d4e-4ec4-beb6-d30852108a67@lunn.ch>
 References: <TYZPR01MB55563BD6A2B78402E4BB44D4C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
+ <TYZPR01MB5556D5568546D6DA4313209EC9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,27 +65,106 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <TYZPR01MB55563BD6A2B78402E4BB44D4C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
+In-Reply-To: <TYZPR01MB5556D5568546D6DA4313209EC9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
 
-On Sun, Jan 21, 2024 at 08:40:39PM +0800, Ziyang Huang wrote:
-> Enable ethernet support for IPQ5018.
-> 
-> Praveenkumar I (1):
->   clk: qcom: support for duplicate freq in RCG2 freq table
-> 
-> Ziyang Huang (7):
->   net: phy: Introduce Qualcomm IPQ5018 internal PHY driver
->   phy: Introduce Qualcomm ethernet uniphy driver
->   net: stmmac: Introduce Qualcomm IPQ50xx DWMAC driver
->   clk: qcom: gcc-ipq5018: correct gcc_gmac0_sys_clk reg
->   net: mdio: ipq4019: support reset control
->   arm64: dts: qcom: ipq5018: enable ethernet support
->   arm64: dts: qcom: ipq5018-rdp432-c2: enable ethernet support
+On Sun, Jan 21, 2024 at 08:42:30PM +0800, Ziyang Huang wrote:
+> Signed-off-by: Ziyang Huang <hzyitc@outlook.com>
 
-Hi Ziyang
+You need to say something in the commit message. One obvious thing is
+to justify not using the at803x driver, since 
 
-You failed to Cc: a number of Maintainers here. e.g for the PHY and
-MDIO patches i would of expected the PHY and maintainers to be Cc:ed.
+> +#define IPQ5018_PHY_ID			0x004dd0c0
 
-     Andrew
+is in the Atheros OUI range.
+
+> +static int ipq5018_probe(struct phy_device *phydev)
+> +{
+> +	struct ipq5018_phy *priv;
+> +	struct device *dev = &phydev->mdio.dev;
+> +	char name[64];
+> +	int ret;
+
+I guess you are new to mainline network. Please read:
+
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+
+Section 1.6.4.
+
+> +
+> +	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
+> +	if (!priv)
+> +		return dev_err_probe(dev, -ENOMEM,
+> +				     "failed to allocate priv\n");
+
+Please read the documentation of dev_err_probe() and this fix the
+obvious problem with this.
+
+> +	snprintf(name, sizeof(name), "%s#rx", dev_name(dev));
+> +	priv->clk_rx = clk_hw_register_fixed_rate(dev, name, NULL, 0,
+> +						  TX_RX_CLK_RATE);
+> +	if (IS_ERR_OR_NULL(priv->clk_rx))
+> +		return dev_err_probe(dev, PTR_ERR(priv->clk_rx),
+> +				     "failed to register rx clock\n");
+> +
+> +	snprintf(name, sizeof(name), "%s#tx", dev_name(dev));
+> +	priv->clk_tx = clk_hw_register_fixed_rate(dev, name, NULL, 0,
+> +						  TX_RX_CLK_RATE);
+> +	if (IS_ERR_OR_NULL(priv->clk_tx))
+> +		return dev_err_probe(dev, PTR_ERR(priv->clk_tx),
+> +				     "failed to register tx clock\n");
+> +
+> +	priv->clk_data = devm_kzalloc(dev,
+> +				      struct_size(priv->clk_data, hws, 2),
+> +				      GFP_KERNEL);
+> +	if (!priv->clk_data)
+> +		return dev_err_probe(dev, -ENOMEM,
+> +				     "failed to allocate clk_data\n");
+> +
+> +	priv->clk_data->num = 2;
+> +	priv->clk_data->hws[0] = priv->clk_rx;
+> +	priv->clk_data->hws[1] = priv->clk_tx;
+> +	ret = of_clk_add_hw_provider(dev->of_node, of_clk_hw_onecell_get,
+> +				     priv->clk_data);
+> +	if (ret)
+> +		return dev_err_probe(dev, ret,
+> +				     "fail to register clock provider\n");
+
+This needs an explanation. Why register two fixed clocks, which you
+never use? Why not put these two clocks in DT?
+
+> +
+> +	return 0;
+> +}
+> +
+> +static int ipq5018_soft_reset(struct phy_device *phydev)
+> +{
+> +	int ret;
+> +
+> +	ret = phy_modify(phydev, IPQ5018_PHY_FIFO_CONTROL,
+> +			 IPQ5018_PHY_FIFO_RESET, 0);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	msleep(50);
+> +
+> +	ret = phy_modify(phydev, IPQ5018_PHY_FIFO_CONTROL,
+> +			 IPQ5018_PHY_FIFO_RESET, IPQ5018_PHY_FIFO_RESET);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	return 0;
+> +}
+
+This needs an explanation. It is also somewhat like
+qca808x_link_change_notify(). Is it really sufficient to only do this
+reset FIFO during a soft reset, or is it needed when ever the link
+changes?
+
+You also appear to be missing device tree bindings.
+
+    Andrew
+
+---
+pw-bot: cr
+
 
