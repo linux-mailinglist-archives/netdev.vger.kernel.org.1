@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-64501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED79F835718
-	for <lists+netdev@lfdr.de>; Sun, 21 Jan 2024 18:30:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F17D83573C
+	for <lists+netdev@lfdr.de>; Sun, 21 Jan 2024 19:21:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 817961F21722
-	for <lists+netdev@lfdr.de>; Sun, 21 Jan 2024 17:30:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 015891F21504
+	for <lists+netdev@lfdr.de>; Sun, 21 Jan 2024 18:21:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E9B8381B9;
-	Sun, 21 Jan 2024 17:30:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C99D381DA;
+	Sun, 21 Jan 2024 18:21:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dZ9AP3vN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sJKi79lp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF680381B7
-	for <netdev@vger.kernel.org>; Sun, 21 Jan 2024 17:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5920B38380
+	for <netdev@vger.kernel.org>; Sun, 21 Jan 2024 18:21:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705858226; cv=none; b=BexHgSDBOuBjjOFpMVi+8hHcs5RlVTr8EzAZGEb5rgOLzc1/xw/AuqqtBgAgB2iwZ5ZVKcN6a+pfwh8hHVlKMwzKqI4W9dNW1YWFnjCsV9F+robAjd/ZzfGgv9cAae3OKApry+FlwsrfFVnJYjneO9pQmoa6jvzOphMpPeEGEqQ=
+	t=1705861281; cv=none; b=OFH1E814SX//bovu1RBQVTd7sYII4MTude5XqHGIdYWuvi4eGblbEd/dB7F4l4F82Y6qexQfv26HDXAvXKIuUFZ7+RqxTCHF0TGglgbnctQfQXxYNOSM7jv/CaajlvTcfgMf1tp50qDtuyRdh51oU6FmIIGlDMnV44POirGP5Nc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705858226; c=relaxed/simple;
-	bh=grWm4aTLJWC2xD/oHwnk6GfD6cYc+Ps0rhJnwnVhlGs=;
+	s=arc-20240116; t=1705861281; c=relaxed/simple;
+	bh=CZJeid/ERACScUJhcXusaeijXLmvi6Ui+EZmAiq1T3E=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=MDJCuhpRdnZC4UcMcjerhyLYbiK/PPgOJzP87tUQ7SwxrjB1GTW2d31MqwcebGTUirYEdh3IhgFEllU/sfnxL1tclt1imoMeW8NK4FZIC9oNlv+VJXoWSYoWjKSUAeMx4Mc2cTTl+mXnmSV8P+e1lwsunIbSiAA6ZlRxmA3f4VQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dZ9AP3vN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 73671C433C7;
-	Sun, 21 Jan 2024 17:30:25 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=AWuaEwS05FaPmT+hJ9NCGsnX/VveyxDVF5IC6RRQKN7q4rB2xa0QW68TA3hQP0rQ7sSfmuMxSx9jT5QO5OD07p1ST858eoI3sBLl039W4JtjrQ8uhvC6WVrK8G0ZBL2X3PhspXk7YX57+hcIE35gXHH0TAOn3WDhMTxuTioGuOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sJKi79lp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DF5FFC433F1;
+	Sun, 21 Jan 2024 18:21:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705858225;
-	bh=grWm4aTLJWC2xD/oHwnk6GfD6cYc+Ps0rhJnwnVhlGs=;
+	s=k20201202; t=1705861280;
+	bh=CZJeid/ERACScUJhcXusaeijXLmvi6Ui+EZmAiq1T3E=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dZ9AP3vNnmo1qI3isjGyEymS3PMf0BEJG/WRxlns+0y/vzGwxp5A700qHBfVp34pM
-	 uOM/tvdyZbc7AvRLz16iz7Qhywci2FXoREvn8cVm54BSRwXOHk8qSjAr+/NHa4VxA2
-	 hGFS3M6TV2yWWlf+60ICFyNJHy1Hu5qcuZSuCOAr5SEZ1uvshokOy4p7ZbCyHZwsdx
-	 NgozjM8/XfQH9KTd+vRGfY5x7CIorJ9e1RzrFdV07+eZNIK5Dj5oOjDtggITrAnjgy
-	 TvbsGmt7hljyLTL3miH+/2yblO2+CwlXeqCX4QvthDiuED2oGT2sp65byvy+H3NyS2
-	 N0EykNlAA/jZA==
+	b=sJKi79lpHtUouniL+DY4ofzUlus3HqLffxNBZ2Kif2WUL3npOlCZSHn5B8qe0R2hB
+	 sqeXFrB/Oodlq+ABQPZfjCjXWWJ30xvS1XB3gTK1fpAlQGefAy0jfER7Dae/KXAirM
+	 aiZOzP9cWSZrPwYKdH/HVolpF0FjNB7ti91rKM8rz37+VM/tGz44ph4Z1IHxO1RybL
+	 VQiYt8Q+c44phgC0K8Cmdyj0U65yPzJHqOPHY70Eo1nCuQ4FLu5ksMIEo1TOzDzD2B
+	 A12Xst1qsBVe+WPl/ebYIrSnXld2P6eDSnGl556Vu/B6TrEfSv8irbVHkkHLkT2/Nr
+	 cyMewP94k/Knw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5F712D8C978;
-	Sun, 21 Jan 2024 17:30:25 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CC036D8C970;
+	Sun, 21 Jan 2024 18:21:20 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,35 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2] tc: unify clockid handling
+Subject: Re: [PATCH v3 net] udp: fix busy polling
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170585822538.21563.5730055248074683668.git-patchwork-notify@kernel.org>
-Date: Sun, 21 Jan 2024 17:30:25 +0000
-References: <20240119164019.63584-2-stephen@networkplumber.org>
-In-Reply-To: <20240119164019.63584-2-stephen@networkplumber.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org
+ <170586128083.13193.4887848149587793890.git-patchwork-notify@kernel.org>
+Date: Sun, 21 Jan 2024 18:21:20 +0000
+References: <20240118201749.4148681-1-edumazet@google.com>
+In-Reply-To: <20240118201749.4148681-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ dsahern@kernel.org, netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ willemb@google.com
 
 Hello:
 
-This patch was applied to iproute2/iproute2.git (main)
-by Stephen Hemminger <stephen@networkplumber.org>:
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-On Fri, 19 Jan 2024 08:40:20 -0800 you wrote:
-> There are three places in tc which all have same code for
-> handling clockid (copy/paste). Move it into tc_util.c.
+On Thu, 18 Jan 2024 20:17:49 +0000 you wrote:
+> Generic sk_busy_loop_end() only looks at sk->sk_receive_queue
+> for presence of packets.
 > 
-> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
-> ---
-> Motivated by (rejected) pull request to deal with missing
-> clockid's on really old versions of glibc.
+> Problem is that for UDP sockets after blamed commit, some packets
+> could be present in another queue: udp_sk(sk)->reader_queue
+> 
+> In some cases, a busy poller could spin until timeout expiration,
+> even if some packets are available in udp_sk(sk)->reader_queue.
 > 
 > [...]
 
 Here is the summary with links:
-  - [iproute2] tc: unify clockid handling
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=91cca2aee76b
+  - [v3,net] udp: fix busy polling
+    https://git.kernel.org/netdev/net/c/a54d51fb2dfb
 
 You are awesome, thank you!
 -- 
