@@ -1,92 +1,188 @@
-Return-Path: <netdev+bounces-64841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64842-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC8F48373D9
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 21:34:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FA648373DD
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 21:35:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95711284669
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 20:34:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 473ED2849F0
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 20:35:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 776C72AD39;
-	Mon, 22 Jan 2024 20:34:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBE6B3AC08;
+	Mon, 22 Jan 2024 20:35:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W9UdbUfW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GpYYAbXj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50C841DFE5;
-	Mon, 22 Jan 2024 20:34:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B327A47A40;
+	Mon, 22 Jan 2024 20:35:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705955690; cv=none; b=LiAOQObKT3hik4wtzoiRzrpgZfrUDFed0YZeKRV3tFACdOgxChu34LQNsU9YQp/aJZSksPvNgnQqaHVHyQAPqgairWd005ZxrxYoXRY6h2MSBbgHToIi+6WN0QTgQMH/tD4X+WU/J/F0Lzv/6ClCzZvN0tREMuWS/Ftyz81SaAI=
+	t=1705955740; cv=none; b=dxQ4k59uSkZGpGV0iKy+GBaRM56N0PV0RfV+arpFG7UIDZjrvZtUYEW8R2WekWoNxpUm6p7Yxi7n8Xr5a3n0ZZ9H7HzQX5NUxtRHkob1d48vkkhnkr6dX+DyCszGxCRR0KXcjgfzw+in5f1VTeOwMlzJUyr+4ev4gY2LM7DepNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705955690; c=relaxed/simple;
-	bh=V5cmoTuULoWNYm46a6ywQDlkSQMsgm/OdPOrANJiJVo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RypjqbU3R+Bthdl0/mTHXBSTiIRCL42d7dX4gVnjthOyk28P4kbDqHLTW999/C4KhbF4r94pULBdsJKF4hsP4IeZ6aF7cfZIdY/eZuVtVyWjt2xFbmfZaDWipFE4raxDV7iQkvzk0GhV/Pq8iubz8AsK7IMUvnD6olUk2idBC0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W9UdbUfW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0B4DC433A6;
-	Mon, 22 Jan 2024 20:34:49 +0000 (UTC)
+	s=arc-20240116; t=1705955740; c=relaxed/simple;
+	bh=JkGc8IyQPIqwjSecvxXezPEjnK8PibvJovCtGictt3w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=InVBJeI0jVjzQmLrN7kN3pi5jmj/tLHbITg+MFxoQ6NRpIZC+AOv18yv6ws/e7q5t4xC+p+61EP7Q/eWWSBgzUFZVxukGOn7/Y278zYKyfOWN12+NGjfhmUaZbQITGSwVdI9lUzQycATatneoN3+Sz/oNmcbghF73dz3cPSF9To=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GpYYAbXj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2951C433C7;
+	Mon, 22 Jan 2024 20:35:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705955689;
-	bh=V5cmoTuULoWNYm46a6ywQDlkSQMsgm/OdPOrANJiJVo=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=W9UdbUfWnmEKRK9+KT2odx42x8+09Geh810AJ5mYzAeJQPSAu+5dn6g0s4O+2re4X
-	 gvoQo/19dBlOZup43iTh2+xVBX5EdUuI/+gg93spmSCKMVwrhczXtCTP4vvY8pFDBB
-	 YEAakBnP6OU+VylHZBWeqMsZ7ZVZGb5AKTNqfoUoynkAr8AF/Mz+LOP6Y8ZSBGYKwC
-	 xxPmX+6MbIXNVjJQxyqNwP/xsSF7K8JnC0b1giihwELpDo+ATssoIxKWAaN+GuJMmW
-	 tWpnk0MebpvwobkMEwgXBhDYjgxbsOjse1QgQWcH/EYb41jfOnufXWeBwyrxQ6+EBl
-	 Vrs19j4LcVFSw==
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-55817a12ad8so3881494a12.2;
-        Mon, 22 Jan 2024 12:34:49 -0800 (PST)
-X-Gm-Message-State: AOJu0Yy0zDhGbIQyewuK1RsOj4KmcVY0TOEdQUUMuIvby0IB821raRxQ
-	XPszGmsBUGQ1HZ3nV4okkMRquXoVQOHrh3REXN2OaXOOvhu7cPfeZFC4YV3jFhlfwqO8WdEzWHP
-	zuvoSwjx8BuU1DYz6rxox4LIkcVw=
-X-Google-Smtp-Source: AGHT+IG85Eoeg9WBFX8KzgBjG4JF6JfnLT+fdMlItTYbC035wmY/ToxDKMxonv/slZ9MnxD+r1bilt0/EYdum+117zk=
-X-Received: by 2002:a17:906:2683:b0:a28:b71d:6801 with SMTP id
- t3-20020a170906268300b00a28b71d6801mr2651916ejc.149.1705955688198; Mon, 22
- Jan 2024 12:34:48 -0800 (PST)
+	s=k20201202; t=1705955740;
+	bh=JkGc8IyQPIqwjSecvxXezPEjnK8PibvJovCtGictt3w=;
+	h=From:To:Cc:Subject:Date:From;
+	b=GpYYAbXjsExEqt7ukw+bKZAr1WGMsX1EZBoCPwZo+Wpn4zskQec0zl+zUis0QP+hA
+	 vVV6IObyD0iRPThSE7idDwaiq+drb5bRy9wnacPq5nnKT/x1ZYKFPfjJ5Fvnz/8BIv
+	 oDSgILcD5G3Q7SoeDwf7XSXC6pOS9qQSu+5owAwRjsJ081JkKoJbUH0xVf8IXGab3J
+	 jTO3hFGXQAQuC/esFtzfcijBZ+mVn62/tAGxeSdzxseasiMS/VvkcK/tLOMkHkXxT0
+	 SzAZCrWeX9i7MPx0qtH9DdfNVqUwqL5qieBCEyPLKLctbnojme5/ZvWL8k2eyhZxVK
+	 iu4l3l9rL6gOA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	shuah@kernel.org,
+	razor@blackwall.org,
+	idosch@nvidia.com,
+	horms@kernel.org,
+	jakub@cloudflare.com,
+	kuniyu@amazon.com,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net] selftests: fill in some missing configs for net
+Date: Mon, 22 Jan 2024 12:35:28 -0800
+Message-ID: <20240122203528.672004-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240122-topic-qdf_cleanup_net-v1-1-caf0d9c4408a@linaro.org>
-In-Reply-To: <20240122-topic-qdf_cleanup_net-v1-1-caf0d9c4408a@linaro.org>
-From: Timur Tabi <timur@kernel.org>
-Date: Mon, 22 Jan 2024 14:34:11 -0600
-X-Gmail-Original-Message-ID: <CAOZdJXXCmZi8Qx-y2D_NhJiafnGhvma2OY6F+KauqYcNAAQNCQ@mail.gmail.com>
-Message-ID: <CAOZdJXXCmZi8Qx-y2D_NhJiafnGhvma2OY6F+KauqYcNAAQNCQ@mail.gmail.com>
-Subject: Re: [PATCH] net: ethernet: qualcomm: Remove QDF24xx support
-To: Konrad Dybcio <konrad.dybcio@linaro.org>
-Cc: Timur Tabi <timur@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Marijn Suijten <marijn.suijten@somainline.org>, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jan 22, 2024 at 6:02=E2=80=AFAM Konrad Dybcio <konrad.dybcio@linaro=
-.org> wrote:
->
-> This SoC family was destined for server use, featuring Qualcomm's very
-> interesting Kryo cores (before "Kryo" became a marketing term for Arm
-> cores with small modifications). It did however not leave the labs of
-> Qualcomm and presumably some partners, nor was it ever productized.
->
-> Remove the related drivers, as they seem to be long obsolete.
->
-> Signed-off-by: Konrad Dybcio <konrad.dybcio@linaro.org>
+We are missing a lot of config options from net selftests,
+it seems:
 
-Sad day indeed, but understandable.
+tun/tap:     CONFIG_TUN, CONFIG_MACVLAN, CONFIG_MACVTAP
+fib_tests:   CONFIG_NET_SCH_FQ_CODEL
+l2tp:        CONFIG_L2TP, CONFIG_L2TP_V3, CONFIG_L2TP_IP, CONFIG_L2TP_ETH
+sctp-vrf:    CONFIG_INET_DIAG
+txtimestamp: CONFIG_NET_CLS_U32
+vxlan_mdb:   CONFIG_BRIDGE_VLAN_FILTERING
+gre_gso:     CONFIG_NET_IPGRE_DEMUX, CONFIG_IP_GRE, CONFIG_IPV6_GRE
+srv6_end_dt*_l3vpn:   CONFIG_IPV6_SEG6_LWTUNNEL
+ip_local_port_range:  CONFIG_MPTCP
+fib_test:    CONFIG_NET_CLS_BASIC
+rtnetlink:   CONFIG_MACSEC, CONFIG_NET_SCH_HTB, CONFIG_XFRM_INTERFACE
+             CONFIG_NET_IPGRE, CONFIG_BONDING
+fib_nexthops: CONFIG_MPLS, CONFIG_MPLS_ROUTING
+vxlan_mdb:   CONFIG_NET_ACT_GACT
+tls:         CONFIG_TLS, CONFIG_CRYPTO_CHACHA20POLY1305
+psample:     CONFIG_PSAMPLE
+fcnal:       CONFIG_TCP_MD5SIG
 
-Acked-by: Timur Tabi <timur@kernel.org>
+Try to add them in a semi-alphabetical order.
 
-If you're looking for other QDF stuff to remove, the QDF2400 hacks in
-the SBSA UART driver really should go.
+Fixes: 62199e3f1658 ("selftests: net: Add VXLAN MDB test")
+Fixes: c12e0d5f267d ("self-tests: introduce self-tests for RPS default mask")
+Fixes: ae5439658cce ("selftests/net: Cover the IP_LOCAL_PORT_RANGE socket option")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+--
+These are not all the options we're missing. Since the merge window
+is over I may not have the time to dig into it myself :(
+
+Adding Fixes tag for 3 semi-random commits which I think missed things.
+The full list would be very long.
+
+CC: shuah@kernel.org
+CC: razor@blackwall.org
+CC: idosch@nvidia.com
+CC: horms@kernel.org
+CC: jakub@cloudflare.com
+CC: kuniyu@amazon.com
+CC: linux-kselftest@vger.kernel.org
+---
+ tools/testing/selftests/net/config | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+
+diff --git a/tools/testing/selftests/net/config b/tools/testing/selftests/net/config
+index 8da562a9ae87..19ff75051660 100644
+--- a/tools/testing/selftests/net/config
++++ b/tools/testing/selftests/net/config
+@@ -1,5 +1,6 @@
+ CONFIG_USER_NS=y
+ CONFIG_NET_NS=y
++CONFIG_BONDING=m
+ CONFIG_BPF_SYSCALL=y
+ CONFIG_TEST_BPF=m
+ CONFIG_NUMA=y
+@@ -14,9 +15,13 @@ CONFIG_VETH=y
+ CONFIG_NET_IPVTI=y
+ CONFIG_IPV6_VTI=y
+ CONFIG_DUMMY=y
++CONFIG_BRIDGE_VLAN_FILTERING=y
+ CONFIG_BRIDGE=y
++CONFIG_CRYPTO_CHACHA20POLY1305=m
+ CONFIG_VLAN_8021Q=y
+ CONFIG_IFB=y
++CONFIG_INET_DIAG=y
++CONFIG_IP_GRE=m
+ CONFIG_NETFILTER=y
+ CONFIG_NETFILTER_ADVANCED=y
+ CONFIG_NF_CONNTRACK=m
+@@ -25,15 +30,36 @@ CONFIG_IP6_NF_IPTABLES=m
+ CONFIG_IP_NF_IPTABLES=m
+ CONFIG_IP6_NF_NAT=m
+ CONFIG_IP_NF_NAT=m
++CONFIG_IPV6_GRE=m
++CONFIG_IPV6_SEG6_LWTUNNEL=y
++CONFIG_L2TP_ETH=m
++CONFIG_L2TP_IP=m
++CONFIG_L2TP=m
++CONFIG_L2TP_V3=y
++CONFIG_MACSEC=m
++CONFIG_MACVLAN=y
++CONFIG_MACVTAP=y
++CONFIG_MPLS=y
++CONFIG_MPTCP=y
+ CONFIG_NF_TABLES=m
+ CONFIG_NF_TABLES_IPV6=y
+ CONFIG_NF_TABLES_IPV4=y
+ CONFIG_NFT_NAT=m
++CONFIG_NET_ACT_GACT=m
++CONFIG_NET_CLS_BASIC=m
++CONFIG_NET_CLS_U32=m
++CONFIG_NET_IPGRE_DEMUX=m
++CONFIG_NET_IPGRE=m
++CONFIG_NET_SCH_FQ_CODEL=m
++CONFIG_NET_SCH_HTB=m
+ CONFIG_NET_SCH_FQ=m
+ CONFIG_NET_SCH_ETF=m
+ CONFIG_NET_SCH_NETEM=y
++CONFIG_PSAMPLE=m
++CONFIG_TCP_MD5SIG=y
+ CONFIG_TEST_BLACKHOLE_DEV=m
+ CONFIG_KALLSYMS=y
++CONFIG_TLS=m
+ CONFIG_TRACEPOINTS=y
+ CONFIG_NET_DROP_MONITOR=m
+ CONFIG_NETDEVSIM=m
+@@ -48,7 +74,9 @@ CONFIG_BAREUDP=m
+ CONFIG_IPV6_IOAM6_LWTUNNEL=y
+ CONFIG_CRYPTO_SM4_GENERIC=y
+ CONFIG_AMT=m
++CONFIG_TUN=y
+ CONFIG_VXLAN=m
+ CONFIG_IP_SCTP=m
+ CONFIG_NETFILTER_XT_MATCH_POLICY=m
+ CONFIG_CRYPTO_ARIA=y
++CONFIG_XFRM_INTERFACE=m
+-- 
+2.43.0
+
 
