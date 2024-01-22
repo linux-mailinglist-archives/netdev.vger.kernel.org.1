@@ -1,76 +1,128 @@
-Return-Path: <netdev+bounces-64849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64850-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A68C68374B6
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 21:56:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A71EF8374D1
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 22:05:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A6FC2830DF
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 20:56:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FF85289EF1
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 21:05:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72C0747A6D;
-	Mon, 22 Jan 2024 20:56:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CFFD47A6F;
+	Mon, 22 Jan 2024 21:05:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pXaqZLOe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AirggS/7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42F872CA8;
-	Mon, 22 Jan 2024 20:56:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3678647F44;
+	Mon, 22 Jan 2024 21:05:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705956993; cv=none; b=IR0e++46TcznhwWLQsHINE7wdFxw9Pucs1jWszd1ILR6sXmi3C2ubeYIwdSUaCnBzJMs92fhrWxjCNUfzjm8m6uPLAlof02zRDm7ILuO5NKbfQdhYpdB7g0adUo5vbrEpBVyVrQifKGV+pdkpQDGKtyXg0mqUTAyXFM31oUywPU=
+	t=1705957543; cv=none; b=CMn0T/BNDyS97WRC9mQ1fWNVQruaEdM+/3wwDe6tr9fXgLUo6M7zP6lHIHGZDE3+gXfteehUx+TdzbbVCOaQhe1B48x8TbuCcSY4lXffjzMeeB10LEOuwW8puvZtwGTzxm3goqnMLwiXofY6cMsbojPbQbe2tlKOzteBrkIAaOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705956993; c=relaxed/simple;
-	bh=dPyR1cD91P/4YTX71Vd3J842ddnSfDF8JMywbnzsy2Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Kkxik5I0xGkyWwzrm2RxS/g1jXQ6cxQcH8c/i+FR0pYcIMLobe3kzWizD9xmbzktjwGoyrHPLmkgJtAlPKTXP2M54Xl15tSLNN6zLd77uicygT5sJ+ll6ko7zRvISxXjuYh9ZXEURKyF658BrKyhUpzBuadOfn8lpoUsdALjwhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pXaqZLOe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 180ECC433C7;
-	Mon, 22 Jan 2024 20:56:32 +0000 (UTC)
+	s=arc-20240116; t=1705957543; c=relaxed/simple;
+	bh=wJKg6MJTVUpbl5/q7sOSYMw2DJ7xmnzIkke3XzQ5k3U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jL1yKOq8XDvGz7ZVmVFhexR4Ec5TP5jzOcXxeTpBRWpnwkCasnehwIHiHDmMjiGAMQfW8S2FFLc3bT/fy4ed6RpQNaxgxjk5Bw36h4kehZT5C8gPntP2bwDZ2BXC/iYwmjoidJfAf4vHXlQC7bKtyPDkMthFLZhOUdXFeBrUKKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AirggS/7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E62D1C433F1;
+	Mon, 22 Jan 2024 21:05:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705956992;
-	bh=dPyR1cD91P/4YTX71Vd3J842ddnSfDF8JMywbnzsy2Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pXaqZLOeYkyUTzMJvz1OJv+zN9IZgBtSJVNrOmA8oqY9cnE0eSYRiJnD38PlVmwOe
-	 EJvQmQ+jqm4afanYkFYr1t7Z5C4tepp1UvLA1ta3y7topcHrfe65bR1IwVDq4cpbZe
-	 3hbAYShtI83DSzCkZYrqI1S/78mXDgdGooepc9lel5KJTldBo3Nm7IlehlijEAJHMw
-	 St9/a535g9TGNilvgn+fCgoA8QsvrP5PwFjJ9PrY5Bw8DfIqF1v8oSSjK7yw2nK5Yu
-	 c2RBEWS2ekAiA6EX4XiWttF+97bEn0Omce3DExu1yfbb60w6j2hzTzaHL7VzBiFbaH
-	 GmL+3cI7YhB+Q==
-Date: Mon, 22 Jan 2024 12:56:31 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: "Peng Fan (OSS)" <peng.fan@oss.nxp.com>, wg@grandegger.com,
- conor+dt@kernel.org, davem@davemloft.net, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, edumazet@google.com, pabeni@redhat.com,
- linux-can@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, Peng Fan
- <peng.fan@nxp.com>
-Subject: Re: [PATCH] dt-bindings: can: fsl,flexcan: add i.MX95 compatible
- string
-Message-ID: <20240122125631.4c54eba1@kernel.org>
-In-Reply-To: <20240122-skilled-wimp-4bc1769bf235-mkl@pengutronix.de>
-References: <20240122091738.2078746-1-peng.fan@oss.nxp.com>
-	<20240122-skilled-wimp-4bc1769bf235-mkl@pengutronix.de>
+	s=k20201202; t=1705957542;
+	bh=wJKg6MJTVUpbl5/q7sOSYMw2DJ7xmnzIkke3XzQ5k3U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AirggS/7uEPAffpwg71n8Copbxwqi/bbwnrfCNb428JinqfAwgH58mtJiwOJnS6MH
+	 2oU1BAJEQ9YZRSsGuKYK+oZZMFAXIPLKap+Pxey5omKg8jZcez/7lNVVTEO6IEyK0q
+	 8+7egxnUdBgHPTlnTMNKFGJ9E0aEorIWJfCMQmQdFmKTC3SWkjrTxe+dTRkNj81Fwy
+	 gwtePA43AgWyTnDIaIZBkANpNLgE8vvcBso1hnPWbUHve7oFarrN4+pb3gsjB0nja/
+	 j+W0YPCgLFfuRYLbrOCpvC9XBV3TQPyzbddLzgdOBASoPj1O7QBQMvhEEeGegPPVx8
+	 uJ9yMmAnpR+/w==
+Date: Mon, 22 Jan 2024 21:05:38 +0000
+From: Simon Horman <horms@kernel.org>
+To: Zhipeng Lu <alexious@zju.edu.cn>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Taku Izumi <izumi.taku@jp.fujitsu.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] fjes: fix memleaks in fjes_hw_setup
+Message-ID: <20240122210538.GJ126470@kernel.org>
+References: <20240122172445.3841883-1-alexious@zju.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240122172445.3841883-1-alexious@zju.edu.cn>
 
-On Mon, 22 Jan 2024 11:26:25 +0100 Marc Kleine-Budde wrote:
-> > Add i.MX95 flexcan which is compatible i.MX93 flexcan
-> > 
-> > Signed-off-by: Peng Fan <peng.fan@nxp.com>  
+On Tue, Jan 23, 2024 at 01:24:42AM +0800, Zhipeng Lu wrote:
+> In fjes_hw_setup, it allocates several memory and delay the deallocation
+> to the fjes_hw_exit in fjes_probe through the following call chain:
 > 
-> Acked-by: Marc Kleine-Budde <mkl@pengutronix.de>
+> fjes_probe
+>   |-> fjes_hw_init
+>         |-> fjes_hw_setup
+>   |-> fjes_hw_exit
+> 
+> However, when fjes_hw_setup fails, fjes_hw_exit won't be called and thus
+> all the resources allocated in fjes_hw_setup will be leaked. In this
+> patch, we free those resources in fjes_hw_setup and prevents such leaks.
+> 
+> Fixes: 2fcbca687702 ("fjes: platform_driver's .probe and .remove routine")
+> Signed-off-by: Zhipeng Lu <alexious@zju.edu.cn>
 
-Hm, you don't apply CAN DTB patches?
+Hi Zhipeng Lu,
+
+It looks like the last non-trivial change to this driver was in 2016.
+So perhaps it is better to leave it be.
+
+But if not, this patch does look correct to me.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+...
+
+> @@ -273,6 +277,25 @@ static int fjes_hw_setup(struct fjes_hw *hw)
+>  	fjes_hw_init_command_registers(hw, &param);
+>  
+>  	return 0;
+> +
+> +free_epbuf:
+> +	for (epidx = 0; epidx < hw->max_epid ; epidx++) {
+> +		if (epidx == hw->my_epid)
+> +			continue;
+> +		fjes_hw_free_epbuf(&hw->ep_shm_info[epidx].tx);
+> +		fjes_hw_free_epbuf(&hw->ep_shm_info[epidx].rx);
+> +	}
+> +	fjes_hw_free_shared_status_region(hw);
+> +free_res_buf:
+> +	kfree(hw->hw_info.res_buf);
+> +	hw->hw_info.res_buf = NULL;
+> +free_req_buf:
+> +	kfree(hw->hw_info.req_buf);
+> +	hw->hw_info.req_buf = NULL;
+> +free_ep_info:
+> +	kfree(hw->ep_shm_info);
+> +	hw->ep_shm_info = NULL;
+> +	return result;
+
+FWIIW, I'm not sure it is necessary to set these pointers NULL,
+although it doesn't do any harm.
+
+Also, if this function returns an error,
+does the caller (fjes_hw_init()) leak hw->hw_info.trace?
+
+>  }
+>  
+>  static void fjes_hw_cleanup(struct fjes_hw *hw)
+> -- 
+> 2.34.1
+> 
 
