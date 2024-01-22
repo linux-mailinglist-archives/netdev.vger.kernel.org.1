@@ -1,375 +1,732 @@
-Return-Path: <netdev+bounces-64649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91C1D836251
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 12:44:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89E2A8362C2
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 13:02:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32B2428DD4C
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 11:44:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C048DB22E86
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 12:02:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EA0C3DB8D;
-	Mon, 22 Jan 2024 11:41:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 122E73AC16;
+	Mon, 22 Jan 2024 12:02:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kV/xZH3T"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ug2RNYKk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06E123DB91;
-	Mon, 22 Jan 2024 11:41:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.88
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE8BD3A8E3
+	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 12:02:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705923698; cv=none; b=qUGBaYKhiGsro+G+E+ymS7uxpwEbfH2DKgOgQCOwnDKQnELMPOomwhQTqVwxojPblLX32NhG/8GNAfuO+5Abb+Z6tCRff9/4M3a08eqdHjEQAlIY0qPNehURa2FyuI53Lyho0AuGwLsIvhwHsXCCV5u4Z77O1NNF+EOpbTvjE3E=
+	t=1705924954; cv=none; b=MIRDKBwPkCnPCRaRczjGqA+mlQz0mqTSmR1Fj90BJMRPGcyycKe+79pZ/C51OBofUIFC3gCIKsdZ3hQdz01LxyuNOyZd7C96BA1Rk5GQJNAuyRiDTfDxLfaIgbN1qjWw0YSZmiIXYF4tLdwv6KECgLQ4KdpbMZ23vG0Iji5mnkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705923698; c=relaxed/simple;
-	bh=OKZx1+gSq6+64b4WR2wUQYQPyNKwVk9QQsdvBosoW5U=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=S+U4miIR+E0kqV8/ZZX34UeEDv4714H/8Xy0TpAig6MxVj3Qb11/PyYdQkpkitsMxOGOMnw6zHDNKslXMcQZ+j3E+XzKpvgsM7gIwH8wvLTmQuuAGzonJXkVdoihbVWvqKnRwOPW26y2c8/TTxm5TNtVRDoB4IZ2SOwovN79qSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kV/xZH3T; arc=none smtp.client-ip=192.55.52.88
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1705923696; x=1737459696;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=OKZx1+gSq6+64b4WR2wUQYQPyNKwVk9QQsdvBosoW5U=;
-  b=kV/xZH3TQDGnVFNJrOh40tFIK2nntqZn+UAoDPKGBTiPvdjWGNpLdGYO
-   BGrpd97FSMSOBJtpgTzAUxzCFXhHSHmUzdGO2hXgC6s9NodRyydEA1qLo
-   W26d6DxNmi5DvquunGtQ6DMApiF6aNmYYK5KHDUBmEtow2neHyZr5FjGN
-   Ibbt4/sF2ZQVyyiZJnleiuJ+XbfB9ZAdEnFa2YhHd4zMIDPbR9miREDJV
-   eohWxccSaoWZ3H2nfYYbpIE6+jcQ3oRCBM77qUetVzhtHV/VxNj8hbSYM
-   m5iEqv09Q/UX+XjW75OEb4HIC9D2cObF8uVS3ND2qpW5OfPuPNg2/7cGa
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10960"; a="432347136"
-X-IronPort-AV: E=Sophos;i="6.05,211,1701158400"; 
-   d="scan'208";a="432347136"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 03:41:35 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10960"; a="904825868"
-X-IronPort-AV: E=Sophos;i="6.05,211,1701158400"; 
-   d="scan'208";a="904825868"
-Received: from turnipsi.fi.intel.com (HELO kekkonen.fi.intel.com) ([10.237.72.44])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 03:41:29 -0800
-Received: from svinhufvud.ger.corp.intel.com (localhost [IPv6:::1])
-	by kekkonen.fi.intel.com (Postfix) with ESMTP id 8554911FBD1;
-	Mon, 22 Jan 2024 13:41:24 +0200 (EET)
-From: Sakari Ailus <sakari.ailus@linux.intel.com>
-To: linux-pm@vger.kernel.org
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	laurent.pinchart@ideasonboard.com,
-	Jacek Lawrynowicz <jacek.lawrynowicz@linux.intel.com>,
-	Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-	David Airlie <airlied@gmail.com>,
-	Daniel Vetter <daniel@ffwll.ch>,
-	Lucas De Marchi <lucas.demarchi@intel.com>,
-	=?UTF-8?q?Thomas=20Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
-	Paul Elder <paul.elder@ideasonboard.com>,
-	Alex Elder <elder@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>,
-	Mark Brown <broonie@kernel.org>,
-	dri-devel@lists.freedesktop.org,
-	intel-gfx@lists.freedesktop.org,
-	intel-xe@lists.freedesktop.org,
-	linux-media@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-sound@vger.kernel.org
-Subject: [PATCH v3 1/2] pm: runtime: Simplify pm_runtime_get_if_active() usage
-Date: Mon, 22 Jan 2024 13:41:21 +0200
-Message-Id: <20240122114121.56752-2-sakari.ailus@linux.intel.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240122114121.56752-1-sakari.ailus@linux.intel.com>
-References: <20240122114121.56752-1-sakari.ailus@linux.intel.com>
+	s=arc-20240116; t=1705924954; c=relaxed/simple;
+	bh=/4KBj3K2vPsKlHNZIpcViEEKM4Ui60clzbZ22hMckNA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=mgAPTFQHLZdfXjOMF/WJCCLi5t5EehXV6HrUK6WbM/xtmRjNC7CeU1xeCZhH5T+/BkVymo0wgk5cnyqIKj6ht+Y+mVGg4mVUsDdWS0hsEuPsSWrBMBfb6TjwF3L1O/dcCRzB+WQ7S5njSIMX9jzp/XYJwMHNOzjFd6nmc1+MPzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Ug2RNYKk; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-554fe147ddeso4234676a12.3
+        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 04:02:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1705924950; x=1706529750; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=eIlO3HALyL2v0eIr4zGjRxQbH4xvoMEAPbNSfAL504Y=;
+        b=Ug2RNYKk4IukJjAPlhzXid1rthbHaGjFt4O1TXEGs3/nT1AAy6Jkj6HRb4nhwDXQaX
+         hGuPVmJEY6aGebvoiuX/o0l02V2hIDPaADG+IqeoVFzxzVw/eUtGARrgavT8djqnzfMg
+         sEuhnawv0yo/R8srgvdYO03oI/WqUNKm43FuYU+/fEF/TcKvm9vhOQGrnyKiAZ45WTeb
+         1i/VZZCbd0dGy5FIiZVssZEbr3HgUR49P6ZD0LOz6CSWov42vcFNW3Pva8uHkjE/Ijr9
+         hAALR0Zqm3C1doOf7vnzOo657Rd1dYYrx6PesFV0nLrNw7WOWASeEny1vyWi7N5Waf8c
+         uMgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705924950; x=1706529750;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eIlO3HALyL2v0eIr4zGjRxQbH4xvoMEAPbNSfAL504Y=;
+        b=HmFxBb5XyRo7oadqIQgvut5rNKl2oxpeSAL7YQLhGKVC86CfoLqyNEbR2gkmNEkNID
+         e12J05mGaNA93z0iDx/uVhGET/9hciVcSn4WcNaOzeD/F2HaphinXydYvAgR9fgX4YuC
+         l5gpqG8PF5fuVhAw3hAnizEBak9g9qQcyM/pVp6eVZuR1YPz+eK4UFQ3T8zhV0HJDfzR
+         igG3gWCNJW5pZ++ZpzX5ntxnBoZM9XRmCWGuA/m7psOf8sWFEZkOy8VsLlMcc2qGl+a8
+         NkshF0OPtle73lxEBKwFgHMFeWMLtRK3T2fFqKf69WIKWjQMzphxSrwPkTmXp/T4K8ar
+         GCtg==
+X-Gm-Message-State: AOJu0YyQJF3s+9R8IBEHk/xipqCyTK/acI+PBATZVUUu6kl/Ug7HttzS
+	BD4KYqqxQ2MJD1OrcdSw5laqmS3jH6wA0T7IfUwAuikoEw8dCfd6fddIG8wm+5I=
+X-Google-Smtp-Source: AGHT+IEE78l7ap//ZveMChfaSm2k/99te4YHok0pgAlADhB1q7F/CfczgE0gEuxeqOwN/KAGVCdNNw==
+X-Received: by 2002:a17:906:bf49:b0:a2f:d76e:5696 with SMTP id ps9-20020a170906bf4900b00a2fd76e5696mr1400483ejb.118.1705924949277;
+        Mon, 22 Jan 2024 04:02:29 -0800 (PST)
+Received: from [10.167.154.1] (178235179218.dynamic-4-waw-k-1-3-0.vectranet.pl. [178.235.179.218])
+        by smtp.gmail.com with ESMTPSA id m27-20020a1709060d9b00b00a2c7d34157asm12979631eji.180.2024.01.22.04.02.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jan 2024 04:02:28 -0800 (PST)
+From: Konrad Dybcio <konrad.dybcio@linaro.org>
+Date: Mon, 22 Jan 2024 13:02:22 +0100
+Subject: [PATCH] net: ethernet: qualcomm: Remove QDF24xx support
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240122-topic-qdf_cleanup_net-v1-1-caf0d9c4408a@linaro.org>
+X-B4-Tracking: v=1; b=H4sIAE1ZrmUC/x2N0QrCMAwAf2Xk2UBXZYK/IjK6JHWBktV2G8LYv
+ 1t8vIPjDqhSVCo8ugOK7Fp1sQb9pQOag70FlRuDd/7meu9xXbISfjiOlCTYlkeTFQcXSZhZrvc
+ BWjuFKjiVYDS32raUmsxFon7/s+frPH/YOTV9fAAAAA==
+To: Timur Tabi <timur@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Marijn Suijten <marijn.suijten@somainline.org>, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ Konrad Dybcio <konrad.dybcio@linaro.org>
+X-Mailer: b4 0.12.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1705924947; l=20468;
+ i=konrad.dybcio@linaro.org; s=20230215; h=from:subject:message-id;
+ bh=/4KBj3K2vPsKlHNZIpcViEEKM4Ui60clzbZ22hMckNA=;
+ b=CYNue+Zau1P8N2wpgZ93Jsw7C4xvLsFk2Uhi0HHAzkYsLGeIS5eBFShvu0mZTNunmY85+mcig
+ wvILhYkQor9A+I2HXRHk0arxPYKdhySJImWeU4oE3/idBV4rXTRBlBa
+X-Developer-Key: i=konrad.dybcio@linaro.org; a=ed25519;
+ pk=iclgkYvtl2w05SSXO5EjjSYlhFKsJ+5OSZBjOkQuEms=
 
-There are two ways to opportunistically increment a device's runtime PM
-usage count, calling either pm_runtime_get_if_active() or
-pm_runtime_get_if_in_use(). The former has an argument to tell whether to
-ignore the usage count or not, and the latter simply calls the former with
-ign_usage_count set to false. The other users that want to ignore the
-usage_count will have to explitly set that argument to true which is a bit
-cumbersome.
+This SoC family was destined for server use, featuring Qualcomm's very
+interesting Kryo cores (before "Kryo" became a marketing term for Arm
+cores with small modifications). It did however not leave the labs of
+Qualcomm and presumably some partners, nor was it ever productized.
 
-To make this function more practical to use, remove the ign_usage_count
-argument from the function. The main implementation is renamed as
-pm_runtime_get_conditional().
+Remove the related drivers, as they seem to be long obsolete.
 
-Signed-off-by: Sakari Ailus <sakari.ailus@linux.intel.com>
-Reviewed-by: Alex Elder <elder@linaro.org> # drivers/net/ipa/ipa_smp2p.c
-Reviewed-by: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-Acked-by: Takashi Iwai <tiwai@suse.de> # sound/
-Reviewed-by: Jacek Lawrynowicz <jacek.lawrynowicz@linux.intel.com> # drivers/accel/ivpu/
-Acked-by: Rodrigo Vivi <rodrigo.vivi@intel.com> # drivers/gpu/drm/i915/
-Reviewed-by: Rodrigo Vivi <rodrigo.vivi@intel.com>
+Signed-off-by: Konrad Dybcio <konrad.dybcio@linaro.org>
 ---
- Documentation/power/runtime_pm.rst      |  5 ++--
- drivers/accel/ivpu/ivpu_pm.c            |  2 +-
- drivers/base/power/runtime.c            | 10 +++++---
- drivers/gpu/drm/i915/intel_runtime_pm.c |  2 +-
- drivers/gpu/drm/xe/xe_pm.c              |  2 +-
- drivers/media/i2c/ccs/ccs-core.c        |  2 +-
- drivers/media/i2c/ov64a40.c             |  2 +-
- drivers/media/i2c/thp7312.c             |  2 +-
- drivers/net/ipa/ipa_smp2p.c             |  2 +-
- drivers/pci/pci.c                       |  2 +-
- include/linux/pm_runtime.h              | 32 +++++++++++++++++++++----
- sound/hda/hdac_device.c                 |  2 +-
- 12 files changed, 45 insertions(+), 20 deletions(-)
+Compile-tested only
+---
+ drivers/net/ethernet/qualcomm/emac/Makefile        |   3 +-
+ .../ethernet/qualcomm/emac/emac-sgmii-qdf2400.c    | 215 ---------------------
+ .../ethernet/qualcomm/emac/emac-sgmii-qdf2432.c    | 202 -------------------
+ drivers/net/ethernet/qualcomm/emac/emac-sgmii.c    | 120 ++----------
+ drivers/net/ethernet/qualcomm/emac/emac-sgmii.h    |   2 -
+ 5 files changed, 21 insertions(+), 521 deletions(-)
 
-diff --git a/Documentation/power/runtime_pm.rst b/Documentation/power/runtime_pm.rst
-index 65b86e487afe..da99379071a4 100644
---- a/Documentation/power/runtime_pm.rst
-+++ b/Documentation/power/runtime_pm.rst
-@@ -396,10 +396,9 @@ drivers/base/power/runtime.c and include/linux/pm_runtime.h:
-       nonzero, increment the counter and return 1; otherwise return 0 without
-       changing the counter
+diff --git a/drivers/net/ethernet/qualcomm/emac/Makefile b/drivers/net/ethernet/qualcomm/emac/Makefile
+index 61d15e091be2..ffc00995acb9 100644
+--- a/drivers/net/ethernet/qualcomm/emac/Makefile
++++ b/drivers/net/ethernet/qualcomm/emac/Makefile
+@@ -6,5 +6,4 @@
+ obj-$(CONFIG_QCOM_EMAC) += qcom-emac.o
  
--  `int pm_runtime_get_if_active(struct device *dev, bool ign_usage_count);`
-+  `int pm_runtime_get_if_active(struct device *dev);`
-     - return -EINVAL if 'power.disable_depth' is nonzero; otherwise, if the
--      runtime PM status is RPM_ACTIVE, and either ign_usage_count is true
--      or the device's usage_count is non-zero, increment the counter and
-+      runtime PM status is RPM_ACTIVE, increment the counter and
-       return 1; otherwise return 0 without changing the counter
+ qcom-emac-objs := emac.o emac-mac.o emac-phy.o emac-sgmii.o emac-ethtool.o \
+-		  emac-sgmii-fsm9900.o emac-sgmii-qdf2432.o \
+-		  emac-sgmii-qdf2400.o
++		  emac-sgmii-fsm9900.o
+diff --git a/drivers/net/ethernet/qualcomm/emac/emac-sgmii-qdf2400.c b/drivers/net/ethernet/qualcomm/emac/emac-sgmii-qdf2400.c
+deleted file mode 100644
+index b29148ce7e05..000000000000
+--- a/drivers/net/ethernet/qualcomm/emac/emac-sgmii-qdf2400.c
++++ /dev/null
+@@ -1,215 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-only
+-/* Copyright (c) 2015-2016, The Linux Foundation. All rights reserved.
+- */
+-
+-/* Qualcomm Technologies, Inc. QDF2400 EMAC SGMII Controller driver.
+- */
+-
+-#include <linux/iopoll.h>
+-#include "emac.h"
+-
+-/* EMAC_SGMII register offsets */
+-#define EMAC_SGMII_PHY_TX_PWR_CTRL		0x000C
+-#define EMAC_SGMII_PHY_LANE_CTRL1		0x0018
+-#define EMAC_SGMII_PHY_CDR_CTRL0		0x0058
+-#define EMAC_SGMII_PHY_POW_DWN_CTRL0		0x0080
+-#define EMAC_SGMII_PHY_RESET_CTRL		0x00a8
+-#define EMAC_SGMII_PHY_INTERRUPT_MASK		0x00b4
+-
+-/* SGMII digital lane registers */
+-#define EMAC_SGMII_LN_DRVR_CTRL0		0x000C
+-#define EMAC_SGMII_LN_DRVR_CTRL1		0x0010
+-#define EMAC_SGMII_LN_DRVR_TAP_EN		0x0018
+-#define EMAC_SGMII_LN_TX_MARGINING		0x001C
+-#define EMAC_SGMII_LN_TX_PRE			0x0020
+-#define EMAC_SGMII_LN_TX_POST			0x0024
+-#define EMAC_SGMII_LN_TX_BAND_MODE		0x0060
+-#define EMAC_SGMII_LN_LANE_MODE			0x0064
+-#define EMAC_SGMII_LN_PARALLEL_RATE		0x007C
+-#define EMAC_SGMII_LN_CML_CTRL_MODE0		0x00C0
+-#define EMAC_SGMII_LN_MIXER_CTRL_MODE0		0x00D8
+-#define EMAC_SGMII_LN_VGA_INITVAL		0x013C
+-#define EMAC_SGMII_LN_UCDR_FO_GAIN_MODE0	0x0184
+-#define EMAC_SGMII_LN_UCDR_SO_GAIN_MODE0	0x0190
+-#define EMAC_SGMII_LN_UCDR_SO_CONFIG		0x019C
+-#define EMAC_SGMII_LN_RX_BAND			0x01A4
+-#define EMAC_SGMII_LN_RX_RCVR_PATH1_MODE0	0x01C0
+-#define EMAC_SGMII_LN_RSM_CONFIG		0x01F8
+-#define EMAC_SGMII_LN_SIGDET_ENABLES		0x0230
+-#define EMAC_SGMII_LN_SIGDET_CNTRL		0x0234
+-#define EMAC_SGMII_LN_SIGDET_DEGLITCH_CNTRL	0x0238
+-#define EMAC_SGMII_LN_RX_EN_SIGNAL		0x02AC
+-#define EMAC_SGMII_LN_RX_MISC_CNTRL0		0x02B8
+-#define EMAC_SGMII_LN_DRVR_LOGIC_CLKDIV		0x02C8
+-#define EMAC_SGMII_LN_RX_RESECODE_OFFSET	0x02CC
+-
+-/* SGMII digital lane register values */
+-#define UCDR_STEP_BY_TWO_MODE0			BIT(7)
+-#define UCDR_xO_GAIN_MODE(x)			((x) & 0x7f)
+-#define UCDR_ENABLE				BIT(6)
+-#define UCDR_SO_SATURATION(x)			((x) & 0x3f)
+-
+-#define SIGDET_LP_BYP_PS4			BIT(7)
+-#define SIGDET_EN_PS0_TO_PS2			BIT(6)
+-
+-#define TXVAL_VALID_INIT			BIT(4)
+-#define KR_PCIGEN3_MODE				BIT(0)
+-
+-#define MAIN_EN					BIT(0)
+-
+-#define TX_MARGINING_MUX			BIT(6)
+-#define TX_MARGINING(x)				((x) & 0x3f)
+-
+-#define TX_PRE_MUX				BIT(6)
+-
+-#define TX_POST_MUX				BIT(6)
+-
+-#define CML_GEAR_MODE(x)			(((x) & 7) << 3)
+-#define CML2CMOS_IBOOST_MODE(x)			((x) & 7)
+-
+-#define RESCODE_OFFSET(x)			((x) & 0x1f)
+-
+-#define MIXER_LOADB_MODE(x)			(((x) & 0xf) << 2)
+-#define MIXER_DATARATE_MODE(x)			((x) & 3)
+-
+-#define VGA_THRESH_DFE(x)			((x) & 0x3f)
+-
+-#define SIGDET_LP_BYP_PS0_TO_PS2		BIT(5)
+-#define SIGDET_FLT_BYP				BIT(0)
+-
+-#define SIGDET_LVL(x)				(((x) & 0xf) << 4)
+-
+-#define SIGDET_DEGLITCH_CTRL(x)			(((x) & 0xf) << 1)
+-
+-#define INVERT_PCS_RX_CLK			BIT(7)
+-
+-#define DRVR_LOGIC_CLK_EN			BIT(4)
+-#define DRVR_LOGIC_CLK_DIV(x)			((x) & 0xf)
+-
+-#define PARALLEL_RATE_MODE0(x)			((x) & 0x3)
+-
+-#define BAND_MODE0(x)				((x) & 0x3)
+-
+-#define LANE_MODE(x)				((x) & 0x1f)
+-
+-#define CDR_PD_SEL_MODE0(x)			(((x) & 0x3) << 5)
+-#define EN_DLL_MODE0				BIT(4)
+-#define EN_IQ_DCC_MODE0				BIT(3)
+-#define EN_IQCAL_MODE0				BIT(2)
+-
+-#define BYPASS_RSM_SAMP_CAL			BIT(1)
+-#define BYPASS_RSM_DLL_CAL			BIT(0)
+-
+-#define L0_RX_EQUALIZE_ENABLE			BIT(6)
+-
+-#define PWRDN_B					BIT(0)
+-
+-#define CDR_MAX_CNT(x)				((x) & 0xff)
+-
+-#define SERDES_START_WAIT_TIMES			100
+-
+-struct emac_reg_write {
+-	unsigned int offset;
+-	u32 val;
+-};
+-
+-static void emac_reg_write_all(void __iomem *base,
+-			       const struct emac_reg_write *itr, size_t size)
+-{
+-	size_t i;
+-
+-	for (i = 0; i < size; ++itr, ++i)
+-		writel(itr->val, base + itr->offset);
+-}
+-
+-static const struct emac_reg_write sgmii_laned[] = {
+-	/* CDR Settings */
+-	{EMAC_SGMII_LN_UCDR_FO_GAIN_MODE0,
+-		UCDR_STEP_BY_TWO_MODE0 | UCDR_xO_GAIN_MODE(10)},
+-	{EMAC_SGMII_LN_UCDR_SO_GAIN_MODE0, UCDR_xO_GAIN_MODE(0)},
+-	{EMAC_SGMII_LN_UCDR_SO_CONFIG, UCDR_ENABLE | UCDR_SO_SATURATION(12)},
+-
+-	/* TX/RX Settings */
+-	{EMAC_SGMII_LN_RX_EN_SIGNAL, SIGDET_LP_BYP_PS4 | SIGDET_EN_PS0_TO_PS2},
+-
+-	{EMAC_SGMII_LN_DRVR_CTRL0, TXVAL_VALID_INIT | KR_PCIGEN3_MODE},
+-	{EMAC_SGMII_LN_DRVR_TAP_EN, MAIN_EN},
+-	{EMAC_SGMII_LN_TX_MARGINING, TX_MARGINING_MUX | TX_MARGINING(25)},
+-	{EMAC_SGMII_LN_TX_PRE, TX_PRE_MUX},
+-	{EMAC_SGMII_LN_TX_POST, TX_POST_MUX},
+-
+-	{EMAC_SGMII_LN_CML_CTRL_MODE0,
+-		CML_GEAR_MODE(1) | CML2CMOS_IBOOST_MODE(1)},
+-	{EMAC_SGMII_LN_MIXER_CTRL_MODE0,
+-		MIXER_LOADB_MODE(12) | MIXER_DATARATE_MODE(1)},
+-	{EMAC_SGMII_LN_VGA_INITVAL, VGA_THRESH_DFE(31)},
+-	{EMAC_SGMII_LN_SIGDET_ENABLES,
+-		SIGDET_LP_BYP_PS0_TO_PS2 | SIGDET_FLT_BYP},
+-	{EMAC_SGMII_LN_SIGDET_CNTRL, SIGDET_LVL(8)},
+-
+-	{EMAC_SGMII_LN_SIGDET_DEGLITCH_CNTRL, SIGDET_DEGLITCH_CTRL(4)},
+-	{EMAC_SGMII_LN_RX_MISC_CNTRL0, INVERT_PCS_RX_CLK},
+-	{EMAC_SGMII_LN_DRVR_LOGIC_CLKDIV,
+-		DRVR_LOGIC_CLK_EN | DRVR_LOGIC_CLK_DIV(4)},
+-
+-	{EMAC_SGMII_LN_PARALLEL_RATE, PARALLEL_RATE_MODE0(1)},
+-	{EMAC_SGMII_LN_TX_BAND_MODE, BAND_MODE0(1)},
+-	{EMAC_SGMII_LN_RX_BAND, BAND_MODE0(2)},
+-	{EMAC_SGMII_LN_DRVR_CTRL1, RESCODE_OFFSET(7)},
+-	{EMAC_SGMII_LN_RX_RESECODE_OFFSET, RESCODE_OFFSET(9)},
+-	{EMAC_SGMII_LN_LANE_MODE, LANE_MODE(26)},
+-	{EMAC_SGMII_LN_RX_RCVR_PATH1_MODE0, CDR_PD_SEL_MODE0(2) |
+-		EN_DLL_MODE0 | EN_IQ_DCC_MODE0 | EN_IQCAL_MODE0},
+-	{EMAC_SGMII_LN_RSM_CONFIG, BYPASS_RSM_SAMP_CAL | BYPASS_RSM_DLL_CAL},
+-};
+-
+-static const struct emac_reg_write physical_coding_sublayer_programming[] = {
+-	{EMAC_SGMII_PHY_POW_DWN_CTRL0, PWRDN_B},
+-	{EMAC_SGMII_PHY_CDR_CTRL0, CDR_MAX_CNT(15)},
+-	{EMAC_SGMII_PHY_TX_PWR_CTRL, 0},
+-	{EMAC_SGMII_PHY_LANE_CTRL1, L0_RX_EQUALIZE_ENABLE},
+-};
+-
+-int emac_sgmii_init_qdf2400(struct emac_adapter *adpt)
+-{
+-	struct emac_sgmii *phy = &adpt->phy;
+-	void __iomem *phy_regs = phy->base;
+-	void __iomem *laned = phy->digital;
+-	unsigned int i;
+-	u32 lnstatus;
+-
+-	/* PCS lane-x init */
+-	emac_reg_write_all(phy->base, physical_coding_sublayer_programming,
+-			   ARRAY_SIZE(physical_coding_sublayer_programming));
+-
+-	/* SGMII lane-x init */
+-	emac_reg_write_all(phy->digital, sgmii_laned, ARRAY_SIZE(sgmii_laned));
+-
+-	/* Power up PCS and start reset lane state machine */
+-
+-	writel(0, phy_regs + EMAC_SGMII_PHY_RESET_CTRL);
+-	writel(1, laned + SGMII_LN_RSM_START);
+-
+-	/* Wait for c_ready assertion */
+-	for (i = 0; i < SERDES_START_WAIT_TIMES; i++) {
+-		lnstatus = readl(phy_regs + SGMII_PHY_LN_LANE_STATUS);
+-		if (lnstatus & BIT(1))
+-			break;
+-		usleep_range(100, 200);
+-	}
+-
+-	if (i == SERDES_START_WAIT_TIMES) {
+-		netdev_err(adpt->netdev, "SGMII failed to start\n");
+-		return -EIO;
+-	}
+-
+-	/* Disable digital and SERDES loopback */
+-	writel(0, phy_regs + SGMII_PHY_LN_BIST_GEN0);
+-	writel(0, phy_regs + SGMII_PHY_LN_BIST_GEN2);
+-	writel(0, phy_regs + SGMII_PHY_LN_CDR_CTRL1);
+-
+-	/* Mask out all the SGMII Interrupt */
+-	writel(0, phy_regs + EMAC_SGMII_PHY_INTERRUPT_MASK);
+-
+-	return 0;
+-}
+diff --git a/drivers/net/ethernet/qualcomm/emac/emac-sgmii-qdf2432.c b/drivers/net/ethernet/qualcomm/emac/emac-sgmii-qdf2432.c
+deleted file mode 100644
+index 65519eeebecd..000000000000
+--- a/drivers/net/ethernet/qualcomm/emac/emac-sgmii-qdf2432.c
++++ /dev/null
+@@ -1,202 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-only
+-/* Copyright (c) 2015-2016, The Linux Foundation. All rights reserved.
+- */
+-
+-/* Qualcomm Technologies, Inc. QDF2432 EMAC SGMII Controller driver.
+- */
+-
+-#include <linux/iopoll.h>
+-#include "emac.h"
+-
+-/* EMAC_SGMII register offsets */
+-#define EMAC_SGMII_PHY_TX_PWR_CTRL		0x000C
+-#define EMAC_SGMII_PHY_LANE_CTRL1		0x0018
+-#define EMAC_SGMII_PHY_CDR_CTRL0		0x0058
+-#define EMAC_SGMII_PHY_POW_DWN_CTRL0		0x0080
+-#define EMAC_SGMII_PHY_RESET_CTRL		0x00a8
+-#define EMAC_SGMII_PHY_INTERRUPT_MASK		0x00b4
+-
+-/* SGMII digital lane registers */
+-#define EMAC_SGMII_LN_DRVR_CTRL0		0x000C
+-#define EMAC_SGMII_LN_DRVR_TAP_EN		0x0018
+-#define EMAC_SGMII_LN_TX_MARGINING		0x001C
+-#define EMAC_SGMII_LN_TX_PRE			0x0020
+-#define EMAC_SGMII_LN_TX_POST			0x0024
+-#define EMAC_SGMII_LN_TX_BAND_MODE		0x0060
+-#define EMAC_SGMII_LN_LANE_MODE			0x0064
+-#define EMAC_SGMII_LN_PARALLEL_RATE		0x0078
+-#define EMAC_SGMII_LN_CML_CTRL_MODE0		0x00B8
+-#define EMAC_SGMII_LN_MIXER_CTRL_MODE0		0x00D0
+-#define EMAC_SGMII_LN_VGA_INITVAL		0x0134
+-#define EMAC_SGMII_LN_UCDR_FO_GAIN_MODE0	0x017C
+-#define EMAC_SGMII_LN_UCDR_SO_GAIN_MODE0	0x0188
+-#define EMAC_SGMII_LN_UCDR_SO_CONFIG		0x0194
+-#define EMAC_SGMII_LN_RX_BAND			0x019C
+-#define EMAC_SGMII_LN_RX_RCVR_PATH1_MODE0	0x01B8
+-#define EMAC_SGMII_LN_RSM_CONFIG		0x01F0
+-#define EMAC_SGMII_LN_SIGDET_ENABLES		0x0224
+-#define EMAC_SGMII_LN_SIGDET_CNTRL		0x0228
+-#define EMAC_SGMII_LN_SIGDET_DEGLITCH_CNTRL	0x022C
+-#define EMAC_SGMII_LN_RX_EN_SIGNAL		0x02A0
+-#define EMAC_SGMII_LN_RX_MISC_CNTRL0		0x02AC
+-#define EMAC_SGMII_LN_DRVR_LOGIC_CLKDIV		0x02BC
+-
+-/* SGMII digital lane register values */
+-#define UCDR_STEP_BY_TWO_MODE0			BIT(7)
+-#define UCDR_xO_GAIN_MODE(x)			((x) & 0x7f)
+-#define UCDR_ENABLE				BIT(6)
+-#define UCDR_SO_SATURATION(x)			((x) & 0x3f)
+-
+-#define SIGDET_LP_BYP_PS4			BIT(7)
+-#define SIGDET_EN_PS0_TO_PS2			BIT(6)
+-
+-#define TXVAL_VALID_INIT			BIT(4)
+-#define KR_PCIGEN3_MODE				BIT(0)
+-
+-#define MAIN_EN					BIT(0)
+-
+-#define TX_MARGINING_MUX			BIT(6)
+-#define TX_MARGINING(x)				((x) & 0x3f)
+-
+-#define TX_PRE_MUX				BIT(6)
+-
+-#define TX_POST_MUX				BIT(6)
+-
+-#define CML_GEAR_MODE(x)			(((x) & 7) << 3)
+-#define CML2CMOS_IBOOST_MODE(x)			((x) & 7)
+-
+-#define MIXER_LOADB_MODE(x)			(((x) & 0xf) << 2)
+-#define MIXER_DATARATE_MODE(x)			((x) & 3)
+-
+-#define VGA_THRESH_DFE(x)			((x) & 0x3f)
+-
+-#define SIGDET_LP_BYP_PS0_TO_PS2		BIT(5)
+-#define SIGDET_FLT_BYP				BIT(0)
+-
+-#define SIGDET_LVL(x)				(((x) & 0xf) << 4)
+-
+-#define SIGDET_DEGLITCH_CTRL(x)			(((x) & 0xf) << 1)
+-
+-#define DRVR_LOGIC_CLK_EN			BIT(4)
+-#define DRVR_LOGIC_CLK_DIV(x)			((x) & 0xf)
+-
+-#define PARALLEL_RATE_MODE0(x)			((x) & 0x3)
+-
+-#define BAND_MODE0(x)				((x) & 0x3)
+-
+-#define LANE_MODE(x)				((x) & 0x1f)
+-
+-#define CDR_PD_SEL_MODE0(x)			(((x) & 0x3) << 5)
+-#define BYPASS_RSM_SAMP_CAL			BIT(1)
+-#define BYPASS_RSM_DLL_CAL			BIT(0)
+-
+-#define L0_RX_EQUALIZE_ENABLE			BIT(6)
+-
+-#define PWRDN_B					BIT(0)
+-
+-#define CDR_MAX_CNT(x)				((x) & 0xff)
+-
+-#define SERDES_START_WAIT_TIMES			100
+-
+-struct emac_reg_write {
+-	unsigned int offset;
+-	u32 val;
+-};
+-
+-static void emac_reg_write_all(void __iomem *base,
+-			       const struct emac_reg_write *itr, size_t size)
+-{
+-	size_t i;
+-
+-	for (i = 0; i < size; ++itr, ++i)
+-		writel(itr->val, base + itr->offset);
+-}
+-
+-static const struct emac_reg_write sgmii_laned[] = {
+-	/* CDR Settings */
+-	{EMAC_SGMII_LN_UCDR_FO_GAIN_MODE0,
+-		UCDR_STEP_BY_TWO_MODE0 | UCDR_xO_GAIN_MODE(10)},
+-	{EMAC_SGMII_LN_UCDR_SO_GAIN_MODE0, UCDR_xO_GAIN_MODE(0)},
+-	{EMAC_SGMII_LN_UCDR_SO_CONFIG, UCDR_ENABLE | UCDR_SO_SATURATION(12)},
+-
+-	/* TX/RX Settings */
+-	{EMAC_SGMII_LN_RX_EN_SIGNAL, SIGDET_LP_BYP_PS4 | SIGDET_EN_PS0_TO_PS2},
+-
+-	{EMAC_SGMII_LN_DRVR_CTRL0, TXVAL_VALID_INIT | KR_PCIGEN3_MODE},
+-	{EMAC_SGMII_LN_DRVR_TAP_EN, MAIN_EN},
+-	{EMAC_SGMII_LN_TX_MARGINING, TX_MARGINING_MUX | TX_MARGINING(25)},
+-	{EMAC_SGMII_LN_TX_PRE, TX_PRE_MUX},
+-	{EMAC_SGMII_LN_TX_POST, TX_POST_MUX},
+-
+-	{EMAC_SGMII_LN_CML_CTRL_MODE0,
+-		CML_GEAR_MODE(1) | CML2CMOS_IBOOST_MODE(1)},
+-	{EMAC_SGMII_LN_MIXER_CTRL_MODE0,
+-		MIXER_LOADB_MODE(12) | MIXER_DATARATE_MODE(1)},
+-	{EMAC_SGMII_LN_VGA_INITVAL, VGA_THRESH_DFE(31)},
+-	{EMAC_SGMII_LN_SIGDET_ENABLES,
+-		SIGDET_LP_BYP_PS0_TO_PS2 | SIGDET_FLT_BYP},
+-	{EMAC_SGMII_LN_SIGDET_CNTRL, SIGDET_LVL(8)},
+-
+-	{EMAC_SGMII_LN_SIGDET_DEGLITCH_CNTRL, SIGDET_DEGLITCH_CTRL(4)},
+-	{EMAC_SGMII_LN_RX_MISC_CNTRL0, 0},
+-	{EMAC_SGMII_LN_DRVR_LOGIC_CLKDIV,
+-		DRVR_LOGIC_CLK_EN | DRVR_LOGIC_CLK_DIV(4)},
+-
+-	{EMAC_SGMII_LN_PARALLEL_RATE, PARALLEL_RATE_MODE0(1)},
+-	{EMAC_SGMII_LN_TX_BAND_MODE, BAND_MODE0(2)},
+-	{EMAC_SGMII_LN_RX_BAND, BAND_MODE0(3)},
+-	{EMAC_SGMII_LN_LANE_MODE, LANE_MODE(26)},
+-	{EMAC_SGMII_LN_RX_RCVR_PATH1_MODE0, CDR_PD_SEL_MODE0(3)},
+-	{EMAC_SGMII_LN_RSM_CONFIG, BYPASS_RSM_SAMP_CAL | BYPASS_RSM_DLL_CAL},
+-};
+-
+-static const struct emac_reg_write physical_coding_sublayer_programming[] = {
+-	{EMAC_SGMII_PHY_POW_DWN_CTRL0, PWRDN_B},
+-	{EMAC_SGMII_PHY_CDR_CTRL0, CDR_MAX_CNT(15)},
+-	{EMAC_SGMII_PHY_TX_PWR_CTRL, 0},
+-	{EMAC_SGMII_PHY_LANE_CTRL1, L0_RX_EQUALIZE_ENABLE},
+-};
+-
+-int emac_sgmii_init_qdf2432(struct emac_adapter *adpt)
+-{
+-	struct emac_sgmii *phy = &adpt->phy;
+-	void __iomem *phy_regs = phy->base;
+-	void __iomem *laned = phy->digital;
+-	unsigned int i;
+-	u32 lnstatus;
+-
+-	/* PCS lane-x init */
+-	emac_reg_write_all(phy->base, physical_coding_sublayer_programming,
+-			   ARRAY_SIZE(physical_coding_sublayer_programming));
+-
+-	/* SGMII lane-x init */
+-	emac_reg_write_all(phy->digital, sgmii_laned, ARRAY_SIZE(sgmii_laned));
+-
+-	/* Power up PCS and start reset lane state machine */
+-
+-	writel(0, phy_regs + EMAC_SGMII_PHY_RESET_CTRL);
+-	writel(1, laned + SGMII_LN_RSM_START);
+-
+-	/* Wait for c_ready assertion */
+-	for (i = 0; i < SERDES_START_WAIT_TIMES; i++) {
+-		lnstatus = readl(phy_regs + SGMII_PHY_LN_LANE_STATUS);
+-		if (lnstatus & BIT(1))
+-			break;
+-		usleep_range(100, 200);
+-	}
+-
+-	if (i == SERDES_START_WAIT_TIMES) {
+-		netdev_err(adpt->netdev, "SGMII failed to start\n");
+-		return -EIO;
+-	}
+-
+-	/* Disable digital and SERDES loopback */
+-	writel(0, phy_regs + SGMII_PHY_LN_BIST_GEN0);
+-	writel(0, phy_regs + SGMII_PHY_LN_BIST_GEN2);
+-	writel(0, phy_regs + SGMII_PHY_LN_CDR_CTRL1);
+-
+-	/* Mask out all the SGMII Interrupt */
+-	writel(0, phy_regs + EMAC_SGMII_PHY_INTERRUPT_MASK);
+-
+-	return 0;
+-}
+diff --git a/drivers/net/ethernet/qualcomm/emac/emac-sgmii.c b/drivers/net/ethernet/qualcomm/emac/emac-sgmii.c
+index e4bc18009d08..573c82b21de5 100644
+--- a/drivers/net/ethernet/qualcomm/emac/emac-sgmii.c
++++ b/drivers/net/ethernet/qualcomm/emac/emac-sgmii.c
+@@ -7,7 +7,6 @@
  
-   `void pm_runtime_put_noidle(struct device *dev);`
-diff --git a/drivers/accel/ivpu/ivpu_pm.c b/drivers/accel/ivpu/ivpu_pm.c
-index 0af8864cb3b5..c6d93c7a1c58 100644
---- a/drivers/accel/ivpu/ivpu_pm.c
-+++ b/drivers/accel/ivpu/ivpu_pm.c
-@@ -292,7 +292,7 @@ int ivpu_rpm_get_if_active(struct ivpu_device *vdev)
- {
+ #include <linux/interrupt.h>
+ #include <linux/iopoll.h>
+-#include <linux/acpi.h>
+ #include <linux/of.h>
+ #include <linux/of_device.h>
+ #include <linux/of_platform.h>
+@@ -275,76 +274,11 @@ static struct sgmii_ops fsm9900_ops = {
+ 	.reset = emac_sgmii_common_reset,
+ };
+ 
+-static struct sgmii_ops qdf2432_ops = {
+-	.init = emac_sgmii_init_qdf2432,
+-	.open = emac_sgmii_common_open,
+-	.close = emac_sgmii_common_close,
+-	.link_change = emac_sgmii_common_link_change,
+-	.reset = emac_sgmii_common_reset,
+-};
+-
+-#ifdef CONFIG_ACPI
+-static struct sgmii_ops qdf2400_ops = {
+-	.init = emac_sgmii_init_qdf2400,
+-	.open = emac_sgmii_common_open,
+-	.close = emac_sgmii_common_close,
+-	.link_change = emac_sgmii_common_link_change,
+-	.reset = emac_sgmii_common_reset,
+-};
+-#endif
+-
+-static int emac_sgmii_acpi_match(struct device *dev, void *data)
+-{
+-#ifdef CONFIG_ACPI
+-	static const struct acpi_device_id match_table[] = {
+-		{
+-			.id = "QCOM8071",
+-		},
+-		{}
+-	};
+-	const struct acpi_device_id *id = acpi_match_device(match_table, dev);
+-	struct sgmii_ops **ops = data;
+-
+-	if (id) {
+-		acpi_handle handle = ACPI_HANDLE(dev);
+-		unsigned long long hrv;
+-		acpi_status status;
+-
+-		status = acpi_evaluate_integer(handle, "_HRV", NULL, &hrv);
+-		if (status) {
+-			if (status == AE_NOT_FOUND)
+-				/* Older versions of the QDF2432 ACPI tables do
+-				 * not have an _HRV property.
+-				 */
+-				hrv = 1;
+-			else
+-				/* Something is wrong with the tables */
+-				return 0;
+-		}
+-
+-		switch (hrv) {
+-		case 1:
+-			*ops = &qdf2432_ops;
+-			return 1;
+-		case 2:
+-			*ops = &qdf2400_ops;
+-			return 1;
+-		}
+-	}
+-#endif
+-
+-	return 0;
+-}
+-
+ static const struct of_device_id emac_sgmii_dt_match[] = {
+ 	{
+ 		.compatible = "qcom,fsm9900-emac-sgmii",
+ 		.data = &fsm9900_ops,
+ 	},
+-	{
+-		.compatible = "qcom,qdf2432-emac-sgmii",
+-		.data = &qdf2432_ops,
+-	},
+ 	{}
+ };
+ 
+@@ -355,45 +289,31 @@ int emac_sgmii_config(struct platform_device *pdev, struct emac_adapter *adpt)
+ 	struct resource *res;
  	int ret;
  
--	ret = pm_runtime_get_if_active(vdev->drm.dev, false);
-+	ret = pm_runtime_get_if_in_use(vdev->drm.dev);
- 	drm_WARN_ON(&vdev->drm, ret < 0);
+-	if (has_acpi_companion(&pdev->dev)) {
+-		struct device *dev;
+-
+-		dev = device_find_child(&pdev->dev, &phy->sgmii_ops,
+-					emac_sgmii_acpi_match);
+-
+-		if (!dev) {
+-			dev_warn(&pdev->dev, "cannot find internal phy node\n");
+-			return 0;
+-		}
+-
+-		sgmii_pdev = to_platform_device(dev);
+-	} else {
+-		const struct of_device_id *match;
+-		struct device_node *np;
+-
+-		np = of_parse_phandle(pdev->dev.of_node, "internal-phy", 0);
+-		if (!np) {
+-			dev_err(&pdev->dev, "missing internal-phy property\n");
+-			return -ENODEV;
+-		}
++	const struct of_device_id *match;
++	struct device_node *np;
  
- 	return ret;
-diff --git a/drivers/base/power/runtime.c b/drivers/base/power/runtime.c
-index 05793c9fbb84..b4cb3f19b0d8 100644
---- a/drivers/base/power/runtime.c
-+++ b/drivers/base/power/runtime.c
-@@ -1176,7 +1176,7 @@ int __pm_runtime_resume(struct device *dev, int rpmflags)
- EXPORT_SYMBOL_GPL(__pm_runtime_resume);
+-		sgmii_pdev = of_find_device_by_node(np);
+-		of_node_put(np);
+-		if (!sgmii_pdev) {
+-			dev_err(&pdev->dev, "invalid internal-phy property\n");
+-			return -ENODEV;
+-		}
++	np = of_parse_phandle(pdev->dev.of_node, "internal-phy", 0);
++	if (!np) {
++		dev_err(&pdev->dev, "missing internal-phy property\n");
++		return -ENODEV;
++	}
  
- /**
-- * pm_runtime_get_if_active - Conditionally bump up device usage counter.
-+ * pm_runtime_get_conditional - Conditionally bump up device usage counter.
-  * @dev: Device to handle.
-  * @ign_usage_count: Whether or not to look at the current usage counter value.
-  *
-@@ -1196,8 +1196,12 @@ EXPORT_SYMBOL_GPL(__pm_runtime_resume);
-  *
-  * The caller is responsible for decrementing the runtime PM usage counter of
-  * @dev after this function has returned a positive value for it.
-+ *
-+ * This function is not primarily intended for use in drivers, most of which are
-+ * better served by either pm_runtime_get_if_active() or
-+ * pm_runtime_get_if_in_use() instead.
-  */
--int pm_runtime_get_if_active(struct device *dev, bool ign_usage_count)
-+int pm_runtime_get_conditional(struct device *dev, bool ign_usage_count)
- {
- 	unsigned long flags;
- 	int retval;
-@@ -1218,7 +1222,7 @@ int pm_runtime_get_if_active(struct device *dev, bool ign_usage_count)
+-		match = of_match_device(emac_sgmii_dt_match, &sgmii_pdev->dev);
+-		if (!match) {
+-			dev_err(&pdev->dev, "unrecognized internal phy node\n");
+-			ret = -ENODEV;
+-			goto error_put_device;
+-		}
++	sgmii_pdev = of_find_device_by_node(np);
++	of_node_put(np);
++	if (!sgmii_pdev) {
++		dev_err(&pdev->dev, "invalid internal-phy property\n");
++		return -ENODEV;
++	}
  
- 	return retval;
- }
--EXPORT_SYMBOL_GPL(pm_runtime_get_if_active);
-+EXPORT_SYMBOL_GPL(pm_runtime_get_conditional);
- 
- /**
-  * __pm_runtime_set_status - Set runtime PM status of a device.
-diff --git a/drivers/gpu/drm/i915/intel_runtime_pm.c b/drivers/gpu/drm/i915/intel_runtime_pm.c
-index 860b51b56a92..b5f8abd2a22b 100644
---- a/drivers/gpu/drm/i915/intel_runtime_pm.c
-+++ b/drivers/gpu/drm/i915/intel_runtime_pm.c
-@@ -246,7 +246,7 @@ static intel_wakeref_t __intel_runtime_pm_get_if_active(struct intel_runtime_pm
- 		 * function, since the power state is undefined. This applies
- 		 * atm to the late/early system suspend/resume handlers.
- 		 */
--		if (pm_runtime_get_if_active(rpm->kdev, ignore_usecount) <= 0)
-+		if (pm_runtime_get_conditional(rpm->kdev, ignore_usecount) <= 0)
- 			return 0;
+-		phy->sgmii_ops = (struct sgmii_ops *)match->data;
++	match = of_match_device(emac_sgmii_dt_match, &sgmii_pdev->dev);
++	if (!match) {
++		dev_err(&pdev->dev, "unrecognized internal phy node\n");
++		ret = -ENODEV;
++		goto error_put_device;
  	}
  
-diff --git a/drivers/gpu/drm/xe/xe_pm.c b/drivers/gpu/drm/xe/xe_pm.c
-index b429c2876a76..dd110058bf74 100644
---- a/drivers/gpu/drm/xe/xe_pm.c
-+++ b/drivers/gpu/drm/xe/xe_pm.c
-@@ -330,7 +330,7 @@ int xe_pm_runtime_put(struct xe_device *xe)
- 
- int xe_pm_runtime_get_if_active(struct xe_device *xe)
- {
--	return pm_runtime_get_if_active(xe->drm.dev, true);
-+	return pm_runtime_get_if_active(xe->drm.dev);
- }
- 
- void xe_pm_assert_unbounded_bridge(struct xe_device *xe)
-diff --git a/drivers/media/i2c/ccs/ccs-core.c b/drivers/media/i2c/ccs/ccs-core.c
-index e21287d50c15..e1ae0f9fad43 100644
---- a/drivers/media/i2c/ccs/ccs-core.c
-+++ b/drivers/media/i2c/ccs/ccs-core.c
-@@ -674,7 +674,7 @@ static int ccs_set_ctrl(struct v4l2_ctrl *ctrl)
- 		break;
- 	}
- 
--	pm_status = pm_runtime_get_if_active(&client->dev, true);
-+	pm_status = pm_runtime_get_if_active(&client->dev);
- 	if (!pm_status)
- 		return 0;
- 
-diff --git a/drivers/media/i2c/ov64a40.c b/drivers/media/i2c/ov64a40.c
-index 4fba4c2cb064..541bf74581d2 100644
---- a/drivers/media/i2c/ov64a40.c
-+++ b/drivers/media/i2c/ov64a40.c
-@@ -3287,7 +3287,7 @@ static int ov64a40_set_ctrl(struct v4l2_ctrl *ctrl)
- 					 exp_max, 1, exp_val);
- 	}
- 
--	pm_status = pm_runtime_get_if_active(ov64a40->dev, true);
-+	pm_status = pm_runtime_get_if_active(ov64a40->dev);
- 	if (!pm_status)
- 		return 0;
- 
-diff --git a/drivers/media/i2c/thp7312.c b/drivers/media/i2c/thp7312.c
-index 2806887514dc..19bd923a7315 100644
---- a/drivers/media/i2c/thp7312.c
-+++ b/drivers/media/i2c/thp7312.c
-@@ -1052,7 +1052,7 @@ static int thp7312_s_ctrl(struct v4l2_ctrl *ctrl)
- 	if (ctrl->flags & V4L2_CTRL_FLAG_INACTIVE)
- 		return -EINVAL;
- 
--	if (!pm_runtime_get_if_active(thp7312->dev, true))
-+	if (!pm_runtime_get_if_active(thp7312->dev))
- 		return 0;
- 
- 	switch (ctrl->id) {
-diff --git a/drivers/net/ipa/ipa_smp2p.c b/drivers/net/ipa/ipa_smp2p.c
-index 5620dc271fac..cbf3d4761ce3 100644
---- a/drivers/net/ipa/ipa_smp2p.c
-+++ b/drivers/net/ipa/ipa_smp2p.c
-@@ -92,7 +92,7 @@ static void ipa_smp2p_notify(struct ipa_smp2p *smp2p)
- 		return;
- 
- 	dev = &smp2p->ipa->pdev->dev;
--	smp2p->power_on = pm_runtime_get_if_active(dev, true) > 0;
-+	smp2p->power_on = pm_runtime_get_if_active(dev) > 0;
- 
- 	/* Signal whether the IPA power is enabled */
- 	mask = BIT(smp2p->enabled_bit);
-diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
-index d8f11a078924..f8293ae71389 100644
---- a/drivers/pci/pci.c
-+++ b/drivers/pci/pci.c
-@@ -2510,7 +2510,7 @@ static void pci_pme_list_scan(struct work_struct *work)
- 			 * If the device is in a low power state it
- 			 * should not be polled either.
- 			 */
--			pm_status = pm_runtime_get_if_active(dev, true);
-+			pm_status = pm_runtime_get_if_active(dev);
- 			if (!pm_status)
- 				continue;
- 
-diff --git a/include/linux/pm_runtime.h b/include/linux/pm_runtime.h
-index 7c9b35448563..a212b3008ade 100644
---- a/include/linux/pm_runtime.h
-+++ b/include/linux/pm_runtime.h
-@@ -72,7 +72,8 @@ extern int pm_runtime_force_resume(struct device *dev);
- extern int __pm_runtime_idle(struct device *dev, int rpmflags);
- extern int __pm_runtime_suspend(struct device *dev, int rpmflags);
- extern int __pm_runtime_resume(struct device *dev, int rpmflags);
--extern int pm_runtime_get_if_active(struct device *dev, bool ign_usage_count);
-+extern int pm_runtime_get_conditional(struct device *dev,
-+					bool ign_usage_count);
- extern int pm_schedule_suspend(struct device *dev, unsigned int delay);
- extern int __pm_runtime_set_status(struct device *dev, unsigned int status);
- extern int pm_runtime_barrier(struct device *dev);
-@@ -94,16 +95,33 @@ extern void pm_runtime_release_supplier(struct device_link *link);
- 
- extern int devm_pm_runtime_enable(struct device *dev);
- 
-+/**
-+ * pm_runtime_get_if_active - Bump up runtime PM usage counter if the device is
-+ *			      in active state
-+ * @dev: Target device.
-+ *
-+ * Increment the runtime PM usage counter of @dev if its runtime PM status is
-+ * %RPM_ACTIVE, in which case it returns 1. If the device is in a different
-+ * state, 0 is returned. -EINVAL is returned if runtime PM is disabled for the
-+ * device.
-+ */
-+static inline int pm_runtime_get_if_active(struct device *dev)
-+{
-+	return pm_runtime_get_conditional(dev, true);
-+}
++	phy->sgmii_ops = (struct sgmii_ops *)match->data;
 +
- /**
-  * pm_runtime_get_if_in_use - Conditionally bump up runtime PM usage counter.
-  * @dev: Target device.
-  *
-  * Increment the runtime PM usage counter of @dev if its runtime PM status is
-- * %RPM_ACTIVE and its runtime PM usage counter is greater than 0.
-+ * %RPM_ACTIVE and its runtime PM usage counter is greater than 0, in which case
-+ * it returns 1. If the device is in a different state or its usage_count is 0,
-+ * 0 is returned. -EINVAL is returned if runtime PM is disabled for the device.
-  */
- static inline int pm_runtime_get_if_in_use(struct device *dev)
- {
--	return pm_runtime_get_if_active(dev, false);
-+	return pm_runtime_get_conditional(dev, false);
- }
+ 	/* Base address is the first address */
+ 	res = platform_get_resource(sgmii_pdev, IORESOURCE_MEM, 0);
+ 	if (!res) {
+diff --git a/drivers/net/ethernet/qualcomm/emac/emac-sgmii.h b/drivers/net/ethernet/qualcomm/emac/emac-sgmii.h
+index 6daeddacbcfa..7b7b0dc44225 100644
+--- a/drivers/net/ethernet/qualcomm/emac/emac-sgmii.h
++++ b/drivers/net/ethernet/qualcomm/emac/emac-sgmii.h
+@@ -40,8 +40,6 @@ struct emac_sgmii {
+ int emac_sgmii_config(struct platform_device *pdev, struct emac_adapter *adpt);
  
- /**
-@@ -275,8 +293,12 @@ static inline int pm_runtime_get_if_in_use(struct device *dev)
- {
- 	return -EINVAL;
- }
--static inline int pm_runtime_get_if_active(struct device *dev,
--					   bool ign_usage_count)
-+static inline int pm_runtime_get_if_active(struct device *dev)
-+{
-+	return -EINVAL;
-+}
-+static inline int pm_runtime_get_conditional(struct device *dev,
-+					     bool ign_usage_count)
- {
- 	return -EINVAL;
- }
-diff --git a/sound/hda/hdac_device.c b/sound/hda/hdac_device.c
-index 7f7b67fe1b65..068c16e52dff 100644
---- a/sound/hda/hdac_device.c
-+++ b/sound/hda/hdac_device.c
-@@ -612,7 +612,7 @@ EXPORT_SYMBOL_GPL(snd_hdac_power_up_pm);
- int snd_hdac_keep_power_up(struct hdac_device *codec)
- {
- 	if (!atomic_inc_not_zero(&codec->in_pm)) {
--		int ret = pm_runtime_get_if_active(&codec->dev, true);
-+		int ret = pm_runtime_get_if_active(&codec->dev);
- 		if (!ret)
- 			return -1;
- 		if (ret < 0)
+ int emac_sgmii_init_fsm9900(struct emac_adapter *adpt);
+-int emac_sgmii_init_qdf2432(struct emac_adapter *adpt);
+-int emac_sgmii_init_qdf2400(struct emac_adapter *adpt);
+ 
+ int emac_sgmii_init(struct emac_adapter *adpt);
+ int emac_sgmii_open(struct emac_adapter *adpt);
+
+---
+base-commit: 319fbd8fc6d339e0a1c7b067eed870c518a13a02
+change-id: 20240122-topic-qdf_cleanup_net-60fceddde376
+
+Best regards,
 -- 
-2.39.2
+Konrad Dybcio <konrad.dybcio@linaro.org>
 
 
