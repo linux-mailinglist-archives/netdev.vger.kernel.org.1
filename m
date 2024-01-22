@@ -1,204 +1,133 @@
-Return-Path: <netdev+bounces-64807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 812EF83725A
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 20:19:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B86983726F
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 20:24:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A650F1C2AD82
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:19:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D6EA28CA2D
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:24:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41E333DB86;
-	Mon, 22 Jan 2024 19:19:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 727513FB18;
+	Mon, 22 Jan 2024 19:24:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WR/0GZl8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Om7TXwRG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F9103DB84
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 19:19:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE7593DBA8;
+	Mon, 22 Jan 2024 19:24:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705951160; cv=none; b=GtGXqQ+EG/ZWkj7Ojisj5Whbr8nTesEU/AiXEJoQ+ZZEwxulhClBB1IIzRzTh/GMIw2lp+9WK2aduIeo+Y2zplUCSfquqJe2mG9cqbra66QPT4uQatdtVAOkqaIZBDeM7S7uYXvAXUNK62LLQUBT1sMPXOK9XEmTBYQwsVpfxRc=
+	t=1705951456; cv=none; b=aEVbdbEvWIgB0P5IdQPrpxmWMzSsTq7ACAjO2j/Cz75McxizM2qQnQv/ogaoItKnb8rW+mJJ6t8Oa4T4JWKYcQ2A9Ei4OzHn23U3FMhSj4oCvxQGfK6rzwrIwkjGudL163Psb9F0Lqlx56PDZe6CSor75y4T/rsvfHpBwnyOfHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705951160; c=relaxed/simple;
-	bh=UMu0ULEg0RSkhXHSeFI70UkeLGGrrkvDCyHYJy+rtd8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cD+yBsEBCw712/iZzbJexagrAeJqWvwwo2YLRyQIvOOVe1Dzk2MoGKxYqMceL1nKmFqKFmz/H+Wgay2XRMomt1HG9vvsUD0bH5exRni8pYEjukaoYxwPMtnB4FvYLV/1+jLn6aPkSh9BvMljnYI70yAMCOBemFnywRf+fZ4EWBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WR/0GZl8; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-33921b95dddso1648415f8f.1
-        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 11:19:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705951156; x=1706555956; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gSCdadprWeMVfFlh2AYZIyRk50xst4g5G77u6mF0zr4=;
-        b=WR/0GZl8HXGFjHyqv1LaHiSHixEdP6q7GN56BMX2HXCDrGP9dJ/6k/5rd5PXKV/sHP
-         5ZUjXb2No8wO1g/GF7BfHFA6qPD7hJwrou1qWg0rVzn3AOZ7hJKAsPYhFH+QHMVFsmbK
-         rq7UOmUByJ/5iTS58FeJhSYycp1uh1tPqur4Wye37MJgYeUJId+mQ3s1KRhmqMN5MZd4
-         Fuf1z+NQd/npCdSL1mfw6YDCqNW2JtCoeuOSMfQp9ny6fcs5Ny3LRn6pcbp0EIfF+G+g
-         wkGWSbOSdy2tbNcwAWuO0s05vxc84i506dCxcw4/mTiZy6JmYAwlpZHliOCxIGk6h3Rg
-         HdUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705951156; x=1706555956;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gSCdadprWeMVfFlh2AYZIyRk50xst4g5G77u6mF0zr4=;
-        b=YVfzl828VFlnr12KknWI+yRS1skQgdtTFg7H70brczICqAz7lusNN3XpZcBIlsr3w1
-         FMJXwWxVnIGe2LjqeXY0QPtAC9TeVOywH1hw9nHPnF6Azcn7eBjtRwcIbEjYZqM3fAPY
-         E4/EHQXziaKkvljH+WsH98HEpLpdzb1oXuCnyyOfo9d0pkR+K6Os0UoJd0yipFlK7T3e
-         47SAgkFq7mWWJdoLE6UY8u/57JPPtTmjQ1sF3b3FmRUNs7G5k1WmbVlIHH87XINhc6LF
-         22Y7j6GduW1GxCTeW0PVhOaOfd2rffYEeXK7ehqPwa2FWMeMNyKfwzqQfgdNC/0+VOfK
-         pqmw==
-X-Gm-Message-State: AOJu0YzuAJ28+gu+Ul8OGXY4HsHOdrHeZWL8m0vqC1AJokWjHAo7RWf3
-	Uu9gYMRcts8W4D7IJDDNDOhMTNt9JhnTQoH7A97JbsrWX0RxTPv0
-X-Google-Smtp-Source: AGHT+IHtNwK5E9ZQ8NyJi9eqCG6oaCAdzJRCrDwY/Ti+nZpQmZyYjbKKjjsCtG8qUeDjHUwjKe/Zpg==
-X-Received: by 2002:adf:f18f:0:b0:337:6951:3e36 with SMTP id h15-20020adff18f000000b0033769513e36mr2079386wro.21.1705951156474;
-        Mon, 22 Jan 2024 11:19:16 -0800 (PST)
-Received: from localhost.localdomain ([2001:b07:646f:4a4d:e17a:bd08:d035:d8c2])
-        by smtp.gmail.com with ESMTPSA id t4-20020a0560001a4400b003392ba296b3sm6211104wry.56.2024.01.22.11.19.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jan 2024 11:19:16 -0800 (PST)
-From: Alessandro Marcolini <alessandromarcolini99@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	donald.hunter@gmail.com,
-	sdf@google.com,
-	chuck.lever@oracle.com,
-	lorenzo@kernel.org,
-	jacob.e.keller@intel.com,
-	jiri@resnulli.us
-Cc: netdev@vger.kernel.org,
-	Alessandro Marcolini <alessandromarcolini99@gmail.com>
-Subject: [PATCH net-next 3/3] tools: ynl: add encoding support for 'sub-message' to ynl
-Date: Mon, 22 Jan 2024 20:19:41 +0100
-Message-ID: <0eedc19860e9b84f105c57d17219b3d0af3100d2.1705950652.git.alessandromarcolini99@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1705950652.git.alessandromarcolini99@gmail.com>
-References: <cover.1705950652.git.alessandromarcolini99@gmail.com>
+	s=arc-20240116; t=1705951456; c=relaxed/simple;
+	bh=MEXKZHQkB/IyiyQVHXrZDxlLURiVSiUhivYGVZLcqn0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ByF9IqdSPil69Mjoli42+D+gwIqFYP0nX0IAnXzNPfou4dpGCGkrz7Bk1kF4Y5NMh3kTZjLtiw06ICf1ucgjdrXg8EvY9vDhT6ATr3u8beJUzY2KeKQPBSrU+osP4oH5FyEvz5gyACdq6sSRuCYGaff3q85qQ2tYEtCfqEH75Xw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Om7TXwRG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FBDEC433C7;
+	Mon, 22 Jan 2024 19:23:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705951455;
+	bh=MEXKZHQkB/IyiyQVHXrZDxlLURiVSiUhivYGVZLcqn0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Om7TXwRG+RLb91NjkMlGtbBbQYrAGinHi8YBBuORygdejt7BZ+vQd9Bqs0sBl/BxP
+	 VCw1yjmez+FHyuigs8WrRG3xG5dxGPTpaOT2qYeFl6QHLeQijLl0kkOlguh3EaCef5
+	 +AkOU52pnihuLtq9XxoisJbYHmdBJ7MWGdIGbaT+Hqd1d3bAs/JdGsBZD+YdEjOqeP
+	 eiYtqYfgWpXt9iSL4haLcS9baDm6slcDBeeq4Pri4phWer/ACYdMdlNEE7R3pgjieo
+	 tFpdEkRwqJLtm9GAX85YeLj+l6gbxcnR7JUDJE+8uHr22Geysx+TUOYD6M7QtotXaK
+	 eSyrD1CGdOh3w==
+Date: Mon, 22 Jan 2024 19:23:43 +0000
+From: Jonathan Cameron <jic23@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Uwe =?UTF-8?B?S2xlaW5lLUvDtm5pZw==?= <u.kleine-koenig@pengutronix.de>,
+ kernel@pengutronix.de, Moritz Fischer <mdf@kernel.org>, Wu Hao
+ <hao.wu@intel.com>, Xu Yilun <yilun.xu@intel.com>, Tom Rix
+ <trix@redhat.com>, linux-fpga@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>,
+ Stefan Schmidt <stefan@datenfreihafen.org>, Miquel Raynal
+ <miquel.raynal@bootlin.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, linux-wpan@vger.kernel.org,
+ netdev@vger.kernel.org, Lars-Peter Clausen <lars@metafoo.de>, Michael
+ Hennerich <Michael.Hennerich@analog.com>, linux-iio@vger.kernel.org, Dmitry
+ Torokhov <dmitry.torokhov@gmail.com>, linux-input@vger.kernel.org, Ulf
+ Hansson <ulf.hansson@linaro.org>, Rayyan Ansari <rayyan@ansari.sh>, Andy
+ Shevchenko <andriy.shevchenko@linux.intel.com>, Jonathan Cameron
+ <Jonathan.Cameron@huawei.com>, Martin Tuma
+ <martin.tuma@digiteqautomotive.com>, Mauro Carvalho Chehab
+ <mchehab@kernel.org>, linux-media@vger.kernel.org, Sergey Kozlov
+ <serjk@netup.ru>, Arnd Bergmann <arnd@arndb.de>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, Yang Yingliang <yangyingliang@huawei.com>,
+ linux-mmc@vger.kernel.org, Richard Weinberger <richard@nod.at>, Vignesh
+ Raghavendra <vigneshr@ti.com>, Rob Herring <robh@kernel.org>, Heiko
+ Stuebner <heiko@sntech.de>, Michal Simek <michal.simek@amd.com>, Amit Kumar
+ Mahapatra via Alsa-devel <alsa-devel@alsa-project.org>,
+ linux-mtd@lists.infradead.org, Martin Blumenstingl
+ <martin.blumenstingl@googlemail.com>, Geert Uytterhoeven
+ <geert+renesas@glider.be>, Pali =?UTF-8?B?Um9ow6Fy?= <pali@kernel.org>,
+ Simon Horman <horms@kernel.org>, Ronald Wahl <ronald.wahl@raritan.com>,
+ Benson Leung <bleung@chromium.org>, Tzung-Bi Shih <tzungbi@kernel.org>,
+ Guenter Roeck <groeck@chromium.org>, chrome-platform@lists.linux.dev, Max
+ Filippov <jcmvbkbc@gmail.com>, linux-spi@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, Bjorn Andersson
+ <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>,
+ linux-arm-msm@vger.kernel.org, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ linux-mediatek@lists.infradead.org, Thomas Zimmermann
+ <tzimmermann@suse.de>, Javier Martinez Canillas <javierm@redhat.com>, Amit
+ Kumar Mahapatra <amit.kumar-mahapatra@amd.com>,
+ dri-devel@lists.freedesktop.org, linux-fbdev@vger.kernel.org,
+ linux-staging@lists.linux.dev, Viresh Kumar <vireshk@kernel.org>, Rui
+ Miguel Silva <rmfrfs@gmail.com>, Johan Hovold <johan@kernel.org>, Alex
+ Elder <elder@kernel.org>, greybus-dev@lists.linaro.org, Peter Huewe
+ <peterhuewe@gmx.de>, Jarkko Sakkinen <jarkko@kernel.org>, Jason Gunthorpe
+ <jgg@ziepe.ca>, linux-integrity@vger.kernel.org, Herve Codina
+ <herve.codina@bootlin.com>, Alan Stern <stern@rowland.harvard.edu>, Aaro
+ Koskinen <aaro.koskinen@iki.fi>, Krzysztof Kozlowski
+ <krzysztof.kozlowski@linaro.org>, linux-usb@vger.kernel.org, Helge Deller
+ <deller@gmx.de>, Dario Binacchi <dario.binacchi@amarulasolutions.com>,
+ Kalle Valo <kvalo@kernel.org>, Dmitry Antipov <dmantipov@yandex.ru>,
+ libertas-dev@lists.infradead.org, linux-wireless@vger.kernel.org, Jonathan
+ Corbet <corbet@lwn.net>, James Clark <james.clark@arm.com>, Bjorn Helgaas
+ <bhelgaas@google.com>, linux-doc@vger.kernel.org
+Subject: Re: [PATCH v2 00/33] spi: get rid of some legacy macros
+Message-ID: <20240122192343.148a0b6d@jic23-huawei>
+In-Reply-To: <e62cdf7f-ce58-4f46-a0a0-25ce9fb271b1@sirena.org.uk>
+References: <cover.1705944943.git.u.kleine-koenig@pengutronix.de>
+	<e62cdf7f-ce58-4f46-a0a0-25ce9fb271b1@sirena.org.uk>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.40; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Add encoding support for 'sub-message' attribute and for resolving
-sub-message selectors at different nesting level from the key
-attribute.
+On Mon, 22 Jan 2024 18:18:22 +0000
+Mark Brown <broonie@kernel.org> wrote:
 
-Also, add encoding support for multi-attr attributes.
+> On Mon, Jan 22, 2024 at 07:06:55PM +0100, Uwe Kleine-K=C3=B6nig wrote:
+>=20
+> > Note that Jonathan Cameron has already applied patch 3 to his tree, it
+> > didn't appear in a public tree though yet. I still included it here to
+> > make the kernel build bots happy. =20
+>=20
+> It's also going to be needed for buildability of the end of the series.
 
-Signed-off-by: Alessandro Marcolini <alessandromarcolini99@gmail.com>
----
- tools/net/ynl/lib/ynl.py | 54 +++++++++++++++++++++++++++++++++++-----
- 1 file changed, 48 insertions(+), 6 deletions(-)
+Ah.  I thought intent was to split this across all the different trees
+then do the final patch only after they were all gone?
 
-diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-index 1e10512b2117..f8c56944f7e7 100644
---- a/tools/net/ynl/lib/ynl.py
-+++ b/tools/net/ynl/lib/ynl.py
-@@ -449,7 +449,7 @@ class YnlFamily(SpecFamily):
-         self.sock.setsockopt(Netlink.SOL_NETLINK, Netlink.NETLINK_ADD_MEMBERSHIP,
-                              mcast_id)
- 
--    def _add_attr(self, space, name, value):
-+    def _add_attr(self, space, name, value, vals):
-         try:
-             attr = self.attr_sets[space][name]
-         except KeyError:
-@@ -458,8 +458,13 @@ class YnlFamily(SpecFamily):
-         if attr["type"] == 'nest':
-             nl_type |= Netlink.NLA_F_NESTED
-             attr_payload = b''
--            for subname, subvalue in value.items():
--                attr_payload += self._add_attr(attr['nested-attributes'], subname, subvalue)
-+            # Check if it's a list of values (i.e. it contains multi-attr elements)
-+            for subname, subvalue in (
-+                ((k, v) for item in value for k, v in item.items())
-+                if isinstance(value, list)
-+                else value.items()
-+            ):
-+                attr_payload += self._add_attr(attr['nested-attributes'], subname, subvalue, vals)
-         elif attr["type"] == 'flag':
-             attr_payload = b''
-         elif attr["type"] == 'string':
-@@ -481,6 +486,12 @@ class YnlFamily(SpecFamily):
-             attr_payload = format.pack(int(value))
-         elif attr['type'] in "bitfield32":
-             attr_payload = struct.pack("II", int(value["value"]), int(value["selector"]))
-+        elif attr['type'] == "sub-message":
-+            spec = self._resolve_selector(attr, vals)
-+            attr_spec = spec["attribute-set"]
-+            attr_payload = b''
-+            for subname, subvalue in value.items():
-+                attr_payload += self._add_attr(attr_spec, subname, subvalue, vals)
-         else:
-             raise Exception(f'Unknown type at {space} {name} {value} {attr["type"]}')
- 
-@@ -555,9 +566,40 @@ class YnlFamily(SpecFamily):
-         sub_msg_spec = self.sub_msgs[sub_msg]
- 
-         selector = attr_spec.selector
--        if selector not in vals:
-+
-+        def _find_attr_path(attr, vals, path=None):
-+            if path is None:
-+                path = []
-+            if isinstance(vals, dict):
-+                if attr in vals:
-+                    return path
-+                for k, v in vals.items():
-+                    result = _find_attr_path(attr, v, path + [k])
-+                    if result is not None:
-+                        return result
-+            elif isinstance(vals, list):
-+                for idx, v in enumerate(vals):
-+                    result = _find_attr_path(attr, v, path + [idx])
-+                    if result is not None:
-+                        return result
-+            return None
-+
-+        def _find_selector_val(sel, vals, path):
-+            while path != []:
-+                v = vals.copy()
-+                for step in path:
-+                    v = v[step]
-+                if sel in v:
-+                    return v[sel]
-+                path.pop()
-+            return vals[sel] if sel in vals else None
-+
-+        attr_path = _find_attr_path(attr_spec.name, vals)
-+        value = _find_selector_val(selector, vals, attr_path)
-+
-+        if value is None:
-             raise Exception(f"There is no value for {selector} to resolve '{attr_spec.name}'")
--        value = vals[selector]
-+
-         if value not in sub_msg_spec.formats:
-             raise Exception(f"No message format for '{value}' in sub-message spec '{sub_msg}'")
- 
-@@ -772,7 +814,7 @@ class YnlFamily(SpecFamily):
-                     format = NlAttr.get_format(m.type, m.byte_order)
-                     msg += format.pack(value)
-         for name, value in vals.items():
--            msg += self._add_attr(op.attr_set.name, name, value)
-+            msg += self._add_attr(op.attr_set.name, name, value, vals)
-         msg = _genl_msg_finalize(msg)
- 
-         self.sock.send(msg, 0)
--- 
-2.43.0
+I'm fine with it going all in one go if people prefer that.
 
+My tree will be out in a few mins. Was just waiting to rebase on rc1
+which I've just done.
+
+Jonathan
 
