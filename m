@@ -1,130 +1,242 @@
-Return-Path: <netdev+bounces-64630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A19BF836165
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 12:26:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 959288361B9
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 12:32:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56829287C57
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 11:26:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB53C1C23E85
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 11:32:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 305913B1AB;
-	Mon, 22 Jan 2024 11:12:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EB0146B9C;
+	Mon, 22 Jan 2024 11:19:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gz40Xgmg"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0E343FB1E;
-	Mon, 22 Jan 2024 11:12:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA1D46B99
+	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 11:19:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705921971; cv=none; b=I7ywl4t8xATgSaEEGKu09f/+EWrsFv7SDAqvf/GZzm3mYoevzcVij+cx3M37WQlGUwx0ORmdFOFW5E0NTvB8L8QQf0oiD51+PA2fJ8lOz7gpIYDaE6snjKfLQtuJHtqUMw/176bQ2iSBRY0DE+rX6zvhFuUdN1EbZS45sMh1ilc=
+	t=1705922378; cv=none; b=iNRT4O10grYupnRLj1nNosfkZVA0B8XkWV3pRHarEKK/ODYhfh5KK0/rbQj6p9dHD/OT3/b1SSZVMEo5vSA9rk30752hH9ToaGCWzfdg1yB3ZrPHGkccJKzyBSa5c092InSK32Ded0cXsqTLhIWgKfyo/CX2NZO4x/QpywqZUVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705921971; c=relaxed/simple;
-	bh=rOtL9M7EFa+Ovl0KWx795b/5zMGGND+rDCTV90EM8Kk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=qpmNT123Ck3EsqmhHbWAcJ40njyl+omtuvsYsz6x2x+JNE4sPILrI2pHPJU5RXvWSOyMWShAvi4qqvgDZeu6fOcswQ0SKXWgWDy/zlo+Qvp51/fu4HQY7gNiqX9RhUa5po8qMs3czsM6Se9RuvQQH2h8o3zRysaAb6Nj5zFWxwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4TJSGS3H4zzsWKc;
-	Mon, 22 Jan 2024 19:11:44 +0800 (CST)
-Received: from dggpeml500026.china.huawei.com (unknown [7.185.36.106])
-	by mail.maildlp.com (Postfix) with ESMTPS id B65991400E5;
-	Mon, 22 Jan 2024 19:12:44 +0800 (CST)
-Received: from [10.174.178.66] (10.174.178.66) by
- dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 22 Jan 2024 19:12:44 +0800
-Message-ID: <7f963ac6-28ef-376c-e20d-bdfaedefba36@huawei.com>
-Date: Mon, 22 Jan 2024 19:12:43 +0800
+	s=arc-20240116; t=1705922378; c=relaxed/simple;
+	bh=QX+S72Jw/G+LWgzrgP6E8bocfqZMYncUlCjzuKuS+tA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=U7YgdbbCAulgFVDSIoyHJPLxtNF8c+p8fSDtu5hFjys4LrWTNfaXZCBY6O0nmCaAXEiMVc0mhf37U3iLPJ83LksAsi/zUZqUEDVe+K4yogU466freLCLCRfuW6avz6tDmj1YrSishQouq9RBuWD7hI8J40sRiPGlUusloqqitAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Gz40Xgmg; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1705922375;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/EdLluhqM4YiUBc7bl3e3yyhKpkhN20GphfcOQyoLCw=;
+	b=Gz40XgmgOxCbhIskjYUQGWD4jhZB0ec9CZX26Et2YthP5YQlWtM5jPvBIulAgs8qNvxAfM
+	SSgvQgpux4qj5dD2sQSDs9J2hvUAxykgnNQseAUnbjFUKP4U5pDvM+B/ymw/5ZnEklIQcC
+	2DdituHrTESfxoDMBjP4gTUsxE4+3EA=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-528-WS9sOzbyOp2ijLv3Gscg0g-1; Mon, 22 Jan 2024 06:19:33 -0500
+X-MC-Unique: WS9sOzbyOp2ijLv3Gscg0g-1
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-5596f90d5c8so1386595a12.3
+        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 03:19:33 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705922372; x=1706527172;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/EdLluhqM4YiUBc7bl3e3yyhKpkhN20GphfcOQyoLCw=;
+        b=UQEsCbB1Ean9QJxd/Hd4e0KvSd94+Y8GJuyAjT0LAoIxu6Ed1syrFlwdQAqL/mt7o9
+         QTUjjLsMM83+G8EIKrX8aVAZ2kOtw7meEEEsM5UqC0eWGkkAvFqIsG+M6cugguIrYhsg
+         AEguhheIsKgEUer6eKdEM0GX1CSHilYsX9K7BdOxSZvgGdg2JuVC4ehI+iyqb1HJPkEv
+         aTLtJFJ++yASOnqtvqtI1ERCLnEYMcKUnIlTp0pXdQIYt7pqS/5L1C0agOvb4iggSgIo
+         c0Ypw9dBABllAjsqMMwdNGOM2JFEpaAl57hVG7TAb5uKNAqgwG3AvOZyV6S8qJ4iWf9l
+         mAzA==
+X-Gm-Message-State: AOJu0YzoHpNyHzeRFNTw672IhQwGPVC+FCsQNSRV/JPRndX+H34rIgQu
+	uG0iA009qdt6LzSHZtp97pTgh3f8I1H2fhQl9ko1Ndd1pAW976zLrD3j3lIWqHStQI18AiLpqVf
+	oXlikyAqBwQDrXZop+upm89wuD98AJ0tXQ2n4aIgvLm6fjR9BC1frhQ==
+X-Received: by 2002:a05:6402:1019:b0:55a:2f61:3697 with SMTP id c25-20020a056402101900b0055a2f613697mr2194705edu.21.1705922372746;
+        Mon, 22 Jan 2024 03:19:32 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHXE5re1Q26n7a0bbj0zp1GIOA0AcKwmF9mk/MNxA2zC+pxvngJHD0TfzSIsf7876Tl0T1qTA==
+X-Received: by 2002:a05:6402:1019:b0:55a:2f61:3697 with SMTP id c25-20020a056402101900b0055a2f613697mr2194689edu.21.1705922372432;
+        Mon, 22 Jan 2024 03:19:32 -0800 (PST)
+Received: from localhost (net-93-71-3-198.cust.vodafonedsl.it. [93.71.3.198])
+        by smtp.gmail.com with ESMTPSA id c14-20020a05640227ce00b0055b49fc4e4esm2524744ede.26.2024.01.22.03.19.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jan 2024 03:19:31 -0800 (PST)
+Date: Mon, 22 Jan 2024 12:19:29 +0100
+From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Cc: Lorenzo Bianconi <lorenzo@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	willemdebruijn.kernel@gmail.com, toke@redhat.com,
+	davem@davemloft.net, edumazet@google.com, bpf@vger.kernel.org,
+	sdf@google.com, jasowang@redhat.com
+Subject: Re: [PATCH v5 net-next 1/3] net: introduce page_pool pointer in
+ softnet_data percpu struct
+Message-ID: <Za5PQX6ORCXtTtF4@lore-desk>
+References: <cover.1702563810.git.lorenzo@kernel.org>
+ <b1432fc51c694f1be8daabb19773744fcee13cf1.1702563810.git.lorenzo@kernel.org>
+ <c49124012f186e06a4a379b060c85e4cca1a9d53.camel@redhat.com>
+ <33bbb170-afdd-477f-9296-a9cede9bc2f2@kernel.org>
+ <ZagQGZ5CM3vEH2RP@lore-desk>
+ <20240117174722.521c9fdf@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.0.2
-Subject: Re: [PATCH netdev] ipv6: Make sure tcp accept_queue's spinlocks are
- initialized
-To: Chen-Yu Tsai <wenst@chromium.org>, "David S. Miller"
-	<davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240122102322.1131826-1-wenst@chromium.org>
-From: shaozhengchao <shaozhengchao@huawei.com>
-In-Reply-To: <20240122102322.1131826-1-wenst@chromium.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpeml500026.china.huawei.com (7.185.36.106)
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="a9ZKnG+ePERiuFE3"
+Content-Disposition: inline
+In-Reply-To: <20240117174722.521c9fdf@kernel.org>
 
-Hi Chen-Yu Tsai:
-	I have send the fixed patch.
-https://lore.kernel.org/all/20240122102001.2851701-1-shaozhengchao@huawei.com/
-Thank you
 
-Zhengchao Shao
+--a9ZKnG+ePERiuFE3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 2024/1/22 18:23, Chen-Yu Tsai wrote:
-> Commit 198bc90e0e73 ("tcp: make sure init the accept_queue's spinlocks
-> once") moved the TCP accept_queue spinlock initialization from a common
-> core function to two places for two cases: the common accept callback,
-> and the socket create callback.
-> 
-> For the second case, only AF_INET (IPv4) was considered. This results
-> in a lockdep error when accepting an incoming IPv6 TCP connection.
-> 
->      INFO: trying to register non-static key.
->      The code is fine but needs lockdep annotation, or maybe
->      you didn't initialize this object before use?
->      turning off the locking correctness validator.
->      Call trace:
->      ... <stack dump> ...
->      register_lock_class (kernel/locking/lockdep.c:977 kernel/locking/lockdep.c:1289)
->      __lock_acquire (kernel/locking/lockdep.c:5014)
->      lock_acquire (./arch/arm64/include/asm/percpu.h:40 kernel/locking/lockdep.c:467 kernel/locking/lockdep.c:5756 kernel/locking/lockdep.c:5719)
->      _raw_spin_lock (./include/linux/spinlock_api_smp.h:134 kernel/locking/spinlock.c:154)
->      inet_csk_complete_hashdance (net/ipv4/inet_connection_sock.c:1303 net/ipv4/inet_connection_sock.c:1355)
->      tcp_check_req (net/ipv4/tcp_minisocks.c:653)
->      tcp_v6_rcv (net/ipv6/tcp_ipv6.c:1837)
->      ip6_protocol_deliver_rcu (net/ipv6/ip6_input.c:438)
->      ip6_input_finish (./include/linux/rcupdate.h:779 net/ipv6/ip6_input.c:484)
->      ip6_input (./include/linux/netfilter.h:314 ./include/linux/netfilter.h:308 net/ipv6/ip6_input.c:492)
->      ip6_sublist_rcv_finish (net/ipv6/ip6_input.c:86 (discriminator 3))
->      ip6_sublist_rcv (net/ipv6/ip6_input.c:317)
->      ipv6_list_rcv (net/ipv6/ip6_input.c:326)
->      __netif_receive_skb_list_core (net/core/dev.c:5577 net/core/dev.c:5625)
->      netif_receive_skb_list_internal (net/core/dev.c:5679 net/core/dev.c:5768)
->      napi_complete_done (./include/linux/list.h:37 (discriminator 2) ./include/net/gro.h:440 (discriminator 2) ./include/net/gro.h:435 (discriminator 2) net/core/dev.c:6108 (discriminator 2))
->      ... <device callback> ...
-> 
-> Fix this by adding the appropriate code to AF_INET6 (IPv6) socket create
-> callback, mirroring what was added for AF_INET.
-> 
-> Fixes: 198bc90e0e73 ("tcp: make sure init the accept_queue's spinlocks once")
-> Signed-off-by: Chen-Yu Tsai <wenst@chromium.org>
-> ---
->   net/ipv6/af_inet6.c | 3 +++
->   1 file changed, 3 insertions(+)
-> 
-> diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
-> index 13a1833a4df5..959bfd9f6344 100644
-> --- a/net/ipv6/af_inet6.c
-> +++ b/net/ipv6/af_inet6.c
-> @@ -199,6 +199,9 @@ static int inet6_create(struct net *net, struct socket *sock, int protocol,
->   	if (INET_PROTOSW_REUSE & answer_flags)
->   		sk->sk_reuse = SK_CAN_REUSE;
->   
-> +	if (INET_PROTOSW_ICSK & answer_flags)
-> +		inet_init_csk_locks(sk);
-> +
->   	inet = inet_sk(sk);
->   	inet_assign_bit(IS_ICSK, sk, INET_PROTOSW_ICSK & answer_flags);
->   
+> On Wed, 17 Jan 2024 18:36:25 +0100 Lorenzo Bianconi wrote:
+> > I would resume this activity and it seems to me there is no a clear dir=
+ection
+> > about where we should add the page_pool (in a per_cpu pointer or in
+> > netdev_rx_queue struct) or if we can rely on page_frag_cache instead.
+> >=20
+> > @Jakub: what do you think? Should we add a page_pool in a per_cpu point=
+er?
+
+Hi Jakub,
+
+>=20
+> Let's try to summarize. We want skb reallocation without linearization
+> for XDP generic. We need some fast-ish way to get pages for the payload.
+
+correct
+
+>=20
+> First, options for placing the allocator:
+>  - struct netdev_rx_queue
+>  - per-CPU
+>=20
+> IMO per-CPU has better scaling properties - you're less likely to
+> increase the CPU count to infinity than spawn extra netdev queues.
+
+ack
+
+>=20
+> The second question is:
+>  - page_frag_cache
+>  - page_pool
+>=20
+> I like the page pool because we have an increasing amount of infra for
+> it, and page pool is already used in veth, which we can hopefully also
+> de-duplicate if we have a per-CPU one, one day. But I do agree that
+> it's not a perfect fit.
+>=20
+> To answer Jesper's questions:
+>  ad1. cache size - we can lower the cache to match page_frag_cache,=20
+>       so I think 8 entries? page frag cache can give us bigger frags=20
+>       and therefore lower frag count, so that's a minus for using=20
+>       page pool
+>  ad2. nl API - we can extend netlink to dump unbound page pools fairly
+>       easily, I didn't want to do it without a clear use case, but I
+>       don't think there are any blockers
+>  ad3. locking - a bit independent of allocator but fair point, we assume
+>       XDP generic or Rx path for now, so sirq context / bh locked out
+>  ad4. right, well, right, IDK what real workloads need, and whether=20
+>       XDP generic should be optimized at all.. I personally lean
+>       towards "no"
+> =20
+> Sorry if I haven't helped much to clarify the direction :)
+> I have no strong preference on question #2, I would prefer to not add
+> per-queue state for something that's in no way tied to the device
+> (question #1 -> per-CPU).=20
+
+Relying on netdev_alloc_cache/napi_alloc_cache will have the upside of reus=
+ing
+current infrastructure (iirc my first revision used this approach).
+The downside is we can't unify the code with veth driver.
+There other way around adding per-cpu page_pools :). Anyway I am fine to ha=
+ve a
+per-cpu page_pool similar to netdev_alloc_cache/napi_alloc_cache.
+
+@Jesper/Ilias: what do you think?
+
+>=20
+> You did good perf analysis of the options, could you share it here
+> again?
+>=20
+
+copying them out from my previous tests:
+
+v00 (NS:ns0 - 192.168.0.1/24) <---> (NS:ns1 - 192.168.0.2/24) v01 =3D=3D(XD=
+P_REDIRECT)=3D=3D> v10 (NS:ns1 - 192.168.1.1/24) <---> (NS:ns2 - 192.168.1.=
+2/24) v11
+
+- v00: iperf3 client (pinned on core 0)
+- v11: iperf3 server (pinned on core 7)
+
+net-next veth codebase (page_pool APIs):
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+- MTU  1500: ~ 5.42 Gbps
+- MTU  8000: ~ 14.1 Gbps
+- MTU 64000: ~ 18.4 Gbps
+
+net-next veth codebase + netdev_alloc_cache/napi_alloc_cache:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+- MTU  1500: ~ 6.62 Gbps
+- MTU  8000: ~ 14.7 Gbps
+- MTU 64000: ~ 19.7 Gbps
+
+xdp_generic codebase + netdev_alloc_cache/napi_alloc_cache:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D
+- MTU  1500: ~ 6.41 Gbps
+- MTU  8000: ~ 14.2 Gbps
+- MTU 64000: ~ 19.8 Gbps
+
+xdp_generic codebase + page_pool in netdev_rx_queue:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+- MTU  1500: ~ 5.75 Gbps
+- MTU  8000: ~ 15.3 Gbps
+- MTU 64000: ~ 21.2 Gbps
+
+IIRC relying on per-cpu page_pool has similar results of adding them in net=
+dev_rx_queue,
+but I can test them again with an updated kernel.
+
+Regards,
+Lorenzo
+
+--a9ZKnG+ePERiuFE3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZa5PQQAKCRA6cBh0uS2t
+rJFPAP92LI5/lVOXGQw2f5E8RBlSmRWxrraBMZxN4N4L6C3TmAEAr1kgFvaQKy+Z
+HB84CxxRYiPIvttJpU+tgPnB/Ox6YAk=
+=B/pY
+-----END PGP SIGNATURE-----
+
+--a9ZKnG+ePERiuFE3--
+
 
