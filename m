@@ -1,126 +1,187 @@
-Return-Path: <netdev+bounces-64644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A18668361E8
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 12:36:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BBC98361F9
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 12:38:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E9C51F27B3C
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 11:36:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 913191C25D78
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 11:38:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2DF53F8FF;
-	Mon, 22 Jan 2024 11:26:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63E3A405F5;
+	Mon, 22 Jan 2024 11:29:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kBRob5AZ"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="k3QKYbNv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F51B47A43
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 11:26:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DFA4405F1;
+	Mon, 22 Jan 2024 11:29:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705922782; cv=none; b=iRKOGREyZZRCIhyoZmPu02Zf1ekSdT/uvpcuQyJIfdAj4zVKv7XEM9vCet7eqKSRZ2jy8HoqzRsn71g4yvq46YaKVPWOFHd7qQZcrxwEx7SMICAXbwYUOQRWDRoS5V3OUibECbaPBej8ilNaa1+ZhGfQbZEiWQifB8o3g2OET9E=
+	t=1705922961; cv=none; b=cuolAsiWTd/eJUFIb/m6oq6pJvcRsGZCQNO5jyRbNV3IOQ6wEr6xh0dJoXD93rLn+8rHj4eSv8FHTpZhDe80iaUDAM5iOHstw+HM92HfwXwM5SQ342vwyRvtWhOE9dcckLWvuDctZNPPwAiw5h1b9cUjqWT78URQjg+3s4N4lZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705922782; c=relaxed/simple;
-	bh=6dOlWcUKbcebWSNV5ZPXFJrJi689QCLmhNcaqvJxhnY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=LXYSUDbJPG7c2tgarpY2wrOy41112nupSAv60xzhV7k9t8D/slxAu47pq9vW+D/3zFLeMLZIv47oQ8O9VZm8uyFrsim2Ull/LyySuaGVW41bQeRjYY5wAJSmz8sMtjFQ4vRuEvYM92GSHsLS7opHbuW3Kxsg7s5wExFV5zzCTTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kBRob5AZ; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbf1c3816a3so3380008276.1
-        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 03:26:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1705922780; x=1706527580; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HJcGY/070CxnAPQgxk2MB4NMkhA2yZaH3cqANTsmxW4=;
-        b=kBRob5AZ8qUqO232Z1wGesrNtzQ+KK7GzSuqhSdmFGYplQTABeXGA9sF55lVfQ7MWh
-         JjVpt8fxgRftiL77BUTWAiX8MSHyiwhCQp9Scwcw52crLE1ipYAKAxnmFRKE+ekZT29M
-         TI4c2o8PPjHHAFK9F9K6eQpUFetzq9oTbA0YEudGX1ggAanhqb9J1dZDNymClb9kWDE+
-         XgYETQLCtpiWQmqBDmmVylm1Wp7FwahZXc1aZ4YeIiqNJ+qa8QlwrjQnRxo1zJqG7R3I
-         GyWXPI4tbXUaE3xVtYOKWJqZ9zC1hdD+zej2xa7+OX7fzjzQ3YB/UOUZ0iu+oZUO3w6b
-         P8Cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705922780; x=1706527580;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HJcGY/070CxnAPQgxk2MB4NMkhA2yZaH3cqANTsmxW4=;
-        b=NzGsAKQ4xolIo5QhJWcUs8Gax/8xaYWb8o95II2gqe74T8sTEkIH9ScrAdIqYXnjJ2
-         YCdY9SdFSp92WzTBKBZGHCmKdBW/6B2s0Gr5DchvWN4q9kRpzx1conMsKF6piiuNxXdi
-         kesBZ2AJItxf4MZ9uzkpEihzEUqoXuyWRL/34Yn03bcldxF1AoHZSsA6d27R9xt0q60V
-         moJ41FCa0kADYKjwFpPwBZwgq5BLbJq5x02c5BhmL+GRoSzo0XlC0zP7mOygvW9LNjJ0
-         h/6y5xiIiPbHOfnHoRgfRIIQfOWxjylqgahViYwD/f/Ui3FjeVfyK2n6e8eP5J67TSAr
-         FPKg==
-X-Gm-Message-State: AOJu0YznBtWsomSB1nQ2JKmd6/k2YQgg5PK0rGEcgygtfBoi9j+lN8aZ
-	5iX8ayFY4TUUV+imldACoQH7Ltdp+Wzdj+Melbyd07eo6S8EGWwWLc5kL6ZztOrIEN6g6T3Gc2L
-	MiW+BYF+B2A==
-X-Google-Smtp-Source: AGHT+IFLQAhCy31YOwxtuub93Jr8Y6cEYAx7ayvAbGpaEwJSuapu+NE1EsLNf8m7OKQSExEe6GfiTrbeWqBKWA==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:dc4d:0:b0:dc2:6501:f45 with SMTP id
- y74-20020a25dc4d000000b00dc265010f45mr242466ybe.2.1705922780372; Mon, 22 Jan
- 2024 03:26:20 -0800 (PST)
-Date: Mon, 22 Jan 2024 11:26:03 +0000
-In-Reply-To: <20240122112603.3270097-1-edumazet@google.com>
+	s=arc-20240116; t=1705922961; c=relaxed/simple;
+	bh=02p3/XLk2GVAFOCVUjH4j4G+NWMsL97dBG6vEoRo548=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D/jlluT92sPygTc8XebAzkEWTe939lM+Y/AUUiHGHcdRDTjkJvN4zaxi1B958GUKySiopO/M9Kg43MQgnkDGLSAlaMzqmdwZoD/ZNPk//GI/m7gjGsrbbrUN6vWEMacYCpJzbxc+57aOSN0UEOLtmRTjwxLAIFq7qsbK+T9WhlE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=k3QKYbNv; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40MAxtDV001776;
+	Mon, 22 Jan 2024 11:29:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=5QH4HoCU8SmewLPPMnnsPEQ8yT5/pbHG6Jqw+tq2pTk=;
+ b=k3QKYbNvKjkrfceL0uRbET6cKX0Sl4SqIGrWj+wPxCV+jxq3yAf93DdqQFbUJ0xIf9zQ
+ ijJrUbEgNixsJDnUKs/kUlOs/o/H3Go5m/Ik0MXX21L+Rtoj2x9WCicFXD5+O1W4hokn
+ vmFlzSYox13kiIRDYWb0Mk2vgf4O7FaeIu5HLoYfrKz1j81iOuJrNfkNzGyWRtnhqmHo
+ NhPR2YVWwi62ZZhRykE73+bNl0YUyWwsXmT9xPjXFR88xFrv27eerMWCfTeZeo8n+wSC
+ X1JiyqsuWn6PJh0NDM74vpqvivPii9XTC0hj0JI3ZXSZg7/LPMscgAhu7A8eLZMv28OJ 0Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vsk8qe56h-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 22 Jan 2024 11:29:06 +0000
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40MBRDbc020845;
+	Mon, 22 Jan 2024 11:29:05 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vsk8qe566-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 22 Jan 2024 11:29:05 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 40MAbajW026507;
+	Mon, 22 Jan 2024 11:29:04 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vrrgt07dw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 22 Jan 2024 11:29:04 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 40MBT2vW12911278
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 22 Jan 2024 11:29:02 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 649E62004E;
+	Mon, 22 Jan 2024 11:29:02 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3C2C920040;
+	Mon, 22 Jan 2024 11:29:02 +0000 (GMT)
+Received: from DESKTOP-2CCOB1S. (unknown [9.171.150.144])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Mon, 22 Jan 2024 11:29:02 +0000 (GMT)
+Date: Mon, 22 Jan 2024 12:29:00 +0100
+From: Tobias Huschle <huschle@linux.ibm.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, Abel Wu <wuyun.abel@bytedance.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        virtualization@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6
+ sched/fair: Add lag based placement)
+Message-ID: <Za5RfPHu/Q9I6P05@DESKTOP-2CCOB1S.>
+References: <20231211115329-mutt-send-email-mst@kernel.org>
+ <CACGkMEudZnF7hUajgt0wtNPCxH8j6A3L1DgJj2ayJWhv9Bh1WA@mail.gmail.com>
+ <20231212111433-mutt-send-email-mst@kernel.org>
+ <42870.123121305373200110@us-mta-641.us.mimecast.lan>
+ <20231213061719-mutt-send-email-mst@kernel.org>
+ <25485.123121307454100283@us-mta-18.us.mimecast.lan>
+ <20231213094854-mutt-send-email-mst@kernel.org>
+ <20231214021328-mutt-send-email-mst@kernel.org>
+ <92916.124010808133201076@us-mta-622.us.mimecast.lan>
+ <20240121134311-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240122112603.3270097-1-edumazet@google.com>
-X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
-Message-ID: <20240122112603.3270097-10-edumazet@google.com>
-Subject: [PATCH net-next 9/9] inet_diag: skip over empty buckets
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: David Ahern <dsahern@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Martin KaFai Lau <kafai@fb.com>, Guillaume Nault <gnault@redhat.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240121134311-mutt-send-email-mst@kernel.org>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: tFuOvGgRbZN-3A8u42BRC_-gNLQlCRlI
+X-Proofpoint-GUID: jXHNqVrtEiakXHusiQPnyvRpdl7S0ZlQ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-22_02,2024-01-22_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ bulkscore=0 adultscore=0 malwarescore=0 suspectscore=0 lowpriorityscore=0
+ impostorscore=0 mlxlogscore=831 spamscore=0 clxscore=1015 mlxscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2401220082
 
-After the removal of inet_diag_table_mutex, sock_diag_table_mutex
-and sock_diag_mutex, I was able so see spinlock contention from
-inet_diag_dump_icsk() when running 100 parallel invocations.
+On Sun, Jan 21, 2024 at 01:44:32PM -0500, Michael S. Tsirkin wrote:
+> On Mon, Jan 08, 2024 at 02:13:25PM +0100, Tobias Huschle wrote:
+> > On Thu, Dec 14, 2023 at 02:14:59AM -0500, Michael S. Tsirkin wrote:
+> > > 
+> > > Peter, would appreciate feedback on this. When is cond_resched()
+> > > insufficient to give up the CPU? Should Documentation/kernel-hacking/hacking.rst
+> > > be updated to require schedule() instead?
+> > > 
+> > 
+> > Happy new year everybody!
+> > 
+> > I'd like to bring this thread back to life. To reiterate:
+> > 
+> > - The introduction of the EEVDF scheduler revealed a performance
+> >   regression in a uperf testcase of ~50%.
+> > - Tracing the scheduler showed that it takes decisions which are
+> >   in line with its design.
+> > - The traces showed as well, that a vhost instance might run
+> >   excessively long on its CPU in some circumstance. Those cause
+> >   the performance regression as they cause delay times of 100+ms
+> >   for a kworker which drives the actual network processing.
+> > - Before EEVDF, the vhost would always be scheduled off its CPU
+> >   in favor of the kworker, as the kworker was being woken up and
+> >   the former scheduler was giving more priority to the woken up
+> >   task. With EEVDF, the kworker, as a long running process, is
+> >   able to accumulate negative lag, which causes EEVDF to not
+> >   prefer it on its wake up, leaving the vhost running.
+> > - If the kworker is not scheduled when being woken up, the vhost
+> >   continues looping until it is migrated off the CPU.
+> > - The vhost offers to be scheduled off the CPU by calling 
+> >   cond_resched(), but, the the need_resched flag is not set,
+> >   therefore cond_resched() does nothing.
+> > 
+> > To solve this, I see the following options 
+> >   (might not be a complete nor a correct list)
+> > - Along with the wakeup of the kworker, need_resched needs to
+> >   be set, such that cond_resched() triggers a reschedule.
+> 
+> Let's try this? Does not look like discussing vhost itself will
+> draw attention from scheduler guys but posting a scheduling
+> patch probably will? Can you post a patch?
+> 
 
-It is time to skip over empty buckets.
+I'll give it a go.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/ipv4/inet_diag.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+> > - The vhost calls schedule() instead of cond_resched() to give up
+> >   the CPU. This would of course be a significantly stricter
+> >   approach and might limit the performance of vhost in other cases.
+> > - Preventing the kworker from accumulating negative lag as it is
+> >   mostly not runnable and if it runs, it only runs for a very short
+> >   time frame. This might clash with the overall concept of EEVDF.
+> > - On cond_resched(), verify if the consumed runtime of the caller
+> >   is outweighing the negative lag of another process (e.g. the 
+> >   kworker) and schedule the other process. Introduces overhead
+> >   to cond_resched.
+> 
+> Or this last one.
+> 
 
-diff --git a/net/ipv4/inet_diag.c b/net/ipv4/inet_diag.c
-index 2c2d8b9dd8e9bb502e52e30dffc70da36d9b1c74..7adace541fe292851a66ccc4de1da2a60ac4714e 100644
---- a/net/ipv4/inet_diag.c
-+++ b/net/ipv4/inet_diag.c
-@@ -1045,6 +1045,10 @@ void inet_diag_dump_icsk(struct inet_hashinfo *hashinfo, struct sk_buff *skb,
- 			num = 0;
- 			ilb = &hashinfo->lhash2[i];
- 
-+			if (hlist_nulls_empty(&ilb->nulls_head)) {
-+				s_num = 0;
-+				continue;
-+			}
- 			spin_lock(&ilb->lock);
- 			sk_nulls_for_each(sk, node, &ilb->nulls_head) {
- 				struct inet_sock *inet = inet_sk(sk);
-@@ -1109,6 +1113,10 @@ void inet_diag_dump_icsk(struct inet_hashinfo *hashinfo, struct sk_buff *skb,
- 			accum = 0;
- 			ibb = &hashinfo->bhash2[i];
- 
-+			if (hlist_empty(&ibb->chain)) {
-+				s_num = 0;
-+				continue;
-+			}
- 			spin_lock_bh(&ibb->lock);
- 			inet_bind_bucket_for_each(tb2, &ibb->chain) {
- 				if (!net_eq(ib2_net(tb2), net))
--- 
-2.43.0.429.g432eaa2c6b-goog
+This one will probably be more complicated as the necessary information
+is not really available at the places where I'd like to see it.
+Will have to ponder on that a bit to figure out if there might be an
+elegant way to approach this.
 
+> 
+> > 
+> > I would be curious on feedback on those ideas and interested in
+> > alternative approaches.
+> 
+> 
 
