@@ -1,304 +1,549 @@
-Return-Path: <netdev+bounces-64685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B37F83658D
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 15:36:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B9A9836597
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 15:38:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F7261C21555
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 14:36:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B0E01F24D91
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 14:38:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A3323D54A;
-	Mon, 22 Jan 2024 14:36:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B0953D551;
+	Mon, 22 Jan 2024 14:38:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ecdCaCfg"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="hjcgCia8"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2052.outbound.protection.outlook.com [40.107.93.52])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 181B520DEF;
-	Mon, 22 Jan 2024 14:36:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705934166; cv=fail; b=JSd8M1bIjfvQD5NLCcMgmMqlNBSL8w+38DYLjYRVAStofAIsA3RKmc7pFxSwl5w/H8Tt3OlhDneTWkgm+nNTyg53jfgzrkSOXKYqm6UDO50LFLDkvz2+S/xMWRC03K+FQ+HhlH0jkSU6kqNG5mZl5WECYl2UH2oDhbD4/7fjCEo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705934166; c=relaxed/simple;
-	bh=WsVMdFNu5TvCDK4Q8SfuKa2sjzdUXknWX5kGt7YTSD4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=s/JXLIwD1YLCa/A9jnEJIU4lPSMK7Wf2XC3LIerabG3pWxQErpedodEGKzJzDBfMYYVMFyKLv7kWnlW8rcl7oVgOI2OzH4nT898okjAUi4Wgh0CtV8bESEMwpRdD+4VAuPbmkrS3rdxcIj3vHTsXd99ouujR6fRPoqBANwxZnA0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ecdCaCfg; arc=fail smtp.client-ip=40.107.93.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FEaDQERmcFx1op6ZXbCwHjdsuD6SIft2kigqYxtADb/FeeG46ylF3vUA5iTS+hTCdRn0sDKT/a3e618x0g39U6U3hGkzxN7a5zwtr/Z8GPTcRHm/SV8YhR2i2KQyWFr37qbYhjOyFBHoME2wCf5HsBaWOfb+NldR/FgV/TTWK79QxISB31zPtuZt5DbGzTqdlPEwE2u+1qlRzr3zB5vpxwWjAYCtJdV6jfloj+8Fqd58tBaY/OCRX/GhiHHaPej/GCBmzTN6TSquTVM5futLJFjxXGQW3cbu+ww/X/ZIZmyujipQbG3G1Y4Gso61EEiz+0Y/Cfm+OQwvbRDEA4QTtA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WsVMdFNu5TvCDK4Q8SfuKa2sjzdUXknWX5kGt7YTSD4=;
- b=h3Ode4ti/b2+uskIEGiZ/HKZpiyqyuocXnxd9I29Hod6SzT1aTjWX0oyJu2O/rsymyeiR410oli+fh3UkS1zCuo5z6AXdm0iXUvT1Pli2dOzBPLM9dQenb0TuK2iyW5pCxOGczMPV2k8MM2qGWNmqlZyRY7a99sSKdrNb0Nbm4I+/r3EwfInb2dCf7zuiWK0K2l+MGSosDd6FryoHHSTjzeYq5iG/Favk6vKgnOjnArpYhZg34GWjJ22Jb8VrWLBbff80YGIeF77LiapCGZTs6RTC8HqPMNkG+hzXllF5lH3lcnA/UJykHwfaAiVVNI0lchplbyddALTHa9Fl1+hPw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WsVMdFNu5TvCDK4Q8SfuKa2sjzdUXknWX5kGt7YTSD4=;
- b=ecdCaCfgkToZzmdCa+mV4u+yzKI4rVAm+jGRgVyhpA3NbK9OSPC4RVjc9Fo+mPIlCvS6BrIwsmPOhLUfXPyFCzRORdwm69CAU8eTfGW9ch8oDjx5cMxxTxTaHrf0GeP+d+uLEiQqdCrcsh5GnVn2oc4+Mk6ws0RrB6rWAljAnfVA9jgUw+25Tcw0qXB2YzfgMy53ajYuyoljDT6mJRtnLkVu/ITjk2cYokPhkU6d5atsrgBhPIXuCD4WJ49fVeOVgyT6FEAiWQtnEEE17Wk6wXnRPU+6vNWu5Ee76078KFhnPpNQ1sWgSDSiryjG/B3zIv7AtIX1s5RXp0qR+ttvwQ==
-Received: from DM6PR12MB4516.namprd12.prod.outlook.com (2603:10b6:5:2ac::20)
- by BN9PR12MB5257.namprd12.prod.outlook.com (2603:10b6:408:11e::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.32; Mon, 22 Jan
- 2024 14:36:00 +0000
-Received: from DM6PR12MB4516.namprd12.prod.outlook.com
- ([fe80::fa7e:d2b7:5f80:2dd4]) by DM6PR12MB4516.namprd12.prod.outlook.com
- ([fe80::fa7e:d2b7:5f80:2dd4%5]) with mapi id 15.20.7202.034; Mon, 22 Jan 2024
- 14:36:00 +0000
-From: Danielle Ratson <danieller@nvidia.com>
-To: Simon Horman <horms@kernel.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"corbet@lwn.net" <corbet@lwn.net>, "linux@armlinux.org.uk"
-	<linux@armlinux.org.uk>, "sdf@google.com" <sdf@google.com>,
-	"kory.maincent@bootlin.com" <kory.maincent@bootlin.com>,
-	"maxime.chevallier@bootlin.com" <maxime.chevallier@bootlin.com>,
-	"vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>,
-	"przemyslaw.kitszel@intel.com" <przemyslaw.kitszel@intel.com>,
-	"ahmed.zaki@intel.com" <ahmed.zaki@intel.com>, "richardcochran@gmail.com"
-	<richardcochran@gmail.com>, "shayagr@amazon.com" <shayagr@amazon.com>,
-	"paul.greenwalt@intel.com" <paul.greenwalt@intel.com>, "jiri@resnulli.us"
-	<jiri@resnulli.us>, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, mlxsw
-	<mlxsw@nvidia.com>, Petr Machata <petrm@nvidia.com>, Ido Schimmel
-	<idosch@nvidia.com>
-Subject: RE: [RFC PATCH net-next 7/9] ethtool: cmis_cdb: Add a layer for
- supporting CDB commands
-Thread-Topic: [RFC PATCH net-next 7/9] ethtool: cmis_cdb: Add a layer for
- supporting CDB commands
-Thread-Index: AQHaTQ+ILxuaMfgJf0Ou8iXfyvUHrbDlohAAgAA/mwA=
-Date: Mon, 22 Jan 2024 14:35:59 +0000
-Message-ID:
- <DM6PR12MB45168A412E91A73A01965331D8752@DM6PR12MB4516.namprd12.prod.outlook.com>
-References: <20240122084530.32451-1-danieller@nvidia.com>
- <20240122084530.32451-8-danieller@nvidia.com>
- <20240122103100.GA126470@kernel.org>
-In-Reply-To: <20240122103100.GA126470@kernel.org>
-Accept-Language: he-IL, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR12MB4516:EE_|BN9PR12MB5257:EE_
-x-ms-office365-filtering-correlation-id: bf5b33f5-6dcc-484b-eca7-08dc1b5773e9
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- zvhSneS9fE7H+Jpfmkc4L1Ib2U7vjJ3DChXymn8EU50mqgqsGwAc/xiGFANGwkX5A6n8j8QIiAPQeTQZXvUweZSCH5vLeCYVGbLneJ0te4pG2X6ttuFkMLtrdRYRzDsWPlJwlwQbtDx8Wq0kG0b+fsqcK2e394ZMxXdo+tprIDiV+scYUVa9J1koNtD4cfGM3KVUk9X9YXRySSRi5o4YAYD8CwZWgU9K29gpEFqb8RsF88M8oec94ryyIqHSTu+6WL5Ne+ZQZjwN718fHCqfgPsUbgNX80NV+mDdXiXR9iunDqukdG0/yhog5egbJJtBk5DX08JFq0fWWJIkMptHPLnfbcZgoVFPOCdIVFFpF/JeGCZK9NbTFmSw/5s3jXneWjY/YIRQRMOpfwp3cYxcNoFulSzLRGBwIdEjqEz2h6Pw4o/i2f9DTJofbFljysWPFCYoV4mGljfnVFEbZvZdch+ipCLFmRm05kBTS1J9KCV4tSTUYlmuUHfWLHfzAJUtX+A/pONULDGcr8z6o+k/QRnKjBu2zHGNgWb00DvsYYLXWObc1RpW1mEYu+GH3dRO6/RHoptvPd2dStYMabyy+KyBuFGktyIbtzx2fgA0N7nIepOrrZyZw5AC2ekAo++bWOhQLpdpb/Rvt0OSgiy2cGCkbrYY/QWhsXtIalVTacg=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4516.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(136003)(346002)(39860400002)(396003)(230273577357003)(230173577357003)(230922051799003)(451199024)(186009)(64100799003)(1800799012)(55016003)(9686003)(6506007)(71200400001)(107886003)(26005)(53546011)(7696005)(86362001)(38100700002)(38070700009)(33656002)(41300700001)(52536014)(4326008)(8676002)(8936002)(2906002)(76116006)(5660300002)(7416002)(316002)(83380400001)(122000001)(478600001)(6916009)(66556008)(66476007)(64756008)(66946007)(66446008)(54906003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?WllyM1VqeENkWG1JcmFMWDBQR0Z2WW9zR2RveERvc01sOVBJWnY5Nnc0bjgy?=
- =?utf-8?B?ZHIvS21YZ0sreHdhb0Nyd0hZU0JsUGRYNTlwU2hsdE5CaU9hb2owZlhKazJC?=
- =?utf-8?B?L2pHYjJObkJ2RjRVOHVRVTNacHcrUnhGNXNYZ1FUeXMzMU8rMU9KVEgvUkw1?=
- =?utf-8?B?SmxmUmtEZjFzQnJGZTZkRHVDNmlETVJQM0NSb2dJbjFyZnlIOGRLOFRJZ3Rh?=
- =?utf-8?B?bGloaVA5bTJ5VXZ6ZUlJQzArMXNlOTI5Uk53ajRYQkNkYTNGZ1AzUkRSWVkv?=
- =?utf-8?B?OHRrTEVhVytudVltcmVmTVVta1FFaWFack1YWFNCenZHUzdXRHhDdEc2bnhY?=
- =?utf-8?B?WE9DVGp3Vy9yS3FIWGRFYS8xUHRMeC9VUXhHOTJHZUZUbldGOWJ6TmhBMDU3?=
- =?utf-8?B?TTIrVkxsNmU5TEJMNlZpbjlqeVpvYldIV3BtWURGdHJockhLVWVZb1NaVDdv?=
- =?utf-8?B?TU43MnpBTTBUa3h2T1BxdHB6eWthVkJnZHhLdm9oZ3ZKSGI1MDlCU2FNcUFj?=
- =?utf-8?B?ZlFRQ291dElrZDljajNCaDR4QzRUK0pURkE0VUp0ZzJPSkx3OXlRUThzay93?=
- =?utf-8?B?blppUHZnWW9KV0E5VkhnZm5VRzY4K1ZOWEdjUFRnaGZHUXZnSkorYmdkWDZK?=
- =?utf-8?B?U0pGbVVvVjVDcFBUd0FlcExIRlBpamhsbGpjOTN4cFZjRW9oL2VRZjJXbFB0?=
- =?utf-8?B?RFM5TDV0QngwN0UvMHUvci9KN2pNR095STlGU3ZsSFVFM1pPeC8rZjhZMUpJ?=
- =?utf-8?B?a0c2TUpyOGxBbVVXbDFjWFVUc2N2WEoyQ2MwTGF5Y0dWZ1N2dnNyV1ZLOGY0?=
- =?utf-8?B?WEw5TXRTZVY3Um1XOHJQZUlYUllGam1BYWpsK2tIamVlU01icHVuUFVMZndC?=
- =?utf-8?B?TGFyNXJXZHdpT3k3OWdGUEtTWG9aaCtsSld1bTg4dEExR0lmSFhPL1dCTDIw?=
- =?utf-8?B?VWxLeWxOUDJHOVZ3TWdMaERJWllLVytBNHgrRlFBallRRjc2TkRoTEw2aW0y?=
- =?utf-8?B?RWxqcVlZL3VNSkVEWXFONnBSYk9yNXZpVFdwMlZRaGRGSm1STGozZXJwOG16?=
- =?utf-8?B?Vk5YbTZNZDdMT015N0VnN1ZBQ29lQkwzLzFyR2Z3M1Bkd3JYZjN6amRWZnFz?=
- =?utf-8?B?elFmV0FrQnRWWTNwS3BRYStZdndlVjJxVkQ2c3FVSGx4NWhiSXVSYWNBdVVj?=
- =?utf-8?B?OTlyZXMvNkJjUGpmaE0xQjRwRVVtSWtoamNmMWIrVzNiSklvZDlQTTBtVEhX?=
- =?utf-8?B?aDlRNW00TWozN1hnMXpCZlAxdHR5S2NQNFgzTnZpdFVUMmR0cjhVeTZ5c3ZO?=
- =?utf-8?B?cW1Ua05CaUZUUzU0aUlXck5nUXJ0ZTMxc3VPYlVIMklRY1BsMUxSK2ZzcVRu?=
- =?utf-8?B?cWdid3dzTTdIdmpjZkw4SmV2Uk5zTWtxYmx1QWVCNXBGTzkyRHZQN1p4eitw?=
- =?utf-8?B?RkYya0M1ZXJTblNTQXl6eW5RVEVwNndoNHlabGYzZUg4b01icHBVMC81bTZz?=
- =?utf-8?B?V1hIR3ZxSEZBMHlTcEJDNFM0UFI0a3diYVd4NEp6OFpSRnZYdnFId2pWTDEz?=
- =?utf-8?B?bTlEZVlFZnVvK1hwSG5GT0JMREhpYVpITTVncmhJMi9FLzA0U1RIbjdNUXNa?=
- =?utf-8?B?dWRWaHJIZkc2RktaM3NwUWRxdjdyZ1picGQ5Nkk1a2hEOXh1LzYySnhZSzZ5?=
- =?utf-8?B?TXI1eng0VWF4SWFNZW5scnBYQlBOS0psRVkyUjRZQ0hmajdZMEo0K0Q2U0Z6?=
- =?utf-8?B?YkM2Q2RUUEFTdXpHMGpOeHk4VWdCMW5zc1VlcFUxdlJqQThMeU5jL1hlK1Ft?=
- =?utf-8?B?K1ZIcmlmUlVXOW51bWorWDFPV1ZQUDRzT0lxdGdPdzF2R2J2ZkJra3RPQ2tK?=
- =?utf-8?B?b3FiSlFjTzJmai9HNzhmSFVLME0vbkl5UFJJMDZpeElpTFo4YVZYMGFLamgx?=
- =?utf-8?B?dndOanNiWHBFQ3JwSGVvdGpqYXVSRDNwZjd5VEJGVG9tc3RrR0xVZWpqQ2JO?=
- =?utf-8?B?aGNkekpoQVZ2eVVkL2RKTWJWYmxFRnVzSno4SFQ4ZWRtSTRyOC9BZm5kekls?=
- =?utf-8?B?M0xHajZ6SkpqR2NQYkNEZXRVQzk2blBjRXk4QVJhUTJMNHhoQ3ZmamtFZzh0?=
- =?utf-8?Q?hT3QImYp36mj+XGMRtXr7r/5e?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4963F3D0A8;
+	Mon, 22 Jan 2024 14:38:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705934293; cv=none; b=BSnb6XFtOx3jz5FtfQ+VVliMzmW+09DhlNRPz6DlNWthcrIT4QMZKfbaLLgGxaoNXNurBJl174mEV4LmlQwfFW9RIzK/qwnaFSd5tXseddI6Arol5qT3aNr0wLkEQqmoCkf+qP216UW2Uo/UqzXPV+nxsxSvgeNzi8gvx2kJdQ8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705934293; c=relaxed/simple;
+	bh=M+N0ZpW6vxrk4+9DBqbg5WMl2HagwFtu+jn7PFsJ2dU=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
+	 In-Reply-To:Content-Type; b=Q27FBCOGzul/pvwRng/K9Cum6lFdMF+STjy8LXU6vQI/GUpHCRh7Zcy42moy703Tdyf40CIU3ewT9czfv2viZ8rVQpSr2NsTQIGiYjIED92kggPn+hHCuHPh3diG8c0Nh1dpe2L15i/pDArMavS29f52hVkr8yTF6a+1TIBGYNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=hjcgCia8; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40MDx3cn023315;
+	Mon, 22 Jan 2024 14:37:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:from:subject:to:cc:references
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=361AUjetoVW9ka0VoP2w8v9wbtdb+FG2MRwwZ0ZqHy4=; b=hj
+	cgCia8GKd0mx5exrusQbynBPi2vDiZnttyolpDqUpmespfylcbKBs98mpwYHQ9L/
+	I9ibYk4HrG3+7nmJ9cy2AieeWjJ7gZ9jWCksWAgbQHN8pbvmIr4OeAi/JENGMRhv
+	zqfivkmu3zI6QFNvZb7bMTMsDPWAGatFmTANzVjni4I7edlgl6jJq7PpiVITI18U
+	fNu87wT5eU2S+ySkS9q9+Zk9MUTX8o05w44A/bSUi3yh4E9kPHrhn4Q7azeCRRKw
+	dLsujyCjDM6cjQzejgEZ8zM9e4288bOaDzXcMB4Wtjt1FwmfKHhNnxL6T1GGrFCG
+	ce6YbuBowzeWRjEpZT6g==
+Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3vsq7w0kcj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 22 Jan 2024 14:37:21 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 40MEbKZn022679
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 22 Jan 2024 14:37:20 GMT
+Received: from [10.253.15.239] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Mon, 22 Jan
+ 2024 06:37:10 -0800
+Message-ID: <17b3fbe0-a806-4b56-a179-bd42f03dd652@quicinc.com>
+Date: Mon, 22 Jan 2024 22:37:00 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4516.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bf5b33f5-6dcc-484b-eca7-08dc1b5773e9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jan 2024 14:36:00.0190
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: GFoO9fYlz8VzmyzrbVVLVFQFIURwQDxrubuqc/AkbFrapT7okqrVP01Y9uVAeTjw3o8+CiMMcQtSW2QDC1viZw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5257
+User-Agent: Mozilla Thunderbird
+From: Lei Wei <quic_leiwei@quicinc.com>
+Subject: Re: [PATCH net-next 17/20] net: ethernet: qualcomm: Add PPE UNIPHY
+ support for phylink
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+        Luo Jie
+	<quic_luoj@quicinc.com>
+CC: <agross@kernel.org>, <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <corbet@lwn.net>, <catalin.marinas@arm.com>, <will@kernel.org>,
+        <p.zabel@pengutronix.de>, <shannon.nelson@amd.com>,
+        <anthony.l.nguyen@intel.com>, <jasowang@redhat.com>,
+        <brett.creeley@amd.com>, <rrameshbabu@nvidia.com>,
+        <joshua.a.hay@intel.com>, <arnd@arndb.de>, <geert+renesas@glider.be>,
+        <neil.armstrong@linaro.org>, <dmitry.baryshkov@linaro.org>,
+        <nfraprado@collabora.com>, <m.szyprowski@samsung.com>,
+        <u-kumar1@ti.com>, <jacob.e.keller@intel.com>, <andrew@lunn.ch>,
+        <netdev@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <ryazanov.s.a@gmail.com>, <ansuelsmth@gmail.com>,
+        <quic_kkumarcs@quicinc.com>, <quic_suruchia@quicinc.com>,
+        <quic_soni@quicinc.com>, <quic_pavir@quicinc.com>,
+        <quic_souravp@quicinc.com>, <quic_linchen@quicinc.com>
+References: <20240110114033.32575-1-quic_luoj@quicinc.com>
+ <20240110114033.32575-18-quic_luoj@quicinc.com>
+ <ZZ6JCIQSimPy0TVY@shell.armlinux.org.uk>
+Content-Language: en-US
+In-Reply-To: <ZZ6JCIQSimPy0TVY@shell.armlinux.org.uk>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: KTl4EaLmIc1662ADOB4RC8ENLFPvCv7W
+X-Proofpoint-ORIG-GUID: KTl4EaLmIc1662ADOB4RC8ENLFPvCv7W
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-22_05,2024-01-22_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ lowpriorityscore=0 spamscore=0 clxscore=1011 suspectscore=0
+ priorityscore=1501 malwarescore=0 bulkscore=0 impostorscore=0
+ mlxlogscore=999 phishscore=0 mlxscore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2311290000
+ definitions=main-2401220099
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBTaW1vbiBIb3JtYW4gPGhvcm1z
-QGtlcm5lbC5vcmc+DQo+IFNlbnQ6IE1vbmRheSwgMjIgSmFudWFyeSAyMDI0IDEyOjMxDQo+IFRv
-OiBEYW5pZWxsZSBSYXRzb24gPGRhbmllbGxlckBudmlkaWEuY29tPg0KPiBDYzogbmV0ZGV2QHZn
-ZXIua2VybmVsLm9yZzsgZGF2ZW1AZGF2ZW1sb2Z0Lm5ldDsgZWR1bWF6ZXRAZ29vZ2xlLmNvbTsN
-Cj4ga3ViYUBrZXJuZWwub3JnOyBwYWJlbmlAcmVkaGF0LmNvbTsgY29yYmV0QGx3bi5uZXQ7DQo+
-IGxpbnV4QGFybWxpbnV4Lm9yZy51azsgc2RmQGdvb2dsZS5jb207IGtvcnkubWFpbmNlbnRAYm9v
-dGxpbi5jb207DQo+IG1heGltZS5jaGV2YWxsaWVyQGJvb3RsaW4uY29tOyB2bGFkaW1pci5vbHRl
-YW5AbnhwLmNvbTsNCj4gcHJ6ZW15c2xhdy5raXRzemVsQGludGVsLmNvbTsgYWhtZWQuemFraUBp
-bnRlbC5jb207DQo+IHJpY2hhcmRjb2NocmFuQGdtYWlsLmNvbTsgc2hheWFnckBhbWF6b24uY29t
-Ow0KPiBwYXVsLmdyZWVud2FsdEBpbnRlbC5jb207IGppcmlAcmVzbnVsbGkudXM7IGxpbnV4LWRv
-Y0B2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LQ0KPiBrZXJuZWxAdmdlci5rZXJuZWwub3JnOyBtbHhz
-dyA8bWx4c3dAbnZpZGlhLmNvbT47IFBldHIgTWFjaGF0YQ0KPiA8cGV0cm1AbnZpZGlhLmNvbT47
-IElkbyBTY2hpbW1lbCA8aWRvc2NoQG52aWRpYS5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUkZDIFBB
-VENIIG5ldC1uZXh0IDcvOV0gZXRodG9vbDogY21pc19jZGI6IEFkZCBhIGxheWVyIGZvcg0KPiBz
-dXBwb3J0aW5nIENEQiBjb21tYW5kcw0KPiANCj4gT24gTW9uLCBKYW4gMjIsIDIwMjQgYXQgMTA6
-NDU6MjhBTSArMDIwMCwgRGFuaWVsbGUgUmF0c29uIHdyb3RlOg0KPiANCj4gLi4uDQo+IA0KPiA+
-ICsvKioNCj4gPiArICogc3RydWN0IGV0aHRvb2xfY21pc19jZGJfcmVxdWVzdCAtIENEQiBjb21t
-YW5kcyByZXF1ZXN0IGZpZWxkcyBhcw0KPiBkZWNyaWJlZCBpbg0KPiA+ICsgKgkJCQl0aGUgQ01J
-UyBzdGFuZGFyZA0KPiA+ICsgKiBAaWQ6IENvbW1hbmQgSUQuDQo+ID4gKyAqIEBlcGxfbGVuOiBF
-UEwgbWVtb3J5IGxlbmd0aC4NCj4gPiArICogQGxwbF9sZW46IExQTCBtZW1vcnkgbGVuZ3RoLg0K
-PiA+ICsgKiBAY2hrX2NvZGU6IENoZWNrIGNvZGUgZm9yIHRoZSBwcmV2aW91cyBmaWVsZCBhbmQg
-dGhlIHBheWxvYWQuDQo+ID4gKyAqIEByZXN2MTogQWRkZWQgdG8gbWF0Y2ggdGhlIENNSVMgc3Rh
-bmRhcmQgcmVxdWVzdCBjb250aW51aXR5Lg0KPiA+ICsgKiBAcmVzdjI6IEFkZGVkIHRvIG1hdGNo
-IHRoZSBDTUlTIHN0YW5kYXJkIHJlcXVlc3QgY29udGludWl0eS4NCj4gPiArICogQHBheWxvYWQ6
-IFBheWxvYWQgZm9yIHRoZSBDREIgY29tbWFuZHMuDQo+ID4gKyAqLw0KPiA+ICtzdHJ1Y3QgZXRo
-dG9vbF9jbWlzX2NkYl9yZXF1ZXN0IHsNCj4gPiArCV9fYmUxNiBpZDsNCj4gPiArCXN0cnVjdF9n
-cm91cChib2R5LA0KPiA+ICsJCXUxNiBlcGxfbGVuOw0KPiA+ICsJCXU4IGxwbF9sZW47DQo+ID4g
-KwkJdTggY2hrX2NvZGU7DQo+ID4gKwkJdTggcmVzdjE7DQo+ID4gKwkJdTggcmVzdjI7DQo+ID4g
-KwkJdTggcGF5bG9hZFtFVEhUT09MX0NNSVNfQ0RCX0xQTF9NQVhfUExfTEVOR1RIXTsNCj4gPiAr
-CSk7DQo+ID4gK307DQo+ID4gKw0KPiA+ICsjZGVmaW5lIENEQl9GX0NPTVBMRVRJT05fVkFMSUQJ
-CUJJVCgwKQ0KPiA+ICsjZGVmaW5lIENEQl9GX1NUQVRVU19WQUxJRAkJQklUKDEpDQo+ID4gKw0K
-PiA+ICsvKioNCj4gPiArICogc3RydWN0IGV0aHRvb2xfY21pc19jZGJfY21kX2FyZ3MgLSBDREIg
-Y29tbWFuZHMgZXhlY3V0aW9uDQo+ID4gK2FyZ3VtZW50cw0KPiA+ICsgKiBAcmVxOiBDREIgY29t
-bWFuZCBmaWVsZHMgYXMgZGVzY3JpYmVkIGluIHRoZSBDTUlTIHN0YW5kYXJkLg0KPiA+ICsgKiBA
-bWF4X2R1cmF0aW9uOiBNYXhpbXVtIGR1cmF0aW9uIHRpbWUgZm9yIGNvbW1hbmQgY29tcGxldGlv
-biBpbg0KPiBtc2VjLg0KPiA+ICsgKiBAcmVhZF93cml0ZV9sZW5fZXh0OiBBbGxvd2FibGUgYWRk
-aXRpb25hbCBudW1iZXIgb2YgYnl0ZSBvY3RldHMgdG8gdGhlDQo+IExQTA0KPiA+ICsgKgkJCWlu
-IGEgUkVBRCBvciBhIFdSSVRFIGNvbW1hbmRzLg0KPiA+ICsgKiBAcnBsX2V4cF9sZW46IEV4cGVj
-dGVkIHJlcGx5IGxlbmd0aCBpbiBieXRlcy4NCj4gPiArICogQGZsYWdzOiBWYWxpZGF0aW9uIGZs
-YWdzIGZvciBDREIgY29tbWFuZHMuDQo+ID4gKyAqLw0KPiA+ICtzdHJ1Y3QgZXRodG9vbF9jbWlz
-X2NkYl9jbWRfYXJncyB7DQo+ID4gKwlzdHJ1Y3QgZXRodG9vbF9jbWlzX2NkYl9yZXF1ZXN0IHJl
-cTsNCj4gPiArCXUxNgkJCQltYXhfZHVyYXRpb247DQo+ID4gKwl1OAkJCQlyZWFkX3dyaXRlX2xl
-bl9leHQ7DQo+ID4gKwl1OCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHJwbF9leHBfbGVu
-Ow0KPiA+ICsJdTgJCQkJZmxhZ3M7DQo+ID4gK307DQo+IA0KPiAuLi4NCj4gDQo+ID4gK2ludCBl
-dGh0b29sX2NtaXNfcGFnZV9pbml0KHN0cnVjdCBldGh0b29sX21vZHVsZV9lZXByb20gKnBhZ2Vf
-ZGF0YSwNCj4gPiArCQkJICAgdTggcGFnZSwgdTMyIG9mZnNldCwgdTMyIGxlbmd0aCkgew0KPiA+
-ICsJcGFnZV9kYXRhLT5wYWdlID0gcGFnZTsNCj4gPiArCXBhZ2VfZGF0YS0+b2Zmc2V0ID0gb2Zm
-c2V0Ow0KPiA+ICsJcGFnZV9kYXRhLT5sZW5ndGggPSBsZW5ndGg7DQo+ID4gKwlwYWdlX2RhdGEt
-PmkyY19hZGRyZXNzID0gRVRIVE9PTF9DTUlTX0NEQl9QQUdFX0kyQ19BRERSOw0KPiA+ICsJcGFn
-ZV9kYXRhLT5kYXRhID0ga21hbGxvYyhwYWdlX2RhdGEtPmxlbmd0aCwgR0ZQX0tFUk5FTCk7DQo+
-ID4gKwlpZiAoIXBhZ2VfZGF0YS0+ZGF0YSkNCj4gPiArCQlyZXR1cm4gLUVOT01FTTsNCj4gPiAr
-DQo+ID4gKwlyZXR1cm4gMDsNCj4gPiArfQ0KPiANCj4gLi4uDQo+IA0KPiA+ICtzdGF0aWMgaW50
-DQo+ID4gK19fZXRodG9vbF9jbWlzX2NkYl9leGVjdXRlX2NtZChzdHJ1Y3QgbmV0X2RldmljZSAq
-ZGV2LA0KPiA+ICsJCQkgICAgICAgc3RydWN0IGV0aHRvb2xfbW9kdWxlX2VlcHJvbSAqcGFnZV9k
-YXRhLA0KPiA+ICsJCQkgICAgICAgdTMyIG9mZnNldCwgdTMyIGxlbmd0aCwgdm9pZCAqZGF0YSkg
-ew0KPiA+ICsJY29uc3Qgc3RydWN0IGV0aHRvb2xfb3BzICpvcHMgPSBkZXYtPmV0aHRvb2xfb3Bz
-Ow0KPiA+ICsJc3RydWN0IG5ldGxpbmtfZXh0X2FjayBleHRhY2sgPSB7fTsNCj4gPiArCWludCBl
-cnI7DQo+ID4gKw0KPiA+ICsJcGFnZV9kYXRhLT5vZmZzZXQgPSBvZmZzZXQ7DQo+ID4gKwlwYWdl
-X2RhdGEtPmxlbmd0aCA9IGxlbmd0aDsNCj4gPiArDQo+ID4gKwltZW1zZXQocGFnZV9kYXRhLT5k
-YXRhLCAwLA0KPiBFVEhUT09MX0NNSVNfQ0RCX0xQTF9NQVhfUExfTEVOR1RIKTsNCj4gPiArCW1l
-bWNweShwYWdlX2RhdGEtPmRhdGEsIGRhdGEsIHBhZ2VfZGF0YS0+bGVuZ3RoKTsNCj4gPiArDQo+
-ID4gKwllcnIgPSBvcHMtPnNldF9tb2R1bGVfZWVwcm9tX2J5X3BhZ2UoZGV2LCBwYWdlX2RhdGEs
-ICZleHRhY2spOw0KPiA+ICsJaWYgKGVyciA8IDApIHsNCj4gPiArCQlpZiAoZXh0YWNrLl9tc2cp
-DQo+ID4gKwkJCW5ldGRldl9lcnIoZGV2LCAiJXNcbiIsIGV4dGFjay5fbXNnKTsNCj4gPiArCX0N
-Cj4gPiArDQo+ID4gKwlyZXR1cm4gZXJyOw0KPiA+ICt9DQo+IA0KPiAuLi4NCj4gDQo+ID4gK2lu
-dCBldGh0b29sX2NtaXNfY2RiX2V4ZWN1dGVfY21kKHN0cnVjdCBuZXRfZGV2aWNlICpkZXYsDQo+
-ID4gKwkJCQkgc3RydWN0IGV0aHRvb2xfY21pc19jZGJfY21kX2FyZ3MgKmFyZ3MpIHsNCj4gPiAr
-CXN0cnVjdCBldGh0b29sX21vZHVsZV9lZXByb20gcGFnZV9kYXRhID0ge307DQo+ID4gKwl1MzIg
-b2Zmc2V0Ow0KPiA+ICsJaW50IGVycjsNCj4gPiArDQo+ID4gKwlhcmdzLT5yZXEuY2hrX2NvZGUg
-PQ0KPiA+ICsJCWNtaXNfY2RiX2NhbGNfY2hlY2tzdW0oJmFyZ3MtPnJlcSwgc2l6ZW9mKGFyZ3Mt
-PnJlcSkpOw0KPiA+ICsNCj4gPiArCWlmIChhcmdzLT5yZXEubHBsX2xlbiA+IGFyZ3MtPnJlYWRf
-d3JpdGVfbGVuX2V4dCkgew0KPiA+ICsJCWV0aG5sX21vZHVsZV9md19mbGFzaF9udGZfZXJyKGRl
-diwNCj4gPiArCQkJCQkgICAgICAiTFBMIGxlbmd0aCBpcyBsb25nZXIgdGhhbiBDREIgcmVhZA0K
-PiB3cml0ZSBsZW5ndGggZXh0ZW5zaW9uIGFsbG93cyIpOw0KPiA+ICsJCXJldHVybiAtRUlOVkFM
-Ow0KPiA+ICsJfQ0KPiA+ICsNCj4gPiArCWVyciA9IGV0aHRvb2xfY21pc19wYWdlX2luaXQoJnBh
-Z2VfZGF0YSwNCj4gRVRIVE9PTF9DTUlTX0NEQl9DTURfUEFHRSwgMCwNCj4gPiArDQo+IEVUSFRP
-T0xfQ01JU19DREJfTFBMX01BWF9QTF9MRU5HVEgpOw0KPiANCj4gRVRIVE9PTF9DTUlTX0NEQl9M
-UExfTUFYX1BMX0xFTkdUSCBpcyBwYXNzZWQgYXMgdGhlIGxlbmd0aCBhcmd1bWVudA0KPiBvZiBl
-dGh0b29sX2NtaXNfcGFnZV9pbml0LCB3aGljaCB3aWxsIGFsbG9jYXRlIHRoYXQgbWFueSBieXRl
-cyBmb3IgcGFnZV9kYXRhLQ0KPiA+ZGF0YS4NCj4gDQo+ID4gKwlpZiAoZXJyIDwgMCkNCj4gPiAr
-CQlyZXR1cm4gZXJyOw0KPiA+ICsNCj4gPiArCS8qIEFjY29yZGluZyB0byB0aGUgQ01JUyBzdGFu
-ZGFyZCwgdGhlcmUgYXJlIHR3byBvcHRpb25zIHRvIHRyaWdnZXINCj4gdGhlDQo+ID4gKwkgKiBD
-REIgY29tbWFuZHMuIFRoZSBkZWZhdWx0IG9wdGlvbiBpcyB0cmlnZ2VyaW5nIHRoZSBjb21tYW5k
-IGJ5DQo+IHdyaXRpbmcNCj4gPiArCSAqIHRoZSBDTURJRCBieXRlcy4gVGhlcmVmb3JlLCB0aGUg
-Y29tbWFuZCB3aWxsIGJlIHNwbGl0IHRvIDIgY2FsbHM6DQo+ID4gKwkgKiBGaXJzdCwgd2l0aCBl
-dmVyeXRoaW5nIGV4Y2VwdCB0aGUgQ01ESUQgZmllbGQgYW5kIHRoZW4gdGhlIENNRElEDQo+ID4g
-KwkgKiBmaWVsZC4NCj4gPiArCSAqLw0KPiA+ICsJb2Zmc2V0ID0gQ01JU19DREJfQ01EX0lEX09G
-RlNFVCArDQo+ID4gKwkJb2Zmc2V0b2Yoc3RydWN0IGV0aHRvb2xfY21pc19jZGJfcmVxdWVzdCwg
-Ym9keSk7DQo+ID4gKwllcnIgPSBfX2V0aHRvb2xfY21pc19jZGJfZXhlY3V0ZV9jbWQoZGV2LCAm
-cGFnZV9kYXRhLCBvZmZzZXQsDQo+ID4gKwkJCQkJICAgICBzaXplb2YoYXJncy0+cmVxLmJvZHkp
-LA0KPiA+ICsJCQkJCSAgICAgJmFyZ3MtPnJlcS5ib2R5KTsNCj4gDQo+IEhpIERhbmllbGxlLA0K
-PiANCj4gSG93ZXZlciwgaGVyZSBzaXplb2YoYXJncy0+cmVxLmJvZHkpIGlzIHBhc3NlZCBhcyB0
-aGUgbGVuZ3RoIGFyZ3VtZW50IG9mDQo+IF9fZXRodG9vbF9jbWlzX2NkYl9leGVjdXRlX2NtZCgp
-IHdoaWNoIHdpbGw6DQo+IA0KPiAxLiBaZXJvIEVUSFRPT0xfQ01JU19DREJfTFBMX01BWF9QTF9M
-RU5HVEggYnl0ZXMgb2YgcGFnZV9kYXRhLT5kYXRhDQo+IDIuIENvcHkgc2l6ZW9mKGFyZ3MtPnJl
-cS5ib2R5KSBieXRlcyBpbnRvIHBhZ2VfZGF0YS0+ZGF0YQ0KPiANCj4gYXJncy0+cmVxLmJvZHkg
-aW5jbHVkZXMgc2V2ZXJhbCBmaWVsZHMsIG9uZSBvZiB3aGljaCBpcw0KPiBFVEhUT09MX0NNSVNf
-Q0RCX0xQTF9NQVhfUExfTEVOR1RIIGJ5dGVzIGxvbmcuIFNvLA0KPiBhcmdzLT5yZXEuYm9keSA+
-IEVUSFRPT0xfQ01JU19DREJfTFBMX01BWF9QTF9MRU5HVEgNCj4gYW5kIGl0IHNlZW1zIHRoYXQg
-c3RlcCAyIGFib3ZlIGNhdXNlcyBhIGJ1ZmZlciBvdmVycnVuLg0KPiANCj4gRmxhZ2dlZCBieSBj
-bGFuZy0xNyBXPTEgYnVpbGQNCj4gDQo+ICBJbiBmaWxlIGluY2x1ZGVkIGZyb20gbmV0L2V0aHRv
-b2wvY21pc19jZGIuYzozOg0KPiAgSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC4vaW5jbHVkZS9saW51
-eC9ldGh0b29sLmg6MTY6DQo+ICBJbiBmaWxlIGluY2x1ZGVkIGZyb20gLi9pbmNsdWRlL2xpbnV4
-L2JpdG1hcC5oOjEyOg0KPiAgSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC4vaW5jbHVkZS9saW51eC9z
-dHJpbmcuaDoyOTU6DQo+ICAuL2luY2x1ZGUvbGludXgvZm9ydGlmeS1zdHJpbmcuaDo1Nzk6NDog
-ZXJyb3I6IGNhbGwgdG8gJ19fd3JpdGVfb3ZlcmZsb3dfZmllbGQnDQo+IGRlY2xhcmVkIHdpdGgg
-J3dhcm5pbmcnIGF0dHJpYnV0ZTogZGV0ZWN0ZWQgd3JpdGUgYmV5b25kIHNpemUgb2YgZmllbGQg
-KDFzdA0KPiBwYXJhbWV0ZXIpOyBtYXliZSB1c2Ugc3RydWN0X2dyb3VwKCk/IFstV2Vycm9yLC1X
-YXR0cmlidXRlLXdhcm5pbmddDQo+ICAgIDU3OSB8ICAgICAgICAgICAgICAgICAgICAgICAgIF9f
-d3JpdGVfb3ZlcmZsb3dfZmllbGQocF9zaXplX2ZpZWxkLCBzaXplKTsNCj4gICAgICAgIHwgICAg
-ICAgICAgICAgICAgICAgICAgICAgXg0KPiAgLi9pbmNsdWRlL2xpbnV4L2ZvcnRpZnktc3RyaW5n
-Lmg6NTc5OjQ6IGVycm9yOiBjYWxsIHRvICdfX3dyaXRlX292ZXJmbG93X2ZpZWxkJw0KPiBkZWNs
-YXJlZCB3aXRoICd3YXJuaW5nJyBhdHRyaWJ1dGU6IGRldGVjdGVkIHdyaXRlIGJleW9uZCBzaXpl
-IG9mIGZpZWxkICgxc3QNCj4gcGFyYW1ldGVyKTsgbWF5YmUgdXNlIHN0cnVjdF9ncm91cCgpPyBb
-LVdlcnJvciwtV2F0dHJpYnV0ZS13YXJuaW5nXQ0KPiAgLi9pbmNsdWRlL2xpbnV4L2ZvcnRpZnkt
-c3RyaW5nLmg6NTc5OjQ6IGVycm9yOiBjYWxsIHRvICdfX3dyaXRlX292ZXJmbG93X2ZpZWxkJw0K
-PiBkZWNsYXJlZCB3aXRoICd3YXJuaW5nJyBhdHRyaWJ1dGU6IGRldGVjdGVkIHdyaXRlIGJleW9u
-ZCBzaXplIG9mIGZpZWxkICgxc3QNCj4gcGFyYW1ldGVyKTsgbWF5YmUgdXNlIHN0cnVjdF9ncm91
-cCgpPyBbLVdlcnJvciwtV2F0dHJpYnV0ZS13YXJuaW5nXQ0KPiANCg0KSGkgU2ltb24sDQoNClRo
-YW5rcyBmb3IgdGhlIGZlZWRiYWNrLg0KDQpJbGwgZml4IHRoYXQsIHNvbWV0aGluZyBsaWtlOg0K
-DQpkaWZmIC0tZ2l0IGEvbmV0L2V0aHRvb2wvY21pc19jZGIuYyBiL25ldC9ldGh0b29sL2NtaXNf
-Y2RiLmMNCmluZGV4IGIyN2UxMjg3MTgxNi4uODg4YjAyZTZlYWRlIDEwMDY0NA0KLS0tIGEvbmV0
-L2V0aHRvb2wvY21pc19jZGIuYw0KKysrIGIvbmV0L2V0aHRvb2wvY21pc19jZGIuYw0KQEAgLTUy
-MSw3ICs1MjEsNyBAQCBpbnQgZXRodG9vbF9jbWlzX2NkYl9leGVjdXRlX2NtZChzdHJ1Y3QgbmV0
-X2RldmljZSAqZGV2LA0KICAgICAgICB9DQoNCiAgICAgICAgZXJyID0gZXRodG9vbF9jbWlzX3Bh
-Z2VfaW5pdCgmcGFnZV9kYXRhLCBFVEhUT09MX0NNSVNfQ0RCX0NNRF9QQUdFLCAwLA0KLSAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEVUSFRPT0xfQ01JU19DREJfTFBMX01BWF9Q
-TF9MRU5HVEgpOw0KKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHNpemVvZihh
-cmdzLT5yZXEuYm9keSkpOw0KICAgICAgICBpZiAoZXJyIDwgMCkNCiAgICAgICAgICAgICAgICBy
-ZXR1cm4gZXJyOw0KDQpEYW5pZWxsZQ0KDQo+IA0KPiA+ICsJaWYgKGVyciA8IDApDQo+ID4gKwkJ
-Z290byBvdXQ7DQo+ID4gKw0KPiA+ICsJb2Zmc2V0ID0gQ01JU19DREJfQ01EX0lEX09GRlNFVCAr
-DQo+ID4gKwkJb2Zmc2V0b2Yoc3RydWN0IGV0aHRvb2xfY21pc19jZGJfcmVxdWVzdCwgaWQpOw0K
-PiA+ICsJZXJyID0gX19ldGh0b29sX2NtaXNfY2RiX2V4ZWN1dGVfY21kKGRldiwgJnBhZ2VfZGF0
-YSwgb2Zmc2V0LA0KPiA+ICsJCQkJCSAgICAgc2l6ZW9mKGFyZ3MtPnJlcS5pZCksDQo+ID4gKwkJ
-CQkJICAgICAmYXJncy0+cmVxLmlkKTsNCj4gPiArCWlmIChlcnIgPCAwKQ0KPiA+ICsJCWdvdG8g
-b3V0Ow0KPiA+ICsNCj4gPiArCWVyciA9IGNtaXNfY2RiX3dhaXRfZm9yX2NvbXBsZXRpb24oZGV2
-LCBhcmdzKTsNCj4gPiArCWlmIChlcnIgPCAwKQ0KPiA+ICsJCWdvdG8gb3V0Ow0KPiA+ICsNCj4g
-PiArCWVyciA9IGNtaXNfY2RiX3dhaXRfZm9yX3N0YXR1cyhkZXYsIGFyZ3MpOw0KPiA+ICsJaWYg
-KGVyciA8IDApDQo+ID4gKwkJZ290byBvdXQ7DQo+ID4gKw0KPiA+ICsJZXJyID0gY21pc19jZGJf
-cHJvY2Vzc19yZXBseShkZXYsICZwYWdlX2RhdGEsIGFyZ3MpOw0KPiA+ICsNCj4gPiArb3V0Og0K
-PiA+ICsJZXRodG9vbF9jbWlzX3BhZ2VfZmluaSgmcGFnZV9kYXRhKTsNCj4gPiArCXJldHVybiBl
-cnI7DQo+ID4gK30NCj4gDQo+IC4uLg0K
+
+
+On 1/10/2024 8:09 PM, Russell King (Oracle) wrote:
+> On Wed, Jan 10, 2024 at 07:40:29PM +0800, Luo Jie wrote:
+>> +static int clk_uniphy_set_rate(struct clk_hw *hw, unsigned long rate,
+>> +			       unsigned long parent_rate)
+>> +{
+>> +	struct clk_uniphy *uniphy = to_clk_uniphy(hw);
+>> +
+>> +	if (rate != UNIPHY_CLK_RATE_125M && rate != UNIPHY_CLK_RATE_312P5M)
+>> +		return -1;
+> 
+> Sigh. I get very annoyed off by stuff like this. It's lazy programming,
+> and makes me wonder why I should be bothered to spend time reviewing if
+> the programmer can't be bothered to pay attention to details. It makes
+> me wonder what else is done lazily in the patch.
+> 
+> -1 is -EPERM "Operation not permitted". This is highly likely not an
+> appropriate error code for this code.
+> 
+Sorry for this. I will update the driver to have appropriate error codes 
+where required.
+
+>> +int ppe_uniphy_autoneg_complete_check(struct ppe_uniphy *uniphy, int port)
+>> +{
+>> +	u32 reg, val;
+>> +	int channel, ret;
+>> +
+>> +	if (uniphy->interface == PHY_INTERFACE_MODE_USXGMII ||
+>> +	    uniphy->interface == PHY_INTERFACE_MODE_QUSGMII) {
+>> +		/* Only uniphy0 may have multi channels */
+>> +		channel = (uniphy->index == 0) ? (port - 1) : 0;
+>> +		reg = (channel == 0) ? VR_MII_AN_INTR_STS_ADDR :
+>> +		       VR_MII_AN_INTR_STS_CHANNEL_ADDR(channel);
+>> +
+>> +		/* Wait auto negotiation complete */
+>> +		ret = read_poll_timeout(ppe_uniphy_read, val,
+>> +					(val & CL37_ANCMPLT_INTR),
+>> +					1000, 100000, true,
+>> +					uniphy, reg);
+>> +		if (ret) {
+>> +			dev_err(uniphy->ppe_dev->dev,
+>> +				"uniphy %d auto negotiation timeout\n", uniphy->index);
+>> +			return ret;
+>> +		}
+>> +
+>> +		/* Clear auto negotiation complete interrupt */
+>> +		ppe_uniphy_mask(uniphy, reg, CL37_ANCMPLT_INTR, 0);
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+> 
+> Why is this necessary? Why is it callable outside this file? Shouldn't
+> this be done in the .pcs_get_state method? If negotiation hasn't
+> completed (and negotiation is being used) then .pcs_get_state should not
+> report that the link is up.
+> 
+Currently it is called outside this file in the following patch: 
+https://lore.kernel.org/netdev/20240110114033.32575-19-quic_luoj@quicinc.com/
+
+Yes, if inband autoneg is used, .pcs_get_state should report the link 
+status.  Then this function should not be needed and should be removed. 
+I will update the .pcs_get_state method for USXGMII if using inband autoneg.
+
+>> +
+>> +int ppe_uniphy_speed_set(struct ppe_uniphy *uniphy, int port, int speed)
+>> +{
+>> +	u32 reg, val;
+>> +	int channel;
+>> +
+>> +	if (uniphy->interface == PHY_INTERFACE_MODE_USXGMII ||
+>> +	    uniphy->interface == PHY_INTERFACE_MODE_QUSGMII) {
+>> +		/* Only uniphy0 may have multiple channels */
+>> +		channel = (uniphy->index == 0) ? (port - 1) : 0;
+>> +
+>> +		reg = (channel == 0) ? SR_MII_CTRL_ADDR :
+>> +		       SR_MII_CTRL_CHANNEL_ADDR(channel);
+>> +
+>> +		switch (speed) {
+>> +		case SPEED_100:
+>> +			val = USXGMII_SPEED_100;
+>> +			break;
+>> +		case SPEED_1000:
+>> +			val = USXGMII_SPEED_1000;
+>> +			break;
+>> +		case SPEED_2500:
+>> +			val = USXGMII_SPEED_2500;
+>> +			break;
+>> +		case SPEED_5000:
+>> +			val = USXGMII_SPEED_5000;
+>> +			break;
+>> +		case SPEED_10000:
+>> +			val = USXGMII_SPEED_10000;
+>> +			break;
+>> +		case SPEED_10:
+>> +			val = USXGMII_SPEED_10;
+>> +			break;
+>> +		default:
+>> +			val = 0;
+>> +			break;
+>> +		}
+>> +
+>> +		ppe_uniphy_mask(uniphy, reg, USXGMII_SPEED_MASK, val);
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +int ppe_uniphy_duplex_set(struct ppe_uniphy *uniphy, int port, int duplex)
+>> +{
+>> +	u32 reg;
+>> +	int channel;
+>> +
+>> +	if (uniphy->interface == PHY_INTERFACE_MODE_USXGMII &&
+>> +	    uniphy->interface == PHY_INTERFACE_MODE_QUSGMII) {
+>> +		/* Only uniphy0 may have multiple channels */
+>> +		channel = (uniphy->index == 0) ? (port - 1) : 0;
+>> +
+>> +		reg = (channel == 0) ? SR_MII_CTRL_ADDR :
+>> +		       SR_MII_CTRL_CHANNEL_ADDR(channel);
+>> +
+>> +		ppe_uniphy_mask(uniphy, reg, USXGMII_DUPLEX_FULL,
+>> +				(duplex == DUPLEX_FULL) ? USXGMII_DUPLEX_FULL : 0);
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+> 
+> What calls the above two functions? Surely this should be called from
+> the .pcs_link_up method? I would also imagine that you call each of
+> these consecutively. So why not modify the register in one go rather
+> than piecemeal like this. I'm not a fan of one-function-to-control-one-
+> parameter-in-a-register style when it results in more register accesses
+> than are really necessary.
+> 
+
+When we consider the sequence of operations expected from the driver by 
+the hardware, the MACand PCSoperations are interleaved. So we were not 
+able to clearly separate the MACand PCS operations during link up into
+.pcs_link_up() and .mac_link_up() ops. So we have avoided using 
+.pcs_link_up() and included the entire sequence in mac_link_up() op. 
+This function is called by the PPE MAC support patch below.
+
+https://lore.kernel.org/netdev/20240110114033.32575-19-quic_luoj@quicinc.com/
+
+The sequence expected by PPE HW from driver for link up is as below:
+1. disable uniphy interface clock. (PCS operation)
+2. configure the PPE port speed clock. (MAC operation)
+3. configure the uniphy pcs speed for usxgmii (PCS operation).
+4. configure PPE MAC speed (MAC operation).
+5. enable uniphy interface clock (PCS operation).
+6. reset uniphy pcs adapter (PCS operation).
+7. enable mac (MAC operation).
+
+I will also check whole patch to rework the 
+one-function-to-control-one-parameter-in-a-register style being used 
+here, thanks for the suggestion.
+
+>> +static void ppe_pcs_get_state(struct phylink_pcs *pcs,
+>> +			      struct phylink_link_state *state)
+>> +{
+>> +	struct ppe_uniphy *uniphy = pcs_to_ppe_uniphy(pcs);
+>> +	u32 val;
+>> +
+>> +	switch (state->interface) {
+>> +	case PHY_INTERFACE_MODE_10GBASER:
+>> +		val = ppe_uniphy_read(uniphy, SR_XS_PCS_KR_STS1_ADDR);
+>> +		state->link = (val & SR_XS_PCS_KR_STS1_PLU) ? 1 : 0;
+> 
+> Unnecessary tenary operation.
+> 
+> 		state->link = !!(val & SR_XS_PCS_KR_STS1_PLU);
+> 
+
+Sure, Thanks for the suggestion, I will update it.
+
+>> +		state->duplex = DUPLEX_FULL;
+>> +		state->speed = SPEED_10000;
+>> +		state->pause |= (MLO_PAUSE_RX | MLO_PAUSE_TX);
+> 
+> Excessive parens.
+> 
+Will update it.
+
+>> +		break;
+>> +	case PHY_INTERFACE_MODE_2500BASEX:
+>> +		val = ppe_uniphy_read(uniphy, UNIPHY_CHANNEL0_INPUT_OUTPUT_6_ADDR);
+>> +		state->link = (val & NEWADDEDFROMHERE_CH0_LINK_MAC) ? 1 : 0;
+> 
+> Ditto.
+> 
+Will update it.
+
+>> +		state->duplex = DUPLEX_FULL;
+>> +		state->speed = SPEED_2500;
+>> +		state->pause |= (MLO_PAUSE_RX | MLO_PAUSE_TX);
+> 
+> Ditto.
+> 
+Will update it.
+
+>> +		break;
+>> +	case PHY_INTERFACE_MODE_1000BASEX:
+>> +	case PHY_INTERFACE_MODE_SGMII:
+>> +		val = ppe_uniphy_read(uniphy, UNIPHY_CHANNEL0_INPUT_OUTPUT_6_ADDR);
+>> +		state->link = (val & NEWADDEDFROMHERE_CH0_LINK_MAC) ? 1 : 0;
+>> +		state->duplex = (val & NEWADDEDFROMHERE_CH0_DUPLEX_MODE_MAC) ?
+>> +			DUPLEX_FULL : DUPLEX_HALF;
+>> +		if (FIELD_GET(NEWADDEDFROMHERE_CH0_SPEED_MODE_MAC, val) == UNIPHY_SPEED_10M)
+>> +			state->speed = SPEED_10;
+>> +		else if (FIELD_GET(NEWADDEDFROMHERE_CH0_SPEED_MODE_MAC, val) == UNIPHY_SPEED_100M)
+>> +			state->speed = SPEED_100;
+>> +		else if (FIELD_GET(NEWADDEDFROMHERE_CH0_SPEED_MODE_MAC, val) == UNIPHY_SPEED_1000M)
+>> +			state->speed = SPEED_1000;
+> 
+> Looks like a switch(FIELD_GET(NEWADDEDFROMHERE_CH0_SPEED_MODE_MAC, val)
+> would be better here. Also "NEWADDEDFROMHERE" ?
+> 
+Sorry for the confusion, I will translate the register to meaningful name.
+
+>> +		state->pause |= (MLO_PAUSE_RX | MLO_PAUSE_TX);
+> 
+> Ditto.
+> 
+Will update it.
+
+> As you make no differentiation between 1000base-X and SGMII, I question
+> whether your hardware supports 1000base-X. I seem to recall in previous
+> discussions that it doesn't. So, that means it doesn't support the
+> inband negotiation word format for 1000base-X. Thus, 1000base-X should
+> not be included in any of these switch statements, and 1000base-X won't
+> be usable.
+> 
+Our hardware supports both 1000base-x and SGMII auto-neg, the hardware 
+can resolve and decode the autoneg result of 1000base-x C37 word format 
+and SGMII auto-neg word format. This information after autoneg 
+resolution is stored in the same register exported to software. This is 
+the reason the same code works for both cases.
+
+>> +/* [register] UNIPHY_MODE_CTRL */
+>> +#define UNIPHY_MODE_CTRL_ADDR				0x46c
+>> +#define NEWADDEDFROMHERE_CH0_AUTONEG_MODE		BIT(0)
+>> +#define NEWADDEDFROMHERE_CH1_CH0_SGMII			BIT(1)
+>> +#define NEWADDEDFROMHERE_CH4_CH1_0_SGMII		BIT(2)
+>> +#define NEWADDEDFROMHERE_SGMII_EVEN_LOW			BIT(3)
+>> +#define NEWADDEDFROMHERE_CH0_MODE_CTRL_25M		GENMASK(6, 4)
+>> +#define NEWADDEDFROMHERE_CH0_QSGMII_SGMII		BIT(8)
+>> +#define NEWADDEDFROMHERE_CH0_PSGMII_QSGMII		BIT(9)
+>> +#define NEWADDEDFROMHERE_SG_MODE			BIT(10)
+>> +#define NEWADDEDFROMHERE_SGPLUS_MODE			BIT(11)
+>> +#define NEWADDEDFROMHERE_XPCS_MODE			BIT(12)
+>> +#define NEWADDEDFROMHERE_USXG_EN			BIT(13)
+>> +#define NEWADDEDFROMHERE_SW_V17_V18			BIT(15)
+> 
+> Again, why "NEWADDEDFROMHERE" ?
+> 
+Will rename to use proper name.
+
+>> +/* [register] VR_XS_PCS_EEE_MCTRL0 */
+>> +#define VR_XS_PCS_EEE_MCTRL0_ADDR			0x38006
+>> +#define LTX_EN						BIT(0)
+>> +#define LRX_EN						BIT(1)
+>> +#define SIGN_BIT					BIT(6)
+> 
+> "SIGN_BIT" is likely too generic a name.
+> 
+As above, will rename the register to proper name.
+
+>> +#define MULT_FACT_100NS					GENMASK(11, 8)
+>> +
+>> +/* [register] VR_XS_PCS_KR_CTRL */
+>> +#define VR_XS_PCS_KR_CTRL_ADDR	0x38007
+>> +#define USXG_MODE					GENMASK(12, 10)
+>> +#define QUXGMII_MODE					(FIELD_PREP(USXG_MODE, 0x5))
+>> +
+>> +/* [register] VR_XS_PCS_EEE_TXTIMER */
+>> +#define VR_XS_PCS_EEE_TXTIMER_ADDR			0x38008
+>> +#define TSL_RES						GENMASK(5, 0)
+>> +#define T1U_RES						GENMASK(7, 6)
+>> +#define TWL_RES						GENMASK(12, 8)
+>> +#define UNIPHY_XPCS_TSL_TIMER				(FIELD_PREP(TSL_RES, 0xa))
+>> +#define UNIPHY_XPCS_T1U_TIMER				(FIELD_PREP(TSL_RES, 0x3))
+>> +#define UNIPHY_XPCS_TWL_TIMER				(FIELD_PREP(TSL_RES, 0x16))
+>> +
+>> +/* [register] VR_XS_PCS_EEE_RXTIMER  */
+>> +#define VR_XS_PCS_EEE_RXTIMER_ADDR			0x38009
+>> +#define RES_100U					GENMASK(7, 0)
+>> +#define TWR_RES						GENMASK(13, 8)
+>> +#define UNIPHY_XPCS_100US_TIMER				(FIELD_PREP(RES_100U, 0xc8))
+>> +#define UNIPHY_XPCS_TWR_TIMER				(FIELD_PREP(RES_100U, 0x1c))
+>> +
+>> +/* [register] VR_XS_PCS_DIG_STS */
+>> +#define VR_XS_PCS_DIG_STS_ADDR				0x3800a
+>> +#define AM_COUNT					GENMASK(14, 0)
+>> +#define QUXGMII_AM_COUNT				(FIELD_PREP(AM_COUNT, 0x6018))
+>> +
+>> +/* [register] VR_XS_PCS_EEE_MCTRL1 */
+>> +#define VR_XS_PCS_EEE_MCTRL1_ADDR			0x3800b
+>> +#define TRN_LPI						BIT(0)
+>> +#define TRN_RXLPI					BIT(8)
+>> +
+>> +/* [register] VR_MII_1_DIG_CTRL1 */
+>> +#define VR_MII_DIG_CTRL1_CHANNEL1_ADDR			0x1a8000
+>> +#define VR_MII_DIG_CTRL1_CHANNEL2_ADDR			0x1b8000
+>> +#define VR_MII_DIG_CTRL1_CHANNEL3_ADDR			0x1c8000
+>> +#define VR_MII_DIG_CTRL1_CHANNEL_ADDR(x)		(0x1a8000 + 0x10000 * ((x) - 1))
+>> +#define CHANNEL_USRA_RST				BIT(5)
+>> +
+>> +/* [register] VR_MII_AN_CTRL */
+>> +#define VR_MII_AN_CTRL_ADDR				0x1f8001
+>> +#define VR_MII_AN_CTRL_CHANNEL1_ADDR			0x1a8001
+>> +#define VR_MII_AN_CTRL_CHANNEL2_ADDR			0x1b8001
+>> +#define VR_MII_AN_CTRL_CHANNEL3_ADDR			0x1c8001
+>> +#define VR_MII_AN_CTRL_CHANNEL_ADDR(x)			(0x1a8001 + 0x10000 * ((x) - 1))
+>> +#define MII_AN_INTR_EN					BIT(0)
+>> +#define MII_CTRL					BIT(8)
+> 
+> Too generic a name.
+> 
+Will update and rename it.
+
+>> +
+>> +/* [register] VR_MII_AN_INTR_STS */
+>> +#define VR_MII_AN_INTR_STS_ADDR				0x1f8002
+>> +#define VR_MII_AN_INTR_STS_CHANNEL1_ADDR		0x1a8002
+>> +#define VR_MII_AN_INTR_STS_CHANNEL2_ADDR		0x1b8002
+>> +#define VR_MII_AN_INTR_STS_CHANNEL3_ADDR		0x1c8002
+>> +#define VR_MII_AN_INTR_STS_CHANNEL_ADDR(x)		(0x1a8002 + 0x10000 * ((x) - 1))
+>> +#define CL37_ANCMPLT_INTR				BIT(0)
+>> +
+>> +/* [register] VR_XAUI_MODE_CTRL */
+>> +#define VR_XAUI_MODE_CTRL_ADDR				0x1f8004
+>> +#define VR_XAUI_MODE_CTRL_CHANNEL1_ADDR			0x1a8004
+>> +#define VR_XAUI_MODE_CTRL_CHANNEL2_ADDR			0x1b8004
+>> +#define VR_XAUI_MODE_CTRL_CHANNEL3_ADDR			0x1c8004
+>> +#define VR_XAUI_MODE_CTRL_CHANNEL_ADDR(x)		(0x1a8004 + 0x10000 * ((x) - 1))
+>> +#define IPG_CHECK					BIT(0)
+>> +
+>> +/* [register] SR_MII_CTRL */
+>> +#define SR_MII_CTRL_ADDR				0x1f0000
+>> +#define SR_MII_CTRL_CHANNEL1_ADDR			0x1a0000
+>> +#define SR_MII_CTRL_CHANNEL2_ADDR			0x1b0000
+>> +#define SR_MII_CTRL_CHANNEL3_ADDR			0x1c0000
+>> +#define SR_MII_CTRL_CHANNEL_ADDR(x)			(0x1a0000 + 0x10000 * ((x) - 1))
+> 
+> 
+>> +#define AN_ENABLE					BIT(12)
+> 
+> Looks like MDIO_AN_CTRL1_ENABLE
+> 
+
+This is the uniphy xpcs autoneg enable control bit, our uniphy is not
+MDIO accessed, I will rename it to a meaningful name.
+
+>> +#define USXGMII_DUPLEX_FULL				BIT(8)
+>> +#define USXGMII_SPEED_MASK				(BIT(13) | BIT(6) | BIT(5))
+>> +#define USXGMII_SPEED_10000				(BIT(13) | BIT(6))
+>> +#define USXGMII_SPEED_5000				(BIT(13) | BIT(5))
+>> +#define USXGMII_SPEED_2500				BIT(5)
+>> +#define USXGMII_SPEED_1000				BIT(6)
+>> +#define USXGMII_SPEED_100				BIT(13)
+>> +#define USXGMII_SPEED_10				0
+> 
+> Looks rather like the standard IEEE 802.3 definitions except for the
+> 2.5G and 5G speeds. Probably worth a comment stating that they're
+> slightly different.
+>
+
+Sure, will add comment for it in code and documentation files, thanks.
+
+>> +
+>> +/* PPE UNIPHY data type */
+>> +struct ppe_uniphy {
+>> +	void __iomem *base;
+>> +	struct ppe_device *ppe_dev;
+>> +	unsigned int index;
+>> +	phy_interface_t interface;
+>> +	struct phylink_pcs pcs;
+>> +};
+>> +
+>> +#define pcs_to_ppe_uniphy(_pcs)				container_of(_pcs, struct ppe_uniphy, pcs)
+> 
+> As this should only be used in the .c file, I suggest making this a
+> static function in the .c file. There should be no requirement to use
+> it outside of the .c file.
+> 
+
+This is used in the following patch as I explained above for the MAC/PCS 
+related comment:
+https://lore.kernel.org/netdev/20240110114033.32575-19-quic_luoj@quicinc.com/
+
+>> +
+>> +struct ppe_uniphy *ppe_uniphy_setup(struct platform_device *pdev);
+>> +
+>> +int ppe_uniphy_speed_set(struct ppe_uniphy *uniphy,
+>> +			 int port, int speed);
+>> +
+>> +int ppe_uniphy_duplex_set(struct ppe_uniphy *uniphy,
+>> +			  int port, int duplex);
+>> +
+>> +int ppe_uniphy_adapter_reset(struct ppe_uniphy *uniphy,
+>> +			     int port);
+>> +
+>> +int ppe_uniphy_autoneg_complete_check(struct ppe_uniphy *uniphy,
+>> +				      int port);
+>> +
+>> +int ppe_uniphy_port_gcc_clock_en_set(struct ppe_uniphy *uniphy,
+>> +				     int port, bool enable);
+>> +
+>> +#endif /* _PPE_UNIPHY_H_ */
+>> diff --git a/include/linux/soc/qcom/ppe.h b/include/linux/soc/qcom/ppe.h
+>> index 268109c823ad..d3cb18df33fa 100644
+>> --- a/include/linux/soc/qcom/ppe.h
+>> +++ b/include/linux/soc/qcom/ppe.h
+>> @@ -20,6 +20,7 @@ struct ppe_device {
+>>   	struct dentry *debugfs_root;
+>>   	bool is_ppe_probed;
+>>   	void *ppe_priv;
+>> +	void *uniphy;
+> 
+> Not struct ppe_uniphy *uniphy? You can declare the struct before use
+> via:
+> 
+> struct ppe_uniphy;
+> 
+> so you don't need to include ppe_uniphy.h in this header.
+> 
+
+Thanks for the good suggestion, will follow this.
+
+> Thanks.
+> 
 
