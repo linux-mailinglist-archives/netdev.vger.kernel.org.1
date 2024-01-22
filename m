@@ -1,137 +1,104 @@
-Return-Path: <netdev+bounces-64531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4DAE8359EE
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 05:00:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0F228359F0
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 05:01:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 240AB1C21330
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 04:00:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B83C1C21296
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 04:01:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBB121865;
-	Mon, 22 Jan 2024 04:00:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 294381865;
+	Mon, 22 Jan 2024 04:01:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Uts/2u6U"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B1251C2E
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 04:00:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C45CE4C65
+	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 04:01:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705896023; cv=none; b=L31egahU9y+xNDfaEivqilKolyoLdIRag09AYuDbSa3l8y7NeaIsJhS9227v7pVW4gyEq+aVmSJt/ges7wjOfEotPzv0PRgszdwURIitP5OwbOpa2A4lqCa0IkSXryA0ITkO+p7SL/XChHLpGpkcSHwSOazqIundh62t2/cNHe8=
+	t=1705896101; cv=none; b=lB57Mcy/xH9pHMPCjapTgst3gI6zA2uo4Ftp4A27RWfhmvAFyIC4HOG8UoxXLOkxUHGeOWLxME8kB8WOaljJGSzUiHIfvhI2na0NYS2DG5Xeb9lNfddjJa0y2ZxkyqwxD8hkwg3mgchmWcsaewI5jHVwtxpJniwtQVSSSgarl0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705896023; c=relaxed/simple;
-	bh=RfCaWemPxqhlPZ8heu498e3IkoMYZhqHxG5JY9rCOw8=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=tb02+1HtA6eBaRYwTDdA8BuAQyUvOBK5OrtU0ITG17CX0+mgh2ZyJ92AP+5l9A+jPR5fMcQen5CYO6M6Ub8fL8Kpl+8PotVMdhNvfWpVlZSFrfqoXIP+oH+CRnTQa7VmBukXNZMK8PL32BWZm3Ujv1ODNGYJ1i1J0wT9de03s2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; arc=none smtp.client-ip=115.124.30.110
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0W.0SWkz_1705896011;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W.0SWkz_1705896011)
-          by smtp.aliyun-inc.com;
-          Mon, 22 Jan 2024 12:00:12 +0800
-Message-ID: <1705895881.6990144-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH 1/1] virtio_net: Add timeout handler to avoid kernel hang
-Date: Mon, 22 Jan 2024 11:58:01 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,
- Heng Qi <hengqi@linux.alibaba.com>,
- Paolo Abeni <pabeni@redhat.com>,
- Zhu Yanjun <yanjun.zhu@intel.com>,
- mst@redhat.com,
- davem@davemloft.net,
- edumazet@google.com,
- kuba@kernel.org,
- virtualization@lists.linux.dev,
- netdev@vger.kernel.org,
- Zhu Yanjun <yanjun.zhu@linux.dev>
-References: <20240115012918.3081203-1-yanjun.zhu@intel.com>
- <ea230712e27af2c8d2d77d1087e45ecfa86abb31.camel@redhat.com>
- <667a9520-a53f-40a2-810a-6c1e45146589@linux.dev>
- <7dd89fc0-f31e-4f83-9c02-58ee67c2d436@linux.alibaba.com>
- <430b899c-aed4-419d-8ae8-544bb9bec5d9@lunn.ch>
- <64270652-8e0c-4db7-b245-b970d9588918@linux.dev>
- <CACGkMEs18hjxiZRDT5-+PMDHkLbEyiviafGiCWsAE6CGBrj+9g@mail.gmail.com>
-In-Reply-To: <CACGkMEs18hjxiZRDT5-+PMDHkLbEyiviafGiCWsAE6CGBrj+9g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1705896101; c=relaxed/simple;
+	bh=Z6kPKgWPBIyc74BfoLAnHtqT/UAn6gRNskxSv0LvWxc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=CM8RPMtmfy2DO0vFFuJ8EViAaPEJ+1yAP7SY3Etv05ki4Q0RtvFvpdcKk9+Z6XeYV6jSZ/WMjkE2F0j5sb3wcrJtl8BGCYV4Rayw2iNHqASLvhV9K4Ca8+Xl/rNgklUcWzbEMVvdBMdOH/JBHHloVispYhPxHpX3m22xRo/2ts8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Uts/2u6U; arc=none smtp.client-ip=209.85.166.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-7baa8da5692so115814939f.0
+        for <netdev@vger.kernel.org>; Sun, 21 Jan 2024 20:01:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705896099; x=1706500899; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=lGjjFHz/+XS34tPNIXpKCwpCAnlCPuXyiXL366vvh4Y=;
+        b=Uts/2u6UNCPjSbPpDbw2hW5xBPFDr5x0juzJfB/oXFhWGFvpCjbvirXAJEKugMxlY+
+         Lpnqg0pk55FuaalYSNar28T51rDLcguSf3TiMWh3rO+aZS7Hj2T4qp/p33pTKMajRPwX
+         ZYk+SNLPV5Pv5MhYahRtsdy0d2duwztIk/pQsciOZhlBJ7d6MhJaDue5h7e/zk+EV5Iw
+         NgYXocHn1UcKofz4gNHHJpbJUHuW52dOgDrxdSEfeB3b834uSPWnGxlJ3tmh72FHKPjg
+         006ejtlTEC9KAAAg7ikkyUavMQ3iu2u5Qv3LmEgjmTE24HmuDMETeF6WG4368u51Q+bs
+         MfgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705896099; x=1706500899;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lGjjFHz/+XS34tPNIXpKCwpCAnlCPuXyiXL366vvh4Y=;
+        b=lkQbPL7R67zib43mtV6hRc5gge7WfX2ZiMHM2yA9lXqUN+CecFeNHlEwdeVveeixSJ
+         5rcJBhtP6QI8rKxhPFioAl1LIOgZvRmG63BHg7B1H7YhmWrK8XRKGgkMrvIBMkpfFU7x
+         OlLHasoBhOZHj+iz7tVCDTcKzTCgC14wBZcb2hjHCslS35Iw04a89U/4ih2hR5B849WP
+         RznzPtSSPR2bf2YXjkfxtaAdYwS0teTXiBz13wivlid0DizdmtaEwzGnQFlKIGJJCU+K
+         ZcPLVC8HFKWxgfhnTs6zabQgM2s4rnOJhUkkXmFVA1vivF1e6acW2npttMqpOR2ZTHDv
+         eiaQ==
+X-Gm-Message-State: AOJu0YwJsbq9Zlf/IUaa+Cw/KbvwElx9euZJF1OK9JJAoKg60RaZvbki
+	JAPXPdAs9EU1eg9Lk+WL2Qr5G730QG9JSYxbclGoN3ffp+vA+ST8
+X-Google-Smtp-Source: AGHT+IE1QPdrBxwpcbbLbbeIEJjXUegVx64aEVlwyoyS8uADhaEKwWr9SWPyYqHiHHsmc2MrNicucg==
+X-Received: by 2002:a6b:7315:0:b0:7bc:4210:2e44 with SMTP id e21-20020a6b7315000000b007bc42102e44mr3740390ioh.30.1705896098911;
+        Sun, 21 Jan 2024 20:01:38 -0800 (PST)
+Received: from ?IPV6:2601:282:1e82:2350:98eb:fac3:d51e:322b? ([2601:282:1e82:2350:98eb:fac3:d51e:322b])
+        by smtp.googlemail.com with ESMTPSA id c14-20020a056602334e00b007bc102fb67asm5764919ioz.10.2024.01.21.20.01.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 21 Jan 2024 20:01:38 -0800 (PST)
+Message-ID: <680a66d1-4b96-4700-9c29-f238933aa962@gmail.com>
+Date: Sun, 21 Jan 2024 21:01:37 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] ss: add option to suppress queue columns
+To: =?UTF-8?Q?Christian_G=C3=B6ttsche?= <cgzones@googlemail.com>,
+ netdev@vger.kernel.org
+References: <20240108111020.12205-1-cgzones@googlemail.com>
+Content-Language: en-US
+From: David Ahern <dsahern@gmail.com>
+In-Reply-To: <20240108111020.12205-1-cgzones@googlemail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, 22 Jan 2024 11:14:30 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Mon, Jan 22, 2024 at 10:12=E2=80=AFAM Zhu Yanjun <yanjun.zhu@linux.dev=
-> wrote:
-> >
-> >
-> > =E5=9C=A8 2024/1/20 1:29, Andrew Lunn =E5=86=99=E9=81=93:
-> > >>>>>        while (!virtqueue_get_buf(vi->cvq, &tmp) &&
-> > >>>>> -           !virtqueue_is_broken(vi->cvq))
-> > >>>>> +           !virtqueue_is_broken(vi->cvq)) {
-> > >>>>> +        if (timeout)
-> > >>>>> +            timeout--;
-> > >>>> This is not really a timeout, just a loop counter. 200 iterations =
-could
-> > >>>> be a very short time on reasonable H/W. I guess this avoid the soft
-> > >>>> lockup, but possibly (likely?) breaks the functionality when we ne=
-ed to
-> > >>>> loop for some non negligible time.
-> > >>>>
-> > >>>> I fear we need a more complex solution, as mentioned by Micheal in=
- the
-> > >>>> thread you quoted.
-> > >>> Got it. I also look forward to the more complex solution to this pr=
-oblem.
-> > >> Can we add a device capability (new feature bit) such as ctrq_wait_t=
-imeout
-> > >> to get a reasonable timeout=EF=BC=9F
-> > > The usual solution to this is include/linux/iopoll.h. If you can sleep
-> > > read_poll_timeout() otherwise read_poll_timeout_atomic().
-> >
-> > I read carefully the functions read_poll_timeout() and
-> > read_poll_timeout_atomic(). The timeout is set by the caller of the 2
-> > functions.
->
-> FYI, in order to avoid a swtich of atomic or not, we need convert rx
-> mode setting to workqueue first:
->
-> https://www.mail-archive.com/virtualization@lists.linux-foundation.org/ms=
-g60298.html
->
-> >
-> > As such, can we add a module parameter to customize this timeout value
-> > by the user?
->
-> Who is the "user" here, or how can the "user" know the value?
->
-> >
-> > Or this timeout value is stored in device register, virtio_net driver
-> > will read this timeout value at initialization?
->
-> See another thread. The design needs to be general, or you can post a RFC.
->
-> In another thought, we've already had a tx watchdog, maybe we can have
-> something similar to cvq and use timeout + reset in that case.
+On 1/8/24 4:10 AM, Christian Göttsche wrote:
+> Add a new option `-Q/--no-queues` to ss(8) to suppress the two standard
+> columns Send-Q and Recv-Q.  This helps to keep the output steady for
+> monitoring purposes (like listening sockets).
+> 
+> Signed-off-by: Christian Göttsche <cgzones@googlemail.com>
+> ---
+> v2: rebase to iproute2-next
+> ---
+>  man/man8/ss.8 |  3 +++
+>  misc/ss.c     | 24 +++++++++++++++++++-----
+>  2 files changed, 22 insertions(+), 5 deletions(-)
+> 
 
-But we may block by the reset ^_^ if the device is broken?
+applied to iproute2-next
 
-Thanks.
-
-
->
-> Thans
->
-> >
-> > Zhu Yanjun
-> >
-> > >
-> > >       Andrew
-> >
->
 
