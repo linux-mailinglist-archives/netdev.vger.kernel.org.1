@@ -1,129 +1,203 @@
-Return-Path: <netdev+bounces-64727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B391836D5F
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:29:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63C52836D64
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:30:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE2231C26F4B
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 17:29:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6A3C1C24603
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 17:30:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBEFF3D38E;
-	Mon, 22 Jan 2024 16:30:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B1201EEE6;
+	Mon, 22 Jan 2024 16:30:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ye4H0ite"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kG4h/RxI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A625338DC7;
-	Mon, 22 Jan 2024 16:30:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 889721E896
+	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 16:30:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705941005; cv=none; b=UKdtwc1QypTkJ1hDhLAIOrAaGM6QmiJXYUmYB3B2nkzUA/7tel4Y+6FqooGXZ0vmOcXE2YDDUe9tFGR3f7nNO59soDd66vYLJgvkiqTyeRi7PTXfWRVptbIHzZtS2/M9d/GSjf9s72m4uLyufJkDX0eBGaxe6EVuhTwexStxO8g=
+	t=1705941036; cv=none; b=sNH4D9lKdD3tg4AKtE8BB+5chDJTJbkNQkpHwX3i6Lg7/CrJGC9fqLB0q6mRnzjINiD1hGk9OB718Vtac8VkJjp8gGRMo5Ur6fu7EadEhPWMjbJ19AI/X43jOZDot45EKj5A1ZIW/6qH6iOOcAVg3qK9YWaxVNsxNX+sh48l2W4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705941005; c=relaxed/simple;
-	bh=OzGrYxrAboZ3xNAP6YdI4Gj21H01FR+mtvCInhIDFhg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=XfGFDTsAHXQgLobOd95RsC6CMGiT+Q04owD45R9SjdXCJ3VX29Bfx6RaFALRfcnPUO2wCkn4KfIneUnR8cgLUPSriMY+n+/FSIvngn6L7WYSB/4Ud1npLA45giftCV3f2qGs3Ie21IO1mzKvs8pq03tWj/MwO/ftBgUJv7MK/PQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ye4H0ite; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A48EBC433C7;
-	Mon, 22 Jan 2024 16:30:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705941005;
-	bh=OzGrYxrAboZ3xNAP6YdI4Gj21H01FR+mtvCInhIDFhg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=Ye4H0itenIlvmOTqqOw+9kFyYzXK16wx1XFlVTPJt9fq+Kgp36t2JlNaFNoiTCEWC
-	 5eS9z+LT1q7dljVuP2r1aozVPuACc5+yQxLH0JUwMu419BwByhMqTZqGyMAFm4badq
-	 SaSawt9e67OemZmajio5b5sOHfYrTKzimqiZrG6aTQZ2VGD/DkZQKJqGW1h+OjMAtV
-	 iiuP3KBY4HLcuTa7ergelTvjX1Bdc49othKQIgX7oKMFTMfP0nX3jZDeTMrfRbqqa0
-	 i1lNZX/pKw5qydYjrblS66wqIE4cn5spyVU5tVhjdmnWba/LTcy1SvNPAzyLNVBiI+
-	 MpBnuWubPalHA==
-From: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-To: Pu Lehui <pulehui@huaweicloud.com>, bpf@vger.kernel.org,
- linux-riscv@lists.infradead.org, netdev@vger.kernel.org
-Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
- Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, Yonghong Song
- <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, KP Singh
- <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
- <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Palmer Dabbelt
- <palmer@dabbelt.com>, Conor Dooley <conor@kernel.org>, Luke Nelson
- <luke.r.nels@gmail.com>, Pu Lehui <pulehui@huawei.com>
-Subject: Re: [PATCH RESEND bpf-next v3 0/6] Zbb support and code
- simplification for RV64 JIT
-In-Reply-To: <f73cdabe-eba3-4842-8da2-a6316590eb1e@huaweicloud.com>
-References: <20240115131235.2914289-1-pulehui@huaweicloud.com>
- <87il3lqvye.fsf@all.your.base.are.belong.to.us>
- <baffbab8-721f-462a-8b58-64972f5eae70@huaweicloud.com>
- <878r4hqvgq.fsf@all.your.base.are.belong.to.us>
- <874jf5qudx.fsf@all.your.base.are.belong.to.us>
- <f73cdabe-eba3-4842-8da2-a6316590eb1e@huaweicloud.com>
-Date: Mon, 22 Jan 2024 17:30:02 +0100
-Message-ID: <87zfwxpbzp.fsf@all.your.base.are.belong.to.us>
+	s=arc-20240116; t=1705941036; c=relaxed/simple;
+	bh=JVTLCUPB7iXC4eIrNg2d8NLxpE109zbJQBMJLtpUjg8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HTcEQAmDSn3W+C901mJ0oYHb2cOXAcyuVrKn4mubI5MEXLBfP1KTrdeCQMFVmfQfqmjTSVTPn8KjsoTaQBlRITeyBLvEOHlcqMO80io4//Dc9a2aya8P44/TygQ5zYOYmMAfnUO0UgcZfGF/uU6LxxmNPVJeMr4oG4okyjPa9Ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kG4h/RxI; arc=none smtp.client-ip=209.85.166.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-361b23b9328so314635ab.1
+        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 08:30:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1705941033; x=1706545833; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CjELHtowAv3ak1AQZT7BU/ZqYcvabtPwYrfG/ySOdno=;
+        b=kG4h/RxIVSe/4lT08ILuhReiNqWS/9H4Q4YeuobortaYHj76Y69ShIbCPhUgg6A2U9
+         kFOAsFBZ9ZCkOQPrGclTBFbaiZ+wcS3xIsj2l5vJW1+fiQyUGVR4BLyXgFb1uFqXUNrp
+         +MremtFoPnPi8g0ngiBo7b9Xijugs5d9RNujzEWh+ULvYS9m/moYHZ8ZLKpBawjtZ1po
+         iugryW2I5aZPO8y0aPaiJ0GwRvl/4uZ3JnHucnFH64rZPAAk6wbAEh3Hzd07DVn9jvpe
+         233fU6+m7GweDBve6LcrRzeGMLvA6QazORYWL5zd1nCUQPlu7KtVkosIOIoUeKsqKZ27
+         wnWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705941033; x=1706545833;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CjELHtowAv3ak1AQZT7BU/ZqYcvabtPwYrfG/ySOdno=;
+        b=oXEXcXpD+xB4/Y5mqakBr/MaehEfhVAjPi7ew4vyM+XUVt4XZx5GoGLVRXOnp3T+oy
+         qeQh6AGNUm3sC7OldaAEDf9S9Bhd3pEsBShlKqi1T9YymmXOJs5cI/zp5jYBzZiXSpb3
+         ChMJhf3gXsz8LlV3IegoiFVGGRYpROqL4v2vefIFZCnsydQArh3pWQk+Fbf0w7YBWyYi
+         KVhVjFQL8zcQrx1ni7qbwQL9kdxhNbHvSZ6FxjTAnkSQa4j8QWpuWicoV5E4JSnWnBI8
+         GFzxFQwh97zjCVuZ2UWx9E36JyPlYTPvwJw/duwMRo3Db5yL071QyAy3boCiloMSj3EF
+         fJYw==
+X-Gm-Message-State: AOJu0YzoMQTKD183oaaOQtxQE0IDrFfNzdHWrwrdq8iS2kUliVKD1P4C
+	pBsYhZzRfRLTWPMnK/2zCWe1LeXn9wMpCcVWIydO+LcEmVEk7deOhauAC2otcstL
+X-Google-Smtp-Source: AGHT+IGC97gkTGATtf9M7kYTIQ90XsuuFjUZxJn7oFDh0SQFpWxPVfSenQKRQC4QLPOYii7BLctCq604l2+O3t2XXSA=
+X-Received: by 2002:a05:6e02:1c2c:b0:361:8079:2843 with SMTP id
+ m12-20020a056e021c2c00b0036180792843mr454962ilh.18.1705941033411; Mon, 22 Jan
+ 2024 08:30:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20240119092024.193066-1-zhangpeng362@huawei.com>
+ <Zap7t9GOLTM1yqjT@casper.infradead.org> <5106a58e-04da-372a-b836-9d3d0bd2507b@huawei.com>
+ <Za6SD48Zf0CXriLm@casper.infradead.org>
+In-Reply-To: <Za6SD48Zf0CXriLm@casper.infradead.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 22 Jan 2024 17:30:18 +0100
+Message-ID: <CANn89iL4qUXsVDRNGgBOweZbJ6ErWMsH+EpOj-55Lky8JEEhqQ@mail.gmail.com>
+Subject: Re: SECURITY PROBLEM: Any user can crash the kernel with TCP ZEROCOPY
+To: Matthew Wilcox <willy@infradead.org>
+Cc: "zhangpeng (AS)" <zhangpeng362@huawei.com>, linux-mm@kvack.org, 
+	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org, 
+	akpm@linux-foundation.org, davem@davemloft.net, dsahern@kernel.org, 
+	kuba@kernel.org, pabeni@redhat.com, arjunroy@google.com, 
+	wangkefeng.wang@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Pu Lehui <pulehui@huaweicloud.com> writes:
-
-> On 2024/1/22 23:07, Bj=C3=B6rn T=C3=B6pel wrote:
->> Bj=C3=B6rn T=C3=B6pel <bjorn@kernel.org> writes:
->>=20
->>> Pu Lehui <pulehui@huaweicloud.com> writes:
->>>
->>>> On 2024/1/22 22:33, Bj=C3=B6rn T=C3=B6pel wrote:
->>>>> Pu Lehui <pulehui@huaweicloud.com> writes:
->>>>>
->>>>>> Add Zbb support [0] to optimize code size and performance of RV64 JI=
-T.
->>>>>> Meanwhile, adjust the code for unification and simplification. Tests
->>>>>> test_bpf.ko and test_verifier have passed, as well as the relative
->>>>>> testcases of test_progs*.
->>>>>>
->>>>>> Link: https://github.com/riscv/riscv-bitmanip/releases/download/1.0.=
-0/bitmanip-1.0.0-38-g865e7a7.pdf [0]
->>>>>>
->>>>>> v3 resend:
->>>>>> - resend for mail be treated as spam.
->>>>>>
->>>>>> v3:
->>>>>> - Change to early-exit code style and make code more explicit.
->>>>>
->>>>> Lehui,
->>>>>
->>>>> Sorry for the delay. I'm chasing a struct_ops RISC-V BPF regression in
->>>>> 6.8-rc1, I will need to wrap my head around that prior reviewing
->>>>> properly.
->>>>>
->>>>
->>>> Oh, I also found the problem with struct ops and fixed it
->>=20
->> Pu, with your patch bpf_iter_setsockopt, bpf_tcp_ca, and dummy_st_ops
->> passes!
->>=20
->> Please spin a proper fixes patch, and feel free to add:
->>=20
->> Tested-by: Bj=C3=B6rn T=C3=B6pel <bjorn@rivosinc.com>
->> Acked-by: Bj=C3=B6rn T=C3=B6pel <bjorn@kernel.org>
->>=20
+On Mon, Jan 22, 2024 at 5:04=E2=80=AFPM Matthew Wilcox <willy@infradead.org=
+> wrote:
 >
-> Is that in a hurry? If not, I would like to send it with the upcoming=20
-> patchset.
+> I'm disappointed to have no reaction from netdev so far.  Let's see if a
+> more exciting subject line evinces some interest.
 
-This is a separate fix, right? What patchset are you referring to where
-the fix would be in?
+Hmm, perhaps some of us were enjoying their weekend ?
 
-As of now 6.8-rc1 is broken! It would be a great with a fix asap...
+I also see '[RFC PATCH] filemap: add mapping_mapped check in
+filemap_unaccount_folio()',
+and during the merge window, network maintainers tend to prioritize
+their work based on tags.
+
+If a stack trace was added, perhaps our attention would have been caught.
+
+I don't really know what changed recently, all I know is that TCP zero
+copy is for real network traffic.
+
+Real trafic uses order-0 pages, 4K at a time.
+
+If can_map_frag() needs to add another safety check, let's add it.
+
+syzbot is usually quite good at bisections, was a bug origin found ?
 
 
-Cheers,
-Bj=C3=B6rn
+>
+> On Sat, Jan 20, 2024 at 02:46:49PM +0800, zhangpeng (AS) wrote:
+> > On 2024/1/19 21:40, Matthew Wilcox wrote:
+> >
+> > > On Fri, Jan 19, 2024 at 05:20:24PM +0800, Peng Zhang wrote:
+> > > > Recently, we discovered a syzkaller issue that triggers
+> > > > VM_BUG_ON_FOLIO in filemap_unaccount_folio() with CONFIG_DEBUG_VM
+> > > > enabled, or bad page without CONFIG_DEBUG_VM.
+> > > >
+> > > > The specific scenarios are as follows:
+> > > > (1) mmap: Use socket fd to create a TCP VMA.
+> > > > (2) open(O_CREAT) + fallocate + sendfile: Read the ext4 file and cr=
+eate
+> > > > the page cache. The mapping of the page cache is ext4 inode->i_mapp=
+ing.
+> > > > Send the ext4 page cache to the socket fd through sendfile.
+> > > > (3) getsockopt TCP_ZEROCOPY_RECEIVE: Receive the ext4 page cache an=
+d use
+> > > > vm_insert_pages() to insert the ext4 page cache to the TCP VMA. In =
+this
+> > > > case, mapcount changes from - 1 to 0. The page cache mapping is ext=
+4
+> > > > inode->i_mapping, but the VMA of the page cache is the TCP VMA and
+> > > > folio->mapping->i_mmap is empty.
+> > > I think this is the bug.  We shouldn't be incrementing the mapcount
+> > > in this scenario.  Assuming we want to support doing this at all and
+> > > we don't want to include something like ...
+> > >
+> > >     if (folio->mapping) {
+> > >             if (folio->mapping !=3D vma->vm_file->f_mapping)
+> > >                     return -EINVAL;
+> > >             if (page_to_pgoff(page) !=3D linear_page_index(vma, addre=
+ss))
+> > >                     return -EINVAL;
+> > >     }
+> > >
+> > > But maybe there's a reason for networking needing to map pages in thi=
+s
+> > > scenario?
+> >
+> > Agreed, and I'm also curious why.
+> >
+> > > > (4) open(O_TRUNC): Deletes the ext4 page cache. In this case, the p=
+age
+> > > > cache is still in the xarray tree of mapping->i_pages and these pag=
+e
+> > > > cache should also be deleted. However, folio->mapping->i_mmap is em=
+pty.
+> > > > Therefore, truncate_cleanup_folio()->unmap_mapping_folio() can't un=
+map
+> > > > i_mmap tree. In filemap_unaccount_folio(), the mapcount of the foli=
+o is
+> > > > 0, causing BUG ON.
+> > > >
+> > > > Syz log that can be used to reproduce the issue:
+> > > > r3 =3D socket$inet_tcp(0x2, 0x1, 0x0)
+> > > > mmap(&(0x7f0000ff9000/0x4000)=3Dnil, 0x4000, 0x0, 0x12, r3, 0x0)
+> > > > r4 =3D socket$inet_tcp(0x2, 0x1, 0x0)
+> > > > bind$inet(r4, &(0x7f0000000000)=3D{0x2, 0x4e24, @multicast1}, 0x10)
+> > > > connect$inet(r4, &(0x7f00000006c0)=3D{0x2, 0x4e24, @empty}, 0x10)
+> > > > r5 =3D openat$dir(0xffffffffffffff9c, &(0x7f00000000c0)=3D'./file0\=
+x00',
+> > > > 0x181e42, 0x0)
+> > > > fallocate(r5, 0x0, 0x0, 0x85b8)
+> > > > sendfile(r4, r5, 0x0, 0x8ba0)
+> > > > getsockopt$inet_tcp_TCP_ZEROCOPY_RECEIVE(r4, 0x6, 0x23,
+> > > > &(0x7f00000001c0)=3D{&(0x7f0000ffb000/0x3000)=3Dnil, 0x3000, 0x0, 0=
+x0, 0x0,
+> > > > 0x0, 0x0, 0x0, 0x0}, &(0x7f0000000440)=3D0x40)
+> > > > r6 =3D openat$dir(0xffffffffffffff9c, &(0x7f00000000c0)=3D'./file0\=
+x00',
+> > > > 0x181e42, 0x0)
+> > > >
+> > > > In the current TCP zerocopy scenario, folio will be released normal=
+ly .
+> > > > When the process exits, if the page cache is truncated before the
+> > > > process exits, BUG ON or Bad page occurs, which does not meet the
+> > > > expectation.
+> > > > To fix this issue, the mapping_mapped() check is added to
+> > > > filemap_unaccount_folio(). In addition, to reduce the impact on
+> > > > performance, no lock is added when mapping_mapped() is checked.
+> > > NAK this patch, you're just preventing the assertion from firing.
+> > > I think there's a deeper problem here.
+> >
+> > --
+> > Best Regards,
+> > Peng
+> >
+> >
 
