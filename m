@@ -1,104 +1,72 @@
-Return-Path: <netdev+bounces-64736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8810E836E35
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:47:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F9F2836E4F
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:50:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3EAB91F27F4B
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 17:47:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 552A71F28B3B
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 17:50:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7882A4B5DC;
-	Mon, 22 Jan 2024 17:12:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E02975DF2E;
+	Mon, 22 Jan 2024 17:16:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VfYbAlV6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vtm/6iTq"
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03F834A9BC;
-	Mon, 22 Jan 2024 17:12:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B76D85EE76;
+	Mon, 22 Jan 2024 17:16:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705943554; cv=none; b=Bh7sXgf33Ijs/xEkNj329hwBpU1nE5MmISs+ZCy9MVsOdobRd7/pR1FBxMkwDn3nNMuawGMBFmLxkBml1bIrpS6UaauK10+0VSv6X0kRDo7pN9Ok52vmWOpPcVegudTANLwQP0/LPHfWDES7rlAg+CZt9+P9r//baL8yvtvxMiE=
+	t=1705943773; cv=none; b=AFVJaoiBmTuTpX+DwbBSSKrfwmjepcY7PNblYKL+HIjK4AB9LzQ7CPjYIY1DL5SivtU4bqyN+lJfareUeojP7WuRwRaL/y7hoWqmQ9hFHjq51RaLenXTve/e9S1VSjpYnTJvRNb9J/5HeW8A8/fXFfRSa1srg8nqzNtjptuuSpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705943554; c=relaxed/simple;
-	bh=1e0c7h65C7Y9VUpkVImG0ZmRYTbDxV8hwPaGMflR99E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TDLDUmIT/LhrszVckGPzEny7HyDlP0DCPGjkuC/CVkrwCisQghAghd1P+TPkTGY2jxwRBWR5Jrvuogm35kUTq71qc/ee/NwBEMmfZTfOxGu5FslXg1x4ZT56kIa6Tx60wyNov/3A21ZgQJmGzdgriJoRBcpslRmC47FIWp0BXkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=VfYbAlV6; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=OocAKhFNnuVz1CoUH7OyvE7TA9nNw+y+skld+4cN6dY=; b=VfYbAlV6K7QQZG9f9GC3tkEAyb
-	TEf8WQcrE1W2XPzRzNH8asCUM7MGml3nQQ2CtWuQHQtvubEJJvrTO/ryyGS5xqBdBcN9EJ0imzMWe
-	BXARefnokht4DEYts66ZIP7bchDA8iRMXFfsFygJ9t6FeFL1YTpSZyICQDl2yjVijDKCZJB1qpzQb
-	MX9td3CHd7INswtLh0wMUT7Cptr0dcMDaPsgmWO4vKmpSPK58tITReXY9L6FI8WpPVuLf7WbxJIiS
-	3ma82UEZ53WQp6PLnWaTD5y81ZoiCyoBvjZ233XsboBa8aDvabNvtwNLei4Cil7Bb/h2St041mwzN
-	PVa5GRzw==;
-Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rRxqU-00000000Uz8-1SZ5;
-	Mon, 22 Jan 2024 17:12:26 +0000
-Date: Mon, 22 Jan 2024 17:12:26 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "zhangpeng (AS)" <zhangpeng362@huawei.com>, linux-mm@kvack.org,
-	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
-	akpm@linux-foundation.org, davem@davemloft.net, dsahern@kernel.org,
-	kuba@kernel.org, pabeni@redhat.com, arjunroy@google.com,
-	wangkefeng.wang@huawei.com
-Subject: Re: SECURITY PROBLEM: Any user can crash the kernel with TCP ZEROCOPY
-Message-ID: <Za6h-tB7plgKje5r@casper.infradead.org>
-References: <20240119092024.193066-1-zhangpeng362@huawei.com>
- <Zap7t9GOLTM1yqjT@casper.infradead.org>
- <5106a58e-04da-372a-b836-9d3d0bd2507b@huawei.com>
- <Za6SD48Zf0CXriLm@casper.infradead.org>
- <CANn89iL4qUXsVDRNGgBOweZbJ6ErWMsH+EpOj-55Lky8JEEhqQ@mail.gmail.com>
+	s=arc-20240116; t=1705943773; c=relaxed/simple;
+	bh=Bji7ZH3bmVt5SepqHNLp1DHXy4F+KSEnONE/lk0cHTo=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=VOrcMWNqrx7zVvwOrYXZPV/vCflGJusokleq3BJXG0/Ki6Fs1qxwMXO5N6ckjCye5f6I5Wd9QDKXop2GJMq1V50EoVzM4YBJJ7NOP+VnRlhDsgqHNnEtUxAT9ZMJR+bjb2L2XkfGMIsXjytoPRI/SGKk/2QSFF1XRpk1dLzE1V4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vtm/6iTq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 397BEC433C7;
+	Mon, 22 Jan 2024 17:16:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705943773;
+	bh=Bji7ZH3bmVt5SepqHNLp1DHXy4F+KSEnONE/lk0cHTo=;
+	h=Date:From:To:Subject:From;
+	b=Vtm/6iTqPx0RFVtPFnTp8dW2L51QIWDdPUmZ1e0dKSaKVk9YLjkTC/ozUszq9Ze2T
+	 JHFF0/dMJy9vfeNZDnQbRGb5AcpGQdldTyeUp321O4w7xqKmjR1A5TJcF9gT4+5wLu
+	 qxoCIzpMsxgfRbs5gZPhXT84ZRS97I4zv7irVzgrIakjvM2vJqT8flz4jZ7W+j/6Aq
+	 hZhAsUYQouJYePxqASEr0lDAjyT6sXTLt8VynFRw/XpjmE0g4TLIXGZ/wJn+8UNOmM
+	 aI5w8bm2jC0YkfHKSKiBlJC21gMTe5LTYKN5TIW9e7nOOAuozqarwLyjWE1MYDzWRX
+	 QMud6RZ2lU0yg==
+Date: Mon, 22 Jan 2024 09:16:12 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "netdev-driver-reviewers@vger.kernel.org"
+ <netdev-driver-reviewers@vger.kernel.org>
+Subject: [ANN] net-next is OPEN
+Message-ID: <20240122091612.3f1a3e3d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iL4qUXsVDRNGgBOweZbJ6ErWMsH+EpOj-55Lky8JEEhqQ@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 22, 2024 at 05:30:18PM +0100, Eric Dumazet wrote:
-> On Mon, Jan 22, 2024 at 5:04 PM Matthew Wilcox <willy@infradead.org> wrote:
-> > I'm disappointed to have no reaction from netdev so far.  Let's see if a
-> > more exciting subject line evinces some interest.
-> 
-> Hmm, perhaps some of us were enjoying their weekend ?
+Hi,
 
-I am all in favour of people taking time off!  However the report came
-in on Friday at 9am UTC so it had been more than a work day for anyone
-anywhere in the world without response.
+net-next is open again, and accepting changes for v6.9.
 
-> I don't really know what changed recently, all I know is that TCP zero
-> copy is for real network traffic.
-> 
-> Real trafic uses order-0 pages, 4K at a time.
-> 
-> If can_map_frag() needs to add another safety check, let's add it.
+Over the merge window I spent some time stringing together selftest
+runner for netdev: https://netdev.bots.linux.dev/status.html
+It is now connected to patchwork, meaning there should be a check
+posted to each patch indicating whether selftests have passed or not.
 
-So it's your opinion that people don't actually use sendfile() from
-a local file, and we can make this fail to zerocopy?  That's good
-because I had a slew of questions about what expectations we had around
-cache coherency between pages mapped this way and write()/mmap() of
-the original file.  If we can just disallow this, we don't need to
-have a discussion about it.
-
-> syzbot is usually quite good at bisections, was a bug origin found ?
-
-I have the impression that Huawei run syzkaller themselves without
-syzbot.  I suspect this bug has been there for a good long time.
-Wonder why nobody's found it before; it doesn't seem complicated for a
-fuzzer to stumble into.
+If you authored any net or drivers/net selftests, please look around
+and see if they are passing. If not - send patches or LMK what I need
+to do to make them pass on the runner.. Make sure to scroll down to 
+the "Not reporting to patchwork" section.
 
