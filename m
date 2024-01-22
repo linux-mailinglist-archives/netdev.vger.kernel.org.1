@@ -1,900 +1,192 @@
-Return-Path: <netdev+bounces-64713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25883836D23
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:24:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79142836C83
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:08:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 86761B23925
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 17:05:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29BB0287D78
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 17:08:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70957495CC;
-	Mon, 22 Jan 2024 15:50:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 506A24B5B7;
+	Mon, 22 Jan 2024 15:53:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DCLpAqb5"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="eKFSq/99"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from APC01-TYZ-obe.outbound.protection.outlook.com (mail-tyzapc01olkn2094.outbound.protection.outlook.com [40.92.107.94])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49903495CA;
-	Mon, 22 Jan 2024 15:50:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705938612; cv=none; b=PmKe7vibooPlz71ac0jEIfix0RtfQac9QOlDOY9VUdrRPaxGRMqVarTkP3Xt149VPbB0iiJJPuTXUDJtlaCnDVQSWf8afm/Mfx3g/Z9cEl6bbRjks+A8dN1xXLk0+Mav1Md0YT3QWOyeLNJzFvfbt1urZIY4dYyf1I9P73Z0Sgk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705938612; c=relaxed/simple;
-	bh=p+TlGwVMmsU570L0oRcCtptBuGnNSCPIjEoFP+qEjcg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=J0nITjzh9Bw9ZL7o6EyZ2AdAOrWvhjwxIBBM1TgHNieezT16dFht6L0XKIZMbRB5P7T+nAxHZgkjd4SsD4v/rf2iBJzXDTqP+rzeSg2I6re+W1PLWX1fdexnM7QmBjEM4zOkmg0BhWtl7dzANz0dTIiuuZ+FGhcKwAN35IB4Jng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DCLpAqb5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F22F1C43390;
-	Mon, 22 Jan 2024 15:50:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705938611;
-	bh=p+TlGwVMmsU570L0oRcCtptBuGnNSCPIjEoFP+qEjcg=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=DCLpAqb5qcg1+gMqsHcdpDrrXwpMn+7zDK7EH++8sWdTnt2juCVtqoZuNazimXclV
-	 lBDMgFOsHwNklF64dzMo+2x7GSSuDXV1FnsWGZbY6dtKmtNh1RV1JJvKbgwvHsL/4O
-	 erqOz657Ux8wdGO9Dk51vedL8yVg8cpz46ZaN5kC4RKtSF2xVSmCvwE74s6npJLKdz
-	 IRmjQLXx2/9VNBGeujsacQLPSJvVYr7o0TW0vEiw9OyObBEwVauEIoXROKzowjLoyv
-	 o5FVDmvKMIQAUGLRnaNVBNFwJtOG09Hr077JjqnabjZIsraT83HgAeFdAiavYjKH9e
-	 476uqTxcm+8Ig==
-Message-ID: <307cd36ead20741667418fae6bf921ce44f891ea.camel@kernel.org>
-Subject: Re: [PATCH v6 3/3] NFSD: add write_ports to netlink command
-From: Jeff Layton <jlayton@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: linux-nfs@vger.kernel.org, lorenzo.bianconi@redhat.com, neilb@suse.de, 
- kuba@kernel.org, chuck.lever@oracle.com, horms@kernel.org,
- netdev@vger.kernel.org
-Date: Mon, 22 Jan 2024 10:50:09 -0500
-In-Reply-To: <Za6LQ8tdSwFil-eO@lore-desk>
-References: <cover.1705771400.git.lorenzo@kernel.org>
-	 <f7c42dae2b232b3b06e54ceb3f00725893973e02.1705771400.git.lorenzo@kernel.org>
-	 <9e3ae337dcf168c60c4cfd51aa0b2fc7b24bcbfb.camel@kernel.org>
-	 <Za6LQ8tdSwFil-eO@lore-desk>
-Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
- keydata=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
-	kZWuOsJdJQdmwlWC5L5ln9xgfr/4mOY38B0U=
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 579DC3DB98;
+	Mon, 22 Jan 2024 15:53:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.107.94
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705938829; cv=fail; b=GtKpO08ZBSHo2vU3GQ9cZrs4swfdTLccDw0iMl5QojYTezp7mp0VwnahADdCGGJKJD+n1HDI0/M8h9lSJayg4FtVdmXy13Et2MEoWivG5jw4bmwwdMysBqCJi7lusCl6BxBmMpS5qH81rFjSXjihiXcSUnl/FdbWpujRUPAqOtU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705938829; c=relaxed/simple;
+	bh=3ijhp17wHWsusWo6tkErYSMp0zLvkGE3oQ8VzVumjAw=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=VtS7AlnJUrIa/RCsRePhhazRreX+nyAzHxDbFuDJXHF92eRzl+56v+llIl/5yvfAsoK+5Ynui+Fm73oLZ8TwwmN9WEnS2fPJ8MnqgN5/Z0roqey/Spp0khax0W04dB+hQhDNMI8aaenVdG/C9fsTNq1tS7U/kUWezPmovrobVnM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=eKFSq/99; arc=fail smtp.client-ip=40.92.107.94
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fe/dR51MGYWyNXzX2XEhJAxDDWxlamBBVekOiWnILWLwH6D3aTAmnrhkqCDtKk8ZD9EEOgwVC8o+2kBBJGpGvMCXb9W+pgQZ4DXb8FoTsi9emGig0Vutd1tPG6QIDLwRXFC1uZNs356TInPK0fZ/6hRbXOEwR7fnpvd1oQhjhqQISFLaYY5Xts3KzokddTV+2gZdLdcMJlzkYUUfsjCO5HpnG3tubKWZFOpKuCugkV6ASirAs9ols4BJwiLNzEKWx6TipKI5WkhZMivixfxdOyZbue4z0EsbxVvDzwR55kuctB9gkgyKfV72exv2fze5K7kw/TUvH9sq6pqCkchZoQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+XEg6cxerjWfFSYeEU37Ji9axPwj+NTZ65b9M1vpDyE=;
+ b=gY3RIt95AioOQg3WTUeI5JaRzazO1lBgBZYTFd8w7gP1HiuyHONvzyyl6Et/4UV2F2D25GLcwOv6TTHKBcQZSESBrPJ8S2o8CaVZDchx7TWrRZUnb61OamFQVok1HzPS7FVOUv3M0QvZcWYJJonKTB82evo2L0JYxP2UC7mCUt+NMD6PmMk2c9zS+X2E+1vuw9mWJJ70GDJ0a8mvPfdiE7QyUX9iuTCakquqecTf+Ze4qiiJfTODJxM8Mur96HbuDXqlsRfoAblpTCYG+sfsE8NdcznAj2Z+4Dv6vhFMn3VbZ+V8IGl5Ao33ypow+rhYvX+EyhXgyBhoPTBJV2MJzw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+XEg6cxerjWfFSYeEU37Ji9axPwj+NTZ65b9M1vpDyE=;
+ b=eKFSq/99sEqWN4v5vlCKMvltdiIca15lghtvrbtiQ6GySACfoFegqagDwh+fgEMn0vI8F3NQM/Ai7kSNPHOJPvEKPp+xZqub07mGcNaRFMZNHw2wB2zjUVQOLiOCPrYFNrzNIL09CPVD3lFzLufllUHdsNjFpTNUIMjtXjWgJVLTcF8TyFLv29VTF2rgFT2qgQv4cGfwOcS/f68cKiMQ2NDa/GFDfP2svm63Pqp49ZFBgyOFqHTyLqGDDApqXM3DWKtxZVufJ6rsQiJKV3+LrhUDwyC3WewEG6MhuV+3dUa26rLeFuOCf9TAXj4+NAi41yu4bwpyBneClfmyu6Ymzw==
+Received: from TYZPR01MB5556.apcprd01.prod.exchangelabs.com
+ (2603:1096:400:363::9) by KL1PR01MB5759.apcprd01.prod.exchangelabs.com
+ (2603:1096:820:10e::9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.31; Mon, 22 Jan
+ 2024 15:53:42 +0000
+Received: from TYZPR01MB5556.apcprd01.prod.exchangelabs.com
+ ([fe80::a639:b02c:5189:7140]) by TYZPR01MB5556.apcprd01.prod.exchangelabs.com
+ ([fe80::a639:b02c:5189:7140%7]) with mapi id 15.20.7202.031; Mon, 22 Jan 2024
+ 15:53:41 +0000
+Message-ID:
+ <TYZPR01MB5556603EA4C5D7BAF9C27C6AC9752@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
+Date: Mon, 22 Jan 2024 23:52:30 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 7/8] arm64: dts: qcom: ipq5018: enable ethernet support
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+ richardcochran@gmail.com, p.zabel@pengutronix.de, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, linux-kernel@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+ linux-mediatek@lists.infradead.org
+References: <TYZPR01MB55563BD6A2B78402E4BB44D4C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
+ <TYZPR01MB5556FA040B07F48AFE544680C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
+ <b8510b38-3669-4a04-9ca6-dbe937ecbec3@lunn.ch>
+From: Ziyang Huang <hzyitc@outlook.com>
+In-Reply-To: <b8510b38-3669-4a04-9ca6-dbe937ecbec3@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TMN: [0IRDUKUQfG4l5zt2hhhcomOj+XtQL6Xa]
+X-ClientProxiedBy: SI2PR02CA0046.apcprd02.prod.outlook.com
+ (2603:1096:4:196::15) To TYZPR01MB5556.apcprd01.prod.exchangelabs.com
+ (2603:1096:400:363::9)
+X-Microsoft-Original-Message-ID:
+ <22820ed2-135d-46f1-90fa-9b3c925bf92f@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: TYZPR01MB5556:EE_|KL1PR01MB5759:EE_
+X-MS-Office365-Filtering-Correlation-Id: f6c5ee07-38e0-4809-d43a-08dc1b624e2b
+X-MS-Exchange-SLBlob-MailProps:
+	Cq7lScuPrnozpoe5DD7mC6QHwETenhSvcTJV0/3/2xM0U79+y5QKtvhkuvux0j6/UQU2njVsKIjiF8+aY9LlGtoyaEbeInVxnK5KXZqrjuXC2R4y6+mOjlPVRnDL3/aMtWLke9rCSw04YxrnFVum1PyC4l9qKaPzj3D80gBOz6vk3q//qrJ7HMTB9ubcH6MPNecSdwWMz/gzlZ2qTP/SouuvMLOodmdZ3Hw6WecDI5wCBR2X6W91+LhEfS4fIpiHjT2TOdQHGUN3Z2bCgzIDc/k/R0UTjmFzR5BjsiVAMftpJ1NVxtDSdMGSDsE5BOrINvIlHoRx3lofBHGphywThYbHwV5FjlVnjFycPzRKsG32NDsKIEC2Vq4aS/p+IR8MuZn5C7TCln+0ZsdqKuMZjwg0hAwhpL2hGamjqs0LLlPktbZ/kGijJmvrdU1vg0r2vmwZNlU3mXMLaFaiHIORfLz0KW/70dYgaF9V5BzwGAhFPf7Dju/5Rzt2ums2wbySKcWvWVo7jrngBY/L4cy1Bfn8XyIoVpRN2vBbXTN6U9uTXY+wPv9YCyPj1J6HtMMlBLw2Q/nyxeXaSYzR2NXiIzzazkgrvAkC1rEemuj8XAtZlphML2l9BEuj9B5UaA2x6nrazgs3vSboXEZuPRHDHpMh7I8V/iv4M/hUMpd3kyKjDLByq/rCCvL+adMxc1HgVmtu8YTijAJlwGcDzV/uoFxe4Or477M8GiDDKJE7GHNSSEf2eYwE/TyAhbqa8jubWdHh+U2nJGM=
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	wkk/ItgTsl3Tk6cqI06PiE2vRyIO1tLUQTuEgQitoKoATCLabWbzPGEkGSFtn5lnaDbWjQo2XsFjSCcxkPijvrs6ZnOD07pNAsr5O5mOeg/0hMo7kMm6Q5MT7hXzJZvSeciLJapxpNZqN2b9iPpYGlqQSeVjWlTHSRnWW6x9powGvPnePgKxMUnYmFTxRtyCvwj9bgrGwlBdH/KTM8m5CKolCC4PuGAmmXTee0cVDa8yXC5/2GKJRkbtoDPvg+54XFLdxt/8W6kL6CHkm3zXcUumnp31fUt7KsDEuzqUbtgvW6CqNu7bWI3EA40UDolxFHUBOt+Hymg9QNrRMTjqgGwXhOLN0tzjdTOj/c8BLvqX7VdUvdj1fkDVRNlJWOtDOMv+t0/LzhglbWj3ap9qm8FxZkwX8PhL+NcRecmN6E2xePXOdDNNWNyX6xwGVDXKslZt/mS02NrwnxgTRgPnDS8y6UchiOi9r8+NNYGUs82sIT4QJBiTESI5Z7ki2cybWERSXo8Ll+FCWUMHP5U0+LwOUcTtc853E7mqjbe/EkrAeLbe9+xfinvkTFVGYXMh
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?OHVoK2dpK1QvUTVtazZqSmNURm13VVZjRi94NVQ3RTV3d2dwM1lITVR1blpq?=
+ =?utf-8?B?UFp3djRkOWNlZFNsVE1tTEMrclRxSWZBZ055YmY0RG5rcjZNdVMyWVN5eUwr?=
+ =?utf-8?B?QUhxcGJyRFN3MDFVNWZtaUwyOVlSc3lVekNRSllXaXpBYTFqN2xhclVVQXNE?=
+ =?utf-8?B?ajFpS1A3b3lWTXB2eERtY3NVVHZHVVZTaGpIOFZPVFN4MGVGUkl6WlNqbkxO?=
+ =?utf-8?B?d3pER21WcjdHeHdMa1hhZWpmbFpwS2YxZjlUc3lNYXJSeVQ5cTNDRHZ2Z0l3?=
+ =?utf-8?B?cVlYVXEvUllFVHJQZWt1elVCRTZPMjl0bEFkb1AzVEhnSTFUTDdja0FHc1Vh?=
+ =?utf-8?B?SU9xMzBFQmswdzFoRVI1b1p1Mkc0ZEtTOUtnQjR6elRRRTVHRjhPWUxpalJk?=
+ =?utf-8?B?R3JVd0ZQRVIvWEppRVpFK1NWK0NWQjl1SGJRdHJ3K1J4dHVuMDJiZk5TV014?=
+ =?utf-8?B?RUo5VUw5VDdLcTRlTS9Udk0ydFBPT1hmY3FkTjRsRnJpTTIrdDhSMVVNbFVk?=
+ =?utf-8?B?bVF5NTZpb1JFT09nV0YxMGtkb0FRWjJMNFdXNjZoOWpiRlFVSktyeHdpWXQ4?=
+ =?utf-8?B?dlJlRDhTc3VLMCtXY29VYi9mWFVHZW9pc25neUROV1FXT3REMWpWdFV0Zndn?=
+ =?utf-8?B?eVAvS21SQmN2QTNjdWEvTVZCZlpZQyswNStLaUlIQVZkYlFWMkxGeDQrWjdT?=
+ =?utf-8?B?bEtyaWIvV0ZBVHEvejUvR0NuYklRMWsweDdydnF6L3FSRTBOK2pYSEdjMnhC?=
+ =?utf-8?B?bG80T1dpcTFPOVZyeWx2elRrY1FDbEJaK2tLTm1sT0sra3A0L3FpcnpCQVY3?=
+ =?utf-8?B?UlkvVUR4OFN5WHhRT3l2TndTL29IYWE0c0dtNk45NkNsc203N1VCaXpoYS9p?=
+ =?utf-8?B?Szl0K3FLNzhXZTVBVnRWYzlCQUF0ODhwNks2b2Q4N2lwU0FKVHVpbUptSmIz?=
+ =?utf-8?B?RHZTYklUcitlUVRGTmpId1VIRVhuSXR5UDYybWhQYUh3R1JwSFhJajJ4WTlo?=
+ =?utf-8?B?elQvNnNVY3NMVUlvdmtsU1VjUkp0VEs5U1JCMDgwcGlPZkc2MWN0bWNMN2tt?=
+ =?utf-8?B?em9zNUVEWnJ6Uk9DbkU3V2xNQWk0Z0szVkJLUjkzZysxcW9tSGJRd2JJYk9u?=
+ =?utf-8?B?ZWZUYXVPblFsaEFFRWRKNGxTRTdIMHY2Z21FRlRoNHA1YzBNdEEvSFFOdnRB?=
+ =?utf-8?B?WXdmQmNRVzRISVJXUUNBa3FUUlB3cFVEMFVFdll6amMvdlluVU9HaE9jTFZo?=
+ =?utf-8?B?VHpIdjRDc2s2V2t1Rm1UYWZWc1RDbit6cU52MFdGSUhVbUM2aldycFBHbXVn?=
+ =?utf-8?B?ZHBYWTczZjNnR0pEMXFHT2xlNGs0QmFJMXYxTUJ2VGczN3VTUzJpKzdzK2hp?=
+ =?utf-8?B?UEp3V3UwSnpVT0VHdTRBSElJcitaNEt4Z2MvZnhRb2wwMVcyV3V3VDNsdXZl?=
+ =?utf-8?B?K05RSXBiRFlIeGVHckRJVlRacmF5N1ZsN2cvWHU1OHRZbHRURVAxZG5iTENM?=
+ =?utf-8?B?ODM1KzhVVGVEd2MvSmlKVHA5YXNqdTZvN3U4cjFUSXJHU2pIdGZXcGRVUTI0?=
+ =?utf-8?B?MlhEcGM5WGdnakgrcFlOSkRhOVIydTcvZjdYY0pJNUtJZjV6R0FHbFRKZ3JC?=
+ =?utf-8?B?OXY5YWR4UXFPT3lIRDhRTzNJclBUYnc9PQ==?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f6c5ee07-38e0-4809-d43a-08dc1b624e2b
+X-MS-Exchange-CrossTenant-AuthSource: TYZPR01MB5556.apcprd01.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jan 2024 15:53:41.3448
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: KL1PR01MB5759
 
-On Mon, 2024-01-22 at 16:35 +0100, Lorenzo Bianconi wrote:
-> > On Sat, 2024-01-20 at 18:33 +0100, Lorenzo Bianconi wrote:
-> > > Introduce write_ports netlink command. For listener-set, userspace is
-> > > expected to provide a NFS listeners list it wants to enable (all the
-> > > other ports will be closed).
-> > >=20
-> >=20
-> > Ditto here. This is a change to a declarative interface, which I think
-> > is a better way to handle this, but we should be aware of the change.
-> >=20
-> > > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> > > ---
-> > > =A0Documentation/netlink/specs/nfsd.yaml |  37 +++++
-> > > =A0fs/nfsd/netlink.c                     |  23 +++
-> > > =A0fs/nfsd/netlink.h                     |   3 +
-> > > =A0fs/nfsd/nfsctl.c                      | 196 ++++++++++++++++++++++=
-++++
-> > > =A0include/uapi/linux/nfsd_netlink.h     |  18 +++
-> > > =A0tools/net/ynl/generated/nfsd-user.c   | 191 ++++++++++++++++++++++=
-+++
-> > > =A0tools/net/ynl/generated/nfsd-user.h   |  55 ++++++++
-> > > =A07 files changed, 523 insertions(+)
-> > >=20
-> > > diff --git a/Documentation/netlink/specs/nfsd.yaml b/Documentation/ne=
-tlink/specs/nfsd.yaml
-> > > index 30f18798e84e..296ff24b23ac 100644
-> > > --- a/Documentation/netlink/specs/nfsd.yaml
-> > > +++ b/Documentation/netlink/specs/nfsd.yaml
-> > > @@ -85,6 +85,26 @@ attribute-sets:
-> > > =A0=A0=A0=A0=A0=A0=A0=A0=A0type: nest
-> > > =A0=A0=A0=A0=A0=A0=A0=A0=A0nested-attributes: nfs-version
-> > > =A0=A0=A0=A0=A0=A0=A0=A0=A0multi-attr: true
-> > > +  -
-> > > +    name: server-instance
-> > > +    attributes:
-> > > +      -
-> > > +        name: transport-name
-> > > +        type: string
-> > > +      -
-> > > +        name: port
-> > > +        type: u32
-> > > +      -
-> > > +        name: inet-proto
-> > > +        type: u16
-> > > +  -
-> > > +    name: server-listener
-> > > +    attributes:
-> > > +      -
-> > > +        name: instance
-> > > +        type: nest
-> > > +        nested-attributes: server-instance
-> > > +        multi-attr: true
-> > > =A0
-> > >=20
-> > >=20
-> > >=20
-> > > =A0operations:
-> > > =A0=A0=A0list:
-> > > @@ -144,3 +164,20 @@ operations:
-> > > =A0=A0=A0=A0=A0=A0=A0=A0=A0reply:
-> > > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0attributes:
-> > > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0- version
-> > > +    -
-> > > +      name: listener-set
-> > > +      doc: set nfs running listeners
-> > > +      attribute-set: server-listener
-> > > +      flags: [ admin-perm ]
-> > > +      do:
-> > > +        request:
-> > > +          attributes:
-> > > +            - instance
-> > > +    -
-> > > +      name: listener-get
-> > > +      doc: get nfs running listeners
-> > > +      attribute-set: server-listener
-> > > +      do:
-> > > +        reply:
-> > > +          attributes:
-> > > +            - instance
-> > > diff --git a/fs/nfsd/netlink.c b/fs/nfsd/netlink.c
-> > > index 5cbbd3295543..c772f9e14761 100644
-> > > --- a/fs/nfsd/netlink.c
-> > > +++ b/fs/nfsd/netlink.c
-> > > @@ -16,6 +16,12 @@ const struct nla_policy nfsd_nfs_version_nl_policy=
-[NFSD_A_NFS_VERSION_MINOR + 1]
-> > > =A0	[NFSD_A_NFS_VERSION_MINOR] =3D { .type =3D NLA_U32, },
-> > > =A0};
-> > > =A0
-> > >=20
-> > >=20
-> > >=20
-> > > +const struct nla_policy nfsd_server_instance_nl_policy[NFSD_A_SERVER=
-_INSTANCE_INET_PROTO + 1] =3D {
-> > > +	[NFSD_A_SERVER_INSTANCE_TRANSPORT_NAME] =3D { .type =3D NLA_NUL_STR=
-ING, },
-> > > +	[NFSD_A_SERVER_INSTANCE_PORT] =3D { .type =3D NLA_U32, },
-> > > +	[NFSD_A_SERVER_INSTANCE_INET_PROTO] =3D { .type =3D NLA_U16, },
-> > > +};
-> > > +
-> > > =A0/* NFSD_CMD_THREADS_SET - do */
-> > > =A0static const struct nla_policy nfsd_threads_set_nl_policy[NFSD_A_S=
-ERVER_WORKER_THREADS + 1] =3D {
-> > > =A0	[NFSD_A_SERVER_WORKER_THREADS] =3D { .type =3D NLA_U32, },
-> > > @@ -26,6 +32,11 @@ static const struct nla_policy nfsd_version_set_nl=
-_policy[NFSD_A_SERVER_PROTO_VE
-> > > =A0	[NFSD_A_SERVER_PROTO_VERSION] =3D NLA_POLICY_NESTED(nfsd_nfs_vers=
-ion_nl_policy),
-> > > =A0};
-> > > =A0
-> > >=20
-> > >=20
-> > >=20
-> > > +/* NFSD_CMD_LISTENER_SET - do */
-> > > +static const struct nla_policy nfsd_listener_set_nl_policy[NFSD_A_SE=
-RVER_LISTENER_INSTANCE + 1] =3D {
-> > > +	[NFSD_A_SERVER_LISTENER_INSTANCE] =3D NLA_POLICY_NESTED(nfsd_server=
-_instance_nl_policy),
-> > > +};
-> > > +
-> > > =A0/* Ops table for nfsd */
-> > > =A0static const struct genl_split_ops nfsd_nl_ops[] =3D {
-> > > =A0	{
-> > > @@ -59,6 +70,18 @@ static const struct genl_split_ops nfsd_nl_ops[] =
-=3D {
-> > > =A0		.doit	=3D nfsd_nl_version_get_doit,
-> > > =A0		.flags	=3D GENL_CMD_CAP_DO,
-> > > =A0	},
-> > > +	{
-> > > +		.cmd		=3D NFSD_CMD_LISTENER_SET,
-> > > +		.doit		=3D nfsd_nl_listener_set_doit,
-> > > +		.policy		=3D nfsd_listener_set_nl_policy,
-> > > +		.maxattr	=3D NFSD_A_SERVER_LISTENER_INSTANCE,
-> > > +		.flags		=3D GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
-> > > +	},
-> > > +	{
-> > > +		.cmd	=3D NFSD_CMD_LISTENER_GET,
-> > > +		.doit	=3D nfsd_nl_listener_get_doit,
-> > > +		.flags	=3D GENL_CMD_CAP_DO,
-> > > +	},
-> > > =A0};
-> > > =A0
-> > >=20
-> > >=20
-> > >=20
-> > > =A0struct genl_family nfsd_nl_family __ro_after_init =3D {
-> > > diff --git a/fs/nfsd/netlink.h b/fs/nfsd/netlink.h
-> > > index c9a1be693fef..10a26ad32cd0 100644
-> > > --- a/fs/nfsd/netlink.h
-> > > +++ b/fs/nfsd/netlink.h
-> > > @@ -13,6 +13,7 @@
-> > > =A0
-> > >=20
-> > >=20
-> > >=20
-> > > =A0/* Common nested types */
-> > > =A0extern const struct nla_policy nfsd_nfs_version_nl_policy[NFSD_A_N=
-FS_VERSION_MINOR + 1];
-> > > +extern const struct nla_policy nfsd_server_instance_nl_policy[NFSD_A=
-_SERVER_INSTANCE_INET_PROTO + 1];
-> > > =A0
-> > >=20
-> > >=20
-> > >=20
-> > > =A0int nfsd_nl_rpc_status_get_start(struct netlink_callback *cb);
-> > > =A0int nfsd_nl_rpc_status_get_done(struct netlink_callback *cb);
-> > > @@ -23,6 +24,8 @@ int nfsd_nl_threads_set_doit(struct sk_buff *skb, s=
-truct genl_info *info);
-> > > =A0int nfsd_nl_threads_get_doit(struct sk_buff *skb, struct genl_info=
- *info);
-> > > =A0int nfsd_nl_version_set_doit(struct sk_buff *skb, struct genl_info=
- *info);
-> > > =A0int nfsd_nl_version_get_doit(struct sk_buff *skb, struct genl_info=
- *info);
-> > > +int nfsd_nl_listener_set_doit(struct sk_buff *skb, struct genl_info =
-*info);
-> > > +int nfsd_nl_listener_get_doit(struct sk_buff *skb, struct genl_info =
-*info);
-> > > =A0
-> > >=20
-> > >=20
-> > >=20
-> > > =A0extern struct genl_family nfsd_nl_family;
-> > > =A0
-> > >=20
-> > >=20
-> > >=20
-> > > diff --git a/fs/nfsd/nfsctl.c b/fs/nfsd/nfsctl.c
-> > > index 53af82303f93..562b209f2921 100644
-> > > --- a/fs/nfsd/nfsctl.c
-> > > +++ b/fs/nfsd/nfsctl.c
-> > > @@ -1896,6 +1896,202 @@ int nfsd_nl_version_get_doit(struct sk_buff *=
-skb, struct genl_info *info)
-> > > =A0	return err;
-> > > =A0}
-> > > =A0
-> > >=20
-> > >=20
-> > >=20
-> > > +/**
-> > > + * nfsd_nl_listener_set_doit - set the nfs running listeners
-> > > + * @skb: reply buffer
-> > > + * @info: netlink metadata and command arguments
-> > > + *
-> > > + * Return 0 on success or a negative errno.
-> > > + */
-> > > +int nfsd_nl_listener_set_doit(struct sk_buff *skb, struct genl_info =
-*info)
-> > > +{
-> > > +	struct nlattr *tb[ARRAY_SIZE(nfsd_server_instance_nl_policy)];
-> > > +	struct net *net =3D genl_info_net(info);
-> > > +	struct svc_xprt *xprt, *tmp_xprt;
-> > > +	const struct nlattr *attr;
-> > > +	struct svc_serv *serv;
-> > > +	const char *xcl_name;
-> > > +	struct nfsd_net *nn;
-> > > +	int port, err, rem;
-> > > +	sa_family_t af;
-> > > +
-> > > +	if (GENL_REQ_ATTR_CHECK(info, NFSD_A_SERVER_LISTENER_INSTANCE))
-> > > +		return -EINVAL;
-> > > +
-> > > +	mutex_lock(&nfsd_mutex);
-> > > +
-> > > +	err =3D nfsd_create_serv(net);
-> > > +	if (err) {
-> > > +		mutex_unlock(&nfsd_mutex);
-> > > +		return err;
-> > > +	}
-> > > +
-> > > +	nn =3D net_generic(net, nfsd_net_id);
-> > > +	serv =3D nn->nfsd_serv;
-> > > +
-> > > +	/* 1- create brand new listeners */
-> > > +	nlmsg_for_each_attr(attr, info->nlhdr, GENL_HDRLEN, rem) {
-> > > +		if (nla_type(attr) !=3D NFSD_A_SERVER_LISTENER_INSTANCE)
-> > > +			continue;
-> > > +
-> > > +		if (nla_parse_nested(tb, ARRAY_SIZE(tb), attr,
-> > > +				     nfsd_server_instance_nl_policy,
-> > > +				     info->extack) < 0)
-> > > +			continue;
-> > > +
-> > > +		if (!tb[NFSD_A_SERVER_INSTANCE_TRANSPORT_NAME] ||
-> > > +		    !tb[NFSD_A_SERVER_INSTANCE_PORT])
-> > > +			continue;
-> > > +
-> > > +		xcl_name =3D nla_data(tb[NFSD_A_SERVER_INSTANCE_TRANSPORT_NAME]);
-> > > +		port =3D nla_get_u32(tb[NFSD_A_SERVER_INSTANCE_PORT]);
-> > > +		if (port < 1 || port > USHRT_MAX)
-> > > +			continue;
-> > > +
-> > > +		af =3D nla_get_u32(tb[NFSD_A_SERVER_INSTANCE_INET_PROTO]);
-> > > +		if (af !=3D PF_INET && af !=3D PF_INET6)
-> > > +			continue;
-> > > +
-> > > +		xprt =3D svc_find_xprt(serv, xcl_name, net, PF_INET, port);
-> > > +		if (xprt) {
-> > > +			svc_xprt_put(xprt);
-> > > +			continue;
-> > > +		}
-> > > +
-> > > +		/* create new listerner */
-> > > +		if (svc_xprt_create(serv, xcl_name, net, af, port,
-> > > +				    SVC_SOCK_ANONYMOUS, get_current_cred()))
-> > > +			continue;
-> > > +	}
-> > > +
-> > > +	/* 2- remove stale listeners */
-> >=20
-> >=20
-> > The old portlist interface was weird, in that it was only additive. You
-> > couldn't use it to close a listening socket (AFAICT). We may be able to
-> > support that now with this interface, but we'll need to test that case
-> > carefully.
-> >=20
-> >=20
-> >=20
-> > > +	spin_lock_bh(&serv->sv_lock);
-> > > +	list_for_each_entry_safe(xprt, tmp_xprt, &serv->sv_permsocks,
-> > > +				 xpt_list) {
-> > > +		struct svc_xprt *rqt_xprt =3D NULL;
-> > > +
-> > > +		nlmsg_for_each_attr(attr, info->nlhdr, GENL_HDRLEN, rem) {
-> > > +			if (nla_type(attr) !=3D NFSD_A_SERVER_LISTENER_INSTANCE)
-> > > +				continue;
-> > > +
-> > > +			if (nla_parse_nested(tb, ARRAY_SIZE(tb), attr,
-> > > +					     nfsd_server_instance_nl_policy,
-> > > +					     info->extack) < 0)
-> > > +				continue;
-> > > +
-> > > +			if (!tb[NFSD_A_SERVER_INSTANCE_TRANSPORT_NAME] ||
-> > > +			    !tb[NFSD_A_SERVER_INSTANCE_PORT])
-> > > +				continue;
-> > > +
-> > > +			xcl_name =3D nla_data(
-> > > +				tb[NFSD_A_SERVER_INSTANCE_TRANSPORT_NAME]);
-> > > +			port =3D nla_get_u32(tb[NFSD_A_SERVER_INSTANCE_PORT]);
-> > > +			if (port < 1 || port > USHRT_MAX)
-> > > +				continue;
-> > > +
-> > > +			af =3D nla_get_u32(tb[NFSD_A_SERVER_INSTANCE_INET_PROTO]);
-> > > +			if (af !=3D PF_INET && af !=3D PF_INET6)
-> > > +				continue;
-> > > +
-> > > +			if (!strcmp(xprt->xpt_class->xcl_name, xcl_name) &&
-> > > +			    port =3D=3D svc_xprt_local_port(xprt) &&
-> > > +			    af =3D=3D xprt->xpt_local.ss_family &&
-> > > +			    xprt->xpt_net =3D=3D net) {
-> > > +				rqt_xprt =3D xprt;
-> > > +				break;
-> > > +			}
-> > > +		}
-> > > +
-> > > +		/* remove stale listener */
-> > > +		if (!rqt_xprt) {
-> > > +			spin_unlock_bh(&serv->sv_lock);
-> > > +			svc_xprt_close(xprt);
-> > >=20
-> >=20
-> > I'm not sure this is safe. Can anything else modify sv_permsocks while
-> > you're not holding the lock? Maybe not since you're holding the
-> > nfsd_mutex, but it's still probably best to restart the list walk if yo=
-u
-> > have to drop the lock here.
-> >=20
-> > You're typically only going to have a few sockets here anyway -- usuall=
-y
-> > just one each for TCP, UDP and maybe RDMA.
->=20
-> what about beeing a bit proactive and set XPT_CLOSE bit before releasing =
-the
-> spinlock (as we already do in svc_xprt_close)?
->=20
+在 2024/1/22 0:45, Andrew Lunn 写道:
+> On Sun, Jan 21, 2024 at 08:42:36PM +0800, Ziyang Huang wrote:
+>> Signed-off-by: Ziyang Huang <hzyitc@outlook.com>
+>> ---
+>>   arch/arm64/boot/dts/qcom/ipq5018.dtsi | 120 +++++++++++++++++++++++++-
+>>   1 file changed, 116 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/arch/arm64/boot/dts/qcom/ipq5018.dtsi b/arch/arm64/boot/dts/qcom/ipq5018.dtsi
+>> index e502a3ecf4b7..b36e5c2136b7 100644
+>> --- a/arch/arm64/boot/dts/qcom/ipq5018.dtsi
+>> +++ b/arch/arm64/boot/dts/qcom/ipq5018.dtsi
+>> @@ -94,6 +94,63 @@ soc: soc@0 {
+>>   		#size-cells = <1>;
+>>   		ranges = <0 0 0 0xffffffff>;
+>>   
+>> +		mdio0: mdio@88000 {
+>> +			#address-cells = <1>;
+>> +			#size-cells = <0>;
+>> +			compatible = "qcom,ipq5018-mdio", "qcom,qca-mdio";
+>> +			reg = <0x88000 0x64>;
+>> +			resets = <&gcc GCC_GEPHY_MDC_SW_ARES>,
+>> +				 <&gcc GCC_GEPHY_DSP_HW_ARES>;
+> 
+> What do these two resets do? An MDIO bus controller is unlikely to
+> have a DSP in it. That is something a PHY is more likely to have. An
+> MDIO bus controller does have an MDC line, but why is it
+> GCC_GEPHY_MDC_SW_ARES not GCC_MDIO_MDC_SW_ARES? So this again makes me
+> think this is a PHY reset, so should be in the PHY node.
+> 
 
-That does sound better, actually. You might have to open-code parts of
-svc_xprt_close, but it's not that big anyway.
+IPQ5018 has two mdio bus. mdio0 is an internal bus which only connects 
+to internal PHY while mdio1 is outgoing and can be used to connect PHY 
+or switch.
 
+So I thought GCC_GEPHY_MDC_SW_ARES is for mdio0 and GCC_MDIO_MDC_SW_ARES 
+is for mdio1.
 
-> >=20
-> >=20
-> > > +			spin_lock_bh(&serv->sv_lock);
-> > > +		}
-> > > +	}
-> > > +	spin_unlock_bh(&serv->sv_lock);
-> > > +
-> > > +	if (!serv->sv_nrthreads && list_empty(&nn->nfsd_serv->sv_permsocks)=
-)
-> > > +		nfsd_destroy_serv(net);
-> > > +
-> > > +	mutex_unlock(&nfsd_mutex);
-> > > +
-> > > +	return 0;
-> > > +}
-> > > +
-> > > +/**
-> > > + * nfsd_nl_listener_get_doit - get the nfs running listeners
-> > > + * @skb: reply buffer
-> > > + * @info: netlink metadata and command arguments
-> > > + *
-> > > + * Return 0 on success or a negative errno.
-> > > + */
-> > > +int nfsd_nl_listener_get_doit(struct sk_buff *skb, struct genl_info =
-*info)
-> > > +{
-> > > +	struct svc_xprt *xprt;
-> > > +	struct svc_serv *serv;
-> > > +	struct nfsd_net *nn;
-> > > +	void *hdr;
-> > > +	int err;
-> > > +
-> > > +	skb =3D genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
-> > > +	if (!skb)
-> > > +		return -ENOMEM;
-> > > +
-> > > +	hdr =3D genlmsg_iput(skb, info);
-> > > +	if (!hdr) {
-> > > +		err =3D -EMSGSIZE;
-> > > +		goto err_free_msg;
-> > > +	}
-> > > +
-> > > +	mutex_lock(&nfsd_mutex);
-> > > +	nn =3D net_generic(genl_info_net(info), nfsd_net_id);
-> > > +	if (!nn->nfsd_serv) {
-> > > +		err =3D -EINVAL;
-> > > +		goto err_nfsd_unlock;
-> > > +	}
-> > > +
-> > > +	serv =3D nn->nfsd_serv;
-> > > +	spin_lock_bh(&serv->sv_lock);
-> > > +	list_for_each_entry(xprt, &serv->sv_permsocks, xpt_list) {
-> > > +		struct nlattr *attr;
-> > > +
-> > > +		attr =3D nla_nest_start_noflag(skb,
-> > > +					     NFSD_A_SERVER_LISTENER_INSTANCE);
-> > > +		if (!attr) {
-> > > +			err =3D -EINVAL;
-> > > +			goto err_serv_unlock;
-> > > +		}
-> > > +
-> > > +		if (nla_put_string(skb, NFSD_A_SERVER_INSTANCE_TRANSPORT_NAME,
-> > > +				   xprt->xpt_class->xcl_name) ||
-> > > +		    nla_put_u32(skb, NFSD_A_SERVER_INSTANCE_PORT,
-> > > +				svc_xprt_local_port(xprt)) ||
-> > > +		    nla_put_u16(skb, NFSD_A_SERVER_INSTANCE_INET_PROTO,
-> > > +				xprt->xpt_local.ss_family)) {
-> > > +			err =3D -EINVAL;
-> > > +			goto err_serv_unlock;
-> > > +		}
-> > > +
-> > > +		nla_nest_end(skb, attr);
-> > > +	}
-> > > +	spin_unlock_bh(&serv->sv_lock);
-> > > +	mutex_unlock(&nfsd_mutex);
-> > > +
-> > > +	genlmsg_end(skb, hdr);
-> > > +
-> > > +	return genlmsg_reply(skb, info);
-> > > +
-> > > +err_serv_unlock:
-> > > +	spin_unlock_bh(&serv->sv_lock);
-> > > +err_nfsd_unlock:
-> > > +	mutex_unlock(&nfsd_mutex);
-> > > +err_free_msg:
-> > > +	nlmsg_free(skb);
-> > > +
-> > > +	return err;
-> > > +}
-> > > +
-> > > =A0/**
-> > > =A0=A0* nfsd_net_init - Prepare the nfsd_net portion of a new net nam=
-espace
-> > > =A0=A0* @net: a freshly-created network namespace
-> > > diff --git a/include/uapi/linux/nfsd_netlink.h b/include/uapi/linux/n=
-fsd_netlink.h
-> > > index 2a06f9fe6fe9..659ab76b8840 100644
-> > > --- a/include/uapi/linux/nfsd_netlink.h
-> > > +++ b/include/uapi/linux/nfsd_netlink.h
-> > > @@ -51,12 +51,30 @@ enum {
-> > > =A0	NFSD_A_SERVER_PROTO_MAX =3D (__NFSD_A_SERVER_PROTO_MAX - 1)
-> > > =A0};
-> > > =A0
-> > >=20
-> > > +enum {
-> > > +	NFSD_A_SERVER_INSTANCE_TRANSPORT_NAME =3D 1,
-> > > +	NFSD_A_SERVER_INSTANCE_PORT,
-> > > +	NFSD_A_SERVER_INSTANCE_INET_PROTO,
-> > > +
-> > > +	__NFSD_A_SERVER_INSTANCE_MAX,
-> > > +	NFSD_A_SERVER_INSTANCE_MAX =3D (__NFSD_A_SERVER_INSTANCE_MAX - 1)
-> > > +};
-> > > +
-> > > +enum {
-> > > +	NFSD_A_SERVER_LISTENER_INSTANCE =3D 1,
-> > > +
-> > > +	__NFSD_A_SERVER_LISTENER_MAX,
-> > > +	NFSD_A_SERVER_LISTENER_MAX =3D (__NFSD_A_SERVER_LISTENER_MAX - 1)
-> > > +};
-> > > +
-> > > =A0enum {
-> > > =A0	NFSD_CMD_RPC_STATUS_GET =3D 1,
-> > > =A0	NFSD_CMD_THREADS_SET,
-> > > =A0	NFSD_CMD_THREADS_GET,
-> > > =A0	NFSD_CMD_VERSION_SET,
-> > > =A0	NFSD_CMD_VERSION_GET,
-> > > +	NFSD_CMD_LISTENER_SET,
-> > > +	NFSD_CMD_LISTENER_GET,
-> > > =A0
-> > >=20
-> > > =A0	__NFSD_CMD_MAX,
-> > > =A0	NFSD_CMD_MAX =3D (__NFSD_CMD_MAX - 1)
-> > > diff --git a/tools/net/ynl/generated/nfsd-user.c b/tools/net/ynl/gene=
-rated/nfsd-user.c
-> > > index ad498543f464..d52f392c7f59 100644
-> > > --- a/tools/net/ynl/generated/nfsd-user.c
-> > > +++ b/tools/net/ynl/generated/nfsd-user.c
-> > > @@ -19,6 +19,8 @@ static const char * const nfsd_op_strmap[] =3D {
-> > > =A0	[NFSD_CMD_THREADS_GET] =3D "threads-get",
-> > > =A0	[NFSD_CMD_VERSION_SET] =3D "version-set",
-> > > =A0	[NFSD_CMD_VERSION_GET] =3D "version-get",
-> > > +	[NFSD_CMD_LISTENER_SET] =3D "listener-set",
-> > > +	[NFSD_CMD_LISTENER_GET] =3D "listener-get",
-> > > =A0};
-> > > =A0
-> > >=20
-> > > =A0const char *nfsd_op_str(int op)
-> > > @@ -39,6 +41,17 @@ struct ynl_policy_nest nfsd_nfs_version_nest =3D {
-> > > =A0	.table =3D nfsd_nfs_version_policy,
-> > > =A0};
-> > > =A0
-> > >=20
-> > > +struct ynl_policy_attr nfsd_server_instance_policy[NFSD_A_SERVER_INS=
-TANCE_MAX + 1] =3D {
-> > > +	[NFSD_A_SERVER_INSTANCE_TRANSPORT_NAME] =3D { .name =3D "transport-=
-name", .type =3D YNL_PT_NUL_STR, },
-> > > +	[NFSD_A_SERVER_INSTANCE_PORT] =3D { .name =3D "port", .type =3D YNL=
-_PT_U32, },
-> > > +	[NFSD_A_SERVER_INSTANCE_INET_PROTO] =3D { .name =3D "inet-proto", .=
-type =3D YNL_PT_U16, },
-> > > +};
-> > > +
-> > > +struct ynl_policy_nest nfsd_server_instance_nest =3D {
-> > > +	.max_attr =3D NFSD_A_SERVER_INSTANCE_MAX,
-> > > +	.table =3D nfsd_server_instance_policy,
-> > > +};
-> > > +
-> > > =A0struct ynl_policy_attr nfsd_rpc_status_policy[NFSD_A_RPC_STATUS_MA=
-X + 1] =3D {
-> > > =A0	[NFSD_A_RPC_STATUS_XID] =3D { .name =3D "xid", .type =3D YNL_PT_U=
-32, },
-> > > =A0	[NFSD_A_RPC_STATUS_FLAGS] =3D { .name =3D "flags", .type =3D YNL_=
-PT_U32, },
-> > > @@ -79,6 +92,15 @@ struct ynl_policy_nest nfsd_server_proto_nest =3D =
-{
-> > > =A0	.table =3D nfsd_server_proto_policy,
-> > > =A0};
-> > > =A0
-> > >=20
-> > > +struct ynl_policy_attr nfsd_server_listener_policy[NFSD_A_SERVER_LIS=
-TENER_MAX + 1] =3D {
-> > > +	[NFSD_A_SERVER_LISTENER_INSTANCE] =3D { .name =3D "instance", .type=
- =3D YNL_PT_NEST, .nest =3D &nfsd_server_instance_nest, },
-> > > +};
-> > > +
-> > > +struct ynl_policy_nest nfsd_server_listener_nest =3D {
-> > > +	.max_attr =3D NFSD_A_SERVER_LISTENER_MAX,
-> > > +	.table =3D nfsd_server_listener_policy,
-> > > +};
-> > > +
-> > > =A0/* Common nested types */
-> > > =A0void nfsd_nfs_version_free(struct nfsd_nfs_version *obj)
-> > > =A0{
-> > > @@ -124,6 +146,64 @@ int nfsd_nfs_version_parse(struct ynl_parse_arg =
-*yarg,
-> > > =A0	return 0;
-> > > =A0}
-> > > =A0
-> > >=20
-> > > +void nfsd_server_instance_free(struct nfsd_server_instance *obj)
-> > > +{
-> > > +	free(obj->transport_name);
-> > > +}
-> > > +
-> > > +int nfsd_server_instance_put(struct nlmsghdr *nlh, unsigned int attr=
-_type,
-> > > +			     struct nfsd_server_instance *obj)
-> > > +{
-> > > +	struct nlattr *nest;
-> > > +
-> > > +	nest =3D mnl_attr_nest_start(nlh, attr_type);
-> > > +	if (obj->_present.transport_name_len)
-> > > +		mnl_attr_put_strz(nlh, NFSD_A_SERVER_INSTANCE_TRANSPORT_NAME, obj-=
->transport_name);
-> > > +	if (obj->_present.port)
-> > > +		mnl_attr_put_u32(nlh, NFSD_A_SERVER_INSTANCE_PORT, obj->port);
-> > > +	if (obj->_present.inet_proto)
-> > > +		mnl_attr_put_u16(nlh, NFSD_A_SERVER_INSTANCE_INET_PROTO, obj->inet=
-_proto);
-> > > +	mnl_attr_nest_end(nlh, nest);
-> > > +
-> > > +	return 0;
-> > > +}
-> > > +
-> > > +int nfsd_server_instance_parse(struct ynl_parse_arg *yarg,
-> > > +			       const struct nlattr *nested)
-> > > +{
-> > > +	struct nfsd_server_instance *dst =3D yarg->data;
-> > > +	const struct nlattr *attr;
-> > > +
-> > > +	mnl_attr_for_each_nested(attr, nested) {
-> > > +		unsigned int type =3D mnl_attr_get_type(attr);
-> > > +
-> > > +		if (type =3D=3D NFSD_A_SERVER_INSTANCE_TRANSPORT_NAME) {
-> > > +			unsigned int len;
-> > > +
-> > > +			if (ynl_attr_validate(yarg, attr))
-> > > +				return MNL_CB_ERROR;
-> > > +
-> > > +			len =3D strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(=
-attr));
-> > > +			dst->_present.transport_name_len =3D len;
-> > > +			dst->transport_name =3D malloc(len + 1);
-> > > +			memcpy(dst->transport_name, mnl_attr_get_str(attr), len);
-> > > +			dst->transport_name[len] =3D 0;
-> > > +		} else if (type =3D=3D NFSD_A_SERVER_INSTANCE_PORT) {
-> > > +			if (ynl_attr_validate(yarg, attr))
-> > > +				return MNL_CB_ERROR;
-> > > +			dst->_present.port =3D 1;
-> > > +			dst->port =3D mnl_attr_get_u32(attr);
-> > > +		} else if (type =3D=3D NFSD_A_SERVER_INSTANCE_INET_PROTO) {
-> > > +			if (ynl_attr_validate(yarg, attr))
-> > > +				return MNL_CB_ERROR;
-> > > +			dst->_present.inet_proto =3D 1;
-> > > +			dst->inet_proto =3D mnl_attr_get_u16(attr);
-> > > +		}
-> > > +	}
-> > > +
-> > > +	return 0;
-> > > +}
-> > > +
-> > > =A0/* =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D NFSD_CMD_RPC_STATUS_=
-GET =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D */
-> > > =A0/* NFSD_CMD_RPC_STATUS_GET - dump */
-> > > =A0int nfsd_rpc_status_get_rsp_dump_parse(const struct nlmsghdr *nlh,=
- void *data)
-> > > @@ -467,6 +547,117 @@ struct nfsd_version_get_rsp *nfsd_version_get(s=
-truct ynl_sock *ys)
-> > > =A0	return NULL;
-> > > =A0}
-> > > =A0
-> > >=20
-> > > +/* =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D NFSD_CMD_LISTENER_SET =
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D */
-> > > +/* NFSD_CMD_LISTENER_SET - do */
-> > > +void nfsd_listener_set_req_free(struct nfsd_listener_set_req *req)
-> > > +{
-> > > +	unsigned int i;
-> > > +
-> > > +	for (i =3D 0; i < req->n_instance; i++)
-> > > +		nfsd_server_instance_free(&req->instance[i]);
-> > > +	free(req->instance);
-> > > +	free(req);
-> > > +}
-> > > +
-> > > +int nfsd_listener_set(struct ynl_sock *ys, struct nfsd_listener_set_=
-req *req)
-> > > +{
-> > > +	struct ynl_req_state yrs =3D { .yarg =3D { .ys =3D ys, }, };
-> > > +	struct nlmsghdr *nlh;
-> > > +	int err;
-> > > +
-> > > +	nlh =3D ynl_gemsg_start_req(ys, ys->family_id, NFSD_CMD_LISTENER_SE=
-T, 1);
-> > > +	ys->req_policy =3D &nfsd_server_listener_nest;
-> > > +
-> > > +	for (unsigned int i =3D 0; i < req->n_instance; i++)
-> > > +		nfsd_server_instance_put(nlh, NFSD_A_SERVER_LISTENER_INSTANCE, &re=
-q->instance[i]);
-> > > +
-> > > +	err =3D ynl_exec(ys, nlh, &yrs);
-> > > +	if (err < 0)
-> > > +		return -1;
-> > > +
-> > > +	return 0;
-> > > +}
-> > > +
-> > > +/* =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D NFSD_CMD_LISTENER_GET =
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D */
-> > > +/* NFSD_CMD_LISTENER_GET - do */
-> > > +void nfsd_listener_get_rsp_free(struct nfsd_listener_get_rsp *rsp)
-> > > +{
-> > > +	unsigned int i;
-> > > +
-> > > +	for (i =3D 0; i < rsp->n_instance; i++)
-> > > +		nfsd_server_instance_free(&rsp->instance[i]);
-> > > +	free(rsp->instance);
-> > > +	free(rsp);
-> > > +}
-> > > +
-> > > +int nfsd_listener_get_rsp_parse(const struct nlmsghdr *nlh, void *da=
-ta)
-> > > +{
-> > > +	struct nfsd_listener_get_rsp *dst;
-> > > +	struct ynl_parse_arg *yarg =3D data;
-> > > +	unsigned int n_instance =3D 0;
-> > > +	const struct nlattr *attr;
-> > > +	struct ynl_parse_arg parg;
-> > > +	int i;
-> > > +
-> > > +	dst =3D yarg->data;
-> > > +	parg.ys =3D yarg->ys;
-> > > +
-> > > +	if (dst->instance)
-> > > +		return ynl_error_parse(yarg, "attribute already present (server-li=
-stener.instance)");
-> > > +
-> > > +	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
-> > > +		unsigned int type =3D mnl_attr_get_type(attr);
-> > > +
-> > > +		if (type =3D=3D NFSD_A_SERVER_LISTENER_INSTANCE) {
-> > > +			n_instance++;
-> > > +		}
-> > > +	}
-> > > +
-> > > +	if (n_instance) {
-> > > +		dst->instance =3D calloc(n_instance, sizeof(*dst->instance));
-> > > +		dst->n_instance =3D n_instance;
-> > > +		i =3D 0;
-> > > +		parg.rsp_policy =3D &nfsd_server_instance_nest;
-> > > +		mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
-> > > +			if (mnl_attr_get_type(attr) =3D=3D NFSD_A_SERVER_LISTENER_INSTANC=
-E) {
-> > > +				parg.data =3D &dst->instance[i];
-> > > +				if (nfsd_server_instance_parse(&parg, attr))
-> > > +					return MNL_CB_ERROR;
-> > > +				i++;
-> > > +			}
-> > > +		}
-> > > +	}
-> > > +
-> > > +	return MNL_CB_OK;
-> > > +}
-> > > +
-> > > +struct nfsd_listener_get_rsp *nfsd_listener_get(struct ynl_sock *ys)
-> > > +{
-> > > +	struct ynl_req_state yrs =3D { .yarg =3D { .ys =3D ys, }, };
-> > > +	struct nfsd_listener_get_rsp *rsp;
-> > > +	struct nlmsghdr *nlh;
-> > > +	int err;
-> > > +
-> > > +	nlh =3D ynl_gemsg_start_req(ys, ys->family_id, NFSD_CMD_LISTENER_GE=
-T, 1);
-> > > +	ys->req_policy =3D &nfsd_server_listener_nest;
-> > > +	yrs.yarg.rsp_policy =3D &nfsd_server_listener_nest;
-> > > +
-> > > +	rsp =3D calloc(1, sizeof(*rsp));
-> > > +	yrs.yarg.data =3D rsp;
-> > > +	yrs.cb =3D nfsd_listener_get_rsp_parse;
-> > > +	yrs.rsp_cmd =3D NFSD_CMD_LISTENER_GET;
-> > > +
-> > > +	err =3D ynl_exec(ys, nlh, &yrs);
-> > > +	if (err < 0)
-> > > +		goto err_free;
-> > > +
-> > > +	return rsp;
-> > > +
-> > > +err_free:
-> > > +	nfsd_listener_get_rsp_free(rsp);
-> > > +	return NULL;
-> > > +}
-> > > +
-> > > =A0const struct ynl_family ynl_nfsd_family =3D  {
-> > > =A0	.name		=3D "nfsd",
-> > > =A0};
-> > > diff --git a/tools/net/ynl/generated/nfsd-user.h b/tools/net/ynl/gene=
-rated/nfsd-user.h
-> > > index d062ee8fa8b6..5765fb6f2ef5 100644
-> > > --- a/tools/net/ynl/generated/nfsd-user.h
-> > > +++ b/tools/net/ynl/generated/nfsd-user.h
-> > > @@ -29,6 +29,18 @@ struct nfsd_nfs_version {
-> > > =A0	__u32 minor;
-> > > =A0};
-> > > =A0
-> > >=20
-> > > +struct nfsd_server_instance {
-> > > +	struct {
-> > > +		__u32 transport_name_len;
-> > > +		__u32 port:1;
-> > > +		__u32 inet_proto:1;
-> > > +	} _present;
-> > > +
-> > > +	char *transport_name;
-> > > +	__u32 port;
-> > > +	__u16 inet_proto;
-> > > +};
-> > > +
-> > > =A0/* =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D NFSD_CMD_RPC_STATUS_=
-GET =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D */
-> > > =A0/* NFSD_CMD_RPC_STATUS_GET - dump */
-> > > =A0struct nfsd_rpc_status_get_rsp_dump {
-> > > @@ -164,4 +176,47 @@ void nfsd_version_get_rsp_free(struct nfsd_versi=
-on_get_rsp *rsp);
-> > > =A0=A0*/
-> > > =A0struct nfsd_version_get_rsp *nfsd_version_get(struct ynl_sock *ys)=
-;
-> > > =A0
-> > >=20
-> > > +/* =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D NFSD_CMD_LISTENER_SET =
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D */
-> > > +/* NFSD_CMD_LISTENER_SET - do */
-> > > +struct nfsd_listener_set_req {
-> > > +	unsigned int n_instance;
-> > > +	struct nfsd_server_instance *instance;
-> > > +};
-> > > +
-> > > +static inline struct nfsd_listener_set_req *nfsd_listener_set_req_al=
-loc(void)
-> > > +{
-> > > +	return calloc(1, sizeof(struct nfsd_listener_set_req));
-> > > +}
-> > > +void nfsd_listener_set_req_free(struct nfsd_listener_set_req *req);
-> > > +
-> > > +static inline void
-> > > +__nfsd_listener_set_req_set_instance(struct nfsd_listener_set_req *r=
-eq,
-> > > +				     struct nfsd_server_instance *instance,
-> > > +				     unsigned int n_instance)
-> > > +{
-> > > +	free(req->instance);
-> > > +	req->instance =3D instance;
-> > > +	req->n_instance =3D n_instance;
-> > > +}
-> > > +
-> > > +/*
-> > > + * set nfs running listeners
-> > > + */
-> > > +int nfsd_listener_set(struct ynl_sock *ys, struct nfsd_listener_set_=
-req *req);
-> > > +
-> > > +/* =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D NFSD_CMD_LISTENER_GET =
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D */
-> > > +/* NFSD_CMD_LISTENER_GET - do */
-> > > +
-> > > +struct nfsd_listener_get_rsp {
-> > > +	unsigned int n_instance;
-> > > +	struct nfsd_server_instance *instance;
-> > > +};
-> > > +
-> > > +void nfsd_listener_get_rsp_free(struct nfsd_listener_get_rsp *rsp);
-> > > +
-> > > +/*
-> > > + * get nfs running listeners
-> > > + */
-> > > +struct nfsd_listener_get_rsp *nfsd_listener_get(struct ynl_sock *ys)=
-;
-> > > +
-> > > =A0#endif /* _LINUX_NFSD_GEN_H */
-> >=20
-> > --=20
-> > Jeff Layton <jlayton@kernel.org>
-> >=20
+GCC_GEPHY_DSP_HW_ARES is seem like PHY reset. But if we don't deassert 
+it, the phy node can't be scaned. So I add it here like what reset-gpios 
+do - to reset PHY or switch.
 
---=20
-Jeff Layton <jlayton@kernel.org>
+> A device tree binding will help sort this out.
+
+Base on the functions I explained, I can't write the accurate names and 
+number of resets here.
+
+> 
+> 
+>      Andrew
+> 
+> ---
+> pw-bot: cr
+
 
