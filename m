@@ -1,200 +1,129 @@
-Return-Path: <netdev+bounces-64575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FACE835BDE
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 08:43:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 370A8835C0E
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 08:53:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87CD5B25279
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 07:43:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E587228797E
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 07:53:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4AA5182D2;
-	Mon, 22 Jan 2024 07:43:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AF51168AA;
+	Mon, 22 Jan 2024 07:53:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="RZDNb1BD"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="C8JnR5iB"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87CCF18053;
-	Mon, 22 Jan 2024 07:43:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C45C61A70A;
+	Mon, 22 Jan 2024 07:53:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.248
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705909412; cv=none; b=i40sBpfs8X36hpnpSSf5iubDe87CeD32Foi2hPnhuVdS4mFAgGs5xjsE3bVn+U/drup3bTrI2CAKaRW2BEY2Z8QsHBfnl5Cik/mr7+v/WEL9lSBDLgHkBSNHrQWdo3FXrN1HFh0+uxp4EbJhkf2/HWdD8jiiyRfPYA0w5KDMA0w=
+	t=1705910003; cv=none; b=M1tnpsx6GakfntvYxQAZhLfktOi5LLoJO1JCZbiCg7JQoG/PAUNtNN7pNmUvjgGIjMK4XHk8N9q/Mx4WEpTXNXWRw41eDa06+XaDggVrBK+IgQIMLmMELVojvtN3MGzLrV1/KPUaK+xqd2+gHyZVskospLlmE4xuWw2wlzkW9X8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705909412; c=relaxed/simple;
-	bh=S066ACWnpDFLMSrXOafm8Oz7IICr0G50mN3vio3lPcA=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Sfp1II7px3CG0efaZ/cZcem720UKjLTO6/5oSJrioy3IlbccMZmsJy6vOkG3J1UkemGK0J1VZmbkbGDQAKR0f2KT8dO8/95KTNbNnHnLSRcm+mGiEobdGWBUIFVWT05Wi74i/qMyfko0XYK2Mpbd68LVkQ0xI8juG7dMn55xNzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=RZDNb1BD; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1705909410; x=1737445410;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=S066ACWnpDFLMSrXOafm8Oz7IICr0G50mN3vio3lPcA=;
-  b=RZDNb1BDFFOCDaT1zHk7jFg2vlyTZcGj1zEVITh6E9crOUgG/tzgQHSm
-   G7RQk8DQz91v+GVNQ+XJDhKJMJMF7loV4aH9ylgnGMV9SGsUE/HBr0j9x
-   K6esp+0k7+gTAZEikrusd1RkywtibjFw0nwk4axtYUenhli9NsQbtUGA4
-   Oyr+SAq5+Fz26mu73kIM2/KiCOz+wT8JXrNe6kM8awbEmH/JnoYRIKvUj
-   3c2AMo6sD6EIx/Hvi3R9fHi25kQMtswFed7Z1Gev65FBGLWfktWKGJLU+
-   ezd9AzQjp4Plu1CZodrt9FI5fL+QT75i2jyZeFTJj10P3jUiKTtzhpgV7
-   Q==;
-X-CSE-ConnectionGUID: ulOQJgl/RJCokYS78RbMAw==
-X-CSE-MsgGUID: 97GFvzoATnCDFpPTLTbNmw==
-X-IronPort-AV: E=Sophos;i="6.05,211,1701154800"; 
-   d="scan'208";a="182323138"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 22 Jan 2024 00:43:27 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 22 Jan 2024 00:42:59 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex04.mchp-main.com
- (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Mon, 22 Jan 2024 00:42:59 -0700
-Date: Mon, 22 Jan 2024 08:42:58 +0100
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: Andre Werner <andre.werner@systec-electronic.com>
-CC: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<linux@armlinux.org.uk>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [RFC net-next v4 2/2] net: phy: adin1100: Add interrupt support
- for link change
-Message-ID: <20240122074258.zmbzngrl7dzhkvwo@DEN-DL-M31836.microchip.com>
-References: <20240121201511.8997-1-andre.werner@systec-electronic.com>
- <20240121201511.8997-3-andre.werner@systec-electronic.com>
+	s=arc-20240116; t=1705910003; c=relaxed/simple;
+	bh=zGg/JyczdYkZ0t+ceaJSIs/Kq8Jy09hGt+I/QMQpZ2c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=chUIQz3VU05paRMeoyhv02ZYodsuiCT+ZTKMgqcsWV6Sb26SC67GPG0nr9WJPd3aq45nHx+8921QD+n41k34V2oZqSy4WQme5FxCxrL/GxgIQ7ZUofo0onm8kBgOC0Jp3et8WsuzhYTwOqM+1IkrPXJwwnFQKaWsiJSfcE2P9w8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=C8JnR5iB; arc=none smtp.client-ip=198.47.23.248
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 40M7qph4056864;
+	Mon, 22 Jan 2024 01:52:51 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1705909971;
+	bh=ArV+uPoRSO6UOeJsZ4X7EFQTfYt+k2zHQ2CQzWZiGq0=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=C8JnR5iBBsmP/y0T2FNblENaXxYMtDHWWIZe04EsTOzocwkoqAn1DI8S0Iq9f2XFI
+	 E7Wvlvxf3HVUNqvVgX+9fW8F6NMqUllnacwL707jsmhC9Kb8pReTQcRysJ6vZ3LwXL
+	 RO/PPJ035iRjvXnqo2uNUdAAWScSLFwSTC/gnra8=
+Received: from DLEE104.ent.ti.com (dlee104.ent.ti.com [157.170.170.34])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 40M7qpKL003897
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 22 Jan 2024 01:52:51 -0600
+Received: from DLEE112.ent.ti.com (157.170.170.23) by DLEE104.ent.ti.com
+ (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 22
+ Jan 2024 01:52:51 -0600
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE112.ent.ti.com
+ (157.170.170.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 22 Jan 2024 01:52:50 -0600
+Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 40M7qiXU088179;
+	Mon, 22 Jan 2024 01:52:45 -0600
+Message-ID: <753e01ea-8882-4e42-928a-9ae588dbeb67@ti.com>
+Date: Mon, 22 Jan 2024 13:22:44 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-In-Reply-To: <20240121201511.8997-3-andre.werner@systec-electronic.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 3/3] net: ti: icssg-prueth: Add support for ICSSG
+ switch firmware
+Content-Language: en-US
+To: Simon Horman <horms@kernel.org>
+CC: Rob Herring <robh@kernel.org>, Dan Carpenter <dan.carpenter@linaro.org>,
+        Jan Kiszka <jan.kiszka@siemens.com>, Andrew Lunn <andrew@lunn.ch>,
+        "Vladimir
+ Oltean" <vladimir.oltean@nxp.com>,
+        Wolfram Sang
+	<wsa+renesas@sang-engineering.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "Grygorii
+ Strashko" <grygorii.strashko@ti.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Roger Quadros <rogerq@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        "Jakub
+ Kicinski" <kuba@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        "David S.
+ Miller" <davem@davemloft.net>,
+        <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <srk@ti.com>, <r-gunasekaran@ti.com>
+References: <20240118071005.1514498-1-danishanwar@ti.com>
+ <20240118071005.1514498-4-danishanwar@ti.com>
+ <20240119204154.GD105385@kernel.org>
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <20240119204154.GD105385@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-The 01/21/2024 20:54, Andre Werner wrote:
 
-Hi Andre,
 
- 
-> An interrupt handler was added to the driver as well as functions
-> to enable interrupts at the phy.
+On 20/01/24 2:11 am, Simon Horman wrote:
+> On Thu, Jan 18, 2024 at 12:40:05PM +0530, MD Danish Anwar wrote:
 > 
-> There are several interrupts maskable at the phy, but only link change
-> interrupts are handled by the driver yet.
+> ...
 > 
-> Signed-off-by: Andre Werner <andre.werner@systec-electronic.com>
-> ---
-> v4:
-> - Change read-modify-write behavior as suggested to phy_modify_mmd.
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_switchdev.c b/drivers/net/ethernet/ti/icssg/icssg_switchdev.c
+>> index 48d8ed4fa7a8..90d0d98e0ef9 100644
+>> --- a/drivers/net/ethernet/ti/icssg/icssg_switchdev.c
+>> +++ b/drivers/net/ethernet/ti/icssg/icssg_switchdev.c
+>> @@ -14,7 +14,7 @@
+>>  
+>>  #include "icssg_prueth.h"
+>>  #include "icssg_switchdev.h"
+>> -#include "icss_mii_rt.h"
+>> +#include "icssg_mii_rt.h"
+>>  
+>>  struct prueth_switchdev_event_work {
+>>  	struct work_struct work;
+> 
+> Hi,
+> 
+> I think this hunk should be squashed into the previous patch.
 
-Usually it is good to keep the change log also from the previous
-versions, so it is easier to see what has been changed.
-
-> ---
->  drivers/net/phy/adin1100.c | 56 ++++++++++++++++++++++++++++++++++++++
->  1 file changed, 56 insertions(+)
-> 
-> diff --git a/drivers/net/phy/adin1100.c b/drivers/net/phy/adin1100.c
-> index 7619d6185801..7c82384e5d30 100644
-> --- a/drivers/net/phy/adin1100.c
-> +++ b/drivers/net/phy/adin1100.c
-> @@ -18,6 +18,12 @@
->  #define PHY_ID_ADIN1110                                0x0283bc91
->  #define PHY_ID_ADIN2111                                0x0283bca1
-> 
-> +#define ADIN_PHY_SUBSYS_IRQ_MASK               0x0021
-> +#define   ADIN_LINK_STAT_CHNG_IRQ_EN           BIT(1)
-> +
-> +#define ADIN_PHY_SUBSYS_IRQ_STATUS             0x0011
-> +#define   ADIN_LINK_STAT_CHNG                  BIT(1)
-> +
->  #define ADIN_FORCED_MODE                       0x8000
->  #define   ADIN_FORCED_MODE_EN                  BIT(0)
-> 
-> @@ -136,6 +142,54 @@ static int adin_config_aneg(struct phy_device *phydev)
->         return genphy_c45_config_aneg(phydev);
->  }
-> 
-> +static int adin_phy_ack_intr(struct phy_device *phydev)
-> +{
-> +       /* Clear pending interrupts */
-> +       int rc = phy_read_mmd(phydev, MDIO_MMD_VEND2,
-> +                             ADIN_PHY_SUBSYS_IRQ_STATUS);
-> +
-> +       return rc < 0 ? rc : 0;
-> +}
-> +
-> +static int adin_config_intr(struct phy_device *phydev)
-> +{
-> +       int ret;
-> +       u16 irq_mask;
-
-Please use reverse x-mas notation here.
-
-> +
-> +       ret = adin_phy_ack_intr(phydev);
-> +
-
-No new line here, between ret and if.
-
-> +       if (ret)
-> +               return ret;
-> +
-> +       if (phydev->interrupts == PHY_INTERRUPT_ENABLED)
-> +               irq_mask = ADIN_LINK_STAT_CHNG_IRQ_EN;
-> +       else
-> +               irq_mask = 0;
-> +
-> +       return phy_modify_mmd(phydev, MDIO_MMD_VEND2,
-> +                             ADIN_PHY_SUBSYS_IRQ_MASK,
-> +                             ADIN_LINK_STAT_CHNG_IRQ_EN, irq_mask);
-> +}
-> +
-> +static irqreturn_t adin_phy_handle_interrupt(struct phy_device *phydev)
-> +{
-> +       int irq_status;
-> +
-> +       irq_status = phy_read_mmd(phydev, MDIO_MMD_VEND2,
-> +                                 ADIN_PHY_SUBSYS_IRQ_STATUS);
-> +       if (irq_status < 0) {
-> +               phy_error(phydev);
-> +               return IRQ_NONE;
-> +       }
-> +
-> +       if (!(irq_status & ADIN_LINK_STAT_CHNG))
-> +               return IRQ_NONE;
-> +
-> +       phy_trigger_machine(phydev);
-> +
-> +       return IRQ_HANDLED;
-> +}
-> +
->  static int adin_set_powerdown_mode(struct phy_device *phydev, bool en)
->  {
->         int ret;
-> @@ -275,6 +329,8 @@ static struct phy_driver adin_driver[] = {
->                 .probe                  = adin_probe,
->                 .config_aneg            = adin_config_aneg,
->                 .read_status            = adin_read_status,
-> +               .config_intr            = adin_config_intr,
-> +               .handle_interrupt       = adin_phy_handle_interrupt,
->                 .set_loopback           = adin_set_loopback,
->                 .suspend                = adin_suspend,
->                 .resume                 = adin_resume,
-> --
-> 2.43.0
-> 
-> 
+Sure Simon, I'll move this to previous patch.
 
 -- 
-/Horatiu
+Thanks and Regards,
+Danish
 
