@@ -1,139 +1,78 @@
-Return-Path: <netdev+bounces-64750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FED5836F6A
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:15:09 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAF1D837033
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:39:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65558291EFC
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:15:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EC14AB2C3CD
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:18:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D2D23D967;
-	Mon, 22 Jan 2024 17:39:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40CEF482D3;
+	Mon, 22 Jan 2024 17:47:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hlZOqYuK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UsGODYUn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA7E4679F7
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 17:39:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11EF7481DE;
+	Mon, 22 Jan 2024 17:47:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705945159; cv=none; b=IH2coNgVGajL6zG/0RAIw5Zq4rNhufT3iOV9TTHHvjYfSK4ccHpomaj95a4/iG4c/usON5fLuF8jYLS/v3T6/0QCI0Hyx5wL3NUEBfSmhXNmWuQ1uz16ZtGpPa0KIcIX9txDrUclCGWuRNih8SD/68kiFMe0dIIb42ji9y/F3oU=
+	t=1705945637; cv=none; b=X5Xdx1Q/8XPWYXnneYFQOMv4EZGkoWGpgit3FDiLzIxBilq+iVm5a9Nme4u/5Ep1kvT05+kepPE2WmaE2dbOAGUlGGsK4MOZXXXEJ5sLx0O+uVeWzTXoINlYOHgG2D8vOcTzd2oN4Uo9atT77IMhMWmlSvgbruI12aHnnQSrK7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705945159; c=relaxed/simple;
-	bh=pVhRcHSJ3aXTlxyGVJozi5V8ZRcCGz5qGw25a4dRsOo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HDHjLrgmhRj+69mL9iXH0b2CgtEk7qoL6pEAaydaafFv2ZEOU8hUtsQUSFixiTnVrmCDC2EU02JxFZTpltQiBezpGuDNXHMWYABD0lgunHGdFPvDYdOgKskeefEKLujz2Og9MxM/nLkNTZFf8PPtYvdpi0LNKnkivjstOONmtaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hlZOqYuK; arc=none smtp.client-ip=209.85.166.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3600b2c43a8so1555ab.0
-        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 09:39:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1705945157; x=1706549957; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VFL/pJ8lBcoZD5EX7oUKXSpQaXjWBIZbPdd+OtvuQEs=;
-        b=hlZOqYuKwHrobJcOUWuYFau/C+5vtbFC5GfohP13sXFPD6oxhJP6OgKULxWFFvW5vh
-         K5fUtqiz1bbOZVXc1NGzRy/M33jENnGghzGCoFlog/sVTUek8FrxiOSwY5ZReF5m6c52
-         GVo5tD4ltshVHaUmUxIrrDyHg0ONTAq/o+t56oItirpiw7vlCjkrbQwTUPAjpmVBPeL3
-         DyrDLLbAq0LPg0+aB5Tq53TdMhxpi/ulVKlri0+L1WRBmgP+FYU/17iRML1TgljZOw2r
-         OGDz0BsQGcO3T/FLeMIe7UJ9ckTmL1Z60t43b8HrDzn6HhvA1rH2u9wtAIhOoaApBXDP
-         rXbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705945157; x=1706549957;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VFL/pJ8lBcoZD5EX7oUKXSpQaXjWBIZbPdd+OtvuQEs=;
-        b=BosBBjS6SXC/fyA/30HtoO02Ph1DesbQYkdc6ghGiv8CPO70i99PV0OVJL+5gNRNmQ
-         +Ag5UoSpC6Uf/cxHbOBGOpIIEp5jdbldZ3WpvnF6YylRMIsM+0rcpecFuyvJdieRG1V7
-         4Nqetj9b45SgchbXPZF7w2wCRS0y5dTaJqjoo9fVmkcJoIHPes+FlfM3mhXQXTEkNxxq
-         qvbj7ZNpUD9XpvPs4PnSvx6DsNR0qof7kqV619Ddu2DIDcWPt9TqQVCbwfYdn4xUE1Ks
-         lyoX3qgUeNXHOg8SEn5YLNZ3RtgfwbrU4I3ORtZUEp3knC+fEg5eKVJ/50G+sRDiVIPJ
-         JenA==
-X-Gm-Message-State: AOJu0YzsXXV3CQZRireT4t5sW2MqSwHgPBZ83gotpet35wDAjl0DiPCo
-	XUjefPFoifEquc/KB0w/wXUt9mGIZUFsnH56Axi/f45Hsc1P
-X-Google-Smtp-Source: AGHT+IEEEj8QEKx7WALQ/y8chwZxkEBYc5Si3Sg0sBoZD48NB4UP8F+1j2y3WziM2jUCW63ZmvVnFrQq9Y40lYL4jZM=
-X-Received: by 2002:a05:6e02:1905:b0:35f:b09b:ccd2 with SMTP id
- w5-20020a056e02190500b0035fb09bccd2mr481453ilu.7.1705945156747; Mon, 22 Jan
- 2024 09:39:16 -0800 (PST)
+	s=arc-20240116; t=1705945637; c=relaxed/simple;
+	bh=2vo08b2Ou5lDv9bhTL7tbHP6Dp5vD0sS8zH3saqrEnI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ViLWVIgqD6P768KVO2qtPmFP1ub89ymmxv+74QR5tiUQcQrCk0PVXnfJQiWxpAIAbXhhFiCDG3rp5yy8VpvsBD6Ww8rAEAeWe5N54b6ynbPnjhGT9xpwhmNvf8tc44PlEizyV9E5Slj65M3PNYyfTjiDaqc9dI3I0nNVfscYpbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UsGODYUn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CDD2C433F1;
+	Mon, 22 Jan 2024 17:47:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705945636;
+	bh=2vo08b2Ou5lDv9bhTL7tbHP6Dp5vD0sS8zH3saqrEnI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UsGODYUn8s1g3P0RKWQnD8pjFzXxWrq53q5UCkEBfj7IQOC90BdWV9GTQgQEn2SzE
+	 ObrawDtkJ3tXS4yOY3xwU5PSQ0UotTey6UTGnvMgu7jII3+3vlz4trsrrID3CZdgku
+	 PLKNoKJPzOcyiXFXSdBNaeX70lXLl3YBghXBawdD8EnkWMwnmgj7I6t9XrDrVEXah8
+	 nP10bn5rZ+LmpbczOjtwGTlhSte50tHJRI2/3XKXNaWoTeyVOoM37brH7es3gkSD02
+	 4mpzeoopEuyLPOJfFEA4Cr7EB5ipc1TZHsjI9xI6ufzzr68ZOJPL20i7xHDAw5wLKs
+	 VkcXefQQKj+GA==
+Date: Mon, 22 Jan 2024 17:47:11 +0000
+From: Simon Horman <horms@kernel.org>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: netdev@vger.kernel.org, patches@lists.linux.dev,
+	Eric Van Hensbergen <ericvh@gmail.com>,
+	Latchesar Ionkov <lucho@ionkov.net>,
+	Dominique Martinet <asmadeus@codewreck.org>, v9fs@lists.linux.dev,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH] 9p/trans_fd: remove Excess kernel-doc comment
+Message-ID: <20240122174711.GD126470@kernel.org>
+References: <20240122053832.15811-1-rdunlap@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240119092024.193066-1-zhangpeng362@huawei.com>
- <Zap7t9GOLTM1yqjT@casper.infradead.org> <5106a58e-04da-372a-b836-9d3d0bd2507b@huawei.com>
- <Za6SD48Zf0CXriLm@casper.infradead.org> <CANn89iL4qUXsVDRNGgBOweZbJ6ErWMsH+EpOj-55Lky8JEEhqQ@mail.gmail.com>
- <Za6h-tB7plgKje5r@casper.infradead.org>
-In-Reply-To: <Za6h-tB7plgKje5r@casper.infradead.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 22 Jan 2024 18:39:04 +0100
-Message-ID: <CANn89iJDNdOpb6L6PkrAcbGcsx6_v4VD0v2XFY77g7tEnJEXXQ@mail.gmail.com>
-Subject: Re: SECURITY PROBLEM: Any user can crash the kernel with TCP ZEROCOPY
-To: Matthew Wilcox <willy@infradead.org>
-Cc: "zhangpeng (AS)" <zhangpeng362@huawei.com>, linux-mm@kvack.org, 
-	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org, 
-	akpm@linux-foundation.org, davem@davemloft.net, dsahern@kernel.org, 
-	kuba@kernel.org, pabeni@redhat.com, arjunroy@google.com, 
-	wangkefeng.wang@huawei.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240122053832.15811-1-rdunlap@infradead.org>
 
-On Mon, Jan 22, 2024 at 6:12=E2=80=AFPM Matthew Wilcox <willy@infradead.org=
-> wrote:
->
-> On Mon, Jan 22, 2024 at 05:30:18PM +0100, Eric Dumazet wrote:
-> > On Mon, Jan 22, 2024 at 5:04=E2=80=AFPM Matthew Wilcox <willy@infradead=
-.org> wrote:
-> > > I'm disappointed to have no reaction from netdev so far.  Let's see i=
-f a
-> > > more exciting subject line evinces some interest.
-> >
-> > Hmm, perhaps some of us were enjoying their weekend ?
->
-> I am all in favour of people taking time off!  However the report came
-> in on Friday at 9am UTC so it had been more than a work day for anyone
-> anywhere in the world without response.
->
-> > I don't really know what changed recently, all I know is that TCP zero
-> > copy is for real network traffic.
-> >
-> > Real trafic uses order-0 pages, 4K at a time.
-> >
-> > If can_map_frag() needs to add another safety check, let's add it.
->
-> So it's your opinion that people don't actually use sendfile() from
-> a local file, and we can make this fail to zerocopy?
+On Sun, Jan 21, 2024 at 09:38:32PM -0800, Randy Dunlap wrote:
+> Remove the "@req" kernel-doc description since there is not 'req'
+> member in the struct p9_conn.
+> 
+> Fixes one kernel-doc warning:
+> trans_fd.c:133: warning: Excess struct member 'req' description in 'p9_conn'
+> 
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
 
-Certainly we do not do that at Google.
-I am not sure if anybody else would have used this.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-
-
- That's good
-> because I had a slew of questions about what expectations we had around
-> cache coherency between pages mapped this way and write()/mmap() of
-> the original file.  If we can just disallow this, we don't need to
-> have a discussion about it.
->
-> > syzbot is usually quite good at bisections, was a bug origin found ?
->
-> I have the impression that Huawei run syzkaller themselves without
-> syzbot.  I suspect this bug has been there for a good long time.
-> Wonder why nobody's found it before; it doesn't seem complicated for a
-> fuzzer to stumble into.
-
-I is strange syzbot (The Google fuzzer) have not found this yet, I
-suspect it might be caused
-by a recent change somewhere ?
-
-A repro would definitely help, I could start a bisection.
 
