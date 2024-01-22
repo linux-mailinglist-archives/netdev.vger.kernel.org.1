@@ -1,303 +1,283 @@
-Return-Path: <netdev+bounces-64613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A44A835F14
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 11:06:51 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0D83835F3E
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 11:14:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DEA061F2605B
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 10:06:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CBB8CB26DD6
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 10:12:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBC5039FEB;
-	Mon, 22 Jan 2024 10:06:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D00953A1C5;
+	Mon, 22 Jan 2024 10:12:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="HO4xkDkM"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2054.outbound.protection.outlook.com [40.107.95.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F138A39FE2
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 10:06:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705917999; cv=none; b=dspy35icp0I+tprIavatGojtN6EzyZTfCtk4uiVt7RnqIBRkBGhZoU/qJx/D8hILA+FvzzcVmtVFCxKSkRi0TrN2K7NA8cuH7SbomAOWyIb/JueVhijAl8H3IZ+/JV2tlaL110PwCMHCwBYvobVtgbe0m8+XODZkW0ZTDB1DzYI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705917999; c=relaxed/simple;
-	bh=cg/V58JXhFdm+AOd4V+8X6Dyf2AKWak+eFFN7VDtiBg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=AFXj4LswPzBvETVBjHFwaUauehX0k804QAUVzLTibxM1e47P4D/EXmo7prO+EBelHfcLB5lzObgPsznA8woC8IBN28lTVkumJEmvdy8he84b8ve+lQpHUlNYaHQq73mano3SuPE9JeI+QIXz7ma1GbEzv+7ygUf8VWBxYBUTXH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4TJQpr14VxzbcFg;
-	Mon, 22 Jan 2024 18:06:12 +0800 (CST)
-Received: from dggpeml500026.china.huawei.com (unknown [7.185.36.106])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4644C1400E5;
-	Mon, 22 Jan 2024 18:06:34 +0800 (CST)
-Received: from [10.174.178.66] (10.174.178.66) by
- dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 22 Jan 2024 18:06:33 +0800
-Message-ID: <e18e24f5-7524-acf5-c9a4-7409fb395e6b@huawei.com>
-Date: Mon, 22 Jan 2024 18:06:33 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D177D3A1CF
+	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 10:12:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705918324; cv=fail; b=pcXt4KsY68gvQUMfyHX34arejKCWTDoqe+RlI0Ruhr/lJcuQyyb66mZUFMyULs4PwsOoT/8q7LpcgtZS0mw5ZksLNcqNiLNFAFrqJmPrSkXQ1rwcuitlYpqWqN1SuR/FKJd4D4aQ2PeODfxSWvV+ctoYJqQYRxl5YINiPug6WGc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705918324; c=relaxed/simple;
+	bh=M8lTWdD4E43TLw7z1vU8R4tU0n7hXtjogPBpVBGaf0o=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=bTwciq0MFYy/7An0vbRJwY2DfEsGb+rQRkFCO1c6TtakqJH3/fVHAG1z1/oNIhhMMuemsdaTOHz9OrYtlZQXHPaC3YETT3Jcj/Mcyw9KjItMhOZcKwjuBGa88SdheYVIpZVokMDIe3NEYVH93X+7I0TMrzDXQ8PZrdCYN+5cL68=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=HO4xkDkM; arc=fail smtp.client-ip=40.107.95.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GMlTM6y4MfwIP26pdqb5vZ7Z5r1JLJM3HBC1c+m0kLd5FPKwTpNzlE7K2J9Jsjf4JV6FAZzVPzdstS3QWJ1kzC1Cjx9kTEp6krPM5hM9hb726XfCmCGzyMvGKlJLnkpyh21gw1slU/M9RDsCvzVNqOkKDqex6EXNmQGhU/tNfmjZm51YXEUNx/BSwvqwFBhruRf8p/0slqK55bHo/HkwL2Tny8mByjAfBm1IT2jNTJwNyjBa6Igwnc9PclWbf+XxCJ+GXGiWTYOn0XmOeyklxdjJ/cfEIbeV05gPusQGi5pYaGUnnjstBXvwZBQqaIZU+vsmQIpzebVYqpeF7LZL8Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=M8lTWdD4E43TLw7z1vU8R4tU0n7hXtjogPBpVBGaf0o=;
+ b=RFk2p4beWgNeBcCECalBeMM6FcFQMTdG1CCp6I9ZF2deVGopJWCFDRL6IqDxgHhhzg1GaqeD/4WRCZF7nBDT4feOwPJgeRjBjwgCWCGyqrAgUy9mQzYpDP3Y/nMjyaIE+/tFTwJ0C7nP+NX8280kyRbKfzBq6xkLmq8ukVxsLMUWDn/9qa1wTxuwp1nskzG2qge1zCsV7Z3A45jE15323X1IOn3SDdfM59JnyGVXGGusy8hFblHPqpjpBfCXHwJwm7lmGs2yhrMYPbu/VKA1Q94xFuzRbsTkJro1ucv9qw13myrqSiMaYfDR4VZX9eZlxB+CFpim/75guEFGOZ6Bvw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=M8lTWdD4E43TLw7z1vU8R4tU0n7hXtjogPBpVBGaf0o=;
+ b=HO4xkDkMFAfSNrYpExdVXBnFiFPUW592IrLXmFvY3NQwKmYewAyspALdCVqMt4+oxnTNF9bd0kjoFyM+qaWkTuqgfqNS40AcojMmMfiADA/jFYx3m0yi6u/IfO2cHZ2d2Nch/5/6MWqACSDgb46uQDzUHsHW6ZTW1YIUgu5cGMDeOXLTd1h+jHVCcqqkazsskq9HbHgCwmRwuT2uxZIPcfoeVhCS9L+TgV8rpSTlYuOXuHaPGYOj8YNSKem26MLFwDyYx/zkfgEz/oIXRQIfZjL1gkC1RkPVQFParHtlAuWnkdjF+RZHZTHy8HXgFztGzCEk60PiiDqIOEWJWfVOJw==
+Received: from DM6PR12MB5565.namprd12.prod.outlook.com (2603:10b6:5:1b6::13)
+ by PH7PR12MB7985.namprd12.prod.outlook.com (2603:10b6:510:27b::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.32; Mon, 22 Jan
+ 2024 10:11:59 +0000
+Received: from DM6PR12MB5565.namprd12.prod.outlook.com
+ ([fe80::e6d3:757d:1bd:8bcd]) by DM6PR12MB5565.namprd12.prod.outlook.com
+ ([fe80::e6d3:757d:1bd:8bcd%6]) with mapi id 15.20.7202.031; Mon, 22 Jan 2024
+ 10:11:59 +0000
+From: Dragos Tatulea <dtatulea@nvidia.com>
+To: "ian.kumlien@gmail.com" <ian.kumlien@gmail.com>
+CC: Gal Pressman <gal@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: Re: [mlx5e] FYI dmesg is filled with
+ mlx5e_page_release_fragmented.isra warnings in 6.6.12
+Thread-Topic: Re: [mlx5e] FYI dmesg is filled with
+ mlx5e_page_release_fragmented.isra warnings in 6.6.12
+Thread-Index: AQHaSiBOOZT2pyeTTUKUgKO6nLGhzLDfsV6AgAAPcgCAAEwNAIAFlb6A
+Date: Mon, 22 Jan 2024 10:11:59 +0000
+Message-ID: <2892e61ddc986c0d1ccb86fd3d6309c8a484d158.camel@nvidia.com>
+References:
+ <CAA85sZvvHtrpTQRqdaOx6gd55zPAVsqMYk_Lwh4Md5knTq7AyA@mail.gmail.com>
+	 <CAA85sZtZ9cL4g-SFSS-pTL11JocoOc4BAU7b4uj26MNckp41wQ@mail.gmail.com>
+	 <uxlqaq25tft55nwyfueyj7g5co2lva2j5qnbsijwazxr2ld4l4@uqhiteuyduhd>
+	 <CAA85sZser9Kd=mEYAKbQOxfGGR=b=17ObzBs46W5QtmWhnB3gQ@mail.gmail.com>
+In-Reply-To:
+ <CAA85sZser9Kd=mEYAKbQOxfGGR=b=17ObzBs46W5QtmWhnB3gQ@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR12MB5565:EE_|PH7PR12MB7985:EE_
+x-ms-office365-filtering-correlation-id: 61b7afa3-2431-4541-4a07-08dc1b32922c
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ erio2xFvZlAoBPASt4U8ylVbAfhZ/QPcgWEcfcoB3NetKUclFr9GEELunzgZE7f300tacMWZPdK/ukPbI5nA4xpmY/4MjlReFQ7IXLkbebHBYk/6DjqwltaM/A39JzmpsFQIx4CMO7ch28ZqV2GGgE++0mSqmEvjnKkRFh/LvNt+GM2Lg+2MB1rWcKZ//hRZ85EjO4Gwzs77cgkpKLWH8k3Fv5lsdkIsRFtrrQ3WnlafiRt4RkLyqTcH3K6pCHCiBW9oQcpqJbaKAi8XtX6WTvZyRay+KNdp3Gj3tbcucCkktfr+EkAE07GzlZh3uFEoXYL6AowZO2Z0HeqmZK3fS3CQJNl9HvyyYiUXNmS8TRq3LuaAvYoGbfFhsHUhMUYa3qdD7HhJAYtIxEoPYYiYm5QuLIO+HtA00mMeFmST5znHwm22GaXqvchowxNkB1Hc6rk5JU/1oZE+KY1h+AKHYPO11VwLF7z1S6+gBk8TkM04ZPnHQPjOa7g2o6kmK40HGPUfUTFv1qgV9QlqthCoWZ366K2WihCzuQiJlY1k6kXi90z7P+KfX6j7YQSbEgelc5O+WKI7NZdWwnaHXw3xsPEP+exPcYqWHiGHMgjggLKj6M2xWilitfbff7r9U8JOPRLGajx/UgaRalmopqyb3T9K9dWTuoLcatnVmfeYe9w=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB5565.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(366004)(136003)(376002)(39860400002)(396003)(230922051799003)(230273577357003)(230173577357003)(1800799012)(451199024)(186009)(64100799003)(2616005)(6506007)(6512007)(53546011)(71200400001)(45080400002)(122000001)(5660300002)(4326008)(8936002)(8676002)(2906002)(6486002)(83380400001)(478600001)(6916009)(316002)(66476007)(66946007)(64756008)(66556008)(91956017)(54906003)(76116006)(66446008)(41300700001)(86362001)(36756003)(38100700002)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?bFcrSTdZU3B1bkRnaUhnR2ZuY1ZESXZST2JJbHNITGdrVGNpeTFJRGo4L21V?=
+ =?utf-8?B?cERnV1B0enFKY3BWdC9KNW5XaDQ4L2I0OUoxeW16SDlQM3k4WFkvSy9DTzdJ?=
+ =?utf-8?B?RThEY1FFcnRSeVR0OEdKOWM0QTlucG1BYzNDMTVFTThrVDkrUjlUWFduTkEx?=
+ =?utf-8?B?VDBNZUhXVUdTRE5IbW5KaWFEbG9xK2RWL3hvVlNBT0FhY1FtTzYrTXYyOFB6?=
+ =?utf-8?B?VUpZdGZUK0lHanBHSG83empzczE0b3RWMGJ3dHA4dnBVVDJKSjU5dFd6d0Ez?=
+ =?utf-8?B?c0N4eEcrZUVrUGZsdVZKZlFqVWRLdEtUNGdtb2o3cTNIeTN3MUVLa2FiRkZj?=
+ =?utf-8?B?MjZ1U3dqbk9sYW5WeCsvWkVJVGZLZnRHT0M0eHRzaW82c2V5bjJHUjVsVU04?=
+ =?utf-8?B?RUNLMkRsOXNLR0V2ZDYzVmE4ZEd2ZVZ4TkxNTG1yWkpnZjRva2FiYnJ6ZVR3?=
+ =?utf-8?B?bGNFS2pnc3dIdWE5U3hBMHFyb3lmYkNHbFJvcEpSM1NJZUpWSE5MVUtNTHkv?=
+ =?utf-8?B?QnJrZThaY0ZnanhobGpUWEtTYm5TNUxUS2ZHUjB5RVBqQit2QlJCTE9yS1dk?=
+ =?utf-8?B?WDRYbkNXdkdFd1BXSEgxR09lZVllOEJHT005SXo2czhFL1R3c0ErMGZTNFZT?=
+ =?utf-8?B?S2lQYiszVVVVamEwUm1ONDBLcWxDdTlCck85QmNRcyt0cFpiU296OEZqNHFl?=
+ =?utf-8?B?Z09xZFRhZjlac0lTOGJVc0libDdZaW9RVEg5MEcvMUNqM3F1WUhBWXA3eUxN?=
+ =?utf-8?B?MjlUeVNLTld4VEFWMFBDb1U1bnptWlUxTkJ2cCtQMlJSZGREd1hMYmlxbGwr?=
+ =?utf-8?B?U2g4NlUxQ280cjJHa1RwclNZOG12bXYyYjJUdU5WYTQzZXhERU90N1RYTkVQ?=
+ =?utf-8?B?dnFGeXpjc0dMU0d3ZDdmc0d3K2dqR05rTFRjMWFmOGlIRHJMMHJ1K0dxS0hH?=
+ =?utf-8?B?U2xDQU5QODl1SHFyVTVNV1c0WU1CZjdpbW5RRnlqRjFSYm55ZHd6dkVmc05h?=
+ =?utf-8?B?U1RTU3RmS2pwUjR3RkZxbzFjOC9LMUZXZytjdVhEN2FKT0psNDQxcEJwUVNk?=
+ =?utf-8?B?M1Q3bCtYY01QUU14dXlwanhzQktlbFNqeU9aNW1hYUYyNUIxZFp6WFZMR3lP?=
+ =?utf-8?B?bEovMUFBa2psUUltaUI2MU11TXZnM0FMSGl2TTRmbHZNNzZQRjFYdkNCa0gv?=
+ =?utf-8?B?VXdKUEhPYjI3dktSc3cybnVteUEyR25qOXBaREkrWXRmR0hxTzh5dnA5dS9K?=
+ =?utf-8?B?UklJdmxSamIvNnptNXk0SGkySmppUnROdDVIdkM2bWtEZDF6SDZlblBLaHhv?=
+ =?utf-8?B?cTJGdFNSaEEwb3VJL3pQMXNsdHhFd0RTN25zVFlHcFU3Tjd0TjFRL05Qbk5P?=
+ =?utf-8?B?NE1Cb0dUNlM5WVYyZEdCb1lMbFdxNTlRZ1J5Q2dkZ0hacEh4QXE5S1JneDY5?=
+ =?utf-8?B?MTZKeGMzOE1EQVh6QUV3bFo5SDJzbVhPL0N4eUlJOHNJdW5XcXQvZHhSUFU1?=
+ =?utf-8?B?OUNQWisxSjZ3eFZCVlh0Y2xlYjA0OU1MUWs0WGJGMHpaMldRbGVSaTdBdWJo?=
+ =?utf-8?B?YWpGTTZqVDFzVWxhTEVJUW0zanpnamc5Q1F2aXhCZ1Z0Wll2YTArMkZSbVl1?=
+ =?utf-8?B?L05IWFNnTFBXZ1l1ZzNKa3JuUWlWSUZpbWdBK1BBdlB0bVljelM5SzZUV2tn?=
+ =?utf-8?B?bExaR3hpMXNOOTlMZW9MdlduWktTallLdFZRTXBiYUs0WERsU2YwQzZ4Tmdq?=
+ =?utf-8?B?djVlcmtvY3ZGcThzQTJ6VXVVZHZ0WDg4bnBxbTZocDA4L21BdzdNcERpWTJr?=
+ =?utf-8?B?bkdEanJmWTl6TjZCQVRDSkEyWVh1TFo5bnd4Rm9hWkNic0lEU2Z6ZkpBR2FI?=
+ =?utf-8?B?TlNKUFlPcE1STTlBT2RnUGdtUitPWENST3hBYjkyMFdCZEpCUTUzdEw0eTFp?=
+ =?utf-8?B?aE1PT2dVMlJNdlk5b2JsVWpNdVh3RTMraVZEekdoYmpDMUovSFExM0RWT2xz?=
+ =?utf-8?B?R0loRStEZ3F5ZjBzQ05jTlRWVytpNTVzejdnVXRpdUQxZzFIS3VYZjFnMDB6?=
+ =?utf-8?B?NjZibTFIVWk1WjhGeXRiNU5DNTc3RG9ocVNUMkYvSkltcFBKSWp4WVUvd1lp?=
+ =?utf-8?B?enFhVVc2UG54UjkrK2pzNmdhQUZxMnJPNXFNV0VVZS9aMWd2ZUk4VWFsMlBO?=
+ =?utf-8?Q?CWSMv2kQIRBZm4rod16PYoVABlFhkutaLtjtiaSW0pNU?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <7E16EADD473B5845AEBAEE4621316CD1@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.0.2
-Subject: Re: [PATCH net,v4] tcp: make sure init the accept_queue's spinlocks
- once
-To: Chen-Yu Tsai <wenst@chromium.org>
-CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <dsahern@kernel.org>,
-	<sming56@aliyun.com>, <hkchu@google.com>, <weiyongjun1@huawei.com>,
-	<yuehaibing@huawei.com>
-References: <20240118012019.1751966-1-shaozhengchao@huawei.com>
- <20240122094219.GA1048271@google.com>
-From: shaozhengchao <shaozhengchao@huawei.com>
-In-Reply-To: <20240122094219.GA1048271@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpeml500026.china.huawei.com (7.185.36.106)
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB5565.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 61b7afa3-2431-4541-4a07-08dc1b32922c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jan 2024 10:11:59.4350
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: tKEsBFb/9PpVL7h4jM/X36H2RhAC2f1C+abqYAo54JiiD2VgMvyZLustTT/8oucQeKNfVDc05FyG2Gys6VYF6A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7985
 
-Hi Chen-Yu：
-	 Thank you for your report. I had the same problem this morning.
-It has been verified locally.
-
-Zhengchao Shao
-
-On 2024/1/22 17:42, Chen-Yu Tsai wrote:
-> Hi,
-> 
-> On Thu, Jan 18, 2024 at 09:20:19AM +0800, Zhengchao Shao wrote:
->> When I run syz's reproduction C program locally, it causes the following
->> issue:
->> pvqspinlock: lock 0xffff9d181cd5c660 has corrupted value 0x0!
->> WARNING: CPU: 19 PID: 21160 at __pv_queued_spin_unlock_slowpath (kernel/locking/qspinlock_paravirt.h:508)
->> Hardware name: Red Hat KVM, BIOS 0.5.1 01/01/2011
->> RIP: 0010:__pv_queued_spin_unlock_slowpath (kernel/locking/qspinlock_paravirt.h:508)
->> Code: 73 56 3a ff 90 c3 cc cc cc cc 8b 05 bb 1f 48 01 85 c0 74 05 c3 cc cc cc cc 8b 17 48 89 fe 48 c7 c7
->> 30 20 ce 8f e8 ad 56 42 ff <0f> 0b c3 cc cc cc cc 0f 0b 0f 1f 40 00 90 90 90 90 90 90 90 90 90
->> RSP: 0018:ffffa8d200604cb8 EFLAGS: 00010282
->> RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff9d1ef60e0908
->> RDX: 00000000ffffffd8 RSI: 0000000000000027 RDI: ffff9d1ef60e0900
->> RBP: ffff9d181cd5c280 R08: 0000000000000000 R09: 00000000ffff7fff
->> R10: ffffa8d200604b68 R11: ffffffff907dcdc8 R12: 0000000000000000
->> R13: ffff9d181cd5c660 R14: ffff9d1813a3f330 R15: 0000000000001000
->> FS:  00007fa110184640(0000) GS:ffff9d1ef60c0000(0000) knlGS:0000000000000000
->> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->> CR2: 0000000020000000 CR3: 000000011f65e000 CR4: 00000000000006f0
->> Call Trace:
->> <IRQ>
->>    _raw_spin_unlock (kernel/locking/spinlock.c:186)
->>    inet_csk_reqsk_queue_add (net/ipv4/inet_connection_sock.c:1321)
->>    inet_csk_complete_hashdance (net/ipv4/inet_connection_sock.c:1358)
->>    tcp_check_req (net/ipv4/tcp_minisocks.c:868)
->>    tcp_v4_rcv (net/ipv4/tcp_ipv4.c:2260)
->>    ip_protocol_deliver_rcu (net/ipv4/ip_input.c:205)
->>    ip_local_deliver_finish (net/ipv4/ip_input.c:234)
->>    __netif_receive_skb_one_core (net/core/dev.c:5529)
->>    process_backlog (./include/linux/rcupdate.h:779)
->>    __napi_poll (net/core/dev.c:6533)
->>    net_rx_action (net/core/dev.c:6604)
->>    __do_softirq (./arch/x86/include/asm/jump_label.h:27)
->>    do_softirq (kernel/softirq.c:454 kernel/softirq.c:441)
->> </IRQ>
->> <TASK>
->>    __local_bh_enable_ip (kernel/softirq.c:381)
->>    __dev_queue_xmit (net/core/dev.c:4374)
->>    ip_finish_output2 (./include/net/neighbour.h:540 net/ipv4/ip_output.c:235)
->>    __ip_queue_xmit (net/ipv4/ip_output.c:535)
->>    __tcp_transmit_skb (net/ipv4/tcp_output.c:1462)
->>    tcp_rcv_synsent_state_process (net/ipv4/tcp_input.c:6469)
->>    tcp_rcv_state_process (net/ipv4/tcp_input.c:6657)
->>    tcp_v4_do_rcv (net/ipv4/tcp_ipv4.c:1929)
->>    __release_sock (./include/net/sock.h:1121 net/core/sock.c:2968)
->>    release_sock (net/core/sock.c:3536)
->>    inet_wait_for_connect (net/ipv4/af_inet.c:609)
->>    __inet_stream_connect (net/ipv4/af_inet.c:702)
->>    inet_stream_connect (net/ipv4/af_inet.c:748)
->>    __sys_connect (./include/linux/file.h:45 net/socket.c:2064)
->>    __x64_sys_connect (net/socket.c:2073 net/socket.c:2070 net/socket.c:2070)
->>    do_syscall_64 (arch/x86/entry/common.c:51 arch/x86/entry/common.c:82)
->>    entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:129)
->>    RIP: 0033:0x7fa10ff05a3d
->>    Code: 5b 41 5c c3 66 0f 1f 84 00 00 00 00 00 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89
->>    c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d ab a3 0e 00 f7 d8 64 89 01 48
->>    RSP: 002b:00007fa110183de8 EFLAGS: 00000202 ORIG_RAX: 000000000000002a
->>    RAX: ffffffffffffffda RBX: 0000000020000054 RCX: 00007fa10ff05a3d
->>    RDX: 000000000000001c RSI: 0000000020000040 RDI: 0000000000000003
->>    RBP: 00007fa110183e20 R08: 0000000000000000 R09: 0000000000000000
->>    R10: 0000000000000000 R11: 0000000000000202 R12: 00007fa110184640
->>    R13: 0000000000000000 R14: 00007fa10fe8b060 R15: 00007fff73e23b20
->> </TASK>
->>
->> The issue triggering process is analyzed as follows:
->> Thread A                                       Thread B
->> tcp_v4_rcv	//receive ack TCP packet       inet_shutdown
->>    tcp_check_req                                  tcp_disconnect //disconnect sock
->>    ...                                              tcp_set_state(sk, TCP_CLOSE)
->>      inet_csk_complete_hashdance                ...
->>        inet_csk_reqsk_queue_add                 inet_listen  //start listen
->>          spin_lock(&queue->rskq_lock)             inet_csk_listen_start
->>          ...                                        reqsk_queue_alloc
->>          ...                                          spin_lock_init
->>          spin_unlock(&queue->rskq_lock)	//warning
->>
->> When the socket receives the ACK packet during the three-way handshake,
->> it will hold spinlock. And then the user actively shutdowns the socket
->> and listens to the socket immediately, the spinlock will be initialized.
->> When the socket is going to release the spinlock, a warning is generated.
->> Also the same issue to fastopenq.lock.
->>
->> Move init spinlock to inet_create and inet_accept to make sure init the
->> accept_queue's spinlocks once.
->>
->> Fixes: fff1f3001cc5 ("tcp: add a spinlock to protect struct request_sock_queue")
->> Fixes: 168a8f58059a ("tcp: TCP Fast Open Server - main code path")
->> Reported-by: Ming Shu <sming56@aliyun.com>
->> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
-> 
-> This patch causes a lockdep error for me on next-20240122 when SSHing
-> into my test device over IPv6. Reverting this patch gets rid of the
-> message, but that is probably not the correct fix.
-> 
-> Given that inet_listen is also used from net/ipv6/af_inet6.c, and
-> __inet_listen_sk is used from mptcp, inet_init_csk_locks() would need
-> to be called in a couple more places. I don't know much about the
-> networking stack, but I can try to come up with a patch.
-> 
-> Backtrace below:
-> 
-> INFO: trying to register non-static key.
-> The code is fine but needs lockdep annotation, or maybe
-> you didn't initialize this object before use?
-> turning off the locking correctness validator.
-> CPU: 0 PID: 0 Comm: swapper/0 Not tainted 6.8.0-rc1-next-20240122-01036-g319fbd8fc6d3 #147 2400bce4623c16f3873f828b5d429524a0849cd3
-> Hardware name: Google Krane Chromebook (DT)
-> Call trace:
-> dump_backtrace (arch/arm64/kernel/stacktrace.c:293)
-> show_stack (arch/arm64/kernel/stacktrace.c:300)
-> dump_stack_lvl (lib/dump_stack.c:107)
-> dump_stack (lib/dump_stack.c:114)
-> register_lock_class (kernel/locking/lockdep.c:977 kernel/locking/lockdep.c:1289)
-> __lock_acquire (kernel/locking/lockdep.c:5014)
-> lock_acquire (./arch/arm64/include/asm/percpu.h:40 kernel/locking/lockdep.c:467 kernel/locking/lockdep.c:5756 kernel/locking/lockdep.c:5719)
-> _raw_spin_lock (./include/linux/spinlock_api_smp.h:134 kernel/locking/spinlock.c:154)
-> inet_csk_complete_hashdance (net/ipv4/inet_connection_sock.c:1303 net/ipv4/inet_connection_sock.c:1355)
-> tcp_check_req (net/ipv4/tcp_minisocks.c:653)
-> tcp_v6_rcv (net/ipv6/tcp_ipv6.c:1837)
-> ip6_protocol_deliver_rcu (net/ipv6/ip6_input.c:438)
-> ip6_input_finish (./include/linux/rcupdate.h:779 net/ipv6/ip6_input.c:484)
-> ip6_input (./include/linux/netfilter.h:314 ./include/linux/netfilter.h:308 net/ipv6/ip6_input.c:492)
-> ip6_sublist_rcv_finish (net/ipv6/ip6_input.c:86 (discriminator 3))
-> ip6_sublist_rcv (net/ipv6/ip6_input.c:317)
-> ipv6_list_rcv (net/ipv6/ip6_input.c:326)
-> __netif_receive_skb_list_core (net/core/dev.c:5577 net/core/dev.c:5625)
-> netif_receive_skb_list_internal (net/core/dev.c:5679 net/core/dev.c:5768)
-> napi_complete_done (./include/linux/list.h:37 (discriminator 2) ./include/net/gro.h:440 (discriminator 2) ./include/net/gro.h:435 (discriminator 2) net/core/dev.c:6108 (discriminator 2))
-> r8152_poll (drivers/net/usb/r8152.c:2780 (discriminator 1)) r8152
-> __napi_poll.constprop.0 (net/core/dev.c:6576)
-> net_rx_action (net/core/dev.c:6647 net/core/dev.c:6778)
-> __do_softirq (./arch/arm64/include/asm/jump_label.h:21 ./include/linux/jump_label.h:207 ./include/trace/events/irq.h:142 kernel/softirq.c:554)
-> ____do_softirq (arch/arm64/kernel/irq.c:82)
-> call_on_irq_stack (arch/arm64/kernel/entry.S:895)
-> do_softirq_own_stack (arch/arm64/kernel/irq.c:87)
-> __irq_exit_rcu (./arch/arm64/include/asm/percpu.h:44 kernel/softirq.c:612 kernel/softirq.c:634)
-> irq_exit_rcu (kernel/softirq.c:646 (discriminator 4))
-> el1_interrupt (arch/arm64/kernel/entry-common.c:505 arch/arm64/kernel/entry-common.c:517)
-> el1h_64_irq_handler (arch/arm64/kernel/entry-common.c:523)
-> el1h_64_irq (arch/arm64/kernel/entry.S:594)
-> arch_local_irq_enable (./arch/arm64/include/asm/irqflags.h:51)
-> cpuidle_enter (drivers/cpuidle/cpuidle.c:388)
-> do_idle (kernel/sched/idle.c:134 kernel/sched/idle.c:215 kernel/sched/idle.c:312)
-> cpu_startup_entry (kernel/sched/idle.c:409)
-> rest_init (./include/linux/rcupdate.h:751 (discriminator 1) init/main.c:701 (discriminator 1))
-> arch_call_rest_init+0x1c/0x28
-> start_kernel (init/main.c:1023 (discriminator 1))
-> __primary_switched (arch/arm64/kernel/head.S:524)
-> 
-> 
-> Regards
-> ChenYu
-> 
->> ---
->> v4: Add a helper to init accept_queue's spinlocks.
->> v3: Move init spinlock to inet_create and inet_accept.
->> v2: Add 'init_done' to make sure init the accept_queue's spinlocks once.
->> ---
->>   include/net/inet_connection_sock.h | 8 ++++++++
->>   net/core/request_sock.c            | 3 ---
->>   net/ipv4/af_inet.c                 | 3 +++
->>   net/ipv4/inet_connection_sock.c    | 4 ++++
->>   4 files changed, 15 insertions(+), 3 deletions(-)
->>
->> diff --git a/include/net/inet_connection_sock.h b/include/net/inet_connection_sock.h
->> index d0a2f827d5f2..9ab4bf704e86 100644
->> --- a/include/net/inet_connection_sock.h
->> +++ b/include/net/inet_connection_sock.h
->> @@ -357,4 +357,12 @@ static inline bool inet_csk_has_ulp(const struct sock *sk)
->>   	return inet_test_bit(IS_ICSK, sk) && !!inet_csk(sk)->icsk_ulp_ops;
->>   }
->>   
->> +static inline void inet_init_csk_locks(struct sock *sk)
->> +{
->> +	struct inet_connection_sock *icsk = inet_csk(sk);
->> +
->> +	spin_lock_init(&icsk->icsk_accept_queue.rskq_lock);
->> +	spin_lock_init(&icsk->icsk_accept_queue.fastopenq.lock);
->> +}
->> +
->>   #endif /* _INET_CONNECTION_SOCK_H */
->> diff --git a/net/core/request_sock.c b/net/core/request_sock.c
->> index f35c2e998406..63de5c635842 100644
->> --- a/net/core/request_sock.c
->> +++ b/net/core/request_sock.c
->> @@ -33,9 +33,6 @@
->>   
->>   void reqsk_queue_alloc(struct request_sock_queue *queue)
->>   {
->> -	spin_lock_init(&queue->rskq_lock);
->> -
->> -	spin_lock_init(&queue->fastopenq.lock);
->>   	queue->fastopenq.rskq_rst_head = NULL;
->>   	queue->fastopenq.rskq_rst_tail = NULL;
->>   	queue->fastopenq.qlen = 0;
->> diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
->> index 835f4f9d98d2..4e635dd3d3c8 100644
->> --- a/net/ipv4/af_inet.c
->> +++ b/net/ipv4/af_inet.c
->> @@ -330,6 +330,9 @@ static int inet_create(struct net *net, struct socket *sock, int protocol,
->>   	if (INET_PROTOSW_REUSE & answer_flags)
->>   		sk->sk_reuse = SK_CAN_REUSE;
->>   
->> +	if (INET_PROTOSW_ICSK & answer_flags)
->> +		inet_init_csk_locks(sk);
->> +
->>   	inet = inet_sk(sk);
->>   	inet_assign_bit(IS_ICSK, sk, INET_PROTOSW_ICSK & answer_flags);
->>   
->> diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
->> index 8e2eb1793685..459af1f89739 100644
->> --- a/net/ipv4/inet_connection_sock.c
->> +++ b/net/ipv4/inet_connection_sock.c
->> @@ -727,6 +727,10 @@ struct sock *inet_csk_accept(struct sock *sk, int flags, int *err, bool kern)
->>   	}
->>   	if (req)
->>   		reqsk_put(req);
->> +
->> +	if (newsk)
->> +		inet_init_csk_locks(newsk);
->> +
->>   	return newsk;
->>   out_err:
->>   	newsk = NULL;
->> -- 
->> 2.34.1
->>
+T24gVGh1LCAyMDI0LTAxLTE4IGF0IDIxOjU0ICswMTAwLCBJYW4gS3VtbGllbiB3cm90ZToNCj4g
+U28gdGhpcyBpcyBhIEwzIG9wZW5zdGFjayBub2RlLCBldmVyeXRoaW5nIHNlZW1lZCB0byBiZSB3
+b3JraW5nIGZpbmUNCj4gdW50aWwgdGhlIFZQTmFhUyBzdGFydGVkIHdvcmtpbmcgKHN0cm9uZ3N3
+YW4gaW4gdGhpcyBjYXNlIHNpbmNlIHRoZQ0KPiBpbXBsZW1lbnRhdGlvbnMgbGVhdmVzIHNvbWUg
+dG8gYmUgZGVzaXJlZCkNCj4gDQo+IEkgaGF2ZSBhIGxvbmdlciBkbWVzZyBvdXRwdXQgdGhhdCBp
+cyA2Mzk2IGxpbmVzLi4uIExldCBtZSBrbm93IGlmIHlvdQ0KPiB3YW50IGl0IC0gSSBhc3N1bWUg
+aXQncyBub3QgZm9yIGEgbWFpbGluZyBsaXN0DQo+IA0KVGhhdCB3b3VsZCBiZSB1c2VmdWwuIFBs
+ZWFzZSBzZW5kIGl0IHByaXZhdGVseS4NCg0KV2UgaGF2ZSBhIHNpbWlsYXIgcmVwb3J0IHRoYXQg
+d2UncmUgbG9va2luZyBpbnRvIGN1cnJlbnRseS4NCg0KPiBUaGUgaXBzZWMgdXNlcyB4ZnJtIGFu
+ZCBpIGFzc3VtZSBpdCB0cmlnZ2VycyBvZmZsb2FkLi4uIFRoZSBwcm9ibGVtIGlzDQo+IHRoYXQg
+dGhpcyBpcyBhIHByb2R1Y3Rpb24gc3lzdGVtIGFuZCBpIGNhbid0IHJlYWxseSB0ZXN0IG9uIGl0
+IDovDQo+IA0KPiBPbiBUaHUsIEphbiAxOCwgMjAyNCBhdCA1OjIy4oCvUE0gRHJhZ29zIFRhdHVs
+ZWEgPGR0YXR1bGVhQG52aWRpYS5jb20+IHdyb3RlOg0KPiA+IA0KPiA+IE9uIDAxLzE4LCBJYW4g
+S3VtbGllbiB3cm90ZToNCj4gPiA+IG9rLCBzbyBhZnRlciBhYm91dCAyMDAgb2YgdGhlc2UsIHdl
+IGhhZCBhIGZ1bGwga2VybmVsIG9vcHMuIG1vcmUNCj4gPiA+IGdyYWNlZnVsIHRoYW4gZWFybGll
+ciBrZXJuZWxzIGJ1dC4uLg0KPiA+ID4gDQo+ID4gPiBPbiBUaHUsIEphbiAxOCwgMjAyNCBhdCA0
+OjA44oCvUE0gSWFuIEt1bWxpZW4gPGlhbi5rdW1saWVuQGdtYWlsLmNvbT4gd3JvdGU6DQo+ID4g
+PiA+IA0KPiA+ID4gPiBbIDEwNjguOTM3MTAxXSAtLS0tLS0tLS0tLS1bIGN1dCBoZXJlIF0tLS0t
+LS0tLS0tLS0NCj4gPiA+ID4gWyAxMDY4LjkzNzk3N10gV0FSTklORzogQ1BVOiAwIFBJRDogMCBh
+dA0KPiA+ID4gPiBpbmNsdWRlL25ldC9wYWdlX3Bvb2wvaGVscGVycy5oOjEzMA0KPiA+ID4gPiBt
+bHg1ZV9wYWdlX3JlbGVhc2VfZnJhZ21lbnRlZC5pc3JhLjArMHg0Ni8weDUwIFttbHg1X2NvcmVd
+DQo+ID4gPiA+IFsgMTA2OC45Mzk0MDddIE1vZHVsZXMgbGlua2VkIGluOiBlY2hhaW5pdihFKSBl
+c3A0KEUpDQo+ID4gPiA+IHhmcm1faW50ZXJmYWNlKEUpIHhmcm02X3R1bm5lbChFKSB0dW5uZWw0
+KEUpIHR1bm5lbDYoRSkgeHRfcG9saWN5KEUpDQo+ID4gPiA+IHh0X3BoeXNkZXYoRSkgeHRfbmF0
+KEUpIHh0X1JFRElSRUNUKEUpIHh0X2NvbW1lbnQoRSkgeHRfY29ubm1hcmsoRSkNCj4gPiA+ID4g
+eHRfbWFyayhFKSB2eGxhbihFKSBpcDZfdWRwX3R1bm5lbChFKSB1ZHBfdHVubmVsKEUpDQo+ID4g
+PiA+IG5mbmV0bGlua19jdHRpbWVvdXQoRSkgeHRfY29ubnRyYWNrKEUpIG5mdF9jaGFpbl9uYXQo
+RSkNCj4gPiA+ID4geHRfTUFTUVVFUkFERShFKSBuZl9jb25udHJhY2tfbmV0bGluayhFKSB4dF9h
+ZGRydHlwZShFKSBuZnRfY29tcGF0KEUpDQo+ID4gPiA+IG5mX3RhYmxlcyhFKSBuZm5ldGxpbmso
+RSkgYnJfbmV0ZmlsdGVyKEUpIGJyaWRnZShFKSA4MDIxcShFKSBnYXJwKEUpDQo+ID4gPiA+IG1y
+cChFKSBzdHAoRSkgbGxjKEUpIG92ZXJsYXkoRSkgYm9uZGluZyhFKSBjZmc4MDIxMShFKSByZmtp
+bGwoRSkNCj4gPiA+ID4gaXBtaV9zc2lmKEUpIGludGVsX3JhcGxfbXNyKEUpIGludGVsX3JhcGxf
+Y29tbW9uKEUpIHNiX2VkYWMoRSkNCj4gPiA+ID4geDg2X3BrZ190ZW1wX3RoZXJtYWwoRSkgaW50
+ZWxfcG93ZXJjbGFtcChFKSB2ZmF0KEUpIGZhdChFKSBjb3JldGVtcChFKQ0KPiA+ID4gPiBrdm1f
+aW50ZWwoRSkga3ZtKEUpIGlUQ09fd2R0KEUpIG1seDVfaWIoRSkgaW50ZWxfcG1jX2J4dChFKQ0K
+PiA+ID4gPiBpVENPX3ZlbmRvcl9zdXBwb3J0KEUpIGFjcGlfaXBtaShFKSBpMmNfYWxnb19iaXQo
+RSkgaXBtaV9zaShFKQ0KPiA+ID4gPiBpcnFieXBhc3MoRSkgaWJfdXZlcmJzKEUpIGRybV9zaG1l
+bV9oZWxwZXIoRSkgaXBtaV9kZXZpbnRmKEUpDQo+ID4gPiA+IGlvYXRkbWEoRSkgcmFwbChFKSBp
+MmNfaTgwMShFKSBpbnRlbF9jc3RhdGUoRSkgaWJfY29yZShFKQ0KPiA+ID4gPiBpbnRlbF91bmNv
+cmUoRSkgcGNzcGtyKEUpIGRybV9rbXNfaGVscGVyKEUpIGpveWRldihFKSBscGNfaWNoKEUpDQo+
+ID4gPiA+IGhwaWxvKEUpIGFjcGlfdGFkKEUpIGlwbWlfbXNnaGFuZGxlcihFKSBhY3BpX3Bvd2Vy
+X21ldGVyKEUpIGRjYShFKQ0KPiA+ID4gPiBpMmNfc21idXMoRSkgeGZzKEUpDQo+ID4gPiA+IFsg
+MTA2OC45Mzk3ODJdICBkcm0oRSkgb3BlbnZzd2l0Y2goRSkgbmZfY29ubmNvdW50KEUpIG5mX25h
+dChFKQ0KPiA+ID4gPiBleHQ0KEUpIG1iY2FjaGUoRSkgamJkMihFKSBtbHg1X2NvcmUoRSkgc2Rf
+bW9kKEUpIHQxMF9waShFKSBzZyhFKQ0KPiA+ID4gPiBjcmN0MTBkaWZfcGNsbXVsKEUpIGNyYzMy
+X3BjbG11bChFKSBwb2x5dmFsX2NsbXVsbmkoRSkNCj4gPiA+ID4gcG9seXZhbF9nZW5lcmljKEUp
+IHNlcmlvX3JhdyhFKSBnaGFzaF9jbG11bG5pX2ludGVsKEUpIG1seGZ3KEUpIHRnMyhFKQ0KPiA+
+ID4gPiBocHNhKEUpIHRscyhFKSBocHdkdChFKSBzY3NpX3RyYW5zcG9ydF9zYXMoRSkgcHNhbXBs
+ZShFKSB3bWkoRSkNCj4gPiA+ID4gcGNpX2h5cGVydl9pbnRmKEUpIGRtX21pcnJvcihFKSBkbV9y
+ZWdpb25faGFzaChFKSBkbV9sb2coRSkgZG1fbW9kKEUpDQo+ID4gPiA+IG5mX2Nvbm50cmFjayhF
+KSBsaWJjcmMzMmMoRSkgY3JjMzJjX2ludGVsKEUpIG5mX2RlZnJhZ19pcHY2KEUpDQo+ID4gPiA+
+IG5mX2RlZnJhZ19pcHY0KEUpIGlwNl90YWJsZXMoRSkgZnVzZShFKQ0KPiA+ID4gPiBbIDEwNjgu
+OTQ3ODY0XSBDUFU6IDAgUElEOiAwIENvbW06IHN3YXBwZXIvMCBLZHVtcDogbG9hZGVkIFRhaW50
+ZWQ6IEcNCj4gPiA+ID4gICAgICAgVyAgIEUgICAgICA2LjYuMTItMS5lbDkuZWxyZXBvLng4Nl82
+NCAjMQ0KPiA+ID4gPiBbIDEwNjguOTQ5MDE0XSBIYXJkd2FyZSBuYW1lOiBIUCBQcm9MaWFudCBE
+TDM2MCBHZW45L1Byb0xpYW50IERMMzYwDQo+ID4gPiA+IEdlbjksIEJJT1MgUDg5IDExLzIzLzIw
+MjENCj4gPiA+ID4gWyAxMDY4Ljk0OTU1Ml0gUklQOg0KPiA+ID4gPiAwMDEwOm1seDVlX3BhZ2Vf
+cmVsZWFzZV9mcmFnbWVudGVkLmlzcmEuMCsweDQ2LzB4NTAgW21seDVfY29yZV0NCj4gPiA+ID4g
+WyAxMDY4Ljk1MTAzM10gQ29kZTogZjcgZGEgZjAgNDggMGYgYzEgNTYgMjggNDggMzkgYzIgNzgg
+MWQgNzQgMDUgYzMNCj4gPiA+ID4gY2MgY2MgY2MgY2MgNDggOGIgYmYgNjAgMDQgMDAgMDAgYjkg
+MDEgMDAgMDAgMDAgYmEgZmYgZmYgZmYgZmYgZTkgZGENCj4gPiA+ID4gZjcgZjMgZGEgPDBmPiAw
+YiBjMyBjYyBjYyBjYyBjYyAwZiAxZiAwMCA5MCA5MCA5MCA5MCA5MCA5MCA5MCA5MCA5MCA5MA0K
+PiA+ID4gPiA5MCA5MA0KPiA+ID4gPiBbIDEwNjguOTUyNjMyXSBSU1A6IDAwMTg6ZmZmZmIzYTgw
+MDAwM2RmMCBFRkxBR1M6IDAwMDEwMjk3DQo+ID4gPiA+IFsgMTA2OC45NTMzMDFdIFJBWDogMDAw
+MDAwMDAwMDAwMDAzZCBSQlg6IGZmZmY5ODdmNTFiNzgwMDAgUkNYOiAwMDAwMDAwMDAwMDAwMDUw
+DQo+ID4gPiA+IFsgMTA2OC45NTQyNzldIFJEWDogMDAwMDAwMDAwMDAwMDAwMCBSU0k6IGZmZmZk
+YjUyNDY1MDg1ODAgUkRJOiBmZmZmOTg3ZjUxYjc4MDAwDQo+ID4gPiA+IFsgMTA2OC45NTUzNThd
+IFJCUDogZmZmZjk4N2ZjZGIwYjU0MCBSMDg6IDAwMDAwMDAwMDAwMDAwMDYgUjA5OiBmZmZmOTg4
+ZWM0NDgzMGMwDQo+ID4gPiA+IFsgMTA2OC45NTc2NzRdIFIxMDogMDAwMDAwMDAwMDAwMDAwMCBS
+MTE6IGZmZmY5ODdmY2FiNzcwNDAgUjEyOiAwMDAwMDAwMDAwMDAwMDQwDQo+ID4gPiA+IFsgMTA2
+OC45NTg2NjldIFIxMzogMDAwMDAwMDAwMDAwMDA0MCBSMTQ6IGZmZmY5ODdmY2RiMGIxNjggUjE1
+OiAwMDAwMDAwMDAwMDAwMDNjDQo+ID4gPiA+IFsgMTA2OC45NTk4MjhdIEZTOiAgMDAwMDAwMDAw
+MDAwMDAwMCgwMDAwKSBHUzpmZmZmOTg4ZWJmYzAwMDAwKDAwMDApDQo+ID4gPiA+IGtubEdTOjAw
+MDAwMDAwMDAwMDAwMDANCj4gPiA+ID4gWyAxMDY4Ljk2MDQ2Nl0gQ1M6ICAwMDEwIERTOiAwMDAw
+IEVTOiAwMDAwIENSMDogMDAwMDAwMDA4MDA1MDAzMw0KPiA+ID4gPiBbIDEwNjguOTYxMzUwXSBD
+UjI6IDAwMDA3ZjE3MzkyNWE0ZTAgQ1IzOiAwMDAwMDAxMDY3YTFlMDA2IENSNDogMDAwMDAwMDAw
+MDE3MDZmMA0KPiA+ID4gPiBbIDEwNjguOTYyMjMwXSBDYWxsIFRyYWNlOg0KPiA+ID4gPiBbIDEw
+NjguOTYyNDc4XSAgPElSUT4NCj4gPiA+ID4gWyAxMDY4Ljk2MzA1NV0gID8gX193YXJuKzB4ODAv
+MHgxMzANCj4gPiA+ID4gWyAxMDY4Ljk2MzA3M10gID8gbWx4NWVfcGFnZV9yZWxlYXNlX2ZyYWdt
+ZW50ZWQuaXNyYS4wKzB4NDYvMHg1MCBbbWx4NV9jb3JlXQ0KPiA+ID4gPiBbIDEwNjguOTY0Mjc1
+XSAgPyByZXBvcnRfYnVnKzB4MWMzLzB4MWQwDQo+ID4gPiA+IFsgMTA2OC45NjQ1ODVdICA/IGhh
+bmRsZV9idWcrMHg0Mi8weDcwDQo+ID4gPiA+IFsgMTA2OC45NjUyMjhdICA/IGV4Y19pbnZhbGlk
+X29wKzB4MTQvMHg3MA0KPiA+ID4gPiBbIDEwNjguOTY1NTM4XSAgPyBhc21fZXhjX2ludmFsaWRf
+b3ArMHgxNi8weDIwDQo+ID4gPiA+IFsgMTA2OC45NjU4NTRdICA/IG1seDVlX3BhZ2VfcmVsZWFz
+ZV9mcmFnbWVudGVkLmlzcmEuMCsweDQ2LzB4NTAgW21seDVfY29yZV0NCj4gPiA+ID4gWyAxMDY4
+Ljk2NjUxOF0gIG1seDVlX2ZyZWVfcnhfbXB3cWUrMHgxOGUvMHgxYzAgW21seDVfY29yZV0NCj4g
+PiA+ID4gWyAxMDY4Ljk2NzIyMV0gIG1seDVlX3Bvc3RfcnhfbXB3cWVzKzB4MWE1LzB4MjgwIFtt
+bHg1X2NvcmVdDQo+ID4gPiA+IFsgMTA2OC45Njc4MTBdICBtbHg1ZV9uYXBpX3BvbGwrMHgxNDMv
+MHg3MTAgW21seDVfY29yZV0NCj4gPiA+ID4gWyAxMDY4Ljk2ODQxNl0gID8gX19uZXRpZl9yZWNl
+aXZlX3NrYl9vbmVfY29yZSsweDkyLzB4YTANCj4gPiA+ID4gWyAxMDY4Ljk2ODc5OV0gIF9fbmFw
+aV9wb2xsKzB4MmMvMHgxYjANCj4gPiA+ID4gWyAxMDY4Ljk3MDA2Nl0gIG5ldF9yeF9hY3Rpb24r
+MHgyYTcvMHgzNzANCj4gPiA+ID4gWyAxMDY4Ljk3MTAxMl0gID8gbWx4NV9jcV90YXNrbGV0X2Ni
+KzB4NzgvMHgxODAgW21seDVfY29yZV0NCj4gPiA+ID4gWyAxMDY4Ljk3MTY4M10gIF9fZG9fc29m
+dGlycSsweGYwLzB4MmVlDQo+ID4gPiA+IFsgMTA2OC45NzIwMDJdICBfX2lycV9leGl0X3JjdSsw
+eDgzLzB4ZjANCj4gPiA+ID4gWyAxMDY4Ljk3MjMzOF0gIGNvbW1vbl9pbnRlcnJ1cHQrMHhiOC8w
+eGQwDQo+ID4gPiA+IFsgMTA2OC45NzI3MzhdICA8L0lSUT4NCj4gPiA+ID4gWyAxMDY4Ljk3MzMy
+NF0gIDxUQVNLPg0KPiA+ID4gPiBbIDEwNjguOTc0MDE5XSAgYXNtX2NvbW1vbl9pbnRlcnJ1cHQr
+MHgyMi8weDQwDQo+ID4gPiA+IFsgMTA2OC45NzQ0MTJdIFJJUDogMDAxMDpjcHVpZGxlX2VudGVy
+X3N0YXRlKzB4YzgvMHg0MzANCj4gPiA+ID4gWyAxMDY4Ljk3NDc4N10gQ29kZTogMGUgYzAgNDcg
+ZmYgZTggOTkgZjAgZmYgZmYgOGIgNTMgMDQgNDkgODkgYzUgMGYNCj4gPiA+ID4gMWYgNDQgMDAg
+MDAgMzEgZmYgZTggODcgOTkgNDYgZmYgNDUgODQgZmYgMGYgODUgM2YgMDIgMDAgMDAgZmIgMGYg
+MWYNCj4gPiA+ID4gNDQgMDAgMDAgPDQ1PiA4NSBmNiAwZiA4OCA2ZSAwMSAwMCAwMCA0OSA2MyBk
+NiA0YyAyYiAyYyAyNCA0OCA4ZCAwNCA1Mg0KPiA+ID4gPiA0OCA4ZA0KPiA+ID4gPiBbIDEwNjgu
+OTc2NDczXSBSU1A6IDAwMTg6ZmZmZmZmZmY5Y2EwM2U0OCBFRkxBR1M6IDAwMDAwMjQ2DQo+ID4g
+PiA+IFsgMTA2OC45NzY4NzJdIFJBWDogZmZmZjk4OGViZmMwMDAwMCBSQlg6IGZmZmY5ODhlYmZj
+M2RhNzggUkNYOiAwMDAwMDAwMDAwMDAwMDFmDQo+ID4gPiA+IFsgMTA2OC45Nzc4NjldIFJEWDog
+MDAwMDAwMDAwMDAwMDAwMCBSU0k6IGZmZmZmZmZmOWMzMGUwZmYgUkRJOiBmZmZmZmZmZjljMmU4
+MmYwDQo+ID4gPiA+IFsgMTA2OC45Nzg4MjRdIFJCUDogMDAwMDAwMDAwMDAwMDAwNCBSMDg6IDAw
+MDAwMGY4ZTE4ZjFiZWYgUjA5OiAwMDAwMDAwMDAwMDAwMDE4DQo+ID4gPiA+IFsgMTA2OC45Nzk4
+MDJdIFIxMDogMDAwMDAwMDAwMDAwOTQ0MSBSMTE6IGZmZmY5ODhlYmZjMzE3ZTQgUjEyOiBmZmZm
+ZmZmZjljZWFmNmMwDQo+ID4gPiA+IFsgMTA2OC45ODA4NDFdIFIxMzogMDAwMDAwZjhlMThmMWJl
+ZiBSMTQ6IDAwMDAwMDAwMDAwMDAwMDQgUjE1OiAwMDAwMDAwMDAwMDAwMDAwDQo+ID4gPiA+IFsg
+MTA2OC45ODE4MDFdICA/IGNwdWlkbGVfZW50ZXJfc3RhdGUrMHhiOS8weDQzMA0KPiA+ID4gPiBb
+IDEwNjguOTgyNjY5XSAgY3B1aWRsZV9lbnRlcisweDI5LzB4NDANCj4gPiA+ID4gWyAxMDY4Ljk4
+MzAwM10gIGNwdWlkbGVfaWRsZV9jYWxsKzB4MTBhLzB4MTcwDQo+ID4gPiA+IFsgMTA2OC45ODMz
+NDldICBkb19pZGxlKzB4N2UvMHhlMA0KPiA+ID4gPiBbIDEwNjguOTg0MDE1XSAgY3B1X3N0YXJ0
+dXBfZW50cnkrMHgyNi8weDMwDQo+ID4gPiA+IFsgMTA2OC45ODQzMzNdICByZXN0X2luaXQrMHhj
+ZC8weGQwDQo+ID4gPiA+IFsgMTA2OC45ODUwMDhdICBhcmNoX2NhbGxfcmVzdF9pbml0KzB4YS8w
+eDMwDQo+ID4gPiA+IFsgMTA2OC45ODUzMjZdICBzdGFydF9rZXJuZWwrMHgzMzIvMHg0MTANCj4g
+PiA+ID4gWyAxMDY4Ljk4NTYyOF0gIHg4Nl82NF9zdGFydF9yZXNlcnZhdGlvbnMrMHgxNC8weDMw
+DQo+ID4gPiA+IFsgMTA2OC45ODYzMzddICB4ODZfNjRfc3RhcnRfa2VybmVsKzB4OGUvMHg5MA0K
+PiA+ID4gPiBbIDEwNjguOTg2NjUzXSAgc2Vjb25kYXJ5X3N0YXJ0dXBfNjRfbm9fdmVyaWZ5KzB4
+MThmLzB4MTliDQo+ID4gPiA+IFsgMTA2OC45ODcwNjhdICA8L1RBU0s+DQo+ID4gPiA+IFsgMTA2
+OC45ODczMDVdIC0tLVsgZW5kIHRyYWNlIDAwMDAwMDAwMDAwMDAwMDAgXS0tLQ0KPiA+ID4gDQo+
+ID4gDQo+ID4gVGhhbmtzIGZvciB0aGUgcmVwb3J0LiBXZSBnb3QgYW5vdGhlciBzaW1pbGFyIHJl
+cG9ydCByZWNlbnRseSB3aGljaCB3ZQ0KPiA+IGRvbid0IHNlZSBpbnRlcm5hbGx5Lg0KPiA+IA0K
+PiA+IERvIHlvdSBrbm93IHdoYXQgd2FzIHRoZSBsYXN0IGtub3duIGtlcm5lbCB3b3JraW5nIHZl
+cnNpb24/DQo+ID4gDQo+ID4gQ291bGQgeW91IGRlc2NyaWJlIHRoZSBjb25maWd1cmF0aW9uIGFu
+ZCB0aGUgcmVwcm9kdWN0aW9uIHN0ZXBzPw0KPiA+IA0KPiA+IFRoYW5rcywNCj4gPiBEcmFnb3MN
+Cg0K
 
