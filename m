@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-64758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B91A837049
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:41:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33C77837038
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:40:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CED2D1C213EC
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:41:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E70381F251A5
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:40:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBBF06169E;
-	Mon, 22 Jan 2024 18:08:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFE3D60DFA;
+	Mon, 22 Jan 2024 18:08:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A8D560EDB
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 18:08:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0371E5FEEB
+	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 18:08:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705946914; cv=none; b=nob91ave88MvojFGn3DbfuWMWrMw8dQJnn6hGf9k6vHTy6IOEZcJpHI/z42PcrQm2gT5CzfBQpoBi2hfA/UIQbKdYLo/ex4NulEFWevNu9GmbUdBF3/QiDx6vMWcAALBM0Wje5sKg8foDJSVUIsZV5kYuKMphFkWNKb2vUIZ+uM=
+	t=1705946911; cv=none; b=ElTtLRVp8KJiKRT0jtJ2PnEMEuG9vCjzvERiA9+2bpwh7saQaTH9RJx47137Z3SKVyeLaX60rFP4lP5utkSGVkLYGS1BYluQ0wqgBb4G+bwRPgee2uUeIHqKFRwuXbh/3qei1OD8pRKBCPJwThCqJRsc4DJXtvWNAUO12I13M2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705946914; c=relaxed/simple;
-	bh=J5G8sNk8EOiCf1vT1VH2qoFSGlM7S/4V1Y+pnNGwgPk=;
+	s=arc-20240116; t=1705946911; c=relaxed/simple;
+	bh=iR4kxLxaE7Icwhg9XpP8gyJgiftiGtkYPg5z6rw0lWQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eoWAkPohpYZXRdiQed9HVDOiH7rlQbka6cA9pQ09n5BxLIh1odKzfoufQ0wzhxqLI5i1AFmWjvhhzCX489SGCUGSHqsGaHue/upapaKDHHrE7wujbkFblUN2GvZ0kYqe83ipux0QeacHnETZXWuFiAXKlMLcmhlbSxHdk7cWzeY=
+	 MIME-Version:Content-Type; b=qBXDSXEqkgWqvqVZE4Sc085F4v4t4yHRM4iicx9/VmZNEye2CoDR1T4xTGfqsQ0I7Z2qZtr93VNbuDpA7p+hFHTcTLVGbR+PMV29sWXxITtUjsVjBnNyqhRViYrCzw578z6/2DXchw3Job9rLzIEWpqmdDygpAApnurRfScN+z0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,15 +33,15 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1rRyiW-0001rg-36; Mon, 22 Jan 2024 19:08:16 +0100
+	id 1rRyiW-0001rw-8O; Mon, 22 Jan 2024 19:08:16 +0100
 Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1rRyiV-001eQ2-J1; Mon, 22 Jan 2024 19:08:15 +0100
+	id 1rRyiV-001eQ7-Rs; Mon, 22 Jan 2024 19:08:15 +0100
 Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.96)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1rRyiV-005Zxd-1b;
+	id 1rRyiV-005Zxh-2U;
 	Mon, 22 Jan 2024 19:08:15 +0100
 From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
 To: Mark Brown <broonie@kernel.org>
@@ -51,15 +51,12 @@ Cc: kernel@pengutronix.de,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Ronald Wahl <ronald.wahl@raritan.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-spi@vger.kernel.org
-Subject: [PATCH v2 14/33] net: ks8851: Follow renaming of SPI "master" to "controller"
-Date: Mon, 22 Jan 2024 19:07:09 +0100
-Message-ID:  <8fd38ae26985ad770b21979469b36e5afff0473a.1705944943.git.u.kleine-koenig@pengutronix.de>
+Subject: [PATCH v2 15/33] net: vertexcom: mse102x: Follow renaming of SPI "master" to "controller"
+Date: Mon, 22 Jan 2024 19:07:10 +0100
+Message-ID:  <007fae0c67ce212a1d31082ad5762197c87bcd57.1705944943.git.u.kleine-koenig@pengutronix.de>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1705944943.git.u.kleine-koenig@pengutronix.de>
 References: <cover.1705944943.git.u.kleine-koenig@pengutronix.de>
@@ -70,7 +67,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1475; i=u.kleine-koenig@pengutronix.de; h=from:subject:message-id; bh=J5G8sNk8EOiCf1vT1VH2qoFSGlM7S/4V1Y+pnNGwgPk=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlrq7T21kGgzgUSXStTOMt1lumvjV7wRCdpjd8j 2lNzDkK8uyJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZa6u0wAKCRCPgPtYfRL+ Tqs/B/0U7IcHfVYiJyOo5g2gyk1I7tklQqpDglnCsNwWZyldX1WQAg87/+4JRL5VvMD3sOuLObU wOzcy9EzUaq31dmam8Ij3/wjiS9youm4NGNKvfFAJF1hvZvAN0Xytd6N6SbMdcYHpnCeLgRWyUE AvZmteteMvlopxMHDP0Xe71//iQLd1I+LznN+VRaMtDQKnQMZY59hKVL425t50FKKPh4tUMeXiv WOH1Ea/Cj1JrGlzBaxGTOgly/uK1Dw7jQxaRorukPj0RkFN0zpQauSfgumke13cAmYH1A+PnA2Q Tu8wfNU7dlNr/KnziNf0SQ5AdcEd5CEca8ae4Siq22a9QUew
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1090; i=u.kleine-koenig@pengutronix.de; h=from:subject:message-id; bh=iR4kxLxaE7Icwhg9XpP8gyJgiftiGtkYPg5z6rw0lWQ=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlrq7UA6Lxfh6Mp7DFurx6GyME0hE2Jfo0sMA4A bE79fFN6giJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZa6u1AAKCRCPgPtYfRL+ Toj2CAC1hxmRZLmZ3JtzHqs9FTXz5bVe80g03g/ovNpfkfb8fWUlgGVKnD/CsjhCxmk+0x6P93R NoBZrY8tYpm30YBtTQlZd3KsuEl2Zh25mFZMBF+clxtH9XzQlxAGtBRzkM1tME1/olDYnibAiAW m4zBqQXqe8rBbzeMsEG02LKYCU1z5Zd7ycJd/5tGChyMkpD+H0SUpB0P+OnQXPATH+kO/+PSb5P OxFvUWgK2txCoZH2pxz2GdKTyTw6NIbwqF3vBNGPJiuK3iatRvJgKLO8s+EMLL/CZq1++cqWTnC cCdTIaJAKLsi7s+NKmdyoe+OcXtNiaxevHmveZclfKW4H3sU
 X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
@@ -88,31 +85,22 @@ this driver.
 Reviewed-by: Simon Horman <horms@kernel.org>
 Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 ---
- drivers/net/ethernet/micrel/ks8851_spi.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/vertexcom/mse102x.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/micrel/ks8851_spi.c b/drivers/net/ethernet/micrel/ks8851_spi.c
-index 54f2eac11a63..2f803377c9f9 100644
---- a/drivers/net/ethernet/micrel/ks8851_spi.c
-+++ b/drivers/net/ethernet/micrel/ks8851_spi.c
-@@ -156,7 +156,7 @@ static void ks8851_rdreg(struct ks8851_net *ks, unsigned int op,
+diff --git a/drivers/net/ethernet/vertexcom/mse102x.c b/drivers/net/ethernet/vertexcom/mse102x.c
+index aeed2a093e34..edd8b59680e5 100644
+--- a/drivers/net/ethernet/vertexcom/mse102x.c
++++ b/drivers/net/ethernet/vertexcom/mse102x.c
+@@ -664,7 +664,7 @@ static int mse102x_probe_spi(struct spi_device *spi)
+ 	spi->bits_per_word = 8;
+ 	spi->mode |= SPI_MODE_3;
+ 	/* enforce minimum speed to ensure device functionality */
+-	spi->master->min_speed_hz = MIN_FREQ_HZ;
++	spi->controller->min_speed_hz = MIN_FREQ_HZ;
  
- 	txb[0] = cpu_to_le16(op | KS_SPIOP_RD);
- 
--	if (kss->spidev->master->flags & SPI_CONTROLLER_HALF_DUPLEX) {
-+	if (kss->spidev->controller->flags & SPI_CONTROLLER_HALF_DUPLEX) {
- 		msg = &kss->spi_msg2;
- 		xfer = kss->spi_xfer2;
- 
-@@ -180,7 +180,7 @@ static void ks8851_rdreg(struct ks8851_net *ks, unsigned int op,
- 	ret = spi_sync(kss->spidev, msg);
- 	if (ret < 0)
- 		netdev_err(ks->netdev, "read: spi_sync() failed\n");
--	else if (kss->spidev->master->flags & SPI_CONTROLLER_HALF_DUPLEX)
-+	else if (kss->spidev->controller->flags & SPI_CONTROLLER_HALF_DUPLEX)
- 		memcpy(rxb, trx, rxl);
- 	else
- 		memcpy(rxb, trx + 2, rxl);
+ 	if (!spi->max_speed_hz)
+ 		spi->max_speed_hz = MAX_FREQ_HZ;
 -- 
 2.43.0
 
