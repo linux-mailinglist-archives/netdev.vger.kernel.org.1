@@ -1,107 +1,98 @@
-Return-Path: <netdev+bounces-64745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03008836F10
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:09:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE7F3836F1C
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:09:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36B9A1C25343
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:09:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1EA51F2D507
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:09:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88C9A3FB30;
-	Mon, 22 Jan 2024 17:34:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC9865733D;
+	Mon, 22 Jan 2024 17:35:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="eWTa4QXy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sRdhz3q5"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B71AB56B77;
-	Mon, 22 Jan 2024 17:34:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 923534A990;
+	Mon, 22 Jan 2024 17:35:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705944863; cv=none; b=ZYLfQdQ3xNdmh1sUpokiaESjzG1TjmgXrlgmM4AkdCUjPXuAbjIeW0Jc1DaDEBqeKKX1YJ1EZYUDVYx9GJbrMp3hiXrhngNUYE4rUpd9LbNwGO9t71ggMAcpPgjO8FODyfNZZ7ENtCziaBtTXx8LlP2r4vXuOlN5Q0+NUjNrIsU=
+	t=1705944931; cv=none; b=cow5+mXNc46WsKs8TEb9w7XBohBo27VWzinFwEZw1dwPIOervya8sMWwiZISMe6GOMDYptAK5kPxsNGlSd5s991qmJEAV5SLgv8gH0Rsu8P31OeI4+aupWX35SG/ob/z+Hlr7/n8FeZfx8Qy1aXny9+19rvjjzxb4NIZCxv3mcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705944863; c=relaxed/simple;
-	bh=8hedJBX60cSPOSwd7qtDOvB0MY2R5+r1VTQuSWCC+GQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EM72NKFEKVRQ+Eytw90R0ZYKoNfhwVqGk5814ivgHvQAS0KkT56FWS/jhAcLkTqx2luyV323wPjui/avoLFMzkU7ummp24WZVMnQ8MSqgNfAziPCY/vAndSNC3KUUJanouLcfb/ZdpX0XZbYZv+oA/OsfFGTFb4KRT/Kw8xa1O4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=eWTa4QXy; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=GWnT5S4Q6XzDJBRpEknqgOW0ZyLDPeI6kyNoprab2vM=; b=eWTa4QXyrVBO656lSz5cMMLRyy
-	R6pDqNNQj8yI9pfktmlDM2dJvaXnLVSst2pNMmm5eqxhxxmJB6x0wkoNQ+gbkAv7EUL0MdozU8Qee
-	H1SFbw/Y7JnA/iHu0f0//49u9J+NQqQBDQ1snFjFX75fyr78iZfOqRF5I7QNEGvK19So=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rRyBY-005kSZ-AZ; Mon, 22 Jan 2024 18:34:12 +0100
-Date: Mon, 22 Jan 2024 18:34:12 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Ziyang Huang <hzyitc@outlook.com>
-Cc: mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
-	richardcochran@gmail.com, p.zabel@pengutronix.de,
-	matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-	linux-mediatek@lists.infradead.org,
-	Praveenkumar I <ipkumar@codeaurora.org>,
-	Abhishek Sahu <absahu@codeaurora.org>
-Subject: Re: [PATCH 5/8] clk: qcom: support for duplicate freq in RCG2 freq
- table
-Message-ID: <b84df52a-f144-4ec3-b81b-20d1a0176aff@lunn.ch>
-References: <TYZPR01MB55563BD6A2B78402E4BB44D4C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
- <TYZPR01MB5556DEA3D4740441EC561414C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
- <28cca132-d5bb-4cff-ba2f-9be241a5ce83@lunn.ch>
- <TYZPR01MB55565998F43009AD351AC07EC9752@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
+	s=arc-20240116; t=1705944931; c=relaxed/simple;
+	bh=h/7MA+uqwVPx3lfrDrsWshvS6sJaQjSKgJKwuuLOb4c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FS1fWU9tAhSyQGZXIjOMifwEw1h7EhSE+ePQ8yGM9rHfgAPwJU021iobmZ9n+FW93q3skoIzV27Lb/iDUfJPXFdOvcuSOzV6xtT7h2mOpSmnPp4PC/dCNH07UK5b/otDyc9BN6Jyr0QfEOe5+YLZ+2gSOQt6ke0m4mwPNoaLQfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sRdhz3q5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 863BAC43394;
+	Mon, 22 Jan 2024 17:35:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705944930;
+	bh=h/7MA+uqwVPx3lfrDrsWshvS6sJaQjSKgJKwuuLOb4c=;
+	h=From:To:Cc:Subject:Date:From;
+	b=sRdhz3q50c2LFzSjqgwuho5ugqACLibobv3W1S6w6tBmB8+2ejZg1QBnlhJO163ev
+	 kMsTOgb6J7LCBJGMYpRdoHMrVJfdUnwsf1iJltEMe1Gg/qADOJ8N63KTinYOO9XvYd
+	 X2Qt4hqZyEYxoBmBY7MiwrJQkFAwZ45NHBox7/OmjbSXsGq8tyqxNU0SxT609l0wWN
+	 wEmcjzTvTiL07RKYnH1MbTyL7MBHZdKFMVHfFF/aOZ66nBKMf8wtGMn5aixFcxDbje
+	 +o1RE4KGl49C22uL4YZp5f9Q4WyW+qe6HVbmskMEjv+SpWClURCixy/lJPI6IJImCt
+	 ZNnjc/JZP6MAg==
+From: Rob Herring <robh@kernel.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>
+Cc: netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] net: marvell,prestera: Fix example PCI bus addressing
+Date: Mon, 22 Jan 2024 11:35:14 -0600
+Message-ID: <20240122173514.935742-1-robh@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <TYZPR01MB55565998F43009AD351AC07EC9752@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
+Content-Transfer-Encoding: 8bit
 
-> > > Change-Id: I97d9e1b55d8f3ee095f6f01729af527ba90e50e5
-> > > Signed-off-by: Abhishek Sahu <absahu@codeaurora.org>
-> > > (cherry picked from commit 775e7d3b69ffc97afb5bd5a6c9c423f2f4d8a0b2)
-> > > Signed-off-by: Praveenkumar I <ipkumar@codeaurora.org>
-> > > 
-> > > Change-Id: If10193fc79a3c1375ab73597813745ff1f4df0ad
-> > > 
-> > > Pick from https://git.codelinaro.org/clo/qsdk/oss/kernel/linux-ipq-5.4/-/commit/6dfb368bae130bee58e00ddf8330b55066e1c8c5
-> > > 
-> > > Signed-off-by: Ziyang Huang <hzyitc@outlook.com>
-> > 
-> > Please clean up these tags. These Change-ID tags are meaningless in
-> > mainline. 775e7d3b69ffc97afb5bd5a6c9c423f2f4d8a0b2 is not in mainline
-> > either. The picked from might be interesting, but please put it into
-> > the body of the commit message, not mixed in with the tags.
-> > 
-> > Who actually wrote this patch? The first Signed-off-by: is from
-> > Abhishek Sahu. But you have a From of Praveenkumar I ?
-> 
-> I have no idea about this. This patch is from Qualcomm vendor linux code.
+The example for PCI devices has some addressing errors. 'reg' is written
+as if the parent bus is PCI, but the default bus for examples is 1
+address and size cell. 'ranges' is defining config space with a
+size of 0. Generally, config space should not be defined in
+'ranges', only PCI memory and I/O spaces. Fix these issues by updating
+the values with made-up, but valid values.
 
-O.K. Since this is direct from the vendor, who probably does not track
-code authorship correctly, i would say the author in git is probably
-wrong. I would set the author: to Abhishek Sahu <absahu@codeaurora.org>.
+This was uncovered with recent dtschema changes.
 
-> What's more, I don't known how to deal with these commit message since I'm
-> not the author and I'm not sure do I have right to edit them even though
-> this is GPL code.
+Signed-off-by: Rob Herring <robh@kernel.org>
+---
+ Documentation/devicetree/bindings/net/marvell,prestera.yaml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-You should keep all the Signed-off-by, in the order they are. But the
-Change-Id is meaningless, so there is no problem removing them.
+diff --git a/Documentation/devicetree/bindings/net/marvell,prestera.yaml b/Documentation/devicetree/bindings/net/marvell,prestera.yaml
+index 5ea8b73663a5..16ff892f7bbd 100644
+--- a/Documentation/devicetree/bindings/net/marvell,prestera.yaml
++++ b/Documentation/devicetree/bindings/net/marvell,prestera.yaml
+@@ -78,8 +78,8 @@ examples:
+     pcie@0 {
+         #address-cells = <3>;
+         #size-cells = <2>;
+-        ranges = <0x0 0x0 0x0 0x0 0x0 0x0>;
+-        reg = <0x0 0x0 0x0 0x0 0x0 0x0>;
++        ranges = <0x02000000 0x0 0x100000 0x10000000 0x0 0x0>;
++        reg = <0x0 0x1000>;
+         device_type = "pci";
+ 
+         switch@0,0 {
+-- 
+2.43.0
 
-	  Andrew
 
