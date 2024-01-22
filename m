@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-64578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE816835C11
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 08:54:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E3AB835C19
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 08:55:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2D4D6B22219
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 07:54:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D3FA61F22C57
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 07:55:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0701E171D5;
-	Mon, 22 Jan 2024 07:54:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F24BD179BA;
+	Mon, 22 Jan 2024 07:55:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hTAKZoKL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uDyYzwoQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE8FD20DD2;
-	Mon, 22 Jan 2024 07:54:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C981220DDA;
+	Mon, 22 Jan 2024 07:55:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705910073; cv=none; b=MLCRXvZAuMe0cSzYw6+AmfedyFXq5ZjarWiP8QdrbOwXlBW0Td4LGKtJsNUJEo6bxZF6Af7P9z76lbGA6utVeh/XnqXW3l2+7oJDPwAyrwuwD/NTpncdxLtbpa3vOw5bT6igkXkOMH8eZpqo3ODPBpAZ7nQX+BgEn74nlbIGKzY=
+	t=1705910117; cv=none; b=dvV5Ewq9B3+aUeIPNjoC3fo/bcovJ4jz0wcS7ZJWDLqsV3NX0w5S0vGEIG7u/h+tkWlg5scvmDL0AAzrctxMos34r5mGY/K9dCQTUF2mNpp1JHIwzMJx6l9/cp/y8bTqxOLaF2YMME9hHeR/kPNFbaTyPPLpQYtH4q8lgYqMhbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705910073; c=relaxed/simple;
-	bh=2su90Gj5IaJlBWuPLJpwINxwihDs/8h9SYfAyTVMhWA=;
+	s=arc-20240116; t=1705910117; c=relaxed/simple;
+	bh=OlIF/YgaBAY0KyswtUOGGdnsqxNRgTdzZnKd+teQ718=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XFF4N4Njmulgkc5LXQ0N1Y78tV4BONSqsZ1tH+j9CzSUoPL10G5A2glxkei/d8ZijdhihVQs2WPZ7ydMZKuQtZP26vNJs7Z4Aqm9OnawtdAQCcVySVLnT08Kd9nGk8BNgBsuQY/2g7qUQnYkTVdo44kicxstKCCbt00iYT/6hb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hTAKZoKL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50038C433C7;
-	Mon, 22 Jan 2024 07:54:30 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=g3hsWDB2OFBYmoO1zrlSvvkHYHdvRa9GHMBD+AedHJvMN0AFWvNYRZ2rCvlvI4/bD8LsoPVbCqzzqmIkrfM2gWXV+5/ONsRbQhdCQSEV6rVmxYsbHUW+1kB+7dUImPeXWfznWWUZY9ZdJOSeBZzgyJGNwu0MwA1VNjNeCEnwarA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uDyYzwoQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D660EC433F1;
+	Mon, 22 Jan 2024 07:55:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705910073;
-	bh=2su90Gj5IaJlBWuPLJpwINxwihDs/8h9SYfAyTVMhWA=;
+	s=k20201202; t=1705910117;
+	bh=OlIF/YgaBAY0KyswtUOGGdnsqxNRgTdzZnKd+teQ718=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=hTAKZoKLuH2t2yUIgq5LHKfcopj5o9NUM1gYLq++7+wP6PY7JFs6T3gCgeeFtXSik
-	 T2sVtvlVa4Py4S1IwOwV3L/EUnwe55mlkd1Dx/FKOtd6FJZmLxvFYsCGVKWlAjVZO3
-	 prHwnb9QzikZhY4Rk6DYAkjKYU2qxnzudtEJHWwk6Mso/i5aWNJgkY7fedEtVDJ9UA
-	 sRZfgxYEi6KvQTbj5dsoRjtKiaBeA/kjq5drKQ0eLaYUC9DRmeVuDrXPLeQUWejWrX
-	 ua8LxiATeUmVmJvtnGIK9DvUkXUjPUM4qlamgUk6yuJr3IuchUXLdng4pzxeMojuV0
-	 M1LXZIH7hd4sQ==
-Message-ID: <3c40c1fb-fafc-47e2-acd0-360d7456e93b@kernel.org>
-Date: Mon, 22 Jan 2024 08:54:27 +0100
+	b=uDyYzwoQ8xCvf7wsWZYBF72Aa+S38tDJDyaj4uJmgonltMWcHGjY/BO/Hy5cGn886
+	 uoB70SMEzpuE9X/6YakmQOIYpELnIj9ehkCXV1+WZf50U6VVuTgakTKvseAj7U7QPX
+	 arbEXg1qPFoID/WpCszL6c7s8sTHRkAxAAVNV6x0pqoKhZae+KDBeMdLcWRNh6cxf8
+	 Qfk8S809uuwjxvUmVu7ZljaalsBEU7KPIMi9oJ5xv4WO8lq7GIl0preIJw/EPsaEyK
+	 fL6s1jGVTBqLYrtGiNb7QMJkswWkL+vpPtIIdPmqymVXEV+CK8JtTmZlUP6+WvZ0nx
+	 GskgLhvwPsg6A==
+Message-ID: <01c61975-cc78-4045-8c60-bb11045a7c97@kernel.org>
+Date: Mon, 22 Jan 2024 08:55:13 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,18 +50,19 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 8/8] arm64: dts: qcom: ipq5018-rdp432-c2: enable ethernet
- support
+Subject: Re: [PATCH 5/8] clk: qcom: support for duplicate freq in RCG2 freq
+ table
+Content-Language: en-US
 To: Ziyang Huang <hzyitc@outlook.com>, mcoquelin.stm32@gmail.com
 Cc: alexandre.torgue@foss.st.com, richardcochran@gmail.com,
  p.zabel@pengutronix.de, matthias.bgg@gmail.com,
  angelogioacchino.delregno@collabora.com, linux-kernel@vger.kernel.org,
  linux-stm32@st-md-mailman.stormreply.com,
  linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
- linux-mediatek@lists.infradead.org
+ linux-mediatek@lists.infradead.org, Praveenkumar I <ipkumar@codeaurora.org>,
+ Abhishek Sahu <absahu@codeaurora.org>
 References: <TYZPR01MB55563BD6A2B78402E4BB44D4C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
- <TYZPR01MB5556D3E73D7F7242F810F915C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
-Content-Language: en-US
+ <TYZPR01MB5556DEA3D4740441EC561414C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Autocrypt: addr=krzk@kernel.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -106,72 +107,49 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <TYZPR01MB5556D3E73D7F7242F810F915C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
+In-Reply-To: <TYZPR01MB5556DEA3D4740441EC561414C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
 On 21/01/2024 13:42, Ziyang Huang wrote:
-> Signed-off-by: Ziyang Huang <hzyitc@outlook.com>
-
-Missing commit msg.
-
-Please use scripts/get_maintainers.pl to get a list of necessary people
-and lists to CC. It might happen, that command when run on an older
-kernel, gives you outdated entries. Therefore please be sure you base
-your patches on recent Linux kernel.
-
-Tools like b4 or scripts_getmaintainer.pl provide you proper list of
-people, so fix your workflow. Tools might also fail if you work on some
-ancient tree (don't, use mainline), work on fork of kernel (don't, use
-mainline) or you ignore some maintainers (really don't). Just use b4 and
-all the problems go away.
-
-You missed at least devicetree list (maybe more), so this won't be
-tested by automated tooling. Performing review on untested code might be
-a waste of time, thus I will skip this patch entirely till you follow
-the process allowing the patch to be tested.
-
-Please kindly resend and include all necessary To/Cc entries.
-
-
-> ---
->  .../arm64/boot/dts/qcom/ipq5018-rdp432-c2.dts | 52 +++++++++++++++++++
->  1 file changed, 52 insertions(+)
+> From: Praveenkumar I <ipkumar@codeaurora.org>
 > 
-> diff --git a/arch/arm64/boot/dts/qcom/ipq5018-rdp432-c2.dts b/arch/arm64/boot/dts/qcom/ipq5018-rdp432-c2.dts
-> index e636a1cb9b77..074b78d7939c 100644
-> --- a/arch/arm64/boot/dts/qcom/ipq5018-rdp432-c2.dts
-> +++ b/arch/arm64/boot/dts/qcom/ipq5018-rdp432-c2.dts
-> @@ -15,6 +15,9 @@ / {
->  
->  	aliases {
->  		serial0 = &blsp1_uart1;
-> +
+> Currently RCG code looks up the frequency table during set
+> rate and return the first available frequency greater than
+> requested rate. If CLK_SET_RATE_PARENT flag is set then the
+> set_rate request will go to its parent otherwise the clock
+> framework will configure pre-div, m and n according to the
+> returned frequency table entry. In this case, it is assuming
+> that parent clock will run in the same frequency with which
+> pre-div, m and n has been derived. But it may be possible
+> that the parent clock supports multiple frequency and the
+> same frequency can be derived with different pre-div, m and
+> n values depending upon current frequency.  Also, the same
+> frequency can be derived from different parent sources and
+> currently there is no option for having duplicate
+> frequencies in frequency table and choosing the best one
+> according to current rate.
+> 
+> Now this patch adds the support for having duplicate
+> frequencies in frequency table. During set rate, it will
+> compare the actual rate for each entry with requested rate
+> and will select the best entry in which the difference will
+> be less.
+> 
+> The existing functionality won’t be affected with this code
+> change since this code change will hit only if frequency
+> table has duplicate values.
+> 
+> Change-Id: I97d9e1b55d8f3ee095f6f01729af527ba90e50e5
+> Signed-off-by: Abhishek Sahu <absahu@codeaurora.org>
+> (cherry picked from commit 775e7d3b69ffc97afb5bd5a6c9c423f2f4d8a0b2)
+> Signed-off-by: Praveenkumar I <ipkumar@codeaurora.org>
+> 
+> Change-Id: If10193fc79a3c1375ab73597813745ff1f4df0ad
 
-Drop.
-
-> +		ethernet0 = &gmac0;
-> +		ethernet1 = &gmac1;
-
-Keep alphabetical order.
-
->  	};
->  
->  	chosen {
-> @@ -43,6 +46,22 @@ &sleep_clk {
->  };
->  
->  &tlmm {
-> +	mdio1_pins: mdio1_pins {
-
-This wasn't ever tested. NAK.
-
-It does not look like you tested the DTS against bindings. Please run
-`make dtbs_check W=1` (see
-Documentation/devicetree/bindings/writing-schema.rst or
-https://www.linaro.org/blog/tips-and-tricks-for-validating-devicetree-sources-with-the-devicetree-schema/
-for instructions).
-
+Please run scripts/checkpatch.pl and fix reported warnings. Some
+warnings can be ignored, but the code here looks like it needs a fix.
+Feel free to get in touch if the warning is not clear.
 
 Best regards,
 Krzysztof
