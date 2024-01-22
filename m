@@ -1,188 +1,192 @@
-Return-Path: <netdev+bounces-64842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64843-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FA648373DD
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 21:35:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B70AB83746B
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 21:47:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 473ED2849F0
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 20:35:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 638571F2633A
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 20:47:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBE6B3AC08;
-	Mon, 22 Jan 2024 20:35:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7200947784;
+	Mon, 22 Jan 2024 20:44:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GpYYAbXj"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="ZDA0ax07"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B327A47A40;
-	Mon, 22 Jan 2024 20:35:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48E9A4BAA7
+	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 20:44:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705955740; cv=none; b=dxQ4k59uSkZGpGV0iKy+GBaRM56N0PV0RfV+arpFG7UIDZjrvZtUYEW8R2WekWoNxpUm6p7Yxi7n8Xr5a3n0ZZ9H7HzQX5NUxtRHkob1d48vkkhnkr6dX+DyCszGxCRR0KXcjgfzw+in5f1VTeOwMlzJUyr+4ev4gY2LM7DepNU=
+	t=1705956298; cv=none; b=bNLkmpoQgQxRqTau1FWcMpZLFiSoP9MJoXhG79KLm/B8eA7i9ErD6bdW/mqngXyzux0PMAGCcXmtsCgTZaOHfhOQY1fbDMy6tIanZ4kJV+p8PFdpbBIY+LlPshmsmIKFh6KwFMtY7iniyjA47XR5igNf8lAh6Duc/b0I0SsykB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705955740; c=relaxed/simple;
-	bh=JkGc8IyQPIqwjSecvxXezPEjnK8PibvJovCtGictt3w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=InVBJeI0jVjzQmLrN7kN3pi5jmj/tLHbITg+MFxoQ6NRpIZC+AOv18yv6ws/e7q5t4xC+p+61EP7Q/eWWSBgzUFZVxukGOn7/Y278zYKyfOWN12+NGjfhmUaZbQITGSwVdI9lUzQycATatneoN3+Sz/oNmcbghF73dz3cPSF9To=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GpYYAbXj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2951C433C7;
-	Mon, 22 Jan 2024 20:35:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705955740;
-	bh=JkGc8IyQPIqwjSecvxXezPEjnK8PibvJovCtGictt3w=;
-	h=From:To:Cc:Subject:Date:From;
-	b=GpYYAbXjsExEqt7ukw+bKZAr1WGMsX1EZBoCPwZo+Wpn4zskQec0zl+zUis0QP+hA
-	 vVV6IObyD0iRPThSE7idDwaiq+drb5bRy9wnacPq5nnKT/x1ZYKFPfjJ5Fvnz/8BIv
-	 oDSgILcD5G3Q7SoeDwf7XSXC6pOS9qQSu+5owAwRjsJ081JkKoJbUH0xVf8IXGab3J
-	 jTO3hFGXQAQuC/esFtzfcijBZ+mVn62/tAGxeSdzxseasiMS/VvkcK/tLOMkHkXxT0
-	 SzAZCrWeX9i7MPx0qtH9DdfNVqUwqL5qieBCEyPLKLctbnojme5/ZvWL8k2eyhZxVK
-	 iu4l3l9rL6gOA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	shuah@kernel.org,
-	razor@blackwall.org,
-	idosch@nvidia.com,
-	horms@kernel.org,
-	jakub@cloudflare.com,
-	kuniyu@amazon.com,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net] selftests: fill in some missing configs for net
-Date: Mon, 22 Jan 2024 12:35:28 -0800
-Message-ID: <20240122203528.672004-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1705956298; c=relaxed/simple;
+	bh=g6xaSKZDP6ofReqSz5vu+HuLjLS2h0NXy9Z6C5o2PcI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AIn/p1oU96RrNy1p+exUxyuZmjS8/XBD3k1M+/q9ovzSDG9ZhSYE9g43yBTAPXB7QZW0e/w5wSFGIas41Q1lbs6JEdWPeFf0fTks2VXe6twh92P6sHIyXaC1/08XtGb5FFUMJPACkgtLz7W+o15WnLTKeSCcv71b+cyBjnM246g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=ZDA0ax07; arc=none smtp.client-ip=209.85.208.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2cd9cb17cbeso6319181fa.1
+        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 12:44:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1705956294; x=1706561094; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=14o4A7ZljgoD8Pn95jwq8PPzUV9gsCH/1yNA7rahmQs=;
+        b=ZDA0ax07B8UH/0Iwifwlw9TtizYm/7UUv8rRoXsIGRKisjNiOEqNHPftR/GpTFraV4
+         gM1fLIbb65JQXeLcw1/WN3pVUZ9HfZWTMmBJ8Wp0Yy3tMbUi2B79vSVINXiHaZa10M+H
+         RTQq0X/fMhXbstT0ybku19lT7TCEer9usgtDLBvuyejhoRrjIrDuLXCXENlBbJYeDuNg
+         1GTPkYsMLs8FACM98g7wGkxsM2bgUq20/6MLSfRxKgHT6HHY0NNAkPkhN0WjHkS4G4aH
+         2gUlFsldiEf+7PE5FL9JBKgAkIGPxV3GGJ3w0zilcv7tJW+Bji9MIsQX34Brvqe6L/vl
+         cIkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705956294; x=1706561094;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=14o4A7ZljgoD8Pn95jwq8PPzUV9gsCH/1yNA7rahmQs=;
+        b=xMDJqCY4+qnLhqK+E0gW6HyhAvZKu42fMwFbisOWD1U9BxJYucJEGIAUdS0Z0JD465
+         JVC3/zWsSIf6EqZ+GtoHsbrGYpTUDLev/bMvzwxx7MyXpVPTlk5Jw0R/x9HcjAI1bm4O
+         Cng+0T9DY0hEdK36m/qaXcsKmI4g3bKqxKb0Bcd1+iOU2GpLDaQhJes4xALYbnj5QdCR
+         yKxKNHwV6TQitNZOZOni78TBesK2SsJCmWB7jXJXrXxKEM9uqN1v2/LfBPOoLQug33pI
+         zFSpSLaZHH93eksnBkabNE0LIxvp9NOpFAv8nC72iZGftZ2MvdcuuG7fleG6D31b0vjn
+         lrDg==
+X-Gm-Message-State: AOJu0Yw+a01e1WoR6ms4Ap0VDmqJiRYwtBsoy6xlaDcNc0ugQzQEfHOX
+	ig2+6W1faiFfnrfkzvzObFtkWUedIN2O17r1eFozGsqLAw2r/4b5EboHtP10Y5PaAPGaxRaKdsK
+	eIvID8Zwtv2RsnmImFmGDiVvKPjCCiFZeRsDHXg==
+X-Google-Smtp-Source: AGHT+IFUPq4ubBVDpKCfSFl7DOYz2OWSloLvlgV2IP3dVTKTc6ea7OOsuCys5raTvW8fLxBof4jPf4taxbQ7ucQZP7k=
+X-Received: by 2002:a2e:2e19:0:b0:2cc:e68b:ee59 with SMTP id
+ u25-20020a2e2e19000000b002cce68bee59mr4418775lju.1.1705956294210; Mon, 22 Jan
+ 2024 12:44:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240120192125.1340857-1-andrew@lunn.ch> <20240122122457.jt6xgvbiffhmmksr@skbuf>
+ <0d9e0412-6ca3-407a-b2a1-b18ab4c20714@lunn.ch>
+In-Reply-To: <0d9e0412-6ca3-407a-b2a1-b18ab4c20714@lunn.ch>
+From: Tim Menninger <tmenninger@purestorage.com>
+Date: Mon, 22 Jan 2024 12:44:42 -0800
+Message-ID: <CAO-L_45iCb+TFMSqZJex-mZKfopBXxR=KH5aV4Wfx5eF5_N_8Q@mail.gmail.com>
+Subject: Re: [PATCH net v1] net: dsa: mv88e6xxx: Make unsupported C45 reads
+ return 0xffff
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev-maintainers <edumazet@google.com>, kuba@kernel.org, 
+	pabeni@redhat.com, davem@davemloft.net, netdev <netdev@vger.kernel.org>, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-We are missing a lot of config options from net selftests,
-it seems:
+On Mon, Jan 22, 2024 at 5:39=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Mon, Jan 22, 2024 at 02:24:57PM +0200, Vladimir Oltean wrote:
+> > Hi Andrew,
+> >
+> > On Sat, Jan 20, 2024 at 08:21:25PM +0100, Andrew Lunn wrote:
+> > > When there is no device on the bus for a given address, the pull up
+> > > resistor on the data line results in the read returning 0xffff. The
+> > > phylib core code understands this when scanning for devices on the
+> > > bus, and a number of MDIO bus masters make use of this as a way to
+> > > indicate they cannot perform the read.
+> > >
+> > > Make us of this as a minimal fix for stable where the mv88e6xxx
+> >
+> > s/us/use/
+> >
+> > Also, what is the "proper" fix if this is the minimal one for stable?
+>
+> Hi Vladimir
+>
+> I have a patchset for net-next, once it opens. I looked at how C22 and
+> C45 differ in handling error codes. C22 allows the MDIO bus driver to
+> return -ENODEV to indicate its impossible for a device to be at a
+> given address. The scan code then skips that address and continues to
+> the next address. Current C45 code would turn that -ENODEV into an
+> -EIO and consider it fatal. So i change the C45 code to allow for
+> -ENODEV in the same way, and change the mv88e6xxx driver to return
+> -ENODEV if there are is no C45 read op.
+>
+> Since making the handling of the error codes uniform is more than a
+> simple fix, i decided on a minimal fix for net.
+>
+> Thanks for the comments on the commit message, i will address them
+> soon.
+>
+>         Andrew
 
-tun/tap:     CONFIG_TUN, CONFIG_MACVLAN, CONFIG_MACVTAP
-fib_tests:   CONFIG_NET_SCH_FQ_CODEL
-l2tp:        CONFIG_L2TP, CONFIG_L2TP_V3, CONFIG_L2TP_IP, CONFIG_L2TP_ETH
-sctp-vrf:    CONFIG_INET_DIAG
-txtimestamp: CONFIG_NET_CLS_U32
-vxlan_mdb:   CONFIG_BRIDGE_VLAN_FILTERING
-gre_gso:     CONFIG_NET_IPGRE_DEMUX, CONFIG_IP_GRE, CONFIG_IPV6_GRE
-srv6_end_dt*_l3vpn:   CONFIG_IPV6_SEG6_LWTUNNEL
-ip_local_port_range:  CONFIG_MPTCP
-fib_test:    CONFIG_NET_CLS_BASIC
-rtnetlink:   CONFIG_MACSEC, CONFIG_NET_SCH_HTB, CONFIG_XFRM_INTERFACE
-             CONFIG_NET_IPGRE, CONFIG_BONDING
-fib_nexthops: CONFIG_MPLS, CONFIG_MPLS_ROUTING
-vxlan_mdb:   CONFIG_NET_ACT_GACT
-tls:         CONFIG_TLS, CONFIG_CRYPTO_CHACHA20POLY1305
-psample:     CONFIG_PSAMPLE
-fcnal:       CONFIG_TCP_MD5SIG
+I'm not sure I fully agree with returning 0xffff here, and especially not
+for just one of the four functions (reads and writes, c22 and c45). If the
+end goal is to unify error handling, what if we keep the return values as
+they are, i.e. continue to return -EOPNOTSUPP, and then in get_phy_c22_id
+and get_phy_c45_ids on error we do something like:
 
-Try to add them in a semi-alphabetical order.
+    return (phy_reg =3D=3D -EIO || phy_reg =3D=3D -ENODEV || phy_reg =3D=3D=
+ -EOPNOTSUPP)
+        ? -ENODEV : -EIO;
 
-Fixes: 62199e3f1658 ("selftests: net: Add VXLAN MDB test")
-Fixes: c12e0d5f267d ("self-tests: introduce self-tests for RPS default mask")
-Fixes: ae5439658cce ("selftests/net: Cover the IP_LOCAL_PORT_RANGE socket option")
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
---
-These are not all the options we're missing. Since the merge window
-is over I may not have the time to dig into it myself :(
+So the diff looks something like (just getting a point across, haven't
+tried or style checked this)
 
-Adding Fixes tag for 3 semi-random commits which I think missed things.
-The full list would be very long.
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 3611ea64875e..f21f07f33f06 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -758,12 +758,14 @@ static int get_phy_c45_devs_in_pkg(struct
+mii_bus *bus, int addr, int dev_addr,
 
-CC: shuah@kernel.org
-CC: razor@blackwall.org
-CC: idosch@nvidia.com
-CC: horms@kernel.org
-CC: jakub@cloudflare.com
-CC: kuniyu@amazon.com
-CC: linux-kselftest@vger.kernel.org
----
- tools/testing/selftests/net/config | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+        phy_reg =3D mdiobus_c45_read(bus, addr, dev_addr, MDIO_DEVS2);
+        if (phy_reg < 0)
+-               return -EIO;
++               return (phy_reg =3D=3D -EIO || phy_reg =3D=3D -ENODEV ||
+phy_reg =3D=3D -EOPNOTSUPP)
++                       ? -ENODEV : -EIO;
+        *devices_in_package =3D phy_reg << 16;
 
-diff --git a/tools/testing/selftests/net/config b/tools/testing/selftests/net/config
-index 8da562a9ae87..19ff75051660 100644
---- a/tools/testing/selftests/net/config
-+++ b/tools/testing/selftests/net/config
-@@ -1,5 +1,6 @@
- CONFIG_USER_NS=y
- CONFIG_NET_NS=y
-+CONFIG_BONDING=m
- CONFIG_BPF_SYSCALL=y
- CONFIG_TEST_BPF=m
- CONFIG_NUMA=y
-@@ -14,9 +15,13 @@ CONFIG_VETH=y
- CONFIG_NET_IPVTI=y
- CONFIG_IPV6_VTI=y
- CONFIG_DUMMY=y
-+CONFIG_BRIDGE_VLAN_FILTERING=y
- CONFIG_BRIDGE=y
-+CONFIG_CRYPTO_CHACHA20POLY1305=m
- CONFIG_VLAN_8021Q=y
- CONFIG_IFB=y
-+CONFIG_INET_DIAG=y
-+CONFIG_IP_GRE=m
- CONFIG_NETFILTER=y
- CONFIG_NETFILTER_ADVANCED=y
- CONFIG_NF_CONNTRACK=m
-@@ -25,15 +30,36 @@ CONFIG_IP6_NF_IPTABLES=m
- CONFIG_IP_NF_IPTABLES=m
- CONFIG_IP6_NF_NAT=m
- CONFIG_IP_NF_NAT=m
-+CONFIG_IPV6_GRE=m
-+CONFIG_IPV6_SEG6_LWTUNNEL=y
-+CONFIG_L2TP_ETH=m
-+CONFIG_L2TP_IP=m
-+CONFIG_L2TP=m
-+CONFIG_L2TP_V3=y
-+CONFIG_MACSEC=m
-+CONFIG_MACVLAN=y
-+CONFIG_MACVTAP=y
-+CONFIG_MPLS=y
-+CONFIG_MPTCP=y
- CONFIG_NF_TABLES=m
- CONFIG_NF_TABLES_IPV6=y
- CONFIG_NF_TABLES_IPV4=y
- CONFIG_NFT_NAT=m
-+CONFIG_NET_ACT_GACT=m
-+CONFIG_NET_CLS_BASIC=m
-+CONFIG_NET_CLS_U32=m
-+CONFIG_NET_IPGRE_DEMUX=m
-+CONFIG_NET_IPGRE=m
-+CONFIG_NET_SCH_FQ_CODEL=m
-+CONFIG_NET_SCH_HTB=m
- CONFIG_NET_SCH_FQ=m
- CONFIG_NET_SCH_ETF=m
- CONFIG_NET_SCH_NETEM=y
-+CONFIG_PSAMPLE=m
-+CONFIG_TCP_MD5SIG=y
- CONFIG_TEST_BLACKHOLE_DEV=m
- CONFIG_KALLSYMS=y
-+CONFIG_TLS=m
- CONFIG_TRACEPOINTS=y
- CONFIG_NET_DROP_MONITOR=m
- CONFIG_NETDEVSIM=m
-@@ -48,7 +74,9 @@ CONFIG_BAREUDP=m
- CONFIG_IPV6_IOAM6_LWTUNNEL=y
- CONFIG_CRYPTO_SM4_GENERIC=y
- CONFIG_AMT=m
-+CONFIG_TUN=y
- CONFIG_VXLAN=m
- CONFIG_IP_SCTP=m
- CONFIG_NETFILTER_XT_MATCH_POLICY=m
- CONFIG_CRYPTO_ARIA=y
-+CONFIG_XFRM_INTERFACE=m
--- 
-2.43.0
+        phy_reg =3D mdiobus_c45_read(bus, addr, dev_addr, MDIO_DEVS1);
+        if (phy_reg < 0)
+-               return -EIO;
++               return (phy_reg =3D=3D -EIO || phy_reg =3D=3D -ENODEV ||
+phy_reg =3D=3D -EOPNOTSUPP)
++                       ? -ENODEV : -EIO;
+        *devices_in_package |=3D phy_reg;
 
+        return 0;
+@@ -882,7 +884,8 @@ static int get_phy_c22_id(struct mii_bus *bus, int
+addr, u32 *phy_id)
+        phy_reg =3D mdiobus_read(bus, addr, MII_PHYSID1);
+        if (phy_reg < 0) {
+                /* returning -ENODEV doesn't stop bus scanning */
+-               return (phy_reg =3D=3D -EIO || phy_reg =3D=3D -ENODEV) ? -E=
+NODEV : -EIO;
++               return (phy_reg =3D=3D -EIO || phy_reg =3D=3D -ENODEV ||
+phy_reg =3D=3D -EOPNOTSUPP)
++                       ? -ENODEV : -EIO;
+        }
+
+        *phy_id =3D phy_reg << 16;
+@@ -891,7 +894,8 @@ static int get_phy_c22_id(struct mii_bus *bus, int
+addr, u32 *phy_id)
+        phy_reg =3D mdiobus_read(bus, addr, MII_PHYSID2);
+        if (phy_reg < 0) {
+                /* returning -ENODEV doesn't stop bus scanning */
+-               return (phy_reg =3D=3D -EIO || phy_reg =3D=3D -ENODEV) ? -E=
+NODEV : -EIO;
++               return (phy_reg =3D=3D -EIO || phy_reg =3D=3D -ENODEV ||
+phy_reg =3D=3D -EOPNOTSUPP)
++                       ? -ENODEV : -EIO;
+        }
+
+        *phy_id |=3D phy_reg;
+
+This might even resemble what you had in mind in your initial feedback...
+
+Tim
 
