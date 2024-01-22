@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-64774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11A4783715A
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:58:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02C8083715F
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:58:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 159ED1F2A003
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:58:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6ACBE285CE4
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:58:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 448C64F1F2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B3C94F1EF;
 	Mon, 22 Jan 2024 18:27:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="csPXcNEA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SH0nyJP4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D52624EB34
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 18:27:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CF5D4EB3F
+	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 18:27:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705948042; cv=none; b=pm/ZDkjruRu0oyPKLRjRL1F2+VGApD7rIYLoB6TPQW4wt+GOimu/6mAL0PNgcWHSGpwGtq9zLtpjzPLdcsnSISMTvn0MMl76kbOVPjBAZTCbDPkHsqmeC0SSlmLk7cRGi/TCIsxeNhV0NTwDZX9NPonHGqYMB3TtIeZZzyHhNZ4=
+	t=1705948042; cv=none; b=si7pg5SlErpQfUzEKvx7kwXDv6d/sXE0tCcGGMvWniRqF7OVQIoTCI0YHYySfkDQsr8Kvnp7fAF/yYIKBCYS9xajjm7b+YLaIikaTcc2SptgL6KiUEDcypmtpXjDq+g8npCgroII7frUgoMblFzabUdk9hr30O8aI3gvVw0zM+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1705948042; c=relaxed/simple;
-	bh=c637tod2X5oCr5L5H14vRRP9qp9Mxb34IFjEb1sNtS0=;
+	bh=JQtrOJwcOYER/NPvqtTcHz+T6P+35i6x0S4VO1eN4kc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=HraZ3d3UN/P46biKjJ0VrFqZr5OzKMO0hoy+x7WEAwDCxZTaZGeL9OS/q5nX9/NMZu56AuTmRNo3smkJ203oLrfz5Q0IDw4MJebNJxUraUqg3epfXO2q6vUUNYz1AIdwDq1Ff9IBt3H9GrtB+9vdekkaRmP3JwBmwqxvmyjAawo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--shailend.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=csPXcNEA; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=O7cPq3KscrhADrxpkNj0MIaeW8dH08Fp4firfP8W1vrzYytJ0iBsGtrXKbjONxw9hA6XeNzd8DhYJZo5IlGoy7/zx6EPAZXYIo3CXW3953KMi1cPb024rJASiftYSwdAfPUEe+JdUSJY2vrOiYxB+QDqGIUni7gHWSncY2CmIwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--shailend.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SH0nyJP4; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--shailend.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc26605c273so5132730276.0
-        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 10:27:18 -0800 (PST)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5ffa9b3659cso36790777b3.1
+        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 10:27:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1705948038; x=1706552838; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1705948039; x=1706552839; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ldJ7zfylBUKegiJSiQoeJpoPmabB3Vg1EhaFutzLsoY=;
-        b=csPXcNEAavC4rIJER7zZs3gcofznsKyv71n9dQS9IEHsGzexq5A52nGH/g6p6UolPE
-         NQ+U2U8PQU+Y3nt9P718cXzvWD0W6t6/FksSemP5WzK+UzAFb5GcmNGjznby2eaJFIiX
-         4QLFYAZZ93pquT66rQQ+CHYj6QRjISLDysIvdZvkPjy3MqnzUHYt9VCF6tfDI8BNX1uM
-         2y0LD3mEqq+9F9DimOVUMWPVmLPHrMCuJksV/KVtQ0NIXPAshuw7DtpSYMoZnZVZlKc3
-         vPmDhirdrVq15rXvaAGSQp4gdjzCGrCGf8oX9IHJ3Xf6vs5tnoGaA3XhB3O7kdLnqch1
-         EBTA==
+        bh=9YHpQmPN0D7ujtn/xUcQd/74Nin1ta+g/9SKfN+rq9U=;
+        b=SH0nyJP4lyVKklK5qMVJWxNaQYdj9LLYfMo+WcJAO1BvyuXbUqBH9togLTvpHfVA4J
+         I3lsVCnnHDAGR7P+NQeLQLhbbdU1XqXfHBciD45//DsfbiOjvaxx/AbjuKftY/Di9flt
+         fn+DQQrjn9FaT6MrOpTix+bOp/Hs3VVwjTtm0EH+H7Ue4ThF+CytilZ8mNeAK0GQbj5b
+         VAb8BRBZDnUebvRIcYJ3zFYacGBiaRRDnObqBFi+IzQg+yR15USI0rRhmTj5/GhtHC5w
+         WxNOjy/XL7rtEtqonLL1NffasiWtsxBmKgP2y9WeFSIQYxUxPa3aIgOjiK78H7YEfY26
+         VfLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705948038; x=1706552838;
+        d=1e100.net; s=20230601; t=1705948039; x=1706552839;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ldJ7zfylBUKegiJSiQoeJpoPmabB3Vg1EhaFutzLsoY=;
-        b=R0GjzXv1rCTvHd02nKByhuFlQPq5CACPZnhRKijFmUP/UYHqD8v6ZIONy01SaT9qMT
-         XLFk1cXV7n/ob7a9PqCBojvwN7mnfSluE5AiQAmzmaKyYQzl+WpQSPcajD8HugjRTqYE
-         8WY7+o1jCO/bOjFbcBtozUSF4HMMlW/gYuJ0gaIW3xkUKZoUpH6IhKdUr+W+1gFroD5V
-         0vhKk448fMyIieh6CNHQ0XAqzqjs7IgRTd+sAJ1TEp+IuJnw+mr2CtnSh89m3MX3UQLr
-         nN/8dbhqFXTpOGSpfc6cSRTN4Iq3ArJ+FO3pn6CQAp7EJLm70Ic+SA+x5awKN6ODCPx+
-         9F5g==
-X-Gm-Message-State: AOJu0YzqVq7jDufbF7LEnExQpUgm0vxI7DbytnBXOlfnSb7GBLBonyxJ
-	/21eT6fPm3YeojOkc/zzH6ZT/PvBvf/iV5iYfZS5dAUymlkwzsFwt2yKDr4t6zaC4+WI5ZAQy+1
-	57X8rRinldRzOV2Zd6exum9+UNwT7jm5w+70jVPNVic8NDrrRp7/4ogJ9SMI9na4yyHfuLxTCp+
-	pq0NUczBxct3ZybGWDVn1MVT8hEJB8lvgPfeKXfvKFiL0=
-X-Google-Smtp-Source: AGHT+IEdXJdX9GuuHnocjkE3zoazQe6t5JU6umF/ybXrIoDa1ZryyTCpA72iy4RygAsRxuMO4tIjUYwoNTEnrQ==
+        bh=9YHpQmPN0D7ujtn/xUcQd/74Nin1ta+g/9SKfN+rq9U=;
+        b=R6bXnk7SWJyCqDNbrnYzWEgnJeO0yu48IY9WSADGJXBI6SgqFMqR2CJcn5wLmudRn2
+         IhHRc73Kueh3vwxB9IKi7Tff+R8W3GqFL4iU1cLGNFRm3V45zQVOJa8xW9+EZFeXWSNy
+         Yz6Y7vTzbrya5welRbCribzmK3PscrCHIWWBlE6xRUDcHZ5FDOGGRQkTT44z+P4EbP/b
+         q5FlLt4JFNKvHfsGE5G4+YUmLNZELf8BNxqn+7qs8tF1E49RyF1ZkGoen1Bx2QWgV67n
+         minMSqsUDs1yVBZvma0RESfPPIAzdU7ImIsW5GFsyVxCmx9wfeAoV2kb+46+VmpUKFNZ
+         Pnww==
+X-Gm-Message-State: AOJu0Ywy9MXONN78ZYv32meLepAuVpcoFhsENgoj6HEfdAK47zTiQgQ1
+	7REg9Kjk/ZAcN9OSXZ75uVwDmX7eOK/uplQO4iJnI62ePJXjI1dWxnIOGWx0NScra4Fs6TxW6lL
+	XH+JdO7gtEURBGZm4zy3Z5WPnv1u6wVIRNVOc8/9zEsg45EFG7Y/haGWUe5Sj4MMbIPWnLdbRMo
+	SylkFjcPbUcTXDLSDZm27BRFfdW7LEQO8MqPjOW4ookOg=
+X-Google-Smtp-Source: AGHT+IEwWQeVz10rV54WnVJ4ONOHkWStZQKhnJELZVKnzZLJv1sEsyCqAogYrp6imk8tLjtUshiLncXuIQvTqQ==
 X-Received: from shailendkvm.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:2648])
- (user=shailend job=sendgmr) by 2002:a25:d60b:0:b0:dc2:2af6:6ace with SMTP id
- n11-20020a25d60b000000b00dc22af66acemr2162622ybg.3.1705948037879; Mon, 22 Jan
- 2024 10:27:17 -0800 (PST)
-Date: Mon, 22 Jan 2024 18:26:29 +0000
+ (user=shailend job=sendgmr) by 2002:a5b:a4a:0:b0:dc2:2ab7:5f09 with SMTP id
+ z10-20020a5b0a4a000000b00dc22ab75f09mr2171455ybq.2.1705948039468; Mon, 22 Jan
+ 2024 10:27:19 -0800 (PST)
+Date: Mon, 22 Jan 2024 18:26:30 +0000
 In-Reply-To: <20240122182632.1102721-1-shailend@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,2010 +74,258 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240122182632.1102721-1-shailend@google.com>
 X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
-Message-ID: <20240122182632.1102721-4-shailend@google.com>
-Subject: [PATCH net-next 3/6] gve: Switch to config-aware queue allocation
+Message-ID: <20240122182632.1102721-5-shailend@google.com>
+Subject: [PATCH net-next 4/6] gve: Refactor gve_open and gve_close
 From: Shailend Chand <shailend@google.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net, kuba@kernel.org, Shailend Chand <shailend@google.com>, 
 	Willem de Bruijn <willemb@google.com>, Jeroen de Borst <jeroendb@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-The new config-aware functions will help achieve the goal of being able
-to allocate resources for new queues while there already are active
-queues serving traffic.
+gve_open is rewritten to be composed of two funcs: gve_queues_mem_alloc
+and gve_queues_start. The former only allocates queue resources without
+doing anything to install the queues, which is taken up by the latter.
+Similarly gve_close is split into gve_queues_stop and
+gve_queues_mem_free.
 
-These new functions work off of arbitrary queue allocation configs
-rather than just the currently active config in priv, and they return
-the newly allocated resources instead of writing them into priv.
+Separating the acts of queue resource allocation and making the queue
+become live help with subsequent changes that aim to not take down the
+datapath when applying new configurations.
 
 Signed-off-by: Shailend Chand <shailend@google.com>
 Reviewed-by: Willem de Bruijn <willemb@google.com>
 Reviewed-by: Jeroen de Borst <jeroendb@google.com>
 ---
- drivers/net/ethernet/google/gve/gve.h        |  92 +--
- drivers/net/ethernet/google/gve/gve_dqo.h    |  16 +-
- drivers/net/ethernet/google/gve/gve_main.c   | 601 +++++++++++--------
- drivers/net/ethernet/google/gve/gve_rx.c     | 116 ++--
- drivers/net/ethernet/google/gve/gve_rx_dqo.c |  91 ++-
- drivers/net/ethernet/google/gve/gve_tx.c     | 128 ++--
- drivers/net/ethernet/google/gve/gve_tx_dqo.c | 108 +++-
- drivers/net/ethernet/google/gve/gve_utils.c  |  16 +
- drivers/net/ethernet/google/gve/gve_utils.h  |   2 +
- 9 files changed, 745 insertions(+), 425 deletions(-)
+ drivers/net/ethernet/google/gve/gve_main.c | 159 +++++++++++++++------
+ 1 file changed, 119 insertions(+), 40 deletions(-)
 
-diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
-index ba6819ac600e..fd290f3ad6ec 100644
---- a/drivers/net/ethernet/google/gve/gve.h
-+++ b/drivers/net/ethernet/google/gve/gve.h
-@@ -966,14 +966,14 @@ static inline bool gve_is_qpl(struct gve_priv *priv)
- 		priv->queue_format == GVE_DQO_QPL_FORMAT;
- }
- 
--/* Returns the number of tx queue page lists
-- */
--static inline u32 gve_num_tx_qpls(struct gve_priv *priv)
-+/* Returns the number of tx queue page lists */
-+static inline u32 gve_num_tx_qpls(const struct gve_queue_config *tx_cfg,
-+				  int num_xdp_queues,
-+				  bool is_qpl)
- {
--	if (!gve_is_qpl(priv))
-+	if (!is_qpl)
- 		return 0;
--
--	return priv->tx_cfg.num_queues + priv->num_xdp_queues;
-+	return tx_cfg->num_queues + num_xdp_queues;
- }
- 
- /* Returns the number of XDP tx queue page lists
-@@ -986,14 +986,13 @@ static inline u32 gve_num_xdp_qpls(struct gve_priv *priv)
- 	return priv->num_xdp_queues;
- }
- 
--/* Returns the number of rx queue page lists
-- */
--static inline u32 gve_num_rx_qpls(struct gve_priv *priv)
-+/* Returns the number of rx queue page lists */
-+static inline u32 gve_num_rx_qpls(const struct gve_queue_config *rx_cfg,
-+				  bool is_qpl)
- {
--	if (!gve_is_qpl(priv))
-+	if (!is_qpl)
- 		return 0;
--
--	return priv->rx_cfg.num_queues;
-+	return rx_cfg->num_queues;
- }
- 
- static inline u32 gve_tx_qpl_id(struct gve_priv *priv, int tx_qid)
-@@ -1006,59 +1005,59 @@ static inline u32 gve_rx_qpl_id(struct gve_priv *priv, int rx_qid)
- 	return priv->tx_cfg.max_queues + rx_qid;
- }
- 
-+/* Returns the index into priv->qpls where a certain rx queue's QPL resides */
-+static inline u32 gve_get_rx_qpl_id(const struct gve_queue_config *tx_cfg, int rx_qid)
-+{
-+	return tx_cfg->max_queues + rx_qid;
-+}
-+
- static inline u32 gve_tx_start_qpl_id(struct gve_priv *priv)
- {
- 	return gve_tx_qpl_id(priv, 0);
- }
- 
--static inline u32 gve_rx_start_qpl_id(struct gve_priv *priv)
-+/* Returns the index into priv->qpls where the first rx queue's QPL resides */
-+static inline u32 gve_rx_start_qpl_id(const struct gve_queue_config *tx_cfg)
- {
--	return gve_rx_qpl_id(priv, 0);
-+	return gve_get_rx_qpl_id(tx_cfg, 0);
- }
- 
--/* Returns a pointer to the next available tx qpl in the list of qpls
-- */
-+/* Returns a pointer to the next available tx qpl in the list of qpls */
- static inline
--struct gve_queue_page_list *gve_assign_tx_qpl(struct gve_priv *priv, int tx_qid)
-+struct gve_queue_page_list *gve_assign_tx_qpl(struct gve_tx_alloc_rings_cfg *cfg,
-+					      int tx_qid)
- {
--	int id = gve_tx_qpl_id(priv, tx_qid);
--
- 	/* QPL already in use */
--	if (test_bit(id, priv->qpl_cfg.qpl_id_map))
-+	if (test_bit(tx_qid, cfg->qpl_cfg->qpl_id_map))
- 		return NULL;
--
--	set_bit(id, priv->qpl_cfg.qpl_id_map);
--	return &priv->qpls[id];
-+	set_bit(tx_qid, cfg->qpl_cfg->qpl_id_map);
-+	return &cfg->qpls[tx_qid];
- }
- 
--/* Returns a pointer to the next available rx qpl in the list of qpls
-- */
-+/* Returns a pointer to the next available rx qpl in the list of qpls */
- static inline
--struct gve_queue_page_list *gve_assign_rx_qpl(struct gve_priv *priv, int rx_qid)
-+struct gve_queue_page_list *gve_assign_rx_qpl(struct gve_rx_alloc_rings_cfg *cfg,
-+					      int rx_qid)
- {
--	int id = gve_rx_qpl_id(priv, rx_qid);
--
-+	int id = gve_get_rx_qpl_id(cfg->qcfg_tx, rx_qid);
- 	/* QPL already in use */
--	if (test_bit(id, priv->qpl_cfg.qpl_id_map))
-+	if (test_bit(id, cfg->qpl_cfg->qpl_id_map))
- 		return NULL;
--
--	set_bit(id, priv->qpl_cfg.qpl_id_map);
--	return &priv->qpls[id];
-+	set_bit(id, cfg->qpl_cfg->qpl_id_map);
-+	return &cfg->qpls[id];
- }
- 
--/* Unassigns the qpl with the given id
-- */
--static inline void gve_unassign_qpl(struct gve_priv *priv, int id)
-+/* Unassigns the qpl with the given id */
-+static inline void gve_unassign_qpl(struct gve_qpl_config *qpl_cfg, int id)
- {
--	clear_bit(id, priv->qpl_cfg.qpl_id_map);
-+	clear_bit(id, qpl_cfg->qpl_id_map);
- }
- 
--/* Returns the correct dma direction for tx and rx qpls
-- */
-+/* Returns the correct dma direction for tx and rx qpls */
- static inline enum dma_data_direction gve_qpl_dma_dir(struct gve_priv *priv,
- 						      int id)
- {
--	if (id < gve_rx_start_qpl_id(priv))
-+	if (id < gve_rx_start_qpl_id(&priv->tx_cfg))
- 		return DMA_TO_DEVICE;
- 	else
- 		return DMA_FROM_DEVICE;
-@@ -1103,8 +1102,12 @@ int gve_xdp_xmit_one(struct gve_priv *priv, struct gve_tx_ring *tx,
- void gve_xdp_tx_flush(struct gve_priv *priv, u32 xdp_qid);
- bool gve_tx_poll(struct gve_notify_block *block, int budget);
- bool gve_xdp_poll(struct gve_notify_block *block, int budget);
--int gve_tx_alloc_rings(struct gve_priv *priv, int start_id, int num_rings);
--void gve_tx_free_rings_gqi(struct gve_priv *priv, int start_id, int num_rings);
-+int gve_tx_alloc_rings_gqi(struct gve_priv *priv,
-+			   struct gve_tx_alloc_rings_cfg *cfg);
-+void gve_tx_free_rings_gqi(struct gve_priv *priv,
-+			   struct gve_tx_alloc_rings_cfg *cfg);
-+void gve_tx_start_ring_gqi(struct gve_priv *priv, int idx);
-+void gve_tx_stop_ring_gqi(struct gve_priv *priv, int idx);
- u32 gve_tx_load_event_counter(struct gve_priv *priv,
- 			      struct gve_tx_ring *tx);
- bool gve_tx_clean_pending(struct gve_priv *priv, struct gve_tx_ring *tx);
-@@ -1113,7 +1116,12 @@ void gve_rx_write_doorbell(struct gve_priv *priv, struct gve_rx_ring *rx);
- int gve_rx_poll(struct gve_notify_block *block, int budget);
- bool gve_rx_work_pending(struct gve_rx_ring *rx);
- int gve_rx_alloc_rings(struct gve_priv *priv);
--void gve_rx_free_rings_gqi(struct gve_priv *priv);
-+int gve_rx_alloc_rings_gqi(struct gve_priv *priv,
-+			   struct gve_rx_alloc_rings_cfg *cfg);
-+void gve_rx_free_rings_gqi(struct gve_priv *priv,
-+			   struct gve_rx_alloc_rings_cfg *cfg);
-+void gve_rx_start_ring_gqi(struct gve_priv *priv, int idx);
-+void gve_rx_stop_ring_gqi(struct gve_priv *priv, int idx);
- /* Reset */
- void gve_schedule_reset(struct gve_priv *priv);
- int gve_reset(struct gve_priv *priv, bool attempt_teardown);
-diff --git a/drivers/net/ethernet/google/gve/gve_dqo.h b/drivers/net/ethernet/google/gve/gve_dqo.h
-index 8058b09f8e3e..b81584829c40 100644
---- a/drivers/net/ethernet/google/gve/gve_dqo.h
-+++ b/drivers/net/ethernet/google/gve/gve_dqo.h
-@@ -38,10 +38,18 @@ netdev_features_t gve_features_check_dqo(struct sk_buff *skb,
- 					 netdev_features_t features);
- bool gve_tx_poll_dqo(struct gve_notify_block *block, bool do_clean);
- int gve_rx_poll_dqo(struct gve_notify_block *block, int budget);
--int gve_tx_alloc_rings_dqo(struct gve_priv *priv);
--void gve_tx_free_rings_dqo(struct gve_priv *priv);
--int gve_rx_alloc_rings_dqo(struct gve_priv *priv);
--void gve_rx_free_rings_dqo(struct gve_priv *priv);
-+int gve_tx_alloc_rings_dqo(struct gve_priv *priv,
-+			   struct gve_tx_alloc_rings_cfg *cfg);
-+void gve_tx_free_rings_dqo(struct gve_priv *priv,
-+			   struct gve_tx_alloc_rings_cfg *cfg);
-+void gve_tx_start_ring_dqo(struct gve_priv *priv, int idx);
-+void gve_tx_stop_ring_dqo(struct gve_priv *priv, int idx);
-+int gve_rx_alloc_rings_dqo(struct gve_priv *priv,
-+			   struct gve_rx_alloc_rings_cfg *cfg);
-+void gve_rx_free_rings_dqo(struct gve_priv *priv,
-+			   struct gve_rx_alloc_rings_cfg *cfg);
-+void gve_rx_start_ring_dqo(struct gve_priv *priv, int idx);
-+void gve_rx_stop_ring_dqo(struct gve_priv *priv, int idx);
- int gve_clean_tx_done_dqo(struct gve_priv *priv, struct gve_tx_ring *tx,
- 			  struct napi_struct *napi);
- void gve_rx_post_buffers_dqo(struct gve_rx_ring *rx);
 diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
-index e07048cd249e..8049a47c38fc 100644
+index 8049a47c38fc..3515484e4cea 100644
 --- a/drivers/net/ethernet/google/gve/gve_main.c
 +++ b/drivers/net/ethernet/google/gve/gve_main.c
-@@ -582,61 +582,102 @@ static void gve_teardown_device_resources(struct gve_priv *priv)
- 	gve_clear_device_resources_ok(priv);
+@@ -1350,45 +1350,99 @@ static void gve_rx_stop_rings(struct gve_priv *priv, int num_rings)
+ 	}
  }
  
-+static int gve_unregister_qpl(struct gve_priv *priv, u32 i)
+-static int gve_open(struct net_device *dev)
++static void gve_queues_mem_free(struct gve_priv *priv,
++				struct gve_qpls_alloc_cfg *qpls_alloc_cfg,
++				struct gve_tx_alloc_rings_cfg *tx_alloc_cfg,
++				struct gve_rx_alloc_rings_cfg *rx_alloc_cfg)
++{
++	gve_free_rings(priv, tx_alloc_cfg, rx_alloc_cfg);
++	gve_free_qpls(priv, qpls_alloc_cfg);
++}
++
++static int gve_queues_mem_alloc(struct gve_priv *priv,
++				struct gve_qpls_alloc_cfg *qpls_alloc_cfg,
++				struct gve_tx_alloc_rings_cfg *tx_alloc_cfg,
++				struct gve_rx_alloc_rings_cfg *rx_alloc_cfg)
 +{
 +	int err;
 +
-+	err = gve_adminq_unregister_page_list(priv, priv->qpls[i].id);
++	err = gve_alloc_qpls(priv, qpls_alloc_cfg);
 +	if (err) {
-+		netif_err(priv, drv, priv->dev,
-+			  "Failed to unregister queue page list %d\n",
-+			  priv->qpls[i].id);
++		netif_err(priv, drv, priv->dev, "Failed to alloc QPLs\n");
 +		return err;
 +	}
-+
-+	priv->num_registered_pages -= priv->qpls[i].num_entries;
-+	return 0;
-+}
-+
-+static int gve_register_qpl(struct gve_priv *priv, u32 i)
-+{
-+	int num_rx_qpls;
-+	int pages;
-+	int err;
-+
-+	/* Rx QPLs succeed Tx QPLs in the priv->qpls array. */
-+	num_rx_qpls = gve_num_rx_qpls(&priv->rx_cfg, gve_is_qpl(priv));
-+	if (i >= gve_rx_start_qpl_id(&priv->tx_cfg) + num_rx_qpls) {
-+		netif_err(priv, drv, priv->dev,
-+			  "Cannot register nonexisting QPL at index %d\n", i);
-+		return -EINVAL;
-+	}
-+
-+	pages = priv->qpls[i].num_entries;
-+
-+	if (pages + priv->num_registered_pages > priv->max_registered_pages) {
-+		netif_err(priv, drv, priv->dev,
-+			  "Reached max number of registered pages %llu > %llu\n",
-+			  pages + priv->num_registered_pages,
-+			  priv->max_registered_pages);
-+		return -EINVAL;
-+	}
-+
-+	err = gve_adminq_register_page_list(priv, &priv->qpls[i]);
++	tx_alloc_cfg->qpls = qpls_alloc_cfg->qpls;
++	rx_alloc_cfg->qpls = qpls_alloc_cfg->qpls;
++	err = gve_alloc_rings(priv, tx_alloc_cfg, rx_alloc_cfg);
 +	if (err) {
-+		netif_err(priv, drv, priv->dev,
-+			  "failed to register queue page list %d\n",
-+			  priv->qpls[i].id);
-+		/* This failure will trigger a reset - no need to clean
-+		 * up
-+		 */
-+		return err;
++		netif_err(priv, drv, priv->dev, "Failed to alloc rings\n");
++		goto free_qpls;
 +	}
 +
-+	priv->num_registered_pages += pages;
 +	return 0;
++
++free_qpls:
++	gve_free_qpls(priv, qpls_alloc_cfg);
++	return err;
 +}
 +
- static int gve_register_xdp_qpls(struct gve_priv *priv)
++static void gve_queues_mem_remove(struct gve_priv *priv)
  {
- 	int start_id;
- 	int err;
- 	int i;
- 
--	start_id = gve_tx_qpl_id(priv, gve_xdp_tx_start_queue_id(priv));
-+	start_id = gve_xdp_tx_start_queue_id(priv);
- 	for (i = start_id; i < start_id + gve_num_xdp_qpls(priv); i++) {
--		err = gve_adminq_register_page_list(priv, &priv->qpls[i]);
--		if (err) {
--			netif_err(priv, drv, priv->dev,
--				  "failed to register queue page list %d\n",
--				  priv->qpls[i].id);
--			/* This failure will trigger a reset - no need to clean
--			 * up
--			 */
-+		err = gve_register_qpl(priv, i);
-+		/* This failure will trigger a reset - no need to clean up */
-+		if (err)
- 			return err;
--		}
- 	}
- 	return 0;
- }
- 
- static int gve_register_qpls(struct gve_priv *priv)
- {
-+	int num_tx_qpls, num_rx_qpls;
- 	int start_id;
- 	int err;
- 	int i;
- 
--	start_id = gve_tx_start_qpl_id(priv);
--	for (i = start_id; i < start_id + gve_num_tx_qpls(priv); i++) {
--		err = gve_adminq_register_page_list(priv, &priv->qpls[i]);
--		if (err) {
--			netif_err(priv, drv, priv->dev,
--				  "failed to register queue page list %d\n",
--				  priv->qpls[i].id);
--			/* This failure will trigger a reset - no need to clean
--			 * up
--			 */
-+	num_tx_qpls = gve_num_tx_qpls(&priv->tx_cfg, gve_num_xdp_qpls(priv),
-+				      gve_is_qpl(priv));
-+	num_rx_qpls = gve_num_rx_qpls(&priv->rx_cfg, gve_is_qpl(priv));
+ 	struct gve_tx_alloc_rings_cfg tx_alloc_cfg = {0};
+ 	struct gve_rx_alloc_rings_cfg rx_alloc_cfg = {0};
+ 	struct gve_qpls_alloc_cfg qpls_alloc_cfg = {0};
+-	struct gve_priv *priv = netdev_priv(dev);
 +
-+	for (i = 0; i < num_tx_qpls; i++) {
-+		err = gve_register_qpl(priv, i);
-+		if (err)
- 			return err;
--		}
- 	}
- 
--	start_id = gve_rx_start_qpl_id(priv);
--	for (i = start_id; i < start_id + gve_num_rx_qpls(priv); i++) {
--		err = gve_adminq_register_page_list(priv, &priv->qpls[i]);
--		if (err) {
--			netif_err(priv, drv, priv->dev,
--				  "failed to register queue page list %d\n",
--				  priv->qpls[i].id);
--			/* This failure will trigger a reset - no need to clean
--			 * up
--			 */
-+	/* there might be a gap between the tx and rx qpl ids */
-+	start_id = gve_rx_start_qpl_id(&priv->tx_cfg);
-+	for (i = 0; i < num_rx_qpls; i++) {
-+		err = gve_register_qpl(priv, start_id + i);
-+		if (err)
- 			return err;
--		}
- 	}
-+
- 	return 0;
- }
- 
-@@ -646,48 +687,40 @@ static int gve_unregister_xdp_qpls(struct gve_priv *priv)
- 	int err;
- 	int i;
- 
--	start_id = gve_tx_qpl_id(priv, gve_xdp_tx_start_queue_id(priv));
-+	start_id = gve_xdp_tx_start_queue_id(priv);
- 	for (i = start_id; i < start_id + gve_num_xdp_qpls(priv); i++) {
--		err = gve_adminq_unregister_page_list(priv, priv->qpls[i].id);
--		/* This failure will trigger a reset - no need to clean up */
--		if (err) {
--			netif_err(priv, drv, priv->dev,
--				  "Failed to unregister queue page list %d\n",
--				  priv->qpls[i].id);
-+		err = gve_unregister_qpl(priv, i);
-+		/* This failure will trigger a reset - no need to clean */
-+		if (err)
- 			return err;
--		}
- 	}
- 	return 0;
- }
- 
- static int gve_unregister_qpls(struct gve_priv *priv)
- {
-+	int num_tx_qpls, num_rx_qpls;
- 	int start_id;
- 	int err;
- 	int i;
- 
--	start_id = gve_tx_start_qpl_id(priv);
--	for (i = start_id; i < start_id + gve_num_tx_qpls(priv); i++) {
--		err = gve_adminq_unregister_page_list(priv, priv->qpls[i].id);
--		/* This failure will trigger a reset - no need to clean up */
--		if (err) {
--			netif_err(priv, drv, priv->dev,
--				  "Failed to unregister queue page list %d\n",
--				  priv->qpls[i].id);
-+	num_tx_qpls = gve_num_tx_qpls(&priv->tx_cfg, gve_num_xdp_qpls(priv),
-+				      gve_is_qpl(priv));
-+	num_rx_qpls = gve_num_rx_qpls(&priv->rx_cfg, gve_is_qpl(priv));
-+
-+	for (i = 0; i < num_tx_qpls; i++) {
-+		err = gve_unregister_qpl(priv, i);
-+		/* This failure will trigger a reset - no need to clean */
-+		if (err)
- 			return err;
--		}
- 	}
- 
--	start_id = gve_rx_start_qpl_id(priv);
--	for (i = start_id; i < start_id + gve_num_rx_qpls(priv); i++) {
--		err = gve_adminq_unregister_page_list(priv, priv->qpls[i].id);
--		/* This failure will trigger a reset - no need to clean up */
--		if (err) {
--			netif_err(priv, drv, priv->dev,
--				  "Failed to unregister queue page list %d\n",
--				  priv->qpls[i].id);
-+	start_id = gve_rx_start_qpl_id(&priv->tx_cfg);
-+	for (i = 0; i < num_rx_qpls; i++) {
-+		err = gve_unregister_qpl(priv, start_id + i);
-+		/* This failure will trigger a reset - no need to clean */
-+		if (err)
- 			return err;
--		}
- 	}
- 	return 0;
- }
-@@ -762,120 +795,124 @@ static int gve_create_rings(struct gve_priv *priv)
- 	return 0;
- }
- 
--static void add_napi_init_xdp_sync_stats(struct gve_priv *priv,
--					 int (*napi_poll)(struct napi_struct *napi,
--							  int budget))
-+static void init_xdp_sync_stats(struct gve_priv *priv)
- {
- 	int start_id = gve_xdp_tx_start_queue_id(priv);
- 	int i;
- 
--	/* Add xdp tx napi & init sync stats*/
-+	/* Init stats */
- 	for (i = start_id; i < start_id + priv->num_xdp_queues; i++) {
- 		int ntfy_idx = gve_tx_idx_to_ntfy(priv, i);
- 
- 		u64_stats_init(&priv->tx[i].statss);
- 		priv->tx[i].ntfy_id = ntfy_idx;
--		gve_add_napi(priv, ntfy_idx, napi_poll);
- 	}
- }
- 
--static void add_napi_init_sync_stats(struct gve_priv *priv,
--				     int (*napi_poll)(struct napi_struct *napi,
--						      int budget))
-+static void gve_init_sync_stats(struct gve_priv *priv)
- {
- 	int i;
- 
--	/* Add tx napi & init sync stats*/
--	for (i = 0; i < gve_num_tx_queues(priv); i++) {
--		int ntfy_idx = gve_tx_idx_to_ntfy(priv, i);
--
-+	for (i = 0; i < priv->tx_cfg.num_queues; i++)
- 		u64_stats_init(&priv->tx[i].statss);
--		priv->tx[i].ntfy_id = ntfy_idx;
--		gve_add_napi(priv, ntfy_idx, napi_poll);
--	}
--	/* Add rx napi  & init sync stats*/
--	for (i = 0; i < priv->rx_cfg.num_queues; i++) {
--		int ntfy_idx = gve_rx_idx_to_ntfy(priv, i);
- 
-+	/* Init stats for XDP TX queues */
-+	init_xdp_sync_stats(priv);
-+
-+	for (i = 0; i < priv->rx_cfg.num_queues; i++)
- 		u64_stats_init(&priv->rx[i].statss);
--		priv->rx[i].ntfy_id = ntfy_idx;
--		gve_add_napi(priv, ntfy_idx, napi_poll);
++	gve_get_curr_alloc_cfgs(priv, &qpls_alloc_cfg,
++				&tx_alloc_cfg, &rx_alloc_cfg);
++	gve_queues_mem_free(priv, &qpls_alloc_cfg,
++			    &tx_alloc_cfg, &rx_alloc_cfg);
++	priv->qpls = NULL;
++	priv->tx = NULL;
++	priv->rx = NULL;
 +}
 +
-+static void gve_tx_get_curr_alloc_cfg(struct gve_priv *priv,
-+				      struct gve_tx_alloc_rings_cfg *cfg)
++/* The passed-in queue memory is stored into priv and the queues are made live.
++ * No memory is allocated. Passed-in memory is freed on errors.
++ */
++static int gve_queues_start(struct gve_priv *priv,
++			    struct gve_qpls_alloc_cfg *qpls_alloc_cfg,
++			    struct gve_tx_alloc_rings_cfg *tx_alloc_cfg,
++			    struct gve_rx_alloc_rings_cfg *rx_alloc_cfg)
 +{
-+	cfg->qcfg = &priv->tx_cfg;
-+	cfg->raw_addressing = !gve_is_qpl(priv);
-+	cfg->qpls = priv->qpls;
-+	cfg->qpl_cfg = &priv->qpl_cfg;
-+	cfg->ring_size = priv->tx_desc_cnt;
-+	cfg->start_idx = 0;
-+	cfg->num_rings = gve_num_tx_queues(priv);
-+	cfg->tx = priv->tx;
-+}
-+
-+static void gve_tx_stop_rings(struct gve_priv *priv, int start_id, int num_rings)
-+{
-+	int i;
-+
-+	if (!priv->tx)
-+		return;
-+
-+	for (i = start_id; i < start_id + num_rings; i++) {
-+		if (gve_is_gqi(priv))
-+			gve_tx_stop_ring_gqi(priv, i);
-+		else
-+			gve_tx_stop_ring_dqo(priv, i);
- 	}
- }
- 
--static void gve_tx_free_rings(struct gve_priv *priv, int start_id, int num_rings)
-+static void gve_tx_start_rings(struct gve_priv *priv, int start_id,
-+			       int num_rings)
- {
--	if (gve_is_gqi(priv)) {
--		gve_tx_free_rings_gqi(priv, start_id, num_rings);
--	} else {
--		gve_tx_free_rings_dqo(priv);
-+	int i;
-+
-+	for (i = start_id; i < start_id + num_rings; i++) {
-+		if (gve_is_gqi(priv))
-+			gve_tx_start_ring_gqi(priv, i);
-+		else
-+			gve_tx_start_ring_dqo(priv, i);
- 	}
- }
- 
- static int gve_alloc_xdp_rings(struct gve_priv *priv)
- {
--	int start_id;
-+	struct gve_tx_alloc_rings_cfg cfg = {0};
- 	int err = 0;
- 
- 	if (!priv->num_xdp_queues)
- 		return 0;
- 
--	start_id = gve_xdp_tx_start_queue_id(priv);
--	err = gve_tx_alloc_rings(priv, start_id, priv->num_xdp_queues);
-+	gve_tx_get_curr_alloc_cfg(priv, &cfg);
-+	cfg.start_idx = gve_xdp_tx_start_queue_id(priv);
-+	cfg.num_rings = priv->num_xdp_queues;
-+
-+	err = gve_tx_alloc_rings_gqi(priv, &cfg);
- 	if (err)
- 		return err;
--	add_napi_init_xdp_sync_stats(priv, gve_napi_poll);
-+
-+	gve_tx_start_rings(priv, cfg.start_idx, cfg.num_rings);
-+	init_xdp_sync_stats(priv);
- 
- 	return 0;
- }
- 
--static int gve_alloc_rings(struct gve_priv *priv)
-+static int gve_alloc_rings(struct gve_priv *priv,
-+			   struct gve_tx_alloc_rings_cfg *tx_alloc_cfg,
-+			   struct gve_rx_alloc_rings_cfg *rx_alloc_cfg)
- {
++	struct net_device *dev = priv->dev;
  	int err;
  
--	/* Setup tx rings */
--	priv->tx = kvcalloc(priv->tx_cfg.max_queues, sizeof(*priv->tx),
--			    GFP_KERNEL);
--	if (!priv->tx)
--		return -ENOMEM;
--
- 	if (gve_is_gqi(priv))
--		err = gve_tx_alloc_rings(priv, 0, gve_num_tx_queues(priv));
-+		err = gve_tx_alloc_rings_gqi(priv, tx_alloc_cfg);
- 	else
--		err = gve_tx_alloc_rings_dqo(priv);
-+		err = gve_tx_alloc_rings_dqo(priv, tx_alloc_cfg);
- 	if (err)
--		goto free_tx;
--
--	/* Setup rx rings */
--	priv->rx = kvcalloc(priv->rx_cfg.max_queues, sizeof(*priv->rx),
--			    GFP_KERNEL);
--	if (!priv->rx) {
--		err = -ENOMEM;
--		goto free_tx_queue;
--	}
-+		return err;
- 
- 	if (gve_is_gqi(priv))
--		err = gve_rx_alloc_rings(priv);
-+		err = gve_rx_alloc_rings_gqi(priv, rx_alloc_cfg);
- 	else
--		err = gve_rx_alloc_rings_dqo(priv);
-+		err = gve_rx_alloc_rings_dqo(priv, rx_alloc_cfg);
- 	if (err)
--		goto free_rx;
--
--	if (gve_is_gqi(priv))
--		add_napi_init_sync_stats(priv, gve_napi_poll);
--	else
--		add_napi_init_sync_stats(priv, gve_napi_poll_dqo);
-+		goto free_tx;
- 
- 	return 0;
- 
--free_rx:
--	kvfree(priv->rx);
--	priv->rx = NULL;
--free_tx_queue:
--	gve_tx_free_rings(priv, 0, gve_num_tx_queues(priv));
- free_tx:
--	kvfree(priv->tx);
--	priv->tx = NULL;
-+	if (gve_is_gqi(priv))
-+		gve_tx_free_rings_gqi(priv, tx_alloc_cfg);
-+	else
-+		gve_tx_free_rings_dqo(priv, tx_alloc_cfg);
- 	return err;
- }
- 
-@@ -923,52 +960,30 @@ static int gve_destroy_rings(struct gve_priv *priv)
- 	return 0;
- }
- 
--static void gve_rx_free_rings(struct gve_priv *priv)
--{
--	if (gve_is_gqi(priv))
--		gve_rx_free_rings_gqi(priv);
--	else
--		gve_rx_free_rings_dqo(priv);
--}
--
- static void gve_free_xdp_rings(struct gve_priv *priv)
- {
--	int ntfy_idx, start_id;
--	int i;
-+	struct gve_tx_alloc_rings_cfg cfg = {0};
++	/* Record new resources into priv */
++	priv->qpls = qpls_alloc_cfg->qpls;
++	priv->tx = tx_alloc_cfg->tx;
++	priv->rx = rx_alloc_cfg->rx;
 +
-+	gve_tx_get_curr_alloc_cfg(priv, &cfg);
-+	cfg.start_idx = gve_xdp_tx_start_queue_id(priv);
-+	cfg.num_rings = priv->num_xdp_queues;
- 
--	start_id = gve_xdp_tx_start_queue_id(priv);
- 	if (priv->tx) {
--		for (i = start_id; i <  start_id + priv->num_xdp_queues; i++) {
--			ntfy_idx = gve_tx_idx_to_ntfy(priv, i);
--			gve_remove_napi(priv, ntfy_idx);
--		}
--		gve_tx_free_rings(priv, start_id, priv->num_xdp_queues);
-+		gve_tx_stop_rings(priv, cfg.start_idx, cfg.num_rings);
-+		gve_tx_free_rings_gqi(priv, &cfg);
- 	}
- }
- 
--static void gve_free_rings(struct gve_priv *priv)
-+static void gve_free_rings(struct gve_priv *priv,
-+			   struct gve_tx_alloc_rings_cfg *tx_cfg,
-+			   struct gve_rx_alloc_rings_cfg *rx_cfg)
- {
--	int num_tx_queues = gve_num_tx_queues(priv);
--	int ntfy_idx;
--	int i;
--
--	if (priv->tx) {
--		for (i = 0; i < num_tx_queues; i++) {
--			ntfy_idx = gve_tx_idx_to_ntfy(priv, i);
--			gve_remove_napi(priv, ntfy_idx);
--		}
--		gve_tx_free_rings(priv, 0, num_tx_queues);
--		kvfree(priv->tx);
--		priv->tx = NULL;
--	}
--	if (priv->rx) {
--		for (i = 0; i < priv->rx_cfg.num_queues; i++) {
--			ntfy_idx = gve_rx_idx_to_ntfy(priv, i);
--			gve_remove_napi(priv, ntfy_idx);
--		}
--		gve_rx_free_rings(priv);
--		kvfree(priv->rx);
--		priv->rx = NULL;
-+	if (gve_is_gqi(priv)) {
-+		gve_tx_free_rings_gqi(priv, tx_cfg);
-+		gve_rx_free_rings_gqi(priv, rx_cfg);
-+	} else {
-+		gve_tx_free_rings_dqo(priv, tx_cfg);
-+		gve_rx_free_rings_dqo(priv, rx_cfg);
- 	}
- }
- 
-@@ -990,21 +1005,13 @@ int gve_alloc_page(struct gve_priv *priv, struct device *dev,
- 	return 0;
- }
- 
--static int gve_alloc_queue_page_list(struct gve_priv *priv, u32 id,
--				     int pages)
-+static int gve_alloc_queue_page_list(struct gve_priv *priv,
-+				     struct gve_queue_page_list *qpl,
-+				     u32 id, int pages)
- {
--	struct gve_queue_page_list *qpl = &priv->qpls[id];
- 	int err;
- 	int i;
- 
--	if (pages + priv->num_registered_pages > priv->max_registered_pages) {
--		netif_err(priv, drv, priv->dev,
--			  "Reached max number of registered pages %llu > %llu\n",
--			  pages + priv->num_registered_pages,
--			  priv->max_registered_pages);
--		return -EINVAL;
--	}
--
- 	qpl->id = id;
- 	qpl->num_entries = 0;
- 	qpl->pages = kvcalloc(pages, sizeof(*qpl->pages), GFP_KERNEL);
-@@ -1025,7 +1032,6 @@ static int gve_alloc_queue_page_list(struct gve_priv *priv, u32 id,
- 			return -ENOMEM;
- 		qpl->num_entries++;
- 	}
--	priv->num_registered_pages += pages;
- 
- 	return 0;
- }
-@@ -1039,9 +1045,10 @@ void gve_free_page(struct device *dev, struct page *page, dma_addr_t dma,
- 		put_page(page);
- }
- 
--static void gve_free_queue_page_list(struct gve_priv *priv, u32 id)
-+static void gve_free_queue_page_list(struct gve_priv *priv,
-+				     struct gve_queue_page_list *qpl,
-+				     int id)
- {
--	struct gve_queue_page_list *qpl = &priv->qpls[id];
- 	int i;
- 
- 	if (!qpl->pages)
-@@ -1058,19 +1065,30 @@ static void gve_free_queue_page_list(struct gve_priv *priv, u32 id)
- free_pages:
- 	kvfree(qpl->pages);
- 	qpl->pages = NULL;
--	priv->num_registered_pages -= qpl->num_entries;
- }
- 
--static int gve_alloc_xdp_qpls(struct gve_priv *priv)
-+static void gve_free_n_qpls(struct gve_priv *priv,
-+			    struct gve_queue_page_list *qpls,
-+			    int start_id,
-+			    int num_qpls)
-+{
-+	int i;
++	/* Record new configs into priv */
++	priv->qpl_cfg = *qpls_alloc_cfg->qpl_cfg;
++	priv->tx_cfg = *tx_alloc_cfg->qcfg;
++	priv->rx_cfg = *rx_alloc_cfg->qcfg;
++	priv->tx_desc_cnt = tx_alloc_cfg->ring_size;
++	priv->rx_desc_cnt = rx_alloc_cfg->ring_size;
 +
-+	for (i = start_id; i < start_id + num_qpls; i++)
-+		gve_free_queue_page_list(priv, &qpls[i], i);
-+}
-+
-+static int gve_alloc_n_qpls(struct gve_priv *priv,
-+			    struct gve_queue_page_list *qpls,
-+			    int page_count,
-+			    int start_id,
-+			    int num_qpls)
- {
--	int start_id;
--	int i, j;
- 	int err;
-+	int i;
- 
--	start_id = gve_tx_qpl_id(priv, gve_xdp_tx_start_queue_id(priv));
--	for (i = start_id; i < start_id + gve_num_xdp_qpls(priv); i++) {
--		err = gve_alloc_queue_page_list(priv, i,
--						priv->tx_pages_per_qpl);
-+	for (i = start_id; i < start_id + num_qpls; i++) {
-+		err = gve_alloc_queue_page_list(priv, &qpls[i], i, page_count);
- 		if (err)
- 			goto free_qpls;
- 	}
-@@ -1078,95 +1096,89 @@ static int gve_alloc_xdp_qpls(struct gve_priv *priv)
- 	return 0;
- 
- free_qpls:
--	for (j = start_id; j <= i; j++)
--		gve_free_queue_page_list(priv, j);
-+	/* Must include the failing QPL too for gve_alloc_queue_page_list fails
-+	 * without cleaning up.
-+	 */
-+	gve_free_n_qpls(priv, qpls, start_id, i - start_id + 1);
- 	return err;
- }
- 
--static int gve_alloc_qpls(struct gve_priv *priv)
-+static int gve_alloc_qpls(struct gve_priv *priv,
-+			  struct gve_qpls_alloc_cfg *cfg)
- {
--	int max_queues = priv->tx_cfg.max_queues + priv->rx_cfg.max_queues;
-+	int max_queues = cfg->tx_cfg->max_queues + cfg->rx_cfg->max_queues;
-+	int rx_start_id, tx_num_qpls, rx_num_qpls;
-+	struct gve_queue_page_list *qpls;
- 	int page_count;
--	int start_id;
--	int i, j;
- 	int err;
- 
--	if (!gve_is_qpl(priv))
-+	if (cfg->raw_addressing)
- 		return 0;
- 
--	priv->qpls = kvcalloc(max_queues, sizeof(*priv->qpls), GFP_KERNEL);
--	if (!priv->qpls)
-+	qpls = kvcalloc(max_queues, sizeof(*qpls), GFP_KERNEL);
-+	if (!qpls)
- 		return -ENOMEM;
- 
--	start_id = gve_tx_start_qpl_id(priv);
--	page_count = priv->tx_pages_per_qpl;
--	for (i = start_id; i < start_id + gve_num_tx_qpls(priv); i++) {
--		err = gve_alloc_queue_page_list(priv, i,
--						page_count);
--		if (err)
--			goto free_qpls;
-+	cfg->qpl_cfg->qpl_map_size = BITS_TO_LONGS(max_queues) *
-+		sizeof(unsigned long) * BITS_PER_BYTE;
-+	cfg->qpl_cfg->qpl_id_map = kvcalloc(BITS_TO_LONGS(max_queues),
-+					    sizeof(unsigned long), GFP_KERNEL);
-+	if (!cfg->qpl_cfg->qpl_id_map) {
-+		err = -ENOMEM;
-+		goto free_qpl_array;
- 	}
- 
--	start_id = gve_rx_start_qpl_id(priv);
-+	/* Allocate TX QPLs */
-+	page_count = priv->tx_pages_per_qpl;
-+	tx_num_qpls = gve_num_tx_qpls(cfg->tx_cfg, cfg->num_xdp_queues,
-+				      gve_is_qpl(priv));
-+	err = gve_alloc_n_qpls(priv, qpls, page_count, 0, tx_num_qpls);
-+	if (err)
-+		goto free_qpl_map;
- 
-+	/* Allocate RX QPLs */
-+	rx_start_id = gve_rx_start_qpl_id(cfg->tx_cfg);
- 	/* For GQI_QPL number of pages allocated have 1:1 relationship with
- 	 * number of descriptors. For DQO, number of pages required are
- 	 * more than descriptors (because of out of order completions).
- 	 */
--	page_count = priv->queue_format == GVE_GQI_QPL_FORMAT ?
--		priv->rx_data_slot_cnt : priv->rx_pages_per_qpl;
--	for (i = start_id; i < start_id + gve_num_rx_qpls(priv); i++) {
--		err = gve_alloc_queue_page_list(priv, i,
--						page_count);
--		if (err)
--			goto free_qpls;
--	}
--
--	priv->qpl_cfg.qpl_map_size = BITS_TO_LONGS(max_queues) *
--				     sizeof(unsigned long) * BITS_PER_BYTE;
--	priv->qpl_cfg.qpl_id_map = kvcalloc(BITS_TO_LONGS(max_queues),
--					    sizeof(unsigned long), GFP_KERNEL);
--	if (!priv->qpl_cfg.qpl_id_map) {
--		err = -ENOMEM;
--		goto free_qpls;
--	}
-+	page_count = cfg->is_gqi ? priv->rx_data_slot_cnt : priv->rx_pages_per_qpl;
-+	rx_num_qpls = gve_num_rx_qpls(cfg->rx_cfg, gve_is_qpl(priv));
-+	err = gve_alloc_n_qpls(priv, qpls, page_count, rx_start_id, rx_num_qpls);
-+	if (err)
-+		goto free_tx_qpls;
- 
-+	cfg->qpls = qpls;
- 	return 0;
- 
--free_qpls:
--	for (j = 0; j <= i; j++)
--		gve_free_queue_page_list(priv, j);
--	kvfree(priv->qpls);
--	priv->qpls = NULL;
-+free_tx_qpls:
-+	gve_free_n_qpls(priv, qpls, 0, tx_num_qpls);
-+free_qpl_map:
-+	kvfree(cfg->qpl_cfg->qpl_id_map);
-+	cfg->qpl_cfg->qpl_id_map = NULL;
-+free_qpl_array:
-+	kvfree(qpls);
- 	return err;
- }
- 
--static void gve_free_xdp_qpls(struct gve_priv *priv)
--{
--	int start_id;
--	int i;
--
--	start_id = gve_tx_qpl_id(priv, gve_xdp_tx_start_queue_id(priv));
--	for (i = start_id; i < start_id + gve_num_xdp_qpls(priv); i++)
--		gve_free_queue_page_list(priv, i);
--}
--
--static void gve_free_qpls(struct gve_priv *priv)
-+static void gve_free_qpls(struct gve_priv *priv,
-+			  struct gve_qpls_alloc_cfg *cfg)
- {
--	int max_queues = priv->tx_cfg.max_queues + priv->rx_cfg.max_queues;
-+	int max_queues = cfg->tx_cfg->max_queues + cfg->rx_cfg->max_queues;
-+	struct gve_queue_page_list *qpls = cfg->qpls;
- 	int i;
- 
--	if (!priv->qpls)
-+	if (!qpls)
- 		return;
- 
--	kvfree(priv->qpl_cfg.qpl_id_map);
--	priv->qpl_cfg.qpl_id_map = NULL;
-+	kvfree(cfg->qpl_cfg->qpl_id_map);
-+	cfg->qpl_cfg->qpl_id_map = NULL;
- 
- 	for (i = 0; i < max_queues; i++)
--		gve_free_queue_page_list(priv, i);
-+		gve_free_queue_page_list(priv, &qpls[i], i);
- 
--	kvfree(priv->qpls);
--	priv->qpls = NULL;
-+	kvfree(qpls);
-+	cfg->qpls = NULL;
- }
- 
- /* Use this to schedule a reset when the device is capable of continuing
-@@ -1277,8 +1289,72 @@ static void gve_drain_page_cache(struct gve_priv *priv)
- 	}
- }
- 
-+static void gve_qpls_get_curr_alloc_cfg(struct gve_priv *priv,
-+					struct gve_qpls_alloc_cfg *cfg)
-+{
-+	  cfg->raw_addressing = !gve_is_qpl(priv);
-+	  cfg->is_gqi = gve_is_gqi(priv);
-+	  cfg->num_xdp_queues = priv->num_xdp_queues;
-+	  cfg->qpl_cfg = &priv->qpl_cfg;
-+	  cfg->tx_cfg = &priv->tx_cfg;
-+	  cfg->rx_cfg = &priv->rx_cfg;
-+	  cfg->qpls = priv->qpls;
-+}
-+
-+static void gve_rx_get_curr_alloc_cfg(struct gve_priv *priv,
-+				      struct gve_rx_alloc_rings_cfg *cfg)
-+{
-+	cfg->qcfg = &priv->rx_cfg;
-+	cfg->qcfg_tx = &priv->tx_cfg;
-+	cfg->raw_addressing = !gve_is_qpl(priv);
-+	cfg->qpls = priv->qpls;
-+	cfg->qpl_cfg = &priv->qpl_cfg;
-+	cfg->ring_size = priv->rx_desc_cnt;
-+	cfg->rx = priv->rx;
-+}
-+
-+static void gve_get_curr_alloc_cfgs(struct gve_priv *priv,
-+				    struct gve_qpls_alloc_cfg *qpls_alloc_cfg,
-+				    struct gve_tx_alloc_rings_cfg *tx_alloc_cfg,
-+				    struct gve_rx_alloc_rings_cfg *rx_alloc_cfg)
-+{
-+	gve_qpls_get_curr_alloc_cfg(priv, qpls_alloc_cfg);
-+	gve_tx_get_curr_alloc_cfg(priv, tx_alloc_cfg);
-+	gve_rx_get_curr_alloc_cfg(priv, rx_alloc_cfg);
-+}
-+
-+static void gve_rx_start_rings(struct gve_priv *priv, int num_rings)
-+{
-+	int i;
-+
-+	for (i = 0; i < num_rings; i++) {
-+		if (gve_is_gqi(priv))
-+			gve_rx_start_ring_gqi(priv, i);
-+		else
-+			gve_rx_start_ring_dqo(priv, i);
-+	}
-+}
-+
-+static void gve_rx_stop_rings(struct gve_priv *priv, int num_rings)
-+{
-+	int i;
-+
-+	if (!priv->rx)
-+		return;
-+
-+	for (i = 0; i < num_rings; i++) {
-+		if (gve_is_gqi(priv))
-+			gve_rx_stop_ring_gqi(priv, i);
-+		else
-+			gve_rx_stop_ring_dqo(priv, i);
-+	}
-+}
-+
- static int gve_open(struct net_device *dev)
- {
-+	struct gve_tx_alloc_rings_cfg tx_alloc_cfg = {0};
-+	struct gve_rx_alloc_rings_cfg rx_alloc_cfg = {0};
-+	struct gve_qpls_alloc_cfg qpls_alloc_cfg = {0};
- 	struct gve_priv *priv = netdev_priv(dev);
- 	int err;
- 
-@@ -1287,14 +1363,22 @@ static int gve_open(struct net_device *dev)
+ 	if (priv->xdp_prog)
+ 		priv->num_xdp_queues = priv->rx_cfg.num_queues;
  	else
  		priv->num_xdp_queues = 0;
  
--	err = gve_alloc_qpls(priv);
-+	gve_get_curr_alloc_cfgs(priv, &qpls_alloc_cfg,
-+				&tx_alloc_cfg, &rx_alloc_cfg);
-+	err = gve_alloc_qpls(priv, &qpls_alloc_cfg);
- 	if (err)
- 		return err;
+-	gve_get_curr_alloc_cfgs(priv, &qpls_alloc_cfg,
+-				&tx_alloc_cfg, &rx_alloc_cfg);
+-	err = gve_alloc_qpls(priv, &qpls_alloc_cfg);
+-	if (err)
+-		return err;
+-	priv->qpls = qpls_alloc_cfg.qpls;
+-	tx_alloc_cfg.qpls = priv->qpls;
+-	rx_alloc_cfg.qpls = priv->qpls;
+-	err = gve_alloc_rings(priv, &tx_alloc_cfg, &rx_alloc_cfg);
+-	if (err)
+-		goto free_qpls;
 -
--	err = gve_alloc_rings(priv);
-+	priv->qpls = qpls_alloc_cfg.qpls;
-+	tx_alloc_cfg.qpls = priv->qpls;
-+	rx_alloc_cfg.qpls = priv->qpls;
-+	err = gve_alloc_rings(priv, &tx_alloc_cfg, &rx_alloc_cfg);
- 	if (err)
- 		goto free_qpls;
+-	gve_tx_start_rings(priv, 0, tx_alloc_cfg.num_rings);
+-	gve_rx_start_rings(priv, rx_alloc_cfg.qcfg->num_queues);
++	gve_tx_start_rings(priv, 0, tx_alloc_cfg->num_rings);
++	gve_rx_start_rings(priv, rx_alloc_cfg->qcfg->num_queues);
+ 	gve_init_sync_stats(priv);
  
-+	gve_tx_start_rings(priv, 0, tx_alloc_cfg.num_rings);
-+	gve_rx_start_rings(priv, rx_alloc_cfg.qcfg->num_queues);
-+	gve_init_sync_stats(priv);
-+
  	err = netif_set_real_num_tx_queues(dev, priv->tx_cfg.num_queues);
  	if (err)
- 		goto free_rings;
-@@ -1333,9 +1417,11 @@ static int gve_open(struct net_device *dev)
+-		goto free_rings;
++		goto stop_and_free_rings;
+ 	err = netif_set_real_num_rx_queues(dev, priv->rx_cfg.num_queues);
+ 	if (err)
+-		goto free_rings;
++		goto stop_and_free_rings;
+ 
+ 	err = gve_reg_xdp_info(priv, dev);
+ 	if (err)
+-		goto free_rings;
++		goto stop_and_free_rings;
+ 
+ 	err = gve_register_qpls(priv);
+ 	if (err)
+@@ -1416,29 +1470,22 @@ static int gve_open(struct net_device *dev)
+ 	priv->interface_up_cnt++;
  	return 0;
  
- free_rings:
--	gve_free_rings(priv);
-+	gve_tx_stop_rings(priv, 0, tx_alloc_cfg.num_rings);
-+	gve_rx_stop_rings(priv, rx_alloc_cfg.qcfg->num_queues);
-+	gve_free_rings(priv, &tx_alloc_cfg, &rx_alloc_cfg);
- free_qpls:
--	gve_free_qpls(priv);
-+	gve_free_qpls(priv, &qpls_alloc_cfg);
- 	return err;
- 
+-free_rings:
+-	gve_tx_stop_rings(priv, 0, tx_alloc_cfg.num_rings);
+-	gve_rx_stop_rings(priv, rx_alloc_cfg.qcfg->num_queues);
+-	gve_free_rings(priv, &tx_alloc_cfg, &rx_alloc_cfg);
+-free_qpls:
+-	gve_free_qpls(priv, &qpls_alloc_cfg);
+-	return err;
+-
  reset:
-@@ -1354,6 +1440,9 @@ static int gve_open(struct net_device *dev)
+-	/* This must have been called from a reset due to the rtnl lock
+-	 * so just return at this point.
+-	 */
+ 	if (gve_get_reset_in_progress(priv))
+-		return err;
+-	/* Otherwise reset before returning */
++		goto stop_and_free_rings;
+ 	gve_reset_and_teardown(priv, true);
+ 	/* if this fails there is nothing we can do so just ignore the return */
+ 	gve_reset_recovery(priv, false);
+ 	/* return the original error */
+ 	return err;
++stop_and_free_rings:
++	gve_tx_stop_rings(priv, 0, gve_num_tx_queues(priv));
++	gve_rx_stop_rings(priv, priv->rx_cfg.num_queues);
++	gve_queues_mem_remove(priv);
++	return err;
+ }
  
- static int gve_close(struct net_device *dev)
+-static int gve_close(struct net_device *dev)
++static int gve_open(struct net_device *dev)
  {
-+	struct gve_tx_alloc_rings_cfg tx_alloc_cfg = {0};
-+	struct gve_rx_alloc_rings_cfg rx_alloc_cfg = {0};
-+	struct gve_qpls_alloc_cfg qpls_alloc_cfg = {0};
+ 	struct gve_tx_alloc_rings_cfg tx_alloc_cfg = {0};
+ 	struct gve_rx_alloc_rings_cfg rx_alloc_cfg = {0};
+@@ -1446,7 +1493,30 @@ static int gve_close(struct net_device *dev)
  	struct gve_priv *priv = netdev_priv(dev);
  	int err;
  
-@@ -1372,8 +1461,14 @@ static int gve_close(struct net_device *dev)
- 	del_timer_sync(&priv->stats_report_timer);
- 
- 	gve_unreg_xdp_info(priv);
--	gve_free_rings(priv);
--	gve_free_qpls(priv);
-+
+-	netif_carrier_off(dev);
 +	gve_get_curr_alloc_cfgs(priv, &qpls_alloc_cfg,
 +				&tx_alloc_cfg, &rx_alloc_cfg);
-+	gve_tx_stop_rings(priv, 0, tx_alloc_cfg.num_rings);
-+	gve_rx_stop_rings(priv, rx_alloc_cfg.qcfg->num_queues);
-+	gve_free_rings(priv, &tx_alloc_cfg, &rx_alloc_cfg);
-+	gve_free_qpls(priv, &qpls_alloc_cfg);
 +
- 	priv->interface_down_cnt++;
- 	return 0;
- 
-@@ -1390,8 +1485,11 @@ static int gve_close(struct net_device *dev)
- 
- static int gve_remove_xdp_queues(struct gve_priv *priv)
- {
-+	int qpl_start_id;
- 	int err;
- 
-+	qpl_start_id = gve_xdp_tx_start_queue_id(priv);
++	err = gve_queues_mem_alloc(priv, &qpls_alloc_cfg,
++				   &tx_alloc_cfg, &rx_alloc_cfg);
++	if (err)
++		return err;
 +
- 	err = gve_destroy_xdp_rings(priv);
- 	if (err)
- 		return err;
-@@ -1402,18 +1500,22 @@ static int gve_remove_xdp_queues(struct gve_priv *priv)
++	/* No need to free on error: ownership of resources is lost after
++	 * calling gve_queues_start.
++	 */
++	err = gve_queues_start(priv, &qpls_alloc_cfg,
++			       &tx_alloc_cfg, &rx_alloc_cfg);
++	if (err)
++		return err;
++
++	return 0;
++}
++
++static int gve_queues_stop(struct gve_priv *priv)
++{
++	int err;
++
++	netif_carrier_off(priv->dev);
+ 	if (gve_get_device_rings_ok(priv)) {
+ 		gve_turndown(priv);
+ 		gve_drain_page_cache(priv);
+@@ -1462,12 +1532,8 @@ static int gve_close(struct net_device *dev)
  
  	gve_unreg_xdp_info(priv);
- 	gve_free_xdp_rings(priv);
--	gve_free_xdp_qpls(priv);
-+
-+	gve_free_n_qpls(priv, priv->qpls, qpl_start_id, gve_num_xdp_qpls(priv));
- 	priv->num_xdp_queues = 0;
+ 
+-	gve_get_curr_alloc_cfgs(priv, &qpls_alloc_cfg,
+-				&tx_alloc_cfg, &rx_alloc_cfg);
+-	gve_tx_stop_rings(priv, 0, tx_alloc_cfg.num_rings);
+-	gve_rx_stop_rings(priv, rx_alloc_cfg.qcfg->num_queues);
+-	gve_free_rings(priv, &tx_alloc_cfg, &rx_alloc_cfg);
+-	gve_free_qpls(priv, &qpls_alloc_cfg);
++	gve_tx_stop_rings(priv, 0, gve_num_tx_queues(priv));
++	gve_rx_stop_rings(priv, priv->rx_cfg.num_queues);
+ 
+ 	priv->interface_down_cnt++;
  	return 0;
+@@ -1483,6 +1549,19 @@ static int gve_close(struct net_device *dev)
+ 	return gve_reset_recovery(priv, false);
  }
  
- static int gve_add_xdp_queues(struct gve_priv *priv)
- {
-+	int start_id;
- 	int err;
- 
--	priv->num_xdp_queues = priv->tx_cfg.num_queues;
-+	priv->num_xdp_queues = priv->rx_cfg.num_queues;
- 
--	err = gve_alloc_xdp_qpls(priv);
-+	start_id = gve_xdp_tx_start_queue_id(priv);
-+	err = gve_alloc_n_qpls(priv, priv->qpls, priv->tx_pages_per_qpl,
-+			       start_id, gve_num_xdp_qpls(priv));
- 	if (err)
- 		goto err;
- 
-@@ -1438,7 +1540,7 @@ static int gve_add_xdp_queues(struct gve_priv *priv)
- free_xdp_rings:
- 	gve_free_xdp_rings(priv);
- free_xdp_qpls:
--	gve_free_xdp_qpls(priv);
-+	gve_free_n_qpls(priv, priv->qpls, start_id, gve_num_xdp_qpls(priv));
- err:
- 	priv->num_xdp_queues = 0;
- 	return err;
-@@ -2037,6 +2139,8 @@ static int gve_init_priv(struct gve_priv *priv, bool skip_describe_device)
- 		goto err;
- 	}
- 
-+	priv->num_registered_pages = 0;
-+
- 	if (skip_describe_device)
- 		goto setup_device;
- 
-@@ -2066,7 +2170,6 @@ static int gve_init_priv(struct gve_priv *priv, bool skip_describe_device)
- 	if (!gve_is_gqi(priv))
- 		netif_set_tso_max_size(priv->dev, GVE_DQO_TX_MAX);
- 
--	priv->num_registered_pages = 0;
- 	priv->rx_copybreak = GVE_DEFAULT_RX_COPYBREAK;
- 	/* gvnic has one Notification Block per MSI-x vector, except for the
- 	 * management vector
-diff --git a/drivers/net/ethernet/google/gve/gve_rx.c b/drivers/net/ethernet/google/gve/gve_rx.c
-index 7a8dc5386fff..c294a1595b6a 100644
---- a/drivers/net/ethernet/google/gve/gve_rx.c
-+++ b/drivers/net/ethernet/google/gve/gve_rx.c
-@@ -23,7 +23,9 @@ static void gve_rx_free_buffer(struct device *dev,
- 	gve_free_page(dev, page_info->page, dma, DMA_FROM_DEVICE);
- }
- 
--static void gve_rx_unfill_pages(struct gve_priv *priv, struct gve_rx_ring *rx)
-+static void gve_rx_unfill_pages(struct gve_priv *priv,
-+				struct gve_rx_ring *rx,
-+				struct gve_rx_alloc_rings_cfg *cfg)
- {
- 	u32 slots = rx->mask + 1;
- 	int i;
-@@ -36,7 +38,7 @@ static void gve_rx_unfill_pages(struct gve_priv *priv, struct gve_rx_ring *rx)
- 		for (i = 0; i < slots; i++)
- 			page_ref_sub(rx->data.page_info[i].page,
- 				     rx->data.page_info[i].pagecnt_bias - 1);
--		gve_unassign_qpl(priv, rx->data.qpl->id);
-+		gve_unassign_qpl(cfg->qpl_cfg, rx->data.qpl->id);
- 		rx->data.qpl = NULL;
- 
- 		for (i = 0; i < rx->qpl_copy_pool_mask + 1; i++) {
-@@ -49,16 +51,26 @@ static void gve_rx_unfill_pages(struct gve_priv *priv, struct gve_rx_ring *rx)
- 	rx->data.page_info = NULL;
- }
- 
--static void gve_rx_free_ring(struct gve_priv *priv, int idx)
-+void gve_rx_stop_ring_gqi(struct gve_priv *priv, int idx)
++static int gve_close(struct net_device *dev)
 +{
-+	int ntfy_idx = gve_rx_idx_to_ntfy(priv, idx);
-+
-+	if (!gve_rx_was_added_to_block(priv, idx))
-+		return;
-+
-+	gve_remove_napi(priv, ntfy_idx);
-+	gve_rx_remove_from_block(priv, idx);
-+}
-+
-+static void gve_rx_free_ring_gqi(struct gve_priv *priv, struct gve_rx_ring *rx,
-+				 struct gve_rx_alloc_rings_cfg *cfg)
- {
--	struct gve_rx_ring *rx = &priv->rx[idx];
- 	struct device *dev = &priv->pdev->dev;
- 	u32 slots = rx->mask + 1;
-+	int idx = rx->q_num;
- 	size_t bytes;
- 
--	gve_rx_remove_from_block(priv, idx);
--
--	bytes = sizeof(struct gve_rx_desc) * priv->rx_desc_cnt;
-+	bytes = sizeof(struct gve_rx_desc) * cfg->ring_size;
- 	dma_free_coherent(dev, bytes, rx->desc.desc_ring, rx->desc.bus);
- 	rx->desc.desc_ring = NULL;
- 
-@@ -66,7 +78,7 @@ static void gve_rx_free_ring(struct gve_priv *priv, int idx)
- 			  rx->q_resources, rx->q_resources_bus);
- 	rx->q_resources = NULL;
- 
--	gve_rx_unfill_pages(priv, rx);
-+	gve_rx_unfill_pages(priv, rx, cfg);
- 
- 	bytes = sizeof(*rx->data.data_ring) * slots;
- 	dma_free_coherent(dev, bytes, rx->data.data_ring,
-@@ -108,7 +120,8 @@ static int gve_rx_alloc_buffer(struct gve_priv *priv, struct device *dev,
- 	return 0;
- }
- 
--static int gve_prefill_rx_pages(struct gve_rx_ring *rx)
-+static int gve_rx_prefill_pages(struct gve_rx_ring *rx,
-+				struct gve_rx_alloc_rings_cfg *cfg)
- {
- 	struct gve_priv *priv = rx->gve;
- 	u32 slots;
-@@ -127,7 +140,7 @@ static int gve_prefill_rx_pages(struct gve_rx_ring *rx)
- 		return -ENOMEM;
- 
- 	if (!rx->data.raw_addressing) {
--		rx->data.qpl = gve_assign_rx_qpl(priv, rx->q_num);
-+		rx->data.qpl = gve_assign_rx_qpl(cfg, rx->q_num);
- 		if (!rx->data.qpl) {
- 			kvfree(rx->data.page_info);
- 			rx->data.page_info = NULL;
-@@ -185,7 +198,7 @@ static int gve_prefill_rx_pages(struct gve_rx_ring *rx)
- 		page_ref_sub(rx->data.page_info[i].page,
- 			     rx->data.page_info[i].pagecnt_bias - 1);
- 
--	gve_unassign_qpl(priv, rx->data.qpl->id);
-+	gve_unassign_qpl(cfg->qpl_cfg, rx->data.qpl->id);
- 	rx->data.qpl = NULL;
- 
- 	return err;
-@@ -207,13 +220,23 @@ static void gve_rx_ctx_clear(struct gve_rx_ctx *ctx)
- 	ctx->drop_pkt = false;
- }
- 
--static int gve_rx_alloc_ring(struct gve_priv *priv, int idx)
-+void gve_rx_start_ring_gqi(struct gve_priv *priv, int idx)
-+{
-+	int ntfy_idx = gve_rx_idx_to_ntfy(priv, idx);
-+
-+	gve_rx_add_to_block(priv, idx);
-+	gve_add_napi(priv, ntfy_idx, gve_napi_poll);
-+}
-+
-+static int gve_rx_alloc_ring_gqi(struct gve_priv *priv,
-+				 struct gve_rx_alloc_rings_cfg *cfg,
-+				 struct gve_rx_ring *rx,
-+				 int idx)
- {
--	struct gve_rx_ring *rx = &priv->rx[idx];
- 	struct device *hdev = &priv->pdev->dev;
-+	u32 slots = priv->rx_data_slot_cnt;
- 	int filled_pages;
- 	size_t bytes;
--	u32 slots;
- 	int err;
- 
- 	netif_dbg(priv, drv, priv->dev, "allocating rx ring\n");
-@@ -223,9 +246,8 @@ static int gve_rx_alloc_ring(struct gve_priv *priv, int idx)
- 	rx->gve = priv;
- 	rx->q_num = idx;
- 
--	slots = priv->rx_data_slot_cnt;
- 	rx->mask = slots - 1;
--	rx->data.raw_addressing = priv->queue_format == GVE_GQI_RDA_FORMAT;
-+	rx->data.raw_addressing = cfg->raw_addressing;
- 
- 	/* alloc rx data ring */
- 	bytes = sizeof(*rx->data.data_ring) * slots;
-@@ -246,7 +268,7 @@ static int gve_rx_alloc_ring(struct gve_priv *priv, int idx)
- 		goto abort_with_slots;
- 	}
- 
--	filled_pages = gve_prefill_rx_pages(rx);
-+	filled_pages = gve_rx_prefill_pages(rx, cfg);
- 	if (filled_pages < 0) {
- 		err = -ENOMEM;
- 		goto abort_with_copy_pool;
-@@ -269,7 +291,7 @@ static int gve_rx_alloc_ring(struct gve_priv *priv, int idx)
- 		  (unsigned long)rx->data.data_bus);
- 
- 	/* alloc rx desc ring */
--	bytes = sizeof(struct gve_rx_desc) * priv->rx_desc_cnt;
-+	bytes = sizeof(struct gve_rx_desc) * cfg->ring_size;
- 	rx->desc.desc_ring = dma_alloc_coherent(hdev, bytes, &rx->desc.bus,
- 						GFP_KERNEL);
- 	if (!rx->desc.desc_ring) {
-@@ -277,15 +299,11 @@ static int gve_rx_alloc_ring(struct gve_priv *priv, int idx)
- 		goto abort_with_q_resources;
- 	}
- 	rx->cnt = 0;
--	rx->db_threshold = priv->rx_desc_cnt / 2;
-+	rx->db_threshold = slots / 2;
- 	rx->desc.seqno = 1;
- 
--	/* Allocating half-page buffers allows page-flipping which is faster
--	 * than copying or allocating new pages.
--	 */
- 	rx->packet_buffer_size = GVE_DEFAULT_RX_BUFFER_SIZE;
- 	gve_rx_ctx_clear(&rx->ctx);
--	gve_rx_add_to_block(priv, idx);
- 
- 	return 0;
- 
-@@ -294,7 +312,7 @@ static int gve_rx_alloc_ring(struct gve_priv *priv, int idx)
- 			  rx->q_resources, rx->q_resources_bus);
- 	rx->q_resources = NULL;
- abort_filled:
--	gve_rx_unfill_pages(priv, rx);
-+	gve_rx_unfill_pages(priv, rx, cfg);
- abort_with_copy_pool:
- 	kvfree(rx->qpl_copy_pool);
- 	rx->qpl_copy_pool = NULL;
-@@ -306,36 +324,58 @@ static int gve_rx_alloc_ring(struct gve_priv *priv, int idx)
- 	return err;
- }
- 
--int gve_rx_alloc_rings(struct gve_priv *priv)
-+int gve_rx_alloc_rings_gqi(struct gve_priv *priv,
-+			   struct gve_rx_alloc_rings_cfg *cfg)
- {
-+	struct gve_rx_ring *rx;
- 	int err = 0;
--	int i;
-+	int i, j;
- 
--	for (i = 0; i < priv->rx_cfg.num_queues; i++) {
--		err = gve_rx_alloc_ring(priv, i);
-+	if (!cfg->raw_addressing && !cfg->qpls) {
-+		netif_err(priv, drv, priv->dev,
-+			  "Cannot alloc QPL ring before allocing QPLs\n");
-+		return -EINVAL;
-+	}
-+
-+	rx = kvcalloc(cfg->qcfg->max_queues, sizeof(struct gve_rx_ring),
-+		      GFP_KERNEL);
-+	if (!rx)
-+		return -ENOMEM;
-+
-+	for (i = 0; i < cfg->qcfg->num_queues; i++) {
-+		err = gve_rx_alloc_ring_gqi(priv, cfg, &rx[i], i);
- 		if (err) {
- 			netif_err(priv, drv, priv->dev,
- 				  "Failed to alloc rx ring=%d: err=%d\n",
- 				  i, err);
--			break;
-+			goto cleanup;
- 		}
- 	}
--	/* Unallocate if there was an error */
--	if (err) {
--		int j;
- 
--		for (j = 0; j < i; j++)
--			gve_rx_free_ring(priv, j);
--	}
-+	cfg->rx = rx;
-+	return 0;
-+
-+cleanup:
-+	for (j = 0; j < i; j++)
-+		gve_rx_free_ring_gqi(priv, &rx[j], cfg);
-+	kvfree(rx);
- 	return err;
- }
- 
--void gve_rx_free_rings_gqi(struct gve_priv *priv)
-+void gve_rx_free_rings_gqi(struct gve_priv *priv,
-+			   struct gve_rx_alloc_rings_cfg *cfg)
- {
-+	struct gve_rx_ring *rx = cfg->rx;
- 	int i;
- 
--	for (i = 0; i < priv->rx_cfg.num_queues; i++)
--		gve_rx_free_ring(priv, i);
-+	if (!rx)
-+		return;
-+
-+	for (i = 0; i < cfg->qcfg->num_queues;  i++)
-+		gve_rx_free_ring_gqi(priv, &rx[i], cfg);
-+
-+	kvfree(rx);
-+	cfg->rx = NULL;
- }
- 
- void gve_rx_write_doorbell(struct gve_priv *priv, struct gve_rx_ring *rx)
-diff --git a/drivers/net/ethernet/google/gve/gve_rx_dqo.c b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
-index f281e42a7ef9..8e6aeb5b3ed4 100644
---- a/drivers/net/ethernet/google/gve/gve_rx_dqo.c
-+++ b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
-@@ -199,20 +199,30 @@ static int gve_alloc_page_dqo(struct gve_rx_ring *rx,
- 	return 0;
- }
- 
--static void gve_rx_free_ring_dqo(struct gve_priv *priv, int idx)
-+void gve_rx_stop_ring_dqo(struct gve_priv *priv, int idx)
-+{
-+	int ntfy_idx = gve_rx_idx_to_ntfy(priv, idx);
-+
-+	if (!gve_rx_was_added_to_block(priv, idx))
-+		return;
-+
-+	gve_remove_napi(priv, ntfy_idx);
-+	gve_rx_remove_from_block(priv, idx);
-+}
-+
-+static void gve_rx_free_ring_dqo(struct gve_priv *priv, struct gve_rx_ring *rx,
-+				 struct gve_rx_alloc_rings_cfg *cfg)
- {
--	struct gve_rx_ring *rx = &priv->rx[idx];
- 	struct device *hdev = &priv->pdev->dev;
- 	size_t completion_queue_slots;
- 	size_t buffer_queue_slots;
-+	int idx = rx->q_num;
- 	size_t size;
- 	int i;
- 
- 	completion_queue_slots = rx->dqo.complq.mask + 1;
- 	buffer_queue_slots = rx->dqo.bufq.mask + 1;
- 
--	gve_rx_remove_from_block(priv, idx);
--
- 	if (rx->q_resources) {
- 		dma_free_coherent(hdev, sizeof(*rx->q_resources),
- 				  rx->q_resources, rx->q_resources_bus);
-@@ -226,7 +236,7 @@ static void gve_rx_free_ring_dqo(struct gve_priv *priv, int idx)
- 			gve_free_page_dqo(priv, bs, !rx->dqo.qpl);
- 	}
- 	if (rx->dqo.qpl) {
--		gve_unassign_qpl(priv, rx->dqo.qpl->id);
-+		gve_unassign_qpl(cfg->qpl_cfg, rx->dqo.qpl->id);
- 		rx->dqo.qpl = NULL;
- 	}
- 
-@@ -251,17 +261,26 @@ static void gve_rx_free_ring_dqo(struct gve_priv *priv, int idx)
- 	netif_dbg(priv, drv, priv->dev, "freed rx ring %d\n", idx);
- }
- 
--static int gve_rx_alloc_ring_dqo(struct gve_priv *priv, int idx)
-+void gve_rx_start_ring_dqo(struct gve_priv *priv, int idx)
-+{
-+	int ntfy_idx = gve_rx_idx_to_ntfy(priv, idx);
-+
-+	gve_rx_add_to_block(priv, idx);
-+	gve_add_napi(priv, ntfy_idx, gve_napi_poll_dqo);
-+}
-+
-+static int gve_rx_alloc_ring_dqo(struct gve_priv *priv,
-+				 struct gve_rx_alloc_rings_cfg *cfg,
-+				 struct gve_rx_ring *rx,
-+				 int idx)
- {
--	struct gve_rx_ring *rx = &priv->rx[idx];
- 	struct device *hdev = &priv->pdev->dev;
- 	size_t size;
- 	int i;
- 
--	const u32 buffer_queue_slots =
--		priv->queue_format == GVE_DQO_RDA_FORMAT ?
--		priv->options_dqo_rda.rx_buff_ring_entries : priv->rx_desc_cnt;
--	const u32 completion_queue_slots = priv->rx_desc_cnt;
-+	const u32 buffer_queue_slots = cfg->raw_addressing ?
-+		priv->options_dqo_rda.rx_buff_ring_entries : cfg->ring_size;
-+	const u32 completion_queue_slots = cfg->ring_size;
- 
- 	netif_dbg(priv, drv, priv->dev, "allocating rx ring DQO\n");
- 
-@@ -274,7 +293,7 @@ static int gve_rx_alloc_ring_dqo(struct gve_priv *priv, int idx)
- 	rx->ctx.skb_head = NULL;
- 	rx->ctx.skb_tail = NULL;
- 
--	rx->dqo.num_buf_states = priv->queue_format == GVE_DQO_RDA_FORMAT ?
-+	rx->dqo.num_buf_states = cfg->raw_addressing ?
- 		min_t(s16, S16_MAX, buffer_queue_slots * 4) :
- 		priv->rx_pages_per_qpl;
- 	rx->dqo.buf_states = kvcalloc(rx->dqo.num_buf_states,
-@@ -308,8 +327,8 @@ static int gve_rx_alloc_ring_dqo(struct gve_priv *priv, int idx)
- 	if (!rx->dqo.bufq.desc_ring)
- 		goto err;
- 
--	if (priv->queue_format != GVE_DQO_RDA_FORMAT) {
--		rx->dqo.qpl = gve_assign_rx_qpl(priv, rx->q_num);
-+	if (!cfg->raw_addressing) {
-+		rx->dqo.qpl = gve_assign_rx_qpl(cfg, rx->q_num);
- 		if (!rx->dqo.qpl)
- 			goto err;
- 		rx->dqo.next_qpl_page_idx = 0;
-@@ -320,12 +339,10 @@ static int gve_rx_alloc_ring_dqo(struct gve_priv *priv, int idx)
- 	if (!rx->q_resources)
- 		goto err;
- 
--	gve_rx_add_to_block(priv, idx);
--
- 	return 0;
- 
- err:
--	gve_rx_free_ring_dqo(priv, idx);
-+	gve_rx_free_ring_dqo(priv, rx, cfg);
- 	return -ENOMEM;
- }
- 
-@@ -337,13 +354,26 @@ void gve_rx_write_doorbell_dqo(const struct gve_priv *priv, int queue_idx)
- 	iowrite32(rx->dqo.bufq.tail, &priv->db_bar2[index]);
- }
- 
--int gve_rx_alloc_rings_dqo(struct gve_priv *priv)
-+int gve_rx_alloc_rings_dqo(struct gve_priv *priv,
-+			   struct gve_rx_alloc_rings_cfg *cfg)
- {
--	int err = 0;
-+	struct gve_rx_ring *rx;
++	struct gve_priv *priv = netdev_priv(dev);
 +	int err;
- 	int i;
- 
--	for (i = 0; i < priv->rx_cfg.num_queues; i++) {
--		err = gve_rx_alloc_ring_dqo(priv, i);
-+	if (!cfg->raw_addressing && !cfg->qpls) {
-+		netif_err(priv, drv, priv->dev,
-+			  "Cannot alloc QPL ring before allocing QPLs\n");
-+		return -EINVAL;
-+	}
 +
-+	rx = kvcalloc(cfg->qcfg->max_queues, sizeof(struct gve_rx_ring),
-+		      GFP_KERNEL);
-+	if (!rx)
-+		return -ENOMEM;
++	err = gve_queues_stop(priv);
++	if (err)
++		return err;
 +
-+	for (i = 0; i < cfg->qcfg->num_queues; i++) {
-+		err = gve_rx_alloc_ring_dqo(priv, cfg, &rx[i], i);
- 		if (err) {
- 			netif_err(priv, drv, priv->dev,
- 				  "Failed to alloc rx ring=%d: err=%d\n",
-@@ -352,21 +382,30 @@ int gve_rx_alloc_rings_dqo(struct gve_priv *priv)
- 		}
- 	}
- 
-+	cfg->rx = rx;
- 	return 0;
- 
- err:
- 	for (i--; i >= 0; i--)
--		gve_rx_free_ring_dqo(priv, i);
--
-+		gve_rx_free_ring_dqo(priv, &rx[i], cfg);
-+	kvfree(rx);
- 	return err;
- }
- 
--void gve_rx_free_rings_dqo(struct gve_priv *priv)
-+void gve_rx_free_rings_dqo(struct gve_priv *priv,
-+			   struct gve_rx_alloc_rings_cfg *cfg)
- {
-+	struct gve_rx_ring *rx = cfg->rx;
- 	int i;
- 
--	for (i = 0; i < priv->rx_cfg.num_queues; i++)
--		gve_rx_free_ring_dqo(priv, i);
-+	if (!rx)
-+		return;
-+
-+	for (i = 0; i < cfg->qcfg->num_queues;  i++)
-+		gve_rx_free_ring_dqo(priv, &rx[i], cfg);
-+
-+	kvfree(rx);
-+	cfg->rx = NULL;
- }
- 
- void gve_rx_post_buffers_dqo(struct gve_rx_ring *rx)
-diff --git a/drivers/net/ethernet/google/gve/gve_tx.c b/drivers/net/ethernet/google/gve/gve_tx.c
-index 07ba124780df..4b9853adc113 100644
---- a/drivers/net/ethernet/google/gve/gve_tx.c
-+++ b/drivers/net/ethernet/google/gve/gve_tx.c
-@@ -196,29 +196,36 @@ static int gve_clean_xdp_done(struct gve_priv *priv, struct gve_tx_ring *tx,
- static int gve_clean_tx_done(struct gve_priv *priv, struct gve_tx_ring *tx,
- 			     u32 to_do, bool try_to_wake);
- 
--static void gve_tx_free_ring(struct gve_priv *priv, int idx)
-+void gve_tx_stop_ring_gqi(struct gve_priv *priv, int idx)
- {
-+	int ntfy_idx = gve_tx_idx_to_ntfy(priv, idx);
- 	struct gve_tx_ring *tx = &priv->tx[idx];
-+
-+	if (!gve_tx_was_added_to_block(priv, idx))
-+		return;
-+
-+	gve_remove_napi(priv, ntfy_idx);
-+	gve_clean_tx_done(priv, tx, priv->tx_desc_cnt, false);
-+	netdev_tx_reset_queue(tx->netdev_txq);
-+	gve_tx_remove_from_block(priv, idx);
-+}
-+
-+static void gve_tx_free_ring_gqi(struct gve_priv *priv, struct gve_tx_ring *tx,
-+				 struct gve_tx_alloc_rings_cfg *cfg)
-+{
- 	struct device *hdev = &priv->pdev->dev;
-+	int idx = tx->q_num;
- 	size_t bytes;
- 	u32 slots;
- 
--	gve_tx_remove_from_block(priv, idx);
- 	slots = tx->mask + 1;
--	if (tx->q_num < priv->tx_cfg.num_queues) {
--		gve_clean_tx_done(priv, tx, priv->tx_desc_cnt, false);
--		netdev_tx_reset_queue(tx->netdev_txq);
--	} else {
--		gve_clean_xdp_done(priv, tx, priv->tx_desc_cnt);
--	}
--
- 	dma_free_coherent(hdev, sizeof(*tx->q_resources),
- 			  tx->q_resources, tx->q_resources_bus);
- 	tx->q_resources = NULL;
- 
- 	if (!tx->raw_addressing) {
- 		gve_tx_fifo_release(priv, &tx->tx_fifo);
--		gve_unassign_qpl(priv, tx->tx_fifo.qpl->id);
-+		gve_unassign_qpl(cfg->qpl_cfg, tx->tx_fifo.qpl->id);
- 		tx->tx_fifo.qpl = NULL;
- 	}
- 
-@@ -232,11 +239,23 @@ static void gve_tx_free_ring(struct gve_priv *priv, int idx)
- 	netif_dbg(priv, drv, priv->dev, "freed tx queue %d\n", idx);
- }
- 
--static int gve_tx_alloc_ring(struct gve_priv *priv, int idx)
-+void gve_tx_start_ring_gqi(struct gve_priv *priv, int idx)
- {
-+	int ntfy_idx = gve_tx_idx_to_ntfy(priv, idx);
- 	struct gve_tx_ring *tx = &priv->tx[idx];
-+
-+	gve_tx_add_to_block(priv, idx);
-+
-+	tx->netdev_txq = netdev_get_tx_queue(priv->dev, idx);
-+	gve_add_napi(priv, ntfy_idx, gve_napi_poll);
-+}
-+
-+static int gve_tx_alloc_ring_gqi(struct gve_priv *priv,
-+				 struct gve_tx_alloc_rings_cfg *cfg,
-+				 struct gve_tx_ring *tx,
-+				 int idx)
-+{
- 	struct device *hdev = &priv->pdev->dev;
--	u32 slots = priv->tx_desc_cnt;
- 	size_t bytes;
- 
- 	/* Make sure everything is zeroed to start */
-@@ -245,23 +264,23 @@ static int gve_tx_alloc_ring(struct gve_priv *priv, int idx)
- 	spin_lock_init(&tx->xdp_lock);
- 	tx->q_num = idx;
- 
--	tx->mask = slots - 1;
-+	tx->mask = cfg->ring_size - 1;
- 
- 	/* alloc metadata */
--	tx->info = vcalloc(slots, sizeof(*tx->info));
-+	tx->info = vcalloc(cfg->ring_size, sizeof(*tx->info));
- 	if (!tx->info)
- 		return -ENOMEM;
- 
- 	/* alloc tx queue */
--	bytes = sizeof(*tx->desc) * slots;
-+	bytes = sizeof(*tx->desc) * cfg->ring_size;
- 	tx->desc = dma_alloc_coherent(hdev, bytes, &tx->bus, GFP_KERNEL);
- 	if (!tx->desc)
- 		goto abort_with_info;
- 
--	tx->raw_addressing = priv->queue_format == GVE_GQI_RDA_FORMAT;
--	tx->dev = &priv->pdev->dev;
-+	tx->raw_addressing = cfg->raw_addressing;
-+	tx->dev = hdev;
- 	if (!tx->raw_addressing) {
--		tx->tx_fifo.qpl = gve_assign_tx_qpl(priv, idx);
-+		tx->tx_fifo.qpl = gve_assign_tx_qpl(cfg, idx);
- 		if (!tx->tx_fifo.qpl)
- 			goto abort_with_desc;
- 		/* map Tx FIFO */
-@@ -277,12 +296,6 @@ static int gve_tx_alloc_ring(struct gve_priv *priv, int idx)
- 	if (!tx->q_resources)
- 		goto abort_with_fifo;
- 
--	netif_dbg(priv, drv, priv->dev, "tx[%d]->bus=%lx\n", idx,
--		  (unsigned long)tx->bus);
--	if (idx < priv->tx_cfg.num_queues)
--		tx->netdev_txq = netdev_get_tx_queue(priv->dev, idx);
--	gve_tx_add_to_block(priv, idx);
--
- 	return 0;
- 
- abort_with_fifo:
-@@ -290,7 +303,7 @@ static int gve_tx_alloc_ring(struct gve_priv *priv, int idx)
- 		gve_tx_fifo_release(priv, &tx->tx_fifo);
- abort_with_qpl:
- 	if (!tx->raw_addressing)
--		gve_unassign_qpl(priv, tx->tx_fifo.qpl->id);
-+		gve_unassign_qpl(cfg->qpl_cfg, tx->tx_fifo.qpl->id);
- abort_with_desc:
- 	dma_free_coherent(hdev, bytes, tx->desc, tx->bus);
- 	tx->desc = NULL;
-@@ -300,36 +313,73 @@ static int gve_tx_alloc_ring(struct gve_priv *priv, int idx)
- 	return -ENOMEM;
- }
- 
--int gve_tx_alloc_rings(struct gve_priv *priv, int start_id, int num_rings)
-+int gve_tx_alloc_rings_gqi(struct gve_priv *priv,
-+			   struct gve_tx_alloc_rings_cfg *cfg)
- {
-+	struct gve_tx_ring *tx = cfg->tx;
- 	int err = 0;
--	int i;
-+	int i, j;
-+
-+	if (!cfg->raw_addressing && !cfg->qpls) {
-+		netif_err(priv, drv, priv->dev,
-+			  "Cannot alloc QPL ring before allocing QPLs\n");
-+		return -EINVAL;
-+	}
-+
-+	if (cfg->start_idx + cfg->num_rings > cfg->qcfg->max_queues) {
-+		netif_err(priv, drv, priv->dev,
-+			  "Cannot alloc more than the max num of Tx rings\n");
-+		return -EINVAL;
-+	}
-+
-+	if (cfg->start_idx == 0) {
-+		tx = kvcalloc(cfg->qcfg->max_queues, sizeof(struct gve_tx_ring),
-+			      GFP_KERNEL);
-+		if (!tx)
-+			return -ENOMEM;
-+	} else if (!tx) {
-+		netif_err(priv, drv, priv->dev,
-+			  "Cannot alloc tx rings from a nonzero start idx without tx array\n");
-+		return -EINVAL;
-+	}
- 
--	for (i = start_id; i < start_id + num_rings; i++) {
--		err = gve_tx_alloc_ring(priv, i);
-+	for (i = cfg->start_idx; i < cfg->start_idx + cfg->num_rings; i++) {
-+		err = gve_tx_alloc_ring_gqi(priv, cfg, &tx[i], i);
- 		if (err) {
- 			netif_err(priv, drv, priv->dev,
- 				  "Failed to alloc tx ring=%d: err=%d\n",
- 				  i, err);
--			break;
-+			goto cleanup;
- 		}
- 	}
--	/* Unallocate if there was an error */
--	if (err) {
--		int j;
- 
--		for (j = start_id; j < i; j++)
--			gve_tx_free_ring(priv, j);
--	}
-+	cfg->tx = tx;
++	gve_queues_mem_remove(priv);
 +	return 0;
-+
-+cleanup:
-+	for (j = 0; j < i; j++)
-+		gve_tx_free_ring_gqi(priv, &tx[j], cfg);
-+	if (cfg->start_idx == 0)
-+		kvfree(tx);
- 	return err;
- }
- 
--void gve_tx_free_rings_gqi(struct gve_priv *priv, int start_id, int num_rings)
-+void gve_tx_free_rings_gqi(struct gve_priv *priv,
-+			   struct gve_tx_alloc_rings_cfg *cfg)
- {
-+	struct gve_tx_ring *tx = cfg->tx;
- 	int i;
- 
--	for (i = start_id; i < start_id + num_rings; i++)
--		gve_tx_free_ring(priv, i);
-+	if (!tx)
-+		return;
-+
-+	for (i = cfg->start_idx; i < cfg->start_idx + cfg->num_rings; i++)
-+		gve_tx_free_ring_gqi(priv, &tx[i], cfg);
-+
-+	if (cfg->start_idx == 0) {
-+		kvfree(tx);
-+		cfg->tx = NULL;
-+	}
- }
- 
- /* gve_tx_avail - Calculates the number of slots available in the ring
-diff --git a/drivers/net/ethernet/google/gve/gve_tx_dqo.c b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-index f59c4710f118..bc34b6cd3a3e 100644
---- a/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-+++ b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-@@ -188,13 +188,27 @@ static void gve_tx_clean_pending_packets(struct gve_tx_ring *tx)
- 	}
- }
- 
--static void gve_tx_free_ring_dqo(struct gve_priv *priv, int idx)
-+void gve_tx_stop_ring_dqo(struct gve_priv *priv, int idx)
- {
-+	int ntfy_idx = gve_tx_idx_to_ntfy(priv, idx);
- 	struct gve_tx_ring *tx = &priv->tx[idx];
--	struct device *hdev = &priv->pdev->dev;
--	size_t bytes;
- 
-+	if (!gve_tx_was_added_to_block(priv, idx))
-+		return;
-+
-+	gve_remove_napi(priv, ntfy_idx);
-+	gve_clean_tx_done_dqo(priv, tx, /*napi=*/NULL);
-+	netdev_tx_reset_queue(tx->netdev_txq);
-+	gve_tx_clean_pending_packets(tx);
- 	gve_tx_remove_from_block(priv, idx);
 +}
 +
-+static void gve_tx_free_ring_dqo(struct gve_priv *priv, struct gve_tx_ring *tx,
-+				 struct gve_tx_alloc_rings_cfg *cfg)
-+{
-+	struct device *hdev = &priv->pdev->dev;
-+	int idx = tx->q_num;
-+	size_t bytes;
- 
- 	if (tx->q_resources) {
- 		dma_free_coherent(hdev, sizeof(*tx->q_resources),
-@@ -223,7 +237,7 @@ static void gve_tx_free_ring_dqo(struct gve_priv *priv, int idx)
- 	tx->dqo.tx_qpl_buf_next = NULL;
- 
- 	if (tx->dqo.qpl) {
--		gve_unassign_qpl(priv, tx->dqo.qpl->id);
-+		gve_unassign_qpl(cfg->qpl_cfg, tx->dqo.qpl->id);
- 		tx->dqo.qpl = NULL;
- 	}
- 
-@@ -253,9 +267,22 @@ static int gve_tx_qpl_buf_init(struct gve_tx_ring *tx)
- 	return 0;
- }
- 
--static int gve_tx_alloc_ring_dqo(struct gve_priv *priv, int idx)
-+void gve_tx_start_ring_dqo(struct gve_priv *priv, int idx)
+ static int gve_remove_xdp_queues(struct gve_priv *priv)
  {
-+	int ntfy_idx = gve_tx_idx_to_ntfy(priv, idx);
- 	struct gve_tx_ring *tx = &priv->tx[idx];
-+
-+	gve_tx_add_to_block(priv, idx);
-+
-+	tx->netdev_txq = netdev_get_tx_queue(priv->dev, idx);
-+	gve_add_napi(priv, ntfy_idx, gve_napi_poll_dqo);
-+}
-+
-+static int gve_tx_alloc_ring_dqo(struct gve_priv *priv,
-+				 struct gve_tx_alloc_rings_cfg *cfg,
-+				 struct gve_tx_ring *tx,
-+				 int idx)
-+{
- 	struct device *hdev = &priv->pdev->dev;
- 	int num_pending_packets;
- 	size_t bytes;
-@@ -263,12 +290,11 @@ static int gve_tx_alloc_ring_dqo(struct gve_priv *priv, int idx)
- 
- 	memset(tx, 0, sizeof(*tx));
- 	tx->q_num = idx;
--	tx->dev = &priv->pdev->dev;
--	tx->netdev_txq = netdev_get_tx_queue(priv->dev, idx);
-+	tx->dev = hdev;
- 	atomic_set_release(&tx->dqo_compl.hw_tx_head, 0);
- 
- 	/* Queue sizes must be a power of 2 */
--	tx->mask = priv->tx_desc_cnt - 1;
-+	tx->mask = cfg->ring_size - 1;
- 	tx->dqo.complq_mask = priv->queue_format == GVE_DQO_RDA_FORMAT ?
- 		priv->options_dqo_rda.tx_comp_ring_entries - 1 :
- 		tx->mask;
-@@ -327,8 +353,8 @@ static int gve_tx_alloc_ring_dqo(struct gve_priv *priv, int idx)
- 	if (!tx->q_resources)
- 		goto err;
- 
--	if (gve_is_qpl(priv)) {
--		tx->dqo.qpl = gve_assign_tx_qpl(priv, idx);
-+	if (!cfg->raw_addressing) {
-+		tx->dqo.qpl = gve_assign_tx_qpl(cfg, idx);
- 		if (!tx->dqo.qpl)
- 			goto err;
- 
-@@ -336,22 +362,45 @@ static int gve_tx_alloc_ring_dqo(struct gve_priv *priv, int idx)
- 			goto err;
- 	}
- 
--	gve_tx_add_to_block(priv, idx);
--
- 	return 0;
- 
- err:
--	gve_tx_free_ring_dqo(priv, idx);
-+	gve_tx_free_ring_dqo(priv, tx, cfg);
- 	return -ENOMEM;
- }
- 
--int gve_tx_alloc_rings_dqo(struct gve_priv *priv)
-+int gve_tx_alloc_rings_dqo(struct gve_priv *priv,
-+			   struct gve_tx_alloc_rings_cfg *cfg)
- {
-+	struct gve_tx_ring *tx = cfg->tx;
- 	int err = 0;
--	int i;
-+	int i, j;
- 
--	for (i = 0; i < priv->tx_cfg.num_queues; i++) {
--		err = gve_tx_alloc_ring_dqo(priv, i);
-+	if (!cfg->raw_addressing && !cfg->qpls) {
-+		netif_err(priv, drv, priv->dev,
-+			  "Cannot alloc QPL ring before allocing QPLs\n");
-+		return -EINVAL;
-+	}
-+
-+	if (cfg->start_idx + cfg->num_rings > cfg->qcfg->max_queues) {
-+		netif_err(priv, drv, priv->dev,
-+			  "Cannot alloc more than the max num of Tx rings\n");
-+		return -EINVAL;
-+	}
-+
-+	if (cfg->start_idx == 0) {
-+		tx = kvcalloc(cfg->qcfg->max_queues, sizeof(struct gve_tx_ring),
-+			      GFP_KERNEL);
-+		if (!tx)
-+			return -ENOMEM;
-+	} else if (!tx) {
-+		netif_err(priv, drv, priv->dev,
-+			  "Cannot alloc tx rings from a nonzero start idx without tx array\n");
-+		return -EINVAL;
-+	}
-+
-+	for (i = cfg->start_idx; i < cfg->start_idx + cfg->num_rings; i++) {
-+		err = gve_tx_alloc_ring_dqo(priv, cfg, &tx[i], i);
- 		if (err) {
- 			netif_err(priv, drv, priv->dev,
- 				  "Failed to alloc tx ring=%d: err=%d\n",
-@@ -360,27 +409,32 @@ int gve_tx_alloc_rings_dqo(struct gve_priv *priv)
- 		}
- 	}
- 
-+	cfg->tx = tx;
- 	return 0;
- 
- err:
--	for (i--; i >= 0; i--)
--		gve_tx_free_ring_dqo(priv, i);
--
-+	for (j = 0; j < i; j++)
-+		gve_tx_free_ring_dqo(priv, &tx[j], cfg);
-+	if (cfg->start_idx == 0)
-+		kvfree(tx);
- 	return err;
- }
- 
--void gve_tx_free_rings_dqo(struct gve_priv *priv)
-+void gve_tx_free_rings_dqo(struct gve_priv *priv,
-+			   struct gve_tx_alloc_rings_cfg *cfg)
- {
-+	struct gve_tx_ring *tx = cfg->tx;
- 	int i;
- 
--	for (i = 0; i < priv->tx_cfg.num_queues; i++) {
--		struct gve_tx_ring *tx = &priv->tx[i];
-+	if (!tx)
-+		return;
- 
--		gve_clean_tx_done_dqo(priv, tx, /*napi=*/NULL);
--		netdev_tx_reset_queue(tx->netdev_txq);
--		gve_tx_clean_pending_packets(tx);
-+	for (i = cfg->start_idx; i < cfg->start_idx + cfg->num_rings; i++)
-+		gve_tx_free_ring_dqo(priv, &tx[i], cfg);
- 
--		gve_tx_free_ring_dqo(priv, i);
-+	if (cfg->start_idx == 0) {
-+		kvfree(tx);
-+		cfg->tx = NULL;
- 	}
- }
- 
-diff --git a/drivers/net/ethernet/google/gve/gve_utils.c b/drivers/net/ethernet/google/gve/gve_utils.c
-index 974a75623789..535b1796b91d 100644
---- a/drivers/net/ethernet/google/gve/gve_utils.c
-+++ b/drivers/net/ethernet/google/gve/gve_utils.c
-@@ -8,6 +8,14 @@
- #include "gve_adminq.h"
- #include "gve_utils.h"
- 
-+bool gve_tx_was_added_to_block(struct gve_priv *priv, int queue_idx)
-+{
-+	struct gve_notify_block *block =
-+			&priv->ntfy_blocks[gve_tx_idx_to_ntfy(priv, queue_idx)];
-+
-+	return block->tx != NULL;
-+}
-+
- void gve_tx_remove_from_block(struct gve_priv *priv, int queue_idx)
- {
- 	struct gve_notify_block *block =
-@@ -30,6 +38,14 @@ void gve_tx_add_to_block(struct gve_priv *priv, int queue_idx)
- 			    queue_idx);
- }
- 
-+bool gve_rx_was_added_to_block(struct gve_priv *priv, int queue_idx)
-+{
-+	struct gve_notify_block *block =
-+			&priv->ntfy_blocks[gve_rx_idx_to_ntfy(priv, queue_idx)];
-+
-+	return block->rx != NULL;
-+}
-+
- void gve_rx_remove_from_block(struct gve_priv *priv, int queue_idx)
- {
- 	struct gve_notify_block *block =
-diff --git a/drivers/net/ethernet/google/gve/gve_utils.h b/drivers/net/ethernet/google/gve/gve_utils.h
-index 924516e9eaae..277921a629f7 100644
---- a/drivers/net/ethernet/google/gve/gve_utils.h
-+++ b/drivers/net/ethernet/google/gve/gve_utils.h
-@@ -11,9 +11,11 @@
- 
- #include "gve.h"
- 
-+bool gve_tx_was_added_to_block(struct gve_priv *priv, int queue_idx);
- void gve_tx_remove_from_block(struct gve_priv *priv, int queue_idx);
- void gve_tx_add_to_block(struct gve_priv *priv, int queue_idx);
- 
-+bool gve_rx_was_added_to_block(struct gve_priv *priv, int queue_idx);
- void gve_rx_remove_from_block(struct gve_priv *priv, int queue_idx);
- void gve_rx_add_to_block(struct gve_priv *priv, int queue_idx);
- 
+ 	int qpl_start_id;
 -- 
 2.43.0.429.g432eaa2c6b-goog
 
