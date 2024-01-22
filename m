@@ -1,109 +1,79 @@
-Return-Path: <netdev+bounces-64853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B83B8374D7
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 22:06:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CAC48374E8
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 22:09:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B08031F26772
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 21:06:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53CFC2876CA
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 21:09:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB26447F69;
-	Mon, 22 Jan 2024 21:06:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF80047F49;
+	Mon, 22 Jan 2024 21:09:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="QuiDbSWd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LXap1gsb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 343C947A6D
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 21:06:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8CAE3D962;
+	Mon, 22 Jan 2024 21:09:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705957588; cv=none; b=u6O93Kf3SUblIAi1PWMDaxqBar8AEk+Ir0G/pdz5Y2xEpNMaLV04485qVd46+b2slE1tVvF+Si3hchJijR6rBN4pf/DvPTY/Va6YjvY00csoMB9OBetmcOzj1cTdp0X2c44Oo7+Q0ulBA9/fQ5ppoNMkC5dQ2BL5GxwLcFFF2AA=
+	t=1705957786; cv=none; b=OZxLBR2GD7YsdTrCXG+HPTWNvdNOfcxaFmad031UfQHYFSlSRSBcBu7dZNdyV1UBZufWukWrftZmJGtYk3wrwBlDPXOhYit12lRwXXFVPcG6uprUNSVcK+3gezO21k8GsRPhvH0cxqxDFjj6ckLETQjWGUigti1s9e3wn0d5Xhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705957588; c=relaxed/simple;
-	bh=R5NFm9Vn2Ry+J7lRv8Yxdqvgnal/4a4PhPeLxeyLFzI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nVacppFxxVknMn1dVHD5e3qgI+T2917bBiJZHmhYhVJRAyrJQzi/stii20Q7oopC1urVjlWFU7eap0/oXmXYaiAn4cpmvIwDmCZwCS9C3YDHUOr/vs+f6rxBFBbKrIV8EiSkVBE7HcnVN0kN15F1G/QR0qxdw+fmybIUyDczofo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=QuiDbSWd; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6da6b0eb2d4so1771619b3a.1
-        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 13:06:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1705957585; x=1706562385; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lTTBUbPLLX22gXQYpGSKcgT+U6sNZgRatKr6dDm48ic=;
-        b=QuiDbSWdFlNF/79ek5uPEuK/jbZdk6Nd66WaYy4Yj91tgv2ldOl/bn60OFoKxjOeCD
-         3tR0SvxwInGNhI68bz3xt6ViYUCyS0NCWwkESMvyTXWWfzmGYekFYMWY5sXXjNQwrvxl
-         FzSvEqCOkjvpf4tf2Jvi+to56+LaNOTvXUil7N+m0c1eTdNbTv8KXaWNKcbB37D68QzY
-         bK/x4CiwsTe6rC/uezq+APbTVa++5Y2+AO+WDdGV+4lHji90liLd3+QI5ylr+OsACEnO
-         sCXod4ld4XQVt5bRB408bTVLXbOgpKdoofsFZgEOCvcSzL+eUamJc3dqZDVfyC4yUUy+
-         0sgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705957585; x=1706562385;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lTTBUbPLLX22gXQYpGSKcgT+U6sNZgRatKr6dDm48ic=;
-        b=LjixgrWLIeOu+/BItHxsv7UtU/wCyu3GTTV6hWC3cpPY3zuDEvk++8oKVkmJNpMqJV
-         nfu3dvP0S8+KLKTXsZiUHtJtYimwsmAkVysSdQlxBt8X4U/p4+AesOxc2aG5EYFIC6hB
-         YOPq3Wsd8vrE/zG0ycQx8WAgFo1HjtJS8SqbIik48+YahnR9W1Xmv3uci+yBDyrYys+1
-         sDDAuTKUBr0lgNeZctJ6QbhzalP2XQvaH15waA0HEUw8pmbfE7hcsAQuzc8wFkYypPTp
-         eb0SNcDSJp3fPxkfGd7Jick4LtAyBulNIs8pIjfMH2Df2wiK7f3NUuV7p2zZRlcYRn1h
-         ujkQ==
-X-Gm-Message-State: AOJu0YyxOa4sRMiSjKI/qQHL0M+PLvtmKnAxquWRMKpDdrHTK2/+10Kd
-	anH84zUOxKJCCwpDicENGPLWdFJLH4A90K/yqxZKPsUgt63UHMjL7aN20I5Jso3GyBESPu/ybR1
-	OGQ==
-X-Google-Smtp-Source: AGHT+IF/lChGsMkCgmCg+5aiYMU6Ll6k1FkIn1K+sesuVRKCAa4NlWcTt0lBfdu0U4nYwTig3L8I/g==
-X-Received: by 2002:a05:6a00:2d1c:b0:6dd:5cfd:808 with SMTP id fa28-20020a056a002d1c00b006dd5cfd0808mr113127pfb.51.1705957585388;
-        Mon, 22 Jan 2024 13:06:25 -0800 (PST)
-Received: from rogue-one.tail33bf8.ts.net ([201.17.86.134])
-        by smtp.gmail.com with ESMTPSA id r11-20020a056a00216b00b006dbce4a2136sm4559306pff.142.2024.01.22.13.06.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jan 2024 13:06:25 -0800 (PST)
-From: Pedro Tammela <pctammela@mojatatu.com>
-To: netdev@vger.kernel.org
-Cc: Pedro Tammela <pctammela@mojatatu.com>
-Subject: [PATCH iproute2 2/2] bpf: include libgen.h for basename
-Date: Mon, 22 Jan 2024 18:05:46 -0300
-Message-Id: <20240122210546.3423784-3-pctammela@mojatatu.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240122210546.3423784-1-pctammela@mojatatu.com>
-References: <20240122210546.3423784-1-pctammela@mojatatu.com>
+	s=arc-20240116; t=1705957786; c=relaxed/simple;
+	bh=Ih7R6TYxhCM9I3BeQKAYztZnAv4JyEVKt9MpxCjzGWE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tKbDU4TcoQx2r8BfeCT6w58rsnBWvYPu8bMVn15x+1PsNGIHM3H8ZlAy5WpsUbJqhRIgbVQS0lEvV2GRuF6KYdqE5Ji6/og6X/e3H4x1+Iv+pQW2YTn8QZP8qoDvdLyDqEcKUNvhMj4adLG1b4agF06XlevTyGSwXH6sIO9K+Bs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LXap1gsb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7201C433C7;
+	Mon, 22 Jan 2024 21:09:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705957786;
+	bh=Ih7R6TYxhCM9I3BeQKAYztZnAv4JyEVKt9MpxCjzGWE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LXap1gsbnuqyJgpUh20kPe601KuOC0HAQTF5WaOrs+Di36aEs0U41afa7zyLoBVXV
+	 +qr6Spp1cMGbGTwm3jllrajaeJdB/1EgVjjx6nT6GAzNUe3hNx/T6zqZ9fPvA0qvlx
+	 Cz/HHKqvkwDPG55XRCihWpu7LBIL9CEhxX4q1N+4CoYRUFVlqJHj6zn0Vx8eUyjOVv
+	 SRN+MKyAEZeQ1QruUgeA8ljEd4M/lrR+noQJXHLgdUkV+yNAO92fsUqR3kv2kFseoK
+	 Q+hZ1vtBqRbXkGwFYQN6GyTGAACygObyPYFw43sBU2drzNRtAQZWePvpBxEBRQiiNo
+	 rtRPY2NbiOx9g==
+Date: Mon, 22 Jan 2024 13:09:44 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Konrad Dybcio <konrad.dybcio@linaro.org>
+Cc: Denis Kirjanov <dkirjanov@suse.de>, Timur Tabi <timur@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Marijn Suijten
+ <marijn.suijten@somainline.org>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH] net: ethernet: qualcomm: Remove QDF24xx support
+Message-ID: <20240122130944.288284fc@kernel.org>
+In-Reply-To: <88a6314b-f780-4511-85a5-839115beeff5@linaro.org>
+References: <20240122-topic-qdf_cleanup_net-v1-1-caf0d9c4408a@linaro.org>
+	<ce1b41a4-a9bc-4dbc-ae85-5187b3cab10b@suse.de>
+	<88a6314b-f780-4511-85a5-839115beeff5@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-In musl basename() is only available via libgen.h
+On Mon, 22 Jan 2024 16:36:01 +0100 Konrad Dybcio wrote:
+> > On 1/22/24 15:02, Konrad Dybcio wrote:  
+> >> This SoC family was destined for server use, featuring Qualcomm's very
+> >> interesting Kryo cores (before "Kryo" became a marketing term for Arm
+> >> cores with small modifications). It did however not leave the labs of
+> >> Qualcomm and presumably some partners, nor was it ever productized.  
+> > 
+> > You forgot the net-next prefix  
+> 
+> Right. Should I resend, or just leave it now?
 
-Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
----
- lib/bpf_legacy.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/lib/bpf_legacy.c b/lib/bpf_legacy.c
-index 844974e9..741eec8d 100644
---- a/lib/bpf_legacy.c
-+++ b/lib/bpf_legacy.c
-@@ -18,6 +18,7 @@
- #include <stdarg.h>
- #include <limits.h>
- #include <assert.h>
-+#include <libgen.h>
- 
- #ifdef HAVE_ELF
- #include <libelf.h>
--- 
-2.40.1
-
+Looks like our bot guessed right, you can leave it.
 
