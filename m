@@ -1,144 +1,111 @@
-Return-Path: <netdev+bounces-64664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC2E683633D
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 13:30:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34E15836348
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 13:34:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 02E80B26C48
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 12:29:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 68D341C22BE9
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 12:34:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79AAF3BB36;
-	Mon, 22 Jan 2024 12:29:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0085E374FA;
+	Mon, 22 Jan 2024 12:33:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="SEHtaFCY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e5+MoYN6"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2053.outbound.protection.outlook.com [40.107.8.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C7023BB24;
-	Mon, 22 Jan 2024 12:29:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.8.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705926571; cv=fail; b=JPcRBhCQiEp6EJB9NASndTAJ4/kOWjNM/4axDWtMvOxhwAyqxf7NH9g/N++lAhiQCHNYxxtNigCreK8WK9CtHACDlynYwKuhSJ560jJGKRppN5cy4EOJHrBoRd+RhxBCFbRD9El8WnMC+Z6XE6H+lNLkN2DrST/yUyubd7uIFxQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705926571; c=relaxed/simple;
-	bh=vNuxATwKD2QErL/JsXg9qlD88jRApjuQU3yxML6xhPI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=daqPLda5H9NqgBoxp4Jkn0omxkKobE4KwCcpGl6POWpR9CgjitUTsf9rRvR3ytbKUK6lAoGImLVqkyXAmSHX3mPM3POOXTPCridl56D1Iy6z2IIQ8lB4jo1kPsIlpNbWdnsWuaC51zLsTQpjU3G0hrCxn+M85iPNgR12KZ9bR6U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=SEHtaFCY; arc=fail smtp.client-ip=40.107.8.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Z+LMNlkmrRB3el5n1MW6a/mKuSVrQptVvN91rj0NqkXRSQ1/TZzv5HoXktLWnS56RqkhDigv+XnT06yzEx/B/BrUWC2svGGSatX7TWZE38DNRAK4loHumKdSMxOLZfy4WOOAKdFrDPZsDUuaP26An92GNijyJ06jAbRUvxmPqP2j1z9seIPrK7iYqnncLxj4fHyhJdoL1AAcxPex9GxE7JswZMeC3vSneqY7OSmUkTCbgah+Zf4JrvCrLyRkPvQytVQ6vNHnRSOlgiRjBcTCH0CCbk6/AESmMqIaugZLKC4PZoXYQAt0y6aKer0j9AEatRHjZ0PWVbDCKyAKdk3V+A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vNuxATwKD2QErL/JsXg9qlD88jRApjuQU3yxML6xhPI=;
- b=N3Qw2IK2MvZsv1g5hB+A4uSS106j16mXFau/oel2qWNKXRTZcWSMeoyX36OUkE7l/dqr3cgdIurr3GRrMr1Qy0+XOkgSwaarvJdRNGDD8xgKVBnXJek0c0HHH34DafnaeYtQoYiAu0pwuoGuOJMDeroV8Sjz/0KzNcJdK0jpjh5U8IJq8loWHEXVtl+6xJhklcnqhZKO+ryryps8et3weuhfXNzT1hZ9ckPrNmd3G4inznT/SuJ+MmYOe8z4pwyhIdpwxRuDvCSJMk9/XpEEhuEYevl1+diy5hRuLfnZOp/jnVUvEbItO+PSD8753kahl0a/iKiBF38S2hNreAe/Kg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vNuxATwKD2QErL/JsXg9qlD88jRApjuQU3yxML6xhPI=;
- b=SEHtaFCYrLw1tQ2D9EMACEKipF0tlvOVR7MYwBu+5ODJfl+txcPSPA8ebsEjw2gxfpn8ZHzOmM8lnnGemWpOHx8ywmy6OxnqOf3h+WdYo4gDl1z47zoU+BxCp1z2n9CCKd2RVSS+rvifYzR+V+P7sfoWkHOUkfJgOsVcQTKCVNU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from VE1PR04MB7374.eurprd04.prod.outlook.com (2603:10a6:800:1ac::11)
- by DB9PR04MB9645.eurprd04.prod.outlook.com (2603:10a6:10:309::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.32; Mon, 22 Jan
- 2024 12:29:25 +0000
-Received: from VE1PR04MB7374.eurprd04.prod.outlook.com
- ([fe80::62cb:e6bf:a1ad:ba34]) by VE1PR04MB7374.eurprd04.prod.outlook.com
- ([fe80::62cb:e6bf:a1ad:ba34%6]) with mapi id 15.20.7202.031; Mon, 22 Jan 2024
- 12:29:25 +0000
-Date: Mon, 22 Jan 2024 14:29:21 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev-maintainers <edumazet@google.com>, kuba@kernel.org,
-	pabeni@redhat.com, davem@davemloft.net,
-	netdev <netdev@vger.kernel.org>, stable@vger.kernel.org,
-	Tim Menninger <tmenninger@purestorage.com>
-Subject: Re: [PATCH net v1] net: dsa: mv88e6xxx: Make unsupported C45 reads
- return 0xffff
-Message-ID: <20240122122921.sxdkiu6udgxbs247@skbuf>
-References: <20240120192125.1340857-1-andrew@lunn.ch>
- <20240122122457.jt6xgvbiffhmmksr@skbuf>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240122122457.jt6xgvbiffhmmksr@skbuf>
-X-ClientProxiedBy: AS4PR09CA0003.eurprd09.prod.outlook.com
- (2603:10a6:20b:5e0::6) To VE1PR04MB7374.eurprd04.prod.outlook.com
- (2603:10a6:800:1ac::11)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5423A31A61;
+	Mon, 22 Jan 2024 12:33:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705926835; cv=none; b=FdeCRydcyFojSVxXwp99R13Se/QsM4S66uwpQAcypStoIXuTytUpgHnzE5N2ks2aM0IUZTDhkKFmDnXErhnlozyGb9ZaVdB8jzpEA8Q8MHn5UCwVwK71EIWjQ+3twu+WdrF1dYEWy6ZaZbwxbsXBFdOeWTwlpGMgrFZNthcKu10=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705926835; c=relaxed/simple;
+	bh=XTDB6//crJGG/H3m1XnEvHrPWpGka2r/ZPypNjVQ76w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZtX0nEL1T3fVJdoDThT46inC30R64wFu+TJDn8Yc5rWBmwYqgytvfnBAGtCDv03hT/j1TQNKREkzxB0v+ZRr8nr7JEm0O3h8QJlPPy23uwadDpwYTju/O+Q3eIli5oXBxYk2gnx+dkbYcsOU+L6TW0JEcy1DhadRy+6MEOXUVT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e5+MoYN6; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-50ec948ad31so3291941e87.2;
+        Mon, 22 Jan 2024 04:33:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705926832; x=1706531632; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bFxRSXpfyegZX74xz8OgyH0TqgyPmSRwyVAL2eqo6Q0=;
+        b=e5+MoYN6jNiDGC3rkIDjt65kly1odEFlx95Qv8pbnLFOT9JJU1Je3RH/FBHgp1hEXf
+         Ph3MUr6nBNqxOoAzV9z7JMBkmXyzo+9zWGP9orMd8X5/pW8YTErOWX13Cw+5L/ig6Ipv
+         nhSEZX8HkyKvx6RQ3kV2+1/LyQNKtb1SMVObxnwEpgbq2TnpcjJd+541HC2FiV0My9Wg
+         ydHwI1eCjmztKgoafFRu3MNYNPCD+MNaPuNuB79wPBmiP2sXLjedmMF9hilyNxJbVVJ5
+         Zbl0TckF4QFk7BLNZzz3IP9ckkMosJ4rqlDr79Zp3RwSumaJLNGO6mV/nV5IDHvyqXME
+         jASA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705926832; x=1706531632;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bFxRSXpfyegZX74xz8OgyH0TqgyPmSRwyVAL2eqo6Q0=;
+        b=d8Qpy5gCDVdSb5nOd9NOO6dYM7KTL5re3oDyWi5L2EdOZxS6XsrW7x8Y/bWdG2x3tN
+         sbMlF3OYEV1rcp1pureOojeEVDXuizWmI6lwRTsTtdbB033xmNckA6sK385A8MUg01Jy
+         Eu85hSdSPs+efGQS6gTidHZOBUBXky8az0bNOIPheD4q2il3W2ttrP/gccqTv/FdvSL4
+         0ALVu2fOdBA42v6aBxSkmQkvZV+65iQk77vQr7khHgaiC3zNjLpfQRKn1WfTSwsnIXqr
+         RvlfRiFdeXlQhK1qlQP4bSKvpdp1/2ffN96zgSIU/xWpWio1Lzd5N1vatGHJ/ZFlErQe
+         M3uw==
+X-Gm-Message-State: AOJu0YywLhMdYz2JW4aYrrAOoj7OVdxMxoNNzqPuAp2rIE2mjeNtX7Ev
+	tBUPNoepLatojUZw6HY4l3lZZcgA8C/aE/mfNE5jVmT/b8RVzxSE
+X-Google-Smtp-Source: AGHT+IE27PJB1NHdKUDjIrtru5lVJQa/6wd07V7mmwsTZ2/nxlWmOfso3vPr5kcpEXy5gjqP7xfJ8A==
+X-Received: by 2002:a05:6512:a8b:b0:50e:ccd8:f9d9 with SMTP id m11-20020a0565120a8b00b0050eccd8f9d9mr1771847lfu.24.1705926831991;
+        Mon, 22 Jan 2024 04:33:51 -0800 (PST)
+Received: from skbuf ([188.25.255.36])
+        by smtp.gmail.com with ESMTPSA id q9-20020aa7cc09000000b00558a3e892b3sm14008365edt.41.2024.01.22.04.33.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jan 2024 04:33:51 -0800 (PST)
+Date: Mon, 22 Jan 2024 14:33:49 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Tim Menninger <tmenninger@purestorage.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, f.fainelli@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: dsa: mv88e6xxx: Make *_c45 callbacks agree with
+ phy_*_c45 callbacks
+Message-ID: <20240122123349.cxx2i2kzrhuqnasp@skbuf>
+References: <20240116193542.711482-1-tmenninger@purestorage.com>
+ <04d22048-737a-4281-a43f-b125ebe0c896@lunn.ch>
+ <CAO-L_44YVi0HDk4gC9QijMZrYNGoKtfH7qsXOwtDwM4VrFRDHw@mail.gmail.com>
+ <da87ce82-7337-4be4-a2af-bd2136626c56@lunn.ch>
+ <CAO-L_46kqBrDdYP7p3He0cBF1OP7TJKnhYK1NR_gMZf2n_928A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: VE1PR04MB7374:EE_|DB9PR04MB9645:EE_
-X-MS-Office365-Filtering-Correlation-Id: 85a19d34-c02e-4d27-900a-08dc1b45c517
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	WhG8YPR4/rtcLjSyuvTRVYpaeg/31CmjxYr3LIvhocgEZcTJJarHKf9L5lVDmsUDXQgnMqyPkUivEeVkz+EsslzaNf37rxAO3720qSYG99liBDahQBEvRFI4EqNVmXZYaTUOBDGEGPDRAoMLZ3dk6Boxu+JdaZr2MSMMJoPedDxnmZgPrx+yS3fo9zjF6on5h5blqB7TEqDCCJoaftb0EOmXZb9Ijw75nkEjqfkkxjOiRdWTzPXBhChUYU3DUCgkFRHCfF5lHfoLwANuCeWZjWLEQ8+xyELx2XwgQ8aaJKERfUpTSJv9Ae7PqXxfprzxG8/MbEGgCTjYSSpony+uxmnirB1drLcWlqIwUbyrnfWz6HvJMHbjDEY92whcYweSy18BM0QcLHaetOSIYC+mC4xvFOwMB2AvBx3aIwwxlkJcFCsOlRsNFSKsHgSDlwEXd24bZ8UC/Bv/rrJKD/gvZQIk6U94G95UoqszSVPwcvSm5FBPaN78QXS3Kp+6AfOboARAIEcAtrILwQRxlr7KZBzW0A7YjmoLu3EkYGpO2Oh5E42mahThAXaV/5Xj1H0s
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VE1PR04MB7374.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(136003)(366004)(346002)(396003)(376002)(39860400002)(230922051799003)(64100799003)(451199024)(186009)(1800799012)(86362001)(478600001)(6486002)(4744005)(26005)(1076003)(2906002)(33716001)(4326008)(316002)(6916009)(44832011)(6666004)(6506007)(9686003)(6512007)(8936002)(8676002)(54906003)(41300700001)(38100700002)(5660300002)(66946007)(66556008)(66476007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?WPAwg3Wwtv+2Z2ezwuOMK7/GqY2/pzUuCwtJpnjNBXfLsd8py6+8AjHbI36S?=
- =?us-ascii?Q?8QYSVKKQ+YVpHHiuhyVAMFh6hCVj2Td94bfau9IqcPInd5jew2nbxS7Q+SaA?=
- =?us-ascii?Q?GRq2lwIq+rZYlp7zXBbETYy2jsW3lc4bjrhF/3gWjMKz/V7vu8uAcWumwMoN?=
- =?us-ascii?Q?8wyZ1vcI8fW0uDXr4oTE6Tx+BWdPP5TYkFWVw8ge/PfvV61uZ2GKm9TZVPFu?=
- =?us-ascii?Q?M+a7+ye1TllHfKRXNWeMMfWqm1/OxWPYPYXCsDarbxV6S8goyBmxyWXll5Qb?=
- =?us-ascii?Q?6cNlewgz1ZC3X/6MTazh37fg5bA0flzHmQVOZJgGm1ZSD09ifDE2Ht75Hwzf?=
- =?us-ascii?Q?7JVtkapljenroLzLLW1kvUxBTITamo6mITnakAODAQHgdt/hyClyxb2Sg5kV?=
- =?us-ascii?Q?feMen0fntpUpt0o4HEdJg0OJwPdtsxgiB930b7OAmoW5JCapi6+gb3g0Bmo0?=
- =?us-ascii?Q?DiTj1C6EdIi/PscOJW0CnSdwu7CD4JPLWMpIwns7TRFNIDIN1nDAD17ceyEZ?=
- =?us-ascii?Q?iHuCsiWZ/CidJ+daxK/SXIPpWhbvvsutDSoGwQRXQPLi5WozTrBcRkJ4Ecfd?=
- =?us-ascii?Q?N7pnBn6Rm5DZIvGLoCSBYLv/ErcqnlJFDTcLiOyYJLOphObcVL/7WJtz8yxO?=
- =?us-ascii?Q?VnpqJgqOqLUJJPhn4fnYykTWZg/bO2YtI/q4RuCoq49p91atUq2dyCRlCpkO?=
- =?us-ascii?Q?fL+Zdjx3E4fUr1PWoTWiVHOjmOePPbdqMzcap2GSt3YER3pEcwgRL/NSyqez?=
- =?us-ascii?Q?qiMILgP+p5KX+ancGpTfeib9W8b7s59ZMlt920LvpX/DK5MgvXrf5d7DR11p?=
- =?us-ascii?Q?i0aYIIEdTIhQP8JyU1ZtrNAxn8ex+6sQKgEmMAB0v/v08YTO2uqKxSNV0fQv?=
- =?us-ascii?Q?Db+wJBocsUYJEdy7g3JK5CVKRG2I2LF+E+Lfl4FmfKB/M9+PD/kBDnz2Mr3Q?=
- =?us-ascii?Q?mYWucsxuW0+Csq5+ozkvD/bcT0TSKC0B0k1+FtGszIVNE7EbMMW5orG083ZA?=
- =?us-ascii?Q?LcyMJHzJIlgWAHSQre0c6myntb7dHEG64UP6ztjJWr1/NeUfWfuTg9PhhBv2?=
- =?us-ascii?Q?QsWlIk5SAOlG2B8R3JdYvHp6BHsUuibZkIHpoSAqArtJt+8PH0KkIvWaGctx?=
- =?us-ascii?Q?Wan1PBJDr9/DEOIa+eUI8y8vMmuwMt8OmLVIDJSwPZnicyGkVTs1bTZ1fwdF?=
- =?us-ascii?Q?uogGheH0LXXZVZEp9aqniMxQTw4yx+LCRFYd8NDLjGPfSCGXnwnIkDfObkET?=
- =?us-ascii?Q?V6kaeIBMeIXEkEwhdIK8Y5QPureKJDbkb7lTDYQaMayxUYLUSjbs9WLLIhjq?=
- =?us-ascii?Q?O6FDNsgofrDkFTA5T/OuNxNK1CBSP2w3/OwGfxvVzmxxBSfbq2sbxaXo424l?=
- =?us-ascii?Q?WZ6FV2wf6ytE6/2jayk4Z/c9i2SUhOutKBhhquz9cFcrlAbnwiVIE5ekp5ZM?=
- =?us-ascii?Q?YX1wa8mU14ioy9XfefC5lknY8LxYo+Uhn8gauk4LjVt9lZvb/ICdp5TGK+6U?=
- =?us-ascii?Q?jryMKK2gT1N9xnr8wcpiRJ6uYG0uqJTSRrLACBpNUt3wVJvLqQdZUlEKWMW0?=
- =?us-ascii?Q?j5lnWy3lZv54hndqJVClS07qiiWGxBnt75GYch0hm6DTTYzHTGRwz4M+C2mL?=
- =?us-ascii?Q?VQ=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 85a19d34-c02e-4d27-900a-08dc1b45c517
-X-MS-Exchange-CrossTenant-AuthSource: VE1PR04MB7374.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jan 2024 12:29:25.4079
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: KrYHOtY5iYIb0nrgRT4yE2vv+oBfz2y3PAz+++CLO5ctJup+lOFiXOd/iXtzh0VDUPjpIWIDdFwwQLXjL4dVyw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB9645
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAO-L_46kqBrDdYP7p3He0cBF1OP7TJKnhYK1NR_gMZf2n_928A@mail.gmail.com>
 
-On Mon, Jan 22, 2024 at 02:24:57PM +0200, Vladimir Oltean wrote:
-> > Fixes: 1a136ca2e089 ("net: mdio: scan bus based on bus capabilities for C22 and C45")
-> > Fixes: da099a7fb13d ("net: phy: Remove probe_capabilities")
+On Tue, Jan 16, 2024 at 05:51:13PM -0800, Tim Menninger wrote:
+> My impression is still that the read_c45 function should agree with the
+> phy_read_c45 function, but that isn't a hill I care to die on if you still
+> think otherwise. Thoughts?
 
-Also: commit da099a7fb13d ("net: phy: Remove probe_capabilities") is not
-a functional change, so I don't see why it should be blamed? I suppose
-'git bisect' would find 1a136ca2e089 ("net: mdio: scan bus based on bus
-capabilities for C22 and C45")?
+FWIW, Tim's approach is consistent with what drivers/net/mdio/mdio-mux.c does.
 
+		if (parent_bus->read)
+			cb->mii_bus->read = mdio_mux_read;
+		if (parent_bus->write)
+			cb->mii_bus->write = mdio_mux_write;
+		if (parent_bus->read_c45)
+			cb->mii_bus->read_c45 = mdio_mux_read_c45;
+		if (parent_bus->write_c45)
+			cb->mii_bus->write_c45 = mdio_mux_write_c45;
+
+My only objection to his patch (apart from the commit message which
+should indeed be more detailed) is that I would have preferred the same
+"if" syntax rather than the use of a ternary operator with NULL.
 
