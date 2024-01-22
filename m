@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-64756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2357837030
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:38:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B91A837049
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:41:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4F781C2931F
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:38:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CED2D1C213EC
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:41:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EB27605C5;
-	Mon, 22 Jan 2024 18:08:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBBF06169E;
+	Mon, 22 Jan 2024 18:08:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDC735FEEB
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 18:08:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A8D560EDB
+	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 18:08:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705946906; cv=none; b=JHzL45q3LcXqLJUepWOl+1vDRU9DTiznmo0D2aFGmWtP+E6J/fxP0FfUxz+BT2Y/aciNc2kK4iOh6ZLxpvrxHKgSkcOSFpeyeeTIxH+MfE+BnuFY7BmqMVyVHgLj2MTcHv41nENbn28nPZiLHiVX5Q/8oOwvbvi5hJ4m4fUtu/A=
+	t=1705946914; cv=none; b=nob91ave88MvojFGn3DbfuWMWrMw8dQJnn6hGf9k6vHTy6IOEZcJpHI/z42PcrQm2gT5CzfBQpoBi2hfA/UIQbKdYLo/ex4NulEFWevNu9GmbUdBF3/QiDx6vMWcAALBM0Wje5sKg8foDJSVUIsZV5kYuKMphFkWNKb2vUIZ+uM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705946906; c=relaxed/simple;
-	bh=F9z6aShlF2QVCfyIAngRvio0THfTtO+tvcHMyVGuSz0=;
+	s=arc-20240116; t=1705946914; c=relaxed/simple;
+	bh=J5G8sNk8EOiCf1vT1VH2qoFSGlM7S/4V1Y+pnNGwgPk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hvqOf4cb/K10LDYmN48vviRSIpAhKWbeI3bqVrWYWgOR1wS4WaB7tcO0jQ95S54sMKcKCMGKswRQY5kgAmCeyGVFQwhTU7Sn+5T/eV0D9nOiFurpC5J/iNW9vCKOZh+eYQ5F5UW7lVrGU43m1U07S1I2rVj0GCQkCSU0umn5rAQ=
+	 MIME-Version:Content-Type; b=eoWAkPohpYZXRdiQed9HVDOiH7rlQbka6cA9pQ09n5BxLIh1odKzfoufQ0wzhxqLI5i1AFmWjvhhzCX489SGCUGSHqsGaHue/upapaKDHHrE7wujbkFblUN2GvZ0kYqe83ipux0QeacHnETZXWuFiAXKlMLcmhlbSxHdk7cWzeY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,34 +33,33 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1rRyiV-0001lS-9L; Mon, 22 Jan 2024 19:08:15 +0100
+	id 1rRyiW-0001rg-36; Mon, 22 Jan 2024 19:08:16 +0100
 Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1rRyiT-001ePK-1S; Mon, 22 Jan 2024 19:08:13 +0100
+	id 1rRyiV-001eQ2-J1; Mon, 22 Jan 2024 19:08:15 +0100
 Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.96)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1rRyiS-005Zwr-35;
-	Mon, 22 Jan 2024 19:08:12 +0100
+	id 1rRyiV-005Zxd-1b;
+	Mon, 22 Jan 2024 19:08:15 +0100
 From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
 To: Mark Brown <broonie@kernel.org>
 Cc: kernel@pengutronix.de,
-	Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	linux-wpan@vger.kernel.org,
+	Simon Horman <horms@kernel.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Ronald Wahl <ronald.wahl@raritan.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	linux-spi@vger.kernel.org,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH v2 02/33] ieee802154: ca8210: Follow renaming of SPI "master" to "controller"
-Date: Mon, 22 Jan 2024 19:06:57 +0100
-Message-ID:  <145fba5c430e40114ab861229e52efd3ff941e42.1705944943.git.u.kleine-koenig@pengutronix.de>
+	linux-spi@vger.kernel.org
+Subject: [PATCH v2 14/33] net: ks8851: Follow renaming of SPI "master" to "controller"
+Date: Mon, 22 Jan 2024 19:07:09 +0100
+Message-ID:  <8fd38ae26985ad770b21979469b36e5afff0473a.1705944943.git.u.kleine-koenig@pengutronix.de>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1705944943.git.u.kleine-koenig@pengutronix.de>
 References: <cover.1705944943.git.u.kleine-koenig@pengutronix.de>
@@ -71,7 +70,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1008; i=u.kleine-koenig@pengutronix.de; h=from:subject:message-id; bh=F9z6aShlF2QVCfyIAngRvio0THfTtO+tvcHMyVGuSz0=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlrq7FVmfdtureI6sxPVMY6mRDi6HC1bOGCaYo8 G3mpHn9EKWJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZa6uxQAKCRCPgPtYfRL+ TtWhB/9+7G/MH1SST//skhGiMv8T5+wus+BYEukTNVSQ8eXV++0yK/07/nbUrG6IA+XvuhzXEN1 kJorilUWP6IuTYOdgH8hCrJx2HRm9kvraRtQmk+/vwv7FF1NOowH6iXoMy09hXSF6oFCUDIaEan rrOp8pWvpTsWtzkmYd69k0TmERigqR7aOMuWNah37vGbu/9A9jU00PazBmRi288M/EdW0a0NwCr NzDj70SfJj/2Atr/ox7BDC+/OE8nTuleefMTyID21jU2n3JH2LdOXrl/HhFAjyANoKekhKDYbOU 5JprN0QYTepsJ9gpOY8VGmi76W17yj0jyU9H+cVBrz7DyqS+
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1475; i=u.kleine-koenig@pengutronix.de; h=from:subject:message-id; bh=J5G8sNk8EOiCf1vT1VH2qoFSGlM7S/4V1Y+pnNGwgPk=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlrq7T21kGgzgUSXStTOMt1lumvjV7wRCdpjd8j 2lNzDkK8uyJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZa6u0wAKCRCPgPtYfRL+ Tqs/B/0U7IcHfVYiJyOo5g2gyk1I7tklQqpDglnCsNwWZyldX1WQAg87/+4JRL5VvMD3sOuLObU wOzcy9EzUaq31dmam8Ij3/wjiS9youm4NGNKvfFAJF1hvZvAN0Xytd6N6SbMdcYHpnCeLgRWyUE AvZmteteMvlopxMHDP0Xe71//iQLd1I+LznN+VRaMtDQKnQMZY59hKVL425t50FKKPh4tUMeXiv WOH1Ea/Cj1JrGlzBaxGTOgly/uK1Dw7jQxaRorukPj0RkFN0zpQauSfgumke13cAmYH1A+PnA2Q Tu8wfNU7dlNr/KnziNf0SQ5AdcEd5CEca8ae4Siq22a9QUew
 X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
@@ -87,25 +86,33 @@ To be able to remove these compatibility macros push the renaming into
 this driver.
 
 Reviewed-by: Simon Horman <horms@kernel.org>
-Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>
 Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 ---
- drivers/net/ieee802154/ca8210.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/micrel/ks8851_spi.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-index 4ec0dab38872..f732c150462b 100644
---- a/drivers/net/ieee802154/ca8210.c
-+++ b/drivers/net/ieee802154/ca8210.c
-@@ -2956,7 +2956,7 @@ static int ca8210_test_interface_init(struct ca8210_priv *priv)
- 		node_name,
- 		sizeof(node_name),
- 		"ca8210@%d_%d",
--		priv->spi->master->bus_num,
-+		priv->spi->controller->bus_num,
- 		spi_get_chipselect(priv->spi, 0)
- 	);
+diff --git a/drivers/net/ethernet/micrel/ks8851_spi.c b/drivers/net/ethernet/micrel/ks8851_spi.c
+index 54f2eac11a63..2f803377c9f9 100644
+--- a/drivers/net/ethernet/micrel/ks8851_spi.c
++++ b/drivers/net/ethernet/micrel/ks8851_spi.c
+@@ -156,7 +156,7 @@ static void ks8851_rdreg(struct ks8851_net *ks, unsigned int op,
  
+ 	txb[0] = cpu_to_le16(op | KS_SPIOP_RD);
+ 
+-	if (kss->spidev->master->flags & SPI_CONTROLLER_HALF_DUPLEX) {
++	if (kss->spidev->controller->flags & SPI_CONTROLLER_HALF_DUPLEX) {
+ 		msg = &kss->spi_msg2;
+ 		xfer = kss->spi_xfer2;
+ 
+@@ -180,7 +180,7 @@ static void ks8851_rdreg(struct ks8851_net *ks, unsigned int op,
+ 	ret = spi_sync(kss->spidev, msg);
+ 	if (ret < 0)
+ 		netdev_err(ks->netdev, "read: spi_sync() failed\n");
+-	else if (kss->spidev->master->flags & SPI_CONTROLLER_HALF_DUPLEX)
++	else if (kss->spidev->controller->flags & SPI_CONTROLLER_HALF_DUPLEX)
+ 		memcpy(rxb, trx, rxl);
+ 	else
+ 		memcpy(rxb, trx + 2, rxl);
 -- 
 2.43.0
 
