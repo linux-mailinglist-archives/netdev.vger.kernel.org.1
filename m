@@ -1,269 +1,855 @@
-Return-Path: <netdev+bounces-64710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8F66836C5D
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:03:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E1BA836CAE
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:14:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3EA91288E6C
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 17:03:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4A515B28C05
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 16:59:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D80C487A0;
-	Mon, 22 Jan 2024 15:45:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D29A47F61;
+	Mon, 22 Jan 2024 15:35:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=synopsys.com header.i=@synopsys.com header.b="U2t5yHk+";
-	dkim=pass (2048-bit key) header.d=synopsys.com header.i=@synopsys.com header.b="WNXztdLV";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=synopsys.com header.i=@synopsys.com header.b="ouYu6Pon"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="drXQi9RJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00230701.pphosted.com (mx0b-00230701.pphosted.com [148.163.158.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ADAF604C7;
-	Mon, 22 Jan 2024 15:45:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.158.9
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705938315; cv=fail; b=bKOvaYF8IjZOX67FGlC8V70Zip12Apx0a5V9ftypTNadjuH6ttJcFN8tZV7k6C6NPQGE9CyH1cFJllpyl9Hc9rkJiQYT8Amcuf3gRAHZpj4IXmsJJwshjBs4Moebe8NQTuoYxuJ6LtnBipcbMqWuXTbGFr46Qcse+6zb6pOu4AM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705938315; c=relaxed/simple;
-	bh=X1B1R6wLPU9yyyRcXAxBwxXGa5PLOqIacXYIR1GEzEk=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=CJvHZyhajEbw0HKbGgJVlCyO8+cUkfRNE8TIi1TVv3pkgBnjByqGdWrYMeLEzhi58LHow0d7jZykUQUwKiDJ+A+IAYLszDdUp6sTvjd2vD3H1ZIKK+3huquAyVBg0eK1I325hbCdu2KkJJ/FOiMtQVB7J19doCjmLkXr5hvqJCI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=synopsys.com; spf=pass smtp.mailfrom=synopsys.com; dkim=pass (2048-bit key) header.d=synopsys.com header.i=@synopsys.com header.b=U2t5yHk+; dkim=pass (2048-bit key) header.d=synopsys.com header.i=@synopsys.com header.b=WNXztdLV; dkim=fail (1024-bit key) header.d=synopsys.com header.i=@synopsys.com header.b=ouYu6Pon reason="signature verification failed"; arc=fail smtp.client-ip=148.163.158.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=synopsys.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=synopsys.com
-Received: from pps.filterd (m0297265.ppops.net [127.0.0.1])
-	by mx0a-00230701.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40MElGae004849;
-	Mon, 22 Jan 2024 07:44:36 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=synopsys.com; h=
-	from:to:cc:subject:date:message-id:references:in-reply-to
-	:content-type:content-transfer-encoding:mime-version; s=
-	pfptdkimsnps; bh=X1B1R6wLPU9yyyRcXAxBwxXGa5PLOqIacXYIR1GEzEk=; b=
-	U2t5yHk+DFa4eewRJSQMrAdTdI0E9GJTGTfVOutA8EV2ERDuR0YxVTem2Hgn8GOa
-	u4+XT8P0IQh3mPSob0RbckaPZRWljARrV3nXkxklt4r+6YFniJWb2/eWN1COBfmF
-	bw6BRnbj+wUYkyMnZzP71simmlNYFPUNxspSwz+coa/jck15ZSeTe+v5tT6P4/pN
-	AFtKD3Kb8VVJK/3Xasnsivh+XyydR0szjrvHpaphs9nE4RRz75YuCSzkIehM7YBa
-	Rt33spa3h0ndZRqJAQV8HTbArjvHIAP3pBVti4mh/TmxdAzKrPNhDHy6THbcUW0w
-	g3byfKSnPEr8JIilM47oLQ==
-Received: from smtprelay-out1.synopsys.com (smtprelay-out1.synopsys.com [149.117.73.133])
-	by mx0a-00230701.pphosted.com (PPS) with ESMTPS id 3vrdywg29p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 22 Jan 2024 07:44:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=synopsys.com; s=mail;
-	t=1705938275; bh=X1B1R6wLPU9yyyRcXAxBwxXGa5PLOqIacXYIR1GEzEk=;
-	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
-	b=WNXztdLVNGQIE9m5zYM0aW9U+AeznRjNYDpKWaUwi6Uhrywh1xIH4tzlaMlwqt8nS
-	 Lr4dbgNoRw9fBCn20gvFRFqCqWmKmNZL87fU1VFvIWcE+cHo0gZKCsZBacRPxC8jyF
-	 Ln6sK1cYGRUWWWvdcJ33m3kb+C9x9FaMJBJIKQx7EEmeF4nxRPwR95UAiDE8EmXv1T
-	 AI6Xn35GLkrl6XdgxRmXZ2EZdi98nqt2jQ7kJe5aZHsWZBx4lyiDryS48On5nBvS15
-	 mbAwxoKQmjcOl9dyLWHZXBtRFEleqtBTi9aR5UiCHomlvH1YNvDgyas40Mhb8QG9mM
-	 quN1StxUBktFg==
-Received: from mailhost.synopsys.com (badc-mailhost1.synopsys.com [10.192.0.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits)
-	 client-signature RSA-PSS (2048 bits))
-	(Client CN "mailhost.synopsys.com", Issuer "SNPSica2" (verified OK))
-	by smtprelay-out1.synopsys.com (Postfix) with ESMTPS id 1084B4054D;
-	Mon, 22 Jan 2024 15:44:32 +0000 (UTC)
-Received: from o365relay-in.synopsys.com (us03-o365relay1.synopsys.com [10.4.161.137])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(Client CN "o365relay-in.synopsys.com", Issuer "Entrust Certification Authority - L1K" (verified OK))
-	by mailhost.synopsys.com (Postfix) with ESMTPS id ACB0CA00DE;
-	Mon, 22 Jan 2024 15:44:30 +0000 (UTC)
-Authentication-Results: o365relay-in.synopsys.com; dmarc=pass (p=reject dis=none) header.from=synopsys.com
-Authentication-Results: o365relay-in.synopsys.com; spf=pass smtp.mailfrom=synopsys.com
-Authentication-Results: o365relay-in.synopsys.com;
-	dkim=pass (1024-bit key; unprotected) header.d=synopsys.com header.i=@synopsys.com header.a=rsa-sha256 header.s=selector1 header.b=ouYu6Pon;
-	dkim-atps=neutral
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02lp2040.outbound.protection.outlook.com [104.47.51.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(Client CN "mail.protection.outlook.com", Issuer "DigiCert Cloud Services CA-1" (verified OK))
-	by o365relay-in.synopsys.com (Postfix) with ESMTPS id 81A65404D6;
-	Mon, 22 Jan 2024 15:44:26 +0000 (UTC)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Qp6b5FvkiAzBJWmqPI2LzzpHicPfseSRL2zGyzzwKOEVUj/CsLdMP+zZ2EWlEkUPmG4qX6oxso3FTY7X1IAGbgnxsEKk2Bs6FYmWZRrg0OWtw2Ovdy4MGW1xYpfFBpu3bBl2sM7z6Lb9o7MMLQydWDQ6GjBRkCoWtqRR19Tc3TkvBZI6mhxPaH1dC+djqVVQYTw9/zOQPm1EHpXBBNyoQrPEHbqFInq79EVDICjExRZVrIePrB/RnmfRGw0C4QLMSyyCwWhVcwwXEmyOLARwmhlzJ+8Uqb8Yr1mTsakVON7FxI9M9RrYQm2sI5/HS3hwUNeFogmVVJpuWPHv9VQKLQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=X1B1R6wLPU9yyyRcXAxBwxXGa5PLOqIacXYIR1GEzEk=;
- b=UhjfhVSYSPd3GFIhTiwFOH6eRkhGTuVWxEXtWDxgb/Vntpms738OtCnjAFqmXUmP1x7J4Dh8YR/iQm1Wa58XxZ8GusddMZSV8hTAEJwJ4NqUoP+56WumRaVciI+fQ8AoCpvlUhymHkOJblwOPZMpzbhtAln8DTlsZvla7/TWBp08QFGLBk6r+n/Q7ul9Z/jEVRZke0vhrVcPM7uBU/GeRkz9pMcau9XEsS/CYkAXGEaVQwh5daHbv7TwvHVbLZYQpp0u7AJgwysBJT+iQ+o5fbGz/2hLXmrZvFfnRNtIto0tJGi0cpnFamA9B0kjWn+NMnNLXFOPGcHrAabShFzo6g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=synopsys.com; dmarc=pass action=none header.from=synopsys.com;
- dkim=pass header.d=synopsys.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=synopsys.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=X1B1R6wLPU9yyyRcXAxBwxXGa5PLOqIacXYIR1GEzEk=;
- b=ouYu6PonHmsJzbiEHYuiCCqogv9WL+qVD5A3E3AL3gUcO0UcypfwU9NnY+aLNf7ADaZGShyHi44jcS0cr0vrOB5k5ALaGF1hipgtNBZNeaMki+MW4i9VGg5NM5bs2NL620pzXpr8DgrTLg4Vn3/XTVx/kUvMexSogJr4nuSU6JA=
-Received: from DM4PR12MB5088.namprd12.prod.outlook.com (2603:10b6:5:38b::9) by
- MW4PR12MB5667.namprd12.prod.outlook.com (2603:10b6:303:18a::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.23; Mon, 22 Jan
- 2024 15:44:19 +0000
-Received: from DM4PR12MB5088.namprd12.prod.outlook.com
- ([fe80::5d56:80df:e884:3a2e]) by DM4PR12MB5088.namprd12.prod.outlook.com
- ([fe80::5d56:80df:e884:3a2e%6]) with mapi id 15.20.7202.034; Mon, 22 Jan 2024
- 15:44:19 +0000
-X-SNPS-Relay: synopsys.com
-From: Jose Abreu <Jose.Abreu@synopsys.com>
-To: Bernd Edlinger <bernd.edlinger@hotmail.de>, Andrew Lunn <andrew@lunn.ch>
-CC: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
-        "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Jiri Pirko <jiri@nvidia.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jose Abreu <Jose.Abreu@synopsys.com>
-Subject: RE: [PATCH v2] net: stmmac: Wait a bit for the reset to take effect
-Thread-Topic: [PATCH v2] net: stmmac: Wait a bit for the reset to take effect
-Thread-Index: 
- AQHaR+f2GstLsKb9/0S+PUQyg8BFNbDdCMAAgAExZgCAAACJsIAChBOAgAAsIgCABIFvAIAAlR4A
-Date: Mon, 22 Jan 2024 15:44:19 +0000
-Message-ID: 
- <DM4PR12MB50880D31E415D0DD95D991F9D3752@DM4PR12MB5088.namprd12.prod.outlook.com>
-References: 
- <AS8P193MB1285DECD77863E02EF45828BE4A1A@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
- <AS8P193MB1285EEAFE30C0DE7B201D33CE46C2@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
- <6e33c038-45a7-4941-b5d9-ce5704e13d48@lunn.ch>
- <AS8P193MB128591BBF397DC664D7D860EE4722@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
- <DM4PR12MB50883D41B18E8627FBDF5E32D3722@DM4PR12MB5088.namprd12.prod.outlook.com>
- <AS8P193MB1285B34B71F3143FA9B0A053E4702@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
- <DM4PR12MB5088435544A3D355C94632DFD3702@DM4PR12MB5088.namprd12.prod.outlook.com>
- <AS8P193MB1285D9F82E8065739C0AD962E4752@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
-In-Reply-To: 
- <AS8P193MB1285D9F82E8065739C0AD962E4752@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-dg-ref: 
- PG1ldGE+PGF0IG5tPSJib2R5LnR4dCIgcD0iYzpcdXNlcnNcam9hYnJldVxhcHBkYXRhXHJvYW1pbmdcMDlkODQ5YjYtMzJkMy00YTQwLTg1ZWUtNmI4NGJhMjllMzViXG1zZ3NcbXNnLTE4ZGFmNDFkLWI5M2QtMTFlZS04NjNjLTNjMjE5Y2RkNzFiNFxhbWUtdGVzdFwxOGRhZjQxZi1iOTNkLTExZWUtODYzYy0zYzIxOWNkZDcxYjRib2R5LnR4dCIgc3o9IjI0MTUiIHQ9IjEzMzUwNDExODU2NjM5NTEzOCIgaD0iWjNqb3I1cFFPOWNZRm91WjV3STVTa2RHWHVjPSIgaWQ9IiIgYmw9IjAiIGJvPSIxIi8+PC9tZXRhPg==
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM4PR12MB5088:EE_|MW4PR12MB5667:EE_
-x-ms-office365-filtering-correlation-id: bbccede2-2c51-40c1-fc95-08dc1b60ff1b
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 
- PlW8B+Yr+6TTBeD47HUxNfB7e2mAgO776JokbuHYtBbimJpa9LUiP/Tmqzmwhdo/I42CGDCLutBtOPncNBEu4PM0o+HLRh+Zh21xgLtlX85JVfumDxF0555NR81AiGCnTFVKahdtDwDt6kUBdNgNcwxYj9UQYhQEv9R3Rx0Lyc1qRLgxJCRoTnipdgBc2SX0sXJXkpVAwhftJq29Kt39fCwYsUNAy/OziOlRnZgwWPz5QxS61Hvg/EWiGPjJWOcv3EBVs5mVn2cp5XAJerw49KgCncDGx2ARLqLNs4Q01hR6FnByiXreuj599dFEFWRi06rwXXLMkq2Jtw3KJdWFlR6foUkApVhCAD3+tS1Dhkvd4lAICsqZgky9RQD83ekgBxK46QHpVg9jHzePIHviqrNhxWbM2pVcC416SMcMU5awPsZX77pTTUGzY1n6hX6V3kAsAVoxbI4PyWHlhkMAkpKau4OcZWc7RcXPfD3Wx744kjHcGfoBT0xKiwNlmZ3nTRyJV2mhGuY9DbEEYUqRndtUJ5n/adQhP16m0rw5tpFjDikZzHZpGtk2M5jQP7/tqjKM+kMkp5vsSSrYNvkkh18rczeGD4K/WmsA0Ej+SdX3N9DPNtlrPjqxINpEhTg1
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5088.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(366004)(39860400002)(396003)(136003)(376002)(230922051799003)(186009)(64100799003)(451199024)(1800799012)(71200400001)(53546011)(38100700002)(41300700001)(86362001)(33656002)(2906002)(8676002)(122000001)(7696005)(478600001)(6506007)(316002)(76116006)(66556008)(66946007)(52536014)(7416002)(83380400001)(5660300002)(64756008)(9686003)(4326008)(66446008)(66476007)(54906003)(107886003)(110136005)(26005)(8936002)(38070700009)(55016003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?utf-8?B?MGFOUk5HV1BNWkJ5VWxZOXNlWUxERlJidWFiQTFTcGdiZlRRMWhPMFZad01o?=
- =?utf-8?B?UU0veEpZWHdicHFOQlNpRU5ydnBYUUhpZm9RWUljY0UxeXlWMzYrT1V5a0pE?=
- =?utf-8?B?a0dob3NWVnJYMjYyVlIvZ002UmNGL0RhYlhXVlNHR0xiZk84ZHkvdHQzeHla?=
- =?utf-8?B?UTNNMWRWOE1Jc3lMOGZna2U0SW5rc01aSDVBdWxGQWx1Y2JvZXNtRWt1WEJt?=
- =?utf-8?B?WmR1K280NzdTQkxvSUllUWRZbzVFSW1DZG1nZXFXc2hHeHIxU2pZbGhjMW9E?=
- =?utf-8?B?WWZ0S2hVYWFiQWNYSVJ2a1RDd0hhQnZ3SEUzU3c2dStnSnBWNTdYNXRDZTEv?=
- =?utf-8?B?OW9hVDZLdE93ZVF6TE1LUWg2c0g1dG9tWm5JMHVoU2lBWkJvTjhXYmliSnc2?=
- =?utf-8?B?SXlSM3RXaVVGRU1WbkdCTk1qR2R6aWx1enpVcHA1WGZaVVlDSkJna05CQ1lq?=
- =?utf-8?B?bzdyTDNObEtHemFUd010NVdEK3ZYVFZ6cTBEcFYzKzBxclhxNjVvU1JDM2Mx?=
- =?utf-8?B?VU82R0NhTWxlVjFTMmo3QXNCL1pHcExWMHhzYldPNmdhZWl2N00vVFdCSDcr?=
- =?utf-8?B?SWN6aFhlMU5rNDVhYTB2YjNXWUJ5RlViYUlsRWlpbWFDNGJyd3d2dmpMTWo3?=
- =?utf-8?B?U1ZDQUhiRS9EQTVLaUlhUlRSak9wSWsxOG8xRGxGeUphcmRKZGJtb21MMkNy?=
- =?utf-8?B?cGpzbVVSSUpUTU9qb3RTa09uYWowemJibWxGUm9PNGJkL3VWakF3RUFCcmRL?=
- =?utf-8?B?VDg3VnhFbDY0Y2ZON2puNkh3dlI2cWF6dVRYcng3Ymh1UlRsUHJuRnEyTW5P?=
- =?utf-8?B?RCtOMmtnNVF4MkZaMS9FdW5UUlRSMXpJb1pSckpLWHVBaCtFeFhqRlJPMnpz?=
- =?utf-8?B?alNla2NVZ0dWME1td0kzK1AwdlpqQlQrSW9WWEVnVUcwa3RaMEpRSHZERVp5?=
- =?utf-8?B?L0xrRTloMlhJWFVJSWpnZE1VZ1RoMFc3QklVZ2ZHS1FNVmhuTDUyaXJpNWZk?=
- =?utf-8?B?UE5IZS8rNG9lczNqRHRXeE8zM1IreU5CcW5UK2diQ0RHU1R6Sml1c2dRaGJ6?=
- =?utf-8?B?Wnk5bmhCWjBZSWNsVE5QOHI3UVBmeWx4eWZyS1FpS2FYZlhaTllSc3hleU12?=
- =?utf-8?B?M2ZtWElPWGk3RlhNbFBWZ2RhcExmSUZTeFhhZThuNkpIT01BbzExSlhONVh6?=
- =?utf-8?B?ei9FNTFBcm4yNGZOUis0R09MWXIwNFMwYkFXNUNlcFd6VE5mc25yWFFsS3FY?=
- =?utf-8?B?elNDQjQwSzB0ck5rcmxwck8vcmRuc2xrN1hCRmlWVnlMQ2ZNc1ZRMS85clly?=
- =?utf-8?B?MHh1QStaK3N1ekh0N0h1Q001TWxMTXQyNXdMU0RLeGEvakswZWpaN0hQY09i?=
- =?utf-8?B?VnZDaGhyMkZ6MzdTS0ZLMTJFdnFEb0NOYmlPelA5ZW02bzVCcWg4ZzRFeHZy?=
- =?utf-8?B?Vjk4cXgrRXFzYVY2WENWWE8vZlZIaTJ3SG8vRXBmSnAzeDVhYm05cDFRMWJB?=
- =?utf-8?B?blJ6V00wZU4rVUliTDBLNndyTWwvNkhkNmtVZDcvQlZOeUd5eEphZXplRDdo?=
- =?utf-8?B?RlpVK2dFY095bGlqVGJzUGFuVkJSVXMvRFJpQWZwM0ozanRNZGk5MW9JL2hB?=
- =?utf-8?B?b3RTUUJkbFl5S1RVWk52UVJTQUhxNjZTcG5TWG9jRDB4YVBxL0UxWlBvSWJk?=
- =?utf-8?B?dHpKd0RjNlpKVVJoMkU1S2pBc3c0bG1waXpYeENQclpzZHNNYktJbWhrajVV?=
- =?utf-8?B?eWRtS3lnbS9vckZPVXpZbWNjbExKNHFyV2E3TDhpelRGZE51akdFdkQzSTFh?=
- =?utf-8?B?S2UyZE5GVUpFTXQwNUs0b3RmT1BtUlJYekpBWEl0WXorY1QwRHRMTUtmN0RG?=
- =?utf-8?B?Y0Y3ZTNRbHF6K3FSQXZ0WTdzMWtub2tsb2szZFNoS3hWU1lGWU1oVkRKWkdo?=
- =?utf-8?B?dWtpUlovcktEejdhemc3SFhGMjVpRkF4Y2hZd1p1cytUWXhRNit2V1IzcmQx?=
- =?utf-8?B?U29ITWdVaUFNRW5OYmJBNExNVmcrWmpqdndFZzN1RDVaOXRBcDZVcGNQNzB3?=
- =?utf-8?B?dGJaZUdoS3IreEZrbElkZEVSSEZZQ3JMaDRPNzBQQkVXM3FxM2EwZ01DREhk?=
- =?utf-8?Q?7pWpn5cA8YGWjeib+PbAQZnUb?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9A5347F5F;
+	Mon, 22 Jan 2024 15:35:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705937736; cv=none; b=btVnWhuYElRWcD918Y+ar2nNWUrmVeJwSMiaGzLcrl9g28wMYOJYVfx8NKcl+PUSbEYV9+1OwLrRYmXGukEblmS1iyS8idVCquXC+XiNQzB6J8UPFq5AaU2iLsav5CMc3UbB3QtN3YLnq0c7pVW0ftCPN2D/UZBquHbgUQwgSAo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705937736; c=relaxed/simple;
+	bh=cw5Mpw7n9M0hjUDaAX7nmstJjwmkUaACvFFjDSI04pM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=G2EGQUYDS8kIlJ0zkXnHtS+ggLa/eWAlU0mdTWekfJGrRrDdFXB5Dsm4f5HCABx7Rk4TCdgNbEw9iPzfuFIVEzin5NWWG5zteoCRhrCNnFPzhawiIBIIV4rPkWYzKmLkGzUuk8jpvFPgrtpkKsYnQ/4ZYzBljtPjwWoKSYX6RwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=drXQi9RJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D31DDC433C7;
+	Mon, 22 Jan 2024 15:35:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705937735;
+	bh=cw5Mpw7n9M0hjUDaAX7nmstJjwmkUaACvFFjDSI04pM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=drXQi9RJ0LjGHQYir+LKwlDIR3jMO59nj03htS6+w2EqCEEtmnJF1ca0pY+LhTk7r
+	 SWCmsgVrv174VxdCWCu58to9bVYS/u9KrZ53lEv/lWzRZEk98lZ+4DRdOt4fK+euue
+	 haVynhDWoXZRstTYJ6ZzeOD8UioCrYpBo4nlgsOKjpK7azP09oqLsiZJu4NC97pGgH
+	 rBhx5jpt/OxD7VLifs8HK/NZDhhCqaeEJcOxAk+zE+/g7+n9S99FbiRbI0QD6OPrjS
+	 BjaMpN80Pwgd7J/4yyt8t9IZAWF9jOGUwQ46S4BqAG/h5cFgPrYQLvpNP7+QI1CP9T
+	 gHZd3Hb13ZwxQ==
+Date: Mon, 22 Jan 2024 16:35:31 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: linux-nfs@vger.kernel.org, lorenzo.bianconi@redhat.com, neilb@suse.de,
+	kuba@kernel.org, chuck.lever@oracle.com, horms@kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v6 3/3] NFSD: add write_ports to netlink command
+Message-ID: <Za6LQ8tdSwFil-eO@lore-desk>
+References: <cover.1705771400.git.lorenzo@kernel.org>
+ <f7c42dae2b232b3b06e54ceb3f00725893973e02.1705771400.git.lorenzo@kernel.org>
+ <9e3ae337dcf168c60c4cfd51aa0b2fc7b24bcbfb.camel@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	Hwmq7jdcPfPkmNqJlw11RpCY2ZxK3YYFQcKYjgtVjr8ZfE4ucr7r2e3PFISbPESCgslDfAGV63EViPDYZUjGSwXxZgVVH6sJuWGD7jhEBKnvaALl/wfmhvThplyAlp77tnvHQpPKJqjC/DgpYVXvgrlnkn7jmP3RKNJunLqwDYdJB4tePVPANADoIHxbHlpJWJVpcOA22lswn8DM1sfRnJSlk1YDECeYFhLp8Oz+ivXpddu272/VQYwk2muXHtnTA7vk5Dum2/ZtVY0aSadJEFRDNdM+W15Fg6CYtRMChP3tnvmfdJCcEtpMeJhZJrL5zyXAemq9HwAi1rpopwnKR5xVQH5HdWSdbL+akdYiWMPC/UwVhwLBpD2nH+IK8D8XsNzbBeuIfct2ss3B+CAXfJIkVhHHsnqArohRiHCaw0oixRiocvMdTeU3IWUZCe75/FRcdCx9TQc29ml+3DWtjsgcYGAmjro2n13t3A2eu5SvuwVjBNl+/YzSHI0dof2gP/Wp6dJVzAgrY/0PgRCDctCwSLLLeJ+Uebc3AjQH/t2Kwo3UN0gJGr7nLKBGjrDjX+2gd8in54r4ZzVJoeCEHlJ55PJBVpah1wm4EpBVHGTNYR+N5yloLVXM28YAovjW4mXtJ7P7aVXDEHIiYEBwtg==
-X-OriginatorOrg: synopsys.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5088.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bbccede2-2c51-40c1-fc95-08dc1b60ff1b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jan 2024 15:44:19.0557
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: c33c9f88-1eb7-4099-9700-16013fd9e8aa
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: QUOCSdV4LBDvbn7dkphgRmnfIyO5j9Y74fbqai6N3gOzWwvs3D4gzCW3YcFq23ABXTsR1gFVA7NlWZYhxlp+xA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB5667
-X-Proofpoint-GUID: zfngRYfthnivuaEmr8e_ANuYU7VU2UKQ
-X-Proofpoint-ORIG-GUID: zfngRYfthnivuaEmr8e_ANuYU7VU2UKQ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-22_05,2024-01-22_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_active_cloned_notspam policy=outbound_active_cloned score=0
- clxscore=1015 spamscore=0 priorityscore=1501 impostorscore=0 mlxscore=0
- bulkscore=0 phishscore=0 suspectscore=0 malwarescore=0 adultscore=0
- lowpriorityscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2311290000 definitions=main-2401220107
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="9Hh0vlcC0XRrsh2y"
+Content-Disposition: inline
+In-Reply-To: <9e3ae337dcf168c60c4cfd51aa0b2fc7b24bcbfb.camel@kernel.org>
 
-RnJvbTogQmVybmQgRWRsaW5nZXIgPGJlcm5kLmVkbGluZ2VyQGhvdG1haWwuZGU+DQpEYXRlOiBN
-b24sIEphbiAyMiwgMjAyNCBhdCAwNjo0MTo0Ng0KDQo+IE9uIDEvMTkvMjQgMTE6MzgsIEpvc2Ug
-QWJyZXUgd3JvdGU6DQo+ID4gSSB1bmRlcnN0YW5kIHlvdXIgcG9pbnQsIGJ1dCB0aGUgZGVsYXkg
-c2hvdWxkIGJlIG9uIHJlc2V0IGZ1bmN0aW9uIGl0c2VsZiwgc2luY2UgaXQgZGVwZW5kcw0KPiA+
-IG9uIHRoZSBTb0MgdGhhdCBzdG1tYWMgaXMgaW50ZWdyYXRlZC4NCj4gPiANCj4gPiBQbGVhc2Ug
-cmVmZXIgdG8gcmVzZXRfc2ltcGxlX3Jlc2V0KCksIHdoZXJlIHVzbGVlcF9yYW5nZSgpIGlzIHVz
-ZWQuDQo+ID4gDQo+IA0KPiBPa2F5LCBpbiBteSBjYXNlIHRoZSBTT0MgaXMgYW4gQWx0ZXJhIEN5
-Y2xvbmVWIGFuZCByZXNldCBjb250cm9sIHNlZW1zIHRvIGJlIGFuIGFsdHIscnN0LW1ncg0KPiB3
-aGljaCBpcyBpbmRlZWQgYmFzZWQgb24gdGhpcyByZXNldF9zaW1wbGVfcmVzZXQuDQo+IA0KPiBT
-byBpdCBpbXBsZW1lbnRzIHJlc2V0X2NvbnRyb2xfYXNzZXJ0LCByZXNldF9jb250cm9sX2RlYXNz
-ZXJ0LCBhbmQgcmVzZXRfY29udHJvbF9yZXNldC4NCj4gQnV0IHRoZSBhYm92ZSBtZW50aW9uZWQg
-ZGVsYXkgYWZmZWN0cyBvbmx5IHRoZSB3aWR0aCBvZiB0aGUgcmVzZXQgcHVsc2UgdGhhdCBpcyBn
-ZW5lcmF0ZWQNCj4gYnkgdGhlIHJlc2V0X2NvbnRyb2xfcmVzZXQgbWV0aG9kLg0KPiANCj4gSG93
-ZXZlciBpZiB5b3UgbG9vayBhdCB0aGUgY29kZSBpbiBzdG1tYWNfZHZyX3Byb2JsZSB3aGVyZSB0
-aGUgcmVzZXQgcHVsc2UgaXMgZ2VuZXJhdGVkLA0KPiB5b3Ugd2lsbCBzZWUgdGhhdCB0aGUgcmVz
-ZXQgcHVsc2UgaXMgb25seSBnZW5lcmF0ZWQgd2l0aCByZXNldF9jb250cm9sX2Fzc2VydC9kZWFz
-c2VydDoNCj4gDQo+ICAgICAgICAgaWYgKHByaXYtPnBsYXQtPnN0bW1hY19yc3QpIHsNCj4gICAg
-ICAgICAgICAgICAgIHJldCA9IHJlc2V0X2NvbnRyb2xfYXNzZXJ0KHByaXYtPnBsYXQtPnN0bW1h
-Y19yc3QpOw0KPiAgICAgICAgICAgICAgICAgcmVzZXRfY29udHJvbF9kZWFzc2VydChwcml2LT5w
-bGF0LT5zdG1tYWNfcnN0KTsNCj4gICAgICAgICAgICAgICAgIC8qIFNvbWUgcmVzZXQgY29udHJv
-bGxlcnMgaGF2ZSBvbmx5IHJlc2V0IGNhbGxiYWNrIGluc3RlYWQgb2YNCj4gICAgICAgICAgICAg
-ICAgICAqIGFzc2VydCArIGRlYXNzZXJ0IGNhbGxiYWNrcyBwYWlyLg0KPiAgICAgICAgICAgICAg
-ICAgICovDQo+ICAgICAgICAgICAgICAgICBpZiAocmV0ID09IC1FTk9UU1VQUCkNCj4gICAgICAg
-ICAgICAgICAgICAgICAgICAgcmVzZXRfY29udHJvbF9yZXNldChwcml2LT5wbGF0LT5zdG1tYWNf
-cnN0KTsNCj4gICAgICAgICB9DQo+IA0KPiBJIGRvbid0IGtub3cgd2hpY2ggcmVzZXQgY29udHJv
-bGxlciB0aGF0IHdvdWxkIGJlLCB3aGVyZSBvbmx5IGEgcmVzZXRfY29udHJvbF9yZXNldCBpcw0K
-PiBhdmFpbGFibGUsIGJ1dCBpbiBteSBjYXNlIHJldCA9PSAwLCBhbmQgZXZlbiBpZiBJIGNvdWxk
-IGdldCB0aGUgcmVzZXRfY29udHJvbF9yZXNldA0KPiB0byBiZSB1c2VkLCB0aGUgaXNzdWUgaXMg
-bm90IHRoZSBkdXJhdGlvbiBob3cgbG9uZyB0aGUgcmVzZXQgbGluZSBpcyBpbiBhY3RpdmUgc3Rh
-dGUsDQo+IGJ1dCB0aGUgZHVyYXRpb24gdGhhdCBpcyBuZWVkZWQgZm9yIHRoZSBkZXZpY2UgdG8g
-cmVjb3ZlciBmcm9tIHRoZSByZXNldC4NCg0KU29ycnksIEkgaW5kZWVkIG1pc3NlZCB0aGUgZmFj
-dCB0aGF0IG9uIHNpbXBsZV9yZXNldCB0aGUgZGVhc3NlcnQgaXMgZG9uZQ0KYWZ0ZXIgdGhlIGRl
-bGF5LiBCdXQgbXkgcG9pbnQgd2FzIHRoYXQgd2hhdCB5b3UgYXJlIGZhY2luZyBpcyBleHBlY3Rl
-ZCBzaW5jZQ0KbW9zdCBvZiBTb0MgY2hpcHMgbmVlZCBzb21lIHRpbWUgdG8gcmVjb3ZlciBmcm9t
-IHJlc2V0LCBhbmQgdGhpcyB0aW1lIGlzDQpncmVhdGx5IGRlcGVuZGVudCBvbiBpbnRlZ3JhdGlv
-bicgcmVmZXJlbmNlIGNsb2NrIHZhbHVlIChsb3dlciByZWZlcmVuY2UNCnZhbHVlcyBjYXVzZSAi
-cmVjb3ZlciIgdG8gdGFrZSBsb25nZXIpLg0KDQpJIGhhdmUgbm8gb2JqZWN0aW9uIHRvIHlvdXIg
-cGF0Y2ggc2luY2UgaXQncyBpbmRlZWQgYSB2ZXJ5IHNtYWxsIHZhbHVlLCBidXQNCkkgYmVsaWV2
-ZSByZXNldCBmcmFtZXdvcmsgYW5kL29yIEFsdGVyYScgcmVzZXQgbWFuYWdlciBzaG91bGQgdGFr
-ZSB0aGVzZSBkZWxheXMNCmludG8gYWNjb3VudCBvbiBkZWFzc2VydCwgc2luY2UgdGhleSBhcmUg
-ZXhwZWN0ZWQgdG8gaGFwcGVuLg0KDQpUaGFua3MsDQpKb3NlDQo=
+
+--9Hh0vlcC0XRrsh2y
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+> On Sat, 2024-01-20 at 18:33 +0100, Lorenzo Bianconi wrote:
+> > Introduce write_ports netlink command. For listener-set, userspace is
+> > expected to provide a NFS listeners list it wants to enable (all the
+> > other ports will be closed).
+> >=20
+>=20
+> Ditto here. This is a change to a declarative interface, which I think
+> is a better way to handle this, but we should be aware of the change.
+>=20
+> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> > ---
+> >  Documentation/netlink/specs/nfsd.yaml |  37 +++++
+> >  fs/nfsd/netlink.c                     |  23 +++
+> >  fs/nfsd/netlink.h                     |   3 +
+> >  fs/nfsd/nfsctl.c                      | 196 ++++++++++++++++++++++++++
+> >  include/uapi/linux/nfsd_netlink.h     |  18 +++
+> >  tools/net/ynl/generated/nfsd-user.c   | 191 +++++++++++++++++++++++++
+> >  tools/net/ynl/generated/nfsd-user.h   |  55 ++++++++
+> >  7 files changed, 523 insertions(+)
+> >=20
+> > diff --git a/Documentation/netlink/specs/nfsd.yaml b/Documentation/netl=
+ink/specs/nfsd.yaml
+> > index 30f18798e84e..296ff24b23ac 100644
+> > --- a/Documentation/netlink/specs/nfsd.yaml
+> > +++ b/Documentation/netlink/specs/nfsd.yaml
+> > @@ -85,6 +85,26 @@ attribute-sets:
+> >          type: nest
+> >          nested-attributes: nfs-version
+> >          multi-attr: true
+> > +  -
+> > +    name: server-instance
+> > +    attributes:
+> > +      -
+> > +        name: transport-name
+> > +        type: string
+> > +      -
+> > +        name: port
+> > +        type: u32
+> > +      -
+> > +        name: inet-proto
+> > +        type: u16
+> > +  -
+> > +    name: server-listener
+> > +    attributes:
+> > +      -
+> > +        name: instance
+> > +        type: nest
+> > +        nested-attributes: server-instance
+> > +        multi-attr: true
+> > =20
+> >  operations:
+> >    list:
+> > @@ -144,3 +164,20 @@ operations:
+> >          reply:
+> >            attributes:
+> >              - version
+> > +    -
+> > +      name: listener-set
+> > +      doc: set nfs running listeners
+> > +      attribute-set: server-listener
+> > +      flags: [ admin-perm ]
+> > +      do:
+> > +        request:
+> > +          attributes:
+> > +            - instance
+> > +    -
+> > +      name: listener-get
+> > +      doc: get nfs running listeners
+> > +      attribute-set: server-listener
+> > +      do:
+> > +        reply:
+> > +          attributes:
+> > +            - instance
+> > diff --git a/fs/nfsd/netlink.c b/fs/nfsd/netlink.c
+> > index 5cbbd3295543..c772f9e14761 100644
+> > --- a/fs/nfsd/netlink.c
+> > +++ b/fs/nfsd/netlink.c
+> > @@ -16,6 +16,12 @@ const struct nla_policy nfsd_nfs_version_nl_policy[N=
+FSD_A_NFS_VERSION_MINOR + 1]
+> >  	[NFSD_A_NFS_VERSION_MINOR] =3D { .type =3D NLA_U32, },
+> >  };
+> > =20
+> > +const struct nla_policy nfsd_server_instance_nl_policy[NFSD_A_SERVER_I=
+NSTANCE_INET_PROTO + 1] =3D {
+> > +	[NFSD_A_SERVER_INSTANCE_TRANSPORT_NAME] =3D { .type =3D NLA_NUL_STRIN=
+G, },
+> > +	[NFSD_A_SERVER_INSTANCE_PORT] =3D { .type =3D NLA_U32, },
+> > +	[NFSD_A_SERVER_INSTANCE_INET_PROTO] =3D { .type =3D NLA_U16, },
+> > +};
+> > +
+> >  /* NFSD_CMD_THREADS_SET - do */
+> >  static const struct nla_policy nfsd_threads_set_nl_policy[NFSD_A_SERVE=
+R_WORKER_THREADS + 1] =3D {
+> >  	[NFSD_A_SERVER_WORKER_THREADS] =3D { .type =3D NLA_U32, },
+> > @@ -26,6 +32,11 @@ static const struct nla_policy nfsd_version_set_nl_p=
+olicy[NFSD_A_SERVER_PROTO_VE
+> >  	[NFSD_A_SERVER_PROTO_VERSION] =3D NLA_POLICY_NESTED(nfsd_nfs_version_=
+nl_policy),
+> >  };
+> > =20
+> > +/* NFSD_CMD_LISTENER_SET - do */
+> > +static const struct nla_policy nfsd_listener_set_nl_policy[NFSD_A_SERV=
+ER_LISTENER_INSTANCE + 1] =3D {
+> > +	[NFSD_A_SERVER_LISTENER_INSTANCE] =3D NLA_POLICY_NESTED(nfsd_server_i=
+nstance_nl_policy),
+> > +};
+> > +
+> >  /* Ops table for nfsd */
+> >  static const struct genl_split_ops nfsd_nl_ops[] =3D {
+> >  	{
+> > @@ -59,6 +70,18 @@ static const struct genl_split_ops nfsd_nl_ops[] =3D=
+ {
+> >  		.doit	=3D nfsd_nl_version_get_doit,
+> >  		.flags	=3D GENL_CMD_CAP_DO,
+> >  	},
+> > +	{
+> > +		.cmd		=3D NFSD_CMD_LISTENER_SET,
+> > +		.doit		=3D nfsd_nl_listener_set_doit,
+> > +		.policy		=3D nfsd_listener_set_nl_policy,
+> > +		.maxattr	=3D NFSD_A_SERVER_LISTENER_INSTANCE,
+> > +		.flags		=3D GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
+> > +	},
+> > +	{
+> > +		.cmd	=3D NFSD_CMD_LISTENER_GET,
+> > +		.doit	=3D nfsd_nl_listener_get_doit,
+> > +		.flags	=3D GENL_CMD_CAP_DO,
+> > +	},
+> >  };
+> > =20
+> >  struct genl_family nfsd_nl_family __ro_after_init =3D {
+> > diff --git a/fs/nfsd/netlink.h b/fs/nfsd/netlink.h
+> > index c9a1be693fef..10a26ad32cd0 100644
+> > --- a/fs/nfsd/netlink.h
+> > +++ b/fs/nfsd/netlink.h
+> > @@ -13,6 +13,7 @@
+> > =20
+> >  /* Common nested types */
+> >  extern const struct nla_policy nfsd_nfs_version_nl_policy[NFSD_A_NFS_V=
+ERSION_MINOR + 1];
+> > +extern const struct nla_policy nfsd_server_instance_nl_policy[NFSD_A_S=
+ERVER_INSTANCE_INET_PROTO + 1];
+> > =20
+> >  int nfsd_nl_rpc_status_get_start(struct netlink_callback *cb);
+> >  int nfsd_nl_rpc_status_get_done(struct netlink_callback *cb);
+> > @@ -23,6 +24,8 @@ int nfsd_nl_threads_set_doit(struct sk_buff *skb, str=
+uct genl_info *info);
+> >  int nfsd_nl_threads_get_doit(struct sk_buff *skb, struct genl_info *in=
+fo);
+> >  int nfsd_nl_version_set_doit(struct sk_buff *skb, struct genl_info *in=
+fo);
+> >  int nfsd_nl_version_get_doit(struct sk_buff *skb, struct genl_info *in=
+fo);
+> > +int nfsd_nl_listener_set_doit(struct sk_buff *skb, struct genl_info *i=
+nfo);
+> > +int nfsd_nl_listener_get_doit(struct sk_buff *skb, struct genl_info *i=
+nfo);
+> > =20
+> >  extern struct genl_family nfsd_nl_family;
+> > =20
+> > diff --git a/fs/nfsd/nfsctl.c b/fs/nfsd/nfsctl.c
+> > index 53af82303f93..562b209f2921 100644
+> > --- a/fs/nfsd/nfsctl.c
+> > +++ b/fs/nfsd/nfsctl.c
+> > @@ -1896,6 +1896,202 @@ int nfsd_nl_version_get_doit(struct sk_buff *sk=
+b, struct genl_info *info)
+> >  	return err;
+> >  }
+> > =20
+> > +/**
+> > + * nfsd_nl_listener_set_doit - set the nfs running listeners
+> > + * @skb: reply buffer
+> > + * @info: netlink metadata and command arguments
+> > + *
+> > + * Return 0 on success or a negative errno.
+> > + */
+> > +int nfsd_nl_listener_set_doit(struct sk_buff *skb, struct genl_info *i=
+nfo)
+> > +{
+> > +	struct nlattr *tb[ARRAY_SIZE(nfsd_server_instance_nl_policy)];
+> > +	struct net *net =3D genl_info_net(info);
+> > +	struct svc_xprt *xprt, *tmp_xprt;
+> > +	const struct nlattr *attr;
+> > +	struct svc_serv *serv;
+> > +	const char *xcl_name;
+> > +	struct nfsd_net *nn;
+> > +	int port, err, rem;
+> > +	sa_family_t af;
+> > +
+> > +	if (GENL_REQ_ATTR_CHECK(info, NFSD_A_SERVER_LISTENER_INSTANCE))
+> > +		return -EINVAL;
+> > +
+> > +	mutex_lock(&nfsd_mutex);
+> > +
+> > +	err =3D nfsd_create_serv(net);
+> > +	if (err) {
+> > +		mutex_unlock(&nfsd_mutex);
+> > +		return err;
+> > +	}
+> > +
+> > +	nn =3D net_generic(net, nfsd_net_id);
+> > +	serv =3D nn->nfsd_serv;
+> > +
+> > +	/* 1- create brand new listeners */
+> > +	nlmsg_for_each_attr(attr, info->nlhdr, GENL_HDRLEN, rem) {
+> > +		if (nla_type(attr) !=3D NFSD_A_SERVER_LISTENER_INSTANCE)
+> > +			continue;
+> > +
+> > +		if (nla_parse_nested(tb, ARRAY_SIZE(tb), attr,
+> > +				     nfsd_server_instance_nl_policy,
+> > +				     info->extack) < 0)
+> > +			continue;
+> > +
+> > +		if (!tb[NFSD_A_SERVER_INSTANCE_TRANSPORT_NAME] ||
+> > +		    !tb[NFSD_A_SERVER_INSTANCE_PORT])
+> > +			continue;
+> > +
+> > +		xcl_name =3D nla_data(tb[NFSD_A_SERVER_INSTANCE_TRANSPORT_NAME]);
+> > +		port =3D nla_get_u32(tb[NFSD_A_SERVER_INSTANCE_PORT]);
+> > +		if (port < 1 || port > USHRT_MAX)
+> > +			continue;
+> > +
+> > +		af =3D nla_get_u32(tb[NFSD_A_SERVER_INSTANCE_INET_PROTO]);
+> > +		if (af !=3D PF_INET && af !=3D PF_INET6)
+> > +			continue;
+> > +
+> > +		xprt =3D svc_find_xprt(serv, xcl_name, net, PF_INET, port);
+> > +		if (xprt) {
+> > +			svc_xprt_put(xprt);
+> > +			continue;
+> > +		}
+> > +
+> > +		/* create new listerner */
+> > +		if (svc_xprt_create(serv, xcl_name, net, af, port,
+> > +				    SVC_SOCK_ANONYMOUS, get_current_cred()))
+> > +			continue;
+> > +	}
+> > +
+> > +	/* 2- remove stale listeners */
+>=20
+>=20
+> The old portlist interface was weird, in that it was only additive. You
+> couldn't use it to close a listening socket (AFAICT). We may be able to
+> support that now with this interface, but we'll need to test that case
+> carefully.
+>=20
+>=20
+>=20
+> > +	spin_lock_bh(&serv->sv_lock);
+> > +	list_for_each_entry_safe(xprt, tmp_xprt, &serv->sv_permsocks,
+> > +				 xpt_list) {
+> > +		struct svc_xprt *rqt_xprt =3D NULL;
+> > +
+> > +		nlmsg_for_each_attr(attr, info->nlhdr, GENL_HDRLEN, rem) {
+> > +			if (nla_type(attr) !=3D NFSD_A_SERVER_LISTENER_INSTANCE)
+> > +				continue;
+> > +
+> > +			if (nla_parse_nested(tb, ARRAY_SIZE(tb), attr,
+> > +					     nfsd_server_instance_nl_policy,
+> > +					     info->extack) < 0)
+> > +				continue;
+> > +
+> > +			if (!tb[NFSD_A_SERVER_INSTANCE_TRANSPORT_NAME] ||
+> > +			    !tb[NFSD_A_SERVER_INSTANCE_PORT])
+> > +				continue;
+> > +
+> > +			xcl_name =3D nla_data(
+> > +				tb[NFSD_A_SERVER_INSTANCE_TRANSPORT_NAME]);
+> > +			port =3D nla_get_u32(tb[NFSD_A_SERVER_INSTANCE_PORT]);
+> > +			if (port < 1 || port > USHRT_MAX)
+> > +				continue;
+> > +
+> > +			af =3D nla_get_u32(tb[NFSD_A_SERVER_INSTANCE_INET_PROTO]);
+> > +			if (af !=3D PF_INET && af !=3D PF_INET6)
+> > +				continue;
+> > +
+> > +			if (!strcmp(xprt->xpt_class->xcl_name, xcl_name) &&
+> > +			    port =3D=3D svc_xprt_local_port(xprt) &&
+> > +			    af =3D=3D xprt->xpt_local.ss_family &&
+> > +			    xprt->xpt_net =3D=3D net) {
+> > +				rqt_xprt =3D xprt;
+> > +				break;
+> > +			}
+> > +		}
+> > +
+> > +		/* remove stale listener */
+> > +		if (!rqt_xprt) {
+> > +			spin_unlock_bh(&serv->sv_lock);
+> > +			svc_xprt_close(xprt);
+> >=20
+>=20
+> I'm not sure this is safe. Can anything else modify sv_permsocks while
+> you're not holding the lock? Maybe not since you're holding the
+> nfsd_mutex, but it's still probably best to restart the list walk if you
+> have to drop the lock here.
+>=20
+> You're typically only going to have a few sockets here anyway -- usually
+> just one each for TCP, UDP and maybe RDMA.
+
+what about beeing a bit proactive and set XPT_CLOSE bit before releasing the
+spinlock (as we already do in svc_xprt_close)?
+
+Regards,
+Lorenzo
+
+>=20
+>=20
+> > +			spin_lock_bh(&serv->sv_lock);
+> > +		}
+> > +	}
+> > +	spin_unlock_bh(&serv->sv_lock);
+> > +
+> > +	if (!serv->sv_nrthreads && list_empty(&nn->nfsd_serv->sv_permsocks))
+> > +		nfsd_destroy_serv(net);
+> > +
+> > +	mutex_unlock(&nfsd_mutex);
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +/**
+> > + * nfsd_nl_listener_get_doit - get the nfs running listeners
+> > + * @skb: reply buffer
+> > + * @info: netlink metadata and command arguments
+> > + *
+> > + * Return 0 on success or a negative errno.
+> > + */
+> > +int nfsd_nl_listener_get_doit(struct sk_buff *skb, struct genl_info *i=
+nfo)
+> > +{
+> > +	struct svc_xprt *xprt;
+> > +	struct svc_serv *serv;
+> > +	struct nfsd_net *nn;
+> > +	void *hdr;
+> > +	int err;
+> > +
+> > +	skb =3D genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
+> > +	if (!skb)
+> > +		return -ENOMEM;
+> > +
+> > +	hdr =3D genlmsg_iput(skb, info);
+> > +	if (!hdr) {
+> > +		err =3D -EMSGSIZE;
+> > +		goto err_free_msg;
+> > +	}
+> > +
+> > +	mutex_lock(&nfsd_mutex);
+> > +	nn =3D net_generic(genl_info_net(info), nfsd_net_id);
+> > +	if (!nn->nfsd_serv) {
+> > +		err =3D -EINVAL;
+> > +		goto err_nfsd_unlock;
+> > +	}
+> > +
+> > +	serv =3D nn->nfsd_serv;
+> > +	spin_lock_bh(&serv->sv_lock);
+> > +	list_for_each_entry(xprt, &serv->sv_permsocks, xpt_list) {
+> > +		struct nlattr *attr;
+> > +
+> > +		attr =3D nla_nest_start_noflag(skb,
+> > +					     NFSD_A_SERVER_LISTENER_INSTANCE);
+> > +		if (!attr) {
+> > +			err =3D -EINVAL;
+> > +			goto err_serv_unlock;
+> > +		}
+> > +
+> > +		if (nla_put_string(skb, NFSD_A_SERVER_INSTANCE_TRANSPORT_NAME,
+> > +				   xprt->xpt_class->xcl_name) ||
+> > +		    nla_put_u32(skb, NFSD_A_SERVER_INSTANCE_PORT,
+> > +				svc_xprt_local_port(xprt)) ||
+> > +		    nla_put_u16(skb, NFSD_A_SERVER_INSTANCE_INET_PROTO,
+> > +				xprt->xpt_local.ss_family)) {
+> > +			err =3D -EINVAL;
+> > +			goto err_serv_unlock;
+> > +		}
+> > +
+> > +		nla_nest_end(skb, attr);
+> > +	}
+> > +	spin_unlock_bh(&serv->sv_lock);
+> > +	mutex_unlock(&nfsd_mutex);
+> > +
+> > +	genlmsg_end(skb, hdr);
+> > +
+> > +	return genlmsg_reply(skb, info);
+> > +
+> > +err_serv_unlock:
+> > +	spin_unlock_bh(&serv->sv_lock);
+> > +err_nfsd_unlock:
+> > +	mutex_unlock(&nfsd_mutex);
+> > +err_free_msg:
+> > +	nlmsg_free(skb);
+> > +
+> > +	return err;
+> > +}
+> > +
+> >  /**
+> >   * nfsd_net_init - Prepare the nfsd_net portion of a new net namespace
+> >   * @net: a freshly-created network namespace
+> > diff --git a/include/uapi/linux/nfsd_netlink.h b/include/uapi/linux/nfs=
+d_netlink.h
+> > index 2a06f9fe6fe9..659ab76b8840 100644
+> > --- a/include/uapi/linux/nfsd_netlink.h
+> > +++ b/include/uapi/linux/nfsd_netlink.h
+> > @@ -51,12 +51,30 @@ enum {
+> >  	NFSD_A_SERVER_PROTO_MAX =3D (__NFSD_A_SERVER_PROTO_MAX - 1)
+> >  };
+> > =20
+> > +enum {
+> > +	NFSD_A_SERVER_INSTANCE_TRANSPORT_NAME =3D 1,
+> > +	NFSD_A_SERVER_INSTANCE_PORT,
+> > +	NFSD_A_SERVER_INSTANCE_INET_PROTO,
+> > +
+> > +	__NFSD_A_SERVER_INSTANCE_MAX,
+> > +	NFSD_A_SERVER_INSTANCE_MAX =3D (__NFSD_A_SERVER_INSTANCE_MAX - 1)
+> > +};
+> > +
+> > +enum {
+> > +	NFSD_A_SERVER_LISTENER_INSTANCE =3D 1,
+> > +
+> > +	__NFSD_A_SERVER_LISTENER_MAX,
+> > +	NFSD_A_SERVER_LISTENER_MAX =3D (__NFSD_A_SERVER_LISTENER_MAX - 1)
+> > +};
+> > +
+> >  enum {
+> >  	NFSD_CMD_RPC_STATUS_GET =3D 1,
+> >  	NFSD_CMD_THREADS_SET,
+> >  	NFSD_CMD_THREADS_GET,
+> >  	NFSD_CMD_VERSION_SET,
+> >  	NFSD_CMD_VERSION_GET,
+> > +	NFSD_CMD_LISTENER_SET,
+> > +	NFSD_CMD_LISTENER_GET,
+> > =20
+> >  	__NFSD_CMD_MAX,
+> >  	NFSD_CMD_MAX =3D (__NFSD_CMD_MAX - 1)
+> > diff --git a/tools/net/ynl/generated/nfsd-user.c b/tools/net/ynl/genera=
+ted/nfsd-user.c
+> > index ad498543f464..d52f392c7f59 100644
+> > --- a/tools/net/ynl/generated/nfsd-user.c
+> > +++ b/tools/net/ynl/generated/nfsd-user.c
+> > @@ -19,6 +19,8 @@ static const char * const nfsd_op_strmap[] =3D {
+> >  	[NFSD_CMD_THREADS_GET] =3D "threads-get",
+> >  	[NFSD_CMD_VERSION_SET] =3D "version-set",
+> >  	[NFSD_CMD_VERSION_GET] =3D "version-get",
+> > +	[NFSD_CMD_LISTENER_SET] =3D "listener-set",
+> > +	[NFSD_CMD_LISTENER_GET] =3D "listener-get",
+> >  };
+> > =20
+> >  const char *nfsd_op_str(int op)
+> > @@ -39,6 +41,17 @@ struct ynl_policy_nest nfsd_nfs_version_nest =3D {
+> >  	.table =3D nfsd_nfs_version_policy,
+> >  };
+> > =20
+> > +struct ynl_policy_attr nfsd_server_instance_policy[NFSD_A_SERVER_INSTA=
+NCE_MAX + 1] =3D {
+> > +	[NFSD_A_SERVER_INSTANCE_TRANSPORT_NAME] =3D { .name =3D "transport-na=
+me", .type =3D YNL_PT_NUL_STR, },
+> > +	[NFSD_A_SERVER_INSTANCE_PORT] =3D { .name =3D "port", .type =3D YNL_P=
+T_U32, },
+> > +	[NFSD_A_SERVER_INSTANCE_INET_PROTO] =3D { .name =3D "inet-proto", .ty=
+pe =3D YNL_PT_U16, },
+> > +};
+> > +
+> > +struct ynl_policy_nest nfsd_server_instance_nest =3D {
+> > +	.max_attr =3D NFSD_A_SERVER_INSTANCE_MAX,
+> > +	.table =3D nfsd_server_instance_policy,
+> > +};
+> > +
+> >  struct ynl_policy_attr nfsd_rpc_status_policy[NFSD_A_RPC_STATUS_MAX + =
+1] =3D {
+> >  	[NFSD_A_RPC_STATUS_XID] =3D { .name =3D "xid", .type =3D YNL_PT_U32, =
+},
+> >  	[NFSD_A_RPC_STATUS_FLAGS] =3D { .name =3D "flags", .type =3D YNL_PT_U=
+32, },
+> > @@ -79,6 +92,15 @@ struct ynl_policy_nest nfsd_server_proto_nest =3D {
+> >  	.table =3D nfsd_server_proto_policy,
+> >  };
+> > =20
+> > +struct ynl_policy_attr nfsd_server_listener_policy[NFSD_A_SERVER_LISTE=
+NER_MAX + 1] =3D {
+> > +	[NFSD_A_SERVER_LISTENER_INSTANCE] =3D { .name =3D "instance", .type =
+=3D YNL_PT_NEST, .nest =3D &nfsd_server_instance_nest, },
+> > +};
+> > +
+> > +struct ynl_policy_nest nfsd_server_listener_nest =3D {
+> > +	.max_attr =3D NFSD_A_SERVER_LISTENER_MAX,
+> > +	.table =3D nfsd_server_listener_policy,
+> > +};
+> > +
+> >  /* Common nested types */
+> >  void nfsd_nfs_version_free(struct nfsd_nfs_version *obj)
+> >  {
+> > @@ -124,6 +146,64 @@ int nfsd_nfs_version_parse(struct ynl_parse_arg *y=
+arg,
+> >  	return 0;
+> >  }
+> > =20
+> > +void nfsd_server_instance_free(struct nfsd_server_instance *obj)
+> > +{
+> > +	free(obj->transport_name);
+> > +}
+> > +
+> > +int nfsd_server_instance_put(struct nlmsghdr *nlh, unsigned int attr_t=
+ype,
+> > +			     struct nfsd_server_instance *obj)
+> > +{
+> > +	struct nlattr *nest;
+> > +
+> > +	nest =3D mnl_attr_nest_start(nlh, attr_type);
+> > +	if (obj->_present.transport_name_len)
+> > +		mnl_attr_put_strz(nlh, NFSD_A_SERVER_INSTANCE_TRANSPORT_NAME, obj->t=
+ransport_name);
+> > +	if (obj->_present.port)
+> > +		mnl_attr_put_u32(nlh, NFSD_A_SERVER_INSTANCE_PORT, obj->port);
+> > +	if (obj->_present.inet_proto)
+> > +		mnl_attr_put_u16(nlh, NFSD_A_SERVER_INSTANCE_INET_PROTO, obj->inet_p=
+roto);
+> > +	mnl_attr_nest_end(nlh, nest);
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +int nfsd_server_instance_parse(struct ynl_parse_arg *yarg,
+> > +			       const struct nlattr *nested)
+> > +{
+> > +	struct nfsd_server_instance *dst =3D yarg->data;
+> > +	const struct nlattr *attr;
+> > +
+> > +	mnl_attr_for_each_nested(attr, nested) {
+> > +		unsigned int type =3D mnl_attr_get_type(attr);
+> > +
+> > +		if (type =3D=3D NFSD_A_SERVER_INSTANCE_TRANSPORT_NAME) {
+> > +			unsigned int len;
+> > +
+> > +			if (ynl_attr_validate(yarg, attr))
+> > +				return MNL_CB_ERROR;
+> > +
+> > +			len =3D strnlen(mnl_attr_get_str(attr), mnl_attr_get_payload_len(at=
+tr));
+> > +			dst->_present.transport_name_len =3D len;
+> > +			dst->transport_name =3D malloc(len + 1);
+> > +			memcpy(dst->transport_name, mnl_attr_get_str(attr), len);
+> > +			dst->transport_name[len] =3D 0;
+> > +		} else if (type =3D=3D NFSD_A_SERVER_INSTANCE_PORT) {
+> > +			if (ynl_attr_validate(yarg, attr))
+> > +				return MNL_CB_ERROR;
+> > +			dst->_present.port =3D 1;
+> > +			dst->port =3D mnl_attr_get_u32(attr);
+> > +		} else if (type =3D=3D NFSD_A_SERVER_INSTANCE_INET_PROTO) {
+> > +			if (ynl_attr_validate(yarg, attr))
+> > +				return MNL_CB_ERROR;
+> > +			dst->_present.inet_proto =3D 1;
+> > +			dst->inet_proto =3D mnl_attr_get_u16(attr);
+> > +		}
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+> > +
+> >  /* =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D NFSD_CMD_RPC_STATUS_GET =
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D */
+> >  /* NFSD_CMD_RPC_STATUS_GET - dump */
+> >  int nfsd_rpc_status_get_rsp_dump_parse(const struct nlmsghdr *nlh, voi=
+d *data)
+> > @@ -467,6 +547,117 @@ struct nfsd_version_get_rsp *nfsd_version_get(str=
+uct ynl_sock *ys)
+> >  	return NULL;
+> >  }
+> > =20
+> > +/* =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D NFSD_CMD_LISTENER_SET =
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D */
+> > +/* NFSD_CMD_LISTENER_SET - do */
+> > +void nfsd_listener_set_req_free(struct nfsd_listener_set_req *req)
+> > +{
+> > +	unsigned int i;
+> > +
+> > +	for (i =3D 0; i < req->n_instance; i++)
+> > +		nfsd_server_instance_free(&req->instance[i]);
+> > +	free(req->instance);
+> > +	free(req);
+> > +}
+> > +
+> > +int nfsd_listener_set(struct ynl_sock *ys, struct nfsd_listener_set_re=
+q *req)
+> > +{
+> > +	struct ynl_req_state yrs =3D { .yarg =3D { .ys =3D ys, }, };
+> > +	struct nlmsghdr *nlh;
+> > +	int err;
+> > +
+> > +	nlh =3D ynl_gemsg_start_req(ys, ys->family_id, NFSD_CMD_LISTENER_SET,=
+ 1);
+> > +	ys->req_policy =3D &nfsd_server_listener_nest;
+> > +
+> > +	for (unsigned int i =3D 0; i < req->n_instance; i++)
+> > +		nfsd_server_instance_put(nlh, NFSD_A_SERVER_LISTENER_INSTANCE, &req-=
+>instance[i]);
+> > +
+> > +	err =3D ynl_exec(ys, nlh, &yrs);
+> > +	if (err < 0)
+> > +		return -1;
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +/* =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D NFSD_CMD_LISTENER_GET =
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D */
+> > +/* NFSD_CMD_LISTENER_GET - do */
+> > +void nfsd_listener_get_rsp_free(struct nfsd_listener_get_rsp *rsp)
+> > +{
+> > +	unsigned int i;
+> > +
+> > +	for (i =3D 0; i < rsp->n_instance; i++)
+> > +		nfsd_server_instance_free(&rsp->instance[i]);
+> > +	free(rsp->instance);
+> > +	free(rsp);
+> > +}
+> > +
+> > +int nfsd_listener_get_rsp_parse(const struct nlmsghdr *nlh, void *data)
+> > +{
+> > +	struct nfsd_listener_get_rsp *dst;
+> > +	struct ynl_parse_arg *yarg =3D data;
+> > +	unsigned int n_instance =3D 0;
+> > +	const struct nlattr *attr;
+> > +	struct ynl_parse_arg parg;
+> > +	int i;
+> > +
+> > +	dst =3D yarg->data;
+> > +	parg.ys =3D yarg->ys;
+> > +
+> > +	if (dst->instance)
+> > +		return ynl_error_parse(yarg, "attribute already present (server-list=
+ener.instance)");
+> > +
+> > +	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
+> > +		unsigned int type =3D mnl_attr_get_type(attr);
+> > +
+> > +		if (type =3D=3D NFSD_A_SERVER_LISTENER_INSTANCE) {
+> > +			n_instance++;
+> > +		}
+> > +	}
+> > +
+> > +	if (n_instance) {
+> > +		dst->instance =3D calloc(n_instance, sizeof(*dst->instance));
+> > +		dst->n_instance =3D n_instance;
+> > +		i =3D 0;
+> > +		parg.rsp_policy =3D &nfsd_server_instance_nest;
+> > +		mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
+> > +			if (mnl_attr_get_type(attr) =3D=3D NFSD_A_SERVER_LISTENER_INSTANCE)=
+ {
+> > +				parg.data =3D &dst->instance[i];
+> > +				if (nfsd_server_instance_parse(&parg, attr))
+> > +					return MNL_CB_ERROR;
+> > +				i++;
+> > +			}
+> > +		}
+> > +	}
+> > +
+> > +	return MNL_CB_OK;
+> > +}
+> > +
+> > +struct nfsd_listener_get_rsp *nfsd_listener_get(struct ynl_sock *ys)
+> > +{
+> > +	struct ynl_req_state yrs =3D { .yarg =3D { .ys =3D ys, }, };
+> > +	struct nfsd_listener_get_rsp *rsp;
+> > +	struct nlmsghdr *nlh;
+> > +	int err;
+> > +
+> > +	nlh =3D ynl_gemsg_start_req(ys, ys->family_id, NFSD_CMD_LISTENER_GET,=
+ 1);
+> > +	ys->req_policy =3D &nfsd_server_listener_nest;
+> > +	yrs.yarg.rsp_policy =3D &nfsd_server_listener_nest;
+> > +
+> > +	rsp =3D calloc(1, sizeof(*rsp));
+> > +	yrs.yarg.data =3D rsp;
+> > +	yrs.cb =3D nfsd_listener_get_rsp_parse;
+> > +	yrs.rsp_cmd =3D NFSD_CMD_LISTENER_GET;
+> > +
+> > +	err =3D ynl_exec(ys, nlh, &yrs);
+> > +	if (err < 0)
+> > +		goto err_free;
+> > +
+> > +	return rsp;
+> > +
+> > +err_free:
+> > +	nfsd_listener_get_rsp_free(rsp);
+> > +	return NULL;
+> > +}
+> > +
+> >  const struct ynl_family ynl_nfsd_family =3D  {
+> >  	.name		=3D "nfsd",
+> >  };
+> > diff --git a/tools/net/ynl/generated/nfsd-user.h b/tools/net/ynl/genera=
+ted/nfsd-user.h
+> > index d062ee8fa8b6..5765fb6f2ef5 100644
+> > --- a/tools/net/ynl/generated/nfsd-user.h
+> > +++ b/tools/net/ynl/generated/nfsd-user.h
+> > @@ -29,6 +29,18 @@ struct nfsd_nfs_version {
+> >  	__u32 minor;
+> >  };
+> > =20
+> > +struct nfsd_server_instance {
+> > +	struct {
+> > +		__u32 transport_name_len;
+> > +		__u32 port:1;
+> > +		__u32 inet_proto:1;
+> > +	} _present;
+> > +
+> > +	char *transport_name;
+> > +	__u32 port;
+> > +	__u16 inet_proto;
+> > +};
+> > +
+> >  /* =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D NFSD_CMD_RPC_STATUS_GET =
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D */
+> >  /* NFSD_CMD_RPC_STATUS_GET - dump */
+> >  struct nfsd_rpc_status_get_rsp_dump {
+> > @@ -164,4 +176,47 @@ void nfsd_version_get_rsp_free(struct nfsd_version=
+_get_rsp *rsp);
+> >   */
+> >  struct nfsd_version_get_rsp *nfsd_version_get(struct ynl_sock *ys);
+> > =20
+> > +/* =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D NFSD_CMD_LISTENER_SET =
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D */
+> > +/* NFSD_CMD_LISTENER_SET - do */
+> > +struct nfsd_listener_set_req {
+> > +	unsigned int n_instance;
+> > +	struct nfsd_server_instance *instance;
+> > +};
+> > +
+> > +static inline struct nfsd_listener_set_req *nfsd_listener_set_req_allo=
+c(void)
+> > +{
+> > +	return calloc(1, sizeof(struct nfsd_listener_set_req));
+> > +}
+> > +void nfsd_listener_set_req_free(struct nfsd_listener_set_req *req);
+> > +
+> > +static inline void
+> > +__nfsd_listener_set_req_set_instance(struct nfsd_listener_set_req *req,
+> > +				     struct nfsd_server_instance *instance,
+> > +				     unsigned int n_instance)
+> > +{
+> > +	free(req->instance);
+> > +	req->instance =3D instance;
+> > +	req->n_instance =3D n_instance;
+> > +}
+> > +
+> > +/*
+> > + * set nfs running listeners
+> > + */
+> > +int nfsd_listener_set(struct ynl_sock *ys, struct nfsd_listener_set_re=
+q *req);
+> > +
+> > +/* =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D NFSD_CMD_LISTENER_GET =
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D */
+> > +/* NFSD_CMD_LISTENER_GET - do */
+> > +
+> > +struct nfsd_listener_get_rsp {
+> > +	unsigned int n_instance;
+> > +	struct nfsd_server_instance *instance;
+> > +};
+> > +
+> > +void nfsd_listener_get_rsp_free(struct nfsd_listener_get_rsp *rsp);
+> > +
+> > +/*
+> > + * get nfs running listeners
+> > + */
+> > +struct nfsd_listener_get_rsp *nfsd_listener_get(struct ynl_sock *ys);
+> > +
+> >  #endif /* _LINUX_NFSD_GEN_H */
+>=20
+> --=20
+> Jeff Layton <jlayton@kernel.org>
+>=20
+
+--9Hh0vlcC0XRrsh2y
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZa6LQwAKCRA6cBh0uS2t
+rHwFAQDQZUyHbqhRNg8iGUJJ/1eoIvlG6jhhLwLfiP09P2BktwEA46mnDqbKcn2p
+/nl0lcc99g73b3BUYTm0rk3rtmOAEgM=
+=LfyT
+-----END PGP SIGNATURE-----
+
+--9Hh0vlcC0XRrsh2y--
 
