@@ -1,251 +1,158 @@
-Return-Path: <netdev+bounces-64569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08020835B6A
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 08:12:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44D35835B63
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 08:10:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 74D191F21EED
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 07:12:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5BC6B24318
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 07:10:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12924E554;
-	Mon, 22 Jan 2024 07:12:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5AC0DF61;
+	Mon, 22 Jan 2024 07:10:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TyFevWtu"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96E18DF6E
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 07:12:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28348DF54
+	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 07:10:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705907539; cv=none; b=ewrrLYkEV7Ihctpm0uOuO61SunSDGjZ4S94RhWviHtHYFQWm/K6O9PAuWhU0HtV98l1+lY1bUjPkxy6329Mi5Oo9VQFcMPPtURMrB0kxcDYA8ZkCBpgtonZAEfJ8XkgDdOqzgm2STz6F9yny0vBGbJRR3gJx9kkwCKN/tnIMCVA=
+	t=1705907403; cv=none; b=SaSN+Vv11CzzbhUpu6EKEcKZwCYTE2Ou4hAleiJgWauOky94n73KcP64cgNTgm2B8L4EHIMNy3ijatrHfYG9/DLYa4asec8WDVpXSwfDNltPY39geN3CBKvgNyOFxB4LO+cXT3Fc6Vv+uv+UOKN9S4AezypR52/KOfvCv5NdSTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705907539; c=relaxed/simple;
-	bh=5TKqAWVs55lchICqxGsxk0ZeT7m9HqP3li9rplBM75g=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=rbUFuw5++VMyepqHR6bU1oJ1Go/e/7AWB1u9G4lgnys2app2TY6VdoHFrkGz4DL0pIEP9+44oxbEixpEh0I32wrb+GS7/sdp625GCQ76tL4y0zLynUZsBbZlWukEQvmN9UijTrnfjSSoER3tJGmlh4Mv/I60ov2dr4r9pFbuCpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; arc=none smtp.client-ip=115.124.30.110
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0W.2pvmj_1705907214;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W.2pvmj_1705907214)
-          by smtp.aliyun-inc.com;
-          Mon, 22 Jan 2024 15:06:55 +0800
-Message-ID: <1705906930.2143333-5-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH 1/1] virtio_net: Add timeout handler to avoid kernel hang
-Date: Mon, 22 Jan 2024 15:02:10 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,
- Heng Qi <hengqi@linux.alibaba.com>,
- Paolo Abeni <pabeni@redhat.com>,
- Zhu Yanjun <yanjun.zhu@intel.com>,
- mst@redhat.com,
- davem@davemloft.net,
- edumazet@google.com,
- kuba@kernel.org,
- virtualization@lists.linux.dev,
- netdev@vger.kernel.org,
- Zhu Yanjun <yanjun.zhu@linux.dev>
-References: <20240115012918.3081203-1-yanjun.zhu@intel.com>
- <ea230712e27af2c8d2d77d1087e45ecfa86abb31.camel@redhat.com>
- <667a9520-a53f-40a2-810a-6c1e45146589@linux.dev>
- <7dd89fc0-f31e-4f83-9c02-58ee67c2d436@linux.alibaba.com>
- <430b899c-aed4-419d-8ae8-544bb9bec5d9@lunn.ch>
- <64270652-8e0c-4db7-b245-b970d9588918@linux.dev>
- <CACGkMEs18hjxiZRDT5-+PMDHkLbEyiviafGiCWsAE6CGBrj+9g@mail.gmail.com>
- <1705895881.6990144-1-xuanzhuo@linux.alibaba.com>
- <CACGkMEvvn76w+BZArOWK-c1gsqNNx6bH8HPoqPAqpJG_7EYntA@mail.gmail.com>
- <1705904164.7020166-3-xuanzhuo@linux.alibaba.com>
- <CACGkMEsTT7hrm2QWZq-NasfVAJHsUoZq5hijvLE_jY+2YyKytg@mail.gmail.com>
- <CACGkMEt4zyESemjPwZtD5d4d00jtorY0qR5vM9y96NZzKkdj8A@mail.gmail.com>
-In-Reply-To: <CACGkMEt4zyESemjPwZtD5d4d00jtorY0qR5vM9y96NZzKkdj8A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1705907403; c=relaxed/simple;
+	bh=pwFRrgKpkxKFy6hH38Kve6ZIxGaQDXFJJpqMk2XXqYw=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=ZrjbNiI2nIDJP/rIXmGMGIpEdecv5AYtMhfIBH8IAAvcGvtwaF+6i0CsPDa7hEzdxtSR09Xrage7fhP49gcaKxCh1K6+MGS87nkz/I8QXKW/mRV7LjMaseO2oRCZliPTfNDLxk3tgFr5olpgJ3ry1mn2wyb+PWFJMgYhdKDNitA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TyFevWtu; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-55a349cf29cso3081730a12.0
+        for <netdev@vger.kernel.org>; Sun, 21 Jan 2024 23:10:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705907400; x=1706512200; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:cc:to:subject:from
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WIVpVahN8if7Ws1n8y5moE/HlMuPKFAfwUqkOSB6vLE=;
+        b=TyFevWtuTjQYsjT2JRMeTAKu6NQTMprA29EfQelQNoDhzR4+lgEwI5StI/1ch0pfDU
+         iqDeT7z3S0/xk8L72s3ViiaKWY2D5SbqG7bb6R4j5q4w3mr75Gsh5xQdusE3+RgJTfPl
+         6aParLureTyBiDNaLx0jJQZ9LhOJ0TVfaVQzK7WnnJqJqX5UmE/sPWBVY5ITGH+4aMIC
+         a/WRkXUvafnMRpPlihzuVkqGuo4fDFP+g+0CDLi44pG9442u6bR6x8vhS5Hwx0dQ4H/0
+         3Etti1cEcQLSUemh9t7J4MHMLPBUvO6hwZoNOKbtli+DsVAOY5GAfNgG41kjDuXs8zLi
+         KjVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705907400; x=1706512200;
+        h=content-transfer-encoding:content-language:cc:to:subject:from
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=WIVpVahN8if7Ws1n8y5moE/HlMuPKFAfwUqkOSB6vLE=;
+        b=dDkxq8PM0q26g4vYpiO3UzZp1vDwJae7GyFsLQKQ16pWcuzJJ7PjYihj74/Oza7z17
+         NJvXKDrhWlRUNBtyjhlJKIvXHaip0uHjKVSCulod/V3s3xDLKRqrOuoGvBVCIv80AqHE
+         r0c9UuyBJw7mCEY9UEOJldgMA06ABUvuKab2qVNTRCXbKnOTckJAJOHMbS6R+B7F9Guh
+         bY52ZPvdZn2wgNKWdByjHeTM/WFclEYmgtZysvKjhjO6RxZEw5xom4RxOa4QatodF2Dq
+         w0d/utPsV3Zx6yMKpzVf4x7c9lC4bejZyURKsKuJKFuN3LZbqn8Fp4ctm7IHMMojXyA4
+         /VYg==
+X-Gm-Message-State: AOJu0YyK7a2iLABHepqg8hcyESDVuPr4VX9rwZOCJPyAO4XELwaMO+24
+	/7WDW5moSFK1mxYSARZY8OZ+bB2NGm+fbBi1986LsNvFozGDJl6aXYjfXFAC
+X-Google-Smtp-Source: AGHT+IHc7ZHrcbuQZb0OmVls5+xlIwaOQmvcjqu07o7GriL917nl3GYZRhtBRhQeZs8beS2TYp0BWw==
+X-Received: by 2002:a05:6402:3551:b0:559:fa58:6bdc with SMTP id f17-20020a056402355100b00559fa586bdcmr2067150edd.55.1705907400020;
+        Sun, 21 Jan 2024 23:10:00 -0800 (PST)
+Received: from [192.168.26.149] (031011218106.poznan.vectranet.pl. [31.11.218.106])
+        by smtp.googlemail.com with ESMTPSA id fd4-20020a056402388400b0055864f99f78sm13815317edb.20.2024.01.21.23.09.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 21 Jan 2024 23:09:59 -0800 (PST)
+Message-ID: <bdffa33c-e3eb-4c3b-adf3-99a02bc7d205@gmail.com>
+Date: Mon, 22 Jan 2024 08:09:58 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+From: =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>
+Subject: Race in PHY subsystem? Attaching to PHY devices before they get
+ probed
+To: Network Development <netdev@vger.kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Robert Marko <robimarko@gmail.com>,
+ Ansuel Smith <ansuelsmth@gmail.com>, Daniel Golle <daniel@makrotopia.org>
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, 22 Jan 2024 14:58:09 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Mon, Jan 22, 2024 at 2:55=E2=80=AFPM Jason Wang <jasowang@redhat.com> =
-wrote:
-> >
-> > On Mon, Jan 22, 2024 at 2:20=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.aliba=
-ba.com> wrote:
-> > >
-> > > On Mon, 22 Jan 2024 12:16:27 +0800, Jason Wang <jasowang@redhat.com> =
-wrote:
-> > > > On Mon, Jan 22, 2024 at 12:00=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.=
-alibaba.com> wrote:
-> > > > >
-> > > > > On Mon, 22 Jan 2024 11:14:30 +0800, Jason Wang <jasowang@redhat.c=
-om> wrote:
-> > > > > > On Mon, Jan 22, 2024 at 10:12=E2=80=AFAM Zhu Yanjun <yanjun.zhu=
-@linux.dev> wrote:
-> > > > > > >
-> > > > > > >
-> > > > > > > =E5=9C=A8 2024/1/20 1:29, Andrew Lunn =E5=86=99=E9=81=93:
-> > > > > > > >>>>>        while (!virtqueue_get_buf(vi->cvq, &tmp) &&
-> > > > > > > >>>>> -           !virtqueue_is_broken(vi->cvq))
-> > > > > > > >>>>> +           !virtqueue_is_broken(vi->cvq)) {
-> > > > > > > >>>>> +        if (timeout)
-> > > > > > > >>>>> +            timeout--;
-> > > > > > > >>>> This is not really a timeout, just a loop counter. 200 i=
-terations could
-> > > > > > > >>>> be a very short time on reasonable H/W. I guess this avo=
-id the soft
-> > > > > > > >>>> lockup, but possibly (likely?) breaks the functionality =
-when we need to
-> > > > > > > >>>> loop for some non negligible time.
-> > > > > > > >>>>
-> > > > > > > >>>> I fear we need a more complex solution, as mentioned by =
-Micheal in the
-> > > > > > > >>>> thread you quoted.
-> > > > > > > >>> Got it. I also look forward to the more complex solution =
-to this problem.
-> > > > > > > >> Can we add a device capability (new feature bit) such as c=
-trq_wait_timeout
-> > > > > > > >> to get a reasonable timeout=EF=BC=9F
-> > > > > > > > The usual solution to this is include/linux/iopoll.h. If yo=
-u can sleep
-> > > > > > > > read_poll_timeout() otherwise read_poll_timeout_atomic().
-> > > > > > >
-> > > > > > > I read carefully the functions read_poll_timeout() and
-> > > > > > > read_poll_timeout_atomic(). The timeout is set by the caller =
-of the 2
-> > > > > > > functions.
-> > > > > >
-> > > > > > FYI, in order to avoid a swtich of atomic or not, we need conve=
-rt rx
-> > > > > > mode setting to workqueue first:
-> > > > > >
-> > > > > > https://www.mail-archive.com/virtualization@lists.linux-foundat=
-ion.org/msg60298.html
-> > > > > >
-> > > > > > >
-> > > > > > > As such, can we add a module parameter to customize this time=
-out value
-> > > > > > > by the user?
-> > > > > >
-> > > > > > Who is the "user" here, or how can the "user" know the value?
-> > > > > >
-> > > > > > >
-> > > > > > > Or this timeout value is stored in device register, virtio_ne=
-t driver
-> > > > > > > will read this timeout value at initialization?
-> > > > > >
-> > > > > > See another thread. The design needs to be general, or you can =
-post a RFC.
-> > > > > >
-> > > > > > In another thought, we've already had a tx watchdog, maybe we c=
-an have
-> > > > > > something similar to cvq and use timeout + reset in that case.
-> > > > >
-> > > > > But we may block by the reset ^_^ if the device is broken?
-> > > >
-> > > > I mean vq reset here.
-> > >
-> > > I see.
-> > >
-> > > I mean when the deivce is broken, the vq reset also many be blocked.
-> > >
-> > >         void vp_modern_set_queue_reset(struct virtio_pci_modern_devic=
-e *mdev, u16 index)
-> > >         {
-> > >                 struct virtio_pci_modern_common_cfg __iomem *cfg;
-> > >
-> > >                 cfg =3D (struct virtio_pci_modern_common_cfg __iomem =
-*)mdev->common;
-> > >
-> > >                 vp_iowrite16(index, &cfg->cfg.queue_select);
-> > >                 vp_iowrite16(1, &cfg->queue_reset);
-> > >
-> > >                 while (vp_ioread16(&cfg->queue_reset))
-> > >                         msleep(1);
-> > >
-> > >                 while (vp_ioread16(&cfg->cfg.queue_enable))
-> > >                         msleep(1);
-> > >         }
-> > >         EXPORT_SYMBOL_GPL(vp_modern_set_queue_reset);
-> > >
-> > > In this function, for the broken device, we can not expect something.
-> >
-> > Yes, it's best effort, there's no guarantee then. But it doesn't harm t=
-o try.
-> >
-> > Thanks
-> >
-> > >
-> > >
-> > > >
-> > > > It looks like we have multiple goals here
-> > > >
-> > > > 1) avoid lockups, using workqueue + cond_resched() seems to be
-> > > > sufficient, it has issue but nothing new
-> > > > 2) recover from the unresponsive device, the issue for timeout is t=
-hat
-> > > > it needs to deal with false positives
-> > >
-> > >
-> > > I agree.
-> > >
-> > > But I want to add a new goal, cvq async. In the netdim, we will
-> > > send many requests via the cvq, so the cvq async will be nice.
->
-> Then you need an interrupt for cvq.
->
-> FYI, I've posted a series that use interrupt for cvq in the past:
->
-> https://lore.kernel.org/lkml/6026e801-6fda-fee9-a69b-d06a80368621@redhat.=
-com/t/
+Hi!
 
-I know this. But the interrupt maybe not a good solution without new space.
+I have MT7988 SoC board with following problem:
+[   26.887979] Aquantia AQR113C mdio-bus:08: aqr107_wait_reset_complete failed: -110
 
->
-> Haven't found time in working on this anymore, maybe we can start from
-> this or not.
+This issue is known to occur when PHY's firmware is not running. After
+some debugging I discovered that .config_init() CB gets called while
+.probe() CB is still being executed.
+
+It turns out mtk_soc_eth.c calls phylink_of_phy_connect() before my PHY
+gets fully probed and it seems there is nothing in PHY subsystem
+verifying that. Please note this PHY takes quite some time to probe as
+it involves sending firmware to hardware.
+
+Is that a possible race in PHY subsystem?
+Should we have phy_attach_direct() wait for PHY to be fully probed?
 
 
-I said async, but my aim is to put many requests to the cvq before getting =
-the
-response.
 
-Heng Qi posted this https://lore.kernel.org/all/1705410693-118895-4-git-sen=
-d-email-hengqi@linux.alibaba.com/
+I verified this issue with following patch although -EPROBE_DEFER didn't
+work automagically and I had to re-do "ifconfig eth2 up" manually.
 
-Thanks.
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 3611ea64875e..3be499d2376b 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -1437,6 +1437,11 @@ int phy_attach_direct(struct net_device *dev, struct phy_device *phydev,
+  	bool using_genphy = false;
+  	int err;
 
++	if (!phydev->probed) {
++		phydev_warn(phydev, "PHY is not ready yet!\n");
++		return -EPROBE_DEFER;
++	}
++
+  	/* For Ethernet device drivers that register their own MDIO bus, we
+  	 * will have bus->owner match ndev_mod, so we do not want to increment
+  	 * our own module->refcnt here, otherwise we would not be able to
+@@ -1562,6 +1567,8 @@ int phy_attach_direct(struct net_device *dev, struct phy_device *phydev,
+  		phydev->devlink = device_link_add(dev->dev.parent, &phydev->mdio.dev,
+  						  DL_FLAG_PM_RUNTIME | DL_FLAG_STATELESS);
 
->
-> Thanks
->
-> > >
-> > > Thanks.
-> > >
-> > >
-> > > >
-> > > > Thanks
-> > > >
-> > > > >
-> > > > > Thanks.
-> > > > >
-> > > > >
-> > > > > >
-> > > > > > Thans
-> > > > > >
-> > > > > > >
-> > > > > > > Zhu Yanjun
-> > > > > > >
-> > > > > > > >
-> > > > > > > >       Andrew
-> > > > > > >
-> > > > > >
-> > > > >
-> > > >
-> > >
->
++	phydev->probed = true;
++
+  	return err;
+
+  error:
+@@ -3382,6 +3389,9 @@ static int phy_probe(struct device *dev)
+  	if (err)
+  		phy_device_reset(phydev, 1);
+
++	if (!err)
++		phydev->probed = true;
++
+  	return err;
+  }
+
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index 684efaeca07c..29875a22ac89 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -634,6 +634,8 @@ struct macsec_ops;
+   * handling, as well as handling shifts in PHY hardware state
+   */
+  struct phy_device {
++	bool probed;
++
+  	struct mdio_device mdio;
+
+  	/* Information about the PHY type */
 
