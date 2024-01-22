@@ -1,141 +1,193 @@
-Return-Path: <netdev+bounces-64698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F07FC8369E6
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 17:13:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 487D7836A4E
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 17:24:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7ECD286058
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 16:13:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DF691C24F72
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 16:24:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 610C350245;
-	Mon, 22 Jan 2024 15:12:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g1aLLm/+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97C9253E27;
+	Mon, 22 Jan 2024 15:15:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDE9F3F8EE;
-	Mon, 22 Jan 2024 15:12:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF43353E23;
+	Mon, 22 Jan 2024 15:15:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705936377; cv=none; b=UPQ2BkEgrPqT6LTPiRz/vifqTYjLZh/9lOvGap4Q+Y0llgN0DX1GwO52oi4aBLfVnH6cjspsfVzgiwVD/cv0xz2EIj/eT7ARNdALN7tAdbbpTbyJR+P+NjUmgltyAq5hxpd53JBistbeVNyeojH6soIROLEToCM4OyVV5vp08GA=
+	t=1705936507; cv=none; b=AFqGe/7ocewBuvrKwd2mn4vI3VAYa2KLesLJwzVHzGFXGLPC0sGvpOWDhClO9q0+cYUHqHitKlUYT5E1XIWoIPF95zcxzkm7/o8xl65bAXm3iCzQTFRCMRAJRBI8RynjyFk1yxrFLj8Se1cL5lYAladJMGcB/RTTGF6k1QLZOLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705936377; c=relaxed/simple;
-	bh=F8f7LxqnB4DWxevS+3UIAe7bfKrLO5NJPchO5Xp1HuQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DWU8IggbX8i8QhtqiULy4pwDJF9GP90iO/H+yPEgrzDDptB9O8D+5yPJAny3g2KSRm/Q4ys7ThcQ/ICb8xWqlol9SsO1ko+9YZiC70wTRcTSMkoyongeSH68pfXq9TRzlED/rYrTDvcMAwqZyYLaGLXSd735hSTGKon//kT6bI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g1aLLm/+; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-559cef15db5so7657471a12.0;
-        Mon, 22 Jan 2024 07:12:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705936374; x=1706541174; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0LEUEYz+ew2ECb67VWN/zpFNcZ3uWeplc0iWoOX36Ng=;
-        b=g1aLLm/+zUzSv2vIjdR09pRvY8bsH7BIT95mLfp82PETicSSiXI4iz154y8lj0Gl8H
-         cY6rAJSvAummE35yLXx6OZBV+46bBGrEgkySuBYakkV6d2aX73S6X3LgiJS1n3ZorFvC
-         KlG8pO81haBe/Wh2LWeVSOD+QWtvgImzwJ168XasrPRg+NLM8gp4X6WhTU0UUjEwD7/C
-         afqmDd3V7FAm3UrNb+/i5JJaYc15qVTcZpTXMltmchjfRzF9EPAFYO0zNaac9cY9zQLS
-         XA/eyCPmXbr9YS/aKd1qrX4flmCdvpLWLst8KZRHCPqFT0M0nwMDAgjFy2EHrx5i9bsL
-         u1Vw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705936374; x=1706541174;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0LEUEYz+ew2ECb67VWN/zpFNcZ3uWeplc0iWoOX36Ng=;
-        b=Uv12JvKkoOXpDZKaehv8G9+Rw4d1Gf07meO+UGMESXdBTVqZK7RSaFc74sb/j+jk4V
-         LBuo6pEElSSNlLr+rq41xF4262SmSFkurFzBqtpoyifUHavTzoGBrX4aKkqmvV/miXc2
-         3B51qKOS3xJXKPl+2HaVwf46EfwOI2u7q2UP5BgN0/7wNKCjBHiRdNbo+1FShtqeRdZX
-         qCskuGVFpQYzsoAJu7d0UCoKeKtozPCG1fisXe/KD0htQHSNIb0AbaJtHmvog0RMckA2
-         BIC26CAtOFrILPKkf0ccTroYE7fXtqQtlbIJ0PhU1nqeBDsw80EHswvCG+2vns0cbfAB
-         QScQ==
-X-Gm-Message-State: AOJu0YwuP4Or++PGf83j9kBLilbw4x9GxasXJtIp1yIlZ6FfrDFZE2+M
-	vJZ7ZfCKe4Ilo06cHLXsGKlaZJnizSoEhf47dMnw21vNqeutjZIf
-X-Google-Smtp-Source: AGHT+IGTJDoUzcbPE+cHVrC5chv52od6TNhT61AcXuBecr0U5QGiDYHdEyhTiteGFvtYgAyKPJEV0A==
-X-Received: by 2002:a17:906:ce44:b0:a2e:82db:8c32 with SMTP id se4-20020a170906ce4400b00a2e82db8c32mr4199842ejb.28.1705936373571;
-        Mon, 22 Jan 2024 07:12:53 -0800 (PST)
-Received: from skbuf ([188.25.255.36])
-        by smtp.gmail.com with ESMTPSA id cu12-20020a170906ba8c00b00a2f181266f6sm5343874ejd.148.2024.01.22.07.12.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jan 2024 07:12:53 -0800 (PST)
-Date: Mon, 22 Jan 2024 17:12:51 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Tim Menninger <tmenninger@purestorage.com>, f.fainelli@gmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: dsa: mv88e6xxx: Make *_c45 callbacks agree with
- phy_*_c45 callbacks
-Message-ID: <20240122151251.sl6fzxmfi2f6tokf@skbuf>
-References: <20240116193542.711482-1-tmenninger@purestorage.com>
- <04d22048-737a-4281-a43f-b125ebe0c896@lunn.ch>
- <CAO-L_44YVi0HDk4gC9QijMZrYNGoKtfH7qsXOwtDwM4VrFRDHw@mail.gmail.com>
- <da87ce82-7337-4be4-a2af-bd2136626c56@lunn.ch>
- <CAO-L_46kqBrDdYP7p3He0cBF1OP7TJKnhYK1NR_gMZf2n_928A@mail.gmail.com>
- <20240122123349.cxx2i2kzrhuqnasp@skbuf>
- <1aab2398-2fe9-40b6-aa5b-34dde946668a@lunn.ch>
+	s=arc-20240116; t=1705936507; c=relaxed/simple;
+	bh=19J+4GB1lRn3R499I83K30s9klCVFpgzm9yKt0O2xSM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=q3FKCoxjRk8WICmv1PjfEu4Ksi4P59cdgoKeJQDZdIhaBLzL8UxnGnXcSpEV3o+EFbKszZ6PwQsBbYT466+bL9r7ApkB2a4T1kQPMW4NMcCsRC5dCA0UYQQ3PodLhZVDxvoBBaDVgNf3+qyZRkmpECat6UlLN1Py0/D7fVRsXYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4TJYdB60Vbz1S5N0;
+	Mon, 22 Jan 2024 23:13:18 +0800 (CST)
+Received: from kwepemd100009.china.huawei.com (unknown [7.221.188.135])
+	by mail.maildlp.com (Postfix) with ESMTPS id D43D11A0172;
+	Mon, 22 Jan 2024 23:15:01 +0800 (CST)
+Received: from [10.67.109.184] (10.67.109.184) by
+ kwepemd100009.china.huawei.com (7.221.188.135) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1258.28; Mon, 22 Jan 2024 23:15:00 +0800
+Message-ID: <2281e59d-80d4-480f-894d-614d2160365b@huawei.com>
+Date: Mon, 22 Jan 2024 23:15:00 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1aab2398-2fe9-40b6-aa5b-34dde946668a@lunn.ch>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RESEND bpf-next v3 0/6] Zbb support and code
+ simplification for RV64 JIT
+Content-Language: en-US
+To: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, Pu Lehui
+	<pulehui@huaweicloud.com>, <bpf@vger.kernel.org>,
+	<linux-riscv@lists.infradead.org>, <netdev@vger.kernel.org>
+CC: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+	<martin.lau@linux.dev>, Song Liu <song@kernel.org>, Yonghong Song
+	<yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, KP Singh
+	<kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
+	<haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Palmer Dabbelt
+	<palmer@dabbelt.com>, Conor Dooley <conor@kernel.org>, Luke Nelson
+	<luke.r.nels@gmail.com>
+References: <20240115131235.2914289-1-pulehui@huaweicloud.com>
+ <87il3lqvye.fsf@all.your.base.are.belong.to.us>
+ <baffbab8-721f-462a-8b58-64972f5eae70@huaweicloud.com>
+ <878r4hqvgq.fsf@all.your.base.are.belong.to.us>
+From: Pu Lehui <pulehui@huawei.com>
+In-Reply-To: <878r4hqvgq.fsf@all.your.base.are.belong.to.us>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemd100009.china.huawei.com (7.221.188.135)
 
-On Mon, Jan 22, 2024 at 03:30:20PM +0100, Andrew Lunn wrote:
-> On Mon, Jan 22, 2024 at 02:33:49PM +0200, Vladimir Oltean wrote:
-> > On Tue, Jan 16, 2024 at 05:51:13PM -0800, Tim Menninger wrote:
-> > > My impression is still that the read_c45 function should agree with the
-> > > phy_read_c45 function, but that isn't a hill I care to die on if you still
-> > > think otherwise. Thoughts?
-> > 
-> > FWIW, Tim's approach is consistent with what drivers/net/mdio/mdio-mux.c does.
-> > 
-> > 		if (parent_bus->read)
-> > 			cb->mii_bus->read = mdio_mux_read;
-> > 		if (parent_bus->write)
-> > 			cb->mii_bus->write = mdio_mux_write;
-> > 		if (parent_bus->read_c45)
-> > 			cb->mii_bus->read_c45 = mdio_mux_read_c45;
-> > 		if (parent_bus->write_c45)
-> > 			cb->mii_bus->write_c45 = mdio_mux_write_c45;
-> > 
-> > My only objection to his patch (apart from the commit message which
-> > should indeed be more detailed) is that I would have preferred the same
-> > "if" syntax rather than the use of a ternary operator with NULL.
+
+
+On 2024/1/22 22:44, Björn Töpel wrote:
+> Pu Lehui <pulehui@huaweicloud.com> writes:
 > 
-> I agree it could be fixed this way. But what i don't like about the
-> current code is how C22 and C45 do different things with error
-> codes. Since the current code is trying to use an error code, i would
-> prefer to fix that error code handling, rather than swap to a
-> different way to indicate its not supported.
+>> On 2024/1/22 22:33, Björn Töpel wrote:
+>>> Pu Lehui <pulehui@huaweicloud.com> writes:
+>>>
+>>>> Add Zbb support [0] to optimize code size and performance of RV64 JIT.
+>>>> Meanwhile, adjust the code for unification and simplification. Tests
+>>>> test_bpf.ko and test_verifier have passed, as well as the relative
+>>>> testcases of test_progs*.
+>>>>
+>>>> Link: https://github.com/riscv/riscv-bitmanip/releases/download/1.0.0/bitmanip-1.0.0-38-g865e7a7.pdf [0]
+>>>>
+>>>> v3 resend:
+>>>> - resend for mail be treated as spam.
+>>>>
+>>>> v3:
+>>>> - Change to early-exit code style and make code more explicit.
+>>>
+>>> Lehui,
+>>>
+>>> Sorry for the delay. I'm chasing a struct_ops RISC-V BPF regression in
+>>> 6.8-rc1, I will need to wrap my head around that prior reviewing
+>>> properly.
+>>>
+>>
+>> Oh, I also found the problem with struct ops and fixed it
 > 
-> 	  Andrew
+> Awesome, I just started bisecting the following test_progs sub-test
+> fails on 6.8-rc1:
+> 
+> bpf_iter_setsockopt:
+> Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000
+> Oops [#1]
+> Modules linked in: bpf_testmod(OE) drm fuse i2c_core dm_mod drm_panel_orientation_quirks backlight configfs ip_tables x_tables
+> CPU: 1 PID: 458 Comm: test_progs Tainted: G           OE      6.8.0-rc1-kselftest_plain #1
+> Hardware name: riscv-virtio,qemu (DT)
+> epc : 0x0
+>   ra : tcp_set_ca_state+0x2c/0x9a
+> epc : 0000000000000000 ra : ffffffff80cdc6b2 sp : ff2000000000b910
+>   gp : ffffffff82587b60 tp : ff60000087ea8040 t0 : 0000000000000000
+>   t1 : ffffffff801ed15e t2 : 0000000000000000 s0 : ff2000000000b930
+>   s1 : ff600000879296c0 a0 : ff20000000497000 a1 : 0000000000000008
+>   a2 : 0000000000000001 a3 : ff60000087ea83a0 a4 : 0000000000000000
+>   a5 : 0000000000000106 a6 : 0000000000000021 a7 : 0000000000000000
+>   s2 : 0000000000000000 s3 : ff60000086878008 s4 : ff60000082ce2f40
+>   s5 : ff60000084f56040 s6 : ff60000087929040 s7 : ff60000086878008
+>   s8 : ff2000000000ba5f s9 : ff60000087928a00 s10: 0000000000000002
+>   s11: ff60000087928040 t3 : 000000000001ffff t4 : 0100000000000000
+>   t5 : 0000000000000000 t6 : ff6000008792a118
+> status: 0000000200000120 badaddr: 0000000000000000 cause: 000000000000000c
+> Code: Unable to access instruction at 0xffffffffffffffec.
+> ---[ end trace 0000000000000000 ]---
+> 
+> bpf_tcp_ca:
+> Unable to handle kernel paging request at virtual address ff60000088554500
+> Oops [#1]
+> Modules linked in: iptable_raw xt_connmark bpf_testmod(OE) drm fuse i2c_core drm_panel_orientation_quirks backlight dm_mod configfs ip_tables x_tables [last unloaded: bpf_testmod(OE)]
+> CPU: 3 PID: 458 Comm: test_progs Tainted: G           OE      6.8.0-rc1-kselftest_plain #1
+> Hardware name: riscv-virtio,qemu (DT)
+> epc : 0xff60000088554500
+>   ra : tcp_ack+0x288/0x1232
+> epc : ff60000088554500 ra : ffffffff80cc7166 sp : ff2000000117ba50
+>   gp : ffffffff82587b60 tp : ff60000087be0040 t0 : ff60000088554500
+>   t1 : ffffffff801ed24e t2 : 0000000000000000 s0 : ff2000000117bbc0
+>   s1 : 0000000000000500 a0 : ff20000000691000 a1 : 0000000000000018
+>   a2 : 0000000000000001 a3 : ff60000087be03a0 a4 : 0000000000000000
+>   a5 : 0000000000000000 a6 : 0000000000000021 a7 : ffffffff8263f880
+>   s2 : 000000004ac3c13b s3 : 000000004ac3c13a s4 : 0000000000008200
+>   s5 : 0000000000000001 s6 : 0000000000000104 s7 : ff2000000117bb00
+>   s8 : ff600000885544c0 s9 : 0000000000000000 s10: ff60000086ff0b80
+>   s11: 000055557983a9c0 t3 : 0000000000000000 t4 : 000000000000ffc4
+>   t5 : ffffffff8154f170 t6 : 0000000000000030
+> status: 0000000200000120 badaddr: ff60000088554500 cause: 000000000000000c
+> Code: c796 67d7 0000 0000 0052 0002 c13b 4ac3 0000 0000 (0001) 0000
+> ---[ end trace 0000000000000000 ]---
+> 
+> dummy_st_ops:
+> Unable to handle kernel access to user memory without uaccess routines at virtual address 0000000000043022
+> Oops [#1]
+> Modules linked in: iptable_raw xt_connmark bpf_testmod(OE) drm fuse i2c_core drm_panel_orientation_quirks backlight dm_mod configfs ip_tables x_tables [last unloaded: bpf_testmod(OE)]
+> CPU: 1 PID: 452 Comm: test_progs Tainted: G           OE      6.8.0-rc1-kselftest_plain #1
+> Hardware name: riscv-virtio,qemu (DT)
+> epc : 0x43022
+>   ra : bpf_struct_ops_test_run+0x188/0x37a
+> epc : 0000000000043022 ra : ffffffff80c75d1a sp : ff200000002a3ce0
+>   gp : ffffffff82587b60 tp : ff6000008356b840 t0 : 0000000000043023
+>   t1 : ffffffff801ed062 t2 : 000000000000ff00 s0 : ff200000002a3d40
+>   s1 : ffffffff78207000 a0 : fffffffff2f3f4f5 a1 : 0000000000000008
+>   a2 : 0000000000000001 a3 : ff6000008356bba0 a4 : 0000000000000000
+>   a5 : fffffffff2f3f4f5 a6 : 0000000000000021 a7 : 0000000052464e43
+>   s2 : 0000000000000000 s3 : ff60000080b33b80 s4 : 0000000000000084
+>   s5 : ff60000083334c00 s6 : ff60000084861580 s7 : 00007ffff0887668
+>   s8 : 00007fffaa859030 s9 : 0000000000000000 s10: 000055556631ca4c
+>   s11: 000055556631c9c0 t3 : 000000000000000f t4 : 0000000000000800
+>   t5 : 0001000000000000 t6 : ff6000008adb9bf8
+> status: 0000000200000120 badaddr: 0000000000043022 cause: 000000000000000c
+> Code: Unable to access instruction at 0x000000000004300e.
+> ---[ end trace 0000000000000000 ]---
+> 
+> Environment: OpenSBI 1.4, Qemu 8.2.0, U-boot UEFI
+> 
+> Is that the same that you se >
 
-You did write in commit da099a7fb13d ("net: phy: Remove probe_capabilities")
-that the MDIO bus API is now this: "Deciding if to probe of PHYs using
-C45 is now determine by if the bus provides the C45 read method."
+Yes, is the same issue. The question is that the commit 2cd3e3772e41 
+("x86/cfi,bpf: Fix bpf_struct_ops CFI") change func_addr of 
+arch_prepare_bpf_trampoline from NULL to not NULL, while we use 
+func_addr to distinguish struct_ops and regular trampoline. After commit 
+2cd3e3772e41, we can use BPF_TRAMP_F_INDIRECT to distinguish them as it 
+always be set in struct_ops.
 
-Do you not agree that Tim's approach is the more straightforward
-solution overall to skip C45 PHY probing, given this API, both code wise
-and runtime wise? Are there downsides to it?
-
-I have no objection to the C22 vs C45 error code handling inconsistency.
-It can be improved, sure. But it also does not matter here, if we agree
-that this problem can be sorted out in a more straightforward way with
-no negative consequences.
-
-I sort of don't understand the desire to have the smallest patch in
-terms of lines of code, when the end result will end up being suboptimal
-compared to something with just a little more lines (1 vs 4).
+> I'll take your patch for a spin!
+> 
+> 
+> Björn
 
