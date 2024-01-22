@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-64923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E8DF837BFC
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 02:08:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 537808383E1
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 03:30:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10CB51F2ACE4
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 01:08:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0AAB21F2911B
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 02:30:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 624E07F4;
-	Tue, 23 Jan 2024 00:24:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A378165196;
+	Tue, 23 Jan 2024 01:58:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="rfiR9spj"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="C614+0v3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B32B372;
-	Tue, 23 Jan 2024 00:24:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C22B4E1AD;
+	Tue, 23 Jan 2024 01:58:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705969464; cv=none; b=quublve2e6VOs+HEAKdfhJxK4h1gpsOy77kvieTZABJdIM2AqdaLTLn1CuF17fr+OYZXLqfe/l9cmYInziWM1r2ZHY2sBul145IDdx5RE/w2ww2YuRIkChT196rIkKBQh/Ezbz5LeF6Nzwt1mdlEpJzxwW8sVoeYVqWpVSiCFUg=
+	t=1705975087; cv=none; b=FAWq1fkH1C3Tc/2dNoXqRcr8kfCNH1DPDHQcGQBZzKHxs+1w6Jc0LpmTFfaQGL7Si/DLCqTYOgXU35Q740tXaYn+S1ZmXRGihIVvcSTCncKxHYRQeEaDInH6FHtPCXB5kZa81RRS17Ixn9VZDjb20Ia07rnIPjsEZoO3LhT2ob8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705969464; c=relaxed/simple;
-	bh=bSghpvZNq1T3rrpOYipet9T1woLnbL0GcCMSCBWTcXA=;
+	s=arc-20240116; t=1705975087; c=relaxed/simple;
+	bh=iVY1TzcuO4Cyuf0UOnawI7Amn1utTnfZG4w20lJDqCQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WYPvv02WZzc0M1Q3xqHiGp13zI3jWUiYfNSGPOeecH5S/uRB0ZsGQdcYAR1YmquSqjnNxqiHbnukRgxARhwMio8cT4W617CsZs6OjZkKomaYXdvfAvV/zDwUJzWZ2CKncfGTW69lbeuLhbDTyfG1tMwmetzW3Czx7nVw2VLJIgQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=rfiR9spj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECD3EC433F1;
-	Tue, 23 Jan 2024 00:24:23 +0000 (UTC)
+	 MIME-Version; b=bBoTpsZnyJVKTyfNEuxqm7g3u8KUm9Z9XB2DUOw06JnxwXbd2SRKyTNT13wH3nepmHhJcsykd8sRX+Md9BXzogVrWI/SVYywppUfUqEQ5BsGuLI6fNnElymGsqplKTrCEiySmUU/IWBU1tWPYXkksoFzz/BgFuMKRcykP677Cps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=C614+0v3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40936C433F1;
+	Tue, 23 Jan 2024 01:58:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1705969464;
-	bh=bSghpvZNq1T3rrpOYipet9T1woLnbL0GcCMSCBWTcXA=;
+	s=korg; t=1705975087;
+	bh=iVY1TzcuO4Cyuf0UOnawI7Amn1utTnfZG4w20lJDqCQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rfiR9spjTzHxxdoTeR0FvNE3EcmwgaO1wwbRrvv4UUGWLyyHjPgEUZPwmTxdfGx6T
-	 MVNmoXTc657mmVatc3sxc8Yi+uV60hVyHH9MvR8wT0AAqNrFYYkBbQvZHfGBghUsjf
-	 BEnAze1OtvkiiEOqX//1SclGKGrjw47s8KPeyzyU=
+	b=C614+0v3WSdV1nrICY3FRvadL3bhw/qo/lsiDveM32KwtnaBbQ11vizxJdz3/CoUY
+	 Lgpy9tNGW8kSG5Eawe7iJQ1i0PhzQSrcVpaK7lMfusXfi87t2Dpk3NcoBnA4e6XhEp
+	 14apqUhpu2ha35ZylztS60vTvlaYvuioBIZ6wNI4=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -51,12 +51,12 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	linux-afs@lists.infradead.org,
 	netdev@vger.kernel.org,
 	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 6.7 239/641] rxrpc: Fix skbuff cleanup of calls recvmsg_queue and rx_oos_queue
-Date: Mon, 22 Jan 2024 15:52:23 -0800
-Message-ID: <20240122235825.406423043@linuxfoundation.org>
+Subject: [PATCH 6.6 219/583] rxrpc: Fix skbuff cleanup of calls recvmsg_queue and rx_oos_queue
+Date: Mon, 22 Jan 2024 15:54:30 -0800
+Message-ID: <20240122235818.703132870@linuxfoundation.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240122235818.091081209@linuxfoundation.org>
-References: <20240122235818.091081209@linuxfoundation.org>
+In-Reply-To: <20240122235812.238724226@linuxfoundation.org>
+References: <20240122235812.238724226@linuxfoundation.org>
 User-Agent: quilt/0.67
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -68,7 +68,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.7-stable review patch.  If anyone has any objections, please let me know.
+6.6-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
