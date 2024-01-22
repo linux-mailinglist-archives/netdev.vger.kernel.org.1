@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-64846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64847-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C7FD83747D
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 21:49:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A4BD837494
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 21:51:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C752E290823
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 20:49:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B41E11F2AE89
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 20:51:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78B804778B;
-	Mon, 22 Jan 2024 20:49:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3891B47A58;
+	Mon, 22 Jan 2024 20:51:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M1hVgyLq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EPWsA64Q"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E3D73D3A7;
-	Mon, 22 Jan 2024 20:49:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11937405CF;
+	Mon, 22 Jan 2024 20:51:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705956588; cv=none; b=haTpsirdk6FQBbQDCFR6BFfOFVnhmeyxKpvs2vMw0648b3wckt9prYf7lWqujrl4hsjnlJ5abAOUALtrXC3nSZKmDXV5JFMB1vexz9UB+xwHP2ZFLjjWCtKCjU1pz2TYw8ODXSArw5T+meA4HEe9t8IHc+Hyi+yuVdfk6OXBBzA=
+	t=1705956703; cv=none; b=qbsJFev1DMAtC2gRdEERyZ6blmuk9UdHgDGf0L79IyOPO3nps78NS4VJ31cbcL0w7BXStw8TPjX6W+0jF/kxSXlXtpgLuePucW984qWgYMOsrCvzmoyqC6bZ+KNm+YzezkH9WFuJvtZOVxW2Z+hO4Bk0ivne+1gzq1Yw2WRFQTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705956588; c=relaxed/simple;
-	bh=8uQMHUcXhtjhqayjyELeGsTQuyul/RDw0AHVO1zqFyc=;
+	s=arc-20240116; t=1705956703; c=relaxed/simple;
+	bh=kBy1Gyk4KwbMYdlczXCSVyblnX5b1/z4nvmDyE4PLA4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gRXmGaXvTAzXQtXbd4IwIl6KykjM7NgF1PLC3VXB8SNpZmO1wv987+rHNF++GK1bqDDCPfLcjRAyxxK7ZsLTQj4ZAEi72LXq4OaPfT625jV3x3Fl+NQijjkBfqurOH5gq8tATcW5tUKj94xnd2qG/d0YbSuMyCETAuAcmUFegck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M1hVgyLq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 775E8C433B1;
-	Mon, 22 Jan 2024 20:49:45 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=JCnVj8IzJgYCDvlH5Pq4arTWNAKCgwCDG8II28dLqsAvxtzWYiDFxK6HSjXEptf9edJ+YK/DFGKavAt+dFGrVIyxoPVbgFq1rFfTqcOtQuiiISY+Y95PWeZuEQuxZyUkkBDBvqj+hDVmlMxjGIyFYPcroohuKEkATzrQRf4Jxyo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EPWsA64Q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6596EC433C7;
+	Mon, 22 Jan 2024 20:51:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705956587;
-	bh=8uQMHUcXhtjhqayjyELeGsTQuyul/RDw0AHVO1zqFyc=;
+	s=k20201202; t=1705956702;
+	bh=kBy1Gyk4KwbMYdlczXCSVyblnX5b1/z4nvmDyE4PLA4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=M1hVgyLqytB+uOHN87/G0Mx0O6oa8OSf0K4e4wc1VVYQIoqwi9xrsFE6x4PEEx/8Y
-	 lr0H/drkLUBoaLo9VKnXH1F5F8BA6la87ESLGGQN7aAFXtpdL8mX4PEmb3kqSX1SE3
-	 06YjGNizjI3n+wh2XLRin7lCLVaJqDFJ49BZpHfCqhUGf0DKgawRJYdNgMToHt7nk3
-	 qOFwgp2AqXaKkwgX20Gh6slmRbXDORYVstZToPkBncThvJa8obBig35ydVnzS5+eAR
-	 jUzFydz+GaIKg2nnmhyOwuNyW6w5xebf2y26X7zJLIohGGQ+4YP1CbYvzuxGbdR7RD
-	 fJlYIJKL8et8A==
-Date: Mon, 22 Jan 2024 20:49:38 +0000
+	b=EPWsA64QiIJiR5DEKExhPQM45t/lykkdoZuwLhoV9qa+hsveaxJx69OxBa/F/lttl
+	 8mcarfEKPnDixdfMXPTmx8P8sNxYiNicA2r/9EbkMiGkN6JNadMqgArG0N+L7Dp4LI
+	 ZMdOY8bk1HQDwQhlGiV/xjr6XXLZPsz4of0y+bEzh3Pzlr3e/mCmP1cXB7YLHD4hFX
+	 1BLcFb2ODHKE5LBI2OX1zFMzprz3/sdPLD3t5cdDxdxEnbA8LDwoMygQjEOwCbIfdj
+	 oLY98/Kr7+ilOZkPyfeLiK9MJEPNyMW1n7Bc1d10tubvdK6pz64h1LY9AnD9sNrkVi
+	 G5SPSU89GeJcg==
+Date: Mon, 22 Jan 2024 20:51:37 +0000
 From: Simon Horman <horms@kernel.org>
-To: mhklinux@outlook.com
-Cc: haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
+To: Suresh Kumar <suresh2514@gmail.com>
+Cc: jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
 	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, linux-kernel@vger.kernel.org,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net 1/1] hv_netvsc: Calculate correct ring size when
- PAGE_SIZE is not 4 Kbytes
-Message-ID: <20240122204938.GG126470@kernel.org>
-References: <20240122162028.348885-1-mhklinux@outlook.com>
+	pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH iwl v2] i40e: print correct hw max rss count in kernel
+ ring buffer
+Message-ID: <20240122205137.GH126470@kernel.org>
+References: <20240120072806.8554-1-suresh2514@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,37 +60,38 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240122162028.348885-1-mhklinux@outlook.com>
+In-Reply-To: <20240120072806.8554-1-suresh2514@gmail.com>
 
-On Mon, Jan 22, 2024 at 08:20:28AM -0800, mhkelley58@gmail.com wrote:
-> From: Michael Kelley <mhklinux@outlook.com>
+On Sat, Jan 20, 2024 at 12:58:06PM +0530, Suresh Kumar wrote:
+> pf->rss_size_max is hardcoded and always prints max rss count as 64.
 > 
-> Current code in netvsc_drv_init() incorrectly assumes that PAGE_SIZE
-> is 4 Kbytes, which is wrong on ARM64 with 16K or 64K page size. As a
-> result, the default VMBus ring buffer size on ARM64 with 64K page size
-> is 8 Mbytes instead of the expected 512 Kbytes. While this doesn't break
-> anything, a typical VM with 8 vCPUs and 8 netvsc channels wastes 120
-> Mbytes (8 channels * 2 ring buffers/channel * 7.5 Mbytes/ring buffer).
+> Eg:
+>   kernel: i40e 0000:af:00.1: User requested queue count/HW max RSS count:  104/64
 > 
-> Unfortunately, the module parameter specifying the ring buffer size
-> is in units of 4 Kbyte pages. Ideally, it should be in units that
-> are independent of PAGE_SIZE, but backwards compatibility prevents
-> changing that now.
+> whereas  ethtool reports the correct value from "vsi->num_queue_pairs"
 > 
-> Fix this by having netvsc_drv_init() hardcode 4096 instead of using
-> PAGE_SIZE when calculating the ring buffer size in bytes. Also
-> use the VMBUS_RING_SIZE macro to ensure proper alignment when running
-> with page size larger than 4K.
+> Channel parameters for eno33:
+> Pre-set maximums:
+> RX:     n/a
+> TX:     n/a
+> Other:      1
+> Combined:   104
+> Current hardware settings:
+> RX:     n/a
+> TX:     n/a
+> Other:      1
+> Combined:   104  <-------
 > 
-> Cc: <stable@vger.kernel.org> # 5.15.x
-> Signed-off-by: Michael Kelley <mhklinux@outlook.com>
+> and is misleading.
+> 
+> Change it to vsi->num_queue_pairs
+> 
+> Signed-off-by: Suresh Kumar <suresh2514@gmail.com>
 
-Hi Michael,
+Hi Suresh,
 
-As a bug fix this probably warrants a fixes tag.
-Perhaps this is appropriate?
+following-up on our earlier emails.
 
-Fixes: 450d7a4b7ace ("Staging: hv: ring parameter")
-
-...
+I do think that if this it is a fix it should have a fixes tag.
+Which should be for the commit where the bug was first visible to users.
 
