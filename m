@@ -1,111 +1,163 @@
-Return-Path: <netdev+bounces-64665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34E15836348
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 13:34:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3F91836356
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 13:36:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 68D341C22BE9
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 12:34:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F6911F21BC5
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 12:36:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0085E374FA;
-	Mon, 22 Jan 2024 12:33:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 726F638392;
+	Mon, 22 Jan 2024 12:36:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e5+MoYN6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K5yJbjiM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5423A31A61;
-	Mon, 22 Jan 2024 12:33:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DF373C68A
+	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 12:36:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705926835; cv=none; b=FdeCRydcyFojSVxXwp99R13Se/QsM4S66uwpQAcypStoIXuTytUpgHnzE5N2ks2aM0IUZTDhkKFmDnXErhnlozyGb9ZaVdB8jzpEA8Q8MHn5UCwVwK71EIWjQ+3twu+WdrF1dYEWy6ZaZbwxbsXBFdOeWTwlpGMgrFZNthcKu10=
+	t=1705926992; cv=none; b=hj6PnzNn26+FJevIoklfrT1BHFL669fOMgQiiOKg7drJeM829EZN0r9JEXdJpMRI+xpwoJFctqrM09SH5JVKznYijN3YedBfiCf/Z8QZ0iRf4Z3Gh0eZhSBkdIzdjaVHXhMCbACXh2XKxCKuVEQV6VmzAec1+LPjHGfvnB3A/4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705926835; c=relaxed/simple;
-	bh=XTDB6//crJGG/H3m1XnEvHrPWpGka2r/ZPypNjVQ76w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZtX0nEL1T3fVJdoDThT46inC30R64wFu+TJDn8Yc5rWBmwYqgytvfnBAGtCDv03hT/j1TQNKREkzxB0v+ZRr8nr7JEm0O3h8QJlPPy23uwadDpwYTju/O+Q3eIli5oXBxYk2gnx+dkbYcsOU+L6TW0JEcy1DhadRy+6MEOXUVT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e5+MoYN6; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-50ec948ad31so3291941e87.2;
-        Mon, 22 Jan 2024 04:33:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705926832; x=1706531632; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bFxRSXpfyegZX74xz8OgyH0TqgyPmSRwyVAL2eqo6Q0=;
-        b=e5+MoYN6jNiDGC3rkIDjt65kly1odEFlx95Qv8pbnLFOT9JJU1Je3RH/FBHgp1hEXf
-         Ph3MUr6nBNqxOoAzV9z7JMBkmXyzo+9zWGP9orMd8X5/pW8YTErOWX13Cw+5L/ig6Ipv
-         nhSEZX8HkyKvx6RQ3kV2+1/LyQNKtb1SMVObxnwEpgbq2TnpcjJd+541HC2FiV0My9Wg
-         ydHwI1eCjmztKgoafFRu3MNYNPCD+MNaPuNuB79wPBmiP2sXLjedmMF9hilyNxJbVVJ5
-         Zbl0TckF4QFk7BLNZzz3IP9ckkMosJ4rqlDr79Zp3RwSumaJLNGO6mV/nV5IDHvyqXME
-         jASA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705926832; x=1706531632;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bFxRSXpfyegZX74xz8OgyH0TqgyPmSRwyVAL2eqo6Q0=;
-        b=d8Qpy5gCDVdSb5nOd9NOO6dYM7KTL5re3oDyWi5L2EdOZxS6XsrW7x8Y/bWdG2x3tN
-         sbMlF3OYEV1rcp1pureOojeEVDXuizWmI6lwRTsTtdbB033xmNckA6sK385A8MUg01Jy
-         Eu85hSdSPs+efGQS6gTidHZOBUBXky8az0bNOIPheD4q2il3W2ttrP/gccqTv/FdvSL4
-         0ALVu2fOdBA42v6aBxSkmQkvZV+65iQk77vQr7khHgaiC3zNjLpfQRKn1WfTSwsnIXqr
-         RvlfRiFdeXlQhK1qlQP4bSKvpdp1/2ffN96zgSIU/xWpWio1Lzd5N1vatGHJ/ZFlErQe
-         M3uw==
-X-Gm-Message-State: AOJu0YywLhMdYz2JW4aYrrAOoj7OVdxMxoNNzqPuAp2rIE2mjeNtX7Ev
-	tBUPNoepLatojUZw6HY4l3lZZcgA8C/aE/mfNE5jVmT/b8RVzxSE
-X-Google-Smtp-Source: AGHT+IE27PJB1NHdKUDjIrtru5lVJQa/6wd07V7mmwsTZ2/nxlWmOfso3vPr5kcpEXy5gjqP7xfJ8A==
-X-Received: by 2002:a05:6512:a8b:b0:50e:ccd8:f9d9 with SMTP id m11-20020a0565120a8b00b0050eccd8f9d9mr1771847lfu.24.1705926831991;
-        Mon, 22 Jan 2024 04:33:51 -0800 (PST)
-Received: from skbuf ([188.25.255.36])
-        by smtp.gmail.com with ESMTPSA id q9-20020aa7cc09000000b00558a3e892b3sm14008365edt.41.2024.01.22.04.33.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jan 2024 04:33:51 -0800 (PST)
-Date: Mon, 22 Jan 2024 14:33:49 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Tim Menninger <tmenninger@purestorage.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, f.fainelli@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: dsa: mv88e6xxx: Make *_c45 callbacks agree with
- phy_*_c45 callbacks
-Message-ID: <20240122123349.cxx2i2kzrhuqnasp@skbuf>
-References: <20240116193542.711482-1-tmenninger@purestorage.com>
- <04d22048-737a-4281-a43f-b125ebe0c896@lunn.ch>
- <CAO-L_44YVi0HDk4gC9QijMZrYNGoKtfH7qsXOwtDwM4VrFRDHw@mail.gmail.com>
- <da87ce82-7337-4be4-a2af-bd2136626c56@lunn.ch>
- <CAO-L_46kqBrDdYP7p3He0cBF1OP7TJKnhYK1NR_gMZf2n_928A@mail.gmail.com>
+	s=arc-20240116; t=1705926992; c=relaxed/simple;
+	bh=FonPDTkq8bm+MzOhIHp03CNgxfktHG90NHq3K6u9+R8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pm/6T4Xtb9FPb8G3gM03GgNsv12qPosUiyuw9zdTeSybdFVRX03YCHs/fF4e+uk5C+i9vx6SnPqIQJx/TGhPcTtTKeawIu/pMHU3JOguYI514KCZAbfvZww5c36tJh4gvBQvr4MpJXcJePdLDwDlJ+CIV5GwYjSKZcq8t/qVAsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=K5yJbjiM; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1705926990; x=1737462990;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=FonPDTkq8bm+MzOhIHp03CNgxfktHG90NHq3K6u9+R8=;
+  b=K5yJbjiMoe8G5tIlrvexuyZzl4uOT+v3M15OiAjxMa+bGZGRK70eFLcd
+   gy0LLNcwqYMqQJOHkaQv4cSWx4kHrToy0D3OLSeKZs1gqdqHh/aG3EoFR
+   xZ4jxUQUFvS3HVFG2cInbIOKLP215hWQDj+/zq2VlfbBJhEcmK0B/UIg/
+   64+uCMB8uhAwOW0ynjASKNXKqRr+tqiIQ0yFW6E3TQOMt2qNF7Lt70pAw
+   iDa5Sp5MrP7TMbMAoFNtKlX0O6HA3uuYPrUHsqyrhhzrYUd5w0CtfqBqQ
+   LQvInW2qymXmsRaNASSWFw6d1UyCZsI8l3btG8K/H/y3EttEdwPpxlKH7
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10960"; a="8569488"
+X-IronPort-AV: E=Sophos;i="6.05,211,1701158400"; 
+   d="scan'208";a="8569488"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 04:36:29 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,211,1701158400"; 
+   d="scan'208";a="19973510"
+Received: from mszycik-mobl1.ger.corp.intel.com (HELO [10.237.140.122]) ([10.237.140.122])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 04:36:28 -0800
+Message-ID: <324a30c2-c4a0-487e-bad9-9977c6e503ba@linux.intel.com>
+Date: Mon, 22 Jan 2024 13:36:25 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAO-L_46kqBrDdYP7p3He0cBF1OP7TJKnhYK1NR_gMZf2n_928A@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net] ice: Add check for lport
+ extraction to LAG init
+Content-Language: en-US
+To: Dave Ertman <david.m.ertman@intel.com>, intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org, Przemek Kitszel <przemyslaw.kitszel@intel.com>
+References: <20240119211517.127142-1-david.m.ertman@intel.com>
+From: Marcin Szycik <marcin.szycik@linux.intel.com>
+In-Reply-To: <20240119211517.127142-1-david.m.ertman@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jan 16, 2024 at 05:51:13PM -0800, Tim Menninger wrote:
-> My impression is still that the read_c45 function should agree with the
-> phy_read_c45 function, but that isn't a hill I care to die on if you still
-> think otherwise. Thoughts?
 
-FWIW, Tim's approach is consistent with what drivers/net/mdio/mdio-mux.c does.
 
-		if (parent_bus->read)
-			cb->mii_bus->read = mdio_mux_read;
-		if (parent_bus->write)
-			cb->mii_bus->write = mdio_mux_write;
-		if (parent_bus->read_c45)
-			cb->mii_bus->read_c45 = mdio_mux_read_c45;
-		if (parent_bus->write_c45)
-			cb->mii_bus->write_c45 = mdio_mux_write_c45;
+On 19.01.2024 22:15, Dave Ertman wrote:
+> To fully support initializing the LAG support code, a DDP package that
+> extracts the logical port from the metadata is required.  If such a
+> package is not present, there could be difficulties in supporting some
+> bond types.
+> 
+> Add a check into the initialization flow that will bypass the new paths
+> if any of the support pieces are missing.
+> 
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 
-My only objection to his patch (apart from the commit message which
-should indeed be more detailed) is that I would have preferred the same
-"if" syntax rather than the use of a ternary operator with NULL.
+Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+
+> Fixes: df006dd4b1dc ("ice: Add initial support framework for LAG")
+> Signed-off-by: Dave Ertman <david.m.ertman@intel.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_lag.c | 25 ++++++++++++++++++++++--
+>  drivers/net/ethernet/intel/ice/ice_lag.h |  3 +++
+>  2 files changed, 26 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_lag.c b/drivers/net/ethernet/intel/ice/ice_lag.c
+> index 2a25323105e5..467372d541d2 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_lag.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_lag.c
+> @@ -151,6 +151,27 @@ ice_lag_find_hw_by_lport(struct ice_lag *lag, u8 lport)
+>  	return NULL;
+>  }
+>  
+> +/**
+> + * ice_pkg_has_lport_extract - check if lport extraction supported
+> + * @hw: HW struct
+> + */
+> +static bool ice_pkg_has_lport_extract(struct ice_hw *hw)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < hw->blk[ICE_BLK_SW].es.count; i++) {
+> +		u16 offset;
+> +		u8 fv_prot;
+> +
+> +		ice_find_prot_off(hw, ICE_BLK_SW, ICE_SW_DEFAULT_PROFILE, i,
+> +				  &fv_prot, &offset);
+> +		if (fv_prot == ICE_FV_PROT_MDID &&
+> +		    offset == ICE_LP_EXT_BUF_OFFSET)
+> +			return true;
+> +	}
+> +	return false;
+> +}
+> +
+>  /**
+>   * ice_lag_find_primary - returns pointer to primary interfaces lag struct
+>   * @lag: local interfaces lag struct
+> @@ -1206,7 +1227,7 @@ static void ice_lag_del_prune_list(struct ice_lag *lag, struct ice_pf *event_pf)
+>  }
+>  
+>  /**
+> - * ice_lag_init_feature_support_flag - Check for NVM support for LAG
+> + * ice_lag_init_feature_support_flag - Check for package and NVM support for LAG
+>   * @pf: PF struct
+>   */
+>  static void ice_lag_init_feature_support_flag(struct ice_pf *pf)
+> @@ -1219,7 +1240,7 @@ static void ice_lag_init_feature_support_flag(struct ice_pf *pf)
+>  	else
+>  		ice_clear_feature_support(pf, ICE_F_ROCE_LAG);
+>  
+> -	if (caps->sriov_lag)
+> +	if (caps->sriov_lag && ice_pkg_has_lport_extract(&pf->hw))
+>  		ice_set_feature_support(pf, ICE_F_SRIOV_LAG);
+>  	else
+>  		ice_clear_feature_support(pf, ICE_F_SRIOV_LAG);
+> diff --git a/drivers/net/ethernet/intel/ice/ice_lag.h b/drivers/net/ethernet/intel/ice/ice_lag.h
+> index ede833dfa658..183b38792ef2 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_lag.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_lag.h
+> @@ -17,6 +17,9 @@ enum ice_lag_role {
+>  #define ICE_LAG_INVALID_PORT 0xFF
+>  
+>  #define ICE_LAG_RESET_RETRIES		5
+> +#define ICE_SW_DEFAULT_PROFILE		0
+> +#define ICE_FV_PROT_MDID		255
+> +#define ICE_LP_EXT_BUF_OFFSET		32
+>  
+>  struct ice_pf;
+>  struct ice_vf;
 
