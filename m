@@ -1,160 +1,174 @@
-Return-Path: <netdev+bounces-64693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A8E483664F
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 16:01:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1647836845
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 16:31:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2047528EE66
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 15:01:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 22C781C2230C
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 15:31:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D29D41779;
-	Mon, 22 Jan 2024 14:56:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02A8046B83;
+	Mon, 22 Jan 2024 15:02:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lF69lYdG"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="LLE5PCUi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60E7C4176A;
-	Mon, 22 Jan 2024 14:56:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 667BA46559;
+	Mon, 22 Jan 2024 15:02:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705935376; cv=none; b=N5D77o8UB+txGI1mCddR40qDGRuh0hjuCYNE4RKDLtQZyuAd36asjx40o0g+dATTupG8vzHN20+LfP00TSFj+wJXEXBK9+S5hOnd5vP4QgymfHwG4u8A6oXN+UE54AX4f0/iPuj1aIIqeD5vMjA6zIZcZZfi4bP3fK1aR+G6Dlo=
+	t=1705935763; cv=none; b=osobGjl2zqOXpPDGfJ9mIRGUBmOVoKIgb9m8A39qIjhZHsySttnQUzkV9EUKAgo5W3hLKzgZDfbERIo3/S4Zk7zCQs0UeHkUv/0fF0+jijd2JqZKjk3GkUIqifpmZWMU3KM5ch68bC3vs0w6gZa8EM80yLheETi2XEMmkWhhR8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705935376; c=relaxed/simple;
-	bh=aylFoYFUNFDwJsODArIOK0d6BnWENGefvOy/9zETano=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ailz+TkVBDoZmvRVS+YqpU6xVrdQf6EacjDOnJDjFk350hJdpJq+lZDAryGwtoO9vsxN50TJosV01BS0K5pmk41SsjSLJ8LTtCFxi6EmOc4s9K/USWXTT/8FHe8eiAsjMXDf9fh/UKp+iIlhKAgfSUQMhtnEW8ogrjBkoM5mO2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lF69lYdG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6468C43390;
-	Mon, 22 Jan 2024 14:56:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705935375;
-	bh=aylFoYFUNFDwJsODArIOK0d6BnWENGefvOy/9zETano=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lF69lYdGrvMV1bT1hg/5DzxS20FbA4Ah7UaL9p1jiDmR1zA7PdY5nSrRaEyzMelNB
-	 iB4igEA6RBKx5rP6sm4hLAQcsSElqObxT0lK/AjnxCDzSnGrHdgXSpyzhKFX7pls+/
-	 SDyKfxIZF4FqNwVu+qH1o2NseSOD+QTlKJZJArLtdUJcrvPJfowgsNfvf5/+p1lJAO
-	 K/EOe2UbqpTszK6Dci4ZCv44aUB/vLhvWUxqnmqqfAmjDkDwbseLtlKlB/xsZwaLpO
-	 7Uot3P6JWc9O+KaPragbwuwW8aYwqOAGvhwyY9uHDMpzI7OL9BwmkOqbAW+6o4EtbA
-	 kmBPqoS3P6zzQ==
-Date: Mon, 22 Jan 2024 14:56:09 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: linux-riscv@lists.infradead.org,
-	Conor Dooley <conor.dooley@microchip.com>,
-	Daire McNamara <daire.mcnamara@microchip.com>,
-	Wolfgang Grandegger <wg@grandegger.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org
-Subject: Re: [PATCH v2 2/7] dt-bindings: can: mpfs: add missing required clock
-Message-ID: <20240122-uncoated-cherub-a29cba1c0035@spud>
-References: <20240122-catty-roast-d3625dbb02fe@spud>
- <20240122-breeder-lying-0d3668d98886@spud>
- <20240122-surely-crimp-ba4a8c55106d-mkl@pengutronix.de>
- <20240122-cruelly-dainty-002081f0beb2@spud>
- <20240122-smokeless-ion-63e4148c22e5-mkl@pengutronix.de>
+	s=arc-20240116; t=1705935763; c=relaxed/simple;
+	bh=8bGFmix80U9/t8wZwLZ5Rw+q5Uz4pSAAPOUtF8Qbh94=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
+	 In-Reply-To:Content-Type; b=GhLIvtxxxHKnAUWxvWGXwoNlRMigW6piUH2xXbbfIgMhyTnybgm1s4gspC+cLD2q6yQBVsi0O6FVq5w8aTTIm+eW2Jk9jcc6oHSYWxIcBB2AgeSZ4Ec+Jm4o85ETzCn4laps2/Gd3+UtPKLmwVlkUMfLRorejL2DgZxoAlVfxy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=LLE5PCUi; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40MEEKRt023856;
+	Mon, 22 Jan 2024 15:01:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:from:subject:to:cc:references
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=HQT4IJbpgLyZu2gWdGASTg7GGU/7nlJGfQLF+O8FORE=; b=LL
+	E5PCUiZBDKg8XqVuua7R999Yh9pC48m4tqG18SD1WAx0xYI+itnKZPLYT8clKoV1
+	9moXCOpKjo/n/9ZtvP1MRVOL5QfrxYO2RqrF0v8cucDiLRw5tOJnDo/xLq2cbRtr
+	9JyTOEdnirWWl/NG1i43JA7jnaNP3+HTPwGyJ94Td+MdK0mvgnCHw5oOMtc0xgDN
+	fiA8nMxxoI/X9LoDFpMjBo2VOomcTwaHZNrk+OdEzQ+37l5EyBaQ8jV5j94d99mX
+	ZJ1sUdS60CwKF5Wnc+IIUceB2UB0aHHc26pw0vkUK4i9yHY1EcYiPGzOyzd6U0cc
+	vtQESgHJVipbP86uichg==
+Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3vsq7w0n1t-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 22 Jan 2024 15:01:39 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 40MF1c2U009224
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 22 Jan 2024 15:01:38 GMT
+Received: from [10.253.15.239] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Mon, 22 Jan
+ 2024 07:01:28 -0800
+Message-ID: <fc9c3e08-a83c-4748-89e4-8b7b0c62da7f@quicinc.com>
+Date: Mon, 22 Jan 2024 23:01:26 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="VZgP6gFILu/j/CyX"
-Content-Disposition: inline
-In-Reply-To: <20240122-smokeless-ion-63e4148c22e5-mkl@pengutronix.de>
+User-Agent: Mozilla Thunderbird
+From: Lei Wei <quic_leiwei@quicinc.com>
+Subject: Re: [PATCH net-next 18/20] net: ethernet: qualcomm: Add PPE MAC
+ support for phylink
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+        Luo Jie
+	<quic_luoj@quicinc.com>
+CC: <agross@kernel.org>, <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <corbet@lwn.net>, <catalin.marinas@arm.com>, <will@kernel.org>,
+        <p.zabel@pengutronix.de>, <shannon.nelson@amd.com>,
+        <anthony.l.nguyen@intel.com>, <jasowang@redhat.com>,
+        <brett.creeley@amd.com>, <rrameshbabu@nvidia.com>,
+        <joshua.a.hay@intel.com>, <arnd@arndb.de>, <geert+renesas@glider.be>,
+        <neil.armstrong@linaro.org>, <dmitry.baryshkov@linaro.org>,
+        <nfraprado@collabora.com>, <m.szyprowski@samsung.com>,
+        <u-kumar1@ti.com>, <jacob.e.keller@intel.com>, <andrew@lunn.ch>,
+        <netdev@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <ryazanov.s.a@gmail.com>, <ansuelsmth@gmail.com>,
+        <quic_kkumarcs@quicinc.com>, <quic_suruchia@quicinc.com>,
+        <quic_soni@quicinc.com>, <quic_pavir@quicinc.com>,
+        <quic_souravp@quicinc.com>, <quic_linchen@quicinc.com>
+References: <20240110114033.32575-1-quic_luoj@quicinc.com>
+ <20240110114033.32575-19-quic_luoj@quicinc.com>
+ <ZZ6LGiSde4hHM+6j@shell.armlinux.org.uk>
+Content-Language: en-US
+In-Reply-To: <ZZ6LGiSde4hHM+6j@shell.armlinux.org.uk>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: rEqqTzP-nAa7s86SsOJYcDTm33YE2naW
+X-Proofpoint-ORIG-GUID: rEqqTzP-nAa7s86SsOJYcDTm33YE2naW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-22_05,2024-01-22_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ lowpriorityscore=0 spamscore=0 clxscore=1015 suspectscore=0
+ priorityscore=1501 malwarescore=0 bulkscore=0 impostorscore=0
+ mlxlogscore=742 phishscore=0 mlxscore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2311290000
+ definitions=main-2401220102
 
 
---VZgP6gFILu/j/CyX
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 22, 2024 at 03:46:04PM +0100, Marc Kleine-Budde wrote:
-> On 22.01.2024 14:21:04, Conor Dooley wrote:
-> > On Mon, Jan 22, 2024 at 02:13:16PM +0100, Marc Kleine-Budde wrote:
-> > > On 22.01.2024 12:19:50, Conor Dooley wrote:
-> > > > From: Conor Dooley <conor.dooley@microchip.com>
-> > > >=20
-> > > > The CAN controller on PolarFire SoC has an AHB peripheral clock _an=
-d_ a
-> > > > CAN bus clock. The bus clock was omitted when the binding was writt=
-en,
-> > > > but is required for operation. Make up for lost time and add it.
-> > > >=20
-> > > > Cautionary tale in adding bindings without having implemented a real
-> > > > user for them perhaps.
-> > > >=20
-> > > > Fixes: c878d518d7b6 ("dt-bindings: can: mpfs: document the mpfs CAN=
- controller")
-> > > > Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
-> > > > ---
-> > > >  .../devicetree/bindings/net/can/microchip,mpfs-can.yaml     | 6 ++=
-++--
-> > > >  1 file changed, 4 insertions(+), 2 deletions(-)
-> > > >=20
-> > > > diff --git a/Documentation/devicetree/bindings/net/can/microchip,mp=
-fs-can.yaml b/Documentation/devicetree/bindings/net/can/microchip,mpfs-can.=
-yaml
-> > > > index 45aa3de7cf01..01e4d4a54df6 100644
-> > > > --- a/Documentation/devicetree/bindings/net/can/microchip,mpfs-can.=
-yaml
-> > > > +++ b/Documentation/devicetree/bindings/net/can/microchip,mpfs-can.=
-yaml
-> > > > @@ -24,7 +24,9 @@ properties:
-> > > >      maxItems: 1
-> > > > =20
-> > > >    clocks:
-> > > > -    maxItems: 1
-> > > > +    items:
-> > > > +      - description: AHB peripheral clock
-> > > > +      - description: CAN bus clock
-> > >=20
-> > > What about adding clock-names, so that the order can be checked
-> > > automatically?
-> >=20
-> > I don't personally care for doing so, but if your heart is set on having
-> > them, then sure.
->=20
-> Usually the CAN driver needs to have the clock rate of the clocks that
-> the basis for the CAN bus clock. Looking at the clocks description it's
-> probably the 2nd one.
->=20
-> With clock-names we can automatically check that the 2nd clock is always
-> the CAN clock.
+On 1/10/2024 8:18 PM, Russell King (Oracle) wrote:
+> On Wed, Jan 10, 2024 at 07:40:30PM +0800, Luo Jie wrote:
+>> +static void ppe_phylink_mac_link_up(struct ppe_device *ppe_dev, int port,
+>> +				    struct phy_device *phy,
+>> +				    unsigned int mode, phy_interface_t interface,
+>> +				    int speed, int duplex, bool tx_pause, bool rx_pause)
+>> +{
+>> +	struct phylink_pcs *pcs = ppe_phylink_mac_select_pcs(ppe_dev, port, interface);
+>> +	struct ppe_uniphy *uniphy = pcs_to_ppe_uniphy(pcs);
+>> +	struct ppe_port *ppe_port = ppe_port_get(ppe_dev, port);
+>> +
+>> +	/* Wait uniphy auto-negotiation completion */
+>> +	ppe_uniphy_autoneg_complete_check(uniphy, port);
+> 
+> Way too late...
+> 
 
-I think we already had this discussion on v1, where I said that the
-binding requires the clocks to be in that order, regardless of whether
-or not clock-names is provided. You feel more strongly about it than I
-do, so I will add them when I get around to sending a v3.
 
-Cheers,
-Conor.
+Yes agree, this will be removed. If inband autoneg is used, 
+.pcs_get_state should report the link status.  Then this function call 
+should not be needed and should be removed.
 
---VZgP6gFILu/j/CyX
-Content-Type: application/pgp-signature; name="signature.asc"
+>> @@ -352,6 +1230,12 @@ static int ppe_port_maxframe_set(struct ppe_device *ppe_dev,
+>>   }
+>>   
+>>   static struct ppe_device_ops qcom_ppe_ops = {
+>> +	.phylink_setup = ppe_phylink_setup,
+>> +	.phylink_destroy = ppe_phylink_destroy,
+>> +	.phylink_mac_config = ppe_phylink_mac_config,
+>> +	.phylink_mac_link_up = ppe_phylink_mac_link_up,
+>> +	.phylink_mac_link_down = ppe_phylink_mac_link_down,
+>> +	.phylink_mac_select_pcs = ppe_phylink_mac_select_pcs,
+>>   	.set_maxframe = ppe_port_maxframe_set,
+>>   };
+> 
+> Why this extra layer of abstraction? If you need separate phylink
+> operations, why not implement separate phylink_mac_ops structures?
+> 
 
------BEGIN PGP SIGNATURE-----
+This PPE driver will serve as the base driver for higher level drivers
+such as the ethernet DMA (EDMA) driver and the DSA switch driver. The
+ppe_device_ops is exported to these higher level drivers, to allow 
+access to PPE operations. For example, the EDMA driver (ethernet 
+netdevice driver to be pushed for review after the PPE driver) will use 
+the phylink_setup/destroy ops for managing netdevice to PHY linkage. The 
+set_maxframe op is also to be used by the EDMA driver during MTU change 
+operation on the ethernet port.
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZa6CCQAKCRB4tDGHoIJi
-0pBqAP9YBmYf5WMQ1g9eFFxDgDvxgLL7NbWukSK4TuirCpfVHwD/Vdz4dl59G+UV
-fpzZQ35NUAbACLJ4724ApN5rJRTBQQU=
-=WsOe
------END PGP SIGNATURE-----
+I also mentioned it in the section "Exported PPE Device Operations" in 
+PPE driver documentation:
+https://lore.kernel.org/netdev/20240110114033.32575-2-quic_luoj@quicinc.com/
 
---VZgP6gFILu/j/CyX--
+Whereas the PPE DSA switch driver is expected to use the phylink_mac 
+ops. However，we will remove the phylink_mac ops from this patch now 
+since it is currently unused.
+
 
