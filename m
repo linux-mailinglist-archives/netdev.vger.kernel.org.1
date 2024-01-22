@@ -1,197 +1,227 @@
-Return-Path: <netdev+bounces-64802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64803-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4992837236
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 20:16:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E736837238
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 20:16:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F39C2914E0
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:16:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4967E1C2A2FB
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:16:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DD2A4A9A8;
-	Mon, 22 Jan 2024 19:06:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D49D47A4D;
+	Mon, 22 Jan 2024 19:07:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AKP4JZKE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lu8U8ZvF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 044044A9A3;
-	Mon, 22 Jan 2024 19:06:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A428E4B5B9
+	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 19:07:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705950383; cv=none; b=qLPHOh2KdPbLYBiCyrfKR+mqTiXoEpNIlWJgQwyBs4Da1BtQUlwp00Cjn6FpUTn10CPSwpdXDZwEB/ybPPanlT6Zpp2f2Y0lyjzjcZ5TU6Q9STCyyTFxMt7rxVltqLg0/T3EKXMoZROfKs885jzSFuj4pOe/IC+owTcCMfp8q6g=
+	t=1705950431; cv=none; b=M9Lkwke2PPIhvcGwyt0M18c9YRPNl6eQ4aYQl83BvCV+iMZCL5n2PjAEhse73mpyTn6v2SMGP9UC1etOOjJQkMlqamPlJuVF3SMgVoT+HRR9vUbckrnLFv9qxUkSczeJ/iocqJOArdtid23VHU7XKGV3d5g4MNR9XnB8ky4caJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705950383; c=relaxed/simple;
-	bh=3Zxrw5yAUlUVp3ob/vJEIsDQ5grjL/Vrq9t/P3JVT5I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fV1d04stwudaVjDkLT7b1qeRDdeYHMYb6sMN0gpWkatgAq4XfiPchcStlBPajthOCgvumSLtLEImuy1RXooi5K5jtZ2A2c7uVG4u5fg0yhK2BVpemkgSrKcu+MUAdudfnL7qGRqqk7YyXspm/qLadu79Kx0IEfINqrog2EKMUng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AKP4JZKE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05A8BC43390;
-	Mon, 22 Jan 2024 19:06:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705950382;
-	bh=3Zxrw5yAUlUVp3ob/vJEIsDQ5grjL/Vrq9t/P3JVT5I=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=AKP4JZKEui5YZol6k/ks0JQoanuucUUUmuq8PAiVcbBCwppxSBtdYQmtUwDMW6d6N
-	 reIq6VAK3Aaf5nhBW3Fsua19euuoGsw5pDRJbsj5mYCz2OGUUHty1oRUynr74Ccgi5
-	 2SuP4gs/1BAnUp5MIyWSB6HWwrpeq5yVCXdlM4k4Kg4lyQyU7T97R7LwidXQKMm83E
-	 n5ea95rp+j9LlvgRj1XDBptVgEd0aQES8h+nX9Kd/omgd1B5e9EsboyWTwlD1DFIA2
-	 Qj/lnuuPzSUooQKwHck1uw1obSFEUNdYYuYO98msNqGCavqVw/QqdEXYHPtTLhz3Jf
-	 uZmdRrpqYKFPg==
-Message-ID: <43412916-a567-4318-85e4-d5a12bf7624f@kernel.org>
-Date: Mon, 22 Jan 2024 20:06:15 +0100
+	s=arc-20240116; t=1705950431; c=relaxed/simple;
+	bh=J3X8GVbPwbWprmfKxurMXfCYtRxL+wL4zwEU0P0GXRA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cOuRtpvvNZ4plPUaSqaOV41d2J4j7XAqoKczFMzNqtirkz82V1iSJHfkILp28Vl7YAa6yy6jBNz7jj4TDOjdHhUPeu3jaY7Gl29QrFKiYhfp0FOEbeIXoh8xX9yLpPx6reNtKaNBbm4EECPw1RA4qM5mevWlklRDrPHDwL5vvs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lu8U8ZvF; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-40eb28271f8so5118845e9.2
+        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 11:07:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705950428; x=1706555228; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+61oH9jxk08/F+Ys2f393i8HD1ofs6XPqrs+bNHPwWE=;
+        b=lu8U8ZvFA1Ch8Wr9j+5JNY1o6/HZUZjHEZ5wUXVl5Obq7VyVFPVb0/ax6k4vJYe8Pt
+         ev7pjvGvFIcMWulwZeCBDEuOcc4gltHJisa8/YI/yd7SOFBCm2ARczNJdxXtFwfjo250
+         vmR+8B71CM/vSXhdfbEOGCEMiHpcA0UqFlOTXl0pr39vdXmjGOu8/CU92hkw9hv9iFhY
+         XOOYj1Eb1WU7HZIRdw/M9BEO1Tbbas7zswSWeZWLdITmLpiB4lBHUmSFDdktgXj3KfRY
+         UsdDitRroExOHqX4ZApQjxHId8uXp55jYykvRfJ/Zv+n7xLSHPIljHZh0G55oQbux8uI
+         1GLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705950428; x=1706555228;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+61oH9jxk08/F+Ys2f393i8HD1ofs6XPqrs+bNHPwWE=;
+        b=M0N9+trDa3GApB3TNamCPDlfCiS5WTN6+j5IBFGKEx2omgLjufmlvDVsNjUucquCO2
+         GPmBEqgaCLoLIAGVC+gO7FR6a+9nFgx0y8pvCVeemntbBBQ4PQTm/Y3Lr0+2/FBS1fhJ
+         6rySHH5aQZyu8ueur7o6Ej2evEvlw+vi0L5+2Kn7skn32S08jHyKbAuAFl7XzT5jWMmU
+         VlT2B1jwO+yCqTpldTPSWZIqmVCevFzTle7HTzv3gDVdwSwUPeAY8jHwuAZAIIlJv3VJ
+         ALcOjPivGTF10dcOrj6P5u2JRz3YSslXbpvEpKkjAw1b54oLMlwQFlx8Xkwx/cNgoXDO
+         2Zpg==
+X-Gm-Message-State: AOJu0YyCGYJCPW2q7Y5dMNfB4GliZ/KKbJvjqtcFJ0lqAYmD4gLwKBYy
+	Zfcjbdo/yvEj4oAfJjpWiFTd2wlcio1r6FpUUGV93TDMR4rPplaS
+X-Google-Smtp-Source: AGHT+IE2bbHeral2QsCEe0BKqPYfjzpDMfI/YKIep2u+GT57rJIfmrG17Iv5QVUlwNwU9sl1hJxMlQ==
+X-Received: by 2002:a05:600c:470f:b0:40d:58d7:6370 with SMTP id v15-20020a05600c470f00b0040d58d76370mr1305544wmo.46.1705950427438;
+        Mon, 22 Jan 2024 11:07:07 -0800 (PST)
+Received: from localhost.localdomain ([2001:b07:646f:4a4d:e17a:bd08:d035:d8c2])
+        by smtp.gmail.com with ESMTPSA id fl6-20020a05600c0b8600b0040ea9ba9d58sm6980385wmb.37.2024.01.22.11.07.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jan 2024 11:07:06 -0800 (PST)
+From: Alessandro Marcolini <alessandromarcolini99@gmail.com>
+To: jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	Alessandro Marcolini <alessandromarcolini99@gmail.com>
+Subject: [PATCH net-next] taprio: validate TCA_TAPRIO_ATTR_FLAGS through policy instead of open-coding
+Date: Mon, 22 Jan 2024 20:07:38 +0100
+Message-ID: <20240122190738.32327-1-alessandromarcolini99@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Kernel panic in netif_rx_internal after v6 pings between netns
-Content-Language: en-GB, fr-BE
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>, Netdev <netdev@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>
-References: <98724dcd-ddf3-4f78-a386-f966ffbc9528@kernel.org>
- <CANn89iLAYXpRiGaGi+rvOZyxMfpUmW2cOg6hLhqE=+2JJS8rkw@mail.gmail.com>
- <65c4f6a2-207f-45e0-9ec3-bad81a05b196@kernel.org>
- <5340b60d-a09a-4865-a648-d1a45e9e6d5f@kernel.org>
- <20240122092804.3535b652@kernel.org>
- <f96b33ab-56d5-4a43-a1ff-2e68e2c55ac2@kernel.org>
- <20240122103658.592962d1@kernel.org>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
- YBNdx5Xl74NLSgx6y/1NiMQGuKeu+2BmtnkiGxBNanfXcnl4L4Lzz+iXBvvbtCbynnnqDDqU
- c7SPFMpMesgpcu1xFt0F6bcxE+0ojRtSCZ5HDElKlHJNYtD1uwY4UYVGWUGCF/+cY1YLmtfb
- WdNb/SFo+Mp0HItfBC12qtDIXYvbfNUGVnA5jXeWMEyYhSNktLnpDL2gBUCsdbkov5VjiOX7
- CRTkX0UgNWRjyFZwThaZADEvAOo12M5uSBk7h07yJ97gqvBtcx45IsJwfUJE4hy8qZqsA62A
- nTRflBvp647IXAiCcwWsEgE5AXKwA3aL6dcpVR17JXJ6nwHHnslVi8WesiqzUI9sbO/hXeXw
- TDSB+YhErbNOxvHqCzZEnGAAFf6ges26fRVyuU119AzO40sjdLV0l6LE7GshddyazWZf0iac
- nEhX9NKxGnuhMu5SXmo2poIQttJuYAvTVUNwQVEx/0yY5xmiuyqvXa+XT7NKJkOZSiAPlNt6
- VffjgOP62S7M9wDShUghN3F7CPOrrRsOHWO/l6I/qJdUMW+MHSFYPfYiFXoLUZyPvNVCYSgs
- 3oQaFhHapq1f345XBtfG3fOYp1K2wTXd4ThFraTLl8PHxCn4ywARAQABzSRNYXR0aGlldSBC
- YWVydHMgPG1hdHR0YmVAa2VybmVsLm9yZz7CwZEEEwEIADsCGwMFCwkIBwIGFQoJCAsCBBYC
- AwECHgECF4AWIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZUDpDAIZAQAKCRD2t4JPQmmgcz33
- EACjROM3nj9FGclR5AlyPUbAq/txEX7E0EFQCDtdLPrjBcLAoaYJIQUV8IDCcPjZMJy2ADp7
- /zSwYba2rE2C9vRgjXZJNt21mySvKnnkPbNQGkNRl3TZAinO1Ddq3fp2c/GmYaW1NWFSfOmw
- MvB5CJaN0UK5l0/drnaA6Hxsu62V5UnpvxWgexqDuo0wfpEeP1PEqMNzyiVPvJ8bJxgM8qoC
- cpXLp1Rq/jq7pbUycY8GeYw2j+FVZJHlhL0w0Zm9CFHThHxRAm1tsIPc+oTorx7haXP+nN0J
- iqBXVAxLK2KxrHtMygim50xk2QpUotWYfZpRRv8dMygEPIB3f1Vi5JMwP4M47NZNdpqVkHrm
- jvcNuLfDgf/vqUvuXs2eA2/BkIHcOuAAbsvreX1WX1rTHmx5ud3OhsWQQRVL2rt+0p1DpROI
- 3Ob8F78W5rKr4HYvjX2Inpy3WahAm7FzUY184OyfPO/2zadKCqg8n01mWA9PXxs84bFEV2mP
- VzC5j6K8U3RNA6cb9bpE5bzXut6T2gxj6j+7TsgMQFhbyH/tZgpDjWvAiPZHb3sV29t8XaOF
- BwzqiI2AEkiWMySiHwCCMsIH9WUH7r7vpwROko89Tk+InpEbiphPjd7qAkyJ+tNIEWd1+MlX
- ZPtOaFLVHhLQ3PLFLkrU3+Yi3tXqpvLE3gO3LM7BTQRV4/npARAA5+u/Sx1n9anIqcgHpA7l
- 5SUCP1e/qF7n5DK8LiM10gYglgY0XHOBi0S7vHppH8hrtpizx+7t5DBdPJgVtR6SilyK0/mp
- 9nWHDhc9rwU3KmHYgFFsnX58eEmZxz2qsIY8juFor5r7kpcM5dRR9aB+HjlOOJJgyDxcJTwM
- 1ey4L/79P72wuXRhMibN14SX6TZzf+/XIOrM6TsULVJEIv1+NdczQbs6pBTpEK/G2apME7vf
- mjTsZU26Ezn+LDMX16lHTmIJi7Hlh7eifCGGM+g/AlDV6aWKFS+sBbwy+YoS0Zc3Yz8zrdbi
- Kzn3kbKd+99//mysSVsHaekQYyVvO0KD2KPKBs1S/ImrBb6XecqxGy/y/3HWHdngGEY2v2IP
- Qox7mAPznyKyXEfG+0rrVseZSEssKmY01IsgwwbmN9ZcqUKYNhjv67WMX7tNwiVbSrGLZoqf
- Xlgw4aAdnIMQyTW8nE6hH/Iwqay4S2str4HZtWwyWLitk7N+e+vxuK5qto4AxtB7VdimvKUs
- x6kQO5F3YWcC3vCXCgPwyV8133+fIR2L81R1L1q3swaEuh95vWj6iskxeNWSTyFAVKYYVskG
- V+OTtB71P1XCnb6AJCW9cKpC25+zxQqD2Zy0dK3u2RuKErajKBa/YWzuSaKAOkneFxG3LJIv
- Hl7iqPF+JDCjB5sAEQEAAcLBXwQYAQIACQUCVeP56QIbDAAKCRD2t4JPQmmgc5VnD/9YgbCr
- HR1FbMbm7td54UrYvZV/i7m3dIQNXK2e+Cbv5PXf19ce3XluaE+wA8D+vnIW5mbAAiojt3Mb
- 6p0WJS3QzbObzHNgAp3zy/L4lXwc6WW5vnpWAzqXFHP8D9PTpqvBALbXqL06smP47JqbyQxj
- Xf7D2rrPeIqbYmVY9da1KzMOVf3gReazYa89zZSdVkMojfWsbq05zwYU+SCWS3NiyF6QghbW
- voxbFwX1i/0xRwJiX9NNbRj1huVKQuS4W7rbWA87TrVQPXUAdkyd7FRYICNW+0gddysIwPoa
- KrLfx3Ba6Rpx0JznbrVOtXlihjl4KV8mtOPjYDY9u+8x412xXnlGl6AC4HLu2F3ECkamY4G6
- UxejX+E6vW6Xe4n7H+rEX5UFgPRdYkS1TA/X3nMen9bouxNsvIJv7C6adZmMHqu/2azX7S7I
- vrxxySzOw9GxjoVTuzWMKWpDGP8n71IFeOot8JuPZtJ8omz+DZel+WCNZMVdVNLPOd5frqOv
- mpz0VhFAlNTjU1Vy0CnuxX3AM51J8dpdNyG0S8rADh6C8AKCDOfUstpq28/6oTaQv7QZdge0
- JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20240122103658.592962d1@kernel.org>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 22/01/2024 19:36, Jakub Kicinski wrote:
-> On Mon, 22 Jan 2024 19:22:42 +0100 Matthieu Baerts wrote:
->>> Somewhat related. What do you do currently to ignore crashes?  
->>
->> I was wondering why you wanted to ignore crashes :) ... but then I saw
->> the new "Test ignored" and "Crashes ignored" sections on the status
->> page. Just to be sure: you don't want to report issues that have not
->> been introduced by the new patches, right?
-> 
-> Initially, yes, but going forward I bet we'll always see crashes and
-> breakage introduced downstream. So we need some knobs to selectively
-> silence failing things.
+As of now, the field TCA_TAPRIO_ATTR_FLAGS is being validated by manually
+checking its value, using the function taprio_flags_valid().
 
-Even if I guess it will mainly be around the merge window, I understand
-it will be annoying to have issues for at least one week, until the next
-sync with Linus' tree.
+With this patch, the field will be validated through the netlink policy
+NLA_POLICY_MASK, where the mask is defined by TAPRIO_SUPPORTED_FLAGS.
+The mutual exclusivity of the two flags TCA_TAPRIO_ATTR_FLAG_FULL_OFFLOAD
+and TCA_TAPRIO_ATTR_FLAG_TXTIME_ASSIST is still checked manually.
 
-> In an ideal world we'd also have some form of "last seen" stat
-> displayed to know when to retire these entries..
+Changes since RFC:
+- fixed reversed xmas tree
+- use NL_SET_ERR_MSG_MOD() for both invalid configuration
 
-Good idea!
+Signed-off-by: Alessandro Marcolini <alessandromarcolini99@gmail.com>
+---
+ net/sched/sch_taprio.c | 71 +++++++++++++++---------------------------
+ 1 file changed, 25 insertions(+), 46 deletions(-)
 
->> We don't need to do that on MPTCP side:
->> - either it is a new crash with patches that are in reviewed and that's
->> not impacting others → we test each series individually, not a batch of
->> series.
->> - or there are issues with recent patches, not in netdev yet → we fix,
->> or revert.
->> - or there is an issue elsewhere, like the kernel panic we reported
->> here: usually I try to quickly apply a workaround, e.g. applying a fix,
->> or a revert. I don't think we ever had an issue really impacting us
->> where we couldn't find a quick solution in one or two days. With the
->> panic we reported here, ~15% of the tests had an issue, that's "OK" to
->> have that for a few days/weeks
->>
->> With fewer tests and a smaller community, it is easier for us to just
->> say on the ML and weekly meetings: "this is a known issue, please ignore
->> for the moment". But if possible, I try to add a workaround/fix in our
->> repo used by the CI and devs (not upstreamed).
->>
->> For NIPA CI, do you want to do like with the build and compare with a
->> reference? Or multiple ones to take into account unstable tests? Or
->> maintain a list of known issues (I think you started to do that,
->> probably safer/easier for the moment)?
-> 
-> Exactly - where we can a before/after diff is the best. We do that for
-> all static checker / building kind of tests. But for selftests I'm not
-> sure how effective and applicable that is. Even the stack trace I
-> posted here happens somewhat unreliably :( We can try to develop more
-> intelligent ways going forward, obviously :)
-
-Maybe just by checking the last X rans, instead of the last one?
-
-Maybe also enough to just mark the tests as WARN with "was failing
-before" text (+ a percentage)?
-
->>> I was seeing a lot of:
->>> https://netdev-2.bots.linux.dev/vmksft-net-mp/results/431181/vm-crash-thr0-2
->>>
->>> So I hacked up this function to filter the crash from NIPA CI:
->>> https://github.com/kuba-moo/nipa/blob/master/contest/remote/lib/vm.py#L50
->>> It tries to get first 5 function names from the stack, to form 
->>> a "fingerprint". But I seem to recall a discussion at LPC's testing
->>> track that there are existing solutions for generating fingerprints.
->>> Are you aware of any?  
->>
->> No, sorry. But I guess they are using that with syzkaller, no?
->>
->> I have to admit that crashes (or warnings) are quite rare, so there was
->> no need to have an automation there. But if it is easy to have a
->> fingerprint, I will be interested as well, it can help for the tracking:
->> to find occurrences of crashes/warnings that are very hard to reproduce.
-> 
-> Indeed, I'll keep my ear to the ground. I believe it was discussed in
-> relation to KCIDB.
-
-Maybe good to ask people behind Syzkaller, they must have something in
-place :)
-
-Cheers,
-Matt
+diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
+index 31a8252bd09c..b8ecebe17ae8 100644
+--- a/net/sched/sch_taprio.c
++++ b/net/sched/sch_taprio.c
+@@ -40,6 +40,8 @@ static struct static_key_false taprio_have_working_mqprio;
+ 
+ #define TXTIME_ASSIST_IS_ENABLED(flags) ((flags) & TCA_TAPRIO_ATTR_FLAG_TXTIME_ASSIST)
+ #define FULL_OFFLOAD_IS_ENABLED(flags) ((flags) & TCA_TAPRIO_ATTR_FLAG_FULL_OFFLOAD)
++#define TAPRIO_SUPPORTED_FLAGS \
++	(TCA_TAPRIO_ATTR_FLAG_TXTIME_ASSIST | TCA_TAPRIO_ATTR_FLAG_FULL_OFFLOAD)
+ #define TAPRIO_FLAGS_INVALID U32_MAX
+ 
+ struct sched_entry {
+@@ -408,19 +410,6 @@ static bool is_valid_interval(struct sk_buff *skb, struct Qdisc *sch)
+ 	return entry;
+ }
+ 
+-static bool taprio_flags_valid(u32 flags)
+-{
+-	/* Make sure no other flag bits are set. */
+-	if (flags & ~(TCA_TAPRIO_ATTR_FLAG_TXTIME_ASSIST |
+-		      TCA_TAPRIO_ATTR_FLAG_FULL_OFFLOAD))
+-		return false;
+-	/* txtime-assist and full offload are mutually exclusive */
+-	if ((flags & TCA_TAPRIO_ATTR_FLAG_TXTIME_ASSIST) &&
+-	    (flags & TCA_TAPRIO_ATTR_FLAG_FULL_OFFLOAD))
+-		return false;
+-	return true;
+-}
+-
+ /* This returns the tstamp value set by TCP in terms of the set clock. */
+ static ktime_t get_tcp_tstamp(struct taprio_sched *q, struct sk_buff *skb)
+ {
+@@ -1031,7 +1020,8 @@ static const struct nla_policy taprio_policy[TCA_TAPRIO_ATTR_MAX + 1] = {
+ 	[TCA_TAPRIO_ATTR_SCHED_CYCLE_TIME]           =
+ 		NLA_POLICY_FULL_RANGE_SIGNED(NLA_S64, &taprio_cycle_time_range),
+ 	[TCA_TAPRIO_ATTR_SCHED_CYCLE_TIME_EXTENSION] = { .type = NLA_S64 },
+-	[TCA_TAPRIO_ATTR_FLAGS]                      = { .type = NLA_U32 },
++	[TCA_TAPRIO_ATTR_FLAGS]                      =
++		NLA_POLICY_MASK(NLA_U32, TAPRIO_SUPPORTED_FLAGS),
+ 	[TCA_TAPRIO_ATTR_TXTIME_DELAY]		     = { .type = NLA_U32 },
+ 	[TCA_TAPRIO_ATTR_TC_ENTRY]		     = { .type = NLA_NESTED },
+ };
+@@ -1815,33 +1805,6 @@ static int taprio_mqprio_cmp(const struct net_device *dev,
+ 	return 0;
+ }
+ 
+-/* The semantics of the 'flags' argument in relation to 'change()'
+- * requests, are interpreted following two rules (which are applied in
+- * this order): (1) an omitted 'flags' argument is interpreted as
+- * zero; (2) the 'flags' of a "running" taprio instance cannot be
+- * changed.
+- */
+-static int taprio_new_flags(const struct nlattr *attr, u32 old,
+-			    struct netlink_ext_ack *extack)
+-{
+-	u32 new = 0;
+-
+-	if (attr)
+-		new = nla_get_u32(attr);
+-
+-	if (old != TAPRIO_FLAGS_INVALID && old != new) {
+-		NL_SET_ERR_MSG_MOD(extack, "Changing 'flags' of a running schedule is not supported");
+-		return -EOPNOTSUPP;
+-	}
+-
+-	if (!taprio_flags_valid(new)) {
+-		NL_SET_ERR_MSG_MOD(extack, "Specified 'flags' are not valid");
+-		return -EINVAL;
+-	}
+-
+-	return new;
+-}
+-
+ static int taprio_change(struct Qdisc *sch, struct nlattr *opt,
+ 			 struct netlink_ext_ack *extack)
+ {
+@@ -1852,6 +1815,7 @@ static int taprio_change(struct Qdisc *sch, struct nlattr *opt,
+ 	struct net_device *dev = qdisc_dev(sch);
+ 	struct tc_mqprio_qopt *mqprio = NULL;
+ 	unsigned long flags;
++	__u32 taprio_flags;
+ 	ktime_t start;
+ 	int i, err;
+ 
+@@ -1863,12 +1827,27 @@ static int taprio_change(struct Qdisc *sch, struct nlattr *opt,
+ 	if (tb[TCA_TAPRIO_ATTR_PRIOMAP])
+ 		mqprio = nla_data(tb[TCA_TAPRIO_ATTR_PRIOMAP]);
+ 
+-	err = taprio_new_flags(tb[TCA_TAPRIO_ATTR_FLAGS],
+-			       q->flags, extack);
+-	if (err < 0)
+-		return err;
++	/* The semantics of the 'flags' argument in relation to 'change()'
++	 * requests, are interpreted following two rules (which are applied in
++	 * this order): (1) an omitted 'flags' argument is interpreted as
++	 * zero; (2) the 'flags' of a "running" taprio instance cannot be
++	 * changed.
++	 */
++	taprio_flags = tb[TCA_TAPRIO_ATTR_FLAGS] ? nla_get_u32(tb[TCA_TAPRIO_ATTR_FLAGS]) : 0;
+ 
+-	q->flags = err;
++	/* txtime-assist and full offload are mutually exclusive */
++	if ((taprio_flags & TCA_TAPRIO_ATTR_FLAG_TXTIME_ASSIST) &&
++	    (taprio_flags & TCA_TAPRIO_ATTR_FLAG_FULL_OFFLOAD)) {
++		NL_SET_ERR_MSG_MOD(extack, "TXTIME_ASSIST and FULL_OFFLOAD are mutually exclusive");
++		return -EINVAL;
++	}
++
++	if (q->flags != TAPRIO_FLAGS_INVALID && q->flags != taprio_flags) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "Changing 'flags' of a running schedule is not supported");
++		return -EOPNOTSUPP;
++	}
++	q->flags = taprio_flags;
+ 
+ 	err = taprio_parse_mqprio_opt(dev, mqprio, extack, q->flags);
+ 	if (err < 0)
 -- 
-Sponsored by the NGI0 Core fund.
+2.43.0
+
 
