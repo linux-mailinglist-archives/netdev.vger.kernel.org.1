@@ -1,157 +1,357 @@
-Return-Path: <netdev+bounces-64580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E3AB835C19
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 08:55:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2A0F835C2A
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 08:58:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D3FA61F22C57
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 07:55:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C1DBB278FC
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 07:58:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F24BD179BA;
-	Mon, 22 Jan 2024 07:55:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9877317BD2;
+	Mon, 22 Jan 2024 07:57:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uDyYzwoQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PmKrCXyC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C981220DDA;
-	Mon, 22 Jan 2024 07:55:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDE8B374E7
+	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 07:57:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705910117; cv=none; b=dvV5Ewq9B3+aUeIPNjoC3fo/bcovJ4jz0wcS7ZJWDLqsV3NX0w5S0vGEIG7u/h+tkWlg5scvmDL0AAzrctxMos34r5mGY/K9dCQTUF2mNpp1JHIwzMJx6l9/cp/y8bTqxOLaF2YMME9hHeR/kPNFbaTyPPLpQYtH4q8lgYqMhbY=
+	t=1705910246; cv=none; b=Mvagd6vSrm7/9NM/6mVl5kKoULPEH/4qMjaj1qG397vzK3CrS+2Q9tmBLVx9qNsRbBPtYS97KlIZiC6vkGlmPJrsmyGYJJDpHOVCZi0Z8EriRLvx42VH14eB5irp+KdrpmFtADgKfxZfI7xaFCLkwC35PcL+n+WUQlHEy4Z9anA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705910117; c=relaxed/simple;
-	bh=OlIF/YgaBAY0KyswtUOGGdnsqxNRgTdzZnKd+teQ718=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=g3hsWDB2OFBYmoO1zrlSvvkHYHdvRa9GHMBD+AedHJvMN0AFWvNYRZ2rCvlvI4/bD8LsoPVbCqzzqmIkrfM2gWXV+5/ONsRbQhdCQSEV6rVmxYsbHUW+1kB+7dUImPeXWfznWWUZY9ZdJOSeBZzgyJGNwu0MwA1VNjNeCEnwarA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uDyYzwoQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D660EC433F1;
-	Mon, 22 Jan 2024 07:55:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705910117;
-	bh=OlIF/YgaBAY0KyswtUOGGdnsqxNRgTdzZnKd+teQ718=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=uDyYzwoQ8xCvf7wsWZYBF72Aa+S38tDJDyaj4uJmgonltMWcHGjY/BO/Hy5cGn886
-	 uoB70SMEzpuE9X/6YakmQOIYpELnIj9ehkCXV1+WZf50U6VVuTgakTKvseAj7U7QPX
-	 arbEXg1qPFoID/WpCszL6c7s8sTHRkAxAAVNV6x0pqoKhZae+KDBeMdLcWRNh6cxf8
-	 Qfk8S809uuwjxvUmVu7ZljaalsBEU7KPIMi9oJ5xv4WO8lq7GIl0preIJw/EPsaEyK
-	 fL6s1jGVTBqLYrtGiNb7QMJkswWkL+vpPtIIdPmqymVXEV+CK8JtTmZlUP6+WvZ0nx
-	 GskgLhvwPsg6A==
-Message-ID: <01c61975-cc78-4045-8c60-bb11045a7c97@kernel.org>
-Date: Mon, 22 Jan 2024 08:55:13 +0100
+	s=arc-20240116; t=1705910246; c=relaxed/simple;
+	bh=8/D8aMjhRKPSV1/ngJ5OSp6Ih/06N83ZJrJW1yvTrEY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lbLzC+0CCIElTinYri2mC24xaZ9JXRdk6iwBHtovtFazJbVcimDhkJzBWTg7/0ruQfGPvtyX3XEkAX5DRY0UnL/Bl99QOEYjGI8cKYmnK8jaWA6C/OSNh3Xq+LWQXi5kdBuGi2urvW7Sqzfr1t0Cn27xLnIXdXFbGMzmwmDUtUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PmKrCXyC; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1705910244;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vcjJhXadeqF54swuXOqN0DiEs6FdnKgQxq8VgnzlUIY=;
+	b=PmKrCXyC4/kiS9VPC8ZNRY3oDgD6lf8G6M7iN8dMn0Pre6ROYXeD316TUJ9kCo16sEOPtg
+	fPdVqOawRqs/j8AK/4TwsP9pY6M13CUkeGryBhExK6Er0CJ5dX0AzzSwdJ/dZ7Ym7Z8MvV
+	EJl5A5y4HJ7RvcjDJqUraMpDMVTzGxA=
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
+ [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-437-H5rvpJ08NViHgriaizW-iw-1; Mon, 22 Jan 2024 02:57:22 -0500
+X-MC-Unique: H5rvpJ08NViHgriaizW-iw-1
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-6dbd093c2baso529635b3a.3
+        for <netdev@vger.kernel.org>; Sun, 21 Jan 2024 23:57:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705910241; x=1706515041;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vcjJhXadeqF54swuXOqN0DiEs6FdnKgQxq8VgnzlUIY=;
+        b=HFqMYi/0wAChnZUbLRk+KVZlGVJJA/WIY01S0fDkAu5sZcXcAFIrqGiwTS7+YaeF3V
+         MSc9ivrxJ/WNnVfTPdkqwlj9buexO0dv98OTfNfrFrtUFxDy+wlpBBQ8prouXILRqF97
+         km8wnz6C1TNdMzW+a5uS21tf7S0wizwOVpMlXyzwQzQabdtBVzj51rhvvB6QyAqBRQrC
+         QPH2Rv7/ch5t3Q39f9YoMwHfp1icyGnOk+on87fIqH2QyIBxUZ2ZsrC+jyDHJ9CNv6yo
+         O7dUA68KatvG83Cj1Inec9v4KsxmFVjxTHbPe8YIxunwtcies5sExPq5gqHPGS0vWBot
+         ltgg==
+X-Gm-Message-State: AOJu0Yxq1RjEG2J7sGLuSvd23nl47/CuneGO1/2nToIFViMdQGM9elti
+	UkO/UYY9OP9SuFN/JHKYL/XS8PIB6l8akr2LiMdxvRCnrUQZrQiV/KKmRIaBw/wJHT3hf6EeBHG
+	9E3OGq17nxx/GSdLAlQKPFiAqKrS9gFLeEARoyh41FreXAdCFn9kOjSf7BFI8hoEc/rvsezmZwe
+	ddb8y2JqHgRFPkOptAxT21Prk8XzYu
+X-Received: by 2002:aa7:930c:0:b0:6db:cade:b92 with SMTP id cz12-20020aa7930c000000b006dbcade0b92mr1426598pfb.32.1705910241322;
+        Sun, 21 Jan 2024 23:57:21 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFNnN2g54ReIVGG+knzMh6IZCuuvqs6WaseAc0H/OQAqAWfr/UZZ30+mTt3EjAbXPMBVV+XJp/go8S/nPthdlU=
+X-Received: by 2002:aa7:930c:0:b0:6db:cade:b92 with SMTP id
+ cz12-20020aa7930c000000b006dbcade0b92mr1426588pfb.32.1705910240975; Sun, 21
+ Jan 2024 23:57:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/8] clk: qcom: support for duplicate freq in RCG2 freq
- table
-Content-Language: en-US
-To: Ziyang Huang <hzyitc@outlook.com>, mcoquelin.stm32@gmail.com
-Cc: alexandre.torgue@foss.st.com, richardcochran@gmail.com,
- p.zabel@pengutronix.de, matthias.bgg@gmail.com,
- angelogioacchino.delregno@collabora.com, linux-kernel@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
- linux-mediatek@lists.infradead.org, Praveenkumar I <ipkumar@codeaurora.org>,
- Abhishek Sahu <absahu@codeaurora.org>
-References: <TYZPR01MB55563BD6A2B78402E4BB44D4C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
- <TYZPR01MB5556DEA3D4740441EC561414C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <TYZPR01MB5556DEA3D4740441EC561414C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20240115012918.3081203-1-yanjun.zhu@intel.com>
+ <ea230712e27af2c8d2d77d1087e45ecfa86abb31.camel@redhat.com>
+ <667a9520-a53f-40a2-810a-6c1e45146589@linux.dev> <7dd89fc0-f31e-4f83-9c02-58ee67c2d436@linux.alibaba.com>
+ <430b899c-aed4-419d-8ae8-544bb9bec5d9@lunn.ch> <64270652-8e0c-4db7-b245-b970d9588918@linux.dev>
+ <CACGkMEs18hjxiZRDT5-+PMDHkLbEyiviafGiCWsAE6CGBrj+9g@mail.gmail.com>
+ <1705895881.6990144-1-xuanzhuo@linux.alibaba.com> <CACGkMEvvn76w+BZArOWK-c1gsqNNx6bH8HPoqPAqpJG_7EYntA@mail.gmail.com>
+ <1705904164.7020166-3-xuanzhuo@linux.alibaba.com> <CACGkMEsTT7hrm2QWZq-NasfVAJHsUoZq5hijvLE_jY+2YyKytg@mail.gmail.com>
+ <CACGkMEt4zyESemjPwZtD5d4d00jtorY0qR5vM9y96NZzKkdj8A@mail.gmail.com>
+ <1705906930.2143333-5-xuanzhuo@linux.alibaba.com> <CACGkMEuO2wO-kwMWdR9hFSCJwLUN5jwKxCCaAmxJOB8sm5bfoA@mail.gmail.com>
+ <1705908305.1535513-7-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <1705908305.1535513-7-xuanzhuo@linux.alibaba.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 22 Jan 2024 15:57:08 +0800
+Message-ID: <CACGkMEvRQfSN0S0r4nXNHS1A2LzjhSfL4-1bFrYx4y0yM9yOag@mail.gmail.com>
+Subject: Re: [PATCH 1/1] virtio_net: Add timeout handler to avoid kernel hang
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heng Qi <hengqi@linux.alibaba.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Zhu Yanjun <yanjun.zhu@intel.com>, mst@redhat.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	Zhu Yanjun <yanjun.zhu@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 21/01/2024 13:42, Ziyang Huang wrote:
-> From: Praveenkumar I <ipkumar@codeaurora.org>
-> 
-> Currently RCG code looks up the frequency table during set
-> rate and return the first available frequency greater than
-> requested rate. If CLK_SET_RATE_PARENT flag is set then the
-> set_rate request will go to its parent otherwise the clock
-> framework will configure pre-div, m and n according to the
-> returned frequency table entry. In this case, it is assuming
-> that parent clock will run in the same frequency with which
-> pre-div, m and n has been derived. But it may be possible
-> that the parent clock supports multiple frequency and the
-> same frequency can be derived with different pre-div, m and
-> n values depending upon current frequency.  Also, the same
-> frequency can be derived from different parent sources and
-> currently there is no option for having duplicate
-> frequencies in frequency table and choosing the best one
-> according to current rate.
-> 
-> Now this patch adds the support for having duplicate
-> frequencies in frequency table. During set rate, it will
-> compare the actual rate for each entry with requested rate
-> and will select the best entry in which the difference will
-> be less.
-> 
-> The existing functionality won’t be affected with this code
-> change since this code change will hit only if frequency
-> table has duplicate values.
-> 
-> Change-Id: I97d9e1b55d8f3ee095f6f01729af527ba90e50e5
-> Signed-off-by: Abhishek Sahu <absahu@codeaurora.org>
-> (cherry picked from commit 775e7d3b69ffc97afb5bd5a6c9c423f2f4d8a0b2)
-> Signed-off-by: Praveenkumar I <ipkumar@codeaurora.org>
-> 
-> Change-Id: If10193fc79a3c1375ab73597813745ff1f4df0ad
+On Mon, Jan 22, 2024 at 3:36=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
+om> wrote:
+>
+> On Mon, 22 Jan 2024 15:19:12 +0800, Jason Wang <jasowang@redhat.com> wrot=
+e:
+> > On Mon, Jan 22, 2024 at 3:07=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.aliba=
+ba.com> wrote:
+> > >
+> > > On Mon, 22 Jan 2024 14:58:09 +0800, Jason Wang <jasowang@redhat.com> =
+wrote:
+> > > > On Mon, Jan 22, 2024 at 2:55=E2=80=AFPM Jason Wang <jasowang@redhat=
+.com> wrote:
+> > > > >
+> > > > > On Mon, Jan 22, 2024 at 2:20=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux=
+.alibaba.com> wrote:
+> > > > > >
+> > > > > > On Mon, 22 Jan 2024 12:16:27 +0800, Jason Wang <jasowang@redhat=
+.com> wrote:
+> > > > > > > On Mon, Jan 22, 2024 at 12:00=E2=80=AFPM Xuan Zhuo <xuanzhuo@=
+linux.alibaba.com> wrote:
+> > > > > > > >
+> > > > > > > > On Mon, 22 Jan 2024 11:14:30 +0800, Jason Wang <jasowang@re=
+dhat.com> wrote:
+> > > > > > > > > On Mon, Jan 22, 2024 at 10:12=E2=80=AFAM Zhu Yanjun <yanj=
+un.zhu@linux.dev> wrote:
+> > > > > > > > > >
+> > > > > > > > > >
+> > > > > > > > > > =E5=9C=A8 2024/1/20 1:29, Andrew Lunn =E5=86=99=E9=81=
+=93:
+> > > > > > > > > > >>>>>        while (!virtqueue_get_buf(vi->cvq, &tmp) &=
+&
+> > > > > > > > > > >>>>> -           !virtqueue_is_broken(vi->cvq))
+> > > > > > > > > > >>>>> +           !virtqueue_is_broken(vi->cvq)) {
+> > > > > > > > > > >>>>> +        if (timeout)
+> > > > > > > > > > >>>>> +            timeout--;
+> > > > > > > > > > >>>> This is not really a timeout, just a loop counter.=
+ 200 iterations could
+> > > > > > > > > > >>>> be a very short time on reasonable H/W. I guess th=
+is avoid the soft
+> > > > > > > > > > >>>> lockup, but possibly (likely?) breaks the function=
+ality when we need to
+> > > > > > > > > > >>>> loop for some non negligible time.
+> > > > > > > > > > >>>>
+> > > > > > > > > > >>>> I fear we need a more complex solution, as mention=
+ed by Micheal in the
+> > > > > > > > > > >>>> thread you quoted.
+> > > > > > > > > > >>> Got it. I also look forward to the more complex sol=
+ution to this problem.
+> > > > > > > > > > >> Can we add a device capability (new feature bit) suc=
+h as ctrq_wait_timeout
+> > > > > > > > > > >> to get a reasonable timeout=EF=BC=9F
+> > > > > > > > > > > The usual solution to this is include/linux/iopoll.h.=
+ If you can sleep
+> > > > > > > > > > > read_poll_timeout() otherwise read_poll_timeout_atomi=
+c().
+> > > > > > > > > >
+> > > > > > > > > > I read carefully the functions read_poll_timeout() and
+> > > > > > > > > > read_poll_timeout_atomic(). The timeout is set by the c=
+aller of the 2
+> > > > > > > > > > functions.
+> > > > > > > > >
+> > > > > > > > > FYI, in order to avoid a swtich of atomic or not, we need=
+ convert rx
+> > > > > > > > > mode setting to workqueue first:
+> > > > > > > > >
+> > > > > > > > > https://www.mail-archive.com/virtualization@lists.linux-f=
+oundation.org/msg60298.html
+> > > > > > > > >
+> > > > > > > > > >
+> > > > > > > > > > As such, can we add a module parameter to customize thi=
+s timeout value
+> > > > > > > > > > by the user?
+> > > > > > > > >
+> > > > > > > > > Who is the "user" here, or how can the "user" know the va=
+lue?
+> > > > > > > > >
+> > > > > > > > > >
+> > > > > > > > > > Or this timeout value is stored in device register, vir=
+tio_net driver
+> > > > > > > > > > will read this timeout value at initialization?
+> > > > > > > > >
+> > > > > > > > > See another thread. The design needs to be general, or yo=
+u can post a RFC.
+> > > > > > > > >
+> > > > > > > > > In another thought, we've already had a tx watchdog, mayb=
+e we can have
+> > > > > > > > > something similar to cvq and use timeout + reset in that =
+case.
+> > > > > > > >
+> > > > > > > > But we may block by the reset ^_^ if the device is broken?
+> > > > > > >
+> > > > > > > I mean vq reset here.
+> > > > > >
+> > > > > > I see.
+> > > > > >
+> > > > > > I mean when the deivce is broken, the vq reset also many be blo=
+cked.
+> > > > > >
+> > > > > >         void vp_modern_set_queue_reset(struct virtio_pci_modern=
+_device *mdev, u16 index)
+> > > > > >         {
+> > > > > >                 struct virtio_pci_modern_common_cfg __iomem *cf=
+g;
+> > > > > >
+> > > > > >                 cfg =3D (struct virtio_pci_modern_common_cfg __=
+iomem *)mdev->common;
+> > > > > >
+> > > > > >                 vp_iowrite16(index, &cfg->cfg.queue_select);
+> > > > > >                 vp_iowrite16(1, &cfg->queue_reset);
+> > > > > >
+> > > > > >                 while (vp_ioread16(&cfg->queue_reset))
+> > > > > >                         msleep(1);
+> > > > > >
+> > > > > >                 while (vp_ioread16(&cfg->cfg.queue_enable))
+> > > > > >                         msleep(1);
+> > > > > >         }
+> > > > > >         EXPORT_SYMBOL_GPL(vp_modern_set_queue_reset);
+> > > > > >
+> > > > > > In this function, for the broken device, we can not expect some=
+thing.
+> > > > >
+> > > > > Yes, it's best effort, there's no guarantee then. But it doesn't =
+harm to try.
+> > > > >
+> > > > > Thanks
+> > > > >
+> > > > > >
+> > > > > >
+> > > > > > >
+> > > > > > > It looks like we have multiple goals here
+> > > > > > >
+> > > > > > > 1) avoid lockups, using workqueue + cond_resched() seems to b=
+e
+> > > > > > > sufficient, it has issue but nothing new
+> > > > > > > 2) recover from the unresponsive device, the issue for timeou=
+t is that
+> > > > > > > it needs to deal with false positives
+> > > > > >
+> > > > > >
+> > > > > > I agree.
+> > > > > >
+> > > > > > But I want to add a new goal, cvq async. In the netdim, we will
+> > > > > > send many requests via the cvq, so the cvq async will be nice.
+> > > >
+> > > > Then you need an interrupt for cvq.
+> > > >
+> > > > FYI, I've posted a series that use interrupt for cvq in the past:
+> > > >
+> > > > https://lore.kernel.org/lkml/6026e801-6fda-fee9-a69b-d06a80368621@r=
+edhat.com/t/
+> > >
+> > > I know this. But the interrupt maybe not a good solution without new =
+space.
+> >
+> > What do you mean by "new space"?
+>
+> Yes, I know, the cvq can work with interrupt by the virtio spec.
+> But as I know, many hypervisors implement the cvq without supporting inte=
+rrupt.
 
-Please run scripts/checkpatch.pl and fix reported warnings. Some
-warnings can be ignored, but the code here looks like it needs a fix.
-Feel free to get in touch if the warning is not clear.
+It's a bug of the hypervisor that needs to be fix. Interrupt is
+provided by transport not the virtio itself.
 
-Best regards,
-Krzysztof
+Otherwise it can only support for Linux but not other OSes.
+
+> If we let the cvq work with interrupt without negotiation then
+> many hypervisors will hang on the new kernel.
+>
+> >
+> > We can introduce something like enable_cb_delayed(), then you will
+> > only get notified after several requests.
+> >
+> > >
+> > > >
+> > > > Haven't found time in working on this anymore, maybe we can start f=
+rom
+> > > > this or not.
+> > >
+> > >
+> > > I said async, but my aim is to put many requests to the cvq before ge=
+tting the
+> > > response.
+> >
+> > It doesn't differ from TX/RX in this case.
+> >
+> > >
+> > > Heng Qi posted this https://lore.kernel.org/all/1705410693-118895-4-g=
+it-send-email-hengqi@linux.alibaba.com/
+> > >
+> >
+> > This seems like a hack, if interrupt is used, you can simply do that
+> > in the callback.
+>
+> YES.
+>
+> I also want to change the code, I just want to say the async is a goal.
+>
+> For the rx mode, we have introduce a work queue, I want to move the
+> sending command job to the work queue. The caller just wakeup
+> the work queue.
+>
+> If the caller want to got the result sync, then the caller can wait for i=
+t.
+> If not, the caller can register an function to the work queue.
+>
+> And I think it will be easy to implement the timeout inside the workqueue=
+.
+
+Looks much more complicated than a simple interrupt + timer/watchdog etc.
+
+Thanks
+
+>
+> Thanks.
+>
+>
+> >
+> > Thanks
+> >
+> > > Thanks.
+> > >
+> > >
+> > > >
+> > > > Thanks
+> > > >
+> > > > > >
+> > > > > > Thanks.
+> > > > > >
+> > > > > >
+> > > > > > >
+> > > > > > > Thanks
+> > > > > > >
+> > > > > > > >
+> > > > > > > > Thanks.
+> > > > > > > >
+> > > > > > > >
+> > > > > > > > >
+> > > > > > > > > Thans
+> > > > > > > > >
+> > > > > > > > > >
+> > > > > > > > > > Zhu Yanjun
+> > > > > > > > > >
+> > > > > > > > > > >
+> > > > > > > > > > >       Andrew
+> > > > > > > > > >
+> > > > > > > > >
+> > > > > > > >
+> > > > > > >
+> > > > > >
+> > > >
+> > >
+> >
+>
 
 
