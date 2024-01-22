@@ -1,180 +1,282 @@
-Return-Path: <netdev+bounces-64611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8C07835EAA
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 10:51:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D6A5835EE2
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 11:00:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E3AFB216A4
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 09:51:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1D6E2879B6
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 10:00:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A01E3A1A0;
-	Mon, 22 Jan 2024 09:48:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4E3E39FD9;
+	Mon, 22 Jan 2024 10:00:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aqReZBA1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WUW4C+8W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B28443C6A4
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 09:48:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E232A3A1A6;
+	Mon, 22 Jan 2024 10:00:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705916925; cv=none; b=C9WHe5uP2Mi8H8InmMtYn1XJxhuPnEAYLiDcL2EQBcbHIzgGHvBXp36feulJxxNLnO9xJNm6RrPuaNv4yswOk6S2czW6wuw3LP7wwna/DwnRuhx8nyJnHSnSbKEH1WW2tVvyGPuWDK6nD72wZ3NdWF6zKs6HJHl3AQtS5MXg7X0=
+	t=1705917645; cv=none; b=E/37k+V4DGu+tu1JcG7eh5AxQnwEfw9LTekICh2DbAK9TOav0eT00ZatXdbV2tu8RD3D4NEwwv50MAANC6fsgkslzx4c8UGf8QWvisDt9pgq6pHXt9CobXS1U6YHtK4phFnlp9HzFdPsd+Xfo7QtCUDP/quL9k7yN/Vc3lJtGdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705916925; c=relaxed/simple;
-	bh=5K8tPnMFa+QKo6kdGyT8j7IyjQOFivKvAkI+ZSEhqg4=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=ZCAfa5FyfKTjx2AkQBg7NbOMIAMhMLY3RXwKhhWYgENaQMI6+oif0qx8gW7NqNjZu2I+dJv6MXO2ET81LhcXWG6XemXMG+eFwG0/vgfM9xUQIGs68o4NnZ8BlITzzybs/GIuNo3d2CvpplXqqPS4faDatfQOTi1o9KNkRLdkaO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aqReZBA1; arc=none smtp.client-ip=209.85.208.48
+	s=arc-20240116; t=1705917645; c=relaxed/simple;
+	bh=RviGP00bc2z5L9e16SGhcQi/O8tKdDVcvKn/cFKyZf8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XW+ilYPWEj5V2c89ln+hjQCw3zzWWkm415UC6ONMitgs0upMsfkXM7P6X1cex9GE8bFKfka0kkKjKZT7nigcGhryh1+rflMaY6c7T4T5HxlXso2wHU0U10kRa3luupShJIRXn7nXegj5sReRKhjkDuHorwD6QqKpw75b20liscI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WUW4C+8W; arc=none smtp.client-ip=209.85.167.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-55790581457so3839148a12.3
-        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 01:48:43 -0800 (PST)
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-50e72e3d435so2571837e87.2;
+        Mon, 22 Jan 2024 02:00:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705916922; x=1706521722; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=NTW4B+3J6fWtPaE3vAIyW/f9uxJ4MJ00NaVmb9ONWFU=;
-        b=aqReZBA1yg08yh+M5akecjzBlqaklxNFlpKHdW/alUNrYlgiYYYiXjNyyByA1pWSpC
-         y3RWnEJl5CjXzBTf1HLA0cOXerykKzbJSx52Tat/ZbMrsxD0Zhz6gkghp3COJeb9SSRc
-         qmGdYY+HzobMa2aKjsFudFiMZh13DFRK2biR0mK8BBNTalxaCipRF0wA43Spz9VFxaLe
-         0GimC1GrgXjPcoqpFfAxTpoHFqxQneg0sNL7l4jgWiNPbsymgqlcGJs5N+pzn/6X781b
-         gbDQA/81fNcxcSMWxTmXpxNWUhHW4+aOO/vf55wpPufs52hukIXQYqucuKytHKMOWnhT
-         Cqkw==
+        d=gmail.com; s=20230601; t=1705917642; x=1706522442; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XJvUSmFKxVkc/aj2645yUF6Llh0UZojhKj6fnT1VtgE=;
+        b=WUW4C+8Wh0zOPj9d/SVIQclAlgvyP0Fl1r6I/MO7fVadx48xM8rnYgo5c1H8fDp/iD
+         DcayBZuGZC9z/uo9/u1N176mBVKuI1JrluHtMZ17C9J7+35aHss+WEI3e2yCL6ovYJuj
+         CRtZAxsFUCgcrW7pVY+vzhzoMldXcSs1z3Mb7VjJ34zNk7n32gBAbYKt7b8mRlXjt6Gm
+         4R63gOIdy3jbaRxy9UBl2X1e6uCE4iXlkku3KVgDWkd5eWFENarTssDCtRYca94kk9F5
+         /XYYxpRAjRvmP5AFl8SCt8xXmyJf9A+vm4vGKHnCQqCLRZGXNUgWKXd76OKx7a3Nqu6H
+         99Vw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705916922; x=1706521722;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NTW4B+3J6fWtPaE3vAIyW/f9uxJ4MJ00NaVmb9ONWFU=;
-        b=E1G4ETOUN+VuH6YTgR0QibJXR1jAtDCqas9h9XmPHeeoV5+O2onKkG3SwI8bf8H0R/
-         BFFDq8iOhXUHSq0sXAZ9qWOEVDcW5gVePxH/W2eXmGSrGNfuJtahiZQXsmmBZJYG8HtS
-         8gvaMbJ8ninydJ7F9SyUSo30fErSH4g6pwa9cbl8wOEewKIG1/mjaAKTvj2LXqGhSB9K
-         KW377QO7gAG6PtbUehpGkcPtX5IcAA4dh20ekJZ49swInLSpaECfR1hGcl4YdC7zXX4G
-         XjWxoMT9UBwbCDE+oA4aVpkA0mVRI9nk04xWcRkf2U3Yq6xCJ1C5a63r5PqakC72kAQ1
-         BalQ==
-X-Gm-Message-State: AOJu0Yw4G5e/II7xpwJ6fQ0jWyqsrxGyY0oFqUWhATtk4efHfw+AS1SF
-	N6xRpAMiOuq0oKIqdDYAhtSJ9xPX1Y55EepcAH+gmvvhuN7feZF9h11QOeN9
-X-Google-Smtp-Source: AGHT+IEavQ83XZ2/jzwSqH4YJChVMGe/+aLkCu/cbbfBqRQfJwxeJzVG8anxRq6Jw45FzrlOyOhjjw==
-X-Received: by 2002:a17:906:c9d5:b0:a27:be67:1743 with SMTP id hk21-20020a170906c9d500b00a27be671743mr1739408ejb.40.1705916921542;
-        Mon, 22 Jan 2024 01:48:41 -0800 (PST)
-Received: from [192.168.26.149] (031011218106.poznan.vectranet.pl. [31.11.218.106])
-        by smtp.googlemail.com with ESMTPSA id vk6-20020a170907cbc600b00a2ecec00a88sm6197060ejc.99.2024.01.22.01.48.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Jan 2024 01:48:41 -0800 (PST)
-Message-ID: <05f333aa-5457-409a-8f53-148b9f4d0da9@gmail.com>
-Date: Mon, 22 Jan 2024 10:48:40 +0100
+        d=1e100.net; s=20230601; t=1705917642; x=1706522442;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XJvUSmFKxVkc/aj2645yUF6Llh0UZojhKj6fnT1VtgE=;
+        b=d0QkH02auwLQxTgnOD+Sg/zPa8JEYKicYY45OcFD1NUqh0pu5JYbiAmdEwBJUeQShC
+         q0155Gd0BzJot5rEeT0g4NT2BaLs0oWD+hfLMutZh7oNA1j0TD5jmrS0b7JIgaieDEkt
+         vyTI4aE6y0AtMAXbSLQC44MmdzKKK+FvdCrEqfz651JuxYDKdZvVeq9802d5yxPWUpzL
+         u9NH8zboxIq1gsQMe6iCNMtLXu0R/yuE+wiUWZun4sIFbn+nImBZo1kLS0IKhFgHuN+U
+         mAKKn2y5lonMpbQMeFe54HdlEhqkAEuiZeTpW+AJBIaR1ivwmQ9/OID0tB5pzG1L9h9J
+         IrrQ==
+X-Gm-Message-State: AOJu0Yy7YGHauK217MvVgW0gRyFwsDVJqW6LFhXeYEQyMAgDaR/FBqLD
+	V67EjYEa8Xh8Px7piQvs8zo9C4WPEsoguZ+Iyk+EKA8rkGoWEKg9
+X-Google-Smtp-Source: AGHT+IEssD/hfPPeOOMHxQJvdb3GjMChqufvu3VcLm9fhwD+pPdZrTLpsswyzYA4xoIoKlv/ESBQWQ==
+X-Received: by 2002:ac2:42ca:0:b0:50e:3d3b:93fa with SMTP id n10-20020ac242ca000000b0050e3d3b93famr737632lfl.12.1705917641364;
+        Mon, 22 Jan 2024 02:00:41 -0800 (PST)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id k5-20020ac24565000000b0050f0c199448sm1937151lfm.168.2024.01.22.02.00.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jan 2024 02:00:40 -0800 (PST)
+Date: Mon, 22 Jan 2024 13:00:37 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Denis Kirjanov <dkirjanov@suse.de>, 
+	Suraj Jaiswal <quic_jsuraj@quicinc.com>
+Cc: Suraj Jaiswal <quic_jsuraj@quicinc.com>, Vinod Koul <vkoul@kernel.org>, 
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>, Andy Gross <agross@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, Prasad Sodagudi <psodagud@quicinc.com>, 
+	Andrew Halaney <ahalaney@redhat.com>, Rob Herring <robh@kernel.org>, kernel@quicinc.com
+Subject: Re: [PATCH net-next v9 3/3] net: stmmac: Add driver support for
+ DWMAC5 common safety IRQ
+Message-ID: <giimpexp3qk3byb725r3ot3aund2bwmi45yrctkydatm73d5af@e36xmjf2ehvu>
+References: <20240110111649.2256450-1-quic_jsuraj@quicinc.com>
+ <20240110111649.2256450-4-quic_jsuraj@quicinc.com>
+ <633ff61d-f73d-4221-a2fd-79f913880761@suse.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Race in PHY subsystem? Attaching to PHY devices before they get
- probed
-From: =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>
-To: Network Development <netdev@vger.kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Robert Marko <robimarko@gmail.com>,
- Ansuel Smith <ansuelsmth@gmail.com>, Daniel Golle <daniel@makrotopia.org>
-References: <bdffa33c-e3eb-4c3b-adf3-99a02bc7d205@gmail.com>
-Content-Language: en-US
-In-Reply-To: <bdffa33c-e3eb-4c3b-adf3-99a02bc7d205@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <633ff61d-f73d-4221-a2fd-79f913880761@suse.de>
 
-On 22.01.2024 08:09, Rafał Miłecki wrote:
-> I have MT7988 SoC board with following problem:
-> [   26.887979] Aquantia AQR113C mdio-bus:08: aqr107_wait_reset_complete failed: -110
+On Wed, Jan 10, 2024 at 03:07:30PM +0300, Denis Kirjanov wrote:
 > 
-> This issue is known to occur when PHY's firmware is not running. After
-> some debugging I discovered that .config_init() CB gets called while
-> .probe() CB is still being executed.
 > 
-> It turns out mtk_soc_eth.c calls phylink_of_phy_connect() before my PHY
-> gets fully probed and it seems there is nothing in PHY subsystem
-> verifying that. Please note this PHY takes quite some time to probe as
-> it involves sending firmware to hardware.
+> On 1/10/24 14:16, Suraj Jaiswal wrote:
+> > Add support to listen HW safety IRQ like ECC(error
+> > correction code), DPP(data path parity), FSM(finite state
+> > machine) fault in common IRQ line.
 > 
-> Is that a possible race in PHY subsystem?
-> Should we have phy_attach_direct() wait for PHY to be fully probed?
+> As I see .safety_feat_irq_status available not just in dwmac5 but 
+> in dwxgmac2_core and that means that the subject line is not just about dwmac5
 
-I don't expect this to be an acceptable solution but it works as a quick
-workaround & proof of issue.
+Right. Suraj, could you please fix the subject to be describing the
+actual change? The commit message body more-or-less describes it
+correctly.
 
-[   24.763875] mtk_soc_eth 15100000.ethernet eth2: Waiting for PHY mdio-bus:08 to become ready
-[   38.645874] mtk_soc_eth 15100000.ethernet eth2: PHY mdio-bus:08 is ready now
+> 
+> > 
+> > Signed-off-by: Suraj Jaiswal <quic_jsuraj@quicinc.com>
+> > ---
+> >  drivers/net/ethernet/stmicro/stmmac/common.h  |  1 +
+> >  drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  3 ++
+> >  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 41 ++++++++++++++++++-
+> >  .../ethernet/stmicro/stmmac/stmmac_platform.c |  8 ++++
+> >  4 files changed, 51 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
+> > index 721c1f8e892f..b9233b09b80f 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/common.h
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/common.h
+> > @@ -344,6 +344,7 @@ enum request_irq_err {
+> >  	REQ_IRQ_ERR_ALL,
+> >  	REQ_IRQ_ERR_TX,
+> >  	REQ_IRQ_ERR_RX,
+> > +	REQ_IRQ_ERR_SFTY,
+> >  	REQ_IRQ_ERR_SFTY_UE,
+> >  	REQ_IRQ_ERR_SFTY_CE,
+> >  	REQ_IRQ_ERR_LPI,
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+> > index 9f89acf31050..ca3d93851bed 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+> > @@ -31,6 +31,7 @@ struct stmmac_resources {
+> >  	int wol_irq;
+> >  	int lpi_irq;
+> >  	int irq;
+> > +	int sfty_irq;
+> >  	int sfty_ce_irq;
+> >  	int sfty_ue_irq;
+> >  	int rx_irq[MTL_MAX_RX_QUEUES];
+> > @@ -297,6 +298,7 @@ struct stmmac_priv {
+> >  	void __iomem *ptpaddr;
+> >  	void __iomem *estaddr;
+> >  	unsigned long active_vlans[BITS_TO_LONGS(VLAN_N_VID)];
+> > +	int sfty_irq;
+> >  	int sfty_ce_irq;
+> >  	int sfty_ue_irq;
+> >  	int rx_irq[MTL_MAX_RX_QUEUES];
+> > @@ -305,6 +307,7 @@ struct stmmac_priv {
+> >  	char int_name_mac[IFNAMSIZ + 9];
+> >  	char int_name_wol[IFNAMSIZ + 9];
+> >  	char int_name_lpi[IFNAMSIZ + 9];
+> > +	char int_name_sfty[IFNAMSIZ + 10];
+> >  	char int_name_sfty_ce[IFNAMSIZ + 10];
+> >  	char int_name_sfty_ue[IFNAMSIZ + 10];
+> >  	char int_name_rx_irq[MTL_MAX_TX_QUEUES][IFNAMSIZ + 14];
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > index 47de466e432c..e0192a282121 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > @@ -3592,6 +3592,10 @@ static void stmmac_free_irq(struct net_device *dev,
+> >  		if (priv->wol_irq > 0 && priv->wol_irq != dev->irq)
+> >  			free_irq(priv->wol_irq, dev);
+> >  		fallthrough;
+> > +	case REQ_IRQ_ERR_SFTY:
+> > +		if (priv->sfty_irq > 0 && priv->sfty_irq != dev->irq)
+> > +			free_irq(priv->sfty_irq, dev);
+> > +		fallthrough;
+> >  	case REQ_IRQ_ERR_WOL:
+> >  		free_irq(dev->irq, dev);
+> >  		fallthrough;
+> > @@ -3661,6 +3665,23 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+> >  		}
+> >  	}
+> >  
+> > +	/* Request the common Safety Feature Correctible/Uncorrectible
+> > +	 * Error line in case of another line is used
+> > +	 */
+> > +	if (priv->sfty_irq > 0 && priv->sfty_irq != dev->irq) {
+> > +		int_name = priv->int_name_sfty;
+> > +		sprintf(int_name, "%s:%s", dev->name, "safety");
+> > +		ret = request_irq(priv->sfty_irq, stmmac_safety_interrupt,
+> > +				  0, int_name, dev);
+> > +		if (unlikely(ret < 0)) {
+> > +			netdev_err(priv->dev,
+> > +				   "%s: alloc sfty MSI %d (error: %d)\n",
+> > +				   __func__, priv->sfty_irq, ret);
+> > +			irq_err = REQ_IRQ_ERR_SFTY;
+> > +			goto irq_error;
+> > +		}
+> > +	}
+> > +
+> >  	/* Request the Safety Feature Correctible Error line in
+> >  	 * case of another line is used
+> >  	 */
+> > @@ -3798,6 +3819,21 @@ static int stmmac_request_irq_single(struct net_device *dev)
+> >  		}
+> >  	}
+> >  
+> > +	/* Request the common Safety Feature Correctible/Uncorrectible
+> > +	 * Error line in case of another line is used
+> > +	 */
+> > +	if (priv->sfty_irq > 0 && priv->sfty_irq != dev->irq) {
+> > +		ret = request_irq(priv->sfty_irq, stmmac_safety_interrupt,
+> > +				  IRQF_SHARED, dev->name, dev);
+> > +		if (unlikely(ret < 0)) {
+> > +			netdev_err(priv->dev,
+> > +				   "%s: ERROR: allocating the sfty IRQ %d (%d)\n",
+> > +				   __func__, priv->sfty_irq, ret);
+> > +			irq_err = REQ_IRQ_ERR_SFTY;
+> > +			goto irq_error;
+> > +		}
+> > +	}
+> > +
+> >  	return 0;
+> >  
+> >  irq_error:
+> > @@ -6022,8 +6058,8 @@ static irqreturn_t stmmac_interrupt(int irq, void *dev_id)
+> >  	if (test_bit(STMMAC_DOWN, &priv->state))
+> >  		return IRQ_HANDLED;
+> >  
 
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 3611ea64875e..cdb766b0ea22 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -1435,8 +1435,21 @@ int phy_attach_direct(struct net_device *dev, struct phy_device *phydev,
-  	struct device *d = &phydev->mdio.dev;
-  	struct module *ndev_owner = NULL;
-  	bool using_genphy = false;
-+	unsigned long time_left;
-  	int err;
+> > -	/* Check if a fatal error happened */
+> > -	if (stmmac_safety_feat_interrupt(priv))
+> > +	/* Check ASP error if it isn't delivered via an individual IRQ */
+> > +	if (priv->sfty_irq <= 0 && stmmac_safety_feat_interrupt(priv))
 
-+	if (!try_wait_for_completion(&phydev->probed)) {
-+		netdev_info(dev, "Waiting for PHY %s to become ready\n", phydev_name(phydev));
-+
-+		time_left = wait_for_completion_timeout(&phydev->probed, msecs_to_jiffies(20000));
-+		if (!time_left) {
-+			netdev_warn(dev, "PHY %s is still not ready!\n", phydev_name(phydev));
-+			return -EPROBE_DEFER;
-+		}
-+
-+		netdev_info(dev, "PHY %s is ready now\n", phydev_name(phydev));
-+	}
-+
-  	/* For Ethernet device drivers that register their own MDIO bus, we
-  	 * will have bus->owner match ndev_mod, so we do not want to increment
-  	 * our own module->refcnt here, otherwise we would not be able to
-@@ -1562,6 +1575,8 @@ int phy_attach_direct(struct net_device *dev, struct phy_device *phydev,
-  		phydev->devlink = device_link_add(dev->dev.parent, &phydev->mdio.dev,
-  						  DL_FLAG_PM_RUNTIME | DL_FLAG_STATELESS);
+Well, I guess this is the best we can do with no IRQs handling part
+refactoring.
 
-+	complete(&phydev->probed);
-+
-  	return err;
+> >  		return IRQ_HANDLED;
+> >  
+> >  	/* To handle Common interrupts */
+> > @@ -7462,6 +7498,7 @@ int stmmac_dvr_probe(struct device *device,
+> >  	priv->dev->irq = res->irq;
+> >  	priv->wol_irq = res->wol_irq;
+> >  	priv->lpi_irq = res->lpi_irq;
+> > +	priv->sfty_irq = res->sfty_irq;
+> >  	priv->sfty_ce_irq = res->sfty_ce_irq;
+> >  	priv->sfty_ue_irq = res->sfty_ue_irq;
+> >  	for (i = 0; i < MTL_MAX_RX_QUEUES; i++)
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> > index 70eadc83ca68..ab250161fd79 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> > @@ -743,6 +743,14 @@ int stmmac_get_platform_resources(struct platform_device *pdev,
+> >  		dev_info(&pdev->dev, "IRQ eth_lpi not found\n");
+> >  	}
+> >  
+> > +	stmmac_res->sfty_irq =
+> > +		platform_get_irq_byname_optional(pdev, "sfty");
+> > +	if (stmmac_res->sfty_irq < 0) {
+> > +		if (stmmac_res->sfty_irq == -EPROBE_DEFER)
+> > +			return -EPROBE_DEFER;
+> > +		dev_info(&pdev->dev, "IRQ safety IRQ not found\n");
 
-  error:
-@@ -3382,6 +3397,9 @@ static int phy_probe(struct device *dev)
-  	if (err)
-  		phy_device_reset(phydev, 1);
+s/IRQ safety IRQ/IRQ sfty
+* Although I would have also converted this to just dev_dbg() since
+* the IRQ line is optional and is present on a single platform you
+* have.
 
-+	if (!err)
-+		complete(&phydev->probed);
-+
-  	return err;
-  }
 
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 684efaeca07c..d95b68dfad59 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -541,6 +541,7 @@ struct macsec_ops;
-   * struct phy_device - An instance of a PHY
-   *
-   * @mdio: MDIO bus this PHY is on
-+ * @probed: Completion of PHY probing
-   * @drv: Pointer to the driver for this PHY instance
-   * @devlink: Create a link between phy dev and mac dev, if the external phy
-   *           used by current mac interface is managed by another mac interface.
-@@ -636,6 +637,8 @@ struct macsec_ops;
-  struct phy_device {
-  	struct mdio_device mdio;
+With the subject and the log-message fixed feel free to add:
 
-+	struct completion probed;
-+
-  	/* Information about the PHY type */
-  	/* And management functions */
-  	struct phy_driver *drv;
+Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
 
+-Serge(y) 
+
+> > +	}
+> > +
+> >  	stmmac_res->addr = devm_platform_ioremap_resource(pdev, 0);
+> >  
+> >  	return PTR_ERR_OR_ZERO(stmmac_res->addr);
+> 
 
