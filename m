@@ -1,78 +1,76 @@
-Return-Path: <netdev+bounces-64848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC8C78374AA
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 21:54:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A68C68374B6
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 21:56:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE2C51C281A3
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 20:54:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A6FC2830DF
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 20:56:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E31E847A5D;
-	Mon, 22 Jan 2024 20:54:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72C0747A6D;
+	Mon, 22 Jan 2024 20:56:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CBQO4paG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pXaqZLOe"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAE1F3FB3D;
-	Mon, 22 Jan 2024 20:54:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42F872CA8;
+	Mon, 22 Jan 2024 20:56:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705956883; cv=none; b=JVeMiIqp42N/etEqSTmq5pgCl1wrWs+zzcdDSGf8qytzw57IzwmterNgySw4jfYLZgH8WzlaW73JNqVjC+jEeqfQqfUSPSZwQ6ZNzf/q3WK0rN+iNVDDeHyPQShefdSfpW0iKrq4sEbzKZ4FdjJPocyNvZqmKZzbPmzm8Hy6Tnc=
+	t=1705956993; cv=none; b=IR0e++46TcznhwWLQsHINE7wdFxw9Pucs1jWszd1ILR6sXmi3C2ubeYIwdSUaCnBzJMs92fhrWxjCNUfzjm8m6uPLAlof02zRDm7ILuO5NKbfQdhYpdB7g0adUo5vbrEpBVyVrQifKGV+pdkpQDGKtyXg0mqUTAyXFM31oUywPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705956883; c=relaxed/simple;
-	bh=KEX41Z4GRimqE32SG++boCA0zNkine8aAS5Yw0qR+A0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p5X3AU8mZoR2zmYQv+GWv1joObJ2ATyADTnZX6IV3lbMxLHcilmwTTa9ZeNceYOu6dFJDEAHDfiIjtjJeDrvSJlid5lMSvTFswSP5Dn5yUtOObgLhYE4dr3U7gvV04S8BEeKSTyJToxh8M3mFdKrxqtCK0IhxtLmXA8MdyHax7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CBQO4paG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB3A2C433C7;
-	Mon, 22 Jan 2024 20:54:42 +0000 (UTC)
+	s=arc-20240116; t=1705956993; c=relaxed/simple;
+	bh=dPyR1cD91P/4YTX71Vd3J842ddnSfDF8JMywbnzsy2Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Kkxik5I0xGkyWwzrm2RxS/g1jXQ6cxQcH8c/i+FR0pYcIMLobe3kzWizD9xmbzktjwGoyrHPLmkgJtAlPKTXP2M54Xl15tSLNN6zLd77uicygT5sJ+ll6ko7zRvISxXjuYh9ZXEURKyF658BrKyhUpzBuadOfn8lpoUsdALjwhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pXaqZLOe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 180ECC433C7;
+	Mon, 22 Jan 2024 20:56:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705956883;
-	bh=KEX41Z4GRimqE32SG++boCA0zNkine8aAS5Yw0qR+A0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CBQO4paG9koX3vIjlW9iQWAqOGWjjUxV2KYVyhj3vtOVahAUl5Knia4Oz4WBlIzP9
-	 VWofbRLhCV/89mY7ctYttJ5USrI7m1FxxWVbq+8CduQ4+c+O5BvtHn732VUVMYPpSr
-	 PYPmtw7d7ILDIVgxkk9iozy3vkp5DFRFB8X/nULHO9MgdoQjKr1ODwz+8vAnda0tz+
-	 X1n7wN+GTrwdnw5xG5RPmAEg6b/xRq8+GveyE4TLnv72dQUPG0H5iWzRlqdKcyHZ+k
-	 IfiyKDVm8fG9zYJ4KkrcYFc++Pdu0ngzfssD40ZiNJVpoQUkyDSvZrzwp0pDjfExb4
-	 YzGR8GDJSbELQ==
-Date: Mon, 22 Jan 2024 20:54:40 +0000
-From: Simon Horman <horms@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"netdev-driver-reviewers@vger.kernel.org" <netdev-driver-reviewers@vger.kernel.org>
-Subject: Re: [ANN] net-next is OPEN
-Message-ID: <20240122205440.GI126470@kernel.org>
-References: <20240122091612.3f1a3e3d@kernel.org>
+	s=k20201202; t=1705956992;
+	bh=dPyR1cD91P/4YTX71Vd3J842ddnSfDF8JMywbnzsy2Q=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=pXaqZLOeYkyUTzMJvz1OJv+zN9IZgBtSJVNrOmA8oqY9cnE0eSYRiJnD38PlVmwOe
+	 EJvQmQ+jqm4afanYkFYr1t7Z5C4tepp1UvLA1ta3y7topcHrfe65bR1IwVDq4cpbZe
+	 3hbAYShtI83DSzCkZYrqI1S/78mXDgdGooepc9lel5KJTldBo3Nm7IlehlijEAJHMw
+	 St9/a535g9TGNilvgn+fCgoA8QsvrP5PwFjJ9PrY5Bw8DfIqF1v8oSSjK7yw2nK5Yu
+	 c2RBEWS2ekAiA6EX4XiWttF+97bEn0Omce3DExu1yfbb60w6j2hzTzaHL7VzBiFbaH
+	 GmL+3cI7YhB+Q==
+Date: Mon, 22 Jan 2024 12:56:31 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: "Peng Fan (OSS)" <peng.fan@oss.nxp.com>, wg@grandegger.com,
+ conor+dt@kernel.org, davem@davemloft.net, robh+dt@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, edumazet@google.com, pabeni@redhat.com,
+ linux-can@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, Peng Fan
+ <peng.fan@nxp.com>
+Subject: Re: [PATCH] dt-bindings: can: fsl,flexcan: add i.MX95 compatible
+ string
+Message-ID: <20240122125631.4c54eba1@kernel.org>
+In-Reply-To: <20240122-skilled-wimp-4bc1769bf235-mkl@pengutronix.de>
+References: <20240122091738.2078746-1-peng.fan@oss.nxp.com>
+	<20240122-skilled-wimp-4bc1769bf235-mkl@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240122091612.3f1a3e3d@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 22, 2024 at 09:16:12AM -0800, Jakub Kicinski wrote:
-> Hi,
+On Mon, 22 Jan 2024 11:26:25 +0100 Marc Kleine-Budde wrote:
+> > Add i.MX95 flexcan which is compatible i.MX93 flexcan
+> > 
+> > Signed-off-by: Peng Fan <peng.fan@nxp.com>  
 > 
-> net-next is open again, and accepting changes for v6.9.
-> 
-> Over the merge window I spent some time stringing together selftest
-> runner for netdev: https://netdev.bots.linux.dev/status.html
-> It is now connected to patchwork, meaning there should be a check
-> posted to each patch indicating whether selftests have passed or not.
+> Acked-by: Marc Kleine-Budde <mkl@pengutronix.de>
 
-Excellent, I'm really pleased to see this.
-
-> If you authored any net or drivers/net selftests, please look around
-> and see if they are passing. If not - send patches or LMK what I need
-> to do to make them pass on the runner.. Make sure to scroll down to 
-> the "Not reporting to patchwork" section.
+Hm, you don't apply CAN DTB patches?
 
