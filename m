@@ -1,162 +1,138 @@
-Return-Path: <netdev+bounces-64670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1038836424
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 14:14:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4888C836448
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 14:18:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 897812928D5
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 13:14:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BC4E1C21D25
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 13:18:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 879933CF5F;
-	Mon, 22 Jan 2024 13:13:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C6633CF4B;
+	Mon, 22 Jan 2024 13:18:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BiXeXdC2"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0CE03C6BC
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 13:13:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7593C3CF42;
+	Mon, 22 Jan 2024 13:18:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705929235; cv=none; b=iZ5jmZFMJxoCKaKr4DiVQvtIgeASMAqCkQQXLhaQX9mtqF4yDhkRabIfb9+qly+V02gQiYP1a+J+9SFcofH438v7WTAMb92D1DipH6mkTGVOHu41NrXZen4GLUjLfqpSJji7VDoGXrDMAWDfQkDG4xEs68Sh0BcZWKpErPma4E4=
+	t=1705929498; cv=none; b=QzDPOS+bO/aOWZYFH550k5isEX2Nw8jUFb4N+mAxI9gDvn7pkesZ8JBkSixNSjVKKXBJT4nR6VbhV055Pe3W8ZT21kJeCCuYwpzoapyQCOAbS7q44Gt2VyzQbCfGe4Klz/xJCb1Eu2kJcUfSE86XtmC2yBmX52WDkbp5P788hyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705929235; c=relaxed/simple;
-	bh=5R7j8Dl9cK0KfAuJewWJ6X7E8Pn2vi+QuvLjLtLOAz8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xcs7Ce5btRCVi73muJtx5PBTPw2WJBAWj8zZSZkvXZK1yuTZC6n9Zq3xM2pzvm97qPBPqlCF9VKJ7Evh1/eDvtiRW8vQw1eWmvlUDmN3WGiqWAzh0snxi3T5bkqOav8tJPKB4Z9dkmOoGtHHOu7WpvEyZLweJCxMPX28WW86Lb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rRu75-0005ez-Pg; Mon, 22 Jan 2024 14:13:19 +0100
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rRu73-001biB-E1; Mon, 22 Jan 2024 14:13:17 +0100
-Received: from pengutronix.de (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id EDDCF27B58F;
-	Mon, 22 Jan 2024 13:13:16 +0000 (UTC)
-Date: Mon, 22 Jan 2024 14:13:16 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Conor Dooley <conor@kernel.org>
-Cc: linux-riscv@lists.infradead.org, 
-	Conor Dooley <conor.dooley@microchip.com>, Daire McNamara <daire.mcnamara@microchip.com>, 
-	Wolfgang Grandegger <wg@grandegger.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-clk@vger.kernel.org
-Subject: Re: [PATCH v2 2/7] dt-bindings: can: mpfs: add missing required clock
-Message-ID: <20240122-surely-crimp-ba4a8c55106d-mkl@pengutronix.de>
-References: <20240122-catty-roast-d3625dbb02fe@spud>
- <20240122-breeder-lying-0d3668d98886@spud>
+	s=arc-20240116; t=1705929498; c=relaxed/simple;
+	bh=8nLLKjq7oCgzDw9ZUQYrf7nyBzR8EtSEWOgsdOU6lQc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XmNskOwsT2OLvfPAXNShnJZKFRC/vvteqLQoUhndsbqUW+FqJdScC30wpYeYN6Hp8fjv9jtMZTlJ/LYJA+QzLK/2bh2e+jjTdOZQT29sHl/uhKvNC1i21j+7BdnMYNSab7SkkkCsqov+k1KaQr+Co47aHtLK02iCIIeDRwfhkg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BiXeXdC2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39F57C433C7;
+	Mon, 22 Jan 2024 13:18:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705929498;
+	bh=8nLLKjq7oCgzDw9ZUQYrf7nyBzR8EtSEWOgsdOU6lQc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=BiXeXdC2+ZiP2FRLKDQwzYdq0y5ubv9vBTA0B0ikOHQas0ZfvD3KOcNNxTl19GbpK
+	 fPKUc5VSlnYIcQfjFZzYbjGYQ8n0JHPASQPSw8WutcXa7in05wIxdZZLBP3ZskEzEz
+	 41Vk2gpgNX+xaT6lHj60V1ffkx7NEeEh0O+zN799EoRwDygLV58J4BWdkHQ1MGfSvB
+	 fZXc4u8IwlCVXXrucG0Fmk8kbzJgNlJFItu6+EPHoDV7dRqP4ImMordg2WrQmFOoSH
+	 wBDpT2Izrb6HOtTSMoiDmawcf/QUOm7yeGiT12xIyxtMBJ48RAuc8ynfaFELMHhip0
+	 VB0kfR4U6A25Q==
+Message-ID: <e97a55a9-34ae-46a3-9646-9bf70f6976ff@kernel.org>
+Date: Mon, 22 Jan 2024 15:18:13 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="gm5qx6ivqj7qxcxg"
-Content-Disposition: inline
-In-Reply-To: <20240122-breeder-lying-0d3668d98886@spud>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2] net: ethernet: ti: cpsw_new: enable mac_managed_pm to
+ fix mdio
+Content-Language: en-US
+To: Sinthu Raja <sinthu.raja@mistralsolutions.com>,
+ Denis Kirjanov <dkirjanov@suse.de>, Siddharth Vadapalli
+ <s-vadapalli@ti.com>, Ravi Gunasekaran <r-gunasekaran@ti.com>
+Cc: linux-omap@vger.kernel.org, netdev@vger.kernel.org,
+ Sinthu Raja <sinthu.raja@ti.com>
+References: <20240122093326.7618-1-sinthu.raja@ti.com>
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <20240122093326.7618-1-sinthu.raja@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+Hi,
 
---gm5qx6ivqj7qxcxg
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On 22.01.2024 12:19:50, Conor Dooley wrote:
-> From: Conor Dooley <conor.dooley@microchip.com>
->=20
-> The CAN controller on PolarFire SoC has an AHB peripheral clock _and_ a
-> CAN bus clock. The bus clock was omitted when the binding was written,
-> but is required for operation. Make up for lost time and add it.
->=20
-> Cautionary tale in adding bindings without having implemented a real
-> user for them perhaps.
->=20
-> Fixes: c878d518d7b6 ("dt-bindings: can: mpfs: document the mpfs CAN contr=
-oller")
-> Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
+On 22/01/2024 11:33, Sinthu Raja wrote:
+> From: Sinthu Raja <sinthu.raja@ti.com>
+> 
+> The below commit  introduced a WARN when phy state is not in the states:
+> PHY_HALTED, PHY_READY and PHY_UP.
+> commit 744d23c71af3 ("net: phy: Warn about incorrect mdio_bus_phy_resume() state")
+> 
+> When cpsw_new resumes, there have port in PHY_NOLINK state, so the below
+> warning comes out. Set mac_managed_pm be true to tell mdio that the phy
+> resume/suspend is managed by the mac, to fix the following warning:
+> 
+> WARNING: CPU: 0 PID: 965 at drivers/net/phy/phy_device.c:326 mdio_bus_phy_resume+0x140/0x144
+> CPU: 0 PID: 965 Comm: sh Tainted: G           O       6.1.46-g247b2535b2 #1
+> Hardware name: Generic AM33XX (Flattened Device Tree)
+>  unwind_backtrace from show_stack+0x18/0x1c
+>  show_stack from dump_stack_lvl+0x24/0x2c
+>  dump_stack_lvl from __warn+0x84/0x15c
+>  __warn from warn_slowpath_fmt+0x1a8/0x1c8
+>  warn_slowpath_fmt from mdio_bus_phy_resume+0x140/0x144
+>  mdio_bus_phy_resume from dpm_run_callback+0x3c/0x140
+>  dpm_run_callback from device_resume+0xb8/0x2b8
+>  device_resume from dpm_resume+0x144/0x314
+>  dpm_resume from dpm_resume_end+0x14/0x20
+>  dpm_resume_end from suspend_devices_and_enter+0xd0/0x924
+>  suspend_devices_and_enter from pm_suspend+0x2e0/0x33c
+>  pm_suspend from state_store+0x74/0xd0
+>  state_store from kernfs_fop_write_iter+0x104/0x1ec
+>  kernfs_fop_write_iter from vfs_write+0x1b8/0x358
+>  vfs_write from ksys_write+0x78/0xf8
+>  ksys_write from ret_fast_syscall+0x0/0x54
+> Exception stack(0xe094dfa8 to 0xe094dff0)
+> dfa0:                   00000004 005c3fb8 00000001 005c3fb8 00000004 00000001
+> dfc0: 00000004 005c3fb8 b6f6bba0 00000004 00000004 0059edb8 00000000 00000000
+> dfe0: 00000004 bed918f0 b6f09bd3 b6e89a66
+> 
+> Fixes: 744d23c71af3 ("net: phy: Warn about incorrect mdio_bus_phy_resume() state")
+> Signed-off-by: Sinthu Raja <sinthu.raja@ti.com>
 > ---
->  .../devicetree/bindings/net/can/microchip,mpfs-can.yaml     | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->=20
-> diff --git a/Documentation/devicetree/bindings/net/can/microchip,mpfs-can=
-=2Eyaml b/Documentation/devicetree/bindings/net/can/microchip,mpfs-can.yaml
-> index 45aa3de7cf01..01e4d4a54df6 100644
-> --- a/Documentation/devicetree/bindings/net/can/microchip,mpfs-can.yaml
-> +++ b/Documentation/devicetree/bindings/net/can/microchip,mpfs-can.yaml
-> @@ -24,7 +24,9 @@ properties:
->      maxItems: 1
-> =20
->    clocks:
-> -    maxItems: 1
-> +    items:
-> +      - description: AHB peripheral clock
-> +      - description: CAN bus clock
+> 
+> Changes in V2:
+> Address review comment
+> 	Add Fixes tag.
+> 
+> V1: https://patchwork.kernel.org/project/netdevbpf/patch/20240122083414.6246-1-sinthu.raja@ti.com/
+> 
+>  drivers/net/ethernet/ti/cpsw_new.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/ti/cpsw_new.c b/drivers/net/ethernet/ti/cpsw_new.c
+> index 498c50c6d1a7..087dcb67505a 100644
+> --- a/drivers/net/ethernet/ti/cpsw_new.c
+> +++ b/drivers/net/ethernet/ti/cpsw_new.c
+> @@ -773,6 +773,9 @@ static void cpsw_slave_open(struct cpsw_slave *slave, struct cpsw_priv *priv)
+>  			slave->slave_num);
+>  		return;
+>  	}
+> +
+> +	phy->mac_managed_pm = true;
+> +
+>  	slave->phy = phy;
+>  
+>  	phy_attached_info(slave->phy);
 
-What about adding clock-names, so that the order can be checked
-automatically?
+I believe this cpsw.c will also be affected by the same issue. Right?
+Also you will need to Cc: stable@vger.kernel.org # v6.0+
 
-> =20
->  required:
->    - compatible
-> @@ -39,7 +41,7 @@ examples:
->      can@2010c000 {
->          compatible =3D "microchip,mpfs-can";
->          reg =3D <0x2010c000 0x1000>;
-> -        clocks =3D <&clkcfg 17>;
-> +        clocks =3D <&clkcfg 17>, <&clkcfg 37>;
->          interrupt-parent =3D <&plic>;
->          interrupts =3D <56>;
->      };
-> --=20
-> 2.43.0
->=20
->=20
-
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---gm5qx6ivqj7qxcxg
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmWuaecACgkQvlAcSiqK
-BOiItAgAiVb1F3nml4JkuMIY7dmQo5gzshMOge9YwxV+CViwK6+VZN81W+a+uBRC
-nG6H9blRP6/eWCGmJMty07eR8pnzfzh1F7fdSr3ZjVJAtPcNY/Ywc5ByKebJz8jS
-bXxVgQ4cxcMzl54lO6xd0cFi9cCAIc8ENFStCmEhc65/KJMu8uDcitYv2T1fDj3d
-mrs7ok2oKy0JvVoQUVdeSfcWj3KxK4Hl4HX4cDZlsQhLuNRcRm17k5Xf8wtqiW+T
-Qi0Lyzls8rj/Phk0qKpWpcsMxVa76FAYj6W6yyW0s0mP+0piGLWfxNYqdXsvkOvh
-7ak8HyX1amqRf3OBh6/9Uk1imCpACw==
-=oZCM
------END PGP SIGNATURE-----
-
---gm5qx6ivqj7qxcxg--
+-- 
+cheers,
+-roger
 
