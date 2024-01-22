@@ -1,305 +1,271 @@
-Return-Path: <netdev+bounces-64573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78910835BB4
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 08:35:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A25A835BA6
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 08:33:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05BDC1F21F69
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 07:35:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA1C81F22368
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 07:33:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A4FD111BB;
-	Mon, 22 Jan 2024 07:35:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C140014F6C;
+	Mon, 22 Jan 2024 07:33:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="r16CENZi";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="zpp3PUi1";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="r16CENZi";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="zpp3PUi1";
+	dkim=permerror (0-bit key) header.d=gmail.com header.i=@gmail.com header.b="CzqZMzEZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48802107B2
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 07:35:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A56B1FBF1;
+	Mon, 22 Jan 2024 07:33:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705908950; cv=none; b=KKeGy3ai6JL06htfQ/UEyA26VOLsC0Wdcv/6jR+/icE7aM1tYybtayl+Sj1qaRFGxh817zvT+5CaMJw7hw7LT1sr+Y0ISiwceoEyVq101fKrHkk3OHd9mbXdbSjoBKrrLq9QUA+Ei1A7n2isf31XXFI+jVyult1kdo8VgH5lCVg=
+	t=1705908784; cv=none; b=YGwa8ZWMqWaOCwMjUgwwkGdbxnBY/Mz1GemHWB484aQi8qXUc/FfwK87TnlgNngWpnpUReg1WPkuD35INbIWctrTaoA206RM7aZuR5FpF0plikUitpqKmShu5JcZFCbM/9ZiZgdll5wDEu7mQBjobfhQhXfAEBMqoLnq27bq7oY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705908950; c=relaxed/simple;
-	bh=k8z2Iik+KlmAB+9Xa/+jhUTSPbRw4llxLfLbtQ3LfoY=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=fwC04QOzkZysqvYwrlf0lNnHz6IF9SztP6sVTQotTQ2+qRbKpyi9Sg3NH1LBp8FLGtVSM3NzNs6y4EeBCfIfgTZjAGpDLb7yhlTCUNI0AyhHy2w2rpzyGH6eQVl4PNnNbVV3GoY4TbLCSWxswqUlP/jYQMYRqbXCdm+z6cQWTFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; arc=none smtp.client-ip=115.124.30.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R281e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0W.3mrKp_1705908942;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W.3mrKp_1705908942)
-          by smtp.aliyun-inc.com;
-          Mon, 22 Jan 2024 15:35:43 +0800
-Message-ID: <1705908305.1535513-7-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH 1/1] virtio_net: Add timeout handler to avoid kernel hang
-Date: Mon, 22 Jan 2024 15:25:05 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,
- Heng Qi <hengqi@linux.alibaba.com>,
- Paolo Abeni <pabeni@redhat.com>,
- Zhu Yanjun <yanjun.zhu@intel.com>,
- mst@redhat.com,
- davem@davemloft.net,
- edumazet@google.com,
- kuba@kernel.org,
- virtualization@lists.linux.dev,
- netdev@vger.kernel.org,
- Zhu Yanjun <yanjun.zhu@linux.dev>
-References: <20240115012918.3081203-1-yanjun.zhu@intel.com>
- <ea230712e27af2c8d2d77d1087e45ecfa86abb31.camel@redhat.com>
- <667a9520-a53f-40a2-810a-6c1e45146589@linux.dev>
- <7dd89fc0-f31e-4f83-9c02-58ee67c2d436@linux.alibaba.com>
- <430b899c-aed4-419d-8ae8-544bb9bec5d9@lunn.ch>
- <64270652-8e0c-4db7-b245-b970d9588918@linux.dev>
- <CACGkMEs18hjxiZRDT5-+PMDHkLbEyiviafGiCWsAE6CGBrj+9g@mail.gmail.com>
- <1705895881.6990144-1-xuanzhuo@linux.alibaba.com>
- <CACGkMEvvn76w+BZArOWK-c1gsqNNx6bH8HPoqPAqpJG_7EYntA@mail.gmail.com>
- <1705904164.7020166-3-xuanzhuo@linux.alibaba.com>
- <CACGkMEsTT7hrm2QWZq-NasfVAJHsUoZq5hijvLE_jY+2YyKytg@mail.gmail.com>
- <CACGkMEt4zyESemjPwZtD5d4d00jtorY0qR5vM9y96NZzKkdj8A@mail.gmail.com>
- <1705906930.2143333-5-xuanzhuo@linux.alibaba.com>
- <CACGkMEuO2wO-kwMWdR9hFSCJwLUN5jwKxCCaAmxJOB8sm5bfoA@mail.gmail.com>
-In-Reply-To: <CACGkMEuO2wO-kwMWdR9hFSCJwLUN5jwKxCCaAmxJOB8sm5bfoA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1705908784; c=relaxed/simple;
+	bh=sWD5AGkRBwhuAG/GT1Bayy7saGl12tVct1E5myEMZ04=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LiFo8NgTjH2esKPoZiuttqWVDj7UC3dILbdrdqHnLM3bEefYObviKgMirHY/dc33TgcnVmR/YpBKnPh2t5xWs1JqYihnImcRuuqX+ImR08F1q89IJRJj9WZjDlZqAXQNXsv+SQE1RmHweqsfhAhouP81j6/IuA/RAmhpbd+GFLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=r16CENZi; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=zpp3PUi1; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=r16CENZi; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=zpp3PUi1; dkim=permerror (0-bit key) header.d=gmail.com header.i=@gmail.com header.b=CzqZMzEZ; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 3C2A61FB96;
+	Mon, 22 Jan 2024 07:32:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1705908778;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:list-id:
+	 list-unsubscribe:list-subscribe;
+	bh=3igCp/BzejU8TkKcIbMGYWN93bxOYZ2K40uNvLaOz04=;
+	b=r16CENZivv40J9jGSZzhRzZ8/4fFpAdxpyLT4kaqPCPcbJrDV62Mz2/p3XQ4fxMzJkWPph
+	faSmjOxfd2i5mwdZ3GV6aVd1JNdUZdVSc1MjHuQ+jKBRClcDAcK2DwSC54JGVFiWeeoWQE
+	sqOwq1zWq4SInVo6ny7rj9vVy3/kdlw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1705908778;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:list-id:
+	 list-unsubscribe:list-subscribe;
+	bh=3igCp/BzejU8TkKcIbMGYWN93bxOYZ2K40uNvLaOz04=;
+	b=zpp3PUi1pQV+VpbvqQ0qczoVRLDXcjVVREz/LYwpSyAAqxL36cM8E3F12ShoyK3dYAbEtw
+	guJm6tb8bYI8AjAQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1705908778;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:list-id:
+	 list-unsubscribe:list-subscribe;
+	bh=3igCp/BzejU8TkKcIbMGYWN93bxOYZ2K40uNvLaOz04=;
+	b=r16CENZivv40J9jGSZzhRzZ8/4fFpAdxpyLT4kaqPCPcbJrDV62Mz2/p3XQ4fxMzJkWPph
+	faSmjOxfd2i5mwdZ3GV6aVd1JNdUZdVSc1MjHuQ+jKBRClcDAcK2DwSC54JGVFiWeeoWQE
+	sqOwq1zWq4SInVo6ny7rj9vVy3/kdlw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1705908778;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:list-id:
+	 list-unsubscribe:list-subscribe;
+	bh=3igCp/BzejU8TkKcIbMGYWN93bxOYZ2K40uNvLaOz04=;
+	b=zpp3PUi1pQV+VpbvqQ0qczoVRLDXcjVVREz/LYwpSyAAqxL36cM8E3F12ShoyK3dYAbEtw
+	guJm6tb8bYI8AjAQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 23ED9139A2;
+	Mon, 22 Jan 2024 07:32:57 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([10.150.64.162])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id DTK5BikarmW+TAAAD6G6ig
+	(envelope-from <pvorel@suse.cz>); Mon, 22 Jan 2024 07:32:57 +0000
+From: Petr Vorel <pvorel@suse.cz>
+To: sedat.dilek@gmail.com,
+	David Howells <dhowells@redhat.com>
+Cc: ceph-devel@vger.kernel.org,
+	davem@davemloft.net,
+	eadavis@qq.com,
+	edumazet@google.com,
+	horms@kernel.org,
+	jaltman@auristor.com,
+	jarkko@kernel.org,
+	jlayton@redhat.com,
+	keyrings@vger.kernel.org,
+	kuba@kernel.org,
+	linux-afs@lists.infradead.org,
+	linux-cifs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-nfs@vger.kernel.org,
+	marc.dionne@auristor.com,
+	markus.suvanto@gmail.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	pengfei.xu@intel.com,
+	smfrench@gmail.com,
+	stable@vger.kernel.org,
+	torvalds@linux-foundation.org,
+	wang840925@gmail.com,
+	sashal@kernel.org,
+	gregkh@linuxfoundation.org,
+	pvorel@suse.cz
+Subject: Re: [PATCH] keys, dns: Fix size check of V1 server-list header
+Date: Mon, 22 Jan 2024 08:32:20 +0100
+Message-ID: <CA+icZUUc_0M_6JU3dZzVqrUUrWJceY1uD8dO2yFMCwtHtkaa_Q@mail.gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <1850031.1704921100@warthog.procyon.org.uk>
+References: <1850031.1704921100@warthog.procyon.org.uk>
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46]) (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits)) (No client certificate requested) by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC5DE5382; Thu, 11 Jan 2024 05:59:25 +0000 (UTC)
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-50eaa8b447bso5330201e87.1; Wed, 10 Jan 2024 21:59:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20230601; t=1704952764; x=1705557564; darn=vger.kernel.org; h=content-transfer-encoding:cc:to:subject:message-id:date:from :reply-to:in-reply-to:references:mime-version:from:to:cc:subject :date:message-id:reply-to; bh=FJ87IotFFb22oBVL3yLTlm/KMv2+8lgNVJRq/vObCyk=; b=CzqZMzEZtvDdKV5J1zvfpPjPR0wILxDKt26BQKl6dgvHwvuCdUpx9zofNRErh3RHcX 4RuSBM6WZWJ1QKGW+9aiqdcuZ62e09X44gxoTRBDE+voHnFnRDsr+edQ5ck1zC7LsJhN EMK1qwLK1bRNnbMuChx86E3Azw77svFukz6fqTpXK3bsM2rTrEDn7RijQtfJzRULk5fh 03jquwf/rzboIOEKrCR16L4yr1+Xatxw99hk68jjfEH+31e9vDr7ITE8LCsNPBfAQQpH P6UrE+PD1kzUZiHQ0KvBiTXXqrktw2yk9LaQhbiPyPJxRxnNuSars1Af7vD/wPL9xNN4 4M3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=1e100.net; s=20230601; t=1704952764; x=1705557564; h=content-transfer-encoding:cc:to:subject:message-id:date:from :reply-to:in-reply-to:references:mime-version:x-gm-message-state :from:to:cc:subject:date:message-id:reply-to; bh=FJ87IotFFb22oBVL3yLTlm/KMv2+8lgNVJRq/vObCyk=; b=PZikC1qFb00UIl7giDpbUhRi+PwG7WMGC2I2TAEF1QH5b8owBpy+p/8rvT3vq+CCsV V461beb9lR8JKSyJ8vearvFNjmrLIwdr8iJQp047Rwx+y81rtRcoq5yQ/yYSOHA76ehV lG2l3qp7uLV1MfLdNTGrt1s2zyKLXu7rjfQwT4PmnAXsQMnVUVqx3nnKa0jZFzbUvrOX s/zCJhOF6LAB2tHaRWCdKxPTPkGzCPKp2F8Xet1nwZI0SRPETfv9nGa3Y0Ltqxv7XDHQ MJ8M7lvivuv4Xh6kXxoODM4mc+k54GZl5vBHmg5W8oItq7JtStAu94AtWAezRC/u+uR9 5KZQ==
+X-Gm-Message-State: AOJu0YyVqvzD5u0f/yOoNxYT7dq5ZdTTUXgj+AXRBVyKnTXhwC7XN5aF /LgPOEbucY8bFWak009t9Uj9eZlnQaX9WuTMcro=
+X-Google-Smtp-Source: AGHT+IGQ5ZV/gXo7v/rJ2auVyXpmqs0QYfi3tBSjxW2wUQzS96ysR1EG48kjTCbHRzoOg/0bxoYvPzkVO6R5r9tJSuk=
+X-Received: by 2002:a05:6512:3990:b0:50e:2e5d:10a8 with SMTP id j16-20020a056512399000b0050e2e5d10a8mr136706lfu.133.1704952763509; Wed, 10 Jan 2024 21:59:23 -0800 (PST)
+Precedence: bulk
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Reply-To: sedat.dilek@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: ********
+X-Spamd-Bar: ++++++++
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=r16CENZi;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=zpp3PUi1
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [8.63 / 50.00];
+	 HAS_REPLYTO(0.30)[sedat.dilek@gmail.com];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 SUSE_ML_WHITELIST_VGER(-0.10)[];
+	 R_RATELIMIT(0.00)[to_ip_from(RL9hkrcy1f6ordxndu6pi8qgoz)];
+	 DKIM_TRACE(0.00)[suse.cz:+];
+	 MX_GOOD(-0.01)[];
+	 NEURAL_HAM_SHORT(-0.20)[-1.000];
+	 MAILLIST(-0.15)[generic];
+	 FREEMAIL_TO(0.00)[gmail.com,redhat.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 BAYES_HAM(-3.00)[100.00%];
+	 ARC_NA(0.00)[];
+	 R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	 RCVD_COUNT_FIVE(0.00)[5];
+	 FROM_HAS_DN(0.00)[];
+	 FREEMAIL_ENVRCPT(0.00)[gmail.com,qq.com];
+	 PRECEDENCE_BULK(0.00)[];
+	 TAGGED_RCPT(0.00)[];
+	 FREEMAIL_REPLYTO(4.00)[gmail.com];
+	 REPLYTO_DOM_NEQ_FROM_DOM(1.60)[];
+	 MIME_GOOD(-0.10)[text/plain];
+	 HAS_LIST_UNSUB(-0.01)[];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 SPOOF_REPLYTO(6.00)[suse.cz,gmail.com];
+	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	 RCPT_COUNT_TWELVE(0.00)[29];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FREEMAIL_CC(0.00)[vger.kernel.org,davemloft.net,qq.com,google.com,kernel.org,auristor.com,redhat.com,lists.infradead.org,gmail.com,intel.com,linux-foundation.org,linuxfoundation.org,suse.cz];
+	 RCVD_TLS_ALL(0.00)[];
+	 SUSPICIOUS_RECIPS(1.50)[]
+X-Spam-Score: 8.63
+X-Rspamd-Queue-Id: 3C2A61FB96
+X-Spam-Flag: NO
 
-On Mon, 22 Jan 2024 15:19:12 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Mon, Jan 22, 2024 at 3:07=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
-.com> wrote:
-> >
-> > On Mon, 22 Jan 2024 14:58:09 +0800, Jason Wang <jasowang@redhat.com> wr=
-ote:
-> > > On Mon, Jan 22, 2024 at 2:55=E2=80=AFPM Jason Wang <jasowang@redhat.c=
-om> wrote:
-> > > >
-> > > > On Mon, Jan 22, 2024 at 2:20=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.a=
-libaba.com> wrote:
-> > > > >
-> > > > > On Mon, 22 Jan 2024 12:16:27 +0800, Jason Wang <jasowang@redhat.c=
-om> wrote:
-> > > > > > On Mon, Jan 22, 2024 at 12:00=E2=80=AFPM Xuan Zhuo <xuanzhuo@li=
-nux.alibaba.com> wrote:
-> > > > > > >
-> > > > > > > On Mon, 22 Jan 2024 11:14:30 +0800, Jason Wang <jasowang@redh=
-at.com> wrote:
-> > > > > > > > On Mon, Jan 22, 2024 at 10:12=E2=80=AFAM Zhu Yanjun <yanjun=
-.zhu@linux.dev> wrote:
-> > > > > > > > >
-> > > > > > > > >
-> > > > > > > > > =E5=9C=A8 2024/1/20 1:29, Andrew Lunn =E5=86=99=E9=81=93:
-> > > > > > > > > >>>>>        while (!virtqueue_get_buf(vi->cvq, &tmp) &&
-> > > > > > > > > >>>>> -           !virtqueue_is_broken(vi->cvq))
-> > > > > > > > > >>>>> +           !virtqueue_is_broken(vi->cvq)) {
-> > > > > > > > > >>>>> +        if (timeout)
-> > > > > > > > > >>>>> +            timeout--;
-> > > > > > > > > >>>> This is not really a timeout, just a loop counter. 2=
-00 iterations could
-> > > > > > > > > >>>> be a very short time on reasonable H/W. I guess this=
- avoid the soft
-> > > > > > > > > >>>> lockup, but possibly (likely?) breaks the functional=
-ity when we need to
-> > > > > > > > > >>>> loop for some non negligible time.
-> > > > > > > > > >>>>
-> > > > > > > > > >>>> I fear we need a more complex solution, as mentioned=
- by Micheal in the
-> > > > > > > > > >>>> thread you quoted.
-> > > > > > > > > >>> Got it. I also look forward to the more complex solut=
-ion to this problem.
-> > > > > > > > > >> Can we add a device capability (new feature bit) such =
-as ctrq_wait_timeout
-> > > > > > > > > >> to get a reasonable timeout=EF=BC=9F
-> > > > > > > > > > The usual solution to this is include/linux/iopoll.h. I=
-f you can sleep
-> > > > > > > > > > read_poll_timeout() otherwise read_poll_timeout_atomic(=
-).
-> > > > > > > > >
-> > > > > > > > > I read carefully the functions read_poll_timeout() and
-> > > > > > > > > read_poll_timeout_atomic(). The timeout is set by the cal=
-ler of the 2
-> > > > > > > > > functions.
-> > > > > > > >
-> > > > > > > > FYI, in order to avoid a swtich of atomic or not, we need c=
-onvert rx
-> > > > > > > > mode setting to workqueue first:
-> > > > > > > >
-> > > > > > > > https://www.mail-archive.com/virtualization@lists.linux-fou=
-ndation.org/msg60298.html
-> > > > > > > >
-> > > > > > > > >
-> > > > > > > > > As such, can we add a module parameter to customize this =
-timeout value
-> > > > > > > > > by the user?
-> > > > > > > >
-> > > > > > > > Who is the "user" here, or how can the "user" know the valu=
-e?
-> > > > > > > >
-> > > > > > > > >
-> > > > > > > > > Or this timeout value is stored in device register, virti=
-o_net driver
-> > > > > > > > > will read this timeout value at initialization?
-> > > > > > > >
-> > > > > > > > See another thread. The design needs to be general, or you =
-can post a RFC.
-> > > > > > > >
-> > > > > > > > In another thought, we've already had a tx watchdog, maybe =
-we can have
-> > > > > > > > something similar to cvq and use timeout + reset in that ca=
-se.
-> > > > > > >
-> > > > > > > But we may block by the reset ^_^ if the device is broken?
-> > > > > >
-> > > > > > I mean vq reset here.
-> > > > >
-> > > > > I see.
-> > > > >
-> > > > > I mean when the deivce is broken, the vq reset also many be block=
-ed.
-> > > > >
-> > > > >         void vp_modern_set_queue_reset(struct virtio_pci_modern_d=
-evice *mdev, u16 index)
-> > > > >         {
-> > > > >                 struct virtio_pci_modern_common_cfg __iomem *cfg;
-> > > > >
-> > > > >                 cfg =3D (struct virtio_pci_modern_common_cfg __io=
-mem *)mdev->common;
-> > > > >
-> > > > >                 vp_iowrite16(index, &cfg->cfg.queue_select);
-> > > > >                 vp_iowrite16(1, &cfg->queue_reset);
-> > > > >
-> > > > >                 while (vp_ioread16(&cfg->queue_reset))
-> > > > >                         msleep(1);
-> > > > >
-> > > > >                 while (vp_ioread16(&cfg->cfg.queue_enable))
-> > > > >                         msleep(1);
-> > > > >         }
-> > > > >         EXPORT_SYMBOL_GPL(vp_modern_set_queue_reset);
-> > > > >
-> > > > > In this function, for the broken device, we can not expect someth=
-ing.
-> > > >
-> > > > Yes, it's best effort, there's no guarantee then. But it doesn't ha=
-rm to try.
-> > > >
-> > > > Thanks
-> > > >
-> > > > >
-> > > > >
-> > > > > >
-> > > > > > It looks like we have multiple goals here
-> > > > > >
-> > > > > > 1) avoid lockups, using workqueue + cond_resched() seems to be
-> > > > > > sufficient, it has issue but nothing new
-> > > > > > 2) recover from the unresponsive device, the issue for timeout =
-is that
-> > > > > > it needs to deal with false positives
-> > > > >
-> > > > >
-> > > > > I agree.
-> > > > >
-> > > > > But I want to add a new goal, cvq async. In the netdim, we will
-> > > > > send many requests via the cvq, so the cvq async will be nice.
-> > >
-> > > Then you need an interrupt for cvq.
-> > >
-> > > FYI, I've posted a series that use interrupt for cvq in the past:
-> > >
-> > > https://lore.kernel.org/lkml/6026e801-6fda-fee9-a69b-d06a80368621@red=
-hat.com/t/
-> >
-> > I know this. But the interrupt maybe not a good solution without new sp=
-ace.
+From: Sedat Dilek <sedat.dilek@gmail.com>
+
+On Wed, Jan 10, 2024 at 10:12 PM David Howells <dhowells@redhat.com> wrote:
 >
-> What do you mean by "new space"?
-
-Yes, I know, the cvq can work with interrupt by the virtio spec.
-But as I know, many hypervisors implement the cvq without supporting interr=
-upt.
-If we let the cvq work with interrupt without negotiation then
-many hypervisors will hang on the new kernel.
-
 >
-> We can introduce something like enable_cb_delayed(), then you will
-> only get notified after several requests.
+> Fix the size check added to dns_resolver_preparse() for the V1 server-list
+> header so that it doesn't give EINVAL if the size supplied is the same as
+> the size of the header struct (which should be valid).
 >
-> >
-> > >
-> > > Haven't found time in working on this anymore, maybe we can start from
-> > > this or not.
-> >
-> >
-> > I said async, but my aim is to put many requests to the cvq before gett=
-ing the
-> > response.
+> This can be tested with:
 >
-> It doesn't differ from TX/RX in this case.
+>         echo -n -e '\0\0\01\xff\0\0' | keyctl padd dns_resolver desc @p
 >
-> >
-> > Heng Qi posted this https://lore.kernel.org/all/1705410693-118895-4-git=
--send-email-hengqi@linux.alibaba.com/
-> >
+> which will give "add_key: Invalid argument" without this fix.
 >
-> This seems like a hack, if interrupt is used, you can simply do that
-> in the callback.
+> Fixes: 1997b3cb4217 ("keys, dns: Fix missing size check of V1 server-list header")
 
-YES.
+[ CC stable@vger.kernel.org ]
 
-I also want to change the code, I just want to say the async is a goal.
+Your (follow-up) patch is now upstream.
 
-For the rx mode, we have introduce a work queue, I want to move the
-sending command job to the work queue. The caller just wakeup
-the work queue.
+https://git.kernel.org/linus/acc657692aed438e9931438f8c923b2b107aebf9
 
-If the caller want to got the result sync, then the caller can wait for it.
-If not, the caller can register an function to the work queue.
+This misses CC: Stable Tag as suggested by Linus.
 
-And I think it will be easy to implement the timeout inside the workqueue.
+Looks like linux-6.1.y and linux-6.6.y needs it, too.
 
-Thanks.
+https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=v6.6.11&id=da89365158f6f656b28bcdbcbbe9eaf97c63c474
+https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=v6.1.72&id=079eefaecfd7bbb8fcc30eccb0dfdf50c91f1805
 
+BG,
+-Sedat-
 
+Hi Greg, Sasa,
+
+could you please add this also to linux-6.1.y and linux-6.6.y?  (Easily
+applicable to both, needed for both.) Or is there any reason why it's not
+being added?
+
+Kind regards,
+Petr
+
+> Reported-by: Pengfei Xu <pengfei.xu@intel.com>
+> Link: https://lore.kernel.org/r/ZZ4fyY4r3rqgZL+4@xpf.sh.intel.com/
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Edward Adam Davis <eadavis@qq.com>
+> cc: Linus Torvalds <torvalds@linux-foundation.org>
+> cc: Simon Horman <horms@kernel.org>
+> Cc: Jarkko Sakkinen <jarkko@kernel.org>
+> Cc: Jeffrey E Altman <jaltman@auristor.com>
+> Cc: Wang Lei <wang840925@gmail.com>
+> Cc: Jeff Layton <jlayton@redhat.com>
+> Cc: Steve French <sfrench@us.ibm.com>
+> Cc: Marc Dionne <marc.dionne@auristor.com>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> ---
+>  net/dns_resolver/dns_key.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> Thanks
+> diff --git a/net/dns_resolver/dns_key.c b/net/dns_resolver/dns_key.c
+> index f18ca02aa95a..c42ddd85ff1f 100644
+> --- a/net/dns_resolver/dns_key.c
+> +++ b/net/dns_resolver/dns_key.c
+> @@ -104,7 +104,7 @@ dns_resolver_preparse(struct key_preparsed_payload *prep)
+>                 const struct dns_server_list_v1_header *v1;
 >
-> > Thanks.
-> >
-> >
-> > >
-> > > Thanks
-> > >
-> > > > >
-> > > > > Thanks.
-> > > > >
-> > > > >
-> > > > > >
-> > > > > > Thanks
-> > > > > >
-> > > > > > >
-> > > > > > > Thanks.
-> > > > > > >
-> > > > > > >
-> > > > > > > >
-> > > > > > > > Thans
-> > > > > > > >
-> > > > > > > > >
-> > > > > > > > > Zhu Yanjun
-> > > > > > > > >
-> > > > > > > > > >
-> > > > > > > > > >       Andrew
-> > > > > > > > >
-> > > > > > > >
-> > > > > > >
-> > > > > >
-> > > > >
-> > >
-> >
+>                 /* It may be a server list. */
+> -               if (datalen <= sizeof(*v1))
+> +               if (datalen < sizeof(*v1))
+>                         return -EINVAL;
 >
+>                 v1 = (const struct dns_server_list_v1_header *)data;
+>
+>
+
 
