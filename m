@@ -1,128 +1,120 @@
-Return-Path: <netdev+bounces-64921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ED9B837AC9
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 01:54:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E8DF837BFC
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 02:08:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5F6A1F221D0
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 00:54:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10CB51F2ACE4
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 01:08:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90F1C131747;
-	Tue, 23 Jan 2024 00:18:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 624E07F4;
+	Tue, 23 Jan 2024 00:24:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cdc/tAPA"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="rfiR9spj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1587C130E42;
-	Tue, 23 Jan 2024 00:18:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B32B372;
+	Tue, 23 Jan 2024 00:24:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705969087; cv=none; b=uGwd9SMZafa0uffcBylvuUzMXa93xmHFVERgrryScHg4Wjv5Y6FoLFf0DZqkiR7mExhAhvfmJHrFCr0Mv4D8dsa5K/g8FGVtVWdMWDVMcim32Bii1FdjyehyGwM5VmxxIG+PkYJ+oF4uuSfwt7CxxtWBimICiQaUKYGTZN6P4q8=
+	t=1705969464; cv=none; b=quublve2e6VOs+HEAKdfhJxK4h1gpsOy77kvieTZABJdIM2AqdaLTLn1CuF17fr+OYZXLqfe/l9cmYInziWM1r2ZHY2sBul145IDdx5RE/w2ww2YuRIkChT196rIkKBQh/Ezbz5LeF6Nzwt1mdlEpJzxwW8sVoeYVqWpVSiCFUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705969087; c=relaxed/simple;
-	bh=XsRAAQsPjyC7mAb+Rj2z59L5HzWedPqLWk2ITIOdKXQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rx7GFiymXbD5z9DPdtFQ3F1eeI0p74tztbrMlkD6zaHAsL1/8ccn27EiI/456G0R6HCVV3WZ6yzLL/G5AB9sxnxEKBjJAPpFO+jFWwbeyeRYph1RSkTrhpVcLZVx/gVQ1pL5/d6Ku8V3suvFz7+aGVy+2TZQ/pEy3+byJr64ZBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cdc/tAPA; arc=none smtp.client-ip=209.85.210.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-6ddef319fabso2468351a34.1;
-        Mon, 22 Jan 2024 16:18:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705969085; x=1706573885; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Q5tcut5oygY7UPZdDIt+xFB2Y78NvHfsic1L6PsWyUg=;
-        b=cdc/tAPACzupPpbH5VORZ7hc7AnoJioLxaVG812Lz1fm8YGP03HTunaK/cwGoaFX32
-         tjaBVnR06u/aJsNEIL/lyJUYj2Mqo56H328NCt1cr/XDM3QMro+BSlUJQ6Ao5UMqiL2w
-         sDLe+yhxt4I2Fxdi2GQUH6zmieuASB0h4Jh1aDjc69kAvAM9GXdnWl+AjO+3hF0j4m9q
-         Bdz3OGo9xzr87g4kLmNRAvQ0SlZZUGX3UcqLv7839bPi4L93ifoNhsyp1btEfrme9E++
-         g8E4QoLxoxyBBGpkwQvRuZLk+HH10bHMj9cZnKrVN70U9SjQiTeJUOtdXxt5r1mUCogP
-         Qwrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705969085; x=1706573885;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Q5tcut5oygY7UPZdDIt+xFB2Y78NvHfsic1L6PsWyUg=;
-        b=nbbR3/QT+Y+LGV1iNdUTdRlClvipzY2DHPliOoiNQlaaG7SB0+AJWJi9wVSJBOFMux
-         usjEK0L0jlyHk0tvpq/OvnfLj/t5y4J9Ref9uKq+W/ui0HX2t4zvRS13EHN1aOaksl1U
-         /v+h17YPyfF4widD37n6KWJaFwaGGP303vLGXcc8mVeI1HAtjX3/Fsrl5Sn+wCSgigNX
-         imR+VHLAMoZMqeKol+4bz8BYzblmri8o0G+6Wl0Fwu8AKZl3BPDtHKHCLE/HsuR8mj9W
-         qJu6kCgw1W3BL7ZgudxjEEC1IjqyTkXnUTPShp1nvvypgQijnSYreM6n8lwOmK6qx1Hw
-         CTCQ==
-X-Gm-Message-State: AOJu0YxdmiG019pAwlowvytaV8v9EFVzIM1smWMXAzK5LlWLScs0Ohb7
-	0DKhttlZy6XKjrJhq2+Z2xjGdIx2b49yfiblnsEFou+xwXiPzlGBrxU5WC8Dl9lD1sn0H/DBanC
-	ZvUz3uNp5sJFg1TxPeOI6KRSMy5Q=
-X-Google-Smtp-Source: AGHT+IEt+nzuO0vPiyMVhwP8H+8gsOeo6E7KF9TNsThfFsGLL/wWzyOJFHqOCS8PKUYUzNOhmBo5Bba7NCqvFq8+wro=
-X-Received: by 2002:a05:6358:6f0e:b0:176:25b:7af8 with SMTP id
- r14-20020a0563586f0e00b00176025b7af8mr1951748rwn.52.1705969084916; Mon, 22
- Jan 2024 16:18:04 -0800 (PST)
+	s=arc-20240116; t=1705969464; c=relaxed/simple;
+	bh=bSghpvZNq1T3rrpOYipet9T1woLnbL0GcCMSCBWTcXA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=WYPvv02WZzc0M1Q3xqHiGp13zI3jWUiYfNSGPOeecH5S/uRB0ZsGQdcYAR1YmquSqjnNxqiHbnukRgxARhwMio8cT4W617CsZs6OjZkKomaYXdvfAvV/zDwUJzWZ2CKncfGTW69lbeuLhbDTyfG1tMwmetzW3Czx7nVw2VLJIgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=rfiR9spj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECD3EC433F1;
+	Tue, 23 Jan 2024 00:24:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1705969464;
+	bh=bSghpvZNq1T3rrpOYipet9T1woLnbL0GcCMSCBWTcXA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=rfiR9spjTzHxxdoTeR0FvNE3EcmwgaO1wwbRrvv4UUGWLyyHjPgEUZPwmTxdfGx6T
+	 MVNmoXTc657mmVatc3sxc8Yi+uV60hVyHH9MvR8wT0AAqNrFYYkBbQvZHfGBghUsjf
+	 BEnAze1OtvkiiEOqX//1SclGKGrjw47s8KPeyzyU=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	Marc Dionne <marc.dionne@auristor.com>,
+	David Howells <dhowells@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-afs@lists.infradead.org,
+	netdev@vger.kernel.org,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.7 239/641] rxrpc: Fix skbuff cleanup of calls recvmsg_queue and rx_oos_queue
+Date: Mon, 22 Jan 2024 15:52:23 -0800
+Message-ID: <20240122235825.406423043@linuxfoundation.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240122235818.091081209@linuxfoundation.org>
+References: <20240122235818.091081209@linuxfoundation.org>
+User-Agent: quilt/0.67
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1705432850.git.amery.hung@bytedance.com> <813b2de18b94389f4df53f21b8a328e1c2fdda13.1705432850.git.amery.hung@bytedance.com>
-In-Reply-To: <813b2de18b94389f4df53f21b8a328e1c2fdda13.1705432850.git.amery.hung@bytedance.com>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Mon, 22 Jan 2024 16:17:52 -0800
-Message-ID: <CAEf4BzaDCsVOBgCkZKPpM2RbsiKQMLToRaiYpBYejX=F5DncuA@mail.gmail.com>
-Subject: Re: [RFC PATCH v7 6/8] tools/libbpf: Add support for BPF_PROG_TYPE_QDISC
-To: Amery Hung <ameryhung@gmail.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, yangpeihao@sjtu.edu.cn, 
-	toke@redhat.com, jhs@mojatatu.com, jiri@resnulli.us, sdf@google.com, 
-	xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jan 17, 2024 at 1:57=E2=80=AFPM Amery Hung <ameryhung@gmail.com> wr=
-ote:
->
-> While eBPF qdisc uses NETLINK for attachment, expected_attach_type is
-> required at load time to verify context access from different programs.
-> This patch adds the section definition for this.
->
-> Signed-off-by: Amery Hung <amery.hung@bytedance.com>
-> ---
->  tools/lib/bpf/libbpf.c | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
-> index e067be95da3c..0541f85b4ce6 100644
-> --- a/tools/lib/bpf/libbpf.c
-> +++ b/tools/lib/bpf/libbpf.c
-> @@ -8991,6 +8991,10 @@ static const struct bpf_sec_def section_defs[] =3D=
+6.7-stable review patch.  If anyone has any objections, please let me know.
+
+------------------
+
+From: David Howells <dhowells@redhat.com>
+
+[ Upstream commit 4fc68c4c1a114ba597b4f3b082f04622dfa0e0f6 ]
+
+Fix rxrpc_cleanup_ring() to use rxrpc_purge_queue() rather than
+skb_queue_purge() so that the count of outstanding skbuffs is correctly
+updated when a failed call is cleaned up.
+
+Without this rmmod may hang waiting for rxrpc_n_rx_skbs to become zero.
+
+Fixes: 5d7edbc9231e ("rxrpc: Get rid of the Rx ring")
+Reported-by: Marc Dionne <marc.dionne@auristor.com>
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: linux-afs@lists.infradead.org
+cc: netdev@vger.kernel.org
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/rxrpc/call_object.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/rxrpc/call_object.c b/net/rxrpc/call_object.c
+index 773eecd1e979..f10b37c14772 100644
+--- a/net/rxrpc/call_object.c
++++ b/net/rxrpc/call_object.c
+@@ -545,8 +545,8 @@ void rxrpc_get_call(struct rxrpc_call *call, enum rxrpc_call_trace why)
+  */
+ static void rxrpc_cleanup_ring(struct rxrpc_call *call)
  {
->         SEC_DEF("struct_ops.s+",        STRUCT_OPS, 0, SEC_SLEEPABLE),
->         SEC_DEF("sk_lookup",            SK_LOOKUP, BPF_SK_LOOKUP, SEC_ATT=
-ACHABLE),
->         SEC_DEF("netfilter",            NETFILTER, BPF_NETFILTER, SEC_NON=
-E),
-> +       SEC_DEF("qdisc/enqueue",        QDISC, BPF_QDISC_ENQUEUE, SEC_ATT=
-ACHABLE_OPT),
-> +       SEC_DEF("qdisc/dequeue",        QDISC, BPF_QDISC_DEQUEUE, SEC_ATT=
-ACHABLE_OPT),
-> +       SEC_DEF("qdisc/reset",          QDISC, BPF_QDISC_RESET, SEC_ATTAC=
-HABLE_OPT),
-> +       SEC_DEF("qdisc/init",           QDISC, BPF_QDISC_INIT, SEC_ATTACH=
-ABLE_OPT),
+-	skb_queue_purge(&call->recvmsg_queue);
+-	skb_queue_purge(&call->rx_oos_queue);
++	rxrpc_purge_queue(&call->recvmsg_queue);
++	rxrpc_purge_queue(&call->rx_oos_queue);
+ }
+ 
+ /*
+-- 
+2.43.0
 
-seems like SEC_ATTACHABLE (or just 0) is what you want.
-expected_attach_type shouldn't be optional for any new program type
 
->  };
->
->  int libbpf_register_prog_handler(const char *sec,
-> --
-> 2.20.1
->
->
+
 
