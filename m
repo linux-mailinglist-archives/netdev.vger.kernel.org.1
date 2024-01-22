@@ -1,69 +1,71 @@
-Return-Path: <netdev+bounces-64804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBC6E837254
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 20:19:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE95A837257
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 20:19:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59A0229308C
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:19:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 897591F339CC
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:19:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDAF23D3AF;
-	Mon, 22 Jan 2024 19:19:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8246B3DBA8;
+	Mon, 22 Jan 2024 19:19:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LjfE5PGo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cdTzV2XJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2382A3DBA8
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 19:19:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB89A3DBBB
+	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 19:19:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705951153; cv=none; b=AGtgdpcruzHb5L6tBNR8ZJpEqoxcgt5Iyz2Vd/iG7Xk66IEBEECW85X1czS3OGHMl6oCyQhL3wOlUsjtiwZ6MMvMDHrIts8mX/N4yRf+YYC/R8CyG90NlZ3lvRAGlFeztZtGggPGOVWOVcVYkXmJLvFYMYK+aDdzJ4vN90FbinU=
+	t=1705951155; cv=none; b=FbYdr8+xZWQGarL5AGHS9Haj2FMDx35pvBxNJdMGpHMq1YM51l4tcMfutxwU15dAbzmf0pBqQGdQnqaou9PIrJfO7XVDITElm9WcEgDYZcdmDTUpHGRJ3lfLGOWyxLfKBu9j0baEVudP6L/+pE07jiSN2R/uF+T5bOJbLL7nvrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705951153; c=relaxed/simple;
-	bh=uca6q5Oh3s/CoS8UCW0ogv0w7QVy3wQtaI6yUwDqIoo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CMNV98uXs1j8Wch7Vks7fk3lNcn5FE6qHBvCc567WUcVnVf/fu4s8uayyr2uhGL26wMOgP+gE2pkKLQz/igayeo+bLp8UPgIPodWigHt6EdH6izRybAyOTV0DzYKhDfdYW3/FpJaqvYNyaK8ig7+Fn++tiAgMwgwjqui/+EjuFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LjfE5PGo; arc=none smtp.client-ip=209.85.221.43
+	s=arc-20240116; t=1705951155; c=relaxed/simple;
+	bh=NIzF4HOoeWcX09o9CigouEo1jnkrQhGpQ/EDdZaZ4zA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=V/vy66w0MxKCveE0eo3MXCYTIUYvhnlklseu5Phq56V9MH1UXDG0EvYp9IWftFj86vKBC1IvHwVdKAGkeXlTFyRhNs9IGS3mxmWqMpSnAwZQ4E0gyrWTp6UwfOOs3963mbTbphRVknexvo0J5Pb/+kAa8faaBQgJ2VDgJxjiOVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cdTzV2XJ; arc=none smtp.client-ip=209.85.221.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-339231c062bso2356291f8f.0
-        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 11:19:11 -0800 (PST)
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3367a304091so3901289f8f.3
+        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 11:19:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705951150; x=1706555950; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6zZRCetuh/hmwn2DQqJfxSRqzPBAeMxk5hf25iYxxbs=;
-        b=LjfE5PGouY8jrmHgEEtYtnyYHtxW8go0xVrD++FO8QMlq4pYkTF+a0pSoL6aXBAqFx
-         urQs5Bc8O9ZZEx9c0dXcJJHCdvkgzrdrQPGyWpa6iAZ7ciWgBeoAFZ8mzoKt13MZGmis
-         80jZ2p+OAPds7USfYDqgxif7hAAWs6WR/dsbNOo340nYKjwVHYzScwnW40iznqFW1itA
-         DBx+R8i3lPZzZT2Uns5D/TwQAbm2/vRaPZpoXVbfmEIaULDBpeekRDttKqeROnAO/a64
-         ZyWqYZGUCqL1LMHCBN1ztc34whBMd69dsybxgmJebLfX0zK/08Ggwmtp6KcU5a/JDL0n
-         qpug==
+        d=gmail.com; s=20230601; t=1705951152; x=1706555952; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=t57AyYBGWcxZqrcQdzRHminQZoOXAn71o8VVm2M9WtU=;
+        b=cdTzV2XJCEAolZWa8jGpBhuELwOoIGF5Ch4ux1ZL2XQxUgAVOo/Y3CWnF656bNFHPS
+         Wr6Cz1qRBLvcoisD5Z7kixN9jH0WhTP8+0uj3O2Wsz1jSxIaFj/B7NZzhiN59k1KkgfT
+         irxgp0kZOEiLDkjA3K31UGIIKTihogvG+dnuGh1JXITIZmgr4L8M8jOBkyaJJILdO2LC
+         dnhv5aI7ideDtqxtrreTfwWYA9ww0C8MQNYklqRpbnr7kHZbpwvHd9tzKgDQJBTq22LE
+         zv1CmFkRXKRNtBDIUrJi9hOXogr1/9LYqjZqlE4jsfPm5IrpG5OK6Cid57k3bbBAzJGG
+         bMkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705951150; x=1706555950;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6zZRCetuh/hmwn2DQqJfxSRqzPBAeMxk5hf25iYxxbs=;
-        b=KvaW+WwxyxfmLT5bE3w2JKonmAybhX5fu/CJG5X7EpG+ycVNQcWKh7nd/sk90yiyfF
-         0Gli5xCc6kwPYlGPApedjrpogQ8iWwfyaxaLuVyAeCxIAjuTu1q1646iGbuv3ihbrs9q
-         fFvTKhw01AavrfKYUjdH4Ifte5Nar6R/hBCdZCTK2MYNjmEX0Fjk5xXOWNMDxuHelBSB
-         j1WpR5+Py3hzqSvpRaElS/A/edRgf0+t2gRdMFutlfIP7oM+a5OqbknYjJoSg+mwPxx9
-         y3haH5NfFAMYDZHk5rAoW9jyxIHLrVe1ncDLHDR4bpsWU5vNEgASoIOCd6VVG7Cqdvae
-         YBXQ==
-X-Gm-Message-State: AOJu0YyBtv4bvQ1ZFk72fcXSMFMIY4cgdHA31wd4zBOLp/2rzofvCDTc
-	CKdqdwZwgo/D0lab06WfaU+sDaYMZHkZRAQqJpt83zB4xj9fRkuz
-X-Google-Smtp-Source: AGHT+IHb+XI1Kdwa//c5+T/oUA9B6y56Eyv8pPIMHVTyBDasseDbmsmgxJHeeME/bk7ceAbNtffniA==
-X-Received: by 2002:adf:f4d1:0:b0:337:c88d:51b1 with SMTP id h17-20020adff4d1000000b00337c88d51b1mr2279690wrp.96.1705951150225;
-        Mon, 22 Jan 2024 11:19:10 -0800 (PST)
+        d=1e100.net; s=20230601; t=1705951152; x=1706555952;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=t57AyYBGWcxZqrcQdzRHminQZoOXAn71o8VVm2M9WtU=;
+        b=fpSZVbAk/mGkSVoHeuDACqt4M9RHQr8T7RRoSYzhlrz/h3HGtwjga4xrxC2RHfyIL1
+         NpL2X6PRdipHELYVoFAwYqRR/96DBPWZC0qst1ZGXUZ85j9V7YPZFKEjhYfMLW22KRdr
+         7Jmp2CT3b6HOgkde/WD7jDveQxoCWoBofRzYa4Glg65UwVhhECso7AzxQlwlatbdx9BS
+         LbHL7ADtV6INMuipUsl3CIVW8yx6vvdss5W1ZcMkoAJ/L5fxcnObluw4Z2p6FvzDSH7z
+         AfF64yYOeTsBnwtXHTcUaSt82ErZrGqZKSzFqgkrl6S3yTxM3kT2ym6zgl5JvFRv5P/J
+         YeAg==
+X-Gm-Message-State: AOJu0YzzDMurcGFBsZcYnStUrpg6eQ7Agq74xY8QGh4sIXVtbeQB8w/v
+	BZOXStSIcUA9uVcGR9OLPnvs3GKuYnYoJlH6cIT5oVsF/MrxKv2wI9yj8l7ql+tKkg==
+X-Google-Smtp-Source: AGHT+IHOQuIxgiyCBV5wbYT2HDXnYtBafZH9JkanrftdVJCFfPFuHYxOGEczNL7CABclb2xlVqB4MQ==
+X-Received: by 2002:a05:6000:1e81:b0:337:9a60:f00b with SMTP id dd1-20020a0560001e8100b003379a60f00bmr2125719wrb.127.1705951152275;
+        Mon, 22 Jan 2024 11:19:12 -0800 (PST)
 Received: from localhost.localdomain ([2001:b07:646f:4a4d:e17a:bd08:d035:d8c2])
-        by smtp.gmail.com with ESMTPSA id t4-20020a0560001a4400b003392ba296b3sm6211104wry.56.2024.01.22.11.19.09
+        by smtp.gmail.com with ESMTPSA id t4-20020a0560001a4400b003392ba296b3sm6211104wry.56.2024.01.22.11.19.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jan 2024 11:19:09 -0800 (PST)
+        Mon, 22 Jan 2024 11:19:12 -0800 (PST)
 From: Alessandro Marcolini <alessandromarcolini99@gmail.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -77,10 +79,12 @@ To: davem@davemloft.net,
 	jiri@resnulli.us
 Cc: netdev@vger.kernel.org,
 	Alessandro Marcolini <alessandromarcolini99@gmail.com>
-Subject: [PATCH net-next 0/3] tools: ynl: Add sub-message and multi-attr encoding support
-Date: Mon, 22 Jan 2024 20:19:38 +0100
-Message-ID: <cover.1705950652.git.alessandromarcolini99@gmail.com>
+Subject: [PATCH net-next 1/3] tools: ynl: correct typo and docstring
+Date: Mon, 22 Jan 2024 20:19:39 +0100
+Message-ID: <800f2681d56b5195c8b22173a3b83bbac021af92.1705950652.git.alessandromarcolini99@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <cover.1705950652.git.alessandromarcolini99@gmail.com>
+References: <cover.1705950652.git.alessandromarcolini99@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,26 +93,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patchset adds the encoding support for sub-message attributes and
-multi-attr objects.
+Correct typo in SpecAttr docstring. Changed SpecSubMessageFormat
+docstring.
 
-Patch 1 corrects a typo and the docstring for SpecSubMessageFormat
-Patch 2 adds the multi-attr attribute to the entry object for taprio
-Patch 3 updates the _add_attr method to support sub-message encoding
+Signed-off-by: Alessandro Marcolini <alessandromarcolini99@gmail.com>
+---
+ tools/net/ynl/lib/nlspec.py | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-It is now possible to add a taprio qdisc using ynl:
-# /tools/net/ynl/cli.py --spec Documentation/netlink/specs/tc.yaml --do newqdisc --create --json '{"family":1, "ifindex":4, "handle":65536, "parent":4294967295, "info":0, "kind":"taprio", "stab":{"base":"000000000000001f00000000000000000000000000000000"}, "options":{"priomap":"03010101010101010101010101010101010001000100020000000000000000000000000000000000000000000000000000000100020003000000000000000000000000000000000000000000000000000000", "sched-clockid":11, "sched-entry-list":[{"entry":{"index":0, "cmd":0, "gate-mask":1, "interval":300000}}, {"entry":{"index":1, "cmd":0, "gate-mask":2, "interval":300000}}, {"entry":{"index":2, "cmd":0, "gate-mask":4, "interval":400000}}], "sched-base-time":1528743495910289987, "flags": 1}}'
-
-Alessandro Marcolini (3):
-  tools: ynl: correct typo and docstring
-  doc: netlink: specs: tc: add multi-attr to tc-taprio-sched-entry
-  tools: ynl: add encoding support for 'sub-message' to ynl
-
- Documentation/netlink/specs/tc.yaml |  3 +-
- tools/net/ynl/lib/nlspec.py         |  7 ++--
- tools/net/ynl/lib/ynl.py            | 54 +++++++++++++++++++++++++----
- 3 files changed, 53 insertions(+), 11 deletions(-)
-
+diff --git a/tools/net/ynl/lib/nlspec.py b/tools/net/ynl/lib/nlspec.py
+index 44f13e383e8a..f8feae363970 100644
+--- a/tools/net/ynl/lib/nlspec.py
++++ b/tools/net/ynl/lib/nlspec.py
+@@ -144,7 +144,7 @@ class SpecEnumSet(SpecElement):
+ 
+ 
+ class SpecAttr(SpecElement):
+-    """ Single Netlink atttribute type
++    """ Single Netlink attribute type
+ 
+     Represents a single attribute type within an attr space.
+ 
+@@ -306,10 +306,9 @@ class SpecSubMessage(SpecElement):
+ 
+ 
+ class SpecSubMessageFormat(SpecElement):
+-    """ Netlink sub-message definition
++    """ Netlink sub-message format definition
+ 
+-    Represents a set of sub-message formats for polymorphic nlattrs
+-    that contain type-specific sub messages.
++    Represents a single format for a sub-message.
+ 
+     Attributes:
+         value         attribute value to match against type selector
 -- 
 2.43.0
 
