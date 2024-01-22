@@ -1,232 +1,145 @@
-Return-Path: <netdev+bounces-64721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAE6E836CA0
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:12:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C557836CEF
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:21:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A32B1F2693F
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 17:12:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B9F0EB34422
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 17:16:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3E0A6169C;
-	Mon, 22 Jan 2024 16:01:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DF3E63409;
+	Mon, 22 Jan 2024 16:04:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="bHcvl2ma"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="a3n75wVq"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 715BF4D117;
-	Mon, 22 Jan 2024 16:01:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B1564A96;
+	Mon, 22 Jan 2024 16:04:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705939268; cv=none; b=f5hMBI6aV+aZKx8rQlIEDX5F5aaGWznoxd5qw4V2Ijvobh8GyoX3ZDoaDajr4eMqrOUDMNtXCeQjI/jdLpvdbTUj3x8C2ljQZORSw8MKsVb/Mn5c/0KTxeAEfzGMClHzzeR8NZ+cTbqjZx5GiZkOIeq9CtVe2suzeja4LdYzyWU=
+	t=1705939481; cv=none; b=Z7FCbn4XWA1kM62zjf4dPou7H32Z2t0j7AxGP3D5zIaxUbXvVa2rEWuqRRWKIF5fexMc0JnFIQmXexy3jFqkYO/vbgyy4vmNieashJ7IGJFeeltgDHrkgB8epyl3SWS1JaqFde1/vPZ6jBFVWxIalu7Q7Pe7Thvir/qwwFrPabU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705939268; c=relaxed/simple;
-	bh=/V4sb8LgDiZWE3Juc5rPE5tfHJq1izPIerz9v0keYy0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=LxmBnZ6XwfVFnaK/90y00EQt4h4nYaysH5yw5yIxjjHzfCEpXhUf5A4EyaUb5QjiErvO+l0rc8YYNN+4kD6HsNScYEDeIGs7qtxUHzqBEm6QQtoxO6I0l7u/TEWRm4bQ3o5DeIlcDTLFdnaRYu2Wm4aqvZe/nURGRBcFGbv7jp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=bHcvl2ma; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1099)
-	id 5796220E2C09; Mon, 22 Jan 2024 08:01:07 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5796220E2C09
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1705939267;
-	bh=xk+J9offpgOWbG5/MefCVQrVZHtpJxME2AVu0bJoiYU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bHcvl2mayTfpazeaOQG9hVEQXa1ILyF8kUGfhE6iASJYmYhatoicq0AOly7Z4LuxU
-	 H8pbA507JOC4hRlF4LhZTc2OqPFEtH+7i6rGcIkjT6Pi8J4XzqVb6iTQRtHFpwW2zl
-	 aUezifPhXwAXFcDmV/+9GazlNkX72BqxTEoZr+IY=
-From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-To: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	longli@microsoft.com,
-	yury.norov@gmail.com,
-	leon@kernel.org,
-	cai.huoqing@linux.dev,
-	ssengar@linux.microsoft.com,
-	vkuznets@redhat.com,
-	tglx@linutronix.de,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: schakrabarti@microsoft.com,
-	paulros@microsoft.com,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-Subject: [PATCH 4/4 V2 net-next] net: mana: Assigning IRQ affinity on HT cores
-Date: Mon, 22 Jan 2024 08:00:59 -0800
-Message-Id: <1705939259-2859-5-git-send-email-schakrabarti@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1705939259-2859-1-git-send-email-schakrabarti@linux.microsoft.com>
-References: <1705939259-2859-1-git-send-email-schakrabarti@linux.microsoft.com>
+	s=arc-20240116; t=1705939481; c=relaxed/simple;
+	bh=LQYoESU7xerC3BkodB2VTvJv0urwsX6r0veVIJG7Unk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=In7OKXn5uzMGPd+egpnx28OCGRv8ahrHRHhELuOJZCRxSpLS5kv+FATrr8S32kRIi2gSK+np/3JcsDUaw4SWtLJtbckGlMawJyeBJnW1WJQTBpxvYd0RGs3kew04Gcy1CoTw7rI7CyCLE3DR+A3O13KS19gIJV2RakoA1bnOtXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=a3n75wVq; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=Fby4dc1Suk6EB1Xeu8J3YVmpMVpj8AzcbM0Glo3ehlA=; b=a3n75wVqsJWKY9jmFCiF3BQLse
+	jpHMlu7C/fU9Pekbp7ixiRpn1TgtmgQF5jyuS1fe5Q/E8MVzFa2yVjZrFxeeQ+888Wj9PB7oYTq4N
+	8nkTfjm2lNfL7reU0TpbjzgvC1mLySE4f0TXASfs3RIU/4L/odKBprX3jYJCxphHedwSI23+5PANo
+	F/Eq7YKu5C1yLJWe2LWXZPAG6C4DJGIWpB0qTMak77nwoFp86nhx7p16FBBEhc2DfVuJfah4lG8YH
+	qDTHkLe+fn5/ZMM5o2ubcvtR8+E7oW9oJv/1ldyfZgPEAKAeimDVE5vdS+NZ6gA7kAcERrL+ADEnj
+	aQmicc2g==;
+Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rRwml-00000000LaV-1Ff1;
+	Mon, 22 Jan 2024 16:04:31 +0000
+Date: Mon, 22 Jan 2024 16:04:31 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: "zhangpeng (AS)" <zhangpeng362@huawei.com>
+Cc: linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+	netdev@vger.kernel.org, akpm@linux-foundation.org,
+	edumazet@google.com, davem@davemloft.net, dsahern@kernel.org,
+	kuba@kernel.org, pabeni@redhat.com, arjunroy@google.com,
+	wangkefeng.wang@huawei.com
+Subject: SECURITY PROBLEM: Any user can crash the kernel with TCP ZEROCOPY
+Message-ID: <Za6SD48Zf0CXriLm@casper.infradead.org>
+References: <20240119092024.193066-1-zhangpeng362@huawei.com>
+ <Zap7t9GOLTM1yqjT@casper.infradead.org>
+ <5106a58e-04da-372a-b836-9d3d0bd2507b@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5106a58e-04da-372a-b836-9d3d0bd2507b@huawei.com>
 
-Existing MANA design assigns IRQ to every CPU, including sibling
-hyper-threads. This may cause multiple IRQs to be active simultaneously
-in the same core and may reduce the network performance.
+I'm disappointed to have no reaction from netdev so far.  Let's see if a
+more exciting subject line evinces some interest.
 
-Improve the performance by assigning IRQ to non sibling CPUs in local
-NUMA node. The performance improvement we are getting using ntttcp with
-following patch is around 15 percent against existing design and
-approximately 11 percent, when trying to assign one IRQ in each core
-across NUMA nodes, if enough cores are present.
-The change will improve the performance for the system
-with high number of CPU, where number of CPUs in a node is more than
-64 CPUs. Nodes with 64 CPUs or less than 64 CPUs will not be affected
-by this change.
-
-The performance study was done using ntttcp tool in Azure.
-The node had 2 nodes with 32 cores each, total 128 vCPU and number of channels
-were 32 for 32 RX rings.
-
-The below table shows a comparison between existing design and new
-design:
-
-IRQ   node-num    core-num   CPU        performance(%)
-1      0 | 0       0 | 0     0 | 0-1     0
-2      0 | 0       0 | 1     1 | 2-3     3
-3      0 | 0       1 | 2     2 | 4-5     10
-4      0 | 0       1 | 3     3 | 6-7     15
-5      0 | 0       2 | 4     4 | 8-9     15
----
----
-25     0 | 0       12| 24    24| 48-49   12
----
-32     0 | 0       15| 31    31| 62-63   12
-33     0 | 0       16| 0     32| 0-1     10
----
-64     0 | 0       31| 31    63| 62-63   0
-
-Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
----
- .../net/ethernet/microsoft/mana/gdma_main.c   | 61 +++++++++++++++----
- 1 file changed, 50 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-index 05a0ac054823..1332db9a08eb 100644
---- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-@@ -1249,7 +1249,7 @@ void mana_gd_free_res_map(struct gdma_resource *r)
- 	r->size = 0;
- }
- 
--static __maybe_unused int irq_setup(unsigned int *irqs, unsigned int len, int node)
-+static int irq_setup(unsigned int *irqs, unsigned int len, int node)
- {
- 	const struct cpumask *next, *prev = cpu_none_mask;
- 	cpumask_var_t cpus __free(free_cpumask_var);
-@@ -1280,13 +1280,16 @@ static __maybe_unused int irq_setup(unsigned int *irqs, unsigned int len, int no
- 
- static int mana_gd_setup_irqs(struct pci_dev *pdev)
- {
--	unsigned int max_queues_per_port = num_online_cpus();
- 	struct gdma_context *gc = pci_get_drvdata(pdev);
-+	unsigned int max_queues_per_port;
- 	struct gdma_irq_context *gic;
- 	unsigned int max_irqs, cpu;
--	int nvec, irq;
-+	int start_irq_index = 1;
-+	int nvec, *irqs, irq;
- 	int err, i = 0, j;
- 
-+	cpus_read_lock();
-+	max_queues_per_port = num_online_cpus();
- 	if (max_queues_per_port > MANA_MAX_NUM_QUEUES)
- 		max_queues_per_port = MANA_MAX_NUM_QUEUES;
- 
-@@ -1294,8 +1297,18 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
- 	max_irqs = max_queues_per_port + 1;
- 
- 	nvec = pci_alloc_irq_vectors(pdev, 2, max_irqs, PCI_IRQ_MSIX);
--	if (nvec < 0)
-+	if (nvec < 0) {
-+		cpus_read_unlock();
- 		return nvec;
-+	}
-+	if (nvec <= num_online_cpus())
-+		start_irq_index = 0;
-+
-+	irqs = kmalloc_array((nvec - start_irq_index), sizeof(int), GFP_KERNEL);
-+	if (!irqs) {
-+		err = -ENOMEM;
-+		goto free_irq_vector;
-+	}
- 
- 	gc->irq_contexts = kcalloc(nvec, sizeof(struct gdma_irq_context),
- 				   GFP_KERNEL);
-@@ -1323,17 +1336,41 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
- 			goto free_irq;
- 		}
- 
--		err = request_irq(irq, mana_gd_intr, 0, gic->name, gic);
--		if (err)
--			goto free_irq;
--
--		cpu = cpumask_local_spread(i, gc->numa_node);
--		irq_set_affinity_and_hint(irq, cpumask_of(cpu));
-+		if (!i) {
-+			err = request_irq(irq, mana_gd_intr, 0, gic->name, gic);
-+			if (err)
-+				goto free_irq;
-+
-+			/* If number of IRQ is one extra than number of online CPUs,
-+			 * then we need to assign IRQ0 (hwc irq) and IRQ1 to
-+			 * same CPU.
-+			 * Else we will use different CPUs for IRQ0 and IRQ1.
-+			 * Also we are using cpumask_local_spread instead of
-+			 * cpumask_first for the node, because the node can be
-+			 * mem only.
-+			 */
-+			if (start_irq_index) {
-+				cpu = cpumask_local_spread(i, gc->numa_node);
-+				irq_set_affinity_and_hint(irq, cpumask_of(cpu));
-+			} else {
-+				irqs[start_irq_index] = irq;
-+			}
-+		} else {
-+			irqs[i - start_irq_index] = irq;
-+			err = request_irq(irqs[i - start_irq_index], mana_gd_intr, 0,
-+					  gic->name, gic);
-+			if (err)
-+				goto free_irq;
-+		}
- 	}
- 
-+	err = irq_setup(irqs, (nvec - start_irq_index), gc->numa_node);
-+	if (err)
-+		goto free_irq;
-+
- 	gc->max_num_msix = nvec;
- 	gc->num_msix_usable = nvec;
--
-+	cpus_read_unlock();
- 	return 0;
- 
- free_irq:
-@@ -1346,8 +1383,10 @@ static int mana_gd_setup_irqs(struct pci_dev *pdev)
- 	}
- 
- 	kfree(gc->irq_contexts);
-+	kfree(irqs);
- 	gc->irq_contexts = NULL;
- free_irq_vector:
-+	cpus_read_unlock();
- 	pci_free_irq_vectors(pdev);
- 	return err;
- }
--- 
-2.34.1
-
+On Sat, Jan 20, 2024 at 02:46:49PM +0800, zhangpeng (AS) wrote:
+> On 2024/1/19 21:40, Matthew Wilcox wrote:
+> 
+> > On Fri, Jan 19, 2024 at 05:20:24PM +0800, Peng Zhang wrote:
+> > > Recently, we discovered a syzkaller issue that triggers
+> > > VM_BUG_ON_FOLIO in filemap_unaccount_folio() with CONFIG_DEBUG_VM
+> > > enabled, or bad page without CONFIG_DEBUG_VM.
+> > > 
+> > > The specific scenarios are as follows:
+> > > (1) mmap: Use socket fd to create a TCP VMA.
+> > > (2) open(O_CREAT) + fallocate + sendfile: Read the ext4 file and create
+> > > the page cache. The mapping of the page cache is ext4 inode->i_mapping.
+> > > Send the ext4 page cache to the socket fd through sendfile.
+> > > (3) getsockopt TCP_ZEROCOPY_RECEIVE: Receive the ext4 page cache and use
+> > > vm_insert_pages() to insert the ext4 page cache to the TCP VMA. In this
+> > > case, mapcount changes from - 1 to 0. The page cache mapping is ext4
+> > > inode->i_mapping, but the VMA of the page cache is the TCP VMA and
+> > > folio->mapping->i_mmap is empty.
+> > I think this is the bug.  We shouldn't be incrementing the mapcount
+> > in this scenario.  Assuming we want to support doing this at all and
+> > we don't want to include something like ...
+> > 
+> > 	if (folio->mapping) {
+> > 		if (folio->mapping != vma->vm_file->f_mapping)
+> > 			return -EINVAL;
+> > 		if (page_to_pgoff(page) != linear_page_index(vma, address))
+> > 			return -EINVAL;
+> > 	}
+> > 
+> > But maybe there's a reason for networking needing to map pages in this
+> > scenario?
+> 
+> Agreed, and I'm also curious why.
+> 
+> > > (4) open(O_TRUNC): Deletes the ext4 page cache. In this case, the page
+> > > cache is still in the xarray tree of mapping->i_pages and these page
+> > > cache should also be deleted. However, folio->mapping->i_mmap is empty.
+> > > Therefore, truncate_cleanup_folio()->unmap_mapping_folio() can't unmap
+> > > i_mmap tree. In filemap_unaccount_folio(), the mapcount of the folio is
+> > > 0, causing BUG ON.
+> > > 
+> > > Syz log that can be used to reproduce the issue:
+> > > r3 = socket$inet_tcp(0x2, 0x1, 0x0)
+> > > mmap(&(0x7f0000ff9000/0x4000)=nil, 0x4000, 0x0, 0x12, r3, 0x0)
+> > > r4 = socket$inet_tcp(0x2, 0x1, 0x0)
+> > > bind$inet(r4, &(0x7f0000000000)={0x2, 0x4e24, @multicast1}, 0x10)
+> > > connect$inet(r4, &(0x7f00000006c0)={0x2, 0x4e24, @empty}, 0x10)
+> > > r5 = openat$dir(0xffffffffffffff9c, &(0x7f00000000c0)='./file0\x00',
+> > > 0x181e42, 0x0)
+> > > fallocate(r5, 0x0, 0x0, 0x85b8)
+> > > sendfile(r4, r5, 0x0, 0x8ba0)
+> > > getsockopt$inet_tcp_TCP_ZEROCOPY_RECEIVE(r4, 0x6, 0x23,
+> > > &(0x7f00000001c0)={&(0x7f0000ffb000/0x3000)=nil, 0x3000, 0x0, 0x0, 0x0,
+> > > 0x0, 0x0, 0x0, 0x0}, &(0x7f0000000440)=0x40)
+> > > r6 = openat$dir(0xffffffffffffff9c, &(0x7f00000000c0)='./file0\x00',
+> > > 0x181e42, 0x0)
+> > > 
+> > > In the current TCP zerocopy scenario, folio will be released normally .
+> > > When the process exits, if the page cache is truncated before the
+> > > process exits, BUG ON or Bad page occurs, which does not meet the
+> > > expectation.
+> > > To fix this issue, the mapping_mapped() check is added to
+> > > filemap_unaccount_folio(). In addition, to reduce the impact on
+> > > performance, no lock is added when mapping_mapped() is checked.
+> > NAK this patch, you're just preventing the assertion from firing.
+> > I think there's a deeper problem here.
+> 
+> -- 
+> Best Regards,
+> Peng
+> 
+> 
 
