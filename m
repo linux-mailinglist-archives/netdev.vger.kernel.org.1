@@ -1,127 +1,92 @@
-Return-Path: <netdev+bounces-64840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64841-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E4ED8373C9
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 21:31:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC8F48373D9
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 21:34:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB0471C21168
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 20:31:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95711284669
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 20:34:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0F64210FB;
-	Mon, 22 Jan 2024 20:31:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 776C72AD39;
+	Mon, 22 Jan 2024 20:34:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nrLzox2x"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W9UdbUfW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 362E82CA8
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 20:31:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50C841DFE5;
+	Mon, 22 Jan 2024 20:34:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705955479; cv=none; b=YJL5k5ezc9ZzDmQSgOZJf1U0WnaLNXXPgUylihmQxQP79HOXM/SAuLEJXwiL6o6iDDDn4HXfMrzX+UBMxAk+/X3w7lyuuovHpR7U3fhO4jms4NFKdA+gOkJnosvBX0oktUdF0tKPfn9ezUkCvNc1BLviPkgDYH5nBzZ1WEz1tBM=
+	t=1705955690; cv=none; b=LiAOQObKT3hik4wtzoiRzrpgZfrUDFed0YZeKRV3tFACdOgxChu34LQNsU9YQp/aJZSksPvNgnQqaHVHyQAPqgairWd005ZxrxYoXRY6h2MSBbgHToIi+6WN0QTgQMH/tD4X+WU/J/F0Lzv/6ClCzZvN0tREMuWS/Ftyz81SaAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705955479; c=relaxed/simple;
-	bh=4PawHpWZBteYPGQoAKR1nj6H0GXT78vwoPghFictrPc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=m7MclyqOyJLRCynIGTnTrhkSZszmAh+RJkOcSEacutIzYi9phT1FUcvff2kuUShnvgrGzuGWtqlyswZch+7u9tFixhfGJvwEpqoXkw4psyCVlYJkBQSbP2DqnY/1YMo9KVkspVbmkn2oCaUSpM3rAF5LyH8WLDd9dwSCfdaJxEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nrLzox2x; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-40e800461baso43294065e9.3
-        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 12:31:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705955476; x=1706560276; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4PawHpWZBteYPGQoAKR1nj6H0GXT78vwoPghFictrPc=;
-        b=nrLzox2xn40rI/LIcp2BNB9cZNqOnmH/nFEoAlcuGG12dwkulARPIWG2fhABxkng1q
-         pJgvSWKonMB9wUzaDSNf7FVJQROrlSxHl57VFIfXz1dROwl/y5puslY39YjH3eX0WzNi
-         5aiGBPtQ/XcJfdMJjsc1fTTsRT0bKI26JHzi/6BnAlRUMnUxdThuC3XtjZkz12ZbLtCT
-         zHQZ/p+enfkWgNdQAtvgf41J6wkQJIwL0h0I0+WqhqY+hBs75s1apHt839oCpR98CwxF
-         RfRS1QzqkQTPRirRHZh6KMZBUQRnFHYtcudYCzjjRtJpd7moksFPgDvH4phAkJg1tu5J
-         20/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705955476; x=1706560276;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4PawHpWZBteYPGQoAKR1nj6H0GXT78vwoPghFictrPc=;
-        b=qcH2lmBBtyaUSlbXqA3fIlLfdoUItN2DEERsdl7Se8AmNovfm34+jf8di2vhyjKxyF
-         FCrkNki2ruI6JyBS8GQKQuj2zSKvPd2tdCEeQarzbBWyZKsE+fXCZyLA2zAzQZ5R83cP
-         vDtpPUM/q/7Ox0Ac3CbXy3cJ4xhGUsDsP4CUKqSDRgBvWlxi19t7k28LSCQN9U2Tm56e
-         Z4wx2Qc+Uuugk2+keq07vfGmLf6T3jcyYFgL3xMS5tmtJOmbtNNRWdf4hAP2AK1AzK4W
-         rwqJF4toqq4vOmMwEo12e37IQ0fVMaV4kCzbTwFW3xk5vJLZ0lEGLJzXUyw/qV+wovZH
-         jDSA==
-X-Gm-Message-State: AOJu0YzzG5ilYFGUZaIAxhC7WhB7qzWJYlwc08916NMn+7l7EWFXxrca
-	umu5SGyao0wbCv+gwgkPrTJJ4Ub+y3M7cTS/nsqAUzlPr8HtQYo/
-X-Google-Smtp-Source: AGHT+IGLHN2zHb8cuiVahaqmB0V5MhppFDh06WTOY9us6NzwG0zZaVSoOyNkawXSXGJT6c+KwAJiyQ==
-X-Received: by 2002:a05:600c:4285:b0:40c:dda4:3582 with SMTP id v5-20020a05600c428500b0040cdda43582mr1238578wmc.314.1705955476018;
-        Mon, 22 Jan 2024 12:31:16 -0800 (PST)
-Received: from ?IPV6:2001:b07:646f:4a4d:e17a:bd08:d035:d8c2? ([2001:b07:646f:4a4d:e17a:bd08:d035:d8c2])
-        by smtp.gmail.com with ESMTPSA id g4-20020a05600c310400b0040e88d1422esm20084144wmo.31.2024.01.22.12.31.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Jan 2024 12:31:15 -0800 (PST)
-Message-ID: <ca02156a-16e3-499b-a0b2-e4bdccaeca97@gmail.com>
-Date: Mon, 22 Jan 2024 21:31:59 +0100
+	s=arc-20240116; t=1705955690; c=relaxed/simple;
+	bh=V5cmoTuULoWNYm46a6ywQDlkSQMsgm/OdPOrANJiJVo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RypjqbU3R+Bthdl0/mTHXBSTiIRCL42d7dX4gVnjthOyk28P4kbDqHLTW999/C4KhbF4r94pULBdsJKF4hsP4IeZ6aF7cfZIdY/eZuVtVyWjt2xFbmfZaDWipFE4raxDV7iQkvzk0GhV/Pq8iubz8AsK7IMUvnD6olUk2idBC0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W9UdbUfW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0B4DC433A6;
+	Mon, 22 Jan 2024 20:34:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705955689;
+	bh=V5cmoTuULoWNYm46a6ywQDlkSQMsgm/OdPOrANJiJVo=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=W9UdbUfWnmEKRK9+KT2odx42x8+09Geh810AJ5mYzAeJQPSAu+5dn6g0s4O+2re4X
+	 gvoQo/19dBlOZup43iTh2+xVBX5EdUuI/+gg93spmSCKMVwrhczXtCTP4vvY8pFDBB
+	 YEAakBnP6OU+VylHZBWeqMsZ7ZVZGb5AKTNqfoUoynkAr8AF/Mz+LOP6Y8ZSBGYKwC
+	 xxPmX+6MbIXNVjJQxyqNwP/xsSF7K8JnC0b1giihwELpDo+ATssoIxKWAaN+GuJMmW
+	 tWpnk0MebpvwobkMEwgXBhDYjgxbsOjse1QgQWcH/EYb41jfOnufXWeBwyrxQ6+EBl
+	 Vrs19j4LcVFSw==
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-55817a12ad8so3881494a12.2;
+        Mon, 22 Jan 2024 12:34:49 -0800 (PST)
+X-Gm-Message-State: AOJu0Yy0zDhGbIQyewuK1RsOj4KmcVY0TOEdQUUMuIvby0IB821raRxQ
+	XPszGmsBUGQ1HZ3nV4okkMRquXoVQOHrh3REXN2OaXOOvhu7cPfeZFC4YV3jFhlfwqO8WdEzWHP
+	zuvoSwjx8BuU1DYz6rxox4LIkcVw=
+X-Google-Smtp-Source: AGHT+IG85Eoeg9WBFX8KzgBjG4JF6JfnLT+fdMlItTYbC035wmY/ToxDKMxonv/slZ9MnxD+r1bilt0/EYdum+117zk=
+X-Received: by 2002:a17:906:2683:b0:a28:b71d:6801 with SMTP id
+ t3-20020a170906268300b00a28b71d6801mr2651916ejc.149.1705955688198; Mon, 22
+ Jan 2024 12:34:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/3] tools: ynl: add encoding support for
- 'sub-message' to ynl
-Content-Language: en-US
-To: Breno Leitao <leitao@debian.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, donald.hunter@gmail.com, sdf@google.com,
- chuck.lever@oracle.com, lorenzo@kernel.org, jacob.e.keller@intel.com,
- jiri@resnulli.us, netdev@vger.kernel.org
-References: <cover.1705950652.git.alessandromarcolini99@gmail.com>
- <0eedc19860e9b84f105c57d17219b3d0af3100d2.1705950652.git.alessandromarcolini99@gmail.com>
- <Za7GBaCiE+LUv6ZZ@gmail.com>
-From: Alessandro Marcolini <alessandromarcolini99@gmail.com>
-In-Reply-To: <Za7GBaCiE+LUv6ZZ@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20240122-topic-qdf_cleanup_net-v1-1-caf0d9c4408a@linaro.org>
+In-Reply-To: <20240122-topic-qdf_cleanup_net-v1-1-caf0d9c4408a@linaro.org>
+From: Timur Tabi <timur@kernel.org>
+Date: Mon, 22 Jan 2024 14:34:11 -0600
+X-Gmail-Original-Message-ID: <CAOZdJXXCmZi8Qx-y2D_NhJiafnGhvma2OY6F+KauqYcNAAQNCQ@mail.gmail.com>
+Message-ID: <CAOZdJXXCmZi8Qx-y2D_NhJiafnGhvma2OY6F+KauqYcNAAQNCQ@mail.gmail.com>
+Subject: Re: [PATCH] net: ethernet: qualcomm: Remove QDF24xx support
+To: Konrad Dybcio <konrad.dybcio@linaro.org>
+Cc: Timur Tabi <timur@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Marijn Suijten <marijn.suijten@somainline.org>, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 1/22/24 20:46, Breno Leitao wrote:
-> This is a bit hard to read.
+On Mon, Jan 22, 2024 at 6:02=E2=80=AFAM Konrad Dybcio <konrad.dybcio@linaro=
+.org> wrote:
 >
-> Is it possible to make it a bit easier to read?
+> This SoC family was destined for server use, featuring Qualcomm's very
+> interesting Kryo cores (before "Kryo" became a marketing term for Arm
+> cores with small modifications). It did however not leave the labs of
+> Qualcomm and presumably some partners, nor was it ever productized.
+>
+> Remove the related drivers, as they seem to be long obsolete.
+>
+> Signed-off-by: Konrad Dybcio <konrad.dybcio@linaro.org>
 
-Hi! Yes, an easier to read version could be:
+Sad day indeed, but understandable.
 
-diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-index f8c56944f7e7..d837e769c5bf 100644
---- a/tools/net/ynl/lib/ynl.py
-+++ b/tools/net/ynl/lib/ynl.py
-@@ -459,12 +459,13 @@ class YnlFamily(SpecFamily):
-             nl_type |= Netlink.NLA_F_NESTED
-             attr_payload = b''
-             # Check if it's a list of values (i.e. it contains multi-attr elements)
--            for subname, subvalue in (
--                ((k, v) for item in value for k, v in item.items())
--                if isinstance(value, list)
--                else value.items()
--            ):
--                attr_payload += self._add_attr(attr['nested-attributes'], subname, subvalue, vals)
-+            if isinstance(value, list):
-+                for item in value:
-+                    for subname, subvalue in item.items():
-+                        attr_payload += self._add_attr(attr['nested-attributes'], subname, subvalue, vals)
-+            else:
-+                for subname, subvalue in value.items():
-+                    attr_payload += self._add_attr(attr['nested-attributes'], subname, subvalue, vals)
-         elif attr["type"] == 'flag':
-             attr_payload = b''
-         elif attr["type"] == 'string':
+Acked-by: Timur Tabi <timur@kernel.org>
 
-
+If you're looking for other QDF stuff to remove, the QDF2400 hacks in
+the SBSA UART driver really should go.
 
