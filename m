@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-64640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42F7C8361E4
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 12:36:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11EA68361E5
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 12:36:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B75E01F26BBF
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 11:36:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 801EA1F23310
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 11:36:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E05713F8D9;
-	Mon, 22 Jan 2024 11:26:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3D923F8E7;
+	Mon, 22 Jan 2024 11:26:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h6FAXYo6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xLnuOsi+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 581563F8CD
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 11:26:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CE033F8DA
+	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 11:26:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705922775; cv=none; b=PRdG9IQD0JixWKiWfttJG4qViUSNSpFexjEZ1YZspX0710KahmEEc26NsE6IpKzyjgrOwfQZRbtY2dMekFs4bZfbcv6j1mbDcjkHuNsKSIg4brgLWK0af4c9hHRYABAR8NmrsGTdzLAixUMeHCfYa0iVX4X1g/Q8YFytFCxvmd0=
+	t=1705922777; cv=none; b=oib+Ynjmi0ZuSfr5qgUb0sPhhStXraM2aWKTAR3jkuENVSfSM13qpvUMWhk+cSzZuWqfzbHhdibmylddh7K2l4Uo1Qk0/+4pKZExRapJ+sSznvOmOipDkJFPyEGltjLK9OcGxC9vdckd/nVoR4hIEinqneDR+5OWcdmXi/aqEuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705922775; c=relaxed/simple;
-	bh=l9SA8v+4TFZQ8N657F5G0BhsOUUZ5R9fIn1eoQw8wnI=;
+	s=arc-20240116; t=1705922777; c=relaxed/simple;
+	bh=vxidMbCYXyFohTbN76O8AW0qy18C/53GKZu87KgqYTg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=cZM6eycZkyKHJ3gb8n2gr9rEsuN9xDp6Ge1Pteu+rpKaZOEHGbDqrmMExAqlJOOEQGbUJgqzi1k+T4FUw1cClQ+winfSgknqbbot+u5+OWvzLwcaAywt1l6xSQ0zSiUfxX3NuybTUZzhSi/xGGQiV+Tvc4W18qK/fyHhssazU60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h6FAXYo6; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=Wy0rsgvUQ2iUCHaRMzp88H/93abegf7kS9A3Wz63rSuWk3Zn6EPSInuNeSBz0BAvOnqIW2YrED2zLqM5/gvM28FGRhtxqcF+JDRZ7YTHibF/UrGx29PM/pC2tCEBuwbBIlIDUB+L0Ay3/zpCYBfN4XBjB+t3rikJWGsI/KyS2Ts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xLnuOsi+; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5f874219ff9so41218417b3.0
-        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 03:26:14 -0800 (PST)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc21b7f41a1so3761120276.2
+        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 03:26:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1705922773; x=1706527573; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1705922775; x=1706527575; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iGPEMQJW5dCocp4lvGLpK54zbiitNAk237d0lz5qykk=;
-        b=h6FAXYo6H0ZB/Y+PvaXWk1joUUVrqbtD1SFSv6I9zYwbcqJRoic+sH0wSh1oAFhYx3
-         oi0xjhxwohhydPgqM51FYtSroiG7p6KCeluB9KW/my7ZhlExfQ2BoY4ZKcPdrRrqT0y2
-         Uxw1S/tj+d6HwZ179xF2knmRQlMfEiGor9gYs60hBLAuD8Hn42wbJb4/PGMiCeTvHPUz
-         QCEl0Sq3aFv9vfxwlzJK7i1eGbxfic4mjg9HWuAJwZzZ0iHs0p9ZW7rFIVIzUpGRMXl4
-         kdH3468Bxc2wDoiD3O7oM9L5Rpydl2hLXm4knGL8IvyDoiz6ShiabI/R2qdTx0pDP0Kp
-         aa6Q==
+        bh=vxIpnoRhiJc3HKPPtqnbyr1be8f5Qn7V1jQs+qyhD2A=;
+        b=xLnuOsi+rbjBWri/Cf+62GR4W+YLR+eYJxDfpaQWwC19MfXWblgt126H5e2ElI9QTI
+         uj6fDFg51upw/FM/kqkXopVpyRmyMOTccbqB79SdKwGVlDujDAZMY+TbDXzgVdTR/Iwg
+         5jWK2S4f/Jrt7LsMas/htcGrqcxFsuKKFSK6GvzcHWcIvCJqARWNV3are4vKBPdvE/yg
+         tz1ysplu/XNkEIhtCB1b+mboH2glniw85dRXobriu28xF09ROlBKn2DYEGNMky7wd4KZ
+         coVvvP6f8i15dWzaacyiJau24xlBgk+gGo/l7IblQCLSLNFVa7ebjldLMLoTlKdkF+Nz
+         b6Ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705922773; x=1706527573;
+        d=1e100.net; s=20230601; t=1705922775; x=1706527575;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iGPEMQJW5dCocp4lvGLpK54zbiitNAk237d0lz5qykk=;
-        b=gDT96LX2o3qT2HODdSKQ+PVuzw/Te6zojxoPrKRCBR9ul1gJHJYX36767is+4mJOiL
-         fgZ5Q1RagrLi6T1Kvr5SpCEbK776iD5Y2V6xwet612Wwl9IFMIubireN/dVWKiAnh72i
-         6R7IjXKjGG94r2wgCEtXy6qxVUVQ9RZqmVnzt3YYzAG3uKe8TaycVXb15I5F+bh7eAG9
-         l6Kl5b95Hw1fUjYu5Oe3+M5JPgEE7BuUuPMKl9BfJwv5ytobYLIAZFD65HISJV+PVD+H
-         /Aw4zl0GVkwTqmNFhEpyZqypFQ/goGn6k0bjresC8uBZ/NGRWKBRGUaQUbrKR5fpMs33
-         ka0Q==
-X-Gm-Message-State: AOJu0YzP8zqQexS1RgHDQgUGjXd4Ss6978IHXWhuvB1JxWDbQQ1PxLo2
-	jc2uFG+t0IVYCHFYrSnqeydPm+wknc6t6T1VCGih68VkL3FEbzI9EhCdr6gRy+3GYD13SA4iXZl
-	UPXlIAyYMfg==
-X-Google-Smtp-Source: AGHT+IGXrU8Q1Ag+YJ0UYXKXfdKeM1SUjMWriMtXzIilF0I/ArJ13HiUG52EYkWHet08bJxi6iPB8zjyufpjfg==
+        bh=vxIpnoRhiJc3HKPPtqnbyr1be8f5Qn7V1jQs+qyhD2A=;
+        b=Df+P2oc1lD060Uj+bgeLy2ClRkirgdXQord2FdU3izZ8bDEvb3QcqHgZK4LdUknoXI
+         nsC6meTgFW425t2HM6H2ZcOS/btyYcUpk8DiAxJA4ZcT1aISVma5DoXU1H+Ju/6xRsxU
+         boGyck+lLDl7RB6dN/BNWezTComG0lU3wafEhFAspa/Q/l0UrBCRwdnTAfFT8gIrNh3q
+         /EpeoFAbpXDyN0r40B4/bfG+Sm309FZ+XaSD/6NHYgMo4L2NbQhJRxOxbaU5UH+/Xdnk
+         ESPAJ5kdgi/txWopBJXO5Lr4UJwfxML30nRtKJ6NuhA688kuxb7zW+8zBmy7Fqs+5cFK
+         oNnA==
+X-Gm-Message-State: AOJu0Yyo92iDwo57QQ0eVn5Aka11Z7fhSLQbdOQsllxW+hZbpsjznhea
+	geRC7Gv7BE87R+YKp6yGLytSfAM8QbcS6w8ceoDrWrwCKGmyPg6oErRxmp4udL2RIWUtw/mSwL+
+	7vJJgAxvp7A==
+X-Google-Smtp-Source: AGHT+IGqTIu4rzlOq2VVTvzztBL8EImU4MOHkhIBW4nGo6ZPgjnHp95J6OnPPeq+USGF3SgBU7rAW8voo/1xrQ==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a81:4c86:0:b0:5ff:6ec3:b8da with SMTP id
- z128-20020a814c86000000b005ff6ec3b8damr1728834ywa.1.1705922773405; Mon, 22
- Jan 2024 03:26:13 -0800 (PST)
-Date: Mon, 22 Jan 2024 11:25:59 +0000
+ (user=edumazet job=sendgmr) by 2002:a5b:90b:0:b0:dc2:3619:e94e with SMTP id
+ a11-20020a5b090b000000b00dc23619e94emr294710ybq.6.1705922775153; Mon, 22 Jan
+ 2024 03:26:15 -0800 (PST)
+Date: Mon, 22 Jan 2024 11:26:00 +0000
 In-Reply-To: <20240122112603.3270097-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,8 +73,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240122112603.3270097-1-edumazet@google.com>
 X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
-Message-ID: <20240122112603.3270097-6-edumazet@google.com>
-Subject: [PATCH net-next 5/9] sock_diag: add module pointer to "struct sock_diag_handler"
+Message-ID: <20240122112603.3270097-7-edumazet@google.com>
+Subject: [PATCH net-next 6/9] sock_diag: allow concurrent operations
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -83,140 +83,162 @@ Cc: David Ahern <dsahern@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
 	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Following patch is going to use RCU instead of
-sock_diag_table_mutex acquisition.
+sock_diag_broadcast_destroy_work() and __sock_diag_cmd()
+are currently using sock_diag_table_mutex to protect
+against concurrent sock_diag_handlers[] changes.
 
-This patch is a preparation, no change of behavior yet.
+This makes inet_diag dump serialized, thus less scalable
+than legacy /proc files.
+
+It is time to switch to full RCU protection.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/linux/sock_diag.h | 1 +
- net/ipv4/inet_diag.c      | 2 ++
- net/netlink/diag.c        | 1 +
- net/packet/diag.c         | 1 +
- net/smc/smc_diag.c        | 1 +
- net/tipc/diag.c           | 1 +
- net/unix/diag.c           | 1 +
- net/vmw_vsock/diag.c      | 1 +
- net/xdp/xsk_diag.c        | 1 +
- 9 files changed, 10 insertions(+)
+ net/core/sock_diag.c | 73 +++++++++++++++++++++++++-------------------
+ 1 file changed, 42 insertions(+), 31 deletions(-)
 
-diff --git a/include/linux/sock_diag.h b/include/linux/sock_diag.h
-index 0b9ecd8cf9793bc26138a0a36474e78773fb4f31..7c07754d711b9bd04bc57f8ed08981849fcadb11 100644
---- a/include/linux/sock_diag.h
-+++ b/include/linux/sock_diag.h
-@@ -13,6 +13,7 @@ struct nlmsghdr;
- struct sock;
+diff --git a/net/core/sock_diag.c b/net/core/sock_diag.c
+index c53b731f2d6728d113b90732f4df5b011a438038..72009e1f4380dfdcbf43ed08791e5039e74f5c54 100644
+--- a/net/core/sock_diag.c
++++ b/net/core/sock_diag.c
+@@ -16,7 +16,7 @@
+ #include <linux/inet_diag.h>
+ #include <linux/sock_diag.h>
  
- struct sock_diag_handler {
-+	struct module *owner;
- 	__u8 family;
- 	int (*dump)(struct sk_buff *skb, struct nlmsghdr *nlh);
- 	int (*get_info)(struct sk_buff *skb, struct sock *sk);
-diff --git a/net/ipv4/inet_diag.c b/net/ipv4/inet_diag.c
-index abf7dc9827969d7e8061420be8629730ccce5449..52ce20691e4ef1382da94473128e3c14c55bd542 100644
---- a/net/ipv4/inet_diag.c
-+++ b/net/ipv4/inet_diag.c
-@@ -1488,6 +1488,7 @@ int inet_diag_handler_get_info(struct sk_buff *skb, struct sock *sk)
+-static const struct sock_diag_handler *sock_diag_handlers[AF_MAX];
++static const struct sock_diag_handler __rcu *sock_diag_handlers[AF_MAX];
+ static int (*inet_rcv_compat)(struct sk_buff *skb, struct nlmsghdr *nlh);
+ static DEFINE_MUTEX(sock_diag_table_mutex);
+ static struct workqueue_struct *broadcast_wq;
+@@ -122,6 +122,24 @@ static size_t sock_diag_nlmsg_size(void)
+ 	       + nla_total_size_64bit(sizeof(struct tcp_info))); /* INET_DIAG_INFO */
  }
  
- static const struct sock_diag_handler inet_diag_handler = {
-+	.owner = THIS_MODULE,
- 	.family = AF_INET,
- 	.dump = inet_diag_handler_cmd,
- 	.get_info = inet_diag_handler_get_info,
-@@ -1495,6 +1496,7 @@ static const struct sock_diag_handler inet_diag_handler = {
- };
++static const struct sock_diag_handler *sock_diag_lock_handler(int family)
++{
++	const struct sock_diag_handler *handler;
++
++	rcu_read_lock();
++	handler = rcu_dereference(sock_diag_handlers[family]);
++	if (handler && !try_module_get(handler->owner))
++		handler = NULL;
++	rcu_read_unlock();
++
++	return handler;
++}
++
++static void sock_diag_unlock_handler(const struct sock_diag_handler *handler)
++{
++	module_put(handler->owner);
++}
++
+ static void sock_diag_broadcast_destroy_work(struct work_struct *work)
+ {
+ 	struct broadcast_sk *bsk =
+@@ -138,12 +156,12 @@ static void sock_diag_broadcast_destroy_work(struct work_struct *work)
+ 	if (!skb)
+ 		goto out;
  
- static const struct sock_diag_handler inet6_diag_handler = {
-+	.owner = THIS_MODULE,
- 	.family = AF_INET6,
- 	.dump = inet_diag_handler_cmd,
- 	.get_info = inet_diag_handler_get_info,
-diff --git a/net/netlink/diag.c b/net/netlink/diag.c
-index 1eeff9422856eb9006e25b21ef188280b4cff7f6..e12c90d5f6ad29446ea1990c88c19bcb0ee856c3 100644
---- a/net/netlink/diag.c
-+++ b/net/netlink/diag.c
-@@ -241,6 +241,7 @@ static int netlink_diag_handler_dump(struct sk_buff *skb, struct nlmsghdr *h)
+-	mutex_lock(&sock_diag_table_mutex);
+-	hndl = sock_diag_handlers[sk->sk_family];
+-	if (hndl && hndl->get_info)
+-		err = hndl->get_info(skb, sk);
+-	mutex_unlock(&sock_diag_table_mutex);
+-
++	hndl = sock_diag_lock_handler(sk->sk_family);
++	if (hndl) {
++		if (hndl->get_info)
++			err = hndl->get_info(skb, sk);
++		sock_diag_unlock_handler(hndl);
++	}
+ 	if (!err)
+ 		nlmsg_multicast(sock_net(sk)->diag_nlsk, skb, 0, group,
+ 				GFP_KERNEL);
+@@ -184,33 +202,26 @@ EXPORT_SYMBOL_GPL(sock_diag_unregister_inet_compat);
+ 
+ int sock_diag_register(const struct sock_diag_handler *hndl)
+ {
+-	int err = 0;
++	int family = hndl->family;
+ 
+-	if (hndl->family >= AF_MAX)
++	if (family >= AF_MAX)
+ 		return -EINVAL;
+ 
+-	mutex_lock(&sock_diag_table_mutex);
+-	if (sock_diag_handlers[hndl->family])
+-		err = -EBUSY;
+-	else
+-		WRITE_ONCE(sock_diag_handlers[hndl->family], hndl);
+-	mutex_unlock(&sock_diag_table_mutex);
+-
+-	return err;
++	return !cmpxchg((const struct sock_diag_handler **)
++				&sock_diag_handlers[family],
++			NULL, hndl) ? 0 : -EBUSY;
  }
+ EXPORT_SYMBOL_GPL(sock_diag_register);
  
- static const struct sock_diag_handler netlink_diag_handler = {
-+	.owner = THIS_MODULE,
- 	.family = AF_NETLINK,
- 	.dump = netlink_diag_handler_dump,
- };
-diff --git a/net/packet/diag.c b/net/packet/diag.c
-index 9a7980e3309d6a2950688f8b69b08c15c288f601..b3bd2f6c2bf7be7b1436aa1a7fad6ef3f77217ad 100644
---- a/net/packet/diag.c
-+++ b/net/packet/diag.c
-@@ -245,6 +245,7 @@ static int packet_diag_handler_dump(struct sk_buff *skb, struct nlmsghdr *h)
+-void sock_diag_unregister(const struct sock_diag_handler *hnld)
++void sock_diag_unregister(const struct sock_diag_handler *hndl)
+ {
+-	int family = hnld->family;
++	int family = hndl->family;
+ 
+ 	if (family >= AF_MAX)
+ 		return;
+ 
+-	mutex_lock(&sock_diag_table_mutex);
+-	BUG_ON(sock_diag_handlers[family] != hnld);
+-	WRITE_ONCE(sock_diag_handlers[family], NULL);
+-	mutex_unlock(&sock_diag_table_mutex);
++	xchg((const struct sock_diag_handler **)&sock_diag_handlers[family],
++	     NULL);
  }
+ EXPORT_SYMBOL_GPL(sock_diag_unregister);
  
- static const struct sock_diag_handler packet_diag_handler = {
-+	.owner = THIS_MODULE,
- 	.family = AF_PACKET,
- 	.dump = packet_diag_handler_dump,
- };
-diff --git a/net/smc/smc_diag.c b/net/smc/smc_diag.c
-index 52f7c4f1e7670d723a6858614f071f73dbd88dc5..32bad267fa3e2729b833cb711a6bb946bc7229d9 100644
---- a/net/smc/smc_diag.c
-+++ b/net/smc/smc_diag.c
-@@ -255,6 +255,7 @@ static int smc_diag_handler_dump(struct sk_buff *skb, struct nlmsghdr *h)
+@@ -227,20 +238,20 @@ static int __sock_diag_cmd(struct sk_buff *skb, struct nlmsghdr *nlh)
+ 		return -EINVAL;
+ 	req->sdiag_family = array_index_nospec(req->sdiag_family, AF_MAX);
+ 
+-	if (READ_ONCE(sock_diag_handlers[req->sdiag_family]) == NULL)
++	if (!rcu_access_pointer(sock_diag_handlers[req->sdiag_family]))
+ 		sock_load_diag_module(req->sdiag_family, 0);
+ 
+-	mutex_lock(&sock_diag_table_mutex);
+-	hndl = sock_diag_handlers[req->sdiag_family];
++	hndl = sock_diag_lock_handler(req->sdiag_family);
+ 	if (hndl == NULL)
+-		err = -ENOENT;
+-	else if (nlh->nlmsg_type == SOCK_DIAG_BY_FAMILY)
++		return -ENOENT;
++
++	if (nlh->nlmsg_type == SOCK_DIAG_BY_FAMILY)
+ 		err = hndl->dump(skb, nlh);
+ 	else if (nlh->nlmsg_type == SOCK_DESTROY && hndl->destroy)
+ 		err = hndl->destroy(skb, nlh);
+ 	else
+ 		err = -EOPNOTSUPP;
+-	mutex_unlock(&sock_diag_table_mutex);
++	sock_diag_unlock_handler(hndl);
+ 
+ 	return err;
  }
- 
- static const struct sock_diag_handler smc_diag_handler = {
-+	.owner = THIS_MODULE,
- 	.family = AF_SMC,
- 	.dump = smc_diag_handler_dump,
- };
-diff --git a/net/tipc/diag.c b/net/tipc/diag.c
-index 18733451c9e0c23a63d9400d408979aab46ecf19..54dde8c4e4d46d8556b9cc5396c863d24306d547 100644
---- a/net/tipc/diag.c
-+++ b/net/tipc/diag.c
-@@ -95,6 +95,7 @@ static int tipc_sock_diag_handler_dump(struct sk_buff *skb,
- }
- 
- static const struct sock_diag_handler tipc_sock_diag_handler = {
-+	.owner = THIS_MODULE,
- 	.family = AF_TIPC,
- 	.dump = tipc_sock_diag_handler_dump,
- };
-diff --git a/net/unix/diag.c b/net/unix/diag.c
-index bec09a3a1d44ce56d43e16583fdf3b417cce4033..c3648b706509653480b71ea26ec4f8462f1a3c42 100644
---- a/net/unix/diag.c
-+++ b/net/unix/diag.c
-@@ -322,6 +322,7 @@ static int unix_diag_handler_dump(struct sk_buff *skb, struct nlmsghdr *h)
- }
- 
- static const struct sock_diag_handler unix_diag_handler = {
-+	.owner = THIS_MODULE,
- 	.family = AF_UNIX,
- 	.dump = unix_diag_handler_dump,
- };
-diff --git a/net/vmw_vsock/diag.c b/net/vmw_vsock/diag.c
-index 2e29994f92ffa2facee45cd53ec791034182508c..ab87ef66c1e88765911a3b6ff89b7fc720b6d692 100644
---- a/net/vmw_vsock/diag.c
-+++ b/net/vmw_vsock/diag.c
-@@ -157,6 +157,7 @@ static int vsock_diag_handler_dump(struct sk_buff *skb, struct nlmsghdr *h)
- }
- 
- static const struct sock_diag_handler vsock_diag_handler = {
-+	.owner = THIS_MODULE,
- 	.family = AF_VSOCK,
- 	.dump = vsock_diag_handler_dump,
- };
-diff --git a/net/xdp/xsk_diag.c b/net/xdp/xsk_diag.c
-index 9f8955367275e2439d910f978fc3b2b7a1669978..09dcea0cbbed97d9a41e88224994279cfbf8c536 100644
---- a/net/xdp/xsk_diag.c
-+++ b/net/xdp/xsk_diag.c
-@@ -194,6 +194,7 @@ static int xsk_diag_handler_dump(struct sk_buff *nlskb, struct nlmsghdr *hdr)
- }
- 
- static const struct sock_diag_handler xsk_diag_handler = {
-+	.owner = THIS_MODULE,
- 	.family = AF_XDP,
- 	.dump = xsk_diag_handler_dump,
- };
+@@ -286,12 +297,12 @@ static int sock_diag_bind(struct net *net, int group)
+ 	switch (group) {
+ 	case SKNLGRP_INET_TCP_DESTROY:
+ 	case SKNLGRP_INET_UDP_DESTROY:
+-		if (!READ_ONCE(sock_diag_handlers[AF_INET]))
++		if (!rcu_access_pointer(sock_diag_handlers[AF_INET]))
+ 			sock_load_diag_module(AF_INET, 0);
+ 		break;
+ 	case SKNLGRP_INET6_TCP_DESTROY:
+ 	case SKNLGRP_INET6_UDP_DESTROY:
+-		if (!READ_ONCE(sock_diag_handlers[AF_INET6]))
++		if (!rcu_access_pointer(sock_diag_handlers[AF_INET6]))
+ 			sock_load_diag_module(AF_INET6, 0);
+ 		break;
+ 	}
 -- 
 2.43.0.429.g432eaa2c6b-goog
 
