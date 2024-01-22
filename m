@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-64641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11EA68361E5
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 12:36:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CA6A8361E7
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 12:36:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 801EA1F23310
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 11:36:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A8C91F26F15
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 11:36:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3D923F8E7;
-	Mon, 22 Jan 2024 11:26:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FFF03F8FE;
+	Mon, 22 Jan 2024 11:26:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xLnuOsi+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="We+6Dd40"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CE033F8DA
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 11:26:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D55C03F8ED
+	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 11:26:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705922777; cv=none; b=oib+Ynjmi0ZuSfr5qgUb0sPhhStXraM2aWKTAR3jkuENVSfSM13qpvUMWhk+cSzZuWqfzbHhdibmylddh7K2l4Uo1Qk0/+4pKZExRapJ+sSznvOmOipDkJFPyEGltjLK9OcGxC9vdckd/nVoR4hIEinqneDR+5OWcdmXi/aqEuc=
+	t=1705922779; cv=none; b=BmjAC5rgVnimHZBSibo5naReCCeBLYVzKa3fLgc0Bbb0zBBzwx5nVGc1+iqI0PcImeNtppkbxOJDMkiEnZmZvO2UqZzhrYZYssRi3zowD56JdSWLy2R/U5bD+V1RDIuH7PneMLY3GVOcEex6tTq5z3HGhOaDpi5h2iIKF0voxLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705922777; c=relaxed/simple;
-	bh=vxidMbCYXyFohTbN76O8AW0qy18C/53GKZu87KgqYTg=;
+	s=arc-20240116; t=1705922779; c=relaxed/simple;
+	bh=ApC04zQXIG+U7E3FSd9RmP7u5X0Hsw8NToht6h1EG5w=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Wy0rsgvUQ2iUCHaRMzp88H/93abegf7kS9A3Wz63rSuWk3Zn6EPSInuNeSBz0BAvOnqIW2YrED2zLqM5/gvM28FGRhtxqcF+JDRZ7YTHibF/UrGx29PM/pC2tCEBuwbBIlIDUB+L0Ay3/zpCYBfN4XBjB+t3rikJWGsI/KyS2Ts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xLnuOsi+; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=jaXdEERwdNc9AR1wTOn2/9m4yFC1ZdQGDT5mG+/XvKoOl1xeNkWecJhvPWDQ1XigAK2+FwJ1IG9ZCgkFjGtbKVAx6Fn5vbMIO2oEtEjSrZJ2AQjDsa+BOWNtqKuFRxV29eGuTfulFDjzs9cf/lQ5pwqaC9D7iw3ocYYPEVOR0To=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=We+6Dd40; arc=none smtp.client-ip=209.85.160.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc21b7f41a1so3761120276.2
-        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 03:26:15 -0800 (PST)
+Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-42a32dff21bso37080251cf.0
+        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 03:26:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1705922775; x=1706527575; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1705922777; x=1706527577; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vxIpnoRhiJc3HKPPtqnbyr1be8f5Qn7V1jQs+qyhD2A=;
-        b=xLnuOsi+rbjBWri/Cf+62GR4W+YLR+eYJxDfpaQWwC19MfXWblgt126H5e2ElI9QTI
-         uj6fDFg51upw/FM/kqkXopVpyRmyMOTccbqB79SdKwGVlDujDAZMY+TbDXzgVdTR/Iwg
-         5jWK2S4f/Jrt7LsMas/htcGrqcxFsuKKFSK6GvzcHWcIvCJqARWNV3are4vKBPdvE/yg
-         tz1ysplu/XNkEIhtCB1b+mboH2glniw85dRXobriu28xF09ROlBKn2DYEGNMky7wd4KZ
-         coVvvP6f8i15dWzaacyiJau24xlBgk+gGo/l7IblQCLSLNFVa7ebjldLMLoTlKdkF+Nz
-         b6Ug==
+        bh=xogYlF2oxp9dYKLsyqApeNTZyiXgwE/X6+ecmtksWFA=;
+        b=We+6Dd40me0Ea/ncT/FPdkpuXTvVIYqZWITMgvtmvcaawHf7H3JFNa319Wk3EiIwGb
+         GdhrKo6x/6cvXXU9sN1IoURuMsDLXc4BziFFKK7Y07V0SZB2AqxXo7hDi4X3raTDQnsv
+         ry5UOfJafWTwcrZ1wZ8uoZG013wBLYZGyGhVWrfdG6TxAnxSNmZUsBmUo01OmxFNP9yr
+         WdjQOR7PuECnzSuJGw7/6VDcRDD7FYNy21yvNjWKwNVUYg6elFbqXFdJJ1Jxi846dx2v
+         3t2BnAytTgApGz2HRRcmXAXNimwEFgh2CkKjJ+49kOYR12JmNuG7Y8n6/ZbZkqLZcYls
+         7i6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705922775; x=1706527575;
+        d=1e100.net; s=20230601; t=1705922777; x=1706527577;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vxIpnoRhiJc3HKPPtqnbyr1be8f5Qn7V1jQs+qyhD2A=;
-        b=Df+P2oc1lD060Uj+bgeLy2ClRkirgdXQord2FdU3izZ8bDEvb3QcqHgZK4LdUknoXI
-         nsC6meTgFW425t2HM6H2ZcOS/btyYcUpk8DiAxJA4ZcT1aISVma5DoXU1H+Ju/6xRsxU
-         boGyck+lLDl7RB6dN/BNWezTComG0lU3wafEhFAspa/Q/l0UrBCRwdnTAfFT8gIrNh3q
-         /EpeoFAbpXDyN0r40B4/bfG+Sm309FZ+XaSD/6NHYgMo4L2NbQhJRxOxbaU5UH+/Xdnk
-         ESPAJ5kdgi/txWopBJXO5Lr4UJwfxML30nRtKJ6NuhA688kuxb7zW+8zBmy7Fqs+5cFK
-         oNnA==
-X-Gm-Message-State: AOJu0Yyo92iDwo57QQ0eVn5Aka11Z7fhSLQbdOQsllxW+hZbpsjznhea
-	geRC7Gv7BE87R+YKp6yGLytSfAM8QbcS6w8ceoDrWrwCKGmyPg6oErRxmp4udL2RIWUtw/mSwL+
-	7vJJgAxvp7A==
-X-Google-Smtp-Source: AGHT+IGqTIu4rzlOq2VVTvzztBL8EImU4MOHkhIBW4nGo6ZPgjnHp95J6OnPPeq+USGF3SgBU7rAW8voo/1xrQ==
+        bh=xogYlF2oxp9dYKLsyqApeNTZyiXgwE/X6+ecmtksWFA=;
+        b=i6ycv0zn5oQgr3swOZ+42HZym0F6WjaY9l4tYY+R9XPjxwWs3Ba0yOVnYX/oPuGpqF
+         OV2H6bCbVh9tBX/tDrBCRjvcXuN+VT5xsrjVyck9zsq7WczBAgjxN+LrjgMV13VkCxns
+         RVgksB3fAdScusLE5tyXNiAJ4Sqn/iaJjAp0r0Gs1khevAWfyB2hmkc/Kx/FY67H4EBZ
+         gA+dyDDbIEo5tTFanhJ1wh3bi7YOfzSop8lFxy6wz9qZ/QTUURyM6VdfaOYZ/drYuLq3
+         HpT/3wm+DUkSww3YBAupYKY1Q/Z/+IOUdtrrgDskxnw8cgdD8h0TbsBOvB+ljQEFbUpk
+         2oig==
+X-Gm-Message-State: AOJu0YxSxmPL3rT+C5u3DOW0yueBqVvROr3kahorDpUQYFFfdQyJppUj
+	b9APAbk/qFxOJ/0Ixd5tnnYZo1e+qoxqEJcFzbO3TU4M4LADuDOltkCbJsJi3SKa8XfbPbNInYq
+	w8IrWdif5Xg==
+X-Google-Smtp-Source: AGHT+IEqUD2+x17vbjYvLJ6DIUAXhFbh3rDjVAOF2kgXXarJsZkwHizW7CJ7ToFYU3P+ZYke9xNS7vooCR3arQ==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a5b:90b:0:b0:dc2:3619:e94e with SMTP id
- a11-20020a5b090b000000b00dc23619e94emr294710ybq.6.1705922775153; Mon, 22 Jan
- 2024 03:26:15 -0800 (PST)
-Date: Mon, 22 Jan 2024 11:26:00 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:622a:5908:b0:42a:dc3:3155 with SMTP
+ id ga8-20020a05622a590800b0042a0dc33155mr668721qtb.11.1705922776925; Mon, 22
+ Jan 2024 03:26:16 -0800 (PST)
+Date: Mon, 22 Jan 2024 11:26:01 +0000
 In-Reply-To: <20240122112603.3270097-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,8 +73,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240122112603.3270097-1-edumazet@google.com>
 X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
-Message-ID: <20240122112603.3270097-7-edumazet@google.com>
-Subject: [PATCH net-next 6/9] sock_diag: allow concurrent operations
+Message-ID: <20240122112603.3270097-8-edumazet@google.com>
+Subject: [PATCH net-next 7/9] sock_diag: allow concurrent operation in sock_diag_rcv_msg()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -83,162 +83,156 @@ Cc: David Ahern <dsahern@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
 	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-sock_diag_broadcast_destroy_work() and __sock_diag_cmd()
-are currently using sock_diag_table_mutex to protect
-against concurrent sock_diag_handlers[] changes.
+TCPDIAG_GETSOCK and DCCPDIAG_GETSOCK diag are serialized
+on sock_diag_table_mutex.
 
-This makes inet_diag dump serialized, thus less scalable
-than legacy /proc files.
+This is to make sure inet_diag module is not unloaded
+while diag was ongoing.
 
-It is time to switch to full RCU protection.
+It is time to get rid of this mutex and use RCU protection,
+allowing full parallelism.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/core/sock_diag.c | 73 +++++++++++++++++++++++++-------------------
- 1 file changed, 42 insertions(+), 31 deletions(-)
+ include/linux/sock_diag.h |  9 ++++++--
+ net/core/sock_diag.c      | 43 +++++++++++++++++++++++----------------
+ net/ipv4/inet_diag.c      |  9 ++++++--
+ 3 files changed, 40 insertions(+), 21 deletions(-)
 
+diff --git a/include/linux/sock_diag.h b/include/linux/sock_diag.h
+index 7c07754d711b9bd04bc57f8ed08981849fcadb11..110978dc9af1b19194644151af5456b8c6644cf9 100644
+--- a/include/linux/sock_diag.h
++++ b/include/linux/sock_diag.h
+@@ -23,8 +23,13 @@ struct sock_diag_handler {
+ int sock_diag_register(const struct sock_diag_handler *h);
+ void sock_diag_unregister(const struct sock_diag_handler *h);
+ 
+-void sock_diag_register_inet_compat(int (*fn)(struct sk_buff *skb, struct nlmsghdr *nlh));
+-void sock_diag_unregister_inet_compat(int (*fn)(struct sk_buff *skb, struct nlmsghdr *nlh));
++struct sock_diag_inet_compat {
++	struct module *owner;
++	int (*fn)(struct sk_buff *skb, struct nlmsghdr *nlh);
++};
++
++void sock_diag_register_inet_compat(const struct sock_diag_inet_compat *ptr);
++void sock_diag_unregister_inet_compat(const struct sock_diag_inet_compat *ptr);
+ 
+ u64 __sock_gen_cookie(struct sock *sk);
+ 
 diff --git a/net/core/sock_diag.c b/net/core/sock_diag.c
-index c53b731f2d6728d113b90732f4df5b011a438038..72009e1f4380dfdcbf43ed08791e5039e74f5c54 100644
+index 72009e1f4380dfdcbf43ed08791e5039e74f5c54..5c3666431df49b3c278ef795f11ba542247796a6 100644
 --- a/net/core/sock_diag.c
 +++ b/net/core/sock_diag.c
-@@ -16,7 +16,7 @@
- #include <linux/inet_diag.h>
+@@ -17,8 +17,9 @@
  #include <linux/sock_diag.h>
  
--static const struct sock_diag_handler *sock_diag_handlers[AF_MAX];
-+static const struct sock_diag_handler __rcu *sock_diag_handlers[AF_MAX];
- static int (*inet_rcv_compat)(struct sk_buff *skb, struct nlmsghdr *nlh);
- static DEFINE_MUTEX(sock_diag_table_mutex);
+ static const struct sock_diag_handler __rcu *sock_diag_handlers[AF_MAX];
+-static int (*inet_rcv_compat)(struct sk_buff *skb, struct nlmsghdr *nlh);
+-static DEFINE_MUTEX(sock_diag_table_mutex);
++
++static struct sock_diag_inet_compat __rcu *inet_rcv_compat;
++
  static struct workqueue_struct *broadcast_wq;
-@@ -122,6 +122,24 @@ static size_t sock_diag_nlmsg_size(void)
- 	       + nla_total_size_64bit(sizeof(struct tcp_info))); /* INET_DIAG_INFO */
+ 
+ DEFINE_COOKIE(sock_cookie);
+@@ -184,19 +185,20 @@ void sock_diag_broadcast_destroy(struct sock *sk)
+ 	queue_work(broadcast_wq, &bsk->work);
  }
  
-+static const struct sock_diag_handler *sock_diag_lock_handler(int family)
-+{
-+	const struct sock_diag_handler *handler;
-+
-+	rcu_read_lock();
-+	handler = rcu_dereference(sock_diag_handlers[family]);
-+	if (handler && !try_module_get(handler->owner))
-+		handler = NULL;
-+	rcu_read_unlock();
-+
-+	return handler;
-+}
-+
-+static void sock_diag_unlock_handler(const struct sock_diag_handler *handler)
-+{
-+	module_put(handler->owner);
-+}
-+
- static void sock_diag_broadcast_destroy_work(struct work_struct *work)
+-void sock_diag_register_inet_compat(int (*fn)(struct sk_buff *skb, struct nlmsghdr *nlh))
++void sock_diag_register_inet_compat(const struct sock_diag_inet_compat *ptr)
  {
- 	struct broadcast_sk *bsk =
-@@ -138,12 +156,12 @@ static void sock_diag_broadcast_destroy_work(struct work_struct *work)
- 	if (!skb)
- 		goto out;
- 
 -	mutex_lock(&sock_diag_table_mutex);
--	hndl = sock_diag_handlers[sk->sk_family];
--	if (hndl && hndl->get_info)
--		err = hndl->get_info(skb, sk);
+-	inet_rcv_compat = fn;
 -	mutex_unlock(&sock_diag_table_mutex);
--
-+	hndl = sock_diag_lock_handler(sk->sk_family);
-+	if (hndl) {
-+		if (hndl->get_info)
-+			err = hndl->get_info(skb, sk);
-+		sock_diag_unlock_handler(hndl);
-+	}
- 	if (!err)
- 		nlmsg_multicast(sock_net(sk)->diag_nlsk, skb, 0, group,
- 				GFP_KERNEL);
-@@ -184,33 +202,26 @@ EXPORT_SYMBOL_GPL(sock_diag_unregister_inet_compat);
- 
- int sock_diag_register(const struct sock_diag_handler *hndl)
- {
--	int err = 0;
-+	int family = hndl->family;
- 
--	if (hndl->family >= AF_MAX)
-+	if (family >= AF_MAX)
- 		return -EINVAL;
- 
--	mutex_lock(&sock_diag_table_mutex);
--	if (sock_diag_handlers[hndl->family])
--		err = -EBUSY;
--	else
--		WRITE_ONCE(sock_diag_handlers[hndl->family], hndl);
--	mutex_unlock(&sock_diag_table_mutex);
--
--	return err;
-+	return !cmpxchg((const struct sock_diag_handler **)
-+				&sock_diag_handlers[family],
-+			NULL, hndl) ? 0 : -EBUSY;
++	xchg((__force const struct sock_diag_inet_compat **)&inet_rcv_compat,
++	     ptr);
  }
- EXPORT_SYMBOL_GPL(sock_diag_register);
+ EXPORT_SYMBOL_GPL(sock_diag_register_inet_compat);
  
--void sock_diag_unregister(const struct sock_diag_handler *hnld)
-+void sock_diag_unregister(const struct sock_diag_handler *hndl)
+-void sock_diag_unregister_inet_compat(int (*fn)(struct sk_buff *skb, struct nlmsghdr *nlh))
++void sock_diag_unregister_inet_compat(const struct sock_diag_inet_compat *ptr)
  {
--	int family = hnld->family;
-+	int family = hndl->family;
- 
- 	if (family >= AF_MAX)
- 		return;
- 
 -	mutex_lock(&sock_diag_table_mutex);
--	BUG_ON(sock_diag_handlers[family] != hnld);
--	WRITE_ONCE(sock_diag_handlers[family], NULL);
+-	inet_rcv_compat = NULL;
 -	mutex_unlock(&sock_diag_table_mutex);
-+	xchg((const struct sock_diag_handler **)&sock_diag_handlers[family],
-+	     NULL);
- }
- EXPORT_SYMBOL_GPL(sock_diag_unregister);
- 
-@@ -227,20 +238,20 @@ static int __sock_diag_cmd(struct sk_buff *skb, struct nlmsghdr *nlh)
- 		return -EINVAL;
- 	req->sdiag_family = array_index_nospec(req->sdiag_family, AF_MAX);
- 
--	if (READ_ONCE(sock_diag_handlers[req->sdiag_family]) == NULL)
-+	if (!rcu_access_pointer(sock_diag_handlers[req->sdiag_family]))
- 		sock_load_diag_module(req->sdiag_family, 0);
- 
--	mutex_lock(&sock_diag_table_mutex);
--	hndl = sock_diag_handlers[req->sdiag_family];
-+	hndl = sock_diag_lock_handler(req->sdiag_family);
- 	if (hndl == NULL)
--		err = -ENOENT;
--	else if (nlh->nlmsg_type == SOCK_DIAG_BY_FAMILY)
-+		return -ENOENT;
++	const struct sock_diag_inet_compat *old;
 +
-+	if (nlh->nlmsg_type == SOCK_DIAG_BY_FAMILY)
- 		err = hndl->dump(skb, nlh);
- 	else if (nlh->nlmsg_type == SOCK_DESTROY && hndl->destroy)
- 		err = hndl->destroy(skb, nlh);
- 	else
- 		err = -EOPNOTSUPP;
--	mutex_unlock(&sock_diag_table_mutex);
-+	sock_diag_unlock_handler(hndl);
- 
- 	return err;
++	old = xchg((__force const struct sock_diag_inet_compat **)&inet_rcv_compat,
++		   NULL);
++	WARN_ON_ONCE(old != ptr);
  }
-@@ -286,12 +297,12 @@ static int sock_diag_bind(struct net *net, int group)
- 	switch (group) {
- 	case SKNLGRP_INET_TCP_DESTROY:
- 	case SKNLGRP_INET_UDP_DESTROY:
--		if (!READ_ONCE(sock_diag_handlers[AF_INET]))
-+		if (!rcu_access_pointer(sock_diag_handlers[AF_INET]))
+ EXPORT_SYMBOL_GPL(sock_diag_unregister_inet_compat);
+ 
+@@ -259,20 +261,27 @@ static int __sock_diag_cmd(struct sk_buff *skb, struct nlmsghdr *nlh)
+ static int sock_diag_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 			     struct netlink_ext_ack *extack)
+ {
++	const struct sock_diag_inet_compat *ptr;
+ 	int ret;
+ 
+ 	switch (nlh->nlmsg_type) {
+ 	case TCPDIAG_GETSOCK:
+ 	case DCCPDIAG_GETSOCK:
+-		if (inet_rcv_compat == NULL)
++
++		if (!rcu_access_pointer(inet_rcv_compat))
  			sock_load_diag_module(AF_INET, 0);
- 		break;
- 	case SKNLGRP_INET6_TCP_DESTROY:
- 	case SKNLGRP_INET6_UDP_DESTROY:
--		if (!READ_ONCE(sock_diag_handlers[AF_INET6]))
-+		if (!rcu_access_pointer(sock_diag_handlers[AF_INET6]))
- 			sock_load_diag_module(AF_INET6, 0);
- 		break;
- 	}
+ 
+-		mutex_lock(&sock_diag_table_mutex);
+-		if (inet_rcv_compat != NULL)
+-			ret = inet_rcv_compat(skb, nlh);
+-		else
+-			ret = -EOPNOTSUPP;
+-		mutex_unlock(&sock_diag_table_mutex);
++		rcu_read_lock();
++		ptr = rcu_dereference(inet_rcv_compat);
++		if (ptr && !try_module_get(ptr->owner))
++			ptr = NULL;
++		rcu_read_unlock();
++
++		ret = -EOPNOTSUPP;
++		if (ptr) {
++			ret = ptr->fn(skb, nlh);
++			module_put(ptr->owner);
++		}
+ 
+ 		return ret;
+ 	case SOCK_DIAG_BY_FAMILY:
+diff --git a/net/ipv4/inet_diag.c b/net/ipv4/inet_diag.c
+index 52ce20691e4ef1382da94473128e3c14c55bd542..2c2d8b9dd8e9bb502e52e30dffc70da36d9b1c74 100644
+--- a/net/ipv4/inet_diag.c
++++ b/net/ipv4/inet_diag.c
+@@ -1527,6 +1527,11 @@ void inet_diag_unregister(const struct inet_diag_handler *h)
+ }
+ EXPORT_SYMBOL_GPL(inet_diag_unregister);
+ 
++static const struct sock_diag_inet_compat inet_diag_compat = {
++	.owner	= THIS_MODULE,
++	.fn	= inet_diag_rcv_msg_compat,
++};
++
+ static int __init inet_diag_init(void)
+ {
+ 	const int inet_diag_table_size = (IPPROTO_MAX *
+@@ -1545,7 +1550,7 @@ static int __init inet_diag_init(void)
+ 	if (err)
+ 		goto out_free_inet;
+ 
+-	sock_diag_register_inet_compat(inet_diag_rcv_msg_compat);
++	sock_diag_register_inet_compat(&inet_diag_compat);
+ out:
+ 	return err;
+ 
+@@ -1560,7 +1565,7 @@ static void __exit inet_diag_exit(void)
+ {
+ 	sock_diag_unregister(&inet6_diag_handler);
+ 	sock_diag_unregister(&inet_diag_handler);
+-	sock_diag_unregister_inet_compat(inet_diag_rcv_msg_compat);
++	sock_diag_unregister_inet_compat(&inet_diag_compat);
+ 	kfree(inet_diag_table);
+ }
+ 
 -- 
 2.43.0.429.g432eaa2c6b-goog
 
