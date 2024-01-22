@@ -1,138 +1,125 @@
-Return-Path: <netdev+bounces-64681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2270683653C
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 15:21:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2D99836565
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 15:31:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C521728590C
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 14:21:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D5331B28B87
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 14:26:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ADAB3D39A;
-	Mon, 22 Jan 2024 14:21:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1C433D554;
+	Mon, 22 Jan 2024 14:26:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aULTBvzO"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jr1UCVj1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F3803D0AB;
-	Mon, 22 Jan 2024 14:21:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB5623D550;
+	Mon, 22 Jan 2024 14:26:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705933271; cv=none; b=jwfaoPP1RtrCADVCphMXxuEPjs1ZlIlgzU9oNIvBAgzOFjn2bE3Vn9mI3w2PDa7rmwnmGwLjc9DFBHD7yidULBwxFBdXOTF6/bfJM54a0/uDmKZvhMnf5TZCnPUWxgabY1p+tCVRoMoq2+m8Q5ztj7sxEnuZfcfjwal6s3ZpCbM=
+	t=1705933564; cv=none; b=joOAZ8IW9nB+o62ZONNKy/AnSQhOflERtW0RiYzcxwnPSbAI9j5CPAIcc+xBCW9pxQbQGjdSBFcDreWE4xth/UIFQfEQi/1kkP+bVax5usQHO+AoN6h6ICnMIvSJ/LEWzef3sIS8kVDxnp9SJJTunxU8S+hdeJiyCJJPHFy6DLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705933271; c=relaxed/simple;
-	bh=sx/SZLbzMQXRoEFA2HncNv0TFxOKZA5thjdd5ftlYe0=;
+	s=arc-20240116; t=1705933564; c=relaxed/simple;
+	bh=pjnm2lVqgNCInFj28zDKIV7ML2AgLtVB+44YgPff9vM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gCauYN+R2AovxEL+GbzfHBReJjofTmYR/97kabCpFe7qq0ckLHnggLbZHxHMjj9fDO/4MQvEC/0l1JT4aUYIjSEQUu62fs1PYwvaWrXJzZnpch28X1AeBBxIqLt2w5+NPGmQbWBE6eVZccBgoY93gsBrfUXWEqS5L1s5jP6/Sq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aULTBvzO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69F2FC43390;
-	Mon, 22 Jan 2024 14:21:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705933270;
-	bh=sx/SZLbzMQXRoEFA2HncNv0TFxOKZA5thjdd5ftlYe0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aULTBvzOcVWXQIjlnSyRyEMNDtqOjd3XEOyS8vuVrbiYHUA7YtaRnRjRc9Z9d25Sg
-	 CqrCc9VQ5U02axVUdBL8THASd0iD3CqiiczGwsv7P61HCxDSa06iAOLsKxkDi3rSsd
-	 ZIzh1VlKgWGaVRF94JjyzQaeednEnO9saZS0FFK1SI2klZPrtrs5wa6hrfwEbmz3/q
-	 kxGxwBcIBe7DQDGX/ASVUHH6GwMt/wcTDX4D9G6GpY+dVUV+761IJsAKRUVXec2mjb
-	 GnO2zyWh5L/nRHdrDKXj0npYtFpVBowpgjCjlzqfJ0ZwAij3KGddkhl1l+C3/APBSZ
-	 zplaUPlvFcPpA==
-Date: Mon, 22 Jan 2024 14:21:04 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: linux-riscv@lists.infradead.org,
-	Conor Dooley <conor.dooley@microchip.com>,
-	Daire McNamara <daire.mcnamara@microchip.com>,
-	Wolfgang Grandegger <wg@grandegger.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org
-Subject: Re: [PATCH v2 2/7] dt-bindings: can: mpfs: add missing required clock
-Message-ID: <20240122-cruelly-dainty-002081f0beb2@spud>
-References: <20240122-catty-roast-d3625dbb02fe@spud>
- <20240122-breeder-lying-0d3668d98886@spud>
- <20240122-surely-crimp-ba4a8c55106d-mkl@pengutronix.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=YUyT/JMxaOszL0D5bp2zsUK+DDoX+QzxRJC+MNOnSDz04/ACLJCLQdyPAhZ607iJ/1u6F2twvXpw0V/V3o3kw33IfA3pKV/lryz5CnRURrDh9Fcza4uBtAnJ8ckjen148HDykE6zG5cdkH4qEsaP1xRrct4S97waok44hDHo8mU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jr1UCVj1; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ZgpoVOQM8qrxQhdVveMCPFTkIxUppA0Pw9b82iO99kI=; b=jr1UCVj1Q4Bptbe9SGYAU94oiy
+	+J3vFXfAUmclOcNEKiS/+8BISG6iv9l4K7FuRewcUy5Q4BfmJFtWoYCTxooiqKP6+NnNQNfyb2kTq
+	S5M9atD4TW+8KRdWxeJUAqi4r+hRuUjIeD9Qm5yNjNBe3hPRt48tN5yplKPrGtyTTUAM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rRvEz-005jLv-Qg; Mon, 22 Jan 2024 15:25:33 +0100
+Date: Mon, 22 Jan 2024 15:25:33 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jie Luo <quic_luoj@quicinc.com>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, agross@kernel.org,
+	andersson@kernel.org, konrad.dybcio@linaro.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org, corbet@lwn.net, catalin.marinas@arm.com,
+	will@kernel.org, p.zabel@pengutronix.de, linux@armlinux.org.uk,
+	shannon.nelson@amd.com, anthony.l.nguyen@intel.com,
+	jasowang@redhat.com, brett.creeley@amd.com, rrameshbabu@nvidia.com,
+	joshua.a.hay@intel.com, arnd@arndb.de, geert+renesas@glider.be,
+	neil.armstrong@linaro.org, dmitry.baryshkov@linaro.org,
+	nfraprado@collabora.com, m.szyprowski@samsung.com, u-kumar1@ti.com,
+	jacob.e.keller@intel.com, netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, ryazanov.s.a@gmail.com,
+	ansuelsmth@gmail.com, quic_kkumarcs@quicinc.com,
+	quic_suruchia@quicinc.com, quic_soni@quicinc.com,
+	quic_pavir@quicinc.com, quic_souravp@quicinc.com,
+	quic_linchen@quicinc.com, quic_leiwei@quicinc.com
+Subject: Re: [PATCH net-next 02/20] dt-bindings: net: qcom,ppe: Add bindings
+ yaml file
+Message-ID: <6fbfc205-fffa-42bd-8019-368559db77ac@lunn.ch>
+References: <20240110114033.32575-1-quic_luoj@quicinc.com>
+ <20240110114033.32575-3-quic_luoj@quicinc.com>
+ <1d1116da-9af3-49e4-a180-cff721df5df5@linaro.org>
+ <749136bc-3db9-4b2d-a9ca-e5fb5985f639@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="DgDTawVh/uoBk6a9"
-Content-Disposition: inline
-In-Reply-To: <20240122-surely-crimp-ba4a8c55106d-mkl@pengutronix.de>
-
-
---DgDTawVh/uoBk6a9
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <749136bc-3db9-4b2d-a9ca-e5fb5985f639@quicinc.com>
 
-On Mon, Jan 22, 2024 at 02:13:16PM +0100, Marc Kleine-Budde wrote:
-> On 22.01.2024 12:19:50, Conor Dooley wrote:
-> > From: Conor Dooley <conor.dooley@microchip.com>
-> >=20
-> > The CAN controller on PolarFire SoC has an AHB peripheral clock _and_ a
-> > CAN bus clock. The bus clock was omitted when the binding was written,
-> > but is required for operation. Make up for lost time and add it.
-> >=20
-> > Cautionary tale in adding bindings without having implemented a real
-> > user for them perhaps.
-> >=20
-> > Fixes: c878d518d7b6 ("dt-bindings: can: mpfs: document the mpfs CAN con=
-troller")
-> > Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
-> > ---
-> >  .../devicetree/bindings/net/can/microchip,mpfs-can.yaml     | 6 ++++--
-> >  1 file changed, 4 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/Documentation/devicetree/bindings/net/can/microchip,mpfs-c=
-an.yaml b/Documentation/devicetree/bindings/net/can/microchip,mpfs-can.yaml
-> > index 45aa3de7cf01..01e4d4a54df6 100644
-> > --- a/Documentation/devicetree/bindings/net/can/microchip,mpfs-can.yaml
-> > +++ b/Documentation/devicetree/bindings/net/can/microchip,mpfs-can.yaml
-> > @@ -24,7 +24,9 @@ properties:
-> >      maxItems: 1
-> > =20
-> >    clocks:
-> > -    maxItems: 1
-> > +    items:
-> > +      - description: AHB peripheral clock
-> > +      - description: CAN bus clock
->=20
-> What about adding clock-names, so that the order can be checked
-> automatically?
+> > > +++ b/Documentation/devicetree/bindings/net/qcom,ppe.yaml
+> > > @@ -0,0 +1,1330 @@
+> > > +# SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
+> > > +%YAML 1.2
+> > > +---
+> > > +$id: http://devicetree.org/schemas/net/qcom,ppe.yaml#
+> > > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > > +
+> > > +title: Qualcomm Packet Process Engine Ethernet controller
+> > 
+> > Where is the ref to ethernet controllers schema?
+> Sorry, the title above is not describing the device for this dtbindings
+> correctly.  It should say "Qualcomm Packet Process Engine". The
+> reference to the schema for PPE is mentioned above.
 
-I don't personally care for doing so, but if your heart is set on having
-them, then sure.
+I think you are not correctly understanding the comment. within the
+PPE you have a collection of Ethernet interfaces. All the common
+properties for Ethernet ports are described in
 
-Cheers,
-Conor.
+Documentation/devicetree/bindings/net/ethernet-controller.yaml
 
---DgDTawVh/uoBk6a9
-Content-Type: application/pgp-signature; name="signature.asc"
+so you are expected to reference this schema.
 
------BEGIN PGP SIGNATURE-----
+> > > +description:
+> > > +  The PPE(packet process engine) is comprised of three componets, Ethernet
+> > > +  DMA, Switch core and Port wrapper, Ethernet DMA is used to transmit and
+> > > +  receive packets between Ethernet subsytem and host. The Switch core has
+> > > +  maximum 8 ports(maximum 6 front panel ports and two FIFO interfaces),
+> > > +  among which there are GMAC/XGMACs used as external interfaces and FIFO
+> > > +  interfaces connected the EDMA/EIP, The port wrapper provides connections
+> > > +  from the GMAC/XGMACS to SGMII/QSGMII/PSGMII/USXGMII/10G-BASER etc, there
+> > > +  are maximu 3 UNIPHY(PCS) instances supported by PPE.
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZa550AAKCRB4tDGHoIJi
-0mG6AQCzkwjYc3ET9xROc6H+kOYEOP7ViMXoh/nf1GZddfy7NQD+Ny8uVB9lFx5n
-5oK3FNCWB0tKkiI3fXCZswAn1hOjGA0=
-=3HmK
------END PGP SIGNATURE-----
+I think a big part of the problem here is, you have a flat
+representation of the PPE. But device tree is very hierarchical. The
+hardware itself is also probably very hierarchical. Please spend some
+timer studying other DT descriptions of similar hardware. Then throw
+away this vendor crap DT binding and start again from scratch, with a
+hierarchical description of the hardware.
 
---DgDTawVh/uoBk6a9--
+	Andrew
 
