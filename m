@@ -1,61 +1,64 @@
-Return-Path: <netdev+bounces-64561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4828835ADE
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 07:17:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17586835AE0
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 07:20:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73689287741
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 06:17:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7E80281707
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 06:20:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B369B5697;
-	Mon, 22 Jan 2024 06:17:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9A036122;
+	Mon, 22 Jan 2024 06:20:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57135D262;
-	Mon, 22 Jan 2024 06:17:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 402635C96
+	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 06:20:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705904255; cv=none; b=NjR9UTZ8K4+I9mRClejTVHzZTb+UgF7NBVj4ulysdIsDG6RR2U3ukYWOC35SmvpfeHIOD7s6ciFt9rwFX9zTbAVhrlzx6cCZYkxvXIA5mNtm+Y+ekzyeR9cbJ67vn2pM0+elVEYBr37LgDrlXCbrthGk5e4pbuI/5rwhns6sMx4=
+	t=1705904451; cv=none; b=QseS/jwJjXbP9BIcaAM60sn7CD5Dh/r1ayTjDqQaLq5DMc1wPSiF8/PZRvndkBQ/YPxtJmIDH1Cetiz97X4mB/HROvoBpYgf8YAH65CzH5Chw2Lg+FUnoXz4BGvn0VPY1lOgnm1l1S5102i73uepwk9W7XpS9vDKiZ/+8VnUWAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705904255; c=relaxed/simple;
-	bh=ZuxfKqos1iB9Had5ORFMI/UkY5m/YWXWSgmx7Txplas=;
+	s=arc-20240116; t=1705904451; c=relaxed/simple;
+	bh=v/vfuGNCxKfU9OTRJKebhw6gsWAwnYEsJaqHBkLt5bA=;
 	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=u/M401z3w99aCJlWF88hiZRX7Yx8juQt/lPz4+vYAsbXsBgDMJTfDcBlKlmPj3N0Op3XlRngD91OpZZH16+I3xZxyd0FPgvbvcIRYoWU8JIHZx/gl/Xi6Btov4iIkrI5/GcUWBctM+5ya+xQxnr6QOHO++u/obRX6tagrCQhITc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; arc=none smtp.client-ip=115.124.30.132
+	 Content-Type; b=ONJlWuff9+/E5tQYkSAHyZyzXSjhTRjhc7K4tReFgxCknJ/Zdwg/YH3A77c2Rfa2fCxKR0TsJ06WOurPhl/HvTMF710Mm96GNNHjJ+uM4AnpHAkg4EqQ/Oi6aBxOBfw19SVBT8B4uyr4GoOoyR/pqtm0t/oG9FeTVDKfwLemPLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; arc=none smtp.client-ip=115.124.30.100
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R251e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0W.1fZgZ_1705903929;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W.1fZgZ_1705903929)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0W.2.Epn_1705904439;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W.2.Epn_1705904439)
           by smtp.aliyun-inc.com;
-          Mon, 22 Jan 2024 14:12:10 +0800
-Message-ID: <1705903444.5368986-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v3 06/27] virtio_ring: introduce virtqueue_get_buf_ctx_dma()
-Date: Mon, 22 Jan 2024 14:04:04 +0800
+          Mon, 22 Jan 2024 14:20:40 +0800
+Message-ID: <1705904164.7020166-3-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH 1/1] virtio_net: Add timeout handler to avoid kernel hang
+Date: Mon, 22 Jan 2024 14:16:04 +0800
 From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
+Cc: Andrew Lunn <andrew@lunn.ch>,
+ Heng Qi <hengqi@linux.alibaba.com>,
  Paolo Abeni <pabeni@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- virtualization@lists.linux-foundation.org,
- bpf@vger.kernel.org
-References: <20231229073108.57778-1-xuanzhuo@linux.alibaba.com>
- <20231229073108.57778-7-xuanzhuo@linux.alibaba.com>
- <CACGkMEvaTr1iT1M7DXN1PNOAZPM75BGv-wTOkyqb-7Sgjshwaw@mail.gmail.com>
- <1705390340.4814627-3-xuanzhuo@linux.alibaba.com>
- <CACGkMEuo7m82cTxFSeryyYemMP8AgeKgE6kKYqoFGChTZ7KNWA@mail.gmail.com>
-In-Reply-To: <CACGkMEuo7m82cTxFSeryyYemMP8AgeKgE6kKYqoFGChTZ7KNWA@mail.gmail.com>
+ Zhu Yanjun <yanjun.zhu@intel.com>,
+ mst@redhat.com,
+ davem@davemloft.net,
+ edumazet@google.com,
+ kuba@kernel.org,
+ virtualization@lists.linux.dev,
+ netdev@vger.kernel.org,
+ Zhu Yanjun <yanjun.zhu@linux.dev>
+References: <20240115012918.3081203-1-yanjun.zhu@intel.com>
+ <ea230712e27af2c8d2d77d1087e45ecfa86abb31.camel@redhat.com>
+ <667a9520-a53f-40a2-810a-6c1e45146589@linux.dev>
+ <7dd89fc0-f31e-4f83-9c02-58ee67c2d436@linux.alibaba.com>
+ <430b899c-aed4-419d-8ae8-544bb9bec5d9@lunn.ch>
+ <64270652-8e0c-4db7-b245-b970d9588918@linux.dev>
+ <CACGkMEs18hjxiZRDT5-+PMDHkLbEyiviafGiCWsAE6CGBrj+9g@mail.gmail.com>
+ <1705895881.6990144-1-xuanzhuo@linux.alibaba.com>
+ <CACGkMEvvn76w+BZArOWK-c1gsqNNx6bH8HPoqPAqpJG_7EYntA@mail.gmail.com>
+In-Reply-To: <CACGkMEvvn76w+BZArOWK-c1gsqNNx6bH8HPoqPAqpJG_7EYntA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
@@ -64,136 +67,113 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 
-On Mon, 22 Jan 2024 12:18:51 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Tue, Jan 16, 2024 at 3:47=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
-.com> wrote:
+On Mon, 22 Jan 2024 12:16:27 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> On Mon, Jan 22, 2024 at 12:00=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibab=
+a.com> wrote:
 > >
-> > On Thu, 11 Jan 2024 16:34:09 +0800, Jason Wang <jasowang@redhat.com> wr=
+> > On Mon, 22 Jan 2024 11:14:30 +0800, Jason Wang <jasowang@redhat.com> wr=
 ote:
-> > > On Fri, Dec 29, 2023 at 3:31=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.ali=
-baba.com> wrote:
+> > > On Mon, Jan 22, 2024 at 10:12=E2=80=AFAM Zhu Yanjun <yanjun.zhu@linux=
+.dev> wrote:
 > > > >
-> > > > introduce virtqueue_get_buf_ctx_dma() to collect the dma info when
-> > > > get buf from virtio core for premapped mode.
 > > > >
-> > > > If the virtio queue is premapped mode, the virtio-net send buf may
-> > > > have many desc. Every desc dma address need to be unmap. So here we
-> > > > introduce a new helper to collect the dma address of the buffer from
-> > > > the virtio core.
+> > > > =E5=9C=A8 2024/1/20 1:29, Andrew Lunn =E5=86=99=E9=81=93:
+> > > > >>>>>        while (!virtqueue_get_buf(vi->cvq, &tmp) &&
+> > > > >>>>> -           !virtqueue_is_broken(vi->cvq))
+> > > > >>>>> +           !virtqueue_is_broken(vi->cvq)) {
+> > > > >>>>> +        if (timeout)
+> > > > >>>>> +            timeout--;
+> > > > >>>> This is not really a timeout, just a loop counter. 200 iterati=
+ons could
+> > > > >>>> be a very short time on reasonable H/W. I guess this avoid the=
+ soft
+> > > > >>>> lockup, but possibly (likely?) breaks the functionality when w=
+e need to
+> > > > >>>> loop for some non negligible time.
+> > > > >>>>
+> > > > >>>> I fear we need a more complex solution, as mentioned by Michea=
+l in the
+> > > > >>>> thread you quoted.
+> > > > >>> Got it. I also look forward to the more complex solution to thi=
+s problem.
+> > > > >> Can we add a device capability (new feature bit) such as ctrq_wa=
+it_timeout
+> > > > >> to get a reasonable timeout=EF=BC=9F
+> > > > > The usual solution to this is include/linux/iopoll.h. If you can =
+sleep
+> > > > > read_poll_timeout() otherwise read_poll_timeout_atomic().
 > > > >
-> > > > Because the BAD_RING is called (that may set vq->broken), so
-> > > > the relative "const" of vq is removed.
-> > > >
-> > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > ---
-> > > >  drivers/virtio/virtio_ring.c | 174 +++++++++++++++++++++++++------=
-----
-> > > >  include/linux/virtio.h       |  16 ++++
-> > > >  2 files changed, 142 insertions(+), 48 deletions(-)
-> > > >
-> > > > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_r=
-ing.c
-> > > > index 51d8f3299c10..1374b3fd447c 100644
-> > > > --- a/drivers/virtio/virtio_ring.c
-> > > > +++ b/drivers/virtio/virtio_ring.c
-> > > > @@ -362,6 +362,45 @@ static struct device *vring_dma_dev(const stru=
-ct vring_virtqueue *vq)
-> > > >         return vq->dma_dev;
-> > > >  }
-> > > >
-> > > > +/*
-> > > > + *     use_dma_api premapped -> do_unmap
-> > > > + *  1. false       false        false
-> > > > + *  2. true        false        true
-> > > > + *  3. true        true         false
-> > > > + *
-> > > > + * Only #3, we should return the DMA info to the driver.
+> > > > I read carefully the functions read_poll_timeout() and
+> > > > read_poll_timeout_atomic(). The timeout is set by the caller of the=
+ 2
+> > > > functions.
 > > >
-> > > Btw, I guess you meant "#3 is false" here?
+> > > FYI, in order to avoid a swtich of atomic or not, we need convert rx
+> > > mode setting to workqueue first:
 > > >
-> > > And could we reduce the size of these 3 * 3 matrices? It's usually a
-> > > hint that the code is not optmized.
+> > > https://www.mail-archive.com/virtualization@lists.linux-foundation.or=
+g/msg60298.html
+> > >
+> > > >
+> > > > As such, can we add a module parameter to customize this timeout va=
+lue
+> > > > by the user?
+> > >
+> > > Who is the "user" here, or how can the "user" know the value?
+> > >
+> > > >
+> > > > Or this timeout value is stored in device register, virtio_net driv=
+er
+> > > > will read this timeout value at initialization?
+> > >
+> > > See another thread. The design needs to be general, or you can post a=
+ RFC.
+> > >
+> > > In another thought, we've already had a tx watchdog, maybe we can have
+> > > something similar to cvq and use timeout + reset in that case.
 > >
-> > On the process of doing dma map, we force the (use_dma_api, premapped).
-> >
-> > if premapped:
-> >      virtio core skip dma map
-> > else:
-> >         if use_dma_api:
-> >                 do dma map
-> >         else:
-> >                 work with the physical address.
-> >
-> > Here we force the (premapped, do_unmap).
-> >
-> > do_unmap is an optimization. We just check this to know should we do dm=
-a unmap
-> > or not.
-> >
-> > Now, we introduced an new case, when the virtio core skip dma unmap,
-> > we may need to return the dma info to the driver. That just occur when
-> > the (premapped, do_unmap) is (true, false). Because that the (premmaped,
-> > do_unmap) may be (false, false).
-> >
-> > For the matrices, I just want to show where the do_unmap comes from.
-> > That is a optimization, we use this many places, not to check (use_dma_=
-api,
-> > premapped) on the process of doing unmap. And only for the case #3, we =
-should
-> > return the dma info to drivers.
+> > But we may block by the reset ^_^ if the device is broken?
 >
-> Ok, it tries to ease the life of the readers.
+> I mean vq reset here.
+
+I see.
+
+I mean when the deivce is broken, the vq reset also many be blocked.
+
+	void vp_modern_set_queue_reset(struct virtio_pci_modern_device *mdev, u16 =
+index)
+	{
+		struct virtio_pci_modern_common_cfg __iomem *cfg;
+
+		cfg =3D (struct virtio_pci_modern_common_cfg __iomem *)mdev->common;
+
+		vp_iowrite16(index, &cfg->cfg.queue_select);
+		vp_iowrite16(1, &cfg->queue_reset);
+
+		while (vp_ioread16(&cfg->queue_reset))
+			msleep(1);
+
+		while (vp_ioread16(&cfg->cfg.queue_enable))
+			msleep(1);
+	}
+	EXPORT_SYMBOL_GPL(vp_modern_set_queue_reset);
+
+In this function, for the broken device, we can not expect something.
+
+
 >
-> I wonder if something like
+> It looks like we have multiple goals here
 >
-> bool virtqueue_needs_unmap() can help, it can judge based on the value
-> of use_dma_api and premapped.
+> 1) avoid lockups, using workqueue + cond_resched() seems to be
+> sufficient, it has issue but nothing new
+> 2) recover from the unresponsive device, the issue for timeout is that
+> it needs to deal with false positives
 
 
-I think not too much.
+I agree.
 
-Because do_unmap is for this.
-
-
-
-+static bool vring_need_unmap(struct vring_virtqueue *vq,
-+			     struct virtio_dma_head *dma,
-+			     dma_addr_t addr, unsigned int length)
-+{
-+	if (vq->do_unmap)
-+		return true;
-
-Before this, we is to judge whether we should do unmap or not.
-After this, we is to judge whehter we should return dma info to driver or n=
-ot.
-
-If you want to simplify this function, I will say no.
-
-If you want to replace "do_unmap" with virtqueue_needs_unmap(), I will say =
-ok.
-But I think we donot need to do that.
-
-+
-+	if (!vq->premapped)
-+		return false;
-+
-+	if (!dma)
-+		return false;
-+
-+	if (unlikely(dma->next >=3D dma->num)) {
-+		BAD_RING(vq, "premapped vq: collect dma overflow: %pad %u\n",
-+			 &addr, length);
-+		return false;
-+	}
-+
-+	dma->items[dma->next].addr =3D addr;
-+	dma->items[dma->next].length =3D length;
-+
-+	++dma->next;
-+
-+	return false;
-+}
-
+But I want to add a new goal, cvq async. In the netdim, we will
+send many requests via the cvq, so the cvq async will be nice.
 
 Thanks.
 
@@ -204,9 +184,16 @@ Thanks.
 > >
 > > Thanks.
 > >
+> >
 > > >
-> > > Thanks
+> > > Thans
 > > >
+> > > >
+> > > > Zhu Yanjun
+> > > >
+> > > > >
+> > > > >       Andrew
+> > > >
 > > >
 > >
 >
