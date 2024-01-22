@@ -1,92 +1,107 @@
-Return-Path: <netdev+bounces-64744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FCC7836EF3
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:06:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03008836F10
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:09:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBD37292317
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:06:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36B9A1C25343
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:09:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6082651B8;
-	Mon, 22 Jan 2024 17:28:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88C9A3FB30;
+	Mon, 22 Jan 2024 17:34:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T5Whsgbe"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="eWTa4QXy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BAD1651AE;
-	Mon, 22 Jan 2024 17:28:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B71AB56B77;
+	Mon, 22 Jan 2024 17:34:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705944486; cv=none; b=EZVGwLJTsaAQ1ZOfkBPxQTCm//fji549OJXxA65laHcOIHSZbjWbfgpG0ZLW3PFYQahEgPFkVnUT6KVQeb/7p7/hYEdA2uI+CgyQD3atXSSi1CtwUg0zHYludQSkXJOtXdv1VB+WI3rt8dTOloyN2BGve7fTxK2xRKs5O/DIZBk=
+	t=1705944863; cv=none; b=ZYLfQdQ3xNdmh1sUpokiaESjzG1TjmgXrlgmM4AkdCUjPXuAbjIeW0Jc1DaDEBqeKKX1YJ1EZYUDVYx9GJbrMp3hiXrhngNUYE4rUpd9LbNwGO9t71ggMAcpPgjO8FODyfNZZ7ENtCziaBtTXx8LlP2r4vXuOlN5Q0+NUjNrIsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705944486; c=relaxed/simple;
-	bh=52IzLNkZxh7QhXFoV4ABbKrbI7QGTj3FNCgGcZDHDww=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SYPoBqgvMTnLEeEkHFGPDdNF7K2kxB+szXCr8nINy6JejawB4IVbRs7/UpZketMybAb2RmOopjI3O1QqSrb3JE2811prLFNMbIKq1ueS5J2QYGGj2D1wfQSF3GMsZltUZzoAg8Z44o8tqtH9X3LSf1MZq180d13ncTiAi0rKCIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T5Whsgbe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B031BC43394;
-	Mon, 22 Jan 2024 17:28:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705944485;
-	bh=52IzLNkZxh7QhXFoV4ABbKrbI7QGTj3FNCgGcZDHDww=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=T5WhsgbeEW3ZXKO2vbH5I1UYpsnZqe5JDc8V6Rov7Jf2+l7MdWyUX0FPeZTcL43/V
-	 +bkrnIMdKgWhiI3urV/0L9JZh2amhfdc1SG/luKrsXSXFt7W1n/Mqs3onHkPBPRqYX
-	 /aHnuQgdbuRFSPSipZZkoQwANsE8D31l/IDFtLMLCX8J5jsxfiyMdq6hLFM8ZOZI8A
-	 mwaMppQ+KKZOTO2fJS/zyc22CimfJRAiDoM3WMTZ9q9LuUntyG7ik9oNwrjjK39U5Y
-	 04oemuiJf5uWFZBlzTSl/BusxVckG0a9XPhwztucndTp9wnxq0Pu2dpK+mMNzO0Fyf
-	 KtN7EOem8qN1w==
-Date: Mon, 22 Jan 2024 09:28:04 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>, Netdev <netdev@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>
-Subject: Re: Kernel panic in netif_rx_internal after v6 pings between netns
-Message-ID: <20240122092804.3535b652@kernel.org>
-In-Reply-To: <5340b60d-a09a-4865-a648-d1a45e9e6d5f@kernel.org>
-References: <98724dcd-ddf3-4f78-a386-f966ffbc9528@kernel.org>
-	<CANn89iLAYXpRiGaGi+rvOZyxMfpUmW2cOg6hLhqE=+2JJS8rkw@mail.gmail.com>
-	<65c4f6a2-207f-45e0-9ec3-bad81a05b196@kernel.org>
-	<5340b60d-a09a-4865-a648-d1a45e9e6d5f@kernel.org>
+	s=arc-20240116; t=1705944863; c=relaxed/simple;
+	bh=8hedJBX60cSPOSwd7qtDOvB0MY2R5+r1VTQuSWCC+GQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EM72NKFEKVRQ+Eytw90R0ZYKoNfhwVqGk5814ivgHvQAS0KkT56FWS/jhAcLkTqx2luyV323wPjui/avoLFMzkU7ummp24WZVMnQ8MSqgNfAziPCY/vAndSNC3KUUJanouLcfb/ZdpX0XZbYZv+oA/OsfFGTFb4KRT/Kw8xa1O4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=eWTa4QXy; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=GWnT5S4Q6XzDJBRpEknqgOW0ZyLDPeI6kyNoprab2vM=; b=eWTa4QXyrVBO656lSz5cMMLRyy
+	R6pDqNNQj8yI9pfktmlDM2dJvaXnLVSst2pNMmm5eqxhxxmJB6x0wkoNQ+gbkAv7EUL0MdozU8Qee
+	H1SFbw/Y7JnA/iHu0f0//49u9J+NQqQBDQ1snFjFX75fyr78iZfOqRF5I7QNEGvK19So=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rRyBY-005kSZ-AZ; Mon, 22 Jan 2024 18:34:12 +0100
+Date: Mon, 22 Jan 2024 18:34:12 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Ziyang Huang <hzyitc@outlook.com>
+Cc: mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+	richardcochran@gmail.com, p.zabel@pengutronix.de,
+	matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
+	Praveenkumar I <ipkumar@codeaurora.org>,
+	Abhishek Sahu <absahu@codeaurora.org>
+Subject: Re: [PATCH 5/8] clk: qcom: support for duplicate freq in RCG2 freq
+ table
+Message-ID: <b84df52a-f144-4ec3-b81b-20d1a0176aff@lunn.ch>
+References: <TYZPR01MB55563BD6A2B78402E4BB44D4C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
+ <TYZPR01MB5556DEA3D4740441EC561414C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
+ <28cca132-d5bb-4cff-ba2f-9be241a5ce83@lunn.ch>
+ <TYZPR01MB55565998F43009AD351AC07EC9752@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <TYZPR01MB55565998F43009AD351AC07EC9752@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
 
-On Sat, 20 Jan 2024 18:53:50 +0100 Matthieu Baerts wrote:
-> FYI, I managed to find a commit that seems to be causing the issue:
+> > > Change-Id: I97d9e1b55d8f3ee095f6f01729af527ba90e50e5
+> > > Signed-off-by: Abhishek Sahu <absahu@codeaurora.org>
+> > > (cherry picked from commit 775e7d3b69ffc97afb5bd5a6c9c423f2f4d8a0b2)
+> > > Signed-off-by: Praveenkumar I <ipkumar@codeaurora.org>
+> > > 
+> > > Change-Id: If10193fc79a3c1375ab73597813745ff1f4df0ad
+> > > 
+> > > Pick from https://git.codelinaro.org/clo/qsdk/oss/kernel/linux-ipq-5.4/-/commit/6dfb368bae130bee58e00ddf8330b55066e1c8c5
+> > > 
+> > > Signed-off-by: Ziyang Huang <hzyitc@outlook.com>
+> > 
+> > Please clean up these tags. These Change-ID tags are meaningless in
+> > mainline. 775e7d3b69ffc97afb5bd5a6c9c423f2f4d8a0b2 is not in mainline
+> > either. The picked from might be interesting, but please put it into
+> > the body of the commit message, not mixed in with the tags.
+> > 
+> > Who actually wrote this patch? The first Signed-off-by: is from
+> > Abhishek Sahu. But you have a From of Praveenkumar I ?
 > 
->   8e791f7eba4c ("x86/kprobes: Drop removed INT3 handling code")
-> 
-> It is not clear why, but if I revert it, I can no longer reproduce the
-> issue. I reported the issue to the patch's author and the x86's ML:
-> 
-> https://lore.kernel.org/r/06cb540e-34ff-4dcd-b936-19d4d14378c9@kernel.org
-> 
-> Thank you again for your help.
+> I have no idea about this. This patch is from Qualcomm vendor linux code.
 
-Hi Matthieu!
+O.K. Since this is direct from the vendor, who probably does not track
+code authorship correctly, i would say the author in git is probably
+wrong. I would set the author: to Abhishek Sahu <absahu@codeaurora.org>.
 
-Somewhat related. What do you do currently to ignore crashes?
-I was seeing a lot of:
-https://netdev-2.bots.linux.dev/vmksft-net-mp/results/431181/vm-crash-thr0-2
+> What's more, I don't known how to deal with these commit message since I'm
+> not the author and I'm not sure do I have right to edit them even though
+> this is GPL code.
 
-So I hacked up this function to filter the crash from NIPA CI:
-https://github.com/kuba-moo/nipa/blob/master/contest/remote/lib/vm.py#L50
-It tries to get first 5 function names from the stack, to form 
-a "fingerprint". But I seem to recall a discussion at LPC's testing
-track that there are existing solutions for generating fingerprints.
-Are you aware of any?
+You should keep all the Signed-off-by, in the order they are. But the
+Change-Id is meaningless, so there is no problem removing them.
 
-(FWIW the crash from above seems to be gone on latest linux.git,
-this night's CIs run are crash-free.)
+	  Andrew
 
