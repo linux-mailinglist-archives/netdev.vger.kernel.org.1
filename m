@@ -1,130 +1,116 @@
-Return-Path: <netdev+bounces-64595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 901C7835D4E
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 09:54:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 777A6835D73
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 09:58:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A406281037
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 08:54:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 192151F253F2
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 08:58:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30C4938FBE;
-	Mon, 22 Jan 2024 08:49:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kTk+oUuT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B56639AF0;
+	Mon, 22 Jan 2024 08:57:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CB323D550
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 08:49:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24BE539AEA
+	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 08:57:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705913365; cv=none; b=a6tkCSXey+6yOIkVkboDuvDcWX85uyLNvPWuqgK1bw+zgAOurN0mh2bFFQZr137gDn+40R/4D1Rp8rRi/45FwL8t2nCYGQ6ojCAeOes3rIZ7GLvIpJjKzWZl8hBUKnQ++03iBlvcGrNDbdM2oQ5MTfcaoy7hm1sIzNbA7I42gi4=
+	t=1705913833; cv=none; b=HTVx7ytAi5QrnYXlwRj/pbzBcgt/sD9xhCSEYsZj2UF9llHZ31mhOQFkIhamnezdCb3/7rAfGPRU/qL/olH9S4YMD0odVLM9mTGHLjCM35z+k6/SZfEGXq6f/ZwWP0WtH6MV/vXMs4otoc2HizrY+wYRjp/RTuFDR5/Aw7ItEHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705913365; c=relaxed/simple;
-	bh=bNH3ZpjBAKn5TeoM1nK6+6sD5RKl/6zFsJkHG6oXOcA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cUPrphX8XrH6ythrTaxL5lbvq+PqVd9zfd+/WvUfzuRo6Kc0kYeI+0Zo2coPdFPoGoH+MHhsR6JSj9c/BHdxRIdOIlQwgHBovEwsS/nj6uV0z0z34vSdUxgwcKii9LmljXSTupbX/Tm4vO4tVO0btFiAaiesI+kbcjY2faeVoko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kTk+oUuT; arc=none smtp.client-ip=95.215.58.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <9f7eb287-543f-4865-90ca-b853e04ff126@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1705913361;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lRUsv1GPag3hvBW68P9fUo86vXVS9tXvByMFvo4Foag=;
-	b=kTk+oUuTs9giJlWOdBKKx8r081rAhh+zGj7csG9qyiKpSD4wl63zcvowgcm8CtZn/Nwa7w
-	r8Q8DGiof+Fi5lVNBXd+6LMthdA1SF4IK2fZGFojGHqmjw6y9z8xvuApt8DPH06PZstbK5
-	uMTQSkdtb7NYjFy628QGNQHtKh9eJKs=
-Date: Mon, 22 Jan 2024 16:49:07 +0800
+	s=arc-20240116; t=1705913833; c=relaxed/simple;
+	bh=1jcCvsdjNMV3GDJ4KZaJE8c1CpXgEwfJ0Xvj4k+6mek=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qoQKFfO3b65OV+iVJn13iimvhvY0/HEeAfS1q/c7PI2cxXIY4XUDrbOi4BNoWo6jfhIcQWcwt7c0fvXTBUmFyc2ZU2Xo95uuWvP2VUg45PjMNIj1Su1hPCoR96LFowrxkedY6xQsHIOyXMhQXt+HCdMlEcKTVTsrB4PUzkN13nw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.41.52] (port=45324 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1rRq6y-003Dnp-GL; Mon, 22 Jan 2024 09:56:58 +0100
+Date: Mon, 22 Jan 2024 09:56:55 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Zhengchao Shao <shaozhengchao@huawei.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	anjali.k.kulkarni@oracle.com, kuniyu@amazon.com, fw@strlen.de,
+	weiyongjun1@huawei.com, yuehaibing@huawei.com
+Subject: Re: [PATCH net,v4] netlink: fix potential sleeping issue in
+ mqueue_flush_file
+Message-ID: <Za4t110BCZAnlf1o@calendula>
+References: <20240122011807.2110357-1-shaozhengchao@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [Linux Kernel Bug] UBSAN: array-index-out-of-bounds in
- rds_cmsg_recv
-To: Randy Dunlap <rdunlap@infradead.org>, Chenyuan Yang
- <chenyuan0y@gmail.com>, santosh.shilimkar@oracle.com,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- rds-devel@oss.oracle.com, linux-kernel@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, "syzkaller@googlegroups.com"
- <syzkaller@googlegroups.com>, Zijie Zhao <zzjas98@gmail.com>
-References: <CALGdzuoVdq-wtQ4Az9iottBqC5cv9ZhcE5q8N7LfYFvkRsOVcw@mail.gmail.com>
- <27319d3d-61dd-41e3-be6c-ccc08b9b3688@linux.dev>
- <c4cd5048-1838-4464-ba79-26cc595e380f@infradead.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <c4cd5048-1838-4464-ba79-26cc595e380f@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240122011807.2110357-1-shaozhengchao@huawei.com>
+X-Spam-Score: -1.9 (-)
 
-在 2024/1/22 13:48, Randy Dunlap 写道:
-> Hi,
-> 
-> 
-> On 1/21/24 00:34, Zhu Yanjun wrote:
->> 在 2024/1/19 22:29, Chenyuan Yang 写道:
->>> Dear Linux Kernel Developers for Network RDS,
->>>
->>> We encountered "UBSAN: array-index-out-of-bounds in rds_cmsg_recv"
->>> when testing the RDS with our generated specifications. The C
->>> reproduce program and logs for this crash are attached.
->>>
->>> This crash happens when RDS receives messages by using
->>> `rds_cmsg_recv`, which reads the `j+1` index of the array
->>> `inc->i_rx_lat_trace`
->>> (https://elixir.bootlin.com/linux/v6.7/source/net/rds/recv.c#L585).
->>> The length of `inc->i_rx_lat_trace` array is 4 (defined by
->>> `RDS_RX_MAX_TRACES`,
->>> https://elixir.bootlin.com/linux/v6.7/source/net/rds/rds.h#L289) while
->>> `j` is the value stored in another array `rs->rs_rx_trace`
->>> (https://elixir.bootlin.com/linux/v6.7/source/net/rds/recv.c#L583),
->>> which is sent from others and could be arbitrary value.
->>
->> I recommend to use the latest rds to make tests. The rds in linux kernel upstream is too old. The rds in oracle linux is newer.
-> 
-> Why is the upstream kernel lagging behind?  Is the RDS maintainer going
-> to submit patches to update mainline?
+On Mon, Jan 22, 2024 at 09:18:07AM +0800, Zhengchao Shao wrote:
+> I analyze the potential sleeping issue of the following processes:
+> Thread A                                Thread B
+> ...                                     netlink_create  //ref = 1
+> do_mq_notify                            ...
+>   sock = netlink_getsockbyfilp          ...     //ref = 2
+>   info->notify_sock = sock;             ...
+> ...                                     netlink_sendmsg
+> ...                                       skb = netlink_alloc_large_skb  //skb->head is vmalloced
+> ...                                       netlink_unicast
+> ...                                         sk = netlink_getsockbyportid //ref = 3
+> ...                                         netlink_sendskb
+> ...                                           __netlink_sendskb
+> ...                                             skb_queue_tail //put skb to sk_receive_queue
+> ...                                         sock_put //ref = 2
+> ...                                     ...
+> ...                                     netlink_release
+> ...                                       deferred_put_nlk_sk //ref = 1
+> mqueue_flush_file
+>   spin_lock
+>   remove_notification
+>     netlink_sendskb
+>       sock_put  //ref = 0
+>         sk_free
+>           ...
+>           __sk_destruct
+>             netlink_sock_destruct
+>               skb_queue_purge  //get skb from sk_receive_queue
+>                 ...
+>                 __skb_queue_purge_reason
+>                   kfree_skb_reason
+>                     __kfree_skb
+>                     ...
+>                     skb_release_all
+>                       skb_release_head_state
+>                         netlink_skb_destructor
+>                           vfree(skb->head)  //sleeping while holding spinlock
+>
+> In netlink_sendmsg, if the memory pointed to by skb->head is allocated by
+> vmalloc, and is put to sk_receive_queue queue, also the skb is not freed.
+> When the mqueue executes flush, the sleeping bug will occur. Use
+> vfree_atomic instead of vfree in netlink_skb_destructor to solve the issue.
 
-When I was in Oracle and worked with RDS, I have planned to upgrade 
-kernel rds to the latest. But after I submitted several patch series, 
-Oracle Developing Center of China was shutdown. I can not finish the 
-plan. But the UEK kernel in Oracle linux has the latest RDS.
+mqueue notification is of NOTIFY_COOKIE_LEN size:
 
-If you want to make tests with rds, I recommend to use UEK kernel in 
-Oracle Linux.
+static int do_mq_notify(mqd_t mqdes, const struct sigevent *notification)
+{
+        [...]
+                if (notification->sigev_notify == SIGEV_THREAD) {
+                        long timeo;
 
-Or you can install UEK kernel in RedHat. IMO, this UEK kernel can also 
-work in RedHat Linux.
+                        /* create the notify skb */
+                        nc = alloc_skb(NOTIFY_COOKIE_LEN, GFP_KERNEL);
+                        if (!nc)
+                                return -ENOMEM;
 
-Zhu Yanjun
-
-> 
-> Thanks.
-> 
->> Zhu Yanjun
->>
->>>
->>> This crash might be exploited to read the value out-of-bound from the
->>> array by setting arbitrary values for the array `rs->rs_rx_trace`.
->>>
->>> If you have any questions or require more information, please feel
->>> free to contact us.
->>>
->>> Best,
->>> Chenyuan
->>
->>
-> 
-
+Do you have a reproducer?
 
