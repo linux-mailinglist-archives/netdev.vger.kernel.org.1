@@ -1,207 +1,174 @@
-Return-Path: <netdev+bounces-64767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 236B1837119
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:55:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DCE4837130
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:56:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A55771F30148
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:55:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F422D1F2241C
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:56:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A5D4495CD;
-	Mon, 22 Jan 2024 18:20:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 639084BAAF;
+	Mon, 22 Jan 2024 18:22:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="devtgNN0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5042148CE0;
-	Mon, 22 Jan 2024 18:20:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39ACF4BAA2;
+	Mon, 22 Jan 2024 18:22:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705947620; cv=none; b=eu0s23LbsGkJteOiZ2/mUdA7JryhAaeauaW4lSttrYK+GKynMGipMwxxwj5NAUB61zEs0b02P8jmDbEVNsYUjqh5Dwf6MNFBwFH3DvOVCLJWSDOSl6ms8b3q7bZ7Mrj+hQYDp84TWaFINQdM246fqGGsdXWSVG6fPkS38od56Bs=
+	t=1705947770; cv=none; b=jyLpvQs7Soy2obSt909wKiUwEr3LukCITKafxHaFvANWQMPHTWTLZqC+BlejT1VtHH0Uh+IHds8f7tEPjFEs1B4+Jgj73J6rHMBaC+wPk+gkcn1J0MXsTFliX/Tqyfa6B/QS7kggMRMGRZDHGbxiehtalg1j0Y5RSH5m944JHD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705947620; c=relaxed/simple;
-	bh=H5X+U/KaE3kCsYxxYIvBmg6vy/P+UIq6sIiNfpZz/ts=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=DiLVlT5jTWcr+3TVJU8ZOEOuaH7PQXGsFNmxBaDAYFIIN2kQXFa3rSAtK2jrS/pf2amCwebhI5jAnD32aKVV4ALcxvTpg4X5bGtrQb5onfDWW8+yGkAhjX66HHFPfjyt+pMGLMHLGlETcjgr1q2PSsxJmrjGXdsH94xO0m/MI0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a28fb463a28so339882166b.3;
-        Mon, 22 Jan 2024 10:20:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705947616; x=1706552416;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UfjyR+rXK8G2NXu1lb4+wObFJcorSaLJVEzfmJKuPjU=;
-        b=oeP5nZ1ZGMPcwRIXOvaoXAdFv7ZzRJ+jNmtj9GGCkmzd/Pyha7LBinYEzhEoXtBOl4
-         0KyyRLKiylf3T5MP888/ixLPTC+3eQtxcVdT2wC4v2A82wEj4wx/73HCW3b2Rczskuv2
-         Zkv0ZI3rKAXhZ363ZF/ElCNPF4jp0h3ST5bDsf2AydyMBC2orTVY4zDU/2ObKAZjq33r
-         pFnd4yR8kc9gU1axGGRbMUj/IlcDufjLlovk0+d4xdjiXmpXKUNpUggcObFYTIPawcqd
-         aKSyJxmpPFbuJdjyzBsaSW2ky0sOmtmLJVVk+dSbqZCbQsFe6f3m63OZcWlqHGIt3O7E
-         KrNg==
-X-Gm-Message-State: AOJu0YxRCPcQGqHCt/xZMeEXmYj809513B6ljnQUr5AvmBc1vuw15EC+
-	PqLT7G5T1J88JSWhHuzf94NOVri8sIZDOr8fvgHQ0/uRmADPm85x
-X-Google-Smtp-Source: AGHT+IFp4nMux3cpKUPttvT2dKkgZPEQn99mmS/+6x3l6O5kyWpWNbpNkEaip3VgsrCs2lmblRh/NQ==
-X-Received: by 2002:a17:907:c08a:b0:a2f:de73:eeb2 with SMTP id st10-20020a170907c08a00b00a2fde73eeb2mr2544713ejc.144.1705947616246;
-        Mon, 22 Jan 2024 10:20:16 -0800 (PST)
-Received: from localhost (fwdproxy-lla-007.fbsv.net. [2a03:2880:30ff:7::face:b00c])
-        by smtp.gmail.com with ESMTPSA id w17-20020a17090652d100b00a28116285e0sm9296412ejn.165.2024.01.22.10.20.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jan 2024 10:20:15 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-To: dsahern@kernel.org,
-	weiwan@google.com,
-	kuba@kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: leit@meta.com,
-	netdev@vger.kernel.org (open list:NETWORKING [IPv4/IPv6]),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH RESEND net-next 2/2] net/ipv6: resolve warning in ip6_fib.c
-Date: Mon, 22 Jan 2024 10:19:55 -0800
-Message-Id: <20240122181955.2391676-2-leitao@debian.org>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20240122181955.2391676-1-leitao@debian.org>
-References: <20240122181955.2391676-1-leitao@debian.org>
+	s=arc-20240116; t=1705947770; c=relaxed/simple;
+	bh=8ff78h9bJtx1azZLBLk1EKJHIodHEpeL9E/XnvsmPko=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZTIcHtuWv8UKxB/LHCfNvlUkeOnINtSOP4RP0ZeH3pEwUMV5rTE2FX92faiiOulte9gLBdgSvHnMbUiI13RsRsIqkbgG4u1nDoMIDt0RPWs5KD4nSrvK7LwfRbCcvPu82/oE8bRA9+ErP7YAPxH8HXBI1Rx0NYi9Tfhfgyl28Ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=devtgNN0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F03DDC433C7;
+	Mon, 22 Jan 2024 18:22:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705947770;
+	bh=8ff78h9bJtx1azZLBLk1EKJHIodHEpeL9E/XnvsmPko=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=devtgNN0jDYFRdzNk3Wt1y9JSHXhizTYMpfs8XvyYsJh9dfLHfoxM1Z7yJ73twTv9
+	 G+3t5cvDuGsFkGYFpiHtMRyHnQVVbGOuNgwNKpfCNxzhvhDFKeqdaZfWu3q7qBn5CL
+	 uQ8PBHSMsUQihpxJw2S5gzL0M0U2lbtgcFmpWUCwv7h72hA0cGwK1m6nnpiFD21dzI
+	 6xuVTQd7k0wzVzP/jkQuNHvwGfyWkebctqOKP6ySl2ynLVELSVXnm8p8OgpWpxNgEI
+	 eWYQoxLRCr0TioMTOcjOUE2hzjwXgUxn7k5J5NElOfpB2UfT1rvUgNbl/tCdcZPJxn
+	 rBNIKEoQG+/tQ==
+Message-ID: <f96b33ab-56d5-4a43-a1ff-2e68e2c55ac2@kernel.org>
+Date: Mon, 22 Jan 2024 19:22:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: Kernel panic in netif_rx_internal after v6 pings between netns
+Content-Language: en-GB, fr-BE
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, Netdev <netdev@vger.kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>
+References: <98724dcd-ddf3-4f78-a386-f966ffbc9528@kernel.org>
+ <CANn89iLAYXpRiGaGi+rvOZyxMfpUmW2cOg6hLhqE=+2JJS8rkw@mail.gmail.com>
+ <65c4f6a2-207f-45e0-9ec3-bad81a05b196@kernel.org>
+ <5340b60d-a09a-4865-a648-d1a45e9e6d5f@kernel.org>
+ <20240122092804.3535b652@kernel.org>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20240122092804.3535b652@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-In some configurations, the 'iter' variable in function
-fib6_repair_tree() is unused, resulting the following warning when
-compiled with W=1.
+Hi Jakub,
 
-    net/ipv6/ip6_fib.c:1781:6: warning: variable 'iter' set but not used [-Wunused-but-set-variable]
-     1781 |         int iter = 0;
-	  |             ^
+On 22/01/2024 18:28, Jakub Kicinski wrote:
 
-It is unclear what is the advantage of this RT6_TRACE() macro[1], since
-users can control pr_debug() in runtime, which is better than at
-compilation time. pr_debug() has no overhead when disabled.
+(...)
 
-Remove the RT6_TRACE() in favor of simple pr_debug() helpers.
+> Somewhat related. What do you do currently to ignore crashes?
 
-[1] Link: https://lore.kernel.org/all/ZZwSEJv2HgI0cD4J@gmail.com/
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- include/net/ip6_fib.h |  6 ------
- net/ipv6/ip6_fib.c    | 15 +++++++++------
- net/ipv6/route.c      |  8 ++++----
- 3 files changed, 13 insertions(+), 16 deletions(-)
+I was wondering why you wanted to ignore crashes :) ... but then I saw
+the new "Test ignored" and "Crashes ignored" sections on the status
+page. Just to be sure: you don't want to report issues that have not
+been introduced by the new patches, right?
 
-diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
-index 9ba6413fd2e3..360b12e61850 100644
---- a/include/net/ip6_fib.h
-+++ b/include/net/ip6_fib.h
-@@ -30,12 +30,6 @@
- 
- #define RT6_DEBUG 2
- 
--#if RT6_DEBUG >= 3
--#define RT6_TRACE(x...) pr_debug(x)
--#else
--#define RT6_TRACE(x...) do { ; } while (0)
--#endif
--
- struct rt6_info;
- struct fib6_info;
- 
-diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-index fb41bec6b4b5..38a0348b1d17 100644
---- a/net/ipv6/ip6_fib.c
-+++ b/net/ipv6/ip6_fib.c
-@@ -1801,7 +1801,7 @@ static struct fib6_node *fib6_repair_tree(struct net *net,
- 					    lockdep_is_held(&table->tb6_lock));
- 		struct fib6_info *new_fn_leaf;
- 
--		RT6_TRACE("fixing tree: plen=%d iter=%d\n", fn->fn_bit, iter);
-+		pr_debug("fixing tree: plen=%d iter=%d\n", fn->fn_bit, iter);
- 		iter++;
- 
- 		WARN_ON(fn->fn_flags & RTN_RTINFO);
-@@ -1864,7 +1864,8 @@ static struct fib6_node *fib6_repair_tree(struct net *net,
- 		FOR_WALKERS(net, w) {
- 			if (!child) {
- 				if (w->node == fn) {
--					RT6_TRACE("W %p adjusted by delnode 1, s=%d/%d\n", w, w->state, nstate);
-+					pr_debug("W %p adjusted by delnode 1, s=%d/%d\n",
-+						 w, w->state, nstate);
- 					w->node = pn;
- 					w->state = nstate;
- 				}
-@@ -1872,10 +1873,12 @@ static struct fib6_node *fib6_repair_tree(struct net *net,
- 				if (w->node == fn) {
- 					w->node = child;
- 					if (children&2) {
--						RT6_TRACE("W %p adjusted by delnode 2, s=%d\n", w, w->state);
-+						pr_debug("W %p adjusted by delnode 2, s=%d\n",
-+							 w, w->state);
- 						w->state = w->state >= FWS_R ? FWS_U : FWS_INIT;
- 					} else {
--						RT6_TRACE("W %p adjusted by delnode 2, s=%d\n", w, w->state);
-+						pr_debug("W %p adjusted by delnode 2, s=%d\n",
-+							 w, w->state);
- 						w->state = w->state >= FWS_C ? FWS_U : FWS_INIT;
- 					}
- 				}
-@@ -1951,7 +1954,7 @@ static void fib6_del_route(struct fib6_table *table, struct fib6_node *fn,
- 	read_lock(&net->ipv6.fib6_walker_lock);
- 	FOR_WALKERS(net, w) {
- 		if (w->state == FWS_C && w->leaf == rt) {
--			RT6_TRACE("walker %p adjusted by delroute\n", w);
-+			pr_debug("walker %p adjusted by delroute\n", w);
- 			w->leaf = rcu_dereference_protected(rt->fib6_next,
- 					    lockdep_is_held(&table->tb6_lock));
- 			if (!w->leaf)
-@@ -2289,7 +2292,7 @@ static int fib6_age(struct fib6_info *rt, void *arg)
- 
- 	if (rt->fib6_flags & RTF_EXPIRES && rt->expires) {
- 		if (time_after(now, rt->expires)) {
--			RT6_TRACE("expiring %p\n", rt);
-+			pr_debug("expiring %p\n", rt);
- 			return -1;
- 		}
- 		gc_args->more++;
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index ea1dec8448fc..63b4c6056582 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -2085,12 +2085,12 @@ static void rt6_age_examine_exception(struct rt6_exception_bucket *bucket,
- 	 */
- 	if (!(rt->rt6i_flags & RTF_EXPIRES)) {
- 		if (time_after_eq(now, rt->dst.lastuse + gc_args->timeout)) {
--			RT6_TRACE("aging clone %p\n", rt);
-+			pr_debug("aging clone %p\n", rt);
- 			rt6_remove_exception(bucket, rt6_ex);
- 			return;
- 		}
- 	} else if (time_after(jiffies, rt->dst.expires)) {
--		RT6_TRACE("purging expired route %p\n", rt);
-+		pr_debug("purging expired route %p\n", rt);
- 		rt6_remove_exception(bucket, rt6_ex);
- 		return;
- 	}
-@@ -2101,8 +2101,8 @@ static void rt6_age_examine_exception(struct rt6_exception_bucket *bucket,
- 		neigh = __ipv6_neigh_lookup_noref(rt->dst.dev, &rt->rt6i_gateway);
- 
- 		if (!(neigh && (neigh->flags & NTF_ROUTER))) {
--			RT6_TRACE("purging route %p via non-router but gateway\n",
--				  rt);
-+			pr_debug("purging route %p via non-router but gateway\n",
-+				 rt);
- 			rt6_remove_exception(bucket, rt6_ex);
- 			return;
- 		}
+We don't need to do that on MPTCP side:
+- either it is a new crash with patches that are in reviewed and that's
+not impacting others → we test each series individually, not a batch of
+series.
+- or there are issues with recent patches, not in netdev yet → we fix,
+or revert.
+- or there is an issue elsewhere, like the kernel panic we reported
+here: usually I try to quickly apply a workaround, e.g. applying a fix,
+or a revert. I don't think we ever had an issue really impacting us
+where we couldn't find a quick solution in one or two days. With the
+panic we reported here, ~15% of the tests had an issue, that's "OK" to
+have that for a few days/weeks
+
+With fewer tests and a smaller community, it is easier for us to just
+say on the ML and weekly meetings: "this is a known issue, please ignore
+for the moment". But if possible, I try to add a workaround/fix in our
+repo used by the CI and devs (not upstreamed).
+
+For NIPA CI, do you want to do like with the build and compare with a
+reference? Or multiple ones to take into account unstable tests? Or
+maintain a list of known issues (I think you started to do that,
+probably safer/easier for the moment)?
+
+> I was seeing a lot of:
+> https://netdev-2.bots.linux.dev/vmksft-net-mp/results/431181/vm-crash-thr0-2
+> 
+> So I hacked up this function to filter the crash from NIPA CI:
+> https://github.com/kuba-moo/nipa/blob/master/contest/remote/lib/vm.py#L50
+> It tries to get first 5 function names from the stack, to form 
+> a "fingerprint". But I seem to recall a discussion at LPC's testing
+> track that there are existing solutions for generating fingerprints.
+> Are you aware of any?
+
+No, sorry. But I guess they are using that with syzkaller, no?
+
+I have to admit that crashes (or warnings) are quite rare, so there was
+no need to have an automation there. But if it is easy to have a
+fingerprint, I will be interested as well, it can help for the tracking:
+to find occurrences of crashes/warnings that are very hard to reproduce.
+
+> (FWIW the crash from above seems to be gone on latest linux.git,
+> this night's CIs run are crash-free.)
+
+Good it was quickly fixed!
+
+Cheers,
+Matt
 -- 
-2.39.3
-
+Sponsored by the NGI0 Core fund.
 
