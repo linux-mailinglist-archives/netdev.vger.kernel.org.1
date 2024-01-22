@@ -1,142 +1,154 @@
-Return-Path: <netdev+bounces-64748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64749-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53625836F4D
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:12:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F0C3836FDA
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:26:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07D3B1F2B92B
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:12:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 81FC3B2BFEA
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:14:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6FAA5A0F4;
-	Mon, 22 Jan 2024 17:37:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EA9D41203;
+	Mon, 22 Jan 2024 17:38:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="GxcCDIxd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JuAFpTO4"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A66B66B50;
-	Mon, 22 Jan 2024 17:37:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32E3840C1F;
+	Mon, 22 Jan 2024 17:38:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705945056; cv=none; b=InSuGj+sut7AB6e3+oqh7dHsAVJtIco/4MeUg/7HmLS2IPgyFYRBtcTrlZLrfp3LVSqhcS6Oxn+xAIUVQWBWIE+m7pjU0jRe/HBRAsAJHwiuy1GE1QPMzGf+qEo1XRI0RCIjyQyO8xJLoooNNObEwayx0/amNCxk6Lr/jkNjd40=
+	t=1705945128; cv=none; b=N2IFC2oYOJvdh94RYFJ/uAx4IlIwoAjL/QfoWG/Uq14A+GAaUSfAwIZHsNtns2W1Nh2HHcmZI8A6wTKJb7j5uCO0SRGLchVY53Imn0t4OZfX1scVgnrqcJYGk0xsnW06l/G0x5a4byeQLWdoD+iVxWswjZQCd9nRqR/y/jLicmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705945056; c=relaxed/simple;
-	bh=8WYz4IV5sJnk5aen6jbAq+q3NiEqFAzxRle76P/6Bcg=;
+	s=arc-20240116; t=1705945128; c=relaxed/simple;
+	bh=s97P5ad8CGWrxO21PQ5C9STKmQGTWqhS9e/Fu2B5J0w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bHEUgjEpNrcwO2M4nSU0PXdsHvawUl8PF2rt599eW0kBLAmpmp/EB6JbKdoUzf+vdGyCBNXFc+MeLNgssLZCy89vN88LncP5E0AvxVRFtOfC8ZcJw+xgTOxyO9nm5E7I2XEJ3qXwcXWXsdJeNDJ3hV8CAASyi7YsGmbUvY7D7rQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=GxcCDIxd; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Tpq99Xn3oyUQ1UeFUe2J523sJUHds2quY0PBRgIFX08=; b=GxcCDIxdcwixCbMs9SgULyWG0E
-	wCMQM9VlMDAwLQxTgpHTEnRfE7msH3WejKCDAHDyw87vHsUC+aNXNRD5jNUUHo0qapTZA38hZrvJZ
-	53K0QFJlwd5MNlRh0P8e6SnP37AmP2XpUWXxNWqzhwcI/X3UQ95Ykmav1x5+PGmO4et3HnLPPxJ0m
-	Ovo2XLa+Jaq5M5MgSObj3Z+PHWiB4+DorhpvG0pA59gH/tQGUs3xQUfmp57dswHCfYH54aZiBnGwQ
-	aGo7q/CvW8kcAt7Ga7nDj7uHEPQQsZl1YGmuv0vUAqKgOCyJXWhLwIOjPfq76ejYFSQo4GqGevKVU
-	rqsU1+RQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56168)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rRyEA-0001Ho-0p;
-	Mon, 22 Jan 2024 17:36:54 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rRyE0-0001CD-Mi; Mon, 22 Jan 2024 17:36:44 +0000
-Date: Mon, 22 Jan 2024 17:36:44 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Lei Wei <quic_leiwei@quicinc.com>
-Cc: Luo Jie <quic_luoj@quicinc.com>, agross@kernel.org,
-	andersson@kernel.org, konrad.dybcio@linaro.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, corbet@lwn.net, catalin.marinas@arm.com,
-	will@kernel.org, p.zabel@pengutronix.de, shannon.nelson@amd.com,
-	anthony.l.nguyen@intel.com, jasowang@redhat.com,
-	brett.creeley@amd.com, rrameshbabu@nvidia.com,
-	joshua.a.hay@intel.com, arnd@arndb.de, geert+renesas@glider.be,
-	neil.armstrong@linaro.org, dmitry.baryshkov@linaro.org,
-	nfraprado@collabora.com, m.szyprowski@samsung.com, u-kumar1@ti.com,
-	jacob.e.keller@intel.com, andrew@lunn.ch, netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, ryazanov.s.a@gmail.com,
-	ansuelsmth@gmail.com, quic_kkumarcs@quicinc.com,
-	quic_suruchia@quicinc.com, quic_soni@quicinc.com,
-	quic_pavir@quicinc.com, quic_souravp@quicinc.com,
-	quic_linchen@quicinc.com
-Subject: Re: [PATCH net-next 18/20] net: ethernet: qualcomm: Add PPE MAC
- support for phylink
-Message-ID: <Za6nrICG8gjwTsJ9@shell.armlinux.org.uk>
-References: <20240110114033.32575-1-quic_luoj@quicinc.com>
- <20240110114033.32575-19-quic_luoj@quicinc.com>
- <ZZ6LGiSde4hHM+6j@shell.armlinux.org.uk>
- <fc9c3e08-a83c-4748-89e4-8b7b0c62da7f@quicinc.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=QYMYf0ogDwc647h236n7JNy+77E/2ByhhmQrsPcnawoBFIqGgHyDdxiK09quHAMbtV93tjfKuIvqni+W+AL/s8XoPN0noUmKkJS+EyCGPiqva+bKbvqxmFGHds0H/P/8OcZFG1bkmQGbOF7LItEwUbZSk/fPN3XOhMlkTsSvPe4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JuAFpTO4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 403CEC433F1;
+	Mon, 22 Jan 2024 17:38:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705945127;
+	bh=s97P5ad8CGWrxO21PQ5C9STKmQGTWqhS9e/Fu2B5J0w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JuAFpTO4VI3Yr4fOiCfZbAQwdKFYU0AdHcap5+Mw/07qi6v4lEN5DqbTuANk5L8T4
+	 p78ZfIu8Px2GzvoOs7wS8eJzYm8uvjG8a8Hy34ZdqeQTNql/1IgU7x4NOKsn0zKsr/
+	 AHBeD0wSAyGNpBlD3gvQA1NUOvCexaf+iJtE/QXoenL1fJeZKy6Cqo1O3qc9/6cX4K
+	 uwR1QNG9JkmcfCBBcgcS2cPrD84OBWA9WS1VymOkHxjEtmav9WQp86tb9N2lrSAdwF
+	 xH2dQsn0F/PFUAJRCGcYYq6ZiCmS7WECdJ/0vOBFLIhATa3VdOW/VyJfb1r9xVAyAi
+	 8gB9oXA1UeUDg==
+Date: Mon, 22 Jan 2024 17:38:41 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Fabian Pfitzner <f.pfitzner@pengutronix.de>
+Cc: Michael Hennerich <michael.hennerich@analog.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Alexandru Tachici <alexandru.tachici@analog.com>,
+	kernel@pengutronix.de, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: phy: adin: add missing clock option
+Message-ID: <20240122-referable-unpainted-e17146ad8c7a@spud>
+References: <20240122110311.2725036-1-f.pfitzner@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="T9OLXLfc2/3CNTTe"
+Content-Disposition: inline
+In-Reply-To: <20240122110311.2725036-1-f.pfitzner@pengutronix.de>
+
+
+--T9OLXLfc2/3CNTTe
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <fc9c3e08-a83c-4748-89e4-8b7b0c62da7f@quicinc.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 22, 2024 at 11:01:26PM +0800, Lei Wei wrote:
-> 
-> 
-> On 1/10/2024 8:18 PM, Russell King (Oracle) wrote:
-> > On Wed, Jan 10, 2024 at 07:40:30PM +0800, Luo Jie wrote:
-> > > @@ -352,6 +1230,12 @@ static int ppe_port_maxframe_set(struct ppe_device *ppe_dev,
-> > >   }
-> > >   static struct ppe_device_ops qcom_ppe_ops = {
-> > > +	.phylink_setup = ppe_phylink_setup,
-> > > +	.phylink_destroy = ppe_phylink_destroy,
-> > > +	.phylink_mac_config = ppe_phylink_mac_config,
-> > > +	.phylink_mac_link_up = ppe_phylink_mac_link_up,
-> > > +	.phylink_mac_link_down = ppe_phylink_mac_link_down,
-> > > +	.phylink_mac_select_pcs = ppe_phylink_mac_select_pcs,
-> > >   	.set_maxframe = ppe_port_maxframe_set,
-> > >   };
-> > 
-> > Why this extra layer of abstraction? If you need separate phylink
-> > operations, why not implement separate phylink_mac_ops structures?
-> > 
-> 
-> This PPE driver will serve as the base driver for higher level drivers
-> such as the ethernet DMA (EDMA) driver and the DSA switch driver.
+On Mon, Jan 22, 2024 at 12:03:12PM +0100, Fabian Pfitzner wrote:
+> The GP_CLK pin on Adin1300 PHY's offers three different output clocks.
+> This patch adds the missing 125MHz recovered clock option which is not
+> yet availible in the driver.
+>=20
+> Signed-off-by: Fabian Pfitzner <f.pfitzner@pengutronix.de>
+> ---
+>  Documentation/devicetree/bindings/net/adi,adin.yaml | 7 +++++--
 
-Why not have the higher level drivers provide a pointer to the
-appropriate phylink_mac_ops structure? Having extra levels of
-indirection makes my future maintenance of phylink harder (I'm already
-bugged by DSA doing this, and it's a right pain.)
+Binding patches should be split out from drivers please.
 
-For example, if one of your higher level drivers needs the mac_prepare
-or mac_finish functionality, you have to add a shim, extra function
-pointers and so on.
+Thanks,
+Conor.
 
-If I need to add an extra parameter to a method, then I have to fix
-up your shim layer _as well_ as all the called methods - in other
-words, it adds extra maintenance burden.
+>  drivers/net/phy/adin.c                              | 2 ++
+>  2 files changed, 7 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/Documentation/devicetree/bindings/net/adi,adin.yaml b/Docume=
+ntation/devicetree/bindings/net/adi,adin.yaml
+> index 929cf8c0b0fd..cd1b4efa692b 100644
+> --- a/Documentation/devicetree/bindings/net/adi,adin.yaml
+> +++ b/Documentation/devicetree/bindings/net/adi,adin.yaml
+> @@ -38,14 +38,17 @@ properties:
+> =20
+>    adi,phy-output-clock:
+>      description: |
+> -      Select clock output on GP_CLK pin. Two clocks are available:
+> -      A 25MHz reference and a free-running 125MHz.
+> +      Select clock output on GP_CLK pin. Three clocks are available:
+> +        - 25MHz reference
+> +        - free-running 125MHz=20
+> +        - recovered 125MHz
+>        The phy can alternatively automatically switch between the referen=
+ce and
+>        the 125MHz clocks based on its internal state.
+>      $ref: /schemas/types.yaml#/definitions/string
+>      enum:
+>        - 25mhz-reference
+>        - 125mhz-free-running
+> +      - 125mhz-recovered
+>        - adaptive-free-running
+> =20
+>    adi,phy-output-reference-clock:
+> diff --git a/drivers/net/phy/adin.c b/drivers/net/phy/adin.c
+> index 2e1a46e121d9..b1ed6fd24763 100644
+> --- a/drivers/net/phy/adin.c
+> +++ b/drivers/net/phy/adin.c
+> @@ -508,6 +508,8 @@ static int adin_config_clk_out(struct phy_device *phy=
+dev)
+>  		sel |=3D ADIN1300_GE_CLK_CFG_25;
+>  	} else if (strcmp(val, "125mhz-free-running") =3D=3D 0) {
+>  		sel |=3D ADIN1300_GE_CLK_CFG_FREE_125;
+> +	} else if (strcmp(val, "125mhz-recovered") =3D=3D 0) {
+> +		sel |=3D ADIN1300_GE_CLK_CFG_RCVR_125;
+>  	} else if (strcmp(val, "adaptive-free-running") =3D=3D 0) {
+>  		sel |=3D ADIN1300_GE_CLK_CFG_HRT_FREE;
+>  	} else {
+>=20
+> base-commit: 6613476e225e090cc9aad49be7fa504e290dd33d
+> --=20
+> 2.39.2
+>=20
 
-It also makes detecting whether an implementation provides something
-or not harder - see the problems when mac_select_pcs() was introduced
-and rather than testing to see whether the method is populated, we
-have to call the method with a dummy value to discover whether the
-sub-driver implements it or not. Honestly, I would really like to get
-rid of DSA's phylink_mac_ops shim layer.
+--T9OLXLfc2/3CNTTe
+Content-Type: application/pgp-signature; name="signature.asc"
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZa6oIQAKCRB4tDGHoIJi
+0jbYAP49mdKtvg7unND1j8aBN/hxnTyY3WvZ5HQqpXL7NlTl6QD+MSD66DKsii7j
+HvCpLEZMFmLKxjcK1iYDb5IdOtDR2gQ=
+=rSP9
+-----END PGP SIGNATURE-----
+
+--T9OLXLfc2/3CNTTe--
 
