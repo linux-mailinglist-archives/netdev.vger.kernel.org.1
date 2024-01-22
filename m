@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-64852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD6128374D6
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 22:06:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B83B8374D7
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 22:06:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C1A31F28077
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 21:06:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B08031F26772
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 21:06:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA10347F51;
-	Mon, 22 Jan 2024 21:06:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB26447F69;
+	Mon, 22 Jan 2024 21:06:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="LRAz0WtU"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="QuiDbSWd"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4464A47A6D
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 21:06:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 343C947A6D
+	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 21:06:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705957585; cv=none; b=Wiqr8Vp2POlQHDhBWdRGvjzxvi3Hd4ZSxBCMoQX9VS2wRr5kJkhzMzoF/+KzU9Bkp+BdysSHUHhStlYk39utmbMtMvPMfx4i1N/z3nd7Dxd4RMbq4Zn58UJJd5wIkawVmzDvcm+lJ7zHrJpM5EaEOLzpX9JKllmkkhbMDHMoB3Y=
+	t=1705957588; cv=none; b=u6O93Kf3SUblIAi1PWMDaxqBar8AEk+Ir0G/pdz5Y2xEpNMaLV04485qVd46+b2slE1tVvF+Si3hchJijR6rBN4pf/DvPTY/Va6YjvY00csoMB9OBetmcOzj1cTdp0X2c44Oo7+Q0ulBA9/fQ5ppoNMkC5dQ2BL5GxwLcFFF2AA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705957585; c=relaxed/simple;
-	bh=aCs6xZ7io6k23xvYEINaZLZhsHKRJayWapBNQtC1sQk=;
+	s=arc-20240116; t=1705957588; c=relaxed/simple;
+	bh=R5NFm9Vn2Ry+J7lRv8Yxdqvgnal/4a4PhPeLxeyLFzI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Fy4pFwawy9iXayTiCKV+MZE27yZ97e1PUB85zH8wp0lK/X461ivxIKd8oaBxC/nW/XTBLhrKw5/vDds1pajfPiDZ10nk0KxKFEgRoOMPjwehGg0FOd1K7jLGGdkiBu08msbjMw7wUXSSK8bKTP4AzuHDjDlWeYNB90MtpGzfWS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=LRAz0WtU; arc=none smtp.client-ip=209.85.210.174
+	 MIME-Version; b=nVacppFxxVknMn1dVHD5e3qgI+T2917bBiJZHmhYhVJRAyrJQzi/stii20Q7oopC1urVjlWFU7eap0/oXmXYaiAn4cpmvIwDmCZwCS9C3YDHUOr/vs+f6rxBFBbKrIV8EiSkVBE7HcnVN0kN15F1G/QR0qxdw+fmybIUyDczofo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=QuiDbSWd; arc=none smtp.client-ip=209.85.210.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6dbd2e435d9so1359339b3a.1
-        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 13:06:24 -0800 (PST)
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6da6b0eb2d4so1771619b3a.1
+        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 13:06:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1705957583; x=1706562383; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1705957585; x=1706562385; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WznYS3ekaQLBbh1QxiBqv2BassJWeck7jrnHfEWLJsA=;
-        b=LRAz0WtUld6/vRCxQzlCNUbxBEP3qXsB/QSx8qacl5MgHdW06vHmpIJlpMNj0DuDal
-         h/8wPhW7LHOWxWns878GQda41jozIOc9VPzB3zySrOjoOtHhg4WbBmbrg/6Ug1obiAc7
-         fMtR32d1wj0m7hOO5WL9m0WWiPNTdvkiTohzrDqGrO1b3vVzc25sPYxCHjK2VVOAjGry
-         7iZsFQ4oHRe0clKUr1cEjFk5zeJse1t4ozT8DDwTVUhwhUuc7/+B9iGkhFf038XzWY9D
-         QFoXLR+POPKnVCuX6bKgMResj2z7JTnQsFDjhVmco9Zv+GnvwKcJnILCPPhHraKMvWvS
-         lJxQ==
+        bh=lTTBUbPLLX22gXQYpGSKcgT+U6sNZgRatKr6dDm48ic=;
+        b=QuiDbSWdFlNF/79ek5uPEuK/jbZdk6Nd66WaYy4Yj91tgv2ldOl/bn60OFoKxjOeCD
+         3tR0SvxwInGNhI68bz3xt6ViYUCyS0NCWwkESMvyTXWWfzmGYekFYMWY5sXXjNQwrvxl
+         FzSvEqCOkjvpf4tf2Jvi+to56+LaNOTvXUil7N+m0c1eTdNbTv8KXaWNKcbB37D68QzY
+         bK/x4CiwsTe6rC/uezq+APbTVa++5Y2+AO+WDdGV+4lHji90liLd3+QI5ylr+OsACEnO
+         sCXod4ld4XQVt5bRB408bTVLXbOgpKdoofsFZgEOCvcSzL+eUamJc3dqZDVfyC4yUUy+
+         0sgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705957583; x=1706562383;
+        d=1e100.net; s=20230601; t=1705957585; x=1706562385;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=WznYS3ekaQLBbh1QxiBqv2BassJWeck7jrnHfEWLJsA=;
-        b=c39j5HNJ2FO42fOs5ncdouysBe/eiU4cVf2f7te/WhbgFY+wI/vsc0+/tvuVhjDrr3
-         IpiXg0vOLo9XtHJujpYo8q2BZiA/i0XSbObm/O91TW86rU6Q8Xsqr3fojELrL7zGGxGf
-         42v5Q0/yNUCwXiX7ULlYbi9yNv2xLNlo3Nka2FZMcwj0LsVT0GPI3FvNcFFmCIm6ePvZ
-         by2pPqQ8FhMxyIDSg4ljA/jxBWJqXFSeuXEGn88kEej3OSjimJoJrCKtbfXXZtdAjWSX
-         5tgIFH06kMuQS8C6f2omnPQCe84YMnokjNK107LNfC80sFBkhhpZ7q8DlhP6264eFFpm
-         bs4w==
-X-Gm-Message-State: AOJu0YwoVUKInoz+jHLot5sDrooj/zjd82cQEQCSccPySyzeJ8iLIa0M
-	XMKgyLyCOLtjje40+8YEAvihNssT+31unvo4scZPWO+ry9Cran4CLKJB1cPp6yQEbYwa4bntPNG
-	Yjw==
-X-Google-Smtp-Source: AGHT+IFOZrPMCXkB6IsNkOo/v+aQlU7WCYqj2ZSFL5ecML6TWl0NoAHDy+ahR76X0YOO0E/1dIzRfw==
-X-Received: by 2002:a05:6a20:43a1:b0:19a:5ced:3c22 with SMTP id i33-20020a056a2043a100b0019a5ced3c22mr2601009pzl.21.1705957583487;
-        Mon, 22 Jan 2024 13:06:23 -0800 (PST)
+        bh=lTTBUbPLLX22gXQYpGSKcgT+U6sNZgRatKr6dDm48ic=;
+        b=LjixgrWLIeOu+/BItHxsv7UtU/wCyu3GTTV6hWC3cpPY3zuDEvk++8oKVkmJNpMqJV
+         nfu3dvP0S8+KLKTXsZiUHtJtYimwsmAkVysSdQlxBt8X4U/p4+AesOxc2aG5EYFIC6hB
+         YOPq3Wsd8vrE/zG0ycQx8WAgFo1HjtJS8SqbIik48+YahnR9W1Xmv3uci+yBDyrYys+1
+         sDDAuTKUBr0lgNeZctJ6QbhzalP2XQvaH15waA0HEUw8pmbfE7hcsAQuzc8wFkYypPTp
+         eb0SNcDSJp3fPxkfGd7Jick4LtAyBulNIs8pIjfMH2Df2wiK7f3NUuV7p2zZRlcYRn1h
+         ujkQ==
+X-Gm-Message-State: AOJu0YyxOa4sRMiSjKI/qQHL0M+PLvtmKnAxquWRMKpDdrHTK2/+10Kd
+	anH84zUOxKJCCwpDicENGPLWdFJLH4A90K/yqxZKPsUgt63UHMjL7aN20I5Jso3GyBESPu/ybR1
+	OGQ==
+X-Google-Smtp-Source: AGHT+IF/lChGsMkCgmCg+5aiYMU6Ll6k1FkIn1K+sesuVRKCAa4NlWcTt0lBfdu0U4nYwTig3L8I/g==
+X-Received: by 2002:a05:6a00:2d1c:b0:6dd:5cfd:808 with SMTP id fa28-20020a056a002d1c00b006dd5cfd0808mr113127pfb.51.1705957585388;
+        Mon, 22 Jan 2024 13:06:25 -0800 (PST)
 Received: from rogue-one.tail33bf8.ts.net ([201.17.86.134])
-        by smtp.gmail.com with ESMTPSA id r11-20020a056a00216b00b006dbce4a2136sm4559306pff.142.2024.01.22.13.06.22
+        by smtp.gmail.com with ESMTPSA id r11-20020a056a00216b00b006dbce4a2136sm4559306pff.142.2024.01.22.13.06.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jan 2024 13:06:23 -0800 (PST)
+        Mon, 22 Jan 2024 13:06:25 -0800 (PST)
 From: Pedro Tammela <pctammela@mojatatu.com>
 To: netdev@vger.kernel.org
 Cc: Pedro Tammela <pctammela@mojatatu.com>
-Subject: [PATCH iproute2 1/2] color: use empty format string instead of NULL in vfprintf
-Date: Mon, 22 Jan 2024 18:05:45 -0300
-Message-Id: <20240122210546.3423784-2-pctammela@mojatatu.com>
+Subject: [PATCH iproute2 2/2] bpf: include libgen.h for basename
+Date: Mon, 22 Jan 2024 18:05:46 -0300
+Message-Id: <20240122210546.3423784-3-pctammela@mojatatu.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20240122210546.3423784-1-pctammela@mojatatu.com>
 References: <20240122210546.3423784-1-pctammela@mojatatu.com>
@@ -84,34 +84,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-NULL is passed in the format string when nothing is to be printed.
-This is commonly done in the print_bool function when a flag is false.
-Glibc seems to handle this case nicely but for musl it will cause a
-segmentation fault.
-
-The following is an example of one crash in musl based systems/containers:
-   tc qdisc add dev dummy0 handle 1: root choke limit 1000 bandwidth 10000
-   tc qdisc replace dev dummy0 handle 1: root choke limit 1000 bandwidth 10000 min 100
-   tc qdisc show dev dummy0
+In musl basename() is only available via libgen.h
 
 Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
 ---
- lib/color.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ lib/bpf_legacy.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/lib/color.c b/lib/color.c
-index 59976847..027e1703 100644
---- a/lib/color.c
-+++ b/lib/color.c
-@@ -143,7 +143,7 @@ int color_fprintf(FILE *fp, enum color_attr attr, const char *fmt, ...)
- 	va_start(args, fmt);
+diff --git a/lib/bpf_legacy.c b/lib/bpf_legacy.c
+index 844974e9..741eec8d 100644
+--- a/lib/bpf_legacy.c
++++ b/lib/bpf_legacy.c
+@@ -18,6 +18,7 @@
+ #include <stdarg.h>
+ #include <limits.h>
+ #include <assert.h>
++#include <libgen.h>
  
- 	if (!color_is_enabled || attr == COLOR_NONE) {
--		ret = vfprintf(fp, fmt, args);
-+		ret = vfprintf(fp, fmt ?: "", args);
- 		goto end;
- 	}
- 
+ #ifdef HAVE_ELF
+ #include <libelf.h>
 -- 
 2.40.1
 
