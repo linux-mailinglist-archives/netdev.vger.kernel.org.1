@@ -1,243 +1,160 @@
-Return-Path: <netdev+bounces-64729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E922836D6D
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:30:21 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FC19836F15
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:09:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D73C01F25FB9
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 17:30:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 67B40B30209
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 17:31:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8472155E5E;
-	Mon, 22 Jan 2024 16:32:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AAB473163;
+	Mon, 22 Jan 2024 16:32:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Rj/rzkzg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K3Eb+61L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E5A51E4B3;
-	Mon, 22 Jan 2024 16:32:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D490156466;
+	Mon, 22 Jan 2024 16:32:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.88
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705941126; cv=none; b=DCqxxd7frW4YkgCAp1JuSIH3UokONBmOgvvIOWlNJWf1KNGhjNzNk/LsaQ6QXfMDWfk6HOsigmuaSJkJOtp1qk7QIDoar9rGH6o1fV2QCiViO67ocOMzMIlP+z42jaQjoL8l509Z1h1lgnNw1XSfgrisbUpPC1mfZvWtceZ+VgQ=
+	t=1705941159; cv=none; b=oYF4dMTunNypb9xw0aqUaab0OAFvC/lV87i4OteXmcg86+jvwC7TEWf+xdaXRvmtwJ09830yrMAJ3ZxGHtU+ddHwPK7C2bmGMkaBDM1xm1zw3Psm7PYwsSaY1jcNkh4s44ZDFvshQahHQC/k/xBlGoPqQQB9PMyKjQc96hXnCMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705941126; c=relaxed/simple;
-	bh=ncxCdYw0MO9BomJqGZJBlLsA9dRHN7VWjUDWMdHRXwY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QHTpfMXYu2TqtVU1LrtuixA+AADMGKIhyKpgGuCl4NQEnd5YGUbaHLg/4JK/ht8N847yzdVDUfqJeD7fINPl8R9iIx+g0jkTrSKrWHWU+cE9fO5lgTXIZAgAt7Q5QAXqZIq0Mpl0cBgW3FMW5n3hxeje4OyBC39ROxd8qLYx7cY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Rj/rzkzg; arc=none smtp.client-ip=192.55.52.120
+	s=arc-20240116; t=1705941159; c=relaxed/simple;
+	bh=q+mUZdd5s8JkPZLmLiPG2KxVKoVyZ0JMYzMnTmOTZpg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uqlpjjk47vWFtZsiWFMtgHg+QrQfR6FKv/02lhkHw7pHbiTCEd8q6laU26lpCbKey7c9Fk+QmfhVUA6wR0Q5VfUbEiDiyBotfHFNaq8j0D6dEtiQCyTTgKP82Fygfm5AJsgd7emnSdt688vjx9je3wIR3Uq82gAaDy3R9SSQciI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=K3Eb+61L; arc=none smtp.client-ip=192.55.52.88
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1705941124; x=1737477124;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ncxCdYw0MO9BomJqGZJBlLsA9dRHN7VWjUDWMdHRXwY=;
-  b=Rj/rzkzgJUF+zq2X1B3loP0QZioLaFIFIQ5INj5IIpif1GrKL5ut+cT/
-   LZCuztfC2RGTcXIBqqnHPFC6DQ35+jSvTrV0D7SM5NbDZu7Ox8cqMMYU+
-   i2akIWCgLfvWs1J2+SrA7d5uTxLT/pJ3zraXu7134u7giR1NLsPt0LRcg
-   BxiyMNrRNpwwxo3YG4k7Z8m4307KN0MWCclMr3JJyf81bRTTACUp3YQ6K
-   R4aH4LQ9P1r4AKJwkkUyKmTIY5E0+xfYygVZevhBxvSQRAIQOVLjt8LEE
-   iSUpiyAgyqUknrx1B/CRMki1EKmxQj0Gqf59jUt+3WjIM+ZH4oLUWs2+x
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="400118311"
+  t=1705941157; x=1737477157;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=q+mUZdd5s8JkPZLmLiPG2KxVKoVyZ0JMYzMnTmOTZpg=;
+  b=K3Eb+61LaZegyaW2uufEbcNjXf+CJUCN/5rUJupydkEC48/qOLVcVYTz
+   q0p6tcA4vChfRiK8T4rfCCs9in1CdHUNnZRna6QYljkA2V6EKGCvF1oro
+   p6oVMhaNTgMWHBEKeQTlvU2JamKuKk3Ny7hjKbKWhJEZCkH2CHt+Oz9YZ
+   +JP/Fpwd3e4cX3/bXBQwPnfJDD43w4zod6ygvbdju+BP6yZZAZD1QTPGO
+   yjTOVA2nz3TmCsH7XtpRZOLLfiSOAsPkUBB7T9k+otBGqPKiR3HyMj6l9
+   EE/ILmD9J3VMv3qEsSr53urcFl3P4yJDvxpqF+o/NYBia5nNR34qD9dmn
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="432413277"
 X-IronPort-AV: E=Sophos;i="6.05,211,1701158400"; 
-   d="scan'208";a="400118311"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 08:32:03 -0800
+   d="scan'208";a="432413277"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 08:32:24 -0800
 X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="855989740"
 X-IronPort-AV: E=Sophos;i="6.05,211,1701158400"; 
-   d="scan'208";a="27709159"
-Received: from lkp-server01.sh.intel.com (HELO 961aaaa5b03c) ([10.239.97.150])
-  by fmviesa001.fm.intel.com with ESMTP; 22 Jan 2024 08:32:01 -0800
-Received: from kbuild by 961aaaa5b03c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rRxDK-0006ka-2J;
-	Mon, 22 Jan 2024 16:31:58 +0000
-Date: Tue, 23 Jan 2024 00:31:37 +0800
-From: kernel test robot <lkp@intel.com>
-To: Lorenzo Bianconi <lorenzo@kernel.org>, linux-nfs@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, lorenzo.bianconi@redhat.com,
-	neilb@suse.de, jlayton@kernel.org, kuba@kernel.org,
-	chuck.lever@oracle.com, horms@kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v6 3/3] NFSD: add write_ports to netlink command
-Message-ID: <202401230032.Sx6BKQgl-lkp@intel.com>
-References: <f7c42dae2b232b3b06e54ceb3f00725893973e02.1705771400.git.lorenzo@kernel.org>
+   d="scan'208";a="855989740"
+Received: from yongwool-mobl3.amr.corp.intel.com (HELO [10.209.52.151]) ([10.209.52.151])
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 08:32:23 -0800
+Message-ID: <ff370e42-f48b-4c62-9b44-9d4031cd78b0@intel.com>
+Date: Mon, 22 Jan 2024 08:32:22 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f7c42dae2b232b3b06e54ceb3f00725893973e02.1705771400.git.lorenzo@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 7/7] x86/vmware: Add TDX hypercall support
+Content-Language: en-US
+To: Alexey Makhalov <alexey.makhalov@broadcom.com>,
+ linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, bp@alien8.de,
+ hpa@zytor.com, dave.hansen@linux.intel.com, mingo@redhat.com,
+ tglx@linutronix.de
+Cc: x86@kernel.org, netdev@vger.kernel.org, richardcochran@gmail.com,
+ linux-input@vger.kernel.org, dmitry.torokhov@gmail.com, zackr@vmware.com,
+ linux-graphics-maintainer@vmware.com, pv-drivers@vmware.com,
+ namit@vmware.com, timothym@vmware.com, akaher@vmware.com, jsipek@vmware.com,
+ dri-devel@lists.freedesktop.org, daniel@ffwll.ch, airlied@gmail.com,
+ tzimmermann@suse.de, mripard@kernel.org, maarten.lankhorst@linux.intel.com,
+ horms@kernel.org, kirill.shutemov@linux.intel.com
+References: <20240109084052.58661-1-amakhalov@vmware.com>
+ <20240109084052.58661-8-amakhalov@vmware.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <20240109084052.58661-8-amakhalov@vmware.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Lorenzo,
+On 1/9/24 00:40, Alexey Makhalov wrote:
+> +#ifdef CONFIG_INTEL_TDX_GUEST
+> +unsigned long vmware_tdx_hypercall(unsigned long cmd,
+> +				   struct tdx_module_args *args)
+> +{
+> +	if (!hypervisor_is_type(X86_HYPER_VMWARE))
+> +		return ULONG_MAX;
+> +
+> +	if (cmd & ~VMWARE_CMD_MASK) {
+> +		pr_warn_once("Out of range command %lx\n", cmd);
+> +		return ULONG_MAX;
+> +	}
+> +
+> +	args->r10 = VMWARE_TDX_VENDOR_LEAF;
+> +	args->r11 = VMWARE_TDX_HCALL_FUNC;
+> +	args->r12 = VMWARE_HYPERVISOR_MAGIC;
+> +	args->r13 = cmd;
+> +	args->r15 = 0; /* CPL */
+> +
+> +	__tdx_hypercall(args);
+> +
+> +	return args->r12;
+> +}
+> +EXPORT_SYMBOL_GPL(vmware_tdx_hypercall);
+> +#endif
 
-kernel test robot noticed the following build errors:
+This is the kind of wrapper that I was hoping for.  Thanks.
 
-[auto build test ERROR on v6.7]
-[cannot apply to linus/master trondmy-nfs/linux-next next-20240122]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Lorenzo-Bianconi/NFSD-convert-write_threads-to-netlink-command/20240121-013808
-base:   v6.7
-patch link:    https://lore.kernel.org/r/f7c42dae2b232b3b06e54ceb3f00725893973e02.1705771400.git.lorenzo%40kernel.org
-patch subject: [PATCH v6 3/3] NFSD: add write_ports to netlink command
-config: x86_64-rhel-8.3-kselftests (https://download.01.org/0day-ci/archive/20240123/202401230032.Sx6BKQgl-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240123/202401230032.Sx6BKQgl-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202401230032.Sx6BKQgl-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   fs/nfsd/nfsctl.c: In function 'nfsd_nl_listener_set_doit':
->> fs/nfsd/nfsctl.c:2017:17: error: implicit declaration of function 'nfsd_destroy_serv'; did you mean 'nfsd4_destroy_session'? [-Werror=implicit-function-declaration]
-    2017 |                 nfsd_destroy_serv(net);
-         |                 ^~~~~~~~~~~~~~~~~
-         |                 nfsd4_destroy_session
-   cc1: some warnings being treated as errors
-
-
-vim +2017 fs/nfsd/nfsctl.c
-
-  1900	
-  1901	/**
-  1902	 * nfsd_nl_listener_set_doit - set the nfs running listeners
-  1903	 * @skb: reply buffer
-  1904	 * @info: netlink metadata and command arguments
-  1905	 *
-  1906	 * Return 0 on success or a negative errno.
-  1907	 */
-  1908	int nfsd_nl_listener_set_doit(struct sk_buff *skb, struct genl_info *info)
-  1909	{
-  1910		struct nlattr *tb[ARRAY_SIZE(nfsd_server_instance_nl_policy)];
-  1911		struct net *net = genl_info_net(info);
-  1912		struct svc_xprt *xprt, *tmp_xprt;
-  1913		const struct nlattr *attr;
-  1914		struct svc_serv *serv;
-  1915		const char *xcl_name;
-  1916		struct nfsd_net *nn;
-  1917		int port, err, rem;
-  1918		sa_family_t af;
-  1919	
-  1920		if (GENL_REQ_ATTR_CHECK(info, NFSD_A_SERVER_LISTENER_INSTANCE))
-  1921			return -EINVAL;
-  1922	
-  1923		mutex_lock(&nfsd_mutex);
-  1924	
-  1925		err = nfsd_create_serv(net);
-  1926		if (err) {
-  1927			mutex_unlock(&nfsd_mutex);
-  1928			return err;
-  1929		}
-  1930	
-  1931		nn = net_generic(net, nfsd_net_id);
-  1932		serv = nn->nfsd_serv;
-  1933	
-  1934		/* 1- create brand new listeners */
-  1935		nlmsg_for_each_attr(attr, info->nlhdr, GENL_HDRLEN, rem) {
-  1936			if (nla_type(attr) != NFSD_A_SERVER_LISTENER_INSTANCE)
-  1937				continue;
-  1938	
-  1939			if (nla_parse_nested(tb, ARRAY_SIZE(tb), attr,
-  1940					     nfsd_server_instance_nl_policy,
-  1941					     info->extack) < 0)
-  1942				continue;
-  1943	
-  1944			if (!tb[NFSD_A_SERVER_INSTANCE_TRANSPORT_NAME] ||
-  1945			    !tb[NFSD_A_SERVER_INSTANCE_PORT])
-  1946				continue;
-  1947	
-  1948			xcl_name = nla_data(tb[NFSD_A_SERVER_INSTANCE_TRANSPORT_NAME]);
-  1949			port = nla_get_u32(tb[NFSD_A_SERVER_INSTANCE_PORT]);
-  1950			if (port < 1 || port > USHRT_MAX)
-  1951				continue;
-  1952	
-  1953			af = nla_get_u32(tb[NFSD_A_SERVER_INSTANCE_INET_PROTO]);
-  1954			if (af != PF_INET && af != PF_INET6)
-  1955				continue;
-  1956	
-  1957			xprt = svc_find_xprt(serv, xcl_name, net, PF_INET, port);
-  1958			if (xprt) {
-  1959				svc_xprt_put(xprt);
-  1960				continue;
-  1961			}
-  1962	
-  1963			/* create new listerner */
-  1964			if (svc_xprt_create(serv, xcl_name, net, af, port,
-  1965					    SVC_SOCK_ANONYMOUS, get_current_cred()))
-  1966				continue;
-  1967		}
-  1968	
-  1969		/* 2- remove stale listeners */
-  1970		spin_lock_bh(&serv->sv_lock);
-  1971		list_for_each_entry_safe(xprt, tmp_xprt, &serv->sv_permsocks,
-  1972					 xpt_list) {
-  1973			struct svc_xprt *rqt_xprt = NULL;
-  1974	
-  1975			nlmsg_for_each_attr(attr, info->nlhdr, GENL_HDRLEN, rem) {
-  1976				if (nla_type(attr) != NFSD_A_SERVER_LISTENER_INSTANCE)
-  1977					continue;
-  1978	
-  1979				if (nla_parse_nested(tb, ARRAY_SIZE(tb), attr,
-  1980						     nfsd_server_instance_nl_policy,
-  1981						     info->extack) < 0)
-  1982					continue;
-  1983	
-  1984				if (!tb[NFSD_A_SERVER_INSTANCE_TRANSPORT_NAME] ||
-  1985				    !tb[NFSD_A_SERVER_INSTANCE_PORT])
-  1986					continue;
-  1987	
-  1988				xcl_name = nla_data(
-  1989					tb[NFSD_A_SERVER_INSTANCE_TRANSPORT_NAME]);
-  1990				port = nla_get_u32(tb[NFSD_A_SERVER_INSTANCE_PORT]);
-  1991				if (port < 1 || port > USHRT_MAX)
-  1992					continue;
-  1993	
-  1994				af = nla_get_u32(tb[NFSD_A_SERVER_INSTANCE_INET_PROTO]);
-  1995				if (af != PF_INET && af != PF_INET6)
-  1996					continue;
-  1997	
-  1998				if (!strcmp(xprt->xpt_class->xcl_name, xcl_name) &&
-  1999				    port == svc_xprt_local_port(xprt) &&
-  2000				    af == xprt->xpt_local.ss_family &&
-  2001				    xprt->xpt_net == net) {
-  2002					rqt_xprt = xprt;
-  2003					break;
-  2004				}
-  2005			}
-  2006	
-  2007			/* remove stale listener */
-  2008			if (!rqt_xprt) {
-  2009				spin_unlock_bh(&serv->sv_lock);
-  2010				svc_xprt_close(xprt);
-  2011				spin_lock_bh(&serv->sv_lock);
-  2012			}
-  2013		}
-  2014		spin_unlock_bh(&serv->sv_lock);
-  2015	
-  2016		if (!serv->sv_nrthreads && list_empty(&nn->nfsd_serv->sv_permsocks))
-> 2017			nfsd_destroy_serv(net);
-  2018	
-  2019		mutex_unlock(&nfsd_mutex);
-  2020	
-  2021		return 0;
-  2022	}
-  2023	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
