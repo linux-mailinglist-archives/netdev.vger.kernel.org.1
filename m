@@ -1,99 +1,96 @@
-Return-Path: <netdev+bounces-64683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64684-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D1368365A6
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 15:41:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E82E83657F
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 15:33:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B2E5B26795
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 14:30:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F0A001F2232D
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 14:33:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 181183D54C;
-	Mon, 22 Jan 2024 14:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 712A83D553;
+	Mon, 22 Jan 2024 14:33:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="JW4dmjn1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SS2SBpYw"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 648B93D547;
-	Mon, 22 Jan 2024 14:30:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F033D551;
+	Mon, 22 Jan 2024 14:33:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705933830; cv=none; b=Wm1B90zE9Tpx26MhX6Wv+w8EofJs2KOw8bDuWWTYnc1LQ9rxV42TofqipxJGWDhqnA83MQCXMyVucY9xPvX3VKLUvxGT3/4WmCUYBWOlo1/4hjxh275rSpr9cUU0dmlmuiJlrG0a2WcR1uPznrQBQqXRD4872ttIAqf7NkZd1AE=
+	t=1705934013; cv=none; b=OGQOCh1VZC9DohPAyETTkv2Pdg16duNlr5Eq82H9DAi8QfVDkIxjijsYXljr2R7wrpVRgolEDAeNuD9BmLmkKljORQlggIaSUmz3Sua5yv2PGZuRGEsmdL7Fhrg6FKWDdx664PwkcWKMOm80v5CV3AjGGtxrJTUyor5rEJBkBI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705933830; c=relaxed/simple;
-	bh=dgLOf7Khtp+J1XhVD9pejnsi3nX98vVH3ivdZpsrJpI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LJ15Qa4Din+FKgsAjpz7ATcsKqNsHsXXl7dA+DP+8CzbbEotDmEQfeYwvbAxNzhMGIkqJFQSOpoklVklgl+Fyv79q0QPs1lh2DwVFZKsuJIv/Fbsn6pp7fhSudTHYWMch3rd0gpc3gc98v5b6CRPddu7gFgzVBVAutEkC1/Wxcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=JW4dmjn1; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=bzd1tg+vrjBmxQsgnC2fRQKVGdqRO1+ttiHgoPg/H0U=; b=JW4dmjn1facfKbazaZTJYnNKja
-	VcChOwN1+nCfU6NLMutlzGzDgJXeThJaQ2AtgLGlYFETZ8+MK/poMXdnjJqemHlH8rAyoLovErOmw
-	TcLT9woB8Qn++eGFlqUefMV43EZzCOpcDhJ1EnLIu8eWLlUnPLz5yLM3lDvuR4HyIKgY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rRvJc-005jNn-BL; Mon, 22 Jan 2024 15:30:20 +0100
-Date: Mon, 22 Jan 2024 15:30:20 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Tim Menninger <tmenninger@purestorage.com>, f.fainelli@gmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: dsa: mv88e6xxx: Make *_c45 callbacks agree with
- phy_*_c45 callbacks
-Message-ID: <1aab2398-2fe9-40b6-aa5b-34dde946668a@lunn.ch>
-References: <20240116193542.711482-1-tmenninger@purestorage.com>
- <04d22048-737a-4281-a43f-b125ebe0c896@lunn.ch>
- <CAO-L_44YVi0HDk4gC9QijMZrYNGoKtfH7qsXOwtDwM4VrFRDHw@mail.gmail.com>
- <da87ce82-7337-4be4-a2af-bd2136626c56@lunn.ch>
- <CAO-L_46kqBrDdYP7p3He0cBF1OP7TJKnhYK1NR_gMZf2n_928A@mail.gmail.com>
- <20240122123349.cxx2i2kzrhuqnasp@skbuf>
+	s=arc-20240116; t=1705934013; c=relaxed/simple;
+	bh=8gCK9vmYYbOmXz91aeGohAAbZ9CT8MPYBv+dkby9x6g=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=bQDN6ocmCduq0OgEW4CQEBybgDI53ICctDJhNlw/LDLxtJUrgFngxqeaHkZ6hC4gCad09gUF7f8j+geGY2a8NRnf8ayDTrhrFGk8Az6sa42GT08TtSjEPmkOj53ZfG+GfvJ28qq2WF2Uhf+1oPYLNL7exI0N3/SVJPiIDb5hUu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SS2SBpYw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49D4BC433F1;
+	Mon, 22 Jan 2024 14:33:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705934012;
+	bh=8gCK9vmYYbOmXz91aeGohAAbZ9CT8MPYBv+dkby9x6g=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=SS2SBpYwtQoQnArem80S7dL4zsJ2zVdK5bcRSlUrJvQR1V4o1MX2/RfEXhr9/r13A
+	 8b/Ncj+rdng+0cBrQCZUlCPpusOa/m/AL7HtQ+i4xEtIxxEqFg5Ybs2XPI5U/ZIQBN
+	 g2/jqv+0ts2Mg3+qaoG8mMPGgsxV91EkU5UJmdhcE04PsnBWN0fXBTnzEaBSYFPDmb
+	 zFp78QiqOC/cORxGM2AVJgujShJlIiDsZvo3dUyqMmh9nZjMUBSMRQwETCXBiP3lEc
+	 e6SZkwL0F2xpO5Q7GgkOAINufxnQ/y7qEUtCEszbU6e+6QBtVT+i0zk9dzjWG3vKC7
+	 KkERSGly33Jug==
+From: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+To: Pu Lehui <pulehui@huaweicloud.com>, bpf@vger.kernel.org,
+ linux-riscv@lists.infradead.org, netdev@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
+ Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, Yonghong Song
+ <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, KP Singh
+ <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
+ <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Conor Dooley <conor@kernel.org>, Luke Nelson
+ <luke.r.nels@gmail.com>, Pu Lehui <pulehui@huawei.com>, Pu Lehui
+ <pulehui@huaweicloud.com>
+Subject: Re: [PATCH RESEND bpf-next v3 0/6] Zbb support and code
+ simplification for RV64 JIT
+In-Reply-To: <20240115131235.2914289-1-pulehui@huaweicloud.com>
+References: <20240115131235.2914289-1-pulehui@huaweicloud.com>
+Date: Mon, 22 Jan 2024 15:33:29 +0100
+Message-ID: <87il3lqvye.fsf@all.your.base.are.belong.to.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240122123349.cxx2i2kzrhuqnasp@skbuf>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 22, 2024 at 02:33:49PM +0200, Vladimir Oltean wrote:
-> On Tue, Jan 16, 2024 at 05:51:13PM -0800, Tim Menninger wrote:
-> > My impression is still that the read_c45 function should agree with the
-> > phy_read_c45 function, but that isn't a hill I care to die on if you still
-> > think otherwise. Thoughts?
-> 
-> FWIW, Tim's approach is consistent with what drivers/net/mdio/mdio-mux.c does.
-> 
-> 		if (parent_bus->read)
-> 			cb->mii_bus->read = mdio_mux_read;
-> 		if (parent_bus->write)
-> 			cb->mii_bus->write = mdio_mux_write;
-> 		if (parent_bus->read_c45)
-> 			cb->mii_bus->read_c45 = mdio_mux_read_c45;
-> 		if (parent_bus->write_c45)
-> 			cb->mii_bus->write_c45 = mdio_mux_write_c45;
-> 
-> My only objection to his patch (apart from the commit message which
-> should indeed be more detailed) is that I would have preferred the same
-> "if" syntax rather than the use of a ternary operator with NULL.
+Pu Lehui <pulehui@huaweicloud.com> writes:
 
-I agree it could be fixed this way. But what i don't like about the
-current code is how C22 and C45 do different things with error
-codes. Since the current code is trying to use an error code, i would
-prefer to fix that error code handling, rather than swap to a
-different way to indicate its not supported.
+> Add Zbb support [0] to optimize code size and performance of RV64 JIT.
+> Meanwhile, adjust the code for unification and simplification. Tests
+> test_bpf.ko and test_verifier have passed, as well as the relative
+> testcases of test_progs*.
+>
+> Link: https://github.com/riscv/riscv-bitmanip/releases/download/1.0.0/bit=
+manip-1.0.0-38-g865e7a7.pdf [0]
+>
+> v3 resend:
+> - resend for mail be treated as spam.
+>
+> v3:
+> - Change to early-exit code style and make code more explicit.
 
-	  Andrew
+Lehui,
+
+Sorry for the delay. I'm chasing a struct_ops RISC-V BPF regression in
+6.8-rc1, I will need to wrap my head around that prior reviewing
+properly.
+
+
+Bj=C3=B6rn
+
 
