@@ -1,177 +1,266 @@
-Return-Path: <netdev+bounces-64563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93D53835B21
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 07:40:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A4CB835B43
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 07:55:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F03A4B25E86
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 06:40:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C6C7CB23E12
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 06:55:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7B91612B;
-	Mon, 22 Jan 2024 06:40:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14E86CA7F;
+	Mon, 22 Jan 2024 06:54:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Io8sGADF"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05olkn2099.outbound.protection.outlook.com [40.92.91.99])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36A37F9C4;
-	Mon, 22 Jan 2024 06:40:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.91.99
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705905651; cv=fail; b=TvCQO+DTm2U1ZXpPoadwbt23KTMPh7yvnPizd4mtzOdqH2gfSnbNLKyecniFgLWRNcvv1RW5z73SYeC8tFs5Cs5TvoShZMCiKffoivxVl76Rar1J5Oik0sscPf+7Z72E1wPONsXbWF9nnTC5F+EhXKZg1ebn8aGjvgXOH/gxzYY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705905651; c=relaxed/simple;
-	bh=NSkMO4Nac3nz7cejeoqqrvTeOLHmq3mz2ZPJFYeFpjY=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=S/ssqyS4DxDs3XJJcsP1GjJR0j5ZnSImAhiyba5tjhJl2uBWuY5CRjHij+teTRg4hjJbG2x4VWnBqJV+gHZKZjeVSclxFway2j8jBajqBqerZjZ85Y9pgxylQgNNV54WoD0LBqjmYutLSgs0YwUPJ4cLdILyEU8UGD2InISV8XE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.de; spf=pass smtp.mailfrom=hotmail.de; arc=fail smtp.client-ip=40.92.91.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hotmail.de
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ad/oSl/AiIb8OCS9g8JP1R3e0JS1m9zLm3bI9hSIBFBxFVd2yDi2RW7uzZbF12hySgPIVpCUdUMTHZiMWoGN1pJ1UoAg0eOLv3U5T+0MOIpbeC2UG92T2xJsJj3ILmbW2Y5J8eUljph+hRwWns2FiLj9cJXJFdeMD4qG4/dChuuPAqVaksO/0lB4w2iLjcBsALIYU62k3tLMsJ2kMVRgE4+e0qvhFf17j/0e43yj2rpG0r76ZyWtC/qHAZdk05lenLgM5kPo4OU0ZBoTUbz31pON8Orv057wIGZiHAGpYN6cgsFWGeOZYhE4uDtn4597f2WxXAL/tsDkDuvuUp1FMQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ytEtmXqaKsOZm1gTjcEc+6KeUtF9uMBuPamMf6HLzIU=;
- b=XHtEb5UvP0Dwcj5YEW/8PZ5vLCDWiH8fv3LXZDPyGRW0RInejELQ+wxfoe+bVF7jbg6gW7cj7p2U+Mw6Ns4ikigBH2Sz1ED6e3DC0bIf8AMBNlo23mibaJpQ/jyQ0LWJ0WPXwj/PcWTLL3jjCf3eWErVtIdCXzS66PcKfxS5mF5hyDu9//6KZCfTvEyDUXGjbFgxDExTII83RUeCBjq8pFKOG46MfTWgnsWmUpX5W7qOlNOujONXKRz1l2ZwdzjS7cWo+Qm2JPS7Hwi1fD06Znqc3vlu//0uPzxMzujejY0fepHvPHXDI41xC8vlw6PH8zZPXX4dmIkzGtb8vj728Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-Received: from AS8P193MB1285.EURP193.PROD.OUTLOOK.COM (2603:10a6:20b:333::21)
- by DB9P193MB1258.EURP193.PROD.OUTLOOK.COM (2603:10a6:10:250::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.32; Mon, 22 Jan
- 2024 06:40:47 +0000
-Received: from AS8P193MB1285.EURP193.PROD.OUTLOOK.COM
- ([fe80::897e:cfd5:b29b:c611]) by AS8P193MB1285.EURP193.PROD.OUTLOOK.COM
- ([fe80::897e:cfd5:b29b:c611%6]) with mapi id 15.20.7202.031; Mon, 22 Jan 2024
- 06:40:47 +0000
-Message-ID:
- <AS8P193MB1285D9F82E8065739C0AD962E4752@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
-Date: Mon, 22 Jan 2024 07:41:46 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] net: stmmac: Wait a bit for the reset to take effect
-To: Jose Abreu <Jose.Abreu@synopsys.com>, Andrew Lunn <andrew@lunn.ch>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-stm32@st-md-mailman.stormreply.com"
- <linux-stm32@st-md-mailman.stormreply.com>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Jiri Pirko <jiri@nvidia.com>, Andrew Morton <akpm@linux-foundation.org>
-References: <AS8P193MB1285DECD77863E02EF45828BE4A1A@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
- <AS8P193MB1285EEAFE30C0DE7B201D33CE46C2@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
- <6e33c038-45a7-4941-b5d9-ce5704e13d48@lunn.ch>
- <AS8P193MB128591BBF397DC664D7D860EE4722@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
- <DM4PR12MB50883D41B18E8627FBDF5E32D3722@DM4PR12MB5088.namprd12.prod.outlook.com>
- <AS8P193MB1285B34B71F3143FA9B0A053E4702@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
- <DM4PR12MB5088435544A3D355C94632DFD3702@DM4PR12MB5088.namprd12.prod.outlook.com>
-Content-Language: en-US
-From: Bernd Edlinger <bernd.edlinger@hotmail.de>
-In-Reply-To: <DM4PR12MB5088435544A3D355C94632DFD3702@DM4PR12MB5088.namprd12.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TMN: [MbmuCELclWdqPjWjsFMftdLCZiOUMnOFD/HE2Nzg5aQthoxFJl24AEKOaTo1vhkn]
-X-ClientProxiedBy: BE1P281CA0017.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:15::8) To AS8P193MB1285.EURP193.PROD.OUTLOOK.COM
- (2603:10a6:20b:333::21)
-X-Microsoft-Original-Message-ID:
- <5eac8f06-1044-4c84-a77b-435cb4954243@hotmail.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 549C8B656
+	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 06:54:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705906497; cv=none; b=ef7No8bIDddEgFX6zUKgq29rf3k3GX7e1y61lQfk9e3VRZpfqm+gJIIUCF/gEpwHh6oEE2KtQH+8LpV1V/WsS6NYLseMU+F9fZNTZWuvEen191w68voYfYWVf7nt7QnKSIsqknAmIPjxN9VxYzncKvLFb9tGa4yj+VTdsRXS+uY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705906497; c=relaxed/simple;
+	bh=7E8E53K2VKxfUU8hm5+y8DQdxN4b4jDzMb6j3B0gODo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rVGTmaG6gFokv3hEsaaab45pi8SjBveinMeI1jkNrilEHxDgWgN2DFGvFuhbrScG4ET7cYDXrpK8bJi7gzfbmHYEBaVM9MrXUQZr3JxP0Sl/FcwJONT1oqLgbPwXstDcurHj0nAm1gMSk8DAl+kdNA5zaKJtOu7npurqzg2Rlsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Io8sGADF; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1705906494;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JvL0EYk0yA8VZbOmPDp1AqJR4YUQln1x+o2jxPOvKjI=;
+	b=Io8sGADFjBccMs4DsJxNUNl9RH/WT2DjWJFsMVYi1mRSyHBK0UAclQ7vyQS+7iklaCzljU
+	oBu2T14effK830Yrr3E4VHYoeWNsdcj44qnV94MM75velRycxrn8nzCrRt9f4Vr70IvnBf
+	OsPQXvcal+xo8DC7odfdycElUKSu5mM=
+Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
+ [209.85.167.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-171-R1rCrY-kPzymUa7q0EOeEQ-1; Mon, 22 Jan 2024 01:54:52 -0500
+X-MC-Unique: R1rCrY-kPzymUa7q0EOeEQ-1
+Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-3bd49a8f086so5437073b6e.0
+        for <netdev@vger.kernel.org>; Sun, 21 Jan 2024 22:54:52 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705906492; x=1706511292;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JvL0EYk0yA8VZbOmPDp1AqJR4YUQln1x+o2jxPOvKjI=;
+        b=dtDdGK4kjlYUsZUkh9o8/K71TgmxzHYBuR6BVk9f4QfMmUXgF63YWZsnB8ugOfr2Ro
+         YVeb+7IhdMMapXDgYcRIW0/vUWeXVTuFL3KZf0gpoaRSqjq6PkfttxwnETOIthKF/jkv
+         XByFKLK/4S3/ZGqu79EnoLrGWpKdiPgwCqsrvl+2rKxFgkOb7rIZ8PqnLQaYc1n866tH
+         JAvrK+NaAR/WPJTH2Qp+jS/gkoZ4mJ1pO0mB4UuSdeXjjOWQ0hiGygtyGmF6WQoHjQr2
+         w1Saqxivp9M/U7/nCMqntGl5V2TTsgfPW54VL9I0dzYn+L8hlOBWKUxoEjbD5NQcNMWh
+         XC7A==
+X-Gm-Message-State: AOJu0YxW5m7EqCPiT+rRh7qDuEvzX0amLpWkPXnpMpRUV02iywb3hdmr
+	r6Yh4QxlZldpWiRxPjz8f9Afmc9IN+dD0uJ/5Z/FYocE13FZzV4ebgJhfX5rqz4stFbv70U68NF
+	rLwtHTsBfvLT2y/SWg2vAuU+a/OYcXCB12jCuUTFhz8rPPf/xPiThjqihDsFATep5rTkVaxHR8i
+	dI+MCD+V5q8XNDWq6f6fXTUhaidAQY
+X-Received: by 2002:a05:6808:21a0:b0:3bc:25c4:d85f with SMTP id be32-20020a05680821a000b003bc25c4d85fmr5424220oib.74.1705906492071;
+        Sun, 21 Jan 2024 22:54:52 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFZ8nvL3dGIQKuKlrjshwdncUFX/FxBnfNVdQigOwtAGbOH4UeeQB6L5XfmdlUoZquf1YQ7U/anP2pr+KQ9PzI=
+X-Received: by 2002:a05:6808:21a0:b0:3bc:25c4:d85f with SMTP id
+ be32-20020a05680821a000b003bc25c4d85fmr5424214oib.74.1705906491848; Sun, 21
+ Jan 2024 22:54:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS8P193MB1285:EE_|DB9P193MB1258:EE_
-X-MS-Office365-Filtering-Correlation-Id: 284b56ee-95f6-42ed-fbc0-08dc1b1510e8
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	63Skqt01WyK7Q1lhb+2jxw8EHtAGaOiPnTXXSDeLAY0L1dVYPCiIwmlcx05M1al14dC+QHVrgicvozDGg2oA+JoXTprByrF0JNlqSdhHc31EXPa2YyFnvpS4drSitYrcboqguWBKUEhnmhno7uPMj1K/ivxWV9vs+0vzGaHhib2VRMvVCljU+bz946l+rNKsLJKiDfZaJ4xxeIdO9oLJVOdq4fo+TvePBJ7H1H2nzwdJy1RfqHU1ZmCl+EhScwZwFWJwuaRG/Z71mW6QLnkBtug/lcRkvFODkhtPTN2kS2Oaas/YQKoM2bCH8RkHSWi02LOm0qTZtLzYt0qRgU4UX7iAW+Ex3DJcvPAKxZ7/nNgfOr9fYGmRBHZNFHrYWfMCAo9k9lGLDrHInwlAI5NUCWV+QBfyCo5jmiOyxdJoH6RV7D+v5xiYvwQ5AXVK8THTLlja+1t2hkG13nrO2CD9su+iK0YRAo9aUy+JVAUDA2ccjLbWgVomfXwSDCLkYgk2LKrqv81jIDHlCxs66x2UxbaoAhTrAdAnOtHFAHCglBQdVKfYGjbSUR73SGoysVcn
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ZElRMUxQU2hsUUlqcXN0ZEFVQXY2aGxjR09wSHdTeVErNEhEdGVLcXFZUzRH?=
- =?utf-8?B?N3VhTjJmY2pmMWVrTWIzNTdSUEt0bFIyVkQ3VFV1UHRYS2Y1OStNaTVDUE01?=
- =?utf-8?B?YU82VFdReHNrU1U1eDFITExGdzlHc1ZkbVNhV05uZlZFQnRLOEZBNWcvRDk4?=
- =?utf-8?B?dkV4ckgwTXVLdXBPYlVXRzZDK3JHYU02V1Y3aWZrS2oyei8yUXF1RG16dGhw?=
- =?utf-8?B?SVJRZ21oR2dpWVFYU29OaXp6TG40alFWWFYrUk1rTXhqYXZUMCtwbUtMb2pG?=
- =?utf-8?B?UGNxOEF3TVVHNWY4Qnh4VTBXczcvYXRoSk96ak50T3dpZ2tGcDlyM2JOY1Y2?=
- =?utf-8?B?RjB6ditsTlRyYmMwWGVkZm5lTlFzWWsvdE5BQ0NnWWp6anVUbDhUdmhhN3VG?=
- =?utf-8?B?TDZGZ0UvNkVZMVhHbk9QdnkwWEhwZHZleHpHWVVCL2tMQ3Q3WTg4dmtSQlBE?=
- =?utf-8?B?SjVlaTYwRVl5cHRDdnhrSGxsQnh6SEZIU2Z1YVg5Z09WeHJIZDVwRmZRZ3gw?=
- =?utf-8?B?Q2QrS000M3NlWVF6RkpTZnAxRTFXeFphenN5S1hhMTRYdTJUY3ZGay90SmM1?=
- =?utf-8?B?WHZFNXgrYU53eTFFM0ZjUk1xUWsvNmRxV3BDWW0wTHEzNHdSM2Zjbmx3dExZ?=
- =?utf-8?B?Z01NSFJJY3Z6TFdsSU4rcmUzK1didzhBTVpGUEpLR1Q3WFFUdUk4VUF5WUpw?=
- =?utf-8?B?RGM0YVg3ZkkzdnNHbEF3VW14MWJKR2NnL2I0YXJZQ20vMURjQnlld1hOZDhj?=
- =?utf-8?B?VTJpSjdIdHdreFFVVEQwOVJZMFB0aGVERElleDJLTlN2UXkxRVM1K0ttenla?=
- =?utf-8?B?ZTJBYnp5WkZINmgycVFWVnlLWWVIb1h6b0JCV1BnV2VKQXU4LzNONmQvbDh3?=
- =?utf-8?B?MnBUNlFHLzNrbFVLeUNxUU9jSS9wUDNoVjBuZWtXYkJBd3l4cDd4dGVMQjk1?=
- =?utf-8?B?SjR5TnJHNUw3S2ZxNHd4QVViLzZ6bmNCN0FqbXZGdnpTQUR4ZHM5azRqSnpk?=
- =?utf-8?B?di81NlphdllickowSTZxTGdTRVRSKzJyMEJyT2p6VDV0dHBwSWg4czM2MFpU?=
- =?utf-8?B?d3JQRHFLOTd5aFVQM2NySGR5S01tUzlZbFFvOGl6V2pBc1FORjJERXRmaCtq?=
- =?utf-8?B?b3F0NWZ6a1BsNHY2SlM0NXd1aVg5WndJZ0NWRktselV5bDBkSnE1c3NqZzc1?=
- =?utf-8?B?QWk1V3Z2VXhyNHVES1Z6Nk5pWlVyOXZlMk5manp6azVUWGpRQlpXcHJzWnB4?=
- =?utf-8?B?WlpWMWN1L0pOKy8rd2dGcUtwV2ZGWmlwdmxQbHYwZG9BLzUzOE91UFhITVBO?=
- =?utf-8?B?MlBkUFErWUUxTFkvNklWV1JGcE1USE1JSFlwUitFRmFFbmNIRVcyeFl1VUV1?=
- =?utf-8?B?bCt0VUtLMll2a3dmSm9qeTJKVFg2QWNvdXFPNVpWTFR3TUxESnRKLzZRMEFT?=
- =?utf-8?B?WkhmdUo1dkVhT1BSQ3VML1RDZkJ4UmJZL3AveFpNL2NiaXZNV1ZtTkZQaDhK?=
- =?utf-8?B?RUlsY1JwODhFOWxiWHhOaGNublZHdnlsRDhITHFZL3pFWVFSRGk2MlVTNG1w?=
- =?utf-8?B?bmJjM1VISHc3N0xkenJsR1pBVmdsK0QyTzhoY3FoTDVxT2tjWldxMGpST1RF?=
- =?utf-8?B?SE9oRlB4WmxiQWdqWTVWRzZvdExRcXpRQmZLTHRHd3g3Z1RBaWtqdTJpWWNJ?=
- =?utf-8?B?MUpBN1JrVHlVc3VZUC9rQXAvbEp4bGtzeFY0cERMcUVvQ3REaEZFZ3ZzemVk?=
- =?utf-8?Q?lD+qsbDUGF0oSLB4mA=3D?=
-X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-80ceb.templateTenant
-X-MS-Exchange-CrossTenant-Network-Message-Id: 284b56ee-95f6-42ed-fbc0-08dc1b1510e8
-X-MS-Exchange-CrossTenant-AuthSource: AS8P193MB1285.EURP193.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jan 2024 06:40:47.5225
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9P193MB1258
+References: <20231229073108.57778-1-xuanzhuo@linux.alibaba.com>
+ <20231229073108.57778-7-xuanzhuo@linux.alibaba.com> <CACGkMEvaTr1iT1M7DXN1PNOAZPM75BGv-wTOkyqb-7Sgjshwaw@mail.gmail.com>
+ <1705390340.4814627-3-xuanzhuo@linux.alibaba.com> <CACGkMEuo7m82cTxFSeryyYemMP8AgeKgE6kKYqoFGChTZ7KNWA@mail.gmail.com>
+ <1705903444.5368986-1-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <1705903444.5368986-1-xuanzhuo@linux.alibaba.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 22 Jan 2024 14:54:39 +0800
+Message-ID: <CACGkMEsYs3zKVNxzDMtAHZKAUEFppxBvWb0LMGDWVMwQqvX83Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 06/27] virtio_ring: introduce virtqueue_get_buf_ctx_dma()
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	virtualization@lists.linux-foundation.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 1/19/24 11:38, Jose Abreu wrote:
-> I understand your point, but the delay should be on reset function itself, since it depends
-> on the SoC that stmmac is integrated.
-> 
-> Please refer to reset_simple_reset(), where usleep_range() is used.
-> 
+On Mon, Jan 22, 2024 at 2:12=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
+om> wrote:
+>
+> On Mon, 22 Jan 2024 12:18:51 +0800, Jason Wang <jasowang@redhat.com> wrot=
+e:
+> > On Tue, Jan 16, 2024 at 3:47=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.aliba=
+ba.com> wrote:
+> > >
+> > > On Thu, 11 Jan 2024 16:34:09 +0800, Jason Wang <jasowang@redhat.com> =
+wrote:
+> > > > On Fri, Dec 29, 2023 at 3:31=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.a=
+libaba.com> wrote:
+> > > > >
+> > > > > introduce virtqueue_get_buf_ctx_dma() to collect the dma info whe=
+n
+> > > > > get buf from virtio core for premapped mode.
+> > > > >
+> > > > > If the virtio queue is premapped mode, the virtio-net send buf ma=
+y
+> > > > > have many desc. Every desc dma address need to be unmap. So here =
+we
+> > > > > introduce a new helper to collect the dma address of the buffer f=
+rom
+> > > > > the virtio core.
+> > > > >
+> > > > > Because the BAD_RING is called (that may set vq->broken), so
+> > > > > the relative "const" of vq is removed.
+> > > > >
+> > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > > > ---
+> > > > >  drivers/virtio/virtio_ring.c | 174 +++++++++++++++++++++++++----=
+------
+> > > > >  include/linux/virtio.h       |  16 ++++
+> > > > >  2 files changed, 142 insertions(+), 48 deletions(-)
+> > > > >
+> > > > > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio=
+_ring.c
+> > > > > index 51d8f3299c10..1374b3fd447c 100644
+> > > > > --- a/drivers/virtio/virtio_ring.c
+> > > > > +++ b/drivers/virtio/virtio_ring.c
+> > > > > @@ -362,6 +362,45 @@ static struct device *vring_dma_dev(const st=
+ruct vring_virtqueue *vq)
+> > > > >         return vq->dma_dev;
+> > > > >  }
+> > > > >
+> > > > > +/*
+> > > > > + *     use_dma_api premapped -> do_unmap
+> > > > > + *  1. false       false        false
+> > > > > + *  2. true        false        true
+> > > > > + *  3. true        true         false
+> > > > > + *
+> > > > > + * Only #3, we should return the DMA info to the driver.
+> > > >
+> > > > Btw, I guess you meant "#3 is false" here?
+> > > >
+> > > > And could we reduce the size of these 3 * 3 matrices? It's usually =
+a
+> > > > hint that the code is not optmized.
+> > >
+> > > On the process of doing dma map, we force the (use_dma_api, premapped=
+).
+> > >
+> > > if premapped:
+> > >      virtio core skip dma map
+> > > else:
+> > >         if use_dma_api:
+> > >                 do dma map
+> > >         else:
+> > >                 work with the physical address.
+> > >
+> > > Here we force the (premapped, do_unmap).
+> > >
+> > > do_unmap is an optimization. We just check this to know should we do =
+dma unmap
+> > > or not.
+> > >
+> > > Now, we introduced an new case, when the virtio core skip dma unmap,
+> > > we may need to return the dma info to the driver. That just occur whe=
+n
+> > > the (premapped, do_unmap) is (true, false). Because that the (premmap=
+ed,
+> > > do_unmap) may be (false, false).
+> > >
+> > > For the matrices, I just want to show where the do_unmap comes from.
+> > > That is a optimization, we use this many places, not to check (use_dm=
+a_api,
+> > > premapped) on the process of doing unmap. And only for the case #3, w=
+e should
+> > > return the dma info to drivers.
+> >
+> > Ok, it tries to ease the life of the readers.
+> >
+> > I wonder if something like
+> >
+> > bool virtqueue_needs_unmap() can help, it can judge based on the value
+> > of use_dma_api and premapped.
+>
+>
+> I think not too much.
+>
+> Because do_unmap is for this.
+>
+>
+>
+> +static bool vring_need_unmap(struct vring_virtqueue *vq,
+> +                            struct virtio_dma_head *dma,
+> +                            dma_addr_t addr, unsigned int length)
+> +{
+> +       if (vq->do_unmap)
+> +               return true;
+>
+> Before this, we is to judge whether we should do unmap or not.
+> After this, we is to judge whehter we should return dma info to driver or=
+ not.
+>
+> If you want to simplify this function, I will say no.
+>
+> If you want to replace "do_unmap" with virtqueue_needs_unmap(), I will sa=
+y ok.
 
-Okay, in my case the SOC is an Altera CycloneV and reset control seems to be an altr,rst-mgr
-which is indeed based on this reset_simple_reset.
+That's my point.
 
-So it implements reset_control_assert, reset_control_deassert, and reset_control_reset.
-But the above mentioned delay affects only the width of the reset pulse that is generated
-by the reset_control_reset method.
+> But I think we donot need to do that.
 
-However if you look at the code in stmmac_dvr_proble where the reset pulse is generated,
-you will see that the reset pulse is only generated with reset_control_assert/deassert:
-
-        if (priv->plat->stmmac_rst) {
-                ret = reset_control_assert(priv->plat->stmmac_rst);
-                reset_control_deassert(priv->plat->stmmac_rst);
-                /* Some reset controllers have only reset callback instead of
-                 * assert + deassert callbacks pair.
-                 */
-                if (ret == -ENOTSUPP)
-                        reset_control_reset(priv->plat->stmmac_rst);
-        }
-
-I don't know which reset controller that would be, where only a reset_control_reset is
-available, but in my case ret == 0, and even if I could get the reset_control_reset
-to be used, the issue is not the duration how long the reset line is in active state,
-but the duration that is needed for the device to recover from the reset.
-
+Just a suggestion, and you can move the comment above there.
 
 Thanks
-Bernd.
+
+>
+> +
+> +       if (!vq->premapped)
+> +               return false;
+> +
+> +       if (!dma)
+> +               return false;
+> +
+> +       if (unlikely(dma->next >=3D dma->num)) {
+> +               BAD_RING(vq, "premapped vq: collect dma overflow: %pad %u=
+\n",
+> +                        &addr, length);
+> +               return false;
+> +       }
+> +
+> +       dma->items[dma->next].addr =3D addr;
+> +       dma->items[dma->next].length =3D length;
+> +
+> +       ++dma->next;
+> +
+> +       return false;
+> +}
+>
+>
+> Thanks.
+>
+>
+> >
+> > Thanks
+> >
+> > >
+> > > Thanks.
+> > >
+> > > >
+> > > > Thanks
+> > > >
+> > > >
+> > >
+> >
+>
+
 
