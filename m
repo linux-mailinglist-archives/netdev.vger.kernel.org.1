@@ -1,93 +1,73 @@
-Return-Path: <netdev+bounces-64597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60FB2835D77
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 09:58:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75D2E835D89
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 10:03:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85DEE1C23CC3
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 08:58:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26B50284D2F
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 09:03:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45BFC374C1;
-	Mon, 22 Jan 2024 08:57:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A586038DED;
+	Mon, 22 Jan 2024 09:03:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="rn+PrnE6";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="03jwonnZ";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="maN0sgPP";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="3ctN9PAT"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="c/QAyF23"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7517339FE9;
-	Mon, 22 Jan 2024 08:57:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F72336AEF
+	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 09:03:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705913864; cv=none; b=ts0gc6REINw1EPQKUohJ0gUQE1J/aU60dXeRmK53bu8XDfqwxixEYl3U7ErNCvy6SLHX+pXpheeblyoItdVwpdXKMveKH87GXgbp7PIhTaXWhEJVI+QS/lhcjNiY41iw1iXEIfXkyw7nHfmBpfTe4a/b3uyg0EGcHRbMurUfuEo=
+	t=1705914184; cv=none; b=rmIR9Mxl1QtOIB+d2eFVc/aZtO0HDgRzoNqj4n8AEYZAEn8SOQNN0wlvktboXU6gSF1m8mb8By1OC7YgdbPc+oDgsBdwlluksHGU2YrARSmsVrUbNDNeGPlEnDzzHvtlhBoFoa6P/29UBgGuNCPCT1WIOarXEAalFWvJ4BgPtR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705913864; c=relaxed/simple;
-	bh=KA1JVTbOBM3uBfYU6S2UqF+B/JP1ASsLjDXyfPbhQ+w=;
+	s=arc-20240116; t=1705914184; c=relaxed/simple;
+	bh=wW46cQ3UwS0nraNXjGVR8wst41VmCyfX698Ufto+Ma4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tizNzCn6F/ILRY1ABcnT81MDcQvP1hr6nSacnEqZ9/fK6fU4emUz/vjh7gWGdmEOgV61H40eBdryfP2NQtBTjgKONjLhJWozsQDdAiVCWOhkFN9+6SwTiYmyyVuc4EFFwlAPLkwf9lbUSGTWTUCGujp6hd5QE7dwVYjivs1I3zk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=rn+PrnE6; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=03jwonnZ; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=maN0sgPP; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=3ctN9PAT; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 5B2CC1FBB7;
-	Mon, 22 Jan 2024 08:57:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1705913860; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iiQ6RpqMIcBoOOnsDSCp7bi1bWTsKeg9JbKPmZLkpT4=;
-	b=rn+PrnE6VzmU1xq5Lo1uHES1GwA/SCbmRys1kfsUvfsYiLc3PBwwoBUrcL4tXgI5cdObY6
-	mkiSJpyX/bbTJgYRaJL4ythvDgS43+8KzNBi7N+U8rFyrMy4kVDFR1wlRhz/GRlLj7Ytgw
-	6uRaEgm8HzFFsajZEe7ZPUTn/lwKWY8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1705913860;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iiQ6RpqMIcBoOOnsDSCp7bi1bWTsKeg9JbKPmZLkpT4=;
-	b=03jwonnZDGYa/BFArL9WK1gOUCWlJo0lkyv9puGq83AxUkuGTYkZJrc9TWHViKVc1S7mNY
-	NScYO43W1dtJHbCw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1705913859; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iiQ6RpqMIcBoOOnsDSCp7bi1bWTsKeg9JbKPmZLkpT4=;
-	b=maN0sgPPpU/h5kuJO7NGKfbktoMP2iGI1EqgERLaXWaqQOD7DA5SFLrMk+thqO2/L0+Psb
-	y4FR36Rl5qzD/HWMHusV3b0fE0iII1f0WSmGmfqYOi/6mrETRrMa4QyN2wq8fXiBZ+Ara/
-	NMgar+3qkAUAV/hI6hRlQANpPzxu1bM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1705913859;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iiQ6RpqMIcBoOOnsDSCp7bi1bWTsKeg9JbKPmZLkpT4=;
-	b=3ctN9PATQk2ZO+iPHbYzxccXuMJpw9fM+zOw4Lpjuyb2DMTDcDVrzj6DjJQAOGJTC8OpOz
-	tlEe+EXWSO7zmkDQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D072013995;
-	Mon, 22 Jan 2024 08:57:38 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id SGfMLwIurmXcZgAAD6G6ig
-	(envelope-from <dkirjanov@suse.de>); Mon, 22 Jan 2024 08:57:38 +0000
-Message-ID: <8f031b17-9d86-42bf-b857-a7a46942a1cf@suse.de>
-Date: Mon, 22 Jan 2024 11:57:37 +0300
+	 In-Reply-To:Content-Type; b=IHkB3w5YvFRnCickBrcLVWE8PYWRccl0m/sN6HcmphuYdhcE3BIQq0ZH/JxnaBJzYBGaylkv+aSuKeROdK7If4oFORVVfgHSNJPVFjNEEg9ugWFRfx2SjLw/My2H6d8jBoKXJKkswQI8+B9m5ai63Tae4hTWO1/2WLb1WyWajoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=c/QAyF23; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-40eaf973eb4so3518725e9.0
+        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 01:03:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1705914180; x=1706518980; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=j20of4/RjuNyS9eIIV2sFplmIp4k//FgJbvHWLk9vyY=;
+        b=c/QAyF232WBTCQfs4pXvRrvNlZ5l/MvahYp2q3vWBq1CoV24aCeVKlOO1epDmHuunY
+         TIbh5w8iT0OVIVqU02TRzceCn63zzybTiAfCHqbNe/IB6jBzx+wkMIikbW5jBXsc+kxh
+         wDp3BNdhGc2mrIkPVRfeUO3Mb4QGby4sIdpnz/2pT34JjbLJW4Ba8JceQUQt51W/8swk
+         CsieYz2p6o40lo9nish7mlPr+UCy3xVkfJ31cgEz6HA2R706XdM4XXHTcIc34gfmzctg
+         55ZF6kxGjI2d8bsQWuIxyEWtWYC78TdA9uWWHSrsxV3jrwDpz87KMEP0XzsQiYMqbzK/
+         EQXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705914180; x=1706518980;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=j20of4/RjuNyS9eIIV2sFplmIp4k//FgJbvHWLk9vyY=;
+        b=PdYa9H2zV3CA3YNG5pYI1FjaOAfbW+i24QkdufyzI/9JnGsJrDLFYoNkejVMT0KJNO
+         pDxrgH8rvim9WUbczpx4sc2Pvzh57ok5gXVgkB069hToRB4nK2MiubCDk6FtL4eC7Wz7
+         okRtkMvi2oQbgjiMHD4dcFFuVNThVE2ZPmBywMqM/8FPDvGDCQZc3/vhBfMmq+ThEo/i
+         EdVP3XyNNXyIrBtVN0+XfdpAiEutqJz7HvhY5jWZfWcxjQgMTWZlRZ+H7lqoLfm7TXoM
+         HLL3vpcKYKL7bIKUnbFNzFkUdD6XSOY3WLQ+T8I0kwzP95kHMi0xjisBjBqKBeTRFC2w
+         VPKQ==
+X-Gm-Message-State: AOJu0YyEzp1Buk3qDfaE58qK8IlKsG5tEY8qy87c1MHD14KDwkn554/1
+	hJNXomGCIosZ1vKi9D1LxuuMiNWjhfyCfQvAmoQTpOxFfrUyhVX3dWoUZB0EWFA=
+X-Google-Smtp-Source: AGHT+IEEEn/i9g7Yboj5MSN4LpPMvbj7b/VZJYID0Dtp4cn2r95ftCrYi2/ro0bM9+PsfEqs1s+dQw==
+X-Received: by 2002:a05:600c:458a:b0:40e:6665:2beb with SMTP id r10-20020a05600c458a00b0040e66652bebmr1896275wmo.152.1705914180490;
+        Mon, 22 Jan 2024 01:03:00 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.215.66])
+        by smtp.gmail.com with ESMTPSA id h17-20020a05600c499100b0040d6e07a147sm37016318wmp.23.2024.01.22.01.02.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 Jan 2024 01:03:00 -0800 (PST)
+Message-ID: <0656e87f-04f6-4627-9b9e-2b538b622549@linaro.org>
+Date: Mon, 22 Jan 2024 10:02:58 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,99 +75,99 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V3] net: ethernet: ti: cpsw_new: enable mac_managed_pm to
- fix mdio
+Subject: Re: [PATCH v4 1/8] clk: qcom: ipq5332: add const qualifier to the
+ clk_init_data structure
 Content-Language: en-US
-To: Sinthu Raja <sinthu.raja@mistralsolutions.com>,
- Siddharth Vadapalli <s-vadapalli@ti.com>,
- Ravi Gunasekaran <r-gunasekaran@ti.com>, Roger Quadros <rogerq@kernel.org>
-Cc: linux-omap@vger.kernel.org, netdev@vger.kernel.org,
- Sinthu Raja <sinthu.raja@ti.com>
-References: <20240122083414.6246-1-sinthu.raja@ti.com>
-From: Denis Kirjanov <dkirjanov@suse.de>
-In-Reply-To: <20240122083414.6246-1-sinthu.raja@ti.com>
+To: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konrad.dybcio@linaro.org>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
+ linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+References: <20240122-ipq5332-nsscc-v4-0-19fa30019770@quicinc.com>
+ <20240122-ipq5332-nsscc-v4-1-19fa30019770@quicinc.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20240122-ipq5332-nsscc-v4-1-19fa30019770@quicinc.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Authentication-Results: smtp-out2.suse.de;
-	none
-X-Spamd-Result: default: False [-0.12 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 XM_UA_NO_VERSION(0.01)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 BAYES_HAM(-0.03)[55.35%];
-	 MIME_GOOD(-0.10)[text/plain];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 RCPT_COUNT_SEVEN(0.00)[7];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[ti.com:email];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 RCVD_TLS_ALL(0.00)[];
-	 MID_RHS_MATCH_FROM(0.00)[]
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spam-Score: -0.12
 
+On 22/01/2024 06:56, Kathiravan Thirumoorthy wrote:
+> There are few places where clk_init_data structure doesn't carry the const
+> qualifier. Let's add the same.
 
+And why should they carry const?
 
-On 1/22/24 11:34, Sinthu Raja wrote:
-> From: Sinthu Raja <sinthu.raja@ti.com>
 > 
-> The below commit  introduced a WARN when phy state is not in the states:
-> PHY_HALTED, PHY_READY and PHY_UP.
-> commit 744d23c71af3 ("net: phy: Warn about incorrect mdio_bus_phy_resume() state")
-> 
-> When cpsw_new resumes, there have port in PHY_NOLINK state, so the below
-> warning comes out. Set mac_managed_pm be true to tell mdio that the phy
-> resume/suspend is managed by the mac, to fix the following warning:
-> 
-> WARNING: CPU: 0 PID: 965 at drivers/net/phy/phy_device.c:326 mdio_bus_phy_resume+0x140/0x144
-> CPU: 0 PID: 965 Comm: sh Tainted: G           O       6.1.46-g247b2535b2 #1
-> Hardware name: Generic AM33XX (Flattened Device Tree)
->  unwind_backtrace from show_stack+0x18/0x1c
->  show_stack from dump_stack_lvl+0x24/0x2c
->  dump_stack_lvl from __warn+0x84/0x15c
->  __warn from warn_slowpath_fmt+0x1a8/0x1c8
->  warn_slowpath_fmt from mdio_bus_phy_resume+0x140/0x144
->  mdio_bus_phy_resume from dpm_run_callback+0x3c/0x140
->  dpm_run_callback from device_resume+0xb8/0x2b8
->  device_resume from dpm_resume+0x144/0x314
->  dpm_resume from dpm_resume_end+0x14/0x20
->  dpm_resume_end from suspend_devices_and_enter+0xd0/0x924
->  suspend_devices_and_enter from pm_suspend+0x2e0/0x33c
->  pm_suspend from state_store+0x74/0xd0
->  state_store from kernfs_fop_write_iter+0x104/0x1ec
->  kernfs_fop_write_iter from vfs_write+0x1b8/0x358
->  vfs_write from ksys_write+0x78/0xf8
->  ksys_write from ret_fast_syscall+0x0/0x54
-> Exception stack(0xe094dfa8 to 0xe094dff0)
-> dfa0:                   00000004 005c3fb8 00000001 005c3fb8 00000004 00000001
-> dfc0: 00000004 005c3fb8 b6f6bba0 00000004 00000004 0059edb8 00000000 00000000
-> dfe0: 00000004 bed918f0 b6f09bd3 b6e89a66
-> 
-Please add "Fixes" tag
-
-> Signed-off-by: Sinthu Raja <sinthu.raja@ti.com>
+> Acked-by: Konrad Dybcio <konrad.dybcio@linaro.org>
+> Signed-off-by: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
 > ---
->  drivers/net/ethernet/ti/cpsw_new.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  drivers/clk/qcom/gcc-ipq5332.c | 38 +++++++++++++++++++-------------------
+>  1 file changed, 19 insertions(+), 19 deletions(-)
 > 
-> diff --git a/drivers/net/ethernet/ti/cpsw_new.c b/drivers/net/ethernet/ti/cpsw_new.c
-> index 498c50c6d1a7..087dcb67505a 100644
-> --- a/drivers/net/ethernet/ti/cpsw_new.c
-> +++ b/drivers/net/ethernet/ti/cpsw_new.c
-> @@ -773,6 +773,9 @@ static void cpsw_slave_open(struct cpsw_slave *slave, struct cpsw_priv *priv)
->  			slave->slave_num);
->  		return;
->  	}
-> +
-> +	phy->mac_managed_pm = true;
-> +
->  	slave->phy = phy;
->  
->  	phy_attached_info(slave->phy);
+> diff --git a/drivers/clk/qcom/gcc-ipq5332.c b/drivers/clk/qcom/gcc-ipq5332.c
+> index f98591148a97..66d5399798fe 100644
+> --- a/drivers/clk/qcom/gcc-ipq5332.c
+> +++ b/drivers/clk/qcom/gcc-ipq5332.c
+> @@ -65,7 +65,7 @@ static struct clk_alpha_pll gpll0_main = {
+>  static struct clk_fixed_factor gpll0_div2 = {
+>  	.mult = 1,
+>  	.div = 2,
+> -	.hw.init = &(struct clk_init_data) {
+> +	.hw.init = &(const struct clk_init_data) {
+
+This is a cast, why do you need const? What does it even change?
+
+Best regards,
+Krzysztof
+
 
