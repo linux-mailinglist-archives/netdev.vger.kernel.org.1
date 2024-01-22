@@ -1,280 +1,168 @@
-Return-Path: <netdev+bounces-64606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 639B5835DE5
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 10:17:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C70B835DD0
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 10:14:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12101281FB5
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 09:16:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEFBF288473
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 09:14:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6002039856;
-	Mon, 22 Jan 2024 09:16:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5521E39848;
+	Mon, 22 Jan 2024 09:13:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="j8Jg5oz/"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02on2057.outbound.protection.outlook.com [40.107.249.57])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7CF93984F
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 09:16:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705915016; cv=none; b=r8K023KSRXPL3miWxj1HBn1x7Vc5dLzFvWe7mORn9Hn59Hs8e9+uFYM18jjT3TwEyVbGPh9BAHW6QeZi7zJTugyQhPAidhCPP+3btqSia4mxPsNu16N9CElJCy/hcWSEe9n6av5nE0Fw0pRwjPfi3NYI7T1jQ2idmzQPKQDvBA0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705915016; c=relaxed/simple;
-	bh=HpNVXgyTdzt7tGWGUoRz7wtnHgt4ex5FhcPLj7FKQPs=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=mccX3gkRc8QJuKWKhd/BlyGBvIFRMW432ZVLhX4FSVfbj6CBQwfnnAVMGLSND9SxRNuCTZtXltfU83BIJEEFDsyeidksl6r7hKoX+JegOzNSPFz/hJkJn4+Xi1qb1Mt0aJ0v0HLCinxjS9XnZj3PXAi5rBz1Jrd/5Wz6GiLAfrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; arc=none smtp.client-ip=115.124.30.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R661e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0W.5aV37_1705915003;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W.5aV37_1705915003)
-          by smtp.aliyun-inc.com;
-          Mon, 22 Jan 2024 17:16:43 +0800
-Message-ID: <1705914702.0358708-10-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH 1/1] virtio_net: Add timeout handler to avoid kernel hang
-Date: Mon, 22 Jan 2024 17:11:42 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,
- Heng Qi <hengqi@linux.alibaba.com>,
- Paolo Abeni <pabeni@redhat.com>,
- Zhu Yanjun <yanjun.zhu@intel.com>,
- mst@redhat.com,
- davem@davemloft.net,
- edumazet@google.com,
- kuba@kernel.org,
- virtualization@lists.linux.dev,
- netdev@vger.kernel.org,
- Zhu Yanjun <yanjun.zhu@linux.dev>
-References: <20240115012918.3081203-1-yanjun.zhu@intel.com>
- <ea230712e27af2c8d2d77d1087e45ecfa86abb31.camel@redhat.com>
- <667a9520-a53f-40a2-810a-6c1e45146589@linux.dev>
- <7dd89fc0-f31e-4f83-9c02-58ee67c2d436@linux.alibaba.com>
- <430b899c-aed4-419d-8ae8-544bb9bec5d9@lunn.ch>
- <64270652-8e0c-4db7-b245-b970d9588918@linux.dev>
- <CACGkMEs18hjxiZRDT5-+PMDHkLbEyiviafGiCWsAE6CGBrj+9g@mail.gmail.com>
- <1705895881.6990144-1-xuanzhuo@linux.alibaba.com>
- <CACGkMEvvn76w+BZArOWK-c1gsqNNx6bH8HPoqPAqpJG_7EYntA@mail.gmail.com>
- <1705904164.7020166-3-xuanzhuo@linux.alibaba.com>
- <CACGkMEsTT7hrm2QWZq-NasfVAJHsUoZq5hijvLE_jY+2YyKytg@mail.gmail.com>
- <CACGkMEt4zyESemjPwZtD5d4d00jtorY0qR5vM9y96NZzKkdj8A@mail.gmail.com>
- <1705906930.2143333-5-xuanzhuo@linux.alibaba.com>
- <CACGkMEuO2wO-kwMWdR9hFSCJwLUN5jwKxCCaAmxJOB8sm5bfoA@mail.gmail.com>
- <1705908305.1535513-7-xuanzhuo@linux.alibaba.com>
- <CACGkMEvRQfSN0S0r4nXNHS1A2LzjhSfL4-1bFrYx4y0yM9yOag@mail.gmail.com>
- <1705910488.8207285-9-xuanzhuo@linux.alibaba.com>
- <CACGkMEu5bO_TeBuKGv0gyaUCnq=euq81y9xJ-MK=VBoCxhVe-Q@mail.gmail.com>
-In-Reply-To: <CACGkMEu5bO_TeBuKGv0gyaUCnq=euq81y9xJ-MK=VBoCxhVe-Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AF803984B;
+	Mon, 22 Jan 2024 09:13:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.249.57
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705914810; cv=fail; b=fdgEi6JAr8nIZfRjiOgf6bOxBF8nlhmAYqCSnwbL3rPrxFO4N/yuCzoIkQ8TY8eUshmQ+GME2/CixX1B7RXrYEUio1AIFU1j81puTXK/T+c305D9SdzRBe5NthXGRNhfc348Z/qOC119k0n4Ra2+NgPHh04c/QREG6CB41ysVcE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705914810; c=relaxed/simple;
+	bh=Sx5ueojNCX/R4jNCvEuAgiFDhuL/ht3iFSgcC9pbFLk=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=MyDQLX/yAmZebSZ3OkaFTY9/lzyATtT/n+YmRjwh8PFXmj7WqAoLbuiLOylCROVrFKc2rdtxT+Ex6MzRJpeLvx94ooW6Jx9lnnvESZIyfomFev2a4keIJ4IqR+hJ9LfMVVK/T8AxwhJxnu1T1kemucUCnzBg3Na2zuAX95gTKBw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (1024-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=j8Jg5oz/; arc=fail smtp.client-ip=40.107.249.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MapojS6/KajYjmvDuF/cbcSc1nDB5e0f4qhyUtyCmSQ4SFYjO0axRfyA+WpJgGaYaQ/fxdJDqBslxwg/zZbqSl2Oyk6o9PvFuib8mIhefjm48T4MZ1Y8PCIFx1EkTpPYSNujFWFZ0W2DdmJ1tzfq2Ijt6DIiwE/dSU8dlI+OVXQ2P8m6FHC5tBHn7YWtYHTGriV+raRBIlALje3Ebo9QuZ1gZJRgDfDoDrkCl8LuGZTK3Hnvluy79tEgGBObnaXHzSSicF+t8giGmN4nbWx4zj15PYrZJ6N2Mj5EErHS/tQl8mdzgxLDZ8rm7B1ryVugBhq8YwMi0e0jgd/k8H6oVg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4OjG4AoWwuAMRUmAAaN3es7l0fJ7Pa2qkw1U/8hqRyA=;
+ b=REbdxf+5vb94eGm67waZmqu2R2HZ7bUApjuM8oxVUaJBnv/OYHta+9+ylrvdyatcVdqjLCLyBruKDPCHq0mf1CxForCXGtjdq5VlrZZSZcEqGwg9Dxd4eV1vwQB5740pRRjPZButJH8czp1XCNhsw3rdkX47032UIS+dsTMgE2XhIIUmaLxxdnoj0gNxMFfmZfkCwLobeMI3O1D7TPiVYEQoUbcKHz+YTegFt/gMY9ZKcaA8Xo7mfAp9MoxObjDU7HPxYjXeit4z3ONyuxexHgmF2pKEtMHhwN+RjadWCvjFiF5Jb00/dHU8lj3EGqQEihJwZajffyu6A6eLAl8Mug==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector2-NXP1-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4OjG4AoWwuAMRUmAAaN3es7l0fJ7Pa2qkw1U/8hqRyA=;
+ b=j8Jg5oz/lo2NAu6nxfV/lhAubB9mTUepcGrtdAyUE3uaCfsJG1txdabG+rI9JqWTZA4hbOxIDG1ZYO2++YsZRVhlLs463Go+OsJI1d1qHMacD32uTyC+ija2nTlRJsY+NJt1dACcL94UHF1kjz6SzcuicnMln7iKMsdgUoyqPGE=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=oss.nxp.com;
+Received: from DU0PR04MB9417.eurprd04.prod.outlook.com (2603:10a6:10:358::11)
+ by AS1PR04MB9333.eurprd04.prod.outlook.com (2603:10a6:20b:4df::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.32; Mon, 22 Jan
+ 2024 09:13:22 +0000
+Received: from DU0PR04MB9417.eurprd04.prod.outlook.com
+ ([fe80::c499:8cef:9bb1:ced6]) by DU0PR04MB9417.eurprd04.prod.outlook.com
+ ([fe80::c499:8cef:9bb1:ced6%3]) with mapi id 15.20.7202.031; Mon, 22 Jan 2024
+ 09:13:22 +0000
+From: "Peng Fan (OSS)" <peng.fan@oss.nxp.com>
+To: wg@grandegger.com,
+	mkl@pengutronix.de,
+	conor+dt@kernel.org,
+	davem@davemloft.net,
+	robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org
+Cc: edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-can@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Peng Fan <peng.fan@nxp.com>
+Subject: [PATCH] dt-bindings: can: fsl,flexcan: add i.MX95 compatible string
+Date: Mon, 22 Jan 2024 17:17:38 +0800
+Message-Id: <20240122091738.2078746-1-peng.fan@oss.nxp.com>
+X-Mailer: git-send-email 2.37.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SI2PR06CA0009.apcprd06.prod.outlook.com
+ (2603:1096:4:186::17) To DU0PR04MB9417.eurprd04.prod.outlook.com
+ (2603:10a6:10:358::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DU0PR04MB9417:EE_|AS1PR04MB9333:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5c34e138-fe73-456c-fd34-08dc1b2a6170
+X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	M6iDr4Tk11rYGg0uRAL8C81CAYO5JdHFzB7a5Ljsp+ZHk3gg/CpBsK6a6zRrykLpVwc8NLvOJ3I1iikMp4/eNA2jcuH5KyOnSalXIiL5D77otjTquueeyxzXqmxQiQxBszPFRRqkH0lZJs1CiuZn9QZA+7A5GDWFhLJ25wuxmdcnYoGyjW3/t7HgZmaMrPRwBv+TLG1HrP8TKPa48JSCmBAHCmkXgdYaOCTsuJiwK1/ZifbH40w7VbO41sCjbD5n1ZQl2dye8zOLtakuzoVCwpglPmNs/nwVyrQmNo1x7pXeyE+ziLu4z5kXJWzcUBh9zmquDVlaqXBz2v1TDNVkZjYv/LwTkOz99xUWqgVQuV6RpgNWVNG21ZoCrbUHljXkvII/tCNu9JyGPcIGyyEKEbCxX3EbpJ0v0DBzyHJyS/LX7ktY94VhWFM0roVGPIqtsrelfBvkEL3M/F3yOseIl5twKHTFCTFx/vLkM8R14b5+PQoDcm3wdeCBRDiyzNSXIvQC2xRF4S5fwR+w3mkszynafXkLgWxRhm7waL9g39+5q+L1cWDaNsPu6cizE4iViaUk8XMzvWQD8oxr3GNCiiVnPDXPcfsGjjixr7ak8zKAnjpAfZjety8segSNm2oi
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR04MB9417.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(366004)(136003)(376002)(396003)(39860400002)(230922051799003)(1800799012)(64100799003)(451199024)(186009)(1076003)(6512007)(6666004)(2616005)(26005)(6506007)(52116002)(7416002)(5660300002)(8676002)(4326008)(4744005)(8936002)(41300700001)(2906002)(478600001)(316002)(66476007)(66556008)(66946007)(6486002)(86362001)(38100700002)(38350700005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?65brI60ITT7+TSXQ91XZ3cXExBD693AiO42Z/QstFAKIQNOo0Fu8CRDjJTpQ?=
+ =?us-ascii?Q?ogE3vjpfW7r3XNo/LNpI93ZI1sAGSYQrRuox2/zYeposcpOn8kWxiDrGi0Gr?=
+ =?us-ascii?Q?xN2y61GEp86SByRBlqngcntS4tEaFTPTUg9A4bbW7Y6pcngrlJieCBv0bTv/?=
+ =?us-ascii?Q?bc62hzXlit2NgInni8taPoD8mW6qHJtqWIP0BtIsCQlO+VXF6LaRIUb2HzYg?=
+ =?us-ascii?Q?EKlXdSahRw7L2va3CFjKK0vvCf14I9geVVhaICvzbcRMLGtF7oF6kmbDpsZ6?=
+ =?us-ascii?Q?q2YVn7+ItxvOOs6RH74GKthAbPGq3bBCQvxOfoSqiH+bYMmfHEOTkzipcycU?=
+ =?us-ascii?Q?8JccUPYK7jvlvkZqt+hUaZhbJB5C8/lG5ZSl7UqkhecaILbD8BG84Gkt9bJx?=
+ =?us-ascii?Q?lx4HiJcFTbcN+wxQz2IvzDFojdNwsrXmD67YPB/3DWQlBBTyNY2YDxIiJKpQ?=
+ =?us-ascii?Q?EQNXa6cJzVUJiWbwvS1EY/PVPk9I06JoZhQvZa/BuXLGHScMt8ohtNVvv+V1?=
+ =?us-ascii?Q?/of/snmxs5hXo2wmeNpnhw/sda79ksMd3JbnRVZ6yicjr1PtFLYJIXgTnl0D?=
+ =?us-ascii?Q?9v+OJKPzGklqgQPg2+iooeKYEQ3IQhbTzjNXYYhYQp++54a32em0kHLhnPkX?=
+ =?us-ascii?Q?u7pyV2FLtzLbIdHh7XZd4eBGnuCUJhiS9z1cNm0LSBAgUVnYAxIYZk4c5Oq3?=
+ =?us-ascii?Q?TMZ2FQ77H2PlkH9HFE24wb9SacJcpclGFvjUxQWtC+KzQIHfKuF1WNQy/Z9j?=
+ =?us-ascii?Q?udgMf0AWqs+4t9/0SKVvLMjhxua7No+64XApJn5UAYijDJaEsCd6T3ZOBoPs?=
+ =?us-ascii?Q?V9VK55mtfLrQcna+TnSCUUOuYDdwEUKJgFb3x7v8QAQu1ghX2V13kwent5UX?=
+ =?us-ascii?Q?urh9ylPRg6txm823ZKlcJDZhaf47PtYPQN6vE/VzvWcVOkZuCNcR3f7EkAWI?=
+ =?us-ascii?Q?yuFf3nPi8gv7UABHR6vthW4XV25PiAkE4VaJStT30Dj5MKvjGNBkP5Qpg/G5?=
+ =?us-ascii?Q?BZYefYUfYDMsXgaJg/MYau/+f20uC1Mph4HgcmczLL2N9u2Xlx5M+GWDlSvU?=
+ =?us-ascii?Q?wb6XskD0JKry425T/7pyVAAnsqHTYspa9re3PHyhIUHqKzTrXBBimySCJ5Iy?=
+ =?us-ascii?Q?7WoNSsxuxFswIISdGe4z06QinfnKD+MH+pyTK+mfMlhY0p1UNoMEqhMmhBXm?=
+ =?us-ascii?Q?i3I04vllqhW35G6LCqD0xse1ePW9gg/+IQdFqDOGnbRk4aAO9ZBzBh0e3VyO?=
+ =?us-ascii?Q?HYJl1RhYxEqcA0fkD5hQtDCrXLuLeCpbnzV+ssAbcxRce4GwO3aStSJrhblA?=
+ =?us-ascii?Q?ZSA9yUc/yKZWQcj9i7Del/YxgAMpLKnGQuMql+cqUh41Sr5sb7kkCFOWUCE9?=
+ =?us-ascii?Q?RXkwqTAsDGAbFOlw+lCi4qBOix8k0bisU11jULQYeQXwlkun2k0JeA+aaFx/?=
+ =?us-ascii?Q?GPee2O76uRu2O7/fsnq2HJ5ldI+GRHjLlKXObUCajQSsfrfXOtyzFa7auM4c?=
+ =?us-ascii?Q?PYJfZed0q0MvLZRryx4JQo/KS/Wli43g0HVyuTfiYpkfNbylyFpScVs0F7QD?=
+ =?us-ascii?Q?Zzi+oq0HxwqSZoV/nzEY7xnndnT5Q1qeUnrKpJgU?=
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5c34e138-fe73-456c-fd34-08dc1b2a6170
+X-MS-Exchange-CrossTenant-AuthSource: DU0PR04MB9417.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jan 2024 09:13:22.0437
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: owGUhEHR4LUx2KwLF5ElPxdDBmxtab6E+iwjGuClgIZ5+deptjAyBZ18wGtcnxJtLpsbJa5G6tZnDwhSi3lf+w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS1PR04MB9333
 
-On Mon, 22 Jan 2024 16:32:46 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Mon, Jan 22, 2024 at 4:04=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
-.com> wrote:
-> >
-> > On Mon, 22 Jan 2024 15:57:08 +0800, Jason Wang <jasowang@redhat.com> wr=
-ote:
-> > > On Mon, Jan 22, 2024 at 3:36=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.ali=
-baba.com> wrote:
-> > > >
-> > > > On Mon, 22 Jan 2024 15:19:12 +0800, Jason Wang <jasowang@redhat.com=
-> wrote:
-> > > > > On Mon, Jan 22, 2024 at 3:07=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux=
-.alibaba.com> wrote:
-> > > > > >
-> > > > > > On Mon, 22 Jan 2024 14:58:09 +0800, Jason Wang <jasowang@redhat=
-.com> wrote:
-> > > > > > > On Mon, Jan 22, 2024 at 2:55=E2=80=AFPM Jason Wang <jasowang@=
-redhat.com> wrote:
-> > > > > > > >
-> > > > > > > > On Mon, Jan 22, 2024 at 2:20=E2=80=AFPM Xuan Zhuo <xuanzhuo=
-@linux.alibaba.com> wrote:
-> > > > > > > > >
-> > > > > > > > > On Mon, 22 Jan 2024 12:16:27 +0800, Jason Wang <jasowang@=
-redhat.com> wrote:
-> > > > > > > > > > On Mon, Jan 22, 2024 at 12:00=E2=80=AFPM Xuan Zhuo <xua=
-nzhuo@linux.alibaba.com> wrote:
-> > > > > > > > > > >
-> > > > > > > > > > > On Mon, 22 Jan 2024 11:14:30 +0800, Jason Wang <jasow=
-ang@redhat.com> wrote:
-> > > > > > > > > > > > On Mon, Jan 22, 2024 at 10:12=E2=80=AFAM Zhu Yanjun=
- <yanjun.zhu@linux.dev> wrote:
-> > > > > > > > > > > > >
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > =E5=9C=A8 2024/1/20 1:29, Andrew Lunn =E5=86=99=
-=E9=81=93:
-> > > > > > > > > > > > > >>>>>        while (!virtqueue_get_buf(vi->cvq, &=
-tmp) &&
-> > > > > > > > > > > > > >>>>> -           !virtqueue_is_broken(vi->cvq))
-> > > > > > > > > > > > > >>>>> +           !virtqueue_is_broken(vi->cvq)) {
-> > > > > > > > > > > > > >>>>> +        if (timeout)
-> > > > > > > > > > > > > >>>>> +            timeout--;
-> > > > > > > > > > > > > >>>> This is not really a timeout, just a loop co=
-unter. 200 iterations could
-> > > > > > > > > > > > > >>>> be a very short time on reasonable H/W. I gu=
-ess this avoid the soft
-> > > > > > > > > > > > > >>>> lockup, but possibly (likely?) breaks the fu=
-nctionality when we need to
-> > > > > > > > > > > > > >>>> loop for some non negligible time.
-> > > > > > > > > > > > > >>>>
-> > > > > > > > > > > > > >>>> I fear we need a more complex solution, as m=
-entioned by Micheal in the
-> > > > > > > > > > > > > >>>> thread you quoted.
-> > > > > > > > > > > > > >>> Got it. I also look forward to the more compl=
-ex solution to this problem.
-> > > > > > > > > > > > > >> Can we add a device capability (new feature bi=
-t) such as ctrq_wait_timeout
-> > > > > > > > > > > > > >> to get a reasonable timeout=EF=BC=9F
-> > > > > > > > > > > > > > The usual solution to this is include/linux/iop=
-oll.h. If you can sleep
-> > > > > > > > > > > > > > read_poll_timeout() otherwise read_poll_timeout=
-_atomic().
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > I read carefully the functions read_poll_timeout(=
-) and
-> > > > > > > > > > > > > read_poll_timeout_atomic(). The timeout is set by=
- the caller of the 2
-> > > > > > > > > > > > > functions.
-> > > > > > > > > > > >
-> > > > > > > > > > > > FYI, in order to avoid a swtich of atomic or not, w=
-e need convert rx
-> > > > > > > > > > > > mode setting to workqueue first:
-> > > > > > > > > > > >
-> > > > > > > > > > > > https://www.mail-archive.com/virtualization@lists.l=
-inux-foundation.org/msg60298.html
-> > > > > > > > > > > >
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > As such, can we add a module parameter to customi=
-ze this timeout value
-> > > > > > > > > > > > > by the user?
-> > > > > > > > > > > >
-> > > > > > > > > > > > Who is the "user" here, or how can the "user" know =
-the value?
-> > > > > > > > > > > >
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > Or this timeout value is stored in device registe=
-r, virtio_net driver
-> > > > > > > > > > > > > will read this timeout value at initialization?
-> > > > > > > > > > > >
-> > > > > > > > > > > > See another thread. The design needs to be general,=
- or you can post a RFC.
-> > > > > > > > > > > >
-> > > > > > > > > > > > In another thought, we've already had a tx watchdog=
-, maybe we can have
-> > > > > > > > > > > > something similar to cvq and use timeout + reset in=
- that case.
-> > > > > > > > > > >
-> > > > > > > > > > > But we may block by the reset ^_^ if the device is br=
-oken?
-> > > > > > > > > >
-> > > > > > > > > > I mean vq reset here.
-> > > > > > > > >
-> > > > > > > > > I see.
-> > > > > > > > >
-> > > > > > > > > I mean when the deivce is broken, the vq reset also many =
-be blocked.
-> > > > > > > > >
-> > > > > > > > >         void vp_modern_set_queue_reset(struct virtio_pci_=
-modern_device *mdev, u16 index)
-> > > > > > > > >         {
-> > > > > > > > >                 struct virtio_pci_modern_common_cfg __iom=
-em *cfg;
-> > > > > > > > >
-> > > > > > > > >                 cfg =3D (struct virtio_pci_modern_common_=
-cfg __iomem *)mdev->common;
-> > > > > > > > >
-> > > > > > > > >                 vp_iowrite16(index, &cfg->cfg.queue_selec=
-t);
-> > > > > > > > >                 vp_iowrite16(1, &cfg->queue_reset);
-> > > > > > > > >
-> > > > > > > > >                 while (vp_ioread16(&cfg->queue_reset))
-> > > > > > > > >                         msleep(1);
-> > > > > > > > >
-> > > > > > > > >                 while (vp_ioread16(&cfg->cfg.queue_enable=
-))
-> > > > > > > > >                         msleep(1);
-> > > > > > > > >         }
-> > > > > > > > >         EXPORT_SYMBOL_GPL(vp_modern_set_queue_reset);
-> > > > > > > > >
-> > > > > > > > > In this function, for the broken device, we can not expec=
-t something.
-> > > > > > > >
-> > > > > > > > Yes, it's best effort, there's no guarantee then. But it do=
-esn't harm to try.
-> > > > > > > >
-> > > > > > > > Thanks
-> > > > > > > >
-> > > > > > > > >
-> > > > > > > > >
-> > > > > > > > > >
-> > > > > > > > > > It looks like we have multiple goals here
-> > > > > > > > > >
-> > > > > > > > > > 1) avoid lockups, using workqueue + cond_resched() seem=
-s to be
-> > > > > > > > > > sufficient, it has issue but nothing new
-> > > > > > > > > > 2) recover from the unresponsive device, the issue for =
-timeout is that
-> > > > > > > > > > it needs to deal with false positives
-> > > > > > > > >
-> > > > > > > > >
-> > > > > > > > > I agree.
-> > > > > > > > >
-> > > > > > > > > But I want to add a new goal, cvq async. In the netdim, w=
-e will
-> > > > > > > > > send many requests via the cvq, so the cvq async will be =
-nice.
-> > > > > > >
-> > > > > > > Then you need an interrupt for cvq.
-> > > > > > >
-> > > > > > > FYI, I've posted a series that use interrupt for cvq in the p=
-ast:
-> > > > > > >
-> > > > > > > https://lore.kernel.org/lkml/6026e801-6fda-fee9-a69b-d06a8036=
-8621@redhat.com/t/
-> > > > > >
-> > > > > > I know this. But the interrupt maybe not a good solution withou=
-t new space.
-> > > > >
-> > > > > What do you mean by "new space"?
-> > > >
-> > > > Yes, I know, the cvq can work with interrupt by the virtio spec.
-> > > > But as I know, many hypervisors implement the cvq without supportin=
-g interrupt.
-> > >
-> > > It's a bug of the hypervisor that needs to be fix. Interrupt is
-> > > provided by transport not the virtio itself.
-> >
-> > YES. I agree.
-> >
-> > But I still think we should not work with interrupt without any negotia=
-tion
-> > directly. I more like to introduce a new feature to enable this.
->
-> I can hardly believe we need to workaround the issue of specific
-> hypervisors like this...
+From: Peng Fan <peng.fan@nxp.com>
 
-Maybe we should hear others.
+Add i.MX95 flexcan which is compatible i.MX93 flexcan
 
-We are ok for this. I just think for other hypervisors.
+Signed-off-by: Peng Fan <peng.fan@nxp.com>
+---
+ Documentation/devicetree/bindings/net/can/fsl,flexcan.yaml | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Thanks.
+diff --git a/Documentation/devicetree/bindings/net/can/fsl,flexcan.yaml b/Documentation/devicetree/bindings/net/can/fsl,flexcan.yaml
+index 4162469c3c08..f197d9b516bb 100644
+--- a/Documentation/devicetree/bindings/net/can/fsl,flexcan.yaml
++++ b/Documentation/devicetree/bindings/net/can/fsl,flexcan.yaml
+@@ -38,6 +38,9 @@ properties:
+               - fsl,imx6ul-flexcan
+               - fsl,imx6sx-flexcan
+           - const: fsl,imx6q-flexcan
++      - items:
++          - const: fsl,imx95-flexcan
++          - const: fsl,imx93-flexcan
+       - items:
+           - enum:
+               - fsl,ls1028ar1-flexcan
+-- 
+2.37.1
 
-
-
->
-> Thanks
->
-> >
-> > Thanks.
-> >
-> >
->
 
