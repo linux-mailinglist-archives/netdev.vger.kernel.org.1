@@ -1,120 +1,176 @@
-Return-Path: <netdev+bounces-64660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B608A83631D
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 13:23:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C994C836331
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 13:26:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E94E31C22C39
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 12:23:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3E671B20A8A
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 12:25:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD7193C694;
-	Mon, 22 Jan 2024 12:20:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44BD23B790;
+	Mon, 22 Jan 2024 12:24:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jb3dmfnL"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="YtSjANMV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out2-smtp.messagingengine.com (out2-smtp.messagingengine.com [66.111.4.26])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA26C3DB93;
-	Mon, 22 Jan 2024 12:20:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B3093CF43
+	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 12:24:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.111.4.26
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705926045; cv=none; b=oty4Tg8+AUA+4QdULl3jqEQz62Uc1ao+mm89MBCcZj9BZynkCyRxNfHtbvVAULLRZUIgPy7dp7qdc5moIEMZXUjNe063QBR0Hs50V439d5zEtF7cNhFS7Qy+dbeHKsxCrawK6e0HtASyvu+XPWu57ZxdocR7mj66dxgyMyVzrKA=
+	t=1705926292; cv=none; b=CYBNYlYLgrhl/vSPNUNpS0UnZghB3d15bN5DIqzXlj9xLtCQqrso06y4pQR7mN+ybXitAxUcZ/xQKE+67xzL33ntwU33UsNTw5Q3yqp4F1858k8lOB3niSh1p/zSeHa6aWxqP5Q+ZCy39NIcAtULQtSVcYZUDXJmGVIRid3s7FE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705926045; c=relaxed/simple;
-	bh=GT65QrRSZZI/JIdwPBcys6eLLwNLwpPSE/DJ6auIUks=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Rl9Q87iHcWVUJgCDsOxwWTUMzCHGJnjrTDatYIbP/u/EVLMQ+ioMy+DCRYjtQpAjrfm/pky94/ygVK+IYYS9WoaJc7GH9EyyK0EEOfnOIsJnF2x62gLPZ9Oz3l5RDDyIvj4MEdhX+UA37p1Jn3CTHM1nDUIj6Vtt1+1c3CXnmTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jb3dmfnL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0B1FC433C7;
-	Mon, 22 Jan 2024 12:20:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705926045;
-	bh=GT65QrRSZZI/JIdwPBcys6eLLwNLwpPSE/DJ6auIUks=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jb3dmfnLIjra2EvCeWTQURVArpunSXQ8WZ7SvOrjHrcqnIRO5bLN1bGYZZ/fwYmsc
-	 6Ir67jWsLHwz1/2EYI0irVemtunm2SMWpxgnOoA1UBRM0ane3xizfMUd1xb5sK2mZY
-	 0qOheNB4lcGneWBomX5Yg7lGZOYJTGR6c0UNDDEJsCbzWckfPr14Qn8zBst4GCCB3D
-	 Y9rMCRDy46UsioPfKTAUAKNTq99J2hlXSmBoDaxuVNXiLanJenqJR/AZf7Iz/5239v
-	 sPNu1DBIuqjTE5ZBs7wCYyAo+5VFS1cfkS/+hy4H9VWOseqEYxwEH+vGEycXOvEREF
-	 0nOuQWwkl4/+w==
-From: Conor Dooley <conor@kernel.org>
-To: linux-riscv@lists.infradead.org
-Cc: conor@kernel.org,
-	Conor Dooley <conor.dooley@microchip.com>,
-	Daire McNamara <daire.mcnamara@microchip.com>,
-	Wolfgang Grandegger <wg@grandegger.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	linux-can@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-clk@vger.kernel.org
-Subject: [PATCH v2 7/7] riscv: dts: microchip: add missing CAN bus clocks
-Date: Mon, 22 Jan 2024 12:19:55 +0000
-Message-ID: <20240122-splice-poncho-18a369c7dbc7@spud>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240122-catty-roast-d3625dbb02fe@spud>
-References: <20240122-catty-roast-d3625dbb02fe@spud>
+	s=arc-20240116; t=1705926292; c=relaxed/simple;
+	bh=1vPCL+hXp5d2hF4hyeY6ExLiER5oX1KpKEtYMmuNo28=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y1JerhDYgB0PTlxshQhfCzFcBKyj8HPo9anHgd/VFQuPJa2mK1yXYWDXRoRYLKnPWL3MgUCs0w+bwB00+AZnBwYweYabDDOBNCcz5ITelZ49dOtvmD2F0oAg1GXK7N42iERlQ0gYfT2+qzhfZ1hLHWFZBuQHPA5swlFTJP676FQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=YtSjANMV; arc=none smtp.client-ip=66.111.4.26
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+	by mailout.nyi.internal (Postfix) with ESMTP id 335FC5C0105;
+	Mon, 22 Jan 2024 07:24:47 -0500 (EST)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute3.internal (MEProxy); Mon, 22 Jan 2024 07:24:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm3; t=1705926287; x=1706012687; bh=8y2Ffo4BVr+R16XlQrPK27zig33B
+	07C2uHU9JBY8BzE=; b=YtSjANMVVGMYbuZE8G0n4K1qW8Ajobwk3Rqyac7XfFcc
+	0/9SsnSXRPe7tvaVrnFvXyTMvwuudbCxwS0jY50luNlTIzjQHp1yUaTx/2yWnmRr
+	LjX2EFL3Dcli5VjHGI3vRp1H9DvGQNgASXBDTrRgDCg3gVSG1Th7UsHS9xBz1AbQ
+	CL+iFqmqhYb+sYbuWaZTOQCuXN1AV+oMEFbVLlRdWDq7yaaeCHRfxEMzc9ZNKboW
+	cFrFBhAS71CCH9ZBVpf0YLeMDgSldDlgnV9Ezmdc6aExsGh6UsXPFKGNTrWrFjy1
+	sg5DbRPE+LJyiCDDYsJYZusbok8/NH9uiJi1IiO72g==
+X-ME-Sender: <xms:jl6uZeusyl9v80qC3svg-OkKcLYMEr6N62WZVnwSv_aHL4xjmwZSOw>
+    <xme:jl6uZTfeQFv5RQa2usyXcVPGFPb9TvSvcJcZfXR0CzUEMAau2WIxXDNXBXPJ90wFR
+    z5_Uyx2nxkvXR8>
+X-ME-Received: <xmr:jl6uZZxfWKZNIPlO86dWrJ6aqydGXwoe9I6IuvJMMySS5XPgpsTo_ldHUGS6>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdekiedgfeekucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcu
+    ufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrth
+    htvghrnhepvddufeevkeehueegfedtvdevfefgudeifeduieefgfelkeehgeelgeejjeeg
+    gefhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepih
+    guohhstghhsehiughoshgthhdrohhrgh
+X-ME-Proxy: <xmx:jl6uZZNJOurvDb_rwkKam-wykjRgxI9yh0XdxfMElbp6qeNsBhFqEA>
+    <xmx:jl6uZe8ps6I9Fv1eJL8KS_5JG8hKYfeD47YPLXLGUcUqnsiV26PJdQ>
+    <xmx:jl6uZRUxMKkD9CZPBVvdSsh-VlVa2Nru2qbLQ4quqrzXshOZYMH7_g>
+    <xmx:j16uZQLmeX3pU05J9RYs-PICfuSUs1Zjf94TQhMhVjAGqF2nr47S6g>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 22 Jan 2024 07:24:46 -0500 (EST)
+Date: Mon, 22 Jan 2024 14:24:43 +0200
+From: Ido Schimmel <idosch@idosch.org>
+To: Alce Lafranque <alce@lafranque.net>
+Cc: netdev@vger.kernel.org, stephen@networkplumber.org,
+	Vincent Bernat <vincent@bernat.ch>, dsahern@gmail.com
+Subject: Re: [PATCH iproute2] vxlan: add support for flowlab inherit
+Message-ID: <Za5eizfgzl5mwt50@shredder>
+References: <20240120124418.26117-1-alce@lafranque.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1347; i=conor.dooley@microchip.com; h=from:subject:message-id; bh=pLA+R73nzpZMSjL5ZIEEpNbYsZjEzmZPe5bK/xmNjSY=; b=owGbwMvMwCFWscWwfUFT0iXG02pJDKnrYlPleT5Wn+6OL38lGp3sdiX9kvjzCpZLh79GzvM5s zmRq2ByRykLgxgHg6yYIkvi7b4WqfV/XHY497yFmcPKBDKEgYtTACZS+YmRYZunivptLuErjQu/ N1lXLrlwi/XW5XCGE7N82m+Ic7Ruv83wz+SeTKeekUOK973a71eDBd/2iDnWPnL2uLo3PEXiktF WJgA=
-X-Developer-Key: i=conor.dooley@microchip.com; a=openpgp; fpr=F9ECA03CF54F12CD01F1655722E2C55B37CF380C
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240120124418.26117-1-alce@lafranque.net>
 
-From: Conor Dooley <conor.dooley@microchip.com>
+s/flowlab/flowlabel/ in subject
 
-The CAN controller on PolarFire SoC has an AHB peripheral clock _and_ a
-CAN bus clock. The bus clock was omitted when the binding was written,
-but is required for operation. Make up for lost time and add to the DT.
+My understanding is that new features should be targeted at
+iproute2-next. See the README.
 
-Fixes: 38a71fc04895 ("riscv: dts: microchip: add mpfs's CAN controllers")
-Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
----
- arch/riscv/boot/dts/microchip/mpfs.dtsi | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On Sat, Jan 20, 2024 at 06:44:18AM -0600, Alce Lafranque wrote:
+> @@ -214,10 +214,16 @@ static int vxlan_parse_opt(struct link_util *lu, int argc, char **argv,
+>  			NEXT_ARG();
+>  			check_duparg(&attrs, IFLA_VXLAN_LABEL, "flowlabel",
+>  				     *argv);
+> -			if (get_u32(&uval, *argv, 0) ||
+> -			    (uval & ~LABEL_MAX_MASK))
+> -				invarg("invalid flowlabel", *argv);
+> -			addattr32(n, 1024, IFLA_VXLAN_LABEL, htonl(uval));
+> +			if (strcmp(*argv, "inherit") == 0) {
+> +				addattr32(n, 1024, IFLA_VXLAN_LABEL_POLICY, VXLAN_LABEL_INHERIT);
+> +			} else {
+> +				if (get_u32(&uval, *argv, 0) ||
+> +				    (uval & ~LABEL_MAX_MASK))
+> +					invarg("invalid flowlabel", *argv);
+> +				addattr32(n, 1024, IFLA_VXLAN_LABEL_POLICY, VXLAN_LABEL_FIXED);
 
-diff --git a/arch/riscv/boot/dts/microchip/mpfs.dtsi b/arch/riscv/boot/dts/microchip/mpfs.dtsi
-index 266489d43912..4d70df0f908c 100644
---- a/arch/riscv/boot/dts/microchip/mpfs.dtsi
-+++ b/arch/riscv/boot/dts/microchip/mpfs.dtsi
-@@ -416,7 +416,7 @@ i2c1: i2c@2010b000 {
- 		can0: can@2010c000 {
- 			compatible = "microchip,mpfs-can";
- 			reg = <0x0 0x2010c000 0x0 0x1000>;
--			clocks = <&clkcfg CLK_CAN0>;
-+			clocks = <&clkcfg CLK_CAN0>, <&clkcfg CLK_MSSPLL3>;
- 			interrupt-parent = <&plic>;
- 			interrupts = <56>;
- 			status = "disabled";
-@@ -425,7 +425,7 @@ can0: can@2010c000 {
- 		can1: can@2010d000 {
- 			compatible = "microchip,mpfs-can";
- 			reg = <0x0 0x2010d000 0x0 0x1000>;
--			clocks = <&clkcfg CLK_CAN1>;
-+			clocks = <&clkcfg CLK_CAN1>, <&clkcfg CLK_MSSPLL3>;
- 			interrupt-parent = <&plic>;
- 			interrupts = <57>;
- 			status = "disabled";
--- 
-2.43.0
+I think I mentioned this during the review of the kernel patch, but the
+current approach relies on old kernels ignoring the
+'IFLA_VXLAN_LABEL_POLICY' attribute which is not nice. My personal
+preference would be to add a new keyword for the new attribute:
 
+# ip link set dev vx0 type vxlan flowlabel_policy inherit
+# ip link set dev vx0 type vxlan flowlabel_policy fixed flowlabel 10
+
+But let's see what David thinks.
+
+> +				addattr32(n, 1024, IFLA_VXLAN_LABEL,
+> +					  htonl(uval));
+> +			}
+>  		} else if (!matches(*argv, "ageing")) {
+>  			__u32 age;
+>  
+> @@ -580,12 +586,25 @@ static void vxlan_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
+>  			print_string(PRINT_ANY, "df", "df %s ", "inherit");
+>  	}
+>  
+> -	if (tb[IFLA_VXLAN_LABEL]) {
+> -		__u32 label = rta_getattr_u32(tb[IFLA_VXLAN_LABEL]);
+> -
+> -		if (label)
+> -			print_0xhex(PRINT_ANY, "label",
+> -				    "flowlabel %#llx ", ntohl(label));
+> +	enum ifla_vxlan_label_policy policy = VXLAN_LABEL_FIXED;
+> +	if (tb[IFLA_VXLAN_LABEL_POLICY]) {
+> +		policy = rta_getattr_u32(tb[IFLA_VXLAN_LABEL_POLICY]);
+> +	}
+
+Checkpatch says:
+
+WARNING: Missing a blank line after declarations
+#112: FILE: ip/iplink_vxlan.c:590:
++       enum ifla_vxlan_label_policy policy = VXLAN_LABEL_FIXED;
++       if (tb[IFLA_VXLAN_LABEL_POLICY]) {
+
+WARNING: braces {} are not necessary for single statement blocks
+#112: FILE: ip/iplink_vxlan.c:590:
++       if (tb[IFLA_VXLAN_LABEL_POLICY]) {
++               policy = rta_getattr_u32(tb[IFLA_VXLAN_LABEL_POLICY]);
++       }
+
+> +	switch (policy) {
+> +	case VXLAN_LABEL_FIXED:
+> +		if (tb[IFLA_VXLAN_LABEL]) {
+> +			__u32 label = rta_getattr_u32(tb[IFLA_VXLAN_LABEL]);
+> +
+> +			if (label)
+> +				print_0xhex(PRINT_ANY, "label",
+> +					    "flowlabel %#llx ", ntohl(label));
+> +		}
+> +		break;
+> +	case VXLAN_LABEL_INHERIT:
+> +		print_string(PRINT_FP, NULL, "flowlabel %s ", "inherit");
+> +		break;
+> +	default:
+> +		break;
+>  	}
+>  
+>  	if (tb[IFLA_VXLAN_AGEING]) {
+> -- 
+> 2.39.2
+> 
+> 
 
