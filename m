@@ -1,282 +1,303 @@
-Return-Path: <netdev+bounces-64612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64613-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D6A5835EE2
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 11:00:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A44A835F14
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 11:06:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1D6E2879B6
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 10:00:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DEA061F2605B
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 10:06:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4E3E39FD9;
-	Mon, 22 Jan 2024 10:00:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WUW4C+8W"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBC5039FEB;
+	Mon, 22 Jan 2024 10:06:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E232A3A1A6;
-	Mon, 22 Jan 2024 10:00:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F138A39FE2
+	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 10:06:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705917645; cv=none; b=E/37k+V4DGu+tu1JcG7eh5AxQnwEfw9LTekICh2DbAK9TOav0eT00ZatXdbV2tu8RD3D4NEwwv50MAANC6fsgkslzx4c8UGf8QWvisDt9pgq6pHXt9CobXS1U6YHtK4phFnlp9HzFdPsd+Xfo7QtCUDP/quL9k7yN/Vc3lJtGdo=
+	t=1705917999; cv=none; b=dspy35icp0I+tprIavatGojtN6EzyZTfCtk4uiVt7RnqIBRkBGhZoU/qJx/D8hILA+FvzzcVmtVFCxKSkRi0TrN2K7NA8cuH7SbomAOWyIb/JueVhijAl8H3IZ+/JV2tlaL110PwCMHCwBYvobVtgbe0m8+XODZkW0ZTDB1DzYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705917645; c=relaxed/simple;
-	bh=RviGP00bc2z5L9e16SGhcQi/O8tKdDVcvKn/cFKyZf8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XW+ilYPWEj5V2c89ln+hjQCw3zzWWkm415UC6ONMitgs0upMsfkXM7P6X1cex9GE8bFKfka0kkKjKZT7nigcGhryh1+rflMaY6c7T4T5HxlXso2wHU0U10kRa3luupShJIRXn7nXegj5sReRKhjkDuHorwD6QqKpw75b20liscI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WUW4C+8W; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-50e72e3d435so2571837e87.2;
-        Mon, 22 Jan 2024 02:00:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705917642; x=1706522442; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XJvUSmFKxVkc/aj2645yUF6Llh0UZojhKj6fnT1VtgE=;
-        b=WUW4C+8Wh0zOPj9d/SVIQclAlgvyP0Fl1r6I/MO7fVadx48xM8rnYgo5c1H8fDp/iD
-         DcayBZuGZC9z/uo9/u1N176mBVKuI1JrluHtMZ17C9J7+35aHss+WEI3e2yCL6ovYJuj
-         CRtZAxsFUCgcrW7pVY+vzhzoMldXcSs1z3Mb7VjJ34zNk7n32gBAbYKt7b8mRlXjt6Gm
-         4R63gOIdy3jbaRxy9UBl2X1e6uCE4iXlkku3KVgDWkd5eWFENarTssDCtRYca94kk9F5
-         /XYYxpRAjRvmP5AFl8SCt8xXmyJf9A+vm4vGKHnCQqCLRZGXNUgWKXd76OKx7a3Nqu6H
-         99Vw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705917642; x=1706522442;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XJvUSmFKxVkc/aj2645yUF6Llh0UZojhKj6fnT1VtgE=;
-        b=d0QkH02auwLQxTgnOD+Sg/zPa8JEYKicYY45OcFD1NUqh0pu5JYbiAmdEwBJUeQShC
-         q0155Gd0BzJot5rEeT0g4NT2BaLs0oWD+hfLMutZh7oNA1j0TD5jmrS0b7JIgaieDEkt
-         vyTI4aE6y0AtMAXbSLQC44MmdzKKK+FvdCrEqfz651JuxYDKdZvVeq9802d5yxPWUpzL
-         u9NH8zboxIq1gsQMe6iCNMtLXu0R/yuE+wiUWZun4sIFbn+nImBZo1kLS0IKhFgHuN+U
-         mAKKn2y5lonMpbQMeFe54HdlEhqkAEuiZeTpW+AJBIaR1ivwmQ9/OID0tB5pzG1L9h9J
-         IrrQ==
-X-Gm-Message-State: AOJu0Yy7YGHauK217MvVgW0gRyFwsDVJqW6LFhXeYEQyMAgDaR/FBqLD
-	V67EjYEa8Xh8Px7piQvs8zo9C4WPEsoguZ+Iyk+EKA8rkGoWEKg9
-X-Google-Smtp-Source: AGHT+IEssD/hfPPeOOMHxQJvdb3GjMChqufvu3VcLm9fhwD+pPdZrTLpsswyzYA4xoIoKlv/ESBQWQ==
-X-Received: by 2002:ac2:42ca:0:b0:50e:3d3b:93fa with SMTP id n10-20020ac242ca000000b0050e3d3b93famr737632lfl.12.1705917641364;
-        Mon, 22 Jan 2024 02:00:41 -0800 (PST)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id k5-20020ac24565000000b0050f0c199448sm1937151lfm.168.2024.01.22.02.00.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jan 2024 02:00:40 -0800 (PST)
-Date: Mon, 22 Jan 2024 13:00:37 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Denis Kirjanov <dkirjanov@suse.de>, 
-	Suraj Jaiswal <quic_jsuraj@quicinc.com>
-Cc: Suraj Jaiswal <quic_jsuraj@quicinc.com>, Vinod Koul <vkoul@kernel.org>, 
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>, Andy Gross <agross@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, Prasad Sodagudi <psodagud@quicinc.com>, 
-	Andrew Halaney <ahalaney@redhat.com>, Rob Herring <robh@kernel.org>, kernel@quicinc.com
-Subject: Re: [PATCH net-next v9 3/3] net: stmmac: Add driver support for
- DWMAC5 common safety IRQ
-Message-ID: <giimpexp3qk3byb725r3ot3aund2bwmi45yrctkydatm73d5af@e36xmjf2ehvu>
-References: <20240110111649.2256450-1-quic_jsuraj@quicinc.com>
- <20240110111649.2256450-4-quic_jsuraj@quicinc.com>
- <633ff61d-f73d-4221-a2fd-79f913880761@suse.de>
+	s=arc-20240116; t=1705917999; c=relaxed/simple;
+	bh=cg/V58JXhFdm+AOd4V+8X6Dyf2AKWak+eFFN7VDtiBg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=AFXj4LswPzBvETVBjHFwaUauehX0k804QAUVzLTibxM1e47P4D/EXmo7prO+EBelHfcLB5lzObgPsznA8woC8IBN28lTVkumJEmvdy8he84b8ve+lQpHUlNYaHQq73mano3SuPE9JeI+QIXz7ma1GbEzv+7ygUf8VWBxYBUTXH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4TJQpr14VxzbcFg;
+	Mon, 22 Jan 2024 18:06:12 +0800 (CST)
+Received: from dggpeml500026.china.huawei.com (unknown [7.185.36.106])
+	by mail.maildlp.com (Postfix) with ESMTPS id 4644C1400E5;
+	Mon, 22 Jan 2024 18:06:34 +0800 (CST)
+Received: from [10.174.178.66] (10.174.178.66) by
+ dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 22 Jan 2024 18:06:33 +0800
+Message-ID: <e18e24f5-7524-acf5-c9a4-7409fb395e6b@huawei.com>
+Date: Mon, 22 Jan 2024 18:06:33 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <633ff61d-f73d-4221-a2fd-79f913880761@suse.de>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.2
+Subject: Re: [PATCH net,v4] tcp: make sure init the accept_queue's spinlocks
+ once
+To: Chen-Yu Tsai <wenst@chromium.org>
+CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <dsahern@kernel.org>,
+	<sming56@aliyun.com>, <hkchu@google.com>, <weiyongjun1@huawei.com>,
+	<yuehaibing@huawei.com>
+References: <20240118012019.1751966-1-shaozhengchao@huawei.com>
+ <20240122094219.GA1048271@google.com>
+From: shaozhengchao <shaozhengchao@huawei.com>
+In-Reply-To: <20240122094219.GA1048271@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
 
-On Wed, Jan 10, 2024 at 03:07:30PM +0300, Denis Kirjanov wrote:
+Hi Chen-Yu：
+	 Thank you for your report. I had the same problem this morning.
+It has been verified locally.
+
+Zhengchao Shao
+
+On 2024/1/22 17:42, Chen-Yu Tsai wrote:
+> Hi,
+> 
+> On Thu, Jan 18, 2024 at 09:20:19AM +0800, Zhengchao Shao wrote:
+>> When I run syz's reproduction C program locally, it causes the following
+>> issue:
+>> pvqspinlock: lock 0xffff9d181cd5c660 has corrupted value 0x0!
+>> WARNING: CPU: 19 PID: 21160 at __pv_queued_spin_unlock_slowpath (kernel/locking/qspinlock_paravirt.h:508)
+>> Hardware name: Red Hat KVM, BIOS 0.5.1 01/01/2011
+>> RIP: 0010:__pv_queued_spin_unlock_slowpath (kernel/locking/qspinlock_paravirt.h:508)
+>> Code: 73 56 3a ff 90 c3 cc cc cc cc 8b 05 bb 1f 48 01 85 c0 74 05 c3 cc cc cc cc 8b 17 48 89 fe 48 c7 c7
+>> 30 20 ce 8f e8 ad 56 42 ff <0f> 0b c3 cc cc cc cc 0f 0b 0f 1f 40 00 90 90 90 90 90 90 90 90 90
+>> RSP: 0018:ffffa8d200604cb8 EFLAGS: 00010282
+>> RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff9d1ef60e0908
+>> RDX: 00000000ffffffd8 RSI: 0000000000000027 RDI: ffff9d1ef60e0900
+>> RBP: ffff9d181cd5c280 R08: 0000000000000000 R09: 00000000ffff7fff
+>> R10: ffffa8d200604b68 R11: ffffffff907dcdc8 R12: 0000000000000000
+>> R13: ffff9d181cd5c660 R14: ffff9d1813a3f330 R15: 0000000000001000
+>> FS:  00007fa110184640(0000) GS:ffff9d1ef60c0000(0000) knlGS:0000000000000000
+>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>> CR2: 0000000020000000 CR3: 000000011f65e000 CR4: 00000000000006f0
+>> Call Trace:
+>> <IRQ>
+>>    _raw_spin_unlock (kernel/locking/spinlock.c:186)
+>>    inet_csk_reqsk_queue_add (net/ipv4/inet_connection_sock.c:1321)
+>>    inet_csk_complete_hashdance (net/ipv4/inet_connection_sock.c:1358)
+>>    tcp_check_req (net/ipv4/tcp_minisocks.c:868)
+>>    tcp_v4_rcv (net/ipv4/tcp_ipv4.c:2260)
+>>    ip_protocol_deliver_rcu (net/ipv4/ip_input.c:205)
+>>    ip_local_deliver_finish (net/ipv4/ip_input.c:234)
+>>    __netif_receive_skb_one_core (net/core/dev.c:5529)
+>>    process_backlog (./include/linux/rcupdate.h:779)
+>>    __napi_poll (net/core/dev.c:6533)
+>>    net_rx_action (net/core/dev.c:6604)
+>>    __do_softirq (./arch/x86/include/asm/jump_label.h:27)
+>>    do_softirq (kernel/softirq.c:454 kernel/softirq.c:441)
+>> </IRQ>
+>> <TASK>
+>>    __local_bh_enable_ip (kernel/softirq.c:381)
+>>    __dev_queue_xmit (net/core/dev.c:4374)
+>>    ip_finish_output2 (./include/net/neighbour.h:540 net/ipv4/ip_output.c:235)
+>>    __ip_queue_xmit (net/ipv4/ip_output.c:535)
+>>    __tcp_transmit_skb (net/ipv4/tcp_output.c:1462)
+>>    tcp_rcv_synsent_state_process (net/ipv4/tcp_input.c:6469)
+>>    tcp_rcv_state_process (net/ipv4/tcp_input.c:6657)
+>>    tcp_v4_do_rcv (net/ipv4/tcp_ipv4.c:1929)
+>>    __release_sock (./include/net/sock.h:1121 net/core/sock.c:2968)
+>>    release_sock (net/core/sock.c:3536)
+>>    inet_wait_for_connect (net/ipv4/af_inet.c:609)
+>>    __inet_stream_connect (net/ipv4/af_inet.c:702)
+>>    inet_stream_connect (net/ipv4/af_inet.c:748)
+>>    __sys_connect (./include/linux/file.h:45 net/socket.c:2064)
+>>    __x64_sys_connect (net/socket.c:2073 net/socket.c:2070 net/socket.c:2070)
+>>    do_syscall_64 (arch/x86/entry/common.c:51 arch/x86/entry/common.c:82)
+>>    entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:129)
+>>    RIP: 0033:0x7fa10ff05a3d
+>>    Code: 5b 41 5c c3 66 0f 1f 84 00 00 00 00 00 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89
+>>    c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d ab a3 0e 00 f7 d8 64 89 01 48
+>>    RSP: 002b:00007fa110183de8 EFLAGS: 00000202 ORIG_RAX: 000000000000002a
+>>    RAX: ffffffffffffffda RBX: 0000000020000054 RCX: 00007fa10ff05a3d
+>>    RDX: 000000000000001c RSI: 0000000020000040 RDI: 0000000000000003
+>>    RBP: 00007fa110183e20 R08: 0000000000000000 R09: 0000000000000000
+>>    R10: 0000000000000000 R11: 0000000000000202 R12: 00007fa110184640
+>>    R13: 0000000000000000 R14: 00007fa10fe8b060 R15: 00007fff73e23b20
+>> </TASK>
+>>
+>> The issue triggering process is analyzed as follows:
+>> Thread A                                       Thread B
+>> tcp_v4_rcv	//receive ack TCP packet       inet_shutdown
+>>    tcp_check_req                                  tcp_disconnect //disconnect sock
+>>    ...                                              tcp_set_state(sk, TCP_CLOSE)
+>>      inet_csk_complete_hashdance                ...
+>>        inet_csk_reqsk_queue_add                 inet_listen  //start listen
+>>          spin_lock(&queue->rskq_lock)             inet_csk_listen_start
+>>          ...                                        reqsk_queue_alloc
+>>          ...                                          spin_lock_init
+>>          spin_unlock(&queue->rskq_lock)	//warning
+>>
+>> When the socket receives the ACK packet during the three-way handshake,
+>> it will hold spinlock. And then the user actively shutdowns the socket
+>> and listens to the socket immediately, the spinlock will be initialized.
+>> When the socket is going to release the spinlock, a warning is generated.
+>> Also the same issue to fastopenq.lock.
+>>
+>> Move init spinlock to inet_create and inet_accept to make sure init the
+>> accept_queue's spinlocks once.
+>>
+>> Fixes: fff1f3001cc5 ("tcp: add a spinlock to protect struct request_sock_queue")
+>> Fixes: 168a8f58059a ("tcp: TCP Fast Open Server - main code path")
+>> Reported-by: Ming Shu <sming56@aliyun.com>
+>> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+> 
+> This patch causes a lockdep error for me on next-20240122 when SSHing
+> into my test device over IPv6. Reverting this patch gets rid of the
+> message, but that is probably not the correct fix.
+> 
+> Given that inet_listen is also used from net/ipv6/af_inet6.c, and
+> __inet_listen_sk is used from mptcp, inet_init_csk_locks() would need
+> to be called in a couple more places. I don't know much about the
+> networking stack, but I can try to come up with a patch.
+> 
+> Backtrace below:
+> 
+> INFO: trying to register non-static key.
+> The code is fine but needs lockdep annotation, or maybe
+> you didn't initialize this object before use?
+> turning off the locking correctness validator.
+> CPU: 0 PID: 0 Comm: swapper/0 Not tainted 6.8.0-rc1-next-20240122-01036-g319fbd8fc6d3 #147 2400bce4623c16f3873f828b5d429524a0849cd3
+> Hardware name: Google Krane Chromebook (DT)
+> Call trace:
+> dump_backtrace (arch/arm64/kernel/stacktrace.c:293)
+> show_stack (arch/arm64/kernel/stacktrace.c:300)
+> dump_stack_lvl (lib/dump_stack.c:107)
+> dump_stack (lib/dump_stack.c:114)
+> register_lock_class (kernel/locking/lockdep.c:977 kernel/locking/lockdep.c:1289)
+> __lock_acquire (kernel/locking/lockdep.c:5014)
+> lock_acquire (./arch/arm64/include/asm/percpu.h:40 kernel/locking/lockdep.c:467 kernel/locking/lockdep.c:5756 kernel/locking/lockdep.c:5719)
+> _raw_spin_lock (./include/linux/spinlock_api_smp.h:134 kernel/locking/spinlock.c:154)
+> inet_csk_complete_hashdance (net/ipv4/inet_connection_sock.c:1303 net/ipv4/inet_connection_sock.c:1355)
+> tcp_check_req (net/ipv4/tcp_minisocks.c:653)
+> tcp_v6_rcv (net/ipv6/tcp_ipv6.c:1837)
+> ip6_protocol_deliver_rcu (net/ipv6/ip6_input.c:438)
+> ip6_input_finish (./include/linux/rcupdate.h:779 net/ipv6/ip6_input.c:484)
+> ip6_input (./include/linux/netfilter.h:314 ./include/linux/netfilter.h:308 net/ipv6/ip6_input.c:492)
+> ip6_sublist_rcv_finish (net/ipv6/ip6_input.c:86 (discriminator 3))
+> ip6_sublist_rcv (net/ipv6/ip6_input.c:317)
+> ipv6_list_rcv (net/ipv6/ip6_input.c:326)
+> __netif_receive_skb_list_core (net/core/dev.c:5577 net/core/dev.c:5625)
+> netif_receive_skb_list_internal (net/core/dev.c:5679 net/core/dev.c:5768)
+> napi_complete_done (./include/linux/list.h:37 (discriminator 2) ./include/net/gro.h:440 (discriminator 2) ./include/net/gro.h:435 (discriminator 2) net/core/dev.c:6108 (discriminator 2))
+> r8152_poll (drivers/net/usb/r8152.c:2780 (discriminator 1)) r8152
+> __napi_poll.constprop.0 (net/core/dev.c:6576)
+> net_rx_action (net/core/dev.c:6647 net/core/dev.c:6778)
+> __do_softirq (./arch/arm64/include/asm/jump_label.h:21 ./include/linux/jump_label.h:207 ./include/trace/events/irq.h:142 kernel/softirq.c:554)
+> ____do_softirq (arch/arm64/kernel/irq.c:82)
+> call_on_irq_stack (arch/arm64/kernel/entry.S:895)
+> do_softirq_own_stack (arch/arm64/kernel/irq.c:87)
+> __irq_exit_rcu (./arch/arm64/include/asm/percpu.h:44 kernel/softirq.c:612 kernel/softirq.c:634)
+> irq_exit_rcu (kernel/softirq.c:646 (discriminator 4))
+> el1_interrupt (arch/arm64/kernel/entry-common.c:505 arch/arm64/kernel/entry-common.c:517)
+> el1h_64_irq_handler (arch/arm64/kernel/entry-common.c:523)
+> el1h_64_irq (arch/arm64/kernel/entry.S:594)
+> arch_local_irq_enable (./arch/arm64/include/asm/irqflags.h:51)
+> cpuidle_enter (drivers/cpuidle/cpuidle.c:388)
+> do_idle (kernel/sched/idle.c:134 kernel/sched/idle.c:215 kernel/sched/idle.c:312)
+> cpu_startup_entry (kernel/sched/idle.c:409)
+> rest_init (./include/linux/rcupdate.h:751 (discriminator 1) init/main.c:701 (discriminator 1))
+> arch_call_rest_init+0x1c/0x28
+> start_kernel (init/main.c:1023 (discriminator 1))
+> __primary_switched (arch/arm64/kernel/head.S:524)
 > 
 > 
-> On 1/10/24 14:16, Suraj Jaiswal wrote:
-> > Add support to listen HW safety IRQ like ECC(error
-> > correction code), DPP(data path parity), FSM(finite state
-> > machine) fault in common IRQ line.
+> Regards
+> ChenYu
 > 
-> As I see .safety_feat_irq_status available not just in dwmac5 but 
-> in dwxgmac2_core and that means that the subject line is not just about dwmac5
-
-Right. Suraj, could you please fix the subject to be describing the
-actual change? The commit message body more-or-less describes it
-correctly.
-
-> 
-> > 
-> > Signed-off-by: Suraj Jaiswal <quic_jsuraj@quicinc.com>
-> > ---
-> >  drivers/net/ethernet/stmicro/stmmac/common.h  |  1 +
-> >  drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  3 ++
-> >  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 41 ++++++++++++++++++-
-> >  .../ethernet/stmicro/stmmac/stmmac_platform.c |  8 ++++
-> >  4 files changed, 51 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
-> > index 721c1f8e892f..b9233b09b80f 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/common.h
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/common.h
-> > @@ -344,6 +344,7 @@ enum request_irq_err {
-> >  	REQ_IRQ_ERR_ALL,
-> >  	REQ_IRQ_ERR_TX,
-> >  	REQ_IRQ_ERR_RX,
-> > +	REQ_IRQ_ERR_SFTY,
-> >  	REQ_IRQ_ERR_SFTY_UE,
-> >  	REQ_IRQ_ERR_SFTY_CE,
-> >  	REQ_IRQ_ERR_LPI,
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> > index 9f89acf31050..ca3d93851bed 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> > @@ -31,6 +31,7 @@ struct stmmac_resources {
-> >  	int wol_irq;
-> >  	int lpi_irq;
-> >  	int irq;
-> > +	int sfty_irq;
-> >  	int sfty_ce_irq;
-> >  	int sfty_ue_irq;
-> >  	int rx_irq[MTL_MAX_RX_QUEUES];
-> > @@ -297,6 +298,7 @@ struct stmmac_priv {
-> >  	void __iomem *ptpaddr;
-> >  	void __iomem *estaddr;
-> >  	unsigned long active_vlans[BITS_TO_LONGS(VLAN_N_VID)];
-> > +	int sfty_irq;
-> >  	int sfty_ce_irq;
-> >  	int sfty_ue_irq;
-> >  	int rx_irq[MTL_MAX_RX_QUEUES];
-> > @@ -305,6 +307,7 @@ struct stmmac_priv {
-> >  	char int_name_mac[IFNAMSIZ + 9];
-> >  	char int_name_wol[IFNAMSIZ + 9];
-> >  	char int_name_lpi[IFNAMSIZ + 9];
-> > +	char int_name_sfty[IFNAMSIZ + 10];
-> >  	char int_name_sfty_ce[IFNAMSIZ + 10];
-> >  	char int_name_sfty_ue[IFNAMSIZ + 10];
-> >  	char int_name_rx_irq[MTL_MAX_TX_QUEUES][IFNAMSIZ + 14];
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > index 47de466e432c..e0192a282121 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > @@ -3592,6 +3592,10 @@ static void stmmac_free_irq(struct net_device *dev,
-> >  		if (priv->wol_irq > 0 && priv->wol_irq != dev->irq)
-> >  			free_irq(priv->wol_irq, dev);
-> >  		fallthrough;
-> > +	case REQ_IRQ_ERR_SFTY:
-> > +		if (priv->sfty_irq > 0 && priv->sfty_irq != dev->irq)
-> > +			free_irq(priv->sfty_irq, dev);
-> > +		fallthrough;
-> >  	case REQ_IRQ_ERR_WOL:
-> >  		free_irq(dev->irq, dev);
-> >  		fallthrough;
-> > @@ -3661,6 +3665,23 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
-> >  		}
-> >  	}
-> >  
-> > +	/* Request the common Safety Feature Correctible/Uncorrectible
-> > +	 * Error line in case of another line is used
-> > +	 */
-> > +	if (priv->sfty_irq > 0 && priv->sfty_irq != dev->irq) {
-> > +		int_name = priv->int_name_sfty;
-> > +		sprintf(int_name, "%s:%s", dev->name, "safety");
-> > +		ret = request_irq(priv->sfty_irq, stmmac_safety_interrupt,
-> > +				  0, int_name, dev);
-> > +		if (unlikely(ret < 0)) {
-> > +			netdev_err(priv->dev,
-> > +				   "%s: alloc sfty MSI %d (error: %d)\n",
-> > +				   __func__, priv->sfty_irq, ret);
-> > +			irq_err = REQ_IRQ_ERR_SFTY;
-> > +			goto irq_error;
-> > +		}
-> > +	}
-> > +
-> >  	/* Request the Safety Feature Correctible Error line in
-> >  	 * case of another line is used
-> >  	 */
-> > @@ -3798,6 +3819,21 @@ static int stmmac_request_irq_single(struct net_device *dev)
-> >  		}
-> >  	}
-> >  
-> > +	/* Request the common Safety Feature Correctible/Uncorrectible
-> > +	 * Error line in case of another line is used
-> > +	 */
-> > +	if (priv->sfty_irq > 0 && priv->sfty_irq != dev->irq) {
-> > +		ret = request_irq(priv->sfty_irq, stmmac_safety_interrupt,
-> > +				  IRQF_SHARED, dev->name, dev);
-> > +		if (unlikely(ret < 0)) {
-> > +			netdev_err(priv->dev,
-> > +				   "%s: ERROR: allocating the sfty IRQ %d (%d)\n",
-> > +				   __func__, priv->sfty_irq, ret);
-> > +			irq_err = REQ_IRQ_ERR_SFTY;
-> > +			goto irq_error;
-> > +		}
-> > +	}
-> > +
-> >  	return 0;
-> >  
-> >  irq_error:
-> > @@ -6022,8 +6058,8 @@ static irqreturn_t stmmac_interrupt(int irq, void *dev_id)
-> >  	if (test_bit(STMMAC_DOWN, &priv->state))
-> >  		return IRQ_HANDLED;
-> >  
-
-> > -	/* Check if a fatal error happened */
-> > -	if (stmmac_safety_feat_interrupt(priv))
-> > +	/* Check ASP error if it isn't delivered via an individual IRQ */
-> > +	if (priv->sfty_irq <= 0 && stmmac_safety_feat_interrupt(priv))
-
-Well, I guess this is the best we can do with no IRQs handling part
-refactoring.
-
-> >  		return IRQ_HANDLED;
-> >  
-> >  	/* To handle Common interrupts */
-> > @@ -7462,6 +7498,7 @@ int stmmac_dvr_probe(struct device *device,
-> >  	priv->dev->irq = res->irq;
-> >  	priv->wol_irq = res->wol_irq;
-> >  	priv->lpi_irq = res->lpi_irq;
-> > +	priv->sfty_irq = res->sfty_irq;
-> >  	priv->sfty_ce_irq = res->sfty_ce_irq;
-> >  	priv->sfty_ue_irq = res->sfty_ue_irq;
-> >  	for (i = 0; i < MTL_MAX_RX_QUEUES; i++)
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> > index 70eadc83ca68..ab250161fd79 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> > @@ -743,6 +743,14 @@ int stmmac_get_platform_resources(struct platform_device *pdev,
-> >  		dev_info(&pdev->dev, "IRQ eth_lpi not found\n");
-> >  	}
-> >  
-> > +	stmmac_res->sfty_irq =
-> > +		platform_get_irq_byname_optional(pdev, "sfty");
-> > +	if (stmmac_res->sfty_irq < 0) {
-> > +		if (stmmac_res->sfty_irq == -EPROBE_DEFER)
-> > +			return -EPROBE_DEFER;
-> > +		dev_info(&pdev->dev, "IRQ safety IRQ not found\n");
-
-s/IRQ safety IRQ/IRQ sfty
-* Although I would have also converted this to just dev_dbg() since
-* the IRQ line is optional and is present on a single platform you
-* have.
-
-
-With the subject and the log-message fixed feel free to add:
-
-Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
-
--Serge(y) 
-
-> > +	}
-> > +
-> >  	stmmac_res->addr = devm_platform_ioremap_resource(pdev, 0);
-> >  
-> >  	return PTR_ERR_OR_ZERO(stmmac_res->addr);
-> 
+>> ---
+>> v4: Add a helper to init accept_queue's spinlocks.
+>> v3: Move init spinlock to inet_create and inet_accept.
+>> v2: Add 'init_done' to make sure init the accept_queue's spinlocks once.
+>> ---
+>>   include/net/inet_connection_sock.h | 8 ++++++++
+>>   net/core/request_sock.c            | 3 ---
+>>   net/ipv4/af_inet.c                 | 3 +++
+>>   net/ipv4/inet_connection_sock.c    | 4 ++++
+>>   4 files changed, 15 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/include/net/inet_connection_sock.h b/include/net/inet_connection_sock.h
+>> index d0a2f827d5f2..9ab4bf704e86 100644
+>> --- a/include/net/inet_connection_sock.h
+>> +++ b/include/net/inet_connection_sock.h
+>> @@ -357,4 +357,12 @@ static inline bool inet_csk_has_ulp(const struct sock *sk)
+>>   	return inet_test_bit(IS_ICSK, sk) && !!inet_csk(sk)->icsk_ulp_ops;
+>>   }
+>>   
+>> +static inline void inet_init_csk_locks(struct sock *sk)
+>> +{
+>> +	struct inet_connection_sock *icsk = inet_csk(sk);
+>> +
+>> +	spin_lock_init(&icsk->icsk_accept_queue.rskq_lock);
+>> +	spin_lock_init(&icsk->icsk_accept_queue.fastopenq.lock);
+>> +}
+>> +
+>>   #endif /* _INET_CONNECTION_SOCK_H */
+>> diff --git a/net/core/request_sock.c b/net/core/request_sock.c
+>> index f35c2e998406..63de5c635842 100644
+>> --- a/net/core/request_sock.c
+>> +++ b/net/core/request_sock.c
+>> @@ -33,9 +33,6 @@
+>>   
+>>   void reqsk_queue_alloc(struct request_sock_queue *queue)
+>>   {
+>> -	spin_lock_init(&queue->rskq_lock);
+>> -
+>> -	spin_lock_init(&queue->fastopenq.lock);
+>>   	queue->fastopenq.rskq_rst_head = NULL;
+>>   	queue->fastopenq.rskq_rst_tail = NULL;
+>>   	queue->fastopenq.qlen = 0;
+>> diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
+>> index 835f4f9d98d2..4e635dd3d3c8 100644
+>> --- a/net/ipv4/af_inet.c
+>> +++ b/net/ipv4/af_inet.c
+>> @@ -330,6 +330,9 @@ static int inet_create(struct net *net, struct socket *sock, int protocol,
+>>   	if (INET_PROTOSW_REUSE & answer_flags)
+>>   		sk->sk_reuse = SK_CAN_REUSE;
+>>   
+>> +	if (INET_PROTOSW_ICSK & answer_flags)
+>> +		inet_init_csk_locks(sk);
+>> +
+>>   	inet = inet_sk(sk);
+>>   	inet_assign_bit(IS_ICSK, sk, INET_PROTOSW_ICSK & answer_flags);
+>>   
+>> diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
+>> index 8e2eb1793685..459af1f89739 100644
+>> --- a/net/ipv4/inet_connection_sock.c
+>> +++ b/net/ipv4/inet_connection_sock.c
+>> @@ -727,6 +727,10 @@ struct sock *inet_csk_accept(struct sock *sk, int flags, int *err, bool kern)
+>>   	}
+>>   	if (req)
+>>   		reqsk_put(req);
+>> +
+>> +	if (newsk)
+>> +		inet_init_csk_locks(newsk);
+>> +
+>>   	return newsk;
+>>   out_err:
+>>   	newsk = NULL;
+>> -- 
+>> 2.34.1
+>>
 
