@@ -1,116 +1,193 @@
-Return-Path: <netdev+bounces-64596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 777A6835D73
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 09:58:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60FB2835D77
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 09:58:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 192151F253F2
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 08:58:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85DEE1C23CC3
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 08:58:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B56639AF0;
-	Mon, 22 Jan 2024 08:57:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45BFC374C1;
+	Mon, 22 Jan 2024 08:57:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="rn+PrnE6";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="03jwonnZ";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="maN0sgPP";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="3ctN9PAT"
 X-Original-To: netdev@vger.kernel.org
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24BE539AEA
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 08:57:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7517339FE9;
+	Mon, 22 Jan 2024 08:57:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705913833; cv=none; b=HTVx7ytAi5QrnYXlwRj/pbzBcgt/sD9xhCSEYsZj2UF9llHZ31mhOQFkIhamnezdCb3/7rAfGPRU/qL/olH9S4YMD0odVLM9mTGHLjCM35z+k6/SZfEGXq6f/ZwWP0WtH6MV/vXMs4otoc2HizrY+wYRjp/RTuFDR5/Aw7ItEHg=
+	t=1705913864; cv=none; b=ts0gc6REINw1EPQKUohJ0gUQE1J/aU60dXeRmK53bu8XDfqwxixEYl3U7ErNCvy6SLHX+pXpheeblyoItdVwpdXKMveKH87GXgbp7PIhTaXWhEJVI+QS/lhcjNiY41iw1iXEIfXkyw7nHfmBpfTe4a/b3uyg0EGcHRbMurUfuEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705913833; c=relaxed/simple;
-	bh=1jcCvsdjNMV3GDJ4KZaJE8c1CpXgEwfJ0Xvj4k+6mek=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qoQKFfO3b65OV+iVJn13iimvhvY0/HEeAfS1q/c7PI2cxXIY4XUDrbOi4BNoWo6jfhIcQWcwt7c0fvXTBUmFyc2ZU2Xo95uuWvP2VUg45PjMNIj1Su1hPCoR96LFowrxkedY6xQsHIOyXMhQXt+HCdMlEcKTVTsrB4PUzkN13nw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [78.30.41.52] (port=45324 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1rRq6y-003Dnp-GL; Mon, 22 Jan 2024 09:56:58 +0100
-Date: Mon, 22 Jan 2024 09:56:55 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Zhengchao Shao <shaozhengchao@huawei.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	anjali.k.kulkarni@oracle.com, kuniyu@amazon.com, fw@strlen.de,
-	weiyongjun1@huawei.com, yuehaibing@huawei.com
-Subject: Re: [PATCH net,v4] netlink: fix potential sleeping issue in
- mqueue_flush_file
-Message-ID: <Za4t110BCZAnlf1o@calendula>
-References: <20240122011807.2110357-1-shaozhengchao@huawei.com>
+	s=arc-20240116; t=1705913864; c=relaxed/simple;
+	bh=KA1JVTbOBM3uBfYU6S2UqF+B/JP1ASsLjDXyfPbhQ+w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tizNzCn6F/ILRY1ABcnT81MDcQvP1hr6nSacnEqZ9/fK6fU4emUz/vjh7gWGdmEOgV61H40eBdryfP2NQtBTjgKONjLhJWozsQDdAiVCWOhkFN9+6SwTiYmyyVuc4EFFwlAPLkwf9lbUSGTWTUCGujp6hd5QE7dwVYjivs1I3zk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=rn+PrnE6; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=03jwonnZ; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=maN0sgPP; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=3ctN9PAT; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 5B2CC1FBB7;
+	Mon, 22 Jan 2024 08:57:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1705913860; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iiQ6RpqMIcBoOOnsDSCp7bi1bWTsKeg9JbKPmZLkpT4=;
+	b=rn+PrnE6VzmU1xq5Lo1uHES1GwA/SCbmRys1kfsUvfsYiLc3PBwwoBUrcL4tXgI5cdObY6
+	mkiSJpyX/bbTJgYRaJL4ythvDgS43+8KzNBi7N+U8rFyrMy4kVDFR1wlRhz/GRlLj7Ytgw
+	6uRaEgm8HzFFsajZEe7ZPUTn/lwKWY8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1705913860;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iiQ6RpqMIcBoOOnsDSCp7bi1bWTsKeg9JbKPmZLkpT4=;
+	b=03jwonnZDGYa/BFArL9WK1gOUCWlJo0lkyv9puGq83AxUkuGTYkZJrc9TWHViKVc1S7mNY
+	NScYO43W1dtJHbCw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1705913859; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iiQ6RpqMIcBoOOnsDSCp7bi1bWTsKeg9JbKPmZLkpT4=;
+	b=maN0sgPPpU/h5kuJO7NGKfbktoMP2iGI1EqgERLaXWaqQOD7DA5SFLrMk+thqO2/L0+Psb
+	y4FR36Rl5qzD/HWMHusV3b0fE0iII1f0WSmGmfqYOi/6mrETRrMa4QyN2wq8fXiBZ+Ara/
+	NMgar+3qkAUAV/hI6hRlQANpPzxu1bM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1705913859;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iiQ6RpqMIcBoOOnsDSCp7bi1bWTsKeg9JbKPmZLkpT4=;
+	b=3ctN9PATQk2ZO+iPHbYzxccXuMJpw9fM+zOw4Lpjuyb2DMTDcDVrzj6DjJQAOGJTC8OpOz
+	tlEe+EXWSO7zmkDQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D072013995;
+	Mon, 22 Jan 2024 08:57:38 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id SGfMLwIurmXcZgAAD6G6ig
+	(envelope-from <dkirjanov@suse.de>); Mon, 22 Jan 2024 08:57:38 +0000
+Message-ID: <8f031b17-9d86-42bf-b857-a7a46942a1cf@suse.de>
+Date: Mon, 22 Jan 2024 11:57:37 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240122011807.2110357-1-shaozhengchao@huawei.com>
-X-Spam-Score: -1.9 (-)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V3] net: ethernet: ti: cpsw_new: enable mac_managed_pm to
+ fix mdio
+Content-Language: en-US
+To: Sinthu Raja <sinthu.raja@mistralsolutions.com>,
+ Siddharth Vadapalli <s-vadapalli@ti.com>,
+ Ravi Gunasekaran <r-gunasekaran@ti.com>, Roger Quadros <rogerq@kernel.org>
+Cc: linux-omap@vger.kernel.org, netdev@vger.kernel.org,
+ Sinthu Raja <sinthu.raja@ti.com>
+References: <20240122083414.6246-1-sinthu.raja@ti.com>
+From: Denis Kirjanov <dkirjanov@suse.de>
+In-Reply-To: <20240122083414.6246-1-sinthu.raja@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Authentication-Results: smtp-out2.suse.de;
+	none
+X-Spamd-Result: default: False [-0.12 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 XM_UA_NO_VERSION(0.01)[];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 BAYES_HAM(-0.03)[55.35%];
+	 MIME_GOOD(-0.10)[text/plain];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 RCPT_COUNT_SEVEN(0.00)[7];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[ti.com:email];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 RCVD_TLS_ALL(0.00)[];
+	 MID_RHS_MATCH_FROM(0.00)[]
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spam-Score: -0.12
 
-On Mon, Jan 22, 2024 at 09:18:07AM +0800, Zhengchao Shao wrote:
-> I analyze the potential sleeping issue of the following processes:
-> Thread A                                Thread B
-> ...                                     netlink_create  //ref = 1
-> do_mq_notify                            ...
->   sock = netlink_getsockbyfilp          ...     //ref = 2
->   info->notify_sock = sock;             ...
-> ...                                     netlink_sendmsg
-> ...                                       skb = netlink_alloc_large_skb  //skb->head is vmalloced
-> ...                                       netlink_unicast
-> ...                                         sk = netlink_getsockbyportid //ref = 3
-> ...                                         netlink_sendskb
-> ...                                           __netlink_sendskb
-> ...                                             skb_queue_tail //put skb to sk_receive_queue
-> ...                                         sock_put //ref = 2
-> ...                                     ...
-> ...                                     netlink_release
-> ...                                       deferred_put_nlk_sk //ref = 1
-> mqueue_flush_file
->   spin_lock
->   remove_notification
->     netlink_sendskb
->       sock_put  //ref = 0
->         sk_free
->           ...
->           __sk_destruct
->             netlink_sock_destruct
->               skb_queue_purge  //get skb from sk_receive_queue
->                 ...
->                 __skb_queue_purge_reason
->                   kfree_skb_reason
->                     __kfree_skb
->                     ...
->                     skb_release_all
->                       skb_release_head_state
->                         netlink_skb_destructor
->                           vfree(skb->head)  //sleeping while holding spinlock
->
-> In netlink_sendmsg, if the memory pointed to by skb->head is allocated by
-> vmalloc, and is put to sk_receive_queue queue, also the skb is not freed.
-> When the mqueue executes flush, the sleeping bug will occur. Use
-> vfree_atomic instead of vfree in netlink_skb_destructor to solve the issue.
 
-mqueue notification is of NOTIFY_COOKIE_LEN size:
 
-static int do_mq_notify(mqd_t mqdes, const struct sigevent *notification)
-{
-        [...]
-                if (notification->sigev_notify == SIGEV_THREAD) {
-                        long timeo;
+On 1/22/24 11:34, Sinthu Raja wrote:
+> From: Sinthu Raja <sinthu.raja@ti.com>
+> 
+> The below commit  introduced a WARN when phy state is not in the states:
+> PHY_HALTED, PHY_READY and PHY_UP.
+> commit 744d23c71af3 ("net: phy: Warn about incorrect mdio_bus_phy_resume() state")
+> 
+> When cpsw_new resumes, there have port in PHY_NOLINK state, so the below
+> warning comes out. Set mac_managed_pm be true to tell mdio that the phy
+> resume/suspend is managed by the mac, to fix the following warning:
+> 
+> WARNING: CPU: 0 PID: 965 at drivers/net/phy/phy_device.c:326 mdio_bus_phy_resume+0x140/0x144
+> CPU: 0 PID: 965 Comm: sh Tainted: G           O       6.1.46-g247b2535b2 #1
+> Hardware name: Generic AM33XX (Flattened Device Tree)
+>  unwind_backtrace from show_stack+0x18/0x1c
+>  show_stack from dump_stack_lvl+0x24/0x2c
+>  dump_stack_lvl from __warn+0x84/0x15c
+>  __warn from warn_slowpath_fmt+0x1a8/0x1c8
+>  warn_slowpath_fmt from mdio_bus_phy_resume+0x140/0x144
+>  mdio_bus_phy_resume from dpm_run_callback+0x3c/0x140
+>  dpm_run_callback from device_resume+0xb8/0x2b8
+>  device_resume from dpm_resume+0x144/0x314
+>  dpm_resume from dpm_resume_end+0x14/0x20
+>  dpm_resume_end from suspend_devices_and_enter+0xd0/0x924
+>  suspend_devices_and_enter from pm_suspend+0x2e0/0x33c
+>  pm_suspend from state_store+0x74/0xd0
+>  state_store from kernfs_fop_write_iter+0x104/0x1ec
+>  kernfs_fop_write_iter from vfs_write+0x1b8/0x358
+>  vfs_write from ksys_write+0x78/0xf8
+>  ksys_write from ret_fast_syscall+0x0/0x54
+> Exception stack(0xe094dfa8 to 0xe094dff0)
+> dfa0:                   00000004 005c3fb8 00000001 005c3fb8 00000004 00000001
+> dfc0: 00000004 005c3fb8 b6f6bba0 00000004 00000004 0059edb8 00000000 00000000
+> dfe0: 00000004 bed918f0 b6f09bd3 b6e89a66
+> 
+Please add "Fixes" tag
 
-                        /* create the notify skb */
-                        nc = alloc_skb(NOTIFY_COOKIE_LEN, GFP_KERNEL);
-                        if (!nc)
-                                return -ENOMEM;
-
-Do you have a reproducer?
+> Signed-off-by: Sinthu Raja <sinthu.raja@ti.com>
+> ---
+>  drivers/net/ethernet/ti/cpsw_new.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/ti/cpsw_new.c b/drivers/net/ethernet/ti/cpsw_new.c
+> index 498c50c6d1a7..087dcb67505a 100644
+> --- a/drivers/net/ethernet/ti/cpsw_new.c
+> +++ b/drivers/net/ethernet/ti/cpsw_new.c
+> @@ -773,6 +773,9 @@ static void cpsw_slave_open(struct cpsw_slave *slave, struct cpsw_priv *priv)
+>  			slave->slave_num);
+>  		return;
+>  	}
+> +
+> +	phy->mac_managed_pm = true;
+> +
+>  	slave->phy = phy;
+>  
+>  	phy_attached_info(slave->phy);
 
