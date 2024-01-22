@@ -1,135 +1,108 @@
-Return-Path: <netdev+bounces-64887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4016837593
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 22:43:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF245837594
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 22:44:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 511B8285592
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 21:43:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F94B1F2BEC7
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 21:44:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC0AB481CC;
-	Mon, 22 Jan 2024 21:43:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0993A481D0;
+	Mon, 22 Jan 2024 21:44:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NhQJ8lHr"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PQ/eF/ZS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EC653EA95
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 21:43:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7108E3EA95
+	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 21:44:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705959827; cv=none; b=g3BgO8Hnt2tRypE185/fQWP4wJraRz1juDss7An8Sbyt6ocqjILd/f28t6f/nqkHxkKlE8ZBc8ARhRlSToqEsI/fl5VRH3jZqlrPLKyxA5V2KI/HN76p+idICprOKEH986N8QHVPQ0MUGK7z3/gRgApz20sOwU2zeOsGx4WwQi8=
+	t=1705959871; cv=none; b=oYddhr8srxwPtg0s2F7AX1wQ8vG/kzIOQkIq1AenRGrOVp1hpUneYPMbFxZgnboKySUoSNuwLysLTaiffyOERZq1Ca76mep7ILE8qVqrJ90Iuw0T6eR96RcwQPx7BPE0iM47T1Pbov+bOh0uHwp1JgjnW296EXn6kdC/4mPbuCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705959827; c=relaxed/simple;
-	bh=I9C5xqxnnAgemuRHcSKUW5jBZMLUxmiyTLrOEGNYQD8=;
-	h=Content-Type:From:Mime-Version:Subject:Date:Message-Id:References:
-	 Cc:In-Reply-To:To; b=pqZua4+zdfHQ07hxJ2SEBsBtI3/QVucYgsjcgdDE0rEKniCmeLu7m/5a4yVhjUxPnXcW23s0KPwTnkdpwmXt88pTu4z1umO1RAkhAcd4gE041mTDoWSlWYFt3UueiMmRasi0i1GBDFxTLfQyIVm+pYlojhIQ6ybP9uRAA9WgU+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NhQJ8lHr; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-40eacb4bfa0so16078245e9.1
-        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 13:43:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705959824; x=1706564624; darn=vger.kernel.org;
-        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
-         :from:content-transfer-encoding:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vtmwS9uSICuxVGkdR63++2qh5ZjV4LyrYBIrO67aycg=;
-        b=NhQJ8lHrIvcqlmR7QKgI3twgL+ALZCX+Bxh14dt7TqUPEY4MsrHd/oNjLr/HHzj99T
-         obGoW541mNMRKQo8fLjkKnkOGpNzR5oFteeIv4sCjHpFAK1p4GUhA+Nzk+GEjhZzjnze
-         6NwodU+vssW3eGWgYgPpBPtgKIMjxEBbNC8uh+UZe3eCpgmwPz8hs5NRmJ8ZyNgVI+82
-         M9BDEVASQgqM3asgbrl+1v9nE/DJ5eGFOmGzssQAfcklZQ5i8cqfzefs8bL3PS+1VM3A
-         IwYYS06ixzZ3DjROmucP/4kyTdVoAY18O1HiFBYIQ3ODL5g86Wgl1jQkyP8ldCTW9b3O
-         y/Kw==
+	s=arc-20240116; t=1705959871; c=relaxed/simple;
+	bh=OnaVsuJ2eTrsOW2eX2ZsStahDMb3BDYaCGq1vSWSsIk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IO6RuHkxZ2pGgBXtSBeYnxAqufnIQBjayP9oe+B0Mbft8BBsHS9Q1WU8OIO2kTeFbjNap5qMolko5GC7QfcXcwW1wBVmti0qQWRoeNzDMFPTRnjH9TrHSwz0nOQIknTGfh1A/Q84IwrrMITYIK/+6qL92grA6SuJAOxu4L0xhek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PQ/eF/ZS; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1705959869;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uTA7X9tYRVaCQxnz75s4KQvy8kumvksC7rr7nu7TkuQ=;
+	b=PQ/eF/ZSCp0MLW9Zpz7rpfOmRiKh9SbObhvu2oEynCUrKkEL/ZS1a09LP9ZhS2ojDx5Z++
+	uSi5j7b8yquUyID1hJiI0ph5wesrrmtnHHfREURyyVITO/7chuqwp6e7pg9nGEhwuCGY8V
+	hBDeBOoFlaJ5bxykzQRBS6wDCXTF8cs=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-493-obDiZeOuOiS25ZxQYec-SQ-1; Mon, 22 Jan 2024 16:44:28 -0500
+X-MC-Unique: obDiZeOuOiS25ZxQYec-SQ-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3367e2bd8b0so2682478f8f.1
+        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 13:44:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705959824; x=1706564624;
-        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
-         :from:content-transfer-encoding:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vtmwS9uSICuxVGkdR63++2qh5ZjV4LyrYBIrO67aycg=;
-        b=F0M0YUZMxPePHTy4fOLhx7jMjjBrjPwIewfG2cNBvtr3jumRd+Ap55GqwbahE7kYW9
-         rZG0DBSNKJZ439BJZ53Ez/3ueSnunL/h51F3NM1bVbEmq1hIwhlOxlgTEs94TPRDTIiM
-         nqe6/QoRrnyTHqzLIAd+iRY7+I/WpTIGVxRIk+gk/gSR3yp2g0c0B1LTwJcgqMM+eIIa
-         qSDbq5PVktiAvWYUVD8F7rxtMD5SsUn2g/wCISe0r9XTea0pAWnZh77OVyedLS8AJBfg
-         +nvGy2qjQfvbSE9zWN8I6bJqpTPi+Ujv2OXHDMn+2shrLdA+GET2aBYZfaIG9Y1fYV3Z
-         qOLA==
-X-Gm-Message-State: AOJu0YzUYhUmyd7TyL084WYcFI0zXAnXdKm43ddmDrkHKsXRy1y64Je9
-	TbQIeBxczcuGqj111CXgRIFYeHQyhUXKnflrwMJvJza08Zwp5+E+
-X-Google-Smtp-Source: AGHT+IHepKC6skw0NNlmf6JVLFoDIgFxTIf/8bZ0xSEB6YnimOPVk9ToyuZmoM6HLa3tdgc4XiZ0jg==
-X-Received: by 2002:a7b:cb93:0:b0:40e:431c:76d9 with SMTP id m19-20020a7bcb93000000b0040e431c76d9mr2488324wmi.148.1705959823742;
-        Mon, 22 Jan 2024 13:43:43 -0800 (PST)
-Received: from smtpclient.apple ([89.150.15.164])
-        by smtp.gmail.com with ESMTPSA id fl21-20020a05600c0b9500b0040e9d507424sm14010247wmb.5.2024.01.22.13.43.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Jan 2024 13:43:42 -0800 (PST)
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From: Donald Hunter <donald.hunter@gmail.com>
+        d=1e100.net; s=20230601; t=1705959867; x=1706564667;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uTA7X9tYRVaCQxnz75s4KQvy8kumvksC7rr7nu7TkuQ=;
+        b=mzMWyGnf+Ww97YGG1Wy5JfvBUJuPMCCDC8r0lG//c6p2txDPKTqLCkQmWYIM2nhMvo
+         muudMkTc2Fps9inH2p8aMqdV8DpeTMsCLJ3wFf1R98Aner1AQx3TKZvrXOK5Bixbyfw9
+         f3gDBiBC5KvX4UfnW3GCd5a7G+AZ7aStzMgFHzfiTobj6tFsgAjhIm7Av7dpcoqUiDB1
+         Rw4Td/cAu/WgmvtQBo2JLbTnfmvP5cqCXpCgUEvEnkHWsy6KsjzNXIiy9/mQRm3KM34d
+         36zadsqHrt0DFhyY8c1rD656cVD3oZHpGOt04zkwOqxVlCMUw0yKk1xNMc7Ci5WNKrkW
+         h+cw==
+X-Gm-Message-State: AOJu0YwWqiPguSzA9ptex4qVoKG1I8n5Jo9v2SJtcu24L7eRJ1xBYsy6
+	IGVsGXE1QjUgWN6LjsTan3fteaSubyAp4/l+/ywPyeP8pa0/GdIk+d1AOaM7kwzuKCJcUoSbjKk
+	VZxMUb6ymNzB0ZYRbmHSJlScWQYmtIpp9NveGTKJ1JbSD7dyZysZhrQ==
+X-Received: by 2002:a5d:5f8c:0:b0:337:3ed6:8697 with SMTP id dr12-20020a5d5f8c000000b003373ed68697mr3422224wrb.90.1705959867052;
+        Mon, 22 Jan 2024 13:44:27 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHZUqT5N+43v3469ML+ldsst19EUQegJa7GxBB/IGUey7MxIMivH4Rv0qjcoaxcCGf6bHBHkQ==
+X-Received: by 2002:a5d:5f8c:0:b0:337:3ed6:8697 with SMTP id dr12-20020a5d5f8c000000b003373ed68697mr3422218wrb.90.1705959866712;
+        Mon, 22 Jan 2024 13:44:26 -0800 (PST)
+Received: from debian (2a01cb058d23d6005fec131dfc58016b.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:5fec:131d:fc58:16b])
+        by smtp.gmail.com with ESMTPSA id b17-20020a5d4d91000000b0033935b0a0fdsm4093802wru.44.2024.01.22.13.44.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jan 2024 13:44:26 -0800 (PST)
+Date: Mon, 22 Jan 2024 22:44:24 +0100
+From: Guillaume Nault <gnault@redhat.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Martin KaFai Lau <kafai@fb.com>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com
+Subject: Re: [PATCH net-next 9/9] inet_diag: skip over empty buckets
+Message-ID: <Za7huFhYnIydYK9J@debian>
+References: <20240122112603.3270097-1-edumazet@google.com>
+ <20240122112603.3270097-10-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH net-next 0/3] tools: ynl: Add sub-message and multi-attr encoding support
-Date: Mon, 22 Jan 2024 22:43:31 +0100
-Message-Id: <88580D1A-7F70-4598-8E2B-18A85174EEF8@gmail.com>
-References: <cover.1705950652.git.alessandromarcolini99@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, sdf@google.com, chuck.lever@oracle.com, lorenzo@kernel.org,
- jacob.e.keller@intel.com, jiri@resnulli.us, netdev@vger.kernel.org
-In-Reply-To: <cover.1705950652.git.alessandromarcolini99@gmail.com>
-To: Alessandro Marcolini <alessandromarcolini99@gmail.com>
-X-Mailer: iPhone Mail (21D50)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240122112603.3270097-10-edumazet@google.com>
 
+On Mon, Jan 22, 2024 at 11:26:03AM +0000, Eric Dumazet wrote:
+> After the removal of inet_diag_table_mutex, sock_diag_table_mutex
+> and sock_diag_mutex, I was able so see spinlock contention from
+> inet_diag_dump_icsk() when running 100 parallel invocations.
+> 
+> It is time to skip over empty buckets.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
+Reviewed-by: Guillaume Nault <gnault@redhat.com>
 
-> On 22 Jan 2024, at 20:19, Alessandro Marcolini <alessandromarcolini99@gmai=
-l.com> wrote:
->=20
-> =EF=BB=BFThis patchset adds the encoding support for sub-message attribute=
-s and
-> multi-attr objects.
-
-I have a longer patchset that covers this plus some refactoring for nested s=
-truct definitions and a lot of addtions to the tc spec. Do you mind if I pos=
-t it and we review to see if there is anything from your patchset that is mi=
-ssing from mine?
-
-Thanks,
-Donald
-
-> Patch 1 corrects a typo and the docstring for SpecSubMessageFormat
-> Patch 2 adds the multi-attr attribute to the entry object for taprio
-> Patch 3 updates the _add_attr method to support sub-message encoding
->=20
-> It is now possible to add a taprio qdisc using ynl:
-> # /tools/net/ynl/cli.py --spec Documentation/netlink/specs/tc.yaml --do ne=
-wqdisc --create --json '{"family":1, "ifindex":4, "handle":65536, "parent":4=
-294967295, "info":0, "kind":"taprio", "stab":{"base":"000000000000001f000000=
-00000000000000000000000000"}, "options":{"priomap":"030101010101010101010101=
-0101010101000100010002000000000000000000000000000000000000000000000000000000=
-0100020003000000000000000000000000000000000000000000000000000000", "sched-cl=
-ockid":11, "sched-entry-list":[{"entry":{"index":0, "cmd":0, "gate-mask":1, "=
-interval":300000}}, {"entry":{"index":1, "cmd":0, "gate-mask":2, "interval":=
-300000}}, {"entry":{"index":2, "cmd":0, "gate-mask":4, "interval":400000}}],=
- "sched-base-time":1528743495910289987, "flags": 1}}'
->=20
-> Alessandro Marcolini (3):
->  tools: ynl: correct typo and docstring
->  doc: netlink: specs: tc: add multi-attr to tc-taprio-sched-entry
->  tools: ynl: add encoding support for 'sub-message' to ynl
->=20
-> Documentation/netlink/specs/tc.yaml |  3 +-
-> tools/net/ynl/lib/nlspec.py         |  7 ++--
-> tools/net/ynl/lib/ynl.py            | 54 +++++++++++++++++++++++++----
-> 3 files changed, 53 insertions(+), 11 deletions(-)
->=20
-> --
-> 2.43.0
->=20
 
