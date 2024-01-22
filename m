@@ -1,128 +1,145 @@
-Return-Path: <netdev+bounces-64651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29C6E8362C8
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 13:05:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C881A8362F7
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 13:20:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC39D289434
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 12:05:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 69ABA1F225F5
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 12:20:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1295A3B790;
-	Mon, 22 Jan 2024 12:05:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 554AB3B790;
+	Mon, 22 Jan 2024 12:20:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Con4/fbV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ob2Qox9R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A2E13B2BF
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 12:05:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20FE73B2B6;
+	Mon, 22 Jan 2024 12:20:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705925123; cv=none; b=TcjZxbinA3XRtSuWrvUge3CB7gOxypvpKORQAVstZXPW8Ez+/6HqzoKI0cUnNUx6PFm8gIisVgJigmAtntD2f8yvnt9jPM/X7C82LCpQjMim4wv60ekwdW2Jc449fLDJEatrytRvRyoBF4lMOwt2ZnLGH69/hT1BJ2gtrdRd3Hg=
+	t=1705926012; cv=none; b=AWAQksmf3k3Pgoil3Vy+F3M2MTP3QiHAzTABwvnbxiu8k6nixXSCwIJ5/UMxUahEYbhXRPN+hLUaJuDBKuwfG9s3+ZpopE6P5PZ7BkLtG8yr57xpcnB51rkqEo6rb129G9bXQSoPkRd+bW5+DwXZ48ivT6F7cGsCDsDEJEJDBWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705925123; c=relaxed/simple;
-	bh=u7S/jdB1Dy2pQ9IW3NQ2ljJCJKWpQ/bKhhsYIE+ira0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OlEbyUDdzubhI3tHV7Kej/yMpUpr8flIQp4g8QptzRIh4IVtOfUqNvtfC7II3Gx/C8uSUJl//jT6VEv2/GHhlmwAYlK6wDdM8im7psUlwb99HqjZn32Ym+LnmGCeN53B99bJEk9XTpN3AEkZqWurAu6s2R/UhLjDFPDqyVDp5Hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Con4/fbV; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-55c24a32bf4so6532a12.0
-        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 04:05:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1705925119; x=1706529919; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tuNTWGZcfjM1YzSznjjfGHQINmpVyE/XllmWFq9KKMc=;
-        b=Con4/fbVzc8MsnCtQZPP+tpNDNdT9ORHazActkahh4HNv1utbkMNnrM5CbFr7tdjHv
-         U7lSNa9YMrdtU+gFol/ujk+c39eBnEl8O+dzkoC6L/lteDfhg4VZGbvn3BtGP0XEUBL8
-         hB5M8XeIJTLspCubvMb0qpbBjxSw8YLqGAnzCN2Rd8Tv1qWw18hgT9ZJV3BbShOvQ59P
-         XhvmNaow362XaXPmZrxf2BXXFC7XQDu0jWRpip1AQGTtDlAEfnJW/v4sYIxm1n64cOXk
-         4Qfyq2VfIRh61B+JcjNG2qOXgetwJnh7VuXLlOvXJx2+mtPLawhd04b8tjCPmr6atDVZ
-         No/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705925119; x=1706529919;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tuNTWGZcfjM1YzSznjjfGHQINmpVyE/XllmWFq9KKMc=;
-        b=n2WHbLavTmukevb5RziZpeFKbhcsYXAKqsMP90ptKwlrPNci8orqMmvmc07YPIwyn4
-         3PTTLzMwpk3imB33su9C2oHCiARNrrx1drWrUmPPYkXVO2TnFawBeMjb/QRbTEcfKSDx
-         DcjN1adm2U9z71eulObRpHno8+2mm8kfejn01ey5o93Ba5BsiKWK2GehSsDeZPWoFxGB
-         u/t4zQlQiN4GN/kmoBhDVAfHLhC87xdvD0Ebum6/+WZFJ7D3V7GLVdH5YcdOd7KfPX7U
-         5KiRmaW9R4qpCb2iDyhvDSz+aklCXxI2PQx0InVu9WIIobkabNPvsGxYE2j4Di6+dad7
-         SwVw==
-X-Gm-Message-State: AOJu0YxfMEtnR1yWVUgH4n8vqUt4H/hw6lfgqqZ3fKnjV7pDY1iICeo8
-	JsuXBcVeGGSOySeXepKbx0VuuHTPZiJsQxH7qPnwJshLRdBPhpRn9hFaI99gyA==
-X-Google-Smtp-Source: AGHT+IFdpwG/XCMDcD9Hegj6Cwm2OsVbTQIBWlyjxWMM1b1eIeGFfCQyjb0++UTCQjGKiumcFIj76NCu6+ySocas9lY=
-X-Received: by 2002:a05:6402:17dc:b0:55c:6a45:d6de with SMTP id
- s28-20020a05640217dc00b0055c6a45d6demr2262edy.0.1705925119224; Mon, 22 Jan
- 2024 04:05:19 -0800 (PST)
+	s=arc-20240116; t=1705926012; c=relaxed/simple;
+	bh=IlLNZwCv119gs+G1XZGQUJ/nTZHJ2OxfZVk+jo076AY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tf0K9iQ6JZtzsOzi1fZU2jJJToDlr0uBxFPDp07GGgKhUiHQIzIZjqLYf4xeu4KdGkRznftM6MQ4cOxg48Csr/7eC0V5OFQd+lKdVTy7qnBZYa1NUHDJ2CBi89eOdl5I7WN0L2w/nXDmB+/zvxsHuRr194xp3fup/l3k0xa+ma0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ob2Qox9R; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3934FC433F1;
+	Mon, 22 Jan 2024 12:20:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705926011;
+	bh=IlLNZwCv119gs+G1XZGQUJ/nTZHJ2OxfZVk+jo076AY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ob2Qox9Rq4r16y13ck9Hpq/TMnEm3RnAjWh84mJdSYOZTkruw2jb+VCPFnb0Lh4YU
+	 pS5oIzblRyjnRjjqPfAHjKIZKxL9x42SXUb8gB1lQbEUn+1l+lMIUcaAV95xVZGoUU
+	 P2XGfjHWsDWVYKJuf3CompvjiOERgDFSqMsfHP5LatjVDA5SEfF20l6DqbM7sIlXi8
+	 RV6aXp4F2GBCs1WO8rmakFi3XVxuIQUthGmGg/B3KKVmCmgRzoVZl6cS3czqWGreXt
+	 2FZGSOYl7DWpB/B9+H/v/gNjlgs6z/gBcfpU6eBBKBhJk55mR7KOgsYj8TsM5AK61G
+	 EdbigUbi7JqxQ==
+From: Conor Dooley <conor@kernel.org>
+To: linux-riscv@lists.infradead.org
+Cc: conor@kernel.org,
+	Conor Dooley <conor.dooley@microchip.com>,
+	Daire McNamara <daire.mcnamara@microchip.com>,
+	Wolfgang Grandegger <wg@grandegger.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>,
+	linux-can@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-clk@vger.kernel.org
+Subject: [PATCH v2 0/7] MPFS clock fixes required for correct CAN clock modeling
+Date: Mon, 22 Jan 2024 12:19:48 +0000
+Message-ID: <20240122-catty-roast-d3625dbb02fe@spud>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240122102001.2851701-1-shaozhengchao@huawei.com>
-In-Reply-To: <20240122102001.2851701-1-shaozhengchao@huawei.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 22 Jan 2024 13:05:08 +0100
-Message-ID: <CANn89iKSkpWWBWUXj37LS11O=42S9sm5o0Dj0SQeESG_V9U2rQ@mail.gmail.com>
-Subject: Re: [PATCH net] ipv6: init the accept_queue's spinlocks in inet6_create
-To: Zhengchao Shao <shaozhengchao@huawei.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org, 
-	kuba@kernel.org, pabeni@redhat.com, weiyongjun1@huawei.com, 
-	yuehaibing@huawei.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2564; i=conor.dooley@microchip.com; h=from:subject:message-id; bh=LljwZDfMNfbMVLp7XtH+2mdlVEJFVNUoZZukL9HDn4g=; b=owGbwMvMwCFWscWwfUFT0iXG02pJDKnrYpNPeB3Nb1kttaDRUG6G2KQrfo9W/pvGmv1XWTDCd +Zr1hbbjlIWBjEOBlkxRZbE230tUuv/uOxw7nkLM4eVCWQIAxenAEyEjZvhfzE3J/uknFOdS1IO rBILU2HdXCJ24FX6s1di79+EBT29fpqRYfPeFnMmbcM8vdZjkyPudL37ZpvB+vux3oJDb74//3y ligUA
+X-Developer-Key: i=conor.dooley@microchip.com; a=openpgp; fpr=F9ECA03CF54F12CD01F1655722E2C55B37CF380C
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jan 22, 2024 at 11:10=E2=80=AFAM Zhengchao Shao
-<shaozhengchao@huawei.com> wrote:
->
-> In commit 198bc90e0e73("tcp: make sure init the accept_queue's spinlocks
-> once"), the spinlocks of accept_queue are initialized only when socket is
-> created in the inet4 scenario. The locks are not initialized when socket
-> is created in the inet6 scenario. The kernel reports the following error:
-> INFO: trying to register non-static key.
-> The code is fine but needs lockdep annotation, or maybe
-> you didn't initialize this object before use?
-> turning off the locking correctness validator.
-> Hardware name: Red Hat KVM, BIOS 0.5.1 01/01/2011
-> Call Trace:
-> <TASK>
->         dump_stack_lvl (lib/dump_stack.c:107)
->         register_lock_class (kernel/locking/lockdep.c:1289)
->         __lock_acquire (kernel/locking/lockdep.c:5015)
->         lock_acquire.part.0 (kernel/locking/lockdep.c:5756)
->         _raw_spin_lock_bh (kernel/locking/spinlock.c:178)
->         inet_csk_listen_stop (net/ipv4/inet_connection_sock.c:1386)
->         tcp_disconnect (net/ipv4/tcp.c:2981)
->         inet_shutdown (net/ipv4/af_inet.c:935)
->         __sys_shutdown (./include/linux/file.h:32 net/socket.c:2438)
->         __x64_sys_shutdown (net/socket.c:2445)
->         do_syscall_64 (arch/x86/entry/common.c:52)
->         entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:129)
-> RIP: 0033:0x7f52ecd05a3d
-> Code: 5b 41 5c c3 66 0f 1f 84 00 00 00 00 00 f3 0f 1e fa 48 89 f8 48 89 f=
-7
-> 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff
-> ff 73 01 c3 48 8b 0d ab a3 0e 00 f7 d8 64 89 01 48
-> RSP: 002b:00007f52ecf5dde8 EFLAGS: 00000293 ORIG_RAX: 0000000000000030
-> RAX: ffffffffffffffda RBX: 00007f52ecf5e640 RCX: 00007f52ecd05a3d
-> RDX: 00007f52ecc8b188 RSI: 0000000000000000 RDI: 0000000000000004
-> RBP: 00007f52ecf5de20 R08: 00007ffdae45c69f R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000293 R12: 00007f52ecf5e640
-> R13: 0000000000000000 R14: 00007f52ecc8b060 R15: 00007ffdae45c6e0
->
-> Fixes: 198bc90e0e73 ("tcp: make sure init the accept_queue's spinlocks on=
-ce")
-> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+From: Conor Dooley <conor.dooley@microchip.com>
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+While reviewing a CAN driver internally for MPFS [1], I realised
+that the modeling of the MSSPLL such that only one of its outputs could
+be used was not correct. The CAN controllers on MPFS take 2 input
+clocks - one that is the bus clock, acquired from the main MSSPLL and
+a second clock for the AHB interface to the result of the SoC.
+Currently the binding for the CAN controllers and the represetnation
+of the MSSPLL only allows for one of these clocks.
+Modify the binding and devicetree to expect two clocks and rework the
+main clock controller driver for MPFS such that it is capable of
+providing multiple outputs from the MSSPLL.
+
+Cheers,
+Conor.
+
+1 - Hopefully that'll show up on the lists soon, once we are happy with
+  it ourselves. (As of v2, that's not happened yet, Christmas etc gettin
+  in the way, soonTM).
+
+Changes in v2:
+- Swap MSSPLL out for MSSPLL0 in the driver, there's no functional
+  change there.
+- drop the unneeded maxItems from clocks.
+
+CC: Conor Dooley <conor.dooley@microchip.com>
+CC: Daire McNamara <daire.mcnamara@microchip.com>
+CC: Wolfgang Grandegger <wg@grandegger.com>
+CC: Marc Kleine-Budde <mkl@pengutronix.de>
+CC: "David S. Miller" <davem@davemloft.net>
+CC: Eric Dumazet <edumazet@google.com>
+CC: Jakub Kicinski <kuba@kernel.org>
+CC: Paolo Abeni <pabeni@redhat.com>
+CC: Rob Herring <robh+dt@kernel.org>
+CC: Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
+CC: Paul Walmsley <paul.walmsley@sifive.com>
+CC: Palmer Dabbelt <palmer@dabbelt.com>
+CC: Albert Ou <aou@eecs.berkeley.edu>
+CC: Michael Turquette <mturquette@baylibre.com>
+CC: Stephen Boyd <sboyd@kernel.org>
+CC: linux-riscv@lists.infradead.org
+CC: linux-can@vger.kernel.org
+CC: netdev@vger.kernel.org
+CC: devicetree@vger.kernel.org
+CC: linux-kernel@vger.kernel.org
+CC: linux-clk@vger.kernel.org
+
+Conor Dooley (7):
+  dt-bindings: clock: mpfs: add more MSSPLL output definitions
+  dt-bindings: can: mpfs: add missing required clock
+  clk: microchip: mpfs: split MSSPLL in two
+  clk: microchip: mpfs: setup for using other mss pll outputs
+  clk: microchip: mpfs: add missing MSSPLL outputs
+  clk: microchip: mpfs: convert MSSPLL outputs to clk_divider
+  riscv: dts: microchip: add missing CAN bus clocks
+
+ .../bindings/net/can/microchip,mpfs-can.yaml  |   6 +-
+ arch/riscv/boot/dts/microchip/mpfs.dtsi       |   4 +-
+ drivers/clk/microchip/clk-mpfs.c              | 154 ++++++++++--------
+ .../dt-bindings/clock/microchip,mpfs-clock.h  |   5 +
+ 4 files changed, 98 insertions(+), 71 deletions(-)
+
+-- 
+2.43.0
+
 
