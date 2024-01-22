@@ -1,167 +1,108 @@
-Return-Path: <netdev+bounces-64740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 275B2836FC1
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:23:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A5E0836EC5
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:02:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 58C39B307DE
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:02:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1CA2D1F2F095
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:02:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 091EF54FB4;
-	Mon, 22 Jan 2024 17:25:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3106B54FA7;
+	Mon, 22 Jan 2024 17:24:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JAgys+5E"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [20.231.56.155])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 459DC54674;
-	Mon, 22 Jan 2024 17:25:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=20.231.56.155
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C980861693
+	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 17:24:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705944307; cv=none; b=Y3t+0KpJ8YjEhaa9S/hqZHnioAgk6ukU8o8XsqcrGxMzHF5zZybG8UoPtZtPAkWUMsZSTRl7THdGqjtQNursd7begbIwwc/1ZIRntv/75YiaBvqFoe9lDL+n4mzgsLaubtibpZsSEFuz0ju+VtWSVee9VeYtqUm6wCzowuCVEOc=
+	t=1705944299; cv=none; b=F4vhE99i9BENPI74+yFgq4gZKtFWkO0Xj3lnBYcqqTkqbSKSaCJYJ3v5VnSgjzN5p6r2jA4fHbpOjXej6vpcdhEO2HWR/D5V0e/9nmWgfoBJWGQTdUS9wNDYRKgvmogIgLbe2966hg248c+1wm/gfhRtKy23JRONFz5Ge41w4VQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705944307; c=relaxed/simple;
-	bh=6OO3Chktb+FuhqSNF2+WLXNeECvA9tRujwLQlYCWGJk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mov5V7g4re7/wVebp6q/oJa2pF9J+YUkkVaP1V3Y35MeXIGjP/AzA2fnp7waDALil8FPE1sxydqw76/hAhBzvuBsnB/qDcMBcEjNnqVwco4MhP7JbB4gInqLAzfCbH8V6VncPxwcfbihgiviKM2vsSIyPga7sLVmacHvnGEuwtQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=20.231.56.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from luzhipeng.223.5.5.5 (unknown [39.174.92.167])
-	by mail-app4 (Coremail) with SMTP id cS_KCgCHo4LmpK5lwGJ5AA--.18173S2;
-	Tue, 23 Jan 2024 01:24:54 +0800 (CST)
-From: Zhipeng Lu <alexious@zju.edu.cn>
-To: alexious@zju.edu.cn
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Taku Izumi <izumi.taku@jp.fujitsu.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] fjes: fix memleaks in fjes_hw_setup
-Date: Tue, 23 Jan 2024 01:24:42 +0800
-Message-Id: <20240122172445.3841883-1-alexious@zju.edu.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1705944299; c=relaxed/simple;
+	bh=GLKrUxyUALQSq9fwpY8O3C/BV3WYCVeFB6nxgTw9uhk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZF5UYAFLpYtuTi2CEZE24S/eEpQ5g7fim6aPjGsmSYN9hfxsDQqdQHWzlA2yKmIeHZEMvd5payJ6VmfwSbrs+rMxWoAXiqc+VVxFal2ddA3BFLSn42eXe/MbP4hbHRXAoB9xnaLZeEFMtIPw9uPdznhXUPSyFbuO3Uk5mKe4esU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JAgys+5E; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1705944296;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NHT5hl8+BLdILjj1xi8MQ0aOcIL0yqmoqgp/WV8qlxc=;
+	b=JAgys+5ERO9dz66Fe0YbF1q49Z++uygEiA/ThJakfCxncE+NbPWWJxgh2dPPcgrZt+ZTiH
+	o3d3TSwz5Me9gEZHC0XNVLIpZt5KV2NbUrqf8Cz21eWYfAD4KX9ApN1n8b/Yl3I803fYaW
+	bPt9SrQ5vGlPFJQkst1YDPlElq8mOJQ=
+Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com
+ [209.85.161.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-166-Bi0WzT4hNTWofg08LaHiyg-1; Mon, 22 Jan 2024 12:24:54 -0500
+X-MC-Unique: Bi0WzT4hNTWofg08LaHiyg-1
+Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-59927811bf8so4005076eaf.1
+        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 09:24:54 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705944293; x=1706549093;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NHT5hl8+BLdILjj1xi8MQ0aOcIL0yqmoqgp/WV8qlxc=;
+        b=fFblDzZHPm0PPxdUdLVic63iqAV5vH0UB03zLWdjead2kQ81GSB+Par3zOUnV+T1xZ
+         SY9JfIGwlsb2dYNJcswSM5UGz/cIR1i5FYmEPPPrB7Pn9PptHOkYAkshuiCaoS9RSoyV
+         EzeNVCU4FIlpInSofq+i2JQZ/PicVtTTgP6xrfjNWAgzd3+wzXTN6WU/w2x9EBJPAiWq
+         3M6ReTSuvo1/jQcpAIqpAH3J1IGNuCUgoScNokrSrwSzya0zGnpVh/DkigY378ZR+RZY
+         YeWr4GeIFTE+VTDdTDcz3WJMsR9gvXv+a3tG62CWQrwGeRIjp5EiMbWz7PlgYpml6OFd
+         GchQ==
+X-Gm-Message-State: AOJu0Yz6kw13bMMElVtTfs1C6/TfuCWEWNaRbpcMo/+RvPhsZEPFwYBl
+	PFJqjv1A6eQttJVWe+zPNePDFadxeUjOB3I+1QzAMs339Vg0f4zLOoFFFNWMLydwsU/qZ6s82La
+	rtlskdP5ltU4/LWTGINedRl/TyX0zM7HTx+Atty4p1/B8pPofEgOhUg==
+X-Received: by 2002:a05:6358:224a:b0:175:fc1a:c7df with SMTP id i10-20020a056358224a00b00175fc1ac7dfmr3920459rwc.15.1705944293661;
+        Mon, 22 Jan 2024 09:24:53 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFWJJtcXzQYMuheVKrhee/bQQMW5AoBwjJN8Pb77kx7v+HPIe/kZYwgSGcA2jyjQAfq1FSomw==
+X-Received: by 2002:a05:6358:224a:b0:175:fc1a:c7df with SMTP id i10-20020a056358224a00b00175fc1ac7dfmr3920448rwc.15.1705944293469;
+        Mon, 22 Jan 2024 09:24:53 -0800 (PST)
+Received: from debian (2a01cb058d23d60079fd8eadf0dd7f4f.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:79fd:8ead:f0dd:7f4f])
+        by smtp.gmail.com with ESMTPSA id ly4-20020a0562145c0400b0068688a2964asm1542850qvb.113.2024.01.22.09.24.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jan 2024 09:24:53 -0800 (PST)
+Date: Mon, 22 Jan 2024 18:24:49 +0100
+From: Guillaume Nault <gnault@redhat.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Martin KaFai Lau <kafai@fb.com>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com
+Subject: Re: [PATCH net-next 5/9] sock_diag: add module pointer to "struct
+ sock_diag_handler"
+Message-ID: <Za6k4bpSj9OGAwij@debian>
+References: <20240122112603.3270097-1-edumazet@google.com>
+ <20240122112603.3270097-6-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cS_KCgCHo4LmpK5lwGJ5AA--.18173S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxXFW3Cr4DZFW7CryxAF4fKrg_yoW5WrWUpF
-	W5u34fArWDJr4fJwsFqF48ZryrA3Z7JryUCa9xK3s7Z343ZFs0qF1fAFW2vryktryvvF1U
-	Krn8A34UuF1DWa7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvm14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v26r
-	xl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj
-	6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr
-	0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v2
-	6r126r1DMxkIecxEwVAFwVW8MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r
-	4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF
-	67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2I
-	x0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2
-	z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnU
-	UI43ZEXa7VUjj2NtUUUUU==
-X-CM-SenderInfo: qrsrjiarszq6lmxovvfxof0/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240122112603.3270097-6-edumazet@google.com>
 
-In fjes_hw_setup, it allocates several memory and delay the deallocation
-to the fjes_hw_exit in fjes_probe through the following call chain:
+On Mon, Jan 22, 2024 at 11:25:59AM +0000, Eric Dumazet wrote:
+> Following patch is going to use RCU instead of
+> sock_diag_table_mutex acquisition.
+> 
+> This patch is a preparation, no change of behavior yet.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-fjes_probe
-  |-> fjes_hw_init
-        |-> fjes_hw_setup
-  |-> fjes_hw_exit
-
-However, when fjes_hw_setup fails, fjes_hw_exit won't be called and thus
-all the resources allocated in fjes_hw_setup will be leaked. In this
-patch, we free those resources in fjes_hw_setup and prevents such leaks.
-
-Fixes: 2fcbca687702 ("fjes: platform_driver's .probe and .remove routine")
-Signed-off-by: Zhipeng Lu <alexious@zju.edu.cn>
----
- drivers/net/fjes/fjes_hw.c | 37 ++++++++++++++++++++++++++++++-------
- 1 file changed, 30 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/fjes/fjes_hw.c b/drivers/net/fjes/fjes_hw.c
-index 704e949484d0..b9b5554ea862 100644
---- a/drivers/net/fjes/fjes_hw.c
-+++ b/drivers/net/fjes/fjes_hw.c
-@@ -221,21 +221,25 @@ static int fjes_hw_setup(struct fjes_hw *hw)
- 
- 	mem_size = FJES_DEV_REQ_BUF_SIZE(hw->max_epid);
- 	hw->hw_info.req_buf = kzalloc(mem_size, GFP_KERNEL);
--	if (!(hw->hw_info.req_buf))
--		return -ENOMEM;
-+	if (!(hw->hw_info.req_buf)) {
-+		result = -ENOMEM;
-+		goto free_ep_info;
-+	}
- 
- 	hw->hw_info.req_buf_size = mem_size;
- 
- 	mem_size = FJES_DEV_RES_BUF_SIZE(hw->max_epid);
- 	hw->hw_info.res_buf = kzalloc(mem_size, GFP_KERNEL);
--	if (!(hw->hw_info.res_buf))
--		return -ENOMEM;
-+	if (!(hw->hw_info.res_buf)) {
-+		result = -ENOMEM;
-+		goto free_req_buf;
-+	}
- 
- 	hw->hw_info.res_buf_size = mem_size;
- 
- 	result = fjes_hw_alloc_shared_status_region(hw);
- 	if (result)
--		return result;
-+		goto free_res_buf;
- 
- 	hw->hw_info.buffer_share_bit = 0;
- 	hw->hw_info.buffer_unshare_reserve_bit = 0;
-@@ -246,11 +250,11 @@ static int fjes_hw_setup(struct fjes_hw *hw)
- 
- 			result = fjes_hw_alloc_epbuf(&buf_pair->tx);
- 			if (result)
--				return result;
-+				goto free_epbuf;
- 
- 			result = fjes_hw_alloc_epbuf(&buf_pair->rx);
- 			if (result)
--				return result;
-+				goto free_epbuf;
- 
- 			spin_lock_irqsave(&hw->rx_status_lock, flags);
- 			fjes_hw_setup_epbuf(&buf_pair->tx, mac,
-@@ -273,6 +277,25 @@ static int fjes_hw_setup(struct fjes_hw *hw)
- 	fjes_hw_init_command_registers(hw, &param);
- 
- 	return 0;
-+
-+free_epbuf:
-+	for (epidx = 0; epidx < hw->max_epid ; epidx++) {
-+		if (epidx == hw->my_epid)
-+			continue;
-+		fjes_hw_free_epbuf(&hw->ep_shm_info[epidx].tx);
-+		fjes_hw_free_epbuf(&hw->ep_shm_info[epidx].rx);
-+	}
-+	fjes_hw_free_shared_status_region(hw);
-+free_res_buf:
-+	kfree(hw->hw_info.res_buf);
-+	hw->hw_info.res_buf = NULL;
-+free_req_buf:
-+	kfree(hw->hw_info.req_buf);
-+	hw->hw_info.req_buf = NULL;
-+free_ep_info:
-+	kfree(hw->ep_shm_info);
-+	hw->ep_shm_info = NULL;
-+	return result;
- }
- 
- static void fjes_hw_cleanup(struct fjes_hw *hw)
--- 
-2.34.1
+Reviewed-by: Guillaume Nault <gnault@redhat.com>
 
 
