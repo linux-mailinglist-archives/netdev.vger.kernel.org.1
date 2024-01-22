@@ -1,74 +1,77 @@
-Return-Path: <netdev+bounces-64890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C09F8375E6
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 23:15:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E1CD8375E7
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 23:16:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE5FB1F26EC6
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 22:15:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C97431C23ED4
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 22:16:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C86B4482FB;
-	Mon, 22 Jan 2024 22:15:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60683487A7;
+	Mon, 22 Jan 2024 22:16:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="i0vDi4Co"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TGuf/RYV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A54F482D6
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 22:15:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E5AF4878A;
+	Mon, 22 Jan 2024 22:16:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705961738; cv=none; b=oRErYZKCqKeoKCLLJY2RYr9exIZJVPiEXEXR44qpRxBSn/7PwR6Kxp+ScImVltJ+Ju3G/TS07/+XSEmf9g58t4IPUQQ/WZZSu3oS7YwWDtVpk+Vn2eBsaWaz0YMRfLxivqZERY31IXOW2kLbuJNYQNLyo+mUGGzE23/O/Kjhh1w=
+	t=1705961780; cv=none; b=iTjCKo9DjkKcdki7r82Ji9sO0GUbJJexhU2VhRVdZa5I27F6Rk/iEWT2ycCkQe73ZAQj7BXshyh8kwhVfP8eHxNaZUBb6PucZZuKDSKNAHB/deVpIJDUtTQGDW8xNxMpnN7aSbYMQkBxSl+NMnQ1gl83MtlcPDAp9OQZWDp0Inc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705961738; c=relaxed/simple;
-	bh=Ec7Y1u2xmhlxw/89pIWwcJaiWAXN15QHRwr6zj9CDFA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uP+jTt4LoBy8bph/gWW/RdQfE59D5IBdfvl0Il11EkPawTYzQ7idnrwc0PeHc7dx/prZl0cA1iRNZafjhFU8G+iXb0A6vSkMLmE+2s1irlRHiGKon+WrspvbRNKAdxCNdZTbxK9+iKQjfc9bsFwKMFS0UT14OVL9+/otQ6u9u8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=i0vDi4Co; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1705961737; x=1737497737;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=6SCWmzXZHDFtrO7jaXjEt8+o2QpAS4JIe44X0+wrna0=;
-  b=i0vDi4CoSDTeBZ/BAQo88WKlsCEwShADvZ153glXn6EjJi42LhVBpMdj
-   lB7IQDmrfHM/NXyzTCFYFYOMJQPxp26UhEQ9cjogq7elb97d003EjxEhv
-   xhMqV8EJS7syZ2nfswcUnclyDoNfxRy0Pwfm/yuBl8N77cZI8SNfe1LuV
-   Y=;
-X-IronPort-AV: E=Sophos;i="6.05,212,1701129600"; 
-   d="scan'208";a="60341808"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-d7759ebe.us-east-1.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 22:15:35 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
-	by email-inbound-relay-iad-1d-m6i4x-d7759ebe.us-east-1.amazon.com (Postfix) with ESMTPS id 8F5BC4A630;
-	Mon, 22 Jan 2024 22:15:34 +0000 (UTC)
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:28658]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.24.5:2525] with esmtp (Farcaster)
- id 967a9fda-a4be-4591-9686-41a3c16c506a; Mon, 22 Jan 2024 22:15:33 +0000 (UTC)
-X-Farcaster-Flow-ID: 967a9fda-a4be-4591-9686-41a3c16c506a
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Mon, 22 Jan 2024 22:15:33 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.24) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Mon, 22 Jan 2024 22:15:31 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <lilinke99@qq.com>
-CC: <netdev@vger.kernel.org>
-Subject: Re: [PATCH] net: use READ_ONCE() to read in concurrent environment
-Date: Mon, 22 Jan 2024 14:15:21 -0800
-Message-ID: <20240122221521.17445-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <tencent_F35C58B90E47D014455212BC7110EDBB2106@qq.com>
-References: <tencent_F35C58B90E47D014455212BC7110EDBB2106@qq.com>
+	s=arc-20240116; t=1705961780; c=relaxed/simple;
+	bh=VHR9MavX+FfaIMqh+/3w74h7tG9QgHOB/7JBdInQVHw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Fep0czeP86nZU/f9+a5VvKKY2aGqzdhSfwchNEtMjroPuLQE5Eaj7GbqIBeu+ouv4VwE02/PQa9q+mYVrkVuNUwm0qlB0KqZQXjp6RFXKUnwzgyyERSLdSpaatrqDQv5bQ2bFgRkXZvkzAlQBhQMiG1ZaXiHXwKWKTAp7qQhLu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TGuf/RYV; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1705961779; x=1737497779;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=VHR9MavX+FfaIMqh+/3w74h7tG9QgHOB/7JBdInQVHw=;
+  b=TGuf/RYVL/ATyfUJyvcZpETcsOMHRWQW8e3ebzMKWt6RMDiRKsXpYjAG
+   dVQgcg+jtOsS80cxdIgcyXbfZryDQYViHJ1pYuIsrWeny4H5KuRKXSwUT
+   t5q7Oqvtw4Tu5D4/IhXc8Xlf6wK04yHnSHQVOr0to6NIV1uhZTPgCPdl2
+   cPQ9nKrpPm9PM0+RBg6Wi7XM52gkIlsDU/WhcHbyQdafHBR3I5bMcMkFT
+   qDPISpcx574KBx5CRyX6Il9EqCaIk51G7KHIElaFlpnBz+3n9+/wloRPk
+   YMTtF57yPDc87bUiXxx0UliazQ/PRI3SGuDEoHVWXC2iAUjWZSYGKhAHS
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="7995474"
+X-IronPort-AV: E=Sophos;i="6.05,212,1701158400"; 
+   d="scan'208";a="7995474"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 14:16:18 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,212,1701158400"; 
+   d="scan'208";a="1360451"
+Received: from boxer.igk.intel.com ([10.102.20.173])
+  by fmviesa003.fm.intel.com with ESMTP; 22 Jan 2024 14:16:15 -0800
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: bpf@vger.kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org
+Cc: netdev@vger.kernel.org,
+	magnus.karlsson@intel.com,
+	bjorn@kernel.org,
+	maciej.fijalkowski@intel.com,
+	echaudro@redhat.com,
+	lorenzo@kernel.org,
+	martin.lau@linux.dev,
+	tirthendu.sarkar@intel.com,
+	john.fastabend@gmail.com,
+	horms@kernel.org
+Subject: [PATCH v5 bpf 00/11] net: bpf_xdp_adjust_tail() and Intel mbuf fixes
+Date: Mon, 22 Jan 2024 23:15:59 +0100
+Message-Id: <20240122221610.556746-1-maciej.fijalkowski@intel.com>
+X-Mailer: git-send-email 2.35.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,63 +79,73 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWA003.ant.amazon.com (10.13.139.18) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
 
-From: linke li <lilinke99@qq.com>
-Date: Tue, 23 Jan 2024 04:24:46 +0800
-> In function sk_stream_wait_memory(), reads of sk->sk_err and sk->sk_shutdown
-> is protected using READ_ONCE() in line 145, 146.
-> 145: 		ret = sk_wait_event(sk, &current_timeo, READ_ONCE(sk->sk_err) ||
-> 146: 				    (READ_ONCE(sk->sk_shutdown) & SEND_SHUTDOWN) ||
-> 
-> But reads in line 133 are not protected. This may cause unexpected error
-> when other threads change sk->sk_err and sk->sk_shutdown. Function
-> sk_stream_wait_connect() has same problem.
-> 
-> There is patch similar to this. https://github.com/torvalds/linux/commit/c1c0ce31b2420d5c173228a2132a492ede03d81f
-> This patch find two read of same variable while one is protected, another
-> is not. And READ_ONCE() is added to protect.
+Hey,
 
-This is not sufficient.
-You need to add WRITE_ONCE() on the writer side as well.
+after a break followed by dealing with sickness, here is a v5 that makes
+bpf_xdp_adjust_tail() actually usable for ZC drivers that support XDP
+multi-buffer. Since v4 I tried also using bpf_xdp_adjust_tail() with
+positive offset which exposed yet another issues, which can be observed
+by increased commit count when compared to v3.
 
-Also, you can disambiguate Subject by mentioning sk_state or
-sk_stream_wait_connect().
+John, in the end I think we should remove handling
+MEM_TYPE_XSK_BUFF_POOL from __xdp_return(), but it is out of the scope
+for fixes set, IMHO.
 
-Thanks!
+Thanks,
+Maciej
+
+v5:
+- pick correct version of patch 5 [Simon]
+- elaborate a bit more on what patch 2 fixes
+
+v4:
+- do not clear frags flag when deleting tail; xsk_buff_pool now does
+  that
+- skip some NULL tests for xsk_buff_get_tail [Martin, John]
+- address problems around registering xdp_rxq_info
+- fix bpf_xdp_frags_increase_tail() for ZC mbuf
+
+v3:
+- add acks
+- s/xsk_buff_tail_del/xsk_buff_del_tail
+- address i40e as well (thanks Tirthendu)
+
+v2:
+- fix !CONFIG_XDP_SOCKETS builds
+- add reviewed-by tag to patch 3
 
 
-> 
-> Signed-off-by: linke li <lilinke99@qq.com>
-> ---
->  net/core/stream.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/core/stream.c b/net/core/stream.c
-> index b16dfa568a2d..7e67a2bf4480 100644
-> --- a/net/core/stream.c
-> +++ b/net/core/stream.c
-> @@ -63,7 +63,7 @@ int sk_stream_wait_connect(struct sock *sk, long *timeo_p)
->  		int err = sock_error(sk);
->  		if (err)
->  			return err;
-> -		if ((1 << sk->sk_state) & ~(TCPF_SYN_SENT | TCPF_SYN_RECV))
-> +		if ((1 << READ_ONCE(sk->sk_state)) & ~(TCPF_SYN_SENT | TCPF_SYN_RECV))
->  			return -EPIPE;
->  		if (!*timeo_p)
->  			return -EAGAIN;
-> @@ -130,7 +130,7 @@ int sk_stream_wait_memory(struct sock *sk, long *timeo_p)
->  	while (1) {
->  		sk_set_bit(SOCKWQ_ASYNC_NOSPACE, sk);
->  
-> -		if (sk->sk_err || (sk->sk_shutdown & SEND_SHUTDOWN))
-> +		if (READ_ONCE(sk->sk_err) || (READ_ONCE(sk->sk_shutdown) & SEND_SHUTDOWN))
->  			goto do_error;
->  		if (!*timeo_p)
->  			goto do_eagain;
-> -- 
-> 2.39.3 (Apple Git-145)
+Maciej Fijalkowski (10):
+  xsk: recycle buffer in case Rx queue was full
+  xsk: make xsk_buff_pool responsible for clearing xdp_buff::flags
+  xsk: fix usage of multi-buffer BPF helpers for ZC XDP
+  ice: work on pre-XDP prog frag count
+  ice: remove redundant xdp_rxq_info registration
+  intel: xsk: initialize skb_frag_t::bv_offset in ZC drivers
+  ice: update xdp_rxq_info::frag_size for ZC enabled Rx queue
+  xdp: reflect tail increase for MEM_TYPE_XSK_BUFF_POOL
+  i40e: set xdp_rxq_info::frag_size
+  i40e: update xdp_rxq_info::frag_size for ZC enabled Rx queue
+
+Tirthendu Sarkar (1):
+  i40e: handle multi-buffer packets that are shrunk by xdp prog
+
+ drivers/net/ethernet/intel/i40e/i40e_main.c   | 47 ++++++++++++------
+ drivers/net/ethernet/intel/i40e/i40e_txrx.c   | 49 +++++++++----------
+ drivers/net/ethernet/intel/i40e/i40e_xsk.c    |  4 +-
+ drivers/net/ethernet/intel/ice/ice_base.c     |  7 ++-
+ drivers/net/ethernet/intel/ice/ice_txrx.c     | 19 ++++---
+ drivers/net/ethernet/intel/ice/ice_txrx.h     |  1 +
+ drivers/net/ethernet/intel/ice/ice_txrx_lib.h | 31 ++++++++----
+ drivers/net/ethernet/intel/ice/ice_xsk.c      |  4 +-
+ include/net/xdp_sock_drv.h                    | 26 ++++++++++
+ net/core/filter.c                             | 43 ++++++++++++----
+ net/xdp/xsk.c                                 | 12 +++--
+ net/xdp/xsk_buff_pool.c                       |  3 ++
+ 12 files changed, 167 insertions(+), 79 deletions(-)
+
+-- 
+2.34.1
+
 
