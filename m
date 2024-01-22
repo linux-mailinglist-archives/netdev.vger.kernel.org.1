@@ -1,170 +1,129 @@
-Return-Path: <netdev+bounces-64608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41976835E4E
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 10:34:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CB1E835E5A
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 10:39:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B17D11F23C13
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 09:34:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C8E951F23878
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 09:39:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7468347A1;
-	Mon, 22 Jan 2024 09:34:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AC2439AD4;
+	Mon, 22 Jan 2024 09:39:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mistralsolutions.com header.i=@mistralsolutions.com header.b="Y0UviTW8"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="hsFuu2b2"
 X-Original-To: netdev@vger.kernel.org
-Received: from egress-ip12b.ess.de.barracuda.com (egress-ip12b.ess.de.barracuda.com [18.185.115.216])
+Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C27A39AD1
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 09:34:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.185.115.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6F8539FC5;
+	Mon, 22 Jan 2024 09:39:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.111.4.28
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705916044; cv=none; b=kkcOi2cqgre8JWxbItE0PfSSE28lDCAzc/+b58jVf+lMbda/94SYzBxv0FRclm3TuhO0RXLLht7smEJXHsR6Z0k5D3L/oaJhrsGnkPguu4cXoOFxRyf1Gf6Sr34g6HMvKkF8Z4E4h6DPbbjZh2TdbAux/txL0HzNbtFTHptpMv4=
+	t=1705916363; cv=none; b=LrmuiegyY12ZTVyLgOH9KrSsxHZ2tE8U3gvwXt1My609km4ISZUune88rjeAKRuDFACC8X8/isYC5dxvBWhjFiXCrTfYO8lRskB6rf5mI2ov4UWN00J8qKJBKUdeEFTUDCqlzDLOtQxwGva7M9NeKjardEvBSyMAITCPYOWR2d4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705916044; c=relaxed/simple;
-	bh=P0+6uEwIBZU3BYlRAcQRybTZdpBi1s2dNvZ0BgFAFog=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=E4sgxo1qtmUABYzZ0+TF6rI5Nw9Cu7JZTsBS74YvKgNxDIJCVT2DVNIxVb2Ca/R4H9jX+rzhdEMomDz83oIXev7An1blNHlkuWoEFhHV/fXl+5b7Zl2B7cAtaRfblG+wg0ij2soY71UolvqBMG1kGFERzPovpqSjipBgngdf8mE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mistralsolutions.com; spf=pass smtp.mailfrom=mistralsolutions.com; dkim=pass (1024-bit key) header.d=mistralsolutions.com header.i=@mistralsolutions.com header.b=Y0UviTW8; arc=none smtp.client-ip=18.185.115.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mistralsolutions.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mistralsolutions.com
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com [209.85.210.199]) by mx-outbound16-189.eu-central-1b.ess.aws.cudaops.com (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO); Mon, 22 Jan 2024 09:33:55 +0000
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-6dbd391197cso746832b3a.2
-        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 01:33:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mistralsolutions.com; s=google; t=1705916023; x=1706520823; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=B3x9YvWePqbJz0Vi8aYxV6T7rpjQm9a56asqJakSWOE=;
-        b=Y0UviTW8CVgxX/XHiLhO600iMT5EPFCwU/fuO5GgquLEUAlIH8mjh3CsnB/1zkWS82
-         Ehcs7JjarLJZnJd48yPcuhkKxH8Tnl/gWvnfhOIpsXn/8BJk2WLseLKRmV+HmS7c6UNg
-         ni426VTO8pcmY97I1OCFFWyV2u7q0uqrhWs0U=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705916023; x=1706520823;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=B3x9YvWePqbJz0Vi8aYxV6T7rpjQm9a56asqJakSWOE=;
-        b=EFifjDAHyj+UsvMXCB+HdTGtrnGxRfYv7P/Zaw7ga8NqJrFzVQNzTqUKmq+mxkJXLH
-         U6ZQn++FHYRoOrojNko0dRmGWn2zY5oNd8RmWJsKJxEV5KRZUgzweZjp8tl8a3s1R/ZW
-         4m2y1+73/3LdCa22QHejh84xbhq6c2m2kJOuLWT86cJjb7FXqGveoxNptfGEYezUWbYM
-         fhd0abLFkERW64fjYw7JUBzyeBh6Gdu0djZz7m0j843Unubbo1Ml108c9OzPjdswE4R+
-         CeV1ndvO61+o3D1IfzPhj1CE5tRVaOkmZEi3YsEmyxUZ6MopejIBb0VBS8X00AvND9Rz
-         2X2A==
-X-Gm-Message-State: AOJu0Ywb1iHV3cGrSJ0Vkyd/t8fnpyZcMIoTkyxOtDE6rubHvIYQ6jyl
-	YPYHJs6ohet8dYxN+Fmqy2KZSLMXwnK9UYe/sGi4XjVtRLHZE1XYa07ha5mE+f5fg1NzD5gMxco
-	LRhRFtZoxqTblXjynkqR1qxjpX/pBErb3tDUZ77F0/L0fvqpjX8X0XY0hRfgFfavXd7E+dfSsRH
-	3t60X4oB8Wpxv7
-X-Received: by 2002:aa7:9848:0:b0:6db:cdba:be9c with SMTP id n8-20020aa79848000000b006dbcdbabe9cmr1104163pfq.54.1705916022795;
-        Mon, 22 Jan 2024 01:33:42 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHRJ7YfbuOaZxiKuVCXGS0I90m6OLHu7E9lHmU6ZWmtVqIoDzlXxbZG7nN1qnTTewOyLQcilg==
-X-Received: by 2002:aa7:9848:0:b0:6db:cdba:be9c with SMTP id n8-20020aa79848000000b006dbcdbabe9cmr1104153pfq.54.1705916022450;
-        Mon, 22 Jan 2024 01:33:42 -0800 (PST)
-Received: from LAP568U.mistral.in ([106.51.227.150])
-        by smtp.gmail.com with ESMTPSA id w17-20020aa79a11000000b006d997b5d009sm9150756pfj.69.2024.01.22.01.33.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jan 2024 01:33:41 -0800 (PST)
-From: Sinthu Raja <sinthu.raja@mistralsolutions.com>
-X-Google-Original-From: Sinthu Raja <sinthu.raja@ti.com>
-To: Denis Kirjanov <dkirjanov@suse.de>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>,
-	Ravi Gunasekaran <r-gunasekaran@ti.com>,
-	Roger Quadros <rogerq@kernel.org>
-Cc: linux-omap@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Sinthu Raja <sinthu.raja@ti.com>
-Subject: [PATCH V2] net: ethernet: ti: cpsw_new: enable mac_managed_pm to fix mdio
-Date: Mon, 22 Jan 2024 15:03:26 +0530
-Message-Id: <20240122093326.7618-1-sinthu.raja@ti.com>
-X-Mailer: git-send-email 2.36.1
+	s=arc-20240116; t=1705916363; c=relaxed/simple;
+	bh=//UbHTP66T/3Bbp+ALZPOi1OABLSsOFzh5n/KVWypkE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IXlFxWA9NCpB6TMKDFhGNVxizFFW5uqTD/Vqi6vDtQjotOVU7oSWhV6sCwqxUPt3BpahoZeBDSm8XZz479kaGvhsUwZgnSEGr/Zwd8RqUQc70MZJxsTxGUksKOXWbtMhwNsB7rTLYEAZiOw4ysysMD+MBqxhgDZ27QltRRp/Fjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=hsFuu2b2; arc=none smtp.client-ip=66.111.4.28
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from compute7.internal (compute7.nyi.internal [10.202.2.48])
+	by mailout.nyi.internal (Postfix) with ESMTP id 85D785C00C4;
+	Mon, 22 Jan 2024 04:39:20 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute7.internal (MEProxy); Mon, 22 Jan 2024 04:39:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm3; t=1705916360; x=1706002760; bh=PotvrWwsMR7MuOH77N/IRKZsV4mk
+	ArNK04ios3YAzIE=; b=hsFuu2b2twCbknwE+EuDoJTW9qkJ2mGnsHoYDbZ8NLCc
+	KiG9Ia2LrUf57XxrJycupOOrY1TX4jLx2XgtavqXsXr0xKTe2nJzENY5mFT1G2t/
+	jXD4XSinaIQmBv+TQwVKQgrHKgF+osHgV+g/7oiPb2gPrLjFOL4UVbU3IBkkPWVU
+	RO5Rv/vAp2EtOgrRXtUAqwjj8f/8/Lcuclim/hrUeIyYWIfr3xCj51cK5sA9kTi2
+	9I8i0KUzdM2VxFT10OVrgPtC94KsGucrknT/arg1XrNjvmwtT+RlunaRH+WZ1kCd
+	sB0qemqQQtIXbw5pxsvF/4dWp91/oZBiLcjmqaYgRA==
+X-ME-Sender: <xms:yDeuZb6TPPVuOY5yfTIFF3yXTScpTerW5Bf8K5dXSwy5OM6nCrZiXQ>
+    <xme:yDeuZQ64pRbjeNOmKtjSAi-9J25szfF4C9ppmCQwAvo_UcuCvo70i6mEE6kJZg0lK
+    VcQff4rExP0osI>
+X-ME-Received: <xmr:yDeuZSdKNFCe-1iSyVs1VM4Ckkr_AdTqLeV7eygihpOdkRgXRIzgERGNCQIB>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdekiedgtdehucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcu
+    ufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrth
+    htvghrnhepvddufeevkeehueegfedtvdevfefgudeifeduieefgfelkeehgeelgeejjeeg
+    gefhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepih
+    guohhstghhsehiughoshgthhdrohhrgh
+X-ME-Proxy: <xmx:yDeuZcIIupMje_iHZoxF1OdxwQ2zZW31ChpAcZ5atPYIm-UwYZvtHA>
+    <xmx:yDeuZfLKL5WyuJkX-rkwz6vGtoQzugMiqlVMZ99rGSFjEvEExQ2XtA>
+    <xmx:yDeuZVxxrelR5apV_1K4F8678Zp6Tss3QnIlZiRXj65wRt6gAq0wFg>
+    <xmx:yDeuZcFQzG5cGj0Mp7cLyCABKiWM084MABd998OhUsRMK3JLFz5fFA>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 22 Jan 2024 04:39:19 -0500 (EST)
+Date: Mon, 22 Jan 2024 11:39:16 +0200
+From: Ido Schimmel <idosch@idosch.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Thomas Lamprecht <t.lamprecht@proxmox.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: vxlan: how to expose opt-in RFC conformity with unprocessed
+ header flags
+Message-ID: <Za43xKoWDtL6MxCn@shredder>
+References: <db8b9e19-ad75-44d3-bfb2-46590d426ff5@proxmox.com>
+ <20240116082357.22daf549@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-BESS-ID: 1705916028-304285-12434-1896-1
-X-BESS-VER: 2019.1_20240103.1634
-X-BESS-Apparent-Source-IP: 209.85.210.199
-X-BESS-Parts: H4sIAAAAAAACA4uuVkqtKFGyUirNy1bSUcovVrIyMjEzB7IygIIWpoaGyanmxm
-	amKalJqSkGZubGBgYpScnJlobGqUkGiUq1sQAzQdNdQQAAAA==
-X-BESS-Outbound-Spam-Score: 0.40
-X-BESS-Outbound-Spam-Report: Code version 3.2, rules version 3.2.2.253677 [from 
-	cloudscan22-249.eu-central-1b.ess.aws.cudaops.com]
-	Rule breakdown below
-	 pts rule name              description
-	---- ---------------------- --------------------------------
-	0.00 BSF_SC0_MISMATCH_TO    META: Envelope rcpt doesn't match header 
-	0.00 BSF_BESS_OUTBOUND      META: BESS Outbound 
-	0.40 BSF_SC0_SA085b         META: Custom Rule SA085b 
-X-BESS-Outbound-Spam-Status: SCORE=0.40 using account:ESS91090 scores of KILL_LEVEL=7.0 tests=BSF_SC0_MISMATCH_TO, BSF_BESS_OUTBOUND, BSF_SC0_SA085b
-X-BESS-BRTS-Status:1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240116082357.22daf549@kernel.org>
 
-From: Sinthu Raja <sinthu.raja@ti.com>
+On Tue, Jan 16, 2024 at 08:23:57AM -0800, Jakub Kicinski wrote:
+> On Fri, 12 Jan 2024 16:13:22 +0100 Thomas Lamprecht wrote:
+> > What would be the accepted way to add a switch of making this RFC conform in
+> > an opt-in way? A module parameter? A sysfs entry? Through netlink?
+> 
+> Thru netlink. 
 
-The below commit  introduced a WARN when phy state is not in the states:
-PHY_HALTED, PHY_READY and PHY_UP.
-commit 744d23c71af3 ("net: phy: Warn about incorrect mdio_bus_phy_resume() state")
++1 
 
-When cpsw_new resumes, there have port in PHY_NOLINK state, so the below
-warning comes out. Set mac_managed_pm be true to tell mdio that the phy
-resume/suspend is managed by the mac, to fix the following warning:
+> My intuition would be to try to add a "ignore bits" mask, rather than
+> "RFC compliance knob" because RFCs may have shorter lifespan than
+> kernel's uAPI guarantees..
 
-WARNING: CPU: 0 PID: 965 at drivers/net/phy/phy_device.c:326 mdio_bus_phy_resume+0x140/0x144
-CPU: 0 PID: 965 Comm: sh Tainted: G           O       6.1.46-g247b2535b2 #1
-Hardware name: Generic AM33XX (Flattened Device Tree)
- unwind_backtrace from show_stack+0x18/0x1c
- show_stack from dump_stack_lvl+0x24/0x2c
- dump_stack_lvl from __warn+0x84/0x15c
- __warn from warn_slowpath_fmt+0x1a8/0x1c8
- warn_slowpath_fmt from mdio_bus_phy_resume+0x140/0x144
- mdio_bus_phy_resume from dpm_run_callback+0x3c/0x140
- dpm_run_callback from device_resume+0xb8/0x2b8
- device_resume from dpm_resume+0x144/0x314
- dpm_resume from dpm_resume_end+0x14/0x20
- dpm_resume_end from suspend_devices_and_enter+0xd0/0x924
- suspend_devices_and_enter from pm_suspend+0x2e0/0x33c
- pm_suspend from state_store+0x74/0xd0
- state_store from kernfs_fop_write_iter+0x104/0x1ec
- kernfs_fop_write_iter from vfs_write+0x1b8/0x358
- vfs_write from ksys_write+0x78/0xf8
- ksys_write from ret_fast_syscall+0x0/0x54
-Exception stack(0xe094dfa8 to 0xe094dff0)
-dfa0:                   00000004 005c3fb8 00000001 005c3fb8 00000004 00000001
-dfc0: 00000004 005c3fb8 b6f6bba0 00000004 00000004 0059edb8 00000000 00000000
-dfe0: 00000004 bed918f0 b6f09bd3 b6e89a66
+Newer Spectrum chips have a 64 bit mask that covers the entire VXLAN
+header. If a bit is set in the mask and the corresponding bit in the
+VXLAN header is not zero, the packet is dropped / trapped.
 
-Fixes: 744d23c71af3 ("net: phy: Warn about incorrect mdio_bus_phy_resume() state")
-Signed-off-by: Sinthu Raja <sinthu.raja@ti.com>
----
+Another option, assuming the interface that receives the encapsulated
+packets is known, is to clear the reserved bits in the VXLAN header
+using pedit. This seems to work:
 
-Changes in V2:
-Address review comment
-	Add Fixes tag.
+tc -n ns2 qdisc add dev veth1 clsact
+tc -n ns2 filter add dev veth1 ingress pref 1 proto ip flower ip_proto udp \
+        dst_port 4789 \
+        action pedit munge offset 28 u8 set 0x08
 
-V1: https://patchwork.kernel.org/project/netdevbpf/patch/20240122083414.6246-1-sinthu.raja@ti.com/
+Tested by setting the reserved bits on the other side and making sure
+ping works:
 
- drivers/net/ethernet/ti/cpsw_new.c | 3 +++
- 1 file changed, 3 insertions(+)
+tc -n ns1 qdisc add dev veth0 clsact
+tc -n ns1 filter add dev veth0 egress pref 1 proto ip flower ip_proto udp \
+        dst_port 4789 \
+        action pedit munge offset 28 u8 set 0xff
 
-diff --git a/drivers/net/ethernet/ti/cpsw_new.c b/drivers/net/ethernet/ti/cpsw_new.c
-index 498c50c6d1a7..087dcb67505a 100644
---- a/drivers/net/ethernet/ti/cpsw_new.c
-+++ b/drivers/net/ethernet/ti/cpsw_new.c
-@@ -773,6 +773,9 @@ static void cpsw_slave_open(struct cpsw_slave *slave, struct cpsw_priv *priv)
- 			slave->slave_num);
- 		return;
- 	}
-+
-+	phy->mac_managed_pm = true;
-+
- 	slave->phy = phy;
- 
- 	phy_attached_info(slave->phy);
--- 
-2.36.1
-
+The advantage is that no kernel changes are required whereas the netlink
+solution will have to be maintained forever, even after the other side
+is fixed.
 
