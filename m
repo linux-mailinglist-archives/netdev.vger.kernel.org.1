@@ -1,60 +1,52 @@
-Return-Path: <netdev+bounces-64746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE7F3836F1C
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:09:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E80A3836F27
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:11:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1EA51F2D507
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:09:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A141F2935A9
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:11:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC9865733D;
-	Mon, 22 Jan 2024 17:35:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sRdhz3q5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 094613FE57;
+	Mon, 22 Jan 2024 17:36:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 923534A990;
-	Mon, 22 Jan 2024 17:35:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from zg8tndyumtaxlji0oc4xnzya.icoremail.net (zg8tndyumtaxlji0oc4xnzya.icoremail.net [46.101.248.176])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 027FE405C1;
+	Mon, 22 Jan 2024 17:36:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.101.248.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705944931; cv=none; b=cow5+mXNc46WsKs8TEb9w7XBohBo27VWzinFwEZw1dwPIOervya8sMWwiZISMe6GOMDYptAK5kPxsNGlSd5s991qmJEAV5SLgv8gH0Rsu8P31OeI4+aupWX35SG/ob/z+Hlr7/n8FeZfx8Qy1aXny9+19rvjjzxb4NIZCxv3mcs=
+	t=1705945018; cv=none; b=ndYPsoc/sU3dn6F6q4RrmxfBN9mCb/wdzS7s54OxtLtajIapNbc6OIWFmEg/6aeFdWyKo9MMwdDzoIjXjEFp2uANjBbTrPK/T0JZVIe6qHuy3aI7tRcuUlS6+my0RjhLAcXk1n5NwnAUd/n6RIgPkDZqRSyEEercna9xVXQYQFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705944931; c=relaxed/simple;
-	bh=h/7MA+uqwVPx3lfrDrsWshvS6sJaQjSKgJKwuuLOb4c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FS1fWU9tAhSyQGZXIjOMifwEw1h7EhSE+ePQ8yGM9rHfgAPwJU021iobmZ9n+FW93q3skoIzV27Lb/iDUfJPXFdOvcuSOzV6xtT7h2mOpSmnPp4PC/dCNH07UK5b/otDyc9BN6Jyr0QfEOe5+YLZ+2gSOQt6ke0m4mwPNoaLQfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sRdhz3q5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 863BAC43394;
-	Mon, 22 Jan 2024 17:35:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705944930;
-	bh=h/7MA+uqwVPx3lfrDrsWshvS6sJaQjSKgJKwuuLOb4c=;
-	h=From:To:Cc:Subject:Date:From;
-	b=sRdhz3q50c2LFzSjqgwuho5ugqACLibobv3W1S6w6tBmB8+2ejZg1QBnlhJO163ev
-	 kMsTOgb6J7LCBJGMYpRdoHMrVJfdUnwsf1iJltEMe1Gg/qADOJ8N63KTinYOO9XvYd
-	 X2Qt4hqZyEYxoBmBY7MiwrJQkFAwZ45NHBox7/OmjbSXsGq8tyqxNU0SxT609l0wWN
-	 wEmcjzTvTiL07RKYnH1MbTyL7MBHZdKFMVHfFF/aOZ66nBKMf8wtGMn5aixFcxDbje
-	 +o1RE4KGl49C22uL4YZp5f9Q4WyW+qe6HVbmskMEjv+SpWClURCixy/lJPI6IJImCt
-	 ZNnjc/JZP6MAg==
-From: Rob Herring <robh@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1705945018; c=relaxed/simple;
+	bh=i72cJ4XFiJ0tpwKQAmgnTBVwkuYQVUv9RJhyiyqLK+o=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qRCi844cvUn1AxLdcHQof2Kb2QDlrveu9FGFD/zmZNIH9MJodScNVewiC1BVx+QRgMrl/boDjxL68ulSUmAX65cAaSooIgkhurEZnPD7tmlt89xP36PNf5bHDTpVEGcsONtCJMIonL0tUQpTB5MIL8sCxrRPInIiCuxYPIenmt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=46.101.248.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from luzhipeng.223.5.5.5 (unknown [39.174.92.167])
+	by mail-app3 (Coremail) with SMTP id cC_KCgBnSTOlp65lU814AA--.4097S2;
+	Tue, 23 Jan 2024 01:36:38 +0800 (CST)
+From: Zhipeng Lu <alexious@zju.edu.cn>
+To: alexious@zju.edu.cn
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>
-Cc: netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
+	Piotr Marczak <piotr.marczak@intel.com>,
+	Alice Michael <alice.michael@intel.com>,
+	Jeff Kirsher <jeffrey.t.kirsher@intel.com>,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] net: marvell,prestera: Fix example PCI bus addressing
-Date: Mon, 22 Jan 2024 11:35:14 -0600
-Message-ID: <20240122173514.935742-1-robh@kernel.org>
-X-Mailer: git-send-email 2.43.0
+Subject: [PATCH] i40e: fix a memleak in i40e_init_recovery_mode
+Date: Tue, 23 Jan 2024 01:36:33 +0800
+Message-Id: <20240122173633.3843715-1-alexious@zju.edu.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,37 +54,83 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cC_KCgBnSTOlp65lU814AA--.4097S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7KrWkZr17Zr1xKr45GrWrGrg_yoW8CryDpF
+	4DWa4kGry0qr43Was7Gw48CFZ5J3y3tryUWa13Kan5urnYyF1kXFy8tFyUCFy8ArZ3X3Zx
+	Jrn7ArWxuryDGw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9K14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFylc2xSY4AK67AK6r4l42xK82IYc2Ij64vIr4
+	1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK
+	67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI
+	8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAv
+	wI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14
+	v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfU0sjjDUUUU
+X-CM-SenderInfo: qrsrjiarszq6lmxovvfxof0/
 
-The example for PCI devices has some addressing errors. 'reg' is written
-as if the parent bus is PCI, but the default bus for examples is 1
-address and size cell. 'ranges' is defining config space with a
-size of 0. Generally, config space should not be defined in
-'ranges', only PCI memory and I/O spaces. Fix these issues by updating
-the values with made-up, but valid values.
+In i40e_init_recovery_mode, pf->vsi is allocated without free, causing
+a memleak. This patch adds deallocation operations for pf->vsi in each
+and every error-handling paths after pf->vsi's.
 
-This was uncovered with recent dtschema changes.
-
-Signed-off-by: Rob Herring <robh@kernel.org>
+Fixes: 4ff0ee1af016 ("i40e: Introduce recovery mode support")
+Signed-off-by: Zhipeng Lu <alexious@zju.edu.cn>
 ---
- Documentation/devicetree/bindings/net/marvell,prestera.yaml | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/intel/i40e/i40e_main.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/marvell,prestera.yaml b/Documentation/devicetree/bindings/net/marvell,prestera.yaml
-index 5ea8b73663a5..16ff892f7bbd 100644
---- a/Documentation/devicetree/bindings/net/marvell,prestera.yaml
-+++ b/Documentation/devicetree/bindings/net/marvell,prestera.yaml
-@@ -78,8 +78,8 @@ examples:
-     pcie@0 {
-         #address-cells = <3>;
-         #size-cells = <2>;
--        ranges = <0x0 0x0 0x0 0x0 0x0 0x0>;
--        reg = <0x0 0x0 0x0 0x0 0x0 0x0>;
-+        ranges = <0x02000000 0x0 0x100000 0x10000000 0x0 0x0>;
-+        reg = <0x0 0x1000>;
-         device_type = "pci";
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+index 1ab8dbe2d880..a2ed6bb3b2dc 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_main.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+@@ -15598,27 +15598,27 @@ static int i40e_init_recovery_mode(struct i40e_pf *pf, struct i40e_hw *hw)
+ 	v_idx = i40e_vsi_mem_alloc(pf, I40E_VSI_MAIN);
+ 	if (v_idx < 0) {
+ 		err = v_idx;
+-		goto err_switch_setup;
++		goto err_vsis;
+ 	}
+ 	pf->lan_vsi = v_idx;
+ 	vsi = pf->vsi[v_idx];
+ 	if (!vsi) {
+ 		err = -EFAULT;
+-		goto err_switch_setup;
++		goto err_vsis;
+ 	}
+ 	vsi->alloc_queue_pairs = 1;
+ 	err = i40e_config_netdev(vsi);
+ 	if (err)
+-		goto err_switch_setup;
++		goto err_vsis;
+ 	err = register_netdev(vsi->netdev);
+ 	if (err)
+-		goto err_switch_setup;
++		goto err_vsis;
+ 	vsi->netdev_registered = true;
+ 	i40e_dbg_pf_init(pf);
  
-         switch@0,0 {
+ 	err = i40e_setup_misc_vector_for_recovery_mode(pf);
+ 	if (err)
+-		goto err_switch_setup;
++		goto err_vsis;
+ 
+ 	/* tell the firmware that we're starting */
+ 	i40e_send_version(pf);
+@@ -15628,7 +15628,8 @@ static int i40e_init_recovery_mode(struct i40e_pf *pf, struct i40e_hw *hw)
+ 		  round_jiffies(jiffies + pf->service_timer_period));
+ 
+ 	return 0;
+-
++err_vsis:
++	kfree(pf->vsi);
+ err_switch_setup:
+ 	i40e_reset_interrupt_capability(pf);
+ 	timer_shutdown_sync(&pf->service_timer);
 -- 
-2.43.0
+2.34.1
 
 
