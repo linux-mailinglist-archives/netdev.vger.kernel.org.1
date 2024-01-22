@@ -1,134 +1,159 @@
-Return-Path: <netdev+bounces-64779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 494F583729C
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 20:32:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67B1183726B
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 20:24:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C9D4B2417E
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:01:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 30B57B2DB3A
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:03:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A881D1EF03;
-	Mon, 22 Jan 2024 18:37:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F+Ihr1J/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 284265BACC;
+	Mon, 22 Jan 2024 18:46:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FFE11EEE6;
-	Mon, 22 Jan 2024 18:37:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 620335BAC3;
+	Mon, 22 Jan 2024 18:46:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705948620; cv=none; b=Myu6C00g8lMaVT31ernlNe2Ww4jvngvqmsBgGbwmJzS+glH2V6YA4Taoy3xoMLWTtnHaRSlpSXSvHd0At/OzeRhtUwoBvCqBGhlw37ZZDtu4a3d1RnbDqnNyqaRWYKH5FZWWTylcbBlru2L+KxKcqzVd0Xi6F+k70OUuyWM+TnI=
+	t=1705949170; cv=none; b=LORvqpeeI1HIHja6/+8Uj3mLXLwrGksTY4ckEkI/EZ+2Bp7EVR22iHwpxYamWroWs2xrE5kmRzNNtOXEqpr5TAZatCmzmGmwLsVkBuBpFxjKDo6ughN8QHdYcAABDPOrW9JLNzLg4DDMYWqO4nrJWKwReSZ32kjjcGuPoMvmubU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705948620; c=relaxed/simple;
-	bh=hrwjbRp1ado/yW8ClBvMvhONAHhRUekw/nstehGSnZM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FzKE46IbBt7UQ8iC9L8oOtjAkNiKScKZh2/H1KweBlkreom4G0KRod9FEYTR9Tkw7U8iHUureUkqzhEaVR4ub7u77iK0HF7eWU2dky/y1TF1M+TrI/8zfFQGKWsNX6zuxBw0zqe90GHe6fBe+oQWnB42tgBqVzatHKU6vtSKxJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F+Ihr1J/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7198C433C7;
-	Mon, 22 Jan 2024 18:36:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705948620;
-	bh=hrwjbRp1ado/yW8ClBvMvhONAHhRUekw/nstehGSnZM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=F+Ihr1J/rinwBofu3hFnmERu66u6Qwd2ohTRAek0EaKIh8OOXpybSPROymf+a2WYD
-	 kTNKzxkLmXUsQvYgnvAZRD00i7/LvXcpfwOHAlJ/qwp49Mns8P0AbVLSpwepqAC4Og
-	 1nGQYA5lDvN/Kn3i7jvxw6T8xhW6QEkMDeguab5SXgxxr06M0qbLNibIDV2PCEOljV
-	 JBUNxKlFRw1xs4kzZeAB72eSKKEfaTA9X//NR7/plFd6tNryUjO51hN1wWimXStzq7
-	 lbyDMdQNh3OT4SWjJXlzGb5JVyxp9ZBA9YpvZrRPcal/fecMkOJWTxPXpGD8bXeoOp
-	 PJOrbj8Ih7pDA==
-Date: Mon, 22 Jan 2024 10:36:58 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>, Netdev <netdev@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>
-Subject: Re: Kernel panic in netif_rx_internal after v6 pings between netns
-Message-ID: <20240122103658.592962d1@kernel.org>
-In-Reply-To: <f96b33ab-56d5-4a43-a1ff-2e68e2c55ac2@kernel.org>
-References: <98724dcd-ddf3-4f78-a386-f966ffbc9528@kernel.org>
-	<CANn89iLAYXpRiGaGi+rvOZyxMfpUmW2cOg6hLhqE=+2JJS8rkw@mail.gmail.com>
-	<65c4f6a2-207f-45e0-9ec3-bad81a05b196@kernel.org>
-	<5340b60d-a09a-4865-a648-d1a45e9e6d5f@kernel.org>
-	<20240122092804.3535b652@kernel.org>
-	<f96b33ab-56d5-4a43-a1ff-2e68e2c55ac2@kernel.org>
+	s=arc-20240116; t=1705949170; c=relaxed/simple;
+	bh=pzPwDMOCE0MMJ2sYG8Gsy5L1FligvJrj5Ckdv1712os=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=HxRLTDgWVMGjsCEFjZ1ACdDJRH2K8bfBC11ZCy7TkB5RTbo+flU/4UlTAnhOq5lFWF7EwO/1yNd5oSyeWDNAN9QilORB5uMTgkCcRxMbXT4T8buZ/qOtq++GncMJ9WOBrTnu/RhsrnUY6vHWkhw246918eegqKZ4HgfhSooFXXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-55a349cf29cso4001445a12.0;
+        Mon, 22 Jan 2024 10:46:08 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705949166; x=1706553966;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DTDhm5SHc5SG3eH0usr1EHvpWxPR+i068Kqq/mbcS7o=;
+        b=bB615LudaehmQT52lYKiiw9SGf0iKkhUOvq5B7lYN/dEXFT5GXLcGQQmdgvW2OXw+e
+         7bmD7R58o7uc2nrQ23wgLlfFP+HKlkUQekI85pn4SgtXNL0BjtDESGoux2V4EiTgYM+o
+         E7NdfxIv1DyiNHx00n0ObiowAsRWr9TQs7Wvi1DdeTCTKw/WvUipyR8rRDv7w7nLpyNF
+         J60pfq6Gsl/hnrZrxGR8gV9DRwHwezKLBkir1Z8CzxKy6plpTsk6jtwWj7yCAw77mWcH
+         rjON3GMhZ31q4hlRlidwBMFGHNSoyKi2OOjv0YZ9J0qdZwLPQz3JahHySWbA6Ufd2Jb2
+         8uMw==
+X-Gm-Message-State: AOJu0Yya0gbNtlzzix8GAcICqjGZgcVnI/QW6XLYKKlAc2nWdEae9NEM
+	94Qxhy6Eq6c9GHCbc/DrG7UKfks8OYyBYOAMuNZcl5G4D1upZe1W
+X-Google-Smtp-Source: AGHT+IEor1MIAxud/tRkTgpWSv4+yqjOAEaOocwNlrk4ZnCQLsKMERbdNHXkgGvUKu4uL0Gc7VLSrQ==
+X-Received: by 2002:a17:907:a0d0:b0:a2f:ec73:9928 with SMTP id hw16-20020a170907a0d000b00a2fec739928mr2033807ejc.150.1705949166523;
+        Mon, 22 Jan 2024 10:46:06 -0800 (PST)
+Received: from localhost (fwdproxy-lla-001.fbsv.net. [2a03:2880:30ff:1::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a5-20020a1709063e8500b00a28badcf367sm13620121ejj.54.2024.01.22.10.46.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jan 2024 10:46:06 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+To: kuba@kernel.org,
+	davem@davemloft.net,
+	abeni@redhat.com,
+	edumazet@google.com,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: dsahern@kernel.org,
+	weiwan@google.com,
+	geert@linux-m68k.org,
+	Bagas Sanjaya <bagasdotme@gmail.com>,
+	Greg Ungerer <gerg@linux-m68k.org>,
+	netdev@vger.kernel.org (open list:8390 NETWORK DRIVERS [WD80x3/SMC-ELITE, SMC-ULT...),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net-next 01/22] net: fill in MODULE_DESCRIPTION()s for 8390
+Date: Mon, 22 Jan 2024 10:45:22 -0800
+Message-Id: <20240122184543.2501493-2-leitao@debian.org>
+X-Mailer: git-send-email 2.39.3
+In-Reply-To: <20240122184543.2501493-1-leitao@debian.org>
+References: <20240122184543.2501493-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, 22 Jan 2024 19:22:42 +0100 Matthieu Baerts wrote:
-> > Somewhat related. What do you do currently to ignore crashes? =20
->=20
-> I was wondering why you wanted to ignore crashes :) ... but then I saw
-> the new "Test ignored" and "Crashes ignored" sections on the status
-> page. Just to be sure: you don't want to report issues that have not
-> been introduced by the new patches, right?
+W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
+Add descriptions to all the good old 8390 modules and drivers.
 
-Initially, yes, but going forward I bet we'll always see crashes and
-breakage introduced downstream. So we need some knobs to selectively
-silence failing things.
+Signed-off-by: Breno Leitao <leitao@debian.org>
+CC: geert@linux-m68k.org
+---
+ drivers/net/ethernet/8390/8390.c      | 1 +
+ drivers/net/ethernet/8390/8390p.c     | 1 +
+ drivers/net/ethernet/8390/apne.c      | 1 +
+ drivers/net/ethernet/8390/hydra.c     | 1 +
+ drivers/net/ethernet/8390/stnic.c     | 1 +
+ drivers/net/ethernet/8390/zorro8390.c | 1 +
+ 6 files changed, 6 insertions(+)
 
-In an ideal world we'd also have some form of "last seen" stat
-displayed to know when to retire these entries..
+diff --git a/drivers/net/ethernet/8390/8390.c b/drivers/net/ethernet/8390/8390.c
+index 0e0aa4016858..c5636245f1ca 100644
+--- a/drivers/net/ethernet/8390/8390.c
++++ b/drivers/net/ethernet/8390/8390.c
+@@ -100,4 +100,5 @@ static void __exit ns8390_module_exit(void)
+ module_init(ns8390_module_init);
+ module_exit(ns8390_module_exit);
+ #endif /* MODULE */
++MODULE_DESCRIPTION("National Semiconductor 8390 core driver");
+ MODULE_LICENSE("GPL");
+diff --git a/drivers/net/ethernet/8390/8390p.c b/drivers/net/ethernet/8390/8390p.c
+index 6834742057b3..6d429b11e9c6 100644
+--- a/drivers/net/ethernet/8390/8390p.c
++++ b/drivers/net/ethernet/8390/8390p.c
+@@ -102,4 +102,5 @@ static void __exit NS8390p_cleanup_module(void)
+ 
+ module_init(NS8390p_init_module);
+ module_exit(NS8390p_cleanup_module);
++MODULE_DESCRIPTION("National Semiconductor 8390 core for ISA driver");
+ MODULE_LICENSE("GPL");
+diff --git a/drivers/net/ethernet/8390/apne.c b/drivers/net/ethernet/8390/apne.c
+index a09f383dd249..828edca8d30c 100644
+--- a/drivers/net/ethernet/8390/apne.c
++++ b/drivers/net/ethernet/8390/apne.c
+@@ -610,4 +610,5 @@ static int init_pcmcia(void)
+ 	return 1;
+ }
+ 
++MODULE_DESCRIPTION("National Semiconductor 8390 Amiga PCMCIA ethernet driver");
+ MODULE_LICENSE("GPL");
+diff --git a/drivers/net/ethernet/8390/hydra.c b/drivers/net/ethernet/8390/hydra.c
+index 24f49a8ff903..fd9dcdc356e6 100644
+--- a/drivers/net/ethernet/8390/hydra.c
++++ b/drivers/net/ethernet/8390/hydra.c
+@@ -270,4 +270,5 @@ static void __exit hydra_cleanup_module(void)
+ module_init(hydra_init_module);
+ module_exit(hydra_cleanup_module);
+ 
++MODULE_DESCRIPTION("Zorro-II Hydra 8390 ethernet driver");
+ MODULE_LICENSE("GPL");
+diff --git a/drivers/net/ethernet/8390/stnic.c b/drivers/net/ethernet/8390/stnic.c
+index 265976e3b64a..6cc0e190aa79 100644
+--- a/drivers/net/ethernet/8390/stnic.c
++++ b/drivers/net/ethernet/8390/stnic.c
+@@ -296,4 +296,5 @@ static void __exit stnic_cleanup(void)
+ 
+ module_init(stnic_probe);
+ module_exit(stnic_cleanup);
++MODULE_DESCRIPTION("National Semiconductor DP83902AV ethernet driver");
+ MODULE_LICENSE("GPL");
+diff --git a/drivers/net/ethernet/8390/zorro8390.c b/drivers/net/ethernet/8390/zorro8390.c
+index d70390e9d03d..c24dd4fe7a10 100644
+--- a/drivers/net/ethernet/8390/zorro8390.c
++++ b/drivers/net/ethernet/8390/zorro8390.c
+@@ -443,4 +443,5 @@ static void __exit zorro8390_cleanup_module(void)
+ module_init(zorro8390_init_module);
+ module_exit(zorro8390_cleanup_module);
+ 
++MODULE_DESCRIPTION("Zorro NS8390-based ethernet driver");
+ MODULE_LICENSE("GPL");
+-- 
+2.39.3
 
-> We don't need to do that on MPTCP side:
-> - either it is a new crash with patches that are in reviewed and that's
-> not impacting others =E2=86=92 we test each series individually, not a ba=
-tch of
-> series.
-> - or there are issues with recent patches, not in netdev yet =E2=86=92 we=
- fix,
-> or revert.
-> - or there is an issue elsewhere, like the kernel panic we reported
-> here: usually I try to quickly apply a workaround, e.g. applying a fix,
-> or a revert. I don't think we ever had an issue really impacting us
-> where we couldn't find a quick solution in one or two days. With the
-> panic we reported here, ~15% of the tests had an issue, that's "OK" to
-> have that for a few days/weeks
->=20
-> With fewer tests and a smaller community, it is easier for us to just
-> say on the ML and weekly meetings: "this is a known issue, please ignore
-> for the moment". But if possible, I try to add a workaround/fix in our
-> repo used by the CI and devs (not upstreamed).
->=20
-> For NIPA CI, do you want to do like with the build and compare with a
-> reference? Or multiple ones to take into account unstable tests? Or
-> maintain a list of known issues (I think you started to do that,
-> probably safer/easier for the moment)?
-
-Exactly - where we can a before/after diff is the best. We do that for
-all static checker / building kind of tests. But for selftests I'm not
-sure how effective and applicable that is. Even the stack trace I
-posted here happens somewhat unreliably :( We can try to develop more
-intelligent ways going forward, obviously :)
-
-> > I was seeing a lot of:
-> > https://netdev-2.bots.linux.dev/vmksft-net-mp/results/431181/vm-crash-t=
-hr0-2
-> >=20
-> > So I hacked up this function to filter the crash from NIPA CI:
-> > https://github.com/kuba-moo/nipa/blob/master/contest/remote/lib/vm.py#L=
-50
-> > It tries to get first 5 function names from the stack, to form=20
-> > a "fingerprint". But I seem to recall a discussion at LPC's testing
-> > track that there are existing solutions for generating fingerprints.
-> > Are you aware of any? =20
->=20
-> No, sorry. But I guess they are using that with syzkaller, no?
->=20
-> I have to admit that crashes (or warnings) are quite rare, so there was
-> no need to have an automation there. But if it is easy to have a
-> fingerprint, I will be interested as well, it can help for the tracking:
-> to find occurrences of crashes/warnings that are very hard to reproduce.
-
-Indeed, I'll keep my ear to the ground. I believe it was discussed in
-relation to KCIDB.
 
