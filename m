@@ -1,131 +1,84 @@
-Return-Path: <netdev+bounces-64625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0316B836177
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 12:28:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D233A836115
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 12:20:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D0B88B2D2D7
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 11:10:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89A5028BE9E
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 11:20:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7E6A3B18E;
-	Mon, 22 Jan 2024 11:04:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 315063A8E1;
+	Mon, 22 Jan 2024 11:07:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IuKILk40"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8D663EA65
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 11:04:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A183CF48;
+	Mon, 22 Jan 2024 11:07:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705921486; cv=none; b=WJJZZ6dl+fVMGsKLSCcRLBWsNK20yNje3VcWDsbK37SlucfmjIe62yBPR9Jw7cuXaKc2OYV61ZFP+lJ4laJm3pKQle5LW+p/ppvdcY2Muz8OrzUF2C/J7DPyWP8jZ9S0ludck9NwtsfgEJvTDKyG8Rb9skV4i9RslkXjjEm0oKw=
+	t=1705921645; cv=none; b=sKnU60iMy39aGKzswZFiuwQEZ1GUuCcfBiPLHqEotDBo9vSvGbD8oiqh52m2XtlTuHHqHtpCQgQKBxOwta00X7oDQwrgNrIjAGosoguhRhY3yMCiXbE16CbGOdK9Rb838Ws3BvSlJUyegY3WcXdmqyzkSs2Fx0X1GQjQN6uN8as=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705921486; c=relaxed/simple;
-	bh=eqirOGjCZP2NBSEkK8uc5P/vksk2IIWKQWYB/n+5qkY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iVMwcgbAO8UTJ5XxlVwdJTDV4RRdsg1roJ/jI2lNXnmFAy1cXB4G1sL14uaLVFQelJgMXUNuaMZRwWOwtfCkou2SMmaEoSX2jBRfBOhnXRSnNK8S0hmdtA+6OHqihRWh+17QlO8nwbvmoJ71yFfD/ysqoNbix0sh/xObHSDEO4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <fpf@pengutronix.de>)
-	id 1rRs6K-0003nV-7r; Mon, 22 Jan 2024 12:04:24 +0100
-Received: from [2a0a:edc0:0:1101:1d::54] (helo=dude05.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <fpf@pengutronix.de>)
-	id 1rRs6I-001Zhh-Mi; Mon, 22 Jan 2024 12:04:22 +0100
-Received: from fpf by dude05.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <fpf@pengutronix.de>)
-	id 1rRs6I-00BSQd-23;
-	Mon, 22 Jan 2024 12:04:22 +0100
-From: Fabian Pfitzner <f.pfitzner@pengutronix.de>
-To: Michael Hennerich <michael.hennerich@analog.com>,
+	s=arc-20240116; t=1705921645; c=relaxed/simple;
+	bh=5gE+Km5fi/TLlf+ZbAr7bjFoCBGdCvtbA843YDHnPdo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OiroNK3NezJuHeUJinKpG5DBPBiVUF7JhU0RJUpGR/PkewP3d6VGyDO5lcMg7NuH69i1hQpYYqHRdXm6F92eHWHrj/txxjYKZWZuWo26xS9KVfxHlw2bv9ov4MTVCQiDJmlqsxOo0bgl29Zs6lWjpoB4AiGY+URbUdRgU89SYQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IuKILk40; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0B4DC433F1;
+	Mon, 22 Jan 2024 11:07:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705921644;
+	bh=5gE+Km5fi/TLlf+ZbAr7bjFoCBGdCvtbA843YDHnPdo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IuKILk40lppFwkQ3einuh+aBf9EHDFc+HzB4nd9+TtD9RD8cFXoLb9uH0b4wcO+l5
+	 ZgLolbB4kBvfbwMSNrdrt/DX6AdvlyCth5hF6iWkiIlyoyIRSFCRRp25OxYZNLH3y+
+	 hS6J8bEWWqa7aGoYc/N0uJ5A58jQBo7moXbm94fXOfi+eVUfAEAHY2Rr8blocQIcsO
+	 ajf6rqjrYgNlqJcKQ4SMOOBsFcXbNNRAsSAo+eNg6ghbMwFRi9I2q34o76bh7w4Q7n
+	 VTvdOtNITDJ0/WmwMVcBlOzG7leefF8TlyW8g72DnSu42/vcq2xUuXF7Zzg8g9L7g8
+	 KhDKkzWdD59sA==
+Date: Mon, 22 Jan 2024 11:07:19 +0000
+From: Simon Horman <horms@kernel.org>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Alexandru Tachici <alexandru.tachici@analog.com>
-Cc: kernel@pengutronix.de,
-	Fabian Pfitzner <f.pfitzner@pengutronix.de>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] net: phy: adin: add missing clock option
-Date: Mon, 22 Jan 2024 12:03:12 +0100
-Message-Id: <20240122110311.2725036-1-f.pfitzner@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jeff Kirsher <jeffrey.t.kirsher@intel.com>,
+	Mark Rustad <mark.d.rustad@intel.com>, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH] ixgbe: Fix an error handling path in
+ ixgbe_read_iosf_sb_reg_x550()
+Message-ID: <20240122110719.GC126470@kernel.org>
+References: <d39bbffb8817499cc2ae636cdef3b9c1eba59618.1705771534.git.christophe.jaillet@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: fpf@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d39bbffb8817499cc2ae636cdef3b9c1eba59618.1705771534.git.christophe.jaillet@wanadoo.fr>
 
-The GP_CLK pin on Adin1300 PHY's offers three different output clocks.
-This patch adds the missing 125MHz recovered clock option which is not
-yet availible in the driver.
+On Sat, Jan 20, 2024 at 06:25:36PM +0100, Christophe JAILLET wrote:
+> All error handling paths, except this one, go to 'out' where
+> release_swfw_sync() is called.
+> This call balances the acquire_swfw_sync() call done at the beginning of
+> the function.
+> 
+> Branch to the error handling path in order to correctly release some
+> resources in case of error.
+> 
+> Fixes: ae14a1d8e104 ("ixgbe: Fix IOSF SB access issues")
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 
-Signed-off-by: Fabian Pfitzner <f.pfitzner@pengutronix.de>
----
- Documentation/devicetree/bindings/net/adi,adin.yaml | 7 +++++--
- drivers/net/phy/adin.c                              | 2 ++
- 2 files changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/Documentation/devicetree/bindings/net/adi,adin.yaml b/Documentation/devicetree/bindings/net/adi,adin.yaml
-index 929cf8c0b0fd..cd1b4efa692b 100644
---- a/Documentation/devicetree/bindings/net/adi,adin.yaml
-+++ b/Documentation/devicetree/bindings/net/adi,adin.yaml
-@@ -38,14 +38,17 @@ properties:
- 
-   adi,phy-output-clock:
-     description: |
--      Select clock output on GP_CLK pin. Two clocks are available:
--      A 25MHz reference and a free-running 125MHz.
-+      Select clock output on GP_CLK pin. Three clocks are available:
-+        - 25MHz reference
-+        - free-running 125MHz 
-+        - recovered 125MHz
-       The phy can alternatively automatically switch between the reference and
-       the 125MHz clocks based on its internal state.
-     $ref: /schemas/types.yaml#/definitions/string
-     enum:
-       - 25mhz-reference
-       - 125mhz-free-running
-+      - 125mhz-recovered
-       - adaptive-free-running
- 
-   adi,phy-output-reference-clock:
-diff --git a/drivers/net/phy/adin.c b/drivers/net/phy/adin.c
-index 2e1a46e121d9..b1ed6fd24763 100644
---- a/drivers/net/phy/adin.c
-+++ b/drivers/net/phy/adin.c
-@@ -508,6 +508,8 @@ static int adin_config_clk_out(struct phy_device *phydev)
- 		sel |= ADIN1300_GE_CLK_CFG_25;
- 	} else if (strcmp(val, "125mhz-free-running") == 0) {
- 		sel |= ADIN1300_GE_CLK_CFG_FREE_125;
-+	} else if (strcmp(val, "125mhz-recovered") == 0) {
-+		sel |= ADIN1300_GE_CLK_CFG_RCVR_125;
- 	} else if (strcmp(val, "adaptive-free-running") == 0) {
- 		sel |= ADIN1300_GE_CLK_CFG_HRT_FREE;
- 	} else {
-
-base-commit: 6613476e225e090cc9aad49be7fa504e290dd33d
--- 
-2.39.2
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
