@@ -1,106 +1,139 @@
-Return-Path: <netdev+bounces-64813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7766A8372A3
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 20:34:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 368ED8372AF
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 20:35:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 19B1A1F2686A
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:34:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E31AC294688
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 19:35:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 989473EA81;
-	Mon, 22 Jan 2024 19:33:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EB9B3F8D2;
+	Mon, 22 Jan 2024 19:35:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jO/DHwQ3"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="EOpCfM5K"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F953B790;
-	Mon, 22 Jan 2024 19:33:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4549F3E49E;
+	Mon, 22 Jan 2024 19:35:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705952038; cv=none; b=D8qdVgEe9wBpr47FcfDFLzjyJBlvjf21o6Mlg9pRn9HEew3nA8tlcw/KL0B/E3WnpCxQT9StlXtkzxRS/Xc+hix7jynjBhxZ6vn0xfu2Je/z999ZdLPA3Wd9QkznlhC6LC6eCVIE13lG30sw7Wsi5E9oAk+oCXw3QpmTPvlbdaU=
+	t=1705952149; cv=none; b=BLpB2doXg0zghTG48Ee8loYAzs9/l1l5h9YeD3LPlVmTRurE/f84JGiAg7ss2DgTHXf+TBKvYdDzkDmIgONczhCSQy/q+4UZDPpcrWgdj9irlGb7YQVgca54cmSd4ALa9BHNnOXPVixlUtg7a/WFQltT+4ysGZACfBDoi0MrKXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705952038; c=relaxed/simple;
-	bh=p0GdHpTNMv7Dcw3S5KC6jiYf/8HQU0tAijW9BrNacbQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UVlqK0aCBITsmhTchzJaT9HfaBnbP5LabLnWyxFIzVfiSYdNxx8HcPQWOvOzIvqAZAJD3D0hl3/ttY/EzGwXXHV4D6VZCfa6lOe4LrITtl8BpgN/KG7eFuTkENb/s4FYT9QQgQmbS99J3sZUQkrE7ejl0jTyca7fCRwEwrKHPRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jO/DHwQ3; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=/Z6SXTn8YhiWrcZlgd1ZQ8j3V9FW9S8AEHmuF/IWI4A=; b=jO/DHwQ3UDrqPgaEKtXlb4KHhO
-	uOoDeXsV8PaWWb+8cBpTjQXStv6T5GVS/7ybW/ZtdJ1r8nBWbNzCHUtWA3OmkVQyxNdroow63o24l
-	u3pH6TnbNKF6aXOkIrgkVw8Ia0qjLYomaVI/PL7XdWk4S9HhXx5mLLyoTnsBu5ggpgO0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rS031-005lA4-Eo; Mon, 22 Jan 2024 20:33:31 +0100
-Date: Mon, 22 Jan 2024 20:33:31 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Breno Leitao <leitao@debian.org>
-Cc: kuba@kernel.org, davem@davemloft.net, abeni@redhat.com,
-	edumazet@google.com, Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Paolo Abeni <pabeni@redhat.com>, Alexander Couzens <lynxis@fe80.eu>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Jose Abreu <Jose.Abreu@synopsys.com>, dsahern@kernel.org,
-	weiwan@google.com,
-	"open list:LYNX PCS MODULE" <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"moderated list:ARM/Mediatek SoC support" <linux-arm-kernel@lists.infradead.org>,
-	"moderated list:ARM/Mediatek SoC support" <linux-mediatek@lists.infradead.org>
-Subject: Re: [PATCH net-next 03/22] net: fill in MODULE_DESCRIPTION()s for
- PCS Layer
-Message-ID: <52e39a1b-c551-4eea-9606-62be0cbad39f@lunn.ch>
-References: <20240122184543.2501493-1-leitao@debian.org>
- <20240122184543.2501493-4-leitao@debian.org>
+	s=arc-20240116; t=1705952149; c=relaxed/simple;
+	bh=haT/AD72cVJuSdHy1jeAPFd2n5sHagIc/kkcLqP5A0Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=oTNBP62EZGhSMmnqqPjYfRY7QKTweYEpy0GgYIwKEb8m9FlZWqrHRax2VCsvZRgnkrVuUF8/DmlsLWT/8jlWKP6sYCy3LHHmiQVBekGXNeX/pKf8Xco+lpz6eSKYxPQdVOtoXXTIGpoC8xJ4p7XJK82NDhPLs39TayXJDwIXUtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=EOpCfM5K; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40MJGSQE006734;
+	Mon, 22 Jan 2024 19:35:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=9isa3JFSy6VdY+glkUp9HPdVmPFw++kMzlZhCC5EJ3s=; b=EO
+	pCfM5KGyN8NG3l254NXIRUa8iiY4TWY33MNYu9T/cIvlUXj5IajqcJsqFhDW13p9
+	9O8fko5KcGTrPySVDLPDUiDhtED5kodh/kCEpmgMX99HRGenkMhlU1RAjoT+H9Kk
+	j6uM8rZYMZ7PLNLillM1v3edU0VY4AeI2SEGvQEqhxqM1cy7od7b7tzn41kTI0C6
+	9MQ/G8hjrSkuO9fNGns85bpUzbZh6uklaAMXZ2GFrvLnM30MCsK08ZGbsDNTof4u
+	RS9sOpuy7BUhm4bkSdG+JFiymuEDXv23i9Ezw4/x1ZtxC/qL8omLrfinT2Iw7Mbm
+	RkeevhF+s9BNCORJuFNw==
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3vstd98nxw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 22 Jan 2024 19:35:28 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 40MJZRAj027331
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 22 Jan 2024 19:35:27 GMT
+Received: from [10.226.49.146] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Mon, 22 Jan
+ 2024 11:35:26 -0800
+Message-ID: <62e299a8-c82e-40e0-854b-6fee1275cb2d@quicinc.com>
+Date: Mon, 22 Jan 2024 12:35:02 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240122184543.2501493-4-leitao@debian.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 16/22] net: fill in MODULE_DESCRIPTION()s for
+ Qualcom drivers
+To: Breno Leitao <leitao@debian.org>, <kuba@kernel.org>, <davem@davemloft.net>,
+        <abeni@redhat.com>, <edumazet@google.com>,
+        Timur Tabi
+	<timur@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Sean Tranchetti
+	<quic_stranche@quicinc.com>
+CC: <dsahern@kernel.org>, <weiwan@google.com>,
+        "open list:QUALCOMM EMAC
+ GIGABIT ETHERNET DRIVER" <netdev@vger.kernel.org>,
+        open list
+	<linux-kernel@vger.kernel.org>
+References: <20240122184543.2501493-1-leitao@debian.org>
+ <20240122184543.2501493-17-leitao@debian.org>
+Content-Language: en-US
+From: "Subash Abhinov Kasiviswanathan (KS)" <quic_subashab@quicinc.com>
+In-Reply-To: <20240122184543.2501493-17-leitao@debian.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 8LLGFYo3DoZ0xGqE-a4xHbJ5br91V7ya
+X-Proofpoint-ORIG-GUID: 8LLGFYo3DoZ0xGqE-a4xHbJ5br91V7ya
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-22_09,2024-01-22_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=0 bulkscore=0 impostorscore=0 mlxlogscore=999 mlxscore=0
+ spamscore=0 priorityscore=1501 phishscore=0 malwarescore=0 adultscore=0
+ clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2311290000 definitions=main-2401220139
 
-On Mon, Jan 22, 2024 at 10:45:24AM -0800, Breno Leitao wrote:
+
+On 1/22/2024 11:45 AM, Breno Leitao wrote:
 > W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
-> Add descriptions to the LynxI PCS MediaTek's SoC.
-
-That patch now does more than that.
-
+> Add descriptions to the Qualcom rmnet and emac drivers.
+> 
 > Signed-off-by: Breno Leitao <leitao@debian.org>
 > ---
->  drivers/net/pcs/pcs-lynx.c      | 1 +
->  drivers/net/pcs/pcs-mtk-lynxi.c | 1 +
->  drivers/net/pcs/pcs-xpcs.c      | 1 +
->  3 files changed, 3 insertions(+)
+>   drivers/net/ethernet/qualcomm/emac/emac.c          | 1 +
+>   drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c | 1 +
+>   2 files changed, 2 insertions(+)
 > 
-> diff --git a/drivers/net/pcs/pcs-lynx.c b/drivers/net/pcs/pcs-lynx.c
-> index dc3962b2aa6b..d51d09beaab3 100644
-> --- a/drivers/net/pcs/pcs-lynx.c
-> +++ b/drivers/net/pcs/pcs-lynx.c
-> @@ -398,4 +398,5 @@ void lynx_pcs_destroy(struct phylink_pcs *pcs)
->  }
->  EXPORT_SYMBOL(lynx_pcs_destroy);
->  
-> +MODULE_DESCRIPTION("MediaTek SGMII library for Lynx PCS");
+> diff --git a/drivers/net/ethernet/qualcomm/emac/emac.c b/drivers/net/ethernet/qualcomm/emac/emac.c
+> index 3270df72541b..4c06f55878de 100644
+> --- a/drivers/net/ethernet/qualcomm/emac/emac.c
+> +++ b/drivers/net/ethernet/qualcomm/emac/emac.c
+> @@ -771,5 +771,6 @@ static struct platform_driver emac_platform_driver = {
+>   
+>   module_platform_driver(emac_platform_driver);
+>   
+> +MODULE_DESCRIPTION("Qualcomm EMAC Gigabit Ethernet driver");
+>   MODULE_LICENSE("GPL v2");
+>   MODULE_ALIAS("platform:qcom-emac");
+> diff --git a/drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c b/drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c
+> index 5b69b9268c75..f3bea196a8f9 100644
+> --- a/drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c
+> +++ b/drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c
+> @@ -520,4 +520,5 @@ static void __exit rmnet_exit(void)
+>   module_init(rmnet_init)
+>   module_exit(rmnet_exit)
+>   MODULE_ALIAS_RTNL_LINK("rmnet");
+> +MODULE_DESCRIPTION("Qualcomm RmNet MAP driver");
+>   MODULE_LICENSE("GPL v2");
 
-pcs-lynx is for NXP hardware, not MediaTek.
+For rmnet
 
-    Andrew
-
----
-pw-bot: cr
+Reviewed-by: Subash Abhinov Kasiviswanathan <quic_subashab@quicinc.com>
 
