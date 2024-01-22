@@ -1,171 +1,388 @@
-Return-Path: <netdev+bounces-64574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F786835BB6
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 08:36:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3E98835C00
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 08:50:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 347131C217F4
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 07:36:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F5EE1F25CBD
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 07:50:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCADC1642A;
-	Mon, 22 Jan 2024 07:35:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBE5016410;
+	Mon, 22 Jan 2024 07:50:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE3EDFBE1;
-	Mon, 22 Jan 2024 07:35:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DD3A168A7
+	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 07:50:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705908951; cv=none; b=pHciYUmO6k8qxhnBkVZ7w6GlM6P6o5iMbGRv2Sis6PHTeMHwRPf9C5rTsh/h8Ykee6KRGetGSms08WAz5YFhxSmFb855cLWjWAJmVcHdYiAsYdx0YZbtuoaPD+l1o8yCVMiLU1u8Uvn5f9F8S32bT/UjBPw/glUof2Q4IA81E48=
+	t=1705909810; cv=none; b=SBnFl63EEruIzBdYFbRkoEXPrqF31yIe+bPu7nx5v+oxel9xxTJWhZ36NyDsTrwmmadx7kjOFAtp9DaYsMzAiWZqI/+uVgCFxzpuR7hzU0EcGzOJ4TIp+miZrDl0lrvNKw5/WpNTLTxqCRKTveov6txdlqSk0vvTTaSvlRYgt3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705908951; c=relaxed/simple;
-	bh=a84Ae00L5X+yF+jz93N/QgllxGAF2cgD93WBqZxUQnU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LW10TVcIURohqx0bQ/7rHrNYFQAJtJUqYCvOAsl2stf/CPvb0akMTZGBAAJJMUvwFAumovSfF+NZphS/s+bS5/+WJU7mET2YxifqrUfys/5/4eOkqeGxd0OPlj3ux4Ix7tPk8mvyBWZYfqmdEceEZ7Edyfz7V54K9j6RbyGWnGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 89f05498b4a1435a833053f4f2fd8887-20240122
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.35,REQID:f3d5e596-f7c8-4dbd-b751-633a1d132f37,IP:20,
-	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-	ON:release,TS:5
-X-CID-INFO: VERSION:1.1.35,REQID:f3d5e596-f7c8-4dbd-b751-633a1d132f37,IP:20,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:5
-X-CID-META: VersionHash:5d391d7,CLOUDID:af3d1c83-8d4f-477b-89d2-1e3bdbef96d1,B
-	ulkID:240119232059I7ZFFJYE,BulkQuantity:6,Recheck:0,SF:44|64|66|24|17|19|1
-	02,TC:nil,Content:0,EDM:-3,IP:-2,URL:11|1,File:nil,Bulk:40,QS:nil,BEC:nil,
-	COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_FSI,TF_CID_SPAM_ULN,TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,
-	TF_CID_SPAM_FSD
-X-UUID: 89f05498b4a1435a833053f4f2fd8887-20240122
-Received: from mail.kylinos.cn [(39.156.73.10)] by mailgw
-	(envelope-from <chentao@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 1749565469; Mon, 22 Jan 2024 15:35:30 +0800
-Received: from mail.kylinos.cn (localhost [127.0.0.1])
-	by mail.kylinos.cn (NSMail) with SMTP id E9923E000EB9;
-	Mon, 22 Jan 2024 15:35:29 +0800 (CST)
-X-ns-mid: postfix-65AE1AC1-869568164
-Received: from [172.20.15.234] (unknown [172.20.15.234])
-	by mail.kylinos.cn (NSMail) with ESMTPA id 810BFE000EB9;
-	Mon, 22 Jan 2024 15:35:23 +0800 (CST)
-Message-ID: <cf3668f1-cf86-49ff-83f4-47ed8a039d0d@kylinos.cn>
-Date: Mon, 22 Jan 2024 15:35:22 +0800
+	s=arc-20240116; t=1705909810; c=relaxed/simple;
+	bh=gavQG+2p3iMLHLENGCPnZBXZNuLyM4huH221HOhdVSY=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=OG1Sn99etZuCM6jDAsak3ZpOKvOXWGzjUpTlc5v3UW6UYIcClo/yM1/X077dpky2+8fKSdvs20MPOrB1DUTz4OivF4HpUozGEn7YzlZgEkycZncihK+BKUpPzgZc+1SrWw1zE9ord6MXfq/LwDqexblZ3aqiCZ3UWrfm4MdebJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; arc=none smtp.client-ip=115.124.30.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0W.49dnl_1705909804;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W.49dnl_1705909804)
+          by smtp.aliyun-inc.com;
+          Mon, 22 Jan 2024 15:50:04 +0800
+Message-ID: <1705909320.9590936-8-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next 3/3] virtio-net: reduce the CPU consumption of dim worker
+Date: Mon, 22 Jan 2024 15:42:00 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Heng Qi <hengqi@linux.alibaba.com>
+Cc: Jason Wang <jasowang@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ netdev@vger.kernel.org,
+ virtualization@lists.linux.dev
+References: <1705410693-118895-1-git-send-email-hengqi@linux.alibaba.com>
+ <1705410693-118895-4-git-send-email-hengqi@linux.alibaba.com>
+In-Reply-To: <1705410693-118895-4-git-send-email-hengqi@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] ipvs: Simplify the allocation of ip_vs_conn slab
- caches
-Content-Language: en-US
-To: Simon Horman <horms@kernel.org>
-Cc: ja@ssi.bg, pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, lvs-devel@vger.kernel.org,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- linux-kernel@vger.kernel.org
-References: <20240117072045.142215-1-chentao@kylinos.cn>
- <20240117092928.GA618956@kernel.org>
- <ba5b4e70-365f-476a-9969-6f9a891221a7@kylinos.cn>
- <20240119152039.GC89683@kernel.org>
-From: Kunwu Chan <chentao@kylinos.cn>
-In-Reply-To: <20240119152039.GC89683@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-On 2024/1/19 23:20, Simon Horman wrote:
-> On Thu, Jan 18, 2024 at 10:22:05AM +0800, Kunwu Chan wrote:
->> Hi Simon,
->>
->> Thanks for your reply.
->>
->> On 2024/1/17 17:29, Simon Horman wrote:
->>> On Wed, Jan 17, 2024 at 03:20:45PM +0800, Kunwu Chan wrote:
->>>> Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
->>>> to simplify the creation of SLAB caches.
->>>>
->>>> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
->>>
->>> Hi Kunwu Chan,
->>>
->>> I think this is more of a cleanup than a fix,
->>> so it should probably be targeted at 'nf-next' rather than 'net'.
->> Thanks, I'm confused about when to use "nf-next" or "net" or "net-next".
->> "nf-next" means fixing errors for linux-next.git and linux-stable.git, while
->> "nf" or "next" just means linux-next.git?
-> 
-> Hi Kunwu,
-> 
-> nf is for fixes for Netfilter (which includes IPVS). The target tree is nf.git
-> nf-next is for non-fixes for Netfilter. The target tree if nf-next.git
-> 
-> net is for fixes for Networking code, which does not have a more specific
-> tree (as is the case for Netfilter). The target tree is net.git.
-> Liikewise, net-next is for non-fixes for Networking code.
-> The target tree is net-next.git
-> 
-Hi Simon,
+On Tue, 16 Jan 2024 21:11:33 +0800, Heng Qi <hengqi@linux.alibaba.com> wrote:
+> Accumulate multiple request commands to kick the device once,
+> and obtain the processing results of the corresponding commands
+> asynchronously. The batch command method is used to optimize the
+> CPU overhead of the DIM worker caused by the guest being busy
+> waiting for the command response result.
+>
+> On an 8-queue device, without this patch, the guest cpu overhead
+> due to waiting for cvq could be 10+% and above. With this patch,
+> the corresponding overhead is basically invisible.
+>
+> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+> ---
+>  drivers/net/virtio_net.c | 185 ++++++++++++++++++++++++++++++++++++++++-------
+>  1 file changed, 158 insertions(+), 27 deletions(-)
+>
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index e4305ad..9f22c85 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -33,6 +33,8 @@
+>  module_param(gso, bool, 0444);
+>  module_param(napi_tx, bool, 0644);
+>
+> +#define BATCH_CMD 25
+> +
+>  /* FIXME: MTU in config. */
+>  #define GOOD_PACKET_LEN (ETH_HLEN + VLAN_HLEN + ETH_DATA_LEN)
+>  #define GOOD_COPY_LEN	128
+> @@ -134,6 +136,9 @@ struct virtnet_interrupt_coalesce {
+>  };
+>
+>  struct virtnet_batch_coal {
+> +	struct virtio_net_ctrl_hdr hdr;
+> +	virtio_net_ctrl_ack status;
+> +	__u8 usable;
+>  	__le32 num_entries;
+>  	struct virtio_net_ctrl_coal_vq coal_vqs[];
+>  };
+> @@ -299,6 +304,7 @@ struct virtnet_info {
+>
+>  	/* Work struct for delayed refilling if we run low on memory. */
+>  	struct delayed_work refill;
+> +	struct delayed_work get_cvq;
+>
+>  	/* Is delayed refill enabled? */
+>  	bool refill_enabled;
+> @@ -326,6 +332,7 @@ struct virtnet_info {
+>  	bool rx_dim_enabled;
+>
+>  	/* Interrupt coalescing settings */
+> +	int cvq_cmd_nums;
+>  	struct virtnet_batch_coal *batch_coal;
+>  	struct virtnet_interrupt_coalesce intr_coal_tx;
+>  	struct virtnet_interrupt_coalesce intr_coal_rx;
+> @@ -2512,6 +2519,46 @@ static int virtnet_tx_resize(struct virtnet_info *vi,
+>  	return err;
+>  }
+>
+> +static bool virtnet_process_dim_cmd(struct virtnet_info *vi, void *res)
+> +{
+> +	struct virtnet_batch_coal *batch_coal;
+> +	u16 queue;
+> +	int i;
+> +
+> +	if (res != ((void *)vi)) {
+> +		batch_coal = (struct virtnet_batch_coal *)res;
+> +		batch_coal->usable = true;
+> +		vi->cvq_cmd_nums--;
+> +		for (i = 0; i < batch_coal->num_entries; i++) {
+> +			queue = batch_coal->coal_vqs[i].vqn / 2;
+> +			vi->rq[queue].dim.state = DIM_START_MEASURE;
+> +		}
+> +	} else {
+> +		return true;
+> +	}
+> +
+> +	return false;
+> +}
+> +
+> +static bool virtnet_cvq_response(struct virtnet_info *vi, bool poll)
+> +{
+> +	unsigned tmp;
+> +	void *res;
+> +
+> +	if (!poll) {
+> +		while ((res = virtqueue_get_buf(vi->cvq, &tmp)) &&
+> +		       !virtqueue_is_broken(vi->cvq))
+> +			virtnet_process_dim_cmd(vi, res);
+> +		return 0;
+> +	}
+> +
+> +	while (!(res = virtqueue_get_buf(vi->cvq, &tmp)) &&
+> +	       !virtqueue_is_broken(vi->cvq))
+> +		cpu_relax();
+> +
+> +	return virtnet_process_dim_cmd(vi, res);
+> +}
+> +
+>  /*
+>   * Send command via the control virtqueue and check status.  Commands
+>   * supported by the hypervisor, as indicated by feature bits, should
+> @@ -2521,7 +2568,7 @@ static bool virtnet_send_command(struct virtnet_info *vi, u8 class, u8 cmd,
+>  				 struct scatterlist *out)
+>  {
+>  	struct scatterlist *sgs[4], hdr, stat;
+> -	unsigned out_num = 0, tmp;
+> +	unsigned out_num = 0;
+>  	int ret;
+>
+>  	/* Caller should know better */
+> @@ -2555,9 +2602,9 @@ static bool virtnet_send_command(struct virtnet_info *vi, u8 class, u8 cmd,
+>  	/* Spin for a response, the kick causes an ioport write, trapping
+>  	 * into the hypervisor, so the request should be handled immediately.
+>  	 */
+> -	while (!virtqueue_get_buf(vi->cvq, &tmp) &&
+> -	       !virtqueue_is_broken(vi->cvq))
+> -		cpu_relax();
+> +	while (true)
+> +		if (virtnet_cvq_response(vi, true))
+> +			break;
+>
+>  	return vi->ctrl->status == VIRTIO_NET_OK;
+>  }
+> @@ -2709,6 +2756,7 @@ static int virtnet_close(struct net_device *dev)
+>  		cancel_work_sync(&vi->rq[i].dim.work);
+>  	}
+>
+> +	cancel_delayed_work_sync(&vi->get_cvq);
+>  	return 0;
+>  }
+>
+> @@ -3520,22 +3568,99 @@ static int virtnet_send_notf_coal_vq_cmds(struct virtnet_info *vi,
+>  	return 0;
+>  }
+>
+> +static bool virtnet_add_dim_command(struct virtnet_info *vi,
+> +				    struct virtnet_batch_coal *ctrl)
+> +{
+> +	struct scatterlist *sgs[4], hdr, stat, out;
+> +	unsigned out_num = 0;
+> +	int ret;
+> +
+> +	/* Caller should know better */
+> +	BUG_ON(!virtio_has_feature(vi->vdev, VIRTIO_NET_F_CTRL_VQ));
+> +
+> +	ctrl->hdr.class = VIRTIO_NET_CTRL_NOTF_COAL;
+> +	ctrl->hdr.cmd = VIRTIO_NET_CTRL_NOTF_COAL_VQS_SET;
+> +
+> +	/* Add header */
+> +	sg_init_one(&hdr, &ctrl->hdr, sizeof(ctrl->hdr));
+> +	sgs[out_num++] = &hdr;
+> +
+> +	/* Add body */
+> +	sg_init_one(&out, &ctrl->num_entries, sizeof(ctrl->num_entries) +
+> +		    ctrl->num_entries * sizeof(struct virtnet_coal_entry));
+> +	sgs[out_num++] = &out;
+> +
+> +	/* Add return status. */
+> +	ctrl->status = VIRTIO_NET_OK;
+> +	sg_init_one(&stat, &ctrl->status, sizeof(ctrl->status));
+> +	sgs[out_num] = &stat;
+> +
+> +	BUG_ON(out_num + 1 > ARRAY_SIZE(sgs));
+> +	ret = virtqueue_add_sgs(vi->cvq, sgs, out_num, 1, ctrl, GFP_ATOMIC);
+> +	if (ret < 0) {
+> +		dev_warn(&vi->vdev->dev, "Failed to add sgs for command vq: %d\n.", ret);
+> +		return false;
+> +	}
+> +
+> +	virtqueue_kick(vi->cvq);
+> +
+> +	ctrl->usable = false;
+> +	vi->cvq_cmd_nums++;
+> +
+> +	return true;
+> +}
 
-Thank you very much for your detailed guidance.
-In the future, I will carefully follow the rules you introduced to set 
-the appropriate subject for the patch.
+
+We should merge this to the function virtnet_send_command.
 
 
-> The MAINTAINERS file, and get_maintainers.pl script are useful here.
-> 
-> nf is merged into net on request from the Netfilter maintainers,
-> this is it's path to released kernels.
-> Likewise, nf-next is merged into net-next.
-> 
-Before send the patch, I'll read the MAINTAINERS file, and search in 
-email-list to confirm the correct subject.
+> +
+> +static void get_cvq_work(struct work_struct *work)
+> +{
+> +	struct virtnet_info *vi =
+> +		container_of(work, struct virtnet_info, get_cvq.work);
+> +
+> +	if (!rtnl_trylock()) {
+> +		schedule_delayed_work(&vi->get_cvq, 5);
+> +		return;
+> +	}
+> +
+> +	if (!vi->cvq_cmd_nums)
+> +		goto ret;
+> +
+> +	virtnet_cvq_response(vi, false);
+> +
+> +	if (vi->cvq_cmd_nums)
+> +		schedule_delayed_work(&vi->get_cvq, 5);
+> +
+> +ret:
+> +	rtnl_unlock();
+> +}
+> +
+>  static void virtnet_rx_dim_work(struct work_struct *work)
+>  {
+>  	struct dim *dim = container_of(work, struct dim, work);
+>  	struct receive_queue *rq = container_of(dim,
+>  			struct receive_queue, dim);
+>  	struct virtnet_info *vi = rq->vq->vdev->priv;
+> +	struct virtnet_batch_coal *avail_coal;
+>  	struct dim_cq_moder update_moder;
+> -	struct virtnet_batch_coal *coal = vi->batch_coal;
+> -	struct scatterlist sgs;
+> -	int i, j = 0;
+> +	int i, j = 0, position;
+> +	u8 *buf;
+>
+>  	if (!rtnl_trylock()) {
+>  		schedule_work(&dim->work);
+>  		return;
+>  	}
+>
+> +	if (vi->cvq_cmd_nums == BATCH_CMD || vi->cvq->num_free < 3 ||
+> +	    vi->cvq->num_free <= (virtqueue_get_vring_size(vi->cvq) / 3))
+> +		virtnet_cvq_response(vi, true);
+> +
+> +	for (i = 0; i < BATCH_CMD; i++) {
+> +		buf = (u8 *)vi->batch_coal;
+> +		position = i * (sizeof(struct virtnet_batch_coal) +
+> +				vi->max_queue_pairs * sizeof(struct virtnet_coal_entry));
+> +		avail_coal = (struct virtnet_batch_coal *)(&buf[position]);
+> +		if (avail_coal->usable)
+> +			break;
 
-And if need a new subject patch, i could resend a new one.
->>
->>>
->>> If it is a fix, then I would suggest targeting it at 'nf'
->>> and providing a Fixes tag.
->> I'll keep it in mind in the future.
->>>
->>> The above notwithstanding, this looks good to me.
->>>
->>> Acked-by: Simon Horman <horms@kernel.org>
->>>
->>>> ---
->>>>    net/netfilter/ipvs/ip_vs_conn.c | 4 +---
->>>>    1 file changed, 1 insertion(+), 3 deletions(-)
->>>>
->>>> diff --git a/net/netfilter/ipvs/ip_vs_conn.c b/net/netfilter/ipvs/ip_vs_conn.c
->>>> index a743db073887..98d7dbe3d787 100644
->>>> --- a/net/netfilter/ipvs/ip_vs_conn.c
->>>> +++ b/net/netfilter/ipvs/ip_vs_conn.c
->>>> @@ -1511,9 +1511,7 @@ int __init ip_vs_conn_init(void)
->>>>    		return -ENOMEM;
->>>>    	/* Allocate ip_vs_conn slab cache */
->>>> -	ip_vs_conn_cachep = kmem_cache_create("ip_vs_conn",
->>>> -					      sizeof(struct ip_vs_conn), 0,
->>>> -					      SLAB_HWCACHE_ALIGN, NULL);
->>>> +	ip_vs_conn_cachep = KMEM_CACHE(ip_vs_conn, SLAB_HWCACHE_ALIGN);
->>>>    	if (!ip_vs_conn_cachep) {
->>>>    		kvfree(ip_vs_conn_tab);
->>>>    		return -ENOMEM;
->> -- 
->> Thanks,
->>    Kunwu
->>
--- 
-Thanks,
-   Kunwu
 
+list or kmalloc here are all better way.
+
+
+> +	}
+> +
+>  	/* Each rxq's work is queued by "net_dim()->schedule_work()"
+>  	 * in response to NAPI traffic changes. Note that dim->profile_ix
+>  	 * for each rxq is updated prior to the queuing action.
+> @@ -3552,30 +3677,26 @@ static void virtnet_rx_dim_work(struct work_struct *work)
+>  		update_moder = net_dim_get_rx_moderation(dim->mode, dim->profile_ix);
+>  		if (update_moder.usec != rq->intr_coal.max_usecs ||
+>  		    update_moder.pkts != rq->intr_coal.max_packets) {
+> -			coal->coal_vqs[j].vqn = cpu_to_le16(rxq2vq(i));
+> -			coal->coal_vqs[j].coal.max_usecs = cpu_to_le32(update_moder.usec);
+> -			coal->coal_vqs[j].coal.max_packets = cpu_to_le32(update_moder.pkts);
+> +			avail_coal->coal_vqs[j].vqn = cpu_to_le16(rxq2vq(i));
+> +			avail_coal->coal_vqs[j].coal.max_usecs = cpu_to_le32(update_moder.usec);
+> +			avail_coal->coal_vqs[j].coal.max_packets = cpu_to_le32(update_moder.pkts);
+>  			rq->intr_coal.max_usecs = update_moder.usec;
+>  			rq->intr_coal.max_packets = update_moder.pkts;
+>  			j++;
+> -		}
+> +		} else if (dim->state == DIM_APPLY_NEW_PROFILE)
+> +			dim->state = DIM_START_MEASURE;
+>  	}
+>
+>  	if (!j)
+>  		goto ret;
+>
+> -	coal->num_entries = cpu_to_le32(j);
+> -	sg_init_one(&sgs, coal, sizeof(struct virtnet_batch_coal) +
+> -		    j * sizeof(struct virtio_net_ctrl_coal_vq));
+> -	if (!virtnet_send_command(vi, VIRTIO_NET_CTRL_NOTF_COAL,
+> -				  VIRTIO_NET_CTRL_NOTF_COAL_VQS_SET,
+> -				  &sgs))
+> -		dev_warn(&vi->vdev->dev, "Failed to add dim command\n.");
+> +	avail_coal->num_entries = cpu_to_le32(j);
+> +	if (!virtnet_add_dim_command(vi, avail_coal))
+> +		goto ret;
+>
+> -	for (i = 0; i < j; i++) {
+> -		rq = &vi->rq[(coal->coal_vqs[i].vqn) / 2];
+> -		rq->dim.state = DIM_START_MEASURE;
+> -	}
+> +	virtnet_cvq_response(vi, false);
+
+Is this usable?
+
+
+> +	if (vi->cvq_cmd_nums)
+> +		schedule_delayed_work(&vi->get_cvq, 1);
+>
+>  ret:
+>  	rtnl_unlock();
+> @@ -4402,7 +4523,9 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
+>
+>  static int virtnet_alloc_queues(struct virtnet_info *vi)
+>  {
+> -	int i, len;
+> +	struct virtnet_batch_coal *batch_coal;
+> +	int i, position;
+> +	u8 *buf;
+>
+>  	if (vi->has_cvq) {
+>  		vi->ctrl = kzalloc(sizeof(*vi->ctrl), GFP_KERNEL);
+> @@ -4418,13 +4541,21 @@ static int virtnet_alloc_queues(struct virtnet_info *vi)
+>  	if (!vi->rq)
+>  		goto err_rq;
+>
+> -	len = sizeof(struct virtnet_batch_coal) +
+> -	      vi->max_queue_pairs * sizeof(struct virtio_net_ctrl_coal_vq);
+> -	vi->batch_coal = kzalloc(len, GFP_KERNEL);
+> -	if (!vi->batch_coal)
+> +	buf = kzalloc(BATCH_CMD * (sizeof(struct virtnet_batch_coal) +
+> +		      vi->max_queue_pairs * sizeof(struct virtnet_coal_entry)), GFP_KERNEL);
+> +	if (!buf)
+>  		goto err_coal;
+>
+> +	vi->batch_coal = (struct virtnet_batch_coal *)buf;
+> +	for (i = 0; i < BATCH_CMD; i++) {
+> +		position = i * (sizeof(struct virtnet_batch_coal) +
+> +				vi->max_queue_pairs * sizeof(struct virtnet_coal_entry));
+> +		batch_coal = (struct virtnet_batch_coal *)(&buf[position]);
+> +		batch_coal->usable = true;
+> +	}
+> +
+>  	INIT_DELAYED_WORK(&vi->refill, refill_work);
+> +	INIT_DELAYED_WORK(&vi->get_cvq, get_cvq_work);
+>  	for (i = 0; i < vi->max_queue_pairs; i++) {
+>  		vi->rq[i].pages = NULL;
+>  		netif_napi_add_weight(vi->dev, &vi->rq[i].napi, virtnet_poll,
+> --
+> 1.8.3.1
+>
 
