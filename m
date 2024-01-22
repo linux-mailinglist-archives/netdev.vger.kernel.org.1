@@ -1,151 +1,191 @@
-Return-Path: <netdev+bounces-64623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64624-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43DFD83600B
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 11:49:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14DA5836048
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 12:02:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEA3F1F21A19
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 10:49:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A97F21F27B9B
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 11:02:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C5EA3A1C0;
-	Mon, 22 Jan 2024 10:49:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35F183A8C3;
+	Mon, 22 Jan 2024 11:02:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="AeP7C9p8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T7Kuibwb"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09CBA3A8C3;
-	Mon, 22 Jan 2024 10:49:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.248
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A0153A27B;
+	Mon, 22 Jan 2024 11:02:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705920551; cv=none; b=o/KN4NI3Go7Pe8GdXfQjZE59oGcOU7UkU3fUgcSGeO15Io5i+q6QCom3QPZKfFhbTHEHMrf6N03Y3Jyaz7Bvo983PaAMFPy82UyWGi+SEScu8VGJcjuCLv9dsnhWbl8J9rR2pB76V0tF49qYoUp/xx5XRUFAQcYPeNkQdnTABpE=
+	t=1705921343; cv=none; b=jaVFNgQbGWXck2PIpES4CuQ5BteoAWeyI5TAkfH6guxeyWQKReNPwlK52OTuLyGLNYXr5bgHMV5AlLY5c4YXYTxCSo7t1hb8lidnWbF17quJLP5XjHDfxZSNIwY7iWmZYPfqUbDjQV6+om55H8sj6X/TC6Z0HfI3M9AYX/aXHAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705920551; c=relaxed/simple;
-	bh=G/7NfDFOlqtjKjUrpbty5x9de3dLn4eUQJxwgMCjSdA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=GZ4G5pdeoIlCPM4XjkATBhVSX/zAiFVvYgtwHOKnpj7Ly85/YKizJDNFGVmJVyAYZ1S34cx3WGwyTsI21Eqzpl3Zcyy910TnaiGDUa4hC5QAGhCNZHwN25qhCPHc3IqEvAcpzgD1TvO+5aZBKVMmsL64QxW/k6TaWggR/wJYDM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=AeP7C9p8; arc=none smtp.client-ip=198.47.23.248
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 40MAmoUX116000;
-	Mon, 22 Jan 2024 04:48:50 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1705920530;
-	bh=BJya4J7U2wsMIZQXgChP3PwMJktx8r9T37jW6na+29g=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=AeP7C9p820x3uyj/qwJyH4LKUX3cRh2wjwSINg5BwXaqc9Sl+Wj1OCR+aA6ZBdBX4
-	 HoVKTa95ZtCevUftW2jQa0oV78e80VNnAaJQTeY/kMYQu6Rh6fdt7SgG+/qmKGQruO
-	 QmZ3vfj+sq/DFYyy0OvEadQ43uYa6zUGiqN1Ak20=
-Received: from DFLE108.ent.ti.com (dfle108.ent.ti.com [10.64.6.29])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 40MAmnW8015586
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Mon, 22 Jan 2024 04:48:50 -0600
-Received: from DFLE115.ent.ti.com (10.64.6.36) by DFLE108.ent.ti.com
- (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 22
- Jan 2024 04:48:49 -0600
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE115.ent.ti.com
- (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Mon, 22 Jan 2024 04:48:49 -0600
-Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 40MAmiYU061813;
-	Mon, 22 Jan 2024 04:48:44 -0600
-Message-ID: <ad5c31cc-7cb6-4791-86fe-b2ba30abf33e@ti.com>
-Date: Mon, 22 Jan 2024 16:18:43 +0530
+	s=arc-20240116; t=1705921343; c=relaxed/simple;
+	bh=8gUsGOjD9YP0iDHyZAGJHZMPpDKBiz7lZX9fJx+/4G0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pMGZKkO+Wi07XljWadnvsFqpXajyKUgywxFKu0BitbqAQ24cxCWEIMuSK+zWem8u7WKgJICx3loV5KI7HJj2qoTZQ6/YYVChdwU8+n2zXNAT9Xk3cCJTvNYSztU6kQgCZgirPk6ugq2EPdCdo2t2tz4/ZqebLRuFxpQ6bjog5Tg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T7Kuibwb; arc=none smtp.client-ip=209.85.167.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-50eabbc3dccso3570815e87.2;
+        Mon, 22 Jan 2024 03:02:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705921338; x=1706526138; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :reply-to:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=XEM8HK9MzMAP7SMXuKJPDZgtk2XEhhSMXfxWrnbRBa0=;
+        b=T7KuibwbwocLAL6YfitQzuS+Zgpfo86G3GlFYE0T2YHlIooCJV5EqSboxJmGSIiKn0
+         yc8C5vupj8hWxv/MYAJpOhb0f2oMDxPxEep+3jhJoq18JgXUvWjkOdwcuEHUZ0s7w4FC
+         k6/kN2DW0OpvgG3GJnFbm0AdPupBNEnRCpDI8Gr7tsK02Db8352+ocp86DGrFNLgW6Zk
+         1NMu1UEJdBf7EIcbZdDsKNUn1E65CZdZNFxeNJx4ncOMWKcmmtMI5hfFvtcfctAHs9h5
+         RiMgew2W/jRm36Z76oBjr5P/JFGOlZCu3j4r0tP4eu6XD61RkaQGKilGETnHteD/5zkp
+         zwMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705921338; x=1706526138;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :reply-to:in-reply-to:references:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XEM8HK9MzMAP7SMXuKJPDZgtk2XEhhSMXfxWrnbRBa0=;
+        b=Ny1crkLzIgskOJ25MfuM/6fEX2VDWtBfYjgqb0+jwR1OVRaAwGveWXNH74+ufkee8s
+         qg5CEmsrho5+zQsYcBYCG+3Ypw4nSOOcXBOjvSiPuiErit8aZTQrN00wI6ccPl5Itwe+
+         utD28Hj244uCdBuCeafS4ItYwjvdOsJ9Dsqti6ysMQW3AWuEhpJK3/kmuE5n4ontT/p0
+         Cr001taRh47690SLxei0ukgeHZsc+4/2e3JHp/y0E0QpK2cijUmOX/59cZbo7PQqXl0t
+         6Yn4C9eibe48w0HdgxIAiEr2w5cxHWinXfoo01K6LuTUl16y9Id5Dn5yYrLMb/GFVb0e
+         spJg==
+X-Gm-Message-State: AOJu0Yz5wzHkeAHH1VxNpSQ39pkcW3nbp3pVc53NliGw4dN+X5etEghG
+	tvxYPFk0v6BPnO0L+VQLFqMeIbdYg7DHYF+1KYXHuMd4zVISTHjJeB9qlZHrvguLKisJVaipSZB
+	exRTSLj1QODiGuFGyVqMLl1eVm/o=
+X-Google-Smtp-Source: AGHT+IEsxY3yWZhSDIWVwKDU2WuujYESZYUaZh9OU/xEwm6QHepspTMmLW9p70u+yDEvCP6XE3LVSD5JV4hcXnYZmGE=
+X-Received: by 2002:ac2:5e76:0:b0:50e:7b34:c18a with SMTP id
+ a22-20020ac25e76000000b0050e7b34c18amr620208lfr.111.1705921337901; Mon, 22
+ Jan 2024 03:02:17 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 1/3] net: ti: icssg-prueth: Add helper functions to
- configure FDB
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Rob Herring <robh@kernel.org>, Dan Carpenter <dan.carpenter@linaro.org>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Vladimir Oltean
-	<vladimir.oltean@nxp.com>,
-        Wolfram Sang <wsa+renesas@sang-engineering.com>,
-        Arnd Bergmann <arnd@arndb.de>, Vignesh Raghavendra <vigneshr@ti.com>,
-        Roger
- Quadros <rogerq@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Jakub Kicinski
-	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <srk@ti.com>, <r-gunasekaran@ti.com>
-References: <20240118071005.1514498-1-danishanwar@ti.com>
- <20240118071005.1514498-2-danishanwar@ti.com>
- <a9c18466-7d7d-4a63-8096-d832bd9e455f@lunn.ch>
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <a9c18466-7d7d-4a63-8096-d832bd9e455f@lunn.ch>
+References: <1850031.1704921100@warthog.procyon.org.uk> <CA+icZUUc_0M_6JU3dZzVqrUUrWJceY1uD8dO2yFMCwtHtkaa_Q@mail.gmail.com>
+In-Reply-To: <CA+icZUUc_0M_6JU3dZzVqrUUrWJceY1uD8dO2yFMCwtHtkaa_Q@mail.gmail.com>
+Reply-To: sedat.dilek@gmail.com
+From: Sedat Dilek <sedat.dilek@gmail.com>
+Date: Mon, 22 Jan 2024 12:01:41 +0100
+Message-ID: <CA+icZUWYSxfFHf5A56h9b4uOYYaANNxo2Z+cpwP1Bs1pF8MXQQ@mail.gmail.com>
+Subject: Re: [PATCH] keys, dns: Fix size check of V1 server-list header
+To: sedat.dilek@gmail.com
+Cc: David Howells <dhowells@redhat.com>, ceph-devel@vger.kernel.org, davem@davemloft.net, 
+	eadavis@qq.com, edumazet@google.com, horms@kernel.org, jaltman@auristor.com, 
+	jarkko@kernel.org, jlayton@redhat.com, keyrings@vger.kernel.org, 
+	kuba@kernel.org, linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-nfs@vger.kernel.org, marc.dionne@auristor.com, markus.suvanto@gmail.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com, pengfei.xu@intel.com, 
+	smfrench@gmail.com, stable@vger.kernel.org, torvalds@linux-foundation.org, 
+	wang840925@gmail.com, sashal@kernel.org, gregkh@linuxfoundation.org, 
+	pvorel@suse.cz
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, Jan 22, 2024 at 8:33=E2=80=AFAM Petr Vorel <pvorel@suse.cz> wrote:
+>
+> From: Sedat Dilek <sedat.dilek@gmail.com>
+>
+> On Wed, Jan 10, 2024 at 10:12=E2=80=AFPM David Howells <dhowells@redhat.c=
+om> wrote:
+> >
+> >
+> > Fix the size check added to dns_resolver_preparse() for the V1 server-l=
+ist
+> > header so that it doesn't give EINVAL if the size supplied is the same =
+as
+> > the size of the header struct (which should be valid).
+> >
+> > This can be tested with:
+> >
+> >         echo -n -e '\0\0\01\xff\0\0' | keyctl padd dns_resolver desc @p
+> >
+> > which will give "add_key: Invalid argument" without this fix.
+> >
+> > Fixes: 1997b3cb4217 ("keys, dns: Fix missing size check of V1 server-li=
+st header")
+>
+> [ CC stable@vger.kernel.org ]
+>
+> Your (follow-up) patch is now upstream.
+>
+> https://git.kernel.org/linus/acc657692aed438e9931438f8c923b2b107aebf9
+>
+> This misses CC: Stable Tag as suggested by Linus.
+>
+> Looks like linux-6.1.y and linux-6.6.y needs it, too.
+>
+> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?=
+h=3Dv6.6.11&id=3Dda89365158f6f656b28bcdbcbbe9eaf97c63c474
+> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?=
+h=3Dv6.1.72&id=3D079eefaecfd7bbb8fcc30eccb0dfdf50c91f1805
+>
+> BG,
+> -Sedat-
+>
+> Hi Greg, Sasa,
+>
+> could you please add this also to linux-6.1.y and linux-6.6.y?  (Easily
+> applicable to both, needed for both.) Or is there any reason why it's not
+> being added?
+>
 
+Great!
 
-On 19/01/24 7:25 pm, Andrew Lunn wrote:
->> +int icssg_fdb_add_del(struct prueth_emac *emac, const unsigned char *addr,
->> +		      u8 vid, u8 fid_c2, bool add)
->> +{
->> +
->> +	for (i = 0; i < ETH_ALEN; i++)
->> +		mac_fid[i] = addr[i];
-> 
-> ether_addr_copy()
+I forgot to CC Greg and Sasha directly.
 
-Sure.
+Thanks.
 
-> 
->> +
->> +	/* 1-1 VID-FID mapping is already setup */
->> +	mac_fid[ETH_ALEN] = fid;
->> +	mac_fid[ETH_ALEN + 1] = 0;
->> +
->> +	fdb_slot = bitrev32(crc32_le(0, mac_fid, 8)) & PRUETH_SWITCH_FDB_MASK;
->> +
-> 
->> +	fid_c2 |= ICSSG_FDB_ENTRY_VALID;
->> +	memcpy(&fdb_cmd.cmd_args[0], addr, 4);
->> +	memcpy(&fdb_cmd.cmd_args[1], &addr[4], 2);
->> +	fdb_cmd.cmd_args[1] |= ((fid << 16) | (fid_c2 << 24));
->> +	fdb_cmd.cmd_args[2] = fdb_slot;
-> 
->> +int icssg_fdb_lookup(struct prueth_emac *emac, const unsigned char *addr,
->> +		     u8 vid)
->> +{
-> 
->> +	for (i = 0; i < ETH_ALEN; i++)
->> +		mac_fid[i] = addr[i];
->> +
->> +	/* 1-1 VID-FID mapping is already setup */
->> +	mac_fid[ETH_ALEN] = fid;
->> +	mac_fid[ETH_ALEN + 1] = 0;
-> 
->> +	memcpy(&fdb_cmd.cmd_args[0], addr, 4);
->> +	memcpy(&fdb_cmd.cmd_args[1], &addr[4], 2);
->> +	fdb_cmd.cmd_args[1] |= fid << 16;
->> +	fdb_cmd.cmd_args[2] = fdb_slot;
-> 
-> Maybe add some helpers to reduce the amount of duplicated code?
-> 
+BG,
+-Sedat-
 
-Some codes are duplicated in icssg_fdb_add_del() and icssg_fdb_lookup().
-I'll try to add helpers in next version to minimize this.
-
->       Andrew
-
--- 
-Thanks and Regards,
-Danish
+> Kind regards,
+> Petr
+>
+> > Reported-by: Pengfei Xu <pengfei.xu@intel.com>
+> > Link: https://lore.kernel.org/r/ZZ4fyY4r3rqgZL+4@xpf.sh.intel.com/
+> > Signed-off-by: David Howells <dhowells@redhat.com>
+> > cc: Edward Adam Davis <eadavis@qq.com>
+> > cc: Linus Torvalds <torvalds@linux-foundation.org>
+> > cc: Simon Horman <horms@kernel.org>
+> > Cc: Jarkko Sakkinen <jarkko@kernel.org>
+> > Cc: Jeffrey E Altman <jaltman@auristor.com>
+> > Cc: Wang Lei <wang840925@gmail.com>
+> > Cc: Jeff Layton <jlayton@redhat.com>
+> > Cc: Steve French <sfrench@us.ibm.com>
+> > Cc: Marc Dionne <marc.dionne@auristor.com>
+> > Cc: "David S. Miller" <davem@davemloft.net>
+> > Cc: Eric Dumazet <edumazet@google.com>
+> > Cc: Jakub Kicinski <kuba@kernel.org>
+> > Cc: Paolo Abeni <pabeni@redhat.com>
+> > ---
+> >  net/dns_resolver/dns_key.c |    2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/net/dns_resolver/dns_key.c b/net/dns_resolver/dns_key.c
+> > index f18ca02aa95a..c42ddd85ff1f 100644
+> > --- a/net/dns_resolver/dns_key.c
+> > +++ b/net/dns_resolver/dns_key.c
+> > @@ -104,7 +104,7 @@ dns_resolver_preparse(struct key_preparsed_payload =
+*prep)
+> >                 const struct dns_server_list_v1_header *v1;
+> >
+> >                 /* It may be a server list. */
+> > -               if (datalen <=3D sizeof(*v1))
+> > +               if (datalen < sizeof(*v1))
+> >                         return -EINVAL;
+> >
+> >                 v1 =3D (const struct dns_server_list_v1_header *)data;
+> >
+> >
+>
 
