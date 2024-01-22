@@ -1,77 +1,81 @@
-Return-Path: <netdev+bounces-64851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFE968374D5
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 22:06:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD6128374D6
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 22:06:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 259DDB27F3C
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 21:06:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C1A31F28077
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 21:06:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF62D47A74;
-	Mon, 22 Jan 2024 21:06:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA10347F51;
+	Mon, 22 Jan 2024 21:06:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="y2g78O8x"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="LRAz0WtU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BA6047A6C
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 21:06:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4464A47A6D
+	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 21:06:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705957584; cv=none; b=BViN3qKcKqyQqT5F3OzJBVbX0WOtVUIY6bUywQFL9ZiEZSuunRdBW5UT98XEfWF9OYHYATzqDWd0DC3HHkGTSWrjm0dzQTGBKovG5uucSGQXWUjylexLCVZW6zowlhdBOw6bZXJ/xDGuSUnz3AQgb9HtvXd2bHovEsimf2AjZJs=
+	t=1705957585; cv=none; b=Wiqr8Vp2POlQHDhBWdRGvjzxvi3Hd4ZSxBCMoQX9VS2wRr5kJkhzMzoF/+KzU9Bkp+BdysSHUHhStlYk39utmbMtMvPMfx4i1N/z3nd7Dxd4RMbq4Zn58UJJd5wIkawVmzDvcm+lJ7zHrJpM5EaEOLzpX9JKllmkkhbMDHMoB3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705957584; c=relaxed/simple;
-	bh=we2tJlnUQoyFBmXIgCxQKmIAvUO9WottmLs7Hg8P/E4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ArzRzy4k91GPTVwAAylI7UDCuEQj6nXrlNeGOcBcbCJep2ks+fNx6SImMBEQXFAANltLCTEapFYyFTE5/4z4Jo/ik4u9qq17d36+7qKhZoqR9mPgZT3VpsOWPfvSI31P8hEsqPq2Kt8oX+qEbqErTXSagb2cduPAUlH0zYTFV4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=y2g78O8x; arc=none smtp.client-ip=209.85.210.170
+	s=arc-20240116; t=1705957585; c=relaxed/simple;
+	bh=aCs6xZ7io6k23xvYEINaZLZhsHKRJayWapBNQtC1sQk=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Fy4pFwawy9iXayTiCKV+MZE27yZ97e1PUB85zH8wp0lK/X461ivxIKd8oaBxC/nW/XTBLhrKw5/vDds1pajfPiDZ10nk0KxKFEgRoOMPjwehGg0FOd1K7jLGGdkiBu08msbjMw7wUXSSK8bKTP4AzuHDjDlWeYNB90MtpGzfWS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=LRAz0WtU; arc=none smtp.client-ip=209.85.210.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-6db0fdd2b8fso1699169b3a.2
-        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 13:06:22 -0800 (PST)
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6dbd2e435d9so1359339b3a.1
+        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 13:06:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1705957582; x=1706562382; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=HqK1FfQSTBEOxDirrkwqtMCsYe2oUlNdNplmne1kglY=;
-        b=y2g78O8xNCgAGMk6eFrZCp4C6cG27eisJWVWL4kYgrC96wbvI2XXTOulggV+zUUvmO
-         R6yOXSegngxPs3/b8YohfD3hHgt/D/waif0VCfWezAOqNA4RnbdKJSKaLe8N94A2C2yN
-         /1mdWlGCoC9TBy2ChTeSVFwTKPu3oTQfq5SjEE9FycqAINxbtIe0TVTYt2TTXIE0aiS4
-         yoGZd24XvFF7/wNU2EJ2UPoiZj/WqbLiwA8UdsaFahS9DE1L6uCHRinPDCfO5DOQsMSB
-         l2LPHBVcXigM7jkx3Cp53XU8v/rTX+M3cS+6kSlDThwmnv1gZQjQ12GHT4wRE1742Pi7
-         R65w==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1705957583; x=1706562383; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WznYS3ekaQLBbh1QxiBqv2BassJWeck7jrnHfEWLJsA=;
+        b=LRAz0WtUld6/vRCxQzlCNUbxBEP3qXsB/QSx8qacl5MgHdW06vHmpIJlpMNj0DuDal
+         h/8wPhW7LHOWxWns878GQda41jozIOc9VPzB3zySrOjoOtHhg4WbBmbrg/6Ug1obiAc7
+         fMtR32d1wj0m7hOO5WL9m0WWiPNTdvkiTohzrDqGrO1b3vVzc25sPYxCHjK2VVOAjGry
+         7iZsFQ4oHRe0clKUr1cEjFk5zeJse1t4ozT8DDwTVUhwhUuc7/+B9iGkhFf038XzWY9D
+         QFoXLR+POPKnVCuX6bKgMResj2z7JTnQsFDjhVmco9Zv+GnvwKcJnILCPPhHraKMvWvS
+         lJxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705957582; x=1706562382;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HqK1FfQSTBEOxDirrkwqtMCsYe2oUlNdNplmne1kglY=;
-        b=B/C5Ma5C49nD88tFKZrtIi7vhvRhiMbwoBhiacnlHEdfRN/2sMcXXOqAFXyrtP7MPq
-         qYQih8Mo2j0K9FBhS9xR053ihiV2a8rGPcX+CUVNRLe71BGKnugXLij/W7Iaxk518IE7
-         dCxmorjWIwzdTxOAMupwgjX1CiMKmMv1plmRPSTsRd9QbDMt1/lBUcZ1Lx/+UTh7UJVT
-         lf98BXFPIG66OcylH7H8bGZb5sKwOddtAy8BSj1K9mt2jfG6IHoWD9Z3BqPqAzSrEnpL
-         0nzDzQjELfSeuS2qL7+QCTBqGwX/x7iidG+EPFfXzfXefKwkxxEobC1yWKMQzb4hhOJa
-         joFA==
-X-Gm-Message-State: AOJu0YwV18z3pL2L3vForSUSa8+YQXnc9sm6bVAIpl7B4rEcnO58Bz+P
-	el8ulE4OKL/rh8LrUye2p2ODPNUpSEc5ZTmxec3ibDWLOtSERSV8Zr7qlM25DMubwd/PTDhA3+f
-	xbA==
-X-Google-Smtp-Source: AGHT+IEW0MgItSwxpP5KjQQWiWGiX5KL6vM7jsoyOJi3Bul2XCKmGskeTtHpHs6UxT/61/AWU3yi/Q==
-X-Received: by 2002:a05:6a00:a0c:b0:6da:4d94:8838 with SMTP id p12-20020a056a000a0c00b006da4d948838mr3251865pfh.42.1705957581984;
-        Mon, 22 Jan 2024 13:06:21 -0800 (PST)
+        d=1e100.net; s=20230601; t=1705957583; x=1706562383;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WznYS3ekaQLBbh1QxiBqv2BassJWeck7jrnHfEWLJsA=;
+        b=c39j5HNJ2FO42fOs5ncdouysBe/eiU4cVf2f7te/WhbgFY+wI/vsc0+/tvuVhjDrr3
+         IpiXg0vOLo9XtHJujpYo8q2BZiA/i0XSbObm/O91TW86rU6Q8Xsqr3fojELrL7zGGxGf
+         42v5Q0/yNUCwXiX7ULlYbi9yNv2xLNlo3Nka2FZMcwj0LsVT0GPI3FvNcFFmCIm6ePvZ
+         by2pPqQ8FhMxyIDSg4ljA/jxBWJqXFSeuXEGn88kEej3OSjimJoJrCKtbfXXZtdAjWSX
+         5tgIFH06kMuQS8C6f2omnPQCe84YMnokjNK107LNfC80sFBkhhpZ7q8DlhP6264eFFpm
+         bs4w==
+X-Gm-Message-State: AOJu0YwoVUKInoz+jHLot5sDrooj/zjd82cQEQCSccPySyzeJ8iLIa0M
+	XMKgyLyCOLtjje40+8YEAvihNssT+31unvo4scZPWO+ry9Cran4CLKJB1cPp6yQEbYwa4bntPNG
+	Yjw==
+X-Google-Smtp-Source: AGHT+IFOZrPMCXkB6IsNkOo/v+aQlU7WCYqj2ZSFL5ecML6TWl0NoAHDy+ahR76X0YOO0E/1dIzRfw==
+X-Received: by 2002:a05:6a20:43a1:b0:19a:5ced:3c22 with SMTP id i33-20020a056a2043a100b0019a5ced3c22mr2601009pzl.21.1705957583487;
+        Mon, 22 Jan 2024 13:06:23 -0800 (PST)
 Received: from rogue-one.tail33bf8.ts.net ([201.17.86.134])
-        by smtp.gmail.com with ESMTPSA id r11-20020a056a00216b00b006dbce4a2136sm4559306pff.142.2024.01.22.13.06.20
+        by smtp.gmail.com with ESMTPSA id r11-20020a056a00216b00b006dbce4a2136sm4559306pff.142.2024.01.22.13.06.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jan 2024 13:06:21 -0800 (PST)
+        Mon, 22 Jan 2024 13:06:23 -0800 (PST)
 From: Pedro Tammela <pctammela@mojatatu.com>
 To: netdev@vger.kernel.org
 Cc: Pedro Tammela <pctammela@mojatatu.com>
-Subject: [PATCH iproute2 0/2] some musl fixes
-Date: Mon, 22 Jan 2024 18:05:44 -0300
-Message-Id: <20240122210546.3423784-1-pctammela@mojatatu.com>
+Subject: [PATCH iproute2 1/2] color: use empty format string instead of NULL in vfprintf
+Date: Mon, 22 Jan 2024 18:05:45 -0300
+Message-Id: <20240122210546.3423784-2-pctammela@mojatatu.com>
 X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20240122210546.3423784-1-pctammela@mojatatu.com>
+References: <20240122210546.3423784-1-pctammela@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,17 +84,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Fix subtle differences between musl and glibc which are
-causing iproute2 to crash in Alpine Linux.
+NULL is passed in the format string when nothing is to be printed.
+This is commonly done in the print_bool function when a flag is false.
+Glibc seems to handle this case nicely but for musl it will cause a
+segmentation fault.
 
-Pedro Tammela (2):
-  color: use empty format string instead of NULL in vfprintf
-  bpf: include libgen.h for basename
+The following is an example of one crash in musl based systems/containers:
+   tc qdisc add dev dummy0 handle 1: root choke limit 1000 bandwidth 10000
+   tc qdisc replace dev dummy0 handle 1: root choke limit 1000 bandwidth 10000 min 100
+   tc qdisc show dev dummy0
 
- lib/bpf_legacy.c | 1 +
- lib/color.c      | 2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
+Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
+---
+ lib/color.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/lib/color.c b/lib/color.c
+index 59976847..027e1703 100644
+--- a/lib/color.c
++++ b/lib/color.c
+@@ -143,7 +143,7 @@ int color_fprintf(FILE *fp, enum color_attr attr, const char *fmt, ...)
+ 	va_start(args, fmt);
+ 
+ 	if (!color_is_enabled || attr == COLOR_NONE) {
+-		ret = vfprintf(fp, fmt, args);
++		ret = vfprintf(fp, fmt ?: "", args);
+ 		goto end;
+ 	}
+ 
 -- 
 2.40.1
 
