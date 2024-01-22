@@ -1,163 +1,111 @@
-Return-Path: <netdev+bounces-64711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C68B9836C62
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:04:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FF9B836C6A
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:04:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBD2E1C22F33
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 17:04:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 066C2286693
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 17:04:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07EF1487A8;
-	Mon, 22 Jan 2024 15:46:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B89C60B85;
+	Mon, 22 Jan 2024 15:47:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="ef6wev5c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fu5qJG7R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01BF74879B
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 15:46:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07122487AC;
+	Mon, 22 Jan 2024 15:47:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705938381; cv=none; b=ubCCmY7puGUNEwSwULHS501MkiofLuOf29tURknlmk5bnz2CHu50y/JeIGk9o0fUGEfxryxwPZCg/u6b6lk7U2lH12oPB40xGrKL4Hhgf4LPLVJ1Cp94G6RsmyLSy6sD2H32etl3DqFP/2ASTeJSjRC94UXs2uk0QvFbCff56Wo=
+	t=1705938431; cv=none; b=Kq9GZcIWcEEihMYmyXr6a4V2ssSqibDasTkZN9oUht3/qefhZ81V55p7QVKF65USCiY8dmad7SHZ7NikgjyvUiMLvWdvTyTOfVqOKGmvzrq4YRxg033GyYLHYwWUdhWhEiYMn3/bYsy9FW9vb7ajXMscEzDoQakV5UVKmjZ4snw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705938381; c=relaxed/simple;
-	bh=Q3IypqO28Yb+DzzwNtttB/UgiMayE/ppZJQHO2Ue42Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=s4bUTPdGN5tvCMYMFx5HXtiIer5AaexQheOcdGX8iwF/gz3R4aFOAU7hYaFy5Ki7Of6fIN8g/VNyStg21lYgPMvChwyPgP3ffSFEDZGyaaBHhqCHoNJKGhhEuuW8PMKmKwLz03QiB4lGFTCg3wAe1zR30rUj3vh+04oNHIJtpyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=ef6wev5c; arc=none smtp.client-ip=209.85.208.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2cd3aea2621so8118171fa.1
-        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 07:46:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1705938378; x=1706543178; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KDiX8deGBaeQY+VXPZTuQ9WcGTvy4qXQiQeT5miW9vM=;
-        b=ef6wev5cD24ZsEafC+CE9jVPmssf3b9Ylzw9o5PP3yu66YDIIVBP29cUEsr3cdOA2z
-         RSOEbncDECOK/kyVkzOOWYCyd3E6ylUx72ROCfLI8NDlUHnDJsLI/WRmN/bglEzfGWtH
-         DACMMwzfig7aYcf6L2I8BNoZ8Q8OvrS9gp2vr0HuMxCBRGH+tOng1Nwl7jXYJeYfGhbY
-         0GfWlkag7hQgHZ55OFXru/gAWDx+o3B0W7RrEF0VjlozdfXAMk2H/fR+d83HFYGkW2Yd
-         oyOGns0yV/WUHll2uAXPktUP/DUYcWbtMXzJdJMMX82Xmf4VzOzOXhEMKlxHDPQwfvwr
-         HucA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705938378; x=1706543178;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KDiX8deGBaeQY+VXPZTuQ9WcGTvy4qXQiQeT5miW9vM=;
-        b=GOx6UXq9+KAwrfFcWgwZzqqfu5hXvChL8UuRUoMVPNRbTb/qfIOtffe3A3GKhLOa4N
-         WcKglUB1kaWG27Icv9iieLrh3oQiIcwg5V9FLGtHGqKWjeJ9KxWKq9hscOOH3uodfux2
-         L0D8HLMgJrA9FkNABqTl9c54plxkTyBQyn/yvXbNbDCIQzi2GvHzDtnZoQ5Zpt4ylVDk
-         WVnygyp6sJmOi0leUcmBm2aVenH9GYEidjGVbDExit/axEWbPZ2wXcZu+WDOMa+1Icmj
-         3Gm/grhMUleNOZvrCkm4BrGT/xkV/hzUER+YiWg4M7rVBVlicdFVT6dAsHdOayfbgJzs
-         PWUQ==
-X-Gm-Message-State: AOJu0Yw49tkho5J2s/aYFGWwITNJe/o/unyhw90e6VjzgWDeSsx9r6pD
-	K6iQw9n1BYClLGgwWTQT9IUieTWMycVyPips19xxgjvsa2TiiscTg344qAfYN9jP4n/jTH5bqGL
-	sGOHLw6qcP7n7N1t+COhC8zrUggXUJlp/vcOmjw==
-X-Google-Smtp-Source: AGHT+IEkmusRehyV+4kG4FZHYzdhCSAz/ElpZ5e9RTnc5yZ4R3DvkXekQLsBvVN/CUhhjcBnlR7vkc81fjOIcU+Hji0=
-X-Received: by 2002:a2e:3212:0:b0:2cd:94f2:673d with SMTP id
- y18-20020a2e3212000000b002cd94f2673dmr4146250ljy.0.1705938377923; Mon, 22 Jan
- 2024 07:46:17 -0800 (PST)
+	s=arc-20240116; t=1705938431; c=relaxed/simple;
+	bh=MeeGlkv76uplWomLg9ocLHv3pnCOcFvMEIpYsPtsuKo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ff+cJ1jD+dphummLsMBjhywVh3YGumIoHrZqxKhkIm0iUyjARHFuPcxy+G5kNvqy3bL3+CKKzEzXp2eWgoqs1HfM2BFV7F+xEKhwdQs2Igm/eR6VXi5umAeonLQrFh9q1khebXEtKelbnUZRgWVEFo7LIFx/xFnWXW/jaA1DGbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fu5qJG7R; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEB36C43390;
+	Mon, 22 Jan 2024 15:47:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705938430;
+	bh=MeeGlkv76uplWomLg9ocLHv3pnCOcFvMEIpYsPtsuKo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fu5qJG7RkhmQ6jgIor5MANwY+t4GvT6yVQsN1DGTMGXKHe9StM1utWQISbbVvd4ac
+	 B1juEMTY3B1GRWCbOe25U9Rr5uCnTDL1xmJ/yWTVXfPM0zCCKa3j9/sQiZCxGooeM9
+	 iMjZ65xo3ahoMRi85ydV+lr0KflLGBU98Ga5NC+ueAdxgXb5eMu34ild0NwwsR7sf0
+	 oAueXHeCXhks5ui/INetc73O1gkav8kikNXkXqCDAmWWe8iNDwYl1KfxKfVoez11Mq
+	 HXJlAKaAHDgVSvShgmDTArxM1ApWambu8Ki5e2/6suTJWJNyQAGcsC93zGNmh4aeJ/
+	 PeL9/w6ECTJwg==
+Date: Mon, 22 Jan 2024 15:47:04 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: linux-riscv@lists.infradead.org,
+	Conor Dooley <conor.dooley@microchip.com>,
+	Daire McNamara <daire.mcnamara@microchip.com>,
+	Wolfgang Grandegger <wg@grandegger.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org
+Subject: Re: [PATCH v2 2/7] dt-bindings: can: mpfs: add missing required clock
+Message-ID: <20240122-duplicate-nutrient-0edf5dfc9c93@spud>
+References: <20240122-catty-roast-d3625dbb02fe@spud>
+ <20240122-breeder-lying-0d3668d98886@spud>
+ <20240122-surely-crimp-ba4a8c55106d-mkl@pengutronix.de>
+ <20240122-cruelly-dainty-002081f0beb2@spud>
+ <20240122-smokeless-ion-63e4148c22e5-mkl@pengutronix.de>
+ <20240122-uncoated-cherub-a29cba1c0035@spud>
+ <20240122-pogo-reputable-b1d06ae1f1f1-mkl@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240116193542.711482-1-tmenninger@purestorage.com>
- <04d22048-737a-4281-a43f-b125ebe0c896@lunn.ch> <CAO-L_44YVi0HDk4gC9QijMZrYNGoKtfH7qsXOwtDwM4VrFRDHw@mail.gmail.com>
- <da87ce82-7337-4be4-a2af-bd2136626c56@lunn.ch> <CAO-L_46kqBrDdYP7p3He0cBF1OP7TJKnhYK1NR_gMZf2n_928A@mail.gmail.com>
- <20240122123349.cxx2i2kzrhuqnasp@skbuf> <1aab2398-2fe9-40b6-aa5b-34dde946668a@lunn.ch>
- <20240122151251.sl6fzxmfi2f6tokf@skbuf>
-In-Reply-To: <20240122151251.sl6fzxmfi2f6tokf@skbuf>
-From: Tim Menninger <tmenninger@purestorage.com>
-Date: Mon, 22 Jan 2024 07:46:06 -0800
-Message-ID: <CAO-L_45_nZ24pvycdahEy0OP2tZjxCw40_o6HE-_C4jmsX3b8g@mail.gmail.com>
-Subject: Re: [PATCH] net: dsa: mv88e6xxx: Make *_c45 callbacks agree with
- phy_*_c45 callbacks
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, f.fainelli@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Jan 22, 2024 at 7:12=E2=80=AFAM Vladimir Oltean <olteanv@gmail.com>=
- wrote:
->
-> On Mon, Jan 22, 2024 at 03:30:20PM +0100, Andrew Lunn wrote:
-> > On Mon, Jan 22, 2024 at 02:33:49PM +0200, Vladimir Oltean wrote:
-> > > On Tue, Jan 16, 2024 at 05:51:13PM -0800, Tim Menninger wrote:
-> > > > My impression is still that the read_c45 function should agree with=
- the
-> > > > phy_read_c45 function, but that isn't a hill I care to die on if yo=
-u still
-> > > > think otherwise. Thoughts?
-> > >
-> > > FWIW, Tim's approach is consistent with what drivers/net/mdio/mdio-mu=
-x.c does.
-> > >
-> > >             if (parent_bus->read)
-> > >                     cb->mii_bus->read =3D mdio_mux_read;
-> > >             if (parent_bus->write)
-> > >                     cb->mii_bus->write =3D mdio_mux_write;
-> > >             if (parent_bus->read_c45)
-> > >                     cb->mii_bus->read_c45 =3D mdio_mux_read_c45;
-> > >             if (parent_bus->write_c45)
-> > >                     cb->mii_bus->write_c45 =3D mdio_mux_write_c45;
-> > >
-> > > My only objection to his patch (apart from the commit message which
-> > > should indeed be more detailed) is that I would have preferred the sa=
-me
-> > > "if" syntax rather than the use of a ternary operator with NULL.
-> >
-> > I agree it could be fixed this way. But what i don't like about the
-> > current code is how C22 and C45 do different things with error
-> > codes. Since the current code is trying to use an error code, i would
-> > prefer to fix that error code handling, rather than swap to a
-> > different way to indicate its not supported.
-> >
-> >         Andrew
->
-> You did write in commit da099a7fb13d ("net: phy: Remove probe_capabilitie=
-s")
-> that the MDIO bus API is now this: "Deciding if to probe of PHYs using
-> C45 is now determine by if the bus provides the C45 read method."
->
-> Do you not agree that Tim's approach is the more straightforward
-> solution overall to skip C45 PHY probing, given this API, both code wise
-> and runtime wise? Are there downsides to it?
->
-> I have no objection to the C22 vs C45 error code handling inconsistency.
-> It can be improved, sure. But it also does not matter here, if we agree
-> that this problem can be sorted out in a more straightforward way with
-> no negative consequences.
->
-> I sort of don't understand the desire to have the smallest patch in
-> terms of lines of code, when the end result will end up being suboptimal
-> compared to something with just a little more lines (1 vs 4).
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="ZlbIajEJ0GsLUYlg"
+Content-Disposition: inline
+In-Reply-To: <20240122-pogo-reputable-b1d06ae1f1f1-mkl@pengutronix.de>
 
 
-Andrew, would you feel differently if I added to the patch the same
-logic for C22 ops? Perhaps that symmetry should have existed
-in the initial patch, e.g.
+--ZlbIajEJ0GsLUYlg
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-    bus->read =3D chip->info->ops->phy_read
-        ? mv88e6xxx_mdio_read : NULL;
-    bus->write =3D chip->info->ops->phy_write
-        ? mv88e6xxx_mdio_write : NULL;
-    bus->read_c45 =3D chip->info->ops->phy_read_c45
-        ? mv88e6xxx_mdio_read_c45 : NULL;
-    bus->write_c45 =3D chip->info->ops->phy_write_c45
-        ? mv88e6xxx_mdio_write_c45 : NULL;
+On Mon, Jan 22, 2024 at 04:31:32PM +0100, Marc Kleine-Budde wrote:
+> let's get this binding and the CAN driver upstream!
 
-Vladimir, as far as style I have no objections moving to straightlined
-if's. I most prefer to follow the convention the rest of the code follows
-and can change my patch accordingly.
+FWIW, the driver seems to be in a good state (or as good as it can to
+someone unaware of the goings on of CAN). Hopefully the author gets
+a chance to send it out soon.
+
+Cheers,
+Conor.
+
+
+--ZlbIajEJ0GsLUYlg
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZa6N+AAKCRB4tDGHoIJi
+0h2VAP4w9AGyt9LMjr1fxyGbb5m1B484LsXBg9uqxe4Tx/FZsQD9GwDu25MWq/sI
+nV0HlY2+IRQ8+nMMpcWLtXqwCGwB0w4=
+=MXC9
+-----END PGP SIGNATURE-----
+
+--ZlbIajEJ0GsLUYlg--
 
