@@ -1,273 +1,166 @@
-Return-Path: <netdev+bounces-64760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35374837208
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 20:12:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D11E837231
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 20:16:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3DD56B397A0
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:47:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A3884B22EE5
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:46:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DEAD56B8C;
-	Mon, 22 Jan 2024 18:10:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93CCC3A8F9;
+	Mon, 22 Jan 2024 18:09:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="adz3Xybl"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2073.outbound.protection.outlook.com [40.107.244.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0F154A990
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 18:10:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705947046; cv=none; b=YiV0GwESAqZ9GGTxJ9FiOzKjrHveow6SmNMvzb/CspyyCgIhUQFjVHNCIrlY4XPfY71tNInXW0NT/wkFjAl0sYgkNHMqm9a+ECNTl7s7IV3uIj3U04woGWzJ6Rkg3t7L0133Vu1vqZefEzb+Zz5jFZYwPvfd2ZkV27mrGHSaFTU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705947046; c=relaxed/simple;
-	bh=r4hNLx1axTK9D2SO1h2Nidy6wdhcdwS0oI6JMP4mupU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TMpEHPbYb2QyusMswqKzXAZOlWUQhUny4RxzxjoeQ5HBlFMrfdh2XGzkL17XA8vdNmCUfDlnU0cIZB99Lz2IpfmBVdiwVZ8xph+d7IN1LRcxgeFqVsAVfkC3E1rGSSI27+5VJJIrvmDheOxi2UErHoONMQ9kpwCYX2ky1jSB7dU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1rRyiY-0001lP-N0; Mon, 22 Jan 2024 19:08:18 +0100
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1rRyiS-001ePE-PM; Mon, 22 Jan 2024 19:08:12 +0100
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1rRyiS-005Zwj-1m;
-	Mon, 22 Jan 2024 19:08:12 +0100
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To: Mark Brown <broonie@kernel.org>
-Cc: kernel@pengutronix.de,
-	Moritz Fischer <mdf@kernel.org>,
-	Wu Hao <hao.wu@intel.com>,
-	Xu Yilun <yilun.xu@intel.com>,
-	Tom Rix <trix@redhat.com>,
-	linux-fpga@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Lars-Peter Clausen <lars@metafoo.de>,
-	Michael Hennerich <Michael.Hennerich@analog.com>,
-	Jonathan Cameron <jic23@kernel.org>,
-	linux-iio@vger.kernel.org,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	linux-input@vger.kernel.org,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Rayyan Ansari <rayyan@ansari.sh>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Martin Tuma <martin.tuma@digiteqautomotive.com>,
-	Mauro Carvalho Chehab <mchehab@kernel.org>,
-	linux-media@vger.kernel.org,
-	Sergey Kozlov <serjk@netup.ru>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Yang Yingliang <yangyingliang@huawei.com>,
-	linux-mmc@vger.kernel.org,
-	Richard Weinberger <richard@nod.at>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Rob Herring <robh@kernel.org>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Michal Simek <michal.simek@amd.com>,
-	Amit Kumar Mahapatra via Alsa-devel <alsa-devel@alsa-project.org>,
-	linux-mtd@lists.infradead.org,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	=?utf-8?q?Pali_Roh=C3=A1r?= <pali@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Ronald Wahl <ronald.wahl@raritan.com>,
-	Benson Leung <bleung@chromium.org>,
-	Tzung-Bi Shih <tzungbi@kernel.org>,
-	Guenter Roeck <groeck@chromium.org>,
-	chrome-platform@lists.linux.dev,
-	Max Filippov <jcmvbkbc@gmail.com>,
-	linux-spi@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	linux-arm-msm@vger.kernel.org,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-mediatek@lists.infradead.org,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Javier Martinez Canillas <javierm@redhat.com>,
-	Amit Kumar Mahapatra <amit.kumar-mahapatra@amd.com>,
-	dri-devel@lists.freedesktop.org,
-	linux-fbdev@vger.kernel.org,
-	linux-staging@lists.linux.dev,
-	Viresh Kumar <vireshk@kernel.org>,
-	Rui Miguel Silva <rmfrfs@gmail.com>,
-	Johan Hovold <johan@kernel.org>,
-	Alex Elder <elder@kernel.org>,
-	greybus-dev@lists.linaro.org,
-	Peter Huewe <peterhuewe@gmx.de>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	linux-integrity@vger.kernel.org,
-	Herve Codina <herve.codina@bootlin.com>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Aaro Koskinen <aaro.koskinen@iki.fi>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	linux-usb@vger.kernel.org,
-	Helge Deller <deller@gmx.de>,
-	Dario Binacchi <dario.binacchi@amarulasolutions.com>,
-	Kalle Valo <kvalo@kernel.org>,
-	Dmitry Antipov <dmantipov@yandex.ru>,
-	libertas-dev@lists.infradead.org,
-	linux-wireless@vger.kernel.org,
-	Jonathan Corbet <corbet@lwn.net>,
-	James Clark <james.clark@arm.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	linux-doc@vger.kernel.org
-Subject: [PATCH v2 00/33] spi: get rid of some legacy macros
-Date: Mon, 22 Jan 2024 19:06:55 +0100
-Message-ID: <cover.1705944943.git.u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 237533FB26
+	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 18:09:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.73
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1705946958; cv=fail; b=md3iaTLQKX1B8Uw2OBEguPDX+YOhzbqEcysV+dMuuD0kqZBfjSJhEi8qhQO6Htx1k8/lZUs+eQkSJfV0g+3P7zIXI4Yvf6AU+fzmZiriy63eU0+PEhIUKyuhzJGH1c8+ar/rKX0HMPms/frVs2pBjiSuvrpqJJDdYTpZp76yaXA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1705946958; c=relaxed/simple;
+	bh=8AZY3YlgiA9kH2v5rBiG4w8vICpqvwJwhbxgp+C2jBk=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
+	 Content-Type:MIME-Version; b=hp+zfI8vl1z6lvLjmE5/SmyG6vaa7G6loJgdBRdUaR5NMi+aPNXFObOYxh3COKP5i0y6e9cYG1KFPGvq4XSJksQMIdKsNCDk+kQEdMkaAHbCQ1Q6qW6P7MV9VIelkhNZ3kySvgvAGQWNEPHz+gQi6sE9z1oWdSYkXpFjBSA7mIk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=adz3Xybl; arc=fail smtp.client-ip=40.107.244.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iBsE2RQnEYjS5WFdIkPlkhvJWhTfT0DUMLwjpb7adFsyadexxWaFHRvPtBgyteGNigosqYJ+aZ/GdiHf31+Etd/UUsESSiDg9nkm2zf/PZQtbEBLOgRrxOqNdhf034jQf7pcLs9tK9nCJrmzU1KjZw8LrlpCqHzS/TuBU3uF51GRhnaCNbP2/vCaPZ+/B616xwUp2GQj5Rck3GIzIguEyf70pM9e84Kv2M9WnPHhY6hqrb9SWKQb7UdzmFOZlBhV9953a8H2dsuA960WV02z+hSyZG+QPsZ1z8piFhE9oXVg1d6ZemJOSlvfKcPzHY1054zEbx4x9uprpAz8EG9m2g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8AZY3YlgiA9kH2v5rBiG4w8vICpqvwJwhbxgp+C2jBk=;
+ b=RemdiYgu06HFsn869Ny8on8UZXiHXEDUbGS7sNhb0wCa+ts0MUDEccl/+42vcznm+mGDpCcibH9FngjmIFhvQ8kkmOBQoOVQDFcZMoK41eQZK4KFqkLzcGWrSPrcwMqmROih4n1Cg2Zd1v90Z4rXn1wQ79mPrJixXGRU2/Q8Vf8akuwXuREcbHTqUGrzQlnwBzzIM9sTSw/Pw8egn7A4SD4mmJ5uMIP00m7pCD+twzmt63L+TVzcHK7j993fuVCP8YPBJJj2eld+08cUWPD++DQTTAvWEsrY8fEelfYP3MM175OOXvGeaLWHJFjRh7OLsOVTnqXIBExU7uzcPdMk8Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8AZY3YlgiA9kH2v5rBiG4w8vICpqvwJwhbxgp+C2jBk=;
+ b=adz3XyblKELtBYAHjTVt7+dl2ky3Jq3CAC1ivOjW1gYTd3171TeiVxHdgDwkL0SOWbS76WiBw6fSKaZu6hz2H3seN+ClgYNIX9Yia+NH2TTvZ+85H2NsvXu2hwpybEeVyqoyA/mt3ubp1dHJBVRlssNM6kP/MQ54Kfk68ehJxLBeZnq+fueYyqH8WvQ7MT+CXPwv0dH6X6dmeN5erQoDwzjuSeuTuMvj990KztZuYoYORmFUYfTOz3E+lcUpgx9hsoB67iBXUlYIzBeZB1WSSJrrmLCy+mNLvbOiKkQnZ9I/oYpBvlJ0WHsuaPtzYTiFRemJ2ZwEHG7IOssmwdp5Ng==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
+ by CY5PR12MB6551.namprd12.prod.outlook.com (2603:10b6:930:41::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.32; Mon, 22 Jan
+ 2024 18:09:14 +0000
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::d726:fa79:bfce:f670]) by BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::d726:fa79:bfce:f670%6]) with mapi id 15.20.7202.031; Mon, 22 Jan 2024
+ 18:09:14 +0000
+References: <20240118191811.50271-1-rrameshbabu@nvidia.com>
+ <20240118191811.50271-2-rrameshbabu@nvidia.com> <Zazj5KI7BZPnLoc2@hog>
+User-agent: mu4e 1.10.8; emacs 28.2
+From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Gal Pressman <gal@nvidia.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
+ <edumazet@google.com>, Radu Pirea <radu-nicolae.pirea@oss.nxp.com>, "David
+ S . Miller" <davem@davemloft.net>
+Subject: Re: [PATCH net v2 2/2] net: macsec: Only require headroom/tailroom
+ from offload implementer if .mdo_insert_tx_tag is implemented
+Date: Mon, 22 Jan 2024 10:06:58 -0800
+In-reply-to: <Zazj5KI7BZPnLoc2@hog>
+Message-ID: <87le8hgrzq.fsf@nvidia.com>
+Content-Type: text/plain
+X-ClientProxiedBy: BY5PR04CA0010.namprd04.prod.outlook.com
+ (2603:10b6:a03:1d0::20) To BYAPR12MB2743.namprd12.prod.outlook.com
+ (2603:10b6:a03:61::28)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5874; i=u.kleine-koenig@pengutronix.de; h=from:subject:message-id; bh=r4hNLx1axTK9D2SO1h2Nidy6wdhcdwS0oI6JMP4mupU=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlrq7CRGL5rco/IZ7baQyO1t3S9it11eXvRLZKR GbQbTfz3/2JATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZa6uwgAKCRCPgPtYfRL+ TlSmB/4k7WiBaRL3saK9pl+Gkw8Hqk7HVFstVTQ/rkaYbIsJGY0xZw8/1EJjSObFeB+APA4aMQh I79wzfj/BAi6u9wIsVNiQ9y/G7wHtwifXCuuRBAfRSQICGNo++YWb4VjoViqUrlwFz1on55YRHO fF0At9RAUzuTpDwaPQlercYTSV2fRZOyE6oFjYu50ibPS5RDRAlt5RMXKu+KeNvZIt1a7rYblZd 3X+5IV8boWAzqfA2x+ESE9bxy64tcf4U55YuI4LIo7T/6pTUUmJEXiJK3Hqi+KdRcDIt0RoY0Co KLQSX3Yu+cnQoWcdVVqzWe5P2RjCFOxbxIHkvh+IxoWx5PzK
-X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|CY5PR12MB6551:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1fab78ff-4206-41cb-d528-08dc1b753dd9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	7j1rQ90uR9SEJhkMQbuRIKj50R3RdyKbEbj4MbjT1LvyafvArLUv9N05JmtRmP8pZmoWGHoKnaIhTMC5gKWMFrs7GXHU9IrFwZsYAVBHA4VNnQTZUf6+2rZMbN7ByWthGP3fXik7jnsz3PXOKd5Naelp1n6hPeJKw/0L+W5VJb4qpL5HAyCiQpEIXA8ivYt8FMOHWbVHUZYsaztEIyiOLzW6x/sffeC7q2N4GirQBVnIiDefd8RyLBecb9dU5y6KSPotDchW3o9JmMrQpF+KzGF41SGQXE06zmp8lWqsJWepZbjpBlyShXLTkIorM5sS4lbtsKmGe0503xT/6nD9wY0euoIr0HQTIrcZzqh+RXvc6FEKo70Hn3qMIuKA/wdY8X3E6BQgQIisDHqFi2YjjT101d8aM8YKYT/NgdEL1VeiPTHif+3nuc15sCFh7WzQLoIAeI3ZFv3Z1tShfyoXVQpdvxzANvv4TOaVTIL7eNNZxhem6Tt554gf6qVr22h55Zyv764MxXbN0wX8xLbIQVagm+AfdJjv4Zutl/3RTnP0hUYXfjC35yeoI9f22Cby2zHmmxbeqp9vOHaT1HLt+mQ9KNjClMaifnFy04nlX05eu9yJJyogdWzyiF+RU5RBjBzuby3TQDgymJ2n+ZOBew==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(376002)(136003)(396003)(39860400002)(366004)(230922051799003)(186009)(1800799012)(451199024)(64100799003)(38100700002)(36756003)(86362001)(26005)(2616005)(66946007)(8676002)(6486002)(66556008)(478600001)(966005)(8936002)(6666004)(316002)(6506007)(6512007)(66476007)(54906003)(6916009)(83380400001)(2906002)(4326008)(41300700001)(5660300002)(142923001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?wgvcoJ7+ykXeK6fBbD1J/TX8/Y7Q0DId1L7mMJnnyE2zHBYkRB/CpjZ2LP3g?=
+ =?us-ascii?Q?E0g7BsFAsPL8l6LpuRPADcT2Ud0vUyhdGqySt6ttO8ISChrPevjNa1WG5fSc?=
+ =?us-ascii?Q?AWvd/DaBerOtDAeL/NX/imMslGp5wSOmhNisTxCK+kZAdaNxFn7T0HVP54N8?=
+ =?us-ascii?Q?PtJA6zEL8RBFdtCV3eaB279CJDE6aRu3xWZM+2Kqq4KLCV92XyDtaYzC2YHc?=
+ =?us-ascii?Q?wzPYgD5hzgbozXdcsK0gaUZVDRM80rDmKXba5pTozXSM00soY/flM6CKSa+t?=
+ =?us-ascii?Q?jRHNh+G2J+qmcNb0So4tAG6m8AfDKtGgjkdbFAhBPainHhXRoFM2/zZFV5Fu?=
+ =?us-ascii?Q?9zD9yvPepQyi5xc0iXUcU3zpe2QmzrSPG17k4Xo3HbjrryT4D6kOTDj3RpTN?=
+ =?us-ascii?Q?XxnV85h7h7Z+39P4Vzesirs4gghRtYyrQNI5cFFMyMseTpUYW0gjEr88lFVb?=
+ =?us-ascii?Q?ImSTpZlnePSm94K1c2ePd4dfAIpJYDlPgDEQQTLY4NbcamOMTeH1TN9jdsmu?=
+ =?us-ascii?Q?3RBcTUtU9yQHPl7cz3MNRCvSVwuMZ295pKBuVaOjK6Lgzj8fxHGCRNlRLQG8?=
+ =?us-ascii?Q?7Q7QaD4yVmNe6Xd5RhKRk0Bob+8/WjG6vk8QCLCZO8WWLr6K9O2U3u0VlZ8M?=
+ =?us-ascii?Q?Z/DfYGGi1juY4x/f7+2vc15TAn/4FdW6ly5C07aX9ztL9rG2qJvaA/YXsfk6?=
+ =?us-ascii?Q?ov+tLnBxJP0unnEIZLG9acR5n37+IapG/OSeM02x79Pk7UycrZQ29unk4HFv?=
+ =?us-ascii?Q?iLeJYmN1N+tWIjcuo+YZEh1SARXs23SyHQhAJGO0jBAMYrlkdSv6xu5kLLza?=
+ =?us-ascii?Q?h0RqZhEB9xgbIrwJ0sFQyne23c7z6Sl0Yk9uibHfNCm64kuVboUq8o4iAlo+?=
+ =?us-ascii?Q?gwrDTvRMkW6Btxjebaak8uSk5Zwj1BKkUg0vpauCFyGzbrHlgFY+3xEmxN2L?=
+ =?us-ascii?Q?z+z5zF7d34rO1yfhXDzebnORVjd9WxBywQXak1aPTksaKBLKnXjQHVFBRGHw?=
+ =?us-ascii?Q?vxeyPZG45gQvzkER3xX6R+Pb4Qt2KJu0SMXbxoJh8naUdba3PswiEjgKvyeQ?=
+ =?us-ascii?Q?nDrOmSFBj53+gNOlMpHf5NRPwJ6eNiKKUJ1lk2UFWyhbpNhGFxzQZWhJ71z4?=
+ =?us-ascii?Q?t7VakPzivXCM8T8YXTUXDmNxbrkDLlzrNlSqovKN6YQhtNXhonOHR4fEG+Xx?=
+ =?us-ascii?Q?Dh8c8eV1+PSUyfsnqSr5WOAzn9Z9imtoZiRoYuyoAbCwonq+gsT7USowzGNT?=
+ =?us-ascii?Q?11P6AYCwPaE7LGwvx3L6V4P5qm4leWlylwMn2+cn2YpSjwOOl5RR8rq406ni?=
+ =?us-ascii?Q?prPkuCM/GJYlyL1V2RE/MhA0kKfp3+JeMRM9bgKCSOiq0H8uXyyeH0SNbJOQ?=
+ =?us-ascii?Q?LsPYcH8uMEzI5vEOdH7tTw918/nxJzjZaKd+Q9WjY9sXkFGW5rdvLNEKOpmJ?=
+ =?us-ascii?Q?eWimcJrIlGPsoD8VMv+EP9wad+1oh+OInc1oc96WTB3sG8lniWrF4AOtc/st?=
+ =?us-ascii?Q?PLeFEqqmYXFNpMg//yEFzG4cJVEZChEYjVT53AEixVHqaTLtqVFMEtwJMLrE?=
+ =?us-ascii?Q?FafDJjNYY2SDmLIxDWtWa1sdsQwjwPzjjg7OsWoQ40LIXwY1VBVmEx4AhQ5o?=
+ =?us-ascii?Q?ZA=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1fab78ff-4206-41cb-d528-08dc1b753dd9
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jan 2024 18:09:14.3944
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: vl9bNXEBUXm5tGpgiv31XMcEW5Ogu3X+h6zBoZGqhqn/KY+axbXBhwU8lyC4ciRwOj2v2QTIZmY1P3aFi/mrxw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6551
 
-Hello,
+On Sun, 21 Jan, 2024 10:29:08 +0100 Sabrina Dubroca <sd@queasysnail.net> wrote:
+> 2024-01-18, 11:18:07 -0800, Rahul Rameshbabu wrote:
+>> A number of MACsec offload implementers do not implement
+>> .mdo_insert_tx_tag. These implementers also do not specify the needed
+>> headroom/tailroom and depend on the default in the core MACsec stack.
+>
+> FWIW, I had the same concern when Radu submitted these changes, and he
+> answered that the extra room was only needed for SW, not for offload:
+> https://lore.kernel.org/all/a5ef22bc-2457-5eef-7cff-529711c5c242@oss.nxp.com/
 
-this is v2 of this patch set.
+Thanks, this conversation was helpful.
 
-Changes since (implicit) v1, sent with Message-Id:
-cover.1705348269.git.u.kleine-koenig@pengutronix.de:
+>
+> I'm not really objecting to this patch, but is it fixing a bug? If so,
+> it would be useful to describe the problem you're seeing in the commit
+> message for this change.
 
- - Rebase to v6.8-rc1
- - Fix a build failure on sh
- - Added the tags received in (implicit) v1.
+It isn't. I was not sure if other drivers depended on the default
+headroom/tailroom set by the MACsec stack.
 
-The slave-mt27xx driver needs some more work. The patch presented here
-is enough however to get rid of the defines handled in patch 32.
-Cleaning that up is out-of-scope for this series, so I'll delay that
-until later.
+>
+> Does your driver require the default headroom/tailroom?
+>
 
-Note that Jonathan Cameron has already applied patch 3 to his tree, it
-didn't appear in a public tree though yet. I still included it here to
-make the kernel build bots happy.
+mlx5 does not. I am very open to dropping this patch in the series.
 
-Best regards
-Uwe
+--
+Thanks,
 
-Uwe Kleine-König (33):
-  fpga: ice40-spi: Follow renaming of SPI "master" to "controller"
-  ieee802154: ca8210: Follow renaming of SPI "master" to "controller"
-  iio: adc: ad_sigma_delta: Follow renaming of SPI "master" to
-    "controller"
-  Input: pxspad - follow renaming of SPI "master" to "controller"
-  Input: synaptics-rmi4 - follow renaming of SPI "master" to
-    "controller"
-  media: mgb4: Follow renaming of SPI "master" to "controller"
-  media: netup_unidvb: Follow renaming of SPI "master" to "controller"
-  media: usb/msi2500: Follow renaming of SPI "master" to "controller"
-  media: v4l2-subdev: Follow renaming of SPI "master" to "controller"
-  misc: gehc-achc: Follow renaming of SPI "master" to "controller"
-  mmc: mmc_spi: Follow renaming of SPI "master" to "controller"
-  mtd: dataflash: Follow renaming of SPI "master" to "controller"
-  mtd: rawnand: fsl_elbc: Let .probe retry if local bus is missing
-  net: ks8851: Follow renaming of SPI "master" to "controller"
-  net: vertexcom: mse102x: Follow renaming of SPI "master" to
-    "controller"
-  platform/chrome: cros_ec_spi: Follow renaming of SPI "master" to
-    "controller"
-  spi: bitbang: Follow renaming of SPI "master" to "controller"
-  spi: cadence-quadspi: Don't emit error message on allocation error
-  spi: cadence-quadspi: Follow renaming of SPI "master" to "controller"
-  spi: cavium: Follow renaming of SPI "master" to "controller"
-  spi: geni-qcom: Follow renaming of SPI "master" to "controller"
-  spi: loopback-test: Follow renaming of SPI "master" to "controller"
-  spi: slave-mt27xx: Follow renaming of SPI "master" to "controller"
-  spi: spidev: Follow renaming of SPI "master" to "controller"
-  staging: fbtft: Follow renaming of SPI "master" to "controller"
-  staging: greybus: spi: Follow renaming of SPI "master" to "controller"
-  tpm_tis_spi: Follow renaming of SPI "master" to "controller"
-  usb: gadget: max3420_udc: Follow renaming of SPI "master" to
-    "controller"
-  video: fbdev: mmp: Follow renaming of SPI "master" to "controller"
-  wifi: libertas: Follow renaming of SPI "master" to "controller"
-  spi: fsl-lib: Follow renaming of SPI "master" to "controller"
-  spi: Drop compat layer from renaming "master" to "controller"
-  Documentation: spi: Update documentation for renaming "master" to
-    "controller"
-
- .../driver-api/driver-model/devres.rst        |  2 +-
- Documentation/spi/spi-summary.rst             | 74 +++++++++----------
- drivers/char/tpm/tpm_tis_spi_main.c           |  4 +-
- drivers/fpga/ice40-spi.c                      |  4 +-
- drivers/iio/adc/ad_sigma_delta.c              | 14 ++--
- drivers/input/joystick/psxpad-spi.c           |  4 +-
- drivers/input/rmi4/rmi_spi.c                  |  2 +-
- drivers/media/pci/mgb4/mgb4_core.c            | 14 ++--
- .../media/pci/netup_unidvb/netup_unidvb_spi.c | 48 ++++++------
- drivers/media/usb/msi2500/msi2500.c           | 38 +++++-----
- drivers/media/v4l2-core/v4l2-spi.c            |  4 +-
- drivers/misc/gehc-achc.c                      |  8 +-
- drivers/mmc/host/mmc_spi.c                    |  6 +-
- drivers/mtd/devices/mtd_dataflash.c           |  2 +-
- drivers/mtd/nand/raw/fsl_elbc_nand.c          |  3 +-
- drivers/net/ethernet/micrel/ks8851_spi.c      |  4 +-
- drivers/net/ethernet/vertexcom/mse102x.c      |  2 +-
- drivers/net/ieee802154/ca8210.c               |  2 +-
- .../net/wireless/marvell/libertas/if_spi.c    |  2 +-
- drivers/platform/chrome/cros_ec_spi.c         |  8 +-
- drivers/spi/spi-ath79.c                       |  4 +-
- drivers/spi/spi-bitbang.c                     | 64 ++++++++--------
- drivers/spi/spi-butterfly.c                   |  6 +-
- drivers/spi/spi-cadence-quadspi.c             |  7 +-
- drivers/spi/spi-cavium.c                      |  6 +-
- drivers/spi/spi-cavium.h                      |  2 +-
- drivers/spi/spi-davinci.c                     |  6 +-
- drivers/spi/spi-fsl-lib.c                     | 14 ++--
- drivers/spi/spi-geni-qcom.c                   |  2 +-
- drivers/spi/spi-gpio.c                        |  2 +-
- drivers/spi/spi-lm70llp.c                     |  6 +-
- drivers/spi/spi-loopback-test.c               |  4 +-
- drivers/spi/spi-oc-tiny.c                     |  6 +-
- drivers/spi/spi-omap-uwire.c                  |  4 +-
- drivers/spi/spi-sh-sci.c                      | 10 +--
- drivers/spi/spi-slave-mt27xx.c                |  2 +-
- drivers/spi/spi-xilinx.c                      |  4 +-
- drivers/spi/spi-xtensa-xtfpga.c               |  2 +-
- drivers/spi/spi.c                             |  2 +-
- drivers/spi/spidev.c                          |  2 +-
- drivers/staging/fbtft/fbtft-core.c            |  4 +-
- drivers/staging/greybus/spilib.c              | 66 ++++++++---------
- drivers/usb/gadget/udc/max3420_udc.c          |  2 +-
- drivers/video/fbdev/mmp/hw/mmp_spi.c          | 26 +++----
- include/linux/spi/spi.h                       | 20 +----
- include/linux/spi/spi_bitbang.h               |  2 +-
- include/media/v4l2-common.h                   |  6 +-
- 47 files changed, 254 insertions(+), 272 deletions(-)
-
-
-base-commit: 6613476e225e090cc9aad49be7fa504e290dd33d
--- 
-2.43.0
-
+Rahul Rameshbabu
 
