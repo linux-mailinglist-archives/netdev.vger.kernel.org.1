@@ -1,267 +1,123 @@
-Return-Path: <netdev+bounces-64844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CC08837470
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 21:48:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1E17837477
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 21:48:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D27CC1F2674A
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 20:48:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 695B22895D2
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 20:48:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A2FF47F57;
-	Mon, 22 Jan 2024 20:47:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71DB347F59;
+	Mon, 22 Jan 2024 20:48:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="w72KG6Dw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fHwwFqog"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE6F47E8;
-	Mon, 22 Jan 2024 20:47:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AE2247A6F;
+	Mon, 22 Jan 2024 20:48:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705956427; cv=none; b=W1yxUg+qwcwfpBNKxudFrioJxHkvTGGMJjZivRqkXODTDLVYq/2KqjvZ7KeoLTtF6BvneOG26v3DCTXXWavWkU4rPTPlRMagE38xSDKqd93pPKfvHBBsoYaBXs+KBnP1xONdSnGETcjJMyMQk09t8d7J3Q2EYhgXHjfQ+Kw6dV0=
+	t=1705956493; cv=none; b=Z7VwSsB9qqpl0qUGCTuKJPnRyhndizj0fzUjsP/ZYxDAqfbqynSbvhvQaHqYOZeGObXkur+DwA9v4z6GDvWm2VwfH5JePZQZUNZxWWwc+TX5hevhuHoVnnur6faTdAVihh1iM1VADwZwPz6nE2LVbXWE1HZoWQR78nUO9X+I3kE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705956427; c=relaxed/simple;
-	bh=xhoSg7HCiJB8nm0GytlBZuAs5wdKZX1yo/OegtNKoH4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=T/YOphgoGhcANUtaEY/oqZzaX+Vmnlcad24MFqtHMDlv7LwMYtwnrdOh0ZxDQTz79bJek+4Y2D46wsEwqFTej2E0q3Gusjxxyjh4I3WUZUCCahOAky02BnqDIPcfrc0aBk8nDtMHmVSYRGX4uEushUngGSnAOgws77rTUe96ik8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=w72KG6Dw; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from tr.lan (ip-86-49-120-218.bb.vodafone.cz [86.49.120.218])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id E182C8785F;
-	Mon, 22 Jan 2024 21:47:01 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1705956422;
-	bh=JxBtzlcpgR9/Ek6eHU9p5BsUP/L8XPN5FuVoVVQTYTw=;
-	h=From:To:Cc:Subject:Date:From;
-	b=w72KG6DwouCrNqJd8AreYW6NfPC3VAxDJuG2XBRUo4+51bOUKzV6cCbjOfPcHjmSZ
-	 bDfsVCUMg3irOy0aSwynaP3q9Mp4yjkz+XYswsAMeKeEi8PqITG4U9kwmmZCn9Ow64
-	 vE+kPNVqkNyAEYiziN2XYvaGB40hXq41F0E/296AisZVdvNy4ZgZwu3a0BwfLu0HTj
-	 UieZSxkZJObJ43ZJg+G7Nj9LafFy9H5bOYh8HvP8EzP6QuVtIXRKD9jp9/OZUVA25V
-	 M4CuTEZfP8FlOvzJf5kLRqzKhhE12brD63tn5lJE7R03Ph3Xqf1G0WIOAqjXuoWu69
-	 UUXNBYM02cwhg==
-From: Marek Vasut <marex@denx.de>
-To: netdev@vger.kernel.org
-Cc: Marek Vasut <marex@denx.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Lee Jones <lee@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Pavel Machek <pavel@ucw.cz>,
-	=?UTF-8?q?Rafa=C5=82=20Mi=C5=82ecki?= <rafal@milecki.pl>,
-	Rob Herring <robh+dt@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	devicetree@vger.kernel.org,
-	linux-leds@vger.kernel.org
-Subject: [PATCH] [RFC] net: phy: broadcom: Add DT LED configuration support
-Date: Mon, 22 Jan 2024 21:45:51 +0100
-Message-ID: <20240122204650.344794-1-marex@denx.de>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1705956493; c=relaxed/simple;
+	bh=8XRvpSquamu132UqFZuWHKJ8p5Euo14fp4Ytri8iSd0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ctt0Via0zKoT6nRTDSijMN+y64BWfZYGZUbYBcoI8V0P3yWOJgBxDuEMok8MDGzCIX4Yt0Ccq1TBxHEGJ1Se6DWumz78kdDbyOXlpuFNCc6tSKVxH9U/WnRzNpbaorjQIEq33oyAyhMgWr3EtbEkIRMmAcCug2/O5oyiAsLSf2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fHwwFqog; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-78313f4d149so351601785a.1;
+        Mon, 22 Jan 2024 12:48:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705956490; x=1706561290; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=IDi9GcOQS8eCYkI2DpVwexR5G2dm1+2pPXZXYYh/dT8=;
+        b=fHwwFqog0t0OvN7ww7EQlwkNxx3lyxU5poi1oc19J1JOA6smI2Sz5A6W0hqfBEhB/X
+         d/8C2I4FsQfY7csMPYRW+475zJzUFh2BBCVNJkwpqh0B3kYcu2XvrciKS/ceaxcKOWAZ
+         IRrMXYOUN295ljOvfuE/b5b7F8awaeY53Zm8VVeObSCus9jfll7vdTNFd2Dn0oczDQWL
+         IzKxCAoE1qi2aGoChw3wGVTswHiOOxo5jir36VXJMNsQ8URL1Lwjevl1Kg7vL4U5cAQa
+         tkv+kgufGutEJDB2S44SwsAYERoxh4rbfckN6MY7IQnd9gDvCLHGHFYXjWt1WQdF00B6
+         dK7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705956490; x=1706561290;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IDi9GcOQS8eCYkI2DpVwexR5G2dm1+2pPXZXYYh/dT8=;
+        b=KJSiGWolnIz+oZQOkLFC7h/MfbqbGoUerIAQhEaAz8cFhDSb7BdN8YLmDB/GHBS3EH
+         dLEdeqv096pYjf/ZwRbkvrVMjPxQXZ7iLMadULy1swWkQlkTsb0qdizcNZplNNwMWo7Z
+         2IEXd6ldqsBNQE6AWme9UDSJe03uf3TirMTpM6PeHK9TAY0iVixrpo8m0ss/31qeN6HJ
+         NArR+d43xSBvarXD0+0Wg6owtPCGrfrv3HxKXlAczhJM8pzzyPOIJSOLOj37cphcWCQH
+         JsPgWNy/r59YcXCWgYgxjUFgjhOIj5SkdjAVGZkp6U0PRExMZIv9kVp06XC9OuuktaKe
+         6ZGw==
+X-Gm-Message-State: AOJu0Ywas5cwiDioWjbYDpFk0ALD5EnXgB2F+Iu8q73Qt/bXVSeEVK8c
+	HAz45IC4CofBTpqrv2x8W2FlZ3tg20l8cNx3BzOUwKCy667sU2hW
+X-Google-Smtp-Source: AGHT+IHODYDLocg6BOZ3+ciCSlGghq/llOd9vS1/pgnYtr1Ncp9xWFC/Blj7nzHcnzYTn1MnpjfHjw==
+X-Received: by 2002:a05:620a:494b:b0:783:24fc:d09b with SMTP id vz11-20020a05620a494b00b0078324fcd09bmr6272645qkn.106.1705956490265;
+        Mon, 22 Jan 2024 12:48:10 -0800 (PST)
+Received: from errol.ini.cmu.edu ([72.95.245.133])
+        by smtp.gmail.com with ESMTPSA id qp16-20020a05620a389000b00783574d5017sm2440577qkn.19.2024.01.22.12.48.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jan 2024 12:48:09 -0800 (PST)
+Date: Mon, 22 Jan 2024 15:48:08 -0500
+From: "Gabriel L. Somlo" <gsomlo@gmail.com>
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org, davem@davemloft.net, abeni@redhat.com,
+	edumazet@google.com, Paolo Abeni <pabeni@redhat.com>,
+	Karol Gugala <kgugala@antmicro.com>,
+	Mateusz Holenko <mholenko@antmicro.com>,
+	Joel Stanley <joel@jms.id.au>, dsahern@kernel.org,
+	weiwan@google.com,
+	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 11/22] net: fill in MODULE_DESCRIPTION()s for
+ litex
+Message-ID: <Za7UiPIebizfbmQn@errol.ini.cmu.edu>
+References: <20240122184543.2501493-1-leitao@debian.org>
+ <20240122184543.2501493-12-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240122184543.2501493-12-leitao@debian.org>
+X-Clacks-Overhead: GNU Terry Pratchett
 
-The BCM54213E and similar PHYs have extensive LED configuration
-capabilities -- the PHY has two LEDs, either of the two LEDs can
-be configured to 1 of 16 functions (speed, TX, RX, activity, on,
-off, quality, ... multi-color) used to drive single-color LED.
-The multi-color mode is special, it provides 16 more sub-modes
-used to drive multi-color LED.
+On Mon, Jan 22, 2024 at 10:45:32AM -0800, Breno Leitao wrote:
+> W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
+> Add descriptions to the LiteX Liteeth Ethernet device.
+> 
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-The current configuration -- both LEDs configured as multi-color,
-with both LEDs multi-color sub-mode set to link activity indicator,
-is not suitable for all systems in which this PHY is used.
+Acked-by: Gabriel Somlo <gsomlo@gmail.com>
 
-Attempt to implement a way to describe the LED configuration in DT.
+Thanks,
+--Gabriel
 
-Use Documentation/devicetree/bindings/net/ethernet-phy.yaml leds {}
-subnode of the PHY DT node, describe both LEDs present on this PHY
-as single LEDs within the leds {} subnode. Each described LED is a
-subnode of its own, the description uses standard LED subsystem
-bindings from Documentation/devicetree/bindings/leds/common.yaml .
-
-The DT description of the LED configuration can look for example
-like this:
-
-"
-ethernet-phy@1 {
-...
-	leds {
-		#address-cells = <1>;
-		#size-cells = <0>;
-
-		led@0 {
-			reg = <0>;
-			function = LED_FUNCTION_ACTIVITY;
-		};
-
-		led@1 {
-			reg = <1>;
-			function = LED_FUNCTION_SPEED_2;
-		};
-	};
-};
-"
-
-Implement parsing code in the broadcom PHY driver to detemine desired
-LED configuration from DT. In case the leds {} subnode is present, the
-parser code iterates over its subnodes and for each led@N subnode it
-parses the following properties:
-
-- reg - LED ID, either 0 or 1, used to identify the LED on the PHY
-- function - LED single-color function (speed, TX, RX, multi-color...),
-             uses LED subsystem LED_FUNCTION_* string. The parser in
-	     the driver maps this to register setting.
-- function-enumerator - In case function is set to "multi-color",
-                        the multi-color function number. The parser
-			in the driver uses this value directly for
-			the multi-color configuration register.
-
-Once the properties are parsed, the LED configuration registers of the
-PHY are programmed.
-
-The current list of LED subsystem LED_FUNCTION_* does not cover the
-entire list of possible single-color LED functions of this PHY, add
-example extension for "link speed 1" and "link speed 2" setting into
-the leds/common.h header file.
-
-The function-enumerator should probably not be a number, but maybe
-some sort of macro specific to this PHY ? I would like to avoid new
-broadcom PHY specific DT properties.
-
-Signed-off-by: Marek Vasut <marex@denx.de>
----
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Andrew Lunn <andrew@lunn.ch>
-Cc: Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
-Cc: Conor Dooley <conor+dt@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
-Cc: Lee Jones <lee@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Pavel Machek <pavel@ucw.cz>
-Cc: Rafał Miłecki <rafal@milecki.pl>
-Cc: Rob Herring <robh+dt@kernel.org>
-Cc: Russell King <linux@armlinux.org.uk>
-Cc: devicetree@vger.kernel.org
-Cc: linux-leds@vger.kernel.org
-Cc: netdev@vger.kernel.org
----
- drivers/net/phy/broadcom.c        | 56 +++++++++++++++++++++++++++----
- include/dt-bindings/leds/common.h |  2 ++
- 2 files changed, 52 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/phy/broadcom.c b/drivers/net/phy/broadcom.c
-index 312a8bb35d780..9250cd45b0b24 100644
---- a/drivers/net/phy/broadcom.c
-+++ b/drivers/net/phy/broadcom.c
-@@ -407,20 +407,64 @@ static int bcm54xx_config_init(struct phy_device *phydev)
- 
- 	/* For non-SFP setups, encode link speed into LED1 and LED3 pair
- 	 * (green/amber).
--	 * Also flash these two LEDs on activity. This means configuring
--	 * them for MULTICOLOR and encoding link/activity into them.
-+	 * By default, flash these two LEDs on activity. This means
-+	 * configuring them for MULTICOLOR and encoding link/activity
-+	 * into them, but let user reconfigure this via DT.
- 	 * Don't do this for devices on an SFP module, since some of these
- 	 * use the LED outputs to control the SFP LOS signal, and changing
- 	 * these settings will cause LOS to malfunction.
- 	 */
- 	if (!phy_on_sfp(phydev)) {
--		val = BCM54XX_SHD_LEDS1_LED1(BCM_LED_SRC_MULTICOLOR1) |
--			BCM54XX_SHD_LEDS1_LED3(BCM_LED_SRC_MULTICOLOR1);
-+		struct device_node *np = phydev->mdio.dev.of_node;
-+		struct device_node *leds, *led = NULL;
-+		u8 mode[2] = { BCM_LED_SRC_MULTICOLOR1, BCM_LED_SRC_MULTICOLOR1 };
-+		u8 mcmode[2] = { BCM_LED_MULTICOLOR_LINK_ACT, BCM_LED_MULTICOLOR_LINK_ACT };
-+		const char *func;
-+		u32 val, enumerator;
-+		int ret;
-+
-+		leds = of_find_node_by_name(np, "leds");
-+		if (leds) {
-+			for_each_available_child_of_node(leds, led) {
-+				ret = of_property_read_u32(led, "reg", &val);
-+				if (ret < 0 || val >= 2)
-+					continue;
-+
-+				ret = of_property_read_string(led, "function", &func);
-+				if (ret)
-+					continue;
-+
-+				if (!strcmp(func, LED_FUNCTION_TX))
-+					mode[val] = BCM_LED_SRC_XMITLED;
-+				else if (!strcmp(func, LED_FUNCTION_RX))
-+					mode[val] = BCM_LED_SRC_RCVLED;
-+				else if (!strcmp(func, LED_FUNCTION_ACTIVITY))
-+					mode[val] = BCM_LED_SRC_ACTIVITYLED;
-+				else if (!strcmp(func, LED_FUNCTION_SPEED_1))
-+					mode[val] = BCM_LED_SRC_LINKSPD1;
-+				else if (!strcmp(func, LED_FUNCTION_SPEED_2))
-+					mode[val] = BCM_LED_SRC_LINKSPD2;
-+				/* Add other LED settings here */
-+
-+				ret = of_property_read_string(led, "function", &func);
-+				if (ret)
-+					continue;
-+
-+				ret = of_property_read_u32(led, "function-enumerator", &enumerator);
-+				if (ret || enumerator >= 16)
-+					continue;
-+
-+				mcmode[val] = enumerator;
-+			}
-+		}
-+
-+		val = BCM54XX_SHD_LEDS1_LED1(mode[0]) |
-+			BCM54XX_SHD_LEDS1_LED3(mode[1]);
- 		bcm_phy_write_shadow(phydev, BCM54XX_SHD_LEDS1, val);
- 
- 		val = BCM_LED_MULTICOLOR_IN_PHASE |
--			BCM54XX_SHD_LEDS1_LED1(BCM_LED_MULTICOLOR_LINK_ACT) |
--			BCM54XX_SHD_LEDS1_LED3(BCM_LED_MULTICOLOR_LINK_ACT);
-+			BCM54XX_SHD_LEDS1_LED1(mcmode[0]) |
-+			BCM54XX_SHD_LEDS1_LED3(mcmode[1]);
- 		bcm_phy_write_exp(phydev, BCM_EXP_MULTICOLOR, val);
- 	}
- 
-diff --git a/include/dt-bindings/leds/common.h b/include/dt-bindings/leds/common.h
-index 9a0d33d027fff..83d09508841b6 100644
---- a/include/dt-bindings/leds/common.h
-+++ b/include/dt-bindings/leds/common.h
-@@ -102,5 +102,7 @@
- #define LED_FUNCTION_WAN "wan"
- #define LED_FUNCTION_WLAN "wlan"
- #define LED_FUNCTION_WPS "wps"
-+#define LED_FUNCTION_SPEED_1 "speed-1"
-+#define LED_FUNCTION_SPEED_2 "speed-2"
- 
- #endif /* __DT_BINDINGS_LEDS_H */
--- 
-2.43.0
-
+> ---
+>  drivers/net/ethernet/litex/litex_liteeth.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/net/ethernet/litex/litex_liteeth.c b/drivers/net/ethernet/litex/litex_liteeth.c
+> index 5182fe737c37..ff54fbe41bcc 100644
+> --- a/drivers/net/ethernet/litex/litex_liteeth.c
+> +++ b/drivers/net/ethernet/litex/litex_liteeth.c
+> @@ -318,4 +318,5 @@ static struct platform_driver liteeth_driver = {
+>  module_platform_driver(liteeth_driver);
+>  
+>  MODULE_AUTHOR("Joel Stanley <joel@jms.id.au>");
+> +MODULE_DESCRIPTION("LiteX Liteeth Ethernet driver");
+>  MODULE_LICENSE("GPL");
+> -- 
+> 2.39.3
+> 
 
