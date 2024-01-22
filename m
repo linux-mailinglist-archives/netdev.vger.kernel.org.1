@@ -1,140 +1,253 @@
-Return-Path: <netdev+bounces-64618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 142D5835FA1
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 11:28:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0F52835FB8
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 11:31:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCCFF1F27A04
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 10:28:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69D4C282F43
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 10:31:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0EBB3A27B;
-	Mon, 22 Jan 2024 10:26:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA828208DD;
+	Mon, 22 Jan 2024 10:31:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VXYiQi5z"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC5933A1B4
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 10:26:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B05821DFF3;
+	Mon, 22 Jan 2024 10:31:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705919207; cv=none; b=VJbhU3gV/AjGNUp84dNqZVJVJoGRLJgT0HvKoluIXq3Wesq3MlPIJVsUOWj4seWuUEiNazpQvjE6G2Kvy9SSik4LIYBiNOcXHJjOG1zpnWBNE8iuCOvwn3pMbJeUyhmNQTA80qDIvvEe1JeOMY6e/4CXl9tShWVkFVvQs1OVcuQ=
+	t=1705919468; cv=none; b=O9gSOp8Bpxl56woXLbsBUV+Oh0zvsjnZGk0eqClIXy9T/KL8NYV+p2rJuAJuQ/Lg1AWEVLFMw6F5Exbj6ASOavF2VwjrDqQW+coKwQhTbPQlRHjtqLkXkDg5iKD17AnKE0Ssydhg5XCI7eZQsihk/zV9rJBYbiD8XRcNK/BT5tY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705919207; c=relaxed/simple;
-	bh=31jJaBvZTOQyaxK+rh3Ork52rIuNPoSNHjhwCnWTKeQ=;
+	s=arc-20240116; t=1705919468; c=relaxed/simple;
+	bh=Adk4o/syB8kwb6hMdHdd8CxVfC3VENFja8OPDajgNt8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UullzCLm/0E9YPLw6btICGDpZUcg5HtOwURHE/QGB9x1ZVZYNzqdi8v5y5e6Se2m2DjhN0p7j0XXe2zR+7BMKOMiF6QsMm32B+pgQwEFHMPEM6BnrqPprOGPqvRR6aGO7SC5Ab6iQWE4Je5PMfm5lVB4PI0Qs1sL3sXKU6ZSKLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rRrVb-0008Uj-TM; Mon, 22 Jan 2024 11:26:27 +0100
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rRrVa-001ZSN-BT; Mon, 22 Jan 2024 11:26:26 +0100
-Received: from pengutronix.de (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id ED69E27B371;
-	Mon, 22 Jan 2024 10:26:25 +0000 (UTC)
-Date: Mon, 22 Jan 2024 11:26:25 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: "Peng Fan (OSS)" <peng.fan@oss.nxp.com>
-Cc: wg@grandegger.com, conor+dt@kernel.org, davem@davemloft.net, 
-	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Peng Fan <peng.fan@nxp.com>
-Subject: Re: [PATCH] dt-bindings: can: fsl,flexcan: add i.MX95 compatible
- string
-Message-ID: <20240122-skilled-wimp-4bc1769bf235-mkl@pengutronix.de>
-References: <20240122091738.2078746-1-peng.fan@oss.nxp.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=hMW/rcA1rWoxzNrt1smP4YO5GJu7aMmVEdoFjeykTygwCLT0sLMus8Ibu5pdwmeR7hDuzD1QUz2aFmdUdvNnNkRYVbkuDeNA254tQyXNQHurI811NnEZKJRepV+aVxGBtq/fO3Gw12oKjHzcCG697W5vDeJ+K+IaibCZj5ph1ts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VXYiQi5z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F258C43390;
+	Mon, 22 Jan 2024 10:31:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1705919468;
+	bh=Adk4o/syB8kwb6hMdHdd8CxVfC3VENFja8OPDajgNt8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VXYiQi5zdrm6D/arV+leoLROlbr7Rb91J3KkdLkhJFacvol55XCXpGBRHkReoQ+wS
+	 MkW8a9h0UGD2duiJuDVOIRQc078qQhCdjKiWa7YZ0JajQZT3g7KahEljOb9k9u4+L0
+	 SarFw28EbOctK+w9oDuislDN8TCphzc4XCNBhJM2xZHh4GJsXbOdYpiurVhYnFUbSZ
+	 hDzRTkr8ZuZ39SzKyQg1H82b1R5/uANddhFrvfCs4Uxxn1eX18NofmN0nwOXZi936R
+	 6fNa0KMEOiAcpeAHyHYvOfNhPE6/J+R7WSebFfcC47s9rnezA6PZInjFYR6EvpMXUq
+	 c/Nbd7OHGXp9g==
+Date: Mon, 22 Jan 2024 10:31:00 +0000
+From: Simon Horman <horms@kernel.org>
+To: Danielle Ratson <danieller@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
+	linux@armlinux.org.uk, sdf@google.com, kory.maincent@bootlin.com,
+	maxime.chevallier@bootlin.com, vladimir.oltean@nxp.com,
+	przemyslaw.kitszel@intel.com, ahmed.zaki@intel.com,
+	richardcochran@gmail.com, shayagr@amazon.com,
+	paul.greenwalt@intel.com, jiri@resnulli.us,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	mlxsw@nvidia.com, petrm@nvidia.com, idosch@nvidia.com
+Subject: Re: [RFC PATCH net-next 7/9] ethtool: cmis_cdb: Add a layer for
+ supporting CDB commands
+Message-ID: <20240122103100.GA126470@kernel.org>
+References: <20240122084530.32451-1-danieller@nvidia.com>
+ <20240122084530.32451-8-danieller@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="burfdvasnt5xet3h"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240122091738.2078746-1-peng.fan@oss.nxp.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <20240122084530.32451-8-danieller@nvidia.com>
+
+On Mon, Jan 22, 2024 at 10:45:28AM +0200, Danielle Ratson wrote:
+
+...
+
+> +/**
+> + * struct ethtool_cmis_cdb_request - CDB commands request fields as decribed in
+> + *				the CMIS standard
+> + * @id: Command ID.
+> + * @epl_len: EPL memory length.
+> + * @lpl_len: LPL memory length.
+> + * @chk_code: Check code for the previous field and the payload.
+> + * @resv1: Added to match the CMIS standard request continuity.
+> + * @resv2: Added to match the CMIS standard request continuity.
+> + * @payload: Payload for the CDB commands.
+> + */
+> +struct ethtool_cmis_cdb_request {
+> +	__be16 id;
+> +	struct_group(body,
+> +		u16 epl_len;
+> +		u8 lpl_len;
+> +		u8 chk_code;
+> +		u8 resv1;
+> +		u8 resv2;
+> +		u8 payload[ETHTOOL_CMIS_CDB_LPL_MAX_PL_LENGTH];
+> +	);
+> +};
+> +
+> +#define CDB_F_COMPLETION_VALID		BIT(0)
+> +#define CDB_F_STATUS_VALID		BIT(1)
+> +
+> +/**
+> + * struct ethtool_cmis_cdb_cmd_args - CDB commands execution arguments
+> + * @req: CDB command fields as described in the CMIS standard.
+> + * @max_duration: Maximum duration time for command completion in msec.
+> + * @read_write_len_ext: Allowable additional number of byte octets to the LPL
+> + *			in a READ or a WRITE commands.
+> + * @rpl_exp_len: Expected reply length in bytes.
+> + * @flags: Validation flags for CDB commands.
+> + */
+> +struct ethtool_cmis_cdb_cmd_args {
+> +	struct ethtool_cmis_cdb_request req;
+> +	u16				max_duration;
+> +	u8				read_write_len_ext;
+> +	u8                              rpl_exp_len;
+> +	u8				flags;
+> +};
+
+...
+
+> +int ethtool_cmis_page_init(struct ethtool_module_eeprom *page_data,
+> +			   u8 page, u32 offset, u32 length)
+> +{
+> +	page_data->page = page;
+> +	page_data->offset = offset;
+> +	page_data->length = length;
+> +	page_data->i2c_address = ETHTOOL_CMIS_CDB_PAGE_I2C_ADDR;
+> +	page_data->data = kmalloc(page_data->length, GFP_KERNEL);
+> +	if (!page_data->data)
+> +		return -ENOMEM;
+> +
+> +	return 0;
+> +}
+
+...
+
+> +static int
+> +__ethtool_cmis_cdb_execute_cmd(struct net_device *dev,
+> +			       struct ethtool_module_eeprom *page_data,
+> +			       u32 offset, u32 length, void *data)
+> +{
+> +	const struct ethtool_ops *ops = dev->ethtool_ops;
+> +	struct netlink_ext_ack extack = {};
+> +	int err;
+> +
+> +	page_data->offset = offset;
+> +	page_data->length = length;
+> +
+> +	memset(page_data->data, 0, ETHTOOL_CMIS_CDB_LPL_MAX_PL_LENGTH);
+> +	memcpy(page_data->data, data, page_data->length);
+> +
+> +	err = ops->set_module_eeprom_by_page(dev, page_data, &extack);
+> +	if (err < 0) {
+> +		if (extack._msg)
+> +			netdev_err(dev, "%s\n", extack._msg);
+> +	}
+> +
+> +	return err;
+> +}
+
+...
+
+> +int ethtool_cmis_cdb_execute_cmd(struct net_device *dev,
+> +				 struct ethtool_cmis_cdb_cmd_args *args)
+> +{
+> +	struct ethtool_module_eeprom page_data = {};
+> +	u32 offset;
+> +	int err;
+> +
+> +	args->req.chk_code =
+> +		cmis_cdb_calc_checksum(&args->req, sizeof(args->req));
+> +
+> +	if (args->req.lpl_len > args->read_write_len_ext) {
+> +		ethnl_module_fw_flash_ntf_err(dev,
+> +					      "LPL length is longer than CDB read write length extension allows");
+> +		return -EINVAL;
+> +	}
+> +
+> +	err = ethtool_cmis_page_init(&page_data, ETHTOOL_CMIS_CDB_CMD_PAGE, 0,
+> +				     ETHTOOL_CMIS_CDB_LPL_MAX_PL_LENGTH);
+
+ETHTOOL_CMIS_CDB_LPL_MAX_PL_LENGTH is passed as the length argument
+of ethtool_cmis_page_init, which will allocate that many
+bytes for page_data->data.
+
+> +	if (err < 0)
+> +		return err;
+> +
+> +	/* According to the CMIS standard, there are two options to trigger the
+> +	 * CDB commands. The default option is triggering the command by writing
+> +	 * the CMDID bytes. Therefore, the command will be split to 2 calls:
+> +	 * First, with everything except the CMDID field and then the CMDID
+> +	 * field.
+> +	 */
+> +	offset = CMIS_CDB_CMD_ID_OFFSET +
+> +		offsetof(struct ethtool_cmis_cdb_request, body);
+> +	err = __ethtool_cmis_cdb_execute_cmd(dev, &page_data, offset,
+> +					     sizeof(args->req.body),
+> +					     &args->req.body);
+
+Hi Danielle,
+
+However, here sizeof(args->req.body) is passed as the length
+argument of __ethtool_cmis_cdb_execute_cmd() which will:
+
+1. Zero ETHTOOL_CMIS_CDB_LPL_MAX_PL_LENGTH bytes of page_data->data
+2. Copy sizeof(args->req.body) bytes into page_data->data
+
+args->req.body includes several fields, one of which is
+ETHTOOL_CMIS_CDB_LPL_MAX_PL_LENGTH bytes long. So,
+args->req.body > ETHTOOL_CMIS_CDB_LPL_MAX_PL_LENGTH
+and it seems that step 2 above causes a buffer overrun.
+
+Flagged by clang-17 W=1 build
+
+ In file included from net/ethtool/cmis_cdb.c:3:
+ In file included from ./include/linux/ethtool.h:16:
+ In file included from ./include/linux/bitmap.h:12:
+ In file included from ./include/linux/string.h:295:
+ ./include/linux/fortify-string.h:579:4: error: call to '__write_overflow_field' declared with 'warning' attribute: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror,-Wattribute-warning]
+   579 |                         __write_overflow_field(p_size_field, size);
+       |                         ^
+ ./include/linux/fortify-string.h:579:4: error: call to '__write_overflow_field' declared with 'warning' attribute: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror,-Wattribute-warning]
+ ./include/linux/fortify-string.h:579:4: error: call to '__write_overflow_field' declared with 'warning' attribute: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror,-Wattribute-warning]
 
 
---burfdvasnt5xet3h
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> +	if (err < 0)
+> +		goto out;
+> +
+> +	offset = CMIS_CDB_CMD_ID_OFFSET +
+> +		offsetof(struct ethtool_cmis_cdb_request, id);
+> +	err = __ethtool_cmis_cdb_execute_cmd(dev, &page_data, offset,
+> +					     sizeof(args->req.id),
+> +					     &args->req.id);
+> +	if (err < 0)
+> +		goto out;
+> +
+> +	err = cmis_cdb_wait_for_completion(dev, args);
+> +	if (err < 0)
+> +		goto out;
+> +
+> +	err = cmis_cdb_wait_for_status(dev, args);
+> +	if (err < 0)
+> +		goto out;
+> +
+> +	err = cmis_cdb_process_reply(dev, &page_data, args);
+> +
+> +out:
+> +	ethtool_cmis_page_fini(&page_data);
+> +	return err;
+> +}
 
-On 22.01.2024 17:17:38, Peng Fan (OSS) wrote:
-> From: Peng Fan <peng.fan@nxp.com>
->=20
-> Add i.MX95 flexcan which is compatible i.MX93 flexcan
->=20
-> Signed-off-by: Peng Fan <peng.fan@nxp.com>
-
-Acked-by: Marc Kleine-Budde <mkl@pengutronix.de>
-
-regards,
-Marc
-
-> ---
->  Documentation/devicetree/bindings/net/can/fsl,flexcan.yaml | 3 +++
->  1 file changed, 3 insertions(+)
->=20
-> diff --git a/Documentation/devicetree/bindings/net/can/fsl,flexcan.yaml b=
-/Documentation/devicetree/bindings/net/can/fsl,flexcan.yaml
-> index 4162469c3c08..f197d9b516bb 100644
-> --- a/Documentation/devicetree/bindings/net/can/fsl,flexcan.yaml
-> +++ b/Documentation/devicetree/bindings/net/can/fsl,flexcan.yaml
-> @@ -38,6 +38,9 @@ properties:
->                - fsl,imx6ul-flexcan
->                - fsl,imx6sx-flexcan
->            - const: fsl,imx6q-flexcan
-> +      - items:
-> +          - const: fsl,imx95-flexcan
-> +          - const: fsl,imx93-flexcan
->        - items:
->            - enum:
->                - fsl,ls1028ar1-flexcan
-> --=20
-> 2.37.1
->=20
->=20
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---burfdvasnt5xet3h
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmWuQs4ACgkQvlAcSiqK
-BOg7QQgAkneQxlT0NEWKlWlbHh/AoqkNp1TIqRN8YybyrL1Z8sPRUVa8blLUuqv4
-JcI7x9c1hFTnvjjxMdyPea9J9dIaMp2AnfeHl02MEElQTYZc7qKCWSi37SbWmS6l
-O1Gh3w1Ou+O6LlT08QHCLOItFRvMm5bVIHPtNvIkH/7xcnzr8eLfxKMm8FvbJpEq
-jy2MaemoL+k6jewSioUmuMlg4Qx2ht9siyFdykvNEgsGf005YEjTjuZub+YpLLAX
-9kNQVrxgdFOuvbLyKoCbXt5UTZ1FlCHRJXUxRcjj9R3gyXwZnkO5w1WAKfXk9xI/
-ZKtCoA78QIweTkBtRBcYJOvl4imCSg==
-=q+Tr
------END PGP SIGNATURE-----
-
---burfdvasnt5xet3h--
+...
 
