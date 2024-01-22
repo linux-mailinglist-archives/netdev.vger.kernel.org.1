@@ -1,253 +1,343 @@
-Return-Path: <netdev+bounces-64619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0F52835FB8
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 11:31:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A5AE835FD2
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 11:36:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69D4C282F43
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 10:31:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F2D91C2295F
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 10:36:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA828208DD;
-	Mon, 22 Jan 2024 10:31:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A8D6374F1;
+	Mon, 22 Jan 2024 10:36:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VXYiQi5z"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="enaIHhLE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B05821DFF3;
-	Mon, 22 Jan 2024 10:31:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACE103A1A5;
+	Mon, 22 Jan 2024 10:36:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.248
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705919468; cv=none; b=O9gSOp8Bpxl56woXLbsBUV+Oh0zvsjnZGk0eqClIXy9T/KL8NYV+p2rJuAJuQ/Lg1AWEVLFMw6F5Exbj6ASOavF2VwjrDqQW+coKwQhTbPQlRHjtqLkXkDg5iKD17AnKE0Ssydhg5XCI7eZQsihk/zV9rJBYbiD8XRcNK/BT5tY=
+	t=1705919781; cv=none; b=Y71s//+gH2R4d/C3mKfd8J3rK7unT2gyoGpcjEnJauz7mfVyQKwAJ9nsfcgl7fY3eOyVU/p8jaAeLgGpNmI4i6XDuJs38M+Py1TbNLYEh3RjVumiL+/7dC+y8gFJOQOrtYQpIjbr/SxJ+Mo5rG/F4RVC4XKQfsWTuDFezaebKs8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705919468; c=relaxed/simple;
-	bh=Adk4o/syB8kwb6hMdHdd8CxVfC3VENFja8OPDajgNt8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hMW/rcA1rWoxzNrt1smP4YO5GJu7aMmVEdoFjeykTygwCLT0sLMus8Ibu5pdwmeR7hDuzD1QUz2aFmdUdvNnNkRYVbkuDeNA254tQyXNQHurI811NnEZKJRepV+aVxGBtq/fO3Gw12oKjHzcCG697W5vDeJ+K+IaibCZj5ph1ts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VXYiQi5z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F258C43390;
-	Mon, 22 Jan 2024 10:31:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705919468;
-	bh=Adk4o/syB8kwb6hMdHdd8CxVfC3VENFja8OPDajgNt8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VXYiQi5zdrm6D/arV+leoLROlbr7Rb91J3KkdLkhJFacvol55XCXpGBRHkReoQ+wS
-	 MkW8a9h0UGD2duiJuDVOIRQc078qQhCdjKiWa7YZ0JajQZT3g7KahEljOb9k9u4+L0
-	 SarFw28EbOctK+w9oDuislDN8TCphzc4XCNBhJM2xZHh4GJsXbOdYpiurVhYnFUbSZ
-	 hDzRTkr8ZuZ39SzKyQg1H82b1R5/uANddhFrvfCs4Uxxn1eX18NofmN0nwOXZi936R
-	 6fNa0KMEOiAcpeAHyHYvOfNhPE6/J+R7WSebFfcC47s9rnezA6PZInjFYR6EvpMXUq
-	 c/Nbd7OHGXp9g==
-Date: Mon, 22 Jan 2024 10:31:00 +0000
-From: Simon Horman <horms@kernel.org>
-To: Danielle Ratson <danieller@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
-	linux@armlinux.org.uk, sdf@google.com, kory.maincent@bootlin.com,
-	maxime.chevallier@bootlin.com, vladimir.oltean@nxp.com,
-	przemyslaw.kitszel@intel.com, ahmed.zaki@intel.com,
-	richardcochran@gmail.com, shayagr@amazon.com,
-	paul.greenwalt@intel.com, jiri@resnulli.us,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	mlxsw@nvidia.com, petrm@nvidia.com, idosch@nvidia.com
-Subject: Re: [RFC PATCH net-next 7/9] ethtool: cmis_cdb: Add a layer for
- supporting CDB commands
-Message-ID: <20240122103100.GA126470@kernel.org>
-References: <20240122084530.32451-1-danieller@nvidia.com>
- <20240122084530.32451-8-danieller@nvidia.com>
+	s=arc-20240116; t=1705919781; c=relaxed/simple;
+	bh=5FCUgJm+d0z23IyY8QzAQWEaTzcpuImwv3wxkbzHWX4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=LNz/W1+AmEKFGpTj/CT0Aeyg2XM+Yi5wPSqhhjARlVlbgWqEHXRmoV7UJq/D7OJKEkUyBNOys+NMiIMJX+Mr7yLAbtrPT4bjU27OME8tRfBlNVaZCsW2vLvfZob9cuiqLTZ4szb6bSvsM706NJKv8AJTslI3nzbfwCFDHt8rn1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=enaIHhLE; arc=none smtp.client-ip=198.47.23.248
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 40MAZp6Q112188;
+	Mon, 22 Jan 2024 04:35:51 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1705919751;
+	bh=+K/rQCn/hqlJLP3dy1hPy4J9z2pehOjOPDZTTkp8peQ=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=enaIHhLE9/KAkOzmgNI/LHGNp2+UNRx5MW3rjuXB5ZGX8Z2fyU6Is59GoEggRZeWy
+	 7FJSU7K0vrlWw6ZmnoFaZCShCFmhkjtSwdF56iIFRTP1kNA2+KE0yFciV9ufHZqnbA
+	 1m+qs4gMr1hILQe+RreWfo+cVh/EqWaGXcg6E/2k=
+Received: from DLEE103.ent.ti.com (dlee103.ent.ti.com [157.170.170.33])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 40MAZp3E045497
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 22 Jan 2024 04:35:51 -0600
+Received: from DLEE115.ent.ti.com (157.170.170.26) by DLEE103.ent.ti.com
+ (157.170.170.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 22
+ Jan 2024 04:35:50 -0600
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE115.ent.ti.com
+ (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 22 Jan 2024 04:35:50 -0600
+Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 40MAZitu059663;
+	Mon, 22 Jan 2024 04:35:45 -0600
+Message-ID: <d60f87d2-bfaf-40dc-97ed-481ad40aec60@ti.com>
+Date: Mon, 22 Jan 2024 16:05:44 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240122084530.32451-8-danieller@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 3/3] net: ti: icssg-prueth: Add support for ICSSG
+ switch firmware
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Rob Herring <robh@kernel.org>, Dan Carpenter <dan.carpenter@linaro.org>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Vladimir Oltean
+	<vladimir.oltean@nxp.com>,
+        Wolfram Sang <wsa+renesas@sang-engineering.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Grygorii Strashko <grygorii.strashko@ti.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Roger Quadros <rogerq@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "Eric
+ Dumazet" <edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <srk@ti.com>, <r-gunasekaran@ti.com>
+References: <20240118071005.1514498-1-danishanwar@ti.com>
+ <20240118071005.1514498-4-danishanwar@ti.com>
+ <f1ad5388-8a28-4b83-86d5-604d5ece84c0@lunn.ch>
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <f1ad5388-8a28-4b83-86d5-604d5ece84c0@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-On Mon, Jan 22, 2024 at 10:45:28AM +0200, Danielle Ratson wrote:
+Hi Andrew,
 
-...
+On 19/01/24 7:59 pm, Andrew Lunn wrote:
+> On Thu, Jan 18, 2024 at 12:40:05PM +0530, MD Danish Anwar wrote:
+>> Add support for ICSSG switch firmware using existing Dual EMAC driver
+>> with switchdev.
+>>
+>> Limitations:
+>> VLAN offloading is limited to 0-256 IDs.
+>> MDB/FDB static entries are limited to 511 entries and different FDBs can
+>> hash to same bucket and thus may not completely offloaded
+> 
+> What are the limits when using Dual EMAC driver? I'm just wondering if
+> we need to check that 257 VLANs have been offloaded, we cannot swap to
+> switch mode, keep with Dual EMAC?
+> 
 
-> +/**
-> + * struct ethtool_cmis_cdb_request - CDB commands request fields as decribed in
-> + *				the CMIS standard
-> + * @id: Command ID.
-> + * @epl_len: EPL memory length.
-> + * @lpl_len: LPL memory length.
-> + * @chk_code: Check code for the previous field and the payload.
-> + * @resv1: Added to match the CMIS standard request continuity.
-> + * @resv2: Added to match the CMIS standard request continuity.
-> + * @payload: Payload for the CDB commands.
-> + */
-> +struct ethtool_cmis_cdb_request {
-> +	__be16 id;
-> +	struct_group(body,
-> +		u16 epl_len;
-> +		u8 lpl_len;
-> +		u8 chk_code;
-> +		u8 resv1;
-> +		u8 resv2;
-> +		u8 payload[ETHTOOL_CMIS_CDB_LPL_MAX_PL_LENGTH];
-> +	);
-> +};
-> +
-> +#define CDB_F_COMPLETION_VALID		BIT(0)
-> +#define CDB_F_STATUS_VALID		BIT(1)
-> +
-> +/**
-> + * struct ethtool_cmis_cdb_cmd_args - CDB commands execution arguments
-> + * @req: CDB command fields as described in the CMIS standard.
-> + * @max_duration: Maximum duration time for command completion in msec.
-> + * @read_write_len_ext: Allowable additional number of byte octets to the LPL
-> + *			in a READ or a WRITE commands.
-> + * @rpl_exp_len: Expected reply length in bytes.
-> + * @flags: Validation flags for CDB commands.
-> + */
-> +struct ethtool_cmis_cdb_cmd_args {
-> +	struct ethtool_cmis_cdb_request req;
-> +	u16				max_duration;
-> +	u8				read_write_len_ext;
-> +	u8                              rpl_exp_len;
-> +	u8				flags;
-> +};
+Both Switch and dual EMAC has the same limit. Maximum 256 VIDs can ebe
+offloaded in both dual EMAC and switch mode. When VID is greater than
+256, we don't add the vid and return 0. You can see
+prueth_switchdev_vlans_add() for details on how vlans are added.
 
-...
+>> Switch mode requires loading of new firmware into ICSSG cores. This
+>> means interfaces have to taken down and then reconfigured to switch
+>> mode.
+> 
+> This is now out of date?
+> 
+>>
+>> Example assuming ETH1 and ETH2 as ICSSG2 interfaces:
+>>
+>> Switch to ICSSG Switch mode:
+>>  ip link set dev eth1 down
+>>  ip link set dev eth2 down
+>>  ip link add name br0 type bridge
+>>  ip link set dev eth1 master br0
+>>  ip link set dev eth2 master br0
+>>  ip link set dev br0 up
+>>  ip link set dev eth1 up
+>>  ip link set dev eth2 up
+>>  bridge vlan add dev br0 vid 1 pvid untagged self
+>>
+>> Going back to Dual EMAC mode:
+>>
+>>  ip link set dev br0 down
+>>  ip link set dev eth1 nomaster
+>>  ip link set dev eth2 nomaster
+>>  ip link set dev eth1 down
+>>  ip link set dev eth2 down
+>>  ip link del name br0 type bridge
+>>  ip link set dev eth1 up
+>>  ip link set dev eth2 up
+>>
+>> By default, Dual EMAC firmware is loaded, and can be changed to switch
+>> mode by above steps
+>>
+>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+>> ---
+>>  drivers/net/ethernet/ti/Kconfig               |   1 +
+>>  drivers/net/ethernet/ti/Makefile              |   3 +-
+>>  drivers/net/ethernet/ti/icssg/icssg_config.c  | 136 +++++++++++-
+>>  drivers/net/ethernet/ti/icssg/icssg_config.h  |   7 +
+>>  drivers/net/ethernet/ti/icssg/icssg_prueth.c  | 198 +++++++++++++++++-
+>>  .../net/ethernet/ti/icssg/icssg_switchdev.c   |   2 +-
+>>  6 files changed, 333 insertions(+), 14 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/ti/Kconfig b/drivers/net/ethernet/ti/Kconfig
+>> index be01450c20dc..c72f26828b04 100644
+>> --- a/drivers/net/ethernet/ti/Kconfig
+>> +++ b/drivers/net/ethernet/ti/Kconfig
+>> @@ -188,6 +188,7 @@ config TI_ICSSG_PRUETH
+>>  	select TI_ICSS_IEP
+>>  	select TI_K3_CPPI_DESC_POOL
+>>  	depends on PRU_REMOTEPROC
+>> +	depends on NET_SWITCHDEV
+>>  	depends on ARCH_K3 && OF && TI_K3_UDMA_GLUE_LAYER
+>>  	help
+>>  	  Support dual Gigabit Ethernet ports over the ICSSG PRU Subsystem.
+>> diff --git a/drivers/net/ethernet/ti/Makefile b/drivers/net/ethernet/ti/Makefile
+>> index d8590304f3df..d295bded7a32 100644
+>> --- a/drivers/net/ethernet/ti/Makefile
+>> +++ b/drivers/net/ethernet/ti/Makefile
+>> @@ -38,5 +38,6 @@ icssg-prueth-y := icssg/icssg_prueth.o \
+>>  		  icssg/icssg_config.o \
+>>  		  icssg/icssg_mii_cfg.o \
+>>  		  icssg/icssg_stats.o \
+>> -		  icssg/icssg_ethtool.o
+>> +		  icssg/icssg_ethtool.o \
+>> +		  icssg/icssg_switchdev.o
+>>  obj-$(CONFIG_TI_ICSS_IEP) += icssg/icss_iep.o
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.c b/drivers/net/ethernet/ti/icssg/icssg_config.c
+>> index afc10014ec03..eda08a87c902 100644
+>> --- a/drivers/net/ethernet/ti/icssg/icssg_config.c
+>> +++ b/drivers/net/ethernet/ti/icssg/icssg_config.c
+>> @@ -105,28 +105,49 @@ static const struct map hwq_map[2][ICSSG_NUM_OTHER_QUEUES] = {
+>>  	},
+>>  };
+>>  
+>> +static void icssg_config_mii_init_switch(struct prueth_emac *emac)
+> 
+> I'm surprised you need to configure the MII interface different in
+> switch mode. Please could you explain this a bit more.>
 
-> +int ethtool_cmis_page_init(struct ethtool_module_eeprom *page_data,
-> +			   u8 page, u32 offset, u32 length)
-> +{
-> +	page_data->page = page;
-> +	page_data->offset = offset;
-> +	page_data->length = length;
-> +	page_data->i2c_address = ETHTOOL_CMIS_CDB_PAGE_I2C_ADDR;
-> +	page_data->data = kmalloc(page_data->length, GFP_KERNEL);
-> +	if (!page_data->data)
-> +		return -ENOMEM;
-> +
-> +	return 0;
-> +}
+Sure, I'll explain.
 
-...
+TX_MUX_SEL0 (BIT(8)) of TXCFG register indicated weather the port is
+connected to txpru0 or txpru1
 
-> +static int
-> +__ethtool_cmis_cdb_execute_cmd(struct net_device *dev,
-> +			       struct ethtool_module_eeprom *page_data,
-> +			       u32 offset, u32 length, void *data)
-> +{
-> +	const struct ethtool_ops *ops = dev->ethtool_ops;
-> +	struct netlink_ext_ack extack = {};
-> +	int err;
-> +
-> +	page_data->offset = offset;
-> +	page_data->length = length;
-> +
-> +	memset(page_data->data, 0, ETHTOOL_CMIS_CDB_LPL_MAX_PL_LENGTH);
-> +	memcpy(page_data->data, data, page_data->length);
-> +
-> +	err = ops->set_module_eeprom_by_page(dev, page_data, &extack);
-> +	if (err < 0) {
-> +		if (extack._msg)
-> +			netdev_err(dev, "%s\n", extack._msg);
-> +	}
-> +
-> +	return err;
-> +}
+0h = TX data from PRU0 is selected
+1h = TX data from PRU1 is selected
 
-...
+Refer to section 6.5.14.11.3 of TRM [1].
 
-> +int ethtool_cmis_cdb_execute_cmd(struct net_device *dev,
-> +				 struct ethtool_cmis_cdb_cmd_args *args)
-> +{
-> +	struct ethtool_module_eeprom page_data = {};
-> +	u32 offset;
-> +	int err;
-> +
-> +	args->req.chk_code =
-> +		cmis_cdb_calc_checksum(&args->req, sizeof(args->req));
-> +
-> +	if (args->req.lpl_len > args->read_write_len_ext) {
-> +		ethnl_module_fw_flash_ntf_err(dev,
-> +					      "LPL length is longer than CDB read write length extension allows");
-> +		return -EINVAL;
-> +	}
-> +
-> +	err = ethtool_cmis_page_init(&page_data, ETHTOOL_CMIS_CDB_CMD_PAGE, 0,
-> +				     ETHTOOL_CMIS_CDB_LPL_MAX_PL_LENGTH);
+In dual EMAC mode, for port0 the connected PRU cores are pru0, rtu0 and
+txpru0 similarly for port1 the connected PRU cores are pru1, rtu1 and
+txpru1. Port0 and port1 can not communicate among each other as they
+don't share any PRU cores. So BIT(8) for port0 is 0h (meaning TX data
+from PRU0 is selected) and BIT(8) for port1 is 1h (meaning TX data from
+PRU1 is selected)
 
-ETHTOOL_CMIS_CDB_LPL_MAX_PL_LENGTH is passed as the length argument
-of ethtool_cmis_page_init, which will allocate that many
-bytes for page_data->data.
+In switch mode, for port0 the connected PRU cores are pru0, rtu0 and
+*txpru1* similarly for port1 the connected PRU cores are pru1, rtu1 and
+*txpru0*.
 
-> +	if (err < 0)
-> +		return err;
-> +
-> +	/* According to the CMIS standard, there are two options to trigger the
-> +	 * CDB commands. The default option is triggering the command by writing
-> +	 * the CMDID bytes. Therefore, the command will be split to 2 calls:
-> +	 * First, with everything except the CMDID field and then the CMDID
-> +	 * field.
-> +	 */
-> +	offset = CMIS_CDB_CMD_ID_OFFSET +
-> +		offsetof(struct ethtool_cmis_cdb_request, body);
-> +	err = __ethtool_cmis_cdb_execute_cmd(dev, &page_data, offset,
-> +					     sizeof(args->req.body),
-> +					     &args->req.body);
+In switch mode, port0 is connected to txpru1 and port1 is connected to
+txpru0. This enables the firmware to do the forwarding between the
+ports. Now to enable this configuration BIT(8) needs to be set
+differently in switch mode. BIT(8) for port0 is 1h (meaning TX data from
+PRU1 is selected) and BIT(8) for port1 is 0h (meaning TX data from PRU0
+is selected). This enables the forwarding between ports.
 
-Hi Danielle,
-
-However, here sizeof(args->req.body) is passed as the length
-argument of __ethtool_cmis_cdb_execute_cmd() which will:
-
-1. Zero ETHTOOL_CMIS_CDB_LPL_MAX_PL_LENGTH bytes of page_data->data
-2. Copy sizeof(args->req.body) bytes into page_data->data
-
-args->req.body includes several fields, one of which is
-ETHTOOL_CMIS_CDB_LPL_MAX_PL_LENGTH bytes long. So,
-args->req.body > ETHTOOL_CMIS_CDB_LPL_MAX_PL_LENGTH
-and it seems that step 2 above causes a buffer overrun.
-
-Flagged by clang-17 W=1 build
-
- In file included from net/ethtool/cmis_cdb.c:3:
- In file included from ./include/linux/ethtool.h:16:
- In file included from ./include/linux/bitmap.h:12:
- In file included from ./include/linux/string.h:295:
- ./include/linux/fortify-string.h:579:4: error: call to '__write_overflow_field' declared with 'warning' attribute: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror,-Wattribute-warning]
-   579 |                         __write_overflow_field(p_size_field, size);
-       |                         ^
- ./include/linux/fortify-string.h:579:4: error: call to '__write_overflow_field' declared with 'warning' attribute: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror,-Wattribute-warning]
- ./include/linux/fortify-string.h:579:4: error: call to '__write_overflow_field' declared with 'warning' attribute: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror,-Wattribute-warning]
+So MII interface needs to be configured differently for MAC and switch
+mode. The only difference being the BIT(8)
 
 
-> +	if (err < 0)
-> +		goto out;
-> +
-> +	offset = CMIS_CDB_CMD_ID_OFFSET +
-> +		offsetof(struct ethtool_cmis_cdb_request, id);
-> +	err = __ethtool_cmis_cdb_execute_cmd(dev, &page_data, offset,
-> +					     sizeof(args->req.id),
-> +					     &args->req.id);
-> +	if (err < 0)
-> +		goto out;
-> +
-> +	err = cmis_cdb_wait_for_completion(dev, args);
-> +	if (err < 0)
-> +		goto out;
-> +
-> +	err = cmis_cdb_wait_for_status(dev, args);
-> +	if (err < 0)
-> +		goto out;
-> +
-> +	err = cmis_cdb_process_reply(dev, &page_data, args);
-> +
-> +out:
-> +	ethtool_cmis_page_fini(&page_data);
-> +	return err;
-> +}
+>> +{
+>> +	struct prueth *prueth = emac->prueth;
+>> +	int mii = prueth_emac_slice(emac);
+>> +	u32 txcfg_reg, pcnt_reg, txcfg;
+>> +	struct regmap *mii_rt;
+>> +
+>> +	mii_rt = prueth->mii_rt;
+>> +
+>> +	txcfg_reg = (mii == ICSS_MII0) ? PRUSS_MII_RT_TXCFG0 :
+>> +				       PRUSS_MII_RT_TXCFG1;
+>> +	pcnt_reg = (mii == ICSS_MII0) ? PRUSS_MII_RT_RX_PCNT0 :
+>> +				       PRUSS_MII_RT_RX_PCNT1;
+>> +
+>> +	txcfg = PRUSS_MII_RT_TXCFG_TX_ENABLE |
+>> +		PRUSS_MII_RT_TXCFG_TX_AUTO_PREAMBLE |
+>> +		PRUSS_MII_RT_TXCFG_TX_IPG_WIRE_CLK_EN;
+>> +
+>> +	if (emac->phy_if == PHY_INTERFACE_MODE_MII && mii == ICSS_MII1)
+>> +		txcfg |= PRUSS_MII_RT_TXCFG_TX_MUX_SEL;
+>> +	else if (emac->phy_if != PHY_INTERFACE_MODE_MII && mii == ICSS_MII0)
+>> +		txcfg |= PRUSS_MII_RT_TXCFG_TX_MUX_SEL;
+>> +
+>> +	regmap_write(mii_rt, txcfg_reg, txcfg);
+>> +	regmap_write(mii_rt, pcnt_reg, 0x1);
+>> +}
+>> +
+>>  static void icssg_config_mii_init(struct prueth_emac *emac)
+>>  {
+>> -	u32 rxcfg, txcfg, rxcfg_reg, txcfg_reg, pcnt_reg;
+>>  	struct prueth *prueth = emac->prueth;
+>>  	int slice = prueth_emac_slice(emac);
+>> +	u32 txcfg, txcfg_reg, pcnt_reg;
+>>  	struct regmap *mii_rt;
+>>  
+>>  	mii_rt = prueth->mii_rt;
+>>  
+>> -	rxcfg_reg = (slice == ICSS_MII0) ? PRUSS_MII_RT_RXCFG0 :
+>> -				       PRUSS_MII_RT_RXCFG1;
+>>  	txcfg_reg = (slice == ICSS_MII0) ? PRUSS_MII_RT_TXCFG0 :
+>>  				       PRUSS_MII_RT_TXCFG1;
+>>  	pcnt_reg = (slice == ICSS_MII0) ? PRUSS_MII_RT_RX_PCNT0 :
+>>  				       PRUSS_MII_RT_RX_PCNT1;
+>>  
+>> -	rxcfg = MII_RXCFG_DEFAULT;
+>>  	txcfg = MII_TXCFG_DEFAULT;
+>>  
+>> -	if (slice == ICSS_MII1)
+>> -		rxcfg |= PRUSS_MII_RT_RXCFG_RX_MUX_SEL;
+>> -
+>>  	/* In MII mode TX lines swapped inside ICSSG, so TX_MUX_SEL cfg need
+>>  	 * to be swapped also comparing to RGMII mode.
+>>  	 */
+>> @@ -135,7 +156,6 @@ static void icssg_config_mii_init(struct prueth_emac *emac)
+>>  	else if (emac->phy_if != PHY_INTERFACE_MODE_MII && slice == ICSS_MII1)
+>>  		txcfg |= PRUSS_MII_RT_TXCFG_TX_MUX_SEL;
+>>  
+>> -	regmap_write(mii_rt, rxcfg_reg, rxcfg);
+>>  	regmap_write(mii_rt, txcfg_reg, txcfg);
+>>  	regmap_write(mii_rt, pcnt_reg, 0x1);
+>>  }
+>> @@ -249,6 +269,66 @@ static int emac_r30_is_done(struct prueth_emac *emac)
+>>  	return 1;
+>>  }
+>>  
+>> +static int prueth_switch_buffer_setup(struct prueth_emac *emac)
+>> +{
+>> +	struct icssg_buffer_pool_cfg __iomem *bpool_cfg;
+>> +	struct icssg_rxq_ctx __iomem *rxq_ctx;
+>> +	struct prueth *prueth = emac->prueth;
+>> +	int slice = prueth_emac_slice(emac);
+>> +	u32 addr;
+>> +	int i;
+>> +
+>> +	addr = lower_32_bits(prueth->msmcram.pa);
+>> +	if (slice)
+>> +		addr += PRUETH_NUM_BUF_POOLS * PRUETH_EMAC_BUF_POOL_SIZE;
+>> +
+>> +	if (addr % SZ_64K) {
+>> +		dev_warn(prueth->dev, "buffer pool needs to be 64KB aligned\n");
+>> +		return -EINVAL;
+>> +	}
+> 
+> What happens if its not? Do we cleanly stay in Dual EMAC mode without
+> any loss of configuration? Or do bad things happen? Maybe this should
+> be checked at probe time, so you can deny the swap to switch mode
+> quickly and easily?
+> 
 
-...
+This is independent of MAC or switch. The MSMC address always needs to
+be 64KB aligned. This is a bug in Firmware. If it's not 64KB aligned bad
+things might happen, that's why we just stop and return -EINVAL. The
+interface will simply not work. The same check is also done in
+prueth_emac_buffer_setup().
+
+During probe we make sure that the MSMC is aligned with 64KB. You can
+have a look at prueth_probe() [2]. After probe during open() we check
+again to see if MSMC is 64KB aligned and then only do the needed
+configuration. I can move this check from individual switch / mac APIs
+to the beginning of ndo_open() if you want that.
+
+> 	Andrew
+
+
+[1]
+https://www.ti.com/lit/ug/spruid7e/spruid7e.pdf?ts=1705918869984&ref_url=https%253A%252F%252Fwww.ti.com%252Fproduct%252FAM6548
+
+[2]
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/ethernet/ti/icssg/icssg_prueth.c?h=v6.8-rc1#n2079
+
+-- 
+Thanks and Regards,
+Danish
 
