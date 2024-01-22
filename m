@@ -1,186 +1,104 @@
-Return-Path: <netdev+bounces-64735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EA7E836DFD
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:42:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8810E836E35
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 18:47:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 704B61C24952
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 17:42:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3EAB91F27F4B
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 17:47:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 614C447F5B;
-	Mon, 22 Jan 2024 17:02:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7882A4B5DC;
+	Mon, 22 Jan 2024 17:12:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I9yNLUia"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VfYbAlV6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37FED41767;
-	Mon, 22 Jan 2024 17:02:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03F834A9BC;
+	Mon, 22 Jan 2024 17:12:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705942924; cv=none; b=fcnyugLF1tOap98qjg+1uLMj1Pf2iqXmEpKAA6zE8BteI8Gr+c0SywBqkY403u6Fel4+zSdFmThqJpowhSYWiYj244vnok4/OSHdJZcHTR3xBLHzT9FAt8QELL7nxOKykQ1yDFEehz09D4kSaGncDKS29TUjsbWttGQ62y7ZhfI=
+	t=1705943554; cv=none; b=Bh7sXgf33Ijs/xEkNj329hwBpU1nE5MmISs+ZCy9MVsOdobRd7/pR1FBxMkwDn3nNMuawGMBFmLxkBml1bIrpS6UaauK10+0VSv6X0kRDo7pN9Ok52vmWOpPcVegudTANLwQP0/LPHfWDES7rlAg+CZt9+P9r//baL8yvtvxMiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705942924; c=relaxed/simple;
-	bh=cNXx+pNcOPu9bakjCohGYpnVqT6iQFH/OsKqW9Y6OhA=;
+	s=arc-20240116; t=1705943554; c=relaxed/simple;
+	bh=1e0c7h65C7Y9VUpkVImG0ZmRYTbDxV8hwPaGMflR99E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZAld0YBOPZcs2LLN5/uWyFuxcxrd30BDuRmknSLDITgjHFoBkrP/KosOSYvMp1M3llSAyI6ehMQ8xshDLUNWKmrTo7JU5dK/TJUrSzqYNMOfT9zVo5iEIA+/1famXOereeLs9VzbsPrwOpLaDILWbOAUSVA3n+jF4p3ToDob/co=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I9yNLUia; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FB6BC43390;
-	Mon, 22 Jan 2024 17:02:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705942923;
-	bh=cNXx+pNcOPu9bakjCohGYpnVqT6iQFH/OsKqW9Y6OhA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=I9yNLUiaB8t4hTTpf4JRkwgvXD5ROAswt7yDCsQgs/9lpY4Us9b0g97oznNQ9H+Ai
-	 cKN2IO7yH+a1yTQ5Rqxp28n3glie0mgTMZXqKmpFNyB9qtL+L+8SKVE0GDcdEkppWS
-	 +NMbTSZNTExviZ+x/rsuYhdlBs5Li99iO49MGebBls0epm0QaBt2tz+th76cKl57/L
-	 7ujgq0x7Mk7/oB26M2nGkBo+7WIniJx65/sRiv7GLVv5pLeccoADjh26K6gpORMyjd
-	 JG0wAXxCw6uK6WVTcAdE80dW28uKZM5RaE53zMVoMsRFZKjud1pNHP2+YZfKRlY4LN
-	 UuIhXDxaP4NIQ==
-Date: Mon, 22 Jan 2024 18:01:59 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: linux-nfs@vger.kernel.org, lorenzo.bianconi@redhat.com, neilb@suse.de,
-	kuba@kernel.org, chuck.lever@oracle.com, horms@kernel.org,
-	netdev@vger.kernel.org, Steve Dickson <steved@redhat.com>
-Subject: Re: [PATCH v6 0/3] convert write_threads, write_version and
- write_ports to netlink commands
-Message-ID: <Za6fh2cd7ljGj8k4@lore-desk>
-References: <cover.1705771400.git.lorenzo@kernel.org>
- <8b2054af2aa6b74e79aa898b5412b5cc44946f81.camel@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=TDLDUmIT/LhrszVckGPzEny7HyDlP0DCPGjkuC/CVkrwCisQghAghd1P+TPkTGY2jxwRBWR5Jrvuogm35kUTq71qc/ee/NwBEMmfZTfOxGu5FslXg1x4ZT56kIa6Tx60wyNov/3A21ZgQJmGzdgriJoRBcpslRmC47FIWp0BXkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=VfYbAlV6; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=OocAKhFNnuVz1CoUH7OyvE7TA9nNw+y+skld+4cN6dY=; b=VfYbAlV6K7QQZG9f9GC3tkEAyb
+	TEf8WQcrE1W2XPzRzNH8asCUM7MGml3nQQ2CtWuQHQtvubEJJvrTO/ryyGS5xqBdBcN9EJ0imzMWe
+	BXARefnokht4DEYts66ZIP7bchDA8iRMXFfsFygJ9t6FeFL1YTpSZyICQDl2yjVijDKCZJB1qpzQb
+	MX9td3CHd7INswtLh0wMUT7Cptr0dcMDaPsgmWO4vKmpSPK58tITReXY9L6FI8WpPVuLf7WbxJIiS
+	3ma82UEZ53WQp6PLnWaTD5y81ZoiCyoBvjZ233XsboBa8aDvabNvtwNLei4Cil7Bb/h2St041mwzN
+	PVa5GRzw==;
+Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rRxqU-00000000Uz8-1SZ5;
+	Mon, 22 Jan 2024 17:12:26 +0000
+Date: Mon, 22 Jan 2024 17:12:26 +0000
+From: Matthew Wilcox <willy@infradead.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "zhangpeng (AS)" <zhangpeng362@huawei.com>, linux-mm@kvack.org,
+	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+	akpm@linux-foundation.org, davem@davemloft.net, dsahern@kernel.org,
+	kuba@kernel.org, pabeni@redhat.com, arjunroy@google.com,
+	wangkefeng.wang@huawei.com
+Subject: Re: SECURITY PROBLEM: Any user can crash the kernel with TCP ZEROCOPY
+Message-ID: <Za6h-tB7plgKje5r@casper.infradead.org>
+References: <20240119092024.193066-1-zhangpeng362@huawei.com>
+ <Zap7t9GOLTM1yqjT@casper.infradead.org>
+ <5106a58e-04da-372a-b836-9d3d0bd2507b@huawei.com>
+ <Za6SD48Zf0CXriLm@casper.infradead.org>
+ <CANn89iL4qUXsVDRNGgBOweZbJ6ErWMsH+EpOj-55Lky8JEEhqQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="KB9lUJ+ko+IeDdy5"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <8b2054af2aa6b74e79aa898b5412b5cc44946f81.camel@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89iL4qUXsVDRNGgBOweZbJ6ErWMsH+EpOj-55Lky8JEEhqQ@mail.gmail.com>
 
+On Mon, Jan 22, 2024 at 05:30:18PM +0100, Eric Dumazet wrote:
+> On Mon, Jan 22, 2024 at 5:04 PM Matthew Wilcox <willy@infradead.org> wrote:
+> > I'm disappointed to have no reaction from netdev so far.  Let's see if a
+> > more exciting subject line evinces some interest.
+> 
+> Hmm, perhaps some of us were enjoying their weekend ?
 
---KB9lUJ+ko+IeDdy5
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I am all in favour of people taking time off!  However the report came
+in on Friday at 9am UTC so it had been more than a work day for anyone
+anywhere in the world without response.
 
-> On Sat, 2024-01-20 at 18:33 +0100, Lorenzo Bianconi wrote:
-> > Introduce write_threads, write_version and write_ports netlink
-> > commands similar to the ones available through the procfs.
-> >=20
-> > Changes since v5:
-> > - for write_ports and write_version commands, userspace is expected to =
-provide
-> >   a NFS listeners/supported versions list it want to enable (all the ot=
-her
-> >   ports/versions will be disabled).
-> > - fix comments
-> > - rebase on top of nfsd-next
-> > Changes since v4:
-> > - rebase on top of nfsd-next tree
-> > Changes since v3:
-> > - drop write_maxconn and write_maxblksize for the moment
-> > - add write_version and write_ports commands
-> > Changes since v2:
-> > - use u32 to store nthreads in nfsd_nl_threads_set_doit
-> > - rename server-attr in control-plane in nfsd.yaml specs
-> > Changes since v1:
-> > - remove write_v4_end_grace command
-> > - add write_maxblksize and write_maxconn netlink commands
-> >=20
-> > This patch can be tested with user-space tool reported below:
-> > https://github.com/LorenzoBianconi/nfsd-netlink.git
-> >=20
-> > Lorenzo Bianconi (3):
-> >   NFSD: convert write_threads to netlink command
-> >   NFSD: add write_version to netlink command
-> >   NFSD: add write_ports to netlink command
-> >=20
-> >  Documentation/netlink/specs/nfsd.yaml |  94 ++++++
-> >  fs/nfsd/netlink.c                     |  63 ++++
-> >  fs/nfsd/netlink.h                     |  10 +
-> >  fs/nfsd/nfsctl.c                      | 396 ++++++++++++++++++++++
-> >  include/uapi/linux/nfsd_netlink.h     |  44 +++
-> >  tools/net/ynl/generated/nfsd-user.c   | 460 ++++++++++++++++++++++++++
-> >  tools/net/ynl/generated/nfsd-user.h   | 155 +++++++++
-> >  7 files changed, 1222 insertions(+)
-> >=20
->=20
->=20
-> I think this is really close and coming together! Before we merge this
-> though, I'd _really_ like to see some patches for rpc.nfsd in nfs-utils.
-> Until we try to implement the userland bits, we won't know if we've
-> gotten this interface right.
->=20
-> ...and before that, we really need to have some sort of userland program
-> packaged and available for querying the new netlink RPC stats from nfsd.
-> You have the simple userland one on github, but I think we need omething
-> packaged, ideally as part of nfs-utils.
+> I don't really know what changed recently, all I know is that TCP zero
+> copy is for real network traffic.
+> 
+> Real trafic uses order-0 pages, 4K at a time.
+> 
+> If can_map_frag() needs to add another safety check, let's add it.
 
-Hi Jeff,
+So it's your opinion that people don't actually use sendfile() from
+a local file, and we can make this fail to zerocopy?  That's good
+because I had a slew of questions about what expectations we had around
+cache coherency between pages mapped this way and write()/mmap() of
+the original file.  If we can just disallow this, we don't need to
+have a discussion about it.
 
-I guess we can experiment on the new APIs very easily with ynl cli.py.
-Something like:
+> syzbot is usually quite good at bisections, was a bug origin found ?
 
-$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/nfsd.yaml --dum=
-p rpc-status-get
-[{'compound-ops': [53, 22, 9],
- 'daddr4': 3232266828,
- 'dport': 2049,
- 'flags': 5,
- 'proc': 1,
- 'prog': 100003,
- 'saddr4': 3232266753,
- 'service_time': 81705129,
- 'sport': 908,
- 'version': 4,
- 'xid': 0},
-{'compound-ops': [53, 22, 9],
- 'daddr4': 3232266828,
- 'dport': 2049,
- 'flags': 5,
- 'proc': 1,
- 'prog': 100003,
- 'saddr4': 3232266753,
- 'service_time': 81700496,
- 'sport': 908,
- 'version': 4,
- 'xid': 0}]
-
-or=20
-
-=2E/tools/net/ynl/cli.py --spec Documentation/netlink/specs/nfsd.yaml --do =
-threads-get
-{'threads': 8}
-
-(the only required package is jsonschema iirc).
-
-Regards,
-Lorenzo
-
->=20
-> Doing that first would allow you to add the necessary autoconf/libtool
-> stuff to pull in the netlink libraries, which will be a prerequisite for
-> doing the userland rpc.nfsd work, and will probably be a bit simpler
-> than modifying rpc.nfsd.
-> --=20
-> Jeff Layton <jlayton@kernel.org>
-
---KB9lUJ+ko+IeDdy5
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZa6fhwAKCRA6cBh0uS2t
-rFSbAP9R1RTHvGmsRCaO4ma3HM8G2wC16u4sHfTfgVUn63DsKgD/exXFF5MxO4XG
-XfjyB87e5u/fjm31dqXxjKbgOxNGWAw=
-=ysUZ
------END PGP SIGNATURE-----
-
---KB9lUJ+ko+IeDdy5--
+I have the impression that Huawei run syzkaller themselves without
+syzbot.  I suspect this bug has been there for a good long time.
+Wonder why nobody's found it before; it doesn't seem complicated for a
+fuzzer to stumble into.
 
