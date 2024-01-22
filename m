@@ -1,133 +1,162 @@
-Return-Path: <netdev+bounces-64669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E9E783640A
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 14:09:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1038836424
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 14:14:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E848B24F5E
-	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 12:58:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 897812928D5
+	for <lists+netdev@lfdr.de>; Mon, 22 Jan 2024 13:14:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A966D3C07B;
-	Mon, 22 Jan 2024 12:58:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="AI3+L+0c"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 879933CF5F;
+	Mon, 22 Jan 2024 13:13:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D0583A1C6;
-	Mon, 22 Jan 2024 12:58:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0CE03C6BC
+	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 13:13:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705928326; cv=none; b=SISWKg5KvMY3yONVuApzeWCCRxau9mfjoKXV1wqi7p8nN+mg0ZDahxjynnOx577elyyCB0uYX/fwxZFTTQM9HpSESYWnEyLsXcA4H9Kt9uenRg0zw9RHFsI9nJAqHYBL+lhE4xw/jav5IeJkzAk7Q7S0ptXJhT2a9VQNJ8CXIPk=
+	t=1705929235; cv=none; b=iZ5jmZFMJxoCKaKr4DiVQvtIgeASMAqCkQQXLhaQX9mtqF4yDhkRabIfb9+qly+V02gQiYP1a+J+9SFcofH438v7WTAMb92D1DipH6mkTGVOHu41NrXZen4GLUjLfqpSJji7VDoGXrDMAWDfQkDG4xEs68Sh0BcZWKpErPma4E4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705928326; c=relaxed/simple;
-	bh=HFZqcUV95VG1QYVSxv5cz6r1X1VcMnGpM8zbzpiW+y8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=brhFnWGqLa6jJZRCmNkoFQFLlsCnvgghrktglgXa2atRA97wzpqE/rhCNLFofjNlZvbeXjMaxRwEaJ155LH3DxE4yCdj5UH775HL+naqlpe98krff6OtZw9IXPHGp5wDYhGqzjCh7XycbQ+qJMjKkorHcb66RduzREGWaCqq2M4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=AI3+L+0c; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40M42PxT013123;
-	Mon, 22 Jan 2024 12:58:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=uhFlIPVA8pV+lRHjhhGe3aypD6SMO/ddDP706VtvdYg=; b=AI
-	3+L+0cttCB9J6c8qasc3uH9QOpEQY3odQmc8HsWovMy9khvOeb3wJWoSujcXRxAx
-	0xAxGfr+RxvVGbp88WLP/EIsYA27yWhNi8gGQwc1gB43sqZqe+Ty7xcnfcJohasV
-	gxUt01DJ7wsCRAY2AxZ0jgEcDyywiSzGxFwO7mkOr7vRBaaPTSYO5mUKpITtoVDV
-	8moZdHAFnzJBJZoPV+hKo5ltfbFipDy6GDDlF2e4lDXVcu9RARwIKB+c0x1HAOn1
-	DXa00ECgBZmJ0ngYXMRLzJDohxepoPVpM2tfYkNRM3TbKYL+Ga4EpFAuzp0jA5rY
-	kkZfOcjSmwBTOLdl60WQ==
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3vr6xn4044-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 22 Jan 2024 12:58:41 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 40MCweqG020607
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 22 Jan 2024 12:58:40 GMT
-Received: from [10.253.14.163] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Mon, 22 Jan
- 2024 04:58:36 -0800
-Message-ID: <17117e8a-e808-4908-985f-932232b1e6ea@quicinc.com>
-Date: Mon, 22 Jan 2024 20:58:33 +0800
+	s=arc-20240116; t=1705929235; c=relaxed/simple;
+	bh=5R7j8Dl9cK0KfAuJewWJ6X7E8Pn2vi+QuvLjLtLOAz8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Xcs7Ce5btRCVi73muJtx5PBTPw2WJBAWj8zZSZkvXZK1yuTZC6n9Zq3xM2pzvm97qPBPqlCF9VKJ7Evh1/eDvtiRW8vQw1eWmvlUDmN3WGiqWAzh0snxi3T5bkqOav8tJPKB4Z9dkmOoGtHHOu7WpvEyZLweJCxMPX28WW86Lb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1rRu75-0005ez-Pg; Mon, 22 Jan 2024 14:13:19 +0100
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1rRu73-001biB-E1; Mon, 22 Jan 2024 14:13:17 +0100
+Received: from pengutronix.de (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id EDDCF27B58F;
+	Mon, 22 Jan 2024 13:13:16 +0000 (UTC)
+Date: Mon, 22 Jan 2024 14:13:16 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Conor Dooley <conor@kernel.org>
+Cc: linux-riscv@lists.infradead.org, 
+	Conor Dooley <conor.dooley@microchip.com>, Daire McNamara <daire.mcnamara@microchip.com>, 
+	Wolfgang Grandegger <wg@grandegger.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-clk@vger.kernel.org
+Subject: Re: [PATCH v2 2/7] dt-bindings: can: mpfs: add missing required clock
+Message-ID: <20240122-surely-crimp-ba4a8c55106d-mkl@pengutronix.de>
+References: <20240122-catty-roast-d3625dbb02fe@spud>
+ <20240122-breeder-lying-0d3668d98886@spud>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/6] arm64: dts: qcom: ipq9574: Add PPE device tree node
-Content-Language: en-US
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        Dmitry Baryshkov
-	<dmitry.baryshkov@linaro.org>
-CC: <andersson@kernel.org>, <konrad.dybcio@linaro.org>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <quic_kkumarcs@quicinc.com>, <quic_suruchia@quicinc.com>,
-        <quic_soni@quicinc.com>, <quic_pavir@quicinc.com>,
-        <quic_souravp@quicinc.com>, <quic_linchen@quicinc.com>,
-        <quic_leiwei@quicinc.com>
-References: <20240110112059.2498-1-quic_luoj@quicinc.com>
- <20240110112059.2498-2-quic_luoj@quicinc.com>
- <a42718a9-d0f9-47d9-9ee8-fb520ed2a7a8@linaro.org>
- <de0ad768-05fa-4bb1-bcbc-0adb28cb2257@quicinc.com>
- <CAA8EJppeQdB4W8u0ux16pxBBwF_fpt1j-5aC0f849n9_iaaYtQ@mail.gmail.com>
- <6fc9e65a-709a-4923-b0b3-7c460199417a@quicinc.com>
- <84366aa2-e51e-4bce-a9d5-2420f1d9db0c@linaro.org>
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <84366aa2-e51e-4bce-a9d5-2420f1d9db0c@linaro.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: Y5YKXXsMobSKxNPKclEV3TvBAd4GDU69
-X-Proofpoint-ORIG-GUID: Y5YKXXsMobSKxNPKclEV3TvBAd4GDU69
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-22_02,2024-01-22_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- clxscore=1015 mlxscore=0 impostorscore=0 spamscore=0 lowpriorityscore=0
- phishscore=0 malwarescore=0 suspectscore=0 bulkscore=0 mlxlogscore=914
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2311290000 definitions=main-2401220091
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="gm5qx6ivqj7qxcxg"
+Content-Disposition: inline
+In-Reply-To: <20240122-breeder-lying-0d3668d98886@spud>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
 
+--gm5qx6ivqj7qxcxg
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 1/12/2024 10:51 PM, Krzysztof Kozlowski wrote:
-> On 12/01/2024 15:40, Jie Luo wrote:
->>>
->>>   From the first glance, the bindings do not follow upstream principles.
->>> You have all the settings (tdm, port config, etc) in the DT, while
->>> they should instead go to the driver. Well, unless you expect that the
->>> board might need to override them.
->>>
->> Hi Dmitry,
->> The TDM configuration varies per SoC type, since the ethernet port
->> capabilities of the SoCs vary. So we will have two different TDM
->> configurations for IPQ5332 and IPQ9574 SoC. The driver also will
->> need to support future SoC, so we choose to configure this from the
->> DTSI. The same reason applies to the port scheduler config as well.
-> 
-> Your statements here confirm Dmitry suggestion, so these are not board
-> specific and should go to the driver. Please read again Dmitry's sentences.
-> 
-> Best regards,
-> Krzysztof
-> 
+On 22.01.2024 12:19:50, Conor Dooley wrote:
+> From: Conor Dooley <conor.dooley@microchip.com>
+>=20
+> The CAN controller on PolarFire SoC has an AHB peripheral clock _and_ a
+> CAN bus clock. The bus clock was omitted when the binding was written,
+> but is required for operation. Make up for lost time and add it.
+>=20
+> Cautionary tale in adding bindings without having implemented a real
+> user for them perhaps.
+>=20
+> Fixes: c878d518d7b6 ("dt-bindings: can: mpfs: document the mpfs CAN contr=
+oller")
+> Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
+> ---
+>  .../devicetree/bindings/net/can/microchip,mpfs-can.yaml     | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/Documentation/devicetree/bindings/net/can/microchip,mpfs-can=
+=2Eyaml b/Documentation/devicetree/bindings/net/can/microchip,mpfs-can.yaml
+> index 45aa3de7cf01..01e4d4a54df6 100644
+> --- a/Documentation/devicetree/bindings/net/can/microchip,mpfs-can.yaml
+> +++ b/Documentation/devicetree/bindings/net/can/microchip,mpfs-can.yaml
+> @@ -24,7 +24,9 @@ properties:
+>      maxItems: 1
+> =20
+>    clocks:
+> -    maxItems: 1
+> +    items:
+> +      - description: AHB peripheral clock
+> +      - description: CAN bus clock
 
-Sure, we will update the driver to configure the TDM depending on the 
-SoC need.
+What about adding clock-names, so that the order can be checked
+automatically?
+
+> =20
+>  required:
+>    - compatible
+> @@ -39,7 +41,7 @@ examples:
+>      can@2010c000 {
+>          compatible =3D "microchip,mpfs-can";
+>          reg =3D <0x2010c000 0x1000>;
+> -        clocks =3D <&clkcfg 17>;
+> +        clocks =3D <&clkcfg 17>, <&clkcfg 37>;
+>          interrupt-parent =3D <&plic>;
+>          interrupts =3D <56>;
+>      };
+> --=20
+> 2.43.0
+>=20
+>=20
+
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--gm5qx6ivqj7qxcxg
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmWuaecACgkQvlAcSiqK
+BOiItAgAiVb1F3nml4JkuMIY7dmQo5gzshMOge9YwxV+CViwK6+VZN81W+a+uBRC
+nG6H9blRP6/eWCGmJMty07eR8pnzfzh1F7fdSr3ZjVJAtPcNY/Ywc5ByKebJz8jS
+bXxVgQ4cxcMzl54lO6xd0cFi9cCAIc8ENFStCmEhc65/KJMu8uDcitYv2T1fDj3d
+mrs7ok2oKy0JvVoQUVdeSfcWj3KxK4Hl4HX4cDZlsQhLuNRcRm17k5Xf8wtqiW+T
+Qi0Lyzls8rj/Phk0qKpWpcsMxVa76FAYj6W6yyW0s0mP+0piGLWfxNYqdXsvkOvh
+7ak8HyX1amqRf3OBh6/9Uk1imCpACw==
+=oZCM
+-----END PGP SIGNATURE-----
+
+--gm5qx6ivqj7qxcxg--
 
