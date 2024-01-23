@@ -1,117 +1,164 @@
-Return-Path: <netdev+bounces-64942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36A878385B8
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 03:51:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBEA18385EB
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 04:08:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC477B220BE
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 02:46:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F01621C27443
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 03:08:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1D167F4;
-	Tue, 23 Jan 2024 02:46:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C66D5812;
+	Tue, 23 Jan 2024 03:08:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 069B4374;
-	Tue, 23 Jan 2024 02:46:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26F9A810;
+	Tue, 23 Jan 2024 03:08:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705978008; cv=none; b=phRw/aHvUmARoZFX4aMo/1JLqEpJK0UmzrWl8tFcB2nC/9EN3Kq1FrMPJZdpA8VzJs3Q7nuEwJwTuVqYdJBhzkQJYnHCT7qcvyzcUtcpvern3eHIO8vmpbUXmJM9GqPz0bYh5j7qXpTULUkdtzPdX8VyYEslkVataX5cnczDVG4=
+	t=1705979324; cv=none; b=lVzpUm/PbZdcsll3NmNyuVC3g/ImiqYtWfshBD0v1vwW3Thq+j/aOxZEr9puZsTKA47LYErio0iBXeuz2qrhKpvbtC7ozjhJ1IFDwmsFiQ+M53zA5+YPkTgJskwpXt0QY/HS+EC4B3ci07RxRPEBsZ2hfrAb27i0LXFqalmbjJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705978008; c=relaxed/simple;
-	bh=DgpW2TYFY7FMhpYd9iFluKaHz62UIxRSWXxq6QZHrPQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KFU1CkJkbishRyIWFdTJlBqaVEomazu8obgyR2uJwehuir/E0eQSGs0c923EnSz7n0DmxcthNNTiRrtnAfJj0kZsS8Oozybj8eG5w8dvSNcQittmkOKDhiyvt/j3zFHgxQ1oMWIZuqsRDsr5N6oYypiKl6F/ChxKv1a5OER/oyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 5d505d236484480a9e29728173f68199-20240123
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.35,REQID:3ae40562-b553-4881-b1b2-749a43e648c9,IP:10,
-	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-	ON:release,TS:-5
-X-CID-INFO: VERSION:1.1.35,REQID:3ae40562-b553-4881-b1b2-749a43e648c9,IP:10,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:-5
-X-CID-META: VersionHash:5d391d7,CLOUDID:457fa47f-4f93-4875-95e7-8c66ea833d57,B
-	ulkID:240123104638C5ZVN90J,BulkQuantity:0,Recheck:0,SF:44|66|38|24|17|19|1
-	02,TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,CO
-	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,TF_CID_SPAM_SNR
-X-UUID: 5d505d236484480a9e29728173f68199-20240123
-Received: from mail.kylinos.cn [(39.156.73.10)] by mailgw
-	(envelope-from <chentao@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 2008426615; Tue, 23 Jan 2024 10:46:37 +0800
-Received: from mail.kylinos.cn (localhost [127.0.0.1])
-	by mail.kylinos.cn (NSMail) with SMTP id 100C8E000EB9;
-	Tue, 23 Jan 2024 10:46:37 +0800 (CST)
-X-ns-mid: postfix-65AF288C-825111420
-Received: from kernel.. (unknown [172.20.15.234])
-	by mail.kylinos.cn (NSMail) with ESMTPA id 379ACE000EB9;
-	Tue, 23 Jan 2024 10:46:33 +0800 (CST)
-From: Kunwu Chan <chentao@kylinos.cn>
-To: pablo@netfilter.org,
-	kadlec@netfilter.org,
-	fw@strlen.de,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: horms@kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Kunwu Chan <chentao@kylinos.cn>
-Subject: [PATCH nf-next] netfilter: nf_conncount: Use KMEM_CACHE instead of kmem_cache_create()
-Date: Tue, 23 Jan 2024 10:46:31 +0800
-Message-Id: <20240123024631.396631-1-chentao@kylinos.cn>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1705979324; c=relaxed/simple;
+	bh=nSI4BAqP3x9fASt6i5uBdW1dhisjPKtWVX5mFYjrAB4=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eJe93iYAKn8zkf6yxuMEDoAaFFHWLsZTV8ucbPQz3wwo6IjB8msxstjiqwgb/IXS9pCVyzmmhA3F/AaadXzjN8LntpZPi+UG5+UOpbGNovrCKu3Om5wlSC0fXOjDYLTqkt7X1jxneR97Ks0clG+V4Pk3Umz2mCFhDe+YRBbq5GU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4TJsSb1Wnqz29kf6;
+	Tue, 23 Jan 2024 11:06:55 +0800 (CST)
+Received: from dggpemd500003.china.huawei.com (unknown [7.185.36.29])
+	by mail.maildlp.com (Postfix) with ESMTPS id 5B1EE1406C8;
+	Tue, 23 Jan 2024 11:08:23 +0800 (CST)
+Received: from localhost.localdomain (10.175.101.6) by
+ dggpemd500003.china.huawei.com (7.185.36.29) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1258.28; Tue, 23 Jan 2024 11:08:22 +0800
+From: gaoxingwang <gaoxingwang1@huawei.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <gaoxingwang1@huawei.com>,
+	<liaichun@huawei.com>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <yanan@huawei.com>,
+	<yoshfuji@linux-ipv6.org>
+Subject: Re: [Discuss]iproute2: ipv6 route add fail
+Date: Tue, 23 Jan 2024 11:08:13 +0800
+Message-ID: <20240123030813.2493801-1-gaoxingwang1@huawei.com>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <CANn89iK05tppo0neGmKTdU-Dp8Dap6ayxda-++Z3LRp3DFrq+w@mail.gmail.com>
+References: <CANn89iK05tppo0neGmKTdU-Dp8Dap6ayxda-++Z3LRp3DFrq+w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemd500003.china.huawei.com (7.185.36.29)
 
-Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
-to simplify the creation of SLAB caches.
+>> Hello everyone,
+>>
+>> Here is a particular problem with routing.
+>> Sometimes users can run the ip -6 route command to add a route whose destination address is the same as the gateway address, and it can be successfully added. However, adding another route with the same gateway address will fail later.
+>>
+>> Example:
+>> # ip -6 route add 2409:8080:5a0a:60c7::7/128 via 2409:8080:5a0a:60c7::7 dev eth2
+>> # ip -6 route add 2409:8080:5a0a:60c7::8/128 via 2409:8080:5a0a:60c7::7 dev eth2
+>> RTNETLINK answers: No route to host
+>>
+>> Does the kernel not support this application scenario?
+>> Or should the kernel not allow routes with the same destination address as the gateway address to be added so that other more meaningful routes can be added successfully?
+>>
+>> This question puzzles me, thank you very much if your can reply.
+>
+>try running `perf record -e fib6:*` and then run both route commands
+>above. After both have run, Ctrl-C on perf and then run `perf script`
 
-Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
----
- net/netfilter/nf_conncount.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
-
-diff --git a/net/netfilter/nf_conncount.c b/net/netfilter/nf_conncount.c
-index 5d8ed6c90b7e..8715617b02fe 100644
---- a/net/netfilter/nf_conncount.c
-+++ b/net/netfilter/nf_conncount.c
-@@ -605,15 +605,11 @@ static int __init nf_conncount_modinit(void)
- 	for (i =3D 0; i < CONNCOUNT_SLOTS; ++i)
- 		spin_lock_init(&nf_conncount_locks[i]);
-=20
--	conncount_conn_cachep =3D kmem_cache_create("nf_conncount_tuple",
--					   sizeof(struct nf_conncount_tuple),
--					   0, 0, NULL);
-+	conncount_conn_cachep =3D KMEM_CACHE(nf_conncount_tuple, 0);
- 	if (!conncount_conn_cachep)
- 		return -ENOMEM;
-=20
--	conncount_rb_cachep =3D kmem_cache_create("nf_conncount_rb",
--					   sizeof(struct nf_conncount_rb),
--					   0, 0, NULL);
-+	conncount_rb_cachep =3D KMEM_CACHE(nf_conncount_rb, 0);
- 	if (!conncount_rb_cachep) {
- 		kmem_cache_destroy(conncount_conn_cachep);
- 		return -ENOMEM;
---=20
-2.39.2
-
+Here is the result:
+  swapper     0 [002]  5247.545507: fib6:fib6_table_lookup: table 255 oif 3 iif 1 proto 58 ff02::2/0 -> fe80::5054:ff:fe58:e86e/0 tos 0 scope 0 flags 0 ==> dev lo gw :: err -113
+  swapper     0 [002]  5247.545511: fib6:fib6_table_lookup: table 254 oif 3 iif 1 proto 58 ff02::2/0 -> fe80::5054:ff:fe58:e86e/0 tos 0 scope 0 flags 0 ==> dev lo gw :: err -113
+  swapper     0 [001]  5247.545549: fib6:fib6_table_lookup: table 255 oif 4 iif 1 proto 58 ff02::2/0 -> fe80::5054:ff:fe58:e86e/0 tos 0 scope 0 flags 0 ==> dev lo gw :: err -113
+  swapper     0 [001]  5247.545554: fib6:fib6_table_lookup: table 254 oif 4 iif 1 proto 58 ff02::2/0 -> fe80::5054:ff:fe58:e86e/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [001]  5247.545562: fib6:fib6_table_lookup: table 255 oif 0 iif 4 proto 58 fe80::5054:ff:fe58:e86e/0 -> ff02::2/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+       ip 59595 [001]  5247.593130: fib6:fib6_table_lookup: table 254 oif 4 iif 0 proto 0 ::/0 -> 2409:8080:5a0a:60c7::7/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+     bash 59600 [002]  5247.598824: fib6:fib6_table_lookup: table 255 oif 0 iif 3 proto 58 fe80::5054:ff:feb7:19af/0 -> ff02::1:ffb7:19af/0 tos 0 scope 0 flags 0 ==> dev eth1 gw :: err 0
+  swapper     0 [001]  5247.598824: fib6:fib6_table_lookup: table 255 oif 0 iif 4 proto 58 fe80::5054:ff:feb7:19af/0 -> ff02::1:ffb7:19af/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [002]  5247.636429: fib6:fib6_table_lookup: table 255 oif 0 iif 3 proto 0 ::/0 -> ff02::16/0 tos 0 scope 0 flags 0 ==> dev eth1 gw :: err 0
+  swapper     0 [001]  5247.636465: fib6:fib6_table_lookup: table 255 oif 0 iif 4 proto 0 ::/0 -> ff02::16/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [002]  5247.641108: fib6:fib6_table_lookup: table 255 oif 3 iif 1 proto 17 ff02::fb/0 -> fe80::5054:ff:fe93:d0db/0 tos 0 scope 0 flags 0 ==> dev lo gw :: err -113
+  swapper     0 [002]  5247.641112: fib6:fib6_table_lookup: table 254 oif 3 iif 1 proto 17 ff02::fb/0 -> fe80::5054:ff:fe93:d0db/0 tos 0 scope 0 flags 0 ==> dev lo gw :: err -113
+  swapper     0 [001]  5247.641118: fib6:fib6_table_lookup: table 255 oif 4 iif 1 proto 17 ff02::fb/0 -> fe80::5054:ff:fe93:d0db/0 tos 0 scope 0 flags 0 ==> dev lo gw :: err -113
+  swapper     0 [001]  5247.641128: fib6:fib6_table_lookup: table 254 oif 4 iif 1 proto 17 ff02::fb/0 -> fe80::5054:ff:fe93:d0db/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [001]  5247.641134: fib6:fib6_table_lookup: table 255 oif 0 iif 4 proto 17 fe80::5054:ff:fe93:d0db/0 -> ff02::fb/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [001]  5247.642525: fib6:fib6_table_lookup: table 255 oif 4 iif 1 proto 17 ff02::fb/0 -> fe80::5054:ff:fe37:e95a/0 tos 0 scope 0 flags 0 ==> dev lo gw :: err -113
+  swapper     0 [001]  5247.642532: fib6:fib6_table_lookup: table 254 oif 4 iif 1 proto 17 ff02::fb/0 -> fe80::5054:ff:fe37:e95a/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [001]  5247.642537: fib6:fib6_table_lookup: table 255 oif 0 iif 4 proto 17 fe80::5054:ff:fe37:e95a/0 -> ff02::fb/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [002]  5247.642549: fib6:fib6_table_lookup: table 255 oif 3 iif 1 proto 17 ff02::fb/0 -> fe80::5054:ff:fe37:e95a/0 tos 0 scope 0 flags 0 ==> dev lo gw :: err -113
+  swapper     0 [002]  5247.642552: fib6:fib6_table_lookup: table 254 oif 3 iif 1 proto 17 ff02::fb/0 -> fe80::5054:ff:fe37:e95a/0 tos 0 scope 0 flags 0 ==> dev lo gw :: err -113
+  swapper     0 [001]  5247.689676: fib6:fib6_table_lookup: table 255 oif 4 iif 1 proto 58 ff02::2/0 -> fe80::5054:ff:fe09:14e5/0 tos 0 scope 0 flags 0 ==> dev lo gw :: err -113
+  swapper     0 [002]  5247.689680: fib6:fib6_table_lookup: table 255 oif 3 iif 1 proto 58 ff02::2/0 -> fe80::5054:ff:fe09:14e5/0 tos 0 scope 0 flags 0 ==> dev lo gw :: err -113
+  swapper     0 [002]  5247.689682: fib6:fib6_table_lookup: table 254 oif 3 iif 1 proto 58 ff02::2/0 -> fe80::5054:ff:fe09:14e5/0 tos 0 scope 0 flags 0 ==> dev lo gw :: err -113
+  swapper     0 [001]  5247.689684: fib6:fib6_table_lookup: table 254 oif 4 iif 1 proto 58 ff02::2/0 -> fe80::5054:ff:fe09:14e5/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [001]  5247.689690: fib6:fib6_table_lookup: table 255 oif 0 iif 4 proto 58 fe80::5054:ff:fe09:14e5/0 -> ff02::2/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [002]  5247.716616: fib6:fib6_table_lookup: table 255 oif 0 iif 3 proto 0 ::/0 -> ff02::16/0 tos 0 scope 0 flags 0 ==> dev eth1 gw :: err 0
+  swapper     0 [001]  5247.716616: fib6:fib6_table_lookup: table 255 oif 0 iif 4 proto 0 ::/0 -> ff02::16/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [001]  5247.716845: fib6:fib6_table_lookup: table 255 oif 0 iif 4 proto 58 ::/0 -> ff02::1:ff0f:9a04/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [002]  5247.716907: fib6:fib6_table_lookup: table 255 oif 0 iif 3 proto 58 ::/0 -> ff02::1:ff0f:9a04/0 tos 0 scope 0 flags 0 ==> dev eth1 gw :: err 0
+  swapper     0 [001]  5247.778211: fib6:fib6_table_lookup: table 255 oif 0 iif 4 proto 58 ::/0 -> ff02::1:ff05:7/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [002]  5247.778243: fib6:fib6_table_lookup: table 255 oif 0 iif 3 proto 58 ::/0 -> ff02::1:ff05:7/0 tos 0 scope 0 flags 0 ==> dev eth1 gw :: err 0
+  swapper     0 [001]  5247.823813: fib6:fib6_table_lookup: table 255 oif 4 iif 1 proto 58 ff02::2/0 -> fe80::5054:ff:feba:b2fc/0 tos 0 scope 0 flags 0 ==> dev lo gw :: err -113
+  swapper     0 [002]  5247.823816: fib6:fib6_table_lookup: table 255 oif 3 iif 1 proto 58 ff02::2/0 -> fe80::5054:ff:feba:b2fc/0 tos 0 scope 0 flags 0 ==> dev lo gw :: err -113
+  swapper     0 [001]  5247.823818: fib6:fib6_table_lookup: table 254 oif 4 iif 1 proto 58 ff02::2/0 -> fe80::5054:ff:feba:b2fc/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [002]  5247.823821: fib6:fib6_table_lookup: table 254 oif 3 iif 1 proto 58 ff02::2/0 -> fe80::5054:ff:feba:b2fc/0 tos 0 scope 0 flags 0 ==> dev lo gw :: err -113
+  swapper     0 [001]  5247.823824: fib6:fib6_table_lookup: table 255 oif 0 iif 4 proto 58 fe80::5054:ff:feba:b2fc/0 -> ff02::2/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [001]  5247.867777: fib6:fib6_table_lookup: table 255 oif 0 iif 4 proto 0 ::/0 -> ff02::16/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [002]  5247.867820: fib6:fib6_table_lookup: table 255 oif 0 iif 3 proto 0 ::/0 -> ff02::16/0 tos 0 scope 0 flags 0 ==> dev eth1 gw :: err 0
+  swapper     0 [002]  5247.958396: fib6:fib6_table_lookup: table 255 oif 0 iif 3 proto 0 ::/0 -> ff02::16/0 tos 0 scope 0 flags 0 ==> dev eth1 gw :: err 0
+  swapper     0 [001]  5247.958431: fib6:fib6_table_lookup: table 255 oif 0 iif 4 proto 0 ::/0 -> ff02::16/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [001]  5247.959463: fib6:fib6_table_lookup: table 255 oif 0 iif 4 proto 0 ::/0 -> ff02::16/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [002]  5247.959503: fib6:fib6_table_lookup: table 255 oif 0 iif 3 proto 0 ::/0 -> ff02::16/0 tos 0 scope 0 flags 0 ==> dev eth1 gw :: err 0
+  swapper     0 [001]  5247.960377: fib6:fib6_table_lookup: table 255 oif 0 iif 4 proto 0 ::/0 -> ff02::16/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [002]  5247.960442: fib6:fib6_table_lookup: table 255 oif 0 iif 3 proto 0 ::/0 -> ff02::16/0 tos 0 scope 0 flags 0 ==> dev eth1 gw :: err 0
+  swapper     0 [001]  5247.961515: fib6:fib6_table_lookup: table 255 oif 0 iif 4 proto 0 ::/0 -> ff02::16/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [002]  5247.961525: fib6:fib6_table_lookup: table 255 oif 0 iif 3 proto 0 ::/0 -> ff02::16/0 tos 0 scope 0 flags 0 ==> dev eth1 gw :: err 0
+  swapper     0 [002]  5247.962557: fib6:fib6_table_lookup: table 255 oif 0 iif 3 proto 0 ::/0 -> ff02::16/0 tos 0 scope 0 flags 0 ==> dev eth1 gw :: err 0
+  swapper     0 [001]  5247.962557: fib6:fib6_table_lookup: table 255 oif 0 iif 4 proto 0 ::/0 -> ff02::16/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [001]  5247.963515: fib6:fib6_table_lookup: table 255 oif 0 iif 4 proto 0 ::/0 -> ff02::16/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [002]  5247.963524: fib6:fib6_table_lookup: table 255 oif 0 iif 3 proto 0 ::/0 -> ff02::16/0 tos 0 scope 0 flags 0 ==> dev eth1 gw :: err 0
+  swapper     0 [001]  5247.965165: fib6:fib6_table_lookup: table 255 oif 0 iif 4 proto 0 ::/0 -> ff02::16/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [002]  5247.965178: fib6:fib6_table_lookup: table 255 oif 0 iif 3 proto 0 ::/0 -> ff02::16/0 tos 0 scope 0 flags 0 ==> dev eth1 gw :: err 0
+  swapper     0 [002]  5248.014889: fib6:fib6_table_lookup: table 255 oif 0 iif 3 proto 58 fe80::5054:ff:fe8f:5578/0 -> ff02::1:ff35:6cd7/0 tos 0 scope 0 flags 0 ==> dev eth1 gw :: err 0
+  swapper     0 [001]  5248.014890: fib6:fib6_table_lookup: table 255 oif 0 iif 4 proto 58 fe80::5054:ff:fe8f:5578/0 -> ff02::1:ff35:6cd7/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+       ip 59608 [002]  5248.054418: fib6:fib6_table_lookup: table 254 oif 4 iif 0 proto 0 ::/0 -> 2409:8080:5a0a:60c7::7/0 tos 0 scope 0 flags 0 ==> dev eth2 gw 2409:8080:5a0a:60c7::7 err 0
+       ip 59608 [002]  5248.054422: fib6:fib6_table_lookup: table 255 oif 4 iif 0 proto 0 ::/0 -> 2409:8080:5a0a:60c7::7/0 tos 0 scope 0 flags 0 ==> dev lo gw :: err -113
+       ip 59608 [002]  5248.054423: fib6:fib6_table_lookup: table 254 oif 4 iif 0 proto 0 ::/0 -> 2409:8080:5a0a:60c7::7/0 tos 0 scope 0 flags 0 ==> dev eth2 gw 2409:8080:5a0a:60c7::7 err 0
+  swapper     0 [001]  5248.083555: fib6:fib6_table_lookup: table 255 oif 0 iif 4 proto 58 fe80::5054:ff:fec6:b788/0 -> ff02::1:ffc6:b788/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [002]  5248.083555: fib6:fib6_table_lookup: table 255 oif 0 iif 3 proto 58 fe80::5054:ff:fec6:b788/0 -> ff02::1:ffc6:b788/0 tos 0 scope 0 flags 0 ==> dev eth1 gw :: err 0
+  swapper     0 [001]  5248.102781: fib6:fib6_table_lookup: table 255 oif 4 iif 1 proto 58 ff02::16/0 -> fe80::5054:ff:fed0:af21/0 tos 0 scope 0 flags 0 ==> dev lo gw :: err -113
+  swapper     0 [001]  5248.102788: fib6:fib6_table_lookup: table 254 oif 4 iif 1 proto 58 ff02::16/0 -> fe80::5054:ff:fed0:af21/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [001]  5248.102793: fib6:fib6_table_lookup: table 255 oif 0 iif 4 proto 0 fe80::5054:ff:fed0:af21/0 -> ff02::16/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [002]  5248.102801: fib6:fib6_table_lookup: table 255 oif 3 iif 1 proto 58 ff02::16/0 -> fe80::5054:ff:fed0:af21/0 tos 0 scope 0 flags 0 ==> dev lo gw :: err -113
+  swapper     0 [002]  5248.102805: fib6:fib6_table_lookup: table 254 oif 3 iif 1 proto 58 ff02::16/0 -> fe80::5054:ff:fed0:af21/0 tos 0 scope 0 flags 0 ==> dev lo gw :: err -113
+  swapper     0 [002]  5248.119317: fib6:fib6_table_lookup: table 255 oif 0 iif 3 proto 58 33:33::fe:1b2b/0 -> ff02::1:ff07:3b36/0 tos 0 scope 0 flags 0 ==> dev eth1 gw :: err 0
+  swapper     0 [001]  5248.119424: fib6:fib6_table_lookup: table 255 oif 0 iif 4 proto 58 33:33::fe:1b2b/0 -> ff02::1:ff07:3b36/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [001]  5248.140988: fib6:fib6_table_lookup: table 255 oif 4 iif 1 proto 17 ff02::fb/0 -> fe80::5054:ff:feea:2acb/0 tos 0 scope 0 flags 0 ==> dev lo gw :: err -113
+  swapper     0 [001]  5248.140994: fib6:fib6_table_lookup: table 254 oif 4 iif 1 proto 17 ff02::fb/0 -> fe80::5054:ff:feea:2acb/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [001]  5248.140999: fib6:fib6_table_lookup: table 255 oif 0 iif 4 proto 17 fe80::5054:ff:feea:2acb/0 -> ff02::fb/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [002]  5248.141018: fib6:fib6_table_lookup: table 255 oif 3 iif 1 proto 17 ff02::fb/0 -> fe80::5054:ff:feea:2acb/0 tos 0 scope 0 flags 0 ==> dev lo gw :: err -113
+  swapper     0 [002]  5248.141021: fib6:fib6_table_lookup: table 254 oif 3 iif 1 proto 17 ff02::fb/0 -> fe80::5054:ff:feea:2acb/0 tos 0 scope 0 flags 0 ==> dev lo gw :: err -113
+  swapper     0 [001]  5248.141998: fib6:fib6_table_lookup: table 255 oif 4 iif 1 proto 17 ff02::fb/0 -> fe80::5054:ff:fe19:9964/0 tos 0 scope 0 flags 0 ==> dev lo gw :: err -113
+  swapper     0 [001]  5248.142003: fib6:fib6_table_lookup: table 254 oif 4 iif 1 proto 17 ff02::fb/0 -> fe80::5054:ff:fe19:9964/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [002]  5248.142006: fib6:fib6_table_lookup: table 255 oif 3 iif 1 proto 17 ff02::fb/0 -> fe80::5054:ff:fe19:9964/0 tos 0 scope 0 flags 0 ==> dev lo gw :: err -113
+  swapper     0 [001]  5248.142006: fib6:fib6_table_lookup: table 255 oif 0 iif 4 proto 17 fe80::5054:ff:fe19:9964/0 -> ff02::fb/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
+  swapper     0 [002]  5248.142009: fib6:fib6_table_lookup: table 254 oif 3 iif 1 proto 17 ff02::fb/0 -> fe80::5054:ff:fe19:9964/0 tos 0 scope 0 flags 0 ==> dev lo gw :: err -113
+systemctl 59624 [002]  5248.165214: fib6:fib6_table_lookup: table 255 oif 3 iif 1 proto 58 ff02::16/0 -> fe80::6390:1eeb:fded:e180/0 tos 0 scope 0 flags 0 ==> dev lo gw :: err -113
+  swapper     0 [001]  5248.165214: fib6:fib6_table_lookup: table 255 oif 4 iif 1 proto 58 ff02::16/0 -> fe80::6390:1eeb:fded:e180/0 tos 0 scope 0 flags 0 ==> dev lo gw :: err -113
+systemctl 59624 [002]  5248.165217: fib6:fib6_table_lookup: table 254 oif 3 iif 1 proto 58 ff02::16/0 -> fe80::6390:1eeb:fded:e180/0 tos 0 scope 0 flags 0 ==> dev lo gw :: err -113
+  swapper     0 [001]  5248.165219: fib6:fib6_table_lookup: table 254 oif 4 iif 1 proto 58 ff02::16/0 -> fe80::6390:1eeb:fded:e180/0 tos 0 scope 0 flags 0 ==> dev eth2 gw :: err 0
 
