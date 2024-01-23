@@ -1,179 +1,155 @@
-Return-Path: <netdev+bounces-65053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 974A2838FCF
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 14:27:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC6D5838FDF
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 14:29:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F167284E12
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 13:27:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B83B28CBC3
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 13:29:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DB745FB8E;
-	Tue, 23 Jan 2024 13:21:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A3605EE80;
+	Tue, 23 Jan 2024 13:24:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LGUJM/gV"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cv3YdZh9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34F2F5FB8A;
-	Tue, 23 Jan 2024 13:21:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD9955EE83
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 13:24:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706016068; cv=none; b=ZkQMYgg/iuj+46Kz4BLNac4+AQ3VOMRNqNR6hHBsZh0F5yoAoflYqmKAL9wT/d+nN8om6RpmOWNc98Tzv/IH1LCbEXTgk9o08QNYjaEA494ZT7tT2U2TlUWXYPRG907fZ3r6cpC6OaYZcCc8ajWqXdvTOjv0bxMexFFeCKMsH5Q=
+	t=1706016262; cv=none; b=mSrFSP8EcsVr9OWAJ0ghgm9FgfFJVi3Nxjm/kRPFQTeUYuLNYeYpzG3sJs6/+VRuu7Q2hzN+BE2AeSLpAZIFH10mwztWjU2p0OPL6TizOUi9WESOgxhcdV5VI2IZVXeRihMhXdBpkvMdRwcZKGfFBstfdaDtgpdUTrpsgzvze7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706016068; c=relaxed/simple;
-	bh=z0O4e1iPLaTImAhBU/ThUlpcQh0I9n03dpQuUlmP4OA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mT1hYF1iNPkMScL+y8mTFGMVCqyx2Oj501xz9eUOR82YAY18xD0w5C7q4QQT4RZ3r8SEtQ89oQsD6lZme0uCToRkt+8G8qBeV34y6++ZxXQ51lkDrMeRLukchTqsWZIXUfVxm/W+7Z6o1WKj0j1pOYRbqTCipPorHe+/xC3mGxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LGUJM/gV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D0BEC41674;
-	Tue, 23 Jan 2024 13:21:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706016067;
-	bh=z0O4e1iPLaTImAhBU/ThUlpcQh0I9n03dpQuUlmP4OA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LGUJM/gVJWt91je/LmDCII96CW6VTVbEk6EdOd0vHe9ufRvI4NkWKf0kEKVyRou3i
-	 XqM36ikEc46kr0jNCmaL2ZyMk/cYZiHQl1aZokrax3/hq2/uB7UCcYJbG4xxyk+f3S
-	 PgOzcvNUnlC6I2HQF31aqkmEjx4AsKjA3sUWa/AYK9sv1WWcE9KG7XyVOJRBTr4Poc
-	 NE45YkxeQNLHJomMVJjnKWFE/M338kvfPBOdFBWyujA0a0xQ0Eo8Goy+2UE+m7CUHQ
-	 Qc2HZ7O8v+WCzVG8OHBqKsOt1MU4ftpiwDsob0VAl/62J+yBKk8uQh7cY1s+QeETJ/
-	 di9SuK74qmtsw==
-Date: Tue, 23 Jan 2024 14:21:03 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neilb@suse.de>,
-	linux-nfs@vger.kernel.org, lorenzo.bianconi@redhat.com,
-	kuba@kernel.org, horms@kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v6 3/3] NFSD: add write_ports to netlink command
-Message-ID: <Za-9P0NjlIsc1PcE@lore-desk>
-References: <cover.1705771400.git.lorenzo@kernel.org>
- <f7c42dae2b232b3b06e54ceb3f00725893973e02.1705771400.git.lorenzo@kernel.org>
- <9e3ae337dcf168c60c4cfd51aa0b2fc7b24bcbfb.camel@kernel.org>
- <170595930799.23031.17998490973211605470@noble.neil.brown.name>
- <Za7zHvPJdei/vWm4@tissot.1015granger.net>
- <Za-N6BxOMXTGyxmW@lore-desk>
- <85b02061798a1b750a87b0302681b86651d0c7a3.camel@kernel.org>
+	s=arc-20240116; t=1706016262; c=relaxed/simple;
+	bh=VBwivXq55bfpRaa4wqaENglWS6GluVV4xbf1H2HoBDU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oEvDvfffXGblNVmlEPcN8VLo4kE7m2u24MjrY6NBB+4sMwzQjGXij+MyBgWZDGNgGbU0SBuGY42gJzvzfist5UQRZnLlYXoPJ7YnLmgUWeHbZwvhYFtRQb2i/x0jxhB74Kslk5vBgxz+1Cee5q8hiGcPnl630g8auKQusHgAFBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=cv3YdZh9; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-40e8fec0968so55510125e9.1
+        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 05:24:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1706016259; x=1706621059; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=GqOYdntBo4pOdAPj1+70e2GkSN3pr+fcWBsMbKAn17o=;
+        b=cv3YdZh985Lr8T/VvN/SOIgeFJqjaEwdBvBlKwn1fG1vWumuy6HcZWNnIgurn5dTmt
+         ++s6OB1lNBFTNsg95NKjya3xJqWljxLSi5IX94mVwxDkPW/pApN7pN5wfE7p+G60V3Qv
+         aZgRforcZ928q4/wktAbP/vx29V9Srs9moMfZtRPTSVzWCHfJFFfyr3Pp3Xf1wQ+ujl0
+         QVNaWlRMDFRXfhpHxod+5UA4lOUP2vTiOYW4F7zo6q/UcIqYpPR83rQuHSa8dj/EZrnx
+         L4n+4ISjdyCyLCYLvnUm9G7Z6jVTHjrnzPPRn3De22I5KT3fk6ajL02dNy5VRooP+gIz
+         +ChQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706016259; x=1706621059;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GqOYdntBo4pOdAPj1+70e2GkSN3pr+fcWBsMbKAn17o=;
+        b=ZxU55qZ3dMGs0TC9hyO83XZjavabEsYIl470s8x3CBem4daEIgY4230ibYcFTECdNT
+         j3iMOwMKwucWspy29ik7KKQu5g8ySoW+Wi2Z0cqu/9yXHDm7gljds2vP40L2QO0zCx7Q
+         S5oCHuzFIClE66AgUy+Wu0mFKlp5EO9k4Scu3XbrKa1eyF/V5CsrSj5F1GJ4JPzGJizi
+         fRHBbIFAWfPgQj94NGivWKcN5cZvrDeqiKde7UVxccXXxu0F24PWer0oxNpZYYuLeshy
+         XY/53mt6OyHpXYNAE32KnOcS2sHSBnCvx66YN1CmKjVobT8UMXVpn6wNSB1s75Urkm3/
+         k2hg==
+X-Gm-Message-State: AOJu0YznAI4pHC1stbEDun6zDWGjEPeIAvgZ8FoZvESdcyhI9qAKZwmW
+	F3CpDepg846lS6a2E4vHNXYrwChKx0Wow2r21Lk32DskHTowNrobFmO63Y6LfiSqRSznxp4HLcw
+	W
+X-Google-Smtp-Source: AGHT+IFY1InWtCjiR3+ILA4ArgqoyjSVdzR7UnsDdSOE917jAfFwm5T1seKnWROvi0oTQh/VKUSYpQ==
+X-Received: by 2002:a05:600c:2d16:b0:40e:4614:492e with SMTP id x22-20020a05600c2d1600b0040e4614492emr120262wmf.69.1706016259023;
+        Tue, 23 Jan 2024 05:24:19 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.215.66])
+        by smtp.gmail.com with ESMTPSA id w4-20020a05600c474400b0040d5ae2906esm46714142wmo.30.2024.01.23.05.24.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Jan 2024 05:24:18 -0800 (PST)
+Message-ID: <9415e571-50a1-41d3-8205-68e4128bbe6d@linaro.org>
+Date: Tue, 23 Jan 2024 14:24:17 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="oGji4Uj0nBLpvmk1"
-Content-Disposition: inline
-In-Reply-To: <85b02061798a1b750a87b0302681b86651d0c7a3.camel@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] nfc: hci: Save a few bytes of memory when registering a
+ 'nfc_llc' engine
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <6d2b8c390907dcac2e4dc6e71f1b2db2ef8abef1.1705744530.git.christophe.jaillet@wanadoo.fr>
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <6d2b8c390907dcac2e4dc6e71f1b2db2ef8abef1.1705744530.git.christophe.jaillet@wanadoo.fr>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+On 20/01/2024 10:56, Christophe JAILLET wrote:
+> nfc_llc_register() calls pass a string literal as the 'name' parameter.
+> 
+> So kstrdup_const() can be used instead of kfree() to avoid a memory
+> allocation in such cases.
+> 
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 
 
---oGji4Uj0nBLpvmk1
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-> On Tue, 2024-01-23 at 10:59 +0100, Lorenzo Bianconi wrote:
-> > > On Tue, Jan 23, 2024 at 08:35:07AM +1100, NeilBrown wrote:
-> > > > On Tue, 23 Jan 2024, Jeff Layton wrote:
-> > > > > On Sat, 2024-01-20 at 18:33 +0100, Lorenzo Bianconi wrote:
-> > > > > > Introduce write_ports netlink command. For listener-set, usersp=
-ace is
-> > > > > > expected to provide a NFS listeners list it wants to enable (al=
-l the
-> > > > > > other ports will be closed).
-> > > > > >=20
-> > > > >=20
-> > > > > Ditto here. This is a change to a declarative interface, which I =
-think
-> > > > > is a better way to handle this, but we should be aware of the cha=
-nge.
-> > > >=20
-> > > > I agree it is better, and thanks for highlighting the change.
-> > > >=20
-> > > > > > +	/* 2- remove stale listeners */
-> > > > >=20
-> > > > >=20
-> > > > > The old portlist interface was weird, in that it was only additiv=
-e. You
-> > > > > couldn't use it to close a listening socket (AFAICT). We may be a=
-ble to
-> > > > > support that now with this interface, but we'll need to test that=
- case
-> > > > > carefully.
-> > > >=20
-> > > > Do we ever want/need to remove listening sockets?
-> > >=20
-> > > I think that might be an interesting use case. Disabling RDMA, for
-> > > example, should kill the RDMA listening endpoints but leave
-> > > listening sockets in place.
-> > >=20
-> > > But for now, our socket listeners are "any". Wondering how net
-> > > namespaces play into this.
-> > >=20
-> > >=20
-> > > > Normal practice when making any changes is to stop and restart where
-> > > > "stop" removes all sockets, unexports all filesystems, disables all
-> > > > versions.
-> > > > I don't exactly object to supporting fine-grained changes, but I su=
-spect
-> > > > anything that is not used by normal service start will hardly ever =
-be
-> > > > used in practice, so will not be tested.
-> > >=20
-> > > Well, there is that. I guess until we have test coverage for NFSD
-> > > administrative interfaces, we should leave well enough alone.
-> >=20
-> > So to summarize it:
-> > - we will allow to remove enabled versions (as it is in patch v6 2/3)
-> > - we will allow to add new listening sockets but we will not allow to r=
-emove
-> > =A0=A0them (the user/admin will need to stop/start the server).
-> >=20
-> > Agree? If so I will work on it and post v7.
-> >=20
-> >=20
->=20
-> That sounds about right to me. We could eventually relax the restriction
-> about removing sockets later, but for now it's probably best to prohibit
-> it (like Neil suggests).
+You probably need to resend it, because that time net-next was closed.
+If resending, keep my tag.
 
-Do we want to add even the capability to specify the socket file descriptor
-(similar to what we do in __write_ports_addfd())?
+Best regards,
+Krzysztof
 
-Regards,
-Lorenzo
-
->=20
->=20
-> >=20
-> > >=20
-> > >=20
-> > > > So if it is easiest to support reverting previous configuration (as=
- it
-> > > > probably is for version setting), then do so.  But if there is any
-> > > > complexity (as maybe there is with listening sockets), then don't
-> > > > add complexity that won't be used.
-> > > >=20
-> > > > Thanks,
-> > > > NeilBrown
-> > >=20
-> > > --=20
-> > > Chuck Lever
->=20
-> --=20
-> Jeff Layton <jlayton@kernel.org>
-
---oGji4Uj0nBLpvmk1
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZa+9PwAKCRA6cBh0uS2t
-rLjZAP95AZ1urFqF2KP8Eg9tgPCd28subpAoaeXd5sIAEcXj5QEAt7e4wWyzT2PN
-nMr5DVs6HD66u+mtplaRBQfrkdEa8wk=
-=jNqe
------END PGP SIGNATURE-----
-
---oGji4Uj0nBLpvmk1--
 
