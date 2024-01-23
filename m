@@ -1,173 +1,207 @@
-Return-Path: <netdev+bounces-65185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EAB78397D3
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 19:37:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 256088397DE
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 19:38:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D351F1F246F3
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 18:37:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E94C1F25503
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 18:38:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AC72664D6;
-	Tue, 23 Jan 2024 18:37:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E656A823A8;
+	Tue, 23 Jan 2024 18:38:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="qVA3g3jD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IGkHDMw8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 692A550A64
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 18:37:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBAE3664D6;
+	Tue, 23 Jan 2024 18:38:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706035046; cv=none; b=BFytbvmeDLoco0CuLzkPHlI6yA+CAMIqXG9yPYBNZOxm73U6SxB9ALelNfDJlk9GkMG2f8uQbP3a2IGc94TtKm9Jclx3e9baeAJXos7Gg3eHL8D84U2QKfTgBwMsQMa5ecAcKRpcJAvLzZvB6+OQrtiVgf+GaokEbVahpvKnsyQ=
+	t=1706035081; cv=none; b=KiQeC4PaTKPTmOFK+lvWXIvlS9rR4WmePCkCSBfAfHh93+QwRrrkXwV12UZRYA9cCE2DhlffcwabhGxijVZrhZpisMhTP1tIh2Av0qGPzgxqJ8xw5x+N/42y0TvDedNzZldZK8GGM9CVaNcIDgaPAjvxtmlwIk7dqFkDWQR/vZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706035046; c=relaxed/simple;
-	bh=5hmoJYcbxYC/DMuJvWLEbRHwstzxBbKCbzKdquxm6JM=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=AXOODNBN/+Vv/XYlo8kEj8cQxS3aj5W1h37S1v1p99+HiJY/iks8X9WCLkWPcyGhq3POQL8fGvwFvC5bCyTJgMhFTWmeTS8oAPg9fjTlsoEBB+b8ldVVWuWJg0KRhLg0nuA7Fz29NBGUEQoEuyi1g1BcTMhNvGlHDv41okzm+jA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=qVA3g3jD; arc=none smtp.client-ip=185.125.188.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com [209.85.210.197])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id B920B4032E
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 18:37:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1706035036;
-	bh=gyqyrQAXMB5keOkxLiDw4Lf1z+ZGYfQOoYRtUzAmmGE=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID;
-	b=qVA3g3jDKbJ5KjguIGjd4TMXAC90Dc7ycdsbCEXW0Jdpj/HAHf61ye85zr29sOKHb
-	 XOjOS7XAHIoda7MI9kJkjqKgpeehwDCu7QtrjXQiMNYAnPiWqv9kehp7eWmK6iVO7b
-	 rm7Hy3LPiTZPGVwWSMOMp0S0K6GKGsQHoK/KpVZXtOfCDTqmXUxy3q+Feu+juGefdf
-	 YRRY1S12ttXl0XRqDAkeeyAmTnHZN/jywRrHbiK4RoxwO36+wS/9ylDxnoqiNiNxko
-	 gowjG5IhHxIsBGP/o1pcHQWVVuUStuYn5pXo+yCXoVSp73OGE73vLKSfbJ/Eagd5Qg
-	 jCvEVHPV0Y3lA==
-Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-6dd81eb1d43so743067b3a.0
-        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 10:37:16 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706035035; x=1706639835;
-        h=message-id:date:content-transfer-encoding:content-id:mime-version
-         :comments:references:in-reply-to:subject:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gyqyrQAXMB5keOkxLiDw4Lf1z+ZGYfQOoYRtUzAmmGE=;
-        b=a+aQf7BnUS6PLSzYZUGrG0TPfI5Gwyv9IRp6dHirYA8kww4nyoVU0teSrIsX8Le6l8
-         jehgVXNSF1eEzyGjB5mQg+5rc+sv3LgPuoR0ejJqBn3GbJs1GFsqO8M5GwJ3iUiJMvNi
-         iMPqSb+iLlR77kO0tj3QGgR/toKJNbvu7O6iSeVUQDRyiAEZhtzz13jlSEIi6LtPzFvN
-         U+pVuMf0hKeHXFfLoHsSwhuUVMAgiJguUhXvkiA4idagWCAmOGh/4zTc9iFGi8zsze15
-         sCrExxJjvEjiYxhaBbvEXlNTjXdlF22ZUI0BINrinyp6K0WaaXj7m+9umOcG2VcNdmzg
-         Hj8g==
-X-Gm-Message-State: AOJu0YwF4Dmbv3oGrHT2erWCYdDaPNWsfEuWR+OrEyXw6fWQ2MNG3q/T
-	z/BPOgBbpJ8bBJFpm+N3roFhLbBag4uolxxgmlF9B2OfpCubPoiQl6WF0enjQ4syRaH3mMBm0w1
-	npIrPP+O7y3QTToT/2RT9AcpJgHlDEzHQFqmR4ONDgufm1r7gKOugXMtzwwHaH1/0NbWurVGTz+
-	G6gA==
-X-Received: by 2002:a05:6a00:188d:b0:6ce:6407:2264 with SMTP id x13-20020a056a00188d00b006ce64072264mr4479675pfh.56.1706035035185;
-        Tue, 23 Jan 2024 10:37:15 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGMPgR+R7LP+FtJ7+PbKq7/BdFHeTo550Ul1peDUot94cYIfVDmgBsiA8wDh3hVQisK8iuWdw==
-X-Received: by 2002:a05:6a00:188d:b0:6ce:6407:2264 with SMTP id x13-20020a056a00188d00b006ce64072264mr4479667pfh.56.1706035034906;
-        Tue, 23 Jan 2024 10:37:14 -0800 (PST)
-Received: from famine.localdomain ([50.125.80.253])
-        by smtp.gmail.com with ESMTPSA id it11-20020a056a00458b00b006dbcd7b4d19sm6539888pfb.192.2024.01.23.10.37.14
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 23 Jan 2024 10:37:14 -0800 (PST)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id 26A275FFF6; Tue, 23 Jan 2024 10:37:14 -0800 (PST)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id 1FA299FB50;
-	Tue, 23 Jan 2024 10:37:14 -0800 (PST)
-From: Jay Vosburgh <jay.vosburgh@canonical.com>
-To: Hangbin Liu <liuhangbin@gmail.com>
-cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
-    Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-    Eric Dumazet <edumazet@google.com>, Liang Li <liali@redhat.com>
-Subject: Re: [PATCH net] selftests: bonding: do not test arp/ns target with mode balance-alb/tlb
-In-reply-to: <20240123075917.1576360-1-liuhangbin@gmail.com>
-References: <20240123075917.1576360-1-liuhangbin@gmail.com>
-Comments: In-reply-to Hangbin Liu <liuhangbin@gmail.com>
-   message dated "Tue, 23 Jan 2024 15:59:17 +0800."
-X-Mailer: MH-E 8.6+git; nmh 1.6; Emacs 29.0.50
+	s=arc-20240116; t=1706035081; c=relaxed/simple;
+	bh=ms7HuGoB0WMtLxCgb4lhxa49rU0d6Hu6IGv4vgOcDCM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bH+hL6PEA2T+P7nMxGhOzunZTE37msn5q/QNXbI14M065e+Bmbin/SXOnK5dP6duevPqGiHGqvcKXVLmobJhhPzZy8J9cXbIRDSUsNBmkOv20BaVuzzvsV802hhoCW1EncTmhW63Jp9Y84q4bjXtr26ekkiO3er97xmMOBDgBIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IGkHDMw8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD26BC433F1;
+	Tue, 23 Jan 2024 18:37:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706035081;
+	bh=ms7HuGoB0WMtLxCgb4lhxa49rU0d6Hu6IGv4vgOcDCM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IGkHDMw8EVoDlJnJazDQpNl57NWN6ArILT6SrQxb9Nsz4UHUgKCZimb0/ZeKwyQf2
+	 mzcp4XgCWLoLADMN41MVYry4TTRDyuU4G6ZF0JjBfec1cF/bVy0eA9Z+qbJOzu27AE
+	 ltPvAQLvsuJToY2yMHaZoWzwhf5Hr4Q13noLtqRmosSBQ1WJUoSyJ0uWhRcnCbyy4Y
+	 g3hEPuFgZuLg0aJ5B/1LJn0KNpxdbQAljfwrcbk2Q2gSsjEOf4pO+xdVuyJ+zQEB9+
+	 vVq8dXzW7lzRVi6qG/6N3IVPjYYxUrMvMYTNe6UM6kcqzbeBAuI2EvN2A4Nj+IutXB
+	 R+z2QO2hI/lqw==
+Date: Tue, 23 Jan 2024 18:37:55 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Philippe Schenker <dev@pschenker.ch>
+Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Vladimir Oltean <olteanv@gmail.com>, linux-kernel@vger.kernel.org,
+	UNGLinuxDriver@microchip.com, Marek Vasut <marex@denx.de>,
+	Florian Fainelli <f.fainelli@gmail.com>, devicetree@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Rob Herring <robh+dt@kernel.org>
+Subject: Re: [PATCH net-next v1 1/2] dt-bindings: net: dsa: Add KSZ8567
+ switch support
+Message-ID: <20240123-carpool-avatar-c1e51ab3cc32@spud>
+References: <20240123135014.614858-1-dev@pschenker.ch>
+ <20240123-ripening-tabby-b97785375990@spud>
+ <b2e232de11cee47a5932fccc2d151a9c7c276784.camel@pschenker.ch>
+ <20240123-atlas-dart-7e955e7e24e5@spud>
+ <979b1e77b5bb62463d52e7b9d3f9ca1415f4006a.camel@pschenker.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2393.1706035034.1@famine>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="S5tG8E3ZGHoQ0xVt"
+Content-Disposition: inline
+In-Reply-To: <979b1e77b5bb62463d52e7b9d3f9ca1415f4006a.camel@pschenker.ch>
+
+
+--S5tG8E3ZGHoQ0xVt
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 23 Jan 2024 10:37:14 -0800
-Message-ID: <2394.1706035034@famine>
 
-Hangbin Liu <liuhangbin@gmail.com> wrote:
+On Tue, Jan 23, 2024 at 06:30:16PM +0100, Philippe Schenker wrote:
+>=20
+>=20
+> On Tue, 2024-01-23 at 17:23 +0000, Conor Dooley wrote:
+> > On Tue, Jan 23, 2024 at 05:17:53PM +0100, Philippe Schenker wrote:
+> > >=20
+> > >=20
+> > > On Tue, 2024-01-23 at 16:06 +0000, Conor Dooley wrote:
+> > > > On Tue, Jan 23, 2024 at 02:50:13PM +0100, Philippe Schenker
+> > > > wrote:
+> > > > > From: Philippe Schenker <philippe.schenker@impulsing.ch>
+> > > > >=20
+> > > > > This commit adds the dt-binding for KSZ8567, a robust 7-port
+> > > > > Ethernet switch. The KSZ8567 features two RGMII/MII/RMII
+> > > > > interfaces,
+> > > > > each capable of gigabit speeds, complemented by five 10/100
+> > > > > Mbps
+> > > > > MAC/PHYs.
+> > > > >=20
+> > > > > Signed-off-by: Philippe Schenker
+> > > > > <philippe.schenker@impulsing.ch>
+> > > >=20
+> > > > This device has all the same constraints as the other ones in
+> > > > this
+> > > > binding, why is it not compatible with any of them? If it isn't,
+> > > > the
+> > > > compatible should mention why it is not.
+> > >=20
+> > > Hi Conor, Thanks for your message!
+> > >=20
+> > > I need the compatible to make sure the correct ID of the switch is
+> > > being set in the driver as well as its features.
+> >=20
+> > Are the features of this switch such that a driver for another ksz
+> > switch would not work (even in a limited capacity) with the 8567?
+> > Things like the register map changing or some feature being removed
+> > are
+> > examples of why it may not work.
+>=20
+> Yes the ksz dsa driver is made so that it checks the ID of the attached
+> chip and refuses to work if it doesn't match. [1]
 
->The prio_arp/ns tests hard code the mode to active-backup. At the same
->time, The balance-alb/tlb modes do not support arp/ns target. So remove
->the prio_arp/ns tests from the loop and only test active-backup mode.
->
->Fixes: 481b56e0391e ("selftests: bonding: re-format bond option tests")
->Reported-by: Jay Vosburgh <jay.vosburgh@canonical.com>
->Closes: https://lore.kernel.org/netdev/17415.1705965957@famine/
->Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+That sounds counter productive to be honest. Why does the driver not
+trust that the dt is correct? I saw this recently in some IIO drivers,
+but it was shot down for this sort of reason.
 
-Acked-by: Jay Vosburgh <jay.vosburgh@canonical.com>
+> It is a very similar chip and uses the same regmap as KSZ9567 but with
+> lower phy-speeds on its 5 switch ports. The two upstream CPU ports are
+> gigabit capable. All this information is set-up in the second patch of
+> this series. [2]
 
+That, to me, means the lack of a fallback is justified. If it were the
+other way around, then a fallback sounds like it would be suitable.
 
->---
-> .../testing/selftests/drivers/net/bonding/bond_options.sh | 8 ++++----
-> 1 file changed, 4 insertions(+), 4 deletions(-)
->
->diff --git a/tools/testing/selftests/drivers/net/bonding/bond_options.sh =
-b/tools/testing/selftests/drivers/net/bonding/bond_options.sh
->index c54d1697f439..d508486cc0bd 100755
->--- a/tools/testing/selftests/drivers/net/bonding/bond_options.sh
->+++ b/tools/testing/selftests/drivers/net/bonding/bond_options.sh
->@@ -162,7 +162,7 @@ prio_arp()
-> 	local mode=3D$1
-> =
+>=20
+> I will include a description to the second series. Thanks for your
+> feedback.
 
-> 	for primary_reselect in 0 1 2; do
->-		prio_test "mode active-backup arp_interval 100 arp_ip_target ${g_ip4} =
-primary eth1 primary_reselect $primary_reselect"
->+		prio_test "mode $mode arp_interval 100 arp_ip_target ${g_ip4} primary =
-eth1 primary_reselect $primary_reselect"
-> 		log_test "prio" "$mode arp_ip_target primary_reselect $primary_reselec=
-t"
-> 	done
-> }
->@@ -178,7 +178,7 @@ prio_ns()
-> 	fi
-> =
+Okay, thanks. You can add
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
+when you do.
 
-> 	for primary_reselect in 0 1 2; do
->-		prio_test "mode active-backup arp_interval 100 ns_ip6_target ${g_ip6} =
-primary eth1 primary_reselect $primary_reselect"
->+		prio_test "mode $mode arp_interval 100 ns_ip6_target ${g_ip6} primary =
-eth1 primary_reselect $primary_reselect"
-> 		log_test "prio" "$mode ns_ip6_target primary_reselect $primary_reselec=
-t"
-> 	done
-> }
->@@ -194,9 +194,9 @@ prio()
-> =
+And despite the email, I have nothing to do with these switches, I am
+just a sucker that signed up to review dt-bindings...
 
-> 	for mode in $modes; do
-> 		prio_miimon $mode
->-		prio_arp $mode
->-		prio_ns $mode
-> 	done
->+	prio_arp "active-backup"
->+	prio_ns "active-backup"
-> }
-> =
+Thanks,
+Conor.
 
-> arp_validate_test()
->-- =
+>=20
+> Philippe
+>=20
+>=20
+> [1]
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/d=
+rivers/net/dsa/microchip/ksz_common.c?h=3Dv6.8-rc1#n3181
+> [2]
+> https://patchwork.kernel.org/project/netdevbpf/patch/20240123135014.61485=
+8-2-dev@pschenker.ch/
+>=20
+> >=20
+> > > You mean I shall mention the reason in the commit-message, or
+> > > where?
+> >=20
+> > Yes.
+> >=20
+> > Thanks,
+> > Conor
+> >=20
+> > > > > =A0Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml |
+> > > > > 1 +
+> > > > > =A01 file changed, 1 insertion(+)
+> > > > >=20
+> > > > > diff --git
+> > > > > a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> > > > > b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> > > > > index c963dc09e8e1..52acc15ebcbf 100644
+> > > > > ---
+> > > > > a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> > > > > +++
+> > > > > b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> > > > > @@ -31,6 +31,7 @@ properties:
+> > > > > =A0=A0=A0=A0=A0=A0 - microchip,ksz9893
+> > > > > =A0=A0=A0=A0=A0=A0 - microchip,ksz9563
+> > > > > =A0=A0=A0=A0=A0=A0 - microchip,ksz8563
+> > > > > +=A0=A0=A0=A0=A0 - microchip,ksz8567
+> > > > > =A0
+> > > > > =A0=A0 reset-gpios:
+> > > > > =A0=A0=A0=A0 description:
+> > > > > --=20
+> > > > > 2.34.1
+> > > > >=20
 
->2.43.0
->
+--S5tG8E3ZGHoQ0xVt
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZbAHgwAKCRB4tDGHoIJi
+0kvHAQCBF6xD/BKHadO7iZFN9iMOo2RaLe3K9v7g7p0g+HgK8wEAlb9ipxRogUDd
+63FgSdIHfEYOSZlEpaFfRO6sFvdPHQk=
+=5ynU
+-----END PGP SIGNATURE-----
+
+--S5tG8E3ZGHoQ0xVt--
 
