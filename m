@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-65097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68AF88393C7
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 16:53:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06F8D8393D4
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 16:54:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08B4C1F22273
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 15:53:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B35AB28FE2A
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 15:54:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A85A612DC;
-	Tue, 23 Jan 2024 15:49:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61A76604B8;
+	Tue, 23 Jan 2024 15:54:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QVgUQiXF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="faCoNNLB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4C2B604C9;
-	Tue, 23 Jan 2024 15:49:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3754850A61;
+	Tue, 23 Jan 2024 15:54:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706024997; cv=none; b=Tr5KWbJjF6FY5C65nVphGTceo2VUD+ecBjmR7w0i9zhXO9DaNKRbUG8JhiYbcyzH526NQ8rlN4W2i6MfRY2Cwfmc8BlB7Tzp5d9CHhjnFaVy+h/9c0EQTXc/v5KiRxhUgOYft/c2MePSqODye/5RSbZR60S2jySzulpgB9zRh5k=
+	t=1706025242; cv=none; b=ld/RgPhxzLJSlHdEil74kvVdBPHulDlaXzGOS2/TMux5SA7lMvRB3IEUqP7w2Wq4Old9NKTIBEtXoV0UBembWAZfJtrT1i9Jw4tRQLWcvWP1KH6vSIVxpAZOi8Sob/ez7sxWdPPM9e5S9mzaJqusJLli1WBHKLmZiJLm86w4VEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706024997; c=relaxed/simple;
-	bh=YGqdwsVo1pQFlb0ZPxGipZtucxc5DypYwXmKxIYZeMo=;
+	s=arc-20240116; t=1706025242; c=relaxed/simple;
+	bh=MHunYJlSW0xkpBskC5UuarTnjKz+9CaefumWRC8LlQo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aiA4B1u4Tnlq50XgORNicWrB1tZht0XPT1HiynyPsq5UQyaCRkmaaTLby7g3xp1vjXQNrZkViPhpXF/nlPPC9nLI5J1gloZGYGtN+s7U2rZlYi5GK3vP3CJBMENnyNGMs4botcrxyMcPImqXJp5dT7jxH1wOrLUkIwfTG5cnzlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QVgUQiXF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52FC7C433F1;
-	Tue, 23 Jan 2024 15:49:56 +0000 (UTC)
+	 MIME-Version:Content-Type; b=mOIdKttG70zaJa4EeNcsZYsRMPnO3nNui+1EMHt8q8lLsX0xgtQXuwEg+8vuVFC6fgJkZXRm+KDiNGjTgnfjzvf29Bhi3uWAOWtYU/CROQBi/0+MyMRHGuiuH1sxcinSl3JF1oV9nLSguDvmHZ7q8LEkjjbs+cjbOyRsWVz3mEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=faCoNNLB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C10C8C433C7;
+	Tue, 23 Jan 2024 15:54:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706024997;
-	bh=YGqdwsVo1pQFlb0ZPxGipZtucxc5DypYwXmKxIYZeMo=;
+	s=k20201202; t=1706025241;
+	bh=MHunYJlSW0xkpBskC5UuarTnjKz+9CaefumWRC8LlQo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QVgUQiXFYasn3lV9zA1cS7eGqeZQ3yTcrIySknFWLAt8AhM5kZ6IrOjev4lwiPu17
-	 z74Ps/y1HF0wy9bjCCPt4fOTwnXydIdLqwHqS5CEc5eeBwjFmW5szAE7e0hxVmvV4n
-	 Iddub4yJi1fggTzgQR8NoLIFy1I72gvxuLdeQid0H2HUNMFLHX9DCISrsRor2qGNAC
-	 mtq7OO8srtbn2R42EKyjcbzCgP4ZVpzfUGZrHRQZK7cnkAI5SzAJKw2bsbpmy0oauY
-	 hrwiKBj/wV7OVMuNHtWsk4gQd4aWS4NMHfMiujYSpi2PQ59fp+3mBw7Gou7u4bDJmX
-	 mTAXVDbgu/KUQ==
-Date: Tue, 23 Jan 2024 07:49:55 -0800
+	b=faCoNNLBFV5XfXtR+8ZOEu/t+q8LVdInwpjQ39aqoyj9O4YRDBWSl2269MfaUqbRm
+	 smCSJBa/YZOgRaDlR3XsV0VZUxmeDAdjeR8ZC060toABprkH0AqQlHyLIbO6KVWNJD
+	 5+lPEBY2kemrCcz2FostODercaQr23BVNACUQZ+nEpzsoZshGIGxablCGuAQU098vM
+	 zkYcrRFVkzAl/vrgjWbFXVjPkdN8YNOIffLpEwZ+gS+3vN2VTz1gzxIDKpodu22/1K
+	 ZzO2glca/9BvqCkZwtrRbPhQY9KCoysUEAtbLyEOhDYIDxHXxONDr3QZ2wfGfYIlCz
+	 r0BI5DiKLYjFQ==
+Date: Tue, 23 Jan 2024 07:53:59 -0800
 From: Jakub Kicinski <kuba@kernel.org>
 To: Danielle Ratson <danieller@nvidia.com>
 Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "davem@davemloft.net"
@@ -59,55 +59,66 @@ Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "davem@davemloft.net"
  <linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
  <linux-kernel@vger.kernel.org>, mlxsw <mlxsw@nvidia.com>, Petr Machata
  <petrm@nvidia.com>, Ido Schimmel <idosch@nvidia.com>
-Subject: Re: [RFC PATCH net-next 9/9] ethtool: Add ability to flash
+Subject: Re: [RFC PATCH net-next 3/9] ethtool: Add an interface for flashing
  transceiver modules' firmware
-Message-ID: <20240123074955.72c27eb0@kernel.org>
-In-Reply-To: <DM6PR12MB45168E425B2C1832F6D26453D8742@DM6PR12MB4516.namprd12.prod.outlook.com>
+Message-ID: <20240123075359.4c502c79@kernel.org>
+In-Reply-To: <DM6PR12MB4516C97E6EC715DB78466FD3D8742@DM6PR12MB4516.namprd12.prod.outlook.com>
 References: <20240122084530.32451-1-danieller@nvidia.com>
-	<20240122084530.32451-10-danieller@nvidia.com>
-	<20240122210534.5054b202@kernel.org>
-	<DM6PR12MB45168E425B2C1832F6D26453D8742@DM6PR12MB4516.namprd12.prod.outlook.com>
+	<20240122084530.32451-4-danieller@nvidia.com>
+	<20240122205046.5bb0ffe7@kernel.org>
+	<DM6PR12MB4516C97E6EC715DB78466FD3D8742@DM6PR12MB4516.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 23 Jan 2024 13:05:16 +0000 Danielle Ratson wrote:
-> > GENL_REQ_ATTR_CHECK, and you can check it in the caller, before taking
-> > rtnl_lock.
-> >   
-> 
-> OK, np. The idea was to have module_flash_fw() that checks the attrs
-> and extract them into params and ethnl_act_module_fw_flash() should
-> be free from those checks. But if so, maybe this separation is
-> redundant and should combine the two?
+On Tue, 23 Jan 2024 13:34:18 +0000 Danielle Ratson wrote:
+> > > +The firmware update process can take several minutes to complete.
+> > > +Therefore, during the update process notifications are emitted from
+> > > +the kernel to user space updating it about the status and progress. =
+=20
+> >=20
+> > We should state more explicitly that the op just starts the process, an=
+d does
+> > not block. Looks like cable test already uses _ACT as a suffix, is it b=
+ased on
+> > some standard? Doesn't seem all that intuitive to me (or at least less =
+intuitive
+> > than calling it _START...) =20
+>=20
+> From Documentation/networking/ethtool-netlink.rst:
+> "
+> List of message types
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> All constants identifying message types use ``ETHTOOL_CMD_`` prefix and s=
+uffix
+> according to message purpose:
+>=20
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D    =3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D
+> ``_GET``          userspace request to retrieve data
+> ``_SET``          userspace request to set data
+> ``_ACT``          userspace request to perform an action
+> ``_GET_REPLY``    kernel reply to a ``GET`` request
+> ``_SET_REPLY``    kernel reply to a ``SET`` request
+> ``_ACT_REPLY``    kernel reply to an ``ACT`` request
+> ``_NTF``          kernel notification
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D    =3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D
+> "
+>=20
+> So, it looks suitable to me.
 
-No strong preference, whatever looks better :)
-To use GENL_REQ_ATTR_CHECK() I think you'll need to pass genl_info here.
-You can either to that or move the validation.
-
-> > > +  
-> > tb[ETHTOOL_A_MODULE_FW_FLASH_FILE_NAME],  
-> > > +				    "File name attribute is missing");
-> > > +		return -EINVAL;
-> > > +	}
-> > > +
-> > > +	params.file_name =
-> > > +		nla_data(tb[ETHTOOL_A_MODULE_FW_FLASH_FILE_NAME]);  
-> > 
-> > Hm. I think you copy the param struct by value to the work container.
-> > nla_data() is in the skb which is going to get freed after _ACT returns.
-> > So if anyone tries to access the name from the work it's going to UAF?  
-> 
-> The file_name parameter is not really needed inside the work. Once we
-> called request_firmware_direct(), we have all that we need in
-> module_fw->fw. Do we still need to avoid that situation? If so, can
-> you please suggest how?
-
-I'd pass it to module_flash_fw_schedule() as a separate argument, if it
-doesn't have to be saved.
+True, didn't see that. It's fine as a distinction of "doing something"
+vs "setting configuration" but it doesn't express the fact that the
+action is async. AFAIU cable test is also async, so that's fine.
+We'll worry about it when some tries to add _ACT which isn't async.. =F0=9F=
+=A4=B7=EF=B8=8F
 
