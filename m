@@ -1,96 +1,161 @@
-Return-Path: <netdev+bounces-64948-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64949-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBC0283867A
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 05:59:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B38F838682
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 06:05:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2AB991C21533
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 04:59:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90856285B26
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 05:05:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E62B31FC8;
-	Tue, 23 Jan 2024 04:59:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAD381FD1;
+	Tue, 23 Jan 2024 05:05:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AddHfXIH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N7ZVuCqc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD4284400;
-	Tue, 23 Jan 2024 04:59:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A752B1FBF;
+	Tue, 23 Jan 2024 05:05:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705985964; cv=none; b=NImqozgvRPC6gCIn8XFWMrQ9+0/oJb20iiSmmaCoALBeB5O6KVUK6lpklwnPLLffrhJDfCvh0D5k7E9qN5rAGzO5EEJOdz13uZSb4xQjhB/CzmV71dt97/vXmzVscYmPIgctk1RFxwxz9zaBwwL8Hreoh23Qgue6lOeny5Mtz0Q=
+	t=1705986337; cv=none; b=X6/jwShGcm6sTHxHyurheRSYhq+cAHc/+7z45LZ8V0V2Ph1z2OkBBdi9fCF/iwE2CzJ2PkQQ+mQzQYvGn9fjCrhWsGR+MRR7B6lmUBRTelZzRV0kEPXrDD5F1FeWpwkJk5SBZhaOKcX1OA1YmKzuv5YWD5b7i3qcPkrd5upm9qU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705985964; c=relaxed/simple;
-	bh=ApZQ9VoLyfXDpKyhqM+8FaPkC3Zfhdt/ukiSEDuybXg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pcNJq/+ZQc4aEBGkDnnhLPnYEdGR+FnyODekleEvc5cLqICzNBm2Z7MeSPM/271OMAbK+cKgy/LWXTmOvhlNAvKTgsNWp3lz9pAq0AZRsgO+9tilXEUW8ntjSBeIwMqV8siWQ2U9NyHFl3XwcG8wd4BT5irikTKwd9uqTguEmX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AddHfXIH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA8E9C433C7;
-	Tue, 23 Jan 2024 04:59:23 +0000 (UTC)
+	s=arc-20240116; t=1705986337; c=relaxed/simple;
+	bh=//WOM0oQR5MlLwRUy+ZM05+864HU5PzrMPj0MibHAsI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=K47eRArN5WaJNpmDJzi0HJqfUO1/p6V6xblKDTg5r4yI+81qaMdk6rS1gXmT00qtntBHtRvj/Ceo/Ucsl0SkqWN6vTnbiMx8BRq6Dg3opQepbxOfI5l0cl9F8VK8asg/dnveXIcWoJYYxc2WL2a1aNPVH1UnVa4zPqryKh/+9ns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N7ZVuCqc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECAEAC433F1;
+	Tue, 23 Jan 2024 05:05:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705985964;
-	bh=ApZQ9VoLyfXDpKyhqM+8FaPkC3Zfhdt/ukiSEDuybXg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=AddHfXIHlhBKJqgtXct057VQxQH0SC/J77m29Z74Pdz5fXxwCojt5MpJvbLmU8N15
-	 8YbnP4W4RhRraViNliJYTojC7/pDT1Po0a5T8Az9VBa/+RD6j+SaqJ/otikqxigRxp
-	 ahoFANc5O06G7uGs2l923mcWl9OrFPBgaCTpaHFqtFLNAxn8IO6UUF8pisOdP8ZEU2
-	 J0fHn0psL/TT2gcEx7IgPXrmjt5Jf8pnN1y1NmTR2mqZ9ZKg/KkvVqGOaKx58cJmQ4
-	 wCJIdV/2U247mKtXfX7AW8dreFRnLxk/7loNzNqwl5ZjzwLZcRU/+YbrwwU07VnFiT
-	 OOUgBtCpee61Q==
-Message-ID: <0e12d8a0-4ef8-4b22-bc61-072247df47a7@kernel.org>
-Date: Mon, 22 Jan 2024 21:59:22 -0700
+	s=k20201202; t=1705986337;
+	bh=//WOM0oQR5MlLwRUy+ZM05+864HU5PzrMPj0MibHAsI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=N7ZVuCqcgB1Y7LeCxTjnJKx2V7GCJrIDuFuICLYPSpTD8BRPfhARXe1e9q6DahI4R
+	 L5/qMIkl+bAbGcfCxZEuflaVazBzK7yv4hA5PSjBb+mRAO1TUd0z0zPuZ5dytPN3Za
+	 SDeoaZUjYtQdT7D37f5z8KxBzKHG97r8zJTw1KFQKZav0X1N5M26XyFP3lNh7Uy7+v
+	 kzHr0RzZ/bqB8EtM1xc7wlwI3oMc8s4M4nHkRtfoEhIEbSkzI6te1QDmdcQ7rJhRhx
+	 zep7yHCJoDdYF9wHwIn3lsD/nV0IqRKheq9swUXje2m68/zgEMiSmEXYyXz2W37yzR
+	 8KOz78uPyzsmw==
+Date: Mon, 22 Jan 2024 21:05:34 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Danielle Ratson <danieller@nvidia.com>
+Cc: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+ <pabeni@redhat.com>, <corbet@lwn.net>, <linux@armlinux.org.uk>,
+ <sdf@google.com>, <kory.maincent@bootlin.com>,
+ <maxime.chevallier@bootlin.com>, <vladimir.oltean@nxp.com>,
+ <przemyslaw.kitszel@intel.com>, <ahmed.zaki@intel.com>,
+ <richardcochran@gmail.com>, <shayagr@amazon.com>,
+ <paul.greenwalt@intel.com>, <jiri@resnulli.us>,
+ <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <mlxsw@nvidia.com>, <petrm@nvidia.com>, <idosch@nvidia.com>
+Subject: Re: [RFC PATCH net-next 9/9] ethtool: Add ability to flash
+ transceiver modules' firmware
+Message-ID: <20240122210534.5054b202@kernel.org>
+In-Reply-To: <20240122084530.32451-10-danieller@nvidia.com>
+References: <20240122084530.32451-1-danieller@nvidia.com>
+	<20240122084530.32451-10-danieller@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Discuss]iproute2: ipv6 route add fail
-Content-Language: en-US
-To: gaoxingwang <gaoxingwang1@huawei.com>, edumazet@google.com
-Cc: davem@davemloft.net, liaichun@huawei.com, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com, yanan@huawei.com,
- yoshfuji@linux-ipv6.org
-References: <CANn89iK05tppo0neGmKTdU-Dp8Dap6ayxda-++Z3LRp3DFrq+w@mail.gmail.com>
- <20240123030813.2493801-1-gaoxingwang1@huawei.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240123030813.2493801-1-gaoxingwang1@huawei.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 1/22/24 8:08 PM, gaoxingwang wrote:
->>> Hello everyone,
->>>
->>> Here is a particular problem with routing.
->>> Sometimes users can run the ip -6 route command to add a route whose destination address is the same as the gateway address, and it can be successfully added. However, adding another route with the same gateway address will fail later.
->>>
->>> Example:
->>> # ip -6 route add 2409:8080:5a0a:60c7::7/128 via 2409:8080:5a0a:60c7::7 dev eth2
+On Mon, 22 Jan 2024 10:45:30 +0200 Danielle Ratson wrote:
+>  #include <linux/ethtool.h>
+> +#include <linux/sfp.h>
+> +#include <linux/firmware.h>
 
-I missed that this is a self-referencing route. This one really should
-fail because it adds itself as a gateway.
+alphabetical order, please
 
->>> # ip -6 route add 2409:8080:5a0a:60c7::8/128 via 2409:8080:5a0a:60c7::7 dev eth2
->>> RTNETLINK answers: No route to host
+> +static int
+> +module_flash_fw_schedule(struct net_device *dev,
+> +			 struct ethtool_module_fw_flash_params *params,
+> +			 struct netlink_ext_ack *extack)
+> +{
+> +	const struct ethtool_ops *ops = dev->ethtool_ops;
+> +	struct ethtool_module_fw_flash *module_fw;
+> +	int err;
+> +
+> +	if (!ops->set_module_eeprom_by_page ||
+> +	    !ops->get_module_eeprom_by_page) {
+> +		NL_SET_ERR_MSG(extack,
+> +			       "Flashing module firmware is not supported by this device");
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+> +	if (dev->module_fw_flash_in_progress) {
+> +		NL_SET_ERR_MSG(extack, "Module firmware flashing already in progress");
+> +		return -EBUSY;
+> +	}
+> +
+> +	module_fw = kzalloc(sizeof(*module_fw), GFP_KERNEL);
+> +	if (!module_fw)
+> +		return -ENOMEM;
+> +
+> +	module_fw->params = *params;
+> +	err = request_firmware(&module_fw->fw, module_fw->params.file_name,
 
-and this one fails because of the above self referencing route; see
-ip6_route_check_nh:
+request_firmware_direct() ? I think udev timeout is 30 sec and we're
+holding rtnl_lock.. I don't remember why we didn't use that in devlink
 
-        err = ip6_nh_lookup_table(net, cfg, gw_addr,
-                                  cfg->fc_table, flags, &res);
-        /* gw_addr can not require a gateway or resolve to a reject
-         * route. If a device is given, it must match the result.
-         */
+> +			       &dev->dev);
+> +	if (err) {
+> +		NL_SET_ERR_MSG(extack,
+> +			       "Failed to request module firmware image");
+> +		goto err_request_firmware;
+> +	}
+> +
+> +	err = module_flash_fw_work_init(module_fw, dev, extack);
+> +	if (err < 0) {
+> +		NL_SET_ERR_MSG(extack,
+> +			       "Flashing module firmware is not supported by this device");
+> +		goto err_work_init;
+> +	}
+> +
+> +	dev->module_fw_flash_in_progress = true;
 
+What does this protect us from? 
 
->>>
->>> Does the kernel not support this application scenario?
+> +static int module_flash_fw(struct net_device *dev, struct nlattr **tb,
+> +			   struct netlink_ext_ack *extack)
+> +{
+> +	struct ethtool_module_fw_flash_params params = {};
+> +	struct nlattr *attr;
+> +
+> +	if (!tb[ETHTOOL_A_MODULE_FW_FLASH_FILE_NAME]) {
+> +		NL_SET_ERR_MSG_ATTR(extack,
 
-you need to remove the host route that adds a gateway as itself
+GENL_REQ_ATTR_CHECK, and you can check it in the caller,
+before taking rtnl_lock.
+
+> +				    tb[ETHTOOL_A_MODULE_FW_FLASH_FILE_NAME],
+> +				    "File name attribute is missing");
+> +		return -EINVAL;
+> +	}
+> +
+> +	params.file_name =
+> +		nla_data(tb[ETHTOOL_A_MODULE_FW_FLASH_FILE_NAME]);
+
+Hm. I think you copy the param struct by value to the work container.
+nla_data() is in the skb which is going to get freed after _ACT returns.
+So if anyone tries to access the name from the work it's going to UAF?
+
+> +
+> +	attr = tb[ETHTOOL_A_MODULE_FW_FLASH_PASSWORD];
+> +	if (attr) {
+> +		params.password = cpu_to_be32(nla_get_u32(attr));
+> +		params.password_valid = true;
+> +	}
+> +
+> +	return module_flash_fw_schedule(dev, &params, extack);
+> +}
 
 
