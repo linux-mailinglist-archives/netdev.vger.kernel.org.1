@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-65106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA3CA839438
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:06:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F9AE83943B
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:06:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 695821F27074
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 16:06:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 210FE1C237FE
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 16:06:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CBB4664BF;
-	Tue, 23 Jan 2024 16:05:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A82664A89;
+	Tue, 23 Jan 2024 16:05:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MXLPA0LO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nO6dnfc5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AAD664A89;
-	Tue, 23 Jan 2024 16:05:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C5A0664C5;
+	Tue, 23 Jan 2024 16:05:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706025957; cv=none; b=nAuzX0ugssQ5vKDOA9oAgkhNiTK4KYe4naXYYKO0TkjGAIYgtde3SmYxfrjVF90F3j09Ch7dMKcWpw/fPJ03z7f7j8fH7bK092wOl8NghQRc0T2y+zbfQLapVlMHJ9gCBPgzs2aduUcD/WwuuhPI/tMtcYXzNtsu1epjxd7GpEA=
+	t=1706025959; cv=none; b=se/lHXRMYV7Ak7Q18hUKunk1juHd0trNHfYlfBMaWAbjwrlqancW607ZUAx5+ow3OtNxnPfZlk4LOCdHPZQ9hgxUbnn/dNtjFN5RfJky6BFSUPqWotv05gjIewjGmAsR3+EBv9KtnN36ljlxByao+jhRMZfBbmisQZDh/iCBfzg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706025957; c=relaxed/simple;
-	bh=mlIrTgzwyP094bcSNKK/Wi82s2TnOYwwyJfgh2GO+b4=;
+	s=arc-20240116; t=1706025959; c=relaxed/simple;
+	bh=WWlzWq4ogMbA5Bv/ttRCAgp137pwlwv7TucnOnjb4fk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Pjx3EVyDeeN6iPMfF1+c78/tXNEuM9exPTUCWe959YC1EBF6rqHkwgdqEK+ZTmsl/pbgRFvUxEAt0UyFeYHPO7y0j0MosRyH8mfZGjQ08MXde2BEYBh1GR0KHEr6pQxRFGQWeBtJuqkpXZTi4vQVM5SMABPUetqF80QQze5NPEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MXLPA0LO; arc=none smtp.client-ip=209.85.128.54
+	 MIME-Version; b=jwjs1dll15oY8Akkz47fbgUhUunHpJb3Y/rbA/aaE7A2yXfAUJcAkbAjdDeiRfFmLt00EtW1VCPyA9U4HDsoMB9yXPjFkit2oYpRK+oxYY6Q2VDxya3IcqltiYg+aciQEcV1Lo9Fm/bZkLzDgeUqpa9RZBa/q4Z6xjrb2bywzJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nO6dnfc5; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-40e9d4ab5f3so48638715e9.2;
-        Tue, 23 Jan 2024 08:05:55 -0800 (PST)
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-40ec34160baso2190165e9.1;
+        Tue, 23 Jan 2024 08:05:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706025953; x=1706630753; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706025955; x=1706630755; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YmRjBSuIOt9of23+aywKWiGP5DZrvI5CG2rVGVa0CCM=;
-        b=MXLPA0LOzQzQIQxARWwliTOQPoHhc/B1wRfKa7Et6hEUK7zfS+X2/d5HHtHTxBnbXK
-         8zleHftAUmCTNwLsOiFLBKJA5NcZxIClgo/89vUpEyoLh/ZmqJPEBs15TkqgzZdoYXKE
-         x8M7DhSIODP021Re9J9uMMusZjmKleWgr17BbRgAAXLbqmGQ0wDCuF+MNYooI4FqyOg7
-         bLK2BIzJz3f/djqAJsWkGSzjEAqbT/9Prf3awb01feaCJk97eRRhAH3AzFQCakccsVkL
-         awGNzFDqcfdZqaRE57fOYe/zFwg2HSvolpZbtT5ctuT3vtusHjFo9j6Fu2HtqDIq+KjV
-         Ah6Q==
+        bh=nPCt3LCuPfxhjiLPFiqNs15NK/ZpR78NNqvYkTrubSs=;
+        b=nO6dnfc5x6h+IWJC0RlQxW4QLcOdkJF7apd7U1wAluTxBuxxYWaAjChEsp45soosQ9
+         FSzy/Mi/Rq0aB6/p14rCJ35ad7xstJvsPF0o3PHIZvLQGHlyqsBwjxw5OCG/iSenNb27
+         UXhcxx9/KB1vMoPn+Ltq7Dn3xcfsf0boyILXDKGQ2RGqsdlo4nz68LIFsrKM5EXgwikT
+         c4qPHqlD2CRiNISBZJrx4zdnmqhxmvgb/opfz6OIqAtpqqWQmKRy6DzkrehMmRAscyM+
+         Jm9cmHnZMm1Ea/ZFGDsA96is0h0QHaBNaBi6eKv3+5e9wpIj5Go0Pu/4KNm9v1iLCVtB
+         rDMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706025953; x=1706630753;
+        d=1e100.net; s=20230601; t=1706025955; x=1706630755;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=YmRjBSuIOt9of23+aywKWiGP5DZrvI5CG2rVGVa0CCM=;
-        b=WOi6wIsdDCIw1poxdZI6epksihsyvYn1H4nOuo9DcdRAwY9g5W1A6soKsm7W0IzDYI
-         Cgxz+uwWC7YJE+d0g4jie0IFS4t2vMD7GcXdhG4qEhlN8Xyh3CUwqd1tm2HVNDfro5un
-         +suTJCmN1rNDH66++qV20aC+w4kkbFv/8Ef17sBjwtH06NwuhvvxWsnlFLGDd4uLiSpa
-         4ilQ3wV2gWWvQD9wKqWcZdTG7fEbl8gLKJ9LpPPurQ7USRtYUVpYXBb40ryNggHoaGNj
-         GjO7DjS6Q6dJn88KJSE9Y70BEWYtJkBz4HFRmfW4fTdoxrsnJcY3979Ft1H1T4faWpRa
-         0IVw==
-X-Gm-Message-State: AOJu0YzdKh+HedXe4PIFd3OV1/HdnT4NFlraLXUF0yyIJEUO7mZ1qdA7
-	6ihmE4uK74O55VuFsnaP3qRHHTExxQYAhnjNY0LN+UU0GBPSmAEif9x+q/OYnJgH6Ei5
-X-Google-Smtp-Source: AGHT+IHIdmBFPUkjjawXnAaSg0gRMBmxJGXPieqLCocuQZ9Yg7Aq0eVudzXGg5+4GVHC56o4tW+MSQ==
-X-Received: by 2002:a7b:c3d2:0:b0:40e:6d77:85f2 with SMTP id t18-20020a7bc3d2000000b0040e6d7785f2mr243665wmj.173.1706025952903;
-        Tue, 23 Jan 2024 08:05:52 -0800 (PST)
+        bh=nPCt3LCuPfxhjiLPFiqNs15NK/ZpR78NNqvYkTrubSs=;
+        b=ZEOoog+Zomu4ZQEUQnMVkpIg//JXeBBD9kqQgBA62VVwhPl0kPGmeYL7mxEmoR8iAD
+         p9JtVsyLdZkL51+8KjaY7zXpg7kRl7MGDzywOJBctcuGm8TgUGLJclaVCeQ1Q7TFczyU
+         Y4EO9zKMeC1989LGsgqhfLomwwzPavJz/mcdbDUlLMYLWXtgOBpYj16cRzMawu7hG7s+
+         tCrf5N4OOpyUGqKjAXQ6fPU9w5wQcCd/LUrddc+wT5GREYIoXxzpbrIFiPkXuDZf0Adx
+         hy3IyTpzY/uO2UKb9AXpPWYISWJY/24lf+GD/kx3f2eDPEnbdrdW8AaWnioD8h2qmpPZ
+         61Ew==
+X-Gm-Message-State: AOJu0YzR9DGM6opYT5delLXmoox+JSWf8mhqv0Xtb2in/tAYa8FP3y3n
+	A/My0ZXRKdUityuZhnE7EvRAnI7zGEBh9KpWaYfOP0AOAsC1mxN8lpAc72irLlqKJjsG
+X-Google-Smtp-Source: AGHT+IGNF1CcHGzMWJ6BVF4PRWOPMgIcgB8Wb3pb4TGBKFY2U8//vkH6JV+3BsmY2EYg7lbBEtFEjw==
+X-Received: by 2002:a05:600c:4fd0:b0:40e:b981:db9a with SMTP id o16-20020a05600c4fd000b0040eb981db9amr797766wmq.7.1706025954895;
+        Tue, 23 Jan 2024 08:05:54 -0800 (PST)
 Received: from imac.fritz.box ([2a02:8010:60a0:0:b949:92c4:6118:e3b1])
-        by smtp.gmail.com with ESMTPSA id t4-20020a5d42c4000000b003392c3141absm8123830wrr.1.2024.01.23.08.05.50
+        by smtp.gmail.com with ESMTPSA id t4-20020a5d42c4000000b003392c3141absm8123830wrr.1.2024.01.23.08.05.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jan 2024 08:05:51 -0800 (PST)
+        Tue, 23 Jan 2024 08:05:53 -0800 (PST)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: netdev@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -80,9 +80,9 @@ To: netdev@vger.kernel.org,
 	Alessandro Marcolini <alessandromarcolini99@gmail.com>
 Cc: donald.hunter@redhat.com,
 	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v1 04/12] tools/net/ynl: Add support for encoding sub-messages
-Date: Tue, 23 Jan 2024 16:05:30 +0000
-Message-ID: <20240123160538.172-5-donald.hunter@gmail.com>
+Subject: [PATCH net-next v1 05/12] tools/net/ynl: Encode default values for binary blobs
+Date: Tue, 23 Jan 2024 16:05:31 +0000
+Message-ID: <20240123160538.172-6-donald.hunter@gmail.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20240123160538.172-1-donald.hunter@gmail.com>
 References: <20240123160538.172-1-donald.hunter@gmail.com>
@@ -94,78 +94,38 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add sub-message encoding to ynl. This makes it possible to create
-tc qdiscs and other polymorphic netlink objects.
+Add support for defaulting binary byte arrays to all zeros as well as
+defaulting scalar values to 0 when encoding input parameters.
 
 Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
 ---
- tools/net/ynl/lib/ynl.py | 24 +++++++++++++++++++++---
- 1 file changed, 21 insertions(+), 3 deletions(-)
+ tools/net/ynl/lib/ynl.py | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-index dd54205f866f..d1005e662d52 100644
+index d1005e662d52..ea4638c56802 100644
 --- a/tools/net/ynl/lib/ynl.py
 +++ b/tools/net/ynl/lib/ynl.py
-@@ -449,7 +449,7 @@ class YnlFamily(SpecFamily):
-         self.sock.setsockopt(Netlink.SOL_NETLINK, Netlink.NETLINK_ADD_MEMBERSHIP,
-                              mcast_id)
- 
--    def _add_attr(self, space, name, value):
-+    def _add_attr(self, space, name, value, vals):
-         try:
-             attr = self.attr_sets[space][name]
-         except KeyError:
-@@ -458,8 +458,10 @@ class YnlFamily(SpecFamily):
-         if attr["type"] == 'nest':
-             nl_type |= Netlink.NLA_F_NESTED
-             attr_payload = b''
-+            subvals = ChainMap(value, vals)
-             for subname, subvalue in value.items():
--                attr_payload += self._add_attr(attr['nested-attributes'], subname, subvalue)
-+                attr_payload += self._add_attr(attr['nested-attributes'],
-+                                               subname, subvalue, subvals)
-         elif attr["type"] == 'flag':
-             attr_payload = b''
-         elif attr["type"] == 'string':
-@@ -469,6 +471,8 @@ class YnlFamily(SpecFamily):
-                 attr_payload = value
-             elif isinstance(value, str):
-                 attr_payload = bytes.fromhex(value)
-+            elif isinstance(value, dict) and attr.struct_name:
-+                attr_payload = self._encode_struct(attr.struct_name, value)
-             else:
-                 raise Exception(f'Unknown type for binary attribute, value: {value}')
-         elif attr.is_auto_scalar:
-@@ -481,6 +485,20 @@ class YnlFamily(SpecFamily):
-             attr_payload = format.pack(int(value))
-         elif attr['type'] in "bitfield32":
-             attr_payload = struct.pack("II", int(value["value"]), int(value["selector"]))
-+        elif attr['type'] == 'sub-message':
-+            msg_format = self._resolve_selector(attr, vals)
-+            attr_payload = b''
-+            if msg_format.fixed_header:
-+                attr_payload += self._encode_struct(msg_format.fixed_header, value)
-+            if msg_format.attr_set:
-+                if msg_format.attr_set in self.attr_sets:
-+                    nl_type |= Netlink.NLA_F_NESTED
-+                    subvals = ChainMap(value, vals)
-+                    for subname, subvalue in value.items():
-+                        attr_payload += self._add_attr(msg_format.attr_set,
-+                                                       subname, subvalue, subvals)
+@@ -723,12 +723,17 @@ class YnlFamily(SpecFamily):
+         members = self.consts[name].members
+         attr_payload = b''
+         for m in members:
+-            value = vals.pop(m.name) if m.name in vals else 0
++            value = vals.pop(m.name) if m.name in vals else None
+             if m.type == 'pad':
+                 attr_payload += bytearray(m.len)
+             elif m.type == 'binary':
+-                attr_payload += bytes.fromhex(value)
++                if value is None:
++                    attr_payload += bytearray(m.len)
 +                else:
-+                    raise Exception(f"Unknown attribute-set '{msg_format.attr_set}'")
-         else:
-             raise Exception(f'Unknown type at {space} {name} {value} {attr["type"]}')
- 
-@@ -777,7 +795,7 @@ class YnlFamily(SpecFamily):
-         if op.fixed_header:
-             msg += self._encode_struct(op.fixed_header, vals)
-         for name, value in vals.items():
--            msg += self._add_attr(op.attr_set.name, name, value)
-+            msg += self._add_attr(op.attr_set.name, name, value, vals)
-         msg = _genl_msg_finalize(msg)
- 
-         self.sock.send(msg, 0)
++                    attr_payload += bytes.fromhex(value)
+             else:
++                if value is None:
++                    value = 0
+                 format = NlAttr.get_format(m.type, m.byte_order)
+                 attr_payload += format.pack(value)
+         return attr_payload
 -- 
 2.42.0
 
