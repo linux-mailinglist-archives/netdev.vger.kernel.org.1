@@ -1,134 +1,111 @@
-Return-Path: <netdev+bounces-64987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B99CB838B52
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 11:03:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2655838B76
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 11:14:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B283B22F70
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 10:03:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31F7A1C21DB7
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 10:14:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C34E5BAFE;
-	Tue, 23 Jan 2024 10:03:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FB165A109;
+	Tue, 23 Jan 2024 10:14:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Z7kK/SwE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NtJF14n0"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBE215C5E0;
-	Tue, 23 Jan 2024 10:03:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A34D95A0FC
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 10:14:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706004224; cv=none; b=tjd2tLXU2LXmdn7zRIvjRANfFuZmF+WfHULXfMh7xXjGDSfMkk8fMThL3LEF0FQSSmgt0tzpz5JRKs8plFM16aQR+4aJq1DIf/QsqoqOeGT1p4GF65XIMrvCBfkFe3SgGJxJCBdO0r/Dfei/Wtx+fZ4toztYSkcFAfRa13tF+F8=
+	t=1706004853; cv=none; b=XHVqjWbv6Wtb+NI85Bnefylo6hJGZi6cR0wK9cyJKkhAMqG/sssJJUBKoAOPJ6ntIjg7+z5H5OCqsrqAizROJVKbYt/NwZjbnOv9rQUwSbpdrMAgdxjBlpEv15Y76pS2KOAIO/GHxCuUNZ3UoZW8Q2/N9MxQCOfOTGoq3WO64v4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706004224; c=relaxed/simple;
-	bh=uMNNg+3njresSW14XlqPX2ISyI4rysroKuO5EzSZJcY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RahRc0N1htZtGLSPO7LyywyV+QsDVfTxWPTOkuvJNPBeWd1RBv/crn20HKAXfBhZeuIb7/n6pJN9azDsnayxibhrQ/Hs3DgiiNeqRyDL45gCrJBo4M1juQOIpICZkEa2WmOcEbyzaN6K3z9YnrLYe4crG+Zich055AnqPSNrs9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Z7kK/SwE; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1706004222; x=1737540222;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=uMNNg+3njresSW14XlqPX2ISyI4rysroKuO5EzSZJcY=;
-  b=Z7kK/SwECCIj2ufKU3bP/qE23MAuLlt4vwZL6bo5DMnyXp3Fh6Y7+WFG
-   5GKE/YvTMcXA7kDUht3QR3PB1MFtTa1PhVbAp4roBS+STAsVfTY37MS7B
-   0i8Ww0caTP4DRI6MZ76SbhRJy6/nqWXTrQJIRtgNqxOwJtNf2ON3xclrE
-   x3QEg/X9RPhoKc0g9pPRvYnGYs8ddhw5XXdII2KKKJiuFbE8q2Pyc3RQ1
-   IuWUdT5C4qa3o6Kiha2PY9McQawEcQc+ejpl+Z1xftsRKkxP7X8J54atf
-   gd76Yyg9iv11GeQVVPGf85c+cIeePbwAZborb1tAw9RnI74beLB1dGkoL
-   A==;
-X-CSE-ConnectionGUID: RZ1Nz7WUS3Gi2FofoZ48Tg==
-X-CSE-MsgGUID: QLqhO3EaRo+fPgWiwCOc7w==
-X-IronPort-AV: E=Sophos;i="6.05,214,1701154800"; 
-   d="scan'208";a="15158519"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Jan 2024 03:03:40 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 23 Jan 2024 03:03:20 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex01.mchp-main.com
- (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Tue, 23 Jan 2024 03:03:20 -0700
-Date: Tue, 23 Jan 2024 11:03:19 +0100
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <UNGLinuxDriver@microchip.com>
-Subject: Re: [PATCH net] net: lan966x: Fix port configuration when using
- SGMII interface
-Message-ID: <20240123100319.3z6or2ahhztkplgv@DEN-DL-M31836.microchip.com>
-References: <20240123081514.3625293-1-horatiu.vultur@microchip.com>
- <20240123094849.5ce5acc8@device-28.home>
+	s=arc-20240116; t=1706004853; c=relaxed/simple;
+	bh=gs+QbCqNiikPj0gLJvTBbE6TnYyU9UjU3AFyG2oFktg=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=tYpcDkmXJvkgkcN2nx+b2tpt3imm00q6NQ3DDFXN6i7D6mc/OqrXuetljmHOqn6cq+zFBearRr+73NDFd3Q8XCRZWYKGtXGNmtXFyI9oiNmazeHgG9UxG0vAZLPX0nZrXX6/mrhT3ifDVfPD27Xmlmz1u/9VIhpl+PLbaDLr+gE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NtJF14n0; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-40e86a9fc4bso53051995e9.2
+        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 02:14:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706004849; x=1706609649; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-disposition:mime-version
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Dl0txdoX5ubX9q6e6WExjH6NlAxL+YsMy4sstOJvAik=;
+        b=NtJF14n0aOOkmsHf2yCEpnmT4IvGXPqgX0icJiSvmARGDLXqlw8wehgClNe3Cag2sG
+         JDWl8TQ6BZwaqwQ+C4SkagPBzuSAVgRpVduWUjXkyga+HQNUYc+XtQ3eZvQUKE6uF9gZ
+         DVlpN/Iy8y+ZE87AMMDSr7HwWvFVaumESzsHSoX2ZL4OFBOMQxWXyEdrCbzQ/gJB3CG5
+         TldbdTjKPrkAAMd5sliiU85oAMMIN07HrWAJFl4ipj77gRTcvU/vKJau5EWE9aPxHuPd
+         BhpZDpkUrQNsalCrPAweIaVaCAUqQurtDxtbkd2dFGPH7dkmcvuzutPslbR9Yr8uMtLg
+         dKSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706004849; x=1706609649;
+        h=content-transfer-encoding:content-disposition:mime-version
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Dl0txdoX5ubX9q6e6WExjH6NlAxL+YsMy4sstOJvAik=;
+        b=dBr+TxeGT1pnaO/qZBI0BUT3NRuNWkh+HqyJiB7RSkbWrK+NBp8kJDBQBtOF3u1yt0
+         3soh0lMyecimZE54gyAECb4G+76M3OgseuIpd5q7ZMrEINPPazolq4m9Mpp701hY7+3q
+         am2XHmtBYCKvmste6DPYaVsMSHi7wdX8WBbVUMXKVs2nEz8HYLnvetltqRu1LI8bld2U
+         us9NUQrgRXGuRaTR5z2J4LsknCOy07J/T/jomzDmuGM3GfnJ93/EBVxmGvOg63XViDG4
+         l0O/o5mLJRL8kagudkHVrp5Jr7GjWEDzjSmbPoteCeW/FIB8cO+AkrAMvOTCN+OJG1qy
+         i8fg==
+X-Gm-Message-State: AOJu0YwSrzOGGILrOzkXZXKABvh2tnpNU1tPIduvR1w27ik++E2vwaX7
+	rMMgNX0kHsD8+amo1aABU9TOWpE1ydwR3YnxKr3eRV+rxivUj2c=
+X-Google-Smtp-Source: AGHT+IFdWvq+sPNPZWWLC7sV0PhebLTgL0c1UNXu/SCN0X19PiKoV/CT5ThwnXpyF4phCo1fPjinpg==
+X-Received: by 2002:a7b:c043:0:b0:40e:3fa2:a16 with SMTP id u3-20020a7bc043000000b0040e3fa20a16mr380480wmc.201.1706004849433;
+        Tue, 23 Jan 2024 02:14:09 -0800 (PST)
+Received: from p183 ([46.53.248.133])
+        by smtp.gmail.com with ESMTPSA id b13-20020a05600010cd00b003392c1f40acsm7281332wrx.28.2024.01.23.02.14.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Jan 2024 02:14:09 -0800 (PST)
+Date: Tue, 23 Jan 2024 13:14:07 +0300
+From: Alexey Dobriyan <adobriyan@gmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org
+Subject: [PATCH 1/2] connector: fix #include <linux/cn_proc.h>
+Message-ID: <2b04a34e-d049-497b-8d5c-3602d889ab83@p183>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240123094849.5ce5acc8@device-28.home>
+Content-Transfer-Encoding: 8bit
 
-The 01/23/2024 09:48, Maxime Chevallier wrote:
-> 
-> Hello Horatiu,
+Including <linux/cn_proc.h> first line doesn't work because of missing
+forward declaration:
 
-Hi Maxime,
+In file included from kernel/foo.c:1:
+include/linux/cn_proc.h:32:47: error: ‘struct task_struct’ declared inside parameter list will not be visible outside of this definition or declaration [-Werror]
+   32 | static inline void proc_fork_connector(struct task_struct *task)
+      |                                               ^~~~~~~~~~~
 
-> 
-> On Tue, 23 Jan 2024 09:15:14 +0100
-> Horatiu Vultur <horatiu.vultur@microchip.com> wrote:
-> 
-> > In case the interface between the MAC and the PHY is SGMII, then the bit
-> > GIGA_MODE on the MAC side needs to be set regardless of the speed at
-> > which it is running.
-> >
-> > Fixes: d28d6d2e37d1 ("net: lan966x: add port module support")
-> > Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
-> > ---
-> >  drivers/net/ethernet/microchip/lan966x/lan966x_port.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_port.c b/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
-> > index 92108d354051c..975a6d64a2e18 100644
-> > --- a/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
-> > +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
-> > @@ -170,7 +170,8 @@ static void lan966x_port_link_up(struct lan966x_port *port)
-> >       /* Also the GIGA_MODE_ENA(1) needs to be set regardless of the
-> >        * port speed for QSGMII ports.
-> 
-> Small nit, I think this comment above the test could also be updated to
-> reflect that change.
+Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
+---
 
-Ah... yes, you are right. I will update this in the next version.
+ include/linux/cn_proc.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-> 
-> >        */
-> > -     if (phy_interface_num_ports(config->portmode) == 4)
-> > +     if (phy_interface_num_ports(config->portmode) == 4 ||
-> > +         config->portmode == PHY_INTERFACE_MODE_SGMII)
-> >               mode = DEV_MAC_MODE_CFG_GIGA_MODE_ENA_SET(1);
-> >
-> >       lan_wr(config->duplex | mode,
-> 
-> Besides that,
-> 
-> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> 
-> Thanks,
-> 
-> Maxime
-
--- 
-/Horatiu
+--- a/include/linux/cn_proc.h
++++ b/include/linux/cn_proc.h
+@@ -19,6 +19,8 @@
+ 
+ #include <uapi/linux/cn_proc.h>
+ 
++struct task_struct;
++
+ #ifdef CONFIG_PROC_EVENTS
+ void proc_fork_connector(struct task_struct *task);
+ void proc_exec_connector(struct task_struct *task);
 
