@@ -1,116 +1,107 @@
-Return-Path: <netdev+bounces-65074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DAE2839244
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 16:14:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49889839278
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 16:19:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 507001C211D7
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 15:14:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F1A1F1F27024
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 15:19:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 598485FBAA;
-	Tue, 23 Jan 2024 15:14:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=pwaller.net header.i=@pwaller.net header.b="Ft3jafNZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56F1E5FDA3;
+	Tue, 23 Jan 2024 15:19:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.foo.to (mail.foo.to [144.76.29.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B02DE5FBA6
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 15:14:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.29.196
+Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9351604A2;
+	Tue, 23 Jan 2024 15:19:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706022854; cv=none; b=dzuc/GcooeJJjgPX2ORvYQ/l+QqH/NrBt2D8DQVf3Ad7MocjnLONIcfPtH13Tdgv08jaQQCmAb/3uo4eEIuXRWbJgTVaMIaw3pMmB8f/LEwBwhTmK5CI/QVf8U/RRiEE54mOjGD0/ZGpgEpdOwxznwmmVyD/nZkwZpkcSs1qY3Q=
+	t=1706023175; cv=none; b=pfiwr6HBElK7k544B8siFgPTKgR7RmM9AmGC3t6qkI+5XkipJ4lSyg6P17QRuYxpFCJhMClwll2eRDNDmx15OQjI7Phe96zFxi6GrYmwgWRa7iEKjE/nXaQCb9aejZvhlPH9tSnDqBASSo+vKEC2MiHhrMh3p1GF4fYoCxAx8Rg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706022854; c=relaxed/simple;
-	bh=v/S+6f3ILduvjD/9cm93TlQhDZ0D8uWEvZsyWzTwMwY=;
-	h=Content-Type:From:Mime-Version:Subject:Date:Message-Id:References:
-	 Cc:In-Reply-To:To; b=o8vmwAjIh6N2meICjmEO1w3L7pUUgYJBkvYOx5oLREbS6jju/XJ+AYWx6GUg4KXs2P829WVhnLuN/CNCL7rUkWIlamJLddDol0kNLzYioVBqnVSzRO3Pn2XbcsbIraPsJpc3nH3pHJTDwLVTlDo34DbyE7A/S/GHW8RWRaTrxLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=pwaller.net; spf=pass smtp.mailfrom=pwaller.net; dkim=pass (1024-bit key) header.d=pwaller.net header.i=@pwaller.net header.b=Ft3jafNZ; arc=none smtp.client-ip=144.76.29.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=pwaller.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pwaller.net
-Content-Type: text/plain; charset=utf-8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=pwaller.net; s=mail;
-	t=1706022845; bh=v/S+6f3ILduvjD/9cm93TlQhDZ0D8uWEvZsyWzTwMwY=;
-	h=From:Subject:Date:References:Cc:In-Reply-To:To:From;
-	b=Ft3jafNZCcJlODA/2A7h8ubJPKaF8xoyBtPxDRbjoDhibjvWliBNqwijeDbT26DVR
-	 4xIQHLhmwFwbmZ6HBsJxVOY8nofrCnmkG/bLcCTybC9ibPfBPdSY/v94PqD6D69VhE
-	 /vuvR1asRvfinWBSLcMRy5pBCXiUcqbvSYE7Fe78=
-Content-Transfer-Encoding: quoted-printable
-From: Peter Waller <p@pwaller.net>
+	s=arc-20240116; t=1706023175; c=relaxed/simple;
+	bh=+yJL9KDj0aMIFbT4y6ud2q83ukmRwjDWwnHtE9ShxMY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=JT2Cved2s1Z1h28lzSD1k1hSBO8734gEEe4KgvgAl7xUUpNWyaunkhvw1J0HS6eNizXEb15QbsQ2lvWKRjHE5C/LVWS7AMofmdE5WdHWhJOEntshJvt5BCOo63KI+mynKTAxetCx4TqdjqgRRYQwuzicS9ZMjoteYF3P5ewRt6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
+X-IronPort-AV: E=Sophos;i="6.05,214,1701097200"; 
+   d="scan'208";a="195354997"
+Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
+  by relmlie6.idc.renesas.com with ESMTP; 24 Jan 2024 00:19:31 +0900
+Received: from localhost.localdomain (unknown [10.226.93.36])
+	by relmlir5.idc.renesas.com (Postfix) with ESMTP id ECB4E400CEED;
+	Wed, 24 Jan 2024 00:19:26 +0900 (JST)
+From: Biju Das <biju.das.jz@bp.renesas.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Biju Das <biju.das.jz@bp.renesas.com>,
+	Sergey Shtylyov <s.shtylyov@omp.ru>,
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	Nikita Yushchenko <nikita.yoush@cogentembedded.com>,
+	netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Prabhakar Mahadev Lad <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	Biju Das <biju.das.au@gmail.com>
+Subject: [PATCH net-next 0/2] Add HW check sum of load for RZ/G2L GbEthernet IP
+Date: Tue, 23 Jan 2024 15:19:22 +0000
+Message-Id: <20240123151924.373917-1-biju.das.jz@bp.renesas.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [EXT] Aquantia ethernet driver suspend/resume issues
-Date: Tue, 23 Jan 2024 15:13:54 +0000
-Message-Id: <E8060D65-F6C2-4AF5-AE3F-8ED8A30F95EF@pwaller.net>
-References: <3b607ba8-ef5a-56b3-c907-694c0bde437c@marvell.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
- Linus Torvalds <torvalds@linux-foundation.org>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Netdev <netdev@vger.kernel.org>
-In-Reply-To: <3b607ba8-ef5a-56b3-c907-694c0bde437c@marvell.com>
-To: Igor Russkikh <irusskikh@marvell.com>
-X-Mailer: iPhone Mail (21C66)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-True, it is a warning rather than a hard crash, though shutdown hangs. Thank=
-s for the workaround.
+TOE has hw support for calculating IP header and TCP/UDP/ICMP checksum
+for both IPV4 and IPV6.
 
-I can provide more dmesg when I=E2=80=99m back at my computer. Do you need t=
-he whole thing or is there something in particular you want from it? =46rom m=
-emory there isn=E2=80=99t much more in the way of messages that looked conne=
-cted to me.
+Add Tx/Rx checksum offload supported by TOE for IPV4 and TCP/UDP protocols.
 
-Sent from my mobile, please excuse brevity
+For Rx, the result of checksum calculation is attached to last 4byte
+of ethernet frames. First 2bytes is result of IPV4 header checksum
+and next 2 bytes is TCP/UDP/ICMP.
 
-> On 23 Jan 2024, at 14:59, Igor Russkikh <irusskikh@marvell.com> wrote:
->=20
-> =EF=BB=BF
->> On 1/21/2024 10:05 PM, Peter Waller wrote:
->> I see a fix for double free [0] landed in 6.7; I've been running that
->> for a few days and have hit a resume from suspend issue twice. Stack
->> trace looks a little different (via __iommu_dma_map instead of
->> __iommu_dma_free), provided below.
->>=20
->> I've had resume issues with the atlantic driver since I've had this
->> hardware, but it went away for a while and seems as though it may have
->> come back with 6.7. (No crashes since logs begin on Dec 15 till Jan 12,
->> Upgrade to 6.7; crashes 20th and 21st, though my usage style of the
->> system has also varied, maybe crashes are associated with higher memory
->> usage?).
->=20
-> Hi Peter,
->=20
-> Are these hard crashes, or just warnings in dmesg you see?
-> =46rom the log you provided it looks like a warning, meaning system is usa=
-ble
-> and driver can be restored with `if down/up` sequence.
->=20
-> If so, then this is somewhat expected, because I'm still looking into
-> how to refactor this suspend/resume cycle to reduce mem usage.
-> Permanent workaround would be to reduce rx/tx ring sizes with something li=
-ke
->=20
->    ethtool -G rx 1024 tx 1024
->=20
-> If its a hard panic, we should look deeper into it.
->=20
->> Possibly unrelated but I also see fairly frequent (1 to ten times per
->> boot, since logs begin?) messages in my logs of the form "atlantic
->> 0000:0c:00.0: AMD-Vi: Event logged [IO_PAGE_FAULT domain=3D0x0014
->> address=3D0xffce8000 flags=3D0x0020]".
->=20
-> Seems to be unrelated, but basically indicates HW or FW tries to access un=
-mapped
-> memory addresses, and iommu catches that.
-> Full dmesg may help analyze this.
->=20
-> Regards
->  Igor
+If frame does not have error "0000" attached to checksum calculation
+result. For unsupported frames "ffff" is attached to checksum calculation
+result. Cases like IPV6, IPV4 header is always set to "FFFF".
+
+For Tx, the result of checksum calculation is set to the checksum field of
+each IPv4 Header/TCP/UDP/ICMP of ethernet frames. For the unsupported
+frames, those fields are not changed. If a transmission frame is an UDP
+frame of IPv4 and its checksum value in the UDP header field is H’0000,
+TOE does not calculate checksum for UDP part of this frame as it is
+optional function as per standards.
+
+UDP(Tx/Rx) results With check Enabled: 909/946
+UDP(Tx/Rx) results With check Disabled: 903/907
+
+TCP(Tx/Rx) results With check Enabled: 922/928
+TCP(Tx/Rx) results With check Disabled: 882/629
+
+Note:
+ This patches are tested with reverting 
+commit b3edde44e5d4 ("cpufreq/schedutil: Use a fixed reference frequency")
+as it impacts network performance.
+
+Biju Das (2):
+  ravb: Add Rx checksum offload support
+  ravb: Add Tx checksum offload support
+
+ drivers/net/ethernet/renesas/ravb.h      |  35 ++++++
+ drivers/net/ethernet/renesas/ravb_main.c | 137 ++++++++++++++++++++++-
+ 2 files changed, 170 insertions(+), 2 deletions(-)
+
+-- 
+2.25.1
 
 
