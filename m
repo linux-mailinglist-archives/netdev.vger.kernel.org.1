@@ -1,119 +1,99 @@
-Return-Path: <netdev+bounces-65119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8931D83948A
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:19:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8540B839497
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:25:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A039285C6A
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 16:19:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27CB01F26910
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 16:25:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F36886281F;
-	Tue, 23 Jan 2024 16:19:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gOibm1Vr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 930BD6351F;
+	Tue, 23 Jan 2024 16:25:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 983E75F545
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 16:19:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D06BA62A0A;
+	Tue, 23 Jan 2024 16:25:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706026744; cv=none; b=LVoYub7uBQeRaxgYADzmTgHKD8IAA1MR346xqhuZgi3Mb2fDOk4rzcvoDI/6ABjUzZBLs6/19ZQnew6m9oQZFwVFEN+9x9jwmGAzryP6JSle8220o2Q/H6WRW9q74u7wNLs0C0UX5yDEQTDAG3DnqCiE9xCkXfWYS3SouE4DaDQ=
+	t=1706027134; cv=none; b=qV9PwytT3ltFqSfOpE0apgVjbMTod/5GCHkLqSNE2500rMrFEwwtHKVZAqChVPsPZk/69U2jScB3olYXEqiFjWH3WLNK/torU23m0vFOFZSzFrP+CWvuh5/CFcj633RTIxSWjTYBjkjAyz4J5oW2mS4miLlGNEp9rj8Lwq0UvNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706026744; c=relaxed/simple;
-	bh=kblZGqpoT1v3973bj1dYvhSwfjRbVNskJRT/CllZPg0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sTtRruGm3NyViU/1wJYHJqipqLh4007tA1DuGmfoAfbmnvdWZ9eXmVX1/owsjD5tDacuxY2TUjPkET1xl53gsc39j5mzIUWosC9OOIoMLm2nSv6SadhHnYp3e1vndPS00fpn5WqPnhVTuThSkDZ8UV3qZs39KcyyO/Z2TMKI8Z8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gOibm1Vr; arc=none smtp.client-ip=209.85.166.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1706027134; c=relaxed/simple;
+	bh=uwUEjcgrbY8WTTyfrrh0dyrajUMf7SmzZkktsL+CQ+U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uE/721hhl8InftvCarU26UHW9DMKgrcbRiA7aEnyASyVSKsb8TtE42/uum8rxee2ekWo9XkrhOqfZFpwfDm9e0lvjQCva9FB/oPDks4Y58ib1juM3HKZnelzINXzUFDDhEZap4gm5zEcB/t05WH9hx/ZT5M/m/vscuatoMOfpC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-361a1665791so15705025ab.3
-        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 08:19:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706026742; x=1706631542; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JQs7BP6kms/S4iiLpTV19GHpkxt/8LQZgx5uhUMzPXQ=;
-        b=gOibm1VrOM6iaT+3gH8jzQTpcHV1H9clQuXgW7xyf6Lrhh26xyQnLryMehnmthiRUp
-         ky0JMwsLtOqjzkXkDRpmWmFJYyPrYTV5t/Tw/BZwv+V2R61k4K492rqtZf+d/+T/rK5D
-         ph9GrIVgewMdfyFR8icupfgAA2L3AmvtZTYKKYNhSW/IBFYH+uEwDXXmwW6YBc0QblmW
-         YB2zlybQH+Ln426GG44zVZd7uB/YoUI7WQU1nSgPB4bRLbwr6tj69aGmMyoBXdv5oXSa
-         6c5G/lZsth2rdgw/vUHmrAeL4oG7BeOc0ZkaDZq+v2F7ZgvLCvBOPyo4UTS2AZZtV9hy
-         eTgA==
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2cf0e9f76b4so11445171fa.1;
+        Tue, 23 Jan 2024 08:25:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706026742; x=1706631542;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JQs7BP6kms/S4iiLpTV19GHpkxt/8LQZgx5uhUMzPXQ=;
-        b=PEQO8Kn2kibywAgbUrcEkom/kdGFkU9Coa8uaAWsZzIIG9tMEqvyHU4KLM89UMgNiz
-         rJTPvloIIzKbPs4TnUXVgdwUGPG8urSWfsXHofgImq6plCiGwsqmJuyVJzeBo+nCODdb
-         TB0l+dVnYFHLsFLVu2epX8YjCIRntAdTEihybvTUrUbnrM9TtZ/Yeen/RpexabvHd31l
-         zok1qc8fJMDjL+2AvWG4cubphgpb73LJVaJUfbnWNiu3Rz/dnITmWyzUL0q2/+9IBUnN
-         3lKeEbgOBC4GTSRFKRSKGGTFB5bq0rIf1dKA+ESh/KM8FI7q1DAgjN2ix9iGyE1wPCgy
-         N7Ng==
-X-Gm-Message-State: AOJu0YxthPxLRo9kRM+s7j5kAzwwFRuhk27DuiCXRScbehlBoOx4nN6c
-	qe8yTmuHVpT262ltbqsglSNPZ6FWqKB+y6VYy/cVEGWK8EgW2iM/29JaY2J+
-X-Google-Smtp-Source: AGHT+IGgej0/2j51eNU/27AlhiPehqmC+32npHJK3mAsnUqJJoB9U8GbBQKU0q6UkQ6s0hQlhqHemQ==
-X-Received: by 2002:a05:6e02:4ab:b0:35d:66a0:5432 with SMTP id e11-20020a056e0204ab00b0035d66a05432mr78660ils.13.1706026742596;
-        Tue, 23 Jan 2024 08:19:02 -0800 (PST)
-Received: from ?IPV6:2601:282:1e82:2350:3c2c:1afc:52ff:38e7? ([2601:282:1e82:2350:3c2c:1afc:52ff:38e7])
-        by smtp.googlemail.com with ESMTPSA id d7-20020a056e02214700b00361a2072693sm3618433ilv.63.2024.01.23.08.19.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Jan 2024 08:19:01 -0800 (PST)
-Message-ID: <1fb36101-5a3c-4c81-8271-4002768fa0bd@gmail.com>
-Date: Tue, 23 Jan 2024 09:19:00 -0700
+        d=1e100.net; s=20230601; t=1706027131; x=1706631931;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ci2mE3KtOOGm7+F76P6ABI6GsSgvZGpzoB6ufq0O5A8=;
+        b=itToBaonhnlQQnO4+70g0sipIFsFf0RBheGc6zMRDYEaMLpQH8u57TdIXLyYnkNJJW
+         oSCkjL2UhoEEtuu32mAAM0CT/7SSVyVxycB7T8G3HXDmbpeSpfZw/XkPqkWDIoDULcgk
+         ZUvhCjIt/loQ5OATpvRfWH3y9xHNFhHQJAJlhegBveXVf/QUbzoj4XbKbRanlsMbVU9c
+         /JB8IXROKYeEBl5TO3x2q0XyFTr+lkaFdJzDxG1uP5CQrjoHVtKRFnjQGgAi3FI8wbhy
+         Q6wAzN/G/QgD5JdHii6BvJyh3VWROErWkZb5h58yyBbEuENl6+uPAa/4AqYEXeXaaHkE
+         7yEw==
+X-Gm-Message-State: AOJu0YwcqaVYXoOBzjPYHwpjRauXIemCTik9X7VfdWmXiBCnNdpJS272
+	c73zDzrP1pCD2nX2ab7nRKcWHswXcoYcf/ff7pQvAWoMVlb485m7
+X-Google-Smtp-Source: AGHT+IG6JCSRPa4ZKUf1WSa2gtoifg+kf/4XZSWZod7NK+JwGzpLXAejBOUuk7WA354rXov6VK0a2w==
+X-Received: by 2002:ac2:5f06:0:b0:50f:f9b9:f542 with SMTP id 6-20020ac25f06000000b0050ff9b9f542mr811243lfq.7.1706027130479;
+        Tue, 23 Jan 2024 08:25:30 -0800 (PST)
+Received: from gmail.com (fwdproxy-cln-009.fbsv.net. [2a03:2880:31ff:9::face:b00c])
+        by smtp.gmail.com with ESMTPSA id vw13-20020a170907a70d00b00a2e92247a1fsm8355051ejc.62.2024.01.23.08.25.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Jan 2024 08:25:30 -0800 (PST)
+Date: Tue, 23 Jan 2024 08:25:28 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, abeni@redhat.com, edumazet@google.com,
+	dsahern@kernel.org, weiwan@google.com,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	linux-wireless@vger.kernel.org
+Subject: Re: [PATCH net-next 00/22] Fix MODULE_DESCRIPTION() for net (p2)
+Message-ID: <Za/oeIjnMoqqp4Tt@gmail.com>
+References: <20240122184543.2501493-1-leitao@debian.org>
+ <20240122105708.52d33fa0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iproute2] vxlan: add support for flowlab inherit
-Content-Language: en-US
-To: Vincent Bernat <vincent@bernat.ch>, Ido Schimmel <idosch@idosch.org>,
- Alce Lafranque <alce@lafranque.net>
-Cc: netdev@vger.kernel.org, stephen@networkplumber.org
-References: <20240120124418.26117-1-alce@lafranque.net>
- <Za5eizfgzl5mwt50@shredder> <f24380fc-a346-4c81-ae78-e0828d40836e@gmail.com>
- <1793b6c1-9dba-4794-ae0d-5eda4f6db663@bernat.ch>
-From: David Ahern <dsahern@gmail.com>
-In-Reply-To: <1793b6c1-9dba-4794-ae0d-5eda4f6db663@bernat.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240122105708.52d33fa0@kernel.org>
 
-On 1/23/24 12:58 AM, Vincent Bernat wrote:
-> On 2024-01-23 01:41, David Ahern wrote:
->>> My personal
->>> preference would be to add a new keyword for the new attribute:
->>>
->>> # ip link set dev vx0 type vxlan flowlabel_policy inherit
->>> # ip link set dev vx0 type vxlan flowlabel_policy fixed flowlabel 10
->>>
->>> But let's see what David thinks.
->>>
->>
->> A new keyword for the new attribute seems like the most robust.
->>
->> That said, inherit is already used in several ip commands for dscp, ttl
->> and flowlabel for example; I do not see a separate keyword - e.g.,
->> ip6tunnel.c.
+On Mon, Jan 22, 2024 at 10:57:08AM -0800, Jakub Kicinski wrote:
+> On Mon, 22 Jan 2024 10:45:21 -0800 Breno Leitao wrote:
+> >   net: fill in MODULE_DESCRIPTION()s for Broadcom WLAN
+> >   net: fill in MODULE_DESCRIPTION()s for wlcore
+> >   net: fill in MODULE_DESCRIPTION()s for wl1251 and wl12xx
 > 
-> The implementation for flowlabel was modeled along ttl. We did diverge
-> for kernel, we can diverge for iproute2 as well. However, I am unsure if
-> you say we should go for option A (new attribute) or option B (do like
-> for dscp/ttl).
+> Thanks for making progress on these!
+> 
+> When you repost:
+>  - please send these 3 to linux-wireless as a separate series
+>  - make sure mailing lists are CCed on the cover letter
+>    (yes, get_maintainer is embarrassingly bad at its job)
+>  - please send 10 at-a-time, it's probably a good tradeoff
+>    between series size and reposting risk
+>  - please target net, I hope I convinced Paolo that it's okay :)
 
-A divergent kernel API does not mean the command line for iproute2 needs
-to be divergent. Consistent syntax across ip commands is best from a
-user perspective. What are the downsides to making 'inherit' for
-flowlabel work for vxlan like it does for ip6tunnel, ip6tnl and gre6?
-Presumably inherit is relevant for geneve? (We really need to stop
-making these tweaks on a single protocol basis.)
+Sure. I will split this series in 3 and target `net`.
+
+I suppose it is OK to send the patchsets in parallel, instead of waiting
+for the first patchset to be reviewed/accepted before sending the second
+part. Is this correct?
+
+Thanks!
 
