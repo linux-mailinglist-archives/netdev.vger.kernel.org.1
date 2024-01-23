@@ -1,156 +1,119 @@
-Return-Path: <netdev+bounces-65067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFA188390C6
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 15:03:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D531B8390E5
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 15:10:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A686828B3FC
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 14:03:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 873B81F2A3B9
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 14:10:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 913A55F847;
-	Tue, 23 Jan 2024 14:03:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8DBC5F848;
+	Tue, 23 Jan 2024 14:10:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="J5wf3pnt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NEAHLMHI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB7F85F563;
-	Tue, 23 Jan 2024 14:03:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9465B5F845
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 14:10:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706018602; cv=none; b=aMhqIv58vkNs4mHjM1T+GjFoNVVUzEAGoxtoZxJJ/e3xS4MC32i8qS6zRIEvNeiVJ1pRFGyuUpnMhqgIXS8/MpyQf1dEHUWLrqQziIrjWggcRfv+Vw7dWeeK9dYj0UPn7JAgRNQKnQoaCy1x9eEUSozm6P2teIvjJilh4BADQbo=
+	t=1706019025; cv=none; b=j+UVC0xrwIuT6CG91JeBTE95v3ogKyDozLyRPDAzdA4h9bcPKLNBy1yEsWbLkKO6GQ8KUCazv89QzpdSJ9M2UjQFLv5iL8YIxfABjXMtm1NVk5CXFz+vczI+rZK0hhMTUbW2raiH7AUEhIsfCdjisDMlfqQEZhXso4koKHXLh7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706018602; c=relaxed/simple;
-	bh=hlKrbnklZRHtyhAfgwLZQF2nt4+9pCu/Iy9MfEcp0IU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VharcbwWajpjQGr8nYnuoiAqs0aJznWI7R5vpo5NbkBZjDC7pR/kya7egwJrgiPofQH7wLWkOmWmOwp94bqWjbovjBACWLrV9ipk1V29aYnAQT+exTgKdm1WCi6lbzEupxtNUMlC8R5avWKHVAEczrt/kfK67uI74Dw76dv4/RA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=J5wf3pnt; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40NDrToc024811;
-	Tue, 23 Jan 2024 14:03:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=JtE9UsiqiWfdyi4MV6/bGG5MDHlb4VIcfi2PP2a34vw=;
- b=J5wf3pntzgos836U9Igqyp65p1eHWSa4rnwQ8WXisVURXzm8AUL0QOU5TaLMCRTreB61
- c3sY7pPhfuwPc0aT6XuXmNflGahMwdUFXO5NJd4dToNrhHO9iNd5XZUJTEebYp0PQhcs
- 2Hj3LiHo1m9qZCaTzwGW7S+Upx6sqdD62KCd0Tms7rEPYTTAy1bW5M7CJ0XoIcmo0aaX
- 1/fy1FWabQCdLlOYemdAIqVxJe7AYFM8p0+ojDa0zQts8xCjef6GUhq0OMeotihkHcuy
- xs5YlA3bhCMAPU4IohXVYFMdGo9Tqp9IfmiVC/Kx6zxOVtOqsjty5vKiWEOE+3B1rA3t Vw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vteqwr9a5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 23 Jan 2024 14:03:10 +0000
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40NDs7LK026468;
-	Tue, 23 Jan 2024 14:03:09 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vteqwr99g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 23 Jan 2024 14:03:09 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 40NBX7Mm026508;
-	Tue, 23 Jan 2024 14:03:08 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vrrgt7s09-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 23 Jan 2024 14:03:08 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 40NE35Vl56295866
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 23 Jan 2024 14:03:05 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B9A892007B;
-	Tue, 23 Jan 2024 14:03:05 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5AD0920078;
-	Tue, 23 Jan 2024 14:03:05 +0000 (GMT)
-Received: from [9.152.224.38] (unknown [9.152.224.38])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 23 Jan 2024 14:03:05 +0000 (GMT)
-Message-ID: <3c51c969-3884-4104-b38d-570c61525214@linux.ibm.com>
-Date: Tue, 23 Jan 2024 15:03:05 +0100
+	s=arc-20240116; t=1706019025; c=relaxed/simple;
+	bh=As4BfAmUzDoiHW5HROtVC2rYFYWioxlJEDCuxr6sRU4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=FLetN3KIpmN/Z6ONO6ivETtj2jbrEhM3qSMxNW5/GkB7J0VF/Ky2XkUEtDe1Y3rEH+J8vTQPNd9PgyuftWtG4C40f0R/PCOzsptVSBJEGOE8B+8qRmUJ664/X2npzTTU5HGcDxD0eHd2G4eut0QGBKuQazb1Q3Gp5Ib4wlk6Hks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NEAHLMHI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0D32AC43394;
+	Tue, 23 Jan 2024 14:10:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706019025;
+	bh=As4BfAmUzDoiHW5HROtVC2rYFYWioxlJEDCuxr6sRU4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=NEAHLMHIOPntJ3x9I1CuZuFWp7o41URraiUHicEaRyNxdRNnfNzhd918ZdmSVxiEv
+	 Fwcl+2TDUaIkylBDS26USAKcCpuF/slLw+P/mL66lbbIL0sM65YVGJFwkMtGJEfG9h
+	 F8maBEUvfSqE/leMLV1WnggnanT1Fkrz0D+QsNzu6ptaBc40yyFhFz9vk4AQFUJOTU
+	 sjy6EHUvWEnWWwSD9EiHRw8i5ik0jCBWmg5MV5JzQcFcboIHTuE8IlamdVoDxZ5yQG
+	 vLfshfoMlk0zCqbSl9iEUXPTVhVMmp6kR9w+RHaSQxx7gdCoSrFQfybAgJvtuy3yjj
+	 /RdFlrFiBN0Xw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EC797DC99E0;
+	Tue, 23 Jan 2024 14:10:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 00/15] net/smc: implement loopback-ism used by
- SMC-D
-To: Wen Gu <guwen@linux.alibaba.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
-        hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
-        tonylu@linux.alibaba.com, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240111120036.109903-1-guwen@linux.alibaba.com>
- <f98849a7-41e9-421b-97b7-36d720cc43ee@linux.alibaba.com>
- <20a1a1f3-789a-4d91-9a94-dca16161afd7@linux.ibm.com>
- <1860588f-2246-4dcd-9db5-4ccd7add0f4a@linux.alibaba.com>
-Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <1860588f-2246-4dcd-9db5-4ccd7add0f4a@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: SSW86zNU0u0yqe7OCema3jFlkIu8Ysiz
-X-Proofpoint-ORIG-GUID: COMkbAp-6ED6dcEelzULVI7hCHml2eV3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-23_06,2024-01-23_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 suspectscore=0
- lowpriorityscore=0 malwarescore=0 mlxscore=0 mlxlogscore=649 adultscore=0
- bulkscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2401230103
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] ipv6: init the accept_queue's spinlocks in inet6_create
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170601902496.22645.15094740282920490034.git-patchwork-notify@kernel.org>
+Date: Tue, 23 Jan 2024 14:10:24 +0000
+References: <20240122102001.2851701-1-shaozhengchao@huawei.com>
+In-Reply-To: <20240122102001.2851701-1-shaozhengchao@huawei.com>
+To: shaozhengchao <shaozhengchao@huawei.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ weiyongjun1@huawei.com, yuehaibing@huawei.com
 
+Hello:
 
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-On 19.01.24 02:46, Wen Gu wrote:
+On Mon, 22 Jan 2024 18:20:01 +0800 you wrote:
+> In commit 198bc90e0e73("tcp: make sure init the accept_queue's spinlocks
+> once"), the spinlocks of accept_queue are initialized only when socket is
+> created in the inet4 scenario. The locks are not initialized when socket
+> is created in the inet6 scenario. The kernel reports the following error:
+> INFO: trying to register non-static key.
+> The code is fine but needs lockdep annotation, or maybe
+> you didn't initialize this object before use?
+> turning off the locking correctness validator.
+> Hardware name: Red Hat KVM, BIOS 0.5.1 01/01/2011
+> Call Trace:
+> <TASK>
+> 	dump_stack_lvl (lib/dump_stack.c:107)
+> 	register_lock_class (kernel/locking/lockdep.c:1289)
+> 	__lock_acquire (kernel/locking/lockdep.c:5015)
+> 	lock_acquire.part.0 (kernel/locking/lockdep.c:5756)
+> 	_raw_spin_lock_bh (kernel/locking/spinlock.c:178)
+> 	inet_csk_listen_stop (net/ipv4/inet_connection_sock.c:1386)
+> 	tcp_disconnect (net/ipv4/tcp.c:2981)
+> 	inet_shutdown (net/ipv4/af_inet.c:935)
+> 	__sys_shutdown (./include/linux/file.h:32 net/socket.c:2438)
+> 	__x64_sys_shutdown (net/socket.c:2445)
+> 	do_syscall_64 (arch/x86/entry/common.c:52)
+> 	entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:129)
+> RIP: 0033:0x7f52ecd05a3d
+> Code: 5b 41 5c c3 66 0f 1f 84 00 00 00 00 00 f3 0f 1e fa 48 89 f8 48 89 f7
+> 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff
+> ff 73 01 c3 48 8b 0d ab a3 0e 00 f7 d8 64 89 01 48
+> RSP: 002b:00007f52ecf5dde8 EFLAGS: 00000293 ORIG_RAX: 0000000000000030
+> RAX: ffffffffffffffda RBX: 00007f52ecf5e640 RCX: 00007f52ecd05a3d
+> RDX: 00007f52ecc8b188 RSI: 0000000000000000 RDI: 0000000000000004
+> RBP: 00007f52ecf5de20 R08: 00007ffdae45c69f R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000293 R12: 00007f52ecf5e640
+> R13: 0000000000000000 R14: 00007f52ecc8b060 R15: 00007ffdae45c6e0
 > 
-> 
-> On 2024/1/18 21:59, Wenjia Zhang wrote:
->>
->>
->> On 18.01.24 09:27, Wen Gu wrote:
->>>
->>>
->>> On 2024/1/11 20:00, Wen Gu wrote:
->>>> This patch set acts as the second part of the new version of [1] (The first
->>>> part can be referred from [2]), the updated things of this version are listed
->>>> at the end.
->>>>
->>>
->>> Hi Wenjia and Jan, I would appreciate any thoughts or comments you might have
->>> on this series. Thank you very much!
->>>
->> Hi Wen,
->>
->> I'm still in the middle of the proto type on IPPROTO_SMC and other issues, so that I need more time to review this patch series.
->>
->> Thank you for your patience!
->> Wenjia
-> 
-> Understood. Thank you! Wenjia.
-> 
-> Best regards,
-> Wen Gu
-> 
+> [...]
 
-Hello Wen Gu and others,
+Here is the summary with links:
+  - [net] ipv6: init the accept_queue's spinlocks in inet6_create
+    https://git.kernel.org/netdev/net/c/435e202d645c
 
-I just wanted to let you know that unfortunately both Wenjia and Jan have called in sick and we don't know
-when they will be back at work. 
-So I'm sorry but there may be mroe delays in the review of this patchset.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Kind regards
-Alexandra Winter
+
 
