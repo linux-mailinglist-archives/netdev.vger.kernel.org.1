@@ -1,130 +1,192 @@
-Return-Path: <netdev+bounces-65032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D57E838EB6
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 13:47:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC59E838F15
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 14:00:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29332288649
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 12:47:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E1C41C24197
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 13:00:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E000C5D8E7;
-	Tue, 23 Jan 2024 12:47:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15E815F546;
+	Tue, 23 Jan 2024 12:59:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="jUXCPW+z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52276524AB
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 12:47:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 134205F542
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 12:59:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706014067; cv=none; b=Z5C+wSapxVH+CGQuGGVfK51aEL7BNTKR/m+OZHxGj75ImsiJtHvcMYhEMYLbwDf8eBGCjQsy1J/XBhrDAd4Ph23Ves/sUjF5VlEu58sNUQGY8EYY/wCjsq108T0N6qNxf9tEeEwA6nx0QT2SKSJk2jhXaWQP08812QlsejaI+dE=
+	t=1706014776; cv=none; b=msWZbxqD5pjGa8SJf6/3taIlkMJ9okBsn1ZkSjO9OnzPSa8naQLicf7tj+QF/bjYGVpX+da9id7vAXhpuiK9utS/iovAOCeMw24fxQ7gzlFaoedzTraPnZWqY1RrCOsCJRDg5OaDnknan2fxWWOVTgLD4sDJ+isMLFYagpJ/5NA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706014067; c=relaxed/simple;
-	bh=q9n00tnBFonXMjTna0qQYzgXk1NOjbjSEIkMY4LJ58A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=o/DpRn5C48xDKf91hONumeTabsWPITJKeLucoR8QFbE/38qkK5uG8uz9VGL88ZWpE2E+Bum4+8/Qlp4r8YXNvULcQCraWlQQDK25QGSZSDoHffIi0dA7P24qJbm07VHauXvPaJaw5+j2kW+QSSW5UWyo+VQsrVKuCxKoK0vTtCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [112.20.109.155])
-	by gateway (Coremail) with SMTP id _____8AxDOtvta9lsCYEAA--.6521S3;
-	Tue, 23 Jan 2024 20:47:43 +0800 (CST)
-Received: from [192.168.100.8] (unknown [112.20.109.155])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8Dxfs1tta9lNGoUAA--.24196S3;
-	Tue, 23 Jan 2024 20:47:42 +0800 (CST)
-Message-ID: <7615ea18-977e-41b2-80d1-93a4b970d52b@loongson.cn>
-Date: Tue, 23 Jan 2024 20:47:40 +0800
+	s=arc-20240116; t=1706014776; c=relaxed/simple;
+	bh=Jz8kZzB2H2602ULXRUMwCZByqfrvauZa0dgw0w7Ggz0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Wp1kwD6JdSNE3Iqpqw6gI/1d3r71f/GzCJviyhHWpBxfqf/so+Z1owKLEVKxENlHWmCugHixHO8y3uA64AM4TRheRMYjfvYPJd3Ld7WSf2SpyG5mtTumyIyPR99L/4CnLhn3IpZ3Eohr1FDNWpDX7alNjrx1eiX7jkd683xFr6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=jUXCPW+z; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-40e9d4ab5f3so46258195e9.2
+        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 04:59:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tuxon.dev; s=google; t=1706014772; x=1706619572; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cQHkYbac2Sl4VM3IelnZJJZvNleCCL30OPSnoeaFEVU=;
+        b=jUXCPW+zHk5+mtGu+QhVTrzAzK8HxD2t/VKCfIIFjCdVXRCRTYLMuQAAbzldlH3vZ/
+         j4Fqmx2lQq9/PkGynKPI2GHtUDP1r84daeimkyjxvr3X0BE0SZ5lwYifyEpe9wWSVgnP
+         Z903z6ZYMqGoBw+3GzcyBy+G8+tT+7ByNx3LaaUd0ei9d8ztHJO7/PLB2ka0spiCVxWg
+         kgL/TutfPbAXQ5Iqzp/Of1CgLQn1fHQq5QvM9KL1jtXySJhyzQZ8YOWZ0NywEMkklNKz
+         BIR9ppvZTcKwbSV/pFJIKNnUVQgNw9BIV+rnVCQ961duhFz5ptgf6tGMuKBEVTp6GJBz
+         x5UA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706014772; x=1706619572;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cQHkYbac2Sl4VM3IelnZJJZvNleCCL30OPSnoeaFEVU=;
+        b=sUDmdWVxfP9rUrGoltuJlBVhPiiVtIaDMsa9ODDX9tkpHPh0nu37dEaDHJlNfo7xja
+         VyP79zGMFt6Zed8z7BC3uL3Y0grqOpsN8SfhSCGTb7CNy/sr9007UgFv8W1EetG1n8gk
+         y0ZkOmLduEbYIoLxxVY2d1hqao7Ote9PzWnm+kz+eVwEc0tHFse7/Xq4c23T3t1VhY3Z
+         DhyTfKN9rhvJ1FAYa/+gj4ESa3w/NeopqQJEbErNzYOIPxn6l9X+OIwiWq+M70l0x+q8
+         01bNsvLUqF0CwiZAhWZ7opXwKnbKOq+SCIb0uchoaqEO7mDt1t7WcHXTj6IhHzyoi65g
+         HZVQ==
+X-Gm-Message-State: AOJu0YwzKJP8crxJI5fGWXJEGKN/J1Ex8jZO6SLMSxnx6BQ6ZtvnKEtX
+	klYHDgohSLP24x/89yRMDGg03bQasQwuy0FxTCZdYCj8hhpAI4XIXIEo6KwjtJc=
+X-Google-Smtp-Source: AGHT+IGZdgUVcGTlfgZa+LX56jx28y3p4G14/Sy97ErHNhwRxfUG+DlWEVKN3hLT1s78mGgYYkTmZg==
+X-Received: by 2002:a7b:c397:0:b0:40e:4d77:dbf7 with SMTP id s23-20020a7bc397000000b0040e4d77dbf7mr109418wmj.163.1706014772033;
+        Tue, 23 Jan 2024 04:59:32 -0800 (PST)
+Received: from claudiu-X670E-Pro-RS.. ([82.78.167.135])
+        by smtp.gmail.com with ESMTPSA id s4-20020a05600c45c400b0040e6ff60057sm33655711wmo.48.2024.01.23.04.59.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Jan 2024 04:59:31 -0800 (PST)
+From: Claudiu <claudiu.beznea@tuxon.dev>
+X-Google-Original-From: Claudiu <claudiu.beznea.uj@bp.renesas.com>
+To: s.shtylyov@omp.ru,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	richardcochran@gmail.com,
+	p.zabel@pengutronix.de,
+	geert+renesas@glider.be
+Cc: netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	claudiu.beznea@tuxon.dev,
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+Subject: [PATCH net-next v4 00/15] net: ravb: Prepare for suspend to RAM and runtime PM support (part 1)
+Date: Tue, 23 Jan 2024 14:58:14 +0200
+Message-Id: <20240123125829.3970325-1-claudiu.beznea.uj@bp.renesas.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 9/9] net: stmmac: Disable coe for some
- Loongson GNET
-Content-Language: en-US
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
- chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn,
- netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
-References: <cover.1702990507.git.siyanteng@loongson.cn>
- <479a6614d1fc4285c02953bf1ca181fa56942fb6.1702990507.git.siyanteng@loongson.cn>
- <axkfpgoyf2pd76k25563uzd5hfb5gsfr5cqlumn2gezai5xblj@h455tdgbogdh>
-From: Yanteng Si <siyanteng@loongson.cn>
-In-Reply-To: <axkfpgoyf2pd76k25563uzd5hfb5gsfr5cqlumn2gezai5xblj@h455tdgbogdh>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8Dxfs1tta9lNGoUAA--.24196S3
-X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj93XoW7Zr1kCw4rtrW3AF47Jr18Zwc_yoW8GF43pF
-	W8Aa4jkF97Xr1UC3Zxtw4UXF98Ca97tFWUWF4xK3sxWan2k3s7tr15KFWY9r1xZr1FgFW2
-	vrWUuwnxCFn8CrgCm3ZEXasCq-sJn29KB7ZKAUJUUUU7529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUBYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-	AVWUtwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
-	6r4UMxCIbckI1I0E14v26r1Y6r17MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
-	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
-	0xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
-	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AK
-	xVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0b6pPUUUUU==
+
+From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+
+Hi,
+
+This series prepares ravb driver for runtime PM support and adjust the
+already existing suspend to RAM code to work for RZ/G3S (R9A08G045) SoC.
+
+As there are IP versions that switch to module standby when disabling
+the clocks, and because of module standby IP switches to reset and
+the register content is lost, to be able to have runtime PM supported
+for all IP variants, the configuration operations were moved all to
+ravb_open()/ravb_close() letting the ravb_probe() and ravb_remove()
+to deal with resource parsing and allocation/free.
+
+The ethtool and IOCTL APIs that could have been run asyncronously
+were adapted to return if the interface is down. As explained in
+each individual commits description, this should be harmless.
+
+Along with it, the series contains preparatory cleanups.
+
+The series has been tested on the boards with the following device trees:
+- r8a7742-iwg21d-q7.dts
+- r8a774a1-hihope-rzg2m-ex.dts 
+- r9a07g043u11-smarc-rzg2ul.dts
+- r9a07g054l2-smarc-rzv2l.dts
+- r9a07g044l2-smarc-rzg2l.dts
+
+Thank you,
+Claudiu Beznea
+
+Changes in v4:
+- changed cover letter title and keep on 15 patches in series to cope
+  with requirement at [1]
+- add dependency on RESET_CONTROLLER in patch "net: ravb: Make reset
+  controller support mandatory"
+- use pm_runtime_active() in patch "net: ravb: Move the IRQs get and
+  request in the probe function"
+- set config more before reading the mac address in patch "net: ravb: Set
+  config mode in ndo_open and reset mode in ndo_close"
+- collected tags
+  
+[1] https://www.kernel.org/doc/html/v6.6/process/maintainer-netdev.html#tl-dr
+
+Changes in v3:
+- collected tags
+- addressed review comments
+- squashed patch 17/21 ("net: ravb: Keep clock request operations grouped
+  together") from v2 in patch 07/19 ("net: ravb: Move reference clock
+  enable/disable on runtime PM APIs") from v3
+- check for ndev->flags & IFF_UP in patch 17/19 and 18/19 instead of
+  checking netif_running()
+- dropped patch 19/21 ("net: ravb: Do not set promiscuous mode if the
+  interface is down") as the changes there are not necessary as
+  ndev->flags & IFF_UP is already checked at the beginning of
+  __dev_set_rx_mode()
+- remove code from ravb_open() introduced by patch 20/21
+  ("net: ravb: Do not apply RX CSUM settings to hardware if the interface
+  is down") from v2 as this is not necessary; driver already takes
+  care of this in ravb_emac_init_rcar()
+
+Changes in v2:
+- rework the driver (mainly, ravb_open() contains now only resource
+  allocation and parsing leaving the settings to ravb_open(); ravb_remove()
+  has been adapted accordingly) to be able to use runtime PM for all
+  IP variants; due to this number of patches increased
+- adjust previous series to review comments
+- collected tags
+- populated driver's own runtime PM ops with enable/disable of reference
+  clock
 
 
-在 2023/12/21 10:36, Serge Semin 写道:
-> On Tue, Dec 19, 2023 at 10:28:19PM +0800, Yanteng Si wrote:
->> Some chips of Loongson GNET does not support coe, so disable them.
->>
->> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
->> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
->> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
->> ---
->>   drivers/net/ethernet/stmicro/stmmac/hwif.c | 5 +++++
->>   1 file changed, 5 insertions(+)
->>
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.c b/drivers/net/ethernet/stmicro/stmmac/hwif.c
->> index 3724cf698de6..f211880925aa 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/hwif.c
->> +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.c
->> @@ -73,6 +73,11 @@ static int stmmac_dwmac1_quirks(struct stmmac_priv *priv)
->>   		mac->desc = &ndesc_ops;
->>   	}
->>   
->> +	if (priv->synopsys_id == DWLGMAC_CORE_1_00) {
->> +		priv->plat->tx_coe = 0;
->> +		priv->plat->rx_coe = STMMAC_RX_COE_NONE;
->> +	}
-> Couldn't this be done in dwmac-loongson.c?
+Claudiu Beznea (15):
+  net: ravb: Let IP-specific receive function to interrogate descriptors
+  net: ravb: Rely on PM domain to enable gptp_clk
+  net: ravb: Make reset controller support mandatory
+  net: ravb: Switch to SYSTEM_SLEEP_PM_OPS()/RUNTIME_PM_OPS() and
+    pm_ptr()
+  net: ravb: Use tabs instead of spaces
+  net: ravb: Assert/de-assert reset on suspend/resume
+  net: ravb: Move reference clock enable/disable on runtime PM APIs
+  net: ravb: Move the IRQs get and request in the probe function
+  net: ravb: Split GTI computation and set operations
+  net: ravb: Move delay mode set in the driver's ndo_open API
+  net: ravb: Move DBAT configuration to the driver's ndo_open API
+  net: ravb: Move PTP initialization in the driver's ndo_open API for
+    ccc_gac platorms
+  net: ravb: Set config mode in ndo_open and reset mode in ndo_close
+  net: ravb: Simplify ravb_suspend()
+  net: ravb: Simplify ravb_resume()
 
-Sorry for the late reply, I have been busy with patches 4 and 5.
+ drivers/net/ethernet/renesas/Kconfig     |   1 +
+ drivers/net/ethernet/renesas/ravb.h      |   6 +-
+ drivers/net/ethernet/renesas/ravb_main.c | 738 +++++++++++------------
+ 3 files changed, 352 insertions(+), 393 deletions(-)
 
-I think I can give you a definite answer: This is possible, just like
-
-the method you mentioned in patch 5, I only need to
-
-overwrite ld->dwlgmac_dma_ops.get_hw_feature.
-
-
-Thanks,
-
-Yanteng
-
->
-> -Serge(y)
->
->> +
->>   	stmmac_dwmac_mode_quirk(priv);
->>   	return 0;
->>   }
->> -- 
->> 2.31.4
->>
+-- 
+2.39.2
 
 
