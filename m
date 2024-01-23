@@ -1,188 +1,138 @@
-Return-Path: <netdev+bounces-65261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EED77839C5B
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 23:36:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 488E4839C6B
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 23:40:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 32EC0B26EE4
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 22:36:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AC321C22439
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 22:40:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17D6254BC0;
-	Tue, 23 Jan 2024 22:36:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C21EC537F0;
+	Tue, 23 Jan 2024 22:40:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mARSm+/X"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Nnj7jTy9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9245A54673;
-	Tue, 23 Jan 2024 22:36:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91D8551010;
+	Tue, 23 Jan 2024 22:40:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706049387; cv=none; b=RuA++h0MF/ogokt1BtWhbXaO2IFipG6hwz4g/Ctoqkk0RlyGJ8ytDBv/OmNfEg/7/Hk5PHTQX5YSCDFqW1Xjk+aQHghLHLVBvzR8BTmvbQnXSBIJxtb7bXlDhQh0XSHekqwqNCiLfZQdv5H4//sgr0ocKQVbg4JME3DmiGNZcp4=
+	t=1706049636; cv=none; b=bQzyTop+bcFmah4nVLgHqIL+rO4us8EXsXOhL9x96j/MP4mTWCYzu2CYcEuYv7kdJ7b8DDwoiFNt7QOJYfu1p6DOhU4g6bNulni4KEVZhV+fSQF21JiUqX9aOcOLUXER4TIuIEXBBCEaZ0pWQW/fSaymSnxn0zNRDeHwwaaBMKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706049387; c=relaxed/simple;
-	bh=On0QlHaF09Uyj7/AoUsVsIOpy1PzAJx4etnXBVkU+oo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=f0zSt5Vx/xoMoiEbJ8gvzGQ8FdrBU0mr5D4IPd3k0mJ92LWvcjZhsfLTGDIPvHHF6oc5NpH8IBfFuYXObRL8XjBqj1+zlMBhI9lxDZ5HMeMFJjynmQpEUvDU1/4AR/U6aVn90i1xVobj9h1BgL8s5UF/0hMxCZWifDeNC3EqnU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mARSm+/X; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1d6ff29293dso32426785ad.0;
-        Tue, 23 Jan 2024 14:36:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706049384; x=1706654184; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3/Yjct9w9OwNW7EA63W+TU6+iZOg/M5pr/hq6Il+TEo=;
-        b=mARSm+/X7uZ2sdKdj2UajPqrY8i2pfmn2EOq/RZAOEESsPiprUkWe3kJuZIctBvGLy
-         0wCMVmINkvkO/HQ9Tub0sG1dkahabneVfKGzHP4ACLrGAhPGM0HiSvMZ4XUTLdRMvNCl
-         XNrpYF1kFn6F4IR/B9ruWYAeXZKAGjEVegYYjECcbwUAV6aDbfecro0vf7PvJ65Q39iO
-         3hs6KUT9KlFV6tJchOtBBF8NtzjSmzNTHCOMK7PLRg/5TCZ3AB5ZsOllK1UflMGkO2eY
-         ySs99/GjqAoxz+sCREyP11wbl9ed21Mi8NRxNgtGXs3JMxkxiqXyOxCeI/TrpFfepNGW
-         kQFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706049384; x=1706654184;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3/Yjct9w9OwNW7EA63W+TU6+iZOg/M5pr/hq6Il+TEo=;
-        b=Q01zZ55CtDfabfTxXp8dxcptIwhwpGIH4iESNGC68giTec7SBGIqoIo3J397W1HznZ
-         Vw0AlSd4UJFWdM2QlKqhDOb3Jw5G25TVHnF0K1vIn7Ev+2+Sa0sEzZIjxwEZQl2gOHeJ
-         3jTUVjPPtcLMtv7ObYBEt+lEov3Own63LeRp2INGRD4mzNrWw6bJBwTjWiUtPV4o9kxN
-         tCmm9Ucg4wBclxjxTyAzI4mBp3AETf0x6KAHEQcX9d4iA189CwK23SvqMFmUYV+gQbcK
-         WacupESWNjEblB9sibrWGULfvONKkgpA24Ep+CLWHJyd/u8FDzN3YGrXjavzk9yOiUtm
-         +DtQ==
-X-Gm-Message-State: AOJu0Ywqj/zrODSf5MMQz8ncod/QdUwIi0Dy82TZc2Yu5nGUeSCP/GRO
-	ARwa8wkF9P1VrgczMVh4VKMa5pnQaExod+9Fhkbz8QWZXB++Kr9xCun++dut
-X-Google-Smtp-Source: AGHT+IFM/1ZZ032mmP+pOj9N4TP8cIEGf04lpwTBJwL0JUQZ9XlYtgTCPSkhRRy6cXANuW7R+ORXFg==
-X-Received: by 2002:a17:902:b58c:b0:1d7:a2:3332 with SMTP id a12-20020a170902b58c00b001d700a23332mr3600780pls.114.1706049383849;
-        Tue, 23 Jan 2024 14:36:23 -0800 (PST)
-Received: from john.. ([98.97.113.214])
-        by smtp.gmail.com with ESMTPSA id x9-20020a170902e04900b001d73f1fbdd9sm4875241plx.154.2024.01.23.14.36.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jan 2024 14:36:22 -0800 (PST)
-From: John Fastabend <john.fastabend@gmail.com>
-To: netdev@vger.kernel.org,
-	jakub@cloudflare.com
-Cc: john.fastabend@gmail.com,
-	bpf@vger.kernel.org
-Subject: [PATCH bpf-next 4/4] bpf: sockmap test cork and pop combined
-Date: Tue, 23 Jan 2024 14:36:12 -0800
-Message-Id: <20240123223612.1015788-5-john.fastabend@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240123223612.1015788-1-john.fastabend@gmail.com>
-References: <20240123223612.1015788-1-john.fastabend@gmail.com>
+	s=arc-20240116; t=1706049636; c=relaxed/simple;
+	bh=Z/gVOBIyuGeHrB0qusJzDPUINYJVDgoRszKTN0NH9s0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y51A5jGrmoKH5LlYAKc4Ic+GaIg1KbsG//PuSaauml/TX8DWLGg2n1KRvLw9mNTbT1aOZ7uKh5XMto3b6iko990BPPxQQyfMwRGVV96BPCEcb+DiGrGqHHu/sIdB4MAktXTslaAGH1pD0G3MG/ly4GpgQwNm160lrbHW4SIQN2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Nnj7jTy9; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706049635; x=1737585635;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Z/gVOBIyuGeHrB0qusJzDPUINYJVDgoRszKTN0NH9s0=;
+  b=Nnj7jTy9QoK33F0B+UdzyR3BS7WDenry6lephSpBjaV37LgcAmS6CM6b
+   kQnqXtXu8K9z/Mi6eOWJaHmg4DZBPKzeeUi2V466xkG9ITTPn2ayT6bLz
+   NvCVJtFrwcXJajnkX4KUz3eaKKnEtf2l9bNOB6LBh+Z4OL4Bem0xOapUz
+   DREVz3hF44258RZJOtvbHzrE/JLamoaKOz/FDVXTDT4VkTmUDv63lGfXE
+   FJxYbeSPDMC4x1//Sia7CDSntGNS7bUiPCMEkCPa+KCVipRzw0u0Uu8yi
+   Hq5RpDuaQh6srUU+mkRu5+ySmWHLXcqzEkf2KhO9kImTEuDqIZvYFUoLA
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="573954"
+X-IronPort-AV: E=Sophos;i="6.05,215,1701158400"; 
+   d="scan'208";a="573954"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2024 14:40:33 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="876490218"
+X-IronPort-AV: E=Sophos;i="6.05,215,1701158400"; 
+   d="scan'208";a="876490218"
+Received: from turnipsi.fi.intel.com (HELO kekkonen.fi.intel.com) ([10.237.72.44])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2024 14:40:27 -0800
+Received: from kekkonen.localdomain (localhost [127.0.0.1])
+	by kekkonen.fi.intel.com (Postfix) with SMTP id 596D411FB8E;
+	Wed, 24 Jan 2024 00:40:25 +0200 (EET)
+Date: Tue, 23 Jan 2024 22:40:25 +0000
+From: Sakari Ailus <sakari.ailus@linux.intel.com>
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: linux-pm@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>,
+	linux-pci@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	Jaroslav Kysela <perex@perex.cz>,
+	Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>,
+	laurent.pinchart@ideasonboard.com, David Airlie <airlied@gmail.com>,
+	Paul Elder <paul.elder@ideasonboard.com>,
+	linux-media@vger.kernel.org,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	intel-gfx@lists.freedesktop.org,
+	Lucas De Marchi <lucas.demarchi@intel.com>,
+	Mark Brown <broonie@kernel.org>,
+	Jacek Lawrynowicz <jacek.lawrynowicz@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	intel-xe@lists.freedesktop.org,
+	Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+	Alex Elder <elder@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	linux-sound@vger.kernel.org, Takashi Iwai <tiwai@suse.com>,
+	Daniel Vetter <daniel@ffwll.ch>, netdev@vger.kernel.org
+Subject: Re: [PATCH v4 1/3] pm: runtime: Simplify pm_runtime_get_if_active()
+ usage
+Message-ID: <ZbBAWROxRKE8Y8VU@kekkonen.localdomain>
+References: <ZbAlFKE_fZ_riRVu@kekkonen.localdomain>
+ <20240123214801.GA330312@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240123214801.GA330312@bhelgaas>
 
-Its possible to cork data for some N bytes and then pop
-a some bytes off that scatterlist. Test combining cork
-and pop here.
+On Tue, Jan 23, 2024 at 03:48:01PM -0600, Bjorn Helgaas wrote:
+> On Tue, Jan 23, 2024 at 08:44:04PM +0000, Sakari Ailus wrote:
+> > On Tue, Jan 23, 2024 at 11:24:23AM -0600, Bjorn Helgaas wrote:
+> > ...
+> 
+> > > - I don't know whether it's feasible, but it would be nice if the
+> > >   intel_pm_runtime_pm.c rework could be done in one shot instead of
+> > >   being split between patches 1/3 and 2/3.
+> > > 
+> > >   Maybe it could be a preliminary patch that uses the existing
+> > >   if_active/if_in_use interfaces, followed by the trivial if_active
+> > >   updates in this patch.  I think that would make the history easier
+> > >   to read than having the transitory pm_runtime_get_conditional() in
+> > >   the middle.
+> > 
+> > I think I'd merge the two patches. The second patch is fairly small, after
+> > all, and both deal with largely the same code.
+> 
+> I'm not sure which two patches you mean, but the fact that two patches
+> deal with largely the same code is not necessarily an argument for
+> merging them.  From a reviewing perspective, it's nice if a patch like
 
-Signed-off-by: John Fastabend <john.fastabend@gmail.com>
----
- .../bpf/prog_tests/sockmap_msg_helpers.c      | 19 ++++++++++++++-----
- .../bpf/progs/test_sockmap_msg_helpers.c      | 14 +++++++++++++-
- 2 files changed, 27 insertions(+), 6 deletions(-)
+Patches 1 and 2. The third patch introduces a new Runtime PM API function.
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_msg_helpers.c b/tools/testing/selftests/bpf/prog_tests/sockmap_msg_helpers.c
-index a05000b07891..cf38d6bb3f94 100644
---- a/tools/testing/selftests/bpf/prog_tests/sockmap_msg_helpers.c
-+++ b/tools/testing/selftests/bpf/prog_tests/sockmap_msg_helpers.c
-@@ -21,7 +21,7 @@ struct msg_test_opts {
- 
- #define POP_END -1
- 
--static void cork_send(struct msg_test_opts *opts, int cork)
-+static void cork_send(struct msg_test_opts *opts, int cork, int start, int len)
- {
- 	struct test_sockmap_msg_helpers *skel = opts->skel;
- 	char buf[] = "abcdefghijklmnopqrstuvwxyz";
-@@ -29,9 +29,12 @@ static void cork_send(struct msg_test_opts *opts, int cork)
- 	char *recvbuf;
- 	int i;
- 
--	skel->bss->pop = false;
-+	skel->bss->pop = !!len;
- 	skel->bss->cork = cork;
- 
-+	skel->bss->pop_start = start;
-+	skel->bss->pop_len = len;
-+
- 	/* Send N bytes in 27B chunks */
- 	for (i = 0; i < cork / sizeof(buf); i++) {
- 		sent = xsend(opts->client, buf, sizeof(buf), 0);
-@@ -48,7 +51,7 @@ static void cork_send(struct msg_test_opts *opts, int cork)
- 	ASSERT_EQ(skel->bss->size, cork, "cork did not receive all bytes");
- 
- 	recv = xrecv_nonblock(opts->server, recvbuf, total, 0);
--	if (recv != total)
-+	if (recv != total - len)
- 		FAIL("Received incorrect number of bytes");
- 
- 	free(recvbuf);
-@@ -88,9 +91,15 @@ static void test_sockmap_cork()
- 	opts.skel = skel;
- 
- 	/* Small cork */
--	cork_send(&opts, 54);
-+	cork_send(&opts, 54, 0, 0);
- 	/* Full cork */
--	cork_send(&opts, 270);
-+	cork_send(&opts, 270, 0, 0);
-+
-+	/* Combine cork and pop small */
-+	cork_send(&opts, 54, 0, 10);
-+	/* Full cork and pop */
-+	cork_send(&opts, 270, 200, 50);
-+
- close_sockets:
- 	close(client);
- 	close(server);
-diff --git a/tools/testing/selftests/bpf/progs/test_sockmap_msg_helpers.c b/tools/testing/selftests/bpf/progs/test_sockmap_msg_helpers.c
-index 9622f154d016..4c7e70367e35 100644
---- a/tools/testing/selftests/bpf/progs/test_sockmap_msg_helpers.c
-+++ b/tools/testing/selftests/bpf/progs/test_sockmap_msg_helpers.c
-@@ -37,8 +37,19 @@ int msg_helpers(struct sk_msg_md *msg)
- {
- 	size = msg->size;
- 
--	if (cork)
-+	/* If message is not yet fully cork'ed skip push, pull, pop */
-+	if (cork && cork > msg->size) {
- 		err = bpf_msg_cork_bytes(msg, cork);
-+		goto out;
-+	} else if (cork) {
-+	/* If we previously corked the msg we need to clear the cork
-+	 * otherwise next pop would cause datapath to wait for the
-+	 * popped bytes to actually do the send.
-+	 */
-+		err = bpf_msg_cork_bytes(msg, 0);
-+		if (err)
-+			goto out;
-+	}
- 
- 	if (pull)
- 		err = bpf_msg_pull_data(msg, pull_start, pull_end, 0);
-@@ -49,6 +60,7 @@ int msg_helpers(struct sk_msg_md *msg)
- 	if (pop)
- 		err = bpf_msg_pop_data(msg, pop_start, pop_len, 0);
- 
-+out:
- 	return SK_PASS;
- }
- 
+> 1/3, where it's largely mechanical and easy to review, is separated
+> from patches that make more substantive changes.
+> 
+> That's why I think it'd be nice if the "interesting"
+> intel_pm_runtime_pm.c changes were all in the same patch, and ideally,
+> if that patch *only* touched intel_pm_runtime_pm.c.
+
+I don't think squashing the second patch to the first really changes this
+meaningfully: the i915 driver simply needs both
+pm_runtime_get_if_{active,in_use}, and this is what the patch does to other
+drivers already. Making the pm_runtime_get_conditional static would also
+fit for the first patch if the desire is to not to introduce it at all.
+
 -- 
-2.33.0
-
+Sakari Ailus
 
