@@ -1,126 +1,90 @@
-Return-Path: <netdev+bounces-65266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B763839CEC
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 00:07:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0DE0839D1C
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 00:15:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6AF4D1C21A3C
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 23:07:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A11F2836A7
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 23:15:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C05753E14;
-	Tue, 23 Jan 2024 23:07:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F83353E2A;
+	Tue, 23 Jan 2024 23:15:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qgkjjYHe"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="d3OhwnX3"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF8CE210F6;
-	Tue, 23 Jan 2024 23:07:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62A9D53E1C;
+	Tue, 23 Jan 2024 23:15:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706051270; cv=none; b=Ai6zJLn4xhY1fM17XMjjBOGfU5bTsKKBCxUnUy01fnI9Ii4zcokd6wNzBp1aSLUcI0bD7Q6NtH/ft1vZG7SdRdnFJxbxYPNg8kXOTIc7eDFgTWcBAN05WGMkpYX2PIwZ2/vS3rmNfshOVRUT7mDxByhjtkl7xj/WF77sjb8VW70=
+	t=1706051748; cv=none; b=lPNI8Q8B2YCR2Dr8a3krfVHycBuuBYi8GLxRkpNIw9iJYOiFixkRMyGb79PxGtO1afEBCFInDG8SLwTSTTH80cSLg1FEZ9KZjVM7ZT2iPH3My/0yN3uu4vS0nejJKjWK3Xt1vgCONLY+w49B0WxLgkwVzqWg4MU4xenLomofN4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706051270; c=relaxed/simple;
-	bh=EF01pwf93jkw6zcgML//uN79n7gsoLCTDyk3XMANbsk=;
+	s=arc-20240116; t=1706051748; c=relaxed/simple;
+	bh=LclThSWSXCP8WshLZDE4E3mbffplgTTs9CoE7Jd/VJs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gycRRVdkSDxaW9akkuaGr1Ibx2f37kb9lxoG6oxmYSFwshY7t56DQYM0MDpFpXAYOzhOItSLb3ZuiwEtse9IUAWUCLtNEAVi2T4Uh2SY4N6vWzhWd4Mvl81nvCmJ6NRYTlEIvtMdHd3BKiInNuzeVXr1bAxFq7PZLq5wIVODSa0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qgkjjYHe; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=NRVBgIYItdk2+3lbzvE3jStTuPSjEQu47fzzpyYpjtSmefTHI29W4oKN4nVHUpmB+wA6U7etlcHrF7vibasVhLlkxe2q4WdJL9qgNVendZeNxIA0TQjkFiE5/Z3W3WUOObd+kblCDshHmnUaoC+ABJBUftGRqwPClGYQtP1C7tg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=d3OhwnX3; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=LZZ7dIkzvXVF+O0UaEUz1mN+3JIr0400uS5HJQS+H80=; b=qg
-	kjjYHeJxSBG3x262DYoZzND/Jb4HsUTj/VBsNGjbw2WGpe7iYlu7wGpCND/Y9E/rhux1yt5wZiTaa
-	EjBZpn+SH0gc6pRxEL8Qy8gEyrm3oVjmrRZgeH+QWcXqWtlMa+rr7bIIkrbMQEV8Sxq0NyO/Fgdlm
-	aquDAS16be7fs+U=;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=7yX5+XCrARod+VsoOp+tq6jnm8t8QU2YLMp+hsOIWWk=; b=d3OhwnX3Vuxy17BtXJOMDM36JV
+	ooC8IcgtZCGs4yIn/8R2LlAh2pKkLVmTZsRqKetcoqJG3C109ilqxUjwDIQIY0jq9shUqNXbIXS86
+	P/uLuyzEC9ryf7SUfoR71L7HyQZ5b6vhFmTypOlMLhaDQ/zvfn8RZUpVZ7eatF98x2To=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rSPrh-005t3R-UQ; Wed, 24 Jan 2024 00:07:33 +0100
-Date: Wed, 24 Jan 2024 00:07:33 +0100
+	id 1rSPzV-005t58-FR; Wed, 24 Jan 2024 00:15:37 +0100
+Date: Wed, 24 Jan 2024 00:15:37 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Michal =?utf-8?B?Vm9rw6HEjQ==?= <michal.vokac@ysoft.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Christian Lamparter <chunkeey@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, petr.benes@ysoft.com
-Subject: Re: [PATCH net] net: dsa: qca8k: fix illegal usage of GPIO
-Message-ID: <82712052-e7e6-414d-9c11-5595e0d6e097@lunn.ch>
-References: <1705925049-5756-1-git-send-email-michal.vokac@ysoft.com>
+To: Ziyang Huang <hzyitc@outlook.com>
+Cc: mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+	richardcochran@gmail.com, p.zabel@pengutronix.de,
+	matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH 1/8] net: phy: Introduce Qualcomm IPQ5018 internal PHY
+ driver
+Message-ID: <5ce729ad-549a-48f6-b261-ee8cb91e6474@lunn.ch>
+References: <TYZPR01MB55563BD6A2B78402E4BB44D4C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
+ <TYZPR01MB5556D5568546D6DA4313209EC9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
+ <2c6c0d72-5d4e-4ec4-beb6-d30852108a67@lunn.ch>
+ <TYZPR01MB5556D035D9A13962844BB553C9752@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
+ <e1fd863a-6725-4180-8ad3-faeb44c09238@lunn.ch>
+ <TYZPR01MB55567CE79D7F08C738A81683C9742@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1705925049-5756-1-git-send-email-michal.vokac@ysoft.com>
+In-Reply-To: <TYZPR01MB55567CE79D7F08C738A81683C9742@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
 
-On Mon, Jan 22, 2024 at 01:04:09PM +0100, Michal Vokáč wrote:
-> When working with GPIO, its direction must be set either when the GPIO is
-> requested by gpiod_get*() or later on by one of the gpiod_direction_*()
-> functions. Neither of this is done here which result in undefined behavior
-> on some systems.
-> 
-> As the reset GPIO is used right after it is requested here, it makes sense
-> to configure it as GPIOD_OUT_HIGH right away.
-> Fixes: a653f2f538f9 ("net: dsa: qca8k: introduce reset via gpio feature")
-> Signed-off-by: Michal Vokáč <michal.vokac@ysoft.com>
-> ---
->  drivers/net/dsa/qca/qca8k-8xxx.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/dsa/qca/qca8k-8xxx.c b/drivers/net/dsa/qca/qca8k-8xxx.c
-> index 4ce68e655a63..83b19c2d7b97 100644
-> --- a/drivers/net/dsa/qca/qca8k-8xxx.c
-> +++ b/drivers/net/dsa/qca/qca8k-8xxx.c
-> @@ -2037,8 +2037,7 @@ qca8k_sw_probe(struct mdio_device *mdiodev)
->  	priv->dev = &mdiodev->dev;
->  	priv->info = of_device_get_match_data(priv->dev);
->  
-> -	priv->reset_gpio = devm_gpiod_get_optional(priv->dev, "reset",
-> -						   GPIOD_ASIS);
-> +	priv->reset_gpio = devm_gpiod_get_optional(priv->dev, "reset", GPIOD_OUT_HIGH);
->  	if (IS_ERR(priv->reset_gpio))
->  		return PTR_ERR(priv->reset_gpio);
+> After rechecking the vendor code, you are right. The only special thing of
+> this device is that it's a combined device of UNIPHY and at803x general phy.
+> So it needs the UNIPHY initialization sequence. But for the PHY part, it's
+> almost same as others, just has some special registers. I will merge it into
+> at803x driver.
 
-Hi Michal
+The UNIPHY is a separate driver, its a generic PHY driver? Can we keep
+them separate for this internal PHY as well?
 
-So the current code is:
+The initialisation sequence is what is going to be most 'interesting'
+here. How UNIPHY, this PHY and the GCC all come together to make it
+work. But for the moment, i think its best the PHY driver controls its
+own clock input and reset, using standard Linux APIs, once the driver
+has probed via compatible IDs.
 
-	priv->reset_gpio = devm_gpiod_get_optional(priv->dev, "reset",
-						   GPIOD_ASIS);
-	if (IS_ERR(priv->reset_gpio))
-		return PTR_ERR(priv->reset_gpio);
-
-	if (priv->reset_gpio) {
-		gpiod_set_value_cansleep(priv->reset_gpio, 1);
-		/* The active low duration must be greater than 10 ms
-		 * and checkpatch.pl wants 20 ms.
-		 */
-		msleep(20);
-		gpiod_set_value_cansleep(priv->reset_gpio, 0);
-	}
-
-Doesn't your change make the gpiod_set_value_cansleep() pointless?
-
-Please extend your patch to remove it, maybe extending the comment a
-little.
-
-Please also make sure what v2 Is Cc: to the qca8k Maintainers.
-
-    Andrew
-
----
-pw-bot: cr
+       Andrew
 
