@@ -1,150 +1,121 @@
-Return-Path: <netdev+bounces-65166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F4D7839646
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 18:23:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7B4B83964F
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 18:24:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19C3B28C0CE
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:23:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 270F41C23BE4
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:24:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D01887FBA9;
-	Tue, 23 Jan 2024 17:23:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 935C87FBCE;
+	Tue, 23 Jan 2024 17:24:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fta0TOH3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WeSfU2Sm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A126263518;
-	Tue, 23 Jan 2024 17:23:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A4437FBA8;
+	Tue, 23 Jan 2024 17:24:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706030626; cv=none; b=W1gg148dmIaOxBUs45Z0TmZnQsWcn8RXcrZi0wPyOiRIZveB5EM96KJbjRxAy+WkA02TT3UmWm6VLX8VJy8eM1ZI6YUQtZKwJC6YvjH3bgEcvPYgXXi6wn7pr4OgyUoh8AljopODEBmjovCp9b6c6ImbFWqUeYPryAr5tYJh6PI=
+	t=1706030666; cv=none; b=gRZK9yJv0zGbgWFE+YB8ldNr0mVfg3txcBC7coR7kR8nArXej6rBtHkovJB/ap3XSe96P5NIaEXmcUlTRIjAZ7loHaWXcJq8ivt+Q6Ex5/ncXNro3h9welsj2rb6WAZtUm4PVSCtyYbiPb4wH6d2er3CWHymyKCG9BkvVa5R/1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706030626; c=relaxed/simple;
-	bh=femgqPkSEbLEE9OmJM4uIzxaC1oRXQv/pdyrNKGtr8g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ShiP2H/eCvAAWeGNvaCjn5lLU6u+mheOHyhRgftX5eMyZSmG9HzZ6502J6wTpx/4rQbuaFQWuftnrlnDNTXT20au5kh55/ffRNZxXwomOzy6ISTO8TM8w9g+VkS8X7+OA2mPnUKXJPUdRN+plNouNNk1LS8pIG8MGTuZlAL+N9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fta0TOH3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDB86C433F1;
-	Tue, 23 Jan 2024 17:23:42 +0000 (UTC)
+	s=arc-20240116; t=1706030666; c=relaxed/simple;
+	bh=Oyao+3/Ux6TZycEPX8L/CtZdSt0adFVr9KdQJvVkrTM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=bdfmiHotMcJwCEalqx6XJULQBJdFTXgwfX9s/hhgPNt6pQQj0C8mRJsZOLpn3wO3oywJ8OcLYE3R9O7hzAtWVdC7smdWQiycEp0iyvSRsOd5fx6JWU2IkTsTnzaKhIIuuLV3jxLbjZmEWgEkuSi7ut9u+Qe+kepmRT5OTuWk5Rc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WeSfU2Sm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70157C433C7;
+	Tue, 23 Jan 2024 17:24:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706030626;
-	bh=femgqPkSEbLEE9OmJM4uIzxaC1oRXQv/pdyrNKGtr8g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fta0TOH3tYq/WKjiidHvlkG2hPr3JzDIjDfhlqVRhOlp9HHNSimElSS7FDSqDYPNL
-	 ZkaSHgVkDbtE6t8PFjdkX4jUQTedln6xmoT9nMHmlFi5NdsI3xuLAQnTL5JVX3oegx
-	 W3r11RvNH/hrWTEegf38z+JY2NW6UYBYJD7bWl3LGruEbvLSNw7csDZwemEl8sFll/
-	 xp+Heyq2kENomXSOIBFlfihPR7ofERTlwQ2FOdAqQCm7qAP9fVqFf0rl/mgfWI9BP2
-	 k9/ZPtnweshaeP/a4DNjdVzZJ7L4y7ca833lFcza2vz1ja7TJdtKcwYrXoTv4IhUFC
-	 O/wttq99ywYOw==
-Date: Tue, 23 Jan 2024 17:23:40 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Philippe Schenker <dev@pschenker.ch>
-Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Vladimir Oltean <olteanv@gmail.com>, linux-kernel@vger.kernel.org,
-	UNGLinuxDriver@microchip.com, Marek Vasut <marex@denx.de>,
-	Florian Fainelli <f.fainelli@gmail.com>, devicetree@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Rob Herring <robh+dt@kernel.org>
-Subject: Re: [PATCH net-next v1 1/2] dt-bindings: net: dsa: Add KSZ8567
- switch support
-Message-ID: <20240123-atlas-dart-7e955e7e24e5@spud>
-References: <20240123135014.614858-1-dev@pschenker.ch>
- <20240123-ripening-tabby-b97785375990@spud>
- <b2e232de11cee47a5932fccc2d151a9c7c276784.camel@pschenker.ch>
+	s=k20201202; t=1706030665;
+	bh=Oyao+3/Ux6TZycEPX8L/CtZdSt0adFVr9KdQJvVkrTM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=WeSfU2SmF+MThNV+FwS3jNLbx/lbHqp3O8rGmEOzabcSnXEgrwMlsQB9X+zP4Dj5G
+	 wd1fgHH0A7R0Tmo1hzTqTwsERG+4Gn3Cx5lBeFm5nnKu5zpyTImNwviF1z+B9Bs+B5
+	 FDxtofh709s2gjhWj2TwrRefwkgnofaBeH2IOycUb4sAH6b1twJSE7eTOxL5ZpB136
+	 XW94cTSytbK36zuZLvfHBZJyLBwQtXSssVanGsGSNlbp69amctnSVmvxMuZ0ytbIUw
+	 x0q8WUofOp/tNMPpmUcwMX0JnwNQI0b6OZ1iN5n7Qvk/bytqBMVrKlnALAAEsYlcQ0
+	 7dIeV9ibAJhkg==
+Date: Tue, 23 Jan 2024 11:24:23 -0600
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Sakari Ailus <sakari.ailus@linux.intel.com>
+Cc: linux-pm@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>,
+	linux-pci@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	Jaroslav Kysela <perex@perex.cz>,
+	Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>,
+	laurent.pinchart@ideasonboard.com, David Airlie <airlied@gmail.com>,
+	Paul Elder <paul.elder@ideasonboard.com>,
+	linux-media@vger.kernel.org,
+	Thomas =?utf-8?Q?Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+	intel-gfx@lists.freedesktop.org,
+	Lucas De Marchi <lucas.demarchi@intel.com>,
+	Mark Brown <broonie@kernel.org>,
+	Jacek Lawrynowicz <jacek.lawrynowicz@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	intel-xe@lists.freedesktop.org,
+	Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+	Alex Elder <elder@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	linux-sound@vger.kernel.org, Takashi Iwai <tiwai@suse.com>,
+	Daniel Vetter <daniel@ffwll.ch>, netdev@vger.kernel.org
+Subject: Re: [PATCH v4 1/3] pm: runtime: Simplify pm_runtime_get_if_active()
+ usage
+Message-ID: <20240123172423.GA317147@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="puDO/bicEa8XZtpY"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b2e232de11cee47a5932fccc2d151a9c7c276784.camel@pschenker.ch>
+In-Reply-To: <20240123095642.97303-2-sakari.ailus@linux.intel.com>
 
+On Tue, Jan 23, 2024 at 11:56:42AM +0200, Sakari Ailus wrote:
+> There are two ways to opportunistically increment a device's runtime PM
+> usage count, calling either pm_runtime_get_if_active() or
+> pm_runtime_get_if_in_use(). The former has an argument to tell whether to
+> ignore the usage count or not, and the latter simply calls the former with
+> ign_usage_count set to false. The other users that want to ignore the
+> usage_count will have to explitly set that argument to true which is a bit
+> cumbersome.
+> 
+> To make this function more practical to use, remove the ign_usage_count
+> argument from the function. The main implementation is renamed as
+> pm_runtime_get_conditional().
+> 
+> Signed-off-by: Sakari Ailus <sakari.ailus@linux.intel.com>
+> Reviewed-by: Alex Elder <elder@linaro.org> # drivers/net/ipa/ipa_smp2p.c
+> Reviewed-by: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+> Acked-by: Takashi Iwai <tiwai@suse.de> # sound/
+> Reviewed-by: Jacek Lawrynowicz <jacek.lawrynowicz@linux.intel.com> # drivers/accel/ivpu/
+> Acked-by: Rodrigo Vivi <rodrigo.vivi@intel.com> # drivers/gpu/drm/i915/
+> Reviewed-by: Rodrigo Vivi <rodrigo.vivi@intel.com>
 
---puDO/bicEa8XZtpY
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Acked-by: Bjorn Helgaas <bhelgaas@google.com> # drivers/pci/
 
-On Tue, Jan 23, 2024 at 05:17:53PM +0100, Philippe Schenker wrote:
->=20
->=20
-> On Tue, 2024-01-23 at 16:06 +0000, Conor Dooley wrote:
-> > On Tue, Jan 23, 2024 at 02:50:13PM +0100, Philippe Schenker wrote:
-> > > From: Philippe Schenker <philippe.schenker@impulsing.ch>
-> > >=20
-> > > This commit adds the dt-binding for KSZ8567, a robust 7-port
-> > > Ethernet switch. The KSZ8567 features two RGMII/MII/RMII
-> > > interfaces,
-> > > each capable of gigabit speeds, complemented by five 10/100 Mbps
-> > > MAC/PHYs.
-> > >=20
-> > > Signed-off-by: Philippe Schenker <philippe.schenker@impulsing.ch>
-> >=20
-> > This device has all the same constraints as the other ones in this
-> > binding, why is it not compatible with any of them? If it isn't, the
-> > compatible should mention why it is not.
->=20
-> Hi Conor, Thanks for your message!
->=20
-> I need the compatible to make sure the correct ID of the switch is
-> being set in the driver as well as its features.
+- Previous PM history uses "PM: " in the subject lines (not "pm: ").
 
-Are the features of this switch such that a driver for another ksz
-switch would not work (even in a limited capacity) with the 8567?
-Things like the register map changing or some feature being removed are
-examples of why it may not work.
+- I don't know whether it's feasible, but it would be nice if the
+  intel_pm_runtime_pm.c rework could be done in one shot instead of
+  being split between patches 1/3 and 2/3.
 
-> You mean I shall mention the reason in the commit-message, or where?
+  Maybe it could be a preliminary patch that uses the existing
+  if_active/if_in_use interfaces, followed by the trivial if_active
+  updates in this patch.  I think that would make the history easier
+  to read than having the transitory pm_runtime_get_conditional() in
+  the middle.
 
-Yes.
+- Similarly, it would be nice if pm_runtime_get_conditional() never
+  had to be published in pm_runtime.h, instead of being temporarily
+  added there by this patch and then immediately made private by 2/3.
+  Maybe that's not practical, I dunno.
 
-Thanks,
-Conor
-
-> > > =A0Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml | 1 +
-> > > =A01 file changed, 1 insertion(+)
-> > >=20
-> > > diff --git
-> > > a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-> > > b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-> > > index c963dc09e8e1..52acc15ebcbf 100644
-> > > --- a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-> > > +++ b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-> > > @@ -31,6 +31,7 @@ properties:
-> > > =A0=A0=A0=A0=A0=A0 - microchip,ksz9893
-> > > =A0=A0=A0=A0=A0=A0 - microchip,ksz9563
-> > > =A0=A0=A0=A0=A0=A0 - microchip,ksz8563
-> > > +=A0=A0=A0=A0=A0 - microchip,ksz8567
-> > > =A0
-> > > =A0=A0 reset-gpios:
-> > > =A0=A0=A0=A0 description:
-> > > --=20
-> > > 2.34.1
-> > >=20
-
---puDO/bicEa8XZtpY
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZa/2HAAKCRB4tDGHoIJi
-0iK5AP9Rxz/Mwx+CVYnGDVHIuqf+Y0VRbXv4MLXFsmG1xnO9wgEAkK7LkNWYo2x/
-8DecwgALjn0eGXmhJXFDg8p2At5CsgY=
-=KMN+
------END PGP SIGNATURE-----
-
---puDO/bicEa8XZtpY--
+Bjorn
 
