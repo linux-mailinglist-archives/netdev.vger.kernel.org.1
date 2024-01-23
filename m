@@ -1,100 +1,176 @@
-Return-Path: <netdev+bounces-65252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEF5D839BD3
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 23:07:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BB7C839BF7
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 23:18:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 40860B2747E
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 22:07:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F0A31B21ED4
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 22:18:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FC5D4EB39;
-	Tue, 23 Jan 2024 22:06:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 919DB4EB52;
+	Tue, 23 Jan 2024 22:17:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="S0lRAysl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pVi0EGWV"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF52A537F5;
-	Tue, 23 Jan 2024 22:06:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 080584403
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 22:17:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706047587; cv=none; b=CzSaDZYB6eJpcpzIV4MR6CpihPVC5LDfzVhu9GXd0sy2zam8h66AAjD3cgDfIfyahBRg5FJ/FcfIxsnWDFApfDrH6a6TJPAM+QkXzMimNNxmqt2+i8PTdsqYc4zLeMrvDKIIW+UuQ0Y6JoHORWvJdWVp9OiP9C8Khq6QTAMr+X4=
+	t=1706048276; cv=none; b=lmRoco6QSdkZSdTEdPMv8IgdpJoZ6N2WL/Rz33Efg1YuYwbm4BQPb6HRSAS4QENvOx7Zjg7WIp0HvoLQ7An1pm+uKwgk5/jUsduuCyE2gX+fvy2lMnNM9qEFGzczOuAJYynPL7SJafk6Q372tXocOI8bRCUCh5HfS+PxxOfcl4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706047587; c=relaxed/simple;
-	bh=EBG8FKLDL2yNVWwn82X5TrJOhSSQhARDwLMOkbaC8lQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=i2DUCmVDGg53ZK50AQ8rLtZE3Bc68vayRbEWqPCPSEieayqhsWfYWUCuz89h60ynlzQM5wdLuYy2HP9Lw3N6To76rHGyYHeTyhhtA9GfNxzUr+GwlGRd5viUTMQmvrFJNfjLdxI3xR/DmsE0Ucb3MkP88V+YQPhCXDX9ay9C6qA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=S0lRAysl; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=EBG8FKLDL2yNVWwn82X5TrJOhSSQhARDwLMOkbaC8lQ=;
-	t=1706047585; x=1707257185; b=S0lRAysl9QJLH9mzRCts8uJYOAG6U58EfilmPDadRag6sut
-	JoTJCtdYw8mqLFOKAULZUeFfEZV2arWqx6GL5ZfhYbuu6c98OrGX7IFAKcDdb2lquntXq6FbX0SFT
-	FjOCCERgU0sWfHpMI2vCiEz/8gWcutIQRisIJmufWis+4zZJwjxKj5UoAaAFcPZOHzxXTvhkYqLQf
-	mFLT42ZN1ELgJeeJylubU1dy2Y9Q3c0yU5wu+4QCMQr8tK3i1CgXebarjSL04wx368yhK1APVLKRl
-	nszYdWeCD3hwspCMP718/yiwrTvUtGzQt3wI6yvuFFJbfpd/JPpMumaNvaHkMRGQ==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1rSOuT-0000000FG0g-2jwM;
-	Tue, 23 Jan 2024 23:06:22 +0100
-Message-ID: <d6940d0a80fcb522910c433fd3644ed5c524f6d5.camel@sipsolutions.net>
-Subject: Re: pull-request: wireless-2024-01-22
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Kalle Valo <kvalo@kernel.org>, Lukas Bulwahn <lukas.bulwahn@gmail.com>, 
- netdev@vger.kernel.org, linux-wireless@vger.kernel.org, David Gow
- <davidgow@google.com>, Brendan Higgins <brendanhiggins@google.com>, Shuah
- Khan <skhan@linuxfoundation.org>, linux-kselftest@vger.kernel.org, 
- kunit-dev@googlegroups.com
-Date: Tue, 23 Jan 2024 23:06:20 +0100
-In-Reply-To: <20240123134255.3eef6fd9@kernel.org>
-References: <20240122153434.E0254C433C7@smtp.kernel.org>
-	 <20240123084504.1de9b8ac@kernel.org>
-	 <d4c1a7c715a1f47dc45c5d033822d8f47e304bd4.camel@sipsolutions.net>
-	 <20240123134255.3eef6fd9@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+	s=arc-20240116; t=1706048276; c=relaxed/simple;
+	bh=fibjmZmjuKKnvDk9ji89uzWTcVwU0i34NoX/+yPgrZo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Px6N1kpCmPojoHWx6HlaAp89DVysFCgWMhZ2Nxl/5WxIvjFnOlR7qBWvxvPDT81m2zdAZVrqpu+tuqLNylKUPr0peMW/o45Zn1xIX8K+OFR28JTjRixbpKf98vVv+GFeTNf2TOxXft5NGYbiGq2zFV9tYAY6ldEDZ/KyntxT7nc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pVi0EGWV; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5ffa9b3659cso60635987b3.1
+        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 14:17:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1706048274; x=1706653074; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Rw4CHX/yPrA/zwMzsyij6NhlGhkx7uxmvUtdcUBOHDo=;
+        b=pVi0EGWVKAiMg4QifRSF9wDldXJDvetCa8yjgDZY2JmyHqYpNMv2C48uYFn0QazU1e
+         EXExto98Wh9sqFZZvdwLGQHDZjVjLn6JCNtNXiltaJXPjmdp5PPpTg1vwltmWKPZgcjz
+         zlrXo2gA6BZCSQexK76mcwZ9jUrmUgjhwJyXOxj/mrkALfXW432J9wZbc8CuCFph/S3N
+         nKeCPwbvW87OT8tip47OacWC08C8/U9+zhaYF01ctDUdy1yAVW0KOcqMVYKP+ywFEHAP
+         qWpjJWZwaU/Mz8Ed/brk9xd5GQ7JxNuelmwrrBLorYFkn/Fldw3p6G5uFVDDtWgbCdvo
+         Wiqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706048274; x=1706653074;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Rw4CHX/yPrA/zwMzsyij6NhlGhkx7uxmvUtdcUBOHDo=;
+        b=O7Z0X/V5OjN3p5WiyIl9pgOZ3i55pLgIR1nTeN2p1Y3uSYcoL6EMPUyR6pbjbJjLQd
+         awpTC9t+1aStT0F+Gzhk9bMMn5z2gZwC6wjqqi/0gKT2YmEh41DgP3v59gYa3NCzBKx2
+         yDiXNnIjOLfeXRxR13Kdqijb5PEguKK3oyG5EQfNkWzNLdUO1I1y9/GSkv99e521Cua5
+         P9SePZGkVUTFmaS8X0yBUI/3bCSHBKXvO3QKCK+6XBTFWLu4Z1ip8oonqfwxIy7tCQAI
+         rTGP2ZrUq/1z8BYY6bGhYCz2MKx6KrEK6ilyW8Jk7CBpLfmeVlYtVwaHSo/3XgCkndpx
+         QVwQ==
+X-Gm-Message-State: AOJu0Yy/s9BvpyX912CIVybj6mlDlmtXFjXylYlzCtYAFD3/RVbVwDOi
+	I+bCx88tUbRrZotcEgFaw7KlpE2d7WYEx9ck2OBL4zz7eZT7LzYwSJEU7Vou8cAzv/Omlc0smaY
+	kWgRv4J61/5KCtMdP9jQe5w==
+X-Google-Smtp-Source: AGHT+IGzQOEeslPfrOE3siORTL3t/RQ7QXEdr7ChXI3GBke/z5IxA/wuJR/uFV3oftguGvZUfhRfx5oFoHb+uespPw==
+X-Received: from almasrymina.svl.corp.google.com ([2620:15c:2c4:200:3608:aa16:52d:3594])
+ (user=almasrymina job=sendgmr) by 2002:a81:9242:0:b0:5fc:316d:a366 with SMTP
+ id j63-20020a819242000000b005fc316da366mr3066711ywg.4.1706048274064; Tue, 23
+ Jan 2024 14:17:54 -0800 (PST)
+Date: Tue, 23 Jan 2024 14:17:44 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
+Message-ID: <20240123221749.793069-1-almasrymina@google.com>
+Subject: [PATCH net-next v6 0/2] Abstract page from net stack
+From: Mina Almasry <almasrymina@google.com>
+To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jason Gunthorpe <jgg@nvidia.com>, 
+	"=?UTF-8?q?Christian=20K=C3=B6nig?=" <christian.koenig@amd.com>, Shakeel Butt <shakeelb@google.com>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2024-01-23 at 13:42 -0800, Jakub Kicinski wrote:
->=20
-> > We're also adding unit tests to iwlwifi (slowly), any idea if we should
-> > enable that here also? It _is_ now possible to build PCI stuff on kunit=
-,
-> > but it requires some additional config options (virt-pci etc.), not sur=
-e
-> > that's desirable here? It doesn't need it at runtime for the tests, of
-> > course.
->=20
-> but curious to hear about driver testing recommendations.
+Changes in v6:
+- Non-RFC as net-next opened.
+- static_assert skb_frag_t compatibility with bio_vec.
 
-Not sure I have any recommendations ... The test we posted is checking
-an invariant (the devinfo array is sorted in the right way); we used to
-have a check for this in the internal driver variant at init time, now
-it's a kunit test and we don't have to carry the delta to upstream here.
+-----------
 
-I think Miri is also working on some additional tests for some driver-
-internal logic though.
+Changes in RFC v5:
+- RFC due to merge window
+- Changed netmem to __bitwise unsigned long.
 
-So not sure, I guess it'd be just like anything else you could use unit
-testing for, certain self-contained parts of the code that don't really
-otherwise need a device, etc.?
+-----------
 
-johannes
+Changes in v4:
+- Forked off the trivial fixes to skb_frag_t field access to their own
+  patches and changed this to RFC that depends on these fixes:
+
+https://lore.kernel.org/netdev/20240102205905.793738-1-almasrymina@google.c=
+om/T/#u
+https://lore.kernel.org/netdev/20240102205959.794513-1-almasrymina@google.c=
+om/T/#u
+
+- Use an empty struct for netmem instead of void* __bitwise as that's
+  not a correct use of __bitwise.
+
+-----------
+
+Changes in v3:
+
+- Replaced the struct netmem union with an opaque netmem_ref type.
+- Added func docs to the netmem helpers and type.
+- Renamed the skb_frag_t fields since it's no longer a bio_vec
+
+-----------
+
+Changes in v2:
+- Reverted changes to the page_pool. The page pool now retains the same
+  API, so that we don't have to touch many existing drivers. The devmem
+  TCP series will include the changes to the page pool.
+
+- Addressed comments.
+
+This series is a prerequisite to the devmem TCP series. For a full
+snapshot of the code which includes these changes, feel free to check:
+
+https://github.com/mina/linux/commits/tcpdevmem-rfcv5/
+
+-----------
+
+Currently these components in the net stack use the struct page
+directly:
+
+1. Drivers.
+2. Page pool.
+3. skb_frag_t.
+
+To add support for new (non struct page) memory types to the net stack, we
+must first abstract the current memory type.
+
+Originally the plan was to reuse struct page* for the new memory types,
+and to set the LSB on the page* to indicate it's not really a page.
+However, for safe compiler type checking we need to introduce a new type.
+
+struct netmem is introduced to abstract the underlying memory type.
+Currently it's a no-op abstraction that is always a struct page underneath.
+In parallel there is an undergoing effort to add support for devmem to the
+net stack:
+
+https://lore.kernel.org/netdev/20231208005250.2910004-1-almasrymina@google.=
+com/
+
+Cc: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Christian K=C3=B6nig <christian.koenig@amd.com>
+Cc: Shakeel Butt <shakeelb@google.com>
+Cc: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+
+Mina Almasry (2):
+  net: introduce abstraction for network memory
+  net: add netmem to skb_frag_t
+
+ include/linux/skbuff.h | 90 +++++++++++++++++++++++++++++-------------
+ include/net/netmem.h   | 41 +++++++++++++++++++
+ net/core/skbuff.c      | 40 ++++++++++++++++---
+ net/kcm/kcmsock.c      |  9 ++++-
+ 4 files changed, 145 insertions(+), 35 deletions(-)
+ create mode 100644 include/net/netmem.h
+
+--=20
+2.43.0.429.g432eaa2c6b-goog
+
 
