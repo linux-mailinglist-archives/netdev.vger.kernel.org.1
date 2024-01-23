@@ -1,151 +1,156 @@
-Return-Path: <netdev+bounces-65213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E402B839A70
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 21:43:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23F65839A7B
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 21:44:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84E401F2B2E3
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 20:43:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB24828A7E1
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 20:44:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CA9846B3;
-	Tue, 23 Jan 2024 20:43:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50C554A3B;
+	Tue, 23 Jan 2024 20:44:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="C6LkV1EI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6CF720F1;
-	Tue, 23 Jan 2024 20:43:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251355662;
+	Tue, 23 Jan 2024 20:44:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706042596; cv=none; b=bJiU7xcisTw90cGDq8Ai2A8+BSE9dKplaX3JOBLpj9++L/PRTaY9+vTjmhkNNRp0yVzJsrLnpJwNKfYy0STSy/JXxu0fhRAhqWkQQtoFRYHqmhbjNTRAjMIc6u5aoS8Pc1n3qRk42KqYb/ZAeAa94f+Lq/jKyNlmhCr2CLUQwE0=
+	t=1706042656; cv=none; b=IqUKdQaNUwpr8DsPmoY4RTP9/wHVNjZQe6q+u27PxEC33T1gvT2/X1jCcYQFTCqVRp/OklZalc2K793tllYVeu+zBQhHBO0zlchHFM0TSlkG6mgZ3I6kIGKXgL/bB8dvBaQ69p+6ZvlZUr9ttRazeJbhhAihoVuN1p3HAeBa2Z0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706042596; c=relaxed/simple;
-	bh=EEncKghprTOWMaCnJRfayS7I/j2ad9+aypBZ5XxEPbQ=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=JJeLRpdFHEtMBFrBK7UsxXPpv5gvo25gzz2R4bx6B6Zn/8Nd+l7CrYy4x5R4grAumW6xpHAt+R2NiobihRsdQMOhmFXIkmv0wFl5u87BLWTf+XjNrwjTqfD3kJEmrMSzPyLP/JPKtZOmpnVXJZo27EqBudIta88mrDhWA2RgL/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (31.173.84.3) by msexch01.omp.ru (10.188.4.12)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 23 Jan
- 2024 23:43:03 +0300
-Subject: Re: [PATCH net-next v4 07/15] net: ravb: Move reference clock
- enable/disable on runtime PM APIs
-To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
-	<geert+renesas@glider.be>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>
-References: <20240123125829.3970325-1-claudiu.beznea.uj@bp.renesas.com>
- <20240123125829.3970325-8-claudiu.beznea.uj@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <ec3f5d8a-ac38-1134-93a3-c4ceb8b944e0@omp.ru>
-Date: Tue, 23 Jan 2024 23:43:02 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1706042656; c=relaxed/simple;
+	bh=YTYq9NKaF9Qyd5spfDIHdzZzMX2Nn0CsEqHbs7SWNQo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j7mH4xSl3b7g1H4jV40FnP8dEVY4YQDnfETY6kLCyEt+3pb4TWcDsko0DX3qXkxrVDhEo0HcNGWtN2iWINal+LxDoMgtT1ap1phXdfRzqt2UrEOES6KvdHa/j4OnhljKK5q8zE+tkn1EgxlrOcNGB3RC+WEAXDobIE2Ww6hxFIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=C6LkV1EI; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706042655; x=1737578655;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=YTYq9NKaF9Qyd5spfDIHdzZzMX2Nn0CsEqHbs7SWNQo=;
+  b=C6LkV1EIWCLsYBwDFmHNKwBKMCwhZE5rt2ttdKiYHQyLM3L2L4oGN8QB
+   C7ZuWdXR6AEE1mPiohT2CAJcUiSIgDM/RwoSL577UIrq8ZwoZhY0lyQk4
+   zgm0TpfAZEbKvGFtiE70m1X7YtGBCTfT05fiIJqGS3wgNU+pCsCbXAeJM
+   I1NUe9d1P8Gmk1nvcE8JLQxCv0+0JUdmtO0Y8DkSk8DdIjgOmi7ehYyX4
+   enfa6LoXEURFbwoCFocq0eSoBbAlUmUQuXYL8Z0T/TQhxE+D3MMRIGqJZ
+   E4yspDEdwYywB4qjSvkIbHn4pvPnYCaywUtmv3XE43OV1DTP/xZCrVHvW
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="23114666"
+X-IronPort-AV: E=Sophos;i="6.05,215,1701158400"; 
+   d="scan'208";a="23114666"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2024 12:44:13 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="905365871"
+X-IronPort-AV: E=Sophos;i="6.05,215,1701158400"; 
+   d="scan'208";a="905365871"
+Received: from turnipsi.fi.intel.com (HELO kekkonen.fi.intel.com) ([10.237.72.44])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2024 12:44:07 -0800
+Received: from kekkonen.localdomain (localhost [127.0.0.1])
+	by kekkonen.fi.intel.com (Postfix) with SMTP id 7F17811FAD4;
+	Tue, 23 Jan 2024 22:44:04 +0200 (EET)
+Date: Tue, 23 Jan 2024 20:44:04 +0000
+From: Sakari Ailus <sakari.ailus@linux.intel.com>
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: linux-pm@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>,
+	linux-pci@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	Jaroslav Kysela <perex@perex.cz>,
+	Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>,
+	laurent.pinchart@ideasonboard.com, David Airlie <airlied@gmail.com>,
+	Paul Elder <paul.elder@ideasonboard.com>,
+	linux-media@vger.kernel.org,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	intel-gfx@lists.freedesktop.org,
+	Lucas De Marchi <lucas.demarchi@intel.com>,
+	Mark Brown <broonie@kernel.org>,
+	Jacek Lawrynowicz <jacek.lawrynowicz@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	intel-xe@lists.freedesktop.org,
+	Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+	Alex Elder <elder@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	linux-sound@vger.kernel.org, Takashi Iwai <tiwai@suse.com>,
+	Daniel Vetter <daniel@ffwll.ch>, netdev@vger.kernel.org
+Subject: Re: [PATCH v4 1/3] pm: runtime: Simplify pm_runtime_get_if_active()
+ usage
+Message-ID: <ZbAlFKE_fZ_riRVu@kekkonen.localdomain>
+References: <20240123095642.97303-2-sakari.ailus@linux.intel.com>
+ <20240123172423.GA317147@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240123125829.3970325-8-claudiu.beznea.uj@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 01/23/2024 20:31:10
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 182874 [Jan 23 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.84.3 in (user) dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.84.3
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 01/23/2024 20:34:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 1/23/2024 5:23:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240123172423.GA317147@bhelgaas>
 
-On 1/23/24 3:58 PM, Claudiu wrote:
+Hi Bjorn,
 
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+Thanks for the review.
+
+On Tue, Jan 23, 2024 at 11:24:23AM -0600, Bjorn Helgaas wrote:
+> On Tue, Jan 23, 2024 at 11:56:42AM +0200, Sakari Ailus wrote:
+> > There are two ways to opportunistically increment a device's runtime PM
+> > usage count, calling either pm_runtime_get_if_active() or
+> > pm_runtime_get_if_in_use(). The former has an argument to tell whether to
+> > ignore the usage count or not, and the latter simply calls the former with
+> > ign_usage_count set to false. The other users that want to ignore the
+> > usage_count will have to explitly set that argument to true which is a bit
+> > cumbersome.
+> > 
+> > To make this function more practical to use, remove the ign_usage_count
+> > argument from the function. The main implementation is renamed as
+> > pm_runtime_get_conditional().
+> > 
+> > Signed-off-by: Sakari Ailus <sakari.ailus@linux.intel.com>
+> > Reviewed-by: Alex Elder <elder@linaro.org> # drivers/net/ipa/ipa_smp2p.c
+> > Reviewed-by: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+> > Acked-by: Takashi Iwai <tiwai@suse.de> # sound/
+> > Reviewed-by: Jacek Lawrynowicz <jacek.lawrynowicz@linux.intel.com> # drivers/accel/ivpu/
+> > Acked-by: Rodrigo Vivi <rodrigo.vivi@intel.com> # drivers/gpu/drm/i915/
+> > Reviewed-by: Rodrigo Vivi <rodrigo.vivi@intel.com>
 > 
-> Reference clock could be or not part of the power domain. If it is part of
-
-   Could be or not be, perhaps?
-
-> the power domain, the power domain takes care of propertly setting it. In
-
-   Properly. :-)
-
-> case it is not part of the power domain and full runtime PM support is
-> available in driver the clock will not be propertly disabled/enabled at
-> runtime. For this, keep the prepare/unprepare operations in the driver's
-> probe()/remove() functions and move the enable/disable in runtime PM
-> functions.
+> Acked-by: Bjorn Helgaas <bhelgaas@google.com> # drivers/pci/
 > 
-> Along with it, the other clock request operations were moved close to
-> reference clock request and prepare to have all the clock requests
-> specific code grouped together.
+> - Previous PM history uses "PM: " in the subject lines (not "pm: ").
+
+Oops. I'm not sure why I used lower case. (Maybe I've written too many
+times "media:" prefix to the subject?) I'll fix this in v5.
+
 > 
-> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-[...]
+> - I don't know whether it's feasible, but it would be nice if the
+>   intel_pm_runtime_pm.c rework could be done in one shot instead of
+>   being split between patches 1/3 and 2/3.
+> 
+>   Maybe it could be a preliminary patch that uses the existing
+>   if_active/if_in_use interfaces, followed by the trivial if_active
+>   updates in this patch.  I think that would make the history easier
+>   to read than having the transitory pm_runtime_get_conditional() in
+>   the middle.
 
-> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-> index 9fc0e39e33c2..4673cc2faec0 100644
-> --- a/drivers/net/ethernet/renesas/ravb_main.c
-> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-[...]
-> @@ -3060,21 +3058,27 @@ static int ravb_resume(struct device *dev)
->  	return ret;
->  }
->  
-> -static int ravb_runtime_nop(struct device *dev)
-> +static int ravb_runtime_suspend(struct device *dev)
->  {
-> -	/* Runtime PM callback shared between ->runtime_suspend()
-> -	 * and ->runtime_resume(). Simply returns success.
-> -	 *
-> -	 * This driver re-initializes all registers after
-> -	 * pm_runtime_get_sync() anyway so there is no need
-> -	 * to save and restore registers here.
-> -	 */
+I think I'd merge the two patches. The second patch is fairly small, after
+all, and both deal with largely the same code.
 
-   I want to pull out the dummy {ravb|sh_eth}_runtime_nop() funcs --
-they don't seem to be necessary... Then we can implement your clock
-dance with freshly added ravb_runtime_{suspend|resume}()...
+> 
+> - Similarly, it would be nice if pm_runtime_get_conditional() never
+>   had to be published in pm_runtime.h, instead of being temporarily
+>   added there by this patch and then immediately made private by 2/3.
+>   Maybe that's not practical, I dunno.
 
-[...]
+-- 
+Regards,
 
-MBR, Sergey
+Sakari Ailus
 
