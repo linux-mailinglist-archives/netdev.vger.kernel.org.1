@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-65042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4468F838F34
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 14:03:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D3DA838F39
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 14:03:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E70902914BA
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 13:03:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05A6C29183C
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 13:03:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DA07605D5;
-	Tue, 23 Jan 2024 12:59:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B11960881;
+	Tue, 23 Jan 2024 12:59:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="XHtv7cSj"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="kVpYesco"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70AEA604A6
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 12:59:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C7BD605C7
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 12:59:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706014788; cv=none; b=r/MIgwOD51QdXIBIqhV+p9bt8KKMSxIBvILU8iaOhQOWh7ik5wU3WLoOphPa1t32hxJP3hQ8O2XmJLgOnUG0yNyUqXqyKE3oeJy6oLp8sbz/SpfSjc75COUqRladzDtHRdD5JFuDaSPf8NzG4wyZTpYWgdpLH+DfanZ5GHnwXl8=
+	t=1706014789; cv=none; b=i/bA+HN566ZEEvf6ts6uHgEaZFHrbcrClFRHu04I9Zq6KhWmARUinqOO5vWXTvwZ0clRpNZrZ+3qTsWeRUsZmWrEEMYncaGkHSb3WCFm8jIwLgc/PhHz8wfTEUazv32ZiBUGGTZcSdGKI3zSjy+uoRB1v1ckk1kRQxmhtEiBmYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706014788; c=relaxed/simple;
-	bh=BVKHfjjAvYftCSiWzzn5WbjbFsP7wBJZK7YKMMKP/aA=;
+	s=arc-20240116; t=1706014789; c=relaxed/simple;
+	bh=zwRf00erI7gL+iVp7EL8wRdj+/3c4hH+mO5H4G4Z5WQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=f4r+dhqK2W81j8QqWHrCuhAsmYKedlaqgsl+883ghXaRhialjZNg7atHBWpCZUp2ME5ExHM4sSIbaTP3QY21+NCA+EpvIuoxwB2REbV6iGrV+bojRSwI07tsuLHaZME9kh1P2hbrYsDNAFhSu7UbktOWOK2eD+2TERkvCavFXGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=XHtv7cSj; arc=none smtp.client-ip=209.85.128.46
+	 MIME-Version; b=cZX3cphBQ6Q5pP+Gs+Zh4b7lDu51/liXLwnav0+fYt/kSI68TIC9YJxDGPQl23zcUfBd+KA8t5HzvkWp+0wbzC9HonIO6uYwbxqIkvd9xx6vupilahX23235AbjoTp7eHzEEbbu8EPWCi1WOn0uUba0AO7svSKpzXuY8vQci/ZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=kVpYesco; arc=none smtp.client-ip=209.85.221.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-40eb033c192so10610345e9.0
-        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 04:59:46 -0800 (PST)
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-33922d2cb92so3825346f8f.1
+        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 04:59:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1706014785; x=1706619585; darn=vger.kernel.org;
+        d=tuxon.dev; s=google; t=1706014786; x=1706619586; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ErNfF/Xc9qsj3D+ti7spZOyCJXcg8kBzLgnUTUWSxO4=;
-        b=XHtv7cSjJ5YJ12yQlgvvplZajiXf0Rot5IK/dJK9x5Aoo51ofbDazEfyWhFnnCT1mF
-         oHLJiSKnUD5jmkZX957EowbYznSCuQ73SIrj5mqX1qpD7iSZekYp3Nto0knTQy9Yt1dQ
-         UvD5ASJaLN1y6qhhfTNGpqN4JczMqrH8C6zZfbmARXiZfvxa0lMRKYh4cGbeQV0+I/gn
-         yUJgDLgdkUG5fyXwxMM0Jjh+dke8Dio56EtWqAfLTqCKE2SyhMbetjUKPdtCgWpKXMY1
-         4AuwOvc/GnLkqKSIrFDA55L5uXIhPJaIgOWRDSS48rQijaZr/vun5AIuqQa7mor4e/6r
-         phFA==
+        bh=4oU6e2ETHxF91J7rUEFncHWZOjTNYygzuarRFBzd88c=;
+        b=kVpYescoHborLoAT9qW+S2lnooV0v/b3/gznd1o5vXvEeodA2PO1bd2ppn5zhMCn16
+         End3R3dAhRk5TqPXUD9ddS+vZuEVfmSnDS90dNyKRNE4j/Pv8hBVJ7va1fqOR9NaEs88
+         vZyUq0ZnjE04WqDx5wq4F8/Fm1VBhUQGdMiHRIuR4ijBpgg0+KPo4f9c1j7bFyJ77MP7
+         fXKKvlywOONJTtBta0fGRKQTUvM7j/pK1kJ2ckI214RJLP4D44sPHdvnXV59lJZY5kqz
+         Hhk6DQ7/6k8YrpPVF1C1dhjvy9iG6gS/tKsTvJAcpSUvwqajGfLkWCa59fG+dSTEy3d/
+         iPWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706014785; x=1706619585;
+        d=1e100.net; s=20230601; t=1706014786; x=1706619586;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ErNfF/Xc9qsj3D+ti7spZOyCJXcg8kBzLgnUTUWSxO4=;
-        b=DufZSusIXYnl/6fVDRyjihuursUUvyGL2+aIOUaieYV287idGUp2GsRwJklblSesJl
-         BMsyMfissHHkTuRvODaZzSh1RttpotoGtFqlFyhFaeAsx/BJ6VTRlK1CmZur92CR2tJa
-         Jj02jVMnL8xJocxZRgJUm9Uj8d7hkZHQXr0SRfMPjqy6OkbzQEI5IU9BRNxQyUB/xpwV
-         zM6chbMuf79eJC5UFB8I7yverRp9h6LwHC+2ZWvQWCI4cHxQOAbO5PHcG/cNEnrkx9hF
-         ZmfW48++grJ5a21Gc/hkhahbzbCxKsK64Zb7AZ3AudX5ReHy2sh5edCJBOw2uuHuOO7K
-         aGMQ==
-X-Gm-Message-State: AOJu0YzyRlUUiiYrVkAF7W5c8rlysarL55cT07/jLtVXIU/XiUmWzwVV
-	3Rgx6LSOxODu8AMaGfIDM1gnHZ8Y4ZNszEjQpC7vM1M3T4tg1cWst57YTIBMjWc=
-X-Google-Smtp-Source: AGHT+IH+LKGHmd2bBdPiQV5jphH09OG4u0W4qecANFyz1rsQeq9nfIL9uGXldWE23j2xP1KsJVeURg==
-X-Received: by 2002:a05:600c:68cd:b0:40e:a565:3ce2 with SMTP id jd13-20020a05600c68cd00b0040ea5653ce2mr117549wmb.73.1706014784838;
-        Tue, 23 Jan 2024 04:59:44 -0800 (PST)
+        bh=4oU6e2ETHxF91J7rUEFncHWZOjTNYygzuarRFBzd88c=;
+        b=lK3zrdpa1XeCMoVDNRfx/86te0HJ6ZZ92xrTPFb0jCalMJaSV/2ERPBVPVeMbyAlXw
+         OBsm0qSsqpTn9KI5SYOqvbrZchYZ8AJuB7E+wcpiSs8cutiz5TmLDmgjGH7gFY/Vejxa
+         9RQepRC7dofZ1up+jpLJ6JwBl4d/nztnY+9cftll1ZRoAu8qG7XHEDhyKrZV1L/qJNX3
+         ukoTqcx6bFTY1VG9LKs94W2sfJnxuPrq9ot4a7VncTmvmtiZ1C0cBPSleyZFihLP7jmN
+         CboYeqG254NEf2IM2gnhHJecFhezpaLiAUN9dJivF1IzOrxPK4CYUXQV/q6ugAgBASFX
+         N4oA==
+X-Gm-Message-State: AOJu0Ywp5xULGjf8x5/jaRJ8laJwZfdlYUeAO1cU/ib0c5u/KLW6JBsN
+	Nh/ZsmzcJkIuavz/zugrEZyuAVp3LzxMpFforkc3CUfiQ9kam+W/QxM7wD941qs=
+X-Google-Smtp-Source: AGHT+IGB+gMNBnzgu6BSJSZSWfnZQHIGkS7WejcQ267fGk9sxfCygh1ubyAyFYo2rFP0dkj3WSmDkw==
+X-Received: by 2002:a7b:cb0e:0:b0:40e:4996:13b0 with SMTP id u14-20020a7bcb0e000000b0040e499613b0mr240501wmj.272.1706014786082;
+        Tue, 23 Jan 2024 04:59:46 -0800 (PST)
 Received: from claudiu-X670E-Pro-RS.. ([82.78.167.135])
-        by smtp.gmail.com with ESMTPSA id s4-20020a05600c45c400b0040e6ff60057sm33655711wmo.48.2024.01.23.04.59.43
+        by smtp.gmail.com with ESMTPSA id s4-20020a05600c45c400b0040e6ff60057sm33655711wmo.48.2024.01.23.04.59.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jan 2024 04:59:44 -0800 (PST)
+        Tue, 23 Jan 2024 04:59:45 -0800 (PST)
 From: Claudiu <claudiu.beznea@tuxon.dev>
 X-Google-Original-From: Claudiu <claudiu.beznea.uj@bp.renesas.com>
 To: s.shtylyov@omp.ru,
@@ -81,9 +81,9 @@ Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	claudiu.beznea@tuxon.dev,
 	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-Subject: [PATCH net-next v4 10/15] net: ravb: Move delay mode set in the driver's ndo_open API
-Date: Tue, 23 Jan 2024 14:58:24 +0200
-Message-Id: <20240123125829.3970325-11-claudiu.beznea.uj@bp.renesas.com>
+Subject: [PATCH net-next v4 11/15] net: ravb: Move DBAT configuration to the driver's ndo_open API
+Date: Tue, 23 Jan 2024 14:58:25 +0200
+Message-Id: <20240123125829.3970325-12-claudiu.beznea.uj@bp.renesas.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240123125829.3970325-1-claudiu.beznea.uj@bp.renesas.com>
 References: <20240123125829.3970325-1-claudiu.beznea.uj@bp.renesas.com>
@@ -97,176 +97,50 @@ Content-Transfer-Encoding: 8bit
 
 From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
-Delay parsing and setting were done in the driver's probe API. As some IP
-variants switch to reset mode (and thus registers content is lost) when
-setting clocks (due to module standby functionality) to be able to
-implement runtime PM keep the delay parsing in the driver's probe function
-and move the delay applying function to the driver's ndo_open API.
+DBAT setup was done in the driver's probe API. As some IP variants switch
+to reset mode (and thus registers content is lost) when setting clocks
+(due to module standby functionality) to be able to implement runtime PM
+move the DBAT configuration in the driver's ndo_open API.
 
-Along with it, both delay specific functions were kept together.
+This commit prepares the code for the addition of runtime PM.
 
 Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 ---
 
 Changes in v4:
-- collected tags
+- none
 
 Changes in v3:
-- fixed typos in patch description
+- collected tags
 
 Changes in v2:
 - none; this patch is new
 
- drivers/net/ethernet/renesas/ravb_main.c | 107 ++++++++++++-----------
- 1 file changed, 56 insertions(+), 51 deletions(-)
+
+ drivers/net/ethernet/renesas/ravb_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index 8956c33c60e2..69d4854d6738 100644
+index 69d4854d6738..3c7748b5e14e 100644
 --- a/drivers/net/ethernet/renesas/ravb_main.c
 +++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -1800,6 +1800,59 @@ static int ravb_compute_gti(struct net_device *ndev)
- 	return 0;
- }
- 
-+/* Set tx and rx clock internal delay modes */
-+static void ravb_parse_delay_mode(struct device_node *np, struct net_device *ndev)
-+{
-+	struct ravb_private *priv = netdev_priv(ndev);
-+	bool explicit_delay = false;
-+	u32 delay;
-+
-+	if (!priv->info->internal_delay)
-+		return;
-+
-+	if (!of_property_read_u32(np, "rx-internal-delay-ps", &delay)) {
-+		/* Valid values are 0 and 1800, according to DT bindings */
-+		priv->rxcidm = !!delay;
-+		explicit_delay = true;
-+	}
-+	if (!of_property_read_u32(np, "tx-internal-delay-ps", &delay)) {
-+		/* Valid values are 0 and 2000, according to DT bindings */
-+		priv->txcidm = !!delay;
-+		explicit_delay = true;
-+	}
-+
-+	if (explicit_delay)
-+		return;
-+
-+	/* Fall back to legacy rgmii-*id behavior */
-+	if (priv->phy_interface == PHY_INTERFACE_MODE_RGMII_ID ||
-+	    priv->phy_interface == PHY_INTERFACE_MODE_RGMII_RXID) {
-+		priv->rxcidm = 1;
-+		priv->rgmii_override = 1;
-+	}
-+
-+	if (priv->phy_interface == PHY_INTERFACE_MODE_RGMII_ID ||
-+	    priv->phy_interface == PHY_INTERFACE_MODE_RGMII_TXID) {
-+		priv->txcidm = 1;
-+		priv->rgmii_override = 1;
-+	}
-+}
-+
-+static void ravb_set_delay_mode(struct net_device *ndev)
-+{
-+	struct ravb_private *priv = netdev_priv(ndev);
-+	u32 set = 0;
-+
-+	if (!priv->info->internal_delay)
-+		return;
-+
-+	if (priv->rxcidm)
-+		set |= APSR_RDM;
-+	if (priv->txcidm)
-+		set |= APSR_TDM;
-+	ravb_modify(ndev, APSR, APSR_RDM | APSR_TDM, set);
-+}
-+
- /* Network device open function for Ethernet AVB */
- static int ravb_open(struct net_device *ndev)
- {
-@@ -1811,6 +1864,8 @@ static int ravb_open(struct net_device *ndev)
- 	if (info->nc_queues)
+@@ -1865,6 +1865,7 @@ static int ravb_open(struct net_device *ndev)
  		napi_enable(&priv->napi[RAVB_NC]);
  
-+	ravb_set_delay_mode(ndev);
-+
+ 	ravb_set_delay_mode(ndev);
++	ravb_write(ndev, priv->desc_bat_dma, DBAT);
+ 
  	/* Device init */
  	error = ravb_dmac_init(ndev);
- 	if (error)
-@@ -2531,41 +2586,6 @@ static int ravb_set_config_mode(struct net_device *ndev)
- 	return error;
- }
+@@ -2808,7 +2809,6 @@ static int ravb_probe(struct platform_device *pdev)
+ 	}
+ 	for (q = RAVB_BE; q < DBAT_ENTRY_NUM; q++)
+ 		priv->desc_bat[q].die_dt = DT_EOS;
+-	ravb_write(ndev, priv->desc_bat_dma, DBAT);
  
--/* Set tx and rx clock internal delay modes */
--static void ravb_parse_delay_mode(struct device_node *np, struct net_device *ndev)
--{
--	struct ravb_private *priv = netdev_priv(ndev);
--	bool explicit_delay = false;
--	u32 delay;
--
--	if (!of_property_read_u32(np, "rx-internal-delay-ps", &delay)) {
--		/* Valid values are 0 and 1800, according to DT bindings */
--		priv->rxcidm = !!delay;
--		explicit_delay = true;
--	}
--	if (!of_property_read_u32(np, "tx-internal-delay-ps", &delay)) {
--		/* Valid values are 0 and 2000, according to DT bindings */
--		priv->txcidm = !!delay;
--		explicit_delay = true;
--	}
--
--	if (explicit_delay)
--		return;
--
--	/* Fall back to legacy rgmii-*id behavior */
--	if (priv->phy_interface == PHY_INTERFACE_MODE_RGMII_ID ||
--	    priv->phy_interface == PHY_INTERFACE_MODE_RGMII_RXID) {
--		priv->rxcidm = 1;
--		priv->rgmii_override = 1;
--	}
--
--	if (priv->phy_interface == PHY_INTERFACE_MODE_RGMII_ID ||
--	    priv->phy_interface == PHY_INTERFACE_MODE_RGMII_TXID) {
--		priv->txcidm = 1;
--		priv->rgmii_override = 1;
--	}
--}
--
- static int ravb_setup_irq(struct ravb_private *priv, const char *irq_name,
- 			  const char *ch, int *irq, irq_handler_t handler)
- {
-@@ -2650,18 +2670,6 @@ static int ravb_setup_irqs(struct ravb_private *priv)
- 	return ravb_setup_irq(priv, "ch19", "ch19:tx_nc", &irq, ravb_nc_interrupt);
- }
- 
--static void ravb_set_delay_mode(struct net_device *ndev)
--{
--	struct ravb_private *priv = netdev_priv(ndev);
--	u32 set = 0;
--
--	if (priv->rxcidm)
--		set |= APSR_RDM;
--	if (priv->txcidm)
--		set |= APSR_TDM;
--	ravb_modify(ndev, APSR, APSR_RDM | APSR_TDM, set);
--}
--
- static int ravb_probe(struct platform_device *pdev)
- {
- 	struct device_node *np = pdev->dev.of_node;
-@@ -2785,10 +2793,7 @@ static int ravb_probe(struct platform_device *pdev)
- 	if (error)
- 		goto out_rpm_put;
- 
--	if (info->internal_delay) {
--		ravb_parse_delay_mode(np, ndev);
--		ravb_set_delay_mode(ndev);
--	}
-+	ravb_parse_delay_mode(np, ndev);
- 
- 	/* Allocate descriptor base address table */
- 	priv->desc_bat_size = sizeof(struct ravb_desc) * DBAT_ENTRY_NUM;
+ 	/* Initialise HW timestamp list */
+ 	INIT_LIST_HEAD(&priv->ts_skb_list);
 -- 
 2.39.2
 
