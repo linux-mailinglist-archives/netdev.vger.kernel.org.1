@@ -1,74 +1,63 @@
-Return-Path: <netdev+bounces-65173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17C10839693
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 18:40:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F41A28396C0
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 18:46:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C392E1F27FB2
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:40:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC5C429364C
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:46:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 350AF80039;
-	Tue, 23 Jan 2024 17:40:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C39FA8005A;
+	Tue, 23 Jan 2024 17:46:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d3HEU7me"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O64Q2j7k"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 082217FBA1;
-	Tue, 23 Jan 2024 17:40:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93C7A80036;
+	Tue, 23 Jan 2024 17:46:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706031611; cv=none; b=LqZzVbHPujIDCksMxpoWVhedaHryKJqe5a3bCIracQbgHUr3id4lDu3+5JgLMaj+sHoQPZYj1Gn21xRclsHiRbP3bcrL+Qg0PWvmZtoMCTnez2BPB81MZb3voaHFCyrv57MwFwrHCK+PX3vD7JkdK26o0MxfEww+wwFvoyoonzI=
+	t=1706031991; cv=none; b=OKdYVlCEjBmVEh/z/rel16DO5v1bWwAcraETZ3MMHfDP7H4YAxS+PACmNdGAWb622U0wGvG9NfUgRALhwl67pDN1dT/xJbVMDhS46gWgn0nnFRNxz64VOrFpx1XX/CWADoxGyomvrF+vdMwm8Mjby4z61IS2PRe6531o1urpUyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706031611; c=relaxed/simple;
-	bh=3StveZ7O01KUMKkYSW0OiZTG31utUIkqY45LlOjxvBw=;
+	s=arc-20240116; t=1706031991; c=relaxed/simple;
+	bh=NkHE5jAGeam0OhUX55X+rbk7tkRtqWrCjQ1f8FdelE8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AJuxxWaaec25KBNQBa8uJEXpbghAlVSK6BEvW/hLxGBQTdMx02GSMgzxqr/XgfGRnKZdGT0YkhErtqJ/o1D/boDnRqA1z6z5HiQ6hwOkZtpeFGw23guJz/t736tEmfC99J2sXnQVndHsSisCMye3yHhqf9hRdTRtQn27LrAnFf4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d3HEU7me; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEC2AC433F1;
-	Tue, 23 Jan 2024 17:40:04 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=VxPyIRA/JMmGA7zZgCwjwNltP8cUvZ95dXdKEQ7+t+yIDTfBY82Ngvt7QIXAu5KM9PoS/E7MkOWwgzKl0yv7QhQIHJRhvd+6ajDhdS+ou3zRAVpD9HPJu3QSV/T1BoslJ8RNqzItjG1DclyT8yUXqZccbi8K/4UU13IlRmNt0ZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O64Q2j7k; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E11DC433C7;
+	Tue, 23 Jan 2024 17:46:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706031610;
-	bh=3StveZ7O01KUMKkYSW0OiZTG31utUIkqY45LlOjxvBw=;
+	s=k20201202; t=1706031991;
+	bh=NkHE5jAGeam0OhUX55X+rbk7tkRtqWrCjQ1f8FdelE8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=d3HEU7meYerxBi+D51f6kVazcNp4V04WVj8EZprWX19a4JQnMEKWvD+QQTAb7Nb5T
-	 25d4jPu+ddlrrnp3tlkUvyki8ElAjECaCLRnYan5JHntJm4sQ3WgDyjghdmk5DrRNq
-	 MAxa6wXR0MG8oSvStdYv18Z4YQ87KUIb/OeDr5auu/OCkUn+8ZwAV0sTa2XJai9rS2
-	 wyhab2tfozpAGfRKUc3tfWnp2EY1PXdLxnNtO0SoY+0hsIiHdJI0EqR7CoCUfmZAjX
-	 RsCj1YwMUHCOpFah/sgiPnUVYfkMqWFsw4lztEtwfB64WfdCn10n7JW5AvBfxvKl6A
-	 4lMs3PwwmznSg==
-Date: Tue, 23 Jan 2024 17:40:02 +0000
+	b=O64Q2j7kI6EdmKZ7mFXyWaeNIyGfxeOZHcYsgupC8JpBdUjQ4uxSzkGM7iy2OlXAI
+	 tFClav5O4lFK1QzAHICJ3RCsYSqD3vtwnLiplM30pqZG9HwAj5K7nSJXu/3b5hqOQ0
+	 O6AMpTl9P6mQr5X7RBSN+aKEThtUtQHIq1u2u8XPrRbGpahBnKi29VSmCYV273ZcwD
+	 BASyCD/EeAPIgp29JskMQW9/3YS/LWGUt1C2W82IDPNVkX3DhrpJ+kn2Na36hCstIQ
+	 xO4igiLh62T87z4Xw6Z8rRAexLfoL02cWha+ZRkjV+IXP4fzvuwLx2q+4BDCYS3vde
+	 mTOUkFOeNenWw==
+Date: Tue, 23 Jan 2024 17:46:25 +0000
 From: Simon Horman <horms@kernel.org>
-To: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org, cake@lists.bufferbloat.net,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	Petr Pavlu <ppavlu@suse.cz>, Michal Kubecek <mkubecek@suse.cz>,
-	Martin Wilck <mwilck@suse.com>,
-	Pedro Tammela <pctammela@mojatatu.com>
-Subject: Re: [PATCH v4 3/4] net/sched: Load modules via their alias
-Message-ID: <20240123174002.GN254773@kernel.org>
-References: <20240123135242.11430-1-mkoutny@suse.com>
- <20240123135242.11430-4-mkoutny@suse.com>
+To: Markus Elfring <Markus.Elfring@web.de>
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Florian Westphal <fw@strlen.de>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Paolo Abeni <pabeni@redhat.com>, Phil Sutter <phil@nwl.cc>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Kunwu Chan <chentao@kylinos.cn>
+Subject: Re: [PATCH] netfilter: nf_tables: Add a null pointer check in two
+ functions
+Message-ID: <20240123174625.GO254773@kernel.org>
+References: <c49c716a-e070-4ad5-9a90-896537bcd1b5@web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,79 +67,29 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240123135242.11430-4-mkoutny@suse.com>
+In-Reply-To: <c49c716a-e070-4ad5-9a90-896537bcd1b5@web.de>
 
-On Tue, Jan 23, 2024 at 02:52:41PM +0100, Michal Koutný wrote:
-> The cls_,sch_,act_ modules may be loaded lazily during network
-> configuration but without user's awareness and control.
+On Tue, Jan 23, 2024 at 02:45:12PM +0100, Markus Elfring wrote:
+> From: Markus Elfring <elfring@users.sourceforge.net>
+> Date: Tue, 23 Jan 2024 14:28:31 +0100
 > 
-> Switch the lazy loading from canonical module names to a module alias.
-> This allows finer control over lazy loading, the precedent from
-> commit 7f78e0351394 ("fs: Limit sys_mount to only request filesystem
-> modules.") explains it already:
+> The result from a call of the function “kasprintf” was passed to
+> a subsequent function call without checking for a null pointer before
+> (according to a memory allocation failure).
+> This issue was detected by using the Coccinelle software.
 > 
-> 	Using aliases means user space can control the policy of which
-> 	filesystem^W net/sched modules are auto-loaded by editing
-> 	/etc/modprobe.d/*.conf with blacklist and alias directives.
-> 	Allowing simple, safe, well understood work-arounds to known
-> 	problematic software.
+> Thus add a null pointer check and a jump target in affected functions.
 > 
-> By default, nothing changes. However, if a specific module is
-> blacklisted (its canonical name), it won't be modprobe'd when requested
-> under its alias (i.e. kernel auto-loading). It would appear as if the
-> given module was unknown.
-> 
-> The module can still be loaded under its canonical name, which is an
-> explicit (privileged) user action.
-> 
-> Signed-off-by: Michal Koutný <mkoutny@suse.com>
-> ---
->  net/sched/act_api.c | 2 +-
->  net/sched/cls_api.c | 2 +-
->  net/sched/sch_api.c | 4 ++--
->  3 files changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/net/sched/act_api.c b/net/sched/act_api.c
-> index 3e30d7260493..60c0fadfac6d 100644
-> --- a/net/sched/act_api.c
-> +++ b/net/sched/act_api.c
-> @@ -1363,7 +1363,7 @@ struct tc_action_ops *tc_action_load_ops(struct nlattr *nla, u32 flags,
->  
->  		if (rtnl_held)
->  			rtnl_unlock();
-> -		request_module("act_%s", act_name);
-> +		request_module(NET_ACT_ALIAS_PREFIX "%s", name);
+> Fixes: 8877393029e76 ("netfilter: nf_tables: Open-code audit log call in nf_tables_getrule()")
+> Fixes: 0854db2aaef3f ("netfilter: nf_tables: use net_generic infra for transaction data")
+> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
 
-Hi Michal,
+For the record:
 
-name doesn't exist in this context, perhaps the line above should be:
+Markus has posed patches of this nature many times over the past weeks
+and months. They are not fixing bugs - there is no user visible problem.
+And moreover they move the code away from the preferred style -
+avoiding unnecessary checks around code that can handle NULL values.
 
-		request_module(NET_ACT_ALIAS_PREFIX "%s", act_name);
-
->  		if (rtnl_held)
->  			rtnl_lock();
->  
-> diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
-> index 92a12e3d0fe6..b31b832598e7 100644
-> --- a/net/sched/cls_api.c
-> +++ b/net/sched/cls_api.c
-> @@ -257,7 +257,7 @@ tcf_proto_lookup_ops(const char *kind, bool rtnl_held,
->  #ifdef CONFIG_MODULES
->  	if (rtnl_held)
->  		rtnl_unlock();
-> -	request_module("cls_%s", kind);
-> +	request_module(NET_CLS_ALIAS_PREFIX "%s", name);
-
-Likewise, perhaps the line above should be:
-
-	request_module(NET_CLS_ALIAS_PREFIX "%s", kind);
-
->  	if (rtnl_held)
->  		rtnl_lock();
->  	ops = __tcf_proto_lookup_ops(kind);
-
-...
-
--- 
-pw-bot: changes-requested
+Markus, please stop posting patches of this nature.
 
