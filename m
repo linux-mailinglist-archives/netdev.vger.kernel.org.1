@@ -1,122 +1,142 @@
-Return-Path: <netdev+bounces-65177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB816839719
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 18:59:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37E9E839723
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 19:01:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94DBB284F95
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:59:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E08EE1F2A4EF
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 18:01:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8C58811E5;
-	Tue, 23 Jan 2024 17:59:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA607811FB;
+	Tue, 23 Jan 2024 18:01:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lQ1r0Lua"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="N2sVSMFy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26FD480058
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 17:59:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C10D8005D
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 18:01:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706032774; cv=none; b=OY6N0qM6zN9ZbgZSla0EKDkdAkXlPNUwUUfLN3kFTIbfrK/GWmy+XQpE721C/DzUtt9HzKjQ/dTaHH1WVHqv1g633wiWuFQbYFOwcpyLJKkpxCXZoDtF/PP3vHn62JRY0+iF86veuoK1svZ0UK/34nCenDmH8cvSkntNTgxrLZE=
+	t=1706032864; cv=none; b=N9JgYP27nMEw7OcIbiHv0rlEimuT5PqdSUu3NHPO+98Vg/aJfo9iasMy7QCLVdAjty/jRD3C1Eh/bHg6Gw9ZBG4o2A/0PqRLEG/TGodMtjL9vcR8EF5eDf1MgLj0hK21xOJe0qAbCFFyvDtr0odqE0vf/7zlOoDhHxUe5ExP9dk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706032774; c=relaxed/simple;
-	bh=zy+VtAthqnrtNOUurs3SoKsfCadphFbukqOkKL+5+c0=;
+	s=arc-20240116; t=1706032864; c=relaxed/simple;
+	bh=EhSQhj2E2Gw8gZhilODuH0mKnZBkClKrCermf9q8liY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KFUBmakpKxPpDNfNqy1Ktefo9ymbcgoYF5ZsAc8d1Py5skDPWWL41nlg6D7UCVk4uKjqCW8Ru37ei6sE1kpmi7I/11YBBTZp+96hUk4BA7urz6Ess79M+8jsjtfSbzuUelq7wyayElXPBHDMBHB4wyPt0CCR1/O5qBZptC/jOg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=lQ1r0Lua; arc=none smtp.client-ip=209.85.208.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2cd33336b32so61249121fa.0
-        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 09:59:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1706032771; x=1706637571; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MevgjBoC1naTbBSpDdFhU7jz6wq+Ub0rYmPiyyfGzGg=;
-        b=lQ1r0LuaqIBsLzUw9F3CllEmNPwkUTvNHClVpuRm3iq3/0BM5kK8lH8HPiHSBKA4nR
-         IkNVD6C7HeeFp6YIAW2HKv2oqGiY41U7cHFHSeE/CPQOIG7oCQekk26IUqmmz/XXCPjH
-         wgwQCY9gEvgW8b6arKwH2Durs/sHl/3VMCdPU/x9ZbFqO4jlUvh2zF6txvdDhJO1bAtp
-         dTFAdG/idcVGtFpG5tnaSTaM8VxmwfnZIBOIWuCixylG7rAl2lsS74LW/7WidwJo5ZAe
-         ggiBUpkvs76V3dxEk9e1+DOftSzbo1QDRm0vXeC5lKUtNeKD82RiefH4vNB1U0bIAx0g
-         s+Qg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706032771; x=1706637571;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MevgjBoC1naTbBSpDdFhU7jz6wq+Ub0rYmPiyyfGzGg=;
-        b=jVpQi5PwPYZ/CPMMNe/xiGPaCNoET/zCSTjH0F6+8aJDeOntwiw0YkME1TnxszWuAW
-         i5V1BoH5WRLaIkH6ZHRXqAJ0ZeuyTCsM2UcSYBHWE9j++6szTPTg8YJMGRv8rl352XGK
-         qjG+v4DptRCkDNavBzscIo/BftyLphrOh3aOI97QZwzPlGM393tOMK/f3+mVkVq8ocVT
-         ZfE3HsWO1oK3zNXY8uyBSTZHHNJ/LdHxeHKZVN4RRNEDLAtnemVVb6BgAGponKuwZ31h
-         CHKIyT4221LFPSjJ8gd82PHa6f55Y2h3kh7Xr0yGR10w5eE3F/dTjNIsn4ujj2RzvACp
-         5Blw==
-X-Gm-Message-State: AOJu0YyIiJhow0/DVuf3BBpeYW++gzSjpEaoGA/BpieNdeS00IVveNWc
-	KUlmb6bWsgEggjLI/yNFowliBPKQv0KQcL2dy4gcXoKaqhLlBD0HT3GndhX5ahYiqJSa204lQ+N
-	V
-X-Google-Smtp-Source: AGHT+IFsQdXZATi7GwTB0ulTN78M/aUoE2hnQJP5hgZwsQ02mD2/+t03X9iw/GN1e8SEqoW0WSkhyw==
-X-Received: by 2002:a05:651c:2208:b0:2cc:609d:eeaf with SMTP id y8-20020a05651c220800b002cc609deeafmr102633ljq.36.1706032771190;
-        Tue, 23 Jan 2024 09:59:31 -0800 (PST)
-Received: from [172.30.205.123] (UNUSED.212-182-62-129.lubman.net.pl. [212.182.62.129])
-        by smtp.gmail.com with ESMTPSA id f17-20020a05651c03d100b002cdfc29b46dsm1514699ljp.88.2024.01.23.09.59.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Jan 2024 09:59:30 -0800 (PST)
-Message-ID: <4c37d84f-ee46-4557-b25d-01ad9af4e950@linaro.org>
-Date: Tue, 23 Jan 2024 18:59:29 +0100
+	 In-Reply-To:Content-Type; b=TayrklCYEo8dFpIr7eEcoER5aTXGTZXIPyYeWsVMan+rN5Gw8Pg51GRyjaayMLsXQU+2A+Gvcraihm013+72hw0+xQcUbnp5seyWQ2Sn9Mbz3xjA0vlyeUSuetjUIDIrATIxXOEnfragRFbuiNCSAvJpPtMUdio4ZnrkD+Dz+Lk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=N2sVSMFy; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <6b8ade34-d7f4-452d-9893-ace80c97dfed@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1706032861;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7ssa/j3dpmDkZ3OgBuIT0XpwLPpx9/Pz3jRWEPzs1hQ=;
+	b=N2sVSMFycdcjLYUK54iPsNp1bCJQ4+B/mlsOEmOERuS39v1z076zSJdJRoc8X4sXNN7sOu
+	gU92ZM2dVq+uhOGmDQJUmUj4oZJI4/gDA8rLiN+pnXfMzmyk413KVq+etiiBMKei17kT8z
+	osAgyQ8zjwhmjdCz7m8VgpGap/kwpO0=
+Date: Tue, 23 Jan 2024 18:00:57 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: ethernet: qualcomm: Remove QDF24xx support
+Subject: Re: [PATCH iwl-next] ice: Remove and readd netdev during devlink
+ reload
 Content-Language: en-US
-To: Timur Tabi <timur@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Marijn Suijten <marijn.suijten@somainline.org>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-References: <20240122-topic-qdf_cleanup_net-v1-1-caf0d9c4408a@linaro.org>
- <CAOZdJXXCmZi8Qx-y2D_NhJiafnGhvma2OY6F+KauqYcNAAQNCQ@mail.gmail.com>
-From: Konrad Dybcio <konrad.dybcio@linaro.org>
-In-Reply-To: <CAOZdJXXCmZi8Qx-y2D_NhJiafnGhvma2OY6F+KauqYcNAAQNCQ@mail.gmail.com>
+To: Wojciech Drewek <wojciech.drewek@intel.com>,
+ intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org, jiri@resnulli.us
+References: <20240123111849.9367-1-wojciech.drewek@intel.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20240123111849.9367-1-wojciech.drewek@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-
-
-On 1/22/24 21:34, Timur Tabi wrote:
-> On Mon, Jan 22, 2024 at 6:02 AM Konrad Dybcio <konrad.dybcio@linaro.org> wrote:
->>
->> This SoC family was destined for server use, featuring Qualcomm's very
->> interesting Kryo cores (before "Kryo" became a marketing term for Arm
->> cores with small modifications). It did however not leave the labs of
->> Qualcomm and presumably some partners, nor was it ever productized.
->>
->> Remove the related drivers, as they seem to be long obsolete.
->>
->> Signed-off-by: Konrad Dybcio <konrad.dybcio@linaro.org>
+On 23/01/2024 11:18, Wojciech Drewek wrote:
+> Recent changes to the devlink reload (commit 9b2348e2d6c9
+> ("devlink: warn about existing entities during reload-reinit"))
+> force the drivers to destroy devlink ports during reinit.
+> Adjust ice driver to this requirement, unregister netdvice, destroy
+> devlink port. ice_init_eth() was removed and all the common code
+> between probe and reload was moved to ice_load().
 > 
-> Sad day indeed, but understandable.
+> During devlink reload we can't take devl_lock (it's already taken)
+> and in ice_probe() we have to lock it. Use devl_* variant of the API
+> which does not acquire and release devl_lock. Guard ice_load()
+> with devl_lock only in case of probe.
 > 
-> Acked-by: Timur Tabi <timur@kernel.org>
+> Introduce ice_debugfs_fwlog_deinit() in order to release PF's
+> debugfs entries. Move ice_debugfs_exit() call to ice_module_exit().
 > 
-> If you're looking for other QDF stuff to remove, the QDF2400 hacks in
-> the SBSA UART driver really should go.
+> Suggested-by: Jiri Pirko <jiri@nvidia.com>
+> Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
+> ---
+>   drivers/net/ethernet/intel/ice/ice.h         |   3 +
+>   drivers/net/ethernet/intel/ice/ice_debugfs.c |  10 +
+>   drivers/net/ethernet/intel/ice/ice_devlink.c |  68 ++++++-
+>   drivers/net/ethernet/intel/ice/ice_fwlog.c   |   2 +
+>   drivers/net/ethernet/intel/ice/ice_main.c    | 189 ++++++-------------
+>   5 files changed, 139 insertions(+), 133 deletions(-)
+> 
 
-I have a branch completely axing it, but it looks like Qualcomm
-apparently still uses some internally [1].. I'm not super happy,
-but let's wait on this one.
+[...]
 
-Konrad
+> +/**
+> + * ice_devlink_reinit_up - do reinit of the given PF
+> + * @pf: pointer to the PF struct
+> + */
+> +static int ice_devlink_reinit_up(struct ice_pf *pf)
+> +{
+> +	struct ice_vsi *vsi = ice_get_main_vsi(pf);
+> +	struct ice_vsi_cfg_params params = {};
 
-[1] https://lore.kernel.org/linux-arm-msm/52479377-ff61-7537-e4aa-064ab4a77c03@quicinc.com/
+no need for empy init here ...
+
+> +	int err;
+> +
+> +	err = ice_init_dev(pf);
+> +	if (err)
+> +		return err;
+> +
+> +	params = ice_vsi_to_params(vsi);
+
+... because it's completely overwritten here.
+
+> +	params.flags = ICE_VSI_FLAG_INIT;
+> +
+> +	rtnl_lock();
+> +	err = ice_vsi_cfg(vsi, &params);
+> +	if (err)
+> +		goto err_vsi_cfg;
+> +	rtnl_unlock();
+> +
+> +	/* No need to take devl_lock, it's already taken by devlink API */
+> +	err = ice_load(pf);
+> +	if (err)
+> +		goto err_load;
+> +
+> +	return 0;
+> +
+> +err_load:
+> +	rtnl_lock();
+> +	ice_vsi_decfg(vsi);
+> +err_vsi_cfg:
+> +	rtnl_unlock();
+> +	ice_deinit_dev(pf);
+> +	return err;
+> +}
+> +
+
+
 
