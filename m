@@ -1,119 +1,215 @@
-Return-Path: <netdev+bounces-65068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D531B8390E5
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 15:10:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AF3083913C
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 15:21:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 873B81F2A3B9
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 14:10:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 182D41F2887E
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 14:21:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8DBC5F848;
-	Tue, 23 Jan 2024 14:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2306B5F876;
+	Tue, 23 Jan 2024 14:21:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NEAHLMHI"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="PKayuLNr";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="iaeyMu9I"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from wout4-smtp.messagingengine.com (wout4-smtp.messagingengine.com [64.147.123.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9465B5F845
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 14:10:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 430415F858;
+	Tue, 23 Jan 2024 14:21:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706019025; cv=none; b=j+UVC0xrwIuT6CG91JeBTE95v3ogKyDozLyRPDAzdA4h9bcPKLNBy1yEsWbLkKO6GQ8KUCazv89QzpdSJ9M2UjQFLv5iL8YIxfABjXMtm1NVk5CXFz+vczI+rZK0hhMTUbW2raiH7AUEhIsfCdjisDMlfqQEZhXso4koKHXLh7A=
+	t=1706019701; cv=none; b=OPJs9xME0cXRUlLLAhRFb+ARqA8Ewxpwat3jdiyIxavfu6qb2VoqovQZDpqg0syoqvvbb6gcrtpbm7L7w5wRrDeniihanq0vM0fsRmLlnDVKKJZyIsJgp69yzQi7NRVVC0l4+YSpMze1FzkqecV3LOxQDhvX+tkoH0kXemp5374=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706019025; c=relaxed/simple;
-	bh=As4BfAmUzDoiHW5HROtVC2rYFYWioxlJEDCuxr6sRU4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FLetN3KIpmN/Z6ONO6ivETtj2jbrEhM3qSMxNW5/GkB7J0VF/Ky2XkUEtDe1Y3rEH+J8vTQPNd9PgyuftWtG4C40f0R/PCOzsptVSBJEGOE8B+8qRmUJ664/X2npzTTU5HGcDxD0eHd2G4eut0QGBKuQazb1Q3Gp5Ib4wlk6Hks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NEAHLMHI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0D32AC43394;
-	Tue, 23 Jan 2024 14:10:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706019025;
-	bh=As4BfAmUzDoiHW5HROtVC2rYFYWioxlJEDCuxr6sRU4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=NEAHLMHIOPntJ3x9I1CuZuFWp7o41URraiUHicEaRyNxdRNnfNzhd918ZdmSVxiEv
-	 Fwcl+2TDUaIkylBDS26USAKcCpuF/slLw+P/mL66lbbIL0sM65YVGJFwkMtGJEfG9h
-	 F8maBEUvfSqE/leMLV1WnggnanT1Fkrz0D+QsNzu6ptaBc40yyFhFz9vk4AQFUJOTU
-	 sjy6EHUvWEnWWwSD9EiHRw8i5ik0jCBWmg5MV5JzQcFcboIHTuE8IlamdVoDxZ5yQG
-	 vLfshfoMlk0zCqbSl9iEUXPTVhVMmp6kR9w+RHaSQxx7gdCoSrFQfybAgJvtuy3yjj
-	 /RdFlrFiBN0Xw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EC797DC99E0;
-	Tue, 23 Jan 2024 14:10:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1706019701; c=relaxed/simple;
+	bh=BWxFJ6f+lO7oLYsKbxzaJnDar3I13n2vm78DWeqz9IY=;
+	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
+	 Subject:Content-Type; b=FGurJrD2FVc2LQPBukY/6oCCxfahRa/wu+ND5YE51PM39x/do822ysbdaIDpyaGZGCKCeQY2LlsLiAVZRqBJ4lFUV4SztbjbbyH2wBGyOqY26m6eoT3Lbm+PcLHTpVHLpjld4AZk/jh6iqfMOYDuouGM6byvOX+40+fXGMYrJLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=PKayuLNr; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=iaeyMu9I; arc=none smtp.client-ip=64.147.123.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.west.internal (Postfix) with ESMTP id F2C013200A04;
+	Tue, 23 Jan 2024 09:21:36 -0500 (EST)
+Received: from imap51 ([10.202.2.101])
+  by compute5.internal (MEProxy); Tue, 23 Jan 2024 09:21:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1706019696;
+	 x=1706106096; bh=Wb2LadyDq3EncKOixdkKXF1xf+5ToI114DbbSpnU1nY=; b=
+	PKayuLNrs/RNOnY9Pm3PTRTDtc1BuvHxlCD7DuFwY3X2d3w/3n1RTZ9LkQQmom3/
+	w6idujhcC4sf3BbCM5+B3rKAeN6o49DZxzKkXiUHhjhwBc48BWX6QQG9FBbGrESz
+	dY9isiD4klmX7hDZxIpR0XAo9bx2f3HmXbcXHrgnWu377wYBVGHNDJeydLYODUm3
+	R2v4IQChjpBjq1THZkrhojBT62tPQZhhhJX7vhM3GS1LAQ5MUjk8AsVhFsBFrQgH
+	doe9VBd2+6WHeaR4G96Yes5cYzvayqaI2fWvhDYf/ZZHo1Zb7cz6wduRTcnHpKrW
+	6kE0Ci1RccWeYTA5fc/t/A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1706019696; x=
+	1706106096; bh=Wb2LadyDq3EncKOixdkKXF1xf+5ToI114DbbSpnU1nY=; b=i
+	aeyMu9IQJm8viLVFcRG2+AfApl0inhRKl32d9bxe+ynOLxLBL2s/6xnBdR+sart7
+	wAZAjiA4uL/DTaIWBboS2/YhhyDMgMYyxOQ4f604bM7uJzQt+e/9izTFd+xJifVo
+	xQ50WHbYZD/V2ZAwYra6Pek4hm9CLQF0AsKq4BVdceSEFeVHgMY+a42IjHl2qdAC
+	3tidNdDH6brWPgcA3qtQ97S9I8mHpThso03DUhwzCMsTMvIaulq1IZgWkWvjI17h
+	qB/abhBsPAnPQnf0Ws70h0wwPbXzEqjR98NOYls5N0AIzgYtr4Y02V+Cwfh6GpX1
+	RL81i2NKrtG69Wlsq/MXA==
+X-ME-Sender: <xms:b8uvZZutZyYhjvm11xsbDHd-yctTohxrZ96EclPn7v7Uk295CAYxIA>
+    <xme:b8uvZSdJ-DzXvh4tLWbWKsloyBAkMqIGhWu0zDscTRdh84QtuWV6_vntH6OGKUGWc
+    o9tQr6gGnuPR811080>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdekkedgieduucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtgfesthhqredtreerjeenucfhrhhomhepfdet
+    rhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrg
+    htthgvrhhnpefgkeeuleegieeghfduudeltdekfeffjeeuleehleefudettddtgfevueef
+    feeigeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivg
+    eptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvg
+X-ME-Proxy: <xmx:b8uvZcyHxEDFbucCwS_wdJTB7xZCjv4VpoI1kQNX4uuVdNYjj6sBQw>
+    <xmx:b8uvZQOGooI-lZsO5yozfuK-_cjQpfLDCPfU0iE3UrR2Mn2j9dL4qQ>
+    <xmx:b8uvZZ-FoQRRZFNwPBfm4zrKoG5PrhcOqTLtRYQnZkkS4F1E545I9g>
+    <xmx:cMuvZdVu3pmkvuhw0wgTNHs20QG_zyCJ2SI5aNTi4b7I7-93_VGCkA>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id C023DB6008D; Tue, 23 Jan 2024 09:21:35 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.11.0-alpha0-119-ga8b98d1bd8-fm-20240108.001-ga8b98d1b
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] ipv6: init the accept_queue's spinlocks in inet6_create
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170601902496.22645.15094740282920490034.git-patchwork-notify@kernel.org>
-Date: Tue, 23 Jan 2024 14:10:24 +0000
-References: <20240122102001.2851701-1-shaozhengchao@huawei.com>
-In-Reply-To: <20240122102001.2851701-1-shaozhengchao@huawei.com>
-To: shaozhengchao <shaozhengchao@huawei.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- weiyongjun1@huawei.com, yuehaibing@huawei.com
+Message-Id: <0229fa60-2d87-4b1c-b9f0-6f04c6e4dbdd@app.fastmail.com>
+In-Reply-To: <d03e90ca-8485-4d1b-5ec1-c3398e0e8da@linux-m68k.org>
+References: 
+ <CAHk-=wiB4iHTtfZKiy5pC24uOjun4fbj4kSX0=ZnGsOXadMf6g@mail.gmail.com>
+ <20240123111235.3097079-1-geert@linux-m68k.org>
+ <d03e90ca-8485-4d1b-5ec1-c3398e0e8da@linux-m68k.org>
+Date: Tue, 23 Jan 2024 15:21:14 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Geert Uytterhoeven" <geert@linux-m68k.org>, linux-kernel@vger.kernel.org
+Cc: linuxppc-dev@lists.ozlabs.org, linux-sh@vger.kernel.org,
+ sparclinux@vger.kernel.org, intel-xe@lists.freedesktop.org,
+ dri-devel@lists.freedesktop.org, linux-mtd@lists.infradead.org,
+ mpi3mr-linuxdrv.pdl@broadcom.com, linux-scsi@vger.kernel.org,
+ "Chris Zankel" <chris@zankel.net>, "Max Filippov" <jcmvbkbc@gmail.com>,
+ linux-hardening@vger.kernel.org, qat-linux@intel.com,
+ linux-crypto@vger.kernel.org,
+ "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+ Netdev <netdev@vger.kernel.org>
+Subject: Re: Build regressions/improvements in v6.8-rc1
+Content-Type: text/plain;charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Tue, Jan 23, 2024, at 12:45, Geert Uytterhoeven wrote:
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+>> 68 error regressions:
+>
+>>  + /kisskb/src/arch/powerpc/sysdev/udbg_memcons.c: error: no previous=
+ prototype for 'memcons_getc' [-Werror=3Dmissing-prototypes]:  =3D> 80:5
+>>  + /kisskb/src/arch/powerpc/sysdev/udbg_memcons.c: error: no previous=
+ prototype for 'memcons_getc_poll' [-Werror=3Dmissing-prototypes]:  =3D>=
+ 57:5
+>>  + /kisskb/src/arch/powerpc/sysdev/udbg_memcons.c: error: no previous=
+ prototype for 'memcons_putc' [-Werror=3Dmissing-prototypes]:  =3D> 44:6
+>
+> powerpc-gcc{5,12,13}/ppc64_book3e_allmodconfig
 
-On Mon, 22 Jan 2024 18:20:01 +0800 you wrote:
-> In commit 198bc90e0e73("tcp: make sure init the accept_queue's spinlocks
-> once"), the spinlocks of accept_queue are initialized only when socket is
-> created in the inet4 scenario. The locks are not initialized when socket
-> is created in the inet6 scenario. The kernel reports the following error:
-> INFO: trying to register non-static key.
-> The code is fine but needs lockdep annotation, or maybe
-> you didn't initialize this object before use?
-> turning off the locking correctness validator.
-> Hardware name: Red Hat KVM, BIOS 0.5.1 01/01/2011
-> Call Trace:
-> <TASK>
-> 	dump_stack_lvl (lib/dump_stack.c:107)
-> 	register_lock_class (kernel/locking/lockdep.c:1289)
-> 	__lock_acquire (kernel/locking/lockdep.c:5015)
-> 	lock_acquire.part.0 (kernel/locking/lockdep.c:5756)
-> 	_raw_spin_lock_bh (kernel/locking/spinlock.c:178)
-> 	inet_csk_listen_stop (net/ipv4/inet_connection_sock.c:1386)
-> 	tcp_disconnect (net/ipv4/tcp.c:2981)
-> 	inet_shutdown (net/ipv4/af_inet.c:935)
-> 	__sys_shutdown (./include/linux/file.h:32 net/socket.c:2438)
-> 	__x64_sys_shutdown (net/socket.c:2445)
-> 	do_syscall_64 (arch/x86/entry/common.c:52)
-> 	entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:129)
-> RIP: 0033:0x7f52ecd05a3d
-> Code: 5b 41 5c c3 66 0f 1f 84 00 00 00 00 00 f3 0f 1e fa 48 89 f8 48 89 f7
-> 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff
-> ff 73 01 c3 48 8b 0d ab a3 0e 00 f7 d8 64 89 01 48
-> RSP: 002b:00007f52ecf5dde8 EFLAGS: 00000293 ORIG_RAX: 0000000000000030
-> RAX: ffffffffffffffda RBX: 00007f52ecf5e640 RCX: 00007f52ecd05a3d
-> RDX: 00007f52ecc8b188 RSI: 0000000000000000 RDI: 0000000000000004
-> RBP: 00007f52ecf5de20 R08: 00007ffdae45c69f R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000293 R12: 00007f52ecf5e640
-> R13: 0000000000000000 R14: 00007f52ecc8b060 R15: 00007ffdae45c6e0
-> 
-> [...]
+I now sent patches for powerpc booke warnings
 
-Here is the summary with links:
-  - [net] ipv6: init the accept_queue's spinlocks in inet6_create
-    https://git.kernel.org/netdev/net/c/435e202d645c
+>>  + /kisskb/src/arch/sh/kernel/cpu/init.c: error: no previous prototyp=
+e for 'l2_cache_init' [-Werror=3Dmissing-prototypes]:  =3D> 99:29
+>
+> sh4-gcc1[123]/se7{619,750}_defconfig
+> sh4-gcc1[123]/sh-{all{mod,no,yes},def}config
+> sh4-gcc11/sh-allnoconfig
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+I assume the sh maintainers will eventually get to that
 
+>>  + /kisskb/src/arch/sparc/include/asm/floppy_64.h: error: no previous=
+ prototype for 'sparc_floppy_irq' [-Werror=3Dmissing-prototypes]:  =3D> =
+200:13
+>>  + /kisskb/src/arch/sparc/include/asm/floppy_64.h: error: no previous=
+ prototype for 'sun_pci_fd_dma_callback' [-Werror=3Dmissing-prototypes]:=
+  =3D> 437:6
+>
+> sparc64-gcc{5,11,12,13}/sparc64-allmodconfig
 
+Andrew Morton did a patch for the sparc warnings, and Andreas Larsson
+is joining as a maintainer, so hopefully he can pick that up soon.
+> sparc64-gcc{5,1[123]}/sparc64-allmodconfig
+>
+>>  + /kisskb/src/arch/sparc/vdso/vclock_gettime.c: error: no previous p=
+rototype for '__vdso_clock_gettime' [-Werror=3Dmissing-prototypes]:  =3D=
+> 254:1
+>>  + /kisskb/src/arch/sparc/vdso/vclock_gettime.c: error: no previous p=
+rototype for '__vdso_clock_gettime_stick' [-Werror=3Dmissing-prototypes]=
+:  =3D> 282:1
+>>  + /kisskb/src/arch/sparc/vdso/vclock_gettime.c: error: no previous p=
+rototype=20
+
+There are prototypes in include/vdso/gettime.h that should be
+used here, but unfortunately the sparc implementation does
+not match the prototypes because sparc is missing the gettime64
+support.
+
+> sparc64-gcc{5,12,13}/sparc64-{allno,def}config
+> sparc64-gcc11/sparc64-{all{mod,no},def}config
+>
+>>  + /kisskb/src/arch/x86/um/shared/sysdep/kernel-offsets.h: error: no =
+previous prototype for =E2=80=98foo=E2=80=99 [-Werror=3Dmissing-prototyp=
+es]:  =3D> 9:6
+>
+> um-x86_64-gcc12/um-{all{mod,yes},def}config
+
+I made a patch for arch/um yesterday.
+
+> sparc64-gcc1[12]/sparc64-allmodconfig
+>
+>>  + /kisskb/src/drivers/scsi/mpi3mr/mpi3mr_transport.c: error: the fra=
+me size of 1680 bytes is larger than 1536 bytes [-Werror=3Dframe-larger-=
+than=3D]:  =3D> 1818:1
+
+I sent a patch in November when the regression started, missed
+the reply about needing another change
+https://lore.kernel.org/all/CAFdVvOxH4UQjww4124E2ttuTgknzkHoPxVSFOQgLfoV=
+_dkANwQ@mail.gmail.com/
+
+>>  + {standard input}: Error: displacement to undefined symbol .L105 ov=
+erflows 8-bit field :  =3D> 590, 593
+>>  + {standard input}: Error: displacement to undefined symbol .L135 ov=
+erflows 8-bit field :  =3D> 603
+>>  + {standard input}: Error: displacement to undefined symbol .L140 ov=
+erflows 8-bit field :  =3D> 606
+>>  + {standard input}: Error: displacement to undefined symbol .L76 ove=
+rflows 12-bit field:  =3D> 591, 594
+>>  + {standard input}: Error: displacement to undefined symbol .L77 ove=
+rflows 8-bit field : 607 =3D> 607, 582, 585
+>>  + {standard input}: Error: displacement to undefined symbol .L97 ove=
+rflows 12-bit field:  =3D> 607
+>>  + {standard input}: Error: pcrel too far: 604, 590, 577, 593, 572, 5=
+69, 598, 599, 596, 610 =3D> 610, 574, 599, 569, 598, 596, 601, 590, 604,=
+ 595, 572, 577, 593
+>
+> SH ICE crickets
+
+Linus did a patch for the syscall, and I sent another one for
+arch/sh to prevent this from happening again:
+
+https://lore.kernel.org/all/CAHk-=3Dwjh6Cypo8WC-McXgSzCaou3UXccxB+7PVeSu=
+GR8AjCphg@mail.gmail.com/
+https://lore.kernel.org/all/07d8877b-d933-46f4-8ca4-c10ed602f37e@app.fas=
+tmail.com/
+
+Resent mine now.
+
+      Arnd
 
