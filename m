@@ -1,91 +1,131 @@
-Return-Path: <netdev+bounces-65138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97CBE839572
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:55:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D156F83959E
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 18:01:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C2841F307A0
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 16:55:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D2A58B2E462
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 16:55:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B08186148;
-	Tue, 23 Jan 2024 16:48:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5FE67F7E6;
+	Tue, 23 Jan 2024 16:49:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r8OS+XSo"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="AJPv6UFG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07B8585C7F
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 16:48:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7CFF7F7D6;
+	Tue, 23 Jan 2024 16:49:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706028515; cv=none; b=D0MgSmjgrGQ5R7zpM/sW5dDXSanM/S38FXB9I+vatYbUPbX9vVEUq80WfJ3YqWjChVkm/6/JhlcsyRu5oXSb59kd1XVsLAlR8+34WtFd0RYoOAzz54DYRyF+x6aBKCyqVOfLBdK9lRh10A+fjjx0wZVXxRdHz8QlxYACXTBgXj0=
+	t=1706028565; cv=none; b=V/5vip1ms4SMH9dE6OEkIEkEfzdo9dgJKdjIoEjC79awTy8m5Axv5jyvrcx+gQW9QljCgHwpZjbX8ziRdBuEi8xSgpBQMZPTMo5PWZ2G7/Cb+gyvmET3lCLXm+c/sN/qNMQwtGmOI1EAMbl3luVKfNd5vOc2OiuUDfiWULpDt6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706028515; c=relaxed/simple;
-	bh=RYoO9jDumV+r59op/XZ/ktXEsNIugdrzJGVKIDBudlA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s+QLkMwVZXSfhsFn1DFc+le16YpbjdrAwl2kVVwD0KiF0e4t9DPQ2iAb6uBD8VVWx7DDu3GUpXhL63/hCQ5YIuILcAEG5TZy+ovSpA1JN3eoLzhiIU0uTOy5JsIlYFqs2wGWQNQtTOuS2LGMcpah9Q6XbUbNyftREGlLjP+kNgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r8OS+XSo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B6B0C433C7;
-	Tue, 23 Jan 2024 16:48:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706028514;
-	bh=RYoO9jDumV+r59op/XZ/ktXEsNIugdrzJGVKIDBudlA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=r8OS+XSoMyeAvG8ypAPS00QpS8EBN3IMbf/k6IKeiZyhF1K4yzFUCD2AEDdCwv1Av
-	 Uo/JGhX/77ZqdpfXkJg3nOGNIQX8yS/pxWYbdfNFH7rTleIiuTJol6LEKIkC6MD8EK
-	 en17YNG0181OxkQz5fW3VuDRSVm9KFR96kPTGptsVxGBYfZeyjNc3HWdwRjWx3UZgw
-	 +yRSfGFdR58bPHBVLwUtkWhMVU3D75TB33nfRLDsLZJmpvQLSy66m6Tqg6HjKfgHe/
-	 GH7QEysBK668Z/r7pCpYWc970nLeUab3y91EB4qL1YJtFTIj0Qm3PHCMvd24gR5pdP
-	 NA4wguTvkJcEQ==
-Date: Tue, 23 Jan 2024 16:48:30 +0000
-From: Simon Horman <horms@kernel.org>
-To: Karol Kolacinski <karol.kolacinski@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com, jesse.brandeburg@intel.com,
-	Jacob Keller <jacob.e.keller@intel.com>
-Subject: Re: [PATCH v7 iwl-next 2/7] ice: pass reset type to PTP reset
- functions
-Message-ID: <20240123164830.GH254773@kernel.org>
-References: <20240123105131.2842935-1-karol.kolacinski@intel.com>
- <20240123105131.2842935-3-karol.kolacinski@intel.com>
+	s=arc-20240116; t=1706028565; c=relaxed/simple;
+	bh=s8eNjaucuWQYc0HKJeNwNy6Unt32xpOwN41j7lwXD78=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VfwVSJA1R/usPZyTgIswuhFhIoq5TBS6GgaCz6QdsCkNIZ+pVo6UxSpOxo9D6txwn8LH8GNLufST2VjD64XWdsnqirWcBptUe0w5mMjwNTYCdD5KBkSwSfr77K7pDX9XAS1SluLw4YXtq3ykDd9LWErHuI706JTmZqAquHyKymU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=AJPv6UFG; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPA id E032D2000A;
+	Tue, 23 Jan 2024 16:49:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1706028560;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=2/nVxlyyP875JRLsYNdHih9WHy+g/yRTle4VEGY2Rms=;
+	b=AJPv6UFGth4LkYMBRqtVGek3ksv+x7ewYqfnh5SiFiHrCCEyllw+hWxspNsaktGZrsGJTf
+	hEJni2Cc7B4XPOVajApwG26SYDnc829fFcuEiWEakOEhzPgJubRDNN1P3ntj3679Fqq28t
+	6S4tEyPCFd6oWkC6yYFo+plkZDnxRChOhTOyOfNM/J41xOJ02H+ymWRwRIXivjykxsvhnA
+	a64RYSysgOBobhNQ5xsZBICe/8GyyY4p6Gac1XP2lTi5TEv7aGlqSj/Mf1KA3hmt37RVxz
+	4PAF7dF6akyBr/DjEHjwRJIUA/YMtOjQv8sYkpFrwCW9o92Ou40iEkYiSLqeqQ==
+From: Herve Codina <herve.codina@bootlin.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Herve Codina <herve.codina@bootlin.com>
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	Andrew Lunn <andrew@lunn.ch>,
+	Mark Brown <broonie@kernel.org>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: [PATCH 0/4] Add support for QMC HDLC
+Date: Tue, 23 Jan 2024 17:49:05 +0100
+Message-ID: <20240123164912.249540-1-herve.codina@bootlin.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240123105131.2842935-3-karol.kolacinski@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
-On Tue, Jan 23, 2024 at 11:51:26AM +0100, Karol Kolacinski wrote:
-> From: Jacob Keller <jacob.e.keller@intel.com>
-> 
-> The ice_ptp_prepare_for_reset() and ice_ptp_reset() functions currently
-> check the pf->flags ICE_FLAG_PFR_REQ bit to determine if the current
-> reset is a PF reset or not.
-> 
-> This is problematic, because it is possible that a PF reset and a higher
-> level reset (CORE reset, GLOBAL reset, EMP reset) are requested
-> simultaneously. In that case, the driver performs the highest level
-> reset requested. However, the ICE_FLAG_PFR_REQ flag will still be set.
-> 
-> The main driver reset functions take an enum ice_reset_req indicating
-> which reset is actually being performed. Pass this data into the PTP
-> functions and rely on this instead of relying on the driver flags.
-> 
-> This ensures that the PTP code performs the proper level of reset that
-> the driver is actually undergoing.
-> 
-> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Hi,
 
-Sorry, I sent this just now for v6, not realising that v7 had been posted.
+This series introduces the QMC HDLC support.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Patches were previously sent as part of a full feature series and were
+previously reviewed in that context:
+"Add support for QMC HDLC, framer infrastructure and PEF2256 framer" [1]
+
+In order to ease the merge, the full feature series has been split and
+needed parts were merged in v6.8-rc1:
+ - "Prepare the PowerQUICC QMC and TSA for the HDLC QMC driver" [2]
+ - "Add support for framer infrastructure and PEF2256 framer" [3]
+
+This series contains patches related to the QMC HDLC part (QMC HDLC
+driver):
+ - Introduce the QMC HDLC driver (patches 1 and 2)
+ - Add timeslots change support in QMC HDLC (patch 3)
+ - Add framer support as a framer consumer in QMC HDLC (patch 4)
+
+Compare to the original full feature series, a modification was done on
+patch 3 in order to use a coherent prefix in the commit title.
+
+I kept the patches unsquashed as they were previously sent and reviewed.
+Of course, I can squash them if needed.
+
+Best regards,
+Hervé
+
+[1]: https://lore.kernel.org/linux-kernel/20231115144007.478111-1-herve.codina@bootlin.com/
+[2]: https://lore.kernel.org/linux-kernel/20231205152116.122512-1-herve.codina@bootlin.com/
+[3]: https://lore.kernel.org/linux-kernel/20231128132534.258459-1-herve.codina@bootlin.com/
+
+Changes compare to the full feature series:
+  - Patch 3
+    Use 'net: wan: fsl_qmc_hdlc:' as commit title prefix
+
+Patches extracted:
+  - Patch 1 : full feature series patch 7
+  - Patch 2 : full feature series patch 8
+  - Patch 3 : full feature series patch 20
+  - Patch 4 : full feature series patch 27
+
+Herve Codina (4):
+  net: wan: Add support for QMC HDLC
+  MAINTAINERS: Add the Freescale QMC HDLC driver entry
+  net: wan: fsl_qmc_hdlc: Add runtime timeslots changes support
+  net: wan: fsl_qmc_hdlc: Add framer support
+
+ MAINTAINERS                    |   7 +
+ drivers/net/wan/Kconfig        |  12 +
+ drivers/net/wan/Makefile       |   1 +
+ drivers/net/wan/fsl_qmc_hdlc.c | 820 +++++++++++++++++++++++++++++++++
+ 4 files changed, 840 insertions(+)
+ create mode 100644 drivers/net/wan/fsl_qmc_hdlc.c
+
+-- 
+2.43.0
+
 
