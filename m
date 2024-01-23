@@ -1,63 +1,66 @@
-Return-Path: <netdev+bounces-65117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D3F283946C
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:13:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91C6C839481
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:18:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22C4E28B031
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 16:13:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 303F01F258D8
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 16:18:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 874ED63512;
-	Tue, 23 Jan 2024 16:12:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8319F6351A;
+	Tue, 23 Jan 2024 16:17:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=pschenker.ch header.i=@pschenker.ch header.b="n6HPYBOg"
+	dkim=pass (1024-bit key) header.d=pschenker.ch header.i=@pschenker.ch header.b="F519chZT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-8fac.mail.infomaniak.ch (smtp-8fac.mail.infomaniak.ch [83.166.143.172])
+Received: from smtp-bc0a.mail.infomaniak.ch (smtp-bc0a.mail.infomaniak.ch [45.157.188.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3A5B62A00
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 16:12:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.166.143.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DF596281F
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 16:17:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706026374; cv=none; b=vGl1mchIcO/WDTcWgLQRNpTu+uJZzvLEzVUcjV0PrCIWBhjrzWfv1dRS4rJd3JnHgrt2++Rm9hpbX6yEuRHov/Z9TqNPfYSYapg9fN2W9QBZq8J/e31+gCgrACjvsxOifFCrMMJLQjFip/Fv64ud0/rng1GRsm4Vvi+bPSZjgJU=
+	t=1706026678; cv=none; b=TBUNvYZ7oTSJ5dZgVMho29j9ysUS4JWUraZWG4vBQf3YC/snWQmF4zoAqEh5H0QHzbr22qgXSsZioX2/LIlpt1xGL/BLa2IxcMOVcr/UIXVcoR0+EfD1ZtWaRBpmLHrFhqF59ET8AqA0hERh8KqHIQ8itVAK7IfaoNSKWaiqSP8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706026374; c=relaxed/simple;
-	bh=i1OzNCpI26Wg0eT7rbnbAnzeVkcf9qe2qCiLeIsXEWg=;
+	s=arc-20240116; t=1706026678; c=relaxed/simple;
+	bh=1NG8wi6AszbC+t2mITn/X0WKvcHrmSYn4Gpm9d1E7n0=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=jmmKmLY/mwjLTFQwZQiA0l1/K5oZyK0ER6kG/68HaCSKZR5Ugzyr1KSqONKZI0AMPSUGpLjY0sQXeTlX1Ss2kJLiNgGS9fr2BPQGMF7qt7etE2hVTQ82LBOMM0vpVd4z1436ycR0+vYNChtVWGrZ+plC5RiNFSDAJM5cJcMHhyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pschenker.ch; spf=pass smtp.mailfrom=pschenker.ch; dkim=pass (1024-bit key) header.d=pschenker.ch header.i=@pschenker.ch header.b=n6HPYBOg; arc=none smtp.client-ip=83.166.143.172
+	 Content-Type:MIME-Version; b=J26gu6KWzhQxTcrX1aPGwGktDGQOJ3gPTKlvX7zMawyUqDiXEZX7dJYofg3GDorOlJ6+R+u/i2/1HZn2kOw0+QlsT6CkR/UM99R221Q7bLBKuTPDFzjuFpymWbufI3NEPeQ8MNGEMw97fSAFkVhYu8YiP7wrr+/gyfnVddh79fU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pschenker.ch; spf=pass smtp.mailfrom=pschenker.ch; dkim=pass (1024-bit key) header.d=pschenker.ch header.i=@pschenker.ch header.b=F519chZT; arc=none smtp.client-ip=45.157.188.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pschenker.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pschenker.ch
-Received: from smtp-3-0001.mail.infomaniak.ch (unknown [10.4.36.108])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4TKBvN48cyzMrCDr;
-	Tue, 23 Jan 2024 17:12:48 +0100 (CET)
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4TKBvM3nVZzMpnPd;
-	Tue, 23 Jan 2024 17:12:47 +0100 (CET)
+Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4TKC1G3P7FzMqFgm;
+	Tue, 23 Jan 2024 17:17:54 +0100 (CET)
+Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4TKC1F6DShzr4;
+	Tue, 23 Jan 2024 17:17:53 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=pschenker.ch;
-	s=20220412; t=1706026368;
-	bh=i1OzNCpI26Wg0eT7rbnbAnzeVkcf9qe2qCiLeIsXEWg=;
+	s=20220412; t=1706026674;
+	bh=1NG8wi6AszbC+t2mITn/X0WKvcHrmSYn4Gpm9d1E7n0=;
 	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=n6HPYBOgx3QZrZaTJTN/XIEdKCiR8caM1kdebelBwztZLf7vueVmGN4+DP6klUj6W
-	 XM1vBunZEOSJaEi53JZeepGMZS2pOTFxXht/8Zx/baprcxgAzaP1wXYs6lZtnIkmoh
-	 fOcCvpns27o+GitARfZBbWw1xHY0jfSMijyeRm2I=
-Message-ID: <3296d591ac66edb5f0c20ef31f9502d58d43fb4e.camel@pschenker.ch>
-Subject: Re: [PATCH net-next v1 2/2] net: dsa: Add KSZ8567 switch support
+	b=F519chZTJVObdy2utWFWlWTH24Apz/VpWi/QpvB+KxeHkqtE98o1TTT1fXq61NgK6
+	 5ee7pjWUiJ6viyIQyOFKs2nIBqE5c9DMoJf9YNJr6eotoDf8MMnfEpSR2aLfatIAmj
+	 x21UmRMKRV8e5BCnndG/sC5Kc3wb1eONigMf0ILA=
+Message-ID: <b2e232de11cee47a5932fccc2d151a9c7c276784.camel@pschenker.ch>
+Subject: Re: [PATCH net-next v1 1/2] dt-bindings: net: dsa: Add KSZ8567
+ switch support
 From: Philippe Schenker <dev@pschenker.ch>
-To: Arun.Ramadoss@microchip.com, netdev@vger.kernel.org
-Cc: olteanv@gmail.com, andrew@lunn.ch, krzysztof.kozlowski+dt@linaro.org, 
- Woojung.Huh@microchip.com, davem@davemloft.net, marex@denx.de,
- pabeni@redhat.com,  conor+dt@kernel.org, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org,  UNGLinuxDriver@microchip.com,
- edumazet@google.com, kuba@kernel.org,  robh+dt@kernel.org,
- f.fainelli@gmail.com
-Date: Tue, 23 Jan 2024 17:12:47 +0100
-In-Reply-To: <605c219739760b1f4ef5fa47216fc3d5d8bc8c46.camel@microchip.com>
+To: Conor Dooley <conor@kernel.org>
+Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, Conor Dooley
+ <conor+dt@kernel.org>, Woojung Huh <woojung.huh@microchip.com>, Vladimir
+ Oltean <olteanv@gmail.com>, linux-kernel@vger.kernel.org,
+ UNGLinuxDriver@microchip.com,  Marek Vasut <marex@denx.de>, Florian
+ Fainelli <f.fainelli@gmail.com>, devicetree@vger.kernel.org, Eric Dumazet
+ <edumazet@google.com>, "David S . Miller" <davem@davemloft.net>, Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Jakub Kicinski
+ <kuba@kernel.org>,  Andrew Lunn <andrew@lunn.ch>, Rob Herring
+ <robh+dt@kernel.org>
+Date: Tue, 23 Jan 2024 17:17:53 +0100
+In-Reply-To: <20240123-ripening-tabby-b97785375990@spud>
 References: <20240123135014.614858-1-dev@pschenker.ch>
-	 <20240123135014.614858-2-dev@pschenker.ch>
-	 <605c219739760b1f4ef5fa47216fc3d5d8bc8c46.camel@microchip.com>
+	 <20240123-ripening-tabby-b97785375990@spud>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 User-Agent: Evolution 3.44.4-0ubuntu2 
@@ -69,18 +72,13 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-Infomaniak-Routing: alpha
 
-Hi Arun and thanks for your message!
 
-On Tue, 2024-01-23 at 15:58 +0000, Arun.Ramadoss@microchip.com wrote:
-> Hi Philippe,
->=20
-> On Tue, 2024-01-23 at 14:50 +0100, Philippe Schenker wrote:
-> > EXTERNAL EMAIL: Do not click links or open attachments unless you
-> > know the content is safe
-> >=20
+
+On Tue, 2024-01-23 at 16:06 +0000, Conor Dooley wrote:
+> On Tue, Jan 23, 2024 at 02:50:13PM +0100, Philippe Schenker wrote:
 > > From: Philippe Schenker <philippe.schenker@impulsing.ch>
 > >=20
-> > This commit introduces support for the KSZ8567, a robust 7-port
+> > This commit adds the dt-binding for KSZ8567, a robust 7-port
 > > Ethernet switch. The KSZ8567 features two RGMII/MII/RMII
 > > interfaces,
 > > each capable of gigabit speeds, complemented by five 10/100 Mbps
@@ -88,21 +86,44 @@ On Tue, 2024-01-23 at 15:58 +0000, Arun.Ramadoss@microchip.com wrote:
 > >=20
 > > Signed-off-by: Philippe Schenker <philippe.schenker@impulsing.ch>
 >=20
-> KSZ8567 switch is similar to KSZ9897/KSZ9567 except that internal
-> phys
-> are without gigabit capability.
-> So add KSZ8567 related updates adjacent to KSZ9567. So it will be
-> grouped together and easier to update in case new features are added
-> to
-> this switch family.
+> This device has all the same constraints as the other ones in this
+> binding, why is it not compatible with any of them? If it isn't, the
+> compatible should mention why it is not.
 
+Hi Conor, Thanks for your message!
 
-I actually tried sorting it kind of alphanumerically but I can put it
-next to KSZ9567, will do in a v2 but wait a bit more for some feedback
-to arrive.
+I need the compatible to make sure the correct ID of the switch is
+being set in the driver as well as its features.
+
+You mean I shall mention the reason in the commit-message, or where?
 
 Philippe
 
 >=20
+> Cheers,
+> Conor.
 >=20
+> > ---
+> >=20
+> > =C2=A0Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml | 1 =
++
+> > =C2=A01 file changed, 1 insertion(+)
+> >=20
+> > diff --git
+> > a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> > b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> > index c963dc09e8e1..52acc15ebcbf 100644
+> > --- a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> > +++ b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> > @@ -31,6 +31,7 @@ properties:
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - microchip,ksz9893
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - microchip,ksz9563
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - microchip,ksz8563
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - microchip,ksz8567
+> > =C2=A0
+> > =C2=A0=C2=A0 reset-gpios:
+> > =C2=A0=C2=A0=C2=A0=C2=A0 description:
+> > --=20
+> > 2.34.1
+> >=20
 
