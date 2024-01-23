@@ -1,164 +1,173 @@
-Return-Path: <netdev+bounces-64981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 457E5838B17
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 10:56:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96EF6838B21
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 10:57:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A2D51C20E0E
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 09:56:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F0353B22304
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 09:57:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5916359B7F;
-	Tue, 23 Jan 2024 09:56:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B2AE5A11D;
+	Tue, 23 Jan 2024 09:56:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZHGUiZ4B"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GbaLFC2f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FB115A100
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 09:56:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 521965A781;
+	Tue, 23 Jan 2024 09:56:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706003777; cv=none; b=Qd02T/IjsDCHLVw8kfVucO1JpXR5LBLwJWAQxlEjOn9tqVU2/xuqJ7TI+0G+mpsKKwnLI2KtI/VDv3JCzNnB1ij62xoEmrzKImUff2bNp5baQarK6d/jdURYp1lhKK9ABRrBmNchqRL2g61CuXyxgaIJA3VUK95DxPh54Chwa7g=
+	t=1706003816; cv=none; b=bHg2nwWhBUeMCA/JA8mjh3wXry9s7GJOyQNHp2X8r9VwuiK1VzdK5uE0MliBMv3+u0mGPCAt8EW109k9XMzu8xi4fOEKlRPYovfoKREtDW9IHxtlJ3CVsaJpi1jBylqr5ndTm/ToGkMXvfm1yPsJ9J+pPMowysljvy04cMh/j70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706003777; c=relaxed/simple;
-	bh=oc9Oysjni3ydGEpm3YDVh/15RVAletOH3LRLcKW6L2I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=m2e6SI2oEwitVorb00I59te1fC80eUcmZyVUvMZbiRR2zXdwXynoqCAhXCxH16YPyIphWZ4bVUKEKWA4CQiuWeBmhXqPjOilCUEg1ZeSesEKI2ZjyxESFMiJIy2U+Cv6hEcv0XsUhB55tpp0RJ5SXRcMnrXUV5y2d9s+9TAYtLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ZHGUiZ4B; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-40e9101b5f9so46143605e9.3
-        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 01:56:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1706003773; x=1706608573; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Pd7Hb7m2iMwIQrn8qvIVrWmzIrDfXJvCnVzjTZCjLDs=;
-        b=ZHGUiZ4BPKhzO0HTTLFXh9vR7sX2bF1PCjwCUjvjrfbyot0g7wWpnD7McCUSr1xsjh
-         CEhb7+gkCKLjyhY1761GvmGXsFUTmC00uI/4sCoaCpa1A8AZu57C7JmTeMZvk9w8RfVM
-         bYsUcqvhMzmMS1c1LWUnZKzfHeQ1sak94ezMa6zFKb60Swpol9Wsh4c+vpj56bHfYWy3
-         v7p3uC0jfJXrF0SvrsX/IFyfeQyZrh4OczlR/Ly3SOMQu3QEtEp/n7ozFlgnF/LW1ijW
-         gSebuOLYdJTun+A+0rSNjAEqvlZ4DObSuYLcwvCra5/XFtdvYJy+KLXWAai8bnRQQEE2
-         Q52g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706003773; x=1706608573;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Pd7Hb7m2iMwIQrn8qvIVrWmzIrDfXJvCnVzjTZCjLDs=;
-        b=kT0W3eyOLkQkgy7L2plIdA/e3GZpVqVAgThOiaL5QHWWYGmXwXZnCfrA/nVh0ktqj7
-         LtQQqxlSU7Y1O77XOlTVKBItVra5Q44xxomUs2WeEmyQVKzRMunnPX9hIo8llqVWqkVq
-         ahZO0d+U9b32SEnyE/Sp31mAn0xYDWRgC4hqpzc6PxRBGqeRJWkeqrLFzusUj5LHQz2u
-         4Qgo9vNLYkGdvyWXJMr5f5th371pPEqO/jvrAERnT30rmOWm8kri56WC/I7wlynKAGVA
-         xfJIyeKEGvA8bq06zPZz/247NGuKOrCuzkhiigpQ6eNlP8ylnVIkC0Q7Qw8YhPSQrHKA
-         xibg==
-X-Gm-Message-State: AOJu0YwOl3SJ5p6+h4kSmR+DIP/0CJUbDx+tEHj8adZ3Ka7D3qpYWt8E
-	VPO8nYQRKhxadLLm/liFuMLmbce4EQ6mCgmY5rbo6PdbRotq1e7geoMNAFzANaE=
-X-Google-Smtp-Source: AGHT+IHzwY5cRu9xczalZqFBHEjcP/tkDy6VyEpi3Id1yYcjXUUFY86PXQ8S0269gQuIjgRQhysqsA==
-X-Received: by 2002:a05:600c:1c21:b0:40e:ac07:21fe with SMTP id j33-20020a05600c1c2100b0040eac0721femr401326wms.177.1706003773735;
-        Tue, 23 Jan 2024 01:56:13 -0800 (PST)
-Received: from [192.168.1.20] ([178.197.215.66])
-        by smtp.gmail.com with ESMTPSA id bg23-20020a05600c3c9700b0040d91fa270fsm42202520wmb.36.2024.01.23.01.56.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Jan 2024 01:56:13 -0800 (PST)
-Message-ID: <a4aacb81-04b5-4a9f-809e-5b52fb0c4d7b@linaro.org>
-Date: Tue, 23 Jan 2024 10:56:10 +0100
+	s=arc-20240116; t=1706003816; c=relaxed/simple;
+	bh=giqjHNiHA5lOOXvLyPmmD7zXAE91+Pqyfa9jWZiXxrk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Hvqli8CRUISjK/JNOIlQgZDwBdnAwQJekjwPf1LCcowhdMaNmJu8Vbijriv9WKfS4MLSJgrklqcWudLOOPa2StgVYwO7EUaTBHPtsJ3pkyDqH6wPe3Ut4pLFlAUpU70yR2KfeY1OpWVSyfMOy1GQt9iIUehcexy15qT8mmqqjoU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GbaLFC2f; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706003815; x=1737539815;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=giqjHNiHA5lOOXvLyPmmD7zXAE91+Pqyfa9jWZiXxrk=;
+  b=GbaLFC2fWlGW9+IB6Xgf8Bxcq4EaAD4lk3qS36kTvcsDd4X2bPqySXfJ
+   FN8/q3O1seoEDpsnFF8Rg7WiEON+yJ00GR6P+UykLHekxsbKxvFcin08u
+   mf03RParLv83OxPOlkMbZCtiaSK3ZAH1M0M9pX15UZkQKEgDSCtfPfpqG
+   gHBY1tW5akeBrR89MqGFBWod9THaczH0u39CV3GVk4vQWu/YCwLii3s80
+   UlTO4750NlOWHEF+T3XK6sTXi4r//zvWIeIPCfWY7aq6+DdXnUi9sEXur
+   DHUK2abtM2AZEVOwUpIsbFA8K3S0VfUfT886WVhpMHFkp6X5yqthXQTVQ
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="365646"
+X-IronPort-AV: E=Sophos;i="6.05,214,1701158400"; 
+   d="scan'208";a="365646"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2024 01:56:54 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,214,1701158400"; 
+   d="scan'208";a="27962082"
+Received: from turnipsi.fi.intel.com (HELO kekkonen.fi.intel.com) ([10.237.72.44])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2024 01:56:47 -0800
+Received: from svinhufvud.ger.corp.intel.com (localhost [IPv6:::1])
+	by kekkonen.fi.intel.com (Postfix) with ESMTP id 2554111FC49;
+	Tue, 23 Jan 2024 11:56:43 +0200 (EET)
+From: Sakari Ailus <sakari.ailus@linux.intel.com>
+To: linux-pm@vger.kernel.org
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	laurent.pinchart@ideasonboard.com,
+	Jacek Lawrynowicz <jacek.lawrynowicz@linux.intel.com>,
+	Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+	David Airlie <airlied@gmail.com>,
+	Daniel Vetter <daniel@ffwll.ch>,
+	Lucas De Marchi <lucas.demarchi@intel.com>,
+	=?UTF-8?q?Thomas=20Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+	Paul Elder <paul.elder@ideasonboard.com>,
+	Alex Elder <elder@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>,
+	Mark Brown <broonie@kernel.org>,
+	dri-devel@lists.freedesktop.org,
+	intel-gfx@lists.freedesktop.org,
+	intel-xe@lists.freedesktop.org,
+	linux-media@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-sound@vger.kernel.org
+Subject: [PATCH v4 0/3] Small runtime PM API changes
+Date: Tue, 23 Jan 2024 11:56:41 +0200
+Message-Id: <20240123095642.97303-1-sakari.ailus@linux.intel.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: phy: adin: add missing clock option
-Content-Language: en-US
-To: Fabian Pfitzner <f.pfitzner@pengutronix.de>,
- Michael Hennerich <michael.hennerich@analog.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Alexandru Tachici <alexandru.tachici@analog.com>
-Cc: kernel@pengutronix.de, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240122110311.2725036-1-f.pfitzner@pengutronix.de>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20240122110311.2725036-1-f.pfitzner@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 22/01/2024 12:03, Fabian Pfitzner wrote:
-> The GP_CLK pin on Adin1300 PHY's offers three different output clocks.
-> This patch adds the missing 125MHz recovered clock option which is not
-> yet availible in the driver.
-> 
+Hi folks,
 
-Typo
+Here's a small but a different set of patches for making two relatively
+minor changes to runtime PM API. I restarted version numbering as this is
+meaningfully different from the previous set.
 
-> Signed-off-by: Fabian Pfitzner <f.pfitzner@pengutronix.de>
-> ---
->  Documentation/devicetree/bindings/net/adi,adin.yaml | 7 +++++--
+pm_runtime_get_if_active() loses its second argument as it only made sense
+to have ign_usage_count argument true.
 
-Bindings are separate.
+The other change is also small but it has an effect on callers:
+pm_runtime_put_autosuspend() will, in the future, be re-purposed to
+include a call to pm_runtime_mark_last_busy() as well. Before this,
+current users of the function are moved to __pm_runtime_put_autosuspend()
+(added by this patchset) which will continue to have the current
+behaviour.
 
-Please run scripts/checkpatch.pl and fix reported warnings. Some
-warnings can be ignored, but the code here looks like it needs a fix.
-Feel free to get in touch if the warning is not clear.
+I haven't included the conversion patches in this set as I only want to do
+that once this set has been approved and merged. The tree specific patches
+can be found here, on linux-next master (there are some V4L2 patches
+there, too, please ignore them for now):
+<URL:https://git.kernel.org/pub/scm/linux/kernel/git/sailus/linux-next.git/log/?
 
+Later on, users calling pm_runtime_mark_last_busy() immediately followed
+by __pm_runtime_put_autosuspend() will be switched back to
+pm_runtime_put_autosuspend() once its behaviour change has been done (a
+patch near top of that branch). I'll provide these once the preceding ones
+have been merged.
 
+Comments are welcome.
 
-Best regards,
-Krzysztof
+since v3:
+
+- patch 1: Drop the previously added documentation on driver use of
+  pm_runtime_get_conditional().
+
+- Add a patch to make pm_runtime_get_conditional() static, including
+  switching i915 to pm_runtime_get_if_{active,in_use}.
+
+since v2:
+
+- Rebase on v6.8-rc1 (no changes).
+
+- Add Rodrigo's Reviewed-by: to the 1st patch.
+
+since v1:
+
+- patch 1: Rename __pm_runtime_get_conditional() as
+  pm_runtime_get_conditional().
+
+- patch 1: Reword documentation on driver use of
+  pm_runtime_get_conditional().
+
+Sakari Ailus (3):
+  pm: runtime: Simplify pm_runtime_get_if_active() usage
+  pm: runtime: Make pm_runtime_get_if_conditional() private
+  pm: runtime: Add pm_runtime_put_autosuspend() replacement
+
+ Documentation/power/runtime_pm.rst      | 22 +++++++++-------
+ drivers/accel/ivpu/ivpu_pm.c            |  2 +-
+ drivers/base/power/runtime.c            | 34 +++++++++++++++++++++++--
+ drivers/gpu/drm/i915/intel_runtime_pm.c |  5 +++-
+ drivers/gpu/drm/xe/xe_pm.c              |  2 +-
+ drivers/media/i2c/ccs/ccs-core.c        |  2 +-
+ drivers/media/i2c/ov64a40.c             |  2 +-
+ drivers/media/i2c/thp7312.c             |  2 +-
+ drivers/net/ipa/ipa_smp2p.c             |  2 +-
+ drivers/pci/pci.c                       |  2 +-
+ include/linux/pm_runtime.h              | 30 +++++++++++-----------
+ sound/hda/hdac_device.c                 |  2 +-
+ 12 files changed, 72 insertions(+), 35 deletions(-)
+
+-- 
+2.39.2
 
 
