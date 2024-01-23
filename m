@@ -1,114 +1,158 @@
-Return-Path: <netdev+bounces-64959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3736838816
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 08:40:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C2E3838835
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 08:45:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9E0328305E
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 07:40:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5AB41F23E10
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 07:45:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F48C48CE4;
-	Tue, 23 Jan 2024 07:40:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A5005473D;
+	Tue, 23 Jan 2024 07:45:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="IipoaWVK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h1peFCRO"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E3B1810;
-	Tue, 23 Jan 2024 07:40:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DE80524DC;
+	Tue, 23 Jan 2024 07:45:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705995643; cv=none; b=pGaaqyQhm7c8f/keLCjcfZIFr56T7SLLWa2CN2vWt9wIoaW6ra84nS2LcMWl0Sx5C3N3rspG3Flh3y9/18csUSRwa5J1LQjrRXPVCsQvAItlazm+mjazXPapPi9J/YFGYjGAvn/9PDVHsmFDic6cm8slrLniqkoZIvhSCWtyRw8=
+	t=1705995916; cv=none; b=pRcsU14aQNLEOh/gd3dqvD+q5euXJfEfo0GhhCqT/l2wjkMxZrWODzzI0gNSkMLg5QMBlb1SWvhacnU62ixKYhRmR6BtGDyz/zWHirtu9pHMym/3SM33jdtwJM/R10nNrUmKpTzqO8Oa4r9yHQ0EZJHTy5raxsDxTZte7pJHKbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705995643; c=relaxed/simple;
-	bh=ZoqLbtBF8i+gzadYvqr5JJ9kHSwfg9TbADroP5aIfWc=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d25tqcZgHq3fXQU8vCHbw30NlRwfbr1z04kKe8pP9hFZiegTPSNLk5s+fYyLwK0wJs0vgJSiZPSDGJj0wh/CiYzfcY0pEOUVUamPkCu1j7cquam6z92dZUxvKp5jWGadF54fwg0p/IBILUsre4SsN53FUCq31FdAv1IjS07J+lg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=IipoaWVK; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+	s=arc-20240116; t=1705995916; c=relaxed/simple;
+	bh=gR1DaQBEiwp7b8LXQ3gqb1TinU2mUqOSau6sGyjnT/I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qFA8TbyE+uxp/hex/XOvsWPWp1Qeg3y5NEFgExC4UauoA89NoUplrQAIu8iKbFtQbRigIsSXZw6YhT6XZ98h4sMohyC5YVdmBys5P0FJFvg9tLPJ9J2ghxHJuaNgCQHSgvSE2ufDF9SnxRUma0vUIk3IOPbkwkjjMF8nME5dm5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h1peFCRO; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1705995641; x=1737531641;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1705995915; x=1737531915;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ZoqLbtBF8i+gzadYvqr5JJ9kHSwfg9TbADroP5aIfWc=;
-  b=IipoaWVKjgHjdqfmkSe5jj7suz6mk5xWFg4R7ir7a7Nkw3uh/zHwKgJ6
-   hRl1QKFHmdxPyUc7fzCOv8WPvEaneinhvU+Vzxp+JGFsjTB5GOLJ7Y/Fb
-   LZMyg3Dq5QYw2y6shoe6u/p9NjJaJk7F9vDGE0B0VwdsvVDLlq0SWfsXJ
-   FENtmxR5Xf7ChMv9Xyy1DBfh5dsYHpxknoU/ZrDqlPEbaf1WB/u1lIpDp
-   Ni6v5euIXs1ecuqTHMqHgFsabl2pChS+4f97YO43fBdO2SNkLyaQsN0cF
-   aHbiCOabi05thctaZRrKh91KPXn8ajj+Eq2yXedQXk8YLyoSr5LUJjYsV
-   g==;
-X-CSE-ConnectionGUID: w/pk/xxkRa+jFa3DU5zIZw==
-X-CSE-MsgGUID: hyNmLgQ4Tda7JxR6YODDzA==
-X-IronPort-AV: E=Sophos;i="6.05,213,1701154800"; 
-   d="scan'208";a="15629781"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Jan 2024 00:40:34 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
- chn-vm-ex02.mchp-main.com (10.10.87.72) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 23 Jan 2024 00:40:24 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex02.mchp-main.com
- (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Tue, 23 Jan 2024 00:40:24 -0700
-Date: Tue, 23 Jan 2024 08:40:23 +0100
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: Breno Leitao <leitao@debian.org>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <abeni@redhat.com>,
-	<edumazet@google.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, "Claudiu
- Manoil" <claudiu.manoil@nxp.com>, Alexandre Belloni
-	<alexandre.belloni@bootlin.com>, <UNGLinuxDriver@microchip.com>, Paolo Abeni
-	<pabeni@redhat.com>, <dsahern@kernel.org>, <weiwan@google.com>, "open
- list:OCELOT ETHERNET SWITCH DRIVER" <netdev@vger.kernel.org>, open list
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 14/22] net: fill in MODULE_DESCRIPTION()s for
- ocelot
-Message-ID: <20240123074023.pu5hqjarvhawufmc@DEN-DL-M31836.microchip.com>
-References: <20240122184543.2501493-1-leitao@debian.org>
- <20240122184543.2501493-15-leitao@debian.org>
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=gR1DaQBEiwp7b8LXQ3gqb1TinU2mUqOSau6sGyjnT/I=;
+  b=h1peFCROm9fade0rEu976ABmV1J9R9L4GGyBGxIBuzOXGqiOsmu2gilY
+   P4omdRlUA6oAv9eUjAlumNfh9LO4+PjvCm9U0+IxQRGsCYCacxEvy/U5O
+   5BsWHfuAlZLu27bQFDuDQhGVoroqxkUQ51z9x5pRR5IsYSH1Wi4lMX664
+   zjzjUea6mCJ7o3ajNb/9jjbxv8hqel12Xf6/oxLNs+DfOA/SxBqKhGki/
+   8pANVaCC3DawY9yeoJXrgKiCPQJEVqdi3xiIl1WT6ZrZ/HGaLXbUdlSDq
+   Zb69fvlTviKiKnHo0FvKlrS+IIA1qOceOH/z1qA86DbiX/9v+zdD9oZqu
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="1336526"
+X-IronPort-AV: E=Sophos;i="6.05,213,1701158400"; 
+   d="scan'208";a="1336526"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 23:45:13 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="909211748"
+X-IronPort-AV: E=Sophos;i="6.05,213,1701158400"; 
+   d="scan'208";a="909211748"
+Received: from turnipsi.fi.intel.com (HELO kekkonen.fi.intel.com) ([10.237.72.44])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2024 23:45:06 -0800
+Received: from kekkonen.localdomain (localhost [127.0.0.1])
+	by kekkonen.fi.intel.com (Postfix) with ESMTP id 81AD911FB9B;
+	Tue, 23 Jan 2024 09:45:03 +0200 (EET)
+Date: Tue, 23 Jan 2024 07:45:03 +0000
+From: Sakari Ailus <sakari.ailus@linux.intel.com>
+To: "Rafael J. Wysocki" <rafael@kernel.org>
+Cc: Bjorn Helgaas <helgaas@kernel.org>, linux-pm@vger.kernel.org,
+	linux-pci@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	Jaroslav Kysela <perex@perex.cz>,
+	Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>,
+	laurent.pinchart@ideasonboard.com, David Airlie <airlied@gmail.com>,
+	Paul Elder <paul.elder@ideasonboard.com>,
+	linux-media@vger.kernel.org,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	intel-gfx@lists.freedesktop.org,
+	Lucas De Marchi <lucas.demarchi@intel.com>,
+	Mark Brown <broonie@kernel.org>,
+	Jacek Lawrynowicz <jacek.lawrynowicz@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	intel-xe@lists.freedesktop.org,
+	Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+	Alex Elder <elder@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	linux-sound@vger.kernel.org, Takashi Iwai <tiwai@suse.com>,
+	Daniel Vetter <daniel@ffwll.ch>, netdev@vger.kernel.org
+Subject: Re: [PATCH v3 1/2] pm: runtime: Simplify pm_runtime_get_if_active()
+ usage
+Message-ID: <Za9uf3icrVE6Ajbe@kekkonen.localdomain>
+References: <20240122114121.56752-2-sakari.ailus@linux.intel.com>
+ <20240122181205.GA275751@bhelgaas>
+ <CAJZ5v0gUpo6Shz2kQzie4XE23=fiPvD0=2yhjGptw8QbCq2SAg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240122184543.2501493-15-leitao@debian.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJZ5v0gUpo6Shz2kQzie4XE23=fiPvD0=2yhjGptw8QbCq2SAg@mail.gmail.com>
 
-The 01/22/2024 10:45, Breno Leitao wrote:
-> W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
-> Add descriptions to the Ocelot SoCs (VSC7514) helpers driver.
-> 
-> Signed-off-by: Breno Leitao <leitao@debian.org>
+Hi Rafael, Björn,
 
-Reviewed-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+Thanks for the review.
 
-> ---
->  drivers/net/ethernet/mscc/ocelot.c | 1 +
->  1 file changed, 1 insertion(+)
+On Mon, Jan 22, 2024 at 07:16:54PM +0100, Rafael J. Wysocki wrote:
+> On Mon, Jan 22, 2024 at 7:12 PM Bjorn Helgaas <helgaas@kernel.org> wrote:
+> >
+> > On Mon, Jan 22, 2024 at 01:41:21PM +0200, Sakari Ailus wrote:
+> > > There are two ways to opportunistically increment a device's runtime PM
+> > > usage count, calling either pm_runtime_get_if_active() or
+> > > pm_runtime_get_if_in_use(). The former has an argument to tell whether to
+> > > ignore the usage count or not, and the latter simply calls the former with
+> > > ign_usage_count set to false. The other users that want to ignore the
+> > > usage_count will have to explitly set that argument to true which is a bit
+> > > cumbersome.
+> >
+> > s/explitly/explicitly/
+> >
+> > > To make this function more practical to use, remove the ign_usage_count
+> > > argument from the function. The main implementation is renamed as
+> > > pm_runtime_get_conditional().
+> > >
+> > > Signed-off-by: Sakari Ailus <sakari.ailus@linux.intel.com>
+> > > Reviewed-by: Alex Elder <elder@linaro.org> # drivers/net/ipa/ipa_smp2p.c
+> > > Reviewed-by: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+> > > Acked-by: Takashi Iwai <tiwai@suse.de> # sound/
+> > > Reviewed-by: Jacek Lawrynowicz <jacek.lawrynowicz@linux.intel.com> # drivers/accel/ivpu/
+> > > Acked-by: Rodrigo Vivi <rodrigo.vivi@intel.com> # drivers/gpu/drm/i915/
+> > > Reviewed-by: Rodrigo Vivi <rodrigo.vivi@intel.com>
+> >
+> > Acked-by: Bjorn Helgaas <bhelgaas@google.com> # drivers/pci/
+> >
+> > > -EXPORT_SYMBOL_GPL(pm_runtime_get_if_active);
+> > > +EXPORT_SYMBOL_GPL(pm_runtime_get_conditional);
+> >
+> > If pm_runtime_get_conditional() is exported, shouldn't it also be
+> > documented in Documentation/power/runtime_pm.rst?
+> >
+> > But I'm dubious about exporting it because
+> > __intel_runtime_pm_get_if_active() is the only caller, and you end up
+> > with the same pattern there that we have before this series in the PM
+> > core.  Why can't intel_runtime_pm.c be updated to use
+> > pm_runtime_get_if_active() or pm_runtime_get_if_in_use() directly, and
+> > make pm_runtime_get_conditional() static?
 > 
-> diff --git a/drivers/net/ethernet/mscc/ocelot.c b/drivers/net/ethernet/mscc/ocelot.c
-> index 56ccbd4c37fe..12999d9be3af 100644
-> --- a/drivers/net/ethernet/mscc/ocelot.c
-> +++ b/drivers/net/ethernet/mscc/ocelot.c
-> @@ -3078,4 +3078,5 @@ void ocelot_deinit_port(struct ocelot *ocelot, int port)
->  }
->  EXPORT_SYMBOL(ocelot_deinit_port);
-> 
-> +MODULE_DESCRIPTION("Ocelot SoCs (VSC7514) helpers");
->  MODULE_LICENSE("Dual MIT/GPL");
-> --
-> 2.39.3
-> 
+> Sounds like a good suggestion to me.
+
+The i915 driver uses both but I guess it's not too much different to check
+ignore_usecount separately than passing it to the API function?
+
+I'll add another patch to do this and moving
+pm_runtime_get_if_{active,in_use} implementations to runtime.c.
 
 -- 
-/Horatiu
+Regards,
+
+Sakari Ailus
 
