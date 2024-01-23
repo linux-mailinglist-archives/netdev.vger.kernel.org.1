@@ -1,105 +1,132 @@
-Return-Path: <netdev+bounces-64962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27CE483883B
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 08:48:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F6A383885C
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 08:56:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D49E8287861
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 07:48:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 99F99B249B7
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 07:55:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44F9752F77;
-	Tue, 23 Jan 2024 07:48:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9800255C1E;
+	Tue, 23 Jan 2024 07:55:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="BWUI8qL+"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="elGjg72i"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D673C2AE91;
-	Tue, 23 Jan 2024 07:48:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86C6153E2E
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 07:55:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705996119; cv=none; b=uVN2ScmMOnDI2ouG9AWnWUFnO+ko3ji9/60ursEa70UEcNQYniXov69RurFuBshGEJdcNd8yvKUU27qcYG3faWkGomzWlYDUZc76QmnHQOnlQ2QKAN1vXN0zoXCcPD2a6q4RA6wqn4zUFEK1O1q69KmbAwKkY0t0rLhiWBHCL5w=
+	t=1705996552; cv=none; b=llKsZeo++21anS5jog/3HbYR9hVClmi6UtRxyKE1OJV2SAES5rceubnf3z5uGHcRQHkDkuII3AEvbSnho/7xImpElQyUXU9S20Qso6qaOH4AHkIQ8iRJR8bYPbGjF7V25yOkvKWUv3DA3aNXD+OWHhHbcuz1IhKfm4BLPPkYebY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705996119; c=relaxed/simple;
-	bh=FOaUGUAAPTmWN3a9feloa0W95Ay+xWAJhmLKNf/SkB4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=maXCkh07tCUjZTZlGfPbIYauSH7HJCkfkE0yv9nBohEdL/ORfOAm5MH87ta21IOmG4lIC7VHJDksHtLR3ePIYwc6LrnhYBL0zoxDnWhbNpAOhIJQl0x8VV8IqEwdRXdukHreVsrSTaos0hzVo3+2FNG1B9nTh8toPfbulPlNy7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=BWUI8qL+; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 3929920004;
-	Tue, 23 Jan 2024 07:48:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1705996108;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pUT2brhMEPIx4srIoyzG1PnPuZrNbL8eu4Saokysw2c=;
-	b=BWUI8qL+fMLKZcw+A3+49Cy2mH3c85xLY8ey+cP4qoIBCOtro34o0HHSTOhrK8Uwm1fQZj
-	L6r0+IWw68OPwv0QJvxtG9RMIR/FYvYOjScbGw9R+kRAuNCes9xWIVKrVB91lmmSDT+icr
-	UBFnd4J7XYlRjAaJfthiT6WsHZ1RC6HC+dE6DGwSyp0asZ8m13IRLzcOiMymexvRFoTTmO
-	7Z5qxho2o04PAHF1DWRcF8qPCSJYCIterTn4V+wL+mlyoQMmdVt1t6lldWN/NlDzSPda11
-	DAJHn8Wy2vaUZE80aZl6HChUOn5KbEI3oewr/oLrjWxsr7hdAKS/0qheEIEbPg==
-Date: Tue, 23 Jan 2024 08:48:26 +0100
-From: Alexandre Belloni <alexandre.belloni@bootlin.com>
-To: Breno Leitao <leitao@debian.org>
-Cc: kuba@kernel.org, davem@davemloft.net, abeni@redhat.com,
-	edumazet@google.com, Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	UNGLinuxDriver@microchip.com, Paolo Abeni <pabeni@redhat.com>,
-	dsahern@kernel.org, weiwan@google.com,
-	"open list:OCELOT ETHERNET SWITCH DRIVER" <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 14/22] net: fill in MODULE_DESCRIPTION()s for
- ocelot
-Message-ID: <20240123074826330a374e@mail.local>
-References: <20240122184543.2501493-1-leitao@debian.org>
- <20240122184543.2501493-15-leitao@debian.org>
+	s=arc-20240116; t=1705996552; c=relaxed/simple;
+	bh=rMGf+CVc1XpOboA/v5hnPFBLZuvKbP8V2WzhkUVFjJU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XGN9byy+n1och3TJdTfGurJJ8RIv4ubrvjGyFM7UjnCfh8p4te+DG+7/4mo8wO1MUNeMd+4J5dtJWm+S8B6YDidLqJfrKqV2L/rgnmeB+hMsUbbY8vAQV0kISJrBgPp6j6xealwzws3xWbqto5sXhC1lNEkI5UIf1fcDDYugHbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=elGjg72i; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2cd1a1c5addso46820531fa.1
+        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 23:55:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1705996548; x=1706601348; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TcDZ9mN+FRhUYNa88zGuloBXNab4ChQevtTM4gkLaHM=;
+        b=elGjg72idNRYQE6o04kBl6eJWZhk7gMZ3D//pQiiDNlEgeNyCeeKMRipWiHknYd/eA
+         bEDgwCKkT0/83ikHRWiUNq2LHrpOhFzqe5AyvqCR/L/HVkuGBLBGd1XMPcQ5vShWxG/K
+         6gA17/9szoraGXDG+6qQQ97TgBa/DAhWrkYtoCefjEiS0XSj1N2dDsyySHolukS1l6uE
+         XXYwy/K7O6PO99rnlUjK2PnkJfh/gIEHso/OUSXJy2AsECgl54vBA9ge0RAFifNV1Ptl
+         wKh9XfosC9cgRJVJBpkbe87hB0CMqc3h/+0OEsepqANi4S5+gI/dSpJMKgvOHebs36vc
+         lVxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705996548; x=1706601348;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TcDZ9mN+FRhUYNa88zGuloBXNab4ChQevtTM4gkLaHM=;
+        b=eX/ffcuv6lB4B2ebmPN6A6HsqWlP9ifHVw2AMMhlA3bXqgxYfjXiGO92biqbyobrYn
+         R5NI6H/W4xcAcHPgCHiEtKmQaJLJeA0V1a0I/sKsJdNYbSUpGAZfiznVFSurKwegFW3n
+         BxqRxZ6hQ29zUjkIMAMKo3W86jy3hpBv2LeeQ9MPwkHaFHx+BUdKcnXlyj0ykiam5AFD
+         ZGlCDJjm2JrK5J6kfW9WpHJvK9ybRtkeSd1RqD1A5wD7h400Pls71cBoYUlKHgE+i8FD
+         x3hRB4OrW+koGdFnvTeRN8FZh7GCnBfkUxFA4gaz/NyYeKnpY2C/u9Zh9a6K8yxZ+Ar1
+         MSTg==
+X-Gm-Message-State: AOJu0Ywmgk6c8msTrddNC51Ra5s+XpIUF45xpZ6CHVINDbNk7QyRep3t
+	8EHVfOoOFe4S9G0vJWSioQ2pEi+z5k87LbsVk0oePTbo5q4zd4NFjKOfUwBP5g==
+X-Google-Smtp-Source: AGHT+IGOFZkXrAicjcWyVjNqJjubZsBeK8Mb6x8RXvRNYGfYb5g2wOo5JsA3FPRz9L6sUcwYs42zyg==
+X-Received: by 2002:a05:651c:b0c:b0:2cf:124b:a2aa with SMTP id b12-20020a05651c0b0c00b002cf124ba2aamr266588ljr.2.1705996548598;
+        Mon, 22 Jan 2024 23:55:48 -0800 (PST)
+Received: from [10.156.60.236] (ip-037-024-206-209.um08.pools.vodafone-ip.de. [37.24.206.209])
+        by smtp.gmail.com with ESMTPSA id a8-20020a029408000000b0046edc723291sm1426989jai.78.2024.01.22.23.55.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 Jan 2024 23:55:48 -0800 (PST)
+Message-ID: <35ff4947-7863-40da-b0e7-3b84e17c6163@suse.com>
+Date: Tue, 23 Jan 2024 08:55:44 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240122184543.2501493-15-leitao@debian.org>
-X-GND-Sasl: alexandre.belloni@bootlin.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 80/82] xen-netback: Refactor intentional wrap-around test
+Content-Language: en-US
+To: Kees Cook <keescook@chromium.org>
+Cc: Wei Liu <wei.liu@kernel.org>, Paul Durrant <paul@xen.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ xen-devel@lists.xenproject.org, netdev@vger.kernel.org,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+References: <20240122235208.work.748-kees@kernel.org>
+ <20240123002814.1396804-80-keescook@chromium.org>
+From: Jan Beulich <jbeulich@suse.com>
+Autocrypt: addr=jbeulich@suse.com; keydata=
+ xsDiBFk3nEQRBADAEaSw6zC/EJkiwGPXbWtPxl2xCdSoeepS07jW8UgcHNurfHvUzogEq5xk
+ hu507c3BarVjyWCJOylMNR98Yd8VqD9UfmX0Hb8/BrA+Hl6/DB/eqGptrf4BSRwcZQM32aZK
+ 7Pj2XbGWIUrZrd70x1eAP9QE3P79Y2oLrsCgbZJfEwCgvz9JjGmQqQkRiTVzlZVCJYcyGGsD
+ /0tbFCzD2h20ahe8rC1gbb3K3qk+LpBtvjBu1RY9drYk0NymiGbJWZgab6t1jM7sk2vuf0Py
+ O9Hf9XBmK0uE9IgMaiCpc32XV9oASz6UJebwkX+zF2jG5I1BfnO9g7KlotcA/v5ClMjgo6Gl
+ MDY4HxoSRu3i1cqqSDtVlt+AOVBJBACrZcnHAUSuCXBPy0jOlBhxPqRWv6ND4c9PH1xjQ3NP
+ nxJuMBS8rnNg22uyfAgmBKNLpLgAGVRMZGaGoJObGf72s6TeIqKJo/LtggAS9qAUiuKVnygo
+ 3wjfkS9A3DRO+SpU7JqWdsveeIQyeyEJ/8PTowmSQLakF+3fote9ybzd880fSmFuIEJldWxp
+ Y2ggPGpiZXVsaWNoQHN1c2UuY29tPsJgBBMRAgAgBQJZN5xEAhsDBgsJCAcDAgQVAggDBBYC
+ AwECHgECF4AACgkQoDSui/t3IH4J+wCfQ5jHdEjCRHj23O/5ttg9r9OIruwAn3103WUITZee
+ e7Sbg12UgcQ5lv7SzsFNBFk3nEQQCACCuTjCjFOUdi5Nm244F+78kLghRcin/awv+IrTcIWF
+ hUpSs1Y91iQQ7KItirz5uwCPlwejSJDQJLIS+QtJHaXDXeV6NI0Uef1hP20+y8qydDiVkv6l
+ IreXjTb7DvksRgJNvCkWtYnlS3mYvQ9NzS9PhyALWbXnH6sIJd2O9lKS1Mrfq+y0IXCP10eS
+ FFGg+Av3IQeFatkJAyju0PPthyTqxSI4lZYuJVPknzgaeuJv/2NccrPvmeDg6Coe7ZIeQ8Yj
+ t0ARxu2xytAkkLCel1Lz1WLmwLstV30g80nkgZf/wr+/BXJW/oIvRlonUkxv+IbBM3dX2OV8
+ AmRv1ySWPTP7AAMFB/9PQK/VtlNUJvg8GXj9ootzrteGfVZVVT4XBJkfwBcpC/XcPzldjv+3
+ HYudvpdNK3lLujXeA5fLOH+Z/G9WBc5pFVSMocI71I8bT8lIAzreg0WvkWg5V2WZsUMlnDL9
+ mpwIGFhlbM3gfDMs7MPMu8YQRFVdUvtSpaAs8OFfGQ0ia3LGZcjA6Ik2+xcqscEJzNH+qh8V
+ m5jjp28yZgaqTaRbg3M/+MTbMpicpZuqF4rnB0AQD12/3BNWDR6bmh+EkYSMcEIpQmBM51qM
+ EKYTQGybRCjpnKHGOxG0rfFY1085mBDZCH5Kx0cl0HVJuQKC+dV2ZY5AqjcKwAxpE75MLFkr
+ wkkEGBECAAkFAlk3nEQCGwwACgkQoDSui/t3IH7nnwCfcJWUDUFKdCsBH/E5d+0ZnMQi+G0A
+ nAuWpQkjM1ASeQwSHEeAWPgskBQL
+In-Reply-To: <20240123002814.1396804-80-keescook@chromium.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello,
-
-On 22/01/2024 10:45:35-0800, Breno Leitao wrote:
-> W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
-> Add descriptions to the Ocelot SoCs (VSC7514) helpers driver.
-> 
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> ---
->  drivers/net/ethernet/mscc/ocelot.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/net/ethernet/mscc/ocelot.c b/drivers/net/ethernet/mscc/ocelot.c
-> index 56ccbd4c37fe..12999d9be3af 100644
-> --- a/drivers/net/ethernet/mscc/ocelot.c
-> +++ b/drivers/net/ethernet/mscc/ocelot.c
-> @@ -3078,4 +3078,5 @@ void ocelot_deinit_port(struct ocelot *ocelot, int port)
->  }
->  EXPORT_SYMBOL(ocelot_deinit_port);
+On 23.01.2024 01:27, Kees Cook wrote:
+> --- a/drivers/net/xen-netback/hash.c
+> +++ b/drivers/net/xen-netback/hash.c
+> @@ -345,7 +345,7 @@ u32 xenvif_set_hash_mapping(struct xenvif *vif, u32 gref, u32 len,
+>  		.flags = GNTCOPY_source_gref
+>  	}};
 >  
-> +MODULE_DESCRIPTION("Ocelot SoCs (VSC7514) helpers");
+> -	if ((off + len < off) || (off + len > vif->hash.size) ||
+> +	if ((add_would_overflow(off, len)) || (off + len > vif->hash.size) ||
 
-Shouldn't that mention that this is related to the Ethernet switch?
+I'm not maintainer of this code, but if I was I would ask that the
+excess parentheses be removed, to improve readability.
 
->  MODULE_LICENSE("Dual MIT/GPL");
-> -- 
-> 2.39.3
-> 
-
--- 
-Alexandre Belloni, co-owner and COO, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+Jan
 
