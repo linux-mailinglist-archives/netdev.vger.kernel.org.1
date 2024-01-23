@@ -1,162 +1,130 @@
-Return-Path: <netdev+bounces-65031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 167AA838EAB
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 13:43:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D57E838EB6
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 13:47:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA1492887F1
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 12:43:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29332288649
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 12:47:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 364925DF34;
-	Tue, 23 Jan 2024 12:43:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XJCozqNf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E000C5D8E7;
+	Tue, 23 Jan 2024 12:47:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A1DD5DF08
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 12:43:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52276524AB
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 12:47:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706013806; cv=none; b=s4W8+J+OBWb7mqMtZS2ccLCXw3YDRC4HyU7o3+J9Mzs+wSbtYkCXHfL+4jJbBFO/raoAU4YbKvQhNDgKw7nZkbwsSVFECcD7/CRmUzVxzzgFBr9rolxz8s/PF4sGr8Ufun7sUyp3t8eJPKtvM26FYJbpzGGX0jzKU5OClhFyJqc=
+	t=1706014067; cv=none; b=Z5C+wSapxVH+CGQuGGVfK51aEL7BNTKR/m+OZHxGj75ImsiJtHvcMYhEMYLbwDf8eBGCjQsy1J/XBhrDAd4Ph23Ves/sUjF5VlEu58sNUQGY8EYY/wCjsq108T0N6qNxf9tEeEwA6nx0QT2SKSJk2jhXaWQP08812QlsejaI+dE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706013806; c=relaxed/simple;
-	bh=84yjr7gbpEkRE8gAzV/hpUqJKBt7miw2N0I7r2yHdrw=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=e7IMf1usAWOH3v0qxesHcUnaewi63YJB4J50JaKnzizEaWWSpiLeyFb+zLrqY2T4sNTqxQrfsWvTQJ9fKJ8SQeszuqij6n1bFoVjb1bzxoWsreWJ13/guo9V2WeTdGp8nL1tF820RDHOggueyHp/8PxjmpOXEdMovGvcugI/ko8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XJCozqNf; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706013803;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=u1qcZn2nMXqL+D3a89leltZffSAbMsnoEG5Bg++SMtY=;
-	b=XJCozqNf+J6yUzKq85xGKloczEx/ZUT0NPdH/PSNjiRNqlYeZJlGeBAo6XPEOsUhkz1vn0
-	4ZZc2ywAneQuiWGCcDv/nqgl2e7bBwGNrbN59wx+Wz1tsqLuFk+Hd9hb5srLpafMB6yRg1
-	Wr9MuICiVYcyy/LRw0axxp/7+EY9Zp0=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-570-Tl5oINSbNluHMRezRmZWDw-1; Tue, 23 Jan 2024 07:43:22 -0500
-X-MC-Unique: Tl5oINSbNluHMRezRmZWDw-1
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-78313358d3bso128621585a.0
-        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 04:43:21 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706013801; x=1706618601;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=u1qcZn2nMXqL+D3a89leltZffSAbMsnoEG5Bg++SMtY=;
-        b=TIdvco/rhC4zCp7VnQTFXhyiX6q0YivjJDeUBL4vUkKz5eCT+oFYJI6E4MkJ6SPrKX
-         jocNB/hsQf0dMoVebo6GyYCtDsd9NgeHjBxpapQyehdAAH/yuMk7WWMq8kfGT63uqYAI
-         eNYC3ZrNH1EtpjTRPyUh9eA57R/Fkc1ssMhHaFzYRaDZVI4p3gEZ02NG5SMCJhbTXMgz
-         zNf3btXu/ackC8q403usnXtBuCIUl/OzE8zdkYsz+qSiEIbfkJTv0We4DTGeEFJadgzT
-         lNHBXhB0CTK1OiIV+c2z/YaseDDzDpai7UmfZDo21X4zRa7hB3l2+0t5hXP8BHCuUJ2N
-         sxww==
-X-Gm-Message-State: AOJu0YxBR/jl3AeAJpW5O7qMDtqYlwp0jJPrRYNblGt4xdWu+r2X5w08
-	ATTi7hYNuaSzioxD3R6+DeNUHRSiX0oplvo5Bx8RY5fwNwfmsizdGw7vo88Njl2+u7Evi1q7+0O
-	M1v50+h9KOZYqxTV/eg8P3osghp+Z3pZM0bO2VNa34MqkHXn5jYFJ7w==
-X-Received: by 2002:a05:6214:300c:b0:685:70d7:3336 with SMTP id ke12-20020a056214300c00b0068570d73336mr10461967qvb.4.1706013801438;
-        Tue, 23 Jan 2024 04:43:21 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHddoLwefm0Y9mdzFqyJ9YMpEh0BhkY6oGG0QP+cH6Hmafi6vzmDJz9IZDmLyFlIVYpCQIuvA==
-X-Received: by 2002:a05:6214:300c:b0:685:70d7:3336 with SMTP id ke12-20020a056214300c00b0068570d73336mr10461956qvb.4.1706013801087;
-        Tue, 23 Jan 2024 04:43:21 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-245-66.dyn.eolo.it. [146.241.245.66])
-        by smtp.gmail.com with ESMTPSA id nw7-20020a0562143a0700b0068696e28763sm1437245qvb.127.2024.01.23.04.43.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jan 2024 04:43:20 -0800 (PST)
-Message-ID: <5e7f5cf2e13e36d9ad4b1d4c546c6f596c2dc8f6.camel@redhat.com>
-Subject: Re: [PATCH V2] net: ethernet: ti: cpsw_new: enable mac_managed_pm
- to fix mdio
-From: Paolo Abeni <pabeni@redhat.com>
-To: Sinthu Raja <sinthu.raja@mistralsolutions.com>, Denis Kirjanov
- <dkirjanov@suse.de>, Siddharth Vadapalli <s-vadapalli@ti.com>, Ravi
- Gunasekaran <r-gunasekaran@ti.com>, Roger Quadros <rogerq@kernel.org>
-Cc: linux-omap@vger.kernel.org, netdev@vger.kernel.org, Sinthu Raja
-	 <sinthu.raja@ti.com>
-Date: Tue, 23 Jan 2024 13:43:18 +0100
-In-Reply-To: <20240122093326.7618-1-sinthu.raja@ti.com>
-References: <20240122093326.7618-1-sinthu.raja@ti.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+	s=arc-20240116; t=1706014067; c=relaxed/simple;
+	bh=q9n00tnBFonXMjTna0qQYzgXk1NOjbjSEIkMY4LJ58A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=o/DpRn5C48xDKf91hONumeTabsWPITJKeLucoR8QFbE/38qkK5uG8uz9VGL88ZWpE2E+Bum4+8/Qlp4r8YXNvULcQCraWlQQDK25QGSZSDoHffIi0dA7P24qJbm07VHauXvPaJaw5+j2kW+QSSW5UWyo+VQsrVKuCxKoK0vTtCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [112.20.109.155])
+	by gateway (Coremail) with SMTP id _____8AxDOtvta9lsCYEAA--.6521S3;
+	Tue, 23 Jan 2024 20:47:43 +0800 (CST)
+Received: from [192.168.100.8] (unknown [112.20.109.155])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8Dxfs1tta9lNGoUAA--.24196S3;
+	Tue, 23 Jan 2024 20:47:42 +0800 (CST)
+Message-ID: <7615ea18-977e-41b2-80d1-93a4b970d52b@loongson.cn>
+Date: Tue, 23 Jan 2024 20:47:40 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 9/9] net: stmmac: Disable coe for some
+ Loongson GNET
+Content-Language: en-US
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
+ chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn,
+ netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
+References: <cover.1702990507.git.siyanteng@loongson.cn>
+ <479a6614d1fc4285c02953bf1ca181fa56942fb6.1702990507.git.siyanteng@loongson.cn>
+ <axkfpgoyf2pd76k25563uzd5hfb5gsfr5cqlumn2gezai5xblj@h455tdgbogdh>
+From: Yanteng Si <siyanteng@loongson.cn>
+In-Reply-To: <axkfpgoyf2pd76k25563uzd5hfb5gsfr5cqlumn2gezai5xblj@h455tdgbogdh>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8Dxfs1tta9lNGoUAA--.24196S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj93XoW7Zr1kCw4rtrW3AF47Jr18Zwc_yoW8GF43pF
+	W8Aa4jkF97Xr1UC3Zxtw4UXF98Ca97tFWUWF4xK3sxWan2k3s7tr15KFWY9r1xZr1FgFW2
+	vrWUuwnxCFn8CrgCm3ZEXasCq-sJn29KB7ZKAUJUUUU7529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	AVWUtwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
+	6r4UMxCIbckI1I0E14v26r1Y6r17MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
+	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
+	0xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
+	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AK
+	xVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0b6pPUUUUU==
 
-On Mon, 2024-01-22 at 15:03 +0530, Sinthu Raja wrote:
-> From: Sinthu Raja <sinthu.raja@ti.com>
 
-Please respect the 24h grace period before posting a new version:
+在 2023/12/21 10:36, Serge Semin 写道:
+> On Tue, Dec 19, 2023 at 10:28:19PM +0800, Yanteng Si wrote:
+>> Some chips of Loongson GNET does not support coe, so disable them.
+>>
+>> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+>> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+>> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+>> ---
+>>   drivers/net/ethernet/stmicro/stmmac/hwif.c | 5 +++++
+>>   1 file changed, 5 insertions(+)
+>>
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.c b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+>> index 3724cf698de6..f211880925aa 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/hwif.c
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+>> @@ -73,6 +73,11 @@ static int stmmac_dwmac1_quirks(struct stmmac_priv *priv)
+>>   		mac->desc = &ndesc_ops;
+>>   	}
+>>   
+>> +	if (priv->synopsys_id == DWLGMAC_CORE_1_00) {
+>> +		priv->plat->tx_coe = 0;
+>> +		priv->plat->rx_coe = STMMAC_RX_COE_NONE;
+>> +	}
+> Couldn't this be done in dwmac-loongson.c?
 
-https://elixir.bootlin.com/linux/latest/source/Documentation/process/mainta=
-iner-netdev.rst#L399
+Sorry for the late reply, I have been busy with patches 4 and 5.
 
-Also please keep a consistent revision numbering scheme. This v2
-apparently come after v3 ?!?
+I think I can give you a definite answer: This is possible, just like
 
-> The below commit  introduced a WARN when phy state is not in the states:
-> PHY_HALTED, PHY_READY and PHY_UP.
-> commit 744d23c71af3 ("net: phy: Warn about incorrect mdio_bus_phy_resume(=
-) state")
->=20
-> When cpsw_new resumes, there have port in PHY_NOLINK state, so the below
-> warning comes out. Set mac_managed_pm be true to tell mdio that the phy
-> resume/suspend is managed by the mac, to fix the following warning:
->=20
-> WARNING: CPU: 0 PID: 965 at drivers/net/phy/phy_device.c:326 mdio_bus_phy=
-_resume+0x140/0x144
-> CPU: 0 PID: 965 Comm: sh Tainted: G           O       6.1.46-g247b2535b2 =
-#1
-> Hardware name: Generic AM33XX (Flattened Device Tree)
->  unwind_backtrace from show_stack+0x18/0x1c
->  show_stack from dump_stack_lvl+0x24/0x2c
->  dump_stack_lvl from __warn+0x84/0x15c
->  __warn from warn_slowpath_fmt+0x1a8/0x1c8
->  warn_slowpath_fmt from mdio_bus_phy_resume+0x140/0x144
->  mdio_bus_phy_resume from dpm_run_callback+0x3c/0x140
->  dpm_run_callback from device_resume+0xb8/0x2b8
->  device_resume from dpm_resume+0x144/0x314
->  dpm_resume from dpm_resume_end+0x14/0x20
->  dpm_resume_end from suspend_devices_and_enter+0xd0/0x924
->  suspend_devices_and_enter from pm_suspend+0x2e0/0x33c
->  pm_suspend from state_store+0x74/0xd0
->  state_store from kernfs_fop_write_iter+0x104/0x1ec
->  kernfs_fop_write_iter from vfs_write+0x1b8/0x358
->  vfs_write from ksys_write+0x78/0xf8
->  ksys_write from ret_fast_syscall+0x0/0x54
-> Exception stack(0xe094dfa8 to 0xe094dff0)
-> dfa0:                   00000004 005c3fb8 00000001 005c3fb8 00000004 0000=
-0001
-> dfc0: 00000004 005c3fb8 b6f6bba0 00000004 00000004 0059edb8 00000000 0000=
-0000
-> dfe0: 00000004 bed918f0 b6f09bd3 b6e89a66
->=20
-> Fixes: 744d23c71af3 ("net: phy: Warn about incorrect mdio_bus_phy_resume(=
-) state")
+the method you mentioned in patch 5, I only need to
 
-I think the real issue was introduced somewhere else in the TI driver.
-The above commit just report the inconsistent state.
+overwrite ld->dwlgmac_dma_ops.get_hw_feature.
 
-Note that you probably will a small series of 2 separate patches to
-address the issue bot in cpsw_new.c and cpsw.c, as mentioned by Roger.
 
-Cheers,
+Thanks,
 
-Paolo
+Yanteng
+
+>
+> -Serge(y)
+>
+>> +
+>>   	stmmac_dwmac_mode_quirk(priv);
+>>   	return 0;
+>>   }
+>> -- 
+>> 2.31.4
+>>
 
 
