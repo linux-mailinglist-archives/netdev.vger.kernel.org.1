@@ -1,192 +1,106 @@
-Return-Path: <netdev+bounces-64974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 883F6838A04
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 10:11:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5292838A10
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 10:15:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39BCE28A2D3
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 09:11:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 446241F25840
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 09:15:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E82057894;
-	Tue, 23 Jan 2024 09:11:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBDB658115;
+	Tue, 23 Jan 2024 09:15:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ojH8FY9k"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75A5F57311
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 09:11:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0071858114;
+	Tue, 23 Jan 2024 09:15:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706001083; cv=none; b=cbam27Rj5BHV+IQjV9C0AKjGsm6IdoCJVYQRbp4jpZLEGShA4yhMZup8NDULU5uU4PVnmGxEElGJAfJqrCeiiR/NFHyESzKQTCygvWNx/TrdM11+9qBbd0T/1ozxIGPnWiq5VwbiHgt5+n5ZR+FmLj5kARL5jILK39JZd2FGkCE=
+	t=1706001319; cv=none; b=teJDWCKgf8ycMGXNtvkxVIp4DvSRE5dWUeGrQT+abc+UjtyTe1xlU6e5bb1N8JyhXi59H+RnWH0dkV5qYBxphpiTAnXQKvYiiCK7+vlgsGn0839pvR6EBw/m410M+64sBO86sDl8SHt/A3N//Q47oHQjjtghTRtrFdOkhFyTxsw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706001083; c=relaxed/simple;
-	bh=QTm5KDaDNycZTdiSGLpEJGEokNHNaMWSiHCJhri3Orc=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=MtbzT52Ce3APYc2qVV9ZkXwhaf4VeWboAoYSpiiU4U8g7nIYZcHzSsxOYKizC0OR9e8Ec4dg7jltmCdVHGHq/hkJLXyeXJz++StpTY3pIfiCVWTdt9YxrWfqfN1Vg3unDba3sD+J6bVGgr7nAgi2UWJls+NI2d5edpqS3120jV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7bef3fcd7e7so411751339f.1
-        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 01:11:22 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706001081; x=1706605881;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/8JHX+MRfx2RrG0GI0Ld2XhBIptDf5Ajx1M3GH8izJY=;
-        b=xGpDC/RCbgiFb+LVBU1h6GPg9KGz00pd/p1Vh0oe3bW2EZV7e7x7K5s7iETNS8arGb
-         53NndtnGmELYIxQZlFavN5CFw4PzwL7x7jvWl353DIG/DrrF0TIW5mGjp1iOhvAZRvFb
-         kvom/2DllQJqgqoAhVvkvZMg0n5wu/pvylt+r15Sd4BpF3/Ru3uwV+U94ZSg2ARXUtVS
-         NzGb4SeD42kXFRo89p/1IYLyte0Qx9NBcalRu4UvGhSpuz/8JNpw+PPKSb8HE74myB3w
-         aXqq3byNN9jyneRnNJnceAfK2KwrQmT5D5LV/a08ygkjvrTB/54q3AVfvF9mJdu+gJUN
-         niIQ==
-X-Gm-Message-State: AOJu0YyvywBKaJAcc++3xwgvxIwdvHDVa+BHvcw665VwsTajW8S/MW+J
-	pThRnXggKYKfyEhmB5L9Rn9IoGvTe3BZuNa1OSylRrTsSjqmxGwJPKuNQTsFUKozNNLsdTnSU20
-	l7Jkd2V4kpbpFGxs3vg+ETOfukaYfZTt5SOll0QMQsgeRy/yM9JPTQt4=
-X-Google-Smtp-Source: AGHT+IHjnT0c6IU9Y8eh+EIRpgV7cYUACnvoc+unffKxZ5AxGkGqIWUUhaap7lDH7CtHwNqdHiJ3cRowKibaUG9YrzOkadiGK1zu
+	s=arc-20240116; t=1706001319; c=relaxed/simple;
+	bh=Mu4jvDM/Gpa3jYnWKBrbmxafetUa+cgrJwz8QwpT7fA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FT1KIpMXDsNypZqprSQ1hQwimA8CHctvDVTLz25f3CictB5r1z/bdHMiw2b98VdBtbhbO0lyE15wZuBZW5P3llf9V0unn3j/wsuYjrOpSJJNBA3qpqRMMOpA9PJHZx9/DFwaPBPtOlS0kXwvhTV57I0UdtIsy9xCy2MAgPlTa9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ojH8FY9k; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id CDE9C1BF205;
+	Tue, 23 Jan 2024 09:15:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1706001309;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=J+BnTNr7Ae3D9xLmTYxlT4lRtHyTsNW6UydqPcRonqs=;
+	b=ojH8FY9kBTCiD+oqrC7vRrSbmndmiEFW96aDb/yp9vB/b3sxUnSFgQgOlUmDKatTcdc36O
+	ZJiqcJFzRmX1CK0jlQ+k0KTEf/JvcdiL4abM4wJD57w/AYt/8iLQVB1r8DS+W5PvpKkGYx
+	uP1sxalpwp9uCUDWUPKQNLuB/g4r8PyCBm6XVGcnb9+ybJP2fPQ2Thz5s/vtB47g2ctzOB
+	r9I625VzLtxiOk6paGRAsVZDHQDFmM0CqC1JTaI1vrO41A/6CXomvPf0iQVt9iUIVW3hpI
+	5SNpZL6HsXsOhquLC53AGIk32vG5VozUsAZjs4GlrqkZsEPTH99wjRi6Zt9L8Q==
+Date: Tue, 23 Jan 2024 10:15:07 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: "Jenishkumar Patel [C]" <jpatel2@marvell.com>
+Cc: "marcin.s.wojtas@gmail.com" <marcin.s.wojtas@gmail.com>,
+ "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "davem@davemloft.net"
+ <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Antoine
+ Tenart <atenart@kernel.org>
+Subject: Re: [EXT] Re: [net v4 PATCH 1/1] net: mvpp2: clear BM pool before
+ initialization
+Message-ID: <20240123101507.6ae730bd@device-28.home>
+In-Reply-To: <PH0PR18MB4543B5E92792ECD5D3683861EC752@PH0PR18MB4543.namprd18.prod.outlook.com>
+References: <20240119035914.2595665-1-jpatel2@marvell.com>
+	<20240119150451.476d6ba2@device-28.home>
+	<PH0PR18MB4543B5E92792ECD5D3683861EC752@PH0PR18MB4543.namprd18.prod.outlook.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.39; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d88:b0:35f:f01e:bb18 with SMTP id
- h8-20020a056e021d8800b0035ff01ebb18mr875536ila.6.1706001081646; Tue, 23 Jan
- 2024 01:11:21 -0800 (PST)
-Date: Tue, 23 Jan 2024 01:11:21 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000007549a6060f99544d@google.com>
-Subject: [syzbot] [tipc?] general protection fault in tipc_udp_nl_dump_remoteip
-From: syzbot <syzbot+314c727eef32ba20b65d@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, jmaloy@redhat.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	tipc-discussion@lists.sourceforge.net, ying.xue@windriver.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Hello,
+Hi,
 
-syzbot found the following issue on:
+On Mon, 22 Jan 2024 06:02:07 +0000
+"Jenishkumar Patel [C]" <jpatel2@marvell.com> wrote:
 
-HEAD commit:    39369c9a6e09 selftests: netdevsim: add a config file
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=1383ebbde80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6d54ca15e81ba55f
-dashboard link: https://syzkaller.appspot.com/bug?extid=314c727eef32ba20b65d
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+> > > +/* Cleanup pool before actual initialization in the OS */ static void 
+> > > +mvpp2_bm_pool_cleanup(struct mvpp2 *priv, int pool_id) {
+> > > +	unsigned int thread = mvpp2_cpu_to_thread(priv, get_cpu());
+> > > +	u32 val;
+> > > +	int i;
+> > > +
+> > > +	/* Drain the BM from all possible residues left by firmware */
+> > > +	for (i = 0; i < MVPP2_BM_POOL_SIZE_MAX; i++)
+> > > +		mvpp2_thread_read(priv, thread, MVPP2_BM_PHY_ALLOC_REG(pool_id));  
+> > 
+> > ... I think you didn't answer Antoine's comment on that loop from the V2, regarding what this does exactly. From the other sites this is used, it seems to perform an allocation from the pool, can you clarify how safe it is to do so here, if for example the BM was never configured by the firmware beforehand and is therefore already in a Stopped state ?
+> 
+> Reading the register provides a pointer to buffer that is already allocated during BM initialization. When multiple reading is done on the register, it will drain all the pointers that are stored by previous firmware. Also reading this register does not perform any allocation as it is only performing register read operation, thus when the BM is not configured earlier then it will not lead to any stop state.
+> 
+> > And are we not risking any leak if there was something in the pool that we don't release ?
+> 
+> The data on the pointer given by register read is written after the read operation is preformed, which means the pointer does not contain any data, thus there is no leak.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Thanks for your answers, I think that's clear to me then.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/3095adfa6c3d/disk-39369c9a.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/105f20ab46b4/vmlinux-39369c9a.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/2d8afb887806/bzImage-39369c9a.xz
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+314c727eef32ba20b65d@syzkaller.appspotmail.com
+Maxime
 
-general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-CPU: 1 PID: 14603 Comm: syz-executor.3 Not tainted 6.7.0-syzkaller-04690-g39369c9a6e09 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-RIP: 0010:tipc_udp_nl_dump_remoteip+0x3c7/0xa60 net/tipc/udp_media.c:513
-Code: 48 c1 ea 03 80 3c 02 00 0f 85 df 05 00 00 48 8b 9b 98 00 00 00 48 b8 00 00 00 00 00 fc ff df 4c 8d 7b c8 48 89 da 48 c1 ea 03 <80> 3c 02 00 0f 85 6b 06 00 00 48 8b 03 48 39 d9 4c 8d 70 c8 0f 84
-RSP: 0018:ffffc900160171e8 EFLAGS: 00010246
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffff88804cc52098
-RDX: 0000000000000000 RSI: ffffffff8a288b69 RDI: 0000000000000005
-RBP: ffff888047885780 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000001000 R12: 0000000000000000
-R13: ffffc90016017268 R14: ffff888047885780 R15: ffffffffffffffc8
-FS:  00007f35d634c6c0(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f1f7a57b038 CR3: 000000002bfe0000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- genl_dumpit+0x119/0x220 net/netlink/genetlink.c:1025
- netlink_dump+0x588/0xca0 net/netlink/af_netlink.c:2264
- __netlink_dump_start+0x6d0/0x9c0 net/netlink/af_netlink.c:2370
- genl_family_rcv_msg_dumpit+0x1e1/0x2d0 net/netlink/genetlink.c:1074
- genl_family_rcv_msg net/netlink/genetlink.c:1190 [inline]
- genl_rcv_msg+0x470/0x800 net/netlink/genetlink.c:1208
- netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2543
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1217
- netlink_unicast_kernel net/netlink/af_netlink.c:1341 [inline]
- netlink_unicast+0x53b/0x810 net/netlink/af_netlink.c:1367
- netlink_sendmsg+0x8b7/0xd70 net/netlink/af_netlink.c:1908
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0xd5/0x180 net/socket.c:745
- ____sys_sendmsg+0x6ac/0x940 net/socket.c:2584
- ___sys_sendmsg+0x135/0x1d0 net/socket.c:2638
- __sys_sendmsg+0x117/0x1e0 net/socket.c:2667
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xd3/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-RIP: 0033:0x7f35d567cda9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f35d634c0c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f35d57abf80 RCX: 00007f35d567cda9
-RDX: 0000000000000000 RSI: 0000000020000340 RDI: 0000000000000003
-RBP: 00007f35d56c947a R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007f35d57abf80 R15: 00007ffed090ed98
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:tipc_udp_nl_dump_remoteip+0x3c7/0xa60 net/tipc/udp_media.c:513
-Code: 48 c1 ea 03 80 3c 02 00 0f 85 df 05 00 00 48 8b 9b 98 00 00 00 48 b8 00 00 00 00 00 fc ff df 4c 8d 7b c8 48 89 da 48 c1 ea 03 <80> 3c 02 00 0f 85 6b 06 00 00 48 8b 03 48 39 d9 4c 8d 70 c8 0f 84
-RSP: 0018:ffffc900160171e8 EFLAGS: 00010246
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffff88804cc52098
-RDX: 0000000000000000 RSI: ffffffff8a288b69 RDI: 0000000000000005
-RBP: ffff888047885780 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000001000 R12: 0000000000000000
-R13: ffffc90016017268 R14: ffff888047885780 R15: ffffffffffffffc8
-FS:  00007f35d634c6c0(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fc4601dcf78 CR3: 000000002bfe0000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	48 c1 ea 03          	shr    $0x3,%rdx
-   4:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
-   8:	0f 85 df 05 00 00    	jne    0x5ed
-   e:	48 8b 9b 98 00 00 00 	mov    0x98(%rbx),%rbx
-  15:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
-  1c:	fc ff df
-  1f:	4c 8d 7b c8          	lea    -0x38(%rbx),%r15
-  23:	48 89 da             	mov    %rbx,%rdx
-  26:	48 c1 ea 03          	shr    $0x3,%rdx
-* 2a:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
-  2e:	0f 85 6b 06 00 00    	jne    0x69f
-  34:	48 8b 03             	mov    (%rbx),%rax
-  37:	48 39 d9             	cmp    %rbx,%rcx
-  3a:	4c 8d 70 c8          	lea    -0x38(%rax),%r14
-  3e:	0f                   	.byte 0xf
-  3f:	84                   	.byte 0x84
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
