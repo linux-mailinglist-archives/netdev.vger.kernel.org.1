@@ -1,56 +1,57 @@
-Return-Path: <netdev+bounces-65179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3114283972F
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 19:03:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70AD783976F
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 19:17:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C772A1F2513D
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 18:03:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00C15B22F3A
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 18:17:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 583A881207;
-	Tue, 23 Jan 2024 18:03:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E74481AD2;
+	Tue, 23 Jan 2024 18:17:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eHCNMsCD"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E09481AA2;
-	Tue, 23 Jan 2024 18:03:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 680B081211;
+	Tue, 23 Jan 2024 18:17:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706032999; cv=none; b=WvAbV+RoOWp1IgL57f8hbG8urR787/fYtCgRg806wSLhdTCkxVpJ5EpzslMxsDVpVXhv1aRmiJPAq9D9xjkUsH61UP+41bDEjCvX7V7YMthb+UXeiIWZfk4lqMihwrlkDWKrR37d2EG+p18aYu5icDDkBnjElbrkX+nAXIUDpzs=
+	t=1706033841; cv=none; b=Dgzah6ZN1LieJ5cOpfruz0gPgAvmRVbxcuXyaXaasRNvzeUbuocBUFQ+SZ6TfIJclWP8WBS+lpD4R4LF5IXIUTnFU5vGzjkn6UDbdOCsi4XAY7Ch1AFGjpFyPG6kV51Jrhp81iZXwbxLCw9LJPBqYQgWXiq3b44nET1UUuegXkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706032999; c=relaxed/simple;
-	bh=EL5p5c0hwl2jJMI3Rm+9efOqsd/1ZSKtNHzHsiSsBcI=;
+	s=arc-20240116; t=1706033841; c=relaxed/simple;
+	bh=unKlMqWhOrc7oLSBAs+sTo6HWltBQeZv/oWa9STjUl8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xqf7zaCXz0lmJ1D4DOShs/hZpH3vIZqgySF0DGiZL9xHBdf+Br1vkpUX4VRXNvaq0FESAoSMRJr5hzhcFk47uEVCO2VFEBBgUEhBAEeUzSbYzeMaXNiMpvme6aosBq2VQsN5Qc6bZBxir94oxipdruikEJbpGyVG6oEcXOlx1C8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1rSL71-0002f0-JY; Tue, 23 Jan 2024 19:03:03 +0100
-Date: Tue, 23 Jan 2024 19:03:03 +0100
-From: Florian Westphal <fw@strlen.de>
-To: Kees Cook <keescook@chromium.org>
-Cc: linux-hardening@vger.kernel.org,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 64/82] netfilter: Refactor intentional wrap-around test
-Message-ID: <20240123180303.GB31645@breakpoint.cc>
-References: <20240122235208.work.748-kees@kernel.org>
- <20240123002814.1396804-64-keescook@chromium.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=KkzIo91wbb+BXZqbdc9H6IchCleKOcmya9ETEbDyPUZlKw3o88jR4o/7ThQzFUhwMHPzul1cNVr1pTNNSRW7PiV0DApVpHXohnpXGIKEnaVxfx6kZGBfRZozlIdS1QNgp90mtsPEcRVR098pS7ZlVXETYIsFJi/Y8mKQWPP5yFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eHCNMsCD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64873C43390;
+	Tue, 23 Jan 2024 18:17:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706033840;
+	bh=unKlMqWhOrc7oLSBAs+sTo6HWltBQeZv/oWa9STjUl8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eHCNMsCDZNKDnH/rK96JBMsA5RQBzAlm2qY0mje8iutGUR5H/S3eVCtCYALf3Pq90
+	 XDqgSnjq6EiI+ZRHMbeSHeoEIniwqyuMdv9gv2YwcfbJxtbBvuVA0BidFogIG61Q2n
+	 xfzAaOhR0Z5Xg0t5VqE1WpulNSCUADhjUXfi6J8NixO5Sc8o3AGqU/8KM8Z0wRfdNi
+	 9inUgqDO8x7RfjwCBbqQB2b7xvffyt4uOQm/5a037yohMFA6mBspf8TdIr3jFoFouW
+	 C6Og2hJWdIvaeP7eaS1Y/X8dY9ZFRNCEihPyI1V5Fy5nkEWMc85JEZZ7y6AruQtZ5K
+	 D+KihjKdDOwew==
+Date: Tue, 23 Jan 2024 18:17:16 +0000
+From: Simon Horman <horms@kernel.org>
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	sgoutham@marvell.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, sbhatta@marvell.com,
+	gakula@marvell.com, hkelam@marvell.com,
+	Suman Ghosh <sumang@marvell.com>
+Subject: Re: [PATCH net] octeontx2-af: Initialize bitmap arrays.
+Message-ID: <20240123181716.GP254773@kernel.org>
+References: <20240123051245.3801246-1-rkannoth@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,15 +60,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240123002814.1396804-64-keescook@chromium.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20240123051245.3801246-1-rkannoth@marvell.com>
 
-Kees Cook <keescook@chromium.org> wrote:
-> In an effort to separate intentional arithmetic wrap-around from
-> unexpected wrap-around, we need to refactor places that depend on this
-> kind of math. One of the most common code patterns of this is:
-> 
-> 	VAR + value < VAR
++ Suman Ghosh <sumang@marvell.com>
 
-Acked-by: Florian Westphal <fw@strlen.de>
+On Tue, Jan 23, 2024 at 10:42:45AM +0530, Ratheesh Kannoth wrote:
+> kmalloc_array() does not initializes memory to zero.
+> This causes issues with bitmap. Use devm_kcalloc()
+> to fix the issue.
+
+Hi Ratheesh,
+
+I assume that the reason that the cited commit moved away from devm_
+allocations was to allow more natural management of the resources
+independently of the life cycle of the driver instance. Or in other words,
+the need to free the bitmaps in npc_mcam_rsrcs_deinit() probably indicates
+that devm_ allocations of them aren't giving us anything.
+
+So, perhaps kcalloc() is more appropriate than devm_kcalloc() ?
+
+> Fixes: dd7842878633 ("octeontx2-af: Add new devlink param to configure maximum usable NIX block LFs")
+> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
 
