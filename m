@@ -1,135 +1,124 @@
-Return-Path: <netdev+bounces-64928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48D31837E52
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 02:38:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF358837E7B
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 02:39:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA7CA1F26AAF
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 01:38:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1CA51C28F4C
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 01:39:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99CAC56775;
-	Tue, 23 Jan 2024 00:42:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF9745EE67;
+	Tue, 23 Jan 2024 00:43:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QK6sjKdz"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="ELFwoPQJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1642C3984D
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 00:41:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3AC754BD2
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 00:43:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705970521; cv=none; b=iYSex/lET7Vm74b4PGo5RWr1Is1EMkFoh6T3vUu4uV5ayX1ZitIdQ7hE9XuIY5iGMlsyvDmaw0jrMhkPFubUuXFdiFqEpSW/Zo0EwIhBKqPgMQjRsJpaf69Hre+ltmcjNitKoZouBKn1OKiAie3zdOqcySnQCctBKKTWdRLldqk=
+	t=1705970620; cv=none; b=G8YeIcaNP2qff6YezO9dYI46fOVQ5+8D4/ppY8N3efl/Q0p9DinFTVCqwBLAThqsO02rYfflt32r6OhBjb0Y5xfQyjxFPwaj2etPRpsxF0lyIbRaSXf2fPGm63Vi9VmkJAlkjkruwnJ9cIzQCLz6y+qJWjhCeF5RV7bVqGccy/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705970521; c=relaxed/simple;
-	bh=bBLScMOQcBvVNOy/zJDQHVZUw/QdrcCI7ya/rWvm2Kc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fGvTHQh6cdf8i4xnDkiyzNuY2Rfv5s/1/HlcOf2ZtLIIfCDGFVV7o+TCa9M20Re9MHgja9N5hpLiT+6x6MDr6GCnz3c2/53bye0vovqCjD1oBBkMf5DcWROE5beSwexvBd7F4YP4JS3RZNcdbxHpPiEUdWzFBTSP8XBuFOHOAZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QK6sjKdz; arc=none smtp.client-ip=209.85.166.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-3619e804f3aso13270975ab.2
-        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 16:41:59 -0800 (PST)
+	s=arc-20240116; t=1705970620; c=relaxed/simple;
+	bh=MUqmS4qhJg2vbTbZv6gK5aLD9zNZIlzbDg0H92mWw6U=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SXh47uVEt0eK3kR2wCLfQvlr05PZAmVyUYIbAkYqgAJcUVw7wOnCL1gYnlONlzDZzllbUoD9HlM3OFDxzG5h6E7W/dKIQBGuVEZ0WIUXl7ajm4fVZhHsa+sib8Zv3fjljVKajWJJQFuihRCd4VskalAi+ePLErdD/QZUqjacWxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=ELFwoPQJ; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6dbd07916d0so2226613b3a.0
+        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 16:43:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705970519; x=1706575319; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9msZ1BDws4gmxhQ29cGonhe7XlKkP+NlpnlynOK523s=;
-        b=QK6sjKdztlzuYzSLU7/8nr2aKTqLF3/wXCsWg6INLObJhH6Faoqyk1b0N1X+fe1280
-         m4ftC7ZjAKc2DweCy3aYhCU5FXygwe6ltM1RJlO8s00KExx5QvUG34gASQB4NuFAb2+j
-         FS3S9fWRN4I9fTKQZY/s4JaVs8vsT9KtT0RxK2ar6kTF1yQ0JUynrVqUqrYYjkDbDXzC
-         Q6PcfLvUs2nM58l4WiQcWLdIgLRpY8UMgwWNk6DPA4pabY/iLWkPKI9g0vG/bFqkJAiF
-         /16fsMMXuccYuknr2n+ZwlbeG9m77BNaN4Q9jB6eJ0HlyKkq7ZLe2zIhM2Pq8ma25YI/
-         vplQ==
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1705970618; x=1706575418; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1M/IGdbPj8T8OQPGukSpGo/Li+GJjkhXjFZxGan4dSs=;
+        b=ELFwoPQJUuWzZi3HzwHhv7ChY3p0KHwpSxWyi3pUPezbuPbAkoFmqOd+n3OG/BYIV4
+         vXrTrv/PblMW6K9KFyS3rMgCBbHoYciiNxvFUHnjpe81zL7DHdBrGci7VstEDo4ksUlY
+         TZ/SlCdp/340hBgXSG1PhOyrCM/E283GfSShd/Vk6MR6n8f5XGvmGbY/5XeljlZfTNGi
+         8o6CAZfuSf7HAPHxbrhcP1q0eahMz9YiEKh01gkBEU8oAYWEDSblWRqrmj0ai+ytmQXc
+         RBxgGgW9lHkVWfN7QfTLm3ruP2C64odwrHX5O/0Q0DsFScrKVHgY6xgCWZQ/XOkcFnzc
+         eOhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705970519; x=1706575319;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9msZ1BDws4gmxhQ29cGonhe7XlKkP+NlpnlynOK523s=;
-        b=HpvNb+o3XPiS1/jHNyHWhFniV3BlsQQ0MbBH0T8DVJjxnqSQ+yAn6el0lFy8T9bxAo
-         m2X4HKd4PQmwMPdgeCHcRsXI6DgKZ3eJUpTUECRUQnHOSPAt9Kxpdyd9OW0EnHXdK5Qv
-         yXoxRlAHMSs+4YlI5OuadugYV60haggFo7rWVJGF/BrF9hdQDz7+WAvOcVGA8ZrvIg3k
-         kBubFmA4auJTkWwLGkJeOogL+5Ln7oxsMGGlqW82kfsCL9oaa9NK3TDB7lbBef07jZuR
-         ZgQnGhR2DZGF8tDIGKJfF5Cwhlf3c6W1G9XXoyB240KD9J1q6yJw5xyhvcohRgcveyWC
-         eBsQ==
-X-Gm-Message-State: AOJu0Ywjc4Aq5PeCsfuZoQtyp4SJW5CM+jFOWFB5gWGD7Y/Wv5CMCk6z
-	z4opKThMb9HE2HRG87+kBlN7Nanw1UDDDBdIudhLuT96WMFEBobbWckoFBK5
-X-Google-Smtp-Source: AGHT+IG4uS9u21Y1QMq6cjqeCpviQHzow+mcR9/+4u//+4H0HTrc5iy4gYcV1ODHx0Rdn/xcf8FNIQ==
-X-Received: by 2002:a05:6e02:1a8d:b0:360:fe84:1ee9 with SMTP id k13-20020a056e021a8d00b00360fe841ee9mr4589926ilv.120.1705970519042;
-        Mon, 22 Jan 2024 16:41:59 -0800 (PST)
-Received: from ?IPV6:2601:282:1e82:2350:3c2c:1afc:52ff:38e7? ([2601:282:1e82:2350:3c2c:1afc:52ff:38e7])
-        by smtp.googlemail.com with ESMTPSA id y18-20020a056e020f5200b00361a70e112asm3025925ilj.59.2024.01.22.16.41.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Jan 2024 16:41:58 -0800 (PST)
-Message-ID: <f24380fc-a346-4c81-ae78-e0828d40836e@gmail.com>
-Date: Mon, 22 Jan 2024 17:41:57 -0700
+        d=1e100.net; s=20230601; t=1705970618; x=1706575418;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1M/IGdbPj8T8OQPGukSpGo/Li+GJjkhXjFZxGan4dSs=;
+        b=hfR9/wTiv2IGOKmvWY5Z8uNLOFNLn5pG8+ZkjVephBV6siybEhQTibL09WS5Qgt65P
+         kkRQfdJWiuoe1jMJNyUJ1jdACW2dQYVbYhd4YUILmM27wAtq+lw3qiBw2aO0kVfcqMs7
+         R/uW1pr7fXreDPCrPbraOc6ol3aWhLNxAfG5uy/JhmJlHz/VB/8kuUuXbtLGsXqlY44S
+         gi7RKlDU4qjYotVtDsvMgW4fOIW0RNzC3r/ACYsLGTOwWFW0esiCpZD9BkK9sGG68sde
+         hiHAwct+St1ZqTQePD7B1F09bUJ97gVjJBXUc1nnpC4HprrLQhu5GUG9J194qhjIt+jG
+         98EQ==
+X-Gm-Message-State: AOJu0YyA8P46dboGgvbn0q1GDJ1o9++ri8PaiwLFPIbCmSGHsgK0CNlK
+	366qWdQOqHpGoz+1waKxU2g4TGouPFl2cEAa108fEDN+dlhM9F2BWX1rdFv9WZ24MDebhMw0ZR5
+	nxik=
+X-Google-Smtp-Source: AGHT+IE6ysBb50a5Rt/xCmNgeb+8tJicrjDS4XaIs86aYGYUJ9SeyQlYxDfkmk6T4+t24VJc6fF3KA==
+X-Received: by 2002:a05:6a00:9389:b0:6db:eccd:c756 with SMTP id ka9-20020a056a00938900b006dbeccdc756mr1280257pfb.57.1705970618106;
+        Mon, 22 Jan 2024 16:43:38 -0800 (PST)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id ks21-20020a056a004b9500b006dac91d55f7sm10314445pfb.136.2024.01.22.16.43.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jan 2024 16:43:37 -0800 (PST)
+Date: Mon, 22 Jan 2024 16:43:36 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Pedro Tammela <pctammela@mojatatu.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH iproute2 1/2] color: use empty format string instead of
+ NULL in vfprintf
+Message-ID: <20240122164336.12119994@hermes.local>
+In-Reply-To: <20240122210546.3423784-2-pctammela@mojatatu.com>
+References: <20240122210546.3423784-1-pctammela@mojatatu.com>
+	<20240122210546.3423784-2-pctammela@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iproute2] vxlan: add support for flowlab inherit
-Content-Language: en-US
-To: Ido Schimmel <idosch@idosch.org>, Alce Lafranque <alce@lafranque.net>
-Cc: netdev@vger.kernel.org, stephen@networkplumber.org,
- Vincent Bernat <vincent@bernat.ch>
-References: <20240120124418.26117-1-alce@lafranque.net>
- <Za5eizfgzl5mwt50@shredder>
-From: David Ahern <dsahern@gmail.com>
-In-Reply-To: <Za5eizfgzl5mwt50@shredder>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 1/22/24 5:24 AM, Ido Schimmel wrote:
-> s/flowlab/flowlabel/ in subject
-> 
-> My understanding is that new features should be targeted at
-> iproute2-next. See the README.
-> 
-> On Sat, Jan 20, 2024 at 06:44:18AM -0600, Alce Lafranque wrote:
->> @@ -214,10 +214,16 @@ static int vxlan_parse_opt(struct link_util *lu, int argc, char **argv,
->>  			NEXT_ARG();
->>  			check_duparg(&attrs, IFLA_VXLAN_LABEL, "flowlabel",
->>  				     *argv);
->> -			if (get_u32(&uval, *argv, 0) ||
->> -			    (uval & ~LABEL_MAX_MASK))
->> -				invarg("invalid flowlabel", *argv);
->> -			addattr32(n, 1024, IFLA_VXLAN_LABEL, htonl(uval));
->> +			if (strcmp(*argv, "inherit") == 0) {
->> +				addattr32(n, 1024, IFLA_VXLAN_LABEL_POLICY, VXLAN_LABEL_INHERIT);
->> +			} else {
->> +				if (get_u32(&uval, *argv, 0) ||
->> +				    (uval & ~LABEL_MAX_MASK))
->> +					invarg("invalid flowlabel", *argv);
->> +				addattr32(n, 1024, IFLA_VXLAN_LABEL_POLICY, VXLAN_LABEL_FIXED);
-> 
-> I think I mentioned this during the review of the kernel patch, but the
-> current approach relies on old kernels ignoring the
-> 'IFLA_VXLAN_LABEL_POLICY' attribute which is not nice. 
+On Mon, 22 Jan 2024 18:05:45 -0300
+Pedro Tammela <pctammela@mojatatu.com> wrote:
 
-Common theme with vxlan attributes :-(
-
-
-> My personal
-> preference would be to add a new keyword for the new attribute:
+> NULL is passed in the format string when nothing is to be printed.
+> This is commonly done in the print_bool function when a flag is false.
+> Glibc seems to handle this case nicely but for musl it will cause a
+> segmentation fault.
 > 
-> # ip link set dev vx0 type vxlan flowlabel_policy inherit
-> # ip link set dev vx0 type vxlan flowlabel_policy fixed flowlabel 10
+> The following is an example of one crash in musl based systems/containers:
+>    tc qdisc add dev dummy0 handle 1: root choke limit 1000 bandwidth 10000
+>    tc qdisc replace dev dummy0 handle 1: root choke limit 1000 bandwidth 10000 min 100
+>    tc qdisc show dev dummy0
 > 
-> But let's see what David thinks.
-> 
+> Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
+> ---
+>  lib/color.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
+Wouldn't it be simpler to just add a short circuit check.
+This would fix the color case as well.
 
-A new keyword for the new attribute seems like the most robust.
-
-That said, inherit is already used in several ip commands for dscp, ttl
-and flowlabel for example; I do not see a separate keyword - e.g.,
-ip6tunnel.c.
+diff --git a/lib/color.c b/lib/color.c
+index 59976847295c..cd0f9f7509b5 100644
+--- a/lib/color.c
++++ b/lib/color.c
+@@ -140,6 +140,9 @@ int color_fprintf(FILE *fp, enum color_attr attr, const char *fmt, ...)
+ 	int ret = 0;
+ 	va_list args;
+ 
++	if (fmt == NULL)
++		return 0;
++
+ 	va_start(args, fmt);
+ 
+ 	if (!color_is_enabled || attr == COLOR_NONE) {
 
