@@ -1,215 +1,168 @@
-Return-Path: <netdev+bounces-65069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AF3083913C
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 15:21:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9400283915D
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 15:29:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 182D41F2887E
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 14:21:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D3C4289D15
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 14:28:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2306B5F876;
-	Tue, 23 Jan 2024 14:21:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A857A5EE99;
+	Tue, 23 Jan 2024 14:28:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="PKayuLNr";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="iaeyMu9I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SNCavZI6"
 X-Original-To: netdev@vger.kernel.org
-Received: from wout4-smtp.messagingengine.com (wout4-smtp.messagingengine.com [64.147.123.20])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 430415F858;
-	Tue, 23 Jan 2024 14:21:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ED8C5FDC3;
+	Tue, 23 Jan 2024 14:28:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706019701; cv=none; b=OPJs9xME0cXRUlLLAhRFb+ARqA8Ewxpwat3jdiyIxavfu6qb2VoqovQZDpqg0syoqvvbb6gcrtpbm7L7w5wRrDeniihanq0vM0fsRmLlnDVKKJZyIsJgp69yzQi7NRVVC0l4+YSpMze1FzkqecV3LOxQDhvX+tkoH0kXemp5374=
+	t=1706020118; cv=none; b=INPll1aJcAL0qqlrIwBnJtXdGpAath4RBGunz6+SArZ94jDV4I803ygt/XhuQvb6+HLnyVGUpuTvYUhjL89hXqg3J/b6hm0TrtxO43D+B1I6JSUQQNgnhaf1TgwSpFY5GfdbgTYlA+j10rUzrxYrvUfT4ShITrdbsxF4udWVS6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706019701; c=relaxed/simple;
-	bh=BWxFJ6f+lO7oLYsKbxzaJnDar3I13n2vm78DWeqz9IY=;
-	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
-	 Subject:Content-Type; b=FGurJrD2FVc2LQPBukY/6oCCxfahRa/wu+ND5YE51PM39x/do822ysbdaIDpyaGZGCKCeQY2LlsLiAVZRqBJ4lFUV4SztbjbbyH2wBGyOqY26m6eoT3Lbm+PcLHTpVHLpjld4AZk/jh6iqfMOYDuouGM6byvOX+40+fXGMYrJLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=PKayuLNr; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=iaeyMu9I; arc=none smtp.client-ip=64.147.123.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailout.west.internal (Postfix) with ESMTP id F2C013200A04;
-	Tue, 23 Jan 2024 09:21:36 -0500 (EST)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Tue, 23 Jan 2024 09:21:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1706019696;
-	 x=1706106096; bh=Wb2LadyDq3EncKOixdkKXF1xf+5ToI114DbbSpnU1nY=; b=
-	PKayuLNrs/RNOnY9Pm3PTRTDtc1BuvHxlCD7DuFwY3X2d3w/3n1RTZ9LkQQmom3/
-	w6idujhcC4sf3BbCM5+B3rKAeN6o49DZxzKkXiUHhjhwBc48BWX6QQG9FBbGrESz
-	dY9isiD4klmX7hDZxIpR0XAo9bx2f3HmXbcXHrgnWu377wYBVGHNDJeydLYODUm3
-	R2v4IQChjpBjq1THZkrhojBT62tPQZhhhJX7vhM3GS1LAQ5MUjk8AsVhFsBFrQgH
-	doe9VBd2+6WHeaR4G96Yes5cYzvayqaI2fWvhDYf/ZZHo1Zb7cz6wduRTcnHpKrW
-	6kE0Ci1RccWeYTA5fc/t/A==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1706019696; x=
-	1706106096; bh=Wb2LadyDq3EncKOixdkKXF1xf+5ToI114DbbSpnU1nY=; b=i
-	aeyMu9IQJm8viLVFcRG2+AfApl0inhRKl32d9bxe+ynOLxLBL2s/6xnBdR+sart7
-	wAZAjiA4uL/DTaIWBboS2/YhhyDMgMYyxOQ4f604bM7uJzQt+e/9izTFd+xJifVo
-	xQ50WHbYZD/V2ZAwYra6Pek4hm9CLQF0AsKq4BVdceSEFeVHgMY+a42IjHl2qdAC
-	3tidNdDH6brWPgcA3qtQ97S9I8mHpThso03DUhwzCMsTMvIaulq1IZgWkWvjI17h
-	qB/abhBsPAnPQnf0Ws70h0wwPbXzEqjR98NOYls5N0AIzgYtr4Y02V+Cwfh6GpX1
-	RL81i2NKrtG69Wlsq/MXA==
-X-ME-Sender: <xms:b8uvZZutZyYhjvm11xsbDHd-yctTohxrZ96EclPn7v7Uk295CAYxIA>
-    <xme:b8uvZSdJ-DzXvh4tLWbWKsloyBAkMqIGhWu0zDscTRdh84QtuWV6_vntH6OGKUGWc
-    o9tQr6gGnuPR811080>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdekkedgieduucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtgfesthhqredtreerjeenucfhrhhomhepfdet
-    rhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrg
-    htthgvrhhnpefgkeeuleegieeghfduudeltdekfeffjeeuleehleefudettddtgfevueef
-    feeigeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivg
-    eptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvg
-X-ME-Proxy: <xmx:b8uvZcyHxEDFbucCwS_wdJTB7xZCjv4VpoI1kQNX4uuVdNYjj6sBQw>
-    <xmx:b8uvZQOGooI-lZsO5yozfuK-_cjQpfLDCPfU0iE3UrR2Mn2j9dL4qQ>
-    <xmx:b8uvZZ-FoQRRZFNwPBfm4zrKoG5PrhcOqTLtRYQnZkkS4F1E545I9g>
-    <xmx:cMuvZdVu3pmkvuhw0wgTNHs20QG_zyCJ2SI5aNTi4b7I7-93_VGCkA>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id C023DB6008D; Tue, 23 Jan 2024 09:21:35 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.11.0-alpha0-119-ga8b98d1bd8-fm-20240108.001-ga8b98d1b
+	s=arc-20240116; t=1706020118; c=relaxed/simple;
+	bh=BGfyJ7gRhT1Aa7UkF14qIivTkKkNepV0vVoRH+fhsZQ=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=L7kS+CFd/FcVnb4njEBL+dlSGdEGLFvgRReahU6bE0xLMwqNtaayQ9vuCjX9RrMmmZsClNdjiS62nxWcbX6cwxWiv7MDVAyQjDjWp+KWSpG9/8NBnGx0bs4ZNHQKNBnPltoISDS9ywjKF3AVNLD50XOImdzCLL2c3XIYsUqGhCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SNCavZI6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EA87C43399;
+	Tue, 23 Jan 2024 14:28:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706020118;
+	bh=BGfyJ7gRhT1Aa7UkF14qIivTkKkNepV0vVoRH+fhsZQ=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=SNCavZI6yZKaylpSjfyLqz0TDhSFV3GMsi9zjs/HoG6cjrI+JJycCDs/gKqKqRewz
+	 kXqi6arqlce2icTtfjLmNVacI96nFhncb/zRsoca7H1NBPBWwti+KRaqUVTozqbl+f
+	 koinx/8QjJnletclhxaIQd9X8JLGs/5STeAD1NiIEo1gLDBtib+ZufZAO13tfXf3It
+	 eBbrWI7pSt0k9hF/c0tFXxYkX+oXp6nQJ39AzEUm5kWVNqLcDiSOsko2hn+Zy7rStG
+	 L8flw0YQg3Qc+zp52UFU1FFjt1QySnFxpU1fzsOVO0I3MtjPdrACAaudicbUb2u0C2
+	 lcPq45USr7M/g==
+Message-ID: <3f035d3bc494ec03b83ae237e407c42f2ddc4c53.camel@kernel.org>
+Subject: Re: [PATCH v6 3/3] NFSD: add write_ports to netlink command
+From: Jeff Layton <jlayton@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neilb@suse.de>, 
+	linux-nfs@vger.kernel.org, lorenzo.bianconi@redhat.com, kuba@kernel.org, 
+	horms@kernel.org, netdev@vger.kernel.org
+Date: Tue, 23 Jan 2024 09:28:36 -0500
+In-Reply-To: <Za-9P0NjlIsc1PcE@lore-desk>
+References: <cover.1705771400.git.lorenzo@kernel.org>
+	 <f7c42dae2b232b3b06e54ceb3f00725893973e02.1705771400.git.lorenzo@kernel.org>
+	 <9e3ae337dcf168c60c4cfd51aa0b2fc7b24bcbfb.camel@kernel.org>
+	 <170595930799.23031.17998490973211605470@noble.neil.brown.name>
+	 <Za7zHvPJdei/vWm4@tissot.1015granger.net> <Za-N6BxOMXTGyxmW@lore-desk>
+	 <85b02061798a1b750a87b0302681b86651d0c7a3.camel@kernel.org>
+	 <Za-9P0NjlIsc1PcE@lore-desk>
+Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
+ keydata=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
+	kZWuOsJdJQdmwlWC5L5ln9xgfr/4mOY38B0U=
+Content-Type: text/plain; charset="ISO-8859-15"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <0229fa60-2d87-4b1c-b9f0-6f04c6e4dbdd@app.fastmail.com>
-In-Reply-To: <d03e90ca-8485-4d1b-5ec1-c3398e0e8da@linux-m68k.org>
-References: 
- <CAHk-=wiB4iHTtfZKiy5pC24uOjun4fbj4kSX0=ZnGsOXadMf6g@mail.gmail.com>
- <20240123111235.3097079-1-geert@linux-m68k.org>
- <d03e90ca-8485-4d1b-5ec1-c3398e0e8da@linux-m68k.org>
-Date: Tue, 23 Jan 2024 15:21:14 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Geert Uytterhoeven" <geert@linux-m68k.org>, linux-kernel@vger.kernel.org
-Cc: linuxppc-dev@lists.ozlabs.org, linux-sh@vger.kernel.org,
- sparclinux@vger.kernel.org, intel-xe@lists.freedesktop.org,
- dri-devel@lists.freedesktop.org, linux-mtd@lists.infradead.org,
- mpi3mr-linuxdrv.pdl@broadcom.com, linux-scsi@vger.kernel.org,
- "Chris Zankel" <chris@zankel.net>, "Max Filippov" <jcmvbkbc@gmail.com>,
- linux-hardening@vger.kernel.org, qat-linux@intel.com,
- linux-crypto@vger.kernel.org,
- "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
- Netdev <netdev@vger.kernel.org>
-Subject: Re: Build regressions/improvements in v6.8-rc1
-Content-Type: text/plain;charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 23, 2024, at 12:45, Geert Uytterhoeven wrote:
+On Tue, 2024-01-23 at 14:21 +0100, Lorenzo Bianconi wrote:
+> > On Tue, 2024-01-23 at 10:59 +0100, Lorenzo Bianconi wrote:
+> > > > On Tue, Jan 23, 2024 at 08:35:07AM +1100, NeilBrown wrote:
+> > > > > On Tue, 23 Jan 2024, Jeff Layton wrote:
+> > > > > > On Sat, 2024-01-20 at 18:33 +0100, Lorenzo Bianconi wrote:
+> > > > > > > Introduce write_ports netlink command. For listener-set, user=
+space is
+> > > > > > > expected to provide a NFS listeners list it wants to enable (=
+all the
+> > > > > > > other ports will be closed).
+> > > > > > >=20
+> > > > > >=20
+> > > > > > Ditto here. This is a change to a declarative interface, which =
+I think
+> > > > > > is a better way to handle this, but we should be aware of the c=
+hange.
+> > > > >=20
+> > > > > I agree it is better, and thanks for highlighting the change.
+> > > > >=20
+> > > > > > > +	/* 2- remove stale listeners */
+> > > > > >=20
+> > > > > >=20
+> > > > > > The old portlist interface was weird, in that it was only addit=
+ive. You
+> > > > > > couldn't use it to close a listening socket (AFAICT). We may be=
+ able to
+> > > > > > support that now with this interface, but we'll need to test th=
+at case
+> > > > > > carefully.
+> > > > >=20
+> > > > > Do we ever want/need to remove listening sockets?
+> > > >=20
+> > > > I think that might be an interesting use case. Disabling RDMA, for
+> > > > example, should kill the RDMA listening endpoints but leave
+> > > > listening sockets in place.
+> > > >=20
+> > > > But for now, our socket listeners are "any". Wondering how net
+> > > > namespaces play into this.
+> > > >=20
+> > > >=20
+> > > > > Normal practice when making any changes is to stop and restart wh=
+ere
+> > > > > "stop" removes all sockets, unexports all filesystems, disables a=
+ll
+> > > > > versions.
+> > > > > I don't exactly object to supporting fine-grained changes, but I =
+suspect
+> > > > > anything that is not used by normal service start will hardly eve=
+r be
+> > > > > used in practice, so will not be tested.
+> > > >=20
+> > > > Well, there is that. I guess until we have test coverage for NFSD
+> > > > administrative interfaces, we should leave well enough alone.
+> > >=20
+> > > So to summarize it:
+> > > - we will allow to remove enabled versions (as it is in patch v6 2/3)
+> > > - we will allow to add new listening sockets but we will not allow to=
+ remove
+> > > =A0=A0them (the user/admin will need to stop/start the server).
+> > >=20
+> > > Agree? If so I will work on it and post v7.
+> > >=20
+> > >=20
+> >=20
+> > That sounds about right to me. We could eventually relax the restrictio=
+n
+> > about removing sockets later, but for now it's probably best to prohibi=
+t
+> > it (like Neil suggests).
+>=20
+> Do we want to add even the capability to specify the socket file descript=
+or
+> (similar to what we do in __write_ports_addfd())?
+>=20
 
->> 68 error regressions:
->
->>  + /kisskb/src/arch/powerpc/sysdev/udbg_memcons.c: error: no previous=
- prototype for 'memcons_getc' [-Werror=3Dmissing-prototypes]:  =3D> 80:5
->>  + /kisskb/src/arch/powerpc/sysdev/udbg_memcons.c: error: no previous=
- prototype for 'memcons_getc_poll' [-Werror=3Dmissing-prototypes]:  =3D>=
- 57:5
->>  + /kisskb/src/arch/powerpc/sysdev/udbg_memcons.c: error: no previous=
- prototype for 'memcons_putc' [-Werror=3Dmissing-prototypes]:  =3D> 44:6
->
-> powerpc-gcc{5,12,13}/ppc64_book3e_allmodconfig
+That's a great question. We do need to properly support the -H option to
+rpc.nfsd. What we do today is look up the hostname or address using
+getaddrinfo, and then open a listening socket for that address and then
+pass that fd down to the kernel, which I think then takes the socket and
+sticks it on sv_permsocks.
 
-I now sent patches for powerpc booke warnings
+All of that seems a bit klunky. Ideally, I'd say the best thing would be
+to allow userland to pass the sockaddr we look up directly via netlink,
+and then let the kernel open the socket. That will probably mean
+refactoring some of the svc_xprt_create machinery to take a sockaddr,
+but I don't think it looks too hard to do.
 
->>  + /kisskb/src/arch/sh/kernel/cpu/init.c: error: no previous prototyp=
-e for 'l2_cache_init' [-Werror=3Dmissing-prototypes]:  =3D> 99:29
->
-> sh4-gcc1[123]/se7{619,750}_defconfig
-> sh4-gcc1[123]/sh-{all{mod,no,yes},def}config
-> sh4-gcc11/sh-allnoconfig
-
-I assume the sh maintainers will eventually get to that
-
->>  + /kisskb/src/arch/sparc/include/asm/floppy_64.h: error: no previous=
- prototype for 'sparc_floppy_irq' [-Werror=3Dmissing-prototypes]:  =3D> =
-200:13
->>  + /kisskb/src/arch/sparc/include/asm/floppy_64.h: error: no previous=
- prototype for 'sun_pci_fd_dma_callback' [-Werror=3Dmissing-prototypes]:=
-  =3D> 437:6
->
-> sparc64-gcc{5,11,12,13}/sparc64-allmodconfig
-
-Andrew Morton did a patch for the sparc warnings, and Andreas Larsson
-is joining as a maintainer, so hopefully he can pick that up soon.
-> sparc64-gcc{5,1[123]}/sparc64-allmodconfig
->
->>  + /kisskb/src/arch/sparc/vdso/vclock_gettime.c: error: no previous p=
-rototype for '__vdso_clock_gettime' [-Werror=3Dmissing-prototypes]:  =3D=
-> 254:1
->>  + /kisskb/src/arch/sparc/vdso/vclock_gettime.c: error: no previous p=
-rototype for '__vdso_clock_gettime_stick' [-Werror=3Dmissing-prototypes]=
-:  =3D> 282:1
->>  + /kisskb/src/arch/sparc/vdso/vclock_gettime.c: error: no previous p=
-rototype=20
-
-There are prototypes in include/vdso/gettime.h that should be
-used here, but unfortunately the sparc implementation does
-not match the prototypes because sparc is missing the gettime64
-support.
-
-> sparc64-gcc{5,12,13}/sparc64-{allno,def}config
-> sparc64-gcc11/sparc64-{all{mod,no},def}config
->
->>  + /kisskb/src/arch/x86/um/shared/sysdep/kernel-offsets.h: error: no =
-previous prototype for =E2=80=98foo=E2=80=99 [-Werror=3Dmissing-prototyp=
-es]:  =3D> 9:6
->
-> um-x86_64-gcc12/um-{all{mod,yes},def}config
-
-I made a patch for arch/um yesterday.
-
-> sparc64-gcc1[12]/sparc64-allmodconfig
->
->>  + /kisskb/src/drivers/scsi/mpi3mr/mpi3mr_transport.c: error: the fra=
-me size of 1680 bytes is larger than 1536 bytes [-Werror=3Dframe-larger-=
-than=3D]:  =3D> 1818:1
-
-I sent a patch in November when the regression started, missed
-the reply about needing another change
-https://lore.kernel.org/all/CAFdVvOxH4UQjww4124E2ttuTgknzkHoPxVSFOQgLfoV=
-_dkANwQ@mail.gmail.com/
-
->>  + {standard input}: Error: displacement to undefined symbol .L105 ov=
-erflows 8-bit field :  =3D> 590, 593
->>  + {standard input}: Error: displacement to undefined symbol .L135 ov=
-erflows 8-bit field :  =3D> 603
->>  + {standard input}: Error: displacement to undefined symbol .L140 ov=
-erflows 8-bit field :  =3D> 606
->>  + {standard input}: Error: displacement to undefined symbol .L76 ove=
-rflows 12-bit field:  =3D> 591, 594
->>  + {standard input}: Error: displacement to undefined symbol .L77 ove=
-rflows 8-bit field : 607 =3D> 607, 582, 585
->>  + {standard input}: Error: displacement to undefined symbol .L97 ove=
-rflows 12-bit field:  =3D> 607
->>  + {standard input}: Error: pcrel too far: 604, 590, 577, 593, 572, 5=
-69, 598, 599, 596, 610 =3D> 610, 574, 599, 569, 598, 596, 601, 590, 604,=
- 595, 572, 577, 593
->
-> SH ICE crickets
-
-Linus did a patch for the syscall, and I sent another one for
-arch/sh to prevent this from happening again:
-
-https://lore.kernel.org/all/CAHk-=3Dwjh6Cypo8WC-McXgSzCaou3UXccxB+7PVeSu=
-GR8AjCphg@mail.gmail.com/
-https://lore.kernel.org/all/07d8877b-d933-46f4-8ca4-c10ed602f37e@app.fas=
-tmail.com/
-
-Resent mine now.
-
-      Arnd
+--=20
+Jeff Layton <jlayton@kernel.org>
 
