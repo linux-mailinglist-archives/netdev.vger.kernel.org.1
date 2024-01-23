@@ -1,594 +1,244 @@
-Return-Path: <netdev+bounces-65210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65212-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE26A839A41
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 21:27:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59CD9839A51
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 21:34:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0AAFCB231A6
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 20:27:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F9971C21F75
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 20:34:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC35686133;
-	Tue, 23 Jan 2024 20:27:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4BC41FC8;
+	Tue, 23 Jan 2024 20:34:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DGLb9/AH"
+	dkim=pass (2048-bit key) header.d=seco.com header.i=@seco.com header.b="nqIEn9KI";
+	dkim=pass (2048-bit key) header.d=seco.com header.i=@seco.com header.b="nqIEn9KI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-cy1gcc01bn2064.outbound.protection.outlook.com [52.100.19.64])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB8C885C7E
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 20:26:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706041620; cv=none; b=Tdvqf941pDyHfyPjU5eVhw+lB9MdGCjJ4Is53p802LMF2+AiIZCzpUwWtTIsMcnkl4nLcJlzQYWY0x7nls9Zx/rQm+nIcpehLz2qoR5hBPGfGoJbPFYOaoaqmO3NFLsRjz0PUsVEmaiU2hNX3P5VSCDf7L/rxQWM84SafjRDDzc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706041620; c=relaxed/simple;
-	bh=lPOmdBfqPlROahUfiBC+UDCM7bAo5q7c16gX51K9xW0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Content-Type; b=uAM1mEZ6WEiO0i+wh1wNQzCMw+4vjK5JvcJXirH3guJYfl5oiuvXyFcRiC+qlKp0WumxGGqlSgt92lEU5EQSNJGi719vW1vC/p/VDM9onVpbmpOtkoYY1PilcV8I/AcVmo1cVazFWB0sR+7GfEtYXPioauJISWKRF3IrGju2mUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aahila.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DGLb9/AH; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aahila.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-5ce10b4cea9so3449847a12.1
-        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 12:26:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706041618; x=1706646418; darn=vger.kernel.org;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=214qheYZ2/zRjjxJu2mNGIicHOVvwb5irFFO5dJinwA=;
-        b=DGLb9/AHlDKCWva+3DJ79AsSFx40jqmtLO3/f1Ukd1TvVXYmKY3ns0PUvjRdQShEh4
-         uzKv5HmEnrhMGexFRTPs6oBI6VQV97fm22SN9fH1yEgKzSwAV2JN6B4EWKIgrb3owv73
-         lcIJ3wsA+sjmwk178E5sKZ89DUp5t9GJxrFPM3NpldICkSVsVRgVismZVHWEDQv5sU8g
-         a1hnxmfJV7rXrcvy3hJQpWD6Jy6XxQIOFyCOzzAaU8coGwHv+yWWbYT7rUu59mHy0yl0
-         scSFgCQC8s3z3PjffXzq1XJ8BN+hoJyRiNPFzMomLYKiMu1TWEmv/EEtmj86iTL0uqe1
-         5GIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706041618; x=1706646418;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=214qheYZ2/zRjjxJu2mNGIicHOVvwb5irFFO5dJinwA=;
-        b=MRdtCapSkJHkHRgRdg/085HKf4aowM3a2XKTKT5OCUf/l5AQSX4+W5jbKvkvgVBzsu
-         34/6cJ68RjWvtVjh2xz5MI/u0Jpye70zxLnsiGXf+ucxHXve2NeeQPQgiCfRRDcfrjs5
-         1jZbkvmmryEUT0GsJHZttEKerP0HjzXnutLKuQ4Ez3GVNwDIx24c7JjypqvFmD4GSU7E
-         J2+5qkLQElQT8Lf8z6VLytEXtOYFg1vw9DoJ8Tcpp+XEnN984cwA4MX9Yey9l1ImrnR0
-         7vEPz0XCZPLwfnxzhFouaK1Zv63XKEXvRrCGJ+tltLPsVzRZOGDaVzJuxQuK0lseAl6T
-         Flbg==
-X-Gm-Message-State: AOJu0YwuxXydhi6VlUc9fp1/ynp4niLVQFng8ZpftT5KU1vTPjyvKvw7
-	EkJsV0O1M94NVtQXffJc/TUVQ2WOih3k0RpkNDFUh2yHemNDjA8T/Lu4hnOTLcvhvxZ7inRx9fE
-	JzA==
-X-Google-Smtp-Source: AGHT+IFBhCh0UUNRdpMCPV4mWbwU2Q1e/qaUSRDt+LXvxSMAb/Nw83IpqPfSTti3A1NSpvvFyL4xPGx5iJw=
-X-Received: from aahila.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2f3])
- (user=aahila job=sendgmr) by 2002:a05:6a02:a0c:b0:5ce:91b:f59f with SMTP id
- cm12-20020a056a020a0c00b005ce091bf59fmr714pgb.2.1706041618524; Tue, 23 Jan
- 2024 12:26:58 -0800 (PST)
-Date: Tue, 23 Jan 2024 20:26:38 +0000
-In-Reply-To: <20240123202638.1498449-1-aahila@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1901F1FB2
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 20:34:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.100.19.64
+ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706042054; cv=fail; b=r3tMhIeaUkJYEItq4GKEvaAkEh+/pnpmuGE7ng3WTeGRQIjU7/pYyPs7jaSGIuRPUu14FXA5X8ofLRobaGJxKPvPXPd6XO2Dwk0x/+sJ26KBwooHlz7iyE2w/Kv8f8n76s0JZXxLOVteUCIoCeg9QHbJf03zR5a6Gtbv7hrAa/4=
+ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706042054; c=relaxed/simple;
+	bh=1I1eoy/HAdrOto4kk/VdeOQgzq4ZVN6tTIz4UtAYnMg=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Gsj8G3JBf/mGyBKxWPPLyetaYJjh0VzOSb7GntGDWATI7MjIcn1E74q0GKok3DiHxieAIA4uCcMDRr69rNyF4FftT4cn9/T8HnseMYj9AVsQBZm0NjjOWFyu3AFFq+ZU+aJsMbVaVDDM4GqQkihxz57/QJcE7MKGasHJrlmOiK0=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=seco.com; spf=pass smtp.mailfrom=seco.com; dkim=pass (2048-bit key) header.d=seco.com header.i=@seco.com header.b=nqIEn9KI; dkim=pass (2048-bit key) header.d=seco.com header.i=@seco.com header.b=nqIEn9KI; arc=fail smtp.client-ip=52.100.19.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=seco.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seco.com
+ARC-Seal: i=2; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=pass;
+ b=gbiX615xromF4lngM47rjomgLV38LxYgfZUVZWvKID5TnRDKvpTRCC4KO21F+8AGM5i9nxrmTYDOARLh1gH9goH58sY4kFcr5R3R9qtArYycf+ut3K7yMdQrUQVbY2eL4i2HLmE1LK9JlFe6g2T6zFC3EHVAkrApx21YUK0T+pPts4lQuw3qstPIuk2EnWo1Y83+US2g6dX+X48Vy/BBu6Z0rHie/9EVo2IPgX1+arEtKG34Wh5VFORktQxFilYfIbF/TzsRiV0hdujTTMsHQHnjj767xZKVmUdOTK8+AOVUv7OgWeC09USTQOoQo/lfPSEwAW80317vE3fQKx1wGg==
+ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xgE/B/vrKFQdLqwpJfrrRv3zFR8n7DbGe7yItbWljXE=;
+ b=OjrtXOZ9j4ZQaX+NAdD89DeBUWJZXPms3CUK58bGsHuIGpqyq5BWpmXSeWhJ1iuFMF7xkW3S65zK16tEDXjOXHjAFN55VBS+efyW9amaHUcYi4qHLqVFwq5b0MCVIuqY59P2/4WHzig7f6DAoThuBMStKgHM2M0BkH9UYvjxw7Q6itlTqeC0mNSpuA9gVXYclWlvQFszIzpCzKFl9PAxTxhp0k7a0jMFFij+kX39NzqnbR3o7+kMkharUejFf+9c1L34GolaoCgxqrrisf14RBB5lUfTkjquwKBq7SMe2fJaO4ojSAI5FmX0XsCOp7l0UPdiPTwQXd2nw8ylGxTJpA==
+ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
+ 20.160.56.85) smtp.rcpttodomain=arinc9.com smtp.mailfrom=seco.com; dmarc=pass
+ (p=reject sp=reject pct=100) action=none header.from=seco.com; dkim=pass
+ (signature was verified) header.d=seco.com; arc=pass (0 oda=1 ltdi=1
+ spf=[1,1,smtp.mailfrom=seco.com] dkim=[1,1,header.d=seco.com]
+ dmarc=[1,1,header.from=seco.com])
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=seco.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xgE/B/vrKFQdLqwpJfrrRv3zFR8n7DbGe7yItbWljXE=;
+ b=nqIEn9KISY/8te3+bRomEu/EPeVrTC7ds/0K7K5AQ493J8kSL+Tx9aNlk2T/4jfOQdtwiJrkbgSX8C3KaR6J6XUqE4gHopC0RIwOcgKZiY0wKD1kRqTEU7m0zwr51zhfhx1icQ4QqK/Cf0ELecqREzHfkxkbdsiQePERu/mNlmFdwKKb0+D66YKIo9WK2Ntu7CHYHMrcVyY3ufYj0eprT9KNhMZj0KvviH8sAjSEDNdjAZkRmQ4EwwicCRPVsoE/wPEbyywXa0dK7GF7iGG4kQ3Cc04vBG3h51UW51uJLWjew36g0X6U9HduQYSfs1EIZgsefUJPq6Tajte+tjBDUg==
+Received: from BE1P281CA0240.DEUP281.PROD.OUTLOOK.COM (2603:10a6:b10:8c::9) by
+ GVXPR03MB10382.eurprd03.prod.outlook.com (2603:10a6:150:149::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.31; Tue, 23 Jan
+ 2024 20:34:05 +0000
+Received: from VI1EUR05FT046.eop-eur05.prod.protection.outlook.com
+ (2603:10a6:b10:8c:cafe::38) by BE1P281CA0240.outlook.office365.com
+ (2603:10a6:b10:8c::9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.22 via Frontend
+ Transport; Tue, 23 Jan 2024 20:34:05 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 20.160.56.85)
+ smtp.mailfrom=seco.com; dkim=pass (signature was verified)
+ header.d=seco.com;dmarc=pass action=none header.from=seco.com;
+Received-SPF: Pass (protection.outlook.com: domain of seco.com designates
+ 20.160.56.85 as permitted sender) receiver=protection.outlook.com;
+ client-ip=20.160.56.85; helo=repost-eu.tmcas.trendmicro.com; pr=C
+Received: from repost-eu.tmcas.trendmicro.com (20.160.56.85) by
+ VI1EUR05FT046.mail.protection.outlook.com (10.233.243.107) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7228.21 via Frontend Transport; Tue, 23 Jan 2024 20:34:04 +0000
+Received: from outmta (unknown [192.168.82.140])
+	by repost-eu.tmcas.trendmicro.com (Trend Micro CAS) with ESMTP id 32D1D2009538D;
+	Tue, 23 Jan 2024 20:34:04 +0000 (UTC)
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (unknown [104.47.18.104])
+	by repre.tmcas.trendmicro.com (Trend Micro CAS) with ESMTPS id 4BA622008006E;
+	Tue, 23 Jan 2024 20:34:03 +0000 (UTC)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WZHEbEtTf4gG5IfDeO9SRWwDuyjiJJxbxYUsjPxMrWZQ14E96HF4Z8ocdrIBXrGUakWKVdf3ZesC0y5P1ImlO0D7aJrIYjOeijYMrYJeONl8igVGWLNbhmbnWDyIJwmlDnMN+6zxqMNYp/hjroiTJm7JYj+JazUrqQlPjh0f08EAOkvF1iBqq/cGxb/VB0ooV6UcBlT7FcdMDZ7+h+7i8kW2ngovQs192sfGuG3DYBSIA5zsg1WHM2hA89U+0H1Y5LcMnK0kTEz6PoeIEpE5kqLbv8AyF3w9oM1HB+gVPhurxKVx7FyIRMya1QnHCqqPKcNFkFym0btcjwbOeZWzsw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xgE/B/vrKFQdLqwpJfrrRv3zFR8n7DbGe7yItbWljXE=;
+ b=avhB3mK0rA4j4kNxuI4JAdW8ZYrmH1izee0bK9W27y2cuAyWpoxTCZzMYs4HKrPizjCyLBCqo+NTCe+skqiHaCfkZTcI4fYda1FW77+XN1yxAa26qA/QF2s8qWg7EVcpOBUN368z36G2zd/vy8eBUi7ZELSbLyEQj7/dDcohB9CLTkc6DZmB1E2/rvNkxDnzs1zmSk29PNT+cKCCIooLWAe21Nxu2WgfwYTSw7KFuI4ZHXbSkLNoLpUy0jPnXfnDPXPV4tRSX1aT0Hz8GvdlI3yEGJRNmFXcBYQnnZyUbZASmi6dgdsjdJMXFu3/ko9/6KuqzcNtby7NzkRfKjkzZA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=seco.com; dmarc=pass action=none header.from=seco.com;
+ dkim=pass header.d=seco.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=seco.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xgE/B/vrKFQdLqwpJfrrRv3zFR8n7DbGe7yItbWljXE=;
+ b=nqIEn9KISY/8te3+bRomEu/EPeVrTC7ds/0K7K5AQ493J8kSL+Tx9aNlk2T/4jfOQdtwiJrkbgSX8C3KaR6J6XUqE4gHopC0RIwOcgKZiY0wKD1kRqTEU7m0zwr51zhfhx1icQ4QqK/Cf0ELecqREzHfkxkbdsiQePERu/mNlmFdwKKb0+D66YKIo9WK2Ntu7CHYHMrcVyY3ufYj0eprT9KNhMZj0KvviH8sAjSEDNdjAZkRmQ4EwwicCRPVsoE/wPEbyywXa0dK7GF7iGG4kQ3Cc04vBG3h51UW51uJLWjew36g0X6U9HduQYSfs1EIZgsefUJPq6Tajte+tjBDUg==
+Authentication-Results-Original: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=seco.com;
+Received: from DB9PR03MB8847.eurprd03.prod.outlook.com (2603:10a6:10:3dd::13)
+ by AM9PR03MB7251.eurprd03.prod.outlook.com (2603:10a6:20b:26e::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.22; Tue, 23 Jan
+ 2024 20:34:01 +0000
+Received: from DB9PR03MB8847.eurprd03.prod.outlook.com
+ ([fe80::ec0a:c3a4:c8f9:9f84]) by DB9PR03MB8847.eurprd03.prod.outlook.com
+ ([fe80::ec0a:c3a4:c8f9:9f84%7]) with mapi id 15.20.7202.031; Tue, 23 Jan 2024
+ 20:34:01 +0000
+Message-ID: <e3647618-b896-47a2-b9b9-c75b56813293@seco.com>
+Date: Tue, 23 Jan 2024 15:33:57 -0500
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC net-next 03/14] net: phylink: add support for PCS link
+ change notifications
+Content-Language: en-US
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Landen.Chao@mediatek.com, UNGLinuxDriver@microchip.com,
+ alexandre.belloni@bootlin.com, andrew@lunn.ch,
+ angelogioacchino.delregno@collabora.com, arinc.unal@arinc9.com,
+ claudiu.manoil@nxp.com, daniel@makrotopia.org, davem@davemloft.net,
+ dqfext@gmail.com, edumazet@google.com, f.fainelli@gmail.com,
+ hkallweit1@gmail.com, kuba@kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, matthias.bgg@gmail.com,
+ netdev@vger.kernel.org, olteanv@gmail.com, pabeni@redhat.com,
+ sean.wang@mediatek.com
+References: <E1qChay-00Fmrf-9Y@rmk-PC.armlinux.org.uk>
+ <75773076-39a2-49dd-9eb2-15a10955a60d@seco.com>
+ <ZbAch9ZlbDrZqzpw@shell.armlinux.org.uk>
+From: Sean Anderson <sean.anderson@seco.com>
+In-Reply-To: <ZbAch9ZlbDrZqzpw@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MN2PR11CA0025.namprd11.prod.outlook.com
+ (2603:10b6:208:23b::30) To DB9PR03MB8847.eurprd03.prod.outlook.com
+ (2603:10a6:10:3dd::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240123202638.1498449-1-aahila@google.com>
-X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
-Message-ID: <20240123202638.1498449-2-aahila@google.com>
-Subject: [PATCH net-next v4 2/2] bonding: Add independent control state machine
-From: Aahil Awatramani <aahila@google.com>
-To: Aahil Awatramani <aahila@google.com>, David Dillow <dave@thedillows.org>, 
-	Mahesh Bandewar <maheshb@google.com>, Jay Vosburgh <j.vosburgh@gmail.com>, 
-	Hangbin Liu <liuhangbin@gmail.com>, Andy Gospodarek <andy@greyhouse.net>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Martin KaFai Lau <martin.lau@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-TrafficTypeDiagnostic:
+	DB9PR03MB8847:EE_|AM9PR03MB7251:EE_|VI1EUR05FT046:EE_|GVXPR03MB10382:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4206483d-920f-47f8-8b67-08dc1c52a424
+X-TrendMicro-CAS-OUT-LOOP-IDENTIFIER: 656f966764b7fb185830381c646b41a1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam-Untrusted: BCL:0;
+X-Microsoft-Antispam-Message-Info-Original:
+ ipgRB1nUDTNtORMGvbYh5m+BBOyXLZwWI1h4ItM8Nn/bJNRGZD/td2e+gSt/0tZb4gXHL4/93MPMbbPl5T37daHP27PaudPgPvnHc0ri5cJ30E+pZkAL/nh/l0AKCQUGvl5CZtSbnk4I9HYQvWl3zGPr6QWgYswFud35g4KVwVqvSrIQm49wSOlMmbXf9i32eikDRjeP7AJKDXrF2nVOZvBBMUCvRIpJBOAHo/nr2UOmTLRMlW6RpZVvOke4O0Zhb4Fsvq3n5kAPqpYBqc4afZqj+kyLCT5h4/RDF1Cm/P544QExJUUBtMQeg4HCg39cexsaOGNL7mvD0G6qys5JDCKbX/dQfA282vOwlvDygu2mP9YomtCt0sVVNeoVRFGskoBQ2KcSIq4tTERczkz8WrPRBXIkiTDeY+tXPswGiajNJh853SbvXfTCpi7pWztJo/y7WUhK6sKU+sD59k8bYUh9AGSjAgs8f/GEZoFQ73c7I105JmBqhSIXGjID2JpqX+qe/z+KT/K401KKl5C0AYZFlaZpccaWyT0sgvv9J4T/EyA4I3CuHjFkbzx+tE2Bwlzy1+6GVZLc5oW3W9qstLCNlQkp2sE2CDto47gQ2DZBvqZNoyHoIybE4Z+IvuJseeKxWOY9yaZlHgnbh1mvXF1k+/4Yq8BG9OCuRnVJmwV83N4w6TFzxemPzzGVCKHy
+X-Forefront-Antispam-Report-Untrusted:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR03MB8847.eurprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(376002)(346002)(396003)(366004)(39850400004)(230922051799003)(451199024)(1800799012)(64100799003)(186009)(36756003)(38350700005)(15650500001)(38100700002)(2906002)(41300700001)(478600001)(6486002)(52116002)(53546011)(6506007)(6666004)(86362001)(31696002)(6916009)(66476007)(66556008)(66946007)(6512007)(316002)(31686004)(83380400001)(2616005)(26005)(7416002)(5660300002)(44832011)(8936002)(8676002)(4326008)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR03MB7251
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped:
+ VI1EUR05FT046.eop-eur05.prod.protection.outlook.com
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id-Prvs:
+	e6eb6628-0886-43ad-69e2-08dc1c52a1f5
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	gU7myuqVWe2XgXYzLQSupeJJQ0HdtZxXGaldAbB3fLXV1L7NpzsruO9kMscudYOOUWokX57JhqvdItYqka95dfp9B2o1vZiI3OuZDAT5pnAaEjm3u/r8CSociE8Z2XBe64EMmydsvQ5G2/oPHB6ZX7QXEzTPG19SGdvLDaribVYGO6x/Uo0NpoeFrofbf9dZVzt8CdwX8QfsuAL3BMk7ewyWKVRKMXLMR5wgaiHZGxKFkPANPUHiATextIbwKM+wCHPc/rtbvBhHJpBqxpgH7lOlkINwcd6E9eTmM61qA1MudnyMaXKZwXpYC2Nk/6p71aRQnNjUDzUUMLXZ4XWwSHdWuXSr75KY0Aawz44lG9zBDtRjst3Y8FnChCcZAaZ4TUyDsuUMuNEFxd6Pveubu0VJT7W3FkmBN1tiWNrlKa1ljZa2nB3bF6VMPMTw8V7e9ChJfUvxmepiV05VtElbwcwIz/dRol2Q27HUE5nisHWOKF7VDhw24j2EBOjZ883A4lzHPWLXGfYsvGecITeIy8zQyPyiQlIHjmyRc1woC6y1hSY4SxCEBPsXYABsSZwAjSZ8blgtU+1iQojEN3aubikT13FIW/dlq8lojxU1D8FwSX7t0BB1pHHz6T9KSZzSsciTOK3K8bgt5n7kc0SWukvGHgymgSRXRkYsrbBlhM4jgYLz0E3VhPFBuD05Tf7vlIwijxN+SlVNCmpU8mG0dIneANY3859TbS94ADbXEGQMVad6Et4JrX5+jzOd5brMjMEwwxeJTLxcaWMVVDqAt56xlyLvNgTXNYVGLlUl0NRfH8pirdmrq9Uxwq0r35O6RAOhUV1kI+pYf9rad3G3Ng==
+X-Forefront-Antispam-Report:
+	CIP:20.160.56.85;CTRY:NL;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:repost-eu.tmcas.trendmicro.com;PTR:repost-eu.tmcas.trendmicro.com;CAT:NONE;SFS:(13230031)(346002)(396003)(136003)(39850400004)(376002)(230922051799003)(64100799003)(82310400011)(186009)(5400799018)(451199024)(1800799012)(36840700001)(46966006)(40470700004)(26005)(36756003)(31696002)(40480700001)(86362001)(7596003)(356005)(7636003)(40460700003)(31686004)(47076005)(2616005)(36860700001)(34070700002)(82740400003)(83380400001)(4326008)(6512007)(478600001)(6666004)(53546011)(6916009)(6506007)(8676002)(8936002)(316002)(70206006)(6486002)(70586007)(7416002)(2906002)(15650500001)(44832011)(5660300002)(41300700001)(336012)(43740500002)(12100799054);DIR:OUT;SFP:1501;
+X-OriginatorOrg: seco.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jan 2024 20:34:04.5740
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4206483d-920f-47f8-8b67-08dc1c52a424
+X-MS-Exchange-CrossTenant-Id: bebe97c3-6438-442e-ade3-ff17aa50e733
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=bebe97c3-6438-442e-ade3-ff17aa50e733;Ip=[20.160.56.85];Helo=[repost-eu.tmcas.trendmicro.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	VI1EUR05FT046.eop-eur05.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR03MB10382
 
-Add support for the independent control state machine per IEEE
-802.1AX-2008 5.4.15 in addition to the existing implementation of the
-coupled control state machine.
+On 1/23/24 15:07, Russell King (Oracle) wrote:
+> On Tue, Jan 23, 2024 at 02:46:15PM -0500, Sean Anderson wrote:
+>> Hi Russell,
+>> 
+>> Does there need to be any locking when calling phylink_pcs_change? I
+>> noticed that you call it from threaded IRQ context in [1]. Can that race
+>> with phylink_major_config?
+> 
+> What kind of scenario are you thinking may require locking?
 
-Introduces two new states, AD_MUX_COLLECTING and AD_MUX_DISTRIBUTING in
-the LACP MUX state machine for separated handling of an initial
-Collecting state before the Collecting and Distributing state. This
-enables a port to be in a state where it can receive incoming packets
-while not still distributing. This is useful for reducing packet loss when
-a port begins distributing before its partner is able to collect.
+Can't we at least get a spurious bounce? E.g.
 
-Added new functions such as bond_set_slave_tx_disabled_flags and
-bond_set_slave_rx_enabled_flags to precisely manage the port's collecting
-and distributing states. Previously, there was no dedicated method to
-disable TX while keeping RX enabled, which this patch addresses.
+pcs_major_config()
+  pcs_disable(old_pcs) /* masks IRQ */
+  old_pcs->phylink = NULL;
+  new_pcs->phylink = pl;
+  ...
+  pcs_enable(new_pcs) /* unmasks IRQ */
+  ...
 
-Note that the regular flow process in the kernel's bonding driver remains
-unaffected by this patch. The extension requires explicit opt-in by the
-user (in order to ensure no disruptions for existing setups) via netlink
-support using the new bonding parameter coupled_control. The default value
-for coupled_control is set to 1 so as to preserve existing behaviour.
+pcs_handle_irq(new_pcs) /* Link up IRQ */
+  phylink_pcs_change(new_pcs, true)
+    phylink_run_resolve(pl)
 
-Signed-off-by: Aahil Awatramani <aahila@google.com>
----
- drivers/net/bonding/bond_3ad.c     | 157 +++++++++++++++++++++++++++--
- drivers/net/bonding/bond_main.c    |   1 +
- drivers/net/bonding/bond_netlink.c |  16 +++
- drivers/net/bonding/bond_options.c |  28 ++++-
- include/net/bond_3ad.h             |   2 +
- include/net/bond_options.h         |   1 +
- include/net/bonding.h              |  23 +++++
- include/uapi/linux/if_link.h       |   1 +
- tools/include/uapi/linux/if_link.h |   1 +
- 9 files changed, 222 insertions(+), 8 deletions(-)
+phylink_resolve(pl)
+  /* Link up */
 
-diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
-index c99ffe6c683a..f2942e8c6c91 100644
---- a/drivers/net/bonding/bond_3ad.c
-+++ b/drivers/net/bonding/bond_3ad.c
-@@ -106,6 +106,9 @@ static void ad_agg_selection_logic(struct aggregator *aggregator,
- static void ad_clear_agg(struct aggregator *aggregator);
- static void ad_initialize_agg(struct aggregator *aggregator);
- static void ad_initialize_port(struct port *port, int lacp_fast);
-+static void ad_enable_collecting(struct port *port);
-+static void ad_disable_distributing(struct port *port,
-+				    bool *update_slave_arr);
- static void ad_enable_collecting_distributing(struct port *port,
- 					      bool *update_slave_arr);
- static void ad_disable_collecting_distributing(struct port *port,
-@@ -171,9 +174,38 @@ static inline int __agg_has_partner(struct aggregator *agg)
- 	return !is_zero_ether_addr(agg->partner_system.mac_addr_value);
- }
- 
-+/**
-+ * __disable_distributing_port - disable the port's slave for distributing.
-+ * Port will still be able to collect.
-+ * @port: the port we're looking at
-+ *
-+ * This will disable only distributing on the port's slave.
-+ */
-+static void __disable_distributing_port(struct port *port)
-+{
-+	bond_set_slave_tx_disabled_flags(port->slave, BOND_SLAVE_NOTIFY_LATER);
-+}
-+
-+/**
-+ * __enable_collecting_port - enable the port's slave for collecting,
-+ * if it's up
-+ * @port: the port we're looking at
-+ *
-+ * This will enable only collecting on the port's slave.
-+ */
-+static void __enable_collecting_port(struct port *port)
-+{
-+	struct slave *slave = port->slave;
-+
-+	if (slave->link == BOND_LINK_UP && bond_slave_is_up(slave))
-+		bond_set_slave_rx_enabled_flags(slave, BOND_SLAVE_NOTIFY_LATER);
-+}
-+
- /**
-  * __disable_port - disable the port's slave
-  * @port: the port we're looking at
-+ *
-+ * This will disable both collecting and distributing on the port's slave.
-  */
- static inline void __disable_port(struct port *port)
- {
-@@ -183,6 +215,8 @@ static inline void __disable_port(struct port *port)
- /**
-  * __enable_port - enable the port's slave, if it's up
-  * @port: the port we're looking at
-+ *
-+ * This will enable both collecting and distributing on the port's slave.
-  */
- static inline void __enable_port(struct port *port)
- {
-@@ -193,10 +227,27 @@ static inline void __enable_port(struct port *port)
- }
- 
- /**
-- * __port_is_enabled - check if the port's slave is in active state
-+ * __port_move_to_attached_state - check if port should transition back to attached
-+ * state.
-+ * @port: the port we're looking at
-+ */
-+static bool __port_move_to_attached_state(struct port *port)
-+{
-+	if (!(port->sm_vars & AD_PORT_SELECTED) ||
-+	    (port->sm_vars & AD_PORT_STANDBY) ||
-+	    !(port->partner_oper.port_state & LACP_STATE_SYNCHRONIZATION) ||
-+	    !(port->actor_oper_port_state & LACP_STATE_SYNCHRONIZATION))
-+		port->sm_mux_state = AD_MUX_ATTACHED;
-+
-+	return port->sm_mux_state == AD_MUX_ATTACHED;
-+}
-+
-+/**
-+ * __port_is_collecting_distributing - check if the port's slave is in the
-+ * combined collecting/distributing state
-  * @port: the port we're looking at
-  */
--static inline int __port_is_enabled(struct port *port)
-+static int __port_is_collecting_distributing(struct port *port)
- {
- 	return bond_is_active_slave(port->slave);
- }
-@@ -942,6 +993,7 @@ static int ad_marker_send(struct port *port, struct bond_marker *marker)
-  */
- static void ad_mux_machine(struct port *port, bool *update_slave_arr)
- {
-+	struct bonding *bond = __get_bond_by_port(port);
- 	mux_states_t last_state;
- 
- 	/* keep current State Machine state to compare later if it was
-@@ -999,9 +1051,13 @@ static void ad_mux_machine(struct port *port, bool *update_slave_arr)
- 			if ((port->sm_vars & AD_PORT_SELECTED) &&
- 			    (port->partner_oper.port_state & LACP_STATE_SYNCHRONIZATION) &&
- 			    !__check_agg_selection_timer(port)) {
--				if (port->aggregator->is_active)
--					port->sm_mux_state =
--					    AD_MUX_COLLECTING_DISTRIBUTING;
-+				if (port->aggregator->is_active) {
-+					int state = AD_MUX_COLLECTING_DISTRIBUTING;
-+
-+					if (!bond->params.coupled_control)
-+						state = AD_MUX_COLLECTING;
-+					port->sm_mux_state = state;
-+				}
- 			} else if (!(port->sm_vars & AD_PORT_SELECTED) ||
- 				   (port->sm_vars & AD_PORT_STANDBY)) {
- 				/* if UNSELECTED or STANDBY */
-@@ -1019,11 +1075,45 @@ static void ad_mux_machine(struct port *port, bool *update_slave_arr)
- 			}
- 			break;
- 		case AD_MUX_COLLECTING_DISTRIBUTING:
-+			if (!__port_move_to_attached_state(port)) {
-+				/* if port state hasn't changed make
-+				 * sure that a collecting distributing
-+				 * port in an active aggregator is enabled
-+				 */
-+				if (port->aggregator->is_active &&
-+				    !__port_is_collecting_distributing(port)) {
-+					__enable_port(port);
-+					*update_slave_arr = true;
-+				}
-+			}
-+			break;
-+		case AD_MUX_COLLECTING:
-+			if (!__port_move_to_attached_state(port)) {
-+				if ((port->sm_vars & AD_PORT_SELECTED) &&
-+				    (port->partner_oper.port_state & LACP_STATE_SYNCHRONIZATION) &&
-+				    (port->partner_oper.port_state & LACP_STATE_COLLECTING)) {
-+					port->sm_mux_state = AD_MUX_DISTRIBUTING;
-+				} else {
-+					/* If port state hasn't changed, make sure that a collecting
-+					 * port is enabled for an active aggregator.
-+					 */
-+					struct slave *slave = port->slave;
-+
-+					if (port->aggregator->is_active &&
-+					    bond_is_slave_rx_disabled(slave)) {
-+						ad_enable_collecting(port);
-+						*update_slave_arr = true;
-+					}
-+				}
-+			}
-+			break;
-+		case AD_MUX_DISTRIBUTING:
- 			if (!(port->sm_vars & AD_PORT_SELECTED) ||
- 			    (port->sm_vars & AD_PORT_STANDBY) ||
-+			    !(port->partner_oper.port_state & LACP_STATE_COLLECTING) ||
- 			    !(port->partner_oper.port_state & LACP_STATE_SYNCHRONIZATION) ||
- 			    !(port->actor_oper_port_state & LACP_STATE_SYNCHRONIZATION)) {
--				port->sm_mux_state = AD_MUX_ATTACHED;
-+				port->sm_mux_state = AD_MUX_COLLECTING;
- 			} else {
- 				/* if port state hasn't changed make
- 				 * sure that a collecting distributing
-@@ -1031,7 +1121,7 @@ static void ad_mux_machine(struct port *port, bool *update_slave_arr)
- 				 */
- 				if (port->aggregator &&
- 				    port->aggregator->is_active &&
--				    !__port_is_enabled(port)) {
-+				    !__port_is_collecting_distributing(port)) {
- 					__enable_port(port);
- 					*update_slave_arr = true;
- 				}
-@@ -1082,6 +1172,20 @@ static void ad_mux_machine(struct port *port, bool *update_slave_arr)
- 							  update_slave_arr);
- 			port->ntt = true;
- 			break;
-+		case AD_MUX_COLLECTING:
-+			port->actor_oper_port_state |= LACP_STATE_COLLECTING;
-+			port->actor_oper_port_state &= ~LACP_STATE_DISTRIBUTING;
-+			port->actor_oper_port_state |= LACP_STATE_SYNCHRONIZATION;
-+			ad_enable_collecting(port);
-+			ad_disable_distributing(port, update_slave_arr);
-+			port->ntt = true;
-+			break;
-+		case AD_MUX_DISTRIBUTING:
-+			port->actor_oper_port_state |= LACP_STATE_DISTRIBUTING;
-+			port->actor_oper_port_state |= LACP_STATE_SYNCHRONIZATION;
-+			ad_enable_collecting_distributing(port,
-+							  update_slave_arr);
-+			break;
- 		default:
- 			break;
- 		}
-@@ -1906,6 +2010,45 @@ static void ad_initialize_port(struct port *port, int lacp_fast)
- 	}
- }
- 
-+/**
-+ * ad_enable_collecting - enable a port's receive
-+ * @port: the port we're looking at
-+ *
-+ * Enable @port if it's in an active aggregator
-+ */
-+static void ad_enable_collecting(struct port *port)
-+{
-+	if (port->aggregator->is_active) {
-+		struct slave *slave = port->slave;
-+
-+		slave_dbg(slave->bond->dev, slave->dev,
-+			  "Enabling collecting on port %d (LAG %d)\n",
-+			  port->actor_port_number,
-+			  port->aggregator->aggregator_identifier);
-+		__enable_collecting_port(port);
-+	}
-+}
-+
-+/**
-+ * ad_disable_distributing - disable a port's transmit
-+ * @port: the port we're looking at
-+ * @update_slave_arr: Does slave array need update?
-+ */
-+static void ad_disable_distributing(struct port *port, bool *update_slave_arr)
-+{
-+	if (port->aggregator &&
-+	    !MAC_ADDRESS_EQUAL(&port->aggregator->partner_system,
-+			       &(null_mac_addr))) {
-+		slave_dbg(port->slave->bond->dev, port->slave->dev,
-+			  "Disabling distributing on port %d (LAG %d)\n",
-+			  port->actor_port_number,
-+			  port->aggregator->aggregator_identifier);
-+		__disable_distributing_port(port);
-+		/* Slave array needs an update */
-+		*update_slave_arr = true;
-+	}
-+}
-+
- /**
-  * ad_enable_collecting_distributing - enable a port's transmit/receive
-  * @port: the port we're looking at
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 8e6cc0e133b7..30f4b0ff01c0 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -6331,6 +6331,7 @@ static int __init bond_check_params(struct bond_params *params)
- 	params->ad_actor_sys_prio = ad_actor_sys_prio;
- 	eth_zero_addr(params->ad_actor_system);
- 	params->ad_user_port_key = ad_user_port_key;
-+	params->coupled_control = 1;
- 	if (packets_per_slave > 0) {
- 		params->reciprocal_packets_per_slave =
- 			reciprocal_value(packets_per_slave);
-diff --git a/drivers/net/bonding/bond_netlink.c b/drivers/net/bonding/bond_netlink.c
-index cfa74cf8bb1a..29b4c3d1b9b6 100644
---- a/drivers/net/bonding/bond_netlink.c
-+++ b/drivers/net/bonding/bond_netlink.c
-@@ -122,6 +122,7 @@ static const struct nla_policy bond_policy[IFLA_BOND_MAX + 1] = {
- 	[IFLA_BOND_PEER_NOTIF_DELAY]    = NLA_POLICY_FULL_RANGE(NLA_U32, &delay_range),
- 	[IFLA_BOND_MISSED_MAX]		= { .type = NLA_U8 },
- 	[IFLA_BOND_NS_IP6_TARGET]	= { .type = NLA_NESTED },
-+	[IFLA_BOND_COUPLED_CONTROL]	= { .type = NLA_U8 },
- };
- 
- static const struct nla_policy bond_slave_policy[IFLA_BOND_SLAVE_MAX + 1] = {
-@@ -549,6 +550,16 @@ static int bond_changelink(struct net_device *bond_dev, struct nlattr *tb[],
- 			return err;
- 	}
- 
-+	if (data[IFLA_BOND_COUPLED_CONTROL]) {
-+		int coupled_control = nla_get_u8(data[IFLA_BOND_COUPLED_CONTROL]);
-+
-+		bond_opt_initval(&newval, coupled_control);
-+		err = __bond_opt_set(bond, BOND_OPT_COUPLED_CONTROL, &newval,
-+				     data[IFLA_BOND_COUPLED_CONTROL], extack);
-+		if (err)
-+			return err;
-+	}
-+
- 	return 0;
- }
- 
-@@ -615,6 +626,7 @@ static size_t bond_get_size(const struct net_device *bond_dev)
- 						/* IFLA_BOND_NS_IP6_TARGET */
- 		nla_total_size(sizeof(struct nlattr)) +
- 		nla_total_size(sizeof(struct in6_addr)) * BOND_MAX_NS_TARGETS +
-+		nla_total_size(sizeof(u8)) +	/* IFLA_BOND_COUPLED_CONTROL */
- 		0;
- }
- 
-@@ -774,6 +786,10 @@ static int bond_fill_info(struct sk_buff *skb,
- 		       bond->params.missed_max))
- 		goto nla_put_failure;
- 
-+	if (nla_put_u8(skb, IFLA_BOND_COUPLED_CONTROL,
-+		       bond->params.coupled_control))
-+		goto nla_put_failure;
-+
- 	if (BOND_MODE(bond) == BOND_MODE_8023AD) {
- 		struct ad_info info;
- 
-diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond_options.c
-index f3f27f0bd2a6..4cdbc7e084f4 100644
---- a/drivers/net/bonding/bond_options.c
-+++ b/drivers/net/bonding/bond_options.c
-@@ -84,7 +84,8 @@ static int bond_option_ad_user_port_key_set(struct bonding *bond,
- 					    const struct bond_opt_value *newval);
- static int bond_option_missed_max_set(struct bonding *bond,
- 				      const struct bond_opt_value *newval);
--
-+static int bond_option_coupled_control_set(struct bonding *bond,
-+					   const struct bond_opt_value *newval);
- 
- static const struct bond_opt_value bond_mode_tbl[] = {
- 	{ "balance-rr",    BOND_MODE_ROUNDROBIN,   BOND_VALFLAG_DEFAULT},
-@@ -232,6 +233,12 @@ static const struct bond_opt_value bond_missed_max_tbl[] = {
- 	{ NULL,		-1,	0},
- };
- 
-+static const struct bond_opt_value bond_coupled_control_tbl[] = {
-+	{ "on",  1,  BOND_VALFLAG_DEFAULT},
-+	{ "off", 0,  0},
-+	{ NULL,  -1, 0},
-+};
-+
- static const struct bond_option bond_opts[BOND_OPT_LAST] = {
- 	[BOND_OPT_MODE] = {
- 		.id = BOND_OPT_MODE,
-@@ -496,6 +503,15 @@ static const struct bond_option bond_opts[BOND_OPT_LAST] = {
- 		.desc = "Delay between each peer notification on failover event, in milliseconds",
- 		.values = bond_peer_notif_delay_tbl,
- 		.set = bond_option_peer_notif_delay_set
-+	},
-+	[BOND_OPT_COUPLED_CONTROL] = {
-+		.id = BOND_OPT_COUPLED_CONTROL,
-+		.name = "coupled_control",
-+		.desc = "Opt into using coupled control MUX for LACP states",
-+		.unsuppmodes = BOND_MODE_ALL_EX(BIT(BOND_MODE_8023AD)),
-+		.flags = BOND_OPTFLAG_IFDOWN,
-+		.values = bond_coupled_control_tbl,
-+		.set = bond_option_coupled_control_set,
- 	}
- };
- 
-@@ -1692,3 +1708,13 @@ static int bond_option_ad_user_port_key_set(struct bonding *bond,
- 	bond->params.ad_user_port_key = newval->value;
- 	return 0;
- }
-+
-+static int bond_option_coupled_control_set(struct bonding *bond,
-+					   const struct bond_opt_value *newval)
-+{
-+	netdev_info(bond->dev, "Setting coupled_control to %s (%llu)\n",
-+		    newval->string, newval->value);
-+
-+	bond->params.coupled_control = newval->value;
-+	return 0;
-+}
-diff --git a/include/net/bond_3ad.h b/include/net/bond_3ad.h
-index c5e57c6bd873..9ce5ac2bfbad 100644
---- a/include/net/bond_3ad.h
-+++ b/include/net/bond_3ad.h
-@@ -54,6 +54,8 @@ typedef enum {
- 	AD_MUX_DETACHED,	/* mux machine */
- 	AD_MUX_WAITING,		/* mux machine */
- 	AD_MUX_ATTACHED,	/* mux machine */
-+	AD_MUX_COLLECTING,	/* mux machine */
-+	AD_MUX_DISTRIBUTING,	/* mux machine */
- 	AD_MUX_COLLECTING_DISTRIBUTING	/* mux machine */
- } mux_states_t;
- 
-diff --git a/include/net/bond_options.h b/include/net/bond_options.h
-index 69292ecc0325..473a0147769e 100644
---- a/include/net/bond_options.h
-+++ b/include/net/bond_options.h
-@@ -76,6 +76,7 @@ enum {
- 	BOND_OPT_MISSED_MAX,
- 	BOND_OPT_NS_TARGETS,
- 	BOND_OPT_PRIO,
-+	BOND_OPT_COUPLED_CONTROL,
- 	BOND_OPT_LAST
- };
- 
-diff --git a/include/net/bonding.h b/include/net/bonding.h
-index 5b8b1b644a2d..b61fb1aa3a56 100644
---- a/include/net/bonding.h
-+++ b/include/net/bonding.h
-@@ -148,6 +148,7 @@ struct bond_params {
- #if IS_ENABLED(CONFIG_IPV6)
- 	struct in6_addr ns_targets[BOND_MAX_NS_TARGETS];
- #endif
-+	int coupled_control;
- 
- 	/* 2 bytes of padding : see ether_addr_equal_64bits() */
- 	u8 ad_actor_system[ETH_ALEN + 2];
-@@ -167,6 +168,7 @@ struct slave {
- 	u8     backup:1,   /* indicates backup slave. Value corresponds with
- 			      BOND_STATE_ACTIVE and BOND_STATE_BACKUP */
- 	       inactive:1, /* indicates inactive slave */
-+	       rx_disabled:1, /* indicates whether slave's Rx is disabled */
- 	       should_notify:1, /* indicates whether the state changed */
- 	       should_notify_link:1; /* indicates whether the link changed */
- 	u8     duplex;
-@@ -568,6 +570,14 @@ static inline void bond_set_slave_inactive_flags(struct slave *slave,
- 		bond_set_slave_state(slave, BOND_STATE_BACKUP, notify);
- 	if (!slave->bond->params.all_slaves_active)
- 		slave->inactive = 1;
-+	if (BOND_MODE(slave->bond) == BOND_MODE_8023AD)
-+		slave->rx_disabled = 1;
-+}
-+
-+static inline void bond_set_slave_tx_disabled_flags(struct slave *slave,
-+						 bool notify)
-+{
-+	bond_set_slave_state(slave, BOND_STATE_BACKUP, notify);
- }
- 
- static inline void bond_set_slave_active_flags(struct slave *slave,
-@@ -575,6 +585,14 @@ static inline void bond_set_slave_active_flags(struct slave *slave,
- {
- 	bond_set_slave_state(slave, BOND_STATE_ACTIVE, notify);
- 	slave->inactive = 0;
-+	if (BOND_MODE(slave->bond) == BOND_MODE_8023AD)
-+		slave->rx_disabled = 0;
-+}
-+
-+static inline void bond_set_slave_rx_enabled_flags(struct slave *slave,
-+					       bool notify)
-+{
-+	slave->rx_disabled = 0;
- }
- 
- static inline bool bond_is_slave_inactive(struct slave *slave)
-@@ -582,6 +600,11 @@ static inline bool bond_is_slave_inactive(struct slave *slave)
- 	return slave->inactive;
- }
- 
-+static inline bool bond_is_slave_rx_disabled(struct slave *slave)
-+{
-+	return slave->rx_disabled;
-+}
-+
- static inline void bond_propose_link_state(struct slave *slave, int state)
- {
- 	slave->link_new_state = state;
-diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-index 29ff80da2775..7a54fcff2eec 100644
---- a/include/uapi/linux/if_link.h
-+++ b/include/uapi/linux/if_link.h
-@@ -976,6 +976,7 @@ enum {
- 	IFLA_BOND_AD_LACP_ACTIVE,
- 	IFLA_BOND_MISSED_MAX,
- 	IFLA_BOND_NS_IP6_TARGET,
-+	IFLA_BOND_COUPLED_CONTROL,
- 	__IFLA_BOND_MAX,
- };
- 
-diff --git a/tools/include/uapi/linux/if_link.h b/tools/include/uapi/linux/if_link.h
-index a0aa05a28cf2..f0d71b2a3f1e 100644
---- a/tools/include/uapi/linux/if_link.h
-+++ b/tools/include/uapi/linux/if_link.h
-@@ -974,6 +974,7 @@ enum {
- 	IFLA_BOND_AD_LACP_ACTIVE,
- 	IFLA_BOND_MISSED_MAX,
- 	IFLA_BOND_NS_IP6_TARGET,
-+	IFLA_BOND_COUPLED_CONTROL,
- 	__IFLA_BOND_MAX,
- };
- 
--- 
-2.43.0.429.g432eaa2c6b-goog
+pcs_handle_irq(old_pcs) /* Link down IRQ (pending from before pcs_disable) */
+  phylink_pcs_change(old_pcs, false)
+    phylink_run_resolve(pl) /* Doesn't see the NULL */
 
+phylink_resolve(pl)
+  /* Link down; retrigger */
+phylink_resolve(pl)
+  /* Link up */
+
+And mac_link_dropped probably needs WRITE_ONCE in order to take
+advantage of the ordering provided by queue_work.
+
+> I guess the possibility would be if pcs->phylink changes and the
+> compiler reads it multiple times - READ_ONCE() should solve that.
+> 
+> However, in terms of the mechanics, there's no race.
+> 
+> During the initial bringup, the resolve worker isn't started until
+> after phylink_major_config() has completed (it's started at
+> phylink_enable_and_run_resolve().) So, if phylink_pcs_change()
+> gets called while in phylink_major_config() there, it'll see
+> that pl->phylink_disable_state is non-zero, and won't queue the
+> work.
+> 
+> The next one is within the worker itself - and there can only
+> be one instance of the worker running in totality. So, if
+> phylink_pcs_change() gets called while phylink_major_config() is
+> running from this path, the only thing it'll do is re-schedule
+> the resolve worker to run another iteration which is harmless
+> (whether or not the PCS is still current.)
+> 
+> The last case is phylink_ethtool_ksettings_set(). This runs under
+> the state_mutex, which locks out the resolve worker (since it also
+> takes that mutex).
+> 
+> So calling phylink_pcs_change() should be pretty harmless _unless_
+> the compiler re-reads pcs->phylink multiple times inside
+> phylink_pcs_change(), which I suppose with modern compilers is
+> possible. Hence my suggestion above about READ_ONCE() for that.
+> 
+> Have you encountered an OOPS because pcs->phylink has become NULL?
+> Or have you spotted another issue?
+
+I was looking at extending this code, and I was wondering if I needed
+to e.g. take RTNL first. Thanks for the quick response.
+
+--Sean
 
