@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-65047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65048-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAA8C838F43
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 14:05:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8288838F48
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 14:05:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1363B292157
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 13:05:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCEBC1C26CD3
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 13:05:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62DE360EF2;
-	Tue, 23 Jan 2024 12:59:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1BCE60EDE;
+	Tue, 23 Jan 2024 12:59:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="YmC4zG0j"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="Ti8TJJXr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B015860DC2
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 12:59:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2263560EE5
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 12:59:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706014793; cv=none; b=C+vp0o6+Z41XDqq6N2ygYtpv7B4Rt1QC73AT+dohKlCGblotOvhnJQo8YQQ2QxjODcXTwGqdWtxO73mcfs/GbEYvHG227LRQsE4duofkpcctZhfFErmj/tSZdsxvy0Xj4DjibBpxxVfjmfLexkjeKBtYDJjL8u1Mu3yryJa0AEc=
+	t=1706014794; cv=none; b=HQApAC1gFLNeZDzoFLQ2ZkI61ttFrRwO/SRwiOmJcNz90l4ZOis+DaLlupbuzBMtKLrLEI///89c15J6tiw0uSGuH4HNx8b7KP3nDHsghzhIYJclpGUzynDJpvbwlqNmUpRuoSJf6/gOUqXSPw79pxFVlGqsGEsB6JAp8Rfkt+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706014793; c=relaxed/simple;
-	bh=hqR1Fnpsr1zfZ4XXcoXvlX+RpLOUELhZTTBjGjxL0o8=;
+	s=arc-20240116; t=1706014794; c=relaxed/simple;
+	bh=GAfex3EeCPOP5cI6V5/XBZUeYcq3hRCugb2RoCTcDIw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GXW1fu0LyX+sLdJGeeLTA4yVbhhpuQg17uu8yMO84aHsqBwq9JTE4Dtw/kmijQ7KNF4X3rgwnKdaQGe34Uim/ua0gwii8YvsbsANTh+HZ7DsiGFvsmLMcuVKzVZNzIREL0L5bxvCg/XE2DDeaIC/U2fkj0p88F2NOKcdxKLPQBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=YmC4zG0j; arc=none smtp.client-ip=209.85.128.43
+	 MIME-Version; b=ajRk1/K2w6t1euU3qxCv2uRFwOZwEacMICRMF8XP21boVOT5+RNMJccty/fMrYB3YUDngiSe+drGhuJTRWrchncGaqdVgZ8fxb/+IB4ePrggPJ8HQzHgYoyCPLWe/kN0PzPt4icQTDfND84feTQHJFI912wZsd0Y8dnFrHNq06k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=Ti8TJJXr; arc=none smtp.client-ip=209.85.221.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-40ec32453d5so570505e9.2
-        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 04:59:51 -0800 (PST)
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-33921b95dddso2067627f8f.1
+        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 04:59:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1706014790; x=1706619590; darn=vger.kernel.org;
+        d=tuxon.dev; s=google; t=1706014791; x=1706619591; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5b1oLq4gou76iDcjhTA1HtV5RCuNVpeTpFhZ4OqPYQ0=;
-        b=YmC4zG0jTksQVPjkb92HEunVFQCS4/NAb56zj2Sr1S7O+ZPbIwM01q48AXCmKPow+p
-         WOoDbAebfh8w44pyUwWL7FiyeIjh8EWW3I8AnAOd7MH/KsoJabUvmgcBOqBZrmbnTlim
-         dziiqJvFhEcWDA+znKAcNYWCuRABQ61biSjsWSWyeFq4NMi2PHF8akXMDd+e1K7ApElc
-         7yNRJz82gq6p9qNqoWDEBn7h+PhYB7w08gAfMT8ZN/Ip5WkMAjwgObcMjMLTh4DCq8aZ
-         MpbO7frsAWo0jdIUB4I2K6drBwMLJIosdKsd+kK+Yu3+1PO8TggsC0k/yUPWHxqke9k8
-         +K8w==
+        bh=Gee9HyQUIxP/lOlV73mQEGTBYaMlN2Gud82I2snD3lY=;
+        b=Ti8TJJXrVyNSkWt4/LQ3iQAdtT/hduqfZPWbO8tIv/sETH09Pb9WiSYh1Q7sIptpMH
+         kRyf+RlG8GNmLtupoJDbQvFbg1MB7MD034YPKRJNnVy3GY749dMZc0NI9uMSUi13qy4X
+         9NB1ZhyY+aX/k2TgwAwUA5AVSX6GBSE4vl5YnwgMci+vjZD1s/xA7a+t4LYTFUL7Uig0
+         Jjy+rViQ4KheY8M8XGVmeh6/+/DAw4LOgSBftQFqPjrAsxoLl2Nx+VUxRtHpyIkv711l
+         2KqjQR4R14LJ9yhVquyQLdlvaLt78TUuRz3iju/6QOTJgBfPoqWew//RQEY2bRMWhHXg
+         tXdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706014790; x=1706619590;
+        d=1e100.net; s=20230601; t=1706014791; x=1706619591;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5b1oLq4gou76iDcjhTA1HtV5RCuNVpeTpFhZ4OqPYQ0=;
-        b=aiF5uhXWklUsm9HgCjGefg03IRe3CtSECLIb2f3+/fwLjBeFfCOSxtNNlVMr8TbL7y
-         SkONS0F7mnOhzB6RiGwJnt3vEzutJXsHSxMlSnSJI+SI5pGMcT2N14ES3RYsOQ+mupkU
-         eO4rKj1TvotDLhX7ex8FGmPQ4PJEEM/v0vlZDxVsA2DBafAYLOUUo/4uPyt+9WQTlFrQ
-         0kv467mo6PudecGv+bx3OZOfKf1Hs4YAf17rOEOGOsyrc7xtkYs/WT9VCbBzNsmEZBq/
-         iOt0g+XwnGlPsZU5PRt7jIfaQ/fRc47MdzEv3fXD17XUcqden6+qzMMUHcEfa8VwPJbL
-         NS1A==
-X-Gm-Message-State: AOJu0YyaV3L879juWrXaWWiVHVqphdmVAbfNC0lrL2bnypJUJgDtPNku
-	/w6kEw92YWwqelIKLhFHybwaERyKAD26jwsECGwzSV2RIoQg+jZx4ttKABhuXuU=
-X-Google-Smtp-Source: AGHT+IF4h3c/kZ2AbFArDi40SsQW4e3/TwvabAGd1gvGbT6W6M1Bu1YIY/SyyeZZuovyDQ8aMHobCA==
-X-Received: by 2002:a05:600c:4509:b0:40e:b244:1be3 with SMTP id t9-20020a05600c450900b0040eb2441be3mr490190wmo.175.1706014790203;
-        Tue, 23 Jan 2024 04:59:50 -0800 (PST)
+        bh=Gee9HyQUIxP/lOlV73mQEGTBYaMlN2Gud82I2snD3lY=;
+        b=qqsngFDXkStEJLcfUJgoD308Kq7wCKopUpxjCiMq9iBmjueKlko5ShtQS0mbnE4wew
+         Bsq8/dbV428MwXuyb2GCHxu02caFsXZBLlCHkEt5sg3RvBOfLBYIy3dDVf0Na7+FfuHm
+         7spdORrGNairviuzCOLFPm1awh8QrqVFJQ1gADN6Pjliri2lh6BncDUtt9HIwofZvrQr
+         V9QuOTeqp06A+mngtLRAIutJcneVMYD28zKnsaVOjLSTXqOAvOAdcZKT9xt/5X3ugTTU
+         4Rcj31eaZYMA7WYpEcExZw8v6iFMsKM8pavXSFbtI+bYqec9Ktq5MPn8X5iSXXDinr3w
+         dTjA==
+X-Gm-Message-State: AOJu0YxI1iRH4vw7wlEcfEldy/0LMNLolZWbTb+TwjVoJg9uRB6uN+MN
+	10NLADCYSLy+BnKub1O+1zlU+mg6Ygx7yR/8ch+Q8hQ8wkrCLrjqKrLdyc6NtyA=
+X-Google-Smtp-Source: AGHT+IHP6aM461l+fJb6gS6Dzbxboy8KQYTWPCasaDd9or9E6K2RV/TfXvZrITgSvXHUTE9OL+aGAA==
+X-Received: by 2002:a7b:c4d0:0:b0:40e:937f:16d8 with SMTP id g16-20020a7bc4d0000000b0040e937f16d8mr122523wmk.50.1706014791440;
+        Tue, 23 Jan 2024 04:59:51 -0800 (PST)
 Received: from claudiu-X670E-Pro-RS.. ([82.78.167.135])
-        by smtp.gmail.com with ESMTPSA id s4-20020a05600c45c400b0040e6ff60057sm33655711wmo.48.2024.01.23.04.59.49
+        by smtp.gmail.com with ESMTPSA id s4-20020a05600c45c400b0040e6ff60057sm33655711wmo.48.2024.01.23.04.59.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jan 2024 04:59:49 -0800 (PST)
+        Tue, 23 Jan 2024 04:59:51 -0800 (PST)
 From: Claudiu <claudiu.beznea@tuxon.dev>
 X-Google-Original-From: Claudiu <claudiu.beznea.uj@bp.renesas.com>
 To: s.shtylyov@omp.ru,
@@ -81,9 +81,9 @@ Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	claudiu.beznea@tuxon.dev,
 	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-Subject: [PATCH net-next v4 14/15] net: ravb: Simplify ravb_suspend()
-Date: Tue, 23 Jan 2024 14:58:28 +0200
-Message-Id: <20240123125829.3970325-15-claudiu.beznea.uj@bp.renesas.com>
+Subject: [PATCH net-next v4 15/15] net: ravb: Simplify ravb_resume()
+Date: Tue, 23 Jan 2024 14:58:29 +0200
+Message-Id: <20240123125829.3970325-16-claudiu.beznea.uj@bp.renesas.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240123125829.3970325-1-claudiu.beznea.uj@bp.renesas.com>
 References: <20240123125829.3970325-1-claudiu.beznea.uj@bp.renesas.com>
@@ -97,10 +97,11 @@ Content-Transfer-Encoding: 8bit
 
 From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
-As ravb_close() contains now the call to ravb_ptp_stop() for both ccc_gac
-and gPTP aware platforms, there is no need to keep the separate call in
-ravb_suspend(). Instead, move it to ravb_wol_setup(). In this way the
-resulting code is cleaner.
+Remove explicit calls to functions that are called by ravb_open(). There is
+no need to have them doubled now that the ravb_open() already contains
+what is needed for the interface configuration. Along with it,
+configurations needed by PTP were moved to ravb_wol_restore(). With this,
+code in ravb_resume() becomes simpler.
 
 Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
@@ -116,41 +117,99 @@ Changes in v3:
 Changes in v2:
 - none; this patch is new
 
- drivers/net/ethernet/renesas/ravb_main.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+
+ drivers/net/ethernet/renesas/ravb_main.c | 58 ++++++++++--------------
+ 1 file changed, 24 insertions(+), 34 deletions(-)
 
 diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index e22760b91a97..74568c836468 100644
+index 74568c836468..ff105e332396 100644
 --- a/drivers/net/ethernet/renesas/ravb_main.c
 +++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -2929,6 +2929,9 @@ static int ravb_wol_setup(struct net_device *ndev)
- 	/* Enable MagicPacket */
- 	ravb_modify(ndev, ECMR, ECMR_MPDE, ECMR_MPDE);
- 
-+	if (priv->info->ccc_gac)
-+		ravb_ptp_stop(ndev);
+@@ -2939,6 +2939,20 @@ static int ravb_wol_restore(struct net_device *ndev)
+ {
+ 	struct ravb_private *priv = netdev_priv(ndev);
+ 	const struct ravb_hw_info *info = priv->info;
++	int error;
 +
- 	return enable_irq_wake(priv->emac_irq);
- }
++	/* Set reset mode to rearm the WoL logic. */
++	error = ravb_set_opmode(ndev, CCC_OPC_RESET);
++	if (error)
++		return error;
++
++	/* Set AVB config mode. */
++	error = ravb_set_config_mode(ndev);
++	if (error)
++		return error;
++
++	if (priv->info->ccc_gac)
++		ravb_ptp_init(ndev, priv->pdev);
  
-@@ -2961,14 +2964,10 @@ static int ravb_suspend(struct device *dev)
- 	netif_device_detach(ndev);
+ 	if (info->nc_queues)
+ 		napi_enable(&priv->napi[RAVB_NC]);
+@@ -2978,53 +2992,29 @@ static int ravb_resume(struct device *dev)
+ {
+ 	struct net_device *ndev = dev_get_drvdata(dev);
+ 	struct ravb_private *priv = netdev_priv(ndev);
+-	const struct ravb_hw_info *info = priv->info;
+ 	int ret;
  
- 	if (priv->wol_enabled)
--		ret = ravb_wol_setup(ndev);
--	else
--		ret = ravb_close(ndev);
-+		return ravb_wol_setup(ndev);
- 
--	if (priv->info->ccc_gac)
--		ravb_ptp_stop(ndev);
--
--	if (priv->wol_enabled)
-+	ret = ravb_close(ndev);
-+	if (ret)
+ 	ret = reset_control_deassert(priv->rstc);
+ 	if (ret)
  		return ret;
  
- reset_assert:
+-	/* If WoL is enabled set reset mode to rearm the WoL logic */
++	if (!netif_running(ndev))
++		return 0;
++
++	/* If WoL is enabled restore the interface. */
+ 	if (priv->wol_enabled) {
+-		ret = ravb_set_opmode(ndev, CCC_OPC_RESET);
++		ret = ravb_wol_restore(ndev);
+ 		if (ret)
+ 			return ret;
+ 	}
+ 
+-	/* All register have been reset to default values.
+-	 * Restore all registers which where setup at probe time and
+-	 * reopen device if it was running before system suspended.
+-	 */
+-
+-	/* Set AVB config mode */
+-	ret = ravb_set_config_mode(ndev);
+-	if (ret)
++	/* Reopening the interface will restore the device to the working state. */
++	ret = ravb_open(ndev);
++	if (ret < 0)
+ 		return ret;
+ 
+-	ravb_set_gti(ndev);
+-
+-	if (info->internal_delay)
+-		ravb_set_delay_mode(ndev);
+-
+-	/* Restore descriptor base address table */
+-	ravb_write(ndev, priv->desc_bat_dma, DBAT);
+-
+-	if (priv->info->ccc_gac)
+-		ravb_ptp_init(ndev, priv->pdev);
+-
+-	if (netif_running(ndev)) {
+-		if (priv->wol_enabled) {
+-			ret = ravb_wol_restore(ndev);
+-			if (ret)
+-				return ret;
+-		}
+-		ret = ravb_open(ndev);
+-		if (ret < 0)
+-			return ret;
+-		ravb_set_rx_mode(ndev);
+-		netif_device_attach(ndev);
+-	}
++	ravb_set_rx_mode(ndev);
++	netif_device_attach(ndev);
+ 
+ 	return ret;
+ }
 -- 
 2.39.2
 
