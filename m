@@ -1,126 +1,81 @@
-Return-Path: <netdev+bounces-65223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E44F7839B45
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 22:41:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FEB2839B4A
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 22:43:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BCEB1F22310
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 21:41:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 93504B24730
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 21:43:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A6A53984D;
-	Tue, 23 Jan 2024 21:41:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDD3B3A8EE;
+	Tue, 23 Jan 2024 21:42:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="zCZj2S+L"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VnpLjQ59"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 807CB1EEE7
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 21:41:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0BA8442F;
+	Tue, 23 Jan 2024 21:42:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706046067; cv=none; b=OuYsV6XD6ms7PpyxBJEj7oFc/gVl6Y0CcGlzWY56+o0LtVBfbpi0ILzDfmjQHtI/34o3XYuSFDdaCZcv29SN/QenOCjLpicYj2wqb1ly8wl00t7AOjBIZ6WnRxLA44UnrSCxFG+QyWdJwEtbr3hdeUi0IDT9CoqTOT3sr0WQ28k=
+	t=1706046176; cv=none; b=V52i/RremWrmDV5Dm8obztoEH/7sv/oxNQ7VewcrX9m8Wq/IRRMboWPBqlmffpTHdKaGGmViv1+mbnVFS1VqBPFt0Ud5naO/zZLb2UnIr2gdv7OKm3IcD1tOMV0jInOQDHEBZzCIIyksqdSTN4HiXbXc4ExUtDuL2DeYPPusYA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706046067; c=relaxed/simple;
-	bh=kQtLBPIfcQAiSV7iSRDty0wVB4/l4DPXmkkr1VAxUxw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ISUvBHHGoLLG1ovnopEIqfPumQG7L/Re7Rpt84qiEdHtFjYOdl0clZ0oJh9YPPgfSDSJWpwa8UzGF0KPqyj1eSR7Bgb7pU7hTVDm6jDuxL5CF0wM2JLVaaex1AI1ZVuv0kW51DSrpxpOfeDRT4s5APHcYVhOWbZqk9gfEFCRyIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=zCZj2S+L; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-6d9b37f4804so3517781b3a.1
-        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 13:41:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1706046065; x=1706650865; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=w9Pn3IDwBwkxE6RxEKw9IjZecSiPr9jZLGy1+n4d62E=;
-        b=zCZj2S+LnAs2Rk8JbkcSD8ThWE8DzQLoraaIFA0FvfDSoZSH3Qtbwo6SNA7SB6XkUJ
-         qcphQiZMXzFarGGG/UOB5Gel6LD+NibrqnJRCcHNP4rDoFXyxboRdGpr5V2DfYTEalrh
-         UKaHxZa4ExoL72SaYJ2bNclt8W0e4Qj/yMuXWkqYKYAjG/xMBe+S6vjh1ipYhf79zBm7
-         NWlvSTJGhihNoKi5emZBQgGtfQMgmxElunS8r5c0Oc4vkKW4CN6S5Tl9cxuU9EM6zf/H
-         84+PHHUKW7QFnzO0mHcxa2ifJZwN3jcQR1uJfa++Fl6JeuLXl2VY93iqICUigk6ROVhE
-         owlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706046065; x=1706650865;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=w9Pn3IDwBwkxE6RxEKw9IjZecSiPr9jZLGy1+n4d62E=;
-        b=wYpbNb2OHZi9PjHtEtwksr2/yY+etXvl3DDvtz3CszjupC5sbRBycCgjbnpF94eqUP
-         OXihf022vwMQ7GxYsGBHmEMp4CzV98R1JwtGDcVdjMJiD3S19Yn7swvF44wgMBxXym+t
-         N/kCGM6KoZJ8cs/MxsN0IUKYK9ST265ciRGZOmnVNlJ275MaForoJfhC1BorgSHT2+3g
-         R7RuyVtvvMNYomrglUfMU0T1Jgw/PebwWDSzNRAfPaiJpEZpM3BND8inPBA/xJ9cDTRm
-         Dgx29v7/PUKW3yOE6B0Hskb6/seY7KjNl4lisEanQjGs4pVWufL0wxL/IMLyMlseRMzQ
-         7kCA==
-X-Gm-Message-State: AOJu0YxQgaAm/W1KRzev9e2AYJ0A0IVO654dLFm9e2f5LfwHRt/LrfBN
-	mLCtfDna9YwNG64sppTIrU1YGC7pNI5xaaIy2q+bfDDI//ilqA3Ry56BsZs32Q==
-X-Google-Smtp-Source: AGHT+IG7Ym2Dc/4j9lhZJ+3ROkkUe3ElRWdj9IOIpTv0BpJYVxh7lxIjXtCwnC9/dE2oQQm8XTi6ug==
-X-Received: by 2002:a05:6a00:2e25:b0:6d2:74fc:1f1e with SMTP id fc37-20020a056a002e2500b006d274fc1f1emr242838pfb.14.1706046064881;
-        Tue, 23 Jan 2024 13:41:04 -0800 (PST)
-Received: from ?IPV6:2804:7f1:e2c1:2229:1771:59f5:c218:f604? ([2804:7f1:e2c1:2229:1771:59f5:c218:f604])
-        by smtp.gmail.com with ESMTPSA id ey15-20020a056a0038cf00b006db05eb1301sm12247385pfb.21.2024.01.23.13.41.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Jan 2024 13:41:04 -0800 (PST)
-Message-ID: <afb9ea78-9d9a-4ab3-bee4-a1da3175cdba@mojatatu.com>
-Date: Tue, 23 Jan 2024 18:41:01 -0300
+	s=arc-20240116; t=1706046176; c=relaxed/simple;
+	bh=NpQv4S8oPU0k3iSrzk5lY5kY5ErVmyclbPIdZ/b3Mdg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lAfGwlom+/f4ZQxODYmVYt21VQWIY7wRzo6eXsdjW9zlsDO6g3+hrU/pSbX0XrzTm3GIVRzEGQgpU6JjTZOYPYvBUR50mX0Nw6pStRNYK6Z4067vR0sbrXBxZFnYanL/tD2PFVVCs5OPXlICnlyXcZa7Jfrlz+fQagbkTT2vcBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VnpLjQ59; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29041C433C7;
+	Tue, 23 Jan 2024 21:42:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706046176;
+	bh=NpQv4S8oPU0k3iSrzk5lY5kY5ErVmyclbPIdZ/b3Mdg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=VnpLjQ59l/FGxHgTBTWwHvfhXNNYiMoQwjFCTnU4s2KMeLWDKm61gCzy3ASAVqX7P
+	 DlqSsELBEPkjK0/rttNqaiL3AEOj8P9yV1lNWdh8gZjssuXDos84NuQe56azVCowVR
+	 JC8Kx6jts38gLxw+YUdmh3scK9j52Z6cw6rQPr38VF7xqpuvxRC0IWZt0WoNefoLMx
+	 tQUJ1MAlGcRX1o9h/icbc0LQ6tEUM/zi5L4Yn3MX0OLWS6lInEV0NDSrpAH+IXRr7s
+	 VGvN+vHhQZ44sJVh/OzIF4gkexfxdb4YJff3hHafgVs3XFx7nurMxBQL9JAijRUg9Z
+	 zL3nfD69SX4vQ==
+Date: Tue, 23 Jan 2024 13:42:55 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: Kalle Valo <kvalo@kernel.org>, Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+ netdev@vger.kernel.org, linux-wireless@vger.kernel.org, David Gow
+ <davidgow@google.com>, Brendan Higgins <brendanhiggins@google.com>, Shuah
+ Khan <skhan@linuxfoundation.org>, linux-kselftest@vger.kernel.org,
+ kunit-dev@googlegroups.com
+Subject: Re: pull-request: wireless-2024-01-22
+Message-ID: <20240123134255.3eef6fd9@kernel.org>
+In-Reply-To: <d4c1a7c715a1f47dc45c5d033822d8f47e304bd4.camel@sipsolutions.net>
+References: <20240122153434.E0254C433C7@smtp.kernel.org>
+	<20240123084504.1de9b8ac@kernel.org>
+	<d4c1a7c715a1f47dc45c5d033822d8f47e304bd4.camel@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iproute2-next] m_mirred: Allow mirred to block
-Content-Language: en-US
-To: David Ahern <dsahern@kernel.org>, stephen@networkplumber.org,
- netdev@vger.kernel.org
-Cc: kernel@mojatatu.com
-References: <20240123161115.69729-1-victor@mojatatu.com>
- <158eaf99-1018-4ef6-bfdf-5f86464aae83@kernel.org>
-From: Victor Nogueira <victor@mojatatu.com>
-In-Reply-To: <158eaf99-1018-4ef6-bfdf-5f86464aae83@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 23/01/2024 15:17, David Ahern wrote:
-> On 1/23/24 9:11 AM, Victor Nogueira wrote:
->> ---
->>   tc/m_mirred.c | 60 +++++++++++++++++++++++++++++++++++++++++----------
-> 
-> missing the man page update
-> 
->> [...]
->> diff --git a/tc/m_mirred.c b/tc/m_mirred.c
->> index e5653e67f..db847b1a3 100644
->> --- a/tc/m_mirred.c
->> +++ b/tc/m_mirred.c
->> @@ -162,15 +167,38 @@ parse_direction(struct action_util *a, int *argc_p, char ***argv_p,
->>   					TCA_INGRESS_REDIR;
->>   				p.action = TC_ACT_STOLEN;
->>   				ok++;
->> -			} else if ((redir || mirror) &&
->> -				   matches(*argv, "dev") == 0) {
->> -				NEXT_ARG();
->> -				if (strlen(d))
->> -					duparg("dev", *argv);
->> -
->> -				strncpy(d, *argv, sizeof(d)-1);
->> -				argc--;
->> -				argv++;
->> +			} else if ((redir || mirror)) {
->> +				if (matches(*argv, "blockid") == 0) {
-> 
-> Not accepting any more uses of matches.
-> [...]   
+On Tue, 23 Jan 2024 19:19:35 +0100 Johannes Berg wrote:
+> Looks like that needs adjustments to the config file there, mostly? I
+> can see about adding that, probably not that hard, at least for
+> mac80211/cfg80211.
 
-Thank you for the catches.
-Sent a v2 fixing these issues.
+To be clear I was mostly thinking about mac80211/cfg80211...
 
-cheers,
-Victor
+> We're also adding unit tests to iwlwifi (slowly), any idea if we should
+> enable that here also? It _is_ now possible to build PCI stuff on kunit,
+> but it requires some additional config options (virt-pci etc.), not sure
+> that's desirable here? It doesn't need it at runtime for the tests, of
+> course.
+
+but curious to hear about driver testing recommendations.
 
