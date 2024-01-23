@@ -1,225 +1,177 @@
-Return-Path: <netdev+bounces-65200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99E298399D4
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 20:44:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94E688399D7
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 20:46:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4ACCE28EAF6
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 19:44:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C51B1F25C95
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 19:46:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5811682D6A;
-	Tue, 23 Jan 2024 19:44:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1286282D67;
+	Tue, 23 Jan 2024 19:46:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=pschenker.ch header.i=@pschenker.ch header.b="T/2AMIqw"
+	dkim=pass (2048-bit key) header.d=seco.com header.i=@seco.com header.b="dr1AMS9S";
+	dkim=pass (2048-bit key) header.d=seco.com header.i=@seco.com header.b="dr1AMS9S"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-bc0a.mail.infomaniak.ch (smtp-bc0a.mail.infomaniak.ch [45.157.188.10])
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05hn2241.outbound.protection.outlook.com [52.100.174.241])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E1A6823AE;
-	Tue, 23 Jan 2024 19:44:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.10
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706039061; cv=none; b=Hl9O7f/Yqw/eSpiPlSDLU5qmGfMZViezLdQlIt5KC61Gx9ImTvvDmRalx2WvBRkdzWyCrFUpWJD2gP8kiRIGw9nbg4DoXMiB99vjkP+bf/rxp827hR7jGYXRCxRtUj2bNhAODPV7oe5pOWghG2WKuGUMgNjO/B0uKqzxb+zKfpI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706039061; c=relaxed/simple;
-	bh=wl5cqQcWfykVVJblgMlQOTH7snhU8fazVZAYDiv1i+4=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=FikCOcbR6njjAiaSutt6VF5CSxjaFBNgezZUX2H7ZBYOb92xsJ8LpeYbIpF6HYOHpQr9mrxg0W7a8BcCxwr2zJptPgii78gF65ATZCmUTPt8Dy5xXfLqcZ1bXs7O1PjhBaQr5lVlSfUE3tEFvmOhwu7GoGshgoHTI1ZI73jX/qg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pschenker.ch; spf=pass smtp.mailfrom=pschenker.ch; dkim=pass (1024-bit key) header.d=pschenker.ch header.i=@pschenker.ch header.b=T/2AMIqw; arc=none smtp.client-ip=45.157.188.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pschenker.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pschenker.ch
-Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4TKHbK2DftzMr2QW;
-	Tue, 23 Jan 2024 20:44:13 +0100 (CET)
-Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4TKHbJ0MFvz3b;
-	Tue, 23 Jan 2024 20:44:12 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=pschenker.ch;
-	s=20220412; t=1706039053;
-	bh=wl5cqQcWfykVVJblgMlQOTH7snhU8fazVZAYDiv1i+4=;
-	h=Subject:From:Reply-To:To:Cc:Date:In-Reply-To:References:From;
-	b=T/2AMIqwHzqN4SWaSS2PkqwluUZlfpZsXeGU7/6qHPr6ik3hmzYtDPlc1Zqmot1mS
-	 fv70ViNQ1UiDjB/+DWv9HOk3eCLB0S/KWffHjYl9D2bmyZjM75yAuKFcFfWy+molC0
-	 7qMbku6xa9/9Rqkwi/1wkiF5TP6KrMHI/kwZLV/A=
-Message-ID: <1b5a20ce6e6332b7fad7b6af61a5548152ae19c9.camel@pschenker.ch>
-Subject: Re: [PATCH net-next v1 1/2] dt-bindings: net: dsa: Add KSZ8567
- switch support
-From: Philippe Schenker <dev@pschenker.ch>
-Reply-To: dev@pschenker.ch
-To: Conor Dooley <conor@kernel.org>
-Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, Conor Dooley
- <conor+dt@kernel.org>, Woojung Huh <woojung.huh@microchip.com>, Vladimir
- Oltean <olteanv@gmail.com>, linux-kernel@vger.kernel.org,
- UNGLinuxDriver@microchip.com,  Marek Vasut <marex@denx.de>, Florian
- Fainelli <f.fainelli@gmail.com>, devicetree@vger.kernel.org, Eric Dumazet
- <edumazet@google.com>, "David S . Miller" <davem@davemloft.net>, Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Jakub Kicinski
- <kuba@kernel.org>,  Andrew Lunn <andrew@lunn.ch>, Rob Herring
- <robh+dt@kernel.org>
-Date: Tue, 23 Jan 2024 20:44:11 +0100
-In-Reply-To: <20240123-carpool-avatar-c1e51ab3cc32@spud>
-References: <20240123135014.614858-1-dev@pschenker.ch>
-	 <20240123-ripening-tabby-b97785375990@spud>
-	 <b2e232de11cee47a5932fccc2d151a9c7c276784.camel@pschenker.ch>
-	 <20240123-atlas-dart-7e955e7e24e5@spud>
-	 <979b1e77b5bb62463d52e7b9d3f9ca1415f4006a.camel@pschenker.ch>
-	 <20240123-carpool-avatar-c1e51ab3cc32@spud>
-Autocrypt: addr=dev@pschenker.ch; prefer-encrypt=mutual;
- keydata=mQGNBGS2ZAkBDADqs7dCmUtCld0RXbarkJeH9uOPdaRTpSS3HrdCqyQ65RCu9AnloKX68EZbZU0v+UiHAURwhG6vtO91QP6oSPiLDJzicPN+sAwdxgmCYOLavyiQDTlzodu0yZvLlWXMAAs19n2Gz0WVZqltnaxWHVbeAFqYWGjemeKRM7v0W66wh4vTmCVL3Ywk0Pp/HjvNjijDIGV2kBubNK221Nc5Yo+1jsAkh0xhzngLpdjIMsF/ZzihitiTVYvwparu6COzw5W9naNE3CdW+QDVPmYOGy2zdX+1ETjHo+gOAX86vwDjjG/7sGM+6pb6bUDKJja7+K6Z5pqL6iNz3lLcvgsKobd/kqL39Y5phhh66hAut9a91flBEqk09GRMsiBkNslXmFctEM4SXXJJTLKe1UXq3tScb0+2vB61qidpmQTLRBVq3TXtdelPMBLwuA4UwHb2DDo9lx+YX2EPVWIn03+M9cqw5ICvB0F1mYAlKnLy7p2EX/EYHugmH0mzq4i7nQNpTOEAEQEAAbQkUGhpbGlwcGUgU2NoZW5rZXIgPGRldkBwc2NoZW5rZXIuY2g+iQHOBBMBCgA4FiEEPaCxfVqqNYSPnRhRjRDjR2hoXxoFAmS2ZAkCGwMFCwkIBwIGFQoJCAsCBBYCAwECHgECF4AACgkQjRDjR2hoXxqd8Qv6Awz00hYCopnatbPJOFElSbtVK2O17rXtSzWfnemKbgVdA/K0KEbwuYtovF5sQIooYvkwNXH648hxLtgtXQAyuTQp0x0nYHMNxum24td6W3gPSzT+MqRNL6h1XrVAr8r5ThPWRfjqZcq7sY/AEajoQUm3d7PmvZaDd17ROWgrJRlAy4spL+mA7r3o1LCI6/wxHog5kkAuj4hnwP1pVaUNSiQWG2mcBb63VIE6ebIraymg6zeh0wsr3pK1Wz1n7cbhB40oWc9DXhNSLx9pRn/tbtaM2qdoIA1f30yIGvAu1
-	8jXJe5S3DdG1u+PmRW4vrE+ocEW8fkz+HUVlWbMhUvvn1xL1/qIg0hoFxNWEPQ+aXa3XOm10FZJrFuRDOj7tN1BjHtOZLnhTEfYFQWWuPzlOwP6qmO2XvkpsJ3UaCq49JYntptUVHx5HniQMWZ1G8ee67EEoqj71yiex24bOf1cR+58bgTUjiyD2pfOEQzu91h4G4oPGBMAfQekAWvckIU/tDJQaGlsaXBwZSBTY2hlbmtlciA8cGhpbGlwcGUuc2NoZW5rZXJAaW1wdWxzaW5nLmNoPokBzgQTAQoAOBYhBD2gsX1aqjWEj50YUY0Q40doaF8aBQJktnc/AhsDBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAAoJEI0Q40doaF8a+3IL/1yWbe4XmaNv0o6hyWvQhdKD9hd8XCeqDderAPJMMloYSO6a1ZL/OxQxiuLkEUghHs7ps0vyfogGGZmavulWmhUSgi4oNXO+jRT+BgJF4latXqRX3cyMI2MJXTWC8SVhK4cYR2VLGp8hjPKNInRlogxiRycU/gwe22VwiWv4rDmpPNL6um2KG1rbiD/GJqxRLw7GFQj+Lg6DD92YBTd80OujwAhcJz4RqVins/G1gsuScJG0VgmvWCnV/XzsXHxRhVF+W4JM8lX/aPHxQPKTEhssAFLJ6v7G5KYIC87Jc0c0316e9B3P/TJRD0vOcAbW8yQ8K3laCvBcEYQcSt0wY4C6J6bvC3gGmJV8Kq5+uRAjSHOQPGAOGRS+leNJqmCppUts4BYFvJlhwYy+kkCVXORkYnjaao2OXV0C/FsRgjOqib8oJ2M10xYDHAbJnq/f5IqhsFJQXU002ZkjHr4tLvnL37b7RraTyx//H7h2ggHc9K19VduKWShfITlb9qbb47kBjQRktmQJAQwAyVg2XHYOv2xmHvOUiXIIsBe2X7leY/wWjbGDGIqOehalDUf1UE+BTgoTVd+0Hr7yxMZOL4Fr+RiK1t
-	ezkUjjLzqAQgI24HkhSdiw4gBpoeXqLK5g+iDR+/ZW23tW3ZdIy09AUBNQyUDBN8zDw6C+OnywdDeHDhoT8y5v36bZffJJQzxbbP63sMul94tQyjt+yVPoCfUVclbPSdeNd2dcjIhr1r34PI2VReYZFLqItJuByU0stZPaEsnkWYK/5Y03s6y49mvmw9YkUzJxj+Zud3FA2lo7Vfr00CZGj5oTrg/DNb8qyPLfSXyiFVJK8Cx1cwNm5Q8bILElYrmPEKZH77Iq94Pp9P5i067faMaWR1kS0MEy8xHdyC9Eha1CbUq7Fh7suapfSTAsWv+oX48YLgaDCg4YwAjMBxYcGg+keqJBDP0a3zrzyd1XYlw7j/yHTewdXgL4GN/WX6WkuxeMf4TLjIseCJ66VguQ2PFPT9c+QD1Jr6sWltn17/9V4k5JABEBAAGJAbYEGAEKACAWIQQ9oLF9Wqo1hI+dGFGNEONHaGhfGgUCZLZkCQIbDAAKCRCNEONHaGhfGuiQC/4iUa523daeC5+VEiWc5IOTSOUsqv8hExqwhvbo5gGeizztnGC2VeWnkmYzae0mopBqBgCXoGY4qAJIy0/apgpEBXGVYwkMFfHuwccD0bdo206VGh9qSsBHblJ/46Pv+vyGbbJ5zGm98eP7JriDLsMeeJi9Q08vdfqXZieQTi7HgUzViGCgjM52ofD41t2QPBLG4pt15240vciQonsbwZL5PQNPJuC9WYtWeRYL9Ta4YwOoX04ro9kRDuuHTB8dTSb00ptn9YJiKzFzccW0KWFqZ/aK1j7HY6tQM1b4XhcToPOIt4gZLZFgIxhhVVWIwYvqINRi376yVv+soJp5jjghymD1cnINgbQttHgtOc1H9/rBrVkT8KPab39x+xxmXxldT6gxyOc68nbnD6cloe99lZNUhycDMn/zPoe4235lpmqhC3mNQ/hnwGN4dywifiAJNg8D6gu3M4QaVqeNEPxyBCNfdquoFLW
-	7y2ACHIW8WQkD8EORcLp7+QKQh4NgSkg=
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.1 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E6C65C8EA
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 19:46:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.100.174.241
+ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706039196; cv=fail; b=gEuFXzYL7yB7jngZ+Vh/PyLU8KSKnKxpjONCGxqD8r1lQ5EkRveIliszv9PydjVkHjZ1VZsRsQrcFmqP1z80csdYNcuz6y5RWhYyuOWdLMHKYHbdZHCFoxxMLT++51MuxGESD+8k6BHW5FAsg9iGpeJ5+k7Gdyc9t5vQCzwISM0=
+ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706039196; c=relaxed/simple;
+	bh=BieAvVCvIYDSWXlduGRHuyAc6a4DmCF8wQMe9dQh92o=;
+	h=Message-ID:Date:To:Cc:References:Subject:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=C9fppeeUf2ZtnmPW20A/KNehOhwhdE5tB/D2zjSPgQzVjTHmLrDH5rSX+C7BiAE3p0PnlnCSAYWZUN5ar6AboYDruRd/Iq+TaesW5PAW9Iy6lCAYaKfX0H6kAKIMuHH9tgcrMnKIg6CNvQU6RbM06yLNsRp3Wz/MoEFcYcOwNGs=
+ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=seco.com; spf=pass smtp.mailfrom=seco.com; dkim=pass (2048-bit key) header.d=seco.com header.i=@seco.com header.b=dr1AMS9S; dkim=pass (2048-bit key) header.d=seco.com header.i=@seco.com header.b=dr1AMS9S; arc=fail smtp.client-ip=52.100.174.241
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=seco.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seco.com
+ARC-Seal: i=2; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=pass;
+ b=OU4Zh8FOk2vURTTZJHjFePI+uT8Nv8enUbbUKzzL0dl6BX/ugqbq0EyyyXlSzuxJgHnE9BM3Do4E11MsicaoIfdDmU7BqIBJrGo63leKrzZimBBKsmnxNURjS4zUHc7lWq6VyVLCV6jBmZt3oaMxeqRxEviN7xM/fK2KmcJK5qa+mDo5ArBZ+G4LDf2oF9cWVgq98WAHe2HKyMuhsGuvn6/yH4arnF7Z82eKBQhWOJPrZaVPit9UnMpb4luK+Vxy5pHQh1yY4fLO3m40ptZlBiddJn/fe1eIwGOsCg0X2TfeLoGp4rY3EzfjEoMBjpi54ld23x58WDTGI2p1o1bHiA==
+ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BieAvVCvIYDSWXlduGRHuyAc6a4DmCF8wQMe9dQh92o=;
+ b=fBV1V0l3b5gHhlwFzdoutUZd7wUCHJyIKqel4dkBrpzAg454a6DJgikCrp5SOmyvupyNX4VvDZbsYxl8yP5iCGoAXvWCFrsCoUaw35WMpuneC/+4at/vT71sbTxBatmxJyw1i1iY6BXIgt03hjUk1lpXyuShZGcSkhNFTsVOoA6YAhF2J5ecf9DZtyTvxXsh8Yc7DCW7jtqy19F1NinKNrB77ZsOYAofFeqgPKc8JpufI3dwuBSbols1DfbmOf5c2ln1VTAKIrdvRt9M/+03JicSW4/45B5DDFExbPHbSKDFoJHzV4Ec8fgbL/LK1fvpHBEoTvBbsOIdzsqfPUqdag==
+ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
+ 20.160.56.85) smtp.rcpttodomain=arinc9.com smtp.mailfrom=seco.com; dmarc=pass
+ (p=reject sp=reject pct=100) action=none header.from=seco.com; dkim=pass
+ (signature was verified) header.d=seco.com; arc=pass (0 oda=1 ltdi=1
+ spf=[1,1,smtp.mailfrom=seco.com] dkim=[1,1,header.d=seco.com]
+ dmarc=[1,1,header.from=seco.com])
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=seco.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BieAvVCvIYDSWXlduGRHuyAc6a4DmCF8wQMe9dQh92o=;
+ b=dr1AMS9SXEA9RN9T01c1HjGyaNsUqgChQiVBSErnIOBzfWrqTcmZNlOlbwZ0jVF6erG3YGOCMJ1XGeP2VpcbAzwqKWJdi3f5N9foZqzQFWoE1exu4sIyXq7uxo2QzQGBJfPXz0QSN/qSoVZ1Y4lz0q7WOrNXsIA/QXeGxjsmfBVcDbyJwOnXQroK/Qe66CQX+eh5a15MtznBUTCyEQCahw9CCUoFf51phqSzhmdpZUlAXh9Jnxn/kp1RnB0cj/VLynjyXIczjTSboge8FLmRcmaF/f1iI5Cro2BsjO0xSj8DT9CqyQ6nwqrvNrLnp2iXD7ADJ/KC3NZOZOPXGrVO7Q==
+Received: from AS9PR06CA0694.eurprd06.prod.outlook.com (2603:10a6:20b:49f::7)
+ by GV1PR03MB10329.eurprd03.prod.outlook.com (2603:10a6:150:15f::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.33; Tue, 23 Jan
+ 2024 19:46:27 +0000
+Received: from AM6EUR05FT068.eop-eur05.prod.protection.outlook.com
+ (2603:10a6:20b:49f:cafe::5c) by AS9PR06CA0694.outlook.office365.com
+ (2603:10a6:20b:49f::7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.36 via Frontend
+ Transport; Tue, 23 Jan 2024 19:46:26 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 20.160.56.85)
+ smtp.mailfrom=seco.com; dkim=pass (signature was verified)
+ header.d=seco.com;dmarc=pass action=none header.from=seco.com;
+Received-SPF: Pass (protection.outlook.com: domain of seco.com designates
+ 20.160.56.85 as permitted sender) receiver=protection.outlook.com;
+ client-ip=20.160.56.85; helo=repost-eu.tmcas.trendmicro.com; pr=C
+Received: from repost-eu.tmcas.trendmicro.com (20.160.56.85) by
+ AM6EUR05FT068.mail.protection.outlook.com (10.233.240.222) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7228.21 via Frontend Transport; Tue, 23 Jan 2024 19:46:26 +0000
+Received: from outmta (unknown [192.168.82.132])
+	by repost-eu.tmcas.trendmicro.com (Trend Micro CAS) with ESMTP id 7800720083980;
+	Tue, 23 Jan 2024 19:46:26 +0000 (UTC)
+Received: from EUR01-HE1-obe.outbound.protection.outlook.com (unknown [104.47.0.51])
+	by repre.tmcas.trendmicro.com (Trend Micro CAS) with ESMTPS id B74852008006F;
+	Tue, 23 Jan 2024 19:46:24 +0000 (UTC)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jLudlQ0cE5jsF/M9hNWIrlXgX317u5fvdZbXDEB9kl16BMd0JdkbGqENSWZ961745XfNfVhEdX94fy/IVKLjeo0FoPUosGpcCxbwRu9ijdosr6Ct884w3UDnf+efR+2M40TDPx7HtoAWj3wxPAHCpZVVcBn4L8B4EvCR03Q0c4IFlQXvyY5il27XLROmXFtO+RDX7dVlKE5Eu9VUHSb7vvRaqiFzTzjfx8l8POSstJFfoerflg3pGy+cwLnhZ2QIrRzl+lCdypQTYzBWj1lS9iX9ay9cbGUVaZSFYW2m9nZYbsYyZYxbZOf/zt1s25SK1cM4YjwMUkh5XgzEsTQQEw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BieAvVCvIYDSWXlduGRHuyAc6a4DmCF8wQMe9dQh92o=;
+ b=A8wMr4ajkZe+JxkaGke4KFzj1NyjN5OYoO7tunQyJMEWC2IVmGPeWH4WHj/FQJFPChxcHCR/lSRm0MEiFQ6jr7gXlPbj6gIg180+BhWqHH/UilnuFXAnMOEFcBRfCqkAPxWolGcHWDlMLF526Q2C2e47QKBaI2FZclllPbQ25Sc+jjpl90kt1EbVaXzNlgbPWrUTXcUuqL6zDIr04NSlB9LgSngzmB2tKnsLCV1hxEMvFpVGvWNjk3jjzC33smhlEhl4zcSdVGEyMEPbaM/5m95HSIlL/qNZQfS/6fE5skiM+8HpsDZoytG00j1xtAibRzEw6CeOEQE+E02ZudyP9w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=seco.com; dmarc=pass action=none header.from=seco.com;
+ dkim=pass header.d=seco.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=seco.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BieAvVCvIYDSWXlduGRHuyAc6a4DmCF8wQMe9dQh92o=;
+ b=dr1AMS9SXEA9RN9T01c1HjGyaNsUqgChQiVBSErnIOBzfWrqTcmZNlOlbwZ0jVF6erG3YGOCMJ1XGeP2VpcbAzwqKWJdi3f5N9foZqzQFWoE1exu4sIyXq7uxo2QzQGBJfPXz0QSN/qSoVZ1Y4lz0q7WOrNXsIA/QXeGxjsmfBVcDbyJwOnXQroK/Qe66CQX+eh5a15MtznBUTCyEQCahw9CCUoFf51phqSzhmdpZUlAXh9Jnxn/kp1RnB0cj/VLynjyXIczjTSboge8FLmRcmaF/f1iI5Cro2BsjO0xSj8DT9CqyQ6nwqrvNrLnp2iXD7ADJ/KC3NZOZOPXGrVO7Q==
+Authentication-Results-Original: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=seco.com;
+Received: from DB9PR03MB8847.eurprd03.prod.outlook.com (2603:10a6:10:3dd::13)
+ by AS8PR03MB7349.eurprd03.prod.outlook.com (2603:10a6:20b:2b6::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.36; Tue, 23 Jan
+ 2024 19:46:21 +0000
+Received: from DB9PR03MB8847.eurprd03.prod.outlook.com
+ ([fe80::ec0a:c3a4:c8f9:9f84]) by DB9PR03MB8847.eurprd03.prod.outlook.com
+ ([fe80::ec0a:c3a4:c8f9:9f84%7]) with mapi id 15.20.7202.031; Tue, 23 Jan 2024
+ 19:46:20 +0000
+Message-ID: <75773076-39a2-49dd-9eb2-15a10955a60d@seco.com>
+Date: Tue, 23 Jan 2024 14:46:15 -0500
+User-Agent: Mozilla Thunderbird
+To: rmk+kernel@armlinux.org.uk
+Cc: Landen.Chao@mediatek.com, UNGLinuxDriver@microchip.com,
+ alexandre.belloni@bootlin.com, andrew@lunn.ch,
+ angelogioacchino.delregno@collabora.com, arinc.unal@arinc9.com,
+ claudiu.manoil@nxp.com, daniel@makrotopia.org, davem@davemloft.net,
+ dqfext@gmail.com, edumazet@google.com, f.fainelli@gmail.com,
+ hkallweit1@gmail.com, kuba@kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, matthias.bgg@gmail.com,
+ netdev@vger.kernel.org, olteanv@gmail.com, pabeni@redhat.com,
+ sean.wang@mediatek.com
+References: <E1qChay-00Fmrf-9Y@rmk-PC.armlinux.org.uk>
+Subject: Re: [PATCH RFC net-next 03/14] net: phylink: add support for PCS link
+ change notifications
+Content-Language: en-US
+From: Sean Anderson <sean.anderson@seco.com>
+In-Reply-To: <E1qChay-00Fmrf-9Y@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BL1PR13CA0422.namprd13.prod.outlook.com
+ (2603:10b6:208:2c3::7) To DB9PR03MB8847.eurprd03.prod.outlook.com
+ (2603:10a6:10:3dd::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Infomaniak-Routing: alpha
+X-MS-TrafficTypeDiagnostic:
+	DB9PR03MB8847:EE_|AS8PR03MB7349:EE_|AM6EUR05FT068:EE_|GV1PR03MB10329:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3a2c3bec-109e-42b5-5dcd-08dc1c4bfca9
+X-TrendMicro-CAS-OUT-LOOP-IDENTIFIER: 656f966764b7fb185830381c646b41a1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam-Untrusted: BCL:0;
+X-Microsoft-Antispam-Message-Info-Original:
+ zQns9ivw3ahEr0FmE3GS9VZMbMgijvDcxYwftoL5GgXgfTloPrMxYDhWOn+/pw0FKOT7OrcU/6J2eJxO/cEmG/aVVAE9WOrBYGMXQmZv4YXvrKgCVaRuCAmPQLugIxoZMb3gmJTJZqNeTKAF0xXaUpTEwoSlg8FMFOL1wu7jwYqCTCYj7vE5dMv1XkKWr89tMHEnNis7qAe0HLTKzSEUUheePMbHkjeiG6kjPvnm4zG2fJ/SBoIAQy1EJ4CEH1/6tir0epgpJMxgkjDBeDYkGX2NPNr9PpeVPFETs1t6+4zHSnmsxi/iasGQW7iAEN7nS0+0IHgTFTJe9owKwensonlIfjw4czPmKtkeA8uTKsQFFIW4ZdgXjfl3m31vmGYpa51Kk/KiceW8EHLJSzA5m08gWwm0DOkSmog9saEP0CZsaC+SoPcUW73SlXssrHqpNtlOR9N5pgYQQGWnSHfy16Ju2aOfz1LzZtGdSYAT2GFG5AnUr9O06F6mYa7zREJBaN1XONme+BJl0dXgb3tXdPFF/HjPle4ZvQI68SzkcsXIXz+JPduUh81rKrr9S9LmFzuJWt2Gq5DR3cr+5BQZLrHYzhYM4UElLNkhPyunFBV/K+9vr98pwOdbBbmoYtPFpW284c6sAlyLh3ScVIKOvZCQnf66pVXhtGLIUrOyTH0=
+X-Forefront-Antispam-Report-Untrusted:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR03MB8847.eurprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39850400004)(366004)(136003)(396003)(346002)(230922051799003)(451199024)(64100799003)(186009)(1800799012)(6512007)(66476007)(31686004)(478600001)(6666004)(2616005)(66556008)(66946007)(316002)(5660300002)(6486002)(26005)(52116002)(6506007)(966005)(83380400001)(4326008)(41320700001)(44832011)(2906002)(36756003)(86362001)(31696002)(38100700002)(41300700001)(15650500001)(8936002)(8676002)(558084003)(38350700005)(7416002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR03MB7349
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped:
+ AM6EUR05FT068.eop-eur05.prod.protection.outlook.com
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id-Prvs:
+	6bd38a55-64e4-4733-5b1e-08dc1c4bf8c7
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	1z7vnXsj4PMujxKrZALTXyvkMUycxLDT1cDmmnqxW5GyZVqpE+iygBPvVdNuKVBOaom5DeuQMH9QT6cECnMnhY/0wLfsF+Ekl+SSXupPh5wGvnENFx6xMc01Dyz8zwP0QdETt0bn3vzjkdvZ3Pa/rNddq5NrrS2pYPmBdJYEFHoAebiZTMITVJssFFnXAhdDYwLjUIariBnjl20B2Egl+RoSylZYYcQQpYstvqyMSeFW4E42iAYMSFJTqHm9KKnWK2arxUhUqCEvve2jqNNtS4TTWXjQsK5V01nO9QhVQy+AmbHdanbzw9wAL1+iFFiGaVORpVDNNjDZgE3H5FUryFa6m/Lf2mrxUtnd7m4zPtRZO/50yB4nZbNk0dKFv0a5fFGyfHHw1MB7X4eAnWaEjT0Ik1Phl9+sMwhT4K0j7a5vXalP2g39jeB3kWx8nvQhHC3hMXQnecZP082hRgEYtMliCwB9C94kP1YTMwX/isbU1saeQnUNJ+2oi5Isxhq6/B6CKUJLmHMQ6pPFwqdYvGibJHY/RnsFAg9hC/x2OmD3Ar47CbXWQMOcCC5e8rOF5MbhseESjaJ3YIJilEtAjn/DlwSav9luWX4IS2ZaVAb0jZjKDcfYutmRkDWQI9Za5FF2tuHiwEoG78JrsoRN/LQZMtOW60GfH9JkZOgn3VLM5K6YwllyP1RWizUyV26AygIF1ST0lqp92/uBB7gbwSBqNmaTvcJbHWxi17EGDTuRMLeR/cWttGtG5S53bOqLcYPpiTWYXyHV9hvu4MbUFNvwKVQzanecjmWKWrsg6ucTsnVRuqikS/WhcQNXF8tt
+X-Forefront-Antispam-Report:
+	CIP:20.160.56.85;CTRY:NL;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:repost-eu.tmcas.trendmicro.com;PTR:repost-eu.tmcas.trendmicro.com;CAT:NONE;SFS:(13230031)(39850400004)(396003)(136003)(376002)(346002)(230922051799003)(64100799003)(451199024)(186009)(1800799012)(82310400011)(5400799018)(40470700004)(36840700001)(46966006)(336012)(6506007)(6666004)(26005)(558084003)(2616005)(6512007)(47076005)(83380400001)(5660300002)(15650500001)(2906002)(478600001)(34070700002)(7416002)(44832011)(41300700001)(6486002)(8936002)(8676002)(4326008)(70206006)(316002)(70586007)(966005)(86362001)(31696002)(7636003)(82740400003)(356005)(36756003)(7596003)(36860700001)(40480700001)(31686004)(40460700003)(43740500002)(12100799054);DIR:OUT;SFP:1501;
+X-OriginatorOrg: seco.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jan 2024 19:46:26.6382
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3a2c3bec-109e-42b5-5dcd-08dc1c4bfca9
+X-MS-Exchange-CrossTenant-Id: bebe97c3-6438-442e-ade3-ff17aa50e733
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=bebe97c3-6438-442e-ade3-ff17aa50e733;Ip=[20.160.56.85];Helo=[repost-eu.tmcas.trendmicro.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	AM6EUR05FT068.eop-eur05.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1PR03MB10329
 
-On Tue, 2024-01-23 at 18:37 +0000, Conor Dooley wrote:
-> On Tue, Jan 23, 2024 at 06:30:16PM +0100, Philippe Schenker wrote:
-> >=20
-> >=20
-> > On Tue, 2024-01-23 at 17:23 +0000, Conor Dooley wrote:
-> > > On Tue, Jan 23, 2024 at 05:17:53PM +0100, Philippe Schenker wrote:
-> > > >=20
-> > > >=20
-> > > > On Tue, 2024-01-23 at 16:06 +0000, Conor Dooley wrote:
-> > > > > On Tue, Jan 23, 2024 at 02:50:13PM +0100, Philippe Schenker
-> > > > > wrote:
-> > > > > > From: Philippe Schenker <philippe.schenker@impulsing.ch>
-> > > > > >=20
-> > > > > > This commit adds the dt-binding for KSZ8567, a robust 7-port
-> > > > > > Ethernet switch. The KSZ8567 features two RGMII/MII/RMII
-> > > > > > interfaces,
-> > > > > > each capable of gigabit speeds, complemented by five 10/100
-> > > > > > Mbps
-> > > > > > MAC/PHYs.
-> > > > > >=20
-> > > > > > Signed-off-by: Philippe Schenker
-> > > > > > <philippe.schenker@impulsing.ch>
-> > > > >=20
-> > > > > This device has all the same constraints as the other ones in
-> > > > > this
-> > > > > binding, why is it not compatible with any of them? If it
-> > > > > isn't,
-> > > > > the
-> > > > > compatible should mention why it is not.
-> > > >=20
-> > > > Hi Conor, Thanks for your message!
-> > > >=20
-> > > > I need the compatible to make sure the correct ID of the switch
-> > > > is
-> > > > being set in the driver as well as its features.
-> > >=20
-> > > Are the features of this switch such that a driver for another ksz
-> > > switch would not work (even in a limited capacity) with the 8567?
-> > > Things like the register map changing or some feature being
-> > > removed
-> > > are
-> > > examples of why it may not work.
-> >=20
-> > Yes the ksz dsa driver is made so that it checks the ID of the
-> > attached
-> > chip and refuses to work if it doesn't match. [1]
->=20
-> That sounds counter productive to be honest. Why does the driver not
-> trust that the dt is correct? I saw this recently in some IIO drivers,
-> but it was shot down for this sort of reason.
->=20
-> > It is a very similar chip and uses the same regmap as KSZ9567 but
-> > with
-> > lower phy-speeds on its 5 switch ports. The two upstream CPU ports
-> > are
-> > gigabit capable. All this information is set-up in the second patch
-> > of
-> > this series. [2]
->=20
-> That, to me, means the lack of a fallback is justified. If it were the
-> other way around, then a fallback sounds like it would be suitable.
+Hi Russell,
 
-Yes, I believe a generic fallback would anyway mostly end up with errors
-or misbehavior. But I also might be wrong. What I checked is that these
-per-switch settings even increased from 5.15..6.7 which to me it seems
-those are really needed.
-I am no expert in this driver at all I just try to make my hardware work
-and with these patches it now seems to switch really well.
+Does there need to be any locking when calling phylink_pcs_change? I
+noticed that you call it from threaded IRQ context in [1]. Can that race
+with phylink_major_config?
 
->=20
-> >=20
-> > I will include a description to the second series. Thanks for your
-> > feedback.
->=20
-> Okay, thanks. You can add
-> Acked-by: Conor Dooley <conor.dooley@microchip.com>
-> when you do.
->=20
-> And despite the email, I have nothing to do with these switches, I am
-> just a sucker that signed up to review dt-bindings...
+--Sean
 
-Well, I'm grateful for your review and feedback. Thanks for your work
-around Linux kernel! And thanks for the Acked-by.
-
-Philippe
-
->=20
-> Thanks,
-> Conor.
->=20
-> >=20
-> > Philippe
-> >=20
-> >=20
-> > [1]
-> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree=
-/drivers/net/dsa/microchip/ksz_common.c?h=3Dv6.8-rc1#n3181
-> > [2]
-> > https://patchwork.kernel.org/project/netdevbpf/patch/20240123135014.614=
-858-2-dev@pschenker.ch/
-> >=20
-> > >=20
-> > > > You mean I shall mention the reason in the commit-message, or
-> > > > where?
-> > >=20
-> > > Yes.
-> > >=20
-> > > Thanks,
-> > > Conor
-> > >=20
-> > > > > > =C2=A0Documentation/devicetree/bindings/net/dsa/microchip,ksz.y=
-am
-> > > > > > l |
-> > > > > > 1 +
-> > > > > > =C2=A01 file changed, 1 insertion(+)
-> > > > > >=20
-> > > > > > diff --git
-> > > > > > a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.ya
-> > > > > > ml
-> > > > > > b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.ya
-> > > > > > ml
-> > > > > > index c963dc09e8e1..52acc15ebcbf 100644
-> > > > > > ---
-> > > > > > a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.ya
-> > > > > > ml
-> > > > > > +++
-> > > > > > b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.ya
-> > > > > > ml
-> > > > > > @@ -31,6 +31,7 @@ properties:
-> > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - microchip,ksz9893
-> > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - microchip,ksz9563
-> > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - microchip,ksz8563
-> > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - microchip,ksz8567
-> > > > > > =C2=A0
-> > > > > > =C2=A0=C2=A0 reset-gpios:
-> > > > > > =C2=A0=C2=A0=C2=A0=C2=A0 description:
-> > > > > > --=20
-> > > > > > 2.34.1
-> > > > > >=20
-
+[1] https://lore.kernel.org/all/E1qJruX-00Gkk8-RY@rmk-PC.armlinux.org.uk/
 
