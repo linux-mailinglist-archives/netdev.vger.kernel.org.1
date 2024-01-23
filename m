@@ -1,108 +1,138 @@
-Return-Path: <netdev+bounces-65208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BF49839A3A
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 21:23:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E586A839A3F
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 21:26:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71BC3293AE8
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 20:23:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F68D28455F
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 20:26:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD78E85C49;
-	Tue, 23 Jan 2024 20:23:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F60685C52;
+	Tue, 23 Jan 2024 20:26:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oBa9glMe"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NwOZBhww"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E1907F7EE
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 20:23:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEE7460EE4
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 20:26:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706041392; cv=none; b=U0sR74jHdG61muYnW1akd63GqgywEYGSONo87mbZCs0gA/+CSvj9LiOBgFJps7tmmhuIdgTK3t8+4kan6vyKwE/gnNbPaevt0TNtsyI3x/ABB7wEgtAkFyHFoZco6EQHv3eX2013CetY88DI6glDIaA4sFCI2enbVHJwyTHQJQw=
+	t=1706041617; cv=none; b=D7Ycni5dsZ/EDHnXOLsKTx3u8W6Gg+ITH2/koACI4S0WwznGt4ZaMiuLpLFV4ke6tepPBO7NbFYI/YQoEFlMqXPRlSsKqirdLxDtJT9g2BZl/rfBDzt0DKWxF5CBHBnOBBcTVpwg1z2WLXP1hK9pNo+HnUD3/Fuy5svTVV90d1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706041392; c=relaxed/simple;
-	bh=BqASrS5v3yWPEFqu6y4zqCpxrbcAoTDrMMa4rh9P/3k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hHO4zPcNScuvL/UrrDkbF2kJ0/lykYIvs1SYGPz04CMT6wHSQkKypOD9gREiJQmNL9ausMo6ou/CuDNyni9DBevZHsEkoBcLyjlhjEkgpv26x5+UiLCfa0mvTSpfpvzkNR7XO0XLVIRTrtqBKgtCvx4DC3TRxaCtLt+8KHjS2Ho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oBa9glMe; arc=none smtp.client-ip=209.85.219.51
+	s=arc-20240116; t=1706041617; c=relaxed/simple;
+	bh=Cp+ymBvg/0BHYvFzHxqF4DKgxRgzwB/sWXRqtG8txJY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Content-Type; b=hhpsx9tZxS8CXBDOfy/kmWyvbDt5FQEqXkH0gyL7/Icw4AMhGyXSiQaWmHkWZTriKetPvCEmKwlLbZJHQ7tmOwU8u9YAu1RpPzUgW5eKVglv+iTCxpoU/IA87/5TkFDk0PQgb8Al8tBagfcF1wiIWFwasR8aHsJJwt9HoWptyfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aahila.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NwOZBhww; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-6869233d472so9618966d6.2
-        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 12:23:11 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aahila.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5cda0492c8eso5300589a12.3
+        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 12:26:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706041390; x=1706646190; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BqASrS5v3yWPEFqu6y4zqCpxrbcAoTDrMMa4rh9P/3k=;
-        b=oBa9glMehjeCvDo7oZQGymSPQS7/NtdX4hKaU7M34xtkws+Q8TZe15GDIAigIygl8f
-         cow+XzyoNsZWOIlusEtfYSVe88AHV33mCpvC4nEWPPQam/HHiMdeUBvCIE5Chut9Qqs+
-         U9m5LF+TFtGNL2lyq2pTwmueGgQQkrYLCU1xDVnDessVG7D3hyQVs/iD0VlFyDjtuDzu
-         zPUiKdO/eCqyfGAxexBKfK7BX9gXNWLW8iPYOu9278S1cXi2oiNT3W9mExmmUUDy0fGk
-         7tdATct7EsOP+tORAp1Np6U/qEMwuyhLpIxHNng7n4KuJI82XjtMSytQJrTrx23pA9kr
-         gqvA==
+        d=google.com; s=20230601; t=1706041615; x=1706646415; darn=vger.kernel.org;
+        h=to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=c0U7M+lCiUNoRWYnkx7E5J9oeIbMrbKijEVU8nWAyc0=;
+        b=NwOZBhwwqRGkDWl6RqptZcaaXqbF/XTC6UfYQ7/qdsK5wWIK85dxL65R+TByHINU1x
+         DfbsqP03vLkqnBJR0ujsRn2ZEs4BnqFH06kHDQxXVpZ9JXbP+4GzoCcFBOd2AsQfTbF/
+         yZlThgKWCf5MSqgF4WtlB+Y2J/Jhkp02WgJbqSUOjU17fZFW8v2Yfp2Y7PW3zyB7VwvG
+         WHQN0+nVNy5CSJ97+iqP4vbi0r8dDlnKW2EH1ndBfkcBX5BiVowZGYzJIdrXwlYGvIqu
+         qztmBf0zD4/L4gMzZ234+83sTl+UF1eMMPpM2hZYQDaKkdydpd0Ui1cCu675wbiHZLSN
+         u1bg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706041390; x=1706646190;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BqASrS5v3yWPEFqu6y4zqCpxrbcAoTDrMMa4rh9P/3k=;
-        b=hhfQai8FkQ5+uVGeNbt3wvuqjUT0SMXof/ssbIs3eZqEJ3Wk7SvtejqncZJKI9pK26
-         aJpmcFed8SgdGgNPI3nDDH8XFkYA8lghRONAODrIQNRo4wnzNs47L4M+J9dYjgJhh6DF
-         myaeGzRbAIDRGPvrbJoBDXE3vpFqJibMF0tVavhF4Exr83zduSEQaNnQmsms/NMEr/WF
-         QXOpT33SdtIonMis0Fj4doHIuXJ1kMCISZOE/y7MIUxBQKSfGm7irGd4EuZdrpzOFlPv
-         ZVCbgk8HS0hzfF1NAz5XwRxobPxQSaQgswNAffg8dhjDB06zNStpf0wZMMSba+7ra6Z0
-         1vqA==
-X-Gm-Message-State: AOJu0YxWZugvjbbp2t24zHkS4Ufk4U235nRR+4ID8wSoUbGIpF5d1Mwf
-	DnPnvsZ1/IOblby8sJ+KCSmQ9WMefKvcnxZOMvC1MtSwOEKtBeGpPdE/dHAxDiB0heVgNn+bWpg
-	mIxR6uQ4otB/dPTXp7l7jCWjoPGr/5N4KqiiL
-X-Google-Smtp-Source: AGHT+IHna79NyELk6+Fcq8hQsna4nxAc71AjuZxgFc8fjxggfR6bowcpQplSGGfvUlte/zTh8cgBUo2A+JI1lpmHDZE=
-X-Received: by 2002:a0c:da8d:0:b0:681:80b2:262f with SMTP id
- z13-20020a0cda8d000000b0068180b2262fmr1319326qvj.107.1706041390167; Tue, 23
- Jan 2024 12:23:10 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706041615; x=1706646415;
+        h=to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=c0U7M+lCiUNoRWYnkx7E5J9oeIbMrbKijEVU8nWAyc0=;
+        b=fZy9x1wiwTGzM3JQ3RTVsS6NCjP9JtZFmdbqBJFQlNTs0PK0fgC2EMxdqE9gustNgD
+         XJ3nPyKA1kZx1WTEmZpflslY05FF/6JlDcwPhWH0+nBhwjsYhT3CXiCJV+r92wMyJYpv
+         bJ56Vq9Gs4TvlIFixshS75HcUiA2FBvK6mHH6SMJgYOUmCIbcGoqSyfZc/0XGjqAf3po
+         fsJk0mR+POXRkco4z7SyGL45QTyCk8083mlsMVxGvq1c+Kh2wLl79hIfpHIhN3OaxzFb
+         Qi1P6/n0SCqPNN4OjLyivjiHeJsM2CgmaWJO7jJbeL9tiFtcz+ky3Ln5l6DAteZD+Yqp
+         DRww==
+X-Gm-Message-State: AOJu0YzVyo/daah3+RiKL1OaTkHj4s+eoeRzWWNziSQwasHORVB6pMxP
+	csHkOTZjza/gCp6RNzqXToL4w/XbwSxvSD+us79GbPVVqFX0WoMfVh5HiH0GRKx6de+GP2Yb26Y
+	V+g==
+X-Google-Smtp-Source: AGHT+IHdN+SZZs5oEAHmcrkZZmRemBImoRFGAgG+gYZW4A2y8GsnkYoKaLaHs7+ljoxTcFm3ZnySdpH8pkg=
+X-Received: from aahila.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2f3])
+ (user=aahila job=sendgmr) by 2002:a63:d0:0:b0:5c7:c00:29cd with SMTP id
+ 199-20020a6300d0000000b005c70c0029cdmr33581pga.12.1706041615116; Tue, 23 Jan
+ 2024 12:26:55 -0800 (PST)
+Date: Tue, 23 Jan 2024 20:26:37 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240122175810.1942504-1-aahila@google.com> <20240122175810.1942504-2-aahila@google.com>
- <20240122211357.767d4edd@kernel.org>
-In-Reply-To: <20240122211357.767d4edd@kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
+Message-ID: <20240123202638.1498449-1-aahila@google.com>
+Subject: [PATCH net-next v4 1/2] bonding: Add independent control state machine
 From: Aahil Awatramani <aahila@google.com>
-Date: Tue, 23 Jan 2024 12:22:58 -0800
-Message-ID: <CAGfWUPzuXi+j=JE2Q3ZZ-MCfS84Y9Om5smB9C4Qn9Fq7RLY6=w@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 2/2] bonding: Add independent control state machine
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: David Dillow <dave@thedillows.org>, Mahesh Bandewar <maheshb@google.com>, 
-	Jay Vosburgh <j.vosburgh@gmail.com>, Hangbin Liu <liuhangbin@gmail.com>, 
-	Andy Gospodarek <andy@greyhouse.net>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+To: Aahil Awatramani <aahila@google.com>, David Dillow <dave@thedillows.org>, 
+	Mahesh Bandewar <maheshb@google.com>, Jay Vosburgh <j.vosburgh@gmail.com>, 
+	Hangbin Liu <liuhangbin@gmail.com>, Andy Gospodarek <andy@greyhouse.net>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
 	Martin KaFai Lau <martin.lau@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
 	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-> The compiler will know what to inline, please drop the "inline"
-> use in C sources in this patch. It just hides unused function
-> warnings and serves no real purpose.
+Add support for the independent control state machine per IEEE
+802.1AX-2008 5.4.15 in addition to the existing implementation of the
+coupled control state machine.
 
-Understood, done.
-I have dropped any inline reference coming from C sources in this patch.
+Introduces two new states, AD_MUX_COLLECTING and AD_MUX_DISTRIBUTING in
+the LACP MUX state machine for separated handling of an initial
+Collecting state before the Collecting and Distributing state. This
+enables a port to be in a state where it can receive incoming packets
+while not still distributing. This is useful for reducing packet loss when
+a port begins distributing before its partner is able to collect.
 
-On Mon, Jan 22, 2024 at 9:14=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Mon, 22 Jan 2024 17:58:10 +0000 Aahil Awatramani wrote:
-> > +static inline void __disable_distributing_port(struct port *port)
->
-> The compiler will know what to inline, please drop the "inline"
-> use in C sources in this patch. It just hides unused function
-> warnings and serves no real purpose.
-> --
-> pw-bot: cr
+Added new functions such as bond_set_slave_tx_disabled_flags and
+bond_set_slave_rx_enabled_flags to precisely manage the port's collecting
+and distributing states. Previously, there was no dedicated method to
+disable TX while keeping RX enabled, which this patch addresses.
+
+Note that the regular flow process in the kernel's bonding driver remains
+unaffected by this patch. The extension requires explicit opt-in by the
+user (in order to ensure no disruptions for existing setups) via netlink
+support using the new bonding parameter coupled_control. The default value
+for coupled_control is set to 1 so as to preserve existing behaviour.
+
+Signed-off-by: Aahil Awatramani <aahila@google.com>
+---
+ Documentation/networking/bonding.rst | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/Documentation/networking/bonding.rst b/Documentation/networking/bonding.rst
+index f7a73421eb76..e774b48de9f5 100644
+--- a/Documentation/networking/bonding.rst
++++ b/Documentation/networking/bonding.rst
+@@ -444,6 +444,18 @@ arp_missed_max
+ 
+ 	The default value is 2, and the allowable range is 1 - 255.
+ 
++coupled_control
++
++    Specifies whether the LACP state machine's MUX in the 802.3ad mode
++    should have separate Collecting and Distributing states.
++
++    This is by implementing the independent control state machine per
++    IEEE 802.1AX-2008 5.4.15 in addition to the existing coupled control
++    state machine.
++
++    The default value is 1. This setting does not separate the Collecting
++    and Distributing states, maintaining the bond in coupled control.
++
+ downdelay
+ 
+ 	Specifies the time, in milliseconds, to wait before disabling
+-- 
+2.43.0.429.g432eaa2c6b-goog
+
 
