@@ -1,77 +1,110 @@
-Return-Path: <netdev+bounces-65079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77F0E839281
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 16:20:21 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F040F8392A2
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 16:26:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 308C328EE65
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 15:20:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92842B24985
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 15:26:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42A8C5FDB9;
-	Tue, 23 Jan 2024 15:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E09985FDC4;
+	Tue, 23 Jan 2024 15:25:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XH6IEXcc"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="DBYZN7Rc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout.web.de (mout.web.de [212.227.15.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1991E5FDA8;
-	Tue, 23 Jan 2024 15:20:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25FA75FDA8;
+	Tue, 23 Jan 2024 15:25:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706023212; cv=none; b=WIGFDOD0Bty7NFfPc9NWPONtK9ZmqjtwDFat+wcdifLwyuP08dNlJb0EoOsj9nZ9AYF6Ov1A+LssQVBwnmZDz9lSEpm+A6D0RvDEhEbcr/9tp0cT2K6BnNCYo6S9Ojn6oI33qaC0baTnGAH9pgW2CW8fxfAosHWUYUjyqTZ5SlU=
+	t=1706023552; cv=none; b=bHFlDZnWG9Y2yLGsTIVyyHDd/Ilb2dWQTvY/snbim0utyPfcCFLdjIFPEEimhc5N52dltYBZc7ox9xZF14dUAhghjwNZK3T4JcOVRUkPer0fGnWbGWpD4hhMpkQ8rUNJOalwlyiJyd4bVbKa+1/nDsC0Gr8oajtUH/dzq7I0RDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706023212; c=relaxed/simple;
-	bh=y6Y3q7VymjvJulxs3xYJ+xTFgnItfIvzQuEUfNt7I7k=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YJweFSJdsP12M40hj3e2ZjhlvChFhWiHGlGo3D5KhqWaUe1yJYSw2YvaeR26JD2Zb/mXJPumh2JGBJ0WUkD/oh+2+8MKIYYRxrRCEhUeR97vPe6v9opW3sbUyfmCOVkvEZGdesuvvuumZGZDivt8Kl/Cu9C9l7a8lGE5g6TzQq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XH6IEXcc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E598C43390;
-	Tue, 23 Jan 2024 15:20:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706023211;
-	bh=y6Y3q7VymjvJulxs3xYJ+xTFgnItfIvzQuEUfNt7I7k=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XH6IEXccyZnsDeFhUQOUUJHiQBLUhIC8PJbd94lKOOS8HkbYIPAOj0ps6V8xYw15p
-	 pfnaZZD/3baZtJYfFJqM0lUhDOkMIN+JLoUd46hCdvWKR7ZLvrOvn9hMbo+E3Ksdcq
-	 zMuOXxbqgzodoxe8zcyZ74z0glEfwpKmDtKqRVtmesFKzIKGe3y4QG8AMJMrnUXYJr
-	 2XAZkIfCzn+nFqQ9Y4Rz6seii+PMS7BMTjVnPgan29oXMgu9SGPVUgy3BeMQsKch73
-	 bXCGeFrKERNrhL72ZqxNO0q1f1qwXrzjzbrYtazjXn38EW4/PcXR7xstKzlcMuTqDo
-	 IsoZF1ZQR3T7w==
-Date: Tue, 23 Jan 2024 07:20:10 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "netdev-driver-reviewers@vger.kernel.org"
- <netdev-driver-reviewers@vger.kernel.org>
-Subject: Re: [ANN] net-next is OPEN
-Message-ID: <20240123072010.7be8fb83@kernel.org>
-In-Reply-To: <Za98C_rCH8iO_yaK@Laptop-X1>
-References: <20240122091612.3f1a3e3d@kernel.org>
-	<Za98C_rCH8iO_yaK@Laptop-X1>
+	s=arc-20240116; t=1706023552; c=relaxed/simple;
+	bh=NrdH8usZFnM59T9pId74ZzCqpc+6sEvvxs5fvueZZ2g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=WSDIdxwh8Z5XNsl6sjQGcKPq7lENvfCEtCdIZ70fMoxS03iM2Nrj+Vd3RhnAXQLmNXIUVgunQxDCgIwK3S9pk5rpyQGMhIW/C/mqXAVvmjQT2/dD+Aa8w01SbzVi9dhygP/4Xz2kFjHSdmUo4kT2XJNGQ5Xpv8ohCGggQt/TpXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=DBYZN7Rc; arc=none smtp.client-ip=212.227.15.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
+	t=1706023515; x=1706628315; i=markus.elfring@web.de;
+	bh=NrdH8usZFnM59T9pId74ZzCqpc+6sEvvxs5fvueZZ2g=;
+	h=X-UI-Sender-Class:Date:Subject:To:References:Cc:From:
+	 In-Reply-To;
+	b=DBYZN7Rcfyje0uKCJw1Nk1/+ihI8F2ouboXH+gj2fw6UY1ZaZ/EN382FiRRffdOn
+	 A5s6Fwl6PDiQJ7waM5BV+AaEfkirV3FQAFB1v/AdZHX8zOcQudqCXll5oU6ciWnvB
+	 0yVrpW9wQHboJL+c7C7MO8r4BlYm4S57e8UIwNsjabot9iEwxSiBbSW4xfuWYpers
+	 oiyl99OhAiM+zd61bxEc6LEy85bBPACj9Pw1V9eLnTru/lJJf1ivxIFByqtRJTPcP
+	 A+y4N6jXCEEfKm/na1L1763rNs0FQ3pNCVPzPN9r5mPnb988dpQGo+73IForTAwVF
+	 r2yVSq2JMnIRLnbtFw==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.87.95]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1N79NA-1r2oBL2FeW-017q97; Tue, 23
+ Jan 2024 16:25:15 +0100
+Message-ID: <5011cd73-10cb-42fc-8013-0695793580eb@web.de>
+Date: Tue, 23 Jan 2024 16:25:11 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: netfilter: nf_tables: Add a null pointer check in two functions
+Content-Language: en-GB
+To: Phil Sutter <phil@nwl.cc>, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, netdev@vger.kernel.org,
+ kernel-janitors@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Florian Westphal <fw@strlen.de>,
+ Jakub Kicinski <kuba@kernel.org>, Jozsef Kadlecsik <kadlec@netfilter.org>,
+ Pablo Neira Ayuso <pablo@netfilter.org>, Paolo Abeni <pabeni@redhat.com>
+References: <c49c716a-e070-4ad5-9a90-896537bcd1b5@web.de>
+ <Za_QJZhWKoq5wg52@orbyte.nwl.cc>
+Cc: LKML <linux-kernel@vger.kernel.org>, Kunwu Chan <chentao@kylinos.cn>
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <Za_QJZhWKoq5wg52@orbyte.nwl.cc>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:nXJcMO2GElsusVPCB2SbHm1IdlNZnFDcX9CaF2xhxJ8kn9DQReW
+ oAMtvozwCRXWmNxuqfcsD50uX/Mxoz0Zy13fGUW9IzAF0yVvZOp27UoaXcW2kMYpVk+2Dtn
+ cAZdtPNDrwpRfGOp0hXMHVlBxbup3ocFEx+oT0ew3+DTembR/RhAJ+EDBtEolyUe0Za8i2U
+ cwwxi1HBiUWT35q2jLGUQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:LQZUrtu9p+s=;s3yh1KV+4oaKaxNoluWZ/iSTW/+
+ bFw4DeIJCs9BZetYTM117fLiTV1WHQzCotP2GpLj13Uhg/O9nD79LncTaBrqYnueeU5DAPof3
+ rSgyQtvxz7qlC6tejBqGnPNILfOtMLQcI7R8x5/WpMnQVBxYGo63UsdeZzumABoW6IS/xBmey
+ SshRpwGUQfvm0PA3/nTsHcDn4hp9kNp7i0awp9N4dr5j+FOP2/uVrCMBi9RJIYIGyhJ1aAKT1
+ uLLFajFk9sHfRQ9MX+xITGXQEQEZWYZ0LBUS338+T/fF3ZIBvwJzWJ2X9r7MnCI/S8EQPqmVC
+ q9gNu7V2s5i2DSDJ4E8cFW0RAgQ+zWaO+eGmp0Rd+Ya579dNwD4bxpInQpIGi6/tcsEro0cG+
+ illHB+DiOc1vVBTGyRbXOR+vdNeN/jWjB8rmur7Q5Bd2XySwB0pFpMZIOoLSrYDRCBeZMDt7N
+ 1ClmHkT3CKcXx6lFKjD7ZvSXs0Tfp9yH+IEG3Vvt5DpaVXVwECaZupeWzO5+NKSfeXMNYxiza
+ n92SSUdgwPYCvYQo4+Q42e1BOUgm0y40WjeA9ygV1/y7Hzag4ZPuerFfoD4ghB0rOimFonpA3
+ xrGC8kauNwWxuGCh/uJR+/oDhiBtSUAVygqgl36LDdMiw0aurwBsh8P/CWhXv8zm8jGNgXsq8
+ yjOx5tpQQPrIJly11MQi1omrBRe2K7OUmtMyl3duLc1nfpqBr7FTobKIPGhNrlSqZN4v+mUfD
+ /RHBtKl139nj8tidvxBWkt3+Ccubw5AsNnwRrOIWguNT+IS/YNSB7gpGiOpJ0wngIRFKdlNv8
+ Txi9uoF+hWpt47J060JtutWEwhw6drMZIpiciqqeSlaMdc/OIY2nNZXdge82x0eak3B8q6AXb
+ AkVeSyryZs2/av5QYuAX7IojIBMM2ylpjhtnuUHD7z/hKER51Jt7SQzo2hhYIgnk7Bzeid9zJ
+ QsK1aQ==
 
-On Tue, 23 Jan 2024 16:45:55 +0800 Hangbin Liu wrote:
-> > Over the merge window I spent some time stringing together selftest
-> > runner for netdev: https://netdev.bots.linux.dev/status.html
-> > It is now connected to patchwork, meaning there should be a check
-> > posted to each patch indicating whether selftests have passed or not.  
-> 
-> Cool! Does it group a couple of patches together and run the tests or
-> run for each patch separately?
+>> The result from a call of the function =E2=80=9Ckasprintf=E2=80=9D was =
+passed to
+>> a subsequent function call without checking for a null pointer before
+>> (according to a memory allocation failure).
+>> This issue was detected by using the Coccinelle software.
+>
+> This is correct and I'm fine with the patch if it avoids ringing alarm
+> bells somewhere, yet it doesn't fix an actual issue here since the
+> allocated buffer is merely passed to vsnprintf() which detects and
+> sanitizes %s args being NULL.
 
-It groups all patches outstanding in patchwork (which build cleanly).
-I'm hoping we could also do HW testing using this setup, so batching
-is a must. Not 100% sure it's the right direction for SW testing but
-there's one way to find out :)
+Should null pointer tolerance be better indicated for such use cases
+by any additional means?
+
+Regards,
+Markus
 
