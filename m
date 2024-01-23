@@ -1,143 +1,130 @@
-Return-Path: <netdev+bounces-65126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 197BE8394A2
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:28:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6B5783954A
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:50:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C55FC28A1BE
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 16:28:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 844751F2FA63
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 16:50:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0F8464A94;
-	Tue, 23 Jan 2024 16:28:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E73281272D9;
+	Tue, 23 Jan 2024 16:45:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="NI4hsxKU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JE/zZSf0"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF3DE64A87;
-	Tue, 23 Jan 2024 16:28:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42C7781AA4
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 16:45:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706027288; cv=none; b=tWGgfosFVBBQ+rF09aBVr8y/dQtLQZC6ZltYKjHHlT4KDa4y1bR+H0v0RL8kOQZc/4RgAxrXBK8RT9/St+vZa5hk5YSmV8YArBiGEcCLHS8nMRkWYC5nI5IQJmdqkjKBRl/mvnMFqZylWfm5biii8YuiN40e5pHIEe810ueck6c=
+	t=1706028341; cv=none; b=kNHZSeToL8Jn2cmjusmCwUO61IdNGuwE4XPCUaSPwiYM+HHLHbwd1VIh02UI+aAfDfdEUdjM48jd2VyRkAu1UQoHAMSEcCgSgLLN+QlXo7YtXye5g0GVQM8V4dDNeSvyDhKkT6uoSP/hsZ2BGPx3IuzyveOR5+1RECQfdqx1HoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706027288; c=relaxed/simple;
-	bh=PdJbj62zZvQxQ7woeaJi+WZHiLkY7K6WdOhj8taHFiU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MvjblLlAHtFsajMggQ8Z+sJwL/zalbKhONAWBQOdeNiy07gr/sM0BZGzk9WIMOkk51gIXnDdkF1aogejDlCR6griiWVWB5ZrgddKiJ2tetpxhl2+vMlyVzc/O0lIWblqR+zoPtXwBkcbKqps4+DxLYd5g1y/iz48+gM6ZVWgLE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=NI4hsxKU; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=tLucNN4+6wCQPeQRbR2eAzPwSGxPFsnr3HAlAXB473E=; b=NI4hsxKU9HsvHXdGCa3OmKc0DY
-	5c8bKndK2L2rO0cOP3NPN+WCcnR7OsTJcoz82KEwQeWD0wf2Qk1Imi30V3b0jtgDBbE1NQmFfNQwK
-	Z3cuXewKqXGidPGWCL5eBg4lEugxFuqaMJ1klsviS1b/jpeM5bfPQp2OJPM1ut9QpB23jNKuWtlit
-	9cxfBP8U2u+HvwqSGisT0f3CrmDsc3DKfLiNRvaC/qxgQdKN+ndXTxY7hHLcmiK4GRqgvDbAgd3ba
-	gnXhnhywIXk4o/0ZHxSstYJUuWebLUhioZd+k+FnWNxkZytTC3VuesZbk3he/XHvzz9FGRbQUrPC6
-	CK9Oh3WA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38376)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rSJcw-0002jc-0i;
-	Tue, 23 Jan 2024 16:27:54 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rSJcq-000256-JW; Tue, 23 Jan 2024 16:27:48 +0000
-Date: Tue, 23 Jan 2024 16:27:48 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Danielle Ratson <danieller@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net, sdf@google.com,
-	kory.maincent@bootlin.com, maxime.chevallier@bootlin.com,
-	vladimir.oltean@nxp.com, przemyslaw.kitszel@intel.com,
-	ahmed.zaki@intel.com, richardcochran@gmail.com, shayagr@amazon.com,
-	paul.greenwalt@intel.com, jiri@resnulli.us,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	mlxsw@nvidia.com, petrm@nvidia.com, idosch@nvidia.com
-Subject: Re: [RFC PATCH net-next 9/9] ethtool: Add ability to flash
- transceiver modules' firmware
-Message-ID: <Za/pBGBB3H+VEbX8@shell.armlinux.org.uk>
-References: <20240122084530.32451-1-danieller@nvidia.com>
- <20240122084530.32451-10-danieller@nvidia.com>
+	s=arc-20240116; t=1706028341; c=relaxed/simple;
+	bh=cyBYyI33oH3F851iInqK0o+xYwK/Fpcr5BbwIBBazQE=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=P8sNpxq+JOy9jsNGm/hPKW2XTZd6hTN/cuK5w8lltzuUKwVkRpqZwLJusdsKBZH37CcdhdK249gPz0WEnuL+Xw4a5iXBvhYLSX4dauJEKsuecZ0EtH6Q7oqMC/HS0hLlyySoo4zUugNvkVkYftL/2aq+tc5RjQdMF1Ic9p8qJCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JE/zZSf0; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-40ebfc5fb19so7425725e9.2
+        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 08:45:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706028338; x=1706633138; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=lyekzzgK7+KB7J6LBIRtHxlOmNM+ByOT3l+fqC5IEc4=;
+        b=JE/zZSf05qVEjyRrkmxkHREu+4ilRLVWwOuzwVTq+6DCWlu/UsWjL9i9lgvtRKfg0n
+         3ibWOdT3Rlb+lSRxqpgYbR2fDGEtAL3R3KmRhXVlUJ0hZURaOPNoetLlvfTJFSeRbacL
+         yCwT2ayt2rMoXkuTwtJlSi2XK+auozt5JwArboTFI78l2HEbhjmcqpGDpGqVTvTkWvGc
+         sIOVigwJQwGZAYo7tBOxUArg9/SxsI0vc1qVgklDSbT3JTu2hGFYeGL6iAgfawUODxGo
+         Yam7sQ4lKCK/KG2r4vmxaUzNuh9eKcBeLrBegoFw0sZTpw25E/ldu1tnXO4VbKz5IGoR
+         HAXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706028338; x=1706633138;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lyekzzgK7+KB7J6LBIRtHxlOmNM+ByOT3l+fqC5IEc4=;
+        b=OTjeEYRvcCbSghrSXcOOkaBCLL6cWW7F4KlRRgXb5CDdXysdU7ve1SnT31rqN/E0AT
+         DSV8fAKut3ZiJCwopyloWWuiOntTqxm778sRt1Mg3AIwdJ3dQtUhOQspL+3oDVogViTW
+         7XVe7cCn93661alfmPVn+lFH///Gq0koxpktHKNxzqAiQOmqQepNu8esO4Gg36zX2PfS
+         laRTKIKa0A9v0jP5U9MnX9pO12Owy4+eYxhNIAQYoY1GHgKCuBwD+/65Ptu/ZRsuyDCe
+         SyocEsEwrHtHz6SbCiWoteiQZb5S7KmhKBVwbG9M0RjhnSIClKObvY08+8ZYgWzzF2Fp
+         +joQ==
+X-Gm-Message-State: AOJu0YxwU0leyrrzbXqOBF6t6kG1fx8NBEKWlSm0BVU67nvjFlTU+ndl
+	tVvD1PDC3yIxw7RZ51ylK+bQz+fXONpsnI7HHzvxx+Ati3SNoGYkQyV7rEasu9bi9aqu
+X-Google-Smtp-Source: AGHT+IETC34SiXruLiimvhYDeUYkUi3nM6ZsBcAv4eyo9BiLMlv/OPTjRm3wcJbbSMTDv8xAxMddww==
+X-Received: by 2002:a05:600c:2152:b0:40d:6af2:f965 with SMTP id v18-20020a05600c215200b0040d6af2f965mr220290wml.106.1706028338105;
+        Tue, 23 Jan 2024 08:45:38 -0800 (PST)
+Received: from imac ([2a02:8010:60a0:0:b949:92c4:6118:e3b1])
+        by smtp.gmail.com with ESMTPSA id bi25-20020a05600c3d9900b0040ea5ae94acsm12381484wmb.27.2024.01.23.08.45.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Jan 2024 08:45:36 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Alessandro Marcolini <alessandromarcolini99@gmail.com>
+Cc: davem@davemloft.net,  edumazet@google.com,  kuba@kernel.org,
+  pabeni@redhat.com,  sdf@google.com,  chuck.lever@oracle.com,
+  lorenzo@kernel.org,  jacob.e.keller@intel.com,  jiri@resnulli.us,
+  netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 1/3] tools: ynl: correct typo and docstring
+In-Reply-To: <800f2681d56b5195c8b22173a3b83bbac021af92.1705950652.git.alessandromarcolini99@gmail.com>
+	(Alessandro Marcolini's message of "Mon, 22 Jan 2024 20:19:39 +0100")
+Date: Tue, 23 Jan 2024 16:28:38 +0000
+Message-ID: <m24jf4ypxl.fsf@gmail.com>
+References: <cover.1705950652.git.alessandromarcolini99@gmail.com>
+	<800f2681d56b5195c8b22173a3b83bbac021af92.1705950652.git.alessandromarcolini99@gmail.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240122084530.32451-10-danieller@nvidia.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain
 
-On Mon, Jan 22, 2024 at 10:45:30AM +0200, Danielle Ratson wrote:
-> +#define MODULE_EEPROM_PAGE	0
-> +#define MODULE_EEPROM_OFFSET	0
-> +#define MODULE_EEPROM_LENGTH	1
-> +#define MODULE_EEPROM_I2C_ADDR	0x50
-> +
-> +static int module_flash_fw_work_init(struct ethtool_module_fw_flash *module_fw,
-> +				     struct net_device *dev,
-> +				     struct netlink_ext_ack *extack)
-> +{
-> +	const struct ethtool_ops *ops = dev->ethtool_ops;
-> +	struct ethtool_module_eeprom page_data = {};
-> +	struct module_sff8024_id_rpl *rpl;
-> +	int err;
-> +
-> +	/* Fetch the SFF-8024 Identifier Value. For all supported standards, it
-> +	 * is located at I2C address 0x50, byte 0. See section 4.1 in SFF-8024,
-> +	 * revision 4.9.
-> +	 */
-> +	page_data.page = MODULE_EEPROM_PAGE;
-> +	page_data.offset = MODULE_EEPROM_OFFSET;
-> +	page_data.length = MODULE_EEPROM_LENGTH;
-> +	page_data.i2c_address = MODULE_EEPROM_I2C_ADDR;
+Alessandro Marcolini <alessandromarcolini99@gmail.com> writes:
 
-Please use better names - these aren't any better than using integers.
+> Correct typo in SpecAttr docstring. Changed SpecSubMessageFormat
+> docstring.
 
-Maybe use SFP_PHYS_ID for the offset?
+These docstring updates lgtm.
 
-> +	page_data.data = kmalloc(page_data.length, GFP_KERNEL);
-> +	if (!page_data.data)
-> +		return -ENOMEM;
-> +
-> +	err = ops->get_module_eeprom_by_page(dev, &page_data, extack);
-> +	if (err < 0)
-> +		goto out;
-> +
-> +	rpl = (struct module_sff8024_id_rpl *)page_data.data;
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 
-What purpose does this structure of a single byte serve? To me, it just
-obfuscates the code.
-
-	u8 phys_id;
-
-	...
-	page_data.offset = SFP_PHYS_ID;
-	page_data.length = sizeof(phys_id);
-	page_data.data = &phys_id;
-	...
-	switch (phys_id) {
-
-will work just as well, and be more explicit about what's actually going
-on here. It doesn't mean that I have to understand what this new
-module_sff8024_id_rpl structure is. I can see that we're just getting
-one byte which is the module physical ID.
-
-You also then don't need to care about kfree()ing one byte of data
-structure.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> Signed-off-by: Alessandro Marcolini <alessandromarcolini99@gmail.com>
+> ---
+>  tools/net/ynl/lib/nlspec.py | 7 +++----
+>  1 file changed, 3 insertions(+), 4 deletions(-)
+>
+> diff --git a/tools/net/ynl/lib/nlspec.py b/tools/net/ynl/lib/nlspec.py
+> index 44f13e383e8a..f8feae363970 100644
+> --- a/tools/net/ynl/lib/nlspec.py
+> +++ b/tools/net/ynl/lib/nlspec.py
+> @@ -144,7 +144,7 @@ class SpecEnumSet(SpecElement):
+>  
+>  
+>  class SpecAttr(SpecElement):
+> -    """ Single Netlink atttribute type
+> +    """ Single Netlink attribute type
+>  
+>      Represents a single attribute type within an attr space.
+>  
+> @@ -306,10 +306,9 @@ class SpecSubMessage(SpecElement):
+>  
+>  
+>  class SpecSubMessageFormat(SpecElement):
+> -    """ Netlink sub-message definition
+> +    """ Netlink sub-message format definition
+>  
+> -    Represents a set of sub-message formats for polymorphic nlattrs
+> -    that contain type-specific sub messages.
+> +    Represents a single format for a sub-message.
+>  
+>      Attributes:
+>          value         attribute value to match against type selector
 
