@@ -1,110 +1,151 @@
-Return-Path: <netdev+bounces-65080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F040F8392A2
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 16:26:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB2DD8392A6
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 16:27:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92842B24985
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 15:26:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FB152844D5
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 15:27:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E09985FDC4;
-	Tue, 23 Jan 2024 15:25:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E33E85FDAF;
+	Tue, 23 Jan 2024 15:27:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="DBYZN7Rc"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="ZJUdZUtq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25FA75FDA8;
-	Tue, 23 Jan 2024 15:25:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCF115EE98
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 15:27:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706023552; cv=none; b=bHFlDZnWG9Y2yLGsTIVyyHDd/Ilb2dWQTvY/snbim0utyPfcCFLdjIFPEEimhc5N52dltYBZc7ox9xZF14dUAhghjwNZK3T4JcOVRUkPer0fGnWbGWpD4hhMpkQ8rUNJOalwlyiJyd4bVbKa+1/nDsC0Gr8oajtUH/dzq7I0RDI=
+	t=1706023662; cv=none; b=HMTJqy8ryzpC1mDEz84vbDGVEoNtljC8hltksSxZKNSrOA8AtQGLCPqgUEanqm2j6nemuGi7Hf0u7cS0k/L0NZ6iSG7TCRmUdQkbuzRDsVhMlK7DsbpYBBZhh6vwrZUNKmhThhLDgGwUeV/ywqjAqVFrr9tUGQ0HMQnR5ssWZKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706023552; c=relaxed/simple;
-	bh=NrdH8usZFnM59T9pId74ZzCqpc+6sEvvxs5fvueZZ2g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
-	 In-Reply-To:Content-Type; b=WSDIdxwh8Z5XNsl6sjQGcKPq7lENvfCEtCdIZ70fMoxS03iM2Nrj+Vd3RhnAXQLmNXIUVgunQxDCgIwK3S9pk5rpyQGMhIW/C/mqXAVvmjQT2/dD+Aa8w01SbzVi9dhygP/4Xz2kFjHSdmUo4kT2XJNGQ5Xpv8ohCGggQt/TpXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=DBYZN7Rc; arc=none smtp.client-ip=212.227.15.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
-	t=1706023515; x=1706628315; i=markus.elfring@web.de;
-	bh=NrdH8usZFnM59T9pId74ZzCqpc+6sEvvxs5fvueZZ2g=;
-	h=X-UI-Sender-Class:Date:Subject:To:References:Cc:From:
-	 In-Reply-To;
-	b=DBYZN7Rcfyje0uKCJw1Nk1/+ihI8F2ouboXH+gj2fw6UY1ZaZ/EN382FiRRffdOn
-	 A5s6Fwl6PDiQJ7waM5BV+AaEfkirV3FQAFB1v/AdZHX8zOcQudqCXll5oU6ciWnvB
-	 0yVrpW9wQHboJL+c7C7MO8r4BlYm4S57e8UIwNsjabot9iEwxSiBbSW4xfuWYpers
-	 oiyl99OhAiM+zd61bxEc6LEy85bBPACj9Pw1V9eLnTru/lJJf1ivxIFByqtRJTPcP
-	 A+y4N6jXCEEfKm/na1L1763rNs0FQ3pNCVPzPN9r5mPnb988dpQGo+73IForTAwVF
-	 r2yVSq2JMnIRLnbtFw==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.87.95]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1N79NA-1r2oBL2FeW-017q97; Tue, 23
- Jan 2024 16:25:15 +0100
-Message-ID: <5011cd73-10cb-42fc-8013-0695793580eb@web.de>
-Date: Tue, 23 Jan 2024 16:25:11 +0100
+	s=arc-20240116; t=1706023662; c=relaxed/simple;
+	bh=Z25+7+eZRMEehXGp6WoC4354Ldu8Jwzdw/xs6nI5mas=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=vGGHW4xBO9i6EH9w/v5zTiInnMz9P1GiN2WCFuZ9zH06271Ijqrl0EFX1I5MRQfWXstqa0rYDzWHDm/JJYUKHcPtAi5Qud1rmYjmD9G5RTCzfwku4lj7wnxtZR4mM9CU/fAawP2RHG/FywiwkYLmem9N3NcohYJiNa2avgNsWNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=ZJUdZUtq; arc=none smtp.client-ip=209.85.208.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2cddf459ba2so9382191fa.1
+        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 07:27:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1706023659; x=1706628459; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/acSyEquTjXcuiLAZAu9D5jbI1RMTR/MKbLTHxg44OI=;
+        b=ZJUdZUtqF9XMIQDqFUojYL8t8gC6Jxax7LXcNWSe8Df4oKJhCCFprbiXoGrZ1fj9WQ
+         MT0kC2nYPrwXtLQJu4mZ/aATDA6cuFxzAJ8kKyBTczUiXL1bqqrOqDC1V3By11I9kK4Y
+         fuw9SyvRdulYbx87pL0XMdSOVmMRedKqUpEvSOn+Z0jjCoDYsKhHI/x/jl82FaXrRqY+
+         HbwR9a4kKh3p6g9yIdGBqFDyMcDaluudWIXUAoDRqwyBaqPDE7xYMuejDIqphAcvmG/1
+         McHUxduPJldwGGnHFsxeUpWWndcZqO1eSDMCkuhh3NObyaaWJcj67Ky4k7G9WfrmAjHF
+         gOuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706023659; x=1706628459;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/acSyEquTjXcuiLAZAu9D5jbI1RMTR/MKbLTHxg44OI=;
+        b=ZRh1jEsYwJdFF6moavTEUIL6Xhqq8Zjga60KOZX+y1NFMQvlXO88vHspYu4Quwc8VF
+         3EWHn24lKG9j9SKEE3SIn+/OY1L8PeJ2etzITcQbOGYwFXXf59SXgAB0pkQvky74jire
+         2h2Z256uwMHAejEtOLCZ0RSnicVVdHLed6ao/nIG7DpBAgreH4tRWFcUoarNlv+lo7Tf
+         BCKzCvxeXSRC/U0Hn4Ieb5X6AztYX+OpmNfBgfdRe3GM3nE9ZWuNC2VljmYvK7dOqpDi
+         SH9byjpqDuN31i6bn9O8Fe4aaLKrjCqNneY7woTryjztFMytCWqeAifQgeS7Yqyzc3A0
+         OmJw==
+X-Gm-Message-State: AOJu0Yw9QpE/+YZc67M13j+AGySYmvAml3/C7Dnq8Jue1PHptWP0oKDd
+	b5IvSyOmfppzBvPu7dfybLfaExFcsAp1WEiBy2bMTSaxHw62+rp0LIEcEkG/X7ler9bEQGwl4O4
+	vH87WWSFf8iN3eIBNnC62sIiUwS8JrknC++4gog==
+X-Google-Smtp-Source: AGHT+IECOsu0WmbMJlmTCB3EljPXp0hBtHwIU8u+z0RczVGoG395LSveV3dNvEJs5hqE6Jjd9Fu7sQw0E9z43zZ65dM=
+X-Received: by 2002:a2e:8356:0:b0:2cd:f76f:640d with SMTP id
+ l22-20020a2e8356000000b002cdf76f640dmr5982118ljh.2.1706023658752; Tue, 23 Jan
+ 2024 07:27:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: netfilter: nf_tables: Add a null pointer check in two functions
-Content-Language: en-GB
-To: Phil Sutter <phil@nwl.cc>, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, netdev@vger.kernel.org,
- kernel-janitors@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Florian Westphal <fw@strlen.de>,
- Jakub Kicinski <kuba@kernel.org>, Jozsef Kadlecsik <kadlec@netfilter.org>,
- Pablo Neira Ayuso <pablo@netfilter.org>, Paolo Abeni <pabeni@redhat.com>
-References: <c49c716a-e070-4ad5-9a90-896537bcd1b5@web.de>
- <Za_QJZhWKoq5wg52@orbyte.nwl.cc>
-Cc: LKML <linux-kernel@vger.kernel.org>, Kunwu Chan <chentao@kylinos.cn>
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <Za_QJZhWKoq5wg52@orbyte.nwl.cc>
-Content-Type: text/plain; charset=UTF-8
+References: <20240120192125.1340857-1-andrew@lunn.ch> <20240122122457.jt6xgvbiffhmmksr@skbuf>
+ <0d9e0412-6ca3-407a-b2a1-b18ab4c20714@lunn.ch> <CAO-L_45iCb+TFMSqZJex-mZKfopBXxR=KH5aV4Wfx5eF5_N_8Q@mail.gmail.com>
+ <5f449e47-fc39-48c3-a784-77b808c31050@lunn.ch>
+In-Reply-To: <5f449e47-fc39-48c3-a784-77b808c31050@lunn.ch>
+From: Tim Menninger <tmenninger@purestorage.com>
+Date: Tue, 23 Jan 2024 07:27:27 -0800
+Message-ID: <CAO-L_46Ltq0Ju_BO+rfvAbe7F=T6m0hZZKu9gzv7=bMV5n6naw@mail.gmail.com>
+Subject: Re: [PATCH net v1] net: dsa: mv88e6xxx: Make unsupported C45 reads
+ return 0xffff
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev-maintainers <edumazet@google.com>, kuba@kernel.org, 
+	pabeni@redhat.com, davem@davemloft.net, netdev <netdev@vger.kernel.org>, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:nXJcMO2GElsusVPCB2SbHm1IdlNZnFDcX9CaF2xhxJ8kn9DQReW
- oAMtvozwCRXWmNxuqfcsD50uX/Mxoz0Zy13fGUW9IzAF0yVvZOp27UoaXcW2kMYpVk+2Dtn
- cAZdtPNDrwpRfGOp0hXMHVlBxbup3ocFEx+oT0ew3+DTembR/RhAJ+EDBtEolyUe0Za8i2U
- cwwxi1HBiUWT35q2jLGUQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:LQZUrtu9p+s=;s3yh1KV+4oaKaxNoluWZ/iSTW/+
- bFw4DeIJCs9BZetYTM117fLiTV1WHQzCotP2GpLj13Uhg/O9nD79LncTaBrqYnueeU5DAPof3
- rSgyQtvxz7qlC6tejBqGnPNILfOtMLQcI7R8x5/WpMnQVBxYGo63UsdeZzumABoW6IS/xBmey
- SshRpwGUQfvm0PA3/nTsHcDn4hp9kNp7i0awp9N4dr5j+FOP2/uVrCMBi9RJIYIGyhJ1aAKT1
- uLLFajFk9sHfRQ9MX+xITGXQEQEZWYZ0LBUS338+T/fF3ZIBvwJzWJ2X9r7MnCI/S8EQPqmVC
- q9gNu7V2s5i2DSDJ4E8cFW0RAgQ+zWaO+eGmp0Rd+Ya579dNwD4bxpInQpIGi6/tcsEro0cG+
- illHB+DiOc1vVBTGyRbXOR+vdNeN/jWjB8rmur7Q5Bd2XySwB0pFpMZIOoLSrYDRCBeZMDt7N
- 1ClmHkT3CKcXx6lFKjD7ZvSXs0Tfp9yH+IEG3Vvt5DpaVXVwECaZupeWzO5+NKSfeXMNYxiza
- n92SSUdgwPYCvYQo4+Q42e1BOUgm0y40WjeA9ygV1/y7Hzag4ZPuerFfoD4ghB0rOimFonpA3
- xrGC8kauNwWxuGCh/uJR+/oDhiBtSUAVygqgl36LDdMiw0aurwBsh8P/CWhXv8zm8jGNgXsq8
- yjOx5tpQQPrIJly11MQi1omrBRe2K7OUmtMyl3duLc1nfpqBr7FTobKIPGhNrlSqZN4v+mUfD
- /RHBtKl139nj8tidvxBWkt3+Ccubw5AsNnwRrOIWguNT+IS/YNSB7gpGiOpJ0wngIRFKdlNv8
- Txi9uoF+hWpt47J060JtutWEwhw6drMZIpiciqqeSlaMdc/OIY2nNZXdge82x0eak3B8q6AXb
- AkVeSyryZs2/av5QYuAX7IojIBMM2ylpjhtnuUHD7z/hKER51Jt7SQzo2hhYIgnk7Bzeid9zJ
- QsK1aQ==
 
->> The result from a call of the function =E2=80=9Ckasprintf=E2=80=9D was =
-passed to
->> a subsequent function call without checking for a null pointer before
->> (according to a memory allocation failure).
->> This issue was detected by using the Coccinelle software.
+On Mon, Jan 22, 2024 at 3:01=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
 >
-> This is correct and I'm fine with the patch if it avoids ringing alarm
-> bells somewhere, yet it doesn't fix an actual issue here since the
-> allocated buffer is merely passed to vsnprintf() which detects and
-> sanitizes %s args being NULL.
+> > I'm not sure I fully agree with returning 0xffff here, and especially n=
+ot
+> > for just one of the four functions (reads and writes, c22 and c45). If =
+the
+> > end goal is to unify error handling, what if we keep the return values =
+as
+> > they are, i.e. continue to return -EOPNOTSUPP, and then in get_phy_c22_=
+id
+> > and get_phy_c45_ids on error we do something like:
+> >
+> >     return (phy_reg =3D=3D -EIO || phy_reg =3D=3D -ENODEV || phy_reg =
+=3D=3D -EOPNOTSUPP)
+> >         ? -ENODEV : -EIO;
+>
+> As i said to Vladimir, what i posted so far is just a minimal fix for
+> stable. After that, i have two patches for net-next, which are the
+> full, clean fix. And the first patch is similar to what you suggest:
+>
+> +++ b/drivers/net/phy/phy_device.c
+> @@ -780,7 +780,7 @@ static int get_phy_c45_devs_in_pkg(struct mii_bus *bu=
+s, int addr, int dev_addr,
+>   * and identifiers in @c45_ids.
+>   *
+>   * Returns zero on success, %-EIO on bus access error, or %-ENODEV if
+> - * the "devices in package" is invalid.
+> + * the "devices in package" is invalid or no device responds.
+>   */
+>  static int get_phy_c45_ids(struct mii_bus *bus, int addr,
+>                            struct phy_c45_device_ids *c45_ids)
+> @@ -803,7 +803,10 @@ static int get_phy_c45_ids(struct mii_bus *bus, int =
+addr,
+>                          */
+>                         ret =3D phy_c45_probe_present(bus, addr, i);
+>                         if (ret < 0)
+> -                               return -EIO;
+> +                               /* returning -ENODEV doesn't stop bus
+> +                                * scanning */
+> +                               return (phy_reg =3D=3D -EIO ||
+> +                                       phy_reg =3D=3D -ENODEV) ? -ENODEV=
+ : -EIO;
+>
+>                         if (!ret)
+>                                 continue;
+>
+> This makes C22 and C45 handling of -ENODEV the same.
+>
+> I then have another patch which changed mv88e6xxx to return -ENODEV.
+> I cannot post the net-next patches for merging until the net patch is
+> accepted and then merged into net-next.
+>
+>   Andrew
 
-Should null pointer tolerance be better indicated for such use cases
-by any additional means?
+Does that mean if there's a device there but it doesn't support C45 (no
+phy_read_c45), it will now return ENODEV?
 
-Regards,
-Markus
+I suppose that's my only nit but at the end of the day I'm not unhappy with=
+ it.
+
+Thank you for taking the time to look at this with me. Is there anything
+else you need from me?
 
