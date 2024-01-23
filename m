@@ -1,78 +1,157 @@
-Return-Path: <netdev+bounces-64954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC9668386A0
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 06:14:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C871838712
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 07:05:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 656B42860A5
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 05:14:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1122FB22D40
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 06:05:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E68BA23CA;
-	Tue, 23 Jan 2024 05:14:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D9024500F;
+	Tue, 23 Jan 2024 06:05:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PvdFL6uZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ae5730Jr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDC8C23BC;
-	Tue, 23 Jan 2024 05:14:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59B773FB0F;
+	Tue, 23 Jan 2024 06:05:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705986840; cv=none; b=g3y8cxjWYVdySk4LsbkxCRRw/jpwK72jqMQTBYY609swycPlzvVsJtR3PuASDGsSH7Z9BHUGVUOLphV0iyopTx5OGKR5P0rgEJqrb34HlXoQFPgjwCpneiJodmSCpxVArufoDL0JymAxCLO90iEE7WtKUM/5LxCyny8KTT8DgU0=
+	t=1705989939; cv=none; b=bljRgiu5bEFiAYFzqohPW68rvEYhtidkcAZegNEt+UbJo/+A07y3vyT8f5j89qv9bG3LhO41upDShE+vFSB9P2gJMDHy4JvgiThgEIpl60VvXftLRu+LQsypXxkx+ozBso8uFiCGYq/UDIhJjJ3RlGvrHGhse0wzxj1pl35MR3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705986840; c=relaxed/simple;
-	bh=fhmV7bfExKQCEsgl/PnFRTNkgnpRk+9YQUz/pKgzL8o=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ipOq84AlHQIcoujDmaEnDSk+PMT29wmizz3LcvSHh78TBI+s15087em7Aizh9TVwLm3/OoIb0ic8QVbbaVFMLf4ja/9ACV9x2T3tT4++ZAXYsaNbegpGMP4HD4pPkNCWGg3N+heP1h/asL0xTXIsnOSDEqwCMTzizIb/zOY8OzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PvdFL6uZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15931C433C7;
-	Tue, 23 Jan 2024 05:13:59 +0000 (UTC)
+	s=arc-20240116; t=1705989939; c=relaxed/simple;
+	bh=+sdw0hQDgpmOLRPB+xoe+83u7va8ZAEDwpSm9bv1KYY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cyOys41X1QAy6pNanfuEqh3BHkih7aHQBuhijsV5h4jYgvgRuZ3Y2aks8v8efmlE4abRLyeAa33VzAxhrNdjnd4dnFVt5NG3ZFaagPoW16EqTASJJIRlWJExpfwZap9VqLCuabq+Z4dhHmgUNk0G9A0ily2heWIIUzx5NCo+a5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ae5730Jr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AD59C433C7;
+	Tue, 23 Jan 2024 06:05:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705986840;
-	bh=fhmV7bfExKQCEsgl/PnFRTNkgnpRk+9YQUz/pKgzL8o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PvdFL6uZA96KnHROnwXgqGmiOAil8xiYb4hg5rF8NE7xKj3EnivlGfutsjBfhhiDo
-	 Oj7G6X1QYRQa9W20YVCrl0V4v6UsCCH3sRHwip3/7xq3UOyo9vUt45gRjNBVKeT/Nv
-	 lPz/Bohz3MKgTGbyLfkpsD9PrwNcf7ttDO+4XzyUAkCF79hMhcLzBm92JknvtD2pUc
-	 +81hfufL/dpycsHHImIXBuzZ0jAjsMQ+dvr90HKqIZVYI4pbvztETGbCSusd+NVlC1
-	 /ZlN/q/b+5Wm4psovMVfNGrs/tnSNzYYQcfXydNCOq+hJhOfrenwcTovYRYPMhN12W
-	 P5sXF0ECH1Yfg==
-Date: Mon, 22 Jan 2024 21:13:57 -0800
+	s=k20201202; t=1705989938;
+	bh=+sdw0hQDgpmOLRPB+xoe+83u7va8ZAEDwpSm9bv1KYY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ae5730JreJ+lZAgla1kVVMvrTZFqwkhMrzqpLeHcNbtf8jf1BBpXX9/rwOwF61rL1
+	 5sUgmxtIw3qvKcVMZPuO5+U8BnaomDFuh+aAVzobh6powFpy3dJV8cWMl4fQbTT4/u
+	 +ABPIf/Od9Bj0isFuVrFGuxR1o6xQfdalQ88MXSKD9AzGkMfn9SlUCpjKExpx+Lobm
+	 UZXViz0GfwZgC1zIXWkTcTPTSCJQD2vz7AyEho2Chy3XjbpnIFJ+5bVAW4qEmOcdY+
+	 DAObi3rfZsK06Uj5F0j1rli+ryA41Dg3nxh+JPOiUmUF2rtWQarrlSHoqs6F3bgGYn
+	 yOrc0dl9sQlgg==
 From: Jakub Kicinski <kuba@kernel.org>
-To: Aahil Awatramani <aahila@google.com>
-Cc: David Dillow <dave@thedillows.org>, Mahesh Bandewar
- <maheshb@google.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Hangbin Liu
- <liuhangbin@gmail.com>, Andy Gospodarek <andy@greyhouse.net>, "David S .
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Martin KaFai Lau <martin.lau@kernel.org>,
- Herbert Xu <herbert@gondor.apana.org.au>, Daniel Borkmann
- <daniel@iogearbox.net>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 2/2] bonding: Add independent control state
- machine
-Message-ID: <20240122211357.767d4edd@kernel.org>
-In-Reply-To: <20240122175810.1942504-2-aahila@google.com>
-References: <20240122175810.1942504-1-aahila@google.com>
-	<20240122175810.1942504-2-aahila@google.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	shuah@kernel.org,
+	horms@kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net] selftests: netdevsim: fix the udp_tunnel_nic test
+Date: Mon, 22 Jan 2024 22:05:29 -0800
+Message-ID: <20240123060529.1033912-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Mon, 22 Jan 2024 17:58:10 +0000 Aahil Awatramani wrote:
-> +static inline void __disable_distributing_port(struct port *port)
+This test is missing a whole bunch of checks for interface
+renaming and one ifup. Presumably it was only used on a system
+with renaming disabled and NetworkManager running.
 
-The compiler will know what to inline, please drop the "inline"
-use in C sources in this patch. It just hides unused function
-warnings and serves no real purpose.
+Fixes: 91f430b2c49d ("selftests: net: add a test for UDP tunnel info infra")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: shuah@kernel.org
+CC: horms@kernel.org
+CC: linux-kselftest@vger.kernel.org
+---
+ .../selftests/drivers/net/netdevsim/udp_tunnel_nic.sh    | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/tools/testing/selftests/drivers/net/netdevsim/udp_tunnel_nic.sh b/tools/testing/selftests/drivers/net/netdevsim/udp_tunnel_nic.sh
+index 4855ef597a15..f98435c502f6 100755
+--- a/tools/testing/selftests/drivers/net/netdevsim/udp_tunnel_nic.sh
++++ b/tools/testing/selftests/drivers/net/netdevsim/udp_tunnel_nic.sh
+@@ -270,6 +270,7 @@ for port in 0 1; do
+ 	echo 1 > $NSIM_DEV_SYS/new_port
+     fi
+     NSIM_NETDEV=`get_netdev_name old_netdevs`
++    ifconfig $NSIM_NETDEV up
+ 
+     msg="new NIC device created"
+     exp0=( 0 0 0 0 )
+@@ -431,6 +432,7 @@ for port in 0 1; do
+     fi
+ 
+     echo $port > $NSIM_DEV_SYS/new_port
++    NSIM_NETDEV=`get_netdev_name old_netdevs`
+     ifconfig $NSIM_NETDEV up
+ 
+     overflow_table0 "overflow NIC table"
+@@ -488,6 +490,7 @@ for port in 0 1; do
+     fi
+ 
+     echo $port > $NSIM_DEV_SYS/new_port
++    NSIM_NETDEV=`get_netdev_name old_netdevs`
+     ifconfig $NSIM_NETDEV up
+ 
+     overflow_table0 "overflow NIC table"
+@@ -544,6 +547,7 @@ for port in 0 1; do
+     fi
+ 
+     echo $port > $NSIM_DEV_SYS/new_port
++    NSIM_NETDEV=`get_netdev_name old_netdevs`
+     ifconfig $NSIM_NETDEV up
+ 
+     overflow_table0 "destroy NIC"
+@@ -573,6 +577,7 @@ for port in 0 1; do
+     fi
+ 
+     echo $port > $NSIM_DEV_SYS/new_port
++    NSIM_NETDEV=`get_netdev_name old_netdevs`
+     ifconfig $NSIM_NETDEV up
+ 
+     msg="create VxLANs v6"
+@@ -633,6 +638,7 @@ for port in 0 1; do
+     fi
+ 
+     echo $port > $NSIM_DEV_SYS/new_port
++    NSIM_NETDEV=`get_netdev_name old_netdevs`
+     ifconfig $NSIM_NETDEV up
+ 
+     echo 110 > $NSIM_DEV_DFS/ports/$port/udp_ports_inject_error
+@@ -688,6 +694,7 @@ for port in 0 1; do
+     fi
+ 
+     echo $port > $NSIM_DEV_SYS/new_port
++    NSIM_NETDEV=`get_netdev_name old_netdevs`
+     ifconfig $NSIM_NETDEV up
+ 
+     msg="create VxLANs v6"
+@@ -747,6 +754,7 @@ for port in 0 1; do
+     fi
+ 
+     echo $port > $NSIM_DEV_SYS/new_port
++    NSIM_NETDEV=`get_netdev_name old_netdevs`
+     ifconfig $NSIM_NETDEV up
+ 
+     msg="create VxLANs v6"
+@@ -877,6 +885,7 @@ msg="re-add a port"
+ 
+ echo 2 > $NSIM_DEV_SYS/del_port
+ echo 2 > $NSIM_DEV_SYS/new_port
++NSIM_NETDEV=`get_netdev_name old_netdevs`
+ check_tables
+ 
+ msg="replace VxLAN in overflow table"
 -- 
-pw-bot: cr
+2.43.0
+
 
