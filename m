@@ -1,112 +1,177 @@
-Return-Path: <netdev+bounces-64971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA0B283896E
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 09:49:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C635583898E
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 09:51:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E64771C2594C
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 08:49:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76B8328C5B0
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 08:51:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D38E56B7A;
-	Tue, 23 Jan 2024 08:48:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60D9556B8F;
+	Tue, 23 Jan 2024 08:50:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="YXBVpSK4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hDaQTB+K"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 509E756450;
-	Tue, 23 Jan 2024 08:48:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF3C92B9CD;
+	Tue, 23 Jan 2024 08:50:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705999739; cv=none; b=MApQTQsIbovNGduNu/SDvFt1eOtwQU2lg/4Hx0C3i1FA1mYFlG8+ijrlCQPGUQloT6MLP7TuIBcDiYZIouEBjza5gxO9xb6u5G1SqWbI4xPx/NCJV84mhXXksE936fT+JLRAmpFhqZSExwBlNg8vMTlhmapO16HvGkY0/O399CQ=
+	t=1705999850; cv=none; b=Nq/Foybri0O27qXNqb1j3I1SvB6Kn1dXbLz4vZmnoPhbbcQCCkSdHwFJ/j2UOKniSCj6HZ3tElW7lq1ZfKFC/xjFccy6fSMIwpyJWH2FQ1HrPcWv6VLAKqRk3sX362EaCGzBJk2D1jlaIayK/YcAJ+qKXUaMFCso6lK7R+JGAlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705999739; c=relaxed/simple;
-	bh=t2eee3p+5fYN3Cokye9kBeOsXjD6ww+E/52wz9ArAMo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=h33dJf3gpDoSYs9wyc5fpfoz8DwkLsSQSESuHg9Zt3+cbcM/BENHpEPKftpkhXhJivD9GUwR7+QCdgHBHn/MkpB9RfTVwzFotkzxUpwO44SJ4l5Ky3urK9Jt6PGJGk3xVP7wgWRljQawuG64rw9DzrwrTR2SP+L3j20PV6Y46xc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=YXBVpSK4; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id BF24620011;
-	Tue, 23 Jan 2024 08:48:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1705999731;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=m4Y70JmNATNTUUvhrItUodsxgvGUce4rjjN5KbaPrtU=;
-	b=YXBVpSK4YTRxCcvIlW+4GiBrR8mtfdKf9xzd5HHbttHWC969LXsxy5xvAbRTcNZ/TsOXnj
-	GDGKDb3QRg9GpPxMu4D3LFX8PHhRCtjdlghGUblGGUclsmgNkGn+rR4Pkpo3QtSeeHqKxJ
-	VznDgeqOfyTdO44lfHQQywdWnVOZXoaNvooOjrOzLEVGONG3I52fvWkpkOYBj4o3KWFEyy
-	+7qlmvnYD2OS4Qdy7ex5XHO8A7JJrYDS+aAIUOM2o29rsDBD5LuVvvbzdn1acewUrF+mhm
-	PsRoUf8NVQVr76HmKu+JV/m9pljp5AYmEtmEbucYooDyhzw5FrCbb5j+uhGosA==
-Date: Tue, 23 Jan 2024 09:48:49 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Horatiu Vultur <horatiu.vultur@microchip.com>
-Cc: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
- <pabeni@redhat.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <UNGLinuxDriver@microchip.com>
-Subject: Re: [PATCH net] net: lan966x: Fix port configuration when using
- SGMII interface
-Message-ID: <20240123094849.5ce5acc8@device-28.home>
-In-Reply-To: <20240123081514.3625293-1-horatiu.vultur@microchip.com>
-References: <20240123081514.3625293-1-horatiu.vultur@microchip.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.39; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1705999850; c=relaxed/simple;
+	bh=wLPog+0OdPWTf/vpChuci+4P8FjJPM6rI/8KZQ+nq7w=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hfNB3gMX3gvEWJbEXSxQsEWaVAHJRTWr71z6GNCc9y5sTvznaCkLYu8sEwXIAi0LqYdpeUdtq8AbRXbAL2GiIhue/nCaDDPPFUMuP0OvOd/U42cgXO8lUZnGA/mnIqE1UiiiJRcwfNS9kQrv9JylL6W6Lq2GmdgRGhaXk1uT8Uc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hDaQTB+K; arc=none smtp.client-ip=209.85.210.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-6de83f5a004so2792387a34.1;
+        Tue, 23 Jan 2024 00:50:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705999848; x=1706604648; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=FNB6nZlr/06kPBlEqaF8a61wrkKCAoA4BnsL6cXaDrQ=;
+        b=hDaQTB+KL5dQHp1OiEXldk3WKg0d1jvkbCh+eaWcP3c2JAF2k7v3wk0CR5SdISx3aB
+         bzNmKzDSIgLwt5Ik2ka6zd/PnFZS2ugclv2VTbPJUYvQ4R7JWi7awivTSwE+uM396zuN
+         jaZz9W+5E8X4eDgvk3MVqvUwwGK3m9NXp2GDMmx+0fE5RbVFI86lPuRuykKjQa/h4yah
+         CYGE2++fxbpBgQmk8vAjieRVj96k2Zki3STreNGDUGY0gW0fBPiR8XXp7wGbB7fmHrXW
+         lqbEsSDvt/XSwvexyldaF3ArhHx5nJjTtQyeizajiWhQ+thYB1T3c+RCGAgFKwU+JjpU
+         M8PQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705999848; x=1706604648;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FNB6nZlr/06kPBlEqaF8a61wrkKCAoA4BnsL6cXaDrQ=;
+        b=NLOpQnSkQ/A92wUQqWGUv7EvRnGQ5q99xuLTMLnsYuWkOnJ/k1/JGLYW+WLb9yvTcX
+         5bHco7quLyktKwS0W1iD8dGnQFmkG4FibD01qrELLLh4rAjIw5gjAv9D2FeL2RdZYZeW
+         MHhqwPDb+TfNvsCU1dSQ32dLgT3tMlDtc3LGF242cJ7GANrEIxOe2SlGIp6YUvm8bZZ6
+         7a/Wo9TXlw5TPtoEGsd9QehIp0/PZITxKkXuzYo192YNo0L804mLrc6QKXt3wBZ11QDs
+         ZOq/OFnhjR+XwAenkl0Ejq+eghzT/0R0wvf2tUFI7hBHE4ppQpivSznTmg2lUE50Ipvm
+         GVUg==
+X-Gm-Message-State: AOJu0YxKf3TfD0nmT9Oj5kgBpHByUkrvjDpEtuzjXOoNObUcTtWtfVMr
+	BjXtwvS1u8Fi/tmddQtn62stxLBrsC72WGmzh7SsLiaEimDNYr3Z
+X-Google-Smtp-Source: AGHT+IHRKZzHqJsuxlpfoRfWi87C1N58CDPLVDywt+3AVD3QL8TKT2ebBbKukW0im0MhyVmjRuztlw==
+X-Received: by 2002:a05:6830:1e2d:b0:6dc:8dfb:3a86 with SMTP id t13-20020a0568301e2d00b006dc8dfb3a86mr5969046otr.15.1705999847791;
+        Tue, 23 Jan 2024 00:50:47 -0800 (PST)
+Received: from localhost.localdomain ([112.65.140.130])
+        by smtp.googlemail.com with ESMTPSA id w70-20020a638249000000b005cf88b016cesm9626322pgd.72.2024.01.23.00.50.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Jan 2024 00:50:47 -0800 (PST)
+From: Furong Xu <0x1207@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Joao Pinto <jpinto@synopsys.com>,
+	Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	xfr@outlook.com,
+	rock.xu@nio.com,
+	Furong Xu <0x1207@gmail.com>
+Subject: [PATCH net] net: stmmac: xgmac: fix safety error descriptions
+Date: Tue, 23 Jan 2024 16:50:37 +0800
+Message-Id: <20240123085037.939471-1-0x1207@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Transfer-Encoding: 8bit
 
-Hello Horatiu,
+Commit 56e58d6c8a56 ("net: stmmac: Implement Safety Features in
+XGMAC core") prints safety error descriptions when safety error assert,
+but missed some special errors, and mixed correctable errors and
+uncorrectable errors together.
+This patch complete the error code list and print the type of errors.
 
-On Tue, 23 Jan 2024 09:15:14 +0100
-Horatiu Vultur <horatiu.vultur@microchip.com> wrote:
+Fixes: 56e58d6c8a56 ("net: stmmac: Implement Safety Features in XGMAC core")
+Signed-off-by: Furong Xu <0x1207@gmail.com>
+---
+ .../ethernet/stmicro/stmmac/dwxgmac2_core.c   | 36 +++++++++----------
+ 1 file changed, 18 insertions(+), 18 deletions(-)
 
-> In case the interface between the MAC and the PHY is SGMII, then the bit
-> GIGA_MODE on the MAC side needs to be set regardless of the speed at
-> which it is running.
-> 
-> Fixes: d28d6d2e37d1 ("net: lan966x: add port module support")
-> Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
-> ---
->  drivers/net/ethernet/microchip/lan966x/lan966x_port.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_port.c b/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
-> index 92108d354051c..975a6d64a2e18 100644
-> --- a/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
-> +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
-> @@ -170,7 +170,8 @@ static void lan966x_port_link_up(struct lan966x_port *port)
->  	/* Also the GIGA_MODE_ENA(1) needs to be set regardless of the
->  	 * port speed for QSGMII ports.
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+index eb48211d9b0e..ad812484059e 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+@@ -748,29 +748,29 @@ static void dwxgmac3_handle_mac_err(struct net_device *ndev,
+ }
+ 
+ static const struct dwxgmac3_error_desc dwxgmac3_mtl_errors[32]= {
+-	{ true, "TXCES", "MTL TX Memory Error" },
++	{ true, "TXCES", "MTL TX Memory Correctable Error" },
+ 	{ true, "TXAMS", "MTL TX Memory Address Mismatch Error" },
+-	{ true, "TXUES", "MTL TX Memory Error" },
++	{ true, "TXUES", "MTL TX Memory Uncorrectable Error" },
+ 	{ false, "UNKNOWN", "Unknown Error" }, /* 3 */
+-	{ true, "RXCES", "MTL RX Memory Error" },
++	{ true, "RXCES", "MTL RX Memory Correctable Error" },
+ 	{ true, "RXAMS", "MTL RX Memory Address Mismatch Error" },
+-	{ true, "RXUES", "MTL RX Memory Error" },
++	{ true, "RXUES", "MTL RX Memory Uncorrectable Error" },
+ 	{ false, "UNKNOWN", "Unknown Error" }, /* 7 */
+-	{ true, "ECES", "MTL EST Memory Error" },
++	{ true, "ECES", "MTL EST Memory Correctable Error" },
+ 	{ true, "EAMS", "MTL EST Memory Address Mismatch Error" },
+-	{ true, "EUES", "MTL EST Memory Error" },
++	{ true, "EUES", "MTL EST Memory Uncorrectable Error" },
+ 	{ false, "UNKNOWN", "Unknown Error" }, /* 11 */
+-	{ true, "RPCES", "MTL RX Parser Memory Error" },
++	{ true, "RPCES", "MTL RX Parser Memory Correctable Error" },
+ 	{ true, "RPAMS", "MTL RX Parser Memory Address Mismatch Error" },
+-	{ true, "RPUES", "MTL RX Parser Memory Error" },
++	{ true, "RPUES", "MTL RX Parser Memory Uncorrectable Error" },
+ 	{ false, "UNKNOWN", "Unknown Error" }, /* 15 */
+-	{ false, "UNKNOWN", "Unknown Error" }, /* 16 */
+-	{ false, "UNKNOWN", "Unknown Error" }, /* 17 */
+-	{ false, "UNKNOWN", "Unknown Error" }, /* 18 */
++	{ true, "SCES", "MTL SGF GCL Memory Correctable Error" },
++	{ true, "SAMS", "MTL SGF GCL Memory Address Mismatch Error" },
++	{ true, "SUES", "MTL SGF GCL Memory Uncorrectable Error" },
+ 	{ false, "UNKNOWN", "Unknown Error" }, /* 19 */
+-	{ false, "UNKNOWN", "Unknown Error" }, /* 20 */
+-	{ false, "UNKNOWN", "Unknown Error" }, /* 21 */
+-	{ false, "UNKNOWN", "Unknown Error" }, /* 22 */
++	{ true, "RXFCES", "MTL RXF Memory Correctable Error" },
++	{ true, "RXFAMS", "MTL RXF Memory Address Mismatch Error" },
++	{ true, "RXFUES", "MTL RXF Memory Uncorrectable Error" },
+ 	{ false, "UNKNOWN", "Unknown Error" }, /* 23 */
+ 	{ false, "UNKNOWN", "Unknown Error" }, /* 24 */
+ 	{ false, "UNKNOWN", "Unknown Error" }, /* 25 */
+@@ -796,13 +796,13 @@ static void dwxgmac3_handle_mtl_err(struct net_device *ndev,
+ }
+ 
+ static const struct dwxgmac3_error_desc dwxgmac3_dma_errors[32]= {
+-	{ true, "TCES", "DMA TSO Memory Error" },
++	{ true, "TCES", "DMA TSO Memory Correctable Error" },
+ 	{ true, "TAMS", "DMA TSO Memory Address Mismatch Error" },
+-	{ true, "TUES", "DMA TSO Memory Error" },
++	{ true, "TUES", "DMA TSO Memory Uncorrectable Error" },
+ 	{ false, "UNKNOWN", "Unknown Error" }, /* 3 */
+-	{ true, "DCES", "DMA DCACHE Memory Error" },
++	{ true, "DCES", "DMA DCACHE Memory Correctable Error" },
+ 	{ true, "DAMS", "DMA DCACHE Address Mismatch Error" },
+-	{ true, "DUES", "DMA DCACHE Memory Error" },
++	{ true, "DUES", "DMA DCACHE Memory Uncorrectable Error" },
+ 	{ false, "UNKNOWN", "Unknown Error" }, /* 7 */
+ 	{ false, "UNKNOWN", "Unknown Error" }, /* 8 */
+ 	{ false, "UNKNOWN", "Unknown Error" }, /* 9 */
+-- 
+2.34.1
 
-Small nit, I think this comment above the test could also be updated to
-reflect that change.
-
->  	 */
-> -	if (phy_interface_num_ports(config->portmode) == 4)
-> +	if (phy_interface_num_ports(config->portmode) == 4 ||
-> +	    config->portmode == PHY_INTERFACE_MODE_SGMII)
->  		mode = DEV_MAC_MODE_CFG_GIGA_MODE_ENA_SET(1);
->  
->  	lan_wr(config->duplex | mode,
-
-Besides that,
-
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-
-Thanks,
-
-Maxime
 
