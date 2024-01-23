@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-65161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7191C83960A
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 18:11:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11E4283960C
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 18:11:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78DE51C289BE
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:11:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33BB91C20B3B
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:11:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A77437FBA8;
-	Tue, 23 Jan 2024 17:10:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02A467FBCD;
+	Tue, 23 Jan 2024 17:11:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ru+UsbUf"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ZBROGkjT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FF217F7F6
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 17:10:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 210CE7F7F6
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 17:11:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706029854; cv=none; b=eOnaWMkgtGQ3j3a1vCXARandX0i//oRsQCJJ1l7SRygwMgUBYMzi/0crylI7+LAzlPI79DvRflC+ZGQyA2mB8L+rYlnpvMntoBiUkwNgS0C9zSqdVGrIai8qkZDjGAB9iNjwSRctYXmnZK6KGXWmlF2UfznhKhjTG7UWeXiC894=
+	t=1706029879; cv=none; b=gvcpGPYrZhs3Ag5iSrIxQ+od4BDU42rfdVYmJprgkJrZV0d2gr/hsT59nwNkl4JY2OqDGGV04bnU3mU/g7RU5p1/xQNoVsT+mlbNdcU4s3vnw9EJBlByPwgpGwhTA0sIf0CZTwDI6rYsRrOttLFQpcAWboB3OtulDEJ+Ra532Nw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706029854; c=relaxed/simple;
-	bh=Ska4ZBQtnGBWOLRSNz/TESKyqfehp3tOgwAMrQGfttw=;
+	s=arc-20240116; t=1706029879; c=relaxed/simple;
+	bh=i/cWrg7AhQg8RuT/t0dJprVi7Eo6wire6YkTgxMefro=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gofkw0VpbBtTpLPJOT99y9HOppaP8sODa9B6THZ9el577pBn2so3sXOhxzPFqpg35KOqhqn8eacXzneSu6Uh7oRLKrBvVCD17lhm8cG5U6CkgHpXqM1D82keqi8ZGhXw67p7oSv9ObAZ/ifVXKxAHsAaF9mDCunND7YE4GhpSxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ru+UsbUf; arc=none smtp.client-ip=207.171.184.29
+	 MIME-Version:Content-Type; b=gjvfc+BEIcNHCxxskdj9SxIQMPLgnSRoJIlkQy3iDRIPjSfG1GrucKEn3NM9bMH7/dHnW/WtUZZtZkXS915o9HS+SCJJM8X+mRAl1LpaiFnmg0uT7zNkToGUxDjwHV0Sf+kfn9Y/2HeHo2rLNbXASOc7ChqEyz5wRZeQAK88EQE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ZBROGkjT; arc=none smtp.client-ip=99.78.197.220
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1706029854; x=1737565854;
+  t=1706029878; x=1737565878;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=RP1WTOsoR94ZzYfTc4cy0gtjX0UaEsBXk+0SXuldg9Q=;
-  b=ru+UsbUfM/GjKZClftptvAyzr6eD35vg2Anqc9S9UBPdlzLgQ7uoc6lb
-   yLft3OgaftxEx2OIWFhZ5RIdLyh02HXwx4yJKZV9+iqsTlrfWmdgemE7y
-   Pbr1JiKxw1NXGYyCgSeLWyDtaLjzdE6U3UFKG4RAQKOW06SX8dUGJEUy8
-   s=;
+  bh=cohv5NMPmOHSBiha6TfQRPgp8ud+P9/1SI1AP+rjhwU=;
+  b=ZBROGkjT/oPm5kIYJHBd2mcqlYf/xBfo8crJEfCeVkhocXcvrGQVWLgr
+   vptDMP0br2L6ICM60HPqYGcN8oa9LfvE6ohDJDqAZa3tpd+PT4XSwo1i6
+   aQznyzR8IH8SnJ9A9jdy+kKdYt/vNnNroX1gtTWAUR8014/ETv4WnOBbj
+   A=;
 X-IronPort-AV: E=Sophos;i="6.05,214,1701129600"; 
-   d="scan'208";a="391941030"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-21d8d9f4.us-west-2.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2024 17:10:53 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
-	by email-inbound-relay-pdx-2a-m6i4x-21d8d9f4.us-west-2.amazon.com (Postfix) with ESMTPS id 194B288A13;
-	Tue, 23 Jan 2024 17:10:52 +0000 (UTC)
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:64635]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.2.126:2525] with esmtp (Farcaster)
- id 345ad896-b424-4fef-83fd-941820b2fd6d; Tue, 23 Jan 2024 17:10:51 +0000 (UTC)
-X-Farcaster-Flow-ID: 345ad896-b424-4fef-83fd-941820b2fd6d
+   d="scan'208";a="60575459"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-b538c141.us-east-1.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2024 17:11:15 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
+	by email-inbound-relay-iad-1e-m6i4x-b538c141.us-east-1.amazon.com (Postfix) with ESMTPS id 5858DA07C7;
+	Tue, 23 Jan 2024 17:11:13 +0000 (UTC)
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:63585]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.44.58:2525] with esmtp (Farcaster)
+ id 5aa43823-0b34-452f-a693-78c2ace00ba3; Tue, 23 Jan 2024 17:11:12 +0000 (UTC)
+X-Farcaster-Flow-ID: 5aa43823-0b34-452f-a693-78c2ace00ba3
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Tue, 23 Jan 2024 17:10:47 +0000
+ 15.2.1118.40; Tue, 23 Jan 2024 17:11:12 +0000
 Received: from 88665a182662.ant.amazon.com (10.187.171.18) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Tue, 23 Jan 2024 17:10:45 +0000
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.40;
+ Tue, 23 Jan 2024 17:11:09 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>
 CC: Ivan Babrou <ivan@cloudflare.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
 	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v5 net-next 4/5] af_unix: Run GC on only one CPU.
-Date: Tue, 23 Jan 2024 09:08:55 -0800
-Message-ID: <20240123170856.41348-5-kuniyu@amazon.com>
+Subject: [PATCH v5 net-next 5/5] af_unix: Try to run GC async.
+Date: Tue, 23 Jan 2024 09:08:56 -0800
+Message-ID: <20240123170856.41348-6-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20240123170856.41348-1-kuniyu@amazon.com>
 References: <20240123170856.41348-1-kuniyu@amazon.com>
@@ -80,7 +80,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D032UWA003.ant.amazon.com (10.13.139.37) To
+X-ClientProxiedBy: EX19D037UWB003.ant.amazon.com (10.13.138.115) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 Precedence: Bulk
 
@@ -92,115 +92,192 @@ In unix_gc(), all inflight AF_UNIX sockets are traversed at least once,
 and more if they are the GC candidate.  Thus, sendmsg() significantly
 slows down with too many inflight AF_UNIX sockets.
 
-There is a small window to invoke multiple unix_gc() instances, which
-will then be blocked by the same spinlock except for one.
+However, if a process sends data with no AF_UNIX FD, the sendmsg() call
+does not need to wait for GC.  After this change, only the process that
+meets the condition below will be blocked under such a situation.
 
-Let's convert unix_gc() to use struct work so that it will not consume
-CPUs unnecessarily.
+  1) cmsg contains AF_UNIX socket
+  2) more than 32 AF_UNIX sent by the same user are still inflight
 
-Note WRITE_ONCE(gc_in_progress, true) is moved before running GC.
-If we leave the WRITE_ONCE() as is and use the following test to
-call flush_work(), a process might not call it.
+Note that even a sendmsg() call that does not meet the condition but has
+AF_UNIX FD will be blocked later in unix_scm_to_skb() by the spinlock,
+but we allow that as a bonus for sane users.
 
-    CPU 0                                     CPU 1
-    ---                                       ---
-                                              start work and call __unix_gc()
-    if (work_pending(&unix_gc_work) ||        <-- false
-        READ_ONCE(gc_in_progress))            <-- false
-            flush_work();                     <-- missed!
-	                                      WRITE_ONCE(gc_in_progress, true)
+The results below are the time spent in unix_dgram_sendmsg() sending 1
+byte of data with no FD 4096 times on a host where 32K inflight AF_UNIX
+sockets exist.
+
+Without series: the sane sendmsg() needs to wait gc unreasonably.
+
+  $ sudo /usr/share/bcc/tools/funclatency -p 11165 unix_dgram_sendmsg
+  Tracing 1 functions for "unix_dgram_sendmsg"... Hit Ctrl-C to end.
+  ^C
+       nsecs               : count     distribution
+  [...]
+      524288 -> 1048575    : 0        |                                        |
+     1048576 -> 2097151    : 3881     |****************************************|
+     2097152 -> 4194303    : 214      |**                                      |
+     4194304 -> 8388607    : 1        |                                        |
+
+  avg = 1825567 nsecs, total: 7477526027 nsecs, count: 4096
+
+With series: the sane sendmsg() can finish much faster.
+
+  $ sudo /usr/share/bcc/tools/funclatency -p 8702  unix_dgram_sendmsg
+  Tracing 1 functions for "unix_dgram_sendmsg"... Hit Ctrl-C to end.
+  ^C
+       nsecs               : count     distribution
+  [...]
+         128 -> 255        : 0        |                                        |
+         256 -> 511        : 4092     |****************************************|
+         512 -> 1023       : 2        |                                        |
+        1024 -> 2047       : 0        |                                        |
+        2048 -> 4095       : 0        |                                        |
+        4096 -> 8191       : 1        |                                        |
+        8192 -> 16383      : 1        |                                        |
+
+  avg = 410 nsecs, total: 1680510 nsecs, count: 4096
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- net/unix/garbage.c | 54 +++++++++++++++++++++++-----------------------
- 1 file changed, 27 insertions(+), 27 deletions(-)
+ include/net/af_unix.h | 12 ++++++++++--
+ include/net/scm.h     |  1 +
+ net/core/scm.c        |  5 +++++
+ net/unix/af_unix.c    |  6 ++++--
+ net/unix/garbage.c    | 10 +++++++++-
+ 5 files changed, 29 insertions(+), 5 deletions(-)
 
+diff --git a/include/net/af_unix.h b/include/net/af_unix.h
+index 2c98ef95017b..f045bbd9017d 100644
+--- a/include/net/af_unix.h
++++ b/include/net/af_unix.h
+@@ -8,13 +8,21 @@
+ #include <linux/refcount.h>
+ #include <net/sock.h>
+ 
++#if IS_ENABLED(CONFIG_UNIX)
++struct unix_sock *unix_get_socket(struct file *filp);
++#else
++static inline struct unix_sock *unix_get_socket(struct file *filp)
++{
++	return NULL;
++}
++#endif
++
+ void unix_inflight(struct user_struct *user, struct file *fp);
+ void unix_notinflight(struct user_struct *user, struct file *fp);
+ void unix_destruct_scm(struct sk_buff *skb);
+ void io_uring_destruct_scm(struct sk_buff *skb);
+ void unix_gc(void);
+-void wait_for_unix_gc(void);
+-struct unix_sock *unix_get_socket(struct file *filp);
++void wait_for_unix_gc(struct scm_fp_list *fpl);
+ struct sock *unix_peer_get(struct sock *sk);
+ 
+ #define UNIX_HASH_MOD	(256 - 1)
+diff --git a/include/net/scm.h b/include/net/scm.h
+index cf68acec4d70..92276a2c5543 100644
+--- a/include/net/scm.h
++++ b/include/net/scm.h
+@@ -25,6 +25,7 @@ struct scm_creds {
+ 
+ struct scm_fp_list {
+ 	short			count;
++	short			count_unix;
+ 	short			max;
+ 	struct user_struct	*user;
+ 	struct file		*fp[SCM_MAX_FD];
+diff --git a/net/core/scm.c b/net/core/scm.c
+index d0e0852a24d5..9cd4b0a01cd6 100644
+--- a/net/core/scm.c
++++ b/net/core/scm.c
+@@ -36,6 +36,7 @@
+ #include <net/compat.h>
+ #include <net/scm.h>
+ #include <net/cls_cgroup.h>
++#include <net/af_unix.h>
+ 
+ 
+ /*
+@@ -85,6 +86,7 @@ static int scm_fp_copy(struct cmsghdr *cmsg, struct scm_fp_list **fplp)
+ 			return -ENOMEM;
+ 		*fplp = fpl;
+ 		fpl->count = 0;
++		fpl->count_unix = 0;
+ 		fpl->max = SCM_MAX_FD;
+ 		fpl->user = NULL;
+ 	}
+@@ -109,6 +111,9 @@ static int scm_fp_copy(struct cmsghdr *cmsg, struct scm_fp_list **fplp)
+ 			fput(file);
+ 			return -EINVAL;
+ 		}
++		if (unix_get_socket(file))
++			fpl->count_unix++;
++
+ 		*fpp++ = file;
+ 		fpl->count++;
+ 	}
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 1e9378036dcc..1720419d93d6 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -1923,11 +1923,12 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
+ 	long timeo;
+ 	int err;
+ 
+-	wait_for_unix_gc();
+ 	err = scm_send(sock, msg, &scm, false);
+ 	if (err < 0)
+ 		return err;
+ 
++	wait_for_unix_gc(scm.fp);
++
+ 	err = -EOPNOTSUPP;
+ 	if (msg->msg_flags&MSG_OOB)
+ 		goto out;
+@@ -2199,11 +2200,12 @@ static int unix_stream_sendmsg(struct socket *sock, struct msghdr *msg,
+ 	bool fds_sent = false;
+ 	int data_len;
+ 
+-	wait_for_unix_gc();
+ 	err = scm_send(sock, msg, &scm, false);
+ 	if (err < 0)
+ 		return err;
+ 
++	wait_for_unix_gc(scm.fp);
++
+ 	err = -EOPNOTSUPP;
+ 	if (msg->msg_flags & MSG_OOB) {
+ #if IS_ENABLED(CONFIG_AF_UNIX_OOB)
 diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-index d5ef46a75f1f..3f599db59f9d 100644
+index 3f599db59f9d..4046c606f0e6 100644
 --- a/net/unix/garbage.c
 +++ b/net/unix/garbage.c
-@@ -86,7 +86,6 @@
- /* Internal data structures and random procedures: */
- 
- static LIST_HEAD(gc_candidates);
--static DECLARE_WAIT_QUEUE_HEAD(unix_gc_wait);
- 
- static void scan_inflight(struct sock *x, void (*func)(struct unix_sock *),
- 			  struct sk_buff_head *hitlist)
-@@ -182,23 +181,8 @@ static void inc_inflight_move_tail(struct unix_sock *u)
+@@ -311,8 +311,9 @@ void unix_gc(void)
  }
  
- static bool gc_in_progress;
--#define UNIX_INFLIGHT_TRIGGER_GC 16000
--
+ #define UNIX_INFLIGHT_TRIGGER_GC 16000
++#define UNIX_INFLIGHT_SANE_USER (SCM_MAX_FD * 8)
+ 
 -void wait_for_unix_gc(void)
--{
--	/* If number of inflight sockets is insane,
--	 * force a garbage collect right now.
--	 * Paired with the WRITE_ONCE() in unix_inflight(),
--	 * unix_notinflight() and gc_in_progress().
--	 */
--	if (READ_ONCE(unix_tot_inflight) > UNIX_INFLIGHT_TRIGGER_GC &&
--	    !READ_ONCE(gc_in_progress))
--		unix_gc();
--	wait_event(unix_gc_wait, !READ_ONCE(gc_in_progress));
--}
- 
--/* The external entry point: unix_gc() */
--void unix_gc(void)
-+static void __unix_gc(struct work_struct *work)
++void wait_for_unix_gc(struct scm_fp_list *fpl)
  {
- 	struct sk_buff *next_skb, *skb;
- 	struct unix_sock *u;
-@@ -209,13 +193,6 @@ void unix_gc(void)
+ 	/* If number of inflight sockets is insane,
+ 	 * force a garbage collect right now.
+@@ -324,6 +325,13 @@ void wait_for_unix_gc(void)
+ 	    !READ_ONCE(gc_in_progress))
+ 		unix_gc();
  
- 	spin_lock(&unix_gc_lock);
- 
--	/* Avoid a recursive GC. */
--	if (gc_in_progress)
--		goto out;
--
--	/* Paired with READ_ONCE() in wait_for_unix_gc(). */
--	WRITE_ONCE(gc_in_progress, true);
--
- 	/* First, select candidates for garbage collection.  Only
- 	 * in-flight sockets are considered, and from those only ones
- 	 * which don't have any external reference.
-@@ -322,8 +299,31 @@ void unix_gc(void)
- 	/* Paired with READ_ONCE() in wait_for_unix_gc(). */
- 	WRITE_ONCE(gc_in_progress, false);
- 
--	wake_up(&unix_gc_wait);
--
-- out:
- 	spin_unlock(&unix_gc_lock);
- }
-+
-+static DECLARE_WORK(unix_gc_work, __unix_gc);
-+
-+void unix_gc(void)
-+{
-+	WRITE_ONCE(gc_in_progress, true);
-+	queue_work(system_unbound_wq, &unix_gc_work);
-+}
-+
-+#define UNIX_INFLIGHT_TRIGGER_GC 16000
-+
-+void wait_for_unix_gc(void)
-+{
-+	/* If number of inflight sockets is insane,
-+	 * force a garbage collect right now.
-+	 *
-+	 * Paired with the WRITE_ONCE() in unix_inflight(),
-+	 * unix_notinflight(), and __unix_gc().
++	/* Penalise users who want to send AF_UNIX sockets
++	 * but whose sockets have not been received yet.
 +	 */
-+	if (READ_ONCE(unix_tot_inflight) > UNIX_INFLIGHT_TRIGGER_GC &&
-+	    !READ_ONCE(gc_in_progress))
-+		unix_gc();
++	if (!fpl || !fpl->count_unix ||
++	    READ_ONCE(fpl->user->unix_inflight) < UNIX_INFLIGHT_SANE_USER)
++		return;
 +
-+	if (READ_ONCE(gc_in_progress))
-+		flush_work(&unix_gc_work);
-+}
+ 	if (READ_ONCE(gc_in_progress))
+ 		flush_work(&unix_gc_work);
+ }
 -- 
 2.30.2
 
