@@ -1,103 +1,156 @@
-Return-Path: <netdev+bounces-65172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 426A883968C
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 18:38:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 17C10839693
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 18:40:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E2E231F27DAD
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:38:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C392E1F27FB2
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:40:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E52A980032;
-	Tue, 23 Jan 2024 17:38:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 350AF80039;
+	Tue, 23 Jan 2024 17:40:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DyYPcmvn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d3HEU7me"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6C0D7F7DC;
-	Tue, 23 Jan 2024 17:38:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 082217FBA1;
+	Tue, 23 Jan 2024 17:40:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706031515; cv=none; b=QJh9QMrmxX4hU3/0g3uWfijuru5ioWZp589MGZCGVHP9wOepKVBoT1Kv23pf4E9jV9Hvqn04e5TJBqpUYg0w6tgbiD1oozOK4nrbPEWbQ5e0afPBmyTOjcoInx13zOKuQk56dog6DA18lOZ4FlRwFbv41Vk23OH2ky459AdG1nU=
+	t=1706031611; cv=none; b=LqZzVbHPujIDCksMxpoWVhedaHryKJqe5a3bCIracQbgHUr3id4lDu3+5JgLMaj+sHoQPZYj1Gn21xRclsHiRbP3bcrL+Qg0PWvmZtoMCTnez2BPB81MZb3voaHFCyrv57MwFwrHCK+PX3vD7JkdK26o0MxfEww+wwFvoyoonzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706031515; c=relaxed/simple;
-	bh=bIsJdjJZWEU6xNDyk8cHPXzvvfDLZ1YMX9qL8aAZnjU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IX8aEMwjT4k64dIM0J1CI4sQEmE+awlf9zD7jYgKQdoOTJQWcfPmLN+I6eVGJ6DBiTW+fIWyVWkmtzZxxum5X0USJP40g4jSQH6L/Q5RfbAl6w2/+jWm+GeJFhLNtsHYB0Q6xs2dNLE5Ish6FW7LOgTKJ3lZK0xP0UUaBDmGycg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DyYPcmvn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1A06C433F1;
-	Tue, 23 Jan 2024 17:38:34 +0000 (UTC)
+	s=arc-20240116; t=1706031611; c=relaxed/simple;
+	bh=3StveZ7O01KUMKkYSW0OiZTG31utUIkqY45LlOjxvBw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AJuxxWaaec25KBNQBa8uJEXpbghAlVSK6BEvW/hLxGBQTdMx02GSMgzxqr/XgfGRnKZdGT0YkhErtqJ/o1D/boDnRqA1z6z5HiQ6hwOkZtpeFGw23guJz/t736tEmfC99J2sXnQVndHsSisCMye3yHhqf9hRdTRtQn27LrAnFf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d3HEU7me; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEC2AC433F1;
+	Tue, 23 Jan 2024 17:40:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706031515;
-	bh=bIsJdjJZWEU6xNDyk8cHPXzvvfDLZ1YMX9qL8aAZnjU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DyYPcmvn3IFYjPPU/IYBz+m0xuoa/F4Fpop96QN9pWBZVFa218EgM3R6xIRG3cTRo
-	 q13f2Do++Oq+xWer+tA7Psgo3LGYGsLzlH98FUEVh0DuWzZaZNrGG2k/+g6Ke0E8Y6
-	 7sSzk6MyIuQRjs2HpmtdTHN124hyPW9837RZwGD12zGPR+f9fOorZB1u/0sPg4DPR/
-	 tIUiQYbDtOUMtNQRC4/GgSMDk4D+ZxLSpSRMCeLZ976EWiiJfbAg1vTDymPaXr/UrA
-	 +zhgKW6k+9ld18thNVrp74JAS1c2hBxtfXCPgsql6dTXvEVJD/B+bK/d+RGFNUrSwa
-	 nxnUdaZbqGWZw==
-Date: Tue, 23 Jan 2024 09:38:34 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Petr Machata <petrm@nvidia.com>, Shuah Khan <shuah@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "netdev-driver-reviewers@vger.kernel.org"
- <netdev-driver-reviewers@vger.kernel.org>,
- <linux-kselftest@vger.kernel.org>
-Subject: Re: [ANN] net-next is OPEN
-Message-ID: <20240123093834.23ea172a@kernel.org>
-In-Reply-To: <87y1cgm040.fsf@nvidia.com>
-References: <20240122091612.3f1a3e3d@kernel.org>
-	<87fryonx35.fsf@nvidia.com>
-	<20240123073412.063bc08e@kernel.org>
-	<87y1cgm040.fsf@nvidia.com>
+	s=k20201202; t=1706031610;
+	bh=3StveZ7O01KUMKkYSW0OiZTG31utUIkqY45LlOjxvBw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=d3HEU7meYerxBi+D51f6kVazcNp4V04WVj8EZprWX19a4JQnMEKWvD+QQTAb7Nb5T
+	 25d4jPu+ddlrrnp3tlkUvyki8ElAjECaCLRnYan5JHntJm4sQ3WgDyjghdmk5DrRNq
+	 MAxa6wXR0MG8oSvStdYv18Z4YQ87KUIb/OeDr5auu/OCkUn+8ZwAV0sTa2XJai9rS2
+	 wyhab2tfozpAGfRKUc3tfWnp2EY1PXdLxnNtO0SoY+0hsIiHdJI0EqR7CoCUfmZAjX
+	 RsCj1YwMUHCOpFah/sgiPnUVYfkMqWFsw4lztEtwfB64WfdCn10n7JW5AvBfxvKl6A
+	 4lMs3PwwmznSg==
+Date: Tue, 23 Jan 2024 17:40:02 +0000
+From: Simon Horman <horms@kernel.org>
+To: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org, cake@lists.bufferbloat.net,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	Petr Pavlu <ppavlu@suse.cz>, Michal Kubecek <mkubecek@suse.cz>,
+	Martin Wilck <mwilck@suse.com>,
+	Pedro Tammela <pctammela@mojatatu.com>
+Subject: Re: [PATCH v4 3/4] net/sched: Load modules via their alias
+Message-ID: <20240123174002.GN254773@kernel.org>
+References: <20240123135242.11430-1-mkoutny@suse.com>
+ <20240123135242.11430-4-mkoutny@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240123135242.11430-4-mkoutny@suse.com>
 
-On Tue, 23 Jan 2024 18:04:19 +0100 Petr Machata wrote:
-> > Unless I'm doing it wrong and the sub-directories are supposed to
-> > inherit the parent directory's config? So net/forwarding/ should
-> > be built with net/'s config? I could not find the info in docs,
-> > does anyone know?  
+On Tue, Jan 23, 2024 at 02:52:41PM +0100, Michal Koutný wrote:
+> The cls_,sch_,act_ modules may be loaded lazily during network
+> configuration but without user's awareness and control.
 > 
-> I don't think they are, net/config defines CONFIG_VXLAN, but then the
-> vxlan tests still complain about unknown device type. Though maybe
-> there's another device type that it's missing...
+> Switch the lazy loading from canonical module names to a module alias.
+> This allows finer control over lazy loading, the precedent from
+> commit 7f78e0351394 ("fs: Limit sys_mount to only request filesystem
+> modules.") explains it already:
 > 
-> What do I do to feed the config file to some build script to get a
-> kernel image to test? I can of course just do something like
-> cat config | xargs -n1 scripts/config -m, but I expect there's some
-> automation for it and I just can't find it.
+> 	Using aliases means user space can control the policy of which
+> 	filesystem^W net/sched modules are auto-loaded by editing
+> 	/etc/modprobe.d/*.conf with blacklist and alias directives.
+> 	Allowing simple, safe, well understood work-arounds to known
+> 	problematic software.
+> 
+> By default, nothing changes. However, if a specific module is
+> blacklisted (its canonical name), it won't be modprobe'd when requested
+> under its alias (i.e. kernel auto-loading). It would appear as if the
+> given module was unknown.
+> 
+> The module can still be loaded under its canonical name, which is an
+> explicit (privileged) user action.
+> 
+> Signed-off-by: Michal Koutný <mkoutny@suse.com>
+> ---
+>  net/sched/act_api.c | 2 +-
+>  net/sched/cls_api.c | 2 +-
+>  net/sched/sch_api.c | 4 ++--
+>  3 files changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/sched/act_api.c b/net/sched/act_api.c
+> index 3e30d7260493..60c0fadfac6d 100644
+> --- a/net/sched/act_api.c
+> +++ b/net/sched/act_api.c
+> @@ -1363,7 +1363,7 @@ struct tc_action_ops *tc_action_load_ops(struct nlattr *nla, u32 flags,
+>  
+>  		if (rtnl_held)
+>  			rtnl_unlock();
+> -		request_module("act_%s", act_name);
+> +		request_module(NET_ACT_ALIAS_PREFIX "%s", name);
 
-The CI script is based on virtme-ng. So it does this:
+Hi Michal,
 
-# $target is net or net/forwarding or drivers/net/bonding etc.
-make mrproper
-vng -v -b -f tools/testing/selftests/$target
-# build the scripts
-make headers
-make -C tools/testing/selftests/$target
+name doesn't exist in this context, perhaps the line above should be:
 
-vng -v -r arch/x86/boot/bzImage --user root
-# inside the VM
-make -C tools/testing/selftests TARGETS=$target run_tests
+		request_module(NET_ACT_ALIAS_PREFIX "%s", act_name);
 
-https://github.com/kuba-moo/nipa/blob/master/contest/remote/vmksft.py#L138
+>  		if (rtnl_held)
+>  			rtnl_lock();
+>  
+> diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+> index 92a12e3d0fe6..b31b832598e7 100644
+> --- a/net/sched/cls_api.c
+> +++ b/net/sched/cls_api.c
+> @@ -257,7 +257,7 @@ tcf_proto_lookup_ops(const char *kind, bool rtnl_held,
+>  #ifdef CONFIG_MODULES
+>  	if (rtnl_held)
+>  		rtnl_unlock();
+> -	request_module("cls_%s", kind);
+> +	request_module(NET_CLS_ALIAS_PREFIX "%s", name);
 
-You're right, it definitely does not "inherit" net's config when
-running forwarding/net. I can easily make it do so, but I'm not clear
-what the expectation from the kselftest subsystem is. Because if other
-testers (people testing stable, KernelCI etc. et.c) don't "inherit" we
-better fill in the config completely so that the tests pass for
-everyone.
+Likewise, perhaps the line above should be:
+
+	request_module(NET_CLS_ALIAS_PREFIX "%s", kind);
+
+>  	if (rtnl_held)
+>  		rtnl_lock();
+>  	ops = __tcf_proto_lookup_ops(kind);
+
+...
+
+-- 
+pw-bot: changes-requested
 
