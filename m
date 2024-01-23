@@ -1,118 +1,126 @@
-Return-Path: <netdev+bounces-65265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50D39839CA2
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 00:00:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B763839CEC
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 00:07:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E41AC1F2651D
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 23:00:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6AF4D1C21A3C
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 23:07:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36D324120C;
-	Tue, 23 Jan 2024 23:00:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C05753E14;
+	Tue, 23 Jan 2024 23:07:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="eB+dbyzQ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qgkjjYHe"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7642DDB5;
-	Tue, 23 Jan 2024 22:59:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF8CE210F6;
+	Tue, 23 Jan 2024 23:07:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706050802; cv=none; b=QurVKzUWbU8qatWBH50Fe2EHMBA1ITo8J5+w+dlTCMDcAQLFFkeDg0Eg41Zcou6g+GE9CISi7HDsd3TqznE+3QOagVVUZr7BX+Nzoin7D3yGcl/mMG8BC3MUx+fILTYTHvdcmt7SSzep06P83YkP1PJOPfbEQ31ad6SHhaCFvE4=
+	t=1706051270; cv=none; b=Ai6zJLn4xhY1fM17XMjjBOGfU5bTsKKBCxUnUy01fnI9Ii4zcokd6wNzBp1aSLUcI0bD7Q6NtH/ft1vZG7SdRdnFJxbxYPNg8kXOTIc7eDFgTWcBAN05WGMkpYX2PIwZ2/vS3rmNfshOVRUT7mDxByhjtkl7xj/WF77sjb8VW70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706050802; c=relaxed/simple;
-	bh=8xwlc7MGcqCvMRjkHOZubnZy5/7P87qpf0FVev832cM=;
+	s=arc-20240116; t=1706051270; c=relaxed/simple;
+	bh=EF01pwf93jkw6zcgML//uN79n7gsoLCTDyk3XMANbsk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K51Zrpm+sz3hFIVQIAM+vhYdqTxO1k4QebxB8rRF6uoyvH2WCjG+oqWRK+m5iywN0xiuSH51LN5iVuIXaI9G49kS/v8fq9NgkhNGv3BKzT61Vy4tOMERA4hBaM5QVlQnZ/OELSw05H9RZKtq+np8R055PE6UI4afn9FH+bwc3Hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=eB+dbyzQ; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=gycRRVdkSDxaW9akkuaGr1Ibx2f37kb9lxoG6oxmYSFwshY7t56DQYM0MDpFpXAYOzhOItSLb3ZuiwEtse9IUAWUCLtNEAVi2T4Uh2SY4N6vWzhWd4Mvl81nvCmJ6NRYTlEIvtMdHd3BKiInNuzeVXr1bAxFq7PZLq5wIVODSa0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qgkjjYHe; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=p+okpn5rGPjYb8kKdD5Ih+F44qguZfi/1iKVDlb0xSo=; b=eB+dbyzQt+aQZ0ZIzJ4XZAHFEC
-	JbMo0Beke50gs/spknsDN7GT1X1vBnYI3fjPFZB+j8twrEpuVdz5fKPVdcuwvAZdvAIcdMtGbXlQE
-	u7Brxbjy491kA5LTOd4Caxu8uD0DrssDkxdPcTcX2GlhiMLUT2hdSDCZiGMz3yFg496Y=;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=LZZ7dIkzvXVF+O0UaEUz1mN+3JIr0400uS5HJQS+H80=; b=qg
+	kjjYHeJxSBG3x262DYoZzND/Jb4HsUTj/VBsNGjbw2WGpe7iYlu7wGpCND/Y9E/rhux1yt5wZiTaa
+	EjBZpn+SH0gc6pRxEL8Qy8gEyrm3oVjmrRZgeH+QWcXqWtlMa+rr7bIIkrbMQEV8Sxq0NyO/Fgdlm
+	aquDAS16be7fs+U=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rSPkB-005t0I-GU; Tue, 23 Jan 2024 23:59:47 +0100
-Date: Tue, 23 Jan 2024 23:59:47 +0100
+	id 1rSPrh-005t3R-UQ; Wed, 24 Jan 2024 00:07:33 +0100
+Date: Wed, 24 Jan 2024 00:07:33 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Tim Menninger <tmenninger@purestorage.com>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>,
-	netdev-maintainers <edumazet@google.com>, kuba@kernel.org,
-	pabeni@redhat.com, davem@davemloft.net,
-	netdev <netdev@vger.kernel.org>, stable@vger.kernel.org
-Subject: Re: [PATCH net v1] net: dsa: mv88e6xxx: Make unsupported C45 reads
- return 0xffff
-Message-ID: <32d96dd3-7fbb-49e5-8b05-269eac1ac80d@lunn.ch>
-References: <20240120192125.1340857-1-andrew@lunn.ch>
- <20240122122457.jt6xgvbiffhmmksr@skbuf>
- <0d9e0412-6ca3-407a-b2a1-b18ab4c20714@lunn.ch>
- <CAO-L_45iCb+TFMSqZJex-mZKfopBXxR=KH5aV4Wfx5eF5_N_8Q@mail.gmail.com>
- <5f449e47-fc39-48c3-a784-77b808c31050@lunn.ch>
- <CAO-L_46Ltq0Ju_BO+rfvAbe7F=T6m0hZZKu9gzv7=bMV5n6naw@mail.gmail.com>
+To: Michal =?utf-8?B?Vm9rw6HEjQ==?= <michal.vokac@ysoft.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Christian Lamparter <chunkeey@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, petr.benes@ysoft.com
+Subject: Re: [PATCH net] net: dsa: qca8k: fix illegal usage of GPIO
+Message-ID: <82712052-e7e6-414d-9c11-5595e0d6e097@lunn.ch>
+References: <1705925049-5756-1-git-send-email-michal.vokac@ysoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAO-L_46Ltq0Ju_BO+rfvAbe7F=T6m0hZZKu9gzv7=bMV5n6naw@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1705925049-5756-1-git-send-email-michal.vokac@ysoft.com>
 
-> Does that mean if there's a device there but it doesn't support C45 (no
-> phy_read_c45), it will now return ENODEV?
+On Mon, Jan 22, 2024 at 01:04:09PM +0100, Michal Vokáč wrote:
+> When working with GPIO, its direction must be set either when the GPIO is
+> requested by gpiod_get*() or later on by one of the gpiod_direction_*()
+> functions. Neither of this is done here which result in undefined behavior
+> on some systems.
+> 
+> As the reset GPIO is used right after it is requested here, it makes sense
+> to configure it as GPIOD_OUT_HIGH right away.
+> Fixes: a653f2f538f9 ("net: dsa: qca8k: introduce reset via gpio feature")
+> Signed-off-by: Michal Vokáč <michal.vokac@ysoft.com>
+> ---
+>  drivers/net/dsa/qca/qca8k-8xxx.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/dsa/qca/qca8k-8xxx.c b/drivers/net/dsa/qca/qca8k-8xxx.c
+> index 4ce68e655a63..83b19c2d7b97 100644
+> --- a/drivers/net/dsa/qca/qca8k-8xxx.c
+> +++ b/drivers/net/dsa/qca/qca8k-8xxx.c
+> @@ -2037,8 +2037,7 @@ qca8k_sw_probe(struct mdio_device *mdiodev)
+>  	priv->dev = &mdiodev->dev;
+>  	priv->info = of_device_get_match_data(priv->dev);
+>  
+> -	priv->reset_gpio = devm_gpiod_get_optional(priv->dev, "reset",
+> -						   GPIOD_ASIS);
+> +	priv->reset_gpio = devm_gpiod_get_optional(priv->dev, "reset", GPIOD_OUT_HIGH);
+>  	if (IS_ERR(priv->reset_gpio))
+>  		return PTR_ERR(priv->reset_gpio);
 
-Yes, mv88e6xxx_mdio_read_c45() will return -ENODEV if
-chip->info->ops->phy_read_c45 is NULL. That will cause the scan of
-that address to immediately skip to the next address. This is old
-behaviour for C22:
+Hi Michal
 
-commit 02a6efcab675fe32815d824837784c3f42a7d892
-Author: Alexandre Belloni <alexandre.belloni@bootlin.com>
-Date:   Tue Apr 24 18:09:04 2018 +0200
+So the current code is:
 
-    net: phy: allow scanning busses with missing phys
-    
-    Some MDIO busses will error out when trying to read a phy address with no
-    phy present at that address. In that case, probing the bus will fail
-    because __mdiobus_register() is scanning the bus for all possible phys
-    addresses.
-    
-    In case MII_PHYSID1 returns -EIO or -ENODEV, consider there is no phy at
-    this address and set the phy ID to 0xffffffff which is then properly
-    handled in get_phy_device().
+	priv->reset_gpio = devm_gpiod_get_optional(priv->dev, "reset",
+						   GPIOD_ASIS);
+	if (IS_ERR(priv->reset_gpio))
+		return PTR_ERR(priv->reset_gpio);
 
-And there are a few MDIO bus drivers which make use of this, e.g.
+	if (priv->reset_gpio) {
+		gpiod_set_value_cansleep(priv->reset_gpio, 1);
+		/* The active low duration must be greater than 10 ms
+		 * and checkpatch.pl wants 20 ms.
+		 */
+		msleep(20);
+		gpiod_set_value_cansleep(priv->reset_gpio, 0);
+	}
 
-static int lan9303_phy_read(struct dsa_switch *ds, int phy, int regnum)
-{
-        struct lan9303 *chip = ds->priv;
-        int phy_base = chip->phy_addr_base;
+Doesn't your change make the gpiod_set_value_cansleep() pointless?
 
-        if (phy == phy_base)
-                return lan9303_virt_phy_reg_read(chip, regnum);
-        if (phy > phy_base + 2)
-                return -ENODEV;
+Please extend your patch to remove it, maybe extending the comment a
+little.
 
-        return chip->ops->phy_read(chip, phy, regnum);
+Please also make sure what v2 Is Cc: to the qca8k Maintainers.
 
-This Ethernet switch supports only a number of PHY addresses, and
-returns -ENODEV for the rest.
+    Andrew
 
-So its a legitimate way to say there is nothing here.
-
-You suggestion of allowing ENOPSUPP for C45 would of fixed the
-problem, but C22 and C45 would support different error codes, which i
-don't like. Its better to be uniform.
-
-	Andrew
+---
+pw-bot: cr
 
