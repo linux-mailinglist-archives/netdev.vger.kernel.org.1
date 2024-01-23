@@ -1,70 +1,56 @@
-Return-Path: <netdev+bounces-65152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79D688395E3
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 18:07:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E63B8395EB
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 18:08:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31B6D29520E
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:07:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D12D61C26B08
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:08:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 460708120B;
-	Tue, 23 Jan 2024 17:05:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 027917FBD0;
+	Tue, 23 Jan 2024 17:06:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QJ7DvcCj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9091F811E2;
-	Tue, 23 Jan 2024 17:05:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D38547F7E2
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 17:06:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706029506; cv=none; b=DAFjCi2UiMDimgFo2jBfeH/X3L5DYlw3zobZU2/OJy4IezgyDpSNLUbZkJzE2/VBok5d3jZSbkWqJqplWnqX9nBy6arFV4WtS5WBmWB3CQf1VCB8s8nKZbG9sxXLISHWDim46Z3tv3VHAVrERu4W9bxrsltiXC10JkvgrN697pI=
+	t=1706029607; cv=none; b=a5iMPrISHqHSvqFqoLqPZ34+vV5gkwxw17FJbmjKTfwKgIGkZf7+T3lkIRxVUMCQU2h3+pkqwnG9adxy/S4GgplrBybXKWmjErkukV962Q6Wmb+vsk0A3rdRzg2nmbPleFWDekAkT2YJDOlCaeW/tmqlKNXK4s4reGNo+4LqI18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706029506; c=relaxed/simple;
-	bh=QIEah4FOv9bksPKqzM9tyNMnwQCDbVHt81ZN6r+F21w=;
+	s=arc-20240116; t=1706029607; c=relaxed/simple;
+	bh=Erfop9FrXjhItjBn5wwdGb8kCczIpV3oW69Bm/Hf82Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jwvFo4dmBVS9cbpUcYN+R9PBYpGHJ/Hqz3kffQe2SQqAR4fAkGrhE7P+kcwM83oPZk1tnao1hQAWUSrRPBRrJGK1X0TTzSDLT8Mbt86p7SffRKiRjiZEmlwI0WymPaq/ja/Gfwj0fFTRF6Or/an4M18/EkfuIn9mXZ7eRM2x8Tw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a3106f5aac8so1775766b.0;
-        Tue, 23 Jan 2024 09:05:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706029503; x=1706634303;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Q+QIB8QvNYUgfdIz2Y/2WnxrNr1jO/SplT5ODZ8UKwU=;
-        b=VPZIrXLH3LPlsCk97aoE5cwOiuiUFHMKIXEEP8ThxB22RAV6j6OcTq+N+ai2jJTrFd
-         gMV5WyyvtyxoQl74vUdCIQwbV/tkRWONszWcyJlphmpvV1LplILU8WairyTgxqEPgrXM
-         mUhqrajcklvDV3qtqcaMqiCgadCYndPrq/aVl9R5nJfc1rtSRCc9sSUD/R/uVTrK0L/0
-         cHMJl7kHAG2dtu7KRy2JZ7ZmsVkBGf7pcvSx+4VzRshrRa06D95+spIig73d7sdz5nAW
-         AoknEH0vnA0s7s3ETOzwa7vxoyNm4C/LAC0Gauxmabp11Uf0v63GbrGqWZd2PivvP4ls
-         JJ1g==
-X-Gm-Message-State: AOJu0YwWEqfhzwrcJpipaEXVKq7x1HCxz+hfBvkSy1B7m1cVcYurhZKi
-	kczRGxuNjY3Huyesrmf/0ZmUgtLUgUtSqKMnzS9bllsA0rxMrhQz
-X-Google-Smtp-Source: AGHT+IFxQLSfmQMt0gNEG71Vt1WSacnBK7+fHp4kMtb2zn6e8WsXB/QrPzeI8ue1y+DhSkCV/IFYcA==
-X-Received: by 2002:a17:906:899:b0:a2c:2437:101c with SMTP id n25-20020a170906089900b00a2c2437101cmr111882eje.13.1706029502526;
-        Tue, 23 Jan 2024 09:05:02 -0800 (PST)
-Received: from gmail.com (fwdproxy-cln-021.fbsv.net. [2a03:2880:31ff:15::face:b00c])
-        by smtp.gmail.com with ESMTPSA id g4-20020a17090669c400b00a2bf375ceebsm14478873ejs.208.2024.01.23.09.05.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jan 2024 09:05:02 -0800 (PST)
-Date: Tue, 23 Jan 2024 09:05:00 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, abeni@redhat.com, edumazet@google.com,
-	dsahern@kernel.org, weiwan@google.com,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	linux-wireless@vger.kernel.org
-Subject: Re: [PATCH net-next 00/22] Fix MODULE_DESCRIPTION() for net (p2)
-Message-ID: <Za/xvBX4Tp+JV8c6@gmail.com>
-References: <20240122184543.2501493-1-leitao@debian.org>
- <20240122105708.52d33fa0@kernel.org>
- <Za/oeIjnMoqqp4Tt@gmail.com>
- <20240123083517.2982c483@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Bltlf05bhParrDKK7zW9jZaZDS7OhUbPWOsPcTDSUov7ghcBXB0gJB0GGp9/ee5PdRnbQfMYwlP2/umPvSr7xky/lFWbp+PZlRog8QEsx2VNSJEsY3pqgwnuXOt9FpklVosPmBD2cs129Fc+Xu3lxe4NyWgJz1YcihdIvgjIRzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QJ7DvcCj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6C6AC433F1;
+	Tue, 23 Jan 2024 17:06:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706029607;
+	bh=Erfop9FrXjhItjBn5wwdGb8kCczIpV3oW69Bm/Hf82Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QJ7DvcCjdpteMgYgXZmEYHaAnuweBOZMjMOyY/DrbiupdYVawY+x+IuQLM2VASF14
+	 YQe8jFF/PBJ/aZfMy4b4UK++/fgTuVn3YvmKZRKQn7/zRD3584Icq3294SGwCxQOLI
+	 ir9yBb+QJ+2r5Vdn8m/moDdnU+rOMwZPz5p2fPiXQtjBP/QstnRrODTJx7CFO/lBOs
+	 6s1+iaz7yKPri71KeInsaOxoWBqhBsKsMBo4PmIuFsnjIcZ5+IMWxYcxoHNErYxPnE
+	 3+EhhuX1uMAc+8US8xqFTFcmfPTXBH4NJqlGazGyhY5Qj8zbS2Bba3FDujwJtF68Is
+	 rgBJCQt1q0isw==
+Date: Tue, 23 Jan 2024 17:06:43 +0000
+From: Simon Horman <horms@kernel.org>
+To: Karol Kolacinski <karol.kolacinski@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com, jesse.brandeburg@intel.com,
+	Jacob Keller <jacob.e.keller@intel.com>
+Subject: Re: [PATCH v7 iwl-next 5/7] ice: rename ice_ptp_tx_cfg_intr
+Message-ID: <20240123170643.GK254773@kernel.org>
+References: <20240123105131.2842935-1-karol.kolacinski@intel.com>
+ <20240123105131.2842935-6-karol.kolacinski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,30 +59,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240123083517.2982c483@kernel.org>
+In-Reply-To: <20240123105131.2842935-6-karol.kolacinski@intel.com>
 
-On Tue, Jan 23, 2024 at 08:35:17AM -0800, Jakub Kicinski wrote:
-> On Tue, 23 Jan 2024 08:25:28 -0800 Breno Leitao wrote:
-> > > When you repost:
-> > >  - please send these 3 to linux-wireless as a separate series
-> > >  - make sure mailing lists are CCed on the cover letter
-> > >    (yes, get_maintainer is embarrassingly bad at its job)
-> > >  - please send 10 at-a-time, it's probably a good tradeoff
-> > >    between series size and reposting risk
-> > >  - please target net, I hope I convinced Paolo that it's okay :)  
-> > 
-> > Sure. I will split this series in 3 and target `net`.
+On Tue, Jan 23, 2024 at 11:51:29AM +0100, Karol Kolacinski wrote:
+> From: Jacob Keller <jacob.e.keller@intel.com>
 > 
-> The wireless ones need to target wireless, just to be clear.
-> The rest should fit into 2 series.
+> The ice_ptp_tx_cfg_intr() function sends a control queue message to
+> configure the PHY timestamp interrupt block. This is a very similar name
+> to a function which is used to configure the MAC Other Interrupt Cause
+> Enable register.
 > 
-> > I suppose it is OK to send the patchsets in parallel, instead of waiting
-> > for the first patchset to be reviewed/accepted before sending the second
-> > part. Is this correct?
+> Rename this function to ice_ptp_cfg_phy_interrupt in order to make it
+> more obvious to the reader what action it performs, and distinguish it
+> from other similarly named functions.
 > 
-> The rate limit is to avoid having to give the same feedback to multiple
-> series, among other things. it'd be better to send one part at a time..
-> it won't take that long :)
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 
-Sure. Thanks for the clarifications!
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 
