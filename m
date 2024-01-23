@@ -1,449 +1,192 @@
-Return-Path: <netdev+bounces-64973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F8178389E7
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 10:04:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 883F6838A04
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 10:11:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F00A289829
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 09:04:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39BCE28A2D3
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 09:11:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B9815676A;
-	Tue, 23 Jan 2024 09:03:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=blackhole.kfki.hu header.i=@blackhole.kfki.hu header.b="WlNeNjTY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E82057894;
+	Tue, 23 Jan 2024 09:11:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp2-kfki.kfki.hu (smtp2-kfki.kfki.hu [148.6.0.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B0642B9C0;
-	Tue, 23 Jan 2024 09:03:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.6.0.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75A5F57311
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 09:11:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706000638; cv=none; b=sTDS/nd9OR3d7Vjq8L37aH8q+EFpNwl40Bn4ZgwkWznr8G50Y5nQAt4OMHFpkAD2vhnDD9SWfUpwCIXe0h3nmZ6tLDCT09rnLooXYT/SZ4rrwEXAT+8olmK0tSHf4lk/Hna3OUDxKsI0KTK2e83HHBcCc7+5zY1fWS3lXJ35d+U=
+	t=1706001083; cv=none; b=cbam27Rj5BHV+IQjV9C0AKjGsm6IdoCJVYQRbp4jpZLEGShA4yhMZup8NDULU5uU4PVnmGxEElGJAfJqrCeiiR/NFHyESzKQTCygvWNx/TrdM11+9qBbd0T/1ozxIGPnWiq5VwbiHgt5+n5ZR+FmLj5kARL5jILK39JZd2FGkCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706000638; c=relaxed/simple;
-	bh=UAHegfb25d4VNXDGuf0H9u03FJExWUekncOgVuwvIio=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=kspfbsPKcgPqTi+39Yd+WWWWTh0YoEii1FqgAvyeb4tUWTUoWUwOZoK1xSI0Z9pN+P9VJSg7bcmm6kd7TQZnLou8goy6jfZTyo92uQdjxmo9RhJs5UuYcuLM1MwuI+Euci12iLoR1tBOeihew31u+qVVsy2cfVr9KybVb++/f8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=blackhole.kfki.hu; spf=pass smtp.mailfrom=blackhole.kfki.hu; dkim=pass (1024-bit key) header.d=blackhole.kfki.hu header.i=@blackhole.kfki.hu header.b=WlNeNjTY; arc=none smtp.client-ip=148.6.0.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=blackhole.kfki.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=blackhole.kfki.hu
-Received: from localhost (localhost [127.0.0.1])
-	by smtp2.kfki.hu (Postfix) with ESMTP id 2AED1CC02B2;
-	Tue, 23 Jan 2024 10:03:46 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	blackhole.kfki.hu; h=mime-version:references:message-id
-	:in-reply-to:from:from:date:date:received:received:received
-	:received; s=20151130; t=1706000624; x=1707815025; bh=nC7mKaulMn
-	/6QdKiOoPiOluTjCpw6qXjTKNStEnW7Mg=; b=WlNeNjTYAnYfeRZ6LeeMnrOAah
-	qRyG4kklnAPuRrGc3cWzdmaeMKjM19ra9+1zhsGhZXCN4MIVog6dv42jSEcDM33V
-	s6P6AO/4yoOphNZ3cNwokrO8X7iEgE68La9Z6thpnN9F2U1aEpqVmcb1qfjMyQQd
-	AujeTFJC5fbqW2vEY=
-X-Virus-Scanned: Debian amavisd-new at smtp2.kfki.hu
-Received: from smtp2.kfki.hu ([127.0.0.1])
-	by localhost (smtp2.kfki.hu [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP; Tue, 23 Jan 2024 10:03:44 +0100 (CET)
-Received: from blackhole.kfki.hu (blackhole.szhk.kfki.hu [148.6.240.2])
-	by smtp2.kfki.hu (Postfix) with ESMTP id 4D8E1CC02BF;
-	Tue, 23 Jan 2024 10:03:42 +0100 (CET)
-Received: by blackhole.kfki.hu (Postfix, from userid 1000)
-	id 47E76343167; Tue, 23 Jan 2024 10:03:42 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by blackhole.kfki.hu (Postfix) with ESMTP id 468F5343166;
-	Tue, 23 Jan 2024 10:03:42 +0100 (CET)
-Date: Tue, 23 Jan 2024 10:03:42 +0100 (CET)
-From: Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
-To: Eric Dumazet <edumazet@google.com>
-cc: Pablo Neira Ayuso <pablo@netfilter.org>, netfilter-devel@vger.kernel.org, 
-    David Miller <davem@davemloft.net>, netdev@vger.kernel.org, 
-    kuba@kernel.org, pabeni@redhat.com, Florian Westphal <fw@strlen.de>, 
-    Ale Crismani <ale.crismani@automattic.com>, David Wang <00107082@163.com>
-Subject: Re: [PATCH net 14/14] netfilter: ipset: fix performance regression
- in swap operation
-In-Reply-To: <afb39fa8-3b28-27eb-c8ac-22691a064495@netfilter.org>
-Message-ID: <1a506719-db2b-c2ce-aaa2-d0067b3d772e@blackhole.kfki.hu>
-References: <20240117160030.140264-1-pablo@netfilter.org> <20240117160030.140264-15-pablo@netfilter.org> <CANn89iKtpVy1kSSuk_RSGN0R6L+roNJr81ED4+a2SZ2WKzGsng@mail.gmail.com> <afb39fa8-3b28-27eb-c8ac-22691a064495@netfilter.org>
+	s=arc-20240116; t=1706001083; c=relaxed/simple;
+	bh=QTm5KDaDNycZTdiSGLpEJGEokNHNaMWSiHCJhri3Orc=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=MtbzT52Ce3APYc2qVV9ZkXwhaf4VeWboAoYSpiiU4U8g7nIYZcHzSsxOYKizC0OR9e8Ec4dg7jltmCdVHGHq/hkJLXyeXJz++StpTY3pIfiCVWTdt9YxrWfqfN1Vg3unDba3sD+J6bVGgr7nAgi2UWJls+NI2d5edpqS3120jV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7bef3fcd7e7so411751339f.1
+        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 01:11:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706001081; x=1706605881;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/8JHX+MRfx2RrG0GI0Ld2XhBIptDf5Ajx1M3GH8izJY=;
+        b=xGpDC/RCbgiFb+LVBU1h6GPg9KGz00pd/p1Vh0oe3bW2EZV7e7x7K5s7iETNS8arGb
+         53NndtnGmELYIxQZlFavN5CFw4PzwL7x7jvWl353DIG/DrrF0TIW5mGjp1iOhvAZRvFb
+         kvom/2DllQJqgqoAhVvkvZMg0n5wu/pvylt+r15Sd4BpF3/Ru3uwV+U94ZSg2ARXUtVS
+         NzGb4SeD42kXFRo89p/1IYLyte0Qx9NBcalRu4UvGhSpuz/8JNpw+PPKSb8HE74myB3w
+         aXqq3byNN9jyneRnNJnceAfK2KwrQmT5D5LV/a08ygkjvrTB/54q3AVfvF9mJdu+gJUN
+         niIQ==
+X-Gm-Message-State: AOJu0YyvywBKaJAcc++3xwgvxIwdvHDVa+BHvcw665VwsTajW8S/MW+J
+	pThRnXggKYKfyEhmB5L9Rn9IoGvTe3BZuNa1OSylRrTsSjqmxGwJPKuNQTsFUKozNNLsdTnSU20
+	l7Jkd2V4kpbpFGxs3vg+ETOfukaYfZTt5SOll0QMQsgeRy/yM9JPTQt4=
+X-Google-Smtp-Source: AGHT+IHjnT0c6IU9Y8eh+EIRpgV7cYUACnvoc+unffKxZ5AxGkGqIWUUhaap7lDH7CtHwNqdHiJ3cRowKibaUG9YrzOkadiGK1zu
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="110363376-766840901-1706000622=:2980"
+X-Received: by 2002:a05:6e02:1d88:b0:35f:f01e:bb18 with SMTP id
+ h8-20020a056e021d8800b0035ff01ebb18mr875536ila.6.1706001081646; Tue, 23 Jan
+ 2024 01:11:21 -0800 (PST)
+Date: Tue, 23 Jan 2024 01:11:21 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000007549a6060f99544d@google.com>
+Subject: [syzbot] [tipc?] general protection fault in tipc_udp_nl_dump_remoteip
+From: syzbot <syzbot+314c727eef32ba20b65d@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, jmaloy@redhat.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
+	tipc-discussion@lists.sourceforge.net, ying.xue@windriver.com
+Content-Type: text/plain; charset="UTF-8"
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+Hello,
 
---110363376-766840901-1706000622=:2980
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+syzbot found the following issue on:
 
-Hi,
+HEAD commit:    39369c9a6e09 selftests: netdevsim: add a config file
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=1383ebbde80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6d54ca15e81ba55f
+dashboard link: https://syzkaller.appspot.com/bug?extid=314c727eef32ba20b65d
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
-On Thu, 18 Jan 2024, Jozsef Kadlecsik wrote:
+Unfortunately, I don't have any reproducer for this issue yet.
 
-> On Thu, 18 Jan 2024, Eric Dumazet wrote:
->=20
-> > On Wed, Jan 17, 2024 at 5:00=E2=80=AFPM Pablo Neira Ayuso <pablo@netf=
-ilter.org> wrote:
-> > >
-> > > The patch "netfilter: ipset: fix race condition between swap/destro=
-y
-> > > and kernel side add/del/test", commit 28628fa9 fixes a race conditi=
-on.
-> > > But the synchronize_rcu() added to the swap function unnecessarily =
-slows
-> > > it down: it can safely be moved to destroy and use call_rcu() inste=
-ad.
-> > > Thus we can get back the same performance and preventing the race c=
-ondition
-> > > at the same time.
-[...]
-> > > +static void
-> > > +ip_set_destroy_set_rcu(struct rcu_head *head)
-> > > +{
-> > > +       struct ip_set *set =3D container_of(head, struct ip_set, rc=
-u);
-> > > +
-> > > +       ip_set_destroy_set(set);
-> >=20
-> > Calling ip_set_destroy_set() from BH (rcu callbacks) is not working.
->=20
-> Yeah, it calls cancel_delayed_work_sync() to handle the garbage collect=
-or=20
-> and that can wait. The call can be moved into the main destroy function=
-=20
-> and let the rcu callback do just the minimal job, however it needs a=20
-> restructuring. So please skip this patch now.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/3095adfa6c3d/disk-39369c9a.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/105f20ab46b4/vmlinux-39369c9a.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/2d8afb887806/bzImage-39369c9a.xz
 
-I reworked the patch to work safely with using call_rcu() and still=20
-preventing the race condition. According to my tests the patch works as=20
-intended, but it'd be good to receive feedback that it indeed fixes the=20
-issue properly.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+314c727eef32ba20b65d@syzkaller.appspotmail.com
 
-From 23e85f453da573dd4265e7d1fffd2aeab3369e0d Mon Sep 17 00:00:00 2001
-From: Jozsef Kadlecsik <kadlec@netfilter.org>
-Date: Tue, 16 Jan 2024 17:10:45 +0100
-Subject: [PATCH 1/1] netfilter: ipset: fix performance regression in swap
- operation
+general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+CPU: 1 PID: 14603 Comm: syz-executor.3 Not tainted 6.7.0-syzkaller-04690-g39369c9a6e09 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+RIP: 0010:tipc_udp_nl_dump_remoteip+0x3c7/0xa60 net/tipc/udp_media.c:513
+Code: 48 c1 ea 03 80 3c 02 00 0f 85 df 05 00 00 48 8b 9b 98 00 00 00 48 b8 00 00 00 00 00 fc ff df 4c 8d 7b c8 48 89 da 48 c1 ea 03 <80> 3c 02 00 0f 85 6b 06 00 00 48 8b 03 48 39 d9 4c 8d 70 c8 0f 84
+RSP: 0018:ffffc900160171e8 EFLAGS: 00010246
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffff88804cc52098
+RDX: 0000000000000000 RSI: ffffffff8a288b69 RDI: 0000000000000005
+RBP: ffff888047885780 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000001000 R12: 0000000000000000
+R13: ffffc90016017268 R14: ffff888047885780 R15: ffffffffffffffc8
+FS:  00007f35d634c6c0(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f1f7a57b038 CR3: 000000002bfe0000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ genl_dumpit+0x119/0x220 net/netlink/genetlink.c:1025
+ netlink_dump+0x588/0xca0 net/netlink/af_netlink.c:2264
+ __netlink_dump_start+0x6d0/0x9c0 net/netlink/af_netlink.c:2370
+ genl_family_rcv_msg_dumpit+0x1e1/0x2d0 net/netlink/genetlink.c:1074
+ genl_family_rcv_msg net/netlink/genetlink.c:1190 [inline]
+ genl_rcv_msg+0x470/0x800 net/netlink/genetlink.c:1208
+ netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2543
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1217
+ netlink_unicast_kernel net/netlink/af_netlink.c:1341 [inline]
+ netlink_unicast+0x53b/0x810 net/netlink/af_netlink.c:1367
+ netlink_sendmsg+0x8b7/0xd70 net/netlink/af_netlink.c:1908
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0xd5/0x180 net/socket.c:745
+ ____sys_sendmsg+0x6ac/0x940 net/socket.c:2584
+ ___sys_sendmsg+0x135/0x1d0 net/socket.c:2638
+ __sys_sendmsg+0x117/0x1e0 net/socket.c:2667
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xd3/0x250 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+RIP: 0033:0x7f35d567cda9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f35d634c0c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f35d57abf80 RCX: 00007f35d567cda9
+RDX: 0000000000000000 RSI: 0000000020000340 RDI: 0000000000000003
+RBP: 00007f35d56c947a R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000000b R14: 00007f35d57abf80 R15: 00007ffed090ed98
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:tipc_udp_nl_dump_remoteip+0x3c7/0xa60 net/tipc/udp_media.c:513
+Code: 48 c1 ea 03 80 3c 02 00 0f 85 df 05 00 00 48 8b 9b 98 00 00 00 48 b8 00 00 00 00 00 fc ff df 4c 8d 7b c8 48 89 da 48 c1 ea 03 <80> 3c 02 00 0f 85 6b 06 00 00 48 8b 03 48 39 d9 4c 8d 70 c8 0f 84
+RSP: 0018:ffffc900160171e8 EFLAGS: 00010246
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffff88804cc52098
+RDX: 0000000000000000 RSI: ffffffff8a288b69 RDI: 0000000000000005
+RBP: ffff888047885780 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000001000 R12: 0000000000000000
+R13: ffffc90016017268 R14: ffff888047885780 R15: ffffffffffffffc8
+FS:  00007f35d634c6c0(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fc4601dcf78 CR3: 000000002bfe0000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	48 c1 ea 03          	shr    $0x3,%rdx
+   4:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
+   8:	0f 85 df 05 00 00    	jne    0x5ed
+   e:	48 8b 9b 98 00 00 00 	mov    0x98(%rbx),%rbx
+  15:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+  1c:	fc ff df
+  1f:	4c 8d 7b c8          	lea    -0x38(%rbx),%r15
+  23:	48 89 da             	mov    %rbx,%rdx
+  26:	48 c1 ea 03          	shr    $0x3,%rdx
+* 2a:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
+  2e:	0f 85 6b 06 00 00    	jne    0x69f
+  34:	48 8b 03             	mov    (%rbx),%rax
+  37:	48 39 d9             	cmp    %rbx,%rcx
+  3a:	4c 8d 70 c8          	lea    -0x38(%rax),%r14
+  3e:	0f                   	.byte 0xf
+  3f:	84                   	.byte 0x84
 
-The patch "netfilter: ipset: fix race condition between swap/destroy
-and kernel side add/del/test", commit 28628fa9 fixes a race condition.
-But the synchronize_rcu() added to the swap function unnecessarily slows
-it down: it can safely be moved to destroy and use call_rcu() instead.
 
-Eric Dumazet pointed out that simply calling the destroy functions as
-rcu callback does not work: sets with timeout use garbage collectors
-which need cancelling at destroy which can wait. Therefore the destroy
-functions are split into two: cancelling garbage collectors safely at
-executing the command received by netlink and moving the remaining
-part only into the rcu callback.
-
-Link: https://lore.kernel.org/lkml/C0829B10-EAA6-4809-874E-E1E9C05A8D84@a=
-utomattic.com/
-Fixes: 28628fa952fe ("netfilter: ipset: fix race condition between swap/d=
-estroy and kernel side add/del/test")
-Reported-by: Ale Crismani <ale.crismani@automattic.com>
-Reported-by: David Wang <00107082@163.com
-Signed-off-by: Jozsef Kadlecsik <kadlec@netfilter.org>
 ---
- include/linux/netfilter/ipset/ip_set.h  |  4 +++
- net/netfilter/ipset/ip_set_bitmap_gen.h | 14 ++++++++--
- net/netfilter/ipset/ip_set_core.c       | 37 +++++++++++++++++++------
- net/netfilter/ipset/ip_set_hash_gen.h   | 15 ++++++++--
- net/netfilter/ipset/ip_set_list_set.c   | 13 +++++++--
- 5 files changed, 65 insertions(+), 18 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/include/linux/netfilter/ipset/ip_set.h b/include/linux/netfi=
-lter/ipset/ip_set.h
-index e8c350a3ade1..e9f4f845d760 100644
---- a/include/linux/netfilter/ipset/ip_set.h
-+++ b/include/linux/netfilter/ipset/ip_set.h
-@@ -186,6 +186,8 @@ struct ip_set_type_variant {
- 	/* Return true if "b" set is the same as "a"
- 	 * according to the create set parameters */
- 	bool (*same_set)(const struct ip_set *a, const struct ip_set *b);
-+	/* Cancel ongoing garbage collectors before destroying the set*/
-+	void (*cancel_gc)(struct ip_set *set);
- 	/* Region-locking is used */
- 	bool region_lock;
- };
-@@ -242,6 +244,8 @@ extern void ip_set_type_unregister(struct ip_set_type=
- *set_type);
-=20
- /* A generic IP set */
- struct ip_set {
-+	/* For call_cru in destroy */
-+	struct rcu_head rcu;
- 	/* The name of the set */
- 	char name[IPSET_MAXNAMELEN];
- 	/* Lock protecting the set data */
-diff --git a/net/netfilter/ipset/ip_set_bitmap_gen.h b/net/netfilter/ipse=
-t/ip_set_bitmap_gen.h
-index 26ab0e9612d8..9523104a90da 100644
---- a/net/netfilter/ipset/ip_set_bitmap_gen.h
-+++ b/net/netfilter/ipset/ip_set_bitmap_gen.h
-@@ -28,6 +28,7 @@
- #define mtype_del		IPSET_TOKEN(MTYPE, _del)
- #define mtype_list		IPSET_TOKEN(MTYPE, _list)
- #define mtype_gc		IPSET_TOKEN(MTYPE, _gc)
-+#define mtype_cancel_gc		IPSET_TOKEN(MTYPE, _cancel_gc)
- #define mtype			MTYPE
-=20
- #define get_ext(set, map, id)	((map)->extensions + ((set)->dsize * (id))=
-)
-@@ -57,9 +58,6 @@ mtype_destroy(struct ip_set *set)
- {
- 	struct mtype *map =3D set->data;
-=20
--	if (SET_WITH_TIMEOUT(set))
--		del_timer_sync(&map->gc);
--
- 	if (set->dsize && set->extensions & IPSET_EXT_DESTROY)
- 		mtype_ext_cleanup(set);
- 	ip_set_free(map->members);
-@@ -288,6 +286,15 @@ mtype_gc(struct timer_list *t)
- 	add_timer(&map->gc);
- }
-=20
-+static void
-+mtype_cancel_gc(struct ip_set *set)
-+{
-+	struct mtype *map =3D set->data;
-+
-+	if (SET_WITH_TIMEOUT(set))
-+		del_timer_sync(&map->gc);
-+}
-+
- static const struct ip_set_type_variant mtype =3D {
- 	.kadt	=3D mtype_kadt,
- 	.uadt	=3D mtype_uadt,
-@@ -301,6 +308,7 @@ static const struct ip_set_type_variant mtype =3D {
- 	.head	=3D mtype_head,
- 	.list	=3D mtype_list,
- 	.same_set =3D mtype_same_set,
-+	.cancel_gc =3D mtype_cancel_gc,
- };
-=20
- #endif /* __IP_SET_BITMAP_IP_GEN_H */
-diff --git a/net/netfilter/ipset/ip_set_core.c b/net/netfilter/ipset/ip_s=
-et_core.c
-index 4c133e06be1d..bcaad9c009fe 100644
---- a/net/netfilter/ipset/ip_set_core.c
-+++ b/net/netfilter/ipset/ip_set_core.c
-@@ -1182,6 +1182,14 @@ ip_set_destroy_set(struct ip_set *set)
- 	kfree(set);
- }
-=20
-+static void
-+ip_set_destroy_set_rcu(struct rcu_head *head)
-+{
-+	struct ip_set *set =3D container_of(head, struct ip_set, rcu);
-+
-+	ip_set_destroy_set(set);
-+}
-+
- static int ip_set_destroy(struct sk_buff *skb, const struct nfnl_info *i=
-nfo,
- 			  const struct nlattr * const attr[])
- {
-@@ -1193,8 +1201,6 @@ static int ip_set_destroy(struct sk_buff *skb, cons=
-t struct nfnl_info *info,
- 	if (unlikely(protocol_min_failed(attr)))
- 		return -IPSET_ERR_PROTOCOL;
-=20
--	/* Must wait for flush to be really finished in list:set */
--	rcu_barrier();
-=20
- 	/* Commands are serialized and references are
- 	 * protected by the ip_set_ref_lock.
-@@ -1206,8 +1212,10 @@ static int ip_set_destroy(struct sk_buff *skb, con=
-st struct nfnl_info *info,
- 	 * counter, so if it's already zero, we can proceed
- 	 * without holding the lock.
- 	 */
--	read_lock_bh(&ip_set_ref_lock);
- 	if (!attr[IPSET_ATTR_SETNAME]) {
-+		/* Must wait for flush to be really finished in list:set */
-+		rcu_barrier();
-+		read_lock_bh(&ip_set_ref_lock);
- 		for (i =3D 0; i < inst->ip_set_max; i++) {
- 			s =3D ip_set(inst, i);
- 			if (s && (s->ref || s->ref_netlink)) {
-@@ -1221,6 +1229,8 @@ static int ip_set_destroy(struct sk_buff *skb, cons=
-t struct nfnl_info *info,
- 			s =3D ip_set(inst, i);
- 			if (s) {
- 				ip_set(inst, i) =3D NULL;
-+				/* Must cancel garbage collectors */
-+				s->variant->cancel_gc(s);
- 				ip_set_destroy_set(s);
- 			}
- 		}
-@@ -1228,6 +1238,9 @@ static int ip_set_destroy(struct sk_buff *skb, cons=
-t struct nfnl_info *info,
- 		inst->is_destroyed =3D false;
- 	} else {
- 		u32 flags =3D flag_exist(info->nlh);
-+		u16 features =3D 0;
-+
-+		read_lock_bh(&ip_set_ref_lock);
- 		s =3D find_set_and_id(inst, nla_data(attr[IPSET_ATTR_SETNAME]),
- 				    &i);
- 		if (!s) {
-@@ -1238,10 +1251,16 @@ static int ip_set_destroy(struct sk_buff *skb, co=
-nst struct nfnl_info *info,
- 			ret =3D -IPSET_ERR_BUSY;
- 			goto out;
- 		}
-+		features =3D s->type->features;
- 		ip_set(inst, i) =3D NULL;
- 		read_unlock_bh(&ip_set_ref_lock);
--
--		ip_set_destroy_set(s);
-+		if (features & IPSET_TYPE_NAME) {
-+			/* Must wait for flush to be really finished  */
-+			rcu_barrier();
-+		}
-+		/* Must cancel garbage collectors */
-+		s->variant->cancel_gc(s);
-+		call_rcu(&s->rcu, ip_set_destroy_set_rcu);
- 	}
- 	return 0;
- out:
-@@ -1394,9 +1413,6 @@ static int ip_set_swap(struct sk_buff *skb, const s=
-truct nfnl_info *info,
- 	ip_set(inst, to_id) =3D from;
- 	write_unlock_bh(&ip_set_ref_lock);
-=20
--	/* Make sure all readers of the old set pointers are completed. */
--	synchronize_rcu();
--
- 	return 0;
- }
-=20
-@@ -2409,8 +2425,11 @@ ip_set_fini(void)
- {
- 	nf_unregister_sockopt(&so_set);
- 	nfnetlink_subsys_unregister(&ip_set_netlink_subsys);
--
- 	unregister_pernet_subsys(&ip_set_net_ops);
-+
-+	/* Wait for call_rcu() in destroy */
-+	rcu_barrier();
-+
- 	pr_debug("these are the famous last words\n");
- }
-=20
-diff --git a/net/netfilter/ipset/ip_set_hash_gen.h b/net/netfilter/ipset/=
-ip_set_hash_gen.h
-index 7c2399541771..c62998b46f00 100644
---- a/net/netfilter/ipset/ip_set_hash_gen.h
-+++ b/net/netfilter/ipset/ip_set_hash_gen.h
-@@ -221,6 +221,7 @@ static const union nf_inet_addr zeromask =3D {};
- #undef mtype_gc_do
- #undef mtype_gc
- #undef mtype_gc_init
-+#undef mtype_cancel_gc
- #undef mtype_variant
- #undef mtype_data_match
-=20
-@@ -265,6 +266,7 @@ static const union nf_inet_addr zeromask =3D {};
- #define mtype_gc_do		IPSET_TOKEN(MTYPE, _gc_do)
- #define mtype_gc		IPSET_TOKEN(MTYPE, _gc)
- #define mtype_gc_init		IPSET_TOKEN(MTYPE, _gc_init)
-+#define mtype_cancel_gc		IPSET_TOKEN(MTYPE, _cancel_gc)
- #define mtype_variant		IPSET_TOKEN(MTYPE, _variant)
- #define mtype_data_match	IPSET_TOKEN(MTYPE, _data_match)
-=20
-@@ -449,9 +451,6 @@ mtype_destroy(struct ip_set *set)
- 	struct htype *h =3D set->data;
- 	struct list_head *l, *lt;
-=20
--	if (SET_WITH_TIMEOUT(set))
--		cancel_delayed_work_sync(&h->gc.dwork);
--
- 	mtype_ahash_destroy(set, ipset_dereference_nfnl(h->table), true);
- 	list_for_each_safe(l, lt, &h->ad) {
- 		list_del(l);
-@@ -598,6 +597,15 @@ mtype_gc_init(struct htable_gc *gc)
- 	queue_delayed_work(system_power_efficient_wq, &gc->dwork, HZ);
- }
-=20
-+static void
-+mtype_cancel_gc(struct ip_set *set)
-+{
-+	struct htype *h =3D set->data;
-+
-+	if (SET_WITH_TIMEOUT(set))
-+		cancel_delayed_work_sync(&h->gc.dwork);
-+}
-+
- static int
- mtype_add(struct ip_set *set, void *value, const struct ip_set_ext *ext,
- 	  struct ip_set_ext *mext, u32 flags);
-@@ -1440,6 +1448,7 @@ static const struct ip_set_type_variant mtype_varia=
-nt =3D {
- 	.uref	=3D mtype_uref,
- 	.resize	=3D mtype_resize,
- 	.same_set =3D mtype_same_set,
-+	.cancel_gc =3D mtype_cancel_gc,
- 	.region_lock =3D true,
- };
-=20
-diff --git a/net/netfilter/ipset/ip_set_list_set.c b/net/netfilter/ipset/=
-ip_set_list_set.c
-index e162636525cf..6c3f28bc59b3 100644
---- a/net/netfilter/ipset/ip_set_list_set.c
-+++ b/net/netfilter/ipset/ip_set_list_set.c
-@@ -426,9 +426,6 @@ list_set_destroy(struct ip_set *set)
- 	struct list_set *map =3D set->data;
- 	struct set_elem *e, *n;
-=20
--	if (SET_WITH_TIMEOUT(set))
--		timer_shutdown_sync(&map->gc);
--
- 	list_for_each_entry_safe(e, n, &map->members, list) {
- 		list_del(&e->list);
- 		ip_set_put_byindex(map->net, e->id);
-@@ -545,6 +542,15 @@ list_set_same_set(const struct ip_set *a, const stru=
-ct ip_set *b)
- 	       a->extensions =3D=3D b->extensions;
- }
-=20
-+static void
-+list_set_cancel_gc(struct ip_set *set)
-+{
-+	struct list_set *map =3D set->data;
-+
-+	if (SET_WITH_TIMEOUT(set))
-+		timer_shutdown_sync(&map->gc);
-+}
-+
- static const struct ip_set_type_variant set_variant =3D {
- 	.kadt	=3D list_set_kadt,
- 	.uadt	=3D list_set_uadt,
-@@ -558,6 +564,7 @@ static const struct ip_set_type_variant set_variant =3D=
- {
- 	.head	=3D list_set_head,
- 	.list	=3D list_set_list,
- 	.same_set =3D list_set_same_set,
-+	.cancel_gc =3D list_set_cancel_gc,
- };
-=20
- static void
---=20
-2.39.2
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-Best regards,
-Jozsef
---=20
-E-mail  : kadlec@blackhole.kfki.hu, kadlecsik.jozsef@wigner.hu
-PGP key : https://wigner.hu/~kadlec/pgp_public_key.txt
-Address : Wigner Research Centre for Physics
-          H-1525 Budapest 114, POB. 49, Hungary
---110363376-766840901-1706000622=:2980--
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
