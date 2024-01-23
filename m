@@ -1,91 +1,201 @@
-Return-Path: <netdev+bounces-64918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35D5183788C
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 01:23:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66C678378E2
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 01:25:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6987F1C27219
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 00:23:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CAF61C2762C
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 00:25:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC07312CD8A;
-	Mon, 22 Jan 2024 23:59:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D664144628;
+	Tue, 23 Jan 2024 00:04:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b="m5j53zVB"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="eV3CerKZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F06E12CD83
-	for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 23:59:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E27F323C6
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 00:04:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705967991; cv=none; b=FHgDATKBGRsBHi3r8wcSh4nLGZ0xZ8G5H5AKIB0mj+lPsfHBqyG9j46T3QDlXpxHgSG4XsSPn+AjhoBq+nh6jYJvWwvxXudgvSTOJ8IFAxTRXVM+STS/CX39Emgwt2OUElonIoQF89kFXI/Uhv9fr1Q6NApGRBYgyiSMmmuGK/s=
+	t=1705968280; cv=none; b=NupL/kS46r5IeRiNR/Ajm76dfZ0/nEbV8xq9xRsBVhkED+pKfNlujFvexxRwZiFSdMXxjbZRduDlIrftIHzqKSp/S5PpJ7xdP2OsowmXj+y21luCicYDMuRGMMKkCrpuVVaP11fPPKsxFpCbOK9vQ5ShuQlbM0WVTav/TOive24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705967991; c=relaxed/simple;
-	bh=1cpuXFapHllyU5JZGY5dSnZoVqrMowgjvxAj773vc1g=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=KxZzwcYQnxmE8UcJtENhy8f3Ib2Nky7Lxsa7stlDbzWDoVj+D8RWVQuzo8KEzEl69PUAm2ZFt4KqHoYWRjLxk0X1+Ps1FtByA3FEqq66OPgU1sAXrVKl6TDLG3whvE/oJCBzq3Y2AFaEKHQEc7VPfR4m11gwceSU4I2ETiqfHfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu; spf=pass smtp.mailfrom=umich.edu; dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b=m5j53zVB; arc=none smtp.client-ip=209.85.128.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=umich.edu
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-5f254d1a6daso37498187b3.2
-        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 15:59:48 -0800 (PST)
+	s=arc-20240116; t=1705968280; c=relaxed/simple;
+	bh=8Z+ULs/q4uaFuzdQu2SajzdOoT1NsPPNsx1Mfe0md28=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QUJh0H8dS7olkvVASNPgJuG4FqS72yf3AlHWL0R164nCQTWDb8Vb9aiEr+QRcGWQhxHpnH2lxpFHhB2yOVNuW22TLclDEE80Ic9lCX9JuoLRWLLfaFksaOJxhnGlHz/qwXxHkSkXjSOt/LMWgwi5Wzy1L7TaQyiCrQj0YQhO1qM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=eV3CerKZ; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1d74dce86f7so12884575ad.2
+        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 16:04:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=umich.edu; s=google-2016-06-03; t=1705967988; x=1706572788; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=1cpuXFapHllyU5JZGY5dSnZoVqrMowgjvxAj773vc1g=;
-        b=m5j53zVBJ54WwgO8oRcaMUfffrnFU65XQKVBYajW8BVc9FSGK6ry5kCRW24RMSwP1A
-         sUFCk+3gvWkMiyVwfQgAIqRjmA5jy8GC7aDK/s7lwPPjHryoK132ccD+ckJdovj4FsOB
-         U+ioW4gurU3ILHcTG/R/2rGUDygxlx6+0i35x6gmKVbBcQqhjzT1HpgpMHYXicyVOjqe
-         EtT2bTgwCEWaZyImx/DcD72KM8mbYv6FqZe9AYXALkn2LToGDRI5lsA6KClUsv7Kx64S
-         756uZW+4L6bdPruaHbg1wDJVyUk6PLR30Ivhk1uLhwUw78hbbu7MIv9dFEVwhcMybFoF
-         5Tpg==
+        d=broadcom.com; s=google; t=1705968277; x=1706573077; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=xgfmCkmz6VqNVg7hccbLpNYur17IGmTm4uzzQPE4EUY=;
+        b=eV3CerKZhwI9x4gxtyPsu9NuV0Fb2tRLJa3VnuH4jP9X3MBPYJZdtIwze6uPbYgbTD
+         nq4LQeO93qm1moiZmwOtANf1VqmQxC/fjoBiP8M2LCWH36ynab/o0bptbt366lZHGDU8
+         BT8WY7I8FHKJC+fyVfAt4QQf7QqH4VwC9FMAg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705967988; x=1706572788;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1cpuXFapHllyU5JZGY5dSnZoVqrMowgjvxAj773vc1g=;
-        b=U+JBYrdzPaNj56AjQxahIC05ZmyJuVO374WuSVSWcSol+huQ6oNiM4Ys6K/0ZvAOWm
-         016JRhTjb50zjh5ckci1IUxg7nHqn4wB/xGx6sTFtB2nGP4ajkkQq72Kvl3/Ac8lUQU4
-         d6ikWmWoj0bAuKyTN4/8XJqwphR54R2OXWO/qOcXgAZ7+5CrOB2CmJxVgiWe1ABY10pI
-         nBB/p9XiDGbJmMyvOCnPNbyOUaySxzwgJnS+5bBNieM4oLUTHOrKVRY0c10Pz+p16z5u
-         7/91LCVAXISyfn9UfI7EE7JD/GaFmUwAR0Gp3V5uMB3Nhrv88u713Wtfbyi0wRopstkd
-         IJwA==
-X-Gm-Message-State: AOJu0YznGLVnoYbZfPJrJgwDY8q8d5G0R27M8vBxFBxZRn4EPbYj8A/D
-	7+hNQvkQRxhuLWC3QwTjtcloje7u/bUFq+RW7F6JnYZFpCdFfNGYa8a0JgI7Z7s4GY9XYUmO3YE
-	Fe+FODwo49gQ/mnX8dwyLaKUbb7QOPh+6iGOlkg==
-X-Google-Smtp-Source: AGHT+IEXnljb49I9p7A6olKst+2c/syrXFQTkvCTns3I7EOUunt4MEECpj7JTo0++c2hnOxBxZ0ZT8+Rd+PN5RqIgZI=
-X-Received: by 2002:a81:52c5:0:b0:5ff:55f6:7530 with SMTP id
- g188-20020a8152c5000000b005ff55f67530mr3744078ywb.12.1705967988107; Mon, 22
- Jan 2024 15:59:48 -0800 (PST)
+        d=1e100.net; s=20230601; t=1705968277; x=1706573077;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xgfmCkmz6VqNVg7hccbLpNYur17IGmTm4uzzQPE4EUY=;
+        b=TDmPFyLbzS0h0SXJQxUiKpNalekbqSSzLloHT7H8Z+WZ4BSj26lc/RqRvLHEQxthFJ
+         s2UPOf2ld8Cygdc4zRnz/9T4SHHl4Ms7Xt66RBVkITlzE5xHo9eedjn9HoaIyGGILq0F
+         V7bhY+6/4bVpluv561IFS6jKMQX+7b/HGDKLtbL/KW+8TdKh6TQDPh3cgY005Nv0PTPj
+         /CAAbSj+2HkMok6BPCCatF2oidQ/UDK0ywcWEow5P/jY97sCS0lnqVbkl/g8+/qBConQ
+         sfrNaufPvmAiNdfdvP8zclIAfPxJU32DUVrO6yktrjVFLtrjQMScaOj/qZQKLjaZbiFi
+         2xKg==
+X-Gm-Message-State: AOJu0Yz0/xFmsPGjJJhdTsSv62zGBE/7YVu5UIupFMb17eMPIpdJLy6b
+	ZRsxKt/00UwwFkR7w3SY/zhjZwHmqc6UaCQyWpFZcZLVzFRZ1cB8AjTyQyIcfw==
+X-Google-Smtp-Source: AGHT+IF5yKC8hKNBRzCwOfVpSH7KZaK0Y2BiM8IVrQK6Ra+ueNGnouj9WLbWFBvo3F8qwKPNnXzqHw==
+X-Received: by 2002:a17:903:2487:b0:1d7:6a42:616a with SMTP id p7-20020a170903248700b001d76a42616amr606317plw.114.1705968277246;
+        Mon, 22 Jan 2024 16:04:37 -0800 (PST)
+Received: from [10.62.13.168] ([128.177.82.146])
+        by smtp.gmail.com with ESMTPSA id u7-20020a170902b28700b001d751b1b241sm2359500plr.26.2024.01.22.16.04.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 Jan 2024 16:04:36 -0800 (PST)
+Message-ID: <c01cecef-db06-49d8-aa2e-548908c65861@broadcom.com>
+Date: Mon, 22 Jan 2024 16:04:33 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Trevor Gross <tmgross@umich.edu>
-Date: Mon, 22 Jan 2024 18:59:37 -0500
-Message-ID: <CALNs47v8x8RsV=EOKQnsL3RFycbY9asrq9bBV5z-sLjYYy+AVw@mail.gmail.com>
-Subject: Suggestions for TC Rust Projects
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 7/7] x86/vmware: Add TDX hypercall support
+To: "H. Peter Anvin" <hpa@zytor.com>, Dave Hansen <dave.hansen@intel.com>,
+ linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, bp@alien8.de,
+ dave.hansen@linux.intel.com, mingo@redhat.com, tglx@linutronix.de
+Cc: x86@kernel.org, netdev@vger.kernel.org, richardcochran@gmail.com,
+ linux-input@vger.kernel.org, dmitry.torokhov@gmail.com, zackr@vmware.com,
+ linux-graphics-maintainer@vmware.com, pv-drivers@vmware.com,
+ namit@vmware.com, timothym@vmware.com, akaher@vmware.com, jsipek@vmware.com,
+ dri-devel@lists.freedesktop.org, daniel@ffwll.ch, airlied@gmail.com,
+ tzimmermann@suse.de, mripard@kernel.org, maarten.lankhorst@linux.intel.com,
+ horms@kernel.org, kirill.shutemov@linux.intel.com
+References: <20240109084052.58661-1-amakhalov@vmware.com>
+ <20240109084052.58661-8-amakhalov@vmware.com>
+ <ff370e42-f48b-4c62-9b44-9d4031cd78b0@intel.com>
+ <4CF87BC4-E8C8-4584-A275-5A985D5A18A1@zytor.com>
+Content-Language: en-US
+From: Alexey Makhalov <alexey.makhalov@broadcom.com>
+Autocrypt: addr=alexey.makhalov@broadcom.com; keydata=
+ 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 EuY0
+In-Reply-To: <4CF87BC4-E8C8-4584-A275-5A985D5A18A1@zytor.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Jamal,
 
-At a meeting you mentioned that TC might have some interest in a
-Rust-written component, I assume probably a scheduler or BPF. Is there
-anything specific you have in mind that would be useful?
 
-We are getting more contributors interested in doing Rust work that
-are looking for projects, so just collecting some ideas we can point
-them at.
+On 1/22/24 10:28 AM, H. Peter Anvin wrote:
+> On January 22, 2024 8:32:22 AM PST, Dave Hansen <dave.hansen@intel.com> wrote:
+>> On 1/9/24 00:40, Alexey Makhalov wrote:
+>>> +#ifdef CONFIG_INTEL_TDX_GUEST
+>>> +unsigned long vmware_tdx_hypercall(unsigned long cmd,
+>>> +				   struct tdx_module_args *args)
+>>> +{
+>>> +	if (!hypervisor_is_type(X86_HYPER_VMWARE))
+>>> +		return ULONG_MAX;
+>>> +
+>>> +	if (cmd & ~VMWARE_CMD_MASK) {
+>>> +		pr_warn_once("Out of range command %lx\n", cmd);
+>>> +		return ULONG_MAX;
+>>> +	}
+>>> +
+>>> +	args->r10 = VMWARE_TDX_VENDOR_LEAF;
+>>> +	args->r11 = VMWARE_TDX_HCALL_FUNC;
+>>> +	args->r12 = VMWARE_HYPERVISOR_MAGIC;
+>>> +	args->r13 = cmd;
+>>> +	args->r15 = 0; /* CPL */
+>>> +
+>>> +	__tdx_hypercall(args);
+>>> +
+>>> +	return args->r12;
+>>> +}
+>>> +EXPORT_SYMBOL_GPL(vmware_tdx_hypercall);
+>>> +#endif
+>>
+>> This is the kind of wrapper that I was hoping for.  Thanks.
+>>
+>> Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
+>>
+> 
+> I'm slightly confused by this TBH.
+> 
+> Why are the arguments passed in as a structure, which is modified by the wrapper to boot? This is analogous to a system call interface.
+> 
+> Furthermore, this is an out-of-line function; it should never be called with !X86_HYPER_VMWARE or you are introducing overhead for other hypervisors; I believe a pr_warn_once() is in order at least, just as you have for the out-of-range test.
+> 
 
-Thanks,
-Trevor
+This patch series introduces vmware_hypercall family of functions 
+similar to kvm_hypercall. Similarity: both vmware and kvm 
+implementations are static inline functions and both of them use 
+__tdx_hypercall (global not exported symbol). Difference: kvm_hypercall 
+functions are used _only_ within the kernel, but vmware_hypercall are 
+also used by modules.
+Exporting __tdx_hypercall function is an original Dave's concern.
+So we ended up with exporting wrapper, not generic, but VMware specific 
+with added checks against arbitrary use.
+vmware_tdx_hypercall is not designed for !X86_HYPER_VMWARE callers. But 
+such a calls are not forbidden.
+Arguments in a structure is an API for __tdx_hypercall(). Input and 
+output argument handling are done by vmware_hypercall callers, while 
+VMware specific dress up is inside the wrapper.
+
+Peter, do you think code comments are required to make it clear for the 
+reader?
+
+
 
