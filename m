@@ -1,113 +1,100 @@
-Return-Path: <netdev+bounces-65251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B99E839BB6
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 23:02:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEF5D839BD3
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 23:07:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C213B225A2
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 22:02:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 40860B2747E
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 22:07:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A58B833CCA;
-	Tue, 23 Jan 2024 22:02:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FC5D4EB39;
+	Tue, 23 Jan 2024 22:06:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="W8oT6HUv"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="S0lRAysl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 047334F205
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 22:02:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF52A537F5;
+	Tue, 23 Jan 2024 22:06:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706047371; cv=none; b=cbcxonOAt8NYiXusfsJNmS54k0/pRTjlee7LdkrB9LMLzJ29AAlr9EeqG95kCxtNBqP684VX335FRW0iW/TrnFEjZIKLbbHRVNg7UgFQvirH1/dJXfchXP1gNqYGkt9SN05pnwXuU2BYnaXvgK1oLudjQtTtPWOci1oFOwAb9a8=
+	t=1706047587; cv=none; b=CzSaDZYB6eJpcpzIV4MR6CpihPVC5LDfzVhu9GXd0sy2zam8h66AAjD3cgDfIfyahBRg5FJ/FcfIxsnWDFApfDrH6a6TJPAM+QkXzMimNNxmqt2+i8PTdsqYc4zLeMrvDKIIW+UuQ0Y6JoHORWvJdWVp9OiP9C8Khq6QTAMr+X4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706047371; c=relaxed/simple;
-	bh=HgTRRVjyuzAuc+uFsVWjvlHsJe4nAGYNRCrTr1McRp8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DVTIdq+HAeqwa1G5vTO540lrNkBCzeGFNq9PfGvObKK0qlgbWv6Z9SQST8UPxlOiKlhe9VRJcJPofbtQ6jDc4T14BcPjG06q2pLIwkM9m1t2zi1peIuhOxYCtGuk5cCsGsU/o2WP+XQn2A5oIqnyvxh/UnFmk9XbYldf7yzZDpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=W8oT6HUv; arc=none smtp.client-ip=209.85.128.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-5ff7ec8772dso40678177b3.0
-        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 14:02:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1706047369; x=1706652169; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HgTRRVjyuzAuc+uFsVWjvlHsJe4nAGYNRCrTr1McRp8=;
-        b=W8oT6HUvRfOF/tcgM17M+2Oxv3Pj/o8OpY/Hxn44ZdwyRM8giAFOF3Thxovqe78NPN
-         E11vGjA+hvYOAGv0vIL+jf/WCf/AxReeqVSDgm/CVSH6DD1y4+y7iCUJXgAjy/quCTUq
-         qvDpynfpHBnVV7aJw1D3ul8+DxApOFCXUtdP6RzzQS/kpjPSaUxr1XyUs03rB63mXqS5
-         omhAfOAXmu+YvP9c3I2um8LPopOBRXNz1bA4LK4jmHHcttkUuKEFej6q5ql4O3wkeN/9
-         jwsO5XB5BvvZLCbKKwMvV6nVUqlVnPn4YxApG9cSyC0ql1v908e/UPBinc24x2GaezPc
-         SeQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706047369; x=1706652169;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HgTRRVjyuzAuc+uFsVWjvlHsJe4nAGYNRCrTr1McRp8=;
-        b=M6wHLsUdpsVXPc7GdfWezmkcsUk9iCl5aWRxlRhNajjVizyIByanjLwqf5jKmrg/zV
-         bmpv0zgF6HYc8t/oeT41OfmF6a09SB8YCNI61whCJ8Ex8TDR+yn2PT+VkkvEkzixj0fh
-         PtGemRb4PPrvZ02ZBmJwe/rcUIiNHsNa3de7yEGqBpP33oaMg13qAo8ey9pnJs981imx
-         SwNoEFon1/0Jnq+fzRNOkXysj/CFh3ARmwGlQxm9FTLeddS7Fq84AuThQ/hJQhIVkRbU
-         NtMUxlohFSbvJ1ftGfgJOTgS/+81PMthfWjq/+Oi8UPfFwdCzT8gh8OF63ob+bkR8uGm
-         Dl/A==
-X-Gm-Message-State: AOJu0Yw4qInNefKcmI6HRj/IAPLOvbY2yl7q4sSdCB4rCYwCJm7JxXwN
-	n1k7y67A9twbPA561SsBSmBQjz4xsbh6gtWjlRPZe2Lw5H6JSUev9cy82MGmg0dGvFoMr8YIHAJ
-	9urfzxjDEBHOBa61v1GN/uv3ZYL1p+F8PgySVfeRDcniBn+QAE8E=
-X-Google-Smtp-Source: AGHT+IFbEKDHqQmuehxqhp8FfEkVg8iS6AJ6u08P9ZuFWtI25K4qsjori8s0DwJzbDWn7qVPqEE1EkAPc0omeV6ElPo=
-X-Received: by 2002:a0d:e207:0:b0:5ff:af99:54f2 with SMTP id
- l7-20020a0de207000000b005ffaf9954f2mr4468429ywe.50.1706047368667; Tue, 23 Jan
- 2024 14:02:48 -0800 (PST)
+	s=arc-20240116; t=1706047587; c=relaxed/simple;
+	bh=EBG8FKLDL2yNVWwn82X5TrJOhSSQhARDwLMOkbaC8lQ=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=i2DUCmVDGg53ZK50AQ8rLtZE3Bc68vayRbEWqPCPSEieayqhsWfYWUCuz89h60ynlzQM5wdLuYy2HP9Lw3N6To76rHGyYHeTyhhtA9GfNxzUr+GwlGRd5viUTMQmvrFJNfjLdxI3xR/DmsE0Ucb3MkP88V+YQPhCXDX9ay9C6qA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=S0lRAysl; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=EBG8FKLDL2yNVWwn82X5TrJOhSSQhARDwLMOkbaC8lQ=;
+	t=1706047585; x=1707257185; b=S0lRAysl9QJLH9mzRCts8uJYOAG6U58EfilmPDadRag6sut
+	JoTJCtdYw8mqLFOKAULZUeFfEZV2arWqx6GL5ZfhYbuu6c98OrGX7IFAKcDdb2lquntXq6FbX0SFT
+	FjOCCERgU0sWfHpMI2vCiEz/8gWcutIQRisIJmufWis+4zZJwjxKj5UoAaAFcPZOHzxXTvhkYqLQf
+	mFLT42ZN1ELgJeeJylubU1dy2Y9Q3c0yU5wu+4QCMQr8tK3i1CgXebarjSL04wx368yhK1APVLKRl
+	nszYdWeCD3hwspCMP718/yiwrTvUtGzQt3wI6yvuFFJbfpd/JPpMumaNvaHkMRGQ==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1rSOuT-0000000FG0g-2jwM;
+	Tue, 23 Jan 2024 23:06:22 +0100
+Message-ID: <d6940d0a80fcb522910c433fd3644ed5c524f6d5.camel@sipsolutions.net>
+Subject: Re: pull-request: wireless-2024-01-22
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Kalle Valo <kvalo@kernel.org>, Lukas Bulwahn <lukas.bulwahn@gmail.com>, 
+ netdev@vger.kernel.org, linux-wireless@vger.kernel.org, David Gow
+ <davidgow@google.com>, Brendan Higgins <brendanhiggins@google.com>, Shuah
+ Khan <skhan@linuxfoundation.org>, linux-kselftest@vger.kernel.org, 
+ kunit-dev@googlegroups.com
+Date: Tue, 23 Jan 2024 23:06:20 +0100
+In-Reply-To: <20240123134255.3eef6fd9@kernel.org>
+References: <20240122153434.E0254C433C7@smtp.kernel.org>
+	 <20240123084504.1de9b8ac@kernel.org>
+	 <d4c1a7c715a1f47dc45c5d033822d8f47e304bd4.camel@sipsolutions.net>
+	 <20240123134255.3eef6fd9@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240123214420.25716-1-luizluca@gmail.com> <CAJq09z4H5TmOq4tM1RifGrVQPrSs57dR7yCv=1+gnxZadFobbA@mail.gmail.com>
-In-Reply-To: <CAJq09z4H5TmOq4tM1RifGrVQPrSs57dR7yCv=1+gnxZadFobbA@mail.gmail.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Tue, 23 Jan 2024 23:02:37 +0100
-Message-ID: <CACRpkda=zELXRSvXT98FiQh8jv9xJ3HU_Rn9iJLGzgBWmNeb+g@mail.gmail.com>
-Subject: Re: [PATCH 00/11] net: dsa: realtek: variants to drivers, interfaces
- to a common module
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: netdev@vger.kernel.org, alsi@bang-olufsen.dk, andrew@lunn.ch, 
-	f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	arinc.unal@arinc9.com, ansuelsmth@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-malware-bazaar: not-scanned
 
-On Tue, Jan 23, 2024 at 10:55=E2=80=AFPM Luiz Angelo Daros de Luca
-<luizluca@gmail.com> wrote:
+On Tue, 2024-01-23 at 13:42 -0800, Jakub Kicinski wrote:
+>=20
+> > We're also adding unit tests to iwlwifi (slowly), any idea if we should
+> > enable that here also? It _is_ now possible to build PCI stuff on kunit=
+,
+> > but it requires some additional config options (virt-pci etc.), not sur=
+e
+> > that's desirable here? It doesn't need it at runtime for the tests, of
+> > course.
+>=20
+> but curious to hear about driver testing recommendations.
 
-> Sorry for the mess. The cover-letter broke the subject-prefix I was
-> using. I'll resent using the correct prefix/version.
+Not sure I have any recommendations ... The test we posted is checking
+an invariant (the devinfo array is sorted in the right way); we used to
+have a check for this in the internal driver variant at init time, now
+it's a kunit test and we don't have to carry the delta to upstream here.
 
-Why not check out the "b4" tool? It helps with this kind of
-stuff.
-https://lore.kernel.org/netdev/CACRpkdaXV=3DP7NZZpS8YC67eQ2BDvR+oMzgJcjJ+GW=
-9vFhy+3iQ@mail.gmail.com/
+I think Miri is also working on some additional tests for some driver-
+internal logic though.
 
-It's not very magical, from v4 I would create a new branch:
-b4 prep -n rtl83xx -f v6.8-rc1
-b4 prep --force-version 5
-b4 prep --set-prefixes net-next
-b4 prep --edit cover
-<insert contents of patch 0/11 cover letter>
-then cherry pick the 11 patches on top of that branch
-and next time you b4 send it, it will pop out as v5.
+So not sure, I guess it'd be just like anything else you could use unit
+testing for, certain self-contained parts of the code that don't really
+otherwise need a device, etc.?
 
-OK I know it's a bit of threshold but the b4 threshold is
-really low.
-
-Yours,
-Linus Walleij
+johannes
 
