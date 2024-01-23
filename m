@@ -1,156 +1,147 @@
-Return-Path: <netdev+bounces-65214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23F65839A7B
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 21:44:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A456839ABD
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 22:02:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB24828A7E1
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 20:44:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33102285488
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 21:02:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50C554A3B;
-	Tue, 23 Jan 2024 20:44:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9602538D;
+	Tue, 23 Jan 2024 21:02:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="C6LkV1EI"
+	dkim=pass (1024-bit key) header.d=pwaller.net header.i=@pwaller.net header.b="Ar/aGfIr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from mail.foo.to (mail.foo.to [144.76.29.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251355662;
-	Tue, 23 Jan 2024 20:44:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B291AF9D8
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 21:02:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.29.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706042656; cv=none; b=IqUKdQaNUwpr8DsPmoY4RTP9/wHVNjZQe6q+u27PxEC33T1gvT2/X1jCcYQFTCqVRp/OklZalc2K793tllYVeu+zBQhHBO0zlchHFM0TSlkG6mgZ3I6kIGKXgL/bB8dvBaQ69p+6ZvlZUr9ttRazeJbhhAihoVuN1p3HAeBa2Z0=
+	t=1706043733; cv=none; b=iGQbwLeq9hI7pR60qxWI6ylG8vQyhmFPsl7MdGsGmMkEcNCi72rvKQ1SrABDYQXuCsIoHv+D2X2Fg2SJklIJiBdN3pwPiKNSYGNLWJ/jbk/FHGmBPGpCHVMYwGin2IlqmI5OOqRITem3uwqRdy2vjr53caMLEv0bpIJ7sB9LgNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706042656; c=relaxed/simple;
-	bh=YTYq9NKaF9Qyd5spfDIHdzZzMX2Nn0CsEqHbs7SWNQo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=j7mH4xSl3b7g1H4jV40FnP8dEVY4YQDnfETY6kLCyEt+3pb4TWcDsko0DX3qXkxrVDhEo0HcNGWtN2iWINal+LxDoMgtT1ap1phXdfRzqt2UrEOES6KvdHa/j4OnhljKK5q8zE+tkn1EgxlrOcNGB3RC+WEAXDobIE2Ww6hxFIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=C6LkV1EI; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706042655; x=1737578655;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=YTYq9NKaF9Qyd5spfDIHdzZzMX2Nn0CsEqHbs7SWNQo=;
-  b=C6LkV1EIWCLsYBwDFmHNKwBKMCwhZE5rt2ttdKiYHQyLM3L2L4oGN8QB
-   C7ZuWdXR6AEE1mPiohT2CAJcUiSIgDM/RwoSL577UIrq8ZwoZhY0lyQk4
-   zgm0TpfAZEbKvGFtiE70m1X7YtGBCTfT05fiIJqGS3wgNU+pCsCbXAeJM
-   I1NUe9d1P8Gmk1nvcE8JLQxCv0+0JUdmtO0Y8DkSk8DdIjgOmi7ehYyX4
-   enfa6LoXEURFbwoCFocq0eSoBbAlUmUQuXYL8Z0T/TQhxE+D3MMRIGqJZ
-   E4yspDEdwYywB4qjSvkIbHn4pvPnYCaywUtmv3XE43OV1DTP/xZCrVHvW
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="23114666"
-X-IronPort-AV: E=Sophos;i="6.05,215,1701158400"; 
-   d="scan'208";a="23114666"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2024 12:44:13 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="905365871"
-X-IronPort-AV: E=Sophos;i="6.05,215,1701158400"; 
-   d="scan'208";a="905365871"
-Received: from turnipsi.fi.intel.com (HELO kekkonen.fi.intel.com) ([10.237.72.44])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2024 12:44:07 -0800
-Received: from kekkonen.localdomain (localhost [127.0.0.1])
-	by kekkonen.fi.intel.com (Postfix) with SMTP id 7F17811FAD4;
-	Tue, 23 Jan 2024 22:44:04 +0200 (EET)
-Date: Tue, 23 Jan 2024 20:44:04 +0000
-From: Sakari Ailus <sakari.ailus@linux.intel.com>
-To: Bjorn Helgaas <helgaas@kernel.org>
-Cc: linux-pm@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>,
-	linux-pci@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	Jaroslav Kysela <perex@perex.cz>,
-	Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>,
-	laurent.pinchart@ideasonboard.com, David Airlie <airlied@gmail.com>,
-	Paul Elder <paul.elder@ideasonboard.com>,
-	linux-media@vger.kernel.org,
-	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
-	intel-gfx@lists.freedesktop.org,
-	Lucas De Marchi <lucas.demarchi@intel.com>,
-	Mark Brown <broonie@kernel.org>,
-	Jacek Lawrynowicz <jacek.lawrynowicz@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	intel-xe@lists.freedesktop.org,
-	Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-	Alex Elder <elder@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	linux-sound@vger.kernel.org, Takashi Iwai <tiwai@suse.com>,
-	Daniel Vetter <daniel@ffwll.ch>, netdev@vger.kernel.org
-Subject: Re: [PATCH v4 1/3] pm: runtime: Simplify pm_runtime_get_if_active()
- usage
-Message-ID: <ZbAlFKE_fZ_riRVu@kekkonen.localdomain>
-References: <20240123095642.97303-2-sakari.ailus@linux.intel.com>
- <20240123172423.GA317147@bhelgaas>
+	s=arc-20240116; t=1706043733; c=relaxed/simple;
+	bh=8qHo+ftKJOzaPnKdBKTks7d0X+soiClQ3km+6qGPlLs=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=XLpHM/89yykfKWFHFrxaYj39QtQp6ORHW+LUvCUf1BMDZIoPWw2yIKMRu/1X7l4BjigCvAOEnsb89jGFxst3P7CpDDX72oLbfc+PJSRyMqcPw5h9dj3i0fAVo3uWcFXaboWoVWMIMYABNcwNLDaabBadx72S5dY8rZcbirz0eL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=pwaller.net; spf=pass smtp.mailfrom=pwaller.net; dkim=pass (1024-bit key) header.d=pwaller.net header.i=@pwaller.net header.b=Ar/aGfIr; arc=none smtp.client-ip=144.76.29.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=pwaller.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pwaller.net
+Message-ID: <32a0ccb2-9570-4099-961c-6a53e1a553d7@pwaller.net>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=pwaller.net; s=mail;
+	t=1706043729; bh=8qHo+ftKJOzaPnKdBKTks7d0X+soiClQ3km+6qGPlLs=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=Ar/aGfIrlLn/NRmjolfgyDRbwnHmjLcqr0ccNdDxtzxCidhnRAKMdcb2mu64NMuV3
+	 33JM7fc+nOQQqDSugpfmEU9kaLuBpzk29qjH02T/9eDyQB6To0dHUawb/Rb3DKGlvi
+	 X5sXzgSID1Vlmm73F8UYTm1dpMrPtmxx2itV8AXI=
+Date: Tue, 23 Jan 2024 21:02:09 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240123172423.GA317147@bhelgaas>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [EXT] Aquantia ethernet driver suspend/resume issues
+From: Peter Waller <p@pwaller.net>
+To: Igor Russkikh <irusskikh@marvell.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Netdev <netdev@vger.kernel.org>
+References: <3b607ba8-ef5a-56b3-c907-694c0bde437c@marvell.com>
+ <E8060D65-F6C2-4AF5-AE3F-8ED8A30F95EF@pwaller.net>
+Content-Language: en-US
+In-Reply-To: <E8060D65-F6C2-4AF5-AE3F-8ED8A30F95EF@pwaller.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Bjorn,
+Here's part of the log, I can provide more off list if it helps. - Peter
 
-Thanks for the review.
+<previous boot> Filesystems sync: 0.014 seconds
+<n>.678271 Freezing user space processes
+<n>.678366 Freezing user space processes completed (elapsed 0.001 seconds)
+<n>.678383 OOM killer disabled.
+<n>.678397 Freezing remaining freezable tasks
+<n>.678407 Freezing remaining freezable tasks completed (elapsed 0.000 
+seconds)
+<n>.678423 printk: Suspending console(s) (use no_console_suspend to debug)
+<n>.678437 serial 00:04: disabled
+<n>.678654 queueing ieee80211 work while going to suspend
+<n>.678680 sd 9:0:0:0: [sda] Synchronizing SCSI cache
+<n>.678884 ata10.00: Entering standby power mode
+<n>.678900 atlantic 0000:0c:00.0: AMD-Vi: Event logged [IO_PAGE_FAULT 
+domain=0x0014 address=0xfc80b000 flags=0x0020]
+<n>.679124 atlantic 0000:0c:00.0: AMD-Vi: Event logged [IO_PAGE_FAULT 
+domain=0x0014 address=0xffeae520 flags=0x0020]
+<n>.679270 atlantic 0000:0c:00.0: AMD-Vi: Event logged [IO_PAGE_FAULT 
+domain=0x0014 address=0xfc80c000 flags=0x0020]
+<n>.679411 atlantic 0000:0c:00.0: AMD-Vi: Event logged [IO_PAGE_FAULT 
+domain=0x0014 address=0xffeae530 flags=0x0020]
+<n>.679541 ACPI: EC: interrupt blocked
+<n>.679554 amdgpu 0000:03:00.0: amdgpu: MODE1 reset
+<n>.679682 amdgpu 0000:03:00.0: amdgpu: GPU mode1 reset
+<n>.679803 amdgpu 0000:03:00.0: amdgpu: GPU smu mode1 reset
+<n>.679919 ACPI: PM: Preparing to enter system sleep state S3
+<n>.679931 ACPI: EC: event blocked
+<n>.679942 ACPI: EC: EC stopped
+<n>.679952 ACPI: PM: Saving platform NVS memory
+<n>.679959 Disabling non-boot CPUs ...
+<snip>
+<n>.682471 atlantic 0000:0c:00.0 eno2: atlantic: link change old 1000 new 0
+<snip>
+<n>.687497 PM: suspend exit
 
-On Tue, Jan 23, 2024 at 11:24:23AM -0600, Bjorn Helgaas wrote:
-> On Tue, Jan 23, 2024 at 11:56:42AM +0200, Sakari Ailus wrote:
-> > There are two ways to opportunistically increment a device's runtime PM
-> > usage count, calling either pm_runtime_get_if_active() or
-> > pm_runtime_get_if_in_use(). The former has an argument to tell whether to
-> > ignore the usage count or not, and the latter simply calls the former with
-> > ign_usage_count set to false. The other users that want to ignore the
-> > usage_count will have to explitly set that argument to true which is a bit
-> > cumbersome.
-> > 
-> > To make this function more practical to use, remove the ign_usage_count
-> > argument from the function. The main implementation is renamed as
-> > pm_runtime_get_conditional().
-> > 
-> > Signed-off-by: Sakari Ailus <sakari.ailus@linux.intel.com>
-> > Reviewed-by: Alex Elder <elder@linaro.org> # drivers/net/ipa/ipa_smp2p.c
-> > Reviewed-by: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-> > Acked-by: Takashi Iwai <tiwai@suse.de> # sound/
-> > Reviewed-by: Jacek Lawrynowicz <jacek.lawrynowicz@linux.intel.com> # drivers/accel/ivpu/
-> > Acked-by: Rodrigo Vivi <rodrigo.vivi@intel.com> # drivers/gpu/drm/i915/
-> > Reviewed-by: Rodrigo Vivi <rodrigo.vivi@intel.com>
-> 
-> Acked-by: Bjorn Helgaas <bhelgaas@google.com> # drivers/pci/
-> 
-> - Previous PM history uses "PM: " in the subject lines (not "pm: ").
+On 23/01/2024 15:13, Peter Waller wrote:
+> True, it is a warning rather than a hard crash, though shutdown hangs. Thanks for the workaround.
+>
+> I can provide more dmesg when I’m back at my computer. Do you need the whole thing or is there something in particular you want from it? From memory there isn’t much more in the way of messages that looked connected to me.
+>
+> Sent from my mobile, please excuse brevity
+>
+>> On 23 Jan 2024, at 14:59, Igor Russkikh <irusskikh@marvell.com> wrote:
+>>
+>> ﻿
+>>> On 1/21/2024 10:05 PM, Peter Waller wrote:
+>>> I see a fix for double free [0] landed in 6.7; I've been running that
+>>> for a few days and have hit a resume from suspend issue twice. Stack
+>>> trace looks a little different (via __iommu_dma_map instead of
+>>> __iommu_dma_free), provided below.
+>>>
+>>> I've had resume issues with the atlantic driver since I've had this
+>>> hardware, but it went away for a while and seems as though it may have
+>>> come back with 6.7. (No crashes since logs begin on Dec 15 till Jan 12,
+>>> Upgrade to 6.7; crashes 20th and 21st, though my usage style of the
+>>> system has also varied, maybe crashes are associated with higher memory
+>>> usage?).
+>> Hi Peter,
+>>
+>> Are these hard crashes, or just warnings in dmesg you see?
+>>  From the log you provided it looks like a warning, meaning system is usable
+>> and driver can be restored with `if down/up` sequence.
+>>
+>> If so, then this is somewhat expected, because I'm still looking into
+>> how to refactor this suspend/resume cycle to reduce mem usage.
+>> Permanent workaround would be to reduce rx/tx ring sizes with something like
+>>
+>>     ethtool -G rx 1024 tx 1024
+>>
+>> If its a hard panic, we should look deeper into it.
+>>
+>>> Possibly unrelated but I also see fairly frequent (1 to ten times per
+>>> boot, since logs begin?) messages in my logs of the form "atlantic
+>>> 0000:0c:00.0: AMD-Vi: Event logged [IO_PAGE_FAULT domain=0x0014
+>>> address=0xffce8000 flags=0x0020]".
+>> Seems to be unrelated, but basically indicates HW or FW tries to access unmapped
+>> memory addresses, and iommu catches that.
+>> Full dmesg may help analyze this.
+>>
+>> Regards
+>>   Igor
 
-Oops. I'm not sure why I used lower case. (Maybe I've written too many
-times "media:" prefix to the subject?) I'll fix this in v5.
 
-> 
-> - I don't know whether it's feasible, but it would be nice if the
->   intel_pm_runtime_pm.c rework could be done in one shot instead of
->   being split between patches 1/3 and 2/3.
-> 
->   Maybe it could be a preliminary patch that uses the existing
->   if_active/if_in_use interfaces, followed by the trivial if_active
->   updates in this patch.  I think that would make the history easier
->   to read than having the transitory pm_runtime_get_conditional() in
->   the middle.
-
-I think I'd merge the two patches. The second patch is fairly small, after
-all, and both deal with largely the same code.
-
-> 
-> - Similarly, it would be nice if pm_runtime_get_conditional() never
->   had to be published in pm_runtime.h, instead of being temporarily
->   added there by this patch and then immediately made private by 2/3.
->   Maybe that's not practical, I dunno.
-
--- 
-Regards,
-
-Sakari Ailus
 
