@@ -1,138 +1,115 @@
-Return-Path: <netdev+bounces-65262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 488E4839C6B
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 23:40:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF454839C6D
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 23:41:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AC321C22439
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 22:40:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7813128CBFD
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 22:41:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C21EC537F0;
-	Tue, 23 Jan 2024 22:40:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EE9E53808;
+	Tue, 23 Jan 2024 22:41:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Nnj7jTy9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ID5Mj2TG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91D8551010;
-	Tue, 23 Jan 2024 22:40:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D905753815;
+	Tue, 23 Jan 2024 22:41:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706049636; cv=none; b=bQzyTop+bcFmah4nVLgHqIL+rO4us8EXsXOhL9x96j/MP4mTWCYzu2CYcEuYv7kdJ7b8DDwoiFNt7QOJYfu1p6DOhU4g6bNulni4KEVZhV+fSQF21JiUqX9aOcOLUXER4TIuIEXBBCEaZ0pWQW/fSaymSnxn0zNRDeHwwaaBMKU=
+	t=1706049681; cv=none; b=T6kMKeS8Dy+rUFtzJ7nja9MmjEYEfhd9duNv+OtyZb1U8o81euStghAnL70/mFDfPDsiJ0PdiJe/4/MS3R0fa1nAw69AM1R1oDaTZgF6ya7ZF95mjcnjLfVPDL5YFUXOB5LeSuvEdIpG2N5p9WTA9E5nw7F4q4iUpj21YVhJGso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706049636; c=relaxed/simple;
-	bh=Z/gVOBIyuGeHrB0qusJzDPUINYJVDgoRszKTN0NH9s0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y51A5jGrmoKH5LlYAKc4Ic+GaIg1KbsG//PuSaauml/TX8DWLGg2n1KRvLw9mNTbT1aOZ7uKh5XMto3b6iko990BPPxQQyfMwRGVV96BPCEcb+DiGrGqHHu/sIdB4MAktXTslaAGH1pD0G3MG/ly4GpgQwNm160lrbHW4SIQN2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Nnj7jTy9; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706049635; x=1737585635;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Z/gVOBIyuGeHrB0qusJzDPUINYJVDgoRszKTN0NH9s0=;
-  b=Nnj7jTy9QoK33F0B+UdzyR3BS7WDenry6lephSpBjaV37LgcAmS6CM6b
-   kQnqXtXu8K9z/Mi6eOWJaHmg4DZBPKzeeUi2V466xkG9ITTPn2ayT6bLz
-   NvCVJtFrwcXJajnkX4KUz3eaKKnEtf2l9bNOB6LBh+Z4OL4Bem0xOapUz
-   DREVz3hF44258RZJOtvbHzrE/JLamoaKOz/FDVXTDT4VkTmUDv63lGfXE
-   FJxYbeSPDMC4x1//Sia7CDSntGNS7bUiPCMEkCPa+KCVipRzw0u0Uu8yi
-   Hq5RpDuaQh6srUU+mkRu5+ySmWHLXcqzEkf2KhO9kImTEuDqIZvYFUoLA
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="573954"
-X-IronPort-AV: E=Sophos;i="6.05,215,1701158400"; 
-   d="scan'208";a="573954"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2024 14:40:33 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="876490218"
-X-IronPort-AV: E=Sophos;i="6.05,215,1701158400"; 
-   d="scan'208";a="876490218"
-Received: from turnipsi.fi.intel.com (HELO kekkonen.fi.intel.com) ([10.237.72.44])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2024 14:40:27 -0800
-Received: from kekkonen.localdomain (localhost [127.0.0.1])
-	by kekkonen.fi.intel.com (Postfix) with SMTP id 596D411FB8E;
-	Wed, 24 Jan 2024 00:40:25 +0200 (EET)
-Date: Tue, 23 Jan 2024 22:40:25 +0000
-From: Sakari Ailus <sakari.ailus@linux.intel.com>
-To: Bjorn Helgaas <helgaas@kernel.org>
-Cc: linux-pm@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>,
-	linux-pci@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	Jaroslav Kysela <perex@perex.cz>,
-	Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>,
-	laurent.pinchart@ideasonboard.com, David Airlie <airlied@gmail.com>,
-	Paul Elder <paul.elder@ideasonboard.com>,
-	linux-media@vger.kernel.org,
-	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
-	intel-gfx@lists.freedesktop.org,
-	Lucas De Marchi <lucas.demarchi@intel.com>,
-	Mark Brown <broonie@kernel.org>,
-	Jacek Lawrynowicz <jacek.lawrynowicz@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	intel-xe@lists.freedesktop.org,
-	Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-	Alex Elder <elder@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	linux-sound@vger.kernel.org, Takashi Iwai <tiwai@suse.com>,
-	Daniel Vetter <daniel@ffwll.ch>, netdev@vger.kernel.org
-Subject: Re: [PATCH v4 1/3] pm: runtime: Simplify pm_runtime_get_if_active()
- usage
-Message-ID: <ZbBAWROxRKE8Y8VU@kekkonen.localdomain>
-References: <ZbAlFKE_fZ_riRVu@kekkonen.localdomain>
- <20240123214801.GA330312@bhelgaas>
+	s=arc-20240116; t=1706049681; c=relaxed/simple;
+	bh=KBDvm6jR3jzfuV1y7xgwPcuBi4NbghpqGKRgTpdaYA0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=iAXyhE05Jd4Buz6p3cm7XCHcTjvbPFpUVLct3sD6V4vhQf+hDyZAx0XdxPUriOyv68+1NOUEhzkvHvQdatgJHy8Y5I5xSOcN+oyi8dU7dkIPjPBlMtDz195yw04QHqktOGRUL23MkfL3acPksYnKO1Dxl2PaZ+EqPcy/N84Xy/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ID5Mj2TG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5D1F8C433F1;
+	Tue, 23 Jan 2024 22:41:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706049681;
+	bh=KBDvm6jR3jzfuV1y7xgwPcuBi4NbghpqGKRgTpdaYA0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ID5Mj2TG0vzsElzcLaMMnAeMTMVOy3C7JHQmAlFvDkTN6e51X3uYJw58Msqy0vT1P
+	 Sh2qQipu6ey19zHf7Lg3RNlPjzBpjW9T/P2fKyDQpxbrBMstepn64I2VFf5FraHQ3A
+	 gk5JYjZY+mJPUZfaTzY/eX6l2/BZLpOitxIdeHie+fA7QKeQAQQlgv5PU9AjolshuV
+	 V+hKnmz6hxJoi6WKcMT55N3wLRzhvfIg4H5NTXp4KeRzgtPJ/QIv4bep2o/UXBwg/5
+	 3z7lS0DKBMV4mgimBuNujDHL4xl747fdAY6S1tla2VhN+eJmR9u8yGYr+L95BzmT3A
+	 OyhtMLfb/pCyA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 489EBDFF761;
+	Tue, 23 Jan 2024 22:41:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240123214801.GA330312@bhelgaas>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf] riscv,
+ bpf: Fix unpredictable kernel crash about RV64 struct_ops
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170604968128.538.9171637206468068779.git-patchwork-notify@kernel.org>
+Date: Tue, 23 Jan 2024 22:41:21 +0000
+References: <20240123023207.1917284-1-pulehui@huaweicloud.com>
+In-Reply-To: <20240123023207.1917284-1-pulehui@huaweicloud.com>
+To: Pu Lehui <pulehui@huaweicloud.com>
+Cc: bpf@vger.kernel.org, linux-riscv@lists.infradead.org,
+ netdev@vger.kernel.org, bjorn@kernel.org, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
+ song@kernel.org, yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@google.com, haoluo@google.com, jolsa@kernel.org, palmer@dabbelt.com,
+ luke.r.nels@gmail.com, pulehui@huawei.com
 
-On Tue, Jan 23, 2024 at 03:48:01PM -0600, Bjorn Helgaas wrote:
-> On Tue, Jan 23, 2024 at 08:44:04PM +0000, Sakari Ailus wrote:
-> > On Tue, Jan 23, 2024 at 11:24:23AM -0600, Bjorn Helgaas wrote:
-> > ...
+Hello:
+
+This patch was applied to bpf/bpf.git (master)
+by Daniel Borkmann <daniel@iogearbox.net>:
+
+On Tue, 23 Jan 2024 02:32:07 +0000 you wrote:
+> From: Pu Lehui <pulehui@huawei.com>
 > 
-> > > - I don't know whether it's feasible, but it would be nice if the
-> > >   intel_pm_runtime_pm.c rework could be done in one shot instead of
-> > >   being split between patches 1/3 and 2/3.
-> > > 
-> > >   Maybe it could be a preliminary patch that uses the existing
-> > >   if_active/if_in_use interfaces, followed by the trivial if_active
-> > >   updates in this patch.  I think that would make the history easier
-> > >   to read than having the transitory pm_runtime_get_conditional() in
-> > >   the middle.
-> > 
-> > I think I'd merge the two patches. The second patch is fairly small, after
-> > all, and both deal with largely the same code.
+> We encountered a kernel crash triggered by the bpf_tcp_ca testcase as
+> show below:
 > 
-> I'm not sure which two patches you mean, but the fact that two patches
-> deal with largely the same code is not necessarily an argument for
-> merging them.  From a reviewing perspective, it's nice if a patch like
-
-Patches 1 and 2. The third patch introduces a new Runtime PM API function.
-
-> 1/3, where it's largely mechanical and easy to review, is separated
-> from patches that make more substantive changes.
+> Unable to handle kernel paging request at virtual address ff60000088554500
+> Oops [#1]
+> ...
+> CPU: 3 PID: 458 Comm: test_progs Tainted: G           OE      6.8.0-rc1-kselftest_plain #1
+> Hardware name: riscv-virtio,qemu (DT)
+> epc : 0xff60000088554500
+>  ra : tcp_ack+0x288/0x1232
+> epc : ff60000088554500 ra : ffffffff80cc7166 sp : ff2000000117ba50
+>  gp : ffffffff82587b60 tp : ff60000087be0040 t0 : ff60000088554500
+>  t1 : ffffffff801ed24e t2 : 0000000000000000 s0 : ff2000000117bbc0
+>  s1 : 0000000000000500 a0 : ff20000000691000 a1 : 0000000000000018
+>  a2 : 0000000000000001 a3 : ff60000087be03a0 a4 : 0000000000000000
+>  a5 : 0000000000000000 a6 : 0000000000000021 a7 : ffffffff8263f880
+>  s2 : 000000004ac3c13b s3 : 000000004ac3c13a s4 : 0000000000008200
+>  s5 : 0000000000000001 s6 : 0000000000000104 s7 : ff2000000117bb00
+>  s8 : ff600000885544c0 s9 : 0000000000000000 s10: ff60000086ff0b80
+>  s11: 000055557983a9c0 t3 : 0000000000000000 t4 : 000000000000ffc4
+>  t5 : ffffffff8154f170 t6 : 0000000000000030
+> status: 0000000200000120 badaddr: ff60000088554500 cause: 000000000000000c
+> Code: c796 67d7 0000 0000 0052 0002 c13b 4ac3 0000 0000 (0001) 0000
 > 
-> That's why I think it'd be nice if the "interesting"
-> intel_pm_runtime_pm.c changes were all in the same patch, and ideally,
-> if that patch *only* touched intel_pm_runtime_pm.c.
+> [...]
 
-I don't think squashing the second patch to the first really changes this
-meaningfully: the i915 driver simply needs both
-pm_runtime_get_if_{active,in_use}, and this is what the patch does to other
-drivers already. Making the pm_runtime_get_conditional static would also
-fit for the first patch if the desire is to not to introduce it at all.
+Here is the summary with links:
+  - [bpf] riscv, bpf: Fix unpredictable kernel crash about RV64 struct_ops
+    https://git.kernel.org/bpf/bpf/c/1732ebc4a261
 
+You are awesome, thank you!
 -- 
-Sakari Ailus
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
