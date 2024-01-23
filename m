@@ -1,83 +1,71 @@
-Return-Path: <netdev+bounces-64965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A3FF838868
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 08:59:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7F0B8388AD
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 09:17:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C7DBB20E02
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 07:59:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9782BB2504D
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 08:17:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65B2E5646A;
-	Tue, 23 Jan 2024 07:59:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 595B556478;
+	Tue, 23 Jan 2024 08:17:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RP433jtX"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="OO8tkWyc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB05255C2B
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 07:59:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33E592AE91;
+	Tue, 23 Jan 2024 08:16:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705996767; cv=none; b=BIRv6D0n1LW1LJFV/Aa0CHio91BjZVN0yECur0oI5ZNOvBpVVHyvxy2VbQBUw9PTsY7K8Fl/I5wXrQxT0IMXfOyC1pTYscbv3uSen6cKKo+238B2FIfu5/pU51zCrNFy31d0G3whm/RAD0WcxPyKBcbUp5d0xEeSKpQA/pTl6fg=
+	t=1705997821; cv=none; b=lb19rgxvFEqguVdXb/cdD7eHIIUnvN10XQZD8t12mEmGArEPItSndbRCjD7qfEjX+JiczYEpIrZ4K34oGDaiTlsyVW0mtRYNAaeJiIGFo3qQReU2UdorqCoBf3l0N51C3TowYHfxUcxHdPZ3cM15kSk4qc8DsUJCb2G9FvP9rPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705996767; c=relaxed/simple;
-	bh=bleoSiQ4BR7vrLsbl4t2wu+UvvqvVLMyipfdF/khNMk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qPCuo5BGmcWPeVl0BCD/geey7rH5QNXH0+ujNa1ZV64wZwqSXhrKsMZ2il8g0nNB12K/p+R45Fux1lIw2K7IJgwjkq53qPDsxiZ6QeImAZ/oC8mzIKi0AoarBN+bMONUQ/qgJnnta9vgSqkSNOdyiuKLERpe5GJVWyg6xv+AX5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RP433jtX; arc=none smtp.client-ip=209.85.167.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-3bd932a0cafso2593705b6e.1
-        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 23:59:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705996764; x=1706601564; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3iSPcnATT2PbHUelo74Nd+NAicpTOT2YtFBYZ2iKPCs=;
-        b=RP433jtXS/X32e4MrmyF8I5zWTYr9U3K+3IohQLIf6Pj6xYHzcfIgkIKrp//AE/7Ew
-         HBrDAbWE7E7mDqYC0w4CD1LkLvCmwDja7OGVKKaZ7uIkGl2xreEYwX4OMkQXKrftzDXB
-         Tmsgly2Rpug+FiE8jGan3aLokwyccblPTYzSB7NKlQhQnfXk8oZrsJ+gSYyMJZ5ftkOb
-         zxh9vhcKRWzBAMJS4Zwwb1rwDdxKNMYOlmQzfIq5BV77M38IYcUP+6EjrLwm4J1GIUZI
-         +Leo6ud2ETJk0KT3Twv76heVJGJwqSXfP/OeLD0cg5hUGsbyK8LnkbSNflWtFkgyLndp
-         SwuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705996764; x=1706601564;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3iSPcnATT2PbHUelo74Nd+NAicpTOT2YtFBYZ2iKPCs=;
-        b=lvAszXDiFbtyNCYMre9O5DFX5kv8oQWA38oInPdzP92KKrCbvxeVWZxDD8wN3CTsbS
-         7bS3G6+Uvs/0EOcukBxrlbq/SdAitJl7CZbGX4Nf/KiAW6FUBl5e9LHwMMZGC0VLMssP
-         J96sTKfwB/4ehH7i+PSfq6d3i4PPdmLuDNozorPzRvU0NVNDzTxxwmuietBhKP5+3doz
-         EJ/C6ItsQ4erdlNcTNha399G9/TT3MXO0HEc03Z+cbm5rIt3rBtdFv3xu7/cfat0Xl8Z
-         8TbsmQ5twDd4w2ID7hu8ILxzpagAEEtQc2HqhGQT1yzxb74ImnTz98pppcUtuoQ+kNgk
-         vclQ==
-X-Gm-Message-State: AOJu0YyjRtrJvOXuUtDiiMHUkGaxMVZI1rJK9tYH7R+lA64V4aCJvrZ0
-	PzNypOg7u8bF+s3USL0tp4rduRVbW+RkhFmB7zaM9JV3xRM8Jm8jcHx0JMq7gTvmLg==
-X-Google-Smtp-Source: AGHT+IGzx2REsqTLNm9n5s4KJN6Namw1loUF1WmLabHZFLNhWBO+lsYhW19PURDbVNdvgkLfjXSs3w==
-X-Received: by 2002:a05:6808:118b:b0:3bd:587c:5b6 with SMTP id j11-20020a056808118b00b003bd587c05b6mr4436783oil.61.1705996764061;
-        Mon, 22 Jan 2024 23:59:24 -0800 (PST)
-Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id c4-20020a056a00008400b006dabe67bb85sm10880708pfj.216.2024.01.22.23.59.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jan 2024 23:59:23 -0800 (PST)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Jay Vosburgh <j.vosburgh@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Liang Li <liali@redhat.com>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Jay Vosburgh <jay.vosburgh@canonical.com>
-Subject: [PATCH net] selftests: bonding: do not test arp/ns target with mode balance-alb/tlb
-Date: Tue, 23 Jan 2024 15:59:17 +0800
-Message-ID: <20240123075917.1576360-1-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1705997821; c=relaxed/simple;
+	bh=yL0/rRUOOruG/OmQchTn5YSdcONtJQUhMYQ7Vuqu9Mc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ha8ynrBhc9YCJpYhAYm0oEJs4pQD/WJU+Go5MfwYCOaepKTdQiPrTr2AP9VaEnltqBdcv9aUz+Ct6DFGT3Kc7GxADhNpsfNfQh3iMbs0vEEjcTfOStqZPkNRkxeLqyY99Wd7yY8UiG2sfqVXUWs9wC3F4lk+4B7d7R3HQ/iDAGk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=OO8tkWyc; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1705997819; x=1737533819;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=yL0/rRUOOruG/OmQchTn5YSdcONtJQUhMYQ7Vuqu9Mc=;
+  b=OO8tkWyc+zbu3GDlAGqRlIexhJWbtmruLs8COxEs7IiAbn2PM6wDe4T6
+   LBTQCqH2Z5IQbwn4ZccTUNCVHCymKigp2dYc9n4AKlNbtHgLGiS7xqB7i
+   YQl7Dtg5O2CfjBH2O0Fy65imTrOGrDgq09F2bRjHfPmltF7mCeMBAoLHY
+   4WCkUycYfJNuZAr1+sSb7gDucpRTyourBOQ3A/oJa3UDtLHgWtxDrGeLW
+   0vOcPB0YCpG6sJOheheJ/vn2uuRzuR2BSMQ+YYtZNNK7ZfUdqLhD6fAM9
+   2MS4np6sNzk5L+1kSqBXYa1EYin0t+isY99yVentGzyMAync0Ts1yPB/Q
+   g==;
+X-CSE-ConnectionGUID: k8HP9AtUSy+tUHKq9DRptg==
+X-CSE-MsgGUID: hFw3hhdgQVeUod1aWPjpow==
+X-IronPort-AV: E=Sophos;i="6.05,213,1701154800"; 
+   d="scan'208";a="16393439"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Jan 2024 01:16:57 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 23 Jan 2024 01:16:29 -0700
+Received: from DEN-DL-M31836.microsemi.net (10.10.85.11) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Tue, 23 Jan 2024 01:16:27 -0700
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<UNGLinuxDriver@microchip.com>, Horatiu Vultur <horatiu.vultur@microchip.com>
+Subject: [PATCH net] net: lan966x: Fix port configuration when using SGMII interface
+Date: Tue, 23 Jan 2024 09:15:14 +0100
+Message-ID: <20240123081514.3625293-1-horatiu.vultur@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,54 +73,33 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-The prio_arp/ns tests hard code the mode to active-backup. At the same
-time, The balance-alb/tlb modes do not support arp/ns target. So remove
-the prio_arp/ns tests from the loop and only test active-backup mode.
+In case the interface between the MAC and the PHY is SGMII, then the bit
+GIGA_MODE on the MAC side needs to be set regardless of the speed at
+which it is running.
 
-Fixes: 481b56e0391e ("selftests: bonding: re-format bond option tests")
-Reported-by: Jay Vosburgh <jay.vosburgh@canonical.com>
-Closes: https://lore.kernel.org/netdev/17415.1705965957@famine/
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+Fixes: d28d6d2e37d1 ("net: lan966x: add port module support")
+Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
 ---
- .../testing/selftests/drivers/net/bonding/bond_options.sh | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/microchip/lan966x/lan966x_port.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/drivers/net/bonding/bond_options.sh b/tools/testing/selftests/drivers/net/bonding/bond_options.sh
-index c54d1697f439..d508486cc0bd 100755
---- a/tools/testing/selftests/drivers/net/bonding/bond_options.sh
-+++ b/tools/testing/selftests/drivers/net/bonding/bond_options.sh
-@@ -162,7 +162,7 @@ prio_arp()
- 	local mode=$1
+diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_port.c b/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
+index 92108d354051c..975a6d64a2e18 100644
+--- a/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
++++ b/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
+@@ -170,7 +170,8 @@ static void lan966x_port_link_up(struct lan966x_port *port)
+ 	/* Also the GIGA_MODE_ENA(1) needs to be set regardless of the
+ 	 * port speed for QSGMII ports.
+ 	 */
+-	if (phy_interface_num_ports(config->portmode) == 4)
++	if (phy_interface_num_ports(config->portmode) == 4 ||
++	    config->portmode == PHY_INTERFACE_MODE_SGMII)
+ 		mode = DEV_MAC_MODE_CFG_GIGA_MODE_ENA_SET(1);
  
- 	for primary_reselect in 0 1 2; do
--		prio_test "mode active-backup arp_interval 100 arp_ip_target ${g_ip4} primary eth1 primary_reselect $primary_reselect"
-+		prio_test "mode $mode arp_interval 100 arp_ip_target ${g_ip4} primary eth1 primary_reselect $primary_reselect"
- 		log_test "prio" "$mode arp_ip_target primary_reselect $primary_reselect"
- 	done
- }
-@@ -178,7 +178,7 @@ prio_ns()
- 	fi
- 
- 	for primary_reselect in 0 1 2; do
--		prio_test "mode active-backup arp_interval 100 ns_ip6_target ${g_ip6} primary eth1 primary_reselect $primary_reselect"
-+		prio_test "mode $mode arp_interval 100 ns_ip6_target ${g_ip6} primary eth1 primary_reselect $primary_reselect"
- 		log_test "prio" "$mode ns_ip6_target primary_reselect $primary_reselect"
- 	done
- }
-@@ -194,9 +194,9 @@ prio()
- 
- 	for mode in $modes; do
- 		prio_miimon $mode
--		prio_arp $mode
--		prio_ns $mode
- 	done
-+	prio_arp "active-backup"
-+	prio_ns "active-backup"
- }
- 
- arp_validate_test()
+ 	lan_wr(config->duplex | mode,
 -- 
-2.43.0
+2.34.1
 
 
