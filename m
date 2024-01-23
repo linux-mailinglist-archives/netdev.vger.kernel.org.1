@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-65264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87EE0839C79
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 23:43:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 50D39839CA2
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 00:00:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 23C361F24989
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 22:43:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E41AC1F2651D
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 23:00:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18DCC5380E;
-	Tue, 23 Jan 2024 22:43:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36D324120C;
+	Tue, 23 Jan 2024 23:00:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="knFiS+ei"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="eB+dbyzQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0A86537E4;
-	Tue, 23 Jan 2024 22:43:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7642DDB5;
+	Tue, 23 Jan 2024 22:59:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706049807; cv=none; b=LtaRAgb1kgun0Qa7LNQzYVCdLq9WcZyQzCBBKLYjRU9QkksCxAp1z+ayr04tSLTqTNngovp2wuUQk7mBfDKhy99VN6smN6I9ZDcU+dDg71GrQH7v26UlkDA4AFPdiGYuQ/Yk1IT8gBDarEK2kuG9kg/pmNV8Lq0nj+j3ytRR8Gc=
+	t=1706050802; cv=none; b=QurVKzUWbU8qatWBH50Fe2EHMBA1ITo8J5+w+dlTCMDcAQLFFkeDg0Eg41Zcou6g+GE9CISi7HDsd3TqznE+3QOagVVUZr7BX+Nzoin7D3yGcl/mMG8BC3MUx+fILTYTHvdcmt7SSzep06P83YkP1PJOPfbEQ31ad6SHhaCFvE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706049807; c=relaxed/simple;
-	bh=OZ+avPulNNisVb7nIuTgyy31n+guDcyVHhHC4vVCTik=;
+	s=arc-20240116; t=1706050802; c=relaxed/simple;
+	bh=8xwlc7MGcqCvMRjkHOZubnZy5/7P87qpf0FVev832cM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N8NTqwXN1qi9Acv5z83bowCms3xOUMvSBlChNNkwrKMPKlVBmWdKVpMA0kZKu5Ou5ZbvpccLopPEt9XL1/KOF9WovJt3p0B3GMzKnV6xRwL1t+vEAdqQLtfoXnyZtPqGvugHpPBP6Kq3kP5dMTRqUyPWp1J16xxYyMiKmVP3JAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=knFiS+ei; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B3A3C433C7;
-	Tue, 23 Jan 2024 22:43:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706049806;
-	bh=OZ+avPulNNisVb7nIuTgyy31n+guDcyVHhHC4vVCTik=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=knFiS+einGgUrPzfkPnTaPoUq2xcsI9VXuTrwTmxVfuEHPua8Dz+ORgpHeU9/np1Q
-	 SeyEj6blGzq1OXkZ8K2JE2leSz0gRcl88CpS32bGggNtuE+S5Z3NYnTj5vKhmFmm5c
-	 PRW4QFjNCeFTKqGvD2k5QgVO07arVLWIlN7QwcTa9dx38JGnCjvCDYpafEDluoEaIC
-	 PqPdNXKQNTqaqnAJhNwVadHhAuKBxqhM4PmtlnQEm8usfgAjRd8lXea8S1aKyhMaJZ
-	 4Tx7GfpTpdo6z1Jf270T9er5Nqvk1t8Q9JO2O+gO4LX+NHhKGZ3jcRbYqmdctN8dXo
-	 KdotvPM66vx5Q==
-Date: Tue, 23 Jan 2024 16:43:24 -0600
-From: Rob Herring <robh@kernel.org>
-To: Elad Nachman <enachman@marvell.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [EXT] [PATCH net-next] net: marvell,prestera: Fix example PCI
- bus addressing
-Message-ID: <20240123224324.GA2181680-robh@kernel.org>
-References: <20240122173514.935742-1-robh@kernel.org>
- <BN9PR18MB4251944C1AE34057DACD7556DB742@BN9PR18MB4251.namprd18.prod.outlook.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=K51Zrpm+sz3hFIVQIAM+vhYdqTxO1k4QebxB8rRF6uoyvH2WCjG+oqWRK+m5iywN0xiuSH51LN5iVuIXaI9G49kS/v8fq9NgkhNGv3BKzT61Vy4tOMERA4hBaM5QVlQnZ/OELSw05H9RZKtq+np8R055PE6UI4afn9FH+bwc3Hs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=eB+dbyzQ; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=p+okpn5rGPjYb8kKdD5Ih+F44qguZfi/1iKVDlb0xSo=; b=eB+dbyzQt+aQZ0ZIzJ4XZAHFEC
+	JbMo0Beke50gs/spknsDN7GT1X1vBnYI3fjPFZB+j8twrEpuVdz5fKPVdcuwvAZdvAIcdMtGbXlQE
+	u7Brxbjy491kA5LTOd4Caxu8uD0DrssDkxdPcTcX2GlhiMLUT2hdSDCZiGMz3yFg496Y=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rSPkB-005t0I-GU; Tue, 23 Jan 2024 23:59:47 +0100
+Date: Tue, 23 Jan 2024 23:59:47 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Tim Menninger <tmenninger@purestorage.com>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>,
+	netdev-maintainers <edumazet@google.com>, kuba@kernel.org,
+	pabeni@redhat.com, davem@davemloft.net,
+	netdev <netdev@vger.kernel.org>, stable@vger.kernel.org
+Subject: Re: [PATCH net v1] net: dsa: mv88e6xxx: Make unsupported C45 reads
+ return 0xffff
+Message-ID: <32d96dd3-7fbb-49e5-8b05-269eac1ac80d@lunn.ch>
+References: <20240120192125.1340857-1-andrew@lunn.ch>
+ <20240122122457.jt6xgvbiffhmmksr@skbuf>
+ <0d9e0412-6ca3-407a-b2a1-b18ab4c20714@lunn.ch>
+ <CAO-L_45iCb+TFMSqZJex-mZKfopBXxR=KH5aV4Wfx5eF5_N_8Q@mail.gmail.com>
+ <5f449e47-fc39-48c3-a784-77b808c31050@lunn.ch>
+ <CAO-L_46Ltq0Ju_BO+rfvAbe7F=T6m0hZZKu9gzv7=bMV5n6naw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,91 +66,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <BN9PR18MB4251944C1AE34057DACD7556DB742@BN9PR18MB4251.namprd18.prod.outlook.com>
+In-Reply-To: <CAO-L_46Ltq0Ju_BO+rfvAbe7F=T6m0hZZKu9gzv7=bMV5n6naw@mail.gmail.com>
 
-On Tue, Jan 23, 2024 at 09:59:46AM +0000, Elad Nachman wrote:
-> 
-> 
-> > -----Original Message-----
-> > From: Rob Herring <robh@kernel.org>
-> > Sent: Monday, January 22, 2024 7:35 PM
-> > To: David S. Miller <davem@davemloft.net>; Eric Dumazet
-> > <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni
-> > <pabeni@redhat.com>; Krzysztof Kozlowski
-> > <krzysztof.kozlowski+dt@linaro.org>; Conor Dooley <conor+dt@kernel.org>;
-> > Miquel Raynal <miquel.raynal@bootlin.com>
-> > Cc: netdev@vger.kernel.org; devicetree@vger.kernel.org; linux-
-> > kernel@vger.kernel.org
-> > Subject: [EXT] [PATCH net-next] net: marvell,prestera: Fix example PCI bus
-> > addressing
-> > 
-> > External Email
-> > 
-> > ----------------------------------------------------------------------
-> > The example for PCI devices has some addressing errors. 'reg' is written as if
-> > the parent bus is PCI, but the default bus for examples is 1 address and size
-> > cell. 'ranges' is defining config space with a size of 0. Generally, config space
-> > should not be defined in 'ranges', only PCI memory and I/O spaces. Fix these
-> > issues by updating the values with made-up, but valid values.
-> > 
-> > This was uncovered with recent dtschema changes.
-> > 
-> > Signed-off-by: Rob Herring <robh@kernel.org>
-> > ---
-> >  Documentation/devicetree/bindings/net/marvell,prestera.yaml | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/Documentation/devicetree/bindings/net/marvell,prestera.yaml
-> > b/Documentation/devicetree/bindings/net/marvell,prestera.yaml
-> > index 5ea8b73663a5..16ff892f7bbd 100644
-> > --- a/Documentation/devicetree/bindings/net/marvell,prestera.yaml
-> > +++ b/Documentation/devicetree/bindings/net/marvell,prestera.yaml
-> > @@ -78,8 +78,8 @@ examples:
-> >      pcie@0 {
-> >          #address-cells = <3>;
-> >          #size-cells = <2>;
-> > -        ranges = <0x0 0x0 0x0 0x0 0x0 0x0>;
-> > -        reg = <0x0 0x0 0x0 0x0 0x0 0x0>;
-> > +        ranges = <0x02000000 0x0 0x100000 0x10000000 0x0 0x0>;
-> > +        reg = <0x0 0x1000>;
-> >          device_type = "pci";
-> > 
-> >          switch@0,0 {
-> > --
-> > 2.43.0
-> > 
-> 
-> This yaml has a mix-up of device P/N (belonging to AC3, BC2) and PCIe 
-> IDs (belonging to AC3X, Aldrin2)
-> Looks like a part of the yaml was updated, and another part was not
-> 
-> There is a reference here of actual usage of prestera switch device:
-> https://github.com/dentproject/linux/blob/dent-linux-5.15.y/arch/arm64/boot/dts/marvell/accton-as4564-26p.dts
+> Does that mean if there's a device there but it doesn't support C45 (no
+> phy_read_c45), it will now return ENODEV?
 
-That doesn't match upstream at all...
+Yes, mv88e6xxx_mdio_read_c45() will return -ENODEV if
+chip->info->ops->phy_read_c45 is NULL. That will cause the scan of
+that address to immediately skip to the next address. This is old
+behaviour for C22:
 
-> 
-> So actual ranges and reg could be used instead of made up ones.
-> 
-> But the actual real life dts places the prestera at the top level of 
-> the dts, not under pci.
-> 
-> I am not aware of any dts/dtsi using such kind of switch node under 
-> pcie node, similar to the example given in the yaml file, and did not 
-> manage to find any under latest linux-next for both arm and arm64 dts 
-> directories (please correct me here if I am wrong).
+commit 02a6efcab675fe32815d824837784c3f42a7d892
+Author: Alexandre Belloni <alexandre.belloni@bootlin.com>
+Date:   Tue Apr 24 18:09:04 2018 +0200
 
-Don't know. It seems plausible.
+    net: phy: allow scanning busses with missing phys
+    
+    Some MDIO busses will error out when trying to read a phy address with no
+    phy present at that address. In that case, probing the bus will fail
+    because __mdiobus_register() is scanning the bus for all possible phys
+    addresses.
+    
+    In case MII_PHYSID1 returns -EIO or -ENODEV, consider there is no phy at
+    this address and set the phy ID to 0xffffffff which is then properly
+    handled in get_phy_device().
 
-> 
-> So the question here is if this pci example really necessary for the 
-> prestera device, or can be removed altogether (which is what I think is best to do).
+And there are a few MDIO bus drivers which make use of this, e.g.
 
-Miquel's commit adding indicates such devices exist. Why would he add 
-them otherwise?
+static int lan9303_phy_read(struct dsa_switch *ds, int phy, int regnum)
+{
+        struct lan9303 *chip = ds->priv;
+        int phy_base = chip->phy_addr_base;
 
-Anyways, I'm just fixing boilerplate to make the PCI bus properties 
-valid. Has nothing to do with this Marvell device really.
+        if (phy == phy_base)
+                return lan9303_virt_phy_reg_read(chip, regnum);
+        if (phy > phy_base + 2)
+                return -ENODEV;
 
-Rob
+        return chip->ops->phy_read(chip, phy, regnum);
+
+This Ethernet switch supports only a number of PHY addresses, and
+returns -ENODEV for the rest.
+
+So its a legitimate way to say there is nothing here.
+
+You suggestion of allowing ENOPSUPP for C45 would of fixed the
+problem, but C22 and C45 would support different error codes, which i
+don't like. Its better to be uniform.
+
+	Andrew
 
