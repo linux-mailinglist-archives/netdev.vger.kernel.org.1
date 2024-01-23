@@ -1,284 +1,100 @@
-Return-Path: <netdev+bounces-65162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11E4283960C
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 18:11:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8C72839627
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 18:18:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33BB91C20B3B
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:11:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1CD27B263ED
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:10:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02A467FBCD;
-	Tue, 23 Jan 2024 17:11:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E84780032;
+	Tue, 23 Jan 2024 17:09:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ZBROGkjT"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="wgYAY9fY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 210CE7F7F6
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 17:11:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 315A27FBDE;
+	Tue, 23 Jan 2024 17:09:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706029879; cv=none; b=gvcpGPYrZhs3Ag5iSrIxQ+od4BDU42rfdVYmJprgkJrZV0d2gr/hsT59nwNkl4JY2OqDGGV04bnU3mU/g7RU5p1/xQNoVsT+mlbNdcU4s3vnw9EJBlByPwgpGwhTA0sIf0CZTwDI6rYsRrOttLFQpcAWboB3OtulDEJ+Ra532Nw=
+	t=1706029785; cv=none; b=W/DxjJEPu8x58FE9b7Qp300bMdhWKyN2hMPS5htjTL7hYpl2aPIuMgXX6TOqkQAOQ/aX8q8npaZfdQ0/DgOxaQC2TsAuhQcZQlc0TA/O4mlOImAk5ud3egWEqF6G1EyZannBrc1Z3X+uFtpPE+neJm3oWMnWvaRBswBGWYwvKKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706029879; c=relaxed/simple;
-	bh=i/cWrg7AhQg8RuT/t0dJprVi7Eo6wire6YkTgxMefro=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gjvfc+BEIcNHCxxskdj9SxIQMPLgnSRoJIlkQy3iDRIPjSfG1GrucKEn3NM9bMH7/dHnW/WtUZZtZkXS915o9HS+SCJJM8X+mRAl1LpaiFnmg0uT7zNkToGUxDjwHV0Sf+kfn9Y/2HeHo2rLNbXASOc7ChqEyz5wRZeQAK88EQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ZBROGkjT; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1706029878; x=1737565878;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=cohv5NMPmOHSBiha6TfQRPgp8ud+P9/1SI1AP+rjhwU=;
-  b=ZBROGkjT/oPm5kIYJHBd2mcqlYf/xBfo8crJEfCeVkhocXcvrGQVWLgr
-   vptDMP0br2L6ICM60HPqYGcN8oa9LfvE6ohDJDqAZa3tpd+PT4XSwo1i6
-   aQznyzR8IH8SnJ9A9jdy+kKdYt/vNnNroX1gtTWAUR8014/ETv4WnOBbj
-   A=;
-X-IronPort-AV: E=Sophos;i="6.05,214,1701129600"; 
-   d="scan'208";a="60575459"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-b538c141.us-east-1.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2024 17:11:15 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
-	by email-inbound-relay-iad-1e-m6i4x-b538c141.us-east-1.amazon.com (Postfix) with ESMTPS id 5858DA07C7;
-	Tue, 23 Jan 2024 17:11:13 +0000 (UTC)
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:63585]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.44.58:2525] with esmtp (Farcaster)
- id 5aa43823-0b34-452f-a693-78c2ace00ba3; Tue, 23 Jan 2024 17:11:12 +0000 (UTC)
-X-Farcaster-Flow-ID: 5aa43823-0b34-452f-a693-78c2ace00ba3
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Tue, 23 Jan 2024 17:11:12 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.171.18) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.40;
- Tue, 23 Jan 2024 17:11:09 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Ivan Babrou <ivan@cloudflare.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v5 net-next 5/5] af_unix: Try to run GC async.
-Date: Tue, 23 Jan 2024 09:08:56 -0800
-Message-ID: <20240123170856.41348-6-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240123170856.41348-1-kuniyu@amazon.com>
-References: <20240123170856.41348-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1706029785; c=relaxed/simple;
+	bh=f9UIkkGmIWiROu5ZoBTFMAujbrRQ5tAje4pYEsO7wuo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D7FN0Wp7BlDsPbE0TPKQfuwryEEJug//8ODLdPugJHZz49bbi34vVutiSlYprQ5JsDxN/aJCad+5rswxTvmuULhxR2tJKbfsl/igJjH+GULjZZwjBvvqtotN0+/84rYcfg8k7X0WBj1F3T7n1TiWsVhhfKGH6y2YqkgvDRoHRHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=wgYAY9fY; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=KxYGaRQ9BTEt7m6CX0rx1QWJ078+bbqv0JtUBpFz0ig=; b=wgYAY9fYZRzWZTuR5+OGw7/HWR
+	ikAmCEJlHMmc0SOXFTJFa9IS8b8kxgOf3yVf8xu/9wkqqKX+tBWhx6i2SK7tSBqgZL68TC21N3KC4
+	8Hp6L2orv96i+AAzQhuiZ87ayTkvpNGWhnUBt7R/uxbYSNIUUy/XI3P0zDeUyDx5cyjOhzQaKh4v1
+	rpMUIxWG1CsvUH62fWfoU8/E19SaNa9ra2R5NtcueELM28nGsA2W306KCpCMPPrHhFF4ErfNPfGN6
+	fHlpjSJZV58KpbVB4tAEBltD4oc8bP3o0u83nSXl/E/Gyn0W3gwap5FPdCmTiKxLIInnPAoZj9URf
+	fFjqdeqw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55506)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rSKHJ-0002op-1F;
+	Tue, 23 Jan 2024 17:09:37 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rSKHI-00027L-2P; Tue, 23 Jan 2024 17:09:36 +0000
+Date: Tue, 23 Jan 2024 17:09:35 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Danielle Ratson <danieller@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net, sdf@google.com,
+	kory.maincent@bootlin.com, maxime.chevallier@bootlin.com,
+	vladimir.oltean@nxp.com, przemyslaw.kitszel@intel.com,
+	ahmed.zaki@intel.com, richardcochran@gmail.com, shayagr@amazon.com,
+	paul.greenwalt@intel.com, jiri@resnulli.us,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	mlxsw@nvidia.com, petrm@nvidia.com, idosch@nvidia.com
+Subject: Re: [RFC PATCH net-next 6/9] net: sfp: Add more extended compliance
+ codes
+Message-ID: <Za/yz7xcZORpZnuY@shell.armlinux.org.uk>
+References: <20240122084530.32451-1-danieller@nvidia.com>
+ <20240122084530.32451-7-danieller@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D037UWB003.ant.amazon.com (10.13.138.115) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240122084530.32451-7-danieller@nvidia.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-If more than 16000 inflight AF_UNIX sockets exist and the garbage
-collector is not running, unix_(dgram|stream)_sendmsg() call unix_gc().
-Also, they wait for unix_gc() to complete.
+On Mon, Jan 22, 2024 at 10:45:27AM +0200, Danielle Ratson wrote:
+> SFF-8024 is used to define various constants re-used in several SFF
+> SFP-related specifications.
+> 
+> Add SFF-8024 extended compliance code definitions for CMIS compliant
+> modules and use them in the next patch to determine the firmware flashing
+> work.
+> 
+> Signed-off-by: Danielle Ratson <danieller@nvidia.com>
+> Reviewed-by: Petr Machata <petrm@nvidia.com>
 
-In unix_gc(), all inflight AF_UNIX sockets are traversed at least once,
-and more if they are the GC candidate.  Thus, sendmsg() significantly
-slows down with too many inflight AF_UNIX sockets.
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-However, if a process sends data with no AF_UNIX FD, the sendmsg() call
-does not need to wait for GC.  After this change, only the process that
-meets the condition below will be blocked under such a situation.
+Thanks!
 
-  1) cmsg contains AF_UNIX socket
-  2) more than 32 AF_UNIX sent by the same user are still inflight
-
-Note that even a sendmsg() call that does not meet the condition but has
-AF_UNIX FD will be blocked later in unix_scm_to_skb() by the spinlock,
-but we allow that as a bonus for sane users.
-
-The results below are the time spent in unix_dgram_sendmsg() sending 1
-byte of data with no FD 4096 times on a host where 32K inflight AF_UNIX
-sockets exist.
-
-Without series: the sane sendmsg() needs to wait gc unreasonably.
-
-  $ sudo /usr/share/bcc/tools/funclatency -p 11165 unix_dgram_sendmsg
-  Tracing 1 functions for "unix_dgram_sendmsg"... Hit Ctrl-C to end.
-  ^C
-       nsecs               : count     distribution
-  [...]
-      524288 -> 1048575    : 0        |                                        |
-     1048576 -> 2097151    : 3881     |****************************************|
-     2097152 -> 4194303    : 214      |**                                      |
-     4194304 -> 8388607    : 1        |                                        |
-
-  avg = 1825567 nsecs, total: 7477526027 nsecs, count: 4096
-
-With series: the sane sendmsg() can finish much faster.
-
-  $ sudo /usr/share/bcc/tools/funclatency -p 8702  unix_dgram_sendmsg
-  Tracing 1 functions for "unix_dgram_sendmsg"... Hit Ctrl-C to end.
-  ^C
-       nsecs               : count     distribution
-  [...]
-         128 -> 255        : 0        |                                        |
-         256 -> 511        : 4092     |****************************************|
-         512 -> 1023       : 2        |                                        |
-        1024 -> 2047       : 0        |                                        |
-        2048 -> 4095       : 0        |                                        |
-        4096 -> 8191       : 1        |                                        |
-        8192 -> 16383      : 1        |                                        |
-
-  avg = 410 nsecs, total: 1680510 nsecs, count: 4096
-
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- include/net/af_unix.h | 12 ++++++++++--
- include/net/scm.h     |  1 +
- net/core/scm.c        |  5 +++++
- net/unix/af_unix.c    |  6 ++++--
- net/unix/garbage.c    | 10 +++++++++-
- 5 files changed, 29 insertions(+), 5 deletions(-)
-
-diff --git a/include/net/af_unix.h b/include/net/af_unix.h
-index 2c98ef95017b..f045bbd9017d 100644
---- a/include/net/af_unix.h
-+++ b/include/net/af_unix.h
-@@ -8,13 +8,21 @@
- #include <linux/refcount.h>
- #include <net/sock.h>
- 
-+#if IS_ENABLED(CONFIG_UNIX)
-+struct unix_sock *unix_get_socket(struct file *filp);
-+#else
-+static inline struct unix_sock *unix_get_socket(struct file *filp)
-+{
-+	return NULL;
-+}
-+#endif
-+
- void unix_inflight(struct user_struct *user, struct file *fp);
- void unix_notinflight(struct user_struct *user, struct file *fp);
- void unix_destruct_scm(struct sk_buff *skb);
- void io_uring_destruct_scm(struct sk_buff *skb);
- void unix_gc(void);
--void wait_for_unix_gc(void);
--struct unix_sock *unix_get_socket(struct file *filp);
-+void wait_for_unix_gc(struct scm_fp_list *fpl);
- struct sock *unix_peer_get(struct sock *sk);
- 
- #define UNIX_HASH_MOD	(256 - 1)
-diff --git a/include/net/scm.h b/include/net/scm.h
-index cf68acec4d70..92276a2c5543 100644
---- a/include/net/scm.h
-+++ b/include/net/scm.h
-@@ -25,6 +25,7 @@ struct scm_creds {
- 
- struct scm_fp_list {
- 	short			count;
-+	short			count_unix;
- 	short			max;
- 	struct user_struct	*user;
- 	struct file		*fp[SCM_MAX_FD];
-diff --git a/net/core/scm.c b/net/core/scm.c
-index d0e0852a24d5..9cd4b0a01cd6 100644
---- a/net/core/scm.c
-+++ b/net/core/scm.c
-@@ -36,6 +36,7 @@
- #include <net/compat.h>
- #include <net/scm.h>
- #include <net/cls_cgroup.h>
-+#include <net/af_unix.h>
- 
- 
- /*
-@@ -85,6 +86,7 @@ static int scm_fp_copy(struct cmsghdr *cmsg, struct scm_fp_list **fplp)
- 			return -ENOMEM;
- 		*fplp = fpl;
- 		fpl->count = 0;
-+		fpl->count_unix = 0;
- 		fpl->max = SCM_MAX_FD;
- 		fpl->user = NULL;
- 	}
-@@ -109,6 +111,9 @@ static int scm_fp_copy(struct cmsghdr *cmsg, struct scm_fp_list **fplp)
- 			fput(file);
- 			return -EINVAL;
- 		}
-+		if (unix_get_socket(file))
-+			fpl->count_unix++;
-+
- 		*fpp++ = file;
- 		fpl->count++;
- 	}
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 1e9378036dcc..1720419d93d6 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -1923,11 +1923,12 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
- 	long timeo;
- 	int err;
- 
--	wait_for_unix_gc();
- 	err = scm_send(sock, msg, &scm, false);
- 	if (err < 0)
- 		return err;
- 
-+	wait_for_unix_gc(scm.fp);
-+
- 	err = -EOPNOTSUPP;
- 	if (msg->msg_flags&MSG_OOB)
- 		goto out;
-@@ -2199,11 +2200,12 @@ static int unix_stream_sendmsg(struct socket *sock, struct msghdr *msg,
- 	bool fds_sent = false;
- 	int data_len;
- 
--	wait_for_unix_gc();
- 	err = scm_send(sock, msg, &scm, false);
- 	if (err < 0)
- 		return err;
- 
-+	wait_for_unix_gc(scm.fp);
-+
- 	err = -EOPNOTSUPP;
- 	if (msg->msg_flags & MSG_OOB) {
- #if IS_ENABLED(CONFIG_AF_UNIX_OOB)
-diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-index 3f599db59f9d..4046c606f0e6 100644
---- a/net/unix/garbage.c
-+++ b/net/unix/garbage.c
-@@ -311,8 +311,9 @@ void unix_gc(void)
- }
- 
- #define UNIX_INFLIGHT_TRIGGER_GC 16000
-+#define UNIX_INFLIGHT_SANE_USER (SCM_MAX_FD * 8)
- 
--void wait_for_unix_gc(void)
-+void wait_for_unix_gc(struct scm_fp_list *fpl)
- {
- 	/* If number of inflight sockets is insane,
- 	 * force a garbage collect right now.
-@@ -324,6 +325,13 @@ void wait_for_unix_gc(void)
- 	    !READ_ONCE(gc_in_progress))
- 		unix_gc();
- 
-+	/* Penalise users who want to send AF_UNIX sockets
-+	 * but whose sockets have not been received yet.
-+	 */
-+	if (!fpl || !fpl->count_unix ||
-+	    READ_ONCE(fpl->user->unix_inflight) < UNIX_INFLIGHT_SANE_USER)
-+		return;
-+
- 	if (READ_ONCE(gc_in_progress))
- 		flush_work(&unix_gc_work);
- }
 -- 
-2.30.2
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
