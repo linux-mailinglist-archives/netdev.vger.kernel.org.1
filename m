@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-65159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D606839607
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 18:10:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8917F839609
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 18:10:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 35B0D1C28844
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:10:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 378AE28B511
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:10:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 312237FBA2;
-	Tue, 23 Jan 2024 17:10:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCA227FBB2;
+	Tue, 23 Jan 2024 17:10:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ibx5C/XD"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="BOD5gV4/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 846557F7FE
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 17:10:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58F407F7F6
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 17:10:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706029810; cv=none; b=rrcgxDjii4zU8PONJ4RQd3+in+vf7uPWr5XnTRI52ueP4MHcB7aOPJPxT34XDbKCRh3oFqXKUrPcN61b+eZQLSbncY/fqnUJ8nVPxbmxwN7pkYRAyp0O7s9XyTYJO/NK1Kk/zR1bARKwJJTy4i33pqvLoSYAEN+IReJ1EvSXfMk=
+	t=1706029832; cv=none; b=QtQu5DGHWBlBZZx8Lh5Z+1sHGkX4g1QZxkYImTEubYfO9bF2aHBWF2RQ52HHSX5ogCYPMTMddweKyTzLeqzviw91A+s1Axwy9AeFU8jtQ7tZZ3LIfFYDFXM4h9HzPJ6n0E1/QTdmDHKsx49n61MkOgpSG6g1TYeYRPO28QvRw9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706029810; c=relaxed/simple;
-	bh=9sgFH+aH8RduL/oXfJ/9OV54gAnbI/ZBn6/OfZqRv1g=;
+	s=arc-20240116; t=1706029832; c=relaxed/simple;
+	bh=IZlNcmro5jRU8tfss8l4kcikYKFr3QcGzVLjy+bV/Vg=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Hc4Qsg5C/tNDAwkeuXGhQaY9ulW4oHolpFb8klwRvauR1kCTjNdRmMHUzVv1c45ipOYWrwRf+zIgDDkmBCTKOZF4Ab/7+49VQVEPI0JA5RjYDect7T9/Qucj0b/dDWk0Ih8zL7SdoMJz/9KAYOwnxBVD33RiN0+/8s3M2J7hZNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ibx5C/XD; arc=none smtp.client-ip=207.171.190.10
+	 MIME-Version:Content-Type; b=cFjrFcvTioJ3hHqQNE6TsZb7SdmDx2+SUSc3gbhpJW597LiJ2Vzy4SWy1LqXepm6myCYz6bsWdpDFxmY2rhaKir3mNRiurlW9ahET9482wW7JmYI/JMMxTmG0kicHM1vX4QEvVLIf9f3rQyfOaQsT18+vC8TgnttbdM5itxmy4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=BOD5gV4/; arc=none smtp.client-ip=207.171.184.29
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1706029808; x=1737565808;
+  t=1706029832; x=1737565832;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=QE2AKlODdTRlFW2cSNI6tMVU434EabDijFACQ59lqzQ=;
-  b=ibx5C/XDRYVxqLUYpsuk5+YSgvzwelW+vtCuTMrFoslJOBv5NF/6hmjb
-   E8ALDiFecRzzCO5hLb2DN4m6anigdvexKVqU1kPlBj/NkO/eBlhVcTcD5
-   ftEaLab0q844wMfgV3ho+zB6G8F/vdP82Fqkhz2tiqezRj2z6rzhCqLaM
-   A=;
+  bh=sTBeqlEVuf9EHtcJ4hxm171+iqZwMxe8f79dl6N03uQ=;
+  b=BOD5gV4/o6R0LcvCfWRjngpUQCBt7hJPSfMzp1Yq5ITXJigzAnS/8HNQ
+   QvXwbmNO8TVHHJvrgbSrGwYWwEcryFxxl+MxuY6hSEt03m1jzro3M5CoV
+   yMUK3P5uWmyiluh06TSYLpCqJ0p0TCEQNVZRhrTKset49Et+SMaLOJro+
+   w=;
 X-IronPort-AV: E=Sophos;i="6.05,214,1701129600"; 
-   d="scan'208";a="323010690"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-25ac6bd5.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2024 17:10:02 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan2.iad.amazon.com [10.32.235.34])
-	by email-inbound-relay-iad-1d-m6i4x-25ac6bd5.us-east-1.amazon.com (Postfix) with ESMTPS id 2505A49DF0;
-	Tue, 23 Jan 2024 17:09:59 +0000 (UTC)
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:21354]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.9.26:2525] with esmtp (Farcaster)
- id dacce65c-fb27-4cd0-bd9c-315c647b0a3c; Tue, 23 Jan 2024 17:09:59 +0000 (UTC)
-X-Farcaster-Flow-ID: dacce65c-fb27-4cd0-bd9c-315c647b0a3c
+   d="scan'208";a="391940884"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-fa5fe5fb.us-west-2.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2024 17:10:26 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan3.pdx.amazon.com [10.39.38.70])
+	by email-inbound-relay-pdx-2c-m6i4x-fa5fe5fb.us-west-2.amazon.com (Postfix) with ESMTPS id CB24D40D6F;
+	Tue, 23 Jan 2024 17:10:24 +0000 (UTC)
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:21554]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.2.126:2525] with esmtp (Farcaster)
+ id d1630c5e-5c33-4a8b-800b-2af9780728fb; Tue, 23 Jan 2024 17:10:24 +0000 (UTC)
+X-Farcaster-Flow-ID: d1630c5e-5c33-4a8b-800b-2af9780728fb
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Tue, 23 Jan 2024 17:09:58 +0000
+ 15.2.1118.40; Tue, 23 Jan 2024 17:10:23 +0000
 Received: from 88665a182662.ant.amazon.com (10.187.171.18) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Tue, 23 Jan 2024 17:09:56 +0000
+ 15.2.1118.40; Tue, 23 Jan 2024 17:10:20 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>
 CC: Ivan Babrou <ivan@cloudflare.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>, "Simon
- Horman" <horms@kernel.org>
-Subject: [PATCH v5 net-next 2/5] af_unix: Do not use atomic ops for unix_sk(sk)->inflight.
-Date: Tue, 23 Jan 2024 09:08:53 -0800
-Message-ID: <20240123170856.41348-3-kuniyu@amazon.com>
+	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>, "Pavel
+ Begunkov" <asml.silence@gmail.com>, Simon Horman <horms@kernel.org>
+Subject: [PATCH v5 net-next 3/5] af_unix: Return struct unix_sock from unix_get_socket().
+Date: Tue, 23 Jan 2024 09:08:54 -0800
+Message-ID: <20240123170856.41348-4-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20240123170856.41348-1-kuniyu@amazon.com>
 References: <20240123170856.41348-1-kuniyu@amazon.com>
@@ -81,141 +81,129 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWB002.ant.amazon.com (10.13.139.179) To
+X-ClientProxiedBy: EX19D033UWC002.ant.amazon.com (10.13.139.196) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 Precedence: Bulk
 
-When touching unix_sk(sk)->inflight, we are always under
-spin_lock(&unix_gc_lock).
+Currently, unix_get_socket() returns struct sock, but after calling
+it, we always cast it to unix_sk().
 
-Let's convert unix_sk(sk)->inflight to the normal unsigned long.
+Let's return struct unix_sock from unix_get_socket().
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Acked-by: Pavel Begunkov <asml.silence@gmail.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
 ---
  include/net/af_unix.h |  2 +-
- net/unix/af_unix.c    |  4 ++--
- net/unix/garbage.c    | 17 ++++++++---------
- net/unix/scm.c        |  8 +++++---
- 4 files changed, 16 insertions(+), 15 deletions(-)
+ net/unix/garbage.c    | 19 +++++++------------
+ net/unix/scm.c        | 19 +++++++------------
+ 3 files changed, 15 insertions(+), 25 deletions(-)
 
 diff --git a/include/net/af_unix.h b/include/net/af_unix.h
-index 49c4640027d8..ac38b63db554 100644
+index ac38b63db554..2c98ef95017b 100644
 --- a/include/net/af_unix.h
 +++ b/include/net/af_unix.h
-@@ -61,7 +61,7 @@ struct unix_sock {
- 	struct mutex		iolock, bindlock;
- 	struct sock		*peer;
- 	struct list_head	link;
--	atomic_long_t		inflight;
-+	unsigned long		inflight;
- 	spinlock_t		lock;
- 	unsigned long		gc_flags;
- #define UNIX_GC_CANDIDATE	0
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index ac1f2bc18fc9..1e9378036dcc 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -993,11 +993,11 @@ static struct sock *unix_create1(struct net *net, struct socket *sock, int kern,
- 	sk->sk_write_space	= unix_write_space;
- 	sk->sk_max_ack_backlog	= net->unx.sysctl_max_dgram_qlen;
- 	sk->sk_destruct		= unix_sock_destructor;
--	u	  = unix_sk(sk);
-+	u = unix_sk(sk);
-+	u->inflight = 0;
- 	u->path.dentry = NULL;
- 	u->path.mnt = NULL;
- 	spin_lock_init(&u->lock);
--	atomic_long_set(&u->inflight, 0);
- 	INIT_LIST_HEAD(&u->link);
- 	mutex_init(&u->iolock); /* single task reading lock */
- 	mutex_init(&u->bindlock); /* single task binding lock */
+@@ -14,7 +14,7 @@ void unix_destruct_scm(struct sk_buff *skb);
+ void io_uring_destruct_scm(struct sk_buff *skb);
+ void unix_gc(void);
+ void wait_for_unix_gc(void);
+-struct sock *unix_get_socket(struct file *filp);
++struct unix_sock *unix_get_socket(struct file *filp);
+ struct sock *unix_peer_get(struct sock *sk);
+ 
+ #define UNIX_HASH_MOD	(256 - 1)
 diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-index af3d2221cf6a..051f96a3ab02 100644
+index 051f96a3ab02..d5ef46a75f1f 100644
 --- a/net/unix/garbage.c
 +++ b/net/unix/garbage.c
-@@ -166,17 +166,18 @@ static void scan_children(struct sock *x, void (*func)(struct unix_sock *),
+@@ -105,20 +105,15 @@ static void scan_inflight(struct sock *x, void (*func)(struct unix_sock *),
  
- static void dec_inflight(struct unix_sock *usk)
- {
--	atomic_long_dec(&usk->inflight);
-+	usk->inflight--;
- }
+ 			while (nfd--) {
+ 				/* Get the socket the fd matches if it indeed does so */
+-				struct sock *sk = unix_get_socket(*fp++);
++				struct unix_sock *u = unix_get_socket(*fp++);
  
- static void inc_inflight(struct unix_sock *usk)
- {
--	atomic_long_inc(&usk->inflight);
-+	usk->inflight++;
- }
+-				if (sk) {
+-					struct unix_sock *u = unix_sk(sk);
++				/* Ignore non-candidates, they could have been added
++				 * to the queues after starting the garbage collection
++				 */
++				if (u && test_bit(UNIX_GC_CANDIDATE, &u->gc_flags)) {
++					hit = true;
  
- static void inc_inflight_move_tail(struct unix_sock *u)
- {
--	atomic_long_inc(&u->inflight);
-+	u->inflight++;
-+
- 	/* If this still might be part of a cycle, move it to the end
- 	 * of the list, so that it's checked even if it was already
- 	 * passed over
-@@ -237,14 +238,12 @@ void unix_gc(void)
- 	 */
- 	list_for_each_entry_safe(u, next, &gc_inflight_list, link) {
- 		long total_refs;
--		long inflight_refs;
- 
- 		total_refs = file_count(u->sk.sk_socket->file);
--		inflight_refs = atomic_long_read(&u->inflight);
- 
--		BUG_ON(inflight_refs < 1);
--		BUG_ON(total_refs < inflight_refs);
--		if (total_refs == inflight_refs) {
-+		BUG_ON(!u->inflight);
-+		BUG_ON(total_refs < u->inflight);
-+		if (total_refs == u->inflight) {
- 			list_move_tail(&u->link, &gc_candidates);
- 			__set_bit(UNIX_GC_CANDIDATE, &u->gc_flags);
- 			__set_bit(UNIX_GC_MAYBE_CYCLE, &u->gc_flags);
-@@ -271,7 +270,7 @@ void unix_gc(void)
- 		/* Move cursor to after the current position. */
- 		list_move(&cursor, &u->link);
- 
--		if (atomic_long_read(&u->inflight) > 0) {
-+		if (u->inflight) {
- 			list_move_tail(&u->link, &not_cycle_list);
- 			__clear_bit(UNIX_GC_MAYBE_CYCLE, &u->gc_flags);
- 			scan_children(&u->sk, inc_inflight_move_tail, NULL);
+-					/* Ignore non-candidates, they could
+-					 * have been added to the queues after
+-					 * starting the garbage collection
+-					 */
+-					if (test_bit(UNIX_GC_CANDIDATE, &u->gc_flags)) {
+-						hit = true;
+-
+-						func(u);
+-					}
++					func(u);
+ 				}
+ 			}
+ 			if (hit && hitlist != NULL) {
 diff --git a/net/unix/scm.c b/net/unix/scm.c
-index 822ce0d0d791..e92f2fad6410 100644
+index e92f2fad6410..b5ae5ab16777 100644
 --- a/net/unix/scm.c
 +++ b/net/unix/scm.c
-@@ -53,12 +53,13 @@ void unix_inflight(struct user_struct *user, struct file *fp)
- 	if (s) {
- 		struct unix_sock *u = unix_sk(s);
+@@ -21,9 +21,8 @@ EXPORT_SYMBOL(gc_inflight_list);
+ DEFINE_SPINLOCK(unix_gc_lock);
+ EXPORT_SYMBOL(unix_gc_lock);
  
--		if (atomic_long_inc_return(&u->inflight) == 1) {
-+		if (!u->inflight) {
+-struct sock *unix_get_socket(struct file *filp)
++struct unix_sock *unix_get_socket(struct file *filp)
+ {
+-	struct sock *u_sock = NULL;
+ 	struct inode *inode = file_inode(filp);
+ 
+ 	/* Socket ? */
+@@ -34,10 +33,10 @@ struct sock *unix_get_socket(struct file *filp)
+ 
+ 		/* PF_UNIX ? */
+ 		if (s && ops && ops->family == PF_UNIX)
+-			u_sock = s;
++			return unix_sk(s);
+ 	}
+ 
+-	return u_sock;
++	return NULL;
+ }
+ EXPORT_SYMBOL(unix_get_socket);
+ 
+@@ -46,13 +45,11 @@ EXPORT_SYMBOL(unix_get_socket);
+  */
+ void unix_inflight(struct user_struct *user, struct file *fp)
+ {
+-	struct sock *s = unix_get_socket(fp);
++	struct unix_sock *u = unix_get_socket(fp);
+ 
+ 	spin_lock(&unix_gc_lock);
+ 
+-	if (s) {
+-		struct unix_sock *u = unix_sk(s);
+-
++	if (u) {
+ 		if (!u->inflight) {
  			BUG_ON(!list_empty(&u->link));
  			list_add_tail(&u->link, &gc_inflight_list);
- 		} else {
- 			BUG_ON(list_empty(&u->link));
- 		}
-+		u->inflight++;
- 		/* Paired with READ_ONCE() in wait_for_unix_gc() */
- 		WRITE_ONCE(unix_tot_inflight, unix_tot_inflight + 1);
- 	}
-@@ -75,10 +76,11 @@ void unix_notinflight(struct user_struct *user, struct file *fp)
- 	if (s) {
- 		struct unix_sock *u = unix_sk(s);
+@@ -69,13 +66,11 @@ void unix_inflight(struct user_struct *user, struct file *fp)
  
--		BUG_ON(!atomic_long_read(&u->inflight));
-+		BUG_ON(!u->inflight);
+ void unix_notinflight(struct user_struct *user, struct file *fp)
+ {
+-	struct sock *s = unix_get_socket(fp);
++	struct unix_sock *u = unix_get_socket(fp);
+ 
+ 	spin_lock(&unix_gc_lock);
+ 
+-	if (s) {
+-		struct unix_sock *u = unix_sk(s);
+-
++	if (u) {
+ 		BUG_ON(!u->inflight);
  		BUG_ON(list_empty(&u->link));
  
--		if (atomic_long_dec_and_test(&u->inflight))
-+		u->inflight--;
-+		if (!u->inflight)
- 			list_del_init(&u->link);
- 		/* Paired with READ_ONCE() in wait_for_unix_gc() */
- 		WRITE_ONCE(unix_tot_inflight, unix_tot_inflight - 1);
 -- 
 2.30.2
 
