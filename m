@@ -1,214 +1,156 @@
-Return-Path: <netdev+bounces-65066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34C588390B9
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 15:01:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFA188390C6
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 15:03:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 96B82B22E4C
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 14:00:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A686828B3FC
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 14:03:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DE665F57E;
-	Tue, 23 Jan 2024 14:00:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 913A55F847;
+	Tue, 23 Jan 2024 14:03:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="OpekmM8y"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="J5wf3pnt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB4025F849
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 14:00:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB7F85F563;
+	Tue, 23 Jan 2024 14:03:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706018446; cv=none; b=OOTt5rZFfv8F/px6KU3a4cFNTgQFCxHYdQdUEUQkEPiTE1e5OsFbWfq9lR/3RpKoIO+e/ixs4FPoGbGy4WrUzGqBTnhHFk1MIXoGf2w/0BUSj+LymZWxYXo8K22oVbXwtlMQY5twyzvL3mSlUkSJGWDoDgvnXbthLmPYn+mIso4=
+	t=1706018602; cv=none; b=aMhqIv58vkNs4mHjM1T+GjFoNVVUzEAGoxtoZxJJ/e3xS4MC32i8qS6zRIEvNeiVJ1pRFGyuUpnMhqgIXS8/MpyQf1dEHUWLrqQziIrjWggcRfv+Vw7dWeeK9dYj0UPn7JAgRNQKnQoaCy1x9eEUSozm6P2teIvjJilh4BADQbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706018446; c=relaxed/simple;
-	bh=HfTTP4HiHIHu/yGIr9ubM6o+VjSVWEcNiX9LA06o0qM=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 MIME-Version:Content-Type; b=DDOt8d1X9/SxRH9FBK2Cfxn1obE63cjs5rYCJOBPs+rqnD6mF+p1ooo8x+cRP9lhkWof89YQDGFpvU7jUJEI3XruiIuc4gJDetIyyuMG232d9gKFaewxd9ZMqB6BHJvSfPH7yojmYIIXfe9kCiEZbMZpFBxlH4Rz2k+bYSBmSps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=OpekmM8y; arc=none smtp.client-ip=209.85.208.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2cf19f65271so3178671fa.2
-        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 06:00:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1706018443; x=1706623243; darn=vger.kernel.org;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
-        bh=1KHCL2eWY+J5yaLVKaDnfM9HQAC/swZ3GAjvIgfyRfA=;
-        b=OpekmM8yJrmumR72sJoOxHnlsfQPKWCin10Wy2REw9Z1Xn6Iw6QIRd0uEh7KvNwYAd
-         u5NUGrM8Ts8ZsEXhCNNQ+X6/z54Vj7PwuqpJq07b6PSLLHMWM+mCqarnqtQgvDa5fgXf
-         qjRjF3q3LixyATOlRT1uBgkqAUz89fZhOkFrcIXLoEqbLq3fY1kd3rQG5c8cW1N6F0F8
-         95iCfSCDBEW5rBwn1560S3Q1wtkAksyUG7Sb7ZTd4jaWN/9K/e9y1Dr9i1vESDTa71Kf
-         sEyKBSSCK9gKlorRVN4ux46xBvMGjffnnAnaD7bdkihFi+5qZRSrT23Z9NJDAZ2IhAny
-         Qcvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706018443; x=1706623243;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1KHCL2eWY+J5yaLVKaDnfM9HQAC/swZ3GAjvIgfyRfA=;
-        b=fK0u9MBpYNxveiwrsJDgfOmK9liQO7IthmZoq+ikvLZ9atJa9ScIy+g0D7NTsV9awT
-         r1VUQeiAwwMN07m3sjhiY9FLwAxGf1T8SzRey++x8SdVlWqsT9IC3FE6f06i30eWZzhG
-         uU/iFTWgp33X60fXT0NwQfF5p1JE46AeLNi891SI9tFcT45VoriSxAz9xkNA3FZt7YLC
-         X3DcJJRh8zCaPORxBOiYU/47dHt6jc1upf1sOXeFApqBMyoBmM53qfIGm9/zKFDfGnkW
-         A9NGv/WnCDhBp/6KpGGBJ99hFtrXktsaUCnBDESwjUXdtsLQCh3YlvE2e/tKFyQSQS9g
-         uL3A==
-X-Gm-Message-State: AOJu0YwieWZ36gkOcMhaGoqtfZtWKURRiRA0C9uq4yUugmA6+SKGVi+I
-	SyUO0AjMZds+BKvLkBXau0uJr3/tOC3zICR4rPQosMPVEyiiNP5k8xwYXaSIdCw=
-X-Google-Smtp-Source: AGHT+IHLSZ+f7GlY5ABTmNvEvaR9SxzepmPzhZW7LhBSj1vVxbHJE6a6+WytHsG73qmXIo1DQqPf0g==
-X-Received: by 2002:a05:651c:1025:b0:2cf:e66:6408 with SMTP id w5-20020a05651c102500b002cf0e666408mr720855ljm.92.1706018442743;
-        Tue, 23 Jan 2024 06:00:42 -0800 (PST)
-Received: from cloudflare.com ([2a09:bac5:5064:2dc::49:1bb])
-        by smtp.gmail.com with ESMTPSA id q25-20020a056402041900b0055c104274e7sm3347872edv.78.2024.01.23.06.00.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jan 2024 06:00:42 -0800 (PST)
-References: <20240122203528.672004-1-kuba@kernel.org>
-User-agent: mu4e 1.6.10; emacs 28.3
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, shuah@kernel.org, razor@blackwall.org,
- idosch@nvidia.com, horms@kernel.org, kuniyu@amazon.com,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net] selftests: fill in some missing configs for net
-Date: Tue, 23 Jan 2024 14:55:59 +0100
-In-reply-to: <20240122203528.672004-1-kuba@kernel.org>
-Message-ID: <878r4gtaif.fsf@cloudflare.com>
+	s=arc-20240116; t=1706018602; c=relaxed/simple;
+	bh=hlKrbnklZRHtyhAfgwLZQF2nt4+9pCu/Iy9MfEcp0IU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VharcbwWajpjQGr8nYnuoiAqs0aJznWI7R5vpo5NbkBZjDC7pR/kya7egwJrgiPofQH7wLWkOmWmOwp94bqWjbovjBACWLrV9ipk1V29aYnAQT+exTgKdm1WCi6lbzEupxtNUMlC8R5avWKHVAEczrt/kfK67uI74Dw76dv4/RA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=J5wf3pnt; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40NDrToc024811;
+	Tue, 23 Jan 2024 14:03:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=JtE9UsiqiWfdyi4MV6/bGG5MDHlb4VIcfi2PP2a34vw=;
+ b=J5wf3pntzgos836U9Igqyp65p1eHWSa4rnwQ8WXisVURXzm8AUL0QOU5TaLMCRTreB61
+ c3sY7pPhfuwPc0aT6XuXmNflGahMwdUFXO5NJd4dToNrhHO9iNd5XZUJTEebYp0PQhcs
+ 2Hj3LiHo1m9qZCaTzwGW7S+Upx6sqdD62KCd0Tms7rEPYTTAy1bW5M7CJ0XoIcmo0aaX
+ 1/fy1FWabQCdLlOYemdAIqVxJe7AYFM8p0+ojDa0zQts8xCjef6GUhq0OMeotihkHcuy
+ xs5YlA3bhCMAPU4IohXVYFMdGo9Tqp9IfmiVC/Kx6zxOVtOqsjty5vKiWEOE+3B1rA3t Vw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vteqwr9a5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 23 Jan 2024 14:03:10 +0000
+Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40NDs7LK026468;
+	Tue, 23 Jan 2024 14:03:09 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vteqwr99g-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 23 Jan 2024 14:03:09 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 40NBX7Mm026508;
+	Tue, 23 Jan 2024 14:03:08 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vrrgt7s09-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 23 Jan 2024 14:03:08 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 40NE35Vl56295866
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 23 Jan 2024 14:03:05 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B9A892007B;
+	Tue, 23 Jan 2024 14:03:05 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5AD0920078;
+	Tue, 23 Jan 2024 14:03:05 +0000 (GMT)
+Received: from [9.152.224.38] (unknown [9.152.224.38])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 23 Jan 2024 14:03:05 +0000 (GMT)
+Message-ID: <3c51c969-3884-4104-b38d-570c61525214@linux.ibm.com>
+Date: Tue, 23 Jan 2024 15:03:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 00/15] net/smc: implement loopback-ism used by
+ SMC-D
+To: Wen Gu <guwen@linux.alibaba.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
+        hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
+        tonylu@linux.alibaba.com, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240111120036.109903-1-guwen@linux.alibaba.com>
+ <f98849a7-41e9-421b-97b7-36d720cc43ee@linux.alibaba.com>
+ <20a1a1f3-789a-4d91-9a94-dca16161afd7@linux.ibm.com>
+ <1860588f-2246-4dcd-9db5-4ccd7add0f4a@linux.alibaba.com>
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <1860588f-2246-4dcd-9db5-4ccd7add0f4a@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: SSW86zNU0u0yqe7OCema3jFlkIu8Ysiz
+X-Proofpoint-ORIG-GUID: COMkbAp-6ED6dcEelzULVI7hCHml2eV3
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-23_06,2024-01-23_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 suspectscore=0
+ lowpriorityscore=0 malwarescore=0 mlxscore=0 mlxlogscore=649 adultscore=0
+ bulkscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2401230103
 
-On Mon, Jan 22, 2024 at 12:35 PM -08, Jakub Kicinski wrote:
-> We are missing a lot of config options from net selftests,
-> it seems:
->
-> tun/tap:     CONFIG_TUN, CONFIG_MACVLAN, CONFIG_MACVTAP
-> fib_tests:   CONFIG_NET_SCH_FQ_CODEL
-> l2tp:        CONFIG_L2TP, CONFIG_L2TP_V3, CONFIG_L2TP_IP, CONFIG_L2TP_ETH
-> sctp-vrf:    CONFIG_INET_DIAG
-> txtimestamp: CONFIG_NET_CLS_U32
-> vxlan_mdb:   CONFIG_BRIDGE_VLAN_FILTERING
-> gre_gso:     CONFIG_NET_IPGRE_DEMUX, CONFIG_IP_GRE, CONFIG_IPV6_GRE
-> srv6_end_dt*_l3vpn:   CONFIG_IPV6_SEG6_LWTUNNEL
-> ip_local_port_range:  CONFIG_MPTCP
-> fib_test:    CONFIG_NET_CLS_BASIC
-> rtnetlink:   CONFIG_MACSEC, CONFIG_NET_SCH_HTB, CONFIG_XFRM_INTERFACE
->              CONFIG_NET_IPGRE, CONFIG_BONDING
-> fib_nexthops: CONFIG_MPLS, CONFIG_MPLS_ROUTING
-> vxlan_mdb:   CONFIG_NET_ACT_GACT
-> tls:         CONFIG_TLS, CONFIG_CRYPTO_CHACHA20POLY1305
-> psample:     CONFIG_PSAMPLE
-> fcnal:       CONFIG_TCP_MD5SIG
->
-> Try to add them in a semi-alphabetical order.
->
-> Fixes: 62199e3f1658 ("selftests: net: Add VXLAN MDB test")
-> Fixes: c12e0d5f267d ("self-tests: introduce self-tests for RPS default mask")
-> Fixes: ae5439658cce ("selftests/net: Cover the IP_LOCAL_PORT_RANGE socket option")
 
-MPTCP coverage is a recent (Dec '23) addition. I must have missed it.
 
-Fortunately we don't need to backport that far. Should be:
+On 19.01.24 02:46, Wen Gu wrote:
+> 
+> 
+> On 2024/1/18 21:59, Wenjia Zhang wrote:
+>>
+>>
+>> On 18.01.24 09:27, Wen Gu wrote:
+>>>
+>>>
+>>> On 2024/1/11 20:00, Wen Gu wrote:
+>>>> This patch set acts as the second part of the new version of [1] (The first
+>>>> part can be referred from [2]), the updated things of this version are listed
+>>>> at the end.
+>>>>
+>>>
+>>> Hi Wenjia and Jan, I would appreciate any thoughts or comments you might have
+>>> on this series. Thank you very much!
+>>>
+>> Hi Wen,
+>>
+>> I'm still in the middle of the proto type on IPPROTO_SMC and other issues, so that I need more time to review this patch series.
+>>
+>> Thank you for your patience!
+>> Wenjia
+> 
+> Understood. Thank you! Wenjia.
+> 
+> Best regards,
+> Wen Gu
+> 
 
-Fixes: 122db5e3634b ("selftests/net: add MPTCP coverage for IP_LOCAL_PORT_RANGE")
+Hello Wen Gu and others,
 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> --
-> These are not all the options we're missing. Since the merge window
-> is over I may not have the time to dig into it myself :(
->
-> Adding Fixes tag for 3 semi-random commits which I think missed things.
-> The full list would be very long.
->
-> CC: shuah@kernel.org
-> CC: razor@blackwall.org
-> CC: idosch@nvidia.com
-> CC: horms@kernel.org
-> CC: jakub@cloudflare.com
-> CC: kuniyu@amazon.com
-> CC: linux-kselftest@vger.kernel.org
-> ---
->  tools/testing/selftests/net/config | 28 ++++++++++++++++++++++++++++
->  1 file changed, 28 insertions(+)
->
-> diff --git a/tools/testing/selftests/net/config b/tools/testing/selftests/net/config
-> index 8da562a9ae87..19ff75051660 100644
-> --- a/tools/testing/selftests/net/config
-> +++ b/tools/testing/selftests/net/config
-> @@ -1,5 +1,6 @@
->  CONFIG_USER_NS=y
->  CONFIG_NET_NS=y
-> +CONFIG_BONDING=m
->  CONFIG_BPF_SYSCALL=y
->  CONFIG_TEST_BPF=m
->  CONFIG_NUMA=y
-> @@ -14,9 +15,13 @@ CONFIG_VETH=y
->  CONFIG_NET_IPVTI=y
->  CONFIG_IPV6_VTI=y
->  CONFIG_DUMMY=y
-> +CONFIG_BRIDGE_VLAN_FILTERING=y
->  CONFIG_BRIDGE=y
-> +CONFIG_CRYPTO_CHACHA20POLY1305=m
->  CONFIG_VLAN_8021Q=y
->  CONFIG_IFB=y
-> +CONFIG_INET_DIAG=y
-> +CONFIG_IP_GRE=m
->  CONFIG_NETFILTER=y
->  CONFIG_NETFILTER_ADVANCED=y
->  CONFIG_NF_CONNTRACK=m
-> @@ -25,15 +30,36 @@ CONFIG_IP6_NF_IPTABLES=m
->  CONFIG_IP_NF_IPTABLES=m
->  CONFIG_IP6_NF_NAT=m
->  CONFIG_IP_NF_NAT=m
-> +CONFIG_IPV6_GRE=m
-> +CONFIG_IPV6_SEG6_LWTUNNEL=y
-> +CONFIG_L2TP_ETH=m
-> +CONFIG_L2TP_IP=m
-> +CONFIG_L2TP=m
-> +CONFIG_L2TP_V3=y
-> +CONFIG_MACSEC=m
-> +CONFIG_MACVLAN=y
-> +CONFIG_MACVTAP=y
-> +CONFIG_MPLS=y
-> +CONFIG_MPTCP=y
->  CONFIG_NF_TABLES=m
->  CONFIG_NF_TABLES_IPV6=y
->  CONFIG_NF_TABLES_IPV4=y
->  CONFIG_NFT_NAT=m
-> +CONFIG_NET_ACT_GACT=m
-> +CONFIG_NET_CLS_BASIC=m
-> +CONFIG_NET_CLS_U32=m
-> +CONFIG_NET_IPGRE_DEMUX=m
-> +CONFIG_NET_IPGRE=m
-> +CONFIG_NET_SCH_FQ_CODEL=m
-> +CONFIG_NET_SCH_HTB=m
->  CONFIG_NET_SCH_FQ=m
->  CONFIG_NET_SCH_ETF=m
->  CONFIG_NET_SCH_NETEM=y
-> +CONFIG_PSAMPLE=m
-> +CONFIG_TCP_MD5SIG=y
->  CONFIG_TEST_BLACKHOLE_DEV=m
->  CONFIG_KALLSYMS=y
-> +CONFIG_TLS=m
->  CONFIG_TRACEPOINTS=y
->  CONFIG_NET_DROP_MONITOR=m
->  CONFIG_NETDEVSIM=m
-> @@ -48,7 +74,9 @@ CONFIG_BAREUDP=m
->  CONFIG_IPV6_IOAM6_LWTUNNEL=y
->  CONFIG_CRYPTO_SM4_GENERIC=y
->  CONFIG_AMT=m
-> +CONFIG_TUN=y
->  CONFIG_VXLAN=m
->  CONFIG_IP_SCTP=m
->  CONFIG_NETFILTER_XT_MATCH_POLICY=m
->  CONFIG_CRYPTO_ARIA=y
-> +CONFIG_XFRM_INTERFACE=m
+I just wanted to let you know that unfortunately both Wenjia and Jan have called in sick and we don't know
+when they will be back at work. 
+So I'm sorry but there may be mroe delays in the review of this patchset.
 
+Kind regards
+Alexandra Winter
 
