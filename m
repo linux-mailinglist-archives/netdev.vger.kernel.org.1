@@ -1,69 +1,71 @@
-Return-Path: <netdev+bounces-65239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F0CD839B8B
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 22:56:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 152B3839B8C
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 22:57:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C23491F242B0
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 21:56:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C21F32842AA
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 21:57:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F5C441742;
-	Tue, 23 Jan 2024 21:56:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDCBD4A987;
+	Tue, 23 Jan 2024 21:56:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BrhbaU2a"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ea35Vkei"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f45.google.com (mail-oo1-f45.google.com [209.85.161.45])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED533487AE
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 21:56:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80587487AE
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 21:56:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706047010; cv=none; b=mpBs0bwtFdOG1qSzZu7hOrkXfb2OMUSESC/aCnKwZ4IXtREKX1R6DaFRftukG6JOUZt+Ne6eYGsMsQdAmnajjyYsnu976z8eOwuQS9aSBSc/soF4Xq+klpQXau249ONtrbk3Gz7CwHZQrUWRQEO8LQ85J8hf2M1B4kTg6NH3H8w=
+	t=1706047014; cv=none; b=D66yS3M5tqse1aO1o5x1arPK3b1pGe42XdwDf/GMZfRDnY1pOkW9fM+2WEzC4ctVfspf8t0lvsQkNlnMPBhbSw0W3bqZ2h+F1KtigR8onnHAExUkpd859hpM5wDtYpzhaDzfvUz6TEdmBPSAn2GI11gf3efR0HMo7fEzjA3TWgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706047010; c=relaxed/simple;
-	bh=BvxSB/pDO2jnrNwC0J1Av+EnE+DgvcJVeNNI0mTX2KI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Lh13AcWScac3WzR5GsDhzs3bSCRk1hQXLlEE5EQCXStDZPfEEduKYDXoak3cAJPLRFgK+Nlij9hbmZIpP1bhxONFFDW7UyZUlk+W7vmZsr8uAhP823ztjm59qjkM7Ib0T0I+Z8vcqb4Nai8mPCiiXxECPIzNP7VVRIX8BEfmwBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BrhbaU2a; arc=none smtp.client-ip=209.85.161.45
+	s=arc-20240116; t=1706047014; c=relaxed/simple;
+	bh=dQad2+Z/Xb/mU7me8aRLowsUyHw4NHkMWxImuVtMQuQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nHZVOVDHrsKL/q9Pk6U/77wF00JdPCVvaDX5pCw5mbxEDZ/1m/PCdvV0zm8LxdF91jP2WNpDZjdg0JsfIYLUPfHEl8qSaZbFoc1OV4OwQvgyf9EUB/yaxtbcS/UZa6QWk/mvi7XW+aiOdAv7vt9NsOI2bu5whQ8INFkldEFNOLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ea35Vkei; arc=none smtp.client-ip=209.85.210.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-5989d8decbfso3058314eaf.2
-        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 13:56:48 -0800 (PST)
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-6dd7b525cd6so916944b3a.2
+        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 13:56:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706047007; x=1706651807; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=pSqq7f+3EB1MTvbivcd5VuYRADRq1ldDUtgdgeiF92Y=;
-        b=BrhbaU2aKBL4y1RY9AAhdcjAkjwSO5lom6tcpdM/7xCP7QiBKxHDWTy91l6cbYTBu+
-         aMFfvmyB+TkTnFSvdPQjfqJoA8VSPGVx1H9Ibm5s/DXRXVrP4RnluEj4yKUH6QZXdHQE
-         rtj6Sj+5ryYC2AppF+wEudmgcsEzLAP5CQaG2+2f8fGm82mK9nmQBF7Xzwa2nA6ShRgY
-         Ef3GV4lYXpyFAA/U5W43ZUR56OCWm9R8HvvIN99WeLzkA7vvkr82Aj2gs98+RpvWg3Yd
-         S63oWSWXff6d58vlBGtlIvDd3FSOediXjCu/VfWOZG0RWqKObW79odnqJ20+Jsz0VHk/
-         bvxw==
+        d=gmail.com; s=20230601; t=1706047012; x=1706651812; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uhR6ETdnDbAnJOABgKbs6pb2nligN/fWqMlDmzJKoA0=;
+        b=Ea35VkeisjSks13O/CDyE/05cSdshyiamlJAsHKi4nfgsyxBKFXnDGQlLo9OEYwFQ3
+         +F+j08xsrUlRe0oFkyGosJAuStdUBRKphe1z1+Xvc0thsLoX101uGTX/hMKjZjYZ64SO
+         cw5TlSE72iS6zGZR02l2/8jQxZW8SYw/EjM99I6y1avF8+LcymyTU2auF15xTSRpUMxz
+         dlcVbs62QxE31/oRhjtKTKwKF0Vy28WLnAispOq17vFxRvBoXk2jOp23RlJjRxCKDPsz
+         y2Eq5MGDUoIaoTcW4Y4VMMolnMKpxajofv8qRQ9TXfAjNHVJ/m/CyqbWofPVrFOdvJ1e
+         sCeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706047007; x=1706651807;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pSqq7f+3EB1MTvbivcd5VuYRADRq1ldDUtgdgeiF92Y=;
-        b=bPEcWAZheo5se4tOGE5+HcOd9GkEdqoyLrqyiQ0ar+fhPAsTGGabTEEu+jn/5GGSGM
-         hjj5QnZ84ypVzg5Y6mERJ2kunKEfEptG/TUGW0++1e7iPojzBjX2/5uMpehLlyc3yZ5s
-         XmJIjGxvVZOTp3AEMvbZbOpF+JFMohEszgN//dPFlTHEUR1p1CQ8QqoIT9tjtp1UrFDz
-         wKGlqdaDtOGE6gA4IQB2/xiPr7kRW0NdbMUNVeFnE/5WIQxI/TNMi8Q6UHripq5APx8j
-         lJImaZMjHoVgCn9qyxAgVzZEUoJmwgV9aBj8Ob8AxLJYB3mGPgE/Z71b4F3hDeIcmipj
-         Ty8Q==
-X-Gm-Message-State: AOJu0YzhRtnvgD9H9uYl5S2TpwW7qgExBSawiqcAODiX8UpggvfQvC9T
-	5j7OMBtg2lj+fPY5ScmxbVQhpY0J4J30tiHDtAFElJPW95mnJBKXgZ4FR07ds9E=
-X-Google-Smtp-Source: AGHT+IEimHfWjMCaPpGdfBCi/93MPMWrE+sOMZyiUIUI43fK528NCrw5PnliRxj2rOAVC3C+KGExvg==
-X-Received: by 2002:a05:6358:261c:b0:176:4aba:85d4 with SMTP id l28-20020a056358261c00b001764aba85d4mr4612752rwc.8.1706047007073;
-        Tue, 23 Jan 2024 13:56:47 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706047012; x=1706651812;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uhR6ETdnDbAnJOABgKbs6pb2nligN/fWqMlDmzJKoA0=;
+        b=SWYtm4NDtDg+toSlAyPsGNL2kBs+ZZrXcOVPKgYtaZIp67IqrlUuRUrfRcbIWcQUcS
+         Z8jy/vEjEj+esoe53BMwSypF9GQgkxoZwxHa6hbRKhQglQLtimUj59CHINhjIvH6GFnU
+         qU0qibgLulLB4DenncZz70+5PxcexxBvqRQoiFc4ZtktrJYSIsfzmQNrJQzMGOJvtlRn
+         b/kFKO0VWM+Oqc9swSEkzXB36P4zpbO6dNf8S+q61sgWCXBpf0d96XjRyuzvixbA4Zp5
+         XQ6pLtmDpltrNvKbHp3RBWyJ0IQUpSN+CKiJfUBkO1GEAmhWy8njCDz9nWQOTnXdINGV
+         mioQ==
+X-Gm-Message-State: AOJu0YxGMGxUkyvgTdlxT0wBzapLYXFfBMs6mJ8+3/2cu5NkOo65ylGX
+	5gR8KxxqpQgjVFLQpQgfEvJZANGM6evBOzHXaKGKG/m6lhNJG3I4QuITupArgMI=
+X-Google-Smtp-Source: AGHT+IEB8oHdNs2KIA/e3/fmkYwnZP2g98IKR2XL7CINA+bv+NqoaMq03aOudnpg428BRtmuNdee7g==
+X-Received: by 2002:a05:6a00:1812:b0:6db:e54d:3ae6 with SMTP id y18-20020a056a00181200b006dbe54d3ae6mr3469237pfa.42.1706047011812;
+        Tue, 23 Jan 2024 13:56:51 -0800 (PST)
 Received: from tresc054937.tre-sc.gov.br (177-131-126-82.acessoline.net.br. [177.131.126.82])
-        by smtp.gmail.com with ESMTPSA id q17-20020a637511000000b005d43d5a9678sm693738pgc.35.2024.01.23.13.56.42
+        by smtp.gmail.com with ESMTPSA id q17-20020a637511000000b005d43d5a9678sm693738pgc.35.2024.01.23.13.56.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jan 2024 13:56:46 -0800 (PST)
+        Tue, 23 Jan 2024 13:56:51 -0800 (PST)
 From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
 To: netdev@vger.kernel.org
 Cc: linus.walleij@linaro.org,
@@ -77,11 +79,14 @@ Cc: linus.walleij@linaro.org,
 	pabeni@redhat.com,
 	arinc.unal@arinc9.com,
 	ansuelsmth@gmail.com,
-	Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Subject: [PATCH net-next v4 00/11] net: dsa: realtek: variants to drivers, interfaces to a common module
-Date: Tue, 23 Jan 2024 18:55:52 -0300
-Message-ID: <20240123215606.26716-1-luizluca@gmail.com>
+	Luiz Angelo Daros de Luca <luizluca@gmail.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>
+Subject: [PATCH net-next v4 01/11] net: dsa: realtek: drop cleanup from realtek_ops
+Date: Tue, 23 Jan 2024 18:55:53 -0300
+Message-ID: <20240123215606.26716-2-luizluca@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240123215606.26716-1-luizluca@gmail.com>
+References: <20240123215606.26716-1-luizluca@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,129 +96,28 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The current driver consists of two interface modules (SMI and MDIO) and
-two family/variant modules (RTL8365MB and RTL8366RB). The SMI and MDIO
-modules serve as the platform and MDIO drivers, respectively, calling
-functions from the variant modules. In this setup, one interface module
-can be loaded independently of the other, but both variants must be
-loaded (if not disabled at build time) for any type of interface. This
-approach doesn't scale well, especially with the addition of more switch
-variants (e.g., RTL8366B), leading to loaded but unused modules.
-Additionally, this also seems upside down, as the specific driver code
-normally depends on the more generic functions and not the other way
-around.
+It was never used and never referenced.
 
-Each variant module was converted into real drivers, serving as both a
-platform driver (for switches connected using the SMI interface) and an
-MDIO driver (for MDIO-connected switches). The relationship between the
-variant and interface modules is reversed, with the variant module now
-calling both interface functions (if not disabled at build time). While
-in most devices only one interface is likely used, the interface code is
-significantly smaller than a variant module, consuming fewer resources
-than the previous code. With variant modules now functioning as real
-drivers, compatible strings are published only in a single variant
-module, preventing conflicts.
-
-The patch series introduces a new common module for functions shared by
-both variants. This module also absorbs the two previous interface
-modules, as they would always be loaded anyway.
-
-The series relocates the user MII driver from realtek-smi to rtl83xx. It
-is now used by MDIO-connected switches instead of the generic DSA
-driver. There's a change in how this driver locates the MDIO node. It
-now only searches for a child node named "mdio".
-
-The dsa_switch in realtek_priv->ds is now embedded in the struct. It is
-always in use and avoids dynamic memory allocation.
-
-Testing has been performed with an RTL8367S (rtl8365mb) using MDIO
-interface and an RTL8366RB (rtl8366) with SMI interface.
-
-Luiz
-
+Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Reviewed-by: Alvin Šipraga <alsi@bang-olufsen.dk>
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 ---
+ drivers/net/dsa/realtek/realtek.h | 1 -
+ 1 file changed, 1 deletion(-)
 
-Changes:
-
-v3-v4:
-1) Changed Makefile to use ifdef instead of dynamic variable names.
-2) Added comments for all exported symbols.
-3) Migrated exported symbols to REALTEK_DSA namespace.
-4) renamed realtek_common to rtl83xx.
-5) put the mdio node just after registration and not in driver remove.
-6) rtl83xx_probe now receives a struct with regmap read/write functions
-   and build regmap_config dynamically.
-7) pulled into a new patch the realtek_priv change from "common
-   realtek-dsa module".
-8) pulled into a new patch the user_mii_bus setup changes from "migrate
-   user_mii_bus setup to realtek-dsa".
-9) removed the revert "net: dsa: OF-ware slave_mii_bus" patch from the
-   series.
-
-v2-v3:
-1) Look for the MDIO bus searching for a child node named "mdio" instead
-   of the compatible string.
-2) Removed the check for a phy-handle in ports. ds->user_mii_bus will
-   not be used anymore.
-3) Dropped comments for realtek_common_{probe,register_switch}.
-4) Fixed a compile error in "net: dsa: OF-ware slave_mii_bus".
-5) Used the wrapper realtek_smi_driver_register instead of
-   platform_driver_register.
-
-v1-v2:
-1)  Renamed realtek_common module to realtek-dsa.
-2)  Removed the warning when the MDIO node is not named "mdio."
-3)  ds->user_mii_bus is only assigned if all user ports do not have a
-    phy-handle.
-4)  of_node_put is now back to the driver remove method.
-5)  Renamed realtek_common_probe_{pre,post} to
-    realtek_common_{probe,register_switch}.
-6)  Added some comments for realtek_common_{probe,register_switch}.
-7)  Using dev_err_probe whenever possible.
-8)  Embedded priv->ds into realtek_priv, removing its dynamic
-    allocation.
-9)  Fixed realtek-common.h macros.
-10) Save and check the return value in functions, even when it is the
-    last one.
-11) Added the #if expression as a comment to #else and #endif in header
-    files.
-12) Unregister the platform and the MDIO driver in the reverse order
-    they are registered.
-13) Unregister the first driver if the second one failed to register.
-14) Added the revert patch for "net: dsa: OF-ware slave_mii_bus."
-
-Luiz Angelo Daros de Luca (11):
-  net: dsa: realtek: drop cleanup from realtek_ops
-  net: dsa: realtek: introduce REALTEK_DSA namespace
-  net: dsa: realtek: convert variants into real drivers
-  net: dsa: realtek: keep variant reference in realtek_priv
-  net: dsa: realtek: common rtl83xx module
-  net: dsa: realtek: merge rtl83xx and interface modules into
-    realtek-dsa
-  net: dsa: realtek: get internal MDIO node by name
-  net: dsa: realtek: clean user_mii_bus setup
-  net: dsa: realtek: migrate user_mii_bus setup to realtek-dsa
-  net: dsa: realtek: use the same mii bus driver for both interfaces
-  net: dsa: realtek: embed dsa_switch into realtek_priv
-
- drivers/net/dsa/realtek/Kconfig        |  20 +-
- drivers/net/dsa/realtek/Makefile       |  13 +-
- drivers/net/dsa/realtek/realtek-mdio.c | 211 +++++--------------
- drivers/net/dsa/realtek/realtek-mdio.h |  48 +++++
- drivers/net/dsa/realtek/realtek-smi.c  | 277 +++++--------------------
- drivers/net/dsa/realtek/realtek-smi.h  |  48 +++++
- drivers/net/dsa/realtek/realtek.h      |  12 +-
- drivers/net/dsa/realtek/rtl8365mb.c    | 126 ++++++-----
- drivers/net/dsa/realtek/rtl8366-core.c |  22 +-
- drivers/net/dsa/realtek/rtl8366rb.c    | 119 ++++++-----
- drivers/net/dsa/realtek/rtl83xx.c      | 267 ++++++++++++++++++++++++
- drivers/net/dsa/realtek/rtl83xx.h      |  22 ++
- 12 files changed, 667 insertions(+), 518 deletions(-)
- create mode 100644 drivers/net/dsa/realtek/realtek-mdio.h
- create mode 100644 drivers/net/dsa/realtek/realtek-smi.h
- create mode 100644 drivers/net/dsa/realtek/rtl83xx.c
- create mode 100644 drivers/net/dsa/realtek/rtl83xx.h
-
+diff --git a/drivers/net/dsa/realtek/realtek.h b/drivers/net/dsa/realtek/realtek.h
+index 790488e9c667..e9ee778665b2 100644
+--- a/drivers/net/dsa/realtek/realtek.h
++++ b/drivers/net/dsa/realtek/realtek.h
+@@ -91,7 +91,6 @@ struct realtek_ops {
+ 	int	(*detect)(struct realtek_priv *priv);
+ 	int	(*reset_chip)(struct realtek_priv *priv);
+ 	int	(*setup)(struct realtek_priv *priv);
+-	void	(*cleanup)(struct realtek_priv *priv);
+ 	int	(*get_mib_counter)(struct realtek_priv *priv,
+ 				   int port,
+ 				   struct rtl8366_mib_counter *mib,
 -- 
 2.43.0
 
