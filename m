@@ -1,178 +1,214 @@
-Return-Path: <netdev+bounces-65064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65066-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AB9483907C
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 14:53:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34C588390B9
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 15:01:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7413CB23D7B
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 13:53:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 96B82B22E4C
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 14:00:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1A0F5FB9F;
-	Tue, 23 Jan 2024 13:52:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DE665F57E;
+	Tue, 23 Jan 2024 14:00:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="IboYbwOi";
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="Kko701xO"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="OpekmM8y"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D859D5F565;
-	Tue, 23 Jan 2024 13:52:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB4025F849
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 14:00:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706017972; cv=none; b=P4jPLMZeRsvl+gluesFuCvXrkGPyTDTnuJo+oxhFg8u215qlBdte5iYrLkLIsF7Y5rvqAgAcd6jMWk6HjA591kgJjbnopP71enIp4BJyo+fSg6mK1iPXQ0FwNculpPcUxFjxPVLwasTzAwT66/AhWZ6lhxzcZS8R3wuvIyzp+HI=
+	t=1706018446; cv=none; b=OOTt5rZFfv8F/px6KU3a4cFNTgQFCxHYdQdUEUQkEPiTE1e5OsFbWfq9lR/3RpKoIO+e/ixs4FPoGbGy4WrUzGqBTnhHFk1MIXoGf2w/0BUSj+LymZWxYXo8K22oVbXwtlMQY5twyzvL3mSlUkSJGWDoDgvnXbthLmPYn+mIso4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706017972; c=relaxed/simple;
-	bh=pISfP3Hzv5P7bazKFw8x24gFRtSxfRqfs11zSQ5Dbys=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gfywlABQO+5rtjm5fmJjNQyoRAZzVDbx5Pv/O3XwB+kEas1sGG48EdjfgqMiEtk6cangY+lfDKwAimzM4GvVKwAJu5cAU4p5T4G+pibTyl0VUQR0aJ2MlRvvaeeFdTZuNe+f61rKzO/bc2JuIx+LVGSVO9QaYJ9tRTLt0xt7KN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=IboYbwOi; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=Kko701xO; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 22DEC1FD52;
-	Tue, 23 Jan 2024 13:52:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1706017968; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IUKCAfTVoUrxB4zijGrDV9tJzwRsfCTR6KHiqfmXiK8=;
-	b=IboYbwOiqlbaX2wd0HmSqCbYgYrOKSDteGasFw296lSHkEyhATr/cH9zoRtqXElPiGxbnR
-	HxfNiJztorKYwBEJVT7yUSaSpkc9OlVcIU3hEEogrevpfSOJ3zHkMrxkVzRqlKuxR9qNdQ
-	RuaXoz0uAlp40FjCZCgIpHdkvQ8jt9k=
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1706017967; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IUKCAfTVoUrxB4zijGrDV9tJzwRsfCTR6KHiqfmXiK8=;
-	b=Kko701xOZnUWqfDnlanF9u3rpQaVvN8IRdddv5a6v07dZ/hUHjSJS0D6Bjwno5Ui+ppHgb
-	osLwB01sY//O1VtfadNso6aoj9X5Fk+0R+egC/CyYSt040mF+sLFqYf5bMLssnnldLmVQl
-	0ARVwqFMvYvdbf8Xzb9sSXOMj0FxLz8=
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 04C62139B9;
-	Tue, 23 Jan 2024 13:52:47 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([10.150.64.162])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 8KICAa/Er2UMVwAAD6G6ig
-	(envelope-from <mkoutny@suse.com>); Tue, 23 Jan 2024 13:52:47 +0000
-From: =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>
-To: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	cake@lists.bufferbloat.net
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	Petr Pavlu <ppavlu@suse.cz>,
-	Michal Kubecek <mkubecek@suse.cz>,
-	Martin Wilck <mwilck@suse.com>,
-	Pedro Tammela <pctammela@mojatatu.com>
-Subject: [PATCH v4 4/4] net/sched: Remove alias of sch_clsact
-Date: Tue, 23 Jan 2024 14:52:42 +0100
-Message-ID: <20240123135242.11430-5-mkoutny@suse.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240123135242.11430-1-mkoutny@suse.com>
-References: <20240123135242.11430-1-mkoutny@suse.com>
+	s=arc-20240116; t=1706018446; c=relaxed/simple;
+	bh=HfTTP4HiHIHu/yGIr9ubM6o+VjSVWEcNiX9LA06o0qM=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
+	 MIME-Version:Content-Type; b=DDOt8d1X9/SxRH9FBK2Cfxn1obE63cjs5rYCJOBPs+rqnD6mF+p1ooo8x+cRP9lhkWof89YQDGFpvU7jUJEI3XruiIuc4gJDetIyyuMG232d9gKFaewxd9ZMqB6BHJvSfPH7yojmYIIXfe9kCiEZbMZpFBxlH4Rz2k+bYSBmSps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=OpekmM8y; arc=none smtp.client-ip=209.85.208.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2cf19f65271so3178671fa.2
+        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 06:00:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1706018443; x=1706623243; darn=vger.kernel.org;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=1KHCL2eWY+J5yaLVKaDnfM9HQAC/swZ3GAjvIgfyRfA=;
+        b=OpekmM8yJrmumR72sJoOxHnlsfQPKWCin10Wy2REw9Z1Xn6Iw6QIRd0uEh7KvNwYAd
+         u5NUGrM8Ts8ZsEXhCNNQ+X6/z54Vj7PwuqpJq07b6PSLLHMWM+mCqarnqtQgvDa5fgXf
+         qjRjF3q3LixyATOlRT1uBgkqAUz89fZhOkFrcIXLoEqbLq3fY1kd3rQG5c8cW1N6F0F8
+         95iCfSCDBEW5rBwn1560S3Q1wtkAksyUG7Sb7ZTd4jaWN/9K/e9y1Dr9i1vESDTa71Kf
+         sEyKBSSCK9gKlorRVN4ux46xBvMGjffnnAnaD7bdkihFi+5qZRSrT23Z9NJDAZ2IhAny
+         Qcvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706018443; x=1706623243;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1KHCL2eWY+J5yaLVKaDnfM9HQAC/swZ3GAjvIgfyRfA=;
+        b=fK0u9MBpYNxveiwrsJDgfOmK9liQO7IthmZoq+ikvLZ9atJa9ScIy+g0D7NTsV9awT
+         r1VUQeiAwwMN07m3sjhiY9FLwAxGf1T8SzRey++x8SdVlWqsT9IC3FE6f06i30eWZzhG
+         uU/iFTWgp33X60fXT0NwQfF5p1JE46AeLNi891SI9tFcT45VoriSxAz9xkNA3FZt7YLC
+         X3DcJJRh8zCaPORxBOiYU/47dHt6jc1upf1sOXeFApqBMyoBmM53qfIGm9/zKFDfGnkW
+         A9NGv/WnCDhBp/6KpGGBJ99hFtrXktsaUCnBDESwjUXdtsLQCh3YlvE2e/tKFyQSQS9g
+         uL3A==
+X-Gm-Message-State: AOJu0YwieWZ36gkOcMhaGoqtfZtWKURRiRA0C9uq4yUugmA6+SKGVi+I
+	SyUO0AjMZds+BKvLkBXau0uJr3/tOC3zICR4rPQosMPVEyiiNP5k8xwYXaSIdCw=
+X-Google-Smtp-Source: AGHT+IHLSZ+f7GlY5ABTmNvEvaR9SxzepmPzhZW7LhBSj1vVxbHJE6a6+WytHsG73qmXIo1DQqPf0g==
+X-Received: by 2002:a05:651c:1025:b0:2cf:e66:6408 with SMTP id w5-20020a05651c102500b002cf0e666408mr720855ljm.92.1706018442743;
+        Tue, 23 Jan 2024 06:00:42 -0800 (PST)
+Received: from cloudflare.com ([2a09:bac5:5064:2dc::49:1bb])
+        by smtp.gmail.com with ESMTPSA id q25-20020a056402041900b0055c104274e7sm3347872edv.78.2024.01.23.06.00.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Jan 2024 06:00:42 -0800 (PST)
+References: <20240122203528.672004-1-kuba@kernel.org>
+User-agent: mu4e 1.6.10; emacs 28.3
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, shuah@kernel.org, razor@blackwall.org,
+ idosch@nvidia.com, horms@kernel.org, kuniyu@amazon.com,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net] selftests: fill in some missing configs for net
+Date: Tue, 23 Jan 2024 14:55:59 +0100
+In-reply-to: <20240122203528.672004-1-kuba@kernel.org>
+Message-ID: <878r4gtaif.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.com header.s=susede1 header.b=Kko701xO
-X-Spamd-Result: default: False [2.02 / 50.00];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	 TO_DN_SOME(0.00)[];
-	 DWL_DNSWL_BLOCKED(0.00)[suse.com:dkim];
-	 R_RATELIMIT(0.00)[to_ip_from(RLhcw5w5rtick65589d1tggrs1)];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_TRACE(0.00)[suse.com:+];
-	 MX_GOOD(-0.01)[];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 BAYES_HAM(-0.17)[69.66%];
-	 ARC_NA(0.00)[];
-	 R_DKIM_ALLOW(-0.20)[suse.com:s=susede1];
-	 FROM_HAS_DN(0.00)[];
-	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 TAGGED_RCPT(0.00)[];
-	 MIME_GOOD(-0.10)[text/plain];
-	 DKIM_SIGNED(0.00)[suse.com:s=susede1];
-	 RCPT_COUNT_TWELVE(0.00)[29];
-	 MID_CONTAINS_FROM(1.00)[];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:dkim,suse.com:email];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,mojatatu.com,gmail.com,resnulli.us,iogearbox.net,linux.dev,toke.dk,intel.com,networkplumber.org,suse.cz,suse.com];
-	 RCVD_TLS_ALL(0.00)[];
-	 SUSPICIOUS_RECIPS(1.50)[];
-	 RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Score: 2.02
-X-Rspamd-Queue-Id: 22DEC1FD52
-X-Spam-Level: **
-X-Spam-Flag: NO
-X-Spamd-Bar: ++
+Content-Type: text/plain
 
-The module sch_ingress stands out among net/sched modules
-because it provides multiple act/sch functionalities in a single .ko.
-They have aliases to make autoloading work for any of the provided
-functionalities.
+On Mon, Jan 22, 2024 at 12:35 PM -08, Jakub Kicinski wrote:
+> We are missing a lot of config options from net selftests,
+> it seems:
+>
+> tun/tap:     CONFIG_TUN, CONFIG_MACVLAN, CONFIG_MACVTAP
+> fib_tests:   CONFIG_NET_SCH_FQ_CODEL
+> l2tp:        CONFIG_L2TP, CONFIG_L2TP_V3, CONFIG_L2TP_IP, CONFIG_L2TP_ETH
+> sctp-vrf:    CONFIG_INET_DIAG
+> txtimestamp: CONFIG_NET_CLS_U32
+> vxlan_mdb:   CONFIG_BRIDGE_VLAN_FILTERING
+> gre_gso:     CONFIG_NET_IPGRE_DEMUX, CONFIG_IP_GRE, CONFIG_IPV6_GRE
+> srv6_end_dt*_l3vpn:   CONFIG_IPV6_SEG6_LWTUNNEL
+> ip_local_port_range:  CONFIG_MPTCP
+> fib_test:    CONFIG_NET_CLS_BASIC
+> rtnetlink:   CONFIG_MACSEC, CONFIG_NET_SCH_HTB, CONFIG_XFRM_INTERFACE
+>              CONFIG_NET_IPGRE, CONFIG_BONDING
+> fib_nexthops: CONFIG_MPLS, CONFIG_MPLS_ROUTING
+> vxlan_mdb:   CONFIG_NET_ACT_GACT
+> tls:         CONFIG_TLS, CONFIG_CRYPTO_CHACHA20POLY1305
+> psample:     CONFIG_PSAMPLE
+> fcnal:       CONFIG_TCP_MD5SIG
+>
+> Try to add them in a semi-alphabetical order.
+>
+> Fixes: 62199e3f1658 ("selftests: net: Add VXLAN MDB test")
+> Fixes: c12e0d5f267d ("self-tests: introduce self-tests for RPS default mask")
+> Fixes: ae5439658cce ("selftests/net: Cover the IP_LOCAL_PORT_RANGE socket option")
 
-Since the autoloading was changed to uniformly request any functionality
-under its alias, the non-systemic aliases can be removed now (i.e.
-assuming the alias were only used to ensure autoloading).
+MPTCP coverage is a recent (Dec '23) addition. I must have missed it.
 
-Signed-off-by: Michal Koutný <mkoutny@suse.com>
----
- net/sched/sch_ingress.c | 1 -
- 1 file changed, 1 deletion(-)
+Fortunately we don't need to backport that far. Should be:
 
-diff --git a/net/sched/sch_ingress.c b/net/sched/sch_ingress.c
-index 48a800131e99..c2ef9dcf91d2 100644
---- a/net/sched/sch_ingress.c
-+++ b/net/sched/sch_ingress.c
-@@ -370,6 +370,5 @@ static void __exit ingress_module_exit(void)
- module_init(ingress_module_init);
- module_exit(ingress_module_exit);
- 
--MODULE_ALIAS("sch_clsact");
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Ingress and clsact based ingress and egress qdiscs");
--- 
-2.43.0
+Fixes: 122db5e3634b ("selftests/net: add MPTCP coverage for IP_LOCAL_PORT_RANGE")
+
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> --
+> These are not all the options we're missing. Since the merge window
+> is over I may not have the time to dig into it myself :(
+>
+> Adding Fixes tag for 3 semi-random commits which I think missed things.
+> The full list would be very long.
+>
+> CC: shuah@kernel.org
+> CC: razor@blackwall.org
+> CC: idosch@nvidia.com
+> CC: horms@kernel.org
+> CC: jakub@cloudflare.com
+> CC: kuniyu@amazon.com
+> CC: linux-kselftest@vger.kernel.org
+> ---
+>  tools/testing/selftests/net/config | 28 ++++++++++++++++++++++++++++
+>  1 file changed, 28 insertions(+)
+>
+> diff --git a/tools/testing/selftests/net/config b/tools/testing/selftests/net/config
+> index 8da562a9ae87..19ff75051660 100644
+> --- a/tools/testing/selftests/net/config
+> +++ b/tools/testing/selftests/net/config
+> @@ -1,5 +1,6 @@
+>  CONFIG_USER_NS=y
+>  CONFIG_NET_NS=y
+> +CONFIG_BONDING=m
+>  CONFIG_BPF_SYSCALL=y
+>  CONFIG_TEST_BPF=m
+>  CONFIG_NUMA=y
+> @@ -14,9 +15,13 @@ CONFIG_VETH=y
+>  CONFIG_NET_IPVTI=y
+>  CONFIG_IPV6_VTI=y
+>  CONFIG_DUMMY=y
+> +CONFIG_BRIDGE_VLAN_FILTERING=y
+>  CONFIG_BRIDGE=y
+> +CONFIG_CRYPTO_CHACHA20POLY1305=m
+>  CONFIG_VLAN_8021Q=y
+>  CONFIG_IFB=y
+> +CONFIG_INET_DIAG=y
+> +CONFIG_IP_GRE=m
+>  CONFIG_NETFILTER=y
+>  CONFIG_NETFILTER_ADVANCED=y
+>  CONFIG_NF_CONNTRACK=m
+> @@ -25,15 +30,36 @@ CONFIG_IP6_NF_IPTABLES=m
+>  CONFIG_IP_NF_IPTABLES=m
+>  CONFIG_IP6_NF_NAT=m
+>  CONFIG_IP_NF_NAT=m
+> +CONFIG_IPV6_GRE=m
+> +CONFIG_IPV6_SEG6_LWTUNNEL=y
+> +CONFIG_L2TP_ETH=m
+> +CONFIG_L2TP_IP=m
+> +CONFIG_L2TP=m
+> +CONFIG_L2TP_V3=y
+> +CONFIG_MACSEC=m
+> +CONFIG_MACVLAN=y
+> +CONFIG_MACVTAP=y
+> +CONFIG_MPLS=y
+> +CONFIG_MPTCP=y
+>  CONFIG_NF_TABLES=m
+>  CONFIG_NF_TABLES_IPV6=y
+>  CONFIG_NF_TABLES_IPV4=y
+>  CONFIG_NFT_NAT=m
+> +CONFIG_NET_ACT_GACT=m
+> +CONFIG_NET_CLS_BASIC=m
+> +CONFIG_NET_CLS_U32=m
+> +CONFIG_NET_IPGRE_DEMUX=m
+> +CONFIG_NET_IPGRE=m
+> +CONFIG_NET_SCH_FQ_CODEL=m
+> +CONFIG_NET_SCH_HTB=m
+>  CONFIG_NET_SCH_FQ=m
+>  CONFIG_NET_SCH_ETF=m
+>  CONFIG_NET_SCH_NETEM=y
+> +CONFIG_PSAMPLE=m
+> +CONFIG_TCP_MD5SIG=y
+>  CONFIG_TEST_BLACKHOLE_DEV=m
+>  CONFIG_KALLSYMS=y
+> +CONFIG_TLS=m
+>  CONFIG_TRACEPOINTS=y
+>  CONFIG_NET_DROP_MONITOR=m
+>  CONFIG_NETDEVSIM=m
+> @@ -48,7 +74,9 @@ CONFIG_BAREUDP=m
+>  CONFIG_IPV6_IOAM6_LWTUNNEL=y
+>  CONFIG_CRYPTO_SM4_GENERIC=y
+>  CONFIG_AMT=m
+> +CONFIG_TUN=y
+>  CONFIG_VXLAN=m
+>  CONFIG_IP_SCTP=m
+>  CONFIG_NETFILTER_XT_MATCH_POLICY=m
+>  CONFIG_CRYPTO_ARIA=y
+> +CONFIG_XFRM_INTERFACE=m
 
 
