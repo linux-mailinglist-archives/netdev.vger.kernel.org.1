@@ -1,65 +1,71 @@
-Return-Path: <netdev+bounces-64952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F642838695
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 06:12:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F81E838696
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 06:13:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7AB62B21B0C
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 05:12:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F0ED284380
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 05:13:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5E0223D6;
-	Tue, 23 Jan 2024 05:12:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B90FB2116;
+	Tue, 23 Jan 2024 05:13:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="2K/k3RZe"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="P41N03rK"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BD4B46AB;
-	Tue, 23 Jan 2024 05:12:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 347632107;
+	Tue, 23 Jan 2024 05:13:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705986724; cv=none; b=eEwSXjYTHu1/ko5s9eVEepaw0xhchCsTFteNVdDG8OJ2KQj1xgNUpTyhjea0NWHjLZ+5pMtWZDQOKcv9oA4e9po+oecshm2XxGTS4sSkLBT0i2/DKQaUjiIQ+Kdw6oL++wtQ2JxD6crGaeRh36FszsioKtLAftqrUwepmSiZM8E=
+	t=1705986789; cv=none; b=HEWr9al35Zlt0F0samEKxmz2uThIhVjKqKFT6Cklk+dxZg6ctvjxgxxEq55btggg6je3LZhE3NMc/CabSLUJKVx3/egClQHlDS8QWJUvWp3GbZjaT0LbQ1yU/mhL2OaUIZeCLu7YPJdcPydVfoXx5laBahOdLgneN8gj2JAATmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705986724; c=relaxed/simple;
-	bh=snsJC136EsxeMjRyRrr5nqUNuoswvRVM/1tSC7nK3sQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=poVnHE4kBWZVr3vypbGHGyZD2mQ9vcKYMpQC9gBkpmA1kEqq/oS4DXbFysinHWd4WQ4DV3PU8Gbf09i+EDQyXPBCmehnkzQFqeLAmF/GglBiTKnsVk4J5nqgtgofrOk+RJ3VTHyM9k0mMA/U+zqhN7JPziVWHmoNOYv/I5QnZrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=2K/k3RZe; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=PBzYd1B/1DgsFcocc0KGkyfJ5l6LvBwfL151TplKcQw=; b=2K/k3RZeHPBMJSApFMk8K50k8J
-	s6sM/0AB6CiBm74CGzhJNvDrI7VLbORymaXjfyHCRMBHMpkg3AUv8j9tCTu3YRivt8fpgSl0RR/72
-	7z1lV5zPMw03z1IzobinqOe3QVqYwAebfkmhMU4Z1CnvL4VTDgI9GxaT/F9ASNCbDyLZ4lyOml/4M
-	pT0fXRu8kjIqKyeP70Xp2UNt3COmj9koD8sc1odGxyZymB6Wb42+uxTdT21+qL2pBgtir2zuqFN2K
-	9BH59PsZZPmTQJ441XbFEwRD/3btlDUkVh9AM2zsOYicFigwBbn1J1O6q9HF+nY/Byltm9yCifuj8
-	IPfrectg==;
-Received: from [50.53.50.0] (helo=bombadil.infradead.org)
-	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1rS94s-00F7Dz-1J;
-	Tue, 23 Jan 2024 05:12:02 +0000
-From: Randy Dunlap <rdunlap@infradead.org>
-To: netdev@vger.kernel.org
-Cc: patches@lists.linux.dev,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Jon Maloy <jmaloy@redhat.com>,
-	Ying Xue <ying.xue@windriver.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH resend] tipc: socket: remove Excess struct member kernel-doc warning
-Date: Mon, 22 Jan 2024 21:12:01 -0800
-Message-ID: <20240123051201.24701-1-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1705986789; c=relaxed/simple;
+	bh=a1TBqaaUsQPZKdtcmRl+G4jKCEl+jJJ1H8eSCwKaT78=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dpA7UuEdgjAx68eFgd4JPfHA9LHE8bjPNX8YhJbOln6zbXIGjcpDkoNxe27UtN0KCrktA5uyOdhkUA/hj6pbhULTzi2kbs0e05Kcny/pVFzwJv4jiLhBXD7Jz3wccN+EUxChZTiFjo0ocQlh8KM27IDxiZwKkZAlgqHtd6NNnS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=P41N03rK; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40N3s5Xt021322;
+	Mon, 22 Jan 2024 21:13:00 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=pfpt0220; bh=qKtxjADE
+	4ZUb6j3GQMrUdJpi8zccRiI9JMEvJ/dxOow=; b=P41N03rKS/4HSK4D0nfVV1oy
+	hkoHmynDq1RMu5GNMZg/lGk3Sh6ZorEQbmDPoSli3M+gU27wRYVZK7g1N+/NS0Ml
+	5mbFCIwvpx0fkh1Ibi2FVZaUk/rDmcWk6sTKmIK2sqHgc+WY94PGhJY4HQRG8HEr
+	4+KR556voWyAmY83vq9aimkMFt7dxu3mTUoVqpxb9jQqd06DX+8orV5hlQQAMwTn
+	JykbVroT/AepKREZjnXZxfWV8n/t0bhzDh40jHrsQ3dsNpcH1bJJYHUOCZluv1co
+	nFnhZzvf4aVgeDJREmlgiLe/n1LfC54oX3r9bLRY9LizGy9S3aa+2YNNd9uVwQ==
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3vt5y2069s-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Mon, 22 Jan 2024 21:13:00 -0800 (PST)
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 22 Jan
+ 2024 21:12:58 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Mon, 22 Jan 2024 21:12:58 -0800
+Received: from marvell-OptiPlex-7090.marvell.com (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id B983F3F7070;
+	Mon, 22 Jan 2024 21:12:54 -0800 (PST)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <sbhatta@marvell.com>,
+        <gakula@marvell.com>, <hkelam@marvell.com>,
+        Ratheesh Kannoth
+	<rkannoth@marvell.com>
+Subject: [PATCH net] octeontx2-af: Initialize bitmap arrays.
+Date: Tue, 23 Jan 2024 10:42:45 +0530
+Message-ID: <20240123051245.3801246-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,36 +73,140 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: Coa9FADqEpO7hOKVYBuhhotB-nd5lvzV
+X-Proofpoint-ORIG-GUID: Coa9FADqEpO7hOKVYBuhhotB-nd5lvzV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-23_02,2024-01-22_01,2023-05-22_02
 
-Remove a kernel-doc description to squelch a warning:
+kmalloc_array() does not initializes memory to zero.
+This causes issues with bitmap. Use devm_kcalloc()
+to fix the issue.
 
-socket.c:143: warning: Excess struct member 'blocking_link' description in 'tipc_sock'
-
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Jon Maloy <jmaloy@redhat.com>
-Cc: Ying Xue <ying.xue@windriver.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org
-Cc: Jonathan Corbet <corbet@lwn.net>
-Reviewed-by: Simon Horman <horms@kernel.org>
+Fixes: dd7842878633 ("octeontx2-af: Add new devlink param to configure maximum usable NIX block LFs")
+Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
 ---
-Resend after merge window has closed.
+ .../ethernet/marvell/octeontx2/af/rvu_npc.c   | 55 ++++++++++---------
+ 1 file changed, 28 insertions(+), 27 deletions(-)
 
- net/tipc/socket.c |    1 -
- 1 file changed, 1 deletion(-)
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+index 167145bdcb75..7539e6f0290a 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+@@ -1850,13 +1850,13 @@ void npc_mcam_rsrcs_deinit(struct rvu *rvu)
+ {
+ 	struct npc_mcam *mcam = &rvu->hw->mcam;
+ 
+-	kfree(mcam->bmap);
+-	kfree(mcam->bmap_reverse);
+-	kfree(mcam->entry2pfvf_map);
+-	kfree(mcam->cntr2pfvf_map);
+-	kfree(mcam->entry2cntr_map);
+-	kfree(mcam->cntr_refcnt);
+-	kfree(mcam->entry2target_pffunc);
++	devm_kfree(rvu->dev, mcam->bmap);
++	devm_kfree(rvu->dev, mcam->bmap_reverse);
++	devm_kfree(rvu->dev, mcam->entry2pfvf_map);
++	devm_kfree(rvu->dev, mcam->cntr2pfvf_map);
++	devm_kfree(rvu->dev, mcam->entry2cntr_map);
++	devm_kfree(rvu->dev, mcam->cntr_refcnt);
++	devm_kfree(rvu->dev, mcam->entry2target_pffunc);
+ 	kfree(mcam->counters.bmap);
+ }
+ 
+@@ -1904,21 +1904,22 @@ int npc_mcam_rsrcs_init(struct rvu *rvu, int blkaddr)
+ 	mcam->pf_offset = mcam->nixlf_offset + nixlf_count;
+ 
+ 	/* Allocate bitmaps for managing MCAM entries */
+-	mcam->bmap = kmalloc_array(BITS_TO_LONGS(mcam->bmap_entries),
+-				   sizeof(long), GFP_KERNEL);
++	mcam->bmap = devm_kcalloc(rvu->dev, BITS_TO_LONGS(mcam->bmap_entries),
++				  sizeof(long), GFP_KERNEL);
+ 	if (!mcam->bmap)
+ 		return -ENOMEM;
+ 
+-	mcam->bmap_reverse = kmalloc_array(BITS_TO_LONGS(mcam->bmap_entries),
+-					   sizeof(long), GFP_KERNEL);
++	mcam->bmap_reverse = devm_kcalloc(rvu->dev,
++					  BITS_TO_LONGS(mcam->bmap_entries),
++					  sizeof(long), GFP_KERNEL);
+ 	if (!mcam->bmap_reverse)
+ 		goto free_bmap;
+ 
+ 	mcam->bmap_fcnt = mcam->bmap_entries;
+ 
+ 	/* Alloc memory for saving entry to RVU PFFUNC allocation mapping */
+-	mcam->entry2pfvf_map = kmalloc_array(mcam->bmap_entries,
+-					     sizeof(u16), GFP_KERNEL);
++	mcam->entry2pfvf_map = devm_kcalloc(rvu->dev, mcam->bmap_entries,
++					    sizeof(u16), GFP_KERNEL);
+ 	if (!mcam->entry2pfvf_map)
+ 		goto free_bmap_reverse;
+ 
+@@ -1941,27 +1942,27 @@ int npc_mcam_rsrcs_init(struct rvu *rvu, int blkaddr)
+ 	if (err)
+ 		goto free_entry_map;
+ 
+-	mcam->cntr2pfvf_map = kmalloc_array(mcam->counters.max,
+-					    sizeof(u16), GFP_KERNEL);
++	mcam->cntr2pfvf_map = devm_kcalloc(rvu->dev, mcam->counters.max,
++					   sizeof(u16), GFP_KERNEL);
+ 	if (!mcam->cntr2pfvf_map)
+ 		goto free_cntr_bmap;
+ 
+ 	/* Alloc memory for MCAM entry to counter mapping and for tracking
+ 	 * counter's reference count.
+ 	 */
+-	mcam->entry2cntr_map = kmalloc_array(mcam->bmap_entries,
+-					     sizeof(u16), GFP_KERNEL);
++	mcam->entry2cntr_map = devm_kcalloc(rvu->dev, mcam->bmap_entries,
++					    sizeof(u16), GFP_KERNEL);
+ 	if (!mcam->entry2cntr_map)
+ 		goto free_cntr_map;
+ 
+-	mcam->cntr_refcnt = kmalloc_array(mcam->counters.max,
+-					  sizeof(u16), GFP_KERNEL);
++	mcam->cntr_refcnt = devm_kcalloc(rvu->dev, mcam->counters.max,
++					 sizeof(u16), GFP_KERNEL);
+ 	if (!mcam->cntr_refcnt)
+ 		goto free_entry_cntr_map;
+ 
+ 	/* Alloc memory for saving target device of mcam rule */
+-	mcam->entry2target_pffunc = kmalloc_array(mcam->total_entries,
+-						  sizeof(u16), GFP_KERNEL);
++	mcam->entry2target_pffunc = devm_kcalloc(rvu->dev, mcam->total_entries,
++						 sizeof(u16), GFP_KERNEL);
+ 	if (!mcam->entry2target_pffunc)
+ 		goto free_cntr_refcnt;
+ 
+@@ -1978,19 +1979,19 @@ int npc_mcam_rsrcs_init(struct rvu *rvu, int blkaddr)
+ 	return 0;
+ 
+ free_cntr_refcnt:
+-	kfree(mcam->cntr_refcnt);
++	devm_kfree(rvu->dev, mcam->cntr_refcnt);
+ free_entry_cntr_map:
+-	kfree(mcam->entry2cntr_map);
++	devm_kfree(rvu->dev, mcam->entry2cntr_map);
+ free_cntr_map:
+-	kfree(mcam->cntr2pfvf_map);
++	devm_kfree(rvu->dev, mcam->cntr2pfvf_map);
+ free_cntr_bmap:
+ 	kfree(mcam->counters.bmap);
+ free_entry_map:
+-	kfree(mcam->entry2pfvf_map);
++	devm_kfree(rvu->dev, mcam->entry2pfvf_map);
+ free_bmap_reverse:
+-	kfree(mcam->bmap_reverse);
++	devm_kfree(rvu->dev, mcam->bmap_reverse);
+ free_bmap:
+-	kfree(mcam->bmap);
++	devm_kfree(rvu->dev, mcam->bmap);
+ 
+ 	return -ENOMEM;
+ }
+-- 
+2.25.1
 
-diff -- a/net/tipc/socket.c b/net/tipc/socket.c
---- a/net/tipc/socket.c
-+++ b/net/tipc/socket.c
-@@ -80,7 +80,6 @@ struct sockaddr_pair {
-  * @phdr: preformatted message header used when sending messages
-  * @cong_links: list of congested links
-  * @publications: list of publications for port
-- * @blocking_link: address of the congested link we are currently sleeping on
-  * @pub_count: total # of publications port has made during its lifetime
-  * @conn_timeout: the time we can wait for an unresponded setup request
-  * @probe_unacked: probe has not received ack yet
 
