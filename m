@@ -1,147 +1,165 @@
-Return-Path: <netdev+bounces-65215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A456839ABD
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 22:02:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA050839AD9
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 22:06:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33102285488
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 21:02:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6EF91B29C64
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 21:06:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9602538D;
-	Tue, 23 Jan 2024 21:02:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9077E2C1B7;
+	Tue, 23 Jan 2024 21:06:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=pwaller.net header.i=@pwaller.net header.b="Ar/aGfIr"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="J45UVL1o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.foo.to (mail.foo.to [144.76.29.196])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B291AF9D8
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 21:02:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.29.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86FF64E1BC
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 21:06:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706043733; cv=none; b=iGQbwLeq9hI7pR60qxWI6ylG8vQyhmFPsl7MdGsGmMkEcNCi72rvKQ1SrABDYQXuCsIoHv+D2X2Fg2SJklIJiBdN3pwPiKNSYGNLWJ/jbk/FHGmBPGpCHVMYwGin2IlqmI5OOqRITem3uwqRdy2vjr53caMLEv0bpIJ7sB9LgNI=
+	t=1706043969; cv=none; b=mWFMmNW1FktGZFXfU00QkpTnMgVHzdBn4M3Gngs9dIjZREaHXgE/6VTq87HUSckYs7RixF5KBh4xeIUQ3luBmAswB+YpOGmX+09yYJHbOrEvTVTcrjzqp9eRRp6uO8E7jKant2n6Z68A4amMT+5nt5t7+PTPZ5V3RykJIZa5B2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706043733; c=relaxed/simple;
-	bh=8qHo+ftKJOzaPnKdBKTks7d0X+soiClQ3km+6qGPlLs=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=XLpHM/89yykfKWFHFrxaYj39QtQp6ORHW+LUvCUf1BMDZIoPWw2yIKMRu/1X7l4BjigCvAOEnsb89jGFxst3P7CpDDX72oLbfc+PJSRyMqcPw5h9dj3i0fAVo3uWcFXaboWoVWMIMYABNcwNLDaabBadx72S5dY8rZcbirz0eL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=pwaller.net; spf=pass smtp.mailfrom=pwaller.net; dkim=pass (1024-bit key) header.d=pwaller.net header.i=@pwaller.net header.b=Ar/aGfIr; arc=none smtp.client-ip=144.76.29.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=pwaller.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pwaller.net
-Message-ID: <32a0ccb2-9570-4099-961c-6a53e1a553d7@pwaller.net>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=pwaller.net; s=mail;
-	t=1706043729; bh=8qHo+ftKJOzaPnKdBKTks7d0X+soiClQ3km+6qGPlLs=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=Ar/aGfIrlLn/NRmjolfgyDRbwnHmjLcqr0ccNdDxtzxCidhnRAKMdcb2mu64NMuV3
-	 33JM7fc+nOQQqDSugpfmEU9kaLuBpzk29qjH02T/9eDyQB6To0dHUawb/Rb3DKGlvi
-	 X5sXzgSID1Vlmm73F8UYTm1dpMrPtmxx2itV8AXI=
-Date: Tue, 23 Jan 2024 21:02:09 +0000
+	s=arc-20240116; t=1706043969; c=relaxed/simple;
+	bh=wvda1L3RR/smUjSRPDsfcLiEuhGrOrqrle7idqMf9t8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=q1Js5je9/iBQhrDxdW8VufXCkJqDqjlh3gAkZeMqHiHCXof/s2HsPjWuWriBgu7cit0ktng5P+kmUmVn2xXZ1OS3Byn5xZWyn1M9UEjG8SA81Sn8NWtIYo31uTwKYPgzUpp4mEgG3SJp44imvjECQiBToZugVgQYW0ZlzIDnNfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=J45UVL1o; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=oC+Xzu8aSBBLxTeOfbPxmslOua7SUo4gfiXATYXwkfg=; b=J45UVL1of3oS15/wI5Kdmn28wP
+	7NPwZmDwM3ad0TQT+R6Kl9P6QMirgtMipu5fPDa6WhT2/UwIxx1ne/KkfmlSKDirr4Hd8WuTmok/y
+	FMw4Q3uBOcg8QIoVKE8OzqN9r2whlaugsZJme1hEZSobD0kFllk/tmRuVVCUd3QyKoZhjx7d9rxyt
+	Z5ShI6oUM7qT5YIGi8U1JcpH8BQ7eJBr6osb3Hzb1YneVqu746PUAsQ9kay+HAcICWTBM9GhJ5Gn0
+	4x30bjcoNaX8RJ2CIwr/zI1Rt52PufU+PMTRmN1jdYXkmWxwe4NlGq0QTWfnHnBftRxNSIhd16w8y
+	7KsPIptw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43142)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rSNxu-00035u-1i;
+	Tue, 23 Jan 2024 21:05:50 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rSNxr-0002Fu-Qa; Tue, 23 Jan 2024 21:05:47 +0000
+Date: Tue, 23 Jan 2024 21:05:47 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Sean Anderson <sean.anderson@seco.com>
+Cc: Landen.Chao@mediatek.com, UNGLinuxDriver@microchip.com,
+	alexandre.belloni@bootlin.com, andrew@lunn.ch,
+	angelogioacchino.delregno@collabora.com, arinc.unal@arinc9.com,
+	claudiu.manoil@nxp.com, daniel@makrotopia.org, davem@davemloft.net,
+	dqfext@gmail.com, edumazet@google.com, f.fainelli@gmail.com,
+	hkallweit1@gmail.com, kuba@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, matthias.bgg@gmail.com,
+	netdev@vger.kernel.org, olteanv@gmail.com, pabeni@redhat.com,
+	sean.wang@mediatek.com
+Subject: Re: [PATCH RFC net-next 03/14] net: phylink: add support for PCS
+ link change notifications
+Message-ID: <ZbAqK+RbuJZ6d4tK@shell.armlinux.org.uk>
+References: <E1qChay-00Fmrf-9Y@rmk-PC.armlinux.org.uk>
+ <75773076-39a2-49dd-9eb2-15a10955a60d@seco.com>
+ <ZbAch9ZlbDrZqzpw@shell.armlinux.org.uk>
+ <e3647618-b896-47a2-b9b9-c75b56813293@seco.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [EXT] Aquantia ethernet driver suspend/resume issues
-From: Peter Waller <p@pwaller.net>
-To: Igor Russkikh <irusskikh@marvell.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
- Linus Torvalds <torvalds@linux-foundation.org>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Netdev <netdev@vger.kernel.org>
-References: <3b607ba8-ef5a-56b3-c907-694c0bde437c@marvell.com>
- <E8060D65-F6C2-4AF5-AE3F-8ED8A30F95EF@pwaller.net>
-Content-Language: en-US
-In-Reply-To: <E8060D65-F6C2-4AF5-AE3F-8ED8A30F95EF@pwaller.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e3647618-b896-47a2-b9b9-c75b56813293@seco.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Here's part of the log, I can provide more off list if it helps. - Peter
+On Tue, Jan 23, 2024 at 03:33:57PM -0500, Sean Anderson wrote:
+> On 1/23/24 15:07, Russell King (Oracle) wrote:
+> > On Tue, Jan 23, 2024 at 02:46:15PM -0500, Sean Anderson wrote:
+> >> Hi Russell,
+> >> 
+> >> Does there need to be any locking when calling phylink_pcs_change? I
+> >> noticed that you call it from threaded IRQ context in [1]. Can that race
+> >> with phylink_major_config?
+> > 
+> > What kind of scenario are you thinking may require locking?
+> 
+> Can't we at least get a spurious bounce? E.g.
+> 
+> pcs_major_config()
+>   pcs_disable(old_pcs) /* masks IRQ */
+>   old_pcs->phylink = NULL;
+>   new_pcs->phylink = pl;
+>   ...
+>   pcs_enable(new_pcs) /* unmasks IRQ */
+>   ...
+> 
+> pcs_handle_irq(new_pcs) /* Link up IRQ */
+>   phylink_pcs_change(new_pcs, true)
+>     phylink_run_resolve(pl)
+> 
+> phylink_resolve(pl)
+>   /* Link up */
 
-<previous boot> Filesystems sync: 0.014 seconds
-<n>.678271 Freezing user space processes
-<n>.678366 Freezing user space processes completed (elapsed 0.001 seconds)
-<n>.678383 OOM killer disabled.
-<n>.678397 Freezing remaining freezable tasks
-<n>.678407 Freezing remaining freezable tasks completed (elapsed 0.000 
-seconds)
-<n>.678423 printk: Suspending console(s) (use no_console_suspend to debug)
-<n>.678437 serial 00:04: disabled
-<n>.678654 queueing ieee80211 work while going to suspend
-<n>.678680 sd 9:0:0:0: [sda] Synchronizing SCSI cache
-<n>.678884 ata10.00: Entering standby power mode
-<n>.678900 atlantic 0000:0c:00.0: AMD-Vi: Event logged [IO_PAGE_FAULT 
-domain=0x0014 address=0xfc80b000 flags=0x0020]
-<n>.679124 atlantic 0000:0c:00.0: AMD-Vi: Event logged [IO_PAGE_FAULT 
-domain=0x0014 address=0xffeae520 flags=0x0020]
-<n>.679270 atlantic 0000:0c:00.0: AMD-Vi: Event logged [IO_PAGE_FAULT 
-domain=0x0014 address=0xfc80c000 flags=0x0020]
-<n>.679411 atlantic 0000:0c:00.0: AMD-Vi: Event logged [IO_PAGE_FAULT 
-domain=0x0014 address=0xffeae530 flags=0x0020]
-<n>.679541 ACPI: EC: interrupt blocked
-<n>.679554 amdgpu 0000:03:00.0: amdgpu: MODE1 reset
-<n>.679682 amdgpu 0000:03:00.0: amdgpu: GPU mode1 reset
-<n>.679803 amdgpu 0000:03:00.0: amdgpu: GPU smu mode1 reset
-<n>.679919 ACPI: PM: Preparing to enter system sleep state S3
-<n>.679931 ACPI: EC: event blocked
-<n>.679942 ACPI: EC: EC stopped
-<n>.679952 ACPI: PM: Saving platform NVS memory
-<n>.679959 Disabling non-boot CPUs ...
-<snip>
-<n>.682471 atlantic 0000:0c:00.0 eno2: atlantic: link change old 1000 new 0
-<snip>
-<n>.687497 PM: suspend exit
+By this time, old_pcs->phylink has been set to NULL as you mentioned
+above.
 
-On 23/01/2024 15:13, Peter Waller wrote:
-> True, it is a warning rather than a hard crash, though shutdown hangs. Thanks for the workaround.
->
-> I can provide more dmesg when I’m back at my computer. Do you need the whole thing or is there something in particular you want from it? From memory there isn’t much more in the way of messages that looked connected to me.
->
-> Sent from my mobile, please excuse brevity
->
->> On 23 Jan 2024, at 14:59, Igor Russkikh <irusskikh@marvell.com> wrote:
->>
->> ﻿
->>> On 1/21/2024 10:05 PM, Peter Waller wrote:
->>> I see a fix for double free [0] landed in 6.7; I've been running that
->>> for a few days and have hit a resume from suspend issue twice. Stack
->>> trace looks a little different (via __iommu_dma_map instead of
->>> __iommu_dma_free), provided below.
->>>
->>> I've had resume issues with the atlantic driver since I've had this
->>> hardware, but it went away for a while and seems as though it may have
->>> come back with 6.7. (No crashes since logs begin on Dec 15 till Jan 12,
->>> Upgrade to 6.7; crashes 20th and 21st, though my usage style of the
->>> system has also varied, maybe crashes are associated with higher memory
->>> usage?).
->> Hi Peter,
->>
->> Are these hard crashes, or just warnings in dmesg you see?
->>  From the log you provided it looks like a warning, meaning system is usable
->> and driver can be restored with `if down/up` sequence.
->>
->> If so, then this is somewhat expected, because I'm still looking into
->> how to refactor this suspend/resume cycle to reduce mem usage.
->> Permanent workaround would be to reduce rx/tx ring sizes with something like
->>
->>     ethtool -G rx 1024 tx 1024
->>
->> If its a hard panic, we should look deeper into it.
->>
->>> Possibly unrelated but I also see fairly frequent (1 to ten times per
->>> boot, since logs begin?) messages in my logs of the form "atlantic
->>> 0000:0c:00.0: AMD-Vi: Event logged [IO_PAGE_FAULT domain=0x0014
->>> address=0xffce8000 flags=0x0020]".
->> Seems to be unrelated, but basically indicates HW or FW tries to access unmapped
->> memory addresses, and iommu catches that.
->> Full dmesg may help analyze this.
->>
->> Regards
->>   Igor
+> pcs_handle_irq(old_pcs) /* Link down IRQ (pending from before pcs_disable) */
+>   phylink_pcs_change(old_pcs, false)
+>     phylink_run_resolve(pl) /* Doesn't see the NULL */
 
+So here, phylink_pcs_change(old_pcs, ...) will read old_pcs->phylink and
+find that it's NULL, and do nothing.
 
+> > I guess the possibility would be if pcs->phylink changes and the
+> > compiler reads it multiple times - READ_ONCE() should solve that.
+> > 
+> > However, in terms of the mechanics, there's no race.
+> > 
+> > During the initial bringup, the resolve worker isn't started until
+> > after phylink_major_config() has completed (it's started at
+> > phylink_enable_and_run_resolve().) So, if phylink_pcs_change()
+> > gets called while in phylink_major_config() there, it'll see
+> > that pl->phylink_disable_state is non-zero, and won't queue the
+> > work.
+> > 
+> > The next one is within the worker itself - and there can only
+> > be one instance of the worker running in totality. So, if
+> > phylink_pcs_change() gets called while phylink_major_config() is
+> > running from this path, the only thing it'll do is re-schedule
+> > the resolve worker to run another iteration which is harmless
+> > (whether or not the PCS is still current.)
+> > 
+> > The last case is phylink_ethtool_ksettings_set(). This runs under
+> > the state_mutex, which locks out the resolve worker (since it also
+> > takes that mutex).
+> > 
+> > So calling phylink_pcs_change() should be pretty harmless _unless_
+> > the compiler re-reads pcs->phylink multiple times inside
+> > phylink_pcs_change(), which I suppose with modern compilers is
+> > possible. Hence my suggestion above about READ_ONCE() for that.
+> > 
+> > Have you encountered an OOPS because pcs->phylink has become NULL?
+> > Or have you spotted another issue?
+> 
+> I was looking at extending this code, and I was wondering if I needed
+> to e.g. take RTNL first. Thanks for the quick response.
+
+Note that phylink_mac_change() gets called in irq context, so this
+stuff can't take any mutexes or the rtnl. It is also intended that
+phylink_pcs_change() is similarly callable in irq context.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
