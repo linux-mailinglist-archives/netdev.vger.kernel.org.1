@@ -1,93 +1,134 @@
-Return-Path: <netdev+bounces-64986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D1C8838B46
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 11:00:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B99CB838B52
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 11:03:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0546128E850
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 10:00:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B283B22F70
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 10:03:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13AB85A0FB;
-	Tue, 23 Jan 2024 10:00:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C34E5BAFE;
+	Tue, 23 Jan 2024 10:03:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KdV26JYx"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Z7kK/SwE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E084F5A0F2
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 10:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBE215C5E0;
+	Tue, 23 Jan 2024 10:03:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706004028; cv=none; b=dUfIBiIP0XLawXRs+uoeQFmBoO++3HXK+gzRKukQZ0/Edn/YGqqr9JrqEH65Ob3JliW/aNlWrSkwVQPCVMoc8ALbWsDwJeR5hfDhUKFsNi4bJaknVJifILHEC3kSzE/FW497hHKfQUa28KqyX+zHldYB1Z8FkYWHyleIsNDGL1U=
+	t=1706004224; cv=none; b=tjd2tLXU2LXmdn7zRIvjRANfFuZmF+WfHULXfMh7xXjGDSfMkk8fMThL3LEF0FQSSmgt0tzpz5JRKs8plFM16aQR+4aJq1DIf/QsqoqOeGT1p4GF65XIMrvCBfkFe3SgGJxJCBdO0r/Dfei/Wtx+fZ4toztYSkcFAfRa13tF+F8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706004028; c=relaxed/simple;
-	bh=P86cTJZc6jZpyCaRRQKLv89rcvhOKMjU+QM5EKvjmJ0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Jjk2TeTaMYsrW0k+cmt6vYm/pMfj9sZdbelvQrDgjGBZJ6uq1US6b0lrIyJjr1K8n2QBukM9Cxt8RPVCzzPhcjJQlAKL20Q6RENXUSluDhdfuUNQOu0iDZSTe+fFPJ8AgPL3bZKHZtZlIECDEOW1TWPCTdpXAKKTe+5Rz3k/xcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KdV26JYx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 57172C43394;
-	Tue, 23 Jan 2024 10:00:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706004027;
-	bh=P86cTJZc6jZpyCaRRQKLv89rcvhOKMjU+QM5EKvjmJ0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KdV26JYxcVtncP/h6UjtO4Kll5E9dvA3TRoSi6foseyklmk9IYStzHzU8lGlwbbQz
-	 lFpiK8/em/JcupIbchbC9S+xeMo1nbG/HWcGR7AujdM1Fn5yHGX7s9eqKg/hrSEE4p
-	 GpaBfFpv+X0JOwU3JXanPfpF4krzyp7RRAzE8SzID0bJnG98LrIUWA7d1F8l9PGnk+
-	 y1usX0hJ8j89msG94tjT6Mjla0UimDYQzZytLLmY+m+Sf79btA2X+llcQpI/JWDW3X
-	 zwc6Ng5Y3MVUZ8zXq7nQabtni7QUxS4WS9x9a/1nZHUWSsbeVjazwVJY7Gn3HwrcH3
-	 nwKo6bv2BXRHQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 40B8CDC99E1;
-	Tue, 23 Jan 2024 10:00:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1706004224; c=relaxed/simple;
+	bh=uMNNg+3njresSW14XlqPX2ISyI4rysroKuO5EzSZJcY=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RahRc0N1htZtGLSPO7LyywyV+QsDVfTxWPTOkuvJNPBeWd1RBv/crn20HKAXfBhZeuIb7/n6pJN9azDsnayxibhrQ/Hs3DgiiNeqRyDL45gCrJBo4M1juQOIpICZkEa2WmOcEbyzaN6K3z9YnrLYe4crG+Zich055AnqPSNrs9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Z7kK/SwE; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1706004222; x=1737540222;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=uMNNg+3njresSW14XlqPX2ISyI4rysroKuO5EzSZJcY=;
+  b=Z7kK/SwECCIj2ufKU3bP/qE23MAuLlt4vwZL6bo5DMnyXp3Fh6Y7+WFG
+   5GKE/YvTMcXA7kDUht3QR3PB1MFtTa1PhVbAp4roBS+STAsVfTY37MS7B
+   0i8Ww0caTP4DRI6MZ76SbhRJy6/nqWXTrQJIRtgNqxOwJtNf2ON3xclrE
+   x3QEg/X9RPhoKc0g9pPRvYnGYs8ddhw5XXdII2KKKJiuFbE8q2Pyc3RQ1
+   IuWUdT5C4qa3o6Kiha2PY9McQawEcQc+ejpl+Z1xftsRKkxP7X8J54atf
+   gd76Yyg9iv11GeQVVPGf85c+cIeePbwAZborb1tAw9RnI74beLB1dGkoL
+   A==;
+X-CSE-ConnectionGUID: RZ1Nz7WUS3Gi2FofoZ48Tg==
+X-CSE-MsgGUID: QLqhO3EaRo+fPgWiwCOc7w==
+X-IronPort-AV: E=Sophos;i="6.05,214,1701154800"; 
+   d="scan'208";a="15158519"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Jan 2024 03:03:40 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 23 Jan 2024 03:03:20 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex01.mchp-main.com
+ (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Tue, 23 Jan 2024 03:03:20 -0700
+Date: Tue, 23 Jan 2024 11:03:19 +0100
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <UNGLinuxDriver@microchip.com>
+Subject: Re: [PATCH net] net: lan966x: Fix port configuration when using
+ SGMII interface
+Message-ID: <20240123100319.3z6or2ahhztkplgv@DEN-DL-M31836.microchip.com>
+References: <20240123081514.3625293-1-horatiu.vultur@microchip.com>
+ <20240123094849.5ce5acc8@device-28.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1 net] selftest: Don't reuse port for SO_INCOMING_CPU test.
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170600402726.32452.17185055624218058884.git-patchwork-notify@kernel.org>
-Date: Tue, 23 Jan 2024 10:00:27 +0000
-References: <20240120031642.67014-1-kuniyu@amazon.com>
-In-Reply-To: <20240120031642.67014-1-kuniyu@amazon.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, kuni1840@gmail.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <20240123094849.5ce5acc8@device-28.home>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Fri, 19 Jan 2024 19:16:42 -0800 you wrote:
-> Jakub reported that ASSERT_EQ(cpu, i) in so_incoming_cpu.c seems to
-> fire somewhat randomly.
+The 01/23/2024 09:48, Maxime Chevallier wrote:
 > 
->   # #  RUN           so_incoming_cpu.before_reuseport.test3 ...
->   # # so_incoming_cpu.c:191:test3:Expected cpu (32) == i (0)
->   # # test3: Test terminated by assertion
->   # #          FAIL  so_incoming_cpu.before_reuseport.test3
->   # not ok 3 so_incoming_cpu.before_reuseport.test3
+> Hello Horatiu,
+
+Hi Maxime,
+
 > 
-> [...]
+> On Tue, 23 Jan 2024 09:15:14 +0100
+> Horatiu Vultur <horatiu.vultur@microchip.com> wrote:
+> 
+> > In case the interface between the MAC and the PHY is SGMII, then the bit
+> > GIGA_MODE on the MAC side needs to be set regardless of the speed at
+> > which it is running.
+> >
+> > Fixes: d28d6d2e37d1 ("net: lan966x: add port module support")
+> > Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+> > ---
+> >  drivers/net/ethernet/microchip/lan966x/lan966x_port.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_port.c b/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
+> > index 92108d354051c..975a6d64a2e18 100644
+> > --- a/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
+> > +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
+> > @@ -170,7 +170,8 @@ static void lan966x_port_link_up(struct lan966x_port *port)
+> >       /* Also the GIGA_MODE_ENA(1) needs to be set regardless of the
+> >        * port speed for QSGMII ports.
+> 
+> Small nit, I think this comment above the test could also be updated to
+> reflect that change.
 
-Here is the summary with links:
-  - [v1,net] selftest: Don't reuse port for SO_INCOMING_CPU test.
-    https://git.kernel.org/netdev/net/c/97de5a15edf2
+Ah... yes, you are right. I will update this in the next version.
 
-You are awesome, thank you!
+> 
+> >        */
+> > -     if (phy_interface_num_ports(config->portmode) == 4)
+> > +     if (phy_interface_num_ports(config->portmode) == 4 ||
+> > +         config->portmode == PHY_INTERFACE_MODE_SGMII)
+> >               mode = DEV_MAC_MODE_CFG_GIGA_MODE_ENA_SET(1);
+> >
+> >       lan_wr(config->duplex | mode,
+> 
+> Besides that,
+> 
+> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> 
+> Thanks,
+> 
+> Maxime
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+/Horatiu
 
