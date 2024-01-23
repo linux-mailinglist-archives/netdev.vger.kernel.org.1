@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-65104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65105-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 252D4839433
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:06:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF197839436
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:06:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B11BB25E7F
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 16:06:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 971C21F21DF9
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 16:06:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DB9863510;
-	Tue, 23 Jan 2024 16:05:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27DB961665;
+	Tue, 23 Jan 2024 16:05:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UhDNatIc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GKi8/LaU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CDF561665;
-	Tue, 23 Jan 2024 16:05:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 671C163519;
+	Tue, 23 Jan 2024 16:05:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706025952; cv=none; b=mvm9VZzHU75c2pScjGcsqSbaJOEIUUaM3xU21xQlUZPyeuDDN9vFTVlw9EHlBGt0Ad3VRVXFqCh2Rt/3lbZtbcBRn0Zg4DWXFYZny3BzKpgnl8hvgVM+V6ziwkbx5lOMVWqix8B1iEoznfLInMnjF/6w6GQ9CJnrY/eZGLJoW04=
+	t=1706025955; cv=none; b=fJPbNHCEu74CQnYqj8oTFLDK68+5gAHn93KYKpsoGdvusPgzEpwJp4ya/jsdKrEo/0CZypuWhJfBPtEwy5N//6SffH5tZfh3AbMOcy9XNpcDrlv7+xi3JkJKRLAd9HA5uCgzpKeXY6drafyMHISfDn/jCCbdYqKFoDxyVcsb1r4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706025952; c=relaxed/simple;
-	bh=wGQ2wXJhQOmb+5CEhiazfvQGcY5+AUc3utMAHnbGSDo=;
+	s=arc-20240116; t=1706025955; c=relaxed/simple;
+	bh=UAyF8X7QSWT7mXbILRIB+tuM8vms7O+Ylss9/Xo4KPI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=N/a8sxP7CQLpPFSnXWBoN+POKMVirRxof0edxBgziUAOyuJqiMOizt3pLnbRZa93564UM1hejTwRVRlxQLdSzgVyFPM6emPabtuL6RWE619N64YN1MYR44N/yJ7YAnpLysgWoJXasJO1Qd3HLFJ2qrbtwj4hQLkOGPmyZwGD+l4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UhDNatIc; arc=none smtp.client-ip=209.85.128.51
+	 MIME-Version; b=ZSAiz/447MFWEm9RWJR0Udo24x5yDBdYev7056qRbo6zu6tpYX/gkn7TrnTsj9RkpAcj59pjM7UsBm0mt1u7GWMzykTzNEk5PwS6eAn0LBMGWYwlRZuKoMiZlVZyiS3mNnBvMmIeSBgmx42U7kUhZIoLtr8+9NMOuaG92Ha62rk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GKi8/LaU; arc=none smtp.client-ip=209.85.128.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-40ec3535225so2082475e9.2;
-        Tue, 23 Jan 2024 08:05:51 -0800 (PST)
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-40e87d07c07so56936055e9.1;
+        Tue, 23 Jan 2024 08:05:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706025948; x=1706630748; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706025951; x=1706630751; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ryo8HRjGnljrClxgJ6alqFUbKEiQl5mSg8DOiMtGabA=;
-        b=UhDNatIcrosQRudbRn+3SWDdvdbsSf6gh4R/nMbx68rs4heRXPNGAl07b6HgzNiy1Q
-         G4k3nHI/V7g5Jf2EXmUs1KXdYn6yxxdSvmKFpBU41bOPTBmMdJn66L7KH8asMDwO6VUm
-         8hO+NssqRfZV0Rxv+/sTySTyVI7s3OnAQYP7vchH1/UF1aX9hrYYrpK10+MfFK9rCTZT
-         rPgJnjRA2SqzN/8HzV6YCpBfbBBiRtKLc9D2emIXN9PAX6fhtvEC6ArVhCG4aTsrdu7s
-         sYuJQLm699bq+KU5NWM8PA53nQlezocghFsUQwBGiphZM6gBsSVQwlmhuNBXTBHPgQ9h
-         /Oqg==
+        bh=8nu3GBbweqqLjVKM1I/MvCjJ4k7t4quChK5YPaJt0ls=;
+        b=GKi8/LaUbqn7y6h6VAx7VX51yKm/2vZt9v1qYUlIsIdPP1pELA5S7cmD+Zc3xBc4Uj
+         6OV8rigcNkhqZizmApiudsk5q1ZUP9D1pZ6cMBSeQciyvPPIAVFus0GeRc+351EjlukY
+         uwLHnZZzUOuoJDDdbTCM1d1OX/h+Kd98kIiQPBxaxSHe8C+S+MNVdLFX5yP1BuYsZCrp
+         vp7bV5KtP0jbb8qAL/LMySmdJBvzlJHdRfQSt4qoCkUPRtW0dbBszEFjZmYr3zmZuYUi
+         jT7h5srXWwJFpmXAuUq+lZz5QJ+VxJzmGbKT0K3IwL9fiR43NWvCQT2wKbp/dze+BtI1
+         b8kA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706025948; x=1706630748;
+        d=1e100.net; s=20230601; t=1706025951; x=1706630751;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ryo8HRjGnljrClxgJ6alqFUbKEiQl5mSg8DOiMtGabA=;
-        b=I+FBkZwun7HO9LNtVpoztEVklO7vRnxWqbyzTz/Upb5Y4xZvoBquzhLJJqFh3wyfVP
-         TN0bZ1ksGRBknXSA6Tz7RBUQlhagj5Cy1G89CJ1qndKdrQkQ4TbKQS8DEL24gSOmHrfZ
-         6Ha453dBzty1nxjyGm5FtILJx48vaM3r57zAwdNDWcx5l6K6lpw34ljgwI/wVihLaIcm
-         bV0Ufrkkhmq+P7kj6+cP6gWE1UODdvXlUbWfAFSp7KKTGY/A2E4TVy6EN5cDpKLAjarN
-         H8xPccaWDybVaWAK7Ifd7CudYNR4L0vbzLmC3jTw45YA6ECpBZhH8ipdHcwiEPI2kJea
-         p5TA==
-X-Gm-Message-State: AOJu0YzNzC59iw5ylApH+G5Hj5Bj2z7XXPSM/jPACsI+CBMc3DIx85sO
-	AO+8DGBB1ObbMeU1WgioWsJyShD91qD3YG8u9lNhYsT+9XJk9aYcwcYpEjV+WvCh0Dry
-X-Google-Smtp-Source: AGHT+IFb6wjAXVE63pR4TcjrddfzxSW/TyWAnily9aK+fHwnkXOCPpNqBbqDhvk1YOQmaqaY+hTPfg==
-X-Received: by 2002:a05:600c:33aa:b0:40e:4f69:323d with SMTP id o42-20020a05600c33aa00b0040e4f69323dmr362117wmp.248.1706025948360;
-        Tue, 23 Jan 2024 08:05:48 -0800 (PST)
+        bh=8nu3GBbweqqLjVKM1I/MvCjJ4k7t4quChK5YPaJt0ls=;
+        b=baDSn6IQliXB6utqpfafEiusS/aztWAJldDxNmgll7dkecCFRg5B7/Cz0KHVWQFbIx
+         wwrarW5wSe5Q9eKJZkOIU4oQ9/GKAN4+zXlUP039/Dk5+W/szd4/u+TdM2vraEslxgT7
+         gIYLNoE6YUxXsO7R29Bp9sYq7ogDYN9TqV3e8qHX3O1rYjQX4527nfT35Jg6uDdkAwG7
+         BuaSmt9g+IKguFS97+M/CVjKDJsU+zMdNAYFusaXb9tLKuWWIwKyn3zs65kLF+pedvei
+         jTu3h/Ewe8d3mp5qXL19XPREgDmtAR8fmQk+YJKXxDxPF5t5+KSRkvPAb8KbJ2rYd9hg
+         Fbgw==
+X-Gm-Message-State: AOJu0Ywptd8w36u0dvQHMCaVWH8qQFKbz2TQc7t/iCLH2Nd9wwwnDYe+
+	F3AVv2ecsov47QSWqqg/HCCzCnr48aRb6cs2fGMFtOhDGWc3STMRowfvzjuBObO1riYZ
+X-Google-Smtp-Source: AGHT+IHKgu0iJ8YgSFPKKDbtdjE8Pu9GBIuAmpDvtgIr/BpB2CHjl2lOsCZfwxKWdODVkDg3a84npg==
+X-Received: by 2002:a05:600c:540b:b0:40e:4800:c91f with SMTP id he11-20020a05600c540b00b0040e4800c91fmr301710wmb.9.1706025950651;
+        Tue, 23 Jan 2024 08:05:50 -0800 (PST)
 Received: from imac.fritz.box ([2a02:8010:60a0:0:b949:92c4:6118:e3b1])
-        by smtp.gmail.com with ESMTPSA id t4-20020a5d42c4000000b003392c3141absm8123830wrr.1.2024.01.23.08.05.45
+        by smtp.gmail.com with ESMTPSA id t4-20020a5d42c4000000b003392c3141absm8123830wrr.1.2024.01.23.08.05.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jan 2024 08:05:46 -0800 (PST)
+        Tue, 23 Jan 2024 08:05:48 -0800 (PST)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: netdev@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -80,9 +80,9 @@ To: netdev@vger.kernel.org,
 	Alessandro Marcolini <alessandromarcolini99@gmail.com>
 Cc: donald.hunter@redhat.com,
 	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v1 02/12] tools/net/ynl: Support sub-messages in nested attribute spaces
-Date: Tue, 23 Jan 2024 16:05:28 +0000
-Message-ID: <20240123160538.172-3-donald.hunter@gmail.com>
+Subject: [PATCH net-next v1 03/12] tools/net/ynl: Refactor fixed header encoding into separate method
+Date: Tue, 23 Jan 2024 16:05:29 +0000
+Message-ID: <20240123160538.172-4-donald.hunter@gmail.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20240123160538.172-1-donald.hunter@gmail.com>
 References: <20240123160538.172-1-donald.hunter@gmail.com>
@@ -94,70 +94,60 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Sub-message selectors could only be resolved using values from the
-current nest level. Enable value lookup in outer scopes by using
-collections.ChainMap to implement an ordered lookup from nested to
-outer scopes.
+Refactor the fixed header encoding into a separate _encode_struct method
+so that it can be reused for fixed headers in sub-messages and for
+encoding structs.
 
 Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
 ---
- tools/net/ynl/lib/ynl.py | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ tools/net/ynl/lib/ynl.py | 26 +++++++++++++++-----------
+ 1 file changed, 15 insertions(+), 11 deletions(-)
 
 diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-index 1e10512b2117..b00cde5d29e5 100644
+index b00cde5d29e5..dd54205f866f 100644
 --- a/tools/net/ynl/lib/ynl.py
 +++ b/tools/net/ynl/lib/ynl.py
-@@ -1,6 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
+@@ -701,6 +701,20 @@ class YnlFamily(SpecFamily):
+                 fixed_header_attrs[m.name] = value
+         return fixed_header_attrs
  
--from collections import namedtuple
-+from collections import namedtuple, ChainMap
- import functools
- import os
- import random
-@@ -564,8 +564,8 @@ class YnlFamily(SpecFamily):
-         spec = sub_msg_spec.formats[value]
-         return spec
++    def _encode_struct(self, name, vals):
++        members = self.consts[name].members
++        attr_payload = b''
++        for m in members:
++            value = vals.pop(m.name) if m.name in vals else 0
++            if m.type == 'pad':
++                attr_payload += bytearray(m.len)
++            elif m.type == 'binary':
++                attr_payload += bytes.fromhex(value)
++            else:
++                format = NlAttr.get_format(m.type, m.byte_order)
++                attr_payload += format.pack(value)
++        return attr_payload
++
+     def handle_ntf(self, decoded):
+         msg = dict()
+         if self.include_raw:
+@@ -760,18 +774,8 @@ class YnlFamily(SpecFamily):
  
--    def _decode_sub_msg(self, attr, attr_spec, rsp):
--        msg_format = self._resolve_selector(attr_spec, rsp)
-+    def _decode_sub_msg(self, attr, attr_spec, vals):
-+        msg_format = self._resolve_selector(attr_spec, vals)
-         decoded = {}
-         offset = 0
-         if msg_format.fixed_header:
-@@ -579,10 +579,11 @@ class YnlFamily(SpecFamily):
-                 raise Exception(f"Unknown attribute-set '{attr_space}' when decoding '{attr_spec.name}'")
-         return decoded
- 
--    def _decode(self, attrs, space):
-+    def _decode(self, attrs, space, outer_vals = ChainMap()):
-         if space:
-             attr_space = self.attr_sets[space]
-         rsp = dict()
-+        vals = ChainMap(rsp, outer_vals)
-         for attr in attrs:
-             try:
-                 attr_spec = attr_space.attrs_by_val[attr.type]
-@@ -594,7 +595,7 @@ class YnlFamily(SpecFamily):
-                 continue
- 
-             if attr_spec["type"] == 'nest':
--                subdict = self._decode(NlAttrs(attr.raw), attr_spec['nested-attributes'])
-+                subdict = self._decode(NlAttrs(attr.raw), attr_spec['nested-attributes'], vals)
-                 decoded = subdict
-             elif attr_spec["type"] == 'string':
-                 decoded = attr.as_strz()
-@@ -617,7 +618,7 @@ class YnlFamily(SpecFamily):
-                     selector = self._decode_enum(selector, attr_spec)
-                 decoded = {"value": value, "selector": selector}
-             elif attr_spec["type"] == 'sub-message':
--                decoded = self._decode_sub_msg(attr, attr_spec, rsp)
-+                decoded = self._decode_sub_msg(attr, attr_spec, vals)
-             else:
-                 if not self.process_unknown:
-                     raise Exception(f'Unknown {attr_spec["type"]} with name {attr_spec["name"]}')
+         req_seq = random.randint(1024, 65535)
+         msg = self.nlproto.message(nl_flags, op.req_value, 1, req_seq)
+-        fixed_header_members = []
+         if op.fixed_header:
+-            fixed_header_members = self.consts[op.fixed_header].members
+-            for m in fixed_header_members:
+-                value = vals.pop(m.name) if m.name in vals else 0
+-                if m.type == 'pad':
+-                    msg += bytearray(m.len)
+-                elif m.type == 'binary':
+-                    msg += bytes.fromhex(value)
+-                else:
+-                    format = NlAttr.get_format(m.type, m.byte_order)
+-                    msg += format.pack(value)
++            msg += self._encode_struct(op.fixed_header, vals)
+         for name, value in vals.items():
+             msg += self._add_attr(op.attr_set.name, name, value)
+         msg = _genl_msg_finalize(msg)
 -- 
 2.42.0
 
