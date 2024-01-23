@@ -1,111 +1,112 @@
-Return-Path: <netdev+bounces-64970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD7B5838964
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 09:46:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA0B283896E
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 09:49:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96BE4282D1F
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 08:46:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E64771C2594C
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 08:49:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F6D85647B;
-	Tue, 23 Jan 2024 08:46:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D38E56B7A;
+	Tue, 23 Jan 2024 08:48:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AhzaqwCz"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="YXBVpSK4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B500524D3;
-	Tue, 23 Jan 2024 08:45:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 509E756450;
+	Tue, 23 Jan 2024 08:48:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705999561; cv=none; b=WaR4OMBJtQcjrSzsPJ/f5yj4uKxTkr1z8TRaxPsvNa2qi+BTTSBntpDTJ9gjQZrIUSdHg3WJ1Wo8WhGz3A5azlpKknwfGkliPYejYHWgdVAVKamrB3ota6tYfCjgFMRUSehKNVkcG5lMOziw6Zhvsm6LguqcYAKVJ0WfZstNfGU=
+	t=1705999739; cv=none; b=MApQTQsIbovNGduNu/SDvFt1eOtwQU2lg/4Hx0C3i1FA1mYFlG8+ijrlCQPGUQloT6MLP7TuIBcDiYZIouEBjza5gxO9xb6u5G1SqWbI4xPx/NCJV84mhXXksE936fT+JLRAmpFhqZSExwBlNg8vMTlhmapO16HvGkY0/O399CQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705999561; c=relaxed/simple;
-	bh=D6kFih88yvMnBk9zA9dsUoEgzAg0hzTFRkDJKVgFzw4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hq4dfhD8TK4pzBgaVa5ppAQE8WgEI6PrnAM910X9QCTubdbCOyEINcqu/R3au3x3kbh3oXdTvgp7CdIhZGvnPDojKBSTQakVVCQ2BdWYCvhYv5w0LBQC6nvqE9BL9Esv+pdRUCxfDuuuHdzthUQNyFALk0VpXMi/nYeIRvo09fg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AhzaqwCz; arc=none smtp.client-ip=209.85.215.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-5cde7afa1d7so1907522a12.1;
-        Tue, 23 Jan 2024 00:45:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1705999559; x=1706604359; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FQRv4fqGuefJZzCa/VEJBQ7RQhXLXMbvCA1HYRXseVw=;
-        b=AhzaqwCzfWVJBYoruPhEviT6kyCEvNX63pA686Jq/wSUHtRnUA+tjVZtHA55tu365y
-         HF3d/MMPS/+kUqLEtKaVYzfXLEzNNvK0aW2ucVuJ0WeX/UOadzBZv1kkXWmLlHK3Nha7
-         acJC2JLh6LZdXFkjg5YCYFOWZF+XtMJYJA+P2m5Ly9qv0/0/zYfDzgH2HpjlwGeVOYhr
-         A72czGX42/gWY3QYUmFjK4jjvUR453MQXvuiofpHTusLSWLeW+pn62ZdFGibgbAshq0h
-         yiZX1ziZYm1f/WW9JY26rROqbgvWmOhd0TJxHYsYyp+I75VUJwvo4AFCxBBMwy6Rfns6
-         1aOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705999559; x=1706604359;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FQRv4fqGuefJZzCa/VEJBQ7RQhXLXMbvCA1HYRXseVw=;
-        b=FUOkC+8dtyKdFkCmLdhwLlrUJ5Kr9uTfFAPopgAIQ11+1bE84kxdaQJy3fpO9s2QpD
-         dVJMm545O3qVk29Tk51weMDhRJAP3NGZxPhhQpneBxkqjqLGaI2mbUeKJLkGNKTWo0Fh
-         qq7q3Epon2I+9FlDZDMJmpaqITqo242LyVX6gpbKLtkpIgXHBoZZc1EZpJ39uR244cx+
-         v1RuUZecUMW9O1mv6cbm09zWrXIZVCL7JQb2PIXpRR7qUJ1z7zasE87ixhYQzUTghkdM
-         6O/IBWy5hvslkIqoYJDdl/RPh2uybodoLwGdX6t45I0kUxHAiS5L1A/3FzHzBsEmnk0k
-         exEg==
-X-Gm-Message-State: AOJu0YwlJ530ym36eSKRZupBxrO3erzfgXAqiPB9XMEbj8IwNF/nKOoF
-	HSlnLZDvuu67YYWjCdGtVK4ey+vEG4gIq9j7T8Jrc0t9EhIu0HYv
-X-Google-Smtp-Source: AGHT+IEEdgziwXWLFKlvhKXvh1U2LmbCMN8LgpGqzcf3imoIwChjsBkGSUY1XTFmEj5sXRtkUCbflw==
-X-Received: by 2002:a17:90a:db43:b0:290:9d34:c897 with SMTP id u3-20020a17090adb4300b002909d34c897mr1486452pjx.98.1705999559224;
-        Tue, 23 Jan 2024 00:45:59 -0800 (PST)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id sl7-20020a17090b2e0700b0028bbf4c0264sm11142553pjb.10.2024.01.23.00.45.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jan 2024 00:45:58 -0800 (PST)
-Date: Tue, 23 Jan 2024 16:45:55 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"netdev-driver-reviewers@vger.kernel.org" <netdev-driver-reviewers@vger.kernel.org>
-Subject: Re: [ANN] net-next is OPEN
-Message-ID: <Za98C_rCH8iO_yaK@Laptop-X1>
-References: <20240122091612.3f1a3e3d@kernel.org>
+	s=arc-20240116; t=1705999739; c=relaxed/simple;
+	bh=t2eee3p+5fYN3Cokye9kBeOsXjD6ww+E/52wz9ArAMo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=h33dJf3gpDoSYs9wyc5fpfoz8DwkLsSQSESuHg9Zt3+cbcM/BENHpEPKftpkhXhJivD9GUwR7+QCdgHBHn/MkpB9RfTVwzFotkzxUpwO44SJ4l5Ky3urK9Jt6PGJGk3xVP7wgWRljQawuG64rw9DzrwrTR2SP+L3j20PV6Y46xc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=YXBVpSK4; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id BF24620011;
+	Tue, 23 Jan 2024 08:48:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1705999731;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=m4Y70JmNATNTUUvhrItUodsxgvGUce4rjjN5KbaPrtU=;
+	b=YXBVpSK4YTRxCcvIlW+4GiBrR8mtfdKf9xzd5HHbttHWC969LXsxy5xvAbRTcNZ/TsOXnj
+	GDGKDb3QRg9GpPxMu4D3LFX8PHhRCtjdlghGUblGGUclsmgNkGn+rR4Pkpo3QtSeeHqKxJ
+	VznDgeqOfyTdO44lfHQQywdWnVOZXoaNvooOjrOzLEVGONG3I52fvWkpkOYBj4o3KWFEyy
+	+7qlmvnYD2OS4Qdy7ex5XHO8A7JJrYDS+aAIUOM2o29rsDBD5LuVvvbzdn1acewUrF+mhm
+	PsRoUf8NVQVr76HmKu+JV/m9pljp5AYmEtmEbucYooDyhzw5FrCbb5j+uhGosA==
+Date: Tue, 23 Jan 2024 09:48:49 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>
+Cc: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+ <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <UNGLinuxDriver@microchip.com>
+Subject: Re: [PATCH net] net: lan966x: Fix port configuration when using
+ SGMII interface
+Message-ID: <20240123094849.5ce5acc8@device-28.home>
+In-Reply-To: <20240123081514.3625293-1-horatiu.vultur@microchip.com>
+References: <20240123081514.3625293-1-horatiu.vultur@microchip.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.39; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240122091612.3f1a3e3d@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Mon, Jan 22, 2024 at 09:16:12AM -0800, Jakub Kicinski wrote:
-> Hi,
+Hello Horatiu,
+
+On Tue, 23 Jan 2024 09:15:14 +0100
+Horatiu Vultur <horatiu.vultur@microchip.com> wrote:
+
+> In case the interface between the MAC and the PHY is SGMII, then the bit
+> GIGA_MODE on the MAC side needs to be set regardless of the speed at
+> which it is running.
 > 
-> net-next is open again, and accepting changes for v6.9.
+> Fixes: d28d6d2e37d1 ("net: lan966x: add port module support")
+> Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+> ---
+>  drivers/net/ethernet/microchip/lan966x/lan966x_port.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> Over the merge window I spent some time stringing together selftest
-> runner for netdev: https://netdev.bots.linux.dev/status.html
-> It is now connected to patchwork, meaning there should be a check
-> posted to each patch indicating whether selftests have passed or not.
+> diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_port.c b/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
+> index 92108d354051c..975a6d64a2e18 100644
+> --- a/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
+> +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
+> @@ -170,7 +170,8 @@ static void lan966x_port_link_up(struct lan966x_port *port)
+>  	/* Also the GIGA_MODE_ENA(1) needs to be set regardless of the
+>  	 * port speed for QSGMII ports.
 
-Cool! Does it group a couple of patches together and run the tests or
-run for each patch separately?
+Small nit, I think this comment above the test could also be updated to
+reflect that change.
 
-> 
-> If you authored any net or drivers/net selftests, please look around
-> and see if they are passing. If not - send patches or LMK what I need
-> to do to make them pass on the runner.. Make sure to scroll down to 
-> the "Not reporting to patchwork" section.
+>  	 */
+> -	if (phy_interface_num_ports(config->portmode) == 4)
+> +	if (phy_interface_num_ports(config->portmode) == 4 ||
+> +	    config->portmode == PHY_INTERFACE_MODE_SGMII)
+>  		mode = DEV_MAC_MODE_CFG_GIGA_MODE_ENA_SET(1);
+>  
+>  	lan_wr(config->duplex | mode,
 
-Yes, this could push the selftest authors help checking all the failures.
+Besides that,
 
-[1] https://patchwork.kernel.org/project/netdevbpf/patch/20240122090544.1202880-1-liuhangbin@gmail.com/
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-Thanks
-Hangbin
+Thanks,
+
+Maxime
 
