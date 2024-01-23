@@ -1,168 +1,105 @@
-Return-Path: <netdev+bounces-65169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 002CA83966B
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 18:30:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD8EB839676
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 18:32:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 252D61C212EB
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:30:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66C6328D7C1
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:32:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0428280032;
-	Tue, 23 Jan 2024 17:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7BAD7FBDC;
+	Tue, 23 Jan 2024 17:32:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=pschenker.ch header.i=@pschenker.ch header.b="r3GNIFzq"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="thE0q5pO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-190e.mail.infomaniak.ch (smtp-190e.mail.infomaniak.ch [185.125.25.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 562F18002F;
-	Tue, 23 Jan 2024 17:30:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.25.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCBAC5F555
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 17:32:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706031024; cv=none; b=gjKSPK9DUnTVEpPhpbltAxgFKwwYHbzok8T31+3zz81WITtyROGgEcaUgvVcGRJjo9VxzDtWKH1smFR5xvnakBezFUdmucsBF0sQRW0VmpA5HVeG1AZ17o1lpiG/txzbeT6GdyT7qV65YDAu6zQ4IZXZiLd4vxP/qQjuul8P4gU=
+	t=1706031157; cv=none; b=UrcMh+VkCNTjG5OLVkesZvXaMXn+n/l9HSWMbwh5hOGyVVwosTPhFoCG3GOwpbV7fq6g6HtokX24DuM/nxl/IvxyuOse1vh4dgeCIDbLms74jWHhxRkQpUTkpbg/aKvTWod4WibPI2eu7og9QNMB0GRIyhmkPbPCqAzllhiEteU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706031024; c=relaxed/simple;
-	bh=B/2hHzkuQ9wWcKUuhzt5SkH9HMMQlzQD5Ynkq/2Y300=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=CpPS8NzItWI4eElOupUN3w3yZOzGUb9qh2276WjXfC96oJvPZbW88lXA64R6dm3Ah6DjLZOQxS7ND03lc12FA+tAoAteeLj11U0iMwtRUS1RROXcfQI3R1TRAnRY13f1VlNlCb98YEnxh1PMhCVXWc1hIa0CcRXc3/raEAnMXRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pschenker.ch; spf=pass smtp.mailfrom=pschenker.ch; dkim=pass (1024-bit key) header.d=pschenker.ch header.i=@pschenker.ch header.b=r3GNIFzq; arc=none smtp.client-ip=185.125.25.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pschenker.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pschenker.ch
-Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4TKDcp0b5TzMpvNJ;
-	Tue, 23 Jan 2024 18:30:18 +0100 (CET)
-Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4TKDcn1hJ8z3Y;
-	Tue, 23 Jan 2024 18:30:17 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=pschenker.ch;
-	s=20220412; t=1706031017;
-	bh=B/2hHzkuQ9wWcKUuhzt5SkH9HMMQlzQD5Ynkq/2Y300=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=r3GNIFzq199rrRUz3Q+VVI9tMMH+D+WPkOabnP676ohv2UrLZHWP3jCISbXlvO5cX
-	 S2VmIeRjmW1D4Bet8OaC1QJ38m9C9q2MngZ4Xh2ctki/PjbLEuA+mryQalTGWUvduc
-	 K22L9YMggk5A/o3EywJ1O5Q6+c5VZ60ExwhACc5Q=
-Message-ID: <979b1e77b5bb62463d52e7b9d3f9ca1415f4006a.camel@pschenker.ch>
-Subject: Re: [PATCH net-next v1 1/2] dt-bindings: net: dsa: Add KSZ8567
- switch support
-From: Philippe Schenker <dev@pschenker.ch>
-To: Conor Dooley <conor@kernel.org>
-Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, Conor Dooley
- <conor+dt@kernel.org>, Woojung Huh <woojung.huh@microchip.com>, Vladimir
- Oltean <olteanv@gmail.com>, linux-kernel@vger.kernel.org,
- UNGLinuxDriver@microchip.com,  Marek Vasut <marex@denx.de>, Florian
- Fainelli <f.fainelli@gmail.com>, devicetree@vger.kernel.org, Eric Dumazet
- <edumazet@google.com>, "David S . Miller" <davem@davemloft.net>, Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Jakub Kicinski
- <kuba@kernel.org>,  Andrew Lunn <andrew@lunn.ch>, Rob Herring
- <robh+dt@kernel.org>
-Date: Tue, 23 Jan 2024 18:30:16 +0100
-In-Reply-To: <20240123-atlas-dart-7e955e7e24e5@spud>
-References: <20240123135014.614858-1-dev@pschenker.ch>
-	 <20240123-ripening-tabby-b97785375990@spud>
-	 <b2e232de11cee47a5932fccc2d151a9c7c276784.camel@pschenker.ch>
-	 <20240123-atlas-dart-7e955e7e24e5@spud>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	s=arc-20240116; t=1706031157; c=relaxed/simple;
+	bh=PCC25MdyIxDx6+nyvkbKRYLn45NYp/L57eAn5i4rk8s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gV8vZ7Om8lb8EGn3z2iUxc9vkroWpkNDMprwm1+IbhG5p/eCekatft4V5CwGQUUXWv1RA4cr3HLv8BfzoqHfaGiEBqYllS5GDgMguWT3jaQ4mkU/7luLf3jTuj4SjuvyOyCwN3IynbLCoPwXJCeHzaEBDMPn5vW9vie5xhQ0rG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=thE0q5pO; arc=none smtp.client-ip=209.85.215.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-5cf450eba00so3729969a12.0
+        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 09:32:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1706031155; x=1706635955; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VMkl4lrGe+Wjsdlxgu4GaqGG6Nlrj4aqXcF+J3uPhls=;
+        b=thE0q5pO7+qR0GDX8DNh6rzkGtbC2eC8GFNDYa3+PzLGFRHVvmv1jTsh+LtzWHZItK
+         IjEz6eiiyFp1SaWtTjpk0UtCsjxovqZDgqE4H9XD4BHEe77QGtr1IfXqculqt9HQynnh
+         C/hdaL4acejeuXHVr3odlydxKCcenGb9ddouctirJ07fFN44T0+NSY+8c/cYB/iP5/a2
+         5ygVbZA9/wQKdLzgZHViRKYXqRH2obo8sITq2ZNN3mbrfcS2VWySnSUrBuKAHxEbinsV
+         cMXEu4irwQmZeSuUgbssaG+vi2AreTOJnC8ooo01HrpIyUln+3JUDft3OaMNkhMU/ft4
+         u40w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706031155; x=1706635955;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VMkl4lrGe+Wjsdlxgu4GaqGG6Nlrj4aqXcF+J3uPhls=;
+        b=vi8QlmSR/aR5Defq5oqHwzMeO+4FrQRCQZajjHnv3Z0M1GyEvwVShNxuufwocp87SH
+         4yrNGOwZrj0z3hPsq+g/UYI3+aajG0VT+xKoYMc7DuupOVkZRkqBqRXOIP88KhPlAFoX
+         HDe0aXfb9Qx9VF1mhPQzfZ8JuAUjuRt4c4j3w1rdtQzyUGv8qbjjWyYJ+0mdMlk7ov6J
+         /nsrcsQ7SB5SSHds1sLrU7a3Kpok83qH82nRBIvVXarOmo9vmZGhgt3vsPvocsOtiggD
+         qWAiUu8U46TMvbwgT0wnBx3QdbfaQ4rEbqHMCtBd7KjXWMdr+YxeHlrmr7PjN0AsEpgJ
+         FmTQ==
+X-Gm-Message-State: AOJu0YxyHv2RYQNzKT1CjK8DOTzpe6cKS0zK0Rzmj1WU4QEv9b5n6O3X
+	JwBBxoPHgoiq+TdVjlUUEKQ7u6tYsOpVSJAxuXCat/5761QqPIjbefzjMIrI3oP8g4/KTEkp+Yt
+	tnw==
+X-Google-Smtp-Source: AGHT+IFNWNTdQNslghgClw2xe8yvbEem/mhABnYiPMWm3vNgACl+wPvDxWlsfZXyoPnlfCeUBjRg/g==
+X-Received: by 2002:a05:6a20:d489:b0:19b:62da:16b0 with SMTP id im9-20020a056a20d48900b0019b62da16b0mr6531307pzb.5.1706031155183;
+        Tue, 23 Jan 2024 09:32:35 -0800 (PST)
+Received: from ?IPV6:2804:7f1:e2c1:2229:1771:59f5:c218:f604? ([2804:7f1:e2c1:2229:1771:59f5:c218:f604])
+        by smtp.gmail.com with ESMTPSA id g8-20020a635208000000b005cfbef6657fsm6459747pgb.58.2024.01.23.09.32.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Jan 2024 09:32:34 -0800 (PST)
+Message-ID: <49ecd3a7-caf6-443c-9519-be300f8866ec@mojatatu.com>
+Date: Tue, 23 Jan 2024 14:32:32 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Infomaniak-Routing: alpha
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2-next] m_mirred: Allow mirred to block
+Content-Language: en-US
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: dsahern@kernel.org, netdev@vger.kernel.org, kernel@mojatatu.com
+References: <20240123161115.69729-1-victor@mojatatu.com>
+ <20240123091811.298e3cb5@hermes.local>
+From: Victor Nogueira <victor@mojatatu.com>
+In-Reply-To: <20240123091811.298e3cb5@hermes.local>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 23/01/2024 14:18, Stephen Hemminger wrote:
+> On Tue, 23 Jan 2024 13:11:15 -0300
+> Victor Nogueira <victor@mojatatu.com> wrote:
+> 
+>> +		print_string(PRINT_ANY, "to_dev", " to device %s)", dev);
+> 
+> Suggestion for future.
+> Use colorized device name here.
+> 		print_color_string(PRINT_ANY, COLOR_IFNAME, "to_dev", " to device %s)", dev);
 
+Thank you for the suggestion.
+Will send a patch after this one to fix this.
 
-On Tue, 2024-01-23 at 17:23 +0000, Conor Dooley wrote:
-> On Tue, Jan 23, 2024 at 05:17:53PM +0100, Philippe Schenker wrote:
-> >=20
-> >=20
-> > On Tue, 2024-01-23 at 16:06 +0000, Conor Dooley wrote:
-> > > On Tue, Jan 23, 2024 at 02:50:13PM +0100, Philippe Schenker
-> > > wrote:
-> > > > From: Philippe Schenker <philippe.schenker@impulsing.ch>
-> > > >=20
-> > > > This commit adds the dt-binding for KSZ8567, a robust 7-port
-> > > > Ethernet switch. The KSZ8567 features two RGMII/MII/RMII
-> > > > interfaces,
-> > > > each capable of gigabit speeds, complemented by five 10/100
-> > > > Mbps
-> > > > MAC/PHYs.
-> > > >=20
-> > > > Signed-off-by: Philippe Schenker
-> > > > <philippe.schenker@impulsing.ch>
-> > >=20
-> > > This device has all the same constraints as the other ones in
-> > > this
-> > > binding, why is it not compatible with any of them? If it isn't,
-> > > the
-> > > compatible should mention why it is not.
-> >=20
-> > Hi Conor, Thanks for your message!
-> >=20
-> > I need the compatible to make sure the correct ID of the switch is
-> > being set in the driver as well as its features.
->=20
-> Are the features of this switch such that a driver for another ksz
-> switch would not work (even in a limited capacity) with the 8567?
-> Things like the register map changing or some feature being removed
-> are
-> examples of why it may not work.
-
-Yes the ksz dsa driver is made so that it checks the ID of the attached
-chip and refuses to work if it doesn't match. [1]
-It is a very similar chip and uses the same regmap as KSZ9567 but with
-lower phy-speeds on its 5 switch ports. The two upstream CPU ports are
-gigabit capable. All this information is set-up in the second patch of
-this series. [2]
-
-I will include a description to the second series. Thanks for your
-feedback.
-
-Philippe
-
-
-[1]
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/dri=
-vers/net/dsa/microchip/ksz_common.c?h=3Dv6.8-rc1#n3181
-[2]
-https://patchwork.kernel.org/project/netdevbpf/patch/20240123135014.614858-=
-2-dev@pschenker.ch/
-
->=20
-> > You mean I shall mention the reason in the commit-message, or
-> > where?
->=20
-> Yes.
->=20
-> Thanks,
-> Conor
->=20
-> > > > =C2=A0Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml =
-|
-> > > > 1 +
-> > > > =C2=A01 file changed, 1 insertion(+)
-> > > >=20
-> > > > diff --git
-> > > > a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-> > > > b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-> > > > index c963dc09e8e1..52acc15ebcbf 100644
-> > > > ---
-> > > > a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-> > > > +++
-> > > > b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
-> > > > @@ -31,6 +31,7 @@ properties:
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - microchip,ksz9893
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - microchip,ksz9563
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - microchip,ksz8563
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - microchip,ksz8567
-> > > > =C2=A0
-> > > > =C2=A0=C2=A0 reset-gpios:
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0 description:
-> > > > --=20
-> > > > 2.34.1
-> > > >=20
+cheers,
+Victor
 
