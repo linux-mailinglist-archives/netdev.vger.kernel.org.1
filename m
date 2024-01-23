@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-65226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DFF6839B4C
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 22:44:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A03C839B4D
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 22:44:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 43FB2B225C3
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 21:44:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08E72286204
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 21:44:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C03C3D96B;
-	Tue, 23 Jan 2024 21:44:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78A6E3A8F5;
+	Tue, 23 Jan 2024 21:44:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ym9Nmxr/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jHQ42DCm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8C753A8EE
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 21:44:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2BC739AE5
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 21:44:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706046275; cv=none; b=vCR/EvqQLKeCrS7a3VmXAP3xl3Ws/QXamxlgKXuHLF1NfOPeHVeTP8w7RdolTTqkf26g1Ah31O8r+l2yFtsDuO/J7cFxEzMmTSci2QVqnLQyHTfm2RGcc5aPrJNAR7U4Dpt0XJSEjvyBIwTt0OUFgKtIdYdPy7suWIoSXmf3aiU=
+	t=1706046279; cv=none; b=kZTH77qzfvuQkgC86X9TGiMCZ/B0FshIiebyXErLMFDvBZYu+VRBQr+R8nGy6MSBOEI3zJnK/LOgc/yl2gbYiyQ/9QNuNEeOq+wIsKPK9D/Zh0hJOiwShz5ST66RQp66lg0QeOiiYezwT+33UHRRVucFd7j0iMLmQ82OFYJ9HQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706046275; c=relaxed/simple;
-	bh=dQad2+Z/Xb/mU7me8aRLowsUyHw4NHkMWxImuVtMQuQ=;
+	s=arc-20240116; t=1706046279; c=relaxed/simple;
+	bh=JxlhgfKDAH9pG+T7CbuWIczAu124O8TR8etJzIuzVIc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=INcHFNVf/QSr3eNO4Ft6KBXHRBb4dD7Z4E0v4geD96dQtnhZeO/k4u3hGRhi4S4K7nc9gWri6S7BE8nKMqBYt2sg8Yg7+UZQ4UgS92HhRHTXDrpSWta6RdiSJJ01citZIqU6snd7YA0xKgbzNJGwSHK5JhkaR+xZEs6FrywpbZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ym9Nmxr/; arc=none smtp.client-ip=209.85.214.169
+	 MIME-Version:Content-Type; b=cuqiZtynVmOU8vqVQAyO1o3n5FEKkPhYKLIq50mU3OmXzMKYUw4xxZ5PAp+oRKruqB6wuZVu5Ll29oublVgsaxxyF5DrMe+6owLCe8lmxbIQ9R3PwA287CLapJZ1IXMSbqW3BRELhSg0SkCFP6A+Hco/nD7Dl3aKpd8RiL8OmGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jHQ42DCm; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1d711d7a940so41843415ad.1
-        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 13:44:33 -0800 (PST)
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1d73066880eso27679605ad.3
+        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 13:44:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706046272; x=1706651072; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706046276; x=1706651076; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uhR6ETdnDbAnJOABgKbs6pb2nligN/fWqMlDmzJKoA0=;
-        b=Ym9Nmxr/c/yn9y134If2wHxp2oGmXbk6bh9M8vinxkHxhHPDQIcKQVWzzI+8MRdo92
-         4306pUzH4nlae7Pq7Wv/DvgHisS9buwSJeFgQV9S+Hk10PgTE9P1d5kHrnDidvLE5/BD
-         rHZH/7mGqIWxZX17s8hT2igq0/68wR5agpcbMHV/FUyAzpVLa442U1kTYyYD3ZsFWNpX
-         rZxd1KkRDG/YnMGZPi084p1SfWIs5lQVreOPz+Q7zl/+D8ChGKJQuCLMNpIZ8N5GcyLp
-         ddyGZU3Ep2RRYdf3woazOZ62DiLkqruu9ti5zE3FY0g9MOQuDEDiEamp5bprDrXsAAcX
-         UoOw==
+        bh=dOT+C6LeaBh5H7EKXV1iub7JX9Ztsgpq6Az56Cc9H5k=;
+        b=jHQ42DCmTRKSS6t0VFmU1AJc+gINM6dG5z679GLvDKJpnclnkpaqcR7L/C16JXwhEm
+         8jfDR8UeGaiwZItVxgB7JNS8wRcuOUFJQ6HwlT27nlh9vMziNtt30tgB8EaEvrI7zXeL
+         +FHeg/GF6v4bgJNnoKbxasfA8ErHdboNU+V5ietnWPDUa+JtDinM0xcDfUzxmWE8QAOr
+         0wbg2eD+OcejZC1LMeibJ4UPGPsP9QJEHi6xy1A/HmFiC6bWBSFM14tcyjWkA2CVFG83
+         AcndsxO6DcOB72WNe5KKvOoePerFu2py4/o/lwNbI0xrcCAJiALZvbUlmQXNZcLxjlRO
+         vNug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706046272; x=1706651072;
+        d=1e100.net; s=20230601; t=1706046276; x=1706651076;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=uhR6ETdnDbAnJOABgKbs6pb2nligN/fWqMlDmzJKoA0=;
-        b=V7VAKJ6Ld8+NrXDbOP95VA46g3VuNbKk3SapZo27VmzVRZpHOLS71jjUCwUTCAn/em
-         QtD2u75/U1N0vKDYEP8Qn8aqpuAvr1umatCOWmNCEmZdivhgcX62d6as7E1VpZpr+2uN
-         crKhSLbKzJ7z0gIxE4gQtzKzURW9kMaUIzlJwGZ5iqyER3F3lw1OIrqhb+FFM+Z53QQi
-         Xe8BEA6LrWIqPJbH2csu9Nwguihx0VUxmBk/abdb0POHUkKFjNDpaZ2WEFpcdZUsme1R
-         BlrDvaeoFFh4F4RDbKB4L2KwR0eDVwEMev+SEI1SLiDpdZBLvHL6kmK1YZuPUfwCpf90
-         qotA==
-X-Gm-Message-State: AOJu0YypMAjoeBD6q4ucQFmH85noSLsrx19EUiGjJA00VUCgaxH6W3iD
-	2pN4EK+HBbx8I+ljFglWVjfc0Ob7esFlHJlDuVAaEDdXlsTEG+N/luyy60HDt9g=
-X-Google-Smtp-Source: AGHT+IG+lm6wBs6IpeSOgrJA+2myvCAPTCHva9NAotIG0A4kRwo9Dl+Ys3VxUxmqMA0AamunkU5S1A==
-X-Received: by 2002:a17:903:1107:b0:1d3:f1ca:6a13 with SMTP id n7-20020a170903110700b001d3f1ca6a13mr7164686plh.109.1706046272199;
-        Tue, 23 Jan 2024 13:44:32 -0800 (PST)
+        bh=dOT+C6LeaBh5H7EKXV1iub7JX9Ztsgpq6Az56Cc9H5k=;
+        b=Ob7hanEvvODCzNOWl7tegZNbr41ezO4XtYnPhhWOs/bHXby+6ene5zuKJbb7kDSkGD
+         mtLw+FZXvmg93aXEkJxB3DPI4u2+zXgllFQFFS2vp1qSr+JVdW9Qou1kVy5Sj1Q4qJUt
+         T6rCxDMJW6PgAxJ6b/0f1oKIeCCT3+2lU0KLdfxHOH/MztUSiEbWx5bKSQxiW/m5XdQD
+         QNplCMtqaq/J/Du/bv76O+toxPn8M//4OZDlsAo7zYnI+kjBvtfWNO2v/0w8dPMuyk/C
+         P6Pi8yOkywH4VP7cHlQYghoE6FfHoY4kErWKyQerAPLyCqrDtB/i6l7zOYGUGBmE8Q5v
+         S0Rg==
+X-Gm-Message-State: AOJu0YzN4yA96R7oTeyvBRglxWGrBegFEY10tmj7kbi7i/3ZUXUhM/hh
+	SVPPw6dc1z3M6//6f72pegdEqh8ZsdpdUeK4hKB28USm0pSi65LCHwzbng+FyRY=
+X-Google-Smtp-Source: AGHT+IGoaBmsXUcbwSEbesKEcFiz6JliQ+rvBy+4K91T34yX35Dw4Ay9YdpEX//b1wWpgRrXutcxpA==
+X-Received: by 2002:a17:902:d489:b0:1d7:752f:1e23 with SMTP id c9-20020a170902d48900b001d7752f1e23mr1145162plg.76.1706046276320;
+        Tue, 23 Jan 2024 13:44:36 -0800 (PST)
 Received: from tresc054937.tre-sc.gov.br ([187.94.103.218])
-        by smtp.gmail.com with ESMTPSA id t10-20020a170902bc4a00b001d714a1530bsm8108858plz.176.2024.01.23.13.44.28
+        by smtp.gmail.com with ESMTPSA id t10-20020a170902bc4a00b001d714a1530bsm8108858plz.176.2024.01.23.13.44.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jan 2024 13:44:31 -0800 (PST)
+        Tue, 23 Jan 2024 13:44:35 -0800 (PST)
 From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
 To: netdev@vger.kernel.org
 Cc: linus.walleij@linaro.org,
@@ -79,11 +79,10 @@ Cc: linus.walleij@linaro.org,
 	pabeni@redhat.com,
 	arinc.unal@arinc9.com,
 	ansuelsmth@gmail.com,
-	Luiz Angelo Daros de Luca <luizluca@gmail.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>
-Subject: [PATCH 01/11] net: dsa: realtek: drop cleanup from realtek_ops
-Date: Tue, 23 Jan 2024 18:44:09 -0300
-Message-ID: <20240123214420.25716-2-luizluca@gmail.com>
+	Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Subject: [PATCH 02/11] net: dsa: realtek: introduce REALTEK_DSA namespace
+Date: Tue, 23 Jan 2024 18:44:10 -0300
+Message-ID: <20240123214420.25716-3-luizluca@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240123214420.25716-1-luizluca@gmail.com>
 References: <20240123214420.25716-1-luizluca@gmail.com>
@@ -96,28 +95,157 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-It was never used and never referenced.
+Create a namespace to group the exported symbols.
 
 Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Reviewed-by: Alvin Šipraga <alsi@bang-olufsen.dk>
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- drivers/net/dsa/realtek/realtek.h | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/net/dsa/realtek/realtek-mdio.c |  2 ++
+ drivers/net/dsa/realtek/realtek-smi.c  |  2 ++
+ drivers/net/dsa/realtek/rtl8365mb.c    |  2 ++
+ drivers/net/dsa/realtek/rtl8366-core.c | 22 +++++++++++-----------
+ drivers/net/dsa/realtek/rtl8366rb.c    |  2 ++
+ 5 files changed, 19 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/net/dsa/realtek/realtek.h b/drivers/net/dsa/realtek/realtek.h
-index 790488e9c667..e9ee778665b2 100644
---- a/drivers/net/dsa/realtek/realtek.h
-+++ b/drivers/net/dsa/realtek/realtek.h
-@@ -91,7 +91,6 @@ struct realtek_ops {
- 	int	(*detect)(struct realtek_priv *priv);
- 	int	(*reset_chip)(struct realtek_priv *priv);
- 	int	(*setup)(struct realtek_priv *priv);
--	void	(*cleanup)(struct realtek_priv *priv);
- 	int	(*get_mib_counter)(struct realtek_priv *priv,
- 				   int port,
- 				   struct rtl8366_mib_counter *mib,
+diff --git a/drivers/net/dsa/realtek/realtek-mdio.c b/drivers/net/dsa/realtek/realtek-mdio.c
+index 292e6d087e8b..df214b2f60d1 100644
+--- a/drivers/net/dsa/realtek/realtek-mdio.c
++++ b/drivers/net/dsa/realtek/realtek-mdio.c
+@@ -288,3 +288,5 @@ mdio_module_driver(realtek_mdio_driver);
+ MODULE_AUTHOR("Luiz Angelo Daros de Luca <luizluca@gmail.com>");
+ MODULE_DESCRIPTION("Driver for Realtek ethernet switch connected via MDIO interface");
+ MODULE_LICENSE("GPL");
++MODULE_IMPORT_NS(REALTEK_DSA);
++
+diff --git a/drivers/net/dsa/realtek/realtek-smi.c b/drivers/net/dsa/realtek/realtek-smi.c
+index 755546ed8db6..f628b54de538 100644
+--- a/drivers/net/dsa/realtek/realtek-smi.c
++++ b/drivers/net/dsa/realtek/realtek-smi.c
+@@ -565,3 +565,5 @@ module_platform_driver(realtek_smi_driver);
+ MODULE_AUTHOR("Linus Walleij <linus.walleij@linaro.org>");
+ MODULE_DESCRIPTION("Driver for Realtek ethernet switch connected via SMI interface");
+ MODULE_LICENSE("GPL");
++MODULE_IMPORT_NS(REALTEK_DSA);
++
+diff --git a/drivers/net/dsa/realtek/rtl8365mb.c b/drivers/net/dsa/realtek/rtl8365mb.c
+index b072045eb154..462d5a9a280e 100644
+--- a/drivers/net/dsa/realtek/rtl8365mb.c
++++ b/drivers/net/dsa/realtek/rtl8365mb.c
+@@ -2177,3 +2177,5 @@ EXPORT_SYMBOL_GPL(rtl8365mb_variant);
+ MODULE_AUTHOR("Alvin Šipraga <alsi@bang-olufsen.dk>");
+ MODULE_DESCRIPTION("Driver for RTL8365MB-VC ethernet switch");
+ MODULE_LICENSE("GPL");
++MODULE_IMPORT_NS(REALTEK_DSA);
++
+diff --git a/drivers/net/dsa/realtek/rtl8366-core.c b/drivers/net/dsa/realtek/rtl8366-core.c
+index 59f98d2c8769..7c6520ba3a26 100644
+--- a/drivers/net/dsa/realtek/rtl8366-core.c
++++ b/drivers/net/dsa/realtek/rtl8366-core.c
+@@ -34,7 +34,7 @@ int rtl8366_mc_is_used(struct realtek_priv *priv, int mc_index, int *used)
+ 
+ 	return 0;
+ }
+-EXPORT_SYMBOL_GPL(rtl8366_mc_is_used);
++EXPORT_SYMBOL_NS_GPL(rtl8366_mc_is_used, REALTEK_DSA);
+ 
+ /**
+  * rtl8366_obtain_mc() - retrieve or allocate a VLAN member configuration
+@@ -187,7 +187,7 @@ int rtl8366_set_vlan(struct realtek_priv *priv, int vid, u32 member,
+ 
+ 	return ret;
+ }
+-EXPORT_SYMBOL_GPL(rtl8366_set_vlan);
++EXPORT_SYMBOL_NS_GPL(rtl8366_set_vlan, REALTEK_DSA);
+ 
+ int rtl8366_set_pvid(struct realtek_priv *priv, unsigned int port,
+ 		     unsigned int vid)
+@@ -217,7 +217,7 @@ int rtl8366_set_pvid(struct realtek_priv *priv, unsigned int port,
+ 
+ 	return 0;
+ }
+-EXPORT_SYMBOL_GPL(rtl8366_set_pvid);
++EXPORT_SYMBOL_NS_GPL(rtl8366_set_pvid, REALTEK_DSA);
+ 
+ int rtl8366_enable_vlan4k(struct realtek_priv *priv, bool enable)
+ {
+@@ -243,7 +243,7 @@ int rtl8366_enable_vlan4k(struct realtek_priv *priv, bool enable)
+ 	priv->vlan4k_enabled = enable;
+ 	return 0;
+ }
+-EXPORT_SYMBOL_GPL(rtl8366_enable_vlan4k);
++EXPORT_SYMBOL_NS_GPL(rtl8366_enable_vlan4k, REALTEK_DSA);
+ 
+ int rtl8366_enable_vlan(struct realtek_priv *priv, bool enable)
+ {
+@@ -265,7 +265,7 @@ int rtl8366_enable_vlan(struct realtek_priv *priv, bool enable)
+ 
+ 	return ret;
+ }
+-EXPORT_SYMBOL_GPL(rtl8366_enable_vlan);
++EXPORT_SYMBOL_NS_GPL(rtl8366_enable_vlan, REALTEK_DSA);
+ 
+ int rtl8366_reset_vlan(struct realtek_priv *priv)
+ {
+@@ -290,7 +290,7 @@ int rtl8366_reset_vlan(struct realtek_priv *priv)
+ 
+ 	return 0;
+ }
+-EXPORT_SYMBOL_GPL(rtl8366_reset_vlan);
++EXPORT_SYMBOL_NS_GPL(rtl8366_reset_vlan, REALTEK_DSA);
+ 
+ int rtl8366_vlan_add(struct dsa_switch *ds, int port,
+ 		     const struct switchdev_obj_port_vlan *vlan,
+@@ -345,7 +345,7 @@ int rtl8366_vlan_add(struct dsa_switch *ds, int port,
+ 
+ 	return 0;
+ }
+-EXPORT_SYMBOL_GPL(rtl8366_vlan_add);
++EXPORT_SYMBOL_NS_GPL(rtl8366_vlan_add, REALTEK_DSA);
+ 
+ int rtl8366_vlan_del(struct dsa_switch *ds, int port,
+ 		     const struct switchdev_obj_port_vlan *vlan)
+@@ -389,7 +389,7 @@ int rtl8366_vlan_del(struct dsa_switch *ds, int port,
+ 
+ 	return 0;
+ }
+-EXPORT_SYMBOL_GPL(rtl8366_vlan_del);
++EXPORT_SYMBOL_NS_GPL(rtl8366_vlan_del, REALTEK_DSA);
+ 
+ void rtl8366_get_strings(struct dsa_switch *ds, int port, u32 stringset,
+ 			 uint8_t *data)
+@@ -403,7 +403,7 @@ void rtl8366_get_strings(struct dsa_switch *ds, int port, u32 stringset,
+ 	for (i = 0; i < priv->num_mib_counters; i++)
+ 		ethtool_puts(&data, priv->mib_counters[i].name);
+ }
+-EXPORT_SYMBOL_GPL(rtl8366_get_strings);
++EXPORT_SYMBOL_NS_GPL(rtl8366_get_strings, REALTEK_DSA);
+ 
+ int rtl8366_get_sset_count(struct dsa_switch *ds, int port, int sset)
+ {
+@@ -417,7 +417,7 @@ int rtl8366_get_sset_count(struct dsa_switch *ds, int port, int sset)
+ 
+ 	return priv->num_mib_counters;
+ }
+-EXPORT_SYMBOL_GPL(rtl8366_get_sset_count);
++EXPORT_SYMBOL_NS_GPL(rtl8366_get_sset_count, REALTEK_DSA);
+ 
+ void rtl8366_get_ethtool_stats(struct dsa_switch *ds, int port, uint64_t *data)
+ {
+@@ -441,4 +441,4 @@ void rtl8366_get_ethtool_stats(struct dsa_switch *ds, int port, uint64_t *data)
+ 		data[i] = mibvalue;
+ 	}
+ }
+-EXPORT_SYMBOL_GPL(rtl8366_get_ethtool_stats);
++EXPORT_SYMBOL_NS_GPL(rtl8366_get_ethtool_stats, REALTEK_DSA);
+diff --git a/drivers/net/dsa/realtek/rtl8366rb.c b/drivers/net/dsa/realtek/rtl8366rb.c
+index e3b6a470ca67..baeab5445d99 100644
+--- a/drivers/net/dsa/realtek/rtl8366rb.c
++++ b/drivers/net/dsa/realtek/rtl8366rb.c
+@@ -1938,3 +1938,5 @@ EXPORT_SYMBOL_GPL(rtl8366rb_variant);
+ MODULE_AUTHOR("Linus Walleij <linus.walleij@linaro.org>");
+ MODULE_DESCRIPTION("Driver for RTL8366RB ethernet switch");
+ MODULE_LICENSE("GPL");
++MODULE_IMPORT_NS(REALTEK_DSA);
++
 -- 
 2.43.0
 
