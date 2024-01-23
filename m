@@ -1,77 +1,104 @@
-Return-Path: <netdev+bounces-64950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5E91838686
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 06:07:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDAB8838694
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 06:12:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D1051C22B12
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 05:07:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72B69283622
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 05:12:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 087AD1FC8;
-	Tue, 23 Jan 2024 05:07:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B68520E4;
+	Tue, 23 Jan 2024 05:12:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eNNxPNxc"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="CK7i3sh0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBBF12107;
-	Tue, 23 Jan 2024 05:07:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9DF323C6;
+	Tue, 23 Jan 2024 05:11:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705986423; cv=none; b=QGMFd1nVFwrnWB2oqvIW/fUtwgaxtqaHfNnu9/WW2DNahm6FGCDsYItLQbyOVUqBdpZgbAoAeVo3Mh1CTZyHL+8lBfS3qxqXTwou3Kq4+jlmceEZl9CCP9anL1ZA6xHTB6UoPM7TbuqWi00FJibgkSiw32ZtdmpSIq9nUSiFPxg=
+	t=1705986721; cv=none; b=udRJKiVpW7lNwHdQ/YrxcYWs9YFNgf8VLYV7wsswFxjJumTXX4N1DElawlZUYF6jkFWZvp+NxUC3nia2mZ8Pj+CzRDZkqTQpjgxqpGyiXaWaiwYd6r84pRw5s2YhRA7b4NeyyAW24FahWcc2IqZcpYbDpx72UyatBxtwDS5KU2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705986423; c=relaxed/simple;
-	bh=XX3LA4E4rJdlxLNkIg/Wk1MeSiT4eADZjmfxpCmQY9w=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sUcowx5qm4CdI+pjCZbL2XxgDyIrp9zuHfhpe0bR4tPKM71sp7N9y486doHm9HJBBhnk06wLGRuhS4QF8zdavond/5Q//9SudZ9NdaQkey2VRSW5csawZGV3Rf4Algs3kyvSgMg+tBmgAFnGKJhtD70CaaZaglFRADDDTTyL9cU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eNNxPNxc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03075C433F1;
-	Tue, 23 Jan 2024 05:07:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1705986423;
-	bh=XX3LA4E4rJdlxLNkIg/Wk1MeSiT4eADZjmfxpCmQY9w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=eNNxPNxcEF0Y8CfRXIlvHMd8FJQq4l6Hf6Ct0VV1f3L7IP+Rb3aNV23ItuZ9T72ET
-	 yc2upsGdeLoF0I4F3oE7lu9lPd0F0SM8JLZDG/wULHYk15YAoQU2FxZT8WTKizTSw8
-	 9CoIONbWCpiwXeMdoaBUXinUgR/bioz2pD+6OHc1KByQ0ISZmcOpoPSsJ0avyUpwS+
-	 j7rzN2+XKCqwBprleDsVqJNu2hgmf3xdQQNJxzJXlNgbvjraarc3X3UfcMWy4y4Phc
-	 fPQ5V3pKwj0mHWArP8zA5ZZXu15heq18jO85SGdc99mT1t+wtjZ5WCd37JRBfGqX5f
-	 nLD0yWCY2QoaA==
-Date: Mon, 22 Jan 2024 21:07:00 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Danielle Ratson <danieller@nvidia.com>
-Cc: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
- <pabeni@redhat.com>, <corbet@lwn.net>, <linux@armlinux.org.uk>,
- <sdf@google.com>, <kory.maincent@bootlin.com>,
- <maxime.chevallier@bootlin.com>, <vladimir.oltean@nxp.com>,
- <przemyslaw.kitszel@intel.com>, <ahmed.zaki@intel.com>,
- <richardcochran@gmail.com>, <shayagr@amazon.com>,
- <paul.greenwalt@intel.com>, <jiri@resnulli.us>,
- <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <mlxsw@nvidia.com>, <petrm@nvidia.com>, <idosch@nvidia.com>
-Subject: Re: [RFC PATCH net-next 8/9] ethtool: cmis_fw_update: add a layer
- for supporting firmware update using CDB
-Message-ID: <20240122210700.6e322eb9@kernel.org>
-In-Reply-To: <20240122084530.32451-9-danieller@nvidia.com>
-References: <20240122084530.32451-1-danieller@nvidia.com>
-	<20240122084530.32451-9-danieller@nvidia.com>
+	s=arc-20240116; t=1705986721; c=relaxed/simple;
+	bh=c8iOlCeaEk0mMOc3eox/UyW+/s+RyondPxM+SYVNgYU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dPZVOf+Nfy/xEY1h6Vxu4EakU6oOD9EOajLM97OdrqjFHTowV6KmnEL7LpZf/LJQ6qxpO50ExXx8qXPAFHhrnzl54VxCedmtSr0rO/8vexrdwaVAnfRnNI2pCwHyZlbxbEwjGfJ9j3dMJmwO1vehcqLa9usvA/H0K78chAXDeIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=CK7i3sh0; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=Q0Ch9qtRDsWgaVCBGepAuuXz/gYgKTWF5H3y3EF92GI=; b=CK7i3sh0X/d+FbrRuelyjzmkUF
+	g4WhAEw/bVzzPrcg/Kk8fFNuWWZP3Xc1AGgKnajfVMGG5uZnI0+kJMx/kkITYM/aZBF3/f3/qphdC
+	06uwix2eTLt15I5YGocvVF3eQAEFnKM1EPMldi2U31ysRpqT/MKMtxg6JlO8LpalvWDXnDpgSD8yp
+	NwML+KzgFl8jrNXzGxLI/mAmYgqGhVgGGHpuEdi6iJMsPKrylxk/LEkFDp6L/4sjsv2z+VB4+y9Fs
+	ejN3sjYZhYRNe4sR3EAYKnmbm60QYPWuTGc3ZyBmkeAQkgPR9LkHLrNX9VwYlC5iw3jf70Jj6c/LQ
+	TCh5d8BQ==;
+Received: from [50.53.50.0] (helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1rS94j-00F7Dd-0D;
+	Tue, 23 Jan 2024 05:11:53 +0000
+From: Randy Dunlap <rdunlap@infradead.org>
+To: netdev@vger.kernel.org
+Cc: patches@lists.linux.dev,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Jon Maloy <jmaloy@redhat.com>,
+	Ying Xue <ying.xue@windriver.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH resend] tipc: node: remove Excess struct member kernel-doc warnings
+Date: Mon, 22 Jan 2024 21:11:52 -0800
+Message-ID: <20240123051152.23684-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Mon, 22 Jan 2024 10:45:29 +0200 Danielle Ratson wrote:
-> +	netdev_put(module_fw->dev, &module_fw->dev_tracker);
-> +	module_fw->dev->module_fw_flash_in_progress = false;
+Remove 2 kernel-doc descriptions to squelch warnings:
 
-The other way around :) Once you release the reference you can't touch
-dev at all.
+node.c:150: warning: Excess struct member 'inputq' description in 'tipc_node'
+node.c:150: warning: Excess struct member 'namedq' description in 'tipc_node'
+
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Jon Maloy <jmaloy@redhat.com>
+Cc: Ying Xue <ying.xue@windriver.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Simon Horman <horms@kernel.org>
+---
+Resend after merge window has closed.
+
+ net/tipc/node.c |    2 --
+ 1 file changed, 2 deletions(-)
+
+diff -- a/net/tipc/node.c b/net/tipc/node.c
+--- a/net/tipc/node.c
++++ b/net/tipc/node.c
+@@ -86,8 +86,6 @@ struct tipc_bclink_entry {
+  * @lock: rwlock governing access to structure
+  * @net: the applicable net namespace
+  * @hash: links to adjacent nodes in unsorted hash chain
+- * @inputq: pointer to input queue containing messages for msg event
+- * @namedq: pointer to name table input queue with name table messages
+  * @active_links: bearer ids of active links, used as index into links[] array
+  * @links: array containing references to all links to node
+  * @bc_entry: broadcast link entry
 
