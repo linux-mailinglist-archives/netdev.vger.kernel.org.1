@@ -1,121 +1,168 @@
-Return-Path: <netdev+bounces-65167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7B4B83964F
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 18:24:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 002CA83966B
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 18:30:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 270F41C23BE4
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:24:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 252D61C212EB
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 935C87FBCE;
-	Tue, 23 Jan 2024 17:24:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0428280032;
+	Tue, 23 Jan 2024 17:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WeSfU2Sm"
+	dkim=pass (1024-bit key) header.d=pschenker.ch header.i=@pschenker.ch header.b="r3GNIFzq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-190e.mail.infomaniak.ch (smtp-190e.mail.infomaniak.ch [185.125.25.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A4437FBA8;
-	Tue, 23 Jan 2024 17:24:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 562F18002F;
+	Tue, 23 Jan 2024 17:30:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.25.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706030666; cv=none; b=gRZK9yJv0zGbgWFE+YB8ldNr0mVfg3txcBC7coR7kR8nArXej6rBtHkovJB/ap3XSe96P5NIaEXmcUlTRIjAZ7loHaWXcJq8ivt+Q6Ex5/ncXNro3h9welsj2rb6WAZtUm4PVSCtyYbiPb4wH6d2er3CWHymyKCG9BkvVa5R/1s=
+	t=1706031024; cv=none; b=gjKSPK9DUnTVEpPhpbltAxgFKwwYHbzok8T31+3zz81WITtyROGgEcaUgvVcGRJjo9VxzDtWKH1smFR5xvnakBezFUdmucsBF0sQRW0VmpA5HVeG1AZ17o1lpiG/txzbeT6GdyT7qV65YDAu6zQ4IZXZiLd4vxP/qQjuul8P4gU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706030666; c=relaxed/simple;
-	bh=Oyao+3/Ux6TZycEPX8L/CtZdSt0adFVr9KdQJvVkrTM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=bdfmiHotMcJwCEalqx6XJULQBJdFTXgwfX9s/hhgPNt6pQQj0C8mRJsZOLpn3wO3oywJ8OcLYE3R9O7hzAtWVdC7smdWQiycEp0iyvSRsOd5fx6JWU2IkTsTnzaKhIIuuLV3jxLbjZmEWgEkuSi7ut9u+Qe+kepmRT5OTuWk5Rc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WeSfU2Sm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70157C433C7;
-	Tue, 23 Jan 2024 17:24:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706030665;
-	bh=Oyao+3/Ux6TZycEPX8L/CtZdSt0adFVr9KdQJvVkrTM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=WeSfU2SmF+MThNV+FwS3jNLbx/lbHqp3O8rGmEOzabcSnXEgrwMlsQB9X+zP4Dj5G
-	 wd1fgHH0A7R0Tmo1hzTqTwsERG+4Gn3Cx5lBeFm5nnKu5zpyTImNwviF1z+B9Bs+B5
-	 FDxtofh709s2gjhWj2TwrRefwkgnofaBeH2IOycUb4sAH6b1twJSE7eTOxL5ZpB136
-	 XW94cTSytbK36zuZLvfHBZJyLBwQtXSssVanGsGSNlbp69amctnSVmvxMuZ0ytbIUw
-	 x0q8WUofOp/tNMPpmUcwMX0JnwNQI0b6OZ1iN5n7Qvk/bytqBMVrKlnALAAEsYlcQ0
-	 7dIeV9ibAJhkg==
-Date: Tue, 23 Jan 2024 11:24:23 -0600
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Sakari Ailus <sakari.ailus@linux.intel.com>
-Cc: linux-pm@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>,
-	linux-pci@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	Jaroslav Kysela <perex@perex.cz>,
-	Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>,
-	laurent.pinchart@ideasonboard.com, David Airlie <airlied@gmail.com>,
-	Paul Elder <paul.elder@ideasonboard.com>,
-	linux-media@vger.kernel.org,
-	Thomas =?utf-8?Q?Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
-	intel-gfx@lists.freedesktop.org,
-	Lucas De Marchi <lucas.demarchi@intel.com>,
-	Mark Brown <broonie@kernel.org>,
-	Jacek Lawrynowicz <jacek.lawrynowicz@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	intel-xe@lists.freedesktop.org,
-	Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-	Alex Elder <elder@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	linux-sound@vger.kernel.org, Takashi Iwai <tiwai@suse.com>,
-	Daniel Vetter <daniel@ffwll.ch>, netdev@vger.kernel.org
-Subject: Re: [PATCH v4 1/3] pm: runtime: Simplify pm_runtime_get_if_active()
- usage
-Message-ID: <20240123172423.GA317147@bhelgaas>
+	s=arc-20240116; t=1706031024; c=relaxed/simple;
+	bh=B/2hHzkuQ9wWcKUuhzt5SkH9HMMQlzQD5Ynkq/2Y300=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=CpPS8NzItWI4eElOupUN3w3yZOzGUb9qh2276WjXfC96oJvPZbW88lXA64R6dm3Ah6DjLZOQxS7ND03lc12FA+tAoAteeLj11U0iMwtRUS1RROXcfQI3R1TRAnRY13f1VlNlCb98YEnxh1PMhCVXWc1hIa0CcRXc3/raEAnMXRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pschenker.ch; spf=pass smtp.mailfrom=pschenker.ch; dkim=pass (1024-bit key) header.d=pschenker.ch header.i=@pschenker.ch header.b=r3GNIFzq; arc=none smtp.client-ip=185.125.25.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pschenker.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pschenker.ch
+Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4TKDcp0b5TzMpvNJ;
+	Tue, 23 Jan 2024 18:30:18 +0100 (CET)
+Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4TKDcn1hJ8z3Y;
+	Tue, 23 Jan 2024 18:30:17 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=pschenker.ch;
+	s=20220412; t=1706031017;
+	bh=B/2hHzkuQ9wWcKUuhzt5SkH9HMMQlzQD5Ynkq/2Y300=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=r3GNIFzq199rrRUz3Q+VVI9tMMH+D+WPkOabnP676ohv2UrLZHWP3jCISbXlvO5cX
+	 S2VmIeRjmW1D4Bet8OaC1QJ38m9C9q2MngZ4Xh2ctki/PjbLEuA+mryQalTGWUvduc
+	 K22L9YMggk5A/o3EywJ1O5Q6+c5VZ60ExwhACc5Q=
+Message-ID: <979b1e77b5bb62463d52e7b9d3f9ca1415f4006a.camel@pschenker.ch>
+Subject: Re: [PATCH net-next v1 1/2] dt-bindings: net: dsa: Add KSZ8567
+ switch support
+From: Philippe Schenker <dev@pschenker.ch>
+To: Conor Dooley <conor@kernel.org>
+Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, Conor Dooley
+ <conor+dt@kernel.org>, Woojung Huh <woojung.huh@microchip.com>, Vladimir
+ Oltean <olteanv@gmail.com>, linux-kernel@vger.kernel.org,
+ UNGLinuxDriver@microchip.com,  Marek Vasut <marex@denx.de>, Florian
+ Fainelli <f.fainelli@gmail.com>, devicetree@vger.kernel.org, Eric Dumazet
+ <edumazet@google.com>, "David S . Miller" <davem@davemloft.net>, Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Jakub Kicinski
+ <kuba@kernel.org>,  Andrew Lunn <andrew@lunn.ch>, Rob Herring
+ <robh+dt@kernel.org>
+Date: Tue, 23 Jan 2024 18:30:16 +0100
+In-Reply-To: <20240123-atlas-dart-7e955e7e24e5@spud>
+References: <20240123135014.614858-1-dev@pschenker.ch>
+	 <20240123-ripening-tabby-b97785375990@spud>
+	 <b2e232de11cee47a5932fccc2d151a9c7c276784.camel@pschenker.ch>
+	 <20240123-atlas-dart-7e955e7e24e5@spud>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240123095642.97303-2-sakari.ailus@linux.intel.com>
+X-Infomaniak-Routing: alpha
 
-On Tue, Jan 23, 2024 at 11:56:42AM +0200, Sakari Ailus wrote:
-> There are two ways to opportunistically increment a device's runtime PM
-> usage count, calling either pm_runtime_get_if_active() or
-> pm_runtime_get_if_in_use(). The former has an argument to tell whether to
-> ignore the usage count or not, and the latter simply calls the former with
-> ign_usage_count set to false. The other users that want to ignore the
-> usage_count will have to explitly set that argument to true which is a bit
-> cumbersome.
-> 
-> To make this function more practical to use, remove the ign_usage_count
-> argument from the function. The main implementation is renamed as
-> pm_runtime_get_conditional().
-> 
-> Signed-off-by: Sakari Ailus <sakari.ailus@linux.intel.com>
-> Reviewed-by: Alex Elder <elder@linaro.org> # drivers/net/ipa/ipa_smp2p.c
-> Reviewed-by: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-> Acked-by: Takashi Iwai <tiwai@suse.de> # sound/
-> Reviewed-by: Jacek Lawrynowicz <jacek.lawrynowicz@linux.intel.com> # drivers/accel/ivpu/
-> Acked-by: Rodrigo Vivi <rodrigo.vivi@intel.com> # drivers/gpu/drm/i915/
-> Reviewed-by: Rodrigo Vivi <rodrigo.vivi@intel.com>
 
-Acked-by: Bjorn Helgaas <bhelgaas@google.com> # drivers/pci/
 
-- Previous PM history uses "PM: " in the subject lines (not "pm: ").
+On Tue, 2024-01-23 at 17:23 +0000, Conor Dooley wrote:
+> On Tue, Jan 23, 2024 at 05:17:53PM +0100, Philippe Schenker wrote:
+> >=20
+> >=20
+> > On Tue, 2024-01-23 at 16:06 +0000, Conor Dooley wrote:
+> > > On Tue, Jan 23, 2024 at 02:50:13PM +0100, Philippe Schenker
+> > > wrote:
+> > > > From: Philippe Schenker <philippe.schenker@impulsing.ch>
+> > > >=20
+> > > > This commit adds the dt-binding for KSZ8567, a robust 7-port
+> > > > Ethernet switch. The KSZ8567 features two RGMII/MII/RMII
+> > > > interfaces,
+> > > > each capable of gigabit speeds, complemented by five 10/100
+> > > > Mbps
+> > > > MAC/PHYs.
+> > > >=20
+> > > > Signed-off-by: Philippe Schenker
+> > > > <philippe.schenker@impulsing.ch>
+> > >=20
+> > > This device has all the same constraints as the other ones in
+> > > this
+> > > binding, why is it not compatible with any of them? If it isn't,
+> > > the
+> > > compatible should mention why it is not.
+> >=20
+> > Hi Conor, Thanks for your message!
+> >=20
+> > I need the compatible to make sure the correct ID of the switch is
+> > being set in the driver as well as its features.
+>=20
+> Are the features of this switch such that a driver for another ksz
+> switch would not work (even in a limited capacity) with the 8567?
+> Things like the register map changing or some feature being removed
+> are
+> examples of why it may not work.
 
-- I don't know whether it's feasible, but it would be nice if the
-  intel_pm_runtime_pm.c rework could be done in one shot instead of
-  being split between patches 1/3 and 2/3.
+Yes the ksz dsa driver is made so that it checks the ID of the attached
+chip and refuses to work if it doesn't match. [1]
+It is a very similar chip and uses the same regmap as KSZ9567 but with
+lower phy-speeds on its 5 switch ports. The two upstream CPU ports are
+gigabit capable. All this information is set-up in the second patch of
+this series. [2]
 
-  Maybe it could be a preliminary patch that uses the existing
-  if_active/if_in_use interfaces, followed by the trivial if_active
-  updates in this patch.  I think that would make the history easier
-  to read than having the transitory pm_runtime_get_conditional() in
-  the middle.
+I will include a description to the second series. Thanks for your
+feedback.
 
-- Similarly, it would be nice if pm_runtime_get_conditional() never
-  had to be published in pm_runtime.h, instead of being temporarily
-  added there by this patch and then immediately made private by 2/3.
-  Maybe that's not practical, I dunno.
+Philippe
 
-Bjorn
+
+[1]
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/dri=
+vers/net/dsa/microchip/ksz_common.c?h=3Dv6.8-rc1#n3181
+[2]
+https://patchwork.kernel.org/project/netdevbpf/patch/20240123135014.614858-=
+2-dev@pschenker.ch/
+
+>=20
+> > You mean I shall mention the reason in the commit-message, or
+> > where?
+>=20
+> Yes.
+>=20
+> Thanks,
+> Conor
+>=20
+> > > > =C2=A0Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml =
+|
+> > > > 1 +
+> > > > =C2=A01 file changed, 1 insertion(+)
+> > > >=20
+> > > > diff --git
+> > > > a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> > > > b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> > > > index c963dc09e8e1..52acc15ebcbf 100644
+> > > > ---
+> > > > a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> > > > +++
+> > > > b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> > > > @@ -31,6 +31,7 @@ properties:
+> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - microchip,ksz9893
+> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - microchip,ksz9563
+> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - microchip,ksz8563
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - microchip,ksz8567
+> > > > =C2=A0
+> > > > =C2=A0=C2=A0 reset-gpios:
+> > > > =C2=A0=C2=A0=C2=A0=C2=A0 description:
+> > > > --=20
+> > > > 2.34.1
+> > > >=20
 
