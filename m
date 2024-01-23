@@ -1,159 +1,115 @@
-Return-Path: <netdev+bounces-64932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64926-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDBDF837ECD
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 02:46:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60BEB837D08
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 02:23:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C9271F27C7C
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 01:46:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 189E22912D5
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 01:23:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD544164183;
-	Tue, 23 Jan 2024 00:46:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D40065F84D;
+	Tue, 23 Jan 2024 00:29:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="EtTIlukh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XSKTwf45"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C99113DB8F
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 00:46:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63F4D5F548
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 00:29:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705970769; cv=none; b=C9YDwUZmSmdRCgdXkIF8sbLXTnEgM+SkgRw8ITuahS+gYQjlNY1f8zuQd7ryXl/arLLafbliUmmKUsCkEyy2sZ3TDgb1/nGdJcwwcgCQ+IBSelg1rhmQTcghcOcxT3rrk3RE9lsQzAQfpF4DalmukbBUD0+uwCcfIKT+NzIN2nY=
+	t=1705969773; cv=none; b=bel50hMH7pMMyvfrfuPczQQ7RExHE4dfwz/PPe8PuQDrsl1y4H1/WeCKlGFt/oZo1ZqgHyI7VrnGX+zcpiH6G/j1A1DxTkpXnw1crVItjuMz4cVClQJpksOZ0PhEV5Zs3G2eOCx2PXlPqeVpMroLbm1oZ4WFXjoILejPVKVPuwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705970769; c=relaxed/simple;
-	bh=7EjHVZinq5vMXU1+hzn38DepLpa6iDayHYypzEUYJ8I=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=mYAAW96ytw7NrTwGeveANbGd9bhwjlicJLWm3yB93xoT199h5Wgx5myoQn8gLeMqSIwcUoVxUSig2xnHCV3bQv7xh91KvmypaAz4Lm/gqvZw2AqnGVMeKYfkYO1tjuxTwzhG1RgNVfipZyNsLvC5eEbJe+hrftu1u8RUoyghY38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=EtTIlukh; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2906fd62cb2so862519a91.2
-        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 16:46:07 -0800 (PST)
+	s=arc-20240116; t=1705969773; c=relaxed/simple;
+	bh=7R2DcEUwr1zpg1inccbXQ1F0srmU5iEvCyz+jnzCWUM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SPnutSjCrMA48qaXlUuYP/+LGluzJ/NIl8kfNNa7BMGL184U+CfF1zh21N9YnykBtpXdY6t8kgov9Whw0k/iVk4RrBNtr3oZkMnbGFAA7ndS93hUWaZllSZzds3qsM8rQAWWAwXDpMOa8PCiEhTUglsWmSVxTS5gL0wChVV1wWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XSKTwf45; arc=none smtp.client-ip=209.85.166.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-7ba9c26e14aso86153939f.0
+        for <netdev@vger.kernel.org>; Mon, 22 Jan 2024 16:29:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1705970767; x=1706575567; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QL2EbelNfKplPRaLFa/5pxqZ1ShWs/qPJgvqE5R3xUI=;
-        b=EtTIlukhFan/pNGUy5e9gjkv2ADBCOb8zjKv323DqiiPALFjM0EMgCLOQUEKib1nfv
-         c+1jW7qdWU7miLssL8qiDsYTFzy4RLQflCD8hdFhKwktEHiC/QIVPu3UL50a1O8j+pXA
-         p3YsKTEKT5bDRSHWx3bGOYqyDUo/rJz8Y/+iU=
+        d=gmail.com; s=20230601; t=1705969770; x=1706574570; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0bOLY9JEWCKnhtrT1pNUK8IfJyPj65lMh/72p9SVeAA=;
+        b=XSKTwf45sA4exlDg8hn2Fh4/VhOh5WoBJ4mV+FdcZhGf0H+1OOWyoOwLWYEC3dumdg
+         LOW60Xqqz6rPs1lh6J+i/RE7uGOlbrYYqohELFfXOcGvs4iSi7mZqlzUUCMR79lgVBkT
+         i76mHpvZC8qjr38NlnOztcM5suFWE8NPZdiy3Rp+EqF3bTbeCFJhiU0ElCjTeHXQoVbr
+         qG+5u+azbstk2eFEjK80cz4WbAe4glSMuSzYvbWGPZ0sOwJiwlD6TSSgrbE9P2zcxcDm
+         9OkUuBiRON959n3BeedmIpDy8xo6vSVU44xV7GtCvtEr/OiCO+ZPxvhuPOUxQ35hL3m5
+         YXbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1705970767; x=1706575567;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QL2EbelNfKplPRaLFa/5pxqZ1ShWs/qPJgvqE5R3xUI=;
-        b=WulqGkfwH/4QEqyOtR/cW/QtlVo1Dhmigc/Sw9gSi3sQvOhNn+a9lY9VZQhS1TyzYB
-         AiO4HRF6+8vrfvhqV/ezVffPgae77hPVx1VZqWvypprhLTRT7mbhGWKwSVE5w++LjQ3z
-         zEwqApCEWtROQ51CezwNxDHSdFozlQ6M+sOnT9Ae0RSH3lCwTwJYrIsoz7tZhyJ9Ln0E
-         srmn89ibpCG0PRqSuGUZVfhlmG40zaGH0Eq3u/mHBNuLLqGZKVyr6UCcakqiaDNuRdMn
-         IUbvSV+tXPCk+PMSanx/sNsNkxa+cN/EwwnIujIfPaFv39BTa74y8K8YuTS7hx7MRU8P
-         D0jg==
-X-Gm-Message-State: AOJu0YwKp4/sJmJoXPoT7rnZWuMq5rHYLZnjFwq8whPC7CfCxBdH6mkz
-	MQPr/OK3uMWWnBdqGVQLxEED8PobU4DpbuoWJaupz+vSQRXniMqH5z0cGZCBmg==
-X-Google-Smtp-Source: AGHT+IGRFhkPzejcuLL4VRK+c8dRwaf1aYOd9GmP0Xdnbl6TsX/mwlLYTiaazDEJC80Uor5945a4rA==
-X-Received: by 2002:a17:90a:d306:b0:290:5ccf:af0 with SMTP id p6-20020a17090ad30600b002905ccf0af0mr2174216pju.60.1705970767490;
-        Mon, 22 Jan 2024 16:46:07 -0800 (PST)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id oe11-20020a17090b394b00b00290d0459e3bsm120871pjb.47.2024.01.22.16.45.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jan 2024 16:46:03 -0800 (PST)
-From: Kees Cook <keescook@chromium.org>
-To: linux-hardening@vger.kernel.org
-Cc: Kees Cook <keescook@chromium.org>,
-	Wei Liu <wei.liu@kernel.org>,
-	Paul Durrant <paul@xen.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	xen-devel@lists.xenproject.org,
-	netdev@vger.kernel.org,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 80/82] xen-netback: Refactor intentional wrap-around test
-Date: Mon, 22 Jan 2024 16:27:55 -0800
-Message-Id: <20240123002814.1396804-80-keescook@chromium.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240122235208.work.748-kees@kernel.org>
-References: <20240122235208.work.748-kees@kernel.org>
+        d=1e100.net; s=20230601; t=1705969770; x=1706574570;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0bOLY9JEWCKnhtrT1pNUK8IfJyPj65lMh/72p9SVeAA=;
+        b=kZvji8KpnU3wZai2y/CdfneJeaqZGLBoZ/EzRKnZp3+VlMLsPBA4QSrYzwZolw2v/j
+         Ak3GwBA25Hv2vzk9/udA3q6Ni1xfrYOXyawQ3QLbk2kQn3MP6YY+B7QlHka9r1sz+1ui
+         sCgHFOcVbYRQQYoPeG8WohwnL4rfUpCpDQIjyHeXDIA3aXCzO/Wp67YXws8DJxceTr7w
+         IaE6k1vyQJDDcz1xQTtqDwmTnRBSMJt322bLiRnjkMW0+gaUghrL5pzZVVqy34LCfQJx
+         okrxQeK6N9xc8XsurIq+MrBn0Vzp5rIn3MYRcHKZqk0gaLphz2fvS7NRdY4WbkZB51ld
+         /uOA==
+X-Gm-Message-State: AOJu0YwZ+DE/yHEA9K5cE4bAL5EIw3Njbpga2V9s3UP58PNkvWC1HaVz
+	6ayWRHWT1XBpCqwexWxdARV8VTYxY4Md6hSfbhM1ahKaH5YV2g3c
+X-Google-Smtp-Source: AGHT+IFKgJV/Q+VNzOEZbnCM1X1zbBQVZEsPxpV1HYkxgavERfUiGonROsjVEtlUHL8EBQ28DgNuIw==
+X-Received: by 2002:a6b:ed08:0:b0:7bf:9e23:99a3 with SMTP id n8-20020a6bed08000000b007bf9e2399a3mr796042iog.2.1705969770370;
+        Mon, 22 Jan 2024 16:29:30 -0800 (PST)
+Received: from ?IPV6:2601:282:1e82:2350:3c2c:1afc:52ff:38e7? ([2601:282:1e82:2350:3c2c:1afc:52ff:38e7])
+        by smtp.googlemail.com with ESMTPSA id x7-20020a056602160700b007bf0e4b4c63sm6545865iow.31.2024.01.22.16.29.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 Jan 2024 16:29:30 -0800 (PST)
+Message-ID: <3058351c-c859-4023-9608-9b7b1c8e4bb4@gmail.com>
+Date: Mon, 22 Jan 2024 17:29:29 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2080; i=keescook@chromium.org;
- h=from:subject; bh=7EjHVZinq5vMXU1+hzn38DepLpa6iDayHYypzEUYJ8I=;
- b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBlrwgMGbwjLdUBipRWV/86VXIdYYa28FnqDE8e3
- ji0sb3+qXmJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZa8IDAAKCRCJcvTf3G3A
- JsN6D/9/9pZCcQMxkCKVjCzbTzXOAQTMNmntEY/KiITUeK8EZC1n44hzsCtSDO9z3x4VtvUW53Y
- pRmydxh3JiySpsfiK4OxljXZ/xvSG+v1GEOgkMGo2iye6zXeVeadXsRCP2MY/IsaXKyM0TKUH5i
- g4+ChtKvF7D9haRMeRaLK4ST+SPfUX52+Z0xW6LUaGrz824SDJhB6Gq9j70+OoNvQaUNHrgZjdR
- a67Kgz/3+HnspC4bx9lGFxCUiPdmTZOz2mgatPghMoE1oX04GIjku1UTthsh6180c00i2Sk/LJI
- 1bRchLyEexiVH65VHvz3Ge37s/qRJosLl2xW1ds7SHJKd3qfVFTBa++CN+0tvpd22m7lAAYF7cU
- Rkfs/ZXcyHX1COeG62Bsp15wHODlwmJxEzU00q1Rl6ynr8uVniiXT4RIR9ZRxO5c25/mmUzGvmW
- 3rnZGTP9QuvpKRY6GaVrOWKPiaKo3XhsasnsuFP3f6lkYw/WdOVxY2UUWqvlpj3eah/klmSKi1a
- lDJR8pC8b50zoXsumq3xtz1lKSL3iETbnda7hCBHkYCfEhGJi2WPdHrfeEaXwDkde5gZEwPCzZ3
- EJ9TGrYsYcED0KeZFlmbguqSvBeanX+PMcLQckWAXPEbi1WgzcVvFGckq6ZyPuUJHl0C9DAM8Dk 2036V40Dg9GXNKw==
-X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2] vxlan: add support for flowlab inherit
+Content-Language: en-US
+To: Stephen Hemminger <stephen@networkplumber.org>,
+ Vincent Bernat <vincent@bernat.ch>
+Cc: Ido Schimmel <idosch@idosch.org>, Alce Lafranque <alce@lafranque.net>,
+ netdev@vger.kernel.org
+References: <20240120124418.26117-1-alce@lafranque.net>
+ <Za5eizfgzl5mwt50@shredder> <d94453e7-a56d-4aa5-8e5f-3d9a590fd968@bernat.ch>
+ <20240122161005.29149777@hermes.local>
+From: David Ahern <dsahern@gmail.com>
+In-Reply-To: <20240122161005.29149777@hermes.local>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-In an effort to separate intentional arithmetic wrap-around from
-unexpected wrap-around, we need to refactor places that depend on this
-kind of math. One of the most common code patterns of this is:
+On 1/22/24 5:10 PM, Stephen Hemminger wrote:
+> On Mon, 22 Jan 2024 22:11:32 +0100
+> Vincent Bernat <vincent@bernat.ch> wrote:
+> 
+>> On 2024-01-22 13:24, Ido Schimmel wrote:
+>>> s/flowlab/flowlabel/ in subject
+>>>
+>>> My understanding is that new features should be targeted at
+>>> iproute2-next. See the README.  
+>>
+>> You may be more familiar than I am about this, but since the kernel part 
+>> is already in net, it should go to the stable branch of iproute2.
+> 
+> There is no stable branch. Only current (based of Linus tree)
+> and next (for net-next kernel).
 
-	VAR + value < VAR
+to expand: iproute2 follows the netdev model which means -main is for
+bug fixes, and -next is for new features.
 
-Notably, this is considered "undefined behavior" for signed and pointer
-types, which the kernel works around by using the -fno-strict-overflow
-option in the build[1] (which used to just be -fwrapv). Regardless, we
-want to get the kernel source to the position where we can meaningfully
-instrument arithmetic wrap-around conditions and catch them when they
-are unexpected, regardless of whether they are signed[2], unsigned[3],
-or pointer[4] types.
-
-Refactor open-coded wrap-around addition test to use add_would_overflow().
-This paves the way to enabling the wrap-around sanitizers in the future.
-
-Link: https://git.kernel.org/linus/68df3755e383e6fecf2354a67b08f92f18536594 [1]
-Link: https://github.com/KSPP/linux/issues/26 [2]
-Link: https://github.com/KSPP/linux/issues/27 [3]
-Link: https://github.com/KSPP/linux/issues/344 [4]
-Cc: Wei Liu <wei.liu@kernel.org>
-Cc: Paul Durrant <paul@xen.org>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: xen-devel@lists.xenproject.org
-Cc: netdev@vger.kernel.org
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- drivers/net/xen-netback/hash.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/xen-netback/hash.c b/drivers/net/xen-netback/hash.c
-index ff96f22648ef..69b03b4feba9 100644
---- a/drivers/net/xen-netback/hash.c
-+++ b/drivers/net/xen-netback/hash.c
-@@ -345,7 +345,7 @@ u32 xenvif_set_hash_mapping(struct xenvif *vif, u32 gref, u32 len,
- 		.flags = GNTCOPY_source_gref
- 	}};
- 
--	if ((off + len < off) || (off + len > vif->hash.size) ||
-+	if ((add_would_overflow(off, len)) || (off + len > vif->hash.size) ||
- 	    len > XEN_PAGE_SIZE / sizeof(*mapping))
- 		return XEN_NETIF_CTRL_STATUS_INVALID_PARAMETER;
- 
--- 
-2.34.1
-
+If a new kernel feature needs support in iproute2, then the patch to
+iproute2 needs to be sent during the same development window as the
+kernel support. New feature support will not be added to -main branch
+regardless of when the kernel side landed.
 
