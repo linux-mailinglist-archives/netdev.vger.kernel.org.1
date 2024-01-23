@@ -1,160 +1,582 @@
-Return-Path: <netdev+bounces-65011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09CF0838D3E
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 12:17:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 084A6838D52
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 12:21:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DD226B266CA
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 11:17:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C5821C23034
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 11:21:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97DB35D916;
-	Tue, 23 Jan 2024 11:17:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AFC35D75A;
+	Tue, 23 Jan 2024 11:20:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LKVrx8hz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dOKrKpYc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FC495D90B;
-	Tue, 23 Jan 2024 11:17:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5434A5D732
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 11:20:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.88
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706008637; cv=none; b=XTe5WY0gTey2n9xLevoRVMrLR3dSe4CaoSbbiv5YVhPo02ehHHn3OCsxBy4CIqu4WSrdV3fQF1tw0glpNyJliXiOBEYtA5ezCpCPenDq/jPfIO5Wk5D9OzACaRYg0u81vhAiyfPJyVv9hok0HB99zrP8Hb9BYsJJc75Ukd3mekI=
+	t=1706008854; cv=none; b=Cn5RG/jwYzJokrd4dvDio4fN7Jcz5AJCf5HzSaearV0TWODQ/sbqV9vvMn4LkW446rGTXfqC6W+f4vdxMHSPmzG0qlMzKzTo/IR72yx+W8NCa8apGrZd7KZ1d3AtzGuHEs26dGjAy6AbIWvdCXYYsF2bb48JYGGULS+O7ntRuN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706008637; c=relaxed/simple;
-	bh=ftAvtFeeaW4qgcxPqHdqICXCoefaBuhMOGZYrPFCXN4=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ScHYNXV2Ou7Oq153goeiHWEwfT+0JpIkEIA1cBu8uR0EStegE/1JCYO0RNPOgOANG6XsyZsqQ67MSLk+oJNWgqnlC1EKTQDb4AqrGgXScJmvx6tyRs4x2KGOYJ1S6DgjRR/cI2+atVouFNointvNkXrhc5jy2291M6OaGqgyvvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LKVrx8hz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 410ACC433C7;
-	Tue, 23 Jan 2024 11:17:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706008637;
-	bh=ftAvtFeeaW4qgcxPqHdqICXCoefaBuhMOGZYrPFCXN4=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=LKVrx8hzqlRWgKylRdeOt8OCbo9Z3jIzVNGviOLZsUiPAi0XECPWYc/yvN/BWx0gN
-	 uU95uPEWWixeE7csBZW1Qg9igweBdvcAOW2WK72inFb2fKjPeBW5WZEZRSf3Z+/wnl
-	 EZdwPb2RqWuKk0HqnRyj9W5gtrXx7iNpbp1Oy5XynKp/kt11y+ZZr+yvEhBrHSo+KT
-	 Ui1meSsAKQm2DBa1Ix5rSTdCuRLjJg8yOwiPsSZFK+xapKxQvtMtHNNNRjywFpGBMz
-	 ntiyCC4tl7Wx3trEjtqxnykcRdn76lzzjfdcLUpgSUfD9AhGcLaPtr3WWkmrtvBTpJ
-	 mSs96r+AKdN3g==
-Message-ID: <85b02061798a1b750a87b0302681b86651d0c7a3.camel@kernel.org>
-Subject: Re: [PATCH v6 3/3] NFSD: add write_ports to netlink command
-From: Jeff Layton <jlayton@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>, Chuck Lever
- <chuck.lever@oracle.com>
-Cc: NeilBrown <neilb@suse.de>, linux-nfs@vger.kernel.org, 
-	lorenzo.bianconi@redhat.com, kuba@kernel.org, horms@kernel.org, 
-	netdev@vger.kernel.org
-Date: Tue, 23 Jan 2024 06:17:15 -0500
-In-Reply-To: <Za-N6BxOMXTGyxmW@lore-desk>
-References: <cover.1705771400.git.lorenzo@kernel.org>
-	 <f7c42dae2b232b3b06e54ceb3f00725893973e02.1705771400.git.lorenzo@kernel.org>
-	 <9e3ae337dcf168c60c4cfd51aa0b2fc7b24bcbfb.camel@kernel.org>
-	 <170595930799.23031.17998490973211605470@noble.neil.brown.name>
-	 <Za7zHvPJdei/vWm4@tissot.1015granger.net> <Za-N6BxOMXTGyxmW@lore-desk>
-Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
- keydata=mQINBE6V0TwBEADXhJg7s8wFDwBMEvn0qyhAnzFLTOCHooMZyx7XO7dAiIhDSi7G1NPxwn8jdFUQMCR/GlpozMFlSFiZXiObE7sef9rTtM68ukUyZM4pJ9l0KjQNgDJ6Fr342Htkjxu/kFV1WvegyjnSsFt7EGoDjdKqr1TS9syJYFjagYtvWk/UfHlW09X+jOh4vYtfX7iYSx/NfqV3W1D7EDi0PqVT2h6v8i8YqsATFPwO4nuiTmL6I40ZofxVd+9wdRI4Db8yUNA4ZSP2nqLcLtFjClYRBoJvRWvsv4lm0OX6MYPtv76hka8lW4mnRmZqqx3UtfHX/hF/zH24Gj7A6sYKYLCU3YrI2Ogiu7/ksKcl7goQjpvtVYrOOI5VGLHge0awt7bhMCTM9KAfPc+xL/ZxAMVWd3NCk5SamL2cE99UWgtvNOIYU8m6EjTLhsj8snVluJH0/RcxEeFbnSaswVChNSGa7mXJrTR22lRL6ZPjdMgS2Km90haWPRc8Wolcz07Y2se0xpGVLEQcDEsvv5IMmeMe1/qLZ6NaVkNuL3WOXvxaVT9USW1+/SGipO2IpKJjeDZfehlB/kpfF24+RrK+seQfCBYyUE8QJpvTZyfUHNYldXlrjO6n5MdOempLqWpfOmcGkwnyNRBR46g/jf8KnPRwXs509yAqDB6sELZH+yWr9LQZEwARAQABtCVKZWZmIExheXRvbiA8amxheXRvbkBwb29jaGllcmVkcy5uZXQ+iQI7BBMBAgAlAhsDBgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIXgAUCTpXWPAIZAQAKCRAADmhBGVaCFc65D/4gBLNMHopQYgG/9RIM3kgFCCQV0pLv0hcg1cjr+bPI5f1PzJoOVi9s0wBDHwp8+vtHgYhM54yt43uI7Htij0RHFL5eFqoVT4TSfAg2qlvNemJEOY0e4daljjmZM7UtmpGs9NN0r9r50W82eb5Kw5bc/
-	r0kmR/arUS2st+ecRsCnwAOj6HiURwIgfDMHGPtSkoPpu3DDp/cjcYUg3HaOJuTjtGHFH963B+f+hyQ2BrQZBBE76ErgTDJ2Db9Ey0kw7VEZ4I2nnVUY9B5dE2pJFVO5HJBMp30fUGKvwaKqYCU2iAKxdmJXRIONb7dSde8LqZahuunPDMZyMA5+mkQl7kpIpR6kVDIiqmxzRuPeiMP7O2FCUlS2DnJnRVrHmCljLkZWf7ZUA22wJpepBligemtSRSbqCyZ3B48zJ8g5B8xLEntPo/NknSJaYRvfEQqGxgk5kkNWMIMDkfQOlDSXZvoxqU9wFH/9jTv1/6p8dHeGM0BsbBLMqQaqnWiVt5mG92E1zkOW69LnoozE6Le+12DsNW7RjiR5K+27MObjXEYIW7FIvNN/TQ6U1EOsdxwB8o//Yfc3p2QqPr5uS93SDDan5ehH59BnHpguTc27XiQQZ9EGiieCUx6Zh2ze3X2UW9YNzE15uKwkkuEIj60NvQRmEDfweYfOfPVOueC+iFifbQgSmVmZiBMYXl0b24gPGpsYXl0b25AcmVkaGF0LmNvbT6JAjgEEwECACIFAk6V0q0CGwMGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJEAAOaEEZVoIViKUQALpvsacTMWWOd7SlPFzIYy2/fjvKlfB/Xs4YdNcf9qLqF+lk2RBUHdR/dGwZpvw/OLmnZ8TryDo2zXVJNWEEUFNc7wQpl3i78r6UU/GUY/RQmOgPhs3epQC3PMJj4xFx+VuVcf/MXgDDdBUHaCTT793hyBeDbQuciARDJAW24Q1RCmjcwWIV/pgrlFa4lAXsmhoac8UPc82Ijrs6ivlTweFf16VBc4nSLX5FB3ls7S5noRhm5/Zsd4PGPgIHgCZcPgkAnU1S/A/rSqf3FLpU+CbVBDvlVAnOq9gfNF+QiTlOHdZVIe4gEYAU3CUjbleywQqV02BKxPVM0C5/oVjMVx
-	3bri75n1TkBYGmqAXy9usCkHIsG5CBHmphv9MHmqMZQVsxvCzfnI5IO1+7MoloeeW/lxuyd0pU88dZsV/riHw87i2GJUJtVlMl5IGBNFpqoNUoqmvRfEMeXhy/kUX4Xc03I1coZIgmwLmCSXwx9MaCPFzV/dOOrju2xjO+2sYyB5BNtxRqUEyXglpujFZqJxxau7E0eXoYgoY9gtFGsspzFkVNntamVXEWVVgzJJr/EWW0y+jNd54MfPRqH+eCGuqlnNLktSAVz1MvVRY1dxUltSlDZT7P2bUoMorIPu8p7ZCg9dyX1+9T6Muc5dHxf/BBP/ir+3e8JTFQBFOiLNdFtB9KZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5vcmc+iQI4BBMBAgAiBQJOldK9AhsDBgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIXgAAKCRAADmhBGVaCFWgWD/0ZRi4hN9FK2BdQs9RwNnFZUr7JidAWfCrs37XrA/56olQl3ojn0fQtrP4DbTmCuh0SfMijB24psy1GnkPepnaQ6VRf7Dxg/Y8muZELSOtsv2CKt3/02J1BBitrkkqmHyni5fLLYYg6fub0T/8Kwo1qGPdu1hx2BQRERYtQ/S5d/T0cACdlzi6w8rs5f09hU9Tu4qV1JLKmBTgUWKN969HPRkxiojLQziHVyM/weR5Reu6FZVNuVBGqBD+sfk/c98VJHjsQhYJijcsmgMb1NohAzwrBKcSGKOWJToGEO/1RkIN8tqGnYNp2G+aR685D0chgTl1WzPRM6mFG1+n2b2RR95DxumKVpwBwdLPoCkI24JkeDJ7lXSe3uFWISstFGt0HL8EewP8RuGC8s5h7Ct91HMNQTbjgA+Vi1foWUVXpEintAKgoywaIDlJfTZIl6Ew8ETN/7DLy8bXYgq0XzhaKg3CnOUuGQV5/nl4OAX/3jocT5Cz/OtAiNYj5mLPeL5z2ZszjoCAH6caqsF2oLyA
-	nLqRgDgR+wTQT6gMhr2IRsl+cp8gPHBwQ4uZMb+X00c/Amm9VfviT+BI7B66cnC7Zv6Gvmtu2rEjWDGWPqUgccB7hdMKnKDthkA227/82tYoFiFMb/NwtgGrn5n2vwJyKN6SEoygGrNt0SI84y6hEVbQlSmVmZiBMYXl0b24gPGpsYXl0b25AcHJpbWFyeWRhdGEuY29tPokCOQQTAQIAIwUCU4xmKQIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEAAOaEEZVoIV1H0P/j4OUTwFd7BBbpoSp695qb6HqCzWMuExsp8nZjruymMaeZbGr3OWMNEXRI1FWNHMtcMHWLP/RaDqCJil28proO+PQ/yPhsr2QqJcW4nr91tBrv/MqItuAXLYlsgXqp4BxLP67bzRJ1Bd2x0bWXurpEXY//VBOLnODqThGEcL7jouwjmnRh9FTKZfBDpFRaEfDFOXIfAkMKBa/c9TQwRpx2DPsl3eFWVCNuNGKeGsirLqCxUg5kWTxEorROppz9oU4HPicL6rRH22Ce6nOAON2vHvhkUuO3GbffhrcsPD4DaYup4ic+DxWm+DaSSRJ+e1yJvwi6NmQ9P9UAuLG93S2MdNNbosZ9P8k2mTOVKMc+GooI9Ve/vH8unwitwo7ORMVXhJeU6Q0X7zf3SjwDq2lBhn1DSuTsn2DbsNTiDvqrAaCvbsTsw+SZRwF85eG67eAwouYk+dnKmp1q57LDKMyzysij2oDKbcBlwB/TeX16p8+LxECv51asjS9TInnipssssUDrHIvoTTXWcz7Y5wIngxDFwT8rPY3EggzLGfK5Zx2Q5S/N0FfmADmKknG/D8qGIcJE574D956tiUDKN4I+/g125ORR1v7bP+OIaayAvq17RP+qcAqkxc0x8iCYVCYDouDyNvWPGRhbLUO7mlBpjW9jK9e2fvZY9iw3QzIPGKtClKZWZmIExheXRvbiA8amVmZi5sYXl0
-	b25AcHJpbWFyeWRhdGEuY29tPokCOQQTAQIAIwUCU4xmUAIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEAAOaEEZVoIVzJoQALFCS6n/FHQS+hIzHIb56JbokhK0AFqoLVzLKzrnaeXhE5isWcVg0eoV2oTScIwUSUapy94if69tnUo4Q7YNt8/6yFM6hwZAxFjOXR0ciGE3Q+Z1zi49Ox51yjGMQGxlakV9ep4sV/d5a50M+LFTmYSAFp6HY23JN9PkjVJC4PUv5DYRbOZ6Y1+TfXKBAewMVqtwT1Y+LPlfmI8dbbbuUX/kKZ5ddhV2736fgyfpslvJKYl0YifUOVy4D1G/oSycyHkJG78OvX4JKcf2kKzVvg7/Rnv+AueCfFQ6nGwPn0P91I7TEOC4XfZ6a1K3uTp4fPPs1Wn75X7K8lzJP/p8lme40uqwAyBjk+IA5VGd+CVRiyJTpGZwA0jwSYLyXboX+Dqm9pSYzmC9+/AE7lIgpWj+3iNisp1SWtHc4pdtQ5EU2SEz8yKvDbD0lNDbv4ljI7eflPsvN6vOrxz24mCliEco5DwhpaaSnzWnbAPXhQDWb/lUgs/JNk8dtwmvWnqCwRqElMLVisAbJmC0BhZ/Ab4sph3EaiZfdXKhiQqSGdK4La3OTJOJYZphPdGgnkvDV9Pl1QZ0ijXQrVIy3zd6VCNaKYq7BAKidn5g/2Q8oio9Tf4XfdZ9dtwcB+bwDJFgvvDYaZ5bI3ln4V3EyW5i2NfXazz/GA/I/ZtbsigCFc8ftCBKZWZmIExheXRvbiA8amxheXRvbkBrZXJuZWwub3JnPokCOAQTAQIAIgUCWe8u6AIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQAA5oQRlWghUuCg/+Lb/xGxZD2Q1oJVAE37uW308UpVSD2tAMJUvFTdDbfe3zKlPDTuVsyNsALBGclPLagJ5ZTP+Vp2irAN9uwBuac
-	BOTtmOdz4ZN2tdvNgozzuxp4CHBDVzAslUi2idy+xpsp47DWPxYFIRP3M8QG/aNW052LaPc0cedYxp8+9eiVUNpxF4SiU4i9JDfX/sn9XcfoVZIxMpCRE750zvJvcCUz9HojsrMQ1NFc7MFT1z3MOW2/RlzPcog7xvR5ENPH19ojRDCHqumUHRry+RF0lH00clzX/W8OrQJZtoBPXv9ahka/Vp7kEulcBJr1cH5Wz/WprhsIM7U9pse1f1gYy9YbXtWctUz8uvDR7shsQxAhX3qO7DilMtuGo1v97I/Kx4gXQ52syh/w6EBny71CZrOgD6kJwPVVAaM1LRC28muq91WCFhs/nzHozpbzcheyGtMUI2Ao4K6mnY+3zIuXPygZMFr9KXE6fF7HzKxKuZMJOaEZCiDOq0anx6FmOzs5E6Jqdpo/mtI8beK+BE7Va6ni7YrQlnT0i3vaTVMTiCThbqsB20VrbMjlhpf8lfK1XVNbRq/R7GZ9zHESlsa35ha60yd/j3pu5hT2xyy8krV8vGhHvnJ1XRMJBAB/UYb6FyC7S+mQZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65ke5Ag0ETpXRPAEQAJkVmzCmF+IEenf9a2nZRXMluJohnfl2wCMmw5qNzyk0f+mYuTwTCpw7BE2H0yXk4ZfAuA+xdj14K0A1Dj52j/fKRuDqoNAhQe0b6ipo85Sz98G+XnmQOMeFVp5G1Z7r/QP/nus3mXvtFsu9lLSjMA0cam2NLDt7vx3l9kUYlQBhyIE7/DkKg+3fdqRg7qJoMHNcODtQY+n3hMyaVpplJ/l0DdQDbRSZi5AzDM3DWZEShhuP6/E2LN4O3xWnZukEiz688d1ppl7vBZO9wBql6Ft9Og74diZrTN6lXGGjEWRvO55h6ijMsLCLNDRAVehPhZvSlPldtUuvhZLAjdWpwmzbRIwgoQcO51aWeKthpcpj8feDdKdlVjvJO9fgFD5kqZ
-	QiErRVPpB7VzA/pYV5Mdy7GMbPjmO0IpoL0tVZ8JvUzUZXB3ErS/dJflvboAAQeLpLCkQjqZiQ/DCmgJCrBJst9Xc7YsKKS379Tc3GU33HNSpaOxs2NwfzoesyjKU+P35czvXWTtj7KVVSj3SgzzFk+gLx8y2Nvt9iESdZ1Ustv8tipDsGcvIZ43MQwqU9YbLg8k4V9ch+Mo8SE+C0jyZYDCE2ZGf3OztvtSYMsTnF6/luzVyej1AFVYjKHORzNoTwdHUeC+9/07GO0bMYTPXYvJ/vxBFm3oniXyhgb5FtABEBAAGJAh8EGAECAAkFAk6V0TwCGwwACgkQAA5oQRlWghXhZRAAyycZ2DDyXh2bMYvI8uHgCbeXfL3QCvcw2XoZTH2l2umPiTzrCsDJhgwZfG9BDyOHaYhPasd5qgrUBtjjUiNKjVM+Cx1DnieR0dZWafnqGv682avPblfi70XXr2juRE/fSZoZkyZhm+nsLuIcXTnzY4D572JGrpRMTpNpGmitBdh1l/9O7Fb64uLOtA5Qj5jcHHOjL0DZpjmFWYKlSAHmURHrE8M0qRryQXvlhoQxlJR4nvQrjOPMsqWD5F9mcRyowOzr8amasLv43w92rD2nHoBK6rbFE/qC7AAjABEsZq8+TQmueN0maIXUQu7TBzejsEbV0i29z+kkrjU2NmK5pcxgAtehVxpZJ14LqmN6E0suTtzjNT1eMoqOPrMSx+6vOCIuvJ/MVYnQgHhjtPPnU86mebTY5Loy9YfJAC2EVpxtcCbx2KiwErTndEyWL+GL53LuScUD7tW8vYbGIp4RlnUgPLbqpgssq2gwYO9m75FGuKuB2+2bCGajqalid5nzeq9v7cYLLRgArJfOIBWZrHy2m0C+pFu9DSuV6SNr2dvMQUv1V58h0FaSOxHVQnJdnoHn13g/CKKvyg2EMrMt/EfcXgvDwQbnG9we4xJiWOIOcsvrWcB6C6lWBDA+In7w7SXnnok
-	kZWuOsJdJQdmwlWC5L5ln9xgfr/4mOY38B0U=
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+	s=arc-20240116; t=1706008854; c=relaxed/simple;
+	bh=ju1IrMj8tl7GfNY24P5SXF5CwXUPvQE32RnOdIMtC7c=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KN0DSmHOZ7cqxq0pLVkqkzpKPzZO40O28S0i6gHRNtF7XuJANImdhCzIUSu4vHQtyGytK+ZziAPxkG/zQBOKCatoZFG0i+1kcL70H8FK7IKXeU7SksEOT7rFffBqtGjFb/IZFfbQkt87GPvmz/iLLBLGSrNvfSm1gip1XnBRbjs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dOKrKpYc; arc=none smtp.client-ip=192.55.52.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706008852; x=1737544852;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ju1IrMj8tl7GfNY24P5SXF5CwXUPvQE32RnOdIMtC7c=;
+  b=dOKrKpYcTkiF8InLRPRYk6ikY48KgbkOjqzsPfxxkTcikLp1+yubRTLt
+   X3uzO5l10/c1EwkWl+xorsoiAtrZXFuMCvJejmLs/UC5vLq3QEjifEDCv
+   NBOdpCTxszlkqf9YuzBYe/EjhgLOPPDJNc31HSvoGByZ3mdxo0cC0gzwH
+   Y5R/mVfBIHOz1N6y8BdGMqxnfgM3Y73lesz8leINDJHqHNci/j1paTBTt
+   5Q6QaqKOltpzFSA8tUbwuRWO6e7YzWAVVbitVIYE1GbdKWk8yNEj/vjyG
+   ppEpsCVs8+DHdTUNN4SvNTYc2zPojjubTgZFm0jX2520Z+sD7ktsxV/CQ
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10961"; a="432649259"
+X-IronPort-AV: E=Sophos;i="6.05,214,1701158400"; 
+   d="scan'208";a="432649259"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2024 03:20:51 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,214,1701158400"; 
+   d="scan'208";a="20300081"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmviesa002.fm.intel.com with ESMTP; 23 Jan 2024 03:20:48 -0800
+Received: from rozewie.igk.intel.com (unknown [10.211.8.69])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 25D0C369EB;
+	Tue, 23 Jan 2024 11:20:47 +0000 (GMT)
+From: Wojciech Drewek <wojciech.drewek@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	jiri@resnulli.us
+Subject: [PATCH iwl-next] ice: Remove and readd netdev during devlink reload
+Date: Tue, 23 Jan 2024 12:18:49 +0100
+Message-Id: <20240123111849.9367-1-wojciech.drewek@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Tue, 2024-01-23 at 10:59 +0100, Lorenzo Bianconi wrote:
-> > On Tue, Jan 23, 2024 at 08:35:07AM +1100, NeilBrown wrote:
-> > > On Tue, 23 Jan 2024, Jeff Layton wrote:
-> > > > On Sat, 2024-01-20 at 18:33 +0100, Lorenzo Bianconi wrote:
-> > > > > Introduce write_ports netlink command. For listener-set, userspac=
-e is
-> > > > > expected to provide a NFS listeners list it wants to enable (all =
-the
-> > > > > other ports will be closed).
-> > > > >=20
-> > > >=20
-> > > > Ditto here. This is a change to a declarative interface, which I th=
-ink
-> > > > is a better way to handle this, but we should be aware of the chang=
-e.
-> > >=20
-> > > I agree it is better, and thanks for highlighting the change.
-> > >=20
-> > > > > +	/* 2- remove stale listeners */
-> > > >=20
-> > > >=20
-> > > > The old portlist interface was weird, in that it was only additive.=
- You
-> > > > couldn't use it to close a listening socket (AFAICT). We may be abl=
-e to
-> > > > support that now with this interface, but we'll need to test that c=
-ase
-> > > > carefully.
-> > >=20
-> > > Do we ever want/need to remove listening sockets?
-> >=20
-> > I think that might be an interesting use case. Disabling RDMA, for
-> > example, should kill the RDMA listening endpoints but leave
-> > listening sockets in place.
-> >=20
-> > But for now, our socket listeners are "any". Wondering how net
-> > namespaces play into this.
-> >=20
-> >=20
-> > > Normal practice when making any changes is to stop and restart where
-> > > "stop" removes all sockets, unexports all filesystems, disables all
-> > > versions.
-> > > I don't exactly object to supporting fine-grained changes, but I susp=
-ect
-> > > anything that is not used by normal service start will hardly ever be
-> > > used in practice, so will not be tested.
-> >=20
-> > Well, there is that. I guess until we have test coverage for NFSD
-> > administrative interfaces, we should leave well enough alone.
->=20
-> So to summarize it:
-> - we will allow to remove enabled versions (as it is in patch v6 2/3)
-> - we will allow to add new listening sockets but we will not allow to rem=
-ove
-> =A0=A0them (the user/admin will need to stop/start the server).
->=20
-> Agree? If so I will work on it and post v7.
->=20
->=20
+Recent changes to the devlink reload (commit 9b2348e2d6c9
+("devlink: warn about existing entities during reload-reinit"))
+force the drivers to destroy devlink ports during reinit.
+Adjust ice driver to this requirement, unregister netdvice, destroy
+devlink port. ice_init_eth() was removed and all the common code
+between probe and reload was moved to ice_load().
 
-That sounds about right to me. We could eventually relax the restriction
-about removing sockets later, but for now it's probably best to prohibit
-it (like Neil suggests).
+During devlink reload we can't take devl_lock (it's already taken)
+and in ice_probe() we have to lock it. Use devl_* variant of the API
+which does not acquire and release devl_lock. Guard ice_load()
+with devl_lock only in case of probe.
 
+Introduce ice_debugfs_fwlog_deinit() in order to release PF's
+debugfs entries. Move ice_debugfs_exit() call to ice_module_exit().
 
->=20
-> >=20
-> >=20
-> > > So if it is easiest to support reverting previous configuration (as i=
-t
-> > > probably is for version setting), then do so.  But if there is any
-> > > complexity (as maybe there is with listening sockets), then don't
-> > > add complexity that won't be used.
-> > >=20
-> > > Thanks,
-> > > NeilBrown
-> >=20
-> > --=20
-> > Chuck Lever
+Suggested-by: Jiri Pirko <jiri@nvidia.com>
+Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice.h         |   3 +
+ drivers/net/ethernet/intel/ice/ice_debugfs.c |  10 +
+ drivers/net/ethernet/intel/ice/ice_devlink.c |  68 ++++++-
+ drivers/net/ethernet/intel/ice/ice_fwlog.c   |   2 +
+ drivers/net/ethernet/intel/ice/ice_main.c    | 189 ++++++-------------
+ 5 files changed, 139 insertions(+), 133 deletions(-)
 
---=20
-Jeff Layton <jlayton@kernel.org>
+diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+index e841f6c4f1c4..39734e5b9d56 100644
+--- a/drivers/net/ethernet/intel/ice/ice.h
++++ b/drivers/net/ethernet/intel/ice/ice.h
+@@ -897,6 +897,7 @@ static inline bool ice_is_adq_active(struct ice_pf *pf)
+ }
+ 
+ void ice_debugfs_fwlog_init(struct ice_pf *pf);
++void ice_debugfs_fwlog_deinit(struct ice_pf *pf);
+ void ice_debugfs_init(void);
+ void ice_debugfs_exit(void);
+ void ice_pf_fwlog_update_module(struct ice_pf *pf, int log_level, int module);
+@@ -984,6 +985,8 @@ void ice_service_task_schedule(struct ice_pf *pf);
+ int ice_load(struct ice_pf *pf);
+ void ice_unload(struct ice_pf *pf);
+ void ice_adv_lnk_speed_maps_init(void);
++int ice_init_dev(struct ice_pf *pf);
++void ice_deinit_dev(struct ice_pf *pf);
+ 
+ /**
+  * ice_set_rdma_cap - enable RDMA support
+diff --git a/drivers/net/ethernet/intel/ice/ice_debugfs.c b/drivers/net/ethernet/intel/ice/ice_debugfs.c
+index c2bfba6b9ead..8fdcdfb804b3 100644
+--- a/drivers/net/ethernet/intel/ice/ice_debugfs.c
++++ b/drivers/net/ethernet/intel/ice/ice_debugfs.c
+@@ -647,6 +647,16 @@ void ice_debugfs_fwlog_init(struct ice_pf *pf)
+ 	kfree(fw_modules);
+ }
+ 
++/**
++ * ice_debugfs_fwlog_deinit - cleanup PF's debugfs
++ * @pf: pointer to the PF struct
++ */
++void ice_debugfs_fwlog_deinit(struct ice_pf *pf)
++{
++	debugfs_remove_recursive(pf->ice_debugfs_pf);
++	pf->ice_debugfs_pf = NULL;
++}
++
+ /**
+  * ice_debugfs_init - create root directory for debugfs entries
+  */
+diff --git a/drivers/net/ethernet/intel/ice/ice_devlink.c b/drivers/net/ethernet/intel/ice/ice_devlink.c
+index 97182bacafa3..bece01a2b2ea 100644
+--- a/drivers/net/ethernet/intel/ice/ice_devlink.c
++++ b/drivers/net/ethernet/intel/ice/ice_devlink.c
+@@ -444,6 +444,20 @@ ice_devlink_reload_empr_start(struct ice_pf *pf,
+ 	return 0;
+ }
+ 
++/**
++ * ice_devlink_reinit_down - unload given PF
++ * @pf: pointer to the PF struct
++ */
++static void ice_devlink_reinit_down(struct ice_pf *pf)
++{
++	/* No need to take devl_lock, it's already taken by devlink API */
++	ice_unload(pf);
++	rtnl_lock();
++	ice_vsi_decfg(ice_get_main_vsi(pf));
++	rtnl_unlock();
++	ice_deinit_dev(pf);
++}
++
+ /**
+  * ice_devlink_reload_down - prepare for reload
+  * @devlink: pointer to the devlink instance to reload
+@@ -477,7 +491,7 @@ ice_devlink_reload_down(struct devlink *devlink, bool netns_change,
+ 					   "Remove all VFs before doing reinit\n");
+ 			return -EOPNOTSUPP;
+ 		}
+-		ice_unload(pf);
++		ice_devlink_reinit_down(pf);
+ 		return 0;
+ 	case DEVLINK_RELOAD_ACTION_FW_ACTIVATE:
+ 		return ice_devlink_reload_empr_start(pf, extack);
+@@ -1269,6 +1283,45 @@ static int ice_devlink_set_parent(struct devlink_rate *devlink_rate,
+ 	return status;
+ }
+ 
++/**
++ * ice_devlink_reinit_up - do reinit of the given PF
++ * @pf: pointer to the PF struct
++ */
++static int ice_devlink_reinit_up(struct ice_pf *pf)
++{
++	struct ice_vsi *vsi = ice_get_main_vsi(pf);
++	struct ice_vsi_cfg_params params = {};
++	int err;
++
++	err = ice_init_dev(pf);
++	if (err)
++		return err;
++
++	params = ice_vsi_to_params(vsi);
++	params.flags = ICE_VSI_FLAG_INIT;
++
++	rtnl_lock();
++	err = ice_vsi_cfg(vsi, &params);
++	if (err)
++		goto err_vsi_cfg;
++	rtnl_unlock();
++
++	/* No need to take devl_lock, it's already taken by devlink API */
++	err = ice_load(pf);
++	if (err)
++		goto err_load;
++
++	return 0;
++
++err_load:
++	rtnl_lock();
++	ice_vsi_decfg(vsi);
++err_vsi_cfg:
++	rtnl_unlock();
++	ice_deinit_dev(pf);
++	return err;
++}
++
+ /**
+  * ice_devlink_reload_up - do reload up after reinit
+  * @devlink: pointer to the devlink instance reloading
+@@ -1289,7 +1342,7 @@ ice_devlink_reload_up(struct devlink *devlink,
+ 	switch (action) {
+ 	case DEVLINK_RELOAD_ACTION_DRIVER_REINIT:
+ 		*actions_performed = BIT(DEVLINK_RELOAD_ACTION_DRIVER_REINIT);
+-		return ice_load(pf);
++		return ice_devlink_reinit_up(pf);
+ 	case DEVLINK_RELOAD_ACTION_FW_ACTIVATE:
+ 		*actions_performed = BIT(DEVLINK_RELOAD_ACTION_FW_ACTIVATE);
+ 		return ice_devlink_reload_empr_finish(pf, extack);
+@@ -1695,6 +1748,7 @@ static const struct devlink_port_ops ice_devlink_port_ops = {
+  * @pf: the PF to create a devlink port for
+  *
+  * Create and register a devlink_port for this PF.
++ * This function has to be called under devl_lock.
+  *
+  * Return: zero on success or an error code on failure.
+  */
+@@ -1707,6 +1761,8 @@ int ice_devlink_create_pf_port(struct ice_pf *pf)
+ 	struct device *dev;
+ 	int err;
+ 
++	devlink = priv_to_devlink(pf);
++
+ 	dev = ice_pf_to_dev(pf);
+ 
+ 	devlink_port = &pf->devlink_port;
+@@ -1727,10 +1783,9 @@ int ice_devlink_create_pf_port(struct ice_pf *pf)
+ 	ice_devlink_set_switch_id(pf, &attrs.switch_id);
+ 
+ 	devlink_port_attrs_set(devlink_port, &attrs);
+-	devlink = priv_to_devlink(pf);
+ 
+-	err = devlink_port_register_with_ops(devlink, devlink_port, vsi->idx,
+-					     &ice_devlink_port_ops);
++	err = devl_port_register_with_ops(devlink, devlink_port, vsi->idx,
++					  &ice_devlink_port_ops);
+ 	if (err) {
+ 		dev_err(dev, "Failed to create devlink port for PF %d, error %d\n",
+ 			pf->hw.pf_id, err);
+@@ -1745,10 +1800,11 @@ int ice_devlink_create_pf_port(struct ice_pf *pf)
+  * @pf: the PF to cleanup
+  *
+  * Unregisters the devlink_port structure associated with this PF.
++ * This function has to be called under devl_lock.
+  */
+ void ice_devlink_destroy_pf_port(struct ice_pf *pf)
+ {
+-	devlink_port_unregister(&pf->devlink_port);
++	devl_port_unregister(&pf->devlink_port);
+ }
+ 
+ /**
+diff --git a/drivers/net/ethernet/intel/ice/ice_fwlog.c b/drivers/net/ethernet/intel/ice/ice_fwlog.c
+index 92b5dac481cd..b2acfa05f118 100644
+--- a/drivers/net/ethernet/intel/ice/ice_fwlog.c
++++ b/drivers/net/ethernet/intel/ice/ice_fwlog.c
+@@ -188,6 +188,8 @@ void ice_fwlog_deinit(struct ice_hw *hw)
+ 	if (hw->bus.func)
+ 		return;
+ 
++	ice_debugfs_fwlog_deinit(hw->back);
++
+ 	/* make sure FW logging is disabled to not put the FW in a weird state
+ 	 * for the next driver load
+ 	 */
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 77ba737a50df..5f9b616b90dc 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -4574,90 +4574,6 @@ static void ice_decfg_netdev(struct ice_vsi *vsi)
+ 	vsi->netdev = NULL;
+ }
+ 
+-static int ice_start_eth(struct ice_vsi *vsi)
+-{
+-	int err;
+-
+-	err = ice_init_mac_fltr(vsi->back);
+-	if (err)
+-		return err;
+-
+-	err = ice_vsi_open(vsi);
+-	if (err)
+-		ice_fltr_remove_all(vsi);
+-
+-	return err;
+-}
+-
+-static void ice_stop_eth(struct ice_vsi *vsi)
+-{
+-	ice_fltr_remove_all(vsi);
+-	ice_vsi_close(vsi);
+-}
+-
+-static int ice_init_eth(struct ice_pf *pf)
+-{
+-	struct ice_vsi *vsi = ice_get_main_vsi(pf);
+-	int err;
+-
+-	if (!vsi)
+-		return -EINVAL;
+-
+-	/* init channel list */
+-	INIT_LIST_HEAD(&vsi->ch_list);
+-
+-	err = ice_cfg_netdev(vsi);
+-	if (err)
+-		return err;
+-	/* Setup DCB netlink interface */
+-	ice_dcbnl_setup(vsi);
+-
+-	err = ice_init_mac_fltr(pf);
+-	if (err)
+-		goto err_init_mac_fltr;
+-
+-	err = ice_devlink_create_pf_port(pf);
+-	if (err)
+-		goto err_devlink_create_pf_port;
+-
+-	SET_NETDEV_DEVLINK_PORT(vsi->netdev, &pf->devlink_port);
+-
+-	err = ice_register_netdev(vsi);
+-	if (err)
+-		goto err_register_netdev;
+-
+-	err = ice_tc_indir_block_register(vsi);
+-	if (err)
+-		goto err_tc_indir_block_register;
+-
+-	ice_napi_add(vsi);
+-
+-	return 0;
+-
+-err_tc_indir_block_register:
+-	ice_unregister_netdev(vsi);
+-err_register_netdev:
+-	ice_devlink_destroy_pf_port(pf);
+-err_devlink_create_pf_port:
+-err_init_mac_fltr:
+-	ice_decfg_netdev(vsi);
+-	return err;
+-}
+-
+-static void ice_deinit_eth(struct ice_pf *pf)
+-{
+-	struct ice_vsi *vsi = ice_get_main_vsi(pf);
+-
+-	if (!vsi)
+-		return;
+-
+-	ice_vsi_close(vsi);
+-	ice_unregister_netdev(vsi);
+-	ice_devlink_destroy_pf_port(pf);
+-	ice_tc_indir_block_unregister(vsi);
+-	ice_decfg_netdev(vsi);
+-}
+-
+ /**
+  * ice_wait_for_fw - wait for full FW readiness
+  * @hw: pointer to the hardware structure
+@@ -4683,7 +4599,7 @@ static int ice_wait_for_fw(struct ice_hw *hw, u32 timeout)
+ 	return -ETIMEDOUT;
+ }
+ 
+-static int ice_init_dev(struct ice_pf *pf)
++int ice_init_dev(struct ice_pf *pf)
+ {
+ 	struct device *dev = ice_pf_to_dev(pf);
+ 	struct ice_hw *hw = &pf->hw;
+@@ -4776,7 +4692,7 @@ static int ice_init_dev(struct ice_pf *pf)
+ 	return err;
+ }
+ 
+-static void ice_deinit_dev(struct ice_pf *pf)
++void ice_deinit_dev(struct ice_pf *pf)
+ {
+ 	ice_free_irq_msix_misc(pf);
+ 	ice_deinit_pf(pf);
+@@ -5081,31 +4997,47 @@ static void ice_deinit(struct ice_pf *pf)
+ /**
+  * ice_load - load pf by init hw and starting VSI
+  * @pf: pointer to the pf instance
++ *
++ * This function has to be called under devl_lock.
+  */
+ int ice_load(struct ice_pf *pf)
+ {
+-	struct ice_vsi_cfg_params params = {};
+ 	struct ice_vsi *vsi;
+ 	int err;
+ 
+-	err = ice_init_dev(pf);
++	devl_assert_locked(priv_to_devlink(pf));
++
++	vsi = ice_get_main_vsi(pf);
++
++	/* init channel list */
++	INIT_LIST_HEAD(&vsi->ch_list);
++
++	err = ice_cfg_netdev(vsi);
+ 	if (err)
+ 		return err;
+ 
+-	vsi = ice_get_main_vsi(pf);
++	/* Setup DCB netlink interface */
++	ice_dcbnl_setup(vsi);
+ 
+-	params = ice_vsi_to_params(vsi);
+-	params.flags = ICE_VSI_FLAG_INIT;
++	err = ice_init_mac_fltr(pf);
++	if (err)
++		goto err_init_mac_fltr;
+ 
+-	rtnl_lock();
+-	err = ice_vsi_cfg(vsi, &params);
++	err = ice_devlink_create_pf_port(pf);
+ 	if (err)
+-		goto err_vsi_cfg;
++		goto err_devlink_create_pf_port;
++
++	SET_NETDEV_DEVLINK_PORT(vsi->netdev, &pf->devlink_port);
+ 
+-	err = ice_start_eth(ice_get_main_vsi(pf));
++	err = ice_register_netdev(vsi);
++	if (err)
++		goto err_register_netdev;
++
++	err = ice_tc_indir_block_register(vsi);
+ 	if (err)
+-		goto err_start_eth;
+-	rtnl_unlock();
++		goto err_tc_indir_block_register;
++
++	ice_napi_add(vsi);
+ 
+ 	err = ice_init_rdma(pf);
+ 	if (err)
+@@ -5119,29 +5051,35 @@ int ice_load(struct ice_pf *pf)
+ 	return 0;
+ 
+ err_init_rdma:
+-	ice_vsi_close(ice_get_main_vsi(pf));
+-	rtnl_lock();
+-err_start_eth:
+-	ice_vsi_decfg(ice_get_main_vsi(pf));
+-err_vsi_cfg:
+-	rtnl_unlock();
+-	ice_deinit_dev(pf);
++	ice_tc_indir_block_unregister(vsi);
++err_tc_indir_block_register:
++	ice_unregister_netdev(vsi);
++err_register_netdev:
++	ice_devlink_destroy_pf_port(pf);
++err_devlink_create_pf_port:
++err_init_mac_fltr:
++	ice_decfg_netdev(vsi);
+ 	return err;
+ }
+ 
+ /**
+  * ice_unload - unload pf by stopping VSI and deinit hw
+  * @pf: pointer to the pf instance
++ *
++ * This function has to be called under devl_lock.
+  */
+ void ice_unload(struct ice_pf *pf)
+ {
++	struct ice_vsi *vsi = ice_get_main_vsi(pf);
++
++	devl_assert_locked(priv_to_devlink(pf));
++
+ 	ice_deinit_features(pf);
+ 	ice_deinit_rdma(pf);
+-	rtnl_lock();
+-	ice_stop_eth(ice_get_main_vsi(pf));
+-	ice_vsi_decfg(ice_get_main_vsi(pf));
+-	rtnl_unlock();
+-	ice_deinit_dev(pf);
++	ice_tc_indir_block_unregister(vsi);
++	ice_unregister_netdev(vsi);
++	ice_devlink_destroy_pf_port(pf);
++	ice_decfg_netdev(vsi);
+ }
+ 
+ /**
+@@ -5239,27 +5177,23 @@ ice_probe(struct pci_dev *pdev, const struct pci_device_id __always_unused *ent)
+ 	if (err)
+ 		goto err_init;
+ 
+-	err = ice_init_eth(pf);
++	devl_lock(priv_to_devlink(pf));
++	err = ice_load(pf);
+ 	if (err)
+-		goto err_init_eth;
+-
+-	err = ice_init_rdma(pf);
+-	if (err)
+-		goto err_init_rdma;
++		goto err_load;
++	devl_unlock(priv_to_devlink(pf));
+ 
+ 	err = ice_init_devlink(pf);
+ 	if (err)
+ 		goto err_init_devlink;
+ 
+-	ice_init_features(pf);
+-
+ 	return 0;
+ 
+ err_init_devlink:
+-	ice_deinit_rdma(pf);
+-err_init_rdma:
+-	ice_deinit_eth(pf);
+-err_init_eth:
++	devl_lock(priv_to_devlink(pf));
++	ice_unload(pf);
++err_load:
++	devl_unlock(priv_to_devlink(pf));
+ 	ice_deinit(pf);
+ err_init:
+ 	pci_disable_device(pdev);
+@@ -5342,8 +5276,6 @@ static void ice_remove(struct pci_dev *pdev)
+ 		msleep(100);
+ 	}
+ 
+-	ice_debugfs_exit();
+-
+ 	if (test_bit(ICE_FLAG_SRIOV_ENA, pf->flags)) {
+ 		set_bit(ICE_VF_RESETS_DISABLED, pf->state);
+ 		ice_free_vfs(pf);
+@@ -5357,12 +5289,14 @@ static void ice_remove(struct pci_dev *pdev)
+ 
+ 	if (!ice_is_safe_mode(pf))
+ 		ice_remove_arfs(pf);
+-	ice_deinit_features(pf);
++
+ 	ice_deinit_devlink(pf);
+-	ice_deinit_rdma(pf);
+-	ice_deinit_eth(pf);
+-	ice_deinit(pf);
+ 
++	devl_lock(priv_to_devlink(pf));
++	ice_unload(pf);
++	devl_unlock(priv_to_devlink(pf));
++
++	ice_deinit(pf);
+ 	ice_vsi_release_all(pf);
+ 
+ 	ice_setup_mc_magic_wake(pf);
+@@ -5847,6 +5781,7 @@ module_init(ice_module_init);
+ static void __exit ice_module_exit(void)
+ {
+ 	pci_unregister_driver(&ice_driver);
++	ice_debugfs_exit();
+ 	destroy_workqueue(ice_wq);
+ 	destroy_workqueue(ice_lag_wq);
+ 	pr_info("module unloaded\n");
+-- 
+2.40.1
+
 
