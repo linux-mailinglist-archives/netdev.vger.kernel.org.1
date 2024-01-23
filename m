@@ -1,79 +1,106 @@
-Return-Path: <netdev+bounces-65092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21E99839381
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 16:47:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D42C5839396
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 16:49:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF09F293AFE
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 15:47:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 756221F29F69
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 15:49:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D4E160253;
-	Tue, 23 Jan 2024 15:39:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XotvOHPp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1D3563114;
+	Tue, 23 Jan 2024 15:42:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26713627EF;
-	Tue, 23 Jan 2024 15:39:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38B2D5FDCC;
+	Tue, 23 Jan 2024 15:42:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706024367; cv=none; b=mjexxFshojosxEP9ZdpiuZPRPX65LR1Jshdg8DoomD+JkvhuiMcC+1wmAneUvrXwiRGbPKRFGfV80OFC5daZNKDGbaP8fFR+DPIHnWr+Ji+gdPFBi9nJN9OZw48kRstq3MpzkJFUyEHnMoBLlN3H+PgLx1ot5UWU6CSF+vvjnw8=
+	t=1706024540; cv=none; b=fqRnqAOgaCKsFynLdbzfgDoMcRqyt4MLiZVyu/pnxGMpUtvrSlCAtMPaSQwZq7VjJYqGp4V13edpEksBpl3ooxCc47CVWRX+IRD88BGFggab4LjxwX1piTltBsAJevgpzivEgDuLUHxFY6PLTMSN75Vfsw96a/PzJsEVRr3PCXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706024367; c=relaxed/simple;
-	bh=8geYsNLiY1v6cDcVxFP5+/QUvwGDMSb9dGoII5DVFAc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SAtkXp0mqw0TwPcy4AcpoZVXTooX0I7mLz/jxy8FmNxb8RytDyA1+RSmBI80lA2j/9U5KC9hd4NzXgoSDhlEesV344uLI4pFcngX9R1YBt42Zw5eCDUcjJSQbYQO03hXSPeDkgz2iLSY0HwqOr6h6VWU2K1ls4RFb86rVIdJ5DQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XotvOHPp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4948EC433C7;
-	Tue, 23 Jan 2024 15:39:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706024366;
-	bh=8geYsNLiY1v6cDcVxFP5+/QUvwGDMSb9dGoII5DVFAc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XotvOHPpEFnEucJsRpgj6xlcST4NzvSBc9Nly7jpGQ88bH+52e4lc0Ks4Aqf7Ur4w
-	 VfAdjnkWC/DSKJ51aDwmlcbxZCSSfqvMNEazyaW/b4dA01sxn7QBne4L7+312PfQ/4
-	 XpOQVPfIKb4gHRZw1MaVokA9JE5vV8qgczHFqh/q6EdkrIbTtk3VGC2K2cDT03JNVQ
-	 EehkMdZXW4dw6sD/lnIr1fPOhyqEWYGeOvnVLrGHg9io+UDGNRPqGgePmnQlBgdSPo
-	 GpfwQObbG74XT30UU9HQHZ/B1Orjd/pV4Kk8PON5vaUyhEZ/pABY7LnrO+kQ0f1QwT
-	 dHNBGN4zKbSgA==
-Date: Tue, 23 Jan 2024 07:39:25 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- shuah@kernel.org, horms@kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net] selftests: netdevsim: fix the udp_tunnel_nic test
-Message-ID: <20240123073925.416d3746@kernel.org>
-In-Reply-To: <c029e9d7891fcaf1f635e2a76eae9a5df898f3f6.camel@redhat.com>
-References: <20240123060529.1033912-1-kuba@kernel.org>
-	<c029e9d7891fcaf1f635e2a76eae9a5df898f3f6.camel@redhat.com>
+	s=arc-20240116; t=1706024540; c=relaxed/simple;
+	bh=+UTa81YBW44P6//FAvDPxu5DehAqS8ZpjCgHujskPTc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DqRLiHJW6kkk11ZNo++A208OjMrVyCZ9jP/wUQyrd9ZAtj/z+om1ZTzcyqCaZeEDst5GMD+v3D0xDEfjm78K63XF0hHJAC/QYc4XV7osxWypZaw7KmR82yI0wSP2G50boGhfg0X6QU18zKqb8YkyyZIdDQHgcET53uHjw+0rCfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-55a50649ff6so4858417a12.3;
+        Tue, 23 Jan 2024 07:42:19 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706024537; x=1706629337;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2y5sNM/yucnPZoLAx7205huvZIvC+f7wQVXFZ6uwJs4=;
+        b=bHEtgf4b/KpoejtTgT/6eZpPNau1GrTLkdITtx8PTsm01rkb9xyt2QO87bBBTY8W43
+         N/TKXmL7QHTNpVqbnhtO675UfPnsGFRaUIICYXHyS39j85Zx539TxmVlQGaT+jRyTkIi
+         9Q3Mh7nrkjpthDUBfdym0lgKCStgmSOLBhTfUZ+hYcNsQWgvdvZRSGgfKI0uGnlO6fLt
+         M6PIeAJaNyFfLSfHeg3ZJL2sWV+BRIfdinBx2hRc2pp4QDfnKxPBWHG/bUrngNjseM3r
+         ant1anMYKM/weihu6Cb8tySAGNXH6wIUaRstX+rre674Iiem3bM8O/FSIl6z8LNOfDsu
+         Gmsg==
+X-Gm-Message-State: AOJu0YzzHv/edPV31kzoDbW+SGVwjOdFZze+7W40BHeUF5Mp4mKhLFq3
+	NbQX+EIFA0BYT1yV6hCa1S8eI81Vvbwv8GKGWwMYMJZsxLIq7OttYXRfaocDqEl4mw==
+X-Google-Smtp-Source: AGHT+IFC6wAGsAj8uqnHsUUWEfLyGPf0JkShRDRdnJYHXY00IYEfnj8URw1o78onPzMjsyBmcGXT/Q==
+X-Received: by 2002:a17:906:1391:b0:a28:d273:82b7 with SMTP id f17-20020a170906139100b00a28d27382b7mr43594ejc.41.1706024537177;
+        Tue, 23 Jan 2024 07:42:17 -0800 (PST)
+Received: from gmail.com (fwdproxy-cln-009.fbsv.net. [2a03:2880:31ff:9::face:b00c])
+        by smtp.gmail.com with ESMTPSA id lb14-20020a170906adce00b00a2c869c2fe8sm14146661ejb.161.2024.01.23.07.42.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Jan 2024 07:42:16 -0800 (PST)
+Date: Tue, 23 Jan 2024 07:42:14 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Alexandre Belloni <alexandre.belloni@bootlin.com>
+Cc: kuba@kernel.org, davem@davemloft.net, abeni@redhat.com,
+	edumazet@google.com, Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	UNGLinuxDriver@microchip.com, Paolo Abeni <pabeni@redhat.com>,
+	dsahern@kernel.org, weiwan@google.com,
+	"open list:OCELOT ETHERNET SWITCH DRIVER" <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 14/22] net: fill in MODULE_DESCRIPTION()s for
+ ocelot
+Message-ID: <Za/eVmcC9GS94Ivy@gmail.com>
+References: <20240122184543.2501493-1-leitao@debian.org>
+ <20240122184543.2501493-15-leitao@debian.org>
+ <20240123074826330a374e@mail.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240123074826330a374e@mail.local>
 
-On Tue, 23 Jan 2024 09:27:17 +0100 Paolo Abeni wrote:
-> > @@ -270,6 +270,7 @@ for port in 0 1; do
-> >  	echo 1 > $NSIM_DEV_SYS/new_port
-> >      fi
-> >      NSIM_NETDEV=`get_netdev_name old_netdevs`
-> > +    ifconfig $NSIM_NETDEV up  
+On Tue, Jan 23, 2024 at 08:48:26AM +0100, Alexandre Belloni wrote:
+> Hello,
 > 
-> WoW! I initially thought the above was a typo, before noticing it's
-> actually consistent with the whole script :)
+> On 22/01/2024 10:45:35-0800, Breno Leitao wrote:
+> > W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
+> > Add descriptions to the Ocelot SoCs (VSC7514) helpers driver.
+> > 
+> > Signed-off-by: Breno Leitao <leitao@debian.org>
+> > ---
+> >  drivers/net/ethernet/mscc/ocelot.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> > 
+> > diff --git a/drivers/net/ethernet/mscc/ocelot.c b/drivers/net/ethernet/mscc/ocelot.c
+> > index 56ccbd4c37fe..12999d9be3af 100644
+> > --- a/drivers/net/ethernet/mscc/ocelot.c
+> > +++ b/drivers/net/ethernet/mscc/ocelot.c
+> > @@ -3078,4 +3078,5 @@ void ocelot_deinit_port(struct ocelot *ocelot, int port)
+> >  }
+> >  EXPORT_SYMBOL(ocelot_deinit_port);
+> >  
+> > +MODULE_DESCRIPTION("Ocelot SoCs (VSC7514) helpers");
 > 
-> Do you think we should look at dropping ifconfig usage from self-tests?
-> I guess that in the long run most systems should not have such command
-> available in the default install.
+> Shouldn't that mention that this is related to the Ethernet switch?
 
-Good point, there's only one use outside of this script.
-I'll queue up a conversion for -next!
+sure. let me update it.
 
