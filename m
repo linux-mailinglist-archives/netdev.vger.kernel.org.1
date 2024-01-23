@@ -1,148 +1,128 @@
-Return-Path: <netdev+bounces-64922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-64921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C850837B4A
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 01:59:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ED9B837AC9
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 01:54:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B934D293093
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 00:59:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5F6A1F221D0
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 00:54:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87DD114C590;
-	Tue, 23 Jan 2024 00:21:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90F1C131747;
+	Tue, 23 Jan 2024 00:18:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="NR/AlsA7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cdc/tAPA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C02B514AD2B;
-	Tue, 23 Jan 2024 00:21:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1587C130E42;
+	Tue, 23 Jan 2024 00:18:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1705969269; cv=none; b=IlyxtpcUI2EZS6ivS8enF4XZSvlRjnw0r7ePWsK8Pevm9/3fVMXTRlGk/9QFXZIsLVc5UGv09MEOl//uwV/SELL84YCMxH0ghuPEnytFyR5uIaAM9iWNckYjPuHlzUA5o45fMTv7w43YkX820HD2EgAfKULZFbgDk0paYucWQ/s=
+	t=1705969087; cv=none; b=uGwd9SMZafa0uffcBylvuUzMXa93xmHFVERgrryScHg4Wjv5Y6FoLFf0DZqkiR7mExhAhvfmJHrFCr0Mv4D8dsa5K/g8FGVtVWdMWDVMcim32Bii1FdjyehyGwM5VmxxIG+PkYJ+oF4uuSfwt7CxxtWBimICiQaUKYGTZN6P4q8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1705969269; c=relaxed/simple;
-	bh=m55lPpC+NBSE/XcmCcD0E6mFq9o/I9MNWdauqqDofbk=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=liJsnAWKL7UqpFgQyy2vA+WRWaS+h2d31h89skP4AMlVG9JMHh5g0df7F8wDKL1pLsPsCCP3ZCCNh96OnqAveMeyMQU2uxhLI6RYLQ/yk8+fqGJc+tic1eW9vy/TwTfQmvVrj2ECIxgixR7apGslRXWsRFobtxD8J7a1cnnJJEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=NR/AlsA7; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Received: from [127.0.0.1] ([76.133.66.138])
-	(authenticated bits=0)
-	by mail.zytor.com (8.17.2/8.17.1) with ESMTPSA id 40N0HoLc2798528
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Mon, 22 Jan 2024 16:17:50 -0800
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 40N0HoLc2798528
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2024011201; t=1705969072;
-	bh=naevb4PslKTi+uWE0rIwkjLfQkOH3+GqKQddGwCKH50=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=NR/AlsA7je5VAyZlNPTZHvXBBzujylBLOIxmnxF4bzZa+iaBvnN8bscZ+p5JkQaJH
-	 ktK2PFVspY/AnvBR1rDjgiy5C0pQbhgGOCSnz2c+7QoE2VKG/r5QNRvd9rUsX6u926
-	 B18RybD5ChPM2oeC+/dkh75st/RyLCw4gBhEDZ/8NXV1GEGVVBn5HwNKITtSiD+b6B
-	 RNxHsmhbX42aaKRVUIOUymXOHS/xUCX8Nxf7gg67sU9XnG8TdgCwPUGRJ89WxOxQA0
-	 OHPPuDDGIkVBhGIrtxVa5Ur7uJX/H/QbZqQXpUttoMMbAuhTGzmigvLcbNcDG5iX8f
-	 xhMr6LuORnThg==
-Date: Mon, 22 Jan 2024 16:17:48 -0800
-From: "H. Peter Anvin" <hpa@zytor.com>
-To: Alexey Makhalov <alexey.makhalov@broadcom.com>,
-        Dave Hansen <dave.hansen@intel.com>, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux.dev, bp@alien8.de,
-        dave.hansen@linux.intel.com, mingo@redhat.com, tglx@linutronix.de
-CC: x86@kernel.org, netdev@vger.kernel.org, richardcochran@gmail.com,
-        linux-input@vger.kernel.org, dmitry.torokhov@gmail.com,
-        zackr@vmware.com, linux-graphics-maintainer@vmware.com,
-        pv-drivers@vmware.com, namit@vmware.com, timothym@vmware.com,
-        akaher@vmware.com, jsipek@vmware.com, dri-devel@lists.freedesktop.org,
-        daniel@ffwll.ch, airlied@gmail.com, tzimmermann@suse.de,
-        mripard@kernel.org, maarten.lankhorst@linux.intel.com,
-        horms@kernel.org, kirill.shutemov@linux.intel.com
-Subject: Re: [PATCH v6 7/7] x86/vmware: Add TDX hypercall support
-User-Agent: K-9 Mail for Android
-In-Reply-To: <c01cecef-db06-49d8-aa2e-548908c65861@broadcom.com>
-References: <20240109084052.58661-1-amakhalov@vmware.com> <20240109084052.58661-8-amakhalov@vmware.com> <ff370e42-f48b-4c62-9b44-9d4031cd78b0@intel.com> <4CF87BC4-E8C8-4584-A275-5A985D5A18A1@zytor.com> <c01cecef-db06-49d8-aa2e-548908c65861@broadcom.com>
-Message-ID: <351B1153-9CBE-4774-9FAF-770F9F36856E@zytor.com>
+	s=arc-20240116; t=1705969087; c=relaxed/simple;
+	bh=XsRAAQsPjyC7mAb+Rj2z59L5HzWedPqLWk2ITIOdKXQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rx7GFiymXbD5z9DPdtFQ3F1eeI0p74tztbrMlkD6zaHAsL1/8ccn27EiI/456G0R6HCVV3WZ6yzLL/G5AB9sxnxEKBjJAPpFO+jFWwbeyeRYph1RSkTrhpVcLZVx/gVQ1pL5/d6Ku8V3suvFz7+aGVy+2TZQ/pEy3+byJr64ZBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cdc/tAPA; arc=none smtp.client-ip=209.85.210.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-6ddef319fabso2468351a34.1;
+        Mon, 22 Jan 2024 16:18:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1705969085; x=1706573885; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q5tcut5oygY7UPZdDIt+xFB2Y78NvHfsic1L6PsWyUg=;
+        b=cdc/tAPACzupPpbH5VORZ7hc7AnoJioLxaVG812Lz1fm8YGP03HTunaK/cwGoaFX32
+         tjaBVnR06u/aJsNEIL/lyJUYj2Mqo56H328NCt1cr/XDM3QMro+BSlUJQ6Ao5UMqiL2w
+         sDLe+yhxt4I2Fxdi2GQUH6zmieuASB0h4Jh1aDjc69kAvAM9GXdnWl+AjO+3hF0j4m9q
+         Bdz3OGo9xzr87g4kLmNRAvQ0SlZZUGX3UcqLv7839bPi4L93ifoNhsyp1btEfrme9E++
+         g8E4QoLxoxyBBGpkwQvRuZLk+HH10bHMj9cZnKrVN70U9SjQiTeJUOtdXxt5r1mUCogP
+         Qwrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1705969085; x=1706573885;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Q5tcut5oygY7UPZdDIt+xFB2Y78NvHfsic1L6PsWyUg=;
+        b=nbbR3/QT+Y+LGV1iNdUTdRlClvipzY2DHPliOoiNQlaaG7SB0+AJWJi9wVSJBOFMux
+         usjEK0L0jlyHk0tvpq/OvnfLj/t5y4J9Ref9uKq+W/ui0HX2t4zvRS13EHN1aOaksl1U
+         /v+h17YPyfF4widD37n6KWJaFwaGGP303vLGXcc8mVeI1HAtjX3/Fsrl5Sn+wCSgigNX
+         imR+VHLAMoZMqeKol+4bz8BYzblmri8o0G+6Wl0Fwu8AKZl3BPDtHKHCLE/HsuR8mj9W
+         qJu6kCgw1W3BL7ZgudxjEEC1IjqyTkXnUTPShp1nvvypgQijnSYreM6n8lwOmK6qx1Hw
+         CTCQ==
+X-Gm-Message-State: AOJu0YxdmiG019pAwlowvytaV8v9EFVzIM1smWMXAzK5LlWLScs0Ohb7
+	0DKhttlZy6XKjrJhq2+Z2xjGdIx2b49yfiblnsEFou+xwXiPzlGBrxU5WC8Dl9lD1sn0H/DBanC
+	ZvUz3uNp5sJFg1TxPeOI6KRSMy5Q=
+X-Google-Smtp-Source: AGHT+IEt+nzuO0vPiyMVhwP8H+8gsOeo6E7KF9TNsThfFsGLL/wWzyOJFHqOCS8PKUYUzNOhmBo5Bba7NCqvFq8+wro=
+X-Received: by 2002:a05:6358:6f0e:b0:176:25b:7af8 with SMTP id
+ r14-20020a0563586f0e00b00176025b7af8mr1951748rwn.52.1705969084916; Mon, 22
+ Jan 2024 16:18:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+References: <cover.1705432850.git.amery.hung@bytedance.com> <813b2de18b94389f4df53f21b8a328e1c2fdda13.1705432850.git.amery.hung@bytedance.com>
+In-Reply-To: <813b2de18b94389f4df53f21b8a328e1c2fdda13.1705432850.git.amery.hung@bytedance.com>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Mon, 22 Jan 2024 16:17:52 -0800
+Message-ID: <CAEf4BzaDCsVOBgCkZKPpM2RbsiKQMLToRaiYpBYejX=F5DncuA@mail.gmail.com>
+Subject: Re: [RFC PATCH v7 6/8] tools/libbpf: Add support for BPF_PROG_TYPE_QDISC
+To: Amery Hung <ameryhung@gmail.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, yangpeihao@sjtu.edu.cn, 
+	toke@redhat.com, jhs@mojatatu.com, jiri@resnulli.us, sdf@google.com, 
+	xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On January 22, 2024 4:04:33 PM PST, Alexey Makhalov <alexey=2Emakhalov@broa=
-dcom=2Ecom> wrote:
+On Wed, Jan 17, 2024 at 1:57=E2=80=AFPM Amery Hung <ameryhung@gmail.com> wr=
+ote:
 >
+> While eBPF qdisc uses NETLINK for attachment, expected_attach_type is
+> required at load time to verify context access from different programs.
+> This patch adds the section definition for this.
 >
->On 1/22/24 10:28 AM, H=2E Peter Anvin wrote:
->> On January 22, 2024 8:32:22 AM PST, Dave Hansen <dave=2Ehansen@intel=2E=
-com> wrote:
->>> On 1/9/24 00:40, Alexey Makhalov wrote:
->>>> +#ifdef CONFIG_INTEL_TDX_GUEST
->>>> +unsigned long vmware_tdx_hypercall(unsigned long cmd,
->>>> +				   struct tdx_module_args *args)
->>>> +{
->>>> +	if (!hypervisor_is_type(X86_HYPER_VMWARE))
->>>> +		return ULONG_MAX;
->>>> +
->>>> +	if (cmd & ~VMWARE_CMD_MASK) {
->>>> +		pr_warn_once("Out of range command %lx\n", cmd);
->>>> +		return ULONG_MAX;
->>>> +	}
->>>> +
->>>> +	args->r10 =3D VMWARE_TDX_VENDOR_LEAF;
->>>> +	args->r11 =3D VMWARE_TDX_HCALL_FUNC;
->>>> +	args->r12 =3D VMWARE_HYPERVISOR_MAGIC;
->>>> +	args->r13 =3D cmd;
->>>> +	args->r15 =3D 0; /* CPL */
->>>> +
->>>> +	__tdx_hypercall(args);
->>>> +
->>>> +	return args->r12;
->>>> +}
->>>> +EXPORT_SYMBOL_GPL(vmware_tdx_hypercall);
->>>> +#endif
->>>=20
->>> This is the kind of wrapper that I was hoping for=2E  Thanks=2E
->>>=20
->>> Acked-by: Dave Hansen <dave=2Ehansen@linux=2Eintel=2Ecom>
->>>=20
->>=20
->> I'm slightly confused by this TBH=2E
->>=20
->> Why are the arguments passed in as a structure, which is modified by th=
-e wrapper to boot? This is analogous to a system call interface=2E
->>=20
->> Furthermore, this is an out-of-line function; it should never be called=
- with !X86_HYPER_VMWARE or you are introducing overhead for other hyperviso=
-rs; I believe a pr_warn_once() is in order at least, just as you have for t=
-he out-of-range test=2E
->>=20
+> Signed-off-by: Amery Hung <amery.hung@bytedance.com>
+> ---
+>  tools/lib/bpf/libbpf.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 >
->This patch series introduces vmware_hypercall family of functions similar=
- to kvm_hypercall=2E Similarity: both vmware and kvm implementations are st=
-atic inline functions and both of them use __tdx_hypercall (global not expo=
-rted symbol)=2E Difference: kvm_hypercall functions are used _only_ within =
-the kernel, but vmware_hypercall are also used by modules=2E
->Exporting __tdx_hypercall function is an original Dave's concern=2E
->So we ended up with exporting wrapper, not generic, but VMware specific w=
-ith added checks against arbitrary use=2E
->vmware_tdx_hypercall is not designed for !X86_HYPER_VMWARE callers=2E But=
- such a calls are not forbidden=2E
->Arguments in a structure is an API for __tdx_hypercall()=2E Input and out=
-put argument handling are done by vmware_hypercall callers, while VMware sp=
-ecific dress up is inside the wrapper=2E
->
->Peter, do you think code comments are required to make it clear for the r=
-eader?
->
->
+> diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
+> index e067be95da3c..0541f85b4ce6 100644
+> --- a/tools/lib/bpf/libbpf.c
+> +++ b/tools/lib/bpf/libbpf.c
+> @@ -8991,6 +8991,10 @@ static const struct bpf_sec_def section_defs[] =3D=
+ {
+>         SEC_DEF("struct_ops.s+",        STRUCT_OPS, 0, SEC_SLEEPABLE),
+>         SEC_DEF("sk_lookup",            SK_LOOKUP, BPF_SK_LOOKUP, SEC_ATT=
+ACHABLE),
+>         SEC_DEF("netfilter",            NETFILTER, BPF_NETFILTER, SEC_NON=
+E),
+> +       SEC_DEF("qdisc/enqueue",        QDISC, BPF_QDISC_ENQUEUE, SEC_ATT=
+ACHABLE_OPT),
+> +       SEC_DEF("qdisc/dequeue",        QDISC, BPF_QDISC_DEQUEUE, SEC_ATT=
+ACHABLE_OPT),
+> +       SEC_DEF("qdisc/reset",          QDISC, BPF_QDISC_RESET, SEC_ATTAC=
+HABLE_OPT),
+> +       SEC_DEF("qdisc/init",           QDISC, BPF_QDISC_INIT, SEC_ATTACH=
+ABLE_OPT),
 
-TBH that explanation didn't make much sense to me=2E=2E=2E
+seems like SEC_ATTACHABLE (or just 0) is what you want.
+expected_attach_type shouldn't be optional for any new program type
+
+>  };
+>
+>  int libbpf_register_prog_handler(const char *sec,
+> --
+> 2.20.1
+>
+>
 
