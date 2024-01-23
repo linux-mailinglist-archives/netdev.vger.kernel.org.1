@@ -1,124 +1,75 @@
-Return-Path: <netdev+bounces-65098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06F8D8393D4
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 16:54:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C7E88393E7
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 16:57:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B35AB28FE2A
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 15:54:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8F5E2830A9
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 15:57:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61A76604B8;
-	Tue, 23 Jan 2024 15:54:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BBBC60BA6;
+	Tue, 23 Jan 2024 15:57:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="faCoNNLB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AGlIKORa"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3754850A61;
-	Tue, 23 Jan 2024 15:54:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46A51612CE;
+	Tue, 23 Jan 2024 15:57:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706025242; cv=none; b=ld/RgPhxzLJSlHdEil74kvVdBPHulDlaXzGOS2/TMux5SA7lMvRB3IEUqP7w2Wq4Old9NKTIBEtXoV0UBembWAZfJtrT1i9Jw4tRQLWcvWP1KH6vSIVxpAZOi8Sob/ez7sxWdPPM9e5S9mzaJqusJLli1WBHKLmZiJLm86w4VEI=
+	t=1706025460; cv=none; b=tjAIcmoJkyuQZlm6WXMs8Oqv15JVt7W1qz/O2CFdc84VS2xu51iu8XWp6a/Q0dQYbvoBlt33uH6yBvYfu5Ms1869wbJCy4vgJ7q5+/SwHumvTWdJ7Di0JLrgdhwSj9mdwHndHa28GzjX2awNKVM23nlDXfA4+YxnYfSrZi72NG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706025242; c=relaxed/simple;
-	bh=MHunYJlSW0xkpBskC5UuarTnjKz+9CaefumWRC8LlQo=;
+	s=arc-20240116; t=1706025460; c=relaxed/simple;
+	bh=AE57RfS6LrxW69MjMNy5Ejs67em/s2Lg0dgNEmUrhgg=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mOIdKttG70zaJa4EeNcsZYsRMPnO3nNui+1EMHt8q8lLsX0xgtQXuwEg+8vuVFC6fgJkZXRm+KDiNGjTgnfjzvf29Bhi3uWAOWtYU/CROQBi/0+MyMRHGuiuH1sxcinSl3JF1oV9nLSguDvmHZ7q8LEkjjbs+cjbOyRsWVz3mEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=faCoNNLB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C10C8C433C7;
-	Tue, 23 Jan 2024 15:54:00 +0000 (UTC)
+	 MIME-Version:Content-Type; b=UhqINi8u30FUBJO8YiP7rL2u++foLUZ98YF6XwV5vGVE+Oj+TTGDYXRX6jPfSl/QE0RGKQi0dT3C02UXDgNpOezusJYZpykaU382ZlxgyV8x94el/dZZx3FcivhV7Oq+UrWIU5yFt1nl5OpvApSR3kJKJqRlE1VPF2khGZaNcic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AGlIKORa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DCCFC433F1;
+	Tue, 23 Jan 2024 15:57:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706025241;
-	bh=MHunYJlSW0xkpBskC5UuarTnjKz+9CaefumWRC8LlQo=;
+	s=k20201202; t=1706025459;
+	bh=AE57RfS6LrxW69MjMNy5Ejs67em/s2Lg0dgNEmUrhgg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=faCoNNLBFV5XfXtR+8ZOEu/t+q8LVdInwpjQ39aqoyj9O4YRDBWSl2269MfaUqbRm
-	 smCSJBa/YZOgRaDlR3XsV0VZUxmeDAdjeR8ZC060toABprkH0AqQlHyLIbO6KVWNJD
-	 5+lPEBY2kemrCcz2FostODercaQr23BVNACUQZ+nEpzsoZshGIGxablCGuAQU098vM
-	 zkYcrRFVkzAl/vrgjWbFXVjPkdN8YNOIffLpEwZ+gS+3vN2VTz1gzxIDKpodu22/1K
-	 ZzO2glca/9BvqCkZwtrRbPhQY9KCoysUEAtbLyEOhDYIDxHXxONDr3QZ2wfGfYIlCz
-	 r0BI5DiKLYjFQ==
-Date: Tue, 23 Jan 2024 07:53:59 -0800
+	b=AGlIKORaKUl5XoBLCcYABsaLsQQB8iqijTHoxXwU/kzPvrGrxkEsUn20zKmflRV19
+	 EpBSXUBGN6CSCI6PQO3nxctvGdn4DWwq44WsYSIR0TR5xV02oJ7tEHsbvRbgaHeiSz
+	 s/Bp77pTWGatO+nIkpNvDWX0wLy5DL8/Rwrj6aQa+gZ0oXnxGZsAWSJG1ns+ZzGfl5
+	 8V0ygddQi3NypVDMmhT0+QL2wTIkOj4hUcIZNjH+NtQ+XQQ/nYhPDOcbdLER5+MIlr
+	 Y5NjP9/Yvy0ZIqU7sE1eQN9OhkESD5NzT/8Vu28vC4e4Mwu/7AbiAIbuEEkEFbZEgh
+	 i03vQgjo3V3kg==
+Date: Tue, 23 Jan 2024 07:57:38 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Danielle Ratson <danieller@nvidia.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "davem@davemloft.net"
- <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
- "pabeni@redhat.com" <pabeni@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>,
- "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "sdf@google.com"
- <sdf@google.com>, "kory.maincent@bootlin.com" <kory.maincent@bootlin.com>,
- "maxime.chevallier@bootlin.com" <maxime.chevallier@bootlin.com>,
- "vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>,
- "przemyslaw.kitszel@intel.com" <przemyslaw.kitszel@intel.com>,
- "ahmed.zaki@intel.com" <ahmed.zaki@intel.com>, "richardcochran@gmail.com"
- <richardcochran@gmail.com>, "shayagr@amazon.com" <shayagr@amazon.com>,
- "paul.greenwalt@intel.com" <paul.greenwalt@intel.com>, "jiri@resnulli.us"
- <jiri@resnulli.us>, "linux-doc@vger.kernel.org"
- <linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, mlxsw <mlxsw@nvidia.com>, Petr Machata
- <petrm@nvidia.com>, Ido Schimmel <idosch@nvidia.com>
-Subject: Re: [RFC PATCH net-next 3/9] ethtool: Add an interface for flashing
- transceiver modules' firmware
-Message-ID: <20240123075359.4c502c79@kernel.org>
-In-Reply-To: <DM6PR12MB4516C97E6EC715DB78466FD3D8742@DM6PR12MB4516.namprd12.prod.outlook.com>
-References: <20240122084530.32451-1-danieller@nvidia.com>
-	<20240122084530.32451-4-danieller@nvidia.com>
-	<20240122205046.5bb0ffe7@kernel.org>
-	<DM6PR12MB4516C97E6EC715DB78466FD3D8742@DM6PR12MB4516.namprd12.prod.outlook.com>
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, shuah@kernel.org, razor@blackwall.org,
+ idosch@nvidia.com, horms@kernel.org, kuniyu@amazon.com,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net] selftests: fill in some missing configs for net
+Message-ID: <20240123075738.13bf9b55@kernel.org>
+In-Reply-To: <878r4gtaif.fsf@cloudflare.com>
+References: <20240122203528.672004-1-kuba@kernel.org>
+	<878r4gtaif.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, 23 Jan 2024 13:34:18 +0000 Danielle Ratson wrote:
-> > > +The firmware update process can take several minutes to complete.
-> > > +Therefore, during the update process notifications are emitted from
-> > > +the kernel to user space updating it about the status and progress. =
-=20
-> >=20
-> > We should state more explicitly that the op just starts the process, an=
-d does
-> > not block. Looks like cable test already uses _ACT as a suffix, is it b=
-ased on
-> > some standard? Doesn't seem all that intuitive to me (or at least less =
-intuitive
-> > than calling it _START...) =20
->=20
-> From Documentation/networking/ethtool-netlink.rst:
-> "
-> List of message types
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->=20
-> All constants identifying message types use ``ETHTOOL_CMD_`` prefix and s=
-uffix
-> according to message purpose:
->=20
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D    =3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D
-> ``_GET``          userspace request to retrieve data
-> ``_SET``          userspace request to set data
-> ``_ACT``          userspace request to perform an action
-> ``_GET_REPLY``    kernel reply to a ``GET`` request
-> ``_SET_REPLY``    kernel reply to a ``SET`` request
-> ``_ACT_REPLY``    kernel reply to an ``ACT`` request
-> ``_NTF``          kernel notification
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D    =3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D
-> "
->=20
-> So, it looks suitable to me.
+On Tue, 23 Jan 2024 14:55:59 +0100 Jakub Sitnicki wrote:
+> > Fixes: ae5439658cce ("selftests/net: Cover the IP_LOCAL_PORT_RANGE socket option")  
+> 
+> MPTCP coverage is a recent (Dec '23) addition. I must have missed it.
+> 
+> Fortunately we don't need to backport that far. Should be:
+> 
+> Fixes: 122db5e3634b ("selftests/net: add MPTCP coverage for IP_LOCAL_PORT_RANGE")
 
-True, didn't see that. It's fine as a distinction of "doing something"
-vs "setting configuration" but it doesn't express the fact that the
-action is async. AFAIU cable test is also async, so that's fine.
-We'll worry about it when some tries to add _ACT which isn't async.. =F0=9F=
-=A4=B7=EF=B8=8F
+Thanks! I'll swap when applying, if you don't mind :)
 
