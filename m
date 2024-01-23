@@ -1,136 +1,154 @@
-Return-Path: <netdev+bounces-65057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55973839053
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 14:40:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A5C40839061
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 14:46:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 050CC289196
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 13:40:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E66A28C312
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 13:46:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A96705EE76;
-	Tue, 23 Jan 2024 13:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C18765F550;
+	Tue, 23 Jan 2024 13:46:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Z8EoqhA0"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="BVTyIB26"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2070.outbound.protection.outlook.com [40.107.237.70])
+Received: from mout.web.de (mout.web.de [212.227.15.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 030EC5F542;
-	Tue, 23 Jan 2024 13:40:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.70
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706017228; cv=fail; b=kAbUMu/GUWC1aIx/DngZKH9uwXeFpY8mS8Uyg1Pflyl9ZQSLetsaYZEQNw9DS3h3fUQKt7y6RXjtQ2fcBX0Xk2hvEOcLB1QH2OtjwOAZtwiYlJz7veEKDGS8H4d58le8qC/DzuHtAyCCaQWeYgX7CGzUKAGbHBRuEwcO0+k5fXg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706017228; c=relaxed/simple;
-	bh=3knIhSI+/riJ1vDDOu/ClhroYL+dtZw7PhX4Z85eq38=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=LmLj+mZIG4deKwJqhtPJimZpa9DRfKQ/lwVjV0sh/VRT0xh2RvXu8BGgM+s3YLYKgKh/N0OGwrZXl2fpMhxcFrS81bq9tSxevFhcdZ7mRVhLM7fc5RkOWKQlBUzKU/pfxxNhelYzMgVN9gyUbTnacO5fmYrMfbKrxovElBaYU2M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Z8EoqhA0; arc=fail smtp.client-ip=40.107.237.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OUNUj+WdV/jBS+VOZgG/XYPKI191NEIc+tQvn204tYvWiY5Rj4t+fZPsR9VJ8d6L9/EyD9L5cpqAX153aFknZ4JF3fVZpvCLDVt7UUjBPvnQhPjV/syECZ35A+Qfas4BmHC9LTQq+lar9pzD8tCkqVp4/cxxZNMfRyunx5j+nJ3znmlg5Phqf+XTUId9+iUxaP8IqVZBJnd2pvbLcsR+iWmXAfDJt2YxjtmMDV6/lMWHogYshGss8HRxfMcp6iMPXesoMLB2NQQu3PbwTMTHTqPJOCp6S+QPVFgs38juVYKwtrpw4SoMTH0rib8RhOAbCJXKts/6n0SuE+8jHzuz7w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3knIhSI+/riJ1vDDOu/ClhroYL+dtZw7PhX4Z85eq38=;
- b=dMSya7ojci9EcECsEjoKIkMZLVeo6Nvl9BbFq6uBjQEsAazGcZOkQl05sCL77bTSwp/AXshkRoAlDCl0GlTzbrCBbjZG/ElpeY4kUbL13cSqq+zkZrQAVZSZ93nrNpgNNk5oq2QORyXHDJFqbmo9bMYsbw2hOuO9U8MSlh4VgXdOD3lw4eCPiT8nqzd7AcU9fRCfZJMARRpx9z9HjjezNNoIyJ1tRI6qurNDiwBefgZEp6CIp35P08Zzkeof+hMzx+roDlfvp4Ju9qL3zps9y+vfbu+bcm5Hn24bCMwykIBL8KpzkAK6g9le+DU3L+nV4Ee0dibGfyEtDe4ZEoDCZQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3knIhSI+/riJ1vDDOu/ClhroYL+dtZw7PhX4Z85eq38=;
- b=Z8EoqhA0cv6uVktHr2znAJoC/yI7azGlYXSbmgGubxvxr/wUTEVbsjJjRH1/3ispNiXRrf35F8UkXs4fEEiQvXHNsvQOtQZWdfhUuvw9lBd7qMm9rijm1bw0xX1hm9kpYiEzcaL/eNtt3VL6L3PnI48+doPJByi2gNWOsInjpgMynBdLbz4ruvL5w7rkAHFH0ExQyNDyS241q+biyHCJx6NsnC7HgFtrUC19nt1elWCcEizYxw2rrMwbO7E44ujLRGOFzpszfIZoYTkT0ki9CgXX2QD3uTc90Mv1BGxCwYFQD452O8WDTbZocOGZ0lJV9dSWsEzc0Y636NzunePxvw==
-Received: from BY3PR05CA0049.namprd05.prod.outlook.com (2603:10b6:a03:39b::24)
- by DM6PR12MB4299.namprd12.prod.outlook.com (2603:10b6:5:223::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.37; Tue, 23 Jan
- 2024 13:40:19 +0000
-Received: from CO1PEPF000042AE.namprd03.prod.outlook.com
- (2603:10b6:a03:39b:cafe::e8) by BY3PR05CA0049.outlook.office365.com
- (2603:10b6:a03:39b::24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.21 via Frontend
- Transport; Tue, 23 Jan 2024 13:40:18 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CO1PEPF000042AE.mail.protection.outlook.com (10.167.243.43) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7202.16 via Frontend Transport; Tue, 23 Jan 2024 13:40:18 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 23 Jan
- 2024 05:40:04 -0800
-Received: from yaviefel (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 23 Jan
- 2024 05:40:02 -0800
-References: <20240122091612.3f1a3e3d@kernel.org> <87fryonx35.fsf@nvidia.com>
- <83ff5327-c76a-4b78-ad4b-d34dae477d61@westermo.com>
-User-agent: mu4e 1.8.11; emacs 28.3
-From: Petr Machata <petrm@nvidia.com>
-To: Matthias May <matthias.may@westermo.com>
-CC: Petr Machata <petrm@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"netdev-driver-reviewers@vger.kernel.org"
-	<netdev-driver-reviewers@vger.kernel.org>
-Subject: Re: [ANN] net-next is OPEN
-Date: Tue, 23 Jan 2024 14:38:24 +0100
-In-Reply-To: <83ff5327-c76a-4b78-ad4b-d34dae477d61@westermo.com>
-Message-ID: <87bk9cnp73.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40E9D5F542;
+	Tue, 23 Jan 2024 13:45:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706017560; cv=none; b=DlEV3d+BcOrSd8HgXuq2tuZS9COWGp97DfXbVzctDf8aUful8UnQqAVNwrgXY9GjCts5jL1LSrREx0AKGXHj+O7Osp/PQnosJuVe+697xM+U4i770NuqC7v3FiKHewz6uyY3PFpZSY1mClTFkmW1KT26VSecM1Dtj8/xv6HQfvM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706017560; c=relaxed/simple;
+	bh=lSTLKPXTaO/2qRTR0NkrIYLZTC33Ga49EoNFiaew6C0=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=KP3GM71v95p6LJOWLs5AfQU93K4dOtqooq1KnZ8FPvttdne5hj5TYr8jwWS+gCEbPCVGL1P3Ye/joWSlIWGdi4oNik8FooW+UZvhc/Tx1lCYWujgrqACVLfIpf7F9L2BIlH+De5QGh3e0wELegw0wVHqzzxh8v211YaCN122f8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=BVTyIB26; arc=none smtp.client-ip=212.227.15.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
+	t=1706017520; x=1706622320; i=markus.elfring@web.de;
+	bh=lSTLKPXTaO/2qRTR0NkrIYLZTC33Ga49EoNFiaew6C0=;
+	h=X-UI-Sender-Class:Date:To:Cc:From:Subject;
+	b=BVTyIB26tztVz7P34PiuB1zOYXLxRRpRL9Z/SKmuP4QVU0SyUbF831lUpRBkiNII
+	 i3Itw2a00rWmW8EAClHIegVGvMi3EXbkB3h/7gUOCpzHHxQydmkhO4EWeHy++TjDe
+	 Fc4nhud+CRGmfF7VCBl5cs3QTfAwywdlzp2X1tZ//k5YaQSNoKzbiJyR0jQ71zj10
+	 NHDqXqYETDL4BS+zPfa7xEULkVZoq+Xt4cv2l28VmScYVLYNfBJIlMoTss+HtWWOl
+	 WIItvtlp9uAty7BRe+Ky3sYo1YDmosOv5ZoxMUZuWbP8Stu+OdCtSYTdWfZca33QS
+	 SSRDJPGC22/ZEBEH+Q==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.87.95]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MQ8Wa-1roDmi0bBI-00MMjV; Tue, 23
+ Jan 2024 14:45:20 +0100
+Message-ID: <c49c716a-e070-4ad5-9a90-896537bcd1b5@web.de>
+Date: Tue, 23 Jan 2024 14:45:12 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+To: netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Florian Westphal <fw@strlen.de>, Jakub Kicinski <kuba@kernel.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>,
+ Pablo Neira Ayuso <pablo@netfilter.org>, Paolo Abeni <pabeni@redhat.com>,
+ Phil Sutter <phil@nwl.cc>
+Content-Language: en-GB
+Cc: LKML <linux-kernel@vger.kernel.org>, Kunwu Chan <chentao@kylinos.cn>
+From: Markus Elfring <Markus.Elfring@web.de>
+Subject: [PATCH] netfilter: nf_tables: Add a null pointer check in two
+ functions
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000042AE:EE_|DM6PR12MB4299:EE_
-X-MS-Office365-Filtering-Correlation-Id: 87f29076-51be-44c7-7376-08dc1c18d6a8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	FlqbESc5+EximS9S2daNERTjcTuzws7J/kyxNPoe2sLcKFfJXpbTyjsQEj+kDqTyOmzen7Yov5GYjgb3RLrI5drP1qQuNBYMMcDgUOZNySTj7qJgHhxga1fVilVgNzHtkRDLM/UvRL6i+TCqZ4yiRZFgV7uguOo5kkaAcolLyNV6Xz98WrqsiPlBkdIf9sZBXj4TpEQkHHnLl+J7AUW/QVPI4O72AzEnjadxKLXl5ki8hg7J8qrOKwEtKfRb732rvmlf7Tdh4KKHPWPqabjmLN6/Ezh78mA6mWPwfvNBVwR2QzbOwqIwhi4mI0wt+cHumiVBwKjJNmz6TYGyqH/CR3AHccw7x0lZPMHAurauylSDKI9NbvEai03plaLEMrR3ASrRBn4A/gcer3HkgWgg1dGpt/dBGTXFGKLnd87witGnH9XzDn75SMkMovoh96bONSH944ZPwpvuO7rLcVdj4T+cVihyl6XJFqGpUbFGJYjW3amofQElD+865T+htc19v7jeNr77fzSEcu4DQG5v3AJ7O0KXiegALcL+qMunSfMjTPZ8GZ9px/yXt4Au46NDE27mpmsXaHx3B4D4JIAv6CNQ8L5ikBlaB6NwXQDY70dSM+nDANpb+PzO4mrxlWH2WzUE42kCbu9mPHV7qiPMwPc181VPR6dfskVraaRWkpsXzu/Z5Z688itjMx8Sl3745ekOS2vWAjLWngBSlIstQaRDOcIFvoPBwyoKxymHAie79TlU+ksOJvUJOJeNGmCdbGjfs6DMmsXFx0hMSyBZig==
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(396003)(346002)(136003)(376002)(230922051799003)(1800799012)(64100799003)(186009)(451199024)(82310400011)(46966006)(36840700001)(40470700004)(426003)(6916009)(36860700001)(82740400003)(2906002)(4744005)(36756003)(86362001)(41300700001)(7636003)(356005)(70206006)(70586007)(8936002)(54906003)(8676002)(316002)(6666004)(478600001)(966005)(16526019)(5660300002)(336012)(2616005)(26005)(47076005)(4326008)(40480700001)(40460700003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jan 2024 13:40:18.4830
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 87f29076-51be-44c7-7376-08dc1c18d6a8
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000042AE.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4299
+X-Provags-ID: V03:K1:Q2yg1JxYgb6/HhGmfheXygZrpzmLncDbJLlxEQOSB0psi70e0gA
+ XYDtuVR7HmDUlmjah4xWCvmqi90+SExkj3Zs1Yenh3XpKsRxl2NM/oIv4/mG1S90ymZHQHr
+ oBC8aRx3pac6243pvJNhsZbbf4g5QdE6r5xs7AQd4SuFbmmnGuxipOdUCDVXRtpzaegj9Kp
+ +5MJnt2cFEkIFCrz8ijkA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:urrv4rpcajc=;/nHaTBh4XMqzTVirGs4oOTwcSi7
+ ZIxCLy+7hJuCSuOhVg8aSGW9cJwf9yHPN21+TmX07Z/erdwvtYb/qpAQU6mGPotw2bCCj9kb2
+ lxcnr74Pxs904yx/f/sIhE59WjCjx5zFH3HwdJKNk49/2vliqEweKn9eGG251M7Rt+o8iE0At
+ LzCScwwIV+gvJPJObXmCzdJfzu/vIJkNNyOoQARaDAumB1KXXgi4Ov88uqwFh/ZhKXyFS75MU
+ FIOzvKOEcHAObp/lj7TqFrkEYcKHITFD7cUIFKS9Z1kQOuOTjh3kHF8wiEL+Fh5NZdb1PN2Xl
+ QmUDRsaV0LmU+76U4nkG8R7bi+pcRhWin6OKQejoiYq/A7r99hbi8FDcYc4Z8Hyba64CRvC/R
+ fiB0N4WDHHfX1Dk31xsL/AuTne8LgZpV4KB+1Mk8FZk8mo3BHd1db8lOCL+5x6Qztn/M9eFn9
+ v1OJCeX5DuR95qT5bzhcoiTfWJGDjZVEan7sK0wjbU/+oQHAh9rTJUofA5QtaAxqHWH5PycLk
+ ju1YZzmimdsVbq69r8a0AWeN2XeemLAbE9vSBkej7h9vvhfozIXNPlZgLdzxXwWJGI2Xtg4Hy
+ F3FwWe/foM6cjRVm1QwgIXl1xPRovRK1njOBLBYashgtubclcXgsXr6iOqxLETIx1K3spPAt+
+ hsYsGaMSBFc5M9Yi4mskv7EhSnNQf+gHgq4tsVTQWZdvAg6Pc6YFmZWUO4LDOZsgdHmNNjwol
+ pnEv0Uq09v4os/Bh+7cm1Dm1RjNllvkmXTr5ljqUua5qL+WrJ5aHrRJXNMiFv4qRhlNLP1fdH
+ K0j/3Ln9kHwG8bmQ2ZyGyRyybo1kxcSMMd6fvA9yE2new+Cbg8RB+kvluHjhKCSw7SQdBlgwk
+ NdQAoOrgI1+VMj0yTMCqOPPIb82a5lfDA37+T31k5iZL5J50EyJ9DhSnmM6nB9bwgcW/xkzoe
+ S/cmXQ==
 
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Tue, 23 Jan 2024 14:28:31 +0100
 
-Matthias May <matthias.may@westermo.com> writes:
+The result from a call of the function =E2=80=9Ckasprintf=E2=80=9D was pas=
+sed to
+a subsequent function call without checking for a null pointer before
+(according to a memory allocation failure).
+This issue was detected by using the Coccinelle software.
 
-> Also there seems to be something wrong with ending, see
-> https://netdev-2.bots.linux.dev/vmksft-net/results/433200/81-l2-tos-ttl-i=
-nherit-sh
-> The test outputs the results in a table with box drawing characters (=E2=
-=94=8C=E2=94=80=E2=94=AC=E2=94=90=E2=94=9C=E2=94=80=E2=94=BC=E2=94=A4=E2=94=
-=94=E2=94=80=E2=94=B4=E2=94=98)
+Thus add a null pointer check and a jump target in affected functions.
 
-It looks like whatever is serving the output should use MIME of
-"text/plain;charset=3DUTF-8" instead of just "text/plain".
+Fixes: 8877393029e76 ("netfilter: nf_tables: Open-code audit log call in n=
+f_tables_getrule()")
+Fixes: 0854db2aaef3f ("netfilter: nf_tables: use net_generic infra for tra=
+nsaction data")
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+=2D--
+ net/netfilter/nf_tables_api.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
+index 8438a8922e4a..cb61c7a39a76 100644
+=2D-- a/net/netfilter/nf_tables_api.c
++++ b/net/netfilter/nf_tables_api.c
+@@ -3728,10 +3728,13 @@ static int nf_tables_getrule_reset(struct sk_buff =
+*skb,
+ 			nla_len(nla[NFTA_RULE_TABLE]),
+ 			(char *)nla_data(nla[NFTA_RULE_TABLE]),
+ 			nft_net->base_seq);
++	if (!buf)
++		goto exit;
++
+ 	audit_log_nfcfg(buf, info->nfmsg->nfgen_family, 1,
+ 			AUDIT_NFT_OP_RULE_RESET, GFP_ATOMIC);
+ 	kfree(buf);
+-
++exit:
+ 	return nfnetlink_unicast(skb2, net, portid);
+ }
+
+@@ -7917,6 +7920,8 @@ static int nf_tables_getobj(struct sk_buff *skb, con=
+st struct nfnl_info *info,
+
+ 		nft_net =3D nft_pernet(net);
+ 		buf =3D kasprintf(GFP_ATOMIC, "%s:%u", table->name, nft_net->base_seq);
++		if (!buf)
++			goto fill_obj_info;
+
+ 		audit_log_nfcfg(buf,
+ 				family,
+@@ -7925,7 +7930,7 @@ static int nf_tables_getobj(struct sk_buff *skb, con=
+st struct nfnl_info *info,
+ 				GFP_ATOMIC);
+ 		kfree(buf);
+ 	}
+-
++fill_obj_info:
+ 	err =3D nf_tables_fill_obj_info(skb2, net, NETLINK_CB(skb).portid,
+ 				      info->nlh->nlmsg_seq, NFT_MSG_NEWOBJ, 0,
+ 				      family, table, obj, reset);
+=2D-
+2.43.0
+
 
