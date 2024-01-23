@@ -1,371 +1,632 @@
-Return-Path: <netdev+bounces-65273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2108A839D62
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 00:51:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94A9E839D60
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 00:51:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4B1228C213
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 23:51:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B91DC1C21346
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 23:51:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8683155791;
-	Tue, 23 Jan 2024 23:51:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A36CB54279;
+	Tue, 23 Jan 2024 23:51:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pX8n63m2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mzrFlLdc"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0F4A54F9B
-	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 23:51:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A061353E2A
+	for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 23:51:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706053900; cv=none; b=ReBZfYaIMaqNA9B0Y2DKRnl+0716iWxjy878l4Z8V9Aaw6O09wqjp/W537Amgqd0EppBgIvbTyT9ZRJYhiQFEb78jDoHT28lGsE3a+ZrnjOQeycjSaFGhBjA+LR4dLC4y8KfCKtfnPsYzMifLoxCrvsUTgj3DCM3CbDexN9I1jo=
+	t=1706053895; cv=none; b=F9BX8110yMuwf8azY7r2G5Eiuj+Qx4G3PQZTbHrcRjTIXCOTvvi7hW936/rthEcO1I7n207I2BWTd67yi8utALG4TfZC4CwWkkhKrDTAV5pNU59BvVr7rD6NU5KNOoRbzdKGTlydKYqI+HGPTuNWoroBju/IUC1C5KU3CylBsZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706053900; c=relaxed/simple;
-	bh=Ek1cytM7WS2sE1riwtMA+G7qFW4BlkKBOIO3LuJ5He0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TwL2mgL/qgldKMWuTxf/W29Q1YnABvxHUe0MX5hv4KoDiBl0HJPBZ0KF3xIh2XyMxZTND+YE/QIc7alP29OGKX77qV3XDKKYSSEJNwAcPEl3mcHehcg/0DU6+mKsQ3sWXXk1ZSTlupcQkFc73rG+DrHnuFe5HJ981nTvKS4NXU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pX8n63m2; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <0484f7f7-715f-4084-b42d-6d43ebb5180f@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706053895;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=k47V9DDWici+9jkUdApGNBTXQr4GlP/PqYqY9dLSWEk=;
-	b=pX8n63m2wmR8CgI32R/UBaVE9EwRttIyL4KC8sbyCKoe3D+1UzEkx9pqGuTs2rjtSP7014
-	Me+5kLj72dsCxB7A9HzH/URMKiUggtAh6pQjo0cG1OUhFOwvTqHz9mgi/cGv0HiKL9H5+E
-	Dv52w3RTS5pUX9pKg40oPwibEuhBaUI=
-Date: Tue, 23 Jan 2024 15:51:26 -0800
+	s=arc-20240116; t=1706053895; c=relaxed/simple;
+	bh=M2v1aw8ABCrFxewzbQiNFcDf7AFUUuNm68AIH221mM0=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Content-Type; b=p3P6eY6sKry2QMlkTwmnaMonyGH8cf8pKfG+mLEPGobIcf7aXOLI8dCWdMeCZiNztniIwnZFxaoTQBwDdSRN61Xe4rdQJqsaXEzmYE5WETn6Fl+GRfs5YMhwNs3qhqgrWVgg6QaGrn3GllNoZiyloc1qobDkA2FYL2RdHH2Naug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aahila.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mzrFlLdc; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aahila.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1d705228a8eso40407735ad.1
+        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 15:51:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1706053893; x=1706658693; darn=vger.kernel.org;
+        h=to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=m4DCHLmZ1WFFuH1A4bWrDJmV4crTFox3nbL43EdxpeU=;
+        b=mzrFlLdck73fCSr6cu+O5lmqYR5B8ehC+EEI8CVEHkSTJrn+X+y/HfwHBcLFJdPnQB
+         DJPGocoKysjERn1WCFBwOGlKTzzkcQECPMFT5HFbVNksk4czEFJ1kdPUbtBa2wQm98qZ
+         4hadFVqZuZ6YQw8b7cGvJTK8BHnSyWDfPVPG7bpW//l7C27sO5ANEDxX55DFg6MBB7V6
+         R5YIZLMWa7MOZGB4cGQeyiHWe40qTKxn8nX604GvmQ6ZyS4F306gNs8AW6goNjtRAKK4
+         sSu9oJiWxzDIbaQMuhVloSXf5CdUe1O4usTsB2XVJdVWw8Tb1KGZN84n04a2iYSG+kwR
+         ahsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706053893; x=1706658693;
+        h=to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=m4DCHLmZ1WFFuH1A4bWrDJmV4crTFox3nbL43EdxpeU=;
+        b=I/0eABcFNOU3z5/qAVZyx65K5WEhvMFmhNgffEaRsHYja0FYsXUGZQS95tRmfPfgHX
+         0li68FOsKIGGQUHgk8vKdvS0IqjC90r6jJEgfOFt8yM4w1sXQOwlLjnlt3vgqjN/29xY
+         D6l6a8PgVWjebmzTVDBDslnOxOXIUOgp+2bDL7qgwlKqqSbSlLRsGvfYT+R6syqBI1ah
+         vB9Jv1BjCsm1CHglfoQDImzwk4usXIOlZVGDW/RjS1Y3Th9UA1BQq9QC4cJzUeX5sAKE
+         v67zGnCDA7T0zhrCptBumQHLS9bsIcRt7DWu5JPQfKGjqrOrFs0Vf1F7QQNmmpAg8QQI
+         EI6Q==
+X-Gm-Message-State: AOJu0YzWBbynKnGfWzUi1pvZTMG71Yaz7HKND33G5VsN3I58TYQOW0kp
+	xH3HYwvDNd2LQr9yzzi0+B+fJly7oLxC/nElpcxolGhDDZE3cKOvBw0Uk78ykSk2uZJtApnAtj6
+	Gog==
+X-Google-Smtp-Source: AGHT+IFq6MztPnTkJ+9iBm/3typPnfSarKuli+BM3OQqZyAh2Qcl8ckJ3QO2Ewg2VgjAfRerBSVdnf30BEQ=
+X-Received: from aahila.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2f3])
+ (user=aahila job=sendgmr) by 2002:a17:903:244d:b0:1d7:6501:a1f2 with SMTP id
+ l13-20020a170903244d00b001d76501a1f2mr7167pls.2.1706053892953; Tue, 23 Jan
+ 2024 15:51:32 -0800 (PST)
+Date: Tue, 23 Jan 2024 23:51:30 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [RFC PATCH v7 1/8] net_sched: Introduce eBPF based Qdisc
-Content-Language: en-US
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, yangpeihao@sjtu.edu.cn, toke@redhat.com,
- jhs@mojatatu.com, jiri@resnulli.us, sdf@google.com,
- xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com, netdev@vger.kernel.org
-References: <cover.1705432850.git.amery.hung@bytedance.com>
- <232881645a5c4c05a35df4ff1f08a19ef9a02662.1705432850.git.amery.hung@bytedance.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <232881645a5c4c05a35df4ff1f08a19ef9a02662.1705432850.git.amery.hung@bytedance.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
+Message-ID: <20240123235130.1982654-1-aahila@google.com>
+Subject: [PATCH net-next v5] bonding: Add independent control state machine
+From: Aahil Awatramani <aahila@google.com>
+To: Aahil Awatramani <aahila@google.com>, David Dillow <dave@thedillows.org>, 
+	Mahesh Bandewar <maheshb@google.com>, Jay Vosburgh <j.vosburgh@gmail.com>, 
+	Hangbin Liu <liuhangbin@gmail.com>, Andy Gospodarek <andy@greyhouse.net>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Martin KaFai Lau <martin.lau@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 1/17/24 1:56 PM, Amery Hung wrote:
-> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-> index 0bb92414c036..df280bbb7c0d 100644
-> --- a/include/uapi/linux/bpf.h
-> +++ b/include/uapi/linux/bpf.h
-> @@ -997,6 +997,7 @@ enum bpf_prog_type {
->   	BPF_PROG_TYPE_SK_LOOKUP,
->   	BPF_PROG_TYPE_SYSCALL, /* a program that can execute syscalls */
->   	BPF_PROG_TYPE_NETFILTER,
-> +	BPF_PROG_TYPE_QDISC,
->   };
->   
->   enum bpf_attach_type {
-> @@ -1056,6 +1057,8 @@ enum bpf_attach_type {
->   	BPF_CGROUP_UNIX_GETSOCKNAME,
->   	BPF_NETKIT_PRIMARY,
->   	BPF_NETKIT_PEER,
-> +	BPF_QDISC_ENQUEUE,
-> +	BPF_QDISC_DEQUEUE,
->   	__MAX_BPF_ATTACH_TYPE
->   };
->   
-> @@ -7357,4 +7360,22 @@ struct bpf_iter_num {
->   	__u64 __opaque[1];
->   } __attribute__((aligned(8)));
->   
-> +struct bpf_qdisc_ctx {
-> +	__bpf_md_ptr(struct sk_buff *, skb);
-> +	__u32 classid;
-> +	__u64 expire;
-> +	__u64 delta_ns;
-> +};
-> +
-> +enum {
-> +	SCH_BPF_QUEUED,
-> +	SCH_BPF_DEQUEUED = SCH_BPF_QUEUED,
-> +	SCH_BPF_DROP,
-> +	SCH_BPF_CN,
-> +	SCH_BPF_THROTTLE,
-> +	SCH_BPF_PASS,
-> +	SCH_BPF_BYPASS,
-> +	SCH_BPF_STOLEN,
-> +};
-> +
->   #endif /* _UAPI__LINUX_BPF_H__ */
+Add support for the independent control state machine per IEEE
+802.1AX-2008 5.4.15 in addition to the existing implementation of the
+coupled control state machine.
 
-[ ... ]
+Introduces two new states, AD_MUX_COLLECTING and AD_MUX_DISTRIBUTING in
+the LACP MUX state machine for separated handling of an initial
+Collecting state before the Collecting and Distributing state. This
+enables a port to be in a state where it can receive incoming packets
+while not still distributing. This is useful for reducing packet loss when
+a port begins distributing before its partner is able to collect.
 
-> +static bool tc_qdisc_is_valid_access(int off, int size,
-> +				     enum bpf_access_type type,
-> +				     const struct bpf_prog *prog,
-> +				     struct bpf_insn_access_aux *info)
-> +{
-> +	struct btf *btf;
-> +
-> +	if (off < 0 || off >= sizeof(struct bpf_qdisc_ctx))
-> +		return false;
-> +
-> +	switch (off) {
-> +	case offsetof(struct bpf_qdisc_ctx, skb):
-> +		if (type == BPF_WRITE ||
-> +		    size != sizeof_field(struct bpf_qdisc_ctx, skb))
-> +			return false;
-> +
-> +		if (prog->expected_attach_type != BPF_QDISC_ENQUEUE)
-> +			return false;
-> +
-> +		btf = bpf_get_btf_vmlinux();
-> +		if (IS_ERR_OR_NULL(btf))
-> +			return false;
-> +
-> +		info->btf = btf;
-> +		info->btf_id = tc_qdisc_ctx_access_btf_ids[0];
-> +		info->reg_type = PTR_TO_BTF_ID | PTR_TRUSTED;
-> +		return true;
-> +	case bpf_ctx_range(struct bpf_qdisc_ctx, classid):
-> +		return size == sizeof_field(struct bpf_qdisc_ctx, classid);
-> +	case bpf_ctx_range(struct bpf_qdisc_ctx, expire):
-> +		return size == sizeof_field(struct bpf_qdisc_ctx, expire);
-> +	case bpf_ctx_range(struct bpf_qdisc_ctx, delta_ns):
-> +		return size == sizeof_field(struct bpf_qdisc_ctx, delta_ns);
-> +	default:
-> +		return false;
-> +	}
-> +
-> +	return false;
-> +}
-> +
+Added new functions such as bond_set_slave_tx_disabled_flags and
+bond_set_slave_rx_enabled_flags to precisely manage the port's collecting
+and distributing states. Previously, there was no dedicated method to
+disable TX while keeping RX enabled, which this patch addresses.
 
-[ ... ]
+Note that the regular flow process in the kernel's bonding driver remains
+unaffected by this patch. The extension requires explicit opt-in by the
+user (in order to ensure no disruptions for existing setups) via netlink
+support using the new bonding parameter coupled_control. The default value
+for coupled_control is set to 1 so as to preserve existing behaviour.
 
-> +static int sch_bpf_enqueue(struct sk_buff *skb, struct Qdisc *sch,
-> +			   struct sk_buff **to_free)
-> +{
-> +	struct bpf_sched_data *q = qdisc_priv(sch);
-> +	unsigned int len = qdisc_pkt_len(skb);
-> +	struct bpf_qdisc_ctx ctx = {};
-> +	int res = NET_XMIT_SUCCESS;
-> +	struct sch_bpf_class *cl;
-> +	struct bpf_prog *enqueue;
-> +
-> +	enqueue = rcu_dereference(q->enqueue_prog.prog);
-> +	if (!enqueue)
-> +		return NET_XMIT_DROP;
-> +
-> +	ctx.skb = skb;
-> +	ctx.classid = sch->handle;
-> +	res = bpf_prog_run(enqueue, &ctx);
-> +	switch (res) {
-> +	case SCH_BPF_THROTTLE:
-> +		qdisc_watchdog_schedule_range_ns(&q->watchdog, ctx.expire, ctx.delta_ns);
-> +		qdisc_qstats_overlimit(sch);
-> +		fallthrough;
-> +	case SCH_BPF_QUEUED:
-> +		qdisc_qstats_backlog_inc(sch, skb);
-> +		return NET_XMIT_SUCCESS;
-> +	case SCH_BPF_BYPASS:
-> +		qdisc_qstats_drop(sch);
-> +		__qdisc_drop(skb, to_free);
-> +		return NET_XMIT_SUCCESS | __NET_XMIT_BYPASS;
-> +	case SCH_BPF_STOLEN:
-> +		__qdisc_drop(skb, to_free);
-> +		return NET_XMIT_SUCCESS | __NET_XMIT_STOLEN;
-> +	case SCH_BPF_CN:
-> +		return NET_XMIT_CN;
-> +	case SCH_BPF_PASS:
-> +		break;
-> +	default:
-> +		return qdisc_drop(skb, sch, to_free);
-> +	}
-> +
-> +	cl = sch_bpf_find(sch, ctx.classid);
-> +	if (!cl || !cl->qdisc)
-> +		return qdisc_drop(skb, sch, to_free);
-> +
-> +	res = qdisc_enqueue(skb, cl->qdisc, to_free);
-> +	if (res != NET_XMIT_SUCCESS) {
-> +		if (net_xmit_drop_count(res)) {
-> +			qdisc_qstats_drop(sch);
-> +			cl->drops++;
-> +		}
-> +		return res;
-> +	}
-> +
-> +	sch->qstats.backlog += len;
-> +	sch->q.qlen++;
-> +	return res;
-> +}
-> +
-> +DEFINE_PER_CPU(struct sk_buff*, bpf_skb_dequeue);
-> +
-> +static struct sk_buff *sch_bpf_dequeue(struct Qdisc *sch)
-> +{
-> +	struct bpf_sched_data *q = qdisc_priv(sch);
-> +	struct bpf_qdisc_ctx ctx = {};
-> +	struct sk_buff *skb = NULL;
-> +	struct bpf_prog *dequeue;
-> +	struct sch_bpf_class *cl;
-> +	int res;
-> +
-> +	dequeue = rcu_dereference(q->dequeue_prog.prog);
-> +	if (!dequeue)
-> +		return NULL;
-> +
-> +	__this_cpu_write(bpf_skb_dequeue, NULL);
-> +	ctx.classid = sch->handle;
-> +	res = bpf_prog_run(dequeue, &ctx);
-> +	switch (res) {
-> +	case SCH_BPF_DEQUEUED:
-> +		skb = __this_cpu_read(bpf_skb_dequeue);
-> +		qdisc_bstats_update(sch, skb);
-> +		qdisc_qstats_backlog_dec(sch, skb);
-> +		break;
-> +	case SCH_BPF_THROTTLE:
-> +		qdisc_watchdog_schedule_range_ns(&q->watchdog, ctx.expire, ctx.delta_ns);
-> +		qdisc_qstats_overlimit(sch);
-> +		cl = sch_bpf_find(sch, ctx.classid);
-> +		if (cl)
-> +			cl->overlimits++;
-> +		return NULL;
-> +	case SCH_BPF_PASS:
-> +		cl = sch_bpf_find(sch, ctx.classid);
-> +		if (!cl || !cl->qdisc)
-> +			return NULL;
-> +		skb = qdisc_dequeue_peeked(cl->qdisc);
-> +		if (skb) {
-> +			bstats_update(&cl->bstats, skb);
-> +			qdisc_bstats_update(sch, skb);
-> +			qdisc_qstats_backlog_dec(sch, skb);
-> +			sch->q.qlen--;
-> +		}
-> +		break;
-> +	}
-> +
-> +	return skb;
-> +}
+Signed-off-by: Aahil Awatramani <aahila@google.com>
 
-[ ... ]
+v5:
+  Merge documentation patch with changes patch
+  Add version history in comment description
+v4:
+  Remove inline references from c source files
+v3:
+  Edited commit description
+  Edited documentation description
+  Changed function names
+  Only allow coupled_control change when the bond is down
+v2:
+  Removed sysfs changes
+  Added documentation for new paramater
+  Renamed parameter to coupled_control
+  Update bond_set_slave_inactive_flags() with a 8023ad check
 
-> +static int sch_bpf_init(struct Qdisc *sch, struct nlattr *opt,
-> +			struct netlink_ext_ack *extack)
-> +{
-> +	struct bpf_sched_data *q = qdisc_priv(sch);
-> +	int err;
-> +
-> +	qdisc_watchdog_init(&q->watchdog, sch);
-> +	if (opt) {
-> +		err = sch_bpf_change(sch, opt, extack);
-> +		if (err)
-> +			return err;
-> +	}
-> +
-> +	err = tcf_block_get(&q->block, &q->filter_list, sch, extack);
-> +	if (err)
-> +		return err;
-> +
-> +	return qdisc_class_hash_init(&q->clhash);
-> +}
-> +
-> +static void sch_bpf_reset(struct Qdisc *sch)
-> +{
-> +	struct bpf_sched_data *q = qdisc_priv(sch);
-> +	struct sch_bpf_class *cl;
-> +	unsigned int i;
-> +
-> +	for (i = 0; i < q->clhash.hashsize; i++) {
-> +		hlist_for_each_entry(cl, &q->clhash.hash[i], common.hnode) {
-> +			if (cl->qdisc)
-> +				qdisc_reset(cl->qdisc);
-> +		}
-> +	}
-> +
-> +	qdisc_watchdog_cancel(&q->watchdog);
-> +}
-> +
+---
+ Documentation/networking/bonding.rst |  12 ++
+ drivers/net/bonding/bond_3ad.c       | 157 +++++++++++++++++++++++++--
+ drivers/net/bonding/bond_main.c      |   1 +
+ drivers/net/bonding/bond_netlink.c   |  16 +++
+ drivers/net/bonding/bond_options.c   |  28 ++++-
+ include/net/bond_3ad.h               |   2 +
+ include/net/bond_options.h           |   1 +
+ include/net/bonding.h                |  23 ++++
+ include/uapi/linux/if_link.h         |   1 +
+ tools/include/uapi/linux/if_link.h   |   1 +
+ 10 files changed, 234 insertions(+), 8 deletions(-)
 
-[ ... ]
-
-> +static const struct Qdisc_class_ops sch_bpf_class_ops = {
-> +	.graft		=	sch_bpf_graft,
-> +	.leaf		=	sch_bpf_leaf,
-> +	.find		=	sch_bpf_search,
-> +	.change		=	sch_bpf_change_class,
-> +	.delete		=	sch_bpf_delete,
-> +	.tcf_block	=	sch_bpf_tcf_block,
-> +	.bind_tcf	=	sch_bpf_bind,
-> +	.unbind_tcf	=	sch_bpf_unbind,
-> +	.dump		=	sch_bpf_dump_class,
-> +	.dump_stats	=	sch_bpf_dump_class_stats,
-> +	.walk		=	sch_bpf_walk,
-> +};
-> +
-> +static struct Qdisc_ops sch_bpf_qdisc_ops __read_mostly = {
-> +	.cl_ops		=	&sch_bpf_class_ops,
-> +	.id		=	"bpf",
-> +	.priv_size	=	sizeof(struct bpf_sched_data),
-> +	.enqueue	=	sch_bpf_enqueue,
-> +	.dequeue	=	sch_bpf_dequeue,
-
-I looked at the high level of the patchset. The major ops that it wants to be 
-programmable in bpf is the ".enqueue" and ".dequeue" (+ ".init" and ".reset" in 
-patch 4 and patch 5).
-
-This patch adds a new prog type BPF_PROG_TYPE_QDISC, four attach types (each for 
-".enqueue", ".dequeue", ".init", and ".reset"), and a new "bpf_qdisc_ctx" in the 
-uapi. It is no long an acceptable way to add new bpf extension.
-
-Can the ".enqueue", ".dequeue", ".init", and ".reset" be completely implemented 
-in bpf (with the help of new kfuncs if needed)? Then a struct_ops for Qdisc_ops 
-can be created. The bpf Qdisc_ops can be loaded through the existing struct_ops api.
-
-If other ops (like ".dump", ".dump_stats"...) do not have good use case to be 
-programmable in bpf, it can stay with the kernel implementation for now and only 
-allows the userspace to load the a bpf Qdisc_ops with .equeue/dequeue/init/reset 
-implemented.
-
-You mentioned in the cover letter that:
-"Current struct_ops attachment model does not seem to support replacing only 
-functions of a specific instance of a module, but I might be wrong."
-
-I assumed you meant allow bpf to replace only "some" ops of the Qdisc_ops? Yes, 
-it can be done through the struct_ops's ".init_member". Take a look at 
-bpf_tcp_ca_init_member. The kernel can assign the kernel implementation for 
-".dump" (for example) when loading the bpf Qdisc_ops.
-
-> +	.peek		=	qdisc_peek_dequeued,
-> +	.init		=	sch_bpf_init,
-> +	.reset		=	sch_bpf_reset, > +	.destroy	=	sch_bpf_destroy,
-> +	.change		=	sch_bpf_change,
-> +	.dump		=	sch_bpf_dump,
-> +	.dump_stats	=	sch_bpf_dump_stats,
-> +	.owner		=	THIS_MODULE,
-> +};
-> +
-> +static int __init sch_bpf_mod_init(void)
-> +{
-> +	return register_qdisc(&sch_bpf_qdisc_ops);
-> +}
-> +
-> +static void __exit sch_bpf_mod_exit(void)
-> +{
-> +	unregister_qdisc(&sch_bpf_qdisc_ops);
-> +}
+diff --git a/Documentation/networking/bonding.rst b/Documentation/networking/bonding.rst
+index f7a73421eb76..e774b48de9f5 100644
+--- a/Documentation/networking/bonding.rst
++++ b/Documentation/networking/bonding.rst
+@@ -444,6 +444,18 @@ arp_missed_max
+ 
+ 	The default value is 2, and the allowable range is 1 - 255.
+ 
++coupled_control
++
++    Specifies whether the LACP state machine's MUX in the 802.3ad mode
++    should have separate Collecting and Distributing states.
++
++    This is by implementing the independent control state machine per
++    IEEE 802.1AX-2008 5.4.15 in addition to the existing coupled control
++    state machine.
++
++    The default value is 1. This setting does not separate the Collecting
++    and Distributing states, maintaining the bond in coupled control.
++
+ downdelay
+ 
+ 	Specifies the time, in milliseconds, to wait before disabling
+diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
+index c99ffe6c683a..f2942e8c6c91 100644
+--- a/drivers/net/bonding/bond_3ad.c
++++ b/drivers/net/bonding/bond_3ad.c
+@@ -106,6 +106,9 @@ static void ad_agg_selection_logic(struct aggregator *aggregator,
+ static void ad_clear_agg(struct aggregator *aggregator);
+ static void ad_initialize_agg(struct aggregator *aggregator);
+ static void ad_initialize_port(struct port *port, int lacp_fast);
++static void ad_enable_collecting(struct port *port);
++static void ad_disable_distributing(struct port *port,
++				    bool *update_slave_arr);
+ static void ad_enable_collecting_distributing(struct port *port,
+ 					      bool *update_slave_arr);
+ static void ad_disable_collecting_distributing(struct port *port,
+@@ -171,9 +174,38 @@ static inline int __agg_has_partner(struct aggregator *agg)
+ 	return !is_zero_ether_addr(agg->partner_system.mac_addr_value);
+ }
+ 
++/**
++ * __disable_distributing_port - disable the port's slave for distributing.
++ * Port will still be able to collect.
++ * @port: the port we're looking at
++ *
++ * This will disable only distributing on the port's slave.
++ */
++static void __disable_distributing_port(struct port *port)
++{
++	bond_set_slave_tx_disabled_flags(port->slave, BOND_SLAVE_NOTIFY_LATER);
++}
++
++/**
++ * __enable_collecting_port - enable the port's slave for collecting,
++ * if it's up
++ * @port: the port we're looking at
++ *
++ * This will enable only collecting on the port's slave.
++ */
++static void __enable_collecting_port(struct port *port)
++{
++	struct slave *slave = port->slave;
++
++	if (slave->link == BOND_LINK_UP && bond_slave_is_up(slave))
++		bond_set_slave_rx_enabled_flags(slave, BOND_SLAVE_NOTIFY_LATER);
++}
++
+ /**
+  * __disable_port - disable the port's slave
+  * @port: the port we're looking at
++ *
++ * This will disable both collecting and distributing on the port's slave.
+  */
+ static inline void __disable_port(struct port *port)
+ {
+@@ -183,6 +215,8 @@ static inline void __disable_port(struct port *port)
+ /**
+  * __enable_port - enable the port's slave, if it's up
+  * @port: the port we're looking at
++ *
++ * This will enable both collecting and distributing on the port's slave.
+  */
+ static inline void __enable_port(struct port *port)
+ {
+@@ -193,10 +227,27 @@ static inline void __enable_port(struct port *port)
+ }
+ 
+ /**
+- * __port_is_enabled - check if the port's slave is in active state
++ * __port_move_to_attached_state - check if port should transition back to attached
++ * state.
++ * @port: the port we're looking at
++ */
++static bool __port_move_to_attached_state(struct port *port)
++{
++	if (!(port->sm_vars & AD_PORT_SELECTED) ||
++	    (port->sm_vars & AD_PORT_STANDBY) ||
++	    !(port->partner_oper.port_state & LACP_STATE_SYNCHRONIZATION) ||
++	    !(port->actor_oper_port_state & LACP_STATE_SYNCHRONIZATION))
++		port->sm_mux_state = AD_MUX_ATTACHED;
++
++	return port->sm_mux_state == AD_MUX_ATTACHED;
++}
++
++/**
++ * __port_is_collecting_distributing - check if the port's slave is in the
++ * combined collecting/distributing state
+  * @port: the port we're looking at
+  */
+-static inline int __port_is_enabled(struct port *port)
++static int __port_is_collecting_distributing(struct port *port)
+ {
+ 	return bond_is_active_slave(port->slave);
+ }
+@@ -942,6 +993,7 @@ static int ad_marker_send(struct port *port, struct bond_marker *marker)
+  */
+ static void ad_mux_machine(struct port *port, bool *update_slave_arr)
+ {
++	struct bonding *bond = __get_bond_by_port(port);
+ 	mux_states_t last_state;
+ 
+ 	/* keep current State Machine state to compare later if it was
+@@ -999,9 +1051,13 @@ static void ad_mux_machine(struct port *port, bool *update_slave_arr)
+ 			if ((port->sm_vars & AD_PORT_SELECTED) &&
+ 			    (port->partner_oper.port_state & LACP_STATE_SYNCHRONIZATION) &&
+ 			    !__check_agg_selection_timer(port)) {
+-				if (port->aggregator->is_active)
+-					port->sm_mux_state =
+-					    AD_MUX_COLLECTING_DISTRIBUTING;
++				if (port->aggregator->is_active) {
++					int state = AD_MUX_COLLECTING_DISTRIBUTING;
++
++					if (!bond->params.coupled_control)
++						state = AD_MUX_COLLECTING;
++					port->sm_mux_state = state;
++				}
+ 			} else if (!(port->sm_vars & AD_PORT_SELECTED) ||
+ 				   (port->sm_vars & AD_PORT_STANDBY)) {
+ 				/* if UNSELECTED or STANDBY */
+@@ -1019,11 +1075,45 @@ static void ad_mux_machine(struct port *port, bool *update_slave_arr)
+ 			}
+ 			break;
+ 		case AD_MUX_COLLECTING_DISTRIBUTING:
++			if (!__port_move_to_attached_state(port)) {
++				/* if port state hasn't changed make
++				 * sure that a collecting distributing
++				 * port in an active aggregator is enabled
++				 */
++				if (port->aggregator->is_active &&
++				    !__port_is_collecting_distributing(port)) {
++					__enable_port(port);
++					*update_slave_arr = true;
++				}
++			}
++			break;
++		case AD_MUX_COLLECTING:
++			if (!__port_move_to_attached_state(port)) {
++				if ((port->sm_vars & AD_PORT_SELECTED) &&
++				    (port->partner_oper.port_state & LACP_STATE_SYNCHRONIZATION) &&
++				    (port->partner_oper.port_state & LACP_STATE_COLLECTING)) {
++					port->sm_mux_state = AD_MUX_DISTRIBUTING;
++				} else {
++					/* If port state hasn't changed, make sure that a collecting
++					 * port is enabled for an active aggregator.
++					 */
++					struct slave *slave = port->slave;
++
++					if (port->aggregator->is_active &&
++					    bond_is_slave_rx_disabled(slave)) {
++						ad_enable_collecting(port);
++						*update_slave_arr = true;
++					}
++				}
++			}
++			break;
++		case AD_MUX_DISTRIBUTING:
+ 			if (!(port->sm_vars & AD_PORT_SELECTED) ||
+ 			    (port->sm_vars & AD_PORT_STANDBY) ||
++			    !(port->partner_oper.port_state & LACP_STATE_COLLECTING) ||
+ 			    !(port->partner_oper.port_state & LACP_STATE_SYNCHRONIZATION) ||
+ 			    !(port->actor_oper_port_state & LACP_STATE_SYNCHRONIZATION)) {
+-				port->sm_mux_state = AD_MUX_ATTACHED;
++				port->sm_mux_state = AD_MUX_COLLECTING;
+ 			} else {
+ 				/* if port state hasn't changed make
+ 				 * sure that a collecting distributing
+@@ -1031,7 +1121,7 @@ static void ad_mux_machine(struct port *port, bool *update_slave_arr)
+ 				 */
+ 				if (port->aggregator &&
+ 				    port->aggregator->is_active &&
+-				    !__port_is_enabled(port)) {
++				    !__port_is_collecting_distributing(port)) {
+ 					__enable_port(port);
+ 					*update_slave_arr = true;
+ 				}
+@@ -1082,6 +1172,20 @@ static void ad_mux_machine(struct port *port, bool *update_slave_arr)
+ 							  update_slave_arr);
+ 			port->ntt = true;
+ 			break;
++		case AD_MUX_COLLECTING:
++			port->actor_oper_port_state |= LACP_STATE_COLLECTING;
++			port->actor_oper_port_state &= ~LACP_STATE_DISTRIBUTING;
++			port->actor_oper_port_state |= LACP_STATE_SYNCHRONIZATION;
++			ad_enable_collecting(port);
++			ad_disable_distributing(port, update_slave_arr);
++			port->ntt = true;
++			break;
++		case AD_MUX_DISTRIBUTING:
++			port->actor_oper_port_state |= LACP_STATE_DISTRIBUTING;
++			port->actor_oper_port_state |= LACP_STATE_SYNCHRONIZATION;
++			ad_enable_collecting_distributing(port,
++							  update_slave_arr);
++			break;
+ 		default:
+ 			break;
+ 		}
+@@ -1906,6 +2010,45 @@ static void ad_initialize_port(struct port *port, int lacp_fast)
+ 	}
+ }
+ 
++/**
++ * ad_enable_collecting - enable a port's receive
++ * @port: the port we're looking at
++ *
++ * Enable @port if it's in an active aggregator
++ */
++static void ad_enable_collecting(struct port *port)
++{
++	if (port->aggregator->is_active) {
++		struct slave *slave = port->slave;
++
++		slave_dbg(slave->bond->dev, slave->dev,
++			  "Enabling collecting on port %d (LAG %d)\n",
++			  port->actor_port_number,
++			  port->aggregator->aggregator_identifier);
++		__enable_collecting_port(port);
++	}
++}
++
++/**
++ * ad_disable_distributing - disable a port's transmit
++ * @port: the port we're looking at
++ * @update_slave_arr: Does slave array need update?
++ */
++static void ad_disable_distributing(struct port *port, bool *update_slave_arr)
++{
++	if (port->aggregator &&
++	    !MAC_ADDRESS_EQUAL(&port->aggregator->partner_system,
++			       &(null_mac_addr))) {
++		slave_dbg(port->slave->bond->dev, port->slave->dev,
++			  "Disabling distributing on port %d (LAG %d)\n",
++			  port->actor_port_number,
++			  port->aggregator->aggregator_identifier);
++		__disable_distributing_port(port);
++		/* Slave array needs an update */
++		*update_slave_arr = true;
++	}
++}
++
+ /**
+  * ad_enable_collecting_distributing - enable a port's transmit/receive
+  * @port: the port we're looking at
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 8e6cc0e133b7..30f4b0ff01c0 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -6331,6 +6331,7 @@ static int __init bond_check_params(struct bond_params *params)
+ 	params->ad_actor_sys_prio = ad_actor_sys_prio;
+ 	eth_zero_addr(params->ad_actor_system);
+ 	params->ad_user_port_key = ad_user_port_key;
++	params->coupled_control = 1;
+ 	if (packets_per_slave > 0) {
+ 		params->reciprocal_packets_per_slave =
+ 			reciprocal_value(packets_per_slave);
+diff --git a/drivers/net/bonding/bond_netlink.c b/drivers/net/bonding/bond_netlink.c
+index cfa74cf8bb1a..29b4c3d1b9b6 100644
+--- a/drivers/net/bonding/bond_netlink.c
++++ b/drivers/net/bonding/bond_netlink.c
+@@ -122,6 +122,7 @@ static const struct nla_policy bond_policy[IFLA_BOND_MAX + 1] = {
+ 	[IFLA_BOND_PEER_NOTIF_DELAY]    = NLA_POLICY_FULL_RANGE(NLA_U32, &delay_range),
+ 	[IFLA_BOND_MISSED_MAX]		= { .type = NLA_U8 },
+ 	[IFLA_BOND_NS_IP6_TARGET]	= { .type = NLA_NESTED },
++	[IFLA_BOND_COUPLED_CONTROL]	= { .type = NLA_U8 },
+ };
+ 
+ static const struct nla_policy bond_slave_policy[IFLA_BOND_SLAVE_MAX + 1] = {
+@@ -549,6 +550,16 @@ static int bond_changelink(struct net_device *bond_dev, struct nlattr *tb[],
+ 			return err;
+ 	}
+ 
++	if (data[IFLA_BOND_COUPLED_CONTROL]) {
++		int coupled_control = nla_get_u8(data[IFLA_BOND_COUPLED_CONTROL]);
++
++		bond_opt_initval(&newval, coupled_control);
++		err = __bond_opt_set(bond, BOND_OPT_COUPLED_CONTROL, &newval,
++				     data[IFLA_BOND_COUPLED_CONTROL], extack);
++		if (err)
++			return err;
++	}
++
+ 	return 0;
+ }
+ 
+@@ -615,6 +626,7 @@ static size_t bond_get_size(const struct net_device *bond_dev)
+ 						/* IFLA_BOND_NS_IP6_TARGET */
+ 		nla_total_size(sizeof(struct nlattr)) +
+ 		nla_total_size(sizeof(struct in6_addr)) * BOND_MAX_NS_TARGETS +
++		nla_total_size(sizeof(u8)) +	/* IFLA_BOND_COUPLED_CONTROL */
+ 		0;
+ }
+ 
+@@ -774,6 +786,10 @@ static int bond_fill_info(struct sk_buff *skb,
+ 		       bond->params.missed_max))
+ 		goto nla_put_failure;
+ 
++	if (nla_put_u8(skb, IFLA_BOND_COUPLED_CONTROL,
++		       bond->params.coupled_control))
++		goto nla_put_failure;
++
+ 	if (BOND_MODE(bond) == BOND_MODE_8023AD) {
+ 		struct ad_info info;
+ 
+diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond_options.c
+index f3f27f0bd2a6..4cdbc7e084f4 100644
+--- a/drivers/net/bonding/bond_options.c
++++ b/drivers/net/bonding/bond_options.c
+@@ -84,7 +84,8 @@ static int bond_option_ad_user_port_key_set(struct bonding *bond,
+ 					    const struct bond_opt_value *newval);
+ static int bond_option_missed_max_set(struct bonding *bond,
+ 				      const struct bond_opt_value *newval);
+-
++static int bond_option_coupled_control_set(struct bonding *bond,
++					   const struct bond_opt_value *newval);
+ 
+ static const struct bond_opt_value bond_mode_tbl[] = {
+ 	{ "balance-rr",    BOND_MODE_ROUNDROBIN,   BOND_VALFLAG_DEFAULT},
+@@ -232,6 +233,12 @@ static const struct bond_opt_value bond_missed_max_tbl[] = {
+ 	{ NULL,		-1,	0},
+ };
+ 
++static const struct bond_opt_value bond_coupled_control_tbl[] = {
++	{ "on",  1,  BOND_VALFLAG_DEFAULT},
++	{ "off", 0,  0},
++	{ NULL,  -1, 0},
++};
++
+ static const struct bond_option bond_opts[BOND_OPT_LAST] = {
+ 	[BOND_OPT_MODE] = {
+ 		.id = BOND_OPT_MODE,
+@@ -496,6 +503,15 @@ static const struct bond_option bond_opts[BOND_OPT_LAST] = {
+ 		.desc = "Delay between each peer notification on failover event, in milliseconds",
+ 		.values = bond_peer_notif_delay_tbl,
+ 		.set = bond_option_peer_notif_delay_set
++	},
++	[BOND_OPT_COUPLED_CONTROL] = {
++		.id = BOND_OPT_COUPLED_CONTROL,
++		.name = "coupled_control",
++		.desc = "Opt into using coupled control MUX for LACP states",
++		.unsuppmodes = BOND_MODE_ALL_EX(BIT(BOND_MODE_8023AD)),
++		.flags = BOND_OPTFLAG_IFDOWN,
++		.values = bond_coupled_control_tbl,
++		.set = bond_option_coupled_control_set,
+ 	}
+ };
+ 
+@@ -1692,3 +1708,13 @@ static int bond_option_ad_user_port_key_set(struct bonding *bond,
+ 	bond->params.ad_user_port_key = newval->value;
+ 	return 0;
+ }
++
++static int bond_option_coupled_control_set(struct bonding *bond,
++					   const struct bond_opt_value *newval)
++{
++	netdev_info(bond->dev, "Setting coupled_control to %s (%llu)\n",
++		    newval->string, newval->value);
++
++	bond->params.coupled_control = newval->value;
++	return 0;
++}
+diff --git a/include/net/bond_3ad.h b/include/net/bond_3ad.h
+index c5e57c6bd873..9ce5ac2bfbad 100644
+--- a/include/net/bond_3ad.h
++++ b/include/net/bond_3ad.h
+@@ -54,6 +54,8 @@ typedef enum {
+ 	AD_MUX_DETACHED,	/* mux machine */
+ 	AD_MUX_WAITING,		/* mux machine */
+ 	AD_MUX_ATTACHED,	/* mux machine */
++	AD_MUX_COLLECTING,	/* mux machine */
++	AD_MUX_DISTRIBUTING,	/* mux machine */
+ 	AD_MUX_COLLECTING_DISTRIBUTING	/* mux machine */
+ } mux_states_t;
+ 
+diff --git a/include/net/bond_options.h b/include/net/bond_options.h
+index 69292ecc0325..473a0147769e 100644
+--- a/include/net/bond_options.h
++++ b/include/net/bond_options.h
+@@ -76,6 +76,7 @@ enum {
+ 	BOND_OPT_MISSED_MAX,
+ 	BOND_OPT_NS_TARGETS,
+ 	BOND_OPT_PRIO,
++	BOND_OPT_COUPLED_CONTROL,
+ 	BOND_OPT_LAST
+ };
+ 
+diff --git a/include/net/bonding.h b/include/net/bonding.h
+index 5b8b1b644a2d..b61fb1aa3a56 100644
+--- a/include/net/bonding.h
++++ b/include/net/bonding.h
+@@ -148,6 +148,7 @@ struct bond_params {
+ #if IS_ENABLED(CONFIG_IPV6)
+ 	struct in6_addr ns_targets[BOND_MAX_NS_TARGETS];
+ #endif
++	int coupled_control;
+ 
+ 	/* 2 bytes of padding : see ether_addr_equal_64bits() */
+ 	u8 ad_actor_system[ETH_ALEN + 2];
+@@ -167,6 +168,7 @@ struct slave {
+ 	u8     backup:1,   /* indicates backup slave. Value corresponds with
+ 			      BOND_STATE_ACTIVE and BOND_STATE_BACKUP */
+ 	       inactive:1, /* indicates inactive slave */
++	       rx_disabled:1, /* indicates whether slave's Rx is disabled */
+ 	       should_notify:1, /* indicates whether the state changed */
+ 	       should_notify_link:1; /* indicates whether the link changed */
+ 	u8     duplex;
+@@ -568,6 +570,14 @@ static inline void bond_set_slave_inactive_flags(struct slave *slave,
+ 		bond_set_slave_state(slave, BOND_STATE_BACKUP, notify);
+ 	if (!slave->bond->params.all_slaves_active)
+ 		slave->inactive = 1;
++	if (BOND_MODE(slave->bond) == BOND_MODE_8023AD)
++		slave->rx_disabled = 1;
++}
++
++static inline void bond_set_slave_tx_disabled_flags(struct slave *slave,
++						 bool notify)
++{
++	bond_set_slave_state(slave, BOND_STATE_BACKUP, notify);
+ }
+ 
+ static inline void bond_set_slave_active_flags(struct slave *slave,
+@@ -575,6 +585,14 @@ static inline void bond_set_slave_active_flags(struct slave *slave,
+ {
+ 	bond_set_slave_state(slave, BOND_STATE_ACTIVE, notify);
+ 	slave->inactive = 0;
++	if (BOND_MODE(slave->bond) == BOND_MODE_8023AD)
++		slave->rx_disabled = 0;
++}
++
++static inline void bond_set_slave_rx_enabled_flags(struct slave *slave,
++					       bool notify)
++{
++	slave->rx_disabled = 0;
+ }
+ 
+ static inline bool bond_is_slave_inactive(struct slave *slave)
+@@ -582,6 +600,11 @@ static inline bool bond_is_slave_inactive(struct slave *slave)
+ 	return slave->inactive;
+ }
+ 
++static inline bool bond_is_slave_rx_disabled(struct slave *slave)
++{
++	return slave->rx_disabled;
++}
++
+ static inline void bond_propose_link_state(struct slave *slave, int state)
+ {
+ 	slave->link_new_state = state;
+diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
+index 29ff80da2775..7a54fcff2eec 100644
+--- a/include/uapi/linux/if_link.h
++++ b/include/uapi/linux/if_link.h
+@@ -976,6 +976,7 @@ enum {
+ 	IFLA_BOND_AD_LACP_ACTIVE,
+ 	IFLA_BOND_MISSED_MAX,
+ 	IFLA_BOND_NS_IP6_TARGET,
++	IFLA_BOND_COUPLED_CONTROL,
+ 	__IFLA_BOND_MAX,
+ };
+ 
+diff --git a/tools/include/uapi/linux/if_link.h b/tools/include/uapi/linux/if_link.h
+index a0aa05a28cf2..f0d71b2a3f1e 100644
+--- a/tools/include/uapi/linux/if_link.h
++++ b/tools/include/uapi/linux/if_link.h
+@@ -974,6 +974,7 @@ enum {
+ 	IFLA_BOND_AD_LACP_ACTIVE,
+ 	IFLA_BOND_MISSED_MAX,
+ 	IFLA_BOND_NS_IP6_TARGET,
++	IFLA_BOND_COUPLED_CONTROL,
+ 	__IFLA_BOND_MAX,
+ };
+ 
+-- 
+2.43.0.429.g432eaa2c6b-goog
 
 
