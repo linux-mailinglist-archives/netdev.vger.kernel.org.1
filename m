@@ -1,169 +1,103 @@
-Return-Path: <netdev+bounces-65171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65172-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85827839685
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 18:34:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 426A883968C
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 18:38:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36106290A0C
-	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:34:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E2E231F27DAD
+	for <lists+netdev@lfdr.de>; Tue, 23 Jan 2024 17:38:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13FD17FBD7;
-	Tue, 23 Jan 2024 17:34:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E52A980032;
+	Tue, 23 Jan 2024 17:38:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="CmJCg97v"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DyYPcmvn"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21EA27FBA1;
-	Tue, 23 Jan 2024 17:34:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6C0D7F7DC;
+	Tue, 23 Jan 2024 17:38:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706031287; cv=none; b=kHv0dCTP3rB15hFfMFS2d8umNZ9w7+ljzgaOtVGaG88Rt4x6yEG96t/IZMcjX/4NMC0x+e1reiMtH6ITLxcjsfbLdIQHVsgcRlu959vX/PXjbE5KjdtbHiMZomBln65VGOkv+kV5EiAe6QSqRvY3OmkAXs2AyPa7bHDfQFl+Bi0=
+	t=1706031515; cv=none; b=QJh9QMrmxX4hU3/0g3uWfijuru5ioWZp589MGZCGVHP9wOepKVBoT1Kv23pf4E9jV9Hvqn04e5TJBqpUYg0w6tgbiD1oozOK4nrbPEWbQ5e0afPBmyTOjcoInx13zOKuQk56dog6DA18lOZ4FlRwFbv41Vk23OH2ky459AdG1nU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706031287; c=relaxed/simple;
-	bh=N5ce6+W/71r/j3ApCh6ji0TMDO8AABTut0B7J4mjWDI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WUiZCU4SJrro5Uxxz59hyescJMMg3nCsv8X2OzYlfZEslOHU/G/I2VP5qLy5Iru22D1OMe7dIUFEXlVTKfs052f+jHp4bL6y2YZaJGti4AHOwOs8FYWeR1f6uBNJYRPJAPcihG7bM0nFMoyZz/3p1gLlSBCnux+FmVgZqsZ+/rs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=CmJCg97v; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 3156A87D51;
-	Tue, 23 Jan 2024 18:34:35 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1706031277;
-	bh=fJN0EmvuEyVdTweVqK3lb0gw7cCLtKgMHlV2F/gFt3M=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=CmJCg97v0Bi9szGyck9o3bXSXn8j9wyozrKZR8g1hvsgXIHOPaucmovR886UIt3We
-	 ZsNi4/Agq7n4iAkZ0XFa0UeAy4g9gqACVfjc5tmWRzv4KDA+eHKcVjkTV/aabbIheP
-	 1K51d14poDXzQvo31JRUgA8WGE788CoqFkfyJSjrq+9CmV9y7QOV3tGTfbZ6Q95Khc
-	 oNI2dxY0YArF0ClB80BX7QoOeBKU3jnVT+X4QevhSttYuon1BvRTXbsTD5Cn64ZiPH
-	 Azf1ugYIW3QfywmozWRf50oQ67/Xrzq/w1EAGD5MDCOSUlAZJ59z+74Tie7RXrOkYk
-	 xbL4y8Y8FtvBw==
-Message-ID: <493e9362-bed1-4257-92d5-d1f87e047376@denx.de>
-Date: Tue, 23 Jan 2024 18:34:28 +0100
+	s=arc-20240116; t=1706031515; c=relaxed/simple;
+	bh=bIsJdjJZWEU6xNDyk8cHPXzvvfDLZ1YMX9qL8aAZnjU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IX8aEMwjT4k64dIM0J1CI4sQEmE+awlf9zD7jYgKQdoOTJQWcfPmLN+I6eVGJ6DBiTW+fIWyVWkmtzZxxum5X0USJP40g4jSQH6L/Q5RfbAl6w2/+jWm+GeJFhLNtsHYB0Q6xs2dNLE5Ish6FW7LOgTKJ3lZK0xP0UUaBDmGycg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DyYPcmvn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1A06C433F1;
+	Tue, 23 Jan 2024 17:38:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706031515;
+	bh=bIsJdjJZWEU6xNDyk8cHPXzvvfDLZ1YMX9qL8aAZnjU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DyYPcmvn3IFYjPPU/IYBz+m0xuoa/F4Fpop96QN9pWBZVFa218EgM3R6xIRG3cTRo
+	 q13f2Do++Oq+xWer+tA7Psgo3LGYGsLzlH98FUEVh0DuWzZaZNrGG2k/+g6Ke0E8Y6
+	 7sSzk6MyIuQRjs2HpmtdTHN124hyPW9837RZwGD12zGPR+f9fOorZB1u/0sPg4DPR/
+	 tIUiQYbDtOUMtNQRC4/GgSMDk4D+ZxLSpSRMCeLZ976EWiiJfbAg1vTDymPaXr/UrA
+	 +zhgKW6k+9ld18thNVrp74JAS1c2hBxtfXCPgsql6dTXvEVJD/B+bK/d+RGFNUrSwa
+	 nxnUdaZbqGWZw==
+Date: Tue, 23 Jan 2024 09:38:34 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Petr Machata <petrm@nvidia.com>, Shuah Khan <shuah@kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "netdev-driver-reviewers@vger.kernel.org"
+ <netdev-driver-reviewers@vger.kernel.org>,
+ <linux-kselftest@vger.kernel.org>
+Subject: Re: [ANN] net-next is OPEN
+Message-ID: <20240123093834.23ea172a@kernel.org>
+In-Reply-To: <87y1cgm040.fsf@nvidia.com>
+References: <20240122091612.3f1a3e3d@kernel.org>
+	<87fryonx35.fsf@nvidia.com>
+	<20240123073412.063bc08e@kernel.org>
+	<87y1cgm040.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] [RFC] net: phy: broadcom: Add DT LED configuration
- support
-Content-Language: en-US
-To: Florian Fainelli <florian.fainelli@broadcom.com>, netdev@vger.kernel.org,
- Christian Marangi <ansuelsmth@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Conor Dooley <conor+dt@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Heiner Kallweit <hkallweit1@gmail.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Lee Jones <lee@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Pavel Machek <pavel@ucw.cz>, =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?=
- <rafal@milecki.pl>, Rob Herring <robh+dt@kernel.org>,
- Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
- linux-leds@vger.kernel.org
-References: <20240122204650.344794-1-marex@denx.de>
- <1c57c364-dbe8-42f8-836c-52fad76a3f48@broadcom.com>
-From: Marek Vasut <marex@denx.de>
-In-Reply-To: <1c57c364-dbe8-42f8-836c-52fad76a3f48@broadcom.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 1/22/24 23:34, Florian Fainelli wrote:
-> On 1/22/24 12:45, Marek Vasut wrote:
->> The BCM54213E and similar PHYs have extensive LED configuration
->> capabilities -- the PHY has two LEDs, either of the two LEDs can
->> be configured to 1 of 16 functions (speed, TX, RX, activity, on,
->> off, quality, ... multi-color) used to drive single-color LED.
->> The multi-color mode is special, it provides 16 more sub-modes
->> used to drive multi-color LED.
->>
->> The current configuration -- both LEDs configured as multi-color,
->> with both LEDs multi-color sub-mode set to link activity indicator,
->> is not suitable for all systems in which this PHY is used.
->>
->> Attempt to implement a way to describe the LED configuration in DT.
->>
->> Use Documentation/devicetree/bindings/net/ethernet-phy.yaml leds {}
->> subnode of the PHY DT node, describe both LEDs present on this PHY
->> as single LEDs within the leds {} subnode. Each described LED is a
->> subnode of its own, the description uses standard LED subsystem
->> bindings from Documentation/devicetree/bindings/leds/common.yaml .
->>
->> The DT description of the LED configuration can look for example
->> like this:
->>
->> "
->> ethernet-phy@1 {
->> ...
->>     leds {
->>         #address-cells = <1>;
->>         #size-cells = <0>;
->>
->>         led@0 {
->>             reg = <0>;
->>             function = LED_FUNCTION_ACTIVITY;
->>         };
->>
->>         led@1 {
->>             reg = <1>;
->>             function = LED_FUNCTION_SPEED_2;
->>         };
->>     };
->> };
->> "
->>
->> Implement parsing code in the broadcom PHY driver to detemine desired
->> LED configuration from DT. In case the leds {} subnode is present, the
->> parser code iterates over its subnodes and for each led@N subnode it
->> parses the following properties:
->>
->> - reg - LED ID, either 0 or 1, used to identify the LED on the PHY
->> - function - LED single-color function (speed, TX, RX, multi-color...),
->>               uses LED subsystem LED_FUNCTION_* string. The parser in
->>          the driver maps this to register setting.
->> - function-enumerator - In case function is set to "multi-color",
->>                          the multi-color function number. The parser
->>             in the driver uses this value directly for
->>             the multi-color configuration register.
->>
->> Once the properties are parsed, the LED configuration registers of the
->> PHY are programmed.
->>
->> The current list of LED subsystem LED_FUNCTION_* does not cover the
->> entire list of possible single-color LED functions of this PHY, add
->> example extension for "link speed 1" and "link speed 2" setting into
->> the leds/common.h header file.
->>
->> The function-enumerator should probably not be a number, but maybe
->> some sort of macro specific to this PHY ? I would like to avoid new
->> broadcom PHY specific DT properties.
+On Tue, 23 Jan 2024 18:04:19 +0100 Petr Machata wrote:
+> > Unless I'm doing it wrong and the sub-directories are supposed to
+> > inherit the parent directory's config? So net/forwarding/ should
+> > be built with net/'s config? I could not find the info in docs,
+> > does anyone know?  
 > 
-> The parsing should definitively not be in the driver code, the driver 
-> should only be providing a mapping between the function and enumerator 
-> and a method to set those. Christian has been working on Ethernet PHY 
-> LEDs for a while now, so he would be in a better position to comment 
-> about how to about that.
+> I don't think they are, net/config defines CONFIG_VXLAN, but then the
+> vxlan tests still complain about unknown device type. Though maybe
+> there's another device type that it's missing...
 > 
-> The LED functions and register interface is actually quite stable across 
-> Ethernet PHYs from Broadcom so this code, however it looks like in the 
-> future should be moved to bcm-phy-lib.[ch]. If and where they are 
-> differences we can account for them in the library or by having each PHY 
-> driver entry provide a bcm54xx_* wrapper function that provides a table 
-> with the appropriate mapping.
+> What do I do to feed the config file to some build script to get a
+> kernel image to test? I can of course just do something like
+> cat config | xargs -n1 scripts/config -m, but I expect there's some
+> automation for it and I just can't find it.
 
-I very much agree. I also hope Rafal can chime in, I saw some openwrt 
-LED patches floating around recently.
+The CI script is based on virtme-ng. So it does this:
+
+# $target is net or net/forwarding or drivers/net/bonding etc.
+make mrproper
+vng -v -b -f tools/testing/selftests/$target
+# build the scripts
+make headers
+make -C tools/testing/selftests/$target
+
+vng -v -r arch/x86/boot/bzImage --user root
+# inside the VM
+make -C tools/testing/selftests TARGETS=$target run_tests
+
+https://github.com/kuba-moo/nipa/blob/master/contest/remote/vmksft.py#L138
+
+You're right, it definitely does not "inherit" net's config when
+running forwarding/net. I can easily make it do so, but I'm not clear
+what the expectation from the kselftest subsystem is. Because if other
+testers (people testing stable, KernelCI etc. et.c) don't "inherit" we
+better fill in the config completely so that the tests pass for
+everyone.
 
