@@ -1,137 +1,166 @@
-Return-Path: <netdev+bounces-65430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65431-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A89A83A6D4
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 11:30:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3DF183A6D6
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 11:32:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6768EB27A8A
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:30:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7D4E1C215C3
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:32:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F364518E2E;
-	Wed, 24 Jan 2024 10:29:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB4E953BA;
+	Wed, 24 Jan 2024 10:32:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TaBuLENr"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gGFG5q7m"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEBE31AAA5;
-	Wed, 24 Jan 2024 10:29:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7C29610E
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 10:31:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706092189; cv=none; b=Lg2RNkBZXr92pxdkkQn6ZvEQPja6ou+cuQguVpp+5BmR4Tointd6ziN8teBvd4ddOteXw9wFllpBFGSG2gm/bx7ZmBYY2MWL19s1b1it+b4EO6dWYlde23XSl9qzOczug0dxzBoGQEi5t2WelQ3OWEz0h+zj3cDTb5Pn4ZshmXE=
+	t=1706092321; cv=none; b=keUXNr1ViWrmOUBWlIHzFtGzhcK0FzhC50j4zY8x2sYcApvPA7+HuAYRLEuTGt6UjHTA17B2AkTMTYZAed/lmppyhEBnm6U7Vp3rXOM6Fli11ojHUUtx/QhBKfMYomm1vu5NJtcxOcZokcHShfr8Quo/IDiqQUfdNPbZR1wfbUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706092189; c=relaxed/simple;
-	bh=vGeH8O/idxM0sz+OcKnGybYW1xtFoz1P9rDGvF9sN+0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cm8blExf1pVvOKWGsu2KW+1KvWsEffQ942ALjBt7Hls+PMHkeZ20CSSZ2aD8+QeMXV94bwO7T7oYlFm/P8dpHKC46rorNg7rLylLJI9L5gxREmBgcjt4p83CovrcUBsBg4KIjXvyhWjv/83TcqWRFWZd6O2pTD5GtlQU1uHiJ2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TaBuLENr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8C1EC433F1;
-	Wed, 24 Jan 2024 10:29:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706092189;
-	bh=vGeH8O/idxM0sz+OcKnGybYW1xtFoz1P9rDGvF9sN+0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TaBuLENrsiM5ybt4sZQDl1B4vwATyWMkK62EPQErt5aSPY3Gibg/JcV5Qt+tS12PR
-	 r4LaGlAr/6UDr0af4KDFvM3doYb9CZGjuUjGtTJxeiT7pzsQv5hCESEmWuOkF/lxMy
-	 mBNHYNlcbCoc4Fa/lWPA3+HzjCbcYnJ/rf/dFPxJ31ADgbm1ZwTX9bSt6A4YzTLn4g
-	 74WknBmtdbNsT8Ca/WiIno1FnafcSvf2e70lq7z60NKKZSV3cE9pO5qyCf4zm70DkM
-	 OymxETo4VEBdh6tyTcNaLpN015nsZhZOZsJZYjHwoUlBBmj//Zkw2RRQmLKW1Re3gg
-	 cov2HRISizh0Q==
-Date: Wed, 24 Jan 2024 10:29:44 +0000
-From: Simon Horman <horms@kernel.org>
-To: Michael Kelley <mhklinux@outlook.com>
-Cc: "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
-	"wei.liu@kernel.org" <wei.liu@kernel.org>,
-	"decui@microsoft.com" <decui@microsoft.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net 1/1] hv_netvsc: Calculate correct ring size when
- PAGE_SIZE is not 4 Kbytes
-Message-ID: <20240124102944.GW254773@kernel.org>
-References: <20240122162028.348885-1-mhklinux@outlook.com>
- <SN6PR02MB415753E9E46CCC4AC809220DD4742@SN6PR02MB4157.namprd02.prod.outlook.com>
+	s=arc-20240116; t=1706092321; c=relaxed/simple;
+	bh=GHdfNJvzHjTnwM7jDAPjCZrXhElTb8flfgKGEP3WWYI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lkBSGT5rvq9+BGQ4PVJJkW5m85bqJ2BEe7N1jHSbAHxZghOt/ByFXx4Ar4Vl4tJjbTEdW6LDwWRaC+gB1tXO8BMj5ZBrtFV5RcPyV0w9uGT2540gvd/kYJdmGvHj7Jy3wfh4ockfNL8WII9iyYiF1qa/r341Mnt1sNBwOBAqB00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gGFG5q7m; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706092318;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qCe/8IPSG8wVS4DFIRLbtt63xL0H0bGljwmkzhEiv+0=;
+	b=gGFG5q7mkVrDE4Qf0VcRCH+jAHqwJv7qO4tNg8LMnxUHEoI4xoYwlemxbj3i2fX9q8UoxD
+	GZcE4eK4WVx0lWggfFNWuMfPBWa+q8+Stbpy591N/sbHZDDjJCMg6ZZuaWGtxaN0le41tb
+	JfGON4+R/9ofwv1fpynrT18xgNo7T60=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-398-uG8Nun2MOO6_Y1l0g4LrgQ-1; Wed, 24 Jan 2024 05:31:56 -0500
+X-MC-Unique: uG8Nun2MOO6_Y1l0g4LrgQ-1
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2ccc7c01bd7so38755541fa.0
+        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 02:31:56 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706092315; x=1706697115;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qCe/8IPSG8wVS4DFIRLbtt63xL0H0bGljwmkzhEiv+0=;
+        b=jkIgWqWdGatJEOu43MjqIV4Sv/QlhM0MYALrt7rQPYbANCF7qABgGhOOrWsbGDDR/W
+         4MUTqtS9M9rC1jkDyoUtvc7t02KMsCspT6w/V0PjKqZ/4xaXiFjF1+VuPEDh+nUiK8Hs
+         o6LRpwmrDuD+ebVt6ilw32GLP7KkSjsPqHF9FkAZ+XvQZ4qkv9+lbS58xvI9YdBZBWaL
+         DRlSr0/bpSxF522tw+2VzQM5IjEEkxUXmLQ8FLAhnJp/1TAv/28+WbKvFDylTa4tUYEF
+         6a8fKPv+GjRAXbEgyASERi/a1454/L/Ys0g+Ka8+0rryruzcc98O/L4npF7QfKEN48CX
+         a+EA==
+X-Gm-Message-State: AOJu0YxjCKmS/EMKHyMa6gLSZ5zJ/AbgQPK56VdujCvObUPmynEe8i8/
+	Tn570miuBBYPqycwAFkMKts5xU/eA5/82JMC1b2BOBtchRfZmeRlpAPEKoK5MwUfDGsAaKM7y9j
+	bD51P+3X3CEvvSMzhDf7w2XXXi13tv1XKpN6sC50wrzGtV4FMSqodiwE1+OM9G8hkr9qkBn2Jau
+	M3ugsXBs+sd3hcpQQDcZlTsAAUGuh+
+X-Received: by 2002:a05:651c:2117:b0:2cd:f914:bba7 with SMTP id a23-20020a05651c211700b002cdf914bba7mr898809ljq.34.1706092315286;
+        Wed, 24 Jan 2024 02:31:55 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGTEUYC06RcgAw2TEdVmo8Mj1HI6Jfg1lu6NZRvL7qVAFiKge1AjNQTG9AkNhszwBBAdRhy0LAY1idh/+vhjpw=
+X-Received: by 2002:a05:651c:2117:b0:2cd:f914:bba7 with SMTP id
+ a23-20020a05651c211700b002cdf914bba7mr898798ljq.34.1706092315005; Wed, 24 Jan
+ 2024 02:31:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SN6PR02MB415753E9E46CCC4AC809220DD4742@SN6PR02MB4157.namprd02.prod.outlook.com>
+References: <20240123122736.9915-1-pctammela@mojatatu.com> <20240123122736.9915-3-pctammela@mojatatu.com>
+ <CAKa-r6s_DO1tfcZdsQNBCwjbE0ytJKnZWnvcKqTR+5epdNq4YQ@mail.gmail.com> <7d92788b-13c5-4f53-8b58-9b6ece26310d@mojatatu.com>
+In-Reply-To: <7d92788b-13c5-4f53-8b58-9b6ece26310d@mojatatu.com>
+From: Davide Caratti <dcaratti@redhat.com>
+Date: Wed, 24 Jan 2024 11:31:43 +0100
+Message-ID: <CAKa-r6vJPGQjE4YAtofa-=Pog8a_2Tu5mGcxLjhkoGCqu0JENQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/4] selftests: tc-testing: check if 'jq' is
+ available in taprio script
+To: Pedro Tammela <pctammela@mojatatu.com>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com, 
+	jiri@resnulli.us, shuah@kernel.org, kuba@kernel.org, vladimir.oltean@nxp.com, 
+	edumazet@google.com, pabeni@redhat.com, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 23, 2024 at 05:13:12PM +0000, Michael Kelley wrote:
-> From: Simon Horman @ 2024-01-22 20:49 UTC (permalink / raw)
-> > 
-> > On Mon, Jan 22, 2024 at 08:20:28AM -0800, mhkelley58@gmail.com wrote:
-> > > From: Michael Kelley <mhklinux@outlook.com>
-> > >
-> > > Current code in netvsc_drv_init() incorrectly assumes that PAGE_SIZE
-> > > is 4 Kbytes, which is wrong on ARM64 with 16K or 64K page size. As a
-> > > result, the default VMBus ring buffer size on ARM64 with 64K page size
-> > > is 8 Mbytes instead of the expected 512 Kbytes. While this doesn't break
-> > > anything, a typical VM with 8 vCPUs and 8 netvsc channels wastes 120
-> > > Mbytes (8 channels * 2 ring buffers/channel * 7.5 Mbytes/ring buffer).
-> > >
-> > > Unfortunately, the module parameter specifying the ring buffer size
-> > > is in units of 4 Kbyte pages. Ideally, it should be in units that
-> > > are independent of PAGE_SIZE, but backwards compatibility prevents
-> > > changing that now.
-> > >
-> > > Fix this by having netvsc_drv_init() hardcode 4096 instead of using
-> > > PAGE_SIZE when calculating the ring buffer size in bytes. Also
-> > > use the VMBUS_RING_SIZE macro to ensure proper alignment when running
-> > > with page size larger than 4K.
-> > >
-> > > Cc: <stable@vger.kernel.org> # 5.15.x
-> > > Signed-off-by: Michael Kelley <mhklinux@outlook.com>
-> > 
-> > Hi Michael,
-> > 
-> > As a bug fix this probably warrants a fixes tag.
-> > Perhaps this is appropriate?
-> > 
-> > Fixes: 450d7a4b7ace ("Staging: hv: ring parameter")
-> > 
-> 
-> [This email is cobbled together because for some reason I didn't directly
-> receive your original reply.  So it won't thread correctly with yours.]
-> 
-> I thought about a Fixes: tag, but the situation is a bit weird.  The original
-> code was correct enough at the time it was written in 2010 because Hyper-V
-> only ran on x86/x64 with a 4 Kbyte guest page size.   In fact, all the Hyper-V
-> guest code in the Linux kernel tended to assume a 4 Kbyte page size.
-> During 2019 and 2020, I and others made changes to remove this
-> assumption, in prep for running Hyper-V Linux guests on ARM64.  The
-> ARM64 support was finally enabled with commit 7aff79e297ee in August
-> 2021 for the 5.15 kernel.  Somehow we missed fixing this case in the netvsc
-> driver, and a similar case in the Hyper-V synthetic storage driver (see [1]).
-> 
-> As a result, there's no point in backporting this fix to anything earlier than
-> 5.15, because there's no ARM64 support for Hyper-V guests in earlier kernels.
-> So picking a "Fixes:" commit from back in 2010 doesn't seem helpful.  I could
-> see doing
-> 
-> Fixes: 7aff79e297ee ("Drivers: hv: Enable Hyper-V code to be built on ARM64")
-> 
-> But the connection between that commit and this fix isn't very evident, so I
-> opt'ed for just putting the 5.15.x notation on the Cc: stable@vger.kernel.org
-> line.  That said, I don't feel strongly about it.  I'm just trying to do what's best
-> for the stable branch maintainers and avoid generating backports to kernel
-> versions where it doesn't matter.
+hello Pedro, thanks for your answer!
 
-Thanks for the explanation.
+On Tue, Jan 23, 2024 at 5:47=E2=80=AFPM Pedro Tammela <pctammela@mojatatu.c=
+om> wrote:
+>
+> On 23/01/2024 10:17, Davide Caratti wrote:
+> > hi Pedro,
+> >
+> > On Tue, Jan 23, 2024 at 1:28=E2=80=AFPM Pedro Tammela <pctammela@mojata=
+tu.com> wrote:
+> >>
+> >> If 'jq' is not available the taprio tests that use this script will
+> >> run forever. Check if it exists before entering the while loop.
 
-FWIIW, I would probably have gone for the tag above (7aff79e297ee)
-as presumably that is when the bug started manifesting.
-But I appreciate that it isn't straightforward.
+[...]
+
+> > nit: what about returning $KSFT_SKIP (that is 4) if jq is not there?
+> > so the test does not fail.
+> > thanks!
+>
+> Since these scripts are run in the setup phase, it has a special treatmen=
+t.
+>
+> Take for example this run:
+> ok 1 ba39 - Add taprio Qdisc to multi-queue device (8 queues)
+> ok 2 9462 - Add taprio Qdisc with multiple sched-entry
+> ok 3 8d92 - Add taprio Qdisc with txtime-delay
+> ok 4 d092 - Delete taprio Qdisc with valid handle
+> ok 5 8471 - Show taprio class
+> ok 6 0a85 - Add taprio Qdisc to single-queue device
+> ok 7 3e1e - Add taprio Qdisc with an invalid cycle-time
+> ok 8 39b4 - Reject grafting taprio as child qdisc of software taprio #
+> skipped - "-----> prepare stage" did not complete successfully
+>
+> ok 9 e8a1 - Reject grafting taprio as child qdisc of offloaded taprio #
+> skipped - skipped - previous setup failed 9 39b4
+
+[...]
+
+> As of today it returns 0, success in ksft, even though it clearly
+> wasn't. Looking at the code any failures in the setup/teardown phase
+> will stop the run, skip all the remaining tests but still return success.
+>
+> About returning skip from the script, aside from marking it as skip and
+> continuing the suite, we would need to run a silent teardown, one that
+> executes all commands in the specified teardown but
+> ignores errors. In this case we are assuming all setup steps follow KSFT
+> return codes. Not sure if it it's reasonable or not...
+
+wouldn't this be fixed by adding this line:
+
+"dependsOn" : "command -v jq >/dev/null"
+
+to test scenarios 39b4 and e8a1 ? I'm asking this because jq is used
+also in verifyCmd after the script, to parse results.
+Background for this question: I see tdc skipping both setup and
+teardown stages for each test case in taprio.json where this line:
+
+     "dependsOn": "command -v ciao >/dev/null",
+
+is present. Rather than doing a setup +  silent teardown, just do
+nothing and go to the next test.
+
+> As your suggestion is not a blocker, I would rather address the above
+> problems in a follow up series since they will require some refactoring.
+> WDYT?
+
+no objections, but I'm curious to see if "dependsOn" would fix this case :)
+thanks!
+--=20
+davide
+
 
