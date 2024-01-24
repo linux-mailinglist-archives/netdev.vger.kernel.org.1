@@ -1,384 +1,125 @@
-Return-Path: <netdev+bounces-65441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5222A83A7CF
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 12:28:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADAAB83A7D0
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 12:28:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02B5B290DAB
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 11:28:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D23111C228CA
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 11:28:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F5E31B598;
-	Wed, 24 Jan 2024 11:28:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8037F1B28D;
+	Wed, 24 Jan 2024 11:28:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="l9tTFN8W"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XdUeeD7J"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B71841AADE
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 11:28:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C38831B7E7;
+	Wed, 24 Jan 2024 11:28:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706095704; cv=none; b=X3xSUt910BmJM3go6ZaVfWesRvX0ZcQZ4RoDyYc82UNjT8r3Q8yq7AolNHPgsbpto6DHZSpZJv/FfSw4bPF5tw4dG3qXJ/94jOUSXZ0njMZWI5LDUdiiGimgtaY0bVKxPSXivpUuJaq8Yw8BATsBqpv4ockcTUj2b1zEgIifJkg=
+	t=1706095707; cv=none; b=Ueaa3W8Lwfifn4hI2cnlKVSAecm5I1CXJ4fbmKZufAcGocqb+82bfluvZjb6XMVP3BGen9chnx1s5XpG6oMu6nA697jiPCEHQmDbqT2BmLEurihYzWypC8swtat7SbX/MFLseg1wfewYOiU7NY1a0vQpLCZWZt6lGEvvUBEugW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706095704; c=relaxed/simple;
-	bh=zS/arkhd8QlPP+xZPJ8bRaO5apkXeCZXoTOnSlWdFvk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q7vgXmEJlG6nz7SSEhV87AxYn5/4arDFYZJi1CNRCN3+88vFFq8UYLisok91XlGAd3qnFvQwc1OpplSS+mwVQL0GJBqZ2T2ADJqMjkMNntkD9vVEueGY903lrDL2GcTmfmDCMelMIkm140Y2l/jFyfy+aHVJ06OPP18yvQE2l/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=l9tTFN8W; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <68333f0b-4657-4171-8772-12e2b453f139@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706095694;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=flQ+i4PHxqCY8GhePBhk5z9vbjNANuIkCWuOY/CAPj4=;
-	b=l9tTFN8WP+Ot4NU+G8TiAAc6cToezKGvQq/QPIKus6PfGBz6O/h4DUvh3I02jvEa9jXDZN
-	PgoFhz0+Mf7TYJLJhl/OubDjHXHBGYz8tx/OiPE9MdroLoY0uVtX9F/tzYC8Kdu4HIV4iN
-	w1fwLYf6OA4yisfEd7UGnb8Jo1mOSzA=
-Date: Wed, 24 Jan 2024 11:28:04 +0000
+	s=arc-20240116; t=1706095707; c=relaxed/simple;
+	bh=r5P74bClM0Y/Nw8KBoTHNtFNfwgS0H4TFcvTQX4Dr/E=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=iLEacD5X2ZT91hZIt9xhjBEFyz4pIXUn5gPsPVLEyg5mr6P4vb6FxGjLdm6ztG5TZNlGWP0po0edRfERws7aUFZyFMKAlWLlacHXc2YXrLs5Fy5kisPwsFds1q5CLXZjWNIcT77VmB8xsxUFJpa4ym0dt6mnQIGjdYkCaqwj2YU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XdUeeD7J; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-50ea9daac4cso5796551e87.3;
+        Wed, 24 Jan 2024 03:28:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706095703; x=1706700503; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=19zsXtwg36DXVDsy+4i27k7o2CEiU+qV1nDyQjqpjRU=;
+        b=XdUeeD7JpJ/Pn5LHsRlwCUV7LCKIdCpRoA8OUI88EPjl5Usb8VZ+5r6i/eCEgL51fK
+         ZzUQGcmBF0aEyxQjZvJbNs31v4oUYDJ0ArUIDlN6v47aa4xkgxBMifxBqTqqjWBH6E9C
+         tOA+k1Vh6YznB3BJ0G/Cpel0ohlYKIYyPsr6TFxbeWjf5G+4vEJcR1pIiJVEIitYFlFs
+         SBxyDESnwlZbCA6/9b7H5homCR8rx1oYkqsqEIXhzZ1MMxjJQG4m3Xo2U0Y+TVJVrtm1
+         t1qavGeIwQWdeaKp2UWYtpA8RI64nv5hTKTfVviULOS9eNCooq3bvXpd44La0FG5Nim5
+         wZ2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706095703; x=1706700503;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=19zsXtwg36DXVDsy+4i27k7o2CEiU+qV1nDyQjqpjRU=;
+        b=D1bAa5T//yRuMYYPNhgMolK0OV9o7nKAzKZRmWaBKj7aTgs+SpWnEO1z+wi2uicQnq
+         6N0CkQEsrF/EvwBS+uJEwKXwWHj/FV1VwSmv1qMGqQGuVFfMWOqhq8xLrvVDt1yfwEi1
+         KOAFf+4cLwdoffgjXRvjvYWP6C/Ue3bQsgtyVTlHFXk51Bf2T13friJ7W3Jvj4le3GxC
+         sTNwbqoeD0CHbaJOd7GIXro5w1AeRpMOHPTe+DfTw+/452ciAQLnUxJ7aqRSjJYYlrMe
+         rFHE6wYbGXzKuyeRu/IPrL2u7ltyX8mbxCu6ByELmZXZOLCFLCjYWPWKZ62tTLbIvBKK
+         me0A==
+X-Gm-Message-State: AOJu0Yy2+/fdVnzJrzq6kZLqrarPP3aCB+U6pHbELCyf9B3GI8Bh3pGt
+	KeSFkVGcob5vWn3VsWSuq/zTx5qc5BkYM31qjiI6OH615J8Gac0+
+X-Google-Smtp-Source: AGHT+IH7xH8oWyqYKIFhEJ5qTsz+x6bLkoTDLlHSuZvmlD+8CSE8n9uXR3Qs1YpVnCCFGIlhoTW1ow==
+X-Received: by 2002:a05:6512:202:b0:510:40a:4cb2 with SMTP id a2-20020a056512020200b00510040a4cb2mr1465756lfo.38.1706095703323;
+        Wed, 24 Jan 2024 03:28:23 -0800 (PST)
+Received: from ?IPv6:2003:f6:ef1b:2000:944c:cbc7:1e1c:2c47? (p200300f6ef1b2000944ccbc71e1c2c47.dip0.t-ipconnect.de. [2003:f6:ef1b:2000:944c:cbc7:1e1c:2c47])
+        by smtp.gmail.com with ESMTPSA id e13-20020a170906c00d00b00a2a1bbda0a6sm15497995ejz.175.2024.01.24.03.28.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jan 2024 03:28:23 -0800 (PST)
+Message-ID: <49c0375637372ccae122f2abd2b992406bb40a5c.camel@gmail.com>
+Subject: Re: [PATCH v2 2/2] net: phy: adin: add recovered clock output
+From: Nuno =?ISO-8859-1?Q?S=E1?= <noname.nuno@gmail.com>
+To: Fabian Pfitzner <f.pfitzner@pengutronix.de>, Michael Hennerich
+ <michael.hennerich@analog.com>, Andrew Lunn <andrew@lunn.ch>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>
+Cc: kernel@pengutronix.de, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Date: Wed, 24 Jan 2024 12:31:38 +0100
+In-Reply-To: <20240124102554.1327853-2-f.pfitzner@pengutronix.de>
+References: <20240122110311.2725036-1-f.pfitzner@pengutronix.de>
+	 <20240124102554.1327853-2-f.pfitzner@pengutronix.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [net-next PATCH] octeontx2: Add PTP clock driver for Octeon PTM
- clock.
-Content-Language: en-US
-To: Sai Krishna <saikrishnag@marvell.com>, richardcochran@gmail.com,
- davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, sgoutham@marvell.com, gakula@marvell.com,
- lcherian@marvell.com, hkelam@marvell.com, sbhatta@marvell.com
-Cc: Naveen Mamindlapalli <naveenm@marvell.com>
-References: <20240124064156.2577119-1-saikrishnag@marvell.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20240124064156.2577119-1-saikrishnag@marvell.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 24/01/2024 06:41, Sai Krishna wrote:
-> The PCIe PTM(Precision time measurement) protocol provides precise
-> coordination of events across multiple components like PCIe host
-> clock, PCIe EP PHC local clocks of PCIe devices. This patch adds
-> support for ptp clock based PTM clock. We can use this PTP device
-> to sync the PTM time with CLOCK_REALTIME or other PTP PHC
-> devices using phc2sys.
-> 
-> Signed-off-by: Sai Krishna <saikrishnag@marvell.com>
-> Signed-off-by: Naveen Mamindlapalli <naveenm@marvell.com>
-> Signed-off-by: Sunil Kovvuri Goutham <sgoutham@marvell.com>
+On Wed, 2024-01-24 at 11:25 +0100, Fabian Pfitzner wrote:
+> The ADIN1300 offers three distinct output clocks which can be accessed
+> through the GP_CLK pin. The DT only offers two of the possible options
+> and thus the 125MHz-recovered output clock is missing.
+>=20
+> As there is no other way to configure this pin than through the DT it
+> should be possible to do so for all available outputs.
+>=20
+> Signed-off-by: Fabian Pfitzner <f.pfitzner@pengutronix.de>
 > ---
->   drivers/ptp/Kconfig          |  10 ++
->   drivers/ptp/Makefile         |   1 +
->   drivers/ptp/ptp_octeon_ptm.c | 254 +++++++++++++++++++++++++++++++++++
->   3 files changed, 265 insertions(+)
->   create mode 100644 drivers/ptp/ptp_octeon_ptm.c
-> 
-> diff --git a/drivers/ptp/Kconfig b/drivers/ptp/Kconfig
-> index 5dd5f188e14f..afa82555dbd9 100644
-> --- a/drivers/ptp/Kconfig
-> +++ b/drivers/ptp/Kconfig
-> @@ -212,4 +212,14 @@ config PTP_DFL_TOD
->   	  To compile this driver as a module, choose M here: the module
->   	  will be called ptp_dfl_tod.
->   
-> +config PTP_CLOCK_OCTEON
-> +	tristate "OCTEON PTM PTP clock"
-> +	depends on PTP_1588_CLOCK
-> +	default n
-> +	help
-> +	  This driver adds support for using Octeon PTM device clock as
-> +	  a PTP clock.
-> +
-> +	  To compile this driver as a module, choose M here: the module
-> +	  will be called ptp_octeon_ptm.
->   endmenu
-> diff --git a/drivers/ptp/Makefile b/drivers/ptp/Makefile
-> index dea0cebd2303..e811ae6df5c0 100644
-> --- a/drivers/ptp/Makefile
-> +++ b/drivers/ptp/Makefile
-> @@ -20,3 +20,4 @@ obj-$(CONFIG_PTP_1588_CLOCK_MOCK)	+= ptp_mock.o
->   obj-$(CONFIG_PTP_1588_CLOCK_VMW)	+= ptp_vmw.o
->   obj-$(CONFIG_PTP_1588_CLOCK_OCP)	+= ptp_ocp.o
->   obj-$(CONFIG_PTP_DFL_TOD)		+= ptp_dfl_tod.o
-> +obj-$(CONFIG_PTP_CLOCK_OCTEON)		+= ptp_octeon_ptm.o
-> diff --git a/drivers/ptp/ptp_octeon_ptm.c b/drivers/ptp/ptp_octeon_ptm.c
-> new file mode 100644
-> index 000000000000..da069645ebf7
-> --- /dev/null
-> +++ b/drivers/ptp/ptp_octeon_ptm.c
-> @@ -0,0 +1,254 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/* Marvell PTP PHC clock driver for PCIe PTM (Precision Time Measurement) EP
-> + *
-> + * Copyright (c) 2023 Marvell.
-> + *
-> + */
-> +
-> +#include <linux/delay.h>
-> +#include <linux/device.h>
-> +#include <linux/err.h>
-> +#include <linux/init.h>
-> +#include <linux/kernel.h>
-> +#include <linux/pci.h>
-> +#include <linux/slab.h>
-> +#include <linux/module.h>
-> +
-> +#include <linux/ptp_clock_kernel.h>
-> +
-> +#include "ptp_private.h"
-> +
-> +#define PEMX_PFX_CSX_PFCFGX(pem, pf, _offset)	({typeof(_offset) (offset) = (_offset); \
-> +						((0x8e0000008000 | (u64)(pem) << 36 \
-> +						| (pf) << 18 \
-> +						| (((offset) >> 16) & 1) << 16 \
-> +						| ((offset) >> 3) << 3) \
-> +						+ ((((offset) >> 2) & 1) << 2)); })
-> +
-> +#define PEMX_CFG_WR(a)			(0x8E0000000018ull | (u64)(a) << 36)
-> +#define PEMX_CFG_RD(a)			(0x8E0000000020ull | (u64)(a) << 36)
-> +
-> +/* Octeon CSRs   */
-> +#define PEMX_CFG                        0x8e00000000d8ULL
-> +#define PEMX_PTM_CTL			0x8e0000000098ULL
-> +#define PEMX_PTM_CTL_CAP		BIT_ULL(10)
-> +#define PEMX_PTM_LCL_TIME		0x8e00000000a0ULL /* PTM time */
-> +#define PEMX_PTM_MAS_TIME		0x8e00000000a8ULL /* PTP time */
-> +#define PTM_DEBUG			0
-> +
-> +struct oct_ptp_clock {
-> +	struct ptp_clock *ptp_clock;
-> +	struct ptp_clock_info caps;
-> +	bool cn10k_variant;
-> +};
-> +
-> +static struct oct_ptp_clock oct_ptp_clock;
-> +static void __iomem *ptm_ctl_addr;
-> +static void __iomem *ptm_lcl_addr;
-> +
-> +/* Config space registers   */
-> +#define PCIEEPX_PTM_REQ_STAT		(oct_ptp_clock.cn10k_variant ? 0x3a8 : 0x474)
-> +#define PCIEEPX_PTM_REQ_T1L		(oct_ptp_clock.cn10k_variant ? 0x3b4 : 0x480)
-> +#define PCIEEPX_PTM_REQ_T1M		(oct_ptp_clock.cn10k_variant ? 0x3b8 : 0x484)
-> +#define PCIEEPX_PTM_REQ_T4L		(oct_ptp_clock.cn10k_variant ? 0x3c4 : 0x490)
-> +#define PCIEEPX_PTM_REQ_T4M		(oct_ptp_clock.cn10k_variant ? 0x3c8 : 0x494)
-> +
-> +#define PCI_VENDOR_ID_CAVIUM			0x177d
-> +#define PCI_DEVID_OCTEONTX2_PTP			0xA00C
-> +#define PCI_SUBSYS_DEVID_95XX			0xB300
-> +#define PCI_SUBSYS_DEVID_95XXN			0xB400
-> +#define PCI_SUBSYS_DEVID_95XXMM			0xB500
-> +#define PCI_SUBSYS_DEVID_96XX			0xB200
-> +#define PCI_SUBSYS_DEVID_98XX			0xB100
-> +#define PCI_SUBSYS_DEVID_CN10K_A		0xB900
-> +#define PCI_SUBSYS_DEVID_CN10K_B		0xBD00
-> +#define PCI_SUBSYS_DEVID_CNF10K_A		0xBA00
-> +#define PCI_SUBSYS_DEVID_CNF10K_B		0xBC00
-> +
-> +static bool is_otx2_support_ptm(struct pci_dev *pdev)
-> +{
-> +	return (pdev->subsystem_device == PCI_SUBSYS_DEVID_96XX ||
-> +		pdev->subsystem_device == PCI_SUBSYS_DEVID_95XX ||
-> +		pdev->subsystem_device == PCI_SUBSYS_DEVID_95XXN ||
-> +		pdev->subsystem_device == PCI_SUBSYS_DEVID_98XX ||
-> +		pdev->subsystem_device == PCI_SUBSYS_DEVID_95XXMM);
-> +}
-> +
-> +static bool is_cn10k_support_ptm(struct pci_dev *pdev)
-> +{
-> +	return (pdev->subsystem_device == PCI_SUBSYS_DEVID_CN10K_A ||
-> +		pdev->subsystem_device == PCI_SUBSYS_DEVID_CNF10K_A ||
-> +		pdev->subsystem_device == PCI_SUBSYS_DEVID_CN10K_B ||
-> +		pdev->subsystem_device == PCI_SUBSYS_DEVID_CNF10K_B);
-> +}
-> +
-> +static int ptp_oct_ptm_adjtime(struct ptp_clock_info *ptp, s64 delta)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
-> +
-> +static int ptp_oct_ptm_settime(struct ptp_clock_info *ptp,
-> +			       const struct timespec64 *ts)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
-> +
-> +static u32 read_pcie_config32(int ep_pem, int cfg_addr)
-> +{
-> +	void __iomem *addr;
-> +	u64 val;
-> +
-> +	if (oct_ptp_clock.cn10k_variant) {
-> +		addr  = ioremap(PEMX_PFX_CSX_PFCFGX(ep_pem, 0, cfg_addr), 8);
-> +		if (!addr) {
-> +			pr_err("PTM_EP: Failed to ioremap Octeon CSR space\n");
-> +			return -1U;
-> +		}
-> +		val = readl(addr);
-> +		iounmap(addr);
-> +	} else {
-> +		addr  = ioremap(PEMX_CFG_RD(ep_pem), 8);
-> +		if (!addr) {
-> +			pr_err("PTM_EP: Failed to ioremap Octeon CSR space\n");
-> +			return -1U;
-> +		}
-> +		val = ((1 << 15) | (cfg_addr & 0xfff));
-> +		writeq(val, addr);
-> +		val = readq(addr) >> 32;
-> +		iounmap(addr);
-> +	}
-> +	return (val & 0xffffffff);
-> +}
-> +
-> +static uint64_t octeon_csr_read(u64 csr_addr)
-> +{
-> +	u64 val;
-> +	void __iomem *addr;
-> +
-> +	addr = ioremap(csr_addr, 8);
-> +	if (!addr) {
-> +		pr_err("PTM_EP: Failed to ioremap CSR space\n");
-> +		return -1UL;
-> +	}
-> +	val = (u64)READ_ONCE(*(u64 __iomem *)addr);
-> +	iounmap(addr);
-> +	return val;
-> +}
-> +
-> +static int ptp_oct_ptm_gettime(struct ptp_clock_info *ptp, struct timespec64 *ts)
-> +{
-> +	u64 ptp_time, val64;
-> +#if PTM_DEBUG
-> +	u64 ptm_time;
-> +#endif
 
-Looks like some out-of-tree debug artifacts here and later in the
-function
+Reviewed-by: Nuno Sa <nuno.sa@analog.com>
 
-> +	u32 val32;
-> +
-> +	/* Check for valid PTM context */
-> +	val32 = read_pcie_config32(0, PCIEEPX_PTM_REQ_STAT);
-> +	if (!(val32 & 0x1)) {
-> +		pr_err("PTM_EP: ERROR: PTM context not valid: 0x%x\n", val32);
-> +#if PTM_DEBUG
-> +		ptm_time = 0;
-> +#endif
-> +		ptp_time = 0;
-
-No reason to clean up local variables.
-
-> +		ts->tv_sec = 0;
-> +		ts->tv_nsec = 0;
-> +
-> +		return -EINVAL;
-> +	}
-> +
-> +	/* Trigger PTM/PTP capture */
-> +	val64 = (u64)READ_ONCE(*(u64 __iomem *)ptm_ctl_addr);
-> +	val64 |= PEMX_PTM_CTL_CAP;
-> +	WRITE_ONCE(*(u64 __iomem *)ptm_ctl_addr, val64);
-> +	/* Read PTM/PTP clocks  */
-> +	ptp_time = (u64)READ_ONCE(*(u64 __iomem *)ptm_lcl_addr);
-> +	ts->tv_sec = ptp_time / NSEC_PER_SEC;
-> +	ts->tv_nsec = ptp_time % NSEC_PER_SEC;
-
-ns_to_timespec64() here?
-
-> +
-> +#if PTM_DEBUG
-> +	ptm_time = octeon_csr_read(PEMX_PTM_MAS_TIME);
-> +	pr_info("PTM_EP: system %lld ptm time: %lld\n", ptp_time, ptm_time);
-> +#endif
-> +
-> +	return 0;
-> +}
-> +
-> +static int ptp_oct_ptm_enable(struct ptp_clock_info *ptp,
-> +			      struct ptp_clock_request *rq, int on)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
-> +
-> +static const struct ptp_clock_info ptp_oct_caps = {
-> +	.owner		= THIS_MODULE,
-> +	.name		= "OCTEON PTM PHC",
-> +	.max_adj	= 0,
-> +	.n_ext_ts	= 0,
-> +	.n_pins		= 0,
-> +	.pps		= 0,
-> +	.adjtime	= ptp_oct_ptm_adjtime,
-> +	.gettime64	= ptp_oct_ptm_gettime,
-> +	.settime64	= ptp_oct_ptm_settime,
-> +	.enable		= ptp_oct_ptm_enable,
-> +};
-> +
-> +static void __exit ptp_oct_ptm_exit(void)
-> +{
-> +	iounmap(ptm_ctl_addr);
-> +	iounmap(ptm_lcl_addr);
-> +	ptp_clock_unregister(oct_ptp_clock.ptp_clock);
-> +}
-> +
-> +static int __init ptp_oct_ptm_init(void)
-> +{
-> +	struct pci_dev *pdev = NULL;
-> +
-> +	pdev = pci_get_device(PCI_VENDOR_ID_CAVIUM,
-> +			      PCI_DEVID_OCTEONTX2_PTP, pdev);
-> +	if (!pdev)
-> +		return 0;
-> +
-> +	if (octeon_csr_read(PEMX_CFG) & 0x1ULL) {
-> +		pr_err("PEM0 is configured as RC\n");
-> +		return 0;
-> +	}
-> +
-> +	if (is_otx2_support_ptm(pdev)) {
-> +		oct_ptp_clock.cn10k_variant = 0;
-> +	} else if (is_cn10k_support_ptm(pdev)) {
-> +		oct_ptp_clock.cn10k_variant = 1;
-> +	} else {
-> +		/* PTM_EP: unsupported processor */
-> +		return 0;
-> +	}
-> +
-> +	ptm_ctl_addr = ioremap(PEMX_PTM_CTL, 8);
-> +	if (!ptm_ctl_addr) {
-> +		pr_err("PTM_EP: Failed to ioremap CSR space\n");
-> +		return 0;
-> +	}
-> +
-> +	ptm_lcl_addr = ioremap(PEMX_PTM_LCL_TIME, 8);
-> +	if (!ptm_lcl_addr) {
-> +		pr_err("PTM_EP: Failed to ioremap CSR space\n");
-> +		return 0;
-> +	}
-> +
-> +	oct_ptp_clock.caps = ptp_oct_caps;
-> +
-> +	oct_ptp_clock.ptp_clock = ptp_clock_register(&oct_ptp_clock.caps, NULL);
-> +
-> +	pr_info("PTP device index for PTM clock:%d\n", oct_ptp_clock.ptp_clock->index);
-> +	pr_info("cn10k_variant %d\n", oct_ptp_clock.cn10k_variant);
-> +
-> +	return PTR_ERR_OR_ZERO(oct_ptp_clock.ptp_clock);
-> +}
-> +
-> +module_init(ptp_oct_ptm_init);
-> +module_exit(ptp_oct_ptm_exit);
-> +
-> +MODULE_AUTHOR("Marvell Inc.");
-> +MODULE_DESCRIPTION("PTP PHC clock using PTM");
-> +MODULE_LICENSE("GPL");
+> =C2=A0drivers/net/phy/adin.c | 2 ++
+> =C2=A01 file changed, 2 insertions(+)
+>=20
+> diff --git a/drivers/net/phy/adin.c b/drivers/net/phy/adin.c
+> index 2e1a46e121d9..b1ed6fd24763 100644
+> --- a/drivers/net/phy/adin.c
+> +++ b/drivers/net/phy/adin.c
+> @@ -508,6 +508,8 @@ static int adin_config_clk_out(struct phy_device *phy=
+dev)
+> =C2=A0		sel |=3D ADIN1300_GE_CLK_CFG_25;
+> =C2=A0	} else if (strcmp(val, "125mhz-free-running") =3D=3D 0) {
+> =C2=A0		sel |=3D ADIN1300_GE_CLK_CFG_FREE_125;
+> +	} else if (strcmp(val, "125mhz-recovered") =3D=3D 0) {
+> +		sel |=3D ADIN1300_GE_CLK_CFG_RCVR_125;
+> =C2=A0	} else if (strcmp(val, "adaptive-free-running") =3D=3D 0) {
+> =C2=A0		sel |=3D ADIN1300_GE_CLK_CFG_HRT_FREE;
+> =C2=A0	} else {
 
 
