@@ -1,190 +1,151 @@
-Return-Path: <netdev+bounces-65478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6A0A83AB9E
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 15:25:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1094483AC02
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 15:36:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D54671C2198F
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 14:25:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEBF1291834
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 14:36:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 991A17A705;
-	Wed, 24 Jan 2024 14:25:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3E8812A164;
+	Wed, 24 Jan 2024 14:29:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MVMcHh4w"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="PvU/KE12"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0D6C60DD1;
-	Wed, 24 Jan 2024 14:25:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A12177C08D;
+	Wed, 24 Jan 2024 14:29:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706106338; cv=none; b=c8Faaphc4MxauTjsnrcDyYn96/x4u/IltEXxtpWKhHTtPbpaTIRcCEp12V/vpEYG7NllrMxPeEBPvlCI9OsgEkQmlJ0kiuwGC+cjBTWaItN03au/14fgAfjPhalrVXWu7W79LiimeY6R77Ar+WCWD4DTzQmvb8wb1JC+x8e3jJM=
+	t=1706106593; cv=none; b=GhzQ6Fctnw2UT9C08hNj+792E7hyUw0LVqu7pZcCGF9DUYqiJ26I/urqosigR3a2aTx+3Q8IZ6KPmhit+x6AalEScZKPglDa1WwQejqe+H6xyHFdWpzC4sU6GfY8y/k9QKIH1TIlvquvCtSDYuUs69PU9V388sPhHJxHmG49lBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706106338; c=relaxed/simple;
-	bh=lMQVKwQEtUk214d4vm+VBxmy/h2Gaq10ehD9cWY7mLg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KhzkokXH/QW6eAEDNDjTQ7vFvxXTSyvrFgdv/OHkljfEoIKw2v0+/b5INTDw30n2yqar62IT9lvAd4n9rFBkQD9D77tLoSIfTCA4Ffai87n9iVJQFQFNv6C88e7Li9bvVSaJ+x8k66/xkuSaC8IpWWltU+4YEY8cG8RpwHoDBPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MVMcHh4w; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5100c3f7df1so1943785e87.0;
-        Wed, 24 Jan 2024 06:25:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706106335; x=1706711135; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ojxeaViB6pLAJ/Tfy0YrKqXrdt1fiDqjnZZPco7s5Fg=;
-        b=MVMcHh4wyBcFu2mn7iiVUucILoee6h3vjNdXUDwOb3rRlVHXZzWls3Ol7dx6YaixxG
-         OndCJEOKDBPg5OzRv6ZUEdieCYyq1FEtzt/ucYXnPdnOTqLJRkG3wCYyPCFu9uUpzrZr
-         n4nNVNMZptUQIO2q+apKAySncTIylNtQN/0gVVUa5MLQmuhvTjp7K9o5kLns9wm6cEVd
-         qyS2lA4wo2zXWpikANZr7JR6ZmY7jT13vKRRbU7FSiZ3DUefiEXcu6j/SKzNnoTo8qXu
-         2qY6TCm8ydYmyGNtQ9lqPhnHiR0cnipXKZaqr+HbdTRMGw23zTlzj2lpm3TAIlBpBiOR
-         LRHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706106335; x=1706711135;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ojxeaViB6pLAJ/Tfy0YrKqXrdt1fiDqjnZZPco7s5Fg=;
-        b=jzZkohqx5II3UfrKx1LVCHv8Jp0P+4As/HpB+QHmrrxHqK+LDGoatihY8Wmb/Inwtm
-         uGH7UYBCqpVN0VQcGQOd+9QKrfM9/t+3pADbjAXa/2SaY0yFWAicZy8OCwU0AQ4D2mtT
-         L+PQWapMJSqH8Q6i0J/xXSBwmqu/hge5YapGCe2Cc97gx8+brwykUpGW+HYJcs+kh4wh
-         xR1G+spIB2P5CRWeqwkJlOcdwwxJXwKIYM4ILc8oBRMe4W/p4DTS8gyZk6K8kdHRoUsa
-         XBJHH9C5DfVBPv1wtP350Ycc8InnldIDykzv+6G1fB5zBicnjY1K+xo4ouf0/Jl2BoCq
-         2hnw==
-X-Gm-Message-State: AOJu0Yx/Qycz2PbG5zl6AtD7hrG7+qEopNnL6m/YiYXeF3hRz3fD36uF
-	1eTiDoGH1jIvMvij6QM3/J++xkJZYc5upcSBnuXAv8quS/SXXDdC
-X-Google-Smtp-Source: AGHT+IHZppZBPpxX7hjhZ7O8ug4KnGQsVC8AN7TdTefrgFlvP30wVj6eWIswTHqQKGcYw9kXPrw9eA==
-X-Received: by 2002:a05:6512:32c2:b0:50e:7d27:f930 with SMTP id f2-20020a05651232c200b0050e7d27f930mr4450478lfg.29.1706106334687;
-        Wed, 24 Jan 2024 06:25:34 -0800 (PST)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id a8-20020a19ca08000000b005100cb8395esm308291lfg.15.2024.01.24.06.25.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jan 2024 06:25:32 -0800 (PST)
-Date: Wed, 24 Jan 2024 17:25:27 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Furong Xu <0x1207@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Joao Pinto <jpinto@synopsys.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, xfr@outlook.com, rock.xu@nio.com
-Subject: Re: [PATCH net] net: stmmac: xgmac: fix safety error descriptions
-Message-ID: <ii3muj3nmhuo6s5hm3g7wuiubtyzr632klrcesubtuaoyifogb@ohmunpxvdtsv>
-References: <20240123085037.939471-1-0x1207@gmail.com>
+	s=arc-20240116; t=1706106593; c=relaxed/simple;
+	bh=KkWbxEOL9fYn082VaDJyA7NHt5SNW51VNBbBhRcci8U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XfYUCbNQL0xOMsbdQFW4/IzssoRIZXxG+PU/UiU9LoYaW/dC/d/yJtR5DcqKTzvfB9eBgr9rwmsQzmDvwymrvKawtSS4xDFCNzkfy9gzgyGWoQ7V/5qKX5Hn9Q4zcM7XE4k/HP/y7hSJHnmzE9oEPW4s2R9AhSqWAQnx49NiPrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=PvU/KE12; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40OEMd1L019770;
+	Wed, 24 Jan 2024 14:29:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=id03GCOMuuz9E+q8wpa1mZrFPdzbBKrJ0mBS2dIBSSo=;
+ b=PvU/KE12Bt4bH/E2Y0YdSC27EbEBMgwG+Le0UEm5f63nDQAHXobz1vIi1+KvIMnEMYOU
+ o9xF9xPsqnJ+pRfUTcfiZI2qnBHYntVVD9a3YFz3oiR/TqeHY8cJ5Y9al+7NKhIkD2i/
+ ehW3KlOxOJsLD4C49+CbYXINTml14eB3AZfcr3XFXzOKZkKyhOg/RKeX1JC7VD+++568
+ OD2BW/SE8lJmzSYojQp1uafpKixTd5dg2NNF92BENSkftFbCEHkJgGg70iEb10GCjwRe
+ i6eIGF8L3c8k53sMi9lxvzoKhni92l7ZNv+Olm9Ygd4pr9LNg9e7dJ7n/4+dJzg6u2TD cQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vu0ta5tfx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 24 Jan 2024 14:29:41 +0000
+Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40OETCh7001571;
+	Wed, 24 Jan 2024 14:29:38 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vu0ta5tce-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 24 Jan 2024 14:29:38 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 40OBuS8a025268;
+	Wed, 24 Jan 2024 14:29:30 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vrtqkdxdg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 24 Jan 2024 14:29:30 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 40OETRKM44565084
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 24 Jan 2024 14:29:27 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3372F20043;
+	Wed, 24 Jan 2024 14:29:27 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D249420040;
+	Wed, 24 Jan 2024 14:29:26 +0000 (GMT)
+Received: from [9.152.224.38] (unknown [9.152.224.38])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 24 Jan 2024 14:29:26 +0000 (GMT)
+Message-ID: <13579588-eb9d-4626-a063-c0b77ed80f11@linux.ibm.com>
+Date: Wed, 24 Jan 2024 15:29:26 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240123085037.939471-1-0x1207@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: [REGRESSION] v6.8 SMC-D issues
+To: Wen Gu <guwen@linux.alibaba.com>, wenjia@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        jaka@linux.ibm.com, Matthew Rosato <mjrosato@linux.ibm.com>
+Cc: Linux regressions mailing list <regressions@lists.linux.dev>,
+        borntraeger@linux.ibm.com, svens@linux.ibm.com,
+        alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+        raspl@linux.ibm.com, schnelle@linux.ibm.com,
+        guangguan.wang@linux.alibaba.com, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Halil Pasic <pasic@linux.ibm.com>
+References: <20231219142616.80697-1-guwen@linux.alibaba.com>
+ <20231219142616.80697-8-guwen@linux.alibaba.com>
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <20231219142616.80697-8-guwen@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Qt1EOrmfVf_sdqbTImWI7_I6a3wI5IV9
+X-Proofpoint-GUID: Q2MCPmrpkI3XR9Uka3rzJtqmHUwMkJkA
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-24_06,2024-01-24_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 suspectscore=0
+ adultscore=0 priorityscore=1501 mlxscore=0 clxscore=1011 mlxlogscore=911
+ impostorscore=0 malwarescore=0 lowpriorityscore=0 spamscore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2401240105
 
-On Tue, Jan 23, 2024 at 04:50:37PM +0800, Furong Xu wrote:
-> Commit 56e58d6c8a56 ("net: stmmac: Implement Safety Features in
-> XGMAC core") prints safety error descriptions when safety error assert,
-> but missed some special errors, and mixed correctable errors and
-> uncorrectable errors together.
-> This patch complete the error code list and print the type of errors.
+Hello Wen Gu,
 
-The XGMAC ECC Safety code has likely been just copied from the DW GMAC
-v5 (DW QoS Eth) part. So this change is partly relevant to that code too. I
-can't confirm that the special errors support is relevant to the DW
-QoS Eth too (it likely is though), so what about splitting this patch
-up into two:
-1. Elaborate the errors description for DW GMAC v5 and DW XGMAC.
-2. Add new ECC safety errors support.
-?
+our colleague Matthew reported that SMC-D is failing in certain scenarios on
+kernel v6.8 (thx Matt!). He bisected it to 
+b40584d ("net/smc: compatible with 128-bits extended GID of virtual ISM device")
+I think the root cause could also be somewhere else in the SMC-Dv2.1 patchset.
 
-On the other hand if we were sure that both DW QoS Eth and XGMAC
-safety features implementation match the ideal solution would be to
-refactor out the common code into a dedicated module.
+I was able to reproduce the issue on a 6.8.0-rc1 kernel.
+I tested iperf over smc-d with:
+smc_run iperf3 -s
+smc_run iperf3 -c <IP@>
 
--Serge(y)
+1) Doing an iperf in a single system using 127.0.0.1 as IP@
+(System A=iperf client=iperf server)
+2) Doing iperf to a remote system (System A=client; System B=iperf server)
 
-> 
-> Fixes: 56e58d6c8a56 ("net: stmmac: Implement Safety Features in XGMAC core")
-> Signed-off-by: Furong Xu <0x1207@gmail.com>
-> ---
->  .../ethernet/stmicro/stmmac/dwxgmac2_core.c   | 36 +++++++++----------
->  1 file changed, 18 insertions(+), 18 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> index eb48211d9b0e..ad812484059e 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> @@ -748,29 +748,29 @@ static void dwxgmac3_handle_mac_err(struct net_device *ndev,
->  }
->  
->  static const struct dwxgmac3_error_desc dwxgmac3_mtl_errors[32]= {
-> -	{ true, "TXCES", "MTL TX Memory Error" },
-> +	{ true, "TXCES", "MTL TX Memory Correctable Error" },
->  	{ true, "TXAMS", "MTL TX Memory Address Mismatch Error" },
-> -	{ true, "TXUES", "MTL TX Memory Error" },
-> +	{ true, "TXUES", "MTL TX Memory Uncorrectable Error" },
->  	{ false, "UNKNOWN", "Unknown Error" }, /* 3 */
-> -	{ true, "RXCES", "MTL RX Memory Error" },
-> +	{ true, "RXCES", "MTL RX Memory Correctable Error" },
->  	{ true, "RXAMS", "MTL RX Memory Address Mismatch Error" },
-> -	{ true, "RXUES", "MTL RX Memory Error" },
-> +	{ true, "RXUES", "MTL RX Memory Uncorrectable Error" },
->  	{ false, "UNKNOWN", "Unknown Error" }, /* 7 */
-> -	{ true, "ECES", "MTL EST Memory Error" },
-> +	{ true, "ECES", "MTL EST Memory Correctable Error" },
->  	{ true, "EAMS", "MTL EST Memory Address Mismatch Error" },
-> -	{ true, "EUES", "MTL EST Memory Error" },
-> +	{ true, "EUES", "MTL EST Memory Uncorrectable Error" },
->  	{ false, "UNKNOWN", "Unknown Error" }, /* 11 */
-> -	{ true, "RPCES", "MTL RX Parser Memory Error" },
-> +	{ true, "RPCES", "MTL RX Parser Memory Correctable Error" },
->  	{ true, "RPAMS", "MTL RX Parser Memory Address Mismatch Error" },
-> -	{ true, "RPUES", "MTL RX Parser Memory Error" },
-> +	{ true, "RPUES", "MTL RX Parser Memory Uncorrectable Error" },
->  	{ false, "UNKNOWN", "Unknown Error" }, /* 15 */
-> -	{ false, "UNKNOWN", "Unknown Error" }, /* 16 */
-> -	{ false, "UNKNOWN", "Unknown Error" }, /* 17 */
-> -	{ false, "UNKNOWN", "Unknown Error" }, /* 18 */
-> +	{ true, "SCES", "MTL SGF GCL Memory Correctable Error" },
-> +	{ true, "SAMS", "MTL SGF GCL Memory Address Mismatch Error" },
-> +	{ true, "SUES", "MTL SGF GCL Memory Uncorrectable Error" },
->  	{ false, "UNKNOWN", "Unknown Error" }, /* 19 */
-> -	{ false, "UNKNOWN", "Unknown Error" }, /* 20 */
-> -	{ false, "UNKNOWN", "Unknown Error" }, /* 21 */
-> -	{ false, "UNKNOWN", "Unknown Error" }, /* 22 */
-> +	{ true, "RXFCES", "MTL RXF Memory Correctable Error" },
-> +	{ true, "RXFAMS", "MTL RXF Memory Address Mismatch Error" },
-> +	{ true, "RXFUES", "MTL RXF Memory Uncorrectable Error" },
->  	{ false, "UNKNOWN", "Unknown Error" }, /* 23 */
->  	{ false, "UNKNOWN", "Unknown Error" }, /* 24 */
->  	{ false, "UNKNOWN", "Unknown Error" }, /* 25 */
-> @@ -796,13 +796,13 @@ static void dwxgmac3_handle_mtl_err(struct net_device *ndev,
->  }
->  
->  static const struct dwxgmac3_error_desc dwxgmac3_dma_errors[32]= {
-> -	{ true, "TCES", "DMA TSO Memory Error" },
-> +	{ true, "TCES", "DMA TSO Memory Correctable Error" },
->  	{ true, "TAMS", "DMA TSO Memory Address Mismatch Error" },
-> -	{ true, "TUES", "DMA TSO Memory Error" },
-> +	{ true, "TUES", "DMA TSO Memory Uncorrectable Error" },
->  	{ false, "UNKNOWN", "Unknown Error" }, /* 3 */
-> -	{ true, "DCES", "DMA DCACHE Memory Error" },
-> +	{ true, "DCES", "DMA DCACHE Memory Correctable Error" },
->  	{ true, "DAMS", "DMA DCACHE Address Mismatch Error" },
-> -	{ true, "DUES", "DMA DCACHE Memory Error" },
-> +	{ true, "DUES", "DMA DCACHE Memory Uncorrectable Error" },
->  	{ false, "UNKNOWN", "Unknown Error" }, /* 7 */
->  	{ false, "UNKNOWN", "Unknown Error" }, /* 8 */
->  	{ false, "UNKNOWN", "Unknown Error" }, /* 9 */
-> -- 
-> 2.34.1
-> 
-> 
+The second iperf fails with an error message like:
+"iperf3: error - unable to receive cookie at server: Bad file descriptor" on the server"
+
+If I do first 2) (iperf to remote) and then 1) (iperf to local), then the
+iperf to local fails.
+
+I can do multiple iperf to the first server without problems.
+
+I ran it on a debug server with KASAN, but got no reports in the Logfile.
+
+I will try to debug further, but wanted to let you all know.
+
+Kind regards
+Alexandra
+
+Reported-by: Matthew Rosato <mjrosato@linux.ibm.com>
+
+
 
