@@ -1,71 +1,94 @@
-Return-Path: <netdev+bounces-65688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EDB683B591
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 00:25:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E030E83B5A0
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 00:36:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7C601F23BC3
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 23:25:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99921286AAD
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 23:36:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B2D313665E;
-	Wed, 24 Jan 2024 23:25:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 597E8136665;
+	Wed, 24 Jan 2024 23:36:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fMKdmAqZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mmWMscii"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65F6F136656
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 23:25:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F8E413541D;
+	Wed, 24 Jan 2024 23:36:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706138722; cv=none; b=OCrTYfZv1UCxCGBpgBNPl06U34mMNVLOBhitQNBhedc43sI9asLph7IbHYgsbgmuhTHblS1PUagxQnMIsibTwb/3uQZbKIZMs6EzG5Ob8eEpi+9Uks5kdGXUFxen1u29WUg0mL6Uq8WfOq1ki2C1+37/qmRbAhKHRTKwyVaHkbw=
+	t=1706139393; cv=none; b=iIZcTYpbNwFrRzkvY2JX7qdx6sdHO06VBZgNlKFDcL2ybuq05ZdteNGzvOtX0T7cbczpdQPPQE5zByE/kzK7wKhF3nN6CrLtQk4uDmLdmvUEjbql9V+bbh+PhX8VMZYlyX0KsOavOjLirKY46yKBdwPdFhL2pbsdAtsbMBmZVRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706138722; c=relaxed/simple;
-	bh=mS4D7ctCAGwTiChKKipSFbTSUcNug4Z6StYF3FFc3yU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q2bjII5BGtATErVJhX5tVDf/RRcjLyHGQ74M/6NtNyvliD//H6CWgjXWBreyH9DZled/OVid7oYS9zTRCHLScjEb4YuEQFdLxUiwo7B+/PJHn/obnZQ1WK6utR/vLhG0czMr5mAi//sMdROD+Vwue/U2WH6u0vE1zjIDx/+N9rk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fMKdmAqZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B587CC433F1;
-	Wed, 24 Jan 2024 23:25:21 +0000 (UTC)
+	s=arc-20240116; t=1706139393; c=relaxed/simple;
+	bh=TV6VcTbovvsUyu3ybeDvps8UTz3a8gTAzqnBwryEDsQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hPPAKZAxElpCnjjArEGpgTkafSMFX+wyq3HcuwVwslNyZdA84aPxepnfD5QIEcU4Qgb2N4oqeEXEzmJ7+JWVyhvUaMjO9ngcPaOww2zN/tZYtaQfntCVJx4payjyVEjKwc5kkEau+Y5H2pqCeTcnyjVvlVlrdI0fb7n4x2aeLGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mmWMscii; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52B06C433F1;
+	Wed, 24 Jan 2024 23:36:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706138722;
-	bh=mS4D7ctCAGwTiChKKipSFbTSUcNug4Z6StYF3FFc3yU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fMKdmAqZrdK5OSjEY0u0iNI8KKYPLzV84wjjTej/Yw0eMtyH/jUiXHGYSb9RWPkdM
-	 RfSMSgQQAZLd7FqJOKxk8cviGrX7EtirKT/q+5Pb2n+nfRFEDwIRVwQ8qo3IDv/KMc
-	 biFoyyHbAFoo6g1i6wp29FcrCuvCU4Rham2ahwz1Nt8CtMqYQSvCJOsKWtXcE7kxPL
-	 UBu4gSPNNqgW7VyaC1TRYrWeuBMfj1lKqtOyOsVko5mcrrIJqjGyJn2s7yABX0RsyA
-	 VXALmE3yFC21KeKJ0v4BG8L+Jld6JacnAJRWaGlnSdXFKXOtxZmXrJFAZP/5IFyaht
-	 TmfmkOX8W9SQg==
-Date: Wed, 24 Jan 2024 15:25:20 -0800
+	s=k20201202; t=1706139392;
+	bh=TV6VcTbovvsUyu3ybeDvps8UTz3a8gTAzqnBwryEDsQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=mmWMsciixDMgdND5ie66waz8p4/BytOa3hb9yU6ppue16t1doZIftQUevD414bNYn
+	 RH/3Juo0mMku51WAJIRRP0CYqac5cMN5Qx8ma0jjI2F23LBcczw4Vx5DsOw+n+s1PN
+	 CZz8ytwDGiulHRIBgUc25COCLgp9GQVIeMzcVF34HBorf03v1Al8uJ7WehbRvBdRaf
+	 s8GaJwnAHUxm2KLQyD62APvLbMx0nAkISJQVVml81aZrrpxJmt7wFb841+gzPptQt1
+	 utMAy3INd5FDXYCFxD1oubvJYS4gsnWiU/n1OWMh+tMbQT2KC+12be3GI//DtRJSX5
+	 ttpTgh2KsOR9w==
 From: Jakub Kicinski <kuba@kernel.org>
-To: Alessandro Marcolini <alessandromarcolini99@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- donald.hunter@gmail.com, sdf@google.com, chuck.lever@oracle.com,
- lorenzo@kernel.org, jacob.e.keller@intel.com, jiri@resnulli.us,
- netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 0/3] Add support for encoding multi-attr to ynl
-Message-ID: <20240124152520.4be53f65@kernel.org>
-In-Reply-To: <cover.1706112189.git.alessandromarcolini99@gmail.com>
-References: <cover.1706112189.git.alessandromarcolini99@gmail.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	shuah@kernel.org,
+	0x7f454c46@gmail.com,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net] selftests: tcp_ao: set the timeout to 2 minutes
+Date: Wed, 24 Jan 2024 15:36:30 -0800
+Message-ID: <20240124233630.1977708-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Wed, 24 Jan 2024 17:34:35 +0100 Alessandro Marcolini wrote:
-> This patchset depends on the work done by Donald Hunter:
-> https://lore.kernel.org/netdev/20240123160538.172-1-donald.hunter@gmail.com/T/#t
+The default timeout for tests is 45sec, bench-lookups_ipv6
+seems to take around 50sec when running in a VM without
+HW acceleration. Give it a 2x margin and set the timeout
+to 120sec.
 
-You'll have to repost once Donald's changes are in, sorry :(
-Our build bots and CI do not know how to handle series with
-dependencies.
+Fixes: d1066c9c58d4 ("selftests/net: Add test/benchmark for removing MKTs")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+Long story short I looked at the output for bench-lookups_ipv6
+and it seems to be a trivial timeout problem. With this we're at
+22/24 passing for TCP AO, the reset case failures aren't as obvious...
+
+CC: shuah@kernel.org
+CC: 0x7f454c46@gmail.com
+CC: linux-kselftest@vger.kernel.org
+---
+ tools/testing/selftests/net/tcp_ao/settings | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 tools/testing/selftests/net/tcp_ao/settings
+
+diff --git a/tools/testing/selftests/net/tcp_ao/settings b/tools/testing/selftests/net/tcp_ao/settings
+new file mode 100644
+index 000000000000..6091b45d226b
+--- /dev/null
++++ b/tools/testing/selftests/net/tcp_ao/settings
+@@ -0,0 +1 @@
++timeout=120
+-- 
+2.43.0
+
 
