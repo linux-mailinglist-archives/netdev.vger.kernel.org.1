@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-65284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65286-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 501F5839E45
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 02:30:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B565839E47
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 02:30:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DEE7BB279A6
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 01:30:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EC071F2B086
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 01:30:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29A6915BB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC5FB1FB9;
 	Wed, 24 Jan 2024 01:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FIOpcHba"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HCidxcvB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 077EF15A8
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 01:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A791872;
+	Wed, 24 Jan 2024 01:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706059831; cv=none; b=QVzw5ns5T78SeOLnsMqmnTMvOz8AWxzGauF0t0JsLgc/L4po6n6o3IBLjsi8QCvrDpsNza684YLYbUlhG1ZKTXowxOoabNEpXEvRfcVb8NnNCbghnsiDXXM4WLlhVh5B3o52qGr4WGP7arBma8RGGrJi56L9JeAjhvqAg4nrph4=
+	t=1706059831; cv=none; b=ZV4a0pYGRjlFn697d+qC5tBlHY4079K4Z4iSBCZal0TQv+cdJMrG8iT9r6ARxRlDrnvWzSURvf2O2ZrPurN7bczCALrqDxR6cMAPWXVQFiE2o9mUOpqfVNPysAXjPMUSEoJWaUwxVlPcIkONf/zNt3VbpVrK8SHHGrLBz2nQoXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1706059831; c=relaxed/simple;
-	bh=VpZoUQ5t4BVqm8q9Sw48MGLF8Us8dfWTXEnva3UDeGg=;
+	bh=3mHtlfZjEwIzA755NkkaOfCnUWWE2Q/12sL2IWiuegU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hlt15cDH1GaNLyZrwrKdNzvGEpnIHdzUc/wp2qn3eWqFf1TTJVa2XJ7lUk5dFWHlJmspo9RtFz4Otmw3GAIbCOoIU1aVA4UGUrw222BMOyYoaObbyqs4dPC4oNB4P3x9ReklYz7jLrPxRkchZe300pse8CaDFj7T0RoCfoO4f1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FIOpcHba; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 83898C433B1;
-	Wed, 24 Jan 2024 01:30:30 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=PT9Pxxp5dL2rR9q77OQzUr/qm7R6XyiuuSwg4IuK7u5+YrjtFkUtj7w9zdRWgvBzG+F5nxmtfRknQnihAoYHyLaRV4Fe/wqSQS1Qkq0TUMOyao/ho3Jq0uAmb3jlLMCWsEy59rcjpAFBRPW2PMHxV1xm5ksWISmde9JvY3k2Jjs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HCidxcvB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4EBF6C433B1;
+	Wed, 24 Jan 2024 01:30:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706059830;
-	bh=VpZoUQ5t4BVqm8q9Sw48MGLF8Us8dfWTXEnva3UDeGg=;
+	s=k20201202; t=1706059831;
+	bh=3mHtlfZjEwIzA755NkkaOfCnUWWE2Q/12sL2IWiuegU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=FIOpcHbaVpNtpL2rM4bhSUm7WPYTUrznyr04CgSW48i2p6Wo/AnZTDg2GUoUCZQpx
-	 Xu7Z7NSB8wf7MAeyFtpca0rpCD2fhz1X8JF13hwZm+Plaj0TL5UdZLwBds/uSmIJBQ
-	 5c+MxIV6o8QXjXnrB6rPvWAJEuEwfidh1UDNSi4nrIZN4ZAWCx2h1wYRgmNevVx0zz
-	 FdmmSjxYdWnIE08qDkQgFmT8Oyi2HMS40/DktxmaVe8sf++FBfJyus00x2SqPrgVhZ
-	 92gwWd85So5kqQypqf6r4CuRShCcvspDDNlzNqbbodTY9yek6UrkkRpn6CRkF3uvis
-	 XArXqkhT3Hrjg==
+	b=HCidxcvBJS34/+aTwEBpJ68cVE92EZIEnAVqYvgvt5DM/Jwk70ud9We5acLAEzcOm
+	 9+bV7JMCB/VY7HzCNwqvLki/6ac79ZuThI9t5URQ8CG0sg7NPeUaHXlKiGeCHbKd//
+	 hOAosLri9oq5ogHVAq1YyLptAGoZXJ39Dg3JWxMZ/ry+hXNcp6IWVGZBbn8ZM6s34a
+	 EN5/+DDV4O9d4QOjaVhq2hBRVfZJHljS0Y8dNZwOOkk5aOlB+vMgZuu7olyaZWN/0n
+	 XQo1WseGH+h6nu62KAnTUVaOIxfo4lNIet936NWsvwIzHoZ4eDJuQgEahf4fEsvMoH
+	 rne4RxBC+Kw9Q==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 680B4DFF769;
-	Wed, 24 Jan 2024 01:30:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3DC63DFF760;
+	Wed, 24 Jan 2024 01:30:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2 1/2] Revert "net: macsec: use
- skb_ensure_writable_head_tail to expand the skb"
+Subject: Re: [PATCH] net: ethernet: qualcomm: Remove QDF24xx support
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170605983042.14933.14640605615298216416.git-patchwork-notify@kernel.org>
-Date: Wed, 24 Jan 2024 01:30:30 +0000
-References: <20240118191811.50271-1-rrameshbabu@nvidia.com>
-In-Reply-To: <20240118191811.50271-1-rrameshbabu@nvidia.com>
-To: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Cc: netdev@vger.kernel.org, gal@nvidia.com, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, radu-nicolae.pirea@oss.nxp.com,
- davem@davemloft.net, sd@queasysnail.net
+ <170605983124.14933.9916722082205803213.git-patchwork-notify@kernel.org>
+Date: Wed, 24 Jan 2024 01:30:31 +0000
+References: <20240122-topic-qdf_cleanup_net-v1-1-caf0d9c4408a@linaro.org>
+In-Reply-To: <20240122-topic-qdf_cleanup_net-v1-1-caf0d9c4408a@linaro.org>
+To: Konrad Dybcio <konrad.dybcio@linaro.org>
+Cc: timur@kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, marijn.suijten@somainline.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 18 Jan 2024 11:18:06 -0800 you wrote:
-> This reverts commit b34ab3527b9622ca4910df24ff5beed5aa66c6b5.
+On Mon, 22 Jan 2024 13:02:22 +0100 you wrote:
+> This SoC family was destined for server use, featuring Qualcomm's very
+> interesting Kryo cores (before "Kryo" became a marketing term for Arm
+> cores with small modifications). It did however not leave the labs of
+> Qualcomm and presumably some partners, nor was it ever productized.
 > 
-> Using skb_ensure_writable_head_tail without a call to skb_unshare causes
-> the MACsec stack to operate on the original skb rather than a copy in the
-> macsec_encrypt path. This causes the buffer to be exceeded in space, and
-> leads to warnings generated by skb_put operations. Opting to revert this
-> change since skb_copy_expand is more efficient than
-> skb_ensure_writable_head_tail followed by a call to skb_unshare.
+> Remove the related drivers, as they seem to be long obsolete.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2,1/2] Revert "net: macsec: use skb_ensure_writable_head_tail to expand the skb"
-    https://git.kernel.org/netdev/net/c/3222bc997a24
-  - [net,v2,2/2] net: macsec: Only require headroom/tailroom from offload implementer if .mdo_insert_tx_tag is implemented
-    (no matching commit)
+  - net: ethernet: qualcomm: Remove QDF24xx support
+    https://git.kernel.org/netdev/net-next/c/a2a7f98aeeec
 
 You are awesome, thank you!
 -- 
