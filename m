@@ -1,299 +1,160 @@
-Return-Path: <netdev+bounces-65485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F46D83AC79
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 15:52:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D799883AC7F
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 15:53:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E284E1F21BBE
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 14:52:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90AC229BD51
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 14:53:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23E123D62;
-	Wed, 24 Jan 2024 14:41:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 699717E791;
+	Wed, 24 Jan 2024 14:45:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="R4h3Thrt"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gTmPgO9w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E44992914
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 14:41:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DCA060BA8;
+	Wed, 24 Jan 2024 14:45:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706107270; cv=none; b=gv3nr9MzG+PlPWYQmd/N7x3ehp985Dn++NdV3+l1d43aujP/tGS45to3ynkW2e8QKHXuowIwWl4ZkNBrPdVcmhsr2EujiJLC/xwqeAaFFlPf4uVrpCYGcnoCjKQNGt2LJPvXJXrghV4hZUmNuFZ5POWE2P1WGPnzrUdgvuLfJoI=
+	t=1706107510; cv=none; b=kOe41ndTiOBpGkHovPTJed39kUTlQ+THm+F11kL2V9a71barY6xS1bbb6cGLbbjYDvKlPzkzCuCnyvji8/tzpXHjLIfAOMbX6dB98T6oXVeRckoG/EvDXcDCWz/Eaxi3uaph6h52z350MlJBDIQ/fMT1YythC6J72yWTz7A7K8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706107270; c=relaxed/simple;
-	bh=y/FqdTWqgZOgZWrffLEyBx68VgyiWbZyoy6lWe/hIIo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=l4iAiqor3e456+Mb5gmDBUkHuo5ZpBsFjDSnrOKyX9plt6swCTlKUk+29GS6uA3NSuvXixXftjbPGOldC7wkZBeMFls6Rv7oObbIVnqrcMdgeLYuBiC0WtwpYHbLEgmzpSt+eXigSGh0ar+xIYh39WNlxTMFub9VfbouUIqgxMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=R4h3Thrt; arc=none smtp.client-ip=209.85.219.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-dbe344a6cf4so4886670276.0
-        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 06:41:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1706107266; x=1706712066; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fPbMCu2NffU5jmsnNil1b7MljpjcuhldjvXZtzxkZZ8=;
-        b=R4h3ThrtNceOKZ3clxuVxl1N3V+Nt0wkBlzvalgKBNBd7mQYq9cO9QznQVJAicpp6a
-         VWo8reCR2SvrnWrnPPhM2hByXHgnMPVPrF2fGSgmg8ab7OSfPy2qQajkAb3EZW1YMA/5
-         N4RrU9jClM9ARzS1PZqlHJ/Oha8s0VMHRwsup0havfGCMtuoM4JHOKtDTiZdJ6zCre15
-         TJAqFV/z5LhksOAXN5DqnoVqXBGHBGKeXhQQcRsDM3DFpY/J0Ejx+3qNj2nKBHnL/zfJ
-         V5L/rMCy4Ai/C/dQvFEktaT+/R2/FcfUOSuwnIt+8x279ePgh5OPQr46gtq+cmFTWj2E
-         +bxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706107266; x=1706712066;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fPbMCu2NffU5jmsnNil1b7MljpjcuhldjvXZtzxkZZ8=;
-        b=woYNeUC167I30yktRE0mDbUo8+w8DKeStvVRZEh/7lh0rLZgx5kFb87/3SULUP+vk/
-         gL8gn4NDcYazxW3sQF/lR3U8Tz2HQuxDHwB++qn7AhZqdcId3M8OfAPv0gjIgEjEMUWY
-         s8Om9sleVMFiZ4U0VoYUjKg41MR7Le/QvVqXtZyVjhY8cZR7/FqzrfjeBrO8EQOVypuw
-         vuchInh6trk0j/GjEnp+OcVfZ7f7bMYS0SlcjBMUSEiP7YUYpfRyzcxMZqXLEAXX0AzF
-         MKw6sAzCKxrs5Vlwk94cEdCdDUOTprj8dsbuzxOpj0kOh4Gu63YRvAQzzpdMqF64JdD2
-         /ixw==
-X-Gm-Message-State: AOJu0Yxo55DO2yvTuTFWUYkpke7Ua3VEVm9SNgWI56THzVUlgNK/FyjG
-	EyqMqSw2u+hm1JW4lw+/jz/K5b2o9bWp78uRmeOj0c71yLaw0FfaFGMHVKQGPPA3IjhudKvJzil
-	EOWBIXZWDh+2IdH9lpGAWIqXSnPlbeWetuFCg
-X-Google-Smtp-Source: AGHT+IEpZjts2WQT2YvdyCLA8sNV2c3GfGJBy2BrjHyFbW3vaZylEUaFedqN6uQMDG/AMe1gp8udnpDRqPoxAU9+lDA=
-X-Received: by 2002:a05:6902:561:b0:dc2:66f8:1890 with SMTP id
- a1-20020a056902056100b00dc266f81890mr774961ybt.113.1706107265779; Wed, 24 Jan
- 2024 06:41:05 -0800 (PST)
+	s=arc-20240116; t=1706107510; c=relaxed/simple;
+	bh=6hqy0a4sGpuNFGT9XQmGQQHyoSvs8w4hXCSZapMZQHY=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Y/XGm60eYlv4VOkG2hboxaa2Q2vEOUGQC5I7vIZ0VEJkudX8vzSMC+JQ3DMZgw22V2MccPmFRM6jaWjfpye7Hcev3uWKVhR0OEToLbG3D4JquoO7TTZPKJWdGAb7HeF8xAvD+iF8TzMXDZ/VVu/NRIHITqQ7ch3/7UhmIfLcuXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=gTmPgO9w; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40ODbtMF008712;
+	Wed, 24 Jan 2024 14:45:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : from : to : cc : references : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Z75rsvyQVvkzyLp3paQEXb4qLlOHXspm/NAl7MHlZug=;
+ b=gTmPgO9wG0RDw1ra346Vzi4kr+KCjkY1po2ycIuyMaro2seOywZgfCsEhzF929s2Aryi
+ yApg3jg8UyAYwIjmdptJFrJfUPn3/aGaNxAR6ADvFE2z8T+woYBoOeA0JR5fbBKHy2ZL
+ mI8eZcJl/vUkxDbO9zxt9DiqZI48bPlT4LaEECQ739HmFVAjz49PCNgXVJlJ6t8XdUDJ
+ cRg8goADKa/Ov7UmdLvn8Zf4GX7ajOXmEqe+uoO6WIvb5NF9/VefQP74pGL7BBsspfaJ
+ H2ISYA0Cxfxwi+QeIhb0yhRakroXWwuPFMdDUjz74N2uNh8WMx3gbGAunPMCQvGZCoeI yQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vu3kpsnby-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 24 Jan 2024 14:45:02 +0000
+Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40OEYuZc002004;
+	Wed, 24 Jan 2024 14:45:02 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vu3kpsnb8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 24 Jan 2024 14:45:02 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 40OEEj7I022413;
+	Wed, 24 Jan 2024 14:45:01 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3vrt0m66kx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 24 Jan 2024 14:45:01 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 40OEiwBT46400212
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 24 Jan 2024 14:44:58 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 09D682004B;
+	Wed, 24 Jan 2024 14:44:58 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 75CC720043;
+	Wed, 24 Jan 2024 14:44:57 +0000 (GMT)
+Received: from [9.152.224.38] (unknown [9.152.224.38])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 24 Jan 2024 14:44:57 +0000 (GMT)
+Message-ID: <951176ce-5fcc-4e5a-a25f-df0f7724e797@linux.ibm.com>
+Date: Wed, 24 Jan 2024 15:44:57 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240122194801.152658-1-jhs@mojatatu.com> <20240122194801.152658-16-jhs@mojatatu.com>
- <6841ee07-40c6-9a67-a1a7-c04cbff84757@iogearbox.net>
-In-Reply-To: <6841ee07-40c6-9a67-a1a7-c04cbff84757@iogearbox.net>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Wed, 24 Jan 2024 09:40:54 -0500
-Message-ID: <CAM0EoMnjEpZrajgfKLQhsJjDANsdsZf3z2W8CT9FTMQDw2hGMw@mail.gmail.com>
-Subject: Re: [PATCH v10 net-next 15/15] p4tc: add P4 classifier
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com, 
-	namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com, 
-	Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, jiri@resnulli.us, 
-	xiyou.wangcong@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org, 
-	khalidm@nvidia.com, toke@redhat.com, mattyk@nvidia.com, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [REGRESSION] v6.8 SMC-D issues
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+To: Wen Gu <guwen@linux.alibaba.com>, wenjia@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        jaka@linux.ibm.com, Matthew Rosato <mjrosato@linux.ibm.com>
+Cc: Linux regressions mailing list <regressions@lists.linux.dev>,
+        borntraeger@linux.ibm.com, svens@linux.ibm.com,
+        alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+        raspl@linux.ibm.com, schnelle@linux.ibm.com,
+        guangguan.wang@linux.alibaba.com, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Halil Pasic <pasic@linux.ibm.com>
+References: <20231219142616.80697-1-guwen@linux.alibaba.com>
+ <20231219142616.80697-8-guwen@linux.alibaba.com>
+ <13579588-eb9d-4626-a063-c0b77ed80f11@linux.ibm.com>
+In-Reply-To: <13579588-eb9d-4626-a063-c0b77ed80f11@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: IzTTuGw3QYrqtDuD0CKB1gd2fQHJ1EP-
+X-Proofpoint-ORIG-GUID: 03xzMTm12SCYFdK7jTpXF3hUiLXxyf8e
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-24_06,2024-01-24_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
+ suspectscore=0 spamscore=0 lowpriorityscore=0 mlxlogscore=846
+ impostorscore=0 malwarescore=0 clxscore=1015 adultscore=0 phishscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2401240107
 
-On Wed, Jan 24, 2024 at 8:59=E2=80=AFAM Daniel Borkmann <daniel@iogearbox.n=
-et> wrote:
->
-> On 1/22/24 8:48 PM, Jamal Hadi Salim wrote:
-> > Introduce P4 tc classifier. The main task of this classifier is to mana=
-ge
-> > the lifetime of pipeline instances across one or more netdev ports.
-> > Note a pipeline may be instantiated multiple times across one or more t=
-c chains
-> > and different priorities.
-> >
-> > Note that part or whole of the P4 pipeline could reside in tc, XDP or e=
-ven
-> > hardware depending on how the P4 program was compiled.
-> > To use the P4 classifier you must specify a pipeline name that will be
-> > associated to the filter instance, a s/w parser (eBPF) and datapath P4
-> > control block program (eBPF) program. Although this patchset does not d=
-eal
-> > with offloads, it is also possible to load the h/w part using this filt=
-er.
-> > We will illustrate a few examples further below to clarify. Please trea=
-t
-> > the illustrated split as an example - there are probably more pragmatic
-> > approaches to splitting the pipeline; however, regardless of where the =
-different
-> > pieces of the pipeline are placed (tc, XDP, HW) and what each layer wil=
-l
-> > implement (what part of the pipeline) - these examples are merely showi=
-ng
-> > what is possible.
-> >
-> > The pipeline is assumed to have already been created via a template.
-> >
-> > For example, if we were to add a filter to ingress of a group of netdev=
-s
-> > (tc block 22) and associate it to P4 pipeline simple_l3 we could issue =
-the
-> > following command:
-> >
-> > tc filter add block 22 parent ffff: protocol all prio 6 p4 pname simple=
-_l3 \
-> >      action bpf obj $PARSER.o ... \
-> >      action bpf obj $PROGNAME.o section prog/tc-ingress
-> >
-> > The above uses the classical tc action mechanism in which the first act=
-ion
-> > runs the P4 parser and if that goes well then the P4 control block is
-> > executed. Note, although not shown above, one could also append the com=
-mand
-> > line with other traditional tc actions.
-> >
-> > In these patches, we also support two types of loadings of the pipeline
-> > programs and differentiate between what gets loaded at say tc vs xdp by=
- using
-> > syntax which specifies location as either "prog type tc obj" or
-> > "prog type xdp obj". There is an ongoing discussion in the P4TC communi=
-ty
-> > biweekly meetings which is likely going to have us add another location
-> > definition "prog type hw" which will specify the hardware object file n=
-ame
-> > and other related attributes.
-> >
-> > An example using tc:
-> >
-> > tc filter add block 22 parent ffff: protocol all prio 6 p4 pname simple=
-_l3 \
-> >      prog type tc obj $PARSER.o ... \
-> >      action bpf obj $PROGNAME.o section prog/tc-ingress
-> >
-> > For XDP, to illustrate an example:
-> >
-> > tc filter add dev $P0 ingress protocol all prio 1 p4 pname simple_l3 \
-> >      prog type xdp obj $PARSER.o section parser/xdp \
-> >      pinned_link /sys/fs/bpf/mylink \
-> >      action bpf obj $PROGNAME.o section prog/tc-ingress
-> >
-> > In this case, the parser will be executed in the XDP layer and the rest=
- of
-> > P4 control block as a tc action.
-> >
-> > For illustration sake, the hw one looks as follows (please note there's
-> > still a lot of discussions going on in the meetings - the example is he=
-re
-> > merely to illustrate the tc filter functionality):
-> >
-> > tc filter add block 22 ingress protocol all prio 1 p4 pname simple_l3 \
-> >     prog type hw filename "mypnameprog.o" ... \
-> >     prog type xdp obj $PARSER.o section parser/xdp pinned_link /sys/fs/=
-bpf/mylink \
-> >     action bpf obj $PROGNAME.o section prog/tc-ingress
-> >
-> > The theory of operations is as follows:
-> >
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D1. PARSING=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >
-> > The packet first encounters the parser.
-> > The parser is implemented in ebpf residing either at the TC or XDP
-> > level. The parsed header values are stored in a shared eBPF map.
-> > When the parser runs at XDP level, we load it into XDP using tc filter
-> > command and pin it to a file.
-> >
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D2. ACTIONS=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >
-> > In the above example, the P4 program (minus the parser) is encoded in a=
-n
-> > action($PROGNAME.o). It should be noted that classical tc actions
-> > continue to work:
-> > IOW, someone could decide to add a mirred action to mirror all packets
-> > after or before the ebpf action.
-> >
-> > tc filter add dev $P0 parent ffff: protocol all prio 6 p4 pname simple_=
-l3 \
-> >      prog type tc obj $PARSER.o section parser/tc-ingress \
-> >      action bpf obj $PROGNAME.o section prog/tc-ingress \
-> >      action mirred egress mirror index 1 dev $P1 \
-> >      action bpf obj $ANOTHERPROG.o section mysect/section-1
-> >
-> > It should also be noted that it is feasible to split some of the ingres=
-s
-> > datapath into XDP first and more into TC later (as was shown above for
-> > example where the parser runs at XDP level). YMMV.
-> > Regardless of choice of which scheme to use, none of these will affect
-> > UAPI. It will all depend on whether you generate code to load on XDP vs
-> > tc, etc.
-> >
-> > Co-developed-by: Victor Nogueira <victor@mojatatu.com>
-> > Signed-off-by: Victor Nogueira <victor@mojatatu.com>
-> > Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
-> > Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
-> > Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
->
-> My objections from last iterations still stand, and I also added a nak,
-> so please do not just drop it with new revisions.. from the v10 as you
-> wrote you added further code but despite the various community feedback
-> the design still stands as before, therefore:
->
-> Nacked-by: Daniel Borkmann <daniel@iogearbox.net>
->
 
-We didnt make code changes - but did you read the cover letter and the
-extended commentary in this patch's commit log? We should have
-mentioned it in the changes log. It did respond to your comments.
-There's text that says "the filter manages the lifetime of the
-pipeline" - which in the future could include not only tc but XDP but
-also the hardware path (in the form of a file that gets loaded). I am
-not sure if that message is clear. Your angle being this is layer
-violation. In the last discussion i asked you for suggestions and we
-went the tcx route, which didnt make sense, and  then you didnt
-respond.
 
-> [...]
-> > +static int cls_p4_prog_from_efd(struct nlattr **tb,
-> > +                             struct p4tc_bpf_prog *prog, u32 flags,
-> > +                             struct netlink_ext_ack *extack)
-> > +{
-> > +     struct bpf_prog *fp;
-> > +     u32 prog_type;
-> > +     char *name;
-> > +     u32 bpf_fd;
-> > +
-> > +     bpf_fd =3D nla_get_u32(tb[TCA_P4_PROG_FD]);
-> > +     prog_type =3D nla_get_u32(tb[TCA_P4_PROG_TYPE]);
-> > +
-> > +     if (prog_type !=3D BPF_PROG_TYPE_XDP &&
-> > +         prog_type !=3D BPF_PROG_TYPE_SCHED_ACT) {
->
-> Also as mentioned earlier I don't think tc should hold references on
-> XDP programs in here. It doesn't make any sense aside from the fact
-> that the cls_p4 is also not doing anything with it. This is something
-> that a user space control plane should be doing i.e. managing a XDP
-> link on the target device.
+On 24.01.24 15:29, Alexandra Winter wrote:
+> Hello Wen Gu,
+> 
+> our colleague Matthew reported that SMC-D is failing in certain scenarios on
+> kernel v6.8 (thx Matt!). He bisected it to 
+> b40584d ("net/smc: compatible with 128-bits extended GID of virtual ISM device")
+> I think the root cause could also be somewhere else in the SMC-Dv2.1 patchset.
+> 
+> I was able to reproduce the issue on a 6.8.0-rc1 kernel.
+> I tested iperf over smc-d with:
+> smc_run iperf3 -s
+> smc_run iperf3 -c <IP@>
+> 
+> 1) Doing an iperf in a single system using 127.0.0.1 as IP@
+> (System A=iperf client=iperf server)
+> 2) Doing iperf to a remote system (System A=client; System B=iperf server)
+> 
+> The second iperf fails with an error message like:
+> "iperf3: error - unable to receive cookie at server: Bad file descriptor" on the server"
+> 
+> If I do first 2) (iperf to remote) and then 1) (iperf to local), then the
+> iperf to local fails.
+> 
+> I can do multiple iperf to the first server without problems.
+> 
+> I ran it on a debug server with KASAN, but got no reports in the Logfile.
+> 
+> I will try to debug further, but wanted to let you all know.
+> 
+> Kind regards
+> Alexandra
+> 
+> Reported-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> 
+> 
+> 
 
-This is the same argument about layer violation that you made earlier.
-The filter manages the p4 pipeline - i.e it's not just about the ebpf
-blob(s) but for example in the future (discussions are still ongoing
-with vendors who have P4 NICs) a filter could be loaded to also
-specify the location of the hardware blob.
-I would be happy with a suggestion that gets us moving forward with
-that context in mind.
-
-cheers,
-jamal
-
-> > +             NL_SET_ERR_MSG(extack,
-> > +                            "BPF prog type must be BPF_PROG_TYPE_SCHED=
-_ACT or BPF_PROG_TYPE_XDP");
-> > +             return -EINVAL;
-> > +     }
-> > +
-> > +     fp =3D bpf_prog_get_type_dev(bpf_fd, prog_type, false);
-> > +     if (IS_ERR(fp))
-> > +             return PTR_ERR(fp);
-> > +
-> > +     name =3D nla_memdup(tb[TCA_P4_PROG_NAME], GFP_KERNEL);
-> > +     if (!name) {
-> > +             bpf_prog_put(fp);
-> > +             return -ENOMEM;
-> > +     }
-> > +
-> > +     prog->p4_prog_name =3D name;
-> > +     prog->p4_prog =3D fp;
-> > +
-> > +     return 0;
-> > +}
-> > +
+It seems the issue only occurs, when both client and server are on 6.8+
+When either side is on an older kernel (6.5.6-300.fc39.s390x in my case),
+I don't see the issue.
 
