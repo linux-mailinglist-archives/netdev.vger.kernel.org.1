@@ -1,67 +1,55 @@
-Return-Path: <netdev+bounces-65635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62CC983B3AC
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 22:15:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94C6683B3CF
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 22:21:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 097E3286636
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 21:15:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F4A51C22D3F
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 21:21:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD1321350F4;
-	Wed, 24 Jan 2024 21:15:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA1491350FA;
+	Wed, 24 Jan 2024 21:21:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="caS/RFD7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="abcUIYLz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84E0E132C36;
-	Wed, 24 Jan 2024 21:15:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FEDF7E760;
+	Wed, 24 Jan 2024 21:21:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706130953; cv=none; b=WBZ082EASBTA6ghmXX/cRlsF6+VcDxGoyjnQ8/y2iV3o5/eQf+ngh/YHr4vkuusWSsr/+RDXxel1wEHH9ISq6LXRDs+mkcYBBb8X0JmODmWDrDtEITE3+mNThSpavbOJENhtLi7/eqGfvSLJien+Y57QwGWABvRoN86D/rlCjLE=
+	t=1706131309; cv=none; b=SU9sZP/PBzpsMulrsVf4TtYtSMYPIkcjqp+Cb2JSoIg0kJZyOH/6lfVLaMxmo76qy1tbkgs9aNsG+JsmPYS91kt++R88krMGjpvyFyjz2ZubWgy0ASzd01VKWbmXVRGJ4fNiugzFq+UWw00D8HUD23FG3moII1vZ5iWjDGgL0YI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706130953; c=relaxed/simple;
-	bh=OFjqtM8lNo2bAKe4BwdtD5hhaNo/ydw8F1ylLt/GzqY=;
+	s=arc-20240116; t=1706131309; c=relaxed/simple;
+	bh=s4/+h4EL9rYbjtkxDfsWLSUO+hIa4ufy+G4MfaKgqys=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t7F37RBuUigKZKlyr4eDy0TRZsVwmCqovuBneDcQtwGUZfihxJP4+w6JkOeWmPdCp7WSNwrPhRiM3aug66Zw3DmMInLVhbFqOh7FlDysrhouCPi0QOWMXR8p6HbGfEHJKSwvWmEs5gz+WjSlI/BXnt8HuOPXNiPtb8Wu1G2beiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=caS/RFD7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66BA9C433C7;
-	Wed, 24 Jan 2024 21:15:50 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=DJ9xyg0iz05xFPKlPVAO/Kodub8haBDHTjaDsQWaWUWIsH/yydbkjCx1YswHXLnxOS1rnhkeGrZtgYAzlTaFIgZDkjHrQMKJu+Ql8/z0lgYOToF5Nv48Jj+jEbQ1r2JHlDyOwpRJcA2rTh4ofR84ob3mgq99K6yvW6qMmpKqKuE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=abcUIYLz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DF08C43394;
+	Wed, 24 Jan 2024 21:21:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706130952;
-	bh=OFjqtM8lNo2bAKe4BwdtD5hhaNo/ydw8F1ylLt/GzqY=;
+	s=k20201202; t=1706131309;
+	bh=s4/+h4EL9rYbjtkxDfsWLSUO+hIa4ufy+G4MfaKgqys=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=caS/RFD7bB8STUKBP6YPbDxUfwAZwF1ziKdoPhSSGTTNQC9Hyq+w1cNFPj/cYymEy
-	 MutAIkDY3FgXHocJPLZk+rvy9MsOEzX9C62dn7UclqQHNPGgwXpjYlVJ47IG+5vUXI
-	 B5n9SWsHKjnH9X1zdtdwxn7s5jG563Ug0LUTezL1S0W/BWwZ+6Ah1/CUQcG7/ZiTJY
-	 hN4uXzBiLkOr+30WNhvfZzVeUy/SwqYjOo1tQ+081OYYQUDiWViEi1puUn9wqJKhlH
-	 2QYvWYq/YPexS3ciMba40xx1+ln3eUfXgRGN2pP4kCoKjs/PqAamDGOrwNBDQN9rHl
-	 a9cZ3R/zHGwJw==
-Date: Wed, 24 Jan 2024 21:15:47 +0000
+	b=abcUIYLz0kTJoe2ctRskesPwzSLbXJELHKAh2rnksL6mY0+pWvfl8oA58qAAcqO8g
+	 O2Aiwa/ZWO+eqTvR6NgsRjGKaPklQIkRaDf+Un3TEr5HDCq+1X1XhzvvN+i79etBq4
+	 Ydlx+YCYfiCEmcVrxJdpk3jCMXEuPF6BbrIbc9aDrai/8V1daY6lC3jpZ500u20kU6
+	 7JM2doZqcluYa2Bwu5QxPPBhxwkl7zkC7lRx5u69/+CtCIexBECjxgwydQTTlO9R5U
+	 bShAd/Jk4lNlAxa0YA+VN28HtiaUhUFdiHne2LvswFfm0hGlEx/h6c/RwYAjryEFQ/
+	 jEfiJhQMk8vdQ==
+Date: Wed, 24 Jan 2024 21:21:44 +0000
 From: Simon Horman <horms@kernel.org>
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-Cc: Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	Geethasowjanya Akula <gakula@marvell.com>,
-	Hariprasad Kelam <hkelam@marvell.com>,
-	Suman Ghosh <sumang@marvell.com>
-Subject: Re: [EXT] Re: [PATCH net] octeontx2-af: Initialize bitmap arrays.
-Message-ID: <20240124211547.GD217708@kernel.org>
-References: <20240123051245.3801246-1-rkannoth@marvell.com>
- <20240123181716.GP254773@kernel.org>
- <MWHPR1801MB1918ADCA9FD3FAFAF9CC68B3D37B2@MWHPR1801MB1918.namprd18.prod.outlook.com>
- <20240124103755.GY254773@kernel.org>
- <MWHPR1801MB191860047DEE03672DC642E3D37B2@MWHPR1801MB1918.namprd18.prod.outlook.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, shuah@kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net v3] selftests: net: fix rps_default_mask with >32 CPUs
+Message-ID: <20240124212144.GA348693@kernel.org>
+References: <20240122195815.638997-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,39 +58,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <MWHPR1801MB191860047DEE03672DC642E3D37B2@MWHPR1801MB1918.namprd18.prod.outlook.com>
+In-Reply-To: <20240122195815.638997-1-kuba@kernel.org>
 
-On Wed, Jan 24, 2024 at 10:43:26AM +0000, Ratheesh Kannoth wrote:
-> > From: Simon Horman <horms@kernel.org>
-> > Subject: Re: [EXT] Re: [PATCH net] octeontx2-af: Initialize bitmap arrays.
-> > 
-> > I think the question is: if the devm_kfree() calls are removed, then is the
-> > lifecycle of the objects in question managed correctly?
-> If lifecycle of the objects are managed correctly without devm_kfree(), why this API is 
-> Provided and exported in kernel ?
-
-When the lifecycle of an object is such that it is freed when
-the device is detached and at no other time, then devm_* can be helpful
-because there is no need for devm_free calls.
-
-I do understand that devm_free() exists, and there are cases where
-it makes sense. But I don't think devm_ is buying us anything here.
-
+On Mon, Jan 22, 2024 at 11:58:15AM -0800, Jakub Kicinski wrote:
+> If there is more than 32 cpus the bitmask will start to contain
+> commas, leading to:
 > 
-> > 
-> > > 2. I could see instances of devm_kfree() usage in current kernel where it
-> > does explicit calls.
-> > 
-> > Sure. But in this case the use of devm_* doesn't seem to be adding anything
-> > if the memory is _always_ freed by explicit calls to devm_kfree().
-> I got it.  I would like to keep the diff minimal (rather than deleting lines diff). would this be okay ?
+> ./rps_default_mask.sh: line 36: [: 00000000,00000000: integer expression expected
+> 
+> Remove the commas, bash doesn't interpret leading zeroes as oct
+> so that should be good enough. Switch to bash, Simon reports that
+> not all shells support this type of substitution.
+> 
+> Fixes: c12e0d5f267d ("self-tests: introduce self-tests for RPS default mask")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-My feeling is that if you change your patch to:
-
-1. Use kcalloc() instead of devm_kcalloc()
-2. Not change kfree() calls to devm_kfree()
-
-Then you will end up with a smaller diff than the current patch.
-And it will address the problem described in the patch description.
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
