@@ -1,144 +1,136 @@
-Return-Path: <netdev+bounces-65508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64F1F83ADE1
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 17:00:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EA6183ADF4
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 17:08:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CA7928D1DD
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 16:00:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCE231F24A1E
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 16:08:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E15E37C0BE;
-	Wed, 24 Jan 2024 16:00:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A41737C0BE;
+	Wed, 24 Jan 2024 16:07:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="ZUSIS8Df"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AkpFFABp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB20C7C0BD
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 16:00:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 779257A725;
+	Wed, 24 Jan 2024 16:07:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706112003; cv=none; b=COm9+6Z9mE1Z6ov3Oy/XMwEaXBsFQXOgNoknJS1GqABTUCME3vX8076yaPCwJYF9DB8ilDtxw2rmh3WTSpcedSbCTiI/sQmquQ4ZT1t1vXMJLWRbphduwS3zdAPGKXz4BrSaqhoAeM0hDihAjQjONrvRU6XdvXCELZbB3iGSJKU=
+	t=1706112474; cv=none; b=W+97xLwZ+60Qxukcj9cEW3onbfs8VwSl9uVSER9KwCxOoHN2YgzK70bjq3eMGe+c9vH6A2LxxzCdcOo5RWu2Wn77TJTLFGXzX68pO753lLCPeh3nilTM4DHPvH7EcxGgDXblqK4YsnJu70WX+t3HzK7zLMEueKYZOPY/eLnB3lY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706112003; c=relaxed/simple;
-	bh=xSv5nclyl9NZUM36WnT/fxvfMVq4JPnlI8sG5frcNO0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FoSIDaWCiXq4y3k2EzAD2JQppWpdcp/xxP0pF8IhDanYo00R//ZbvQyMfI/xLQciEreywmfQo01uwTNP0apwJt8ObyxCIR0Vh+B92At9OG5yAE3w5jsEUcrLMyFO2OVk7JqFW3MGX7R0OychvwwTqbRBrYahpMAZLoMmXurlJz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=ZUSIS8Df; arc=none smtp.client-ip=209.85.208.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2cd9cb17cbeso11460681fa.1
-        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 08:00:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1706112000; x=1706716800; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KE7CWWItyYbfndXuvlxJHXRIBozZLlFnhH3yXJATkyM=;
-        b=ZUSIS8DfMyaGc2tugmEnqMRROPQtNSFo0eUEJK+TgtOO7rcIA5B8QQQ9rCahj0h/4g
-         6iPVM7aRfCJzMbfaZr7CMlJr2StbznxoaLZ/jL23ElMajlsVL+0XLaD2AqjahLcXfT8J
-         3SRTRWUeqVmoHxh24j2UF9EkiKm02IYJeLmR56+ZoYyIOBzhRyaXx5pUKEDzl28+0JXT
-         MrzKZp5l9bcmXG/cjwXQ3o+px7fbOmdptmwnvBL9klFtbhKDlK9PVaqiX9zBETudoQM7
-         frRJxekTZ59cQ360ZYev1H3ZD+fe2o4dOVnXBCAk3ksmPJ/Wy5WrCdBIjONuneXpncGV
-         0VHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706112000; x=1706716800;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KE7CWWItyYbfndXuvlxJHXRIBozZLlFnhH3yXJATkyM=;
-        b=ZI7u6AtcwxVrpBUBcfkFNn72EAzRdHWMetBk5x51vxTFwcws2o+4NNrzTf7W6xiBLm
-         kuvd+x6LPLXfCZ0xuT5c5r7TpdIHnlcawNTFFmIA2qH/XNtD03YzHRlIGqjQUMyC32Pb
-         OspZd/8bfPHWNutKXjUMVkYqYW4f2NWARnqdXDAlAMddWhKg/vx/4nIT1Y32XQ1C7iV/
-         vlIJ0SeWOTu5EmMqkprHVe8cJuxYAUOEtMnSZtAqaGPPh6b83jSuKn8KH0tbbihGqHYh
-         E5BZe0FbMe1bTuDVhzsB0ggBoGO4DUIKms9yDUmjZYuhrXng1UntpD0sPriCosNiTAX4
-         pvbQ==
-X-Gm-Message-State: AOJu0Yzdyuzr94ZO+TL1syy0RM7Iake0hv3iV91BNCTdB6V1P5Is9G8l
-	SFDrjdCvqvJt1dhyxlFynmHV2twRfvE3MDpNeVng0cGz826Wjp/jtA4G/0vJPjXzahmxxpIPsdw
-	wVshb6JHWpAb1OE7j1mUFKMbiF1TlvBdk3v3FIg==
-X-Google-Smtp-Source: AGHT+IEc+PIQoVWA63nP+lsGiLgGYaT/0T2jdnesRdyAalXgG+1YO9CryOECZfYyD8CBvfBWOvihp5gTv3iT0LORUEg=
-X-Received: by 2002:a2e:9943:0:b0:2cd:1ca5:282c with SMTP id
- r3-20020a2e9943000000b002cd1ca5282cmr1895907ljj.5.1706111999959; Wed, 24 Jan
- 2024 07:59:59 -0800 (PST)
+	s=arc-20240116; t=1706112474; c=relaxed/simple;
+	bh=T7a150d0tNI47ue4XaQznSfvq2Kxgb5U4vfbNPnQC8A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZJRpGgOh3VcydrvIhOr3qXUP+Cb+fWLx7aqp1/WkPx7TigNt9Q6iynQZhV21tbuzM7vZumDQYTNh8XyIL3libYFHq70G2dLOJpGJdW1iDY2PtqIKP41XEk5G+wiPciOjL7O1ywXFwSZF9m/pRK7j+UxycDvRCy4O63RUaIPHDUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AkpFFABp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09351C433C7;
+	Wed, 24 Jan 2024 16:07:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706112473;
+	bh=T7a150d0tNI47ue4XaQznSfvq2Kxgb5U4vfbNPnQC8A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AkpFFABpJpTm/W1yHzgIqYaAmRMtNDO5b92DqnfpJ9VvStTZi3E6ggtnDYcXTOVlB
+	 iNx4pUbYzt0tcyikh5RqvEpp0BEO3jkA1R0Y/85ophbqGpAqrdZhQntlarok19SYWv
+	 tawp6S6Up5fHCAESVLn9OyiV0mshvWYYRBLl+1fLzsLpWUicgiOt6d9FbsjK/td7yd
+	 kk0IiuVM/FrFcaNjzCWwDQ0vJ9gmg34xBicaLGB3OaT831MO9mZ4mxl95DOVM9rx6t
+	 BcvznleZzDNrXOtRRAB8BjbnRSQbKUyzkmms6eDFIC4iblaWvabJ6ChrazHprXFXF9
+	 H0tXWbdwMy2sA==
+Date: Wed, 24 Jan 2024 16:07:48 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Esben Haabendal <esben@geanix.com>
+Cc: devicetree@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/3] dt-bindings: net: snps,dwmac: Add
+ time-based-scheduling property
+Message-ID: <20240124-reptilian-icing-a95b20f123be@spud>
+References: <b365dc6f756a3fad4dfaa2675c98f4078aba8a55.1706105494.git.esben@geanix.com>
+ <30ce8f45b8752c603acc861ebb2f18d74d2f8a07.1706105494.git.esben@geanix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240120192125.1340857-1-andrew@lunn.ch> <20240122122457.jt6xgvbiffhmmksr@skbuf>
- <0d9e0412-6ca3-407a-b2a1-b18ab4c20714@lunn.ch> <CAO-L_45iCb+TFMSqZJex-mZKfopBXxR=KH5aV4Wfx5eF5_N_8Q@mail.gmail.com>
- <5f449e47-fc39-48c3-a784-77b808c31050@lunn.ch> <CAO-L_46Ltq0Ju_BO+rfvAbe7F=T6m0hZZKu9gzv7=bMV5n6naw@mail.gmail.com>
- <32d96dd3-7fbb-49e5-8b05-269eac1ac80d@lunn.ch>
-In-Reply-To: <32d96dd3-7fbb-49e5-8b05-269eac1ac80d@lunn.ch>
-From: Tim Menninger <tmenninger@purestorage.com>
-Date: Wed, 24 Jan 2024 07:59:48 -0800
-Message-ID: <CAO-L_47Cvh2QFiQ-Ug3Zsa4BnoC85MTN3W4cWJaJddtVUvmOPg@mail.gmail.com>
-Subject: Re: [PATCH net v1] net: dsa: mv88e6xxx: Make unsupported C45 reads
- return 0xffff
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev-maintainers <edumazet@google.com>, kuba@kernel.org, 
-	pabeni@redhat.com, davem@davemloft.net, netdev <netdev@vger.kernel.org>, 
-	stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="orGn1OOIBTBi4VY0"
+Content-Disposition: inline
+In-Reply-To: <30ce8f45b8752c603acc861ebb2f18d74d2f8a07.1706105494.git.esben@geanix.com>
+
+
+--orGn1OOIBTBi4VY0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 23, 2024 at 2:59=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> > Does that mean if there's a device there but it doesn't support C45 (no
-> > phy_read_c45), it will now return ENODEV?
->
-> Yes, mv88e6xxx_mdio_read_c45() will return -ENODEV if
-> chip->info->ops->phy_read_c45 is NULL. That will cause the scan of
-> that address to immediately skip to the next address. This is old
-> behaviour for C22:
->
-> commit 02a6efcab675fe32815d824837784c3f42a7d892
-> Author: Alexandre Belloni <alexandre.belloni@bootlin.com>
-> Date:   Tue Apr 24 18:09:04 2018 +0200
->
->     net: phy: allow scanning busses with missing phys
->
->     Some MDIO busses will error out when trying to read a phy address wit=
-h no
->     phy present at that address. In that case, probing the bus will fail
->     because __mdiobus_register() is scanning the bus for all possible phy=
-s
->     addresses.
->
->     In case MII_PHYSID1 returns -EIO or -ENODEV, consider there is no phy=
- at
->     this address and set the phy ID to 0xffffffff which is then properly
->     handled in get_phy_device().
->
-> And there are a few MDIO bus drivers which make use of this, e.g.
->
-> static int lan9303_phy_read(struct dsa_switch *ds, int phy, int regnum)
-> {
->         struct lan9303 *chip =3D ds->priv;
->         int phy_base =3D chip->phy_addr_base;
->
->         if (phy =3D=3D phy_base)
->                 return lan9303_virt_phy_reg_read(chip, regnum);
->         if (phy > phy_base + 2)
->                 return -ENODEV;
->
->         return chip->ops->phy_read(chip, phy, regnum);
->
-> This Ethernet switch supports only a number of PHY addresses, and
-> returns -ENODEV for the rest.
->
-> So its a legitimate way to say there is nothing here.
->
-> You suggestion of allowing ENOPSUPP for C45 would of fixed the
-> problem, but C22 and C45 would support different error codes, which i
-> don't like. Its better to be uniform.
->
->         Andrew
+On Wed, Jan 24, 2024 at 03:33:06PM +0100, Esben Haabendal wrote:
+> Time Based Scheduling can be enabled per TX queue, if supported by the
+> controller.
 
-Excellent, color me convinced.
+If time based scheduling is not supported by the controller, then the
+property should not be present! The presence of a property like this
+should mean that the feature is supported, using it is up to the
+operating system.
+
+That said, why is this a property that should be in DT? If support is
+per controller is it not sufficient to use the compatible to determine
+if this is supported?
+
+Thanks,
+Conor.
+
+>=20
+> Signed-off-by: Esben Haabendal <esben@geanix.com>
+> ---
+>  Documentation/devicetree/bindings/net/snps,dwmac.yaml | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>=20
+> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Docu=
+mentation/devicetree/bindings/net/snps,dwmac.yaml
+> index 5c2769dc689a..301e9150ecc3 100644
+> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> @@ -399,6 +399,12 @@ properties:
+>              type: boolean
+>              description: TX checksum offload is unsupported by the TX qu=
+eue.
+> =20
+> +          snps,time-based-scheduling:
+> +            type: boolean
+> +            description:
+> +              Time Based Scheduling will be enabled for TX queue.
+> +              This is typically not supported for TX queue 0.
+> +
+>          allOf:
+>            - if:
+>                required:
+> --=20
+> 2.43.0
+>=20
+
+--orGn1OOIBTBi4VY0
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZbE11AAKCRB4tDGHoIJi
+0v8wAP9TtkDEdLKEVA0n+83492ltV8gpozpt7NTDo9bSA8pPRwEAk2CFLW1Ac02u
+hfaJxQ8KnrIuHQjJ9wb8ToaEVgPN9Ag=
+=Q0u6
+-----END PGP SIGNATURE-----
+
+--orGn1OOIBTBi4VY0--
 
