@@ -1,70 +1,72 @@
-Return-Path: <netdev+bounces-65572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F7E783B0DC
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 19:19:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9098C83B0DF
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 19:20:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD301282EC9
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 18:19:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 759C31C22C78
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 18:20:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBDC912A16C;
-	Wed, 24 Jan 2024 18:19:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A3DF12AAC4;
+	Wed, 24 Jan 2024 18:19:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="hKZTYt6z"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="A6uOWj6U"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60F9C128366
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 18:19:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C099D12A17E
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 18:19:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706120391; cv=none; b=QcvRP5go/8xOqZZMqz668FN18W684ipWhUR7TyP9lAF6cP+aFujbyu4wnI9JghSwWjv/2zwZuEW8AUf10NT6zdZ9OuEf4BSNGLArZfAf7T9svSlj9rW+ISXAE0e2ZVLPFxlb+gOjw5kEdOCTOyU5KdhSp69sHRY5drzxJr6fcb0=
+	t=1706120395; cv=none; b=WrLtH8iJ8SEP2XpXRVGObgqW6w2H5+PbUO4mwkk0FrRLlXMtMDbuq3TzUC7jj4wdZvDBaD2c3E1OPXDvVGAqomiB9iKwZLhQb86LDqV/N9j5tgQkiJ8y3Jm/QMsxaAuKI0zY7bpPv0YKlepWa0dSeeKzwgULp5q1cS4zNdyytiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706120391; c=relaxed/simple;
-	bh=2SHR9FJSHmpmQEnrTkrOd4u6y8dYPE+jYTMnavJVZ10=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=m0Ps7krfKCnvRtC8V7WeasQjLBekGQuDp1BBk7K9dtIlYMAPhQkkpCpuMkbZfw8vn5YaFPzGQOBvS5WqVk0wj6+f8vJ4EEd78S4DLVn5PlSIhtB9S2zrDV7+XJIo0TrWNqobeWyVXbDqPC7CkaRSOOSs6qo5UFJJBEuSzmoN4rc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=hKZTYt6z; arc=none smtp.client-ip=209.85.214.169
+	s=arc-20240116; t=1706120395; c=relaxed/simple;
+	bh=hNio0nD1Jw8dvozmdpvI20LoAzPAeMst7QlmZwbRnt8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=ZPWva+3QihfD+BoxroqkGKlxKpxHAOCrJcnHH+h+dm+xyb8Jwqd4oTl6yk2M7vJSzEnrMcRwrplGm3VbBCCNtowX2uaIQ+BWCgtnagt7Q7MblhdX3EIZLVJUwFOZTpIQj1iQhTtr/Ds4KdhBlaE1XgEeG91FKBfwBO6uwYEy6i0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=A6uOWj6U; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1d7393de183so21845945ad.3
-        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 10:19:50 -0800 (PST)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1d780a392fdso10140175ad.3
+        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 10:19:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1706120389; x=1706725189; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=LilT+84arpVB7ic1mUnPbpXL4IkNHurS4WyyyTTg1s8=;
-        b=hKZTYt6zd1XDaJSZYZJKM2A2cDEWUlA1qhZZja6gdTm8/549zP0fvZpGen8LLU6RTB
-         gbFRoS/X0GJuHz5lkBeisFTeqLlVhtP2i2hp7fTVfeYkuksOlBoOmESeEXJTWiX5zSS7
-         MHF+UdIhEAMAZaHeaxpQhQYChvPk3dQUHDivbD7Oj3FWTgDu6fwBObOEnt726JB/AHWj
-         kBewwlOzC9RCybLZExxB85vkE3lkQGrIvN80KpxIV2CVIH2ZZr2V7xP7O95UQtaX3cJh
-         1DO3p0tnFtjnsIJlQeLPF8MtCApd5JRL/r4TkiTzyBbvdmx4l9KLicAZUrFXLEG0Wv9t
-         ajXg==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1706120393; x=1706725193; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/0aWr6I4AG0v1dbSwbiagBcAQfQgpKpYJbEuHRWpjLo=;
+        b=A6uOWj6U5i0UoGPJvTGMcPcmXCZI6zkYgsoKdbAHiuiTvzfajgBqeN+jR5JR3bAM3c
+         1eRkxhjW7eYIPECldiIMdbIHuRCdYq8jifwXitoNyolPSZScqpbx7Kw6JF1bArNMM2Nh
+         gblauNJbQVz+taZ2UMHLRSxOvZ7i29bJ7sjQwJhiW3yABALVVKGPaMkoYbG9KiQNklHy
+         8B7S9qkhZCnZX5DhODs6sMPgCx+0y/K+yInIwVTFjE+0U9hZFdWvlIDYrLzjhJpp0D4f
+         KFU2CSls28+iTC4CrLvXaaRqytnWyzqrhCcxoNYAEUYqv4WCb/vywAAGSh62/03MnFIF
+         g7qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706120389; x=1706725189;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LilT+84arpVB7ic1mUnPbpXL4IkNHurS4WyyyTTg1s8=;
-        b=X2ENdnAkoHCTYr1Ed+laSzHr9OBkMiI3MNnFs6HIlYaY9KSS3d8efdJdPDRSGCiREY
-         W3cIE1xJ9d/SG0fUcEYpT1qVPcHpjrzVYQhGtyBnvErmjwOSLWzR1UZIh2r9ciMgAGRk
-         m83LIixV2ZZNNqq2sNgNQt5BddzsP66Qt1J0hLA56gP+EzWhrCpkYM/l2V8vf2Yotmic
-         sJHtruTYEAnlBz8psXr9Q/hYsLyrUKUxlULT4bq1y0qJFSEDL01yyq8xvBibvhGSfeYX
-         DRUUWN3uTVFGdpwML/v8esC6IjiAV4MD/hcvWHpC4YEeTL10CBppQNXeUx8lsnFkAlp3
-         MpDw==
-X-Gm-Message-State: AOJu0YyWJcdyL99On0VKJF0ryacwZRfxZ5XzSsThKxfgLO9W5KLfr8xd
-	qNc8WzPePMPJqgPN7w0V9bBndbJrtP7yjZjVDC1XgrCG2tv87Ki5CGksigubsdatc/bJTYw8x2L
-	5aA==
-X-Google-Smtp-Source: AGHT+IGO5NziFeNJSMCoCa+lcUVWrD168W9To4nBZxA3JZx9FvVHotwTH2Sbg9XaZeYWKNY/dOBn7A==
-X-Received: by 2002:a17:902:b414:b0:1d7:7811:625f with SMTP id x20-20020a170902b41400b001d77811625fmr801875plr.7.1706120389288;
-        Wed, 24 Jan 2024 10:19:49 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706120393; x=1706725193;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/0aWr6I4AG0v1dbSwbiagBcAQfQgpKpYJbEuHRWpjLo=;
+        b=AIZIqhbn6BaacAF9PEJCj+txI4x+UO17aLoGyQ76MK+/I6nf5b1Q6rvW8g+x7wGhtE
+         FTjaT+aFbwd2LfIUWqeH3bRaVCvxMMxdwZdWAvSy2f5tRzMjOf60QQQ+kfZUnjpwjZvW
+         q2i0WA3oEKSNzdh+c4YhvfqciPuOyGrKA0IY6nkjEo+oFUobUwgQKtXm8Tb7JZX/PZJk
+         EBHlq5v5vthaRTct5oz8u9CNJLasXKCobqXRAfX2CoLdls5IWNdU6gNo8snUi+LWS7BT
+         /MK1Odz7aD2/XTLZL82FKuEGtlwTShCO2UeCF48u7grfX6ui5CpJ8AMMmzq80tPvwHGN
+         Asbw==
+X-Gm-Message-State: AOJu0YwaJfy8HnBgSJ5DNICynxZ48nUBEhZbx8fVbmZiBGy2H7OUIR/H
+	t/1FbuhR2bx5hJJdbCQdlK72QO+Wjv3zBMx+Ur8muk+va5bIaaAIJ29Qnt/U2UnVPWzSWhFhl8y
+	E4A==
+X-Google-Smtp-Source: AGHT+IGFJE4RbbGr5WYcVqee/dmkBr8WSFOLXJPlnoWSCitf6cV2tXPONn5YpfcnHAoHwd2vVHCnXQ==
+X-Received: by 2002:a17:903:1c5:b0:1d5:e4d6:1e07 with SMTP id e5-20020a17090301c500b001d5e4d61e07mr1570669plh.33.1706120392870;
+        Wed, 24 Jan 2024 10:19:52 -0800 (PST)
 Received: from rogue-one.tail33bf8.ts.net ([201.17.86.134])
-        by smtp.gmail.com with ESMTPSA id kd4-20020a17090313c400b001d74ce2ae23sm5577084plb.290.2024.01.24.10.19.45
+        by smtp.gmail.com with ESMTPSA id kd4-20020a17090313c400b001d74ce2ae23sm5577084plb.290.2024.01.24.10.19.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jan 2024 10:19:48 -0800 (PST)
+        Wed, 24 Jan 2024 10:19:52 -0800 (PST)
 From: Pedro Tammela <pctammela@mojatatu.com>
 To: netdev@vger.kernel.org
 Cc: jhs@mojatatu.com,
@@ -78,10 +80,12 @@ Cc: jhs@mojatatu.com,
 	pabeni@redhat.com,
 	linux-kselftest@vger.kernel.org,
 	Pedro Tammela <pctammela@mojatatu.com>
-Subject: [PATCH net-next v2 0/5] selftests: tc-testing: misc changes for tdc
-Date: Wed, 24 Jan 2024 15:19:28 -0300
-Message-Id: <20240124181933.75724-1-pctammela@mojatatu.com>
+Subject: [PATCH net-next v2 1/5] selftests: tc-testing: add missing netfilter config
+Date: Wed, 24 Jan 2024 15:19:29 -0300
+Message-Id: <20240124181933.75724-2-pctammela@mojatatu.com>
 X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20240124181933.75724-1-pctammela@mojatatu.com>
+References: <20240124181933.75724-1-pctammela@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,32 +94,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Patches 1 and 3 are fixes for tdc that were discovered when running it
-using defconfig + tc-testing config and against the latest iproute2.
+On a default config + tc-testing config build, tdc will miss
+all the netfilter related tests because it's missing:
+   CONFIG_NETFILTER=y
 
-Patch 2 improves the taprio tests.
+Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
+---
+ tools/testing/selftests/tc-testing/config | 1 +
+ 1 file changed, 1 insertion(+)
 
-Patch 4 enables all tdc tests.
-
-Patch 5 fixes the return code of tdc for when a test fails
-setup/teardown.
-
-v1->v2: Suggestions by Davide
-
-Pedro Tammela (5):
-  selftests: tc-testing: add missing netfilter config
-  selftests: tc-testing: check if 'jq' is available in taprio tests
-  selftests: tc-testing: adjust fq test to latest iproute2
-  selftests: tc-testing: enable all tdc tests
-  selftests: tc-testing: return fail if a test fails in setup/teardown
-
- tools/testing/selftests/tc-testing/config                      | 1 +
- tools/testing/selftests/tc-testing/tc-tests/qdiscs/fq.json     | 2 +-
- tools/testing/selftests/tc-testing/tc-tests/qdiscs/taprio.json | 2 ++
- tools/testing/selftests/tc-testing/tdc.py                      | 2 +-
- tools/testing/selftests/tc-testing/tdc.sh                      | 3 +--
- 5 files changed, 6 insertions(+), 4 deletions(-)
-
+diff --git a/tools/testing/selftests/tc-testing/config b/tools/testing/selftests/tc-testing/config
+index c60acba951c2..db176fe7d0c3 100644
+--- a/tools/testing/selftests/tc-testing/config
++++ b/tools/testing/selftests/tc-testing/config
+@@ -8,6 +8,7 @@ CONFIG_VETH=y
+ #
+ # Core Netfilter Configuration
+ #
++CONFIG_NETFILTER=y
+ CONFIG_NETFILTER_ADVANCED=y
+ CONFIG_NF_CONNTRACK=m
+ CONFIG_NF_CONNTRACK_MARK=y
 -- 
 2.40.1
 
