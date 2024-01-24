@@ -1,118 +1,299 @@
-Return-Path: <netdev+bounces-65484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F092E83AC77
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 15:52:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F46D83AC79
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 15:52:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 927801F21C08
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 14:52:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E284E1F21BBE
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 14:52:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05B9940C1B;
-	Wed, 24 Jan 2024 14:39:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23E123D62;
+	Wed, 24 Jan 2024 14:41:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PLi9BNiv"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="R4h3Thrt"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3863933CCA;
-	Wed, 24 Jan 2024 14:39:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E44992914
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 14:41:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706107175; cv=none; b=JTo2VoItnG9H5zcNQxk86EZX4z25QQtZ2o9d4cGCIBZ+HgjKTarRsoN9g2BN/lEwKg2Tacgsfoqj+P4+QxsLwKbOiQcPLZFiPdcTUdGog66cxdAdQ6dHeIUhkkWNYspN071TlK36zUwgJMMHMbzTRLVT1xuZUTaLeFJY9nE/S3U=
+	t=1706107270; cv=none; b=gv3nr9MzG+PlPWYQmd/N7x3ehp985Dn++NdV3+l1d43aujP/tGS45to3ynkW2e8QKHXuowIwWl4ZkNBrPdVcmhsr2EujiJLC/xwqeAaFFlPf4uVrpCYGcnoCjKQNGt2LJPvXJXrghV4hZUmNuFZ5POWE2P1WGPnzrUdgvuLfJoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706107175; c=relaxed/simple;
-	bh=c1x4jfQhGGeBjIpXjTtwx0BezuJXjsfMz9UJgm2t4eI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jDhlWo5D0aHBapwza9zFuXYLQ8CazzD1IqcBlzDlKNWwFwW5ArEKlmMFuLGliQkh3FgB/lZVM/ey1yypfVMvHJ01lG+E81s7fIS21O/uDl0rQfYLdY/cVUgOwcnRX9ku18Br9HybGuiDzRIb+RYv5j/CQywUjxQodapGI+BMIJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PLi9BNiv; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 26458C000A;
-	Wed, 24 Jan 2024 14:39:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1706107171;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5+RHsh9TnhTPLnbjSPhtUEq2X2SMkZBbmcU+QGP4t3U=;
-	b=PLi9BNiveB2FxZ5Kx251oO4epHEanAzAZi6a3RwROulee+FHoVP8qt4zusPQzxIoou3qPt
-	XjebwPY3/axeHqsFudNEIKnVFgN3E83/svoI0vrJB9rUyMiB15J+R6NgbCAzWfCTze92up
-	ab3hunpuURdxJofoQ7yly7K4JJ4HFOyOphiz868T8ySlLFfvnLvGrchuuHHSZeNXn37EG1
-	yMUKU7eYp867QzbmHUd1W77/72zzF1HsHB0fMMo4N/N8dIIOG++H+jVMkQaf5+b14e3j1F
-	vFg9T6rcSsYxUGX5jcRwaLaOV67Bj0FCVYbQq0KulDjG9IPblys8hZT9O8+lYA==
-Date: Wed, 24 Jan 2024 15:39:27 +0100
-From: Herve Codina <herve.codina@bootlin.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, Andrew Lunn <andrew@lunn.ch>, Mark Brown
- <broonie@kernel.org>, Christophe Leroy <christophe.leroy@csgroup.eu>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH 1/4] net: wan: Add support for QMC HDLC
-Message-ID: <20240124153927.174f5b7a@bootlin.com>
-In-Reply-To: <7e7c5d46-001c-46db-85ca-eca013225a89@linux.dev>
-References: <20240123164912.249540-1-herve.codina@bootlin.com>
-	<20240123164912.249540-2-herve.codina@bootlin.com>
-	<7e7c5d46-001c-46db-85ca-eca013225a89@linux.dev>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1706107270; c=relaxed/simple;
+	bh=y/FqdTWqgZOgZWrffLEyBx68VgyiWbZyoy6lWe/hIIo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=l4iAiqor3e456+Mb5gmDBUkHuo5ZpBsFjDSnrOKyX9plt6swCTlKUk+29GS6uA3NSuvXixXftjbPGOldC7wkZBeMFls6Rv7oObbIVnqrcMdgeLYuBiC0WtwpYHbLEgmzpSt+eXigSGh0ar+xIYh39WNlxTMFub9VfbouUIqgxMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=R4h3Thrt; arc=none smtp.client-ip=209.85.219.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-dbe344a6cf4so4886670276.0
+        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 06:41:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1706107266; x=1706712066; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fPbMCu2NffU5jmsnNil1b7MljpjcuhldjvXZtzxkZZ8=;
+        b=R4h3ThrtNceOKZ3clxuVxl1N3V+Nt0wkBlzvalgKBNBd7mQYq9cO9QznQVJAicpp6a
+         VWo8reCR2SvrnWrnPPhM2hByXHgnMPVPrF2fGSgmg8ab7OSfPy2qQajkAb3EZW1YMA/5
+         N4RrU9jClM9ARzS1PZqlHJ/Oha8s0VMHRwsup0havfGCMtuoM4JHOKtDTiZdJ6zCre15
+         TJAqFV/z5LhksOAXN5DqnoVqXBGHBGKeXhQQcRsDM3DFpY/J0Ejx+3qNj2nKBHnL/zfJ
+         V5L/rMCy4Ai/C/dQvFEktaT+/R2/FcfUOSuwnIt+8x279ePgh5OPQr46gtq+cmFTWj2E
+         +bxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706107266; x=1706712066;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fPbMCu2NffU5jmsnNil1b7MljpjcuhldjvXZtzxkZZ8=;
+        b=woYNeUC167I30yktRE0mDbUo8+w8DKeStvVRZEh/7lh0rLZgx5kFb87/3SULUP+vk/
+         gL8gn4NDcYazxW3sQF/lR3U8Tz2HQuxDHwB++qn7AhZqdcId3M8OfAPv0gjIgEjEMUWY
+         s8Om9sleVMFiZ4U0VoYUjKg41MR7Le/QvVqXtZyVjhY8cZR7/FqzrfjeBrO8EQOVypuw
+         vuchInh6trk0j/GjEnp+OcVfZ7f7bMYS0SlcjBMUSEiP7YUYpfRyzcxMZqXLEAXX0AzF
+         MKw6sAzCKxrs5Vlwk94cEdCdDUOTprj8dsbuzxOpj0kOh4Gu63YRvAQzzpdMqF64JdD2
+         /ixw==
+X-Gm-Message-State: AOJu0Yxo55DO2yvTuTFWUYkpke7Ua3VEVm9SNgWI56THzVUlgNK/FyjG
+	EyqMqSw2u+hm1JW4lw+/jz/K5b2o9bWp78uRmeOj0c71yLaw0FfaFGMHVKQGPPA3IjhudKvJzil
+	EOWBIXZWDh+2IdH9lpGAWIqXSnPlbeWetuFCg
+X-Google-Smtp-Source: AGHT+IEpZjts2WQT2YvdyCLA8sNV2c3GfGJBy2BrjHyFbW3vaZylEUaFedqN6uQMDG/AMe1gp8udnpDRqPoxAU9+lDA=
+X-Received: by 2002:a05:6902:561:b0:dc2:66f8:1890 with SMTP id
+ a1-20020a056902056100b00dc266f81890mr774961ybt.113.1706107265779; Wed, 24 Jan
+ 2024 06:41:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+References: <20240122194801.152658-1-jhs@mojatatu.com> <20240122194801.152658-16-jhs@mojatatu.com>
+ <6841ee07-40c6-9a67-a1a7-c04cbff84757@iogearbox.net>
+In-Reply-To: <6841ee07-40c6-9a67-a1a7-c04cbff84757@iogearbox.net>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Wed, 24 Jan 2024 09:40:54 -0500
+Message-ID: <CAM0EoMnjEpZrajgfKLQhsJjDANsdsZf3z2W8CT9FTMQDw2hGMw@mail.gmail.com>
+Subject: Re: [PATCH v10 net-next 15/15] p4tc: add P4 classifier
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com, 
+	namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com, 
+	Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, jiri@resnulli.us, 
+	xiyou.wangcong@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org, 
+	khalidm@nvidia.com, toke@redhat.com, mattyk@nvidia.com, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Vadim,
+On Wed, Jan 24, 2024 at 8:59=E2=80=AFAM Daniel Borkmann <daniel@iogearbox.n=
+et> wrote:
+>
+> On 1/22/24 8:48 PM, Jamal Hadi Salim wrote:
+> > Introduce P4 tc classifier. The main task of this classifier is to mana=
+ge
+> > the lifetime of pipeline instances across one or more netdev ports.
+> > Note a pipeline may be instantiated multiple times across one or more t=
+c chains
+> > and different priorities.
+> >
+> > Note that part or whole of the P4 pipeline could reside in tc, XDP or e=
+ven
+> > hardware depending on how the P4 program was compiled.
+> > To use the P4 classifier you must specify a pipeline name that will be
+> > associated to the filter instance, a s/w parser (eBPF) and datapath P4
+> > control block program (eBPF) program. Although this patchset does not d=
+eal
+> > with offloads, it is also possible to load the h/w part using this filt=
+er.
+> > We will illustrate a few examples further below to clarify. Please trea=
+t
+> > the illustrated split as an example - there are probably more pragmatic
+> > approaches to splitting the pipeline; however, regardless of where the =
+different
+> > pieces of the pipeline are placed (tc, XDP, HW) and what each layer wil=
+l
+> > implement (what part of the pipeline) - these examples are merely showi=
+ng
+> > what is possible.
+> >
+> > The pipeline is assumed to have already been created via a template.
+> >
+> > For example, if we were to add a filter to ingress of a group of netdev=
+s
+> > (tc block 22) and associate it to P4 pipeline simple_l3 we could issue =
+the
+> > following command:
+> >
+> > tc filter add block 22 parent ffff: protocol all prio 6 p4 pname simple=
+_l3 \
+> >      action bpf obj $PARSER.o ... \
+> >      action bpf obj $PROGNAME.o section prog/tc-ingress
+> >
+> > The above uses the classical tc action mechanism in which the first act=
+ion
+> > runs the P4 parser and if that goes well then the P4 control block is
+> > executed. Note, although not shown above, one could also append the com=
+mand
+> > line with other traditional tc actions.
+> >
+> > In these patches, we also support two types of loadings of the pipeline
+> > programs and differentiate between what gets loaded at say tc vs xdp by=
+ using
+> > syntax which specifies location as either "prog type tc obj" or
+> > "prog type xdp obj". There is an ongoing discussion in the P4TC communi=
+ty
+> > biweekly meetings which is likely going to have us add another location
+> > definition "prog type hw" which will specify the hardware object file n=
+ame
+> > and other related attributes.
+> >
+> > An example using tc:
+> >
+> > tc filter add block 22 parent ffff: protocol all prio 6 p4 pname simple=
+_l3 \
+> >      prog type tc obj $PARSER.o ... \
+> >      action bpf obj $PROGNAME.o section prog/tc-ingress
+> >
+> > For XDP, to illustrate an example:
+> >
+> > tc filter add dev $P0 ingress protocol all prio 1 p4 pname simple_l3 \
+> >      prog type xdp obj $PARSER.o section parser/xdp \
+> >      pinned_link /sys/fs/bpf/mylink \
+> >      action bpf obj $PROGNAME.o section prog/tc-ingress
+> >
+> > In this case, the parser will be executed in the XDP layer and the rest=
+ of
+> > P4 control block as a tc action.
+> >
+> > For illustration sake, the hw one looks as follows (please note there's
+> > still a lot of discussions going on in the meetings - the example is he=
+re
+> > merely to illustrate the tc filter functionality):
+> >
+> > tc filter add block 22 ingress protocol all prio 1 p4 pname simple_l3 \
+> >     prog type hw filename "mypnameprog.o" ... \
+> >     prog type xdp obj $PARSER.o section parser/xdp pinned_link /sys/fs/=
+bpf/mylink \
+> >     action bpf obj $PROGNAME.o section prog/tc-ingress
+> >
+> > The theory of operations is as follows:
+> >
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D1. PARSING=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >
+> > The packet first encounters the parser.
+> > The parser is implemented in ebpf residing either at the TC or XDP
+> > level. The parsed header values are stored in a shared eBPF map.
+> > When the parser runs at XDP level, we load it into XDP using tc filter
+> > command and pin it to a file.
+> >
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D2. ACTIONS=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >
+> > In the above example, the P4 program (minus the parser) is encoded in a=
+n
+> > action($PROGNAME.o). It should be noted that classical tc actions
+> > continue to work:
+> > IOW, someone could decide to add a mirred action to mirror all packets
+> > after or before the ebpf action.
+> >
+> > tc filter add dev $P0 parent ffff: protocol all prio 6 p4 pname simple_=
+l3 \
+> >      prog type tc obj $PARSER.o section parser/tc-ingress \
+> >      action bpf obj $PROGNAME.o section prog/tc-ingress \
+> >      action mirred egress mirror index 1 dev $P1 \
+> >      action bpf obj $ANOTHERPROG.o section mysect/section-1
+> >
+> > It should also be noted that it is feasible to split some of the ingres=
+s
+> > datapath into XDP first and more into TC later (as was shown above for
+> > example where the parser runs at XDP level). YMMV.
+> > Regardless of choice of which scheme to use, none of these will affect
+> > UAPI. It will all depend on whether you generate code to load on XDP vs
+> > tc, etc.
+> >
+> > Co-developed-by: Victor Nogueira <victor@mojatatu.com>
+> > Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+> > Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
+> > Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
+> > Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+>
+> My objections from last iterations still stand, and I also added a nak,
+> so please do not just drop it with new revisions.. from the v10 as you
+> wrote you added further code but despite the various community feedback
+> the design still stands as before, therefore:
+>
+> Nacked-by: Daniel Borkmann <daniel@iogearbox.net>
+>
 
-On Wed, 24 Jan 2024 10:03:45 +0000
-Vadim Fedorenko <vadim.fedorenko@linux.dev> wrote:
+We didnt make code changes - but did you read the cover letter and the
+extended commentary in this patch's commit log? We should have
+mentioned it in the changes log. It did respond to your comments.
+There's text that says "the filter manages the lifetime of the
+pipeline" - which in the future could include not only tc but XDP but
+also the hardware path (in the form of a file that gets loaded). I am
+not sure if that message is clear. Your angle being this is layer
+violation. In the last discussion i asked you for suggestions and we
+went the tcx route, which didnt make sense, and  then you didnt
+respond.
 
-[...]
-
-> > +static void qmc_hcld_recv_complete(void *context, size_t length, unsigned int flags)
+> [...]
+> > +static int cls_p4_prog_from_efd(struct nlattr **tb,
+> > +                             struct p4tc_bpf_prog *prog, u32 flags,
+> > +                             struct netlink_ext_ack *extack)
 > > +{
-> > +	struct qmc_hdlc_desc *desc = context;
-> > +	struct net_device *netdev = desc->netdev;
-> > +	struct qmc_hdlc *qmc_hdlc = netdev_to_qmc_hdlc(desc->netdev);  
-> 
-> a line above desc->netdev was stored in netdev. better to reuse it and 
-> make declaration part consistent with qmc_hcld_xmit_complete
-
-Yes.
-Will updated in the next iteration.
-
-[...]
-
-> > +static netdev_tx_t qmc_hdlc_xmit(struct sk_buff *skb, struct net_device *netdev)
-> > +{
-> > +	struct qmc_hdlc *qmc_hdlc = netdev_to_qmc_hdlc(netdev);
-> > +	struct qmc_hdlc_desc *desc;
-> > +	unsigned long flags;
-> > +	int ret;
+> > +     struct bpf_prog *fp;
+> > +     u32 prog_type;
+> > +     char *name;
+> > +     u32 bpf_fd;
 > > +
-> > +	spin_lock_irqsave(&qmc_hdlc->tx_lock, flags);
-> > +	desc = &qmc_hdlc->tx_descs[qmc_hdlc->tx_out];
-> > +	if (desc->skb) {
-> > +		/* Should never happen.
-> > +		 * Previous xmit should have already stopped the queue.
-> > +		 */  
-> 
-> according to the comment it's better to make if(unlikely(desc->skb)) or
-> even WARN_ONCE()
-> 
+> > +     bpf_fd =3D nla_get_u32(tb[TCA_P4_PROG_FD]);
+> > +     prog_type =3D nla_get_u32(tb[TCA_P4_PROG_TYPE]);
+> > +
+> > +     if (prog_type !=3D BPF_PROG_TYPE_XDP &&
+> > +         prog_type !=3D BPF_PROG_TYPE_SCHED_ACT) {
+>
+> Also as mentioned earlier I don't think tc should hold references on
+> XDP programs in here. It doesn't make any sense aside from the fact
+> that the cls_p4 is also not doing anything with it. This is something
+> that a user space control plane should be doing i.e. managing a XDP
+> link on the target device.
 
-Indeed. I will use WARN_ONCE() in the next iteration.
+This is the same argument about layer violation that you made earlier.
+The filter manages the p4 pipeline - i.e it's not just about the ebpf
+blob(s) but for example in the future (discussions are still ongoing
+with vendors who have P4 NICs) a filter could be loaded to also
+specify the location of the hardware blob.
+I would be happy with a suggestion that gets us moving forward with
+that context in mind.
 
-Thanks for your review,
-Hervé
+cheers,
+jamal
+
+> > +             NL_SET_ERR_MSG(extack,
+> > +                            "BPF prog type must be BPF_PROG_TYPE_SCHED=
+_ACT or BPF_PROG_TYPE_XDP");
+> > +             return -EINVAL;
+> > +     }
+> > +
+> > +     fp =3D bpf_prog_get_type_dev(bpf_fd, prog_type, false);
+> > +     if (IS_ERR(fp))
+> > +             return PTR_ERR(fp);
+> > +
+> > +     name =3D nla_memdup(tb[TCA_P4_PROG_NAME], GFP_KERNEL);
+> > +     if (!name) {
+> > +             bpf_prog_put(fp);
+> > +             return -ENOMEM;
+> > +     }
+> > +
+> > +     prog->p4_prog_name =3D name;
+> > +     prog->p4_prog =3D fp;
+> > +
+> > +     return 0;
+> > +}
+> > +
 
