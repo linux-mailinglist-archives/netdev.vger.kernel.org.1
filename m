@@ -1,136 +1,132 @@
-Return-Path: <netdev+bounces-65509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EA6183ADF4
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 17:08:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBC6F83AE0B
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 17:11:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCE231F24A1E
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 16:08:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9960B1F21AF0
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 16:11:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A41737C0BE;
-	Wed, 24 Jan 2024 16:07:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D3F77CF18;
+	Wed, 24 Jan 2024 16:10:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AkpFFABp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AVJulX7r"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 779257A725;
-	Wed, 24 Jan 2024 16:07:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E8477C0BD
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 16:10:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706112474; cv=none; b=W+97xLwZ+60Qxukcj9cEW3onbfs8VwSl9uVSER9KwCxOoHN2YgzK70bjq3eMGe+c9vH6A2LxxzCdcOo5RWu2Wn77TJTLFGXzX68pO753lLCPeh3nilTM4DHPvH7EcxGgDXblqK4YsnJu70WX+t3HzK7zLMEueKYZOPY/eLnB3lY=
+	t=1706112647; cv=none; b=cl75eHm1k2IsNr7uAE3B/Iaxx79EWgQtMCfH3mp2YZEF7/W8AiJ87gHu2uVbiWXoAz3oQDC7hF8J3AtBu6sagts1AQ+sIXkYCnGb1c9+o5q4Seuo1mWQYCsUncatTfiIcPhYiRZ8zyUOdKSGJPTZ95BTVCffDilI7gVaYZYyQXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706112474; c=relaxed/simple;
-	bh=T7a150d0tNI47ue4XaQznSfvq2Kxgb5U4vfbNPnQC8A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZJRpGgOh3VcydrvIhOr3qXUP+Cb+fWLx7aqp1/WkPx7TigNt9Q6iynQZhV21tbuzM7vZumDQYTNh8XyIL3libYFHq70G2dLOJpGJdW1iDY2PtqIKP41XEk5G+wiPciOjL7O1ywXFwSZF9m/pRK7j+UxycDvRCy4O63RUaIPHDUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AkpFFABp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09351C433C7;
-	Wed, 24 Jan 2024 16:07:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706112473;
-	bh=T7a150d0tNI47ue4XaQznSfvq2Kxgb5U4vfbNPnQC8A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AkpFFABpJpTm/W1yHzgIqYaAmRMtNDO5b92DqnfpJ9VvStTZi3E6ggtnDYcXTOVlB
-	 iNx4pUbYzt0tcyikh5RqvEpp0BEO3jkA1R0Y/85ophbqGpAqrdZhQntlarok19SYWv
-	 tawp6S6Up5fHCAESVLn9OyiV0mshvWYYRBLl+1fLzsLpWUicgiOt6d9FbsjK/td7yd
-	 kk0IiuVM/FrFcaNjzCWwDQ0vJ9gmg34xBicaLGB3OaT831MO9mZ4mxl95DOVM9rx6t
-	 BcvznleZzDNrXOtRRAB8BjbnRSQbKUyzkmms6eDFIC4iblaWvabJ6ChrazHprXFXF9
-	 H0tXWbdwMy2sA==
-Date: Wed, 24 Jan 2024 16:07:48 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Esben Haabendal <esben@geanix.com>
-Cc: devicetree@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/3] dt-bindings: net: snps,dwmac: Add
- time-based-scheduling property
-Message-ID: <20240124-reptilian-icing-a95b20f123be@spud>
-References: <b365dc6f756a3fad4dfaa2675c98f4078aba8a55.1706105494.git.esben@geanix.com>
- <30ce8f45b8752c603acc861ebb2f18d74d2f8a07.1706105494.git.esben@geanix.com>
+	s=arc-20240116; t=1706112647; c=relaxed/simple;
+	bh=14+iqBeVD9ZtJcK5xsKcKLvFsR2WUCXk0co6Bbfojlo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Ro4l/BAijCfRDGAnk8wWaJsEP8mLIfvJ5r7GDZPQVxdeL85hJuZecHbcQM6gIIFgKLLaskoZ+DYjjNXbJpHw5s6BE4SO5GreghCynx/JqUhxMS7l4mwfIF8G+DW3y9hq4XKAgOkV00IZjxjOr7U7IVN7hAmjVQFUVen4rJWxks8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--pkaligineedi.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AVJulX7r; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--pkaligineedi.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-291041c44e2so237009a91.0
+        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 08:10:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1706112645; x=1706717445; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=7mXpnA5UwK8efRQZtD5qbWdHNoXALh+/9vmjo88DPjk=;
+        b=AVJulX7r1WJH3RJu1IB9pig6lZMbsMimVDBSzkWCmGRmyyYDdzDh50Soonk/4XIz/b
+         sOh7S0i/Pr0kVMdocEzI+8oN4F9ZocQ3h0AFFE11QEkZgfSF+5cHrn1g6cO31enwd9wa
+         y/pmhT2zrQ7J0YbuY33w4PH2ZG3hMNJV3/3pnSSRvRYMFN93PP/i8kofQQeTWwzkIHoP
+         wu5Xus1Ub1jApxQzGiPpLa3NWF/J+UYGguyh3i1MPdBCf5G22F1QEDziDko1OkdobvXW
+         hI6UQ9OI3v8CuqFeW3Qy1zWdw3ijEINQtehzPk8vtEKdqpgZhJD8xEe3pHqzl9dqoJG/
+         /iHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706112645; x=1706717445;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7mXpnA5UwK8efRQZtD5qbWdHNoXALh+/9vmjo88DPjk=;
+        b=vEQiuWKq/B6lYdod3xhON8aVbZTbVHmHNic4bJxKib50qCcI3BP84OY79xaCvUW7Ab
+         rr2VlacNU/NADxgbDo8MF40jskTmUXS8xSPlKGJUQBZgCPc3PhIPQFKyQhXOJMLRMf+h
+         9S6BFZs0Cofv9xaSqRpkW9OhXiB9RA0DPsPJU5Dnwbw+0yocW0FYf8vQszpietcnZzEv
+         RYHLFy7ZozZmMdFWXWosWkaea7qdPULvQQ/gysUars3FKy07ex2ej6lfJeL0RZEdJ7cz
+         /otV6bweo5tdKSpXjhmluqgudNFsOKRU8DdoXXw0M43cH+56f+gLVV1RicyWvgxxzR7Q
+         KooQ==
+X-Gm-Message-State: AOJu0YzZfO83sPd9JtKdj/jJ+8PL7lThLDH1TP7X7Io2H/8MtVG114qa
+	Y7U5Smbt2De0IT4062EbT4L7KqS/B1qTK9kjy9owLWBKtiTDV3kgQnGu0g2JdlPCt1DyO26SjBL
+	du+G0zpjjCdfplnZbOf44FuwdzkSddAhUpGwfCJV+f6X1W1eKsSujqQ6y6yshO2jQW8lWdPmX3n
+	RhSGhtt/Rc52OMY5dK79virL96cvPWYkoD+z0ToZS9s4YcIizWnub0XABX8W8WhtqZ
+X-Google-Smtp-Source: AGHT+IEk991lG/xhHU+U8w5c0Pl/ptIXHvdHNLifVwlJOSA9eZ4SiPrZooKLaBf+9roav3O8HgZ2OpfpiyBtSr1s23U=
+X-Received: from pkaligineedi.sea.corp.google.com ([2620:15c:11c:202:5bff:7416:b04f:2886])
+ (user=pkaligineedi job=sendgmr) by 2002:a17:90a:fb50:b0:28d:8d11:6552 with
+ SMTP id iq16-20020a17090afb5000b0028d8d116552mr42167pjb.4.1706112645029; Wed,
+ 24 Jan 2024 08:10:45 -0800 (PST)
+Date: Wed, 24 Jan 2024 08:10:25 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="orGn1OOIBTBi4VY0"
-Content-Disposition: inline
-In-Reply-To: <30ce8f45b8752c603acc861ebb2f18d74d2f8a07.1706105494.git.esben@geanix.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
+Message-ID: <20240124161025.1819836-1-pkaligineedi@google.com>
+Subject: [PATCH net] gve: Fix skb truesize underestimation
+From: Praveen Kaligineedi <pkaligineedi@google.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, jeroendb@google.com, shailend@google.com, 
+	jfraker@google.com, stable@kernel.org, 
+	Praveen Kaligineedi <pkaligineedi@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
+For a skb frag with a newly allocated copy page, the true size is
+incorrectly set to packet buffer size. It should be set to PAGE_SIZE
+instead.
 
---orGn1OOIBTBi4VY0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Fixes: 82fd151d38d9 ("gve: Reduce alloc and copy costs in the GQ rx path")
+Signed-off-by: Praveen Kaligineedi <pkaligineedi@google.com>
+---
+ drivers/net/ethernet/google/gve/gve_rx.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-On Wed, Jan 24, 2024 at 03:33:06PM +0100, Esben Haabendal wrote:
-> Time Based Scheduling can be enabled per TX queue, if supported by the
-> controller.
+diff --git a/drivers/net/ethernet/google/gve/gve_rx.c b/drivers/net/ethernet/google/gve/gve_rx.c
+index 7a8dc5386fff..76615d47e055 100644
+--- a/drivers/net/ethernet/google/gve/gve_rx.c
++++ b/drivers/net/ethernet/google/gve/gve_rx.c
+@@ -356,7 +356,7 @@ static enum pkt_hash_types gve_rss_type(__be16 pkt_flags)
+ 
+ static struct sk_buff *gve_rx_add_frags(struct napi_struct *napi,
+ 					struct gve_rx_slot_page_info *page_info,
+-					u16 packet_buffer_size, u16 len,
++					unsigned int truesize, u16 len,
+ 					struct gve_rx_ctx *ctx)
+ {
+ 	u32 offset = page_info->page_offset + page_info->pad;
+@@ -389,10 +389,10 @@ static struct sk_buff *gve_rx_add_frags(struct napi_struct *napi,
+ 	if (skb != ctx->skb_head) {
+ 		ctx->skb_head->len += len;
+ 		ctx->skb_head->data_len += len;
+-		ctx->skb_head->truesize += packet_buffer_size;
++		ctx->skb_head->truesize += truesize;
+ 	}
+ 	skb_add_rx_frag(skb, num_frags, page_info->page,
+-			offset, len, packet_buffer_size);
++			offset, len, truesize);
+ 
+ 	return ctx->skb_head;
+ }
+@@ -486,7 +486,7 @@ static struct sk_buff *gve_rx_copy_to_pool(struct gve_rx_ring *rx,
+ 
+ 		memcpy(alloc_page_info.page_address, src, page_info->pad + len);
+ 		skb = gve_rx_add_frags(napi, &alloc_page_info,
+-				       rx->packet_buffer_size,
++				       PAGE_SIZE,
+ 				       len, ctx);
+ 
+ 		u64_stats_update_begin(&rx->statss);
+-- 
+2.43.0.429.g432eaa2c6b-goog
 
-If time based scheduling is not supported by the controller, then the
-property should not be present! The presence of a property like this
-should mean that the feature is supported, using it is up to the
-operating system.
-
-That said, why is this a property that should be in DT? If support is
-per controller is it not sufficient to use the compatible to determine
-if this is supported?
-
-Thanks,
-Conor.
-
->=20
-> Signed-off-by: Esben Haabendal <esben@geanix.com>
-> ---
->  Documentation/devicetree/bindings/net/snps,dwmac.yaml | 6 ++++++
->  1 file changed, 6 insertions(+)
->=20
-> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Docu=
-mentation/devicetree/bindings/net/snps,dwmac.yaml
-> index 5c2769dc689a..301e9150ecc3 100644
-> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> @@ -399,6 +399,12 @@ properties:
->              type: boolean
->              description: TX checksum offload is unsupported by the TX qu=
-eue.
-> =20
-> +          snps,time-based-scheduling:
-> +            type: boolean
-> +            description:
-> +              Time Based Scheduling will be enabled for TX queue.
-> +              This is typically not supported for TX queue 0.
-> +
->          allOf:
->            - if:
->                required:
-> --=20
-> 2.43.0
->=20
-
---orGn1OOIBTBi4VY0
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZbE11AAKCRB4tDGHoIJi
-0v8wAP9TtkDEdLKEVA0n+83492ltV8gpozpt7NTDo9bSA8pPRwEAk2CFLW1Ac02u
-hfaJxQ8KnrIuHQjJ9wb8ToaEVgPN9Ag=
-=Q0u6
------END PGP SIGNATURE-----
-
---orGn1OOIBTBi4VY0--
 
