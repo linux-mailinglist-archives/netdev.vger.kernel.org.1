@@ -1,73 +1,70 @@
-Return-Path: <netdev+bounces-65657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C773383B44F
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 22:55:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C47683B464
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 23:00:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECABB1C244E0
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 21:55:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E78FD1F2314F
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 22:00:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0760E135411;
-	Wed, 24 Jan 2024 21:55:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50D5E135A48;
+	Wed, 24 Jan 2024 21:59:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fMCiQ/wd"
+	dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b="LPpd66cQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
+Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 622A21353FE
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 21:55:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE1D7135406
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 21:59:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706133321; cv=none; b=GdvIFztXrGwC5WQrjrTcH7TFT2SFULJPFHQ8YNJSqOBuO3CKjeCoxtkAQFWL6zz6TfjhFZgNFZ6OmXOKrj+XSuJ0DwE1NBDlcG3rt5R1to62i4Bng/KCyJTAUN+B/zW4MduxjizOViKkeCk217sf6a9cIhItzOZLMmX38c6jJ5o=
+	t=1706133594; cv=none; b=OWHVzv3XpNFQUrHwxPJRDuXc8m+2No345d0/ybX44CH4iALL2wlcAqxPJarF4SoQHFgKmd2DLkJ6JxgUqPDFDu8gUMl1jR8qRU8MqenkZAKiiSgjJuZ4vrgve+8VyI+wNxkPdxWIHDMHpbuCHUbJTJBdzLUiKmKhwzqp9cs/slE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706133321; c=relaxed/simple;
-	bh=n3IPNbbVdKYaZpgAPJ5BWufRGEN+w7t+TDaWYJv2krA=;
+	s=arc-20240116; t=1706133594; c=relaxed/simple;
+	bh=s8xgUZHP3eLVBnQf9Aaqkp79I1G4orO/ySB5HyZFbGE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mZ3U95jn5uz7JKnpxRU8NplrP5H/Z+DzfC1sw/aVPO5Gh7pAvZuNr/eiiilwGgcHxpzyvgXIvKHuUITAWDuuOSI5x+v85YFwEkvhW1mZaN9gVSE244K8rvfFTLwnO60kqUu8Qh5pg+zh/FFAgriCeKZylEb399emtuL1tsHxBmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fMCiQ/wd; arc=none smtp.client-ip=209.85.166.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-7ba9f1cfe94so3404239f.1
-        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 13:55:20 -0800 (PST)
+	 In-Reply-To:Content-Type; b=D5SoBWbWrILM8WRDIFqsjWVQYF+zR2iu1fAUGjjtVkbShhHxuzULaD25mocmx4Kk5F7j+PhbLUcmsNO98Nt0LWNpqX/VwICEib1b6reweW7g/756UvwgPpwvavv6Crg56Ipme08VgnH8O+mBWH85WNUak6XrBXjJGfaq1DI9ls0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org; spf=pass smtp.mailfrom=ieee.org; dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b=LPpd66cQ; arc=none smtp.client-ip=209.85.166.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ieee.org
+Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-7ba903342c2so341047639f.3
+        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 13:59:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706133319; x=1706738119; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=ieee.org; s=google; t=1706133590; x=1706738390; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=g5kAKftFuR26zLdPSqWeCQwMFVTeeC/w9h4h4ULb/2E=;
-        b=fMCiQ/wdcNs8p2JZ6apk5uNnZeUc5gY1cjzgAB0fMHgjkIti8Z+XZRpK4Fn2MzgYu5
-         SfD1loiTy+WhUuMMnt4jSED+K8e6qewIX2iIhY7B3oIFOmPcOfkUmPyyjpBonl+plv/E
-         uZ6npkCkypTAmfiLnGsuUB3tYuaZToZzr5GAR/brNY85mvY3Cs72+/QnA+9vyOMD3r00
-         z/5mVLcZ5+23Jmx8bbr4yFccizl/cYpFH/6L7+u2HgLtjx4II0tEK6R5GewXaPJ0pmBx
-         IwO15ryj28dCVRs6iy4K1cqh9mMemp4ACx/RVJ7zk3dxZGviUf+cPgRNgTyKX0xgxUHj
-         o07Q==
+        bh=5W3Zc4lw9OY5mCDTox2UyfPkd23B5LnUVm+szTHb4aA=;
+        b=LPpd66cQiH3I/nIN9CxxN48FIgGeWvshvkltzYLz50AYb6JCL2tFS0ho7S0e276Lv2
+         /Z1nnaOzwCTHml+FhamI6qsmcg8rkSywGQ9f28dDsg6Ivg6y6AZn9wFkGFzKZOTwwg9L
+         4Z71MwsGdbjl+vcjZZXQXNEQ+qzeTnJo7VI78=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706133319; x=1706738119;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1706133590; x=1706738390;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=g5kAKftFuR26zLdPSqWeCQwMFVTeeC/w9h4h4ULb/2E=;
-        b=BjnaP2SYWaN5Zi3N8T8blR9imr4ACmL0eoRpptuKQzBwpWmExxr71OiLN3FyKHPfVg
-         /aNbpjAklLZdQ5ACHVgsGnIAV42Ax5Tju8DwWuuJP/IGP0VAYnmfIOi/l0PE8/uHAo8O
-         Kmg/tURPOkPYKD3a08RwlWdof2VWUq7L9gT9gxzU7Qbixn8bRJEWS1OcXL4SUbkukdIq
-         kInTFPXzf2vvG6Q1XRroIAGxGnEt6VyOCxYa2ckDM+iO+NPsOtffuRj6XzQVG/d2mFOn
-         7DoW74ZhFA9M1jhdOXQbTmKreTN5msXSs+npwK1oBTs8FF/iK8RVU7wj1Ybi7WKvaMR4
-         Hbmw==
-X-Gm-Message-State: AOJu0YwMtIdbfZMmac4U5s6e5nhTlJ37epBTSVSVXCAYgIXRPj6TARGX
-	84t0+LGIZwfC633ZF6wzDdBY4qkrfOvd/KMetiOKHUUjEzyzJ5X75N8eUvis
-X-Google-Smtp-Source: AGHT+IF5fvenDqwEHCLs7vxXOp+mW8H407CIyJLqns2q3dXJqGUBfQei/3fXVPbrfwSG1oI0WQdBig==
-X-Received: by 2002:a05:6e02:1b08:b0:360:8cd6:5637 with SMTP id i8-20020a056e021b0800b003608cd65637mr164479ilv.23.1706133319347;
-        Wed, 24 Jan 2024 13:55:19 -0800 (PST)
-Received: from ?IPV6:2601:282:1e82:2350:3c2c:1afc:52ff:38e7? ([2601:282:1e82:2350:3c2c:1afc:52ff:38e7])
-        by smtp.googlemail.com with ESMTPSA id j30-20020a02cb1e000000b0046f1c29757esm207867jap.15.2024.01.24.13.55.18
+        bh=5W3Zc4lw9OY5mCDTox2UyfPkd23B5LnUVm+szTHb4aA=;
+        b=GaCIWI3F/oRMgdVg6SyAeH1Z+hFBH5veAv39K/gF6aFLsuBIznijOkNNqCwf4cZqS+
+         ZCUmMcucYkqj7UARJlQ4wR0BvX94Ch6PAN11TIkjCj/vljKV09RfRQzQpoL7N+Qbb9wl
+         eThVpBvJt6QGqMpAo3shGGWpUgOG6MDEh6WuhwciFYptbqmDafyPswUzQyGrRysSldW1
+         jdfX3QzPG6OPEqxdSJLeG0h752fDo8L0Q4isP/h5zV1KRLqitxW96WxGlI6R1bhCj3lM
+         Vrhv7VCXow5cuMHaYZ6A0hrbFT/aFzblNPHB7x81h+tD62oS7GgF60vjN0E8L95vjpIX
+         4mFw==
+X-Gm-Message-State: AOJu0YzSIb6wM9NMpVGs87zvb2IzqCh1sDmlhdehZtzw4VoQiD1H3b0M
+	e1gTFkdmMwNkdB2+cmInxtRQJ5aHccTL0GIz+y4jnX/rnM+2sSNXYwov7lCbXQ==
+X-Google-Smtp-Source: AGHT+IFoErDfBnp90Aso6XiHus3HsXdUa1t+JDihc6T5l+sSuJErscvKMaONLo9iiGOiH+hMVMxlSA==
+X-Received: by 2002:a6b:e901:0:b0:7ba:8db3:2997 with SMTP id u1-20020a6be901000000b007ba8db32997mr140857iof.6.1706133589792;
+        Wed, 24 Jan 2024 13:59:49 -0800 (PST)
+Received: from [172.22.22.28] (c-98-61-227-136.hsd1.mn.comcast.net. [98.61.227.136])
+        by smtp.googlemail.com with ESMTPSA id dq16-20020a0566384d1000b0046e025d9fefsm4228174jab.48.2024.01.24.13.59.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Jan 2024 13:55:19 -0800 (PST)
-Message-ID: <61d1b53f-2879-4f9f-bd68-01333a892c02@gmail.com>
-Date: Wed, 24 Jan 2024 14:55:18 -0700
+        Wed, 24 Jan 2024 13:59:49 -0800 (PST)
+Message-ID: <51d07f81-45f4-4772-915f-ed5dac602a40@ieee.org>
+Date: Wed, 24 Jan 2024 15:59:46 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,101 +72,176 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [6.6.x REGRESSION][BISECTED] dev_snmp6: broken Ip6OutOctets
- accounting for forwarded IPv6 packets
+Subject: Re: [PATCH v2] treewide, serdev: change receive_buf() return type to
+ size_t
+To: Francesco Dolcini <francesco@dolcini.it>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Jiri Slaby <jirislaby@kernel.org>, linux-bluetooth@vger.kernel.org,
+ linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, greybus-dev@lists.linaro.org,
+ linux-iio@vger.kernel.org, netdev@vger.kernel.org,
+ chrome-platform@lists.linux.dev, platform-driver-x86@vger.kernel.org,
+ linux-serial@vger.kernel.org, linux-sound@vger.kernel.org
+Cc: Francesco Dolcini <francesco.dolcini@toradex.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Johan Hovold <johan@kernel.org>, Alex Elder <elder@kernel.org>,
+ Jonathan Cameron <jic23@kernel.org>, Lee Jones <lee@kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+ Hans de Goede <hdegoede@redhat.com>,
+ =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ Benson Leung <bleung@chromium.org>, Tzung-Bi Shih <tzungbi@kernel.org>,
+ Rob Herring <robh@kernel.org>, Jonathan Cameron <Jonathan.Cameron@huawei.com>
+References: <20240122180551.34429-1-francesco@dolcini.it>
 Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, Heng Guo <heng.guo@windriver.com>
-Cc: Vitezslav Samel <vitezslav@samel.cz>, netdev@vger.kernel.org
-References: <ZauRBl7zXWQRVZnl@pc11.op.pod.cz>
- <20240124123006.26bad16c@kernel.org>
-From: David Ahern <dsahern@gmail.com>
-In-Reply-To: <20240124123006.26bad16c@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Alex Elder <elder@ieee.org>
+In-Reply-To: <20240122180551.34429-1-francesco@dolcini.it>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 1/24/24 1:30 PM, Jakub Kicinski wrote:
-> Thanks for the analysis, Vitezslav!
+On 1/22/24 12:05 PM, Francesco Dolcini wrote:
+> From: Francesco Dolcini <francesco.dolcini@toradex.com>
 > 
-> Heng Guo, David, any thoughts on this? Revert?
-
-Revert is best; Heng Guo can revisit the math and try again.
-
-The patch in question basically negated IPSTATS_MIB_OUTOCTETS; I see it
-shown in proc but never bumped in the datapath.
-
+> receive_buf() is called from ttyport_receive_buf() that expects values
+> ">= 0" from serdev_controller_receive_buf(), change its return type from
+> ssize_t to size_t.
 > 
-> On Sat, 20 Jan 2024 10:23:18 +0100 Vitezslav Samel wrote:
->> 	Hi!
->>
->> In short:
->>
->>   since commit e4da8c78973c ("net: ipv4, ipv6: fix IPSTATS_MIB_OUTOCTETS increment duplicated")
->> the "Ip6OutOctets" entry of /proc/net/dev_snmp6/<interface> isn't
->> incremented by packet size for outbound forwarded unicast IPv6 packets.
->>
->>
->> In more detail:
->>
->>   After move from kernel 6.1.y to 6.6.y I was surprised by very low IPv6 to
->> IPv4 outgoing traffic ratio counted from /proc/net/... counters on our linux
->> router. In this simple scenario:
->>
->> 	NET1  <-->  ROUTER  <-->  NET2
->>
->>   the entry Ip6OutOctets of ROUTER's /proc/net/dev_snmp6/<interface> was
->> surprisingly low although the IPv6 traffic between NET1 and NET2 is rather
->> huge comparing to IPv4 traffic. The bisection led me to commit e4da8c78973c.
->> After reverting it, the numbers went to expected values.
->>
->>   Numbers for local outbound IPv6 seems correct, as well as numbers for IPv4.
->>
->>   Since the commit patches both IPv4 and IPv6 reverting it doesn't seem like
->> the right thing to do. Can you, please, look at it and cook some fix?
->>
->> 	Thanks,
->>
->> 		Vita
->>
->> #### git bisect log
->>
->> git bisect start '--' 'include' 'net'
->> # status: waiting for both good and bad commits
->> # good: [fb2635ac69abac0060cc2be2873dc4f524f12e66] Linux 6.1.62
->> git bisect good fb2635ac69abac0060cc2be2873dc4f524f12e66
->> # status: waiting for bad commit, 1 good commit known
->> # bad: [5e9df83a705290c4d974693097df1da9cbe25854] Linux 6.6.9
->> git bisect bad 5e9df83a705290c4d974693097df1da9cbe25854
->> # good: [830b3c68c1fb1e9176028d02ef86f3cf76aa2476] Linux 6.1
->> git bisect good 830b3c68c1fb1e9176028d02ef86f3cf76aa2476
->> # good: [6e98b09da931a00bf4e0477d0fa52748bf28fcce] Merge tag 'net-next-6.4' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next
->> git bisect good 6e98b09da931a00bf4e0477d0fa52748bf28fcce
->> # good: [9b39f758974ff8dfa721e68c6cecfd37e6ddb206] Merge tag 'nf-23-07-20' of https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
->> git bisect good 9b39f758974ff8dfa721e68c6cecfd37e6ddb206
->> # good: [38663034491d00652ac599fa48866bcf2ebd7bc1] Merge tag 'fsnotify_for_v6.6-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/jack/linux-fs
->> git bisect good 38663034491d00652ac599fa48866bcf2ebd7bc1
->> # good: [7ba2090ca64ea1aa435744884124387db1fac70f] Merge tag 'ceph-for-6.6-rc1' of https://github.com/ceph/ceph-client
->> git bisect good 7ba2090ca64ea1aa435744884124387db1fac70f
->> # bad: [ea1cc20cd4ce55dd920a87a317c43da03ccea192] Merge tag 'v6.6-rc7.vfs.fixes' of git://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs
->> git bisect bad ea1cc20cd4ce55dd920a87a317c43da03ccea192
->> # bad: [b938790e70540bf4f2e653dcd74b232494d06c8f] Bluetooth: hci_codec: Fix leaking content of local_codecs
->> git bisect bad b938790e70540bf4f2e653dcd74b232494d06c8f
->> # bad: [6912e724832c47bb381eb1bd1e483ec8df0d0f0f] net/smc: bugfix for smcr v2 server connect success statistic
->> git bisect bad 6912e724832c47bb381eb1bd1e483ec8df0d0f0f
->> # bad: [c3b704d4a4a265660e665df51b129e8425216ed1] igmp: limit igmpv3_newpack() packet size to IP_MAX_MTU
->> git bisect bad c3b704d4a4a265660e665df51b129e8425216ed1
->> # bad: [82ba0ff7bf0483d962e592017bef659ae022d754] net/handshake: fix null-ptr-deref in handshake_nl_done_doit()
->> git bisect bad 82ba0ff7bf0483d962e592017bef659ae022d754
->> # bad: [dc9511dd6f37fe803f6b15b61b030728d7057417] sctp: annotate data-races around sk->sk_wmem_queued
->> git bisect bad dc9511dd6f37fe803f6b15b61b030728d7057417
->> # good: [7e9be1124dbe7888907e82cab20164578e3f9ab7] netfilter: nf_tables: Audit log setelem reset
->> git bisect good 7e9be1124dbe7888907e82cab20164578e3f9ab7
->> # bad: [4e60de1e4769066aa9956c83545c8fa21847f326] Merge tag 'nf-23-08-31' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
->> git bisect bad 4e60de1e4769066aa9956c83545c8fa21847f326
->> # bad: [e4da8c78973c1e307c0431e0b99a969ffb8aa3f1] net: ipv4, ipv6: fix IPSTATS_MIB_OUTOCTETS increment duplicated
->> git bisect bad e4da8c78973c1e307c0431e0b99a969ffb8aa3f1
->> # first bad commit: [e4da8c78973c1e307c0431e0b99a969ffb8aa3f1] net: ipv4, ipv6: fix IPSTATS_MIB_OUTOCTETS increment duplicated
->>
->>
+> The need for this clean-up was noticed while fixing a warning, see
+> commit 94d053942544 ("Bluetooth: btnxpuart: fix recv_buf() return value").
+> Changing the callback prototype to return an unsigned seems the best way
+> to document the API and ensure that is properly used.
 > 
+> GNSS drivers implementation of serdev receive_buf() callback return
+> directly the return value of gnss_insert_raw(). gnss_insert_raw()
+> returns a signed int, however this is not an issue since the value
+> returned is always positive, because of the kfifo_in() implementation.
+
+Agreed.
+
+> gnss_insert_raw() could be changed to return also an unsigned, however
+> this is not implemented here as request by the GNSS maintainer Johan
+> Hovold.
+
+I was going to suggest this, and suggest changing the "ret" in
+gnss_insert_raw() to return size_t.  But to really do that right
+it would include some other changes as well.  Leaving it as an
+int as Johan suggests preserves correct behavior.
+
+One minor point below, plus a couple comments affirming that
+an int return value is OK because it's always non-negative.
+
+Reviewed-by: Alex Elder <elder@linaro.org>
+
+
+> Suggested-by: Jiri Slaby <jirislaby@kernel.org>
+> Link: https://lore.kernel.org/all/087be419-ec6b-47ad-851a-5e1e3ea5cfcc@kernel.org/
+> Signed-off-by: Francesco Dolcini <francesco.dolcini@toradex.com>
+> Acked-by: Jonathan Cameron <Jonathan.Cameron@huawei.com> #for-iio
+> ---
+> v1:
+>   - https://lore.kernel.org/all/20231214170146.641783-1-francesco@dolcini.it/
+> v2:
+>   - rebased on 6.8-rc1
+>   - add acked-by Jonathan
+>   - do not change gnss_insert_raw()
+>   - do not change the code style of the gnss code
+>   - commit message improvements, explain the reasons for doing only minimal
+>     changes on the GNSS part
+> ---
+>   drivers/bluetooth/btmtkuart.c              |  4 ++--
+>   drivers/bluetooth/btnxpuart.c              |  4 ++--
+>   drivers/bluetooth/hci_serdev.c             |  4 ++--
+>   drivers/gnss/serial.c                      |  2 +-
+>   drivers/gnss/sirf.c                        |  2 +-
+>   drivers/greybus/gb-beagleplay.c            |  6 +++---
+>   drivers/iio/chemical/pms7003.c             |  4 ++--
+>   drivers/iio/chemical/scd30_serial.c        |  4 ++--
+>   drivers/iio/chemical/sps30_serial.c        |  4 ++--
+>   drivers/iio/imu/bno055/bno055_ser_core.c   |  4 ++--
+>   drivers/mfd/rave-sp.c                      |  4 ++--
+>   drivers/net/ethernet/qualcomm/qca_uart.c   |  2 +-
+>   drivers/nfc/pn533/uart.c                   |  4 ++--
+>   drivers/nfc/s3fwrn5/uart.c                 |  4 ++--
+>   drivers/platform/chrome/cros_ec_uart.c     |  4 ++--
+>   drivers/platform/surface/aggregator/core.c |  4 ++--
+>   drivers/tty/serdev/serdev-ttyport.c        | 10 ++++------
+>   include/linux/serdev.h                     |  8 ++++----
+>   sound/drivers/serial-generic.c             |  4 ++--
+>   19 files changed, 40 insertions(+), 42 deletions(-)
+> 
+
+. . .
+
+> diff --git a/drivers/mfd/rave-sp.c b/drivers/mfd/rave-sp.c
+> index 6ff84b2600c5..62a6613fb070 100644
+> --- a/drivers/mfd/rave-sp.c
+> +++ b/drivers/mfd/rave-sp.c
+> @@ -471,8 +471,8 @@ static void rave_sp_receive_frame(struct rave_sp *sp,
+>   		rave_sp_receive_reply(sp, data, length);
+>   }
+>   
+> -static ssize_t rave_sp_receive_buf(struct serdev_device *serdev,
+> -				   const u8 *buf, size_t size)
+> +static size_t rave_sp_receive_buf(struct serdev_device *serdev,
+> +				  const u8 *buf, size_t size)
+>   {
+>   	struct device *dev = &serdev->dev;
+>   	struct rave_sp *sp = dev_get_drvdata(dev);
+
+One return path in this function returns (src - buf), which is
+*almost* guaranteed to be positive.  The one case it wouldn't
+be is if the assignment of end wraps around, and that's not
+checked.
+
+I think it's fine, but... That seems theoretically possible.
+
+
+> diff --git a/drivers/net/ethernet/qualcomm/qca_uart.c b/drivers/net/ethernet/qualcomm/qca_uart.c
+> index 223321897b96..20f50bde82ac 100644
+
+. . .
+
+> diff --git a/drivers/platform/surface/aggregator/core.c b/drivers/platform/surface/aggregator/core.c
+> index 9591a28bc38a..ba550eaa06fc 100644
+> --- a/drivers/platform/surface/aggregator/core.c
+> +++ b/drivers/platform/surface/aggregator/core.c
+> @@ -227,8 +227,8 @@ EXPORT_SYMBOL_GPL(ssam_client_bind);
+>   
+>   /* -- Glue layer (serdev_device -> ssam_controller). ------------------------ */
+>   
+> -static ssize_t ssam_receive_buf(struct serdev_device *dev, const u8 *buf,
+> -				size_t n)
+> +static size_t ssam_receive_buf(struct serdev_device *dev, const u8 *buf,
+> +			       size_t n)
+>   {
+>   	struct ssam_controller *ctrl;
+>   	int ret;
+
+Here you the return value will be positive despite ret being
+a signed int.  So like the GNSS case, this is OK.
+
+> diff --git a/drivers/tty/serdev/serdev-ttyport.c b/drivers/tty/serdev/serdev-ttyport.c
+> index e94e090cf0a1..3d7ae7fa5018 100644
+
+. . .
+
+> diff --git a/sound/drivers/serial-generic.c b/sound/drivers/serial-generic.c
+> index d6e5aafd697c..36409a56c675 100644
+> --- a/sound/drivers/serial-generic.c
+> +++ b/sound/drivers/serial-generic.c
+> @@ -100,8 +100,8 @@ static void snd_serial_generic_write_wakeup(struct serdev_device *serdev)
+>   	snd_serial_generic_tx_wakeup(drvdata);
+>   }
+>   
+> -static ssize_t snd_serial_generic_receive_buf(struct serdev_device *serdev,
+> -					      const u8 *buf, size_t count)
+> +static size_t snd_serial_generic_receive_buf(struct serdev_device *serdev,
+> +					     const u8 *buf, size_t count)
+>   {
+>   	int ret;
+>   	struct snd_serial_generic *drvdata = serdev_device_get_drvdata(serdev);
+
+Same thing here.
 
 
