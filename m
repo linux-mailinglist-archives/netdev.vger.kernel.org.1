@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-65359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6C0083A3ED
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:19:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6238083A3EE
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:19:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F234AB270E6
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 08:19:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17CD41F2CF3D
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 08:19:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E6D317573;
-	Wed, 24 Jan 2024 08:19:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6CBE17571;
+	Wed, 24 Jan 2024 08:19:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pcUu1Lw3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JgoE5ARn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B5C617571
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 08:19:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F08917589
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 08:19:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706084345; cv=none; b=fwsBTjYZwRhCqjv6RkhGBSmZ6axpi7aq0Rjswdb42u98Yz8f4ef1KPAAxkY/h7Jbv5QDugV8vHzBtNFaWX9siHTtvS/KlS8TmZWCsvWiWFMqsz3WQYw2vIlcNai9118nWyxDmN4KV0WYz86IfpRV57uRt2wgk/c4mJUyK+flnJY=
+	t=1706084346; cv=none; b=mj7PlFYRehwVurS0uFASpBgib1tvB5J6iWUaD+Xy3rMPK1urpWP5uHK7JH+oGl7+81IacyFN8HS88JmAwuftFNyUkcMkuJ/Cji4Llzo7CZ+1AfBtJhW60PVefC0RCmnPpSw5SFP4710yGfCU0RbxkcZlmFWRise/PH8yOzc8RZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706084345; c=relaxed/simple;
-	bh=IBT3sitrciWcKYJTKPfcybfu0PfdfAt/JYV3/2U2qUY=;
+	s=arc-20240116; t=1706084346; c=relaxed/simple;
+	bh=KLeF6Ff/3eFjKTN5iyOtyNgVUuqo8zcjymMJ4X8MiAU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=io9oKJQcTk2FlS0FMc2NbQyyjhkEJMJjBzBJdc/mFeOyBqE5FDJhgoJ0zXGO+mV5FjPon4HiwJmjhtm1ow/bU1/gYRBfuL41R6UzA72FMrV8oTpDhwV3aB1HazALnbE8rnSBVtz2UIGeqeytDKaYi4HnFctgqZblyjcKqqTqWG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pcUu1Lw3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7446AC433C7;
-	Wed, 24 Jan 2024 08:19:04 +0000 (UTC)
+	 MIME-Version; b=mXXXyDsAo9+9WEiiahiQjyWr99BnBeSqLEfjB8kAsW60ohUzBKU0WWOnxFsHnFLHxVgjeTtu/1GDNwOBxgcrlUgX6ep1Jg5EzYG/g1cR6+WMH6E2MURJE2fFIOeRFpjRr48a5nQA7jcnEbPHkxsiLxuq0qL+0sn3lh4uLQuN/wQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JgoE5ARn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 373C6C433F1;
+	Wed, 24 Jan 2024 08:19:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706084344;
-	bh=IBT3sitrciWcKYJTKPfcybfu0PfdfAt/JYV3/2U2qUY=;
+	s=k20201202; t=1706084346;
+	bh=KLeF6Ff/3eFjKTN5iyOtyNgVUuqo8zcjymMJ4X8MiAU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pcUu1Lw3MNrRra7NUTZuDvm0yjTWeW/XURUReGRTSsJ/EXVEaL3YexIw6TBWoYzFv
-	 HNkv3wGQg1tdG4gJM99rGZrPNGR2G2VcIsmBow3P86jJdGiGedN6T42mgbWfPsHkKx
-	 GLUMS+5g0O/2xXsSaeNmRe5vGM9gK2GZxWeYdH9PTespA9tnG1XkSisYsyFK91WaPu
-	 8AynFyhBT0LVe+yl0SQapSvyjT8DbzxeeRjO6yg/WqVdOKgKIMgSsTlSc7Ud5vGHVP
-	 Dp0Tj70Td3utrT76wgNgSdNehvKbRYjubKnCNs/yC1wxOGqUtOvepuj80RUkHSSju0
-	 S/Akr1tuUvFMg==
+	b=JgoE5ARn4g8sN5jUaAANVm+NieCSzDblIUqCjxuKOrafwzhE2NDuf5rzXY3GeEVdr
+	 sD/EcOqZ4lg6jjVnm1DbLfnAkQvZDScB82W4YbtVbkDp0U9mXb9XORTx954U8BM3+N
+	 tY9pZ85eshbhCuKa3vU1hqy2iXSAV+BLeeceaYHf0/rfwLYBkZn1S8v8Y8ndkkwNFR
+	 1DAio9kXGPVrrY2Wz+ZTdXHISPCT4HWKb73D95tU6hlGuheIdBBj/aFcocqXDFNCur
+	 Nw7kn1NLQ8kaf+Z+T1qBCEhsYpryaItQ2KkbhVNy7lbtRpOF//LD/GtthManQCsLU6
+	 kJ6mlElnKMsSg==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -48,10 +48,11 @@ To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>
-Subject: [net 02/14] net/mlx5: Fix query of sd_group field
-Date: Wed, 24 Jan 2024 00:18:43 -0800
-Message-ID: <20240124081855.115410-3-saeed@kernel.org>
+	Tariq Toukan <tariqt@nvidia.com>,
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Subject: [net 03/14] net/mlx5e: Fix operation precedence bug in port timestamping napi_poll context
+Date: Wed, 24 Jan 2024 00:18:44 -0800
+Message-ID: <20240124081855.115410-4-saeed@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240124081855.115410-1-saeed@kernel.org>
 References: <20240124081855.115410-1-saeed@kernel.org>
@@ -63,94 +64,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Tariq Toukan <tariqt@nvidia.com>
+From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
 
-The sd_group field moved in the HW spec from the MPIR register
-to the vport context.
-Align the query accordingly.
+Indirection (*) is of lower precedence than postfix increment (++). Logic
+in napi_poll context would cause an out-of-bound read by first increment
+the pointer address by byte address space and then dereference the value.
+Rather, the intended logic was to dereference first and then increment the
+underlying value.
 
-Fixes: f5e956329960 ("net/mlx5: Expose Management PCIe Index Register (MPIR)")
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+Fixes: 92214be5979c ("net/mlx5e: Update doorbell for port timestamping CQ before the software counter")
+Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../net/ethernet/mellanox/mlx5/core/vport.c   | 21 +++++++++++++++++++
- include/linux/mlx5/mlx5_ifc.h                 | 10 ++++++---
- include/linux/mlx5/vport.h                    |  1 +
- 3 files changed, 29 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/vport.c b/drivers/net/ethernet/mellanox/mlx5/core/vport.c
-index 21753f327868..1005bb6935b6 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/vport.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/vport.c
-@@ -440,6 +440,27 @@ int mlx5_query_nic_vport_system_image_guid(struct mlx5_core_dev *mdev,
- }
- EXPORT_SYMBOL_GPL(mlx5_query_nic_vport_system_image_guid);
- 
-+int mlx5_query_nic_vport_sd_group(struct mlx5_core_dev *mdev, u8 *sd_group)
-+{
-+	int outlen = MLX5_ST_SZ_BYTES(query_nic_vport_context_out);
-+	u32 *out;
-+	int err;
-+
-+	out = kvzalloc(outlen, GFP_KERNEL);
-+	if (!out)
-+		return -ENOMEM;
-+
-+	err = mlx5_query_nic_vport_context(mdev, 0, out);
-+	if (err)
-+		goto out;
-+
-+	*sd_group = MLX5_GET(query_nic_vport_context_out, out,
-+			     nic_vport_context.sd_group);
-+out:
-+	kvfree(out);
-+	return err;
-+}
-+
- int mlx5_query_nic_vport_node_guid(struct mlx5_core_dev *mdev, u64 *node_guid)
- {
- 	u32 *out;
-diff --git a/include/linux/mlx5/mlx5_ifc.h b/include/linux/mlx5/mlx5_ifc.h
-index bf5320b28b8b..37230253f9f1 100644
---- a/include/linux/mlx5/mlx5_ifc.h
-+++ b/include/linux/mlx5/mlx5_ifc.h
-@@ -4036,8 +4036,13 @@ struct mlx5_ifc_nic_vport_context_bits {
- 	u8	   affiliation_criteria[0x4];
- 	u8	   affiliated_vhca_id[0x10];
- 
--	u8	   reserved_at_60[0xd0];
-+	u8	   reserved_at_60[0xa0];
- 
-+	u8	   reserved_at_100[0x1];
-+	u8         sd_group[0x3];
-+	u8	   reserved_at_104[0x1c];
-+
-+	u8	   reserved_at_120[0x10];
- 	u8         mtu[0x10];
- 
- 	u8         system_image_guid[0x40];
-@@ -10122,8 +10127,7 @@ struct mlx5_ifc_mpir_reg_bits {
- 	u8         reserved_at_20[0x20];
- 
- 	u8         local_port[0x8];
--	u8         reserved_at_28[0x15];
--	u8         sd_group[0x3];
-+	u8         reserved_at_28[0x18];
- 
- 	u8         reserved_at_60[0x20];
- };
-diff --git a/include/linux/mlx5/vport.h b/include/linux/mlx5/vport.h
-index fbb9bf447889..c36cc6d82926 100644
---- a/include/linux/mlx5/vport.h
-+++ b/include/linux/mlx5/vport.h
-@@ -72,6 +72,7 @@ int mlx5_query_nic_vport_mtu(struct mlx5_core_dev *mdev, u16 *mtu);
- int mlx5_modify_nic_vport_mtu(struct mlx5_core_dev *mdev, u16 mtu);
- int mlx5_query_nic_vport_system_image_guid(struct mlx5_core_dev *mdev,
- 					   u64 *system_image_guid);
-+int mlx5_query_nic_vport_sd_group(struct mlx5_core_dev *mdev, u8 *sd_group);
- int mlx5_query_nic_vport_node_guid(struct mlx5_core_dev *mdev, u64 *node_guid);
- int mlx5_modify_nic_vport_node_guid(struct mlx5_core_dev *mdev,
- 				    u16 vport, u64 node_guid);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c b/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
+index c206cc0a8483..078f56a3cbb2 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
+@@ -213,7 +213,7 @@ static void mlx5e_ptp_handle_ts_cqe(struct mlx5e_ptpsq *ptpsq,
+ 	mlx5e_ptpsq_mark_ts_cqes_undelivered(ptpsq, hwtstamp);
+ out:
+ 	napi_consume_skb(skb, budget);
+-	md_buff[*md_buff_sz++] = metadata_id;
++	md_buff[(*md_buff_sz)++] = metadata_id;
+ 	if (unlikely(mlx5e_ptp_metadata_map_unhealthy(&ptpsq->metadata_map)) &&
+ 	    !test_and_set_bit(MLX5E_SQ_STATE_RECOVERING, &sq->state))
+ 		queue_work(ptpsq->txqsq.priv->wq, &ptpsq->report_unhealthy_work);
 -- 
 2.43.0
 
