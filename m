@@ -1,141 +1,201 @@
-Return-Path: <netdev+bounces-65511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65512-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9669283AE1B
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 17:14:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3525283AE2C
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 17:17:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CFBF286BAA
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 16:14:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0F7E1F21C45
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 16:17:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3817F7CF15;
-	Wed, 24 Jan 2024 16:12:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WPJfcmIR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 859C57E563;
+	Wed, 24 Jan 2024 16:17:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E9C17CF08;
-	Wed, 24 Jan 2024 16:12:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E5E97E562;
+	Wed, 24 Jan 2024 16:17:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706112753; cv=none; b=aBSBOK27OKbTDM71E1J9eu1s+GC+UFOTlN+ai4lLh7gGS4FpYpMRNqv2CL8T+8V6eaYCI3Zsxl/yR7NV2T9SibJmwnZjAiSEJnz9dz7cE5MW1P7hQNPwHOcM9CTf7VCUq5ic6nE4EyvRXLD0eZCBh/RhB/ShBuQd86w66+vWd+0=
+	t=1706113047; cv=none; b=B20QLNcWJAgvQyATpBUy8ATPg198iq2HzTW4w3c8l0F+IAYJsW2gQnJkyEFhVh+1IGZv5PXusaKN0QSHdRCi0vZ/+9iCVR0ebDMeLufDZggTD5wF9/79klW1l2IyL+rvVhslO7f+CgqFRDkfn47DZpkZq1KpFSsnnhUKEey4qCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706112753; c=relaxed/simple;
-	bh=vca/IRBT7V4XijVluTRcZtnJHCm0KKGPrd6DmMM9/k0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UG14Ox6RUdbSnSs3TOo9tcX1hQK84bQJQQCPNRVL5pgT+m1A9Hp6G8rpPz7MGPd2BdJpGRAzI9tyxWR9vE8HJ6kdS05cmd5ihrWOz4ASj2moIgromDxTSpQ0oosMXQHcT6Kvv0DD6vQRUdzHUNX2FK3suqBNO0uFU6Gy3INwV0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WPJfcmIR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E75EC433F1;
-	Wed, 24 Jan 2024 16:12:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706112752;
-	bh=vca/IRBT7V4XijVluTRcZtnJHCm0KKGPrd6DmMM9/k0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WPJfcmIRZHvIF6wa5nnnp/4zybp+D3zxl/0hmOsJ/dDJzCsS+wesxKAP+x9CGer4+
-	 kljq02k20OB6JkV3coKGnkx3uuuEd859haMZ11x8jTan1kn/i+0RxNBhWkZJDy9Zp1
-	 n8BLlwT70cH+OebDvTO6EPpggkxw4WNdUWR4HvE0dWdzcDG9Zd58phLrvDDBtA9B5O
-	 hoVOtCmZIL5R8XdWybqE/xTh5hDL1pzOKX1Gmv7rNfIvhW/E4+RzxhcoZGJvjAcSja
-	 TehE+s8fahZHaHaLWOlVsvo9RuxyXZpzEX4PChz5RlwEyg26PE4W1mbEkkt9om1KYn
-	 Jw/vyGhOqeuFg==
-Date: Wed, 24 Jan 2024 16:12:27 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Fabian Pfitzner <f.pfitzner@pengutronix.de>
-Cc: Michael Hennerich <michael.hennerich@analog.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Alexandru Tachici <alexandru.tachici@analog.com>,
-	kernel@pengutronix.de, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] dt-bindings: net: adin: add recovered clock output
-Message-ID: <20240124-thespian-user-e03315490295@spud>
-References: <20240122110311.2725036-1-f.pfitzner@pengutronix.de>
- <20240124102554.1327853-1-f.pfitzner@pengutronix.de>
+	s=arc-20240116; t=1706113047; c=relaxed/simple;
+	bh=rXNeYjIbp304MydXOXcFoTjwZoS/dhBpt7AXuSBz4Ro=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NCCz1rI7HOh3OkQCzI0LUUaIqIZRVWf6avEUi0lZLd+MKanFNL3QIdVInfMxAl4AeWhY0tPd8BuQN34SWbSFyW84/t+3x/mP27L7hJ3kHIa6BX2ZuBadbObPoGQQqLcfeW6iIdLBoB/eTAU3pBnmjoF1VLy8YZHmLgatToGY5AM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl; spf=pass smtp.mailfrom=v0yd.nl; arc=none smtp.client-ip=80.241.56.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=v0yd.nl
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4TKpy30F5Vz9swq;
+	Wed, 24 Jan 2024 17:17:15 +0100 (CET)
+Message-ID: <6e618827-c9c1-4ef8-9c98-27ef10b6d6a2@v0yd.nl>
+Date: Wed, 24 Jan 2024 17:17:12 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="t3OrvrAsH2Aaal0o"
-Content-Disposition: inline
-In-Reply-To: <20240124102554.1327853-1-f.pfitzner@pengutronix.de>
+Subject: Re: [PATCH v3 0/4] Bluetooth: Improve retrying of connection attempts
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20240108224614.56900-1-verdre@v0yd.nl>
+ <CABBYNZKV176teECGnGKTCNNo45ZYbCRs=YddETOUMUsJQX5PdA@mail.gmail.com>
+ <efcc7b97-6bfc-4e5d-8e73-78f2b190fa02@v0yd.nl>
+Content-Language: en-US
+From: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
+In-Reply-To: <efcc7b97-6bfc-4e5d-8e73-78f2b190fa02@v0yd.nl>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
+Hi Luiz,
 
---t3OrvrAsH2Aaal0o
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 1/9/24 10:57 PM, Jonas Dreßler wrote:
+> Hi Luiz,
+> 
+> On 1/9/24 18:53, Luiz Augusto von Dentz wrote:
+>> Hi Jonas,
+>>
+>> On Mon, Jan 8, 2024 at 5:46 PM Jonas Dreßler <verdre@v0yd.nl> wrote:
+>>>
+>>> Since commit 4c67bc74f016 ("[Bluetooth] Support concurrent connect
+>>> requests"), the kernel supports trying to connect again in case the
+>>> bluetooth card is busy and fails to connect.
+>>>
+>>> The logic that should handle this became a bit spotty over time, and also
+>>> cards these days appear to fail with more errors than just "Command
+>>> Disallowed".
+>>>
+>>> This series refactores the handling of concurrent connection requests
+>>> by serializing all "Create Connection" commands for ACL connections
+>>> similar to how we do it for LE connections.
+>>>
+>>> ---
+>>>
+>>> v1: https://lore.kernel.org/linux-bluetooth/20240102185933.64179-1-verdre@v0yd.nl/
+>>> v2: https://lore.kernel.org/linux-bluetooth/20240108183938.468426-1-verdre@v0yd.nl/
+>>> v3:
+>>>    - Move the new sync function to hci_sync.c as requested by review
+>>>    - Abort connection on failure using hci_abort_conn_sync() instead of
+>>>      hci_abort_conn()
+>>>    - Make the last commit message a bit more precise regarding the meaning
+>>>      of BT_CONNECT2 state
+>>>
+>>> Jonas Dreßler (4):
+>>>    Bluetooth: Remove superfluous call to hci_conn_check_pending()
+>>>    Bluetooth: hci_event: Use HCI error defines instead of magic values
+>>>    Bluetooth: hci_conn: Only do ACL connections sequentially
+>>>    Bluetooth: Remove pending ACL connection attempts
+>>>
+>>>   include/net/bluetooth/hci.h      |  3 ++
+>>>   include/net/bluetooth/hci_core.h |  1 -
+>>>   include/net/bluetooth/hci_sync.h |  3 ++
+>>>   net/bluetooth/hci_conn.c         | 83 +++-----------------------------
+>>>   net/bluetooth/hci_event.c        | 29 +++--------
+>>>   net/bluetooth/hci_sync.c         | 72 +++++++++++++++++++++++++++
+>>>   6 files changed, 93 insertions(+), 98 deletions(-)
+>>>
+>>> -- 
+>>> 2.43.0
+>>
+>> After rebasing and fixing a little bit here and there, see v4, looks
+>> like this changes is affecting the following mgmt-tester -s "Pair
+>> Device - Power off 1":
+>>
+>> Pair Device - Power off 1 - init
+>>    Read Version callback
+>>      Status: Success (0x00)
+>>      Version 1.22
+>>    Read Commands callback
+>>      Status: Success (0x00)
+>>    Read Index List callback
+>>      Status: Success (0x00)
+>>    Index Added callback
+>>      Index: 0x0000
+>>    Enable management Mesh interface
+>>    Enabling Mesh feature
+>>    Read Info callback
+>>      Status: Success (0x00)
+>>      Address: 00:AA:01:00:00:00
+>>      Version: 0x09
+>>      Manufacturer: 0x05f1
+>>      Supported settings: 0x0001bfff
+>>      Current settings: 0x00000080
+>>      Class: 0x000000
+>>      Name:
+>>      Short name:
+>>    Mesh feature is enabled
+>> Pair Device - Power off 1 - setup
+>>    Setup sending Set Bondable (0x0009)
+>>    Setup sending Set Powered (0x0005)
+>>    Initial settings completed
+>>    Test setup condition added, total 1
+>>    Client set connectable: Success (0x00)
+>>    Test setup condition complete, 0 left
+>> Pair Device - Power off 1 - setup complete
+>> Pair Device - Power off 1 - run
+>>    Sending Pair Device (0x0019)
+>> Bluetooth: hci0: command 0x0405 tx timeout
+>> Bluetooth: hci0: command 0x0408 tx timeout
+>>    Test condition added, total 1
+>> Pair Device - Power off 1 - test timed out
+>>    Pair Device (0x0019): Disconnected (0x0e)
+>> Pair Device - Power off 1 - test not run
+>> Pair Device - Power off 1 - teardown
+>> Pair Device - Power off 1 - teardown
+>>    Index Removed callback
+>>      Index: 0x0000
+>> Pair Device - Power off 1 - teardown complete
+>> Pair Device - Power off 1 - done
+>>
+> 
+> Thanks for landing the first two commits!
+> 
+> I think this is actually the same issue causing the test failure
+> as in the other issue I had:
+> https://lore.kernel.org/linux-bluetooth/7cee4e74-3a0c-4b7c-9984-696e646160f8@v0yd.nl/
+> 
+> It seems that the emulator is unable to reply to HCI commands sent
+> from the hci_sync machinery, possibly because that is sending things
+> on a separate thread?
 
-On Wed, Jan 24, 2024 at 11:25:54AM +0100, Fabian Pfitzner wrote:
-> The ADIN1300 offers three distinct output clocks which can be accessed
-> through the GP_CLK pin. The DT only offers two of the possible options
-> and thus the 125MHz-recovered output clock is missing.
->=20
-> As there is no other way to configure this pin than through the DT it
-> should be possible to do so for all available outputs.
->=20
-> Signed-off-by: Fabian Pfitzner <f.pfitzner@pengutronix.de>
+Okay I did some further digging now: Turns out this actually not a problem
+with vhci and the emulator, but (in this test case) it's actually intended
+that there's the command times out, because force_power_off is TRUE for
+this test case, and the HCI device gets shut down right after sending the MGMT
+command.
 
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
+The test broke because the "Command Complete" MGMT event comes back with status
+"Disconnected" instead of "Not Powered": The reason for that is the
+hci_abort_conn_sync() that I added in the case where the "Create Connection" HCI
+times out. hci_abort_conn_sync() calls hci_conn_failed() with
+HCI_ERROR_LOCAL_HOST_TERM as expected, this in turn calls the hci_connect_cfm()
+callback (pairing_complete_cb), and there we we look up HCI_ERROR_LOCAL_HOST_TERM
+in mgmt_status_table, ending up with MGMT_STATUS_DISCONNECTED.
+
+When I remove the hci_abort_conn_sync() we get the "Not Powered" failure again,
+I'm not exactly sure why that happens (I assume there's some kind of generic mgmt
+failure return handler that checks hdev_is_powered() and then sets the error).
+
+So the question now is do we want to adjust the test (and possibly bluetoothd?)
+to expect "Disconnected" instead of "Not Powered", or should I get rid of the
+hci_abort_conn_sync() again? Fwiw, in hci_le_create_conn_sync() we also clean
+up like this on ETIMEDOUT (maybe the spec is just different there?), so
+consistency wise it seems better to adjust the test to expect "Disconnected".
 
 Cheers,
-Conor.
+Jonas
 
-> ---
->  Documentation/devicetree/bindings/net/adi,adin.yaml | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
->=20
-> diff --git a/Documentation/devicetree/bindings/net/adi,adin.yaml b/Docume=
-ntation/devicetree/bindings/net/adi,adin.yaml
-> index 929cf8c0b0fd..04059393b756 100644
-> --- a/Documentation/devicetree/bindings/net/adi,adin.yaml
-> +++ b/Documentation/devicetree/bindings/net/adi,adin.yaml
-> @@ -38,14 +38,17 @@ properties:
-> =20
->    adi,phy-output-clock:
->      description: |
-> -      Select clock output on GP_CLK pin. Two clocks are available:
-> -      A 25MHz reference and a free-running 125MHz.
-> +      Select clock output on GP_CLK pin. Three clocks are available:
-> +        - 25MHz reference
-> +        - free-running 125MHz
-> +        - recovered 125MHz
->        The phy can alternatively automatically switch between the referen=
-ce and
->        the 125MHz clocks based on its internal state.
->      $ref: /schemas/types.yaml#/definitions/string
->      enum:
->        - 25mhz-reference
->        - 125mhz-free-running
-> +      - 125mhz-recovered
->        - adaptive-free-running
-> =20
->    adi,phy-output-reference-clock:
->=20
-> base-commit: 6613476e225e090cc9aad49be7fa504e290dd33d
-> --=20
-> 2.39.2
->=20
-
---t3OrvrAsH2Aaal0o
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZbE26wAKCRB4tDGHoIJi
-0uasAP9k19fNc3ngPfP4KVkRXGmzsNoEaqPZih5IpbjEPe/ixgD9EmYsTcGn3IWJ
-8hvoOz5lMTlqOuGoIlB61AKbTVVVXw0=
-=mTuk
------END PGP SIGNATURE-----
-
---t3OrvrAsH2Aaal0o--
+> 
+> Cheers,
+> Jonas
 
