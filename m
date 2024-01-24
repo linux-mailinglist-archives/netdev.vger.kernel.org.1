@@ -1,114 +1,137 @@
-Return-Path: <netdev+bounces-65429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD1DE83A6CD
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 11:29:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A89A83A6D4
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 11:30:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9DABCB27486
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:29:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6768EB27A8A
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:30:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43ECB199A7;
-	Wed, 24 Jan 2024 10:29:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F364518E2E;
+	Wed, 24 Jan 2024 10:29:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="fgg61qzG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TaBuLENr"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F235A19477;
-	Wed, 24 Jan 2024 10:29:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEBE31AAA5;
+	Wed, 24 Jan 2024 10:29:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706092177; cv=none; b=TdWk/l+mbKJS2RsOnE5x+kdwic3B4qdSJM6Ll+H4O0Xt3l2CGK12pp0GyR4aClXxAMuhOPM6o5D0DuW7s13pi3QpsspkVMZ/6va0O8Ly+epQzSrSUFYIRw9wMcFizl24L/UBKTuy5JgXlO9JwevtFucnWvkcevtdK8BmH2O2oDM=
+	t=1706092189; cv=none; b=Lg2RNkBZXr92pxdkkQn6ZvEQPja6ou+cuQguVpp+5BmR4Tointd6ziN8teBvd4ddOteXw9wFllpBFGSG2gm/bx7ZmBYY2MWL19s1b1it+b4EO6dWYlde23XSl9qzOczug0dxzBoGQEi5t2WelQ3OWEz0h+zj3cDTb5Pn4ZshmXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706092177; c=relaxed/simple;
-	bh=Dmx5SuChduxCEeVi8pipanPYbUlTU9+SQdk+aCCDLl4=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=BPW0/sNFp/iuILpayo3HW8UfJ3X2SsOFvhf7BbUN9BSlVGdJ2d8+K1PxN4VYUjStB2p2LAwRIq2MLUYuXNg4ieG42PaBwWFoUM2tXPcG1b61TmrUFvxXDIhlhUm4nTTGgPItrfFlIBgYfr7zRdiwDQWtKFFW7hO9Htm5deiZx5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=fgg61qzG; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=D864anpPxA/M/z0+gC+pfM7u04tkcLvvuRBDrZXY//4=; b=fgg61qzG9tT159hHX2d9OKGJLX
-	oebo7sUnlaxj4Jk6BxJiM9Jc+iMdPvHoAy3Oe2lEjOL2jauwZfl5HxGKAWMZj3rDS1pEiWCda98I4
-	jYZbmklKm5v3LBCp7v3vAezMdt4VMe+ym8YXGObz2X5f+U5AYA79CO+r0XkDvRf7rs2fgk23GGJ20
-	snng/ugdN9IVfuHAwZPNftgL9+O8GD3uWmnho7yigmnEBLkWlAQp98Kj9pwUdmJ+jssExZpgWahvs
-	lluhPxIdrfFVBk+sbS2LZSly8DRM2659JMrvB51QrCnRMDgQMhIwy8WZF5JGQS2NuWdorffN9C+Fx
-	s33yAcxg==;
-Received: from sslproxy02.your-server.de ([78.47.166.47])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rSaVc-000Py7-Vl; Wed, 24 Jan 2024 11:29:29 +0100
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy02.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rSaVc-000ONc-C8; Wed, 24 Jan 2024 11:29:28 +0100
-Subject: Re: [RFC PATCH v7 7/8] samples/bpf: Add an example of bpf fq qdisc
-To: Amery Hung <ameryhung@gmail.com>, netdev@vger.kernel.org
-Cc: bpf@vger.kernel.org, yangpeihao@sjtu.edu.cn, toke@redhat.com,
- jhs@mojatatu.com, jiri@resnulli.us, sdf@google.com,
- xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
-References: <cover.1705432850.git.amery.hung@bytedance.com>
- <52a0e08033292a88865aab37b0b3bd294b93e13c.1705432850.git.amery.hung@bytedance.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <1f48019a-fb72-324c-7626-ba5ccb9307b0@iogearbox.net>
-Date: Wed, 24 Jan 2024 11:29:27 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	s=arc-20240116; t=1706092189; c=relaxed/simple;
+	bh=vGeH8O/idxM0sz+OcKnGybYW1xtFoz1P9rDGvF9sN+0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cm8blExf1pVvOKWGsu2KW+1KvWsEffQ942ALjBt7Hls+PMHkeZ20CSSZ2aD8+QeMXV94bwO7T7oYlFm/P8dpHKC46rorNg7rLylLJI9L5gxREmBgcjt4p83CovrcUBsBg4KIjXvyhWjv/83TcqWRFWZd6O2pTD5GtlQU1uHiJ2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TaBuLENr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8C1EC433F1;
+	Wed, 24 Jan 2024 10:29:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706092189;
+	bh=vGeH8O/idxM0sz+OcKnGybYW1xtFoz1P9rDGvF9sN+0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TaBuLENrsiM5ybt4sZQDl1B4vwATyWMkK62EPQErt5aSPY3Gibg/JcV5Qt+tS12PR
+	 r4LaGlAr/6UDr0af4KDFvM3doYb9CZGjuUjGtTJxeiT7pzsQv5hCESEmWuOkF/lxMy
+	 mBNHYNlcbCoc4Fa/lWPA3+HzjCbcYnJ/rf/dFPxJ31ADgbm1ZwTX9bSt6A4YzTLn4g
+	 74WknBmtdbNsT8Ca/WiIno1FnafcSvf2e70lq7z60NKKZSV3cE9pO5qyCf4zm70DkM
+	 OymxETo4VEBdh6tyTcNaLpN015nsZhZOZsJZYjHwoUlBBmj//Zkw2RRQmLKW1Re3gg
+	 cov2HRISizh0Q==
+Date: Wed, 24 Jan 2024 10:29:44 +0000
+From: Simon Horman <horms@kernel.org>
+To: Michael Kelley <mhklinux@outlook.com>
+Cc: "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
+	"wei.liu@kernel.org" <wei.liu@kernel.org>,
+	"decui@microsoft.com" <decui@microsoft.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net 1/1] hv_netvsc: Calculate correct ring size when
+ PAGE_SIZE is not 4 Kbytes
+Message-ID: <20240124102944.GW254773@kernel.org>
+References: <20240122162028.348885-1-mhklinux@outlook.com>
+ <SN6PR02MB415753E9E46CCC4AC809220DD4742@SN6PR02MB4157.namprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <52a0e08033292a88865aab37b0b3bd294b93e13c.1705432850.git.amery.hung@bytedance.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27163/Tue Jan 23 10:42:11 2024)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SN6PR02MB415753E9E46CCC4AC809220DD4742@SN6PR02MB4157.namprd02.prod.outlook.com>
 
-On 1/17/24 10:56 PM, Amery Hung wrote:
-> tc_sch_fq.bpf.c
-> A simple bpf fair queueing (fq) qdisc that gives each flow a euqal chance
-> to transmit data. The qdisc respects the timestamp in a skb set by an
-> clsact rate limiter. It can also inform the rate limiter about packet drop
-> when enabled to adjust timestamps. The implementation does not prevent hash
-> collision of flows nor does it recycle flows.
+On Tue, Jan 23, 2024 at 05:13:12PM +0000, Michael Kelley wrote:
+> From: Simon Horman @ 2024-01-22 20:49 UTC (permalink / raw)
+> > 
+> > On Mon, Jan 22, 2024 at 08:20:28AM -0800, mhkelley58@gmail.com wrote:
+> > > From: Michael Kelley <mhklinux@outlook.com>
+> > >
+> > > Current code in netvsc_drv_init() incorrectly assumes that PAGE_SIZE
+> > > is 4 Kbytes, which is wrong on ARM64 with 16K or 64K page size. As a
+> > > result, the default VMBus ring buffer size on ARM64 with 64K page size
+> > > is 8 Mbytes instead of the expected 512 Kbytes. While this doesn't break
+> > > anything, a typical VM with 8 vCPUs and 8 netvsc channels wastes 120
+> > > Mbytes (8 channels * 2 ring buffers/channel * 7.5 Mbytes/ring buffer).
+> > >
+> > > Unfortunately, the module parameter specifying the ring buffer size
+> > > is in units of 4 Kbyte pages. Ideally, it should be in units that
+> > > are independent of PAGE_SIZE, but backwards compatibility prevents
+> > > changing that now.
+> > >
+> > > Fix this by having netvsc_drv_init() hardcode 4096 instead of using
+> > > PAGE_SIZE when calculating the ring buffer size in bytes. Also
+> > > use the VMBUS_RING_SIZE macro to ensure proper alignment when running
+> > > with page size larger than 4K.
+> > >
+> > > Cc: <stable@vger.kernel.org> # 5.15.x
+> > > Signed-off-by: Michael Kelley <mhklinux@outlook.com>
+> > 
+> > Hi Michael,
+> > 
+> > As a bug fix this probably warrants a fixes tag.
+> > Perhaps this is appropriate?
+> > 
+> > Fixes: 450d7a4b7ace ("Staging: hv: ring parameter")
+> > 
 > 
-> tc_sch_fq.c
-> A user space program to load and attach the eBPF-based fq qdisc, which
-> by default add the bpf fq to the loopback device, but can also add to other
-> dev and class with '-d' and '-p' options.
+> [This email is cobbled together because for some reason I didn't directly
+> receive your original reply.  So it won't thread correctly with yours.]
 > 
-> To test the bpf fq qdisc with the EDT rate limiter:
-> $ tc qdisc add dev lo clsact
-> $ tc filter add dev lo egress bpf obj tc_clsact_edt.bpf.o sec classifier
-> $ ./tc_sch_fq -s
+> I thought about a Fixes: tag, but the situation is a bit weird.  The original
+> code was correct enough at the time it was written in 2010 because Hyper-V
+> only ran on x86/x64 with a 4 Kbyte guest page size.   In fact, all the Hyper-V
+> guest code in the Linux kernel tended to assume a 4 Kbyte page size.
+> During 2019 and 2020, I and others made changes to remove this
+> assumption, in prep for running Hyper-V Linux guests on ARM64.  The
+> ARM64 support was finally enabled with commit 7aff79e297ee in August
+> 2021 for the 5.15 kernel.  Somehow we missed fixing this case in the netvsc
+> driver, and a similar case in the Hyper-V synthetic storage driver (see [1]).
+> 
+> As a result, there's no point in backporting this fix to anything earlier than
+> 5.15, because there's no ARM64 support for Hyper-V guests in earlier kernels.
+> So picking a "Fixes:" commit from back in 2010 doesn't seem helpful.  I could
+> see doing
+> 
+> Fixes: 7aff79e297ee ("Drivers: hv: Enable Hyper-V code to be built on ARM64")
+> 
+> But the connection between that commit and this fix isn't very evident, so I
+> opt'ed for just putting the 5.15.x notation on the Cc: stable@vger.kernel.org
+> line.  That said, I don't feel strongly about it.  I'm just trying to do what's best
+> for the stable branch maintainers and avoid generating backports to kernel
+> versions where it doesn't matter.
 
-Would be nice if you also include a performance comparison (did you do
-production tests with it?) with side-by-side to native fq and if you see
-a delta elaborate on what would be needed to address it.
+Thanks for the explanation.
 
-> Signed-off-by: Amery Hung <amery.hung@bytedance.com>
-> ---
->   samples/bpf/Makefile            |   8 +-
->   samples/bpf/bpf_experimental.h  | 134 +++++++
->   samples/bpf/tc_clsact_edt.bpf.c | 103 +++++
->   samples/bpf/tc_sch_fq.bpf.c     | 666 ++++++++++++++++++++++++++++++++
->   samples/bpf/tc_sch_fq.c         | 321 +++++++++++++++
->   5 files changed, 1231 insertions(+), 1 deletion(-)
->   create mode 100644 samples/bpf/bpf_experimental.h
->   create mode 100644 samples/bpf/tc_clsact_edt.bpf.c
->   create mode 100644 samples/bpf/tc_sch_fq.bpf.c
->   create mode 100644 samples/bpf/tc_sch_fq.c
+FWIIW, I would probably have gone for the tag above (7aff79e297ee)
+as presumably that is when the bug started manifesting.
+But I appreciate that it isn't straightforward.
 
