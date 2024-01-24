@@ -1,107 +1,107 @@
-Return-Path: <netdev+bounces-65335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD50F83A158
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 06:30:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C4E483A189
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 06:50:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 72FD21F28E0D
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 05:30:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E2B29B22570
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 05:50:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E091CD521;
-	Wed, 24 Jan 2024 05:30:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9821E57C;
+	Wed, 24 Jan 2024 05:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="K24ejKLW"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="fY6AlO3G"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15B55E541;
-	Wed, 24 Jan 2024 05:30:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C61C4E579;
+	Wed, 24 Jan 2024 05:50:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706074222; cv=none; b=S4aYuLpEZu/AV5VpwMm+YE9EZPr9YWxXj7W7+7rROk+4sOOX//BfE1x56PIuF3WH21Zl4eRBpjJEWcd0DHvKGYc7FhME7hcFdJ/7cgqG4GkiHFleAG49nYPLfGu4U3vAuxxnqXLDxlkmMPq1T8olb8Yqyk8bBGhE3skbTy/Xdu4=
+	t=1706075431; cv=none; b=tUcKwS7ri3uIrV8Z+i4h3HE0m1bSt1wuqyqAT0QodG/hkQZijA8/NHOmpy5tBqIc5r01ni+rqZY+2xrFTYmcqddbjdg62+vL9ADvYUr/ZnzJ3iRmGMGjI5Rq732ZFYQL+iaZJ/9+spXAMHbVcjNPaibKda5999fzGif3C0vsGLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706074222; c=relaxed/simple;
-	bh=FQavcIPjhmoM51UmzOB2B4P5+FJvpLKv8uux6tSCgXc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=f2Ejo+jmGEweoivwGHzdjRMx0fhCfSLW05j7imUt58RGE+GWXoe1hGuZUnDWQHlGIVDodr6srpjgfI7jVOwos2GonnvCUwdKF4WHgLYQnAQ1sf+S76ISHGf/56VTVqbvTjhgN1Rwt+Mh5rxsNLrY+0pGaEYcCldkOAlqkp0KjFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=K24ejKLW; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 96D081C0006;
-	Wed, 24 Jan 2024 05:30:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1706074217;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YJwnEn/ClBtP3ilO+FcGRGFqim9G1t0Q9eGcA2ndZV0=;
-	b=K24ejKLWtJLlFjyyw0WHOi7giHVPRfjCB0ExU2rC+g7FxNU8TDZY4ATBHzDeTbTDoppakj
-	UAxBAlaE2+sgZkGna7eSp7xhbv2b7ak/PhvhPSziMG2a+R85HOQiJHmzlCgacNXqiDNbm+
-	fMWFa9gcdtfeJVae+RZhL0MAbefpXIag5WsSstVHUFtLhnIsAK7kF1JIANGY5xtb9pHyX4
-	cqrogJO+iiECfZcAHJecGOTD4Oq66z4ItswEPb+ZCOmvwy4qmG2LgOhAubWURbn90fRwr3
-	8425xyQ2s1tYUbl3cZv0g7zeG5guBwgTmc5ztrUn/6tlFlX0yWqYW9GBFAMdtA==
-Message-ID: <d32d17ed-87b5-4032-b310-f387cea72837@arinc9.com>
-Date: Wed, 24 Jan 2024 08:30:11 +0300
+	s=arc-20240116; t=1706075431; c=relaxed/simple;
+	bh=BF05yO91Iry4JBzSEX4Thf2a4ewvATjtdXiUzdV66mI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OQqPu2/s5H5WyMfLdeOpPyifEE4G5Ynk9V9teSF+glLCxCFBNdyFDRPpcZL71HExPJr2GmBLrE4slsS3cpyIsTUCEoBE9Knm0LfVh1HCRXrDV/wu1nHpxWAHIMvKn4E7ewD2BH/rzWXxhbMSzLm3yaJSa1/4mvKP261fmc6t/Ms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=fY6AlO3G; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40NKRcNo008082;
+	Tue, 23 Jan 2024 21:50:20 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version:content-type; s=
+	pfpt0220; bh=46Rvm9FQCWP55TJBdnEFLrOvq3gVeIGa+Kc7aG9KLkg=; b=fY6
+	AlO3GmP+GecHAGHtyUhje9rJwexDCXb6gBom86CyAYGpIPuZdrpxbqgXjwWfh43V
+	NDGmNhd4J3mQNXHAvs8fPgGbmUzgw+nncOI29x2wfaPO66lJM7MEWLnq8H7VUR7D
+	JX0vGHj6HXfVd9SEw59/l1BOyi8bRut2Iz61FxXU6nunAU4X3v9cUvRPgtP65wYS
+	o94daUyf7+Nkm61iABWTbmQzSmS5i3e2GdK0o7VkCqNW0AbJUe1CKcTXaH6dac4l
+	4cjm9dGDIC+kD/K56htiK9EVYKO7+py/YZo8e0txiA7eyurGVXBKkgVEqOvXwnou
+	gv/omkzrH7u1NdHKs4g==
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3vtmgvhfhy-3
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Tue, 23 Jan 2024 21:50:20 -0800 (PST)
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 23 Jan
+ 2024 21:50:18 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Tue, 23 Jan 2024 21:50:18 -0800
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id 9B8F83F7051;
+	Tue, 23 Jan 2024 21:50:15 -0800 (PST)
+From: Geetha sowjanya <gakula@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
+        <edumazet@google.com>, <sgoutham@marvell.com>, <gakula@marvell.com>,
+        <sbhatta@marvell.com>, <hkelam@marvell.com>
+Subject: [net-next PATCH 0/3] Dynamically allocate BPIDs
+Date: Wed, 24 Jan 2024 11:20:11 +0530
+Message-ID: <20240124055014.32694-1-gakula@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: dsa: remove OF-based MDIO bus registration
- from DSA core
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Luiz Angelo Daros de Luca <luizluca@gmail.com>, mithat.guner@xeront.com,
- erkin.bozoglu@xeront.com, =?UTF-8?Q?Alvin_=C5=A0ipraga?=
- <ALSI@bang-olufsen.dk>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240122053348.6589-1-arinc.unal@arinc9.com>
- <20240122053348.6589-1-arinc.unal@arinc9.com>
- <20240123154431.gwhufnatxjppnm64@skbuf>
-Content-Language: en-US
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <20240123154431.gwhufnatxjppnm64@skbuf>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: 9eo182zJPzrnfbltQxc414xJzv9JzVBi
+X-Proofpoint-GUID: 9eo182zJPzrnfbltQxc414xJzv9JzVBi
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-24_02,2024-01-23_02,2023-05-22_02
 
-On 23.01.2024 18:44, Vladimir Oltean wrote:
-> On Mon, Jan 22, 2024 at 08:33:48AM +0300, Arınç ÜNAL wrote:
->> These subdrivers which control switches [with MDIO bus] probed on OF, will
->> lose the ability to register the MDIO bus OF-based:
->>
->> drivers/net/dsa/b53/b53_common.c
->> drivers/net/dsa/lan9303-core.c
->> drivers/net/dsa/realtek/realtek-mdio.c
->> drivers/net/dsa/vitesse-vsc73xx-core.c
->>
->> These subdrivers let the DSA core driver register the bus:
->> - ds->ops->phy_read() and ds->ops->phy_write() are present.
->> - ds->user_mii_bus is not populated.
->>
->> The commit fe7324b93222 ("net: dsa: OF-ware slave_mii_bus") which brought
->> OF-based MDIO bus registration on the DSA core driver is reasonably recent
->> and, in this time frame, there have been no device trees in the Linux
->> repository that started describing the MDIO bus, or dt-bindings defining
->> the MDIO bus for the switches these subdrivers control. So I don't expect
->> any devices to be affected.
-> 
-> IIUC, Luiz made the original patch for the realtek switches. Shouldn't
-> we wait until realtek registers ds->user_mii_bus on its own, before
-> reverting? Otherwise, you're basically saying that Luiz made the DSA
-> core patch without needing it.
+Current hw support 512 backpressure(BP) Ids. These BPIDs are
+statically reserved among 4 interface types based on number
+of channels supported. Latest HW support configuring
+multiple BPIDs per channel. To support this feature, the
+patch set creates BPIDs free pool from the BPIDs reserved for
+LBK channel as, LBK uses single BPIDs across multiple channels
+and on request it dynamically allocates N number of bpids
+from the free pool. This patch also reworks the LBK device id
+checks.
 
-My findings point to that. Luiz made the patch to optionally register the
-MDIO bus of the MDIO controlled Realtek switches OF-based. So it's not
-necessary to wait.
+Geetha sowjanya (3):
+  octeontx2-af: Create BPIDs free pool
+  octeontx2-af: Add mbox to alloc/free BPIDs
+  octeontx2-af: Cleanup loopback device checks
 
-Arınç
+ .../ethernet/marvell/octeontx2/af/common.h    |   1 +
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |  32 ++
+ .../net/ethernet/marvell/octeontx2/af/rvu.c   |  14 +-
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |  21 +-
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   | 387 +++++++++++++++---
+ .../ethernet/marvell/octeontx2/af/rvu_npc.c   |   8 +-
+ .../ethernet/marvell/octeontx2/af/rvu_sdp.c   |   6 +-
+ 7 files changed, 404 insertions(+), 65 deletions(-)
+
+-- 
+2.25.1
+
 
