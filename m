@@ -1,138 +1,219 @@
-Return-Path: <netdev+bounces-65496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82F7A83AD1C
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 16:21:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5A0583AD43
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 16:27:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B576C1C267A4
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 15:21:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8325628298C
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 15:27:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03EF57C0AF;
-	Wed, 24 Jan 2024 15:20:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C8397A729;
+	Wed, 24 Jan 2024 15:26:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iOGtnf61"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="XOOstg60"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698E17C0A8;
-	Wed, 24 Jan 2024 15:20:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03B7F22085;
+	Wed, 24 Jan 2024 15:26:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706109632; cv=none; b=AxhQbWji12Ul2ZK2nfxu3uWKQioLthcW4Z7lFFXFgQxP2xgZ7jjUwegDv4nfX7Xd5IPyI8NQl9rdYZubHSftd7O5U/Qo8nSPyE3fvVw+HparNWUWMbUPmH/zqtLILbutapJXIGBrC8NJoN/hppdBxCyb5HClDbc7ZJ5ghHxAb/Y=
+	t=1706110015; cv=none; b=D3Zfqqq/ZJxSgtmhGp/PQshmEX0OGMYlYVi3hsl2u6w6xNcan6vyFqlJO/9TErlIANNX68NbxiSLhfHVnJO67RFeszZQ4sNzpnXDYKYxe0m4tCYOnGSAIEDgMdenZFsIKYBdm4/8RNs9bab2cqF8G5V1MTldpDSI5lQbtAQ9Abw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706109632; c=relaxed/simple;
-	bh=yl+lF/nSLhu4DOrgjpjqsY/EIrxDU6VhvxzHFjldzhs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WyXH+2uuNcvHemoXVjLl4wZCQvW2II8iptpeDwUglhXXtWDEuzUsqbDqa6F1YtkN64IX+K2rP22tWYcKZvV6eV65a40M94C6L4Lq3oJJonPekejRyDizgv+u9HasOTecXm+N7TVTjnNCC3RAUwyrpilBtQ3cMX7ZmslDOpPIvjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iOGtnf61; arc=none smtp.client-ip=209.85.219.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-da7ea62e76cso4627221276.3;
-        Wed, 24 Jan 2024 07:20:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706109630; x=1706714430; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2vBrnRIicx5pIHGkAjgFXGDh8NZNQs8Sa9JhNIEiHKg=;
-        b=iOGtnf61tZDsAiHZiiszBLVV1/POqhATNfnGLR8vv+J6vE50aecVsV1j2bwF8+f36U
-         7/N2dZtxYe0lacPFYArkqcBAuqSg8VzArt8qNfhHactpOLPMxgK6opNGFB+/MJJyWDgl
-         Kha9v462UgGnl0zhRHA8IOA5E06dfX5Uhac7rLy8LSx3jLP2lvSxoR6OzWqYSiMas5EM
-         hKqkAlU8u0IuNH7LftL9uLOe/ZGSmd0z8o1/ke+jweOxW84FZ2ixAoLNldOfxAGdOMEw
-         BhRuMnbJvrj5VCPuuY6B/1IVcZYfVsKk2Uv0ECk5tjvGi0vDRUw3feHoMVAWYOX0WtVh
-         Dlzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706109630; x=1706714430;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2vBrnRIicx5pIHGkAjgFXGDh8NZNQs8Sa9JhNIEiHKg=;
-        b=gWcbyesfldPUBSykpM8ql7+AGDavLdmehC3YVslmIIY0+cLoXs94XVEKMW6BcfI8va
-         hZm4dVeR9PQBxBrWlhngtjLEkMxv2EiF+nr1ht9+/EKULHPfotklG5u3d00HcRznTaXk
-         q+iFrYyVPC07SADUbHVeOsTZCmDGfd0I3zKPtkZfBozcvh0JmRi6yGcyMF013mYA4lBC
-         cQ01ov0mDbCQq6s2WIFGaWgJjyKgpXLAM6NIYZPhS/fY9ncv4Cms8/WwMyswVzWs0AiR
-         5pq2VMnBV/Ebzbvr+RaBmUZR943C1QpWzkT9jwWOqIwjTz1+e/rPNnNegTJpKfk8xsk6
-         dHqQ==
-X-Gm-Message-State: AOJu0YwalUifS519Tpet5HuSyc361gwdMEf9HYGz0f21Nwd59EO+T+EU
-	N9+sZ2wcg9Xsbzl75Byh0Y+apq7hKX4G94nUvxC39E+0fCgTUaRI
-X-Google-Smtp-Source: AGHT+IERVG+64Qw6cNxzILHtVXa3i4+0rPfmcDUrLp45sk1QkdaktdxCBMKuQ0ojt690g3KthLLZKA==
-X-Received: by 2002:a25:dcd2:0:b0:dc2:2888:e3d1 with SMTP id y201-20020a25dcd2000000b00dc22888e3d1mr745356ybe.80.1706109629562;
-        Wed, 24 Jan 2024 07:20:29 -0800 (PST)
-Received: from localhost ([2601:344:8301:57f0:abdb:7236:6977:9ab5])
-        by smtp.gmail.com with ESMTPSA id i12-20020a25f20c000000b00db41482d349sm2812032ybe.57.2024.01.24.07.20.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jan 2024 07:20:29 -0800 (PST)
-Date: Wed, 24 Jan 2024 07:20:27 -0800
-From: Yury Norov <yury.norov@gmail.com>
-To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
-	leon@kernel.org, cai.huoqing@linux.dev, ssengar@linux.microsoft.com,
-	vkuznets@redhat.com, tglx@linutronix.de,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	schakrabarti@microsoft.com, paulros@microsoft.com
-Subject: Re: [PATCH 4/4 V2 net-next] net: mana: Assigning IRQ affinity on HT
- cores
-Message-ID: <ZbEqu68J3f9W8nIM@yury-ThinkPad>
-References: <1705939259-2859-1-git-send-email-schakrabarti@linux.microsoft.com>
- <1705939259-2859-5-git-send-email-schakrabarti@linux.microsoft.com>
+	s=arc-20240116; t=1706110015; c=relaxed/simple;
+	bh=4P57sBKVCs3MY83Hd0Fp0MqjqaVsRdjUHDjmEhi/6eI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XdLHPPeHW97QED7v3Z2Ks7Lm3vU4JCUckTy7OKjc+n3Hi0NlCK2vc0drO9Ezyr2sCjj4pXjN7S1W4n+d3B75P3xBhPb+cwWH5+ldAE76bK5ymdWlI7B5qeVwe9zBA1m5/kNEj9rjLVG2GVjYslYnNeLqm3eJYUQjLibZa8hwPrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=XOOstg60; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id A345160007;
+	Wed, 24 Jan 2024 15:26:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1706110010;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TGKqb8PfNbcdc7vOG6mzmbB70CQFl8QHgJOa/gqXS78=;
+	b=XOOstg60KgIbgyGgmgT6sVR+BznJZGxgtuMaNvi2uKxrvRhNy0pjmLTdmOBWrHpbzQOpxS
+	gUiZyRRXGNu/gasgAWh7ilfgenSA6py0gC5+riKvq+4tO+vAfjwYeezowvUng4cyc4v/Mt
+	oGwBLecvDGt1t2XaQfjyOaYG/KulXg4RiGl8yVc+xE//JvRuqhAxWcw7bAA6+Eewl1AViQ
+	/MUZjmldwWdDWBo8f4Vws99TzRH2Y4MtOhK/JhxY8OFw/Cy7f2GTJtGR7xmQwLRH+897pa
+	5Z2z5yCNRuXSmtflltBdnP2vfasJ9Lm/Do09I6ql4bK1psTTfe//1/331v8bTA==
+Date: Wed, 24 Jan 2024 16:26:46 +0100
+From: Herve Codina <herve.codina@bootlin.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, Andrew Lunn <andrew@lunn.ch>, Mark Brown
+ <broonie@kernel.org>, Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH 3/4] net: wan: fsl_qmc_hdlc: Add runtime timeslots
+ changes support
+Message-ID: <20240124162646.24bf9235@bootlin.com>
+In-Reply-To: <fc421c38-66b7-4d4e-abfa-051eccbf793c@linux.dev>
+References: <20240123164912.249540-1-herve.codina@bootlin.com>
+	<20240123164912.249540-4-herve.codina@bootlin.com>
+	<fc421c38-66b7-4d4e-abfa-051eccbf793c@linux.dev>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1705939259-2859-5-git-send-email-schakrabarti@linux.microsoft.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
-On Mon, Jan 22, 2024 at 08:00:59AM -0800, Souradeep Chakrabarti wrote:
-> Existing MANA design assigns IRQ to every CPU, including sibling
-> hyper-threads. This may cause multiple IRQs to be active simultaneously
-> in the same core and may reduce the network performance.
-> 
-> Improve the performance by assigning IRQ to non sibling CPUs in local
-> NUMA node. The performance improvement we are getting using ntttcp with
-> following patch is around 15 percent against existing design and
-> approximately 11 percent, when trying to assign one IRQ in each core
-> across NUMA nodes, if enough cores are present.
-> The change will improve the performance for the system
-> with high number of CPU, where number of CPUs in a node is more than
-> 64 CPUs. Nodes with 64 CPUs or less than 64 CPUs will not be affected
-> by this change.
-> 
-> The performance study was done using ntttcp tool in Azure.
-> The node had 2 nodes with 32 cores each, total 128 vCPU and number of channels
-> were 32 for 32 RX rings.
-> 
-> The below table shows a comparison between existing design and new
-> design:
-> 
-> IRQ   node-num    core-num   CPU        performance(%)
-> 1      0 | 0       0 | 0     0 | 0-1     0
-> 2      0 | 0       0 | 1     1 | 2-3     3
-> 3      0 | 0       1 | 2     2 | 4-5     10
-> 4      0 | 0       1 | 3     3 | 6-7     15
-> 5      0 | 0       2 | 4     4 | 8-9     15
-> ---
-> ---
-> 25     0 | 0       12| 24    24| 48-49   12
-> ---
-> 32     0 | 0       15| 31    31| 62-63   12
-> 33     0 | 0       16| 0     32| 0-1     10
-> ---
-> 64     0 | 0       31| 31    63| 62-63   0
+Hi Vadim,
 
-Did that omitted lines mean 5-24 : 15%, 25-31 : 12% and 33-63 : 10%?
-Or that means that you didn't test those?
+On Wed, 24 Jan 2024 10:10:46 +0000
+Vadim Fedorenko <vadim.fedorenko@linux.dev> wrote:
 
-Would be nice to have full coverage...
+[...]
+> > +static int qmc_hdlc_xlate_slot_map(struct qmc_hdlc *qmc_hdlc,
+> > +				   u32 slot_map, struct qmc_chan_ts_info *ts_info)
+> > +{
+> > +	u64 ts_mask_avail;
+> > +	unsigned int bit;
+> > +	unsigned int i;
+> > +	u64 ts_mask;
+> > +	u64 map;
+> > +
+> > +	/* Tx and Rx masks must be identical */
+> > +	if (ts_info->rx_ts_mask_avail != ts_info->tx_ts_mask_avail) {
+> > +		dev_err(qmc_hdlc->dev, "tx and rx available timeslots mismatch (0x%llx, 0x%llx)\n",
+> > +			ts_info->rx_ts_mask_avail, ts_info->tx_ts_mask_avail);
+> > +		return -EINVAL;
+> > +	}
+> > +
+> > +	ts_mask_avail = ts_info->rx_ts_mask_avail;
+> > +	ts_mask = 0;
+> > +	map = slot_map;
+> > +	bit = 0;
+> > +	for (i = 0; i < 64; i++) {
+> > +		if (ts_mask_avail & BIT_ULL(i)) {
+> > +			if (map & BIT_ULL(bit))
+> > +				ts_mask |= BIT_ULL(i);
+> > +			bit++;
+> > +		}
+> > +	}
+> > +
+> > +	if (hweight64(ts_mask) != hweight64(map)) {
+> > +		dev_err(qmc_hdlc->dev, "Cannot translate timeslots 0x%llx -> (0x%llx,0x%llx)\n",
+> > +			map, ts_mask_avail, ts_mask);
+> > +		return -EINVAL;
+> > +	}
+> > +
+> > +	ts_info->tx_ts_mask = ts_mask;
+> > +	ts_info->rx_ts_mask = ts_mask;
+> > +	return 0;
+> > +}
+> > +
+> > +static int qmc_hdlc_xlate_ts_info(struct qmc_hdlc *qmc_hdlc,
+> > +				  const struct qmc_chan_ts_info *ts_info, u32 *slot_map)
+> > +{
+> > +	u64 ts_mask_avail;
+> > +	unsigned int bit;
+> > +	unsigned int i;
+> > +	u64 ts_mask;
+> > +	u64 map;
+> > +  
+> 
+> Starting from here ...
+> 
+> > +	/* Tx and Rx masks must be identical */
+> > +	if (ts_info->rx_ts_mask_avail != ts_info->tx_ts_mask_avail) {
+> > +		dev_err(qmc_hdlc->dev, "tx and rx available timeslots mismatch (0x%llx, 0x%llx)\n",
+> > +			ts_info->rx_ts_mask_avail, ts_info->tx_ts_mask_avail);
+> > +		return -EINVAL;
+> > +	}
+> > +	if (ts_info->rx_ts_mask != ts_info->tx_ts_mask) {
+> > +		dev_err(qmc_hdlc->dev, "tx and rx timeslots mismatch (0x%llx, 0x%llx)\n",
+> > +			ts_info->rx_ts_mask, ts_info->tx_ts_mask);
+> > +		return -EINVAL;
+> > +	}
+> > +
+> > +	ts_mask_avail = ts_info->rx_ts_mask_avail;
+> > +	ts_mask = ts_info->rx_ts_mask;
+> > +	map = 0;
+> > +	bit = 0;
+> > +	for (i = 0; i < 64; i++) {
+> > +		if (ts_mask_avail & BIT_ULL(i)) {
+> > +			if (ts_mask & BIT_ULL(i))
+> > +				map |= BIT_ULL(bit);
+> > +			bit++;
+> > +		}
+> > +	}
+> > +
+> > +	if (hweight64(ts_mask) != hweight64(map)) {
+> > +		dev_err(qmc_hdlc->dev, "Cannot translate timeslots (0x%llx,0x%llx) -> 0x%llx\n",
+> > +			ts_mask_avail, ts_mask, map);
+> > +		return -EINVAL;
+> > +	}
+> > +  
+> 
+> till here the block looks like copy of the block from previous function.
+> It worth to make a separate function for it, I think.
+> 
+> > +	if (map >= BIT_ULL(32)) {
+> > +		dev_err(qmc_hdlc->dev, "Slot map out of 32bit (0x%llx,0x%llx) -> 0x%llx\n",
+> > +			ts_mask_avail, ts_mask, map);
+> > +		return -EINVAL;
+> > +	}
+> > +
+> > +	*slot_map = map;
+> > +	return 0;
+> > +}
+> > +
+[...]
 
-Thanks,
-Yury
+I am not so sure. There are slighty differences between the two functions.
+The error messages and, in particular, the loop in qmc_hdlc_xlate_slot_map() is:
+	--- 8< ---
+	ts_mask_avail = ts_info->rx_ts_mask_avail;
+	ts_mask = 0;
+	map = slot_map;
+	bit = 0;
+	for (i = 0; i < 64; i++) {
+		if (ts_mask_avail & BIT_ULL(i)) {
+			if (map & BIT_ULL(bit))
+				ts_mask |= BIT_ULL(i);
+			bit++;
+		}
+	}
+	--- 8< ---
+
+whereas it is the following in qmc_hdlc_xlate_ts_info():
+	--- 8< ---
+	ts_mask_avail = ts_info->rx_ts_mask_avail;
+	ts_mask = ts_info->rx_ts_mask;
+	map = 0;
+	bit = 0;
+	for (i = 0; i < 64; i++) {
+		if (ts_mask_avail & BIT_ULL(i)) {
+			if (ts_mask & BIT_ULL(i))
+				map |= BIT_ULL(bit);
+			bit++;
+		}
+	}
+	--- 8< ---
+
+ts_map and map initializations are not the same, i and bit are not used for
+the same purpose and the computed value is not computed based on the same
+information.
+
+With that pointed, I am not sure that having some common code for both
+function will be relevant. Your opinion ?
+
+Best regards,
+Hervé
 
