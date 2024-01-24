@@ -1,269 +1,233 @@
-Return-Path: <netdev+bounces-65391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E79583A53C
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:23:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9548A83A533
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:22:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B383B2912AC
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:23:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45FF828FD48
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:22:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5DB218026;
-	Wed, 24 Jan 2024 09:21:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E654FEEC2;
+	Wed, 24 Jan 2024 09:20:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aYM8h51g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FC4517C91
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 09:21:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A16E18046
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 09:20:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706088077; cv=none; b=M7MlHj1NiJuloPi42KEFQz9qqQeH8+2AJV1tnNrwRCJikQlMqr5hd5B2O7lo13APu77eF7OJO3iwAvEDQhBo+Tz4HamCytb/xZGoXKwOdTAmW+qXdy3GUgBNOeAHQeQ7ruuUZb93XEO3WlmQ/xhDMk1KAYidYjl4Ik7MedDHEck=
+	t=1706088047; cv=none; b=a0wZBIkdi5L0+WIPZ1UL5NYj8tHuBLwVYHwpzFxlQcP/926bRHCJMehAA8TQkXOi9A/tBgw6Ywu14rdsZNtYgT5M+2aFqT0vVgnA0W94gMQjjuy4LXelHd+YZ+wtVe1D7rJ36byXKKCDfM9rmjV0BxMKOFALNbcmu3MZYGSn7b8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706088077; c=relaxed/simple;
-	bh=Q2qONIKK09ZfZukddLM8W0gfwZQOBsz5dYTUKLyZ1Qg=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=tppcfQF27RcE+oT5NKu/0fWxwHaX1pif6SbhgaA1PWFK7bOQeo0hNavnlJYjRss5OvKgb18UCmoxzm6o3QFJNqd3BD+S212FBzbbgZf4uSaCh/iT3BtUjF962L0iN7qYv61f00WEDjPQA8vBq3mRYvJjnfjdyz0FfelbCRJZ8j0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [112.20.109.155])
-	by gateway (Coremail) with SMTP id _____8BxTOmC1rBl_aoEAA--.8539S3;
-	Wed, 24 Jan 2024 17:21:06 +0800 (CST)
-Received: from [192.168.100.8] (unknown [112.20.109.155])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxHs9_1rBlv5AWAA--.33924S3;
-	Wed, 24 Jan 2024 17:21:04 +0800 (CST)
-Message-ID: <ce51f055-7564-4921-b45a-c4a255a9d797@loongson.cn>
-Date: Wed, 24 Jan 2024 17:21:03 +0800
+	s=arc-20240116; t=1706088047; c=relaxed/simple;
+	bh=pIaxCm0BdTGQQl5j5AVo1QAjzXSWk71ot2uZGwLHwuU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NEP8ilWmbmApFaD0epS24Qlb9r0fZNUXri+RVwgrjI18HnxZRd3Gn/UwsZ6jkMqPknpFDJa6FSFTSC2x/hl7+yFddlWFJ/Cx2c9n81fICxlqHM/zJRY8nX4hAch+lg0vIH9Yh03fi+gtHxThS2tlWlj7Kwb/3mvdLQMfo2pEcCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aYM8h51g; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-40e76109cdeso57938755e9.0
+        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 01:20:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706088044; x=1706692844; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gbgXcjMo0b1tw7GtKUoz78SRHuz+q9W4Uz72HU1vbaY=;
+        b=aYM8h51gKD5va30SvjHB739rlws6TXAX2w/WTbBkb5F5yyxQBKl5EnmDoeEPT8T7wj
+         7FXTfDd5D8IqUmPdDGNWedg/c4orp1+Rj/o5TPcExGWHv7D1iEx4bB9B78ZebTpe/F8+
+         zPxDT2LugL2At3USU5aqwjmWXUX2IpqQdnAuzRRA5IYnSyS12xGkKy81vhDqR7AYSM9a
+         d+H+sEF+4ifMoSw8Lvb0qmieRcuMwwg3CYWVGYce7OWTtQC8KAcqiMrhT0frL9WkDIXz
+         h4Zo6AIAhuBQNmERLCeINxhA8Oy/R5m1qj+/HVqX+kxrrrXLjEtuO4LCg5Ikhz5bKiGJ
+         XQww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706088044; x=1706692844;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gbgXcjMo0b1tw7GtKUoz78SRHuz+q9W4Uz72HU1vbaY=;
+        b=t5P9j0Vva9J1rS9KQZrCQ8vg4+OFvlRws/LZaeesETC3IggPaVQXt5zc5lH490KoTu
+         ob1rQx3dU4YHw/tcCeHm9PJUO8+7az9nXHxJw3rLqiCB0YxC6VjiS9ZM1E9wTuNBefde
+         07/GMq+LUm8L6+M7TElE7e1h1AhuBbcjWBvgzQb4NCIipvPPO0bSkmw1HhkLIOkiap8+
+         dBQ3/PslcQkr4590XZkLw72t/vSVwMFfyNqGzX6V/GBPKuxQ9SQGPIXtzHvo4Oqxw/M7
+         dkgZwP/ZFyvDXBhC7baaZeSKvEwWAOnwdCvWws5DvHJvz2t9GZ6R9d6Nih+b7d/8zgjr
+         jhVA==
+X-Gm-Message-State: AOJu0Yzl7pAgGpKG1q9TjoN/IKi25qwYI6WYqLm1pA4fSg80DyDczgp2
+	DAcNAgAwxxzneL6SykONImZOJoejuLllNVHAxlEN2PS8WSnmdHZJliwRZUqboGBk+A==
+X-Google-Smtp-Source: AGHT+IEcMMS7dpfJpDBiFiYQXXFrSfTWA3OzEER6pD2Fsh2VjY2hQsGDsyhof16D/GKJbzVkKbj1Uw==
+X-Received: by 2002:a05:600c:4e86:b0:40e:b195:6bdb with SMTP id f6-20020a05600c4e8600b0040eb1956bdbmr866618wmq.2.1706088043990;
+        Wed, 24 Jan 2024 01:20:43 -0800 (PST)
+Received: from localhost.localdomain ([2001:b07:646f:4a4d:e17a:bd08:d035:d8c2])
+        by smtp.gmail.com with ESMTPSA id y8-20020a5d4ac8000000b00337af95c1d2sm18205477wrs.14.2024.01.24.01.20.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jan 2024 01:20:43 -0800 (PST)
+From: Alessandro Marcolini <alessandromarcolini99@gmail.com>
+To: jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	Alessandro Marcolini <alessandromarcolini99@gmail.com>
+Subject: [PATCH v2 net-next] taprio: validate TCA_TAPRIO_ATTR_FLAGS through policy instead of open-coding
+Date: Wed, 24 Jan 2024 10:21:18 +0100
+Message-ID: <20240124092118.8078-1-alessandromarcolini99@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 7/9] net: stmmac: dwmac-loongson: Add GNET
- support
-Content-Language: en-US
-From: Yanteng Si <siyanteng@loongson.cn>
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
- chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn,
- netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
-References: <cover.1702990507.git.siyanteng@loongson.cn>
- <caf9e822c2f628f09e02760cfa81a1bd4af0b8d6.1702990507.git.siyanteng@loongson.cn>
- <pbju43fy4upk32xcgrerkafnwjvs55p5x4kdaavhia4z7wjoqm@mk55pgs7eczz>
- <ac7cc7fc-60fa-4624-b546-bb31cd5136cb@loongson.cn>
-In-Reply-To: <ac7cc7fc-60fa-4624-b546-bb31cd5136cb@loongson.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8AxHs9_1rBlv5AWAA--.33924S3
-X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj93XoW3GF4fCw4kCry8Ww1DZw4rCrX_yoWxtry3pr
-	1kAFWUGry5Jrn5Gw1DKa1UJFy5Ary5Jw1DWr4xXF1UJrs2yryagryjgr4q9r17Ar4kXr17
-	Jr1UursxuFnxGrgCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-	AVWUtwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
-	6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
-	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
-	0xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
-	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AK
-	xVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUcbAwUUUUU
 
+As of now, the field TCA_TAPRIO_ATTR_FLAGS is being validated by manually
+checking its value, using the function taprio_flags_valid().
 
-在 2024/1/1 15:27, Yanteng Si 写道:
->
-> 在 2023/12/21 10:34, Serge Semin 写道:
->> On Tue, Dec 19, 2023 at 10:26:47PM +0800, Yanteng Si wrote:
->>> Add Loongson GNET (GMAC with PHY) support. Current GNET does not 
->>> support
->>> half duplex mode, and GNET on LS7A only supports ANE when speed is 
->>> set to
->>> 1000M.
->>>
->>> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
->>> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
->>> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
->>> ---
->>>   .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 79 
->>> +++++++++++++++++++
->>>   .../ethernet/stmicro/stmmac/stmmac_ethtool.c  |  6 ++
->>>   include/linux/stmmac.h                        |  2 +
->>>   3 files changed, 87 insertions(+)
->>>
->>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c 
->>> b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
->>> index 2c08d5495214..9e4953c7e4e0 100644
->>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
->>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
->>> @@ -168,6 +168,83 @@ static struct stmmac_pci_info 
->>> loongson_gmac_pci_info = {
->>>       .config = loongson_gmac_config,
->>>   };
->>>   +static void loongson_gnet_fix_speed(void *priv, unsigned int 
->>> speed, unsigned int mode)
->>> +{
->>> +    struct net_device *ndev = dev_get_drvdata(priv);
->>> +    struct stmmac_priv *ptr = netdev_priv(ndev);
->>> +
->>> +    /* The controller and PHY don't work well together.
->>> +     * We need to use the PS bit to check if the controller's status
->>> +     * is correct and reset PHY if necessary.
->>> +     */
->>> +    if (speed == SPEED_1000)
->>> +        if (readl(ptr->ioaddr + MAC_CTRL_REG) & (1 << 15) /* PS */)
->>> +            phy_restart_aneg(ndev->phydev);
->> {} around the outer if please.
-> OK.
->>
->>> +}
->>> +
->>> +static int loongson_gnet_data(struct pci_dev *pdev,
->>> +                  struct plat_stmmacenet_data *plat)
->>> +{
->>> +    loongson_default_data(pdev, plat);
->>> +
->>> +    plat->multicast_filter_bins = 256;
->>> +
->>> +    plat->mdio_bus_data->phy_mask = 0xfffffffb;
->> ~BIT(2)?
-> I still need to confirm, please allow me to get back to you later.
+With this patch, the field will be validated through the netlink policy
+NLA_POLICY_MASK, where the mask is defined by TAPRIO_SUPPORTED_FLAGS.
+The mutual exclusivity of the two flags TCA_TAPRIO_ATTR_FLAG_FULL_OFFLOAD
+and TCA_TAPRIO_ATTR_FLAG_TXTIME_ASSIST is still checked manually.
 
-Yes, that's fine.
+Changes since RFC:
+- fixed reversed xmas tree
+- use NL_SET_ERR_MSG_MOD() for both invalid configuration
 
+Changes since v1 (https://lore.kernel.org/netdev/b90a8935-ab4b-48e2-a21d-1efc528b2788@gmail.com/T/#t):
+- Changed NL_SET_ERR_MSG_MOD to NL_SET_ERR_MSG_ATTR when wrong flags
+  issued
+- Changed __u32 to u32
 
-Thanks,
+Signed-off-by: Alessandro Marcolini <alessandromarcolini99@gmail.com>
+---
+ net/sched/sch_taprio.c | 72 +++++++++++++++---------------------------
+ 1 file changed, 26 insertions(+), 46 deletions(-)
 
-Yanteng
-
-
->>
->>> +
->>> +    plat->phy_addr = 2;
->>> +    plat->phy_interface = PHY_INTERFACE_MODE_INTERNAL;
->>> +
->>> +    plat->bsp_priv = &pdev->dev;
->>> +    plat->fix_mac_speed = loongson_gnet_fix_speed;
->>> +
->>> +    plat->dma_cfg->pbl = 32;
->>> +    plat->dma_cfg->pblx8 = true;
->>> +
->>> +    plat->clk_ref_rate = 125000000;
->>> +    plat->clk_ptp_rate = 125000000;
->>> +
->>> +    return 0;
->>> +}
->>> +
->>> +static int loongson_gnet_config(struct pci_dev *pdev,
->>> +                struct plat_stmmacenet_data *plat,
->>> +                struct stmmac_resources *res,
->>> +                struct device_node *np)
->>> +{
->>> +    int ret;
->>> +    u32 version = readl(res->addr + GMAC_VERSION);
->>> +
->>> +    switch (version & 0xff) {
->>> +    case DWLGMAC_CORE_1_00:
->>> +        ret = loongson_dwmac_config_multi_msi(pdev, plat, res, np, 8);
->>> +        break;
->>> +    default:
->>> +        ret = loongson_dwmac_config_legacy(pdev, plat, res, np);
->> Hm, do you have two versions of Loongson GNET? What does the second
-> Yes.
->> one contain in the GMAC_VERSION register then? Can't you distinguish
->> them by the PCI IDs (device, subsystem, revision)?
->
-> I'm afraid that's not possible.
->
-> Because they have the same pci id and revision.
->
->
-> Thanks,
->
-> Yanteng
->
->>
->> -Serge(y)
->>
->>> +        break;
->>> +    }
->>> +
->>> +    switch (pdev->revision) {
->>> +    case 0x00:
->>> +        plat->flags |=
->>> +            FIELD_PREP(STMMAC_FLAG_DISABLE_HALF_DUPLEX, 1) |
->>> +            FIELD_PREP(STMMAC_FLAG_DISABLE_FORCE_1000, 1);
->>> +        break;
->>> +    case 0x01:
->>> +        plat->flags |=
->>> +            FIELD_PREP(STMMAC_FLAG_DISABLE_HALF_DUPLEX, 1);
->>> +        break;
->>> +    default:
->>> +        break;
->>> +    }
->>> +
->>> +    return ret;
->>> +}
->>> +
->>> +static struct stmmac_pci_info loongson_gnet_pci_info = {
->>> +    .setup = loongson_gnet_data,
->>> +    .config = loongson_gnet_config,
->>> +};
->>> +
->>>   static int loongson_dwmac_probe(struct pci_dev *pdev,
->>>                   const struct pci_device_id *id)
->>>   {
->>> @@ -318,9 +395,11 @@ static SIMPLE_DEV_PM_OPS(loongson_dwmac_pm_ops, 
->>> loongson_dwmac_suspend,
->>>                loongson_dwmac_resume);
->>>     #define PCI_DEVICE_ID_LOONGSON_GMAC    0x7a03
->>> +#define PCI_DEVICE_ID_LOONGSON_GNET    0x7a13
->>>     static const struct pci_device_id loongson_dwmac_id_table[] = {
->>>       { PCI_DEVICE_DATA(LOONGSON, GMAC, &loongson_gmac_pci_info) },
->>> +    { PCI_DEVICE_DATA(LOONGSON, GNET, &loongson_gnet_pci_info) },
->>>       {}
->>>   };
->>>   MODULE_DEVICE_TABLE(pci, loongson_dwmac_id_table);
->>> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c 
->>> b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
->>> index 8105ce47c6ad..d6939eb9a0d8 100644
->>> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
->>> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
->>> @@ -420,6 +420,12 @@ stmmac_ethtool_set_link_ksettings(struct 
->>> net_device *dev,
->>>           return 0;
->>>       }
->>>   +    if (FIELD_GET(STMMAC_FLAG_DISABLE_FORCE_1000, 
->>> priv->plat->flags)) {
->>> +        if (cmd->base.speed == SPEED_1000 &&
->>> +            cmd->base.autoneg != AUTONEG_ENABLE)
->>> +            return -EOPNOTSUPP;
->>> +    }
->>> +
->>>       return phylink_ethtool_ksettings_set(priv->phylink, cmd);
->>>   }
->>>   diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
->>> index f07f79d50b06..067030cdb60f 100644
->>> --- a/include/linux/stmmac.h
->>> +++ b/include/linux/stmmac.h
->>> @@ -222,6 +222,8 @@ struct dwmac4_addrs {
->>>   #define STMMAC_FLAG_EN_TX_LPI_CLOCKGATING    BIT(11)
->>>   #define STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY    BIT(12)
->>>   #define STMMAC_FLAG_HAS_LGMAC            BIT(13)
->>> +#define STMMAC_FLAG_DISABLE_HALF_DUPLEX    BIT(14)
->>> +#define STMMAC_FLAG_DISABLE_FORCE_1000    BIT(15)
->>>     struct plat_stmmacenet_data {
->>>       int bus_id;
->>> -- 
->>> 2.31.4
->>>
+diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
+index 31a8252bd09c..9beecaa4e4d4 100644
+--- a/net/sched/sch_taprio.c
++++ b/net/sched/sch_taprio.c
+@@ -40,6 +40,8 @@ static struct static_key_false taprio_have_working_mqprio;
+ 
+ #define TXTIME_ASSIST_IS_ENABLED(flags) ((flags) & TCA_TAPRIO_ATTR_FLAG_TXTIME_ASSIST)
+ #define FULL_OFFLOAD_IS_ENABLED(flags) ((flags) & TCA_TAPRIO_ATTR_FLAG_FULL_OFFLOAD)
++#define TAPRIO_SUPPORTED_FLAGS \
++	(TCA_TAPRIO_ATTR_FLAG_TXTIME_ASSIST | TCA_TAPRIO_ATTR_FLAG_FULL_OFFLOAD)
+ #define TAPRIO_FLAGS_INVALID U32_MAX
+ 
+ struct sched_entry {
+@@ -408,19 +410,6 @@ static bool is_valid_interval(struct sk_buff *skb, struct Qdisc *sch)
+ 	return entry;
+ }
+ 
+-static bool taprio_flags_valid(u32 flags)
+-{
+-	/* Make sure no other flag bits are set. */
+-	if (flags & ~(TCA_TAPRIO_ATTR_FLAG_TXTIME_ASSIST |
+-		      TCA_TAPRIO_ATTR_FLAG_FULL_OFFLOAD))
+-		return false;
+-	/* txtime-assist and full offload are mutually exclusive */
+-	if ((flags & TCA_TAPRIO_ATTR_FLAG_TXTIME_ASSIST) &&
+-	    (flags & TCA_TAPRIO_ATTR_FLAG_FULL_OFFLOAD))
+-		return false;
+-	return true;
+-}
+-
+ /* This returns the tstamp value set by TCP in terms of the set clock. */
+ static ktime_t get_tcp_tstamp(struct taprio_sched *q, struct sk_buff *skb)
+ {
+@@ -1031,7 +1020,8 @@ static const struct nla_policy taprio_policy[TCA_TAPRIO_ATTR_MAX + 1] = {
+ 	[TCA_TAPRIO_ATTR_SCHED_CYCLE_TIME]           =
+ 		NLA_POLICY_FULL_RANGE_SIGNED(NLA_S64, &taprio_cycle_time_range),
+ 	[TCA_TAPRIO_ATTR_SCHED_CYCLE_TIME_EXTENSION] = { .type = NLA_S64 },
+-	[TCA_TAPRIO_ATTR_FLAGS]                      = { .type = NLA_U32 },
++	[TCA_TAPRIO_ATTR_FLAGS]                      =
++		NLA_POLICY_MASK(NLA_U32, TAPRIO_SUPPORTED_FLAGS),
+ 	[TCA_TAPRIO_ATTR_TXTIME_DELAY]		     = { .type = NLA_U32 },
+ 	[TCA_TAPRIO_ATTR_TC_ENTRY]		     = { .type = NLA_NESTED },
+ };
+@@ -1815,33 +1805,6 @@ static int taprio_mqprio_cmp(const struct net_device *dev,
+ 	return 0;
+ }
+ 
+-/* The semantics of the 'flags' argument in relation to 'change()'
+- * requests, are interpreted following two rules (which are applied in
+- * this order): (1) an omitted 'flags' argument is interpreted as
+- * zero; (2) the 'flags' of a "running" taprio instance cannot be
+- * changed.
+- */
+-static int taprio_new_flags(const struct nlattr *attr, u32 old,
+-			    struct netlink_ext_ack *extack)
+-{
+-	u32 new = 0;
+-
+-	if (attr)
+-		new = nla_get_u32(attr);
+-
+-	if (old != TAPRIO_FLAGS_INVALID && old != new) {
+-		NL_SET_ERR_MSG_MOD(extack, "Changing 'flags' of a running schedule is not supported");
+-		return -EOPNOTSUPP;
+-	}
+-
+-	if (!taprio_flags_valid(new)) {
+-		NL_SET_ERR_MSG_MOD(extack, "Specified 'flags' are not valid");
+-		return -EINVAL;
+-	}
+-
+-	return new;
+-}
+-
+ static int taprio_change(struct Qdisc *sch, struct nlattr *opt,
+ 			 struct netlink_ext_ack *extack)
+ {
+@@ -1852,6 +1815,7 @@ static int taprio_change(struct Qdisc *sch, struct nlattr *opt,
+ 	struct net_device *dev = qdisc_dev(sch);
+ 	struct tc_mqprio_qopt *mqprio = NULL;
+ 	unsigned long flags;
++	u32 taprio_flags;
+ 	ktime_t start;
+ 	int i, err;
+ 
+@@ -1863,12 +1827,28 @@ static int taprio_change(struct Qdisc *sch, struct nlattr *opt,
+ 	if (tb[TCA_TAPRIO_ATTR_PRIOMAP])
+ 		mqprio = nla_data(tb[TCA_TAPRIO_ATTR_PRIOMAP]);
+ 
+-	err = taprio_new_flags(tb[TCA_TAPRIO_ATTR_FLAGS],
+-			       q->flags, extack);
+-	if (err < 0)
+-		return err;
++	/* The semantics of the 'flags' argument in relation to 'change()'
++	 * requests, are interpreted following two rules (which are applied in
++	 * this order): (1) an omitted 'flags' argument is interpreted as
++	 * zero; (2) the 'flags' of a "running" taprio instance cannot be
++	 * changed.
++	 */
++	taprio_flags = tb[TCA_TAPRIO_ATTR_FLAGS] ? nla_get_u32(tb[TCA_TAPRIO_ATTR_FLAGS]) : 0;
+ 
+-	q->flags = err;
++	/* txtime-assist and full offload are mutually exclusive */
++	if ((taprio_flags & TCA_TAPRIO_ATTR_FLAG_TXTIME_ASSIST) &&
++	    (taprio_flags & TCA_TAPRIO_ATTR_FLAG_FULL_OFFLOAD)) {
++		NL_SET_ERR_MSG_ATTR(extack,
++				    "TXTIME_ASSIST and FULL_OFFLOAD are mutually exclusive");
++		return -EINVAL;
++	}
++
++	if (q->flags != TAPRIO_FLAGS_INVALID && q->flags != taprio_flags) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "Changing 'flags' of a running schedule is not supported");
++		return -EOPNOTSUPP;
++	}
++	q->flags = taprio_flags;
+ 
+ 	err = taprio_parse_mqprio_opt(dev, mqprio, extack, q->flags);
+ 	if (err < 0)
+-- 
+2.43.0
 
 
