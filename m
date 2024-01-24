@@ -1,233 +1,202 @@
-Return-Path: <netdev+bounces-65390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9548A83A533
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:22:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA88183A558
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:26:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45FF828FD48
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:22:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A05C1F23584
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:26:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E654FEEC2;
-	Wed, 24 Jan 2024 09:20:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70E5E18030;
+	Wed, 24 Jan 2024 09:23:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aYM8h51g"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="lfoSjgeS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A16E18046
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 09:20:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BA3C175AB;
+	Wed, 24 Jan 2024 09:23:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706088047; cv=none; b=a0wZBIkdi5L0+WIPZ1UL5NYj8tHuBLwVYHwpzFxlQcP/926bRHCJMehAA8TQkXOi9A/tBgw6Ywu14rdsZNtYgT5M+2aFqT0vVgnA0W94gMQjjuy4LXelHd+YZ+wtVe1D7rJ36byXKKCDfM9rmjV0BxMKOFALNbcmu3MZYGSn7b8=
+	t=1706088213; cv=none; b=ddZkHsQUyV7xmlHCxPgF+T7XkP/1ZrVFugSJpMGy2NkGkFxUs8Mj7FvmcjVQE/RIM+sBeCZrOtSkPMcu8VOlqjMJsXEh+Ny8eFrV0vfs/D5mKJdTn9O8K52meSPojbV3imHIVTDMvWeuB6t4RgBvbiYLbQxUh3KvSR3HIIb6cp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706088047; c=relaxed/simple;
-	bh=pIaxCm0BdTGQQl5j5AVo1QAjzXSWk71ot2uZGwLHwuU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NEP8ilWmbmApFaD0epS24Qlb9r0fZNUXri+RVwgrjI18HnxZRd3Gn/UwsZ6jkMqPknpFDJa6FSFTSC2x/hl7+yFddlWFJ/Cx2c9n81fICxlqHM/zJRY8nX4hAch+lg0vIH9Yh03fi+gtHxThS2tlWlj7Kwb/3mvdLQMfo2pEcCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aYM8h51g; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-40e76109cdeso57938755e9.0
-        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 01:20:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706088044; x=1706692844; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gbgXcjMo0b1tw7GtKUoz78SRHuz+q9W4Uz72HU1vbaY=;
-        b=aYM8h51gKD5va30SvjHB739rlws6TXAX2w/WTbBkb5F5yyxQBKl5EnmDoeEPT8T7wj
-         7FXTfDd5D8IqUmPdDGNWedg/c4orp1+Rj/o5TPcExGWHv7D1iEx4bB9B78ZebTpe/F8+
-         zPxDT2LugL2At3USU5aqwjmWXUX2IpqQdnAuzRRA5IYnSyS12xGkKy81vhDqR7AYSM9a
-         d+H+sEF+4ifMoSw8Lvb0qmieRcuMwwg3CYWVGYce7OWTtQC8KAcqiMrhT0frL9WkDIXz
-         h4Zo6AIAhuBQNmERLCeINxhA8Oy/R5m1qj+/HVqX+kxrrrXLjEtuO4LCg5Ikhz5bKiGJ
-         XQww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706088044; x=1706692844;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gbgXcjMo0b1tw7GtKUoz78SRHuz+q9W4Uz72HU1vbaY=;
-        b=t5P9j0Vva9J1rS9KQZrCQ8vg4+OFvlRws/LZaeesETC3IggPaVQXt5zc5lH490KoTu
-         ob1rQx3dU4YHw/tcCeHm9PJUO8+7az9nXHxJw3rLqiCB0YxC6VjiS9ZM1E9wTuNBefde
-         07/GMq+LUm8L6+M7TElE7e1h1AhuBbcjWBvgzQb4NCIipvPPO0bSkmw1HhkLIOkiap8+
-         dBQ3/PslcQkr4590XZkLw72t/vSVwMFfyNqGzX6V/GBPKuxQ9SQGPIXtzHvo4Oqxw/M7
-         dkgZwP/ZFyvDXBhC7baaZeSKvEwWAOnwdCvWws5DvHJvz2t9GZ6R9d6Nih+b7d/8zgjr
-         jhVA==
-X-Gm-Message-State: AOJu0Yzl7pAgGpKG1q9TjoN/IKi25qwYI6WYqLm1pA4fSg80DyDczgp2
-	DAcNAgAwxxzneL6SykONImZOJoejuLllNVHAxlEN2PS8WSnmdHZJliwRZUqboGBk+A==
-X-Google-Smtp-Source: AGHT+IEcMMS7dpfJpDBiFiYQXXFrSfTWA3OzEER6pD2Fsh2VjY2hQsGDsyhof16D/GKJbzVkKbj1Uw==
-X-Received: by 2002:a05:600c:4e86:b0:40e:b195:6bdb with SMTP id f6-20020a05600c4e8600b0040eb1956bdbmr866618wmq.2.1706088043990;
-        Wed, 24 Jan 2024 01:20:43 -0800 (PST)
-Received: from localhost.localdomain ([2001:b07:646f:4a4d:e17a:bd08:d035:d8c2])
-        by smtp.gmail.com with ESMTPSA id y8-20020a5d4ac8000000b00337af95c1d2sm18205477wrs.14.2024.01.24.01.20.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jan 2024 01:20:43 -0800 (PST)
-From: Alessandro Marcolini <alessandromarcolini99@gmail.com>
-To: jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	Alessandro Marcolini <alessandromarcolini99@gmail.com>
-Subject: [PATCH v2 net-next] taprio: validate TCA_TAPRIO_ATTR_FLAGS through policy instead of open-coding
-Date: Wed, 24 Jan 2024 10:21:18 +0100
-Message-ID: <20240124092118.8078-1-alessandromarcolini99@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1706088213; c=relaxed/simple;
+	bh=iXibbrJy5H4kvdEN+3nZQDx0y73tV/y+CG9r37k61+c=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=uDnDXHoFtxUqjCr90pRrgmfo0hI46Y7NoP49Edickb+xZRDgiBBgphZ0hPBqQfiYBdocEyyaPYkJznQ83qG0S7llFN06A1KiREJa561jFlp7AkybSZLTFr7tjLuUMPSrBpjy+lPVj7IdG0nRJjusLiM7I9l6XtCSwwBk3Dy5g6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=lfoSjgeS; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40O6Pg23018306;
+	Wed, 24 Jan 2024 09:22:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	from:to:cc:subject:date:message-id; s=qcppdkim1; bh=rugATKa4IkJP
+	2vKvemVbUve3N/NxJypJVtd+Rko963k=; b=lfoSjgeSZYpmNSjR5osO7cR+4p8D
+	hx5/WSJQAwYXX6aH+eRacL8HsgqKtNPT7t6LMDDzYVlETJF6RIXjLiNNE9vjmQxM
+	s2iQ+WSUS7c60U9Pfj7yw5bRTwX0NGw+hEJr3rPlAhk+x7SIFyRKAJralIEaHtMQ
+	97PgJzSvmgdOkHXYg1NBMrFR7MrxXIJhUBib1hhjYneCYoXzndS4fHDKUCVPog48
+	uFxaOgFe/JuWtiYYTBbyuJil/Muf7hsFx+2XZ453l3qjOQK1mvWffUyZvTq2RsoN
+	gnFodG555VdTqRboPAdE9ZCp80fpjQYkEduAdxxvi3INj/m4mLVEG34sGw==
+Received: from apblrppmta02.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3vtmgwhc7h-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 24 Jan 2024 09:22:33 +0000 (GMT)
+Received: from pps.filterd (APBLRPPMTA02.qualcomm.com [127.0.0.1])
+	by APBLRPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 40O9MSeN008245;
+	Wed, 24 Jan 2024 09:22:28 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 3vr78kqtbh-1;
+	Wed, 24 Jan 2024 09:22:28 +0000
+Received: from APBLRPPMTA02.qualcomm.com (APBLRPPMTA02.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40O9MSwS008239;
+	Wed, 24 Jan 2024 09:22:28 GMT
+Received: from hu-maiyas-hyd.qualcomm.com (hu-snehshah-hyd.qualcomm.com [10.147.246.35])
+	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 40O9MSg6008228;
+	Wed, 24 Jan 2024 09:22:28 +0000
+Received: by hu-maiyas-hyd.qualcomm.com (Postfix, from userid 2319345)
+	id 98C9D5013A3; Wed, 24 Jan 2024 14:52:27 +0530 (+0530)
+From: Sneh Shah <quic_snehshah@quicinc.com>
+To: Vinod Koul <vkoul@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Jose Abreu <joabreu@synopsys.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Cc: Sneh Shah <quic_snehshah@quicinc.com>, kernel@quicinc.com,
+        Andrew Halaney <ahalaney@redhat.com>
+Subject: [PATCH net-next v3] net: stmmac: dwmac-qcom-ethqos: Add support for 2.5G SGMII
+Date: Wed, 24 Jan 2024 14:52:15 +0530
+Message-Id: <20240124092215.14678-1-quic_snehshah@quicinc.com>
+X-Mailer: git-send-email 2.17.1
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: QMmXVuFyVlQNjXVjzbLe2p__f21Lpv1D
+X-Proofpoint-ORIG-GUID: QMmXVuFyVlQNjXVjzbLe2p__f21Lpv1D
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-24_04,2024-01-23_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
+ impostorscore=0 spamscore=0 mlxscore=0 bulkscore=0 suspectscore=0
+ lowpriorityscore=0 clxscore=1011 mlxlogscore=999 phishscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2401190000 definitions=main-2401240066
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-As of now, the field TCA_TAPRIO_ATTR_FLAGS is being validated by manually
-checking its value, using the function taprio_flags_valid().
+Serdes phy needs to operate at 2500 mode for 2.5G speed and 1000
+mode for 1G/100M/10M speed.
+Added changes to configure serdes phy and mac based on link speed.
+Changing serdes phy speed involves multiple register writes for
+serdes block. To avoid redundant write opertions only update serdes
+phy when new speed is different.
 
-With this patch, the field will be validated through the netlink policy
-NLA_POLICY_MASK, where the mask is defined by TAPRIO_SUPPORTED_FLAGS.
-The mutual exclusivity of the two flags TCA_TAPRIO_ATTR_FLAG_FULL_OFFLOAD
-and TCA_TAPRIO_ATTR_FLAG_TXTIME_ASSIST is still checked manually.
-
-Changes since RFC:
-- fixed reversed xmas tree
-- use NL_SET_ERR_MSG_MOD() for both invalid configuration
-
-Changes since v1 (https://lore.kernel.org/netdev/b90a8935-ab4b-48e2-a21d-1efc528b2788@gmail.com/T/#t):
-- Changed NL_SET_ERR_MSG_MOD to NL_SET_ERR_MSG_ATTR when wrong flags
-  issued
-- Changed __u32 to u32
-
-Signed-off-by: Alessandro Marcolini <alessandromarcolini99@gmail.com>
+Signed-off-by: Sneh Shah <quic_snehshah@quicinc.com>
 ---
- net/sched/sch_taprio.c | 72 +++++++++++++++---------------------------
- 1 file changed, 26 insertions(+), 46 deletions(-)
+v3 changelog:
+- updated commit message
+---
+v2 changelog:
+- updated stmmac_pcs_ane to support autoneg disable
+- Update serdes speed to 1000 for 100M and 10M also
+---
+ .../stmicro/stmmac/dwmac-qcom-ethqos.c        | 27 +++++++++++++++++++
+ .../net/ethernet/stmicro/stmmac/stmmac_pcs.h  |  2 ++
+ 2 files changed, 29 insertions(+)
 
-diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
-index 31a8252bd09c..9beecaa4e4d4 100644
---- a/net/sched/sch_taprio.c
-+++ b/net/sched/sch_taprio.c
-@@ -40,6 +40,8 @@ static struct static_key_false taprio_have_working_mqprio;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+index d3bf42d0fceb..c236c939fbe9 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+@@ -103,6 +103,7 @@ struct qcom_ethqos {
+ 	struct clk *link_clk;
+ 	struct phy *serdes_phy;
+ 	unsigned int speed;
++	int serdes_speed;
+ 	phy_interface_t phy_mode;
  
- #define TXTIME_ASSIST_IS_ENABLED(flags) ((flags) & TCA_TAPRIO_ATTR_FLAG_TXTIME_ASSIST)
- #define FULL_OFFLOAD_IS_ENABLED(flags) ((flags) & TCA_TAPRIO_ATTR_FLAG_FULL_OFFLOAD)
-+#define TAPRIO_SUPPORTED_FLAGS \
-+	(TCA_TAPRIO_ATTR_FLAG_TXTIME_ASSIST | TCA_TAPRIO_ATTR_FLAG_FULL_OFFLOAD)
- #define TAPRIO_FLAGS_INVALID U32_MAX
- 
- struct sched_entry {
-@@ -408,19 +410,6 @@ static bool is_valid_interval(struct sk_buff *skb, struct Qdisc *sch)
- 	return entry;
- }
- 
--static bool taprio_flags_valid(u32 flags)
--{
--	/* Make sure no other flag bits are set. */
--	if (flags & ~(TCA_TAPRIO_ATTR_FLAG_TXTIME_ASSIST |
--		      TCA_TAPRIO_ATTR_FLAG_FULL_OFFLOAD))
--		return false;
--	/* txtime-assist and full offload are mutually exclusive */
--	if ((flags & TCA_TAPRIO_ATTR_FLAG_TXTIME_ASSIST) &&
--	    (flags & TCA_TAPRIO_ATTR_FLAG_FULL_OFFLOAD))
--		return false;
--	return true;
--}
--
- /* This returns the tstamp value set by TCP in terms of the set clock. */
- static ktime_t get_tcp_tstamp(struct taprio_sched *q, struct sk_buff *skb)
+ 	const struct ethqos_emac_por *por;
+@@ -602,21 +603,46 @@ static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos)
  {
-@@ -1031,7 +1020,8 @@ static const struct nla_policy taprio_policy[TCA_TAPRIO_ATTR_MAX + 1] = {
- 	[TCA_TAPRIO_ATTR_SCHED_CYCLE_TIME]           =
- 		NLA_POLICY_FULL_RANGE_SIGNED(NLA_S64, &taprio_cycle_time_range),
- 	[TCA_TAPRIO_ATTR_SCHED_CYCLE_TIME_EXTENSION] = { .type = NLA_S64 },
--	[TCA_TAPRIO_ATTR_FLAGS]                      = { .type = NLA_U32 },
-+	[TCA_TAPRIO_ATTR_FLAGS]                      =
-+		NLA_POLICY_MASK(NLA_U32, TAPRIO_SUPPORTED_FLAGS),
- 	[TCA_TAPRIO_ATTR_TXTIME_DELAY]		     = { .type = NLA_U32 },
- 	[TCA_TAPRIO_ATTR_TC_ENTRY]		     = { .type = NLA_NESTED },
- };
-@@ -1815,33 +1805,6 @@ static int taprio_mqprio_cmp(const struct net_device *dev,
- 	return 0;
- }
+ 	int val;
  
--/* The semantics of the 'flags' argument in relation to 'change()'
-- * requests, are interpreted following two rules (which are applied in
-- * this order): (1) an omitted 'flags' argument is interpreted as
-- * zero; (2) the 'flags' of a "running" taprio instance cannot be
-- * changed.
-- */
--static int taprio_new_flags(const struct nlattr *attr, u32 old,
--			    struct netlink_ext_ack *extack)
--{
--	u32 new = 0;
--
--	if (attr)
--		new = nla_get_u32(attr);
--
--	if (old != TAPRIO_FLAGS_INVALID && old != new) {
--		NL_SET_ERR_MSG_MOD(extack, "Changing 'flags' of a running schedule is not supported");
--		return -EOPNOTSUPP;
--	}
--
--	if (!taprio_flags_valid(new)) {
--		NL_SET_ERR_MSG_MOD(extack, "Specified 'flags' are not valid");
--		return -EINVAL;
--	}
--
--	return new;
--}
--
- static int taprio_change(struct Qdisc *sch, struct nlattr *opt,
- 			 struct netlink_ext_ack *extack)
- {
-@@ -1852,6 +1815,7 @@ static int taprio_change(struct Qdisc *sch, struct nlattr *opt,
- 	struct net_device *dev = qdisc_dev(sch);
- 	struct tc_mqprio_qopt *mqprio = NULL;
- 	unsigned long flags;
-+	u32 taprio_flags;
- 	ktime_t start;
- 	int i, err;
++	struct platform_device *pdev = ethqos->pdev;
++	struct net_device *dev = platform_get_drvdata(pdev);
++	struct stmmac_priv *priv = netdev_priv(dev);
+ 	val = readl(ethqos->mac_base + MAC_CTRL_REG);
  
-@@ -1863,12 +1827,28 @@ static int taprio_change(struct Qdisc *sch, struct nlattr *opt,
- 	if (tb[TCA_TAPRIO_ATTR_PRIOMAP])
- 		mqprio = nla_data(tb[TCA_TAPRIO_ATTR_PRIOMAP]);
+ 	switch (ethqos->speed) {
++	case SPEED_2500:
++		val &= ~ETHQOS_MAC_CTRL_PORT_SEL;
++		rgmii_updatel(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
++			      RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
++			      RGMII_IO_MACRO_CONFIG2);
++		if (ethqos->serdes_speed != SPEED_2500)
++			phy_set_speed(ethqos->serdes_phy, SPEED_2500);
++		ethqos->serdes_speed = SPEED_2500;
++		stmmac_pcs_ctrl_ane(priv, priv->ioaddr, 0, 0, 0);
++		break;
+ 	case SPEED_1000:
+ 		val &= ~ETHQOS_MAC_CTRL_PORT_SEL;
+ 		rgmii_updatel(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
+ 			      RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
+ 			      RGMII_IO_MACRO_CONFIG2);
++		if (ethqos->serdes_speed != SPEED_1000)
++			phy_set_speed(ethqos->serdes_phy, SPEED_1000);
++		ethqos->serdes_speed = SPEED_1000;
++		stmmac_pcs_ctrl_ane(priv, priv->ioaddr, 1, 0, 0);
+ 		break;
+ 	case SPEED_100:
+ 		val |= ETHQOS_MAC_CTRL_PORT_SEL | ETHQOS_MAC_CTRL_SPEED_MODE;
++		if (ethqos->serdes_speed != SPEED_1000)
++			phy_set_speed(ethqos->serdes_phy, SPEED_1000);
++		ethqos->serdes_speed = SPEED_1000;
++		stmmac_pcs_ctrl_ane(priv, priv->ioaddr, 1, 0, 0);
+ 		break;
+ 	case SPEED_10:
+ 		val |= ETHQOS_MAC_CTRL_PORT_SEL;
+ 		val &= ~ETHQOS_MAC_CTRL_SPEED_MODE;
++		if (ethqos->serdes_speed != SPEED_1000)
++			phy_set_speed(ethqos->serdes_phy, ethqos->speed);
++		ethqos->serdes_speed = SPEED_1000;
++		stmmac_pcs_ctrl_ane(priv, priv->ioaddr, 1, 0, 0);
+ 		break;
+ 	}
  
--	err = taprio_new_flags(tb[TCA_TAPRIO_ATTR_FLAGS],
--			       q->flags, extack);
--	if (err < 0)
--		return err;
-+	/* The semantics of the 'flags' argument in relation to 'change()'
-+	 * requests, are interpreted following two rules (which are applied in
-+	 * this order): (1) an omitted 'flags' argument is interpreted as
-+	 * zero; (2) the 'flags' of a "running" taprio instance cannot be
-+	 * changed.
-+	 */
-+	taprio_flags = tb[TCA_TAPRIO_ATTR_FLAGS] ? nla_get_u32(tb[TCA_TAPRIO_ATTR_FLAGS]) : 0;
+@@ -789,6 +815,7 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
+ 				     "Failed to get serdes phy\n");
  
--	q->flags = err;
-+	/* txtime-assist and full offload are mutually exclusive */
-+	if ((taprio_flags & TCA_TAPRIO_ATTR_FLAG_TXTIME_ASSIST) &&
-+	    (taprio_flags & TCA_TAPRIO_ATTR_FLAG_FULL_OFFLOAD)) {
-+		NL_SET_ERR_MSG_ATTR(extack,
-+				    "TXTIME_ASSIST and FULL_OFFLOAD are mutually exclusive");
-+		return -EINVAL;
-+	}
-+
-+	if (q->flags != TAPRIO_FLAGS_INVALID && q->flags != taprio_flags) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Changing 'flags' of a running schedule is not supported");
-+		return -EOPNOTSUPP;
-+	}
-+	q->flags = taprio_flags;
+ 	ethqos->speed = SPEED_1000;
++	ethqos->serdes_speed = SPEED_1000;
+ 	ethqos_update_link_clk(ethqos, SPEED_1000);
+ 	ethqos_set_func_clk_en(ethqos);
  
- 	err = taprio_parse_mqprio_opt(dev, mqprio, extack, q->flags);
- 	if (err < 0)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
+index aefc121464b5..13a30e6df4c1 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pcs.h
+@@ -110,6 +110,8 @@ static inline void dwmac_ctrl_ane(void __iomem *ioaddr, u32 reg, bool ane,
+ 	/* Enable and restart the Auto-Negotiation */
+ 	if (ane)
+ 		value |= GMAC_AN_CTRL_ANE | GMAC_AN_CTRL_RAN;
++	else
++		value &= ~GMAC_AN_CTRL_ANE;
+ 
+ 	/* In case of MAC-2-MAC connection, block is configured to operate
+ 	 * according to MAC conf register.
 -- 
-2.43.0
+2.17.1
 
 
