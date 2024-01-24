@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-65278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D607839DE9
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 02:03:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67F6D839DF5
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 02:09:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABE4A1C21953
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 01:03:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 164541F25FA3
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 01:09:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83BDA17F6;
-	Wed, 24 Jan 2024 01:03:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93357EC5;
+	Wed, 24 Jan 2024 01:09:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NW1XArYK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O1wMluka"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5427017E1;
-	Wed, 24 Jan 2024 01:03:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B19E137B;
+	Wed, 24 Jan 2024 01:09:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706058215; cv=none; b=Fx72vQYYCglw8WdFD24fWsjduxULpBnhYgWyM+Goz/fOCAGdRl5WuuLNHJR5IDV/OwQ//EUpXvqY4ZOsnDX2cqdwmB86sYFHSY9iLZ6bhRwjrFDLnYlqqNaT9HtHW45IsEXvlyFkAs+0Qs0zh4pCCKHBuPI5wBpKTxtu8ltbx6I=
+	t=1706058563; cv=none; b=CZXRTkvWS5eWlgKXBFqkjp8WuEIk/8PU+90AJDTRWMW3aqlzzXkYlG/53O+ZDbmA8rTJZCdmAWunQEUGfeLldhoPp5dp1aphm/hEhQ1XX6n0eD+Iy+rRDFibpaA4kXs3AWnITr4BVfTwPmdBbCUPh9b330xvYEp9SzLlsP9OewI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706058215; c=relaxed/simple;
-	bh=1C0aclCSrTodyIiX9t1yGWxG9h2zK+4zsFmooVu0iQs=;
+	s=arc-20240116; t=1706058563; c=relaxed/simple;
+	bh=hh+BQBDKz7XNgSUhocwrdf0ZJxAtOsRrIA4Y4xBDuAQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Tlb8qK6jGH2FMLXOCtPVx+lQ413xRMiCB6i/pZNUKKVwBfQF9gj8tnekmyhg74ccn2ueeIg/hUzGD1tipjSBjEQaEC7ebsnT+lGN/1eJ8NNThCphXlykG/7f8631V3Gg3pEJu9Eyn+1X6YN9VPl0TLUOPjD+QDqpjFdSalV5hHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NW1XArYK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD3A8C433F1;
-	Wed, 24 Jan 2024 01:03:33 +0000 (UTC)
+	 MIME-Version:Content-Type; b=gQDwPlhIK0JfTYKNKaSnyuf6qo27OHBCNSqcWQ1Mdp3mvEdy+vv9uAX2XTgFf5JXj31H0idI5dI9ZLf/Nt/n4ayOWsjY+Bk3uROwBPkoLu3sJiCkMEK8M+n+QhgsJV2NPXDbckSI6Mlx8v/YjdZn7XRGf87BxQ5aWJC2APEO2s8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O1wMluka; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6AFFC433F1;
+	Wed, 24 Jan 2024 01:09:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706058214;
-	bh=1C0aclCSrTodyIiX9t1yGWxG9h2zK+4zsFmooVu0iQs=;
+	s=k20201202; t=1706058563;
+	bh=hh+BQBDKz7XNgSUhocwrdf0ZJxAtOsRrIA4Y4xBDuAQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NW1XArYKalNgr/Ur0uwp3MhGLCPH0L2LOi6rDbWKIb9MkR0WvyeENiNmpGyAMWQ/G
-	 hV21dFBePxK71+X7A7WQCo2d1SXZBU47YWrVR2Po1P5utDSQRUKivvkbLhROUxZOVG
-	 HWsHNdBtIT2c+XoQbNAnlZKFEtig4zDPOgFUHrpJWYbMGLVS3xh1jdHrm4PR+tJNet
-	 4KRcWRi7ouctoLF/3hQCcJ1jkMzXMbI+FcOMcn4MI05ugtxwPldukkx8q62HXLMoyR
-	 TkAFj4m8DRjb3aE0/N08R7SIpeT31juXqLzvTIfMs547SX5dhpupOdh9npyETtFtQr
-	 Yc4SaUOKuBJEA==
-Date: Tue, 23 Jan 2024 17:03:32 -0800
+	b=O1wMluka/uXixVJQrH8yD4sb19h30O5qLKpQjZqIHtk8baGxHk2vaVkE2bBabxq8I
+	 +wFON6A1OCvMdCoDOBX+/ae1aN0Dw8VVbJZD6yhp1bA0fmluco84DThmnVde1kVS6r
+	 fPdYkpFfvtEaEisL/OUfgHgzeavfq9VVzpXrq41neRffd8DmqmJVDY1ZS/voQME25c
+	 EOBXU/YNK0c4YfyuDFFojhURVfHPLO7g7dkeWOMj02FWbJG8xv3FUpkGOGO2Xj4t/Z
+	 a4plablGfJkvdF/wBTjYNdITaWqVGx9vutOD4exYFHRhUk57JX2NVaj2dlKpydkcKQ
+	 YRmf8pqGyxiXg==
+Date: Tue, 23 Jan 2024 17:09:21 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
- decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, longli@microsoft.com, yury.norov@gmail.com,
- leon@kernel.org, cai.huoqing@linux.dev, ssengar@linux.microsoft.com,
- vkuznets@redhat.com, tglx@linutronix.de, linux-hyperv@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org, schakrabarti@microsoft.com,
- paulros@microsoft.com
-Subject: Re: [PATCH 4/4 V2 net-next] net: mana: Assigning IRQ affinity on HT
- cores
-Message-ID: <20240123170332.20dd8a6b@kernel.org>
-In-Reply-To: <1705939259-2859-5-git-send-email-schakrabarti@linux.microsoft.com>
-References: <1705939259-2859-1-git-send-email-schakrabarti@linux.microsoft.com>
-	<1705939259-2859-5-git-send-email-schakrabarti@linux.microsoft.com>
+To: Biju Das <biju.das.jz@bp.renesas.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Sergey Shtylyov
+ <s.shtylyov@omp.ru>, Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+ Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, Wolfram Sang
+ <wsa+renesas@sang-engineering.com>, Nikita Yushchenko
+ <nikita.yoush@cogentembedded.com>, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, Geert Uytterhoeven
+ <geert+renesas@glider.be>, Prabhakar Mahadev Lad
+ <prabhakar.mahadev-lad.rj@bp.renesas.com>, Biju Das <biju.das.au@gmail.com>
+Subject: Re: [PATCH net-next 1/2] ravb: Add Rx checksum offload support
+Message-ID: <20240123170921.51089d41@kernel.org>
+In-Reply-To: <20240123151924.373917-2-biju.das.jz@bp.renesas.com>
+References: <20240123151924.373917-1-biju.das.jz@bp.renesas.com>
+	<20240123151924.373917-2-biju.das.jz@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,19 +67,41 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 22 Jan 2024 08:00:59 -0800 Souradeep Chakrabarti wrote:
-> IRQ   node-num    core-num   CPU        performance(%)
-> 1      0 | 0       0 | 0     0 | 0-1     0
-> 2      0 | 0       0 | 1     1 | 2-3     3
-> 3      0 | 0       1 | 2     2 | 4-5     10
-> 4      0 | 0       1 | 3     3 | 6-7     15
-> 5      0 | 0       2 | 4     4 | 8-9     15
-> ---
-> ---
+On Tue, 23 Jan 2024 15:19:23 +0000 Biju Das wrote:
+> +static void ravb_rx_csum_gbeth(struct sk_buff *skb)
+> +{
+> +	__sum16 csum_ip_hdr, csum_proto;
+> +	u8 *hw_csum;
+> +
+> +	/* The hardware checksum status is contained in sizeof(__sum16) * 2 = 4
+> +	 * bytes appended to packet data. First 2 bytes is ip header csum and
+> +	 * last 2 bytes is protocol csum.
+> +	 */
+> +	if (unlikely(skb->len < sizeof(__sum16) * 2))
+> +		return;
+> +
+> +	hw_csum = skb_tail_pointer(skb) - sizeof(__sum16);
+> +	csum_proto = csum_unfold((__force __sum16)get_unaligned_le16(hw_csum));
+> +
+> +	hw_csum -= sizeof(__sum16);
+> +	csum_ip_hdr = csum_unfold((__force __sum16)get_unaligned_le16(hw_csum));
+> +	skb_trim(skb, skb->len - 2 * sizeof(__sum16));
+> +
+> +	/* TODO: IPV6 Rx csum */
+> +	if (skb->protocol == htons(ETH_P_IP) && csum_ip_hdr == TOE_RX_CSUM_OK &&
+> +	    csum_proto == TOE_RX_CSUM_OK)
+> +		/* Hardware validated our checksum */
+> +		skb->ip_summed = CHECKSUM_UNNECESSARY;
+> +}
 
-Please don't use --- as a line, indent it or use ... because git am
-uses --- as a commit message separator. The commit message will get
-cut off at the first one of those if we try to apply this.
+sparse does not seem to be onboard:
+
+drivers/net/ethernet/renesas/ravb_main.c:771:20: warning: incorrect type in assignment (different base types)
+drivers/net/ethernet/renesas/ravb_main.c:771:20:    expected restricted __sum16 [usertype] csum_proto
+drivers/net/ethernet/renesas/ravb_main.c:771:20:    got restricted __wsum
+drivers/net/ethernet/renesas/ravb_main.c:774:21: warning: incorrect type in assignment (different base types)
+drivers/net/ethernet/renesas/ravb_main.c:774:21:    expected restricted __sum16 [usertype] csum_ip_hdr
+drivers/net/ethernet/renesas/ravb_main.c:774:21:    got restricted __wsum
 -- 
 pw-bot: cr
 
