@@ -1,188 +1,149 @@
-Return-Path: <netdev+bounces-65398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 873B483A5B2
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:41:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7979E83A5DA
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:48:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B5F4F1C2746C
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:41:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 838E41C288A5
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:48:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2BED17C98;
-	Wed, 24 Jan 2024 09:41:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF57418045;
+	Wed, 24 Jan 2024 09:48:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gZOnnVuR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CRntU99J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3ACE17C6C;
-	Wed, 24 Jan 2024 09:41:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2354D1802E
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 09:48:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706089265; cv=none; b=Bw77UBthAogOSuZu8EFqfFtUdS0vGkMO1nB7R14cktHJxKiYUSqqo4V+wb5iVv8v/8zbV8AImigVF9ILjfd9rTeDPerGeraNXf7X/cM7GrfixmajYp+NNcShU6GqFhe2cd19jo53RXplwIrt7ESZLP3G0XVhc4RbXgYkH/x+2G8=
+	t=1706089698; cv=none; b=fbkIl+zNzcZYXBF1mPWY6JTYHMndz6qSWZfo42cE4lBBfpUUkiBW52PBihnf/bdjO16RdX9NDQ6uf+pKqchWyhuQCiLwoumQZl7mdDDUpT56zE8aGf8Rh5ArXJsGjvj6arqRnvH++HBrL4bJRh1R9/JHuacHSFZidd3uSc1dSBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706089265; c=relaxed/simple;
-	bh=+lkuKTCv3wUHbUhaYST2gExklAngKX84H00lKlFUXx4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SyCUYwmuKTmSqDgB9iFzaUHz2DIJhlk8N9L8FCxxdexcRJ5ISvAPZta0lOrXmnKUbaCVc89z7Hm95QIn+gItGgUZxdxlxJzf6lxdFBsLbp2JTwIaK3R02GUK5fx/PDRAQ9mEn76C9dlsdlcE5BeVCjJo66AFC+pHdI7PbzyIHdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gZOnnVuR; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706089264; x=1737625264;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=+lkuKTCv3wUHbUhaYST2gExklAngKX84H00lKlFUXx4=;
-  b=gZOnnVuRoxS62GQ3XR9eHGJzwTQVBwGfZoBcnL1NndO3TPZ4aUHmZUOb
-   /ztTT3KIEXlK24s26ehFLPS2Sf0IDLCU8mcv2ZJnFMfhcMICluI6doIfA
-   xJQfnbo2JoPRDoElgxg5tecE1Xnq5A9doA2BSxHhCRs90JRxC4RLNXAcT
-   k2hE0Cjl490h4zUwsQrOdIwAJOBr7IaG2aigBqm37xtocuO6hKKA6Sozr
-   lf42wMPrTcydBT0lYSuCIulv8IE11CWAzS/G7rg34jGiRuktTgvX05QkF
-   aV6yvH2xqLJKEE1/WrBeruDOXe2aL9OD1uLPDk2pBXBWYDiEutZSfqe5O
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="693417"
-X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="693417"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2024 01:41:03 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="735868699"
-X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="735868699"
-Received: from lkp-server01.sh.intel.com (HELO 961aaaa5b03c) ([10.239.97.150])
-  by orsmga003.jf.intel.com with ESMTP; 24 Jan 2024 01:40:58 -0800
-Received: from kbuild by 961aaaa5b03c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rSZke-00081p-13;
-	Wed, 24 Jan 2024 09:40:56 +0000
-Date: Wed, 24 Jan 2024 17:40:39 +0800
-From: kernel test robot <lkp@intel.com>
-To: Ziyang Huang <hzyitc@outlook.com>, mcoquelin.stm32@gmail.com
-Cc: oe-kbuild-all@lists.linux.dev, alexandre.torgue@foss.st.com,
-	richardcochran@gmail.com, p.zabel@pengutronix.de,
-	matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-	linux-mediatek@lists.infradead.org,
-	Ziyang Huang <hzyitc@outlook.com>
-Subject: Re: [PATCH 3/8] net: stmmac: Introduce Qualcomm IPQ50xx DWMAC driver
-Message-ID: <202401241733.H4p1Af19-lkp@intel.com>
-References: <TYZPR01MB5556B8833322A83632709631C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
+	s=arc-20240116; t=1706089698; c=relaxed/simple;
+	bh=qzxgBVsbZvEsEsWyO0S63ywg3dKcwZnUp7kSZ8xPhnc=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=ImfImls+9M/ONqo2HKI8D1UQZn3n2aEAt4XlZkVFPHcFQozQHzBbAgxFNZbAom9Wv+B+O06WnN/feX6Ml3hLjd372EotXAib2V7gvGdQcwCy74y2uZdlQ1mNG8fwC5AQViGF3laPVBrwGdEBLaRsM4uJHwHIXLuxCmf2iRMKjEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CRntU99J; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-40e60e137aaso57656475e9.0
+        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 01:48:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706089695; x=1706694495; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hwO+PusDvHxvjyYNxsxocMhLLcCKqruiEt9c9sMD0rE=;
+        b=CRntU99Jg6PR+N3fQQAl2A8NIBLuuN8bRp+mcqp5025DnX/f3qDAhKNfzjrzsMz82Q
+         50HxJh+KRoNV2mK8b4VlBMSPLGxiNj6jJPM2P8POSfi+W4L/4q3L5LxEvOKdK+16uIXb
+         qWi686j874hLqBW+SiPbEPphuK7faY9nBeZuIcEGyhrYPE16uriOVfSb6ZdXJqZwcX9h
+         cBRzDlb5LTh3xq2yfAHPVLgykHTCFtwAg0INAeZhQzOTdHHLxLks3uLFNWbwTw5hzEir
+         bX+V/MMpagf7fL8+GTgxXnQD+SrD6rOV91UEoFameAbv6EHPt3xWQgv6RVlQIK24x6bi
+         jjcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706089695; x=1706694495;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hwO+PusDvHxvjyYNxsxocMhLLcCKqruiEt9c9sMD0rE=;
+        b=a1GQsrbu5dIuBYNe4k8A8t45NO50VhF80ST6Xow8Q2OU2UkcwE1ckgkFbSrMmTS3cc
+         pCZPu3aVZgoggeltIp0pSCukU/dKroaqocMoF+HDRiLOmFiZjVF6vCsRp66APOPOdmCm
+         2JeS6ti8wIKEhuYeafVnE+ht9jjBi2VhKp1PAtHZeqOPQQuTx0msToWnFYTkrsnDhEGM
+         ig9CxWGj1h+mFSwXeuabyoladYk8ThpQCUGbNR10bwKdzBWMZnu+a7T31Nlev4/18l95
+         +nZBxYR18B0jWFAZytU1BCJn8FMPpIVAPTrlhCqjjA+l8uGeFhtEogkN82LvVipXbwDX
+         TIEg==
+X-Gm-Message-State: AOJu0YxveXLjX5WXK9phYKHEDNMUMJN72AXg6VLRq7jtT/xh5xktaVA9
+	thOdK95rScoWY2uFj9LT3GZzRo8T0FWj5sCW+CARwPsU0Hsl+vFATwq+5u6HofWz36LL
+X-Google-Smtp-Source: AGHT+IGezWDIeYoamsXYHRTlKYk/ZD6+VasV3R3nqmNMpCQUthUo+A2KT1jtxntVdXPs/KKCpC2DrQ==
+X-Received: by 2002:a05:600c:1656:b0:40e:4492:ffa with SMTP id o22-20020a05600c165600b0040e44920ffamr1242736wmn.61.1706089694902;
+        Wed, 24 Jan 2024 01:48:14 -0800 (PST)
+Received: from imac ([2a02:8010:60a0:0:bd37:9ab2:c68c:dd0c])
+        by smtp.gmail.com with ESMTPSA id k13-20020a05600c1c8d00b0040eb99a7037sm4747933wms.44.2024.01.24.01.48.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jan 2024 01:48:14 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Alessandro Marcolini <alessandromarcolini99@gmail.com>
+Cc: davem@davemloft.net,  edumazet@google.com,  kuba@kernel.org,
+  pabeni@redhat.com,  sdf@google.com,  chuck.lever@oracle.com,
+  lorenzo@kernel.org,  jacob.e.keller@intel.com,  jiri@resnulli.us,
+  netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 3/3] tools: ynl: add encoding support for
+ 'sub-message' to ynl
+In-Reply-To: <17795933-a5ca-44c6-be4c-58ed2e573aff@gmail.com> (Alessandro
+	Marcolini's message of "Wed, 24 Jan 2024 10:12:02 +0100")
+Date: Wed, 24 Jan 2024 09:45:47 +0000
+Message-ID: <m27cjzxdx0.fsf@gmail.com>
+References: <cover.1705950652.git.alessandromarcolini99@gmail.com>
+	<0eedc19860e9b84f105c57d17219b3d0af3100d2.1705950652.git.alessandromarcolini99@gmail.com>
+	<m2v87kxam1.fsf@gmail.com>
+	<17795933-a5ca-44c6-be4c-58ed2e573aff@gmail.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <TYZPR01MB5556B8833322A83632709631C9762@TYZPR01MB5556.apcprd01.prod.exchangelabs.com>
+Content-Type: text/plain
 
-Hi Ziyang,
+Alessandro Marcolini <alessandromarcolini99@gmail.com> writes:
 
-kernel test robot noticed the following build errors:
+> On 1/23/24 17:44, Donald Hunter wrote:
+>> Alessandro Marcolini <alessandromarcolini99@gmail.com> writes:
+>>
+>>> Add encoding support for 'sub-message' attribute and for resolving
+>>> sub-message selectors at different nesting level from the key
+>>> attribute.
+>> I think the relevant patches in my series are:
+>>
+>> https://lore.kernel.org/netdev/20240123160538.172-3-donald.hunter@gmail.com/T/#u
+>> https://lore.kernel.org/netdev/20240123160538.172-5-donald.hunter@gmail.com/T/#u
+> I really like your idea of using ChainMap, I think it's better than mine and more concise.
+>>> Also, add encoding support for multi-attr attributes.
+>> This would be better as a separate patch since it is unrelated to the
+>> other changes.
+> You mean as a separate patch in this patchset or as an entirely new patch?
 
-[auto build test ERROR on robh/for-next]
-[also build test ERROR on clk/clk-next pza/reset/next linus/master v6.8-rc1 next-20240123]
-[cannot apply to pza/imx-drm/next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+I was thinking as a separate patch in this patchset, yes.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Ziyang-Huang/net-phy-Introduce-Qualcomm-IPQ5018-internal-PHY-driver/20240121-204840
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git for-next
-patch link:    https://lore.kernel.org/r/TYZPR01MB5556B8833322A83632709631C9762%40TYZPR01MB5556.apcprd01.prod.exchangelabs.com
-patch subject: [PATCH 3/8] net: stmmac: Introduce Qualcomm IPQ50xx DWMAC driver
-config: parisc-allmodconfig (https://download.01.org/0day-ci/archive/20240124/202401241733.H4p1Af19-lkp@intel.com/config)
-compiler: hppa-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240124/202401241733.H4p1Af19-lkp@intel.com/reproduce)
+>>> Signed-off-by: Alessandro Marcolini <alessandromarcolini99@gmail.com>
+>>> ---
+>>>  tools/net/ynl/lib/ynl.py | 54 +++++++++++++++++++++++++++++++++++-----
+>>>  1 file changed, 48 insertions(+), 6 deletions(-)
+>>>
+>>> diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
+>>> index 1e10512b2117..f8c56944f7e7 100644
+>>> --- a/tools/net/ynl/lib/ynl.py
+>>> +++ b/tools/net/ynl/lib/ynl.py
+>>> @@ -449,7 +449,7 @@ class YnlFamily(SpecFamily):
+>>>          self.sock.setsockopt(Netlink.SOL_NETLINK, Netlink.NETLINK_ADD_MEMBERSHIP,
+>>>                               mcast_id)
+>>>  
+>>> -    def _add_attr(self, space, name, value):
+>>> +    def _add_attr(self, space, name, value, vals):
+>>>          try:
+>>>              attr = self.attr_sets[space][name]
+>>>          except KeyError:
+>>> @@ -458,8 +458,13 @@ class YnlFamily(SpecFamily):
+>>>          if attr["type"] == 'nest':
+>>>              nl_type |= Netlink.NLA_F_NESTED
+>>>              attr_payload = b''
+>>> -            for subname, subvalue in value.items():
+>>> -                attr_payload += self._add_attr(attr['nested-attributes'], subname, subvalue)
+>>> +            # Check if it's a list of values (i.e. it contains multi-attr elements)
+>>> +            for subname, subvalue in (
+>>> +                ((k, v) for item in value for k, v in item.items())
+>>> +                if isinstance(value, list)
+>>> +                else value.items()
+>>> +            ):
+>>> +                attr_payload += self._add_attr(attr['nested-attributes'], subname, subvalue, vals)
+>> Should really check whether multi-attr is true in the spec before
+>> processing the json input as a list of values.
+> Yes, you're right. Maybe I could resend this on top of your changes, what do you think?
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202401241733.H4p1Af19-lkp@intel.com/
-
-All error/warnings (new ones prefixed by >>):
-
-   drivers/net/ethernet/stmicro/stmmac/dwmac-ipq50xx.c: In function 'ipq50xx_gmac_probe':
->> drivers/net/ethernet/stmicro/stmmac/dwmac-ipq50xx.c:94:20: error: implicit declaration of function 'stmmac_probe_config_dt'; did you mean 'devm_stmmac_probe_config_dt'? [-Werror=implicit-function-declaration]
-      94 |         plat_dat = stmmac_probe_config_dt(pdev, stmmac_res.mac);
-         |                    ^~~~~~~~~~~~~~~~~~~~~~
-         |                    devm_stmmac_probe_config_dt
->> drivers/net/ethernet/stmicro/stmmac/dwmac-ipq50xx.c:94:18: warning: assignment to 'struct plat_stmmacenet_data *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
-      94 |         plat_dat = stmmac_probe_config_dt(pdev, stmmac_res.mac);
-         |                  ^
-   cc1: some warnings being treated as errors
-
-
-vim +94 drivers/net/ethernet/stmicro/stmmac/dwmac-ipq50xx.c
-
-    80	
-    81	static int ipq50xx_gmac_probe(struct platform_device *pdev)
-    82	{
-    83		struct device *dev = &pdev->dev;
-    84		struct stmmac_resources stmmac_res;
-    85		struct plat_stmmacenet_data *plat_dat;
-    86		struct ipq50xx_gmac *gmac;
-    87		int ret;
-    88	
-    89		ret = stmmac_get_platform_resources(pdev, &stmmac_res);
-    90		if (ret)
-    91			return dev_err_probe(dev, ret,
-    92					     "failed to get stmmac platform resources\n");
-    93	
-  > 94		plat_dat = stmmac_probe_config_dt(pdev, stmmac_res.mac);
-    95		if (IS_ERR_OR_NULL(plat_dat))
-    96			return dev_err_probe(dev, PTR_ERR(plat_dat),
-    97					     "failed to parse stmmac dt parameters\n");
-    98	
-    99		gmac = devm_kzalloc(dev, sizeof(*gmac), GFP_KERNEL);
-   100		if (!gmac)
-   101			return dev_err_probe(dev, -ENOMEM,
-   102					     "failed to allocate priv\n");
-   103	
-   104		gmac->dev = dev;
-   105	
-   106		memcpy(gmac->clks, ipq50xx_gmac_clks, sizeof(gmac->clks));
-   107		ret = devm_clk_bulk_get_optional(dev, ARRAY_SIZE(gmac->clks), gmac->clks);
-   108		if (ret)
-   109			return dev_err_probe(dev, ret,
-   110					     "failed to acquire clocks\n");
-   111	
-   112		ret = clk_bulk_prepare_enable(ARRAY_SIZE(gmac->clks), gmac->clks);
-   113		if (ret)
-   114			return dev_err_probe(dev, ret,
-   115					     "failed to enable clocks\n");
-   116	
-   117		gmac->rst = devm_reset_control_array_get_exclusive(dev);
-   118		if (IS_ERR_OR_NULL(gmac->rst))
-   119			return dev_err_probe(dev, PTR_ERR(gmac->rst),
-   120					     "failed to acquire reset\n");
-   121	
-   122		ret = reset_control_reset(gmac->rst);
-   123		if (ret)
-   124			return dev_err_probe(dev, ret,
-   125					     "failed to reset\n");
-   126	
-   127		gmac->uniphy = devm_phy_optional_get(dev, "uniphy");
-   128		if (IS_ERR(gmac->uniphy))
-   129			return dev_err_probe(dev, PTR_ERR(gmac->uniphy),
-   130					     "failed to acquire uniphy\n");
-   131	
-   132		plat_dat->bsp_priv = gmac;
-   133		plat_dat->serdes_powerup = ipq50xx_gmac_powerup;
-   134		plat_dat->fix_mac_speed = ipq50xx_gmac_fix_speed;
-   135	
-   136		return stmmac_dvr_probe(dev, plat_dat, &stmmac_res);
-   137	}
-   138	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Yes, that would be great. Thanks!
 
