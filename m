@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-65685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11B3483B586
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 00:20:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A558A83B587
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 00:20:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5DC7DB22441
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 23:20:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 461F81F2365A
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 23:20:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D796136664;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7669513666F;
 	Wed, 24 Jan 2024 23:20:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rJtdk+MB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rLLESttA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0363D136656;
-	Wed, 24 Jan 2024 23:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51CAC13666A
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 23:20:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706138428; cv=none; b=WkXev9tR7QYJb+PpUVpqPVgAgQOuAyr0Jk8qqhDcYkoVG+GGslyCppkFsKiVY0gLzfvMVcz2XsOec9gY4wCmf/CojU7sCF4e185KUWrW2RcrsG02YKN24XfSwa6B/eGIf/Ugas9ChzpF7Q8YmndYWGaR5bjUdcny7uQ4WSCkGnA=
+	t=1706138428; cv=none; b=qYHTQ4fxYvFdnHl71i2XYfuIgjHUwBj8UqwqyWr5vRUqoaite5DZ5sQt55BBEoG5+rS5incLLmAn4qDVKkL3KiNL+vQcSE5JO/589i176QyajAtMQuFBf7t2xShk112vlj770CuEA2HGYB4/Km3z61eALih8/l5vSaP2S0pPJDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1706138428; c=relaxed/simple;
-	bh=7GTQG8sFoJ4iYeZM7dgnESy6/9cSufsoQj9M/N6s+Wc=;
+	bh=xaEPyaxpZeZK6ZCT2bhkeKrXNpGSj+nY2v1/WZL/eSY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LgXflqpJ4/gCbSjEOVpui9XeX4AibchfSMDTEoc1H+F9xLb86d6kTxhjc7pJfnu4PSBXwCqyjVwCtymJKb0gH14InrH0cJ0ZvRIq0B5DXKfmfxNtK7VIJmyTTwIMRrQCh/yqHQ8dzWbE5B5M6XRkad7z3PJi3OWBzOlsE7iEcyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rJtdk+MB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8F4C2C433F1;
+	 In-Reply-To:To:Cc; b=FT02/PZgW6D9/1fPfbHCAKYA/qta8/VZgDVW5ZWOKIE/yUWPI6yzQdy1dI92C59SM4574BSz6Yq0PgLQCbTWLLuFPAAnh85J9vwmonCdAyu2tIDgoZKy7k6FkYkySmv24qj899oMXwl4399K+QSEYM/Gj4wgPAgUeXgN0VIFzO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rLLESttA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E3627C43141;
 	Wed, 24 Jan 2024 23:20:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1706138427;
-	bh=7GTQG8sFoJ4iYeZM7dgnESy6/9cSufsoQj9M/N6s+Wc=;
+	bh=xaEPyaxpZeZK6ZCT2bhkeKrXNpGSj+nY2v1/WZL/eSY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=rJtdk+MBGaaN+9nrJ1RHyMSKdGvhusnXbLDYy5cRETFREbKQ8GOPaBI+0/gtcPkqK
-	 VIFoFo79l6uMpgGK2OmdXczTLqmuM4N+AlROxft5/Mo756IX7/XcViiINy+G/1mXhj
-	 bUiMpiRF4Gs+OZ03+tn+WOuwq8+RdRV+DRdM/8hzEQMt5Voy2Q0qvwqKZ2Rt5brPzh
-	 Gt9EYpUBR8weTsckxKlySa5H5uSf16/yPE5X33zfe8bFiN4ohCpolMzJjKI/8uaLrD
-	 kD37m3XWzlKCBTeJfggWyTCbmxQJkf0o4o5FTh7OzyHxy3Ht4EWjeSq4vBjCDLRd1O
-	 dvwRtYV92IXZg==
+	b=rLLESttAEK5RCM2iHnjURVyfVASANpcG7bRR0ymei+f/Fn3lJ/5sN4HmFcwr/vuU/
+	 0mq9SVYyC0PlBsHi65tTs7DAEZRSaapX5c/mGOwIn1Ld3LQ2ExrZNrbtebBTWJYOAj
+	 CHd8tPpwOAJ9+DuVH5LfHmtbHhSFv3fBr4+YUR0uAWHDEHPfft33uLsXEXbZphSGg4
+	 lNXfLNRpuv5oEEaRQyNsmjD9sKbJQZGTjM41uFyYv20TA5qOGFl2CXibnln9GYROGd
+	 gFozqWWwp0QeltVfoB5FFSIximP+qsYfNvS0epa9WrvtKMVz0oYvgtrJMUC03s9bb7
+	 JlGqdr4Ri5bAQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 771F2D8C966;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D389BD8C966;
 	Wed, 24 Jan 2024 23:20:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,54 +52,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2 00/10] Fix MODULE_DESCRIPTION() for net (p2)
+Subject: Re: [PATCH iproute2] color: handle case where fmt is NULL
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170613842748.28029.10890542758483405613.git-patchwork-notify@kernel.org>
+ <170613842786.28029.4972541107041251626.git-patchwork-notify@kernel.org>
 Date: Wed, 24 Jan 2024 23:20:27 +0000
-References: <20240123190332.677489-1-leitao@debian.org>
-In-Reply-To: <20240123190332.677489-1-leitao@debian.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
- edumazet@google.com, dsahern@kernel.org, weiwan@google.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240123043010.266210-1-stephen@networkplumber.org>
+In-Reply-To: <20240123043010.266210-1-stephen@networkplumber.org>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org, pctammela@mojatatu.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This patch was applied to iproute2/iproute2.git (main)
+by Stephen Hemminger <stephen@networkplumber.org>:
 
-On Tue, 23 Jan 2024 11:03:21 -0800 you wrote:
-> There are hundreds of network modules that misses MODULE_DESCRIPTION(),
-> causing a warnning when compiling with W=1. Example:
+On Mon, 22 Jan 2024 20:30:10 -0800 you wrote:
+> There are cases where NULL is passed as format string when
+> nothing is to be printed. This is commonly done in the print_bool
+> function when a flag is false. Glibc seems to handle this case nicely
+> but for musl it will cause a segmentation fault
 > 
->         WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/net/arcnet/com90io.o
->         WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/net/arcnet/arc-rimi.o
->         WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/net/arcnet/com20020.o
+> Since nothing needs to be printed, in this case; just check
+> for NULL and return.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2,01/10] net: fill in MODULE_DESCRIPTION()s for 8390
-    https://git.kernel.org/netdev/net/c/f5e414167be7
-  - [net,v2,02/10] net: fill in MODULE_DESCRIPTION()s for Broadcom bgmac
-    https://git.kernel.org/netdev/net/c/39535d7ff6c1
-  - [net,v2,03/10] net: fill in MODULE_DESCRIPTION()s for liquidio
-    https://git.kernel.org/netdev/net/c/bb567fbbbbb4
-  - [net,v2,04/10] net: fill in MODULE_DESCRIPTION()s for ep93xxx_eth
-    https://git.kernel.org/netdev/net/c/53c83e2d3648
-  - [net,v2,05/10] net: fill in MODULE_DESCRIPTION()s for nps_enet
-    https://git.kernel.org/netdev/net/c/27881ca8c8e1
-  - [net,v2,06/10] net: fill in MODULE_DESCRIPTION()s for enetc
-    https://git.kernel.org/netdev/net/c/07c42d237567
-  - [net,v2,07/10] net: fill in MODULE_DESCRIPTION()s for fec
-    https://git.kernel.org/netdev/net/c/2e8757648855
-  - [net,v2,08/10] net: fill in MODULE_DESCRIPTION()s for fsl_pq_mdio
-    https://git.kernel.org/netdev/net/c/8183c470c176
-  - [net,v2,09/10] net: fill in MODULE_DESCRIPTION()s for litex
-    https://git.kernel.org/netdev/net/c/07d1e0ce8743
-  - [net,v2,10/10] net: fill in MODULE_DESCRIPTION()s for rvu_mbox
-    https://git.kernel.org/netdev/net/c/bdc6734115d7
+  - [iproute2] color: handle case where fmt is NULL
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=da5a2d94dc01
 
 You are awesome, thank you!
 -- 
