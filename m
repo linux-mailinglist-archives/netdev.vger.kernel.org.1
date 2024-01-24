@@ -1,46 +1,79 @@
-Return-Path: <netdev+bounces-65601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5812083B1FC
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 20:16:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 346C983B20E
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 20:17:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2455BB2CA4E
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 19:13:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ED5D4B2CD18
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 19:16:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF59413342F;
-	Wed, 24 Jan 2024 19:12:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CFA6131E4E;
+	Wed, 24 Jan 2024 19:16:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SSBdW1qu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2492132C10;
-	Wed, 24 Jan 2024 19:12:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0455C77F36;
+	Wed, 24 Jan 2024 19:16:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706123579; cv=none; b=at8bPGD6FIf0bcqG3EmbZe4Bz6wUJAhKdtbJ7kYIhafGTDjT9KEW1NxFHVYQzbAJ2DKmjW93AXxFxSP5nTcC5nzbUxQ99rpy/MvTDgQemWLogDOO7qKMaNpewQvPJwJ7syPYD+ULrjXAn/oVDRsf219GXNzfiviQ8gc91Lcw+Vk=
+	t=1706123773; cv=none; b=KmpU0VzaOhqSL0FUrRCy7RCRqD8syfbuJi0MF/frqzIj45dJaSdErYw8clH+cZji9aSQdMDFqd2g8b3oPJvPzGEgSzB0ET+mZ5CYjS3BTj446coGiPMusRmZoOGVr2MdTCXyw4Ixv5tKzdSaYfZdwJrnQLFUaMjxSR3PwLuFJ9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706123579; c=relaxed/simple;
-	bh=WL5tGIwU6oaPtagTXFU0CYWlH+uOCIWUgqsE+PPyLz0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FdXmnmOBW8yv1QZuSQj1aoCERrZaVwBBD5E0DnY/AguqQzYj9rz/79Ug/f7qJ5W1vgI1rF1MHSz5CAB5NDypOlcZWaFWjvQkHQfryjf65nWHN20RFOA4NO0DmFuxMLbS96zCOzZPSziRvYneW6Inc3L0Me5Q2/3et9A/S1doDNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	fw@strlen.de
-Subject: [PATCH net 6/6] netfilter: nf_tables: validate NFPROTO_* family
-Date: Wed, 24 Jan 2024 20:12:48 +0100
-Message-Id: <20240124191248.75463-7-pablo@netfilter.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240124191248.75463-1-pablo@netfilter.org>
-References: <20240124191248.75463-1-pablo@netfilter.org>
+	s=arc-20240116; t=1706123773; c=relaxed/simple;
+	bh=m6U/0/1KJmUAWxkEnwjfTQGWq3gYu7kd0lNyKdS5oSs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nTPrfSRUpJg9CFHBA0Uf5kl2ZDGNisvx1qR/8zzcEF4OWE2EJM2retR8nQw0JazxgyIZ3FlhedW+fTk7qRsVow2Zqdmiaz0RweiztdVomQGtQjWX82GNJkG4bkG1vGVzOBtkGXVw0ZgNs2oJOixwYnRmQcTyqhULuW5MRKP4hmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SSBdW1qu; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706123771; x=1737659771;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=m6U/0/1KJmUAWxkEnwjfTQGWq3gYu7kd0lNyKdS5oSs=;
+  b=SSBdW1qup1sDfiJanj+l6ybmUDGDTzHadF9bKA3qKBCowi+e7YO9khH2
+   Xu7V/Yg8hMPXUEouU2WeOBAOmG8o0s/jbuoRbMtfsm4HWdJ6VaYfUYpBE
+   tPjzAPKhgj87eAJZDtofY8BBLS6ysEZ1dd8v13s3NcUD2jQAezmWuRz9T
+   dmRYfX+K09PNFlLxaicT45R8f0FQk1lI1jVaFE1RTVRdd9ZypjIkd6WAo
+   hsgEDcNEvaQ2mXfuVHmKBRu4qWUxmJk5GZ9BAWWKEBiZlq7pG/CqMSPLY
+   2OwvCcSpsOY59syc4OVnLdoVJEu5G8KCNVkBhtNGEDVq7Vc08RMAZwcfh
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="1822883"
+X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
+   d="scan'208";a="1822883"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2024 11:16:11 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="820553428"
+X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
+   d="scan'208";a="820553428"
+Received: from boxer.igk.intel.com ([10.102.20.173])
+  by orsmga001.jf.intel.com with ESMTP; 24 Jan 2024 11:16:06 -0800
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: bpf@vger.kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org
+Cc: netdev@vger.kernel.org,
+	magnus.karlsson@intel.com,
+	bjorn@kernel.org,
+	maciej.fijalkowski@intel.com,
+	echaudro@redhat.com,
+	lorenzo@kernel.org,
+	martin.lau@linux.dev,
+	tirthendu.sarkar@intel.com,
+	john.fastabend@gmail.com,
+	horms@kernel.org,
+	kuba@kernel.org
+Subject: [PATCH v6 bpf 00/11] net: bpf_xdp_adjust_tail() and Intel mbuf fixes
+Date: Wed, 24 Jan 2024 20:15:51 +0100
+Message-Id: <20240124191602.566724-1-maciej.fijalkowski@intel.com>
+X-Mailer: git-send-email 2.35.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,190 +82,80 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Several expressions explicitly refer to NF_INET_* hook definitions
-from expr->ops->validate, however, family is not validated.
+Hey,
 
-Bail out with EOPNOTSUPP in case they are used from unsupported
-families.
+after a break followed by dealing with sickness, here is a v6 that makes
+bpf_xdp_adjust_tail() actually usable for ZC drivers that support XDP
+multi-buffer. Since v4 I tried also using bpf_xdp_adjust_tail() with
+positive offset which exposed yet another issues, which can be observed
+by increased commit count when compared to v3.
 
-Fixes: 0ca743a55991 ("netfilter: nf_tables: add compatibility layer for x_tables")
-Fixes: a3c90f7a2323 ("netfilter: nf_tables: flow offload expression")
-Fixes: 2fa841938c64 ("netfilter: nf_tables: introduce routing expression")
-Fixes: 554ced0a6e29 ("netfilter: nf_tables: add support for native socket matching")
-Fixes: ad49d86e07a4 ("netfilter: nf_tables: Add synproxy support")
-Fixes: 4ed8eb6570a4 ("netfilter: nf_tables: Add native tproxy support")
-Fixes: 6c47260250fc ("netfilter: nf_tables: add xfrm expression")
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- net/netfilter/nft_compat.c       | 12 ++++++++++++
- net/netfilter/nft_flow_offload.c |  5 +++++
- net/netfilter/nft_nat.c          |  5 +++++
- net/netfilter/nft_rt.c           |  5 +++++
- net/netfilter/nft_socket.c       |  5 +++++
- net/netfilter/nft_synproxy.c     |  7 +++++--
- net/netfilter/nft_tproxy.c       |  5 +++++
- net/netfilter/nft_xfrm.c         |  5 +++++
- 8 files changed, 47 insertions(+), 2 deletions(-)
+John, in the end I think we should remove handling
+MEM_TYPE_XSK_BUFF_POOL from __xdp_return(), but it is out of the scope
+for fixes set, IMHO.
 
-diff --git a/net/netfilter/nft_compat.c b/net/netfilter/nft_compat.c
-index 5284cd2ad532..f0eeda97bfcd 100644
---- a/net/netfilter/nft_compat.c
-+++ b/net/netfilter/nft_compat.c
-@@ -350,6 +350,12 @@ static int nft_target_validate(const struct nft_ctx *ctx,
- 	unsigned int hook_mask = 0;
- 	int ret;
- 
-+	if (ctx->family != NFPROTO_IPV4 &&
-+	    ctx->family != NFPROTO_IPV6 &&
-+	    ctx->family != NFPROTO_BRIDGE &&
-+	    ctx->family != NFPROTO_ARP)
-+		return -EOPNOTSUPP;
-+
- 	if (nft_is_base_chain(ctx->chain)) {
- 		const struct nft_base_chain *basechain =
- 						nft_base_chain(ctx->chain);
-@@ -595,6 +601,12 @@ static int nft_match_validate(const struct nft_ctx *ctx,
- 	unsigned int hook_mask = 0;
- 	int ret;
- 
-+	if (ctx->family != NFPROTO_IPV4 &&
-+	    ctx->family != NFPROTO_IPV6 &&
-+	    ctx->family != NFPROTO_BRIDGE &&
-+	    ctx->family != NFPROTO_ARP)
-+		return -EOPNOTSUPP;
-+
- 	if (nft_is_base_chain(ctx->chain)) {
- 		const struct nft_base_chain *basechain =
- 						nft_base_chain(ctx->chain);
-diff --git a/net/netfilter/nft_flow_offload.c b/net/netfilter/nft_flow_offload.c
-index ab3362c483b4..397351fa4d5f 100644
---- a/net/netfilter/nft_flow_offload.c
-+++ b/net/netfilter/nft_flow_offload.c
-@@ -384,6 +384,11 @@ static int nft_flow_offload_validate(const struct nft_ctx *ctx,
- {
- 	unsigned int hook_mask = (1 << NF_INET_FORWARD);
- 
-+	if (ctx->family != NFPROTO_IPV4 &&
-+	    ctx->family != NFPROTO_IPV6 &&
-+	    ctx->family != NFPROTO_INET)
-+		return -EOPNOTSUPP;
-+
- 	return nft_chain_validate_hooks(ctx->chain, hook_mask);
- }
- 
-diff --git a/net/netfilter/nft_nat.c b/net/netfilter/nft_nat.c
-index 583885ce7232..808f5802c270 100644
---- a/net/netfilter/nft_nat.c
-+++ b/net/netfilter/nft_nat.c
-@@ -143,6 +143,11 @@ static int nft_nat_validate(const struct nft_ctx *ctx,
- 	struct nft_nat *priv = nft_expr_priv(expr);
- 	int err;
- 
-+	if (ctx->family != NFPROTO_IPV4 &&
-+	    ctx->family != NFPROTO_IPV6 &&
-+	    ctx->family != NFPROTO_INET)
-+		return -EOPNOTSUPP;
-+
- 	err = nft_chain_validate_dependency(ctx->chain, NFT_CHAIN_T_NAT);
- 	if (err < 0)
- 		return err;
-diff --git a/net/netfilter/nft_rt.c b/net/netfilter/nft_rt.c
-index 35a2c28caa60..24d977138572 100644
---- a/net/netfilter/nft_rt.c
-+++ b/net/netfilter/nft_rt.c
-@@ -166,6 +166,11 @@ static int nft_rt_validate(const struct nft_ctx *ctx, const struct nft_expr *exp
- 	const struct nft_rt *priv = nft_expr_priv(expr);
- 	unsigned int hooks;
- 
-+	if (ctx->family != NFPROTO_IPV4 &&
-+	    ctx->family != NFPROTO_IPV6 &&
-+	    ctx->family != NFPROTO_INET)
-+		return -EOPNOTSUPP;
-+
- 	switch (priv->key) {
- 	case NFT_RT_NEXTHOP4:
- 	case NFT_RT_NEXTHOP6:
-diff --git a/net/netfilter/nft_socket.c b/net/netfilter/nft_socket.c
-index 9ed85be79452..f30163e2ca62 100644
---- a/net/netfilter/nft_socket.c
-+++ b/net/netfilter/nft_socket.c
-@@ -242,6 +242,11 @@ static int nft_socket_validate(const struct nft_ctx *ctx,
- 			       const struct nft_expr *expr,
- 			       const struct nft_data **data)
- {
-+	if (ctx->family != NFPROTO_IPV4 &&
-+	    ctx->family != NFPROTO_IPV6 &&
-+	    ctx->family != NFPROTO_INET)
-+		return -EOPNOTSUPP;
-+
- 	return nft_chain_validate_hooks(ctx->chain,
- 					(1 << NF_INET_PRE_ROUTING) |
- 					(1 << NF_INET_LOCAL_IN) |
-diff --git a/net/netfilter/nft_synproxy.c b/net/netfilter/nft_synproxy.c
-index 13da882669a4..1d737f89dfc1 100644
---- a/net/netfilter/nft_synproxy.c
-+++ b/net/netfilter/nft_synproxy.c
-@@ -186,7 +186,6 @@ static int nft_synproxy_do_init(const struct nft_ctx *ctx,
- 		break;
- #endif
- 	case NFPROTO_INET:
--	case NFPROTO_BRIDGE:
- 		err = nf_synproxy_ipv4_init(snet, ctx->net);
- 		if (err)
- 			goto nf_ct_failure;
-@@ -219,7 +218,6 @@ static void nft_synproxy_do_destroy(const struct nft_ctx *ctx)
- 		break;
- #endif
- 	case NFPROTO_INET:
--	case NFPROTO_BRIDGE:
- 		nf_synproxy_ipv4_fini(snet, ctx->net);
- 		nf_synproxy_ipv6_fini(snet, ctx->net);
- 		break;
-@@ -253,6 +251,11 @@ static int nft_synproxy_validate(const struct nft_ctx *ctx,
- 				 const struct nft_expr *expr,
- 				 const struct nft_data **data)
- {
-+	if (ctx->family != NFPROTO_IPV4 &&
-+	    ctx->family != NFPROTO_IPV6 &&
-+	    ctx->family != NFPROTO_INET)
-+		return -EOPNOTSUPP;
-+
- 	return nft_chain_validate_hooks(ctx->chain, (1 << NF_INET_LOCAL_IN) |
- 						    (1 << NF_INET_FORWARD));
- }
-diff --git a/net/netfilter/nft_tproxy.c b/net/netfilter/nft_tproxy.c
-index ae15cd693f0e..71412adb73d4 100644
---- a/net/netfilter/nft_tproxy.c
-+++ b/net/netfilter/nft_tproxy.c
-@@ -316,6 +316,11 @@ static int nft_tproxy_validate(const struct nft_ctx *ctx,
- 			       const struct nft_expr *expr,
- 			       const struct nft_data **data)
- {
-+	if (ctx->family != NFPROTO_IPV4 &&
-+	    ctx->family != NFPROTO_IPV6 &&
-+	    ctx->family != NFPROTO_INET)
-+		return -EOPNOTSUPP;
-+
- 	return nft_chain_validate_hooks(ctx->chain, 1 << NF_INET_PRE_ROUTING);
- }
- 
-diff --git a/net/netfilter/nft_xfrm.c b/net/netfilter/nft_xfrm.c
-index 452f8587adda..1c866757db55 100644
---- a/net/netfilter/nft_xfrm.c
-+++ b/net/netfilter/nft_xfrm.c
-@@ -235,6 +235,11 @@ static int nft_xfrm_validate(const struct nft_ctx *ctx, const struct nft_expr *e
- 	const struct nft_xfrm *priv = nft_expr_priv(expr);
- 	unsigned int hooks;
- 
-+	if (ctx->family != NFPROTO_IPV4 &&
-+	    ctx->family != NFPROTO_IPV6 &&
-+	    ctx->family != NFPROTO_INET)
-+		return -EOPNOTSUPP;
-+
- 	switch (priv->dir) {
- 	case XFRM_POLICY_IN:
- 		hooks = (1 << NF_INET_FORWARD) |
+Thanks,
+Maciej
+
+v6:
+- add acks [Magnus]
+- fix spelling mistakes [Magnus]
+- avoid touching xdp_buff in xp_alloc_{reused,new_from_fq}() [Magnus]
+- s/shrink_data/bpf_xdp_shrink_data [Jakub]
+- remove __shrink_data() [Jakub]
+- check retvals from __xdp_rxq_info_reg() [Magnus]
+
+v5:
+- pick correct version of patch 5 [Simon]
+- elaborate a bit more on what patch 2 fixes
+
+v4:
+- do not clear frags flag when deleting tail; xsk_buff_pool now does
+  that
+- skip some NULL tests for xsk_buff_get_tail [Martin, John]
+- address problems around registering xdp_rxq_info
+- fix bpf_xdp_frags_increase_tail() for ZC mbuf
+
+v3:
+- add acks
+- s/xsk_buff_tail_del/xsk_buff_del_tail
+- address i40e as well (thanks Tirthendu)
+
+v2:
+- fix !CONFIG_XDP_SOCKETS builds
+- add reviewed-by tag to patch 3
+
+
+Maciej Fijalkowski (10):
+  xsk: recycle buffer in case Rx queue was full
+  xsk: make xsk_buff_pool responsible for clearing xdp_buff::flags
+  xsk: fix usage of multi-buffer BPF helpers for ZC XDP
+  ice: work on pre-XDP prog frag count
+  ice: remove redundant xdp_rxq_info registration
+  intel: xsk: initialize skb_frag_t::bv_offset in ZC drivers
+  ice: update xdp_rxq_info::frag_size for ZC enabled Rx queue
+  xdp: reflect tail increase for MEM_TYPE_XSK_BUFF_POOL
+  i40e: set xdp_rxq_info::frag_size
+  i40e: update xdp_rxq_info::frag_size for ZC enabled Rx queue
+
+Tirthendu Sarkar (1):
+  i40e: handle multi-buffer packets that are shrunk by xdp prog
+
+ drivers/net/ethernet/intel/i40e/i40e_main.c   | 47 ++++++++++++------
+ drivers/net/ethernet/intel/i40e/i40e_txrx.c   | 49 +++++++++----------
+ drivers/net/ethernet/intel/i40e/i40e_xsk.c    |  4 +-
+ drivers/net/ethernet/intel/ice/ice_base.c     | 37 ++++++++------
+ drivers/net/ethernet/intel/ice/ice_txrx.c     | 19 ++++---
+ drivers/net/ethernet/intel/ice/ice_txrx.h     |  1 +
+ drivers/net/ethernet/intel/ice/ice_txrx_lib.h | 31 ++++++++----
+ drivers/net/ethernet/intel/ice/ice_xsk.c      |  4 +-
+ include/net/xdp_sock_drv.h                    | 27 ++++++++++
+ net/core/filter.c                             | 44 ++++++++++++++---
+ net/xdp/xsk.c                                 | 12 +++--
+ net/xdp/xsk_buff_pool.c                       |  1 +
+ 12 files changed, 187 insertions(+), 89 deletions(-)
+
 -- 
-2.30.2
+2.34.1
 
 
