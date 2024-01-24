@@ -1,112 +1,140 @@
-Return-Path: <netdev+bounces-65399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01DA983A5D1
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:46:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EB5883A5D6
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:47:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A441C281F27
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:46:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA5601F2358F
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:47:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D8541802B;
-	Wed, 24 Jan 2024 09:46:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B733E18030;
+	Wed, 24 Jan 2024 09:47:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="VFBWV2IP"
+	dkim=pass (1024-bit key) header.d=ysoft.com header.i=@ysoft.com header.b="R+0igcYN"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from uho.ysoft.cz (uho.ysoft.cz [81.19.3.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF533182AB;
-	Wed, 24 Jan 2024 09:46:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB42A18026;
+	Wed, 24 Jan 2024 09:47:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.3.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706089607; cv=none; b=myhuFTHiXkfJCSlXheWFrLGERxm/Rcz57WKflTecmfukR3yVKvYs82c8AxEU7BbXAs40PXcEa9t3i62FoTRLG/Exzun9BuD/xSDZf4ET6pwMFp7Rfd0fuN3j1W7i9gVbL6vjbDUXgqDy7qJAvPLIzCco3iStFzDuEq3XYGeY0W4=
+	t=1706089662; cv=none; b=M69vCrdJrNwFh1Z91xkFqMG2Kj5FjlNCfWV3zDCChfoPJkJYGNRNu+nhwagLtogVmLmzT20RGQKnLkCZ77AT0/d5d3V4+SNfJQ5+oYSm0D2Jg5emQhsvHTqKnrw9n94hF9O5fF1Of641w6XNF9ph5/3UTwIOLDnANqt3e67m6Jc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706089607; c=relaxed/simple;
-	bh=g88xxGggv15/xdqsSHg5R7sXTHhEp+krTJy1ll1lV4U=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=MKEuZaS2q7zQYUn0W/1o+tbOcOpC6UeaTQBEdG0xlAxzyMiibaBMHncqJ6bQzk9FNU4ZXz2TH9H4eWQNO9lPxqQ9HSSsnegUBSYcRR40cMXEeCI8n6KWvs5sxHgqj9Tp6dEUZb/hrFb9QxjKVrf0fCXHcfLUzNdL0VPfrnK0LRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=VFBWV2IP; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=bA7AsA7CeLFm30KGGEVuSKCxjLezcEyRJ3yCntSdgy0=; b=VFBWV2IPxHc2UVAaJtQ1i0QTwo
-	8EMjQINaWYOQBlG9wxWmCqAISdREh9sfQNAaCKABeW5zAHOAtviEVOnOrTou6vyHdWhL7RjDtAoWm
-	wMdNiWj6Yp8i4W7EU/3KpzE5Nln/wljg96lY9xzrUUr3+MSRziMUKAs36jwEqjoZ557c0tOE/zL2u
-	LA5FDakV3oasErJ2ZDivV1tqRLM9RHig8vM9mTfupxuJ5Q/vXyIy3ryYLitYvP53QtFdIatksExrE
-	2I2IdUGUK0MOTbcdfS9vOUHT7U6qoDLEeff3hQ6E4bsONYlAkBvyj7Gf15V2sgq6KQEmI+cZRH+M/
-	uD92dAKw==;
-Received: from sslproxy07.your-server.de ([78.47.199.104])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rSZq7-000K6v-HJ; Wed, 24 Jan 2024 10:46:35 +0100
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rSZq6-0007cZ-2v;
-	Wed, 24 Jan 2024 10:46:34 +0100
-Subject: Re: linux-next: manual merge of the bpf-next tree with the mm tree
-To: Andrew Morton <akpm@linux-foundation.org>,
- Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- bpf <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Next Mailing List <linux-next@vger.kernel.org>,
- Nathan Chancellor <nathan@kernel.org>
-References: <20240124121605.1c4cc5bc@canb.auug.org.au>
- <CAADnVQKBCpkwx1HVaNy1wmHqVrekgkd4LEZm9UzqOkOBniTOyw@mail.gmail.com>
- <20240124001808.bfff657f089afe10e5b0824c@linux-foundation.org>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <8cd3a7f4-db72-dc8f-581c-40d115562c55@iogearbox.net>
-Date: Wed, 24 Jan 2024 10:46:34 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	s=arc-20240116; t=1706089662; c=relaxed/simple;
+	bh=DhBk2roOAt7FxbT1JxJRnTyNS8BQtfRrdklAx9s6+qc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=R2GoiMlFmdyrETCBxLc3q0/tUa1CK6G9P4eDh+46tuqVIhrEGq6lyOlMlg6oFTp3byE1/E3A7o9EXF3/AR0l2mtSehRROQFLXdEHpWbQzb1W/vQCLYv3zPeYWqfNbaL3+gTUWHz9J1fcByyP2nfoE/CfYDNia7txs/1aW+YKL4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ysoft.com; spf=pass smtp.mailfrom=ysoft.com; dkim=pass (1024-bit key) header.d=ysoft.com header.i=@ysoft.com header.b=R+0igcYN; arc=none smtp.client-ip=81.19.3.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ysoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ysoft.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ysoft.com;
+	s=20160406-ysoft-com; t=1706089653;
+	bh=Jx4GYD8pm9jQ3Imx4Fz11AN1lh24CdaB97dRh/vezrU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=R+0igcYNNGyrqLFiugjgepjQV7d+BYKjP/DPfm0kZbitG5ElL2YknPTUIjZf+SWll
+	 z/+ljT5xgCcPA/xeImat5ZZDT7PbjU0LdS6BbhcPJ/5W3lFHEtEOATTOWmgPrlPQ6g
+	 pKh2batzBToFS94fSCufv61PgMK6oVMjFkIsMTNo=
+Received: from [10.1.8.111] (unknown [10.1.8.111])
+	by uho.ysoft.cz (Postfix) with ESMTP id 197CCA047B;
+	Wed, 24 Jan 2024 10:47:33 +0100 (CET)
+Message-ID: <4e74b2a8-f19e-492a-a796-057f52dddd93@ysoft.com>
+Date: Wed, 24 Jan 2024 10:47:32 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240124001808.bfff657f089afe10e5b0824c@linux-foundation.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: dsa: qca8k: fix illegal usage of GPIO
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27163/Tue Jan 23 10:42:11 2024)
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Florian Fainelli <f.fainelli@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Christian Lamparter <chunkeey@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, petr.benes@ysoft.com,
+ Vladimir Oltean <olteanv@gmail.com>, Christian Marangi
+ <ansuelsmth@gmail.com>, "Russell King (Oracle)"
+ <rmk+kernel@armlinux.org.uk>, =?UTF-8?Q?Marek_Beh=C3=BAn?=
+ <kabel@kernel.org>, Jiasheng Jiang <jiasheng@iscas.ac.cn>
+References: <1705925049-5756-1-git-send-email-michal.vokac@ysoft.com>
+ <82712052-e7e6-414d-9c11-5595e0d6e097@lunn.ch>
+From: =?UTF-8?B?TWljaGFsIFZva8OhxI0=?= <michal.vokac@ysoft.com>
+In-Reply-To: <82712052-e7e6-414d-9c11-5595e0d6e097@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 1/24/24 9:18 AM, Andrew Morton wrote:
-> On Tue, 23 Jan 2024 17:18:55 -0800 Alexei Starovoitov <alexei.starovoitov@gmail.com> wrote:
-> 
->>> Today's linux-next merge of the bpf-next tree got a conflict in:
->>>
->>>    tools/testing/selftests/bpf/README.rst
->>>
->>> between commit:
->>>
->>>    0d57063bef1b ("selftests/bpf: update LLVM Phabricator links")
->>>
->>> from the mm-nonmm-unstable branch of the mm tree and commit:
->>>
->>>    f067074bafd5 ("selftests/bpf: Update LLVM Phabricator links")
->>>
->>> from the bpf-next tree.
+On 24. 01. 24 0:07, Andrew Lunn wrote:
+> On Mon, Jan 22, 2024 at 01:04:09PM +0100, Michal Vokáč wrote:
+>> When working with GPIO, its direction must be set either when the GPIO is
+>> requested by gpiod_get*() or later on by one of the gpiod_direction_*()
+>> functions. Neither of this is done here which result in undefined behavior
+>> on some systems.
 >>
->> Andrew,
->> please drop the bpf related commit from your tree.
+>> As the reset GPIO is used right after it is requested here, it makes sense
+>> to configure it as GPIOD_OUT_HIGH right away.
+>> Fixes: a653f2f538f9 ("net: dsa: qca8k: introduce reset via gpio feature")
+>> Signed-off-by: Michal Vokáč <michal.vokac@ysoft.com>
+>> ---
+>>   drivers/net/dsa/qca/qca8k-8xxx.c | 3 +--
+>>   1 file changed, 1 insertion(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/net/dsa/qca/qca8k-8xxx.c b/drivers/net/dsa/qca/qca8k-8xxx.c
+>> index 4ce68e655a63..83b19c2d7b97 100644
+>> --- a/drivers/net/dsa/qca/qca8k-8xxx.c
+>> +++ b/drivers/net/dsa/qca/qca8k-8xxx.c
+>> @@ -2037,8 +2037,7 @@ qca8k_sw_probe(struct mdio_device *mdiodev)
+>>   	priv->dev = &mdiodev->dev;
+>>   	priv->info = of_device_get_match_data(priv->dev);
+>>   
+>> -	priv->reset_gpio = devm_gpiod_get_optional(priv->dev, "reset",
+>> -						   GPIOD_ASIS);
+>> +	priv->reset_gpio = devm_gpiod_get_optional(priv->dev, "reset", GPIOD_OUT_HIGH);
+>>   	if (IS_ERR(priv->reset_gpio))
+>>   		return PTR_ERR(priv->reset_gpio);
 > 
-> um, please don't cherry-pick a single patch from a multi-patch series
-> which I have already applied.
+> Hi Michal
+> 
+> So the current code is:
+> 
+> 	priv->reset_gpio = devm_gpiod_get_optional(priv->dev, "reset",
+> 						   GPIOD_ASIS);
+> 	if (IS_ERR(priv->reset_gpio))
+> 		return PTR_ERR(priv->reset_gpio);
+> 
+> 	if (priv->reset_gpio) {
+> 		gpiod_set_value_cansleep(priv->reset_gpio, 1);
+> 		/* The active low duration must be greater than 10 ms
+> 		 * and checkpatch.pl wants 20 ms.
+> 		 */
+> 		msleep(20);
+> 		gpiod_set_value_cansleep(priv->reset_gpio, 0);
+> 	}
+> 
+> Doesn't your change make the gpiod_set_value_cansleep() pointless?
+> 
+> Please extend your patch to remove it, maybe extending the comment a
+> little.
 
-The BPF one was actually a stand-alone patch targetted at bpf-next:
+Hi Andrew,
+I agree, in this case the call to gpiod_set_value(1) is now pointless.
+I will remove it and describe the change.
+  
+> Please also make sure what v2 Is Cc: to the qca8k Maintainers.
 
-https://lore.kernel.org/bpf/20240111-bpf-update-llvm-phabricator-links-v2-1-9a7ae976bd64@kernel.org/
+I wonder who do you mean by qca8k maintainers? There is no one explicitly
+stated as a qca8k driver maintainer in MAINTAINERS file.
+
+I admit that there is couple of people listed in get_maintainer output
+as authors/commit signers that I have not Cc'd. I have added them to
+the Cc list now and will do in the v2 as well.
+
+Thanks for the comments!
+Michal
+
 
