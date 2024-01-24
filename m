@@ -1,104 +1,84 @@
-Return-Path: <netdev+bounces-65591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AC3C83B1AA
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 20:00:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 077E083B1A9
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 20:00:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D06642883FA
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 19:00:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38FB61C20D7D
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 19:00:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A780B131E23;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADA01131E36;
 	Wed, 24 Jan 2024 19:00:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="v6tDCOLV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ebut8+cX"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 705F77CF33
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 19:00:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D6117CF3F;
+	Wed, 24 Jan 2024 19:00:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706122843; cv=none; b=fCCQ/+6hAL3EXzHlZoFHijVx5XQOLghbs9KUNcTgAQLj9xNz+16AnKzkckHlRCDXDMtPPTdh9bMoGkzBpNE/lDA7K5IlmuWIocLIZ9HNe0rTB5KOhjR8ImT28WL6qE6gkSBMKDQ982TcfvuaQyYglQ60MBrkTqtBSDoN3gE8Prs=
+	t=1706122843; cv=none; b=Bxj+51LY7A1efEtL8XcxVBf0zsnXTpVpr4L68S2qhvAWVQPDrYxXh/dp3UtKi6qzZwan4wM5vtUSeGXA6EsXM9tolhvE5nxh2gmsx1JdV1CFCZi158NuoNahh7ZDwyRBKzZtfLuz7RUpFI3RsxsDD5RK1IGf4NvoET1euViG/GI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1706122843; c=relaxed/simple;
-	bh=p5nhWyIAycQ6cVBS/HribWtrxcxz9r5FFna+9Y+MWNY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ImJixvABpMq1ZdY3ozyBn1609hyDhZ25j3qex0pL2y9z8zH6EqBpVA0Nhz0Of1EZa829Nitx/v5o+eJxS/YmDlAI+YaOwWV29C9OdKJVvtsUZ+7sD4321Ye/+i141oJ5m6HVg03T2yze1zCobGr69WI2teMmS9ANNop08abeXVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=v6tDCOLV; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=BtsgWd3kFF899ZUaNO/15jxz87oEa2vxonZymTbaUMI=; b=v6tDCOLVtEg9HEBcSP6mjiMHdc
-	sHyouiafxIKpFWUFVg9W2nWytaVmr3uZBWYCayvL9N+xlLAxC1/TdCpXUV9lPTAnGAHCNGTxkblCl
-	fEh292YUrV64JEgYaujRUS6hWyZRc79z2cN9VxH27P6AxfDFbJyCQVq5J9DxoLeVoKQMpL8GyYOsc
-	LLjmmG7C9w5CKQx1JJ8xPo2MANSDq0HBbUpi1L0F48lToInZTWlUZgOlQn686ctlI3UVc4QyzzlJc
-	oFujNleOfYKUOdwar9BvQRDDxckBg/EtRt/EqNFz8LmA0w1f0SLVthD2wVUVmvRsvE5pC1oREx8Ti
-	Lb9sLKFg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34266)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rSiU9-0004HQ-17;
-	Wed, 24 Jan 2024 19:00:29 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rSiU7-00035Q-N8; Wed, 24 Jan 2024 19:00:27 +0000
-Date: Wed, 24 Jan 2024 19:00:27 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Christian Marangi <ansuelsmth@gmail.com>,
-	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
-	Network Development <netdev@vger.kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Robert Marko <robimarko@gmail.com>,
-	Daniel Golle <daniel@makrotopia.org>
-Subject: Re: Race in PHY subsystem? Attaching to PHY devices before they get
- probed
-Message-ID: <ZbFeS+Jspx8T228P@shell.armlinux.org.uk>
-References: <bdffa33c-e3eb-4c3b-adf3-99a02bc7d205@gmail.com>
- <a9e79494-b94a-40f7-9c28-22b6220db5c2@lunn.ch>
- <Za6eMg0y2QxogfmD@shell.armlinux.org.uk>
- <65b12597.050a0220.66e91.7b3b@mx.google.com>
- <c3282db2-b1e5-422a-b62f-c081042da9de@lunn.ch>
+	bh=1a0dqgS5c7cs18SxgZIobtpEAw0oYgFxSnOCBXW3YuE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=c+d14EbjbnkoaGAYU+IuOt1MZ4c6f/jRbKZONXeFlPEq4SXLxQ2RoXAxti0+tT0IQiIkScM+Jp4XYlUtvh2KSz4fo/V0XhGm+cFMhwgqkHXOn9pvMcp2tP/SZh9plpePvPa3XB25ZdGIsrH2Dnhs1LiTPIAOKWjP6QGjBIzDxuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ebut8+cX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 925D3C43394;
+	Wed, 24 Jan 2024 19:00:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706122843;
+	bh=1a0dqgS5c7cs18SxgZIobtpEAw0oYgFxSnOCBXW3YuE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Ebut8+cXPCCEej+utPPrhAy0XaABkJGRFWCBZxnTbN7Jyhsk9aBm/rDVFv7IUoukx
+	 JxR1mb9c5w5SQ4/2Na+nRXmJKSOdBH3WIYRGYSubEn5vHPqsad5rt5oZSaToazkFll
+	 v/BH+QbywYilkEoMULvOHWuW3isSjV99Li8My/VDwClaLYfYSp88X1hkb+6sALVXOB
+	 NymhhT+CpUVLNHiNgGcflbDPrmSJCysemE1l4wjTyYr2ebdqx3TL/IgXk04FtMH1pj
+	 qRftt0tdQHOzJYmY6nV8ft+g5OGgc+f75l2uT1G6c0QGPKa6HwF/6rfY2ahL+0R3PH
+	 WtPPkhf6D0rDA==
+Date: Wed, 24 Jan 2024 11:00:41 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, David Ahern
+ <dsahern@kernel.org>, Hangbin Liu <liuhangbin@gmail.com>,
+ netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org
+Subject: Re: [ANN] net-next is OPEN
+Message-ID: <20240124110041.14191da7@kernel.org>
+In-Reply-To: <26616300-dc28-47d1-88bb-1c7247d1699d@kernel.org>
+References: <20240122091612.3f1a3e3d@kernel.org>
+	<Za98C_rCH8iO_yaK@Laptop-X1>
+	<20240123072010.7be8fb83@kernel.org>
+	<d0e28c67-51ad-4da1-a6df-7ebdbd45cd2b@kernel.org>
+	<65b133e83f53e_225ba129414@willemb.c.googlers.com.notmuch>
+	<20240124082255.7c8f7c55@kernel.org>
+	<20240124090123.32672a5b@kernel.org>
+	<26616300-dc28-47d1-88bb-1c7247d1699d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c3282db2-b1e5-422a-b62f-c081042da9de@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 24, 2024 at 06:52:35PM +0100, Andrew Lunn wrote:
-> This is assuming we cannot actually fix phylib to correctly use the
-> driver model, PHYs are not visible until probe is complete, and the
-> MAC drivers can handle that.
+On Wed, 24 Jan 2024 18:35:14 +0000 (GMT) Matthieu Baerts wrote:
+> > Ah, BTW, a major source of failures seems to be that iptables is
+> > mapping to nftables on the executor. And either nftables doesn't
+> > support the functionality the tests expect or we're missing configs :(
+> > E.g. the TTL module.  
+> 
+> I don't know if it is the same issue, but for MPTCP, we use
+> 'iptables-legacy' if available.
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=0c4cd3f86a400
 
-The only thing I can think is some kind of kbuild extension that looks
-through all the PHY drivers that are enabled in some way, generates a
-table of PHY driver match IDs, and use that as an "exclude" list for
-the generic PHY drivers.
-
-This would preclude the use of out of tree PHY drivers. Whether we
-think that's a good or bad thing depends on ones own point of view.
-
-However, the default fall-back to the generic PHY driver can't work
-through the driver model because of the reasons we already know.
-(If someone wants them expanded, then please ask, but Andrew and
-myself are aware, so as I'm replying to Andrew here...)
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Great! Thanks for the pointer. I installed the packages now,
+so folks should be able to fix up their scripts.
 
