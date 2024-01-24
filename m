@@ -1,64 +1,65 @@
-Return-Path: <netdev+bounces-65592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 077E083B1A9
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 20:00:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AB8183B1BD
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 20:04:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38FB61C20D7D
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 19:00:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA5EF1C21144
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 19:04:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADA01131E36;
-	Wed, 24 Jan 2024 19:00:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AABF5131E36;
+	Wed, 24 Jan 2024 19:04:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ebut8+cX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="roPiC3kj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D6117CF3F;
-	Wed, 24 Jan 2024 19:00:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DAF512FF86;
+	Wed, 24 Jan 2024 19:04:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706122843; cv=none; b=Bxj+51LY7A1efEtL8XcxVBf0zsnXTpVpr4L68S2qhvAWVQPDrYxXh/dp3UtKi6qzZwan4wM5vtUSeGXA6EsXM9tolhvE5nxh2gmsx1JdV1CFCZi158NuoNahh7ZDwyRBKzZtfLuz7RUpFI3RsxsDD5RK1IGf4NvoET1euViG/GI=
+	t=1706123073; cv=none; b=FRbTLxvI7+x36ot72P8GsB3RSFJ245MVZoQbsYyT95GpPSahZTQr7Aq3QGB3oSpCIZWIwCgxau0/5z3NAnNSx5GpYdtAvp05LClk0JMqA/CLCW4kWQQwndr50SUDVX8j6leFvBTld9A4MQeSURih0qfmNTEja40pvKD8LWHbbVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706122843; c=relaxed/simple;
-	bh=1a0dqgS5c7cs18SxgZIobtpEAw0oYgFxSnOCBXW3YuE=;
+	s=arc-20240116; t=1706123073; c=relaxed/simple;
+	bh=of1oTW1JzvLQNNZXy9oaZis6Ni23ookIZw9VErs4lEI=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=c+d14EbjbnkoaGAYU+IuOt1MZ4c6f/jRbKZONXeFlPEq4SXLxQ2RoXAxti0+tT0IQiIkScM+Jp4XYlUtvh2KSz4fo/V0XhGm+cFMhwgqkHXOn9pvMcp2tP/SZh9plpePvPa3XB25ZdGIsrH2Dnhs1LiTPIAOKWjP6QGjBIzDxuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ebut8+cX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 925D3C43394;
-	Wed, 24 Jan 2024 19:00:42 +0000 (UTC)
+	 MIME-Version:Content-Type; b=YNb2osw/Jog6+V0lnKq/FbWtrToDjL5n4SkavIsdo+0pjYkpanaNZxcLI+TQdiwvb1AM4WdJ0PQ23ZD+ttZ3kKa9LOM/mTuoHyW+SQn4gJVSsQa3Z826vvsW1RChlmNMS09oVGLFBIUTJYiCrBx7YcCr6ycv7W4vZfrcK5jbhJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=roPiC3kj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9D58C433C7;
+	Wed, 24 Jan 2024 19:04:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706122843;
-	bh=1a0dqgS5c7cs18SxgZIobtpEAw0oYgFxSnOCBXW3YuE=;
+	s=k20201202; t=1706123073;
+	bh=of1oTW1JzvLQNNZXy9oaZis6Ni23ookIZw9VErs4lEI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Ebut8+cXPCCEej+utPPrhAy0XaABkJGRFWCBZxnTbN7Jyhsk9aBm/rDVFv7IUoukx
-	 JxR1mb9c5w5SQ4/2Na+nRXmJKSOdBH3WIYRGYSubEn5vHPqsad5rt5oZSaToazkFll
-	 v/BH+QbywYilkEoMULvOHWuW3isSjV99Li8My/VDwClaLYfYSp88X1hkb+6sALVXOB
-	 NymhhT+CpUVLNHiNgGcflbDPrmSJCysemE1l4wjTyYr2ebdqx3TL/IgXk04FtMH1pj
-	 qRftt0tdQHOzJYmY6nV8ft+g5OGgc+f75l2uT1G6c0QGPKa6HwF/6rfY2ahL+0R3PH
-	 WtPPkhf6D0rDA==
-Date: Wed, 24 Jan 2024 11:00:41 -0800
+	b=roPiC3kjWXq5GHptPY15Wa4Hh55qwJHZ6Ocd5YG/QHMERvVLs680MC5Zkg6fTPoDi
+	 EU0owtZpJ5rcar6vRmarTTv0aq6V+tqYXkBEfz1va5UplLqFhvN2lIE/W+g3b85faL
+	 91ppMn2nVlkzb/tQpnk7d/Pd+/m4tehYqgar1M/I54hXSrYW+uXpXKObL5QJxhiPag
+	 B2PAo53DbdSwOnM9w9FuKT+TOw/qLLMeT89r2YCikICnxbrs4W/QtJb36U3Q9ly+NQ
+	 DssWGsvMy71kDXk5ykpr9zd2/UAHBZ3v79HJX1ll+TBYQIXOaJpreEXKrX/O8U3L4n
+	 8QwYQYnklZ1ag==
+Date: Wed, 24 Jan 2024 11:04:31 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, David Ahern
- <dsahern@kernel.org>, Hangbin Liu <liuhangbin@gmail.com>,
- netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-Subject: Re: [ANN] net-next is OPEN
-Message-ID: <20240124110041.14191da7@kernel.org>
-In-Reply-To: <26616300-dc28-47d1-88bb-1c7247d1699d@kernel.org>
-References: <20240122091612.3f1a3e3d@kernel.org>
-	<Za98C_rCH8iO_yaK@Laptop-X1>
-	<20240123072010.7be8fb83@kernel.org>
-	<d0e28c67-51ad-4da1-a6df-7ebdbd45cd2b@kernel.org>
-	<65b133e83f53e_225ba129414@willemb.c.googlers.com.notmuch>
-	<20240124082255.7c8f7c55@kernel.org>
-	<20240124090123.32672a5b@kernel.org>
-	<26616300-dc28-47d1-88bb-1c7247d1699d@kernel.org>
+To: Dmitry Safonov <dima@arista.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
+ <shuah@kernel.org>, Dmitry Safonov <0x7f454c46@gmail.com>, Mohammad Nassiri
+ <mnassiri@ciena.com>, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/3] selftests/net: A couple of typos fixes in
+ key-management test
+Message-ID: <20240124110431.3c3eba9a@kernel.org>
+In-Reply-To: <1ad64e3d-5252-4aaf-82be-5162edd1e781@arista.com>
+References: <20240118-tcp-ao-test-key-mgmt-v1-0-3583ca147113@arista.com>
+	<20240118085129.6313054b@kernel.org>
+	<358faa27-3ea3-4e63-a76f-7b5deeed756d@arista.com>
+	<20240118091327.173f3cb0@kernel.org>
+	<a9a5378d-c908-4a83-a63d-3e9928733a3d@arista.com>
+	<20240124071229.6a7262cc@kernel.org>
+	<1ad64e3d-5252-4aaf-82be-5162edd1e781@arista.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,17 +69,79 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 24 Jan 2024 18:35:14 +0000 (GMT) Matthieu Baerts wrote:
-> > Ah, BTW, a major source of failures seems to be that iptables is
-> > mapping to nftables on the executor. And either nftables doesn't
-> > support the functionality the tests expect or we're missing configs :(
-> > E.g. the TTL module.  
+On Wed, 24 Jan 2024 17:46:10 +0000 Dmitry Safonov wrote:
+> >> Thanks!
+> >>
+> >> I'll send a patch for it in version 2 (as I anyway need to address
+> >> Simon's feedback).  
+> > 
+> > Hi Dmitry!
+> > 
+> > I put TCP_AO and VETH in the config and the tests seem to fail with  
 > 
-> I don't know if it is the same issue, but for MPTCP, we use
-> 'iptables-legacy' if available.
+> Thanks for wiring it up and for https://netdev.bots.linux.dev/status.html!
 > 
-> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=0c4cd3f86a400
+> > selftests: net/tcp_ao: rst_ipv4
+> > not ok 1 # error 834[lib/kconfig.c:143] Failed to initialize kconfig 2: No such file or directory
+> > # Planned tests != run tests (0 != 1)
+> > # Totals: pass:0 fail:0 xfail:0 xpass:0 skip:0 error:1  
+> 
+> Hehe, yeah I wanted to detect kernels with !CONFIG_TCP_AO, to SKIP the
+> test, rather than FAIL it, which this lib/kconfig.c does.
+> But from a glance, I think it's failing in your run because there are
+> checks with and without TCP_AO, but I didn't think of checking for
+> the hashing algorithms support.
+> 
+> I think what happens is has_tcp_ao():
+> : strcpy(tmp.alg_name, "hmac(sha1)");
+> ...
+> : if (setsockopt(sk, IPPROTO_TCP, TCP_AO_ADD_KEY, &tmp, sizeof(tmp)) < 0)
+> 
+> Could you check that what I suppose is failing, is actually failing?
+> [dima@Mindolluin linux-master]$ grep -e '\<CONFIG_CRYPTO_SHA1\>' -e
+> '\<CONFIG_CRYPTO_HMAC\>' .config
+> CONFIG_CRYPTO_HMAC=y
+> CONFIG_CRYPTO_SHA1=y
 
-Great! Thanks for the pointer. I installed the packages now,
-so folks should be able to fix up their scripts.
+FWIW the config used is uploaded with the results. If you click on 
+the remote it should take you to a location like this:
+
+https://netdev-2.bots.linux.dev/vmksft-tcp-ao/results/435369/
+
+and there should be a config file in there. 
+
+> If that's the case, I'll  add the detection for hashing algorithms to
+> lib/kconfig.c (together with a patch for
+> tools/testing/selftests/net/config).
+> And also heads up for key-management.c - that tries a bunch of hashing
+> algorithms to check that the work and that the key rotation between
+> different algorithms works:
+> 
+> : const char *test_algos[] = {
+> : 	"cmac(aes128)",
+> : 	"hmac(sha1)", "hmac(sha512)", "hmac(sha384)", "hmac(sha256)",
+> : 	"hmac(sha224)", "hmac(sha3-512)",
+> : 	/* only if !CONFIG_FIPS */
+> : #define TEST_NON_FIPS_ALGOS	2
+> : 	"hmac(rmd160)", "hmac(md5)"
+> : };
+
+I was stuck in a meeting and I started playing around with the options 
+for TCP-AO :) I added these options now:
+
+CONFIG_CRYPTO_HMAC=y
+CONFIG_CRYPTO_SHA1=y
+CONFIG_CRYPTO_RMD160=y
+CONFIG_IPV6=y
+CONFIG_TCP_AO=y
+CONFIG_TCP_MD5SIG=y
+CONFIG_VETH=m
+
+And it looks much better! There are still some failures:
+
+https://netdev.bots.linux.dev/contest.html?branch=net-next-2024-01-24--18-00&executor=vmksft-tcp-ao
+
+I added VRF so that should hopefully take care of the MD5 skips
+on the next run. But the failures of the rst-ip* tests don't look 
+like an obvious config problem.
 
