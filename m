@@ -1,165 +1,168 @@
-Return-Path: <netdev+bounces-65547-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65548-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64A7983AFC6
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 18:26:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E799C83AFDE
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 18:29:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 980221C26558
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 17:26:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96DFE28721E
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 17:29:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D08486AC5;
-	Wed, 24 Jan 2024 17:22:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 784477F7DD;
+	Wed, 24 Jan 2024 17:26:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LzpFWfp6"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="o8byVe1X"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB0C37F7C4;
-	Wed, 24 Jan 2024 17:22:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F07F47765D
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 17:26:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706116942; cv=none; b=hBeIYGRlsjx5r9FV+aaqIxJhvT7L3FPMpEEC29PbrIbpEO56NeeSlh/GAUxBNxSS7m+MeW7ph/paj107VerDkY9VmPuIxEOZ8ZFPsCVwi17uoswACfHGB5z+LmEkzn4850FPD2Bx1klxIOWYFPTedHXW+omxEV/ge8MQo71jBhc=
+	t=1706117205; cv=none; b=jhp2/bmruBQAIU6hZswxw2OhsVDcuzVTxcsSA/tfqeyQN/ia5RWqjULIBO9ov6bhiwNZ7XMjdRXA780Fk3oBujFqnGWcK396mKlbBZ/pK6SPtdRMGc5RlarzHljVfqITQ1R5qmwPBP4EbDGCUESua9zj03YBcFWRL1Y72bL0+SI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706116942; c=relaxed/simple;
-	bh=J9cWHBzQAtoEqppKJznkEOwXANl/OtQJlMreI+w5+pM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JyplCo+6wUwP4Ld+g90II4utX7SzLDxkNtk9cI8u2vTFH0zidK/E2mvXh8Y3B9p7+u+ZxvBi8fSmAAt4CCreowdBP5KED2t+aK9wtIxEnqqGchftgLiM/zAQQvN6MvKJ7SiaYGv0bJBMQgQDOtiaCc8i4R1ZGD87VIgHc8YAoI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LzpFWfp6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAF93C433C7;
-	Wed, 24 Jan 2024 17:22:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706116940;
-	bh=J9cWHBzQAtoEqppKJznkEOwXANl/OtQJlMreI+w5+pM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LzpFWfp68rpr4dWHpdN+3IBhvKe1BMer+To6gMN52sFIqJGOHOg2ldSKjRXCcMb5m
-	 TFWNLUoV1HFSfX27ssqcTmUNGmLjfsu/z7ab3gxQuXnjvSNFUQXmjhZEIyIhUWWEIT
-	 CgAYNmzcDLnvRg+viWfwfm6By4Ffbj0ymjEy26C89CVOqr6JLR32V+zT7k2ef93fpP
-	 1Ka1oOBMomGGEuXbLQOuhLohRSeVfalTXlkn0w18Bo0vP0gpL8EpG8vIchAhQdEue3
-	 Cd0Kc25AAqNkrZ3Jhe5TUtRkxqZmjaKSQ074XXZPz2CPZUgeNzrq5mcjx4JO7BaCUH
-	 nqaKOF7sEH13g==
-Date: Wed, 24 Jan 2024 17:22:00 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
-	kernel@pengutronix.de, Moritz Fischer <mdf@kernel.org>,
-	Wu Hao <hao.wu@intel.com>, Xu Yilun <yilun.xu@intel.com>,
-	Tom Rix <trix@redhat.com>, linux-fpga@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
-	Lars-Peter Clausen <lars@metafoo.de>,
-	Michael Hennerich <Michael.Hennerich@analog.com>,
-	Jonathan Cameron <jic23@kernel.org>, linux-iio@vger.kernel.org,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	linux-input@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>,
-	Rayyan Ansari <rayyan@ansari.sh>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Martin Tuma <martin.tuma@digiteqautomotive.com>,
-	Mauro Carvalho Chehab <mchehab@kernel.org>,
-	linux-media@vger.kernel.org, Sergey Kozlov <serjk@netup.ru>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Yang Yingliang <yangyingliang@huawei.com>,
-	linux-mmc@vger.kernel.org, Richard Weinberger <richard@nod.at>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Rob Herring <robh@kernel.org>, Heiko Stuebner <heiko@sntech.de>,
-	Michal Simek <michal.simek@amd.com>,
-	Amit Kumar Mahapatra via Alsa-devel <alsa-devel@alsa-project.org>,
-	linux-mtd@lists.infradead.org,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Pali =?iso-8859-1?Q?Roh=E1r?= <pali@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Ronald Wahl <ronald.wahl@raritan.com>,
-	Benson Leung <bleung@chromium.org>,
-	Tzung-Bi Shih <tzungbi@kernel.org>,
-	Guenter Roeck <groeck@chromium.org>,
-	chrome-platform@lists.linux.dev, Max Filippov <jcmvbkbc@gmail.com>,
-	linux-spi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	linux-arm-msm@vger.kernel.org,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-mediatek@lists.infradead.org,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Javier Martinez Canillas <javierm@redhat.com>,
-	Amit Kumar Mahapatra <amit.kumar-mahapatra@amd.com>,
-	dri-devel@lists.freedesktop.org, linux-fbdev@vger.kernel.org,
-	linux-staging@lists.linux.dev, Viresh Kumar <vireshk@kernel.org>,
-	Rui Miguel Silva <rmfrfs@gmail.com>,
-	Johan Hovold <johan@kernel.org>, Alex Elder <elder@kernel.org>,
-	greybus-dev@lists.linaro.org, Peter Huewe <peterhuewe@gmx.de>,
-	Jarkko Sakkinen <jarkko@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
-	linux-integrity@vger.kernel.org,
-	Herve Codina <herve.codina@bootlin.com>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Aaro Koskinen <aaro.koskinen@iki.fi>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	linux-usb@vger.kernel.org, Helge Deller <deller@gmx.de>,
-	Dario Binacchi <dario.binacchi@amarulasolutions.com>,
-	Kalle Valo <kvalo@kernel.org>, Dmitry Antipov <dmantipov@yandex.ru>,
-	libertas-dev@lists.infradead.org, linux-wireless@vger.kernel.org,
-	Jonathan Corbet <corbet@lwn.net>, James Clark <james.clark@arm.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v2 00/33] spi: get rid of some legacy macros
-Message-ID: <c1e38a30-5075-4d01-af24-ac684e77cf29@sirena.org.uk>
-References: <cover.1705944943.git.u.kleine-koenig@pengutronix.de>
- <2024012417-prissy-sworn-bc55@gregkh>
+	s=arc-20240116; t=1706117205; c=relaxed/simple;
+	bh=UgbguvdTNq/Vdrlx+51bobZaig0XerOayqshn5Lwl2s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YbOL5J0ui3EWEPkMTzkvOGZYALlIolTx9nMjR4QB9ic663vrmdB8Vxhh++a0z7/o18PbTn0fEvlamG9d6C9d9EyWty2mKmbPmCbMGIkVqy8WVg6/HYkw93fjLNy3BZGDdqBpgxQn7BunD/Z8wfIG/J7I/0XodqAW7J/a0CIf+Qw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=o8byVe1X; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1d76943baafso21305015ad.2
+        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 09:26:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1706117203; x=1706722003; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KC4dIipORwUXCXEhvi46+vhyUVrdFLhCkRAmwUvFgiA=;
+        b=o8byVe1X09CFIrSdDq3uffqLBawuAZheSsUJddq4arR78SorQdjecGJwc242uyd/Y1
+         CupGw6/0KdwlvOmsRhxn6NjOaSYaNCEV2kdGkPEcLvxSDAJvf30F7D2Yg00ECIY2I81S
+         1cePZzDus8aJZmryZBtzcwsNxqRMybqev0itWAPddpjJZKv5k9lYKr+niX3hKG8O8RG3
+         RoatluDthhLigImY1FGELjOCpfOFtlftylVopbYku+jkDPGpUq+1fOgAzpLSc9BR2xk0
+         JpkE9IQIIvzwqqoB1FQXkL3/0dl3aGtoeC+/qsp1HliYgGKLgGgnxCtZSmC3u5bl+4yJ
+         Hy0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706117203; x=1706722003;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KC4dIipORwUXCXEhvi46+vhyUVrdFLhCkRAmwUvFgiA=;
+        b=o+V+XSzMOK4A3LXuTeQr1Y+tD1kf2KLQhnQ+81T4DJa1vIRt9cVCGT0WqrWFPEpNP0
+         Z9uQBsAe7Ru67aYgVKkceMbFT5EVdxn4oCTkbpob+uaRK0Q6WtlJBPNVvouyzqzHym7P
+         1NvCkxvHj35nz42vm9Y125wTjOYbLGnbvQtpMA/tKz52wDsoebmTnKD0BhM5iRTj53hf
+         Qqn+5/EHfBctqtfDWO5GuEjF4Q+yyx9c/3Q3aoaqNAkYYTcTCQtZM3eVk17/u7YM95rQ
+         fOPBsl4N4cOrRzFGiTBY33LbwYZJxBKv9/vsR81wjzn3fXx/iYtPxMsbbcQlF/Xd0QzS
+         6J5g==
+X-Gm-Message-State: AOJu0Yyi2/0GbNw5w53qHimlpLBkWMx9XGybPx+LvcthI97VYxxSI3ad
+	tmy0ByYP7xc/KjZOcU075zDlcP3aVXEMPH6wlK4aQCoATZkvhZrnplCbU+9Fdg==
+X-Google-Smtp-Source: AGHT+IF8mHO9Vp+yjjWsfcHYMMOE5qtbHkwt7Yveha3fRRuazxP1rHkpDjmz5SEvwAnfDjGIUg3nJg==
+X-Received: by 2002:a17:902:a5c5:b0:1d7:2d68:cee9 with SMTP id t5-20020a170902a5c500b001d72d68cee9mr825951plq.27.1706117203254;
+        Wed, 24 Jan 2024 09:26:43 -0800 (PST)
+Received: from [192.168.50.25] ([201.17.86.134])
+        by smtp.gmail.com with ESMTPSA id i11-20020a17090320cb00b001d71e21767fsm8956786plb.71.2024.01.24.09.26.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 Jan 2024 09:26:42 -0800 (PST)
+Message-ID: <1883bb47-869d-46ac-a231-0a109645df22@mojatatu.com>
+Date: Wed, 24 Jan 2024 14:26:38 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="FdGjmVpGJ74QDTu1"
-Content-Disposition: inline
-In-Reply-To: <2024012417-prissy-sworn-bc55@gregkh>
-X-Cookie: To err is human, to moo bovine.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/4] selftests: tc-testing: check if 'jq' is
+ available in taprio script
+To: Davide Caratti <dcaratti@redhat.com>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, shuah@kernel.org, kuba@kernel.org,
+ vladimir.oltean@nxp.com, edumazet@google.com, pabeni@redhat.com,
+ linux-kselftest@vger.kernel.org
+References: <20240123122736.9915-1-pctammela@mojatatu.com>
+ <20240123122736.9915-3-pctammela@mojatatu.com>
+ <CAKa-r6s_DO1tfcZdsQNBCwjbE0ytJKnZWnvcKqTR+5epdNq4YQ@mail.gmail.com>
+ <7d92788b-13c5-4f53-8b58-9b6ece26310d@mojatatu.com>
+ <CAKa-r6vJPGQjE4YAtofa-=Pog8a_2Tu5mGcxLjhkoGCqu0JENQ@mail.gmail.com>
+Content-Language: en-US
+From: Pedro Tammela <pctammela@mojatatu.com>
+In-Reply-To: <CAKa-r6vJPGQjE4YAtofa-=Pog8a_2Tu5mGcxLjhkoGCqu0JENQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
+On 24/01/2024 07:31, Davide Caratti wrote:
+> hello Pedro, thanks for your answer!
+> 
+> On Tue, Jan 23, 2024 at 5:47 PM Pedro Tammela <pctammela@mojatatu.com> wrote:
+>>
+>> On 23/01/2024 10:17, Davide Caratti wrote:
+>>> hi Pedro,
+>>>
+>>> On Tue, Jan 23, 2024 at 1:28 PM Pedro Tammela <pctammela@mojatatu.com> wrote:
+>>>>
+>>>> If 'jq' is not available the taprio tests that use this script will
+>>>> run forever. Check if it exists before entering the while loop.
+> 
+> [...]
+> 
+>>> nit: what about returning $KSFT_SKIP (that is 4) if jq is not there?
+>>> so the test does not fail.
+>>> thanks!
+>>
+>> Since these scripts are run in the setup phase, it has a special treatment.
+>>
+>> Take for example this run:
+>> ok 1 ba39 - Add taprio Qdisc to multi-queue device (8 queues)
+>> ok 2 9462 - Add taprio Qdisc with multiple sched-entry
+>> ok 3 8d92 - Add taprio Qdisc with txtime-delay
+>> ok 4 d092 - Delete taprio Qdisc with valid handle
+>> ok 5 8471 - Show taprio class
+>> ok 6 0a85 - Add taprio Qdisc to single-queue device
+>> ok 7 3e1e - Add taprio Qdisc with an invalid cycle-time
+>> ok 8 39b4 - Reject grafting taprio as child qdisc of software taprio #
+>> skipped - "-----> prepare stage" did not complete successfully
+>>
+>> ok 9 e8a1 - Reject grafting taprio as child qdisc of offloaded taprio #
+>> skipped - skipped - previous setup failed 9 39b4
+> 
+> [...]
+> 
+>> As of today it returns 0, success in ksft, even though it clearly
+>> wasn't. Looking at the code any failures in the setup/teardown phase
+>> will stop the run, skip all the remaining tests but still return success.
+>>
+>> About returning skip from the script, aside from marking it as skip and
+>> continuing the suite, we would need to run a silent teardown, one that
+>> executes all commands in the specified teardown but
+>> ignores errors. In this case we are assuming all setup steps follow KSFT
+>> return codes. Not sure if it it's reasonable or not...
+> 
+> wouldn't this be fixed by adding this line:
+> 
+> "dependsOn" : "command -v jq >/dev/null"
+> 
+> to test scenarios 39b4 and e8a1 ? I'm asking this because jq is used
+> also in verifyCmd after the script, to parse results.
+> Background for this question: I see tdc skipping both setup and
+> teardown stages for each test case in taprio.json where this line:
+> 
+>       "dependsOn": "command -v ciao >/dev/null",
+> 
+> is present. Rather than doing a setup +  silent teardown, just do
+> nothing and go to the next test.
 
---FdGjmVpGJ74QDTu1
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Oh indeed! Thanks for the suggestion this is much nicer.
+I will send a v2!
 
-On Wed, Jan 24, 2024 at 09:13:49AM -0800, Greg Kroah-Hartman wrote:
-> On Mon, Jan 22, 2024 at 07:06:55PM +0100, Uwe Kleine-K=F6nig wrote:
+> 
+>> As your suggestion is not a blocker, I would rather address the above
+>> problems in a follow up series since they will require some refactoring.
+>> WDYT?
+> 
+> no objections, but I'm curious to see if "dependsOn" would fix this case :)
+> thanks!
 
-> > Note that Jonathan Cameron has already applied patch 3 to his tree, it
-> > didn't appear in a public tree though yet. I still included it here to
-> > make the kernel build bots happy.
-
-> Are we supposed to take the individual changes in our different
-> subsystem trees, or do you want them all to go through the spi tree?
-
-Given that the final patch removes the legacy interfaces I'm expecting
-to take them via SPI.
-
---FdGjmVpGJ74QDTu1
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmWxRzcACgkQJNaLcl1U
-h9CS5Af+OPZh7Z4aM5AF1TAMNJebJxrwbV+lfEa8zsdVnpHBXYpXokCrVwsSRBtM
-yR/bt2+OoZjrVep6c0lufmewH58kEtQF4UazYao7MD2alCnwzn49m697Ubpnc/k9
-iSCRd+E5ICMZuRdRrDAmd/To7o3jsg85SeN4qLdeer17NkjU6VS9vR6NlzImV/nS
-MXj52eAHL5+EZIpIlwZSBkCxyEEsz/UFaGcFsKMonZ+24Oz5SXXWFhUWfiFCD+fA
-DNZKxXJ9Vk2i5pCUsduff5giUUypwRqVP4C01wYMs7o3jkMZ2cQhtuH8iyDtKKMU
-FSwO3bpbAgZzLbY2G2cqYZyEpqJ8Ow==
-=E3cl
------END PGP SIGNATURE-----
-
---FdGjmVpGJ74QDTu1--
 
