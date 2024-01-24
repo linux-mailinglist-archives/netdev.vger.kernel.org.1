@@ -1,109 +1,84 @@
-Return-Path: <netdev+bounces-65346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DF9783A20E
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 07:32:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9B7083A216
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 07:33:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 770CE1C24513
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 06:32:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F9FE1F263CD
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 06:33:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F292F9C7;
-	Wed, 24 Jan 2024 06:32:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7414CBE5C;
+	Wed, 24 Jan 2024 06:33:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2876E628;
-	Wed, 24 Jan 2024 06:31:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2549628;
+	Wed, 24 Jan 2024 06:33:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706077932; cv=none; b=awpcNBhcmMAjIbfTMjDllziVlqbtBdX27+NYtW34Ifa1SUnvUg8SVfwyr5MIWi9kFqHr4DHLjeJ6bCrkClCC5Oeoe1pLnkQKVfF3RKs180KSjkBjqT+OKeN9uFJrVsmC+sj542o7ccRZvQrkJrrGzP/8Olb0OvNozDtUp1bQplU=
+	t=1706078020; cv=none; b=QszPeBNY/PPHSbVd7Fc4K9TAHLEZz5equ3QgKNXmYgqjwJagn9ty0uqeXMJtshMtqhq6NL2WqLqcAZUKHcpBfQJYF9fxt7cjBhDyY8mU2ON+4rVfcYLgdihOLm3JERRYtCq0rp3DiVoS4yx3yWe9ZBz3rKTPnVfeoGBPz/JhMfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706077932; c=relaxed/simple;
-	bh=NvCcD3W3GSdtW3pNjgJjBbWGVqSOk97olzUAFiThvuY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ezr1Gh3oRDRD7njjPoolOe+yskFSNgAcBOc3A7r0/ca7JQyhb/wIqJg+4GI8Ene7cPHApqy/ypsOt+vkXjTsWivNUQkiWC/MYtmzhcPu6+TbujGxPcJ+OshMBqf2mum3ar4vQVrEaSHikXXq1JTjsq9nBnZBlKzGII25+ntjNKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 66264f1f20144503a1659c927b204992-20240124
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.35,REQID:a7a4f507-c00e-4fc7-9273-f8a515d1704b,IP:10,
-	URL:0,TC:0,Content:-5,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACT
-	ION:release,TS:-10
-X-CID-INFO: VERSION:1.1.35,REQID:a7a4f507-c00e-4fc7-9273-f8a515d1704b,IP:10,UR
-	L:0,TC:0,Content:-5,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:-10
-X-CID-META: VersionHash:5d391d7,CLOUDID:69c1988e-e2c0-40b0-a8fe-7c7e47299109,B
-	ulkID:2401241431565TKGFV73,BulkQuantity:0,Recheck:0,SF:66|38|24|17|19|44|1
-	02,TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,CO
-	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
-X-UUID: 66264f1f20144503a1659c927b204992-20240124
-Received: from mail.kylinos.cn [(39.156.73.10)] by mailgw
-	(envelope-from <chentao@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 978852981; Wed, 24 Jan 2024 14:31:55 +0800
-Received: from mail.kylinos.cn (localhost [127.0.0.1])
-	by mail.kylinos.cn (NSMail) with SMTP id 92849E000EB9;
-	Wed, 24 Jan 2024 14:31:55 +0800 (CST)
-X-ns-mid: postfix-65B0AEDB-395396169
-Received: from kernel.. (unknown [172.20.15.234])
-	by mail.kylinos.cn (NSMail) with ESMTPA id CBC81E000EB9;
-	Wed, 24 Jan 2024 14:31:51 +0800 (CST)
-From: Kunwu Chan <chentao@kylinos.cn>
-To: steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Kunwu Chan <chentao@kylinos.cn>
-Subject: [PATCH ipsec-next] xfrm6_tunnel: Use KMEM_CACHE instead of kmem_cache_create
-Date: Wed, 24 Jan 2024 14:31:50 +0800
-Message-Id: <20240124063150.466037-1-chentao@kylinos.cn>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1706078020; c=relaxed/simple;
+	bh=SAJHujprC1bLB15iQXfqasMZEBQT8JXQnCKvkhWg3b4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sJaBOwdyzGpeZ/9//NJ9W4SQYmtHZ4Gvw4itD1FgTmP9CEywViLV208uX69UR5ScBcN2jUxNru7GdA3C0qzO17nyGa+xnEzVSYb2j1JEVr5CMvm2bgNMXLaJ25dAEkspNzWI99ImoAkjhpA6o+sv1Xxhx2YkDC3jbssj3jpgXPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; arc=none smtp.client-ip=115.124.30.110
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=17;SR=0;TI=SMTPD_---0W.F6BhX_1706078002;
+Received: from 30.221.129.141(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W.F6BhX_1706078002)
+          by smtp.aliyun-inc.com;
+          Wed, 24 Jan 2024 14:33:33 +0800
+Message-ID: <47c1b777-6d4e-40ac-9297-61240c126d6a@linux.alibaba.com>
+Date: Wed, 24 Jan 2024 14:33:21 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 00/15] net/smc: implement loopback-ism used by
+ SMC-D
+To: Alexandra Winter <wintera@linux.ibm.com>,
+ Wenjia Zhang <wenjia@linux.ibm.com>, hca@linux.ibm.com, gor@linux.ibm.com,
+ agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
+ alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240111120036.109903-1-guwen@linux.alibaba.com>
+ <f98849a7-41e9-421b-97b7-36d720cc43ee@linux.alibaba.com>
+ <20a1a1f3-789a-4d91-9a94-dca16161afd7@linux.ibm.com>
+ <1860588f-2246-4dcd-9db5-4ccd7add0f4a@linux.alibaba.com>
+ <3c51c969-3884-4104-b38d-570c61525214@linux.ibm.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <3c51c969-3884-4104-b38d-570c61525214@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
-to simplify the creation of SLAB caches.
 
-Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
----
- net/ipv6/xfrm6_tunnel.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/net/ipv6/xfrm6_tunnel.c b/net/ipv6/xfrm6_tunnel.c
-index 1323f2f6928e..0f3df26878a3 100644
---- a/net/ipv6/xfrm6_tunnel.c
-+++ b/net/ipv6/xfrm6_tunnel.c
-@@ -355,10 +355,7 @@ static int __init xfrm6_tunnel_init(void)
- {
- 	int rv;
-=20
--	xfrm6_tunnel_spi_kmem =3D kmem_cache_create("xfrm6_tunnel_spi",
--						  sizeof(struct xfrm6_tunnel_spi),
--						  0, SLAB_HWCACHE_ALIGN,
--						  NULL);
-+	xfrm6_tunnel_spi_kmem =3D KMEM_CACHE(xfrm6_tunnel_spi, SLAB_HWCACHE_ALI=
-GN);
- 	if (!xfrm6_tunnel_spi_kmem)
- 		return -ENOMEM;
- 	rv =3D register_pernet_subsys(&xfrm6_tunnel_net_ops);
---=20
-2.39.2
+On 2024/1/23 22:03, Alexandra Winter wrote:
+> Hello Wen Gu and others,
+> 
+> I just wanted to let you know that unfortunately both Wenjia and Jan have called in sick and we don't know
+> when they will be back at work.
+> So I'm sorry but there may be mroe delays in the review of this patchset.
+> 
+> Kind regards
+> Alexandra Winter
 
+Hi Alexandra,
+
+Thank you for the update. Health comes first. Wishing Wenjia and Jan
+both make a swift recovery.
+
+Best regards,
+Wen Gu
 
