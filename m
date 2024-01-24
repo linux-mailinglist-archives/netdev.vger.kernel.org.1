@@ -1,137 +1,106 @@
-Return-Path: <netdev+bounces-65378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7FC983A448
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:39:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 518FA83A458
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:40:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A00771F28168
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 08:39:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E6BA71F28600
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 08:40:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED70617755;
-	Wed, 24 Jan 2024 08:39:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA5FB17995;
+	Wed, 24 Jan 2024 08:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B29uDAhA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SPMaaG2e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f47.google.com (mail-ua1-f47.google.com [209.85.222.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EBDF179AE;
-	Wed, 24 Jan 2024 08:39:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C75621798C
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 08:40:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706085563; cv=none; b=d3VnS+zh2SgNXzasmIwBIVuceABlg+HZj5vKLBWhi03NIltP8LJUbVc84WkH45O5Irq6teUgXnFW8Sa8e6QLu00/1on0QQydTYoqWvujo7LEYn4GPlzL8yFhVh+KLkPtUiS8lTDcQ4NcPz1RorZAnXz8ExKRsSkLY8hayxEH/Og=
+	t=1706085631; cv=none; b=Dp7IKmy5JjOZje1oHTOljH52a1Udzc0ARTD19Bny+Drtu2673loYmLwGZBNq+HbYC3R7aYHSaMUVJGVLiSEcptuRc+cypdTT3aCZ84JtVBRUDq+EVtZFJQ+vYD0bBuPTvI8ktUhr0FN4kylJ8Fgzhn6FZHUpBl2FCWNKE5fg3vs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706085563; c=relaxed/simple;
-	bh=TheIARDPadS0e85KWthgYObgOqesHRSvFYgSVSnZgrI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=apzK0hpu+yyuvq1goK5Iz8dP1pcNtCVJIOf3qhNvU49xRTfzJeiI876Kf+yRnax8nkQ4VofQsKQqLsWJzquyReyaSXAcUfa137C3Xp6ynyA8l0i827BRGE+xnywBOOrrNtxS2rWeXxy3LdJqBIaruzw4ld118WAL/balD3oaMQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B29uDAhA; arc=none smtp.client-ip=209.85.222.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f47.google.com with SMTP id a1e0cc1a2514c-7cc2ffdda1cso645318241.1;
-        Wed, 24 Jan 2024 00:39:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706085561; x=1706690361; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=FM/6+HnOh9Ox+KFrd26pJiFhqooyZe0HWDgKtNXA88M=;
-        b=B29uDAhAQGwGhGRPIReLPMw+5sQvILsronFEk+vx7Fvolnf8dz8VKIw44b4zvUtGjb
-         8PYRugMXHcNKGFGBcuT88fKh9b7RxbiQyvwDLcFtOqjd0ZPmo8YTt/4xLQzcgZCJtNmq
-         /gfTXzvuBylVYeur653mhtZLHhHvoue9JdDQqGOP4Obhy9lsuBerDaxkoLOhroXAh+sU
-         zwbRBDfEwsvNU25NnZ7j4kbSJx5KYu8AM7OKoelnBBRr8SogScjGNnMwtURKufKkZdur
-         JBGEavU1feG3PrIZlcf5i5T88W8o9LgbkSzzvDU4wkBbiSjf/Hp2QpZy6ZvlyUcIIfgF
-         Zeuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706085561; x=1706690361;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FM/6+HnOh9Ox+KFrd26pJiFhqooyZe0HWDgKtNXA88M=;
-        b=YnBpo3NHp8uAljZioDHYrpaWBI8rHK1nY9EG7W/uFAKtri4BneqtLUqSNgTWQGjZxr
-         oKMGSmpEJ2p6OxokCVOlRkzIF8ZLKTz3IS/HTG7x3odOSskUAlbpBfBFMZhasM/UdaYv
-         4d+FclQmkbqDqlhXrET00WG8JAnjXegT+o4LVfeV+aMr6qhzDF6N1iVbtgLMy8XEjQkJ
-         9A5Nv+gSGtyZyvOQK1XsdOw5oKE1MVyGhekzzFKwnnt/6LH0gvd2rDxkAATSHm42r4l6
-         1Qz5s79eYklVQ+3iD9FScmptcMCzpvtFlUJtOJ0sgFmrV2fcyTdDut0EWuE+u2vwHpWJ
-         t5Dg==
-X-Gm-Message-State: AOJu0Ywonzf/48k7mfuF0gMknLJJFodAJqFyfBWKnK0KuwU15wYHMLI6
-	foHZy40LCmvsDLwnFnytIhDeqGP2GRNm79y+wvm5QsLwvcYCCXj6Q1JBf4+obw8hUkAs4Kl1I5/
-	aIwdQoSwhacLNh1VJDdBhRrU0oy0=
-X-Google-Smtp-Source: AGHT+IHl23JgLlwsxANNSm7qAYBVvFsYIvuyQGK/m0Nalp8QFIuSGYSK3QkLt9Bcic/3z212ZO3n8C4flD22j1EGL5s=
-X-Received: by 2002:a05:6102:21ca:b0:469:be7b:b000 with SMTP id
- r10-20020a05610221ca00b00469be7bb000mr1343657vsg.2.1706085561284; Wed, 24 Jan
- 2024 00:39:21 -0800 (PST)
+	s=arc-20240116; t=1706085631; c=relaxed/simple;
+	bh=RmOinWO0LyT2ngc+Nm9l7cNtMZI1us/tJSjcDA0BmKs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M7NWqUh9POpl9ZJ5UBTJndOULch/66tADRkeZpLdfjmvUZDPVa6vWjBKi/U22QiYNGoqZOiqDN5fE5ovTY9khYhzvYhM39OITfogiTRThzCD/ENep2k/eKr89isUSXEeuiSkCYzSemG8JzLGhe7qDFymiFJjrKAvdMxyw6d9vLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SPMaaG2e; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CABA2C433F1;
+	Wed, 24 Jan 2024 08:40:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706085631;
+	bh=RmOinWO0LyT2ngc+Nm9l7cNtMZI1us/tJSjcDA0BmKs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SPMaaG2e6N1LOYSBlwkswZQ5m98NsV7R4miFEqXdtPWXB0El2e4d1wrfZITRzkqNF
+	 D3PbLwqeJc+OPfApDeWveWSPQbI5d+L/LGazPB2HIdzq63xHvBv2cwhZaClim5Unjt
+	 23U/BZlg0AQobCC5FXHvCw0unYh6csaTVJs/cte66Bsq6sLYxq2aFo6EuQ6CeiN4Df
+	 UcgcwNAdgyl7c7KrDqUgXrHlHn9LOvcdjD2NGDWm4pmCoZQZZB0piHJ46igl6Bt4NT
+	 MuUV4kFGXDwMJUUOhQPtlVukcbYKIoGnC3eHC8leUOWzvkXfZgDtH8rz/rpDRI1RbF
+	 O4KhKN7Qyzirg==
+Date: Wed, 24 Jan 2024 08:40:27 +0000
+From: Simon Horman <horms@kernel.org>
+To: Alexey Dobriyan <adobriyan@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH 2/2] connector, linux++: fix <uapi/linux/cn_proc.h> header
+Message-ID: <20240124084027.GR254773@kernel.org>
+References: <3878dc5a-9046-4d7a-bf9e-70dcdc5d9265@p183>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240122221610.556746-1-maciej.fijalkowski@intel.com> <20240122221610.556746-7-maciej.fijalkowski@intel.com>
-In-Reply-To: <20240122221610.556746-7-maciej.fijalkowski@intel.com>
-From: Magnus Karlsson <magnus.karlsson@gmail.com>
-Date: Wed, 24 Jan 2024 09:39:10 +0100
-Message-ID: <CAJ8uoz3EQfvxqQNTmq2txz9SFv97b=8drbEB=TqmbMFqSe6y8g@mail.gmail.com>
-Subject: Re: [PATCH v5 bpf 06/11] ice: remove redundant xdp_rxq_info registration
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
-	andrii@kernel.org, netdev@vger.kernel.org, magnus.karlsson@intel.com, 
-	bjorn@kernel.org, echaudro@redhat.com, lorenzo@kernel.org, 
-	martin.lau@linux.dev, tirthendu.sarkar@intel.com, john.fastabend@gmail.com, 
-	horms@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <3878dc5a-9046-4d7a-bf9e-70dcdc5d9265@p183>
 
-On Mon, 22 Jan 2024 at 23:17, Maciej Fijalkowski
-<maciej.fijalkowski@intel.com> wrote:
->
-> xdp_rxq_info struct can be registered by drivers via two functions -
-> xdp_rxq_info_reg() and __xdp_rxq_info_reg(). The latter one allows
-> drivers that support XDP multi-buffer to set up xdp_rxq_info::frag_size
-> which in turn will make it possible to grow the packet via
-> bpf_xdp_adjust_tail() BPF helper.
->
-> Currently, ice registers xdp_rxq_info in two spots:
-> 1) ice_setup_rx_ring() // via xdp_rxq_info_reg(), BUG
-> 2) ice_vsi_cfg_rxq()   // via __xdp_rxq_info_reg(), OK
->
-> Cited commit under fixes tag took care of setting up frag_size and
-> updated registration scheme in 2) but it did not help as
-> 1) is called before 2) and as shown above it uses old registration
-> function. This means that 2) sees that xdp_rxq_info is already
-> registered and never calls __xdp_rxq_info_reg() which leaves us with
-> xdp_rxq_info::frag_size being set to 0.
->
-> To fix this misbehavior, simply remove xdp_rxq_info_reg() call from
-> ice_setup_rx_ring().
-
-Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
-
-> Fixes: 2fba7dc5157b ("ice: Add support for XDP multi-buffer on Rx side")
-> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+On Tue, Jan 23, 2024 at 01:16:46PM +0300, Alexey Dobriyan wrote:
+> Rules around enums are stricter in C++, they decay to ints just as
+> easily but don't convert back to enums:
+> 
+> 	#define PROC_EVENT_ALL (PROC_EVENT_FORK|...)
+> 	enum proc_cn_event ev_type;
+> 	ev_type &= PROC_EVENT_ALL;
+> 
+> main.cc: In function ‘proc_cn_event valid_event(proc_cn_event)’:
+> main.cc:91:17: error: invalid conversion from ‘unsigned int’ to ‘proc_cn_event’ [-fpermissive]
+>    91 |         ev_type &= PROC_EVENT_ALL;
+>       |                 ^
+>       |                 |
+>       |                 unsigned int
+> 
+> Use casts so that both C and C++ compilers are satisfied.
+> 
+> Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
 > ---
->  drivers/net/ethernet/intel/ice/ice_txrx.c | 5 -----
->  1 file changed, 5 deletions(-)
->
-> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
-> index 1760e81379cc..765aea630a1f 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_txrx.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
-> @@ -513,11 +513,6 @@ int ice_setup_rx_ring(struct ice_rx_ring *rx_ring)
->         if (ice_is_xdp_ena_vsi(rx_ring->vsi))
->                 WRITE_ONCE(rx_ring->xdp_prog, rx_ring->vsi->xdp_prog);
->
-> -       if (rx_ring->vsi->type == ICE_VSI_PF &&
-> -           !xdp_rxq_info_is_reg(&rx_ring->xdp_rxq))
-> -               if (xdp_rxq_info_reg(&rx_ring->xdp_rxq, rx_ring->netdev,
-> -                                    rx_ring->q_index, rx_ring->q_vector->napi.napi_id))
-> -                       goto err;
->         return 0;
->
->  err:
-> --
-> 2.34.1
->
->
+> 
+>  include/uapi/linux/cn_proc.h | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> --- a/include/uapi/linux/cn_proc.h
+> +++ b/include/uapi/linux/cn_proc.h
+> @@ -69,8 +69,7 @@ struct proc_input {
+>  
+>  static inline enum proc_cn_event valid_event(enum proc_cn_event ev_type)
+>  {
+> -	ev_type &= PROC_EVENT_ALL;
+> -	return ev_type;
+> +	return (enum proc_cn_event)(ev_type & PROC_EVENT_ALL)
+
+Hi Alexey,
+
+I think the line above needs a ; at the end of it.
+
+>  }
+>  
+>  /*
+> -- 
+> 2.43.0
+> 
 
