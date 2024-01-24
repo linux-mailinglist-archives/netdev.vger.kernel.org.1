@@ -1,140 +1,115 @@
-Return-Path: <netdev+bounces-65400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EB5883A5D6
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:47:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAC1283A5F0
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:52:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA5601F2358F
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:47:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B0601F2D8B5
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:52:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B733E18030;
-	Wed, 24 Jan 2024 09:47:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3DE718042;
+	Wed, 24 Jan 2024 09:52:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ysoft.com header.i=@ysoft.com header.b="R+0igcYN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZFAr/F4l"
 X-Original-To: netdev@vger.kernel.org
-Received: from uho.ysoft.cz (uho.ysoft.cz [81.19.3.130])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB42A18026;
-	Wed, 24 Jan 2024 09:47:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.3.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88FB518032;
+	Wed, 24 Jan 2024 09:52:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706089662; cv=none; b=M69vCrdJrNwFh1Z91xkFqMG2Kj5FjlNCfWV3zDCChfoPJkJYGNRNu+nhwagLtogVmLmzT20RGQKnLkCZ77AT0/d5d3V4+SNfJQ5+oYSm0D2Jg5emQhsvHTqKnrw9n94hF9O5fF1Of641w6XNF9ph5/3UTwIOLDnANqt3e67m6Jc=
+	t=1706089939; cv=none; b=myCGQzfk2UfI95eHyYgZRUBNMdiH/peFU5AYk8O9zTPnnjUxJeUNjGkjaZw67768uCqD2WuZt7NCcQ75EBQ9W2JXBmRsP/FSw4IW87V8nllac4oKxnvm7Xguc81xpIR2cnjTRM8j6ivnwEgp8MfJ1TFWY5KNtr+epfaXox7ru1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706089662; c=relaxed/simple;
-	bh=DhBk2roOAt7FxbT1JxJRnTyNS8BQtfRrdklAx9s6+qc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=R2GoiMlFmdyrETCBxLc3q0/tUa1CK6G9P4eDh+46tuqVIhrEGq6lyOlMlg6oFTp3byE1/E3A7o9EXF3/AR0l2mtSehRROQFLXdEHpWbQzb1W/vQCLYv3zPeYWqfNbaL3+gTUWHz9J1fcByyP2nfoE/CfYDNia7txs/1aW+YKL4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ysoft.com; spf=pass smtp.mailfrom=ysoft.com; dkim=pass (1024-bit key) header.d=ysoft.com header.i=@ysoft.com header.b=R+0igcYN; arc=none smtp.client-ip=81.19.3.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ysoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ysoft.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ysoft.com;
-	s=20160406-ysoft-com; t=1706089653;
-	bh=Jx4GYD8pm9jQ3Imx4Fz11AN1lh24CdaB97dRh/vezrU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=R+0igcYNNGyrqLFiugjgepjQV7d+BYKjP/DPfm0kZbitG5ElL2YknPTUIjZf+SWll
-	 z/+ljT5xgCcPA/xeImat5ZZDT7PbjU0LdS6BbhcPJ/5W3lFHEtEOATTOWmgPrlPQ6g
-	 pKh2batzBToFS94fSCufv61PgMK6oVMjFkIsMTNo=
-Received: from [10.1.8.111] (unknown [10.1.8.111])
-	by uho.ysoft.cz (Postfix) with ESMTP id 197CCA047B;
-	Wed, 24 Jan 2024 10:47:33 +0100 (CET)
-Message-ID: <4e74b2a8-f19e-492a-a796-057f52dddd93@ysoft.com>
-Date: Wed, 24 Jan 2024 10:47:32 +0100
+	s=arc-20240116; t=1706089939; c=relaxed/simple;
+	bh=FrHhwRT74LzSAxTYDGblPpNTXXJlf04Uj/YWEWBkekI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bkFZcp4oZiqwIj+JArRZyXRLJJHaBDVJZ45wVCmIn9kDuOGuea92qhWUsL+w2JL/fgv80gy1E8KmJtmFPcFvgl1MQ60sbddCC7m82JiGLwmGoBec2nQlTZNmUCxvVXL34BndWRH2ML1GTgdDNBkxfW1oLyIUtFZ4MFgLfArAQXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZFAr/F4l; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9891FC433F1;
+	Wed, 24 Jan 2024 09:52:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706089939;
+	bh=FrHhwRT74LzSAxTYDGblPpNTXXJlf04Uj/YWEWBkekI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZFAr/F4l3Zj2y3DvLi82KBSvozWVujy2ittCR06wYIJJEG0wU/uBwU770ShDMowmi
+	 ptXD6zYI4/IIVGkoIG4PIP/P3P52OpfU4uO2r06rrY07Y1dHBI0j+XX/3T0ll5t0VO
+	 CzN3FVRMwZwbXe5+CnMUb9EtF3VfDHbiaCgY+Oc6aa62Bnw9JeX9pGEfTOtuOiAy6A
+	 cwuZq96mi+aLxEJZ4wDxounb1SiDd39dbAO6DgVemw76pGp85GuTTlx636qMEJZPdv
+	 kRYn+wz4BKQH3aH7ob8CJ1qgQ2RzmI5m3uvjPDmS9pBHB5yW+n/2m/cDACjqdjCVMk
+	 F9tY/WEeB7SMA==
+Date: Wed, 24 Jan 2024 10:52:15 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neilb@suse.de>,
+	linux-nfs@vger.kernel.org, lorenzo.bianconi@redhat.com,
+	kuba@kernel.org, horms@kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v6 3/3] NFSD: add write_ports to netlink command
+Message-ID: <ZbDdzwvP6-O2zosC@lore-desk>
+References: <cover.1705771400.git.lorenzo@kernel.org>
+ <f7c42dae2b232b3b06e54ceb3f00725893973e02.1705771400.git.lorenzo@kernel.org>
+ <9e3ae337dcf168c60c4cfd51aa0b2fc7b24bcbfb.camel@kernel.org>
+ <170595930799.23031.17998490973211605470@noble.neil.brown.name>
+ <Za7zHvPJdei/vWm4@tissot.1015granger.net>
+ <Za-N6BxOMXTGyxmW@lore-desk>
+ <85b02061798a1b750a87b0302681b86651d0c7a3.camel@kernel.org>
+ <Za-9P0NjlIsc1PcE@lore-desk>
+ <3f035d3bc494ec03b83ae237e407c42f2ddc4c53.camel@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: dsa: qca8k: fix illegal usage of GPIO
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Florian Fainelli <f.fainelli@gmail.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Christian Lamparter <chunkeey@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, petr.benes@ysoft.com,
- Vladimir Oltean <olteanv@gmail.com>, Christian Marangi
- <ansuelsmth@gmail.com>, "Russell King (Oracle)"
- <rmk+kernel@armlinux.org.uk>, =?UTF-8?Q?Marek_Beh=C3=BAn?=
- <kabel@kernel.org>, Jiasheng Jiang <jiasheng@iscas.ac.cn>
-References: <1705925049-5756-1-git-send-email-michal.vokac@ysoft.com>
- <82712052-e7e6-414d-9c11-5595e0d6e097@lunn.ch>
-From: =?UTF-8?B?TWljaGFsIFZva8OhxI0=?= <michal.vokac@ysoft.com>
-In-Reply-To: <82712052-e7e6-414d-9c11-5595e0d6e097@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="dfijB6BbaqwUDN2H"
+Content-Disposition: inline
+In-Reply-To: <3f035d3bc494ec03b83ae237e407c42f2ddc4c53.camel@kernel.org>
 
-On 24. 01. 24 0:07, Andrew Lunn wrote:
-> On Mon, Jan 22, 2024 at 01:04:09PM +0100, Michal Vokáč wrote:
->> When working with GPIO, its direction must be set either when the GPIO is
->> requested by gpiod_get*() or later on by one of the gpiod_direction_*()
->> functions. Neither of this is done here which result in undefined behavior
->> on some systems.
->>
->> As the reset GPIO is used right after it is requested here, it makes sense
->> to configure it as GPIOD_OUT_HIGH right away.
->> Fixes: a653f2f538f9 ("net: dsa: qca8k: introduce reset via gpio feature")
->> Signed-off-by: Michal Vokáč <michal.vokac@ysoft.com>
->> ---
->>   drivers/net/dsa/qca/qca8k-8xxx.c | 3 +--
->>   1 file changed, 1 insertion(+), 2 deletions(-)
->>
->> diff --git a/drivers/net/dsa/qca/qca8k-8xxx.c b/drivers/net/dsa/qca/qca8k-8xxx.c
->> index 4ce68e655a63..83b19c2d7b97 100644
->> --- a/drivers/net/dsa/qca/qca8k-8xxx.c
->> +++ b/drivers/net/dsa/qca/qca8k-8xxx.c
->> @@ -2037,8 +2037,7 @@ qca8k_sw_probe(struct mdio_device *mdiodev)
->>   	priv->dev = &mdiodev->dev;
->>   	priv->info = of_device_get_match_data(priv->dev);
->>   
->> -	priv->reset_gpio = devm_gpiod_get_optional(priv->dev, "reset",
->> -						   GPIOD_ASIS);
->> +	priv->reset_gpio = devm_gpiod_get_optional(priv->dev, "reset", GPIOD_OUT_HIGH);
->>   	if (IS_ERR(priv->reset_gpio))
->>   		return PTR_ERR(priv->reset_gpio);
-> 
-> Hi Michal
-> 
-> So the current code is:
-> 
-> 	priv->reset_gpio = devm_gpiod_get_optional(priv->dev, "reset",
-> 						   GPIOD_ASIS);
-> 	if (IS_ERR(priv->reset_gpio))
-> 		return PTR_ERR(priv->reset_gpio);
-> 
-> 	if (priv->reset_gpio) {
-> 		gpiod_set_value_cansleep(priv->reset_gpio, 1);
-> 		/* The active low duration must be greater than 10 ms
-> 		 * and checkpatch.pl wants 20 ms.
-> 		 */
-> 		msleep(20);
-> 		gpiod_set_value_cansleep(priv->reset_gpio, 0);
-> 	}
-> 
-> Doesn't your change make the gpiod_set_value_cansleep() pointless?
-> 
-> Please extend your patch to remove it, maybe extending the comment a
-> little.
 
-Hi Andrew,
-I agree, in this case the call to gpiod_set_value(1) is now pointless.
-I will remove it and describe the change.
-  
-> Please also make sure what v2 Is Cc: to the qca8k Maintainers.
+--dfijB6BbaqwUDN2H
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I wonder who do you mean by qca8k maintainers? There is no one explicitly
-stated as a qca8k driver maintainer in MAINTAINERS file.
+[...]
+>=20
+> That's a great question. We do need to properly support the -H option to
+> rpc.nfsd. What we do today is look up the hostname or address using
+> getaddrinfo, and then open a listening socket for that address and then
+> pass that fd down to the kernel, which I think then takes the socket and
+> sticks it on sv_permsocks.
+>=20
+> All of that seems a bit klunky. Ideally, I'd say the best thing would be
+> to allow userland to pass the sockaddr we look up directly via netlink,
+> and then let the kernel open the socket. That will probably mean
+> refactoring some of the svc_xprt_create machinery to take a sockaddr,
+> but I don't think it looks too hard to do.
 
-I admit that there is couple of people listed in get_maintainer output
-as authors/commit signers that I have not Cc'd. I have added them to
-the Cc list now and will do in the v2 as well.
+Do we already have a specific use case for it? I think we can even add it
+later when we have a defined use case for it on top of the current series.
 
-Thanks for the comments!
-Michal
+Regards,
+Lorenzo
 
+>=20
+> --=20
+> Jeff Layton <jlayton@kernel.org>
+>=20
+
+--dfijB6BbaqwUDN2H
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZbDdzwAKCRA6cBh0uS2t
+rANyAP9i20KXWb/nbg18Mp0jyYE4BoELA+TaXQRtC3o9m9M30AEAjnZNc7Nw6W35
+xJMldpec4sHoC/HU7x4qqiUH3e4JzAY=
+=Qoyo
+-----END PGP SIGNATURE-----
+
+--dfijB6BbaqwUDN2H--
 
