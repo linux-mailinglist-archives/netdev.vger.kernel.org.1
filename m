@@ -1,110 +1,87 @@
-Return-Path: <netdev+bounces-65355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B218D83A3D9
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:16:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F366983A3E2
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:18:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 38E6DB25D00
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 08:16:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32D5E1C23754
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 08:18:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11EC01754B;
-	Wed, 24 Jan 2024 08:16:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5B1E1754E;
+	Wed, 24 Jan 2024 08:18:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="BZRyP3ip"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9528171DD;
-	Wed, 24 Jan 2024 08:16:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FAB812E63;
+	Wed, 24 Jan 2024 08:18:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706084168; cv=none; b=spDpBlNMxz1tBQ0S3KbpkHXKvXNJ/OgXq9TAVqLUZRtoVEr3w+RVMR/QzajEvYIoskHOyThtvvhVhBHgmkv6izli10KSpGr8bBxyThWdN4Qj+IUjZ76rZzk5mg0g0gFCca+XsnOtugymKnDjKdqFl1PV+wowQXO51lf8qfq7o4E=
+	t=1706084294; cv=none; b=HsIDs1UsqCCUd6ra8LCxgAPYPU2Wsx7obzio/BkQl6uos1CwsEUIZZGNIUwm3f9brU85Z2LxGIWW9a4yCVjeZqDmBSYUjN5GMNCV68P80aLWXAIpMBbcfDYKN43stU+pA36i0Rn++YUHjSf+z39CYIe0PpDF1sIFeGveeSchkeY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706084168; c=relaxed/simple;
-	bh=/rMbIQJ3jD9TaP/pGU36ORETs0NOMF3ehutw65TTBjY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BULlRE7R6Sl0GFAaypvhlEKaRJ45ukn2DWGips/nhnxI3LD+8RFSMV+OTRA5I4NiBlELzRbux7gmfcc9yi+A2KYmbowa9fFwN0Bbir/W3ZMbLQI0uBocXBNoHNT1OnHO3AZwmgFelpItBwTvVDvbIifXwzdVStkxqtUJ3YhuPKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: b74478b947e1476c901ee4951d5ba963-20240124
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.35,REQID:6aa79073-3673-4d3f-bbdb-ab9a9d335fa4,IP:10,
-	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-	ON:release,TS:-5
-X-CID-INFO: VERSION:1.1.35,REQID:6aa79073-3673-4d3f-bbdb-ab9a9d335fa4,IP:10,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:-5
-X-CID-META: VersionHash:5d391d7,CLOUDID:dd019a8e-e2c0-40b0-a8fe-7c7e47299109,B
-	ulkID:24012416154925IVVJGH,BulkQuantity:0,Recheck:0,SF:66|38|24|17|19|44|1
-	02,TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,CO
-	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_FSI,TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD
-X-UUID: b74478b947e1476c901ee4951d5ba963-20240124
-Received: from mail.kylinos.cn [(39.156.73.10)] by mailgw
-	(envelope-from <chentao@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 2092884169; Wed, 24 Jan 2024 16:15:47 +0800
-Received: from mail.kylinos.cn (localhost [127.0.0.1])
-	by mail.kylinos.cn (NSMail) with SMTP id 57CD3E000EB9;
-	Wed, 24 Jan 2024 16:15:47 +0800 (CST)
-X-ns-mid: postfix-65B0C733-158474490
-Received: from kernel.. (unknown [172.20.15.234])
-	by mail.kylinos.cn (NSMail) with ESMTPA id 88D6EE000EB9;
-	Wed, 24 Jan 2024 16:15:39 +0800 (CST)
-From: Kunwu Chan <chentao@kylinos.cn>
-To: pablo@netfilter.org,
-	kadlec@netfilter.org,
-	fw@strlen.de,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Kunwu Chan <chentao@kylinos.cn>
-Subject: [PATCH nf-next] netfilter: expect: Simplify the allocation of slab caches in nf_conntrack_expect_init
-Date: Wed, 24 Jan 2024 16:15:38 +0800
-Message-Id: <20240124081538.472522-1-chentao@kylinos.cn>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1706084294; c=relaxed/simple;
+	bh=O3ZTw0Uu63QcFIFWBtd8xSjGz0uOj1py/D8YC1lnDs4=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=MfJ0pw7B9NH/X9o7aieeJESe9QqtiL9XapqLrT/CZXN9ljtUEgTpIe62D+2bzIw0c+3s1d2np5/AgpvOzahBRjs6iysxEMGVPd+PnOug6IcfwLjbT+au7RcAwlrAQlApoHYUfAAiZoad2FYhoEfys162fcXTypeOPGkexL6qoA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=BZRyP3ip; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 717ACC433F1;
+	Wed, 24 Jan 2024 08:18:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+	s=korg; t=1706084293;
+	bh=O3ZTw0Uu63QcFIFWBtd8xSjGz0uOj1py/D8YC1lnDs4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=BZRyP3ipRYAo2sW2HKWDQg4ihYobLxaMcfodExVoV3XgMOFGddSJDGUgVtDvC4CZB
+	 qoR7HIafL6fKN9h+lLVjOvqKLLM8sCcvywZyquX4RiOl0FHbPHw6gWxRFQ3bKyhhsz
+	 Df0sauMf2Z1zk58P7R/qfcvuMgL9PsV1v14Azl3E=
+Date: Wed, 24 Jan 2024 00:18:08 -0800
+From: Andrew Morton <akpm@linux-foundation.org>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Daniel Borkmann
+ <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, Andrii
+ Nakryiko <andrii@kernel.org>, bpf <bpf@vger.kernel.org>, Networking
+ <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Nathan Chancellor <nathan@kernel.org>
+Subject: Re: linux-next: manual merge of the bpf-next tree with the mm tree
+Message-Id: <20240124001808.bfff657f089afe10e5b0824c@linux-foundation.org>
+In-Reply-To: <CAADnVQKBCpkwx1HVaNy1wmHqVrekgkd4LEZm9UzqOkOBniTOyw@mail.gmail.com>
+References: <20240124121605.1c4cc5bc@canb.auug.org.au>
+	<CAADnVQKBCpkwx1HVaNy1wmHqVrekgkd4LEZm9UzqOkOBniTOyw@mail.gmail.com>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
-to simplify the creation of SLAB caches.
+On Tue, 23 Jan 2024 17:18:55 -0800 Alexei Starovoitov <alexei.starovoitov@gmail.com> wrote:
 
-Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
----
- net/netfilter/nf_conntrack_expect.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+> > Today's linux-next merge of the bpf-next tree got a conflict in:
+> >
+> >   tools/testing/selftests/bpf/README.rst
+> >
+> > between commit:
+> >
+> >   0d57063bef1b ("selftests/bpf: update LLVM Phabricator links")
+> >
+> > from the mm-nonmm-unstable branch of the mm tree and commit:
+> >
+> >   f067074bafd5 ("selftests/bpf: Update LLVM Phabricator links")
+> >
+> > from the bpf-next tree.
+> 
+> Andrew,
+> please drop the bpf related commit from your tree.
 
-diff --git a/net/netfilter/nf_conntrack_expect.c b/net/netfilter/nf_connt=
-rack_expect.c
-index 81ca348915c9..21fa550966f0 100644
---- a/net/netfilter/nf_conntrack_expect.c
-+++ b/net/netfilter/nf_conntrack_expect.c
-@@ -722,9 +722,7 @@ int nf_conntrack_expect_init(void)
- 			nf_ct_expect_hsize =3D 1;
- 	}
- 	nf_ct_expect_max =3D nf_ct_expect_hsize * 4;
--	nf_ct_expect_cachep =3D kmem_cache_create("nf_conntrack_expect",
--				sizeof(struct nf_conntrack_expect),
--				0, 0, NULL);
-+	nf_ct_expect_cachep =3D KMEM_CACHE(nf_conntrack_expect, 0);
- 	if (!nf_ct_expect_cachep)
- 		return -ENOMEM;
-=20
---=20
-2.39.2
+um, please don't cherry-pick a single patch from a multi-patch series
+which I have already applied.
 
 
