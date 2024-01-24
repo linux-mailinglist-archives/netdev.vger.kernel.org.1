@@ -1,195 +1,184 @@
-Return-Path: <netdev+bounces-65797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65803-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C06883BC67
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:57:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4937E83BCDF
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 10:10:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 315081C216B6
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 08:57:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A88BEB2A1F5
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:10:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 134111B959;
-	Thu, 25 Jan 2024 08:57:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DB4F1BC5A;
+	Thu, 25 Jan 2024 09:06:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KOaqkHxl"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="F4zvZWNx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2071.outbound.protection.outlook.com [40.107.94.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B4511B954
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 08:57:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706173045; cv=none; b=G3r/XAlh8Hce0iT9G+RdkBSZxfANW3Cmjk6cI2QGvHZEC+awdZc8HYw4yi3+wmCxrr9pVebL0xQEN2YJuDPwyGX8XnIkl1f4clXvVNC4aR/Kgl92JObhXoO8fPlG1kkt2V30aKghu+vh5iYsxS0IhihTuXgSYYHQnCiaGsgs4E0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706173045; c=relaxed/simple;
-	bh=23Lb8W/5QooObKMfINUGuu1drcARK0pUG17BP4aKXEY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ax020BdMXqCeh3vJ6gPj4yuzWOw4sBc7RFXNldSQ+n/FfGnUJyqxOyY8RuG98tY3QplnwG5dGV1qUszyGW/gYVU5DhtCeyIxYFbA3QHyw47Nrylm745KZZHOB5BWgi25uMbkWuTF0TpQ1yGo7ejc/+HIMldf59KCmdJx2Ol1dR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KOaqkHxl; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-55818b7053eso11752a12.0
-        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 00:57:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706173041; x=1706777841; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9r7lJ7sqN6ad0sss1zSzMT057tYjk1irl2K8XfZBIhM=;
-        b=KOaqkHxl2Lvpcz3UwCNCcc9ppiVXRn4MyZmR1X64T00luoW3DRIk9f5+zlIkYFYvo7
-         JXtZI65T3hlHtvzCTQzXL1P/GS87rFmLOB2cyN7SmsEJ2zVFD0J8FOtijb5zxSL9hlDo
-         tENrUoh2SwGnK20we0lfsZ90mEpOLhzFZoJ90naJvJPE83DNq3OwxwiHMAm3MekrhLM1
-         2j+fHfxtK5MyY5YbRtx8LPogLtXKlOY8ulbku6o8bjBvh2irc3vOJo/lq8rMk7rV9sQK
-         uTy9w2u6m8j+s4/piEuU8xakMzrg2l2bL20i7J6AxZFQTLZg+AJpktO3A1sNEdlEKgCo
-         Quqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706173041; x=1706777841;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9r7lJ7sqN6ad0sss1zSzMT057tYjk1irl2K8XfZBIhM=;
-        b=XXD6VXhCdGncvpERJ4dPzJt1bJX9r2MEJnfdNrH6pgdQct3f+ki5qlAuxgUJUhUsd3
-         h7okVu+HV0uYi6c7OnG4OXxL+SNC/2OBKPR1oqxQu4aJNbs2N8OgsJ9QpKPgCZTNUr59
-         nRLLitwH7TfqFmBWhtScc73OylG8gEyigFxexe6NloYvWnOJjoCzoJQq1BR7gxxcJH0r
-         Et84XMaDxxCp7lJdvF4ICF3mIK7T5wNGZMwFe0E5R3T7GOFc3m1EP6e/Q23NxziHXVyf
-         OTCEYKok/n1QJuKEtmLV6wAFhOxjfv5ncLZYu3sNzHYRjP+HYcqF7GhVU5LlE0GgI5bt
-         EqFA==
-X-Gm-Message-State: AOJu0Yy4yP01tqq/Yw2wbRf6TsIAmFz0CifwfCc89e5DPHlcvKy5xNvv
-	AfLj3S7HhaFDbz/M29fr3XWr/I+TiIiTZoZVOpDvVvtg9QMhjRzgA8xmonUUk7GlekX+KXle7vA
-	Z6srD35wDyOqD3nCGxJgQN4QokcL4ZuNzbud9X/eGogMKoGvcAagf
-X-Google-Smtp-Source: AGHT+IFb+LIomVFJLxtbxSDpe6zo+tHbcilYXj7QQv606bK/OZ61L+h8gWh+oUEOpBPLNWikPfrmSKdILBy/PKO3PEI=
-X-Received: by 2002:a05:6402:290b:b0:55c:2493:2b31 with SMTP id
- ee11-20020a056402290b00b0055c24932b31mr109377edb.3.1706173041208; Thu, 25 Jan
- 2024 00:57:21 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB2C71BC25;
+	Thu, 25 Jan 2024 09:06:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.71
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706173589; cv=fail; b=Xnk0G4rNgoestNgRXrREodjFr24d8cfctsvqPQ2arBPXLRHoSo0VOEZ5rN022gySvrQeoBN5fwoHS5fTah31hVVjvPAK+7ieEkrUhruqaDuDG1Vpi6NPy5NhL9saz4OJwuOxO2TV10p3ESdiXsad2PIcTi/jnLEkoSRPQuvztoY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706173589; c=relaxed/simple;
+	bh=2hlAnQYntbkug2Ce51mVzTlNp2T85FVikHnRhKUnHr8=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=rguFAQoe9Yssvq8eGJ6WINcidFQVono7mYGGRdPBgPqr8QPyCXyFAIejmcjDIL6aEtuDTMnAfRVatfaO6psFD4JtuaCiaYlSCQHrvLMXShkjQXaxCxuX3RQ3+WHENSHiAblVxxUHMn+yRjjdv3Txsd1EOJmLZCHR+TU4/Yulyhg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=F4zvZWNx; arc=fail smtp.client-ip=40.107.94.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QGSfAT/qxu49LFZOM+XKjaqPivBFb/YhB123JSixohh5heHzH2Ulh9RKsgQiOLAfeo+Dnf1gQkEm2JYmGPh3O+Iys2U1RkB+rXP/xNwTDr2kPMUCgNpAgfjYx92LjBUPrd2EnUADGmCxPdKH4mu/LIn23GH76wYmQUAv8cwDQ6YxJMXBg2dv18iL313XDfpy61lkBAN2tmeJLFj9cgzlnZRebO1XV2wCautv2f/4QXBCWyFJtpy8nXSJn6/hwk+3ZJcBZnJRzax9BV/l+BcHSTPkmfhHW6KHWJvJtzLOA6jyeIG4K3XfHIpRZF/vCDtZWexSzI3lvI5vmetDeJQAtA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QE10+q+bPQZ4yrk7ynqUBqEEcKpIvjkHNs/ynQw5bfA=;
+ b=bvphcTou3LrAc97axXLfgRvoN7KtII9pfdH4orBUM9jr4jDoIePZkFDQbX0aq6NZ5KSniRKFNSx8gWMVupXpXY1/tNNC17hQ/XVotNy5xA+MmUuAe7ALHnIhHItxESk/cm5bozuP0/vxTdkjSE06CLC2TDN0T/TYHWn1qMmYmASpTWzupjrP6XxXvda6P2BIb3AnWaTu9bTrvJqMwEL2Ab58u1MlOeqmAYAkWjt36fT0SGRXrU0CqoXj6J4+oE8o9Zh9B78PZap43cZhwe5HS9WT7pKzP2uSdCWdi//9b6As0HzBRdcxQ2xK5SfBSU0Z3bSRsRsk4PQfsRpLHuL8AQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QE10+q+bPQZ4yrk7ynqUBqEEcKpIvjkHNs/ynQw5bfA=;
+ b=F4zvZWNxdStL3sdiXw6p5tx6o7AtZ3Ncy8uoMZCWFhoQxNAmPGGonhSOqurlbv1IFUOszwVWmHKlH/IxqnTLSIUluESNHrRVNKjPJ2gKmXqXJl66Fwim/HKzCqYa7EnnztteTTWPyKHgzZYSv3n0fhkeKF0yuIanpVzHeZvoasnNepV7PzASSdrBSy2e2wLsYuFIL7O+SLbErymvHEkL5lKmq92Z71krQMXWgiHvszzpEj2tQzjSUz1uT6LICOYytBpsxrbbCtRXlhEhMSDScw7ysKsOjtirEjEHgwDR+1xmTzN9I58XqApume1MOndnhgY26Otcc9VScweeqs8iNw==
+Received: from DM6PR13CA0024.namprd13.prod.outlook.com (2603:10b6:5:bc::37) by
+ DM4PR12MB5795.namprd12.prod.outlook.com (2603:10b6:8:62::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7228.22; Thu, 25 Jan 2024 09:06:25 +0000
+Received: from CY4PEPF0000E9D8.namprd05.prod.outlook.com
+ (2603:10b6:5:bc:cafe::8c) by DM6PR13CA0024.outlook.office365.com
+ (2603:10b6:5:bc::37) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.21 via Frontend
+ Transport; Thu, 25 Jan 2024 09:06:25 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CY4PEPF0000E9D8.mail.protection.outlook.com (10.167.241.83) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7228.16 via Frontend Transport; Thu, 25 Jan 2024 09:06:24 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 25 Jan
+ 2024 01:06:15 -0800
+Received: from yaviefel (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 25 Jan
+ 2024 01:06:13 -0800
+References: <20240122091612.3f1a3e3d@kernel.org> <87fryonx35.fsf@nvidia.com>
+ <20240123073412.063bc08e@kernel.org> <87y1cgm040.fsf@nvidia.com>
+ <20240123093834.23ea172a@kernel.org>
+User-agent: mu4e 1.8.11; emacs 28.3
+From: Petr Machata <petrm@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Petr Machata <petrm@nvidia.com>, Shuah Khan <shuah@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"netdev-driver-reviewers@vger.kernel.org"
+	<netdev-driver-reviewers@vger.kernel.org>, <linux-kselftest@vger.kernel.org>
+Subject: Re: [ANN] net-next is OPEN
+Date: Wed, 24 Jan 2024 12:06:00 +0100
+In-Reply-To: <20240123093834.23ea172a@kernel.org>
+Message-ID: <87ede5n5oc.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240119092024.193066-1-zhangpeng362@huawei.com>
- <Zap7t9GOLTM1yqjT@casper.infradead.org> <5106a58e-04da-372a-b836-9d3d0bd2507b@huawei.com>
- <Za6SD48Zf0CXriLm@casper.infradead.org> <CANn89iL4qUXsVDRNGgBOweZbJ6ErWMsH+EpOj-55Lky8JEEhqQ@mail.gmail.com>
- <Za6h-tB7plgKje5r@casper.infradead.org> <CANn89iJDNdOpb6L6PkrAcbGcsx6_v4VD0v2XFY77g7tEnJEXXQ@mail.gmail.com>
- <4f78fea2-ced6-fc5a-c7f2-b33fcd226f06@huawei.com> <CANn89iKbyTRvWEE-3TyVVwTa=N2KsiV73-__2ASktt2hrauQ0g@mail.gmail.com>
- <d68f50a5-8d83-99ba-1a5a-7f119cd52029@huawei.com>
-In-Reply-To: <d68f50a5-8d83-99ba-1a5a-7f119cd52029@huawei.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 25 Jan 2024 09:57:10 +0100
-Message-ID: <CANn89iJSxsx_6oTM+ggo90vacNM33e_DpgJJg1HQRfkdj3ewqg@mail.gmail.com>
-Subject: Re: SECURITY PROBLEM: Any user can crash the kernel with TCP ZEROCOPY
-To: "zhangpeng (AS)" <zhangpeng362@huawei.com>
-Cc: Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, 
-	netdev@vger.kernel.org, akpm@linux-foundation.org, davem@davemloft.net, 
-	dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, arjunroy@google.com, 
-	wangkefeng.wang@huawei.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D8:EE_|DM4PR12MB5795:EE_
+X-MS-Office365-Filtering-Correlation-Id: 27b9d9df-426b-4b01-60f3-08dc1d84e859
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	MO1MhCWswr0o4Td07yr4Z6nbNXg7aVXJUWXCaA9THcq9lRoC0qv2NCPwJzv9J4J5t9zqJgUpH++wulv9shey6S+UbJPzILlcs/lXjRd1I3aQfr/Xs+ADdf2D3TJkt3+VPS2VCktIj059TKFus8091wJ2QJL0m8Ysef7QcN5gDBnJFnOwz19vK2UIBLCvMH1NA1MhBvFCEqYWfJrQ0paN99kp8AumONo07YhjIax8ILlv28FmMhBnXMK/PInIvmFcPXjtseMlugQ/wYXsFzFQb8cPy3VOkuI0rC5W/nHUPzBKbBG3prtzULlYI3CCTnolhDa2Or9ihIJ0ZQ7sfHDxaKvbYFdQvXkWX+XJieQNKMzBdxsaJDwcQtds/NrhnH+hefameTubSb8+2kbg3sZgPB70K8/zG+Apv/Mmq6FASyW4Y6h2bfWtx//OEZUF9pl+Vepz9eCuqWztkkvhfsgZbMPZTjYfAk/LUToYy9RYuDRkiFp4f1VNvz88zhQyG5/WBw79t7xmxXqaqp2CSPFceQMlFIbkcu1RC2ZVQm36J5lw3YtDsBf1VV6YQwUJ20Qj0IJ7fdKcRPA3QHDpHZg9hN6+y1lW1yQTee6b96ZtmDIGu5wqPho3+jtJJJZsQl3wAlXwyhV6AEAs2I1N2TKjoc3jWMnJDGfZw9x3+mst/z7OiYocgRzbOYbCz9+plBfIYQY65DlMNKFpJwAd8H/ksme7gYeBS6QGPXg8pNxTOoTXCWSqHkEWimggN8tPqJlmLKQ6wxlztIdhrmtOUJKRGg==
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(396003)(376002)(346002)(136003)(39860400002)(230922051799003)(451199024)(1800799012)(186009)(82310400011)(64100799003)(36840700001)(46966006)(40470700004)(47076005)(16526019)(2616005)(426003)(26005)(82740400003)(36860700001)(8676002)(336012)(5660300002)(4326008)(8936002)(41300700001)(2906002)(478600001)(966005)(6666004)(6916009)(54906003)(316002)(70206006)(70586007)(36756003)(86362001)(356005)(7636003)(40460700003)(40480700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jan 2024 09:06:24.9734
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 27b9d9df-426b-4b01-60f3-08dc1d84e859
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000E9D8.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5795
 
-On Thu, Jan 25, 2024 at 3:18=E2=80=AFAM zhangpeng (AS) <zhangpeng362@huawei=
-.com> wrote:
+
+Jakub Kicinski <kuba@kernel.org> writes:
+
+> On Tue, 23 Jan 2024 18:04:19 +0100 Petr Machata wrote:
+>> > Unless I'm doing it wrong and the sub-directories are supposed to
+>> > inherit the parent directory's config? So net/forwarding/ should
+>> > be built with net/'s config? I could not find the info in docs,
+>> > does anyone know?  
+>> 
+>> I don't think they are, net/config defines CONFIG_VXLAN, but then the
+>> vxlan tests still complain about unknown device type. Though maybe
+>> there's another device type that it's missing...
+>> 
+>> What do I do to feed the config file to some build script to get a
+>> kernel image to test? I can of course just do something like
+>> cat config | xargs -n1 scripts/config -m, but I expect there's some
+>> automation for it and I just can't find it.
 >
-> On 2024/1/24 18:11, Eric Dumazet wrote:
+> The CI script is based on virtme-ng. So it does this:
 >
-> > On Wed, Jan 24, 2024 at 10:30=E2=80=AFAM zhangpeng (AS) <zhangpeng362@h=
-uawei.com> wrote:
-> >>
-> >> By using git-bisect, the patch that introduces this issue is 05255b823=
-a617
-> >> ("tcp: add TCP_ZEROCOPY_RECEIVE support for zerocopy receive."). v4.18=
--rc1.
-> >>
-> >> Currently, there are no other repro or c reproduction programs can rep=
-roduce
-> >> the issue. The syz log used to reproduce the issue is as follows:
-> >>
-> >> r3 =3D socket$inet_tcp(0x2, 0x1, 0x0)
-> >> mmap(&(0x7f0000ff9000/0x4000)=3Dnil, 0x4000, 0x0, 0x12, r3, 0x0)
-> >> r4 =3D socket$inet_tcp(0x2, 0x1, 0x0)
-> >> bind$inet(r4, &(0x7f0000000000)=3D{0x2, 0x4e24, @multicast1}, 0x10)
-> >> connect$inet(r4, &(0x7f00000006c0)=3D{0x2, 0x4e24, @empty}, 0x10)
-> >> r5 =3D openat$dir(0xffffffffffffff9c, &(0x7f00000000c0)=3D'./file0\x00=
-',
-> >> 0x181e42, 0x0)
-> >> fallocate(r5, 0x0, 0x0, 0x85b8818)
-> >> sendfile(r4, r5, 0x0, 0x3000)
-> >> getsockopt$inet_tcp_TCP_ZEROCOPY_RECEIVE(r4, 0x6, 0x23,
-> >> &(0x7f00000001c0)=3D{&(0x7f0000ffb000/0x3000)=3Dnil, 0x3000, 0x0, 0x0,
-> >> 0x0, 0x0, 0x0, 0x0, 0x0}, &(0x7f0000000440)=3D0x10)
-> >> r6 =3D openat$dir(0xffffffffffffff9c, &(0x7f00000000c0)=3D'./file0\x00=
-',
-> >> 0x181e42, 0x0)
-> >>
-> > Could you try the following fix then ?
-> >
-> > (We also could remove the !skb_frag_off(frag) condition, as the
-> > !PageCompound() is necessary it seems :/)
-> >
-> > Thanks a lot !
-> >
-> > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> > index 1baa484d21902d2492fc2830d960100dc09683bf..ee954ae7778a651a9da4de0=
-57e3bafe35a6e10d6
-> > 100644
-> > --- a/net/ipv4/tcp.c
-> > +++ b/net/ipv4/tcp.c
-> > @@ -1785,7 +1785,9 @@ static skb_frag_t *skb_advance_to_frag(struct
-> > sk_buff *skb, u32 offset_skb,
-> >
-> >   static bool can_map_frag(const skb_frag_t *frag)
-> >   {
-> > -       return skb_frag_size(frag) =3D=3D PAGE_SIZE && !skb_frag_off(fr=
-ag);
-> > +       return skb_frag_size(frag) =3D=3D PAGE_SIZE &&
-> > +              !skb_frag_off(frag) &&
-> > +              !PageCompound(skb_frag_page(frag));
-> >   }
-> >
-> >   static int find_next_mappable_frag(const skb_frag_t *frag,
+> # $target is net or net/forwarding or drivers/net/bonding etc.
+> make mrproper
+> vng -v -b -f tools/testing/selftests/$target
+
+Actually:
+
+# vng -v -b -f tools/testing/selftests/${target}/config
+
+Didn't know about vng, it's way cool!
+(Despite having used virtme for a long time.)
+
+> # build the scripts
+> make headers
+> make -C tools/testing/selftests/$target
 >
-> This patch doesn't fix this issue. The page cache that can trigger this i=
-ssue
-> doesn't necessarily need to be compound. =F0=9F=99=81
+> vng -v -r arch/x86/boot/bzImage --user root
+> # inside the VM
+> make -C tools/testing/selftests TARGETS=$target run_tests
 
-Ah, too bad :/
+I'm working my way through the selftests.
 
-So the issue is that the page had a mapping. I am no mm expert,
-I am not sure if we need to add more tests (like testing various
-illegal page flags) ?
+> https://github.com/kuba-moo/nipa/blob/master/contest/remote/vmksft.py#L138
+>
+> You're right, it definitely does not "inherit" net's config when
+> running forwarding/net. I can easily make it do so, but I'm not clear
+>
+> what the expectation from the kselftest subsystem is. Because if other
+> testers (people testing stable, KernelCI etc. et.c) don't "inherit" we
+> better fill in the config completely so that the tests pass for
+> everyone.
 
-Can you test this ?
+Oh, gotcha, the question was not whether it does, but whether it's
+supposed to. OK.
 
-(I am still  converting the repro into C)
+IMHO not necessarily. net/config is for net/*.sh, net/forwarding/config
+for net/forwarding/*.sh. It's not a given that whatever is needed for
+net/ is needed for net/forwarding/ as well.
 
-Thanks.
-
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 1baa484d21902d2492fc2830d960100dc09683bf..2128015227a5066ea74b3911eca=
-efe7992da132f
-100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -1785,7 +1785,17 @@ static skb_frag_t *skb_advance_to_frag(struct
-sk_buff *skb, u32 offset_skb,
-
- static bool can_map_frag(const skb_frag_t *frag)
- {
--       return skb_frag_size(frag) =3D=3D PAGE_SIZE && !skb_frag_off(frag);
-+       struct page *page;
-+
-+       if (skb_frag_size(frag) !=3D PAGE_SIZE || skb_frag_off(frag))
-+               return false;
-+
-+       page =3D skb_frag_page(frag);
-+
-+       if (PageCompound(page) || page->mapping)
-+               return false;
-+
-+       return true;
- }
-
- static int find_next_mappable_frag(const skb_frag_t *frag,
+It will also lead to simpler patches, where enabling config options in
+X/ doesn't imply checking for newly useless duplicities in X's child
+directories.
 
