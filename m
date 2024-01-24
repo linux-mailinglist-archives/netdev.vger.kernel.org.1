@@ -1,107 +1,112 @@
-Return-Path: <netdev+bounces-65352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65353-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06C6583A39C
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 08:58:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43C7083A3A1
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 08:59:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B39B629376F
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 07:58:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEA7C1F23845
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 07:59:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B9D2171AF;
-	Wed, 24 Jan 2024 07:58:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB4F5171C2;
+	Wed, 24 Jan 2024 07:59:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JC+OfZMZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1B3117543;
-	Wed, 24 Jan 2024 07:58:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A9F8171AB
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 07:59:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706083101; cv=none; b=AGFigSXvv98amzNaU/70wyvWMWrsJGlmp82jlfMxreX1rww3wfQki3f1ed58V7EPP2PUtsKnL9CXelpQlccAupboGzymn6tQEEifm6uocI0YIJYstKRny5/SVXsfBk44s03pMsGDO/XjJGQT2Wj9m0Uu36oQAN5AczIf23HzcPo=
+	t=1706083158; cv=none; b=HW7f3ZeRUxvBSz0nCkQkPwxjg+Xil/tHsdt69ozHJ2DTAQgYM3Q/QTtfosmlbNLwqLKNLPS4vgczPfAh9F2QGlevlOfee2sPUTCtAOx1lvHVtscGGamqoep4phYjsVP9k9SRB7JOVcg7TpEwXz6ysxTqI+/0FBLtUJiug/qT8Zc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706083101; c=relaxed/simple;
-	bh=1v3O0YVMPI+F7nAtQ6rXg2jQUbThSXmEGB9qvSA8O5g=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pFAw9f5jMcGmxTQSyI9wvc+WiNIHWmTXfat8ZGz1mXjHIsV6rxpAZwxj9ZTMiPO3NqACFSFNLyL6n2+H+h2nQESSXtsGWg0k224aoTpdSsPVUGBVGlYit3gGE+Rs8DyzLkwy1EM694rKg5wyULNngxU1rm5PbpeYkmbi6gLxxqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 299d9bbcd641409e9a7b28d2a21bd8ad-20240124
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.35,REQID:924919e9-e9e1-45c7-b695-27da69cd3540,IP:10,
-	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-	ON:release,TS:-5
-X-CID-INFO: VERSION:1.1.35,REQID:924919e9-e9e1-45c7-b695-27da69cd3540,IP:10,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:-5
-X-CID-META: VersionHash:5d391d7,CLOUDID:11c5998e-e2c0-40b0-a8fe-7c7e47299109,B
-	ulkID:240124155807WFON35KP,BulkQuantity:0,Recheck:0,SF:66|38|24|17|19|44|1
-	02,TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,CO
-	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
-X-UUID: 299d9bbcd641409e9a7b28d2a21bd8ad-20240124
-Received: from mail.kylinos.cn [(39.156.73.10)] by mailgw
-	(envelope-from <chentao@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 2099680962; Wed, 24 Jan 2024 15:58:05 +0800
-Received: from mail.kylinos.cn (localhost [127.0.0.1])
-	by mail.kylinos.cn (NSMail) with SMTP id DBC79E000EB9;
-	Wed, 24 Jan 2024 15:58:04 +0800 (CST)
-X-ns-mid: postfix-65B0C30C-697750425
-Received: from kernel.. (unknown [172.20.15.234])
-	by mail.kylinos.cn (NSMail) with ESMTPA id 3762CE000EB9;
-	Wed, 24 Jan 2024 15:58:03 +0800 (CST)
-From: Kunwu Chan <chentao@kylinos.cn>
-To: santosh.shilimkar@oracle.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	rds-devel@oss.oracle.com,
-	linux-kernel@vger.kernel.org,
-	Kunwu Chan <chentao@kylinos.cn>
-Subject: [PATCH] net: rds: Simplify the allocation of slab caches in rds_conn_init
-Date: Wed, 24 Jan 2024 15:58:01 +0800
-Message-Id: <20240124075801.471330-1-chentao@kylinos.cn>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1706083158; c=relaxed/simple;
+	bh=lEd0Bn9/l4rJl1Z1K+CtoAc2cKowkc02HmrmBSo3jRY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LswhuScUcSWQ1igmNlomLqRG9/RbZ8Q5OrCBDTrzW0YxlFKpzEFnoIX1gqeBIKWCpaAb4axbsuLZLHzjVub8CmAOl0SyUjPn26Zk3S8MLAf8FrofCYOu7S5DBrmJpyCn1IPkQ0Fraux9bpo87bu4ZY2Cj+6MMT875MPrIwlhDGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JC+OfZMZ; arc=none smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6816d221ba6so2735806d6.1
+        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 23:59:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706083156; x=1706687956; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q92C8VzIHJcnlRFLcLBDvGNfbptSh8Rh3tDhxRNYqzE=;
+        b=JC+OfZMZjbDati5bGcFqU9Wl6shrTaqgTdBM9mUtPGjbiEvrqy2aWReazHePKhVF18
+         +DMK5DndLxei9Lye6brGO+e/Nh4Vxsmww47D2Tkah7AjOg94+6ouR5dlC0RYSxml/l1Y
+         FvvBMjyyfHq//W+Dxd/syrsC8M9zZwtm9+APxLq+bl5evciN0W1soZ1X8w5LAdi6+5f9
+         F9Vj4d/KbcwpccMsn+X+JSh1heR1cEY0K7Cx2VSDyAEgDhNyz+T1bunvQV8ByTelDrgB
+         L/IDNVb3jZIRGFCg7JE9pW7WGU+MzFwWtCHEeVcWrFOqPGLNK+qKjWzOa0YG5mHP8zaM
+         6FMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706083156; x=1706687956;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Q92C8VzIHJcnlRFLcLBDvGNfbptSh8Rh3tDhxRNYqzE=;
+        b=ngMCXs8vjlLHrj+jiZZ1ZzVBweRSpV2r3h/BoEx1dUvxgnUrzihONS9zJ8Givt7LlQ
+         IXIRMA0FAzNv7ICVvVRmMVq/gtDXZHg+LiVFegsNTSQ8VVxbN3lLcH2R7i29zbo5ATNn
+         hRbmvwe/dpPbg6O1P80Hpy0CK9fwHfTZXjN9biQFqx/cpGb6juimMQkAi1LWDZ2HleL7
+         kg5YBb+anh9KXJkbywY1WlEr9y0B7QEQuguJjEuXokT82DucAkZ7rxbtVSwo0uHUYuCu
+         L2i9U718WAZbL7+c56L0jNwNwBT/Rujy+0sg2zUbl8NfVqebxVmey/G/ko2zGJJV48Mt
+         uc2w==
+X-Gm-Message-State: AOJu0YzFlrSh7JvysnM5gR71ae9zjZ3jnUlThZxDmAEF9H+v0FT23hUC
+	oUNTqdmiRPiVr9YTWWfHNQ+mmJ4MiDOr5LrPoM+OqLjOO9M7RTFbhqgI3UVcDt6HzZDDdDv4Cci
+	zeGWlF0kUiHotXzp1NYsuj7xztNA=
+X-Google-Smtp-Source: AGHT+IEiyEKrWHLQrCMuEVeuybf2u1RXE5AMEL3PoX90w+hMbjCoqxpJM9kQTQnExbLnwxvzZqG5XAsY9MYzyqzsh2I=
+X-Received: by 2002:a05:6214:d85:b0:686:9d71:842a with SMTP id
+ e5-20020a0562140d8500b006869d71842amr1557448qve.2.1706083155980; Tue, 23 Jan
+ 2024 23:59:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+References: <20240123115846.559559-1-maciej.fijalkowski@intel.com>
+In-Reply-To: <20240123115846.559559-1-maciej.fijalkowski@intel.com>
+From: Magnus Karlsson <magnus.karlsson@gmail.com>
+Date: Wed, 24 Jan 2024 08:59:04 +0100
+Message-ID: <CAJ8uoz1uUj2mMPzoXkp8yUy_FsS_RR214eiJUhvj1Jvxr7=XCg@mail.gmail.com>
+Subject: Re: [PATCH iwl-next 0/2] ice: use ice_vsi_cfg_single_{r,t}xq in XSK
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	anthony.l.nguyen@intel.com, magnus.karlsson@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
-Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
-to simplify the creation of SLAB caches.
+On Tue, 23 Jan 2024 at 12:59, Maciej Fijalkowski
+<maciej.fijalkowski@intel.com> wrote:
+>
+> Ice driver has routines dedicated for configuring single queues. Let us
+> use them from ZC control path. This move will allow us to make
+> ice_vsi_cfg_{r,t}xq() static.
+>
+> Thanks,
+> Maciej
 
-Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
----
- net/rds/connection.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+Thanks for the clean up Maciej. For the series:
 
-diff --git a/net/rds/connection.c b/net/rds/connection.c
-index b4cc699c5fad..c749c5525b40 100644
---- a/net/rds/connection.c
-+++ b/net/rds/connection.c
-@@ -829,9 +829,7 @@ int rds_conn_init(void)
- 	if (ret)
- 		return ret;
-=20
--	rds_conn_slab =3D kmem_cache_create("rds_connection",
--					  sizeof(struct rds_connection),
--					  0, 0, NULL);
-+	rds_conn_slab =3D KMEM_CACHE(rds_connection, 0);
- 	if (!rds_conn_slab) {
- 		rds_loop_net_exit();
- 		return -ENOMEM;
---=20
-2.39.2
+Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
 
+> Maciej Fijalkowski (2):
+>   ice: make ice_vsi_cfg_rxq() static
+>   ice: make ice_vsi_cfg_txq() static
+>
+>  drivers/net/ethernet/intel/ice/ice_base.c | 134 +++++++++++++++++++++-
+>  drivers/net/ethernet/intel/ice/ice_base.h |  10 +-
+>  drivers/net/ethernet/intel/ice/ice_lib.c  | 129 ---------------------
+>  drivers/net/ethernet/intel/ice/ice_lib.h  |  10 --
+>  drivers/net/ethernet/intel/ice/ice_xsk.c  |  22 +---
+>  5 files changed, 142 insertions(+), 163 deletions(-)
+>
+> --
+> 2.34.1
+>
+>
 
