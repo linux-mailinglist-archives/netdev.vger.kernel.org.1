@@ -1,98 +1,108 @@
-Return-Path: <netdev+bounces-65523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F265983AE79
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 17:38:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15B8183AEAC
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 17:48:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 38B10B254A5
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 16:35:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A88741F227AF
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 16:48:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 868D87CF34;
-	Wed, 24 Jan 2024 16:35:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F4547E565;
+	Wed, 24 Jan 2024 16:48:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ekzX3CfW"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ZP+vhr00"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D3681869;
-	Wed, 24 Jan 2024 16:35:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B8EE77638;
+	Wed, 24 Jan 2024 16:48:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706114111; cv=none; b=cHVCenzR6JP06b8FHPV+9w551h2jcFJegkJpybrKDCtooCkgpICSmSw3IwU5GpVjvR1+Mht+XRiH9rxm2A2p0aIeYxGhKghiICBG6xN7YkFCCNjC9h6GW2NTs9BVgV3wchWwuw1Nf6byVMz5FSediDLT7CQgmapgTHCITSqUMtQ=
+	t=1706114889; cv=none; b=aD/jhEFbdsKDTiGkJ64YD/S17lCq56fDvFgMA7EVLdWCNTu9A1BzatDEjBsV9O2lB4r0X7WnZOaeVqUmEYJayovkG8Drknnt4fObrx4hyIlMu06dG1Sg+l0JpaaNed9NlkU8uW26XbiVpIs2eykVSenVKfEMNp6HgDAi3ybP6Q0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706114111; c=relaxed/simple;
-	bh=Kq/5x+fMP1G2L0TmFEfIbl8Ym+J/+oEgZUaVLt8itUE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VFjibdob/Imu6IDMaE5mwD0yPZNVSCDzOqB32gfOFi3Hg+RBAB/J81kelqop2/nz13VSGRtZbVQa2ZtsrfOj7mhPxSfiYTDBbptBfkYc3jgy+7hmqHDNDOt8F/ffrNX41XOpCjxVf3dsuv5Rsk9bQUQNHKwZmpfruYSwkcZjhfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ekzX3CfW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3EA7C433F1;
-	Wed, 24 Jan 2024 16:35:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706114110;
-	bh=Kq/5x+fMP1G2L0TmFEfIbl8Ym+J/+oEgZUaVLt8itUE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ekzX3CfW1b7N6bpLF7WO557NsrbDuVAowKzok1uxLKPWXwaVq095dxD7bH5gwvX9v
-	 9hzsYXvwnGmijY0ouCNYq98PCkxESC7V+IHk6b/992srHTA9hKTbsrD2LzNPnFJ9Lz
-	 Jj5WHA+wQ/snCYjCuqIUbM8c8grdM4SA8nbA/0e0s7vExbX1WJ06Yhq7QDUkkmjfmN
-	 uKieg57dN6LsC6V3p1TcR7pwq3dkmGlEwfInM+iSkK4LIsB3ulYGOrjZcg++BFHXcC
-	 DhMZYxXKx13ln35pIxWdnNJbitVqa3gZqyfH0a13y64QYk0jHTQoEBt8Wtov8kLCbv
-	 34t5eBC6UCzhQ==
-Message-ID: <aae9edba-e354-44fe-938b-57f5a9dd2718@kernel.org>
-Date: Wed, 24 Jan 2024 09:35:09 -0700
+	s=arc-20240116; t=1706114889; c=relaxed/simple;
+	bh=S7DJ3+JCBTXNJeT3R+rQ9rFrdxAQ0AW7yvX18psweRM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NUVchtMeWbz840I5O/FxxH5lXuIZAXGAB2BF6YYTkhn+ZQwYwZ+SmWBNyBhG+5ukidZRQFmsS52/lncD+m0BLW2kw7FI2zaGSePPIj3/gxkX0K+LTVFUL0xqNNJXCaWDWb/ZF2lJu4UeW/58dCpwBEHn8ASElL9UeeTHDHvkz+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ZP+vhr00; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 681F260006;
+	Wed, 24 Jan 2024 16:48:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1706114884;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Hve7mVwzFpKlUFRjGUurQPnaxwP0/IowvX0am3el6Vc=;
+	b=ZP+vhr00cn+7xRAMlu/e3C3oKegJdereg0UiMsYWIOFkp/kXdX7C0czffAtbcw0mCJvj9t
+	4FXEo2tEHTcTX0O9CQshe8PJJu6j/DtBETUyDU1o3szcdZBVskVKrJ7CvCZKDPiKW03JUa
+	PpJ7sJI0I4FuHwr53IMtFmqgd9zaZ2cq5KQjq63grYm4B2Wv3KZO94Q23IpGcoPqyo3dsv
+	0XBizSKr+MDTD3LASFpdWYe1xEDep4L4ELywcImBWNXnLqc+MxbR/XFrXUjz8S6CCxeD7S
+	DFhGCNOkUo7WgwV4YsrrYZd0n+MxTePiuUQsi8jn0necVuv6n8lHDwwo/G7sjw==
+Date: Wed, 24 Jan 2024 17:48:02 +0100
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Stefan Schmidt <stefan@datenfreihafen.org>
+Cc: Breno Leitao <leitao@debian.org>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, Alexander Aring
+ <alex.aring@gmail.com>, netdev@vger.kernel.org, "open list:IEEE 802.15.4
+ SUBSYSTEM" <linux-wpan@vger.kernel.org>, open list
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 06/10] net: fill in MODULE_DESCRIPTION()s for
+ ieee802154
+Message-ID: <20240124174802.0b5910a5@xps-13>
+In-Reply-To: <45711bec-e0f3-43c2-b8f2-b9a55654710b@datenfreihafen.org>
+References: <20240108181610.2697017-1-leitao@debian.org>
+	<20240108181610.2697017-7-leitao@debian.org>
+	<45711bec-e0f3-43c2-b8f2-b9a55654710b@datenfreihafen.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [ANN] net-next is OPEN
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, Hangbin Liu <liuhangbin@gmail.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "netdev-driver-reviewers@vger.kernel.org"
- <netdev-driver-reviewers@vger.kernel.org>
-References: <20240122091612.3f1a3e3d@kernel.org> <Za98C_rCH8iO_yaK@Laptop-X1>
- <20240123072010.7be8fb83@kernel.org>
- <d0e28c67-51ad-4da1-a6df-7ebdbd45cd2b@kernel.org>
- <20240123133925.4b8babdc@kernel.org>
- <256ae085-bf8f-419b-bcea-8cdce1b64dce@kernel.org>
- <7ae6317ee2797c659e2f14b336554a9e5694858e.camel@redhat.com>
- <20240124070755.1c8ef2a4@kernel.org> <20240124081919.4c79a07e@kernel.org>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240124081919.4c79a07e@kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
 
-On 1/24/24 9:19 AM, Jakub Kicinski wrote:
-> On Wed, 24 Jan 2024 07:07:55 -0800 Jakub Kicinski wrote:
->> David, I applied your diff locally, hopefully I did it in time for the
->> 7am Pacific run to have it included :)
-> 
-> This is the latest run:
-> 
-> https://netdev-2.bots.linux.dev/vmksft-net-mp/results/435141/1-fcnal-test-sh/stdout
-> 
-> the nettest warning is indeed gone, but the failures are the same:
+Hi,
 
-yep, I will send a formal patch. I see the timeout is high enough, so
-good there.
+stefan@datenfreihafen.org wrote on Tue, 9 Jan 2024 08:25:21 +0100:
 
+> Hello.
+>=20
+> On 08.01.24 19:16, Breno Leitao wrote:
+> > W=3D1 builds now warn if module is built without a MODULE_DESCRIPTION().
+> > Add descriptions to ieee802154 modules.
+> >=20
+> > Signed-off-by: Breno Leitao <leitao@debian.org>
+> > ---
+> >   net/ieee802154/6lowpan/core.c | 1 +
+> >   net/ieee802154/socket.c       | 1 +
+> >   2 files changed, 2 insertions(+)
+> >=20
+> > diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/cor=
+e.c
+> > index 2c087b7f17c5..b88f6a96d961 100644
+> > --- a/net/ieee802154/6lowpan/core.c
+> > +++ b/net/ieee802154/6lowpan/core.c
+> > @@ -280,5 +280,6 @@ static void __exit lowpan_cleanup_module(void) =20
+> >   >   module_init(lowpan_init_module); =20
+> >   module_exit(lowpan_cleanup_module);
+> > +MODULE_DESCRIPTION("IPv6 over Low power Wireless Personal Area Network=
+ IEEE802154.4 core"); =20
+>=20
+> If we want to nitpick you could write it as IEEE 802.15.4.
 
-> 
-> $ grep FAIL stdout 
-> # TEST: ping local, VRF bind - VRF IP                                           [FAIL]
-> # TEST: ping local, device bind - ns-A IP                                       [FAIL]
-> # TEST: ping local, VRF bind - VRF IP                                           [FAIL]
-> # TEST: ping local, device bind - ns-A IP                                       [FAIL]
-> 
-> :(
+Also agreed, can you please post an update?
 
-known problems. I can disable the tests for now so we avoid regressions,
-and add to the TO-DO list for someone with time.
+Thanks,
+Miqu=C3=A8l
 
