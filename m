@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-65363-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65364-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB11C83A3F2
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:19:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AA2483A3F3
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:19:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE8EB1C2980C
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 08:19:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0DEA2B21D28
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 08:19:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38E50175BB;
-	Wed, 24 Jan 2024 08:19:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43B0C175A1;
+	Wed, 24 Jan 2024 08:19:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MOdHTSuQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j+FGgY8p"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 138F5175B9
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 08:19:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FACD17553
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 08:19:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706084352; cv=none; b=MUy12tOrBIpMGLC41Jov6bVPTsZlaOq+oYTsZhsQwS9H6fIn5Brzs/mhJiXGndb5qC4MB+BC/ViGmalmxJH73vxrZeOABwqRApvYGfxDnU9qp3vnXVodq5AwS/2gpsEdNu+SaLAqyWVAB+uxzORgKASRWQISLM7cIpKrNRztISY=
+	t=1706084354; cv=none; b=fueVjSO5QoF7Cg4tclGQFaEIpihj1UB+cLxrml2h8LQzxgd4IDE2CFOns2luNce6W5dAQNZTcdCvkLIoICjyXbRidVAOXLZChGEgzrvTfndQ7MXoTJQbPsFMwSYoPZCYdy6ulgnd2EtIzbJyBWPr3BIkxZkJlQ2pPTbW/EipVmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706084352; c=relaxed/simple;
-	bh=KVGt6yoP9/bQvdKIXef0+Gw0kf+OAR6Cmx1Rb4HnpgQ=;
+	s=arc-20240116; t=1706084354; c=relaxed/simple;
+	bh=E7KTKsbWWq+XBFUM++BPngc0d4VNozZpEzVUPMSKCKs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DGgvPIzXHsWWse6qCG7not5sLT2JzcHyPiG4IvEcvRR4AIn1ZuMzSsrh0iFyIaIvfOd7vXGodaxqGi1Rq2ZjOy5ACTtlLbXynxuBsAZwLM4ljgY1oMxWVYiTinsGx/4QtJDYEBqs4jdO5C9DLhmcENZ4pfMBYZf38+2NwevTsVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MOdHTSuQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8EF2C433F1;
-	Wed, 24 Jan 2024 08:19:11 +0000 (UTC)
+	 MIME-Version; b=VVN629byYoiRuYZbNKwnxABp1IZpS9ppsg8GuqYw8PS1XSBIgOnjhu4lH/wsq2k3FwnYhkVaSMTSv1ZFGCfS7TOXU5qPfS16cyTYvHeFNV7e4k5qNVEXqt2Qbw6o5dwHViyWdNbbj62JM52t5wixvExE7qktA01NfS+U74W3t4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j+FGgY8p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E1BAC433C7;
+	Wed, 24 Jan 2024 08:19:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706084351;
-	bh=KVGt6yoP9/bQvdKIXef0+Gw0kf+OAR6Cmx1Rb4HnpgQ=;
+	s=k20201202; t=1706084353;
+	bh=E7KTKsbWWq+XBFUM++BPngc0d4VNozZpEzVUPMSKCKs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MOdHTSuQXWFgyHRbmo3QT1yf2DYpYdV606ScRJEYx3tIcjHvhxdUhtHr5TOJzHYiM
-	 chRtAsVbgSeVW4neZD3XxCcU8+FnQVBoOiReZDAqfFbiezGZ9SflrTPbMgqglBlZtC
-	 lvL3NBlBICDd5oMLV7HNp4sRlFtJS8c/jyOQZ43njs3lTpxSUAlwn+nGFx8lLUuRPJ
-	 EuUAMz3xsMA53moGys5UPHNJI+yi1OdqsHJ4hRN1oUyhrLjQ3yCbcLfICZtFX/SfhG
-	 GhZCIILvRW5eB6u73JuD/wrQX+NWEol/3b9nLdNoYZIQkLpJMlGQYOIA4MvMv1sETC
-	 +95taC6vRli4Q==
+	b=j+FGgY8pmf6bw9+DKqnsVErCZB8bPQ8qajCVflbUEEFagaXmmo4V911HUr+mImLuK
+	 3s8OHJm51aQC8wwKcgKTUN2/4BYenYBXlEADGgEaXqWHOS29ikS2vU6M1hs1E57S22
+	 04V5ZLEBnXbpJVc2GGAij1ILKiYw92J4V633juIPL4hC9IVPKoRd5sw0yeEbvwYbPK
+	 RfGqrKnhdv5xFnboTG9Z4FYNpuhfNmUMHfCmg+OcEqSxNgcTSmOI/XInxeVQGw9si9
+	 B4lSacVGC5lsuiMvo9DRkpEVzwAXHR4N4vSrjw1UxpTY1jSvCwiUk1KZJReJEqdP1C
+	 BiByMrrRurGLA==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -49,11 +49,11 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Moshe Shemesh <moshe@nvidia.com>
-Subject: [net 06/14] net/mlx5: Fix a WARN upon a callback command failure
-Date: Wed, 24 Jan 2024 00:18:47 -0800
-Message-ID: <20240124081855.115410-7-saeed@kernel.org>
+	Moshe Shemesh <moshe@nvidia.com>,
+	Gal Pressman <gal@nvidia.com>
+Subject: [net 07/14] net/mlx5: Bridge, fix multicast packets sent to uplink
+Date: Wed, 24 Jan 2024 00:18:48 -0800
+Message-ID: <20240124081855.115410-8-saeed@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240124081855.115410-1-saeed@kernel.org>
 References: <20240124081855.115410-1-saeed@kernel.org>
@@ -65,144 +65,89 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Yishai Hadas <yishaih@nvidia.com>
+From: Moshe Shemesh <moshe@nvidia.com>
 
-The below WARN [1] is reported once a callback command failed.
+To enable multicast packets which are offloaded in bridge multicast
+offload mode to be sent also to uplink, FTE bit uplink_hairpin_en should
+be set. Add this bit to FTE for the bridge multicast offload rules.
 
-As a callback runs under an interrupt context, needs to use the IRQ
-save/restore variant.
-
-[1]
-DEBUG_LOCKS_WARN_ON(lockdep_hardirq_context())
-WARNING: CPU: 15 PID: 0 at kernel/locking/lockdep.c:4353
-              lockdep_hardirqs_on_prepare+0x11b/0x180
-Modules linked in: vhost_net vhost tap mlx5_vfio_pci
-vfio_pci vfio_pci_core vfio_iommu_type1 vfio mlx5_vdpa vringh
-vhost_iotlb vdpa nfnetlink_cttimeout openvswitch nsh ip6table_mangle
-ip6table_nat ip6table_filter ip6_tables iptable_mangle
-xt_conntrackxt_MASQUERADE nf_conntrack_netlink nfnetlink
-xt_addrtype iptable_nat nf_nat br_netfilter rpcsec_gss_krb5
-auth_rpcgss oid_registry overlay rpcrdma rdma_ucm ib_iser libiscsi
-scsi_transport_iscsi rdma_cm iw_cm ib_umad ib_ipoib ib_cm
-mlx5_ib ib_uverbs ib_core fuse mlx5_core
-CPU: 15 PID: 0 Comm: swapper/15 Tainted: G        W 6.7.0-rc4+ #1587
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS
-rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
-RIP: 0010:lockdep_hardirqs_on_prepare+0x11b/0x180
-Code: 00 5b c3 c3 e8 e6 0d 58 00 85 c0 74 d6 8b 15 f0 c3
-      76 01 85 d2 75 cc 48 c7 c6 04 a5 3b 82 48 c7 c7 f1
-      e9 39 82 e8 95 12 f9 ff <0f> 0b 5b c3 e8 bc 0d 58 00
-      85 c0 74 ac 8b 3d c6 c3 76 01 85 ff 75
-RSP: 0018:ffffc900003ecd18 EFLAGS: 00010086
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000027
-RDX: 0000000000000000 RSI: ffff88885fbdb880 RDI: ffff88885fbdb888
-RBP: 00000000ffffff87 R08: 0000000000000000 R09: 0000000000000001
-R10: 0000000000000000 R11: 284e4f5f4e524157 R12: 00000000002c9aa1
-R13: ffff88810aace980 R14: ffff88810aace9b8 R15: 0000000000000003
-FS:  0000000000000000(0000) GS:ffff88885fbc0000(0000)
-knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f731436f4c8 CR3: 000000010aae6001 CR4: 0000000000372eb0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <IRQ>
-? __warn+0x81/0x170
-? lockdep_hardirqs_on_prepare+0x11b/0x180
-? report_bug+0xf8/0x1c0
-? handle_bug+0x3f/0x70
-? exc_invalid_op+0x13/0x60
-? asm_exc_invalid_op+0x16/0x20
-? lockdep_hardirqs_on_prepare+0x11b/0x180
-? lockdep_hardirqs_on_prepare+0x11b/0x180
-trace_hardirqs_on+0x4a/0xa0
-raw_spin_unlock_irq+0x24/0x30
-cmd_status_err+0xc0/0x1a0 [mlx5_core]
-cmd_status_err+0x1a0/0x1a0 [mlx5_core]
-mlx5_cmd_exec_cb_handler+0x24/0x40 [mlx5_core]
-mlx5_cmd_comp_handler+0x129/0x4b0 [mlx5_core]
-cmd_comp_notifier+0x1a/0x20 [mlx5_core]
-notifier_call_chain+0x3e/0xe0
-atomic_notifier_call_chain+0x5f/0x130
-mlx5_eq_async_int+0xe7/0x200 [mlx5_core]
-notifier_call_chain+0x3e/0xe0
-atomic_notifier_call_chain+0x5f/0x130
-irq_int_handler+0x11/0x20 [mlx5_core]
-__handle_irq_event_percpu+0x99/0x220
-? tick_irq_enter+0x5d/0x80
-handle_irq_event_percpu+0xf/0x40
-handle_irq_event+0x3a/0x60
-handle_edge_irq+0xa2/0x1c0
-__common_interrupt+0x55/0x140
-common_interrupt+0x7d/0xa0
-</IRQ>
-<TASK>
-asm_common_interrupt+0x22/0x40
-RIP: 0010:default_idle+0x13/0x20
-Code: c0 08 00 00 00 4d 29 c8 4c 01 c7 4c 29 c2 e9 72 ff
-ff ff cc cc cc cc 8b 05 ea 08 25 01 85 c0 7e 07 0f 00 2d 7f b0 26 00 fb
-f4 <fa> c3 90 66 2e 0f 1f 84 00 00 00 00 00 65 48 8b 04 25 80 d0 02 00
-RSP: 0018:ffffc9000010fec8 EFLAGS: 00000242
-RAX: 0000000000000001 RBX: 000000000000000f RCX: 4000000000000000
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffffff811c410c
-RBP: ffffffff829478c0 R08: 0000000000000001 R09: 0000000000000001
-R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
-? do_idle+0x1ec/0x210
-default_idle_call+0x6c/0x90
-do_idle+0x1ec/0x210
-cpu_startup_entry+0x26/0x30
-start_secondary+0x11b/0x150
-secondary_startup_64_no_verify+0x165/0x16b
-</TASK>
-irq event stamp: 833284
-hardirqs last  enabled at (833283): [<ffffffff811c410c>]
-do_idle+0x1ec/0x210
-hardirqs last disabled at (833284): [<ffffffff81daf9ef>]
-common_interrupt+0xf/0xa0
-softirqs last  enabled at (833224): [<ffffffff81dc199f>]
-__do_softirq+0x2bf/0x40e
-softirqs last disabled at (833177): [<ffffffff81178ddf>]
-irq_exit_rcu+0x7f/0xa0
-
-Fixes: 34f46ae0d4b3 ("net/mlx5: Add command failures data to debugfs")
-Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
-Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
+Fixes: 18c2916cee12 ("net/mlx5: Bridge, snoop igmp/mld packets")
+Signed-off-by: Moshe Shemesh <moshe@nvidia.com>
+Reviewed-by: Gal Pressman <gal@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/cmd.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/esw/bridge_mcast.c | 3 +++
+ drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c           | 2 ++
+ include/linux/mlx5/fs.h                                    | 1 +
+ include/linux/mlx5/mlx5_ifc.h                              | 2 +-
+ 4 files changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-index a7b1f9686c09..4957412ff1f6 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-@@ -1923,6 +1923,7 @@ static void cmd_status_log(struct mlx5_core_dev *dev, u16 opcode, u8 status,
- {
- 	const char *namep = mlx5_command_str(opcode);
- 	struct mlx5_cmd_stats *stats;
-+	unsigned long flags;
- 
- 	if (!err || !(strcmp(namep, "unknown command opcode")))
- 		return;
-@@ -1930,7 +1931,7 @@ static void cmd_status_log(struct mlx5_core_dev *dev, u16 opcode, u8 status,
- 	stats = xa_load(&dev->cmd.stats, opcode);
- 	if (!stats)
- 		return;
--	spin_lock_irq(&stats->lock);
-+	spin_lock_irqsave(&stats->lock, flags);
- 	stats->failed++;
- 	if (err < 0)
- 		stats->last_failed_errno = -err;
-@@ -1939,7 +1940,7 @@ static void cmd_status_log(struct mlx5_core_dev *dev, u16 opcode, u8 status,
- 		stats->last_failed_mbox_status = status;
- 		stats->last_failed_syndrome = syndrome;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge_mcast.c b/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge_mcast.c
+index a7ed87e9d842..22dd30cf8033 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge_mcast.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge_mcast.c
+@@ -83,6 +83,7 @@ mlx5_esw_bridge_mdb_flow_create(u16 esw_owner_vhca_id, struct mlx5_esw_bridge_md
+ 		i++;
  	}
--	spin_unlock_irq(&stats->lock);
-+	spin_unlock_irqrestore(&stats->lock, flags);
- }
  
- /* preserve -EREMOTEIO for outbox.status != OK, otherwise return err as is */
++	rule_spec->flow_context.flags |= FLOW_CONTEXT_UPLINK_HAIRPIN_EN;
+ 	rule_spec->match_criteria_enable = MLX5_MATCH_OUTER_HEADERS;
+ 	dmac_v = MLX5_ADDR_OF(fte_match_param, rule_spec->match_value, outer_headers.dmac_47_16);
+ 	ether_addr_copy(dmac_v, entry->key.addr);
+@@ -587,6 +588,7 @@ mlx5_esw_bridge_mcast_vlan_flow_create(u16 vlan_proto, struct mlx5_esw_bridge_po
+ 	if (!rule_spec)
+ 		return ERR_PTR(-ENOMEM);
+ 
++	rule_spec->flow_context.flags |= FLOW_CONTEXT_UPLINK_HAIRPIN_EN;
+ 	rule_spec->match_criteria_enable = MLX5_MATCH_OUTER_HEADERS;
+ 
+ 	flow_act.action |= MLX5_FLOW_CONTEXT_ACTION_PACKET_REFORMAT;
+@@ -662,6 +664,7 @@ mlx5_esw_bridge_mcast_fwd_flow_create(struct mlx5_esw_bridge_port *port)
+ 		dest.vport.flags = MLX5_FLOW_DEST_VPORT_VHCA_ID;
+ 		dest.vport.vhca_id = port->esw_owner_vhca_id;
+ 	}
++	rule_spec->flow_context.flags |= FLOW_CONTEXT_UPLINK_HAIRPIN_EN;
+ 	handle = mlx5_add_flow_rules(port->mcast.ft, rule_spec, &flow_act, &dest, 1);
+ 
+ 	kvfree(rule_spec);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c
+index 1616a6144f7b..9b8599c200e2 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c
+@@ -566,6 +566,8 @@ static int mlx5_cmd_set_fte(struct mlx5_core_dev *dev,
+ 		 fte->flow_context.flow_tag);
+ 	MLX5_SET(flow_context, in_flow_context, flow_source,
+ 		 fte->flow_context.flow_source);
++	MLX5_SET(flow_context, in_flow_context, uplink_hairpin_en,
++		 !!(fte->flow_context.flags & FLOW_CONTEXT_UPLINK_HAIRPIN_EN));
+ 
+ 	MLX5_SET(flow_context, in_flow_context, extended_destination,
+ 		 extended_dest);
+diff --git a/include/linux/mlx5/fs.h b/include/linux/mlx5/fs.h
+index 6f7725238abc..3fb428ce7d1c 100644
+--- a/include/linux/mlx5/fs.h
++++ b/include/linux/mlx5/fs.h
+@@ -132,6 +132,7 @@ struct mlx5_flow_handle;
+ 
+ enum {
+ 	FLOW_CONTEXT_HAS_TAG = BIT(0),
++	FLOW_CONTEXT_UPLINK_HAIRPIN_EN = BIT(1),
+ };
+ 
+ struct mlx5_flow_context {
+diff --git a/include/linux/mlx5/mlx5_ifc.h b/include/linux/mlx5/mlx5_ifc.h
+index 37230253f9f1..c726f90ab752 100644
+--- a/include/linux/mlx5/mlx5_ifc.h
++++ b/include/linux/mlx5/mlx5_ifc.h
+@@ -3576,7 +3576,7 @@ struct mlx5_ifc_flow_context_bits {
+ 	u8         action[0x10];
+ 
+ 	u8         extended_destination[0x1];
+-	u8         reserved_at_81[0x1];
++	u8         uplink_hairpin_en[0x1];
+ 	u8         flow_source[0x2];
+ 	u8         encrypt_decrypt_type[0x4];
+ 	u8         destination_list_size[0x18];
 -- 
 2.43.0
 
