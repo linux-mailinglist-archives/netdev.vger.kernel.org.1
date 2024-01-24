@@ -1,162 +1,144 @@
-Return-Path: <netdev+bounces-65387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC8FB83A4C2
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:59:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 991EB83A4F0
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:11:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F05D51C22385
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 08:59:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46AC91F23387
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:11:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB89B17BA4;
-	Wed, 24 Jan 2024 08:58:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4885417BBA;
+	Wed, 24 Jan 2024 09:11:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tf0TZZ4j"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j2pBuAw3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40C6D17BA1;
-	Wed, 24 Jan 2024 08:58:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93C9117BB5
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 09:11:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706086710; cv=none; b=Snlb6mvcuq5ki7UUUxxAzgYHmX938TOtCPGGtI7o4uCzUOZ4jr8zqK2QIu99MmLx2ke9XBZZtXH2SVhalslx0PF0YjGMo64vpbg4a1WeA04lykjlU7sSxM6d6962+BPTzb4I/1uAhmRm2eakTdv3Hxuqz2e/KKWIADix5yuMn+Q=
+	t=1706087479; cv=none; b=bhhOanLXj2Grlo8uxsaVWUjiRh910RYA+Df5/dspFyoJeIkGI7bGx7IW9il224dMDjO93sFYIY5eZzXxsoSHjK6wt3mFrpYurABzn+mRHstxehIFs/a7alQfxzH/RRvl99Mh5I0MCF5zxM91lUa4LXHc5d5ejl7FqteJyEEE8+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706086710; c=relaxed/simple;
-	bh=KfasA/UQDAtO30ddzex6IqLBpIDW2MblYV85KrwCaFE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aI3nN1mmU3dQZw737lzuioi+zaIp4BBm8ZPl3CXgUIvd5ClFVAQdfkOBI7cMrWbNXe5GUcqIVGEWuhREH/nk1qzxH0AQB2oxkM1yqm4Alsw2lSncot/7UVCVMz1A74gSuLWr5N3NZfhSN+rPQbe3OwOQfEzOHYwnzsi6WTvd80s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tf0TZZ4j; arc=none smtp.client-ip=209.85.128.172
+	s=arc-20240116; t=1706087479; c=relaxed/simple;
+	bh=9VGADBg2rk9fBxxcm/OMGHk9Zz+UDqkgETRFSqOnxzM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Um+RHhFxeRSLkskhMhtl/VJ7fXFKtaZhQbFiCL4vlgul9aKF7VzqpmiWVxfa4yQPYRiEG+GzKPceceTV0VDzSS3tFV9OuAx5m09b8V0pKmwwugMc/4USwYNLY5kxhuLlnVoCNxMldlq4m6ol7EVJZQo7151piZl+7YfjGqX+9+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j2pBuAw3; arc=none smtp.client-ip=209.85.221.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-5ff9061b7a9so7044447b3.1;
-        Wed, 24 Jan 2024 00:58:29 -0800 (PST)
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-33922d2cb92so4629436f8f.1
+        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 01:11:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706086708; x=1706691508; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=M3nNckpzsRUm2Ct1UNE2+wpLpDPhph7rMcIeyvI2hLs=;
-        b=Tf0TZZ4jJovYukedLp3KKtY0Slf8EABx13R09yBiIctgcdEkyxLLs50UZLyDGLqS38
-         HusOoejuyn3VtNDNrvp1AfyDLqn6oqbWSlN3QXoZiKQCkzGOPnP0xjz2t2W1t5bfFGCu
-         lWuTdRfz9L//JhDHv8B1khrBrGahzL9LE04Hj/hRUKtbiok/H5t0JTedOTWpGoHy1Qx+
-         gOa5kHtC2NRrZ7fa98YW5g5gj1VJPoVdbHLvybKlwh6tLEqBvKJ/8H+/eAprRuw48uQw
-         Zto0dPDbFWtEA1BX5ZmvBLN2MuO4IkGpOmiZYDleyWp/adFMHppXHtlVw4cNHBcd95Z9
-         Ysbg==
+        d=gmail.com; s=20230601; t=1706087476; x=1706692276; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xExOFXYHp9oFZy3D2ue/Dkdid2DJ1Tpm/C/gQxBNuaA=;
+        b=j2pBuAw3frZ/OxTvrYPG24V04OYgH4tDUKwPPRJHHF2NeGUFRYWCNN0jxhR5z22CjD
+         FbtgdNgYTPz4Q6SAWJlRCMMJriYELQVI/iXiP/v2Y3cL1QM0/Kol5xgkrnWFN4EKR0QY
+         +0ONFQmbF+JKSAzYoFhOIw+8joRJQbFqcJv8NoUCQOIdrTo6HHFDuqLTY6CISpnX+DKx
+         dAwtgHpeuee/TUrYhCXRVLBn1nR3c6woxDKDNtFX7nx1+jCYtj0DyBZkqHzZQoAgxyr3
+         aCIl3PNSi0ZcQdSIPL+e99t3+r0uoxpknxmHbrz7uJpIf08LUL/OI6gUK84vMZJKHal6
+         CbeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706086708; x=1706691508;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=M3nNckpzsRUm2Ct1UNE2+wpLpDPhph7rMcIeyvI2hLs=;
-        b=rjK4u1AgA9gAn8TiP7ktLaR2jSfYZFzgcdrMbs0iX8YAJOEDpXvRdNvAw91ivAMRAY
-         hCcO3Pt292LTvjge4rpgUDXy/cLScErVKRVhJOEAu/56X1OoljJShz/4FFbpkd+ks72f
-         SwxhDFCFem/h66cLOBPKUCC8T10A60qxiMZFEd8Wl53Ti5Xw77c6pP85to9oceSHdpKw
-         bnd1KCMo5W7b6x8HNDyIzk0zBxp63mPPUy4QDahMB6hftW12Mv8rMTpEGinLefkimvzK
-         iKhEmwtAJINk9UoztXfZtWjL0CLtfg1NdTTU226yHV7ft0/oZ6Kd6h/O0E+Pll0/lpBo
-         Malg==
-X-Gm-Message-State: AOJu0YwaXyU5TujiCUV43dq0YjA51sBN66wPjuRXf418UOkFkUsYOynU
-	XJ324trdClmlw8fsdQa+xZ4CesJ0jHFCQogvfd3dKXioXIZMq9IAo1EFhWvZ81maDDTm0cf7pP/
-	wRaHpFZdqsfCmhfbCMbxguuaZOTk=
-X-Google-Smtp-Source: AGHT+IEb2L/SOhSk4DZOournNE7K4hdsdAP0YaXcXPZboyLwwuGWyFqweNGKuPpoZAQYQk1/TN/EzGGKWt0/zBRLyZw=
-X-Received: by 2002:a25:eb11:0:b0:dbd:9912:e852 with SMTP id
- d17-20020a25eb11000000b00dbd9912e852mr1392239ybs.2.1706086708230; Wed, 24 Jan
- 2024 00:58:28 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706087476; x=1706692276;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xExOFXYHp9oFZy3D2ue/Dkdid2DJ1Tpm/C/gQxBNuaA=;
+        b=rrOKTcYQu/FS2bXAz49J7bQyVgWgIoAiRJwLnimNh5fUABgvJ1pzVfAQXE4Amf9L2B
+         1GbWbacn9ThcEa6Yrsoc12pGlZtZCeuxoH6raMs+D/pEFouNZ7htkZobUqTjxxOXrvGs
+         bF6fFpZcBvIJfR0S6ZXWmMpgRHWT+TT3fu6Q2wErXgr+ldyg//3XlmiaqZD5JpYc22aI
+         +HQoen5VezEm+RDtDN1FbkGM2TXlrdAVe964qYiCZdTVk6sJkr84gU+XTr1ZE6DNmF9w
+         j/wuKrVg+qbreTkkTD8OTXuo/w4pZH49GSA5cXb9g06rjLSOTnJ28KjXRqf6pcVSpMK4
+         8A8A==
+X-Gm-Message-State: AOJu0YxlRbzXvmEKzXMGEVsDMr7odtNcHjSCa0ZSXt54N6PPnELapNUc
+	5t14F2v0VGB0nesGZ5fNcx0MINOM7PjR/CU5DOvbG48nhgz6fjZ7
+X-Google-Smtp-Source: AGHT+IGSNI4SICpkIYJzMmJu7XnrOmm9ruA+XmlTgnfIxDlf/vB7/jCshKwpZWwkRaJIAFcYXGgBgg==
+X-Received: by 2002:adf:ef12:0:b0:337:bb11:53d7 with SMTP id e18-20020adfef12000000b00337bb1153d7mr181560wro.39.1706087475594;
+        Wed, 24 Jan 2024 01:11:15 -0800 (PST)
+Received: from ?IPV6:2001:b07:646f:4a4d:e17a:bd08:d035:d8c2? ([2001:b07:646f:4a4d:e17a:bd08:d035:d8c2])
+        by smtp.gmail.com with ESMTPSA id e11-20020a5d594b000000b003392bbeeed3sm9848836wri.47.2024.01.24.01.11.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 Jan 2024 01:11:15 -0800 (PST)
+Message-ID: <17795933-a5ca-44c6-be4c-58ed2e573aff@gmail.com>
+Date: Wed, 24 Jan 2024 10:12:02 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240122221610.556746-1-maciej.fijalkowski@intel.com>
-In-Reply-To: <20240122221610.556746-1-maciej.fijalkowski@intel.com>
-From: Magnus Karlsson <magnus.karlsson@gmail.com>
-Date: Wed, 24 Jan 2024 09:58:17 +0100
-Message-ID: <CAJ8uoz04Z72cVnhrQF+z96GTjG_xxYSMA+Lm2F1d5ABHvSuk6Q@mail.gmail.com>
-Subject: Re: [PATCH v5 bpf 00/11] net: bpf_xdp_adjust_tail() and Intel mbuf fixes
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
-	andrii@kernel.org, netdev@vger.kernel.org, magnus.karlsson@intel.com, 
-	bjorn@kernel.org, echaudro@redhat.com, lorenzo@kernel.org, 
-	martin.lau@linux.dev, tirthendu.sarkar@intel.com, john.fastabend@gmail.com, 
-	horms@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 3/3] tools: ynl: add encoding support for
+ 'sub-message' to ynl
+Content-Language: en-US
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, sdf@google.com, chuck.lever@oracle.com,
+ lorenzo@kernel.org, jacob.e.keller@intel.com, jiri@resnulli.us,
+ netdev@vger.kernel.org
+References: <cover.1705950652.git.alessandromarcolini99@gmail.com>
+ <0eedc19860e9b84f105c57d17219b3d0af3100d2.1705950652.git.alessandromarcolini99@gmail.com>
+ <m2v87kxam1.fsf@gmail.com>
+From: Alessandro Marcolini <alessandromarcolini99@gmail.com>
+In-Reply-To: <m2v87kxam1.fsf@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, 22 Jan 2024 at 23:16, Maciej Fijalkowski
-<maciej.fijalkowski@intel.com> wrote:
+On 1/23/24 17:44, Donald Hunter wrote:
+> Alessandro Marcolini <alessandromarcolini99@gmail.com> writes:
 >
-> Hey,
+>> Add encoding support for 'sub-message' attribute and for resolving
+>> sub-message selectors at different nesting level from the key
+>> attribute.
+> I think the relevant patches in my series are:
 >
-> after a break followed by dealing with sickness, here is a v5 that makes
-> bpf_xdp_adjust_tail() actually usable for ZC drivers that support XDP
-> multi-buffer. Since v4 I tried also using bpf_xdp_adjust_tail() with
-> positive offset which exposed yet another issues, which can be observed
-> by increased commit count when compared to v3.
+> https://lore.kernel.org/netdev/20240123160538.172-3-donald.hunter@gmail.com/T/#u
+> https://lore.kernel.org/netdev/20240123160538.172-5-donald.hunter@gmail.com/T/#u
+I really like your idea of using ChainMap, I think it's better than mine and more concise.
+>> Also, add encoding support for multi-attr attributes.
+> This would be better as a separate patch since it is unrelated to the
+> other changes.
+You mean as a separate patch in this patchset or as an entirely new patch?
+>> Signed-off-by: Alessandro Marcolini <alessandromarcolini99@gmail.com>
+>> ---
+>>  tools/net/ynl/lib/ynl.py | 54 +++++++++++++++++++++++++++++++++++-----
+>>  1 file changed, 48 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
+>> index 1e10512b2117..f8c56944f7e7 100644
+>> --- a/tools/net/ynl/lib/ynl.py
+>> +++ b/tools/net/ynl/lib/ynl.py
+>> @@ -449,7 +449,7 @@ class YnlFamily(SpecFamily):
+>>          self.sock.setsockopt(Netlink.SOL_NETLINK, Netlink.NETLINK_ADD_MEMBERSHIP,
+>>                               mcast_id)
+>>  
+>> -    def _add_attr(self, space, name, value):
+>> +    def _add_attr(self, space, name, value, vals):
+>>          try:
+>>              attr = self.attr_sets[space][name]
+>>          except KeyError:
+>> @@ -458,8 +458,13 @@ class YnlFamily(SpecFamily):
+>>          if attr["type"] == 'nest':
+>>              nl_type |= Netlink.NLA_F_NESTED
+>>              attr_payload = b''
+>> -            for subname, subvalue in value.items():
+>> -                attr_payload += self._add_attr(attr['nested-attributes'], subname, subvalue)
+>> +            # Check if it's a list of values (i.e. it contains multi-attr elements)
+>> +            for subname, subvalue in (
+>> +                ((k, v) for item in value for k, v in item.items())
+>> +                if isinstance(value, list)
+>> +                else value.items()
+>> +            ):
+>> +                attr_payload += self._add_attr(attr['nested-attributes'], subname, subvalue, vals)
+> Should really check whether multi-attr is true in the spec before
+> processing the json input as a list of values.
+Yes, you're right. Maybe I could resend this on top of your changes, what do you think?
 
-Thanks for this fix of getting bpf_xdp_djust_tail to work with AF_XDP
-in multi-buffer mode. We clearly need to add a test case for this
-helper in our test suite. I have put it on the todo list.
-
-> John, in the end I think we should remove handling
-> MEM_TYPE_XSK_BUFF_POOL from __xdp_return(), but it is out of the scope
-> for fixes set, IMHO.
->
-> Thanks,
-> Maciej
->
-> v5:
-> - pick correct version of patch 5 [Simon]
-> - elaborate a bit more on what patch 2 fixes
->
-> v4:
-> - do not clear frags flag when deleting tail; xsk_buff_pool now does
->   that
-> - skip some NULL tests for xsk_buff_get_tail [Martin, John]
-> - address problems around registering xdp_rxq_info
-> - fix bpf_xdp_frags_increase_tail() for ZC mbuf
->
-> v3:
-> - add acks
-> - s/xsk_buff_tail_del/xsk_buff_del_tail
-> - address i40e as well (thanks Tirthendu)
->
-> v2:
-> - fix !CONFIG_XDP_SOCKETS builds
-> - add reviewed-by tag to patch 3
->
->
-> Maciej Fijalkowski (10):
->   xsk: recycle buffer in case Rx queue was full
->   xsk: make xsk_buff_pool responsible for clearing xdp_buff::flags
->   xsk: fix usage of multi-buffer BPF helpers for ZC XDP
->   ice: work on pre-XDP prog frag count
->   ice: remove redundant xdp_rxq_info registration
->   intel: xsk: initialize skb_frag_t::bv_offset in ZC drivers
->   ice: update xdp_rxq_info::frag_size for ZC enabled Rx queue
->   xdp: reflect tail increase for MEM_TYPE_XSK_BUFF_POOL
->   i40e: set xdp_rxq_info::frag_size
->   i40e: update xdp_rxq_info::frag_size for ZC enabled Rx queue
->
-> Tirthendu Sarkar (1):
->   i40e: handle multi-buffer packets that are shrunk by xdp prog
->
->  drivers/net/ethernet/intel/i40e/i40e_main.c   | 47 ++++++++++++------
->  drivers/net/ethernet/intel/i40e/i40e_txrx.c   | 49 +++++++++----------
->  drivers/net/ethernet/intel/i40e/i40e_xsk.c    |  4 +-
->  drivers/net/ethernet/intel/ice/ice_base.c     |  7 ++-
->  drivers/net/ethernet/intel/ice/ice_txrx.c     | 19 ++++---
->  drivers/net/ethernet/intel/ice/ice_txrx.h     |  1 +
->  drivers/net/ethernet/intel/ice/ice_txrx_lib.h | 31 ++++++++----
->  drivers/net/ethernet/intel/ice/ice_xsk.c      |  4 +-
->  include/net/xdp_sock_drv.h                    | 26 ++++++++++
->  net/core/filter.c                             | 43 ++++++++++++----
->  net/xdp/xsk.c                                 | 12 +++--
->  net/xdp/xsk_buff_pool.c                       |  3 ++
->  12 files changed, 167 insertions(+), 79 deletions(-)
->
-> --
-> 2.34.1
->
->
 
