@@ -1,164 +1,130 @@
-Return-Path: <netdev+bounces-65466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8357683AAF7
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 14:34:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53FB083AB29
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 14:50:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5BDC2B299C2
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 13:31:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0947928FB22
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 13:50:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BABA177F10;
-	Wed, 24 Jan 2024 13:31:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7EF877F33;
+	Wed, 24 Jan 2024 13:50:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q+R78qre"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="BEXRqT/F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE1C977F0D;
-	Wed, 24 Jan 2024 13:31:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F304A77F25;
+	Wed, 24 Jan 2024 13:50:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706103098; cv=none; b=hgAbmOhUHGJJKC5m+DNnR/tjCjKTSw8KPYDaSxzRawWaunsEmSFcMPUtM7PnVy7M4Ksht4nmxeFZzdkVTaePn+FKw/f14mhLgQf3nLsFBMnS4jb3+WdegmDBfSGKmLNj+iIxkQRNanf1oDwyPBVnXrP3zqtVvnUMlUFTRHh+pko=
+	t=1706104246; cv=none; b=nhplZCg98m236u1rrwf5jmpolw1FVXR1nlprf1XSKIhdl6fii2iAErXFpqUXareAv/y59VnEYGe7oyXJxiGutKI19j/50j4b6BrzAPrZtoy4EGqRYUe2rGNg4c8M5V27AVQDT9/t47KSt3V5EXBxKmKds4bSwU0idd1Zi33+KQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706103098; c=relaxed/simple;
-	bh=vTeFrkOg9VeXj0cMMVSOTlbnmK4O1Tdyk176shwolH0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PcBlkO40l9faC4axd3ER3HpeaV1AKCqjEbrF876OIhMd5sr+FvEy/xbw/eeCLYF3HbLu+CeyekMzZmPIH6e6bZtfenXpQjoT1s1TMjVOtoMmMHgrHaegi4MSxxsgxyFi3ndO4O7fqrPrkoFECDmjqGK2jiJgf2pJz5bfwaASAP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q+R78qre; arc=none smtp.client-ip=209.85.208.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2cf108f6a2dso21443861fa.3;
-        Wed, 24 Jan 2024 05:31:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706103095; x=1706707895; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yh0FSpthPEg0z6Y9MyFNxP4OPN7yLXd22973nZlpFgs=;
-        b=Q+R78qrezgwnW1kOUcm2wn7EiSCIWzueEdRGt945JDCNif07NgXY0nHXDYtN1y6LDi
-         FjE5/tzIL0ssxcZAGfgqLsUfXGrmiaO/hEJ952oB8tLFDhz8BYDiHL0W8N6ZOYBjKBdO
-         pJUN3u5qZyqtQ2mA5s8xknvzsh22Bx1UzJ89oQO9rq8sMk9PVNDy3f3KUssDlDoWyyJq
-         CqTTwpqrkrnm6aEDOjCLiw3/7UNnUNg8s6eKbguuqp7GDCmxfhKaVsdKt4AoNGth6XmM
-         1+1HtpdCoPbtVQ6fFlIzrooCPnDCIIokoZ9URrKonYsEEisieb9lFQDxfvwEyBlfd+RH
-         19Ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706103095; x=1706707895;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yh0FSpthPEg0z6Y9MyFNxP4OPN7yLXd22973nZlpFgs=;
-        b=DfwGQqqeJJ4IdnBXXWGalx5zd9vLXLde5UNVkVVNYNdf410J7EP/E1cy3ianFi8gdf
-         SQ6qfB5BW26f3PYQMBJgLmqH5kbJqe19EKH3bNrTcVzIn/O8FpYU00nSr9x9gTJ1NUGd
-         Yc7ndnNqOZa4civSXAxPJ0JBOlHFNMG7xYpp6pWcbwQwnvZvEajEgnIwgYUg419KFlg6
-         r/Hqq0mnO3Y1uU74sCv2KMSTImrrvSVYvDRoN0dMu+98jUFY/gcueSsK9vm3T7oySERq
-         7cTdUoWSjPnB5W5FvhhQJhkMM4thV1bs9bEp8n+zeUzFED+OSWt2KKRBLUZ3RtxBLAWc
-         X09w==
-X-Gm-Message-State: AOJu0Yy4iRut40HflRnp7rrZBxcFfhv6iWLV+zKwQ3+T18R5M4llNj/c
-	qiEPfcX9jI/7ZF+Ca/IfmTVLR4IflAsbaGN80v0PjNDgWMZLuDks
-X-Google-Smtp-Source: AGHT+IEQ/+uLqbt+Yrb1ZZ6gaA4VtLtXFNiOrQMfZBodzHf8/XDgyTVyYYUU7vCAj5wx35icDs5adg==
-X-Received: by 2002:a2e:8691:0:b0:2cc:7157:4e7f with SMTP id l17-20020a2e8691000000b002cc71574e7fmr726122lji.57.1706103094620;
-        Wed, 24 Jan 2024 05:31:34 -0800 (PST)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id k4-20020a2ea284000000b002cca7ee7375sm2555389lja.136.2024.01.24.05.31.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jan 2024 05:31:33 -0800 (PST)
-Date: Wed, 24 Jan 2024 16:31:31 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Bernd Edlinger <bernd.edlinger@hotmail.de>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	Jiri Pirko <jiri@nvidia.com>, Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH net v3] net: stmmac: Wait a bit for the reset to take
- effect
-Message-ID: <ddwtgxbtzy6vtc2bn5gvuskpco7mhmsmakt4gqk6ksppkmmtp2@w7eti3prlpke>
-References: <AS8P193MB1285DECD77863E02EF45828BE4A1A@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
- <AS8P193MB1285EEAFE30C0DE7B201D33CE46C2@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
- <AS8P193MB1285A810BD78C111E7F6AA34E4752@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
+	s=arc-20240116; t=1706104246; c=relaxed/simple;
+	bh=qv1XCCmrpEelMNYD86CEC9P5gBGzAUCiISJyBzk4RZ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Gs/yf+mIX264q6gN7uFM8OJaX5SGvn+xXXzbCwOs6ExmQOXlFZKfFBVfN/Wzykt97nfJlnOgkD5lk0qTPIRiJNuY5a161wqF67U6D1tTNYXyTqVAI30uYzGTwje5JEllUUPKvmlpNVuS5On0hRezeTNfFroJqXh6Etca9UkBId0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=BEXRqT/F; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 4F0F91C0003;
+	Wed, 24 Jan 2024 13:50:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1706104236;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Aj6ZQfg/DQIXs3PgkhqXH6sZRgoGEcYx3M5juw4r4UA=;
+	b=BEXRqT/FMI6b2tciHLBA1R9XyZWtEnOWl2cS45kZukK1HrYvVzy2FJ/dx8HjzXtGXyviVm
+	mdMuItxi5TjLPLloMGqUV4Kif3QcnfsTbt/mXf+uvMoJ8lWW2y6s0HYUKAX9ixB7oRgxiS
+	KAJ9cCI+cHZi+myA2AdFsgB8ldZZVQR+gPKhrLqFBn8iXV2gt9gNdLQ97u+Kc180/FexiN
+	FSq95iZ9m+CGZ8PFOhpIVe5SRtIQ0IhlhserDqm+TnAGcLvvBiPJonqOro4TuROqyVWT5U
+	XVBtHDxzbWKQkX4PdGRtMu6EqTXAQ62sNc7r5EKqZPRz25NyPaXzE1TVf5utHQ==
+Date: Wed, 24 Jan 2024 14:50:33 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
+ linux-arm-kernel@lists.infradead.org, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Jesse Brandeburg
+ <jesse.brandeburg@intel.com>, Jonathan Corbet <corbet@lwn.net>, Marek
+ =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Piergiorgio Beruto
+ <piergiorgio.beruto@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?B?Tmljb2zDsg==?= Veronese <nicveronese@gmail.com>, Simon Horman
+ <horms@kernel.org>
+Subject: Re: [PATCH net-next v5 07/13] net: ethtool: Introduce a command to
+ list PHYs on an interface
+Message-ID: <20240124145033.1c711fd1@device-28.home>
+In-Reply-To: <2c955f94-7c95-4f66-b739-f0967ec9c171@lunn.ch>
+References: <20231221180047.1924733-1-maxime.chevallier@bootlin.com>
+	<20231221180047.1924733-8-maxime.chevallier@bootlin.com>
+	<20240104153401.08ff9809@kernel.org>
+	<20240105104311.03a35622@device-28.home>
+	<2c955f94-7c95-4f66-b739-f0967ec9c171@lunn.ch>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.39; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AS8P193MB1285A810BD78C111E7F6AA34E4752@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Mon, Jan 22, 2024 at 07:19:09PM +0100, Bernd Edlinger wrote:
-> otherwise the synopsys_id value may be read out wrong,
-> because the GMAC_VERSION register might still be in reset
-> state, for at least 1 us after the reset is de-asserted.
-> 
-> Add a wait for 10 us before continuing to be on the safe side.
-> 
-> > From what have you got that delay value?
-> 
-> Just try and error, with very old linux versions and old gcc versions
-> the synopsys_id was read out correctly most of the time (but not always),
-> with recent linux versions and recnet gcc versions it was read out
-> wrongly most of the time, but again not always.
-> I don't have access to the VHDL code in question, so I cannot
-> tell why it takes so long to get the correct values, I also do not
-> have more than a few hardware samples, so I cannot tell how long
-> this timeout must be in worst case.
-> Experimentally I can tell that the register is read several times
-> as zero immediately after the reset is de-asserted, also adding several
-> no-ops is not enough, adding a printk is enough, also udelay(1) seems to
-> be enough but I tried that not very often, and I have not access to many
-> hardware samples to be 100% sure about the necessary delay.
-> And since the udelay here is only executed once per device instance,
-> it seems acceptable to delay the boot for 10 us.
-> 
-> BTW: my hardware's synopsys id is 0x37.
-> 
-> Fixes: c5e4ddbdfa11 ("net: stmmac: Add support for optional reset control")
-> Signed-off-by: Bernd Edlinger <bernd.edlinger@hotmail.de>
-> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+Hello Andrew,
 
-Thanks for taking all the notes into account. No objections from my
-side:
+On Fri, 5 Jan 2024 14:17:10 +0100
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
+> > > > +int ethnl_phy_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+> > > > +{
+> > > > +	struct ethnl_phy_dump_ctx *ctx = (void *)cb->ctx;
+> > > > +	struct net *net = sock_net(skb->sk);
+> > > > +	unsigned long ifindex = 1;    
+> > > 
+> > > This doesn't look right, if dump gets full you gotta pick up
+> > > when previous call left off.  
+> > 
+> > I wasn't aware that this was the expected DUMP behaviour. So I should
+> > keep track of the last dev and last phy_index dumped in the dump_ctx I
+> > guess ? I'm not sure how I'm going to test this though, I only have
+> > devices with at most 2 PHYs :(  
+> 
+> At a guess....
+> 
+> You are supposed to dump until you are out of space in the buffer. You
+> then return what you have, and expect another call so you can continue
+> with the rest.
+> 
+> Rather than fill the buffer, just hack the code to only put in a
+> single PHY, and then return with the same condition of a full
+> buffer. Hopefully you should get a second call, and you can then test
+> your logic for picking up from where you left off.
+> 
+> Another option might be to add PHY support to netdevsim. Add a debugfs
+> interface to allow you to create arbitrary PHY topologies? You can
+> then even add a test script.
 
--Serge(y)
+Sorry for the delayed answer, I just took a few hours to give it a try,
+and I was able to spin some very basic PHY support for the netdevsim,
+allowing to attach arbitrary instances of fixed_phy devices. I can
+therefore use that as a mean of testing the dump operation, I'll try to
+include that in the next iteration, that should pave the way for some
+testability of more PHY stuff hopefully.
 
-> ---
->  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> v2: rebased to v6.7, retested and updated the commit message
-> as suggested Serge Semins review comment:
-> https://lore.kernel.org/lkml/b4mpa62b2juln47374x6xxnbozb7fcfgztrc5ounk4tvscs3wg@mixnvsoqno7j/
-> and retained Jiri Pirkos Reviwed-by from:
-> https://lore.kernel.org/lkml/ZT+Zq4j9iQj1+Xai@nanopsycho/
-> 
-> v3: addressed review comments.
-> 
-> 
-> Thanks
-> Bernd.
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index a0e46369ae15..b334eb16da23 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -7542,6 +7542,9 @@ int stmmac_dvr_probe(struct device *device,
->  		dev_err(priv->device, "unable to bring out of ahb reset: %pe\n",
->  			ERR_PTR(ret));
->  
-> +	/* Wait a bit for the reset to take effect */
-> +	udelay(10);
-> +
->  	/* Init MAC and get the capabilities */
->  	ret = stmmac_hw_init(priv);
->  	if (ret)
-> -- 
-> 2.39.2
+Thanks for the suggestion,
+
+Maxime
 
