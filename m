@@ -1,85 +1,122 @@
-Return-Path: <netdev+bounces-65654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 532AF83B431
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 22:42:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E699E83B440
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 22:48:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86FE31C24178
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 21:42:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25F131C21508
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 21:48:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AF04135A6D;
-	Wed, 24 Jan 2024 21:41:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87943134737;
+	Wed, 24 Jan 2024 21:48:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ThSkNuM3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AjmQwLl/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 362B9135A66
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 21:41:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F9201353F6;
+	Wed, 24 Jan 2024 21:48:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706132495; cv=none; b=NsOOgvq0Alml7D2KaFFKpCQxKfntVRHp93F1TUCSbOpwo3SRREE2JghuX7bYkoJzWUoGJ+LeLcgHCR44kupZDPLYMJz9Zn/sbGYeHmCykp7Fv8GrmJFo4YySLlLymAZwWrT4G8PcVApyxK4QZ7bOy5wjy5Jx5VSwJOzNlbQMTwg=
+	t=1706132884; cv=none; b=ZCj2b0As3mMYvf9DRLRfv7QdMC+GVRg+6wkK9hufaLNwyIo5Gs6JF9h+rac52HRdaPcAmlR+KckMOWZN4tpoV9/xyzjvdO+VHTGKqUvHkVN0tbV2kKvvimJWOi67kXRTVpkuHJzoK9I00B0ooh8ddLRYF0h44jf7kHFX/O9ykMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706132495; c=relaxed/simple;
-	bh=L6wBSyjWpEkApiKdAKEQJMcpF9u2gtdAWdUQxFKV1i0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=hzYq+TYVNgBbLovcGlQxtmJ6+wFw+daxHLh1C9o8q+Uq8GgY2t5PpUDrBWH5mvZM1NfaSqxVuFKMi8HhFnlJ9Sm16FbJtvHMTaD+pMXzP9FTuiL4tasnkeVt3R4atxPN2wTg2X590YkzDyR4obfSR07Qu4Y9kfWq75g2YgiVPMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ThSkNuM3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AB52C433C7;
-	Wed, 24 Jan 2024 21:41:34 +0000 (UTC)
+	s=arc-20240116; t=1706132884; c=relaxed/simple;
+	bh=RGtonvax3uapi4rH4NaONNxIfvhQULoG+v5mKWQIIiE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Y4LSZ5nue2TczcudS7m0uKvChTjP/YVGjX8hutDV/KsfPCCmV+j06T1NSQu64woJhCA00gtZj4y84VkCutXVLzsMMyl5IdpbvPJooGBAcwqwxX19BObs8QMvZh+97/aXsxCf/d5P8XKLRLd8nUj3CdH7oLRLt+B1E/U988xqSR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AjmQwLl/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93A23C433C7;
+	Wed, 24 Jan 2024 21:48:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706132494;
-	bh=L6wBSyjWpEkApiKdAKEQJMcpF9u2gtdAWdUQxFKV1i0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ThSkNuM3jV+x/sUzwwZ9XsoS+aUl6WknNi9OgUUYgU+MLdd9UfuvjtiwSE8uIamRo
-	 j5UPKwuz8E0Zu+7wgpl9PI09/D9MGKEvaQecPQPaZIZcOCyLvTO7TV+stsPMHiatNa
-	 653FN9CLzRAfy5Np5G2KWOkcoPwwa2RIMPa/A0LsdLFqbcz+dfEx1hDUzsiqYGUg8y
-	 JVhqphcvvPUscX6gSYcyE0I+ZWpUBVQ8ln+xSf/c6eNvysIEGyIPN0uWHVtsovG5JQ
-	 LwzQc/YY+MQBtYZusEmmciK/Z6jXB2TojK7460sFxsacjMNhx+E0WyNWpj6VckqjGi
-	 +J9hMFgWeQzwg==
-From: David Ahern <dsahern@kernel.org>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	David Ahern <dsahern@kernel.org>
-Subject: [PATCH net-next 3/3] selftest: Show expected and actual return codes for test failures in fcnal-test
-Date: Wed, 24 Jan 2024 14:41:17 -0700
-Message-Id: <20240124214117.24687-4-dsahern@kernel.org>
-X-Mailer: git-send-email 2.39.3 (Apple Git-145)
-In-Reply-To: <20240124214117.24687-1-dsahern@kernel.org>
-References: <20240124214117.24687-1-dsahern@kernel.org>
+	s=k20201202; t=1706132883;
+	bh=RGtonvax3uapi4rH4NaONNxIfvhQULoG+v5mKWQIIiE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=AjmQwLl/q71OAnoRhmNsQhK4W9dS35CXVP4MvI49fssz9ruZMTxDGzqfTAIiFOD6C
+	 x+INVNs3HlgYIDC0z7fzhIfxgQGXsCDbxCVWtpdn7dF3pym8vvzyK+qUc40MCsnhHU
+	 r64trbzUjIbq7j543UrQQFmcKdncoaiAL2UfryYJOrQ2hamD0xAfClLFxxTSANVFTt
+	 /25wFYnYHMKYzwhK9pSKC/TJwkYtW+sin/SWeH1gdyufKeG+7tyr+a7iaSbfh6WY55
+	 wNaWl7XGNofrXn5y4eH99ExKqiLG1dXBNavrSSaCh7xMqyGVhnoS05zStKBaIv7Qps
+	 RFFsDXHbbY02g==
+Message-ID: <bd985576-cc99-49c5-a2e0-09622fd6027a@kernel.org>
+Date: Wed, 24 Jan 2024 14:48:02 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [ANN] net-next is OPEN
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, Hangbin Liu <liuhangbin@gmail.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "netdev-driver-reviewers@vger.kernel.org"
+ <netdev-driver-reviewers@vger.kernel.org>
+References: <20240122091612.3f1a3e3d@kernel.org> <Za98C_rCH8iO_yaK@Laptop-X1>
+ <20240123072010.7be8fb83@kernel.org>
+ <d0e28c67-51ad-4da1-a6df-7ebdbd45cd2b@kernel.org>
+ <20240123133925.4b8babdc@kernel.org>
+ <256ae085-bf8f-419b-bcea-8cdce1b64dce@kernel.org>
+ <7ae6317ee2797c659e2f14b336554a9e5694858e.camel@redhat.com>
+ <20240124070755.1c8ef2a4@kernel.org> <20240124081919.4c79a07e@kernel.org>
+ <aae9edba-e354-44fe-938b-57f5a9dd2718@kernel.org>
+ <20240124085919.316a48f9@kernel.org>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20240124085919.316a48f9@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Capture expected and actual return codes for a test that fails in
-the fcnal-test suite.
+On 1/24/24 9:59 AM, Jakub Kicinski wrote:
+> On Wed, 24 Jan 2024 09:35:09 -0700 David Ahern wrote:
+>>> This is the latest run:
+>>>
+>>> https://netdev-2.bots.linux.dev/vmksft-net-mp/results/435141/1-fcnal-test-sh/stdout
+>>>
+>>> the nettest warning is indeed gone, but the failures are the same:  
+>>
+>> yep, I will send a formal patch. I see the timeout is high enough, so
+>> good there.
+> 
+> Well, kinda, to be honest I did bump the time to 4000s locally.
+> The runtime of the entire net suite 1h 10min - that's pretty much
+> the runtime of this one test :) The VMs run the tests without
 
-Signed-off-by: David Ahern <dsahern@kernel.org>
----
- tools/testing/selftests/net/fcnal-test.sh | 1 +
- 1 file changed, 1 insertion(+)
+one *script* = 900+ tests. :-)
 
-diff --git a/tools/testing/selftests/net/fcnal-test.sh b/tools/testing/selftests/net/fcnal-test.sh
-index f590b0fb740e..d7cfb7c2b427 100755
---- a/tools/testing/selftests/net/fcnal-test.sh
-+++ b/tools/testing/selftests/net/fcnal-test.sh
-@@ -109,6 +109,7 @@ log_test()
- 	else
- 		nfail=$((nfail+1))
- 		printf "TEST: %-70s  [FAIL]\n" "${msg}"
-+		echo "    expected rc $expected; actual rc $rc"
- 		if [ "${PAUSE_ON_FAIL}" = "yes" ]; then
- 			echo
- 			echo "hit enter to continue, 'q' to quit"
--- 
-2.39.3 (Apple Git-145)
 
+> HW virtualization, so they are a bit slower, but it'd be nice
+> if no local hacks were necessary. 
+> 
+> I haven't sent a patch to bump it because it may make more sense
+> to split the test into multiple. But as a stop gap we can as well
+> bump the timeout.
+
+The script has the tests in groups and each group can be run in parallel
+(with Hangbin's recent namespace changes). I can look at splitting that
+script into many (or write wrappers to run specific groups), but even
+then most of those test groups need more than 45 seconds. There are lot
+of permutations covered (with and without vrf, different address types,
+different uapis, ...).
+
+> 
+>>> $ grep FAIL stdout 
+>>> # TEST: ping local, VRF bind - VRF IP                 [FAIL]
+>>> # TEST: ping local, device bind - ns-A IP             [FAIL]
+>>> # TEST: ping local, VRF bind - VRF IP                 [FAIL]
+>>> # TEST: ping local, device bind - ns-A IP             [FAIL]
+>>>
+>>> :(  
+>>
+>> known problems. I can disable the tests for now so we avoid regressions,
+>> and add to the TO-DO list for someone with time.
+
+Sent a PR to fix a few things. I did not have to disable any tests -
+everything passes cleanly with the changes. If tests fail after those
+are applied, let's compare OS environments - maybe some sysctl is
+enabled or disabled (or a CONFIG) in your environment.
 
