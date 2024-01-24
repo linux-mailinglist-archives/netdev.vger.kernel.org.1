@@ -1,152 +1,190 @@
-Return-Path: <netdev+bounces-65620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F0E383B266
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 20:41:02 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF60883B2A9
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 21:00:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B04491F25272
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 19:41:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00A17B26D05
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 20:00:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 822B2132C34;
-	Wed, 24 Jan 2024 19:40:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDD92133425;
+	Wed, 24 Jan 2024 19:59:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h6dcMgO3"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="W+5AyxDN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 549A6132C25;
-	Wed, 24 Jan 2024 19:40:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97E60133412
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 19:59:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706125259; cv=none; b=R/5HLDB/xwW09BXaKYGWgVQYCXHmFEoB9URllE9akb27w0Y+FyV9OX9nR+FKWmc19fWVS21US44LaSOtrRY7CqSPVZZ9ZoxqMJHC9AMBdxG0YWAB5IFOCMpW8ZSjIEj0KSX9MV6M5PNCf6+9K74s+eK29QZySGbVTbRnMytA2os=
+	t=1706126383; cv=none; b=BEeS4o7K/l1ZjULvymQQyLR8AxaGp/ghvtvu/aKKwPTHJvgXWhTZBEP36HzQgMdlgWsECGBc1tvzDI2n7h2qblZP2ha7PbTF2aN094L2+ERhUsudL/hPQKDVBoKt4WocNwqLTNiuPK0qm3V41YZyG40f1ETS2P671oIg261ntaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706125259; c=relaxed/simple;
-	bh=pqY2OeRBKAHbZTEwnB+CHG0H7XQtw6Do1NPg5x5BLvA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bb7u7802O6DAcv5bdFmykmkQ1sY+uQ/8kxWS4wjaFPThJd7zaqU42eSVaD6JRfNAxGR8hIVaTQVz5epEQxOiqzX7wBDtDxIW7f4jt6L8MBNVT/7ULA2PHjVSrIcTw9DAI+Uo7UTZZNaNQ/QUtgneNO6YZjcGRRNC7g7dlbM5nk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h6dcMgO3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F284C433F1;
-	Wed, 24 Jan 2024 19:40:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706125258;
-	bh=pqY2OeRBKAHbZTEwnB+CHG0H7XQtw6Do1NPg5x5BLvA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=h6dcMgO3WqlGoTkerCpx0ufw2nOB8j9pxw3rlnUfhe2cpmIAu2VA2nHH6K40ehlgI
-	 1BpxRd8njMF0/YMXXkMzwD0fli44R/4ALU0jiLDthf81KgtfMbCsV3gA34Cgabd33T
-	 sBA49wfMjgmNSvQHUubtwazHDJngIggNk+lk1pZdnlxCfxHkfwq9traZ60jGxJMMXA
-	 yApUyoPK0/8+q5BYqjvRSFJgqtFsNxpRRjVsgG0QJlc5bl3AlD/uwqgUFxyDVzTSYp
-	 gw08g41dmAcsVIcXBoPjUQegaPLmZed5n6DZTKkeojHOCkLc2UM+dH+x/AyD69lDL8
-	 b1Q+nikbR47fg==
-Date: Wed, 24 Jan 2024 11:40:57 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>, David Ahern
- <dsahern@kernel.org>, coreteam@netfilter.org,
- "netdev-driver-reviewers@vger.kernel.org"
- <netdev-driver-reviewers@vger.kernel.org>, Hangbin Liu
- <liuhangbin@gmail.com>, netfilter-devel@vger.kernel.org
-Subject: Re: [netfilter-core] [ANN] net-next is OPEN
-Message-ID: <20240124114057.1ca95198@kernel.org>
-In-Reply-To: <ZbFiF2HzyWHAyH00@calendula>
-References: <20240122091612.3f1a3e3d@kernel.org>
-	<Za98C_rCH8iO_yaK@Laptop-X1>
-	<20240123072010.7be8fb83@kernel.org>
-	<d0e28c67-51ad-4da1-a6df-7ebdbd45cd2b@kernel.org>
-	<65b133e83f53e_225ba129414@willemb.c.googlers.com.notmuch>
-	<20240124082255.7c8f7c55@kernel.org>
-	<20240124090123.32672a5b@kernel.org>
-	<ZbFiF2HzyWHAyH00@calendula>
+	s=arc-20240116; t=1706126383; c=relaxed/simple;
+	bh=odGmuukyp0U9l8zW6CMAJDMbPK6fIBGHu3vXlhB3P3k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nSGKZ+B1AlRxLcpia1KXPlXmy3D0sBm04TKKbUIYwfyCzHF1gpy9tEm78SCsqKDsL5L8yFpBcKjH+m7daUdcYkcwP4ZecYOrWL/84e/fH9EoOV3umqcFDSu7n+TnfhbsqUIhgLnZNCGC6uKdN0q1LnTAD++aDg0Q6mAtyz2V+9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=W+5AyxDN; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-40eccf4a91dso4763615e9.2
+        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 11:59:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=google; t=1706126380; x=1706731180; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MZl4ftythRmcKvCOQh5pb6PiHGn+zNx3H9rMz7CH72o=;
+        b=W+5AyxDNY+eIvQZlCcP7wXZCVFSCqq4YZaIBlA4p6hl+N9V5viTWpR+lUwff+yVMD5
+         F2e9m22RVX8PRnJiTnaVIIOgSf0esYrDjrjBo5OGLY/g78YfiXLhqlsDo+0L3fweecOe
+         7g6q4oPvQ3eWX+xCFHIToBG6CpzbG69lipvT8CcFZuFlM/jMrk5wDeRQbgKkVaJu3Eul
+         J2WKVqxORI4RT9DkkLwCRRR/0FmWSjTuFWLyUVXyxe3VzwU+EXEzjxjQxuzUo4xgVxSL
+         bWaJktZIlVV79v/hXEr+wqSn+NYi4not6C6ucAsn00S7DvQUc7NJ9CVAG1D7vI1gqmwJ
+         5QMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706126380; x=1706731180;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MZl4ftythRmcKvCOQh5pb6PiHGn+zNx3H9rMz7CH72o=;
+        b=rb6LVcoAB7zeQB77xEeAoCKbWpNg0BgyCSlsoTDNJPEpKh30GSxieWKI29d9k1qG1f
+         DQHbXOXMc9t9YoxRpyzK6Zc3wXEQBpaqhxmjO3yJDX8tq3X9iNgIdf5IW+97kv/DNeKI
+         iUxSfqO08vhOE/XmvKPTNCmObFG6ado3X1b1FDQaS+FXupajE6bhTatJkGszgv81Pccf
+         Zuz79SXBR0ryAA3f2JM7eBdkUVGQA/GTIsaEO8SswVdMJjL7JaJRO0Mo3Iy1LmnFJfjz
+         YC4qXET/pjzoXGU8OZxKYHFkh6/zRQz+tjtLZnBmKzuyvSu9Rcts7Splyedl1njNs2j2
+         6A1w==
+X-Gm-Message-State: AOJu0YxgoCmeHz6HO9e34r1FtP7052jBm1Mo6KhNwsl2Z2WvZVONpiPL
+	ofcrkHXHfxdIRkz6Z5eYKbj/mg54Qnaow451MuqtA5ApCQOapksjxkDQAtwC/t9tUzlwfq5l+Ag
+	=
+X-Google-Smtp-Source: AGHT+IFblEqtJKfuFSJ6K/tCJGIVNQ3uYWz2CRDr5fMA3jsSGReNr698pKiQM+BTV1fNHCydek0KDg==
+X-Received: by 2002:a05:600c:314e:b0:40e:b93c:b5f8 with SMTP id h14-20020a05600c314e00b0040eb93cb5f8mr1423543wmo.107.1706126379803;
+        Wed, 24 Jan 2024 11:59:39 -0800 (PST)
+Received: from [10.83.37.178] ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id bi17-20020a05600c3d9100b0040e418494absm99661wmb.46.2024.01.24.11.59.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 Jan 2024 11:59:39 -0800 (PST)
+Message-ID: <3fe0cb4a-9dbe-409a-b856-9b32824583fe@arista.com>
+Date: Wed, 24 Jan 2024 19:59:32 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/3] selftests/net: A couple of typos fixes in
+ key-management test
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, Dmitry Safonov <0x7f454c46@gmail.com>,
+ Mohammad Nassiri <mnassiri@ciena.com>, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240118-tcp-ao-test-key-mgmt-v1-0-3583ca147113@arista.com>
+ <20240118085129.6313054b@kernel.org>
+ <358faa27-3ea3-4e63-a76f-7b5deeed756d@arista.com>
+ <20240118091327.173f3cb0@kernel.org>
+ <a9a5378d-c908-4a83-a63d-3e9928733a3d@arista.com>
+ <20240124071229.6a7262cc@kernel.org>
+ <1ad64e3d-5252-4aaf-82be-5162edd1e781@arista.com>
+ <20240124110431.3c3eba9a@kernel.org>
+From: Dmitry Safonov <dima@arista.com>
+In-Reply-To: <20240124110431.3c3eba9a@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On Wed, 24 Jan 2024 20:16:39 +0100 Pablo Neira Ayuso wrote:
-> > Ah, BTW, a major source of failures seems to be that iptables is
-> > mapping to nftables on the executor. And either nftables doesn't
-> > support the functionality the tests expect or we're missing configs :(
-> > E.g. the TTL module.  
+On 1/24/24 19:04, Jakub Kicinski wrote:
+> On Wed, 24 Jan 2024 17:46:10 +0000 Dmitry Safonov wrote:
+>>>> Thanks!
+>>>>
+>>>> I'll send a patch for it in version 2 (as I anyway need to address
+>>>> Simon's feedback).  
+>>>
+>>> Hi Dmitry!
+>>>
+>>> I put TCP_AO and VETH in the config and the tests seem to fail with  
+>>
+>> Thanks for wiring it up and for https://netdev.bots.linux.dev/status.html!
+>>
+>>> selftests: net/tcp_ao: rst_ipv4
+>>> not ok 1 # error 834[lib/kconfig.c:143] Failed to initialize kconfig 2: No such file or directory
+>>> # Planned tests != run tests (0 != 1)
+>>> # Totals: pass:0 fail:0 xfail:0 xpass:0 skip:0 error:1  
+>>
+>> Hehe, yeah I wanted to detect kernels with !CONFIG_TCP_AO, to SKIP the
+>> test, rather than FAIL it, which this lib/kconfig.c does.
+>> But from a glance, I think it's failing in your run because there are
+>> checks with and without TCP_AO, but I didn't think of checking for
+>> the hashing algorithms support.
+>>
+>> I think what happens is has_tcp_ao():
+>> : strcpy(tmp.alg_name, "hmac(sha1)");
+>> ...
+>> : if (setsockopt(sk, IPPROTO_TCP, TCP_AO_ADD_KEY, &tmp, sizeof(tmp)) < 0)
+>>
+>> Could you check that what I suppose is failing, is actually failing?
+>> [dima@Mindolluin linux-master]$ grep -e '\<CONFIG_CRYPTO_SHA1\>' -e
+>> '\<CONFIG_CRYPTO_HMAC\>' .config
+>> CONFIG_CRYPTO_HMAC=y
+>> CONFIG_CRYPTO_SHA1=y
 > 
-> I could only find in the listing above this:
-
-Thanks for taking a look!
-
-> https://netdev-2.bots.linux.dev/vmksft-net-mp/results/435141/37-ip-defrag-sh/stdout
+> FWIW the config used is uploaded with the results. If you click on 
+> the remote it should take you to a location like this:
 > 
-> which shows:
+> https://netdev-2.bots.linux.dev/vmksft-tcp-ao/results/435369/
 > 
->  ip6tables v1.8.8 (nf_tables): Couldn't load match `conntrack':No such file or directory
+> and there should be a config file in there. 
 > 
-> which seems like setup is broken, ie. it could not find libxt_conntrack.so
+>> If that's the case, I'll  add the detection for hashing algorithms to
+>> lib/kconfig.c (together with a patch for
+>> tools/testing/selftests/net/config).
+>> And also heads up for key-management.c - that tries a bunch of hashing
+>> algorithms to check that the work and that the key rotation between
+>> different algorithms works:
+>>
+>> : const char *test_algos[] = {
+>> : 	"cmac(aes128)",
+>> : 	"hmac(sha1)", "hmac(sha512)", "hmac(sha384)", "hmac(sha256)",
+>> : 	"hmac(sha224)", "hmac(sha3-512)",
+>> : 	/* only if !CONFIG_FIPS */
+>> : #define TEST_NON_FIPS_ALGOS	2
+>> : 	"hmac(rmd160)", "hmac(md5)"
+>> : };
+> 
+> I was stuck in a meeting and I started playing around with the options 
+> for TCP-AO :)
 
-Hm, odd, it's there:
+Haha, the same: 3 hour-long meetings for today :-/
 
-$ ls /lib64/xtables/libxt_conntrack.so
-/lib64/xtables/libxt_conntrack.so
+> I added these options now:
+> 
+> CONFIG_CRYPTO_HMAC=y
+> CONFIG_CRYPTO_SHA1=y
+> CONFIG_CRYPTO_RMD160=y
+> CONFIG_IPV6=y
+> CONFIG_TCP_AO=y
+> CONFIG_TCP_MD5SIG=y
+> CONFIG_VETH=m
+> 
+> And it looks much better! There are still some failures:
+> 
+> https://netdev.bots.linux.dev/contest.html?branch=net-next-2024-01-24--18-00&executor=vmksft-tcp-ao
 
-but I set a custom LD_LIBRARY_PATH, let me make sure that /lib64 
-is in it (normal loaded always scans system paths)!
+Wow! Nice, thank you!
 
-> What is the issue?
+> 
+> I added VRF so that should hopefully take care of the MD5 skips
+> on the next run. But the failures of the rst-ip* tests don't look 
+> like an obvious config problem.
 
-A lot of the tests print warning messages like the ones below.
-Some of them pass some of them fail. Tweaking the kernel config
-to make sure the right CONFIG_IP_NF_TARGET_* and CONFIG_IP_NF_MATCH_*
-are included seem to have made no difference, which I concluded was
-because iptables CLI uses nf_tables here by default..
+Yep, I'll look into this this week.
 
-[435321]$ grep -nrI "Warning: Extension" .
-./6-fib-tests-sh/stdout:305:# Warning: Extension MARK revision 0 not supported, missing kernel module?
-./6-fib-tests-sh/stdout:308:# Warning: Extension MARK revision 0 not supported, missing kernel module?
-./6-fib-tests-sh/stdout:316:# Warning: Extension MARK revision 0 not supported, missing kernel module?
-./6-fib-tests-sh/stdout:319:# Warning: Extension MARK revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:12:# No GRO                                  Warning: Extension udp revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:13:# Warning: Extension udp revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:14:# Warning: Extension udp revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:16:# GRO frag list                           Warning: Extension udp revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:17:# Warning: Extension udp revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:18:# Warning: Extension udp revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:19:# Warning: Extension udp revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:21:# Warning: Extension DNAT revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:23:# GRO fwd                                 Warning: Extension udp revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:24:# Warning: Extension udp revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:38:# GRO frag list over UDP tunnel           Warning: Extension udp revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:39:# Warning: Extension udp revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:40:# Warning: Extension udp revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:41:# Warning: Extension udp revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:43:# Warning: Extension DNAT revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:45:# GRO fwd over UDP tunnel                 Warning: Extension udp revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:46:# Warning: Extension udp revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:61:# No GRO                                  Warning: Extension udp revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:62:# Warning: Extension udp revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:63:# Warning: Extension udp revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:65:# GRO frag list                           Warning: Extension udp revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:66:# Warning: Extension udp revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:67:# Warning: Extension udp revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:68:# Warning: Extension udp revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:72:# GRO fwd                                 Warning: Extension udp revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:73:# Warning: Extension udp revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:88:# GRO frag list over UDP tunnel           Warning: Extension udp revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:89:# Warning: Extension udp revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:90:# Warning: Extension udp revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:91:# Warning: Extension udp revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:95:# GRO fwd over UDP tunnel                 Warning: Extension udp revision 0 not supported, missing kernel module?
-./18-udpgro-fwd-sh/stdout:96:# Warning: Extension udp revision 0 not supported, missing kernel module?
-./37-big-tcp-sh/stdout:17:# Warning: Extension length revision 0 not supported, missing kernel module?
-./37-big-tcp-sh/stdout:19:# Warning: Extension length revision 0 not supported, missing kernel module?
-./37-big-tcp-sh/stdout:22:# Warning: Extension length revision 0 not supported, missing kernel module?
-./37-big-tcp-sh/stdout:24:# Warning: Extension length revision 0 not supported, missing kernel module?
-./56-xfrm-policy-sh/stdout:11:# Warning: Extension policy revision 0 not supported, missing kernel module?
-./56-xfrm-policy-sh/stdout:13:# Warning: Extension policy revision 0 not supported, missing kernel module?
-./54-amt-sh/stdout:94:# Warning: Extension TTL revision 0 not supported, missing kernel module?
+Thanks,
+            Dmitry
 
 
