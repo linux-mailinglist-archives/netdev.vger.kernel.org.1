@@ -1,61 +1,67 @@
-Return-Path: <netdev+bounces-65634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7104183B398
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 22:09:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 62CC983B3AC
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 22:15:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 297B9283F55
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 21:09:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 097E3286636
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 21:15:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6065C1350D1;
-	Wed, 24 Jan 2024 21:09:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD1321350F4;
+	Wed, 24 Jan 2024 21:15:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o8UhNJRz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="caS/RFD7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B92112BE96
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 21:09:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84E0E132C36;
+	Wed, 24 Jan 2024 21:15:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706130541; cv=none; b=JbkL7BcCN9oxWl+82zJB2qJMeYaBs509D59HhUE6uXzDij8nNNbXvqVYa2rsAjCHvtveN4oVoyG3o1bGBz1wXatV8knTt2Gd4JCPwXCr1aUeGNRw+0UuT/UU3EtN+Ball8qSK+e8b3hSO7CnfdPfgk5/7UW7Eo/+o9JFqm1tN0k=
+	t=1706130953; cv=none; b=WBZ082EASBTA6ghmXX/cRlsF6+VcDxGoyjnQ8/y2iV3o5/eQf+ngh/YHr4vkuusWSsr/+RDXxel1wEHH9ISq6LXRDs+mkcYBBb8X0JmODmWDrDtEITE3+mNThSpavbOJENhtLi7/eqGfvSLJien+Y57QwGWABvRoN86D/rlCjLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706130541; c=relaxed/simple;
-	bh=OwqhiirMXNXI3ECk46Nz8ZChmmdmevlnfCw/AuOJ2Do=;
+	s=arc-20240116; t=1706130953; c=relaxed/simple;
+	bh=OFjqtM8lNo2bAKe4BwdtD5hhaNo/ydw8F1ylLt/GzqY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d9ZKJNfmWMFBsyacxEcfk7+Fo3wrMOj50wAniJbfL1HTVdcsFAl9iQYiBe1U3m28CDDUj0n0XVybfXC45BALsVRbGzOVPQteJCZMM5v6KaDpFz4LGa7J+WF2yvP0JVzjB1sJhjPjX0ouBYuI56lSvkcQOeFT37Lhb+lPEpqkPAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o8UhNJRz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90652C433C7;
-	Wed, 24 Jan 2024 21:08:58 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=t7F37RBuUigKZKlyr4eDy0TRZsVwmCqovuBneDcQtwGUZfihxJP4+w6JkOeWmPdCp7WSNwrPhRiM3aug66Zw3DmMInLVhbFqOh7FlDysrhouCPi0QOWMXR8p6HbGfEHJKSwvWmEs5gz+WjSlI/BXnt8HuOPXNiPtb8Wu1G2beiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=caS/RFD7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66BA9C433C7;
+	Wed, 24 Jan 2024 21:15:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706130541;
-	bh=OwqhiirMXNXI3ECk46Nz8ZChmmdmevlnfCw/AuOJ2Do=;
+	s=k20201202; t=1706130952;
+	bh=OFjqtM8lNo2bAKe4BwdtD5hhaNo/ydw8F1ylLt/GzqY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=o8UhNJRz0hfEcmfLtHLEYE4SKXgEMhIQDPe/he45noNkcGPAK8iEcOLvmb4O/mcw8
-	 uBp+Aop5NdoC0a6TTtMoLHUrp4v7t/61OfQoVL1kAVctzrua0FKMPt3MGEaQaugRHm
-	 V/qNjoIV7ujuYYMdHrEw35JIVmAhQEADBwVdDq7r+IA/qm7OR7w4Jd4librmz8m898
-	 9SKkkH8eq/6n0iUnfJlIgzGFrsiwRa+nnWl1P4oChya7GSdw7RtUad+6Clxk0yI7SB
-	 Id6bZvKu4JiTO/QAjHz2P8FqWzMtDaunJQpOTLxCxKkGvddlYFv1+t9zFzt/HJ21FD
-	 JON5+jjwyEJJg==
-Date: Wed, 24 Jan 2024 21:08:55 +0000
+	b=caS/RFD7bB8STUKBP6YPbDxUfwAZwF1ziKdoPhSSGTTNQC9Hyq+w1cNFPj/cYymEy
+	 MutAIkDY3FgXHocJPLZk+rvy9MsOEzX9C62dn7UclqQHNPGgwXpjYlVJ47IG+5vUXI
+	 B5n9SWsHKjnH9X1zdtdwxn7s5jG563Ug0LUTezL1S0W/BWwZ+6Ah1/CUQcG7/ZiTJY
+	 hN4uXzBiLkOr+30WNhvfZzVeUy/SwqYjOo1tQ+081OYYQUDiWViEi1puUn9wqJKhlH
+	 2QYvWYq/YPexS3ciMba40xx1+ln3eUfXgRGN2pP4kCoKjs/PqAamDGOrwNBDQN9rHl
+	 a9cZ3R/zHGwJw==
+Date: Wed, 24 Jan 2024 21:15:47 +0000
 From: Simon Horman <horms@kernel.org>
-To: Kurt Kanzenbach <kurt@linutronix.de>
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [PATCH v1 iwl-next] igc: Add support for LEDs on i225/i226
-Message-ID: <20240124210855.GC217708@kernel.org>
-References: <20240124082408.49138-1-kurt@linutronix.de>
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	Geethasowjanya Akula <gakula@marvell.com>,
+	Hariprasad Kelam <hkelam@marvell.com>,
+	Suman Ghosh <sumang@marvell.com>
+Subject: Re: [EXT] Re: [PATCH net] octeontx2-af: Initialize bitmap arrays.
+Message-ID: <20240124211547.GD217708@kernel.org>
+References: <20240123051245.3801246-1-rkannoth@marvell.com>
+ <20240123181716.GP254773@kernel.org>
+ <MWHPR1801MB1918ADCA9FD3FAFAF9CC68B3D37B2@MWHPR1801MB1918.namprd18.prod.outlook.com>
+ <20240124103755.GY254773@kernel.org>
+ <MWHPR1801MB191860047DEE03672DC642E3D37B2@MWHPR1801MB1918.namprd18.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,49 +70,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240124082408.49138-1-kurt@linutronix.de>
+In-Reply-To: <MWHPR1801MB191860047DEE03672DC642E3D37B2@MWHPR1801MB1918.namprd18.prod.outlook.com>
 
-On Wed, Jan 24, 2024 at 09:24:08AM +0100, Kurt Kanzenbach wrote:
+On Wed, Jan 24, 2024 at 10:43:26AM +0000, Ratheesh Kannoth wrote:
+> > From: Simon Horman <horms@kernel.org>
+> > Subject: Re: [EXT] Re: [PATCH net] octeontx2-af: Initialize bitmap arrays.
+> > 
+> > I think the question is: if the devm_kfree() calls are removed, then is the
+> > lifecycle of the objects in question managed correctly?
+> If lifecycle of the objects are managed correctly without devm_kfree(), why this API is 
+> Provided and exported in kernel ?
 
-...
+When the lifecycle of an object is such that it is freed when
+the device is detached and at no other time, then devm_* can be helpful
+because there is no need for devm_free calls.
 
-> +static int igc_led_hw_control_set(struct led_classdev *led_cdev,
-> +				  unsigned long flags)
-> +{
-> +	struct igc_led_classdev *ldev = lcdev_to_igc_ldev(led_cdev);
-> +	struct igc_adapter *adapter = netdev_priv(ldev->netdev);
-> +	bool blink = false;
-> +	u32 mode;
-> +
-> +	if (flags & BIT(TRIGGER_NETDEV_LINK_10))
-> +		mode = IGC_LEDCTL_MODE_LINK_10;
-> +	if (flags & BIT(TRIGGER_NETDEV_LINK_100))
-> +		mode = IGC_LEDCTL_MODE_LINK_100;
-> +	if (flags & BIT(TRIGGER_NETDEV_LINK_1000))
-> +		mode = IGC_LEDCTL_MODE_LINK_1000;
-> +	if (flags & BIT(TRIGGER_NETDEV_LINK_2500))
-> +		mode = IGC_LEDCTL_MODE_LINK_2500;
-> +	if ((flags & BIT(TRIGGER_NETDEV_TX)) ||
-> +	    (flags & BIT(TRIGGER_NETDEV_RX)))
-> +		mode = IGC_LEDCTL_MODE_ACTIVITY;
+I do understand that devm_free() exists, and there are cases where
+it makes sense. But I don't think devm_ is buying us anything here.
 
-Hi Kurt,
+> 
+> > 
+> > > 2. I could see instances of devm_kfree() usage in current kernel where it
+> > does explicit calls.
+> > 
+> > Sure. But in this case the use of devm_* doesn't seem to be adding anything
+> > if the memory is _always_ freed by explicit calls to devm_kfree().
+> I got it.  I would like to keep the diff minimal (rather than deleting lines diff). would this be okay ?
 
-I guess this can't happen in practice,
-but if none of the conditions above are met,
-then mode is used uninitialised below.
+My feeling is that if you change your patch to:
 
-Flagged by Smatch.
+1. Use kcalloc() instead of devm_kcalloc()
+2. Not change kfree() calls to devm_kfree()
 
-> +
-> +	/* blink is recommended for activity */
-> +	if (mode == IGC_LEDCTL_MODE_ACTIVITY)
-> +		blink = true;
-> +
-> +	igc_led_set(adapter, ldev->index, mode, blink);
-> +
-> +	return 0;
-> +}
+Then you will end up with a smaller diff than the current patch.
+And it will address the problem described in the patch description.
 
-...
 
