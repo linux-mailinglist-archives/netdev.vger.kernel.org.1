@@ -1,73 +1,77 @@
-Return-Path: <netdev+bounces-65275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13D70839D8A
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 01:13:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BB4E839D94
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 01:18:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 445A5B20BC5
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 00:13:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EC221C21381
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 00:18:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EDCB368;
-	Wed, 24 Jan 2024 00:13:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ACDD620;
+	Wed, 24 Jan 2024 00:18:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rCBv13ot"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nt6z1yNf"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B0F5EA9;
-	Wed, 24 Jan 2024 00:13:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E676415A5;
+	Wed, 24 Jan 2024 00:18:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706055187; cv=none; b=uRpxvEZ5EJYwMfIkJrxBk4TpRt/YzXDGbo+PojdkuOkQu9NTfRsvEVMtIF5j12Vi6E9NOoPqeFsVYor0V/fyiA0AOdYm1rLpt3PyajeswiyytEVTl5U7CAWxhDx9AonUxxW4oPFNwL4cGV4hnYd26Pqgtuq50TNEOPWYm2C5H20=
+	t=1706055486; cv=none; b=dJJ+T8gbcTQwv+RGF23gv1R6w8h0rEPGuj2fW+uJUHOL676Irx8JdfLN85Vq1XWmD/K58Z3RwN7FrwboBCDDLGc5hPRMKrfYezupisjmZ1G71tbjNBxrWT5GZWW6P5FfH0gFyyPfVnA7IfPvUw67+bG86Ku7CJrSHMeb1/Ifrwo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706055187; c=relaxed/simple;
-	bh=uwVSjsvlbhuMnsKVH4UGJGHpdO8kjjkWtArFvCLXA9Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=c57FeifOuN48G565+NMSqzmud2W1HebvZnpCIPNKVWVEolxM63jgVUqyAdnL+nw1KedKGQKqmdHMFGNjkX84ari74DJY5fp+mxdV4xHKMC+YJpO8b5jNviv1ZpPiTKeaN9RXHu1eXqwMkueP99lMHPyVwBAEMAbODkJObWPXIek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rCBv13ot; arc=none smtp.client-ip=91.218.175.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <3a0dc098-9b21-4f0b-96a4-de2f55bc8147@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706055181;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uwVSjsvlbhuMnsKVH4UGJGHpdO8kjjkWtArFvCLXA9Y=;
-	b=rCBv13otE4UjPoXNyLTYU5RvKOY20gcBeXUdSewh+2tU/gHxpxHuLW/GUMsMv9lx67OBKC
-	IzmsqTzZyaeorylyX8eIY/Y3hbQz4sOGcwkzVooK/ibQaH3uVi1fGplBC1qKmtALrk9H1m
-	VwxfjhOdnKz1QODqoUCMf+4bUxOXzR4=
-Date: Tue, 23 Jan 2024 16:12:50 -0800
+	s=arc-20240116; t=1706055486; c=relaxed/simple;
+	bh=f1fX9doNgbnxpiBvF1j0flta1iVc3gfQxW1hXOcLdZc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NWE0S50vXPh/7mUAjyTPUNgLjTsfBR4L7OKJEMNYsFQ59dGyd4wLrJ2bu8hQPoYniz6B9pRk/WzUeLNjQECXfKqdga+tbj3VTkZurmc7iNapx6IALSCrIiECTSjC332jNc3TpWr4/yNnYSs8Q3rFhRg3Yj7jy7B2FwZZZeL4U8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nt6z1yNf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CE45C433F1;
+	Wed, 24 Jan 2024 00:18:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706055485;
+	bh=f1fX9doNgbnxpiBvF1j0flta1iVc3gfQxW1hXOcLdZc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Nt6z1yNfWZVWNHA3fTLyEGooReRxG9J58+EiSCpWG1Xl/TExigLcGfuFqcXcZ4Q9u
+	 oE0HwGa/lPrHS0qN77g3xg1y6PdMoFvG3F2dxqkWTTrPQwyc1f30spn4ptpXNBw6nO
+	 1JaOC7dpOlzOyXofDbFBglUnOTVgeADJPO3A39kROgaTQlbtMJvRdfCp7/f/EYxng1
+	 FLuBdgwJBT7tKnmX7wbgjuW6NXL0dFsEZRIlifGj4Dg6P2gR8mjRCBzGHyRMZRAWDN
+	 HFtoh2vcRMtje1NbEkTu8UIasArk2gEmABjLC7uoaRPHtcVykXcL3cyzhHh8PyJlhA
+	 SQCwx5sdxzYQw==
+Date: Tue, 23 Jan 2024 16:18:04 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan
+ Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, Jacob Keller
+ <jacob.e.keller@intel.com>, Breno Leitao <leitao@debian.org>, Jiri Pirko
+ <jiri@resnulli.us>, Alessandro Marcolini <alessandromarcolini99@gmail.com>,
+ donald.hunter@redhat.com
+Subject: Re: [PATCH net-next v1 02/12] tools/net/ynl: Support sub-messages
+ in nested attribute spaces
+Message-ID: <20240123161804.3573953d@kernel.org>
+In-Reply-To: <20240123160538.172-3-donald.hunter@gmail.com>
+References: <20240123160538.172-1-donald.hunter@gmail.com>
+	<20240123160538.172-3-donald.hunter@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v8 1/3] bpf: make common crypto API for TC/XDP
- programs
-Content-Language: en-US
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Herbert Xu <herbert@gondor.apana.org.au>
-Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
- bpf@vger.kernel.org, Victor Stewart <v@nametag.social>,
- Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>
-References: <20240115220803.1973440-1-vadfed@meta.com>
- <52e5df2c-1faf-479f-8b64-a5d0c86c82e5@linux.dev>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <52e5df2c-1faf-479f-8b64-a5d0c86c82e5@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 1/23/24 9:51 AM, Vadim Fedorenko wrote:
-> gentle ping here? it's more than a week with no feedback...
+On Tue, 23 Jan 2024 16:05:28 +0000 Donald Hunter wrote:
+> Sub-message selectors could only be resolved using values from the
+> current nest level. Enable value lookup in outer scopes by using
+> collections.ChainMap to implement an ordered lookup from nested to
+> outer scopes.
 
-It is in my list. I have some backlog. will try to get to it tomorrow.
+Meaning if the key is not found in current scope we'll silently and
+recursively try outer scopes? Did we already document that?
+I remember we discussed it, can you share a link to that discussion?
 
