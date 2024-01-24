@@ -1,152 +1,77 @@
-Return-Path: <netdev+bounces-65632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F359783B35A
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 21:55:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 16FEB83B384
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 22:02:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C8DBB2247E
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 20:54:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9038AB21953
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 21:02:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 367191350F7;
-	Wed, 24 Jan 2024 20:54:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23A931350DB;
+	Wed, 24 Jan 2024 21:02:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CNyrPPJu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KpIcca8d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A29BE1350F6
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 20:54:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE3FA811E4;
+	Wed, 24 Jan 2024 21:02:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706129681; cv=none; b=XTPHFZrlv6nAtV44+ldpHGz+QTBlFir2F1Ep3slZrvgKtKzsKVirgVPm+5x/gTXXEbJYGjHaz629E3KN8DE7y4lWof1jX5PXbJwJ+2DEha7VjEh8vYvjw/Yycg8FmmMHQbR1P/Edmv9nTgqiIxoOVKE0LcodUOHziang/btCaZM=
+	t=1706130148; cv=none; b=E2pBT+a/jkixgmLZTqWibxLOgrWx9HB5Txypqt7CFLOlVcwxoXDe+5XCi2MYMjKXVBByem2vAsHbSyL4LDjwMUNheBjofe/tYwkZbNEGgEz2epmoaKivnBtaeLFJYk/wA0M0Bw17GwpMv1F62at+N1GQnlf5riyEHdMndgleeR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706129681; c=relaxed/simple;
-	bh=RTpEuATypVNj5VxAsZR6nKAIefqlONH2LbSyH6vYsXY=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=HIrLxUlDG4Ps1rFnDQbUA+kKN3Okl4s0lPDpn6WY5nyJ/e5IIrKQe/u01dNbCUIq0jHObXp5A9LdGLw9u676ZCSPQ02JqU7g0RvvXcQuZ52H0pQp4A7/dNu9A7EXsWudlXQ6Hfr4hdFoCL0Pw4E+RU6NorhpUXS8Z99/ntWpDt0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--nktgrg.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CNyrPPJu; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--nktgrg.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5efe82b835fso102995617b3.0
-        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 12:54:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706129678; x=1706734478; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=6kZSksoUVPJmWPdPL8UZDhGGNZPJOUVtvLj/gV7DXkY=;
-        b=CNyrPPJucDcDwRxk2GWTMQ0CMuOObd3AUQ1J0+ABV1KmlUKKrq8tGhoLWmb4U5QIb1
-         E2fPZoAtF1HfL+ikIEX+wC/YYDoA6qo3UqcsgdFFujXgf+s3TGev/q/riYCecPJsT4uj
-         G547k8tgfFPJESLMg7tQH+4aBz+FbjdpqgNN72G68j752zfZMeXoLhamjKSQ0XRD4xiO
-         le5P6keeTy5U6x+7SqK3ICKKVYJ55L0YkSxNRmPHDIg9PxNCV9CGTtErEI2SqbatVxyZ
-         8N7Iodxoyqr9iFuuceGl9NtDWVdH9bWgltDONemrn1zwK2XXPBb3qEQ0bO6ix9zJ5ZPt
-         1bWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706129678; x=1706734478;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6kZSksoUVPJmWPdPL8UZDhGGNZPJOUVtvLj/gV7DXkY=;
-        b=sg1AECGWsYmRX+GamiuyrYt7Ha+mxSBzYdoxs8vqJOONcGD9Kl4appqheAd+c0xa25
-         UpNENyAAiVGXYvD7DqOAuDJLAlb6A79Rp1VuJsZ8S9PQupbXC4nym2y1FWs6TO/kgOPI
-         UgIfksnF/IdqBOZHApBD4c0gtggFnWCGg4+jtQTm53K2+VUWrLNuVjdS4lkN27C8Jc4q
-         v3niRlKSwXWVKXAbfFSi7Mds6g6NUNkE6Gw2aNDnjTf+1t04Jc2zsvpxTTYUqZMSSruq
-         S3dAO5Wy8bao6ktgt35exlphQXXiLDWe/k9B/a7YCeUeLcUnRKCR8pZbp0XZa3xxs399
-         +SAQ==
-X-Gm-Message-State: AOJu0Yw9uzkaAVQKRyxxtKa4AOPkAaaxshIrCZzEytdHcgoYnqTc5tpa
-	/bOAxRfimWI6ieFySZP3A0Ye9AuMHBy3EVMgRCg4cV32HL7uo6ydv2xiVPE5ngcuKDcyYRuDMO7
-	wX5Gq4d473WaHVBQ7kzHglqzz18kVgUpnenrLnMN4Wu4YZNC7BJQqgguszSThxKOzTPixGtdG7p
-	pRgWUc4lx2XbW9si22NWQ7N7MZlDmgx2qa
-X-Google-Smtp-Source: AGHT+IHjtj2/HTMBCL3Ia0Rwooqj0s/CdjjRlZBjwtZgoOz4UNpXofFQRXJC4Jxcw5LPdFo31JVOIhmSA54=
-X-Received: from nktgrg-net.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1d21])
- (user=nktgrg job=sendgmr) by 2002:a81:b809:0:b0:5fb:7b86:db34 with SMTP id
- v9-20020a81b809000000b005fb7b86db34mr651732ywe.4.1706129678673; Wed, 24 Jan
- 2024 12:54:38 -0800 (PST)
-Date: Wed, 24 Jan 2024 20:54:35 +0000
+	s=arc-20240116; t=1706130148; c=relaxed/simple;
+	bh=GRLg7Fttd7YkkhBg0ew3v+e7tGu/q9kze+tM6Iuq/X8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rCBvv9HgQ/W8EFtEa/5XMRO4bBFFyNus2otpDve2DZTdEBFtSjTEQw8CicNeoI1QuxiTCXfp4W8VON4BakbVN9brCeXyAYjEy7MiNcw5Yrlc5MXrgAhWqwcaPYfxlgPhUBp1QdtpTO5eNaTgYGvNNQ+vq1IhltGVYCRmkrHYqxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KpIcca8d; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 848AAC433F1;
+	Wed, 24 Jan 2024 21:02:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706130147;
+	bh=GRLg7Fttd7YkkhBg0ew3v+e7tGu/q9kze+tM6Iuq/X8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KpIcca8di4rparosYDqBdumPDaTqwMUXRU7uIA4G3UfU2QZZgjT16huRflLWB5SpG
+	 Hmgy9fbtM8hhhrsnsV3AWlCgP8nKldAh/P+sHW9bjluCseSDBl4vBSRInVp3TKP/P1
+	 SadyDfruDp3nmigLEH817zET38Uzy++//LggqVZnOdurCmjE8CCYUPPu0FtdIfnsp8
+	 z53evmErpHmlpyjxVKmJ3FvOszEbzWfOh3DNhyL0QzbZg0lYHiVKfKAlALvvVv2DlM
+	 3qqAw2jgq0cQ8AVqYDv3t+tgq1+J8BUlLlGRpqM9P+p+BzBrz02b4GMnXoF8E+GiNk
+	 b8ZTs632Ls3Aw==
+Date: Wed, 24 Jan 2024 21:02:22 +0000
+From: Simon Horman <horms@kernel.org>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, David Ahern <dsahern@kernel.org>,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCHv2 net] selftests/net/lib: update busywait timeout value
+Message-ID: <20240124210222.GB217708@kernel.org>
+References: <20240124061344.1864484-1-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
-Message-ID: <20240124205435.1021490-1-nktgrg@google.com>
-Subject: [PATCH net-next] gve: Modify rx_buf_alloc_fail counter centrally and
- closer to failure
-From: nktgrg <nktgrg@google.com>
-To: netdev@vger.kernel.org, jeroendb@google.com, pkaligineedi@google.com, 
-	shailend@google.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, jfraker@google.com, 
-	linux-kernel@vger.kernel.org
-Cc: stable@kernel.org, Ankit Garg <nktgrg@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240124061344.1864484-1-liuhangbin@gmail.com>
 
-From: Ankit Garg <nktgrg@google.com>
+On Wed, Jan 24, 2024 at 02:13:44PM +0800, Hangbin Liu wrote:
+> The busywait timeout value is a millisecond, not a second. So the
+> current setting 2 is too small. On slow/busy host (or VMs) the
+> current timeout can expire even on "correct" execution, causing random
+> failures. Let's copy the WAIT_TIMEOUT from forwarding/lib.sh and set
+> BUSYWAIT_TIMEOUT here.
+> 
+> Fixes: 25ae948b4478 ("selftests/net: add lib.sh")
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 
-Previously, each caller of gve_rx_alloc_buffer had to increase counter
- and as a result one caller was not tracking those failure. Increasing
- counters at a common location now so callers don't have to duplicate
- code or miss counter management.
-
-Signed-off-by: Ankit Garg <nktgrg@google.com>
----
- drivers/net/ethernet/google/gve/gve_rx.c | 19 +++++++++++--------
- 1 file changed, 11 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/net/ethernet/google/gve/gve_rx.c b/drivers/net/ethernet/google/gve/gve_rx.c
-index 3cb3a9a..eb67ea9 100644
---- a/drivers/net/ethernet/google/gve/gve_rx.c
-+++ b/drivers/net/ethernet/google/gve/gve_rx.c
-@@ -93,7 +93,8 @@ static void gve_setup_rx_buffer(struct gve_rx_slot_page_info *page_info,
- 
- static int gve_rx_alloc_buffer(struct gve_priv *priv, struct device *dev,
- 			       struct gve_rx_slot_page_info *page_info,
--			       union gve_rx_data_slot *data_slot)
-+			       union gve_rx_data_slot *data_slot,
-+			       struct gve_rx_ring *rx)
- {
- 	struct page *page;
- 	dma_addr_t dma;
-@@ -101,8 +102,12 @@ static int gve_rx_alloc_buffer(struct gve_priv *priv, struct device *dev,
- 
- 	err = gve_alloc_page(priv, dev, &page, &dma, DMA_FROM_DEVICE,
- 			     GFP_ATOMIC);
--	if (err)
-+	if (err) {
-+		u64_stats_update_begin(&rx->statss);
-+		rx->rx_buf_alloc_fail++;
-+		u64_stats_update_end(&rx->statss);
- 		return err;
-+	}
- 
- 	gve_setup_rx_buffer(page_info, dma, page, &data_slot->addr);
- 	return 0;
-@@ -143,8 +148,9 @@ static int gve_prefill_rx_pages(struct gve_rx_ring *rx)
- 					    &rx->data.data_ring[i].qpl_offset);
- 			continue;
- 		}
--		err = gve_rx_alloc_buffer(priv, &priv->pdev->dev, &rx->data.page_info[i],
--					  &rx->data.data_ring[i]);
-+		err = gve_rx_alloc_buffer(priv, &priv->pdev->dev,
-+					  &rx->data.page_info[i],
-+					  &rx->data.data_ring[i], rx);
- 		if (err)
- 			goto alloc_err_rda;
- 	}
-@@ -895,10 +901,7 @@ static bool gve_rx_refill_buffers(struct gve_priv *priv, struct gve_rx_ring *rx)
- 				gve_rx_free_buffer(dev, page_info, data_slot);
- 				page_info->page = NULL;
- 				if (gve_rx_alloc_buffer(priv, dev, page_info,
--							data_slot)) {
--					u64_stats_update_begin(&rx->statss);
--					rx->rx_buf_alloc_fail++;
--					u64_stats_update_end(&rx->statss);
-+							data_slot, rx)) {
- 					break;
- 				}
- 			}
--- 
-2.43.0.429.g432eaa2c6b-goog
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
