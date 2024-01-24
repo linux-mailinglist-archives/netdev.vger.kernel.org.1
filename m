@@ -1,77 +1,102 @@
-Return-Path: <netdev+bounces-65633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65640-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16FEB83B384
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 22:02:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDD9C83B3F9
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 22:34:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9038AB21953
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 21:02:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F02861C22DA2
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 21:34:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23A931350DB;
-	Wed, 24 Jan 2024 21:02:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA1171353E7;
+	Wed, 24 Jan 2024 21:34:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KpIcca8d"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="A5A63mPP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE3FA811E4;
-	Wed, 24 Jan 2024 21:02:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DE501350DC
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 21:33:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706130148; cv=none; b=E2pBT+a/jkixgmLZTqWibxLOgrWx9HB5Txypqt7CFLOlVcwxoXDe+5XCi2MYMjKXVBByem2vAsHbSyL4LDjwMUNheBjofe/tYwkZbNEGgEz2epmoaKivnBtaeLFJYk/wA0M0Bw17GwpMv1F62at+N1GQnlf5riyEHdMndgleeR8=
+	t=1706132040; cv=none; b=HzhDM17o+QSie1JKnn0XU5tQbK7H1zRxJEnjqWxZ1F+hzvrH/HRar6HNoR4yKbVGO4WwE3olua9NWQWiXodWuhapFewguYmO7jHnSqjcLCTp7y32XT8RK5rryIBaGXa9wjO7L6JmZrAFDR8qMF+15wjw3RNhc3y+FlyhTTxELtM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706130148; c=relaxed/simple;
-	bh=GRLg7Fttd7YkkhBg0ew3v+e7tGu/q9kze+tM6Iuq/X8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rCBvv9HgQ/W8EFtEa/5XMRO4bBFFyNus2otpDve2DZTdEBFtSjTEQw8CicNeoI1QuxiTCXfp4W8VON4BakbVN9brCeXyAYjEy7MiNcw5Yrlc5MXrgAhWqwcaPYfxlgPhUBp1QdtpTO5eNaTgYGvNNQ+vq1IhltGVYCRmkrHYqxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KpIcca8d; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 848AAC433F1;
-	Wed, 24 Jan 2024 21:02:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706130147;
-	bh=GRLg7Fttd7YkkhBg0ew3v+e7tGu/q9kze+tM6Iuq/X8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KpIcca8di4rparosYDqBdumPDaTqwMUXRU7uIA4G3UfU2QZZgjT16huRflLWB5SpG
-	 Hmgy9fbtM8hhhrsnsV3AWlCgP8nKldAh/P+sHW9bjluCseSDBl4vBSRInVp3TKP/P1
-	 SadyDfruDp3nmigLEH817zET38Uzy++//LggqVZnOdurCmjE8CCYUPPu0FtdIfnsp8
-	 z53evmErpHmlpyjxVKmJ3FvOszEbzWfOh3DNhyL0QzbZg0lYHiVKfKAlALvvVv2DlM
-	 3qqAw2jgq0cQ8AVqYDv3t+tgq1+J8BUlLlGRpqM9P+p+BzBrz02b4GMnXoF8E+GiNk
-	 b8ZTs632Ls3Aw==
-Date: Wed, 24 Jan 2024 21:02:22 +0000
-From: Simon Horman <horms@kernel.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, David Ahern <dsahern@kernel.org>,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCHv2 net] selftests/net/lib: update busywait timeout value
-Message-ID: <20240124210222.GB217708@kernel.org>
-References: <20240124061344.1864484-1-liuhangbin@gmail.com>
+	s=arc-20240116; t=1706132040; c=relaxed/simple;
+	bh=T8WFi+eefvdlThLpuTaze6aHfWAP2ZG/E8hfjmZUbmg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YCbDTmCdE4tTU57i0EpR/erKjXxs/QHO1tFxjQryWZAQ3Iuk0z70PKym/gufiMWvku9W8CBZIvsDnTFX/xDLlZf4BSHjL5UizR4o8JbRWNEdgXdxBFb9qfacysXqC6lkNQEwNR0LkrNvrffPzeIl8GkTz3v928BDfZQYXOT0QUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=A5A63mPP; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706132039; x=1737668039;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=T8WFi+eefvdlThLpuTaze6aHfWAP2ZG/E8hfjmZUbmg=;
+  b=A5A63mPPwhBZJ8rexepeFCb0pKVVkr6mP4mL0Jr7/Tt7ZHjtnBfsgNnt
+   yUuwgIRmwaqa08Q9a6xU35Q/qPHjBQbk6lUuw5YYtOB07anBI3KePc/2U
+   7dLU7fQXAXZuzQaS5Re7uyp48diU877sJE5heIvxQZlqo0+JC/qzGOGhD
+   jMWqLX5T1OFkfyWishAsXdbnM3e9dQre0YrUWoPSTt999TWgJEZwljoCx
+   1Z6VUUm4uHJi6f+8FH/0WjnsXHukvxU9bZ0HpaaQvbldNYtBdaiAIeiDe
+   QAuYnbT7iwzb+ao9EjaNb4luHRGSEqaUHrFnQK/GaUDVVv3Xc55EEhIat
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="8745625"
+X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
+   d="scan'208";a="8745625"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2024 13:33:56 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="909788261"
+X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
+   d="scan'208";a="909788261"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orsmga004.jf.intel.com with ESMTP; 24 Jan 2024 13:33:55 -0800
+Received: from lplachno-mobl.ger.corp.intel.com (lplachno-mobl.ger.corp.intel.com [10.246.2.62])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 8CECE9A4A7;
+	Wed, 24 Jan 2024 15:21:44 +0000 (GMT)
+From: Lukasz Plachno <lukasz.plachno@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	brett.creeley@amd.com,
+	horms@kernel.org,
+	Lukasz Plachno <lukasz.plachno@intel.com>
+Subject: [PATCH iwl-next v4 0/2] ice: Support flow director ether type filters
+Date: Wed, 24 Jan 2024 16:21:39 +0100
+Message-Id: <20240124152141.15077-1-lukasz.plachno@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240124061344.1864484-1-liuhangbin@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jan 24, 2024 at 02:13:44PM +0800, Hangbin Liu wrote:
-> The busywait timeout value is a millisecond, not a second. So the
-> current setting 2 is too small. On slow/busy host (or VMs) the
-> current timeout can expire even on "correct" execution, causing random
-> failures. Let's copy the WAIT_TIMEOUT from forwarding/lib.sh and set
-> BUSYWAIT_TIMEOUT here.
-> 
-> Fixes: 25ae948b4478 ("selftests/net: add lib.sh")
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+Ethtool allows creating rules with type=ether, add support for such
+filters in ice driver.
+Patch 1 allows extending ice_fdir_comp_rules() with handling additional
+type of filters.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+v4: added warning explaining that masks other than broadcast and unicast
+    are not supported, added check for empty filters
+v3: fixed possible use of uninitialized variable "perfect_filter"
+v2: fixed compilation warning by moving default: case between commits
+Jakub Buchocki (1):
+  ice: Implement 'flow-type ether' rules
+
+Lukasz Plachno (1):
+  ice: Remove unnecessary argument from ice_fdir_comp_rules()
+
+ .../net/ethernet/intel/ice/ice_ethtool_fdir.c | 140 +++++++++++++++++-
+ drivers/net/ethernet/intel/ice/ice_fdir.c     | 112 ++++++++------
+ drivers/net/ethernet/intel/ice/ice_fdir.h     |  11 ++
+ drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
+ 4 files changed, 217 insertions(+), 47 deletions(-)
+
+-- 
+2.34.1
 
 
