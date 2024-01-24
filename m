@@ -1,300 +1,145 @@
-Return-Path: <netdev+bounces-65414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CD5683A66B
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 11:11:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EC2483A671
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 11:12:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 323071C24D89
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:11:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C8A2E1F2C8D7
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:12:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A3F018658;
-	Wed, 24 Jan 2024 10:10:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 904F61862A;
+	Wed, 24 Jan 2024 10:12:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Kj5GJSSt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JbSlMkC0"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C064F18643
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 10:10:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEE6F18EB8
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 10:12:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706091056; cv=none; b=SveDzLToNUd0ocHwamngzJZrwyJ/JchVSaaaWQ7+SwICFhvoJbACAgZwG6uz8HKvUQhW97qkS3eoHAsK9uFRpD0fOwR74vHfhiPIed7LlHN8h3/X/DnQa8ekrath7xFjj92qgzrQFBv9zrzBtG/JSx9CFeq6d3QwNTuj02IkbNQ=
+	t=1706091122; cv=none; b=DPwquxlGq53jra8MUpqXrtVXxa2wmpmT+kWhoA2LTtGioI0SJn8hxlqXStwN23jAHAnaQK1k+qBSqkP+JjqNVOJuUShJPeWVL+Ve6u3/SRSeiFHCTGpYpvqRieFT0UaHCoiI2qVY9lbF3AHf3lyfroKpyedbv9v7bRTXO81LyWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706091056; c=relaxed/simple;
-	bh=SSWNhg1BeWMjlsW8eOblnkY8M41Gr7UmMlQfPptWizU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z1Imxbv5u+26nd9GBWoVswhi0U5VVcGNRvNMsGOn8BjXmyjlWrVa9Ov2u0GZtrkiSAhIi6L+w+SHVE+zNZO8CIR2tnsoPV39FLJX4rl5audjEtKB13ZdEslvn6BGvc8iRNB0oYexPsLRjGTusssP5Tc61HYSf8FA5LTUy3q0hPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Kj5GJSSt; arc=none smtp.client-ip=95.215.58.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <fc421c38-66b7-4d4e-abfa-051eccbf793c@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706091051;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kazOr6AAUqaXXxOqjGWomQo5TpJnFcKaIZXSMkHqQh4=;
-	b=Kj5GJSStFxxpSQW/5cQIZZSMUR8GOXhqanSovUXTJMwsCAN9lITPvR1nvMwgCOn7dVvIAO
-	Z31fJeY4dcB0XYncgCP+XSqc4LCNRDUAFOMO6R8Lzybp0I5JAf+/IKdnzGSNAuQreabNc9
-	jztywpVNReG6Q3OnAo7Tjxhm34KjWsU=
-Date: Wed, 24 Jan 2024 10:10:46 +0000
+	s=arc-20240116; t=1706091122; c=relaxed/simple;
+	bh=gGdCXMj1+SakUzt5LtDBJY4BNy2EkmbJOpe6v0OniAY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XOL0YSAZ+Nbgdsvf+y4bGe37Qs9LYQdLFD+RhvgVO6JglmacgxnyetqSs15PS43MbQTomE6asICZa3XoqelChEPplHMNL+cCBDo2Vgva7q9GF5VQpcxnGvVjkKKTD9JtpDKg2CP6Oi1LNXCQXJYHHY/7wg4q1fEyW/+xqrE14nE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JbSlMkC0; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-55c89dbef80so5844a12.1
+        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 02:12:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1706091119; x=1706695919; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c0dfYPbVXfk5SHs/iVuFsnBUb4kmK2ZHh+R+vrVHhv0=;
+        b=JbSlMkC0foUSsQnXhPHn94T+l7jc2R9r2aZ1Lh5/qPR75kH62uhKzqReCEczmDCCE+
+         YkgzLH3ReNdom0x7ltjvUyhBXnRM+dg5K6/idAQvv7llg6LMskHXKkKof+cSRyIluhgf
+         wb9JX+wgmsffp4VQ6SG2Ow9ZpZuLJ3q3+VFzYtVi/FqODw8uzRkrDXx+e/qxNvzNiKDs
+         omu2U1PytammtAfIJgbFJMJGDosBi57A3LGA2LnlFbRDM2bVQnc0v/8kdMz7AI0EeQBl
+         oqjBi+ET3YjgbVu+GmsZSF6E0ER13mgWkXeQWKjVJ3Hx65I3IpO8r9fU7lu7xTnklCuE
+         T7ng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706091119; x=1706695919;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=c0dfYPbVXfk5SHs/iVuFsnBUb4kmK2ZHh+R+vrVHhv0=;
+        b=CdGRi7Xy67lJDMM+qF4FE2kuiix8Tm3nyVL2jyzwz8Wo4GcvH6VyQ0tdq698AzL+uL
+         CWFsBXbhhd9cJFX8V5P8v2kTMdMVbajOX8BohLrO2pjjvIhwnIRgs7WCfDH6T2r4b8dS
+         lcGXcXECeCF7Xs87xBvFuHe9qB2Epw5ZoQua1T8pE5amFkUn6SU6YnwFEYmUjrwMuNFm
+         dZKuEpc1eiYgsEUwzB/xOT5Pr/Yb/qOQ2+iqNb9m6AY38jBmD7SjvIzGZ2uLHZS3L02o
+         q12kvhN/Z9gF99KevvREnA+Cxgo0R6acHdOZAXp+pMQL0N8I0qnkdBhR9KxWvAmmG06m
+         zFRA==
+X-Gm-Message-State: AOJu0Yz3dn+IuNRjhFpxtv0/aGq7loV5ysMCcL/UopdH5zvFK8TjG9HV
+	U/eT5fqvtFSdRQJihONfriiaQQB3SDY3zfKNVYjdI3vaQSBJyuvFy980eFC2I9s02LJa7ns5TK/
+	GX1Cmmk+XPwNYs3baPhXl9ndcNvFf8lNa3SGJ
+X-Google-Smtp-Source: AGHT+IEv+2qSS2pv4rZ9VBB2DT8zXK7L7mYtmD72FrK+uY6AgAGcZqRbyGfOEabfIGTLcaRg2pqq+FKwhBjgQukqWXw=
+X-Received: by 2002:a05:6402:1d84:b0:55a:4959:4978 with SMTP id
+ dk4-20020a0564021d8400b0055a49594978mr38863edb.7.1706091118505; Wed, 24 Jan
+ 2024 02:11:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 3/4] net: wan: fsl_qmc_hdlc: Add runtime timeslots changes
- support
-Content-Language: en-US
-To: Herve Codina <herve.codina@bootlin.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, Andrew Lunn <andrew@lunn.ch>,
- Mark Brown <broonie@kernel.org>,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-References: <20240123164912.249540-1-herve.codina@bootlin.com>
- <20240123164912.249540-4-herve.codina@bootlin.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20240123164912.249540-4-herve.codina@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+References: <20240119092024.193066-1-zhangpeng362@huawei.com>
+ <Zap7t9GOLTM1yqjT@casper.infradead.org> <5106a58e-04da-372a-b836-9d3d0bd2507b@huawei.com>
+ <Za6SD48Zf0CXriLm@casper.infradead.org> <CANn89iL4qUXsVDRNGgBOweZbJ6ErWMsH+EpOj-55Lky8JEEhqQ@mail.gmail.com>
+ <Za6h-tB7plgKje5r@casper.infradead.org> <CANn89iJDNdOpb6L6PkrAcbGcsx6_v4VD0v2XFY77g7tEnJEXXQ@mail.gmail.com>
+ <4f78fea2-ced6-fc5a-c7f2-b33fcd226f06@huawei.com>
+In-Reply-To: <4f78fea2-ced6-fc5a-c7f2-b33fcd226f06@huawei.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 24 Jan 2024 11:11:47 +0100
+Message-ID: <CANn89iKbyTRvWEE-3TyVVwTa=N2KsiV73-__2ASktt2hrauQ0g@mail.gmail.com>
+Subject: Re: SECURITY PROBLEM: Any user can crash the kernel with TCP ZEROCOPY
+To: "zhangpeng (AS)" <zhangpeng362@huawei.com>
+Cc: Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, 
+	netdev@vger.kernel.org, akpm@linux-foundation.org, davem@davemloft.net, 
+	dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, arjunroy@google.com, 
+	wangkefeng.wang@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 23/01/2024 16:49, Herve Codina wrote:
-> QMC channels support runtime timeslots changes but nothing is done at
-> the QMC HDLC driver to handle these changes.
-> 
-> Use existing IFACE ioctl in order to configure the timeslots to use.
-> 
-> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-> Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
-> Acked-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->   drivers/net/wan/fsl_qmc_hdlc.c | 169 ++++++++++++++++++++++++++++++++-
->   1 file changed, 168 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/wan/fsl_qmc_hdlc.c b/drivers/net/wan/fsl_qmc_hdlc.c
-> index 31b637ec8390..82019cd96365 100644
-> --- a/drivers/net/wan/fsl_qmc_hdlc.c
-> +++ b/drivers/net/wan/fsl_qmc_hdlc.c
-> @@ -32,6 +32,7 @@ struct qmc_hdlc {
->   	struct qmc_hdlc_desc tx_descs[8];
->   	unsigned int tx_out;
->   	struct qmc_hdlc_desc rx_descs[4];
-> +	u32 slot_map;
->   };
->   
->   static inline struct qmc_hdlc *netdev_to_qmc_hdlc(struct net_device *netdev)
-> @@ -202,6 +203,162 @@ static netdev_tx_t qmc_hdlc_xmit(struct sk_buff *skb, struct net_device *netdev)
->   	return NETDEV_TX_OK;
->   }
->   
-> +static int qmc_hdlc_xlate_slot_map(struct qmc_hdlc *qmc_hdlc,
-> +				   u32 slot_map, struct qmc_chan_ts_info *ts_info)
-> +{
-> +	u64 ts_mask_avail;
-> +	unsigned int bit;
-> +	unsigned int i;
-> +	u64 ts_mask;
-> +	u64 map;
-> +
-> +	/* Tx and Rx masks must be identical */
-> +	if (ts_info->rx_ts_mask_avail != ts_info->tx_ts_mask_avail) {
-> +		dev_err(qmc_hdlc->dev, "tx and rx available timeslots mismatch (0x%llx, 0x%llx)\n",
-> +			ts_info->rx_ts_mask_avail, ts_info->tx_ts_mask_avail);
-> +		return -EINVAL;
-> +	}
-> +
-> +	ts_mask_avail = ts_info->rx_ts_mask_avail;
-> +	ts_mask = 0;
-> +	map = slot_map;
-> +	bit = 0;
-> +	for (i = 0; i < 64; i++) {
-> +		if (ts_mask_avail & BIT_ULL(i)) {
-> +			if (map & BIT_ULL(bit))
-> +				ts_mask |= BIT_ULL(i);
-> +			bit++;
-> +		}
-> +	}
-> +
-> +	if (hweight64(ts_mask) != hweight64(map)) {
-> +		dev_err(qmc_hdlc->dev, "Cannot translate timeslots 0x%llx -> (0x%llx,0x%llx)\n",
-> +			map, ts_mask_avail, ts_mask);
-> +		return -EINVAL;
-> +	}
-> +
-> +	ts_info->tx_ts_mask = ts_mask;
-> +	ts_info->rx_ts_mask = ts_mask;
-> +	return 0;
-> +}
-> +
-> +static int qmc_hdlc_xlate_ts_info(struct qmc_hdlc *qmc_hdlc,
-> +				  const struct qmc_chan_ts_info *ts_info, u32 *slot_map)
-> +{
-> +	u64 ts_mask_avail;
-> +	unsigned int bit;
-> +	unsigned int i;
-> +	u64 ts_mask;
-> +	u64 map;
-> +
+On Wed, Jan 24, 2024 at 10:30=E2=80=AFAM zhangpeng (AS) <zhangpeng362@huawe=
+i.com> wrote:
+>
+>
+> By using git-bisect, the patch that introduces this issue is 05255b823a61=
+7
+> ("tcp: add TCP_ZEROCOPY_RECEIVE support for zerocopy receive."). v4.18-rc=
+1.
+>
+> Currently, there are no other repro or c reproduction programs can reprod=
+uce
+> the issue. The syz log used to reproduce the issue is as follows:
+>
+> r3 =3D socket$inet_tcp(0x2, 0x1, 0x0)
+> mmap(&(0x7f0000ff9000/0x4000)=3Dnil, 0x4000, 0x0, 0x12, r3, 0x0)
+> r4 =3D socket$inet_tcp(0x2, 0x1, 0x0)
+> bind$inet(r4, &(0x7f0000000000)=3D{0x2, 0x4e24, @multicast1}, 0x10)
+> connect$inet(r4, &(0x7f00000006c0)=3D{0x2, 0x4e24, @empty}, 0x10)
+> r5 =3D openat$dir(0xffffffffffffff9c, &(0x7f00000000c0)=3D'./file0\x00',
+> 0x181e42, 0x0)
+> fallocate(r5, 0x0, 0x0, 0x85b8818)
+> sendfile(r4, r5, 0x0, 0x3000)
+> getsockopt$inet_tcp_TCP_ZEROCOPY_RECEIVE(r4, 0x6, 0x23,
+> &(0x7f00000001c0)=3D{&(0x7f0000ffb000/0x3000)=3Dnil, 0x3000, 0x0, 0x0,
+> 0x0, 0x0, 0x0, 0x0, 0x0}, &(0x7f0000000440)=3D0x10)
+> r6 =3D openat$dir(0xffffffffffffff9c, &(0x7f00000000c0)=3D'./file0\x00',
+> 0x181e42, 0x0)
+>
 
-Starting from here ...
+Could you try the following fix then ?
 
-> +	/* Tx and Rx masks must be identical */
-> +	if (ts_info->rx_ts_mask_avail != ts_info->tx_ts_mask_avail) {
-> +		dev_err(qmc_hdlc->dev, "tx and rx available timeslots mismatch (0x%llx, 0x%llx)\n",
-> +			ts_info->rx_ts_mask_avail, ts_info->tx_ts_mask_avail);
-> +		return -EINVAL;
-> +	}
-> +	if (ts_info->rx_ts_mask != ts_info->tx_ts_mask) {
-> +		dev_err(qmc_hdlc->dev, "tx and rx timeslots mismatch (0x%llx, 0x%llx)\n",
-> +			ts_info->rx_ts_mask, ts_info->tx_ts_mask);
-> +		return -EINVAL;
-> +	}
-> +
-> +	ts_mask_avail = ts_info->rx_ts_mask_avail;
-> +	ts_mask = ts_info->rx_ts_mask;
-> +	map = 0;
-> +	bit = 0;
-> +	for (i = 0; i < 64; i++) {
-> +		if (ts_mask_avail & BIT_ULL(i)) {
-> +			if (ts_mask & BIT_ULL(i))
-> +				map |= BIT_ULL(bit);
-> +			bit++;
-> +		}
-> +	}
-> +
-> +	if (hweight64(ts_mask) != hweight64(map)) {
-> +		dev_err(qmc_hdlc->dev, "Cannot translate timeslots (0x%llx,0x%llx) -> 0x%llx\n",
-> +			ts_mask_avail, ts_mask, map);
-> +		return -EINVAL;
-> +	}
-> +
+(We also could remove the !skb_frag_off(frag) condition, as the
+!PageCompound() is necessary it seems :/)
 
-till here the block looks like copy of the block from previous function.
-It worth to make a separate function for it, I think.
+Thanks a lot !
 
-> +	if (map >= BIT_ULL(32)) {
-> +		dev_err(qmc_hdlc->dev, "Slot map out of 32bit (0x%llx,0x%llx) -> 0x%llx\n",
-> +			ts_mask_avail, ts_mask, map);
-> +		return -EINVAL;
-> +	}
-> +
-> +	*slot_map = map;
-> +	return 0;
-> +}
-> +
-> +static int qmc_hdlc_set_iface(struct qmc_hdlc *qmc_hdlc, int if_iface, const te1_settings *te1)
-> +{
-> +	struct qmc_chan_ts_info ts_info;
-> +	int ret;
-> +
-> +	ret = qmc_chan_get_ts_info(qmc_hdlc->qmc_chan, &ts_info);
-> +	if (ret) {
-> +		dev_err(qmc_hdlc->dev, "get QMC channel ts info failed %d\n", ret);
-> +		return ret;
-> +	}
-> +	ret = qmc_hdlc_xlate_slot_map(qmc_hdlc, te1->slot_map, &ts_info);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = qmc_chan_set_ts_info(qmc_hdlc->qmc_chan, &ts_info);
-> +	if (ret) {
-> +		dev_err(qmc_hdlc->dev, "set QMC channel ts info failed %d\n", ret);
-> +		return ret;
-> +	}
-> +
-> +	qmc_hdlc->slot_map = te1->slot_map;
-> +
-> +	return 0;
-> +}
-> +
-> +static int qmc_hdlc_ioctl(struct net_device *netdev, struct if_settings *ifs)
-> +{
-> +	struct qmc_hdlc *qmc_hdlc = netdev_to_qmc_hdlc(netdev);
-> +	te1_settings te1;
-> +
-> +	switch (ifs->type) {
-> +	case IF_GET_IFACE:
-> +		ifs->type = IF_IFACE_E1;
-> +		if (ifs->size < sizeof(te1)) {
-> +			if (!ifs->size)
-> +				return 0; /* only type requested */
-> +
-> +			ifs->size = sizeof(te1); /* data size wanted */
-> +			return -ENOBUFS;
-> +		}
-> +
-> +		memset(&te1, 0, sizeof(te1));
-> +
-> +		/* Update slot_map */
-> +		te1.slot_map = qmc_hdlc->slot_map;
-> +
-> +		if (copy_to_user(ifs->ifs_ifsu.te1, &te1, sizeof(te1)))
-> +			return -EFAULT;
-> +		return 0;
-> +
-> +	case IF_IFACE_E1:
-> +	case IF_IFACE_T1:
-> +		if (!capable(CAP_NET_ADMIN))
-> +			return -EPERM;
-> +
-> +		if (netdev->flags & IFF_UP)
-> +			return -EBUSY;
-> +
-> +		if (copy_from_user(&te1, ifs->ifs_ifsu.te1, sizeof(te1)))
-> +			return -EFAULT;
-> +
-> +		return qmc_hdlc_set_iface(qmc_hdlc, ifs->type, &te1);
-> +
-> +	default:
-> +		return hdlc_ioctl(netdev, ifs);
-> +	}
-> +}
-> +
->   static int qmc_hdlc_open(struct net_device *netdev)
->   {
->   	struct qmc_hdlc *qmc_hdlc = netdev_to_qmc_hdlc(netdev);
-> @@ -328,13 +485,14 @@ static const struct net_device_ops qmc_hdlc_netdev_ops = {
->   	.ndo_open       = qmc_hdlc_open,
->   	.ndo_stop       = qmc_hdlc_close,
->   	.ndo_start_xmit = hdlc_start_xmit,
-> -	.ndo_siocwandev	= hdlc_ioctl,
-> +	.ndo_siocwandev = qmc_hdlc_ioctl,
->   };
->   
->   static int qmc_hdlc_probe(struct platform_device *pdev)
->   {
->   	struct device_node *np = pdev->dev.of_node;
->   	struct qmc_hdlc *qmc_hdlc;
-> +	struct qmc_chan_ts_info ts_info;
->   	struct qmc_chan_info info;
->   	hdlc_device *hdlc;
->   	int ret;
-> @@ -364,6 +522,15 @@ static int qmc_hdlc_probe(struct platform_device *pdev)
->   		return -EINVAL;
->   	}
->   
-> +	ret = qmc_chan_get_ts_info(qmc_hdlc->qmc_chan, &ts_info);
-> +	if (ret) {
-> +		dev_err(qmc_hdlc->dev, "get QMC channel ts info failed %d\n", ret);
-> +		return ret;
-> +	}
-> +	ret = qmc_hdlc_xlate_ts_info(qmc_hdlc, &ts_info, &qmc_hdlc->slot_map);
-> +	if (ret)
-> +		return ret;
-> +
->   	qmc_hdlc->netdev = alloc_hdlcdev(qmc_hdlc);
->   	if (!qmc_hdlc->netdev) {
->   		dev_err(qmc_hdlc->dev, "failed to alloc hdlc dev\n");
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index 1baa484d21902d2492fc2830d960100dc09683bf..ee954ae7778a651a9da4de057e3=
+bafe35a6e10d6
+100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -1785,7 +1785,9 @@ static skb_frag_t *skb_advance_to_frag(struct
+sk_buff *skb, u32 offset_skb,
 
+ static bool can_map_frag(const skb_frag_t *frag)
+ {
+-       return skb_frag_size(frag) =3D=3D PAGE_SIZE && !skb_frag_off(frag);
++       return skb_frag_size(frag) =3D=3D PAGE_SIZE &&
++              !skb_frag_off(frag) &&
++              !PageCompound(skb_frag_page(frag));
+ }
+
+ static int find_next_mappable_frag(const skb_frag_t *frag,
 
