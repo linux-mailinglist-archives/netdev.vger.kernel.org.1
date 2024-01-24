@@ -1,123 +1,107 @@
-Return-Path: <netdev+bounces-65679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECAAD83B4CB
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 23:35:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D17F83B4DA
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 23:38:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8EE341F24C4D
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 22:35:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 436FF289F35
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 22:38:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC3EC13B7A0;
-	Wed, 24 Jan 2024 22:33:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42E1E135A71;
+	Wed, 24 Jan 2024 22:38:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="QrEmGNw4"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="vpA42fg/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93792137C40;
-	Wed, 24 Jan 2024 22:33:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 354B5134750;
+	Wed, 24 Jan 2024 22:38:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706135602; cv=none; b=um8BVYkxipYqP7i4x73y7zL66VnNOWp0gFAZt0amh/VtvAfGxzv+5HcFp8WYOX9Meb3VARqS9pQanAq2wZopYLJoDmnGtrHwR7hR7SywQBI123pU78fW/KY9GM6JSHrCSv2T/YoUs24OjNcsvX6jqXcsH50aCqyFh+3/bfZWSs4=
+	t=1706135906; cv=none; b=si2OdLl8cLX50Co3X+yeedHMniduhGQqdnGu8Lt/zK6LRh1zaW6/F86MKexRaZCvzpzZXso2yV60RDlyGHjw6ydbPQsHGuOuCa3x9HFHQ1uNwSzNxFKAjLgPD0UOuV4Kz8IPXzQdCA/OCrEcQYtfCH4kUks06nfVNOd0tD3SaWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706135602; c=relaxed/simple;
-	bh=86IbXZg2D8dZ14CMAOHu2fJ9DPKToZGpqc5c/wgcbic=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=C6rheg8hGFXG7I5rNc9WKN8b2tP5cBR0EHTyFikj1ZV1NKTF9mmXrdb1caAH9t9X3TTMfKCHptTDPf4U7jrYYoTx5XQLfrrT2X2rugzBZ2CeXi6OV3ejZthFes6TPl/cq+TUtcWyLTtfEFBQfvnWdZikE3W9ya2SsfvcGhZAGEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=QrEmGNw4; arc=none smtp.client-ip=212.227.17.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-	s=s31663417; t=1706135563; x=1706740363; i=wahrenst@gmx.net;
-	bh=86IbXZg2D8dZ14CMAOHu2fJ9DPKToZGpqc5c/wgcbic=;
-	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:In-Reply-To:
-	 References;
-	b=QrEmGNw49fdFCnb9BqA7tcRfqzGBhuN9iZPjkVmzmBkuFNQLWTUSzBksGe0oQu6I
-	 pBmvYP6ZowcfwDE1MCSkxvSu7o7jlrYKaqK1V4MuvLhwUqpr82frU0fDw4b0sJOMd
-	 AKHw/t7XAl+rDz+5ml6Bzkj5l89YQfraWj5dFu2tNflIPbD5B2neCsJRqS4HgP220
-	 +NUgvRMSgo7KD8RfGdZi01xBnrHKJi0quQ21XUrBMxUWu1mLCgLN6TDdwLIxrIlMV
-	 5kEBVvqFeabFNJOGuiEuqOhN6SuOixN2G9pRSoRuO7MyXNuQ8HjOxuVeUHmO9Dilk
-	 gp+ZdIN7DqqViyOG8w==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from stefanw-SCHENKER ([37.4.248.43]) by mail.gmx.net (mrgmx105
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1N2E1G-1r6Ce5293W-013ecc; Wed, 24
- Jan 2024 23:32:43 +0100
-From: Stefan Wahren <wahrenst@gmx.net>
-To: "David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1706135906; c=relaxed/simple;
+	bh=DTrll0FOkAbkEqdZ2vp/TWJw7W7v966osQ+uN/3YWkM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X4DCpu+VnnT/MX6mDCd5LKMYu+Oa+zoFrETcPmIjfb68dEp6Fy6kki1qwiMLrELBIYrprQR4/8jfXxYE6uSJLDGSLXu7/TCu6saMMmoBvsxXxpO2hPQdlw8ggahvKRkvD5IqOqWLjO5AXRR6aZ6LksXl+HiP6dqaWwiYk8h/7yU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=vpA42fg/; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=m89aTmxIORDpdqFWg3Gk7PEdhQXgqNhKa+YwoQCM5Dg=; b=vpA42fg/VmuC9/m9LxgKbDN78e
+	XQR8plsmgZuKLvoZRHVRlwNXUEVu1QwxxRhXs/TOIJ6MbNDs2rjJjuFVr8u6MqiWJ0kcMtjq1aSSd
+	4UxNRiNS30In28+LvoP6DhIo8NGhTZhSS9OPgIfHjMNCV5jub9mnS+bP/oFw3+eHpIJQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rSlss-0062N8-K5; Wed, 24 Jan 2024 23:38:14 +0100
+Date: Wed, 24 Jan 2024 23:38:14 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Lino Sanfilippo <LinoSanfilippo@gmx.de>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Stefan Wahren <wahrenst@gmx.net>
-Subject: [PATCH V3 14/14 next] MAINTAINERS: add entry for qca7k driver(s)
-Date: Wed, 24 Jan 2024 23:32:11 +0100
-Message-Id: <20240124223211.4687-15-wahrenst@gmx.net>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240124223211.4687-1-wahrenst@gmx.net>
-References: <20240124223211.4687-1-wahrenst@gmx.net>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Robert Marko <robert.marko@sartura.hr>,
+	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH 1/3] dt-bindings: net: ipq4019-mdio: document
+ now supported clock-frequency
+Message-ID: <9a63b6b1-ecf9-4a9f-9b6a-283367b2a219@lunn.ch>
+References: <20240124213640.7582-1-ansuelsmth@gmail.com>
+ <20240124213640.7582-2-ansuelsmth@gmail.com>
+ <010becc5-51f6-44c1-863e-f5092ca5018c@lunn.ch>
+ <65b18ecb.5d0a0220.e8e31.c94c@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:An8E5MmPXOy0Qfm6lQu1YYOOU2P8WzbmtkdufPdgrrGHAjI0V7G
- u5Wd1TrEMwb5QVMDWkLoL9WRYGmgy5VkmxYVKLwnK+f6DDAWijKkFED/8T2O7HUTjq+UTKC
- FG9eznhdJdjAxaGaFq6wnd473nFEmymuS+5Log5UJ7nbhRmqx3vLpohFXP157AyR4isI8T8
- y+O4pZERFrEwYsRJmmJCg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:jhNNaGn7XvM=;fMxvYjVDhqTxkoA8NMapSUXoR+x
- UFJsFxwwh18uQ/8whJreOnD+MkwmqfaI4m2mFm24K2k/mdq941hY7V4ezWkMdry4Zts4q1l+U
- jZafyJYMdFuR9kTfzkk6dofGRLGzam9DQffYVb1T9LBoJ5428ac/NFF+GAGNMLF1aZM33gNwm
- QX9J1crfBsYId0KIOLa1DQlXYekTzD4obok5mtmv8TezRwgAgEbqjr18Vs0xx7rJs1x7pVpi7
- QDYcq6YIZHh5dDWZFU9PEagnw002SKA1agoEA2RSjMeqJMzu0flW7NpRawC42tFmqeSqs3C5Z
- d2BQw/Hmti5AyJXGkN8QEV0u1eH+EYTrVAzaLj93mUn2u3kiH2ql1s4ZbM+icZU76d30DhJxK
- acsttIZhPOSiG7V1VPzdHCQZIq22nKMAPxvcvrLv5rhoW5cxOlos54WtiUzipLr/XrX6ufmVZ
- EeVJUMwXcx8KQqoDabDd9Q6dLKrNZ+tAjZT653PE8S3JASKOiPEWBVHm0O1tMDKFoE8XrvLnk
- i2a7B1S+oQhBY8RyEPBtfwQNACLhfhTtjSxa7UtUSgx955+zx3szdk9lSzVsOtRAJL3cWzo8O
- AW4gkND/F3KsJ0u16qGOvqD9bbgKNyyPD5FBsmBNaeIifVuvSzt4WOo0v9uq9NNrkhWaI2/LK
- OiVy+xHScJJY+vOs3+Os4BCPoPLcrIv4dyFaILKOG7eLFWr3173uYWmI8XZtC1mXqNGCQ5rKD
- FrHRUMzuD/LAXlcrcC9LKz6AFVRoruVyRmRJhPs60qdGvr4fh14JazA/uTG2k9sSZAnNQYkx8
- /lRcu+MpM6D6UYQO1ZksQBBPkA4/4v+fvICyChBgbeB0mhZwouTwD4qEPIeyMo0UCumbAjF0j
- n8iPqM1zuJGYTg3bOI7rQQiAuaYJEL7yBk70z8a5Pqk2OT2DqQnu/PtlJD29AecjkBpwVeCpW
- tE+3Wg==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <65b18ecb.5d0a0220.e8e31.c94c@mx.google.com>
 
-Since upstreaming i contributed a lot to this driver(s),
-so add myself as a maintainer.
+On Wed, Jan 24, 2024 at 11:27:20PM +0100, Christian Marangi wrote:
+> On Wed, Jan 24, 2024 at 11:23:05PM +0100, Andrew Lunn wrote:
+> > > +  clock-frequency:
+> > > +    description:
+> > > +      The MDIO bus clock that must be output by the MDIO bus hardware, if
+> > > +      absent, the default hardware values are used.
+> > > +
+> > > +      MDC rate is feed by an external clock (fixed 100MHz) and is divider
+> > > +      internally. The default divider is /256 resulting in the default rate
+> > > +      applied of 390KHz.
+> > > +    enum: [ 390625, 781250, 1562500, 3125000, 6250000, 12500000 ]
+> > 
+> > Hi Christian
+> > 
+> > 802.3 says the clock should be up to 2.5MHz by default. So the nearest
+> > would be 1562500. Please document that if not set, it defaults to
+> > this. And make the driver actually default to that.
+> >
+> 
+> As I said, this is very fk up and default value is 390KHz unless anyone
+> in the chain sets it (sometime uboot does it but it's not that common...
+> default qsdk uboot doesn't do that for example)... Ok I have to change
+> this to default to 1562500.
 
-Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
-=2D--
- MAINTAINERS | 7 +++++++
- 1 file changed, 7 insertions(+)
+I doubt you will cause any regression by defaulting to 2.5HHz
+instead. That is what the standard says it should be. All devices on
+the bus should support that.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 8d1052fa6a69..5808f06b4ccf 100644
-=2D-- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -18009,6 +18009,13 @@ T:	git git://git.kernel.org/pub/scm/linux/kernel/=
-git/kvalo/ath.git
- F:	Documentation/devicetree/bindings/net/wireless/qca,ath9k.yaml
- F:	drivers/net/wireless/ath/ath9k/
-
-+QUALCOMM ATHEROS QCA7K ETHERNET DRIVER
-+M:	Stefan Wahren <wahrenst@gmx.net>
-+L:	netdev@vger.kernel.org
-+S:	Maintained
-+F:	Documentation/devicetree/bindings/net/qca,qca7000.txt
-+F:	drivers/net/ethernet/qualcomm/qca*
-+
- QUALCOMM BAM-DMUX WWAN NETWORK DRIVER
- M:	Stephan Gerhold <stephan@gerhold.net>
- L:	netdev@vger.kernel.org
-=2D-
-2.34.1
-
+    Andrew
 
