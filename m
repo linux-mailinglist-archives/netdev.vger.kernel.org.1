@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-65360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6238083A3EE
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:19:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7622683A3F0
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:19:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17CD41F2CF3D
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 08:19:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E9D928AF60
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 08:19:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6CBE17571;
-	Wed, 24 Jan 2024 08:19:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83E6D17592;
+	Wed, 24 Jan 2024 08:19:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JgoE5ARn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hNMJ5Wkt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F08917589
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 08:19:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60C6717580
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 08:19:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706084346; cv=none; b=mj7PlFYRehwVurS0uFASpBgib1tvB5J6iWUaD+Xy3rMPK1urpWP5uHK7JH+oGl7+81IacyFN8HS88JmAwuftFNyUkcMkuJ/Cji4Llzo7CZ+1AfBtJhW60PVefC0RCmnPpSw5SFP4710yGfCU0RbxkcZlmFWRise/PH8yOzc8RZk=
+	t=1706084348; cv=none; b=EHF0d9cqCyiOHQrumrHypa5TLqVkvJtT3iVR2FxCst9/rLqrfdKfKUPO18mnDUICUp6MDayoXj7qH2zJrjVLgCNvw6eIf4fDwEAaZXVvfpUpY8MM+JasdoWVzAU8C3DndbhYWy6AOhBNJeL4E4LmwFjEWJMcHkzPm3rKxjloknc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706084346; c=relaxed/simple;
-	bh=KLeF6Ff/3eFjKTN5iyOtyNgVUuqo8zcjymMJ4X8MiAU=;
+	s=arc-20240116; t=1706084348; c=relaxed/simple;
+	bh=1/HOGQk8IcAL/AQOvw0nu3cSZVJD04r7T70Xby+gWwg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mXXXyDsAo9+9WEiiahiQjyWr99BnBeSqLEfjB8kAsW60ohUzBKU0WWOnxFsHnFLHxVgjeTtu/1GDNwOBxgcrlUgX6ep1Jg5EzYG/g1cR6+WMH6E2MURJE2fFIOeRFpjRr48a5nQA7jcnEbPHkxsiLxuq0qL+0sn3lh4uLQuN/wQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JgoE5ARn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 373C6C433F1;
-	Wed, 24 Jan 2024 08:19:06 +0000 (UTC)
+	 MIME-Version; b=H3IlLDanKqCG+5hq3BilRJuFNIZt3CKojCA9Qsi0n39qID98t1vq7xjohtFJJcbZD8aGQy5G3e+ggB333PLyLoWk6sQBaGxDTJ/3D35NYJ2gHmx93L53R4dUx7K3rqLQD5tF6cWD9UNJanIECO8LEjBYdPq+i9m8DDSgJvzZveA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hNMJ5Wkt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 122C2C433F1;
+	Wed, 24 Jan 2024 08:19:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706084346;
-	bh=KLeF6Ff/3eFjKTN5iyOtyNgVUuqo8zcjymMJ4X8MiAU=;
+	s=k20201202; t=1706084348;
+	bh=1/HOGQk8IcAL/AQOvw0nu3cSZVJD04r7T70Xby+gWwg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JgoE5ARn4g8sN5jUaAANVm+NieCSzDblIUqCjxuKOrafwzhE2NDuf5rzXY3GeEVdr
-	 sD/EcOqZ4lg6jjVnm1DbLfnAkQvZDScB82W4YbtVbkDp0U9mXb9XORTx954U8BM3+N
-	 tY9pZ85eshbhCuKa3vU1hqy2iXSAV+BLeeceaYHf0/rfwLYBkZn1S8v8Y8ndkkwNFR
-	 1DAio9kXGPVrrY2Wz+ZTdXHISPCT4HWKb73D95tU6hlGuheIdBBj/aFcocqXDFNCur
-	 Nw7kn1NLQ8kaf+Z+T1qBCEhsYpryaItQ2KkbhVNy7lbtRpOF//LD/GtthManQCsLU6
-	 kJ6mlElnKMsSg==
+	b=hNMJ5Wkt3ggGFfSbymgBVOlbgaKMg8CovgjdH/zUiySoPyByrKZt3+EhK5AAlzHiR
+	 FhV51Rh7LLF/X7Svoa3tcwQiL8YL5tntFG45EhSIopbY97dVxhppJjb55sCCqnKJ1E
+	 r1a952U4cOKxIEEoSmlZtGrQVjf9OdmDgbYJvZGfvRwjaxAMnR1qw1fRLhHKqbKp5D
+	 d0fiH3wqLS0pwLOxIHKjDA4w0NsCMZ8dfSlH/2cLqyn1yy/ENKstk28lA8xQFAQ/+Q
+	 l1xiPCM5Ivf/qRIXyhN2Mhz5Cz1+iSVaDqpWwkhNLw5A2DKlwfTmAXdT4UFQyy+fyI
+	 F8pTAP3oFcEvg==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -49,10 +49,10 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Subject: [net 03/14] net/mlx5e: Fix operation precedence bug in port timestamping napi_poll context
-Date: Wed, 24 Jan 2024 00:18:44 -0800
-Message-ID: <20240124081855.115410-4-saeed@kernel.org>
+	Gal Pressman <gal@nvidia.com>
+Subject: [net 04/14] net/mlx5e: Fix inconsistent hairpin RQT sizes
+Date: Wed, 24 Jan 2024 00:18:45 -0800
+Message-ID: <20240124081855.115410-5-saeed@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240124081855.115410-1-saeed@kernel.org>
 References: <20240124081855.115410-1-saeed@kernel.org>
@@ -64,35 +64,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+From: Tariq Toukan <tariqt@nvidia.com>
 
-Indirection (*) is of lower precedence than postfix increment (++). Logic
-in napi_poll context would cause an out-of-bound read by first increment
-the pointer address by byte address space and then dereference the value.
-Rather, the intended logic was to dereference first and then increment the
-underlying value.
+The processing of traffic in hairpin queues occurs in HW/FW and does not
+involve the cpus, hence the upper bound on max num channels does not
+apply to them.  Using this bound for the hairpin RQT max_table_size is
+wrong.  It could be too small, and cause the error below [1].  As the
+RQT size provided on init does not get modified later, use the same
+value for both actual and max table sizes.
 
-Fixes: 92214be5979c ("net/mlx5e: Update doorbell for port timestamping CQ before the software counter")
-Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+[1]
+mlx5_core 0000:08:00.1: mlx5_cmd_out_err:805:(pid 1200): CREATE_RQT(0x916) op_mod(0x0) failed, status bad parameter(0x3), syndrome (0x538faf), err(-22)
+
+Fixes: 74a8dadac17e ("net/mlx5e: Preparations for supporting larger number of channels")
+Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+Reviewed-by: Gal Pressman <gal@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c | 2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_tc.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c b/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
-index c206cc0a8483..078f56a3cbb2 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
-@@ -213,7 +213,7 @@ static void mlx5e_ptp_handle_ts_cqe(struct mlx5e_ptpsq *ptpsq,
- 	mlx5e_ptpsq_mark_ts_cqes_undelivered(ptpsq, hwtstamp);
- out:
- 	napi_consume_skb(skb, budget);
--	md_buff[*md_buff_sz++] = metadata_id;
-+	md_buff[(*md_buff_sz)++] = metadata_id;
- 	if (unlikely(mlx5e_ptp_metadata_map_unhealthy(&ptpsq->metadata_map)) &&
- 	    !test_and_set_bit(MLX5E_SQ_STATE_RECOVERING, &sq->state))
- 		queue_work(ptpsq->txqsq.priv->wq, &ptpsq->report_unhealthy_work);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+index 30932c9c9a8f..047b465fc6a5 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+@@ -761,7 +761,7 @@ static int mlx5e_hairpin_create_indirect_rqt(struct mlx5e_hairpin *hp)
+ 
+ 	err = mlx5e_rss_params_indir_init(&indir, mdev,
+ 					  mlx5e_rqt_size(mdev, hp->num_channels),
+-					  mlx5e_rqt_size(mdev, priv->max_nch));
++					  mlx5e_rqt_size(mdev, hp->num_channels));
+ 	if (err)
+ 		return err;
+ 
 -- 
 2.43.0
 
