@@ -1,145 +1,107 @@
-Return-Path: <netdev+bounces-65415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EC2483A671
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 11:12:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A15EA83A676
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 11:14:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C8A2E1F2C8D7
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:12:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3BE4EB22039
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:14:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 904F61862A;
-	Wed, 24 Jan 2024 10:12:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A252C1862E;
+	Wed, 24 Jan 2024 10:14:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JbSlMkC0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XAx/F09a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEE6F18EB8
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 10:12:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77D0A1862A;
+	Wed, 24 Jan 2024 10:14:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706091122; cv=none; b=DPwquxlGq53jra8MUpqXrtVXxa2wmpmT+kWhoA2LTtGioI0SJn8hxlqXStwN23jAHAnaQK1k+qBSqkP+JjqNVOJuUShJPeWVL+Ve6u3/SRSeiFHCTGpYpvqRieFT0UaHCoiI2qVY9lbF3AHf3lyfroKpyedbv9v7bRTXO81LyWI=
+	t=1706091248; cv=none; b=i7sEFC7Mkc5cMlLGeQdKBrTfj3MEXj2lblpmfhNISlaWsyFgSj+r0c1RBGJWGfKXbnLKSWBqVp7+q8NPWyuaBqGYKj9duAOAlkmXewxIjI1gOzBrVbrWzUw/yNIt75omdxl/PAhibIs2BKFFW/h8qqmhgsR1eaWF+9Cv/FDjOKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706091122; c=relaxed/simple;
-	bh=gGdCXMj1+SakUzt5LtDBJY4BNy2EkmbJOpe6v0OniAY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XOL0YSAZ+Nbgdsvf+y4bGe37Qs9LYQdLFD+RhvgVO6JglmacgxnyetqSs15PS43MbQTomE6asICZa3XoqelChEPplHMNL+cCBDo2Vgva7q9GF5VQpcxnGvVjkKKTD9JtpDKg2CP6Oi1LNXCQXJYHHY/7wg4q1fEyW/+xqrE14nE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JbSlMkC0; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-55c89dbef80so5844a12.1
-        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 02:12:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706091119; x=1706695919; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=c0dfYPbVXfk5SHs/iVuFsnBUb4kmK2ZHh+R+vrVHhv0=;
-        b=JbSlMkC0foUSsQnXhPHn94T+l7jc2R9r2aZ1Lh5/qPR75kH62uhKzqReCEczmDCCE+
-         YkgzLH3ReNdom0x7ltjvUyhBXnRM+dg5K6/idAQvv7llg6LMskHXKkKof+cSRyIluhgf
-         wb9JX+wgmsffp4VQ6SG2Ow9ZpZuLJ3q3+VFzYtVi/FqODw8uzRkrDXx+e/qxNvzNiKDs
-         omu2U1PytammtAfIJgbFJMJGDosBi57A3LGA2LnlFbRDM2bVQnc0v/8kdMz7AI0EeQBl
-         oqjBi+ET3YjgbVu+GmsZSF6E0ER13mgWkXeQWKjVJ3Hx65I3IpO8r9fU7lu7xTnklCuE
-         T7ng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706091119; x=1706695919;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=c0dfYPbVXfk5SHs/iVuFsnBUb4kmK2ZHh+R+vrVHhv0=;
-        b=CdGRi7Xy67lJDMM+qF4FE2kuiix8Tm3nyVL2jyzwz8Wo4GcvH6VyQ0tdq698AzL+uL
-         CWFsBXbhhd9cJFX8V5P8v2kTMdMVbajOX8BohLrO2pjjvIhwnIRgs7WCfDH6T2r4b8dS
-         lcGXcXECeCF7Xs87xBvFuHe9qB2Epw5ZoQua1T8pE5amFkUn6SU6YnwFEYmUjrwMuNFm
-         dZKuEpc1eiYgsEUwzB/xOT5Pr/Yb/qOQ2+iqNb9m6AY38jBmD7SjvIzGZ2uLHZS3L02o
-         q12kvhN/Z9gF99KevvREnA+Cxgo0R6acHdOZAXp+pMQL0N8I0qnkdBhR9KxWvAmmG06m
-         zFRA==
-X-Gm-Message-State: AOJu0Yz3dn+IuNRjhFpxtv0/aGq7loV5ysMCcL/UopdH5zvFK8TjG9HV
-	U/eT5fqvtFSdRQJihONfriiaQQB3SDY3zfKNVYjdI3vaQSBJyuvFy980eFC2I9s02LJa7ns5TK/
-	GX1Cmmk+XPwNYs3baPhXl9ndcNvFf8lNa3SGJ
-X-Google-Smtp-Source: AGHT+IEv+2qSS2pv4rZ9VBB2DT8zXK7L7mYtmD72FrK+uY6AgAGcZqRbyGfOEabfIGTLcaRg2pqq+FKwhBjgQukqWXw=
-X-Received: by 2002:a05:6402:1d84:b0:55a:4959:4978 with SMTP id
- dk4-20020a0564021d8400b0055a49594978mr38863edb.7.1706091118505; Wed, 24 Jan
- 2024 02:11:58 -0800 (PST)
+	s=arc-20240116; t=1706091248; c=relaxed/simple;
+	bh=/9Bgs9Ucy3j81IsL52Q0gGKY1HfdMRpMhJNhpIJhjKY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MvKl0S0YRw8+1W3hi/q3WEJX+codv4L+AlsjbsxzYTQffSRf+quNGu5xDpTw23n9oP5Jaefzd9JwZdnAEDscJbu5V3Oj35OcEAm6zhwlDx493AFM8hw2h8KgxMHcU2ytrSa/aPDrUsZoF8Nwe3ZwTFstz1OKij4V9Ew6+cwnvQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XAx/F09a; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BA19C433F1;
+	Wed, 24 Jan 2024 10:14:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706091247;
+	bh=/9Bgs9Ucy3j81IsL52Q0gGKY1HfdMRpMhJNhpIJhjKY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XAx/F09aVkFD8ly+L+bDGv7l9Ad2emBf9wREK1IuNzgMyBi2nzMNzqV6K0NDUfW72
+	 CYMkj1CCMxscvL6YODMgdcd5BhOF1HOEr3G/tl+vnMOkciJVq6TXXRZrKmB3BG+Btc
+	 qFfPoQnF/G/XW3sM6PG27qrboilC/oBcbDltaSVt9v35J5qdYq2Ho5VCP5IsjnuDSh
+	 YoMrc8kT+8CVVn/ImffruHwNArxY0AnWFSPkKVH4lSEMMfEj1VP5F2cnGVPSWWZmKO
+	 AaDdTSSUWyafb6fTn/bVWswh5TVZ+NP83HxZsXn5L+vZ2s1gfzT6SRJdvjDWgIcl9M
+	 dyVYPn1w51Y5Q==
+Date: Wed, 24 Jan 2024 10:14:02 +0000
+From: Simon Horman <horms@kernel.org>
+To: Tobias Waldekranz <tobias@waldekranz.com>
+Cc: davem@davemloft.net, kuba@kernel.org, jiri@resnulli.us,
+	ivecera@redhat.com, netdev@vger.kernel.org, roopa@nvidia.com,
+	razor@blackwall.org, bridge@lists.linux.dev, rostedt@goodmis.org,
+	mhiramat@kernel.org, linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 3/5] net: switchdev: Relay all replay messages
+ through a central function
+Message-ID: <20240124101402.GU254773@kernel.org>
+References: <20240123153707.550795-1-tobias@waldekranz.com>
+ <20240123153707.550795-4-tobias@waldekranz.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240119092024.193066-1-zhangpeng362@huawei.com>
- <Zap7t9GOLTM1yqjT@casper.infradead.org> <5106a58e-04da-372a-b836-9d3d0bd2507b@huawei.com>
- <Za6SD48Zf0CXriLm@casper.infradead.org> <CANn89iL4qUXsVDRNGgBOweZbJ6ErWMsH+EpOj-55Lky8JEEhqQ@mail.gmail.com>
- <Za6h-tB7plgKje5r@casper.infradead.org> <CANn89iJDNdOpb6L6PkrAcbGcsx6_v4VD0v2XFY77g7tEnJEXXQ@mail.gmail.com>
- <4f78fea2-ced6-fc5a-c7f2-b33fcd226f06@huawei.com>
-In-Reply-To: <4f78fea2-ced6-fc5a-c7f2-b33fcd226f06@huawei.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 24 Jan 2024 11:11:47 +0100
-Message-ID: <CANn89iKbyTRvWEE-3TyVVwTa=N2KsiV73-__2ASktt2hrauQ0g@mail.gmail.com>
-Subject: Re: SECURITY PROBLEM: Any user can crash the kernel with TCP ZEROCOPY
-To: "zhangpeng (AS)" <zhangpeng362@huawei.com>
-Cc: Matthew Wilcox <willy@infradead.org>, linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, 
-	netdev@vger.kernel.org, akpm@linux-foundation.org, davem@davemloft.net, 
-	dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, arjunroy@google.com, 
-	wangkefeng.wang@huawei.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240123153707.550795-4-tobias@waldekranz.com>
 
-On Wed, Jan 24, 2024 at 10:30=E2=80=AFAM zhangpeng (AS) <zhangpeng362@huawe=
-i.com> wrote:
->
->
-> By using git-bisect, the patch that introduces this issue is 05255b823a61=
-7
-> ("tcp: add TCP_ZEROCOPY_RECEIVE support for zerocopy receive."). v4.18-rc=
-1.
->
-> Currently, there are no other repro or c reproduction programs can reprod=
-uce
-> the issue. The syz log used to reproduce the issue is as follows:
->
-> r3 =3D socket$inet_tcp(0x2, 0x1, 0x0)
-> mmap(&(0x7f0000ff9000/0x4000)=3Dnil, 0x4000, 0x0, 0x12, r3, 0x0)
-> r4 =3D socket$inet_tcp(0x2, 0x1, 0x0)
-> bind$inet(r4, &(0x7f0000000000)=3D{0x2, 0x4e24, @multicast1}, 0x10)
-> connect$inet(r4, &(0x7f00000006c0)=3D{0x2, 0x4e24, @empty}, 0x10)
-> r5 =3D openat$dir(0xffffffffffffff9c, &(0x7f00000000c0)=3D'./file0\x00',
-> 0x181e42, 0x0)
-> fallocate(r5, 0x0, 0x0, 0x85b8818)
-> sendfile(r4, r5, 0x0, 0x3000)
-> getsockopt$inet_tcp_TCP_ZEROCOPY_RECEIVE(r4, 0x6, 0x23,
-> &(0x7f00000001c0)=3D{&(0x7f0000ffb000/0x3000)=3Dnil, 0x3000, 0x0, 0x0,
-> 0x0, 0x0, 0x0, 0x0, 0x0}, &(0x7f0000000440)=3D0x10)
-> r6 =3D openat$dir(0xffffffffffffff9c, &(0x7f00000000c0)=3D'./file0\x00',
-> 0x181e42, 0x0)
->
+On Tue, Jan 23, 2024 at 04:37:05PM +0100, Tobias Waldekranz wrote:
 
-Could you try the following fix then ?
+...
 
-(We also could remove the !skb_frag_off(frag) condition, as the
-!PageCompound() is necessary it seems :/)
+> diff --git a/net/switchdev/switchdev.c b/net/switchdev/switchdev.c
+> index 5b045284849e..05f22f971312 100644
+> --- a/net/switchdev/switchdev.c
+> +++ b/net/switchdev/switchdev.c
+> @@ -307,6 +307,23 @@ int switchdev_port_obj_del(struct net_device *dev,
+>  }
+>  EXPORT_SYMBOL_GPL(switchdev_port_obj_del);
+>  
+> +/**
+> + *	switchdev_replay - Replay switchdev message to driver
 
-Thanks a lot !
+nit: switchdev_call_replay
 
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 1baa484d21902d2492fc2830d960100dc09683bf..ee954ae7778a651a9da4de057e3=
-bafe35a6e10d6
-100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -1785,7 +1785,9 @@ static skb_frag_t *skb_advance_to_frag(struct
-sk_buff *skb, u32 offset_skb,
+> + *	@nb: notifier block to send the message to
+> + *	@val: value passed unmodified to notifier function
 
- static bool can_map_frag(const skb_frag_t *frag)
- {
--       return skb_frag_size(frag) =3D=3D PAGE_SIZE && !skb_frag_off(frag);
-+       return skb_frag_size(frag) =3D=3D PAGE_SIZE &&
-+              !skb_frag_off(frag) &&
-+              !PageCompound(skb_frag_page(frag));
- }
+nit: this should document @type rather than @value
 
- static int find_next_mappable_frag(const skb_frag_t *frag,
+> + *	@info: notifier information data
+> + *
+> + *	Typically issued by the bridge, as a response to a replay
+> + *	request initiated by a port that is either attaching to, or
+> + *	detaching from, that bridge.
+> + */
+> +int switchdev_call_replay(struct notifier_block *nb, unsigned long type,
+> +			  struct switchdev_notifier_info *info)
+> +{
+> +	return nb->notifier_call(nb, type, info);
+> +}
+> +EXPORT_SYMBOL_GPL(switchdev_call_replay);
+> +
+>  static ATOMIC_NOTIFIER_HEAD(switchdev_notif_chain);
+>  static BLOCKING_NOTIFIER_HEAD(switchdev_blocking_notif_chain);
+>  
+> -- 
+> 2.34.1
+> 
 
