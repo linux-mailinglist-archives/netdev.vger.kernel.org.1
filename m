@@ -1,74 +1,93 @@
-Return-Path: <netdev+bounces-65644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5FA283B400
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 22:34:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAA5383B411
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 22:37:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9BB331F2283B
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 21:34:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6730F281D26
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 21:37:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67A4E135411;
-	Wed, 24 Jan 2024 21:34:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 598401353FA;
+	Wed, 24 Jan 2024 21:36:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c9ORrzB3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CWvssRvX"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6363135403
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 21:34:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A29CD131E26;
+	Wed, 24 Jan 2024 21:36:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706132079; cv=none; b=Y2v0AhC/B3ZiCaB7dENL9W38WNIyunlddkzhIVCOj8a7jZk0wSXe5g0aYoaUkUiYAkGQYUFV9ZUr46HUGR4BgpMN71ciPz/Vdkh44/6czK2QRBGvmwrz2V5G/51BxF1kMipwg9iXbEp2iEAqBOv3KD/7nnKlveVNCjQ0Bab6h/8=
+	t=1706132218; cv=none; b=SUwl0ajC/kyKFfBeK9IRgdLvEalkdzjp6qAiDHB2bVts+pbA9qJHc/V4EGN8cCE5tJFd/19mzVi4BYvB7ILXCDxWDFAc0KEiDTAQfZkyXqXBPkG1ZRYOXmALUCxKA6dyReURkhZFgrY2dOlw15Q8Jznv9Ll9+Tp5LeiL3XiBIOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706132079; c=relaxed/simple;
-	bh=5WuvJY3aN3BdxPSU6MNv5FAhNY4DCF0eIbhGXWMwsiw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JlAN6kus5sioSTKW0tFc3CREJFAu4JgNtFKOYi+ys5UO8kc6dvzGBvJRC1IM0JgOQQtMfHaM3bkhC07t200jeTP4JswNFCRPIKcFyoUeTT5WbqOzjwkmwY4lhKNLb5F9IeNSkPDzjbVmYzOinHKC5ggaBCD7KXjvJL540Hkuk4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c9ORrzB3; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706132076;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8G9xRkMOo+i1Iah9aKA8dHZj7Qv1QBS8lrHWTGi9AAg=;
-	b=c9ORrzB3lQGn0NY7ZpkwtTA7F5dyUOSipYxjhY6nMIlHz6jSYPsr7KDlwRT09xUnjQEdk8
-	7K83WtqZ2PpH2VySVrMfdABdvuCv/uNnbhvVcD+VHNqtcxaIbp3yIK3GXRMOt2zE3fi/pm
-	pWKQLuCJnX8QAaM39jxfNWduZ64fvJY=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-583-JxB-9tKWPaSNU0njxx9bNQ-1; Wed,
- 24 Jan 2024 16:34:33 -0500
-X-MC-Unique: JxB-9tKWPaSNU0njxx9bNQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9BAE638212E6;
-	Wed, 24 Jan 2024 21:34:32 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.225.29])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 117AE2166B32;
-	Wed, 24 Jan 2024 21:34:30 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1706132218; c=relaxed/simple;
+	bh=ER8YRl0Ubg2rVsBw6JLH22yHGovsalfF9HW2+d0UgUc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mIJovH0qIxYP+W5PtWDPIWRAPqbwGPB/yn8OntUZWcjzfBGtMMsT8BsK/uQlkApgTtdLPv8vxbcTqmeh2ipua8C5KHjKpTHMQIwshJBipzoZeBRKhNN41HE8zxgwEkNLOdYxBOblEov7lOd6wAq1BBORogerkldS6Um9WxUqGeI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CWvssRvX; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-40ec048e0c1so18917555e9.2;
+        Wed, 24 Jan 2024 13:36:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706132215; x=1706737015; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fOtE6Xk1J/NKQNtTqJEIAQz1hcLUCo0Y1saDef3VZSg=;
+        b=CWvssRvX/nyDqfGGrqBChMAN+vJvDRowNlkfvGAfJxgyFVPtr0G2OUVAzQesDfbj/d
+         bqBKAOujibLNEdS0aYiSoEzxCxYBk370D4Y0WKY4jPLr/3Bz1gi37qnlF0So5bN6T/FC
+         z1IvTMZVHxNgSNrWYKkWa7wgxfDK9+91v6zTaV690QH56W5Qh6ImjtBKd9nH0GFTS+H5
+         9zQ8NeE+a5sHWx3CKFeQVimzKqSO9VmIxhE2ocTdk8n5II6c1QTfjyRiDZnbeJbx7jrF
+         z8Ord+imHq4Sl94JnyBQSBbHaCwZUgjo45aAIGhsnfFfzfdJe4vf4kJ9c2wRI82j6Vt5
+         Jeaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706132215; x=1706737015;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fOtE6Xk1J/NKQNtTqJEIAQz1hcLUCo0Y1saDef3VZSg=;
+        b=NBUvVhnjdXHTJSGcnTJjQ4uioY9AO+FKosHcxnRxRfcBujTWJRDL1XMVoU8YG+k+5Y
+         Rq7FsVbKu5QA7hEwzS/uuV6pSNcjDunrUXzeAf1b5EjbjGnz6jCxM5L0qlFmK1QvpPeW
+         MIivHUjB7f8Y62/cbNNnpq+YdYFtMafWYw6TMUDiNeR8YO6R+t7WGSAc5S4lcBERCXsx
+         E0SXN89cjRJp++2h506WEL76NuVEhBuRY64rY9CXaSirFNXiIGPw7zhdXZhm2GGbVfDx
+         rEgp28kUrM1uLsnV5ziJLyCF+nCaZV5oLrc2fMWMtk1/T1NMcP3v8ZeBOtwRTg+ORfv1
+         RBHA==
+X-Gm-Message-State: AOJu0Yy6icuXWDhgRh2ZAU7fgwMrF/mLS+eZeacAsUcJwoGwoZ39CRY+
+	UC0FZuyRyUTWAFD81d8c21bk1Z7XFOnw9Uot/tAMQoHRXWkfJ96C
+X-Google-Smtp-Source: AGHT+IEhShE9I2lbDwxDWRi5vb+kivrkxinTFc5QgvSilZvf6DqSUcIiZ6aKZAsoR3FngQETjoBKBw==
+X-Received: by 2002:a05:600c:3115:b0:40e:7852:bc85 with SMTP id g21-20020a05600c311500b0040e7852bc85mr2216775wmo.41.1706132214635;
+        Wed, 24 Jan 2024 13:36:54 -0800 (PST)
+Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.googlemail.com with ESMTPSA id q13-20020a05600c46cd00b0040e89ade84bsm339466wmo.4.2024.01.24.13.36.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jan 2024 13:36:54 -0800 (PST)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Willem de Bruijn <willemb@google.com>,
-	Lucas Karpinski <lkarpins@redhat.com>,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net 3/3] selftests: net: explicitly wait for listener ready
-Date: Wed, 24 Jan 2024 22:33:22 +0100
-Message-ID: <4d58900fb09cef42749cfcf2ad7f4b91a97d225c.1706131762.git.pabeni@redhat.com>
-In-Reply-To: <cover.1706131762.git.pabeni@redhat.com>
-References: <cover.1706131762.git.pabeni@redhat.com>
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Robert Marko <robert.marko@sartura.hr>,
+	linux-arm-msm@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Christian Marangi <ansuelsmth@gmail.com>
+Subject: [net-next PATCH 0/3] net: mdio-ipq4019: fix wrong default MDC rate
+Date: Wed, 24 Jan 2024 22:36:30 +0100
+Message-ID: <20240124213640.7582-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,53 +95,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-The UDP GRO forwarding test still hard-code an arbitrary pause
-to wait for the UDP listener becoming ready in background.
+This was a long journey to arrive and discover this problem.
 
-That causes sporadic failures depending on the host load.
+To not waste too much char, there is a race problem with PHY and driver
+probe. This was observed with Aquantia PHY firmware loading.
 
-Replace the sleep with the existing helper waiting for the desired
-port being exposed.
+With some hacks the race problem was workarounded but an interesting
+thing was notice. It took more than a minute for the firmware to load
+via MDIO.
 
-Fixes: a062260a9d5f ("selftests: net: add UDP GRO forwarding self-tests")
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
----
- tools/testing/selftests/net/udpgro_fwd.sh | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+This was strange as the same operation was done by UBoot in at max 5
+second and the same data was loaded.
 
-diff --git a/tools/testing/selftests/net/udpgro_fwd.sh b/tools/testing/selftests/net/udpgro_fwd.sh
-index 5fa8659ab13d..d6b9c759043c 100755
---- a/tools/testing/selftests/net/udpgro_fwd.sh
-+++ b/tools/testing/selftests/net/udpgro_fwd.sh
-@@ -1,6 +1,8 @@
- #!/bin/bash
- # SPDX-License-Identifier: GPL-2.0
- 
-+source net_helper.sh
-+
- BPF_FILE="xdp_dummy.o"
- readonly BASE="ns-$(mktemp -u XXXXXX)"
- readonly SRC=2
-@@ -119,7 +121,7 @@ run_test() {
- 	ip netns exec $NS_DST $ipt -A INPUT -p udp --dport 8000
- 	ip netns exec $NS_DST ./udpgso_bench_rx -C 1000 -R 10 -n 10 -l 1300 $rx_args &
- 	local spid=$!
--	sleep 0.1
-+	wait_local_port_listen "$NS_DST" 8000 udp
- 	ip netns exec $NS_SRC ./udpgso_bench_tx $family -M 1 -s 13000 -S 1300 -D $dst
- 	local retc=$?
- 	wait $spid
-@@ -168,7 +170,7 @@ run_bench() {
- 	ip netns exec $NS_DST bash -c "echo 2 > /sys/class/net/veth$DST/queues/rx-0/rps_cpus"
- 	ip netns exec $NS_DST taskset 0x2 ./udpgso_bench_rx -C 1000 -R 10  &
- 	local spid=$!
--	sleep 0.1
-+	wait_local_port_listen "$NS_DST" 8000 udp
- 	ip netns exec $NS_SRC taskset 0x1 ./udpgso_bench_tx $family -l 3 -S 1300 -D $dst
- 	local retc=$?
- 	wait $spid
+A similar problem was observed on a mtk board that also had an
+Aquantia PHY where the load was very slow. It was notice that the cause
+was the MDIO bus running at a very low speed and the firmware
+was missing a property (present in mtk sdk) that set the right frequency
+to the MDIO bus.
+
+It was fun to find that THE VERY SAME PROBLEM is present on IPQ in a
+different form. The MDIO apply internally a division to the feed clock
+resulting in the bus running at 390KHz instead of 6.25Mhz.
+
+Searching around the web for some documentation and some include and
+analyzing the uboot codeflow resulted in the divider being set wrongly
+at /256 instead of /16 as the value was actually never set.
+Applying the value restore the original load time for the Aquantia PHY.
+
+This series mainly handle this by adding support for the "clock-frequency"
+property.
+
+Christian Marangi (3):
+  dt-bindings: net: ipq4019-mdio: document now supported clock-frequency
+  net: mdio: ipq4019: add support for clock-frequency property
+  arm64: dts: qcom: ipq8074: add clock-frequency to MDIO node
+
+ .../bindings/net/qcom,ipq4019-mdio.yaml       | 10 +++
+ arch/arm64/boot/dts/qcom/ipq8074.dtsi         |  2 +
+ drivers/net/mdio/mdio-ipq4019.c               | 68 +++++++++++++++++--
+ 3 files changed, 75 insertions(+), 5 deletions(-)
+
 -- 
 2.43.0
 
