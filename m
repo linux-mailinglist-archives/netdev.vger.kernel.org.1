@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-65490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B14083ACC5
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 16:08:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF1CC83ACE5
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 16:13:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D9CE288CFD
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 15:08:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4BC65B27765
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 15:12:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15CCF12E56;
-	Wed, 24 Jan 2024 15:07:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C38F33CCA;
+	Wed, 24 Jan 2024 15:12:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gdmkOIwT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ePlmf1xU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0E567A721;
-	Wed, 24 Jan 2024 15:07:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4A8777622;
+	Wed, 24 Jan 2024 15:12:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706108878; cv=none; b=BhB17m4jxD7uP19YnGPDigjOQEonD/gvkQuMf+dE8TOV9updDqzzQ2MQ1bRcYWrMmo3WTpjfYjG10+nZrwAICotGSmlGIvqzPLX4rR3STRcINtMrSQzPLC8f3ZOwx4sTlvT6wECJFVvdnFJu+DaWQn6/t2cnBH3hv8APvTSpRjQ=
+	t=1706109152; cv=none; b=DdGmZsay+uThWdJC9gKlbezA+t6gm7wYSV6Mkh3rtkH3XCgqqYVlf7dIwdtufk+FkYtywWLSBntlXaOfuQa3ZlMkblNbY2suZgRQSbHqClpeFB8srTh9NZi9KLBSRqO61v839iiQCSwuw3sQUw8wCosBUpLP0Xv69seZB8iF8dE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706108878; c=relaxed/simple;
-	bh=ffEzSyxEPiqv/apXJ1stUvLwUts2dciN8C413ERStkE=;
+	s=arc-20240116; t=1706109152; c=relaxed/simple;
+	bh=wfC03zoZ3529QzlkL1NJxd4ZXGSNuHiPokwD376BEfo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QCTcVvoOX2wIRWHlWeoL8NWWbNO47T2URjkQwpDLFFdBMlWdEt3dZmwr9jB9+bxIhA1zHyuTCWYBjmyYNA0/sMslJcE54rTBP6i/zQxPoV2MI678JAYRXEQzK+hRJufgZH4y1DR9WVUhp/WxtSl/DkDOyM/2hVMvdr52A7Rc1PY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gdmkOIwT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 036C7C433F1;
-	Wed, 24 Jan 2024 15:07:56 +0000 (UTC)
+	 MIME-Version:Content-Type; b=inqSxX5iYG3WUpnCZMhbdNK3GUzeQ0hV+GXAmymqrU8gMThjnDRR2CsH+APXUmDhtH3qTamTuXhmR4BTlLmPlTitZQMAJmIW+Qia1VETCIJsL1nnzU84diWUuLt66n4+L2AsxxBayFX/o9x4xjDUOsiiC1CnSeuXMQMP+nLbsN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ePlmf1xU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5249C433F1;
+	Wed, 24 Jan 2024 15:12:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706108877;
-	bh=ffEzSyxEPiqv/apXJ1stUvLwUts2dciN8C413ERStkE=;
+	s=k20201202; t=1706109151;
+	bh=wfC03zoZ3529QzlkL1NJxd4ZXGSNuHiPokwD376BEfo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gdmkOIwTr764xmdo13hSqtVD9NPi1u2n4uphkOnDa4d2YGO56vbpr6T3ILW8eeE42
-	 rFRqkp6EWNbxx7FWXbODgn3OInBA3XPHJf/67KQr3R2Rj9fsdVsniUgdfM+ghUhY7f
-	 u0xu8E1VZYHOWRWGZgVo8soIv0NLx8pfKzja+7UpyEhF1Xvlp2TlnQRHfYstKF+hO7
-	 1qsBIWG7/Fe8UWOJ6jQtYu3grS6EY91o7XW3mm6y/0Yi2enRkQSm3PiSVn4y5RZi4u
-	 twLmDeeTOOwogDZHbbyL5o7TrmmAf7G9IAArK6BSvagDbu7LTug2Y5/DYUkfCxeMtX
-	 dh4o17pCZ5aMA==
-Date: Wed, 24 Jan 2024 07:07:55 -0800
+	b=ePlmf1xUwF23xA/cp661E1kcGNECj8m+f6ryEwXXq8GOlxstCfllrybJV6LPGtNz4
+	 ybkYUd6JQO67OTKgIDQ5O0ubWHEvb104gmNITK/JqvKGrvYQ7/5rVJz9pfY00qaK8e
+	 Y1hrcW8XxWfXFy0jEke1cgQc5hFxA09i9hem1lbLFmKeN7qu73nwcIilbtLPK+Bz8c
+	 tVJf/ruIDcpAprzGlrupxvLfsBYTaHhNokhNujxd0OTZITDMtaKXRDaH7dAoVCI1xK
+	 ltNUWDw7Gf+JG44iZCdjrl+li29Y5AUyJFhZYlHsaVHaNDCiXbaTtV3/unoxhyf3iK
+	 Gqgxth/7H5bow==
+Date: Wed, 24 Jan 2024 07:12:29 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
-Cc: Hangbin Liu <liuhangbin@gmail.com>, "netdev@vger.kernel.org" 
- <netdev@vger.kernel.org>, "netdev-driver-reviewers@vger.kernel.org" 
- <netdev-driver-reviewers@vger.kernel.org>
-Subject: Re: [ANN] net-next is OPEN
-Message-ID: <20240124070755.1c8ef2a4@kernel.org>
-In-Reply-To: <7ae6317ee2797c659e2f14b336554a9e5694858e.camel@redhat.com>
-References: <20240122091612.3f1a3e3d@kernel.org>
-	<Za98C_rCH8iO_yaK@Laptop-X1>
-	<20240123072010.7be8fb83@kernel.org>
-	<d0e28c67-51ad-4da1-a6df-7ebdbd45cd2b@kernel.org>
-	<20240123133925.4b8babdc@kernel.org>
-	<256ae085-bf8f-419b-bcea-8cdce1b64dce@kernel.org>
-	<7ae6317ee2797c659e2f14b336554a9e5694858e.camel@redhat.com>
+To: Dmitry Safonov <dima@arista.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
+ <shuah@kernel.org>, Dmitry Safonov <0x7f454c46@gmail.com>, Mohammad Nassiri
+ <mnassiri@ciena.com>, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/3] selftests/net: A couple of typos fixes in
+ key-management test
+Message-ID: <20240124071229.6a7262cc@kernel.org>
+In-Reply-To: <a9a5378d-c908-4a83-a63d-3e9928733a3d@arista.com>
+References: <20240118-tcp-ao-test-key-mgmt-v1-0-3583ca147113@arista.com>
+	<20240118085129.6313054b@kernel.org>
+	<358faa27-3ea3-4e63-a76f-7b5deeed756d@arista.com>
+	<20240118091327.173f3cb0@kernel.org>
+	<a9a5378d-c908-4a83-a63d-3e9928733a3d@arista.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,34 +67,38 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 24 Jan 2024 09:22:15 +0100 Paolo Abeni wrote:
-> On Tue, 2024-01-23 at 22:20 -0700, David Ahern wrote:
-> > thanks for the tip to direclty run the tests.
-
-Actually, I simplified this one a little bit. What we do now is:
-
-make -C tools/testing/selftests TARGETS={target} TEST_PROGS={prog} TEST_GEN_PROGS="" run_tests
-
-This let's us run tests individually. This way we can put them in 
-a FIFO and have multiple workers run them in parallel.
-
-> > the script needs lot more than 45
-> > seconds. This does the trick, but not sure how to bump the timeout for a
-> > specific test.  
+On Fri, 19 Jan 2024 18:39:14 +0000 Dmitry Safonov wrote:
+> > You probably want something smaller to be honest.
+> > tools/testing/selftests/net/config has a lot of stuff in it 
+> > and it's actually missing a lot more. I'm working thru adding
+> > the missing options to tools/testing/selftests/net/config 
+> > right now so far I got:  
 > 
-> You can set a test-group-specific timeout touching the 'settings' file
-> in the relevant directory. Note that for 'net' self-tests the timeout
-> is currently 3600 seconds (for each test).
+> Thanks!
 > 
-> AFAIK there is no way to set a single-test-specific timeout, without
-> running that specific test individually:
-> 
-> make install TARGETS=net
-> ./kselftest_install/run_kselftest.sh -o <timeout in sec> -t net:fcnal-test.sh
+> I'll send a patch for it in version 2 (as I anyway need to address
+> Simon's feedback).
 
-Yet another thing run_kselftest.sh can do that make can't :(
-We should probably bite the bullet and switch to it at some point.
+Hi Dmitry!
 
-David, I applied your diff locally, hopefully I did it in time for the
-7am Pacific run to have it included :)
+I put TCP_AO and VETH in the config and the tests seem to fail with
+
+selftests: net/tcp_ao: rst_ipv4
+not ok 1 # error 834[lib/kconfig.c:143] Failed to initialize kconfig 2: No such file or directory
+# Planned tests != run tests (0 != 1)
+# Totals: pass:0 fail:0 xfail:0 xpass:0 skip:0 error:1
+
+The script does:
+
+target=net/tcp_ao
+make mrproper
+
+vng -v -b -f tools/testing/selftests/$target
+# build the scripts
+make headers
+make -C tools/testing/selftests/$target
+
+vng -v -r arch/x86/boot/bzImage --user root
+# inside the VM
+make -C tools/testing/selftests TARGETS=$target run_tests
 
