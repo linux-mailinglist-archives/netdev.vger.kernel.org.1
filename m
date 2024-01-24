@@ -1,112 +1,96 @@
-Return-Path: <netdev+bounces-65353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43C7083A3A1
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 08:59:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BF1F83A3D7
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:14:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEA7C1F23845
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 07:59:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9832FB29DD8
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 08:14:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB4F5171C2;
-	Wed, 24 Jan 2024 07:59:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC636171C9;
+	Wed, 24 Jan 2024 08:14:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JC+OfZMZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h/HsZn5o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A9F8171AB
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 07:59:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883FC17548
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 08:14:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706083158; cv=none; b=HW7f3ZeRUxvBSz0nCkQkPwxjg+Xil/tHsdt69ozHJ2DTAQgYM3Q/QTtfosmlbNLwqLKNLPS4vgczPfAh9F2QGlevlOfee2sPUTCtAOx1lvHVtscGGamqoep4phYjsVP9k9SRB7JOVcg7TpEwXz6ysxTqI+/0FBLtUJiug/qT8Zc=
+	t=1706084048; cv=none; b=kvf+IsZWSH4D4dgf1+qxmQm6Zq1MPxCqYCgp13XnrfJ0McbNVS9ypVZ3DdIMAA1NH4oxSyEJ9EdHMAgWIzJFTNPZLArc4uNJ1wWutkoGWK1l8lGYFfu1fBji/wZU3Y3U+wzRzAiaWEHWiSPrhWCq7xTBPNE294CQne/o7xGa7Uo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706083158; c=relaxed/simple;
-	bh=lEd0Bn9/l4rJl1Z1K+CtoAc2cKowkc02HmrmBSo3jRY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LswhuScUcSWQ1igmNlomLqRG9/RbZ8Q5OrCBDTrzW0YxlFKpzEFnoIX1gqeBIKWCpaAb4axbsuLZLHzjVub8CmAOl0SyUjPn26Zk3S8MLAf8FrofCYOu7S5DBrmJpyCn1IPkQ0Fraux9bpo87bu4ZY2Cj+6MMT875MPrIwlhDGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JC+OfZMZ; arc=none smtp.client-ip=209.85.219.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6816d221ba6so2735806d6.1
-        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 23:59:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706083156; x=1706687956; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q92C8VzIHJcnlRFLcLBDvGNfbptSh8Rh3tDhxRNYqzE=;
-        b=JC+OfZMZjbDati5bGcFqU9Wl6shrTaqgTdBM9mUtPGjbiEvrqy2aWReazHePKhVF18
-         +DMK5DndLxei9Lye6brGO+e/Nh4Vxsmww47D2Tkah7AjOg94+6ouR5dlC0RYSxml/l1Y
-         FvvBMjyyfHq//W+Dxd/syrsC8M9zZwtm9+APxLq+bl5evciN0W1soZ1X8w5LAdi6+5f9
-         F9Vj4d/KbcwpccMsn+X+JSh1heR1cEY0K7Cx2VSDyAEgDhNyz+T1bunvQV8ByTelDrgB
-         L/IDNVb3jZIRGFCg7JE9pW7WGU+MzFwWtCHEeVcWrFOqPGLNK+qKjWzOa0YG5mHP8zaM
-         6FMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706083156; x=1706687956;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Q92C8VzIHJcnlRFLcLBDvGNfbptSh8Rh3tDhxRNYqzE=;
-        b=ngMCXs8vjlLHrj+jiZZ1ZzVBweRSpV2r3h/BoEx1dUvxgnUrzihONS9zJ8Givt7LlQ
-         IXIRMA0FAzNv7ICVvVRmMVq/gtDXZHg+LiVFegsNTSQ8VVxbN3lLcH2R7i29zbo5ATNn
-         hRbmvwe/dpPbg6O1P80Hpy0CK9fwHfTZXjN9biQFqx/cpGb6juimMQkAi1LWDZ2HleL7
-         kg5YBb+anh9KXJkbywY1WlEr9y0B7QEQuguJjEuXokT82DucAkZ7rxbtVSwo0uHUYuCu
-         L2i9U718WAZbL7+c56L0jNwNwBT/Rujy+0sg2zUbl8NfVqebxVmey/G/ko2zGJJV48Mt
-         uc2w==
-X-Gm-Message-State: AOJu0YzFlrSh7JvysnM5gR71ae9zjZ3jnUlThZxDmAEF9H+v0FT23hUC
-	oUNTqdmiRPiVr9YTWWfHNQ+mmJ4MiDOr5LrPoM+OqLjOO9M7RTFbhqgI3UVcDt6HzZDDdDv4Cci
-	zeGWlF0kUiHotXzp1NYsuj7xztNA=
-X-Google-Smtp-Source: AGHT+IEiyEKrWHLQrCMuEVeuybf2u1RXE5AMEL3PoX90w+hMbjCoqxpJM9kQTQnExbLnwxvzZqG5XAsY9MYzyqzsh2I=
-X-Received: by 2002:a05:6214:d85:b0:686:9d71:842a with SMTP id
- e5-20020a0562140d8500b006869d71842amr1557448qve.2.1706083155980; Tue, 23 Jan
- 2024 23:59:15 -0800 (PST)
+	s=arc-20240116; t=1706084048; c=relaxed/simple;
+	bh=w12lrpFQkQHQCQaZbaQFaqqpQ3ajIxCZJXt5mJB4e+M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pMDGdIhuFY3KSE1n9kUh0fSndMMuJ3GI3OGVtx/eolo37+n6LY5efHwQbHORAmIYNrJO4zU1f8N/llXSbp9n2VjY2CcRD65yvPwO7UNH84q5RQ1GwYfjEeOI9sChzN3NTK1fIuLYMyyIGM3hqLC6QMXsmuqzgSGvkyr3fZVpYJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h/HsZn5o; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C97ACC433C7;
+	Wed, 24 Jan 2024 08:14:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706084048;
+	bh=w12lrpFQkQHQCQaZbaQFaqqpQ3ajIxCZJXt5mJB4e+M=;
+	h=From:To:Cc:Subject:Date:From;
+	b=h/HsZn5oUKxg0DeaBU4dIfErfA7F6fXJeh3g9ex7GMe++S34P30bxz4P/gjCQU8NH
+	 XEO7RUmGZoK9wryx+VNpvaLq7uEB1tudQmITG5gdxG4PXW/gpdpVdKaMStHBq2z0dh
+	 7U/7hppsRhES5cviXvsaTSTlSrGDCftVRWe0V2yug9TkoMjvxN0FTue9NX5PEKbNqW
+	 t2B1x9GkyHZhY7Q1DkRfNbFTr/YxWA9jfkChkOct1iuhdCx/ftAls3Qs8pVbl9dK2z
+	 R97f/U5fTwKosnKmtxf4itOmOefFkc+O7LzUEfAYsZJKDUjV1EiTjNt00mbVume26d
+	 horfcn9xHQZ4Q==
+From: Saeed Mahameed <saeed@kernel.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>,
+	netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Mike Yu <yumike@google.com>
+Subject: [PATCH net] xfrm: Pass UDP encapsulation in TX packet offload
+Date: Wed, 24 Jan 2024 00:13:54 -0800
+Message-ID: <20240124081354.111307-1-saeed@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240123115846.559559-1-maciej.fijalkowski@intel.com>
-In-Reply-To: <20240123115846.559559-1-maciej.fijalkowski@intel.com>
-From: Magnus Karlsson <magnus.karlsson@gmail.com>
-Date: Wed, 24 Jan 2024 08:59:04 +0100
-Message-ID: <CAJ8uoz1uUj2mMPzoXkp8yUy_FsS_RR214eiJUhvj1Jvxr7=XCg@mail.gmail.com>
-Subject: Re: [PATCH iwl-next 0/2] ice: use ice_vsi_cfg_single_{r,t}xq in XSK
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
-	anthony.l.nguyen@intel.com, magnus.karlsson@intel.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Tue, 23 Jan 2024 at 12:59, Maciej Fijalkowski
-<maciej.fijalkowski@intel.com> wrote:
->
-> Ice driver has routines dedicated for configuring single queues. Let us
-> use them from ZC control path. This move will allow us to make
-> ice_vsi_cfg_{r,t}xq() static.
->
-> Thanks,
-> Maciej
+From: Leon Romanovsky <leonro@nvidia.com>
 
-Thanks for the clean up Maciej. For the series:
+In addition to citied commit in Fixes line, allow UDP encapsulation in
+TX path too.
 
-Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
+Fixes: 89edf40220be ("xfrm: Support UDP encapsulation in packet offload mode")
+CC: Steffen Klassert <steffen.klassert@secunet.com> 
+Reported-by: Mike Yu <yumike@google.com>
+Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+---
+ net/xfrm/xfrm_device.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> Maciej Fijalkowski (2):
->   ice: make ice_vsi_cfg_rxq() static
->   ice: make ice_vsi_cfg_txq() static
->
->  drivers/net/ethernet/intel/ice/ice_base.c | 134 +++++++++++++++++++++-
->  drivers/net/ethernet/intel/ice/ice_base.h |  10 +-
->  drivers/net/ethernet/intel/ice/ice_lib.c  | 129 ---------------------
->  drivers/net/ethernet/intel/ice/ice_lib.h  |  10 --
->  drivers/net/ethernet/intel/ice/ice_xsk.c  |  22 +---
->  5 files changed, 142 insertions(+), 163 deletions(-)
->
-> --
-> 2.34.1
->
->
+diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
+index 3784534c9185..653e51ae3964 100644
+--- a/net/xfrm/xfrm_device.c
++++ b/net/xfrm/xfrm_device.c
+@@ -407,7 +407,7 @@ bool xfrm_dev_offload_ok(struct sk_buff *skb, struct xfrm_state *x)
+ 	struct xfrm_dst *xdst = (struct xfrm_dst *)dst;
+ 	struct net_device *dev = x->xso.dev;
+ 
+-	if (!x->type_offload || x->encap)
++	if (!x->type_offload)
+ 		return false;
+ 
+ 	if (x->xso.type == XFRM_DEV_OFFLOAD_PACKET ||
+-- 
+2.43.0
+
 
