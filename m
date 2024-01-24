@@ -1,67 +1,62 @@
-Return-Path: <netdev+bounces-65525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34EA983AEB9
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 17:52:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7673683AEC3
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 17:54:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C380F1F2487A
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 16:52:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04EE9B23EE2
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 16:53:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 211187E564;
-	Wed, 24 Jan 2024 16:52:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEDCE7E56D;
+	Wed, 24 Jan 2024 16:53:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="YVulQNXr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nSLH5KLA"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 927D47CF3D;
-	Wed, 24 Jan 2024 16:52:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5E657A720;
+	Wed, 24 Jan 2024 16:53:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706115125; cv=none; b=nVwM6X/ZNhePB2fhlrWzTie43/CNzeXZ1lW1Wno210cccKGHuGRaXs4NfbFodc6kXcgUJNjEtzXo9GXFREapN7Q1CMndF4dWHKlxXQe89su6pDKWhsFvM+yOO+si2E5mx5i0x273InggAj1dB9nwHX8gL0yQVulz0vq+ae2Cbkk=
+	t=1706115231; cv=none; b=IfRMsixpJe1eyly7WXHQq1bESaKqCZrG1mGR480WGhvQ6GfSFa2GzsYNUJGYrTlG+p0pcxAYN+iGsT+rGcqRoXcb6HC1ICdjd/tnnsvq4Kk9woUlriALFP5n+Dy0T0RTTfhm7RAkc5p+ofDhs2bPf51npPIghocpqIwt1veH6Iw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706115125; c=relaxed/simple;
-	bh=QIeTCTHch/7rOF4+4kHAvCpl/cSG69Q6EDBjClEVtbc=;
+	s=arc-20240116; t=1706115231; c=relaxed/simple;
+	bh=NezhQgITHK/gMdeQm+g/azFDFFougWnoVBBRRHG6wmM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IT82N34O8km4FAv0UzApoL3teUMqNDEt/lyDJkuvNhKkfMkq7G18vOwwsbi/N2R09XT51ct6eC5Ia5nPDPc8vr1Uh64o5AhPRlh58UmVDOPQdO++7oFdZEhbHEuV7Xd0H1TfzAp0g3SRd5l5xFpICSTUtI1VxAWlg2H8wgcHi8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=YVulQNXr; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id DA75A60002;
-	Wed, 24 Jan 2024 16:51:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1706115120;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QIeTCTHch/7rOF4+4kHAvCpl/cSG69Q6EDBjClEVtbc=;
-	b=YVulQNXrMfl14MdSxUApNWPw0NIwcmJGbHWtvMskD3Pvs2BhQyF16n9TAUzlO2e/MAirEs
-	QU/nI8VKQPwcvm2P4YfH+huycdRBjReTB/pfb3yUPUwfuzgAw5dyafHMRQUqywx4nlPkza
-	sc81Q7cNMWy18gzZEQwB2DUJXrIwU2XdWoBs818W7Z+5tNKKs+AkESX720BYevAjyns/mg
-	WoYH3jtb1IoUeyCVrWm8wzwr3tuTRN5foQh+J1GcFolPL/ER9YSS9SiHQ6yX9p9STfUXMH
-	SvDJiAy1Fk9kcKgh/pKC6t4GkMbPzqH4IsEERcb2RTVagvRitFUuKAz7D1y6Jg==
-Date: Wed, 24 Jan 2024 17:51:58 +0100
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Breno Leitao <leitao@debian.org>
-Cc: kuba@kernel.org, davem@davemloft.net, abeni@redhat.com,
- edumazet@google.com, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt
- <stefan@datenfreihafen.org>, Paolo Abeni <pabeni@redhat.com>,
- dsahern@kernel.org, weiwan@google.com, linux-wpan@vger.kernel.org (open
- list:IEEE 802.15.4 SUBSYSTEM), netdev@vger.kernel.org (open list:NETWORKING
- [GENERAL]), linux-kernel@vger.kernel.org (open list)
-Subject: Re: [PATCH net-next 02/22] net: fill in MODULE_DESCRIPTION()s for
- ieee802154
-Message-ID: <20240124175158.7c8b9490@xps-13>
-In-Reply-To: <20240122184543.2501493-3-leitao@debian.org>
-References: <20240122184543.2501493-1-leitao@debian.org>
-	<20240122184543.2501493-3-leitao@debian.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	 MIME-Version:Content-Type; b=ZFQrWDWP/CP6J1doLsTNQ8CJt3DodnRC1TebXzotJ+yByj31o30cW6c2d2OHv+WjeESW/rW49mL9gX+0Yz0U8Liw++G8ql/dpqcOSlZupIOJeOF1bcFL7Vxv/H/7GdBbFyslFEMcS1ANTXk/kR5YDqCh8qGb48JZF6ynzk1Hr4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nSLH5KLA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9B2DC433C7;
+	Wed, 24 Jan 2024 16:53:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706115231;
+	bh=NezhQgITHK/gMdeQm+g/azFDFFougWnoVBBRRHG6wmM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nSLH5KLAFUAG67HFMYy0D5quAvrHQz55T7gezzS2H2txhkbBuGMMgBoWSAzyJUZf2
+	 hjtFK8SEa+vOYrhWSi3Z2gX5R28ucUz58p4bhmFf3uGvf8oaqCCw0XjqHZRGkQkirW
+	 kMNKWIlpndRlOHLFB7f9i0E8ffutMDEo08iYhleUJEkQ+r4XoSANnIIQxJqGZl/aw2
+	 LxFxiu6EXyCrNPjtR66ezAMbehUKzdyKY8W7TOpl5EmtrIJXeVIAQTTG/nLAmHGX5e
+	 fFavF2RjbAcmZa93aNgsL+v92SwI0kO8cSvJe9EKkbb0yuIcCQ+t++4pDFKobFMFDf
+	 Ey1ENBBrF3PwA==
+Date: Wed, 24 Jan 2024 08:53:49 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: <bpf@vger.kernel.org>, <ast@kernel.org>, <daniel@iogearbox.net>,
+ <andrii@kernel.org>, <netdev@vger.kernel.org>, <magnus.karlsson@intel.com>,
+ <bjorn@kernel.org>, <echaudro@redhat.com>, <lorenzo@kernel.org>,
+ <martin.lau@linux.dev>, <tirthendu.sarkar@intel.com>,
+ <john.fastabend@gmail.com>, <horms@kernel.org>
+Subject: Re: [PATCH v5 bpf 03/11] xsk: fix usage of multi-buffer BPF helpers
+ for ZC XDP
+Message-ID: <20240124085349.3e610e24@kernel.org>
+In-Reply-To: <ZbD8TWLihi4SZTwR@boxer>
+References: <20240122221610.556746-1-maciej.fijalkowski@intel.com>
+	<20240122221610.556746-4-maciej.fijalkowski@intel.com>
+	<20240123175317.730c2e21@kernel.org>
+	<ZbD8TWLihi4SZTwR@boxer>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,23 +65,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: miquel.raynal@bootlin.com
 
-Hi Breno,
-
-leitao@debian.org wrote on Mon, 22 Jan 2024 10:45:23 -0800:
-
-> W=3D1 builds now warn if module is built without a MODULE_DESCRIPTION().
-> Add descriptions to ieee802154 modules.
+On Wed, 24 Jan 2024 13:02:21 +0100 Maciej Fijalkowski wrote:
+> > nit: this has just one caller, why not inline these 3 lines? =20
 >=20
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>
+> we usually rely on compiler to do that, we have the rule "no inlines in
+> source files", no?
 
-I just see the v2 now. Please use "v2" in your commit title using -v or
-git-format-patch.
+I mean Ctrl-x Ctrl-v the code, the function has 3 LoC and one caller.
+And a semi-meaningless name. I'm not sure why this code was factored
+out.
 
-I'll take it through wpan.
+> > nit: prefix the function name, please =20
+>=20
+> will rename to bpf_xdp_shrink_data(). Thanks for taking a look!
 
-Thanks,
-Miqu=C3=A8l
+=F0=9F=91=8D=EF=B8=8F
 
