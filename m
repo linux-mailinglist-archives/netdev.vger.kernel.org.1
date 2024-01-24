@@ -1,136 +1,151 @@
-Return-Path: <netdev+bounces-65626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C27AE83B2E6
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 21:13:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D24783B2EF
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 21:18:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF8691C22563
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 20:13:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 903161C21FD3
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 20:18:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EBCB13342B;
-	Wed, 24 Jan 2024 20:13:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k5MM3NgR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B8A613343A;
+	Wed, 24 Jan 2024 20:18:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D64F0133423;
-	Wed, 24 Jan 2024 20:13:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE177132C17;
+	Wed, 24 Jan 2024 20:18:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706127225; cv=none; b=ZcFyGMobizMB8HT6vfhFw8x5DLITkThnO0nPkQjrsUEbCa8cH9gotrq9Ef94KGDPWfUSXqc2KlOmEVeUod8oL6ILlgVz3wVWshuGDgdljKI5RprC23S2LmxVEPZAdzdWRO7mNRx81pmyRdRym8dd1Rn14Yq3Csdo6WmZqzuXgRk=
+	t=1706127530; cv=none; b=oTms3oBYxSN/p+F/vHKd68EYWi+gP6Rd7c84H+KNLw1jpjJDd+AMFQwk76alYiei1e/mQO7ynF9FVHG32oioXUcCH1h0xV6/nxI5yIr6AtriRvH/AUEZRhdZJDOAxKAtJqg0NHXm5ZD74qZ1vxzT9qkx4RxbCv8qLsF/Y4hrEdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706127225; c=relaxed/simple;
-	bh=jvlK1XKPj74FyfW8+IODLDvDmouCVkNHbde8CZTmkXQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YtbGGtpWk+DzIqBUaIvP+SparrJJpXzIcxWjbZfDfdrC+q7MKPW6PZQu4VpKyT7u0od7rEeQ7J7zD37pbL4VQAjkZf81V16eJdP8Xfin66MWU2B4E0PndKxCw2UDE254ebBRljrBOUoIOjn2ud38DU5ufx1Ymdy77+z8xIvYMwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k5MM3NgR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4842AC433F1;
-	Wed, 24 Jan 2024 20:13:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706127224;
-	bh=jvlK1XKPj74FyfW8+IODLDvDmouCVkNHbde8CZTmkXQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=k5MM3NgRzoCdmTk9wuznplH/2x151KSSNazUQsDtXh7sML4Eub5gGAdB5RJHDhsDh
-	 +4tasUFuIsZv3t1ckuScmU22DETMz6oqnoo11qbDBvu4bbAkZt1n2UNR+/sdcM0b8b
-	 pJq9+CJ3lSCuKFUAT+U9xB2MC9lL/ZKnDwtVxZfW4gQDZ6AdyUJnID+8KLr6KhCZpb
-	 fcuarrceU9Q11l88l095f1zbirwA+nUQWm0zlLZuyTXIifjl2K1am20uKuVKFtu19t
-	 v/6LlecaM2DXvxxhRjqHIkQbk3XGKUuH+aMaijx7JxkWXoyp6hJYsRbzBXc88Re7zy
-	 jwQzUBVKJzH6w==
-Date: Wed, 24 Jan 2024 12:13:43 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>, David Ahern
- <dsahern@kernel.org>, coreteam@netfilter.org,
- "netdev-driver-reviewers@vger.kernel.org"
- <netdev-driver-reviewers@vger.kernel.org>, Hangbin Liu
- <liuhangbin@gmail.com>, netfilter-devel@vger.kernel.org
-Subject: Re: [netfilter-core] [ANN] net-next is OPEN
-Message-ID: <20240124121343.6ce76eff@kernel.org>
-In-Reply-To: <ZbFsyEfMRt8S+ef1@calendula>
-References: <20240122091612.3f1a3e3d@kernel.org>
-	<Za98C_rCH8iO_yaK@Laptop-X1>
-	<20240123072010.7be8fb83@kernel.org>
-	<d0e28c67-51ad-4da1-a6df-7ebdbd45cd2b@kernel.org>
-	<65b133e83f53e_225ba129414@willemb.c.googlers.com.notmuch>
-	<20240124082255.7c8f7c55@kernel.org>
-	<20240124090123.32672a5b@kernel.org>
-	<ZbFiF2HzyWHAyH00@calendula>
-	<20240124114057.1ca95198@kernel.org>
-	<ZbFsyEfMRt8S+ef1@calendula>
+	s=arc-20240116; t=1706127530; c=relaxed/simple;
+	bh=RZpp6IHx31AhesQ6a89N4n47chb3EOWzqHq8eqcwoqM=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=XeBrwM81nEfjiQ/Ak9/M5Zo3j0rV44sOE1wfl5ra1yf9oS/qzznEgNH/NYqTmqsUg1iZaOFwhm8tN4JnUePgPRxEUFXbwWSKaw9837JsoEnZZYBt5wAcp4vlwOzfigFKmYaxIUJWu5x02F1sdEcOJylQARBHFz3r12YPtfrsC9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.105] (178.176.73.201) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 24 Jan
+ 2024 23:18:32 +0300
+Subject: Re: [PATCH net-next v4 10/15] net: ravb: Move delay mode set in the
+ driver's ndo_open API
+To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
+	<geert+renesas@glider.be>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20240123125829.3970325-1-claudiu.beznea.uj@bp.renesas.com>
+ <20240123125829.3970325-11-claudiu.beznea.uj@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <b0a4f320-6218-2631-a5a0-26cfa9a25ee1@omp.ru>
+Date: Wed, 24 Jan 2024 23:18:31 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20240123125829.3970325-11-claudiu.beznea.uj@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 01/24/2024 20:03:06
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 182912 [Jan 24 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.73.201 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.73.201 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	127.0.0.199:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.73.201
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 01/24/2024 20:07:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 1/24/2024 5:13:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Wed, 24 Jan 2024 21:02:16 +0100 Pablo Neira Ayuso wrote:
-> On Wed, Jan 24, 2024 at 11:40:57AM -0800, Jakub Kicinski wrote:
-> > Hm, odd, it's there:
-> > 
-> > $ ls /lib64/xtables/libxt_conntrack.so
-> > /lib64/xtables/libxt_conntrack.so
-> >
-> > but I set a custom LD_LIBRARY_PATH, let me make sure that /lib64 
-> > is in it (normal loaded always scans system paths)!  
+On 1/23/24 3:58 PM, Claudiu wrote:
+
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 > 
-> Could you also check your ./configure output for iptables? It shows
-> the directory where the .so file are search and found:
+> Delay parsing and setting were done in the driver's probe API. As some IP
+> variants switch to reset mode (and thus registers content is lost) when
+
+   s/registers content/the register contents/, perhaps?
+
+> setting clocks (due to module standby functionality) to be able to
+> implement runtime PM keep the delay parsing in the driver's probe function
+> and move the delay applying function to the driver's ndo_open API.
 > 
->   ...
->   Xtables extension directory:          /usr/lib/xtables
-
-I'm using the OS iptables, I was hoping that for net/ tests
-OS iptables should be good enough :S Is there a way to get
-the info you're after?
-
-$ iptables -V 
-iptables v1.8.8 (nf_tables)
-
-> > > What is the issue?  
-> > 
-> > A lot of the tests print warning messages like the ones below.
-> > Some of them pass some of them fail. Tweaking the kernel config
-> > to make sure the right CONFIG_IP_NF_TARGET_* and CONFIG_IP_NF_MATCH_*
-> > are included seem to have made no difference, which I concluded was
-> > because iptables CLI uses nf_tables here by default..  
+> Along with it, both delay specific functions were kept together.
 > 
-> Please, check if the symlink refers to -legacy or -nft via:
+> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+[...]
+
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index 8956c33c60e2..69d4854d6738 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> @@ -1800,6 +1800,59 @@ static int ravb_compute_gti(struct net_device *ndev)
+>  	return 0;
+>  }
+>  
+> +/* Set tx and rx clock internal delay modes */
+> +static void ravb_parse_delay_mode(struct device_node *np, struct net_device *ndev)
+
+   Wait, why are you moving this? Its call site didn't move -- it's still
+down in the probe() method...
+
+[...]
+> @@ -2785,10 +2793,7 @@ static int ravb_probe(struct platform_device *pdev)
+>  	if (error)
+>  		goto out_rpm_put;
+>  
+> -	if (info->internal_delay) {
+> -		ravb_parse_delay_mode(np, ndev);
+> -		ravb_set_delay_mode(ndev);
+> -	}
+> +	ravb_parse_delay_mode(np, ndev);
+>  
+>  	/* Allocate descriptor base address table */
+>  	priv->desc_bat_size = sizeof(struct ravb_desc) * DBAT_ENTRY_NUM;
 > 
-> $ ls -la /usr/sbin/iptables
 
-Ah, neat:
-
-$ ls -la /etc/alternatives/iptables
-lrwxrwxrwx. 1 root root 22 Jan  7 22:10 /etc/alternatives/iptables -> /usr/sbin/iptables-nft
-$ ls -la /usr/sbin/iptables
-lrwxrwxrwx. 1 root root 26 Jan  7 22:10 /usr/sbin/iptables -> /etc/alternatives/iptables
-
-> > [435321]$ grep -nrI "Warning: Extension" .
-> > ./6-fib-tests-sh/stdout:305:# Warning: Extension MARK revision 0 not supported, missing kernel module?  
-> 
-> This could come from either legacy or nftables:
-> 
-> libxtables/xtables.c:                                   "Warning: Extension %s revision 0 not supported, missing kernel module?\n",
-> iptables/nft.c:                         "Warning: Extension %s revision 0 not supported, missing kernel module?\n",
-> 
-> both have the same error.
-> 
-> if that is the nftables backend, it might be also that .config is
-> missing CONFIG_NF_TABLES and CONFIG_NFT_COMPAT there, among other
-> options.
-
-FWIW full config:
-
-https://netdev-2.bots.linux.dev/vmksft-net-mp/results/435321/config
-
-CONFIG_NFT_COMPAT was indeed missing! Let's see how it fares with it enabled.
+MBR, Sergey
 
