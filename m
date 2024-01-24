@@ -1,201 +1,198 @@
-Return-Path: <netdev+bounces-65372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A865083A3FD
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:20:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B228F83A401
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:21:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A1561F2CF48
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 08:20:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCE111C29D35
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 08:21:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E78AC17562;
-	Wed, 24 Jan 2024 08:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63AF417579;
+	Wed, 24 Jan 2024 08:20:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X6Sbw5ps"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nUQ70xiG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com [209.85.217.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1066E17558
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 08:20:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B91F12E63;
+	Wed, 24 Jan 2024 08:20:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706084427; cv=none; b=bAB/udpgeaEQYLc6qGZRBGlFbR6beSxt+eRm0r/zQas+lbIW89+uoihZxsIt0uLHUQe1zP0YtUkhEdCA1X9s/e5XBzKvsqJT1vVgpodLCBvH7jJ5NkIYCnP6fdcA0SltFjc5JGeq9nfxGYjfPEMVFU0d0UYQKV0/IvvsIG1D+0Y=
+	t=1706084441; cv=none; b=Y6j4jfUbjpPWAc0ztZG7lrT1NY02F11uNcoxkN504Kgm2y4hOznlqz8ozbwXVdCu53bF07fOUtET5Yak0dG2HNLs5Sq45Tkm8qYBBLIaS2WQ+fhgZRNIB8fGuEyhzcFSveabvdUrpCyik7u3+jG14VdFp9gp0ukF7sbyTUTh448=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706084427; c=relaxed/simple;
-	bh=V1slcYn21bNXk9V5C8Z6VKwUpsBDUlYBYxAW8Xe7/lU=;
+	s=arc-20240116; t=1706084441; c=relaxed/simple;
+	bh=qRLbMvbeLhh8vf90PYBWWGQ0nf39VJNKUe323XDk3PU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bgajhIrMOEPTHkA557udPMJjOEiinfbPlgS5VqTpFC6bgtvyzJcjtbJGOe32IeArTYH721+2j7RybSScCf8cN6wvemRrsOQyzA9xW/1VvDXjlhsPJAOfGziL53O1Ga9bWvg9svB6b+o2AeEIbbNWTWvyDjOjHqhCKJKO5BZ4jyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X6Sbw5ps; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-55818b7053eso11547a12.0
-        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 00:20:25 -0800 (PST)
+	 To:Cc:Content-Type; b=VfUioeIzW0DrwD+mlxH0by/VK0WvOld3hnZ8v0ma1JxrzTGyPPxjXJBrVuHLYvETKUFxzRfRJ9jRn94/4MQqS88Fl4qinfegmgvOMvDm7DTOwjf3FAxzhyiIW36b7r9/SMqcA/wRXAtmZ0b5ucDevvEwRgqhbua0KnO3qsaU82U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nUQ70xiG; arc=none smtp.client-ip=209.85.217.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f46.google.com with SMTP id ada2fe7eead31-466efea9c10so427413137.1;
+        Wed, 24 Jan 2024 00:20:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706084424; x=1706689224; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jjsqHxMZBRtxTxUYbNLydDXP9JAwq1MY641LAHVQss8=;
-        b=X6Sbw5psGSIi7KBm+5Eg/Z+CUy0Fs2MuiwTIpVYeULrq6lM8r7jsjeqSM7egImr6/g
-         xdrz82Wq2fYHVgPEl6k7uSD1pD5SXkOLH1cRi4VbvkXqxZWGK5BE0l4Bk6U301/MZ4HQ
-         a0JdIH6YfnhxMM8egUYWkrUOkoehh96lDs7/6pZrvV3zSgzuqWjXPXFYWbIoL3zMgZQW
-         op8uW3+I+cp3587KOu89R1PZI2iIb9PqaPshNYwprgxopJO/nEUV69etYhNSFoIOxtei
-         SBKavukmyrzQfU6yqa2e00s7jVLDoBb5KaO+VApSJFoJ4QJT/o0jnT4xIMqaCVYIQTc2
-         cANQ==
+        d=gmail.com; s=20230601; t=1706084438; x=1706689238; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=DGilVobqlxg2nBrRelp49YAwWjGpbZmg4o5NPf2paFo=;
+        b=nUQ70xiGj+mfPF33so+lLxVHG4lveii2pNHlBhlLouwf3TYHIre1ac6CjwCvjCxid4
+         8mcCZMqMNKcUy9eMyPnj6YjDuWRX5V59Qz+IaMOpU1a2TBP6C3XW+Q1oXrLh/ArLgBRL
+         k/qRd4g5SEJIsiTd+xu+Hbu+XY8JbIMkZkS3Sw88xbg+KMWphRH2xiceZEUpZwId5pN6
+         jGIll2mHmOSLJBSe8sWnEedN9KwaWJsvjmGAEYSn/BJ6O4/95siJENXxzD+1wyeBPrQS
+         jL6dUINGJ7g4wKxM7fRDl/1M85LDSI6O/wm0GvOqr8P1YuKGcUMRgCqbJXD1sSM2dzdj
+         sdjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706084424; x=1706689224;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jjsqHxMZBRtxTxUYbNLydDXP9JAwq1MY641LAHVQss8=;
-        b=iJM3obpdtHR6JiSV9jQ27lYSyeJU5C3DCE8Q1loG0aK0YYxaqwHEW8BhKxFH4gLqnR
-         +zb7coKy8lIze9ObR3L5xMu9AhAg2Py3pG8Uppdg2CLEXrf3Mw7RkkcNAgXUT5nWRbPQ
-         Hi0WKBOVA/93m7WTMb1vWHNGrOeitGHqGwpeDs0xqwuyMo4RjnGlTrR2sh9qFviw14aM
-         oQrIXLmdR1pORmMjBjQ/awVLcAk6+2jpcya5Zm0bmkwkrNzSpVzRtqR0KH2dBBIVH51o
-         sXCU2X6JYWGnjXLAKxQJSyLqQIWo7cG+rgMTjgSsQTjYoVY88hH8UN9EVzkatNYivQqN
-         T3Hg==
-X-Gm-Message-State: AOJu0YwVl+2vZwwu6q9v1uWHo6OrQ5zFaOf9z+itZlWWjFoouAEXiHz8
-	c6z/TpUyGey561hUTo3AjlG783ruYZ6+plnuNVot98OWbcmc2QyvDK9JVcnc8nbw9LZmi2sGg0X
-	lChrOWnz6uYF7Xgzoc2NiObgqdshvSmNNuJUM
-X-Google-Smtp-Source: AGHT+IHz4WfxrkWGJUNOWseJkH5AnLnDQaRvNbFcz/95E/NWPxNCQvP1kyyChOKaaGag+8A4H9iRGQ2u8INjs6UvIt4=
-X-Received: by 2002:a05:6402:368:b0:55a:5fe0:87e4 with SMTP id
- s8-20020a056402036800b0055a5fe087e4mr64407edw.0.1706084423970; Wed, 24 Jan
- 2024 00:20:23 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706084438; x=1706689238;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DGilVobqlxg2nBrRelp49YAwWjGpbZmg4o5NPf2paFo=;
+        b=j7GLFYicsknopkZV5DGwzp4yJ0iYopBBoiFc0aWVnMPE9raVV12haY82VAHDb+GvaJ
+         hhP89QKHWx7Kx6kZujsX50kB/CoDm4b0S7oHvjgWYSKFpZRAdNz3J0DCwBT2SqGaRzcN
+         Pd2myftM9gMnNENad+oyaZFFS1pe+qjP0A+sg8spxIoyiideU8yQowFFPXfLzXv8aB45
+         C2j5qlcRzwK6ICacZUoML2zzIBLQlAcbDDvZ74yLNg1yCSulqjjFVnrc/7wzNqiDEfFp
+         SH+ofDc4/86kK+jKOV5fluQxd1gpRj1BFlTz1xf5zqjKAgX/yaYm29UnzULlk0vx6Ejr
+         /LKA==
+X-Gm-Message-State: AOJu0YzChZItpS/4Z4KiIkuj9IiebyfH88OuFTDIJyCrSEbmHUyNKiZ7
+	8gENRsUAmv7WWM+5fNGa4SfemY19buv5X8SAIcZJ1JMGGTecHFcOR91Hr2ttlXIpeRMVSnvdLfi
+	c8QfvHZGXnC0iHOU+/mY6FApIWCA=
+X-Google-Smtp-Source: AGHT+IEj23ogNF8aCFbWmRwaIp3+EYPhaxLwrfmkpU6zMs7WGaNaMrLqP5WYtLMt2BCshBwKebfiuDD4+ugd+LtzLxY=
+X-Received: by 2002:a05:6122:3190:b0:4b7:3417:b5a4 with SMTP id
+ ch16-20020a056122319000b004b73417b5a4mr1359565vkb.1.1706084438254; Wed, 24
+ Jan 2024 00:20:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240124025359.11419-1-jdamato@fastly.com>
-In-Reply-To: <20240124025359.11419-1-jdamato@fastly.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 24 Jan 2024 09:20:09 +0100
-Message-ID: <CANn89i+YKwrgpt8VnHrw4eeVpqRamLkTSr4u+g1mRDMZa6b+7Q@mail.gmail.com>
-Subject: Re: [net-next 0/3] Per epoll context busy poll support
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	chuck.lever@oracle.com, jlayton@kernel.org, linux-api@vger.kernel.org, 
-	brauner@kernel.org, davem@davemloft.net, alexander.duyck@gmail.com, 
-	sridhar.samudrala@intel.com, kuba@kernel.org, Wei Wang <weiwan@google.com>
+References: <20240122221610.556746-1-maciej.fijalkowski@intel.com> <20240122221610.556746-3-maciej.fijalkowski@intel.com>
+In-Reply-To: <20240122221610.556746-3-maciej.fijalkowski@intel.com>
+From: Magnus Karlsson <magnus.karlsson@gmail.com>
+Date: Wed, 24 Jan 2024 09:20:26 +0100
+Message-ID: <CAJ8uoz2W6nqJ=vk6+RR7zEohkv7CTBO+2KsAQAfgp=gf_5-ycA@mail.gmail.com>
+Subject: Re: [PATCH v5 bpf 02/11] xsk: make xsk_buff_pool responsible for
+ clearing xdp_buff::flags
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
+	andrii@kernel.org, netdev@vger.kernel.org, magnus.karlsson@intel.com, 
+	bjorn@kernel.org, echaudro@redhat.com, lorenzo@kernel.org, 
+	martin.lau@linux.dev, tirthendu.sarkar@intel.com, john.fastabend@gmail.com, 
+	horms@kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 24, 2024 at 3:54=E2=80=AFAM Joe Damato <jdamato@fastly.com> wro=
-te:
+On Mon, 22 Jan 2024 at 23:16, Maciej Fijalkowski
+<maciej.fijalkowski@intel.com> wrote:
 >
-> Greetings:
+> XDP multi-buffer support introduced XDP_FLAGS_HAS_FRAGS flag that is
+> used by drivers to notify data path whether xdp_buff contains fragments
+> or not. Data path looks up mentioned flag on first buffer that occupies
+> the linear part of xdp_buff, so drivers only modify it there. This is
+> sufficient for SKB and XDP_DRV modes as usually xdp_buff is allocated on
+> stack or it resides within struct representing driver's queue and
+> fragments are carried via skb_frag_t structs. IOW, we are dealing with
+> only one xdp_buff.
 >
-> TL;DR This builds on commit bf3b9f6372c4 ("epoll: Add busy poll support t=
-o
-> epoll with socket fds.") by allowing user applications to enable
-> epoll-based busy polling and set a busy poll packet budget on a per epoll
-> context basis.
+> ZC mode though relies on list of xdp_buff structs that is carried via
+> xsk_buff_pool::xskb_list, so ZC data path has to make sure that
+> fragments do *not* have XDP_FLAGS_HAS_FRAGS set. Otherwise,
+> xsk_buff_free() could misbehave if it would be executed against xdp_buff
+> that carries a frag with XDP_FLAGS_HAS_FRAGS flag set. Such scenario can
+> take place when within supplied XDP program bpf_xdp_adjust_tail() is
+> used with negative offset that would in turn release the tail fragment
+> from multi-buffer frame.
 >
-> To allow for this, two ioctls have been added for epoll contexts for
-> getting and setting a new struct, struct epoll_params.
+> Calling xsk_buff_free() on tail fragment with XDP_FLAGS_HAS_FRAGS would
+> result in releasing all the nodes from xskb_list that were produced by
+> driver before XDP program execution, which is not what is intended -
+> only tail fragment should be deleted from xskb_list and then it should
+> be put onto xsk_buff_pool::free_list. Such multi-buffer frame will never
+> make it up to user space, so from AF_XDP application POV there would be
+> no traffic running, however due to free_list getting constantly new
+> nodes, driver will be able to feed HW Rx queue with recycled buffers.
+> Bottom line is that instead of traffic being redirected to user space,
+> it would be continuously dropped.
 >
-> This makes epoll-based busy polling much more usable for user
-> applications than the current system-wide sysctl and hardcoded budget.
+> To fix this, let us clear the mentioned flag on xsk_buff_pool side at
+> allocation time, which is what should have been done right from the
+> start of XSK multi-buffer support.
 >
-> Longer explanation:
+> Fixes: 1bbc04de607b ("ice: xsk: add RX multi-buffer support")
+> Fixes: 1c9ba9c14658 ("i40e: xsk: add RX multi-buffer support")
+> Fixes: 24ea50127ecf ("xsk: support mbuf on ZC RX")
+> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> ---
+>  drivers/net/ethernet/intel/i40e/i40e_xsk.c | 1 -
+>  drivers/net/ethernet/intel/ice/ice_xsk.c   | 1 -
+>  net/xdp/xsk_buff_pool.c                    | 3 +++
+>  3 files changed, 3 insertions(+), 2 deletions(-)
 >
-> Presently epoll has support for a very useful form of busy poll based on
-> the incoming NAPI ID (see also: SO_INCOMING_NAPI_ID [1]).
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_xsk.c b/drivers/net/ethernet/intel/i40e/i40e_xsk.c
+> index e99fa854d17f..fede0bb3e047 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_xsk.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_xsk.c
+> @@ -499,7 +499,6 @@ int i40e_clean_rx_irq_zc(struct i40e_ring *rx_ring, int budget)
+>                 xdp_res = i40e_run_xdp_zc(rx_ring, first, xdp_prog);
+>                 i40e_handle_xdp_result_zc(rx_ring, first, rx_desc, &rx_packets,
+>                                           &rx_bytes, xdp_res, &failure);
+> -               first->flags = 0;
+>                 next_to_clean = next_to_process;
+>                 if (failure)
+>                         break;
+> diff --git a/drivers/net/ethernet/intel/ice/ice_xsk.c b/drivers/net/ethernet/intel/ice/ice_xsk.c
+> index 5d1ae8e4058a..d9073a618ad6 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_xsk.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_xsk.c
+> @@ -895,7 +895,6 @@ int ice_clean_rx_irq_zc(struct ice_rx_ring *rx_ring, int budget)
 >
-> This form of busy poll allows epoll_wait to drive NAPI packet processing
-> which allows for a few interesting user application designs which can
-> reduce latency and also potentially improve L2/L3 cache hit rates by
-> deferring NAPI until userland has finished its work.
+>                 if (!first) {
+>                         first = xdp;
+> -                       xdp_buff_clear_frags_flag(first);
+>                 } else if (ice_add_xsk_frag(rx_ring, first, xdp, size)) {
+>                         break;
+>                 }
+> diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
+> index 28711cc44ced..dc5659da6728 100644
+> --- a/net/xdp/xsk_buff_pool.c
+> +++ b/net/xdp/xsk_buff_pool.c
+> @@ -555,6 +555,7 @@ struct xdp_buff *xp_alloc(struct xsk_buff_pool *pool)
 >
-> The documentation available on this is, IMHO, a bit confusing so please
-> allow me to explain how one might use this:
+>         xskb->xdp.data = xskb->xdp.data_hard_start + XDP_PACKET_HEADROOM;
+>         xskb->xdp.data_meta = xskb->xdp.data;
+> +       xskb->xdp.flags = 0;
 >
-> 1. Ensure each application thread has its own epoll instance mapping
-> 1-to-1 with NIC RX queues. An n-tuple filter would likely be used to
-> direct connections with specific dest ports to these queues.
+>         if (pool->dma_need_sync) {
+>                 dma_sync_single_range_for_device(pool->dev, xskb->dma, 0,
+> @@ -601,6 +602,7 @@ static u32 xp_alloc_new_from_fq(struct xsk_buff_pool *pool, struct xdp_buff **xd
+>                 }
 >
-> 2. Optionally: Setup IRQ coalescing for the NIC RX queues where busy
-> polling will occur. This can help avoid the userland app from being
-> pre-empted by a hard IRQ while userland is running. Note this means that
-> userland must take care to call epoll_wait and not take too long in
-> userland since it now drives NAPI via epoll_wait.
->
-> 3. Ensure that all incoming connections added to an epoll instance
-> have the same NAPI ID. This can be done with a BPF filter when
-> SO_REUSEPORT is used or getsockopt + SO_INCOMING_NAPI_ID when a single
-> accept thread is used which dispatches incoming connections to threads.
->
-> 4. Lastly, busy poll must be enabled via a sysctl
-> (/proc/sys/net/core/busy_poll).
->
-> The unfortunate part about step 4 above is that this enables busy poll
-> system-wide which affects all user applications on the system,
-> including epoll-based network applications which were not intended to
-> be used this way or applications where increased CPU usage for lower
-> latency network processing is unnecessary or not desirable.
->
-> If the user wants to run one low latency epoll-based server application
-> with epoll-based busy poll, but would like to run the rest of the
-> applications on the system (which may also use epoll) without busy poll,
-> this system-wide sysctl presents a significant problem.
->
-> This change preserves the system-wide sysctl, but adds a mechanism (via
-> ioctl) to enable or disable busy poll for epoll contexts as needed by
-> individual applications, making epoll-based busy poll more usable.
->
+>                 *xdp = &xskb->xdp;
+> +               xskb->xdp.flags = 0;
 
-I think this description missed the napi_defer_hard_irqs and
-gro_flush_timeout settings ?
+Thanks for catching this. I am thinking we should have an if-statement
+here and only do this when multi-buffer is enabled. The reason that we
+have two different paths for aligned mode and unaligned mode here is
+that we do not have to touch the xdp_buff at all at allocation time in
+aligned mode, which provides a nice speed-up. So let us only do this
+when necessary. What do you think? Same goes for the line in
+xp_alloc_reused().
 
-I would think that if an application really wants to make sure its
-thread is the only one
-eventually calling napi->poll(), we must make sure NIC interrupts stay mask=
-ed.
-
-Current implementations of busy poll always release NAPI_STATE_SCHED bit wh=
-en
-returning to user space.
-
-It seems you want to make sure the application and only the
-application calls the napi->poll()
-at chosen times.
-
-Some kind of contract is needed, and the presence of the hrtimer
-(currently only driven from dev->@gro_flush_timeout)
-would allow to do that correctly.
-
-Whenever we 'trust' user space to perform the napi->poll shortly, we
-also want to arm the hrtimer to eventually detect
-the application took too long, to restart the other mechanisms (NIC irq bas=
-ed)
-
-Note that we added the kthread based napi polling, and we are working
-to add a busy polling feature to these kthreads.
-allowing to completely mask NIC interrupts and further reduce latencies.
-
-Thank you
-
-> Thanks,
-> Joe
+>                 xdp++;
+>         }
 >
-> [1]: https://lore.kernel.org/lkml/20170324170836.15226.87178.stgit@localh=
-ost.localdomain/
+> @@ -621,6 +623,7 @@ static u32 xp_alloc_reused(struct xsk_buff_pool *pool, struct xdp_buff **xdp, u3
+>                 list_del_init(&xskb->free_list_node);
 >
-> Joe Damato (3):
->   eventpoll: support busy poll per epoll instance
->   eventpoll: Add per-epoll busy poll packet budget
->   eventpoll: Add epoll ioctl for epoll_params
->
->  .../userspace-api/ioctl/ioctl-number.rst      |  1 +
->  fs/eventpoll.c                                | 99 ++++++++++++++++++-
->  include/uapi/linux/eventpoll.h                | 12 +++
->  3 files changed, 107 insertions(+), 5 deletions(-)
->
+>                 *xdp = &xskb->xdp;
+> +               xskb->xdp.flags = 0;
+>                 xdp++;
+>         }
+>         pool->free_list_cnt -= nb_entries;
 > --
-> 2.25.1
+> 2.34.1
+>
 >
 
