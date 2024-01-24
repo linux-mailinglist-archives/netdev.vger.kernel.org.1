@@ -1,60 +1,72 @@
-Return-Path: <netdev+bounces-65420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14C0D83A69C
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 11:21:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F401E83A694
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 11:19:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0B5E1F22A93
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:21:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFA20282254
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:19:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04D1618E0E;
-	Wed, 24 Jan 2024 10:21:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 239AA18E0E;
+	Wed, 24 Jan 2024 10:19:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="wpoeUIZd"
 X-Original-To: netdev@vger.kernel.org
-Received: from air.basealt.ru (air.basealt.ru [194.107.17.39])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08F061946F;
-	Wed, 24 Jan 2024 10:21:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A1141862A;
+	Wed, 24 Jan 2024 10:19:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706091691; cv=none; b=SPmi2vJNR9c+BjHAcQsQE1X5gBNFqrTgy/3irAekaJERZR4dPLgDdsqRR7pL6bpKIa8ABKTYE0UBG4dJZQCHFEwHq57llMItxWCyMW2Lq6XydqiSj9Vd/yKqpOS0V0RMHmfbiIJLKZqj5hllh3nU/oGwjc3Sp3zda7PtNJRWRag=
+	t=1706091554; cv=none; b=K0HyNUGAjLCQYb0iYw3C1AgxAx1K9TN8I4HW4bjQMd2SLLNlvTeEg8ACvHoudOJVzz6bYTYGNfO3+OFmkNek2u/BsChHC/o9m/C6a7FJ1jEoCgNkL/cFE/J5i77lUluY3Lh1WKW2mopshOTbrCj8Oc7fFBVQYWOgLVLZZPjJMtw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706091691; c=relaxed/simple;
-	bh=uaN3LU8WCx1N5fdq/9B44/4QcDRIu1L6RQvDR3R3yjM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=MvTgDwGuljECtYH1Y2xSqI/f/+FGNFah5HKDkDq6dVYxB/iBqw7m3Qa9k1PKMWlNd1bt1SGAvSx/RHdPdOrt27FMuby1zcXvFdWwpWAuHGOVXNIKvLkwgAbXLFHn5ll1uhXLC2sB4uz7Winbul2Ehyvb3M2LF2RtUdsIIAa/Ubo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
-Received: by air.basealt.ru (Postfix, from userid 490)
-	id 5F3FB2F20242; Wed, 24 Jan 2024 10:14:33 +0000 (UTC)
-X-Spam-Level: 
-Received: from altlinux.malta.altlinux.ru (obninsk.basealt.ru [217.15.195.17])
-	by air.basealt.ru (Postfix) with ESMTPSA id 2951F2F2022A;
-	Wed, 24 Jan 2024 10:14:31 +0000 (UTC)
-From: kovalev@altlinux.org
-To: pablo@netfilter.org,
-	laforge@gnumonks.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	osmocom-net-gprs@lists.osmocom.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: kovalev@altlinux.org,
-	nickel@altlinux.org,
-	oficerovas@altlinux.org,
-	dutyrok@altlinux.org
-Subject: [PATCH 1/1] gtp: fix use-after-free and null-ptr-deref in gtp_genl_dump_pdp()
-Date: Wed, 24 Jan 2024 13:14:04 +0300
-Message-Id: <20240124101404.161655-2-kovalev@altlinux.org>
-X-Mailer: git-send-email 2.33.8
-In-Reply-To: <20240124101404.161655-1-kovalev@altlinux.org>
-References: <20240124101404.161655-1-kovalev@altlinux.org>
+	s=arc-20240116; t=1706091554; c=relaxed/simple;
+	bh=yeYvgeBO8qftPD9gLi2kowkyqy92YLE64bSsre7Tjc8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nuL4siSBc0W3P4ZLQMPtgQwUKWKDsLf9JgKT5LrnLBiPacCDGPejurW+9TvxqWCqwQnpP3WuOhWfg/3keElsQw/CxmhekxNGQRSBN3ustQPdaTrtfqA4t+yfDrMqG4A67OXARLtKP5N0wPRJKwuFDfRluRAIpxf8zmVxbuBdWk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=wpoeUIZd; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1706091552; x=1737627552;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=yeYvgeBO8qftPD9gLi2kowkyqy92YLE64bSsre7Tjc8=;
+  b=wpoeUIZdU036XdM2SrZYdYO1BDFJ1ojAmsdzpLSWikVhHaCgeMxAo/c2
+   g+QXxFXJj7blRHe7UjKUXPiEIgZtiMTcRgN7vbnybksZchTrI5F6VrLuq
+   Kn6ftT/b6+/ZLRglUBIpzvQXkbL9eS3ZbQbSbDIfZwIViBX83kvO4opnL
+   XdZn9fPFK85qgVIWSXmcVFn6sFAqiHQBpmoE7ss8uW8vb+04uNId+JodK
+   DaMAPhAHTjT7m6UbD0gkAMKp095XSI4FbrJ+U9nhm5NwCY3nymJB5VLzi
+   8WFVD9I0I4hA1tEizgDkkJaMYHbsaUKIvbiljV9SFTyAaZTi9wLWjSTjh
+   w==;
+X-CSE-ConnectionGUID: T28/u+jsQSe9VqMzdG+pyA==
+X-CSE-MsgGUID: 4+gZpKMHQZ6Tx3AWTlULPg==
+X-IronPort-AV: E=Sophos;i="6.05,216,1701154800"; 
+   d="scan'208";a="245938232"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 24 Jan 2024 03:19:11 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 24 Jan 2024 03:18:48 -0700
+Received: from DEN-DL-M31836.microsemi.net (10.10.85.11) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Wed, 24 Jan 2024 03:18:46 -0700
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<UNGLinuxDriver@microchip.com>, <maxime.chevallier@bootlin.com>, "Horatiu
+ Vultur" <horatiu.vultur@microchip.com>
+Subject: [PATCH net v2] net: lan966x: Fix port configuration when using SGMII interface
+Date: Wed, 24 Jan 2024 11:17:58 +0100
+Message-ID: <20240124101758.406068-1-horatiu.vultur@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,109 +74,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-From: Vasiliy Kovalev <kovalev@altlinux.org>
+In case the interface between the MAC and the PHY is SGMII, then the bit
+GIGA_MODE on the MAC side needs to be set regardless of the speed at
+which it is running.
 
-After unloading the module, an instance continues to exist that accesses
-outdated memory addresses.
+Fixes: d28d6d2e37d1 ("net: lan966x: add port module support")
+Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-To prevent this, the dump_pdp_en flag has been added, which blocks the
-dump of pdp contexts by a false value. And only after these checks can
-the net_generic() function be called.
-
-These errors were found using the syzkaller program:
-
-Syzkaller hit 'general protection fault in gtp_genl_dump_pdp' bug.
-gtp: GTP module loaded (pdp ctx size 104 bytes)
-gtp: GTP module unloaded
-general protection fault, probably for non-canonical address
-0xdffffc0000000001:0000 [#1] SMP KASAN NOPTI
-KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
-CPU: 0 PID: 2782 Comm: syz-executor139 Not tainted 5.10.200-std-def-alt1 #1
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.0-alt1
-RIP: 0010:gtp_genl_dump_pdp+0x1b1/0x790 [gtp]
-...
-Call Trace:
- genl_lock_dumpit+0x6b/0xa0 net/netlink/genetlink.c:623
- netlink_dump+0x575/0xc70 net/netlink/af_netlink.c:2271
- __netlink_dump_start+0x64e/0x910 net/netlink/af_netlink.c:2376
- genl_family_rcv_msg_dumpit+0x2b8/0x310 net/netlink/genetlink.c:686
- genl_family_rcv_msg net/netlink/genetlink.c:780 [inline]
- genl_rcv_msg+0x450/0x5a0 net/netlink/genetlink.c:800
- netlink_rcv_skb+0x150/0x440 net/netlink/af_netlink.c:2497
- genl_rcv+0x29/0x40 net/netlink/genetlink.c:811
- netlink_unicast_kernel net/netlink/af_netlink.c:1322 [inline]
- netlink_unicast+0x54e/0x800 net/netlink/af_netlink.c:1348
- netlink_sendmsg+0x914/0xe00 net/netlink/af_netlink.c:1916
- sock_sendmsg_nosec net/socket.c:651 [inline]
- __sock_sendmsg+0x159/0x190 net/socket.c:663
- ____sys_sendmsg+0x712/0x870 net/socket.c:2376
- ___sys_sendmsg+0xf8/0x170 net/socket.c:2430
- __sys_sendmsg+0xea/0x1b0 net/socket.c:2459
- do_syscall_64+0x33/0x40 arch/x86/entry/common.c:46
- entry_SYSCALL_64_after_hwframe+0x62/0xc7
-RIP: 0033:0x7f2ea16c2d49
-
-Fixes: 94a6d9fb88df ("gtp: fix wrong condition in gtp_genl_dump_pdp()")
-Signed-off-by: Vasiliy Kovalev <kovalev@altlinux.org>
 ---
- drivers/net/gtp.c | 18 +++++++++++++++---
- 1 file changed, 15 insertions(+), 3 deletions(-)
+v1->v2:
+- update comment to match the changes to if condition
+---
+ drivers/net/ethernet/microchip/lan966x/lan966x_port.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
-index 477b4d4f860bd3..3fc4639711cd83 100644
---- a/drivers/net/gtp.c
-+++ b/drivers/net/gtp.c
-@@ -1675,6 +1675,8 @@ static int gtp_genl_get_pdp(struct sk_buff *skb, struct genl_info *info)
- 	return err;
- }
+diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_port.c b/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
+index 92108d354051c..2e83bbb9477e0 100644
+--- a/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
++++ b/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
+@@ -168,9 +168,10 @@ static void lan966x_port_link_up(struct lan966x_port *port)
+ 	lan966x_taprio_speed_set(port, config->speed);
  
-+static bool dump_pdp_en;
-+
- static int gtp_genl_dump_pdp(struct sk_buff *skb,
- 				struct netlink_callback *cb)
- {
-@@ -1684,12 +1686,19 @@ static int gtp_genl_dump_pdp(struct sk_buff *skb,
- 	struct pdp_ctx *pctx;
- 	struct gtp_net *gn;
+ 	/* Also the GIGA_MODE_ENA(1) needs to be set regardless of the
+-	 * port speed for QSGMII ports.
++	 * port speed for QSGMII or SGMII ports.
+ 	 */
+-	if (phy_interface_num_ports(config->portmode) == 4)
++	if (phy_interface_num_ports(config->portmode) == 4 ||
++	    config->portmode == PHY_INTERFACE_MODE_SGMII)
+ 		mode = DEV_MAC_MODE_CFG_GIGA_MODE_ENA_SET(1);
  
--	gn = net_generic(net, gtp_net_id);
--
--	if (cb->args[4])
-+	/* Do not allow further operations if the module is
-+	 * unloaded before or after the process is blocked.
-+	 */
-+	if (!dump_pdp_en)
- 		return 0;
- 
- 	rcu_read_lock();
-+	if (!dump_pdp_en || cb->args[4]) {
-+		rcu_read_unlock();
-+		return 0;
-+	}
-+	gn = net_generic(net, gtp_net_id);
-+
- 	list_for_each_entry_rcu(gtp, &gn->gtp_dev_list, list) {
- 		if (last_gtp && last_gtp != gtp)
- 			continue;
-@@ -1914,6 +1923,8 @@ static int __init gtp_init(void)
- 	if (err < 0)
- 		goto unreg_genl_family;
- 
-+	dump_pdp_en = true;
-+
- 	pr_info("GTP module loaded (pdp ctx size %zd bytes)\n",
- 		sizeof(struct pdp_ctx));
- 	return 0;
-@@ -1930,6 +1941,7 @@ late_initcall(gtp_init);
- 
- static void __exit gtp_fini(void)
- {
-+	dump_pdp_en = false;
- 	genl_unregister_family(&gtp_genl_family);
- 	rtnl_link_unregister(&gtp_link_ops);
- 	unregister_pernet_subsys(&gtp_net_ops);
+ 	lan_wr(config->duplex | mode,
 -- 
-2.33.8
+2.34.1
 
 
