@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-65361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7622683A3F0
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:19:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5B5E83A3F1
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:19:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E9D928AF60
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 08:19:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1DCD41F2CDCB
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 08:19:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83E6D17592;
-	Wed, 24 Jan 2024 08:19:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66AC7175A5;
+	Wed, 24 Jan 2024 08:19:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hNMJ5Wkt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tlsR5+br"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60C6717580
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 08:19:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41422175A1
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 08:19:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706084348; cv=none; b=EHF0d9cqCyiOHQrumrHypa5TLqVkvJtT3iVR2FxCst9/rLqrfdKfKUPO18mnDUICUp6MDayoXj7qH2zJrjVLgCNvw6eIf4fDwEAaZXVvfpUpY8MM+JasdoWVzAU8C3DndbhYWy6AOhBNJeL4E4LmwFjEWJMcHkzPm3rKxjloknc=
+	t=1706084350; cv=none; b=ZZISRt24tvVEhqSPHDb1QVurSBgqwvuLfCogDryg0qkCmUiTpDnukcUoOgM9ZM/CR9VgmKweISNeMOislJXlA8lkOP0QvVmFmhRaLhcO9zpUqeodCzm6q4qCWLnRbNmsE8zY1YNsPk0SNVgebb1W+m72yCMNpa+Llsv2utUlK4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706084348; c=relaxed/simple;
-	bh=1/HOGQk8IcAL/AQOvw0nu3cSZVJD04r7T70Xby+gWwg=;
+	s=arc-20240116; t=1706084350; c=relaxed/simple;
+	bh=2PBPtIZyWHhfbsIMNcuMZlB08qWfwmg4dP/8fqq3oJE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=H3IlLDanKqCG+5hq3BilRJuFNIZt3CKojCA9Qsi0n39qID98t1vq7xjohtFJJcbZD8aGQy5G3e+ggB333PLyLoWk6sQBaGxDTJ/3D35NYJ2gHmx93L53R4dUx7K3rqLQD5tF6cWD9UNJanIECO8LEjBYdPq+i9m8DDSgJvzZveA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hNMJ5Wkt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 122C2C433F1;
-	Wed, 24 Jan 2024 08:19:07 +0000 (UTC)
+	 MIME-Version; b=FB3oYgePSBDlgxqmwHtbW9BcDEG2Hj7+s68QT4fbIjRpO8ONHO8StKQfH3v9luxEQ4qMopELqK2pWe5Qqqer7sgV4c7ciF8VyNaeY48i4W/bajiLWysv1/8lvCUuH/vDu1X9i2xuujR135r9EAkNszGrOUAlTiyk3dtH1zfZDIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tlsR5+br; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3EC1C433C7;
+	Wed, 24 Jan 2024 08:19:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706084348;
-	bh=1/HOGQk8IcAL/AQOvw0nu3cSZVJD04r7T70Xby+gWwg=;
+	s=k20201202; t=1706084350;
+	bh=2PBPtIZyWHhfbsIMNcuMZlB08qWfwmg4dP/8fqq3oJE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hNMJ5Wkt3ggGFfSbymgBVOlbgaKMg8CovgjdH/zUiySoPyByrKZt3+EhK5AAlzHiR
-	 FhV51Rh7LLF/X7Svoa3tcwQiL8YL5tntFG45EhSIopbY97dVxhppJjb55sCCqnKJ1E
-	 r1a952U4cOKxIEEoSmlZtGrQVjf9OdmDgbYJvZGfvRwjaxAMnR1qw1fRLhHKqbKp5D
-	 d0fiH3wqLS0pwLOxIHKjDA4w0NsCMZ8dfSlH/2cLqyn1yy/ENKstk28lA8xQFAQ/+Q
-	 l1xiPCM5Ivf/qRIXyhN2Mhz5Cz1+iSVaDqpWwkhNLw5A2DKlwfTmAXdT4UFQyy+fyI
-	 F8pTAP3oFcEvg==
+	b=tlsR5+br9kIM7QofvMZuuKdL3rdH4Vdy9IS+z49+dKM5bbEn+vuOfjuaKt/4j89y1
+	 W/QZz33dYuYIeCEElZKrLyfvh3Wc/MEjvgcDnnk1vo6C6JHHoBF+ljT1CitnkzqWnd
+	 j36jaoTnXoo3+AoxRoBFtWWP1XWVdXRRLu4CvGMAe8YLU8rESHjvXAtO+cuFlykKoW
+	 mLtLcG9IHsDr8/2aDvj3AdX3MqnlkBRIYQu0R0KzlHwokSlkhrZE3yuoSMEHOHWwo5
+	 t6b2WPN7E6hBbmT/yvrBucHhEYzEXMkyIABrbRTFMWCnZAdO01Buk1UJAFL1RgTrDI
+	 3TaV3XJQAMM0w==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -49,10 +49,11 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>
-Subject: [net 04/14] net/mlx5e: Fix inconsistent hairpin RQT sizes
-Date: Wed, 24 Jan 2024 00:18:45 -0800
-Message-ID: <20240124081855.115410-5-saeed@kernel.org>
+	Vlad Buslov <vladbu@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>
+Subject: [net 05/14] net/mlx5e: Fix peer flow lists handling
+Date: Wed, 24 Jan 2024 00:18:46 -0800
+Message-ID: <20240124081855.115410-6-saeed@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240124081855.115410-1-saeed@kernel.org>
 References: <20240124081855.115410-1-saeed@kernel.org>
@@ -64,39 +65,121 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Tariq Toukan <tariqt@nvidia.com>
+From: Vlad Buslov <vladbu@nvidia.com>
 
-The processing of traffic in hairpin queues occurs in HW/FW and does not
-involve the cpus, hence the upper bound on max num channels does not
-apply to them.  Using this bound for the hairpin RQT max_table_size is
-wrong.  It could be too small, and cause the error below [1].  As the
-RQT size provided on init does not get modified later, use the same
-value for both actual and max table sizes.
+The cited change refactored mlx5e_tc_del_fdb_peer_flow() to only clear DUP
+flag when list of peer flows has become empty. However, if any concurrent
+user holds a reference to a peer flow (for example, the neighbor update
+workqueue task is updating peer flow's parent encap entry concurrently),
+then the flow will not be removed from the peer list and, consecutively,
+DUP flag will remain set. Since mlx5e_tc_del_fdb_peers_flow() calls
+mlx5e_tc_del_fdb_peer_flow() for every possible peer index the algorithm
+will try to remove the flow from eswitch instances that it has never peered
+with causing either NULL pointer dereference when trying to remove the flow
+peer list head of peer_index that was never initialized or a warning if the
+list debug config is enabled[0].
 
-[1]
-mlx5_core 0000:08:00.1: mlx5_cmd_out_err:805:(pid 1200): CREATE_RQT(0x916) op_mod(0x0) failed, status bad parameter(0x3), syndrome (0x538faf), err(-22)
+Fix the issue by always removing the peer flow from the list even when not
+releasing the last reference to it.
 
-Fixes: 74a8dadac17e ("net/mlx5e: Preparations for supporting larger number of channels")
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-Reviewed-by: Gal Pressman <gal@nvidia.com>
+[0]:
+
+[ 3102.985806] ------------[ cut here ]------------
+[ 3102.986223] list_del corruption, ffff888139110698->next is NULL
+[ 3102.986757] WARNING: CPU: 2 PID: 22109 at lib/list_debug.c:53 __list_del_entry_valid_or_report+0x4f/0xc0
+[ 3102.987561] Modules linked in: act_ct nf_flow_table bonding act_tunnel_key act_mirred act_skbedit vxlan cls_matchall nfnetlink_cttimeout act_gact cls_flower sch_ingress mlx5_vdpa vringh vhost_iotlb vdpa openvswitch nsh xt_MASQUERADE nf_conntrack_netlink nfnetlink iptable_nat xt_addrtype xt_conntrack nf_nat br_netfilter rpcsec_gss_krb5 auth_rpcg
+ss oid_registry overlay rpcrdma rdma_ucm ib_iser libiscsi scsi_transport_iscsi ib_umad rdma_cm ib_ipoib iw_cm ib_cm mlx5_ib ib_uverbs ib_core mlx5_core [last unloaded: bonding]
+[ 3102.991113] CPU: 2 PID: 22109 Comm: revalidator28 Not tainted 6.6.0-rc6+ #3
+[ 3102.991695] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
+[ 3102.992605] RIP: 0010:__list_del_entry_valid_or_report+0x4f/0xc0
+[ 3102.993122] Code: 39 c2 74 56 48 8b 32 48 39 fe 75 62 48 8b 51 08 48 39 f2 75 73 b8 01 00 00 00 c3 48 89 fe 48 c7 c7 48 fd 0a 82 e8 41 0b ad ff <0f> 0b 31 c0 c3 48 89 fe 48 c7 c7 70 fd 0a 82 e8 2d 0b ad ff 0f 0b
+[ 3102.994615] RSP: 0018:ffff8881383e7710 EFLAGS: 00010286
+[ 3102.995078] RAX: 0000000000000000 RBX: 0000000000000002 RCX: 0000000000000000
+[ 3102.995670] RDX: 0000000000000001 RSI: ffff88885f89b640 RDI: ffff88885f89b640
+[ 3102.997188] DEL flow 00000000be367878 on port 0
+[ 3102.998594] RBP: dead000000000122 R08: 0000000000000000 R09: c0000000ffffdfff
+[ 3102.999604] R10: 0000000000000008 R11: ffff8881383e7598 R12: dead000000000100
+[ 3103.000198] R13: 0000000000000002 R14: ffff888139110000 R15: ffff888101901240
+[ 3103.000790] FS:  00007f424cde4700(0000) GS:ffff88885f880000(0000) knlGS:0000000000000000
+[ 3103.001486] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 3103.001986] CR2: 00007fd42e8dcb70 CR3: 000000011e68a003 CR4: 0000000000370ea0
+[ 3103.002596] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[ 3103.003190] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[ 3103.003787] Call Trace:
+[ 3103.004055]  <TASK>
+[ 3103.004297]  ? __warn+0x7d/0x130
+[ 3103.004623]  ? __list_del_entry_valid_or_report+0x4f/0xc0
+[ 3103.005094]  ? report_bug+0xf1/0x1c0
+[ 3103.005439]  ? console_unlock+0x4a/0xd0
+[ 3103.005806]  ? handle_bug+0x3f/0x70
+[ 3103.006149]  ? exc_invalid_op+0x13/0x60
+[ 3103.006531]  ? asm_exc_invalid_op+0x16/0x20
+[ 3103.007430]  ? __list_del_entry_valid_or_report+0x4f/0xc0
+[ 3103.007910]  mlx5e_tc_del_fdb_peers_flow+0xcf/0x240 [mlx5_core]
+[ 3103.008463]  mlx5e_tc_del_flow+0x46/0x270 [mlx5_core]
+[ 3103.008944]  mlx5e_flow_put+0x26/0x50 [mlx5_core]
+[ 3103.009401]  mlx5e_delete_flower+0x25f/0x380 [mlx5_core]
+[ 3103.009901]  tc_setup_cb_destroy+0xab/0x180
+[ 3103.010292]  fl_hw_destroy_filter+0x99/0xc0 [cls_flower]
+[ 3103.010779]  __fl_delete+0x2d4/0x2f0 [cls_flower]
+[ 3103.011207]  fl_delete+0x36/0x80 [cls_flower]
+[ 3103.011614]  tc_del_tfilter+0x56f/0x750
+[ 3103.011982]  rtnetlink_rcv_msg+0xff/0x3a0
+[ 3103.012362]  ? netlink_ack+0x1c7/0x4e0
+[ 3103.012719]  ? rtnl_calcit.isra.44+0x130/0x130
+[ 3103.013134]  netlink_rcv_skb+0x54/0x100
+[ 3103.013533]  netlink_unicast+0x1ca/0x2b0
+[ 3103.013902]  netlink_sendmsg+0x361/0x4d0
+[ 3103.014269]  __sock_sendmsg+0x38/0x60
+[ 3103.014643]  ____sys_sendmsg+0x1f2/0x200
+[ 3103.015018]  ? copy_msghdr_from_user+0x72/0xa0
+[ 3103.015265]  ___sys_sendmsg+0x87/0xd0
+[ 3103.016608]  ? copy_msghdr_from_user+0x72/0xa0
+[ 3103.017014]  ? ___sys_recvmsg+0x9b/0xd0
+[ 3103.017381]  ? ttwu_do_activate.isra.137+0x58/0x180
+[ 3103.017821]  ? wake_up_q+0x49/0x90
+[ 3103.018157]  ? futex_wake+0x137/0x160
+[ 3103.018521]  ? __sys_sendmsg+0x51/0x90
+[ 3103.018882]  __sys_sendmsg+0x51/0x90
+[ 3103.019230]  ? exit_to_user_mode_prepare+0x56/0x130
+[ 3103.019670]  do_syscall_64+0x3c/0x80
+[ 3103.020017]  entry_SYSCALL_64_after_hwframe+0x46/0xb0
+[ 3103.020469] RIP: 0033:0x7f4254811ef4
+[ 3103.020816] Code: 89 f3 48 83 ec 10 48 89 7c 24 08 48 89 14 24 e8 42 eb ff ff 48 8b 14 24 41 89 c0 48 89 de 48 8b 7c 24 08 b8 2e 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 30 44 89 c7 48 89 04 24 e8 78 eb ff ff 48 8b
+[ 3103.022290] RSP: 002b:00007f424cdd9480 EFLAGS: 00000293 ORIG_RAX: 000000000000002e
+[ 3103.022970] RAX: ffffffffffffffda RBX: 00007f424cdd9510 RCX: 00007f4254811ef4
+[ 3103.023564] RDX: 0000000000000000 RSI: 00007f424cdd9510 RDI: 0000000000000012
+[ 3103.024158] RBP: 00007f424cdda238 R08: 0000000000000000 R09: 00007f41d801a4b0
+[ 3103.024748] R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000001
+[ 3103.025341] R13: 00007f424cdd9510 R14: 00007f424cdda240 R15: 00007f424cdd99a0
+[ 3103.025931]  </TASK>
+[ 3103.026182] ---[ end trace 0000000000000000 ]---
+[ 3103.027033] ------------[ cut here ]------------
+
+Fixes: 9be6c21fdcf8 ("net/mlx5e: Handle offloads flows per peer")
+Signed-off-by: Vlad Buslov <vladbu@nvidia.com>
+Reviewed-by: Mark Bloch <mbloch@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/en_tc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/mellanox/mlx5/core/en_tc.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-index 30932c9c9a8f..047b465fc6a5 100644
+index 047b465fc6a5..9fb2c057bd78 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-@@ -761,7 +761,7 @@ static int mlx5e_hairpin_create_indirect_rqt(struct mlx5e_hairpin *hp)
- 
- 	err = mlx5e_rss_params_indir_init(&indir, mdev,
- 					  mlx5e_rqt_size(mdev, hp->num_channels),
--					  mlx5e_rqt_size(mdev, priv->max_nch));
-+					  mlx5e_rqt_size(mdev, hp->num_channels));
- 	if (err)
- 		return err;
- 
+@@ -2014,9 +2014,10 @@ static void mlx5e_tc_del_fdb_peer_flow(struct mlx5e_tc_flow *flow,
+ 	list_for_each_entry_safe(peer_flow, tmp, &flow->peer_flows, peer_flows) {
+ 		if (peer_index != mlx5_get_dev_index(peer_flow->priv->mdev))
+ 			continue;
++
++		list_del(&peer_flow->peer_flows);
+ 		if (refcount_dec_and_test(&peer_flow->refcnt)) {
+ 			mlx5e_tc_del_fdb_flow(peer_flow->priv, peer_flow);
+-			list_del(&peer_flow->peer_flows);
+ 			kfree(peer_flow);
+ 		}
+ 	}
 -- 
 2.43.0
 
