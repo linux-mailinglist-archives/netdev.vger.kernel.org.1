@@ -1,113 +1,111 @@
-Return-Path: <netdev+bounces-65438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29DE283A753
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 11:58:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 643DA83A79C
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 12:20:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C37E1C21D00
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:58:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E1B8282F84
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 11:20:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2117B1AAA9;
-	Wed, 24 Jan 2024 10:58:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e1L+sDet"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B4741AACF;
+	Wed, 24 Jan 2024 11:20:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from air.basealt.ru (air.basealt.ru [194.107.17.39])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24FE31AAB9
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 10:58:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 832A32BAF3;
+	Wed, 24 Jan 2024 11:20:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.39
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706093883; cv=none; b=Ix5nDXwm9AyYbB74WIEnaL9Ais7onNicPuwM6cCO+lw+Vh9/1U8/js8tiN7gfbHZzAqclO7k2UwohIUhpIjDLy16+qBvzC2MbcgublDrhEnICX/8728ZTvqp1InbrNh7FO5dh5n0kF2KRyYUufs1EaxZtmOJAJUQvc1BtKF335c=
+	t=1706095211; cv=none; b=bAtYECntS7dwPemU4AJ+d7lnOpvCWtUWd+YnAgj4J3FwqGwFHVwM+4+VpOF0b3BFrTL72kt7Md2rqq6dRE6nc/0uhu5bVrSGWh/8CaBjbVOlEbo6uLAX79O22J5E4l4yTkyZzRxSs1lSjoT3junoFqJ7swlY2aS0LFpZh8ZpJWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706093883; c=relaxed/simple;
-	bh=095eySjr9UdkzN6h8F///pYrDXdNnhrwqoAvJkhHULs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ob46D8KpZ4TD0ZV2hqLtHJbLxl9ig/DZtnX31Wjdfj9zR3zk0f5uU7jMGO2dY/AtYQPut8Y8d6n6EId103lcxtxie4qr/jDztEEadkd3X4f6PFmPwoQfe5/OkYl9DuWBjT7Jb1NaMgsW67A33HV+Zm8J6G4b27avQfa2YopyrK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e1L+sDet; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-55818b7053eso13561a12.0
-        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 02:58:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706093879; x=1706698679; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=095eySjr9UdkzN6h8F///pYrDXdNnhrwqoAvJkhHULs=;
-        b=e1L+sDetBI1YtsLpOjLl+VO4HeiNaLjIEvXNzSSEKart/kF+Zh6xzqkOW0x4ipMz/y
-         YGzzHomAOoc6Jrusyrzvc69L/20aHhm3Enkn+nii0MngahBGvW1JVMW3WwNDlgKqRqgH
-         WX7w60pRllwL7r52s2vyLW1YIZETzlZKU4aOgqfJtddLV5XManymdP/g8Q4mDiwD92WT
-         oFjvB3rfkEuumsOpHPxg67f/1dANoY9Qi4DhiAoDyhEAVs9NX5FQ9gbbV2By8iNeo3Dj
-         pk3I9B88iCcQ8fPqBaGOPhjYT9stq+vWZZauR06GB3mHu5P9TOnXZix3WQ2BAqiTk3Vq
-         ZjGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706093879; x=1706698679;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=095eySjr9UdkzN6h8F///pYrDXdNnhrwqoAvJkhHULs=;
-        b=wOlfhNXNot2CWJ9yW05rhtYjUC6GHk+YJZwdZ2nnji1lAkjruxTSwChQS3sreYvmLm
-         t5PqGH1UL5XYpzeKKNa6pc/C64w1PG75CtqqSVXjeoiR8pfNWAqcrxtv7uLsz/MLlMDe
-         fjTH+fAh5pqLWPDhxxK5lGcWnkf8zrmdMMysZZERMM20n82ULKz2urAFve8kwwNy1iCp
-         i2OIgrV+XwQmzzGLnxtr8xWe145ta59K+rY0ZXJFEab0tp8ateES2J3DYAbSM+g3bOwM
-         nw/cyMQjnIP1cm7fseXaoZPvFf80EZMruAoUD5dHn8szzSFURHKQkoJH/emw9RuQ9lry
-         Q+zw==
-X-Gm-Message-State: AOJu0Ywno1XQY+6BKa+slf3YAlMHd9iKbbG76z0hCwriTde+JW+okjWP
-	qcNLMUNxkRMNb/h20rQcT6e5KHu9HxUyAHXuDyaqEimNvDiC6sV3NEX/X+3OiAAA52IBE8jLyHn
-	iGE8jdnEbC13nAE3Fy+viDvihTt7/yIgg2Skn
-X-Google-Smtp-Source: AGHT+IEyJLEJeXzrz7WWPOPz319HwrQPvPDFw7AtqAnVFipnMCWC8jtIyoIoTMP7JJeoV+a2BjBgXMK8TZV1bSra9MA=
-X-Received: by 2002:a05:6402:1d84:b0:55a:4959:4978 with SMTP id
- dk4-20020a0564021d8400b0055a49594978mr44083edb.7.1706093878885; Wed, 24 Jan
- 2024 02:57:58 -0800 (PST)
+	s=arc-20240116; t=1706095211; c=relaxed/simple;
+	bh=SwYywfFiynvvHpJ2PvBMDL2E2B8ISlww9VXd7SFdmSE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iAvqIVw9qJ8N6BaDp+jk0e0fxD5O8zggZGDwSBN7A01Yhhwc5Cw+6McxKNGEqJkueq/uVD7al0V5v2wIWrhbLfMRnNCztFGhVtoF6p9eiPKUPDUek2iC9/5qdARAWh+ZkG+d09fDIs1EFAUVXTzkgQ9QcB17yDl48hGlcArSAzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
+Received: by air.basealt.ru (Postfix, from userid 490)
+	id 733622F20242; Wed, 24 Jan 2024 11:20:06 +0000 (UTC)
+X-Spam-Level: 
+Received: from [10.88.144.178] (obninsk.basealt.ru [217.15.195.17])
+	by air.basealt.ru (Postfix) with ESMTPSA id 94C0B2F20236;
+	Wed, 24 Jan 2024 11:20:04 +0000 (UTC)
+Message-ID: <1144600e-52f1-4c1a-4854-c53e05af5b45@basealt.ru>
+Date: Wed, 24 Jan 2024 14:20:04 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240124101404.161655-1-kovalev@altlinux.org> <20240124101404.161655-2-kovalev@altlinux.org>
-In-Reply-To: <20240124101404.161655-2-kovalev@altlinux.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 24 Jan 2024 11:57:47 +0100
-Message-ID: <CANn89iLKc8-hwvSBE=aSTRg=52Pn9B0HmFDneGCe6PMawPFCnQ@mail.gmail.com>
-Subject: Re: [PATCH 1/1] gtp: fix use-after-free and null-ptr-deref in gtp_genl_dump_pdp()
-To: kovalev@altlinux.org
-Cc: pablo@netfilter.org, laforge@gnumonks.org, davem@davemloft.net, 
-	kuba@kernel.org, pabeni@redhat.com, osmocom-net-gprs@lists.osmocom.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, nickel@altlinux.org, 
-	oficerovas@altlinux.org, dutyrok@altlinux.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH 1/1] gtp: fix use-after-free and null-ptr-deref in
+ gtp_genl_dump_pdp()
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>
+Cc: pablo@netfilter.org, laforge@gnumonks.org, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, osmocom-net-gprs@lists.osmocom.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, nickel@altlinux.org,
+ oficerovas@altlinux.org, dutyrok@altlinux.org, kovalev@altlinux.org
+References: <20240124101404.161655-1-kovalev@altlinux.org>
+ <20240124101404.161655-2-kovalev@altlinux.org>
+ <CANn89iLKc8-hwvSBE=aSTRg=52Pn9B0HmFDneGCe6PMawPFCnQ@mail.gmail.com>
+From: kovalev@altlinux.org
+In-Reply-To: <CANn89iLKc8-hwvSBE=aSTRg=52Pn9B0HmFDneGCe6PMawPFCnQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 24, 2024 at 11:14=E2=80=AFAM <kovalev@altlinux.org> wrote:
->
-> From: Vasiliy Kovalev <kovalev@altlinux.org>
->
-> After unloading the module, an instance continues to exist that accesses
-> outdated memory addresses.
->
-> To prevent this, the dump_pdp_en flag has been added, which blocks the
-> dump of pdp contexts by a false value. And only after these checks can
-> the net_generic() function be called.
->
-> These errors were found using the syzkaller program:
->
-> Syzkaller hit 'general protection fault in gtp_genl_dump_pdp' bug.
-> gtp: GTP module loaded (pdp ctx size 104 bytes)
-> gtp: GTP module unloaded
-> general protection fault, probably for non-canonical address
-> 0xdffffc0000000001:0000 [#1] SMP KASAN NOPTI
-> KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
-> CPU: 0 PID: 2782 Comm: syz-executor139 Not tainted 5.10.200-std-def-alt1 =
-#1
+24.01.2024 13:57, Eric Dumazet wrote:
+> Oh wait, this is a 5.10 kernel ?
+Yes, but the bug is reproduced on the latest stable kernels.
+> Please generate a stack trace using a recent tree, it is possible the
+> bug has been fixed already.
 
-Oh wait, this is a 5.10 kernel ?
+See [PATCH 0/1] above, there's a stack for the 6.6.13 kernel at the 
+bottom of the message.
 
-Please generate a stack trace using a recent tree, it is possible the
-bug has been fixed already.
+[  523.915255] Call Trace:
+[  523.915255]  <TASK>
+[  523.915255]  ? __die+0x1f/0x70
+[  523.915255]  ? page_fault_oops+0x14d/0x4a0
+[  523.915255]  ? exc_page_fault+0x7b/0x180
+[  523.915255]  ? asm_exc_page_fault+0x22/0x30
+[  523.915255]  ? gtp_genl_dump_pdp+0x82/0x190 [gtp]
+[  523.915255]  ? gtp_genl_dump_pdp+0x82/0x190 [gtp]
+[  523.915255]  genl_dumpit+0x2f/0x90
+[  523.915255]  netlink_dump+0x126/0x320
+[  523.915255]  __netlink_dump_start+0x1da/0x2a0
+[  523.915255]  genl_family_rcv_msg_dumpit+0x93/0x100
+[  523.915255]  ? __pfx_genl_start+0x10/0x10
+[  523.915255]  ? __pfx_genl_dumpit+0x10/0x10
+[  523.915255]  ? __pfx_genl_done+0x10/0x10
+[  523.915255]  genl_rcv_msg+0x112/0x2a0
+[  523.915255]  ? __pfx_gtp_genl_dump_pdp+0x10/0x10 [gtp]
+[  523.915255]  ? __pfx_genl_rcv_msg+0x10/0x10
+[  523.915255]  netlink_rcv_skb+0x54/0x110
+[  523.915255]  genl_rcv+0x24/0x40
+[  523.915255]  netlink_unicast+0x19f/0x290
+[  523.915255]  netlink_sendmsg+0x250/0x4e0
+[  523.915255]  ____sys_sendmsg+0x376/0x3b0
+[  523.915255]  ? copy_msghdr_from_user+0x6d/0xb0
+[  523.915255]  ___sys_sendmsg+0x86/0xe0
+[  523.915255]  ? do_fault+0x296/0x470
+[  523.915255]  ? __handle_mm_fault+0x771/0xda0
+[  523.915255]  __sys_sendmsg+0x57/0xb0
+[  523.915255]  do_syscall_64+0x59/0x90
+[  523.915255]  ? ct_kernel_exit.isra.0+0x71/0x90
+[  523.915255]  ? __ct_user_enter+0x5a/0xd0
+[  523.915255]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+[  523.915255] RIP: 0033:0x7f2bcb93cd49
+
+-- 
+Regards,
+Vasiliy Kovalev
+
 
