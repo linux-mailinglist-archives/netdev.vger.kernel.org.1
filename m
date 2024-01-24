@@ -1,127 +1,119 @@
-Return-Path: <netdev+bounces-65500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BA7F83AD6F
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 16:35:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8146883AD74
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 16:35:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E23D1C21275
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 15:35:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37D221F22B7F
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 15:35:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EF567A729;
-	Wed, 24 Jan 2024 15:35:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BFC67CF01;
+	Wed, 24 Jan 2024 15:35:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="mht1A1+y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I/H438GI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 699CF17C67
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 15:35:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D32147C09A;
+	Wed, 24 Jan 2024 15:35:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706110504; cv=none; b=JowiiRvtifOSkeIsiwJ95Vrdrhdbos+1DSJc6+CXW4Fcj6rZ8J+EQ8pRUeebsgxpIiRnP7RaNlyURLcPDbUX389JrN7NXIXaSfdAw9RZDk7FF6l8kvlzhoJ3aMpMp2j7PELzoT4+R47fZYwKJbqdPpsj0QTMdvTxRFWM3dOtI/4=
+	t=1706110509; cv=none; b=KLQhZgW8ufy9ZpGJpmMNNoFVJ6YzaCz9f6IBsu9LTQB4pazjYRQEgum9gcCNmCR7T6xe1wMwQHmnrV2Ud4nwVwaoNMemETfyspDZNdabNNvhIJLf/LBx0O25Kz/JQqTwA+mtj6eMrAFZR2AsnT2BzNUv0euOAs4ry1v2k0cvB1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706110504; c=relaxed/simple;
-	bh=e1gmL1XNCzaWK8GEwCVIk9ts7TUvPrI3ol3v4rmO/+8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gMaCOCLUID8Z3MrYcAaaUj896t4w34hW7YLDUwsVqpsK5t8tqaG8dK5XZZxIeB8tCvmkiK+B4ij5jt7biqo+ZcZ9E2X9uKNGWHQDDd83Eu0PqKyx8nEKInR/oKgeyZfM9eQtqeWqOk8i/WYqptLnjZkcZCf4mNSwjUD67LYCrZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=mht1A1+y; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1d71e24845aso33177105ad.0
-        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 07:35:02 -0800 (PST)
+	s=arc-20240116; t=1706110509; c=relaxed/simple;
+	bh=+8JTMV1B+xUws5Fqq/KkkTH19dYQj6SUFIZ+eCArfoc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=twHvT73C0rVGgnNhnr+3V+kqjRWfRotonVw1FWI62E0VWDNPWvzkxfOiRqbOYSODhsRVB5XbL9pZk3PyBHhg6E8ZEnkhmrVxA7UZjsbzuYxRhJtXUGW5MjgmZS2QMj/pTdrb2Dw1HgRuoGV1eBVVA4PLMRfQCfKJlqMQ0qWUQu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I/H438GI; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-339208f5105so4827070f8f.1;
+        Wed, 24 Jan 2024 07:35:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1706110501; x=1706715301; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=sUCpT1x5YSBfEAWia4LrOlYIR760jEAYw9MCeCt7RGU=;
-        b=mht1A1+yTlloNnNc1qGUqEFn7I5Wy1j3ZEINYfcdDoek92SeXSPVK77DpWuPYwFKLA
-         FRjA73T6DXlztGjYS3d0BVlgSmbDPmUTH6/9+UYu1pT5D/DKLLE/3v5uuG0fl6HUefUW
-         2Jg1b+vny/eextaJ3gp93xjDr1DXdTSOKP4KL0hBqL4IkNvYJ61tMv4Sy4wokfFPVgn5
-         UUe9kI6kiS1Y+aUjQQrPz+Ygq/NRfNIBmJh73VNd6WlhY/qL4cAh0vyq+mss94v971Mb
-         Cooc7RvmHYR0Mrn7LbcTAslFx4ck7OX7Pb9/RznJLQfXwMeNCZADaJvT8co5r2nxUTlJ
-         xdBw==
+        d=gmail.com; s=20230601; t=1706110506; x=1706715306; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tq3rHmajHdoRuvin6AmYJUUivHaABBxlRIi8R3NRBWo=;
+        b=I/H438GIZXCk+bjRuq3B/KY8pe4xm0Jn3YdiZrTZl0k4xTwnTUHEdZ4oTzTY8nqnFc
+         Vu0yN9ymk4lUYiKImo5RBeZwhZaBnO7rggTtjWoTwIVhdUn9dKECw8Ab4oIV1/6A5RdO
+         p/1k7QT8xUIyFiIp9LMz32RNQHbDkUjWF1zBcwSUdH+Wz13doWFKuUQen1rOgIGHL4x7
+         2N8nx0zsvfad1lxzfOg0WAbEzuzgEES+I9KE93SGYdFerFTUT7YKV/WhvwBwcPIg0wUg
+         TedBwlcIGM/UJrkG/D2TNyjSVuDZwiY7l+xLVr4NBz8z1M+nNSbXMG/sO2QelU9EyTwe
+         ehQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706110502; x=1706715302;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sUCpT1x5YSBfEAWia4LrOlYIR760jEAYw9MCeCt7RGU=;
-        b=BGUDITga5MbLg7VN5iC9/TnhP1znQ+pMSeRXyYaiueE5Jp2YpKhdcJhddMw68ByqCo
-         BhFZME0zeF/+u7VTi53WM0eIkwrJGg+hTK6+mgTDIJoxmApQtdN9H4UDJ/HNDiWDE9l7
-         9YalMWJR9IOk/1Dt6CcUW/yPZcQ92mab1KycUEJohuzv+IM6Fl8+GFf9y7xaWjuWSg/q
-         tqLq3Fr73WpkbSJmRZgYjBLVft9HC7CgBDoVvNMauLDJONFXdR6qCsNHSMAprQzQjoZY
-         GoBXvJ1ClDx1/L5sUFvbNIzgSrQuHQ2DFISVnOE56IzPsDvrchOFmMyLqdYzs/38HBCf
-         HEag==
-X-Gm-Message-State: AOJu0Yw2O//5rUfdZ95ebVxaiXW1bqrwAr08tNoY5LeM8L/Fy/ke1UqM
-	BBJFHl0dy+chzOyq7CTOcLhKdQjKuT7h/ijTKqTEfjaFc2dtY/NfD7eEnVf81LOnzzTP5oD78XA
-	=
-X-Google-Smtp-Source: AGHT+IEVJMIXjYvSLYbkrNYredN3g6IiEYMx6kQYhbbXNooItfr6uAwTnZtWKjXV28q7/dYN02C8+w==
-X-Received: by 2002:a17:902:e5d1:b0:1d6:eb7e:3fef with SMTP id u17-20020a170902e5d100b001d6eb7e3fefmr977999plf.114.1706110501667;
-        Wed, 24 Jan 2024 07:35:01 -0800 (PST)
-Received: from exu-caveira.tail33bf8.ts.net ([2804:7f1:e2c1:7b01:4fb3:24d0:ad57:53c9])
-        by smtp.gmail.com with ESMTPSA id kq6-20020a170903284600b001d7284b9461sm7824837plb.128.2024.01.24.07.34.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jan 2024 07:35:01 -0800 (PST)
-From: Victor Nogueira <victor@mojatatu.com>
-To: stephen@networkplumber.org,
-	dsahern@kernel.org,
-	netdev@vger.kernel.org
-Cc: liuhangbin@gmail.com,
-	jhs@mojatatu.com,
-	kernel@mojatatu.com
-Subject: [PATCH iproute2-next 0/2] tc: add NLM_F_ECHO support for actions and filters
-Date: Wed, 24 Jan 2024 12:34:54 -0300
-Message-ID: <20240124153456.117048-1-victor@mojatatu.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1706110506; x=1706715306;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tq3rHmajHdoRuvin6AmYJUUivHaABBxlRIi8R3NRBWo=;
+        b=UF+Vs+6SsHotRK/FHuE3g1PD3OtwIS5SuyiW1lJM4wk34Acahe+y7aDyXrvRFmOvlP
+         mIZIqhxJHZu0fIQlE3klIZsbVe53vvHM4FTg6eWPLpnLz+2ZOTwcjL83hijEn/EzDYwB
+         dnhtsFaM63Y0UW/iyWWS/8C83SQaimBjmLucyzzcyCNT3zubfKD/WZRCcjVAyQkV1+4w
+         XUnGwZ3mAeGvubuPWLWvS2CCLlJCZI0nn3poByx6/bx4pxfzR54hCF0AlSoYD3Ta5LVt
+         W+u6YklMExZJl06qtFpUdLi8/eq46wq+89fw+k0mV3h7cvWxeHwLqeRh+zIorjTqmYay
+         5j6w==
+X-Gm-Message-State: AOJu0YxqcptXV8YRnQYR2JlAbI/U5AaJT1XFY/ah7bLhzvzq8UeLgM96
+	U6DUOK+W0LB/YZYJr16vUp4aS7d71gLulZkqsuSQlLGguvMhPMBZyUlmFGDdw6ctKBcKZwh66zI
+	f1G/0RqDo16cm04GRk/ESamwOGBk=
+X-Google-Smtp-Source: AGHT+IFyW3CbLgXs+fHEYb4Mq62sD30ZjNWsYFvjEe0YQggvEANXkHJWwyuCvTOMp+X3qpF5stjBqdV62fWDzTndjpE=
+X-Received: by 2002:a5d:4211:0:b0:337:aa5c:a8c6 with SMTP id
+ n17-20020a5d4211000000b00337aa5ca8c6mr491519wrq.128.1706110505854; Wed, 24
+ Jan 2024 07:35:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240124121605.1c4cc5bc@canb.auug.org.au> <CAADnVQKBCpkwx1HVaNy1wmHqVrekgkd4LEZm9UzqOkOBniTOyw@mail.gmail.com>
+ <20240124001808.bfff657f089afe10e5b0824c@linux-foundation.org>
+In-Reply-To: <20240124001808.bfff657f089afe10e5b0824c@linux-foundation.org>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 24 Jan 2024 07:34:54 -0800
+Message-ID: <CAADnVQJe-BxbKYsMUXXrsh4wEUPacDT6RtF_qrO1ewns_8T1_w@mail.gmail.com>
+Subject: Re: linux-next: manual merge of the bpf-next tree with the mm tree
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Networking <netdev@vger.kernel.org>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
+	Linux Next Mailing List <linux-next@vger.kernel.org>, Nathan Chancellor <nathan@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Continuing on what Hangbin Liu started [1], this patch set adds support for
-the NLM_F_ECHO flag for tc actions and filters. For qdiscs it will require
-some kernel surgery, and we'll send it soon after this surgery is merged.
+On Wed, Jan 24, 2024 at 12:18=E2=80=AFAM Andrew Morton
+<akpm@linux-foundation.org> wrote:
+>
+> On Tue, 23 Jan 2024 17:18:55 -0800 Alexei Starovoitov <alexei.starovoitov=
+@gmail.com> wrote:
+>
+> > > Today's linux-next merge of the bpf-next tree got a conflict in:
+> > >
+> > >   tools/testing/selftests/bpf/README.rst
+> > >
+> > > between commit:
+> > >
+> > >   0d57063bef1b ("selftests/bpf: update LLVM Phabricator links")
+> > >
+> > > from the mm-nonmm-unstable branch of the mm tree and commit:
+> > >
+> > >   f067074bafd5 ("selftests/bpf: Update LLVM Phabricator links")
+> > >
+> > > from the bpf-next tree.
+> >
+> > Andrew,
+> > please drop the bpf related commit from your tree.
+>
+> um, please don't cherry-pick a single patch from a multi-patch series
+> which I have already applied.
 
-When user space configures the kernel with netlink messages, it can set
-NLM_F_ECHO flag to request the kernel to send the applied configuration
-back to the caller. This allows user space to receive back configuration
-information that is populated by the kernel. Often because there are
-parameters that can only be set by the kernel which become visible with the
-echo, or because user space lets the kernel choose a default value.
+hmm. There was a clear feedback on the v1 of the series not to mix bpf
+and non-bpf patches and a standalone patch was sent as v2.
 
-To illustrate a use case where the kernel will give us a default value,
-the example below shows the user not specifying the action index:
-
-    tc -echo actions add action mirred egress mirror dev lo
-  
-    total acts 0
-    Added action
-          action order 1: mirred (Egress Mirror to device lo) pipe
-          index 1 ref 1 bind 0
-          not_in_hw
-
-Note that the echoed response indicates that the kernel gave us a value
-of index 1
-
-[1] https://lore.kernel.org/netdev/20220916033428.400131-2-liuhangbin@gmail.com/
-
-Victor Nogueira (2):
-  tc: add NLM_F_ECHO support for actions
-  tc: Add NLM_F_ECHO support for filters
-
- man/man8/tc.8  |  6 +++++-
- tc/m_action.c  | 25 ++++++++++++++++++++++---
- tc/tc.c        |  6 +++++-
- tc/tc_filter.c |  8 +++++++-
- 4 files changed, 39 insertions(+), 6 deletions(-)
-
--- 
-2.25.1
-
+Thanks.
 
