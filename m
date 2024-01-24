@@ -1,114 +1,103 @@
-Return-Path: <netdev+bounces-65418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F401E83A694
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 11:19:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D42ED83A692
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 11:18:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFA20282254
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:19:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 133C61C211F3
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:18:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 239AA18E0E;
-	Wed, 24 Jan 2024 10:19:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="wpoeUIZd"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB89F18C3B;
+	Wed, 24 Jan 2024 10:18:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A1141862A;
-	Wed, 24 Jan 2024 10:19:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 351DE18C01
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 10:18:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706091554; cv=none; b=K0HyNUGAjLCQYb0iYw3C1AgxAx1K9TN8I4HW4bjQMd2SLLNlvTeEg8ACvHoudOJVzz6bYTYGNfO3+OFmkNek2u/BsChHC/o9m/C6a7FJ1jEoCgNkL/cFE/J5i77lUluY3Lh1WKW2mopshOTbrCj8Oc7fFBVQYWOgLVLZZPjJMtw=
+	t=1706091522; cv=none; b=ou8JGtN0UiLkOY0PQ9RZ8FZlI4m16BNLX8EXC8uHa/xX7RMuonVpDB9MUZkB8IAYb8s2PuIcTXPDNb1Gr3oVvlKzrg6/+mc5nTNj6X/tXVomGd+wgSxQgHNacJxXEQSC5ksa6cSWzzfTjeg8CwYhxgfrFUtc8UzGVAWQY3yk5x4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706091554; c=relaxed/simple;
-	bh=yeYvgeBO8qftPD9gLi2kowkyqy92YLE64bSsre7Tjc8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nuL4siSBc0W3P4ZLQMPtgQwUKWKDsLf9JgKT5LrnLBiPacCDGPejurW+9TvxqWCqwQnpP3WuOhWfg/3keElsQw/CxmhekxNGQRSBN3ustQPdaTrtfqA4t+yfDrMqG4A67OXARLtKP5N0wPRJKwuFDfRluRAIpxf8zmVxbuBdWk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=wpoeUIZd; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1706091552; x=1737627552;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=yeYvgeBO8qftPD9gLi2kowkyqy92YLE64bSsre7Tjc8=;
-  b=wpoeUIZdU036XdM2SrZYdYO1BDFJ1ojAmsdzpLSWikVhHaCgeMxAo/c2
-   g+QXxFXJj7blRHe7UjKUXPiEIgZtiMTcRgN7vbnybksZchTrI5F6VrLuq
-   Kn6ftT/b6+/ZLRglUBIpzvQXkbL9eS3ZbQbSbDIfZwIViBX83kvO4opnL
-   XdZn9fPFK85qgVIWSXmcVFn6sFAqiHQBpmoE7ss8uW8vb+04uNId+JodK
-   DaMAPhAHTjT7m6UbD0gkAMKp095XSI4FbrJ+U9nhm5NwCY3nymJB5VLzi
-   8WFVD9I0I4hA1tEizgDkkJaMYHbsaUKIvbiljV9SFTyAaZTi9wLWjSTjh
-   w==;
-X-CSE-ConnectionGUID: T28/u+jsQSe9VqMzdG+pyA==
-X-CSE-MsgGUID: 4+gZpKMHQZ6Tx3AWTlULPg==
-X-IronPort-AV: E=Sophos;i="6.05,216,1701154800"; 
-   d="scan'208";a="245938232"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 24 Jan 2024 03:19:11 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 24 Jan 2024 03:18:48 -0700
-Received: from DEN-DL-M31836.microsemi.net (10.10.85.11) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Wed, 24 Jan 2024 03:18:46 -0700
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<UNGLinuxDriver@microchip.com>, <maxime.chevallier@bootlin.com>, "Horatiu
- Vultur" <horatiu.vultur@microchip.com>
-Subject: [PATCH net v2] net: lan966x: Fix port configuration when using SGMII interface
-Date: Wed, 24 Jan 2024 11:17:58 +0100
-Message-ID: <20240124101758.406068-1-horatiu.vultur@microchip.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1706091522; c=relaxed/simple;
+	bh=9+OY4PAWIzRZs7UzVJYwMvFtiA3A4QkSzq1p+PAXIwU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oDnUb3Z2pFbOSB0andFEpOzJEF67VOKW0SfmU1Rm2PYCFl4tApoQveU4mkb9WFi3wqRdDw3Xe5GziW63op7QHkfHgyVoHHhC1KXoJMTu3ip5FImx6KbbOhK6FfnnyR4ufxeZWcztVaQ6ORnhqVyLtdG+4Ppd5udOg+7Rp2pp6Ic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-50eabbc3dccso6623968e87.2
+        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 02:18:41 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706091519; x=1706696319;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CbltCbFre5N0OQzMouEtuc/J0hmDrG82Bva39iCATdo=;
+        b=uTjZdXhgw4A0w1NKVOt1swqn41X6Rtqb8wtZswiOdNxwWHTVCswnNlJygbik6CqWOu
+         Mk4piRDG1c+aqCbof0R6iPTe864HK2UwYYquuAsfFR103snIPPf+LUSRmA4Yv2y389gR
+         j9YIRE++Ld+8lwJ3kJVBi6Q2nsiDzoheN9lzFeMg/3FcH/yDAcf8/gsn/7l5nv1HqeTu
+         tpnqNzUM03HtEj70QmfFU3d7fkT5fOtG+WpF5oAJds1s1wc9N38nAm5yZofywkJeuat0
+         B2ye+4UIJRSCKLoPWewEDE2rOwrnyOoLn5RMjyjES3aCuyp1K1WZwavpld5SthdeyfQ2
+         zHtw==
+X-Gm-Message-State: AOJu0Yz+Iiu4/9Ge5G3aW2KFobAlU/kVVGXiKBvVXiyL6mWwJ4+pPcpO
+	tbnW471ycAz5am5IBpebpLPfKItwUvkC2nJFAoRDv1IvCg5Fob3N
+X-Google-Smtp-Source: AGHT+IGRPJ4LJJn2rrCbgBiuN6e4c4t+HXTgH3ZQ6uhWCYzwge80+GHDwvKkEUIVAcOYnWhPMd8KmA==
+X-Received: by 2002:a05:6512:1082:b0:50f:1e53:d537 with SMTP id j2-20020a056512108200b0050f1e53d537mr1947957lfg.77.1706091518959;
+        Wed, 24 Jan 2024 02:18:38 -0800 (PST)
+Received: from gmail.com (fwdproxy-cln-000.fbsv.net. [2a03:2880:31ff::face:b00c])
+        by smtp.gmail.com with ESMTPSA id th7-20020a1709078e0700b00a2fd84bc421sm4431198ejc.83.2024.01.24.02.18.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jan 2024 02:18:38 -0800 (PST)
+Date: Wed, 24 Jan 2024 02:18:36 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, gospo@broadcom.com,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>
+Subject: Re: [PATCH net-next 13/13] bnxt_en: Make PTP TX timestamp HWRM query
+ silent
+Message-ID: <ZbDj/FI4EJezcfd1@gmail.com>
+References: <20231212005122.2401-1-michael.chan@broadcom.com>
+ <20231212005122.2401-14-michael.chan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231212005122.2401-14-michael.chan@broadcom.com>
 
-In case the interface between the MAC and the PHY is SGMII, then the bit
-GIGA_MODE on the MAC side needs to be set regardless of the speed at
-which it is running.
+Hello Michael, Pavan,
 
-Fixes: d28d6d2e37d1 ("net: lan966x: add port module support")
-Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+On Mon, Dec 11, 2023 at 04:51:22PM -0800, Michael Chan wrote:
+> From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+> 
+> In a busy network, especially with flow control enabled, we may
+> experience timestamp query failures fairly regularly. After a while,
+> dmesg may be flooded with timestamp query failure error messages.
+> 
+> Silence the error message from the low level hwrm function that
+> sends the firmware message.  Change netdev_err() to netdev_WARN_ONCE()
+> if this FW call ever fails.
 
----
-v1->v2:
-- update comment to match the changes to if condition
----
- drivers/net/ethernet/microchip/lan966x/lan966x_port.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+This is starting to cause a warning now, which is not ideal, because
+this error-now-warning happens quite frequently in Meta's fleet.
 
-diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_port.c b/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
-index 92108d354051c..2e83bbb9477e0 100644
---- a/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
-+++ b/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
-@@ -168,9 +168,10 @@ static void lan966x_port_link_up(struct lan966x_port *port)
- 	lan966x_taprio_speed_set(port, config->speed);
- 
- 	/* Also the GIGA_MODE_ENA(1) needs to be set regardless of the
--	 * port speed for QSGMII ports.
-+	 * port speed for QSGMII or SGMII ports.
- 	 */
--	if (phy_interface_num_ports(config->portmode) == 4)
-+	if (phy_interface_num_ports(config->portmode) == 4 ||
-+	    config->portmode == PHY_INTERFACE_MODE_SGMII)
- 		mode = DEV_MAC_MODE_CFG_GIGA_MODE_ENA_SET(1);
- 
- 	lan_wr(config->duplex | mode,
--- 
-2.34.1
+At the same time, we want to have our kernels running warninglessly.
+Moreover, the call stack displayed by the warning doesn't seem to be
+quite useful and doees not help to investigate "the problem", I _think_.
 
+Is it OK to move it back to error, something as:
+
+-	netdev_WARN_ONCE(bp->dev,
++	netdev_err_once(bp->dev,
+			 "TS query for TX timer failed rc = %x\n", rc);
+
+Thank you
 
