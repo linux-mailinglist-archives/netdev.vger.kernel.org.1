@@ -1,121 +1,149 @@
-Return-Path: <netdev+bounces-65577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40ED183B0E8
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 19:20:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4C0283B0EB
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 19:20:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E30751F25336
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 18:20:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 232F81C23330
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 18:20:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFD8212AAD5;
-	Wed, 24 Jan 2024 18:20:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E85E12AADC;
+	Wed, 24 Jan 2024 18:20:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="ceXq5Jv5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Br4mhTz3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0BE212AAEF
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 18:20:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C90F12A17A;
+	Wed, 24 Jan 2024 18:20:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706120410; cv=none; b=Mn4YJQ/PB0cM2BxP0Pw6DAhbwk/QBvj6nKziWjaj8z6IrocGf1nKg75YjPjLNvc+YUBytcoPT0CfcPMRW9iUnM53w3xPCLXuXjpiJTzEylhnVKIXKbC/Yd3vNswVuCPp/HJB+zSARYcvL6pow1xGSBN3RavlIk6sUSiEHhySVNU=
+	t=1706120420; cv=none; b=VDNsY7bzxSVBAjWZBbSI5fsSYXpsK9hUXk9X1caL0LwnGjLPHeV1c8S6d1HaumkF5TqIcMcPFoCj4hK8htQqvx8I1OnTub9DdUHfI8DvdNmV7KgIT9bAg5X+aeYBOpbWlwlKu72EX9VU5Ok7gDWslrQSVfD/3/vr64ckLkCVQsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706120410; c=relaxed/simple;
-	bh=RYKAneGKj5rW3ZSaKMHN+jkOKYrCveP/BkhXpCVNQZ4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=uIrsCvLhaleRtHw28kxxRrVCjZVfv/D6hakfic0o8TTYieU5oOBiSi4Pkg0FKfACE6wemnDV34EU4pc+RyL8i/qYSEDNM6uQXvSqIFlKLTjnuJqN22YW4Cmb6zd796UTTJh5b/QeP5B0gwfpLm/43DTqd5oDcuVXLIklgfqO2Kc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=ceXq5Jv5; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1d51ba18e1bso52850605ad.0
-        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 10:20:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1706120408; x=1706725208; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kcgbFDhBYDnDG7e+EicrCnnoYD+QkO9W9lsCV1iSmek=;
-        b=ceXq5Jv5MzRHqE1C3NvD/5RICRqGnmdGvMduYyW11TMBUtZQa0G7Jqc2G1t4n+f5Kb
-         toR7hETMB65j60p0lQFaAGHqM4w7Wypicd1Qaf6FWGnTXgoJIYt0ddbpMUd54CVeiq+0
-         FcXGsCoVtg2OUcQivrzrkwuD0f701x3zW/aGpoQgDGOwxcc11zI1tC9n2FrszVTkyah1
-         g6N+R1rlBVNGpli3EIrzPBFhRXckScRWP9Bd22P44i1nCV6etkCs9+hDLlCZeXAFfQrh
-         gv/YnOCLSNmuO0QSdwj5BMiJtFFEBxPSJk1I1JpNOnk9YBGj+s+8dkmCPzqWk+BKwvt7
-         8XYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706120408; x=1706725208;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kcgbFDhBYDnDG7e+EicrCnnoYD+QkO9W9lsCV1iSmek=;
-        b=XTPneuy7MBc8xtgEzw2C8asiUS69tmQ7tCq3Ju2p0bq6AG9zoWafJFTd4IUToWVGLj
-         MvPWmpnkhHbgZv2x3T86XXIujTt1A5T/ptxE2+0s16tNCvb6+bwgQBdQfKqexyeVzhId
-         kOLMxU44mzyds39l1gJ5bCtmRHcxJoWtIaAmmravpGSsX2+zbUUnmOEUCqUNKAk0aVHN
-         IKP0yRjRP9UwheCWZy4Kt2yytY1QHR1N9pULUscSMrkJc6K6SiB4eYzcvFrhErAkHJEH
-         yNWbQUzvBZI8YscZ7uOmIUPz2LIFyrOPEgKeXKwQsC7aWEe73eSzU2SFYc6v9Apvfsui
-         vCvw==
-X-Gm-Message-State: AOJu0YwftM+2akbpUUX4LG3wpLLgP1k8LONg4wX5kEdvfnrh9JE332cM
-	zlsGZnV2OwP3qrlAYEi1E6c1qw+BOFzr3+6YxXsz/EmCliuTqk5hqkfsWDSP6beiEYr0M6u3+m2
-	JEA==
-X-Google-Smtp-Source: AGHT+IE8CTP0k1buCWYsLl3oLDOecT3xHXO3leWrGiFV8Ppz71BOfI+ZUTkdNi12sgo3JEFHFPL0eA==
-X-Received: by 2002:a17:902:700a:b0:1d4:cd41:e44b with SMTP id y10-20020a170902700a00b001d4cd41e44bmr1187925plk.124.1706120408032;
-        Wed, 24 Jan 2024 10:20:08 -0800 (PST)
-Received: from rogue-one.tail33bf8.ts.net ([201.17.86.134])
-        by smtp.gmail.com with ESMTPSA id kd4-20020a17090313c400b001d74ce2ae23sm5577084plb.290.2024.01.24.10.20.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jan 2024 10:20:07 -0800 (PST)
-From: Pedro Tammela <pctammela@mojatatu.com>
-To: netdev@vger.kernel.org
-Cc: jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	shuah@kernel.org,
-	kuba@kernel.org,
-	vladimir.oltean@nxp.com,
-	dcaratti@redhat.com,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	linux-kselftest@vger.kernel.org,
-	Pedro Tammela <pctammela@mojatatu.com>
-Subject: [PATCH net-next v2 5/5] selftests: tc-testing: return fail if a test fails in setup/teardown
-Date: Wed, 24 Jan 2024 15:19:33 -0300
-Message-Id: <20240124181933.75724-6-pctammela@mojatatu.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240124181933.75724-1-pctammela@mojatatu.com>
-References: <20240124181933.75724-1-pctammela@mojatatu.com>
+	s=arc-20240116; t=1706120420; c=relaxed/simple;
+	bh=8i7hW/P7gRwZbg6eJhfWSHuYfwNb6fjxwXNOYa+zX2M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uvbt8VOh2YMlU93dpHyDsHorJaND6nVPN7sVdVFF3QEvBGjfZGzNqa1wxVlHadVwURmoPNKBcShewV8t81J/hoIrTm8i8lJvdfAk+fT4KYT12tQJ9pnSdfVwNQRHzJKsS4jvGuFPpx73QsrlJ7bGCe3BAYmH/Us5Ew7xt8mEGlc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Br4mhTz3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A92D4C41679;
+	Wed, 24 Jan 2024 18:20:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706120419;
+	bh=8i7hW/P7gRwZbg6eJhfWSHuYfwNb6fjxwXNOYa+zX2M=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Br4mhTz3ABsovsBh891iFtITCloETm7Xd3auyJ06H5OtOXYpmgIubWlxfBF2VAGmf
+	 OlGgldHJriEwX+TyBKeNai970ecogEG/P+gUzZX4GkxGns9Tk6eEXHb1JVxvu6/qbt
+	 skPzgvzkoqvZSI3fIk0qzZS1oVVsfORv8XNRdsm4o8jNjgkmRgXjCqeQuzGAQ/loQ0
+	 MNqC/og/U/JCX02ROA4VSt/31hoJJKyDJYB6eTiM5FtscPo50IXJxuwfPJcISYJ5Bo
+	 JVUzkTQyQJDT/DwPnh/6uJPHvZSstEkjmSaAd1oD/2eYSXBm+WQRf3GOuraJ/L6/c7
+	 dAa8p4/Z1vrVg==
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2cf13c259f3so21609701fa.2;
+        Wed, 24 Jan 2024 10:20:19 -0800 (PST)
+X-Gm-Message-State: AOJu0Yxwpt606+LtDw54OIps+yrDeL+Duhbv0ZdkYRSgbE0kDoNurYaM
+	RRQVhBsZoRJHRy0yuNNyA0kCkqO7uUtAj6p6eoLQ0vZJz/tZFlQy1Y8PJsSjALFq6Y2v+oAYjAT
+	NdqZa/snRZCRp+bmrDS40Zs1R2g==
+X-Google-Smtp-Source: AGHT+IFQ7o9sj+x/bj/29pY9Rds1Cng62HUIvJOWJ1X7OlDRC8xWzyyEJAbOfVXOJaSePIJD48bw3TcKGaUGSzwtDq4=
+X-Received: by 2002:a05:6512:1295:b0:50e:ca83:887e with SMTP id
+ u21-20020a056512129500b0050eca83887emr2710515lfs.34.1706120417667; Wed, 24
+ Jan 2024 10:20:17 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240122180551.34429-1-francesco@dolcini.it>
+In-Reply-To: <20240122180551.34429-1-francesco@dolcini.it>
+From: Rob Herring <robh@kernel.org>
+Date: Wed, 24 Jan 2024 12:20:05 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqKHjj5SfPTxhXUtmNh1nr1-eNKnL-Mmv-XdyONxgn9UVw@mail.gmail.com>
+Message-ID: <CAL_JsqKHjj5SfPTxhXUtmNh1nr1-eNKnL-Mmv-XdyONxgn9UVw@mail.gmail.com>
+Subject: Re: [PATCH v2] treewide, serdev: change receive_buf() return type to size_t
+To: Francesco Dolcini <francesco@dolcini.it>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jirislaby@kernel.org>, 
+	linux-bluetooth@vger.kernel.org, linux-mediatek@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	greybus-dev@lists.linaro.org, linux-iio@vger.kernel.org, 
+	netdev@vger.kernel.org, chrome-platform@lists.linux.dev, 
+	platform-driver-x86@vger.kernel.org, linux-serial@vger.kernel.org, 
+	linux-sound@vger.kernel.org, 
+	Francesco Dolcini <francesco.dolcini@toradex.com>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Johan Hovold <johan@kernel.org>, Alex Elder <elder@kernel.org>, 
+	Jonathan Cameron <jic23@kernel.org>, Lee Jones <lee@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
+	Hans de Goede <hdegoede@redhat.com>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
+	Benson Leung <bleung@chromium.org>, Tzung-Bi Shih <tzungbi@kernel.org>, 
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-As of today tests throwing exceptions in setup/teardown phase are
-treated as skipped but they should really be failures.
+On Mon, Jan 22, 2024 at 12:06=E2=80=AFPM Francesco Dolcini <francesco@dolci=
+ni.it> wrote:
+>
+> From: Francesco Dolcini <francesco.dolcini@toradex.com>
+>
+> receive_buf() is called from ttyport_receive_buf() that expects values
+> ">=3D 0" from serdev_controller_receive_buf(), change its return type fro=
+m
+> ssize_t to size_t.
+>
+> The need for this clean-up was noticed while fixing a warning, see
+> commit 94d053942544 ("Bluetooth: btnxpuart: fix recv_buf() return value")=
+.
+> Changing the callback prototype to return an unsigned seems the best way
+> to document the API and ensure that is properly used.
+>
+> GNSS drivers implementation of serdev receive_buf() callback return
+> directly the return value of gnss_insert_raw(). gnss_insert_raw()
+> returns a signed int, however this is not an issue since the value
+> returned is always positive, because of the kfifo_in() implementation.
+> gnss_insert_raw() could be changed to return also an unsigned, however
+> this is not implemented here as request by the GNSS maintainer Johan
+> Hovold.
+>
+> Suggested-by: Jiri Slaby <jirislaby@kernel.org>
+> Link: https://lore.kernel.org/all/087be419-ec6b-47ad-851a-5e1e3ea5cfcc@ke=
+rnel.org/
+> Signed-off-by: Francesco Dolcini <francesco.dolcini@toradex.com>
+> Acked-by: Jonathan Cameron <Jonathan.Cameron@huawei.com> #for-iio
+> ---
+> v1:
+>  - https://lore.kernel.org/all/20231214170146.641783-1-francesco@dolcini.=
+it/
+> v2:
+>  - rebased on 6.8-rc1
+>  - add acked-by Jonathan
+>  - do not change gnss_insert_raw()
+>  - do not change the code style of the gnss code
+>  - commit message improvements, explain the reasons for doing only minima=
+l
+>    changes on the GNSS part
+> ---
+>  drivers/bluetooth/btmtkuart.c              |  4 ++--
+>  drivers/bluetooth/btnxpuart.c              |  4 ++--
+>  drivers/bluetooth/hci_serdev.c             |  4 ++--
+>  drivers/gnss/serial.c                      |  2 +-
+>  drivers/gnss/sirf.c                        |  2 +-
+>  drivers/greybus/gb-beagleplay.c            |  6 +++---
+>  drivers/iio/chemical/pms7003.c             |  4 ++--
+>  drivers/iio/chemical/scd30_serial.c        |  4 ++--
+>  drivers/iio/chemical/sps30_serial.c        |  4 ++--
+>  drivers/iio/imu/bno055/bno055_ser_core.c   |  4 ++--
+>  drivers/mfd/rave-sp.c                      |  4 ++--
+>  drivers/net/ethernet/qualcomm/qca_uart.c   |  2 +-
+>  drivers/nfc/pn533/uart.c                   |  4 ++--
+>  drivers/nfc/s3fwrn5/uart.c                 |  4 ++--
+>  drivers/platform/chrome/cros_ec_uart.c     |  4 ++--
+>  drivers/platform/surface/aggregator/core.c |  4 ++--
+>  drivers/tty/serdev/serdev-ttyport.c        | 10 ++++------
+>  include/linux/serdev.h                     |  8 ++++----
+>  sound/drivers/serial-generic.c             |  4 ++--
+>  19 files changed, 40 insertions(+), 42 deletions(-)
 
-Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
----
- tools/testing/selftests/tc-testing/tdc.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/tc-testing/tdc.py b/tools/testing/selftests/tc-testing/tdc.py
-index caeacc691587..ee349187636f 100755
---- a/tools/testing/selftests/tc-testing/tdc.py
-+++ b/tools/testing/selftests/tc-testing/tdc.py
-@@ -541,7 +541,7 @@ def test_runner(pm, args, filtered_tests):
-             message = pmtf.message
-             output = pmtf.output
-             res = TestResult(tidx['id'], tidx['name'])
--            res.set_result(ResultState.skip)
-+            res.set_result(ResultState.fail)
-             res.set_errormsg(pmtf.message)
-             res.set_failmsg(pmtf.output)
-             tsr.add_resultdata(res)
--- 
-2.40.1
-
+Reviewed-by: Rob Herring <robh@kernel.org>
 
