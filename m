@@ -1,115 +1,140 @@
-Return-Path: <netdev+bounces-65393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0CA283A55E
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:27:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8264683A571
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:30:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78470283C02
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:27:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 224A91F22B00
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:30:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24ED218E0F;
-	Wed, 24 Jan 2024 09:24:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b="KFkCKND5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B982917BAB;
+	Wed, 24 Jan 2024 09:30:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-64-226.siemens.flowmailer.net (mta-64-226.siemens.flowmailer.net [185.136.64.226])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C454818EAB
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 09:24:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6025F1802A;
+	Wed, 24 Jan 2024 09:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706088265; cv=none; b=qzEPOjVTLmkYW0p3xAR/JlwVIsmASPKCW7gGsvZ7Zb65/rTldMW4DwPhIRpHmF58+fuBKzGU5ABRZAeg+Z9j6WAiOVq1dLKmlu95V0H9ua923FQTaP0dBoOKZYiyw1YXEQipKzGayFIdqmCYdLJwq+ZnjE28j2blF1ncbbJrkB0=
+	t=1706088631; cv=none; b=kQih61y2HaO9kMVxLANw+Z06BPOOeaeAhNyghYhL6qhlC23mKB9ZijRu2IrVCjFfYFQCbocn9KJlTJEKq/Pb0WI7m8mGwbSYwwbf9ODozFBvi1DJAAgWY3ar0oQL8krFa/ngYx/f4BKHlntHanGIRzHxAx/3FifpP7y+i5dEURU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706088265; c=relaxed/simple;
-	bh=MeoFvYCX5I/4Iw9kDB6v7/eQYwHW6zdRyLzG3rP6rpU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HCMw2EtQjVoE9v6FpSGnuTqOdJ2mqcCDUB1C1lDBYeDJLhUrRY6w9rwE5QxgULbGN1S2Gyiu0lg+7QQ8Tk72nJqqZwMWwGoZGchGAdXb7r31y1gEYM50PzLkBxUmmYB+ro4RTq8wm9eBovKUmd/yLgDjUdqTm1/7LQ+vsbYDZoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b=KFkCKND5; arc=none smtp.client-ip=185.136.64.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
-Received: by mta-64-226.siemens.flowmailer.net with ESMTPSA id 20240124092414412d7080d218c5452d
-        for <netdev@vger.kernel.org>;
-        Wed, 24 Jan 2024 10:24:14 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
- d=siemens.com; i=diogo.ivo@siemens.com;
- h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
- bh=MeoFvYCX5I/4Iw9kDB6v7/eQYwHW6zdRyLzG3rP6rpU=;
- b=KFkCKND5wlYq3tF8QVLXmi5XWvl6k/h21izYNYWzHKsSobtUBEjqlWhXY+2//kPhcfYWUY
- pDeaYxCum81P4MXMVRZ/vNA75lwLJ21HLvOMH5/xXgu0Rfzt3sg95gq4qDAJIMx9rztSIJyI
- gbHbwAH8wZsaoRMwhmNeJdmTGwLQk=;
-Message-ID: <8c4e1e69-210c-4eb7-bd54-97adb16e7c06@siemens.com>
-Date: Wed, 24 Jan 2024 09:24:13 +0000
+	s=arc-20240116; t=1706088631; c=relaxed/simple;
+	bh=qmC5nXw/zGxMMGst/hVylM3OFQtfUYgQ8/8cGXf1tIk=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
+	 In-Reply-To:Content-Type; b=hNcYZw37lEnl0Vnw+vtOGZIqmNhGRT+DEoGzm+1PoC/05dxfS24zJORn6P1QZGbjI9u8k+IsrYBF0J1PG/Q/f/STYRvMTn2tOI4un9PUB8cjk2Po87Ja08E42ke5E/XoPyQaps/i/KF+lDozE9iv3vuagdAKwaCTGO42Tib0+j8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4TKdvc69lnzNlS9;
+	Wed, 24 Jan 2024 17:29:32 +0800 (CST)
+Received: from kwepemm600020.china.huawei.com (unknown [7.193.23.147])
+	by mail.maildlp.com (Postfix) with ESMTPS id A500D18005E;
+	Wed, 24 Jan 2024 17:30:25 +0800 (CST)
+Received: from [10.174.179.160] (10.174.179.160) by
+ kwepemm600020.china.huawei.com (7.193.23.147) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 24 Jan 2024 17:30:24 +0800
+Message-ID: <4f78fea2-ced6-fc5a-c7f2-b33fcd226f06@huawei.com>
+Date: Wed, 24 Jan 2024 17:30:23 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 0/8] Add support for ICSSG-based Ethernet on SR1.0
- devices
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+From: "zhangpeng (AS)" <zhangpeng362@huawei.com>
+Subject: Re: SECURITY PROBLEM: Any user can crash the kernel with TCP ZEROCOPY
+To: Eric Dumazet <edumazet@google.com>, Matthew Wilcox <willy@infradead.org>
+CC: <linux-mm@kvack.org>, <linux-fsdevel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <akpm@linux-foundation.org>, <davem@davemloft.net>,
+	<dsahern@kernel.org>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<arjunroy@google.com>, <wangkefeng.wang@huawei.com>
+References: <20240119092024.193066-1-zhangpeng362@huawei.com>
+ <Zap7t9GOLTM1yqjT@casper.infradead.org>
+ <5106a58e-04da-372a-b836-9d3d0bd2507b@huawei.com>
+ <Za6SD48Zf0CXriLm@casper.infradead.org>
+ <CANn89iL4qUXsVDRNGgBOweZbJ6ErWMsH+EpOj-55Lky8JEEhqQ@mail.gmail.com>
+ <Za6h-tB7plgKje5r@casper.infradead.org>
+ <CANn89iJDNdOpb6L6PkrAcbGcsx6_v4VD0v2XFY77g7tEnJEXXQ@mail.gmail.com>
 Content-Language: en-US
-To: Roger Quadros <rogerq@kernel.org>, danishanwar@ti.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, andrew@lunn.ch, dan.carpenter@linaro.org,
- grygorii.strashko@ti.com, jacob.e.keller@intel.com, robh@kernel.org,
- robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org
-Cc: jan.kiszka@siemens.com, diogo.ivo@siemens.com
-References: <20240117161602.153233-1-diogo.ivo@siemens.com>
- <6b345be6-3bd0-4410-8255-97bf661fc890@kernel.org>
-From: Diogo Ivo <diogo.ivo@siemens.com>
-In-Reply-To: <6b345be6-3bd0-4410-8255-97bf661fc890@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Flowmailer-Platform: Siemens
-Feedback-ID: 519:519-1320519:519-21489:flowmailer
+In-Reply-To: <CANn89iJDNdOpb6L6PkrAcbGcsx6_v4VD0v2XFY77g7tEnJEXXQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemm600020.china.huawei.com (7.193.23.147)
 
-Hi all, thank you for your input so far.
+On 2024/1/23 1:39, Eric Dumazet wrote:
 
-On 1/23/24 12:15, Roger Quadros wrote:
-> Hello Diogo,
->
-> On 17/01/2024 18:14, Diogo Ivo wrote:
->> Hello,
+> On Mon, Jan 22, 2024 at 6:12 PM Matthew Wilcox<willy@infradead.org>  wrote:
+>> On Mon, Jan 22, 2024 at 05:30:18PM +0100, Eric Dumazet wrote:
+>>> On Mon, Jan 22, 2024 at 5:04 PM Matthew Wilcox<willy@infradead.org>  wrote:
+>>>> I'm disappointed to have no reaction from netdev so far.  Let's see if a
+>>>> more exciting subject line evinces some interest.
+>>> Hmm, perhaps some of us were enjoying their weekend ?
+>> I am all in favour of people taking time off!  However the report came
+>> in on Friday at 9am UTC so it had been more than a work day for anyone
+>> anywhere in the world without response.
 >>
->> This series extends the current ICSSG-based Ethernet driver to support
->> Silicon Revision 1.0 devices.
->>
->> Notable differences between the Silicon Revisions are that there is
->> no TX core in SR1.0 with this being handled by the firmware, requiring
->> extra DMA channels to communicate commands to the firmware (with the
->> firmware being different as well) and in the packet classifier.
->>
->> The motivation behind it is that a significant number of Siemens
->> devices containing SR1.0 silicon have been deployed in the field
->> and need to be supported and updated to newer kernel versions
->> without losing functionality.
-> Adding SR1.0 support with all its ifdefs makes the driver more complicated
-> than it should be.
+>>> I don't really know what changed recently, all I know is that TCP zero
+>>> copy is for real network traffic.
+>>>
+>>> Real trafic uses order-0 pages, 4K at a time.
+>>>
+>>> If can_map_frag() needs to add another safety check, let's add it.
+>> So it's your opinion that people don't actually use sendfile() from
+>> a local file, and we can make this fail to zerocopy?
+> Certainly we do not do that at Google.
+> I am not sure if anybody else would have used this.
 >
-> I think we need to treat SR1.0 and SR2.0 as different devices with their
-> own independent drivers. While the data path is pretty much the same,
-> also like in am65-cpsw-nuss.c, the initialization, firmware and other
-> runtime logic is significantly different.
 >
-> How about introducing a new icssg_prueth_sr1.c and putting all the SR1 stuff
-> there? You could still re-use the other helper files in net/ti/icssg/.
-> It also warrants for it's own Kconfig symbol so it can be built only
-> if required.
-> Any common logic could still be moved to icssg_common.c and re-used in both drivers.
+>
+>   That's good
+>> because I had a slew of questions about what expectations we had around
+>> cache coherency between pages mapped this way and write()/mmap() of
+>> the original file.  If we can just disallow this, we don't need to
+>> have a discussion about it.
+>>
+>>> syzbot is usually quite good at bisections, was a bug origin found ?
+>> I have the impression that Huawei run syzkaller themselves without
+>> syzbot.  I suspect this bug has been there for a good long time.
+>> Wonder why nobody's found it before; it doesn't seem complicated for a
+>> fuzzer to stumble into.
+> I is strange syzbot (The Google fuzzer) have not found this yet, I
+> suspect it might be caused
+> by a recent change somewhere ?
+>
+> A repro would definitely help, I could start a bisection.
 
-Yes, that sounds like a more reasonable approach. I will refactor the code
+By using git-bisect, the patch that introduces this issue is 05255b823a617
+("tcp: add TCP_ZEROCOPY_RECEIVE support for zerocopy receive."). v4.18-rc1.
 
-and come back with a v3, hopefully with all patches getting sent out :)
+Currently, there are no other repro or c reproduction programs can reproduce
+the issue. The syz log used to reproduce the issue is as follows:
 
+r3 = socket$inet_tcp(0x2, 0x1, 0x0)
+mmap(&(0x7f0000ff9000/0x4000)=nil, 0x4000, 0x0, 0x12, r3, 0x0)
+r4 = socket$inet_tcp(0x2, 0x1, 0x0)
+bind$inet(r4, &(0x7f0000000000)={0x2, 0x4e24, @multicast1}, 0x10)
+connect$inet(r4, &(0x7f00000006c0)={0x2, 0x4e24, @empty}, 0x10)
+r5 = openat$dir(0xffffffffffffff9c, &(0x7f00000000c0)='./file0\x00',
+0x181e42, 0x0)
+fallocate(r5, 0x0, 0x0, 0x85b8818)
+sendfile(r4, r5, 0x0, 0x3000)
+getsockopt$inet_tcp_TCP_ZEROCOPY_RECEIVE(r4, 0x6, 0x23,
+&(0x7f00000001c0)={&(0x7f0000ffb000/0x3000)=nil, 0x3000, 0x0, 0x0,
+0x0, 0x0, 0x0, 0x0, 0x0}, &(0x7f0000000440)=0x10)
+r6 = openat$dir(0xffffffffffffff9c, &(0x7f00000000c0)='./file0\x00',
+0x181e42, 0x0)
 
-Best regards,
-
-Diogo
+-- 
+Best Regards,
+Peng
 
 
