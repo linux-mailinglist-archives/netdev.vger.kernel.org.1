@@ -1,151 +1,303 @@
-Return-Path: <netdev+bounces-65482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65483-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36F6483AC74
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 15:52:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC2BF83AC70
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 15:51:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 02722B33EDA
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 14:50:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 247121F2693C
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 14:51:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 748667E56B;
-	Wed, 24 Jan 2024 14:36:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BBAE7E57F;
+	Wed, 24 Jan 2024 14:38:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P3QnmFrO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2reVHgE9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3F287E569;
-	Wed, 24 Jan 2024 14:36:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51BCE7CF2C
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 14:38:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706106978; cv=none; b=sD3vmIVSNgtbyaOx2mMgZ9kjGQtwHyDOWA4cxrLe4FY9/sz04p/VVAGCZW9uPGUoVyT5Qj0JeqpguF7fmCQXZzlTrZf31PHwhAV/25MSBng+XrwR0kDGs92cMwqzJYWV24Qf7c5FvxJApDb2pXThrlB0H/odUffoPf2guMW85Bo=
+	t=1706107115; cv=none; b=CcQASbf0fMjFSefTITQalJ97PtHEWx4LTvGV5a+9Q6pqKypUce/7PyvEl281JIZ2gANh2ZHkJ5Nq5kRYr4jd8yd8jnfy332Do5T2XARWuFMegK7Stiy44Rl6OTvjYzyGULWWW0MafQwX/GhVxPgZRqyg8sjZ8XaN0PDTGD37uIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706106978; c=relaxed/simple;
-	bh=VE0ZADAnke3P7nnzuHVGyWI/LwZRUKtUnerEfhM/NSw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XG5f3Xyn2QeX5MbPlh71LBJ4oVUxSDR6vDIjAo189hc2bTpIlIh0L1U4RZk4lW/1vkU1acd2fGBiytzFLTJ8zMojx1SpLpH9ZQJzp7u9EyRDkD2WpROiKvlaTYRx7O8Op6dAvjzFeS+cXcS7ptaQErk4TTxNZ1hxuoQ0p9z9Wx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P3QnmFrO; arc=none smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2cf13c259f3so18886011fa.2;
-        Wed, 24 Jan 2024 06:36:16 -0800 (PST)
+	s=arc-20240116; t=1706107115; c=relaxed/simple;
+	bh=ZbWnbtWyoZNqnhXQdjvsYNKzRaoSAHCPcpKDwFaElw4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bp2eR6sCv9+BQ51HaGml9smiWsSFAe5DgHJ2jzroGDZB9cOojfajcRd2zvaB3QgdaM4hR1o6L4U1x/kqevSUxe5baBu5wXbHR3sAuuoB1f4jbFqV0SlaSOmHQ9NVPAO14/LwvsJp67eAuMjaCfHET5j0OaL2o2BiMai5f9vtCB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2reVHgE9; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-55c89dbef80so8588a12.1
+        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 06:38:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706106975; x=1706711775; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MpDjSBPxR7jul3F3D7fG96de10Q/B8xuAEUwbLIyapo=;
-        b=P3QnmFrO9YF7NOGX7E3NLCjwzsgy5ZF/e73alt9eCNkbmVL3MXHSafl6Tyget9wRP2
-         cd5aj8P0Vmlt4OZtvoXPyncXoqVbwf61nlPSrWJNTlYcBPYXKLYjZvnKlezhFRHHH9mm
-         xia/RJ5sjLj5OYhljPejhRgE2ZNYcU+45JFw4CZLhMIEdo+poDtWTsW/huWXH43WqyNJ
-         6u8ztXJ5FZBXAWc7CNTI5B+vrNrM/j/r6AKQR87RLNo4HF0aEaSa0j52kRQbI73D3+GX
-         aUsXieUs0TNo8cWCVIEh/67e0tjd68sTCw4twU4tPLz0ZY+3W28NQTDzW5PwQsgbMzmt
-         AqXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706106975; x=1706711775;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1706107111; x=1706711911; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MpDjSBPxR7jul3F3D7fG96de10Q/B8xuAEUwbLIyapo=;
-        b=RPx3vZFvun5Z4qsan+V4A0YwR21n7KARgoE7wPOLM1SP6lvlsPlT9tosrxbiOMBIpN
-         pqBhzlfMWpNXx8vRmK/dPZd+Pj9kud2awIm0UwBUx5a8so3PLJE8d43UmkOu5R2g99Pg
-         MnpItO/1tOJvDuD2Qda6nJM4SfIdU0iBGd7xsLlSWQ7jnYYhODe2J2LkiYbFUkjOst9h
-         zwM7Z+9otQ+KdGxZCeOoeCP9slcPprfNUo2HkhDZGMMATQSeT9S3GgS+jqP7kwv16cWr
-         jm1/kjd1NZTL88Unf6lLDCOOBIATJWMf497PqbHzPiY2t1SSbBJ/VDXwpnKg5HbocnDd
-         +XfA==
-X-Gm-Message-State: AOJu0Yw4l/7VBo1W2xlJM9vdywTtl4sUOqQJUY/4Z/ynCMWYzcQtZ9bl
-	+5nV4V8ap1gfWdV5804bF+gUJ97GLZgD/v9xLvhA7k8FTKKorB/o
-X-Google-Smtp-Source: AGHT+IE4diP+Bzi1Qt1K35z7Xbr+sJlFYRnMivzS2AX1CTOywsuripJaMAufPOPXgEYRgRWvFi0pXg==
-X-Received: by 2002:a2e:870c:0:b0:2cd:f540:e397 with SMTP id m12-20020a2e870c000000b002cdf540e397mr482645lji.55.1706106974534;
-        Wed, 24 Jan 2024 06:36:14 -0800 (PST)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id e22-20020a2e9e16000000b002cd628d6ea3sm4033353ljk.112.2024.01.24.06.36.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jan 2024 06:36:13 -0800 (PST)
-Date: Wed, 24 Jan 2024 17:36:10 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Furong Xu <0x1207@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Joao Pinto <jpinto@synopsys.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, xfr@outlook.com, rock.xu@nio.com
-Subject: Re: [PATCH net] net: stmmac: xgmac: fix handling of DPP safety error
- for DMA channels
-Message-ID: <vsert76o6lxxc676tjiiikir577qobfonyo6sgo5eek6alzxlo@tb6hq5s2qcsp>
-References: <20240123095006.979437-1-0x1207@gmail.com>
+        bh=OI2XazdUmRYBQ7l9aiPWaZwPS0yDwP9OAgAwE0uydxY=;
+        b=2reVHgE9PJsGyXtbeT7vRZdPGvES5S7VRUcjOjcb3uA3l1AmZiU1VQnjP8owg/2Z0R
+         AQ7ALNme6SALYD1gznY8EpP3Ezrf3lPAQm22s1/MhuEQc0rXkVICMOSNwJS6XXlRwi1R
+         l+eMMJkx7J+bRll6QkpBLjIyjQ2k5FI+VfmXOOgDACVVtof4M5JUsN6rrKXxchh6aHo5
+         DwHkb0wu/XPzWo4c59N472fOmtFnwlT1J6TKr5nIh6rEpFtOMfT7UUg059t474v4qPqr
+         3wA2exdgy+sVCYtggk5po0CoCy61Csoywbl1ZNOlNxJYsOvcSCLbJi405gwKZ0oaU6nO
+         /Tmw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706107111; x=1706711911;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OI2XazdUmRYBQ7l9aiPWaZwPS0yDwP9OAgAwE0uydxY=;
+        b=JFFM631tPJ3Rdtv5Y6PrYgiAGiwemf+vMFXT+BRqS6UUs8fF3Y3m78C/iGZ7uWTD3e
+         YwVlpcLEVKMzrf4kXT77/JI3jWz5Dz2zjdxSGaMcXUBe/hKvQwFZqTInsCEqX/Zne+LP
+         ViPG3EKqefvHrkyJ+7AqcWWs1WR4rgFzofZqa7XckubVNerm7qLUsQXQMEy2PX8pEIQz
+         7w8Pz8P3rdO+tRxOHazaEidx4xKTZK01QdXAgWx9wUJCg5hb+yw7bsP340UXpsvKgROa
+         b3E6dB6p6aNHTExMXHYEgAGMqCkP4aVohHWc0UO7C3kyGxGUncTbqxK1VZiyFB02jY6I
+         580w==
+X-Gm-Message-State: AOJu0Yy6fianORulnalWw3MNnbFptUSlMjtS8osND671ZojGCn9x97IF
+	a4S1okhcx2iJsFKXO7YPaWG4ej5VjwdgIqV8EqQdnxXff4UFH883pqTZk5crGC5TPrdi8+SiJ+m
+	KS8284mI5/38/8qteWyg/qyRTRDPCF18DkwD/
+X-Google-Smtp-Source: AGHT+IHBWDLFccGGTaeb6uzn1TbCnzo4W4c2GRN7GYO+V1E8Vx4O3nM/NfI/MJil/T6GysJT0LuX6AJT6DGkR7Ha274=
+X-Received: by 2002:a05:6402:b88:b0:55a:7f4e:1d62 with SMTP id
+ cf8-20020a0564020b8800b0055a7f4e1d62mr166510edb.4.1706107111056; Wed, 24 Jan
+ 2024 06:38:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240123095006.979437-1-0x1207@gmail.com>
+References: <20240124025359.11419-1-jdamato@fastly.com> <CANn89i+YKwrgpt8VnHrw4eeVpqRamLkTSr4u+g1mRDMZa6b+7Q@mail.gmail.com>
+ <20240124142008.GA1448@fastly.com>
+In-Reply-To: <20240124142008.GA1448@fastly.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 24 Jan 2024 15:38:19 +0100
+Message-ID: <CANn89i+UiCRpu6M-hDga=dSTk1F5MjkgV=kKS6zC31pvOh78DQ@mail.gmail.com>
+Subject: Re: [net-next 0/3] Per epoll context busy poll support
+To: Joe Damato <jdamato@fastly.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	chuck.lever@oracle.com, jlayton@kernel.org, linux-api@vger.kernel.org, 
+	brauner@kernel.org, davem@davemloft.net, alexander.duyck@gmail.com, 
+	sridhar.samudrala@intel.com, kuba@kernel.org, Wei Wang <weiwan@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 23, 2024 at 05:50:06PM +0800, Furong Xu wrote:
-> Commit 56e58d6c8a56 ("net: stmmac: Implement Safety Features in
-> XGMAC core") checks and reports safety errors, but leaves the
-> Data Path Parity Errors for each channel in DMA unhandled at all, lead to
-> a storm of interrupt.
-> Fix it by checking and clearing the DMA_DPP_Interrupt_Status register.
-> 
-> Fixes: 56e58d6c8a56 ("net: stmmac: Implement Safety Features in XGMAC core")
-> Signed-off-by: Furong Xu <0x1207@gmail.com>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h      | 1 +
->  drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c | 6 ++++++
->  2 files changed, 7 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> index 207ff1799f2c..188e11683136 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> @@ -385,6 +385,7 @@
->  #define XGMAC_DCEIE			BIT(1)
->  #define XGMAC_TCEIE			BIT(0)
->  #define XGMAC_DMA_ECC_INT_STATUS	0x0000306c
-> +#define XGMAC_DMA_DPP_INT_STATUS	0x00003074
->  #define XGMAC_DMA_CH_CONTROL(x)		(0x00003100 + (0x80 * (x)))
->  #define XGMAC_SPH			BIT(24)
->  #define XGMAC_PBLx8			BIT(16)
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> index eb48211d9b0e..874e85b499e2 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> @@ -745,6 +745,12 @@ static void dwxgmac3_handle_mac_err(struct net_device *ndev,
->  
->  	dwxgmac3_log_error(ndev, value, correctable, "MAC",
->  			   dwxgmac3_mac_errors, STAT_OFF(mac_errors), stats);
-> +
-> +	value = readl(ioaddr + XGMAC_DMA_DPP_INT_STATUS);
-> +	writel(value, ioaddr + XGMAC_DMA_DPP_INT_STATUS);
-> +
-> +	if (value)
-> +		netdev_err(ndev, "Found DMA_DPP error, status: 0x%x\n", value);
+On Wed, Jan 24, 2024 at 3:20=E2=80=AFPM Joe Damato <jdamato@fastly.com> wro=
+te:
+>
+> On Wed, Jan 24, 2024 at 09:20:09AM +0100, Eric Dumazet wrote:
+> > On Wed, Jan 24, 2024 at 3:54=E2=80=AFAM Joe Damato <jdamato@fastly.com>=
+ wrote:
+> > >
+> > > Greetings:
+> > >
+> > > TL;DR This builds on commit bf3b9f6372c4 ("epoll: Add busy poll suppo=
+rt to
+> > > epoll with socket fds.") by allowing user applications to enable
+> > > epoll-based busy polling and set a busy poll packet budget on a per e=
+poll
+> > > context basis.
+> > >
+> > > To allow for this, two ioctls have been added for epoll contexts for
+> > > getting and setting a new struct, struct epoll_params.
+> > >
+> > > This makes epoll-based busy polling much more usable for user
+> > > applications than the current system-wide sysctl and hardcoded budget=
+.
+> > >
+> > > Longer explanation:
+> > >
+> > > Presently epoll has support for a very useful form of busy poll based=
+ on
+> > > the incoming NAPI ID (see also: SO_INCOMING_NAPI_ID [1]).
+> > >
+> > > This form of busy poll allows epoll_wait to drive NAPI packet process=
+ing
+> > > which allows for a few interesting user application designs which can
+> > > reduce latency and also potentially improve L2/L3 cache hit rates by
+> > > deferring NAPI until userland has finished its work.
+> > >
+> > > The documentation available on this is, IMHO, a bit confusing so plea=
+se
+> > > allow me to explain how one might use this:
+> > >
+> > > 1. Ensure each application thread has its own epoll instance mapping
+> > > 1-to-1 with NIC RX queues. An n-tuple filter would likely be used to
+> > > direct connections with specific dest ports to these queues.
+> > >
+> > > 2. Optionally: Setup IRQ coalescing for the NIC RX queues where busy
+> > > polling will occur. This can help avoid the userland app from being
+> > > pre-empted by a hard IRQ while userland is running. Note this means t=
+hat
+> > > userland must take care to call epoll_wait and not take too long in
+> > > userland since it now drives NAPI via epoll_wait.
+> > >
+> > > 3. Ensure that all incoming connections added to an epoll instance
+> > > have the same NAPI ID. This can be done with a BPF filter when
+> > > SO_REUSEPORT is used or getsockopt + SO_INCOMING_NAPI_ID when a singl=
+e
+> > > accept thread is used which dispatches incoming connections to thread=
+s.
+> > >
+> > > 4. Lastly, busy poll must be enabled via a sysctl
+> > > (/proc/sys/net/core/busy_poll).
+> > >
+> > > The unfortunate part about step 4 above is that this enables busy pol=
+l
+> > > system-wide which affects all user applications on the system,
+> > > including epoll-based network applications which were not intended to
+> > > be used this way or applications where increased CPU usage for lower
+> > > latency network processing is unnecessary or not desirable.
+> > >
+> > > If the user wants to run one low latency epoll-based server applicati=
+on
+> > > with epoll-based busy poll, but would like to run the rest of the
+> > > applications on the system (which may also use epoll) without busy po=
+ll,
+> > > this system-wide sysctl presents a significant problem.
+> > >
+> > > This change preserves the system-wide sysctl, but adds a mechanism (v=
+ia
+> > > ioctl) to enable or disable busy poll for epoll contexts as needed by
+> > > individual applications, making epoll-based busy poll more usable.
+> > >
+> >
+> > I think this description missed the napi_defer_hard_irqs and
+> > gro_flush_timeout settings ?
+>
+> I'm not sure if those settings are strictly related to the change I am
+> proposing which makes epoll-based busy poll something that can be
+> enabled/disabled on a per-epoll context basis and allows the budget to be
+> set as well, but maybe I am missing something? Sorry for my
+> misunderstanding if so.
+>
+> IMHO: a single system-wide busy poll setting is difficult to use
+> properly and it is unforunate that the packet budget is hardcoded. It wou=
+ld
+> be extremely useful to be able to set both of these on a per-epoll basis
+> and I think my suggested change helps to solve this.
+>
+> Please let me know.
+>
+> Re the two settings you noted:
+>
+> I didn't mention those in the interest of brevity, but yes they can be us=
+ed
+> instead of or in addition to what I've described above.
+>
+> While those settings are very useful, IMHO, they have their own issues
+> because they are system-wide as well. If they were settable per-NAPI, tha=
+t
+> would make it much easier to use them because they could be enabled for t=
+he
+> NAPIs which are being busy-polled by applications that support busy-poll.
+>
+> Imagine you have 3 types of apps running side-by-side:
+>   - A low latency epoll-based busy poll app,
+>   - An app where latency doesn't matter as much, and
+>   - A latency sensitive legacy app which does not yet support epoll-based
+>     busy poll.
+>
+> In the first two cases, the settings you mention would be helpful or not
+> make any difference, but in the third case the system-wide impact might b=
+e
+> undesirable because having IRQs fire might be important to keep latency
+> down.
+>
+> If your comment was more that my cover letter should have mentioned these=
+,
+> I can include that in a future cover letter or suggest some kernel
+> documentation which will discuss all of these features and how they relat=
+e
+> to each other.
+>
+> >
+> > I would think that if an application really wants to make sure its
+> > thread is the only one
+> > eventually calling napi->poll(), we must make sure NIC interrupts stay =
+masked.
+> >
+> > Current implementations of busy poll always release NAPI_STATE_SCHED bi=
+t when
+> > returning to user space.
+> >
+> > It seems you want to make sure the application and only the
+> > application calls the napi->poll()
+> > at chosen times.
+> >
+> > Some kind of contract is needed, and the presence of the hrtimer
+> > (currently only driven from dev->@gro_flush_timeout)
+> > would allow to do that correctly.
+> >
+> > Whenever we 'trust' user space to perform the napi->poll shortly, we
+> > also want to arm the hrtimer to eventually detect
+> > the application took too long, to restart the other mechanisms (NIC irq=
+ based)
+>
+> There is another change [1] I've been looking at from a research paper [2=
+]
+> which does something similar to what you've described above -- it keeps
+> IRQs suppressed during busy polling. The paper suggests a performance
+> improvement is measured when using a mechanism like this to keep IRQs off=
+.
+> Please see the paper for more details.
+>
+> I haven't had a chance to reach out to the authors or to tweak this patch
+> to attempt an RFC / submission for it, but it seems fairly promising in m=
+y
+> initial synthetic tests.
+>
+> When I tested their patch, as you might expect, no IRQs were generated at
+> all for the NAPIs that were being busy polled, but the rest of the
+> NAPIs and queues were generating IRQs as expected.
+>
+> Regardless of the above patch: I think my proposed change is helpful and
+> the IRQ suppression bit can be handled in a separate change in the future=
+.
+> What do you think?
+>
+> > Note that we added the kthread based napi polling, and we are working
+> > to add a busy polling feature to these kthreads.
+> > allowing to completely mask NIC interrupts and further reduce latencies=
+.
+>
+> I am aware of kthread based NAPI polling, yes, but I was not aware that
+> busy polling was being considered as a feature for them, thanks for the
+> head's up.
+>
+> > Thank you
+>
+> Thanks for your comments - I appreciate your time and attention.
+>
+> Could you let me know if your comments are meant as a n-ack or similar?
 
-1. Why not to implement this in the same way as the rest of the safety
-errors handle code? (with the flags described by the
-dwxgmac3_error_desc-based table and the respective counters being
-incremented should the errors were detected)
+Patch #2 needs the 'why' part, and why would we allow user space to
+ask to poll up to 65535 packets...
+There is a reason we have a warning in place when a driver attempts to
+set a budget bigger than 64.
 
-2. I don't see this IRQ being enabled in the dwxgmac3_safety_feat_config()
-method. How come the respective event has turned to be triggered
-anyway?
+You cited recent papers,  I wrote this one specific to linux busy
+polling ( https://netdevconf.info/2.1/papers/BusyPollingNextGen.pdf )
 
--Serge(y) 
+Busy polling had been in the pipe, when Wei sent her patches and follow ups=
+.
 
->  }
->  
->  static const struct dwxgmac3_error_desc dwxgmac3_mtl_errors[32]= {
-> -- 
-> 2.34.1
-> 
-> 
+cb038357937ee4f589aab2469ec3896dce90f317 net: fix race between napi
+kthread mode and busy poll
+5fdd2f0e5c64846bf3066689b73fc3b8dddd1c74 net: add sysfs attribute to
+control napi threaded mode
+29863d41bb6e1d969c62fdb15b0961806942960e net: implement threaded-able
+napi poll loop support
+
+I am saying that I am currently working to implement the kthread busy
+polling implementation,
+after fixing two bugs in SCTP and UDP (making me wondering if busy
+polling is really used these days)
+
+I am also considering unifying napi_threaded_poll() and the
+napi_busy_loop(), and seeing your patches
+coming make this work more challenging.
 
