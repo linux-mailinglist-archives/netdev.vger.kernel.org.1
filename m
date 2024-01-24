@@ -1,154 +1,110 @@
-Return-Path: <netdev+bounces-65563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A0D883B083
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 18:54:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A35E583B085
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 18:54:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 588071C2157A
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 17:54:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6BCC1C2148F
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 17:54:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6881686125;
-	Wed, 24 Jan 2024 17:52:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 836E212A144;
+	Wed, 24 Jan 2024 17:52:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XJFqzfm8"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Sj1xzL0G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E304A7A711;
-	Wed, 24 Jan 2024 17:52:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B76801272AC
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 17:52:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706118748; cv=none; b=p5Rk89/HbXZelz3CnZynThMYKn/UKROLw7mqwuty30W5OhHKTmXfvHUYb3RGlFbGN2RFhf8sC9FRMLRipVPM539y6KvN1y5McyQes1OcljGkrS7gniUZuQpLxh/PhDteSjhAFpEvg+i0qXELuJrIOUekoRwxZUr/iLmpqMuZ7Y4=
+	t=1706118754; cv=none; b=QSryHWQx3qkgRB853AdZn26vvxVpWzHQiZIoNo8VYGg6/4J5WOeM/AmE2Tr7PX9/GUlKKQrQ479HVGZXrbgMUa+UgyiKNUdn84x5pnY7MgRliG0inoeGaMQCFjdLnW5sJa/ymdoMTGJDqjilT7siGRDZrcg6kwl3RMu3BXPiluI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706118748; c=relaxed/simple;
-	bh=iaM0f7Mu+VndqV8QTAWSCtIFAiLhckKr1QXjBV9VlbM=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=Ixrr5ywMzFBq1J4pi3d1VROPJjfzhsIF7Ch3bUqwR7P00ne5D/rx88c5Af5ummIHBKTn0z14Qc2cJlQZ1gZgw1fxvkoOa8TV4g55bkPMnELOt/VrXmkSOnMFi5fObpxKGXiZZiCcI1MJJDjJFs2mh393SWweCI+sBjKQfCkSfSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XJFqzfm8; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1d71cb97937so36287565ad.3;
-        Wed, 24 Jan 2024 09:52:26 -0800 (PST)
+	s=arc-20240116; t=1706118754; c=relaxed/simple;
+	bh=2nzwYy5eLPzezXEa8LQ+/BiHlD0Mt33Sf5tv11jdlcs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ubJbpVwpqPY9c3gaab5eFwxWdHftTLpiKjItwX/oa/zODTUejTsA0U3G3nA5Nl4aZLPgp6ZdrrXzmrooLeqDtAwVR+Dtf5CGcDaldrBDnQSPafcQWPDOUVEbsePgunMiASY5XKg5mxPo61h7AglLFMdkdmijQtjZrFCVCd4x/jg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Sj1xzL0G; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-510133ed214so1129860e87.1
+        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 09:52:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706118746; x=1706723546; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0zISETwUy9JllYHs6YyNzxbyZFYMacyxOxCvaHnvxTM=;
-        b=XJFqzfm8GB4R7lurYTYuHm0ymkLI9u98F/3S7QVUYvylBsivYQ63JFYgGgN2OI/30X
-         6TB8qz/P6tioDhRjJyqViZZrXqJ5Ojlu2WpZSc5Vf0ZmU0+OtTSjWEuX4fiwZXjk5OcR
-         yVMMzmPfCvR1IZN2QJf1NbrRIZxKg0qIMWskjmSWtaNJx/s/SmuPzePgqLXqkUMW/jvR
-         qg68hITwPakuwSOkLI+xNiPl5rrjGPXZHa3iJnqY/lVEkoL8U6zUXLJZSu5qRF0wQ+Al
-         lfjLPYdeU7b9hKps4q6vIVuKCEtCeGxwtgGGd7uZr+B7+I0c0kLX3YXtIhZ2BpzvFhHR
-         3Mjw==
+        d=linaro.org; s=google; t=1706118751; x=1706723551; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vTlQZ1fr4MYjqJNvKsZeP6R4Md0Qcnn9S554f0tlhZM=;
+        b=Sj1xzL0G+MwmNSKuOkkY7myMdHQ1x3Kxu3y7yCD0qhrsFazeFB2DmzpwEAuuqxiTaF
+         JC6Kn14LUf0kaW1TSSC/sxmsjzbxKdyCAnV1QwJ2eQ1aTzhGquHuOwdk8AxCffrTLypC
+         iQhVPcoZb9W5foxRMSC8oUbPK2gfejJnGatH57z+M/kGPkYDmNS5fwnKQWG0R5mt9LD4
+         6aclUOHYbSnnSD15L/FDpTS813RVfySH4ZUbOJVZHEmcR5JG7+CHPmFaEhKfyUoX5V7C
+         Q1+wwd9NERY5kgVaB98++XAO75doawh59Xttk/wBqI6s2IUPnBs3jNQrcolnMOrRYHVG
+         KoNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706118746; x=1706723546;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=0zISETwUy9JllYHs6YyNzxbyZFYMacyxOxCvaHnvxTM=;
-        b=i0oivX4/0dwx5aHNvyy3Ir7uG4/5IoFkvZ/uykk2Vvj1A6hlrCod1hBF3ZvO4qRuN8
-         S00Hj0I+Yy6l+rDHSPfKurHLqXp4499zNgvQ0KHsBhAwkFSqAzTFOGDCRWeE1A29GGRh
-         l1gXJKt8PKfhWroyBOw3MZTxwNiFAGTrE4BWlQjJz3dM1n99ZUrzCrf9E3er9wSrJFgj
-         +YZgTi2+H/kJFmSkVsPDMEX1ZYnb4gNgWDitTngBm7B5dlI6VnSsCMUEvJgSMaYZVQU6
-         UryEm9QmiZmSvRXRzdYBSQbe1SKu4A4iU7HgmYynAjgEBpBSbpfqIGKD5klHwxO0KuHD
-         18Mw==
-X-Gm-Message-State: AOJu0YxXKqaFxvG2Q7DAEx0TpeFeTUAugW9n6zWJpQW/+EPsd1I62w/6
-	v8xN/OjPRllGHcq82ok8wghw0DXiEtKmjQreqFUevdH45b21HWvK+FNP4jZa
-X-Google-Smtp-Source: AGHT+IHTIgVg35qiFiou5PoLiHwCviuNaDj3LTJKrkkENoAKyEmS1B3tpLwagEe3EtmWwYwQZ4Rf5Q==
-X-Received: by 2002:a17:902:e74d:b0:1d3:4860:591b with SMTP id p13-20020a170902e74d00b001d34860591bmr1261930plf.0.1706118746069;
-        Wed, 24 Jan 2024 09:52:26 -0800 (PST)
-Received: from localhost ([98.97.116.78])
-        by smtp.gmail.com with ESMTPSA id u18-20020a170903125200b001d4ac8ac969sm10679985plh.275.2024.01.24.09.52.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jan 2024 09:52:25 -0800 (PST)
-Date: Wed, 24 Jan 2024 09:52:24 -0800
-From: John Fastabend <john.fastabend@gmail.com>
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>, 
- John Fastabend <john.fastabend@gmail.com>
-Cc: netdev@vger.kernel.org, 
- jakub@cloudflare.com, 
- bpf@vger.kernel.org
-Message-ID: <65b14e583fb27_1033b520820@john.notmuch>
-In-Reply-To: <CAEf4BzbkGuDH91X2KaA=448HoZD0m09qQrBDvBxFwdTLTF7JFw@mail.gmail.com>
-References: <20240123223612.1015788-1-john.fastabend@gmail.com>
- <65b0776bd8ee2_fbe42208b8@john.notmuch>
- <CAEf4BzbkGuDH91X2KaA=448HoZD0m09qQrBDvBxFwdTLTF7JFw@mail.gmail.com>
-Subject: Re: [PATCH bpf-next 0/4] transition sockmap testing to test_progs
+        d=1e100.net; s=20230601; t=1706118751; x=1706723551;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vTlQZ1fr4MYjqJNvKsZeP6R4Md0Qcnn9S554f0tlhZM=;
+        b=DWDv5nLVVMrymQA4Nrjx7A9KMifj5U4eXAZXKZ0jDPSYR8KXv6LXpQRzbWSn/qV7Hh
+         KQrVksMkJEARc46ds6nspsx2LKf77UMjo/fddCw6ATymr2S0r9CLC5ZHFa/MCEsAPZ9N
+         g5vbX4yLLMrv07AGobUiuRGpSNDJyxjb1dpD7XjoxQdhk2x8+VQCg13Y8KYJWS1jBpM1
+         jEsWaBYZoMbMvRpIaW0T+JEUR/AE4scznDebBzs77eiKa2IlF/OTzhooVT90LpwIfsSg
+         rPD7U+Rc25MYHNsYpEXUa2kvg3QwGFh1Ro0q74pERgv4vomO+rdLX7Kk2vy1359Q1hIC
+         a38Q==
+X-Gm-Message-State: AOJu0YxgVmIXC9wFTLBWIxCYeAx2pVOwpBHRAmnPML4+zlpt2IbqySUZ
+	RqgQLs4qYtsxzwVJbFsb1Cdf/fpUwsNDggfbmQHikgZ73MV6PoirDKHrg9A+oJaKxTOrq7qFqCj
+	q
+X-Google-Smtp-Source: AGHT+IFVZa2kg7IyRx7QJp069qZ9912rNwBb+h/X1nfVuEMEY0k4ho5ymWS2GZhOS354vQXe07M81g==
+X-Received: by 2002:a05:6512:3b98:b0:510:19dd:6c56 with SMTP id g24-20020a0565123b9800b0051019dd6c56mr18096lfv.125.1706118750800;
+        Wed, 24 Jan 2024 09:52:30 -0800 (PST)
+Received: from [172.30.204.154] (UNUSED.212-182-62-129.lubman.net.pl. [212.182.62.129])
+        by smtp.gmail.com with ESMTPSA id u1-20020a056512128100b0050eb25590ffsm2621579lfs.207.2024.01.24.09.52.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 Jan 2024 09:52:30 -0800 (PST)
+Message-ID: <7c74ef2b-0031-4861-9d97-2c242db14d5e@linaro.org>
+Date: Wed, 24 Jan 2024 18:52:27 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: ethernet: qualcomm: Remove QDF24xx support
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: patchwork-bot+netdevbpf@kernel.org, timur@kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ marijn.suijten@somainline.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240122-topic-qdf_cleanup_net-v1-1-caf0d9c4408a@linaro.org>
+ <170605983124.14933.9916722082205803213.git-patchwork-notify@kernel.org>
+ <0679f568-60e7-47d8-b86e-052a9eb4c103@linaro.org>
+ <20240124073558.41c1b99d@kernel.org>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@linaro.org>
+In-Reply-To: <20240124073558.41c1b99d@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Andrii Nakryiko wrote:
-> On Tue, Jan 23, 2024 at 6:35=E2=80=AFPM John Fastabend <john.fastabend@=
-gmail.com> wrote:
-> >
-> > John Fastabend wrote:
-> > > Its much easier to write and read tests than it was when sockmap wa=
-s
-> > > originally created. At that time we created a test_sockmap prog tha=
-t
-> > > did sockmap tests. But, its showing its age now. For example it rea=
-ds
-> > > user vars out of maps, is hard to run targetted tests, has a differ=
-ent
-> > > format from the familiar test_progs and so on.
-> > >
-> > > I recently thought there was an issue with pop helpers so I created=
 
-> > > some tests to try and track it down. It turns out it was a bug in t=
-he
-> > > BPF program we had not the kernel. But, I think it makes sense to
-> > > start deprecating test_sockmap and converting these to the nicer
-> > > test_progs.
-> > >
-> > > So this is a first round of test_prog tests for sockmap cork and
-> > > pop helpers. I'll add push and pull tests shortly. I think its fine=
-,
-> > > maybe preferred to review smaller patchsets, to send these
-> > > incrementally as I get them created.
-> > >
-> > > Thanks!
-> > >
-> > > John Fastabend (4):
-> > >   bpf: Add modern test for sk_msg prog pop msg header
-> > >   bpf: sockmap, add a sendmsg test so we can check that path
-> > >   bpf: sockmap, add a cork to force buffering of the scatterlist
-> > >   bpf: sockmap test cork and pop combined
-> > >
-> > >  .../bpf/prog_tests/sockmap_helpers.h          |  18 +
-> > >  .../bpf/prog_tests/sockmap_msg_helpers.c      | 351 ++++++++++++++=
-++++
-> > >  .../bpf/progs/test_sockmap_msg_helpers.c      |  67 ++++
-> > >  3 files changed, 436 insertions(+)
-> > >  create mode 100644 tools/testing/selftests/bpf/prog_tests/sockmap_=
-msg_helpers.c
-> > >  create mode 100644 tools/testing/selftests/bpf/progs/test_sockmap_=
-msg_helpers.c
-> > >
-> > > --
-> > > 2.33.0
-> > >
-> >
-> > Will need a v2 to fixup a couple things here. Thanks.
-> >
-> =
 
-> Can you please also try compiling selftests with `make RELEASE=3D1` and=
+On 1/24/24 16:35, Jakub Kicinski wrote:
+> On Wed, 24 Jan 2024 13:38:19 +0100 Konrad Dybcio wrote:
+>> Jakub, can we please drop this (or should I send a revert)?
+>>
+>> It turned out that Qualcomm is actually still using this internally,
+>> for "reasons".. [1]
+> 
+> Oh, I thought you only meant they are using the UART driver (somehow).
+> I'll revert, sorry.
 
-> making sure the compiler doesn't complain about uninitialized
-> variables and such. Unfortunately we don't do this automatically in CI
-> yet.
+Thanks for taking care of this!
 
-Yep thats what I realized I missed after submitting. Thanks.=
+Konrad
 
