@@ -1,126 +1,104 @@
-Return-Path: <netdev+bounces-65382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 646C583A493
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:52:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4D0A83A4A0
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:56:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E0A5283BF0
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 08:52:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87ED21F258CB
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 08:56:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E048179AA;
-	Wed, 24 Jan 2024 08:52:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C9E317BC1;
+	Wed, 24 Jan 2024 08:56:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kchyvg20"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="viEav9YP";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="H1QKrWg8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C578179A8;
-	Wed, 24 Jan 2024 08:52:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 026DB17BAB
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 08:56:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706086364; cv=none; b=impU6b8ZtdB7JSrvDFjweSd7BDKkY7Hnp3hFIl7Vr2BHpr8zooZIT6q0weSqwBQ7my5pCtccn0lVv8IjT6IG0KOv6udf62wQRDSEHqvsforBTEByoeSeT7y5Rs/F28tYiWaXl2t35w54rrHZ6wpYkF+lBvY1hdSA2yCLpjzAsIM=
+	t=1706086565; cv=none; b=NNpcylsnPb9M5xqfWv2ERm3iRt9WC5At8333Fsif2IYVn5CmQdie9k+q7cib78yGd6DkHCbJZNwKRu9PYwLA1xpgGkzgiR1NqAdotEd0BsJIxzdvakEcj/JrtrEYKrL1aEagAWbBTheL+Lf0nBz7HUZ/rvDTCxhvmJMiVxIWRBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706086364; c=relaxed/simple;
-	bh=SnAlArXMenv6/ZGxGogyDDvRrMjF9ReUGoyH+LeyUjA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=L+QAVYS5sJTXM+SaIkuFcrIHz4PYJATCd8qR5V+KRQhQ1ypqpil1O2oxHgAtrrQoJlqPiX5qqIeeVlc/u0OfZ72lnqp24MexYZ76WjJgqV5QdQ56hzY50dT/OFB1EiiWm/Z+wxYVup35TTwUkCpRxb2FAG5ikpBk0t2hBAzPH+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kchyvg20; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-429d9a9e38bso11068571cf.0;
-        Wed, 24 Jan 2024 00:52:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706086362; x=1706691162; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=6G5HRBXgPgaKCvL+TwUplcblL5VUAVBe0RUlShTL+7U=;
-        b=Kchyvg20akJ+us/4/OGA8bBtMoX8HY9UJ9N6TuclyaCjlZvSA7Z40vyMIwgZILTORj
-         8nTr0SxS36rcwFYN6kr4Dg5I5GVrS2mPricWAgY68fW+FarTxYJrw6rax4Tg1siRmHbp
-         ng0Jnm0UcGBi9LagLmuY0eiKL57BZLJSwUyUWVrLXTKryhuCxuqxWlFa5b0xge1AGwud
-         eiZDZgsHpaVb81kw0tfvs1ZzpWmyGmFvVIJYO1W4kjC3y8k6s7pbVx22IL7Aq322Xsgz
-         5FaRvoU7eivyA/eLXotfMx4WVjLtkbnZeb6B8JE/QApGy9qlrhGlevyX0Tc+vIGqZNY5
-         PGlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706086362; x=1706691162;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6G5HRBXgPgaKCvL+TwUplcblL5VUAVBe0RUlShTL+7U=;
-        b=rZzS2J72lLk3c05+CVJ1rJO7N/sPF9EAWLHkk10tAYpUXVMzv6QoG49/W4AJ/7IAEO
-         2nFr/gTCzjfpLsfo9sFg2nQDcDZmV6nnuoHYfcLYloZ3147Bw3AtKR0M0IA2lu33HaZ7
-         B5VDBx/pvfLKqWh4dCH9Ona+eqjAfY43fApEuu9LlrT9hlcFGEsGUainh8X/uVv9iwTC
-         F+d3oBPR0uOPqjd+k8u2PnR/4hNOuJzsx4vz2dHN2KsYrBcnGQYWhDoIUCqdnC6NTf6Q
-         0peDybBQeneUKJjAf6sxuaRE/Hbtu/k2n5qMycDgI7i9VnlWRgkMVCg/yIyVNPjSpooi
-         Qdsg==
-X-Gm-Message-State: AOJu0Yw+9QSzsjz/dlE4IamfX/VsDQxgBEl0s8AzP6X3cw7ghurP06cP
-	c6UfSv1diMiDSZn1ayOKiaHS79LAPFC90HYFFCXisiJsUG0it/X5cogNiKC33sYw/RjX9jke1ck
-	sdy9B6IkxnO3S91euqpmUXavSjZc=
-X-Google-Smtp-Source: AGHT+IHIan+2Mpt6aGU+d5zwpUVUCbWd8+nXaoxJPTuGWQQksc9VhJMpb2oG7ICbqrF3EJe/zSBRyF/g0RzNuEBuqcs=
-X-Received: by 2002:ad4:5805:0:b0:686:90f1:b177 with SMTP id
- dd5-20020ad45805000000b0068690f1b177mr8832995qvb.1.1706086362308; Wed, 24 Jan
- 2024 00:52:42 -0800 (PST)
+	s=arc-20240116; t=1706086565; c=relaxed/simple;
+	bh=tLY1ofwsHENu/CKjziYljNsoNVzcpa+MdbHgyX96fxo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SVoYa5Vd2QYjt328IdFa5WTbhu7oRXCFoMH5WQWad+eBUMTyexRe3EW+041ibVJ08c87c8kbuPSFQvXSUK2MBTTaQG0tJvluWduN/+Vy3iWIrjhVHGxp8Esg9bKidTaI6zYZ8GW67UtmiArAUQeL5N9SwBGc89GI/IYXStgDqg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=viEav9YP; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=H1QKrWg8; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1706086561;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=X4FuCdhJchif0ZdIzxnHwtgL8xgXCxtiB3b4x2qtgyw=;
+	b=viEav9YP9h95SvhqFWpPKp7flAZgvD728Hq8slaOP7HTnpvC467k3GxGGmaRNAIqGBJ6ea
+	xMi+Q17RDjT4Nt3D+TveqOY79vG9LwIHBIDiPqTBG64Zk5H0gGnAJH2LIpptRPHeUTixKn
+	OLy0Q5+KZC/6+HbGesRtDgWzJMVz0Xm+fVHDztKKeY2Rp0p70SDXmy1U//RX0VTXFEg1BF
+	fP+m+2H9nJzqnrdggC+HOsEoVngeaCykHQt3Qxh0jmn7dgVGSfo/jVPIA+9xfKwYlKr30e
+	LRqb7XEyxfk6xmX1cj+hMTJ0TtttjHTzdSL5irpEcMEm8glzjWvEIvC6XHkpig==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1706086561;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=X4FuCdhJchif0ZdIzxnHwtgL8xgXCxtiB3b4x2qtgyw=;
+	b=H1QKrWg83OFrQteVHkRykToIvp18kfiD0+X0Q2GEqfCit2/9nkztWKhvauKGhC9QusYHCD
+	D09Mw56cp5EqaLCQ==
+To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Kurt Kanzenbach <kurt@linutronix.de>
+Subject: [PATCH v2 iwl-next 0/3] igc: ethtool: Flex filter cleanup
+Date: Wed, 24 Jan 2024 09:55:29 +0100
+Message-Id: <20240124085532.58841-1-kurt@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240122221610.556746-1-maciej.fijalkowski@intel.com> <20240122221610.556746-12-maciej.fijalkowski@intel.com>
-In-Reply-To: <20240122221610.556746-12-maciej.fijalkowski@intel.com>
-From: Magnus Karlsson <magnus.karlsson@gmail.com>
-Date: Wed, 24 Jan 2024 09:52:31 +0100
-Message-ID: <CAJ8uoz0eaXqXyUmDXdCHfcCn3pNt4jK2FsY0rmvY-sda-y3zyw@mail.gmail.com>
-Subject: Re: [PATCH v5 bpf 11/11] i40e: update xdp_rxq_info::frag_size for ZC
- enabled Rx queue
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
-	andrii@kernel.org, netdev@vger.kernel.org, magnus.karlsson@intel.com, 
-	bjorn@kernel.org, echaudro@redhat.com, lorenzo@kernel.org, 
-	martin.lau@linux.dev, tirthendu.sarkar@intel.com, john.fastabend@gmail.com, 
-	horms@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Mon, 22 Jan 2024 at 23:18, Maciej Fijalkowski
-<maciej.fijalkowski@intel.com> wrote:
->
-> Now that i40e driver correctly sets up frag_size in xdp_rxq_info, let us
-> make it work for ZC multi-buffer as well. i40e_ring::rx_buf_len for ZC
-> is being set via xsk_pool_get_rx_frame_size() and this needs to be
-> propagated up to xdp_rxq_info.
+Hi,
 
-Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
+this series contains some cosmetics for the flex filter code. The fixes have
+been merged separately via -net already.
 
-> Fixes: 1c9ba9c14658 ("i40e: xsk: add RX multi-buffer support")
-> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> ---
->  drivers/net/ethernet/intel/i40e/i40e_main.c | 7 +++++++
->  1 file changed, 7 insertions(+)
->
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-> index f8d513499607..7b091ce64cc7 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-> @@ -3609,7 +3609,14 @@ static int i40e_configure_rx_ring(struct i40e_ring *ring)
->
->         ring->xsk_pool = i40e_xsk_pool(ring);
->         if (ring->xsk_pool) {
-> +               xdp_rxq_info_unreg(&ring->xdp_rxq);
->                 ring->rx_buf_len = xsk_pool_get_rx_frame_size(ring->xsk_pool);
-> +               err = __xdp_rxq_info_reg(&ring->xdp_rxq, ring->netdev,
-> +                                        ring->queue_index,
-> +                                        ring->q_vector->napi.napi_id,
-> +                                        ring->rx_buf_len);
-> +               if (err)
-> +                       return err;
->                 err = xdp_rxq_info_reg_mem_model(&ring->xdp_rxq,
->                                                  MEM_TYPE_XSK_BUFF_POOL,
->                                                  NULL);
-> --
-> 2.34.1
->
->
+Changes since v1:
+
+ * Add Vinicius Ack
+ * Rebase to v6.8-rc1
+ * Wrap commit messages at 75 chars
+
+Previous versions:
+
+ * v1: https://lore.kernel.org/netdev/20231128074849.16863-1-kurt@linutronix.de/
+
+Kurt Kanzenbach (3):
+  igc: Use reverse xmas tree
+  igc: Use netdev printing functions for flex filters
+  igc: Unify filtering rule fields
+
+ drivers/net/ethernet/intel/igc/igc.h         |  2 +-
+ drivers/net/ethernet/intel/igc/igc_ethtool.c |  4 ++--
+ drivers/net/ethernet/intel/igc/igc_main.c    | 21 ++++++++++----------
+ 3 files changed, 14 insertions(+), 13 deletions(-)
+
+-- 
+2.39.2
+
 
