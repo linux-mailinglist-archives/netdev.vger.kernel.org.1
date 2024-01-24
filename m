@@ -1,231 +1,107 @@
-Return-Path: <netdev+bounces-65453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65454-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9DC483A976
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 13:17:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 38F9883A9CE
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 13:33:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35C1A1F25563
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 12:17:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE0ED1F2165F
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 12:33:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 464696311E;
-	Wed, 24 Jan 2024 12:17:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="EeyuUl53"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF2F777634;
+	Wed, 24 Jan 2024 12:33:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 813C160BAC
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 12:17:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67FDD76918
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 12:33:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706098662; cv=none; b=slkI8ZOZzp7+pOOV+ZdCQREHsvUQ1ZJvFo28ck+6SFfBndQ2+TXtPZQBmowWCbIGTEY3ApFtYm/8qun3UPc/jhinDCaMhdjKAYDojM+Xt5YjlIGQlWPd5MScrXF+PIBaO+bS2hOEw3oBq/LMFLXonowcKEbSnMB6B2ZsEEx7SGU=
+	t=1706099605; cv=none; b=KkGjVXmU/gcfNoauWmNVXpn3qElzKlAC9u2xE3jrJVTTKrY1b7E7W3n77f/dF/JvtpCKVi0TMuh1GZWIi5KzLu7nses/4nSm7Ew+fGvCh05OvQ4SguWiiasxi1z/A4OwAFF0GQDKQYtF/ul+bHgUC+zFAMHj8CaJOacdgFJ8rYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706098662; c=relaxed/simple;
-	bh=4wAsqiXtqLWKVqj2fG/asHpB71yeF4SIWaebwZLRE/0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fdFq6iKhGjB+OwOGcG5cBxacOOrshS9pLMjR+prfKacukUpqhlGAwdzWQ00wVrjrqSeuvDVXBKYrWQpcDHyDmENkUbkjB9AuSySJrBfjGhcdjr4IS6Mu8EpY1ev2Azh3MumY56F29jHgzeqtNnufVowgV9vNXaRwFtiwj5G/O74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=EeyuUl53; arc=none smtp.client-ip=209.85.219.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-dc261316b0dso4147370276.3
-        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 04:17:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1706098658; x=1706703458; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=N40ZEELDdKAG+PltYHXUqIJnRZg2htUPF9zZfWdekds=;
-        b=EeyuUl531izO/zR9hh1JZTFuEh+b7ysIzkXISnSp9/9oRhAF+ZafJOz9793fqgbXMN
-         IiulBQ64otHMwQhkfmDvZd6oJgBt3K09MAFj69vt6AxOdqKobEDllPkjNfUKt9YRKOuW
-         68vBKK1XQnAH5foPJL+dP0c0DpMIZOWT7Gi5p6QDa6+0ooa94oXT3XhxFTRYbFfim5vT
-         esTsBYXYOzaMmhoa0aqcknJtYtIvc47ufL1C9uAt8GNFYyuIYuP2YqRaDOBsk5iMPltY
-         ciR0v9TLJzleIFQttlrJf8qn/lVII7i4Zg5WmYK0MZG2RV0jCLqRn5bq17sqcMnsmv0z
-         jbng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706098658; x=1706703458;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=N40ZEELDdKAG+PltYHXUqIJnRZg2htUPF9zZfWdekds=;
-        b=ReFxRDgugTtd/rO9KlimddUnmCy/T9xpulzx/nNrHhMS3WbnukmFrT3/RtdOq9Pw5V
-         +Eb1YkIhJOjX8ZvVQp8wbBeTm+79DvTGppMEUUKLyj3fDCYlpqTKPPPpIRpwOKhAT5eI
-         22Ml9D3XMSU/z5p1rSqoPkYE4Xkx7/bPWbF3Wqt42EW9nrmiNrMGnrRuZZBoX8K79RcJ
-         WT2LPoFkGtjn1ggBMmrjw+FT9KA3UlOJHkCkD4SkU8EXbdRj/CXsAhQIOwAa69SPoui6
-         GGBfzRXlG+6zKKRIV8PWM+BwfIv21o8gwe86Z9miitgiDW7iEZapvKhJ8Dylm5Sgksfy
-         Tqbg==
-X-Gm-Message-State: AOJu0YxA/w64rmG0np5dXPoBsM9Loj+Zj3kYYoApHhGR9DKH1Wz2RwJY
-	29E9XR9HkNJI4P0gIOVlI2UkNut2EzXjXU/siQTUID6KoNeHNurbjF18XdfvEsTU/yfn57l39QR
-	TFbNU0VPo3v9YaSflPpza5HOvyHPbU06F6Q+3
-X-Google-Smtp-Source: AGHT+IFwzXVb4RY9kn5qPmYvPGQUlYLETaeLn/PuqSP06R4dtdLY3ViYyP66gP8R/osYf0FPE0DXk7hFGVI9sCWzIaI=
-X-Received: by 2002:a25:81d0:0:b0:dc2:8282:a590 with SMTP id
- n16-20020a2581d0000000b00dc28282a590mr448139ybm.125.1706098658502; Wed, 24
- Jan 2024 04:17:38 -0800 (PST)
+	s=arc-20240116; t=1706099605; c=relaxed/simple;
+	bh=ROs5IgYB+xi6Q8VgHMvLAKH4DGo69gM3UD3lu5Nd0rI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nKYE+D1N0JQ4OhMpS0MZhQ5jPkwDoKIfo7DxzPAQFu5WQgHJbkXp3gE1PMmUe43l4Hjo/uM4AaUx30+9ZnqKW6RKNa5VSMy/C86T43X1koiig+ZapbwB1dYHfonGnr2mZzuozgkueA7I95nSIALPAZ+hgKm4az3PLYnk+v9vuR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rScRR-0000Hy-6l; Wed, 24 Jan 2024 13:33:17 +0100
+Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rScRP-0023bP-87; Wed, 24 Jan 2024 13:33:15 +0100
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rScRP-0035AL-0a;
+	Wed, 24 Jan 2024 13:33:15 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com,
+	=?UTF-8?q?S=C3=B8ren=20Andersen?= <san@skov.dk>
+Subject: [PATCH net-next v4 0/3] net: dsa: microchip: implement PHY loopback 
+Date: Wed, 24 Jan 2024 13:33:11 +0100
+Message-Id: <20240124123314.734815-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240123135242.11430-1-mkoutny@suse.com>
-In-Reply-To: <20240123135242.11430-1-mkoutny@suse.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Wed, 24 Jan 2024 07:17:27 -0500
-Message-ID: <CAM0EoMkA1Hp61mp2n06P8aMdnteJZD5tvJPDOuAKi_PNrb+T9A@mail.gmail.com>
-Subject: Re: [PATCH v4 0/4] net/sched: Load modules via alias
-To: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
-	cake@lists.bufferbloat.net, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@toke.dk>, 
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>, Stephen Hemminger <stephen@networkplumber.org>, 
-	Petr Pavlu <ppavlu@suse.cz>, Michal Kubecek <mkubecek@suse.cz>, Martin Wilck <mwilck@suse.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hi Michal,
+changes v4:
+- add Acked-by: Arun Ramadoss <arun.ramadoss@microchip.com> to patch 3
+- add Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com> to patch 3
 
-On Tue, Jan 23, 2024 at 8:52=E2=80=AFAM Michal Koutn=C3=BD <mkoutny@suse.co=
-m> wrote:
->
-> These modules may be loaded lazily without user's awareness and
-> control. Add respective aliases to modules and request them under these
-> aliases so that modprobe's blacklisting mechanism (through aliases)
-> works for them. (The same pattern exists e.g. for filesystem
-> modules.)
->
-> For example (before the change):
->   $ tc filter add dev lo parent 1: protocol ip prio 1 handle 10 tcindex .=
-..
->   # cls_tcindex module is loaded despite a `blacklist cls_tcindex` entry
->   # in /etc/modprobe.d/*.conf
->
-> After the change:
->   $ tc filter add dev lo parent 1: protocol ip prio 1 handle 10 tcindex .=
-..
->   Unknown filter "tcindex", hence option "..." is unparsable
->   # explicit/acknowledged (privileged) action is needed
->   $ modprobe cls_tcindex
->   # blacklist entry won't apply to this direct modprobe, module is
->   # loaded with awareness
->
+changes v3:
+- add Acked-by: Arun Ramadoss <arun.ramadoss@microchip.com> to first 2
+  patches
+- move ksz879x specific loopback handling to separate functions
 
-A small nit seeing Simon's comment which will have you respin.
-cls_tcindex is no longer in the kernel. Can you use another example?
-Also Stephen had some comments last time, not sure if you addressed
-those (nothing on the logs says you did and i didnt see him say
-anything).
+changes v2:
+- add Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com> to first 2
+  patches
+- make sure reverse x-mas tree is present in all patches
+- add new lines between if statements
+- reword commit message of the 3. patch 
 
-cheers,
-jamal
+Oleksij Rempel (3):
+  net: dsa: microchip: ksz8: move BMCR specific code to separate
+    function
+  net: dsa: microchip: Remove redundant optimization in ksz8_w_phy_bmcr
+  net: dsa: microchip: implement PHY loopback configuration for KSZ8794
+    and KSZ8873
 
-> A considered alternative was invoking `modprobe -b` always from
-> request_module(), however, dismissed as too intrusive and slightly
-> confusing in favor of the precedented aliases (the commit 7f78e0351394
-> ("fs: Limit sys_mount to only request filesystem modules.").
->
-> User experience suffers in both alternatives. It's improvement is
-> orthogonal to blacklist honoring.
->
-> Changes from v1 (https://lore.kernel.org/r/20231121175640.9981-1-mkoutny@=
-suse.com)
-> - Treat sch_ and act_ modules analogously to cls_
->
-> Changes from v2 (https://lore.kernel.org/r/20231206192752.18989-1-mkoutny=
-@suse.com)
-> - reorganized commits (one generated commit + manual pre-/post- work)
-> - used alias names more fitting the existing net- aliases
-> - more info in commit messages and cover letter
-> - rebased on current master
->
-> Changes from v3 (https://lore.kernel.org/r/20240112180646.13232-1-mkoutny=
-@suse.com)
-> - rebase on netdev/net-next/main
-> - correct aliases in cls_* modules (wrong sed)
-> - replace repeated prefix strings with a macro
-> - patch also request_module call in qdisc_set_default()
->
-> Michal Koutn=C3=BD (4):
->   net/sched: Add helper macros with module names
->   net/sched: Add module aliases for cls_,sch_,act_ modules
->   net/sched: Load modules via their alias
->   net/sched: Remove alias of sch_clsact
->
->  include/net/act_api.h      | 2 ++
->  include/net/pkt_cls.h      | 2 ++
->  include/net/pkt_sched.h    | 2 ++
->  net/sched/act_api.c        | 2 +-
->  net/sched/act_bpf.c        | 1 +
->  net/sched/act_connmark.c   | 1 +
->  net/sched/act_csum.c       | 1 +
->  net/sched/act_ct.c         | 1 +
->  net/sched/act_ctinfo.c     | 1 +
->  net/sched/act_gact.c       | 1 +
->  net/sched/act_gate.c       | 1 +
->  net/sched/act_ife.c        | 1 +
->  net/sched/act_mirred.c     | 1 +
->  net/sched/act_mpls.c       | 1 +
->  net/sched/act_nat.c        | 1 +
->  net/sched/act_pedit.c      | 1 +
->  net/sched/act_police.c     | 1 +
->  net/sched/act_sample.c     | 1 +
->  net/sched/act_simple.c     | 1 +
->  net/sched/act_skbedit.c    | 1 +
->  net/sched/act_skbmod.c     | 1 +
->  net/sched/act_tunnel_key.c | 1 +
->  net/sched/act_vlan.c       | 1 +
->  net/sched/cls_api.c        | 2 +-
->  net/sched/cls_basic.c      | 1 +
->  net/sched/cls_bpf.c        | 1 +
->  net/sched/cls_cgroup.c     | 1 +
->  net/sched/cls_flow.c       | 1 +
->  net/sched/cls_flower.c     | 1 +
->  net/sched/cls_fw.c         | 1 +
->  net/sched/cls_matchall.c   | 1 +
->  net/sched/cls_route.c      | 1 +
->  net/sched/cls_u32.c        | 1 +
->  net/sched/sch_api.c        | 4 ++--
->  net/sched/sch_cake.c       | 1 +
->  net/sched/sch_cbs.c        | 1 +
->  net/sched/sch_choke.c      | 1 +
->  net/sched/sch_codel.c      | 1 +
->  net/sched/sch_drr.c        | 1 +
->  net/sched/sch_etf.c        | 1 +
->  net/sched/sch_ets.c        | 1 +
->  net/sched/sch_fq.c         | 1 +
->  net/sched/sch_fq_codel.c   | 1 +
->  net/sched/sch_gred.c       | 1 +
->  net/sched/sch_hfsc.c       | 1 +
->  net/sched/sch_hhf.c        | 1 +
->  net/sched/sch_htb.c        | 1 +
->  net/sched/sch_ingress.c    | 3 ++-
->  net/sched/sch_mqprio.c     | 1 +
->  net/sched/sch_multiq.c     | 1 +
->  net/sched/sch_netem.c      | 1 +
->  net/sched/sch_pie.c        | 1 +
->  net/sched/sch_plug.c       | 1 +
->  net/sched/sch_prio.c       | 1 +
->  net/sched/sch_qfq.c        | 1 +
->  net/sched/sch_red.c        | 1 +
->  net/sched/sch_sfb.c        | 1 +
->  net/sched/sch_sfq.c        | 1 +
->  net/sched/sch_skbprio.c    | 1 +
->  net/sched/sch_taprio.c     | 1 +
->  net/sched/sch_tbf.c        | 1 +
->  61 files changed, 66 insertions(+), 5 deletions(-)
->
->
-> base-commit: 736b5545d39ca59d4332a60e56cc8a1a5e264a8e
-> --
-> 2.43.0
->
+ drivers/net/dsa/microchip/ksz8795.c     | 400 ++++++++++++++++--------
+ drivers/net/dsa/microchip/ksz8795_reg.h |   1 +
+ 2 files changed, 270 insertions(+), 131 deletions(-)
+
+-- 
+2.39.2
+
 
