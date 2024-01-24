@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-65358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB4FB83A3EA
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:19:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6C0083A3ED
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:19:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 649BC1F2CE0E
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 08:19:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F234AB270E6
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 08:19:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4114617560;
-	Wed, 24 Jan 2024 08:19:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E6D317573;
+	Wed, 24 Jan 2024 08:19:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="stcKFqpn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pcUu1Lw3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DCCF1755B
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 08:19:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B5C617571
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 08:19:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706084343; cv=none; b=KWGB20U5OQ+scHMYd1DAwpjHi3h0PGr+hJwYPRH/sFP4ZK8+SQmF+rRuTwmS1kqfsVgm+5xQGczYidVAoi2rdbtiwkTUyJCVm6d/Yi7b+L8HS/FyH4ERXN+3HzsrwTRfypAqp2emiT414c+ckUvaz5v8RrwGb75/B4SEFgeKxI0=
+	t=1706084345; cv=none; b=fwsBTjYZwRhCqjv6RkhGBSmZ6axpi7aq0Rjswdb42u98Yz8f4ef1KPAAxkY/h7Jbv5QDugV8vHzBtNFaWX9siHTtvS/KlS8TmZWCsvWiWFMqsz3WQYw2vIlcNai9118nWyxDmN4KV0WYz86IfpRV57uRt2wgk/c4mJUyK+flnJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706084343; c=relaxed/simple;
-	bh=rA6dn+6bYLuo3/wdbkYCg5ckmOYSKUVrOiqp356DWWA=;
+	s=arc-20240116; t=1706084345; c=relaxed/simple;
+	bh=IBT3sitrciWcKYJTKPfcybfu0PfdfAt/JYV3/2U2qUY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GovSj6jljCL2X91oZ9HVKszRHKc7wUl4j5jnCIMXpQAz2qsQVCcbH3KJIyyVlFnS5D74LH5TD8f+dGG/kLfzNvXkVgmHOOH5eUeJ7W4FliDLs5HA8YBgVbFLOzlokxMumRHfztHm4ojcNRYP04UNryuh8G5DQ6XkA21/Yz7dtWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=stcKFqpn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEB45C433A6;
-	Wed, 24 Jan 2024 08:19:02 +0000 (UTC)
+	 MIME-Version; b=io9oKJQcTk2FlS0FMc2NbQyyjhkEJMJjBzBJdc/mFeOyBqE5FDJhgoJ0zXGO+mV5FjPon4HiwJmjhtm1ow/bU1/gYRBfuL41R6UzA72FMrV8oTpDhwV3aB1HazALnbE8rnSBVtz2UIGeqeytDKaYi4HnFctgqZblyjcKqqTqWG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pcUu1Lw3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7446AC433C7;
+	Wed, 24 Jan 2024 08:19:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706084342;
-	bh=rA6dn+6bYLuo3/wdbkYCg5ckmOYSKUVrOiqp356DWWA=;
+	s=k20201202; t=1706084344;
+	bh=IBT3sitrciWcKYJTKPfcybfu0PfdfAt/JYV3/2U2qUY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=stcKFqpn74wDokA0mAqFgvMl/9pBZNRMcssTZXe1qdyV92dGOvhzI5CxYxlk3rJcS
-	 1z40EmPNRijWZXESg8WiX2JauZB4XcUitJK78CM1wQE9xFQjTiZa9r/6XYgn/2WsAI
-	 cDw9JGRhOZ+jbXRVbvwNjYYNuBRR8Zufv04ErmCi9lu+anJ3vdfTWEv6VNeuiYg+6M
-	 ZbZ3Pg1/9MOD2axMDiZd6cW/upJ3GX8xPWBWSoSD4Ye97TSG8H5bMTNw5V7zdq5K8o
-	 oVtw2RyvAoAO+9uo4Ikz7p4XEGx+Rg1V6H5NchhhUOy3eS4U18RnKFdIZjc4fLAh8G
-	 hvUooYaJwB7qg==
+	b=pcUu1Lw3MNrRra7NUTZuDvm0yjTWeW/XURUReGRTSsJ/EXVEaL3YexIw6TBWoYzFv
+	 HNkv3wGQg1tdG4gJM99rGZrPNGR2G2VcIsmBow3P86jJdGiGedN6T42mgbWfPsHkKx
+	 GLUMS+5g0O/2xXsSaeNmRe5vGM9gK2GZxWeYdH9PTespA9tnG1XkSisYsyFK91WaPu
+	 8AynFyhBT0LVe+yl0SQapSvyjT8DbzxeeRjO6yg/WqVdOKgKIMgSsTlSc7Ud5vGHVP
+	 Dp0Tj70Td3utrT76wgNgSdNehvKbRYjubKnCNs/yC1wxOGqUtOvepuj80RUkHSSju0
+	 S/Akr1tuUvFMg==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -49,9 +49,9 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>
-Subject: [net 01/14] net/mlx5e: Use the correct lag ports number when creating TISes
-Date: Wed, 24 Jan 2024 00:18:42 -0800
-Message-ID: <20240124081855.115410-2-saeed@kernel.org>
+Subject: [net 02/14] net/mlx5: Fix query of sd_group field
+Date: Wed, 24 Jan 2024 00:18:43 -0800
+Message-ID: <20240124081855.115410-3-saeed@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240124081855.115410-1-saeed@kernel.org>
 References: <20240124081855.115410-1-saeed@kernel.org>
@@ -63,144 +63,94 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Saeed Mahameed <saeedm@nvidia.com>
+From: Tariq Toukan <tariqt@nvidia.com>
 
-The cited commit moved the code of mlx5e_create_tises() and changed the
-loop to create TISes over MLX5_MAX_PORTS constant value, instead of
-getting the correct lag ports supported by the device, which can cause
-FW errors on devices with less than MLX5_MAX_PORTS ports.
+The sd_group field moved in the HW spec from the MPIR register
+to the vport context.
+Align the query accordingly.
 
-Change that back to mlx5e_get_num_lag_ports(mdev).
-
-Also IPoIB interfaces create there own TISes, they don't use the eth
-TISes, pass a flag to indicate that.
-
-This fixes the following errors that might appear in kernel log:
-mlx5_cmd_out_err:808:(pid 650): CREATE_TIS(0x912) op_mod(0x0) failed, status bad parameter(0x3), syndrome (0x595b5d), err(-22)
-mlx5e_create_mdev_resources:174:(pid 650): alloc tises failed, -22
-
-Fixes: b25bd37c859f ("net/mlx5: Move TISes from priv to mdev HW resources")
+Fixes: f5e956329960 ("net/mlx5: Expose Management PCIe Index Register (MPIR)")
+Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/en.h  |  2 +-
- .../ethernet/mellanox/mlx5/core/en_common.c   | 21 ++++++++++++-------
- .../net/ethernet/mellanox/mlx5/core/en_main.c |  2 +-
- .../ethernet/mellanox/mlx5/core/ipoib/ipoib.c |  2 +-
- include/linux/mlx5/driver.h                   |  1 +
- 5 files changed, 17 insertions(+), 11 deletions(-)
+ .../net/ethernet/mellanox/mlx5/core/vport.c   | 21 +++++++++++++++++++
+ include/linux/mlx5/mlx5_ifc.h                 | 10 ++++++---
+ include/linux/mlx5/vport.h                    |  1 +
+ 3 files changed, 29 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-index 0bfe1ca8a364..55c6ace0acd5 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-@@ -1124,7 +1124,7 @@ static inline bool mlx5_tx_swp_supported(struct mlx5_core_dev *mdev)
- extern const struct ethtool_ops mlx5e_ethtool_ops;
- 
- int mlx5e_create_mkey(struct mlx5_core_dev *mdev, u32 pdn, u32 *mkey);
--int mlx5e_create_mdev_resources(struct mlx5_core_dev *mdev);
-+int mlx5e_create_mdev_resources(struct mlx5_core_dev *mdev, bool create_tises);
- void mlx5e_destroy_mdev_resources(struct mlx5_core_dev *mdev);
- int mlx5e_refresh_tirs(struct mlx5e_priv *priv, bool enable_uc_lb,
- 		       bool enable_mc_lb);
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_common.c b/drivers/net/ethernet/mellanox/mlx5/core/en_common.c
-index 67f546683e85..6ed3a32b7e22 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_common.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_common.c
-@@ -95,7 +95,7 @@ static void mlx5e_destroy_tises(struct mlx5_core_dev *mdev, u32 tisn[MLX5_MAX_PO
- {
- 	int tc, i;
- 
--	for (i = 0; i < MLX5_MAX_PORTS; i++)
-+	for (i = 0; i < mlx5e_get_num_lag_ports(mdev); i++)
- 		for (tc = 0; tc < MLX5_MAX_NUM_TC; tc++)
- 			mlx5e_destroy_tis(mdev, tisn[i][tc]);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/vport.c b/drivers/net/ethernet/mellanox/mlx5/core/vport.c
+index 21753f327868..1005bb6935b6 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/vport.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/vport.c
+@@ -440,6 +440,27 @@ int mlx5_query_nic_vport_system_image_guid(struct mlx5_core_dev *mdev,
  }
-@@ -110,7 +110,7 @@ static int mlx5e_create_tises(struct mlx5_core_dev *mdev, u32 tisn[MLX5_MAX_PORT
- 	int tc, i;
- 	int err;
+ EXPORT_SYMBOL_GPL(mlx5_query_nic_vport_system_image_guid);
  
--	for (i = 0; i < MLX5_MAX_PORTS; i++) {
-+	for (i = 0; i < mlx5e_get_num_lag_ports(mdev); i++) {
- 		for (tc = 0; tc < MLX5_MAX_NUM_TC; tc++) {
- 			u32 in[MLX5_ST_SZ_DW(create_tis_in)] = {};
- 			void *tisc;
-@@ -140,7 +140,7 @@ static int mlx5e_create_tises(struct mlx5_core_dev *mdev, u32 tisn[MLX5_MAX_PORT
- 	return err;
- }
- 
--int mlx5e_create_mdev_resources(struct mlx5_core_dev *mdev)
-+int mlx5e_create_mdev_resources(struct mlx5_core_dev *mdev, bool create_tises)
- {
- 	struct mlx5e_hw_objs *res = &mdev->mlx5e_res.hw_objs;
- 	int err;
-@@ -169,11 +169,15 @@ int mlx5e_create_mdev_resources(struct mlx5_core_dev *mdev)
- 		goto err_destroy_mkey;
- 	}
- 
--	err = mlx5e_create_tises(mdev, res->tisn);
--	if (err) {
--		mlx5_core_err(mdev, "alloc tises failed, %d\n", err);
--		goto err_destroy_bfreg;
-+	if (create_tises) {
-+		err = mlx5e_create_tises(mdev, res->tisn);
-+		if (err) {
-+			mlx5_core_err(mdev, "alloc tises failed, %d\n", err);
-+			goto err_destroy_bfreg;
-+		}
-+		res->tisn_valid = true;
- 	}
++int mlx5_query_nic_vport_sd_group(struct mlx5_core_dev *mdev, u8 *sd_group)
++{
++	int outlen = MLX5_ST_SZ_BYTES(query_nic_vport_context_out);
++	u32 *out;
++	int err;
 +
- 	INIT_LIST_HEAD(&res->td.tirs_list);
- 	mutex_init(&res->td.list_lock);
++	out = kvzalloc(outlen, GFP_KERNEL);
++	if (!out)
++		return -ENOMEM;
++
++	err = mlx5_query_nic_vport_context(mdev, 0, out);
++	if (err)
++		goto out;
++
++	*sd_group = MLX5_GET(query_nic_vport_context_out, out,
++			     nic_vport_context.sd_group);
++out:
++	kvfree(out);
++	return err;
++}
++
+ int mlx5_query_nic_vport_node_guid(struct mlx5_core_dev *mdev, u64 *node_guid)
+ {
+ 	u32 *out;
+diff --git a/include/linux/mlx5/mlx5_ifc.h b/include/linux/mlx5/mlx5_ifc.h
+index bf5320b28b8b..37230253f9f1 100644
+--- a/include/linux/mlx5/mlx5_ifc.h
++++ b/include/linux/mlx5/mlx5_ifc.h
+@@ -4036,8 +4036,13 @@ struct mlx5_ifc_nic_vport_context_bits {
+ 	u8	   affiliation_criteria[0x4];
+ 	u8	   affiliated_vhca_id[0x10];
  
-@@ -203,7 +207,8 @@ void mlx5e_destroy_mdev_resources(struct mlx5_core_dev *mdev)
+-	u8	   reserved_at_60[0xd0];
++	u8	   reserved_at_60[0xa0];
  
- 	mlx5_crypto_dek_cleanup(mdev->mlx5e_res.dek_priv);
- 	mdev->mlx5e_res.dek_priv = NULL;
--	mlx5e_destroy_tises(mdev, res->tisn);
-+	if (res->tisn_valid)
-+		mlx5e_destroy_tises(mdev, res->tisn);
- 	mlx5_free_bfreg(mdev, &res->bfreg);
- 	mlx5_core_destroy_mkey(mdev, res->mkey);
- 	mlx5_core_dealloc_transport_domain(mdev, res->td.tdn);
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index b5f1c4ca38ba..c8e8f512803e 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -5992,7 +5992,7 @@ static int mlx5e_resume(struct auxiliary_device *adev)
- 	if (netif_device_present(netdev))
- 		return 0;
++	u8	   reserved_at_100[0x1];
++	u8         sd_group[0x3];
++	u8	   reserved_at_104[0x1c];
++
++	u8	   reserved_at_120[0x10];
+ 	u8         mtu[0x10];
  
--	err = mlx5e_create_mdev_resources(mdev);
-+	err = mlx5e_create_mdev_resources(mdev, true);
- 	if (err)
- 		return err;
+ 	u8         system_image_guid[0x40];
+@@ -10122,8 +10127,7 @@ struct mlx5_ifc_mpir_reg_bits {
+ 	u8         reserved_at_20[0x20];
  
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/ipoib/ipoib.c b/drivers/net/ethernet/mellanox/mlx5/core/ipoib/ipoib.c
-index 58845121954c..d77be1b4dd9c 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/ipoib/ipoib.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/ipoib/ipoib.c
-@@ -783,7 +783,7 @@ static int mlx5_rdma_setup_rn(struct ib_device *ibdev, u32 port_num,
- 		}
+ 	u8         local_port[0x8];
+-	u8         reserved_at_28[0x15];
+-	u8         sd_group[0x3];
++	u8         reserved_at_28[0x18];
  
- 		/* This should only be called once per mdev */
--		err = mlx5e_create_mdev_resources(mdev);
-+		err = mlx5e_create_mdev_resources(mdev, false);
- 		if (err)
- 			goto destroy_ht;
- 	}
-diff --git a/include/linux/mlx5/driver.h b/include/linux/mlx5/driver.h
-index 8c55ff351e5f..41f03b352401 100644
---- a/include/linux/mlx5/driver.h
-+++ b/include/linux/mlx5/driver.h
-@@ -681,6 +681,7 @@ struct mlx5e_resources {
- 		struct mlx5_sq_bfreg       bfreg;
- #define MLX5_MAX_NUM_TC 8
- 		u32                        tisn[MLX5_MAX_PORTS][MLX5_MAX_NUM_TC];
-+		bool			   tisn_valid;
- 	} hw_objs;
- 	struct net_device *uplink_netdev;
- 	struct mutex uplink_netdev_lock;
+ 	u8         reserved_at_60[0x20];
+ };
+diff --git a/include/linux/mlx5/vport.h b/include/linux/mlx5/vport.h
+index fbb9bf447889..c36cc6d82926 100644
+--- a/include/linux/mlx5/vport.h
++++ b/include/linux/mlx5/vport.h
+@@ -72,6 +72,7 @@ int mlx5_query_nic_vport_mtu(struct mlx5_core_dev *mdev, u16 *mtu);
+ int mlx5_modify_nic_vport_mtu(struct mlx5_core_dev *mdev, u16 mtu);
+ int mlx5_query_nic_vport_system_image_guid(struct mlx5_core_dev *mdev,
+ 					   u64 *system_image_guid);
++int mlx5_query_nic_vport_sd_group(struct mlx5_core_dev *mdev, u8 *sd_group);
+ int mlx5_query_nic_vport_node_guid(struct mlx5_core_dev *mdev, u64 *node_guid);
+ int mlx5_modify_nic_vport_node_guid(struct mlx5_core_dev *mdev,
+ 				    u16 vport, u64 node_guid);
 -- 
 2.43.0
 
