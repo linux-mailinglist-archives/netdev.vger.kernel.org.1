@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-65406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C29783A61E
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:58:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5166983A628
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:59:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5270FB2D253
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:58:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2B598B25891
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:58:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D234182CA;
-	Wed, 24 Jan 2024 09:58:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A7B6182BE;
+	Wed, 24 Jan 2024 09:58:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nBa7QcOG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gQY9D0q2"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E6C1182A3
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 09:58:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C213182DD
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 09:58:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706090308; cv=none; b=B5eFbfAQgyHvnbOmshtKLHyHFCfsZxJlBdt/C0e7fYIwguMIlzzKsUt5E7xfBIfaU6nl4CqcYlmiYIZjVEmU+YyKmh85TCA4y/e8BgBsZGU3nv9eUDdedHFghWxzxINKO+PoekgGmRvNjIx8LqZAGlqn8lNw1NQ8FXOrvfyM/24=
+	t=1706090310; cv=none; b=c26gVfLqHsZT/F0k+IKHcKB0TdD9vp1NxmOX4s/btNZkGyM0hWAtgiz3QlM0XVBA+RmX0uVESamJX9UzDX7M2OWkD9oyoqu9KH05G+f0gwKUSUEWBMJvNVrI3hhUMGW+PlVWrjUvvEBCBJsFvbq2jk7L+pFXmLtvRvgIl1Yr5bo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706090308; c=relaxed/simple;
-	bh=JxIsGELBHrHirnkCBFZCx0PaXMg88UftjkeVSsKg1D4=;
+	s=arc-20240116; t=1706090310; c=relaxed/simple;
+	bh=jhDLcoazW2E5MVGTqI/p46vi+gWkM54IlvHUKP8IXSo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VJGWg5mJ9HhtCmaIs0wTDmkhl8vEwB4TaPgTgn9l53EVCvS7sOpxKRN0BKDas17n634ZE3d+7edfDGbidVPWZTRyECowCFPV2pGzGTfL8YZpRn1TcvTrT6UZM+68Rh/VHvpyGIkX2EojijzDhYNk1v+X1/fOpiO9Bn5i/N5DQjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nBa7QcOG; arc=none smtp.client-ip=209.85.216.42
+	 MIME-Version; b=aSw1rvmOFXddVFpfXLuJ+MZShMIHUXgVJ1pvWnCkghtmO0OqftFLr3lPsgO2L/RUGHgcUgKDKBG+DgubtuTw1Km6iYushO8XP4PhqkNDC5cGlau0MUBfujPbiFORU4+Du6hcXCT4sEHocKLs+jEes+aRD6PzxiBFRjr3buaSUNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gQY9D0q2; arc=none smtp.client-ip=209.85.216.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-29051f5d5e8so2493213a91.0
-        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 01:58:25 -0800 (PST)
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2903cd158f8so3027682a91.2
+        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 01:58:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706090305; x=1706695105; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706090308; x=1706695108; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OdkdHYV/bTjRaswBV7ZNXiCyuFi2PRnts3VTOVvrO5o=;
-        b=nBa7QcOGNWKMwYTAXF1cdWzBlp+f5DnWlXkOXL/Gtkomo+FJhOqJDOaO2eFePcEsXa
-         Wb1zF37oGC42PrzC5U2smlsumGHejldQ7aCyZx2mkB1FRu9PzE213fex90l/EvHyDELW
-         ViIJX/tX3XMdfP6EiEx3r6usjhrj8JjjhALgYBWQ1pJzqliLvjQ9bvxhJcv8uKciLu5Z
-         gI2ve0xMfA7N9s6bJMn5qHJbinjeQY1iV2GbMlz5ekjWfoszorHFwYS72wa3KmPw+UkH
-         buEjfAunQ9Y9wvbCSEb3hclxitflYeCQIG7Q+tUygNd2HsbmURSJPNIGBgJR9YxNxGdA
-         2XAg==
+        bh=gtz9SDGu51uPwXitkL16jBkXc5UEmIDif1hY3bKERas=;
+        b=gQY9D0q2TMUs2GMeTdD96YbWX7wcVPeYoKaanM6R7tYXb/IH2a2fw50EMmDYNkhNO9
+         /BI7aYJunpdj7dGKT5ZSETPtggctv7ari2fe2ntSSdxfElDIlDzv6FFG/1uNKLldXLW9
+         tlu0f1kL4N81vS++vqoMW6zsj5J1DhQPTcE0vGTd96uGEB79p1NTBFIFerCII5Qn/PDX
+         wkwYQ2xhCwUnu/+B9uZoweJXCEYlDPgpXAGSJHYKjlaEzSHlIN3JETUuwMTpYNJ310Oy
+         JmLuoDkSNPj6VrLrAjq7w8Iuplz4RDCkvljFPp/d9QLu9cRtQf4d+A8Rag5JjfffY8H/
+         Q9mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706090305; x=1706695105;
+        d=1e100.net; s=20230601; t=1706090308; x=1706695108;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=OdkdHYV/bTjRaswBV7ZNXiCyuFi2PRnts3VTOVvrO5o=;
-        b=BkuBuicZ3qnwSBps/unB5WFx2Ez/1EJSbMMutxpiPZri+/QlptWnFiBW6pH+MROfTV
-         COFi3jvJrZySQqImDTvFMGEl/ZG9j8Zwr5pSizaOGiAvNw2pegIuJ7KSadNW0RGNozHQ
-         hU+Q7XBkJkhxQLRX0IzZD2jVpL+nKSOTxLIo4kw9iAiGu4YswdD3uMLVq++Ki7FkJksT
-         2p3o1Y2JCc1tZyXVYR6e0ba03lKttmp6nMFoRgCpYf1DAfiM8mL/aKX8rUMZ/ldWLvnY
-         M8J9dKUcsOjQs93g0kmyersaF90FX/JKkskADnq0TsC7FyPywo6kdCtyN7+uRRMjvDnC
-         Vgxw==
-X-Gm-Message-State: AOJu0YwdzXUDN1up9rVEYgetrxmlDEndiGWSliYPDsgXBGjQv3oskHic
-	VZpqyFjzmlf54UgMBsUimzVYYtDYwY5riNt8dAGFYCeHj+JiDMDZjxDxTid0KXrc1rzV
-X-Google-Smtp-Source: AGHT+IEZSH80eRimV8iBLfCDiR4LERHRv4IHjraVXccyM+4qysGMfyi3Ly79x1p2lX0pORGy/d8W9g==
-X-Received: by 2002:a17:90b:f13:b0:290:1a95:2c5d with SMTP id br19-20020a17090b0f1300b002901a952c5dmr3360692pjb.92.1706090304640;
-        Wed, 24 Jan 2024 01:58:24 -0800 (PST)
+        bh=gtz9SDGu51uPwXitkL16jBkXc5UEmIDif1hY3bKERas=;
+        b=UIFU2hoch9x/KCYPKHuKDKI34QTAKweLyW80AGpidK3QnUhqweeuhs/hS4zbeS07/k
+         2jcN8MUFPcBV1vp5ItThNiQs97oVJToTbqueNB6FFb8r2xl/KpQ5j+w834JDwJLchU2X
+         9YpmGIFmt1ThKDQdGaruec1Canse4wKEd+2PsQyM2m+d2358V2YGvuf5DpOtzC1qKH3M
+         Uo/XcTCdD8FnV39R/G1gOP6/bIh+jg76LfuKEHIG+cMLaVk6ilt8dQ9K7Quk4CeUubjB
+         YJ+s4eKAr3B2gXZF6Jv3dyJYKhh0nDYwgVOC6EdQER8EkUTUwhs/CPCCazHlbce5vPb1
+         /y5w==
+X-Gm-Message-State: AOJu0YwQXoEAKUM/DdggW1Jwr6zlRUsd0kwi9fghge4BXLEfjc9Bt/h7
+	Zh8k1LnPzapyAUlaANydjoJtVs8CO7CC9cIbzvXqtd8QWUimPLCS7BVI9Tn6kKJV9qUP
+X-Google-Smtp-Source: AGHT+IEuJK5ITtISGs1PUxkm1ZfhsSpolLmcQA6R7+9cP28nN0QjcCvJ8M/a4/7ZmugbdUoKXZ5HDg==
+X-Received: by 2002:a17:90a:714c:b0:28f:ee85:5c72 with SMTP id g12-20020a17090a714c00b0028fee855c72mr3725902pjs.23.1706090307671;
+        Wed, 24 Jan 2024 01:58:27 -0800 (PST)
 Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id so12-20020a17090b1f8c00b0028dfdfc9a8esm13055367pjb.37.2024.01.24.01.58.21
+        by smtp.gmail.com with ESMTPSA id so12-20020a17090b1f8c00b0028dfdfc9a8esm13055367pjb.37.2024.01.24.01.58.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jan 2024 01:58:24 -0800 (PST)
+        Wed, 24 Jan 2024 01:58:27 -0800 (PST)
 From: Hangbin Liu <liuhangbin@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Jay Vosburgh <j.vosburgh@gmail.com>,
@@ -75,9 +75,9 @@ Cc: Jay Vosburgh <j.vosburgh@gmail.com>,
 	Eric Dumazet <edumazet@google.com>,
 	Liang Li <liali@redhat.com>,
 	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCH net-next 1/4] selftests/net/forwarding: add slowwait functions
-Date: Wed, 24 Jan 2024 17:58:11 +0800
-Message-ID: <20240124095814.1882509-2-liuhangbin@gmail.com>
+Subject: [PATCH net-next 2/4] selftests: bonding: use tc filter to check if LACP was sent
+Date: Wed, 24 Jan 2024 17:58:12 +0800
+Message-ID: <20240124095814.1882509-3-liuhangbin@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240124095814.1882509-1-liuhangbin@gmail.com>
 References: <20240124095814.1882509-1-liuhangbin@gmail.com>
@@ -89,77 +89,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add slowwait functions to wait for some operations that may need a long time
-to finish. The busywait executes the cmd too fast, which is kind of wasting
-cpu in this scenario. At the same time, if shell debugging is enabled with
-`set -x`. the busywait will output too much logs.
+Use tc filter to check if LACP was sent, which is accurate and save
+more time.
 
 Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
- tools/testing/selftests/net/forwarding/lib.sh | 36 +++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ .../net/bonding/bond-break-lacpdu-tx.sh        | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
-index 8a61464ab6eb..07faedc2071b 100644
---- a/tools/testing/selftests/net/forwarding/lib.sh
-+++ b/tools/testing/selftests/net/forwarding/lib.sh
-@@ -41,6 +41,7 @@ fi
- # Kselftest framework requirement - SKIP code is 4.
- ksft_skip=4
+diff --git a/tools/testing/selftests/drivers/net/bonding/bond-break-lacpdu-tx.sh b/tools/testing/selftests/drivers/net/bonding/bond-break-lacpdu-tx.sh
+index 6358df5752f9..5087291d15ce 100755
+--- a/tools/testing/selftests/drivers/net/bonding/bond-break-lacpdu-tx.sh
++++ b/tools/testing/selftests/drivers/net/bonding/bond-break-lacpdu-tx.sh
+@@ -20,21 +20,22 @@
+ #    +------+ +------+
+ #
+ # We use veths instead of physical interfaces
++REQUIRE_MZ=no
++NUM_NETIFS=0
++lib_dir=$(dirname "$0")
++source "$lib_dir"/net_forwarding_lib.sh
  
-+# timeout in milliseconds
- busywait()
- {
- 	local timeout=$1; shift
-@@ -64,6 +65,32 @@ busywait()
- 	done
+ set -e
+-tmp=$(mktemp -q dump.XXXXXX)
+ cleanup() {
+ 	ip link del fab-br0 >/dev/null 2>&1 || :
+ 	ip link del fbond  >/dev/null 2>&1 || :
+ 	ip link del veth1-bond  >/dev/null 2>&1 || :
+ 	ip link del veth2-bond  >/dev/null 2>&1 || :
+ 	modprobe -r bonding  >/dev/null 2>&1 || :
+-	rm -f -- ${tmp}
  }
  
-+# timeout in seconds
-+slowwait()
-+{
-+	local timeout=$1; shift
-+
-+	local start_time="$(date -u +%s)"
-+	while true
-+	do
-+		local out
-+		out=$("$@")
-+		local ret=$?
-+		if ((!ret)); then
-+			echo -n "$out"
-+			return 0
-+		fi
-+
-+		local current_time="$(date -u +%s)"
-+		if ((current_time - start_time > timeout)); then
-+			echo -n "$out"
-+			return 1
-+		fi
-+
-+		sleep 1
-+	done
-+}
-+
- ##############################################################################
- # Sanity checks
+ trap cleanup 0 1 2
+ cleanup
+-sleep 1
  
-@@ -505,6 +532,15 @@ busywait_for_counter()
- 	busywait "$timeout" until_counter_is ">= $((base + delta))" "$@"
- }
+ # create the bridge
+ ip link add fab-br0 address 52:54:00:3B:7C:A6 mtu 1500 type bridge \
+@@ -67,13 +68,12 @@ ip link set fab-br0 up
+ ip link set fbond up
+ ip addr add dev fab-br0 10.0.0.3
  
-+slowwait_for_counter()
-+{
-+	local timeout=$1; shift
-+	local delta=$1; shift
-+
-+	local base=$("$@")
-+	slowwait "$timeout" until_counter_is ">= $((base + delta))" "$@"
-+}
-+
- setup_wait_dev()
- {
- 	local dev=$1; shift
+-tcpdump -n -i veth1-end -e ether proto 0x8809 >${tmp} 2>&1 &
+-sleep 15
+-pkill tcpdump >/dev/null 2>&1
+ rc=0
+-num=$(grep "packets captured" ${tmp} | awk '{print $1}')
+-if test "$num" -gt 0; then
+-	echo "PASS, captured ${num}"
++tc qdisc add dev veth1-end clsact
++tc filter add dev veth1-end ingress protocol 0x8809 pref 1 handle 101 flower skip_hw action pass
++if slowwait_for_counter 15 2 \
++	tc_rule_handle_stats_get "dev veth1-end ingress" 101 ".packets" "" &> /dev/null; then
++	echo "PASS, captured 2"
+ else
+ 	echo "FAIL"
+ 	rc=1
 -- 
 2.43.0
 
