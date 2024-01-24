@@ -1,227 +1,167 @@
-Return-Path: <netdev+bounces-65544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4908D83AF1B
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 18:04:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D23CD83AF37
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 18:08:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B66251F21AA3
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 17:04:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8880A1F2151D
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 17:08:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E76B27F7E7;
-	Wed, 24 Jan 2024 17:04:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0613481ABA;
+	Wed, 24 Jan 2024 17:06:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ctIx2PVB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eckTCup/"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2085.outbound.protection.outlook.com [40.107.244.85])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 534EB7F7CA;
-	Wed, 24 Jan 2024 17:04:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.85
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706115842; cv=fail; b=BhLsP+aPtEfvBrdoJHZoXuDCuLic40qowVGYChz72tKv5vU7TTmoi9a/uOuyqn6hHL8Sd0PQq9bt6psNzlLdrDkiT4dX/6oA3ASVaOPB+f0Uj0mzy6z3fWGBxHCDdsZ0YAA9lCZ9yOn0QdDS38ecwM2rfYNsQrSDRtm3E08vxdQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706115842; c=relaxed/simple;
-	bh=MXYcopAOAcGd9XoG3HOdytzR9tD8ot43sB4qf8mJ0dw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=j590HxCoJSZKfYsanER1Omsk3WL7M/TMX2KOrPmsaQ3RMzJ2gkEluGT5ll27/EocqQ4BI9bNRyT1wdVRH3x0QXdbIs6iokQnOlshSxMabD/GzZKZX3yaKq0Hj7lgvS7fJDqp6/4LuIiLnBxJk7dvWRCyMTVhb1gx49lKAt02RpU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ctIx2PVB; arc=fail smtp.client-ip=40.107.244.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jhqQERvBPgi94Ywi4lPdz9KMfQLASl3BmiaxI68QQxzVYPpNcB+qUipLyL5HsvKbJEvJrUujm/NssavRgKXhJaO0fG2td7wjUG4PAntK2IPTPip/2wpoiuVAV6Xc6o3sg9P66ZpVu+4J41b2OFmQaUZ+WgEyeVyQ9xAKE/CoN4HHbiH0/FsrenETlPGyeq21P95o865ONgUr31id37AAzcOI3epHZqlgZdJz6fyGtgnueKFcdnLn+FlvVwPymvIAQRd5fa76iGZpojkFqwtgI5iMUIdI4tKSSy7Et4EK8f9GTGmdzxg+VF2t915QIkDi2aZx7EMG0udoyOrUxVu7uA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=88nCtg3EmJgWMImNXLFTCuuQs10ypVAq5YprtByVasY=;
- b=VBCoQHA/l46MIL4Un/fa3dwtolD12/hIlzfgeo04adgyFJcYh7c/XrlLAblK4IpuRqzs5O1gFnpir1vj4Ng5BIhQyS3o2r6flLe0zrnuvglyrAo2WPGHgXdniyDBuBvocJ8Jjol0ClIRSSPDo2I5mRzVAI2ginSdls33KEaCmr9KrtWt7d9oWg2hSdZf36s/EhmK/I6ibeXfSGOu2QsASMfEBs/WCV3vT6CjJme8jDCWJ4so1d3qEj0Cs0ISmA4OsGQxV0aOHEBmiO8BoRbx1XOaNCukOr68f0t4VQjeY62hwKKZ3jaCNenoqGvbr5ZYy6y3q4gH6eHc+eJ1K8TvTw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=88nCtg3EmJgWMImNXLFTCuuQs10ypVAq5YprtByVasY=;
- b=ctIx2PVBmNUxbYgg2LUcKKNS5f9ZQzXOZQkInJbku1WbrRZQGUSHfgkyVgCoYhizzQ1jcbbyRMFUJkRYDTMODyHYnQvQF3wXcbBVDNMDkNVN8dPZBVmCFU7PdUOcF5KN1Ppu5YQPfiHLfbNPMMBJByUNTHopePUgzo5OajEBkJGJj4Nyqx/XiaWUSKIoyvmedPhN60IhIEdNzWF5RA6+ThaGN081tLfgJHksW9moHxPvLb2kbVu4QXW9yOV3hXasAz6Bw1ZW/YytUAZ/bnClxhu/cEE8JlFgq6lG8KixH1gwLQEookrBaNw00c08TE3v7KRFo0bdxsChw9C2Knqf6w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4373.namprd12.prod.outlook.com (2603:10b6:208:261::8)
- by DS7PR12MB5935.namprd12.prod.outlook.com (2603:10b6:8:7e::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.22; Wed, 24 Jan
- 2024 17:02:51 +0000
-Received: from MN2PR12MB4373.namprd12.prod.outlook.com
- ([fe80::ff68:f81b:d451:9765]) by MN2PR12MB4373.namprd12.prod.outlook.com
- ([fe80::ff68:f81b:d451:9765%4]) with mapi id 15.20.7228.023; Wed, 24 Jan 2024
- 17:02:51 +0000
-From: Benjamin Poirier <bpoirier@nvidia.com>
-To: netdev@vger.kernel.org
-Cc: Shuah Khan <shuah@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Jay Vosburgh <j.vosburgh@gmail.com>,
-	Andy Gospodarek <andy@greyhouse.net>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Petr Machata <petrm@nvidia.com>,
-	Danielle Ratson <danieller@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Johannes Nixdorf <jnixdorf-oss@avm.de>,
-	Davide Caratti <dcaratti@redhat.com>,
-	Tobias Waldekranz <tobias@waldekranz.com>,
-	Zahari Doychev <zdoychev@maxlinear.com>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	linux-kselftest@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: [PATCH net-next 5/6] selftests: forwarding: Redefine relative_path variable
-Date: Wed, 24 Jan 2024 12:02:21 -0500
-Message-ID: <20240124170222.261664-6-bpoirier@nvidia.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240124170222.261664-1-bpoirier@nvidia.com>
-References: <20240124170222.261664-1-bpoirier@nvidia.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: YQBPR01CA0146.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:c01:7e::14) To MN2PR12MB4373.namprd12.prod.outlook.com
- (2603:10b6:208:261::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF9047E58B;
+	Wed, 24 Jan 2024 17:06:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706115982; cv=none; b=a0yXHEKMHNOOb1Y4vayspR4mtoF6ZPfGXppMSCT5Z8bYSXGqwEltHc5VqkGt33kFtVa8h8r7M/wy9P9qrdlhompHJEx2N7j424U/JojVzvOczwdDsbejqFJfdVo9hu4RAQcrDjNJGIdRSOJ+UdTId/UzisfuSx16EK+rQph5yvc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706115982; c=relaxed/simple;
+	bh=U7lCqVMGrtZDU6zhviF7Qx9nA+uvNFyijhmN2Y2H6Ho=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YH8XUpbSuPU7QttBH6d9vwFEzXe3nMNCqbgoUXZkVoIOKBfFnhWVd/UTUEX/Ds+JLK33/3JR5oJARszSHtqP9B5VOpVJGCehqs1U6bH36e4+zJfj7colmpNgG4f7oWSjkHedklL3LCvWtuoNKFOT8rVvDJ1hMvDbvqIfjlgpuvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eckTCup/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76181C43390;
+	Wed, 24 Jan 2024 17:06:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706115982;
+	bh=U7lCqVMGrtZDU6zhviF7Qx9nA+uvNFyijhmN2Y2H6Ho=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=eckTCup/fuIPxn2crgJaj4gUoyjChf1g4b1ZkHRaYiimKr+gruOeLtJnF6g/QzcTc
+	 zJ8avrQcv/vifQym+rneVJMZgtSBzjW+0D3D0z1ilUJaC83oie/hHE4A464o3vCZty
+	 ev/Ka3iwZRO9st3SibCZBdUMvCUrZJTIn6OKD+N9RGMNVC9ypAGiLOVWQWrJY58fTD
+	 zwbzkT3pjaCCFxAyI4/+xFNPGJE4Q2UXVd6z5RW979ITYpaly9awX4MkoUGtOarCWU
+	 DOxJi0JJoZvK7HVhXLQMlCc0Vju5WRRY89P1xh0VGLFk5PpqPZgFvZsEQUz/5745Ne
+	 b9ADjyqHLnv0w==
+Date: Wed, 24 Jan 2024 09:06:20 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Danielle Ratson <danieller@nvidia.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "davem@davemloft.net"
+ <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+ "pabeni@redhat.com" <pabeni@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>,
+ "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "sdf@google.com"
+ <sdf@google.com>, "kory.maincent@bootlin.com" <kory.maincent@bootlin.com>,
+ "maxime.chevallier@bootlin.com" <maxime.chevallier@bootlin.com>,
+ "vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>,
+ "przemyslaw.kitszel@intel.com" <przemyslaw.kitszel@intel.com>,
+ "ahmed.zaki@intel.com" <ahmed.zaki@intel.com>, "richardcochran@gmail.com"
+ <richardcochran@gmail.com>, "shayagr@amazon.com" <shayagr@amazon.com>,
+ "paul.greenwalt@intel.com" <paul.greenwalt@intel.com>, "jiri@resnulli.us"
+ <jiri@resnulli.us>, "linux-doc@vger.kernel.org"
+ <linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, mlxsw <mlxsw@nvidia.com>, Petr Machata
+ <petrm@nvidia.com>, Ido Schimmel <idosch@nvidia.com>
+Subject: Re: [RFC PATCH net-next 9/9] ethtool: Add ability to flash
+ transceiver modules' firmware
+Message-ID: <20240124090620.69af41a6@kernel.org>
+In-Reply-To: <DM6PR12MB45169D23F12F3680FF8E07F8D87B2@DM6PR12MB4516.namprd12.prod.outlook.com>
+References: <20240122084530.32451-1-danieller@nvidia.com>
+	<20240122084530.32451-10-danieller@nvidia.com>
+	<20240122210534.5054b202@kernel.org>
+	<DM6PR12MB45168E425B2C1832F6D26453D8742@DM6PR12MB4516.namprd12.prod.outlook.com>
+	<20240123074955.72c27eb0@kernel.org>
+	<DM6PR12MB45169D23F12F3680FF8E07F8D87B2@DM6PR12MB4516.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN2PR12MB4373:EE_|DS7PR12MB5935:EE_
-X-MS-Office365-Filtering-Correlation-Id: e4b87f8f-e5ac-4698-a497-08dc1cfe4cac
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	quQX//S1LnmUQycxcz5EFk3SeRh0PZp8UVSsz57Kh3itquzvSCylpgC3tECTZ6+0O5LmpUOrTtziCP9dwLplPwKunpyLZNm2BBgkeqGVE0iTAzyKFSVQMiyh/WwPnY4PGEZ+J8K3PE86mrybmxDBu3J3sRi9pP26nGqt+LghehJ3Oe3bTKEiOtu2VaKsuB9IVaEheIF78EXjGBcGcdxZDujRDnjmezXOsO9VRzzazoUROx7jmiJciIWP0nr1ZN8sny0k5xbZ1+SOpipUxCJEVlRvPGFBs2tqyxMBvAOGY/lcFy55dp4ICF3CAwwWjATzwFxFk9fU8wqjtPugzugHa+xtFQC7k2UaT5qcN94IG7KYKY7nykV0VxO28UfhLnnRGP/l2WxaUxF9lcTouLOb00rAgnoLBTvQySG8pDPE+4d6SNQW3Sg0Z1zGlPnrZseayQqwkZ1qdbZXjxi4OZUumltQlOR/Xe6OGv+FNJ1lbPSKk3nQ+NqYNnrjFxBFkxtoH1XXx9IcQk3Kl0qllUS8Mrp5zc9wQkMB6OTxsBY9fglctmmqT0nVCffYvekBydt0
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4373.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(396003)(136003)(366004)(376002)(39860400002)(230922051799003)(186009)(64100799003)(451199024)(1800799012)(2906002)(7416002)(5660300002)(6916009)(66946007)(66556008)(66476007)(54906003)(316002)(4326008)(8936002)(8676002)(478600001)(6512007)(6486002)(36756003)(38100700002)(86362001)(1076003)(26005)(6666004)(2616005)(83380400001)(41300700001)(6506007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?ZOFVHxNVaDWZOdtMMDpYgTyYTsgOZAFLqb32Pvn3QB2fKD3+rHl5EC8spxIR?=
- =?us-ascii?Q?lqcNbrd0GTa55fq8vi/ZOvwOuONA5Qup9C23RdgphDS6ShvIiVrwJoICgKtd?=
- =?us-ascii?Q?MQykrxFm1JaZ4EKSyHxpctg/DUzZiNHm/sY9b/B/ASHVovku2NdT+hp1NcRg?=
- =?us-ascii?Q?2btpQL+cNkr+LeZggudgh7U0lpscQ5ZEYF3RSxuJnrFM/4qw0fTfJty4e5Ni?=
- =?us-ascii?Q?bae8KDt9jhenfiqIGnj2/LDPK5TqiY3Gebo8iDJCCWA8dt8LPrn2Wm169nC3?=
- =?us-ascii?Q?mf51Yil5UmB/kOlim514Kd6thyeYj/b6LFs+/nx22BtpQIty29rDTLrpa9aR?=
- =?us-ascii?Q?C0AkFsOZ07t72gXwn4wrWmlP5PHAGiFMJ1vzDdJSqliIaos9VR1tMeXarNEp?=
- =?us-ascii?Q?0IA34g294Wf0bonukc5VnTcLdME1oM8/AaoeaLkp86MQ1h+jis7t8IpejlTy?=
- =?us-ascii?Q?+YFe4TSJE/4CEx1N3QTqjmldemsr9jYCYCQKega3bVm1jUvyV6yHRFdGrphp?=
- =?us-ascii?Q?Y1nfDpBXIQXJQBsuFHOuY6FtTVtQSy01lX4igV3pldGCxg3veZw09N097Xgq?=
- =?us-ascii?Q?4LEytIQB5oCIJRjcR+0Kzy1aldPrn5zYFZSuTVPU0+T8itwndo6yE/8JRDvA?=
- =?us-ascii?Q?gcskhYG5tsZZCha8ia1y8cqZIgBNl4jQpx/2PPkAXxozT4fgKL3ngBv9ogw9?=
- =?us-ascii?Q?cettWyJhQMlDkRjWhj5kcKbc4En4qbwvG90gIfMjEIIY100eby3KJAxgMvyg?=
- =?us-ascii?Q?8uLQMpEDdqA7GChb0bz3dwjK4FFPfTG1ld9zkQmhAsECZ56XTnNy0ld93wLD?=
- =?us-ascii?Q?Mrq1AKe3LQqs1mFEBzWWtrrGotwXiG0Lh5FYWqqY3it7g82EAJVbw6SWlo9M?=
- =?us-ascii?Q?0czJ+xabxRuNiUVgoP/yU8CEfUDBFgfgaSdK6KtrPCnlP64yW5N24POQ0Gq3?=
- =?us-ascii?Q?boe18pSdAmsAIF76zCWGPa02R3dnVQrg9ceAzkqMHNBOT2Jv9DG45n/mWe7u?=
- =?us-ascii?Q?/HtC8BJkfCs+nmtpDIDaI2v/qYive4/gOBi2zQaTVHy14a+AsRPcd5lzspdL?=
- =?us-ascii?Q?mFsx6uC84yTlknrXy6iTAVeyAGMcUxw3yBblcIxZ2rWqeqeNA4JhsISYt+zh?=
- =?us-ascii?Q?Wb7SvHaUrWvIO7F6iffBYUrfBSHFVw5/GMdeWkS/b0PutI74ILIjLScQ+/c4?=
- =?us-ascii?Q?+NjiXvqiNzWMg4OXxqL2rMxDL+n0tskw6KjymxXJAlWuCTZ/0PamPN5vpNSI?=
- =?us-ascii?Q?EaCbH3dajecdasnLFMm2YcO6sPv3o72BscKQY9u4wfE+0ddA7o/d1ihSJ9XE?=
- =?us-ascii?Q?YifRfFod9X7n+O6g3dm5i2ua4tLdn2ZG2aNW55xl9OVZnaa4hgeC2DuS3qlf?=
- =?us-ascii?Q?fKlnSgSN5iCt9GP0fbrQZTl3SB2p0xbCvLO7NWc0/1Au3/OD0MtkyLXdTBOJ?=
- =?us-ascii?Q?zP9rpim6Cbmy5jss4AZn7gX1EIwJMrXNvh5anBls+Fk6Vzcux1VPfaxDWisx?=
- =?us-ascii?Q?u6OC6KRjDRgZKhAj30vNcj7LUX6xpnxCR/DCcIbzQXuXiQPNKPCRmPteyVa0?=
- =?us-ascii?Q?gMjx4bOGbv3GMBm//7y0GQ2xphzPg2+t6hreDbRj?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e4b87f8f-e5ac-4698-a497-08dc1cfe4cac
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4373.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jan 2024 17:02:51.4855
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /u0rrdNjOqBz8miURDK/JKEem/KT1gd9AOhMT0V9KKGLtjKcU/GGuLfOpi0BBhoyKMyjEThzsJc6w8hPnDFT1w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5935
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-The following code which is part of lib.sh:
-relative_path="${BASH_SOURCE%/*}"
-if [[ "$relative_path" == "${BASH_SOURCE}" ]]; then
-       relative_path="."
-fi
+On Wed, 24 Jan 2024 15:46:55 +0000 Danielle Ratson wrote:
+> > > The file_name parameter is not really needed inside the work. Once we
+> > > called request_firmware_direct(), we have all that we need in
+> > > module_fw->fw. Do we still need to avoid that situation? If so, can
+> > > you please suggest how? =20
+> >=20
+> > I'd pass it to module_flash_fw_schedule() as a separate argument, if it=
+ doesn't
+> > have to be saved. =20
+>=20
+> It doesn=E2=80=99t make the module_fw->file_name attribute redundant?
 
-reimplements functionality that is part of `dirname`:
-$ dirname ""
-.
+This is what I mean:
 
-To avoid this duplication, replace "relative_path" by "net_forwarding_dir",
-a new variable defined using dirname.
-
-Furthermore, to avoid the potential confusion about what "relative_path" is
-about (cwd, test script directory or test library directory), define
-"net_forwarding_dir" as the absolute path to net/forwarding/.
-
-Tested-by: Petr Machata <petrm@nvidia.com>
-Signed-off-by: Benjamin Poirier <bpoirier@nvidia.com>
----
- tools/testing/selftests/net/forwarding/lib.sh            | 9 +++------
- tools/testing/selftests/net/forwarding/mirror_gre_lib.sh | 2 +-
- .../selftests/net/forwarding/mirror_gre_topo_lib.sh      | 2 +-
- 3 files changed, 5 insertions(+), 8 deletions(-)
-
-diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
-index 8a61464ab6eb..cf0ba4bfe50d 100644
---- a/tools/testing/selftests/net/forwarding/lib.sh
-+++ b/tools/testing/selftests/net/forwarding/lib.sh
-@@ -29,13 +29,10 @@ STABLE_MAC_ADDRS=${STABLE_MAC_ADDRS:=no}
- TCPDUMP_EXTRA_FLAGS=${TCPDUMP_EXTRA_FLAGS:=}
- TROUTE6=${TROUTE6:=traceroute6}
- 
--relative_path="${BASH_SOURCE%/*}"
--if [[ "$relative_path" == "${BASH_SOURCE}" ]]; then
--	relative_path="."
--fi
-+net_forwarding_dir=$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")
- 
--if [[ -f $relative_path/forwarding.config ]]; then
--	source "$relative_path/forwarding.config"
-+if [[ -f $net_forwarding_dir/forwarding.config ]]; then
-+	source "$net_forwarding_dir/forwarding.config"
- fi
- 
- # Kselftest framework requirement - SKIP code is 4.
-diff --git a/tools/testing/selftests/net/forwarding/mirror_gre_lib.sh b/tools/testing/selftests/net/forwarding/mirror_gre_lib.sh
-index fac486178ef7..0c36546e131e 100644
---- a/tools/testing/selftests/net/forwarding/mirror_gre_lib.sh
-+++ b/tools/testing/selftests/net/forwarding/mirror_gre_lib.sh
-@@ -1,6 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0
- 
--source "$relative_path/mirror_lib.sh"
-+source "$net_forwarding_dir/mirror_lib.sh"
- 
- quick_test_span_gre_dir_ips()
+diff --git a/net/ethtool/module.c b/net/ethtool/module.c
+index 69cedb3ede6d..ea048a7089d9 100644
+--- a/net/ethtool/module.c
++++ b/net/ethtool/module.c
+@@ -229,7 +229,7 @@ static int module_flash_fw_work_init(struct ethtool_mod=
+ule_fw_flash *module_fw,
+ }
+=20
+ static int
+-module_flash_fw_schedule(struct net_device *dev,
++module_flash_fw_schedule(struct net_device *dev, const char *file_name,
+ 			 struct ethtool_module_fw_flash_params *params,
+ 			 struct netlink_ext_ack *extack)
  {
-diff --git a/tools/testing/selftests/net/forwarding/mirror_gre_topo_lib.sh b/tools/testing/selftests/net/forwarding/mirror_gre_topo_lib.sh
-index 39c03e2867f4..6e615fffa4ef 100644
---- a/tools/testing/selftests/net/forwarding/mirror_gre_topo_lib.sh
-+++ b/tools/testing/selftests/net/forwarding/mirror_gre_topo_lib.sh
-@@ -33,7 +33,7 @@
- #   |                                                                         |
- #   +-------------------------------------------------------------------------+
- 
--source "$relative_path/mirror_topo_lib.sh"
-+source "$net_forwarding_dir/mirror_topo_lib.sh"
- 
- mirror_gre_topo_h3_create()
+@@ -254,8 +254,7 @@ module_flash_fw_schedule(struct net_device *dev,
+ 		return -ENOMEM;
+=20
+ 	module_fw->params =3D *params;
+-	err =3D request_firmware(&module_fw->fw, module_fw->params.file_name,
+-			       &dev->dev);
++	err =3D request_firmware(&module_fw->fw, file_name, &dev->dev);
+ 	if (err) {
+ 		NL_SET_ERR_MSG(extack,
+ 			       "Failed to request module firmware image");
+@@ -288,6 +287,7 @@ static int module_flash_fw(struct net_device *dev, stru=
+ct nlattr **tb,
+ 			   struct netlink_ext_ack *extack)
  {
--- 
-2.43.0
-
+ 	struct ethtool_module_fw_flash_params params =3D {};
++	const char *file_name;
+ 	struct nlattr *attr;
+=20
+ 	if (!tb[ETHTOOL_A_MODULE_FW_FLASH_FILE_NAME]) {
+@@ -297,8 +297,7 @@ static int module_flash_fw(struct net_device *dev, stru=
+ct nlattr **tb,
+ 		return -EINVAL;
+ 	}
+=20
+-	params.file_name =3D
+-		nla_data(tb[ETHTOOL_A_MODULE_FW_FLASH_FILE_NAME]);
++	file_name =3D nla_data(tb[ETHTOOL_A_MODULE_FW_FLASH_FILE_NAME]);
+=20
+ 	attr =3D tb[ETHTOOL_A_MODULE_FW_FLASH_PASSWORD];
+ 	if (attr) {
+@@ -306,7 +305,7 @@ static int module_flash_fw(struct net_device *dev, stru=
+ct nlattr **tb,
+ 		params.password_valid =3D true;
+ 	}
+=20
+-	return module_flash_fw_schedule(dev, &params, extack);
++	return module_flash_fw_schedule(dev, file_name, &params, extack);
+ }
+=20
+ int ethnl_act_module_fw_flash(struct sk_buff *skb, struct genl_info *info)
+diff --git a/net/ethtool/module_fw.h b/net/ethtool/module_fw.h
+index 969de116f995..888f082f8daf 100644
+--- a/net/ethtool/module_fw.h
++++ b/net/ethtool/module_fw.h
+@@ -13,12 +13,10 @@ void ethtool_cmis_fw_update(struct work_struct *work);
+=20
+ /**
+  * struct ethtool_module_fw_flash_params - module firmware flashing parame=
+ters
+- * @file_name: Firmware image file name.
+  * @password: Module password. Only valid when @pass_valid is set.
+  * @password_valid: Whether the module password is valid or not.
+  */
+ struct ethtool_module_fw_flash_params {
+-	const char *file_name;
+ 	u32 password;
+ 	u8 password_valid:1;
+ };
 
