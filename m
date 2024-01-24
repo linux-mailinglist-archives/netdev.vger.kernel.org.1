@@ -1,135 +1,142 @@
-Return-Path: <netdev+bounces-65623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99A4783B2AD
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 21:01:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54AE483B2BB
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 21:03:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A24C1F243C1
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 20:01:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09BC0288617
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 20:03:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C77D132C36;
-	Wed, 24 Jan 2024 20:01:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED31B1339A7;
+	Wed, 24 Jan 2024 20:02:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YGVANB58"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TIXWtyFH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CA677E760;
-	Wed, 24 Jan 2024 20:01:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 797C6133985;
+	Wed, 24 Jan 2024 20:02:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706126492; cv=none; b=kDjayXflc7rHz9/aHys1gF8vtoiwHRYvAhsyu6oHHgDL/caLjaG3Ye6f9bz1NStpUAY3EQh0bf5PaxQEAQBYjVQGDtTvLdkRrP7JrNnE7ADwIH9xs3sFixZ/PR0kOrQhkQ4ycl0wRreeaiuWii4uTUcheh1KVgc4/B92w2cCl/k=
+	t=1706126562; cv=none; b=iF8NcSRmX5jYJfEKs2DSY3wb2nvf0BvuIrnHMxBn8K3c1G1gYmsKf6wwbrWx/SGKAxc1mLDlyaIDtOT8FgiUVOj6p4O59UwZdAarm+Za7iscpku3F2yhWWc3c6Ql7zwPzewIvCAKsR9cdyBiJo1NO8gxVHryMUW0IO0Qr42y1yI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706126492; c=relaxed/simple;
-	bh=j9TJ2fyrqUd3Lbm5JJKQ+7YnLOOZl/g/NqfYsxK1+zs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uhM73JcAxbLTRH0h9wWxTqySa4r9bhCQDrWftneJXbOi/yps8Lk8zlq0ff2LFyQNfXfNnayqZEgcKtIuxCqIfNq8tYejqWU4Pag10jyjsFrnBC0A10mBE3QNUgYQPM6qrmZ0DDfPkLfwtNfZCHWwBhcyGz6u4mep/Cz/HnloG30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YGVANB58; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-33926ccbc80so3682489f8f.0;
-        Wed, 24 Jan 2024 12:01:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706126488; x=1706731288; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=g37+Ly2UDcn6488sNIyUeVsdun4kQ29ZAAUf8N4sllU=;
-        b=YGVANB58SohPTDfBft2a4ogetd/pLTD21Fe3M+S89gsdxRslcJCnWHoXr8wQ9ev5dm
-         3HcZGwCfM3BDt5eKQ1otb1L/IJD4cvcw/NoTANpBGgKS8OJEKlZZAE0oTnseKgsQy1Cb
-         X8Gwu+eWFir0BLlPBAnzhbQrGioMv4R8iPPCFu38wU4blahTOVp53RmDboGRGiYF2Nj8
-         bVh5OTY9vCvwOW36+EcS6y5D0bJhNewAzQa43TNKVCazicitSq9wftGkuRTZyTwQ1+9b
-         9eiB0CnpFnHcnTgCpfBKgdcMf6hFFzUqYWXdm/c1sKaiQDnn1InHtA7Wx+oRMcFJQbbB
-         XQHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706126488; x=1706731288;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=g37+Ly2UDcn6488sNIyUeVsdun4kQ29ZAAUf8N4sllU=;
-        b=qG6ETgPOXXm3L9ax47toePXsXu/NnmnUAOHGldWKp8aE7QS/5b58AvE4K1F4GtiKux
-         Ef9nHSqSVwQEHYYZfGly45qY56rUV1STvMpC1a5e2UW2Ln2Ap6TC4A6eR6lF7yePeM7h
-         w98YUWDS8+BB6YmkZOAD+V9iyoA9q22rXdcD+uhHz+dSzh5EPhvzzgpxlIsc829d9SFE
-         bOExg4/TCM5r9wqi2ZR0EqsfB2YdDJE3px2jUWJjQHZfn9Kz8UTokwBwkZEGdWz/cSsB
-         seU4R9EvKzZt5foGVRvR/ygt91UhdEN2NRbfjkM2UOPPlcYe4qn1/45T0AxtHB9y/7oP
-         1+Jg==
-X-Gm-Message-State: AOJu0Yx1OiGko4C9B/cDPDJen3DdnmMAG3RQm3njDs4L2iI9JVSvrcRp
-	b1m5OSxNlz/7/OskBneqDYfXyxKSqGRCrx1gIRw28YPAe7CDc53N
-X-Google-Smtp-Source: AGHT+IGy76I+avoBAl1d6S2z9yQB98qhdI+Z1gNVrKsmCjocKdwJvlnoxA5OGHceHvSV4LLvLggEoA==
-X-Received: by 2002:a05:6000:d8f:b0:337:c658:9952 with SMTP id dv15-20020a0560000d8f00b00337c6589952mr1095763wrb.107.1706126488263;
-        Wed, 24 Jan 2024 12:01:28 -0800 (PST)
-Received: from [10.83.37.178] ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id j32-20020a05600c1c2000b0040e813f1f31sm114734wms.25.2024.01.24.12.01.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Jan 2024 12:01:27 -0800 (PST)
-Message-ID: <0bba9ba5-a284-42ba-8275-bcb1e7da2733@gmail.com>
-Date: Wed, 24 Jan 2024 20:01:26 +0000
+	s=arc-20240116; t=1706126562; c=relaxed/simple;
+	bh=jfXWrPM5ALhDnKgFnFkdz4CMio32hmCt3xWSsf12HKU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=C57I24B3iGHxq4RC1uR7Z4VOqayNXANOWtpZUKYn/jWdtALZMmthT64kMeDRf+r5j8VM4gqMsyADXVZqlj+XzBYowmN0G/oEOP7N4OPbfF32hOAuymA8mvoJUEPk/uZjeb5+EVmjchaXdsDD3LOKC9Sks3n+UKF5BI9SgTDN6uw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TIXWtyFH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D9C4C433F1;
+	Wed, 24 Jan 2024 20:02:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706126562;
+	bh=jfXWrPM5ALhDnKgFnFkdz4CMio32hmCt3xWSsf12HKU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TIXWtyFH5yxUa2sKS25qW3wOvsP8Ed2klnxIK0jQEvMXqnYVHZWCU0zqLjO7+ilCR
+	 JWdnVZmbglYShezSvqIcZWDN/Vh46HywERZIGBwdalc9QELX9rTL+upLtWfATkdWgT
+	 WOJSdLKuC7J9/6NYjh+DNGAalqkPr+gBHAK+jK1uAFFeeu8RJwLSBlu58kMYFUoEl1
+	 Yp7MPDfACwXPwjaV1u4/U968HoLm30T94Tl/mdr2QRYc4fOG1E9E30BuK8sKFpJ4U8
+	 n+9CHV5JSYN6y7zhCegxJ1IM+OVstyfug/6ZJ17Jvqz0l9lgm0LjUJl94LQR9K86D2
+	 ni5ld1wGOGq1w==
+Date: Wed, 24 Jan 2024 20:02:07 +0000
+From: Jonathan Cameron <jic23@kernel.org>
+To: Mark Brown <broonie@kernel.org>, linux-spi@vger.kernel.org
+Cc: Uwe =?UTF-8?B?S2xlaW5lLUvDtm5pZw==?= <u.kleine-koenig@pengutronix.de>,
+ kernel@pengutronix.de, Moritz Fischer <mdf@kernel.org>, Wu Hao
+ <hao.wu@intel.com>, Xu Yilun <yilun.xu@intel.com>, Tom Rix
+ <trix@redhat.com>, linux-fpga@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Alexander Aring <alex.aring@gmail.com>,
+ Stefan Schmidt <stefan@datenfreihafen.org>, Miquel Raynal
+ <miquel.raynal@bootlin.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, linux-wpan@vger.kernel.org,
+ netdev@vger.kernel.org, Lars-Peter Clausen <lars@metafoo.de>, Michael
+ Hennerich <Michael.Hennerich@analog.com>, linux-iio@vger.kernel.org, Dmitry
+ Torokhov <dmitry.torokhov@gmail.com>, linux-input@vger.kernel.org, Ulf
+ Hansson <ulf.hansson@linaro.org>, Rayyan Ansari <rayyan@ansari.sh>, Andy
+ Shevchenko <andriy.shevchenko@linux.intel.com>, Jonathan Cameron
+ <Jonathan.Cameron@huawei.com>, Martin Tuma
+ <martin.tuma@digiteqautomotive.com>, Mauro Carvalho Chehab
+ <mchehab@kernel.org>, linux-media@vger.kernel.org, Sergey Kozlov
+ <serjk@netup.ru>, Arnd Bergmann <arnd@arndb.de>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, Yang Yingliang <yangyingliang@huawei.com>,
+ linux-mmc@vger.kernel.org, Richard Weinberger <richard@nod.at>, Vignesh
+ Raghavendra <vigneshr@ti.com>, Rob Herring <robh@kernel.org>, Heiko
+ Stuebner <heiko@sntech.de>, Michal Simek <michal.simek@amd.com>, Amit Kumar
+ Mahapatra via Alsa-devel <alsa-devel@alsa-project.org>,
+ linux-mtd@lists.infradead.org, Martin Blumenstingl
+ <martin.blumenstingl@googlemail.com>, Geert Uytterhoeven
+ <geert+renesas@glider.be>, Pali =?UTF-8?B?Um9ow6Fy?= <pali@kernel.org>,
+ Simon Horman <horms@kernel.org>, Ronald Wahl <ronald.wahl@raritan.com>,
+ Benson Leung <bleung@chromium.org>, Tzung-Bi Shih <tzungbi@kernel.org>,
+ Guenter Roeck <groeck@chromium.org>, chrome-platform@lists.linux.dev, Max
+ Filippov <jcmvbkbc@gmail.com>, linux-arm-kernel@lists.infradead.org, Bjorn
+ Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>,
+ linux-arm-msm@vger.kernel.org, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ linux-mediatek@lists.infradead.org, Thomas Zimmermann
+ <tzimmermann@suse.de>, Javier Martinez Canillas <javierm@redhat.com>, Amit
+ Kumar Mahapatra <amit.kumar-mahapatra@amd.com>,
+ dri-devel@lists.freedesktop.org, linux-fbdev@vger.kernel.org,
+ linux-staging@lists.linux.dev, Viresh Kumar <vireshk@kernel.org>, Rui
+ Miguel Silva <rmfrfs@gmail.com>, Johan Hovold <johan@kernel.org>, Alex
+ Elder <elder@kernel.org>, greybus-dev@lists.linaro.org, Peter Huewe
+ <peterhuewe@gmx.de>, Jarkko Sakkinen <jarkko@kernel.org>, Jason Gunthorpe
+ <jgg@ziepe.ca>, linux-integrity@vger.kernel.org, Herve Codina
+ <herve.codina@bootlin.com>, Alan Stern <stern@rowland.harvard.edu>, Aaro
+ Koskinen <aaro.koskinen@iki.fi>, Krzysztof Kozlowski
+ <krzysztof.kozlowski@linaro.org>, linux-usb@vger.kernel.org, Helge Deller
+ <deller@gmx.de>, Dario Binacchi <dario.binacchi@amarulasolutions.com>,
+ Kalle Valo <kvalo@kernel.org>, Dmitry Antipov <dmantipov@yandex.ru>,
+ libertas-dev@lists.infradead.org, linux-wireless@vger.kernel.org, Jonathan
+ Corbet <corbet@lwn.net>, James Clark <james.clark@arm.com>, Bjorn Helgaas
+ <bhelgaas@google.com>, linux-doc@vger.kernel.org
+Subject: Re: [PATCH v2 00/33] spi: get rid of some legacy macros
+Message-ID: <20240124200207.7e02b501@jic23-huawei>
+In-Reply-To: <20240122192343.148a0b6d@jic23-huawei>
+References: <cover.1705944943.git.u.kleine-koenig@pengutronix.de>
+	<e62cdf7f-ce58-4f46-a0a0-25ce9fb271b1@sirena.org.uk>
+	<20240122192343.148a0b6d@jic23-huawei>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.40; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] selftests: tcp_ao: add a config file
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- shuah@kernel.org, linux-kselftest@vger.kernel.org
-References: <20240124192550.1865743-1-kuba@kernel.org>
-From: Dmitry Safonov <0x7f454c46@gmail.com>
-In-Reply-To: <20240124192550.1865743-1-kuba@kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On 1/24/24 19:25, Jakub Kicinski wrote:
-> Still a bit unclear whether each directory should have its own
-> config file, but assuming they should lets add one for tcp_ao.
-> 
-> The following tests still fail with this config in place:
->  - rst_ipv4,
->  - rst_ipv6,
->  - bench-lookups_ipv6.
-> other 21 pass.
-> 
-> Fixes: d11301f65977 ("selftests/net: Add TCP-AO ICMPs accept test")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+On Mon, 22 Jan 2024 19:23:43 +0000
+Jonathan Cameron <jic23@kernel.org> wrote:
 
-Reviewed-by: Dmitry Safonov <0x7f454c46@gmail.com>
+> On Mon, 22 Jan 2024 18:18:22 +0000
+> Mark Brown <broonie@kernel.org> wrote:
+>=20
+> > On Mon, Jan 22, 2024 at 07:06:55PM +0100, Uwe Kleine-K=C3=B6nig wrote:
+> >  =20
+> > > Note that Jonathan Cameron has already applied patch 3 to his tree, it
+> > > didn't appear in a public tree though yet. I still included it here to
+> > > make the kernel build bots happy.   =20
+> >=20
+> > It's also going to be needed for buildability of the end of the series.=
+ =20
+>=20
+> Ah.  I thought intent was to split this across all the different trees
+> then do the final patch only after they were all gone?
+>=20
+> I'm fine with it going all in one go if people prefer that.
+>=20
+> My tree will be out in a few mins. Was just waiting to rebase on rc1
+> which I've just done.
+>=20
+> Jonathan
+>=20
 
-Thanks again!
+Dropped from my tree.
 
-> ---
-> CC: shuah@kernel.org
-> CC: 0x7f454c46@gmail.com
-> CC: linux-kselftest@vger.kernel.org
-> ---
->  tools/testing/selftests/net/tcp_ao/config | 10 ++++++++++
->  1 file changed, 10 insertions(+)
->  create mode 100644 tools/testing/selftests/net/tcp_ao/config
-> 
-> diff --git a/tools/testing/selftests/net/tcp_ao/config b/tools/testing/selftests/net/tcp_ao/config
-> new file mode 100644
-> index 000000000000..d3277a9de987
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/tcp_ao/config
-> @@ -0,0 +1,10 @@
-> +CONFIG_CRYPTO_HMAC=y
-> +CONFIG_CRYPTO_RMD160=y
-> +CONFIG_CRYPTO_SHA1=y
-> +CONFIG_IPV6_MULTIPLE_TABLES=y
-> +CONFIG_IPV6=y
-> +CONFIG_NET_L3_MASTER_DEV=y
-> +CONFIG_NET_VRF=y
-> +CONFIG_TCP_AO=y
-> +CONFIG_TCP_MD5SIG=y
-> +CONFIG_VETH=m
-
-Thanks,
-           Dmitry
-
+Acked-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 
