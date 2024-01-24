@@ -1,154 +1,160 @@
-Return-Path: <netdev+bounces-65436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 736BE83A723
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 11:47:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7866483A750
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 11:56:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 32BA6B248C8
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:45:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA830B2B3EA
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:55:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ABF318EAB;
-	Wed, 24 Jan 2024 10:45:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="ca35CYqz";
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="ca35CYqz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE46F199D9;
+	Wed, 24 Jan 2024 10:55:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A30F217C65;
-	Wed, 24 Jan 2024 10:45:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD3F11AAB9
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 10:54:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706093138; cv=none; b=V7hW7NPL9ICeJz5DvEZ03NbqbEReYf0YWAdeHv8fPC6bJjgTgLgtACsh5L7Bytk6/S57cqSk3ry9KhggPgmqgHgs3B7VSTvdlnGtlC7sIJFV9663kYA6o4UQW7KS1lfA8drbZB3fMOZ4HTjg9in7UxKXq0W6KJ+VFgtYsFeJgTI=
+	t=1706093702; cv=none; b=dYuAr/Axk0lMxXCC49hdcMERO5NuXjwloJ0qkXR+0yzB+nzEA4Bd8vq4mJpv5YLAvUtIE7DfsQnevYCyFzfnzjwSLkvJwQ8yUF3SjWi72tWsLEJaEnCXEH+RJRStgCICJsxIuJ8hBNiCqo9shW2mBod13yKkaNZEB9LGTWdgzo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706093138; c=relaxed/simple;
-	bh=vDYamFwd5bvpNdoZJxjLLuH6adTcx66pEKYFC55fGvQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qrWcPnyH0+Gg19+pzHvk93jJFeZIcTwwOlqp8NXpNjmD9u1OoH6XuRcS+nRsaoZMvgoTj7raTWFLqqTUkZajeCaMEPEmfSqUuKP5M8n9LFP49Cs/2XOSutim85Arm5thiF+FFtXNJPJc/yiU4B0Ue9PkMFgrJ+8Yi2hDkddFt8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=ca35CYqz; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=ca35CYqz; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id A56F421FE0;
-	Wed, 24 Jan 2024 10:45:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1706093134; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vDYamFwd5bvpNdoZJxjLLuH6adTcx66pEKYFC55fGvQ=;
-	b=ca35CYqzpEv1O6x7kDOtHFG7O6T3WcBTmabdm4u4ubV0Ls4nZg0s4glAWzIiT08w8wZgZh
-	vXt5WR4QWWZ0H8F1wG+GlawIAfygv94xJsvFqVdTNy6nJzf9CXDdsV6D+TIMKSyqnSTKxm
-	TLlxbMo3/dvYCyD8H10KcjSC2brNu7E=
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1706093134; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vDYamFwd5bvpNdoZJxjLLuH6adTcx66pEKYFC55fGvQ=;
-	b=ca35CYqzpEv1O6x7kDOtHFG7O6T3WcBTmabdm4u4ubV0Ls4nZg0s4glAWzIiT08w8wZgZh
-	vXt5WR4QWWZ0H8F1wG+GlawIAfygv94xJsvFqVdTNy6nJzf9CXDdsV6D+TIMKSyqnSTKxm
-	TLlxbMo3/dvYCyD8H10KcjSC2brNu7E=
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7CCF413786;
-	Wed, 24 Jan 2024 10:45:34 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([10.150.64.162])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id UDguHk7qsGVAEQAAD6G6ig
-	(envelope-from <mkoutny@suse.com>); Wed, 24 Jan 2024 10:45:34 +0000
-Date: Wed, 24 Jan 2024 11:45:33 +0100
-From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	bpf@vger.kernel.org, cake@lists.bufferbloat.net, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>, 
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>, Stephen Hemminger <stephen@networkplumber.org>, 
-	Petr Pavlu <ppavlu@suse.cz>, Michal Kubecek <mkubecek@suse.cz>, 
-	Martin Wilck <mwilck@suse.com>, Pedro Tammela <pctammela@mojatatu.com>
-Subject: Re: [PATCH v4 3/4] net/sched: Load modules via their alias
-Message-ID: <7u63ta73ldxnf5ucoywzu4irl6mer66ur4letgpavghkcnvlke@6ajcojmjk5nv>
-References: <20240123135242.11430-1-mkoutny@suse.com>
- <20240123135242.11430-4-mkoutny@suse.com>
- <20240123174002.GN254773@kernel.org>
+	s=arc-20240116; t=1706093702; c=relaxed/simple;
+	bh=Keo6Vfpz0JdkOxM6RyL0ruR9XBey8eEEyX4NlFSdgD8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OWyqcDhncJfBC2S48CDfJtEXPUx4/YEXMNyyRR4hai3yBdr/+110kOSmSRgu4oExQZNyaPZwV6wI82fIhOB6to0vvYiWXcN2c6M5Y3YAmqrRw7/XZaJb7gYIAc9wd/3UlhnbmyPWhyLNG6KJYhH0QRn0XqzQvc+ebTfzL9t1xIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [112.20.109.155])
+	by gateway (Coremail) with SMTP id _____8DxfeuB7LBlXbUEAA--.18399S3;
+	Wed, 24 Jan 2024 18:54:57 +0800 (CST)
+Received: from [192.168.100.8] (unknown [112.20.109.155])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8DxdMx_7LBl3b0WAA--.52096S3;
+	Wed, 24 Jan 2024 18:54:56 +0800 (CST)
+Message-ID: <83f2dba6-1aec-4088-b1e0-e417b14fedb0@loongson.cn>
+Date: Wed, 24 Jan 2024 18:54:55 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="m7zrpn5dfxhi46pl"
-Content-Disposition: inline
-In-Reply-To: <20240123174002.GN254773@kernel.org>
-Authentication-Results: smtp-out1.suse.de;
-	none
-X-Spamd-Result: default: False [-1.77 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 BAYES_HAM(-1.57)[92.18%];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 TAGGED_RCPT(0.00)[];
-	 MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	 R_RATELIMIT(0.00)[to_ip_from(RL63s8thh5w8zyxj4waeg9pq8e)];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.com:s=susede1];
-	 RCPT_COUNT_TWELVE(0.00)[30];
-	 SIGNED_PGP(-2.00)[];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+,1:+,2:~];
-	 MID_RHS_NOT_FQDN(0.50)[];
-	 FREEMAIL_CC(0.00)[vger.kernel.org,lists.bufferbloat.net,davemloft.net,google.com,kernel.org,redhat.com,mojatatu.com,gmail.com,resnulli.us,iogearbox.net,linux.dev,toke.dk,intel.com,networkplumber.org,suse.cz,suse.com];
-	 RCVD_TLS_ALL(0.00)[];
-	 SUSPICIOUS_RECIPS(1.50)[]
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spam-Score: -1.77
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 8/9] net: stmmac: dwmac-loongson: Disable flow
+ control for GMAC
+Content-Language: en-US
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
+ chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn,
+ netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
+References: <cover.1702990507.git.siyanteng@loongson.cn>
+ <89d95c7121117df7ce6236b330c443e13fdbaa80.1702990507.git.siyanteng@loongson.cn>
+ <ex6xwrpnjbgq3vzvycyninsrdb2spc32t5aoiftnuq5aqkh4yx@fexrffrpec5l>
+From: Yanteng Si <siyanteng@loongson.cn>
+In-Reply-To: <ex6xwrpnjbgq3vzvycyninsrdb2spc32t5aoiftnuq5aqkh4yx@fexrffrpec5l>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8DxdMx_7LBl3b0WAA--.52096S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj93XoWxWw43Gr4DGw1rtr17WFyUurX_yoW5WrWDpw
+	s7Za4v9a4DtF17G3Z5Jw4qvF90ga47KFWUuF4Ikw4SvanFkryqqr1YqFW5AF17urWDWFWa
+	qr1j9r1DCFnxAFbCm3ZEXasCq-sJn29KB7ZKAUJUUUU7529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	AVWUtwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
+	6r4UMxCIbckI1I0E14v26r1Y6r17MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
+	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
+	0xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
+	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AK
+	xVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0b6pPUUUUU==
 
 
---m7zrpn5dfxhi46pl
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+在 2023/12/21 10:35, Serge Semin 写道:
+> On Tue, Dec 19, 2023 at 10:28:18PM +0800, Yanteng Si wrote:
+>> Loongson GMAC does not support Flow Control feature. Set flags to
+>> disable it.
+>>
+>> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+>> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+>> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+>> ---
+>>   drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 2 ++
+>>   drivers/net/ethernet/stmicro/stmmac/stmmac_main.c    | 6 +++---
+>>   include/linux/stmmac.h                               | 1 +
+>>   3 files changed, 6 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>> index 9e4953c7e4e0..77c9bcb66a8e 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>> @@ -160,6 +160,8 @@ static int loongson_gmac_config(struct pci_dev *pdev,
+>>   		break;
+>>   	}
+>>   
+>> +	plat->flags |= FIELD_PREP(STMMAC_FLAG_DISABLE_FLOW_CONTROL, 1);
+> Why FIELD_PREP()-ing?
 
-On Tue, Jan 23, 2024 at 05:40:02PM +0000, Simon Horman <horms@kernel.org> wrote:
-> name doesn't exist in this context, perhaps the line above should be:
+This is very early code and will be changed to:
 
-Well spotted (and shame on me for unchecked last-moment edits).
+plat->flags |= STMMAC_FLAG_DISABLE_FLOW_CONTROL;
 
-I will resend after some more feedback or time.
+>
+>> +
+>>   	return ret;
+>>   }
+>>   
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>> index 9764d2ab7e46..d94f61742772 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>> @@ -1236,9 +1236,9 @@ static int stmmac_phy_setup(struct stmmac_priv *priv)
+>>   		xpcs_get_interfaces(priv->hw->xpcs,
+>>   				    priv->phylink_config.supported_interfaces);
+>>   
+>> -	priv->phylink_config.mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
+>> -						MAC_10FD | MAC_100FD |
+>> -						MAC_1000FD;
+>> +	priv->phylink_config.mac_capabilities = MAC_10FD | MAC_100FD | MAC_1000FD;
+>> +	if (!FIELD_GET(STMMAC_FLAG_DISABLE_FLOW_CONTROL, priv->plat->flags))
+> !(priv->plat->flags & STMMAC_FLAG_DISABLE_FLOW_CONTROL) ?
+
+OK!
+
 
 Thanks,
-Michal
 
---m7zrpn5dfxhi46pl
-Content-Type: application/pgp-signature; name="signature.asc"
+Yanteng
 
------BEGIN PGP SIGNATURE-----
+>
+> -Serge(y)
+>
+>> +		priv->phylink_config.mac_capabilities |= MAC_ASYM_PAUSE | MAC_SYM_PAUSE;
+>>   
+>>   	stmmac_set_half_duplex(priv);
+>>   
+>> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+>> index 067030cdb60f..5ece92e4d8c3 100644
+>> --- a/include/linux/stmmac.h
+>> +++ b/include/linux/stmmac.h
+>> @@ -224,6 +224,7 @@ struct dwmac4_addrs {
+>>   #define STMMAC_FLAG_HAS_LGMAC			BIT(13)
+>>   #define STMMAC_FLAG_DISABLE_HALF_DUPLEX	BIT(14)
+>>   #define STMMAC_FLAG_DISABLE_FORCE_1000	BIT(15)
+>> +#define STMMAC_FLAG_DISABLE_FLOW_CONTROL	BIT(16)
+>>   
+>>   struct plat_stmmacenet_data {
+>>   	int bus_id;
+>> -- 
+>> 2.31.4
+>>
 
-iHUEABYKAB0WIQQpEWyjXuwGT2dDBqAGvrMr/1gcjgUCZbDqSwAKCRAGvrMr/1gc
-jmDPAP4kh0vASWmR2BIYzLZ9ltAfmTpMmdRiYjUTl0+b1KWtYwD+NflnVdzmVBHe
-rylTGmjlroohIQGBpbUFvMZZAXcJ6AQ=
-=ko42
------END PGP SIGNATURE-----
-
---m7zrpn5dfxhi46pl--
 
