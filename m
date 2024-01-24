@@ -1,192 +1,188 @@
-Return-Path: <netdev+bounces-65505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9681D83AD7F
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 16:37:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27FB383ADB0
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 16:47:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC9461C210D3
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 15:37:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBCDE282F79
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 15:47:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E06877C083;
-	Wed, 24 Jan 2024 15:37:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A2E67C0AD;
+	Wed, 24 Jan 2024 15:47:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="HEayDUUq"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="T4WGr75P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2075.outbound.protection.outlook.com [40.107.223.75])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AE3A7A729
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 15:37:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706110668; cv=none; b=NoOLQbINwxSaa93ffp789ZS3nfXmJuTyV5pI8sro8Ery4sIyVil1TGZLr+EGJXKAk1qYVpxCLFZV84dm55o1HnA3Pv8Uld8WmV6yYePRsX4IFvT+sK447t48RjlEVD10TIw8v/xVJT8ynsECFrpjxKTZOd2DPGTlN1IZGsr2t7Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706110668; c=relaxed/simple;
-	bh=1g0+jyA0TIHFlph50vci2p1M5IaEFEwQ/UdWafOlG3c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M7DcgUXq8MkHYkVG7vBOtiVJwgCBO0NJqfR616ZDRIiszmpQWeXPa/YwApB73ykJ8eB4UZeDHG5sn+4SrQO0QwOB8j9b33p+8EHQm+UEyrC4N6fbyjM6NdeBKrr2mrcHl+XjBVhoc+HI2fskUyCGYKfB+N76+46rgLqd48XYCWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=HEayDUUq; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1d7354ba334so34792215ad.1
-        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 07:37:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1706110666; x=1706715466; darn=vger.kernel.org;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ClQQw4qNd3GfJ3FxBTexyIn5PW1ERkPEgwB1ggWKE24=;
-        b=HEayDUUqxhH/MhU6x+dBWAYo1IiKZ+YLiUT7v0iTRu3HxOou73sFyNtbE2Fx+T7klj
-         T2nbLXpg3WDf9c/sQwPEL6HohjnL6XJt0EbSBkfB3M5lCktYdoxuhH9w+izlzmmNp1/C
-         ZuLvk9OA9yz8c8ToBYXKR9UoEF+QHg9fJrzqo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706110666; x=1706715466;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ClQQw4qNd3GfJ3FxBTexyIn5PW1ERkPEgwB1ggWKE24=;
-        b=AUs+NQyh94IcKuwvzMzJORPf1POgJrqs55dlUmnNFSDzJ8FTMsLhO/OVrXszsFcOED
-         t5Wr5TpQNUvbukE7olIu1vw0HjQfsHHiBp8O5HQ8yIR+PmIAKm6jZD39Iqr/ZkRJKgKO
-         IIe7722sYTN/zdNE1xlZFWZfxs1nr52CeVhG9JVLXFP/3ezmVJHcuG888ptBnb8KNZ3a
-         hLVK33kohTtdsEhN3NQX5/REsbomX/iaavMzJE3lEjPxnwZpv5qHEGWiRDHXrI4BJjO+
-         zAfZLt+b1kkp/S/9qKFUnMjWRgVo0Xb0tnZuGZHcFt0jLbjkfy+L8e9mJZptL2SKb4/y
-         IJHQ==
-X-Gm-Message-State: AOJu0YzywkxjkpC6n4A2YNyMkCvFL/TAaazczkzwtpo1P5sVjlgC6RyW
-	k/XHNxV5Ku+xPVaHylfb5G/2abDDY3jbiU9h0KrBR2dh91PtPcpmnAkupMaGz6cADjgbfrVM6NF
-	OcERN9nRmBtbIRiLbXOMH8WKGmH6JBt7NIsdn+V9tHu7yEkoB/znAmIxS+ruzb+1jKNF+TlzL+B
-	wKPYJsZHsz7/cJ22bD5KvoiDJH5wKkhRAM41E=
-X-Google-Smtp-Source: AGHT+IH6Rfx/MwuDQs1uCkM5orR22klptLn6TfM4VyPKF7Unf/mKIGimtKEELdAh98AsVGDpoCDzIw==
-X-Received: by 2002:a17:902:ea10:b0:1d7:461c:fe46 with SMTP id s16-20020a170902ea1000b001d7461cfe46mr1230604plg.31.1706110666275;
-        Wed, 24 Jan 2024 07:37:46 -0800 (PST)
-Received: from fastly.com (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id kk6-20020a170903070600b001d720a7a616sm8703658plb.165.2024.01.24.07.37.45
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 24 Jan 2024 07:37:45 -0800 (PST)
-Date: Wed, 24 Jan 2024 07:37:43 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: chuck.lever@oracle.com, jlayton@kernel.org, linux-api@vger.kernel.org,
-	brauner@kernel.org, edumazet@google.com, davem@davemloft.net,
-	alexander.duyck@gmail.com, sridhar.samudrala@intel.com,
-	kuba@kernel.org
-Subject: Re: [net-next 3/3] eventpoll: Add epoll ioctl for epoll_params
-Message-ID: <20240124153742.GA6808@fastly.com>
-References: <20240124025359.11419-1-jdamato@fastly.com>
- <20240124025359.11419-4-jdamato@fastly.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B36007C08B;
+	Wed, 24 Jan 2024 15:46:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.75
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706111220; cv=fail; b=tlrquDbTrAujZxJIdz2tJyg0fRtQ1mGh/bblXc7G8LnT2rzo1i1th1r3Dt3BBz5bpcjN2LILHwi3E9v1ooYtBY1htNVikjFiLMUVJshEhfQ+EHEwT/iZEpFIKU8nhBNq9SALBavHSFbJ9JC1RvuqkZvHyKSmlbqTNI824dx70fc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706111220; c=relaxed/simple;
+	bh=/kFi5+1Tpfgr16OT8Mc9j2iZcRYUxRDMtHOPtDjlPR8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=IMIzcJGndK9rL8QnvzFXw/x6kO1OJF4bP8qkP2MKHEWSe/YdCcLglXpxu0RkPQWUDjK7pX0z6LcDLm4muFfPju7DM+KNubaJln8ny6ttTutWL+NW9DW0Metj040h5BPv/grMOOJbAJOIHvsfIspv25fTkPsjU049vHyehu57l0A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=T4WGr75P; arc=fail smtp.client-ip=40.107.223.75
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FtzB+yrzBsXeLcQGWoJRRXsh180Fn2tMkeqAf8gQ6NyJwes00jTBBalmZsLhggU2iXG2oqK6q+YIEcvWUyQkPGtV3VIebGtwjGGiaVskegUZA1STXaCpvWEPilkng3aiRTWMw6wDgPKB8r2fCGo4Eu33wTTexwSSXRqQH0lIhmIVhsi8R0WOn4CoWHtO8Sps85WmRFrRfIkQKTFiuzGDzHuYjAC2OfwWGWnGHsIlr9ZmVzwkcSz9XGcIm0AdL3MMspOjZKpcm4M26tI7essXya1g+q4Bd78iQ+939B0oyOj82ZCCWjldF8dmSShTilhLYAIMhns7rVdyZrsEtufqqQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/kFi5+1Tpfgr16OT8Mc9j2iZcRYUxRDMtHOPtDjlPR8=;
+ b=Y20OAH9+26sU35zd3RgyqyH20jtG9UoohU7/p0ELGCAS29PRfdMXwsZWDTjPXJHsv9ptc0mo9FDyvbrbRYBExZ+bQ/6z9ar14PnUT2D62x6ICJ+/EYKYO+DLlEWPfmCPMAyWRywMHMn8WHV1NYyVcYnjqKT8AO7l4YRHQdveZONxSnGZF8cffzqts1psBUwFYnKJoeO2h+9b9kp5tUkwy/cZveCgw8RfxCDk5qzNro3E/5f1nuZv92avrqJvn+MAJYVCAFdHZHRMjWE++6FTCM/E7M141xp9aI4NcScyoOS9Iakw3Z8M99TdCaUJA0DB9DOU7P9ATPgaE+x0OPKX1g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/kFi5+1Tpfgr16OT8Mc9j2iZcRYUxRDMtHOPtDjlPR8=;
+ b=T4WGr75PMJ0KC0ase436af2bN7RGHXlha4mMHaf4a+Rr6VaYfk99km9YQFc2jPNeC1nFt4f5XIQDUbCnkiuNwftL9wCeHoqrZAVH+jhEvZSnEaDRRMmexmBxvWW9+zW5fFvnuyODQMlvR/5MoO0cYwzydvE2lpmKW+ZLpJxKYrHHAlA3G8Od/ZXH6Us58e0T+uqZ2oXMq9CIXQN/vDUflZABwYv7kOdXjJWV9RgmXfaMVjYcM+Y/dblkMMLnjLam+NkdoZV0iUyz3xrX34+p7T6dwOewoqBWXh/5iVhYXymPVuCuBjTBmaZme5raBdPeWvJ0SzZr4v5G+A+TwyL7Vw==
+Received: from DM6PR12MB4516.namprd12.prod.outlook.com (2603:10b6:5:2ac::20)
+ by DS0PR12MB6485.namprd12.prod.outlook.com (2603:10b6:8:c6::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7228.24; Wed, 24 Jan 2024 15:46:56 +0000
+Received: from DM6PR12MB4516.namprd12.prod.outlook.com
+ ([fe80::fa7e:d2b7:5f80:2dd4]) by DM6PR12MB4516.namprd12.prod.outlook.com
+ ([fe80::fa7e:d2b7:5f80:2dd4%5]) with mapi id 15.20.7228.022; Wed, 24 Jan 2024
+ 15:46:56 +0000
+From: Danielle Ratson <danieller@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>,
+	"linux@armlinux.org.uk" <linux@armlinux.org.uk>, "sdf@google.com"
+	<sdf@google.com>, "kory.maincent@bootlin.com" <kory.maincent@bootlin.com>,
+	"maxime.chevallier@bootlin.com" <maxime.chevallier@bootlin.com>,
+	"vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>,
+	"przemyslaw.kitszel@intel.com" <przemyslaw.kitszel@intel.com>,
+	"ahmed.zaki@intel.com" <ahmed.zaki@intel.com>, "richardcochran@gmail.com"
+	<richardcochran@gmail.com>, "shayagr@amazon.com" <shayagr@amazon.com>,
+	"paul.greenwalt@intel.com" <paul.greenwalt@intel.com>, "jiri@resnulli.us"
+	<jiri@resnulli.us>, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, mlxsw
+	<mlxsw@nvidia.com>, Petr Machata <petrm@nvidia.com>, Ido Schimmel
+	<idosch@nvidia.com>
+Subject: RE: [RFC PATCH net-next 9/9] ethtool: Add ability to flash
+ transceiver modules' firmware
+Thread-Topic: [RFC PATCH net-next 9/9] ethtool: Add ability to flash
+ transceiver modules' firmware
+Thread-Index: AQHaTQ+QQZNGrHyNcEuTxxeyuUrKM7Dm2XcAgAB26TCAAD0fgIABkOfw
+Date: Wed, 24 Jan 2024 15:46:55 +0000
+Message-ID:
+ <DM6PR12MB45169D23F12F3680FF8E07F8D87B2@DM6PR12MB4516.namprd12.prod.outlook.com>
+References: <20240122084530.32451-1-danieller@nvidia.com>
+	<20240122084530.32451-10-danieller@nvidia.com>
+	<20240122210534.5054b202@kernel.org>
+	<DM6PR12MB45168E425B2C1832F6D26453D8742@DM6PR12MB4516.namprd12.prod.outlook.com>
+ <20240123074955.72c27eb0@kernel.org>
+In-Reply-To: <20240123074955.72c27eb0@kernel.org>
+Accept-Language: he-IL, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR12MB4516:EE_|DS0PR12MB6485:EE_
+x-ms-office365-filtering-correlation-id: 7fe86283-a694-482b-a918-08dc1cf3b17d
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ CrIfuo2AieS2cy5Ct1PvwF7mNmcJeeH3mlRGHEXnzM8YOzABeRufpbn1FgE5e8BAJP+T2Fje5H5D6cfJQL5lo05qOxt/ofRGsYQRI7tKGbE455CcmTvqj6lkLMsvwtB7Tpv3WIL5wNuVq1hgMoIp1Hp1qtlUugDopdD6nWR9hGSgU1YkMH6AuY1ZXiC7lrjAMyMEQ+nMQLb53JICuk15WbK0jK6ywL1H5332njr2+DO2OanpBJi3VHl42IsYYZjbqia7LM+pfLXf0uqOO6ui2ots2tUMibCh1S6skRcPOP/z6XadIGHYs7MxRVYPPINptLR0rFMgRwl78wI1vawrebTlAjSBqRYAp+hqDyo/sBF9A1aGOx1iiO8Uul95RpLmcThx0Q9BhinHgauaGZ1w4/pAFy5z44W21q5pkoeeWEvOac4xm98YE/zkfDLxWmTzDq3WQ9g9Bn30MyZUDKQOoNKi1v/bYIEtOG1Fk4Of4WgOBQePB9U7hVlruVpn1seyzAxNYlSn84N8ISWLupMloPz70DO0xPaR/bK+moz5O5L/CudjuPSCMpHhNDrFerKX9UqkFD0SXb3XPkiXpfoGG2i7VYzhwvE1HJwYD3yjeVK4Q3bphxLnuoMAPZBBfyZY
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4516.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(39860400002)(366004)(396003)(136003)(376002)(230922051799003)(1800799012)(186009)(451199024)(64100799003)(41300700001)(107886003)(55016003)(26005)(38100700002)(38070700009)(478600001)(6506007)(7696005)(9686003)(83380400001)(71200400001)(122000001)(5660300002)(2906002)(66556008)(66476007)(66446008)(76116006)(66946007)(33656002)(316002)(54906003)(86362001)(64756008)(7416002)(8676002)(8936002)(4326008)(52536014)(6916009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?UWptZmpiVERyUmg5d0NhN0hwRGFtRFpFa3ZwekhTZTR3NVNlaERxbHNTSWo2?=
+ =?utf-8?B?TldmMEFTZFVBd1NZWDlhSGJSWVZ0QmowZU9nVHFzNFNvbUpVSnd2dC92YmZu?=
+ =?utf-8?B?NTZreUs5M2xXc3JtZW5uT2dYbVJmL3N4ZzkzZGNlS1dpK2o1RzNxY2RlWE1O?=
+ =?utf-8?B?M1F5eDc2KzE0Y0dWS3pjWUxrOWRwYVJiZzAvaTkvLzNRSFpWQkdtVWFWRkNw?=
+ =?utf-8?B?SGlDZXFXZjJzZ1J3N3FYS3RXcEZ3V0lWV0oxaHYrWjN0azVhM2NnU1JwM1gy?=
+ =?utf-8?B?WmZXV1ZNUmY2Y0JGTlR0ZVB6aEd3aUk3M2JrWm96NkN4dmlPN0JJaU41c0Fu?=
+ =?utf-8?B?WkhqODJwOHJEV3hETGtYTEhYUlNwNFRlQk1jZlRJaWQvMGx2QS85OU5QMUIw?=
+ =?utf-8?B?REtmc3NWdE9Zdmo4RkdWSndXT2NvdC9hUDRoKzJIQWR4T29xalJDdG1YME9V?=
+ =?utf-8?B?a2ovak9BK3k5N2l2UzBSL1dHeDVyLzdwYmdHNndDaWFLbEI4V0puaDIzZ3c2?=
+ =?utf-8?B?WFpaemplWWhXSXVHeVBmK2JPQURwN24vdTdUZU9CYStVK0E4K2FRdFBVTjRT?=
+ =?utf-8?B?MEdSVmtGTnVwK1RwVFhXQ3p4YmFVWVRoUzNvUUZya0o1WjJhbm5zR2tRUlJJ?=
+ =?utf-8?B?b1FueXIwRUxnaG80VWZmSGVBMHVWckhwYm5sNkQ2dGRxNENuU1h3RmJnWjRi?=
+ =?utf-8?B?VnoxU2JYUzlodkNsUFdoY0FSM1J2cFFaZGFicW5yOVJDREJrVjJMUFZnNytj?=
+ =?utf-8?B?Q1M5VGFiUXFZb0ZvaUZnZUN2cWtPeXZIWlg0S0hKUG1zR0I0NFBzelZNOWUz?=
+ =?utf-8?B?K3RiTDlBV3RjaTN3c2N5VlRKVUVRQndTYjROL3V1YkV6MjVaWHZ2ajQ0Rkpx?=
+ =?utf-8?B?MkRrQTk5L2VtbXJ3ZktINjBSOElabEhrZEVDUnA1MEZ2eXJpUWlvUUwyVzl4?=
+ =?utf-8?B?d0tGaXFHZEw2andsb1I1a0FMc3pRSnR3T2x0ZExtMmcrc0VidXZrdytscTMv?=
+ =?utf-8?B?YTRxekR6c21CZjBTNjlFcVdDU2JXVjVtUGhNNkZJYkdvaTJ6TjRSQ2xHVlp6?=
+ =?utf-8?B?bUhnREVlTlhWWjA5V2RoRmxDdldnUXRNVnlNanRZTzRpUlhqZ2JFK3ljbCt5?=
+ =?utf-8?B?bXhNb3JTY1lTUkZNWWpnQWM3RW0vbU5LQy9EYm5rVWxDQ1MzR1JSckRsVjhJ?=
+ =?utf-8?B?cGpQY0NQcjA2RW9wSGp2VjdWUkN5eFBKK3pNZHZYL2gwdE5qYU9jTmNaOXoy?=
+ =?utf-8?B?d2FwdDhNaHllL3lYZXBvS3krMGZqcDg3ZUpzYnMrR0ZKVzkzQ3kxREZTQlpX?=
+ =?utf-8?B?M3Q0S2NpcnlkWWpmcmxHYUVHNXRBZmZWSXoybGNkaW83KzZiOEpiZ29Nc2J0?=
+ =?utf-8?B?bUF1ck9laTE3cC9iUE9DeFRQUUdCYnluUXR4YTkvSkpHR3J0VmdjNm9qRGJ5?=
+ =?utf-8?B?dS9nNHVLRWFUcTAxMWo2blNSTVB0WlZDTEtLRVBIdEEwd1BLU3pYSW9uMVpW?=
+ =?utf-8?B?bHM3akhLT2xMRUNBc0U4Yk1SYlVDNEQ5a3R5MmczT1VrbzYvYU9TTy83Q0VN?=
+ =?utf-8?B?RnlDUm9RRmY4RVAwc0dFSkg4VThVZWN3K2VHQWNUd2dpM2NXQS9wT1h3UFhB?=
+ =?utf-8?B?TW9wcCt3bUl1dlR3M0YvTU5OS1VhRjJmUFlyRFZIMzJSU004V0VsR0NIa21L?=
+ =?utf-8?B?TCtNb1Q2aC81REV4aGR0cEE4Z1ZvOURpVTBtTUpGTXZGRk80MkJwOEF4b3Vx?=
+ =?utf-8?B?Tm1hdmJpR3NCRDRXWmtCVnU2UVY0akhiRHJjRlF5N1FncFhCeC9FOHZnOHFr?=
+ =?utf-8?B?M29GR2s3cWxXcE5vTnpRdUhyUTZ5SXFHK0lObHVUbUVqRmJCUTk0WU9hT3Y0?=
+ =?utf-8?B?ZGVhL2p1cXVzUXFUaEZkaXNNdnlpVVNOMkRNOGRUTTdrZTNGYUlQYzZ1MXFZ?=
+ =?utf-8?B?R1JzNko5RktFcFpnZFN0RWhyNEkrV0Y4VlRRK3lGNURnSEI3cnEwQ1FJVHhp?=
+ =?utf-8?B?aXNzUlh4N1hSN0xTMVRyRy9zbWYyQ2NjME1DZG1xdTBpTGc1WWxpVEFlMmpP?=
+ =?utf-8?B?elpSSUxCNFZUQ0twMXhIU2xNN1M3eC9UQi8rMlNsZjRYLzlMengwZWUvZTQz?=
+ =?utf-8?Q?ViH/MhoKWH/2Wlw1OseEV1pY2?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240124025359.11419-4-jdamato@fastly.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4516.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7fe86283-a694-482b-a918-08dc1cf3b17d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Jan 2024 15:46:55.9846
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: AFHhfZKqnBqOy+zEj4mTHTqsNE4wC2J33hapdzA88HM5Xo7mb3eGbcKHtH2/ThTu1EQZwOxERlWVYX4Me4MUwQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB6485
 
-On Wed, Jan 24, 2024 at 02:53:59AM +0000, Joe Damato wrote:
-> Add an ioctl for getting and setting epoll_params. User programs can use
-> this ioctl to get and set the busy poll usec time or packet budget
-> params for a specific epoll context.
-> 
-> Signed-off-by: Joe Damato <jdamato@fastly.com>
-> ---
->  .../userspace-api/ioctl/ioctl-number.rst      |  1 +
->  fs/eventpoll.c                                | 41 +++++++++++++++++++
->  include/uapi/linux/eventpoll.h                | 12 ++++++
->  3 files changed, 54 insertions(+)
-> 
-> diff --git a/Documentation/userspace-api/ioctl/ioctl-number.rst b/Documentation/userspace-api/ioctl/ioctl-number.rst
-> index 457e16f06e04..b33918232f78 100644
-> --- a/Documentation/userspace-api/ioctl/ioctl-number.rst
-> +++ b/Documentation/userspace-api/ioctl/ioctl-number.rst
-> @@ -309,6 +309,7 @@ Code  Seq#    Include File                                           Comments
->  0x89  0B-DF  linux/sockios.h
->  0x89  E0-EF  linux/sockios.h                                         SIOCPROTOPRIVATE range
->  0x89  F0-FF  linux/sockios.h                                         SIOCDEVPRIVATE range
-> +0x8A  00-1F  linux/eventpoll.h
->  0x8B  all    linux/wireless.h
->  0x8C  00-3F                                                          WiNRADiO driver
->                                                                       <http://www.winradio.com.au/>
-> diff --git a/fs/eventpoll.c b/fs/eventpoll.c
-> index 40bd97477b91..d973147c015c 100644
-> --- a/fs/eventpoll.c
-> +++ b/fs/eventpoll.c
-> @@ -869,6 +869,45 @@ static void ep_clear_and_put(struct eventpoll *ep)
->  		ep_free(ep);
->  }
->  
-> +static long ep_eventpoll_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
-> +{
-> +	int ret;
-> +	struct eventpoll *ep;
-> +	struct epoll_params epoll_params;
-> +	void __user *uarg = (void __user *) arg;
-> +
-> +	if (!is_file_epoll(file))
-> +		return -EINVAL;
-> +
-> +	ep = file->private_data;
-> +
-> +	switch (cmd) {
-> +#ifdef CONFIG_NET_RX_BUSY_POLL
-> +	case EPIOCSPARAMS:
-> +		if (copy_from_user(&epoll_params, uarg, sizeof(epoll_params)))
-> +			return -EFAULT;
-> +
-> +		ep->busy_poll_usecs = epoll_params.busy_poll_usecs;
-> +		ep->busy_poll_budget = epoll_params.busy_poll_budget;
-> +		return 0;
-> +
-> +	case EPIOCGPARAMS:
-> +		memset(&epoll_params, 0, sizeof(epoll_params));
-> +		epoll_params.busy_poll_usecs = ep->busy_poll_usecs;
-> +		epoll_params.busy_poll_budget = ep->busy_poll_budget;
-> +		if (copy_to_user(uarg, &epoll_params, sizeof(epoll_params)))
-> +			return -EFAULT;
-> +
-> +		return 0;
-> +#endif
-> +	default:
-> +		ret = -EINVAL;
-> +		break;
-> +	}
-> +
-> +	return ret;
-> +}
-> +
->  static int ep_eventpoll_release(struct inode *inode, struct file *file)
->  {
->  	struct eventpoll *ep = file->private_data;
-> @@ -975,6 +1014,8 @@ static const struct file_operations eventpoll_fops = {
->  	.release	= ep_eventpoll_release,
->  	.poll		= ep_eventpoll_poll,
->  	.llseek		= noop_llseek,
-> +	.unlocked_ioctl	= ep_eventpoll_ioctl,
-> +	.compat_ioctl   = compat_ptr_ioctl,
->  };
->  
->  /*
-> diff --git a/include/uapi/linux/eventpoll.h b/include/uapi/linux/eventpoll.h
-> index cfbcc4cc49ac..9211103779c4 100644
-> --- a/include/uapi/linux/eventpoll.h
-> +++ b/include/uapi/linux/eventpoll.h
-> @@ -85,4 +85,16 @@ struct epoll_event {
->  	__u64 data;
->  } EPOLL_PACKED;
->  
-> +struct epoll_params {
-> +	u64 busy_poll_usecs;
-> +	u16 busy_poll_budget;
-> +
-> +	/* for future fields */
-> +	uint8_t data[118];
-
-Err, just noticed that this should be a u8, instead. Sorry I missed this.
-
-I assume there will be other feedback to address, but if not, I've noted
-that I need to fix this in the v2.
+PiA+ID4gR0VOTF9SRVFfQVRUUl9DSEVDSywgYW5kIHlvdSBjYW4gY2hlY2sgaXQgaW4gdGhlIGNh
+bGxlciwgYmVmb3JlDQo+ID4gPiB0YWtpbmcgcnRubF9sb2NrLg0KPiA+ID4NCj4gPg0KPiA+IE9L
+LCBucC4gVGhlIGlkZWEgd2FzIHRvIGhhdmUgbW9kdWxlX2ZsYXNoX2Z3KCkgdGhhdCBjaGVja3Mg
+dGhlIGF0dHJzDQo+ID4gYW5kIGV4dHJhY3QgdGhlbSBpbnRvIHBhcmFtcyBhbmQgZXRobmxfYWN0
+X21vZHVsZV9md19mbGFzaCgpIHNob3VsZCBiZQ0KPiA+IGZyZWUgZnJvbSB0aG9zZSBjaGVja3Mu
+IEJ1dCBpZiBzbywgbWF5YmUgdGhpcyBzZXBhcmF0aW9uIGlzIHJlZHVuZGFudA0KPiA+IGFuZCBz
+aG91bGQgY29tYmluZSB0aGUgdHdvPw0KPiANCj4gTm8gc3Ryb25nIHByZWZlcmVuY2UsIHdoYXRl
+dmVyIGxvb2tzIGJldHRlciA6KSBUbyB1c2UNCj4gR0VOTF9SRVFfQVRUUl9DSEVDSygpIEkgdGhp
+bmsgeW91J2xsIG5lZWQgdG8gcGFzcyBnZW5sX2luZm8gaGVyZS4NCj4gWW91IGNhbiBlaXRoZXIg
+dG8gdGhhdCBvciBtb3ZlIHRoZSB2YWxpZGF0aW9uLg0KPiANCj4gPiA+ID4gKw0KPiA+ID4gdGJb
+RVRIVE9PTF9BX01PRFVMRV9GV19GTEFTSF9GSUxFX05BTUVdLA0KPiA+ID4gPiArCQkJCSAgICAi
+RmlsZSBuYW1lIGF0dHJpYnV0ZSBpcyBtaXNzaW5nIik7DQo+ID4gPiA+ICsJCXJldHVybiAtRUlO
+VkFMOw0KPiA+ID4gPiArCX0NCj4gPiA+ID4gKw0KPiA+ID4gPiArCXBhcmFtcy5maWxlX25hbWUg
+PQ0KPiA+ID4gPiArCQlubGFfZGF0YSh0YltFVEhUT09MX0FfTU9EVUxFX0ZXX0ZMQVNIX0ZJTEVf
+TkFNRV0pOw0KPiA+ID4NCj4gPiA+IEhtLiBJIHRoaW5rIHlvdSBjb3B5IHRoZSBwYXJhbSBzdHJ1
+Y3QgYnkgdmFsdWUgdG8gdGhlIHdvcmsgY29udGFpbmVyLg0KPiA+ID4gbmxhX2RhdGEoKSBpcyBp
+biB0aGUgc2tiIHdoaWNoIGlzIGdvaW5nIHRvIGdldCBmcmVlZCBhZnRlciBfQUNUIHJldHVybnMu
+DQo+ID4gPiBTbyBpZiBhbnlvbmUgdHJpZXMgdG8gYWNjZXNzIHRoZSBuYW1lIGZyb20gdGhlIHdv
+cmsgaXQncyBnb2luZyB0byBVQUY/DQo+ID4NCj4gPiBUaGUgZmlsZV9uYW1lIHBhcmFtZXRlciBp
+cyBub3QgcmVhbGx5IG5lZWRlZCBpbnNpZGUgdGhlIHdvcmsuIE9uY2Ugd2UNCj4gPiBjYWxsZWQg
+cmVxdWVzdF9maXJtd2FyZV9kaXJlY3QoKSwgd2UgaGF2ZSBhbGwgdGhhdCB3ZSBuZWVkIGluDQo+
+ID4gbW9kdWxlX2Z3LT5mdy4gRG8gd2Ugc3RpbGwgbmVlZCB0byBhdm9pZCB0aGF0IHNpdHVhdGlv
+bj8gSWYgc28sIGNhbg0KPiA+IHlvdSBwbGVhc2Ugc3VnZ2VzdCBob3c/DQo+IA0KPiBJJ2QgcGFz
+cyBpdCB0byBtb2R1bGVfZmxhc2hfZndfc2NoZWR1bGUoKSBhcyBhIHNlcGFyYXRlIGFyZ3VtZW50
+LCBpZiBpdCBkb2Vzbid0DQo+IGhhdmUgdG8gYmUgc2F2ZWQuDQoNCkl0IGRvZXNu4oCZdCBtYWtl
+IHRoZSBtb2R1bGVfZnctPmZpbGVfbmFtZSBhdHRyaWJ1dGUgcmVkdW5kYW50Pw0K
 
