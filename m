@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-65652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCF5183B42F
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 22:41:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1577283B430
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 22:42:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E7521F23FDE
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 21:41:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A9959B22A22
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 21:42:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D3B8135402;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C63C1135A5B;
 	Wed, 24 Jan 2024 21:41:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PFShbPuE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uxo4VOma"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09EF61353E4
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 21:41:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A34BF135A58
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 21:41:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706132494; cv=none; b=AucO85V9cE2MboNUIrWUCLDFsy9JNOzeh7Wl0T4uddqqYAGHOWTjiBds/tareYnaJd86iX3ngpp+rB4+hf0rOOJqV16mLxUt2uFU2fUocDDh6xeWfQ1hJmGazsLU/5aojigI1Xr0rWYd6UcM5gm8v5gdT4o/6xCDPFViib2O6qk=
+	t=1706132494; cv=none; b=ZXLMjsOuPjoCJrJXYrH+r4lGLDC0g8qGAp+FgAnWsCSPciqZpE5eXOQSgSpFQLopDrJSz92oe2paghHPIFQ1xa025RapkFs1bqs7ju3dNbg32l97yh73ZJ7t25lI8LEjVIExjceJO9ik0sPPUPDMdgg/FoHAQhaaJiJ7uFM5FFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1706132494; c=relaxed/simple;
-	bh=+Esq6AUWHOcGoUPb1Baq0b2HH8sfJUH2AjM6ICNdR4g=;
+	bh=uGTPCJ4KadVLOvov+WSpwl51de34SMMbJdxNYoZBlyE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Wk4/83RPqY6EcZSeAu2PwvU6rdSFWPPoP/HD46lb80exA16ecq3YFrDCnOhLuMSdQBEm1DL4n4erCISX3aOOxuLM5eg5h3pwDaS425QPhQOS8xQ6H6IVNGnp+VZcTkt2MlHMP2MLtYR2cWkmJZGfnP9EjiM0tH6OnlxUAqOw7xI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PFShbPuE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D652C433C7;
+	 MIME-Version; b=WrQnuH3cmJ5cE2Qwg2GM3pzrHXfIi21RCn+O3OYyeWokQaQOnhuTlIgyFiCFxFPe8XXlnyVK99IS8uN4U51cm6CMm1TQlnzSdohIagkLQQT+H6aC55m7BslVvbtaPr27l1QmWT7XxUGerRbX7xJtXGW0O15sc0exNOKjuSSABR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uxo4VOma; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C20FBC433F1;
 	Wed, 24 Jan 2024 21:41:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706132493;
-	bh=+Esq6AUWHOcGoUPb1Baq0b2HH8sfJUH2AjM6ICNdR4g=;
+	s=k20201202; t=1706132494;
+	bh=uGTPCJ4KadVLOvov+WSpwl51de34SMMbJdxNYoZBlyE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PFShbPuEAXnzqAFHImmIN2DEO3hD5o2iuk586DX0JH0fMXD/k0RBVtjEMRJatp2Zv
-	 33arzOU7snNBBQlruhKMq1g9u5dVu0+nbzXPffm0842JJm1w6DAU8L/c9q4HWLnfyl
-	 fWrq5mJEtPCLn98y9hUyJzmeBqsWM36PnIFpSi2ubEaMzvRv3nnPvmarOOLEuoIjTT
-	 otuy67AJI+/ZG984Vlc+YRqrqGF8VfGCWDUzh3zG6rpfEAQsb0VeSOeyBO6tx+LGRn
-	 zdILxppw8eXRJUrL5yfkxCpLZx0DlDPjVuiGyOn63C2T1ny7Ijk3r1Z4sayqISDnok
-	 LN7qpm2UjDG0g==
+	b=Uxo4VOmaNHrwcjwrHdlIvS6rOzPpjImwIuDI0MP6FqC7mEMewtAJGpxYiLdxN8Lfi
+	 7S6puZS0UeXvy+CVVwrIFlU50OdntcR/rVhO+9NQwMGxMatl1PdFHdJJGWr4ZnXgz4
+	 UsycbnUSKNQ0E4yUiSCyVJ6vlTUv7dlTJStnKsXxwab7JYm7/6PlfcdnwHGxpM8Ue9
+	 8kP3Cc3JxZNy4+Xyb4t/bO7/0dZxOtzn+4nH/i2UlmTLZXv0F/a9EX7XMi/2VbZVgw
+	 2jGmp4nZqtjOj5d5oxWC+SmeSR/ao/9uzhHXLOdDy3sY5VnlsqoZADIt6S9BEbSXTe
+	 wV+eDQNUa7PhQ==
 From: David Ahern <dsahern@kernel.org>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
 	David Ahern <dsahern@kernel.org>
-Subject: [PATCH net-next 1/3] selftest: Update PATH for nettest in fcnal-test
-Date: Wed, 24 Jan 2024 14:41:15 -0700
-Message-Id: <20240124214117.24687-2-dsahern@kernel.org>
+Subject: [PATCH net-next 2/3] selftest: Fix set of ping_group_range in fcnal-test
+Date: Wed, 24 Jan 2024 14:41:16 -0700
+Message-Id: <20240124214117.24687-3-dsahern@kernel.org>
 X-Mailer: git-send-email 2.39.3 (Apple Git-145)
 In-Reply-To: <20240124214117.24687-1-dsahern@kernel.org>
 References: <20240124214117.24687-1-dsahern@kernel.org>
@@ -59,29 +59,84 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Allow fcnal-test.sh to be run from top level directory in the
-kernel repo as well as from tools/testing/selftests/net by
-setting the PATH to find the in-tree nettest.
+ping_group_range sysctl has a compound value which does not go
+through the various function layers in tact. Create a helper
+function to bypass the layers and correctly set the value.
 
 Signed-off-by: David Ahern <dsahern@kernel.org>
 ---
- tools/testing/selftests/net/fcnal-test.sh | 3 +++
- 1 file changed, 3 insertions(+)
+ tools/testing/selftests/net/fcnal-test.sh | 21 +++++++++++++++------
+ 1 file changed, 15 insertions(+), 6 deletions(-)
 
 diff --git a/tools/testing/selftests/net/fcnal-test.sh b/tools/testing/selftests/net/fcnal-test.sh
-index 0d4f252427e2..3d69fac6bcc0 100755
+index 3d69fac6bcc0..f590b0fb740e 100755
 --- a/tools/testing/selftests/net/fcnal-test.sh
 +++ b/tools/testing/selftests/net/fcnal-test.sh
-@@ -38,6 +38,9 @@
- # server / client nomenclature relative to ns-A
+@@ -190,6 +190,15 @@ kill_procs()
+ 	sleep 1
+ }
  
- source lib.sh
++set_ping_group()
++{
++	if [ "$VERBOSE" = "1" ]; then
++		echo "COMMAND: ${NSA_CMD} sysctl -q -w net.ipv4.ping_group_range='0 2147483647'"
++	fi
 +
-+PATH=$PWD:$PWD/tools/testing/selftests/net:$PATH
++	${NSA_CMD} sysctl -q -w net.ipv4.ping_group_range='0 2147483647'
++}
 +
- VERBOSE=0
+ do_run_cmd()
+ {
+ 	local cmd="$*"
+@@ -838,14 +847,14 @@ ipv4_ping()
+ 	set_sysctl net.ipv4.raw_l3mdev_accept=1 2>/dev/null
+ 	ipv4_ping_novrf
+ 	setup
+-	set_sysctl net.ipv4.ping_group_range='0 2147483647' 2>/dev/null
++	set_ping_group
+ 	ipv4_ping_novrf
  
- NSA_DEV=eth1
+ 	log_subsection "With VRF"
+ 	setup "yes"
+ 	ipv4_ping_vrf
+ 	setup "yes"
+-	set_sysctl net.ipv4.ping_group_range='0 2147483647' 2>/dev/null
++	set_ping_group
+ 	ipv4_ping_vrf
+ }
+ 
+@@ -2056,12 +2065,12 @@ ipv4_addr_bind()
+ 
+ 	log_subsection "No VRF"
+ 	setup
+-	set_sysctl net.ipv4.ping_group_range='0 2147483647' 2>/dev/null
++	set_ping_group
+ 	ipv4_addr_bind_novrf
+ 
+ 	log_subsection "With VRF"
+ 	setup "yes"
+-	set_sysctl net.ipv4.ping_group_range='0 2147483647' 2>/dev/null
++	set_ping_group
+ 	ipv4_addr_bind_vrf
+ }
+ 
+@@ -2524,14 +2533,14 @@ ipv6_ping()
+ 	setup
+ 	ipv6_ping_novrf
+ 	setup
+-	set_sysctl net.ipv4.ping_group_range='0 2147483647' 2>/dev/null
++	set_ping_group
+ 	ipv6_ping_novrf
+ 
+ 	log_subsection "With VRF"
+ 	setup "yes"
+ 	ipv6_ping_vrf
+ 	setup "yes"
+-	set_sysctl net.ipv4.ping_group_range='0 2147483647' 2>/dev/null
++	set_ping_group
+ 	ipv6_ping_vrf
+ }
+ 
 -- 
 2.39.3 (Apple Git-145)
 
