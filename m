@@ -1,86 +1,154 @@
-Return-Path: <netdev+bounces-65562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2160E83B06F
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 18:52:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A0D883B083
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 18:54:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B7AF71F21CD7
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 17:52:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 588071C2157A
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 17:54:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E9CC12A170;
-	Wed, 24 Jan 2024 17:49:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6881686125;
+	Wed, 24 Jan 2024 17:52:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D0QT1Gf+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XJFqzfm8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77C9712A173;
-	Wed, 24 Jan 2024 17:49:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E304A7A711;
+	Wed, 24 Jan 2024 17:52:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706118562; cv=none; b=GmSQMS/7vatGCxHgjif+An6C29/pgah1KTmhKwlEmemN+Y0e2BjxKrRuNojJ6LMpGAKC50q1yAvHsvN1+29Z5nAq2bm3HHNPZ8ApqdbpXUpwqKLsMrPm36nj6mpo9xlG9xI9DMgayNx2Ma/XnC3S7HmQXF18xC2dQp3fXrmDSE0=
+	t=1706118748; cv=none; b=p5Rk89/HbXZelz3CnZynThMYKn/UKROLw7mqwuty30W5OhHKTmXfvHUYb3RGlFbGN2RFhf8sC9FRMLRipVPM539y6KvN1y5McyQes1OcljGkrS7gniUZuQpLxh/PhDteSjhAFpEvg+i0qXELuJrIOUekoRwxZUr/iLmpqMuZ7Y4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706118562; c=relaxed/simple;
-	bh=3hqcFW9MFEt8NDYqZH9gctuv5FdtWm0NfQ0rEi8qqGg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TjBZVJjQ+860QDqKkK1DEtdJfD1qGu7j3iJKvV241PGwuVDSrhtnWDGOHHsJLRCEaSZ/hfd8VUZnrGoaiViDRHm5UKqa6s5fEo/W0ZRxJOy0qO1jTg1u0lL8tWfn8PcYt+bTm1hC2SU+hvGmbArdtkPidSvb4O22WhzSm3G7Sas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D0QT1Gf+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A60FFC43390;
-	Wed, 24 Jan 2024 17:49:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706118561;
-	bh=3hqcFW9MFEt8NDYqZH9gctuv5FdtWm0NfQ0rEi8qqGg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=D0QT1Gf+zL5KJBReam4s+r1rtChIyCb2BMK4e5ett/VTa+2Iiyyw/QG6t+PbEbitW
-	 nLYakVNgpvpAUBBfFDbJDOSJNPvUlE7HuHJvdkTZukzg62APRaTARfrL5kdkXem6O7
-	 itEvKbQj2R3CNTfyn92Jz4uKxryI/nGXTTfkn//WIPr2fiWqekasKbGmS5lWz6K3jt
-	 RU0DCQyWU932dsirIOlfkrDJZmsKXsKvU8U7cM3Pl+8AKGhwm2mZ2dCVmW2j5NV3TT
-	 G/rBaZhFpMfTuq164K21QYBWM5CN0nyJNM8dpH2QSfLYw9O5aoCFDvu9+9l8er02/D
-	 CBaiZZ+uCrAIA==
-Date: Wed, 24 Jan 2024 09:49:20 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: David Ahern <dsahern@kernel.org>, Hangbin Liu <liuhangbin@gmail.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "netdev-driver-reviewers@vger.kernel.org"
- <netdev-driver-reviewers@vger.kernel.org>, pabeni@redhat.com
-Subject: Re: [ANN] net-next is OPEN
-Message-ID: <20240124094920.7b63950e@kernel.org>
-In-Reply-To: <65b14c16965d7_228db729490@willemb.c.googlers.com.notmuch>
-References: <20240122091612.3f1a3e3d@kernel.org>
-	<Za98C_rCH8iO_yaK@Laptop-X1>
-	<20240123072010.7be8fb83@kernel.org>
-	<d0e28c67-51ad-4da1-a6df-7ebdbd45cd2b@kernel.org>
-	<65b133e83f53e_225ba129414@willemb.c.googlers.com.notmuch>
-	<20240124082255.7c8f7c55@kernel.org>
-	<65b14c16965d7_228db729490@willemb.c.googlers.com.notmuch>
+	s=arc-20240116; t=1706118748; c=relaxed/simple;
+	bh=iaM0f7Mu+VndqV8QTAWSCtIFAiLhckKr1QXjBV9VlbM=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Ixrr5ywMzFBq1J4pi3d1VROPJjfzhsIF7Ch3bUqwR7P00ne5D/rx88c5Af5ummIHBKTn0z14Qc2cJlQZ1gZgw1fxvkoOa8TV4g55bkPMnELOt/VrXmkSOnMFi5fObpxKGXiZZiCcI1MJJDjJFs2mh393SWweCI+sBjKQfCkSfSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XJFqzfm8; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1d71cb97937so36287565ad.3;
+        Wed, 24 Jan 2024 09:52:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706118746; x=1706723546; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0zISETwUy9JllYHs6YyNzxbyZFYMacyxOxCvaHnvxTM=;
+        b=XJFqzfm8GB4R7lurYTYuHm0ymkLI9u98F/3S7QVUYvylBsivYQ63JFYgGgN2OI/30X
+         6TB8qz/P6tioDhRjJyqViZZrXqJ5Ojlu2WpZSc5Vf0ZmU0+OtTSjWEuX4fiwZXjk5OcR
+         yVMMzmPfCvR1IZN2QJf1NbrRIZxKg0qIMWskjmSWtaNJx/s/SmuPzePgqLXqkUMW/jvR
+         qg68hITwPakuwSOkLI+xNiPl5rrjGPXZHa3iJnqY/lVEkoL8U6zUXLJZSu5qRF0wQ+Al
+         lfjLPYdeU7b9hKps4q6vIVuKCEtCeGxwtgGGd7uZr+B7+I0c0kLX3YXtIhZ2BpzvFhHR
+         3Mjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706118746; x=1706723546;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=0zISETwUy9JllYHs6YyNzxbyZFYMacyxOxCvaHnvxTM=;
+        b=i0oivX4/0dwx5aHNvyy3Ir7uG4/5IoFkvZ/uykk2Vvj1A6hlrCod1hBF3ZvO4qRuN8
+         S00Hj0I+Yy6l+rDHSPfKurHLqXp4499zNgvQ0KHsBhAwkFSqAzTFOGDCRWeE1A29GGRh
+         l1gXJKt8PKfhWroyBOw3MZTxwNiFAGTrE4BWlQjJz3dM1n99ZUrzCrf9E3er9wSrJFgj
+         +YZgTi2+H/kJFmSkVsPDMEX1ZYnb4gNgWDitTngBm7B5dlI6VnSsCMUEvJgSMaYZVQU6
+         UryEm9QmiZmSvRXRzdYBSQbe1SKu4A4iU7HgmYynAjgEBpBSbpfqIGKD5klHwxO0KuHD
+         18Mw==
+X-Gm-Message-State: AOJu0YxXKqaFxvG2Q7DAEx0TpeFeTUAugW9n6zWJpQW/+EPsd1I62w/6
+	v8xN/OjPRllGHcq82ok8wghw0DXiEtKmjQreqFUevdH45b21HWvK+FNP4jZa
+X-Google-Smtp-Source: AGHT+IHTIgVg35qiFiou5PoLiHwCviuNaDj3LTJKrkkENoAKyEmS1B3tpLwagEe3EtmWwYwQZ4Rf5Q==
+X-Received: by 2002:a17:902:e74d:b0:1d3:4860:591b with SMTP id p13-20020a170902e74d00b001d34860591bmr1261930plf.0.1706118746069;
+        Wed, 24 Jan 2024 09:52:26 -0800 (PST)
+Received: from localhost ([98.97.116.78])
+        by smtp.gmail.com with ESMTPSA id u18-20020a170903125200b001d4ac8ac969sm10679985plh.275.2024.01.24.09.52.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jan 2024 09:52:25 -0800 (PST)
+Date: Wed, 24 Jan 2024 09:52:24 -0800
+From: John Fastabend <john.fastabend@gmail.com>
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>, 
+ John Fastabend <john.fastabend@gmail.com>
+Cc: netdev@vger.kernel.org, 
+ jakub@cloudflare.com, 
+ bpf@vger.kernel.org
+Message-ID: <65b14e583fb27_1033b520820@john.notmuch>
+In-Reply-To: <CAEf4BzbkGuDH91X2KaA=448HoZD0m09qQrBDvBxFwdTLTF7JFw@mail.gmail.com>
+References: <20240123223612.1015788-1-john.fastabend@gmail.com>
+ <65b0776bd8ee2_fbe42208b8@john.notmuch>
+ <CAEf4BzbkGuDH91X2KaA=448HoZD0m09qQrBDvBxFwdTLTF7JFw@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 0/4] transition sockmap testing to test_progs
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 24 Jan 2024 12:42:46 -0500 Willem de Bruijn wrote:
-> > Here's a more handy link filtered down to failures (clicking on 
-> > the test counts links here):
-> > 
-> > https://netdev.bots.linux.dev/contest.html?branch=net-next-2024-01-24--15-00&executor=vmksft-net-mp&pass=0
-> > 
-> > I have been attributing the udpg[rs]o and timestamp tests to you,
-> > but I haven't actually checked.. are they not yours? :)  
-> 
-> I just looked at the result file and assumed 0 meant fine. Oops.
+Andrii Nakryiko wrote:
+> On Tue, Jan 23, 2024 at 6:35=E2=80=AFPM John Fastabend <john.fastabend@=
+gmail.com> wrote:
+> >
+> > John Fastabend wrote:
+> > > Its much easier to write and read tests than it was when sockmap wa=
+s
+> > > originally created. At that time we created a test_sockmap prog tha=
+t
+> > > did sockmap tests. But, its showing its age now. For example it rea=
+ds
+> > > user vars out of maps, is hard to run targetted tests, has a differ=
+ent
+> > > format from the familiar test_progs and so on.
+> > >
+> > > I recently thought there was an issue with pop helpers so I created=
 
-Sorry about the confusion there, make run_tests apparently always
-returns 0 and the result file holds the exit code :( It could be
-improved by I figured, as long as the JSON output is correct, investing
-the time in the web UI is probably a better choice than massaging 
-the output files.
+> > > some tests to try and track it down. It turns out it was a bug in t=
+he
+> > > BPF program we had not the kernel. But, I think it makes sense to
+> > > start deprecating test_sockmap and converting these to the nicer
+> > > test_progs.
+> > >
+> > > So this is a first round of test_prog tests for sockmap cork and
+> > > pop helpers. I'll add push and pull tests shortly. I think its fine=
+,
+> > > maybe preferred to review smaller patchsets, to send these
+> > > incrementally as I get them created.
+> > >
+> > > Thanks!
+> > >
+> > > John Fastabend (4):
+> > >   bpf: Add modern test for sk_msg prog pop msg header
+> > >   bpf: sockmap, add a sendmsg test so we can check that path
+> > >   bpf: sockmap, add a cork to force buffering of the scatterlist
+> > >   bpf: sockmap test cork and pop combined
+> > >
+> > >  .../bpf/prog_tests/sockmap_helpers.h          |  18 +
+> > >  .../bpf/prog_tests/sockmap_msg_helpers.c      | 351 ++++++++++++++=
+++++
+> > >  .../bpf/progs/test_sockmap_msg_helpers.c      |  67 ++++
+> > >  3 files changed, 436 insertions(+)
+> > >  create mode 100644 tools/testing/selftests/bpf/prog_tests/sockmap_=
+msg_helpers.c
+> > >  create mode 100644 tools/testing/selftests/bpf/progs/test_sockmap_=
+msg_helpers.c
+> > >
+> > > --
+> > > 2.33.0
+> > >
+> >
+> > Will need a v2 to fixup a couple things here. Thanks.
+> >
+> =
+
+> Can you please also try compiling selftests with `make RELEASE=3D1` and=
+
+> making sure the compiler doesn't complain about uninitialized
+> variables and such. Unfortunately we don't do this automatically in CI
+> yet.
+
+Yep thats what I realized I missed after submitting. Thanks.=
 
