@@ -1,128 +1,188 @@
-Return-Path: <netdev+bounces-65425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2961B83A6A7
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 11:22:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A32CD83A6BA
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 11:25:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8DD428B7E6
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:22:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52AA5281DF9
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:25:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF68718E25;
-	Wed, 24 Jan 2024 10:22:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DF2E18E0C;
+	Wed, 24 Jan 2024 10:25:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from exchange.fintech.ru (exchange.fintech.ru [195.54.195.159])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 522F618E2C;
-	Wed, 24 Jan 2024 10:22:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.54.195.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCE4C18EB8
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 10:25:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706091729; cv=none; b=j9+R6CGWmBd9mfl2bXZIMFsOjx0LXiwwpolK9MzytWIJ3C2IpP5z3FUNDDuoM2UbwYUJ3Up6M25sZtjX7N/xixvwjaSnZkq2VKDH+3EKBQDdEjEYToWQ04fhWCmMHpivB1Sli0MaQYsGeINujIBXFE4etutlhDxFEq49lpaNDZk=
+	t=1706091923; cv=none; b=ryTZsy4m1uH1ErtV/gR7AJCiDbnFThXGWBy5k/dCTR2O4VLvox0nwjIGPOfSlnUpk6biOUNi4qsgGh8eyDa64fqZjPpwoQRyP7b3L0sY6nG7ig2RT7YY4UBmgoD4ovqOLhxqXudshqsEoXjDjwuqf5353+ulDpMlG6ow32y0VHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706091729; c=relaxed/simple;
-	bh=ZlArPEEwD7BQTNN98/r9t9pw2bQYWEwA4G5549Z+BZ0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eE699mAL3lLXR0e5ZzahL60dotdrcX56KMMLi9rnx+JXqMGBe2s6m4Jc2OvbtIhqQ4Xlx2kqVqB/WineysyYB5x2IZ3mL2oxR3mSZQm/Glai2QA2TZrkFgxmjiLs+SXSs/AjyYJDkX2e9QyQ30/OyW4pkP5UKwcO0iaypadhH6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru; spf=pass smtp.mailfrom=fintech.ru; arc=none smtp.client-ip=195.54.195.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fintech.ru
-Received: from Ex16-01.fintech.ru (10.0.10.18) by exchange.fintech.ru
- (195.54.195.169) with Microsoft SMTP Server (TLS) id 14.3.498.0; Wed, 24 Jan
- 2024 13:21:56 +0300
-Received: from localhost (10.0.253.138) by Ex16-01.fintech.ru (10.0.10.18)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Wed, 24 Jan
- 2024 13:21:56 +0300
-From: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
-To: "David S. Miller" <davem@davemloft.net>
-CC: Nikita Zhandarovich <n.zhandarovich@fintech.ru>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Ravi Gunasekaran <r-gunasekaran@ti.com>, Simon Horman
-	<horms@kernel.org>, Wojciech Drewek <wojciech.drewek@intel.com>, "Murali
- Karicheri" <m-karicheri2@ti.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>,
-	<syzbot+3ae0a3f42c84074b7c8e@syzkaller.appspotmail.com>
-Subject: [PATCH net] net: hsr: remove WARN_ONCE() in send_hsr_supervision_frame()
-Date: Wed, 24 Jan 2024 02:21:47 -0800
-Message-ID: <20240124102147.14081-1-n.zhandarovich@fintech.ru>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1706091923; c=relaxed/simple;
+	bh=0pmZJopIYJIZWCti0t0yPxieNup7wKCc8Y9PuItxsBY=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=rc1VDPgZ3YceuEOZThyuliIukTOxOB53015gsvp/SjoDd+TdMKXuuCFsCIF6ebVXna3Up/A/UgDbCQFBRow/vpBt5Mh8XKy1hdukHmpaPfGyipmONap5k7POc+a/rdfkwXt0ZbMe+zTDIrQDWCkZHmhGr+pa5/tHjDSHcZ5BbN0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-362806f174dso20280855ab.3
+        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 02:25:21 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706091921; x=1706696721;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3IjjgKM/MY8SfH9QZWtT7IRaOHinXyOsh8fl2oO6AC8=;
+        b=AGUOnuGPdyNPWpEwVbFgu5tghmrBuq8N1TUA+ocEQuxsUbrMEnqFY3hldgkEDOOT/R
+         B8s6KfhS3qHQ/g8ihz5SSBpSSJ2ftvG32zRAeBjkPfguFQ0XlEhaDZjFnzM7CJM998zL
+         ducnJy56jjc9aYoT1pm8G65YaobgTqWvrlJYYePhM79gtsnj+cATjYevmn3rwa16FiI0
+         zIyUZk7H8OKKGFGIVXq94W60xQkE0hh9jzawXfTRvQ3Je6b4+rxUJnVQt9jHQQA/mQ5a
+         erhUR98oG2Cq8heGa58pFDSJTwQHIsNeT1XYCK7gO0HNEH826HfU8a3kL0JQ7UDG1KW/
+         80MA==
+X-Gm-Message-State: AOJu0Ywu4pz65M2sFwevq+ijqpladknoPKmTDsJn92BTHG8q51BbgLLQ
+	2gtE97LP2LpP2nC0OKSnHwY0+UO824XpjB/jkKdxYSUvWSkiQG7EU0vWKmTusHzCeDqAb6XfKrC
+	LbrSoQCDxHgfwsT1cuHrJAKmC/WvER4FK8t1SB4iaQeS3JHRxSjAaPus=
+X-Google-Smtp-Source: AGHT+IEiRsfCvS+pqK1hXoSrlYusHAB5OuC5FtoV9EDiZxs9gFNOsfeueyYWXnjj8w5b8HRkSgiTIwuxtc7ptha8ITQ0JIZ3sgaf
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: Ex16-02.fintech.ru (10.0.10.19) To Ex16-01.fintech.ru
- (10.0.10.18)
+X-Received: by 2002:a05:6e02:1be1:b0:35f:affb:bd7b with SMTP id
+ y1-20020a056e021be100b0035faffbbd7bmr154213ilv.2.1706091921072; Wed, 24 Jan
+ 2024 02:25:21 -0800 (PST)
+Date: Wed, 24 Jan 2024 02:25:21 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000e8ecae060fae7a47@google.com>
+Subject: [syzbot] [mptcp?] WARNING in subflow_data_ready (2)
+From: syzbot <syzbot+732ab7be796ec0d104ac@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, geliang.tang@linux.dev, 
+	geliang.tang@suse.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	martineau@kernel.org, matttbe@kernel.org, mptcp@lists.linux.dev, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Syzkaller reported [1] hitting a warning after failing to allocate
-resources for skb in hsr_init_skb(). Since a WARN_ONCE() call will
-not help much in this case, it might be prudent to switch to
-netdev_warn_once(). At the very least it will suppress syzkaller
-reports such as [1].
+Hello,
 
-Just in case, use netdev_warn_once() in send_prp_supervision_frame()
-for similar reasons.
+syzbot found the following issue on:
 
-[1]
-HSR: Could not send supervision frame
-WARNING: CPU: 1 PID: 85 at net/hsr/hsr_device.c:294 send_hsr_supervision_frame+0x60a/0x810 net/hsr/hsr_device.c:294
-RIP: 0010:send_hsr_supervision_frame+0x60a/0x810 net/hsr/hsr_device.c:294
-...
+HEAD commit:    6613476e225e Linux 6.8-rc1
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=1200cf0de80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f9804db253bdfc61
+dashboard link: https://syzkaller.appspot.com/bug?extid=732ab7be796ec0d104ac
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=111fe2bfe80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17abc23be80000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/cdad5c52fcde/disk-6613476e.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/14491fee3433/vmlinux-6613476e.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/953a5864daf4/bzImage-6613476e.xz
+
+The issue was bisected to:
+
+commit 14c56686a64c65ba716ff48f1f4b19c85f4cb2a9
+Author: Geliang Tang <geliang.tang@suse.com>
+Date:   Wed Oct 18 18:23:55 2023 +0000
+
+    mptcp: avoid sending RST when closing the initial subflow
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=159a9427e80000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=179a9427e80000
+console output: https://syzkaller.appspot.com/x/log.txt?x=139a9427e80000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+732ab7be796ec0d104ac@syzkaller.appspotmail.com
+Fixes: 14c56686a64c ("mptcp: avoid sending RST when closing the initial subflow")
+
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 5097 at net/mptcp/subflow.c:1412 subflow_data_ready+0x3a0/0x690 net/mptcp/subflow.c:1412
+Modules linked in:
+CPU: 1 PID: 5097 Comm: syz-executor260 Not tainted 6.8.0-rc1-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+RIP: 0010:subflow_data_ready+0x3a0/0x690 net/mptcp/subflow.c:1412
+Code: 89 ee e8 13 ff 14 f7 40 84 ed 75 21 e8 d9 03 15 f7 44 89 fe bf 07 00 00 00 e8 3c ff 14 f7 41 83 ff 07 74 09 e8 c1 03 15 f7 90 <0f> 0b 90 e8 b8 03 15 f7 48 89 df e8 70 b2 ff ff 31 ff 89 c5 89 c6
+RSP: 0018:ffffc90003b2ed38 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: ffff88807f306200 RCX: ffffffff8a731e94
+RDX: ffff888028d80000 RSI: ffffffff8a731e9f RDI: 0000000000000005
+RBP: 0000000000000000 R08: 0000000000000005 R09: 0000000000000007
+R10: 000000000000000b R11: 0000000000000000 R12: 1ffff92000765da7
+R13: ffff88802acd5080 R14: ffff88802b24d200 R15: 000000000000000b
+FS:  00007fc7f15026c0(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020000040 CR3: 0000000028426000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 Call Trace:
- <IRQ>
- hsr_announce+0x114/0x370 net/hsr/hsr_device.c:382
- call_timer_fn+0x193/0x590 kernel/time/timer.c:1700
- expire_timers kernel/time/timer.c:1751 [inline]
- __run_timers+0x764/0xb20 kernel/time/timer.c:2022
- run_timer_softirq+0x58/0xd0 kernel/time/timer.c:2035
- __do_softirq+0x21a/0x8de kernel/softirq.c:553
- invoke_softirq kernel/softirq.c:427 [inline]
- __irq_exit_rcu kernel/softirq.c:632 [inline]
- irq_exit_rcu+0xb7/0x120 kernel/softirq.c:644
- sysvec_apic_timer_interrupt+0x95/0xb0 arch/x86/kernel/apic/apic.c:1076
- </IRQ>
  <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:649
-...
+ tcp_data_ready+0x14c/0x5b0 net/ipv4/tcp_input.c:5143
+ tcp_data_queue+0x19bb/0x5190 net/ipv4/tcp_input.c:5223
+ tcp_rcv_state_process+0x11d2/0x4e30 net/ipv4/tcp_input.c:6859
+ tcp_v4_do_rcv+0x369/0xa10 net/ipv4/tcp_ipv4.c:1929
+ sk_backlog_rcv include/net/sock.h:1092 [inline]
+ __release_sock+0x132/0x3b0 net/core/sock.c:2972
+ release_sock+0x5a/0x1f0 net/core/sock.c:3538
+ __mptcp_close_ssk+0xb12/0xfd0 net/mptcp/protocol.c:2421
+ mptcp_pm_nl_rm_addr_or_subflow+0x29e/0xa30 net/mptcp/pm_netlink.c:818
+ mptcp_pm_remove_subflow+0x34/0xa0 net/mptcp/pm.c:69
+ mptcp_pm_remove_addrs_and_subflows+0x5a2/0x6a0 net/mptcp/pm_netlink.c:1558
+ mptcp_nl_remove_addrs_list net/mptcp/pm_netlink.c:1575 [inline]
+ mptcp_pm_nl_flush_addrs_doit+0x3fe/0x6e0 net/mptcp/pm_netlink.c:1616
+ genl_family_rcv_msg_doit+0x1fc/0x2e0 net/netlink/genetlink.c:1113
+ genl_family_rcv_msg net/netlink/genetlink.c:1193 [inline]
+ genl_rcv_msg+0x561/0x800 net/netlink/genetlink.c:1208
+ netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2543
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1217
+ netlink_unicast_kernel net/netlink/af_netlink.c:1341 [inline]
+ netlink_unicast+0x53b/0x810 net/netlink/af_netlink.c:1367
+ netlink_sendmsg+0x8b7/0xd70 net/netlink/af_netlink.c:1908
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0xd5/0x180 net/socket.c:745
+ ____sys_sendmsg+0x6ac/0x940 net/socket.c:2584
+ ___sys_sendmsg+0x135/0x1d0 net/socket.c:2638
+ __sys_sendmsg+0x117/0x1e0 net/socket.c:2667
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xd3/0x250 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+RIP: 0033:0x7fc7f1566d89
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 61 1a 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fc7f1502228 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007fc7f15f1438 RCX: 00007fc7f1566d89
+RDX: 0000000000000000 RSI: 00000000200000c0 RDI: 0000000000000006
+RBP: 00007fc7f15f1430 R08: 00007fc7f15026c0 R09: 00007fc7f15026c0
+R10: 00007fc7f15026c0 R11: 0000000000000246 R12: 00007fc7f15f143c
+R13: 00007fc7f15bd610 R14: 6d705f706374706d R15: 00007fff17bfe738
+ </TASK>
 
-This issue is also found in older kernels (at least up to 5.10).
 
-Cc: stable@vger.kernel.org
-Reported-by: syzbot+3ae0a3f42c84074b7c8e@syzkaller.appspotmail.com
-Fixes: 121c33b07b31 ("net: hsr: introduce common code for skb initialization")
-Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
 ---
- net/hsr/hsr_device.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
-index 7ceb9ac6e730..9d71b66183da 100644
---- a/net/hsr/hsr_device.c
-+++ b/net/hsr/hsr_device.c
-@@ -308,7 +308,7 @@ static void send_hsr_supervision_frame(struct hsr_port *master,
- 
- 	skb = hsr_init_skb(master);
- 	if (!skb) {
--		WARN_ONCE(1, "HSR: Could not send supervision frame\n");
-+		netdev_warn_once(master->dev, "HSR: Could not send supervision frame\n");
- 		return;
- 	}
- 
-@@ -355,7 +355,7 @@ static void send_prp_supervision_frame(struct hsr_port *master,
- 
- 	skb = hsr_init_skb(master);
- 	if (!skb) {
--		WARN_ONCE(1, "PRP: Could not send supervision frame\n");
-+		netdev_warn_once(master->dev, "PRP: Could not send supervision frame\n");
- 		return;
- 	}
- 
--- 
-2.25.1
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
