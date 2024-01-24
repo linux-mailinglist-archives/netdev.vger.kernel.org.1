@@ -1,153 +1,300 @@
-Return-Path: <netdev+bounces-65413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65414-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6504B83A669
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 11:10:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CD5683A66B
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 11:11:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0717A1F26A8E
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:10:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 323071C24D89
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 10:11:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 305A418624;
-	Wed, 24 Jan 2024 10:10:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A3F018658;
+	Wed, 24 Jan 2024 10:10:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="YjRNZ2YV"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Kj5GJSSt"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABC10182C5;
-	Wed, 24 Jan 2024 10:10:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C064F18643
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 10:10:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706091052; cv=none; b=KPzoGzP4YmineABIjHFqWstj+0n9YW8j5z7vOEQOwO4mkI06xjmaLM+G+5sFdwWx7CRsWrqK8yeiaTirDg4YQkcGpCRUT4g3uOFX+Dj930GDPNBpNO6FZEnPa5cC86KhQ1mtZWgF8MYNZnU/yT1O+ol5NQjh2MIDLSiWWw9MOvs=
+	t=1706091056; cv=none; b=SveDzLToNUd0ocHwamngzJZrwyJ/JchVSaaaWQ7+SwICFhvoJbACAgZwG6uz8HKvUQhW97qkS3eoHAsK9uFRpD0fOwR74vHfhiPIed7LlHN8h3/X/DnQa8ekrath7xFjj92qgzrQFBv9zrzBtG/JSx9CFeq6d3QwNTuj02IkbNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706091052; c=relaxed/simple;
-	bh=2uz7wnLrJbJhEj0X+bT2KBLAEV8Bvyqzqqs4OZCEN3E=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=VNSk8JUinVmGCx1yOnN3ejtytZuWzDddvVqEBam8ftEZm1J238MLMEwWhXZZm/gc4yqKS9YvV0RD3bGQ3ioa5wQrk74ddkoK9AFDbnlM/kkbg24l3UYuNvQzfTQgMx+S3enrbh2qFFhe+q5D+niJQZV+y/SDb5wiu426y3giFxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=YjRNZ2YV; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=8NyI5A+LIWDYqfd9WymVb/VBvwDorMqv40CajixTCcc=; b=YjRNZ2YVzuDqNEdcVjgxeXe/tK
-	XMEADPE0aq1SnvyTOkaSi4IeaOxqunsTdGiGrZIqheTJhDS5XxjbCAm6dpjliCSB8rKs595GTJt+V
-	B5dxvzTZJAiKvOf/lLnj1KPLccc1OSFpCwSraNpVH2bc3dZQtoQd3BhI9CTmbiHG6Y25OC0fgo3iB
-	wvO6hWFZ7CmcqGWUgQn8zp5Ijd3vsbHZPj6km79ejnKLygLhZwkazYB9d/MVznrs5oS8F0PPKgHRZ
-	9rO/oX7ZxPeTUtFGI4D4GhMYpckAtvp58VkelUylNCN4cJo/fvjDCGSOApyebJmFCRjekpgh33D40
-	P+4VJJBA==;
-Received: from sslproxy02.your-server.de ([78.47.166.47])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rSaDS-000MXy-5V; Wed, 24 Jan 2024 11:10:42 +0100
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy02.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rSaDR-0008Hi-Gn; Wed, 24 Jan 2024 11:10:41 +0100
-Subject: Re: [RFC PATCH v7 0/8] net_sched: Introduce eBPF based Qdisc
-To: Stanislav Fomichev <sdf@google.com>, Amery Hung <ameryhung@gmail.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, yangpeihao@sjtu.edu.cn,
- toke@redhat.com, jhs@mojatatu.com, jiri@resnulli.us,
- xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
-References: <cover.1705432850.git.amery.hung@bytedance.com>
- <ZbAr_dWoRnjbvv04@google.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <d7755998-079a-2280-8836-def30ff341c5@iogearbox.net>
-Date: Wed, 24 Jan 2024 11:10:41 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	s=arc-20240116; t=1706091056; c=relaxed/simple;
+	bh=SSWNhg1BeWMjlsW8eOblnkY8M41Gr7UmMlQfPptWizU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Z1Imxbv5u+26nd9GBWoVswhi0U5VVcGNRvNMsGOn8BjXmyjlWrVa9Ov2u0GZtrkiSAhIi6L+w+SHVE+zNZO8CIR2tnsoPV39FLJX4rl5audjEtKB13ZdEslvn6BGvc8iRNB0oYexPsLRjGTusssP5Tc61HYSf8FA5LTUy3q0hPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Kj5GJSSt; arc=none smtp.client-ip=95.215.58.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <fc421c38-66b7-4d4e-abfa-051eccbf793c@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1706091051;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kazOr6AAUqaXXxOqjGWomQo5TpJnFcKaIZXSMkHqQh4=;
+	b=Kj5GJSStFxxpSQW/5cQIZZSMUR8GOXhqanSovUXTJMwsCAN9lITPvR1nvMwgCOn7dVvIAO
+	Z31fJeY4dcB0XYncgCP+XSqc4LCNRDUAFOMO6R8Lzybp0I5JAf+/IKdnzGSNAuQreabNc9
+	jztywpVNReG6Q3OnAo7Tjxhm34KjWsU=
+Date: Wed, 24 Jan 2024 10:10:46 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ZbAr_dWoRnjbvv04@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Subject: Re: [PATCH 3/4] net: wan: fsl_qmc_hdlc: Add runtime timeslots changes
+ support
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27163/Tue Jan 23 10:42:11 2024)
+To: Herve Codina <herve.codina@bootlin.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, Andrew Lunn <andrew@lunn.ch>,
+ Mark Brown <broonie@kernel.org>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+References: <20240123164912.249540-1-herve.codina@bootlin.com>
+ <20240123164912.249540-4-herve.codina@bootlin.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20240123164912.249540-4-herve.codina@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On 1/23/24 10:13 PM, Stanislav Fomichev wrote:
-> On 01/17, Amery Hung wrote:
->> Hi,
->>
->> I am continuing the work of ebpf-based Qdisc based on Cong’s previous
->> RFC. The followings are some use cases of eBPF Qdisc:
->>
->> 1. Allow customizing Qdiscs in an easier way. So that people don't
->>     have to write a complete Qdisc kernel module just to experiment
->>     some new queuing theory.
->>
->> 2. Solve EDT's problem. EDT calcuates the "tokens" in clsact which
->>     is before enqueue, it is impossible to adjust those "tokens" after
->>     packets get dropped in enqueue. With eBPF Qdisc, it is easy to
->>     be solved with a shared map between clsact and sch_bpf.
->>
->> 3. Replace qevents, as now the user gains much more control over the
->>     skb and queues.
->>
->> 4. Provide a new way to reuse TC filters. Currently TC relies on filter
->>     chain and block to reuse the TC filters, but they are too complicated
->>     to understand. With eBPF helper bpf_skb_tc_classify(), we can invoke
->>     TC filters on _any_ Qdisc (even on a different netdev) to do the
->>     classification.
->>
->> 5. Potentially pave a way for ingress to queue packets, although
->>     current implementation is still only for egress.
->>
->> I’ve combed through previous comments and appreciated the feedbacks.
->> Some major changes in this RFC is the use of kptr to skb to maintain
->> the validility of skb during its lifetime in the Qdisc, dropping rbtree
->> maps, and the inclusion of two examples.
->>
->> Some questions for discussion:
->>
->> 1. We now pass a trusted kptr of sk_buff to the program instead of
->>     __sk_buff. This makes most helpers using __sk_buff incompatible
->>     with eBPF qdisc. An alternative is to still use __sk_buff in the
->>     context and use bpf_cast_to_kern_ctx() to acquire the kptr. However,
->>     this can only be applied to enqueue program, since in dequeue program
->>     skbs do not come from ctx but kptrs exchanged out of maps (i.e., there
->>     is no __sk_buff). Any suggestion for making skb kptr and helper
->>     functions compatible?
->>
->> 2. The current patchset uses netlink. Do we also want to use bpf_link
->>     for attachment?
+On 23/01/2024 16:49, Herve Codina wrote:
+> QMC channels support runtime timeslots changes but nothing is done at
+> the QMC HDLC driver to handle these changes.
 > 
-> [..]
+> Use existing IFACE ioctl in order to configure the timeslots to use.
 > 
->> 3. People have suggested struct_ops. We chose not to use struct_ops since
->>     users might want to create multiple bpf qdiscs with different
->>     implementations. Current struct_ops attachment model does not seem
->>     to support replacing only functions of a specific instance of a module,
->>     but I might be wrong.
+> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+> Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+> Acked-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>   drivers/net/wan/fsl_qmc_hdlc.c | 169 ++++++++++++++++++++++++++++++++-
+>   1 file changed, 168 insertions(+), 1 deletion(-)
 > 
-> I still feel like it deserves at leasta try. Maybe we can find some potential
-> path where struct_ops can allow different implementations (Martin probably
-> has some ideas about that). I looked at the bpf qdisc itself and it doesn't
-> really have anything complicated (besides trying to play nicely with other
-> tc classes/actions, but I'm not sure how relevant that is).
+> diff --git a/drivers/net/wan/fsl_qmc_hdlc.c b/drivers/net/wan/fsl_qmc_hdlc.c
+> index 31b637ec8390..82019cd96365 100644
+> --- a/drivers/net/wan/fsl_qmc_hdlc.c
+> +++ b/drivers/net/wan/fsl_qmc_hdlc.c
+> @@ -32,6 +32,7 @@ struct qmc_hdlc {
+>   	struct qmc_hdlc_desc tx_descs[8];
+>   	unsigned int tx_out;
+>   	struct qmc_hdlc_desc rx_descs[4];
+> +	u32 slot_map;
+>   };
+>   
+>   static inline struct qmc_hdlc *netdev_to_qmc_hdlc(struct net_device *netdev)
+> @@ -202,6 +203,162 @@ static netdev_tx_t qmc_hdlc_xmit(struct sk_buff *skb, struct net_device *netdev)
+>   	return NETDEV_TX_OK;
+>   }
+>   
+> +static int qmc_hdlc_xlate_slot_map(struct qmc_hdlc *qmc_hdlc,
+> +				   u32 slot_map, struct qmc_chan_ts_info *ts_info)
+> +{
+> +	u64 ts_mask_avail;
+> +	unsigned int bit;
+> +	unsigned int i;
+> +	u64 ts_mask;
+> +	u64 map;
+> +
+> +	/* Tx and Rx masks must be identical */
+> +	if (ts_info->rx_ts_mask_avail != ts_info->tx_ts_mask_avail) {
+> +		dev_err(qmc_hdlc->dev, "tx and rx available timeslots mismatch (0x%llx, 0x%llx)\n",
+> +			ts_info->rx_ts_mask_avail, ts_info->tx_ts_mask_avail);
+> +		return -EINVAL;
+> +	}
+> +
+> +	ts_mask_avail = ts_info->rx_ts_mask_avail;
+> +	ts_mask = 0;
+> +	map = slot_map;
+> +	bit = 0;
+> +	for (i = 0; i < 64; i++) {
+> +		if (ts_mask_avail & BIT_ULL(i)) {
+> +			if (map & BIT_ULL(bit))
+> +				ts_mask |= BIT_ULL(i);
+> +			bit++;
+> +		}
+> +	}
+> +
+> +	if (hweight64(ts_mask) != hweight64(map)) {
+> +		dev_err(qmc_hdlc->dev, "Cannot translate timeslots 0x%llx -> (0x%llx,0x%llx)\n",
+> +			map, ts_mask_avail, ts_mask);
+> +		return -EINVAL;
+> +	}
+> +
+> +	ts_info->tx_ts_mask = ts_mask;
+> +	ts_info->rx_ts_mask = ts_mask;
+> +	return 0;
+> +}
+> +
+> +static int qmc_hdlc_xlate_ts_info(struct qmc_hdlc *qmc_hdlc,
+> +				  const struct qmc_chan_ts_info *ts_info, u32 *slot_map)
+> +{
+> +	u64 ts_mask_avail;
+> +	unsigned int bit;
+> +	unsigned int i;
+> +	u64 ts_mask;
+> +	u64 map;
+> +
 
-Plus it's also not used in the two sample implementations, given you can
-implement this as part of the enqueue operation in bpf. It would make sense
-to drop the kfunc from the set. One other note.. the BPF samples have been
-bitrotting for quite a while, please convert this into a proper BPF selftest
-so that BPF CI can run this.
+Starting from here ...
 
-> With struct_ops you can also get your (2) addressed.
+> +	/* Tx and Rx masks must be identical */
+> +	if (ts_info->rx_ts_mask_avail != ts_info->tx_ts_mask_avail) {
+> +		dev_err(qmc_hdlc->dev, "tx and rx available timeslots mismatch (0x%llx, 0x%llx)\n",
+> +			ts_info->rx_ts_mask_avail, ts_info->tx_ts_mask_avail);
+> +		return -EINVAL;
+> +	}
+> +	if (ts_info->rx_ts_mask != ts_info->tx_ts_mask) {
+> +		dev_err(qmc_hdlc->dev, "tx and rx timeslots mismatch (0x%llx, 0x%llx)\n",
+> +			ts_info->rx_ts_mask, ts_info->tx_ts_mask);
+> +		return -EINVAL;
+> +	}
+> +
+> +	ts_mask_avail = ts_info->rx_ts_mask_avail;
+> +	ts_mask = ts_info->rx_ts_mask;
+> +	map = 0;
+> +	bit = 0;
+> +	for (i = 0; i < 64; i++) {
+> +		if (ts_mask_avail & BIT_ULL(i)) {
+> +			if (ts_mask & BIT_ULL(i))
+> +				map |= BIT_ULL(bit);
+> +			bit++;
+> +		}
+> +	}
+> +
+> +	if (hweight64(ts_mask) != hweight64(map)) {
+> +		dev_err(qmc_hdlc->dev, "Cannot translate timeslots (0x%llx,0x%llx) -> 0x%llx\n",
+> +			ts_mask_avail, ts_mask, map);
+> +		return -EINVAL;
+> +	}
+> +
 
-+1
+till here the block looks like copy of the block from previous function.
+It worth to make a separate function for it, I think.
 
-Thanks,
-Daniel
+> +	if (map >= BIT_ULL(32)) {
+> +		dev_err(qmc_hdlc->dev, "Slot map out of 32bit (0x%llx,0x%llx) -> 0x%llx\n",
+> +			ts_mask_avail, ts_mask, map);
+> +		return -EINVAL;
+> +	}
+> +
+> +	*slot_map = map;
+> +	return 0;
+> +}
+> +
+> +static int qmc_hdlc_set_iface(struct qmc_hdlc *qmc_hdlc, int if_iface, const te1_settings *te1)
+> +{
+> +	struct qmc_chan_ts_info ts_info;
+> +	int ret;
+> +
+> +	ret = qmc_chan_get_ts_info(qmc_hdlc->qmc_chan, &ts_info);
+> +	if (ret) {
+> +		dev_err(qmc_hdlc->dev, "get QMC channel ts info failed %d\n", ret);
+> +		return ret;
+> +	}
+> +	ret = qmc_hdlc_xlate_slot_map(qmc_hdlc, te1->slot_map, &ts_info);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = qmc_chan_set_ts_info(qmc_hdlc->qmc_chan, &ts_info);
+> +	if (ret) {
+> +		dev_err(qmc_hdlc->dev, "set QMC channel ts info failed %d\n", ret);
+> +		return ret;
+> +	}
+> +
+> +	qmc_hdlc->slot_map = te1->slot_map;
+> +
+> +	return 0;
+> +}
+> +
+> +static int qmc_hdlc_ioctl(struct net_device *netdev, struct if_settings *ifs)
+> +{
+> +	struct qmc_hdlc *qmc_hdlc = netdev_to_qmc_hdlc(netdev);
+> +	te1_settings te1;
+> +
+> +	switch (ifs->type) {
+> +	case IF_GET_IFACE:
+> +		ifs->type = IF_IFACE_E1;
+> +		if (ifs->size < sizeof(te1)) {
+> +			if (!ifs->size)
+> +				return 0; /* only type requested */
+> +
+> +			ifs->size = sizeof(te1); /* data size wanted */
+> +			return -ENOBUFS;
+> +		}
+> +
+> +		memset(&te1, 0, sizeof(te1));
+> +
+> +		/* Update slot_map */
+> +		te1.slot_map = qmc_hdlc->slot_map;
+> +
+> +		if (copy_to_user(ifs->ifs_ifsu.te1, &te1, sizeof(te1)))
+> +			return -EFAULT;
+> +		return 0;
+> +
+> +	case IF_IFACE_E1:
+> +	case IF_IFACE_T1:
+> +		if (!capable(CAP_NET_ADMIN))
+> +			return -EPERM;
+> +
+> +		if (netdev->flags & IFF_UP)
+> +			return -EBUSY;
+> +
+> +		if (copy_from_user(&te1, ifs->ifs_ifsu.te1, sizeof(te1)))
+> +			return -EFAULT;
+> +
+> +		return qmc_hdlc_set_iface(qmc_hdlc, ifs->type, &te1);
+> +
+> +	default:
+> +		return hdlc_ioctl(netdev, ifs);
+> +	}
+> +}
+> +
+>   static int qmc_hdlc_open(struct net_device *netdev)
+>   {
+>   	struct qmc_hdlc *qmc_hdlc = netdev_to_qmc_hdlc(netdev);
+> @@ -328,13 +485,14 @@ static const struct net_device_ops qmc_hdlc_netdev_ops = {
+>   	.ndo_open       = qmc_hdlc_open,
+>   	.ndo_stop       = qmc_hdlc_close,
+>   	.ndo_start_xmit = hdlc_start_xmit,
+> -	.ndo_siocwandev	= hdlc_ioctl,
+> +	.ndo_siocwandev = qmc_hdlc_ioctl,
+>   };
+>   
+>   static int qmc_hdlc_probe(struct platform_device *pdev)
+>   {
+>   	struct device_node *np = pdev->dev.of_node;
+>   	struct qmc_hdlc *qmc_hdlc;
+> +	struct qmc_chan_ts_info ts_info;
+>   	struct qmc_chan_info info;
+>   	hdlc_device *hdlc;
+>   	int ret;
+> @@ -364,6 +522,15 @@ static int qmc_hdlc_probe(struct platform_device *pdev)
+>   		return -EINVAL;
+>   	}
+>   
+> +	ret = qmc_chan_get_ts_info(qmc_hdlc->qmc_chan, &ts_info);
+> +	if (ret) {
+> +		dev_err(qmc_hdlc->dev, "get QMC channel ts info failed %d\n", ret);
+> +		return ret;
+> +	}
+> +	ret = qmc_hdlc_xlate_ts_info(qmc_hdlc, &ts_info, &qmc_hdlc->slot_map);
+> +	if (ret)
+> +		return ret;
+> +
+>   	qmc_hdlc->netdev = alloc_hdlcdev(qmc_hdlc);
+>   	if (!qmc_hdlc->netdev) {
+>   		dev_err(qmc_hdlc->dev, "failed to alloc hdlc dev\n");
+
 
