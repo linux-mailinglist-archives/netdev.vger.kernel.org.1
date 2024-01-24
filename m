@@ -1,175 +1,302 @@
-Return-Path: <netdev+bounces-65552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A65E383B04F
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 18:46:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D02683B053
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 18:47:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 190E31F23991
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 17:46:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F1F0283702
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 17:47:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D10481AC8;
-	Wed, 24 Jan 2024 17:46:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE38086125;
+	Wed, 24 Jan 2024 17:47:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="kWaJ5OPD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R7/1fHU4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 465ED8120E
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 17:46:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09E521272B6;
+	Wed, 24 Jan 2024 17:47:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706118381; cv=none; b=D1Xif7DkGdp/FgPjqoU4bWqY883hpayZm8LZQXAriRiY+ltMe8hI3UUW6VrLkZpOBbUKFIdeSfG6MzH6PEWPlG3NMuhP2B65T0jg+zZsTk+BOA2HRXje0GKXm5srEc1vpO5J/ebkc9ciWdZ4bt1/TqPPif7f6awK/s75kJml9YQ=
+	t=1706118435; cv=none; b=YPl+6pgF2WjyVkUBjnuBM2jHRuUGXQcotktCECcoeKhKclfwDgwSny9Vb/KvP3B2Sycmj/cSNI1YRyB/xxMmFp3ErB+gf2FgUIwJqPoLUFHhfJvllRWOgaCDgp0/Iukk8wa787xRhrAiZ3oC1JxODHs9/0QyP7F01Rs2m8oJWgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706118381; c=relaxed/simple;
-	bh=rx8lKKZcE3A1/FLTzYEVMlsLvAtjy/Y784aKerx64Ng=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z2Af3gMYe8+kOzL6BlkUx9AIIW36mmkhEngIiqVp3vxuIoheWYPoVQq5yVRd9QZhy/1ETAYZmFtm1uKlOkp+xmwhCuF3+qffsF6H4vUNxLTF3D8Oof5EtMOUjSs8ObPZy+jHSzkZc64NcLjZGHHqPdQ4LBaQK4dCHurafN94Ra8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=kWaJ5OPD; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-40e7e2e04f0so63128505e9.1
-        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 09:46:19 -0800 (PST)
+	s=arc-20240116; t=1706118435; c=relaxed/simple;
+	bh=QkUjubpofB5Azx+kpt9gh8KxjVh40iHtdBvvB8Y+8qA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RTMPJLp/ZYMPdkaVyMwGYtM04LpnLKoZDkxV7CP3dYPIGJh474mz5LKfeavs2QPKi+uBcPtCXE09pyy0sGkfUyX+BuCo9Xh0ane1tMPzLDRFScl1c3Azjt31PyRUEiFSIqOALCY0C2u2CQYPYOayvsK/OS+nitSpDU3EjeAtZ60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R7/1fHU4; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1d72f71f222so24194475ad.1;
+        Wed, 24 Jan 2024 09:47:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1706118377; x=1706723177; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=eVCU/WWHCSDI7BYE4p1QCv3tn8rHzFU9AC6i2z5h3qE=;
-        b=kWaJ5OPD8SWrPQNFWepde48nJ3rr7QNB5TTRhyPau0Hzz3/iFmfcn/mMWPVy3JYDuh
-         iD4mCt7zW3M0UUHhr7sbRct9Aekarntzc/UlEMInZtHgjzDFgf0diskPME6cctQasXx/
-         6uBZ2JQVnXqqTurTCZuJzDM7HIbkzfnZ5YlyF+McBEWroB7biM2kGvHsDRleO1wqVksJ
-         kS0B/jzLusmgcckI258iJU4zv2OA9AVrTVFap/AkaSORK6ORhWWXS0QwwvNbJcnlS0jd
-         9oGnpqK2Ab9/vgveCStQia7rNnorHnGfFZej9cAPccihoG62wgkbA3bQLIFGKmw+lY0a
-         j5Pw==
+        d=gmail.com; s=20230601; t=1706118433; x=1706723233; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=lQxbBT+TSvZsQ3Ou+NOpiUNwjKU/hcS1Evjle7FB36Y=;
+        b=R7/1fHU4GkG52F1Sc5CMcp5hYKl9mL339t1pQ76FPq6+m6UAkNucov+Z2fVBrwSzQF
+         LEcrNGmoRdQtAeO1KHv7zPcMiqVP0bjD6zBcStjAMUgt4npTQUYET1G7Mzzsu4mi5QRZ
+         clXrLq/Fi/IsuEugEIqD1hz5jHtRhct4WntQN9ZMJavyP2ez+8isZ99hnmoK9Dansm5C
+         vtI2XNTNIjuvxSKJ+kl0mDqQP7mxH04awZVPus1KqUrLa6+sjAHaiTIRUf4QRNhOmdn+
+         3JNa3HdSlXMKgg/rai5NblyuD0Sg3Nsie75fHKwZ0uGDg2oEqwDZWfeAyx6vxCEet6h4
+         Gpew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706118377; x=1706723177;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eVCU/WWHCSDI7BYE4p1QCv3tn8rHzFU9AC6i2z5h3qE=;
-        b=Za5H2TeNNkrAZFgV+i6msTeICyM3LPek4S8l/51Xp0byoY5vLDyaQ8RgJe05cdcBeC
-         /3TZDOxqij/WyFVI4Vxx8Do6YHi/wj4K/RRtO93rk2uXKd4/AGQkcTyeTXgfWyia570w
-         NB1UJFob8eD7wt4RYpG7qAqtZ9ifGdJ4gZn4xUkiK5W03FsQuZRKkEE/Ibp+PUSbaUMc
-         z35Hqfl3pK8H+8BMfrS3d23R2Sq6NHVYMDoink6V+u75bkHO8zDeO/uPt5UJAKQmxk7W
-         Psab10N6XabeFsoG6/JparA4V7tYW9fxEFFX1txqrf1cde+0rISygGc0Sa38IC4E6Rwa
-         LaMA==
-X-Gm-Message-State: AOJu0Yy4SP1i2GYm5cXIavUB1BinhZZYt8mZ/35Y9Zj35XaLfoAg4nWl
-	bMcSSfj4UtYZqjQIolNiu6lCN/+VDuBHfH2YEl9Ogx6o+TA9a8SOSicZvTfe2Q==
-X-Google-Smtp-Source: AGHT+IEkmMRSyW5Nf156YVrdFBl3DnSZXbv256Xf9R4g4JKrV5a1JNhJ61YPNG9vJ0fA/sMCWjitww==
-X-Received: by 2002:a05:600c:4e49:b0:40e:c59d:95ef with SMTP id e9-20020a05600c4e4900b0040ec59d95efmr833207wmq.149.1706118377430;
-        Wed, 24 Jan 2024 09:46:17 -0800 (PST)
-Received: from [10.83.37.178] ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id bi11-20020a05600c3d8b00b0040e6b0a1bc1sm356339wmb.12.2024.01.24.09.46.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Jan 2024 09:46:16 -0800 (PST)
-Message-ID: <1ad64e3d-5252-4aaf-82be-5162edd1e781@arista.com>
-Date: Wed, 24 Jan 2024 17:46:10 +0000
+        d=1e100.net; s=20230601; t=1706118433; x=1706723233;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lQxbBT+TSvZsQ3Ou+NOpiUNwjKU/hcS1Evjle7FB36Y=;
+        b=jhb1z1RzyPDTO+TR2xxhujQv2uhfopBoRoVVmAaX23k9Pzgq9jyh0W0SFa1dhi+QZM
+         yf4D06iSQjofT0KqMRD6mGZC8blaXlpRO3tczpUIY8OVf8xLXDNHvLb7b/GGa9tftv2Y
+         pLZWh5T7yLc3oHd77of+Qo3Sr0XZz/JH2uoNDS6y98pCz2lcuFhcDJpMZ3GgKI4w0a6h
+         JVNGxOMIgvBiYg2yk4MklhB8cIA9FDKYVV0dx/iB5UTDmy37Wgg9jpD+qUMD2fixwwuh
+         RPsgzVAmsUxXbJDwEEaIIE6WXz3CgEZnoKhqFFS0PaTII1cBxkY6rs1aYneNtU4JWlCl
+         4g2A==
+X-Gm-Message-State: AOJu0Yw6cBKp77hb9sV9KqQHjl8kEKbW0darRKPEgtdcyzXL6+DA2GP5
+	yELU3yscHBG4BnW46ca8mQcE4axuwQ2/Xlne3yWYWyJByq709WL5
+X-Google-Smtp-Source: AGHT+IGzjoUJsq3bpdJ+H9jC6qnkNhXQggYHoUKJzgWHNvJuuMcNny1bRMvoJ80FJJykhqBP2FqGFQ==
+X-Received: by 2002:a17:902:d902:b0:1d6:fcc3:c99a with SMTP id c2-20020a170902d90200b001d6fcc3c99amr1060350plz.62.1706118433148;
+        Wed, 24 Jan 2024 09:47:13 -0800 (PST)
+Received: from localhost ([2601:644:9380:8cd0::7fb4])
+        by smtp.gmail.com with ESMTPSA id t7-20020a170902b20700b001d740687d1csm6144225plr.193.2024.01.24.09.47.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jan 2024 09:47:12 -0800 (PST)
+From: Matthew Wood <thepacketgeek@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: leitao@debian.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v1 0/8] netconsole: Add userdata append support
+Date: Wed, 24 Jan 2024 09:46:58 -0800
+Message-ID: <20240124174711.1906102-1-thepacketgeek@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/3] selftests/net: A couple of typos fixes in
- key-management test
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Shuah Khan <shuah@kernel.org>, Dmitry Safonov <0x7f454c46@gmail.com>,
- Mohammad Nassiri <mnassiri@ciena.com>, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240118-tcp-ao-test-key-mgmt-v1-0-3583ca147113@arista.com>
- <20240118085129.6313054b@kernel.org>
- <358faa27-3ea3-4e63-a76f-7b5deeed756d@arista.com>
- <20240118091327.173f3cb0@kernel.org>
- <a9a5378d-c908-4a83-a63d-3e9928733a3d@arista.com>
- <20240124071229.6a7262cc@kernel.org>
-From: Dmitry Safonov <dima@arista.com>
-In-Reply-To: <20240124071229.6a7262cc@kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-Hi Jakub,
+Add the ability to add custom userdata to every outbound netconsole message
+as a collection of key/value pairs, allowing users to add metadata to every
+netconsole message which can be used for  for tagging, filtering, and
+aggregating log messages.
 
-On 1/24/24 15:12, Jakub Kicinski wrote:
-> On Fri, 19 Jan 2024 18:39:14 +0000 Dmitry Safonov wrote:
->>> You probably want something smaller to be honest.
->>> tools/testing/selftests/net/config has a lot of stuff in it 
->>> and it's actually missing a lot more. I'm working thru adding
->>> the missing options to tools/testing/selftests/net/config 
->>> right now so far I got:  
->>
->> Thanks!
->>
->> I'll send a patch for it in version 2 (as I anyway need to address
->> Simon's feedback).
-> 
-> Hi Dmitry!
-> 
-> I put TCP_AO and VETH in the config and the tests seem to fail with
+In a previous patch series the ability to prepend the uname release was
+added towards the goals above. This patch series builds on that
+idea to allow any userdata, keyed by a user provided name, to be
+included in netconsole messages.
 
-Thanks for wiring it up and for https://netdev.bots.linux.dev/status.html!
+If CONFIG_NETCONSOLE_DYNAMIC is enabled an additional userdata
+directory will be presented in the netconsole configfs tree, allowing
+the addition of userdata entries.
 
-> selftests: net/tcp_ao: rst_ipv4
-> not ok 1 # error 834[lib/kconfig.c:143] Failed to initialize kconfig 2: No such file or directory
-> # Planned tests != run tests (0 != 1)
-> # Totals: pass:0 fail:0 xfail:0 xpass:0 skip:0 error:1
+    /sys/kernel/config/netconsole/
+			<target>/
+				enabled
+				release
+				dev_name
+				local_port
+				remote_port
+				local_ip
+				remote_ip
+				local_mac
+				remote_mac
+				userdata/
+					<key>/
+						value
+					<key>/
+						value
+          ...
 
-Hehe, yeah I wanted to detect kernels with !CONFIG_TCP_AO, to SKIP the
-test, rather than FAIL it, which this lib/kconfig.c does.
-But from a glance, I think it's failing in your run because there are
-checks with and without TCP_AO, but I didn't think of checking for
-the hashing algorithms support.
+Testing for this series is as follows:
 
-I think what happens is has_tcp_ao():
-: strcpy(tmp.alg_name, "hmac(sha1)");
-...
-: if (setsockopt(sk, IPPROTO_TCP, TCP_AO_ADD_KEY, &tmp, sizeof(tmp)) < 0)
+Build every patch without CONFIG_NETCONSOLE_DYNAMIC, and also built
+with CONFIG_NETCONSOLE_DYNAMIC enabled for every patch after the config
+option was added
 
-Could you check that what I suppose is failing, is actually failing?
-[dima@Mindolluin linux-master]$ grep -e '\<CONFIG_CRYPTO_SHA1\>' -e
-'\<CONFIG_CRYPTO_HMAC\>' .config
-CONFIG_CRYPTO_HMAC=y
-CONFIG_CRYPTO_SHA1=y
+Test Userdata configfs
 
-If that's the case, I'll  add the detection for hashing algorithms to
-lib/kconfig.c (together with a patch for
-tools/testing/selftests/net/config).
-And also heads up for key-management.c - that tries a bunch of hashing
-algorithms to check that the work and that the key rotation between
-different algorithms works:
+    # Adding userdata
+    cd /sys/kernel/config/netconsole/ && mkdir cmdline0 && cd cmdline0
+    mkdir userdata/release && echo hotfix1 > userdata/release/value
+    preview=3D$(for f in `ls userdata`; do echo $f=3D$(cat userdata/$f/valu=
+e); done)
+    [[ "$preview" =3D=3D $'release=3Dhotfix1' ]] && echo pass || echo fail
+    mkdir userdata/testing && echo something > userdata/testing/value
+    preview=3D$(for f in `ls userdata`; do echo $f=3D$(cat userdata/$f/valu=
+e); done)
+    [[ "$preview" =3D=3D $'release=3Dhotfix1\ntesting=3Dsomething' ]] && ec=
+ho pass || echo fail
+    #
+    # Removing Userdata
+    rmdir userdata/testing
+    preview=3D$(for f in `ls userdata`; do echo $f=3D$(cat userdata/$f/valu=
+e); done)
+    [[ "$preview" =3D=3D $'release=3Dhotfix1' ]] && echo pass || echo fail
+    rmdir userdata/release
+    [[ `cat userdata/complete` =3D=3D $'release=3Dhotfix1' ]] && echo pass =
+|| echo fail
+    #
+    # Adding userdata key with too large of 6.7.0-rc8-virtme,12,481,1795410=
+4,-directory name [<54 chars]
+    mkdir userdata/testing12345678901234567890123456789012345678901234567890
+    [[ $? =3D=3D 1 ]] && echo pass || echo fail
+    #
+    # Adding userdata value with too large of value [<200 chars]
+    mkdir userdata/testing
+    echo `for i in {1..201};do printf "%s" "v";done` > userdata/testing/val=
+ue
+    [[ $? =3D=3D 1 ]] && echo pass || echo fail
+    rmdir userdata/testing
 
-: const char *test_algos[] = {
-: 	"cmac(aes128)",
-: 	"hmac(sha1)", "hmac(sha512)", "hmac(sha384)", "hmac(sha256)",
-: 	"hmac(sha224)", "hmac(sha3-512)",
-: 	/* only if !CONFIG_FIPS */
-: #define TEST_NON_FIPS_ALGOS	2
-: 	"hmac(rmd160)", "hmac(md5)"
-: };
+- Output:
+
+    pass
+    pass
+    pass
+    pass
+    pass
+    mkdir: cannot create directory =E2=80=98cmdline0/userdata/testing123456=
+78901234567890123456789012345678901234567890=E2=80=99: File name too long
+    pass
+    bash: echo: write error: Message too long
+    pass
+
+Test netconsole messages (w/ msg fragmentation)
+
+    echo `for i in {1..996};do printf "%s" "v";done` > /dev/kmsg
+
+- Output:
+
+    6.7.0-rc8-virtme,12,484,84321212,-,ncfrag=3D0/997;vvvvvvvvvvvvvvvvvvvvv=
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv=
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv=
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv=
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv=
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv=
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv=
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv=
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv=
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv=
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv=
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv=
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv=
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv6.7.0-rc8-virtme,12,484,84321212,-,ncfrag=3D=
+952/997;vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+Test empty userdatum
+
+    cd /sys/kernel/config/netconsole/ && mkdir cmdline0
+    mkdir cmdline0/userdata/empty
+    echo test > /dev/kmsg
+    rmdir cmdline0/userdata/empty
+
+- Output:
+
+Test netconsole messages (w/o userdata fragmentation)
+
+    cd /sys/kernel/config/netconsole/ && mkdir cmdline0
+    mkdir cmdline0/userdata/release && echo hotfix1 > cmdline0/userdata/rel=
+ease/value
+    mkdir cmdline0/userdata/testing && echo something > cmdline0/userdata/t=
+esting/value
+    echo test > /dev/kmsg
+    rmdir cmdline0/userdata/release
+    rmdir cmdline0/userdata/testing
+
+- Output:
+    6.7.0-rc8-virtme,12,500,1646292204,-;test
+    release=3Dhotfix1
+    testing=3Dsomething
+
+Test netconsole messages (w/ long body fragmentation)
+    cd /sys/kernel/config/netconsole/ && mkdir cmdline0
+    mkdir cmdline0/userdata/release && echo hotfix1 > cmdline0/userdata/rel=
+ease/value
+    mkdir cmdline0/userdata/testing && echo something > cmdline0/userdata/t=
+esting/value
+    echo `for i in {1..996};do printf "%s" "v";done` > /dev/kmsg
+    rmdir cmdline0/userdata/release
+    rmdir cmdline0/userdata/testing
+
+- Output:
+    6.7.0-rc8-virtme,12,486,156664417,-,ncfrag=3D0/1031;vvvvvvvvvvvvvvvvvvv=
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv=
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv=
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv=
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv=
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv=
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv=
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv=
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv=
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv=
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv=
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv=
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv=
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv6.7.0-rc8-virtme,12,486,156664417,-,ncfrag=
+=3D950/1031;vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    release=3Dhotfix1
+    testing=3Dsomething
+
+Test netconsole messages (w/ long userdata fragmentation)
+
+    cd /sys/kernel/config/netconsole/ && mkdir cmdline0
+    LOREM=3D"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed d=
+o eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad mi=
+nim veniam, quis nostrud exercitation ullamco laboris nisi ut"
+    for i in {0..5}; do mkdir cmdline0/userdata/value${i} && echo ${LOREM} =
+> cmdline0/userdata/value${i}/value; done
+    echo test > /dev/kmsg
+    for i in {0..5}; do rmdir cmdline0/userdata/value${i}; done
+
+- Output:
+    6.7.0-rc8-virtme,12,487,221763007,-,ncfrag=3D0/1241;test
+    value0=3DLorem ipsum dolor sit amet, consectetur adipiscing elit, sed d=
+o eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad mi=
+nim veniam, quis nostrud exercitation ullamco laboris nisi ut
+    value1=3DLorem ipsum dolor sit amet, consectetur adipiscing elit, sed d=
+o eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad mi=
+nim veniam, quis nostrud exercitation ullamco laboris nisi ut
+    value2=3DLorem ipsum dolor sit amet, consectetur adipiscing elit, sed d=
+o eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad mi=
+nim veniam, quis nostrud exercitation ullamco laboris nisi ut
+    value3=3DLorem ipsum dolor sit amet, consectetur adipiscing elit, sed d=
+o eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad mi=
+nim veniam, quis nostrud exercitation ullamco laboris nisi ut
+    value4=3DLorem ipsum dolor sit amet, consectetur adipiscing elit, sed d=
+o eiusmod tempor incididunt ut labore et dolore magn6.7.0-rc8-virtme,12,487=
+,221763007,-,ncfrag=3D950/1241;a aliqua. Ut enim ad minim veniam, quis nost=
+rud exercitation ullamco laboris nisi ut
+    value5=3DLorem ipsum dolor sit amet, consectetur adipiscing elit, sed d=
+o eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad mi=
+nim veniam, quis nostrud exercitation ullamco laboris nisi ut
 
 
-> The script does:
-> 
-> target=net/tcp_ao
-> make mrproper
-> 
-> vng -v -b -f tools/testing/selftests/$target
-> # build the scripts
-> make headers
-> make -C tools/testing/selftests/$target
-> 
-> vng -v -r arch/x86/boot/bzImage --user root
-> # inside the VM
-> make -C tools/testing/selftests TARGETS=$target run_tests
+Matthew Wood (8):
+  net: netconsole: cleanup formatting lints
+  net: netconsole: move netconsole_target config_item to config_group
+  net: netconsole: move newline trimming to function
+  net: netconsole: add docs for appending netconsole user data
+  net: netconsole: add a userdata config_group member to
+    netconsole_target
+  net: netconsole: cache userdata formatted string in netconsole_target
+  net: netconsole: append userdata to netconsole messages
+  net: netconsole: append userdata to fragmented netconsole messages
 
-Thanks,
-            Dmitry
+ Documentation/networking/netconsole.rst |  68 +++++
+ drivers/net/netconsole.c                | 355 ++++++++++++++++++++----
+ 2 files changed, 369 insertions(+), 54 deletions(-)
+
+--
+2.43.0
 
 
