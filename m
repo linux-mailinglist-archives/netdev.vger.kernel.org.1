@@ -1,84 +1,106 @@
-Return-Path: <netdev+bounces-65526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65527-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7673683AEC3
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 17:54:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CF1F83AEC6
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 17:55:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04EE9B23EE2
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 16:53:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9AF0CB2203E
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 16:55:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEDCE7E56D;
-	Wed, 24 Jan 2024 16:53:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E2727E56E;
+	Wed, 24 Jan 2024 16:55:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nSLH5KLA"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XlsU+QGw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5E657A720;
-	Wed, 24 Jan 2024 16:53:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB6AC7C08C;
+	Wed, 24 Jan 2024 16:55:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706115231; cv=none; b=IfRMsixpJe1eyly7WXHQq1bESaKqCZrG1mGR480WGhvQ6GfSFa2GzsYNUJGYrTlG+p0pcxAYN+iGsT+rGcqRoXcb6HC1ICdjd/tnnsvq4Kk9woUlriALFP5n+Dy0T0RTTfhm7RAkc5p+ofDhs2bPf51npPIghocpqIwt1veH6Iw=
+	t=1706115303; cv=none; b=Hluzeod9CrmNLEqmKcE6Rcno2TZh0OyEiuORLh2Hrh6t79gCK4APnjli5cA5Q30jd0UOqWGIbFAEpnJffwOAi5aJ2qLven34rAtKp+dj5JqPObKdUEEZhj6aF+BXX2e/7IIWqcvaRiNNDKzy8dys4wTX6c27bmAGjvDHWBpt6Mw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706115231; c=relaxed/simple;
-	bh=NezhQgITHK/gMdeQm+g/azFDFFougWnoVBBRRHG6wmM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZFQrWDWP/CP6J1doLsTNQ8CJt3DodnRC1TebXzotJ+yByj31o30cW6c2d2OHv+WjeESW/rW49mL9gX+0Yz0U8Liw++G8ql/dpqcOSlZupIOJeOF1bcFL7Vxv/H/7GdBbFyslFEMcS1ANTXk/kR5YDqCh8qGb48JZF6ynzk1Hr4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nSLH5KLA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9B2DC433C7;
-	Wed, 24 Jan 2024 16:53:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706115231;
-	bh=NezhQgITHK/gMdeQm+g/azFDFFougWnoVBBRRHG6wmM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nSLH5KLAFUAG67HFMYy0D5quAvrHQz55T7gezzS2H2txhkbBuGMMgBoWSAzyJUZf2
-	 hjtFK8SEa+vOYrhWSi3Z2gX5R28ucUz58p4bhmFf3uGvf8oaqCCw0XjqHZRGkQkirW
-	 kMNKWIlpndRlOHLFB7f9i0E8ffutMDEo08iYhleUJEkQ+r4XoSANnIIQxJqGZl/aw2
-	 LxFxiu6EXyCrNPjtR66ezAMbehUKzdyKY8W7TOpl5EmtrIJXeVIAQTTG/nLAmHGX5e
-	 fFavF2RjbAcmZa93aNgsL+v92SwI0kO8cSvJe9EKkbb0yuIcCQ+t++4pDFKobFMFDf
-	 Ey1ENBBrF3PwA==
-Date: Wed, 24 Jan 2024 08:53:49 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: <bpf@vger.kernel.org>, <ast@kernel.org>, <daniel@iogearbox.net>,
- <andrii@kernel.org>, <netdev@vger.kernel.org>, <magnus.karlsson@intel.com>,
- <bjorn@kernel.org>, <echaudro@redhat.com>, <lorenzo@kernel.org>,
- <martin.lau@linux.dev>, <tirthendu.sarkar@intel.com>,
- <john.fastabend@gmail.com>, <horms@kernel.org>
-Subject: Re: [PATCH v5 bpf 03/11] xsk: fix usage of multi-buffer BPF helpers
- for ZC XDP
-Message-ID: <20240124085349.3e610e24@kernel.org>
-In-Reply-To: <ZbD8TWLihi4SZTwR@boxer>
-References: <20240122221610.556746-1-maciej.fijalkowski@intel.com>
-	<20240122221610.556746-4-maciej.fijalkowski@intel.com>
-	<20240123175317.730c2e21@kernel.org>
-	<ZbD8TWLihi4SZTwR@boxer>
+	s=arc-20240116; t=1706115303; c=relaxed/simple;
+	bh=P/TUvoMiEV83YDbhVs2P7c3Lloh6Y4fqxH1XGIUbeYo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=akhX0ghq0I4SgdrxSYWVx2cTBnsqFnqDA+2f3I+x+tDnB7HjQ04rDo/Xa7I0VqpzYuBf288ocBz7R52DMl2c3hxiNqYiRgLN4/Ps5YGeRZ54fDBwAPpHxV+IJrFmO4cF0orMvq2V4E/F6jp2/cLwFmPhVLKHKQUO0gD/NaPyTdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=XlsU+QGw; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=0JjZ2ka+CTc+RssEjPxt5afJQaecPxb0qSfuLGFpoPg=; b=XlsU+QGwkOeqLzcp7+pDl4JZ5v
+	k0wvKbTHQTX/DmSSuz8XMFdsUZoEVvhygV+DgDPQ1g7kpRXQZ+grsML3cYCl0FDqV+K04KWs92LpF
+	64+0Tzd4u/0OS3s7kUhhBVbuQPfmz/2BRRbZAJ2Irxti+JXf4Je2EFVNGA/+oorL3IFg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rSgWb-0060kt-9U; Wed, 24 Jan 2024 17:54:53 +0100
+Date: Wed, 24 Jan 2024 17:54:53 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com, Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net-next v5 07/13] net: ethtool: Introduce a command to
+ list PHYs on an interface
+Message-ID: <1092441f-c347-4f61-8405-7cc8a07d5850@lunn.ch>
+References: <20231221180047.1924733-1-maxime.chevallier@bootlin.com>
+ <20231221180047.1924733-8-maxime.chevallier@bootlin.com>
+ <20240104153401.08ff9809@kernel.org>
+ <20240105104311.03a35622@device-28.home>
+ <2c955f94-7c95-4f66-b739-f0967ec9c171@lunn.ch>
+ <20240124145033.1c711fd1@device-28.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240124145033.1c711fd1@device-28.home>
 
-On Wed, 24 Jan 2024 13:02:21 +0100 Maciej Fijalkowski wrote:
-> > nit: this has just one caller, why not inline these 3 lines? =20
->=20
-> we usually rely on compiler to do that, we have the rule "no inlines in
-> source files", no?
+> > Another option might be to add PHY support to netdevsim. Add a debugfs
+> > interface to allow you to create arbitrary PHY topologies? You can
+> > then even add a test script.
+> 
+> Sorry for the delayed answer, I just took a few hours to give it a try,
+> and I was able to spin some very basic PHY support for the netdevsim,
+> allowing to attach arbitrary instances of fixed_phy devices. I can
+> therefore use that as a mean of testing the dump operation, I'll try to
+> include that in the next iteration, that should pave the way for some
+> testability of more PHY stuff hopefully.
 
-I mean Ctrl-x Ctrl-v the code, the function has 3 LoC and one caller.
-And a semi-meaningless name. I'm not sure why this code was factored
-out.
+Great that you looked at this.
 
-> > nit: prefix the function name, please =20
->=20
-> will rename to bpf_xdp_shrink_data(). Thanks for taking a look!
+FYI: Jakub would like to see changes to netdevsim accompanied with
+self tests making you of the features you add. There is also now a
+build bot running the self tests against net-next, so these tests
+should get run quite frequently.
 
-=F0=9F=91=8D=EF=B8=8F
+       Andrew
+
 
