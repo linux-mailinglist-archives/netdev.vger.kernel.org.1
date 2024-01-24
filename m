@@ -1,201 +1,222 @@
-Return-Path: <netdev+bounces-65512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3525283AE2C
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 17:17:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17CC583AE35
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 17:19:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0F7E1F21C45
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 16:17:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7BF7F1F25CF5
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 16:19:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 859C57E563;
-	Wed, 24 Jan 2024 16:17:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 463E87CF23;
+	Wed, 24 Jan 2024 16:19:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MZuIvdus"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E5E97E562;
-	Wed, 24 Jan 2024 16:17:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58B517C094
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 16:19:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706113047; cv=none; b=B20QLNcWJAgvQyATpBUy8ATPg198iq2HzTW4w3c8l0F+IAYJsW2gQnJkyEFhVh+1IGZv5PXusaKN0QSHdRCi0vZ/+9iCVR0ebDMeLufDZggTD5wF9/79klW1l2IyL+rvVhslO7f+CgqFRDkfn47DZpkZq1KpFSsnnhUKEey4qCw=
+	t=1706113155; cv=none; b=BF3hwP9UDTVAZh3fq7iSYr3K/YbJGoSQoZ7kXPdd1sEAs3JNWheHXhpLXULO8y7UuuKX6zOQGKDxI1ZT7z3ucJqupUwy6AzC86Qr33wjhJKYK7x7niL/lfTPd7oEI/7vM3QMUDbshOuDqDud0yb2UJGClnaqPlR1D5QFp3ezZuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706113047; c=relaxed/simple;
-	bh=rXNeYjIbp304MydXOXcFoTjwZoS/dhBpt7AXuSBz4Ro=;
+	s=arc-20240116; t=1706113155; c=relaxed/simple;
+	bh=40XQOYtPCjyB1xPaE3CSwJD38yBvVKSwSOB/CBE/KqE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NCCz1rI7HOh3OkQCzI0LUUaIqIZRVWf6avEUi0lZLd+MKanFNL3QIdVInfMxAl4AeWhY0tPd8BuQN34SWbSFyW84/t+3x/mP27L7hJ3kHIa6BX2ZuBadbObPoGQQqLcfeW6iIdLBoB/eTAU3pBnmjoF1VLy8YZHmLgatToGY5AM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl; spf=pass smtp.mailfrom=v0yd.nl; arc=none smtp.client-ip=80.241.56.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=v0yd.nl
-Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4TKpy30F5Vz9swq;
-	Wed, 24 Jan 2024 17:17:15 +0100 (CET)
-Message-ID: <6e618827-c9c1-4ef8-9c98-27ef10b6d6a2@v0yd.nl>
-Date: Wed, 24 Jan 2024 17:17:12 +0100
+	 In-Reply-To:Content-Type; b=S/HgY2tVGWPBHlUa/aMcwkvE1xUGzMplZsuP+/w5ZagBIcEIQG9hbuNWlkLxBRqEEDx91TyS1VQIDTe3TzHayvkPsTTUbaPLvirt19iR7H/pKIofUSiNHzZXpSHYLdG8bNg/pll4YemhqljAvUqLsRl+Mfx8ky0BOQMm58TWfKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MZuIvdus; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <c8b3c672-864b-497a-9348-383412632a3d@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1706113150;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=T7nuOJoOmUuNlLsb7W1RUqVrxhJT9IAhy3vPZcivD/I=;
+	b=MZuIvdus+xtMhzYerD1BMQmgJbGcBrj5pn4Z0ucLu1/71jxF5Cscc8r/KuSfTEpRSm1nSW
+	H1LF8UzaGhvZYjGnOGoRJKeRBNW4h3ZGETfUWj/DUvjdpcD2EOPetvR0xBWhn4+GKkzOG4
+	mYRsBNdeKut6M/thnO7yA83MG+7raEA=
+Date: Wed, 24 Jan 2024 16:19:03 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3 0/4] Bluetooth: Improve retrying of connection attempts
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-References: <20240108224614.56900-1-verdre@v0yd.nl>
- <CABBYNZKV176teECGnGKTCNNo45ZYbCRs=YddETOUMUsJQX5PdA@mail.gmail.com>
- <efcc7b97-6bfc-4e5d-8e73-78f2b190fa02@v0yd.nl>
+Subject: Re: [PATCH 3/4] net: wan: fsl_qmc_hdlc: Add runtime timeslots changes
+ support
 Content-Language: en-US
-From: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
-In-Reply-To: <efcc7b97-6bfc-4e5d-8e73-78f2b190fa02@v0yd.nl>
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ Andrew Lunn <andrew@lunn.ch>, Mark Brown <broonie@kernel.org>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+References: <20240123164912.249540-1-herve.codina@bootlin.com>
+ <20240123164912.249540-4-herve.codina@bootlin.com>
+ <fc421c38-66b7-4d4e-abfa-051eccbf793c@linux.dev>
+ <20240124162646.24bf9235@bootlin.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20240124162646.24bf9235@bootlin.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi Luiz,
-
-On 1/9/24 10:57 PM, Jonas Dreßler wrote:
-> Hi Luiz,
+On 24/01/2024 15:26, Herve Codina wrote:
+> Hi Vadim,
 > 
-> On 1/9/24 18:53, Luiz Augusto von Dentz wrote:
->> Hi Jonas,
+> On Wed, 24 Jan 2024 10:10:46 +0000
+> Vadim Fedorenko <vadim.fedorenko@linux.dev> wrote:
+> 
+> [...]
+>>> +static int qmc_hdlc_xlate_slot_map(struct qmc_hdlc *qmc_hdlc,
+>>> +				   u32 slot_map, struct qmc_chan_ts_info *ts_info)
+>>> +{
+>>> +	u64 ts_mask_avail;
+>>> +	unsigned int bit;
+>>> +	unsigned int i;
+>>> +	u64 ts_mask;
+>>> +	u64 map;
+>>> +
+>>> +	/* Tx and Rx masks must be identical */
+>>> +	if (ts_info->rx_ts_mask_avail != ts_info->tx_ts_mask_avail) {
+>>> +		dev_err(qmc_hdlc->dev, "tx and rx available timeslots mismatch (0x%llx, 0x%llx)\n",
+>>> +			ts_info->rx_ts_mask_avail, ts_info->tx_ts_mask_avail);
+>>> +		return -EINVAL;
+>>> +	}
+>>> +
+>>> +	ts_mask_avail = ts_info->rx_ts_mask_avail;
+>>> +	ts_mask = 0;
+>>> +	map = slot_map;
+>>> +	bit = 0;
+>>> +	for (i = 0; i < 64; i++) {
+>>> +		if (ts_mask_avail & BIT_ULL(i)) {
+>>> +			if (map & BIT_ULL(bit))
+>>> +				ts_mask |= BIT_ULL(i);
+>>> +			bit++;
+>>> +		}
+>>> +	}
+>>> +
+>>> +	if (hweight64(ts_mask) != hweight64(map)) {
+>>> +		dev_err(qmc_hdlc->dev, "Cannot translate timeslots 0x%llx -> (0x%llx,0x%llx)\n",
+>>> +			map, ts_mask_avail, ts_mask);
+>>> +		return -EINVAL;
+>>> +	}
+>>> +
+>>> +	ts_info->tx_ts_mask = ts_mask;
+>>> +	ts_info->rx_ts_mask = ts_mask;
+>>> +	return 0;
+>>> +}
+>>> +
+>>> +static int qmc_hdlc_xlate_ts_info(struct qmc_hdlc *qmc_hdlc,
+>>> +				  const struct qmc_chan_ts_info *ts_info, u32 *slot_map)
+>>> +{
+>>> +	u64 ts_mask_avail;
+>>> +	unsigned int bit;
+>>> +	unsigned int i;
+>>> +	u64 ts_mask;
+>>> +	u64 map;
+>>> +
 >>
->> On Mon, Jan 8, 2024 at 5:46 PM Jonas Dreßler <verdre@v0yd.nl> wrote:
->>>
->>> Since commit 4c67bc74f016 ("[Bluetooth] Support concurrent connect
->>> requests"), the kernel supports trying to connect again in case the
->>> bluetooth card is busy and fails to connect.
->>>
->>> The logic that should handle this became a bit spotty over time, and also
->>> cards these days appear to fail with more errors than just "Command
->>> Disallowed".
->>>
->>> This series refactores the handling of concurrent connection requests
->>> by serializing all "Create Connection" commands for ACL connections
->>> similar to how we do it for LE connections.
->>>
->>> ---
->>>
->>> v1: https://lore.kernel.org/linux-bluetooth/20240102185933.64179-1-verdre@v0yd.nl/
->>> v2: https://lore.kernel.org/linux-bluetooth/20240108183938.468426-1-verdre@v0yd.nl/
->>> v3:
->>>    - Move the new sync function to hci_sync.c as requested by review
->>>    - Abort connection on failure using hci_abort_conn_sync() instead of
->>>      hci_abort_conn()
->>>    - Make the last commit message a bit more precise regarding the meaning
->>>      of BT_CONNECT2 state
->>>
->>> Jonas Dreßler (4):
->>>    Bluetooth: Remove superfluous call to hci_conn_check_pending()
->>>    Bluetooth: hci_event: Use HCI error defines instead of magic values
->>>    Bluetooth: hci_conn: Only do ACL connections sequentially
->>>    Bluetooth: Remove pending ACL connection attempts
->>>
->>>   include/net/bluetooth/hci.h      |  3 ++
->>>   include/net/bluetooth/hci_core.h |  1 -
->>>   include/net/bluetooth/hci_sync.h |  3 ++
->>>   net/bluetooth/hci_conn.c         | 83 +++-----------------------------
->>>   net/bluetooth/hci_event.c        | 29 +++--------
->>>   net/bluetooth/hci_sync.c         | 72 +++++++++++++++++++++++++++
->>>   6 files changed, 93 insertions(+), 98 deletions(-)
->>>
->>> -- 
->>> 2.43.0
+>> Starting from here ...
 >>
->> After rebasing and fixing a little bit here and there, see v4, looks
->> like this changes is affecting the following mgmt-tester -s "Pair
->> Device - Power off 1":
+>>> +	/* Tx and Rx masks must be identical */
+>>> +	if (ts_info->rx_ts_mask_avail != ts_info->tx_ts_mask_avail) {
+>>> +		dev_err(qmc_hdlc->dev, "tx and rx available timeslots mismatch (0x%llx, 0x%llx)\n",
+>>> +			ts_info->rx_ts_mask_avail, ts_info->tx_ts_mask_avail);
+>>> +		return -EINVAL;
+>>> +	}
+>>> +	if (ts_info->rx_ts_mask != ts_info->tx_ts_mask) {
+>>> +		dev_err(qmc_hdlc->dev, "tx and rx timeslots mismatch (0x%llx, 0x%llx)\n",
+>>> +			ts_info->rx_ts_mask, ts_info->tx_ts_mask);
+>>> +		return -EINVAL;
+>>> +	}
+>>> +
+>>> +	ts_mask_avail = ts_info->rx_ts_mask_avail;
+>>> +	ts_mask = ts_info->rx_ts_mask;
+>>> +	map = 0;
+>>> +	bit = 0;
+>>> +	for (i = 0; i < 64; i++) {
+>>> +		if (ts_mask_avail & BIT_ULL(i)) {
+>>> +			if (ts_mask & BIT_ULL(i))
+>>> +				map |= BIT_ULL(bit);
+>>> +			bit++;
+>>> +		}
+>>> +	}
+>>> +
+>>> +	if (hweight64(ts_mask) != hweight64(map)) {
+>>> +		dev_err(qmc_hdlc->dev, "Cannot translate timeslots (0x%llx,0x%llx) -> 0x%llx\n",
+>>> +			ts_mask_avail, ts_mask, map);
+>>> +		return -EINVAL;
+>>> +	}
+>>> +
 >>
->> Pair Device - Power off 1 - init
->>    Read Version callback
->>      Status: Success (0x00)
->>      Version 1.22
->>    Read Commands callback
->>      Status: Success (0x00)
->>    Read Index List callback
->>      Status: Success (0x00)
->>    Index Added callback
->>      Index: 0x0000
->>    Enable management Mesh interface
->>    Enabling Mesh feature
->>    Read Info callback
->>      Status: Success (0x00)
->>      Address: 00:AA:01:00:00:00
->>      Version: 0x09
->>      Manufacturer: 0x05f1
->>      Supported settings: 0x0001bfff
->>      Current settings: 0x00000080
->>      Class: 0x000000
->>      Name:
->>      Short name:
->>    Mesh feature is enabled
->> Pair Device - Power off 1 - setup
->>    Setup sending Set Bondable (0x0009)
->>    Setup sending Set Powered (0x0005)
->>    Initial settings completed
->>    Test setup condition added, total 1
->>    Client set connectable: Success (0x00)
->>    Test setup condition complete, 0 left
->> Pair Device - Power off 1 - setup complete
->> Pair Device - Power off 1 - run
->>    Sending Pair Device (0x0019)
->> Bluetooth: hci0: command 0x0405 tx timeout
->> Bluetooth: hci0: command 0x0408 tx timeout
->>    Test condition added, total 1
->> Pair Device - Power off 1 - test timed out
->>    Pair Device (0x0019): Disconnected (0x0e)
->> Pair Device - Power off 1 - test not run
->> Pair Device - Power off 1 - teardown
->> Pair Device - Power off 1 - teardown
->>    Index Removed callback
->>      Index: 0x0000
->> Pair Device - Power off 1 - teardown complete
->> Pair Device - Power off 1 - done
+>> till here the block looks like copy of the block from previous function.
+>> It worth to make a separate function for it, I think.
 >>
+>>> +	if (map >= BIT_ULL(32)) {
+>>> +		dev_err(qmc_hdlc->dev, "Slot map out of 32bit (0x%llx,0x%llx) -> 0x%llx\n",
+>>> +			ts_mask_avail, ts_mask, map);
+>>> +		return -EINVAL;
+>>> +	}
+>>> +
+>>> +	*slot_map = map;
+>>> +	return 0;
+>>> +}
+>>> +
+> [...]
 > 
-> Thanks for landing the first two commits!
+> I am not so sure. There are slighty differences between the two functions.
+> The error messages and, in particular, the loop in qmc_hdlc_xlate_slot_map() is:
+> 	--- 8< ---
+> 	ts_mask_avail = ts_info->rx_ts_mask_avail;
+> 	ts_mask = 0;
+> 	map = slot_map;
+> 	bit = 0;
+> 	for (i = 0; i < 64; i++) {
+> 		if (ts_mask_avail & BIT_ULL(i)) {
+> 			if (map & BIT_ULL(bit))
+> 				ts_mask |= BIT_ULL(i);
+> 			bit++;
+> 		}
+> 	}
+> 	--- 8< ---
 > 
-> I think this is actually the same issue causing the test failure
-> as in the other issue I had:
-> https://lore.kernel.org/linux-bluetooth/7cee4e74-3a0c-4b7c-9984-696e646160f8@v0yd.nl/
+> whereas it is the following in qmc_hdlc_xlate_ts_info():
+> 	--- 8< ---
+> 	ts_mask_avail = ts_info->rx_ts_mask_avail;
+> 	ts_mask = ts_info->rx_ts_mask;
+> 	map = 0;
+> 	bit = 0;
+> 	for (i = 0; i < 64; i++) {
+> 		if (ts_mask_avail & BIT_ULL(i)) {
+> 			if (ts_mask & BIT_ULL(i))
+> 				map |= BIT_ULL(bit);
+> 			bit++;
+> 		}
+> 	}
+> 	--- 8< ---
 > 
-> It seems that the emulator is unable to reply to HCI commands sent
-> from the hci_sync machinery, possibly because that is sending things
-> on a separate thread?
-
-Okay I did some further digging now: Turns out this actually not a problem
-with vhci and the emulator, but (in this test case) it's actually intended
-that there's the command times out, because force_power_off is TRUE for
-this test case, and the HCI device gets shut down right after sending the MGMT
-command.
-
-The test broke because the "Command Complete" MGMT event comes back with status
-"Disconnected" instead of "Not Powered": The reason for that is the
-hci_abort_conn_sync() that I added in the case where the "Create Connection" HCI
-times out. hci_abort_conn_sync() calls hci_conn_failed() with
-HCI_ERROR_LOCAL_HOST_TERM as expected, this in turn calls the hci_connect_cfm()
-callback (pairing_complete_cb), and there we we look up HCI_ERROR_LOCAL_HOST_TERM
-in mgmt_status_table, ending up with MGMT_STATUS_DISCONNECTED.
-
-When I remove the hci_abort_conn_sync() we get the "Not Powered" failure again,
-I'm not exactly sure why that happens (I assume there's some kind of generic mgmt
-failure return handler that checks hdev_is_powered() and then sets the error).
-
-So the question now is do we want to adjust the test (and possibly bluetoothd?)
-to expect "Disconnected" instead of "Not Powered", or should I get rid of the
-hci_abort_conn_sync() again? Fwiw, in hci_le_create_conn_sync() we also clean
-up like this on ETIMEDOUT (maybe the spec is just different there?), so
-consistency wise it seems better to adjust the test to expect "Disconnected".
-
-Cheers,
-Jonas
-
+> ts_map and map initializations are not the same, i and bit are not used for
+> the same purpose and the computed value is not computed based on the same
+> information.
 > 
-> Cheers,
-> Jonas
+> With that pointed, I am not sure that having some common code for both
+> function will be relevant. Your opinion ?
+
+I see. I'm just thinking if it's possible to use helpers from bitops.h
+and bitmap.h here to avoid open-coding common parts of the code.
+
+> Best regards,
+> Hervé
+
 
