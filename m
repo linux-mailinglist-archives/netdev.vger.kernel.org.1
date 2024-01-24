@@ -1,207 +1,256 @@
-Return-Path: <netdev+bounces-65376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65377-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F71E83A426
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:31:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A57883A43D
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 09:37:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E6B3281AFE
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 08:31:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF00D1F27DE7
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 08:37:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AF3E1756B;
-	Wed, 24 Jan 2024 08:31:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E752A175AD;
+	Wed, 24 Jan 2024 08:37:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=bp.renesas.com header.i=@bp.renesas.com header.b="wgQ9es+a"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VeVQ9ma4"
 X-Original-To: netdev@vger.kernel.org
-Received: from JPN01-TYC-obe.outbound.protection.outlook.com (mail-tycjpn01on2106.outbound.protection.outlook.com [40.107.114.106])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48CA6171C9;
-	Wed, 24 Jan 2024 08:31:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.114.106
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706085074; cv=fail; b=K+Rg+9yZuhdGFH4tJgrqkPxInlsGyPuybAXyHRXcyi8lxuMDOiWN0zeWBpAyPS7NDjTJukDTmEmN2EvW/zJUdpaLmGgbw1br2hYreZRG4rVFiHPqUhUCypCzTNqNJ1o2FJrcfyzoi1YUR7DeIt0AtHveLXGhHVQjRtPYy3iEjm0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706085074; c=relaxed/simple;
-	bh=26UcZDUFcSwRbIJMA+rKGmjLe1X0ANtNxMFhnGzou3w=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=HIdcCxQv/kChhwd935Qm9jKh3ftTUHYaFIL1GnFlJvaNqS7egspE3D9ZKVN/o5QxJpov09tTqqwTTfauqfEs8GJChMCV3F9xJVvYtPwmVHnhyMf1o/Y3WxCwI74Wt6OBj/Dn+5Ghku2QLLiWl79cP45kDe6HEUhGxZfjS9LB6g8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; dkim=pass (1024-bit key) header.d=bp.renesas.com header.i=@bp.renesas.com header.b=wgQ9es+a; arc=fail smtp.client-ip=40.107.114.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dR18b+55i6wkP9YRqkH9QSbn5JkEGfOsnFlu764tZPfdYXvYb/jtZ4sa4NWK/eun0BkDFJGu3+xsAUMTB75rRhzdBYCxY0qJRz52Lmf4LmHMUhzlexjh8kaQEHsurNzvZNWwgeyegwiN65E3TMoHGivr0jAb8O35mifdrPZxKVbrlWdLxG15Dy8Odynwxh9Rtch22Z8dz8mavuizqmzEZ9E6jNyKvD2Z8ozotrTYsdzcY6ncHGxUUbpZxbDKoX0cOrleORWZQSTF7riAK2YSFYtFhqugiNtmO3y8SVFpxc749/8h5QU/UTcskq0PquONLuMKlD/3xNmTMzDcgxb4/w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XR2w+Nn6+zHixCXCs78S/OfFQalNyfkJ5VEdkMojgBk=;
- b=KUnfTxrnS0+52nNwtwlBFumCM+wzpv03GnCerqfHgkzhNe3M4PKgp4XqFMtR5h8ReZouj/weZjPxtlaXuMiS5oXlJyoCgkLmKW2hwkGZxfM4HCIn4OypAUMo/5q2Hr8T/Z7AYloI4xbwanOgfyUTaNujY+bZUIlHQNY1M3ZWK3wGwdIFjFn1ulNBOhZsKZqNCvfcncU8QwnUqkP4whGGsKZbfrkBQm/HVgbvYKh/p0WIFw2MnESEfCEYFOTEQXR6o3SqOMWS9f6yFGdab+HTHQ5QB1+kFuxjhGHgECfjLgrLqQv12gwt5uY88CZ6lyita/0EnI0BaEnr/+7sf20TWg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=bp.renesas.com; dmarc=pass action=none
- header.from=bp.renesas.com; dkim=pass header.d=bp.renesas.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bp.renesas.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XR2w+Nn6+zHixCXCs78S/OfFQalNyfkJ5VEdkMojgBk=;
- b=wgQ9es+a0iwrhwGHZmwmjWrEtIguo+m3Bze6GcNAcktSiS29nfW7t0H8fs598tgLa25X0idZOXX+thjL0XFeK9J0gmP0/eC0SW5Lq7q/0G9NmjoPe2jJE6CMVLCfU7tZUJXEzc3K92BONpp66BkAKokROgXeydLVGkzxXdVaCgs=
-Received: from TYCPR01MB11269.jpnprd01.prod.outlook.com
- (2603:1096:400:3c0::10) by TYVPR01MB10895.jpnprd01.prod.outlook.com
- (2603:1096:400:299::10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.16; Wed, 24 Jan
- 2024 08:31:06 +0000
-Received: from TYCPR01MB11269.jpnprd01.prod.outlook.com
- ([fe80::8d12:a02a:9fdc:9c78]) by TYCPR01MB11269.jpnprd01.prod.outlook.com
- ([fe80::8d12:a02a:9fdc:9c78%5]) with mapi id 15.20.7228.022; Wed, 24 Jan 2024
- 08:31:06 +0000
-From: Biju Das <biju.das.jz@bp.renesas.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Sergey Shtylyov
-	<s.shtylyov@omp.ru>, Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, Wolfram Sang
-	<wsa+renesas@sang-engineering.com>, nikita.yoush
-	<nikita.yoush@cogentembedded.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-renesas-soc@vger.kernel.org"
-	<linux-renesas-soc@vger.kernel.org>, Geert Uytterhoeven
-	<geert+renesas@glider.be>, Prabhakar Mahadev Lad
-	<prabhakar.mahadev-lad.rj@bp.renesas.com>, biju.das.au
-	<biju.das.au@gmail.com>
-Subject: RE: [PATCH net-next 1/2] ravb: Add Rx checksum offload support
-Thread-Topic: [PATCH net-next 1/2] ravb: Add Rx checksum offload support
-Thread-Index: AQHaTg+VEjiH3LyFqkWrw8nn5AoY4rDoJ82AgAB63UA=
-Date: Wed, 24 Jan 2024 08:31:06 +0000
-Message-ID:
- <TYCPR01MB11269BEF48F2C2C111C91858A867B2@TYCPR01MB11269.jpnprd01.prod.outlook.com>
-References: <20240123151924.373917-1-biju.das.jz@bp.renesas.com>
-	<20240123151924.373917-2-biju.das.jz@bp.renesas.com>
- <20240123170921.51089d41@kernel.org>
-In-Reply-To: <20240123170921.51089d41@kernel.org>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=bp.renesas.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: TYCPR01MB11269:EE_|TYVPR01MB10895:EE_
-x-ms-office365-filtering-correlation-id: 4f1558c1-7f8c-40e7-0db9-08dc1cb6cf4b
-x-ld-processed: 53d82571-da19-47e4-9cb4-625a166a4a2a,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- Tn/u89ObryloL7SGvU8IylcDgVj0lZQD1NXMSqpj8Q2Ogfrwkb0sih57lUgB18/O5sG30y99SW5VQCu1OL6NmzXBhHsY4vggCjWdjVq0B/bIPp6tgx3ccR89QIcUNP+91toTdNot7CegSWE9X2uPT6T8UNlW9Ej/LmHbT/hDf60K3vfTwEhrdRxnFm+LOmSzoBL1Tq0jJO9DSq2LR9kxzBBArlCJD+IhpWT7qRwcJDJ4DVJdtQFdHBX2ra2CrPN37Atin7iAOWOYf4CMBwU4IERLlg5b77g4AscFuLwAEHLWHfVVb/IOGZz/EZrNvUvmh9AvmONei4+n0zGSsjMFVHKokKWTpRWJtWSEvVvvshhetTpKkDhVrvpPwxG5e5OVokK0nUvk3pDDrsmTc3n5guwSbes+0cNniYEvSfGre1l9ovkcqYqG6Hy0KTxSMnZTPZpTHYt0H3VoqfOd07xpgpI0A6aK65gIYJUTkxYRi1mXmVwoBVEzVkKzX/NzWsAPtUCaE9HLUdACdFkCy/fScoEssCn8SAWM7AhW01kTw85yNCbZ/OcJZXVg4tC4bC+tLKxk4r88Aj8KHcPDaEQ+20snVcVmV4ZXbcAk720bM9SWp19LmSQGPQNzB0NVRFAMaBQ3lnhW1WDYwKN6/qcr3Hr3x+CDHNAkynEO2BbKPus=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYCPR01MB11269.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(396003)(376002)(136003)(366004)(346002)(230922051799003)(230173577357003)(230273577357003)(64100799003)(1800799012)(186009)(451199024)(38070700009)(55016003)(41300700001)(83380400001)(33656002)(86362001)(122000001)(9686003)(8936002)(26005)(8676002)(53546011)(6916009)(52536014)(6506007)(66556008)(5660300002)(478600001)(76116006)(316002)(66946007)(66476007)(54906003)(2906002)(64756008)(66446008)(71200400001)(7696005)(7416002)(38100700002)(4326008);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?3vpB7CtLdjwrQd5wB0tQ2TX815DISLiE4Qn+q1V8lN8tAxJYy69MH4AAFHIY?=
- =?us-ascii?Q?TjfN0GfsLkw1BUHRih3buMHKhIMFHxCCAlpbxzq4SNl0t6pe4XJMl/LnYJ67?=
- =?us-ascii?Q?BPk6u9qtubSmHxuJgnfmTAzZKb9UnOkJTN7jf1OvQjUMqHLGbY0CIG4XziXU?=
- =?us-ascii?Q?pyW/Jn34Ndr9UQ67dtNfPpvpYClGzzl6q24LVhHVY8F8ky+c/7O0vgodF5a7?=
- =?us-ascii?Q?WwzMefh40eN+knhAHWIPXwohutR58TDwGb7OuS4REWtnWralethLbbOyUlLi?=
- =?us-ascii?Q?W2DRVQD5N0x7snFH6lin69Ch39T0yWb5o3A4qQqmtCWQaOEI1hSm6ynHe/Yb?=
- =?us-ascii?Q?dItswzsPha2zYgh7yWa4GtDwDtgmzsmvEcW1mS5p7YhP0UwZBs+hRk3v9mih?=
- =?us-ascii?Q?DVUg4bjhb7pjwhX8auw5kz8JBuo4mvxryQBAo9xgQbunqlDccwvRIaMZFFdH?=
- =?us-ascii?Q?QEYl1TWyk/IeUYV3755rcxjK1Q2zBwGZJkVz4yhkvOVJkxVC9Gi2u7Yl4QsL?=
- =?us-ascii?Q?/ZXy8UjiWVgKLgsXdnx1UASFPxHm0moGMqpnvZySytGf/MN+GTV2VqR/pF21?=
- =?us-ascii?Q?8gKMB/PWlP3Og60OP8vCUNnVfzzABA/7L017CxnM/AfmK+qwIwItmWCHUHGe?=
- =?us-ascii?Q?N7X2pjpfLf9eWNvE8J/xUc32INLHWnApfK4q0RorUOE/KR2j+/v2hULwm/7A?=
- =?us-ascii?Q?09fvFak5rZWEA2kqToskfVV4KYOtqQSSJ+6vcnlphVeDZgiPKqinjWWUR+2J?=
- =?us-ascii?Q?uCIvDGkwPSTq5fXeIpoaZ+IZZbuyLU1HkSaAZqtPvWNJWTxWfEry12Udume6?=
- =?us-ascii?Q?qwXCU6K26xaM0uTG36yzKLOFB9VM9lAGOhnnNlYMo69f3I5LegQmiTm98Rc+?=
- =?us-ascii?Q?m9XIkvcvrpypmPTg76gJYg8v3STi96gAPG17Wbvs1cHjejgJ40JqPDO24CjF?=
- =?us-ascii?Q?jax0cwkPUUWri5doqDszdWEtIkRnAeGZNd/eGG9jSU3Yy2+379TA/6q2eMW6?=
- =?us-ascii?Q?q+tEa/SYPbJ+mTyHg450qJxkY+axdJlWV/jtnDZmgwGDuF+c6tvZ0QvSMrmU?=
- =?us-ascii?Q?gy3bTvo0EtfNCtF73xHVo+hdgjwMFCQLlrBOa6EWydPBRrAcuGKW43xFN3F/?=
- =?us-ascii?Q?5PAL1clWQ50zvk3Ze5IhbIbvgEbPOaQs1PZrCZ1UWlIRlblqpahpY8shh+D+?=
- =?us-ascii?Q?eIGEnJuMGaH4vK9k/U60Ezvb/yjHaXaaGUAQb4qXZel/Mr2LOxEZf49gf4K/?=
- =?us-ascii?Q?9xAZXyOkaTRqp2Vggf19ksfyxp3ZrtCS1m2JHhavlstvuwOiwv7GycR4QMld?=
- =?us-ascii?Q?swxaOmq3aWIP/CaspH8Un0thmjkFXvqhc//wSHW0TJ9QIhU/geA96b65x8YV?=
- =?us-ascii?Q?Yn4URqDokPrxfuU2A+D0DbmLg0n76gjlxjnDRYm5kBtnQ040xuhBqnAzVK89?=
- =?us-ascii?Q?Op1p1BPh5RwEplqrf4PTU3NjM4ZFUqGwnLS+qwTYfGGSjVCfdUj53+vFxA7U?=
- =?us-ascii?Q?ihO2sHgKEVQPi4B/5VWlkFN405rOCh36rOA0hMoXxeZor3zERAF7oytLCSsF?=
- =?us-ascii?Q?FoEIFS/utMDwQOOMt3T3ONlKAnWrE0ALm35HU+5TlstWDIgyoJ5kdGSWDeaV?=
- =?us-ascii?Q?0Q=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C37E171D8;
+	Wed, 24 Jan 2024 08:37:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706085448; cv=none; b=SJWi4hE/jVswCvU4/jcNqXkbEvfRehMGDhCrbfVmK4TP4ZTn+BhfwJ8y5hyKwfatZWOE8Vg4k5ixglRgiSP5ZZG7VK6vQiojAEa/bdmpt4BrgbWSjtjEzfxRlONK5IybYJR69/c0NAMPtwDdnfgto7QCjSTIRJjlyy+IjAjwf40=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706085448; c=relaxed/simple;
+	bh=zB3mn3TMR5uRvNxU/1HaMoDvAmBqxw1DqmLmXJ2EaQU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=T3GKUHzmlG1rY+0msXdb8lGJR5sW6SQRb/Ma+gxoqsflGcNsb7gZQ1F7Y7MLGr6lDc6MP+ficclZ/nnUaO78Eu7BLyhkv3UNoJu7uSd6ez8mwd1dv8hC9t8SWY1IH0M/E/MV2TBGNPvfgpyt7rWm4ZNE13qehfENFSFNBXcbe1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VeVQ9ma4; arc=none smtp.client-ip=209.85.222.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-783ae53037fso15569785a.0;
+        Wed, 24 Jan 2024 00:37:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706085445; x=1706690245; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=nJTVntF2VlItmD4v8LVNNH72RGP5v4kzuTD33v2nbSc=;
+        b=VeVQ9ma4mNNGpNCIzeW85Syae+sDfpOJJ94RNv1FsMoJVciPVDutF77FHwyBlGmEez
+         DXY9k9odYUmFW0unct8xWHdt7kdoL/lNTsc6jnS6RM8gcGpoJKhbKdkDPoxAigaaIX7k
+         pQ9vslBXGdekLTwclrShlF4X8C2Qlrq44MG+zSZfPpjqN/gfQBCiD0XgrFaJtKq/1hIJ
+         pOXAFb8Y2Jcvo9DKGwtlW6mEfbn/u4b6PSOZat0gb3VNXddm0bV1YhPex9MdBBOFsmp5
+         ACfzkJYQIJi+RtAHCcgv06wrl0JFkYPtIibgUKrdod4mgulP2f6JkB0+7HhA/ar3da3l
+         1ZWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706085445; x=1706690245;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nJTVntF2VlItmD4v8LVNNH72RGP5v4kzuTD33v2nbSc=;
+        b=h62YxjLCRbl24scqSCGYLA+d5KiQBN/AInDTXGNe973Dkv/ymIUGJ9ovm1+KRyFMiw
+         E2NdpxodTcTd0+yrI0GzNRn9XSOjhwRq6x8bmdTU7trTSgaqeBATSdHW/0dlg58MRqjs
+         x8GK4vFJkY0V4IXHmwgyedf/NQKk4JKSnbi+69EVgPCBFSHguOkTJ1PCky1QB40zki2i
+         vtUrS7KsIPNHAs5vkEGtozkT+fcQhOh8+wmrtkoyQ7OD0WYg7lXgoVEPNpQjSltLdBAg
+         brAwKrSP/tKeRbRiVlKekeJQj4LQt5dX5ZosbAn7iFh5+DPnXWKsYbHmTuivnFe9wtuV
+         rsfw==
+X-Gm-Message-State: AOJu0YxWpWcHYQgmVgZbIyWxMLWMwvlJKHSaHAPJyJsVFz93c52Seqri
+	9SDkLY/AQHsxV+VIUIydmCggZMRXtfD8/UrgBVheytD8VcWbjgOEvQTeU/+wFmO8DJzCFIXQGF4
+	QKhVZNenCowt4oQw3ZBC49ONbLvM=
+X-Google-Smtp-Source: AGHT+IHOsVVVHBUbByJUa6uWDyW/l6Jnfbte5Q9BHJAvgAGRo1oSN0AQ3jSjn2cGqQlFd6JL8nGuAapdFfJDYK8GeI8=
+X-Received: by 2002:a05:6214:3008:b0:685:65ee:b06c with SMTP id
+ ke8-20020a056214300800b0068565eeb06cmr1676490qvb.3.1706085444933; Wed, 24 Jan
+ 2024 00:37:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: bp.renesas.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TYCPR01MB11269.jpnprd01.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4f1558c1-7f8c-40e7-0db9-08dc1cb6cf4b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Jan 2024 08:31:06.6963
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: TJUKBvU6m8l2fLxPhZVpY661pvaZlNsNFNLpnq6iqI7p8c1b+9ASa60KwtLoaZ5IJKccD3ByEpHDAEBMKXgvaG2YwjiNdlKIqtc3NJH/jG8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYVPR01MB10895
+References: <20240122221610.556746-1-maciej.fijalkowski@intel.com> <20240122221610.556746-5-maciej.fijalkowski@intel.com>
+In-Reply-To: <20240122221610.556746-5-maciej.fijalkowski@intel.com>
+From: Magnus Karlsson <magnus.karlsson@gmail.com>
+Date: Wed, 24 Jan 2024 09:37:13 +0100
+Message-ID: <CAJ8uoz2w3A7+aOAKWKjdATUgwQ8u10GHAtjodc_Nhp9FALE9KQ@mail.gmail.com>
+Subject: Re: [PATCH v5 bpf 04/11] ice: work on pre-XDP prog frag count
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
+	andrii@kernel.org, netdev@vger.kernel.org, magnus.karlsson@intel.com, 
+	bjorn@kernel.org, echaudro@redhat.com, lorenzo@kernel.org, 
+	martin.lau@linux.dev, tirthendu.sarkar@intel.com, john.fastabend@gmail.com, 
+	horms@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Jakub Kicinski,
+On Mon, 22 Jan 2024 at 23:16, Maciej Fijalkowski
+<maciej.fijalkowski@intel.com> wrote:
+>
+> Fix an OOM panic in XDP_DRV mode when a XDP program shrinks a
+> multi-buffer packet by 4k bytes and then redirects it to an AF_XDP
+> socket.
+>
+> Since support for handling multi-buffer frames was added to XDP, usage
+> of bpf_xdp_adjust_tail() helper within XDP program can free the page
+> that given fragment occupies and in turn decrease the fragment count
+> within skb_shared_info that is embedded in xdp_buff struct. In current
+> ice driver codebase, it can become problematic when page recycling logic
+> decides not to reuse the page. In such case, __page_frag_cache_drain()
+> is used with ice_rx_buf::pagecnt_bias that was not adjusted after
+> refcount of page was changed by XDP prog which in turn does not drain
+> the refcount to 0 and page is never freed.
+>
+> To address this, let us store the count of frags before the XDP program
+> was executed on Rx ring struct. This will be used to compare with
+> current frag count from skb_shared_info embedded in xdp_buff. A smaller
+> value in the latter indicates that XDP prog freed frag(s). Then, for
+> given delta decrement pagecnt_bias for XDP_DROP verdict.
+>
+> While at it, let us also handle the EOP frag within
+> ice_set_rx_bufs_act() to make our life easier, so all of the adjustments
+> needed to be applied against freed frags are performed in the single
+> place.
+>
+> Fixes: 2fba7dc5157b ("ice: Add support for XDP multi-buffer on Rx side")
+> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_txrx.c     | 14 ++++++---
+>  drivers/net/ethernet/intel/ice/ice_txrx.h     |  1 +
+>  drivers/net/ethernet/intel/ice/ice_txrx_lib.h | 31 +++++++++++++------
+>  3 files changed, 32 insertions(+), 14 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
+> index 59617f055e35..1760e81379cc 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_txrx.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
+> @@ -603,9 +603,7 @@ ice_run_xdp(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
+>                 ret = ICE_XDP_CONSUMED;
+>         }
+>  exit:
+> -       rx_buf->act = ret;
+> -       if (unlikely(xdp_buff_has_frags(xdp)))
+> -               ice_set_rx_bufs_act(xdp, rx_ring, ret);
+> +       ice_set_rx_bufs_act(xdp, rx_ring, ret);
+>  }
+>
+>  /**
+> @@ -893,14 +891,17 @@ ice_add_xdp_frag(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
+>         }
+>
+>         if (unlikely(sinfo->nr_frags == MAX_SKB_FRAGS)) {
+> -               if (unlikely(xdp_buff_has_frags(xdp)))
+> -                       ice_set_rx_bufs_act(xdp, rx_ring, ICE_XDP_CONSUMED);
+> +               ice_set_rx_bufs_act(xdp, rx_ring, ICE_XDP_CONSUMED);
+>                 return -ENOMEM;
+>         }
+>
+>         __skb_fill_page_desc_noacc(sinfo, sinfo->nr_frags++, rx_buf->page,
+>                                    rx_buf->page_offset, size);
+>         sinfo->xdp_frags_size += size;
+> +       /* remember frag count before XDP prog execution; bpf_xdp_adjust_tail()
+> +        * can pop off frags but driver has to handle it on its own
+> +        */
+> +       rx_ring->nr_frags = sinfo->nr_frags;
+>
+>         if (page_is_pfmemalloc(rx_buf->page))
+>                 xdp_buff_set_frag_pfmemalloc(xdp);
+> @@ -1251,6 +1252,7 @@ int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
+>
+>                 xdp->data = NULL;
+>                 rx_ring->first_desc = ntc;
+> +               rx_ring->nr_frags = 0;
+>                 continue;
+>  construct_skb:
+>                 if (likely(ice_ring_uses_build_skb(rx_ring)))
+> @@ -1266,10 +1268,12 @@ int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
+>                                                     ICE_XDP_CONSUMED);
+>                         xdp->data = NULL;
+>                         rx_ring->first_desc = ntc;
+> +                       rx_ring->nr_frags = 0;
+>                         break;
+>                 }
+>                 xdp->data = NULL;
+>                 rx_ring->first_desc = ntc;
+> +               rx_ring->nr_frags = 0;
 
-Thanks for the feedback.
+Are these needed? Or asked in another way, is there some way in which
+ice_set_rx_bufs_act() can be executed before ice_add_xdp_frag()? If
+not, we could remove them.
 
-> -----Original Message-----
-> From: Jakub Kicinski <kuba@kernel.org>
-> Sent: Wednesday, January 24, 2024 1:09 AM
-> Subject: Re: [PATCH net-next 1/2] ravb: Add Rx checksum offload support
->=20
-> On Tue, 23 Jan 2024 15:19:23 +0000 Biju Das wrote:
-> > +static void ravb_rx_csum_gbeth(struct sk_buff *skb) {
-> > +	__sum16 csum_ip_hdr, csum_proto;
-> > +	u8 *hw_csum;
-> > +
-> > +	/* The hardware checksum status is contained in sizeof(__sum16) * 2
-> =3D 4
-> > +	 * bytes appended to packet data. First 2 bytes is ip header csum
-> and
-> > +	 * last 2 bytes is protocol csum.
-> > +	 */
-> > +	if (unlikely(skb->len < sizeof(__sum16) * 2))
-> > +		return;
-> > +
-> > +	hw_csum =3D skb_tail_pointer(skb) - sizeof(__sum16);
-> > +	csum_proto =3D csum_unfold((__force
-> > +__sum16)get_unaligned_le16(hw_csum));
-> > +
-> > +	hw_csum -=3D sizeof(__sum16);
-> > +	csum_ip_hdr =3D csum_unfold((__force
-> __sum16)get_unaligned_le16(hw_csum));
-> > +	skb_trim(skb, skb->len - 2 * sizeof(__sum16));
-> > +
-> > +	/* TODO: IPV6 Rx csum */
-> > +	if (skb->protocol =3D=3D htons(ETH_P_IP) && csum_ip_hdr =3D=3D
-> TOE_RX_CSUM_OK &&
-> > +	    csum_proto =3D=3D TOE_RX_CSUM_OK)
-> > +		/* Hardware validated our checksum */
-> > +		skb->ip_summed =3D CHECKSUM_UNNECESSARY; }
->=20
-> sparse does not seem to be onboard:
->=20
-> drivers/net/ethernet/renesas/ravb_main.c:771:20: warning: incorrect type
-> in assignment (different base types)
-> drivers/net/ethernet/renesas/ravb_main.c:771:20:    expected restricted
-> __sum16 [usertype] csum_proto
-> drivers/net/ethernet/renesas/ravb_main.c:771:20:    got restricted __wsum
-> drivers/net/ethernet/renesas/ravb_main.c:774:21: warning: incorrect type
-> in assignment (different base types)
-> drivers/net/ethernet/renesas/ravb_main.c:774:21:    expected restricted
-> __sum16 [usertype] csum_ip_hdr
-> drivers/net/ethernet/renesas/ravb_main.c:774:21:    got restricted __wsum
+Looks good otherwise.
 
-I have reproduced this issue and the warning is fixed by replacing
-__sum16->__wsum.
+Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
 
-I will send v2 with this fix.
-
-Cheers,
-Biju
+>
+>                 stat_err_bits = BIT(ICE_RX_FLEX_DESC_STATUS0_RXE_S);
+>                 if (unlikely(ice_test_staterr(rx_desc->wb.status_error0,
+> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.h b/drivers/net/ethernet/intel/ice/ice_txrx.h
+> index b3379ff73674..af955b0e5dc5 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_txrx.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_txrx.h
+> @@ -358,6 +358,7 @@ struct ice_rx_ring {
+>         struct ice_tx_ring *xdp_ring;
+>         struct ice_rx_ring *next;       /* pointer to next ring in q_vector */
+>         struct xsk_buff_pool *xsk_pool;
+> +       u32 nr_frags;
+>         dma_addr_t dma;                 /* physical address of ring */
+>         u16 rx_buf_len;
+>         u8 dcb_tc;                      /* Traffic class of ring */
+> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx_lib.h b/drivers/net/ethernet/intel/ice/ice_txrx_lib.h
+> index 762047508619..afcead4baef4 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_txrx_lib.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_txrx_lib.h
+> @@ -12,26 +12,39 @@
+>   * act: action to store onto Rx buffers related to XDP buffer parts
+>   *
+>   * Set action that should be taken before putting Rx buffer from first frag
+> - * to one before last. Last one is handled by caller of this function as it
+> - * is the EOP frag that is currently being processed. This function is
+> - * supposed to be called only when XDP buffer contains frags.
+> + * to the last.
+>   */
+>  static inline void
+>  ice_set_rx_bufs_act(struct xdp_buff *xdp, const struct ice_rx_ring *rx_ring,
+>                     const unsigned int act)
+>  {
+> -       const struct skb_shared_info *sinfo = xdp_get_shared_info_from_buff(xdp);
+> -       u32 first = rx_ring->first_desc;
+> -       u32 nr_frags = sinfo->nr_frags;
+> +       u32 sinfo_frags = xdp_get_shared_info_from_buff(xdp)->nr_frags;
+> +       u32 nr_frags = rx_ring->nr_frags + 1;
+> +       u32 idx = rx_ring->first_desc;
+>         u32 cnt = rx_ring->count;
+>         struct ice_rx_buf *buf;
+>
+>         for (int i = 0; i < nr_frags; i++) {
+> -               buf = &rx_ring->rx_buf[first];
+> +               buf = &rx_ring->rx_buf[idx];
+>                 buf->act = act;
+>
+> -               if (++first == cnt)
+> -                       first = 0;
+> +               if (++idx == cnt)
+> +                       idx = 0;
+> +       }
+> +
+> +       /* adjust pagecnt_bias on frags freed by XDP prog */
+> +       if (sinfo_frags < rx_ring->nr_frags && act == ICE_XDP_CONSUMED) {
+> +               u32 delta = rx_ring->nr_frags - sinfo_frags;
+> +
+> +               while (delta) {
+> +                       if (idx == 0)
+> +                               idx = cnt - 1;
+> +                       else
+> +                               idx--;
+> +                       buf = &rx_ring->rx_buf[idx];
+> +                       buf->pagecnt_bias--;
+> +                       delta--;
+> +               }
+>         }
+>  }
+>
+> --
+> 2.34.1
+>
+>
 
