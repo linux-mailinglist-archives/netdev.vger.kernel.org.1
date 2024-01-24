@@ -1,565 +1,346 @@
-Return-Path: <netdev+bounces-65472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3429283AB45
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 15:00:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D09283AB57
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 15:06:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D723028E308
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 14:00:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90BFA1F2267D
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 14:06:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B97E77F34;
-	Wed, 24 Jan 2024 14:00:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31A037A701;
+	Wed, 24 Jan 2024 14:06:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FoTI0qnz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Vzo6QdYv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73B43199D9
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 13:59:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706104801; cv=none; b=GzlBORJ3cPqrgztvzBrQ95veJxXplTkD82T6+1fEA2L+tFFp1oXlcKYPfCwdlCvwa+VNA8NNFaEJHmCXramfi0zZ2Zp+AohUpUAhN6wglDj+lQFgzKxW/Qynwx3XNGmYRwZlCEmtNOOXQtqGgLUFE/FcDAdWIiTTslDhLDzmnrM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706104801; c=relaxed/simple;
-	bh=qyOaxdX1uFhbX/6JrY49GOdiGcgVIqcU9w77M0WaO2A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YDT9qS0464CboFYyNHpvGLG5eyutT4MLnrfojToAYXJQvzYd5PeShpGe5Bo9M4JzMNiyS4dd7LfJCQFGea+EnmLFB5pk1PiAUwmVibmwAq1TT2nO9l6xDy/rarAAIUtRRTvXMqgAcJhNCRof8K+6pm+D54MZErrXzrL+/kyff0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FoTI0qnz; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-50eac018059so7678182e87.0
-        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 05:59:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706104797; x=1706709597; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=BoxkuWyBIMvMvJWK0XCoaEvMQhQl3AgTxuY2oIOnG7U=;
-        b=FoTI0qnzvK0ZiEtsFV+8feGtGLcHbuBQco5JD0OP1KPvv+DyO33aUm33xyP2JgyLNa
-         zk8Sf8DQo9F6WF+PFYyXzukBDHIrs0mZMkXEI3aNu8C17vM1ECTMDXvCLYJz0Cjqj/RG
-         y6QwIla/8GurOzkC1aMy6Sjvi/t80eRe8lg7OO3RA+r1rSknDjUF4pbEkvWjEgty77+E
-         m5n72S1keyVq3dFvXegrtM4OyF2KmB7/sgRsYbtuJDWFRJpxOYAxe78c6AZI8cZ9CIXQ
-         FCuwB2jplNaTcsmRa4FnngOHNrgAyygsG2JXaw84LQvNEDy3psDxJJD2PDZQaIC5SV0+
-         Bj/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706104797; x=1706709597;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BoxkuWyBIMvMvJWK0XCoaEvMQhQl3AgTxuY2oIOnG7U=;
-        b=jnviK8DghsJQUR67GY90noSlHrJrEi4h5YK2QggmLurzY/F0UkPgMTecAXt4Iax5Qz
-         CnQHz6uXiXu7be2zVTfXU3m4EsF0Hp20tgAS11weghFQZw2Rc6YNIzWWYbNKO1G/aUeJ
-         nYxd6x8moyv5oh9INI4O9SI7I/gIpooJsBTPhd0e2S2XLJVdsfvv7Xp4AIQCDzj0aMaz
-         ecnFlNobjquZ4laqS33tHbXOyHhCRlBe8Lq6CT7huDer68a6FEepKpj2gjyDGR714yaN
-         35dYfaQ+f0tR2bTfiffvf6xq2ozcQMRmkQtfMnz+QgzP2hxVBmDAdACsBG8oCbU8rpTf
-         RqCw==
-X-Gm-Message-State: AOJu0YxSNTZ1/ZXn5PzPSgJyZxJm6flVP3Vvf0ehSi5DjuOXhxsEDWbi
-	30wWI0tr1M8uh4T7Ux88d/mMrvhPIqOxRTRAeRFWW4pCMmxoIv0p
-X-Google-Smtp-Source: AGHT+IGX6ouc2Z3CLFZIzazOzs2pb7xQ1zhwdfl+gw1Ga6QUw1ga5UvDZQQA3tMZgjolWoxAZSNgQQ==
-X-Received: by 2002:a05:6512:208b:b0:510:1370:6095 with SMTP id t11-20020a056512208b00b0051013706095mr340670lfr.135.1706104796923;
-        Wed, 24 Jan 2024 05:59:56 -0800 (PST)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id be42-20020a056512252a00b0050e754c84f9sm2593434lfb.67.2024.01.24.05.59.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jan 2024 05:59:56 -0800 (PST)
-Date: Wed, 24 Jan 2024 16:59:53 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Yanteng Si <siyanteng@loongson.cn>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
-	chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn, 
-	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
-Subject: Re: [PATCH net-next v7 5/9] net: stmmac: Add Loongson-specific
- register definitions
-Message-ID: <zuvtd6iexm6rv4pkp5rg3ti4l4w4rvm4mb6khkmnevl5foriqm@7uearwv2npwd>
-References: <cover.1702990507.git.siyanteng@loongson.cn>
- <bbc826f622b501bc490e838644c9c502185a78df.1702990507.git.siyanteng@loongson.cn>
- <t25ka7blbx2d2d654s5swbtvecip73yd5wpdqiy3xijjmswvni@bxf4dh56x4zl>
- <dc30d3f5-6ebe-4804-ae7d-2834bea22cc4@loongson.cn>
- <hv5y6tcxenqz626tqm54ur7qxd4sjp5zyavshxvqgulfrdrqyj@nlvttdtpl7uc>
- <2a9c9872-eec7-4a72-a59a-2780cd19e8f4@loongson.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA57A63103;
+	Wed, 24 Jan 2024 14:06:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706105166; cv=fail; b=Zrg2vluMkfdWYV0d1nwdG8955VoRkprdtfgQObxDRkhRZ0Htpg+byx+q+oBvQfsBaAVwwlnKUj5kqjlVNO9aJyou7n1TCEACKMO+zzs0iWe/AAvo5yNSpomyeDAYV8FRpATuawNyit27W3MKr/Hb1n2auwF1c6MrsDczC6Gblns=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706105166; c=relaxed/simple;
+	bh=zSBTx8P+VHdOHDPcbRzliAUgR/fZp2uapCVYhp1iiMs=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=TfZ9hnUjQ0vm3/DvsETJH0OPhHibbfULndc1nRuqH4dt0pW1+HRwN5CGH+KSmtTORovyiI87I6UeFYbSFr9nC5vMRZ1ggurBhf2Yr9EHLj/po+ITUmtBpC021Jp2Ecfx8sxRwQSYVpm6HNV7vTmuDFE0vFTfsqHS0bU+sJ42kVM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Vzo6QdYv; arc=fail smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706105164; x=1737641164;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=zSBTx8P+VHdOHDPcbRzliAUgR/fZp2uapCVYhp1iiMs=;
+  b=Vzo6QdYvwvjSqKPgi2ovkH/3s7T4mtCMwstAgmL7fQyOrLpxeCiIN4gc
+   PISrn4VJpkMXPrAHpVFEMaVZxFZH70YXNAfrqrMkEL3OhWCrBv9SLX1MO
+   RAj4sPVZnAFvzN77InsoRxKnW9YIaSmXTP6U23Gjc7qbKdV9ML7xfVNNJ
+   jHPHfNhrVFuQxyjsCBfyKmbnCI9OYOXzqgkckQfz4P5KMUzfI4tirnnAT
+   OaHh631HPoiCtzRqzpXiwVQM5Z4gX260npLdztmrmMNL3yP6F9VFUbhfo
+   ODctmY0LXuSN+9l3AVcp++UdJki4eaiKjiTp5oqKhcTbQ63i611xb5/VH
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="15198486"
+X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
+   d="scan'208";a="15198486"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2024 06:06:03 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10962"; a="929691112"
+X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
+   d="scan'208";a="929691112"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 24 Jan 2024 06:06:02 -0800
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 24 Jan 2024 06:06:01 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 24 Jan 2024 06:06:00 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 24 Jan 2024 06:06:00 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 24 Jan 2024 06:06:00 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eRVFkXiCd22z66Rk1y81+/burK6RI7kPXSvkyCoE4ME0rrjSzKieA33ZLmcBdk4o68sbXFJJ6NmJZuI/Np9HcV0ahz9NG+9NTwZek/ca5Z9xYHfL8NnKNh+UDJAcxsjsbTSvPIAqnlKPemfmP6d/kbWKSWjJqwxGlrqQiJliN3VzneTdlEf0e2qomNwdIht9f3F3PWeMZwzTcROiHW9R//nkGdQGg/I3KDYxitLl05hOT4j7D3gTd3m9sc87WTiwzCpi9sj2ucZljswZOHHb5NRZUD/zNWJxyQtRTdVEc1FWgMblaceKNWcoKNyWQptdD/nHwEfP8NHpDUGsl0IVIA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xXIRTHcs1vkFhl+7cbkvJxKQnYCfHdX/IimRPKkVgM0=;
+ b=giEZ3hcLr81IjitkCqLEmjC/zvd48YvnqbkVSvQhSXEWkPAybBJtUqPMSkR25JgNSmqEUB8eYjzk6nYMF4SyiFJLNtNOdA4tAS8JYiCIbW3HEa01WNUH0f4hJCJQEbpDjevGSy6nmPUa1CQU6ya83icH1WQuwR1XWbF/PSxpFf9XgY60VQJ7Y4v+nrxcK9uurFNqfhBZaw7EUkMEkzJpxJw85cF6wz3XPAxDZ7y0ma2D87MONJ/Jl8zYMh/nbolm8+HD92PDzi8XxnSQzRzhQlStI28V8kyIEIuhcsHn7IoI1pPtAgazKovDftqP4XlRA9l0gYU9NaMqIX2Ge5hHAA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ CYYPR11MB8305.namprd11.prod.outlook.com (2603:10b6:930:c1::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7228.22; Wed, 24 Jan 2024 14:05:52 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::ccab:b5f4:e200:ee47]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::ccab:b5f4:e200:ee47%6]) with mapi id 15.20.7202.035; Wed, 24 Jan 2024
+ 14:05:52 +0000
+Date: Wed, 24 Jan 2024 15:05:45 +0100
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Magnus Karlsson <magnus.karlsson@gmail.com>
+CC: <bpf@vger.kernel.org>, <ast@kernel.org>, <daniel@iogearbox.net>,
+	<andrii@kernel.org>, <netdev@vger.kernel.org>, <magnus.karlsson@intel.com>,
+	<bjorn@kernel.org>, <echaudro@redhat.com>, <lorenzo@kernel.org>,
+	<martin.lau@linux.dev>, <tirthendu.sarkar@intel.com>,
+	<john.fastabend@gmail.com>, <horms@kernel.org>
+Subject: Re: [PATCH v5 bpf 04/11] ice: work on pre-XDP prog frag count
+Message-ID: <ZbEZOS1PK3ia/8dR@boxer>
+References: <20240122221610.556746-1-maciej.fijalkowski@intel.com>
+ <20240122221610.556746-5-maciej.fijalkowski@intel.com>
+ <CAJ8uoz2w3A7+aOAKWKjdATUgwQ8u10GHAtjodc_Nhp9FALE9KQ@mail.gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <CAJ8uoz2w3A7+aOAKWKjdATUgwQ8u10GHAtjodc_Nhp9FALE9KQ@mail.gmail.com>
+X-ClientProxiedBy: VI1PR07CA0257.eurprd07.prod.outlook.com
+ (2603:10a6:803:b4::24) To DM4PR11MB6117.namprd11.prod.outlook.com
+ (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <2a9c9872-eec7-4a72-a59a-2780cd19e8f4@loongson.cn>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|CYYPR11MB8305:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6bf6ec74-7a74-40c6-19e2-08dc1ce59351
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ZV5rW/fJ1N6XlV+VrvmZwmgW01P99HysrtQV9I76iWHdGh4WsPGQY/o4bA52ApvITdt+OULsTOBrkOHmkzVReDUVzov2K2FbqqzSaVCbV82gCvkyrBcAv4J7uls3Upz7i9zWzWAVhEQpC+AjZKcHYKb6uitZVopaGWAZm/QQ2fVeBj73lTdsQ/EGkRQyGqYAbhBRMzUNz5fb7b3/vSm9Qwiq3fWxCA4s08uHLjme0RTDeOlrCG2aD8Js3sw8BzSZa7mgwxa7+95VsvQf4l+ymic4K66MmdotzV6saUlEo/qRYajlLur9CWCodoDluV2KS2dJoBbSWmVdubUTJ+lRP5Ubq/zWbHffyO+bxkDHWPn027NK5I54DY+bKaaNXU/36dnkHvSkjcZVQhrm7BrumMkf45OCFbSWJtPOWKgX+da2XCK0Hr/lqhip7w5aaIz97CalFcyIwkgG62RsrZ0ypOy4c+rZLMUSpg0maw34C/gwYgescI7SZqfZvbxKSWuqsFLuS4sbBumGC2w+hkX0RGzxV54eeu8HYdxuGFAhGIddkZWy58rW35LRaTz3LDvH
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(396003)(136003)(346002)(39860400002)(376002)(230922051799003)(64100799003)(1800799012)(186009)(451199024)(6666004)(6512007)(6506007)(9686003)(6916009)(316002)(66946007)(38100700002)(4326008)(6486002)(478600001)(44832011)(8936002)(8676002)(26005)(2906002)(7416002)(5660300002)(66556008)(66476007)(83380400001)(33716001)(86362001)(41300700001)(82960400001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?k8dA2yxmhZSrS1nttVrU0U90W4s1+0lUCfNYT+HURp19NHvxQZqkfPv043o9?=
+ =?us-ascii?Q?58mV4+Lum2Aq4n66NVesfhL30cRyn7W4bQl577leI3NM9unlwicWCFbm/z7P?=
+ =?us-ascii?Q?4akV68GHvsBTkleNlJySDQTk9UQpHbzJcKhsZx33DQFwGJ54EsLywbAE6lnL?=
+ =?us-ascii?Q?hU0dwCzqNamkhjcoOVah+6rbbaKj6+osxb5zqOSNOYsAlHtAiZutrEya5QEV?=
+ =?us-ascii?Q?xANOBqBHwpFwFkD21oeUiVVcdd0Nnxsyu0CHXe6KLJkqsi/BUXj7ObI4qJiV?=
+ =?us-ascii?Q?F6EiairV4qvG+f2XPFauONrJi8F+dgENLfHLdgS1n6+3l9uBQSxqmG+4aGkA?=
+ =?us-ascii?Q?IUSo7SKLv/J2JCvzRnD0FEjvzXC4CtJiDggvMaIgovdEcXrC6/7uUSBdBbZ3?=
+ =?us-ascii?Q?uRP09lQrxrVp5AOmGqCcopgSFiGPSN79C+l83GHYypLhuPZLtf9aT/cF77ph?=
+ =?us-ascii?Q?EcFSAReK+EPv6svSz1ZyCMaLr2LrOJzOo3qYWPvPttIgCgzCW7oK+w+baTe5?=
+ =?us-ascii?Q?pLaQfwq6ctjmsKNmKShKZH2mUVxO6oCEXiilVGlmfeCR2U6mG1O6Ykt2HEYZ?=
+ =?us-ascii?Q?lTKIhJieEuLvfUDB4Ae3ib2SMW6Urrd7XoKNnzNbjk+TtgnJXF2nITiclYou?=
+ =?us-ascii?Q?s87CBNRtgx8JFtWkxhQzPdEKh6yidDh6J1518tEkOuwMr+23Cu9PhN16rvZw?=
+ =?us-ascii?Q?+GeNJFlSHTEb7v996S7zdVimKHo2B8+VPv3/8pVAlStLbHfF+MtLLf6tJKcM?=
+ =?us-ascii?Q?qV0MotHT64rjw7S9+wL8G+fBoLNwGk26AlzXMEAclAdhXxSTdjIP8uXxHwr1?=
+ =?us-ascii?Q?u+EuTHDZ2H/sfLqObLQDi9Islxu60DHdBQXTQs0jCnHbAZYQi9PTT9hiDk9Z?=
+ =?us-ascii?Q?QeqFfogZpVOCd9jgw+VqgkX9xzBzWZRF6f50BsJXrAAVJ/fHlWyYHdluox8w?=
+ =?us-ascii?Q?o4uwi0ezVLWPBiHLq5b6NzTt9IxCCix2v/yLOFWEUhhlLcv+B2fFEEl5ezHt?=
+ =?us-ascii?Q?KRGlB8/9QEzl6wF2P88ec89HlxLwK1YUQHDGOfmudXrTO3+Gu3a5HvbsJ4ZO?=
+ =?us-ascii?Q?SPniOm1BKZrshPU7OxyTSgAGp3Q5RlwAHzLmLAls/2Yqnsj6Rsr5P8Npj4Nc?=
+ =?us-ascii?Q?EztITD6j9OxVcFKNseSfnML28NSa47OyvbNyXRbwlF2PWPMXwZjhAnq/aS+F?=
+ =?us-ascii?Q?5TDthNLhA5JwEi4I4sHynaL/Kausts0RFKugABJhVOiHRdpR46ef3FpSNOiz?=
+ =?us-ascii?Q?Vt2sI4Zu9ygBd+4rezwJUauQkEPlIGrh6l/nh/+XqLTA9QVUXMTSYad5FzL8?=
+ =?us-ascii?Q?MPGew4JgHriZFAMpBAPLTzEchRILSTbRy/+RMmiSndNz+QOL0oRjd66TBkOb?=
+ =?us-ascii?Q?OpHv7As+twtsnCxeyLtS8jJgQvKlxEbroE5Liof9Yzj1x0m+95cas1hXvVWy?=
+ =?us-ascii?Q?OvuzGgUwJQOa4OovHQQl12KcqXVpCIpOSMYYLXLgis+/g9znQE9hLaH91r9K?=
+ =?us-ascii?Q?i7o7xMxbBmzp9rKDR8RxJavObc1aXfl9RotCLKypR9zTLnYfoPcbdp5YJZK5?=
+ =?us-ascii?Q?FBG+kgwoACWSwZP7WBgUNhBX/2NlzH8jxcusihBXoOQWd/w/M3NSO/gf6XQ9?=
+ =?us-ascii?Q?bw=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6bf6ec74-7a74-40c6-19e2-08dc1ce59351
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jan 2024 14:05:52.5367
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7Zy7aDHP10/e8dFiWKigQ8uuvy+OeGcAGVtL486hVFhzvZ1cvGxMqv9kcBkTv4NVW0dtHAypvQ2uFcBcIwn57X2J0+KlkMaj6VfYTbYl19w=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR11MB8305
+X-OriginatorOrg: intel.com
 
-On Tue, Jan 23, 2024 at 09:08:31PM +0800, Yanteng Si wrote:
+On Wed, Jan 24, 2024 at 09:37:13AM +0100, Magnus Karlsson wrote:
+> On Mon, 22 Jan 2024 at 23:16, Maciej Fijalkowski
+> <maciej.fijalkowski@intel.com> wrote:
+> >
+> > Fix an OOM panic in XDP_DRV mode when a XDP program shrinks a
+> > multi-buffer packet by 4k bytes and then redirects it to an AF_XDP
+> > socket.
+> >
+> > Since support for handling multi-buffer frames was added to XDP, usage
+> > of bpf_xdp_adjust_tail() helper within XDP program can free the page
+> > that given fragment occupies and in turn decrease the fragment count
+> > within skb_shared_info that is embedded in xdp_buff struct. In current
+> > ice driver codebase, it can become problematic when page recycling logic
+> > decides not to reuse the page. In such case, __page_frag_cache_drain()
+> > is used with ice_rx_buf::pagecnt_bias that was not adjusted after
+> > refcount of page was changed by XDP prog which in turn does not drain
+> > the refcount to 0 and page is never freed.
+> >
+> > To address this, let us store the count of frags before the XDP program
+> > was executed on Rx ring struct. This will be used to compare with
+> > current frag count from skb_shared_info embedded in xdp_buff. A smaller
+> > value in the latter indicates that XDP prog freed frag(s). Then, for
+> > given delta decrement pagecnt_bias for XDP_DROP verdict.
+> >
+> > While at it, let us also handle the EOP frag within
+> > ice_set_rx_bufs_act() to make our life easier, so all of the adjustments
+> > needed to be applied against freed frags are performed in the single
+> > place.
+> >
+> > Fixes: 2fba7dc5157b ("ice: Add support for XDP multi-buffer on Rx side")
+> > Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> > ---
+> >  drivers/net/ethernet/intel/ice/ice_txrx.c     | 14 ++++++---
+> >  drivers/net/ethernet/intel/ice/ice_txrx.h     |  1 +
+> >  drivers/net/ethernet/intel/ice/ice_txrx_lib.h | 31 +++++++++++++------
+> >  3 files changed, 32 insertions(+), 14 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
+> > index 59617f055e35..1760e81379cc 100644
+> > --- a/drivers/net/ethernet/intel/ice/ice_txrx.c
+> > +++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
+> > @@ -603,9 +603,7 @@ ice_run_xdp(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
+> >                 ret = ICE_XDP_CONSUMED;
+> >         }
+> >  exit:
+> > -       rx_buf->act = ret;
+> > -       if (unlikely(xdp_buff_has_frags(xdp)))
+> > -               ice_set_rx_bufs_act(xdp, rx_ring, ret);
+> > +       ice_set_rx_bufs_act(xdp, rx_ring, ret);
+> >  }
+> >
+> >  /**
+> > @@ -893,14 +891,17 @@ ice_add_xdp_frag(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
+> >         }
+> >
+> >         if (unlikely(sinfo->nr_frags == MAX_SKB_FRAGS)) {
+> > -               if (unlikely(xdp_buff_has_frags(xdp)))
+> > -                       ice_set_rx_bufs_act(xdp, rx_ring, ICE_XDP_CONSUMED);
+> > +               ice_set_rx_bufs_act(xdp, rx_ring, ICE_XDP_CONSUMED);
+> >                 return -ENOMEM;
+> >         }
+> >
+> >         __skb_fill_page_desc_noacc(sinfo, sinfo->nr_frags++, rx_buf->page,
+> >                                    rx_buf->page_offset, size);
+> >         sinfo->xdp_frags_size += size;
+> > +       /* remember frag count before XDP prog execution; bpf_xdp_adjust_tail()
+> > +        * can pop off frags but driver has to handle it on its own
+> > +        */
+> > +       rx_ring->nr_frags = sinfo->nr_frags;
+> >
+> >         if (page_is_pfmemalloc(rx_buf->page))
+> >                 xdp_buff_set_frag_pfmemalloc(xdp);
+> > @@ -1251,6 +1252,7 @@ int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
+> >
+> >                 xdp->data = NULL;
+> >                 rx_ring->first_desc = ntc;
+> > +               rx_ring->nr_frags = 0;
+> >                 continue;
+> >  construct_skb:
+> >                 if (likely(ice_ring_uses_build_skb(rx_ring)))
+> > @@ -1266,10 +1268,12 @@ int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
+> >                                                     ICE_XDP_CONSUMED);
+> >                         xdp->data = NULL;
+> >                         rx_ring->first_desc = ntc;
+> > +                       rx_ring->nr_frags = 0;
+> >                         break;
+> >                 }
+> >                 xdp->data = NULL;
+> >                 rx_ring->first_desc = ntc;
+> > +               rx_ring->nr_frags = 0;
 > 
-> 在 2024/1/1 20:26, Serge Semin 写道:
-> > On Mon, Jan 01, 2024 at 04:31:48PM +0800, Yanteng Si wrote:
-> > > 在 2023/12/21 10:14, Serge Semin 写道:
-> > > > On Tue, Dec 19, 2023 at 10:26:45PM +0800, Yanteng Si wrote:
-> > > > > There are two types of Loongson DWGMAC. The first type shares the same
-> > > > > register definitions and has similar logic as dwmac1000. The second type
-> > > > > uses several different register definitions, we think it is necessary to
-> > > > > distinguish rx and tx, so we split these bits into two.
-> > > > > 
-> > > > > Simply put, we split some single bit fields into double bits fileds:
-> > > > > 
-> > > > >        Name              Tx          Rx
-> > > > > 
-> > > > > DMA_INTR_ENA_NIE = 0x00040000 | 0x00020000;
-> > > > > DMA_INTR_ENA_AIE = 0x00010000 | 0x00008000;
-> > > > > DMA_STATUS_NIS   = 0x00040000 | 0x00020000;
-> > > > > DMA_STATUS_AIS   = 0x00010000 | 0x00008000;
-> > > > > DMA_STATUS_FBI   = 0x00002000 | 0x00001000;
-> > > > > 
-> > > > > Therefore, when using, TX and RX must be set at the same time.
-> > > > Thanks for the updated patch. It looks much clearer now. Thanks to
-> > > > that I came up with a better and less invasive solution. See my last
-> > > > comment for details.
-> > > > 
-> > > > > Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
-> > > > > Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
-> > > > > Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
-> > > > > ---
-> > > > >    drivers/net/ethernet/stmicro/stmmac/common.h  |  1 +
-> > > > >    .../ethernet/stmicro/stmmac/dwmac-loongson.c  |  2 ++
-> > > > >    .../ethernet/stmicro/stmmac/dwmac1000_dma.c   | 10 ++++--
-> > > > >    .../net/ethernet/stmicro/stmmac/dwmac_dma.h   | 35 +++++++++++++++++++
-> > > > >    .../net/ethernet/stmicro/stmmac/dwmac_lib.c   | 35 +++++++++++++++----
-> > > > >    drivers/net/ethernet/stmicro/stmmac/hwif.c    |  3 +-
-> > > > >    .../net/ethernet/stmicro/stmmac/stmmac_main.c |  1 +
-> > > > >    include/linux/stmmac.h                        |  1 +
-> > > > >    8 files changed, 78 insertions(+), 10 deletions(-)
-> > > > > 
-> > > > > diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
-> > > > > index 721c1f8e892f..48ab21243b26 100644
-> > > > > --- a/drivers/net/ethernet/stmicro/stmmac/common.h
-> > > > > +++ b/drivers/net/ethernet/stmicro/stmmac/common.h
-> > > > > @@ -34,6 +34,7 @@
-> > > > >    #define DWMAC_CORE_5_00		0x50
-> > > > >    #define DWMAC_CORE_5_10		0x51
-> > > > >    #define DWMAC_CORE_5_20		0x52
-> > > > > +#define DWLGMAC_CORE_1_00	0x10
-> > > > This doesn't look correct because these IDs have been defined for the
-> > > > Synopsys IP-core enumerations. Loongson GNET is definitely based on
-> > > > some DW GMAC v3.x IP-core, but instead of updating the USERVER field
-> > > > vendor just overwrote the GMAC_VERSION.SNPSVER field. From that
-> > > > perspective the correct solution would be to override the
-> > > > priv->synopsys_id field with a correct IP-core version (0x37?). See my
-> > > > last comment for details of how to do that.
-> > > See my last reply.
-> > > > >    #define DWXGMAC_CORE_2_10	0x21
-> > > > >    #define DWXGMAC_CORE_2_20	0x22
-> > > > >    #define DWXLGMAC_CORE_2_00	0x20
-> > > > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > > > > index 0d79104d7fd3..fb7506bbc21b 100644
-> > > > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > > > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > > > > @@ -101,6 +101,8 @@ static int loongson_dwmac_probe(struct pci_dev *pdev,
-> > > > >    		plat->mdio_bus_data->needs_reset = true;
-> > > > >    	}
-> > > > > +	plat->flags |= STMMAC_FLAG_HAS_LGMAC;
-> > > > > +
-> > > > If what I suggest in the last comment is implemented this will be
-> > > > unnecessary.
-> > > > 
-> > > > >    	/* Enable pci device */
-> > > > >    	ret = pci_enable_device(pdev);
-> > > > >    	if (ret) {
-> > > > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-> > > > > index 0fb48e683970..a01fe6b7540a 100644
-> > > > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-> > > > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-> > > > None of the generic parts (dwmac1000_dma.c, dwmac_dma.h, dwmac_lib.c)
-> > > > will need to be modified if you implement what I suggest in the last
-> > > > comment.
-> > > > 
-> > > > > @@ -118,7 +118,10 @@ static void dwmac1000_dma_init(struct stmmac_priv *priv, void __iomem *ioaddr,
-> > > > See my comment to patch 4/9. This method can be fully dropped in favor
-> > > > of having the dwmac1000_dma_init_channel() function implemented.
-> > > > 
-> > > > >    	u32 dma_intr_mask;
-> > > > >    	/* Mask interrupts by writing to CSR7 */
-> > > > > -	dma_intr_mask = DMA_INTR_DEFAULT_MASK;
-> > > > > +	if (priv->plat->flags & STMMAC_FLAG_HAS_LGMAC)
-> > > > > +		dma_intr_mask = DMA_INTR_DEFAULT_MASK_LOONGSON;
-> > > > > +	else
-> > > > > +		dma_intr_mask = DMA_INTR_DEFAULT_MASK;
-> > > > >    	dma_config(ioaddr + DMA_BUS_MODE, ioaddr + DMA_INTR_ENA,
-> > > > >    			  dma_cfg, dma_intr_mask, atds);
-> > > > > @@ -130,7 +133,10 @@ static void dwmac1000_dma_init_channel(struct stmmac_priv *priv, void __iomem *i
-> > > > >    	u32 dma_intr_mask;
-> > > > >    	/* Mask interrupts by writing to CSR7 */
-> > > > > -	dma_intr_mask = DMA_INTR_DEFAULT_MASK;
-> > > > > +	if (priv->plat->flags & STMMAC_FLAG_HAS_LGMAC)
-> > > > > +		dma_intr_mask = DMA_INTR_DEFAULT_MASK_LOONGSON;
-> > > > > +	else
-> > > > > +		dma_intr_mask = DMA_INTR_DEFAULT_MASK;
-> > > > >    	if (dma_cfg->multi_msi_en)
-> > > > >    		dma_config(ioaddr + DMA_CHAN_BUS_MODE(chan),
-> > > > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
-> > > > > index 395d5e4c3922..7d33798c0e72 100644
-> > > > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
-> > > > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
-> > > > > @@ -70,16 +70,23 @@
-> > > > >    #define DMA_CONTROL_SR		0x00000002	/* Start/Stop Receive */
-> > > > >    /* DMA Normal interrupt */
-> > > > > +#define DMA_INTR_ENA_NIE_TX_LOONGSON 0x00040000	/* Normal Loongson Tx Summary */
-> > > > > +#define DMA_INTR_ENA_NIE_RX_LOONGSON 0x00020000	/* Normal Loongson Rx Summary */
-> > > > >    #define DMA_INTR_ENA_NIE 0x00010000	/* Normal Summary */
-> > > > >    #define DMA_INTR_ENA_TIE 0x00000001	/* Transmit Interrupt */
-> > > > >    #define DMA_INTR_ENA_TUE 0x00000004	/* Transmit Buffer Unavailable */
-> > > > >    #define DMA_INTR_ENA_RIE 0x00000040	/* Receive Interrupt */
-> > > > >    #define DMA_INTR_ENA_ERE 0x00004000	/* Early Receive */
-> > > > > +#define DMA_INTR_NORMAL_LOONGSON	(DMA_INTR_ENA_NIE_TX_LOONGSON | \
-> > > > > +			 DMA_INTR_ENA_NIE_RX_LOONGSON | DMA_INTR_ENA_RIE | \
-> > > > > +			 DMA_INTR_ENA_TIE)
-> > > > >    #define DMA_INTR_NORMAL	(DMA_INTR_ENA_NIE | DMA_INTR_ENA_RIE | \
-> > > > >    			DMA_INTR_ENA_TIE)
-> > > > >    /* DMA Abnormal interrupt */
-> > > > > +#define DMA_INTR_ENA_AIE_TX_LOONGSON 0x00010000	/* Abnormal Loongson Tx Summary */
-> > > > > +#define DMA_INTR_ENA_AIE_RX_LOONGSON 0x00008000	/* Abnormal Loongson Rx Summary */
-> > > > >    #define DMA_INTR_ENA_AIE 0x00008000	/* Abnormal Summary */
-> > > > >    #define DMA_INTR_ENA_FBE 0x00002000	/* Fatal Bus Error */
-> > > > >    #define DMA_INTR_ENA_ETE 0x00000400	/* Early Transmit */
-> > > > > @@ -91,10 +98,14 @@
-> > > > >    #define DMA_INTR_ENA_TJE 0x00000008	/* Transmit Jabber */
-> > > > >    #define DMA_INTR_ENA_TSE 0x00000002	/* Transmit Stopped */
-> > > > > +#define DMA_INTR_ABNORMAL_LOONGSON	(DMA_INTR_ENA_AIE_TX_LOONGSON | \
-> > > > > +				DMA_INTR_ENA_AIE_RX_LOONGSON | DMA_INTR_ENA_FBE | \
-> > > > > +				DMA_INTR_ENA_UNE)
-> > > > >    #define DMA_INTR_ABNORMAL	(DMA_INTR_ENA_AIE | DMA_INTR_ENA_FBE | \
-> > > > >    				DMA_INTR_ENA_UNE)
-> > > > >    /* DMA default interrupt mask */
-> > > > > +#define DMA_INTR_DEFAULT_MASK_LOONGSON	(DMA_INTR_NORMAL_LOONGSON | DMA_INTR_ABNORMAL_LOONGSON)
-> > > > >    #define DMA_INTR_DEFAULT_MASK	(DMA_INTR_NORMAL | DMA_INTR_ABNORMAL)
-> > > > >    #define DMA_INTR_DEFAULT_RX	(DMA_INTR_ENA_RIE)
-> > > > >    #define DMA_INTR_DEFAULT_TX	(DMA_INTR_ENA_TIE)
-> > > > > @@ -111,9 +122,15 @@
-> > > > >    #define DMA_STATUS_TS_SHIFT	20
-> > > > >    #define DMA_STATUS_RS_MASK	0x000e0000	/* Receive Process State */
-> > > > >    #define DMA_STATUS_RS_SHIFT	17
-> > > > > +#define DMA_STATUS_NIS_TX_LOONGSON	0x00040000	/* Normal Loongson Tx Interrupt Summary */
-> > > > > +#define DMA_STATUS_NIS_RX_LOONGSON	0x00020000	/* Normal Loongson Rx Interrupt Summary */
-> > > > >    #define DMA_STATUS_NIS	0x00010000	/* Normal Interrupt Summary */
-> > > > > +#define DMA_STATUS_AIS_TX_LOONGSON	0x00010000	/* Abnormal Loongson Tx Interrupt Summary */
-> > > > > +#define DMA_STATUS_AIS_RX_LOONGSON	0x00008000	/* Abnormal Loongson Rx Interrupt Summary */
-> > > > >    #define DMA_STATUS_AIS	0x00008000	/* Abnormal Interrupt Summary */
-> > > > >    #define DMA_STATUS_ERI	0x00004000	/* Early Receive Interrupt */
-> > > > > +#define DMA_STATUS_FBI_TX_LOONGSON	0x00002000	/* Fatal Loongson Tx Bus Error Interrupt */
-> > > > > +#define DMA_STATUS_FBI_RX_LOONGSON	0x00001000	/* Fatal Loongson Rx Bus Error Interrupt */
-> > > > >    #define DMA_STATUS_FBI	0x00002000	/* Fatal Bus Error Interrupt */
-> > > > >    #define DMA_STATUS_ETI	0x00000400	/* Early Transmit Interrupt */
-> > > > >    #define DMA_STATUS_RWT	0x00000200	/* Receive Watchdog Timeout */
-> > > > > @@ -128,10 +145,21 @@
-> > > > >    #define DMA_STATUS_TI	0x00000001	/* Transmit Interrupt */
-> > > > >    #define DMA_CONTROL_FTF		0x00100000	/* Flush transmit FIFO */
-> > > > > +#define DMA_STATUS_MSK_COMMON_LOONGSON		(DMA_STATUS_NIS_TX_LOONGSON | \
-> > > > > +					 DMA_STATUS_NIS_RX_LOONGSON | DMA_STATUS_AIS_TX_LOONGSON | \
-> > > > > +					 DMA_STATUS_AIS_RX_LOONGSON | DMA_STATUS_FBI_TX_LOONGSON | \
-> > > > > +					 DMA_STATUS_FBI_RX_LOONGSON)
-> > > > >    #define DMA_STATUS_MSK_COMMON		(DMA_STATUS_NIS | \
-> > > > >    					 DMA_STATUS_AIS | \
-> > > > >    					 DMA_STATUS_FBI)
-> > > > > +#define DMA_STATUS_MSK_RX_LOONGSON		(DMA_STATUS_ERI | \
-> > > > > +					 DMA_STATUS_RWT | \
-> > > > > +					 DMA_STATUS_RPS | \
-> > > > > +					 DMA_STATUS_RU | \
-> > > > > +					 DMA_STATUS_RI | \
-> > > > > +					 DMA_STATUS_OVF | \
-> > > > > +					 DMA_STATUS_MSK_COMMON_LOONGSON)
-> > > > >    #define DMA_STATUS_MSK_RX		(DMA_STATUS_ERI | \
-> > > > >    					 DMA_STATUS_RWT | \
-> > > > >    					 DMA_STATUS_RPS | \
-> > > > > @@ -140,6 +168,13 @@
-> > > > >    					 DMA_STATUS_OVF | \
-> > > > >    					 DMA_STATUS_MSK_COMMON)
-> > > > > +#define DMA_STATUS_MSK_TX_LOONGSON		(DMA_STATUS_ETI | \
-> > > > > +					 DMA_STATUS_UNF | \
-> > > > > +					 DMA_STATUS_TJT | \
-> > > > > +					 DMA_STATUS_TU | \
-> > > > > +					 DMA_STATUS_TPS | \
-> > > > > +					 DMA_STATUS_TI | \
-> > > > > +					 DMA_STATUS_MSK_COMMON_LOONGSON)
-> > > > >    #define DMA_STATUS_MSK_TX		(DMA_STATUS_ETI | \
-> > > > >    					 DMA_STATUS_UNF | \
-> > > > >    					 DMA_STATUS_TJT | \
-> > > > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
-> > > > > index 968801c694e9..a6e2ab4d0f4a 100644
-> > > > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
-> > > > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
-> > > > > @@ -167,6 +167,9 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
-> > > > >    	struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[chan];
-> > > > >    	int ret = 0;
-> > > > >    	/* read the status register (CSR5) */
-> > > > > +	u32 nor_intr_status;
-> > > > > +	u32 abnor_intr_status;
-> > > > > +	u32 fb_intr_status;
-> > > > >    	u32 intr_status = readl(ioaddr + DMA_CHAN_STATUS(chan));
-> > > > >    #ifdef DWMAC_DMA_DEBUG
-> > > > > @@ -176,13 +179,31 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
-> > > > >    	show_rx_process_state(intr_status);
-> > > > >    #endif
-> > > > > -	if (dir == DMA_DIR_RX)
-> > > > > -		intr_status &= DMA_STATUS_MSK_RX;
-> > > > > -	else if (dir == DMA_DIR_TX)
-> > > > > -		intr_status &= DMA_STATUS_MSK_TX;
-> > > > > +	if (priv->plat->flags & STMMAC_FLAG_HAS_LGMAC) {
-> > > > > +		if (dir == DMA_DIR_RX)
-> > > > > +			intr_status &= DMA_STATUS_MSK_RX_LOONGSON;
-> > > > > +		else if (dir == DMA_DIR_TX)
-> > > > > +			intr_status &= DMA_STATUS_MSK_TX_LOONGSON;
-> > > > > +
-> > > > > +		nor_intr_status = intr_status & \
-> > > > > +			(DMA_STATUS_NIS_TX_LOONGSON | DMA_STATUS_NIS_RX_LOONGSON);
-> > > > > +		abnor_intr_status = intr_status & \
-> > > > > +			(DMA_STATUS_AIS_TX_LOONGSON | DMA_STATUS_AIS_RX_LOONGSON);
-> > > > > +		fb_intr_status = intr_status & \
-> > > > > +			(DMA_STATUS_FBI_TX_LOONGSON | DMA_STATUS_FBI_RX_LOONGSON);
-> > > > > +	} else {
-> > > > > +		if (dir == DMA_DIR_RX)
-> > > > > +			intr_status &= DMA_STATUS_MSK_RX;
-> > > > > +		else if (dir == DMA_DIR_TX)
-> > > > > +			intr_status &= DMA_STATUS_MSK_TX;
-> > > > > +
-> > > > > +		nor_intr_status = intr_status & DMA_STATUS_NIS;
-> > > > > +		abnor_intr_status = intr_status & DMA_STATUS_AIS;
-> > > > > +		fb_intr_status = intr_status & DMA_STATUS_FBI;
-> > > > > +	}
-> > > > >    	/* ABNORMAL interrupts */
-> > > > > -	if (unlikely(intr_status & DMA_STATUS_AIS)) {
-> > > > > +	if (unlikely(abnor_intr_status)) {
-> > > > >    		if (unlikely(intr_status & DMA_STATUS_UNF)) {
-> > > > >    			ret = tx_hard_error_bump_tc;
-> > > > >    			x->tx_undeflow_irq++;
-> > > > > @@ -205,13 +226,13 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
-> > > > >    			x->tx_process_stopped_irq++;
-> > > > >    			ret = tx_hard_error;
-> > > > >    		}
-> > > > > -		if (unlikely(intr_status & DMA_STATUS_FBI)) {
-> > > > > +		if (unlikely(intr_status & fb_intr_status)) {
-> > > > >    			x->fatal_bus_error_irq++;
-> > > > >    			ret = tx_hard_error;
-> > > > >    		}
-> > > > >    	}
-> > > > >    	/* TX/RX NORMAL interrupts */
-> > > > > -	if (likely(intr_status & DMA_STATUS_NIS)) {
-> > > > > +	if (likely(nor_intr_status)) {
-> > > > >    		if (likely(intr_status & DMA_STATUS_RI)) {
-> > > > >    			u32 value = readl(ioaddr + DMA_INTR_ENA);
-> > > > >    			/* to schedule NAPI on real RIE event. */
-> > > > > diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.c b/drivers/net/ethernet/stmicro/stmmac/hwif.c
-> > > > > index 1bd34b2a47e8..3724cf698de6 100644
-> > > > > --- a/drivers/net/ethernet/stmicro/stmmac/hwif.c
-> > > > > +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.c
-> > > > > @@ -59,7 +59,8 @@ static int stmmac_dwmac1_quirks(struct stmmac_priv *priv)
-> > > > >    		dev_info(priv->device, "Enhanced/Alternate descriptors\n");
-> > > > >    		/* GMAC older than 3.50 has no extended descriptors */
-> > > > > -		if (priv->synopsys_id >= DWMAC_CORE_3_50) {
-> > > > > +		if (priv->synopsys_id >= DWMAC_CORE_3_50 ||
-> > > > > +		    priv->synopsys_id == DWLGMAC_CORE_1_00) {
-> > > > This could be left as is if the priv->synopsys_id field is overwritten
-> > > > with a correct value (see my last comment).
-> > > > 
-> > > > >    			dev_info(priv->device, "Enabled extended descriptors\n");
-> > > > >    			priv->extend_desc = 1;
-> > > > >    		} else {
-> > > > > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > > > index d868eb8dafc5..9764d2ab7e46 100644
-> > > > > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > > > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > > > @@ -7218,6 +7218,7 @@ static int stmmac_hw_init(struct stmmac_priv *priv)
-> > > > >    	 * riwt_off field from the platform.
-> > > > >    	 */
-> > > > >    	if (((priv->synopsys_id >= DWMAC_CORE_3_50) ||
-> > > > > +		(priv->synopsys_id == DWLGMAC_CORE_1_00) ||
-> > > > the same comment here.
-> > > > 
-> > > > >    	    (priv->plat->has_xgmac)) && (!priv->plat->riwt_off)) {
-> > > > >    		priv->use_riwt = 1;
-> > > > >    		dev_info(priv->device,
-> > > > > diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-> > > > > index dee5ad6e48c5..f07f79d50b06 100644
-> > > > > --- a/include/linux/stmmac.h
-> > > > > +++ b/include/linux/stmmac.h
-> > > > > @@ -221,6 +221,7 @@ struct dwmac4_addrs {
-> > > > >    #define STMMAC_FLAG_RX_CLK_RUNS_IN_LPI		BIT(10)
-> > > > >    #define STMMAC_FLAG_EN_TX_LPI_CLOCKGATING	BIT(11)
-> > > > >    #define STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY	BIT(12)
-> > > > > +#define STMMAC_FLAG_HAS_LGMAC			BIT(13)
-> > > > Seeing the patch in the current state would overcomplicate the generic
-> > > > code and the only functions you need to update are
-> > > > dwmac_dma_interrupt()
-> > > > dwmac1000_dma_init_channel()
-> > > > you can have these methods re-defined with all the Loongson GNET
-> > > > specifics in the low-level platform driver (dwmac-loongson.c). After
-> > > > that you can just override the mac_device_info.dma pointer with a
-> > > > fixed stmmac_dma_ops descriptor. Here is what should be done for that:
-> > > > 
-> > > > 1. Keep the Patch 4/9 with my comments fixed. First it will be partly
-> > > > useful for your GNET device. Second in general it's a correct
-> > > > implementation of the normal DW GMAC v3.x multi-channels feature and
-> > > > will be useful for the DW GMACs with that feature enabled.
-> > > OK.
-> > > > 2. Create the Loongson GNET-specific
-> > > > stmmac_dma_ops.dma_interrupt()
-> > > > stmmac_dma_ops.init_chan()
-> > > > methods in the dwmac-loongson.c driver. Don't forget to move all the
-> > > > Loongson-specific macros from dwmac_dma.h to dwmac-loongson.c.
-> > > It's easy.
-> > > > 3. Create a Loongson GNET-specific platform setup method with the next
-> > > > semantics:
-> > > >      + allocate stmmac_dma_ops instance and initialize it with
-> > > >        dwmac1000_dma_ops.
-> > > Do this in dwmac1000-dma.c? Because this seems impossible to achieve in
-> > > dwmac-loongson.c：
-> > > 
-> > > 
-> > > drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c:606:47: error:
-> > > initializer element is not constant
-> > >    606 | const struct stmmac_dma_ops dwlgmac_dma_ops = dwmac1000_dma_ops;
-> > > >      + override the stmmac_dma_ops.{dma_interrupt, init_chan} with
-> > > >        the pointers to the methods defined in 2.
-> > > Likewise, where should I do this?
-> > > 
-> > > Sorry. I seem to have misinterpreted your meaning again.
-> > No worries. Here is what I meant:
-> > 
-> > 1. Declare the private Loongson GMAC data like this:
-> > struct loongson_data {
-> > 	struct stmmac_dma_ops dma_ops;
-> > };
-> > 2. Allocate the memory for the data in the framework of the Loongson
-> > GMAC device probe() method:
-> > loongson_dwmac_probe()
-> > {
-> > 	...
-> > 	ld = devm_kzalloc(&pdev->dev, sizeof(*ld), GFP_KERNEL);
-> > 	if (!ld)
-> > 		return -ENOMEM;
-> > 	...
-> > 	ld->dma_ops = dwmac1000_dma_ops;
-> > 	ld->dma_ops.init_chan = loongson_gnat_dma_init_chan;
-> > 	ld->dma_ops.dma_interrupt = loongson_gnat_dma_interrupt;
-> > 	...
-> > 	plat->bsp_priv = ld;
-> > }
-> > 3. Define the Loongson-specific plat_stmmacenet_data.setup() method,
-> > which would re-init the stmmac_priv->synopsys_id with a correct value,
-> > allocate the DW *MAC hardware descriptor and pre-initialize it 'dma'
-> > field:
-> > static struct mac_device_info loongson_gnet_setup(void *apriv)
-> > {
-> > 	struct stmmac_priv *priv = apriv;
-> > 	struct mac_device_info *mac;
-> > 	struct loongson_data *ld;
-> > 
-> > 	mac = devm_kzalloc(priv->device, sizeof(*mac), GFP_KERNEL);
-> > 	if (!mac)
-> > 		return NULL;
-> > 
-> > 	priv->synopsys_id = 0x37; // or whatever is a real version of your IP
-> > 
-> > 	ld = priv->plat->bsp_priv;
-> > 	mac->dma = &ld->dma_ops;
-> > 
-> > 	dwmac1000_setup(); // Or Pre-initialize the respective "mac" fields as it's done in dwmac1000_setup()
-> > 
-> > 	return mac;
-> > }
-> > 4. Make sure the plat_stmmacenet_data->setup field is initialized with
-> > the Loongson GNAT-specific setup() method:
-> > static int loongson_gnet_data(struct pci_dev *pdev,
-> >                                struct plat_stmmacenet_data *plat)
-> > {
-> > 	...
-> > 	plat->setup = loongson_gnet_setup;
-> > 	...
-> > }
-> > 
-> > That shall do what I described in by previous message.
-> > 
-> > Note another platform which gets to define its own setup() method
-> > Sun8i:
-> > drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-> > although since it fully redefines the DMA-ops descriptor the only
-> > common part with your case is that it needs to have the setup() method
-> > too.
-> 
+> Are these needed? Or asked in another way, is there some way in which
+> ice_set_rx_bufs_act() can be executed before ice_add_xdp_frag()? If
+> not, we could remove them.
 
-> Thank you so much, this method is so cool!
-> 
->  After three weeks of hard work, everything is working now.
+I am afraid that if you would have fragged packet followed by non-fragged
+one then ice_set_rx_bufs_act() would incorrectly go over more buffers
+than it was supposed to. I think we should keep those, unless I am missing
+something?
 
-Glad my advice could help. Let's see what is done in v8.
-
-* Although I'll be able to get back to review on the next week only.
-
--Serge(y)
-
-> I will reply to
-> your other comments tomorrow.
 > 
+> Looks good otherwise.
 > 
-> Thanks,
+> Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
 > 
-> Yanteng
-> 
-> > > 
-> > > 
-> > > >      + allocate mac_device_info instance and initialize the
-> > > >        mac_device_info.dma field with a pointer to the new
-> > > >        stmmac_dma_ops instance.
-> > > >      + call dwmac1000_setup() or initialize mac_device_info in a way
-> > > >        it's done in dwmac1000_setup() (the later might be better so you
-> > > >        wouldn't need to export the dwmac1000_setup() function).
-> > > >      + override stmmac_priv.synopsys_id with a correct value.
-> > > > 
-> > > > 4. Initialize plat_stmmacenet_data.setup() with the pointer to the
-> > > > method created in 3.
-> > > > 
-> > > > If I didn't miss something stmmac_hwif_init() will call the
-> > > > platform-specific setup method right after fetching the SNPSVER field
-> > > > value. Your setup method will allocate mac_device_info structure then,
-> > > > will pre-initialize the GNET-specific DMA ops field and fix the
-> > > > Synopsys ID with a proper value (as described in 3 above). The rest of
-> > > > the ops descriptors will be initialized in the loop afterwards based
-> > > > on the specified device ID.
-> > > This doesn't seem to work because our device looks something like this:
-> > Please see my note above.
-> > 
-> > > device     pci id   reversion    core version
-> > > LS7A        0x13       0x00       0x35/0x37
-> > > LS7A        0x13       0x01       0x35/0x37
-> > > LS2K        0x13       0x00       0x10
-> > > LS2K        0x13       0x01       0x10
-> > Not sure what you meant by providing this table to me and justifying
-> > that something wouldn't work. But it would have been much useful to
-> > provide a detailed description of what platforms and devices the
-> > current dwmac-loongson.c driver supports and what support you are
-> > trying to add. Cover-letter is a suitable place for it.
-> > 
-> > In anyway the DW GMAC IP-core can't be 0x10. Seeing your device is
-> > having the multi-channels support it must have a version closer to
-> > 0x37 (the highest IP-core version is 3.73a). Please reach the hardware
-> > engineers to clarify what actual DW GMAC IP-core has been utilized in
-> > your case.
-> > 
-> > -Serge(y)
-> > 
-> > > 
-> > > Thanks,
-> > > 
-> > > Yanteng
-> > > 
-> > > > -Serge(y)
-> > > > 
-> > > > >    struct plat_stmmacenet_data {
-> > > > >    	int bus_id;
-> > > > > -- 
-> > > > > 2.31.4
-> > > > > 
-> 
+> >
+> >                 stat_err_bits = BIT(ICE_RX_FLEX_DESC_STATUS0_RXE_S);
+> >                 if (unlikely(ice_test_staterr(rx_desc->wb.status_error0,
+> > diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.h b/drivers/net/ethernet/intel/ice/ice_txrx.h
+> > index b3379ff73674..af955b0e5dc5 100644
+> > --- a/drivers/net/ethernet/intel/ice/ice_txrx.h
+> > +++ b/drivers/net/ethernet/intel/ice/ice_txrx.h
+> > @@ -358,6 +358,7 @@ struct ice_rx_ring {
+> >         struct ice_tx_ring *xdp_ring;
+> >         struct ice_rx_ring *next;       /* pointer to next ring in q_vector */
+> >         struct xsk_buff_pool *xsk_pool;
+> > +       u32 nr_frags;
+> >         dma_addr_t dma;                 /* physical address of ring */
+> >         u16 rx_buf_len;
+> >         u8 dcb_tc;                      /* Traffic class of ring */
+> > diff --git a/drivers/net/ethernet/intel/ice/ice_txrx_lib.h b/drivers/net/ethernet/intel/ice/ice_txrx_lib.h
+> > index 762047508619..afcead4baef4 100644
+> > --- a/drivers/net/ethernet/intel/ice/ice_txrx_lib.h
+> > +++ b/drivers/net/ethernet/intel/ice/ice_txrx_lib.h
+> > @@ -12,26 +12,39 @@
+> >   * act: action to store onto Rx buffers related to XDP buffer parts
+> >   *
+> >   * Set action that should be taken before putting Rx buffer from first frag
+> > - * to one before last. Last one is handled by caller of this function as it
+> > - * is the EOP frag that is currently being processed. This function is
+> > - * supposed to be called only when XDP buffer contains frags.
+> > + * to the last.
+> >   */
+> >  static inline void
+> >  ice_set_rx_bufs_act(struct xdp_buff *xdp, const struct ice_rx_ring *rx_ring,
+> >                     const unsigned int act)
+> >  {
+> > -       const struct skb_shared_info *sinfo = xdp_get_shared_info_from_buff(xdp);
+> > -       u32 first = rx_ring->first_desc;
+> > -       u32 nr_frags = sinfo->nr_frags;
+> > +       u32 sinfo_frags = xdp_get_shared_info_from_buff(xdp)->nr_frags;
+> > +       u32 nr_frags = rx_ring->nr_frags + 1;
+> > +       u32 idx = rx_ring->first_desc;
+> >         u32 cnt = rx_ring->count;
+> >         struct ice_rx_buf *buf;
+> >
+> >         for (int i = 0; i < nr_frags; i++) {
+> > -               buf = &rx_ring->rx_buf[first];
+> > +               buf = &rx_ring->rx_buf[idx];
+> >                 buf->act = act;
+> >
+> > -               if (++first == cnt)
+> > -                       first = 0;
+> > +               if (++idx == cnt)
+> > +                       idx = 0;
+> > +       }
+> > +
+> > +       /* adjust pagecnt_bias on frags freed by XDP prog */
+> > +       if (sinfo_frags < rx_ring->nr_frags && act == ICE_XDP_CONSUMED) {
+> > +               u32 delta = rx_ring->nr_frags - sinfo_frags;
+> > +
+> > +               while (delta) {
+> > +                       if (idx == 0)
+> > +                               idx = cnt - 1;
+> > +                       else
+> > +                               idx--;
+> > +                       buf = &rx_ring->rx_buf[idx];
+> > +                       buf->pagecnt_bias--;
+> > +                       delta--;
+> > +               }
+> >         }
+> >  }
+> >
+> > --
+> > 2.34.1
+> >
+> >
 
