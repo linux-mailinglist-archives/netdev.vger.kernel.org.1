@@ -1,113 +1,384 @@
-Return-Path: <netdev+bounces-65440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3645383A7AE
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 12:24:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5222A83A7CF
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 12:28:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B94541F21060
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 11:24:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02B5B290DAB
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 11:28:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 239B61AAD0;
-	Wed, 24 Jan 2024 11:24:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F5E31B598;
+	Wed, 24 Jan 2024 11:28:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PZMFjFF3"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="l9tTFN8W"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFBE41B593;
-	Wed, 24 Jan 2024 11:24:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B71841AADE
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 11:28:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706095465; cv=none; b=iIAvzc7uL4AIMQKZa/bQzIevkzuKnpHbjWpWjtVvebtN4uXJnZFXfzF0r6yJOQzoqAW0ihRpsRZH2tXaa1Pvo9nNFBbCLhGkQTsGwfsQ0qBduE+3Uxj0pEzrMMAQJEm5LBk9vkM+FViQuTt0noJOt3DtSA4L7mrRm0vSWs5n6OI=
+	t=1706095704; cv=none; b=X3xSUt910BmJM3go6ZaVfWesRvX0ZcQZ4RoDyYc82UNjT8r3Q8yq7AolNHPgsbpto6DHZSpZJv/FfSw4bPF5tw4dG3qXJ/94jOUSXZ0njMZWI5LDUdiiGimgtaY0bVKxPSXivpUuJaq8Yw8BATsBqpv4ockcTUj2b1zEgIifJkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706095465; c=relaxed/simple;
-	bh=oDmzlcTHt2byiZfpR65DYFMdnWeZlnilvXyDpVzRqlo=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=WmKbPAIHqeYmD8iPfVUgJ9aeXnkO1Bq/MDhd/1Qhx87xxlAq2MsnERkidJa8J7VFaDJVPyfm/kLFIoYOGl5L6d4WfdBd0j01zmF/3hYJ9danMsTKvmpw1pf9L4otnMMe3nDg1Vcj6rnZBEnUnxXjbkMC94YFbA0UGENEq1NgyCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PZMFjFF3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A28B4C433C7;
-	Wed, 24 Jan 2024 11:24:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706095464;
-	bh=oDmzlcTHt2byiZfpR65DYFMdnWeZlnilvXyDpVzRqlo=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=PZMFjFF3YSuvslHEhD3jFg8ICu1JlEt1c/2RUumxkx9o6RbfUd2tBU23MM3fz+5Sa
-	 Nv2ZFenCEMkRwr2vvyOwpVtIHMn5TVy1b5+SQvAOBOTaGi4mAG/9yMJk5SwOcztIDa
-	 ZEq0M0h4dRHmI2ltVL84xPwLXXSuMB9g3xx05gkq5W2VaLT5bFjkkkGvMPxsIhHDOC
-	 sqAQbOF4gEg24AqGe1R/gGMQou9GQTV6BK7fJ1jJk+0+3tjOHpgbn+Gd7QbY6tvb1H
-	 Oe1xIS/QPUE2BYgBnhE77uWoHmCWT6B9lZjxfkQRaxs1NRUz6tupKds8Cg/U6+d+Wf
-	 ZHisyLIYy2eVA==
-Message-ID: <8fabd83caa0d44369853a4040a89c069f9b0f935.camel@kernel.org>
-Subject: Re: [PATCH v6 3/3] NFSD: add write_ports to netlink command
-From: Jeff Layton <jlayton@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neilb@suse.de>, 
-	linux-nfs@vger.kernel.org, lorenzo.bianconi@redhat.com, kuba@kernel.org, 
-	horms@kernel.org, netdev@vger.kernel.org
-Date: Wed, 24 Jan 2024 06:24:22 -0500
-In-Reply-To: <ZbDdzwvP6-O2zosC@lore-desk>
-References: <cover.1705771400.git.lorenzo@kernel.org>
-	 <f7c42dae2b232b3b06e54ceb3f00725893973e02.1705771400.git.lorenzo@kernel.org>
-	 <9e3ae337dcf168c60c4cfd51aa0b2fc7b24bcbfb.camel@kernel.org>
-	 <170595930799.23031.17998490973211605470@noble.neil.brown.name>
-	 <Za7zHvPJdei/vWm4@tissot.1015granger.net> <Za-N6BxOMXTGyxmW@lore-desk>
-	 <85b02061798a1b750a87b0302681b86651d0c7a3.camel@kernel.org>
-	 <Za-9P0NjlIsc1PcE@lore-desk>
-	 <3f035d3bc494ec03b83ae237e407c42f2ddc4c53.camel@kernel.org>
-	 <ZbDdzwvP6-O2zosC@lore-desk>
-Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
- keydata=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
-	kZWuOsJdJQdmwlWC5L5ln9xgfr/4mOY38B0U=
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+	s=arc-20240116; t=1706095704; c=relaxed/simple;
+	bh=zS/arkhd8QlPP+xZPJ8bRaO5apkXeCZXoTOnSlWdFvk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Q7vgXmEJlG6nz7SSEhV87AxYn5/4arDFYZJi1CNRCN3+88vFFq8UYLisok91XlGAd3qnFvQwc1OpplSS+mwVQL0GJBqZ2T2ADJqMjkMNntkD9vVEueGY903lrDL2GcTmfmDCMelMIkm140Y2l/jFyfy+aHVJ06OPP18yvQE2l/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=l9tTFN8W; arc=none smtp.client-ip=95.215.58.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <68333f0b-4657-4171-8772-12e2b453f139@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1706095694;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=flQ+i4PHxqCY8GhePBhk5z9vbjNANuIkCWuOY/CAPj4=;
+	b=l9tTFN8WP+Ot4NU+G8TiAAc6cToezKGvQq/QPIKus6PfGBz6O/h4DUvh3I02jvEa9jXDZN
+	PgoFhz0+Mf7TYJLJhl/OubDjHXHBGYz8tx/OiPE9MdroLoY0uVtX9F/tzYC8Kdu4HIV4iN
+	w1fwLYf6OA4yisfEd7UGnb8Jo1mOSzA=
+Date: Wed, 24 Jan 2024 11:28:04 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [net-next PATCH] octeontx2: Add PTP clock driver for Octeon PTM
+ clock.
+Content-Language: en-US
+To: Sai Krishna <saikrishnag@marvell.com>, richardcochran@gmail.com,
+ davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, sgoutham@marvell.com, gakula@marvell.com,
+ lcherian@marvell.com, hkelam@marvell.com, sbhatta@marvell.com
+Cc: Naveen Mamindlapalli <naveenm@marvell.com>
+References: <20240124064156.2577119-1-saikrishnag@marvell.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20240124064156.2577119-1-saikrishnag@marvell.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, 2024-01-24 at 10:52 +0100, Lorenzo Bianconi wrote:
-> [...]
-> >=20
-> > That's a great question. We do need to properly support the -H option t=
-o
-> > rpc.nfsd. What we do today is look up the hostname or address using
-> > getaddrinfo, and then open a listening socket for that address and then
-> > pass that fd down to the kernel, which I think then takes the socket an=
-d
-> > sticks it on sv_permsocks.
-> >=20
-> > All of that seems a bit klunky. Ideally, I'd say the best thing would b=
-e
-> > to allow userland to pass the sockaddr we look up directly via netlink,
-> > and then let the kernel open the socket. That will probably mean
-> > refactoring some of the svc_xprt_create machinery to take a sockaddr,
-> > but I don't think it looks too hard to do.
->=20
-> Do we already have a specific use case for it? I think we can even add it
-> later when we have a defined use case for it on top of the current series=
-.
->=20
+On 24/01/2024 06:41, Sai Krishna wrote:
+> The PCIe PTM(Precision time measurement) protocol provides precise
+> coordination of events across multiple components like PCIe host
+> clock, PCIe EP PHC local clocks of PCIe devices. This patch adds
+> support for ptp clock based PTM clock. We can use this PTP device
+> to sync the PTM time with CLOCK_REALTIME or other PTP PHC
+> devices using phc2sys.
+> 
+> Signed-off-by: Sai Krishna <saikrishnag@marvell.com>
+> Signed-off-by: Naveen Mamindlapalli <naveenm@marvell.com>
+> Signed-off-by: Sunil Kovvuri Goutham <sgoutham@marvell.com>
+> ---
+>   drivers/ptp/Kconfig          |  10 ++
+>   drivers/ptp/Makefile         |   1 +
+>   drivers/ptp/ptp_octeon_ptm.c | 254 +++++++++++++++++++++++++++++++++++
+>   3 files changed, 265 insertions(+)
+>   create mode 100644 drivers/ptp/ptp_octeon_ptm.c
+> 
+> diff --git a/drivers/ptp/Kconfig b/drivers/ptp/Kconfig
+> index 5dd5f188e14f..afa82555dbd9 100644
+> --- a/drivers/ptp/Kconfig
+> +++ b/drivers/ptp/Kconfig
+> @@ -212,4 +212,14 @@ config PTP_DFL_TOD
+>   	  To compile this driver as a module, choose M here: the module
+>   	  will be called ptp_dfl_tod.
+>   
+> +config PTP_CLOCK_OCTEON
+> +	tristate "OCTEON PTM PTP clock"
+> +	depends on PTP_1588_CLOCK
+> +	default n
+> +	help
+> +	  This driver adds support for using Octeon PTM device clock as
+> +	  a PTP clock.
+> +
+> +	  To compile this driver as a module, choose M here: the module
+> +	  will be called ptp_octeon_ptm.
+>   endmenu
+> diff --git a/drivers/ptp/Makefile b/drivers/ptp/Makefile
+> index dea0cebd2303..e811ae6df5c0 100644
+> --- a/drivers/ptp/Makefile
+> +++ b/drivers/ptp/Makefile
+> @@ -20,3 +20,4 @@ obj-$(CONFIG_PTP_1588_CLOCK_MOCK)	+= ptp_mock.o
+>   obj-$(CONFIG_PTP_1588_CLOCK_VMW)	+= ptp_vmw.o
+>   obj-$(CONFIG_PTP_1588_CLOCK_OCP)	+= ptp_ocp.o
+>   obj-$(CONFIG_PTP_DFL_TOD)		+= ptp_dfl_tod.o
+> +obj-$(CONFIG_PTP_CLOCK_OCTEON)		+= ptp_octeon_ptm.o
+> diff --git a/drivers/ptp/ptp_octeon_ptm.c b/drivers/ptp/ptp_octeon_ptm.c
+> new file mode 100644
+> index 000000000000..da069645ebf7
+> --- /dev/null
+> +++ b/drivers/ptp/ptp_octeon_ptm.c
+> @@ -0,0 +1,254 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Marvell PTP PHC clock driver for PCIe PTM (Precision Time Measurement) EP
+> + *
+> + * Copyright (c) 2023 Marvell.
+> + *
+> + */
+> +
+> +#include <linux/delay.h>
+> +#include <linux/device.h>
+> +#include <linux/err.h>
+> +#include <linux/init.h>
+> +#include <linux/kernel.h>
+> +#include <linux/pci.h>
+> +#include <linux/slab.h>
+> +#include <linux/module.h>
+> +
+> +#include <linux/ptp_clock_kernel.h>
+> +
+> +#include "ptp_private.h"
+> +
+> +#define PEMX_PFX_CSX_PFCFGX(pem, pf, _offset)	({typeof(_offset) (offset) = (_offset); \
+> +						((0x8e0000008000 | (u64)(pem) << 36 \
+> +						| (pf) << 18 \
+> +						| (((offset) >> 16) & 1) << 16 \
+> +						| ((offset) >> 3) << 3) \
+> +						+ ((((offset) >> 2) & 1) << 2)); })
+> +
+> +#define PEMX_CFG_WR(a)			(0x8E0000000018ull | (u64)(a) << 36)
+> +#define PEMX_CFG_RD(a)			(0x8E0000000020ull | (u64)(a) << 36)
+> +
+> +/* Octeon CSRs   */
+> +#define PEMX_CFG                        0x8e00000000d8ULL
+> +#define PEMX_PTM_CTL			0x8e0000000098ULL
+> +#define PEMX_PTM_CTL_CAP		BIT_ULL(10)
+> +#define PEMX_PTM_LCL_TIME		0x8e00000000a0ULL /* PTM time */
+> +#define PEMX_PTM_MAS_TIME		0x8e00000000a8ULL /* PTP time */
+> +#define PTM_DEBUG			0
+> +
+> +struct oct_ptp_clock {
+> +	struct ptp_clock *ptp_clock;
+> +	struct ptp_clock_info caps;
+> +	bool cn10k_variant;
+> +};
+> +
+> +static struct oct_ptp_clock oct_ptp_clock;
+> +static void __iomem *ptm_ctl_addr;
+> +static void __iomem *ptm_lcl_addr;
+> +
+> +/* Config space registers   */
+> +#define PCIEEPX_PTM_REQ_STAT		(oct_ptp_clock.cn10k_variant ? 0x3a8 : 0x474)
+> +#define PCIEEPX_PTM_REQ_T1L		(oct_ptp_clock.cn10k_variant ? 0x3b4 : 0x480)
+> +#define PCIEEPX_PTM_REQ_T1M		(oct_ptp_clock.cn10k_variant ? 0x3b8 : 0x484)
+> +#define PCIEEPX_PTM_REQ_T4L		(oct_ptp_clock.cn10k_variant ? 0x3c4 : 0x490)
+> +#define PCIEEPX_PTM_REQ_T4M		(oct_ptp_clock.cn10k_variant ? 0x3c8 : 0x494)
+> +
+> +#define PCI_VENDOR_ID_CAVIUM			0x177d
+> +#define PCI_DEVID_OCTEONTX2_PTP			0xA00C
+> +#define PCI_SUBSYS_DEVID_95XX			0xB300
+> +#define PCI_SUBSYS_DEVID_95XXN			0xB400
+> +#define PCI_SUBSYS_DEVID_95XXMM			0xB500
+> +#define PCI_SUBSYS_DEVID_96XX			0xB200
+> +#define PCI_SUBSYS_DEVID_98XX			0xB100
+> +#define PCI_SUBSYS_DEVID_CN10K_A		0xB900
+> +#define PCI_SUBSYS_DEVID_CN10K_B		0xBD00
+> +#define PCI_SUBSYS_DEVID_CNF10K_A		0xBA00
+> +#define PCI_SUBSYS_DEVID_CNF10K_B		0xBC00
+> +
+> +static bool is_otx2_support_ptm(struct pci_dev *pdev)
+> +{
+> +	return (pdev->subsystem_device == PCI_SUBSYS_DEVID_96XX ||
+> +		pdev->subsystem_device == PCI_SUBSYS_DEVID_95XX ||
+> +		pdev->subsystem_device == PCI_SUBSYS_DEVID_95XXN ||
+> +		pdev->subsystem_device == PCI_SUBSYS_DEVID_98XX ||
+> +		pdev->subsystem_device == PCI_SUBSYS_DEVID_95XXMM);
+> +}
+> +
+> +static bool is_cn10k_support_ptm(struct pci_dev *pdev)
+> +{
+> +	return (pdev->subsystem_device == PCI_SUBSYS_DEVID_CN10K_A ||
+> +		pdev->subsystem_device == PCI_SUBSYS_DEVID_CNF10K_A ||
+> +		pdev->subsystem_device == PCI_SUBSYS_DEVID_CN10K_B ||
+> +		pdev->subsystem_device == PCI_SUBSYS_DEVID_CNF10K_B);
+> +}
+> +
+> +static int ptp_oct_ptm_adjtime(struct ptp_clock_info *ptp, s64 delta)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +
+> +static int ptp_oct_ptm_settime(struct ptp_clock_info *ptp,
+> +			       const struct timespec64 *ts)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +
+> +static u32 read_pcie_config32(int ep_pem, int cfg_addr)
+> +{
+> +	void __iomem *addr;
+> +	u64 val;
+> +
+> +	if (oct_ptp_clock.cn10k_variant) {
+> +		addr  = ioremap(PEMX_PFX_CSX_PFCFGX(ep_pem, 0, cfg_addr), 8);
+> +		if (!addr) {
+> +			pr_err("PTM_EP: Failed to ioremap Octeon CSR space\n");
+> +			return -1U;
+> +		}
+> +		val = readl(addr);
+> +		iounmap(addr);
+> +	} else {
+> +		addr  = ioremap(PEMX_CFG_RD(ep_pem), 8);
+> +		if (!addr) {
+> +			pr_err("PTM_EP: Failed to ioremap Octeon CSR space\n");
+> +			return -1U;
+> +		}
+> +		val = ((1 << 15) | (cfg_addr & 0xfff));
+> +		writeq(val, addr);
+> +		val = readq(addr) >> 32;
+> +		iounmap(addr);
+> +	}
+> +	return (val & 0xffffffff);
+> +}
+> +
+> +static uint64_t octeon_csr_read(u64 csr_addr)
+> +{
+> +	u64 val;
+> +	void __iomem *addr;
+> +
+> +	addr = ioremap(csr_addr, 8);
+> +	if (!addr) {
+> +		pr_err("PTM_EP: Failed to ioremap CSR space\n");
+> +		return -1UL;
+> +	}
+> +	val = (u64)READ_ONCE(*(u64 __iomem *)addr);
+> +	iounmap(addr);
+> +	return val;
+> +}
+> +
+> +static int ptp_oct_ptm_gettime(struct ptp_clock_info *ptp, struct timespec64 *ts)
+> +{
+> +	u64 ptp_time, val64;
+> +#if PTM_DEBUG
+> +	u64 ptm_time;
+> +#endif
 
-Yes:
+Looks like some out-of-tree debug artifacts here and later in the
+function
 
-rpc.nfsd -H makes nfsd listen on a particular address and port. By
-passing down the sockaddr instead of an already-opened socket
-descriptor, we can achieve the goal without having to open sockets in
-userland.
+> +	u32 val32;
+> +
+> +	/* Check for valid PTM context */
+> +	val32 = read_pcie_config32(0, PCIEEPX_PTM_REQ_STAT);
+> +	if (!(val32 & 0x1)) {
+> +		pr_err("PTM_EP: ERROR: PTM context not valid: 0x%x\n", val32);
+> +#if PTM_DEBUG
+> +		ptm_time = 0;
+> +#endif
+> +		ptp_time = 0;
 
---=20
-Jeff Layton <jlayton@kernel.org>
+No reason to clean up local variables.
+
+> +		ts->tv_sec = 0;
+> +		ts->tv_nsec = 0;
+> +
+> +		return -EINVAL;
+> +	}
+> +
+> +	/* Trigger PTM/PTP capture */
+> +	val64 = (u64)READ_ONCE(*(u64 __iomem *)ptm_ctl_addr);
+> +	val64 |= PEMX_PTM_CTL_CAP;
+> +	WRITE_ONCE(*(u64 __iomem *)ptm_ctl_addr, val64);
+> +	/* Read PTM/PTP clocks  */
+> +	ptp_time = (u64)READ_ONCE(*(u64 __iomem *)ptm_lcl_addr);
+> +	ts->tv_sec = ptp_time / NSEC_PER_SEC;
+> +	ts->tv_nsec = ptp_time % NSEC_PER_SEC;
+
+ns_to_timespec64() here?
+
+> +
+> +#if PTM_DEBUG
+> +	ptm_time = octeon_csr_read(PEMX_PTM_MAS_TIME);
+> +	pr_info("PTM_EP: system %lld ptm time: %lld\n", ptp_time, ptm_time);
+> +#endif
+> +
+> +	return 0;
+> +}
+> +
+> +static int ptp_oct_ptm_enable(struct ptp_clock_info *ptp,
+> +			      struct ptp_clock_request *rq, int on)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +
+> +static const struct ptp_clock_info ptp_oct_caps = {
+> +	.owner		= THIS_MODULE,
+> +	.name		= "OCTEON PTM PHC",
+> +	.max_adj	= 0,
+> +	.n_ext_ts	= 0,
+> +	.n_pins		= 0,
+> +	.pps		= 0,
+> +	.adjtime	= ptp_oct_ptm_adjtime,
+> +	.gettime64	= ptp_oct_ptm_gettime,
+> +	.settime64	= ptp_oct_ptm_settime,
+> +	.enable		= ptp_oct_ptm_enable,
+> +};
+> +
+> +static void __exit ptp_oct_ptm_exit(void)
+> +{
+> +	iounmap(ptm_ctl_addr);
+> +	iounmap(ptm_lcl_addr);
+> +	ptp_clock_unregister(oct_ptp_clock.ptp_clock);
+> +}
+> +
+> +static int __init ptp_oct_ptm_init(void)
+> +{
+> +	struct pci_dev *pdev = NULL;
+> +
+> +	pdev = pci_get_device(PCI_VENDOR_ID_CAVIUM,
+> +			      PCI_DEVID_OCTEONTX2_PTP, pdev);
+> +	if (!pdev)
+> +		return 0;
+> +
+> +	if (octeon_csr_read(PEMX_CFG) & 0x1ULL) {
+> +		pr_err("PEM0 is configured as RC\n");
+> +		return 0;
+> +	}
+> +
+> +	if (is_otx2_support_ptm(pdev)) {
+> +		oct_ptp_clock.cn10k_variant = 0;
+> +	} else if (is_cn10k_support_ptm(pdev)) {
+> +		oct_ptp_clock.cn10k_variant = 1;
+> +	} else {
+> +		/* PTM_EP: unsupported processor */
+> +		return 0;
+> +	}
+> +
+> +	ptm_ctl_addr = ioremap(PEMX_PTM_CTL, 8);
+> +	if (!ptm_ctl_addr) {
+> +		pr_err("PTM_EP: Failed to ioremap CSR space\n");
+> +		return 0;
+> +	}
+> +
+> +	ptm_lcl_addr = ioremap(PEMX_PTM_LCL_TIME, 8);
+> +	if (!ptm_lcl_addr) {
+> +		pr_err("PTM_EP: Failed to ioremap CSR space\n");
+> +		return 0;
+> +	}
+> +
+> +	oct_ptp_clock.caps = ptp_oct_caps;
+> +
+> +	oct_ptp_clock.ptp_clock = ptp_clock_register(&oct_ptp_clock.caps, NULL);
+> +
+> +	pr_info("PTP device index for PTM clock:%d\n", oct_ptp_clock.ptp_clock->index);
+> +	pr_info("cn10k_variant %d\n", oct_ptp_clock.cn10k_variant);
+> +
+> +	return PTR_ERR_OR_ZERO(oct_ptp_clock.ptp_clock);
+> +}
+> +
+> +module_init(ptp_oct_ptm_init);
+> +module_exit(ptp_oct_ptm_exit);
+> +
+> +MODULE_AUTHOR("Marvell Inc.");
+> +MODULE_DESCRIPTION("PTP PHC clock using PTM");
+> +MODULE_LICENSE("GPL");
+
 
