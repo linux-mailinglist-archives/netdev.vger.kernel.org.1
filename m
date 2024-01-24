@@ -1,110 +1,107 @@
-Return-Path: <netdev+bounces-65564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65565-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A35E583B085
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 18:54:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFA2F83B088
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 18:55:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6BCC1C2148F
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 17:54:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F52F1F24D89
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 17:55:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 836E212A144;
-	Wed, 24 Jan 2024 17:52:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F09E6129A93;
+	Wed, 24 Jan 2024 17:52:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Sj1xzL0G"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="u5/EEmG5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B76801272AC
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 17:52:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1781B12A152
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 17:52:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706118754; cv=none; b=QSryHWQx3qkgRB853AdZn26vvxVpWzHQiZIoNo8VYGg6/4J5WOeM/AmE2Tr7PX9/GUlKKQrQ479HVGZXrbgMUa+UgyiKNUdn84x5pnY7MgRliG0inoeGaMQCFjdLnW5sJa/ymdoMTGJDqjilT7siGRDZrcg6kwl3RMu3BXPiluI=
+	t=1706118759; cv=none; b=qskhYWtzOv71s4yHqQYnJ7viZcgGvfP75DaABmchGidRc9CscAUULCiWc+07N1ZH3B/v3yd8d/Xa7fgBNKRZKUJS7TfSKunF8v1nxXXOzqmXKM1u3Qw8VacbKi+j0pSuB0qKV6E47zuhzaznJ2jIUHU2p+4X4eFCp6i8+h5Lh8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706118754; c=relaxed/simple;
-	bh=2nzwYy5eLPzezXEa8LQ+/BiHlD0Mt33Sf5tv11jdlcs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ubJbpVwpqPY9c3gaab5eFwxWdHftTLpiKjItwX/oa/zODTUejTsA0U3G3nA5Nl4aZLPgp6ZdrrXzmrooLeqDtAwVR+Dtf5CGcDaldrBDnQSPafcQWPDOUVEbsePgunMiASY5XKg5mxPo61h7AglLFMdkdmijQtjZrFCVCd4x/jg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Sj1xzL0G; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-510133ed214so1129860e87.1
-        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 09:52:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1706118751; x=1706723551; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vTlQZ1fr4MYjqJNvKsZeP6R4Md0Qcnn9S554f0tlhZM=;
-        b=Sj1xzL0G+MwmNSKuOkkY7myMdHQ1x3Kxu3y7yCD0qhrsFazeFB2DmzpwEAuuqxiTaF
-         JC6Kn14LUf0kaW1TSSC/sxmsjzbxKdyCAnV1QwJ2eQ1aTzhGquHuOwdk8AxCffrTLypC
-         iQhVPcoZb9W5foxRMSC8oUbPK2gfejJnGatH57z+M/kGPkYDmNS5fwnKQWG0R5mt9LD4
-         6aclUOHYbSnnSD15L/FDpTS813RVfySH4ZUbOJVZHEmcR5JG7+CHPmFaEhKfyUoX5V7C
-         Q1+wwd9NERY5kgVaB98++XAO75doawh59Xttk/wBqI6s2IUPnBs3jNQrcolnMOrRYHVG
-         KoNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706118751; x=1706723551;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vTlQZ1fr4MYjqJNvKsZeP6R4Md0Qcnn9S554f0tlhZM=;
-        b=DWDv5nLVVMrymQA4Nrjx7A9KMifj5U4eXAZXKZ0jDPSYR8KXv6LXpQRzbWSn/qV7Hh
-         KQrVksMkJEARc46ds6nspsx2LKf77UMjo/fddCw6ATymr2S0r9CLC5ZHFa/MCEsAPZ9N
-         g5vbX4yLLMrv07AGobUiuRGpSNDJyxjb1dpD7XjoxQdhk2x8+VQCg13Y8KYJWS1jBpM1
-         jEsWaBYZoMbMvRpIaW0T+JEUR/AE4scznDebBzs77eiKa2IlF/OTzhooVT90LpwIfsSg
-         rPD7U+Rc25MYHNsYpEXUa2kvg3QwGFh1Ro0q74pERgv4vomO+rdLX7Kk2vy1359Q1hIC
-         a38Q==
-X-Gm-Message-State: AOJu0YxgVmIXC9wFTLBWIxCYeAx2pVOwpBHRAmnPML4+zlpt2IbqySUZ
-	RqgQLs4qYtsxzwVJbFsb1Cdf/fpUwsNDggfbmQHikgZ73MV6PoirDKHrg9A+oJaKxTOrq7qFqCj
-	q
-X-Google-Smtp-Source: AGHT+IFVZa2kg7IyRx7QJp069qZ9912rNwBb+h/X1nfVuEMEY0k4ho5ymWS2GZhOS354vQXe07M81g==
-X-Received: by 2002:a05:6512:3b98:b0:510:19dd:6c56 with SMTP id g24-20020a0565123b9800b0051019dd6c56mr18096lfv.125.1706118750800;
-        Wed, 24 Jan 2024 09:52:30 -0800 (PST)
-Received: from [172.30.204.154] (UNUSED.212-182-62-129.lubman.net.pl. [212.182.62.129])
-        by smtp.gmail.com with ESMTPSA id u1-20020a056512128100b0050eb25590ffsm2621579lfs.207.2024.01.24.09.52.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Jan 2024 09:52:30 -0800 (PST)
-Message-ID: <7c74ef2b-0031-4861-9d97-2c242db14d5e@linaro.org>
-Date: Wed, 24 Jan 2024 18:52:27 +0100
+	s=arc-20240116; t=1706118759; c=relaxed/simple;
+	bh=Gopisa6ia6e3M5Hep3D5tEDD+hYStJChcRlWI+zWbXM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P3PUfADcp4E9FtT08b5gx18rZp+vhRN9WLpn4fqFjOId1wLqoWF+5G/rChCZt02e2ybVQM9pRvn7WTjj4wBcgNOvXF+w4k9lUdoiwXY/IQAWOX34q2EgmxRdmT8OR7rsU3zzM3hLcdFkBkfq/8qwnS/hSietAxVS9OzTT+urhwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=u5/EEmG5; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=mBRdRZbLl2eSZETEZstbkJq+SehwoFaIrZnUllW36ls=; b=u5/EEmG5m0i1gEDlwe8xLb93Vb
+	Zp0KaD/aFMBQBPMID0MlltYHw+iDDDycVbPVXgIpGDucG2tQ7ZIyly9rFF8OHZWhGNc/4U7PagPah
+	fxQ6UJYlZ2PURc3YhjCgTdvs3NUHSUQQGoBDQrZr+Rh3oz5sMORAXvuCmuyCxIyEOY8s=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rShQR-0061AQ-Hr; Wed, 24 Jan 2024 18:52:35 +0100
+Date: Wed, 24 Jan 2024 18:52:35 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
+	Network Development <netdev@vger.kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Robert Marko <robimarko@gmail.com>,
+	Daniel Golle <daniel@makrotopia.org>
+Subject: Re: Race in PHY subsystem? Attaching to PHY devices before they get
+ probed
+Message-ID: <c3282db2-b1e5-422a-b62f-c081042da9de@lunn.ch>
+References: <bdffa33c-e3eb-4c3b-adf3-99a02bc7d205@gmail.com>
+ <a9e79494-b94a-40f7-9c28-22b6220db5c2@lunn.ch>
+ <Za6eMg0y2QxogfmD@shell.armlinux.org.uk>
+ <65b12597.050a0220.66e91.7b3b@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: ethernet: qualcomm: Remove QDF24xx support
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: patchwork-bot+netdevbpf@kernel.org, timur@kernel.org,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- marijn.suijten@somainline.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240122-topic-qdf_cleanup_net-v1-1-caf0d9c4408a@linaro.org>
- <170605983124.14933.9916722082205803213.git-patchwork-notify@kernel.org>
- <0679f568-60e7-47d8-b86e-052a9eb4c103@linaro.org>
- <20240124073558.41c1b99d@kernel.org>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@linaro.org>
-In-Reply-To: <20240124073558.41c1b99d@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <65b12597.050a0220.66e91.7b3b@mx.google.com>
 
-
-
-On 1/24/24 16:35, Jakub Kicinski wrote:
-> On Wed, 24 Jan 2024 13:38:19 +0100 Konrad Dybcio wrote:
->> Jakub, can we please drop this (or should I send a revert)?
->>
->> It turned out that Qualcomm is actually still using this internally,
->> for "reasons".. [1]
+> Well if we start having more and more PHY that require loading a FW then
+> this will become a big problem...
 > 
-> Oh, I thought you only meant they are using the UART driver (somehow).
-> I'll revert, sorry.
+> I wasted some good time on this and if the MDIO is slow enough loading
+> the FW can take even 100s resulting in probe still having to finish and
+> config_init called later.
 
-Thanks for taking care of this!
+If its going to take 100s of seconds, i don't think we can have
+'ip set link up' stall for that long. It needs to return an error code,
+and hopefully a useful error message asking the user to throw the machine
+away and get a better one!
 
-Konrad
+> Since the FW has not been loaded config_init returns bad data and fails
+> to configure. (and after a while probe is complete)
+> 
+> I don't know if it would be ok as a solution but I think moving the
+> fw_load call in the config_init seems to "handle" this problem but IMHO
+> it's still and hack for a fragile implementation.
+
+Just throwing out ideas, but i think we need to split this into two
+different use cases:
+
+1) Firmware loading is fast, only 1-2 seconds. We can block operations
+on the PHY until it is ready
+
+2) Firmware loading is slow, we return -EBUSY or -EAGAIN, or similar.
+
+Maybe we could add a struct completion to struct phy_device, which has
+compete() called on it when probe finishes. phy_attach_direct() does a
+wait_for_completion_timeout()?
+
+This is assuming we cannot actually fix phylib to correctly use the
+driver model, PHYs are not visible until probe is complete, and the
+MAC drivers can handle that.
+
+	Andrew
 
