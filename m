@@ -1,84 +1,70 @@
-Return-Path: <netdev+bounces-65347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9B7083A216
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 07:33:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BC1383A21E
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 07:34:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F9FE1F263CD
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 06:33:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36B85281B12
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 06:34:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7414CBE5C;
-	Wed, 24 Jan 2024 06:33:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B434BE5C;
+	Wed, 24 Jan 2024 06:34:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HH81EEbc"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2549628;
-	Wed, 24 Jan 2024 06:33:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB6E0F9D7
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 06:34:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706078020; cv=none; b=QszPeBNY/PPHSbVd7Fc4K9TAHLEZz5equ3QgKNXmYgqjwJagn9ty0uqeXMJtshMtqhq6NL2WqLqcAZUKHcpBfQJYF9fxt7cjBhDyY8mU2ON+4rVfcYLgdihOLm3JERRYtCq0rp3DiVoS4yx3yWe9ZBz3rKTPnVfeoGBPz/JhMfo=
+	t=1706078075; cv=none; b=TcT597P5X336XtBumyaJ8W5Qc3ha1lAarQPAOUOnxxAVProlGlXlYWV2ZwDFT7tPvfe9ZccLk877pIBTmn8Z5PEmYbzwHUQ5TZlbammUtKQtY6Ov0obbqmN8kZ+SlkVxkJoBi+EErxgDsAGRxlkIMnKilRY87nqGNZhY2gjXxBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706078020; c=relaxed/simple;
-	bh=SAJHujprC1bLB15iQXfqasMZEBQT8JXQnCKvkhWg3b4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sJaBOwdyzGpeZ/9//NJ9W4SQYmtHZ4Gvw4itD1FgTmP9CEywViLV208uX69UR5ScBcN2jUxNru7GdA3C0qzO17nyGa+xnEzVSYb2j1JEVr5CMvm2bgNMXLaJ25dAEkspNzWI99ImoAkjhpA6o+sv1Xxhx2YkDC3jbssj3jpgXPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; arc=none smtp.client-ip=115.124.30.110
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=17;SR=0;TI=SMTPD_---0W.F6BhX_1706078002;
-Received: from 30.221.129.141(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W.F6BhX_1706078002)
-          by smtp.aliyun-inc.com;
-          Wed, 24 Jan 2024 14:33:33 +0800
-Message-ID: <47c1b777-6d4e-40ac-9297-61240c126d6a@linux.alibaba.com>
-Date: Wed, 24 Jan 2024 14:33:21 +0800
+	s=arc-20240116; t=1706078075; c=relaxed/simple;
+	bh=96QamTLIcdD3uMKWaCTBcqiZHUEN8/W35z7kkGurbKs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pPkTF2Zx7bkOuaj6S7jCfZUoZ0bxjuGAzvSVL/ws85QSYNdntmjFFNlwmHRU91WJqcli6TMAkiHio58m6IY1JLqXbdoWnFo9mh8Rvc4DXFuu646j+rcEljO2VD5QYj/dQIZErudXRxdAKY6WkyBrsevzuARZyFzqOhw8KHhsxTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HH81EEbc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D657AC433C7;
+	Wed, 24 Jan 2024 06:34:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706078074;
+	bh=96QamTLIcdD3uMKWaCTBcqiZHUEN8/W35z7kkGurbKs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HH81EEbcIo6McUovC1U8a1MO3Vc5WFDlGC5zyMuDo26qBWsAOM1uRsaKg/Burw5fD
+	 Nmg+oSuRNhXBXjRIhXbD65Xo3nXVsH08FoBwAVesTYnVsYpzoUrWFC8AvfSOCOp9dH
+	 RcGeNzCzyqmGC5w9T+LoCk4QRC8SckI/SE+GQjp7h0XPX6nv1mEleg6OcJY78kxsno
+	 7eKKhcu5q/bWEhMkBhNnyBri7f9fLb2cdBpyKPzKUa9J78yxelYRrc6h03FwomLbph
+	 ay2YQPLDWp7S3juAG/MmXYYfN9lnCVgYDGluCLMzxn6cDvsRMjDRxkUHch6Dqr7e3a
+	 IQfaVy0SgHuaA==
+Date: Wed, 24 Jan 2024 08:34:29 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Denis Kirjanov <kirjanov@gmail.com>
+Cc: stephen@networkplumber.org, netdev@vger.kernel.org,
+	Denis Kirjanov <dkirjanov@suse.de>
+Subject: Re: [PATCH iproute2] rdma: fix a typo in the comment
+Message-ID: <20240124063429.GA9841@unreal>
+References: <20240123121657.1951-1-dkirjanov@suse.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 00/15] net/smc: implement loopback-ism used by
- SMC-D
-To: Alexandra Winter <wintera@linux.ibm.com>,
- Wenjia Zhang <wenjia@linux.ibm.com>, hca@linux.ibm.com, gor@linux.ibm.com,
- agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
- alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240111120036.109903-1-guwen@linux.alibaba.com>
- <f98849a7-41e9-421b-97b7-36d720cc43ee@linux.alibaba.com>
- <20a1a1f3-789a-4d91-9a94-dca16161afd7@linux.ibm.com>
- <1860588f-2246-4dcd-9db5-4ccd7add0f4a@linux.alibaba.com>
- <3c51c969-3884-4104-b38d-570c61525214@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <3c51c969-3884-4104-b38d-570c61525214@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240123121657.1951-1-dkirjanov@suse.de>
 
+On Tue, Jan 23, 2024 at 07:16:57AM -0500, Denis Kirjanov wrote:
+> Signed-off-by: Denis Kirjanov <dkirjanov@suse.de>
+> ---
+>  rdma/rdma.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-On 2024/1/23 22:03, Alexandra Winter wrote:
-> Hello Wen Gu and others,
-> 
-> I just wanted to let you know that unfortunately both Wenjia and Jan have called in sick and we don't know
-> when they will be back at work.
-> So I'm sorry but there may be mroe delays in the review of this patchset.
-> 
-> Kind regards
-> Alexandra Winter
-
-Hi Alexandra,
-
-Thank you for the update. Health comes first. Wishing Wenjia and Jan
-both make a swift recovery.
-
-Best regards,
-Wen Gu
+Thanks,
+Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
 
