@@ -1,122 +1,129 @@
-Return-Path: <netdev+bounces-65343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FEC783A1D2
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 07:11:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B602183A1E4
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 07:14:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00244B26422
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 06:10:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 21720B21A4B
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 06:14:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C5B3E579;
-	Wed, 24 Jan 2024 06:10:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80A53E579;
+	Wed, 24 Jan 2024 06:13:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b="fvpB4voo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U0/PKMB2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 301E563AA
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 06:10:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08CF5168A4;
+	Wed, 24 Jan 2024 06:13:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706076650; cv=none; b=FZgDroJDR7gc/1/x/em97Rpg9ZbbORKDGgFQd6nr24jIjH7Uk7gP9Zd9RG47CjRwyQel2wRM53UMkJcn/ZxT6hBVxcsuwU+4ok0By5H8+cNi2GpsGc74+SMVpmB9PkV/riqf9KShW7YiHphmdtlPi1ab8mtQjxp4Ivi4x6P4ovs=
+	t=1706076838; cv=none; b=P5x0pZmcHkdAyz28Omlg/T10HWtbTLvVEu72EpJibskGv+ao2GRnz2LvRHSjInsPHrCoX1v0UGPlKBf+ScConVB/74bMQalkKz94GncipNmphUteUIL28syX+aq4BWqT9EWmLKRvmGtwFVsxjX6Q01/mi6xCdnY67FY8i9NC6n0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706076650; c=relaxed/simple;
-	bh=vajM2OVTOya+vobW9bkj1vHe99vPM7B2G5ZahYReiiU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dzBSqxzlIb4jNDJ9N2tjydtkb6lQ9T3+1RxW4GI6sdi88hK/4cYxdLRcHj7xpDgy/voNoqRDIu3Rl3iBaCDNzX3gjZwd5mrVKM3O/U/yWIKYU57TsnQUqOo0zNE38vRbYI9T9Kwce067fFVV5C1UrKgNxHA5o2LcNDL6tAmGkEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu; spf=pass smtp.mailfrom=umich.edu; dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b=fvpB4voo; arc=none smtp.client-ip=209.85.219.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=umich.edu
-Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-dc227feab99so4977522276.2
-        for <netdev@vger.kernel.org>; Tue, 23 Jan 2024 22:10:45 -0800 (PST)
+	s=arc-20240116; t=1706076838; c=relaxed/simple;
+	bh=wpswii9EBVuc5OSgXjq6DMvx27D/iKdrgOPy+NO1nVs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ILo7qjJO0t9eMCXtZEJdmXFG9hKx5j8ucuXRkDIe63saAmyNZdbf99yOBXI1gwOztXTaGBbdKse0VnREAnW4Ly/VrRLj19xOR08vSXGRdxfuNny8zoL77gp5V4zjY0np078ZNEfgxLGlwRHbbuhs/5ZHA9DjIVf9xoGvt4quADs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U0/PKMB2; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-290da27f597so780862a91.2;
+        Tue, 23 Jan 2024 22:13:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=umich.edu; s=google-2016-06-03; t=1706076645; x=1706681445; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vajM2OVTOya+vobW9bkj1vHe99vPM7B2G5ZahYReiiU=;
-        b=fvpB4voovaKQT1c1QSwcrgpSzG1/uZeBgU7EQXCLbhIVXugEfdarNbFvcHUEFAumbO
-         fPpv8fvk2RrP1atY9k61zT5tISOgVqNnQlVKrGPISvNZy/y/7IB0uTg5qzurjlXGz7sE
-         3qFKHocTwuxXACfOGix8G0y0TxKndpeuE0M3zdSFe76WOM3SuLC+HAZZTMGuDkwn9fT2
-         IoZY0Kf0mefpdtRoTTk1piX/oAVFsHwk3uArm3xUj5ELN6q5OGe3tbG+UBMeLxr839J+
-         vj9ysX2vex/fvmr+msNRhtVsCctySx7FqrFG52jVYBPWHznKmy4m6DDiD/TvjX/ZpSZ3
-         zb5Q==
+        d=gmail.com; s=20230601; t=1706076836; x=1706681636; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MkrEiZ9sNClSHrh1shdqnEb0FJh7Da1ZFgpqsIzqCCY=;
+        b=U0/PKMB20hdzSd+6pGH1e2Na8NJaFWOPSCxo8CPXuYhXLn2+NqgHk7jDaAG/PyqIKz
+         P38iR/uIH+xcu8tX2DxrBgvePX/cdmNt+k2Qe6CkROoZPuL9t9CKXzCCsh+6bTQeF5l0
+         aASeYU94KbQryyKb/Xxjle+/AAILBpIb8KsC3hUG5ti23Kfzx56TdDmByvRjAwrtIs9u
+         yBHzz2rnz87RfbCFZLYHsI8qzrMeyt4CgT05O2X1NKZEfp9G4OBT0MV12sgk00Mv3pOh
+         u+MxRKuEAlqh0/jn8iy0mIh5QqS1DKqUCr8eaF8+vgvOqADGLatwGPzcXYv4TjCr1OsF
+         tLPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706076645; x=1706681445;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vajM2OVTOya+vobW9bkj1vHe99vPM7B2G5ZahYReiiU=;
-        b=Bh3KzdDsXVpo0RYZPQjz35WBqmIOZswAGJX9JDnpXZuW06oswBPKTXhqexMvU1gI9e
-         dwRUw51Qh5Q+fCo+AfmLJnIWMFO5+2RsTgssfwlVteXfl32GGQW/cQMRDhQXIlzNCZMw
-         I0ZI8nQZEJIL03eRP/nEP+M/jpijWAA41fYauXQegyp2+WAhjRg56/ABCEKOIZmgjDon
-         meifBLqoU91eDTibXsg1XKcS2nAvevKYfd248PuXQYtnd2Vcs2i9NxZS2gHUyTWpHJjy
-         9R4crvv20twf4Dmr597JBIBx/OUhCTH2ItQsA5TCav+c9qhN7ZQPBIePM24uOjz/QfBw
-         9Hzw==
-X-Gm-Message-State: AOJu0YyDeZeRXdjAkU0mXw8cXGH3OhBmsp3BNb9sIlmMFMgoyyYmtfM0
-	wBUyH5evDoM/sS0TC+3FaZDwhtod4na6L/DfejWwElol8ObZkj43YjxUpeovt0km0Ye6MmCol2B
-	ShcDo9rgxG7FxM+/LPaBbFdydcCzgHTqqaPeBiQ==
-X-Google-Smtp-Source: AGHT+IEifamxfhVU3pyFzkjl1xeGIFOosedSeQUaLnWSRC6ia7G27iTM+8JLA2R1j86zPrb5lPPCT4QzYV4gWmeRaIk=
-X-Received: by 2002:a25:df96:0:b0:dc3:6d8c:c1ed with SMTP id
- w144-20020a25df96000000b00dc36d8cc1edmr222955ybg.106.1706076645136; Tue, 23
- Jan 2024 22:10:45 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706076836; x=1706681636;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MkrEiZ9sNClSHrh1shdqnEb0FJh7Da1ZFgpqsIzqCCY=;
+        b=Ug71Hn91XFpA0hJTLa1VlvnoNSGyI3QW5vA36A+5QjS/PpZ6nD4U2Rww9VRJ7VW2Ng
+         j8lm1Lglp5N1gN3M0AW+y+tZtYnnn8BNHscwychNymUblerPomzxuZFzxmg5CBJK7QUl
+         RSeSXFwuNcR5cp0UZfTNZEqa2aPeBBJV9ZwL4F+sA7spBQB/hno4CESBEwe/Wa42hfjk
+         3qkubiMD+zFtw+0lwRh9V8tZyV110/1o1/2MBMUHuMinuxgjfaMBFyeMjbP3e2CtABiC
+         IYy+Vn+vWsHOKOyKRp4MZb8PPHKJsLwb+pxoBX1TsffCMlqI51IPbKY2gIQ1Od43dRHc
+         oh3w==
+X-Gm-Message-State: AOJu0Yy01NxVwNZJORZYDHjHtDV+TIJt8E65CIQ0PeJQadd+sB+GsIT9
+	WrrGCFv+6KA2eomeHQ3UactV0wnJxb3UC6Fy4rOhpI0S37s4MYhqYPSnmqGFs85aSK5E
+X-Google-Smtp-Source: AGHT+IFfY9RYa/RcIAGAWONhUOJzUt8fYja+8oo78jzIGqoRKSOe5qvEM8ERbNm3iFKjoeqbCiKs3w==
+X-Received: by 2002:a17:90a:f3d6:b0:28f:f1ad:ca6b with SMTP id ha22-20020a17090af3d600b0028ff1adca6bmr3213704pjb.85.1706076835684;
+        Tue, 23 Jan 2024 22:13:55 -0800 (PST)
+Received: from Laptop-X1.redhat.com ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id sh11-20020a17090b524b00b0028cdbf2281dsm12800714pjb.48.2024.01.23.22.13.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Jan 2024 22:13:54 -0800 (PST)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	linux-kselftest@vger.kernel.org,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCHv2 net] selftests/net/lib: update busywait timeout value
+Date: Wed, 24 Jan 2024 14:13:44 +0800
+Message-ID: <20240124061344.1864484-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CALNs47v8x8RsV=EOKQnsL3RFycbY9asrq9bBV5z-sLjYYy+AVw@mail.gmail.com>
- <CAM0EoM=1C2xWi1HHoD9ihHD_c6AfQLFKYt4_Y=rnu+YeGX7qMA@mail.gmail.com>
-In-Reply-To: <CAM0EoM=1C2xWi1HHoD9ihHD_c6AfQLFKYt4_Y=rnu+YeGX7qMA@mail.gmail.com>
-From: Trevor Gross <tmgross@umich.edu>
-Date: Wed, 24 Jan 2024 00:10:34 -0600
-Message-ID: <CALNs47sqEzW831Sjh7WzgaVrLQJmM9b0=8bhkWLrR3592GU4vg@mail.gmail.com>
-Subject: Re: Suggestions for TC Rust Projects
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 23, 2024 at 3:23=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com>=
- wrote:
-> [...]
->
-> I think a good starting point would be tc actions. You can write a
-> simple hello world action.
-> Actions will put to test your approach for implementing netlink and
-> skbs which are widely used in the net stack for both control(by
-> netlink) and the runtime datapath. If you can jump that hoop it will
-> open a lot of doors for you into the network stack.
-> Here's a simple action:
-> https://elixir.bootlin.com/linux/v6.8-rc1/source/net/sched/act_simple.c
-> Actually that one may be hiding a lot of abstractions - but if you
-> look at it we can discuss what it is hiding.
+The busywait timeout value is a millisecond, not a second. So the
+current setting 2 is too small. On slow/busy host (or VMs) the
+current timeout can expire even on "correct" execution, causing random
+failures. Let's copy the WAIT_TIMEOUT from forwarding/lib.sh and set
+BUSYWAIT_TIMEOUT here.
 
-That sounds great, getting an OOT equivalent should be a feasible
-first step. I will pass the information along.
+Fixes: 25ae948b4478 ("selftests/net: add lib.sh")
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+---
+v2: add fixes flag. update possible failures.
+---
+ tools/testing/selftests/net/lib.sh | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-> Note: We have written user space netlink code using rust and it was
-> fine but the kernel side is more complex.
+diff --git a/tools/testing/selftests/net/lib.sh b/tools/testing/selftests/net/lib.sh
+index dca549443801..f9fe182dfbd4 100644
+--- a/tools/testing/selftests/net/lib.sh
++++ b/tools/testing/selftests/net/lib.sh
+@@ -4,6 +4,9 @@
+ ##############################################################################
+ # Defines
+ 
++WAIT_TIMEOUT=${WAIT_TIMEOUT:=20}
++BUSYWAIT_TIMEOUT=$((WAIT_TIMEOUT * 1000)) # ms
++
+ # Kselftest framework requirement - SKIP code is 4.
+ ksft_skip=4
+ # namespace list created by setup_ns
+@@ -48,7 +51,7 @@ cleanup_ns()
+ 
+ 	for ns in "$@"; do
+ 		ip netns delete "${ns}" &> /dev/null
+-		if ! busywait 2 ip netns list \| grep -vq "^$ns$" &> /dev/null; then
++		if ! busywait $BUSYWAIT_TIMEOUT ip netns list \| grep -vq "^$ns$" &> /dev/null; then
+ 			echo "Warn: Failed to remove namespace $ns"
+ 			ret=1
+ 		fi
+-- 
+2.43.0
 
-Would that be the code at https://github.com/rust-netlink? Seems like
-a good reference in any case.
-
-Thanks for the information,
-Trevor
-
-> cheers,
-> jamal
->
-> > We are getting more contributors interested in doing Rust work that
-> > are looking for projects, so just collecting some ideas we can point
-> > them at.
-> >
-> > Thanks,
-> > Trevor
 
