@@ -1,108 +1,161 @@
-Return-Path: <netdev+bounces-65448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65449-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86F0283A88E
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 12:52:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A79D283A890
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 12:52:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B95D21C20D79
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 11:52:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38DAF1F22C85
+	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 11:52:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F7E760876;
-	Wed, 24 Jan 2024 11:52:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1383560886;
+	Wed, 24 Jan 2024 11:52:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eZGLJSE6"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="nEefqo6l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B05AE2BB0A
-	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 11:52:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEE906087D
+	for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 11:52:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706097142; cv=none; b=pTribVJdoftBK6zHXGKpM1VMAfARxDEost4g7qqJdy9vetUzRBCszipu/ivA6bBjBi5cFpI4B9Ooz3Hl/f+XPGK4cnH8XMI1oLclkxwHxWuVMw/mvOUcZT6FtuxQMPAhMk4bDSwxA0SznCuJVSYMunCkJN/DaUUxOCWF9amSd40=
+	t=1706097162; cv=none; b=amHXEuxLrI3t8GibNyy/SuylORiUWvy7A9Cf2z7IT4Kn9PSNCTf5bh2kSiHAjLHcn89zSfM4vN8g3FdAdBfntsX74VK6JaV17BBRqlqdJgoDTQ1L6ELis2G8gV2wivPDgDQcjW8ZHML4abD9Cpx8dkXfLBccdzR1Fa5i3s84GAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706097142; c=relaxed/simple;
-	bh=a5H0E6j7eGE53aTaLLK9h7jLJDl/erd4lNXiZJRMz+g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YzlH88kcnR7vRqw9WtyWaTbpDJepMDjpDrq7AoNpzY+hGID1WEyGKt7sNbE/DqyXUmUK4230AsUT1chIQx6PPsl8ij8GYvJdpWdJfsvKXNtbhMHBggS9dfSstsCMmpMPlqaizVfjZbnYXrGVmEs2tBZeoI2d2Da31sOP2OxvvZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eZGLJSE6; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-55cc794291cso5455a12.1
-        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 03:52:20 -0800 (PST)
+	s=arc-20240116; t=1706097162; c=relaxed/simple;
+	bh=35TzRf1iqrpO+kvL/ZgrLkZs4y5LkfcAcVg6kR04IWo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qPs+j1H7HIMoJcPUkc+c7Oj5mog86Zaph3PxZ1ePxcI5PmtBOCKFUCPJu2bNtcMLa7EppUetSWnF6iKCG4h5FPTcTqtiHnjLzNaiSiAt1VFYigbzP3C+A+WgdedSmDd6u3s2n9/wH+vneAkvK3xDGG1hkZwexP+aadOkkgoCFYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=nEefqo6l; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-6ddc1b30458so10207b3a.1
+        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 03:52:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706097139; x=1706701939; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a5H0E6j7eGE53aTaLLK9h7jLJDl/erd4lNXiZJRMz+g=;
-        b=eZGLJSE60NS52Eu/xG6t2f64BKl8C2qfddlfy/YDBOL7i7ZpDMyiA9QfLxzBVmXi04
-         ru/CQwDfo1HNxg1T+lDP7+TyHv7PtItWQB6Vv1pbhvEIrlW+Kn8cVxFhZKdIrNlbSxlM
-         14LIceO5WI8MwnYdhlznhpvpaHtqFanGSntfoblYTke0qi20+qK2UmvEC64ietv3fcjx
-         I3fuK45MCJnwShiAsDRem5+bi0POHWc5H/MxvW3t9W9b1wAiqb1Qezh5HCHkOOTP0RgB
-         pHiLy8jghVButNhnQYyktIf8PQj6Gx737JcL5GkPIeGRg6eBGFDDfFcINC5+jRWTl4qX
-         vHtA==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1706097158; x=1706701958; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VLT6be+hi95lLZ51yKFnZXpYmPsuirEXuz1rGnx+0do=;
+        b=nEefqo6lRRs8PsFFyryxK2G+v0PalBm0C58d+LASKCrT0jU5Q37qtWNI2DUtvmMtiB
+         oN9hcO4xj0UNXjg1I3bsX6QmMUrVlJXWJlv4fo8JJ4TwOfcRat4ZP12En8s1bQjdJmjI
+         Qc87pu84AXD3nc7ZSMF9k3hPF3xaL54dfGNQu5/gd+S6rm78ul/FXA4WaMlbtwnHHKeh
+         iEgBsBuFpb+FVZDNHYmiHjjqLAwv8W9WtF5GTX9+7gl6ZfuyeP8ViMb/XndP8aLATpt/
+         Gx2E1jePujDCk93UNiEzv+tY2pQgccHiRf1zwj/a3uvN+3BGM2/wniIpXFHxsezDbGeR
+         BgpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706097139; x=1706701939;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=a5H0E6j7eGE53aTaLLK9h7jLJDl/erd4lNXiZJRMz+g=;
-        b=OkkxwjFOziKacAi2xQHjrRexvLLp2y7iOaX6Ko+OudhboT3a/faGezBZ4IfmRZsg9C
-         Terd6MF84HfbJ+bxqHbEEaaleNpx4RLQuZU8/FiGavAnbadDJNQMxpcyj7NBWL4VHhwy
-         LlVy3SKveKvGx9acFOqywd9YoUzpis5FPltiVaxRwVrVzPUlyr3m3GnsRayIqsRMhPKz
-         Er2v5gRVgLvjbdi07xePTh57rLEGBrOX2P166NaJTJu1auK4Am2j87dRySz9kL41zuk0
-         RUVUwhJYRb21kqzldNN2bNxXbKz5bHnk2nOqS1AN0ERZSOuxgl9NR4koL/PxTKEPrqhl
-         wudA==
-X-Gm-Message-State: AOJu0YwCROu4fhUghZVK7ZSTMF+2XX747B1wx/rXlRsg6MJSQOOAqYhF
-	Zbuj0FyQXJT2b2Et08FZbqX/k3c8qw2PKQOGr6Xf+83JlHbMf2TTQ/W5Snw+QZoLLTgt+pTi119
-	dE4mfCYF7mTMrOs7CBhM39yCc+ua5or0AlBP/
-X-Google-Smtp-Source: AGHT+IH/GHZq8Aih5T2bhKVnYYebke8oNKPl/T86BTOCByN90Bn9Mikn6W5nbeRbtjUxaevlh+Dm2IHuIzUofLLwBx0=
-X-Received: by 2002:a05:6402:368:b0:55c:6a45:d6de with SMTP id
- s8-20020a056402036800b0055c6a45d6demr94542edw.0.1706097138639; Wed, 24 Jan
- 2024 03:52:18 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706097158; x=1706701958;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VLT6be+hi95lLZ51yKFnZXpYmPsuirEXuz1rGnx+0do=;
+        b=JwDSTIcDVg2piAo61jkYRLgKG4Oe5LjbTM8PsAAGTYajg3k1Ona+A/f7Cno6WgoFhu
+         xyGAcZytksvfwtiuSt1/0WgTd14GOUHW/EOpdBI1Kz0KvyIprjpRQcZCX4g0IP3bTl9+
+         uKyVbMqAI6W5vwrg0E0oL0pwQAAgM5H6E8Ie9Wjd5KeOw8XkZxyFVGlFgS/y1UyxmEfP
+         LCFHMO+QiJueRCqFIOy21i4kI/AfkOIhbjHYf+J1vhrf86iz1ArAfBBpW4suEEpycb+u
+         Rs3jrKGBfewqWEKT17zo89j2yv528k6sGiVFljUgp2X4CmY4uRQinfJNt7XaTF1anvu+
+         KqhQ==
+X-Gm-Message-State: AOJu0YwGIaoCpoH0DkLP6FXW4XaQEY5xrXhdfTW3ViTrBOVBlfmloEXV
+	UE4hp381wz5PJV1LxTuVg4HfmLilQbj1kpJrNv19xjKYPxsH3aeV4msGZYniRQ==
+X-Google-Smtp-Source: AGHT+IG0WojltBds3ScEBQLfdRTNLHLC46Dj8NnJDjrDAx0AB2VlvqF+Mzsup9QlGzy+HXif7JahEA==
+X-Received: by 2002:a05:6a20:8e10:b0:19a:57d9:526b with SMTP id y16-20020a056a208e1000b0019a57d9526bmr864945pzj.47.1706097158042;
+        Wed, 24 Jan 2024 03:52:38 -0800 (PST)
+Received: from [192.168.50.25] ([201.17.86.134])
+        by smtp.gmail.com with ESMTPSA id fm27-20020a056a002f9b00b006d9af7f09easm13479565pfb.29.2024.01.24.03.52.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 Jan 2024 03:52:37 -0800 (PST)
+Message-ID: <6e12e0c3-3e7a-44cc-8fc1-0e85fa55b3f5@mojatatu.com>
+Date: Wed, 24 Jan 2024 08:52:33 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240124101404.161655-1-kovalev@altlinux.org> <20240124101404.161655-2-kovalev@altlinux.org>
- <CANn89iLKc8-hwvSBE=aSTRg=52Pn9B0HmFDneGCe6PMawPFCnQ@mail.gmail.com> <1144600e-52f1-4c1a-4854-c53e05af5b45@basealt.ru>
-In-Reply-To: <1144600e-52f1-4c1a-4854-c53e05af5b45@basealt.ru>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 24 Jan 2024 12:52:04 +0100
-Message-ID: <CANn89iKb+NQPOuZ9wdovQYVOwC=1fUMMdWd5VrEU=EsxTH7nFg@mail.gmail.com>
-Subject: Re: [PATCH 1/1] gtp: fix use-after-free and null-ptr-deref in gtp_genl_dump_pdp()
-To: kovalev@altlinux.org
-Cc: pablo@netfilter.org, laforge@gnumonks.org, davem@davemloft.net, 
-	kuba@kernel.org, pabeni@redhat.com, osmocom-net-gprs@lists.osmocom.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, nickel@altlinux.org, 
-	oficerovas@altlinux.org, dutyrok@altlinux.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: Suggestions for TC Rust Projects
+To: Trevor Gross <tmgross@umich.edu>, Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
+ Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>
+References: <CALNs47v8x8RsV=EOKQnsL3RFycbY9asrq9bBV5z-sLjYYy+AVw@mail.gmail.com>
+ <CAM0EoM=1C2xWi1HHoD9ihHD_c6AfQLFKYt4_Y=rnu+YeGX7qMA@mail.gmail.com>
+ <CALNs47sqEzW831Sjh7WzgaVrLQJmM9b0=8bhkWLrR3592GU4vg@mail.gmail.com>
+Content-Language: en-US
+From: Pedro Tammela <pctammela@mojatatu.com>
+In-Reply-To: <CALNs47sqEzW831Sjh7WzgaVrLQJmM9b0=8bhkWLrR3592GU4vg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jan 24, 2024 at 12:20=E2=80=AFPM <kovalev@altlinux.org> wrote:
->
-> 24.01.2024 13:57, Eric Dumazet wrote:
-> > Oh wait, this is a 5.10 kernel ?
-> Yes, but the bug is reproduced on the latest stable kernels.
-> > Please generate a stack trace using a recent tree, it is possible the
-> > bug has been fixed already.
->
-> See [PATCH 0/1] above, there's a stack for the 6.6.13 kernel at the
-> bottom of the message.
+On 24/01/2024 03:10, Trevor Gross wrote:
+> On Tue, Jan 23, 2024 at 3:23 PM Jamal Hadi Salim <jhs@mojatatu.com> wrote:
+>> [...]
+>>
+>> I think a good starting point would be tc actions. You can write a
+>> simple hello world action.
+>> Actions will put to test your approach for implementing netlink and
+>> skbs which are widely used in the net stack for both control(by
+>> netlink) and the runtime datapath. If you can jump that hoop it will
+>> open a lot of doors for you into the network stack.
+>> Here's a simple action:
+>> https://elixir.bootlin.com/linux/v6.8-rc1/source/net/sched/act_simple.c
+>> Actually that one may be hiding a lot of abstractions - but if you
+>> look at it we can discuss what it is hiding.
+> 
+> That sounds great, getting an OOT equivalent should be a feasible
+> first step. I will pass the information along.
+> 
+>> Note: We have written user space netlink code using rust and it was
+>> fine but the kernel side is more complex.
+> 
+> Would that be the code at https://github.com/rust-netlink? 
 
-Ah, ok. Not sure why you sent a cover letter for a single patch...
+Not really, we wrote a small low level netlink library for an internal tool.
+What Jamal means is that dealing with netlink as it was intended in Rust 
+is not a huge hassle[1]. When we were writing the tool we saw that all 
+of the existing netlink libraries at the time were doing a serialization 
+model, which was not acceptable to us. We wanted to build the message in 
+place without any intermediate structs.
 
-Setting a boolean, in a module that can disappear will not prevent the
-module from disappearing.
+The challenging part for the kernel part will probably be the 
+abstraction and the interfacing with all the C API that exists to 
+validate the netlink attributes which is a must.
 
-This work around might work, or might not work, depending on timing,
-preemptions, ....
+As for documentation `man 7 netlink` is pretty complete and the iproute2 
+source code is usually a good test suite for responses.
 
-Thanks.
+[1]
+
+Take a look at this snippet for instance:
+
+```
+#[derive(Default, NetlinkPolicy)]
+pub struct P4TCActOpts {
+     #[nlattr(nldefs::P4TC_ACT_OPT)]
+     sel: nltypes::DynaSel,
+}
+
+#[derive(Default, NetlinkPolicy)]
+pub struct TCAction {
+     #[nlattr_str(nldefs::TCA_ACT_KIND)]
+     kind: String,
+     #[nlnest(nldefs::TCA_ACT_OPTIONS)]
+     opt: P4TCActOpts,
+}
+```
+
+The NetlinkPolicy trait handles all the boilerplate to construct the 
+message in place and in our implementation it's method base:
+
+```
+let action = TCAction::default();
+action.kind(msg, "foo"); // Adds the attribute `TCA_ACT_KIND` to the msg 
+in place
+```
+
+It kind of resembles the netlink policies in the kernel, so perhaps the 
+above could be a good starting point for the kernel abstraction.
+
+
 
