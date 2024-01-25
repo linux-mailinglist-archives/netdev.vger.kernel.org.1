@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-65959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D846483CA88
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 19:06:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7194783CA90
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 19:09:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B72FB25275
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 18:06:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1365A1F22561
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 18:09:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC3A8133982;
-	Thu, 25 Jan 2024 18:05:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19079132C04;
+	Thu, 25 Jan 2024 18:08:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VGU/dTIa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LMqDvRkJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9FCF130E52;
-	Thu, 25 Jan 2024 18:05:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93846133983
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 18:08:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706205958; cv=none; b=sAbTl4srfRGDDD9n8QZxHxq1cKP8y3U1U+ZRNFlJpLsla+naV0/hDPOxN8ndMDbHnDVregUn3JpIXaIrXOLXtk70YBKY/fIjKVRFn4mu3nm1L6hvY2IkHDhBfOqMcMsrumPfAFxpIRbC804toOV/OCNRJXBRkXN3S7Sg0Z0bnaA=
+	t=1706206138; cv=none; b=CSZn+83FJQmpmj0+ei5cOxF06cF7+l8eyMZ8qwtY6Ksw8gq1WSmh6w7AYmpJar/7fTDfi4espneLLefmRa0lllfJpkL8hseBZWFYY3soAYbhRzHLwbW8Fqmsg4NLqcBNLW2p4+otfG1taYYXDGcjVyPesMmmX87jsFX24KPvsz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706205958; c=relaxed/simple;
-	bh=ApOCe1jf2XuQIgtYNy/gdNK9pc+iETIat//GJzItDng=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AJNAiP2q+TXjquTtr3GGRW4+2uFeOKm1YSvkObimxs6Ys5wxGO/XP2tOYkrFiXAyvsb06xlnsjmeCXZupWbejxUcYYPNBwVP9AeSFFf5Gt5pD8DitsyQGUaaLV4144DCdFFAEYGaBn17h6wKArc6jYbXlxZ1W7/DchRctHVLk/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VGU/dTIa; arc=none smtp.client-ip=209.85.128.179
+	s=arc-20240116; t=1706206138; c=relaxed/simple;
+	bh=aWSjQTXbIbd774DSmCLgZ2MsmMwoHmQxMu9sJOrVHOs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=t6E5JKm3Bwt9ucZwk2/li9JgoWhXeH/5JP5UZ0MKCs4K0mxfFPhbljXY6/3J47TkVul2UdMIYwpDYA3W/ct7MNSo/AHzWvkDEb/ml+lRsY2Q0VbzhldGgaVc79y5FHz7YfNluS0PAWWoVU/w3Yp0vkSvBkjru++AvVo/03v3IAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LMqDvRkJ; arc=none smtp.client-ip=209.85.166.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-5f0629e67f4so74027547b3.3;
-        Thu, 25 Jan 2024 10:05:56 -0800 (PST)
+Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3606ad581a5so27332465ab.1
+        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 10:08:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706205956; x=1706810756; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+        d=gmail.com; s=20230601; t=1706206135; x=1706810935; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Mpe4gom6m8Lte0CROkurnB5K2+Lam3sS1FZ2M/1843M=;
-        b=VGU/dTIaVsj5KXmIQbz6R7JcKflj8al2kFM8Ex0WM/GxX+P0r8rCuQ+MUC5SBJ4UBW
-         GE0XRQX6hwJlgG72j3ZszgyCIZroCaAqVjo3ufItX/ligo5dD8FLY0UVr5f94v/8TAst
-         7PLT3uMoBubs3HpegsWC4cRkQGGWEXtaSHUZdFbT9e2ll3ElMhmMBRpnABQXUjMCutsD
-         h9Fj2bLmNZjgJ6c4u+7Xn2aNfYtgNkiMoC7ujxsm9lI1wSdgOWl9AsguVdOA4KKgX5Ad
-         QY5dHiwrnygO/ObDkP61borw8S/GKnvnRtH/RhTCwlM9YDLtB/aeTYxT2X0c/zAjJD5Z
-         ZZKw==
+        bh=YJ3VuES/VMVNydBsbPcUwynWCEEm3/5x7aKAQxVmOpo=;
+        b=LMqDvRkJ4wBqGq9L3JkhdgCJTXPp1QvBcWNCH8iDhFgmr+UIOv5amdHw+NojDtSuRS
+         HqshiuC0N6/FZK2Ue7CapGqaQEfZ3/66Mkb4Cf0UcQMMLfk3MJS5pU8se/iorK4uKTwN
+         uSyX4B8JQo8HY9TGhr3vuU4gs2THMQFdT1sguYyahbfVBciX4I3hfrfLqzOWtBeNzB3F
+         Qp/Tjvo4Jp17lga0etMKW9lzYDegLWCViMeGgtqlyU590bWPivt1U8x6MbVJFW9abeOq
+         1aZyv522IKcDy1ECoYoZMoG0Jf+vKLFbbsUi0pHmd/hxsNIvfymulhoBLQGqp0Jpezuz
+         1vow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706205956; x=1706810756;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+        d=1e100.net; s=20230601; t=1706206135; x=1706810935;
+        h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Mpe4gom6m8Lte0CROkurnB5K2+Lam3sS1FZ2M/1843M=;
-        b=w7rKRXs81zym0vBCeamq2tSA3LxTdcBHvwjDHlMJY311Ig7qEeRewbBqbBobO/YWk0
-         zx5APKSw9usEBW6Vm37DNtjFZuoGhSCOOe2DqFJzLn+VNcVRyhA5viGRNOby3V9fc16c
-         m2jLtrNCXoAWxeLJFLO/58TIaLPY2A9r+w5i6NVPSwSXW7Uyd2WLDCHFgXcwEKcPMlyZ
-         uJTwwvxUnVr2nit39AJcsEaEpDey5plrcdkMb+L56LuYxqNuwucpS8OJyAVTgzE0R67T
-         x4KWhBpb+DMmYUKqff9S77zmCBdUzKJXFf4LFmmv16Un1H4dUjPxNL28/rllXW0ZvPmF
-         4hqQ==
-X-Gm-Message-State: AOJu0YyeaJW99Dg8gnNayyx53927VM0vYym/JFvzefQUhL0XRoWukD/p
-	W7zAU/Rn3LwSs5yeb0kwytegMXmyU6sxazkLKQJ0jRg+qbGyljzo
-X-Google-Smtp-Source: AGHT+IE+O7Cvhgyx71dY11ZWCnN2Hz414GCToTRHXEMVb3icMz4scLz8xII78oqSp7cQEfE25uB/bg==
-X-Received: by 2002:a05:690c:f05:b0:5ff:88d2:631e with SMTP id dc5-20020a05690c0f0500b005ff88d2631emr266394ywb.90.1706205955662;
-        Thu, 25 Jan 2024 10:05:55 -0800 (PST)
-Received: from ?IPV6:2600:1700:6cf8:1240:5100:fbae:e50d:52c9? ([2600:1700:6cf8:1240:5100:fbae:e50d:52c9])
-        by smtp.gmail.com with ESMTPSA id ey1-20020a05690c300100b00600352c4fa0sm806906ywb.31.2024.01.25.10.05.54
+        bh=YJ3VuES/VMVNydBsbPcUwynWCEEm3/5x7aKAQxVmOpo=;
+        b=nHykujxj4lbEpXG2jpyeBcPxUGBX/wvVDD+fXf6NcDy80qEkLwgZDZ1QxZivHVKz2v
+         bNujH6NPhg6Y8R6mYd8GrjNBeeRDY6pU97qn2Yf/9Hr9Tcop1OZ7cTre+VNjSZ2q0ySN
+         1SL663JpfCsmNjV9BsZh+KBIX9yB5h/h8ytffB53mBgc2LNAPbp7c4sxURUwTkpY9ud2
+         2beWRDmbPU1iFo6ZIYfT4jVUuWncUW7Gw6uJDWMoRZjN94a31L/dF92cVtxJ8h09a8e9
+         SRBqlwEMSdFnAyt05fMPBQAI+BEiW7K73XHhhViNTPxZAXJvDpzBWo+nNWr6jeqSpy+8
+         YXLA==
+X-Gm-Message-State: AOJu0Yxu2E+s7bqGhbB/MNN1/drerbD+pIeWMV4YlPF9TPm2f0g0oEZG
+	T8Vb69roHJMG9CVqHk78fL4kDku8gTuVqO5pjq1pmSiurcQsU+i4EXf7U8ci
+X-Google-Smtp-Source: AGHT+IGhYxuXotz9g5VGliXyHwlpMz5BTEICzFNaDYaAdFhRh0pA3aLpNgRZKA97ZNSyak9nkdUn4w==
+X-Received: by 2002:a05:6e02:68f:b0:35f:9f2f:d67a with SMTP id o15-20020a056e02068f00b0035f9f2fd67amr99299ils.44.1706206135650;
+        Thu, 25 Jan 2024 10:08:55 -0800 (PST)
+Received: from ?IPV6:2601:282:1e82:2350:98eb:fac3:d51e:322b? ([2601:282:1e82:2350:98eb:fac3:d51e:322b])
+        by smtp.googlemail.com with ESMTPSA id j12-20020a056e02154c00b003627b70d918sm3105687ilu.66.2024.01.25.10.08.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Jan 2024 10:05:55 -0800 (PST)
-Message-ID: <8a090e68-d0e8-482f-ba87-a0a91ea59d32@gmail.com>
-Date: Thu, 25 Jan 2024 10:05:52 -0800
+        Thu, 25 Jan 2024 10:08:55 -0800 (PST)
+Message-ID: <4f3dc357-8c90-49fd-96ea-bc28932ea509@gmail.com>
+Date: Thu, 25 Jan 2024 11:08:54 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,182 +75,84 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [syzbot] [bpf?] general protection fault in btf_is_module
+Subject: Re: [PATCH] ip/bond: add coupled_control support
 Content-Language: en-US
-To: Martin KaFai Lau <martin.lau@linux.dev>,
- Kui-Feng Lee <thinker.li@gmail.com>
-Cc: syzbot <syzbot+1336f3d4b10bcda75b89@syzkaller.appspotmail.com>,
- andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
- daniel@iogearbox.net, haoluo@google.com, john.fastabend@gmail.com,
- jolsa@kernel.org, kpsingh@kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, sdf@google.com, song@kernel.org,
- syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
-References: <00000000000026353b060fc21c07@google.com>
- <d6de99ca-64ca-4b21-958d-686efcd3acd8@linux.dev>
-From: Kui-Feng Lee <sinquersw@gmail.com>
-In-Reply-To: <d6de99ca-64ca-4b21-958d-686efcd3acd8@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+To: Aahil Awatramani <aahila@google.com>, Mahesh Bandewar
+ <maheshb@google.com>, David Dillow <dillow@google.com>,
+ Jay Vosburgh <j.vosburgh@gmail.com>, Hangbin Liu <liuhangbin@gmail.com>,
+ netdev@vger.kernel.org
+References: <20240125003816.1403636-1-aahila@google.com>
+From: David Ahern <dsahern@gmail.com>
+In-Reply-To: <20240125003816.1403636-1-aahila@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 1/24/24 5:38 PM, Aahil Awatramani wrote:
+> diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
+> index d17271fb..ff4ceeaf 100644
+> --- a/include/uapi/linux/if_link.h
+> +++ b/include/uapi/linux/if_link.h
+> @@ -1503,6 +1503,7 @@ enum {
+>  	IFLA_BOND_AD_LACP_ACTIVE,
+>  	IFLA_BOND_MISSED_MAX,
+>  	IFLA_BOND_NS_IP6_TARGET,
+> +	IFLA_BOND_COUPLED_CONTROL,
+>  	__IFLA_BOND_MAX,
+>  };
+>  
 
+at best uapi changes should be a separate patch which gets dropped when
+we sync headers with the kernel.
 
-On 1/25/24 10:02, Martin KaFai Lau wrote:
-> On 1/25/24 1:50 AM, syzbot wrote:
->> Hello,
->>
->> syzbot found the following issue on:
->>
->> HEAD commit:    d47b9f68d289 libbpf: Correct bpf_core_read.h comment 
->> wrt b..
->> git tree:       bpf-next
->> console+strace: https://syzkaller.appspot.com/x/log.txt?x=104b1ef7e80000
->> kernel config:  
->> https://syzkaller.appspot.com/x/.config?x=719e6acaf392d56b
->> dashboard link: 
->> https://syzkaller.appspot.com/bug?extid=1336f3d4b10bcda75b89
->> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils 
->> for Debian) 2.40
->> syz repro:      
->> https://syzkaller.appspot.com/x/repro.syz?x=10c1a53be80000
->> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1052cec3e80000
->>
->> Downloadable assets:
->> disk image: 
->> https://storage.googleapis.com/syzbot-assets/1a9b4a5622fb/disk-d47b9f68.raw.xz
->> vmlinux: 
->> https://storage.googleapis.com/syzbot-assets/dd68baeac4fd/vmlinux-d47b9f68.xz
->> kernel image: 
->> https://storage.googleapis.com/syzbot-assets/811ba9dc9ddf/bzImage-d47b9f68.xz
->>
->> IMPORTANT: if you fix the issue, please add the following tag to the 
->> commit:
->> Reported-by: syzbot+1336f3d4b10bcda75b89@syzkaller.appspotmail.com
->>
->> general protection fault, probably for non-canonical address 
->> 0xdffffc000000001b: 0000 [#1] PREEMPT SMP KASAN
->> KASAN: null-ptr-deref in range [0x00000000000000d8-0x00000000000000df]
->> CPU: 0 PID: 5064 Comm: syz-executor334 Not tainted 
->> 6.7.0-syzkaller-12348-gd47b9f68d289 #0
->> Hardware name: Google Google Compute Engine/Google Compute Engine, 
->> BIOS Google 11/17/2023
->> RIP: 0010:btf_is_module+0x26/0x80 kernel/bpf/btf.c:7441
->> Code: 00 eb f0 90 66 0f 1f 00 55 53 48 89 fb e8 92 24 de ff 48 8d bb 
->> d8 00 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <0f> b6 
->> 04 02 84 c0 74 02 7e 48 0f b6 ab d8 00 00 00 31 ff 89 ee e8
->> RSP: 0018:ffffc900039ff828 EFLAGS: 00010206
->> RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffffff81a07f47
->> RDX: 000000000000001b RSI: ffffffff81a9fcfe RDI: 00000000000000d8
->> RBP: ffffc900039ffaf0 R08: 0000000000000001 R09: 0000000000000000
->> R10: 0000000000000004 R11: ffffffff8aa0008b R12: ffffc90000ae6038
->> R13: ffffc90000ae6000 R14: 0000000000000000 R15: 0000000000000000
->> FS:  000055555660b380(0000) GS:ffff8880b9800000(0000) 
->> knlGS:0000000000000000
->> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->> CR2: 0000000001b6b398 CR3: 000000001aaae000 CR4: 00000000003506f0
->> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->> Call Trace:
->>   <TASK>
->>   check_struct_ops_btf_id kernel/bpf/verifier.c:20302 [inline]
-> 
-> Kui-Feng, it should be due to the commit e3f87fdfed7b ("bpf: hold module 
-> refcnt in bpf_struct_ops map creation and prog verification."). I think 
-> it needs a NULL check on the return value from bpf_get_btf_vmlinux().
-> 
-> Please take a look. Thanks.
+> diff --git a/ip/iplink_bond.c b/ip/iplink_bond.c
+> index 214244da..68bc157a 100644
+> --- a/ip/iplink_bond.c
+> +++ b/ip/iplink_bond.c
+> @@ -176,7 +184,7 @@ static int bond_parse_opt(struct link_util *lu, int argc, char **argv,
+>  {
+>  	__u8 mode, use_carrier, primary_reselect, fail_over_mac;
+>  	__u8 xmit_hash_policy, num_peer_notif, all_slaves_active;
+> -	__u8 lacp_active, lacp_rate, ad_select, tlb_dynamic_lb;
+> +	__u8 lacp_active, lacp_rate, ad_select, tlb_dynamic_lb, coupled_control;
+>  	__u16 ad_user_port_key, ad_actor_sys_prio;
+>  	__u32 miimon, updelay, downdelay, peer_notify_delay, arp_interval, arp_validate;
+>  	__u32 arp_all_targets, resend_igmp, min_links, lp_interval;
+> @@ -367,6 +375,13 @@ static int bond_parse_opt(struct link_util *lu, int argc, char **argv,
+>  
+>  			lacp_active = get_index(lacp_active_tbl, *argv);
+>  			addattr8(n, 1024, IFLA_BOND_AD_LACP_ACTIVE, lacp_active);
+> +		} else if (strcmp(*argv, "coupled_control") == 0) {
+> +			NEXT_ARG();
+> +			if (get_index(coupled_control_tbl, *argv) < 0)
+> +				invarg("invalid coupled_control", *argv);
+> +
+> +			coupled_control = get_index(coupled_control_tbl, *argv);
 
-Sure!
+parse_on_off
 
-> 
-> 
->>   check_attach_btf_id kernel/bpf/verifier.c:20730 [inline]
->>   bpf_check+0x6cfe/0x9df0 kernel/bpf/verifier.c:20898
->>   bpf_prog_load+0x14dc/0x2310 kernel/bpf/syscall.c:2769
->>   __sys_bpf+0xbf7/0x4a00 kernel/bpf/syscall.c:5463
->>   __do_sys_bpf kernel/bpf/syscall.c:5567 [inline]
->>   __se_sys_bpf kernel/bpf/syscall.c:5565 [inline]
->>   __x64_sys_bpf+0x78/0xc0 kernel/bpf/syscall.c:5565
->>   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->>   do_syscall_64+0xd3/0x250 arch/x86/entry/common.c:83
->>   entry_SYSCALL_64_after_hwframe+0x63/0x6b
->> RIP: 0033:0x7f4dbbe514a9
->> Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 
->> 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 
->> 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
->> RSP: 002b:00007ffe76acbe18 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
->> RAX: ffffffffffffffda RBX: 00007ffe76acbff8 RCX: 00007f4dbbe514a9
->> RDX: 00000000000000a0 RSI: 00000000200009c0 RDI: 0000000000000005
->> RBP: 00007f4dbbec4610 R08: 0000000000000000 R09: 0000000000000000
->> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
->> R13: 00007ffe76acbfe8 R14: 0000000000000001 R15: 0000000000000001
->>   </TASK>
->> Modules linked in:
->> ---[ end trace 0000000000000000 ]---
->> RIP: 0010:btf_is_module+0x26/0x80 kernel/bpf/btf.c:7441
->> Code: 00 eb f0 90 66 0f 1f 00 55 53 48 89 fb e8 92 24 de ff 48 8d bb 
->> d8 00 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <0f> b6 
->> 04 02 84 c0 74 02 7e 48 0f b6 ab d8 00 00 00 31 ff 89 ee e8
->> RSP: 0018:ffffc900039ff828 EFLAGS: 00010206
->> RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffffff81a07f47
->> RDX: 000000000000001b RSI: ffffffff81a9fcfe RDI: 00000000000000d8
->> RBP: ffffc900039ffaf0 R08: 0000000000000001 R09: 0000000000000000
->> R10: 0000000000000004 R11: ffffffff8aa0008b R12: ffffc90000ae6038
->> R13: ffffc90000ae6000 R14: 0000000000000000 R15: 0000000000000000
->> FS:  000055555660b380(0000) GS:ffff8880b9800000(0000) 
->> knlGS:0000000000000000
->> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->> CR2: 0000000001b6b398 CR3: 000000001aaae000 CR4: 00000000003506f0
->> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->> ----------------
->> Code disassembly (best guess):
->>     0:    00 eb                    add    %ch,%bl
->>     2:    f0 90                    lock nop
->>     4:    66 0f 1f 00              nopw   (%rax)
->>     8:    55                       push   %rbp
->>     9:    53                       push   %rbx
->>     a:    48 89 fb                 mov    %rdi,%rbx
->>     d:    e8 92 24 de ff           call   0xffde24a4
->>    12:    48 8d bb d8 00 00 00     lea    0xd8(%rbx),%rdi
->>    19:    48 b8 00 00 00 00 00     movabs $0xdffffc0000000000,%rax
->>    20:    fc ff df
->>    23:    48 89 fa                 mov    %rdi,%rdx
->>    26:    48 c1 ea 03              shr    $0x3,%rdx
->> * 2a:    0f b6 04 02              movzbl (%rdx,%rax,1),%eax <-- 
->> trapping instruction
->>    2e:    84 c0                    test   %al,%al
->>    30:    74 02                    je     0x34
->>    32:    7e 48                    jle    0x7c
->>    34:    0f b6 ab d8 00 00 00     movzbl 0xd8(%rbx),%ebp
->>    3b:    31 ff                    xor    %edi,%edi
->>    3d:    89 ee                    mov    %ebp,%esi
->>    3f:    e8                       .byte 0xe8
->>
->>
->> ---
->> This report is generated by a bot. It may contain errors.
->> See https://goo.gl/tpsmEJ for more information about syzbot.
->> syzbot engineers can be reached at syzkaller@googlegroups.com.
->>
->> syzbot will keep track of this issue. See:
->> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
->>
->> If the report is already addressed, let syzbot know by replying with:
->> #syz fix: exact-commit-title
->>
->> If you want syzbot to run the reproducer, reply with:
->> #syz test: git://repo/address.git branch-or-commit-hash
->> If you attach or paste a git patch, syzbot will apply it before testing.
->>
->> If you want to overwrite report's subsystems, reply with:
->> #syz set subsystems: new-subsystem
->> (See the list of subsystem names on the web dashboard)
->>
->> If the report is a duplicate of another one, reply with:
->> #syz dup: exact-subject-of-another-report
->>
->> If you want to undo deduplication, reply with:
->> #syz undup
-> 
-> 
+> +			addattr8(n, 1024, IFLA_BOND_COUPLED_CONTROL, coupled_control);
+>  		} else if (matches(*argv, "ad_select") == 0) {
+>  			NEXT_ARG();
+>  			if (get_index(ad_select_tbl, *argv) < 0)
+> @@ -659,6 +674,15 @@ static void bond_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
+>  			     lacp_rate);
+>  	}
+>  
+> +	if (tb[IFLA_BOND_COUPLED_CONTROL]) {
+> +		const char *coupled_control = get_name(coupled_control_tbl,
+> +						   rta_getattr_u8(tb[IFLA_BOND_COUPLED_CONTROL]));
+> +		print_string(PRINT_ANY,
+> +			     "coupled_control",
+> +			     "coupled_control %s ",
+> +			     coupled_control);
+
+print_on_off
+
+> +	}
+> +
+>  	if (tb[IFLA_BOND_AD_SELECT]) {
+>  		const char *ad_select = get_name(ad_select_tbl,
+>  						 rta_getattr_u8(tb[IFLA_BOND_AD_SELECT]));
+
+pw-bot: cr
 
