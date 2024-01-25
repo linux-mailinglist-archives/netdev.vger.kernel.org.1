@@ -1,478 +1,449 @@
-Return-Path: <netdev+bounces-65744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB8CC83B8C1
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 05:49:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60D4883B8CD
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 05:56:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3D702832F5
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 04:48:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53E1D1C231CB
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 04:56:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D5F579CF;
-	Thu, 25 Jan 2024 04:48:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8B9179C7;
+	Thu, 25 Jan 2024 04:56:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eV7QK4TR"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="M8Y7TnSJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2045.outbound.protection.outlook.com [40.107.243.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1574B79C6
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 04:48:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706158135; cv=none; b=SFv5lAz/vOl4nHeNVQB7Cqq87yTvTgCfnA+sigfjAp0KB1Sumi9ZGpVPrt5HWORgrC91bdt2mX5LhsWwcfJ4vNHrtHTaWsDx667jCDOoxdbLQJhI2XMsaXln2/IJepvGc0jX+RY+Ph3DFsK/kZdmgDyzZjeZDFZCFr9iHY6ElCY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706158135; c=relaxed/simple;
-	bh=6DdzQ2E9OeQMD4Ll7S27cDySmDqNA/T9HcWDxZD1J/8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tNWmJI70NdmxwV/3RH1J1j64dZBJL532/hJhAR7yUTWAnFRKVW48au74AP3ZZyRYllGOkDPQ6fUraQriJUAq/wffujnbQvQW8Bec3iDI+p5DaCWvfa/Rj8Ucx5PPcCI+obZc7/KwCGM4HSQHQPU1EDPwOmC75H1Aya/Cb770Bkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eV7QK4TR; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706158133;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5DnZRXqjQvdY1jAfdan5L6v5dW2MXXnZETrlS+Qv9f4=;
-	b=eV7QK4TRVWuynFxTEz4I0ND3zGBKGiXdSlN9dI8fIMqszPhs5piQIWqVHcuV0u/Xis7btH
-	LldPe0G/XlDQH92W5cpkJ3vTlxrQKZU/3ek9M51eB7Mg+E2D62zgZwSiFXINpr7MWVDGK0
-	N8hcUDbCc/FSeLJ56J9OPb0koNWR4L4=
-Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com
- [209.85.161.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-341-5ZZCF9_jOeKofqSW51QrOg-1; Wed, 24 Jan 2024 23:48:51 -0500
-X-MC-Unique: 5ZZCF9_jOeKofqSW51QrOg-1
-Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-598e2d7e22bso6631386eaf.3
-        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 20:48:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706158130; x=1706762930;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5DnZRXqjQvdY1jAfdan5L6v5dW2MXXnZETrlS+Qv9f4=;
-        b=ZIzx6hRayX0tcRubqdQtUVoWCD+qn5kmOpcP0wpBg4fLa5p5GahVojk2xeNmSFOiwA
-         4acOSkFmzIERmFXSA4rdVMGag4/9beWtQA+WpEDptXgVhuLysLq81Vs0LDrFqWu6gqLb
-         +AnJLm+ob6l8kcMXzvZ8YEcV4Gf8nce6pWqPsgmdRchDfyEp0Z4UX8FE74bXhSE/RYBB
-         MW7SyRM+HZ1xFEAog8W11hJsLi01uFdrIagWnqn70Niukhwrdy8/4IjASsVcLVzNYgED
-         fRFCLQZrYDHvYnRmPTCicjHqhnC99Z0NoScaP10pKXfjTSXHOhORJkycYubY5hzAmEMR
-         CZ0w==
-X-Gm-Message-State: AOJu0YzS1oTYSmdv2c2qtb6zWScRTpO+qD8LETU36jTAD777h7pm9+qf
-	P1Qh8C2Npma1A1SadVIdYuM9DXI2ehkhBjCm1OI1W6DsIfmkDfJ2dqpzOH0DiM8x25ddqtkr5q/
-	Kefti8lWLf/K2gzKBvW03sgPkoeoOa9jWnE4A+HL0tGicyQKHIykh8rpLVN5whfJrw+JcUCROoL
-	tjn0RkyqcTv1BRNUujfhb6HmXQcSzA
-X-Received: by 2002:a05:6358:880a:b0:176:7d13:d70e with SMTP id hv10-20020a056358880a00b001767d13d70emr611995rwb.16.1706158130345;
-        Wed, 24 Jan 2024 20:48:50 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFddJIzi0ITLTVUmZVAdoejjTy2B/LClBNQ5q3+0akCp/DD67U3ZDcor5HcvQgQAKcj2DPfjkq9KQFUSYNFNKM=
-X-Received: by 2002:a05:6358:880a:b0:176:7d13:d70e with SMTP id
- hv10-20020a056358880a00b001767d13d70emr611981rwb.16.1706158129995; Wed, 24
- Jan 2024 20:48:49 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D60901FAD
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 04:56:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706158611; cv=fail; b=F3bEu+GTsYeOiIi50Bu4LrDBPiq7WI/YGtpwGEU2c0lsna12u/YsPIjvqDmwVNPb6UBtFr9OdoRxzbmUvJsY7i3tGcOIA5FdqnNzbTg+HsUO5aiYYGYDpfloQifA7d0p8DOBgznDTikuFoU4xvGKBK0sQgY9Zolzr91qIw1eTD4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706158611; c=relaxed/simple;
+	bh=ApwKwNcJmppz6oD+QJ07c5iJnEzpN0ZWSxnvpdjLT3A=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nZa26rICJBByyPIRp6EimJGCHKh0TTk4+4emy5DiJnurnyqiAOXaxvT0mz1GY2Lb8xJ7rNg4oB3ZQAkNODvbeLQ5/negsTdJUYRtyXEOIjwdvcYrAIrm4L0uj01t2ViKqFrkSxM59uGdLImnl5qWqWFFUJ1TEVpfDldCc9EU/1w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=M8Y7TnSJ; arc=fail smtp.client-ip=40.107.243.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=J5H66kif025d0S6q81E4isk4rtR7jrI+neN9YH0h4M7Vv1EXGofqE7KiRvrbZFByJpFg/dXZp8m1YpRWfXrWRwX3Mk5sWKvBpyPOwXSSUGd7o9w/r8tclTfgj/uy9DLv7j1U+huLq4GMRRveCgBgiynL9Gs4BBJYkrSZ9E7Apy5q07p8u7I7dpBMpXxeV+QVpxYzONJnyPYsNkaoQhNGC/xOlBfMUwpniAi6HNqheXu6H8sC2qIk29gMuvJ6JG6fWscahr4jTkeLgNFgAyu9s6u+XIveVQLla13zbkSFiMQ/cRWOnKuyGdMdO8sAGpptCUufbN49ajsW/0URhDTrdQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=eyPEVGaVNJoTyB4jFzWnbJ2UCYRR9IJydCyIUQTt6+Y=;
+ b=RJG2LuUw+UptiGEt3yXOJWIVT7w8f84Cq0ZltsM6rzD1y5+i1b8lYETT6BwJGtbXK4ur6By9hgRzrE5IGAPCLR6cjCO7b5NwxeRcvktB7sQMY2nMWh9+2iUPrxLukNYxHL3Svg5f+9r6p+CsX98V2JS45ravCBHlX1qCBjiG6+oqBMrlbaAMAeKI7LTKpyT/0lNil8a6bfPkNFnf+hPdFFR6l9AqgSCIUAKWRYcnqrU4vVVEViIp6rvyzjNNpXhhYjxV/enZU7JSNOx2NlhjVHT7OYPR14Gp0+Igc6Cr5sAF6H/Td5ttpLJ0jCtmQbaKLkHeBd91yj2pCSMn3GN4bg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eyPEVGaVNJoTyB4jFzWnbJ2UCYRR9IJydCyIUQTt6+Y=;
+ b=M8Y7TnSJAbLkGTciQN7btROzer8EUiwXQrl9jygGXMAwo50dP6DzWz2u34JOz481Y+dZvuDUvWih7bj9H/k/6fdfsOhp9R8JbAo+pwtlCiW7MsTHsFXfvqy8ueNmWyc1u0pPaFl34x0nm8jaPO9/Ogw3FRMMO9wd0ry5i1CsWgj5PdUAhhwSsJYN+SP//eSgHWZdTpctQdgLvG41QIRFi1zpvusNlc8VIRLw+VALLr4iLBBjpuR7hj0wqcLcKPWxQCO6rEheDAx7vR9bxgqpBJTyCbV/Xuf8hhKCns+FX5oA4ElZfOPGJiyy1Sj1H35KvB2WYNkNnKGuRLSL8G9GVg==
+Received: from CYZPR10CA0002.namprd10.prod.outlook.com (2603:10b6:930:8a::6)
+ by SA1PR12MB7199.namprd12.prod.outlook.com (2603:10b6:806:2bc::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7202.37; Thu, 25 Jan
+ 2024 04:56:46 +0000
+Received: from CY4PEPF0000E9CE.namprd03.prod.outlook.com
+ (2603:10b6:930:8a:cafe::ce) by CYZPR10CA0002.outlook.office365.com
+ (2603:10b6:930:8a::6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.26 via Frontend
+ Transport; Thu, 25 Jan 2024 04:56:46 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CY4PEPF0000E9CE.mail.protection.outlook.com (10.167.241.141) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7228.16 via Frontend Transport; Thu, 25 Jan 2024 04:56:46 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 24 Jan
+ 2024 20:56:31 -0800
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 24 Jan
+ 2024 20:56:30 -0800
+Received: from vdi.nvidia.com (10.127.8.11) by mail.nvidia.com (10.129.68.6)
+ with Microsoft SMTP Server id 15.2.986.41 via Frontend Transport; Wed, 24 Jan
+ 2024 20:56:30 -0800
+From: William Tu <witu@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: William Tu <witu@nvidia.com>, <kuba@kernel.org>, <jiri@nvidia.com>,
+	<saeedm@nvidia.com>, <bodong@nvidia.com>
+Subject: [RFC PATCH v2 net-next] Documentation: devlink: Add devlink-sd
+Date: Wed, 24 Jan 2024 20:56:24 -0800
+Message-ID: <20240125045624.68689-1-witu@nvidia.com>
+X-Mailer: git-send-email 2.37.1 (Apple Git-137.1)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1706089075-16084-1-git-send-email-wangyunjian@huawei.com>
-In-Reply-To: <1706089075-16084-1-git-send-email-wangyunjian@huawei.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 25 Jan 2024 12:48:38 +0800
-Message-ID: <CACGkMEu5PaBgh37X4KysoF9YB8qy6jM5W4G6sm+8fjrnK36KXA@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/2] tun: AF_XDP Rx zero-copy support
-To: Yunjian Wang <wangyunjian@huawei.com>
-Cc: mst@redhat.com, willemdebruijn.kernel@gmail.com, kuba@kernel.org, 
-	davem@davemloft.net, magnus.karlsson@intel.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, xudingke@huawei.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9CE:EE_|SA1PR12MB7199:EE_
+X-MS-Office365-Filtering-Correlation-Id: ac09de40-93d5-462c-c73a-08dc1d62088b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	Td869DWGZahpdmNeJrU2SU5nU5jAhfCt1Ne7Cz9KgzqWRo2wk/qgBpi+kEacnZdYFcj8nPS3ZkQ9K2y7BSQU6cghfMpx62szm6ilytFYU0m6CAOA2M2r8Zg1irTAbGvngCVNo/ezH10lCIiyYiErnnoFLhlcxkFVQG34fatMdlzX2fpiR9BDgwJxrtKIOeI92UCezDfCqnOT0VEN57oejCbWZ5fVBl6U1K5ovp47hKl/6BH5YzzlV5Ia89sOqYLAIj8jAR7heACm421Fea6tOVjY7vqgrsWp17KDH4dbB9RtZlgt8ZwDHRBnCN+9CP3n5Bfo8tLRoTBLxFIM7U0MrTUDH0gXmX3AitHSbclPVPw9gV0D7uwFMloDNKyNd2gEWlUxDUXPDL+7YiTTRPCVTBSolxz2j7DS2QxSxhKkzD+5/5ADr16h2iTAkUNft8FApRi0Ojz2fjw+blAjA5NEeuRiOlGDZN+7rWZIgYGbXyv7/Bcy1dLxacIyJjXd3LV3fi77w41gvZT90qWYKG6WTnS1eUgRXG19sqzOvTy2GYR7768+DppgLDJ5zdFRQBk2i2xbatXxm5751P12KNetgj4jcqN4Hn0+X5UTbrX4NxVuPTrNzkiUtiUcHU4b+FR2/XUiLU0aqUsbOGqqpauIucjdbEkC6DO17CDdVmptA+FAfdRnPx46cbUSmSaXrHWebVQNMI0KlFjYEWAAbjceZJjZ3piav+d+2xpi0ja9Z4WD8q7EXlz4rL8z7UynHqLC
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(376002)(346002)(396003)(39860400002)(230922051799003)(451199024)(1800799012)(82310400011)(64100799003)(186009)(46966006)(40470700004)(36840700001)(47076005)(83380400001)(426003)(41300700001)(1076003)(7696005)(336012)(2616005)(107886003)(30864003)(82740400003)(26005)(5660300002)(8676002)(8936002)(478600001)(2906002)(316002)(70586007)(54906003)(36860700001)(4326008)(6916009)(7636003)(70206006)(36756003)(356005)(6666004)(86362001)(66899024)(40480700001)(40460700003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jan 2024 04:56:46.5740
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: ac09de40-93d5-462c-c73a-08dc1d62088b
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000E9CE.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7199
 
-On Wed, Jan 24, 2024 at 5:38=E2=80=AFPM Yunjian Wang <wangyunjian@huawei.co=
-m> wrote:
->
-> Now the zero-copy feature of AF_XDP socket is supported by some
-> drivers, which can reduce CPU utilization on the xdp program.
-> This patch set allows tun to support AF_XDP Rx zero-copy feature.
->
-> This patch tries to address this by:
-> - Use peek_len to consume a xsk->desc and get xsk->desc length.
-> - When the tun support AF_XDP Rx zero-copy, the vq's array maybe empty.
-> So add a check for empty vq's array in vhost_net_buf_produce().
-> - add XDP_SETUP_XSK_POOL and ndo_xsk_wakeup callback support
-> - add tun_put_user_desc function to copy the Rx data to VM
+Add devlink-sd, shared descriptor, documentation. The devlink-sd
+mechanism is targeted for configuration of the shared rx descriptors
+that server as a descriptor pool for ethernet reprsentors (reps)
+to better utilize memory. Following operations are provided:
+ * add/delete a shared descriptor pool
+ * Configure the pool's properties
+ * Bind/unbind a representor's rx channel to a descriptor pool
 
-Code explains themselves, let's explain why you need to do this.
+Propose new devlink objects because existing solutions below do
+not fit our use cases:
+1) devlink params: Need to add many new params to support
+   the shared descriptor pool. It doesn't seem to be a good idea.
+2) devlink-sb (shared buffer): very similar to the API proposed in
+   this patch, but devlink-sb is used in ASIC hardware switch buffer
+   and switch's port. Here the use case is switchdev mode with
+   reprensentor ports and its rx queues.
 
-1) why you want to use peek_len
-2) for "vq's array", what does it mean?
-3) from the view of TUN/TAP tun_put_user_desc() is the TX path, so I
-guess you meant TX zerocopy instead of RX (as I don't see codes for
-RX?)
+AFAIK, Intel's ICE driver and Broadcom's driver also have the switchdev
+mode and representor ports, thus the proposed new API should be useful
+for other vendors.
 
-A big question is how could you handle GSO packets from userspace/guests?
+Any comments are welcome, thanks!
 
->
-> Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
-> ---
->  drivers/net/tun.c   | 165 +++++++++++++++++++++++++++++++++++++++++++-
->  drivers/vhost/net.c |  18 +++--
->  2 files changed, 176 insertions(+), 7 deletions(-)
->
-> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> index afa5497f7c35..248b0f8e07d1 100644
-> --- a/drivers/net/tun.c
-> +++ b/drivers/net/tun.c
-> @@ -77,6 +77,7 @@
->  #include <net/ax25.h>
->  #include <net/rose.h>
->  #include <net/6lowpan.h>
-> +#include <net/xdp_sock_drv.h>
->
->  #include <linux/uaccess.h>
->  #include <linux/proc_fs.h>
-> @@ -145,6 +146,10 @@ struct tun_file {
->         struct tun_struct *detached;
->         struct ptr_ring tx_ring;
->         struct xdp_rxq_info xdp_rxq;
-> +       struct xdp_desc desc;
-> +       /* protects xsk pool */
-> +       spinlock_t pool_lock;
-> +       struct xsk_buff_pool *pool;
->  };
->
->  struct tun_page {
-> @@ -208,6 +213,8 @@ struct tun_struct {
->         struct bpf_prog __rcu *xdp_prog;
->         struct tun_prog __rcu *steering_prog;
->         struct tun_prog __rcu *filter_prog;
-> +       /* tracks AF_XDP ZC enabled queues */
-> +       unsigned long *af_xdp_zc_qps;
->         struct ethtool_link_ksettings link_ksettings;
->         /* init args */
->         struct file *file;
-> @@ -795,6 +802,8 @@ static int tun_attach(struct tun_struct *tun, struct =
-file *file,
->
->         tfile->queue_index =3D tun->numqueues;
->         tfile->socket.sk->sk_shutdown &=3D ~RCV_SHUTDOWN;
-> +       tfile->desc.len =3D 0;
-> +       tfile->pool =3D NULL;
->
->         if (tfile->detached) {
->                 /* Re-attach detached tfile, updating XDP queue_index */
-> @@ -989,6 +998,13 @@ static int tun_net_init(struct net_device *dev)
->                 return err;
->         }
->
-> +       tun->af_xdp_zc_qps =3D bitmap_zalloc(MAX_TAP_QUEUES, GFP_KERNEL);
-> +       if (!tun->af_xdp_zc_qps) {
-> +               security_tun_dev_free_security(tun->security);
-> +               free_percpu(dev->tstats);
-> +               return -ENOMEM;
-> +       }
-> +
->         tun_flow_init(tun);
->
->         dev->hw_features =3D NETIF_F_SG | NETIF_F_FRAGLIST |
-> @@ -1009,6 +1025,7 @@ static int tun_net_init(struct net_device *dev)
->                 tun_flow_uninit(tun);
->                 security_tun_dev_free_security(tun->security);
->                 free_percpu(dev->tstats);
-> +               bitmap_free(tun->af_xdp_zc_qps);
->                 return err;
->         }
->         return 0;
-> @@ -1222,11 +1239,77 @@ static int tun_xdp_set(struct net_device *dev, st=
-ruct bpf_prog *prog,
->         return 0;
->  }
->
-> +static int tun_xsk_pool_enable(struct net_device *netdev,
-> +                              struct xsk_buff_pool *pool,
-> +                              u16 qid)
-> +{
-> +       struct tun_struct *tun =3D netdev_priv(netdev);
-> +       struct tun_file *tfile;
-> +       unsigned long flags;
-> +
-> +       rcu_read_lock();
-> +       tfile =3D rtnl_dereference(tun->tfiles[qid]);
-> +       if (!tfile) {
-> +               rcu_read_unlock();
-> +               return -ENODEV;
-> +       }
-> +
-> +       spin_lock_irqsave(&tfile->pool_lock, flags);
-> +       xsk_pool_set_rxq_info(pool, &tfile->xdp_rxq);
-> +       tfile->pool =3D pool;
-> +       spin_unlock_irqrestore(&tfile->pool_lock, flags);
-> +
-> +       rcu_read_unlock();
-> +       set_bit(qid, tun->af_xdp_zc_qps);
-> +
-> +       return 0;
-> +}
-> +
-> +static int tun_xsk_pool_disable(struct net_device *netdev, u16 qid)
-> +{
-> +       struct tun_struct *tun =3D netdev_priv(netdev);
-> +       struct tun_file *tfile;
-> +       unsigned long flags;
-> +
-> +       if (!test_bit(qid, tun->af_xdp_zc_qps))
-> +               return 0;
-> +
-> +       clear_bit(qid, tun->af_xdp_zc_qps);
-> +
-> +       rcu_read_lock();
-> +       tfile =3D rtnl_dereference(tun->tfiles[qid]);
-> +       if (!tfile) {
-> +               rcu_read_unlock();
-> +               return 0;
-> +       }
-> +
-> +       spin_lock_irqsave(&tfile->pool_lock, flags);
-> +       if (tfile->desc.len) {
-> +               xsk_tx_completed(tfile->pool, 1);
-> +               tfile->desc.len =3D 0;
-> +       }
-> +       tfile->pool =3D NULL;
-> +       spin_unlock_irqrestore(&tfile->pool_lock, flags);
-> +
-> +       rcu_read_unlock();
-> +       return 0;
-> +}
-> +
-> +int tun_xsk_pool_setup(struct net_device *dev, struct xsk_buff_pool *poo=
-l,
-> +                      u16 qid)
-> +{
-> +       return pool ? tun_xsk_pool_enable(dev, pool, qid) :
-> +               tun_xsk_pool_disable(dev, qid);
-> +}
-> +
->  static int tun_xdp(struct net_device *dev, struct netdev_bpf *xdp)
->  {
->         switch (xdp->command) {
->         case XDP_SETUP_PROG:
->                 return tun_xdp_set(dev, xdp->prog, xdp->extack);
-> +       case XDP_SETUP_XSK_POOL:
-> +               return tun_xsk_pool_setup(dev, xdp->xsk.pool,
-> +                                          xdp->xsk.queue_id);
->         default:
->                 return -EINVAL;
->         }
-> @@ -1331,6 +1414,19 @@ static int tun_xdp_tx(struct net_device *dev, stru=
-ct xdp_buff *xdp)
->         return nxmit;
->  }
->
-> +static int tun_xsk_wakeup(struct net_device *dev, u32 qid, u32 flags)
-> +{
-> +       struct tun_struct *tun =3D netdev_priv(dev);
-> +       struct tun_file *tfile;
-> +
-> +       rcu_read_lock();
-> +       tfile =3D rcu_dereference(tun->tfiles[qid]);
-> +       if (tfile)
-> +               __tun_xdp_flush_tfile(tfile);
-> +       rcu_read_unlock();
-> +       return 0;
-> +}
-> +
->  static const struct net_device_ops tap_netdev_ops =3D {
->         .ndo_init               =3D tun_net_init,
->         .ndo_uninit             =3D tun_net_uninit,
-> @@ -1347,6 +1443,7 @@ static const struct net_device_ops tap_netdev_ops =
-=3D {
->         .ndo_get_stats64        =3D dev_get_tstats64,
->         .ndo_bpf                =3D tun_xdp,
->         .ndo_xdp_xmit           =3D tun_xdp_xmit,
-> +       .ndo_xsk_wakeup         =3D tun_xsk_wakeup,
->         .ndo_change_carrier     =3D tun_net_change_carrier,
->  };
->
-> @@ -1404,7 +1501,8 @@ static void tun_net_initialize(struct net_device *d=
-ev)
->                 /* Currently tun does not support XDP, only tap does. */
->                 dev->xdp_features =3D NETDEV_XDP_ACT_BASIC |
->                                     NETDEV_XDP_ACT_REDIRECT |
-> -                                   NETDEV_XDP_ACT_NDO_XMIT;
-> +                                   NETDEV_XDP_ACT_NDO_XMIT |
-> +                                   NETDEV_XDP_ACT_XSK_ZEROCOPY;
->
->                 break;
->         }
-> @@ -2213,6 +2311,37 @@ static void *tun_ring_recv(struct tun_file *tfile,=
- int noblock, int *err)
->         return ptr;
->  }
->
-> +static ssize_t tun_put_user_desc(struct tun_struct *tun,
-> +                                struct tun_file *tfile,
-> +                                struct xdp_desc *desc,
-> +                                struct iov_iter *iter)
-> +{
-> +       size_t size =3D desc->len;
-> +       int vnet_hdr_sz =3D 0;
-> +       size_t ret;
-> +
-> +       if (tun->flags & IFF_VNET_HDR) {
-> +               struct virtio_net_hdr_mrg_rxbuf gso =3D { 0 };
-> +
-> +               vnet_hdr_sz =3D READ_ONCE(tun->vnet_hdr_sz);
-> +               if (unlikely(iov_iter_count(iter) < vnet_hdr_sz))
-> +                       return -EINVAL;
-> +               if (unlikely(copy_to_iter(&gso, sizeof(gso), iter) !=3D
-> +                            sizeof(gso)))
-> +                       return -EFAULT;
-> +               iov_iter_advance(iter, vnet_hdr_sz - sizeof(gso));
-> +       }
-> +
-> +       ret =3D copy_to_iter(xsk_buff_raw_get_data(tfile->pool, desc->add=
-r),
-> +                          size, iter) + vnet_hdr_sz;
-> +
-> +       preempt_disable();
-> +       dev_sw_netstats_tx_add(tun->dev, 1, ret);
-> +       preempt_enable();
-> +
-> +       return ret;
-> +}
-> +
->  static ssize_t tun_do_read(struct tun_struct *tun, struct tun_file *tfil=
-e,
->                            struct iov_iter *to,
->                            int noblock, void *ptr)
-> @@ -2226,6 +2355,22 @@ static ssize_t tun_do_read(struct tun_struct *tun,=
- struct tun_file *tfile,
->         }
->
->         if (!ptr) {
-> +               /* Read frames from xsk's desc */
-> +               if (test_bit(tfile->queue_index, tun->af_xdp_zc_qps)) {
-> +                       spin_lock(&tfile->pool_lock);
-> +                       if (tfile->pool) {
-> +                               ret =3D tun_put_user_desc(tun, tfile, &tf=
-ile->desc, to);
-> +                               xsk_tx_completed(tfile->pool, 1);
-> +                               if (xsk_uses_need_wakeup(tfile->pool))
-> +                                       xsk_set_tx_need_wakeup(tfile->poo=
-l);
-> +                               tfile->desc.len =3D 0;
-> +                       } else {
-> +                               ret =3D -EBADFD;
-> +                       }
-> +                       spin_unlock(&tfile->pool_lock);
-> +                       return ret;
-> +               }
-> +
->                 /* Read frames from ring */
->                 ptr =3D tun_ring_recv(tfile, noblock, &err);
->                 if (!ptr)
-> @@ -2311,6 +2456,7 @@ static void tun_free_netdev(struct net_device *dev)
->
->         BUG_ON(!(list_empty(&tun->disabled)));
->
-> +       bitmap_free(tun->af_xdp_zc_qps);
->         free_percpu(dev->tstats);
->         tun_flow_uninit(tun);
->         security_tun_dev_free_security(tun->security);
-> @@ -2666,7 +2812,19 @@ static int tun_peek_len(struct socket *sock)
->         if (!tun)
->                 return 0;
->
-> -       ret =3D PTR_RING_PEEK_CALL(&tfile->tx_ring, tun_ptr_peek_len);
-> +       if (test_bit(tfile->queue_index, tun->af_xdp_zc_qps)) {
-> +               spin_lock(&tfile->pool_lock);
-> +               if (tfile->pool && xsk_tx_peek_desc(tfile->pool, &tfile->=
-desc)) {
+Signed-off-by: William Tu <witu@nvidia.com>
+---
+v2: work on Jiri's internal feedback
+- use more consistent device name, p0, pf0vf0, etc
+- several grammar and spelling errors
+- several changes to devlink sd api
+  - remove hex, remove sd show, make output 1:1 mapping, use
+  count instead of size, use "add" instead of "create"
+  - remove the use of "we"
+- remove the "default" and introduce "shared-descs" in switchdev mode
+- make description more consistent with definitions in ethtool,
+such as ring, channel, queue.
+---
+ .../networking/devlink/devlink-sd.rst         | 284 ++++++++++++++++++
+ 1 file changed, 284 insertions(+)
+ create mode 100644 Documentation/networking/devlink/devlink-sd.rst
 
-Does it mean if userspace doesn't peek, we can't read anything?
-
-We need to make sure syscall read works as well as vhost_net.
-
-> +                       xsk_tx_release(tfile->pool);
-> +                       ret =3D tfile->desc.len;
-> +                       /* The length of desc must be greater than 0 */
-> +                       if (!ret)
-> +                               xsk_tx_completed(tfile->pool, 1);
-> +               }
-> +               spin_unlock(&tfile->pool_lock);
-> +       } else {
-> +               ret =3D PTR_RING_PEEK_CALL(&tfile->tx_ring, tun_ptr_peek_=
-len);
-> +       }
->         tun_put(tun);
->
->         return ret;
-> @@ -3469,8 +3627,11 @@ static int tun_chr_open(struct inode *inode, struc=
-t file * file)
->
->         mutex_init(&tfile->napi_mutex);
->         RCU_INIT_POINTER(tfile->tun, NULL);
-> +       spin_lock_init(&tfile->pool_lock);
->         tfile->flags =3D 0;
->         tfile->ifindex =3D 0;
-> +       tfile->pool =3D NULL;
-> +       tfile->desc.len =3D 0;
->
->         init_waitqueue_head(&tfile->socket.wq.wait);
->
-> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> index f2ed7167c848..a1f143ad2341 100644
-> --- a/drivers/vhost/net.c
-> +++ b/drivers/vhost/net.c
-> @@ -169,9 +169,10 @@ static int vhost_net_buf_is_empty(struct vhost_net_b=
-uf *rxq)
->
->  static void *vhost_net_buf_consume(struct vhost_net_buf *rxq)
->  {
-> -       void *ret =3D vhost_net_buf_get_ptr(rxq);
-> -       ++rxq->head;
-> -       return ret;
-> +       if (rxq->tail =3D=3D rxq->head)
-> +               return NULL;
-> +
-> +       return rxq->queue[rxq->head++];
->  }
->
->  static int vhost_net_buf_produce(struct vhost_net_virtqueue *nvq)
-> @@ -993,12 +994,19 @@ static void handle_tx(struct vhost_net *net)
->
->  static int peek_head_len(struct vhost_net_virtqueue *rvq, struct sock *s=
-k)
->  {
-> +       struct socket *sock =3D sk->sk_socket;
->         struct sk_buff *head;
->         int len =3D 0;
->         unsigned long flags;
->
-> -       if (rvq->rx_ring)
-> -               return vhost_net_buf_peek(rvq);
-> +       if (rvq->rx_ring) {
-> +               len =3D vhost_net_buf_peek(rvq);
-> +               if (likely(len))
-> +                       return len;
-> +       }
-> +
-> +       if (sock->ops->peek_len)
-> +               return sock->ops->peek_len(sock);
-
-What prevents you from reusing the ptr_ring here? Then you don't need
-the above tricks.
-
-Thanks
-
-
->
->         spin_lock_irqsave(&sk->sk_receive_queue.lock, flags);
->         head =3D skb_peek(&sk->sk_receive_queue);
-> --
-> 2.33.0
->
+diff --git a/Documentation/networking/devlink/devlink-sd.rst b/Documentation/networking/devlink/devlink-sd.rst
+new file mode 100644
+index 000000000000..09182693522f
+--- /dev/null
++++ b/Documentation/networking/devlink/devlink-sd.rst
+@@ -0,0 +1,284 @@
++.. SPDX-License-Identifier: GPL-2.0
++
++==========================
++Devlink Shared Descriptors
++==========================
++
++Glossary
++========
++* REP port: Representor port
++* RQ: Receive Queue or RX Queue
++* WQE: Work Queue Entry
++* IRQ: Interrupt Request
++* Channel: A channel is an IRQ and the set of queues that can trigger
++  that IRQ.  ``devlink-sd`` assumes one rx queue per channel.
++* Descriptor: The data structure that describes a network packet.
++  An RQ consists of multiple descriptors.
++* Device Naming:
++
++  - Uplink representors: p<port_number>, ex: p0.
++  - PF representors: pf<port_number>hpf, ex: pf0hpf.
++  - VF representors: pf<port_number>vf<function_number>, ex: pf0vf1.
++
++Background
++==========
++The ``devlink-sd`` mechanism is targeted for the configuration of the
++shared rx descriptors that host as a descriptor pool for ethernet
++representors (reps) to better utilize memory. Following operations are
++provided:
++
++* Add/delete a shared descriptor pool
++* Configure the pool's properties
++* Bind/unbind a representor's rx channel to a descriptor pool
++
++In switchdev mode, representors are slow-path ports that handle the
++miss traffic, i.e., traffic not being forwarded by the hardware.
++Representor ports are regular ethernet devices, with multiple channels
++consuming DMA memory. Memory consumption of the representor
++port's rx buffers can grow to several GB when scaling to 1k VFs reps.
++For example, in mlx5 driver, each RQ, with a typical 1K descriptors,
++consumes 3MB of DMA memory for packet buffer in descriptors, and with four
++channels, it consumes 4 * 3MB * 1024 = 12GB of memory. And since rep
++ports are for slow path traffic when flows are mostly offloaded,
++most of these rep ports' rx DMA memory is idle.
++
++A network device driver consists of several channels and each channel
++represents an IRQ and a set of queues that trigger that IRQ. devlink-sd
++considers only the *regular* RX queue in each channel, e.g., mlx5's
++non-regular RQs such as XSK RQ and drop RQ are not applicable here.
++Each device driver receives packets by setting up RQ, and each RQ
++receives packets by pre-allocating a dedicated set of rx
++ring descriptors, with each descriptor pointing to a memory buffer.
++The ``shared descriptor pool`` is a descriptor and buffer sharing
++mechanism.  It allows multiple RQs to use the rx ring descriptors
++from the shared descriptor pool. In other words, the RQ no longer has
++its own dedicated rx ring descriptors, which might be idle when there
++is no traffic, but it gets the descriptors from the descriptor pool.
++
++The shared descriptor pool contains rx descriptors and its memory
++buffers. When multiple representors' RQs share the same pool of rx
++descriptors, they share the same set of memory buffers. As a result,
++the heavy-traffic representors can use all descriptors from the pool,
++while the idle, no-traffic representor consumes no memory. All the
++descriptors in the descriptor pool can be used by all the RQs. This
++makes the descriptor memory usage more efficient.
++
++The diagram below first shows two representors with their own the
++regular rep, RQ, and its rx descriptor ring and buffers::
++
++      +--------+            +--------+
++      │ pf0vf1 │            │ pf0vf2 │
++      │   RQ   │            │   RQ   │
++      +--------+            +--------+
++           │                     │
++     +-----┴----------+    +-----┴----------+
++     │ rx descriptors │    │ rx descriptors │
++     │ and buffers    │    │ and buffers    │
++     +----------------+    +----------------+
++
++With shared descriptors, the diagram below shows that two representors
++can share the same descriptor pool::
++
++     +--------+            +--------+
++     │ pf0vf1 │            │ pf0vf2 │
++     │   RQ   │            │   RQ   │
++     +----┬---+            +----┬---+
++          │                     │
++          +---------+  +--------+
++                    │  │
++              +-----┴--┴-------+
++              │     shared     |
++              | rx descriptors │
++              │ and buffers    │
++              +----------------+
++
++API Overview
++============
++* Name:
++   - devlink-sd : devlink shared descriptor configuration
++* Synopsis:
++   - devlink sd pool show [DEV]
++   - devlink sd pool add DEV pool POOL_ID count DESCRIPTOR_NUM
++   - devlink sd pool delete id POOL_ID
++   - devlink sd port pool show [DEV]
++   - devlink sd port pool bind DEV queue QUEUE_ID pool POOL_ID
++   - devlink sd port pool unbind DEV queue QUEUE_ID
++
++Description
++===========
++ * devlink sd pool show - show shared descriptor pool and their
++   attributes
++
++    - DEV - the devlink device that supports shared descriptor pool.  If
++      this argument is omitted all available shared descriptor devices are
++      listed.
++
++ * devlink sd pool add - add a shared descriptor pool and the driver
++   allocates and returns descriptor pool id.
++
++    - DEV: the devlink device that supports shared descriptor pool.
++    - count DESCRIPTOR_NUM: the number of descriptors in the pool.
++
++ * devlink sd pool delete - delete shared descriptor pool
++
++    - pool POOL_ID: the id of the shared descriptor pool to be deleted.
++      Make sure no RX queue of any port is using the pool before deleting it.
++
++ * devlink sd port pool show - display port-pool mappings
++
++    - DEV: the devlink device that supports shared descriptor pool.
++
++ * devlink sd port pool bind - set the port-pool mapping
++
++    - DEV: the devlink device that supports shared descriptor pool.
++    - queue QUEUE_ID: the index of the channel. Note that a representor
++      might have multiple RX queues/channels, specify which queue id to
++      map to the pool.
++    - pool POOL_ID: the id of the shared descriptor pool to be mapped.
++
++ * devlink sd port pool unbind - unbind the port-pool mapping
++
++    - DEV: the devlink device that supports shared descriptor pool.
++    - queue QUEUE_ID: the index of the RX queue/channel.
++
++ * devlink dev eswitch set DEV mode switchdev - enable or disable default
++   port-pool mapping scheme
++
++    - DEV: the devlink device that supports shared descriptor pool.
++    - shared-descs { enable | disable }: enable/disable default port-pool
++      mapping scheme. See details below.
++
++
++Example usage
++=============
++
++.. code:: shell
++
++    # Enable switchdev mode for the device
++    * devlink dev eswitch set pci/0000:08:00.0 mode switchdev
++
++    # Show devlink device
++    $ devlink devlink show
++        pci/0000:08:00.0
++        pci/0000:08:00.1
++
++    # show existing descriptor pools
++    $ devlink sd pool show pci/0000:08:00.0
++        pci/0000:08:00.0: pool 11 count 2048
++
++    # Create a shared descriptor pool and 1024 descriptors, driver
++    # allocates and returns the pool id 12
++    $ devlink sd pool add pci/0000:08:00.0 count 1024
++        pci/0000:08:00.0: pool 12 count 1024
++
++    # Now check the pool again
++    $ devlink sd pool show pci/0000:08:00.0
++        pci/0000:08:00.0: pool 11 count 2048
++        pci/0000:08:00.0: pool 12 count 1024
++
++    # Bind a representor port, pf0vf1, queue 0 to the shared descriptor pool
++    $ devlink sd port pool bind pf0vf1 queue 0 pool 12
++
++    # Bind a representor port, pf0vf2, queue 0 to the shared descriptor pool
++    $ devlink sd port pool bind pf0vf2 queue 0 pool 12
++
++    # Show the rep port-pool mapping of pf0vf1
++    $ devlink sd port pool show pci/0000:08:00.0/11
++        pci/0000:08:00.0/11 queue 0 pool 12
++
++    # Show the rep port-pool mapping of pf0vf2
++    $ devlink sd port pool show pf0vf2
++    # or use the devlink port handle
++    $ devlink sd port pool show pci/0000:08:00.0/22
++        pci/0000:08:00.0/22 queue 0 pool 12
++
++    # To dump all ports mapping for a device
++    $ devlink sd port pool show pci/0000:08:00.0
++        pci/0000:08:00.0/11: queue 0 pool 12
++        pci/0000:08:00.0/22: queue 0 pool 12
++
++    # Unbind a representor port, pf0vf1, queue 0 from the shared descriptor pool
++    $ devlink sd port pool unbind pf0vf1 queue 0
++    $ devlink sd port pool show pci/0000:08:00.0
++        pci/0000:08:00.0/22: queue 0 pool 12
++
++Default Mapping Scheme
++======================
++The ``devlink-sd`` tries to be generic and fine-grained: allowing users
++to create shared descriptor pools and bind them to representor ports, in
++any mapping scheme they want. However, typically users don't want to
++do this by themselves. For convenience, ``devlink-sd`` adds a default mapping
++scheme as follows:
++
++.. code:: shell
++
++   # Create a shared descriptor pool for each rx queue of uplink
++     representor, assume having two queues:
++   $ devlink sd pool show p0
++       pci/0000:08:00.0: pool 8 count 1024 # reserved for queue 0
++       pci/0000:08:00.0: pool 9 count 1024 # reserved for queue 1
++
++   # Bind each representor port to its own shared descriptor pool, ex:
++   $ devlink sb port pool show pf0vf1
++        pci/0000:08:00.0/11: queue 0 pool 8
++        pci/0000:08:00.0/11: queue 1 pool 9
++
++   $ devlink sb port pool show pf0vf2
++        pci/0000:08:00.0/22: queue 0 pool 8
++        pci/0000:08:00.0/22: queue 1 pool 9
++
++The diagram shows the default mapping with two representors, each with
++two RX queues::
++
++     +--------+            +--------+     +--------+
++     │   p0   │            │ pf0vf1 │     | pf0vf2 │
++     │RQ0  RQ1│-------+    │RQ0  RQ1│     |RQ0  RQ1│
++     +-+------+       |    +-+----+-+     +-+----+-+
++       |              |      │    |         |    |
++       |  +------------------+    |     to  |    |
++       |  |           |           |      POOL-8  |
++   +---v--v-+         |     +-----v--+           |
++   │ POOL-8 |         |---> | POOL-9 |<----------+
++   +--------+               +--------+
++    NAPI-0                    NAPI-1
++
++The benefit of this default mapping is that it allows the p0, the uplink
++representor, to receive packets that are destined for pf0vf1 and pf0vf2,
++simply by polling the shared descriptor pools. In the above case, p0
++has two NAPI contexts, NAPI-0 polls for RQ0 and NAPI-1 polls for RQ1.
++Since the NAPI-0 receives packets by checking all the descriptors in
++the POOL-0, and the POOL-0 contains packets also for pf0vf1 and pf0vf2,
++polling POOL-1 can receive all the packets. As a result, uplink representors
++become the single device that receives packets for other representors.
++This makes managing pools and rx queues easier and since only one NAPI
++can poll on one pool, there is no lock required to avoid contention.
++
++Example usage (Default)
++=======================
++
++.. code:: shell
++
++    # Enable switchdev mode with additional *shared-descs* option
++    * devlink dev eswitch set pci/0000:08:00.0 mode switchdev \
++      shared-descs enable
++
++    # Assume two rx queues and one uplink device p0, and two reps pf0vf1 and pf0vf2
++    $ devlink sd port pool show pci/0000:08:00.0
++        pci/0000:08:00.0: queue 0 pool 8
++        pci/0000:08:00.0: queue 1 pool 9
++        pci/0000:08:00.0/11: queue 0 pool 8
++        pci/0000:08:00.0/11: queue 1 pool 9
++        pci/0000:08:00.0/22: queue 0 pool 8
++        pci/0000:08:00.0/22: queue 1 pool 9
++
++    # Disable *shared-descs* option falls back to non-sharing
++    * devlink dev eswitch set pci/0000:08:00.0 mode switchdev \
++      shared-descs disable
++
++    # pool and port-pool mappings are cleared
++    $ devlink sd port pool show pci/0000:08:00.0
++
+-- 
+2.37.1 (Apple Git-137.1)
 
 
