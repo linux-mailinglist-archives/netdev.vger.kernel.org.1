@@ -1,106 +1,77 @@
-Return-Path: <netdev+bounces-65867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E2FA83C176
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 12:59:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41FFB83C17B
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 12:59:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 614451C2332C
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 11:59:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDB761F26169
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 11:59:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9E3C33CDB;
-	Thu, 25 Jan 2024 11:58:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E07745971;
+	Thu, 25 Jan 2024 11:59:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b="wg+onJv7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S5zD5MhB"
 X-Original-To: netdev@vger.kernel.org
-Received: from www530.your-server.de (www530.your-server.de [188.40.30.78])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CD6B45950;
-	Thu, 25 Jan 2024 11:58:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.30.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B0784595C
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 11:59:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706183938; cv=none; b=pSXh1mv93iQUajJBz0XWQjvuOXlsdR09eNUOCiDpVINzlVNOCWCR5gCVFQtfpDA5RhTwr/mAfVnZls2mPGYas+ibDqyfnW2/cjmckbfEx8vhCj/j1NFvx63m5Ir7fLrXXde+Pl2gPRWibqhmGSY13mr5k/5IcVDb2fkrJoCbyqs=
+	t=1706183941; cv=none; b=P0vJggi7DlYX+Hi7kzbl2liyUGVM+jplSgzL2L6D2qPtNoXg1nAjkt2vOJm/dLojs/j4oikeAVpB20rOJm8hFIQ44tzSori1kOgnlBr3ZKYqVpsvAz79FH/HDvcpTHPRobzbhJ4zsCkW8JMQFHyKdO/jiz9nDUdUFOmqQCMPdT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706183938; c=relaxed/simple;
-	bh=kkF3b7McPBdvVoiztKPiGvKZ6z3mXMy71vLk9BtpZeA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=nu16tEy1Vi3PTnkmehSICITaB4UIh/WYTP6lwvEd8ECY4bQGsQ4KbujMlPLwOgAJ/gYU2k5o5dlEIblWRCs4RqOjXuxDQSa3aggUbG1PzpKB0iQS1XxXsiD/62XT4b6Dc4cvD9ygSKHHJt5c9mixeRofzGaez/b0TcvmP7hKieQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com; spf=pass smtp.mailfrom=geanix.com; dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b=wg+onJv7; arc=none smtp.client-ip=188.40.30.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=geanix.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=geanix.com;
-	s=default2211; h=Content-Type:MIME-Version:Message-ID:Date:References:
-	In-Reply-To:Subject:Cc:To:From:Sender:Reply-To:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=Hf6tipOHSadECgsUIyxzcnBsKwPZNts6tZDoPvTRG2c=; b=wg+onJv7knX2ZGhToWqlNLRkF5
-	RIWOo89gho7iVAXbECltAjM2vUXLPMFwFn+2CgWvDqrxcPmmLQ+oo2Hzo9apD46BvH6qtd9MpMTHy
-	h/rNj0wGZvoM/6FF0OO64NKQrE5vMrGZXa2AtfGyWsEfdsCupeyYsRL78NJX+Pq8WIDEp3fAXI7mC
-	qYYC6034h+Eu6HuI3Z3TIt+xyuU0I57snSnPhe7rkZCz/OOSc/g4Gnc1ItJOsYwVvmdlOJRtColw5
-	uG4P8lJV88alDM6NiFA0szTjOtaAjpeAtWAgb9qjyTk/KL+pyVh+UY2AlJz1VAoZ9mrYSUV+e0Me2
-	vpiN5dCg==;
-Received: from sslproxy03.your-server.de ([88.198.220.132])
-	by www530.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <esben@geanix.com>)
-	id 1rSyNh-0000nH-18; Thu, 25 Jan 2024 12:58:53 +0100
-Received: from [185.17.218.86] (helo=localhost)
-	by sslproxy03.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <esben@geanix.com>)
-	id 1rSyNg-000K8S-Bp; Thu, 25 Jan 2024 12:58:52 +0100
-From: esben@geanix.com
-To: Kurt Kanzenbach <kurt.kanzenbach@linutronix.de>
-Cc: netdev@vger.kernel.org,  Alexandre Torgue
- <alexandre.torgue@foss.st.com>,  Jose Abreu <joabreu@synopsys.com>,
-  "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
- <pabeni@redhat.com>,  Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-  linux-stm32@st-md-mailman.stormreply.com,
-  linux-arm-kernel@lists.infradead.org,  linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/3] net: stmmac: Time Based Scheduling support for OF
- platforms
-In-Reply-To: <8734ulekuj.fsf@kurt.kurt.home> (Kurt Kanzenbach's message of
-	"Thu, 25 Jan 2024 12:03:16 +0100")
-References: <b365dc6f756a3fad4dfaa2675c98f4078aba8a55.1706105494.git.esben@geanix.com>
-	<b807c2a70dba9711376b265b6da5fb5ff14589aa.1706105494.git.esben@geanix.com>
-	<8734ulekuj.fsf@kurt.kurt.home>
-Date: Thu, 25 Jan 2024 12:58:52 +0100
-Message-ID: <8734ulhber.fsf@geanix.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1706183941; c=relaxed/simple;
+	bh=Kz4bxwlKhxXeto10pI+42QcBi68jNaKp652CDggy7Ko=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A24ixMR6T8GOWcWwH+kH9WF92v5QdQaK3vYUvnJDnIhszJufqCd9xXHJMiw5rQ0imAWRkrgsYzGxGvbNPkZidGlfGA4edwO6ODIbYHoZ6iak+macZJf4UV+t36BBQzDlF5ko7icazdQMWc0rMHMmKf3cWJflnAtI0AWamaAbDAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S5zD5MhB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 806E8C433C7;
+	Thu, 25 Jan 2024 11:58:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706183940;
+	bh=Kz4bxwlKhxXeto10pI+42QcBi68jNaKp652CDggy7Ko=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=S5zD5MhBkomlMDB4dGU4smJeVgfWJRSu/gi9MQj97Z5RmWDAwc1hcnWK8ESEZWhKB
+	 gq1iFCzeniTisw06S62fdIaUxVpeFVBC1yn9FsxnZwZ9yU4I5SuaLLze8TKYUqiuTO
+	 6lxyu4Xiejfl3r4POI35NRq4qyKhHOsN3tmdRakwYE6dItoG4EH64R+xAR1QRWJUgC
+	 1NQBL9l/tGo7Uz2SeXWpDAgK+T0Zji7S5kTDjIvSlFbty1lf9XHks9m50fz7S0OM/9
+	 mY4/orjpaBAsJEuJxRC2vIYSczqsoedRRgIpgMdifVgt/TtkXVB7Gj1xgLDi8l2LCj
+	 lsci9IwMarZ+Q==
+Date: Thu, 25 Jan 2024 11:58:56 +0000
+From: Simon Horman <horms@kernel.org>
+To: Kurt Kanzenbach <kurt@linutronix.de>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Subject: Re: [PATCH v2 iwl-next 1/3] igc: Use reverse xmas tree
+Message-ID: <20240125115856.GJ217708@kernel.org>
+References: <20240124085532.58841-1-kurt@linutronix.de>
+ <20240124085532.58841-2-kurt@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Authenticated-Sender: esben@geanix.com
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27165/Thu Jan 25 10:51:15 2024)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240124085532.58841-2-kurt@linutronix.de>
 
-Kurt Kanzenbach <kurt.kanzenbach@linutronix.de> writes:
+On Wed, Jan 24, 2024 at 09:55:30AM +0100, Kurt Kanzenbach wrote:
+> Use reverse xmas tree coding style convention in igc_add_flex_filter().
+> 
+> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+> Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
 
-> Hi,
->
-> On Wed Jan 24 2024, Esben Haabendal wrote:
->> This allows enabling TBS for TX queues by adding the
->> snps,time-based-scheduling property. You should check for support for this
->> on your particular controller before enabling. Typically, TX queue 0 does
->> not support TBS.
->
-> More a general question: Do i see that correctly that Launch Time does
-> not work for OF platforms (such as an imx93) at the moment, because the
-> tbs_en property is not configured? Or why are these patches necessary?
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Correct.  You cannot use etf qdisc with "offload" on for OF platforms,
-including imx93.
-Doing that will end with "return -EINVAL" in tc_setup_etf().
-
-I am working with imx98mp, but there should not be any difference for
-imx93.
-
-/Esben
 
