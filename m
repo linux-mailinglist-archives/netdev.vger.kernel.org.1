@@ -1,119 +1,141 @@
-Return-Path: <netdev+bounces-65845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F80F83C054
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 12:10:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F0EA83C059
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 12:10:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5A171F21A77
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 11:10:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 928411C24959
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 11:10:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9E7B58238;
-	Thu, 25 Jan 2024 11:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 052B91C6B8;
+	Thu, 25 Jan 2024 11:01:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ePOMKZRg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O7WF2Ibo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3E4B3FE2B
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 11:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 484591C16;
+	Thu, 25 Jan 2024 11:01:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706180427; cv=none; b=qUsIrcoExo+4RGux6xapJDUJCI4NA3ZjKAFpEhh/8NacO0WMpMu8PaMeDok/a33eLGOFpv+Vth98OBTt/waNL5SB8RSXsKUcXQ1OhHPEjmcVb98pMcFkuS42cEmSUAnNM9v5pzYpKyH97YtunNI+sejOvHWWNncPpaWPcZPLxA4=
+	t=1706180513; cv=none; b=in5w3c6T9tDRzQ6XinlIUOCZfz5hG0f/teTfOlcmqSQ/y7vLUUXZGoBpPUR4LTjAjfkBh+POGLd1EhRbmH1wOTXJD8eetl559kkTe4rjtvwW37dwCiuSnCB/8lTZFttjoUvKGObgiNsMEqkH5wWJLDtfI5Op5lJNG2sxkFrhfyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706180427; c=relaxed/simple;
-	bh=ssVANiXVMl+qiKXCkJfAsXgoW59i1Wh/GpGUAHZFaP0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Ao1e4z6zXt/z6TyxKPEwfBExnEmUNphAExddVjRyOdTLiSKJMml5eO9HvZkpkJc66NkDqAuxqmAmTV6sk5z0iDZ9UGeqkUVlOHJl6SxDEv3KyCsmLf9xIqjOHyipgaJdboq/Bct88hE5F84prUenDK17NJT/B99NN9nsFMr1964=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ePOMKZRg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4EDA2C43390;
-	Thu, 25 Jan 2024 11:00:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706180427;
-	bh=ssVANiXVMl+qiKXCkJfAsXgoW59i1Wh/GpGUAHZFaP0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ePOMKZRg3qLEn+o/Aavd1hBz80nhx06qaEcEDfgDoDTA7ytQkhLqHvMsYB1GPL3Eh
-	 yhVpcAWUSA4JzP3D956eSScy6mWX9WwAaZF5v220XCORT+0GUatGbDmYElOeA1v6yZ
-	 a8BXBmDpWI8OQPRLrP6KFXApx/fjjNAOC6mSTS78WYb7XRNyJoRXlvl26NxYFrfd7J
-	 YGXHcvajBuZw7dzIXZ/rd7/apD2UPzdJFgbpVoWsfhYDvqybNm8NRheLhDnMTILGOX
-	 4EUnsVUigDV6q4+TseJCppBo8UFGt3hGK3XBN0l7DlJDnHHXZjH9RxUsSuHjEFdtyh
-	 rEupaMf2409sw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 364D0D8C962;
-	Thu, 25 Jan 2024 11:00:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1706180513; c=relaxed/simple;
+	bh=CZvtojiC0XEHWqTBwc7RTmZP9uSs74MPCzz4IDlB2Xw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iAZxMiJhCdxNj82cRWnSk/5yIqAA+gMG2Nxxd1uhFKLDy+hq63ZvZAoklSsxsHm4GhWY1KV/j4MEkDis3JZZxVg34Hk48jwGb4a1Ie6NwIdrQfxEEVlxAXPH8Yg47HY4TEEvSdCVO68ZHvynHdEwx7M5YmtllmO/HS49xQ+6/vo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O7WF2Ibo; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5100fd7f71dso2386956e87.1;
+        Thu, 25 Jan 2024 03:01:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706180510; x=1706785310; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=miuHCVwgH0ReGM1PaYlhcfq7/djqKFtBuYNwdTBB2rs=;
+        b=O7WF2IboPkiL62qQinMC6InYGnmFuC7YfXkbagmlOav0nOg571nO+d0/d/Z7nfJMvB
+         pS+o8WKF4z/IM5RqQIQ7vY+bmSPxVkwnsgiP7g3C+HrxfPxChb92EErygT3wswTFANSc
+         Kf9NDTHOMnbiN2u3PKhwxm/No1/BGVx/ycFfTu+yqAX+1kOp9eifjUoszlVaS+SAIOyS
+         CUx9+ZfDFIxeHiuzNL659i5CfS8KXh9+44rOA8V9RTsUPOHJSYJmSyjFhcg6V8gImZM7
+         JRQ87+BY9cpDErYFW387suMC2yqN+YGD4r7xTLinj+V+I5UFeV1EaEDoEbVAwcxMhOLQ
+         4wpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706180510; x=1706785310;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=miuHCVwgH0ReGM1PaYlhcfq7/djqKFtBuYNwdTBB2rs=;
+        b=pHARuzsYnNdj3mSJVsfHjQhpIbLGwxkhD3as3NQ4K4dWteMQ6KNefd3bcqeYhECXCl
+         059KkhQSdQzuwmRFGzPLhgUmT8e9r0tdttcfG8fzZYE7uqhLMqG9gO7KTR+YmwCzQaxw
+         PIe4lIg95TUwdtbwytX10rOd5mdi4MBXXlf9B/DsdnJbcj9rZLJ54l+cGUQE3PNOkjhm
+         yJQB+fG2cGDcTSUqQW+xZ2pPJpI/zTZqCfITKfDSZ86ujIsuggJASFGfhZ0rrDPKeqCZ
+         AexquqHThLqc9b2VZGC9kyKqSCGHT0ft+yA8ePY5xJPMamraRK0N9qs6hSWuIcYDdY2w
+         zdDg==
+X-Gm-Message-State: AOJu0Yy/0MsjMs+2Xtsa0HFNRkkq+6cJS0Fu7hWIaS8FkgK6T4xy4DU/
+	dcTxhC0ry1ib0XBWBaqj6mlWeSvyAk9OFrglRyqwlX8coIQ7zTUs
+X-Google-Smtp-Source: AGHT+IFlB2MgGLnpQeRwCJpsgL6fLkk+sNLY3XK5121CEnUBfLxwPC5+nWSbyXBQ20M00lfQUDSEkQ==
+X-Received: by 2002:ac2:57c5:0:b0:50e:6317:54ab with SMTP id k5-20020ac257c5000000b0050e631754abmr324729lfo.42.1706180509935;
+        Thu, 25 Jan 2024 03:01:49 -0800 (PST)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id d14-20020a194f0e000000b0051006813733sm766441lfb.86.2024.01.25.03.01.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Jan 2024 03:01:49 -0800 (PST)
+Date: Thu, 25 Jan 2024 14:01:46 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Furong Xu <0x1207@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Joao Pinto <jpinto@synopsys.com>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, xfr@outlook.com, rock.xu@nio.com
+Subject: Re: [PATCH net] net: stmmac: xgmac: fix safety error descriptions
+Message-ID: <3aagjpld4v7u4cfj3lge5rg6v6ro3ehnstjz3jfculx3vdpbvd@4y3hw7v4idhp>
+References: <20240123085037.939471-1-0x1207@gmail.com>
+ <ii3muj3nmhuo6s5hm3g7wuiubtyzr632klrcesubtuaoyifogb@ohmunpxvdtsv>
+ <20240125103454.0000312a@gmail.com>
+ <c37feb621fa3f7867af8d97ffe36f577966ba3ec.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [net 01/14] net/mlx5e: Use the correct lag ports number when creating
- TISes
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170618042721.7005.16098750210142855838.git-patchwork-notify@kernel.org>
-Date: Thu, 25 Jan 2024 11:00:27 +0000
-References: <20240124081855.115410-2-saeed@kernel.org>
-In-Reply-To: <20240124081855.115410-2-saeed@kernel.org>
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, saeedm@nvidia.com, netdev@vger.kernel.org,
- tariqt@nvidia.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c37feb621fa3f7867af8d97ffe36f577966ba3ec.camel@redhat.com>
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Saeed Mahameed <saeedm@nvidia.com>:
-
-On Wed, 24 Jan 2024 00:18:42 -0800 you wrote:
-> From: Saeed Mahameed <saeedm@nvidia.com>
+On Thu, Jan 25, 2024 at 11:09:06AM +0100, Paolo Abeni wrote:
+> On Thu, 2024-01-25 at 10:34 +0800, Furong Xu wrote:
+> > On Wed, 24 Jan 2024 17:25:27 +0300
+> > Serge Semin <fancer.lancer@gmail.com> wrote:
+> > 
+> > > On Tue, Jan 23, 2024 at 04:50:37PM +0800, Furong Xu wrote:
+> > > > Commit 56e58d6c8a56 ("net: stmmac: Implement Safety Features in
+> > > > XGMAC core") prints safety error descriptions when safety error assert,
+> > > > but missed some special errors, and mixed correctable errors and
+> > > > uncorrectable errors together.
+> > > > This patch complete the error code list and print the type of errors.  
+> > > 
+> > > The XGMAC ECC Safety code has likely been just copied from the DW GMAC
+> > > v5 (DW QoS Eth) part. So this change is partly relevant to that code too. I
+> > > can't confirm that the special errors support is relevant to the DW
+> > > QoS Eth too (it likely is though), so what about splitting this patch
+> > > up into two:
+> > > 1. Elaborate the errors description for DW GMAC v5 and DW XGMAC.
+> > > 2. Add new ECC safety errors support.
+> > > ?
+> > > 
+> > > On the other hand if we were sure that both DW QoS Eth and XGMAC
+> > > safety features implementation match the ideal solution would be to
+> > > refactor out the common code into a dedicated module.
+> > > 
+> > > -Serge(y)
+> > > 
+> > 
+> > Checked XGMAC Version 3.20a and DW QoS Eth Version 5.20a, the safety error
+> > code definitions are not identical at all, they do have some differences,
+> > about more than 20 bits of status register are different.
+> > I think we should just leave them in individual implementations.
 > 
-> The cited commit moved the code of mlx5e_create_tises() and changed the
-> loop to create TISes over MLX5_MAX_PORTS constant value, instead of
-> getting the correct lag ports supported by the device, which can cause
-> FW errors on devices with less than MLX5_MAX_PORTS ports.
+
+> @Serge: given the above, would you still advice for splitting this
+> patch into 2?
+
+Preliminary I would still in insist on splitting up. I'll double check
+the patch and the Safety feature implementations in both devices and
+give more detailed response to Furong in an hour or so.
+
+-Serge(y)
+
 > 
-> [...]
-
-Here is the summary with links:
-  - [net,01/14] net/mlx5e: Use the correct lag ports number when creating TISes
-    https://git.kernel.org/netdev/net/c/25461ce8b3d2
-  - [net,02/14] net/mlx5: Fix query of sd_group field
-    https://git.kernel.org/netdev/net/c/cfbc3608a8c6
-  - [net,03/14] net/mlx5e: Fix operation precedence bug in port timestamping napi_poll context
-    https://git.kernel.org/netdev/net/c/3876638b2c7e
-  - [net,04/14] net/mlx5e: Fix inconsistent hairpin RQT sizes
-    https://git.kernel.org/netdev/net/c/c20767fd45e8
-  - [net,05/14] net/mlx5e: Fix peer flow lists handling
-    https://git.kernel.org/netdev/net/c/d76fdd31f953
-  - [net,06/14] net/mlx5: Fix a WARN upon a callback command failure
-    https://git.kernel.org/netdev/net/c/cc8091587779
-  - [net,07/14] net/mlx5: Bridge, fix multicast packets sent to uplink
-    https://git.kernel.org/netdev/net/c/ec7cc38ef9f8
-  - [net,08/14] net/mlx5: DR, Use the right GVMI number for drop action
-    https://git.kernel.org/netdev/net/c/5665954293f1
-  - [net,09/14] net/mlx5: DR, Can't go to uplink vport on RX rule
-    https://git.kernel.org/netdev/net/c/5b2a2523eeea
-  - [net,10/14] net/mlx5: Use mlx5 device constant for selecting CQ period mode for ASO
-    https://git.kernel.org/netdev/net/c/20cbf8cbb827
-  - [net,11/14] net/mlx5e: Allow software parsing when IPsec crypto is enabled
-    https://git.kernel.org/netdev/net/c/20f5468a7988
-  - [net,12/14] net/mlx5e: Ignore IPsec replay window values on sender side
-    https://git.kernel.org/netdev/net/c/315a597f9bcf
-  - [net,13/14] net/mlx5e: fix a double-free in arfs_create_groups
-    https://git.kernel.org/netdev/net/c/3c6d5189246f
-  - [net,14/14] net/mlx5e: fix a potential double-free in fs_any_create_groups
-    https://git.kernel.org/netdev/net/c/aef855df7e1b
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+> Thanks,
+> 
+> Paolo
+> 
 
