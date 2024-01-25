@@ -1,157 +1,172 @@
-Return-Path: <netdev+bounces-65931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4276D83C7C9
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 17:23:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A85583C846
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 17:40:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5E9A29598E
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 16:23:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD76C1F229D7
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 16:40:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E54D745FC;
-	Thu, 25 Jan 2024 16:23:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12E3A129A6D;
+	Thu, 25 Jan 2024 16:40:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RQh9hhVr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F284E7316D
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 16:23:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ABBB6E2D3
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 16:40:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706199810; cv=none; b=V9ifQNh0txedhOjOiUjlukQQLTmmVmuV1l2/njOVMl7XptNuurfr7n/QlP3pSVQ4GYDs+SVMjRWf8V0crO5elEbc1PCgu1YQtFTNzDeiPTD3hjELcNPqFcGYrCN7Nks1P1GNCQmuTjgCT3ksX0BLPqQZoow5tbNkCLWQmRNJALc=
+	t=1706200850; cv=none; b=gfOKGJTHO/z6FtRgUq6SPW4ihoB3rB5BeMfhWDQ90wjdKkL8aZUujevAftBQwXmwFU5P5D+yZedgpSEAfe+mJA6VvnM2bPLXC7D5D9mU+VcGHMAFo0xmRTQ1o1mkwCLK+iTPYpb9+TiO5S12QjlSawLipqw67b/KvKr6mbsuGa4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706199810; c=relaxed/simple;
-	bh=+dZNkcg0nSKMNnkYx6iANd3TYWWA8LSBZUJCdRBMUM4=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=PWGpsTQ5hqYjqS+qlK8bJuy6z9BaKGOlzmmrv7lX6HasfswU/cHK7SqOWMh6xe8d7D3nMYd8o3gMSwLCyAm8aohkWbYf6rtGJohYh/FI6zBtxGzym0M1W+kJ56TzCzU2mqGOqrv4k8WrT/uj8kbncPYHVdfESey/8hbZQaYzBvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7bc2b7bef65so673360939f.0
-        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 08:23:28 -0800 (PST)
+	s=arc-20240116; t=1706200850; c=relaxed/simple;
+	bh=O0W7pO1QHGmvl4eOGKao4AsXE/QJTJavOppMaeBzfoI=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=IA2n/4JeVqUMygEqJDYfKrYRspzRlKlY8Eu3SFfWTqcsq977Kpb7rugpZYy1aVUgERUum+lYli4EfsxcnMczkVXsFNcczaqolMwgMOMqmqei1GTmCnvIiHBK8qmdUULfCrn5sT+BuUR1FodgRGuEBVizRKqql66bsVG/QXlFVng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RQh9hhVr; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706200847;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=+ZJC9fSsX7Z9bz1ya4lAJC0kXlHYdZclBj9kIZ708co=;
+	b=RQh9hhVra6KYxhwY0G5K5/2mLvcfKbvieHBhOBwlTFGvkpR3PBh0+vieKHqTAYK2Pixy/Q
+	d55wHrfOcPM8DOmNr748KtG3H5f0uD0z4QEQOsjSHwulEoNCTT7l+U1ZEGXbQ7oNrv88ur
+	VOOEf7KuxndKBfmi5pRAqdPgF7reOjY=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-139-4zQq_P5pPVqWDP-ax56K_Q-1; Thu, 25 Jan 2024 11:40:45 -0500
+X-MC-Unique: 4zQq_P5pPVqWDP-ax56K_Q-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40e354aaf56so18309715e9.1
+        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 08:40:45 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706199808; x=1706804608;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
+        d=1e100.net; s=20230601; t=1706200844; x=1706805644;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pfwtl2ceVzED0XspuP8Y3DZUDaUYR9ioK42BVWaG2HE=;
-        b=iwspJUb8cVOIJOugn6/+iRnHaEX8Du6B/t2X46207bERogcbeQ1+2bnsHwW+awDfWD
-         Y0DkWVED8UPRCjDVErL0w9bB7E+ua9RnqiXWfTi20lDrnXP8GirvMz1OMtKhOc7vf74P
-         tOysA8p8MOuOk1jv6crm2Zi+AFNjUiQDKsjMulmokqiUMKRkqN0GZaU7M0nNM+VvvqMF
-         E64zCvXvUm2ggmClcGwOeQjh2imp1MjA1XqRwP1IDl6vbs/2DvAZatnCAT5Yf9faah4t
-         9Lh9kKgad/zY18r90kuZJ50e/lyJcmfACF59JtRGU5LGKpAJlFyq5xf4xOws5ULixEZi
-         KHHw==
-X-Gm-Message-State: AOJu0YyEcvRiMwxX464EpS6xP1+A7JQkbwfVuf0KnicGNFnb+WHHqUWz
-	TX67NCoKPMtI17+txRparFmQ5+V41nKg8dO7eVqTb0reNVWV2CnaUW1oCmwubgy83DI3UgCG8/o
-	1mYlr78qSVLWH1mlazXjc4a+CUezObBOLiwBrsz9vV4ryHcwjAgAX+qY=
-X-Google-Smtp-Source: AGHT+IGVe/HKB3iccQCPQ0WzW5lz56JBI+wiR7cA3nZjQC1DpK0plDcqQZUhNDqyGqCSGZOQUzI+xHfmWVD2wPOHrJ6hClLSyFwY
+        bh=+ZJC9fSsX7Z9bz1ya4lAJC0kXlHYdZclBj9kIZ708co=;
+        b=UJ0eIM4QjOEe4b87rXiUgj81yTOSyuf47AjyN2X5NnJS3G4MYHwwr7sFEgwhxSCW6N
+         teu66+nX4qUYTEViCRr0OZExjTH5MUuJ1iBfQDeyR4UsVvp+4UqiN3zVWTS/ZAn3+LkG
+         PqHF10c+FNIaID6vGk4Op07pJ6TxT3g7bAw8ErKkwSpCkwoz+wm3F+s4ze00kX7gudGq
+         w7kk5PrryST/ZZAm++aDDpMN/A/MuaChie1BUe8Q/N9Xgm/3ceBVMoh9LTUETpVyb8jx
+         bd5+Xy8Q4SQfZTeokwiTgBitr0NxxV/1j0UQ9rBh7f3pgdfQwiGpnlH8pKDnt88gv4g/
+         PM9Q==
+X-Gm-Message-State: AOJu0YwxLiWHIz/fNoQL45J15eEvcGq4rPhBGglEQTiVdFpqHxTuLjlQ
+	6UIDEm/bcaxZ2a1OrI676TELDFKcqvgFdpNWCxj6paEAXRfCy6OCe/eXWAfq96+SfHPdgVfHhTO
+	vCEeJXuh/7Dqf62PTxhis3CcEzmZEG3lpZGYo0vKdbMCIAqkeOJzPQA==
+X-Received: by 2002:a05:600c:1ca0:b0:40e:c217:7cb with SMTP id k32-20020a05600c1ca000b0040ec21707cbmr3425wms.4.1706200844513;
+        Thu, 25 Jan 2024 08:40:44 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG9tqTmYtVQowX5zZVPD5P/lEFMCgv8Xk4wJwMNPtj+4Zxo7vT8pC9xV/prll1hJiv5GJubaQ==
+X-Received: by 2002:a05:600c:1ca0:b0:40e:c217:7cb with SMTP id k32-20020a05600c1ca000b0040ec21707cbmr3398wms.4.1706200844075;
+        Thu, 25 Jan 2024 08:40:44 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-244-75.dyn.eolo.it. [146.241.244.75])
+        by smtp.gmail.com with ESMTPSA id fm25-20020a05600c0c1900b0040e3bdff98asm3218399wmb.23.2024.01.25.08.40.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Jan 2024 08:40:43 -0800 (PST)
+Message-ID: <a50e07e46036947c873df09b6a48bc8b74547689.camel@redhat.com>
+Subject: Re: [PATCH net] selftests: net: add missing required classifier
+From: Paolo Abeni <pabeni@redhat.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Jakub
+ Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>, Maciej
+ enczykowski <maze@google.com>,  Lina Wang <lina.wang@mediatek.com>,
+ linux-kselftest@vger.kernel.org
+Date: Thu, 25 Jan 2024 17:40:42 +0100
+In-Reply-To: <CANn89iK_i+7RzgeaGQPUieU3c0ME27QeJU9UH9j-ii2TeBoEAA@mail.gmail.com>
+References: 
+	<7c3643763b331e9a400e1874fe089193c99a1c3f.1706170897.git.pabeni@redhat.com>
+	 <CANn89iKqShowy=xMi2KwthYB6gz9X5n9kcqwh_5-JBJ3-jnK+g@mail.gmail.com>
+	 <ecf42dd37e90fec22edd16f64b55189a24147b21.camel@redhat.com>
+	 <CANn89iK_i+7RzgeaGQPUieU3c0ME27QeJU9UH9j-ii2TeBoEAA@mail.gmail.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=mQINBGISiDUBEAC5uMdJicjm3ZlWQJG4u2EU1EhWUSx8IZLUTmEE8zmjPJFSYDcjtfGcbzLPb63BvX7FADmTOkO7gwtDgm501XnQaZgBUnCOUT8qv5MkKsFH20h1XJyqjPeGM55YFAXc+a4WD0YyO5M0+KhDeRLoildeRna1ey944VlZ6Inf67zMYw9vfE5XozBtytFIrRyGEWkQwkjaYhr1cGM8ia24QQVQid3P7SPkR78kJmrT32sGk+TdR4YnZzBvVaojX4AroZrrAQVdOLQWR+w4w1mONfJvahNdjq73tKv51nIpu4SAC1Zmnm3x4u9r22mbMDr0uWqDqwhsvkanYmn4umDKc1ZkBnDIbbumd40x9CKgG6ogVlLYeJa9WyfVMOHDF6f0wRjFjxVoPO6p/ZDkuEa67KCpJnXNYipLJ3MYhdKWBZw0xc3LKiKc+nMfQlo76T/qHMDfRMaMhk+L8gWc3ZlRQFG0/Pd1pdQEiRuvfM5DUXDo/YOZLV0NfRFU9SmtIPhbdm9cV8Hf8mUwubihiJB/9zPvVq8xfiVbdT0sPzBtxW0fXwrbFxYAOFvT0UC2MjlIsukjmXOUJtdZqBE3v3Jf7VnjNVj9P58+MOx9iYo8jl3fNd7biyQWdPDfYk9ncK8km4skfZQIoUVqrWqGDJjHO1W9CQLAxkfOeHrmG29PK9tHIwARAQABtB9QYW9sbyBBYmVuaSA8cGFiZW5pQHJlZGhhdC5jb20+iQJSBBMBCAA8FiEEg1AjqC77wbdLX2LbKSR5jcyPE6QFAmISiDUCGwMFCwkIBwIDIgIBBhUKCQgLAgQWAgMBAh4HAheAAAoJECkkeY3MjxOkJSYQAJcc6MTsuFxYdYZkeWjW//zbD3ApRHzpNlHLVSuJqHr9/aDS+tyszgS8jj9MiqALzgq4iZbg
+ 7ZxN9ZsDL38qVIuFkSpgMZCiUHdxBC11J8nbBSLlpnc924UAyr5XrGA99 6Wl5I4Km3128GY6iAkH54pZpOmpoUyBjcxbJWHstzmvyiXrjA2sMzYjt3Xkqp0cJfIEekOi75wnNPofEEJg28XPcFrpkMUFFvB4Aqrdc2yyR8Y36rbw18sIX3dJdomIP3dL7LoJi9mfUKOnr86Z0xltgcLPGYoCiUZMlXyWgB2IPmmcMP2jLJrusICjZxLYJJLofEjznAJSUEwB/3rlvFrSYvkKkVmfnfro5XEr5nStVTECxfy7RTtltwih85LlZEHP8eJWMUDj3P4Q9CWNgz2pWr1t68QuPHWaA+PrXyasDlcRpRXHZCOcvsKhAaCOG8TzCrutOZ5NxdfXTe3f1jVIEab7lNgr+7HiNVS+UPRzmvBc73DAyToKQBn9kC4jh9HoWyYTepjdcxnio0crmara+/HEyRZDQeOzSexf85I4dwxcdPKXv0fmLtxrN57Ae82bHuRlfeTuDG3x3vl/Bjx4O7Lb+oN2BLTmgpYq7V1WJPUwikZg8M+nvDNcsOoWGbU417PbHHn3N7yS0lLGoCCWyrK1OY0QM4EVsL3TjOfUtCNQYW9sbyBBYmVuaSA8cGFvbG8uYWJlbmlAZ21haWwuY29tPokCUgQTAQgAPBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEoitAhsDBQsJCAcCAyICAQYVCgkICwIEFgIDAQIeBwIXgAAKCRApJHmNzI8TpBzHD/45pUctaCnhee1vkQnmStAYvHmwrWwIEH1lzDMDCpJQHTUQOOJWDAZOFnE/67bxSS81Wie0OKW2jvg1ylmpBA0gPpnzIExQmfP72cQ1TBoeVColVT6Io35BINn+ymM7c0Bn8RvngSEpr3jBtqvvWXjvtnJ5/HbOVQCg62NC6ewosoKJPWpGXMJ9SKsVIOUHsmoWK60spzeiJoSmAwm3zTJQnM5kRh2q
+ iWjoCy8L35zPqR5TV+f5WR5hTVCqmLHSgm1jxwKhPg9L+GfuE4d0SWd84y GeOB3sSxlhWsuTj1K6K3MO9srD9hr0puqjO9sAizd0BJP8ucf/AACfrgmzIqZXCfVS7jJ/M+0ic+j1Si3yY8wYPEi3dvbVC0zsoGj9n1R7B7L9c3g1pZ4L9ui428vnPiMnDN3jh9OsdaXeWLvSvTylYvw9q0DEXVQTv4/OkcoMrfEkfbXbtZ3PRlAiddSZA5BDEkkm6P9KA2YAuooi1OD9d4MW8LFAeEicvHG+TPO6jtKTacdXDRe611EfRwTjBs19HmabSUfFcumL6BlVyceIoSqXFe5jOfGpbBevTZtg4kTSHqymGb6ra6sKs+/9aJiONs5NXY7iacZ55qG3Ib1cpQTps9bQILnqpwL2VTaH9TPGWwMY3Nc2VEc08zsLrXnA/yZKqZ1YzSY9MGXWYLkCDQRiEog1ARAAyXMKL+x1lDvLZVQjSUIVlaWswc0nV5y2EzBdbdZZCP3ysGC+s+n7xtq0o1wOvSvaG9h5q7sYZs+AKbuUbeZPu0bPWKoO02i00yVoSgWnEqDbyNeiSW+vI+VdiXITV83lG6pS+pAoTZlRROkpb5xo0gQ5ZeYok8MrkEmJbsPjdoKUJDBFTwrRnaDOfb+Qx1D22PlAZpdKiNtwbNZWiwEQFm6mHkIVSTUe2zSemoqYX4QQRvbmuMyPIbwbdNWlItukjHsffuPivLF/XsI1gDV67S1cVnQbBgrpFDxN62USwewXkNl+ndwa+15wgJFyq4Sd+RSMTPDzDQPFovyDfA/jxN2SK1Lizam6o+LBmvhIxwZOfdYH8bdYCoSpqcKLJVG3qVcTwbhGJr3kpRcBRz39Ml6iZhJyI3pEoX3bJTlR5Pr1Kjpx13qGydSMos94CIYWAKhegI06aTdvvuiigBwjngo/Rk5S+iEGR5KmTqGyp27o6YxZy6D4NIc6PKUzhIUxfvuHNvfu
+ sD2W1U7eyLdm/jCgticGDsRtweytsgCSYfbz0gdgUuL3EBYN3JLbAU+UZpy v/fyD4cHDWaizNy/KmOI6FFjvVh4LRCpGTGDVPHsQXaqvzUybaMb7HSfmBBzZqqfVbq9n5FqPjAgD2lJ0rkzb9XnVXHgr6bmMRlaTlBMAEQEAAYkCNgQYAQgAIBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEog1AhsMAAoJECkkeY3MjxOkY1YQAKdGjHyIdOWSjM8DPLdGJaPgJdugHZowaoyCxffilMGXqc8axBtmYjUIoXurpl+f+a7S0tQhXjGUt09zKlNXxGcebL5TEPFqgJTHN/77ayLslMTtZVYHE2FiIxkvW48yDjZUlefmphGpfpoXe4nRBNto1mMB9Pb9vR47EjNBZCtWWbwJTIEUwHP2Z5fV9nMx9Zw2BhwrfnODnzI8xRWVqk7/5R+FJvl7s3nY4F+svKGD9QHYmxfd8Gx42PZc/qkeCjUORaOf1fsYyChTtJI4iNm6iWbD9HK5LTMzwl0n0lL7CEsBsCJ97i2swm1DQiY1ZJ95G2Nz5PjNRSiymIw9/neTvUT8VJJhzRl3Nb/EmO/qeahfiG7zTpqSn2dEl+AwbcwQrbAhTPzuHIcoLZYV0xDWzAibUnn7pSrQKja+b8kHD9WF+m7dPlRVY7soqEYXylyCOXr5516upH8vVBmqweCIxXSWqPAhQq8d3hB/Ww2A0H0PBTN1REVw8pRLNApEA7C2nX6RW0XmA53PIQvAP0EAakWsqHoKZ5WdpeOcH9iVlUQhRgemQSkhfNaP9LqR1XKujlTuUTpoyT3xwAzkmSxN1nABoutHEO/N87fpIbpbZaIdinF7b9srwUvDOKsywfs5HMiUZhLKoZzCcU/AEFjQsPTATACGsWf3JYPnWxL9
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:2190:b0:46e:d5b8:e1e8 with SMTP id
- s16-20020a056638219000b0046ed5b8e1e8mr21773jaj.4.1706199808156; Thu, 25 Jan
- 2024 08:23:28 -0800 (PST)
-Date: Thu, 25 Jan 2024 08:23:28 -0800
-In-Reply-To: <000000000000169132060fc66db3@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000007b5379060fc79990@google.com>
-Subject: Re: [syzbot] [net?] [nfc?] KMSAN: uninit-value in nci_dev_up
-From: syzbot <syzbot+7ea9413ea6749baf5574@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, krzysztof.kozlowski@linaro.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
 
-syzbot has found a reproducer for the following issue on:
+On Thu, 2024-01-25 at 15:10 +0100, Eric Dumazet wrote:
+> On Thu, Jan 25, 2024 at 12:38=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> =
+wrote:
+> >=20
+> > On Thu, 2024-01-25 at 09:48 +0100, Eric Dumazet wrote:
+> > > On Thu, Jan 25, 2024 at 9:23=E2=80=AFAM Paolo Abeni <pabeni@redhat.co=
+m> wrote:
+> > > >=20
+> > > > the udpgro_fraglist self-test uses the BPF classifiers, but the
+> > > > current net self-test configuration does not include it, causing
+> > > > CI failures:
+> > > >=20
+> > > >  # selftests: net: udpgro_frglist.sh
+> > > >  # ipv6
+> > > >  # tcp - over veth touching data
+> > > >  # -l 4 -6 -D 2001:db8::1 -t rx -4 -t
+> > > >  # Error: TC classifier not found.
+> > > >  # We have an error talking to the kernel
+> > > >  # Error: TC classifier not found.
+> > > >  # We have an error talking to the kernel
+> > > >=20
+> > > > Add the missing knob.
+> > > >=20
+> > > > Fixes: edae34a3ed92 ("selftests net: add UDP GRO fraglist + bpf sel=
+f-tests")
+> > > > Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> > >=20
+> > > FYI, while looking at the gro test, I found that using strace was
+> > > making it failing as well.
+> >=20
+> > It looks like the gro.sh (large) tests send the to-be-aggregate
+> > segments individually and relay on the gro flush timeout being large
+> > enough to fit all the relevant write operations. I suspect/hope
+> > something alike:
+> >=20
+> > ---
+> > diff --git a/tools/testing/selftests/net/setup_veth.sh b/tools/testing/=
+selftests/net/setup_veth.sh
+> > index a9a1759e035c..1f78a87f6f37 100644
+> > --- a/tools/testing/selftests/net/setup_veth.sh
+> > +++ b/tools/testing/selftests/net/setup_veth.sh
+> > @@ -11,7 +11,7 @@ setup_veth_ns() {
+> >         local -r ns_mac=3D"$4"
+> >=20
+> >         [[ -e /var/run/netns/"${ns_name}" ]] || ip netns add "${ns_name=
+}"
+> > -       echo 100000 > "/sys/class/net/${ns_dev}/gro_flush_timeout"
+> > +       echo 1000000 > "/sys/class/net/${ns_dev}/gro_flush_timeout"
+> >         ip link set dev "${ns_dev}" netns "${ns_name}" mtu 65535
+> >         ip -netns "${ns_name}" link set dev "${ns_dev}" up
+> > ---
+> > should solve the sporadic issues.
+>=20
+> I think you are right.
+>=20
+> I tried multiple values, and found 600,000 was not enough in some cases.
+>=20
+> With 1,000,000, I was able to run the test (with the strace overhead)
+> 100 times without a single failure.
 
-HEAD commit:    9f8413c4a66f Merge tag 'cgroup-for-6.8' of git://git.kerne..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=12c59927e80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=656820e61b758b15
-dashboard link: https://syzkaller.appspot.com/bug?extid=7ea9413ea6749baf5574
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=153e178be80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10a6c1e3e80000
+Thank you for testing!
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/79d9f2f4b065/disk-9f8413c4.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/cbc68430d9c6/vmlinux-9f8413c4.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/9740ad9fc172/bzImage-9f8413c4.xz
+Do you prefer I'll send the formal patch or do you prefer otherwise?=20
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+7ea9413ea6749baf5574@syzkaller.appspotmail.com
+Cheers,
 
-=====================================================
-BUG: KMSAN: uninit-value in nci_init_req net/nfc/nci/core.c:177 [inline]
-BUG: KMSAN: uninit-value in __nci_request net/nfc/nci/core.c:108 [inline]
-BUG: KMSAN: uninit-value in nci_open_device net/nfc/nci/core.c:521 [inline]
-BUG: KMSAN: uninit-value in nci_dev_up+0xfec/0x1b10 net/nfc/nci/core.c:632
- nci_init_req net/nfc/nci/core.c:177 [inline]
- __nci_request net/nfc/nci/core.c:108 [inline]
- nci_open_device net/nfc/nci/core.c:521 [inline]
- nci_dev_up+0xfec/0x1b10 net/nfc/nci/core.c:632
- nfc_dev_up+0x26e/0x440 net/nfc/core.c:118
- nfc_genl_dev_up+0xfe/0x1d0 net/nfc/netlink.c:770
- genl_family_rcv_msg_doit net/netlink/genetlink.c:972 [inline]
- genl_family_rcv_msg net/netlink/genetlink.c:1052 [inline]
- genl_rcv_msg+0x11ec/0x1290 net/netlink/genetlink.c:1067
- netlink_rcv_skb+0x371/0x650 net/netlink/af_netlink.c:2545
- genl_rcv+0x40/0x60 net/netlink/genetlink.c:1076
- netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
- netlink_unicast+0xf47/0x1250 net/netlink/af_netlink.c:1368
- netlink_sendmsg+0x1238/0x13d0 net/netlink/af_netlink.c:1910
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg net/socket.c:745 [inline]
- ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
- ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
- __sys_sendmsg net/socket.c:2667 [inline]
- __do_sys_sendmsg net/socket.c:2676 [inline]
- __se_sys_sendmsg net/socket.c:2674 [inline]
- __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0x6d/0x140 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
+Paolo
 
-Uninit was stored to memory at:
- nci_core_reset_ntf_packet net/nfc/nci/ntf.c:36 [inline]
- nci_ntf_packet+0x19dc/0x39c0 net/nfc/nci/ntf.c:782
- nci_rx_work+0x213/0x500 net/nfc/nci/core.c:1522
- process_one_work kernel/workqueue.c:2633 [inline]
- process_scheduled_works+0x104e/0x1e70 kernel/workqueue.c:2706
- worker_thread+0xf45/0x1490 kernel/workqueue.c:2787
- kthread+0x3ed/0x540 kernel/kthread.c:388
- ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
-
-Uninit was created at:
- slab_post_alloc_hook+0x129/0xa70 mm/slab.h:768
- slab_alloc_node mm/slub.c:3478 [inline]
- kmem_cache_alloc_node+0x5e9/0xb10 mm/slub.c:3523
- kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:560
- __alloc_skb+0x318/0x740 net/core/skbuff.c:651
- alloc_skb include/linux/skbuff.h:1286 [inline]
- virtual_ncidev_write+0x6d/0x280 drivers/nfc/virtual_ncidev.c:120
- vfs_write+0x48b/0x1200 fs/read_write.c:588
- ksys_write+0x20f/0x4c0 fs/read_write.c:643
- __do_sys_write fs/read_write.c:655 [inline]
- __se_sys_write fs/read_write.c:652 [inline]
- __x64_sys_write+0x93/0xd0 fs/read_write.c:652
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0x6d/0x140 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-
-CPU: 1 PID: 5012 Comm: syz-executor935 Not tainted 6.7.0-syzkaller-00562-g9f8413c4a66f #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-=====================================================
-
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
 
