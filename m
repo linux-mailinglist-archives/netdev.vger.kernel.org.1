@@ -1,466 +1,200 @@
-Return-Path: <netdev+bounces-65894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37FFD83C36F
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 14:16:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A549283C38D
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 14:24:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D0091C23A6C
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 13:16:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EBB31F263BC
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 13:24:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78B2C4F613;
-	Thu, 25 Jan 2024 13:16:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C369B50A69;
+	Thu, 25 Jan 2024 13:23:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZlyFJK3U"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Q3bdEWKl"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F03250A83
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 13:16:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BE554F89A;
+	Thu, 25 Jan 2024 13:23:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706188591; cv=none; b=AUOgWnitrWmRP8rOOz8Gsg1wp3ivDf2WMHxczhB3bT68JBbOTx6FWsE/wqtxkQApEpHQaY8r+3Jv0cU3+XktPEg7uBfAuf9RV0yjXabYNH4oI1yiQYPDyEOTMePtNB+ZCRyUsN2s1ZD2f8H/1ECh2NiHN4Rx5iBmbJ1P0sXpxwY=
+	t=1706189037; cv=none; b=MygzytJ4ItdLadD4aSZ06n+ZCv/MhyHhGTVhDvj0Axx45Ds9uQzhRf/7pZTRnO9acb3metEAaPR2/nHyU7PpLVoFZKnEoxRXsZy5WwmjvOd5z7aWWMnRdIVXPW7oMtwC5dM0nnsQiN7jNwnf4WAaCqzcZd4PqMYAZ0dmzvigd6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706188591; c=relaxed/simple;
-	bh=zgcRHDVO3UcRazzTAHysZG4GG7r3Uc5shJ7cwmtOWPE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Yr3eIfUmZUshv0Nqnx/6jnc00ysp1Zx3qmTkSJ+2enlJx3SW4WKtPXOyWK/NNierPsp/7EG+4gCB/t0xKksGGDIanWVh4ts7LKA1q8IfLAwm3eCJoVX5An3NrVyT78U8xWiHyKd3jHC54KbmvaNnh9Pu56TBOy7cFwhUjjnPQIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZlyFJK3U; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706188588;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=+YvQgYm6cd0JHSMYoDmutkMgQpSXysYVuSgvth2yPP8=;
-	b=ZlyFJK3UdG01ttN9TTQvyhA2tY8BNaEj1CDgzYoqjKV1h4y2o8X9SLoFab1Mgm/+gTncQW
-	zBgVKjNE4kwcwez0OyIACiDM1L8VB8NKhfldGwkNjsoAOlisvvQyi06kVC93NGnmIYBRPt
-	FDqpB1bPNblcAl9QwBM6Y79arGTMK0o=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-658-bwRcF_xROKaRk7pvdZuumg-1; Thu,
- 25 Jan 2024 08:16:25 -0500
-X-MC-Unique: bwRcF_xROKaRk7pvdZuumg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3904A3C2B606;
-	Thu, 25 Jan 2024 13:16:25 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.224.166])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 034043C2E;
-	Thu, 25 Jan 2024 13:16:23 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [GIT PULL] Networking for v6.8-rc2
-Date: Thu, 25 Jan 2024 14:16:06 +0100
-Message-ID: <20240125131606.32850-1-pabeni@redhat.com>
+	s=arc-20240116; t=1706189037; c=relaxed/simple;
+	bh=XtQw4AFgGYzqIH/Xew9U1aJm1yzGt9kNKPGGaSBjoEM=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m3YB8zMyx6G7BvlX73NHyA9JTGxAvsWBPs0zsFw5VPGmipoqoPa1XgnZFRtRkkyUTZb7q9iIzhGfVQGv0d7CHzRBzLlqF3kEVEGM5+hf7C+Qoywpdy3W3gvM5uWyLj4/IHHHc+RHhTVZhIWpfdNXhnmspn7qTz5Io3kKPyMcoM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Q3bdEWKl; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1706189035; x=1737725035;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=XtQw4AFgGYzqIH/Xew9U1aJm1yzGt9kNKPGGaSBjoEM=;
+  b=Q3bdEWKlPzwXvXbvENGdjtWt0xCKMfgAwVIcVEUUCHbt0q//Si3NH2R5
+   mp4qCGL659W2d0aYKWfT1DhFLEDQs4b02EtDBok4+EHDw9cXOHWqllqkW
+   88OBrPM9VVFiIOiVUwvqES+YgZH1UDXT8+9OQs5En3rM5gttgR/DrYFDc
+   6G+0A3zEeiOPKYiwhMf8a1sHIXKi0pKo7w8sVwcboKO1FPfc2l345XhP5
+   iBHvTWIiUnAanGFL4nNdNIZOuli/RXzdJJnBPYkZKJ4siWGnfmH3vv/pa
+   s5pmBP14xlf0eRWNCoin6459cEWi9c8JRazHwSlhd47c6+WME2tFAW1nH
+   g==;
+X-CSE-ConnectionGUID: FhQ+gd6DRlilwd5DcEURwA==
+X-CSE-MsgGUID: LmCRtipWROiYABA1X/70Kw==
+X-IronPort-AV: E=Sophos;i="6.05,216,1701154800"; 
+   d="asc'?scan'208";a="15279352"
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Jan 2024 06:23:52 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 25 Jan 2024 06:23:38 -0700
+Received: from wendy (10.10.85.11) by chn-vm-ex04.mchp-main.com (10.10.85.152)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Frontend
+ Transport; Thu, 25 Jan 2024 06:23:35 -0700
+Date: Thu, 25 Jan 2024 13:22:57 +0000
+From: Conor Dooley <conor.dooley@microchip.com>
+To: Vladimir Oltean <olteanv@gmail.com>
+CC: Conor Dooley <conor@kernel.org>, Philippe Schenker <dev@pschenker.ch>,
+	<netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, Conor Dooley
+	<conor+dt@kernel.org>, Woojung Huh <woojung.huh@microchip.com>,
+	<linux-kernel@vger.kernel.org>, <UNGLinuxDriver@microchip.com>, Marek Vasut
+	<marex@denx.de>, Florian Fainelli <f.fainelli@gmail.com>,
+	<devicetree@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, "David S .
+ Miller" <davem@davemloft.net>, Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>, Jakub Kicinski <kuba@kernel.org>,
+	"Andrew Lunn" <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>
+Subject: Re: [PATCH net-next v1 1/2] dt-bindings: net: dsa: Add KSZ8567
+ switch support
+Message-ID: <20240125-neurotic-bouncing-82df9cfc2fa3@wendy>
+References: <20240123135014.614858-1-dev@pschenker.ch>
+ <20240123-ripening-tabby-b97785375990@spud>
+ <b2e232de11cee47a5932fccc2d151a9c7c276784.camel@pschenker.ch>
+ <20240123-atlas-dart-7e955e7e24e5@spud>
+ <979b1e77b5bb62463d52e7b9d3f9ca1415f4006a.camel@pschenker.ch>
+ <20240123-carpool-avatar-c1e51ab3cc32@spud>
+ <20240125095719.2nu3u3auwdcmouaw@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
-
-Hi Linus!
-
-Jakub is doing a lot of work to include the self-tests in our CI,
-as a result a significant amount of self-tests related fixes is
-flowing in (and will likely continue in the next few weeks).
-
-The following changes since commit 736b5545d39ca59d4332a60e56cc8a1a5e264a8e:
-
-  Merge tag 'net-6.8-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2024-01-18 17:33:50 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.8-rc2
-
-for you to fetch changes up to 0a5bd0ffe790511d802e7f40898429a89e2487df:
-
-  Merge branch 'tsnep-xdp-fixes' (2024-01-25 11:59:44 +0100)
-
-----------------------------------------------------------------
-Including fixes from bpf, netfilter and WiFi.
-
-Current release - regressions:
-
-  - bpf: fix a kernel crash for the riscv 64 JIT
-
-  - bnxt_en: fix memory leak in bnxt_hwrm_get_rings()
-
-  - revert "net: macsec: use skb_ensure_writable_head_tail to expand the skb"
-
-Previous releases - regressions:
-
-  - core: fix removing a namespace with conflicting altnames
-
-  - tc/flower: fix chain template offload memory leak
-
-  - tcp:
-    - make sure init the accept_queue's spinlocks once
-    - fix autocork on CPUs with weak memory model
-
-  - udp: fix busy polling
-
-  - mlx5e:
-    - fix out-of-bound read in port timestamping
-    - fix peer flow lists corruption
-
-  - iwlwifi: fix a memory corruption
-
-Previous releases - always broken:
-
-  - netfilter:
-    - nft_chain_filter: handle NETDEV_UNREGISTER for inet/ingress basechain
-    - nft_limit: reject configurations that cause integer overflow
-
-  - bpf: fix bpf_xdp_adjust_tail() with XSK zero-copy mbuf, avoiding
-    a NULL pointer dereference upon shrinking
-
-  - llc: make llc_ui_sendmsg() more robust against bonding changes
-
-  - smc: fix illegal rmb_desc access in SMC-D connection dump
-
-  - dpll: fix pin dump crash for rebound module
-
-  - bnxt_en: fix possible crash after creating sw mqprio TCs
-
-  - hv_netvsc: calculate correct ring size when PAGE_SIZE is not 4 Kbytes
-
-Misc:
-
-  - several self-tests fixes for better integration with the netdev CI
-
-  - added several missing modules descriptions
-
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-
-----------------------------------------------------------------
-Alexei Starovoitov (1):
-      Merge branch 'net-bpf_xdp_adjust_tail-and-intel-mbuf-fixes'
-
-Arkadiusz Kubalewski (4):
-      dpll: fix broken error path in dpll_pin_alloc(..)
-      dpll: fix pin dump crash for rebound module
-      dpll: fix userspace availability of pins
-      dpll: fix register pin with unregistered parent pin
-
-Benjamin Berg (1):
-      wifi: ath11k: rely on mac80211 debugfs handling for vif
-
-Benjamin Poirier (1):
-      selftests: bonding: Increase timeout to 1200s
-
-Bernd Edlinger (1):
-      net: stmmac: Wait a bit for the reset to take effect
-
-Breno Leitao (10):
-      net: fill in MODULE_DESCRIPTION()s for 8390
-      net: fill in MODULE_DESCRIPTION()s for Broadcom bgmac
-      net: fill in MODULE_DESCRIPTION()s for liquidio
-      net: fill in MODULE_DESCRIPTION()s for ep93xxx_eth
-      net: fill in MODULE_DESCRIPTION()s for nps_enet
-      net: fill in MODULE_DESCRIPTION()s for enetc
-      net: fill in MODULE_DESCRIPTION()s for fec
-      net: fill in MODULE_DESCRIPTION()s for fsl_pq_mdio
-      net: fill in MODULE_DESCRIPTION()s for litex
-      net: fill in MODULE_DESCRIPTION()s for rvu_mbox
-
-David S. Miller (2):
-      Merge branch 'tun-fixes'
-      Merge branch 'dpll-fixes'
-
-Dinghao Liu (1):
-      net/mlx5e: fix a potential double-free in fs_any_create_groups
-
-Emmanuel Grumbach (1):
-      wifi: iwlwifi: fix a memory corruption
-
-Eric Dumazet (2):
-      llc: make llc_ui_sendmsg() more robust against bonding changes
-      udp: fix busy polling
-
-Felix Fietkau (1):
-      wifi: mac80211: fix race condition on enabling fast-xmit
-
-Florian Westphal (3):
-      netfilter: nft_limit: reject configurations that cause integer overflow
-      netfilter: nf_tables: restrict anonymous set and map names to 16 bytes
-      netfilter: nf_tables: reject QUEUE/DROP verdict parameters
-
-George Guo (1):
-      netfilter: nf_tables: cleanup documentation
-
-Gerhard Engleder (2):
-      tsnep: Remove FCS for XDP data path
-      tsnep: Fix XDP_RING_NEED_WAKEUP for empty fill ring
-
-Hangbin Liu (1):
-      selftests: bonding: do not test arp/ns target with mode balance-alb/tlb
-
-Horatiu Vultur (1):
-      net: micrel: Fix PTP frame parsing for lan8814
-
-Ido Schimmel (1):
-      net/sched: flower: Fix chain template offload
-
-Jakub Kicinski (8):
-      Merge branch 'bnxt_en-bug-fixes'
-      net: fix removing a namespace with conflicting altnames
-      Merge tag 'wireless-2024-01-22' of git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless
-      selftests: fill in some missing configs for net
-      selftests: net: fix rps_default_mask with >32 CPUs
-      selftests: netdevsim: fix the udp_tunnel_nic test
-      Merge branch 'fix-module_description-for-net-p2'
-      Merge tag 'nf-24-01-24' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
-
-Jenishkumar Maheshbhai Patel (1):
-      net: mvpp2: clear BM pool before initialization
-
-Johannes Berg (1):
-      wifi: mac80211: fix potential sta-link leak
-
-Kalle Valo (1):
-      wifi: p54: fix GCC format truncation warning with wiphy->fw_version
-
-Kuniyuki Iwashima (2):
-      llc: Drop support for ETH_P_TR_802_2.
-      selftest: Don't reuse port for SO_INCOMING_CPU test.
-
-Leon Romanovsky (2):
-      net/mlx5e: Allow software parsing when IPsec crypto is enabled
-      net/mlx5e: Ignore IPsec replay window values on sender side
-
-Lin Ma (1):
-      vlan: skip nested type that is not IFLA_VLAN_QOS_MAPPING
-
-Lukas Bulwahn (1):
-      wifi: cfg80211/mac80211: remove dependency on non-existing option
-
-Maciej Fijalkowski (10):
-      xsk: recycle buffer in case Rx queue was full
-      xsk: make xsk_buff_pool responsible for clearing xdp_buff::flags
-      xsk: fix usage of multi-buffer BPF helpers for ZC XDP
-      ice: work on pre-XDP prog frag count
-      ice: remove redundant xdp_rxq_info registration
-      intel: xsk: initialize skb_frag_t::bv_offset in ZC drivers
-      ice: update xdp_rxq_info::frag_size for ZC enabled Rx queue
-      xdp: reflect tail increase for MEM_TYPE_XSK_BUFF_POOL
-      i40e: set xdp_rxq_info::frag_size
-      i40e: update xdp_rxq_info::frag_size for ZC enabled Rx queue
-
-Michael Chan (5):
-      bnxt_en: Wait for FLR to complete during probe
-      bnxt_en: Fix memory leak in bnxt_hwrm_get_rings()
-      bnxt_en: Fix RSS table entries calculation for P5_PLUS chips
-      bnxt_en: Prevent kernel warning when running offline self test
-      bnxt_en: Fix possible crash after creating sw mqprio TCs
-
-Michael Kelley (1):
-      hv_netvsc: Calculate correct ring size when PAGE_SIZE is not 4 Kbytes
-
-Michal Kazior (1):
-      wifi: cfg80211: fix missing interfaces when dumping
-
-Michal Schmidt (1):
-      idpf: distinguish vports by the dev_port attribute
-
-Moshe Shemesh (1):
-      net/mlx5: Bridge, fix multicast packets sent to uplink
-
-Pablo Neira Ayuso (2):
-      netfilter: nft_chain_filter: handle NETDEV_UNREGISTER for inet/ingress basechain
-      netfilter: nf_tables: validate NFPROTO_* family
-
-Paolo Abeni (3):
-      Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf
-      Merge tag 'mlx5-fixes-2024-01-24' of git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux
-      Merge branch 'tsnep-xdp-fixes'
-
-Pu Lehui (1):
-      riscv, bpf: Fix unpredictable kernel crash about RV64 struct_ops
-
-Rahul Rameshbabu (3):
-      Revert "net: macsec: use skb_ensure_writable_head_tail to expand the skb"
-      net/mlx5e: Fix operation precedence bug in port timestamping napi_poll context
-      net/mlx5: Use mlx5 device constant for selecting CQ period mode for ASO
-
-Saeed Mahameed (1):
-      net/mlx5e: Use the correct lag ports number when creating TISes
-
-Salvatore Dipietro (1):
-      tcp: Add memory barrier to tcp_push()
-
-Sharath Srinivasan (1):
-      net/rds: Fix UBSAN: array-index-out-of-bounds in rds_cmsg_recv
-
-Shenwei Wang (1):
-      net: fec: fix the unhandled context fault from smmu
-
-Tariq Toukan (2):
-      net/mlx5: Fix query of sd_group field
-      net/mlx5e: Fix inconsistent hairpin RQT sizes
-
-Tirthendu Sarkar (1):
-      i40e: handle multi-buffer packets that are shrunk by xdp prog
-
-Vlad Buslov (1):
-      net/mlx5e: Fix peer flow lists handling
-
-Wen Gu (1):
-      net/smc: fix illegal rmb_desc access in SMC-D connection dump
-
-Yevgeny Kliteynik (2):
-      net/mlx5: DR, Use the right GVMI number for drop action
-      net/mlx5: DR, Can't go to uplink vport on RX rule
-
-Yishai Hadas (1):
-      net/mlx5: Fix a WARN upon a callback command failure
-
-Yunjian Wang (2):
-      tun: fix missing dropped counter in tun_xdp_act
-      tun: add missing rx stats accounting in tun_xdp_act
-
-Zhengchao Shao (3):
-      tcp: make sure init the accept_queue's spinlocks once
-      netlink: fix potential sleeping issue in mqueue_flush_file
-      ipv6: init the accept_queue's spinlocks in inet6_create
-
-Zhipeng Lu (2):
-      net/mlx5e: fix a double-free in arfs_create_groups
-      fjes: fix memleaks in fjes_hw_setup
-
- arch/riscv/net/bpf_jit_comp64.c                    |  5 +-
- drivers/dpll/dpll_core.c                           | 68 ++++++++++++++++++----
- drivers/dpll/dpll_core.h                           |  4 +-
- drivers/dpll/dpll_netlink.c                        | 57 +++++++++++++-----
- drivers/net/ethernet/8390/8390.c                   |  1 +
- drivers/net/ethernet/8390/8390p.c                  |  1 +
- drivers/net/ethernet/8390/apne.c                   |  1 +
- drivers/net/ethernet/8390/hydra.c                  |  1 +
- drivers/net/ethernet/8390/stnic.c                  |  1 +
- drivers/net/ethernet/8390/zorro8390.c              |  1 +
- drivers/net/ethernet/broadcom/bcm4908_enet.c       |  1 +
- drivers/net/ethernet/broadcom/bgmac-bcma-mdio.c    |  1 +
- drivers/net/ethernet/broadcom/bgmac-bcma.c         |  1 +
- drivers/net/ethernet/broadcom/bgmac-platform.c     |  1 +
- drivers/net/ethernet/broadcom/bgmac.c              |  1 +
- drivers/net/ethernet/broadcom/bnxt/bnxt.c          | 49 +++++++++++-----
- drivers/net/ethernet/broadcom/bnxt/bnxt.h          |  1 +
- drivers/net/ethernet/broadcom/bnxt/bnxt_dcb.c      |  2 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c  |  7 ++-
- drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c      |  2 +-
- drivers/net/ethernet/cavium/liquidio/lio_core.c    |  1 +
- drivers/net/ethernet/cirrus/ep93xx_eth.c           |  1 +
- drivers/net/ethernet/engleder/tsnep_main.c         | 17 +++++-
- drivers/net/ethernet/ezchip/nps_enet.c             |  1 +
- drivers/net/ethernet/freescale/enetc/enetc.c       |  1 +
- drivers/net/ethernet/freescale/fec_main.c          |  3 +
- drivers/net/ethernet/freescale/fsl_pq_mdio.c       |  1 +
- drivers/net/ethernet/intel/i40e/i40e_main.c        | 47 ++++++++++-----
- drivers/net/ethernet/intel/i40e/i40e_txrx.c        | 49 ++++++++--------
- drivers/net/ethernet/intel/i40e/i40e_xsk.c         |  4 +-
- drivers/net/ethernet/intel/ice/ice_base.c          | 37 +++++++-----
- drivers/net/ethernet/intel/ice/ice_txrx.c          | 19 +++---
- drivers/net/ethernet/intel/ice/ice_txrx.h          |  1 +
- drivers/net/ethernet/intel/ice/ice_txrx_lib.h      | 31 +++++++---
- drivers/net/ethernet/intel/ice/ice_xsk.c           |  4 +-
- drivers/net/ethernet/intel/idpf/idpf_lib.c         |  2 +
- drivers/net/ethernet/litex/litex_liteeth.c         |  1 +
- drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c    | 27 ++++++++-
- drivers/net/ethernet/marvell/octeontx2/af/mbox.c   |  1 +
- drivers/net/ethernet/mellanox/mlx5/core/cmd.c      |  5 +-
- drivers/net/ethernet/mellanox/mlx5/core/en.h       |  2 +-
- .../mellanox/mlx5/core/en/fs_tt_redirect.c         |  1 +
- .../net/ethernet/mellanox/mlx5/core/en/params.c    |  4 +-
- drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c   |  2 +-
- .../ethernet/mellanox/mlx5/core/en_accel/ipsec.c   | 10 +++-
- drivers/net/ethernet/mellanox/mlx5/core/en_arfs.c  | 26 +++++----
- .../net/ethernet/mellanox/mlx5/core/en_common.c    | 21 ++++---
- drivers/net/ethernet/mellanox/mlx5/core/en_main.c  |  2 +-
- drivers/net/ethernet/mellanox/mlx5/core/en_tc.c    |  5 +-
- .../ethernet/mellanox/mlx5/core/esw/bridge_mcast.c |  3 +
- drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c   |  2 +
- .../net/ethernet/mellanox/mlx5/core/ipoib/ipoib.c  |  2 +-
- drivers/net/ethernet/mellanox/mlx5/core/lib/aso.c  |  2 +-
- .../mellanox/mlx5/core/steering/dr_action.c        | 17 ++++--
- drivers/net/ethernet/mellanox/mlx5/core/vport.c    | 21 +++++++
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |  3 +
- drivers/net/fjes/fjes_hw.c                         | 37 +++++++++---
- drivers/net/hyperv/netvsc_drv.c                    |  4 +-
- drivers/net/macsec.c                               | 25 ++++++--
- drivers/net/phy/micrel.c                           | 11 ++++
- drivers/net/tun.c                                  | 10 +++-
- drivers/net/wireless/ath/ath11k/core.h             |  4 --
- drivers/net/wireless/ath/ath11k/debugfs.c          | 25 ++++----
- drivers/net/wireless/ath/ath11k/debugfs.h          | 12 +---
- drivers/net/wireless/ath/ath11k/mac.c              | 12 +---
- drivers/net/wireless/intel/iwlwifi/iwl-dbg-tlv.c   |  4 +-
- drivers/net/wireless/intersil/p54/fwio.c           |  2 +-
- include/linux/mlx5/driver.h                        |  1 +
- include/linux/mlx5/fs.h                            |  1 +
- include/linux/mlx5/mlx5_ifc.h                      | 12 ++--
- include/linux/mlx5/vport.h                         |  1 +
- include/linux/skmsg.h                              |  6 --
- include/net/inet_connection_sock.h                 |  8 +++
- include/net/inet_sock.h                            |  5 --
- include/net/llc_pdu.h                              |  6 +-
- include/net/netfilter/nf_tables.h                  | 49 ++++++++++++----
- include/net/sch_generic.h                          |  4 ++
- include/net/sock.h                                 | 18 +++++-
- include/net/xdp_sock_drv.h                         | 27 +++++++++
- net/8021q/vlan_netlink.c                           |  4 ++
- net/core/dev.c                                     |  9 +++
- net/core/dev.h                                     |  3 +
- net/core/filter.c                                  | 44 ++++++++++++--
- net/core/request_sock.c                            |  3 -
- net/core/sock.c                                    | 11 +++-
- net/ipv4/af_inet.c                                 |  3 +
- net/ipv4/inet_connection_sock.c                    |  4 ++
- net/ipv4/tcp.c                                     |  1 +
- net/ipv6/af_inet6.c                                |  3 +
- net/llc/af_llc.c                                   | 24 +++++---
- net/llc/llc_core.c                                 |  7 ---
- net/mac80211/Kconfig                               |  1 -
- net/mac80211/sta_info.c                            |  7 ++-
- net/mac80211/tx.c                                  |  2 +-
- net/netfilter/nf_tables_api.c                      | 20 +++----
- net/netfilter/nft_chain_filter.c                   | 11 +++-
- net/netfilter/nft_compat.c                         | 12 ++++
- net/netfilter/nft_flow_offload.c                   |  5 ++
- net/netfilter/nft_limit.c                          | 23 +++++---
- net/netfilter/nft_nat.c                            |  5 ++
- net/netfilter/nft_rt.c                             |  5 ++
- net/netfilter/nft_socket.c                         |  5 ++
- net/netfilter/nft_synproxy.c                       |  7 ++-
- net/netfilter/nft_tproxy.c                         |  5 ++
- net/netfilter/nft_xfrm.c                           |  5 ++
- net/netlink/af_netlink.c                           |  2 +-
- net/rds/af_rds.c                                   |  2 +-
- net/sched/cls_api.c                                |  9 ++-
- net/sched/cls_flower.c                             | 23 ++++++++
- net/smc/smc_diag.c                                 |  2 +-
- net/wireless/Kconfig                               |  1 -
- net/wireless/nl80211.c                             |  1 +
- net/xdp/xsk.c                                      | 12 ++--
- net/xdp/xsk_buff_pool.c                            |  1 +
- .../selftests/drivers/net/bonding/bond_options.sh  |  8 +--
- .../testing/selftests/drivers/net/bonding/settings |  2 +-
- .../drivers/net/netdevsim/udp_tunnel_nic.sh        |  9 +++
- tools/testing/selftests/net/config                 | 28 +++++++++
- tools/testing/selftests/net/rps_default_mask.sh    |  6 +-
- tools/testing/selftests/net/so_incoming_cpu.c      | 68 ++++++++++++++++------
- 120 files changed, 928 insertions(+), 341 deletions(-)
-
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="RBdbisQWjGXr+kKp"
+Content-Disposition: inline
+In-Reply-To: <20240125095719.2nu3u3auwdcmouaw@skbuf>
+
+--RBdbisQWjGXr+kKp
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Jan 25, 2024 at 11:57:19AM +0200, Vladimir Oltean wrote:
+> Hi Conor,
+>=20
+> On Tue, Jan 23, 2024 at 06:37:55PM +0000, Conor Dooley wrote:
+> > On Tue, Jan 23, 2024 at 06:30:16PM +0100, Philippe Schenker wrote:
+> > > > > Hi Conor, Thanks for your message!
+> > > > >=20
+> > > > > I need the compatible to make sure the correct ID of the switch is
+> > > > > being set in the driver as well as its features.
+> > > >=20
+> > > > Are the features of this switch such that a driver for another ksz
+> > > > switch would not work (even in a limited capacity) with the 8567?
+> > > > Things like the register map changing or some feature being removed
+> > > > are
+> > > > examples of why it may not work.
+> > >=20
+> > > Yes the ksz dsa driver is made so that it checks the ID of the attach=
+ed
+> > > chip and refuses to work if it doesn't match. [1]
+> >=20
+> > That sounds counter productive to be honest. Why does the driver not
+> > trust that the dt is correct? I saw this recently in some IIO drivers,
+> > but it was shot down for this sort of reason.
+>=20
+> If the hardware provides device ID registers, what is the best practice
+> in reconciling them with the compatible string?
+>=20
+> I see 2 extreme cases. Ethernet PHY devices seem to blindly trust the
+> PHY ID from the "ethernet-phy-idXXXX.XXXX" compatible string, and phylib
+> won't read the PHY ID from the standard MDIO registers when this is prese=
+nt.
+> Whereas PCI seems to completely disregard the vendor ID and device ID
+> from the "pciXXXX,XXXX" compatible string of function OF nodes. Both
+> these subsystems have the "compatible" string optional.
+
+The software is free to do either, even if the compatible is a mandatory
+property. Which is the right thing to do varies though. In your first
+example, the compatible might be used because the standard MDIO
+registers do not provide that function for whatever reason and therefore
+cannot be read. Or there might be some shenzen market ripoff of another
+device that it claims to be in its ID registers but has some
+incompatible difference in the programming model.
+
+In general though, if a device can self identify, I would be inclined to
+value the self identification over that provided by the devicetree.
+
+My comments here were because of the default in the switch statement
+that rejects probe if the ID is unknown as it excludes the use of
+fallback compatibles.
+
+In this particular case, and maybe some historical reasons prevent this
+that I am unaware of, I would read the ID of the device and if that is
+an ID that the driver is aware of, treat that as the truth. As far as I
+can tell from my quick look, the driver does this.
+
+The first potential mismatch then is where the ID is, but does not match
+what the DT claims the device is. As I said, I'd be inclined to trust
+the self identification here, but I can at least understand rejection of
+probe. Again from a quick look, the driver seems to trust the self
+identification.
+
+If the driver don't recognise the ID then I would treat the device as if
+it is what the match data says it is, so that fallback compatibles would
+work. This is the case that this driver does not allow.
+
+> I could see an advantage in using a precise device ID in the compatible
+> string, rather than just one from which the _location_ of the device ID
+> can be deduced, because the precise compatible string allows for much
+> finer grained static analysis in the schema for the device. In case of a
+> switch, that is the number of ports, supported interface modes for each
+> port, etc. With an imprecise device ID, you don't know what you really
+> get until you boot the board.
+
+That is true, I think it is pretty desirable (although admittedly I am
+rather biased) to add specific compatibles for validation reasons even
+if the drivers make no use of them. Generally new bindings for such
+cases require a fair bit of justification, but its harder to stop the
+proliferation of existing cases, without retrofitting specific
+compatibles to the dts users (in addition to the generic one), and
+disallowing the generic compatible in isolation.
+
+> > And despite the email, I have nothing to do with these switches, I am
+> > just a sucker that signed up to review dt-bindings...
+>=20
+> Same here, just a sucker with some switches and not many clues about
+> other things :)
+
+--RBdbisQWjGXr+kKp
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZbJgsQAKCRB4tDGHoIJi
+0g40AQDGGJiI9eFtvksB9tc8NzEdF65pooUYjZujzYiwNOQE6gD/Q054FlhO3uQS
+kX6APqtvzO1BU5Eu/HPGNXZEN1sazgE=
+=1g+r
+-----END PGP SIGNATURE-----
+
+--RBdbisQWjGXr+kKp--
 
