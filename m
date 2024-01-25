@@ -1,187 +1,170 @@
-Return-Path: <netdev+bounces-66040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B86B83D0CC
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 00:38:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E7F083D102
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 00:58:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9FDAA1C23AAF
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 23:38:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7201F1C24687
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 23:58:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76865125B7;
-	Thu, 25 Jan 2024 23:38:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="amo4z3W1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2BB618EC3;
+	Thu, 25 Jan 2024 23:57:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA82F18E00
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 23:38:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B53818C38;
+	Thu, 25 Jan 2024 23:57:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706225892; cv=none; b=ElGhjAMX2jPftTRl3XRiHq9kn1j3Z6VCg4Lf02bE7FuUqh4xgs5r+IE9eTwJ301qTGEKh1KLuxSHM8DdQmbRFWVEB3gqT/ua/7sbZMlNjiNMLAam/C9KM7JMG8yNW8inZ5qsWEgAswg7s5VRlEoqo9qDk1U1UyF3ISXAgM4d9Tw=
+	t=1706227056; cv=none; b=KKWPfYuLYtEj/0rvnSEVrqYHfF1WzujPQY8L8J9BsmAzF4qr7zPbiBjkSnPB88EKPDoMtv3CyPyr98ha+TrasUPw8tkDGoMzGRChykd16obPiER0sK2D4hXSsxvs4uvrEHu9xMKqTR2yoK6VGGHO67c9gLOJ0zkBj0zCXw8CYUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706225892; c=relaxed/simple;
-	bh=rQxsIPw4ltyNyopc66d4dKSxBhDm6RQUyfXO/Es/Zu8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZSmnFanmXrx69JVKFxSjNXDRK7+ddd/m1FEOcc5+91dV2fG0auiuhkov7OXKXYlPMK6zRpHgR4FxXYW2aae+7Pw7muN5deTv7P9eXglZYJnIMmAYGFbRGpvvclj3mi5hw9xcr0ZbWw514Vk4XlCuodCqmr8FLSE4FuqOUT2V340=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com; spf=pass smtp.mailfrom=waldekranz.com; dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b=amo4z3W1; arc=none smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=waldekranz.com
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5100cb64e7dso3962866e87.0
-        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 15:38:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1706225888; x=1706830688; darn=vger.kernel.org;
-        h=mime-version:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Dwubq2bYae3KBFecFHPHMYc1hmT+c4+sZe86rg5b7U4=;
-        b=amo4z3W1T+fKuZPylGgD9xwZyla6YFnXBC+BmxCKLLKdfU3qP4K19Ev3czwHlEJ4eg
-         UFVKXwKu6qR6o0JdjBQJq2GRZ3LV3nm9/4FrsRURcgERzeR+8vkyQaLrYbwy7/CDL3a4
-         Xp+p9WhQ9GCY5IS/FmK9Fdo7b+6GYPoDQh0NN+0/dDv4Uvsu/5rIpdbP2I/FbkwhHdOn
-         eofOdOjuGyl5O9mA8s4kcWhfetB8BM2ORkb7pvC7M67AP4oxpK+7tRAq2g5qXsOIykPt
-         7oOP2B21vPtBQkGA8YyIO2DlralFa5rq+Dobyc2ch6pozYNUAqXEm5BZ6J+xHfVWBGsI
-         42ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706225888; x=1706830688;
-        h=mime-version:message-id:date:subject:cc:to:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Dwubq2bYae3KBFecFHPHMYc1hmT+c4+sZe86rg5b7U4=;
-        b=tCybmXx0f/b4VHin1H8ojgBqz5dtq4vCGXvGvJ1Ycg0JSOhaBrCQ30Uhln1hLDsaa4
-         hYFjqw+cJV3cbe/SXy7RYDEi7zIoeE8RUHEKIEg/dnatnK/2RKUcmkDTPaJGaqe/NUax
-         7O9jusYeEFaPhitIOWTzl9J8AUjVWyry5cdneU9mvNhXHeC4eTKE2p7TY0OAshiG2MKi
-         U2fUg3KSsvFkQpDZySk4SuenhX8oaKavm5Yn7zVLGo8ssE0mAQJVu6QI/joGrj8vMDwn
-         gYmjBR43qs4LBh/wxOGGVaiDcUOcLY58DfSWRkhxge8SxQfxwRzlJPwKhyvv0UHrzlNO
-         9TIg==
-X-Gm-Message-State: AOJu0YzrTgiSpXJTcNnTrXXOaH5JnbM+FcNJYIu4MXh9IGa6E34jLlJg
-	RYkua1yEnGwMr0xYq17KtreuBThtxuLfLXdAGw/k4JhVBI4lDxsxURA2SUlHwaU=
-X-Google-Smtp-Source: AGHT+IHvQiqN05UMfEGVZMojCnj+FENSv7WHyLXhRXyUIhaU0wEIYILnj/2jROtpiZTVn9a6PL5nBg==
-X-Received: by 2002:a19:384c:0:b0:510:df8:72cf with SMTP id d12-20020a19384c000000b005100df872cfmr155947lfj.175.1706225887182;
-        Thu, 25 Jan 2024 15:38:07 -0800 (PST)
-Received: from wkz-x13 (h-158-174-187-194.NA.cust.bahnhof.se. [158.174.187.194])
-        by smtp.gmail.com with ESMTPSA id v17-20020ac258f1000000b0050e7dcc05a5sm8277lfo.102.2024.01.25.15.38.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jan 2024 15:38:06 -0800 (PST)
-From: Tobias Waldekranz <tobias@waldekranz.com>
-To: jiri@resnulli.us, ivecera@redhat.com, roopa@nvidia.com,
- razor@blackwall.org, olteanv@gmail.com
-Cc: netdev@vger.kernel.org, bridge@lists.linux.dev
-Subject: net: switchdev: Port-to-Bridge Synchronization
-Date: Fri, 26 Jan 2024 00:38:05 +0100
-Message-ID: <87fryl6l2a.fsf@waldekranz.com>
+	s=arc-20240116; t=1706227056; c=relaxed/simple;
+	bh=HVwNsG4ex09BIiqCIlusj2ZhDSWkoJndoDRFh/vuS4Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H/qsBRoe31+4qgrRPXCNDhYpj7V7/NDt7DSpvupOQDv2e/vHKUHDYNXrleT0iAV8oL5XRs5VjJ120EoRgYdtGggWhepKmRTl3qoHtnxBgis8dEQMTyKCf3rPkyx/gIY/KaJBseRg7TJ8tdLOV9RW3W19wQh3AL8k7mx4+s7GmwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.96.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1rT9ax-0005RZ-26;
+	Thu, 25 Jan 2024 23:57:19 +0000
+Date: Thu, 25 Jan 2024 23:57:08 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, John Crispin <john@phrozen.org>
+Subject: Re: [PATCH net] net: dsa: mt7530: fix 10M/100M speed on MT7988 switch
+Message-ID: <ZbL1VEcH3RgHZKsq@makrotopia.org>
+References: <a5b04dfa8256d8302f402545a51ac4c626fdba25.1706071272.git.daniel@makrotopia.org>
+ <accda24c-9f12-4cfe-b532-a9c60ec97fca@arinc9.com>
+ <ZbKJv84vGXInRIo1@makrotopia.org>
+ <99a038f3-18d2-44ca-8135-1faf7a37892a@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <99a038f3-18d2-44ca-8135-1faf7a37892a@arinc9.com>
 
-Hello netdev,
+On Fri, Jan 26, 2024 at 01:44:57AM +0300, Arınç ÜNAL wrote:
+> On 25.01.2024 19:18, Daniel Golle wrote:
+> > On Thu, Jan 25, 2024 at 12:49:19PM +0300, Arınç ÜNAL wrote:
+> > > On 24/01/2024 08:17, Daniel Golle wrote:
+> > > > Setup PMCR port register for actual speed and duplex on internally
+> > > > connected PHYs of the MT7988 built-in switch. This fixes links with
+> > > > speeds other than 1000M.
+> > > > 
+> > > > Fixes: ("110c18bfed414 net: dsa: mt7530: introduce driver for MT7988 built-in switch")
+> > > > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> > > 
+> > > Acked-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+> > > 
+> > > I'm wondering why we manually set speed and duplex for these interface
+> > > modes in the first place. I don't how it works for
+> > > PHY_INTERFACE_MODE_INTERNAL but, at least for PHY_INTERFACE_MODE_TRGMII and
+> > > 802.3z interfaces, phylink should already supply proper speed and duplex.
+> > 
+> > It's true that duplex should always be set to full-duplex already by
+> > phylink. However, speed could be 2500MBit/s (2500Base-X) or 2000MBit/s
+> > (?, TRGMII) and we yet need to program the PCR like if it was
+> > 1000MBit/s.
+> > 
+> > Regarding the INTERNAL case: it was added by mistake. In case of
+> > MT7988, all ports of the switch are connected via INTERNAL links,
+> > however, the PHYs still need adjustment of the PCR register just like
+> > on all other MT753x switches and the CPU port is setup elsewhere
+> > anyway.
+> 
+> It's not necessarily PHYs needing adjustment of the port MAC control
+> register.
 
-Let me start by describing an issue that I have found in the
-bridge/switchdev replay logic, which will lead to a larger question
-about how switchdev ports are synchronized with a bridge. Anyway, on the
-bug!
+It's not the PHYs which need adjustment but the MAC PMCR register which
+does.
 
-The steps to reproduce the issue are very simple on my board, but I've
-never seen it before, so it could be that you need a pretty fast (by
-embedded standards) SMP CPU to trigger the race.
+> After reset, speed, duplex mode, etc. will be determined by polling
+> the PHY connected to the switch MAC.
 
-Hardware:
-- Marvell CN9130 SoC
-- Marvell 88E6393X Switch
+Yes, but as it is a DSA driver we don't use **hardware** PHY polling
+and keep that off. Instead, PHY interrupts or software PHY polling is
+used to have Linux determine the link properties.
+We're then forcing these properties on the MAC port of the switch.
 
-Steps:
-1. Create a bridge with multicast snooping enabled
-2. Attach an switch port to the bridge
-3. Remove the bridge
+> on the PMCR because we're also configuring switch MACs that are not
+> connected to PHYs, meaning the switch cannot determine these properties by
+> polling a PHY.
 
-If (2) is done immediately after (1), then my switch's hardware MDB will
-be left with two orphan entries after removing the bridge (3).
+The switch **never** determines these properties itself when using the
+DSA driver. It has a facility to do so, and yes, when accessing
+Ethernet in U-Boot or when using the 'swconfig'-based driver then this
+facility is used. But, I repeat, when using DSA we do not use hardware
+PHY polling. We poll (or rather: react to interrupts) in software
+instead.
 
-On a system running net-next with the switchdev tracepoint series[1]
-applied, this is what it looks like (with comm, pid, timestamp
-etc. trimmed from the trace output to make the lines a bit narrower,
-with an event number added instead):
+> 
+> From what I understand, this code block is for overriding the speed and
+> duplex variables to make the operations on the PMCR below work. It seems
+> that this is actually only useful for PHY_INTERFACE_MODE_2500BASEX.
+> PHY_INTERFACE_MODE_TRGMII is given SPEED_1000 by
+> drivers/net/phy/phylink.c:phylink_interface_max_speed().
+> PHY_INTERFACE_MODE_2500BASEX is given SPEED_2500. Overriding the duplex
+> variable looks unnecessary.
+> 
+> Your patch here doesn't affect CPU ports because MT7531 and MT7988 PMCRs
 
-root@infix-06-0b-00:~$ echo 1 >/sys/kernel/debug/tracing/events/switchdev/enable
-root@infix-06-0b-00:~$ cat /sys/kernel/debug/tracing/trace_pipe | grep HOST_MDB &
-[1] 2602
-root@infix-06-0b-00:~$ ip link add dev br0 up type bridge mcast_snooping 1 && ip link set dev x3 up master br0
-01: switchdev_defer: dev x3 PORT_OBJ_ADD HOST_MDB(flags 0x4 orig br0) vid 0 addr 33:33:ff:87:e4:3f
-02: switchdev_defer: dev x3 PORT_OBJ_ADD HOST_MDB(flags 0x4 orig br0) vid 0 addr 33:33:00:00:00:6a
-03: switchdev_call_replay: dev x3 PORT_OBJ_ADD HOST_MDB(flags 0x0 orig br0) vid 0 addr 33:33:00:00:00:6a -> 0
-04: switchdev_call_replay: dev x3 PORT_OBJ_ADD HOST_MDB(flags 0x0 orig br0) vid 0 addr 33:33:ff:87:e4:3f -> 0
-05: switchdev_call_blocking: dev x3 PORT_OBJ_ADD HOST_MDB(flags 0x4 orig br0) vid 0 addr 33:33:ff:87:e4:3f -> 0
-06: switchdev_call_blocking: dev x3 PORT_OBJ_ADD HOST_MDB(flags 0x4 orig br0) vid 0 addr 33:33:00:00:00:6a -> 0
-07: switchdev_defer: dev x3 PORT_OBJ_ADD HOST_MDB(flags 0x4 orig br0) vid 0 addr 33:33:00:00:00:fb
-08: switchdev_call_blocking: dev x3 PORT_OBJ_ADD HOST_MDB(flags 0x4 orig br0) vid 0 addr 33:33:00:00:00:fb -> 0
-root@infix-06-0b-00:~$ ip link del dev br0
-09: switchdev_call_replay: dev x3 PORT_OBJ_DEL HOST_MDB(flags 0x0 orig br0) vid 0 addr 33:33:00:00:00:fb -> 0
-10: switchdev_call_replay: dev x3 PORT_OBJ_DEL HOST_MDB(flags 0x0 orig br0) vid 0 addr 33:33:00:00:00:6a -> 0
-11: switchdev_call_replay: dev x3 PORT_OBJ_DEL HOST_MDB(flags 0x0 orig br0) vid 0 addr 33:33:ff:87:e4:3f -> 0
-root@infix-06-0b-00:~$ mvls atu
-ADDRESS             FID  STATE      Q  F  0  1  2  3  4  5  6  7  8  9  a
-DEV:0 Marvell 88E6393X
-33:33:00:00:00:6a     1  static     -  -  0  .  .  .  .  .  .  .  .  .  .
-33:33:ff:87:e4:3f     1  static     -  -  0  .  .  .  .  .  .  .  .  .  .
-ff:ff:ff:ff:ff:ff     1  static     -  -  0  1  2  3  4  5  6  7  8  9  a
-root@infix-06-0b-00:~$
+This patch does not intend to affect the CPU port. As I've already
+said in my previous reply "[...] the CPU port is setup elsewhere
+anyway."
 
-Event 01 and 02 are generated when the bridge is parsing an MLD report
-generated by the kernel to register membership in the interface's link
-local group address and the All-Snoopers group. As we are in softirq
-context, the events are placed in the deferred queue.
+Maybe it wasn't clear, but I meant that the CPU port settings are
+intentionally unaffected by this patch.
 
-More or less concurrently, the port is joining the bridge, and the DSA
-layer is sending a SWITCHDEV_BRPORT_OFFLOADED to request a replay of all
-relevant events that happened before it joined. Since we now find the
-two host entries in the bridge's MDB, we replay the events (03 and 04).
+It is intended to affect user ports which with phy-mode = "internal";
+set in DTS -- here we **do** need to set PMCR according the external
+link speed and duplex.
 
-Once the replay is done, at some later point in time, we start to
-process the deferred events and send 05 and 06 (originally 01 and 02) to
-the driver again.
 
-At this point, the DSA layer will have a recorded refcount of 2 for both
-of the groups in question, whereas the bridge only holds a single
-reference count of each membership.
+> are configured with cpu_port_config before mt753x_phylink_mac_link_up(),
+> and PHY_INTERFACE_MODE_INTERNAL is not used for MT7530 which, for MT7530,
+> PMCRs will be set only on mt753x_phylink_mac_link_up().
+> 
+> PMCR_FORCE_SPEED_1000 is set on cpu_port_config. If someone were to get rid
+> of cpu_port_config because of its utter uselessness, PMCR_FORCE_SPEED_1000
+> would not be set, causing the link between port 6 MAC and SoC MAC to break.
+> 
+> In conclusion, I will add "case SPEED_10000:" to the operations where the
+> speed and EEE bits are set on my patch for getting rid of cpu_port_config.
 
-Therefore, when we tear down the bridge, the corresponding UNOFFLOADED
-event will trigger another replay cycle, which will send a single delete
-event for each group, leaving the DSA layer's refcount at 1. This is
-confirmed by the mvls output, showing the two groups are still loaded in
-the ATU.
+PMCR needs to be set according to actual link speed for built-in TP
+PHYs. This is true for all mt7530 variants including MT7988.
 
-The end (of the bug report)
+Maybe the confusion here is that on MT7988 we use 'internal' phy-mode
+for both, the switch CPU port's link to mtk_eth_soc gmac0 as well as
+the links to the 4 built-in 1GE switch PHYs.
 
-How can we make sure that this does not happen?
+The latter were affected by wrongly overriding speed and duplex in
+case phy-mode is set to "internal", which should not have been put
+there (by me) in first place.
 
-Broadly, it seems to me like we need the bridge to signal the start and
-end of a replay sequence (via the deferred queue), which the drivers can
-then use to determine when it should start/stop accepting deferred
-messages. I think this also means that we have to guarantee that no
-new events of a particular class can be generated while we are scanning
-the database of those objects and generating replay events.
-
-Some complicating factors:
-
-- There is no single stream of events to synchronize with.
-  - Some calls are deferred for later dispatch
-  - Some are run synchronously in a blocking context
-  - Some are run synchronously in an atomic context
-
-- The rhashtable which backs the FDB is designed to be lock-free, making
-  it hard to ensure atomicity between a replay cycle and new addresses
-  being learned in the hotpath
-
-- If we take this approach, how can we make sure that most of the
-  driver-side implementation can be shared in switchdev.c, and doesn't
-  have to be reinvented by each driver?
-
-I really hope that someone can tell my why this problem is much easier
-than this!
-
-[1]: https://lore.kernel.org/netdev/20240123153707.550795-1-tobias@waldekranz.com/
+Let's just remove it, ok?
 
