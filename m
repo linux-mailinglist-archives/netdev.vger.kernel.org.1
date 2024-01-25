@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-65937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E53CC83C8A9
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 17:51:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 264CC83C8F4
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 17:59:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E3D82964A9
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 16:51:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B337D1F25420
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 16:59:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B47613DBA3;
-	Thu, 25 Jan 2024 16:44:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1920130E32;
+	Thu, 25 Jan 2024 16:48:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="vDjAXjXo"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="A8NYRUI3"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CCE813DB80
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 16:44:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CBF512FF96
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 16:48:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706201073; cv=none; b=goSG2V/VCPIGtVJ+B7ADNaAMm24QwvN6G+e8iKP7GGJlOR0vWbLeDUkQzF9+KHZ08j5ICxQ6SoNGKmtDku0Evi17op2iIYa9iP7jJ1yCweG1nbH9dLsFYz+uysnzsz8+fzuJzuAbEUlgW47XciAxp2neJmcFDHSfJvKNtS6BoEo=
+	t=1706201287; cv=none; b=ElOa30O5xB6rV99Ylix+P3MboGyNoueFvsRhTIv8Uyu265PbXnkLhVTPM9P/2vv5XKP6PE7cW3NUPBCpfVSgJ26s+ojZkZJ/G9xf9WVucxkJ24vtYJzem2FTNskPlDdD8VeZwfR8HiBCPTW7H8wmqffnITSS/Z8mosymrY/Hd0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706201073; c=relaxed/simple;
-	bh=V/FiD0FG3PIF2CE8OYwEbGQOcTZXenRcqEAoI8yNncI=;
+	s=arc-20240116; t=1706201287; c=relaxed/simple;
+	bh=Bb1fQdiBUqnIlqU/X+L06PwyDumib+a2nLsmzK/Mog0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GzDe8sp5oV/gKdQbIvb2BtOqzCRxONtZxm02vd8dLO224haZl4N5kALhZk91kt5m4oQUHLze/+RiPm2Xo+ksxSL7jawcvLb9Dclfc0aOHfoKq8CuqaC6R7JsfX3sHz8dIbVLl4zuWse0Z3ix3BFWvl1xFfKRWlh+211K/Dd+300=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=vDjAXjXo; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=e/g7s0iuAZlv7gNWYCCwqdTCJ3nbAJkyHgXweydjAgSpC+Co4H7FwmSNYRX+WYcH01QbhngAwIBYSF7EQDJ0Vyc0dPVW+sE3lTZw8oy6D6qs4oRgc1d5V2XlcIzt4b7LUXBrpkb75VLtw45izwlrOvB+FeMW6LSbfaX3CARBbkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=A8NYRUI3; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,23 +36,28 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=CatSwD4YtlSiXbd6Jq7QbblIMTQApIl1yIHb2cQxXvU=; b=vDjAXjXoeBb26UrzfFNw6EmXvF
-	LNt/StM2ea+FjsJTmE3XWHK1iqff4TYsTLVcusojioGNjcrL/DmFwC/Ee++/g8F7i9JioiecwzkEx
-	njBPb5wUKO38qN5r0N6F0WwxsBeRyOmnITWntsnYopcnsEaHsfBex/toFoM7yTjnDrGQ=;
+	bh=Brtm+X/hPzncxyQIojg0OUi8pFhxYzTJe+3ddjp2XmE=; b=A8NYRUI39YdzMH9pdsr99ygVSB
+	oaAkxDkTi3L+nmIf1a6Nqq+vwIzBBCPFxwwD3MdLzM1Tpzxspyq9qUAEH/o3Kq2oSbqZPQE5JQciO
+	B9HzL2plMrw0L1J6ZeB2aeACdKmIjhM5ChJa3F5euEtFW4uNiQUpPCYhJCIGCBsnm+bA=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rT2pw-0066Jo-7B; Thu, 25 Jan 2024 17:44:20 +0100
-Date: Thu, 25 Jan 2024 17:44:20 +0100
+	id 1rT2tM-0066OD-LT; Thu, 25 Jan 2024 17:47:52 +0100
+Date: Thu, 25 Jan 2024 17:47:52 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, linux@armlinux.org.uk, horms@kernel.org,
-	netdev@vger.kernel.org, mengyuanlou@net-swift.com
-Subject: Re: [PATCH net-next v3 2/2] net: txgbe: use irq_domain for interrupt
- controller
-Message-ID: <d077ffb4-ab5d-47c1-875d-bb73744bcb17@lunn.ch>
-References: <20240124024525.26652-1-jiawenwu@trustnetic.com>
- <20240124024525.26652-3-jiawenwu@trustnetic.com>
+To: Kurt Kanzenbach <kurt@linutronix.de>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Subject: Re: [PATCH v1 iwl-next] igc: Add support for LEDs on i225/i226
+Message-ID: <2caec578-a268-4e82-95df-9573a52d6b7b@lunn.ch>
+References: <20240124082408.49138-1-kurt@linutronix.de>
+ <de659af0-807f-4176-a7c2-d8013d445f9e@lunn.ch>
+ <87ede5eumt.fsf@kurt.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,20 +66,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240124024525.26652-3-jiawenwu@trustnetic.com>
+In-Reply-To: <87ede5eumt.fsf@kurt.kurt.home>
 
-On Wed, Jan 24, 2024 at 10:45:25AM +0800, Jiawen Wu wrote:
-> In the current interrupt controller, the MAC interrupt acts as the
-> parent interrupt in the GPIO IRQ chip. But when the number of Rx/Tx
-> ring changes, the PCI IRQ vector needs to be reallocated. Then this
-> interrupt controller would be corrupted. So use irq_domain structure
-> to avoid the above problem.
+On Thu, Jan 25, 2024 at 08:31:54AM +0100, Kurt Kanzenbach wrote:
+> On Wed Jan 24 2024, Andrew Lunn wrote:
+> > On Wed, Jan 24, 2024 at 09:24:08AM +0100, Kurt Kanzenbach wrote:
+> >> Add support for LEDs on i225/i226. The LEDs can be controlled via sysfs
+> >> from user space using the netdev trigger. The LEDs are named as
+> >> igc-<bus><device>-<led> to be easily identified.
+> >> 
+> >> Offloading activity and link speed is supported. Tested on Intel i225.
+> >
+> > Nice to see something not driver by phylib/DSA making use of LEDs.
+> >
+> > Is there no plain on/off support? Ideally we want that for software
+> > blinking for when a mode is not supported.
 > 
-> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+> Plain on and off is supported is supported, too. Should be possible to
+> implement brightness_set().
 
-Apart from the TRUE vs true, this looks O.K. to me.
+Great.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Its actually better to first implement brightness_set(). That gives
+you full support for everything the netdev trigger has. Then add
+offload, which is optional, and will fall back to software for modes
+which cannot be offloaded.
 
-    Andrew
+      Andrew
 
