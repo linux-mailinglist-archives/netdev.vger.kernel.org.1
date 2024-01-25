@@ -1,183 +1,795 @@
-Return-Path: <netdev+bounces-65697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5869183B620
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 01:38:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89E5783B621
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 01:39:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC44FB22428
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 00:38:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA0D5B22822
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 00:39:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5058962B;
-	Thu, 25 Jan 2024 00:38:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AE7C65F;
+	Thu, 25 Jan 2024 00:39:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="q+KPlNZ1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xiYHdRFY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD585C9A
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 00:38:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECEC462B
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 00:39:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706143122; cv=none; b=ILOT2k+eAZELEVsU0CQ7s5mzfVEfkrLD7xEJID1acZyk3hwo+bGh4W3Cj27Tq+vzde5aQArQgbha9OEk9r1VQ5xKeMpaNTRq0FiJtWHu0O4Jf+ih99n769UYKsFEapPiO6LFV+nEMq7MTpxkDxoRkMJ/90nWfROFtTYZakKpW3s=
+	t=1706143146; cv=none; b=mCH0MgwfAwPElvk8W9vifPDer1kMkKFYPVz4FttEmdboN3qX0DfiB4oGIyD9f2QlNE39TyeudHcGCX+fZYlZLiYwXCgSoyHzstwAzgl1Vn1V3KkkGEgzZmn4j+POftBulh/aDSLr8js/hM2y78bPiW5I0VaMe+oR71cYHRqI124=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706143122; c=relaxed/simple;
-	bh=UXLqFLPksc8TBX/fRVryVJZhDzQr4mi4A1tE1ruVOXw=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Content-Type; b=MDbSvXhf9r7ymZjjtmrxY13NedCwWXdCyXOhHVR0vkep+wV3OtBKXQybdHhhBqnu8Ji7HycM9o8VtGXeTWgX4tJp6PII2ahlSHR8fKzkXW8Fg/npPh72JqNybE+2dOx+TXKveoZ/il6FgMx71MX/FjHZ7G3lUOg0gJr5nOW5fFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aahila.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=q+KPlNZ1; arc=none smtp.client-ip=209.85.210.202
+	s=arc-20240116; t=1706143146; c=relaxed/simple;
+	bh=C4R+JBwCm8dOyrO3GPSZ78gsgcQgtXLxC1fmPUmqVXc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=U4ZiKO/e4ragpimWSyWyjdzHkCgH1ASOjHK+GPh7CHWFiIedvd2DBKFz4JYfcQhIEfQMuw83JpIoqrDsdIT20JiW6Pe1B6LL+n2Drl8i3nlC/WqJFCvrM2lzaJimcEXlB6aLXSg+snZO1jg2u7OXVNwDVBPeifkpIENHTmmRN0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xiYHdRFY; arc=none smtp.client-ip=209.85.128.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aahila.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6ddcf5f19b1so11693b3a.3
-        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 16:38:40 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-5ff9adbf216so52291647b3.1
+        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 16:39:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706143120; x=1706747920; darn=vger.kernel.org;
-        h=to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=qn8BdPFqvNPf3y3XhmI+SBitz5j0kIGn7Bzsh51rVlY=;
-        b=q+KPlNZ1MZXhnXm5hTYk0cIfz2cPAnNd82XquMh+Gg9MhCHJ4L1EFf85v5XZBf3Jc4
-         7Anl6kKF5qCtY3RlgcvezLN/azbI9NmM8GKonzFek05UXHC8KnU5hzQ/poIhWS6jARXj
-         RNTAy0042UCCtooXrO6CcH5P3l0CNHMuIYxZcm5IfYAWLc8q8J9wOAPCY2pRu1n/jR1b
-         6HyENu3a3U7u/G0M9EkFnjsrPrA2MLjXYXT59Us1kY+u4cfSvuXICsaaZfPUyG7alEUU
-         i/tUP9HwXtOp97t1Lc82W44gxMCYGcngem1IkJ/sDQBlZJDhsxWf8x3+0dP7bFq0d//O
-         +TXQ==
+        d=google.com; s=20230601; t=1706143143; x=1706747943; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gM+/EW1tvI/cJKvx9Xvw7jwGwaR4XOJ0Ec4GFxAPe/0=;
+        b=xiYHdRFYQ6TDgUe0bztIZ7Mf+zqkhfQ9VuY5G5WCHh3oFXoCA2Q7DLgscoD1QCS7DI
+         bwt1BTbxRdknzxmbcrH9TiGC4c9I0ABXcP2/03M+iBIFMiPlZoF7G5+/93bM8NEjzyGn
+         H28xFN0hE4cnAtJPTsTdwlkjOL9EVZQIzzu4mFBQot/Bri7yl6dLBa9N/JF/b9rba8BD
+         MrcpNjGbxUN/bapOe++tIt7fEYVYjk2NUMT7bJh093n69rxZmXoMq9O61dsheYwp9PaY
+         EzD676qBfvq/hDyDehvxrcn4JBHEB9IsUe0uLr2CmBkGd/esmBikV7JebmG58UrLoLX0
+         +RBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706143120; x=1706747920;
-        h=to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qn8BdPFqvNPf3y3XhmI+SBitz5j0kIGn7Bzsh51rVlY=;
-        b=qjqOkvec5XgAYMornydF3Diea4VOsethgmd+PGjDwdDWBCApluAQyV5Zn0UD2Uk5Mz
-         RCljoDNCFxOoKmcf7EgT9M7OJC2Ksb9m+zftxD5kiZnwWS8HwpBOfDUIhMEtqb4+0b7i
-         pP3wPfhADnEarOxJutElFwHdbGQO/yVMFjec9lALSJBD+b36ua7Ix4xYV5MPm1tMkhfV
-         fZDR/xdsz2UDvYUCf4S0d2FNYmCBeEMr3mLoEcYCJE0qLWsYjQR1vp2Xe3RNRSJC+idU
-         7ZvU8hamzTTXAauBjlWGmw5ZIIHsb1GPx0j+26UyRDQlOR/tAwYQfC4g1K5yB7CKsk5t
-         GHdw==
-X-Gm-Message-State: AOJu0YxAGeitU2Rduzmo3pEpXi6P8IlyxRpk4SaiSY5nwOfcQuvYMkST
-	m0xjZUMtD09yxeWpWQk9NfMyZFamEYsY85BA1ob17TB5DF1BUGyrNgZF4LDCnkxFWjX8om8Rh9B
-	QbA==
-X-Google-Smtp-Source: AGHT+IFa8Yq0GOgKUEbFmsa3YIW/J5CoVPcUUnAXHVJbLjsY5ctlLjWC3/Y4MB07S0ZXLnxh8t0tgnNqgsI=
-X-Received: from aahila.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2f3])
- (user=aahila job=sendgmr) by 2002:a05:6a00:190d:b0:6dd:8444:d141 with SMTP id
- y13-20020a056a00190d00b006dd8444d141mr6837pfi.4.1706143120068; Wed, 24 Jan
- 2024 16:38:40 -0800 (PST)
-Date: Thu, 25 Jan 2024 00:38:16 +0000
+        d=1e100.net; s=20230601; t=1706143143; x=1706747943;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gM+/EW1tvI/cJKvx9Xvw7jwGwaR4XOJ0Ec4GFxAPe/0=;
+        b=vbwMGBpJnhC5QBQS5MBJCT/VCZ/9MLR92ttEYEXjL0bBD59KRd55ZcfndcgQnI1q3I
+         ZYiqN6ztcgFieJOrerPtFEZPdnah1FfkQNEOSCmd7xSp58fgpyjsvtFaMi6SbmJu4N6v
+         nuJyZ2L2rNHmcYuEaJW0/YVBG5DPG2h/zgoPtNlIINfcJHhfmtvdU+smBOpvgA+2T5Co
+         pWNyZcjN7/1hAF9tKxbdQiRsg6FOnn3ylCZUONPcNvrwv+r/0xnu0evSfP8fWFV1Tczg
+         vcKsLBbqS3VF93bNzBrJx8evQHL/9H7p8pFYq2VqLa9Hn/Jei1aIDNS9Ct2R7DJ1fAsP
+         iWIw==
+X-Gm-Message-State: AOJu0Yy8rxlzOdXMQxXdiF92XsiESR+OPtxTRnyAjFzRH+hDxmbmVN5c
+	YOe5kCNWWW7kjCp86nT/9/X6HzgMQQSLFt45K3SXvhYJRYVuovW1dc8/UVKK9NX1785C9rKPMqC
+	Nb5iQKpjUZIO0+yY2foostl4uXdZ+REVLRZgC
+X-Google-Smtp-Source: AGHT+IH6XIoWzgSXXj3oIBMBwL9MYZ9wvTsfQto95obbDMzJxafAPrDDiHgIDmuCRVKinDnDLOPxSjsZcpn6OwKbt/8=
+X-Received: by 2002:a05:690c:f89:b0:602:9c74:2285 with SMTP id
+ df9-20020a05690c0f8900b006029c742285mr15980ywb.29.1706143142746; Wed, 24 Jan
+ 2024 16:39:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
-Message-ID: <20240125003816.1403636-1-aahila@google.com>
-Subject: [PATCH] ip/bond: add coupled_control support
+MIME-Version: 1.0
+References: <20240123235130.1982654-1-aahila@google.com> <4577.1706076998@famine>
+ <CAGfWUPwsh3xFK6JvT9p07eXD2j1V=B=kVNfPOWJj6L4SXyeyDA@mail.gmail.com> <7770.1706120209@famine>
+In-Reply-To: <7770.1706120209@famine>
 From: Aahil Awatramani <aahila@google.com>
-To: Aahil Awatramani <aahila@google.com>, Mahesh Bandewar <maheshb@google.com>, 
-	David Dillow <dillow@google.com>, Jay Vosburgh <j.vosburgh@gmail.com>, 
-	David Ahern <dsahern@gmail.com>, Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
+Date: Wed, 24 Jan 2024 16:38:51 -0800
+Message-ID: <CAGfWUPzBP_jNxrHeTmmKw0LCCJxuV9MELoKUGCwP648gGE0PQA@mail.gmail.com>
+Subject: Re: [PATCH net-next v5] bonding: Add independent control state machine
+To: Jay Vosburgh <jay.vosburgh@canonical.com>
+Cc: David Dillow <dave@thedillows.org>, Mahesh Bandewar <maheshb@google.com>, 
+	Hangbin Liu <liuhangbin@gmail.com>, Andy Gospodarek <andy@greyhouse.net>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Martin KaFai Lau <martin.lau@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-coupled_control specifies whether the LACP state machine's MUX in the
-802.3ad mode should have separate Collecting and Distributing states per
-IEEE 802.1AX-2008 5.4.15 for coupled and independent control state.
+>         Could you post it now?  They're logically parts of a single
+> feature, so should go together.  As a practical matter, though, it's
+> easier to test this patch with the iproute patch available.
 
-By default this setting is on and does not separate the Collecting and
-Distributing states, maintaining the bond in coupled control. If set off,
-will toggle independent control state machine which will seperate
-Collecting and Distributing states.
+Sure, I have uploaded the patch for review, and also cc'd you on the email.
+I also realised that I haven't appended coupled_control to procfs.
+Will add that change in v6.
 
-Signed-off-by: Aahil Awatramani <aahila@google.com>
----
- include/uapi/linux/if_link.h |  1 +
- ip/iplink_bond.c             | 26 +++++++++++++++++++++++++-
- 2 files changed, 26 insertions(+), 1 deletion(-)
-
-diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-index d17271fb..ff4ceeaf 100644
---- a/include/uapi/linux/if_link.h
-+++ b/include/uapi/linux/if_link.h
-@@ -1503,6 +1503,7 @@ enum {
- 	IFLA_BOND_AD_LACP_ACTIVE,
- 	IFLA_BOND_MISSED_MAX,
- 	IFLA_BOND_NS_IP6_TARGET,
-+	IFLA_BOND_COUPLED_CONTROL,
- 	__IFLA_BOND_MAX,
- };
- 
-diff --git a/ip/iplink_bond.c b/ip/iplink_bond.c
-index 214244da..68bc157a 100644
---- a/ip/iplink_bond.c
-+++ b/ip/iplink_bond.c
-@@ -87,6 +87,12 @@ static const char *lacp_rate_tbl[] = {
- 	NULL,
- };
- 
-+static const char *coupled_control_tbl[] = {
-+	"off",
-+	"on",
-+	NULL,
-+};
-+
- static const char *ad_select_tbl[] = {
- 	"stable",
- 	"bandwidth",
-@@ -148,6 +154,7 @@ static void print_explain(FILE *f)
- 		"                [ tlb_dynamic_lb TLB_DYNAMIC_LB ]\n"
- 		"                [ lacp_rate LACP_RATE ]\n"
- 		"                [ lacp_active LACP_ACTIVE]\n"
-+		"                [ coupled_control COUPLED_CONTROL]\n"
- 		"                [ ad_select AD_SELECT ]\n"
- 		"                [ ad_user_port_key PORTKEY ]\n"
- 		"                [ ad_actor_sys_prio SYSPRIO ]\n"
-@@ -162,6 +169,7 @@ static void print_explain(FILE *f)
- 		"XMIT_HASH_POLICY := layer2|layer2+3|layer3+4|encap2+3|encap3+4|vlan+srcmac\n"
- 		"LACP_ACTIVE := off|on\n"
- 		"LACP_RATE := slow|fast\n"
-+		"COUPLED_CONTROL := on|off\n"
- 		"AD_SELECT := stable|bandwidth|count\n"
- 	);
- }
-@@ -176,7 +184,7 @@ static int bond_parse_opt(struct link_util *lu, int argc, char **argv,
- {
- 	__u8 mode, use_carrier, primary_reselect, fail_over_mac;
- 	__u8 xmit_hash_policy, num_peer_notif, all_slaves_active;
--	__u8 lacp_active, lacp_rate, ad_select, tlb_dynamic_lb;
-+	__u8 lacp_active, lacp_rate, ad_select, tlb_dynamic_lb, coupled_control;
- 	__u16 ad_user_port_key, ad_actor_sys_prio;
- 	__u32 miimon, updelay, downdelay, peer_notify_delay, arp_interval, arp_validate;
- 	__u32 arp_all_targets, resend_igmp, min_links, lp_interval;
-@@ -367,6 +375,13 @@ static int bond_parse_opt(struct link_util *lu, int argc, char **argv,
- 
- 			lacp_active = get_index(lacp_active_tbl, *argv);
- 			addattr8(n, 1024, IFLA_BOND_AD_LACP_ACTIVE, lacp_active);
-+		} else if (strcmp(*argv, "coupled_control") == 0) {
-+			NEXT_ARG();
-+			if (get_index(coupled_control_tbl, *argv) < 0)
-+				invarg("invalid coupled_control", *argv);
-+
-+			coupled_control = get_index(coupled_control_tbl, *argv);
-+			addattr8(n, 1024, IFLA_BOND_COUPLED_CONTROL, coupled_control);
- 		} else if (matches(*argv, "ad_select") == 0) {
- 			NEXT_ARG();
- 			if (get_index(ad_select_tbl, *argv) < 0)
-@@ -659,6 +674,15 @@ static void bond_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- 			     lacp_rate);
- 	}
- 
-+	if (tb[IFLA_BOND_COUPLED_CONTROL]) {
-+		const char *coupled_control = get_name(coupled_control_tbl,
-+						   rta_getattr_u8(tb[IFLA_BOND_COUPLED_CONTROL]));
-+		print_string(PRINT_ANY,
-+			     "coupled_control",
-+			     "coupled_control %s ",
-+			     coupled_control);
-+	}
-+
- 	if (tb[IFLA_BOND_AD_SELECT]) {
- 		const char *ad_select = get_name(ad_select_tbl,
- 						 rta_getattr_u8(tb[IFLA_BOND_AD_SELECT]));
--- 
-2.43.0.429.g432eaa2c6b-goog
-
+On Wed, Jan 24, 2024 at 10:16=E2=80=AFAM Jay Vosburgh
+<jay.vosburgh@canonical.com> wrote:
+>
+> Aahil Awatramani <aahila@google.com> wrote:
+>
+> >>         Do you have a corresponding iproute2 patch to enable changing
+> >> the coupled_control option?
+> >
+> >I do have the corresponding patch for iproute2 to enable changing
+> >coupled_control, I planned to push that patch for review directly
+> >after this one.
+>
+>         Could you post it now?  They're logically parts of a single
+> feature, so should go together.  As a practical matter, though, it's
+> easier to test this patch with the iproute patch available.
+>
+>         -J
+>
+> >
+> >On Tue, Jan 23, 2024 at 10:16=E2=80=AFPM Jay Vosburgh
+> ><jay.vosburgh@canonical.com> wrote:
+> >>
+> >> Aahil Awatramani <aahila@google.com> wrote:
+> >>
+> >> >Add support for the independent control state machine per IEEE
+> >> >802.1AX-2008 5.4.15 in addition to the existing implementation of the
+> >> >coupled control state machine.
+> >> >
+> >> >Introduces two new states, AD_MUX_COLLECTING and AD_MUX_DISTRIBUTING =
+in
+> >> >the LACP MUX state machine for separated handling of an initial
+> >> >Collecting state before the Collecting and Distributing state. This
+> >> >enables a port to be in a state where it can receive incoming packets
+> >> >while not still distributing. This is useful for reducing packet loss=
+ when
+> >> >a port begins distributing before its partner is able to collect.
+> >> >
+> >> >Added new functions such as bond_set_slave_tx_disabled_flags and
+> >> >bond_set_slave_rx_enabled_flags to precisely manage the port's collec=
+ting
+> >> >and distributing states. Previously, there was no dedicated method to
+> >> >disable TX while keeping RX enabled, which this patch addresses.
+> >> >
+> >> >Note that the regular flow process in the kernel's bonding driver rem=
+ains
+> >> >unaffected by this patch. The extension requires explicit opt-in by t=
+he
+> >> >user (in order to ensure no disruptions for existing setups) via netl=
+ink
+> >> >support using the new bonding parameter coupled_control. The default =
+value
+> >> >for coupled_control is set to 1 so as to preserve existing behaviour.
+> >>
+> >>         Do you have a corresponding iproute2 patch to enable changing
+> >> the coupled_control option?
+> >>
+> >>         -J
+> >>
+> >> >Signed-off-by: Aahil Awatramani <aahila@google.com>
+> >> >
+> >> >v5:
+> >> >  Merge documentation patch with changes patch
+> >> >  Add version history in comment description
+> >> >v4:
+> >> >  Remove inline references from c source files
+> >> >v3:
+> >> >  Edited commit description
+> >> >  Edited documentation description
+> >> >  Changed function names
+> >> >  Only allow coupled_control change when the bond is down
+> >> >v2:
+> >> >  Removed sysfs changes
+> >> >  Added documentation for new paramater
+> >> >  Renamed parameter to coupled_control
+> >> >  Update bond_set_slave_inactive_flags() with a 8023ad check
+> >> >
+> >> >---
+> >> > Documentation/networking/bonding.rst |  12 ++
+> >> > drivers/net/bonding/bond_3ad.c       | 157 +++++++++++++++++++++++++=
+--
+> >> > drivers/net/bonding/bond_main.c      |   1 +
+> >> > drivers/net/bonding/bond_netlink.c   |  16 +++
+> >> > drivers/net/bonding/bond_options.c   |  28 ++++-
+> >> > include/net/bond_3ad.h               |   2 +
+> >> > include/net/bond_options.h           |   1 +
+> >> > include/net/bonding.h                |  23 ++++
+> >> > include/uapi/linux/if_link.h         |   1 +
+> >> > tools/include/uapi/linux/if_link.h   |   1 +
+> >> > 10 files changed, 234 insertions(+), 8 deletions(-)
+> >> >
+> >> >diff --git a/Documentation/networking/bonding.rst b/Documentation/net=
+working/bonding.rst
+> >> >index f7a73421eb76..e774b48de9f5 100644
+> >> >--- a/Documentation/networking/bonding.rst
+> >> >+++ b/Documentation/networking/bonding.rst
+> >> >@@ -444,6 +444,18 @@ arp_missed_max
+> >> >
+> >> >       The default value is 2, and the allowable range is 1 - 255.
+> >> >
+> >> >+coupled_control
+> >> >+
+> >> >+    Specifies whether the LACP state machine's MUX in the 802.3ad mo=
+de
+> >> >+    should have separate Collecting and Distributing states.
+> >> >+
+> >> >+    This is by implementing the independent control state machine pe=
+r
+> >> >+    IEEE 802.1AX-2008 5.4.15 in addition to the existing coupled con=
+trol
+> >> >+    state machine.
+> >> >+
+> >> >+    The default value is 1. This setting does not separate the Colle=
+cting
+> >> >+    and Distributing states, maintaining the bond in coupled control=
+.
+> >> >+
+> >> > downdelay
+> >> >
+> >> >       Specifies the time, in milliseconds, to wait before disabling
+> >> >diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bon=
+d_3ad.c
+> >> >index c99ffe6c683a..f2942e8c6c91 100644
+> >> >--- a/drivers/net/bonding/bond_3ad.c
+> >> >+++ b/drivers/net/bonding/bond_3ad.c
+> >> >@@ -106,6 +106,9 @@ static void ad_agg_selection_logic(struct aggrega=
+tor *aggregator,
+> >> > static void ad_clear_agg(struct aggregator *aggregator);
+> >> > static void ad_initialize_agg(struct aggregator *aggregator);
+> >> > static void ad_initialize_port(struct port *port, int lacp_fast);
+> >> >+static void ad_enable_collecting(struct port *port);
+> >> >+static void ad_disable_distributing(struct port *port,
+> >> >+                                  bool *update_slave_arr);
+> >> > static void ad_enable_collecting_distributing(struct port *port,
+> >> >                                             bool *update_slave_arr);
+> >> > static void ad_disable_collecting_distributing(struct port *port,
+> >> >@@ -171,9 +174,38 @@ static inline int __agg_has_partner(struct aggre=
+gator *agg)
+> >> >       return !is_zero_ether_addr(agg->partner_system.mac_addr_value)=
+;
+> >> > }
+> >> >
+> >> >+/**
+> >> >+ * __disable_distributing_port - disable the port's slave for distri=
+buting.
+> >> >+ * Port will still be able to collect.
+> >> >+ * @port: the port we're looking at
+> >> >+ *
+> >> >+ * This will disable only distributing on the port's slave.
+> >> >+ */
+> >> >+static void __disable_distributing_port(struct port *port)
+> >> >+{
+> >> >+      bond_set_slave_tx_disabled_flags(port->slave, BOND_SLAVE_NOTIF=
+Y_LATER);
+> >> >+}
+> >> >+
+> >> >+/**
+> >> >+ * __enable_collecting_port - enable the port's slave for collecting=
+,
+> >> >+ * if it's up
+> >> >+ * @port: the port we're looking at
+> >> >+ *
+> >> >+ * This will enable only collecting on the port's slave.
+> >> >+ */
+> >> >+static void __enable_collecting_port(struct port *port)
+> >> >+{
+> >> >+      struct slave *slave =3D port->slave;
+> >> >+
+> >> >+      if (slave->link =3D=3D BOND_LINK_UP && bond_slave_is_up(slave)=
+)
+> >> >+              bond_set_slave_rx_enabled_flags(slave, BOND_SLAVE_NOTI=
+FY_LATER);
+> >> >+}
+> >> >+
+> >> > /**
+> >> >  * __disable_port - disable the port's slave
+> >> >  * @port: the port we're looking at
+> >> >+ *
+> >> >+ * This will disable both collecting and distributing on the port's =
+slave.
+> >> >  */
+> >> > static inline void __disable_port(struct port *port)
+> >> > {
+> >> >@@ -183,6 +215,8 @@ static inline void __disable_port(struct port *po=
+rt)
+> >> > /**
+> >> >  * __enable_port - enable the port's slave, if it's up
+> >> >  * @port: the port we're looking at
+> >> >+ *
+> >> >+ * This will enable both collecting and distributing on the port's s=
+lave.
+> >> >  */
+> >> > static inline void __enable_port(struct port *port)
+> >> > {
+> >> >@@ -193,10 +227,27 @@ static inline void __enable_port(struct port *p=
+ort)
+> >> > }
+> >> >
+> >> > /**
+> >> >- * __port_is_enabled - check if the port's slave is in active state
+> >> >+ * __port_move_to_attached_state - check if port should transition b=
+ack to attached
+> >> >+ * state.
+> >> >+ * @port: the port we're looking at
+> >> >+ */
+> >> >+static bool __port_move_to_attached_state(struct port *port)
+> >> >+{
+> >> >+      if (!(port->sm_vars & AD_PORT_SELECTED) ||
+> >> >+          (port->sm_vars & AD_PORT_STANDBY) ||
+> >> >+          !(port->partner_oper.port_state & LACP_STATE_SYNCHRONIZATI=
+ON) ||
+> >> >+          !(port->actor_oper_port_state & LACP_STATE_SYNCHRONIZATION=
+))
+> >> >+              port->sm_mux_state =3D AD_MUX_ATTACHED;
+> >> >+
+> >> >+      return port->sm_mux_state =3D=3D AD_MUX_ATTACHED;
+> >> >+}
+> >> >+
+> >> >+/**
+> >> >+ * __port_is_collecting_distributing - check if the port's slave is =
+in the
+> >> >+ * combined collecting/distributing state
+> >> >  * @port: the port we're looking at
+> >> >  */
+> >> >-static inline int __port_is_enabled(struct port *port)
+> >> >+static int __port_is_collecting_distributing(struct port *port)
+> >> > {
+> >> >       return bond_is_active_slave(port->slave);
+> >> > }
+> >> >@@ -942,6 +993,7 @@ static int ad_marker_send(struct port *port, stru=
+ct bond_marker *marker)
+> >> >  */
+> >> > static void ad_mux_machine(struct port *port, bool *update_slave_arr=
+)
+> >> > {
+> >> >+      struct bonding *bond =3D __get_bond_by_port(port);
+> >> >       mux_states_t last_state;
+> >> >
+> >> >       /* keep current State Machine state to compare later if it was
+> >> >@@ -999,9 +1051,13 @@ static void ad_mux_machine(struct port *port, b=
+ool *update_slave_arr)
+> >> >                       if ((port->sm_vars & AD_PORT_SELECTED) &&
+> >> >                           (port->partner_oper.port_state & LACP_STAT=
+E_SYNCHRONIZATION) &&
+> >> >                           !__check_agg_selection_timer(port)) {
+> >> >-                              if (port->aggregator->is_active)
+> >> >-                                      port->sm_mux_state =3D
+> >> >-                                          AD_MUX_COLLECTING_DISTRIBU=
+TING;
+> >> >+                              if (port->aggregator->is_active) {
+> >> >+                                      int state =3D AD_MUX_COLLECTIN=
+G_DISTRIBUTING;
+> >> >+
+> >> >+                                      if (!bond->params.coupled_cont=
+rol)
+> >> >+                                              state =3D AD_MUX_COLLE=
+CTING;
+> >> >+                                      port->sm_mux_state =3D state;
+> >> >+                              }
+> >> >                       } else if (!(port->sm_vars & AD_PORT_SELECTED)=
+ ||
+> >> >                                  (port->sm_vars & AD_PORT_STANDBY)) =
+{
+> >> >                               /* if UNSELECTED or STANDBY */
+> >> >@@ -1019,11 +1075,45 @@ static void ad_mux_machine(struct port *port,=
+ bool *update_slave_arr)
+> >> >                       }
+> >> >                       break;
+> >> >               case AD_MUX_COLLECTING_DISTRIBUTING:
+> >> >+                      if (!__port_move_to_attached_state(port)) {
+> >> >+                              /* if port state hasn't changed make
+> >> >+                               * sure that a collecting distributing
+> >> >+                               * port in an active aggregator is ena=
+bled
+> >> >+                               */
+> >> >+                              if (port->aggregator->is_active &&
+> >> >+                                  !__port_is_collecting_distributing=
+(port)) {
+> >> >+                                      __enable_port(port);
+> >> >+                                      *update_slave_arr =3D true;
+> >> >+                              }
+> >> >+                      }
+> >> >+                      break;
+> >> >+              case AD_MUX_COLLECTING:
+> >> >+                      if (!__port_move_to_attached_state(port)) {
+> >> >+                              if ((port->sm_vars & AD_PORT_SELECTED)=
+ &&
+> >> >+                                  (port->partner_oper.port_state & L=
+ACP_STATE_SYNCHRONIZATION) &&
+> >> >+                                  (port->partner_oper.port_state & L=
+ACP_STATE_COLLECTING)) {
+> >> >+                                      port->sm_mux_state =3D AD_MUX_=
+DISTRIBUTING;
+> >> >+                              } else {
+> >> >+                                      /* If port state hasn't change=
+d, make sure that a collecting
+> >> >+                                       * port is enabled for an acti=
+ve aggregator.
+> >> >+                                       */
+> >> >+                                      struct slave *slave =3D port->=
+slave;
+> >> >+
+> >> >+                                      if (port->aggregator->is_activ=
+e &&
+> >> >+                                          bond_is_slave_rx_disabled(=
+slave)) {
+> >> >+                                              ad_enable_collecting(p=
+ort);
+> >> >+                                              *update_slave_arr =3D =
+true;
+> >> >+                                      }
+> >> >+                              }
+> >> >+                      }
+> >> >+                      break;
+> >> >+              case AD_MUX_DISTRIBUTING:
+> >> >                       if (!(port->sm_vars & AD_PORT_SELECTED) ||
+> >> >                           (port->sm_vars & AD_PORT_STANDBY) ||
+> >> >+                          !(port->partner_oper.port_state & LACP_STA=
+TE_COLLECTING) ||
+> >> >                           !(port->partner_oper.port_state & LACP_STA=
+TE_SYNCHRONIZATION) ||
+> >> >                           !(port->actor_oper_port_state & LACP_STATE=
+_SYNCHRONIZATION)) {
+> >> >-                              port->sm_mux_state =3D AD_MUX_ATTACHED=
+;
+> >> >+                              port->sm_mux_state =3D AD_MUX_COLLECTI=
+NG;
+> >> >                       } else {
+> >> >                               /* if port state hasn't changed make
+> >> >                                * sure that a collecting distributing
+> >> >@@ -1031,7 +1121,7 @@ static void ad_mux_machine(struct port *port, b=
+ool *update_slave_arr)
+> >> >                                */
+> >> >                               if (port->aggregator &&
+> >> >                                   port->aggregator->is_active &&
+> >> >-                                  !__port_is_enabled(port)) {
+> >> >+                                  !__port_is_collecting_distributing=
+(port)) {
+> >> >                                       __enable_port(port);
+> >> >                                       *update_slave_arr =3D true;
+> >> >                               }
+> >> >@@ -1082,6 +1172,20 @@ static void ad_mux_machine(struct port *port, =
+bool *update_slave_arr)
+> >> >                                                         update_slave=
+_arr);
+> >> >                       port->ntt =3D true;
+> >> >                       break;
+> >> >+              case AD_MUX_COLLECTING:
+> >> >+                      port->actor_oper_port_state |=3D LACP_STATE_CO=
+LLECTING;
+> >> >+                      port->actor_oper_port_state &=3D ~LACP_STATE_D=
+ISTRIBUTING;
+> >> >+                      port->actor_oper_port_state |=3D LACP_STATE_SY=
+NCHRONIZATION;
+> >> >+                      ad_enable_collecting(port);
+> >> >+                      ad_disable_distributing(port, update_slave_arr=
+);
+> >> >+                      port->ntt =3D true;
+> >> >+                      break;
+> >> >+              case AD_MUX_DISTRIBUTING:
+> >> >+                      port->actor_oper_port_state |=3D LACP_STATE_DI=
+STRIBUTING;
+> >> >+                      port->actor_oper_port_state |=3D LACP_STATE_SY=
+NCHRONIZATION;
+> >> >+                      ad_enable_collecting_distributing(port,
+> >> >+                                                        update_slave=
+_arr);
+> >> >+                      break;
+> >> >               default:
+> >> >                       break;
+> >> >               }
+> >> >@@ -1906,6 +2010,45 @@ static void ad_initialize_port(struct port *po=
+rt, int lacp_fast)
+> >> >       }
+> >> > }
+> >> >
+> >> >+/**
+> >> >+ * ad_enable_collecting - enable a port's receive
+> >> >+ * @port: the port we're looking at
+> >> >+ *
+> >> >+ * Enable @port if it's in an active aggregator
+> >> >+ */
+> >> >+static void ad_enable_collecting(struct port *port)
+> >> >+{
+> >> >+      if (port->aggregator->is_active) {
+> >> >+              struct slave *slave =3D port->slave;
+> >> >+
+> >> >+              slave_dbg(slave->bond->dev, slave->dev,
+> >> >+                        "Enabling collecting on port %d (LAG %d)\n",
+> >> >+                        port->actor_port_number,
+> >> >+                        port->aggregator->aggregator_identifier);
+> >> >+              __enable_collecting_port(port);
+> >> >+      }
+> >> >+}
+> >> >+
+> >> >+/**
+> >> >+ * ad_disable_distributing - disable a port's transmit
+> >> >+ * @port: the port we're looking at
+> >> >+ * @update_slave_arr: Does slave array need update?
+> >> >+ */
+> >> >+static void ad_disable_distributing(struct port *port, bool *update_=
+slave_arr)
+> >> >+{
+> >> >+      if (port->aggregator &&
+> >> >+          !MAC_ADDRESS_EQUAL(&port->aggregator->partner_system,
+> >> >+                             &(null_mac_addr))) {
+> >> >+              slave_dbg(port->slave->bond->dev, port->slave->dev,
+> >> >+                        "Disabling distributing on port %d (LAG %d)\=
+n",
+> >> >+                        port->actor_port_number,
+> >> >+                        port->aggregator->aggregator_identifier);
+> >> >+              __disable_distributing_port(port);
+> >> >+              /* Slave array needs an update */
+> >> >+              *update_slave_arr =3D true;
+> >> >+      }
+> >> >+}
+> >> >+
+> >> > /**
+> >> >  * ad_enable_collecting_distributing - enable a port's transmit/rece=
+ive
+> >> >  * @port: the port we're looking at
+> >> >diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bo=
+nd_main.c
+> >> >index 8e6cc0e133b7..30f4b0ff01c0 100644
+> >> >--- a/drivers/net/bonding/bond_main.c
+> >> >+++ b/drivers/net/bonding/bond_main.c
+> >> >@@ -6331,6 +6331,7 @@ static int __init bond_check_params(struct bond=
+_params *params)
+> >> >       params->ad_actor_sys_prio =3D ad_actor_sys_prio;
+> >> >       eth_zero_addr(params->ad_actor_system);
+> >> >       params->ad_user_port_key =3D ad_user_port_key;
+> >> >+      params->coupled_control =3D 1;
+> >> >       if (packets_per_slave > 0) {
+> >> >               params->reciprocal_packets_per_slave =3D
+> >> >                       reciprocal_value(packets_per_slave);
+> >> >diff --git a/drivers/net/bonding/bond_netlink.c b/drivers/net/bonding=
+/bond_netlink.c
+> >> >index cfa74cf8bb1a..29b4c3d1b9b6 100644
+> >> >--- a/drivers/net/bonding/bond_netlink.c
+> >> >+++ b/drivers/net/bonding/bond_netlink.c
+> >> >@@ -122,6 +122,7 @@ static const struct nla_policy bond_policy[IFLA_B=
+OND_MAX + 1] =3D {
+> >> >       [IFLA_BOND_PEER_NOTIF_DELAY]    =3D NLA_POLICY_FULL_RANGE(NLA_=
+U32, &delay_range),
+> >> >       [IFLA_BOND_MISSED_MAX]          =3D { .type =3D NLA_U8 },
+> >> >       [IFLA_BOND_NS_IP6_TARGET]       =3D { .type =3D NLA_NESTED },
+> >> >+      [IFLA_BOND_COUPLED_CONTROL]     =3D { .type =3D NLA_U8 },
+> >> > };
+> >> >
+> >> > static const struct nla_policy bond_slave_policy[IFLA_BOND_SLAVE_MAX=
+ + 1] =3D {
+> >> >@@ -549,6 +550,16 @@ static int bond_changelink(struct net_device *bo=
+nd_dev, struct nlattr *tb[],
+> >> >                       return err;
+> >> >       }
+> >> >
+> >> >+      if (data[IFLA_BOND_COUPLED_CONTROL]) {
+> >> >+              int coupled_control =3D nla_get_u8(data[IFLA_BOND_COUP=
+LED_CONTROL]);
+> >> >+
+> >> >+              bond_opt_initval(&newval, coupled_control);
+> >> >+              err =3D __bond_opt_set(bond, BOND_OPT_COUPLED_CONTROL,=
+ &newval,
+> >> >+                                   data[IFLA_BOND_COUPLED_CONTROL], =
+extack);
+> >> >+              if (err)
+> >> >+                      return err;
+> >> >+      }
+> >> >+
+> >> >       return 0;
+> >> > }
+> >> >
+> >> >@@ -615,6 +626,7 @@ static size_t bond_get_size(const struct net_devi=
+ce *bond_dev)
+> >> >                                               /* IFLA_BOND_NS_IP6_TA=
+RGET */
+> >> >               nla_total_size(sizeof(struct nlattr)) +
+> >> >               nla_total_size(sizeof(struct in6_addr)) * BOND_MAX_NS_=
+TARGETS +
+> >> >+              nla_total_size(sizeof(u8)) +    /* IFLA_BOND_COUPLED_C=
+ONTROL */
+> >> >               0;
+> >> > }
+> >> >
+> >> >@@ -774,6 +786,10 @@ static int bond_fill_info(struct sk_buff *skb,
+> >> >                      bond->params.missed_max))
+> >> >               goto nla_put_failure;
+> >> >
+> >> >+      if (nla_put_u8(skb, IFLA_BOND_COUPLED_CONTROL,
+> >> >+                     bond->params.coupled_control))
+> >> >+              goto nla_put_failure;
+> >> >+
+> >> >       if (BOND_MODE(bond) =3D=3D BOND_MODE_8023AD) {
+> >> >               struct ad_info info;
+> >> >
+> >> >diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding=
+/bond_options.c
+> >> >index f3f27f0bd2a6..4cdbc7e084f4 100644
+> >> >--- a/drivers/net/bonding/bond_options.c
+> >> >+++ b/drivers/net/bonding/bond_options.c
+> >> >@@ -84,7 +84,8 @@ static int bond_option_ad_user_port_key_set(struct =
+bonding *bond,
+> >> >                                           const struct bond_opt_valu=
+e *newval);
+> >> > static int bond_option_missed_max_set(struct bonding *bond,
+> >> >                                     const struct bond_opt_value *new=
+val);
+> >> >-
+> >> >+static int bond_option_coupled_control_set(struct bonding *bond,
+> >> >+                                         const struct bond_opt_value=
+ *newval);
+> >> >
+> >> > static const struct bond_opt_value bond_mode_tbl[] =3D {
+> >> >       { "balance-rr",    BOND_MODE_ROUNDROBIN,   BOND_VALFLAG_DEFAUL=
+T},
+> >> >@@ -232,6 +233,12 @@ static const struct bond_opt_value bond_missed_m=
+ax_tbl[] =3D {
+> >> >       { NULL,         -1,     0},
+> >> > };
+> >> >
+> >> >+static const struct bond_opt_value bond_coupled_control_tbl[] =3D {
+> >> >+      { "on",  1,  BOND_VALFLAG_DEFAULT},
+> >> >+      { "off", 0,  0},
+> >> >+      { NULL,  -1, 0},
+> >> >+};
+> >> >+
+> >> > static const struct bond_option bond_opts[BOND_OPT_LAST] =3D {
+> >> >       [BOND_OPT_MODE] =3D {
+> >> >               .id =3D BOND_OPT_MODE,
+> >> >@@ -496,6 +503,15 @@ static const struct bond_option bond_opts[BOND_O=
+PT_LAST] =3D {
+> >> >               .desc =3D "Delay between each peer notification on fai=
+lover event, in milliseconds",
+> >> >               .values =3D bond_peer_notif_delay_tbl,
+> >> >               .set =3D bond_option_peer_notif_delay_set
+> >> >+      },
+> >> >+      [BOND_OPT_COUPLED_CONTROL] =3D {
+> >> >+              .id =3D BOND_OPT_COUPLED_CONTROL,
+> >> >+              .name =3D "coupled_control",
+> >> >+              .desc =3D "Opt into using coupled control MUX for LACP=
+ states",
+> >> >+              .unsuppmodes =3D BOND_MODE_ALL_EX(BIT(BOND_MODE_8023AD=
+)),
+> >> >+              .flags =3D BOND_OPTFLAG_IFDOWN,
+> >> >+              .values =3D bond_coupled_control_tbl,
+> >> >+              .set =3D bond_option_coupled_control_set,
+> >> >       }
+> >> > };
+> >> >
+> >> >@@ -1692,3 +1708,13 @@ static int bond_option_ad_user_port_key_set(st=
+ruct bonding *bond,
+> >> >       bond->params.ad_user_port_key =3D newval->value;
+> >> >       return 0;
+> >> > }
+> >> >+
+> >> >+static int bond_option_coupled_control_set(struct bonding *bond,
+> >> >+                                         const struct bond_opt_value=
+ *newval)
+> >> >+{
+> >> >+      netdev_info(bond->dev, "Setting coupled_control to %s (%llu)\n=
+",
+> >> >+                  newval->string, newval->value);
+> >> >+
+> >> >+      bond->params.coupled_control =3D newval->value;
+> >> >+      return 0;
+> >> >+}
+> >> >diff --git a/include/net/bond_3ad.h b/include/net/bond_3ad.h
+> >> >index c5e57c6bd873..9ce5ac2bfbad 100644
+> >> >--- a/include/net/bond_3ad.h
+> >> >+++ b/include/net/bond_3ad.h
+> >> >@@ -54,6 +54,8 @@ typedef enum {
+> >> >       AD_MUX_DETACHED,        /* mux machine */
+> >> >       AD_MUX_WAITING,         /* mux machine */
+> >> >       AD_MUX_ATTACHED,        /* mux machine */
+> >> >+      AD_MUX_COLLECTING,      /* mux machine */
+> >> >+      AD_MUX_DISTRIBUTING,    /* mux machine */
+> >> >       AD_MUX_COLLECTING_DISTRIBUTING  /* mux machine */
+> >> > } mux_states_t;
+> >> >
+> >> >diff --git a/include/net/bond_options.h b/include/net/bond_options.h
+> >> >index 69292ecc0325..473a0147769e 100644
+> >> >--- a/include/net/bond_options.h
+> >> >+++ b/include/net/bond_options.h
+> >> >@@ -76,6 +76,7 @@ enum {
+> >> >       BOND_OPT_MISSED_MAX,
+> >> >       BOND_OPT_NS_TARGETS,
+> >> >       BOND_OPT_PRIO,
+> >> >+      BOND_OPT_COUPLED_CONTROL,
+> >> >       BOND_OPT_LAST
+> >> > };
+> >> >
+> >> >diff --git a/include/net/bonding.h b/include/net/bonding.h
+> >> >index 5b8b1b644a2d..b61fb1aa3a56 100644
+> >> >--- a/include/net/bonding.h
+> >> >+++ b/include/net/bonding.h
+> >> >@@ -148,6 +148,7 @@ struct bond_params {
+> >> > #if IS_ENABLED(CONFIG_IPV6)
+> >> >       struct in6_addr ns_targets[BOND_MAX_NS_TARGETS];
+> >> > #endif
+> >> >+      int coupled_control;
+> >> >
+> >> >       /* 2 bytes of padding : see ether_addr_equal_64bits() */
+> >> >       u8 ad_actor_system[ETH_ALEN + 2];
+> >> >@@ -167,6 +168,7 @@ struct slave {
+> >> >       u8     backup:1,   /* indicates backup slave. Value correspond=
+s with
+> >> >                             BOND_STATE_ACTIVE and BOND_STATE_BACKUP =
+*/
+> >> >              inactive:1, /* indicates inactive slave */
+> >> >+             rx_disabled:1, /* indicates whether slave's Rx is disab=
+led */
+> >> >              should_notify:1, /* indicates whether the state changed=
+ */
+> >> >              should_notify_link:1; /* indicates whether the link cha=
+nged */
+> >> >       u8     duplex;
+> >> >@@ -568,6 +570,14 @@ static inline void bond_set_slave_inactive_flags=
+(struct slave *slave,
+> >> >               bond_set_slave_state(slave, BOND_STATE_BACKUP, notify)=
+;
+> >> >       if (!slave->bond->params.all_slaves_active)
+> >> >               slave->inactive =3D 1;
+> >> >+      if (BOND_MODE(slave->bond) =3D=3D BOND_MODE_8023AD)
+> >> >+              slave->rx_disabled =3D 1;
+> >> >+}
+> >> >+
+> >> >+static inline void bond_set_slave_tx_disabled_flags(struct slave *sl=
+ave,
+> >> >+                                               bool notify)
+> >> >+{
+> >> >+      bond_set_slave_state(slave, BOND_STATE_BACKUP, notify);
+> >> > }
+> >> >
+> >> > static inline void bond_set_slave_active_flags(struct slave *slave,
+> >> >@@ -575,6 +585,14 @@ static inline void bond_set_slave_active_flags(s=
+truct slave *slave,
+> >> > {
+> >> >       bond_set_slave_state(slave, BOND_STATE_ACTIVE, notify);
+> >> >       slave->inactive =3D 0;
+> >> >+      if (BOND_MODE(slave->bond) =3D=3D BOND_MODE_8023AD)
+> >> >+              slave->rx_disabled =3D 0;
+> >> >+}
+> >> >+
+> >> >+static inline void bond_set_slave_rx_enabled_flags(struct slave *sla=
+ve,
+> >> >+                                             bool notify)
+> >> >+{
+> >> >+      slave->rx_disabled =3D 0;
+> >> > }
+> >> >
+> >> > static inline bool bond_is_slave_inactive(struct slave *slave)
+> >> >@@ -582,6 +600,11 @@ static inline bool bond_is_slave_inactive(struct=
+ slave *slave)
+> >> >       return slave->inactive;
+> >> > }
+> >> >
+> >> >+static inline bool bond_is_slave_rx_disabled(struct slave *slave)
+> >> >+{
+> >> >+      return slave->rx_disabled;
+> >> >+}
+> >> >+
+> >> > static inline void bond_propose_link_state(struct slave *slave, int =
+state)
+> >> > {
+> >> >       slave->link_new_state =3D state;
+> >> >diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_lin=
+k.h
+> >> >index 29ff80da2775..7a54fcff2eec 100644
+> >> >--- a/include/uapi/linux/if_link.h
+> >> >+++ b/include/uapi/linux/if_link.h
+> >> >@@ -976,6 +976,7 @@ enum {
+> >> >       IFLA_BOND_AD_LACP_ACTIVE,
+> >> >       IFLA_BOND_MISSED_MAX,
+> >> >       IFLA_BOND_NS_IP6_TARGET,
+> >> >+      IFLA_BOND_COUPLED_CONTROL,
+> >> >       __IFLA_BOND_MAX,
+> >> > };
+> >> >
+> >> >diff --git a/tools/include/uapi/linux/if_link.h b/tools/include/uapi/=
+linux/if_link.h
+> >> >index a0aa05a28cf2..f0d71b2a3f1e 100644
+> >> >--- a/tools/include/uapi/linux/if_link.h
+> >> >+++ b/tools/include/uapi/linux/if_link.h
+> >> >@@ -974,6 +974,7 @@ enum {
+> >> >       IFLA_BOND_AD_LACP_ACTIVE,
+> >> >       IFLA_BOND_MISSED_MAX,
+> >> >       IFLA_BOND_NS_IP6_TARGET,
+> >> >+      IFLA_BOND_COUPLED_CONTROL,
+> >> >       __IFLA_BOND_MAX,
+> >> > };
+> >> >
+> >> >--
+> >> >2.43.0.429.g432eaa2c6b-goog
+> >> >
+> >> >
+>
+> ---
+>         -Jay Vosburgh, jay.vosburgh@canonical.com
 
