@@ -1,117 +1,85 @@
-Return-Path: <netdev+bounces-65996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E2A483CD39
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 21:13:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5821683CD3C
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 21:16:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82DC31C23E80
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 20:13:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B57891F22731
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 20:16:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62249137C40;
-	Thu, 25 Jan 2024 20:13:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8FA5136651;
+	Thu, 25 Jan 2024 20:16:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="refS9tKZ";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="/0aUNS7m"
+	dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b="twBKf6FR"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.manjaro.org (mail.manjaro.org [116.203.91.91])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08A2C137C4F;
-	Thu, 25 Jan 2024 20:13:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2381279C7
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 20:16:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.91.91
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706213597; cv=none; b=SFuzRH+uYkzLaiIqjTcNrgBfW9UfKaROxuVCwphJOD0hHRBTQHkWzd7WlPW6xhZY2OmgWPHYOemRzCtnyDBHG47fJZKvLXlJltrcJ/atC09BzqxNKcRsnLxKG3WMStU2sdbl8IRttgEecc9OjDsQHz8UsAk8tdxHMn+F3GcoRx8=
+	t=1706213769; cv=none; b=E8+Jb8eNlQAHz5PDtpGAI3WVrE4xg3+b9zUTqqmJR04BVLTqrKV9sEUu3lcVJcGahxke5LgO8r6uvGinpvymlq6bgIDjTZwVUfrfvzeXCzLogTaLu3x6L1qf1HUVCDes1WLWhPnL2xRdSwAO1/M/4aA6pqTZxALlTqNflj9EhP8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706213597; c=relaxed/simple;
-	bh=kjBeNGNqVDJc9FrnmImpOQIUdMHiixU4ZSE2URt8uJM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=YQsSoNKqr7tAjcT7sgilbI6nZRIC9TU+FSW6El7UIGEQof6hnofXGF7qY8JOsU8PUUOnFcWO76GlwNBI+FcUzPk3ABg19eKisHxpbAIOgAh5HZUFd35wEykrPnu6NgVLXftIgBur9fk1h5f1juESHemy9CZR1Xg/ZV+uIXn0v3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=refS9tKZ; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=/0aUNS7m; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1706213591;
+	s=arc-20240116; t=1706213769; c=relaxed/simple;
+	bh=4RdZ9J5MXeKwf7WAlNoAVVtnVU/ieNbokDNNyvedFJU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qTys4lV0gxlIOqhAVtqVZBbN/oBeijjjBGmtNDI6/n8uN5jhB2sPyLQ5RDPReB1w7bM6wUSDNj8N3PQXvTr4hdDWQpHBQmgaS/7cUv1dg8GYqRfWEr5Q6A46lesYfv5PaTCXE7sy6hIWKO4QiX8bVyEVkSSF1h1mC/SC5bwKHSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org; spf=pass smtp.mailfrom=manjaro.org; dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b=twBKf6FR; arc=none smtp.client-ip=116.203.91.91
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manjaro.org
+From: Tobias Schramm <t.schramm@manjaro.org>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manjaro.org; s=2021;
+	t=1706213757;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PaIo5QJEoCWgfuIV2H0XngC0pt3mav+j7mul9cTp4+o=;
-	b=refS9tKZshoR9HF/jitIxpdw4PBP0KN2fSJDL50TBNSSE4nLT1xt/CiU8WD/qIUovzHFTj
-	Dc1+uMR0mM/KNlOw2Jvc33Eg2sUO4YQugup7mPrKBJK+oRlVqLAh7gD4b37QPoYmblM+XQ
-	DQp3np2HM00y5lR8canjfuWqIcbVb1nBYsJdJgolXNBnHPesw+30bKJr2n+Fcxgg1LSpVZ
-	TEHNSqlzaD3Xi0LltGlhaMWvOF/jHp7XMZbJ+eY+Da8jCC8l0vuxi35Ugn0Mu/WQktYAfX
-	slvgSGHkC8u7+hGZkQxP3/6w39IISbYUt9i3xk04KUEEfRDoK8x5VWsuqSJnXQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1706213591;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PaIo5QJEoCWgfuIV2H0XngC0pt3mav+j7mul9cTp4+o=;
-	b=/0aUNS7maUI9XK8hviQ15XXGp7RCYbM88im65y6z+TXz1RgzScO+jbYOBdJsp5cGHutSS2
-	MYHbkz2Agp+po5Ag==
-To: Simon Horman <horms@kernel.org>, Peter Hilber
- <peter.hilber@opensynergy.com>
-Cc: linux-kernel@vger.kernel.org, "D, Lakshmi Sowjanya"
- <lakshmi.sowjanya.d@intel.com>, jstultz@google.com, giometti@enneenne.com,
- corbet@lwn.net, andriy.shevchenko@linux.intel.com, "Dong, Eddie"
- <eddie.dong@intel.com>, "Hall, Christopher S"
- <christopher.s.hall@intel.com>, Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Wanpeng Li
- <wanpengli@tencent.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, Mark
- Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>, Daniel
- Lezcano <daniel.lezcano@linaro.org>, Richard Cochran
- <richardcochran@gmail.com>, kvm@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [RFC PATCH v2 2/7] x86/tsc: Add clocksource ID, set
- system_counterval_t.cs_id
-In-Reply-To: <20231224162709.GA230301@kernel.org>
-References: <20231215220612.173603-1-peter.hilber@opensynergy.com>
- <20231215220612.173603-3-peter.hilber@opensynergy.com>
- <20231224162709.GA230301@kernel.org>
-Date: Thu, 25 Jan 2024 21:13:10 +0100
-Message-ID: <87le8dgoix.ffs@tglx>
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Z5A/5SzMwbcDNCjVJW8fzQYGvVC3KmAKUTtcphn+Ajo=;
+	b=twBKf6FRp7Qo75xTuJgYaK8U9Rqrq+WSdkAgOQ4tZxTwvk8sB1dppedF0lVVQZuBPOMUKR
+	zNLIX8bn8n1+Ve5uJzaKscoUZq6KpXjRBDsVh1rcT5U4oZJr6fV8FAZmuh5NWLrWMiCbDH
+	mDQdvswh5ljyhJGFHp8i37VTA6aG7z6nvpGH7DbpXJSdDCgHG1K+jWhX6w128kneLDqqXZ
+	OyUYBlrlrBdq1CJjdlcP4pAOga7cKDLdoG6/cz2hygC953DX9P0JEV0NFxJ8Ddjrk4iD5l
+	3ORT5cL9e5k+mQLa38mUTpaWTBXAHcdvx+1ncIoJsqRjfnUC1EofLeIyosqVTA==
+To: netdev@vger.kernel.org
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Tobias Schramm <t.schramm@manjaro.org>
+Subject: [PATCH net-next] dt-bindings: nfc: ti,trf7970a: fix usage example
+Date: Thu, 25 Jan 2024 21:15:05 +0100
+Message-ID: <20240125201505.1117039-1-t.schramm@manjaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+Authentication-Results: ORIGINATING;
+	auth=pass smtp.auth=t.schramm@manjaro.org smtp.mailfrom=t.schramm@manjaro.org
 
-On Sun, Dec 24 2023 at 16:27, Simon Horman wrote:
-> On Fri, Dec 15, 2023 at 11:06:07PM +0100, Peter Hilber wrote:
->> @@ -1327,12 +1334,15 @@ EXPORT_SYMBOL(convert_art_to_tsc);
->>   * that this flag is set before conversion to TSC is attempted.
->>   *
->>   * Return:
->> - * struct system_counterval_t - system counter value with the pointer to the
->> + * struct system_counterval_t - system counter value with the ID of the
->>   *	corresponding clocksource
->>   *	@cycles:	System counter value
->>   *	@cs:		Clocksource corresponding to system counter value. Used
->>   *			by timekeeping code to verify comparability of two cycle
->>   *			values.
->> + *	@cs_id:		Clocksource ID corresponding to system counter value.
->> + *			Used by timekeeping code to verify comparability of two
->> + *			cycle values.
->
-> None of the documented parameters to convert_art_ns_to_tsc() above
-> correspond to the parameters of convert_art_ns_to_tsc() below.
+The TRF7970A is a SPI device, not I2C.
 
-Obviously not because they document the return value. The sole argument
-of the function @art_ns is documented correctly.
+Signed-off-by: Tobias Schramm <t.schramm@manjaro.org>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+---
+ Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> The same patch that corrects the kernel doc for convert_art_ns_to_tsc()
-> could also correct the kernel doc for tsc_refine_calibration_work()
-> by documenting it's work parameter.
+diff --git a/Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml b/Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml
+index 9cc236ec42f2..d0332eb76ad2 100644
+--- a/Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml
++++ b/Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml
+@@ -73,7 +73,7 @@ examples:
+     #include <dt-bindings/gpio/gpio.h>
+     #include <dt-bindings/interrupt-controller/irq.h>
+ 
+-    i2c {
++    spi {
+         #address-cells = <1>;
+         #size-cells = <0>;
+ 
+-- 
+2.43.0
 
-That's a separate cleanup. Feel free to send a patch for that.
-
-Thanks,
-
-        tglx
 
