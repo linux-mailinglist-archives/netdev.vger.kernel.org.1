@@ -1,120 +1,187 @@
-Return-Path: <netdev+bounces-65920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6202983C706
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 16:36:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 971EA83C709
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 16:38:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 198F6296000
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 15:36:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9D811C21243
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 15:38:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 572D06EB78;
-	Thu, 25 Jan 2024 15:36:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2347E6EB78;
+	Thu, 25 Jan 2024 15:38:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UjU3KLuL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 182AF73170;
-	Thu, 25 Jan 2024 15:36:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C56E224E8;
+	Thu, 25 Jan 2024 15:38:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706196978; cv=none; b=BDuxp8kcmTonmdI7PKIFpC3O/Sa5NBOqnNzu5nw0uqLQweQ40gZJsAagyJK5BKOR4jvT/zCrISFWkj2lJdhoHbn+YCE7Tpi5vPY8UxP9TUpas/sO+YXvozi43iVLLiu5qgVjKNjQFxRT8UlN1Ifqm4yedjQ5RQ9jEFc4/jO4Gzo=
+	t=1706197103; cv=none; b=KYFWHnRnWXNa56f0dYuwmUoQVrU3K9bnb6mEHdWsLXz/uvo3mQoZHuDQOPqnE32Xhrn+aLUMHU73XAFeR8cN/Ld9dt3XSpwW6SptBUWxuZKNgOZh2kvCCZyS2IROLzWnT566X0Fw9BIJ+ALPByNstNGcV0kdp/ZSpdqpYFvtFmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706196978; c=relaxed/simple;
-	bh=Fxq6kkiG+dJZ/VNJkEc06gi+jmyZF2rGKm1JWnpOm5c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Rp7n9F4Wq9Lfycs/8GCvmGoEXkh0gj1aMW9OQMhoYOnuL/j+cSLXao4+lY1T4lYEc8H0sCXQ2GvouvgVFKLik3TaN+vHptoPJlI1rEZl/glL9osuzAsTlIcpcuisSoZZ0sLus/zwXb4f5dW1LTvc03yDmYfmQd0dyKGa+wveqzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1706197103; c=relaxed/simple;
+	bh=byvDxAhUtvp7acMAGcMLskPCxqfTZAZ8QG5UuT/xtWQ=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Cg00KZRdFCohIrjC5h1WXZJEAeoAk56NaUlCXu6RqyuIQ6nFOabVP03Ks/Lowe3xcCzVAnQgBqo7rbOvbfRZPkMe9ePWr6Ya0SP0ccBiQNZ0nAbpCpEmQd9lpPOfLD5Hbph/qQLmKNWsHUJSBozHHLMNaNodriOwSAj0slvpTF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UjU3KLuL; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a2dc7827a97so769416266b.2;
-        Thu, 25 Jan 2024 07:36:15 -0800 (PST)
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7831806c527so590298085a.3;
+        Thu, 25 Jan 2024 07:38:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706197100; x=1706801900; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cHrl0FaBSIFJYdqSiJ2PYmm8uRkpy7SOlEX5cSpoK4w=;
+        b=UjU3KLuL1msLLQQU+fGkChorh8hQBVWt+jua+tof7JQ+GKeoL7w4YvlUTA1ds/CwDr
+         LHqafHLjkZbTEnKYXFjRZkhI8XN3eZ7V9EqSSxv5AQGx72p+Ywv5dCmrv/f4SBkrfx65
+         DKJElXXhhiQIfnKXlO0fH8wWsljGACg7jqt/mxR8xOaqzFBZzoaFDHk/0YAdczLau1nF
+         FyvLjYtfiGFkMvbyfrmj5tLDa8TjH+2NP1YsZwtGe7qh7KYzuT1ykA4tTOTYjNeTvAbt
+         teha90T8Z4oNi+kPQ7Y4ACWKoELdpNLKYdNGBjxiVzx0AXIfYFLequEfrjddFla2ZBzw
+         zliw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706196972; x=1706801772;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XpAh/AgeLA3yAZ+8/BxWrNJnaxhn5Tb3BytJoAv2i+I=;
-        b=Tke0OwVeOdw6hoyjXGF9hSnCp2sNa/ij4ivJZ6nBk325bxPTbRPHepAkUtwa/mTRfm
-         SNg9MHAvMGHERBgwsLED3+l3Ej9x7vAF+DZrRWLvO3nMZgfnxAnwVUKwl0RousstugyF
-         NsZmfaOm03oiuz/qcigdqJOLTJSQI1BA3QQHglBOT+VA5g4rZJq5eQRC0FxYxXvCsNDS
-         GwoT10pGPxf0kcb8fxAtCBhw441eubP5+zBkg5nBn0v+T5v09Vltf4XFuTvaQXIqakxo
-         ilEPNCfNv+uLJQL3BtBqlWgtSbvMDAq3ZpTguVbjHYGs3PdiAJHcdUFqaU+Deq++B9KT
-         4Acw==
-X-Gm-Message-State: AOJu0YwPYPDBU6IevzdW4WkmlaQK7yPiOb86m53NIH/0o37lWlztHjzm
-	rm40tMuziTT6YcVYJahnMgUbf0i9mXwTBqJ0zwFR7jLY6rqHKRlx
-X-Google-Smtp-Source: AGHT+IGIRMS6s46BQQttwTEKXx/01hU23t7uTsm4HcMNUcNWqctF9c1iZDS50ehb/W0/fsXPZZQcEQ==
-X-Received: by 2002:a17:906:b7c3:b0:a31:b59:9cec with SMTP id fy3-20020a170906b7c300b00a310b599cecmr690538ejb.16.1706196972374;
-        Thu, 25 Jan 2024 07:36:12 -0800 (PST)
-Received: from gmail.com (fwdproxy-cln-116.fbsv.net. [2a03:2880:31ff:74::face:b00c])
-        by smtp.gmail.com with ESMTPSA id ep21-20020a1709069b5500b00a2ae7fb3fc6sm1161842ejc.93.2024.01.25.07.36.11
+        d=1e100.net; s=20230601; t=1706197100; x=1706801900;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=cHrl0FaBSIFJYdqSiJ2PYmm8uRkpy7SOlEX5cSpoK4w=;
+        b=enbzCu8OlrJLlkzcgqvkXenvsV3QFK2hyUngYervZVusLeLFanhFt9fPjQRC307QnD
+         O5albXIEFb0dXnEaarjObBfoymXLsIIC4st18zXccyOMuv1OQk/WK2wMq0M53NjNj56b
+         C0EHMgHEgXIaAzCr1Rx10H7LSvBoVrBq2wk6J/kg/V3LKeeqgdugMzL1lkOHvTa3eTGJ
+         ztqtwK+haYeFhuzuYVojW3zcwEkPBdukK3lNSk/RCHU3IaqF1OytaYxuz1TG/ouNRxub
+         6TYNACNfMtoxi24fn6erIoNr2Q1PIpai2bXiAMmLNkwPrcZeAxTHhtdXHCA3HNCSvBZy
+         a1FQ==
+X-Gm-Message-State: AOJu0YzGKthRC0ebkijQ473atnkC40BZgaK4HGRxnB1HhzI7rikK6Azc
+	Op5VchJ0Lc9h0Gs4JRs5QehQCOsYj+DlqzwvwqJJYC6g5YMTI7AM
+X-Google-Smtp-Source: AGHT+IEAmp6uhSjfaws1nkmIP1IbMkRnpyXtx286q8qSh4COTLGG/s8Bvis/3eTDkY6BwhV/DMP0rg==
+X-Received: by 2002:a05:6214:258d:b0:685:1ece:98e3 with SMTP id fq13-20020a056214258d00b006851ece98e3mr1457926qvb.53.1706197100223;
+        Thu, 25 Jan 2024 07:38:20 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCWD98V4GP+9OH3UmroasB4gtEeSKiX8odSaUE5aKF7224qZ/8bCSCJuCLD3LIJgwXchdMeOAfUW1lifq/wQK6AjJQ6JgUe5kHq90OLveuv2ZZ7OY+APejpo3D5hwr0uCv0rvyacyEZm5IpbGLsrY4HeWKb3kwtyWHmDjIwU5Lc/C6vdpkuJSFng3q061f/fJDwp7YoOhVaSchi0DGLHzbt+d9a/xvkANqveJ0TShMscU0JxXRS5rQRD2NMKZinUxE3Xke51bReq8gI+m+cc4LGdlyGRacIrWkEX1+QS2hkYSI4nJTcZhrHpQQ==
+Received: from localhost (131.65.194.35.bc.googleusercontent.com. [35.194.65.131])
+        by smtp.gmail.com with ESMTPSA id j7-20020a0ceb07000000b00681092cb7b4sm5519133qvp.103.2024.01.25.07.38.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jan 2024 07:36:12 -0800 (PST)
-Date: Thu, 25 Jan 2024 07:36:10 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Miquel Raynal <miquel.raynal@bootlin.com>
-Cc: kuba@kernel.org, davem@davemloft.net, abeni@redhat.com,
-	edumazet@google.com, Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Paolo Abeni <pabeni@redhat.com>, dsahern@kernel.org,
-	weiwan@google.com,
-	"open list:IEEE 802.15.4 SUBSYSTEM" <linux-wpan@vger.kernel.org>,
-	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 02/22] net: fill in MODULE_DESCRIPTION()s for
- ieee802154
-Message-ID: <ZbJ/6saj5Rn20x1N@gmail.com>
-References: <20240122184543.2501493-1-leitao@debian.org>
- <20240122184543.2501493-3-leitao@debian.org>
- <20240124175158.7c8b9490@xps-13>
- <ZbIxYnEbFXi6NBMU@gmail.com>
- <20240125155532.285a2bbd@xps-13>
+        Thu, 25 Jan 2024 07:38:19 -0800 (PST)
+Date: Thu, 25 Jan 2024 10:38:19 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Lucas Karpinski <lkarpins@redhat.com>, 
+ linux-kselftest@vger.kernel.org
+Message-ID: <65b2806b90b29_2bce412943c@willemb.c.googlers.com.notmuch>
+In-Reply-To: <6cb2ddf941698e2feb780dfae9325e98cd39d7a9.camel@redhat.com>
+References: <cover.1706131762.git.pabeni@redhat.com>
+ <28e7af7c031557f691dc8045ee41dd549dd5e74c.1706131762.git.pabeni@redhat.com>
+ <65b1b4e92df6_250560294f4@willemb.c.googlers.com.notmuch>
+ <49d15fe58d9cd415ca96739b08c59c7cde5c3422.camel@redhat.com>
+ <65b26fe61346d_2b890a294b4@willemb.c.googlers.com.notmuch>
+ <6cb2ddf941698e2feb780dfae9325e98cd39d7a9.camel@redhat.com>
+Subject: Re: [PATCH net 1/3] selftests: net: remove dependency on ebpf tests
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240125155532.285a2bbd@xps-13>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jan 25, 2024 at 03:55:32PM +0100, Miquel Raynal wrote:
-> Hi Breno,
-> 
-> leitao@debian.org wrote on Thu, 25 Jan 2024 02:01:06 -0800:
-> 
-> > Hello Miquèl,
-> > 
-> > On Wed, Jan 24, 2024 at 05:51:58PM +0100, Miquel Raynal wrote:
-> > > Hi Breno,
-> > > 
-> > > leitao@debian.org wrote on Mon, 22 Jan 2024 10:45:23 -0800:
-> > >   
-> > > > W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
-> > > > Add descriptions to ieee802154 modules.
+Paolo Abeni wrote:
+> On Thu, 2024-01-25 at 09:27 -0500, Willem de Bruijn wrote:
+> > Paolo Abeni wrote:
+> > > On Wed, 2024-01-24 at 20:10 -0500, Willem de Bruijn wrote:
+> > > > Paolo Abeni wrote:
+> > > > > Several net tests requires an XDP program build under the ebpf
+> > > > > directory, and error out if such program is not available.
+> > > > > 
+> > > > > That makes running successful net test hard, let's duplicate into the
+> > > > > net dir the [very small] program, re-using the existing rules to build
+> > > > > it, and finally dropping the bogus dependency.
+> > > > > 
+> > > > > Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> > > > > ---
+> > > > >  tools/testing/selftests/net/Makefile          |  5 +++--
+> > > > >  tools/testing/selftests/net/udpgro.sh         |  4 ++--
+> > > > >  tools/testing/selftests/net/udpgro_bench.sh   |  4 ++--
+> > > > >  tools/testing/selftests/net/udpgro_frglist.sh |  6 +++---
+> > > > >  tools/testing/selftests/net/udpgro_fwd.sh     |  2 +-
+> > > > >  tools/testing/selftests/net/veth.sh           |  4 ++--
+> > > > >  tools/testing/selftests/net/xdp_dummy.c       | 13 +++++++++++++
+> > > > >  7 files changed, 26 insertions(+), 12 deletions(-)
+> > > > >  create mode 100644 tools/testing/selftests/net/xdp_dummy.c
+> > > > > 
+> > > > > diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+> > > > > index 50818075e566..304d8b852ef0 100644
+> > > > > --- a/tools/testing/selftests/net/Makefile
+> > > > > +++ b/tools/testing/selftests/net/Makefile
+> > > > > @@ -84,6 +84,7 @@ TEST_PROGS += sctp_vrf.sh
+> > > > >  TEST_GEN_FILES += sctp_hello
+> > > > >  TEST_GEN_FILES += csum
+> > > > >  TEST_GEN_FILES += nat6to4.o
+> > > > > +TEST_GEN_FILES += xdp_dummy.o
+> > > > >  TEST_GEN_FILES += ip_local_port_range
+> > > > >  TEST_GEN_FILES += bind_wildcard
+> > > > >  TEST_PROGS += test_vxlan_mdb.sh
+> > > > > @@ -104,7 +105,7 @@ $(OUTPUT)/tcp_inq: LDLIBS += -lpthread
+> > > > >  $(OUTPUT)/bind_bhash: LDLIBS += -lpthread
+> > > > >  $(OUTPUT)/io_uring_zerocopy_tx: CFLAGS += -I../../../include/
+> > > > >  
+> > > > > -# Rules to generate bpf obj nat6to4.o
+> > > > > +# Rules to generate bpf objs
+> > > > >  CLANG ?= clang
+> > > > >  SCRATCH_DIR := $(OUTPUT)/tools
+> > > > >  BUILD_DIR := $(SCRATCH_DIR)/build
+> > > > > @@ -139,7 +140,7 @@ endif
+> > > > >  
+> > > > >  CLANG_SYS_INCLUDES = $(call get_sys_includes,$(CLANG),$(CLANG_TARGET_ARCH))
+> > > > >  
+> > > > > -$(OUTPUT)/nat6to4.o: nat6to4.c $(BPFOBJ) | $(MAKE_DIRS)
+> > > > > +$(OUTPUT)/nat6to4.o $(OUTPUT)/xdp_dummy.o: $(OUTPUT)/%.o : %.c $(BPFOBJ) | $(MAKE_DIRS)
+> > > > >  	$(CLANG) -O2 --target=bpf -c $< $(CCINCLUDE) $(CLANG_SYS_INCLUDES) -o $@
 > > > > 
-> > > > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > > > Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>  
+> > > > is the "$(OUTPUT)/%.o :" intentional or a leftover from editing?
 > > > 
-> > > I just see the v2 now. Please use "v2" in your commit title using -v or
-> > > git-format-patch.  
+> > > Is intentional and AFAICS required to let this rule being selected when
+> > > the output directory is not an empty string (the target and the pre-req
+> > > will be in different directories).
 > > 
-> > Sorry, I am not sure I followed what you meant.  I've sent the v2, which
-> > contains the 'v2' _tag_:
+> > Thanks. I don't understand why. Sorry to harp on this small point, but
+> > you've verified that the build fails without? Is it perhaps due to that
+> > "$(MAKE_DIRS)" order-only-prerequisite? But nat6to4 on its own did not
+> > need this.
 > 
-> I believe *this* is a v2 because you fixed your initial patch,
-> following Stefan's suggestion.
+> I tried quite a bit of permutation (all others failing) before
+> selecting this one (shame on me, with a stackoverflow hint [!!!]).
 > 
-> Anyway, it's fine for me to merge this patch through net directly (I
-> don't know if net maintainers want W=1 fixes to go through net or
-> net-next) so:
+> But I finally found the relevant documentation reference:
+> 
+> https://www.gnu.org/software/make/manual/make.html#Static-Pattern
+> 
+> A simpler wildcard rule would not be enough, as the already existing
+> wildcard used to build plain c files will take precedence.
+> 
+> nat6to4 did not need this fancy syntax, as it was a simple, single
+> target single pre-req rule - that takes precedence on the mentioned
+> wildcard.
+> 
+> Please let me know if the above clarifies a bit the scenario.
 
-Thanks Miquèl. Jakub convinced Paolo that these fixes should go through
-net, that is why I am targeting `net`.
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
-https://lore.kernel.org/all/20240122105708.52d33fa0@kernel.org/
+Thanks for looking that up!
+
+So the wildcard is needed for the %.c in the new rule. Makes sense.
+
 
