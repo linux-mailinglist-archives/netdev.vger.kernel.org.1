@@ -1,91 +1,92 @@
-Return-Path: <netdev+bounces-65818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8140783BDCF
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 10:48:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C073983BDDA
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 10:49:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A1F51F32D29
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:48:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 611921F33883
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:49:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96EE91C2BD;
-	Thu, 25 Jan 2024 09:46:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F05F1BF33;
+	Thu, 25 Jan 2024 09:49:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X6iCK0cz"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="Xv9q88tE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f68.google.com (mail-wr1-f68.google.com [209.85.221.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 082641CF83
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 09:46:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB0021CA81;
+	Thu, 25 Jan 2024 09:49:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706176015; cv=none; b=Yj3uOAlmROsBvxG4eCjUItwU9h/V9tPeUybu/hHTAJ7AEWOeqb/+rF8dB6T3HtRDFG/ndDdZJEgxkAaGWgCVbBfeAITNKXyVqku5Ur1Xu78/xuheVwTj8+OkE43xuBsV4G+iNgmVm6qie7SBTC6Tm9+9Qsr8TOPqujI8sA1jj1E=
+	t=1706176175; cv=none; b=bbcZ/0j7wIRUDOtF3xwuN4XvP2g9zQA6P4sz6Y9Bj7LXWbRkvfT2TQG7qZbS4DKKsfT/1ebkGMvP7KXuFL49iRbVk2YlGhDX7zoi/aXHwClCOSu/jcsLmLKutUzTijd+f28g3G/oYaKx8toNHfl80oVcNYc8GFXr9G/MDtc7dRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706176015; c=relaxed/simple;
-	bh=hkEykdYpLKytx7M0B7g+Mh0aAttAPO6NJFKKwuHsyQk=;
+	s=arc-20240116; t=1706176175; c=relaxed/simple;
+	bh=JodpOLAPwczmZ4a6VZMuVd4PZAjoFOUygw/5EqMMmN0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MfSlTbhioMlM90shBptJnFHpQG2Fp4m2/IqwfFDDZcKht9eDueHv4thiF/mPJ2yrJbqywAKzVnIyoNthdZhExWMpw0DLkyg8HWg5mUF13m8GXDNnAEA4S92RatXXFiJhhehuMe9iQA0Lbwd8lYsfecprFcggy3Dl/01IgULEORQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X6iCK0cz; arc=none smtp.client-ip=209.85.221.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f68.google.com with SMTP id ffacd0b85a97d-337cf4eabc9so5135104f8f.3
-        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 01:46:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706176012; x=1706780812; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hkEykdYpLKytx7M0B7g+Mh0aAttAPO6NJFKKwuHsyQk=;
-        b=X6iCK0czsOJ/qHtJ5J2YICX/FrHNoxRlJIAfOkb6RRmkXKe4iWqdu/eJIj/WmFot9X
-         WHThJy6VF6WMhZlo5pVZ23Cj94ZTALLMUAowIhj7TZIk3OtdJT0QkeLgWHmp0OeN9UVE
-         xAMxJSqcGiZyHZ3Lg7C5m7TV4Ot39ywj0t1zFbofDD6dZaQmWSrFXcoG8Uxg61GJRJ/p
-         96NcR0usDNW7AP+eEq6lDkW7y/iJFcI1ZUSpGk+7hp5BVmGMs2lXNk+uxGqyQ8N/bBs6
-         H7gH1jrRjSxP+zc65KVb5jDX3rn/QlxHVq0Ox3oeUFKQr7OZ+z9v5mG8CFHtc3VAuix/
-         mlng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706176012; x=1706780812;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hkEykdYpLKytx7M0B7g+Mh0aAttAPO6NJFKKwuHsyQk=;
-        b=rE4Vwq49J6x//QzA0J7ZsiCQWGJ/hYsbu/OWwoMnk+TLDVb5JxVkuzjoxAC4J9twik
-         yuoXFPhhwpwHwxzlHlmmhjdeur3hJ+1KmJwO2KEW/+khG08F3KAO8M25TpAjnFysvHYB
-         gveMKMiaMz+cNqFPAgPg5+e8zrYTiPHCVPAoUm2J8F0us/K12pj3uHRlxAkCmahfcPVl
-         gxxot67YM26iuwILRBQaHstY67WnsLZPPdNgScH/ULdNaVoqS9eEFJ/kLa1IufPf0Qga
-         k1eqCucHGERFTndxG3Gur5cpkT5bvD6sQ5gYrWcjEaPjvnda4UBo1+u6a9qCuLuPnxgN
-         ivMg==
-X-Gm-Message-State: AOJu0Yy4F/7iqJFjB0nCi5jiWERZ9fTa30spMHKNdENX7tDG1Y1NIPy+
-	5+3FEEsXX9ziZfq7oZWime4s5Noe0cyXwqirctGKWDnEGJV7vVoG
-X-Google-Smtp-Source: AGHT+IH3AYbtNz0URUwZKaxjRy0ECI3wAA/U98qDQb7L7Jfn6cBPzMRcUGRd+zc8sb/jH1Y6NZURCQ==
-X-Received: by 2002:adf:f107:0:b0:337:3ed6:8697 with SMTP id r7-20020adff107000000b003373ed68697mr391580wro.90.1706176011959;
-        Thu, 25 Jan 2024 01:46:51 -0800 (PST)
-Received: from localhost ([217.212.240.67])
-        by smtp.gmail.com with ESMTPSA id v4-20020a5d6784000000b0033940bc04fesm6270766wru.16.2024.01.25.01.46.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Jan 2024 01:46:51 -0800 (PST)
-Message-ID: <d6587a2c-0a1c-4a1e-a1fa-e94c6b3b7a98@gmail.com>
-Date: Thu, 25 Jan 2024 10:46:28 +0100
+	 In-Reply-To:Content-Type; b=o0uEholvpEwy6atden4mMixSpSaINeiJiw4ke0dXpd9Rt/YwlRfO+7Qo6LOtapsurMow3ufJVXSqCT8VbsqMkxKnhjTkpWtOgUWUdyYqVYOPTmU0hwSCmMDxndn7yBpbQ0lJ86HpLTTSlHmTC2U29rgRHyczzkikrJFD5jfWVME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=Xv9q88tE; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 8B8F14000D;
+	Thu, 25 Jan 2024 09:49:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1706176164;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4spzynnZLzSXpZvD9M1NQEXqK2+5EzKlAxOSnoAYggE=;
+	b=Xv9q88tEhpXwElHUBolfyOODB7HD7meHv1GR2s55oHM7A4OEjiWUqYzOFj8ciEdBzd44cO
+	7DtlbABxYZ2vHFqx+n2QG0dgRKKIXy+iQ3u5T1hYXKi3aILRBwZEmjlN52xaLEikx9OOkS
+	I2rRUS8pg6d7naLcCKGAVX8UVslHemONhgc8dqjmMqumdHGfhwQvyofeXBUOod+b54YSah
+	bh7oM53p3eRvj8tG/acVjEZ2+A5lU3yYfebD8Kj2YnwUOPUyPjfYBq7vmhCh07/AnwYwtN
+	ulNUGSGzpXLZXyALFeCVlleyTW5HYZdDQqImSNiGSJBP9NAkHB3jqZVwxsmcGA==
+Message-ID: <accda24c-9f12-4cfe-b532-a9c60ec97fca@arinc9.com>
+Date: Thu, 25 Jan 2024 12:49:19 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net] ipmr: fix kernel panic when forwarding mcast packets
-Content-Language: en-US
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>,
- "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org
-References: <20240124121538.3188769-1-nicolas.dichtel@6wind.com>
-From: Leone Fernando <leone4fernando@gmail.com>
-In-Reply-To: <20240124121538.3188769-1-nicolas.dichtel@6wind.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: dsa: mt7530: fix 10M/100M speed on MT7988 switch
+Content-Language: en-GB
+To: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+ Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
+ <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+Cc: John Crispin <john@phrozen.org>
+References: <a5b04dfa8256d8302f402545a51ac4c626fdba25.1706071272.git.daniel@makrotopia.org>
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <a5b04dfa8256d8302f402545a51ac4c626fdba25.1706071272.git.daniel@makrotopia.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
 
-I missed this path, thanks for fixing it.
-Eric's suggestion looks good to me.
+On 24/01/2024 08:17, Daniel Golle wrote:
+> Setup PMCR port register for actual speed and duplex on internally
+> connected PHYs of the MT7988 built-in switch. This fixes links with
+> speeds other than 1000M.
+> 
+> Fixes: ("110c18bfed414 net: dsa: mt7530: introduce driver for MT7988 built-in switch")
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+
+Acked-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+
+I'm wondering why we manually set speed and duplex for these interface
+modes in the first place. I don't how it works for
+PHY_INTERFACE_MODE_INTERNAL but, at least for PHY_INTERFACE_MODE_TRGMII and
+802.3z interfaces, phylink should already supply proper speed and duplex.
+
+Arınç
 
