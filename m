@@ -1,84 +1,88 @@
-Return-Path: <netdev+bounces-65737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65738-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 513A883B886
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 04:57:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10ACF83B88C
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 05:01:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7675F1C21489
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 03:57:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8328E2840AC
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 04:01:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59C296FCA;
-	Thu, 25 Jan 2024 03:57:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2D6E6FD1;
+	Thu, 25 Jan 2024 04:01:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XNdzEAwS"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="JzPvh0mb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2077.outbound.protection.outlook.com [40.107.92.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F6066FC3
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 03:57:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706155071; cv=none; b=bRj22AmFNsT5e2vM5ciJvQtAMWgKUJZdz9h7TFjex4tZSe6K/WQy+zD3MuIFX/TrvqfyB5hCD4cB+sF/cevepHOwzbVtwPqbG+4ExkHFeVAqMK0DCsuEadSZmS+lMDWB9Fs5HU/ZRyz7ts+OrcdokTXtpqzM5gCG/WRP+8OlHIQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706155071; c=relaxed/simple;
-	bh=u5cpuDX7VeunhX9X+nzoJMuIqWttFa13DlHLwqS/TsQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Qq2dqZa0DeD1PbTTtCd0dHTr+z+oJ7dLa45CgVBZCPk3M4yhIrOaxPSb6rkiUmGrh6D3OkNgjLfBmKw3sNNh4ZkE0HNHpK7V1qSYvkfqYW6Jw/FbA0FCskIkrh7WZ9NQLKXrb8DSDKz5fBeGXXTX/hmIJlLI1bsyGPbP+Svm69Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XNdzEAwS; arc=none smtp.client-ip=209.85.167.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-3bb9d54575cso4297266b6e.2
-        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 19:57:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706155068; x=1706759868; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3E4079ibVinIdGps59KvFdwr6rMljC3CIAqrs9YlyJ8=;
-        b=XNdzEAwSGgttm4RbVP87GGD9B2x4vsn8C2Coca8j85CVpy6tBQafSWYTH6pxlOgQjo
-         0MZpJRKOCnxHPXJPYRtXsC7RG/R+DKkj/SjWNRPyKd3fjlREonMd6+6/jhDNOpwDMG1t
-         dEgfpKViIyFiolMT7BbZpE8mVm7jQ3Xw4PUnW864iAmsW9tJ23L/AmZp1t4fs+CETdyL
-         9HTJYG8k01CFrrQwZR6n1K/eN1UpWYWQxfHLYDLk062Db+/9sDsL2vG/fn4liio5OxhS
-         T5gH8558pjk746yGA+MaGZ4kS2HAAbAX6aKFHqZoUCGvNkFvQ056XxSmOcqPzcl3nf6F
-         piAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706155068; x=1706759868;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3E4079ibVinIdGps59KvFdwr6rMljC3CIAqrs9YlyJ8=;
-        b=TgCMm2/tux4/JGnpyLJZcsK/MJOoeWO/84mOlNobxfOtIpKzSLU8PzvYUkPZy+ooaO
-         2cxji91/kAUZPb0ALImo/umKjGcD1mXCLIcIvMjBpqtgJ8jj/gVXqj98e2eEmpF0ddm6
-         ngbGOAG60XOKwm5FVlNfknwK5XRW1BWCp3kokK+qu2mGdVyW5CIB3dtmGpdDDYiO/ZYc
-         43lpTu/DVqaykKmqxq54EnfUukMy1qdR/8VY6kW8oxLvjb9QESYfpKhVOEonxxZi5DYH
-         VjZc8aNZJT5Uo2hLfNNOPn5afHFGKtDNRcn0z43fwOCCiMZ0c5wjRqiSbz58nbnHC9uX
-         TZjQ==
-X-Gm-Message-State: AOJu0YwhTR0lFc6btvOlvLoPEQUnL2C9bOQouC1SvpbwWqthng3jkvgC
-	/+fBpo7EYwJ53oZKXUVjO2dTL6QDE4BHK18wIIRp8iGKX9QxjbJyngOcTVnxWok=
-X-Google-Smtp-Source: AGHT+IH1hJS7sgA8uJ4GIkk6nCSq7p8JoUMb85Kjqy8cZNdZfhXb1TZMSAdfEc9jq+kqNhhPmoxb1g==
-X-Received: by 2002:a05:6808:6089:b0:3bd:a273:27c4 with SMTP id de9-20020a056808608900b003bda27327c4mr313795oib.73.1706155068422;
-        Wed, 24 Jan 2024 19:57:48 -0800 (PST)
-Received: from xavier.lan ([136.38.127.248])
-        by smtp.gmail.com with ESMTPSA id u12-20020aa7848c000000b006ddce451a4fsm306322pfn.22.2024.01.24.19.57.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jan 2024 19:57:48 -0800 (PST)
-From: Alex Henrie <alexhenrie24@gmail.com>
-To: netdev@vger.kernel.org,
-	dan@danm.net,
-	bagasdotme@gmail.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	jikos@kernel.org
-Cc: Alex Henrie <alexhenrie24@gmail.com>
-Subject: [PATCH net-next] net: ipv6/addrconf: make regen_advance independent of retrans time
-Date: Wed, 24 Jan 2024 20:57:06 -0700
-Message-ID: <20240125035710.32118-1-alexhenrie24@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 229EC6FCA
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 04:00:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.77
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706155260; cv=fail; b=O4BcFZs4g8tHG0DvQqBPlxvsxTYQdVAuDHakcDIvQTlYDN/sIHaF+4/FLC8JalkYyAEpu2yYaOvtNJ/zE11ZfzNxJP5JXAOKALLYQNHCEV2OiXjAMHyZAoWvWBai2WEsK3UmOzi+iLTSb5qXI/fdARLKFoWsTWKHGDHvb46LOgQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706155260; c=relaxed/simple;
+	bh=HxvzL+sd7NkdmDTom3D/nDBowNb3xrHbUJn09J9UhPw=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SaaUKxYYBLXPfFVS31HDPj7ZU71rUz155Zvr9HlUIlXNkJxxAiFTYR4E9bBfUdoCqmgetexpHyCbwEzKg5C3nrVgjZIuPuX0qxu82ndmBP9Mn+yIaRw4cLQnWNG0QWiC0slW4yK87GAS8mU43Dh1DlXE2r4Mo343BYGRFuW3eXw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=JzPvh0mb; arc=fail smtp.client-ip=40.107.92.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Zth6Gn9k2pN7Xgg+sLJMSUzZGiYHVhdI7nTJYylGMuKoa2vtfOPVl+WCIFGM2oCUSGRCxWT/RziiRvZa9x7KGCAhjmuDjDzB7MJ7z7FOBTWuO/OhbfFHKR8q8eJMAW522iGDGXPDuyeblY8PY3AMwYnW1dybdApPL4j52mS7SvIgNmJ4KzrG1g5RtnzCFTKzt8d98ArtDPe7r4mKx+9Ax3DHGy21UT7rDl13jd3M0ad8953vtzDQaaTiTjnhWomr5P1oiD0zPI4ZNZA+3gUmJMzqn6J1e0fDCDW8CwJpYeGuuUaGQV603Kmm9/xjQwVz8VzwixhQijJvnNnu3AaeAw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QPcCzGdjzrz/2274vB4F1ajuRAmMWWbDWh/+huQR7Ks=;
+ b=LZJcKRdUsg7TgsLjrertzVOCJ8pcSjBWPUMiB7SVxFKxxTygkmrVDfwGlUSzrlk9neldajFSBN1DqXNOPyqLlun5WqnWC6r7M8MxNtuDdUEwGzLVxI1so0awjWPLLDp8g137uQ9OdofqWIYwfHx2I2GVvZ926e1Y2g6gEwBTyt2tPS0cnipqpb1VkS4fcL5ymnSCtLguGqnMYvdXR4bYhrXdtFY43wsG4G59AH4E6Pt0jA6aXFGiN8OuZscYRD2gUjZQsOKX96hRLOE+hbB0qY1aWk6GjLyp/iBU/IExqIIiGYp4M3O5W2AYbQ60mbjyPZbTbzz/7jFDHzye/XBUPg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QPcCzGdjzrz/2274vB4F1ajuRAmMWWbDWh/+huQR7Ks=;
+ b=JzPvh0mboeOpe8pCrmN5cM596s6Ip+xryduzylVAxeht43XxZsEO2Vn61RXIWXMiS7Xz9ieACMqFbOfJyrWNrESy4GPdlaCg1z99FpqgUBX+vqPG6zL8h/5fVhhRqFVf9z8663yi4IrOcB3j35GKuj0jBQJjpQxQR6sk2XsLKE1Ee2m/KJ4a/qIQZrR4sxbViS78U/OTiviSd71HB+bPZRQiZdf5jRLcBi0mPJ0mizeOEwtZE2pbrDY+AHgfs/zGCnAOKQtKq6dzobcSjrXMLoc0R2Ulvt1ncqlxWPXdna5dBaRmz84JdbCFAWP8fCcb7g0xrS4HPgRrkbnEWTmC7w==
+Received: from BYAPR05CA0043.namprd05.prod.outlook.com (2603:10b6:a03:74::20)
+ by CH3PR12MB8076.namprd12.prod.outlook.com (2603:10b6:610:127::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.22; Thu, 25 Jan
+ 2024 04:00:56 +0000
+Received: from SJ1PEPF00001CE1.namprd05.prod.outlook.com
+ (2603:10b6:a03:74:cafe::e5) by BYAPR05CA0043.outlook.office365.com
+ (2603:10b6:a03:74::20) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.21 via Frontend
+ Transport; Thu, 25 Jan 2024 04:00:56 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ SJ1PEPF00001CE1.mail.protection.outlook.com (10.167.242.9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7202.16 via Frontend Transport; Thu, 25 Jan 2024 04:00:55 +0000
+Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 24 Jan
+ 2024 20:00:43 -0800
+Received: from drhqmail202.nvidia.com (10.126.190.181) by
+ drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.41; Wed, 24 Jan 2024 20:00:42 -0800
+Received: from vdi.nvidia.com (10.127.8.12) by mail.nvidia.com
+ (10.126.190.181) with Microsoft SMTP Server id 15.2.986.41 via Frontend
+ Transport; Wed, 24 Jan 2024 20:00:42 -0800
+From: William Tu <witu@nvidia.com>
+To: <netdev@vger.kernel.org>
+Subject: [PATCH net-next] Documentation: mlx5.rst: Add note for eswitch MD
+Date: Wed, 24 Jan 2024 20:00:41 -0800
+Message-ID: <20240125040041.5589-1-witu@nvidia.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,173 +90,67 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE1:EE_|CH3PR12MB8076:EE_
+X-MS-Office365-Filtering-Correlation-Id: 082dc83e-2370-4690-614b-08dc1d5a3b44
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	06HS8oe8c6Zml05yDI/gyKdHgIb1PhtuyQJJn/0R7+WLgk4oeTzOcg/arEUs/+P2L+qZ6x+EzLfuORzWxLnRrSxvX7NQ3V20fWBxtZ+2WAyAyYB4YkVCbkouzUvBWwRweUYQFCeYOwvJT4TxloOLNQfKNsPH8sjn1swbwd2iJtpUkqeMPy+sfBeQtNBSAg0c4gaQpfDkqWPiXX/5nYdeudHcWv2NgvLZViLr6VTR8WEtow9jgUqu/W0x/HI7MrcuL4qfCyVApnDpzuKe8JAG95x0axsZxSnzLghOrTGo8l/hZjSCcY9XXtxvMrTyjd+NxYTTGymLYVbMG5qlCpP7ZChzk67SjJ6MfTTMJcsd/7JM1evuI79fcM4Qfrq7Ki/oWbO557R24qjtpOo7rbFWU7h7F1xAAQYSomV6H7QOvTWMo5arAWiiFzS6gKStFsZZN5CErgPQYWRU1VwHDdJme518aiYgVxJzHpXwjUjxMpH0x9WaIXRkvx4WwGvY+zruy/KjuJWjh1Os1q2oah1xlZFmbPynIBQmNvZhuVPThOnQcN6aDUtZeIPEinwf2S9HLsLmjIATKjeXts93K38On2KJmEE4B61QBhGL4iVWhKqIYT6TWdwtm71aoFdYGH8lrebme9vtnQIhOpOhaUWt7Hb+uUs1c9P4dbpBKWlBn06k2jIx1v5X7f10HbfdLpO4SH1zmdkyTEdgU7ZU/EmH/e3T0xGlRlNiQ6BDgCIOW2PUoQgPv/kY1pmsJwFEH4Lt
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(39860400002)(346002)(376002)(396003)(230922051799003)(451199024)(64100799003)(1800799012)(186009)(82310400011)(46966006)(36840700001)(40470700004)(40480700001)(40460700003)(1076003)(70586007)(5660300002)(316002)(6916009)(36860700001)(426003)(8676002)(26005)(8936002)(336012)(2616005)(70206006)(2906002)(83380400001)(47076005)(356005)(7636003)(478600001)(36756003)(41300700001)(86362001)(7696005)(82740400003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jan 2024 04:00:55.8054
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 082dc83e-2370-4690-614b-08dc1d5a3b44
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00001CE1.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8076
 
-In RFC 4941, REGEN_ADVANCE is a constant value of 5 seconds, and the RFC
-does not permit the creation of temporary addresses with lifetimes
-shorter than that:
+Add a note when using esw_port_metadata. The parameter has runtime
+mode but setting it does not take effect immediately. Setting it must
+happen in legacy mode, and the port metadata takes effects when the
+switchdev mode is enabled.
 
-> When processing a Router Advertisement with a Prefix
-> Information option carrying a global scope prefix for the purposes of
-> address autoconfiguration (i.e., the A bit is set), the node MUST
-> perform the following steps:
+Disable eswitch port metadata::
+  $ devlink dev param set pci/0000:06:00.0 name esw_port_metadata value \
+    false cmode runtime
+Change eswitch mode to switchdev mode where after choosing the metadata value::
+  $ devlink dev eswitch set pci/0000:06:00.0 mode switchdev
 
-> 5.  A temporary address is created only if this calculated Preferred
->     Lifetime is greater than REGEN_ADVANCE time units.
+Note that other mlx5 devlink runtime parameters, esw_multiport and
+flow_steering_mode, do not have this limitation.
 
-Moreover, using a non-constant regen_advance has undesirable side
-effects. If regen_advance swelled above temp_prefered_lft,
-ipv6_create_tempaddr would error out without creating any new address.
-On my machine and network, this error happened immediately with the
-preferred lifetime set to 1 second, after a few minutes with the
-preferred lifetime set to 4 seconds, and not at all with the preferred
-lifetime set to 5 seconds. During my investigation, I found a Stack
-Exchange post from another person who seems to have had the same
-problem: They stopped getting new addresses if they lowered the
-preferred lifetime below 3 seconds, and they didn't really know why.
-
-Some users want to change their IPv6 address as frequently as possible
-regardless of the RFC's arbitrary minimum lifetime. For the benefit of
-those users, add a regen_advance sysctl parameter that can be set to
-below or above 5 seconds.
-
-Link: https://datatracker.ietf.org/doc/html/rfc4941#section-3.3
-Link: https://serverfault.com/a/1031168/310447
-Signed-off-by: Alex Henrie <alexhenrie24@gmail.com>
+Signed-off-by: William Tu <witu@nvidia.com>
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 ---
- Documentation/networking/ip-sysctl.rst | 20 +++++++++++++-------
- include/linux/ipv6.h                   |  1 +
- include/net/addrconf.h                 |  5 +++--
- net/ipv6/addrconf.c                    | 17 +++++++++++------
- 4 files changed, 28 insertions(+), 15 deletions(-)
+ Documentation/networking/devlink/mlx5.rst | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
-index 7afff42612e9..0f121eda2978 100644
---- a/Documentation/networking/ip-sysctl.rst
-+++ b/Documentation/networking/ip-sysctl.rst
-@@ -2502,18 +2502,17 @@ use_tempaddr - INTEGER
- 		* -1 (for point-to-point devices and loopback devices)
+diff --git a/Documentation/networking/devlink/mlx5.rst b/Documentation/networking/devlink/mlx5.rst
+index 3f70417cf792..16700c1bc963 100644
+--- a/Documentation/networking/devlink/mlx5.rst
++++ b/Documentation/networking/devlink/mlx5.rst
+@@ -105,6 +105,10 @@ parameters.
  
- temp_valid_lft - INTEGER
--	valid lifetime (in seconds) for temporary addresses. If less than the
--	minimum required lifetime (typically 5 seconds), temporary addresses
--	will not be created.
-+	valid lifetime (in seconds) for temporary addresses. If temp_valid_lft
-+	is less than or equal to regen_advance, temporary addresses will not be
-+	created.
- 
- 	Default: 172800 (2 days)
- 
- temp_prefered_lft - INTEGER
- 	Preferred lifetime (in seconds) for temporary addresses. If
--	temp_prefered_lft is less than the minimum required lifetime (typically
--	5 seconds), temporary addresses will not be created. If
--	temp_prefered_lft is greater than temp_valid_lft, the preferred lifetime
--	is temp_valid_lft.
-+	temp_prefered_lft is less than or equal to regen_advance, temporary
-+	addresses will not be created. If temp_prefered_lft is greater than
-+	temp_valid_lft, the preferred lifetime is temp_valid_lft.
- 
- 	Default: 86400 (1 day)
- 
-@@ -2535,6 +2534,13 @@ max_desync_factor - INTEGER
- 
- 	Default: 600
- 
-+regen_advance - INTEGER
+        When metadata is disabled, the above use cases will fail to initialize if
+        users try to enable them.
 +
-+	How far in advance (in seconds) to create a new temporary address before
-+	the current one is deprecated.
-+
-+	Default: 5
-+
- regen_max_retry - INTEGER
- 	Number of attempts before give up attempting to generate
- 	valid temporary addresses.
-diff --git a/include/linux/ipv6.h b/include/linux/ipv6.h
-index 5e605e384aac..1ff10ef9abb6 100644
---- a/include/linux/ipv6.h
-+++ b/include/linux/ipv6.h
-@@ -27,6 +27,7 @@ struct ipv6_devconf {
- 	__s32		use_tempaddr;
- 	__s32		temp_valid_lft;
- 	__s32		temp_prefered_lft;
-+	__s32		regen_advance;
- 	__s32		regen_max_retry;
- 	__s32		max_desync_factor;
- 	__s32		max_addresses;
-diff --git a/include/net/addrconf.h b/include/net/addrconf.h
-index 61ebe723ee4d..b8f9d88959c7 100644
---- a/include/net/addrconf.h
-+++ b/include/net/addrconf.h
-@@ -8,8 +8,9 @@
- 
- #define MIN_VALID_LIFETIME		(2*3600)	/* 2 hours */
- 
--#define TEMP_VALID_LIFETIME		(7*86400)
--#define TEMP_PREFERRED_LIFETIME		(86400)
-+#define TEMP_VALID_LIFETIME		(7*86400)	/* 1 week */
-+#define TEMP_PREFERRED_LIFETIME		(86400)		/* 24 hours */
-+#define REGEN_ADVANCE			(5)		/* 5 seconds */
- #define REGEN_MAX_RETRY			(3)
- #define MAX_DESYNC_FACTOR		(600)
- 
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index 733ace18806c..047ac97ae3c8 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -195,6 +195,7 @@ static struct ipv6_devconf ipv6_devconf __read_mostly = {
- 	.use_tempaddr		= 0,
- 	.temp_valid_lft		= TEMP_VALID_LIFETIME,
- 	.temp_prefered_lft	= TEMP_PREFERRED_LIFETIME,
-+	.regen_advance		= REGEN_ADVANCE,
- 	.regen_max_retry	= REGEN_MAX_RETRY,
- 	.max_desync_factor	= MAX_DESYNC_FACTOR,
- 	.max_addresses		= IPV6_MAX_ADDRESSES,
-@@ -257,6 +258,7 @@ static struct ipv6_devconf ipv6_devconf_dflt __read_mostly = {
- 	.use_tempaddr		= 0,
- 	.temp_valid_lft		= TEMP_VALID_LIFETIME,
- 	.temp_prefered_lft	= TEMP_PREFERRED_LIFETIME,
-+	.regen_advance		= REGEN_ADVANCE,
- 	.regen_max_retry	= REGEN_MAX_RETRY,
- 	.max_desync_factor	= MAX_DESYNC_FACTOR,
- 	.max_addresses		= IPV6_MAX_ADDRESSES,
-@@ -1372,9 +1374,7 @@ static int ipv6_create_tempaddr(struct inet6_ifaddr *ifp, bool block)
- 
- 	age = (now - ifp->tstamp) / HZ;
- 
--	regen_advance = idev->cnf.regen_max_retry *
--			idev->cnf.dad_transmits *
--			max(NEIGH_VAR(idev->nd_parms, RETRANS_TIME), HZ/100) / HZ;
-+	regen_advance = idev->cnf.regen_advance;
- 
- 	/* recalculate max_desync_factor each time and update
- 	 * idev->desync_factor if it's larger
-@@ -4577,9 +4577,7 @@ static void addrconf_verify_rtnl(struct net *net)
- 			    !ifp->regen_count && ifp->ifpub) {
- 				/* This is a non-regenerated temporary addr. */
- 
--				unsigned long regen_advance = ifp->idev->cnf.regen_max_retry *
--					ifp->idev->cnf.dad_transmits *
--					max(NEIGH_VAR(ifp->idev->nd_parms, RETRANS_TIME), HZ/100) / HZ;
-+				unsigned long regen_advance = ifp->idev->cnf.regen_advance;
- 
- 				if (age + regen_advance >= ifp->prefered_lft) {
- 					struct inet6_ifaddr *ifpub = ifp->ifpub;
-@@ -6789,6 +6787,13 @@ static const struct ctl_table addrconf_sysctl[] = {
- 		.mode		= 0644,
- 		.proc_handler	= proc_dointvec,
- 	},
-+	{
-+		.procname	= "regen_advance",
-+		.data		= &ipv6_devconf.regen_advance,
-+		.maxlen		= sizeof(int),
-+		.mode		= 0644,
-+		.proc_handler	= proc_dointvec,
-+	},
- 	{
- 		.procname	= "regen_max_retry",
- 		.data		= &ipv6_devconf.regen_max_retry,
++       Note: Setting this parameter does not take effect immediately. Setting
++       must happen in legacy mode and eswitch port metadata takes effect after
++       enabling switchdev mode.
+    * - ``hairpin_num_queues``
+      - u32
+      - driverinit
 -- 
-2.43.0
+2.34.1
 
 
