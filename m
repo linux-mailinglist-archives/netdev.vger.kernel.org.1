@@ -1,153 +1,150 @@
-Return-Path: <netdev+bounces-66020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F1B783CF43
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 23:24:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFBFE83CF5B
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 23:29:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE26C296A7A
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 22:24:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77CA41F2284C
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 22:29:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57C2913AA5C;
-	Thu, 25 Jan 2024 22:23:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 179E713B793;
+	Thu, 25 Jan 2024 22:29:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pTfVShRy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dEFfkSx1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BB4713A27D
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 22:23:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AF4613B787;
+	Thu, 25 Jan 2024 22:29:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706221439; cv=none; b=TcYyOCsXlwUJ4Wg9E+nHfA8Pzrj0FOIM0bd4Flsw/s9tlVvMqX92RB2UJn2L1MDy3qVGT24jgru3hvjYNUdFV2UhXofAYzGZfJnNN1lZMXgDAolB+Ka/oxq6/g/yGpg4r7+9y+ZIGzbsU24lsBQJzqU1Q/lJ7koWpNc2aTSJ8U4=
+	t=1706221791; cv=none; b=dYQNTxR2/axnnpdfbNELM525hy4l8OOdmvUXXyK4OWdPKXC24djbSp/fFNCawdiTGSB5Bo2plTVNCxAhMQ457SVytMyWdmuatcYkXf1WCSy94jOpTXdH65YUrQAglsIP04LjHFK5DOAgW6ZSzfA+VdoDd1PZ7JTIU5zhS2WSWPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706221439; c=relaxed/simple;
-	bh=6cRWQrFRgUief1NPnFvtkb56/IGUthGnWRG8BdZ5rnw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NAIFXZiAmeJZ9WB17NNSTTkcB2sFeR+P5NdPVjb9DyWug1lDqGHCp9I2kqoe/tyeGaalNDgEGrJD+QhrN7FiqEbjiZjc7kqc4g7Uz7wagd4w7m0Ync7wr4BKfIr3ovSuUJfbYN9NzlLjoJtKIQbAUzsArx72UGcRPt4oA3uuwsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pTfVShRy; arc=none smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-429d2ebdf05so96071cf.0
-        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 14:23:55 -0800 (PST)
+	s=arc-20240116; t=1706221791; c=relaxed/simple;
+	bh=teWxaZbkvWhb0PCw6q28RFREAnhb+f1N7VXEo2/etKQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UbEqSe+dPSd83w4ESOlgBAevgJYLFUVI3vzR4pAaCFeEwrafkJpUeXVj2zT48y7hZ510xGSrXxBf47Xg/AjTTMAIWsqaIH70sdognumCiBm3dzzuVqzsl2YcEH8zqtFuT2FNqVYNITH81ELd3d7dw2HKUyKm7JUcb0I5fUWZbtY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dEFfkSx1; arc=none smtp.client-ip=209.85.167.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-3bbbc6bcc78so19895b6e.1;
+        Thu, 25 Jan 2024 14:29:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706221435; x=1706826235; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ugES21rFNQxHoBbo+moEN7jaIFZGE4ifkZMe2NX5CNo=;
-        b=pTfVShRyO2AL4MzrXTva6NbnJCIQ7aIBT3EYZS18QmL3bRkV3i2uPcXDBI3m62d6dd
-         3waK1Wf1OxCo14Z1Iq00q5O1RGp0lQmrCXUZ+5dJj4AQfCUDdeFAPtCL1uYh1i7zYXdK
-         4ZxEg9VV3uJeGDrUSg2d+0GNp7F7aRVaUI+Hgl6q6rNwL/C0bVLXDMHz6u0wixTsldnA
-         1jZlshntfObVlUcpTnMGmZezta2hs2FqXTFDTpykeqbP17MT38VHvWaziHqbEqZxK0a7
-         DL7mE8Hf7/eL2JJZA0maFA5vTs0OE6/bee/EP+FgrEhlIWw55RvI63agxFf06Htd+y3t
-         fQLg==
+        d=gmail.com; s=20230601; t=1706221788; x=1706826588; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ouPYgv6jvx+UEBYd2b28+Blg8/f1MS+BmmcDzg8dExg=;
+        b=dEFfkSx1lM12Ws+RFdttte2hsT36bVG58tYR62eE888DGz43Tpfp6+NVnMSefeB3ni
+         DSgVEsj0eYg5XTb2yPcd/iqon4Cmsy1/zRsgE1IAMELxVD+n84XmiWPDHltpsW6WFcJP
+         9+exS6pl3lPHV0dbbt73ls2jICrdi1lFlpUpqE/ZXQjFl+fROJ0HyAvDUuRkTU8Em2Aw
+         nxDEYhwhnPptXzWRtZp23czP/FT+YaHZ/MHbKkTWDKP9Qw+LlpKTEfr7lJ8SZPntcsjh
+         TA0Kv6SYaxuDLDg/VrKZ0J52Q62l7A8QBYHTzLaC+2ixYcTWgwd1IobpSY6cTKVvxYWn
+         rpfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706221435; x=1706826235;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ugES21rFNQxHoBbo+moEN7jaIFZGE4ifkZMe2NX5CNo=;
-        b=Ql4RXLqg+ibSpHlp/8ezZOY9CujgpKGtig7OCjMAR+YQHRbLmKKvsoerVlJY4T83As
-         Se6W+FKfgSvPqoLG5LWUWAu9xUf+rusIuFLpJdDE3yKbARCkmIs4KzIM3UyNLRbeQtF9
-         mjhE/AzS7xLbWRzTcoizqF/a9t5n55PXAT/rk0gS6ASTe+YoONS0/ZsO45ChPVaOhc+g
-         WJbTXliKQDUzIPsvZ9tEdlSogF1GZ557QxlPmsXoFZ2MFxXgoYiFxqw6SMcISVvxHKeZ
-         69YqNT4Ye7/BMTyA9Ox8gWUdNmyjpB9uQ5VEEo+ualicDFuIwsNhLVDvL8vAUYRtyW1w
-         ilTw==
-X-Gm-Message-State: AOJu0YxI4YxPhVaHcm68T/mf0fviy89b2vkOc+ysJKScHVpcXS8tvSz1
-	8LeeJi0xbugs786nLeaFMr6itlONktjAjPXFuB2o6Cs8iNX7EAbzEArIWdUjf3y7Dy5ewEtPC2R
-	nM66xuVjPVwqVN42KVDvQVOKWRcC9AjCYMUY2
-X-Google-Smtp-Source: AGHT+IGyt1ku60lKQ5hWkUlvNugCNWMatPICldi3Xxa0R/YH6+vQKdazVRsKCHrMOApQSR0HU7DhpAxCNO2a57KN+L0=
-X-Received: by 2002:a05:622a:6099:b0:42a:5924:b0bf with SMTP id
- hf25-20020a05622a609900b0042a5924b0bfmr69431qtb.22.1706221434912; Thu, 25 Jan
- 2024 14:23:54 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706221788; x=1706826588;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ouPYgv6jvx+UEBYd2b28+Blg8/f1MS+BmmcDzg8dExg=;
+        b=CSy2rCapOGhHcVGaDQVwAC4/5AJP/+FOIimb6NsSfrwynL6YXijSthqBo9cOnLqwoM
+         2YNopA675mIdxjs0zEjXBM3u73qA1apE0FsZ8doZwfW0fNahApr6jGaRzkV5CucBVBkI
+         1PTAa+mwlKC7MjNVKz27kJQQq3Y9YmYP59WXe1zkv3O+C66miAxdi2JqNOTabKIA56MJ
+         EJEl3BRpveTIf6yAoci3Eb6V7DKPXYjqxVQPAqfjttoNj8k8ujr7LCr7mi2N8f830fku
+         A0BLzLHuHkM2gn0L0hRhQwpEu4KP5Gw6wt+/ERGm+V/C+uzR8/jB/xJ7DXEIduEm943m
+         7keg==
+X-Gm-Message-State: AOJu0Yy06Ng15C4KxLsmf1EXfkyfTz2ovLC3gCJVCzp5WIVPm4u2/sQd
+	dFLmp8sINy4fX6uL3Umwe//fEipIdlXqsyQpH2MnvzXIwDIU8N7W43VvzrhQ
+X-Google-Smtp-Source: AGHT+IG2/VOSv7+PKEiOE3BXtYPlBdE7raA2v7l8QZn0/Wb+nptsL1ZfejajXmKefyekueVTU6waZg==
+X-Received: by 2002:a05:6808:2024:b0:3bd:d8d4:5706 with SMTP id q36-20020a056808202400b003bdd8d45706mr541354oiw.12.1706221788293;
+        Thu, 25 Jan 2024 14:29:48 -0800 (PST)
+Received: from wsfd-netdev15.ntdv.lab.eng.bos.redhat.com (nat-pool-bos-t.redhat.com. [66.187.233.206])
+        by smtp.gmail.com with ESMTPSA id b26-20020a05620a04fa00b007836720b96asm5448924qkh.24.2024.01.25.14.29.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Jan 2024 14:29:47 -0800 (PST)
+From: Xin Long <lucien.xin@gmail.com>
+To: network dev <netdev@vger.kernel.org>,
+	netfilter-devel@vger.kernel.org,
+	linux-sctp@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Subject: [PATCH nf] netfilter: check SCTP_CID_SHUTDOWN_ACK for vtag setting in sctp_new
+Date: Thu, 25 Jan 2024 17:29:46 -0500
+Message-Id: <28d65b0749b8c1a8ae369eec6021248659ba810c.1706221786.git.lucien.xin@gmail.com>
+X-Mailer: git-send-email 2.39.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240125103317.2334989-1-edumazet@google.com> <ZbKHVt_wkIfjKJXB@casper.infradead.org>
-In-Reply-To: <ZbKHVt_wkIfjKJXB@casper.infradead.org>
-From: Arjun Roy <arjunroy@google.com>
-Date: Thu, 25 Jan 2024 14:23:43 -0800
-Message-ID: <CAOFY-A3pi-FNbe_=ED+4HGimBdLq95xiom++Jd6f9aRrbEssBA@mail.gmail.com>
-Subject: Re: [PATCH net] tcp: add sanity checks to rx zerocopy
-To: Matthew Wilcox <willy@infradead.org>
-Cc: Eric Dumazet <edumazet@google.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Neal Cardwell <ncardwell@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	ZhangPeng <zhangpeng362@huawei.com>, linux-mm@vger.kernel.org, 
-	Andrew Morton <akpm@linux-foundation.org>, linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jan 25, 2024 at 8:07=E2=80=AFAM Matthew Wilcox <willy@infradead.org=
-> wrote:
->
-> On Thu, Jan 25, 2024 at 10:33:17AM +0000, Eric Dumazet wrote:
-> > +++ b/net/ipv4/tcp.c
-> > @@ -1786,7 +1786,17 @@ static skb_frag_t *skb_advance_to_frag(struct sk=
-_buff *skb, u32 offset_skb,
-> >
-> >  static bool can_map_frag(const skb_frag_t *frag)
-> >  {
-> > -     return skb_frag_size(frag) =3D=3D PAGE_SIZE && !skb_frag_off(frag=
-);
-> > +     struct page *page;
-> > +
-> > +     if (skb_frag_size(frag) !=3D PAGE_SIZE || skb_frag_off(frag))
-> > +             return false;
-> > +
-> > +     page =3D skb_frag_page(frag);
-> > +
-> > +     if (PageCompound(page) || page->mapping)
-> > +             return false;
->
-> I'm not entirely sure why you're testing PageCompound here.  If a driver
-> allocates a compound page, we'd still want to be able to insert it,
-> right?
->
+The annotation says in sctp_new(): "If it is a shutdown ack OOTB packet, we
+expect a return shutdown complete, otherwise an ABORT Sec 8.4 (5) and (8)".
+However, it does not check SCTP_CID_SHUTDOWN_ACK before setting vtag[REPLY]
+in the conntrack entry(ct).
 
-Resend b/c I forgot I was in HTML mode email, oops.
+Because of that, if the ct in Router disappears for some reason in [1]
+with the packet sequence like below:
 
-Is there a common use case for a NIC driver to be doing this? I was
-under the impression NIC drivers would get pages individually since it
-would be harder to find physically contiguous groupings in general.
+   Client > Server: sctp (1) [INIT] [init tag: 3201533963]
+   Server > Client: sctp (1) [INIT ACK] [init tag: 972498433]
+   Client > Server: sctp (1) [COOKIE ECHO]
+   Server > Client: sctp (1) [COOKIE ACK]
+   Client > Server: sctp (1) [DATA] (B)(E) [TSN: 3075057809]
+   Server > Client: sctp (1) [SACK] [cum ack 3075057809]
+   Server > Client: sctp (1) [HB REQ]
+   (the ct in Router disappears somehow)  <-------- [1]
+   Client > Server: sctp (1) [HB ACK]
+   Client > Server: sctp (1) [DATA] (B)(E) [TSN: 3075057810]
+   Client > Server: sctp (1) [DATA] (B)(E) [TSN: 3075057810]
+   Client > Server: sctp (1) [HB REQ]
+   Client > Server: sctp (1) [DATA] (B)(E) [TSN: 3075057810]
+   Client > Server: sctp (1) [HB REQ]
+   Client > Server: sctp (1) [ABORT]
 
-Anyways, a possible reason to not allow compound pages - if we have
-some large memory range and different receiving users are interested
-in different parts of the range in userspace - since the whole range
-is pinned till everyone is done with it, it can lead to worse cases of
-memory lingering when some user only wanted 10 bytes out of some N *
-PAGE_SIZE range for a multi-minute long period.
+when processing HB ACK packet in Router it calls sctp_new() to initialize
+the new ct with vtag[REPLY] set to HB_ACK packet's vtag.
 
--Arjun
+Later when sending DATA from Client, all the SACKs from Server will get
+dropped in Router, as the SACK packet's vtag does not match vtag[REPLY]
+in the ct. The worst thing is the vtag in this ct will never get fixed
+by the upcoming packets from Server.
 
+This patch fixes it by checking SCTP_CID_SHUTDOWN_ACK before setting
+vtag[REPLY] in the ct in sctp_new() as the annotation says. With this
+fix, it will leave vtag[REPLY] in ct to 0 in the case above, and the
+next HB REQ/ACK from Server is able to fix the vtag as its value is 0
+in nf_conntrack_sctp_packet().
 
-> I have a feeling that we want to fix this in the VM layer.  There are
-> some weird places calling vm_insert_page() and we should probably make
-> them all fail.
->
-> Something like this, perhaps?
->
-> diff --git a/mm/memory.c b/mm/memory.c
-> index 1a60faad2e49..ae0abab56d38 100644
-> --- a/mm/memory.c
-> +++ b/mm/memory.c
-> @@ -1871,6 +1871,10 @@ static int insert_page_into_pte_locked(struct vm_a=
-rea_struct *vma, pte_t *pte,
->
->         if (!pte_none(ptep_get(pte)))
->                 return -EBUSY;
-> +       if (folio->mapping &&
-> +           ((addr - vma->vm_start) / PAGE_SIZE + vma->vm_pgoff) !=3D
-> +           (folio->index + folio_page_idx(folio, page)))
-> +               return -EINVAL;
->         /* Ok, finally just insert the thing.. */
->         folio_get(folio);
->         inc_mm_counter(vma->vm_mm, mm_counter_file(folio));
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
+---
+ net/netfilter/nf_conntrack_proto_sctp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/netfilter/nf_conntrack_proto_sctp.c b/net/netfilter/nf_conntrack_proto_sctp.c
+index c6bd533983c1..4cc97f971264 100644
+--- a/net/netfilter/nf_conntrack_proto_sctp.c
++++ b/net/netfilter/nf_conntrack_proto_sctp.c
+@@ -283,7 +283,7 @@ sctp_new(struct nf_conn *ct, const struct sk_buff *skb,
+ 			pr_debug("Setting vtag %x for secondary conntrack\n",
+ 				 sh->vtag);
+ 			ct->proto.sctp.vtag[IP_CT_DIR_ORIGINAL] = sh->vtag;
+-		} else {
++		} else if (sch->type == SCTP_CID_SHUTDOWN_ACK) {
+ 		/* If it is a shutdown ack OOTB packet, we expect a return
+ 		   shutdown complete, otherwise an ABORT Sec 8.4 (5) and (8) */
+ 			pr_debug("Setting vtag %x for new conn OOTB\n",
+-- 
+2.39.1
+
 
