@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-66006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66007-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B903983CDBC
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 21:46:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4433483CDF6
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 22:04:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BD391F2292B
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 20:46:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D5C31C238C2
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 21:04:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7E99137C31;
-	Thu, 25 Jan 2024 20:45:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F0D01386CC;
+	Thu, 25 Jan 2024 21:03:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Iu30FEXn"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="oQ47RzA6"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AA4C131E40;
-	Thu, 25 Jan 2024 20:45:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA781386BB;
+	Thu, 25 Jan 2024 21:03:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706215551; cv=none; b=JtWhgIkzla+Tji7tBawXM4hWMljOn460Lc3VZj4Pp7j1vP8WDKQfj8LWqCJ7qJARHDDBuOzTZY7v2HuCWA5Xo3Q0eZS8WCNVjuVoAgFhLfCb33k2XbrEoo+akeElm2E/CNZCZgpU0J4fKjZSgnf/Yc9FH0deYjAtLy8eTvL6wCQ=
+	t=1706216636; cv=none; b=X9Cltc+bfKSQAtbafo37/tgvEu6KVUtsg4JEEZWD0Pu4KbKs5SffTimT5vbb/tcOxGj/7ljQPcgQ/+/H9brIxa1GScXzEFMFs+nh6ivn5xjkBYPTlFlblV8Rk+VUipERu1ppuEd8DWYBCeD8uRYKXXmkI1zLqSpzs1MtZf/yoo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706215551; c=relaxed/simple;
-	bh=MEYtjeW29vfCnD9UeqkFj+lrriB0AqvztxsmzdZxKf8=;
+	s=arc-20240116; t=1706216636; c=relaxed/simple;
+	bh=XvQKZeltXenXh3RZWvWZ+AtK3njPDgPT8/8uVcOeufg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oJdE1XIOWBEipotMBWzvhuiQ9m/Zlb2mQKETNBKeTGS855uOeMphe/TrrHch9xGi6UsJXZEFy/gPpr5u02GzlYhSJkV6OS2fKo12Yy4lkgKR1qtCkQFt8Amjt6GoEHSsDaUA3aWXDZyle/ueReHTiDSKiPKIrraZ4JHwjawzPxo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Iu30FEXn; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=IDOisMhQkrEBxxXOw83J6+zumu/X5N+U7P4RnSI54YEndmH40BZV90c8HUHzZZoxcEjuCvqSxKjGO92cWW1P8jwAgg6HdFzzk8pbfOI8kkOfndSb7315yDv9CHLEyxbC+yg5IaefZuwfQLOlvYQlt6I5WPrNNb8xuBJeVzVIDDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=oQ47RzA6; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=NjvNmpvcyNjsNydEo+Z2ltkIxVtWxwctxxsjrOVm3aI=; b=Iu30FEXnJMWAZuuxH3st9SEc0J
-	05YCNF82thUjrVtBzvkzYVU1IuZKCChHWOB5Qeok3uOZCv7PQ5CQ/s/n5t5j0G74VYzQol8ZZKyGb
-	RUnIMCWFbfjBYch9zGLzaiK+aMJ72YN8j4Z0rfFOr2zW7xcAA33YPLIxKSDMUFqmOWao=;
+	bh=Bu/MVp9rSX8C5VovP+Gle5TXdDW/jXtcb4d6OYgbRKE=; b=oQ47RzA6/NF69XT8vHhdbvU5Q4
+	EV2nhyPaB0Bp56zCEaEGXAAiU+B0bbnRKvt1rMvM8CqIm6aW+++ImL2feh/wNvpa5qwsxqvfpCOqo
+	h2OneHD/QgB2z/wUxyOvj6TnbM+uWWM9BRzRZ2+AWlf5y+JUEnZmfFsFKTlOgyg93CQg=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rT6bQ-0067eB-86; Thu, 25 Jan 2024 21:45:36 +0100
-Date: Thu, 25 Jan 2024 21:45:36 +0100
+	id 1rT6sr-0067iF-FU; Thu, 25 Jan 2024 22:03:37 +0100
+Date: Thu, 25 Jan 2024 22:03:37 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: Danielle Ratson <danieller@nvidia.com>
 Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
@@ -54,12 +54,11 @@ Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
 	paul.greenwalt@intel.com, jiri@resnulli.us,
 	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
 	mlxsw@nvidia.com, petrm@nvidia.com, idosch@nvidia.com
-Subject: Re: [RFC PATCH net-next 1/9] ethtool: Add ethtool operation to write
- to a transceiver module EEPROM
-Message-ID: <20ab7355-fc72-4dba-b3ea-db2244909bab@lunn.ch>
+Subject: Re: [RFC PATCH net-next 9/9] ethtool: Add ability to flash
+ transceiver modules' firmware
+Message-ID: <5bf6b526-02c4-4940-b8ec-bf858f9d4a58@lunn.ch>
 References: <20240122084530.32451-1-danieller@nvidia.com>
- <20240122084530.32451-2-danieller@nvidia.com>
- <9eecccb0-a875-4dbc-b88c-5b2aad838305@lunn.ch>
+ <20240122084530.32451-10-danieller@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,36 +67,46 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9eecccb0-a875-4dbc-b88c-5b2aad838305@lunn.ch>
+In-Reply-To: <20240122084530.32451-10-danieller@nvidia.com>
 
-On Thu, Jan 25, 2024 at 09:26:16PM +0100, Andrew Lunn wrote:
-> On Mon, Jan 22, 2024 at 10:45:22AM +0200, Danielle Ratson wrote:
-> > From: Ido Schimmel <idosch@nvidia.com>
-> > 
-> > Ethtool can already retrieve information from a transceiver module
-> > EEPROM by invoking the ethtool_ops::get_module_eeprom_by_page operation.
-> > Add a corresponding operation that allows ethtool to write to a
-> > transceiver module EEPROM.
-> > 
-> > The purpose of this operation is not to enable arbitrary read / write
-> > access, but to allow the kernel to write to specific addresses as part
-> > of transceiver module firmware flashing. In the future, more
-> > functionality can be implemented on top of these read / write
-> > operations.
-> 
-> My memory is dim, but i thought we decided that since the algorithm to
-> program these modules is defined in the standard, all we need to do is
-> pass the firmware blob, and have an in kernel implementation of the
-> algorithm. There is no need to have an arbitrary write blob to module,
-> which might, or might not be abused in the future.
+> +static int
+> +module_flash_fw_schedule(struct net_device *dev,
+> +			 struct ethtool_module_fw_flash_params *params,
+> +			 struct netlink_ext_ack *extack)
+> +{
+> +	const struct ethtool_ops *ops = dev->ethtool_ops;
+> +	struct ethtool_module_fw_flash *module_fw;
+> +	int err;
+> +
+> +	if (!ops->set_module_eeprom_by_page ||
+> +	    !ops->get_module_eeprom_by_page) {
+> +		NL_SET_ERR_MSG(extack,
+> +			       "Flashing module firmware is not supported by this device");
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+> +	if (dev->module_fw_flash_in_progress) {
+> +		NL_SET_ERR_MSG(extack, "Module firmware flashing already in progress");
+> +		return -EBUSY;
+> +	}
+> +
+> +	module_fw = kzalloc(sizeof(*module_fw), GFP_KERNEL);
+> +	if (!module_fw)
+> +		return -ENOMEM;
+> +
+> +	module_fw->params = *params;
+> +	err = request_firmware(&module_fw->fw, module_fw->params.file_name,
+> +			       &dev->dev);
 
-O.K, back after reading more of the patches.
+How big are these firmware blobs?
 
-If i'm understanding the code correctly, this is never exposed to
-userspace? Its purely an in kernel API? It would be good to make that
-clear in the commit message, and document that in the ethtool ops
-structure.
+Ideally we want to be able to use the same API to upgrade things like
+GPON modules, which often run an openwrt image, and they are plugged
+into a cable modem which does not have too much RAM.
 
-Thanks
-      Andrew
+Given that the interface to the EEPROM is using 128 byte 1/2 pages,
+would it be possible to use request_partial_firmware_into_buf() to
+read it on demand, rather than all at once?
+
+     Andrew
 
