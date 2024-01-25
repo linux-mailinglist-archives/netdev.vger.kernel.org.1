@@ -1,181 +1,172 @@
-Return-Path: <netdev+bounces-65780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65781-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 748BC83BB2F
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:02:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B696B83BB43
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:04:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99B1E1C25AF4
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 08:02:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 663DD28D133
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 08:04:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A6301759E;
-	Thu, 25 Jan 2024 08:01:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8F32171C9;
+	Thu, 25 Jan 2024 08:03:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fVJnmgWN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fS9LzZeP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D164C1A587
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 08:01:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 509AB1B7E3;
+	Thu, 25 Jan 2024 08:03:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706169671; cv=none; b=DYnkHkeaQn0dUePWTL+xA4ONVk6/kbpkwBSGK3Lq4P9oq2Io75dWZqzZ6O1pKs45psTQUaYVTS+75ET9wuQEI+ZZc63Wlv2wxz4NbDynkbXSRuANRD2ywU0y5rsdjTseZ5fXoK2Gp5eshnHpOwvZ3XQmNJFV3NZdJV5/4KDXHp4=
+	t=1706169793; cv=none; b=jW5X6euoT6zqDVPmD38C+71skgQJxlx2wPTLSLfBeLX5eXVR8mt/FicorjQfxgktGFn/3r7IXwf+6XHLmkGOPY0Fw/GKSz1cpSgYPzdsNye8MVjbbf8WTeXPJ3KB2BCD6S1dqphMxWhTLtCPnDFnf8gUgXMhtFcB+Yms8GWHqb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706169671; c=relaxed/simple;
-	bh=JlGqtlXmGZ0i7vbAdQZllGOf+Z4BV9SFg89a3Ou+PNo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YsyNjmrRxBZQ2vIKwpKeYKEbOa69CMg7k9AbOerEWilrMUspBqQUOTTI5ofKGT7hHOxpjyVkhDKESVPu+GBbJErODAjUn7+B2xn+cl/qOOQiLlokaLU7k8V+rfG6fiCUAf2yTRi2ia3CK7krPNJGLQHiO6lRZ45bXhhi8h5EpBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fVJnmgWN; arc=none smtp.client-ip=209.85.221.46
+	s=arc-20240116; t=1706169793; c=relaxed/simple;
+	bh=Q+apXASFN9hAfeGyUzb9CbK0Nwnl5hmRD0eJMrpKgCU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cyOgonnOtJzoYDSgiXVdyNGPnl31/ceutYLKaMPHY1heSOn9x9bgtmIsBLlh0J68vQtpQJs2jksbZTAtF5EwSndfmiqpw+VgN74XYJ0I6sUcxR9PY89BH7eXhK032YxvwvbJLXd6xbqiPiOJzDu7Ip64H6+mEtQQ0H9yf55rMPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fS9LzZeP; arc=none smtp.client-ip=209.85.222.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-33926ccbc80so4052380f8f.0
-        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 00:01:09 -0800 (PST)
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-783bd5ab16bso2179385a.1;
+        Thu, 25 Jan 2024 00:03:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706169668; x=1706774468; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=k9kXOGBqOvW0ff6agZpHOQcSoxxYTM2oeo2GnQTYfso=;
-        b=fVJnmgWND1ZzL6Vv6RyBtiZVkFG1V8cctlj7fPW28cFToqyJn+eX7mA15X63PElmIa
-         BgYPNudy98lFOP4ProOfVsJw61AHeAGWSyE454urdYKO9SBLFsr7lNFJTZvw/mJrzJ85
-         CPLydmt8i9VyyFt5odeTjHFoRuAsEqE8kL/mFrYUZvBR/grORYYS2i8bhGOkbOzg9npB
-         zSf7bE2PY7ecUlcq0+JV6WNXZL1FXCxVH0TLg91xFE18ZMW5BvbeNJ+WGFfQ8tmMiQ7h
-         rEyMI544O3ywmEpKIVp1dWXpMNxqPGHXAlgXsuIp4pH4Zc2bDlLHdmzTP2+iYG3ZUYo7
-         AvkA==
+        d=gmail.com; s=20230601; t=1706169791; x=1706774591; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=T4/qnbYwOLKQwJh7Og4jBlxBc5i+e/lVSW01/xJVsmM=;
+        b=fS9LzZePDQERC2lCVAACq9PQzUw7Xie2c0zzhKrDX14xpESnRJ+VxLX3yAYKJUozK/
+         xWf292G3t+05rjeLR61FnWTBI9ZwieFawuakZcrc+BvNTHPs4ojEW+n1U9H874U8bEYP
+         1KiCgHJAPqR3v1KO9OY/aUQyZ6xuUvARSlF9//nGNzm2wcgIKqWb5IEj3INTe52BNmt0
+         lXfGT2UOSJ0Af1BQhcOqk9yceqjuIAvPHXhoncsQBPKDJHu5LrQtvm7bv408BhxPqDUs
+         92t6S3ZZrsQfI76skCXjYwRyhk2gYLnCk9QdN1hWQlr7MsPB8y7qcSYop8RFjDvvF6PE
+         bqEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706169668; x=1706774468;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=k9kXOGBqOvW0ff6agZpHOQcSoxxYTM2oeo2GnQTYfso=;
-        b=Hz59ztZPdqSseh3vtXYgvJKKtPMOMnNa0ohv04cxRx2frxO7LbBib6Da8u7JyafuFS
-         /sSh2lGpJIfwgUu5JwrWA5ryR6VCwxhsGX6Qu+RCJ/5UU84VXMQA9OfXQTWF+mtEye8e
-         vSa4xQYXnL8Q01M5IZyYbk0Bpp4a0886QK9CvYlY7qndIq/pKG71lmSkKNhs0O9xYYj4
-         lV1Hp0nsfI/jCl7M7yWCH3p2slo8XqpVmoLz80/kM7ZAYv98a2P9wA/SQGTcMx0mcrVA
-         X6nbsZDNc2BW/y5KN4JtIxiNmyjeKcR5o6BXxaxgMKzwEK7/QbTxgJLKvjtXqGiYucH0
-         VcBA==
-X-Gm-Message-State: AOJu0YxgmBakRbIfb0mCpoiHOR8PDqwsAK7xfga0FiSOpIjdsOYWpBg/
-	2rlAEMQa/4x+ls4qg4RlIhyYKTnmsYUAWFQrsyvCN56CEUXtOncC
-X-Google-Smtp-Source: AGHT+IG4I/XsvK3tTvsqQ2pCxl8Ub/ZaSP+qyJC63ILXa0jyT9K04fiRgYDOkFCJfiXiazRWcUGBDQ==
-X-Received: by 2002:adf:f8c7:0:b0:337:c0e2:8b15 with SMTP id f7-20020adff8c7000000b00337c0e28b15mr428063wrq.101.1706169667964;
-        Thu, 25 Jan 2024 00:01:07 -0800 (PST)
-Received: from [172.27.57.151] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id g14-20020a05600c4ece00b0040d5ae2906esm1599782wmq.30.2024.01.25.00.01.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Jan 2024 00:01:07 -0800 (PST)
-Message-ID: <4bb155ee-f727-449f-bd88-ba117107a88f@gmail.com>
-Date: Thu, 25 Jan 2024 10:01:05 +0200
+        d=1e100.net; s=20230601; t=1706169791; x=1706774591;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=T4/qnbYwOLKQwJh7Og4jBlxBc5i+e/lVSW01/xJVsmM=;
+        b=T5cO1wgSAs8DXpqGvywK41/EgcE2V4kE2Yi9TeZbPOk2ongXz7PioC00+aKHPQTYah
+         SM2eHgIZCF4eEJxke5JiS5gE8vLzvZSHmsV4kxAZ4lDfFCzIDfAjeBJ2LERuvsvC9vY5
+         XwovEX2asGKcsBbE0F4QFoJiZveIMSNqbM2NGEzk/uoFXqVFNqSTxLKtJvRysllAmSCj
+         YqeQlfr53NaoIm6i6RrIgRcctFKYDSPji0tO7l1aaoMf5kuRZWwnp/wCoVc8FkoCoZrB
+         R6c41E7LkL91lh5y9AF11KH7l2cfcsNvfYfWoj/l1wdo8l9PfPvTE9Jk9LDAhC7tf+eN
+         b+Vw==
+X-Gm-Message-State: AOJu0Yxk333ATR+0R5z6X+6AzyQZsTc+h15lUiLu0SBQju6OnrujxHaN
+	6PBgNaXvFDeTNUSTIF7JFLEf1Hp/JpwGOZ4bBlvGVcERhSyj2hjfAQMeRuJ8ZMj28JWPZE+JZaZ
+	A7ou73COr2YBKJYNtBDlREnLe3fw=
+X-Google-Smtp-Source: AGHT+IHQ04R8lQPfClb/chn2yyN0DiOmwlzEjWJ3uNy8pvLIIOmCXX2kyqb6BFLtxFDHfG8r0B7CjFlT//AEN5aZeuk=
+X-Received: by 2002:a05:6214:5294:b0:686:9faf:6f10 with SMTP id
+ kj20-20020a056214529400b006869faf6f10mr1139585qvb.0.1706169791014; Thu, 25
+ Jan 2024 00:03:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next 10/15] net/mlx5e: Let channels be SD-aware
-Content-Language: en-US
-To: Gal Pressman <gal@nvidia.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: Saeed Mahameed <saeed@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>,
- netdev@vger.kernel.org, Tariq Toukan <tariqt@nvidia.com>
-References: <20231221005721.186607-1-saeed@kernel.org>
- <20231221005721.186607-11-saeed@kernel.org>
- <20240104145041.67475695@kernel.org>
- <effce034-6bc5-4e98-9b21-c80e8d56f705@nvidia.com>
- <20240108190811.3ad5d259@kernel.org>
- <d0ce07a6-2ca7-4604-84a8-550b1c87f602@nvidia.com>
- <20240109080036.65634705@kernel.org>
- <9d29e624-fc02-44cd-9a92-01f813e66eed@nvidia.com>
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <9d29e624-fc02-44cd-9a92-01f813e66eed@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240124191602.566724-1-maciej.fijalkowski@intel.com> <20240124191602.566724-9-maciej.fijalkowski@intel.com>
+In-Reply-To: <20240124191602.566724-9-maciej.fijalkowski@intel.com>
+From: Magnus Karlsson <magnus.karlsson@gmail.com>
+Date: Thu, 25 Jan 2024 09:02:59 +0100
+Message-ID: <CAJ8uoz13xSsc2tOyFv4i7=vXh_2=7t39HNeGC4dPufAbozDR6g@mail.gmail.com>
+Subject: Re: [PATCH v6 bpf 08/11] ice: update xdp_rxq_info::frag_size for ZC
+ enabled Rx queue
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
+	andrii@kernel.org, netdev@vger.kernel.org, magnus.karlsson@intel.com, 
+	bjorn@kernel.org, echaudro@redhat.com, lorenzo@kernel.org, 
+	martin.lau@linux.dev, tirthendu.sarkar@intel.com, john.fastabend@gmail.com, 
+	horms@kernel.org, kuba@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
+On Wed, 24 Jan 2024 at 20:27, Maciej Fijalkowski
+<maciej.fijalkowski@intel.com> wrote:
+>
+> Now that ice driver correctly sets up frag_size in xdp_rxq_info, let us
+> make it work for ZC multi-buffer as well. ice_rx_ring::rx_buf_len for ZC
+> is being set via xsk_pool_get_rx_frame_size() and this needs to be
+> propagated up to xdp_rxq_info.
+>
+> Use a bigger hammer and instead of unregistering only xdp_rxq_info's
+> memory model, unregister it altogether and register it again and have
+> xdp_rxq_info with correct frag_size value.
 
+Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
 
-On 10/01/2024 16:09, Gal Pressman wrote:
-> On 09/01/2024 18:00, Jakub Kicinski wrote:
->> On Tue, 9 Jan 2024 16:15:50 +0200 Gal Pressman wrote:
->>>>> I'm confused, how are RX queues related to XPS?
->>>>
->>>> Separate sentence, perhaps I should be more verbose..
->>>
->>> Sorry, yes, your understanding is correct.
->>> If a packet is received on RQ 0 then it is from PF 0, RQ 1 came from PF
->>> 1, etc. Though this is all from the same wire/port.
->>>
->>> You can enable arfs for example, which will make sure that packets that
->>> are destined to a certain CPU will be received by the PF that is closer
->>> to it.
->>
->> Got it.
->>
->>>>> XPS shouldn't be affected, we just make sure that whatever queue XPS
->>>>> chose will go out through the "right" PF.
->>>>
->>>> But you said "correct" to queue 0 going to PF 0 and queue 1 to PF 1.
->>>> The queue IDs in my question refer to the queue mapping form the stacks
->>>> perspective. If user wants to send everything to queue 0 will it use
->>>> both PFs?
->>>
->>> If all traffic is transmitted through queue 0, it will go out from PF 0
->>> (the PF that is closer to CPU 0 numa).
->>
-
-Hi,
-I'm back from a long vacation. Catching up on emails...
-
->> Okay, but earlier you said: "whatever queue XPS chose will go out
->> through the "right" PF." - which I read as PF will be chosen based
->> on CPU locality regardless of XPS logic.
->>
->> If queue 0 => PF 0, then user has to set up XPS to make CPUs from NUMA
->> node which has PF 0 use even number queues, and PF 1 to use odd number
->> queues. Correct?
-
-Exactly. That's the desired configuration.
-Our driver has the logic to set it in default.
-
-Here's the default XPS on my setup:
-
-NUMA:
-   NUMA node(s):          2
-   NUMA node0 CPU(s):     0-11
-   NUMA node1 CPU(s):     12-23
-
-PF0 on node0, PF1 on node1.
-
-/sys/class/net/eth2/queues/tx-0/xps_cpus:000001
-/sys/class/net/eth2/queues/tx-1/xps_cpus:001000
-/sys/class/net/eth2/queues/tx-2/xps_cpus:000002
-/sys/class/net/eth2/queues/tx-3/xps_cpus:002000
-/sys/class/net/eth2/queues/tx-4/xps_cpus:000004
-/sys/class/net/eth2/queues/tx-5/xps_cpus:004000
-/sys/class/net/eth2/queues/tx-6/xps_cpus:000008
-/sys/class/net/eth2/queues/tx-7/xps_cpus:008000
-/sys/class/net/eth2/queues/tx-8/xps_cpus:000010
-/sys/class/net/eth2/queues/tx-9/xps_cpus:010000
-/sys/class/net/eth2/queues/tx-10/xps_cpus:000020
-/sys/class/net/eth2/queues/tx-11/xps_cpus:020000
-/sys/class/net/eth2/queues/tx-12/xps_cpus:000040
-/sys/class/net/eth2/queues/tx-13/xps_cpus:040000
-/sys/class/net/eth2/queues/tx-14/xps_cpus:000080
-/sys/class/net/eth2/queues/tx-15/xps_cpus:080000
-/sys/class/net/eth2/queues/tx-16/xps_cpus:000100
-/sys/class/net/eth2/queues/tx-17/xps_cpus:100000
-/sys/class/net/eth2/queues/tx-18/xps_cpus:000200
-/sys/class/net/eth2/queues/tx-19/xps_cpus:200000
-/sys/class/net/eth2/queues/tx-20/xps_cpus:000400
-/sys/class/net/eth2/queues/tx-21/xps_cpus:400000
-/sys/class/net/eth2/queues/tx-22/xps_cpus:000800
-/sys/class/net/eth2/queues/tx-23/xps_cpus:800000
-
-> 
-> I think it is based on the default xps configuration, but I don't want
-> to get the details wrong, checking with Tariq and will reply (he's OOO).
-> 
+> Fixes: 1bbc04de607b ("ice: xsk: add RX multi-buffer support")
+> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_base.c | 37 ++++++++++++++---------
+>  1 file changed, 23 insertions(+), 14 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
+> index 533b923cae2d..7ac847718882 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_base.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_base.c
+> @@ -547,19 +547,27 @@ int ice_vsi_cfg_rxq(struct ice_rx_ring *ring)
+>         ring->rx_buf_len = ring->vsi->rx_buf_len;
+>
+>         if (ring->vsi->type == ICE_VSI_PF) {
+> -               if (!xdp_rxq_info_is_reg(&ring->xdp_rxq))
+> -                       /* coverity[check_return] */
+> -                       __xdp_rxq_info_reg(&ring->xdp_rxq, ring->netdev,
+> -                                          ring->q_index,
+> -                                          ring->q_vector->napi.napi_id,
+> -                                          ring->vsi->rx_buf_len);
+> +               if (!xdp_rxq_info_is_reg(&ring->xdp_rxq)) {
+> +                       err = __xdp_rxq_info_reg(&ring->xdp_rxq, ring->netdev,
+> +                                                ring->q_index,
+> +                                                ring->q_vector->napi.napi_id,
+> +                                                ring->rx_buf_len);
+> +                       if (err)
+> +                               return err;
+> +               }
+>
+>                 ring->xsk_pool = ice_xsk_pool(ring);
+>                 if (ring->xsk_pool) {
+> -                       xdp_rxq_info_unreg_mem_model(&ring->xdp_rxq);
+> +                       xdp_rxq_info_unreg(&ring->xdp_rxq);
+>
+>                         ring->rx_buf_len =
+>                                 xsk_pool_get_rx_frame_size(ring->xsk_pool);
+> +                       err = __xdp_rxq_info_reg(&ring->xdp_rxq, ring->netdev,
+> +                                                ring->q_index,
+> +                                                ring->q_vector->napi.napi_id,
+> +                                                ring->rx_buf_len);
+> +                       if (err)
+> +                               return err;
+>                         err = xdp_rxq_info_reg_mem_model(&ring->xdp_rxq,
+>                                                          MEM_TYPE_XSK_BUFF_POOL,
+>                                                          NULL);
+> @@ -571,13 +579,14 @@ int ice_vsi_cfg_rxq(struct ice_rx_ring *ring)
+>                         dev_info(dev, "Registered XDP mem model MEM_TYPE_XSK_BUFF_POOL on Rx ring %d\n",
+>                                  ring->q_index);
+>                 } else {
+> -                       if (!xdp_rxq_info_is_reg(&ring->xdp_rxq))
+> -                               /* coverity[check_return] */
+> -                               __xdp_rxq_info_reg(&ring->xdp_rxq,
+> -                                                  ring->netdev,
+> -                                                  ring->q_index,
+> -                                                  ring->q_vector->napi.napi_id,
+> -                                                  ring->vsi->rx_buf_len);
+> +                       if (!xdp_rxq_info_is_reg(&ring->xdp_rxq)) {
+> +                               err = __xdp_rxq_info_reg(&ring->xdp_rxq, ring->netdev,
+> +                                                        ring->q_index,
+> +                                                        ring->q_vector->napi.napi_id,
+> +                                                        ring->rx_buf_len);
+> +                               if (err)
+> +                                       return err;
+> +                       }
+>
+>                         err = xdp_rxq_info_reg_mem_model(&ring->xdp_rxq,
+>                                                          MEM_TYPE_PAGE_SHARED,
+> --
+> 2.34.1
+>
+>
 
