@@ -1,90 +1,68 @@
-Return-Path: <netdev+bounces-65826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A090683BDFF
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 10:53:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BE1D83BE05
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 10:54:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 307AC1F307EC
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:53:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E428F1F30BC0
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:54:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 890071CD13;
-	Thu, 25 Jan 2024 09:53:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C9DE1C6AD;
+	Thu, 25 Jan 2024 09:53:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="UozhGrAK"
+	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="KRrMtcPM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 098F51CD09
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 09:52:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 614611BF33;
+	Thu, 25 Jan 2024 09:53:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.149.199.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706176381; cv=none; b=eUo2/VrVjtT2aMYZ2OBByH4RcP7AlOWLaWVuU/ulaf8rNVMaDa+rEPrkaZp1s7CENb1MYJm5HWNO6HRldbYJbDQnJalTNoGiqh2POwTOhZYA3WE1qPpF8myA7EX/yMBPE0sHxw0B7cu9/0WHKM+PlEUZroBMuNeAHzV7+Amfb3o=
+	t=1706176415; cv=none; b=IlCjbgNvwEDNyFejH/2rBq6fkF1oZQbNBBPVxcukUgfQj/+lHTBjrrkEH60GX3V+IwRcI2qoxSa/93BzRArX+4qusdB6wCr+jW09clHAxMLXl1WNliD3RRwg0iZPc+C6sIBc6E0iPFa8Y1sok7y3s2CWTI0R93NtIZvc/Aju6Nw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706176381; c=relaxed/simple;
-	bh=u25TQi/eCQzC6TkwHDavOWDYLYRf4oNMi+35yG2C16I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hHolOIESl6QeGWTuIGZyNm6NOUi4TczqzGZ2sAo2AZbvy6xOkzKfx6kqIEmRiCbOn1jfUyBWvoh/OQ5tPeGMXgbueXzi2H/UklDmgygM7zLhLQVEZdpWPLN50q7dIy+Or6iTVUvPW/OytBzmU3dPTUVIYNSr1cVLDHGD1XNYcYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=UozhGrAK; arc=none smtp.client-ip=209.85.167.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-3bd6581bc62so4442191b6e.2
-        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 01:52:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1706176379; x=1706781179; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vwHQQ3y8mRIC5l7GJR/3O2cr3VUs7tVDE1ZJ0OPgKKc=;
-        b=UozhGrAK9gJVtTbSEPb//zh8wAFymQqVEBy7InQ12SzZc5ARf5Eb7M93dmLIhki/EA
-         JhDC5fXgqPlWipQJ9aUvmj2pKBSj1Hidi9NzJtMbgPsJkciPTrf6s8Jh3alfhr2NDq3D
-         T4tu3plSujc4TxrUEVIqpZsbk81cQGX65wQVk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706176379; x=1706781179;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vwHQQ3y8mRIC5l7GJR/3O2cr3VUs7tVDE1ZJ0OPgKKc=;
-        b=aBuCnirK/rv6xMhClc8NPOzpoZGqqkNrJCXDjAXO0wWsDTCZ1HZnWwWyfHM6JY3rHT
-         1lemzGKiaZjJ2U7ujhn7itVsvImO23VmdqE2yhdjmMHXdjXRslzgaPXGckmfxAj4+980
-         emPdmIbwPxwU0Og5LSWPvDqETHd0zXXux9xAnxkBB2z3CcFmnrlAdxb3mtU9uYS/QIeK
-         FIcikt3RSw7D/sEW8FOIV7TH6Vq755Bw1U+2Pxc6zkNhUpTvJ5J4DUpQULZ2AI6QE3jP
-         pU4xFQRAMNd5kegBIStQkJTd3+MauxTlGDraDtZqJ248nd3+5HPaVBs+wdsxeOm2lm25
-         1b9A==
-X-Gm-Message-State: AOJu0YzpqiiK1mHE33VI3L4KpWYcMT+3GBQr4DoIu3vjgM0KFEEisd30
-	kuRAEpzA1wz4xolgY4P2cM753aVKHKcaLzwdU6aGAJKyvYkTwKX9byg+rYy3sg==
-X-Google-Smtp-Source: AGHT+IF9ouqrxuN/kDRByMxn/PlL63gtfiQf6zEmcMi2K5+Vu4orKTJyiaEsZI9CeowBst0wk6XIzQ==
-X-Received: by 2002:a05:6808:1911:b0:3bd:c038:b71a with SMTP id bf17-20020a056808191100b003bdc038b71amr770409oib.25.1706176379179;
-        Thu, 25 Jan 2024 01:52:59 -0800 (PST)
-Received: from wenstp920.tpe.corp.google.com ([2401:fa00:1:10:7fb6:ed02:1c59:9f9c])
-        by smtp.gmail.com with ESMTPSA id gu15-20020a056a004e4f00b006dd8a4bbbc7sm3228275pfb.101.2024.01.25.01.52.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jan 2024 01:52:58 -0800 (PST)
-From: Chen-Yu Tsai <wenst@chromium.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: Chen-Yu Tsai <wenst@chromium.org>,
-	Sean Wang <sean.wang@mediatek.com>,
-	linux-bluetooth@vger.kernel.org,
+	s=arc-20240116; t=1706176415; c=relaxed/simple;
+	bh=MOQWUs4LfrqyBim3cdZJiOlBAObGGDGpzuE1pIY1Gwg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JtRk/8T67nRMUOc6HOO8g/F3m/4Nwzkh4xZkpQ/2xOFE01rivhKw5NjxVNjR62wI+fYc1BDYb25IBNE+uKxY2qoUHfxwxQ3zL6t6LKg1khMQdpY2Pc67CFc5XrOK+UB2BHEkKJKL2P5mS09XnM7FaikUVZQUWoZNwiZwMYpIQcY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru; spf=pass smtp.mailfrom=ispras.ru; dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b=KRrMtcPM; arc=none smtp.client-ip=83.149.199.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
+Received: from localhost.ispras.ru (unknown [10.10.165.6])
+	by mail.ispras.ru (Postfix) with ESMTPSA id 755C04076731;
+	Thu, 25 Jan 2024 09:53:23 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru 755C04076731
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
+	s=default; t=1706176403;
+	bh=KQrR+5BkSPmu/kRG4OwqNQfdmbL9yFyULUlnEV6F95k=;
+	h=From:To:Cc:Subject:Date:From;
+	b=KRrMtcPMC+9jDKT+AIn/r5Lj8MaJLvhTzsrcsyy3xGxnr7uDd+F9aRmE1BdU0jfE2
+	 AAfNyzDjwRfyNf9T6Kx+iqsaazo712CpMtE8/9mEp8tKVgNpjuZU0HBhneWS7q+l0E
+	 o2bP+OZ8QbLRtOmmzA9sT/4Go1hKPCX2hzTOvaRw=
+From: Fedor Pchelkin <pchelkin@ispras.ru>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Fedor Pchelkin <pchelkin@ispras.ru>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jeremy Cline <jeremy@jcline.org>,
+	Simon Horman <horms@kernel.org>,
+	Breno Leitao <leitao@debian.org>,
+	Ilan Elias <ilane@ti.com>,
+	"John W. Linville" <linville@tuxdriver.com>,
 	netdev@vger.kernel.org,
-	linux-mediatek@lists.infradead.org,
-	devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] arm64: dts: mediatek: mt8183-pico6: Fix bluetooth node
-Date: Thu, 25 Jan 2024 17:52:38 +0800
-Message-ID: <20240125095240.2308340-3-wenst@chromium.org>
-X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
-In-Reply-To: <20240125095240.2308340-1-wenst@chromium.org>
-References: <20240125095240.2308340-1-wenst@chromium.org>
+	linux-kernel@vger.kernel.org,
+	Alexey Khoroshilov <khoroshilov@ispras.ru>,
+	lvc-project@linuxtesting.org,
+	stable@vger.kernel.org,
+	syzbot+6b7c68d9c21e4ee4251b@syzkaller.appspotmail.com
+Subject: [PATCH net] nfc: nci: free rx_data_reassembly skb on NCI device cleanup
+Date: Thu, 25 Jan 2024 12:53:09 +0300
+Message-ID: <20240125095310.15738-1-pchelkin@ispras.ru>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,33 +71,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Bluetooth is not a random device connected to the MMC/SD controller. It
-is function 2 of the SDIO device.
+rx_data_reassembly skb is stored during NCI data exchange for processing
+fragmented packets. It is dropped only when the last fragment is processed
+or when an NTF packet with NCI_OP_RF_DEACTIVATE_NTF opcode is received.
+However, the NCI device may be deallocated before that which leads to skb
+leak.
 
-Fix the address of the bluetooth node. Also fix the node name and drop
-the label.
+As by design the rx_data_reassembly skb is bound to the NCI device and
+nothing prevents the device to be freed before the skb is processed in
+some way and cleaned, free it on the NCI device cleanup.
 
-Fixes: 055ef10ccdd4 ("arm64: dts: mt8183: Add jacuzzi pico/pico6 board")
-Signed-off-by: Chen-Yu Tsai <wenst@chromium.org>
+Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
+
+Fixes: 6a2968aaf50c ("NFC: basic NCI protocol implementation")
+Cc: stable@vger.kernel.org
+Reported-by: syzbot+6b7c68d9c21e4ee4251b@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/lkml/000000000000f43987060043da7b@google.com/
+Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
 ---
- arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi-pico6.dts | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ net/nfc/nci/core.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi-pico6.dts b/arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi-pico6.dts
-index a2e74b829320..6a7ae616512d 100644
---- a/arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi-pico6.dts
-+++ b/arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi-pico6.dts
-@@ -82,7 +82,8 @@ pins-clk {
- };
- 
- &mmc1 {
--	bt_reset: bt-reset {
-+	bluetooth@2 {
-+		reg = <2>;
- 		compatible = "mediatek,mt7921s-bluetooth";
- 		pinctrl-names = "default";
- 		pinctrl-0 = <&bt_pins_reset>;
+diff --git a/net/nfc/nci/core.c b/net/nfc/nci/core.c
+index 97348cedb16b..cdad47b140fa 100644
+--- a/net/nfc/nci/core.c
++++ b/net/nfc/nci/core.c
+@@ -1208,6 +1208,10 @@ void nci_free_device(struct nci_dev *ndev)
+ {
+ 	nfc_free_device(ndev->nfc_dev);
+ 	nci_hci_deallocate(ndev);
++
++	/* drop partial rx data packet if present */
++	if (ndev->rx_data_reassembly)
++		kfree_skb(ndev->rx_data_reassembly);
+ 	kfree(ndev);
+ }
+ EXPORT_SYMBOL(nci_free_device);
 -- 
-2.43.0.429.g432eaa2c6b-goog
+2.43.0
 
 
