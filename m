@@ -1,84 +1,95 @@
-Return-Path: <netdev+bounces-65850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A151083C087
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 12:15:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3419E83C08E
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 12:16:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BECB11C21DF7
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 11:15:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF4C81F23A36
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 11:16:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F0502C870;
-	Thu, 25 Jan 2024 11:07:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F9244439A;
+	Thu, 25 Jan 2024 11:10:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pC33db9x"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tDcEa5HG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B41D2C69D
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 11:07:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 583603D97F;
+	Thu, 25 Jan 2024 11:10:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706180866; cv=none; b=Ille8x54vtaZR8t11FUL931zVIDKCNynSW3Kd1GoDdhi3TcrU0DIFCMpma7Xk+F9lBwagpw2lVkXDvGEQDdLhDCKfq5pXBmAItO4X7yb+xz1ThNbsvmULWB9h0e8m+aJqjZLeLAsHiw7QKQmWNvFYTMS3hSOIJtmHtEiPs0B+3U=
+	t=1706181027; cv=none; b=LAEENoODNJqAp5ma8bzyaRfkUWPDwB5iQ4UKhHVLVusUTYxWnAIIuEgH7ENCI08JAmg/Dwd1mNmoCI7a+AXLWWCL2mOQGkmoFzf0XVAfwVXxkV3S5Mi7WsfoMjE6bmIiKwf4Cix++XFvNxb6Jm+0LrYgYFDN6b4TPZQy32atOGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706180866; c=relaxed/simple;
-	bh=aYYCJudU8yAUgkMyhB1YwN2Sg7x602RYmD/3GTG+plA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HZgg01RBJ3goNlAk9SgYiFatIqvKkkZevFEt79PHU769izwjG/bocy2+qBC7sW8C0gLT65UWMYJ27L3BSEsmCJIoew/NbLDBmtHxVWmsZqOHqScW5RY4nHb4PsQFVUdW+GzVXifmP8qov5xI/71xbK0NS1ZzyXMqk0RB02pM2/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pC33db9x; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77E9EC433F1;
-	Thu, 25 Jan 2024 11:07:44 +0000 (UTC)
+	s=arc-20240116; t=1706181027; c=relaxed/simple;
+	bh=FU1l9ZzyEdEuQNKjbo0qAjBu5YIHHAdY5D5LVXqoKs4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=LjxVtvZI1T9lrPGmbgWCZAB775Z0teopMtIdR8GEE56D2Jd2aTI+cSkVUpssNt65Q5sgMauB7/0IOQYJXyu6fPe+01z32BAHyKOS0zherrrVrW0ig0vNAnXQoddfQ4xhE2qpI00qHF45DPW8k9N2SLvN7bec7FBvsbUKMfm12Tg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tDcEa5HG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C6AE0C433F1;
+	Thu, 25 Jan 2024 11:10:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706180865;
-	bh=aYYCJudU8yAUgkMyhB1YwN2Sg7x602RYmD/3GTG+plA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pC33db9xAAvNYuBouA84sGa2BAY23nEQ2wCPOlhGs2/nc4PqxRaufVBH7n5noAnsY
-	 jnYeqjCKVWODNd83CoyWUM9qYJ3poP1F2G7XxprkXa+qExe5JtwJ7u4LrOZWGEVELr
-	 fXX7z83WvvTiwXjbZGuwIhwOa5HSb346qLCZ57yYPuZf/kRRvY38Vx2tH35bL2N17m
-	 Q180MYgkv1UJ+hAM1mZSkebsCOKDLnt4q5lAa9mKII7eR4FxU1bbc/t+90OmkxsE/m
-	 QCXAkH4W5HeVwyliIeRcPo+X1xoCQTb9JC9vUdV6yIpBPTvHi3aA2zO/bOk8JCsNW7
-	 +xtpvHWkiQ6HA==
-Date: Thu, 25 Jan 2024 11:07:41 +0000
-From: Simon Horman <horms@kernel.org>
-To: Wojciech Drewek <wojciech.drewek@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	jiri@resnulli.us
-Subject: Re: [PATCH iwl-next] ice: Remove and readd netdev during devlink
- reload
-Message-ID: <20240125110741.GE217708@kernel.org>
-References: <20240123111849.9367-1-wojciech.drewek@intel.com>
+	s=k20201202; t=1706181026;
+	bh=FU1l9ZzyEdEuQNKjbo0qAjBu5YIHHAdY5D5LVXqoKs4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=tDcEa5HG2Y+6Tu5SsfEdSu+vhB6Fy2yi7KhFScZqx8OIaZbv/VDJTiL8QWNrbtvut
+	 ntkRDQqjkiiz9NT/4EZiK2BixcekKi76RFTCSTk0kMwIwQxpVkBfT1nXfeuPkzy9GB
+	 kw2aZndjGYOXY7a5rYFwrYVLjO+7pc5RwZm5OhbqHcp9tlWa2G38pSh660TclsxgpP
+	 GSx0v874aLB5Jsm3mzrNZ48cwQ7dadC2ROm0rzThkw9mNULmtRgdOiark8h5fgGif9
+	 BDQByxLHEyyV94kIRpcTVG/C3SFu/rl0ffzfJZdj3U9y0Af9L4AR7GP7Rjf36EoJBE
+	 AzX+1F3k4dIog==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AC809D8C962;
+	Thu, 25 Jan 2024 11:10:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240123111849.9367-1-wojciech.drewek@intel.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/2] tsnep: XDP fixes
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170618102670.13412.407737441943094051.git-patchwork-notify@kernel.org>
+Date: Thu, 25 Jan 2024 11:10:26 +0000
+References: <20240123200918.61219-1-gerhard@engleder-embedded.com>
+In-Reply-To: <20240123200918.61219-1-gerhard@engleder-embedded.com>
+To: Gerhard Engleder <gerhard@engleder-embedded.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
+ kuba@kernel.org, edumazet@google.com, pabeni@redhat.com, bjorn@kernel.org,
+ magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
+ jonathan.lemon@gmail.com
 
-On Tue, Jan 23, 2024 at 12:18:49PM +0100, Wojciech Drewek wrote:
-> Recent changes to the devlink reload (commit 9b2348e2d6c9
-> ("devlink: warn about existing entities during reload-reinit"))
-> force the drivers to destroy devlink ports during reinit.
-> Adjust ice driver to this requirement, unregister netdvice, destroy
-> devlink port. ice_init_eth() was removed and all the common code
-> between probe and reload was moved to ice_load().
-> 
-> During devlink reload we can't take devl_lock (it's already taken)
-> and in ice_probe() we have to lock it. Use devl_* variant of the API
-> which does not acquire and release devl_lock. Guard ice_load()
-> with devl_lock only in case of probe.
-> 
-> Introduce ice_debugfs_fwlog_deinit() in order to release PF's
-> debugfs entries. Move ice_debugfs_exit() call to ice_module_exit().
-> 
-> Suggested-by: Jiri Pirko <jiri@nvidia.com>
-> Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
+Hello:
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Tue, 23 Jan 2024 21:09:16 +0100 you wrote:
+> Found two driver specific problems during XDP and XSK testing.
+> 
+> Gerhard Engleder (2):
+>   tsnep: Remove FCS for XDP data path
+>   tsnep: Fix XDP_RING_NEED_WAKEUP for empty fill ring
+> 
+>  drivers/net/ethernet/engleder/tsnep_main.c | 17 +++++++++++++++--
+>  1 file changed, 15 insertions(+), 2 deletions(-)
+
+Here is the summary with links:
+  - [net,1/2] tsnep: Remove FCS for XDP data path
+    https://git.kernel.org/netdev/net/c/50bad6f797d4
+  - [net,2/2] tsnep: Fix XDP_RING_NEED_WAKEUP for empty fill ring
+    https://git.kernel.org/netdev/net/c/9a91c05f4bd6
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
