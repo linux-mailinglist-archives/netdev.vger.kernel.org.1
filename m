@@ -1,283 +1,204 @@
-Return-Path: <netdev+bounces-65724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF04A83B72B
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 03:35:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9999E83B72D
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 03:35:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F1342873DC
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 02:35:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D43C1F240E5
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 02:35:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F52A80B;
-	Thu, 25 Jan 2024 02:35:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5775D63AC;
+	Thu, 25 Jan 2024 02:35:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FQSQVDqJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RNZT4bTh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 121496FAD;
-	Thu, 25 Jan 2024 02:35:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B02926FB5;
+	Thu, 25 Jan 2024 02:35:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706150108; cv=none; b=LVJJjc70RAZtjLVCyD8Uq2nX6XrXDPJmz52YC1b3U4Sr6Lb5WmPuQhqGXSHEa3DakCOYZBrDF7OylRIp2ahsHYxAlNg565y1d/0BsRMzsj3KSBlTrj3qYvKDaDvAetzyk0kOizlyWN9OmDvsw/lFqT94kAZX3ulx9/pJNo+LJ0E=
+	t=1706150110; cv=none; b=jlTAiF8hgVRmpK3Jha8f/G7UyXWoALEh4+XGTsBQ62pTn/XJKvi8C+yaOut6x8m6HNZnlQ/Qf8Fwj3NtO1D3EcatCT88fmZTLHY1uHKWcFtFxuJTsDY44m821i0L0CDuYUC4llsrwLEDw7D0292GYpIR/5+HT8FRvfr6pR8lBVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706150108; c=relaxed/simple;
-	bh=oZB+rnSbNrbRk4wjrjm8hwRt9npaPT1zlo6uV1C7jBE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TCj0nZPYL3Ax+5WJa0b8lM8YlOrXTVfiguF5h4OCkPQz8p8SA9lwxzOVtjCDgM/xhXp3YxusWZBcHo09+W36J+dajmcWkkmvvYDayqr5HLaNaMcsv5XyibZd5zF+Fc0SJbA+dFovLDp8aHtPqQhBkdYIgXlKNcaf7lW1WY61HiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FQSQVDqJ; arc=none smtp.client-ip=209.85.221.52
+	s=arc-20240116; t=1706150110; c=relaxed/simple;
+	bh=XYlohPcYkZZG3N7LFgbcX46ub+cimlttqnW2msr9Xzo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RFaq8AcTcfirS4+UB1DIh6ihs1enKXSmM19KOSZu9jodDKHsYMBZpyvqg+1hOcsnCMl+THns6cwuWtxhC8vkj9myeWsQPY2ENdu6PnpvNe/+1TspEjv9DtnjbKaz18bidFiUMU9n2v32w3irPaTnEECdxw10gP+XcsAsxo0pnKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RNZT4bTh; arc=none smtp.client-ip=209.85.216.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-337d99f9cdfso5258863f8f.0;
-        Wed, 24 Jan 2024 18:35:06 -0800 (PST)
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-29065efa06fso3767308a91.1;
+        Wed, 24 Jan 2024 18:35:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706150105; x=1706754905; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1706150108; x=1706754908; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UalBL1KksrfmBSIphDpJ0OaRMGhEKAxnBVdciCrs4XE=;
-        b=FQSQVDqJ8I6l9c2HOv7z5NNslTKXBwfoYJRfXKARfVUOmcY5OkG2VxPE15OgBPQ/DX
-         sJenj2jdje95N7pT2E3W+8U4QOoKKrJ3bxV7pGygxHKXP4XywjlnLqsRQDLQQ4ocUIJK
-         XbEyb+Up2XiF4pgrzDGmL7USStK93MRGi9It2iRZ6pAX0XNiCGYU5GnU8t2/+KK8GJ/r
-         1nQy0G1TKYIz5nbOtDI6pc/NaqbZAdrGkSk59MZw/Ka0GDZRoEFJneSFt6c7p4khVSWt
-         DmCmGcfdroLmGQN9tq55JyBbyzyeMyuPzUd35RWALehHr0PTRsTSaXnJIV31hnpNInqT
-         GT3g==
+        bh=ElI5s79820kPutuntGaxiQesjo2hgbJF7ifEMpPB0Eg=;
+        b=RNZT4bThZuJ1/AnhwTTouTUaqbgTzAwcMfYjX1Pa/R8yQXqsClACLt7nt4F+QLI48l
+         4kR8h5bW+lo55vtrdEFXfSSTKmWRWPp+kDkX66g8lIM57+jWLy5jqTWXHOpJKAaeBfaD
+         dQ3Yns2iMbAkw+4aEzYFI2nxk+Qp67FJ4U3viosWOlMJ3dZvc03E3ZzJHHWngBZGJsAV
+         GandcWDiS4Kn5UkTaapFyeCvxj1YtQWJKAVzZRb0gx4SVakC+U0ofpmrZTPixwrgGh9L
+         mqiRX7pXXuxIrP1hWPYjU6nx9/EYerQ9ZuUwVX10y7l7YHVm4YL/1v0onsinnnSxOWX7
+         UYPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706150105; x=1706754905;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1706150108; x=1706754908;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UalBL1KksrfmBSIphDpJ0OaRMGhEKAxnBVdciCrs4XE=;
-        b=nhBr9NnW8psbensYUPHdctjCmkXnhJUETzj0aaH8V+TQ+EOL+DxAkFhU9rOMVgNBPq
-         rU3bbe1RwBPXXSJCRVXPW2z13UnHHGyJdIV5K70xug3uk+ItT/hepnoKMi7CuEzBmYH9
-         zje9t+Ko5kqjSNoH5At5VxNonMOd+2O0XK0N+1R3r2El3knrzhQJ9lCB1/bDmFDzNUL1
-         AlRwRwED5mCQhotw/tyC8tdkLdh4sUgwgd30XZmG/PrIVu66vM9tUcFECWFzNgb15Y/q
-         194otfV2LXP5rFOYWadFtyqDNv71B5Ea5ytEoQdBKwEKm4gM4Eg9LkL65por229wQlqM
-         osSw==
-X-Gm-Message-State: AOJu0YxFpJDVUOLc0cOBX4CvXXc4dHU1O//qrHf1GIBB/urPl1NiEQ8h
-	bGoJ5TW9bcUyf0mv7gWfa3MvQwQrdzsqz6xJsdCpSUP9tVA+sXE2fhAi9UVClDd6I0TmP1UfAid
-	iJFOLQDbKco8Bsm/zUj809S7md1w=
-X-Google-Smtp-Source: AGHT+IGDzSrhufVoRNE2fXRGZnsr5pi4JBJdAN8QI72PY4YftYfoWgIBPtleEOK2p463fu9lj9F+JurNTKMXt98dfc0=
-X-Received: by 2002:a5d:6448:0:b0:336:ebf3:b8fa with SMTP id
- d8-20020a5d6448000000b00336ebf3b8famr142862wrw.83.1706150104485; Wed, 24 Jan
- 2024 18:35:04 -0800 (PST)
+        bh=ElI5s79820kPutuntGaxiQesjo2hgbJF7ifEMpPB0Eg=;
+        b=NT2qxxvhrtHtABON5sMzVuqkF9KDcdiSOaohNVp4Hw5g+peX8gacr7tnQSBhr3N1Nh
+         JbH9dp4KPU/qElpocpKvc/cnll92ApW7EYvJrmYUoA+FnPmNrNcKMfTMTUqcEtwCBf51
+         TNLd5I9NznFWUXEztfWVMvJ95XqWoShlWe8WtPVn/eCpFWTABOP8Z3RBc+j503wxhIO2
+         v2HWF3nvrD+EEHMadd6QYi1Gsm5+UFPuHwOzI/c9lB2rTqqiBX7uoD18q4k8dbMfMXw0
+         JfAtznraQt9qzfUcyE4fYWopnhTr/hwYRnv1koxJRRDWCJ+OtrKt3Ku/yyWBT+gxuHUv
+         vzxA==
+X-Gm-Message-State: AOJu0YxmYAKxJvvZZd18wSJ2d8DY8RgxGBpdHpIdSQP1vIjbRMcyKNr2
+	HibD+NsK/t+PMpvAEfVdCpn+m7ZbvBh5o6bCbyiL6iWCgk9jMj6o
+X-Google-Smtp-Source: AGHT+IH0qJiBgXBUOvhArhS7A5BZqdhwGL4PVANneN5oH8MrPA9qqy+6X4q55NX/xqbSsqPnc7Qb7A==
+X-Received: by 2002:a17:90a:e543:b0:28d:dbe8:aa6c with SMTP id ei3-20020a17090ae54300b0028ddbe8aa6cmr255558pjb.36.1706150107884;
+        Wed, 24 Jan 2024 18:35:07 -0800 (PST)
+Received: from localhost ([129.146.253.192])
+        by smtp.gmail.com with ESMTPSA id sx8-20020a17090b2cc800b0028ac1112124sm358775pjb.30.2024.01.24.18.35.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jan 2024 18:35:07 -0800 (PST)
+Date: Thu, 25 Jan 2024 10:34:54 +0800
+From: Furong Xu <0x1207@gmail.com>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Joao Pinto <jpinto@synopsys.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ xfr@outlook.com, rock.xu@nio.com
+Subject: Re: [PATCH net] net: stmmac: xgmac: fix safety error descriptions
+Message-ID: <20240125103454.0000312a@gmail.com>
+In-Reply-To: <ii3muj3nmhuo6s5hm3g7wuiubtyzr632klrcesubtuaoyifogb@ohmunpxvdtsv>
+References: <20240123085037.939471-1-0x1207@gmail.com>
+	<ii3muj3nmhuo6s5hm3g7wuiubtyzr632klrcesubtuaoyifogb@ohmunpxvdtsv>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.34; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240124191602.566724-1-maciej.fijalkowski@intel.com>
- <20240124191602.566724-5-maciej.fijalkowski@intel.com> <f1ce06fd-30da-405e-8082-e35a9a88c5bd@amd.com>
-In-Reply-To: <f1ce06fd-30da-405e-8082-e35a9a88c5bd@amd.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Wed, 24 Jan 2024 18:34:52 -0800
-Message-ID: <CAADnVQ+7qB44dGT4xkMPRrxNJrY-MFVU8E=jPiD+_CXvL6Didw@mail.gmail.com>
-Subject: Re: [PATCH v6 bpf 04/11] ice: work on pre-XDP prog frag count
-To: Brett Creeley <bcreeley@amd.com>
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, bpf <bpf@vger.kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Network Development <netdev@vger.kernel.org>, 
-	"Karlsson, Magnus" <magnus.karlsson@intel.com>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
-	Eelco Chaudron <echaudro@redhat.com>, Lorenzo Bianconi <lorenzo@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, "Sarkar, Tirthendu" <tirthendu.sarkar@intel.com>, 
-	John Fastabend <john.fastabend@gmail.com>, Simon Horman <horms@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 24, 2024 at 6:26=E2=80=AFPM Brett Creeley <bcreeley@amd.com> wr=
-ote:
->
->
->
-> On 1/24/2024 11:15 AM, Maciej Fijalkowski wrote:
-> > Caution: This message originated from an External Source. Use proper ca=
-ution when opening attachments, clicking links, or responding.
-> >
-> >
-> > Fix an OOM panic in XDP_DRV mode when a XDP program shrinks a
-> > multi-buffer packet by 4k bytes and then redirects it to an AF_XDP
-> > socket.
-> >
-> > Since support for handling multi-buffer frames was added to XDP, usage
-> > of bpf_xdp_adjust_tail() helper within XDP program can free the page
-> > that given fragment occupies and in turn decrease the fragment count
-> > within skb_shared_info that is embedded in xdp_buff struct. In current
-> > ice driver codebase, it can become problematic when page recycling logi=
-c
-> > decides not to reuse the page. In such case, __page_frag_cache_drain()
-> > is used with ice_rx_buf::pagecnt_bias that was not adjusted after
-> > refcount of page was changed by XDP prog which in turn does not drain
-> > the refcount to 0 and page is never freed.
-> >
-> > To address this, let us store the count of frags before the XDP program
-> > was executed on Rx ring struct. This will be used to compare with
-> > current frag count from skb_shared_info embedded in xdp_buff. A smaller
-> > value in the latter indicates that XDP prog freed frag(s). Then, for
-> > given delta decrement pagecnt_bias for XDP_DROP verdict.
-> >
-> > While at it, let us also handle the EOP frag within
-> > ice_set_rx_bufs_act() to make our life easier, so all of the adjustment=
-s
-> > needed to be applied against freed frags are performed in the single
-> > place.
-> >
-> > Fixes: 2fba7dc5157b ("ice: Add support for XDP multi-buffer on Rx side"=
-)
-> > Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
-> > Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+On Wed, 24 Jan 2024 17:25:27 +0300
+Serge Semin <fancer.lancer@gmail.com> wrote:
+
+> On Tue, Jan 23, 2024 at 04:50:37PM +0800, Furong Xu wrote:
+> > Commit 56e58d6c8a56 ("net: stmmac: Implement Safety Features in
+> > XGMAC core") prints safety error descriptions when safety error assert,
+> > but missed some special errors, and mixed correctable errors and
+> > uncorrectable errors together.
+> > This patch complete the error code list and print the type of errors.  
+> 
+> The XGMAC ECC Safety code has likely been just copied from the DW GMAC
+> v5 (DW QoS Eth) part. So this change is partly relevant to that code too. I
+> can't confirm that the special errors support is relevant to the DW
+> QoS Eth too (it likely is though), so what about splitting this patch
+> up into two:
+> 1. Elaborate the errors description for DW GMAC v5 and DW XGMAC.
+> 2. Add new ECC safety errors support.
+> ?
+> 
+> On the other hand if we were sure that both DW QoS Eth and XGMAC
+> safety features implementation match the ideal solution would be to
+> refactor out the common code into a dedicated module.
+> 
+> -Serge(y)
+> 
+
+Checked XGMAC Version 3.20a and DW QoS Eth Version 5.20a, the safety error
+code definitions are not identical at all, they do have some differences,
+about more than 20 bits of status register are different.
+I think we should just leave them in individual implementations.
+
+> > 
+> > Fixes: 56e58d6c8a56 ("net: stmmac: Implement Safety Features in XGMAC core")
+> > Signed-off-by: Furong Xu <0x1207@gmail.com>
 > > ---
-> >   drivers/net/ethernet/intel/ice/ice_txrx.c     | 14 ++++++---
-> >   drivers/net/ethernet/intel/ice/ice_txrx.h     |  1 +
-> >   drivers/net/ethernet/intel/ice/ice_txrx_lib.h | 31 +++++++++++++-----=
--
-> >   3 files changed, 32 insertions(+), 14 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/et=
-hernet/intel/ice/ice_txrx.c
-> > index 74d13cc5a3a7..0c9b4aa8a049 100644
-> > --- a/drivers/net/ethernet/intel/ice/ice_txrx.c
-> > +++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
-> > @@ -603,9 +603,7 @@ ice_run_xdp(struct ice_rx_ring *rx_ring, struct xdp=
-_buff *xdp,
-> >                  ret =3D ICE_XDP_CONSUMED;
-> >          }
-> >   exit:
-> > -       rx_buf->act =3D ret;
-> > -       if (unlikely(xdp_buff_has_frags(xdp)))
-> > -               ice_set_rx_bufs_act(xdp, rx_ring, ret);
-> > +       ice_set_rx_bufs_act(xdp, rx_ring, ret);
-> >   }
-> >
-> >   /**
-> > @@ -893,14 +891,17 @@ ice_add_xdp_frag(struct ice_rx_ring *rx_ring, str=
-uct xdp_buff *xdp,
-> >          }
-> >
-> >          if (unlikely(sinfo->nr_frags =3D=3D MAX_SKB_FRAGS)) {
-> > -               if (unlikely(xdp_buff_has_frags(xdp)))
-> > -                       ice_set_rx_bufs_act(xdp, rx_ring, ICE_XDP_CONSU=
-MED);
-> > +               ice_set_rx_bufs_act(xdp, rx_ring, ICE_XDP_CONSUMED);
-> >                  return -ENOMEM;
-> >          }
-> >
-> >          __skb_fill_page_desc_noacc(sinfo, sinfo->nr_frags++, rx_buf->p=
-age,
-> >                                     rx_buf->page_offset, size);
-> >          sinfo->xdp_frags_size +=3D size;
-> > +       /* remember frag count before XDP prog execution; bpf_xdp_adjus=
-t_tail()
-> > +        * can pop off frags but driver has to handle it on its own
-> > +        */
-> > +       rx_ring->nr_frags =3D sinfo->nr_frags;
-> >
-> >          if (page_is_pfmemalloc(rx_buf->page))
-> >                  xdp_buff_set_frag_pfmemalloc(xdp);
-> > @@ -1251,6 +1252,7 @@ int ice_clean_rx_irq(struct ice_rx_ring *rx_ring,=
- int budget)
-> >
-> >                  xdp->data =3D NULL;
-> >                  rx_ring->first_desc =3D ntc;
-> > +               rx_ring->nr_frags =3D 0;
-> >                  continue;
-> >   construct_skb:
-> >                  if (likely(ice_ring_uses_build_skb(rx_ring)))
-> > @@ -1266,10 +1268,12 @@ int ice_clean_rx_irq(struct ice_rx_ring *rx_rin=
-g, int budget)
-> >                                                      ICE_XDP_CONSUMED);
-> >                          xdp->data =3D NULL;
-> >                          rx_ring->first_desc =3D ntc;
-> > +                       rx_ring->nr_frags =3D 0;
-> >                          break;
-> >                  }
-> >                  xdp->data =3D NULL;
-> >                  rx_ring->first_desc =3D ntc;
-> > +               rx_ring->nr_frags =3D 0;
-> >
-> >                  stat_err_bits =3D BIT(ICE_RX_FLEX_DESC_STATUS0_RXE_S);
-> >                  if (unlikely(ice_test_staterr(rx_desc->wb.status_error=
-0,
-> > diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.h b/drivers/net/et=
-hernet/intel/ice/ice_txrx.h
-> > index b3379ff73674..af955b0e5dc5 100644
-> > --- a/drivers/net/ethernet/intel/ice/ice_txrx.h
-> > +++ b/drivers/net/ethernet/intel/ice/ice_txrx.h
-> > @@ -358,6 +358,7 @@ struct ice_rx_ring {
-> >          struct ice_tx_ring *xdp_ring;
-> >          struct ice_rx_ring *next;       /* pointer to next ring in q_v=
-ector */
-> >          struct xsk_buff_pool *xsk_pool;
-> > +       u32 nr_frags;
-> >          dma_addr_t dma;                 /* physical address of ring */
-> >          u16 rx_buf_len;
-> >          u8 dcb_tc;                      /* Traffic class of ring */
-> > diff --git a/drivers/net/ethernet/intel/ice/ice_txrx_lib.h b/drivers/ne=
-t/ethernet/intel/ice/ice_txrx_lib.h
-> > index 762047508619..afcead4baef4 100644
-> > --- a/drivers/net/ethernet/intel/ice/ice_txrx_lib.h
-> > +++ b/drivers/net/ethernet/intel/ice/ice_txrx_lib.h
-> > @@ -12,26 +12,39 @@
-> >    * act: action to store onto Rx buffers related to XDP buffer parts
-> >    *
-> >    * Set action that should be taken before putting Rx buffer from firs=
-t frag
-> > - * to one before last. Last one is handled by caller of this function =
-as it
-> > - * is the EOP frag that is currently being processed. This function is
-> > - * supposed to be called only when XDP buffer contains frags.
-> > + * to the last.
-> >    */
-> >   static inline void
-> >   ice_set_rx_bufs_act(struct xdp_buff *xdp, const struct ice_rx_ring *r=
-x_ring,
-> >                      const unsigned int act)
-> >   {
-> > -       const struct skb_shared_info *sinfo =3D xdp_get_shared_info_fro=
-m_buff(xdp);
-> > -       u32 first =3D rx_ring->first_desc;
-> > -       u32 nr_frags =3D sinfo->nr_frags;
-> > +       u32 sinfo_frags =3D xdp_get_shared_info_from_buff(xdp)->nr_frag=
-s;
-> > +       u32 nr_frags =3D rx_ring->nr_frags + 1;
-> > +       u32 idx =3D rx_ring->first_desc;
-> >          u32 cnt =3D rx_ring->count;
-> >          struct ice_rx_buf *buf;
-> >
-> >          for (int i =3D 0; i < nr_frags; i++) {
-> > -               buf =3D &rx_ring->rx_buf[first];
-> > +               buf =3D &rx_ring->rx_buf[idx];
-> >                  buf->act =3D act;
-> >
-> > -               if (++first =3D=3D cnt)
-> > -                       first =3D 0;
-> > +               if (++idx =3D=3D cnt)
-> > +                       idx =3D 0;
-> > +       }
-> > +
-> > +       /* adjust pagecnt_bias on frags freed by XDP prog */
-> > +       if (sinfo_frags < rx_ring->nr_frags && act =3D=3D ICE_XDP_CONSU=
-MED) {
-> > +               u32 delta =3D rx_ring->nr_frags - sinfo_frags;
-> > +
-> > +               while (delta) {
-> > +                       if (idx =3D=3D 0)
-> > +                               idx =3D cnt - 1;
-> > +                       else
-> > +                               idx--;
-> > +                       buf =3D &rx_ring->rx_buf[idx];
-> > +                       buf->pagecnt_bias--;
-> > +                       delta--;
-> > +               }
->
-> Nit, but the function name ice_set_rx_bufs_act() doesn't completely
-> align with what it's doing anymore due to the additional pagecnt_bias
-> changes.
+> >  .../ethernet/stmicro/stmmac/dwxgmac2_core.c   | 36 +++++++++----------
+> >  1 file changed, 18 insertions(+), 18 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> > index eb48211d9b0e..ad812484059e 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> > @@ -748,29 +748,29 @@ static void dwxgmac3_handle_mac_err(struct net_device *ndev,
+> >  }
+> >  
+> >  static const struct dwxgmac3_error_desc dwxgmac3_mtl_errors[32]= {
+> > -	{ true, "TXCES", "MTL TX Memory Error" },
+> > +	{ true, "TXCES", "MTL TX Memory Correctable Error" },
+> >  	{ true, "TXAMS", "MTL TX Memory Address Mismatch Error" },
+> > -	{ true, "TXUES", "MTL TX Memory Error" },
+> > +	{ true, "TXUES", "MTL TX Memory Uncorrectable Error" },
+> >  	{ false, "UNKNOWN", "Unknown Error" }, /* 3 */
+> > -	{ true, "RXCES", "MTL RX Memory Error" },
+> > +	{ true, "RXCES", "MTL RX Memory Correctable Error" },
+> >  	{ true, "RXAMS", "MTL RX Memory Address Mismatch Error" },
+> > -	{ true, "RXUES", "MTL RX Memory Error" },
+> > +	{ true, "RXUES", "MTL RX Memory Uncorrectable Error" },
+> >  	{ false, "UNKNOWN", "Unknown Error" }, /* 7 */
+> > -	{ true, "ECES", "MTL EST Memory Error" },
+> > +	{ true, "ECES", "MTL EST Memory Correctable Error" },
+> >  	{ true, "EAMS", "MTL EST Memory Address Mismatch Error" },
+> > -	{ true, "EUES", "MTL EST Memory Error" },
+> > +	{ true, "EUES", "MTL EST Memory Uncorrectable Error" },
+> >  	{ false, "UNKNOWN", "Unknown Error" }, /* 11 */
+> > -	{ true, "RPCES", "MTL RX Parser Memory Error" },
+> > +	{ true, "RPCES", "MTL RX Parser Memory Correctable Error" },
+> >  	{ true, "RPAMS", "MTL RX Parser Memory Address Mismatch Error" },
+> > -	{ true, "RPUES", "MTL RX Parser Memory Error" },
+> > +	{ true, "RPUES", "MTL RX Parser Memory Uncorrectable Error" },
+> >  	{ false, "UNKNOWN", "Unknown Error" }, /* 15 */
+> > -	{ false, "UNKNOWN", "Unknown Error" }, /* 16 */
+> > -	{ false, "UNKNOWN", "Unknown Error" }, /* 17 */
+> > -	{ false, "UNKNOWN", "Unknown Error" }, /* 18 */
+> > +	{ true, "SCES", "MTL SGF GCL Memory Correctable Error" },
+> > +	{ true, "SAMS", "MTL SGF GCL Memory Address Mismatch Error" },
+> > +	{ true, "SUES", "MTL SGF GCL Memory Uncorrectable Error" },
+> >  	{ false, "UNKNOWN", "Unknown Error" }, /* 19 */
+> > -	{ false, "UNKNOWN", "Unknown Error" }, /* 20 */
+> > -	{ false, "UNKNOWN", "Unknown Error" }, /* 21 */
+> > -	{ false, "UNKNOWN", "Unknown Error" }, /* 22 */
+> > +	{ true, "RXFCES", "MTL RXF Memory Correctable Error" },
+> > +	{ true, "RXFAMS", "MTL RXF Memory Address Mismatch Error" },
+> > +	{ true, "RXFUES", "MTL RXF Memory Uncorrectable Error" },
+> >  	{ false, "UNKNOWN", "Unknown Error" }, /* 23 */
+> >  	{ false, "UNKNOWN", "Unknown Error" }, /* 24 */
+> >  	{ false, "UNKNOWN", "Unknown Error" }, /* 25 */
+> > @@ -796,13 +796,13 @@ static void dwxgmac3_handle_mtl_err(struct net_device *ndev,
+> >  }
+> >  
+> >  static const struct dwxgmac3_error_desc dwxgmac3_dma_errors[32]= {
+> > -	{ true, "TCES", "DMA TSO Memory Error" },
+> > +	{ true, "TCES", "DMA TSO Memory Correctable Error" },
+> >  	{ true, "TAMS", "DMA TSO Memory Address Mismatch Error" },
+> > -	{ true, "TUES", "DMA TSO Memory Error" },
+> > +	{ true, "TUES", "DMA TSO Memory Uncorrectable Error" },
+> >  	{ false, "UNKNOWN", "Unknown Error" }, /* 3 */
+> > -	{ true, "DCES", "DMA DCACHE Memory Error" },
+> > +	{ true, "DCES", "DMA DCACHE Memory Correctable Error" },
+> >  	{ true, "DAMS", "DMA DCACHE Address Mismatch Error" },
+> > -	{ true, "DUES", "DMA DCACHE Memory Error" },
+> > +	{ true, "DUES", "DMA DCACHE Memory Uncorrectable Error" },
+> >  	{ false, "UNKNOWN", "Unknown Error" }, /* 7 */
+> >  	{ false, "UNKNOWN", "Unknown Error" }, /* 8 */
+> >  	{ false, "UNKNOWN", "Unknown Error" }, /* 9 */
+> > -- 
+> > 2.34.1
+> > 
+> >   
 
-The patch set was applied. Please advise whether this can stay as-is
-or follow up is absolutely necessary.
 
