@@ -1,98 +1,112 @@
-Return-Path: <netdev+bounces-65914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65915-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 494AE83C5FD
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 16:02:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE2E583C616
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 16:08:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01C1028C1E3
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 15:02:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 28C57B20F74
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 15:08:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C3516EB40;
-	Thu, 25 Jan 2024 15:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MSpXFasW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 395266E2B3;
+	Thu, 25 Jan 2024 15:08:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail2.pod.cz (mail2.pod.cz [213.155.227.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E72C323764;
-	Thu, 25 Jan 2024 15:00:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A735C1F5F6
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 15:08:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.155.227.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706194827; cv=none; b=iGMR/NqYVTPkdBwDG5r7+9B4cBiFNVXJf1B4taDN+VqZ6ZTgCcNN2lzJbShzVD1vhGnEWSiAm2tjzMeubxNzn78gbS2Reu2by9ejdGS7u6RhcJZFQ3Q2H8P2zGutpXLezvRLUJqe1Gdyzc0qDYsYjhmOJu6LC+54CHV6IwhSDC8=
+	t=1706195303; cv=none; b=nelwJgixBlsWhtGtpv8Dq8JKj9LeUHe54NdWBDxPvjDAY87Q5/gbqE50AFGBNOkkI1vhHP4STRveTz8WV2/4jcfWmDzC52lhtw4lOmKmj0C9tvo/iAAxrra+Xx5iTPbHwyZHAHOqorDynWg6XdlIK18KTcFWNyCxk1BGltnzo1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706194827; c=relaxed/simple;
-	bh=eJ0fPZy5H3HPFj4qbHHzlx5qHvg0wqNVEjDL2Z6lfPA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gcgn3Pmr3dW4vVxa853uIRgC3RQCXoEHL1VGM4WAGMMUMMk9fkP2rv6gKnmE15U5klxW4TncDaQ9wsxyxPdOUFiDI6QWc80U+pRVizC+y6yF2K78jlzB6ZU1GEMAxHs5Aobj3vUPJmOoks6cAJREIEkxGKlCFB4yD7hLtDYsWU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MSpXFasW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A49EBC43390;
-	Thu, 25 Jan 2024 15:00:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706194826;
-	bh=eJ0fPZy5H3HPFj4qbHHzlx5qHvg0wqNVEjDL2Z6lfPA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MSpXFasW/lWHRJZ/rNGQYjVPz2RcWSJE1wv0XkdNwcjHHyt7zD48+qzoaCT2ry07L
-	 jujebahj6eccGcPEGAN2vPBuj/TXJLe3Y4srogK0w5tq3q4AqNSI2GkiF7gx5TCE9h
-	 jnh+PpPOc7U/yTlymPLdNmeXPnhixcT/xAKv14M3Q+WuRDiIlMeANS5woqHUMiK05Y
-	 HC/7jTwGIM7wIqSh6fQUJlhFE128uRfxy8nuj0wHXYoP23WHRLZAQdAp7o16xnnuKV
-	 NoKb88xMwchfej1nh7WGg9RBpp9xoKs9z7B88ky/cAjuXYy1D0HRjAaDuXdgJIrteQ
-	 yrV6+ltSsphUQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 867FBD8C962;
-	Thu, 25 Jan 2024 15:00:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1706195303; c=relaxed/simple;
+	bh=qz4RGbBlUfuE6FmdlS7T0HLJMMcnhd446L6PyBP/7rA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CTwc78f+8hyXFsVFarLN7vggoEollIZzXmvd02uvAHBZ3XDZzMXpYtvxcplWg/sbMWTVlYM8aJg+oF0j1uiusMTeB2JiohY4wgi8+aDZAscj4Ea3J5G6CJBagwjn0nkOCVMKY5dYwMW53aXEx3mhM65lZ71uLyObKxVIPCMKOJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=samel.cz; spf=pass smtp.mailfrom=samel.cz; arc=none smtp.client-ip=213.155.227.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=samel.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samel.cz
+X-Envelope-From: vitezslav@samel.cz
+X-Envelope-To: dsahern@gmail.com
+X-Envelope-From: vitezslav@samel.cz
+X-Envelope-To: kuba@kernel.org
+X-Envelope-From: vitezslav@samel.cz
+X-Envelope-To: netdev@vger.kernel.org
+X-Envelope-From: vitezslav@samel.cz
+X-Envelope-To: heng.guo@windriver.com
+Received: from pc11.op.pod.cz (pc11.op.pod.cz [IPv6:2001:718:1008:3::11])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-384) server-digest SHA384
+	 client-signature ECDSA (P-384) client-digest SHA384)
+	(Client CN "pc11.op.pod.cz", Issuer "Povodi Odry - mail CA" (verified OK))
+	by mail.ov.pod.cz (Postfix) with ESMTPS id 4TLPMt0QlczHnQV;
+	Thu, 25 Jan 2024 16:08:09 +0100 (CET)
+Received: by pc11.op.pod.cz (Postfix, from userid 475)
+	id 4TLPMs0lYyz6yYZ; Thu, 25 Jan 2024 16:08:09 +0100 (CET)
+Date: Thu, 25 Jan 2024 16:08:09 +0100
+From: Vitezslav Samel <vitezslav@samel.cz>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: David Ahern <dsahern@gmail.com>, heng guo <heng.guo@windriver.com>,
+	netdev@vger.kernel.org
+Subject: Re: [6.6.x REGRESSION][BISECTED] dev_snmp6: broken Ip6OutOctets
+ accounting for forwarded IPv6 packets
+Message-ID: <ZbJ5Wfx7jNfXBpAP@pc11.op.pod.cz>
+Mail-Followup-To: Jakub Kicinski <kuba@kernel.org>,
+	David Ahern <dsahern@gmail.com>, heng guo <heng.guo@windriver.com>,
+	netdev@vger.kernel.org
+References: <ZauRBl7zXWQRVZnl@pc11.op.pod.cz>
+ <20240124123006.26bad16c@kernel.org>
+ <61d1b53f-2879-4f9f-bd68-01333a892c02@gmail.com>
+ <493d90b0-53f8-487e-8e0f-49f1dce65d58@windriver.com>
+ <20240124174652.670af8d9@kernel.org>
+ <ZbIEDFETblTqqCWm@pc11.op.pod.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: dsa: mt7530: support OF-based registration of
- switch MDIO bus
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170619482654.13332.18301642158515027225.git-patchwork-notify@kernel.org>
-Date: Thu, 25 Jan 2024 15:00:26 +0000
-References: <20240122053431.7751-1-arinc.unal@arinc9.com>
-In-Reply-To: <20240122053431.7751-1-arinc.unal@arinc9.com>
-To: =?utf-8?b?QXLEsW7DpyDDnE5BTCA8YXJpbmMudW5hbEBhcmluYzkuY29tPg==?=@codeaurora.org
-Cc: daniel@makrotopia.org, Landen.Chao@mediatek.com, dqfext@gmail.com,
- sean.wang@mediatek.com, andrew@lunn.ch, f.fainelli@gmail.com,
- olteanv@gmail.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, matthias.bgg@gmail.com,
- angelogioacchino.delregno@collabora.com, mail@david-bauer.net,
- mithat.guner@xeront.com, erkin.bozoglu@xeront.com, luizluca@gmail.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZbIEDFETblTqqCWm@pc11.op.pod.cz>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Mon, 22 Jan 2024 08:34:31 +0300 you wrote:
-> Currently the MDIO bus of the switches the MT7530 DSA subdriver controls
-> can only be registered as non-OF-based. Bring support for registering the
-> bus OF-based.
+On Thu, Jan 25, 2024 at 07:47:40 +0100, Vitezslav Samel wrote:
+> On Wed, Jan 24, 2024 at 17:46:52 -0800, Jakub Kicinski wrote:
+> > On Thu, 25 Jan 2024 08:37:11 +0800 heng guo wrote:
+> > > >> Heng Guo, David, any thoughts on this? Revert?  
+> > > > Revert is best; Heng Guo can revisit the math and try again.
+> > > >
+> > > > The patch in question basically negated IPSTATS_MIB_OUTOCTETS; I see it
+> > > > shown in proc but never bumped in the datapath.  
+> > > [HG]: Yes please revert it. I verified the patch on ipv4, seems I should 
+> > > not touch the codes to ipv6. Sorry for it.
+> > 
+> > Would you mind sending a patch with a revert, explaining the situation,
+> > the right Fixes tag and a link to Vitezslav's report?
 > 
-> The subdrivers that control switches [with MDIO bus] probed on OF must
-> follow this logic to support all cases properly:
+>   I took a look at current master and found that there is yet another
+> commit since 6.6.x which touches this area: commit b4a11b2033b7 by Heng Guo
+> ("net: fix IPSTATS_MIB_OUTPKGS increment in OutForwDatagrams"). It went
+> in v6.7-rc1.
 > 
-> [...]
+>   I will test current master this afternoon and report back.
 
-Here is the summary with links:
-  - [net-next] net: dsa: mt7530: support OF-based registration of switch MDIO bus
-    https://git.kernel.org/netdev/net-next/c/91374ba537bd
+  Test 1: Linus' current master: IPv6 octets accounting is OK
+  Test 2: 6.6.13 with b4a11b2033b7 ("net: fix IPSTATS_MIB_OUTPKGS
+          increment in OutForwDatagrams") on top is also OK.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+  Seems like my problem was solved in master already, but
+it still exists in 6.6.y. IMHO commit b4a11b2033b7 should be
+marked as for-stable-6.6.y and forwarded to GregKH. AFAIK only 6.6.y
+stable tree is affected.
 
+  But beware: I only tested my specific problem and I don't know if the
+commit with fix doesn't break anything else.
 
+	Thanks,
+
+		Vita
 
