@@ -1,160 +1,119 @@
-Return-Path: <netdev+bounces-65814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D138A83BD53
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 10:30:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 94E0483BD5B
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 10:32:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8894F1F2D8C6
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:30:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 485721F2E0B9
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:32:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 038D41BDFA;
-	Thu, 25 Jan 2024 09:28:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 661EA1C6B8;
+	Thu, 25 Jan 2024 09:29:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VRVpUuTh"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 262B31BF27;
-	Thu, 25 Jan 2024 09:28:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B018320B27;
+	Thu, 25 Jan 2024 09:29:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706174936; cv=none; b=Zf1Akv7mbTTGODF5U1IdeCRtP0qqVDWoVWvnRTJBI4EuI/I2rcuIjiERYfQqq6f70JOh6LRuFIBg0pASGeMfuJE3kNDpuCaFLXdmGo4w0A0HX/VROcGoUkRVc/iuZwmxJftYgIEFr6vaUVJ7edn3kkx7wqftjZ6uDqtO9tSmYqA=
+	t=1706174955; cv=none; b=bG3nL2Sj0cbSVnZ2Yh3t2MoGHx8CATt0UWMRLTxoKyet7EoPqhJ+IimjiQZIoVetZ/Jmw8ZrFg4IpqB6WAvr7ZZx+fALXxDnD+IaQ/GhNHvSF4qvoVwH2U4sPxlG1PoIcmTIrvdLIhWZNV/aPSzBe0nU2jtWGmZc5D1fD3EEuRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706174936; c=relaxed/simple;
-	bh=4oi/mDvJ66W3EHJcJkd6l/BObOrE9wC8bVqVRycPZXw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Vd0aQ9L3dDL95q88bABdBJfvQp6407F3UedP2glwDYuwTQkYPG51WOmkMI+2pQOp6a9ulvOHB6IsTY7okbeaHUuiCpC8NuPI5wGfDFpcqZ2AP9FHWcc+w/LHqwzqCe21RFnalBDzLp+55HwEZdZ/lgg+Rg5HXSWd28p2ZnXx7AY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; arc=none smtp.client-ip=115.124.30.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=23;SR=0;TI=SMTPD_---0W.JurKr_1706174923;
-Received: from 30.221.129.223(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W.JurKr_1706174923)
-          by smtp.aliyun-inc.com;
-          Thu, 25 Jan 2024 17:28:44 +0800
-Message-ID: <d93bdf89-d724-4f2a-a3fc-f3a46e54202c@linux.alibaba.com>
-Date: Thu, 25 Jan 2024 17:28:43 +0800
+	s=arc-20240116; t=1706174955; c=relaxed/simple;
+	bh=f0WH8mYyehhGdFrch/FhoI1euWmA1llvn3BltzJk/c4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R3x+zxAkBTVaTjVIEYBJljnSlPwZJDz4UTvVPCpbv42EIXY1fgstRi/u6kE6O3aDMs4jGp3VhydzJo4ttUCU9LwTctGmYjO/NZghbTlfwpo1DgRGF6gjOGglfDP7FAGJ9l1J6uhAc0huSCmimZZ1TRwOjntW/5gdbgqG7A1A+AA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VRVpUuTh; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a3150c9568bso126109466b.1;
+        Thu, 25 Jan 2024 01:29:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706174952; x=1706779752; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ORIJE9f/z+ZprW7cvU+93rl1XYAcpcHTZAoKwb7UAN8=;
+        b=VRVpUuThNJrDjTYgKf6vO22YIyZi+oNs8Y/jqx0xQf96QSswiUub3hJG63p06DlX8v
+         EmvMHGvEB37jDTYF7PvQq+iikUD3QQw/DUltsUdnvu4cKBzPZ3gg6un1Lt7wvaqSegpA
+         1CXgzBHQppJQliXm7jFV6+mhH9iAITVDftAahi07l6IgrGYPNVCUcrRqXlUIp9RS7OnW
+         jcJ4GcXsxUMxJ2FhQxIv0MHQJ9g71D5HHHVo+IgsEM7+v2Pi13ctjhQbwqW8towHszzl
+         kcq0a01w+HmCucr6pgiSfXKsaj0PmOYiFRXW5A7n5nagU3hMhvTcL/VuNEC0qbY2JRq3
+         bNdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706174952; x=1706779752;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ORIJE9f/z+ZprW7cvU+93rl1XYAcpcHTZAoKwb7UAN8=;
+        b=k+OjBXCswDRZ1Izo2FcLf9TCeO5gItTmFkoWCl8phLhbnECukWFma0wsgbuhOnaMOu
+         88wNo0a0pyCPA1ZkNunXMxImx6YlWgunmQD13q5RnpzkNq56VDa7ooT/1O69NV/ti8nl
+         31XGvUq5i4E0mz6Q0oKUi6AErFgq7bN4UjG0Yf+3Q3fpYaP3qFs3JvenVziYNnaeihfE
+         aPl48C039RcrPoYR5TEKtfZiPKDXM5TvP4kXje6kQphlzMchQKWVfjuppC7v0ERbGpIy
+         II+7MkWjLexzbBBToqw0NJ5/uEW7vzUhXIpqsuyLPbqJe1YkaJOoxI08yYAnDQMJbc5l
+         Hfog==
+X-Gm-Message-State: AOJu0YxqbCz0I5nJJm3Xezv/UDhqFnp2EsrEPEXaynA934L3N+uFTeli
+	heoer0QctOz4SbOlxSt2qf0e7q0Tr3QbEfRQoKMvB5mMZmrjqOAl
+X-Google-Smtp-Source: AGHT+IExWFNGCj8bFUwy2D2zj58GEhzyTbrPM9rW1Uu9Oo1+KTW3AUkCmUyW46u3+HQvCsrrPWXfSQ==
+X-Received: by 2002:a17:907:9387:b0:a28:c8bd:fbfc with SMTP id cm7-20020a170907938700b00a28c8bdfbfcmr224236ejc.215.1706174951457;
+        Thu, 25 Jan 2024 01:29:11 -0800 (PST)
+Received: from skbuf ([188.25.255.36])
+        by smtp.gmail.com with ESMTPSA id k20-20020a17090646d400b00a30e0f7b4f3sm822210ejs.31.2024.01.25.01.29.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Jan 2024 01:29:11 -0800 (PST)
+Date: Thu, 25 Jan 2024 11:29:09 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: dsa: mt7530: select MEDIATEK_GE_PHY for
+ NET_DSA_MT7530_MDIO
+Message-ID: <20240125092909.exaisdjkkgmc5fue@skbuf>
+References: <20240122053451.8004-1-arinc.unal@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [REGRESSION] v6.8 SMC-D issues
-To: Alexandra Winter <wintera@linux.ibm.com>, wenjia@linux.ibm.com,
- hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, jaka@linux.ibm.com,
- Matthew Rosato <mjrosato@linux.ibm.com>
-Cc: Linux regressions mailing list <regressions@lists.linux.dev>,
- borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
- tonylu@linux.alibaba.com, raspl@linux.ibm.com, schnelle@linux.ibm.com,
- guangguan.wang@linux.alibaba.com, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Halil Pasic <pasic@linux.ibm.com>
-References: <20231219142616.80697-1-guwen@linux.alibaba.com>
- <20231219142616.80697-8-guwen@linux.alibaba.com>
- <13579588-eb9d-4626-a063-c0b77ed80f11@linux.ibm.com>
- <530afe45-ba6b-4970-a71c-1f1255f5fca9@linux.alibaba.com>
- <8090bb34-1b70-43ea-ae13-df5d9a5eb761@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <8090bb34-1b70-43ea-ae13-df5d9a5eb761@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240122053451.8004-1-arinc.unal@arinc9.com>
 
-
-
-On 2024/1/25 16:26, Alexandra Winter wrote:
+On Mon, Jan 22, 2024 at 08:34:51AM +0300, Arınç ÜNAL wrote:
+> Quoting from commit 4223f8651287 ("net: dsa: mt7530: make NET_DSA_MT7530
+> select MEDIATEK_GE_PHY"):
 > 
+> Make MediaTek MT753x DSA driver enable MediaTek Gigabit PHYs driver to
+> properly control MT7530 and MT7531 switch PHYs.
 > 
-> On 25.01.24 05:59, Wen Gu wrote:
->> After a while debug I found an elementary mistake of mine in
->> b40584d ("net/smc: compatible with 128-bits extended GID of virtual ISM device")..
->>
->> The operator order in smcd_lgr_match() is not as expected. It will always return
->> 'true' in remote-system case.
->>
->>   static bool smcd_lgr_match(struct smc_link_group *lgr,
->> -                          struct smcd_dev *smcismdev, u64 peer_gid)
->> +                          struct smcd_dev *smcismdev,
->> +                          struct smcd_gid *peer_gid)
->>   {
->> -       return lgr->peer_gid == peer_gid && lgr->smcd == smcismdev;
->> +       return lgr->peer_gid.gid == peer_gid->gid && lgr->smcd == smcismdev &&
->> +               smc_ism_is_virtual(smcismdev) ?
->> +               (lgr->peer_gid.gid_ext == peer_gid->gid_ext) : 1;
->>   }
->>
->> Could you please try again with this patch? to see if this is the root cause.
->> Really sorry for the inconvenience.
->>
->> diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
->> index da6a8d9c81ea..c6a6ba56c9e3 100644
->> --- a/net/smc/smc_core.c
->> +++ b/net/smc/smc_core.c
->> @@ -1896,8 +1896,8 @@ static bool smcd_lgr_match(struct smc_link_group *lgr,
->>                             struct smcd_gid *peer_gid)
->>   {
->>          return lgr->peer_gid.gid == peer_gid->gid && lgr->smcd == smcismdev &&
->> -               smc_ism_is_virtual(smcismdev) ?
->> -               (lgr->peer_gid.gid_ext == peer_gid->gid_ext) : 1;
->> +               (smc_ism_is_virtual(smcismdev) ?
->> +                (lgr->peer_gid.gid_ext == peer_gid->gid_ext) : 1);
->>   }
->>
->>
->> Thanks,
->> Wen Gu
+> A noticeable change is that the behaviour of switchport interfaces going
+> up-down-up-down is no longer there.
 > 
-> Hello Wen Gu,
+> Now, the switch can be used without the PHYs but, at the moment, every
+> hardware design out there that I have seen uses them. For that, it would
+> make the most sense to force the selection of MEDIATEK_GE_PHY for the MDIO
+> interface which currently controls the MT7530 and MT7531 switches.
 > 
-> thank you for the quick resposne and for finding this nasty bug.
-> I can confirm that with your patch I do not see the issue anymore.
+> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+> ---
 
-Thank you very much for your confirmation, Alexandra.
+I see MEDIATEK_GE_PHY only depends on NETDEVICES && PHYLIB, so it should
+have no problem being directly selected by a driver without breaking the
+build by causing unmet dependencies.
 
-> Please send a fix to the mailing lists. See
-> https://docs.kernel.org/process/handling-regressions.html
-> for some tips.
-> 
+I also see there is precedent with CONFIG_TXGBE selecting
+MARVELL_10G_PHY, CONFIG_R8169 selecting REALTEK_PHY, and others.
 
-Thank you. Will do.
-
-> May I propose that instead of adding the brackets, you change this function
-> to an if-then-else sequence for readability and maintainability?
-> I would still mention the missing brackets in the commit message, so
-> readers can quickly understand the issue.
-
-I agree. if-then-else will make it clearer. I will fix it like this:
-
-diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
-index da6a8d9c81ea..1d5bce82d4d8 100644
---- a/net/smc/smc_core.c
-+++ b/net/smc/smc_core.c
-@@ -1895,9 +1895,15 @@ static bool smcd_lgr_match(struct smc_link_group *lgr,
-                            struct smcd_dev *smcismdev,
-                            struct smcd_gid *peer_gid)
-  {
--       return lgr->peer_gid.gid == peer_gid->gid && lgr->smcd == smcismdev &&
--               smc_ism_is_virtual(smcismdev) ?
--               (lgr->peer_gid.gid_ext == peer_gid->gid_ext) : 1;
-+       if (lgr->peer_gid.gid != peer_gid->gid ||
-+           lgr->smcd != smcismdev)
-+               return false;
-+
-+       if (smc_ism_is_virtual(smcismdev) &&
-+           lgr->peer_gid.gid_ext != peer_gid->gid_ext)
-+               return false;
-+
-+       return true;
-  }
-
-Thanks again,
-Wen Gu
-
-> 
-> Thanks again for the quick response.
-> Sandy
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
