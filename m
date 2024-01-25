@@ -1,134 +1,91 @@
-Return-Path: <netdev+bounces-65817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B9B083BD8C
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 10:39:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8140783BDCF
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 10:48:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98AA9B2EF7D
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:33:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A1F51F32D29
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:48:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 203E91BDD5;
-	Thu, 25 Jan 2024 09:31:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96EE91C2BD;
+	Thu, 25 Jan 2024 09:46:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WC6nwv1D"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X6iCK0cz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-wr1-f68.google.com (mail-wr1-f68.google.com [209.85.221.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68DB81BDC2;
-	Thu, 25 Jan 2024 09:31:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 082641CF83
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 09:46:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706175070; cv=none; b=HWWdlR9Ela3GmY78BPGkTnDSNfMOGd4yIIQbgtdJPegMGvando+tn9mxk5L917ccodxNWBfNitW6JqswHC2hdf7Ir5DhMdeEJ0hxxvBCRGkVv7ykzqG5nHfMQdlosdHB90sapVAx2dF94z6xiOxeQ5z0Bgtn7FE7OGyKJScsSw8=
+	t=1706176015; cv=none; b=Yj3uOAlmROsBvxG4eCjUItwU9h/V9tPeUybu/hHTAJ7AEWOeqb/+rF8dB6T3HtRDFG/ndDdZJEgxkAaGWgCVbBfeAITNKXyVqku5Ur1Xu78/xuheVwTj8+OkE43xuBsV4G+iNgmVm6qie7SBTC6Tm9+9Qsr8TOPqujI8sA1jj1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706175070; c=relaxed/simple;
-	bh=OeShpqzxJE7yLOFxxvK9qlbC3YgMT04WmY+0Pht28xQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Au+ocbJG9zAQQ/1BP/abWhjjKXBTCPse79oSeqvf0isYpDgT5pj2ci4q62gCno5fYBFxs9ubv/+FR5d3nHHZkMuLCEFojPiMOnXe0IMkyNqovWLq/7nq2pJ4dI7vrIupwtqZwh7Xz6FyrZrFBcuvll1lT7l4r8ZJahl3+SkbgyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WC6nwv1D; arc=none smtp.client-ip=209.85.208.51
+	s=arc-20240116; t=1706176015; c=relaxed/simple;
+	bh=hkEykdYpLKytx7M0B7g+Mh0aAttAPO6NJFKKwuHsyQk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MfSlTbhioMlM90shBptJnFHpQG2Fp4m2/IqwfFDDZcKht9eDueHv4thiF/mPJ2yrJbqywAKzVnIyoNthdZhExWMpw0DLkyg8HWg5mUF13m8GXDNnAEA4S92RatXXFiJhhehuMe9iQA0Lbwd8lYsfecprFcggy3Dl/01IgULEORQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X6iCK0cz; arc=none smtp.client-ip=209.85.221.68
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-55a50649ff6so7183035a12.3;
-        Thu, 25 Jan 2024 01:31:08 -0800 (PST)
+Received: by mail-wr1-f68.google.com with SMTP id ffacd0b85a97d-337cf4eabc9so5135104f8f.3
+        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 01:46:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706175066; x=1706779866; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=yF1vj6bD4OantSklaxQBfzwibMkOXYYkC5p2/Evicfs=;
-        b=WC6nwv1DAO+WUe+jGRSDhXj418Jv6mU5tgpHLkd0H3J7o3Gm1xSZO5zqe1Ip5T6tLC
-         NtzykAejh7caOGjFOlx4OPOiLOY4ItlU8pu+d4SdggA+fzIEuJ9noVh1dzpZv16EL/mu
-         N0DG83jgISRlexCdtMTQaOlhAs7MxcTGOXc7MjSW/7Exe1SxNKOnd04Bd9H3442nAB/I
-         7OPswA8ah8BU9//oY80Xg826daKgOSkrU2R6q19YKpjgFkQRaM52pP93acMQEj1CPeqb
-         yzxvbDcSj8squdYcp4C3pkC2J7FhjpSjQXmfJf8Ip0fIhLbkqRIW2oVl+mwcYLVtTDEU
-         4ZFg==
+        d=gmail.com; s=20230601; t=1706176012; x=1706780812; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hkEykdYpLKytx7M0B7g+Mh0aAttAPO6NJFKKwuHsyQk=;
+        b=X6iCK0czsOJ/qHtJ5J2YICX/FrHNoxRlJIAfOkb6RRmkXKe4iWqdu/eJIj/WmFot9X
+         WHThJy6VF6WMhZlo5pVZ23Cj94ZTALLMUAowIhj7TZIk3OtdJT0QkeLgWHmp0OeN9UVE
+         xAMxJSqcGiZyHZ3Lg7C5m7TV4Ot39ywj0t1zFbofDD6dZaQmWSrFXcoG8Uxg61GJRJ/p
+         96NcR0usDNW7AP+eEq6lDkW7y/iJFcI1ZUSpGk+7hp5BVmGMs2lXNk+uxGqyQ8N/bBs6
+         H7gH1jrRjSxP+zc65KVb5jDX3rn/QlxHVq0Ox3oeUFKQr7OZ+z9v5mG8CFHtc3VAuix/
+         mlng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706175066; x=1706779866;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1706176012; x=1706780812;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yF1vj6bD4OantSklaxQBfzwibMkOXYYkC5p2/Evicfs=;
-        b=fMJBiT/cta7JZJXeE2jduWz3Hnx8plJQDVrCrmfOmPnFoANczfpoZL3O2qKjlHc24g
-         UgFyMimlaL1U8HpDdYhcCBmCa2Eppuang0/krClFw/Sn98IRqry1RpfUnmmvovfytqZP
-         R6MZ53kFvh6Lr7wgmVEZyLwCf4s5t4I/218rSQuAls1ONsvuR2+L3AHjbUigNuQTxGwT
-         H7Aybz7E4u6rAjXlrlnPdQ9teMhgkqVn7GIZiC7svIXhNBrOjv64WMVpQ2vb3iIm50RD
-         ARupKc6YvtbfnyrDAF/yjATMKwwVd0MgsJ3N1j211QdsLo/vY7XGG2vPfsy4GAuGOb29
-         emwg==
-X-Gm-Message-State: AOJu0YyInI1Ny839wb3zVP1+FYQeuTCzOq07q37ZGDPavK87kXAlbwd1
-	9Btpe5Z5v2ywLEHPT26XBdyY7ZZSOD0nTotPMDZxBQjGfXhZu9R1
-X-Google-Smtp-Source: AGHT+IFD9l2XpZg6gJ3Y5v2cAtGMf4TOPGAa0HvVrsoqEDBhW3/sdNPJABjpXIj+kn4fncD/5XKE+A==
-X-Received: by 2002:a17:907:8693:b0:a2d:d05e:5704 with SMTP id qa19-20020a170907869300b00a2dd05e5704mr456600ejc.30.1706175066341;
-        Thu, 25 Jan 2024 01:31:06 -0800 (PST)
-Received: from skbuf ([188.25.255.36])
-        by smtp.gmail.com with ESMTPSA id k14-20020a1709065fce00b00a28aa4871c7sm809849ejv.205.2024.01.25.01.31.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jan 2024 01:31:06 -0800 (PST)
-Date: Thu, 25 Jan 2024 11:31:03 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: arinc.unal@arinc9.com
-Cc: Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Russell King <linux@armlinux.org.uk>, mithat.guner@xeront.com,
-	erkin.bozoglu@xeront.com,
-	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next v3 1/7] net: dsa: mt7530: always trap frames to
- active CPU port on MT7530
-Message-ID: <20240125093103.xlf46pezqj6d5ij7@skbuf>
-References: <20240122-for-netnext-mt7530-improvements-1-v3-0-042401f2b279@arinc9.com>
- <20240122-for-netnext-mt7530-improvements-1-v3-0-042401f2b279@arinc9.com>
- <20240122-for-netnext-mt7530-improvements-1-v3-1-042401f2b279@arinc9.com>
- <20240122-for-netnext-mt7530-improvements-1-v3-1-042401f2b279@arinc9.com>
+        bh=hkEykdYpLKytx7M0B7g+Mh0aAttAPO6NJFKKwuHsyQk=;
+        b=rE4Vwq49J6x//QzA0J7ZsiCQWGJ/hYsbu/OWwoMnk+TLDVb5JxVkuzjoxAC4J9twik
+         yuoXFPhhwpwHwxzlHlmmhjdeur3hJ+1KmJwO2KEW/+khG08F3KAO8M25TpAjnFysvHYB
+         gveMKMiaMz+cNqFPAgPg5+e8zrYTiPHCVPAoUm2J8F0us/K12pj3uHRlxAkCmahfcPVl
+         gxxot67YM26iuwILRBQaHstY67WnsLZPPdNgScH/ULdNaVoqS9eEFJ/kLa1IufPf0Qga
+         k1eqCucHGERFTndxG3Gur5cpkT5bvD6sQ5gYrWcjEaPjvnda4UBo1+u6a9qCuLuPnxgN
+         ivMg==
+X-Gm-Message-State: AOJu0Yy4F/7iqJFjB0nCi5jiWERZ9fTa30spMHKNdENX7tDG1Y1NIPy+
+	5+3FEEsXX9ziZfq7oZWime4s5Noe0cyXwqirctGKWDnEGJV7vVoG
+X-Google-Smtp-Source: AGHT+IH3AYbtNz0URUwZKaxjRy0ECI3wAA/U98qDQb7L7Jfn6cBPzMRcUGRd+zc8sb/jH1Y6NZURCQ==
+X-Received: by 2002:adf:f107:0:b0:337:3ed6:8697 with SMTP id r7-20020adff107000000b003373ed68697mr391580wro.90.1706176011959;
+        Thu, 25 Jan 2024 01:46:51 -0800 (PST)
+Received: from localhost ([217.212.240.67])
+        by smtp.gmail.com with ESMTPSA id v4-20020a5d6784000000b0033940bc04fesm6270766wru.16.2024.01.25.01.46.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 Jan 2024 01:46:51 -0800 (PST)
+Message-ID: <d6587a2c-0a1c-4a1e-a1fa-e94c6b3b7a98@gmail.com>
+Date: Thu, 25 Jan 2024 10:46:28 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240122-for-netnext-mt7530-improvements-1-v3-1-042401f2b279@arinc9.com>
- <20240122-for-netnext-mt7530-improvements-1-v3-1-042401f2b279@arinc9.com>
+Subject: Re: [PATCH net] ipmr: fix kernel panic when forwarding mcast packets
+Content-Language: en-US
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>,
+ "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org
+References: <20240124121538.3188769-1-nicolas.dichtel@6wind.com>
+From: Leone Fernando <leone4fernando@gmail.com>
+In-Reply-To: <20240124121538.3188769-1-nicolas.dichtel@6wind.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 22, 2024 at 08:35:52AM +0300, Arınç ÜNAL via B4 Relay wrote:
-> From: Arınç ÜNAL <arinc.unal@arinc9.com>
-> 
-> On the MT7530 switch, the CPU_PORT field indicates which CPU port to trap
-> frames to, regardless of the affinity of the inbound user port.
-> 
-> When multiple CPU ports are in use, if the DSA conduit interface is down,
-> trapped frames won't be passed to the conduit interface.
-> 
-> To make trapping frames work including this case, implement
-> ds->ops->conduit_state_change() on this subdriver and set the CPU_PORT
-> field to the numerically smallest CPU port whose conduit interface is up.
-> Introduce the active_cpu_ports field to store the information of the active
-> CPU ports. Correct the macros, CPU_PORT is bits 4 through 6 of the
-> register.
-> 
-> Add a comment to explain frame trapping for this switch.
-> 
-> Currently, the driver doesn't support the use of multiple CPU ports so this
-> is not necessarily a bug fix.
-> 
-> Suggested-by: Vladimir Oltean <olteanv@gmail.com>
-> Suggested-by: Russell King (Oracle) <linux@armlinux.org.uk>
-> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-> ---
-
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+I missed this path, thanks for fixing it.
+Eric's suggestion looks good to me.
 
