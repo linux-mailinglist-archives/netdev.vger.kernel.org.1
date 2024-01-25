@@ -1,125 +1,154 @@
-Return-Path: <netdev+bounces-65791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65792-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39C4683BC2D
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:41:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6291883BC36
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:44:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD8D128B165
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 08:41:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8ED301C256A0
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 08:44:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3C391B944;
-	Thu, 25 Jan 2024 08:41:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 664A81B945;
+	Thu, 25 Jan 2024 08:44:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JuvXD19/"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="JbQaa1Qv"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41BB010A26
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 08:41:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E88E01BC20;
+	Thu, 25 Jan 2024 08:44:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706172071; cv=none; b=iuFFwq9rbFE4nzAdBVMEWh3ptKNG1azdhrFi8d6wjZ79UWMnd7I9nfgb7ZHLUvfG7zC0gEKsj8RxacMOA1Ci3NAC0aluNMeAKY01mefKE3a2lpIxV2v0tdSy7wc4BYTuLoFGu5918wubtiPX5hki2zLvi+WRLpsk9ndBmman2do=
+	t=1706172264; cv=none; b=ehDLzaXFHBBkbUOks2dQoDHuRrl6AVP8wyvE0YUaOtRzU3odBdJsnpexn60EeFTvRthhHYChJvi5z6oBFovNlXKM8UPlPls9LctUzD3KngYA4Ou1bdA/e4uBomYKBfQUfBM0kjqUBbOyYgC3cCOG04vmo0YS7VBtyspOsDdSlEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706172071; c=relaxed/simple;
-	bh=uaw2OQxOj/iJ0FDVCczkm669hzJBFI58+e9xoVccMms=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=BEjtpWSgaYHpXR8cIq09PnAQ2YAsTwrRDfCHaoHP8/b4CHNGwhfRyG3CmaMd12Vf4UFL6TfUSJT/MFQMDfrIkMs4/UUYZ8WhSeOgSYcHOECOWZiBM/6kQ71335Q4hQzqNIolxnYfWVmZhoxRdjzyknaaBzSa87zLZQjJKEK8o9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JuvXD19/; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706172069;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=uaw2OQxOj/iJ0FDVCczkm669hzJBFI58+e9xoVccMms=;
-	b=JuvXD19/IzER7z2WT7ZySt0KmFha5XKjHOLWJDw4H2bvSgJJrA1XgIovkedMtkC/GkEKud
-	jv8lmp+y1fG8CrFrzI6QqyYAudHSVcHBODNy1eUtgH3MxQ4Z0AJ9UbPJc8g+GYDgur/gJ5
-	htDYegcsRxbbYwBgH0UhW43/Piz8Jwg=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-301-audz1yfqPIeZTStAW2xrCg-1; Thu, 25 Jan 2024 03:41:07 -0500
-X-MC-Unique: audz1yfqPIeZTStAW2xrCg-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-337d5ce8e20so100262f8f.0
-        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 00:41:07 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706172066; x=1706776866;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uaw2OQxOj/iJ0FDVCczkm669hzJBFI58+e9xoVccMms=;
-        b=LPPDXutHQ/N2xjlfduynhWJkCGbrxQ5kB88HmgfXydHXFNExhujgyp7DRh9BISNjAn
-         h/C0kFKGvOl5uaVhtORk+tbMnzEel0MQ/JgCi9V+56DkhVad2K0fwZcSWKBFoqFHvMaM
-         xI7w/yw2JPlgJDnuluvxp53jdeCCHyrUT6X6PTQZppVBsHM07tYe0m9KHJZWnEv4htl7
-         z1oKa95AzLb5HnXuSeA3P5IPVhmRE9bij3eNMEy2X2P3O2X4FEl+6AxwrTDvAcMs6hD9
-         qEEY+IsOLa6X49Hyh+bNLSZffUs05oVBa3XpKfRHc2WLWDA8we7vHYFAyOoKDNFqfo+f
-         48Rg==
-X-Forwarded-Encrypted: i=0; AJvYcCX9WnxHqd1ge44grOcqb+oACElzDD3kpLQ+xT069Wa3bWVLEFlsNCLrtRQ2rHxu8GOQXd2jsdJeLLbeYOMlM/ul3998B4ld
-X-Gm-Message-State: AOJu0YwZubLT7TNnlIpTrFEHWC8WlzAPaHjWxKwZQuR/uYvLeBDnphB+
-	iumnZG+4lfeobvRPAjWMfgb8yjHDBDV+WNdW+9gSFOQmwKkn0kz4ng6W3TkNCUCJprLXDzjcBgp
-	uHHLTMAzwRj8iJhNRxJjzGiq0g/88NRShXkuy3b0Gj8hpCr1Qil1FEA==
-X-Received: by 2002:adf:a1dd:0:b0:337:cf8c:af59 with SMTP id v29-20020adfa1dd000000b00337cf8caf59mr661354wrv.1.1706172066738;
-        Thu, 25 Jan 2024 00:41:06 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE5Lvs9xGjT0kLSYRJQCsGyMbe8bbhQ21hw/TvaKxqphBRKbqtzBf+YXCVVrIXGF/wap9IkmQ==
-X-Received: by 2002:adf:a1dd:0:b0:337:cf8c:af59 with SMTP id v29-20020adfa1dd000000b00337cf8caf59mr661340wrv.1.1706172066350;
-        Thu, 25 Jan 2024 00:41:06 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-244-75.dyn.eolo.it. [146.241.244.75])
-        by smtp.gmail.com with ESMTPSA id d21-20020adfa355000000b003392a486758sm12793418wrb.99.2024.01.25.00.41.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jan 2024 00:41:05 -0800 (PST)
-Message-ID: <b2d71d3d01211af31e706acf386904760bae8301.camel@redhat.com>
-Subject: Re: [PATCH] ipv6: Ensure natural alignment of const ipv6 loopback
- and router addresses
-From: Paolo Abeni <pabeni@redhat.com>
-To: Helge Deller <deller@kernel.org>, "David S. Miller"
- <davem@davemloft.net>,  netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,  linux-parisc@vger.kernel.org
-Date: Thu, 25 Jan 2024 09:41:04 +0100
-In-Reply-To: <Za7dsxCjItn-dlfy@p100>
-References: <Za7dsxCjItn-dlfy@p100>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+	s=arc-20240116; t=1706172264; c=relaxed/simple;
+	bh=bIAqh3O/SJZ40uz8p+xJYJ/m9ym/SnLIQi9cPGspif8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=UVz/e8PdIdGIXSKExB3yjJrf7XfJ9DxllWVgdyD7opYLcqJe7MZMuaGlb0iHLZGdVkRC5ov9PBSVeMfBVES+qTNQ77z/FDweBR8YX7HK1Z3ChLgsBjgjYbq+yajn2H+Vu4jc+06qxGdmOtm0B2xX8vZiK4vORlIfGCU1aIsa+Bk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=JbQaa1Qv; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=veQ/CK0jTuc04jePgKpivFqI1zg8kgnliwMvdizlimM=; b=JbQaa1QvOSVbjuLMVFRPsKUfrJ
+	DunKlGHuS5VWr05VsNaBKVNT9GozhlS1oZLBmeM/tgl66ZMAvOwaIq/pMe2iCHhZtLHdhLphbIDZL
+	Hyog0yQy0Dh0EXn/QPdsPLDsRZBH8hcEteCzFubiRGlxxvpSUHeLzzXP3ztKbI2LCJSYDQxWE/nYB
+	IzQxH/Hy+RwrVQRvv4OYTzV8HkPS9lEEj63PTqQbAkeDpExVv3TxmEiLZu24Uz/jwpBjIT13t5POu
+	pvRQd1KbNog0qGjGYWtYivDU5zabhuXdWq0ZfmUUy7pi71gANsuoE9R1D3HgF0jd85BdzNqKgKUVw
+	sqmHPqlg==;
+Received: from 226.206.1.85.dynamic.wline.res.cust.swisscom.ch ([85.1.206.226] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1rSvLN-000Iaj-PL; Thu, 25 Jan 2024 09:44:17 +0100
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: davem@davemloft.net
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: pull-request: bpf 2024-01-25
+Date: Thu, 25 Jan 2024 09:44:16 +0100
+Message-Id: <20240125084416.10876-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.21.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27164/Wed Jan 24 10:45:32 2024)
 
-On Mon, 2024-01-22 at 22:27 +0100, Helge Deller wrote:
-> On a parisc64 kernel I notice sometimes this kernel warning:
-> Kernel unaligned access to 0x40ff8814 at ndisc_send_skb+0xc0/0x4d8
->=20
-> The address 0x40ff8814 points to the in6addr_linklocal_allrouters
-> variable and the warning simply means that some ipv6 function tries to
-> read a 64-bit word directly from the not-64-bit aligned
-> in6addr_linklocal_allrouters variable.
->=20
-> The patch below ensures that those ipv6 loopback and router addresses
-> always will be naturally aligned and as such prevents unaligned accesses
-> for all architectures.
->=20
-> Signed-off-by: Helge Deller <deller@gmx.de>
+Hi David, hi Jakub, hi Paolo, hi Eric,
 
-The patch LGTM, but the above looks like material for the 'net' tree,
-would you mind sending a v2 including a relevant fixes tag, the target
-tree in the subject prefix and possibly the stacktrace you observe?
+The following pull-request contains BPF updates for your *net* tree.
 
-Feel free to include my acked-by tag in v2.
+We've added 12 non-merge commits during the last 2 day(s) which contain
+a total of 13 files changed, 190 insertions(+), 91 deletions(-).
 
-Thanks,
+The main changes are:
 
-Paolo
+1) Fix bpf_xdp_adjust_tail() in context of XSK zero-copy drivers which
+   support XDP multi-buffer. The former triggered a NULL pointer
+   dereference upon shrinking, from Maciej Fijalkowski & Tirthendu Sarkar.
 
+2) Fix a bug in riscv64 BPF JIT which emitted a wrong prologue and
+   epilogue for struct_ops programs, from Pu Lehui.
+
+Please consider pulling these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
+
+Thanks a lot!
+
+Also thanks to reporters, reviewers and testers of commits in this pull-request:
+
+Björn Töpel, Maciej Fijalkowski, Magnus Karlsson
+
+----------------------------------------------------------------
+
+The following changes since commit 1347775dea7f62798b4d5ef60771cdd7cfff25d8:
+
+  Merge tag 'wireless-2024-01-22' of git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless (2024-01-23 08:38:13 -0800)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
+
+for you to fetch changes up to 9d71bc833f57a6549c753e37ce47136d35b67fc4:
+
+  Merge branch 'net-bpf_xdp_adjust_tail-and-intel-mbuf-fixes' (2024-01-24 16:24:07 -0800)
+
+----------------------------------------------------------------
+bpf-for-netdev
+
+----------------------------------------------------------------
+Alexei Starovoitov (1):
+      Merge branch 'net-bpf_xdp_adjust_tail-and-intel-mbuf-fixes'
+
+Maciej Fijalkowski (10):
+      xsk: recycle buffer in case Rx queue was full
+      xsk: make xsk_buff_pool responsible for clearing xdp_buff::flags
+      xsk: fix usage of multi-buffer BPF helpers for ZC XDP
+      ice: work on pre-XDP prog frag count
+      ice: remove redundant xdp_rxq_info registration
+      intel: xsk: initialize skb_frag_t::bv_offset in ZC drivers
+      ice: update xdp_rxq_info::frag_size for ZC enabled Rx queue
+      xdp: reflect tail increase for MEM_TYPE_XSK_BUFF_POOL
+      i40e: set xdp_rxq_info::frag_size
+      i40e: update xdp_rxq_info::frag_size for ZC enabled Rx queue
+
+Pu Lehui (1):
+      riscv, bpf: Fix unpredictable kernel crash about RV64 struct_ops
+
+Tirthendu Sarkar (1):
+      i40e: handle multi-buffer packets that are shrunk by xdp prog
+
+ arch/riscv/net/bpf_jit_comp64.c               |  5 +--
+ drivers/net/ethernet/intel/i40e/i40e_main.c   | 47 ++++++++++++++++---------
+ drivers/net/ethernet/intel/i40e/i40e_txrx.c   | 49 +++++++++++++--------------
+ drivers/net/ethernet/intel/i40e/i40e_xsk.c    |  4 +--
+ drivers/net/ethernet/intel/ice/ice_base.c     | 37 ++++++++++++--------
+ drivers/net/ethernet/intel/ice/ice_txrx.c     | 19 +++++------
+ drivers/net/ethernet/intel/ice/ice_txrx.h     |  1 +
+ drivers/net/ethernet/intel/ice/ice_txrx_lib.h | 31 ++++++++++++-----
+ drivers/net/ethernet/intel/ice/ice_xsk.c      |  4 +--
+ include/net/xdp_sock_drv.h                    | 27 +++++++++++++++
+ net/core/filter.c                             | 44 ++++++++++++++++++++----
+ net/xdp/xsk.c                                 | 12 ++++---
+ net/xdp/xsk_buff_pool.c                       |  1 +
+ 13 files changed, 190 insertions(+), 91 deletions(-)
 
