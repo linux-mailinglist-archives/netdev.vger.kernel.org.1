@@ -1,109 +1,205 @@
-Return-Path: <netdev+bounces-65961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C99283CA92
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 19:09:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68E5883CA93
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 19:10:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23B59291F71
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 18:09:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D10F1C23353
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 18:10:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E554313398C;
-	Thu, 25 Jan 2024 18:09:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32888133997;
+	Thu, 25 Jan 2024 18:10:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="icN2RJTH"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CIRbStlj"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 654E0132C04
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 18:09:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09FA8132C04;
+	Thu, 25 Jan 2024 18:10:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706206163; cv=none; b=cSiTXNnTaaQzm38CORnnsE6tKXma7W6s/rVXlgMdzfcGQTvhJxJLP8+NDk81tPM0h0Nnfc6fiJSq/Q5R28tskdGZSukmzMeuq+D44L1uD/mfztR7Ee/sfmZwxfvLYZ/TPJlJUwLlt/V2ksUwWQ9Z/B9uYjOr6PKFyKz4ISRTC6A=
+	t=1706206210; cv=none; b=gZ5ZyUQ86qEaOj3blf2ce3Z3I3074NMe4qJyP8cE5vbGYd43ZfRuFmSLpLekm1ULgNrsvKfO0UpQ2Cp+QDcW4hpfqzmNr56ywktWAdQe4Hp/j06TYFPG96uaw6q07YtQG16sbZ7Asp0i54tR8MvTdHzsFjzuiJlQ89tmwRyUqhw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706206163; c=relaxed/simple;
-	bh=x9sRqV3hC/XcuQMwTaODTmd26LK5jjkv/G5dMeLV0+k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OpkMFcw+YHVILfljcQcXQ7Afla+b7YbSca4hycwm5PpyqkxfVuxK3RJIhekhdkCISglz5TcnZ0RhcSA1KQSzG677hVKVFTVMhLuwMuxgs7ILvgxce0rU2dj7eWN/l1Afg3bxH+U2y37hAx0x/w4mUhxQRp4xqVrmWjkizO12jn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=icN2RJTH; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706206161;
+	s=arc-20240116; t=1706206210; c=relaxed/simple;
+	bh=2qxgiU/kjGyslf6jlA4bqvkrXtYXz08QZ7CIiQ+YWyo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
+	 In-Reply-To:Content-Type; b=JJDloCB3ImA23qzbTY9hgUwgXo9qht8tHn4cpHaiUNTatfjqXylY1ZADm2rBMW/q0VvOOcbK5aSu+Vz9XqdDf623d9l7mTAFzgOMyXbs0uUFmOKS6jUut5Vct+J93/6rILFKhNLPX636VoelU1d5wqGpLypjpAi2KKsAVtSAe6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CIRbStlj; arc=none smtp.client-ip=95.215.58.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <d5bf7be3-8c9e-4ab1-a105-0d3e1c745d51@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1706206205;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Sg9+ktb/HYu5+TMU9uhf3pyyy7AvynDtYCcoVozMG5w=;
-	b=icN2RJTHgV5Y5CtxBS0vAS3+YjeUxYI4eVMBGXFa1VtLONfxkBKHhoQkMvhZ3oSXOXtpo2
-	eWAg0EA+hy9yzJZKEOQqMzWAHkAuNmOsZMSsxPPd+aYlWqZsB6BeQa37lA1Y1B+13t8siX
-	Cvab5nGPcF3i2Mb+yHxIdgVwUjDyGj0=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-465-3aUVE1o5PzuHawXYkyvY1g-1; Thu,
- 25 Jan 2024 13:09:15 -0500
-X-MC-Unique: 3aUVE1o5PzuHawXYkyvY1g-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 009F31C0BA49;
-	Thu, 25 Jan 2024 18:09:15 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.224.166])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id B87B62166B32;
-	Thu, 25 Jan 2024 18:09:13 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net] selftests: net: give more time for GRO aggregation
-Date: Thu, 25 Jan 2024 19:09:06 +0100
-Message-ID: <bffec2beab3a5672dd13ecabe4fad81d2155b367.1706206101.git.pabeni@redhat.com>
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kbOkwczQdqT6rnEcotwrf5J+UUlD3rCorQj1R8O8yoo=;
+	b=CIRbStljmRYl+Z78XSI08c5pG1rLiPS6edOlM5xaBCA61NeThM+3TF2EO7goCgty6ZAIPV
+	GQVpdKsCBbgfczvg5n0+wzt/fvrOtSR3+h8qOdtZDldQcISqyWoP4kbj8Q5BfqO9Sj+4+X
+	CSwstgm+WoqiwALXo8nAvFwlk/ItPpE=
+Date: Thu, 25 Jan 2024 10:09:57 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+Subject: Re: [syzbot] [bpf?] general protection fault in
+ bpf_struct_ops_find_value
+Content-Language: en-US
+To: Kui-Feng Lee <sinquersw@gmail.com>
+References: <00000000000040d68a060fc8db8c@google.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: syzbot <syzbot+88f0aafe5f950d7489d7@syzkaller.appspotmail.com>,
+ andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+ daniel@iogearbox.net, haoluo@google.com, john.fastabend@gmail.com,
+ jolsa@kernel.org, kpsingh@kernel.org, linux-kernel@vger.kernel.org,
+ martin.lau@kernel.org, netdev@vger.kernel.org, sdf@google.com,
+ song@kernel.org, syzkaller-bugs@googlegroups.com, thinker.li@gmail.com,
+ yonghong.song@linux.dev
+In-Reply-To: <00000000000040d68a060fc8db8c@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-The gro.sh test-case relay on the gro_flush_timeout to ensure
-that all the segments belonging to any given batch are properly
-aggregated.
+On 1/25/24 9:53 AM, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    d47b9f68d289 libbpf: Correct bpf_core_read.h comment wrt b..
+> git tree:       bpf-next
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=11479fe7e80000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=719e6acaf392d56b
+> dashboard link: https://syzkaller.appspot.com/bug?extid=88f0aafe5f950d7489d7
+> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14ea6be3e80000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15bc199be80000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/1a9b4a5622fb/disk-d47b9f68.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/dd68baeac4fd/vmlinux-d47b9f68.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/811ba9dc9ddf/bzImage-d47b9f68.xz
+> 
+> The issue was bisected to:
+> 
+> commit fcc2c1fb0651477c8ed78a3a293c175ccd70697a
+> Author: Kui-Feng Lee <thinker.li@gmail.com>
+> Date:   Fri Jan 19 22:49:59 2024 +0000
+> 
+>      bpf: pass attached BTF to the bpf_struct_ops subsystem
+> 
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=106a04c3e80000
+> final oops:     https://syzkaller.appspot.com/x/report.txt?x=126a04c3e80000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=146a04c3e80000
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+88f0aafe5f950d7489d7@syzkaller.appspotmail.com
+> Fixes: fcc2c1fb0651 ("bpf: pass attached BTF to the bpf_struct_ops subsystem")
+> 
+> general protection fault, probably for non-canonical address 0xdffffc0000000011: 0000 [#1] PREEMPT SMP KASAN
+> KASAN: null-ptr-deref in range [0x0000000000000088-0x000000000000008f]
+> CPU: 0 PID: 5058 Comm: syz-executor257 Not tainted 6.7.0-syzkaller-12348-gd47b9f68d289 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+> RIP: 0010:bpf_struct_ops_find_value+0x49/0x140 kernel/bpf/btf.c:8763
+> Code: 7d ea dd ff 45 85 e4 0f 84 d7 00 00 00 e8 ff ee dd ff 48 8d bb 88 00 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 dc 00 00 00 48 8b 9b 88 00 00 00 48 85 db 0f 84
+> RSP: 0018:ffffc90003bb7b20 EFLAGS: 00010206
+> RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffffff81aa3283
+> RDX: 0000000000000011 RSI: ffffffff81aa3291 RDI: 0000000000000088
+> RBP: ffffc90003bb7dd0 R08: 0000000000000005 R09: 0000000000000000
+> R10: 0000000000000002 R11: 0000000000000000 R12: 0000000000000002
+> R13: 000000000000001a R14: ffffffff8ad6bca0 R15: ffffc90003bb7e04
+> FS:  0000555556ed2380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 000000000160d398 CR3: 000000007809c000 CR4: 00000000003506f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>   <TASK>
+>   bpf_struct_ops_map_alloc+0x12f/0x5d0 kernel/bpf/bpf_struct_ops.c:674
 
-The other end, the sender is a user-space program transmitting
-each packet with a separate write syscall. A busy host and/or
-stracing the sender program can make the relevant segments reach
-the GRO engine after the flush timeout triggers.
+The check should be IS_ERR_"OR_NULL"(btf).  Kui-Feng, please take a look. Thanks.
 
-Give the GRO flush timeout more slack, to avoid sporadic self-tests
-failures.
-
-Fixes: 9af771d2ec04 ("selftests/net: allow GRO coalesce test on veth")
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
----
- tools/testing/selftests/net/setup_veth.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/net/setup_veth.sh b/tools/testing/selftests/net/setup_veth.sh
-index a9a1759e035c..1f78a87f6f37 100644
---- a/tools/testing/selftests/net/setup_veth.sh
-+++ b/tools/testing/selftests/net/setup_veth.sh
-@@ -11,7 +11,7 @@ setup_veth_ns() {
- 	local -r ns_mac="$4"
- 
- 	[[ -e /var/run/netns/"${ns_name}" ]] || ip netns add "${ns_name}"
--	echo 100000 > "/sys/class/net/${ns_dev}/gro_flush_timeout"
-+	echo 1000000 > "/sys/class/net/${ns_dev}/gro_flush_timeout"
- 	ip link set dev "${ns_dev}" netns "${ns_name}" mtu 65535
- 	ip -netns "${ns_name}" link set dev "${ns_dev}" up
- 
--- 
-2.43.0
+>   map_create+0x548/0x1b90 kernel/bpf/syscall.c:1237
+>   __sys_bpf+0xa32/0x4a00 kernel/bpf/syscall.c:5445
+>   __do_sys_bpf kernel/bpf/syscall.c:5567 [inline]
+>   __se_sys_bpf kernel/bpf/syscall.c:5565 [inline]
+>   __x64_sys_bpf+0x78/0xc0 kernel/bpf/syscall.c:5565
+>   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>   do_syscall_64+0xd3/0x250 arch/x86/entry/common.c:83
+>   entry_SYSCALL_64_after_hwframe+0x63/0x6b
+> RIP: 0033:0x7f9f205ef2e9
+> Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007fffa4ce4088 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+> RAX: ffffffffffffffda RBX: 00007fffa4ce4268 RCX: 00007f9f205ef2e9
+> RDX: 0000000000000048 RSI: 00000000200004c0 RDI: 0000000000000000
+> RBP: 00007f9f20662610 R08: 0000000000000000 R09: 0000000000000000
+> R10: 00000000ffffffff R11: 0000000000000246 R12: 0000000000000001
+> R13: 00007fffa4ce4258 R14: 0000000000000001 R15: 0000000000000001
+>   </TASK>
+> Modules linked in:
+> ---[ end trace 0000000000000000 ]---
+> RIP: 0010:bpf_struct_ops_find_value+0x49/0x140 kernel/bpf/btf.c:8763
+> Code: 7d ea dd ff 45 85 e4 0f 84 d7 00 00 00 e8 ff ee dd ff 48 8d bb 88 00 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 dc 00 00 00 48 8b 9b 88 00 00 00 48 85 db 0f 84
+> RSP: 0018:ffffc90003bb7b20 EFLAGS: 00010206
+> RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffffff81aa3283
+> RDX: 0000000000000011 RSI: ffffffff81aa3291 RDI: 0000000000000088
+> RBP: ffffc90003bb7dd0 R08: 0000000000000005 R09: 0000000000000000
+> R10: 0000000000000002 R11: 0000000000000000 R12: 0000000000000002
+> R13: 000000000000001a R14: ffffffff8ad6bca0 R15: ffffc90003bb7e04
+> FS:  0000555556ed2380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 000000000160d398 CR3: 000000007809c000 CR4: 00000000003506f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> ----------------
+> Code disassembly (best guess), 4 bytes skipped:
+>     0:	45 85 e4             	test   %r12d,%r12d
+>     3:	0f 84 d7 00 00 00    	je     0xe0
+>     9:	e8 ff ee dd ff       	call   0xffddef0d
+>     e:	48 8d bb 88 00 00 00 	lea    0x88(%rbx),%rdi
+>    15:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+>    1c:	fc ff df
+>    1f:	48 89 fa             	mov    %rdi,%rdx
+>    22:	48 c1 ea 03          	shr    $0x3,%rdx
+> * 26:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
+>    2a:	0f 85 dc 00 00 00    	jne    0x10c
+>    30:	48 8b 9b 88 00 00 00 	mov    0x88(%rbx),%rbx
+>    37:	48 85 db             	test   %rbx,%rbx
+>    3a:	0f                   	.byte 0xf
+>    3b:	84                   	.byte 0x84
+> 
+> 
+> ---
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+> 
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+> 
+> If the report is already addressed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
+> 
+> If you want syzbot to run the reproducer, reply with:
+> #syz test: git://repo/address.git branch-or-commit-hash
+> If you attach or paste a git patch, syzbot will apply it before testing.
+> 
+> If you want to overwrite report's subsystems, reply with:
+> #syz set subsystems: new-subsystem
+> (See the list of subsystem names on the web dashboard)
+> 
+> If the report is a duplicate of another one, reply with:
+> #syz dup: exact-subject-of-another-report
+> 
+> If you want to undo deduplication, reply with:
+> #syz undup
 
 
