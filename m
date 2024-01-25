@@ -1,145 +1,126 @@
-Return-Path: <netdev+bounces-65854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5485483C0B1
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 12:22:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6333483C0FD
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 12:37:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86ABD1C21C37
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 11:22:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D206285221
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 11:37:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D44FB225A9;
-	Thu, 25 Jan 2024 11:22:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B4C732C91;
+	Thu, 25 Jan 2024 11:33:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="ksFqiTwE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fox/lw+v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B1151CAAE;
-	Thu, 25 Jan 2024 11:21:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F636225DF;
+	Thu, 25 Jan 2024 11:33:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706181720; cv=none; b=CxmpbZBdTOnMH8RRwrXgM7cSY1Q7wpILLTszPieZWV7VapU1PxlvTePYSBZJTt1c7C8eSyyIlK112wonVxCCNJirHuPGBmzdChSTYHkOcwhgDJN2oeenDe1i+1RvwRD+1VYcx8wI4j9PmoY8RPcn9J3JZlhWZWcgHPCpiMNuFFI=
+	t=1706182421; cv=none; b=DF7QMJVmSsSpm4Da5R2cPC2GIM7OpipgWC3HXASOKVsvaliU66DfhXSZfbj7VKrdTIk/Hc1pkmECtAGjeZvrGXsBn0ZxGsQSZjVjDUrq10aekFFpgMaO/UomdWd+5xXx9x1XIzsVKtino0fs7P7ojqArqv8n3setxFRKxzV7W30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706181720; c=relaxed/simple;
-	bh=3UJsTPYOcBuLCUS/AoSNIE0q49JbYk1tipQ/7awvQm4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=cR96S6Qz1vVAaHlTX42rX+lC1YtynVOqzTkdZN8u2lvmWT9PKf/NIm0F0RRh4VCJhgUErbwZh0DnQeGFfIT43lYdXnOB3hexUEyFe1vLv66uX+Dyf0xBqdjldVoDVc/hKqks4NRlgek52odS063pnNT16qSh8dDehDQVvCa/hU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=ksFqiTwE; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40P8veXf008478;
-	Thu, 25 Jan 2024 03:21:51 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	from:to:cc:subject:date:message-id:mime-version:content-type; s=
-	pfpt0220; bh=fXkopoE1vDo6nTbf5yAboxI/984BJBBIUflwlsaQrIs=; b=ksF
-	qiTwEEOqoKrq9gY1jtjMl7VPu0nPt6CDQMjfV1erDZcuTWyjeHWQDIcFW1HjPC8E
-	+pQgnrOQJG3dFiv6vC2IV5o1Q07oHYz0P9691kBSWH36862xeo2JrFHi2TmCxD2S
-	2tUoVhvZVnddUVCCmNwce1Ho08FPeKpJaS3igbdjhmkoNakVSKqC8LZbLNlcCa66
-	VYLFR2Kq7uPrI83rLDX/YDZv90RCVrIw0BeaxqU34PIFINnMu2ZxwBkcYdUkFGx2
-	KoNcaQJ4MO4qBUjDK4eIp33b8uMemBNxvLyfaPPdz5Twdi9Fg8B07ZmTJw8YNIBO
-	T1IQwaHocWb8I8MH2lA==
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3vumk90cqn-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Thu, 25 Jan 2024 03:21:51 -0800 (PST)
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 25 Jan
- 2024 03:21:37 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Thu, 25 Jan 2024 03:21:37 -0800
-Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-	by maili.marvell.com (Postfix) with ESMTP id 0EF4E3F7082;
-	Thu, 25 Jan 2024 03:21:34 -0800 (PST)
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
-        <davem@davemloft.net>, <sbhatta@marvell.com>, <gakula@marvell.com>,
-        <sgoutham@marvell.com>
-Subject: [net-next PATCH] octeontx2-pf: Add support to read eeprom information
-Date: Thu, 25 Jan 2024 16:51:33 +0530
-Message-ID: <20240125112133.8483-1-hkelam@marvell.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1706182421; c=relaxed/simple;
+	bh=IGYfPI7688VfayKOecv3nY8+501LOVMN+CzGWqpbr0s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rsu6mDzCxbmFFhYsl8Z8y6iFRLOZabitD6nus8LDddmbu37umIRryUSAKLGVd8Y6pN686M/lA/W8LN3LN8te7a4FiV+yO/QhrxvjlJwKoZ9Uqig/LlYxe+L/33DL0YoMadCSGWA2wHnbuckTxwNv7mRTy680unocI7msC0cn1oE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fox/lw+v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DADE4C433F1;
+	Thu, 25 Jan 2024 11:33:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706182421;
+	bh=IGYfPI7688VfayKOecv3nY8+501LOVMN+CzGWqpbr0s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Fox/lw+voPCBAsWOueVB3iJzpSaSNiWS0nwdr9xKBupWBpySniTn/+Z7a3znK8NBO
+	 JoJUpPgusVpkIisNqYcq9bFOCrWGvipvWkekke6dsxP/WcfcQqXr5rBQstC8e97KBa
+	 DXPpHpnVJptQOPeOmcn7NAE7BZBkx4m+6/NPq2dFUep1RUrXk1/z0TaqRvfhukAnno
+	 Zs1wcoxTFYhINRkq6/ZMkBx7G9lJyQw+3mxMKirPamwSZPnp9oRDcbno0TsHYmcoKk
+	 ow4OLBXaxg4LGxvvr38vQCc+MrtBtBbYupRUgzorsbqRSZ0ice10emaqmIMk+L9wdi
+	 W2hrpqzE1tO8g==
+Date: Thu, 25 Jan 2024 11:33:36 +0000
+From: Simon Horman <horms@kernel.org>
+To: Geetha sowjanya <gakula@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
+	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+	sgoutham@marvell.com, sbhatta@marvell.com, hkelam@marvell.com
+Subject: Re: [net-next PATCH 1/3] octeontx2-af: Create BPIDs free pool
+Message-ID: <20240125113336.GF217708@kernel.org>
+References: <20240124055014.32694-1-gakula@marvell.com>
+ <20240124055014.32694-2-gakula@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: jiRCFEXdqvLs-pdKTnxH8gPY9UkgKTWQ
-X-Proofpoint-GUID: jiRCFEXdqvLs-pdKTnxH8gPY9UkgKTWQ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-25_06,2024-01-25_01,2023-05-22_02
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240124055014.32694-2-gakula@marvell.com>
 
-Add support to read/decode EEPROM module information using ethtool.
+On Wed, Jan 24, 2024 at 11:20:12AM +0530, Geetha sowjanya wrote:
+> Current code reserves 64 bpids for 64 LBK channels. But in most
+> of the cases multiple LBK channels uses same bpid. This leads
+> to inefficient use of bpids. Latest HW support configured multiple
+> bpids per channel for other interface types (CGX). For better use
+> of these bpids, this patch creates pool of free bpids from reserved
+> LBK bpids. This free pool is used to allocate bpid on request for
+> another interface like sso etc.
+> 
+> This patch also reduces the number of bpids for cgx interfaces to 8
+> and adds proper error code
+> 
+> Signed-off-by: Geetha sowjanya <gakula@marvell.com>
 
-Usage: ethtool -m <interface>
+Hi Geetha,
 
-Signed-off-by: Christina Jacob <cjacob@marvell.com>
-Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
-Signed-off-by: Sunil Goutham <sgoutham@marvell.com>
----
- .../marvell/octeontx2/nic/otx2_ethtool.c      | 33 +++++++++++++++++++
- 1 file changed, 33 insertions(+)
+I have some suggestions for possible follow-up below.
+That notwithstanding patch looks good to me.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
-index 2928898c7f8d..8e4e22a2817b 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
-@@ -1185,6 +1185,37 @@ static void otx2_get_link_mode_info(u64 link_mode_bmap,
- 			      otx2_link_modes);
- }
- 
-+static int otx2_get_module_info(struct net_device *netdev,
-+				struct ethtool_modinfo *modinfo)
-+{
-+	struct otx2_nic *pfvf = netdev_priv(netdev);
-+	struct cgx_fw_data *rsp;
-+
-+	rsp = otx2_get_fwdata(pfvf);
-+	if (IS_ERR(rsp))
-+		return PTR_ERR(rsp);
-+
-+	modinfo->type = rsp->fwdata.sfp_eeprom.sff_id;
-+	modinfo->eeprom_len = SFP_EEPROM_SIZE;
-+	return 0;
-+}
-+
-+static int otx2_get_module_eeprom(struct net_device *netdev,
-+				  struct ethtool_eeprom *ee,
-+				  u8 *data)
-+{
-+	struct otx2_nic *pfvf = netdev_priv(netdev);
-+	struct cgx_fw_data *rsp;
-+
-+	rsp = otx2_get_fwdata(pfvf);
-+	if (IS_ERR(rsp))
-+		return PTR_ERR(rsp);
-+
-+	memcpy(data, &rsp->fwdata.sfp_eeprom.buf, ee->len);
-+
-+	return 0;
-+}
-+
- static int otx2_get_link_ksettings(struct net_device *netdev,
- 				   struct ethtool_link_ksettings *cmd)
- {
-@@ -1343,6 +1374,8 @@ static const struct ethtool_ops otx2_ethtool_ops = {
- 	.set_fecparam		= otx2_set_fecparam,
- 	.get_link_ksettings     = otx2_get_link_ksettings,
- 	.set_link_ksettings     = otx2_set_link_ksettings,
-+	.get_module_info	= otx2_get_module_info,
-+	.get_module_eeprom	= otx2_get_module_eeprom,
- };
- 
- void otx2_set_ethtool_ops(struct net_device *netdev)
--- 
-2.17.1
+Reviewed-by: Simon Horman <horms@kernel.org>
 
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+> index 66203a90f052..e1eae16b09b3 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+> @@ -499,14 +499,84 @@ static void nix_interface_deinit(struct rvu *rvu, u16 pcifunc, u8 nixlf)
+>  	rvu_cgx_disable_dmac_entries(rvu, pcifunc);
+>  }
+>  
+> +#define NIX_BPIDS_PER_LMAC	8
+> +#define NIX_BPIDS_PER_CPT	1
+> +static int nix_setup_bpids(struct rvu *rvu, struct nix_hw *hw, int blkaddr)
+> +{
+> +	struct nix_bp *bp = &hw->bp;
+> +	int err, max_bpids;
+> +	u64 cfg;
+> +
+> +	cfg = rvu_read64(rvu, blkaddr, NIX_AF_CONST1);
+> +	max_bpids = (cfg >> 12) & 0xFFF;
+
+I don't think this needs to block progress of this patch,
+but rather I'm providing this as a suggestion for a follow-up.
+
+I think it would be nice to define a mask, created using GENMASK,
+that names the register field (I don't know what it is).
+And then uses FIELD_GET here.
+
+Likewise for the 0xFFF below, and possibly elsewhere in this patch.
+
+Further, in patch 2 I see the use of BIT(11) in the following patch.
+And existing use of BIT(16) in this file.  I assume are register fields.
+If so it would be nice to make #defines to name them too.
+
+> +
+> +	/* Reserve the BPIds for CGX and SDP */
+> +	bp->cgx_bpid_cnt = rvu->hw->cgx_links * NIX_BPIDS_PER_LMAC;
+> +	bp->sdp_bpid_cnt = rvu->hw->sdp_links * (cfg & 0xFFF);
+> +	bp->free_pool_base = bp->cgx_bpid_cnt + bp->sdp_bpid_cnt +
+> +			     NIX_BPIDS_PER_CPT;
+> +	bp->bpids.max = max_bpids - bp->free_pool_base;
+
+...
 
