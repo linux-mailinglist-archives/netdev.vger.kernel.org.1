@@ -1,140 +1,145 @@
-Return-Path: <netdev+bounces-65853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66EB183C0A8
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 12:19:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5485483C0B1
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 12:22:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E4C51F21351
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 11:19:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86ABD1C21C37
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 11:22:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D5911BDCA;
-	Thu, 25 Jan 2024 11:19:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D44FB225A9;
+	Thu, 25 Jan 2024 11:22:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JY3dvuhI"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="ksFqiTwE"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 085E12C684
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 11:19:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B1151CAAE;
+	Thu, 25 Jan 2024 11:21:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706181566; cv=none; b=S7IXA+j62joSFL0e9/PW+Ec95ElJhcFwG+bGV+JGO861gbY23j+FnXA71k+Bj9oudcgdT70QtbHDlozrmPblVSxLvOd/PBCf4GIMKWTXsFIwmBdRGkleo9dBYOZCCV2fmdCIwNpfrQmfAwilBX0WHvMZ9otC9YVwitoyvgaj/30=
+	t=1706181720; cv=none; b=CxmpbZBdTOnMH8RRwrXgM7cSY1Q7wpILLTszPieZWV7VapU1PxlvTePYSBZJTt1c7C8eSyyIlK112wonVxCCNJirHuPGBmzdChSTYHkOcwhgDJN2oeenDe1i+1RvwRD+1VYcx8wI4j9PmoY8RPcn9J3JZlhWZWcgHPCpiMNuFFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706181566; c=relaxed/simple;
-	bh=xKAsoMcYtFoyZPEPpTE0PQGxfXqVqP/pt/GlEQ4Bizo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=c8dh7Sam5uBzjAHjHQSehxOTdvmMYXZSdQZXwHfu0Lr0BUQxgrEKK6jeIZ5o7qyN5SZcevetG3jFeHODYsbrUpyuJNcLPGraTsZjFIgpXxoBqYqWaUOgmTEGdAiQv8YCCOlWuXPK/iQePzDHkUt1HABGhVpQX0Lpz/zidzC31m0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JY3dvuhI; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <a682b902-37a2-4d43-8f39-56ca213f6663@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706181562;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=P8URD1vAOHrfsrYKDP5G3s1YP4WHQXpABy6Lvzc8bus=;
-	b=JY3dvuhI05AEZr9tYAf6eR1MXe/uXQ+eBRG9klw71qQ49wt0jA69SHS87vhtky8eoD5N7P
-	e96zcDc1oWQc/cxtjeKZv8LEJSxiRNMlniXHMb797AL88bYM+PpeyCLxxzlJF1XFkoqA/Y
-	omXTF0mHtAwZd2B1u+j5Py6DuAURyMQ=
-Date: Thu, 25 Jan 2024 11:19:17 +0000
+	s=arc-20240116; t=1706181720; c=relaxed/simple;
+	bh=3UJsTPYOcBuLCUS/AoSNIE0q49JbYk1tipQ/7awvQm4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=cR96S6Qz1vVAaHlTX42rX+lC1YtynVOqzTkdZN8u2lvmWT9PKf/NIm0F0RRh4VCJhgUErbwZh0DnQeGFfIT43lYdXnOB3hexUEyFe1vLv66uX+Dyf0xBqdjldVoDVc/hKqks4NRlgek52odS063pnNT16qSh8dDehDQVvCa/hU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=ksFqiTwE; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40P8veXf008478;
+	Thu, 25 Jan 2024 03:21:51 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version:content-type; s=
+	pfpt0220; bh=fXkopoE1vDo6nTbf5yAboxI/984BJBBIUflwlsaQrIs=; b=ksF
+	qiTwEEOqoKrq9gY1jtjMl7VPu0nPt6CDQMjfV1erDZcuTWyjeHWQDIcFW1HjPC8E
+	+pQgnrOQJG3dFiv6vC2IV5o1Q07oHYz0P9691kBSWH36862xeo2JrFHi2TmCxD2S
+	2tUoVhvZVnddUVCCmNwce1Ho08FPeKpJaS3igbdjhmkoNakVSKqC8LZbLNlcCa66
+	VYLFR2Kq7uPrI83rLDX/YDZv90RCVrIw0BeaxqU34PIFINnMu2ZxwBkcYdUkFGx2
+	KoNcaQJ4MO4qBUjDK4eIp33b8uMemBNxvLyfaPPdz5Twdi9Fg8B07ZmTJw8YNIBO
+	T1IQwaHocWb8I8MH2lA==
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3vumk90cqn-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Thu, 25 Jan 2024 03:21:51 -0800 (PST)
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 25 Jan
+ 2024 03:21:37 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Thu, 25 Jan 2024 03:21:37 -0800
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id 0EF4E3F7082;
+	Thu, 25 Jan 2024 03:21:34 -0800 (PST)
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
+        <davem@davemloft.net>, <sbhatta@marvell.com>, <gakula@marvell.com>,
+        <sgoutham@marvell.com>
+Subject: [net-next PATCH] octeontx2-pf: Add support to read eeprom information
+Date: Thu, 25 Jan 2024 16:51:33 +0530
+Message-ID: <20240125112133.8483-1-hkelam@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v8 1/3] bpf: make common crypto API for TC/XDP
- programs
-Content-Language: en-US
-To: Martin KaFai Lau <martin.lau@linux.dev>, Vadim Fedorenko <vadfed@meta.com>
-Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
- bpf@vger.kernel.org, Victor Stewart <v@nametag.social>,
- Jakub Kicinski <kuba@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Herbert Xu <herbert@gondor.apana.org.au>
-References: <20240115220803.1973440-1-vadfed@meta.com>
- <3d2d5f4e-c554-4648-bcec-839d83585123@linux.dev>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <3d2d5f4e-c554-4648-bcec-839d83585123@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: jiRCFEXdqvLs-pdKTnxH8gPY9UkgKTWQ
+X-Proofpoint-GUID: jiRCFEXdqvLs-pdKTnxH8gPY9UkgKTWQ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-25_06,2024-01-25_01,2023-05-22_02
 
-On 25/01/2024 01:10, Martin KaFai Lau wrote:
-> On 1/15/24 2:08 PM, Vadim Fedorenko wrote:
->> +static int bpf_crypto_crypt(const struct bpf_crypto_ctx *ctx,
->> +                const struct bpf_dynptr_kern *src,
->> +                struct bpf_dynptr_kern *dst,
->> +                const struct bpf_dynptr_kern *siv,
->> +                bool decrypt)
->> +{
->> +    u32 src_len, dst_len, siv_len;
->> +    const u8 *psrc;
->> +    u8 *pdst, *piv;
->> +    int err;
->> +
->> +    if (ctx->type->get_flags(ctx->tfm) & CRYPTO_TFM_NEED_KEY)
-> 
-> nit. Does the indirect call get_flags() return different values?
-> Should it be rejected earlier, e.g. in bpf_crypto_ctx_create()?
+Add support to read/decode EEPROM module information using ethtool.
 
-Well, that is the common pattern in crypto subsys to check flags.
-But after looking at it second time, I think I have to refactor this
-part. CRYPTO_TFM_NEED_KEY is set during tfm creation if algo requires
-the key. And it's freed when the key setup is successful. As there is no
-way bpf programs can modify tfm directly we can move this check to
-bpf_crypto_ctx_create() to key setup part and avoid indirect call in 
-this place.
-> 
->> +        return -EINVAL;
->> +
->> +    if (__bpf_dynptr_is_rdonly(dst))
->> +        return -EINVAL;
->> +
->> +    siv_len = __bpf_dynptr_size(siv);
->> +    src_len = __bpf_dynptr_size(src);
->> +    dst_len = __bpf_dynptr_size(dst);
->> +    if (!src_len || !dst_len)
->> +        return -EINVAL;
->> +
->> +    if (siv_len != (ctx->type->ivsize(ctx->tfm) + 
->> ctx->type->statesize(ctx->tfm)))
-> 
-> Same here, two indirect calls per en/decrypt kfunc call. Does the return 
-> value change?
+Usage: ethtool -m <interface>
 
-I have to check the size of IV provided by the caller, and then to avoid
-indirect calls I have to store these values somewhere in ctx. It gives a
-direct access to these values to bpf programs, which can potentially
-abuse them. Not sure if it's good to open such opportunity.
+Signed-off-by: Christina Jacob <cjacob@marvell.com>
+Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
+Signed-off-by: Sunil Goutham <sgoutham@marvell.com>
+---
+ .../marvell/octeontx2/nic/otx2_ethtool.c      | 33 +++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
-> 
->> +        return -EINVAL;
->> +
->> +    psrc = __bpf_dynptr_data(src, src_len);
->> +    if (!psrc)
->> +        return -EINVAL;
->> +    pdst = __bpf_dynptr_data_rw(dst, dst_len);
->> +    if (!pdst)
->> +        return -EINVAL;
->> +
->> +    piv = siv_len ? __bpf_dynptr_data_rw(siv, siv_len) : NULL;
->> +    if (siv_len && !piv)
->> +        return -EINVAL;
->> +
->> +    err = decrypt ? ctx->type->decrypt(ctx->tfm, psrc, pdst, src_len, 
->> piv)
->> +              : ctx->type->encrypt(ctx->tfm, psrc, pdst, src_len, piv);
->> +
->> +    return err;
->> +}
-> 
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
+index 2928898c7f8d..8e4e22a2817b 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
+@@ -1185,6 +1185,37 @@ static void otx2_get_link_mode_info(u64 link_mode_bmap,
+ 			      otx2_link_modes);
+ }
+ 
++static int otx2_get_module_info(struct net_device *netdev,
++				struct ethtool_modinfo *modinfo)
++{
++	struct otx2_nic *pfvf = netdev_priv(netdev);
++	struct cgx_fw_data *rsp;
++
++	rsp = otx2_get_fwdata(pfvf);
++	if (IS_ERR(rsp))
++		return PTR_ERR(rsp);
++
++	modinfo->type = rsp->fwdata.sfp_eeprom.sff_id;
++	modinfo->eeprom_len = SFP_EEPROM_SIZE;
++	return 0;
++}
++
++static int otx2_get_module_eeprom(struct net_device *netdev,
++				  struct ethtool_eeprom *ee,
++				  u8 *data)
++{
++	struct otx2_nic *pfvf = netdev_priv(netdev);
++	struct cgx_fw_data *rsp;
++
++	rsp = otx2_get_fwdata(pfvf);
++	if (IS_ERR(rsp))
++		return PTR_ERR(rsp);
++
++	memcpy(data, &rsp->fwdata.sfp_eeprom.buf, ee->len);
++
++	return 0;
++}
++
+ static int otx2_get_link_ksettings(struct net_device *netdev,
+ 				   struct ethtool_link_ksettings *cmd)
+ {
+@@ -1343,6 +1374,8 @@ static const struct ethtool_ops otx2_ethtool_ops = {
+ 	.set_fecparam		= otx2_set_fecparam,
+ 	.get_link_ksettings     = otx2_get_link_ksettings,
+ 	.set_link_ksettings     = otx2_set_link_ksettings,
++	.get_module_info	= otx2_get_module_info,
++	.get_module_eeprom	= otx2_get_module_eeprom,
+ };
+ 
+ void otx2_set_ethtool_ops(struct net_device *netdev)
+-- 
+2.17.1
 
 
