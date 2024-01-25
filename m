@@ -1,167 +1,190 @@
-Return-Path: <netdev+bounces-65778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65779-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E628C83BAE7
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 08:43:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA69C83BB24
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:00:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9ADF928A95A
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 07:43:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED0D61C25B61
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 08:00:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE57E12E48;
-	Thu, 25 Jan 2024 07:42:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 117DD17580;
+	Thu, 25 Jan 2024 08:00:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tu+I/kx2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EOfY2pXE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE945171AC
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 07:42:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6279F18EA1;
+	Thu, 25 Jan 2024 08:00:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706168566; cv=none; b=JYJMqnv28ra/4P+8XVTPwSJ6TvxB7FJ8uzWlcxcq2QHjJlURYwK+9EnsVRtGasf1t3+EtL+/YEPfE/7hFvC1cjV87gi19gCUnRbk/D6WoRIS/mpp1Vg2LZhK4XJJ9L/Yfb8gxmY7gEOWqvgs8pr1A5aTs0GHsoHhffIHew6DYZM=
+	t=1706169633; cv=none; b=CZRuxOdrRSM3pDlSDY4VuypqwVZzgP8oJsCV2KSmuIbTrgjJadRfnIU6ax/AB2wYZCCKVLX8FiluShi//eId2LH6GDd6jca04qGi6/RfRU+DJmKEqQh6lfLmIlN2zC2ptUgrS7VG4kWAB7t0Amg+/mp1PuDuInl2U9ev19u2NRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706168566; c=relaxed/simple;
-	bh=7xAkom3T2QLILkKiLMsK+HWLk0D4+SUx0hFMjJ1ZuzQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jxCkUvfNWSHEvZVzDgXX1dsrd+9xh/xf2pKDT80kEU+B+HMbMRS1+4XgaTV8buibvUJQ8bwxqtZABuRJQ/WHDAz6PSlFzonxlBmdU6wdgmBJyKGGgFIHKkZRReMdAHrQsfcy9/MJrbcq6pxNNlrHLsrAJqaGBFk89h/fh6eFVTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tu+I/kx2; arc=none smtp.client-ip=209.85.128.46
+	s=arc-20240116; t=1706169633; c=relaxed/simple;
+	bh=Rw/CV6hnBTs6QlahCT/GlBU3pjLy0gvfjwid+kDuu2Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dA03yrQ2Y6TqM06KIv2R5tEoWALxjO2Ki78Mxzn7nj39MCIfieA8m0b2LBUCaSsBdjUmX+NEZ8Py16vAXfdqRasFhAs1ytXIwEsLNt8nG0nkhiMNrOLTB3N9uQ+ct1pYjOS1avbnp7JNgHXryHus7vQT3t+P3byV0oPtxHe5nf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EOfY2pXE; arc=none smtp.client-ip=209.85.219.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-40ed218ed1eso1720965e9.0
-        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 23:42:44 -0800 (PST)
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-681928235d6so1990136d6.0;
+        Thu, 25 Jan 2024 00:00:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706168563; x=1706773363; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tE0X+WKalimw2YH682/ks5g/NzEBw9mJrvA9GMaew6o=;
-        b=Tu+I/kx22Cpl+cI29yXGzi43jZfEjdQqeMlirXTm17Yi+5/haExcuR2jbLtLezx4a7
-         BK4uSLZEKGsPYPvrBQwMYFuXFZV5/fgzfCvvaJ44mC77eClEJb44vepCHAmANX0yN1lr
-         3Z7eM35yWb6vtwhqSEeJJSCH4T2BCXmtIn7lEaZ/Mi/plJFZakV8vPwJdhf0a4yOEi4W
-         Y9nP6ymsggF4YHMrgNIje0tntROoCcN+riqw5ICfB7LXCIv5027zwp7+8Nxo5HcelHiH
-         Ud+hW3aIqUxrYoRV4SoqslKonQXW9/5RWcre5ARwAD1gHbF2Q13ljijkHkDnw/+uz+M0
-         nDPg==
+        d=gmail.com; s=20230601; t=1706169630; x=1706774430; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=qKioZPq8Ys4mwzQb62lQj1glFylF4RuCOvnhfRyw0QI=;
+        b=EOfY2pXEEG7G99tnyJ+DKWzoL+KLarafwQGqDpeROTSFVyRU283Y4618dN62DMZTWp
+         ZSenT1VfBzj6V5r9RjAY/UhfoyUxYuBFR8iABuRlhVHgQ464cu+1uLj5B5rdzzixk4/Q
+         HkQXigfmhF1Ig0nYKiP5GmOUj9bK6Z5ewt3AI8TWgv+31ku2EIOv7flXvV2GzXaTDzno
+         NRingSBsnNyP3gZDQD5rn+G9GBjEboYplK53oEbOkt2SPUP9BppFnMk33mumidtdHVcG
+         1GbxttWI+8AGDtQbBQR8iqOTi1aXkPFMhR65+0jKuCXwET8PVAJTBtocBk1w2lWADZjJ
+         pasQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706168563; x=1706773363;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tE0X+WKalimw2YH682/ks5g/NzEBw9mJrvA9GMaew6o=;
-        b=YNmmUM3ui/asWlxYpY8mvQAVN47fUGB70kzRf7VwEMXG+01YvZwXgKoRmwF48+gArE
-         1MkRoYCVzEQ4fh2wpQJIGcDHAyFwm57ccmPaPnwj+Z0b8akIiAncxieldvvu8sQFzgyz
-         ygwXB1FzHLSOmyJv5e+sPT86STIXfJqdcm6DZhHgzFqYTzPYTIQNC/6aOgSAe+pOWJK4
-         EKP2WjKogxp43qcQqimJSkO4vS5FKogBBPLxyFNzIQ1Bh+tkR/yvitB0zGgnK7h6yAJ9
-         jgd7fdiLd943v+8pKaRrcJuZcjdmYKJm142z5HnigPDiKhehqNHUz79ZhbOXdIsDyPoh
-         ZjGQ==
-X-Gm-Message-State: AOJu0YwC14qYdoT5fWGYiVci+mxXoY9+AiLZ776oeqVraPLDDhTOYzPe
-	HjTdV8unfzDaxzbNugjTtjVG59MhYWZTDWv/MwXU3lRBkbyFWP1N
-X-Google-Smtp-Source: AGHT+IGjGhnM96fODwnxylkE0JJtAF/Il3rmcHJhpTe4wuS19DEM1ADuhYIJxq0yvNbjdco7pC0f8w==
-X-Received: by 2002:a05:600c:1c1c:b0:40e:66a5:574 with SMTP id j28-20020a05600c1c1c00b0040e66a50574mr208042wms.120.1706168562921;
-        Wed, 24 Jan 2024 23:42:42 -0800 (PST)
-Received: from [172.27.57.151] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id v29-20020adfa1dd000000b0033929310ae4sm12826476wrv.73.2024.01.24.23.42.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Jan 2024 23:42:42 -0800 (PST)
-Message-ID: <6e17498c-2499-4c91-bc50-33bab8201965@gmail.com>
-Date: Thu, 25 Jan 2024 09:42:41 +0200
+        d=1e100.net; s=20230601; t=1706169630; x=1706774430;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qKioZPq8Ys4mwzQb62lQj1glFylF4RuCOvnhfRyw0QI=;
+        b=UBtcqC1cxsLfu8rMI8XLt3Qj//YFGUqoIui1gkpTTJfPl8HXjXaEK9vpaHrHexVqzb
+         Gfo3QmFlKVKs2BGXuV83nuZlzU92RFro8hsXOCQnIzcz4J5Vg4eBCCgGSv5PVwrGq36W
+         2z/vRYvkYv/mgDMI8LV3Lz71n/pI2+p+wiEHay3rRWa3hyw9Cm5QSsdD9J0HWWdl4t+y
+         ggOASPP2iFTtLC8PfgBqmniev90sjsdnPHJ7FKKDacfmKPGxv604WKV8scOMuQTOEZqy
+         ex/crKwFHoCfgpu8dhT5jsQ6RQG4w2TZihRxhQbS0Mhk/u90T/ib+q3CjqPOpUwHspfm
+         rBVQ==
+X-Gm-Message-State: AOJu0Yxl3SsMwQGx1NCao6ifRts6ByK7pOf3pgMx3WJYUE6Q7/+K39po
+	kHzA0szkDwodMTML+yiGmHnLpZRA9u2z/yYQe1KCyuFyvHFYcI2F9k0nAXX9ZZPvfJx8K/H7dT5
+	fIlHmMTfY4TyMiWSjzKPHJaPcKWM=
+X-Google-Smtp-Source: AGHT+IEWx7CLxkV3M4IExWfi8elk94uDdw95SpRtOcn5E3BIBTO/5Wjff9+hfEFXkl8gfw11DNWXE9nS+yzVYvCjsQM=
+X-Received: by 2002:a05:6214:d64:b0:686:acfe:bbc2 with SMTP id
+ 4-20020a0562140d6400b00686acfebbc2mr1004983qvs.4.1706169630050; Thu, 25 Jan
+ 2024 00:00:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next 07/15] net/mlx5: SD, Add informative prints in kernel
- log
-Content-Language: en-US
-To: Jiri Pirko <jiri@resnulli.us>, Saeed Mahameed <saeed@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>,
- netdev@vger.kernel.org, Tariq Toukan <tariqt@nvidia.com>
-References: <20231221005721.186607-1-saeed@kernel.org>
- <20231221005721.186607-8-saeed@kernel.org> <ZZfySfG4VClzDKTr@nanopsycho>
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <ZZfySfG4VClzDKTr@nanopsycho>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240124191602.566724-1-maciej.fijalkowski@intel.com> <20240124191602.566724-3-maciej.fijalkowski@intel.com>
+In-Reply-To: <20240124191602.566724-3-maciej.fijalkowski@intel.com>
+From: Magnus Karlsson <magnus.karlsson@gmail.com>
+Date: Thu, 25 Jan 2024 09:00:18 +0100
+Message-ID: <CAJ8uoz062-xNhy4xQB-vz7OKL+Gk7Ey_Gii2ADGK23isTzMhCg@mail.gmail.com>
+Subject: Re: [PATCH v6 bpf 02/11] xsk: make xsk_buff_pool responsible for
+ clearing xdp_buff::flags
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
+	andrii@kernel.org, netdev@vger.kernel.org, magnus.karlsson@intel.com, 
+	bjorn@kernel.org, echaudro@redhat.com, lorenzo@kernel.org, 
+	martin.lau@linux.dev, tirthendu.sarkar@intel.com, john.fastabend@gmail.com, 
+	horms@kernel.org, kuba@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
+On Wed, 24 Jan 2024 at 20:17, Maciej Fijalkowski
+<maciej.fijalkowski@intel.com> wrote:
+>
+> XDP multi-buffer support introduced XDP_FLAGS_HAS_FRAGS flag that is
+> used by drivers to notify data path whether xdp_buff contains fragments
+> or not. Data path looks up mentioned flag on first buffer that occupies
+> the linear part of xdp_buff, so drivers only modify it there. This is
+> sufficient for SKB and XDP_DRV modes as usually xdp_buff is allocated on
+> stack or it resides within struct representing driver's queue and
+> fragments are carried via skb_frag_t structs. IOW, we are dealing with
+> only one xdp_buff.
+>
+> ZC mode though relies on list of xdp_buff structs that is carried via
+> xsk_buff_pool::xskb_list, so ZC data path has to make sure that
+> fragments do *not* have XDP_FLAGS_HAS_FRAGS set. Otherwise,
+> xsk_buff_free() could misbehave if it would be executed against xdp_buff
+> that carries a frag with XDP_FLAGS_HAS_FRAGS flag set. Such scenario can
+> take place when within supplied XDP program bpf_xdp_adjust_tail() is
+> used with negative offset that would in turn release the tail fragment
+> from multi-buffer frame.
+>
+> Calling xsk_buff_free() on tail fragment with XDP_FLAGS_HAS_FRAGS would
+> result in releasing all the nodes from xskb_list that were produced by
+> driver before XDP program execution, which is not what is intended -
+> only tail fragment should be deleted from xskb_list and then it should
+> be put onto xsk_buff_pool::free_list. Such multi-buffer frame will never
+> make it up to user space, so from AF_XDP application POV there would be
+> no traffic running, however due to free_list getting constantly new
+> nodes, driver will be able to feed HW Rx queue with recycled buffers.
+> Bottom line is that instead of traffic being redirected to user space,
+> it would be continuously dropped.
+>
+> To fix this, let us clear the mentioned flag on xsk_buff_pool side
+> during xdp_buff initialization, which is what should have been done
+> right from the start of XSK multi-buffer support.
 
+Thanks!
 
-On 05/01/2024 14:12, Jiri Pirko wrote:
-> Thu, Dec 21, 2023 at 01:57:13AM CET, saeed@kernel.org wrote:
->> From: Tariq Toukan <tariqt@nvidia.com>
->>
->> Print to kernel log when an SD group moves from/to ready state.
->>
->> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
->> Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
->> ---
->> .../net/ethernet/mellanox/mlx5/core/lib/sd.c  | 21 +++++++++++++++++++
->> 1 file changed, 21 insertions(+)
->>
->> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
->> index 3309f21d892e..f68942277c62 100644
->> --- a/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
->> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
->> @@ -373,6 +373,21 @@ static void sd_cmd_unset_secondary(struct mlx5_core_dev *secondary)
->> 	mlx5_fs_cmd_set_l2table_entry_silent(secondary, 0);
->> }
->>
->> +static void sd_print_group(struct mlx5_core_dev *primary)
->> +{
->> +	struct mlx5_sd *sd = mlx5_get_sd(primary);
->> +	struct mlx5_core_dev *pos;
->> +	int i;
->> +
->> +	sd_info(primary, "group id %#x, primary %s, vhca %u\n",
->> +		sd->group_id, pci_name(primary->pdev),
->> +		MLX5_CAP_GEN(primary, vhca_id));
->> +	mlx5_sd_for_each_secondary(i, primary, pos)
->> +		sd_info(primary, "group id %#x, secondary#%d %s, vhca %u\n",
->> +			sd->group_id, i - 1, pci_name(pos->pdev),
->> +			MLX5_CAP_GEN(pos, vhca_id));
->> +}
->> +
->> int mlx5_sd_init(struct mlx5_core_dev *dev)
->> {
->> 	struct mlx5_core_dev *primary, *pos, *to;
->> @@ -410,6 +425,10 @@ int mlx5_sd_init(struct mlx5_core_dev *dev)
->> 			goto err_unset_secondaries;
->> 	}
->>
->> +	sd_info(primary, "group id %#x, size %d, combined\n",
->> +		sd->group_id, mlx5_devcom_comp_get_size(sd->devcom));
-> 
-> Can't you rather expose this over sysfs or debugfs? I mean, dmesg print
-> does not seem like a good idea.
-> 
-> 
+Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
 
-I think that the events of netdev combine/uncombine are important enough 
-to be logged in the kernel dmesg.
-I can implement a debugfs as an addition, not replacing the print.
-
->> +	sd_print_group(primary);
->> +
->> 	return 0;
->>
->> err_unset_secondaries:
->> @@ -440,6 +459,8 @@ void mlx5_sd_cleanup(struct mlx5_core_dev *dev)
->> 	mlx5_sd_for_each_secondary(i, primary, pos)
->> 		sd_cmd_unset_secondary(pos);
->> 	sd_cmd_unset_primary(primary);
->> +
->> +	sd_info(primary, "group id %#x, uncombined\n", sd->group_id);
->> out:
->> 	sd_unregister(dev);
->> 	sd_cleanup(dev);
->> -- 
->> 2.43.0
->>
->>
+> Fixes: 1bbc04de607b ("ice: xsk: add RX multi-buffer support")
+> Fixes: 1c9ba9c14658 ("i40e: xsk: add RX multi-buffer support")
+> Fixes: 24ea50127ecf ("xsk: support mbuf on ZC RX")
+> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> ---
+>  drivers/net/ethernet/intel/i40e/i40e_xsk.c | 1 -
+>  drivers/net/ethernet/intel/ice/ice_xsk.c   | 1 -
+>  include/net/xdp_sock_drv.h                 | 1 +
+>  net/xdp/xsk_buff_pool.c                    | 1 +
+>  4 files changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_xsk.c b/drivers/net/ethernet/intel/i40e/i40e_xsk.c
+> index af7d5fa6cdc1..82aca0d16a3e 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_xsk.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_xsk.c
+> @@ -498,7 +498,6 @@ int i40e_clean_rx_irq_zc(struct i40e_ring *rx_ring, int budget)
+>                 xdp_res = i40e_run_xdp_zc(rx_ring, first, xdp_prog);
+>                 i40e_handle_xdp_result_zc(rx_ring, first, rx_desc, &rx_packets,
+>                                           &rx_bytes, xdp_res, &failure);
+> -               first->flags = 0;
+>                 next_to_clean = next_to_process;
+>                 if (failure)
+>                         break;
+> diff --git a/drivers/net/ethernet/intel/ice/ice_xsk.c b/drivers/net/ethernet/intel/ice/ice_xsk.c
+> index 5d1ae8e4058a..d9073a618ad6 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_xsk.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_xsk.c
+> @@ -895,7 +895,6 @@ int ice_clean_rx_irq_zc(struct ice_rx_ring *rx_ring, int budget)
+>
+>                 if (!first) {
+>                         first = xdp;
+> -                       xdp_buff_clear_frags_flag(first);
+>                 } else if (ice_add_xsk_frag(rx_ring, first, xdp, size)) {
+>                         break;
+>                 }
+> diff --git a/include/net/xdp_sock_drv.h b/include/net/xdp_sock_drv.h
+> index 526c1e7f505e..9819e2af0378 100644
+> --- a/include/net/xdp_sock_drv.h
+> +++ b/include/net/xdp_sock_drv.h
+> @@ -164,6 +164,7 @@ static inline void xsk_buff_set_size(struct xdp_buff *xdp, u32 size)
+>         xdp->data = xdp->data_hard_start + XDP_PACKET_HEADROOM;
+>         xdp->data_meta = xdp->data;
+>         xdp->data_end = xdp->data + size;
+> +       xdp->flags = 0;
+>  }
+>
+>  static inline dma_addr_t xsk_buff_raw_get_dma(struct xsk_buff_pool *pool,
+> diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
+> index 28711cc44ced..ce60ecd48a4d 100644
+> --- a/net/xdp/xsk_buff_pool.c
+> +++ b/net/xdp/xsk_buff_pool.c
+> @@ -555,6 +555,7 @@ struct xdp_buff *xp_alloc(struct xsk_buff_pool *pool)
+>
+>         xskb->xdp.data = xskb->xdp.data_hard_start + XDP_PACKET_HEADROOM;
+>         xskb->xdp.data_meta = xskb->xdp.data;
+> +       xskb->xdp.flags = 0;
+>
+>         if (pool->dma_need_sync) {
+>                 dma_sync_single_range_for_device(pool->dev, xskb->dma, 0,
+> --
+> 2.34.1
+>
+>
 
