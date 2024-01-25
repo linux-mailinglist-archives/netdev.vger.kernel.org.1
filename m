@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-66012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A3BD83CF0A
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 22:58:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD44E83CF0B
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 22:58:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4977E296694
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 21:58:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 34DE01F28318
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 21:58:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E3B513B7A3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8FD713B7B0;
 	Thu, 25 Jan 2024 21:58:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EIudf/tK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CRPReSWs"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56806131E4F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E98D13AA51
 	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 21:58:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706219888; cv=none; b=MntinhENZDuIxAokqGlkFyLg0hRlMW5MgrIiJPFk+Jnn8rPVZkmNyVed2itPQ65zNXU7/LoY4AZQDRpeLAoky6U2tveAFQixYzgibdnwGNWsD12QXjNky8md5tnzPKUwrWiblbPD6DCuQsrsVqv5g7QlRaYh1nvfj6a54EooCuA=
+	t=1706219888; cv=none; b=r3n4bDaysL+S+sxVyaTaXXw/fYr5Cr6zKDx1aiAsbtsFVb8yM+hYtYdzHCBz23S8PMB67lferSw7jLg9S3EHbxtEXqGYxlkt938HXQPL0BykzjJVNf3WfJLpkgQ40Gi4FaIzR2vgA4U++kyOSxEa+IbZcFwQEs5PxTWu47hxXJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1706219888; c=relaxed/simple;
-	bh=stgeR66TwzFFTcUIQFNgm7NxYDTf88Ntdi/tbtDdSd4=;
+	bh=DiThgfsoGsR+pFKV5qWLElB1Wl34x5slFqPiPD8NROA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gU73NmbF1Fdc3Oq5/UHG2R2XJin46OXZ1sf6KSvIpo0VPo3xu4D5kiwyj6L9b4XA32wqtoibAOETaYRks0ThSZRPsGNzZ3qMAfmDErL6IG+X2ieQDVDTRFWDS5Ll7tpiwedp0179H1G/n0UPxqMxfnKt9kWsOO8jaR+Owe06SHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EIudf/tK; arc=none smtp.client-ip=192.198.163.9
+	 MIME-Version; b=KZ6s6GO8c8sQ8HvLtL26vlxx2KU8UxCX+LaiSzaWQobHBO/SnT4YuC/P8MVCNpfhq15y2L2dNz3o9oIGfJnN7Vx1G0M5qKUxF7hqYEHUBPnfD3FcTBPuOF5Os2JIvsIT3RnJCfGZFV7e3D0AAkzKsJPs1YkrqLKkwfVUlM3Xw10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CRPReSWs; arc=none smtp.client-ip=192.198.163.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706219886; x=1737755886;
+  t=1706219887; x=1737755887;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=stgeR66TwzFFTcUIQFNgm7NxYDTf88Ntdi/tbtDdSd4=;
-  b=EIudf/tKwOtZSAgGBUWmk6g28HDVkvb4KGCAWNeCrGJTLJnPC89fkygq
-   5U7R5VhecMs+G5I9SFBOL0wXJ08pRn+4lwZ7DKGZ4mQ2oKJMHp/qsCW3Y
-   NLMOCOcSYnr7nxuurrq0L5w4TCIsMrTglAk8+kklgh6UoqyCLcZZ/WMG+
-   jJD3Spt5PS979k0xvzjn3ipStpZMvz8WUxrC2adWqrn54CUJI36T+77PO
-   dtKPWkMfHXPAjyEI4vLfRN8uz/sJKWdclsU2sJnSVVioQ/swWSbnEW5kV
-   dNsjsJTYlhUjeY75slkBZELCyIjfML6gnbm5QrBjFB6z+YMMA0LRSzij1
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="9069090"
+  bh=DiThgfsoGsR+pFKV5qWLElB1Wl34x5slFqPiPD8NROA=;
+  b=CRPReSWsl6mL68oN4cRDYL6gk0ofXS8n/+7FXXtGgf+JF2sL3FWkKxrq
+   P8hT+nRXNZ27ICNSt3tmZU7KeiZyGSD7ydCEO89+X4qGqEUH+rNRjZvLq
+   aB38fYpsiF9A7Ci2mp5/UaHfsbvFetf+pLZ1lOK9pnnum9KdLRDicZaat
+   ffZhQgEgHzpH2ff/VKPd9LDGxda37SNq5GV73iNrM1bapNWhV0f8uaSuD
+   bBQlivfr3E8cLnthH/ZriLqFnVcjRl+xvZg/I1VfIkl+jXR9KCDYtngJZ
+   B+MeXa21YFIwV5LZhkyIyYImPRlSNxVkCIlsnzkntg7lZHvDJIojqTmHt
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="9069096"
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="9069090"
+   d="scan'208";a="9069096"
 Received: from orviesa001.jf.intel.com ([10.64.159.141])
   by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2024 13:58:04 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="35239924"
+   d="scan'208";a="35239927"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa001.jf.intel.com with ESMTP; 25 Jan 2024 13:58:03 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -66,9 +66,9 @@ Cc: Jacob Keller <jacob.e.keller@intel.com>,
 	Karol Kolacinski <karol.kolacinski@intel.com>,
 	Simon Horman <horms@kernel.org>,
 	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Subject: [PATCH net-next 2/7] ice: pass reset type to PTP reset functions
-Date: Thu, 25 Jan 2024 13:57:50 -0800
-Message-ID: <20240125215757.2601799-3-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 3/7] ice: rename verify_cached to has_ready_bitmap
+Date: Thu, 25 Jan 2024 13:57:51 -0800
+Message-ID: <20240125215757.2601799-4-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20240125215757.2601799-1-anthony.l.nguyen@intel.com>
 References: <20240125215757.2601799-1-anthony.l.nguyen@intel.com>
@@ -82,21 +82,15 @@ Content-Transfer-Encoding: 8bit
 
 From: Jacob Keller <jacob.e.keller@intel.com>
 
-The ice_ptp_prepare_for_reset() and ice_ptp_reset() functions currently
-check the pf->flags ICE_FLAG_PFR_REQ bit to determine if the current
-reset is a PF reset or not.
+The tx->verify_cached flag is used to inform the Tx timestamp tracking
+code whether it needs to verify the cached Tx timestamp value against
+a previous captured value. This is necessary on E810 hardware which does
+not have a Tx timestamp ready bitmap.
 
-This is problematic, because it is possible that a PF reset and a higher
-level reset (CORE reset, GLOBAL reset, EMP reset) are requested
-simultaneously. In that case, the driver performs the highest level
-reset requested. However, the ICE_FLAG_PFR_REQ flag will still be set.
-
-The main driver reset functions take an enum ice_reset_req indicating
-which reset is actually being performed. Pass this data into the PTP
-functions and rely on this instead of relying on the driver flags.
-
-This ensures that the PTP code performs the proper level of reset that
-the driver is actually undergoing.
+In addition, we currently rely on the fact that the
+ice_get_phy_tx_tstamp_ready() function returns all 1s for E810 hardware.
+Instead of introducing a brand new flag, rename and verify_cached to
+has_ready_bitmap, inverting the relevant checks.
 
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
@@ -105,120 +99,97 @@ Reviewed-by: Simon Horman <horms@kernel.org>
 Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_main.c |  4 ++--
- drivers/net/ethernet/intel/ice/ice_ptp.c  | 13 +++++++------
- drivers/net/ethernet/intel/ice/ice_ptp.h  | 16 ++++++++++++----
- 3 files changed, 21 insertions(+), 12 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_ptp.c | 12 ++++++------
+ drivers/net/ethernet/intel/ice/ice_ptp.h |  8 +++++---
+ 2 files changed, 11 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index dd4a9bc0dfdc..0c589524cf43 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -613,7 +613,7 @@ ice_prepare_for_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
- 	ice_pf_dis_all_vsi(pf, false);
- 
- 	if (test_bit(ICE_FLAG_PTP_SUPPORTED, pf->flags))
--		ice_ptp_prepare_for_reset(pf);
-+		ice_ptp_prepare_for_reset(pf, reset_type);
- 
- 	if (ice_is_feature_supported(pf, ICE_F_GNSS))
- 		ice_gnss_exit(pf);
-@@ -7548,7 +7548,7 @@ static void ice_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
- 	 * fail.
- 	 */
- 	if (test_bit(ICE_FLAG_PTP_SUPPORTED, pf->flags))
--		ice_ptp_reset(pf);
-+		ice_ptp_reset(pf, reset_type);
- 
- 	if (ice_is_feature_supported(pf, ICE_F_GNSS))
- 		ice_gnss_init(pf);
 diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 8ed4af219f9b..96b5f992f127 100644
+index 96b5f992f127..a10e0018b2e2 100644
 --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
 +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -2631,8 +2631,9 @@ static void ice_ptp_periodic_work(struct kthread_work *work)
- /**
-  * ice_ptp_prepare_for_reset - Prepare PTP for reset
-  * @pf: Board private structure
-+ * @reset_type: the reset type being performed
-  */
--void ice_ptp_prepare_for_reset(struct ice_pf *pf)
-+void ice_ptp_prepare_for_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
- {
- 	struct ice_ptp *ptp = &pf->ptp;
- 	u8 src_tmr;
-@@ -2647,7 +2648,7 @@ void ice_ptp_prepare_for_reset(struct ice_pf *pf)
- 
- 	kthread_cancel_delayed_work_sync(&ptp->work);
- 
--	if (test_bit(ICE_PFR_REQ, pf->state))
-+	if (reset_type == ICE_RESET_PFR)
+@@ -606,11 +606,11 @@ void ice_ptp_complete_tx_single_tstamp(struct ice_ptp_tx *tx)
+ 	 * timestamp. If it is not, skip this for now assuming it hasn't yet
+ 	 * been captured by hardware.
+ 	 */
+-	if (!drop_ts && tx->verify_cached &&
++	if (!drop_ts && !tx->has_ready_bitmap &&
+ 	    raw_tstamp == tx->tstamps[idx].cached_tstamp)
  		return;
  
- 	ice_ptp_release_tx_tracker(pf, &pf->ptp.port.tx);
-@@ -2667,8 +2668,9 @@ void ice_ptp_prepare_for_reset(struct ice_pf *pf)
- /**
-  * ice_ptp_reset - Initialize PTP hardware clock support after reset
-  * @pf: Board private structure
-+ * @reset_type: the reset type being performed
-  */
--void ice_ptp_reset(struct ice_pf *pf)
-+void ice_ptp_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
- {
- 	struct ice_ptp *ptp = &pf->ptp;
- 	struct ice_hw *hw = &pf->hw;
-@@ -2677,15 +2679,14 @@ void ice_ptp_reset(struct ice_pf *pf)
- 	u64 time_diff;
+-	if (tx->verify_cached && raw_tstamp)
++	if (!tx->has_ready_bitmap && raw_tstamp)
+ 		tx->tstamps[idx].cached_tstamp = raw_tstamp;
+ 	clear_bit(idx, tx->in_use);
+ 	skb = tx->tstamps[idx].skb;
+@@ -751,7 +751,7 @@ static void ice_ptp_process_tx_tstamp(struct ice_ptp_tx *tx)
+ 		 * from the last cached timestamp. If it is not, skip this for
+ 		 * now assuming it hasn't yet been captured by hardware.
+ 		 */
+-		if (!drop_ts && tx->verify_cached &&
++		if (!drop_ts && !tx->has_ready_bitmap &&
+ 		    raw_tstamp == tx->tstamps[idx].cached_tstamp)
+ 			continue;
  
- 	if (ptp->state == ICE_PTP_READY) {
--		ice_ptp_prepare_for_reset(pf);
-+		ice_ptp_prepare_for_reset(pf, reset_type);
- 	} else if (ptp->state != ICE_PTP_RESETTING) {
- 		err = -EINVAL;
- 		dev_err(ice_pf_to_dev(pf), "PTP was not initialized\n");
- 		goto err;
- 	}
+@@ -761,7 +761,7 @@ static void ice_ptp_process_tx_tstamp(struct ice_ptp_tx *tx)
  
--	if (test_bit(ICE_PFR_REQ, pf->state) ||
--	    !ice_pf_src_tmr_owned(pf))
-+	if (reset_type == ICE_RESET_PFR || !ice_pf_src_tmr_owned(pf))
- 		goto pfr;
+ skip_ts_read:
+ 		spin_lock_irqsave(&tx->lock, flags);
+-		if (tx->verify_cached && raw_tstamp)
++		if (!tx->has_ready_bitmap && raw_tstamp)
+ 			tx->tstamps[idx].cached_tstamp = raw_tstamp;
+ 		clear_bit(idx, tx->in_use);
+ 		skb = tx->tstamps[idx].skb;
+@@ -1014,7 +1014,7 @@ ice_ptp_init_tx_e82x(struct ice_pf *pf, struct ice_ptp_tx *tx, u8 port)
+ 	tx->block = port / ICE_PORTS_PER_QUAD;
+ 	tx->offset = (port % ICE_PORTS_PER_QUAD) * INDEX_PER_PORT_E82X;
+ 	tx->len = INDEX_PER_PORT_E82X;
+-	tx->verify_cached = 0;
++	tx->has_ready_bitmap = 1;
  
- 	err = ice_ptp_init_phc(hw);
+ 	return ice_ptp_alloc_tx_tracker(tx);
+ }
+@@ -1037,7 +1037,7 @@ ice_ptp_init_tx_e810(struct ice_pf *pf, struct ice_ptp_tx *tx)
+ 	 * verify new timestamps against cached copy of the last read
+ 	 * timestamp.
+ 	 */
+-	tx->verify_cached = 1;
++	tx->has_ready_bitmap = 0;
+ 
+ 	return ice_ptp_alloc_tx_tracker(tx);
+ }
 diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.h b/drivers/net/ethernet/intel/ice/ice_ptp.h
-index 2457380142e1..afe454abe997 100644
+index afe454abe997..aa7a5588d11d 100644
 --- a/drivers/net/ethernet/intel/ice/ice_ptp.h
 +++ b/drivers/net/ethernet/intel/ice/ice_ptp.h
-@@ -314,8 +314,9 @@ enum ice_tx_tstamp_work ice_ptp_process_ts(struct ice_pf *pf);
+@@ -100,7 +100,7 @@ struct ice_perout_channel {
+  * the last timestamp we read for a given index. If the current timestamp
+  * value is the same as the cached value, we assume a new timestamp hasn't
+  * been captured. This avoids reporting stale timestamps to the stack. This is
+- * only done if the verify_cached flag is set in ice_ptp_tx structure.
++ * only done if the has_ready_bitmap flag is not set in ice_ptp_tx structure.
+  */
+ struct ice_tx_tstamp {
+ 	struct sk_buff *skb;
+@@ -130,7 +130,9 @@ enum ice_tx_tstamp_work {
+  * @init: if true, the tracker is initialized;
+  * @calibrating: if true, the PHY is calibrating the Tx offset. During this
+  *               window, timestamps are temporarily disabled.
+- * @verify_cached: if true, verify new timestamp differs from last read value
++ * @has_ready_bitmap: if true, the hardware has a valid Tx timestamp ready
++ *                    bitmap register. If false, fall back to verifying new
++ *                    timestamp values against previously cached copy.
+  * @last_ll_ts_idx_read: index of the last LL TS read by the FW
+  */
+ struct ice_ptp_tx {
+@@ -143,7 +145,7 @@ struct ice_ptp_tx {
+ 	u8 len;
+ 	u8 init : 1;
+ 	u8 calibrating : 1;
+-	u8 verify_cached : 1;
++	u8 has_ready_bitmap : 1;
+ 	s8 last_ll_ts_idx_read;
+ };
  
- u64 ice_ptp_get_rx_hwts(const union ice_32b_rx_flex_desc *rx_desc,
- 			const struct ice_pkt_ctx *pkt_ctx);
--void ice_ptp_reset(struct ice_pf *pf);
--void ice_ptp_prepare_for_reset(struct ice_pf *pf);
-+void ice_ptp_reset(struct ice_pf *pf, enum ice_reset_req reset_type);
-+void ice_ptp_prepare_for_reset(struct ice_pf *pf,
-+			       enum ice_reset_req reset_type);
- void ice_ptp_init(struct ice_pf *pf);
- void ice_ptp_release(struct ice_pf *pf);
- void ice_ptp_link_change(struct ice_pf *pf, u8 port, bool linkup);
-@@ -355,8 +356,15 @@ ice_ptp_get_rx_hwts(const union ice_32b_rx_flex_desc *rx_desc,
- 	return 0;
- }
- 
--static inline void ice_ptp_reset(struct ice_pf *pf) { }
--static inline void ice_ptp_prepare_for_reset(struct ice_pf *pf) { }
-+static inline void ice_ptp_reset(struct ice_pf *pf,
-+				 enum ice_reset_req reset_type)
-+{
-+}
-+
-+static inline void ice_ptp_prepare_for_reset(struct ice_pf *pf,
-+					     enum ice_reset_req reset_type)
-+{
-+}
- static inline void ice_ptp_init(struct ice_pf *pf) { }
- static inline void ice_ptp_release(struct ice_pf *pf) { }
- static inline void ice_ptp_link_change(struct ice_pf *pf, u8 port, bool linkup)
 -- 
 2.41.0
 
