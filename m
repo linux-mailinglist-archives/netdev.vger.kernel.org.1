@@ -1,150 +1,149 @@
-Return-Path: <netdev+bounces-66021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFBFE83CF5B
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 23:29:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A318E83CF72
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 23:35:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77CA41F2284C
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 22:29:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34E0228BC6E
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 22:35:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 179E713B793;
-	Thu, 25 Jan 2024 22:29:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 854D2111B2;
+	Thu, 25 Jan 2024 22:35:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dEFfkSx1"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wtzgWT5L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AF4613B787;
-	Thu, 25 Jan 2024 22:29:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D36E811197
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 22:35:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706221791; cv=none; b=dYQNTxR2/axnnpdfbNELM525hy4l8OOdmvUXXyK4OWdPKXC24djbSp/fFNCawdiTGSB5Bo2plTVNCxAhMQ457SVytMyWdmuatcYkXf1WCSy94jOpTXdH65YUrQAglsIP04LjHFK5DOAgW6ZSzfA+VdoDd1PZ7JTIU5zhS2WSWPc=
+	t=1706222104; cv=none; b=rI0OjXkqUGnbPHQXZAq6n4Fclnn2ScsIdUsItwQpMvWEc/H6D5G2IWm3tNTc645mFdIgy9/9fs2fqK+B5AUTCTRcUMhBK9ImL2FMdSWjuKw6IBAqdQlybkcnBzmWHhzMKqJGSMSqDHdwW8RqpalbBUA49YMseCWxr1xwBxvJfM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706221791; c=relaxed/simple;
-	bh=teWxaZbkvWhb0PCw6q28RFREAnhb+f1N7VXEo2/etKQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UbEqSe+dPSd83w4ESOlgBAevgJYLFUVI3vzR4pAaCFeEwrafkJpUeXVj2zT48y7hZ510xGSrXxBf47Xg/AjTTMAIWsqaIH70sdognumCiBm3dzzuVqzsl2YcEH8zqtFuT2FNqVYNITH81ELd3d7dw2HKUyKm7JUcb0I5fUWZbtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dEFfkSx1; arc=none smtp.client-ip=209.85.167.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-3bbbc6bcc78so19895b6e.1;
-        Thu, 25 Jan 2024 14:29:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706221788; x=1706826588; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ouPYgv6jvx+UEBYd2b28+Blg8/f1MS+BmmcDzg8dExg=;
-        b=dEFfkSx1lM12Ws+RFdttte2hsT36bVG58tYR62eE888DGz43Tpfp6+NVnMSefeB3ni
-         DSgVEsj0eYg5XTb2yPcd/iqon4Cmsy1/zRsgE1IAMELxVD+n84XmiWPDHltpsW6WFcJP
-         9+exS6pl3lPHV0dbbt73ls2jICrdi1lFlpUpqE/ZXQjFl+fROJ0HyAvDUuRkTU8Em2Aw
-         nxDEYhwhnPptXzWRtZp23czP/FT+YaHZ/MHbKkTWDKP9Qw+LlpKTEfr7lJ8SZPntcsjh
-         TA0Kv6SYaxuDLDg/VrKZ0J52Q62l7A8QBYHTzLaC+2ixYcTWgwd1IobpSY6cTKVvxYWn
-         rpfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706221788; x=1706826588;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ouPYgv6jvx+UEBYd2b28+Blg8/f1MS+BmmcDzg8dExg=;
-        b=CSy2rCapOGhHcVGaDQVwAC4/5AJP/+FOIimb6NsSfrwynL6YXijSthqBo9cOnLqwoM
-         2YNopA675mIdxjs0zEjXBM3u73qA1apE0FsZ8doZwfW0fNahApr6jGaRzkV5CucBVBkI
-         1PTAa+mwlKC7MjNVKz27kJQQq3Y9YmYP59WXe1zkv3O+C66miAxdi2JqNOTabKIA56MJ
-         EJEl3BRpveTIf6yAoci3Eb6V7DKPXYjqxVQPAqfjttoNj8k8ujr7LCr7mi2N8f830fku
-         A0BLzLHuHkM2gn0L0hRhQwpEu4KP5Gw6wt+/ERGm+V/C+uzR8/jB/xJ7DXEIduEm943m
-         7keg==
-X-Gm-Message-State: AOJu0Yy06Ng15C4KxLsmf1EXfkyfTz2ovLC3gCJVCzp5WIVPm4u2/sQd
-	dFLmp8sINy4fX6uL3Umwe//fEipIdlXqsyQpH2MnvzXIwDIU8N7W43VvzrhQ
-X-Google-Smtp-Source: AGHT+IG2/VOSv7+PKEiOE3BXtYPlBdE7raA2v7l8QZn0/Wb+nptsL1ZfejajXmKefyekueVTU6waZg==
-X-Received: by 2002:a05:6808:2024:b0:3bd:d8d4:5706 with SMTP id q36-20020a056808202400b003bdd8d45706mr541354oiw.12.1706221788293;
-        Thu, 25 Jan 2024 14:29:48 -0800 (PST)
-Received: from wsfd-netdev15.ntdv.lab.eng.bos.redhat.com (nat-pool-bos-t.redhat.com. [66.187.233.206])
-        by smtp.gmail.com with ESMTPSA id b26-20020a05620a04fa00b007836720b96asm5448924qkh.24.2024.01.25.14.29.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jan 2024 14:29:47 -0800 (PST)
-From: Xin Long <lucien.xin@gmail.com>
-To: network dev <netdev@vger.kernel.org>,
-	netfilter-devel@vger.kernel.org,
-	linux-sctp@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-Subject: [PATCH nf] netfilter: check SCTP_CID_SHUTDOWN_ACK for vtag setting in sctp_new
-Date: Thu, 25 Jan 2024 17:29:46 -0500
-Message-Id: <28d65b0749b8c1a8ae369eec6021248659ba810c.1706221786.git.lucien.xin@gmail.com>
-X-Mailer: git-send-email 2.39.1
+	s=arc-20240116; t=1706222104; c=relaxed/simple;
+	bh=QjRL4Lk5HuY4dVTiSx8FBdwbiQ0YMbtGB8QHYiNAY2I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ciq68L0B98EzsWyB3LGTewYFFOz0SkdDL2any+oQe4eAkd90ElgIsGFILSTkoTctm25eu2wXD93uRNANWUtOHXmvWQ3c4D1bDGIGMeKfns7gpq9NF3Zhp2ch83FE58F14sDqyz+dJcLAXiLIywj39u2HnyNc+FaNDWQIJcxZ5Ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wtzgWT5L; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <cec469f4-2fd0-479a-8919-0d5578687fb2@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1706222099;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3VzS1vt3EtrBAK2HSrfT6Y50voBH4lEx0F/Lw8xZM2M=;
+	b=wtzgWT5LTkRp2WrBIhRy7sO7hmnbBZqcOjMT8tTrhe71/FP+70vIqM4XKn27NrqSYdKoM3
+	E6F/jTVuouhXLpdawNbgUQVPLQv4K1u7ZMpZ4qsgn5ulBZV75N0guGW62B5W/gz8/1P3Pv
+	EGVjC+iRhS/rPAQEHvUFwOoNC/WHDSQ=
+Date: Thu, 25 Jan 2024 14:34:49 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH bpf-next v8 1/3] bpf: make common crypto API for TC/XDP
+ programs
+Content-Language: en-US
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Vadim Fedorenko <vadfed@meta.com>
+Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+ bpf@vger.kernel.org, Victor Stewart <v@nametag.social>,
+ Jakub Kicinski <kuba@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>
+References: <20240115220803.1973440-1-vadfed@meta.com>
+ <3d2d5f4e-c554-4648-bcec-839d83585123@linux.dev>
+ <a682b902-37a2-4d43-8f39-56ca213f6663@linux.dev>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <a682b902-37a2-4d43-8f39-56ca213f6663@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-The annotation says in sctp_new(): "If it is a shutdown ack OOTB packet, we
-expect a return shutdown complete, otherwise an ABORT Sec 8.4 (5) and (8)".
-However, it does not check SCTP_CID_SHUTDOWN_ACK before setting vtag[REPLY]
-in the conntrack entry(ct).
+On 1/25/24 3:19 AM, Vadim Fedorenko wrote:
+> On 25/01/2024 01:10, Martin KaFai Lau wrote:
+>> On 1/15/24 2:08 PM, Vadim Fedorenko wrote:
+>>> +static int bpf_crypto_crypt(const struct bpf_crypto_ctx *ctx,
+>>> +                const struct bpf_dynptr_kern *src,
+>>> +                struct bpf_dynptr_kern *dst,
+>>> +                const struct bpf_dynptr_kern *siv,
+>>> +                bool decrypt)
+>>> +{
+>>> +    u32 src_len, dst_len, siv_len;
+>>> +    const u8 *psrc;
+>>> +    u8 *pdst, *piv;
+>>> +    int err;
+>>> +
+>>> +    if (ctx->type->get_flags(ctx->tfm) & CRYPTO_TFM_NEED_KEY)
+>>
+>> nit. Does the indirect call get_flags() return different values?
+>> Should it be rejected earlier, e.g. in bpf_crypto_ctx_create()?
+> 
+> Well, that is the common pattern in crypto subsys to check flags.
+> But after looking at it second time, I think I have to refactor this
+> part. CRYPTO_TFM_NEED_KEY is set during tfm creation if algo requires
+> the key. And it's freed when the key setup is successful. As there is no
+> way bpf programs can modify tfm directly we can move this check to
+> bpf_crypto_ctx_create() to key setup part and avoid indirect call in this place.
+>>
+>>> +        return -EINVAL;
+>>> +
+>>> +    if (__bpf_dynptr_is_rdonly(dst))
+>>> +        return -EINVAL;
+>>> +
+>>> +    siv_len = __bpf_dynptr_size(siv);
+>>> +    src_len = __bpf_dynptr_size(src);
+>>> +    dst_len = __bpf_dynptr_size(dst);
+>>> +    if (!src_len || !dst_len)
+>>> +        return -EINVAL;
+>>> +
+>>> +    if (siv_len != (ctx->type->ivsize(ctx->tfm) + 
+>>> ctx->type->statesize(ctx->tfm)))
+>>
+>> Same here, two indirect calls per en/decrypt kfunc call. Does the return value 
+>> change?
+> 
+> I have to check the size of IV provided by the caller, and then to avoid
+> indirect calls I have to store these values somewhere in ctx. It gives a
+> direct access to these values to bpf programs, which can potentially
+> abuse them. Not sure if it's good to open such opportunity.
 
-Because of that, if the ct in Router disappears for some reason in [1]
-with the packet sequence like below:
+I don't think it makes any difference considering tfm has already been 
+accessible in ctx->tfm. A noob question, what secret is in the siv len?
 
-   Client > Server: sctp (1) [INIT] [init tag: 3201533963]
-   Server > Client: sctp (1) [INIT ACK] [init tag: 972498433]
-   Client > Server: sctp (1) [COOKIE ECHO]
-   Server > Client: sctp (1) [COOKIE ACK]
-   Client > Server: sctp (1) [DATA] (B)(E) [TSN: 3075057809]
-   Server > Client: sctp (1) [SACK] [cum ack 3075057809]
-   Server > Client: sctp (1) [HB REQ]
-   (the ct in Router disappears somehow)  <-------- [1]
-   Client > Server: sctp (1) [HB ACK]
-   Client > Server: sctp (1) [DATA] (B)(E) [TSN: 3075057810]
-   Client > Server: sctp (1) [DATA] (B)(E) [TSN: 3075057810]
-   Client > Server: sctp (1) [HB REQ]
-   Client > Server: sctp (1) [DATA] (B)(E) [TSN: 3075057810]
-   Client > Server: sctp (1) [HB REQ]
-   Client > Server: sctp (1) [ABORT]
+btw, unrelated, based on the selftest in patch 3, is it supporting any siv_len > 
+0 for now?
 
-when processing HB ACK packet in Router it calls sctp_new() to initialize
-the new ct with vtag[REPLY] set to HB_ACK packet's vtag.
-
-Later when sending DATA from Client, all the SACKs from Server will get
-dropped in Router, as the SACK packet's vtag does not match vtag[REPLY]
-in the ct. The worst thing is the vtag in this ct will never get fixed
-by the upcoming packets from Server.
-
-This patch fixes it by checking SCTP_CID_SHUTDOWN_ACK before setting
-vtag[REPLY] in the ct in sctp_new() as the annotation says. With this
-fix, it will leave vtag[REPLY] in ct to 0 in the case above, and the
-next HB REQ/ACK from Server is able to fix the vtag as its value is 0
-in nf_conntrack_sctp_packet().
-
-Signed-off-by: Xin Long <lucien.xin@gmail.com>
----
- net/netfilter/nf_conntrack_proto_sctp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/netfilter/nf_conntrack_proto_sctp.c b/net/netfilter/nf_conntrack_proto_sctp.c
-index c6bd533983c1..4cc97f971264 100644
---- a/net/netfilter/nf_conntrack_proto_sctp.c
-+++ b/net/netfilter/nf_conntrack_proto_sctp.c
-@@ -283,7 +283,7 @@ sctp_new(struct nf_conn *ct, const struct sk_buff *skb,
- 			pr_debug("Setting vtag %x for secondary conntrack\n",
- 				 sh->vtag);
- 			ct->proto.sctp.vtag[IP_CT_DIR_ORIGINAL] = sh->vtag;
--		} else {
-+		} else if (sch->type == SCTP_CID_SHUTDOWN_ACK) {
- 		/* If it is a shutdown ack OOTB packet, we expect a return
- 		   shutdown complete, otherwise an ABORT Sec 8.4 (5) and (8) */
- 			pr_debug("Setting vtag %x for new conn OOTB\n",
--- 
-2.39.1
+> 
+>>
+>>> +        return -EINVAL;
+>>> +
+>>> +    psrc = __bpf_dynptr_data(src, src_len);
+>>> +    if (!psrc)
+>>> +        return -EINVAL;
+>>> +    pdst = __bpf_dynptr_data_rw(dst, dst_len);
+>>> +    if (!pdst)
+>>> +        return -EINVAL;
+>>> +
+>>> +    piv = siv_len ? __bpf_dynptr_data_rw(siv, siv_len) : NULL;
+>>> +    if (siv_len && !piv)
+>>> +        return -EINVAL;
+>>> +
+>>> +    err = decrypt ? ctx->type->decrypt(ctx->tfm, psrc, pdst, src_len, piv)
+>>> +              : ctx->type->encrypt(ctx->tfm, psrc, pdst, src_len, piv);
+>>> +
+>>> +    return err;
+>>> +}
+>>
+> 
 
 
