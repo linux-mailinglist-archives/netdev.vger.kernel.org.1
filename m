@@ -1,223 +1,153 @@
-Return-Path: <netdev+bounces-65735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DC3683B869
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 04:39:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A229183B870
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 04:45:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B39421C231C2
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 03:39:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41D6A1F22AC3
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 03:45:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86BD86FC5;
-	Thu, 25 Jan 2024 03:39:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D500D6FCC;
+	Thu, 25 Jan 2024 03:45:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iKXFgzX+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WwZaKobw"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BB6863DD
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 03:39:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 552416FA7
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 03:45:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706153986; cv=none; b=a+aLkFk+GK8A09EAiSfkZ4Mc3IOtFflGnSwpU5uGTsH3PPI5y0tGrJoz7WNZTOiwGFFFbWT2tn0+ocfrMZLa5LIxKCtu9DGydGkkvE11i082/e5oK9qftn+IBaGJrILEPMiMQRlbQzmkYIdTfwPFEE2TAa0iubzqlK3iP86V9IY=
+	t=1706154312; cv=none; b=bcjQY08Woklzaz36FFn3XBxQ4TAtvbNFRqhEB7wrn2AKCmkHJzgxhjeqzGAE/YsQH79Fga/C8R0DROniI9j+vvC+mqVrsJCMvL8eRP4lVE0YveppYd64RPHraJxNO8mXWPu7WCTM8DBetrFRu2logEJByv/1aswe9LwVEG+wayQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706153986; c=relaxed/simple;
-	bh=bzfgSrTXZv75Mm6hevdNUUdlfQUg3HZgZpDtc3gLtjE=;
+	s=arc-20240116; t=1706154312; c=relaxed/simple;
+	bh=vLrTDc4Xoy5bYh/zxDyVoWC8mEokvcqct9ta/iT40Nk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bMysi8mOgRE7EI9JyWlYelG0Hzb+8qnl8vzXGePfID1KInNt56eI7r5BIOHwx5ZQgX69YqFJukUxlswq45aHMMDvxOkAKseIrWCFc65xrLVGicIRvmi049di3LrBUl50oN5BlUkxvQSD2gzDemq7gldpYw8TQ4j3nuGiVOiCo2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iKXFgzX+; arc=none smtp.client-ip=170.10.133.124
+	 To:Cc:Content-Type; b=TvHVjq4ZiEIjZBdKC/CiHBaZVKA1O4mltF5Bu7gXsRZsxMyFRJggbFBT9fYQGCxzG+D1+eUqzxRqLzKZw2BUEhGqByPSldO88AlLfrZtjFbuo211GVWXO4WIViwLqyUzDjYTZXQKPUUxg1W5Jmy449R0a41FYXfciVKuIA+PVOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WwZaKobw; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706153983;
+	s=mimecast20190719; t=1706154310;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=qhIcirBtLyJR8yn+TaM7AmyOi7FPWH074qlYOHeT1Pg=;
-	b=iKXFgzX+gAZyUrLAaBsMMN9o+OEL0ZyEsqsoXYlgdhD2TPK+UHAtffELpTjcHr4BIGIoNM
-	JLIWoA/En7SF+Tcndt8bFtn77gYwNN2PENY9Lt/+4UyffM+Y7Lnqch873A9sPyzLdGXhfw
-	2aup75ydAIr8YbPQGV0IfDohlNaqXAQ=
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
- [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=oTLyEhCAK8CZLpP4xZtHuONSiITSgynu6b1Omr3hZKk=;
+	b=WwZaKobw/rJl09pNRx/Op+DG3lgmk/q2pluDS1w9qlkfelSZS97OWrvfqAaVzNF5Tv2rSo
+	kIsEl8Or9ULY1QKPjEHTjr25AmtenAx8a18hBTFmoy8F6Yve/BKcczfDPYShDx06vfseVu
+	/8IV1GPHNangib5tWuGpEFisGTvU2ok=
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
+ [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-322-X7CvFtb9NRqmsXgYSmNtZw-1; Wed, 24 Jan 2024 22:39:42 -0500
-X-MC-Unique: X7CvFtb9NRqmsXgYSmNtZw-1
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-6ddb83a5deeso1138403b3a.3
-        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 19:39:41 -0800 (PST)
+ us-mta-182-rglKtVoAP6akN3ys9pxCTQ-1; Wed, 24 Jan 2024 22:45:08 -0500
+X-MC-Unique: rglKtVoAP6akN3ys9pxCTQ-1
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2908517996cso4262330a91.2
+        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 19:45:07 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706153980; x=1706758780;
+        d=1e100.net; s=20230601; t=1706154307; x=1706759107;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qhIcirBtLyJR8yn+TaM7AmyOi7FPWH074qlYOHeT1Pg=;
-        b=QaedG0kwlVG8GDg5j7LR/SyXSHFuYR+UECHg8OJR7p7ylJ4iDLYpiZIRW7CnkEBA82
-         q4TOM30Gq4yOqSzG5Vd85OtQ7iZzsML8LMkPxYRNYk+9F2Sjxe4Awlkmp8udIyeVpOhG
-         CyArf+G1Yj6U4iST9DSuTIT17D8FHGP0xCC7EVxvcBIHCPosIppMYTHeaLu82IDxZe/D
-         TaZX45g9Kw6m7y6hQTfptLM5hlg+gMDZrdmEaNbZvnoB1a4ac7G935Fwxabuw4/1TbrN
-         gcRlqMW0TOJ1n2sUGpwPsuN+PIb05vpqTcmi9aPe9gRqHeJrqzb8HhD9RU3MebKfj2+Y
-         5cvQ==
-X-Gm-Message-State: AOJu0Ywo8ZGCwG3kAJxeL58+9qOAhXuHDQBOb/GDn/o8fg013qkHptC/
-	B3RaCTbgsjMe0DRCGwK1Wee6Af9PUVHWc4vawoppzS1TbjlSOWzk2XRZxyX+VO5cpDYGo7zpXUr
-	NonoFZp1Kb0uZjVnM63aiMeeFMTqsu6KluXJV7IlUaX4H/+VZn6XoHbxNDUF/Cn7s5aHcbkwg6K
-	lkd2+MOOUKkovoYRLl7IepVOOCXyEd
-X-Received: by 2002:a05:6a00:27a3:b0:6d9:b66f:3d16 with SMTP id bd35-20020a056a0027a300b006d9b66f3d16mr291082pfb.50.1706153980665;
-        Wed, 24 Jan 2024 19:39:40 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFaSzOq8OPaBB6Tm8EEh0l52HE0p4Uu3X2xESlPVUQ9JKv5URCEQPGZtpr7WpXJp0bAO33LkGRhVaAqIrGA+vI=
-X-Received: by 2002:a05:6a00:27a3:b0:6d9:b66f:3d16 with SMTP id
- bd35-20020a056a0027a300b006d9b66f3d16mr291071pfb.50.1706153980378; Wed, 24
- Jan 2024 19:39:40 -0800 (PST)
+        bh=oTLyEhCAK8CZLpP4xZtHuONSiITSgynu6b1Omr3hZKk=;
+        b=hlgogc1sI98tPODDkW9CfrTA2PQmTg2LlKKVfyWozbk83WLpLxU/oQaOvB7SFCJrVd
+         TP2tCMGyrGWjR+bk5Bdn4HEnHQV3YCTmqVquZ0O2/BVN2fZWpkA113yNWAcxfG3ApXV4
+         tMnGvbJ6CtHZUyxYlBxMNgI6Rmfd/5VmCIKArE9FFJG+QbYKlHZYFGbTovFmiow4sBaT
+         MrUsoloa58XjRAxUaUpU7PDSVyKHDMQvHMEHa9KEmlg6+K+U/mvk4pJ+gHKqJ4YUz4ey
+         Hv6s79SYkFCY1sL1eGkI46zVfvbnC0cbYCan2c1jvWytfOKiJJdfsg/Vnj3LHb4k4h/m
+         8ToA==
+X-Gm-Message-State: AOJu0Yw/M5eZmeW/pt9FqyRfih3pMZm8j3ChQKdZKWfrELnMLWWa4O1c
+	phTHgyMo4g6oGfsu6gtoza7yK21+VbKdGcGYQMP9ja0wyuPScIfakMBcDhMVVAopliQHZ7iyeDd
+	6TH34MF9Y/wp7ncY08prEHnPE8nRyHRQkkTwvtdGt8kHIbMvzM+fD4zCYldxqKJkYO1EasTCQUi
+	5r8ygrMXoQsZnEDqLTrtjDHgFKvaba
+X-Received: by 2002:a17:90a:408d:b0:28e:aaaa:34e9 with SMTP id l13-20020a17090a408d00b0028eaaaa34e9mr182531pjg.51.1706154307062;
+        Wed, 24 Jan 2024 19:45:07 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGbu1lzip0SCxOTcwvrv+rvbb49TS9A60SGDUkl5bo+jQA2c3GzM5bva6U9MdT+5KDma5bqFN0iWxHPq/rqtek=
+X-Received: by 2002:a17:90a:408d:b0:28e:aaaa:34e9 with SMTP id
+ l13-20020a17090a408d00b0028eaaaa34e9mr182523pjg.51.1706154306654; Wed, 24 Jan
+ 2024 19:45:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240116075924.42798-1-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <20240116075924.42798-1-xuanzhuo@linux.alibaba.com>
+References: <1706089075-16084-1-git-send-email-wangyunjian@huawei.com> <65b15f6ba776f_22a8cb29487@willemb.c.googlers.com.notmuch>
+In-Reply-To: <65b15f6ba776f_22a8cb29487@willemb.c.googlers.com.notmuch>
 From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 25 Jan 2024 11:39:28 +0800
-Message-ID: <CACGkMEuvubWfg8Wc+=eNqg1rHR+PD6jsH7_QEJV6=S+DUVdThQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 0/5] virtio-net: sq support premapped mode
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, virtualization@lists.linux.dev, 
-	bpf@vger.kernel.org
+Date: Thu, 25 Jan 2024 11:44:55 +0800
+Message-ID: <CACGkMEtdi=MKedNh1foupjqJW3EouhUp4iwsj1t3v=nNQ=VvBw@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/2] tun: AF_XDP Rx zero-copy support
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Yunjian Wang <wangyunjian@huawei.com>, mst@redhat.com, kuba@kernel.org, 
+	davem@davemloft.net, magnus.karlsson@intel.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, xudingke@huawei.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 16, 2024 at 3:59=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
-om> wrote:
+On Thu, Jan 25, 2024 at 3:05=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
 >
-> This is the second part of virtio-net support AF_XDP zero copy.
+> Yunjian Wang wrote:
+> > Now the zero-copy feature of AF_XDP socket is supported by some
+> > drivers, which can reduce CPU utilization on the xdp program.
+> > This patch set allows tun to support AF_XDP Rx zero-copy feature.
+> >
+> > This patch tries to address this by:
+> > - Use peek_len to consume a xsk->desc and get xsk->desc length.
+> > - When the tun support AF_XDP Rx zero-copy, the vq's array maybe empty.
+> > So add a check for empty vq's array in vhost_net_buf_produce().
+> > - add XDP_SETUP_XSK_POOL and ndo_xsk_wakeup callback support
+> > - add tun_put_user_desc function to copy the Rx data to VM
+> >
+> > Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
 >
-> The whole patch set
-> http://lore.kernel.org/all/20231229073108.57778-1-xuanzhuo@linux.alibaba.=
-com
+> I don't fully understand the higher level design of this feature yet.
 >
-> ## About the branch
+> But some initial comments at the code level.
 >
-> This patch set is pushed to the net-next branch, but some patches are abo=
-ut
-> virtio core. Because the entire patch set for virtio-net to support AF_XD=
-P
-> should be pushed to net-next, I hope these patches will be merged into ne=
-t-next
-> with the virtio core maintains's Acked-by.
->
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
->
-> ## AF_XDP
->
-> XDP socket(AF_XDP) is an excellent bypass kernel network framework. The z=
-ero
-> copy feature of xsk (XDP socket) needs to be supported by the driver. The
-> performance of zero copy is very good. mlx5 and intel ixgbe already suppo=
-rt
-> this feature, This patch set allows virtio-net to support xsk's zerocopy =
-xmit
-> feature.
->
-> At present, we have completed some preparation:
->
-> 1. vq-reset (virtio spec and kernel code)
-> 2. virtio-core premapped dma
-> 3. virtio-net xdp refactor
->
-> So it is time for Virtio-Net to complete the support for the XDP Socket
-> Zerocopy.
->
-> Virtio-net can not increase the queue num at will, so xsk shares the queu=
-e with
-> kernel.
->
-> On the other hand, Virtio-Net does not support generate interrupt from dr=
-iver
-> manually, so when we wakeup tx xmit, we used some tips. If the CPU run by=
- TX
-> NAPI last time is other CPUs, use IPI to wake up NAPI on the remote CPU. =
-If it
-> is also the local CPU, then we wake up napi directly.
->
-> This patch set includes some refactor to the virtio-net to let that to su=
-pport
-> AF_XDP.
->
-> ## performance
->
-> ENV: Qemu with vhost-user(polling mode).
-> Host CPU: Intel(R) Xeon(R) Platinum 8163 CPU @ 2.50GHz
->
-> ### virtio PMD in guest with testpmd
->
-> testpmd> show port stats all
->
->  ######################## NIC statistics for port 0 #####################=
-###
->  RX-packets: 19531092064 RX-missed: 0     RX-bytes: 1093741155584
->  RX-errors: 0
->  RX-nombuf: 0
->  TX-packets: 5959955552 TX-errors: 0     TX-bytes: 371030645664
->
->
->  Throughput (since last show)
->  Rx-pps:   8861574     Rx-bps:  3969985208
->  Tx-pps:   8861493     Tx-bps:  3969962736
->  ########################################################################=
-####
->
-> ### AF_XDP PMD in guest with testpmd
->
-> testpmd> show port stats all
->
->   ######################## NIC statistics for port 0  ###################=
-#####
->   RX-packets: 68152727   RX-missed: 0          RX-bytes:  3816552712
->   RX-errors: 0
->   RX-nombuf:  0
->   TX-packets: 68114967   TX-errors: 33216      TX-bytes:  3814438152
->
->   Throughput (since last show)
->   Rx-pps:      6333196          Rx-bps:   2837272088
->   Tx-pps:      6333227          Tx-bps:   2837285936
->   #######################################################################=
-#####
->
-> But AF_XDP consumes more CPU for tx and rx napi(100% and 86%).
->
-> ## maintain
->
-> I am currently a reviewer for virtio-net. I commit to maintain AF_XDP sup=
-port in
-> virtio-net.
->
-> Please review.
->
+> > ---
+> >  drivers/net/tun.c   | 165 +++++++++++++++++++++++++++++++++++++++++++-
+> >  drivers/vhost/net.c |  18 +++--
+> >  2 files changed, 176 insertions(+), 7 deletions(-)
+> >
 
-Rethink of the whole design, I have one question:
+[...]
 
-The reason we need to store DMA information is to harden the virtqueue
-to make sure the DMA unmap is safe. This seems redundant when the
-buffer were premapped by the driver, for example:
+> >  struct tun_page {
+> > @@ -208,6 +21
+> >
+> > diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> > index f2ed7167c848..a1f143ad2341 100644
+> > --- a/drivers/vhost/net.c
+> > +++ b/drivers/vhost/net.c
+>
+> For virtio maintainer: is it okay to have tun and vhost/net changes in
+> the same patch, or is it better to split them?
 
-Receive queue maintains DMA information, so it doesn't need desc_extra to w=
-ork.
+It's better to split, but as you comment below, if it must be done in
+one patch we need to explain why.
 
-So can we simply
-
-1) when premapping is enabled, store DMA information by driver itself
-2) don't store DMA information in desc_extra
-
-Would this be simpler?
+>
+> > @@ -169,9 +169,10 @@ static int vhost_net_buf_is_empty(struct vhost_net=
+_buf *rxq)
+> >
+> >  static void *vhost_net_buf_consume(struct vhost_net_buf *rxq)
+> >  {
+> > -     void *ret =3D vhost_net_buf_get_ptr(rxq);
+> > -     ++rxq->head;
+> > -     return ret;
+> > +     if (rxq->tail =3D=3D rxq->head)
+> > +             return NULL;
+> > +
+> > +     return rxq->queue[rxq->head++];
+>
+> Why this change?
 
 Thanks
 
