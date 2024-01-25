@@ -1,106 +1,82 @@
-Return-Path: <netdev+bounces-65952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F50B83CA39
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 18:42:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F72783CA41
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 18:44:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C013D1F218DE
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 17:42:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4C3F1F220E7
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 17:44:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1A7B131754;
-	Thu, 25 Jan 2024 17:42:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A435D13175B;
+	Thu, 25 Jan 2024 17:44:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="VMhqxUbA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hdHbrdAq"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8471413174E;
-	Thu, 25 Jan 2024 17:42:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D71C13175A;
+	Thu, 25 Jan 2024 17:44:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706204530; cv=none; b=Ptt3uhT8D6R5sLoOAVEOABAReJvpx9CulPm3HO8hwL/yEjGqKEmk4CY6ZFmROSFw5NrXDp3MbsUnnOpOfSiXw1CncPohCRtA1CcjIrV/gNwdKXMZHsduYG7EeL6zCAW4j6zvYC3AX0DjkPgy95vEZK87Lz53JJ/IZFAgsFgaNJg=
+	t=1706204686; cv=none; b=WYLN71A4zeK5+r5LGXKbgmCwZU7PMAMKMSbypQsCqaJjgA/56Mld5oDYlnYaykkp0FBTv+lbFPmVZwGTG5eM8iE5rfbt29/0RGCz/lsqiKnAReY2G1CT6MCat7i2SOwZN25rYssDnTDRccAfoNpm0Ktz6ePbKzB0so3BMvNHL50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706204530; c=relaxed/simple;
-	bh=CF6+Hi4GeAzVx8LW4GbLCLydMins7gG/oRur2TOzDOg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PpQDty+CEhuNdGpo/+Mu2vW/ZXpiZNilt3obB0OEHR92F7Q4z3TbLXukO+xdN6MP6wU/MvLEnUJIwGk+inbfJwmIrYXLAElNlwO+iEqXq32fBSa+jJklbsFiKgzP5HtAXNHNmZj/Z94GPd7d8xmgPXiDIzGXCWMQmD/WEPVqBBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=VMhqxUbA; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=MES6gX+8+nsyFlBsllvbTSH4KOA6qMyryRvdsV3V++0=; b=VMhqxUbASXJ0v04b3ZignKoixS
-	cOQIm2Edg+dGILNGx7+XCILEu2nd3Z91Reo/SiiMfOoBlzAW3sKGo+BuHIfjSN1u68GV4Lspnszdy
-	/gNOWmOpZwev7iXCWY04Y/090Q3Ej56a/5rs/RogJ3WrXLRyI4iIY9gfhdr3YpzXEsLM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rT3jp-0066ie-GY; Thu, 25 Jan 2024 18:42:05 +0100
-Date: Thu, 25 Jan 2024 18:42:05 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	tmgross@umich.edu
-Subject: Re: [PATCH net-next] rust: phy: use VTABLE_DEFAULT_ERROR
-Message-ID: <4573a237-dd18-4ea0-8de4-8b465eb856c7@lunn.ch>
-References: <20240125014502.3527275-1-fujita.tomonori@gmail.com>
- <20240125014502.3527275-2-fujita.tomonori@gmail.com>
+	s=arc-20240116; t=1706204686; c=relaxed/simple;
+	bh=nSGwV2wF/A1m1KK33CaJZwXh3S7H2z5bahv5KRLksB4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=H5xGx5ZX+0O6/bHxZkJU9zs824HrbLrE2sR+kqgZOhKBo7e3MdC6sMeps87mDtwmACIy7kV1WEM2KPaZmGmhuUF1bA97NyNvOpkP/2y8D7w5ZA0rVZgube2Kc8ZZWRnj1x89CyuQedDsbT9Ip4cfIdsgsKpRprgrNsTNxg4R/0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hdHbrdAq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 919ACC433C7;
+	Thu, 25 Jan 2024 17:44:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706204686;
+	bh=nSGwV2wF/A1m1KK33CaJZwXh3S7H2z5bahv5KRLksB4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hdHbrdAqT2alPvemeu3jLjZ3JHu0DurC/s+/H7+BDLCVZu2XlCcJUwAkFFQggt+da
+	 esOSKqPtpkWKLLIT3MpqAsBLhFUq3j60Z9KhNEWWyclOvHUmQ0BKC0nvU0nmOSJ6uV
+	 JhKnWsQ1TcSpugkRQW/d0GcSED727DX2VAPRVojQLIq8FYzwL/9Uz+XvZM2566Wxjw
+	 88+5pqSB9vthc+X28dzy1qDXADNo01L9wtAFTbqdIzEO2cc3+UsfnOJoRj+z52r0QN
+	 W+Cv4xTusZZFDX59Xlka52qkepPjYweqolT9XthKdpLhDszHcAaiJeE8SB3xJxCPJN
+	 44zEekVODTswg==
+Date: Thu, 25 Jan 2024 09:44:44 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: Pavan Chebbi <pavan.chebbi@broadcom.com>, Michael Chan
+ <michael.chan@broadcom.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
+ Cochran <richardcochran@gmail.com>, gospo@broadcom.com, "open list:BROADCOM
+ BNXT_EN 50 GIGABIT ETHERNET DRIVER" <netdev@vger.kernel.org>, open list
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net] bnxt_en: Make PTP timestamp HWRM more silent
+Message-ID: <20240125094444.3185487e@kernel.org>
+In-Reply-To: <CALs4sv3cpcy5G6d+3UL8dVSyN1vFbgiin8gLiVxKOfWUAAB0+Q@mail.gmail.com>
+References: <20240125134104.2045573-1-leitao@debian.org>
+	<CALs4sv2U+3uu1Nz0Sf9_Ya6YKxK09WU=QH4VmO94FjC3iWX3rA@mail.gmail.com>
+	<ZbJ11qxfmOfRseJO@gmail.com>
+	<CALs4sv3cpcy5G6d+3UL8dVSyN1vFbgiin8gLiVxKOfWUAAB0+Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240125014502.3527275-2-fujita.tomonori@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jan 25, 2024 at 10:45:02AM +0900, FUJITA Tomonori wrote:
-> Since 6.8-rc1, using VTABLE_DEFAULT_ERROR for optional functions
-> (never called) in #[vtable] is the recommended way.
-> 
-> Note that no functional changes in this patch.
-> 
-> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
-> ---
->  rust/kernel/net/phy.rs | 16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
-> 
-> diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
-> index 203918192a1f..96e09c6e8530 100644
-> --- a/rust/kernel/net/phy.rs
-> +++ b/rust/kernel/net/phy.rs
-> @@ -580,12 +580,12 @@ pub trait Driver {
->  
->      /// Issues a PHY software reset.
->      fn soft_reset(_dev: &mut Device) -> Result {
-> -        Err(code::ENOTSUPP)
-> +        kernel::build_error(VTABLE_DEFAULT_ERROR)
->      }
+On Thu, 25 Jan 2024 20:51:25 +0530 Pavan Chebbi wrote:
+> > > LGTM, however, you may still need to add a proper fixes tag.  
+> >
+> > Thanks. I didn't include a fix tag because it is not a fix per se, but,
+> > I can easily send a v2 if this is needed.  
 
-Dumb question, which i should probably duckduckgo myself.
+We should pick it as a fix. If we put it in net-next and someone
+complains cherry-picking it into net would be a PITA. And we shouldn't
+spew WARN()s about known-to-be-occurring conditions, GregKH is pretty
+clear about that.
 
-Why is it called VTABLE_DEFAULT_ERROR and not
-VTABLE_NOT_SUPPORTED_ERROR?
-
-Looking through the C code my guess would be -EINVAL would be the
-default, or maybe 0.
-
-The semantics of ENOTSUPP can also vary. Its often not an actual
-error, it just a means to indicate its not supported, and the caller
-might decide to do something different as a result. One typical use in
-the network stack is offloading functionality to hardware.
-e.g. blinking the LEDs on the RJ45 connected. The driver could be
-asked to blink to show activity of a received packet. Some hardware
-can only indicate activity for both receive and transmit, so the
-driver would return -EOPNOTSUPP. Software blinking would then be used
-instead of hardware blinking.
-
-	 Andrew
+If you can post the Fixes tag in a reply our apply scripts should pick
+it up automatically. Or at least mine will :)
 
