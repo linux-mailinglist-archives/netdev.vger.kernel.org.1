@@ -1,112 +1,173 @@
-Return-Path: <netdev+bounces-65912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E433383C5F5
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 16:01:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 240D183C5F7
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 16:01:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B0801F26962
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 15:01:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 55E22B24411
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 15:01:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E385633F0;
-	Thu, 25 Jan 2024 14:58:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="QSH+IOcz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C567E7690F;
+	Thu, 25 Jan 2024 14:59:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CEBE3A1B6
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 14:58:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3124063108
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 14:59:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706194716; cv=none; b=mXYuwTNBpW24xy/NBon4YShAcwAFtdJCEz9LD25ZNKxf/7pn5STeoaSoIEYsXWs5kJch9LouRhDemYNrQOhfFXhmdPMt/GZWQiv212Ca5/H0HhLT94Yp0ZE2/5O3j1VFtHgXl/4qb0qCuLucPRLMywnx5gp8L1SSoCK1QqO7khg=
+	t=1706194770; cv=none; b=as+9WETn+3u/zBpu9Sb04zdVzu9iWTCKc1JBvKGx0WNvMEgjWqLICFtRoQOjHmOHjxqGAx7UQV2xkwLO0o8nSDZluHuro3Uv7Bi0UeRixDjHWFa/HtEim6U9RKo8Gz/kvoNRUGp+oGDcHeFcykr7QRoAIrNHNZmX6SgAiI0aTzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706194716; c=relaxed/simple;
-	bh=rd6oVQa+k79eRxijjYNuA9nITD36Vt//Tdbgl8Y9V0s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=SSsdhIw0u2otY75xdcDoGmhEjcxlBX/tG53LVx34C7+q/GJASjCnin7LWayY98RJITE8VTC6gEao89U/GErz9mOnogHjPrnMaN6F+3l7VbJ2xEe4RQm/OBtxHxsJ6qL2gPCzKysOB8DyHE7gCcdPip+VODY0NNzErCTv1K5CKw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=QSH+IOcz; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40P5MMgO001493;
-	Thu, 25 Jan 2024 06:58:20 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=pfpt0220;
-	 bh=1AI9tTIT4DZn/0HfsAZ6EULmpHvXVdOqQb84r6NaMZY=; b=QSH+IOczlpcN
-	Nd6ZjX/zTtmBzBljCqZGX0fgLIHrfyLWYdTY53ixdTdmV3ywc590HbGWWUuBYiVs
-	h1NBoK7ucOQJeFh4I0Pmwv1elPGlFhnuBWQR8gjth26+BsUkXeiuucjhYw3cfSOU
-	9lTW3E28GYGYs9AVuPrwxQ044eCHCHNq3tDpMT8l5xdJJDm5ec2EmC52iaej1/xW
-	vffGM0xOFRIxjcx0I0mWrOHPs39JuE6F+jR05mCs87DPAJ1USsR0Sdlk5HLSLw4U
-	ZxeMGZUzmYx4x9D1qMyTT5F1Adl7SgsM+j2VToQVq6lOkNziXp6HuynDfBBROaSs
-	Z01k6datlQ==
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3vuhehswh8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Thu, 25 Jan 2024 06:58:19 -0800 (PST)
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 25 Jan
- 2024 06:58:18 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Thu, 25 Jan 2024 06:58:18 -0800
-Received: from [10.9.8.28] (unknown [10.9.8.28])
-	by maili.marvell.com (Postfix) with ESMTP id AA6243F7044;
-	Thu, 25 Jan 2024 06:58:12 -0800 (PST)
-Message-ID: <02c93063-a6a3-8992-38dc-b978529736c4@marvell.com>
-Date: Thu, 25 Jan 2024 15:58:10 +0100
+	s=arc-20240116; t=1706194770; c=relaxed/simple;
+	bh=SfFn+LVcnbuv5H4nqloyIIFSzx33UBtzl06rVuhZWQ0=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=re7krH/2dtkYjWZJY1163hw26fnQetdqY8a1HDaOjz0Q+Cg6/lI0VNlcbounKKcLOjCDF7AX61fi0t/cK/zvGf8bkrVKYXgK3S5IChTX1sT8JeUUj8JJDSoGQTX5WuQjm+FnVBE/bweizJfu0DT/H3V916Z570o5RV1NxOPFf+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-361a7ea0c21so55913675ab.3
+        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 06:59:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706194768; x=1706799568;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mU/6jmvsgWaXqy37Fg30ApZ+uX0PZZKZQyHdPjP2LT8=;
+        b=XdqixGDe27L0nGx7ACK+yCVd7NuUCySvgi69zriS9vuzUyixMzmrN6H2uMZJbI6THZ
+         4ixMcTIydZ6au/7hNsDGsSXokYa+z3SPDMcRXZeH1LwFHS7D1NE+4UbIml5amk/kZlfg
+         /lDPmS+XZYdfCWjrXqqg60+S99SQeqgfWqlXuPBzZf0ed+vEamke8GicM7Mu+WON3K2v
+         1jrmaCbsxu1nqs+B5+czO+HqFOeZbRN8M6KdioaEBogxuIDkw7hJxv5mTnQcHLNscVxf
+         d3Rzblf2ZzeyhiCZy7Mo71zjr/IbA5xpkCsi7+LNktToPNgJL2uik+RPF/oE8b773Pob
+         q2+Q==
+X-Gm-Message-State: AOJu0YxfD5BerzIZm0YdYqxE3aLYCErzJTdSRcxgRdGYYi01QPXQsJsh
+	rusHSKa0Po/C+77hTfaz8YNfc/r62gbXE1qesHxY1adLmN6JBOLcnyYT2Lgl2r/uzSwOLIKEkRe
+	ly9TMId9RHCx5NUP1BuU/bgE+VQdix2g79JZntblGtkFdIBfcYZvkkO4=
+X-Google-Smtp-Source: AGHT+IHp4re/iMw2MOCT4gjPBNDzQTxoQGWDHzn1FkIssXpT44U6JZgNW0rYoAj/TyX3Vzm/1ErbMQyJ6nxzkngKtY20pGUYu6Bv
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [EXT] Aquantia ethernet driver suspend/resume issues
-To: Peter Waller <p@pwaller.net>
-CC: Jakub Kicinski <kuba@kernel.org>,
-        Linus Torvalds
-	<torvalds@linux-foundation.org>,
-        Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>,
-        Netdev <netdev@vger.kernel.org>
-References: <3b607ba8-ef5a-56b3-c907-694c0bde437c@marvell.com>
- <E8060D65-F6C2-4AF5-AE3F-8ED8A30F95EF@pwaller.net>
- <32a0ccb2-9570-4099-961c-6a53e1a553d7@pwaller.net>
-Content-Language: en-US
-From: Igor Russkikh <irusskikh@marvell.com>
-In-Reply-To: <32a0ccb2-9570-4099-961c-6a53e1a553d7@pwaller.net>
+X-Received: by 2002:a05:6e02:12c2:b0:361:9a4c:8bf5 with SMTP id
+ i2-20020a056e0212c200b003619a4c8bf5mr151623ilm.6.1706194768397; Thu, 25 Jan
+ 2024 06:59:28 -0800 (PST)
+Date: Thu, 25 Jan 2024 06:59:28 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000169132060fc66db3@google.com>
+Subject: [syzbot] [net?] [nfc?] KMSAN: uninit-value in nci_dev_up
+From: syzbot <syzbot+7ea9413ea6749baf5574@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, krzysztof.kozlowski@linaro.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-ORIG-GUID: VgzmYXV5kxHpWpjVPFqiFXNXTWAGUUrT
-X-Proofpoint-GUID: VgzmYXV5kxHpWpjVPFqiFXNXTWAGUUrT
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-25_08,2024-01-25_01,2023-05-22_02
+
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    9f8413c4a66f Merge tag 'cgroup-for-6.8' of git://git.kerne..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=14d73c27e80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=656820e61b758b15
+dashboard link: https://syzkaller.appspot.com/bug?extid=7ea9413ea6749baf5574
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/79d9f2f4b065/disk-9f8413c4.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/cbc68430d9c6/vmlinux-9f8413c4.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/9740ad9fc172/bzImage-9f8413c4.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+7ea9413ea6749baf5574@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in nci_init_req net/nfc/nci/core.c:177 [inline]
+BUG: KMSAN: uninit-value in __nci_request net/nfc/nci/core.c:108 [inline]
+BUG: KMSAN: uninit-value in nci_open_device net/nfc/nci/core.c:521 [inline]
+BUG: KMSAN: uninit-value in nci_dev_up+0xfec/0x1b10 net/nfc/nci/core.c:632
+ nci_init_req net/nfc/nci/core.c:177 [inline]
+ __nci_request net/nfc/nci/core.c:108 [inline]
+ nci_open_device net/nfc/nci/core.c:521 [inline]
+ nci_dev_up+0xfec/0x1b10 net/nfc/nci/core.c:632
+ nfc_dev_up+0x26e/0x440 net/nfc/core.c:118
+ nfc_genl_dev_up+0xfe/0x1d0 net/nfc/netlink.c:770
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:972 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1052 [inline]
+ genl_rcv_msg+0x11ec/0x1290 net/netlink/genetlink.c:1067
+ netlink_rcv_skb+0x371/0x650 net/netlink/af_netlink.c:2545
+ genl_rcv+0x40/0x60 net/netlink/genetlink.c:1076
+ netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
+ netlink_unicast+0xf47/0x1250 net/netlink/af_netlink.c:1368
+ netlink_sendmsg+0x1238/0x13d0 net/netlink/af_netlink.c:1910
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg net/socket.c:745 [inline]
+ ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
+ __sys_sendmsg net/socket.c:2667 [inline]
+ __do_sys_sendmsg net/socket.c:2676 [inline]
+ __se_sys_sendmsg net/socket.c:2674 [inline]
+ __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x6d/0x140 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+Uninit was stored to memory at:
+ nci_core_reset_ntf_packet net/nfc/nci/ntf.c:36 [inline]
+ nci_ntf_packet+0x19dc/0x39c0 net/nfc/nci/ntf.c:782
+ nci_rx_work+0x213/0x500 net/nfc/nci/core.c:1522
+ process_one_work kernel/workqueue.c:2633 [inline]
+ process_scheduled_works+0x104e/0x1e70 kernel/workqueue.c:2706
+ worker_thread+0xf45/0x1490 kernel/workqueue.c:2787
+ kthread+0x3ed/0x540 kernel/kthread.c:388
+ ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+
+Uninit was created at:
+ slab_post_alloc_hook+0x129/0xa70 mm/slab.h:768
+ slab_alloc_node mm/slub.c:3478 [inline]
+ kmem_cache_alloc_node+0x5e9/0xb10 mm/slub.c:3523
+ kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:560
+ __alloc_skb+0x318/0x740 net/core/skbuff.c:651
+ alloc_skb include/linux/skbuff.h:1286 [inline]
+ virtual_ncidev_write+0x6d/0x280 drivers/nfc/virtual_ncidev.c:120
+ vfs_write+0x48b/0x1200 fs/read_write.c:588
+ ksys_write+0x20f/0x4c0 fs/read_write.c:643
+ __do_sys_write fs/read_write.c:655 [inline]
+ __se_sys_write fs/read_write.c:652 [inline]
+ __x64_sys_write+0x93/0xd0 fs/read_write.c:652
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x6d/0x140 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+CPU: 1 PID: 5642 Comm: syz-executor.0 Not tainted 6.7.0-syzkaller-00562-g9f8413c4a66f #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+=====================================================
 
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-On 1/23/2024 10:02 PM, Peter Waller wrote:
-> Here's part of the log, I can provide more off list if it helps. - Peter
-> 
-> <n>.678900 atlantic 0000:0c:00.0: AMD-Vi: Event logged [IO_PAGE_FAULT
-> domain=0x0014 address=0xfc80b000 flags=0x0020]
-> <n>.679124 atlantic 0000:0c:00.0: AMD-Vi: Event logged [IO_PAGE_FAULT
-> domain=0x0014 address=0xffeae520 flags=0x0020]
-> <n>.679270 atlantic 0000:0c:00.0: AMD-Vi: Event logged [IO_PAGE_FAULT
-> domain=0x0014 address=0xfc80c000 flags=0x0020]
-> <n>.679411 atlantic 0000:0c:00.0: AMD-Vi: Event logged [IO_PAGE_FAULT
-> domain=0x0014 address=0xffeae530 flags=0x0020]
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-Thanks, these looks like descriptor prefetch accesses (those aligned by 0x10), and packet page accesses (aligned by 0x1000).
-Overall strange, because driver normally deinit all the device activities, not to access host memory after unmapping.
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-I will check if there any potential flaws exist.
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-Regards,
-  Igor
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
