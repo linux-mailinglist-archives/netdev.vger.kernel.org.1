@@ -1,172 +1,319 @@
-Return-Path: <netdev+bounces-65932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A85583C846
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 17:40:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8626F83C84A
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 17:42:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD76C1F229D7
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 16:40:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3462C28F56B
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 16:42:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12E3A129A6D;
-	Thu, 25 Jan 2024 16:40:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FCB312FF96;
+	Thu, 25 Jan 2024 16:42:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RQh9hhVr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QfxGgY4p"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ABBB6E2D3
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 16:40:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B440458AAE;
+	Thu, 25 Jan 2024 16:42:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706200850; cv=none; b=gfOKGJTHO/z6FtRgUq6SPW4ihoB3rB5BeMfhWDQ90wjdKkL8aZUujevAftBQwXmwFU5P5D+yZedgpSEAfe+mJA6VvnM2bPLXC7D5D9mU+VcGHMAFo0xmRTQ1o1mkwCLK+iTPYpb9+TiO5S12QjlSawLipqw67b/KvKr6mbsuGa4=
+	t=1706200932; cv=none; b=LRVNhItzLT2YrKYR49/Tggqega0RIiIxgJL1xwl06K6cyYEFI20Zq5S9Ogrt35TjMDsVdnheIHc4HHhsVltGFC8pEy4ZDIRwSu30v1xJezhG8bzko+dapy3e7cz6Ut6SBW16Xjlzdswh5a0UdNC2h/WPB1UGdIK3xCgN090fHDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706200850; c=relaxed/simple;
-	bh=O0W7pO1QHGmvl4eOGKao4AsXE/QJTJavOppMaeBzfoI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=IA2n/4JeVqUMygEqJDYfKrYRspzRlKlY8Eu3SFfWTqcsq977Kpb7rugpZYy1aVUgERUum+lYli4EfsxcnMczkVXsFNcczaqolMwgMOMqmqei1GTmCnvIiHBK8qmdUULfCrn5sT+BuUR1FodgRGuEBVizRKqql66bsVG/QXlFVng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RQh9hhVr; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706200847;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=+ZJC9fSsX7Z9bz1ya4lAJC0kXlHYdZclBj9kIZ708co=;
-	b=RQh9hhVra6KYxhwY0G5K5/2mLvcfKbvieHBhOBwlTFGvkpR3PBh0+vieKHqTAYK2Pixy/Q
-	d55wHrfOcPM8DOmNr748KtG3H5f0uD0z4QEQOsjSHwulEoNCTT7l+U1ZEGXbQ7oNrv88ur
-	VOOEf7KuxndKBfmi5pRAqdPgF7reOjY=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-139-4zQq_P5pPVqWDP-ax56K_Q-1; Thu, 25 Jan 2024 11:40:45 -0500
-X-MC-Unique: 4zQq_P5pPVqWDP-ax56K_Q-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40e354aaf56so18309715e9.1
-        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 08:40:45 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706200844; x=1706805644;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+ZJC9fSsX7Z9bz1ya4lAJC0kXlHYdZclBj9kIZ708co=;
-        b=UJ0eIM4QjOEe4b87rXiUgj81yTOSyuf47AjyN2X5NnJS3G4MYHwwr7sFEgwhxSCW6N
-         teu66+nX4qUYTEViCRr0OZExjTH5MUuJ1iBfQDeyR4UsVvp+4UqiN3zVWTS/ZAn3+LkG
-         PqHF10c+FNIaID6vGk4Op07pJ6TxT3g7bAw8ErKkwSpCkwoz+wm3F+s4ze00kX7gudGq
-         w7kk5PrryST/ZZAm++aDDpMN/A/MuaChie1BUe8Q/N9Xgm/3ceBVMoh9LTUETpVyb8jx
-         bd5+Xy8Q4SQfZTeokwiTgBitr0NxxV/1j0UQ9rBh7f3pgdfQwiGpnlH8pKDnt88gv4g/
-         PM9Q==
-X-Gm-Message-State: AOJu0YwxLiWHIz/fNoQL45J15eEvcGq4rPhBGglEQTiVdFpqHxTuLjlQ
-	6UIDEm/bcaxZ2a1OrI676TELDFKcqvgFdpNWCxj6paEAXRfCy6OCe/eXWAfq96+SfHPdgVfHhTO
-	vCEeJXuh/7Dqf62PTxhis3CcEzmZEG3lpZGYo0vKdbMCIAqkeOJzPQA==
-X-Received: by 2002:a05:600c:1ca0:b0:40e:c217:7cb with SMTP id k32-20020a05600c1ca000b0040ec21707cbmr3425wms.4.1706200844513;
-        Thu, 25 Jan 2024 08:40:44 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG9tqTmYtVQowX5zZVPD5P/lEFMCgv8Xk4wJwMNPtj+4Zxo7vT8pC9xV/prll1hJiv5GJubaQ==
-X-Received: by 2002:a05:600c:1ca0:b0:40e:c217:7cb with SMTP id k32-20020a05600c1ca000b0040ec21707cbmr3398wms.4.1706200844075;
-        Thu, 25 Jan 2024 08:40:44 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-244-75.dyn.eolo.it. [146.241.244.75])
-        by smtp.gmail.com with ESMTPSA id fm25-20020a05600c0c1900b0040e3bdff98asm3218399wmb.23.2024.01.25.08.40.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jan 2024 08:40:43 -0800 (PST)
-Message-ID: <a50e07e46036947c873df09b6a48bc8b74547689.camel@redhat.com>
-Subject: Re: [PATCH net] selftests: net: add missing required classifier
-From: Paolo Abeni <pabeni@redhat.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Jakub
- Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>, Maciej
- enczykowski <maze@google.com>,  Lina Wang <lina.wang@mediatek.com>,
- linux-kselftest@vger.kernel.org
-Date: Thu, 25 Jan 2024 17:40:42 +0100
-In-Reply-To: <CANn89iK_i+7RzgeaGQPUieU3c0ME27QeJU9UH9j-ii2TeBoEAA@mail.gmail.com>
-References: 
-	<7c3643763b331e9a400e1874fe089193c99a1c3f.1706170897.git.pabeni@redhat.com>
-	 <CANn89iKqShowy=xMi2KwthYB6gz9X5n9kcqwh_5-JBJ3-jnK+g@mail.gmail.com>
-	 <ecf42dd37e90fec22edd16f64b55189a24147b21.camel@redhat.com>
-	 <CANn89iK_i+7RzgeaGQPUieU3c0ME27QeJU9UH9j-ii2TeBoEAA@mail.gmail.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=mQINBGISiDUBEAC5uMdJicjm3ZlWQJG4u2EU1EhWUSx8IZLUTmEE8zmjPJFSYDcjtfGcbzLPb63BvX7FADmTOkO7gwtDgm501XnQaZgBUnCOUT8qv5MkKsFH20h1XJyqjPeGM55YFAXc+a4WD0YyO5M0+KhDeRLoildeRna1ey944VlZ6Inf67zMYw9vfE5XozBtytFIrRyGEWkQwkjaYhr1cGM8ia24QQVQid3P7SPkR78kJmrT32sGk+TdR4YnZzBvVaojX4AroZrrAQVdOLQWR+w4w1mONfJvahNdjq73tKv51nIpu4SAC1Zmnm3x4u9r22mbMDr0uWqDqwhsvkanYmn4umDKc1ZkBnDIbbumd40x9CKgG6ogVlLYeJa9WyfVMOHDF6f0wRjFjxVoPO6p/ZDkuEa67KCpJnXNYipLJ3MYhdKWBZw0xc3LKiKc+nMfQlo76T/qHMDfRMaMhk+L8gWc3ZlRQFG0/Pd1pdQEiRuvfM5DUXDo/YOZLV0NfRFU9SmtIPhbdm9cV8Hf8mUwubihiJB/9zPvVq8xfiVbdT0sPzBtxW0fXwrbFxYAOFvT0UC2MjlIsukjmXOUJtdZqBE3v3Jf7VnjNVj9P58+MOx9iYo8jl3fNd7biyQWdPDfYk9ncK8km4skfZQIoUVqrWqGDJjHO1W9CQLAxkfOeHrmG29PK9tHIwARAQABtB9QYW9sbyBBYmVuaSA8cGFiZW5pQHJlZGhhdC5jb20+iQJSBBMBCAA8FiEEg1AjqC77wbdLX2LbKSR5jcyPE6QFAmISiDUCGwMFCwkIBwIDIgIBBhUKCQgLAgQWAgMBAh4HAheAAAoJECkkeY3MjxOkJSYQAJcc6MTsuFxYdYZkeWjW//zbD3ApRHzpNlHLVSuJqHr9/aDS+tyszgS8jj9MiqALzgq4iZbg
- 7ZxN9ZsDL38qVIuFkSpgMZCiUHdxBC11J8nbBSLlpnc924UAyr5XrGA99 6Wl5I4Km3128GY6iAkH54pZpOmpoUyBjcxbJWHstzmvyiXrjA2sMzYjt3Xkqp0cJfIEekOi75wnNPofEEJg28XPcFrpkMUFFvB4Aqrdc2yyR8Y36rbw18sIX3dJdomIP3dL7LoJi9mfUKOnr86Z0xltgcLPGYoCiUZMlXyWgB2IPmmcMP2jLJrusICjZxLYJJLofEjznAJSUEwB/3rlvFrSYvkKkVmfnfro5XEr5nStVTECxfy7RTtltwih85LlZEHP8eJWMUDj3P4Q9CWNgz2pWr1t68QuPHWaA+PrXyasDlcRpRXHZCOcvsKhAaCOG8TzCrutOZ5NxdfXTe3f1jVIEab7lNgr+7HiNVS+UPRzmvBc73DAyToKQBn9kC4jh9HoWyYTepjdcxnio0crmara+/HEyRZDQeOzSexf85I4dwxcdPKXv0fmLtxrN57Ae82bHuRlfeTuDG3x3vl/Bjx4O7Lb+oN2BLTmgpYq7V1WJPUwikZg8M+nvDNcsOoWGbU417PbHHn3N7yS0lLGoCCWyrK1OY0QM4EVsL3TjOfUtCNQYW9sbyBBYmVuaSA8cGFvbG8uYWJlbmlAZ21haWwuY29tPokCUgQTAQgAPBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEoitAhsDBQsJCAcCAyICAQYVCgkICwIEFgIDAQIeBwIXgAAKCRApJHmNzI8TpBzHD/45pUctaCnhee1vkQnmStAYvHmwrWwIEH1lzDMDCpJQHTUQOOJWDAZOFnE/67bxSS81Wie0OKW2jvg1ylmpBA0gPpnzIExQmfP72cQ1TBoeVColVT6Io35BINn+ymM7c0Bn8RvngSEpr3jBtqvvWXjvtnJ5/HbOVQCg62NC6ewosoKJPWpGXMJ9SKsVIOUHsmoWK60spzeiJoSmAwm3zTJQnM5kRh2q
- iWjoCy8L35zPqR5TV+f5WR5hTVCqmLHSgm1jxwKhPg9L+GfuE4d0SWd84y GeOB3sSxlhWsuTj1K6K3MO9srD9hr0puqjO9sAizd0BJP8ucf/AACfrgmzIqZXCfVS7jJ/M+0ic+j1Si3yY8wYPEi3dvbVC0zsoGj9n1R7B7L9c3g1pZ4L9ui428vnPiMnDN3jh9OsdaXeWLvSvTylYvw9q0DEXVQTv4/OkcoMrfEkfbXbtZ3PRlAiddSZA5BDEkkm6P9KA2YAuooi1OD9d4MW8LFAeEicvHG+TPO6jtKTacdXDRe611EfRwTjBs19HmabSUfFcumL6BlVyceIoSqXFe5jOfGpbBevTZtg4kTSHqymGb6ra6sKs+/9aJiONs5NXY7iacZ55qG3Ib1cpQTps9bQILnqpwL2VTaH9TPGWwMY3Nc2VEc08zsLrXnA/yZKqZ1YzSY9MGXWYLkCDQRiEog1ARAAyXMKL+x1lDvLZVQjSUIVlaWswc0nV5y2EzBdbdZZCP3ysGC+s+n7xtq0o1wOvSvaG9h5q7sYZs+AKbuUbeZPu0bPWKoO02i00yVoSgWnEqDbyNeiSW+vI+VdiXITV83lG6pS+pAoTZlRROkpb5xo0gQ5ZeYok8MrkEmJbsPjdoKUJDBFTwrRnaDOfb+Qx1D22PlAZpdKiNtwbNZWiwEQFm6mHkIVSTUe2zSemoqYX4QQRvbmuMyPIbwbdNWlItukjHsffuPivLF/XsI1gDV67S1cVnQbBgrpFDxN62USwewXkNl+ndwa+15wgJFyq4Sd+RSMTPDzDQPFovyDfA/jxN2SK1Lizam6o+LBmvhIxwZOfdYH8bdYCoSpqcKLJVG3qVcTwbhGJr3kpRcBRz39Ml6iZhJyI3pEoX3bJTlR5Pr1Kjpx13qGydSMos94CIYWAKhegI06aTdvvuiigBwjngo/Rk5S+iEGR5KmTqGyp27o6YxZy6D4NIc6PKUzhIUxfvuHNvfu
- sD2W1U7eyLdm/jCgticGDsRtweytsgCSYfbz0gdgUuL3EBYN3JLbAU+UZpy v/fyD4cHDWaizNy/KmOI6FFjvVh4LRCpGTGDVPHsQXaqvzUybaMb7HSfmBBzZqqfVbq9n5FqPjAgD2lJ0rkzb9XnVXHgr6bmMRlaTlBMAEQEAAYkCNgQYAQgAIBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEog1AhsMAAoJECkkeY3MjxOkY1YQAKdGjHyIdOWSjM8DPLdGJaPgJdugHZowaoyCxffilMGXqc8axBtmYjUIoXurpl+f+a7S0tQhXjGUt09zKlNXxGcebL5TEPFqgJTHN/77ayLslMTtZVYHE2FiIxkvW48yDjZUlefmphGpfpoXe4nRBNto1mMB9Pb9vR47EjNBZCtWWbwJTIEUwHP2Z5fV9nMx9Zw2BhwrfnODnzI8xRWVqk7/5R+FJvl7s3nY4F+svKGD9QHYmxfd8Gx42PZc/qkeCjUORaOf1fsYyChTtJI4iNm6iWbD9HK5LTMzwl0n0lL7CEsBsCJ97i2swm1DQiY1ZJ95G2Nz5PjNRSiymIw9/neTvUT8VJJhzRl3Nb/EmO/qeahfiG7zTpqSn2dEl+AwbcwQrbAhTPzuHIcoLZYV0xDWzAibUnn7pSrQKja+b8kHD9WF+m7dPlRVY7soqEYXylyCOXr5516upH8vVBmqweCIxXSWqPAhQq8d3hB/Ww2A0H0PBTN1REVw8pRLNApEA7C2nX6RW0XmA53PIQvAP0EAakWsqHoKZ5WdpeOcH9iVlUQhRgemQSkhfNaP9LqR1XKujlTuUTpoyT3xwAzkmSxN1nABoutHEO/N87fpIbpbZaIdinF7b9srwUvDOKsywfs5HMiUZhLKoZzCcU/AEFjQsPTATACGsWf3JYPnWxL9
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+	s=arc-20240116; t=1706200932; c=relaxed/simple;
+	bh=unKZxtZkNvgDgI5CInfVc1fnq6EYgeAlrqhGEyQdlhk=;
+	h=Date:From:To:Cc:Subject:Message-ID; b=RjqbcDwE/JtNHeYyHqURAJVCgpXJOp8G35vIoemqQ1A6f3EnHBTdY50/Taoe49oLPCULwmT81U6I+EvpRsX4YnoUmLyZH2VsrxtWZD2o68/+B46JgCTYo+a/GUrdPaROv/4JKN+dgAMqKiqHVufyiofwp+ylw/0Oe6tvRAY0UjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QfxGgY4p; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706200930; x=1737736930;
+  h=date:from:to:cc:subject:message-id;
+  bh=unKZxtZkNvgDgI5CInfVc1fnq6EYgeAlrqhGEyQdlhk=;
+  b=QfxGgY4pLgPwKh0qCb0lE8qNe1QicQYC9lhI36/MzueFyjlURghm2lI6
+   HKtKbPHRcrvUgRJZStlSZ9Kol+9AwSEeDXBzHqjCW6i2Z8JmTggAZVc3b
+   rtERXufNhxJSQqJ7DyrPMTSET2UG9XbZGhM2MSd7nNker7leQnLfiMVAL
+   cinU7f08/MCXDqYQUQMN7rNdFIjgB+43jILwYcpOR6daeJrst6dAyS9kt
+   HSC599q142ll5lAZceLveR7iodk/NbNkHdCQpdbwdXiohTT3giDcDjFN0
+   xlUpCmRev2urX1afCjT783sV/ppQKJpLJqfxw9p0mn8j2AG5oUo2sfjnY
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="2088007"
+X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
+   d="scan'208";a="2088007"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2024 08:42:07 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
+   d="scan'208";a="28817207"
+Received: from lkp-server01.sh.intel.com (HELO 370188f8dc87) ([10.239.97.150])
+  by fmviesa001.fm.intel.com with ESMTP; 25 Jan 2024 08:42:04 -0800
+Received: from kbuild by 370188f8dc87 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rT2nh-0000Cm-2R;
+	Thu, 25 Jan 2024 16:42:01 +0000
+Date: Fri, 26 Jan 2024 00:41:14 +0800
+From: kernel test robot <lkp@intel.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Linux Memory Management List <linux-mm@kvack.org>,
+ dmaengine@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-arm-msm@vger.kernel.org, linux-bcachefs@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-usb@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: [linux-next:master] BUILD REGRESSION
+ 01af33cc9894b4489fb68fa35c40e9fe85df63dc
+Message-ID: <202401260007.1GUNDTMR-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
 
-On Thu, 2024-01-25 at 15:10 +0100, Eric Dumazet wrote:
-> On Thu, Jan 25, 2024 at 12:38=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> =
-wrote:
-> >=20
-> > On Thu, 2024-01-25 at 09:48 +0100, Eric Dumazet wrote:
-> > > On Thu, Jan 25, 2024 at 9:23=E2=80=AFAM Paolo Abeni <pabeni@redhat.co=
-m> wrote:
-> > > >=20
-> > > > the udpgro_fraglist self-test uses the BPF classifiers, but the
-> > > > current net self-test configuration does not include it, causing
-> > > > CI failures:
-> > > >=20
-> > > >  # selftests: net: udpgro_frglist.sh
-> > > >  # ipv6
-> > > >  # tcp - over veth touching data
-> > > >  # -l 4 -6 -D 2001:db8::1 -t rx -4 -t
-> > > >  # Error: TC classifier not found.
-> > > >  # We have an error talking to the kernel
-> > > >  # Error: TC classifier not found.
-> > > >  # We have an error talking to the kernel
-> > > >=20
-> > > > Add the missing knob.
-> > > >=20
-> > > > Fixes: edae34a3ed92 ("selftests net: add UDP GRO fraglist + bpf sel=
-f-tests")
-> > > > Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> > >=20
-> > > FYI, while looking at the gro test, I found that using strace was
-> > > making it failing as well.
-> >=20
-> > It looks like the gro.sh (large) tests send the to-be-aggregate
-> > segments individually and relay on the gro flush timeout being large
-> > enough to fit all the relevant write operations. I suspect/hope
-> > something alike:
-> >=20
-> > ---
-> > diff --git a/tools/testing/selftests/net/setup_veth.sh b/tools/testing/=
-selftests/net/setup_veth.sh
-> > index a9a1759e035c..1f78a87f6f37 100644
-> > --- a/tools/testing/selftests/net/setup_veth.sh
-> > +++ b/tools/testing/selftests/net/setup_veth.sh
-> > @@ -11,7 +11,7 @@ setup_veth_ns() {
-> >         local -r ns_mac=3D"$4"
-> >=20
-> >         [[ -e /var/run/netns/"${ns_name}" ]] || ip netns add "${ns_name=
-}"
-> > -       echo 100000 > "/sys/class/net/${ns_dev}/gro_flush_timeout"
-> > +       echo 1000000 > "/sys/class/net/${ns_dev}/gro_flush_timeout"
-> >         ip link set dev "${ns_dev}" netns "${ns_name}" mtu 65535
-> >         ip -netns "${ns_name}" link set dev "${ns_dev}" up
-> > ---
-> > should solve the sporadic issues.
->=20
-> I think you are right.
->=20
-> I tried multiple values, and found 600,000 was not enough in some cases.
->=20
-> With 1,000,000, I was able to run the test (with the strace overhead)
-> 100 times without a single failure.
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
+branch HEAD: 01af33cc9894b4489fb68fa35c40e9fe85df63dc  Add linux-next specific files for 20240125
 
-Thank you for testing!
+Error/Warning reports:
 
-Do you prefer I'll send the formal patch or do you prefer otherwise?=20
+https://lore.kernel.org/oe-kbuild-all/202401251829.0m6Eo4LI-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202401252355.PhD9im8z-lkp@intel.com
 
-Cheers,
+Error/Warning ids grouped by kconfigs:
 
-Paolo
+gcc_recent_errors
+|-- arm-allmodconfig
+|   |-- drivers-dma-at_hdmac.c:warning:Enum-value-ATC_IS_CYCLIC-not-described-in-enum-atc_status
+|   `-- drivers-dma-at_hdmac.c:warning:Enum-value-ATC_IS_PAUSED-not-described-in-enum-atc_status
+|-- arm-allyesconfig
+|   |-- drivers-dma-at_hdmac.c:warning:Enum-value-ATC_IS_CYCLIC-not-described-in-enum-atc_status
+|   `-- drivers-dma-at_hdmac.c:warning:Enum-value-ATC_IS_PAUSED-not-described-in-enum-atc_status
+|-- arm-randconfig-002-20240125
+|   |-- drivers-dma-at_hdmac.c:warning:Enum-value-ATC_IS_CYCLIC-not-described-in-enum-atc_status
+|   `-- drivers-dma-at_hdmac.c:warning:Enum-value-ATC_IS_PAUSED-not-described-in-enum-atc_status
+|-- arm-randconfig-003-20240125
+|   |-- drivers-dma-at_hdmac.c:warning:Enum-value-ATC_IS_CYCLIC-not-described-in-enum-atc_status
+|   `-- drivers-dma-at_hdmac.c:warning:Enum-value-ATC_IS_PAUSED-not-described-in-enum-atc_status
+|-- i386-randconfig-061-20240125
+|   |-- include-linux-mm_inline.h:sparse:sparse:incorrect-type-in-argument-(different-address-spaces)-expected-struct-anon_vma_name-anon_name-got-struct-anon_vma_name-noderef-__rcu-anon_name
+|   |-- mm-madvise.c:sparse:sparse:incorrect-type-in-argument-(different-address-spaces)-expected-struct-kref-kref-got-struct-kref-noderef-__rcu
+|   |-- mm-madvise.c:sparse:sparse:incorrect-type-in-assignment-(different-address-spaces)-expected-struct-anon_vma_name-noderef-__rcu-anon_name-got-struct-anon_vma_name
+|   `-- mm-madvise.c:sparse:sparse:incorrect-type-in-return-expression-(different-address-spaces)-expected-struct-anon_vma_name-got-struct-anon_vma_name-noderef-__rcu-anon_name
+|-- i386-randconfig-062-20240125
+|   `-- lib-checksum_kunit.c:sparse:sparse:incorrect-type-in-argument-(different-base-types)-expected-restricted-__wsum-usertype-sum-got-unsigned-int-assigned-csum
+|-- i386-randconfig-063-20240125
+|   `-- lib-checksum_kunit.c:sparse:sparse:incorrect-type-in-argument-(different-base-types)-expected-restricted-__wsum-usertype-sum-got-unsigned-int-assigned-csum
+|-- i386-randconfig-141-20240125
+|   |-- fs-bcachefs-btree_locking.c-bch2_trans_relock()-warn:passing-zero-to-PTR_ERR
+|   |-- fs-bcachefs-buckets.c-bch2_trans_account_disk_usage_change()-error:we-previously-assumed-trans-disk_res-could-be-null-(see-line-)
+|   `-- mm-huge_memory.c-thpsize_create()-warn:Calling-kobject_put-get-with-state-initialized-unset-from-line:
+|-- microblaze-randconfig-r123-20240125
+|   `-- lib-checksum_kunit.c:sparse:sparse:incorrect-type-in-argument-(different-base-types)-expected-restricted-__wsum-usertype-csum-got-unsigned-int-assigned-csum
+|-- mips-allyesconfig
+|   |-- (.ref.text):relocation-truncated-to-fit:R_MIPS_26-against-start_secondary
+|   `-- (.text):relocation-truncated-to-fit:R_MIPS_26-against-kernel_entry
+`-- parisc-randconfig-r112-20240125
+    |-- include-linux-mm_inline.h:sparse:sparse:incorrect-type-in-argument-(different-address-spaces)-expected-struct-anon_vma_name-anon_name-got-struct-anon_vma_name-noderef-__rcu-anon_name
+    |-- lib-checksum_kunit.c:sparse:sparse:incorrect-type-in-argument-(different-base-types)-expected-restricted-__wsum-usertype-sum-got-unsigned-int-assigned-csum
+    |-- mm-madvise.c:sparse:sparse:incorrect-type-in-argument-(different-address-spaces)-expected-struct-kref-kref-got-struct-kref-noderef-__rcu
+    |-- mm-madvise.c:sparse:sparse:incorrect-type-in-assignment-(different-address-spaces)-expected-struct-anon_vma_name-noderef-__rcu-anon_name-got-struct-anon_vma_name
+    `-- mm-madvise.c:sparse:sparse:incorrect-type-in-return-expression-(different-address-spaces)-expected-struct-anon_vma_name-got-struct-anon_vma_name-noderef-__rcu-anon_name
+clang_recent_errors
+|-- arm-defconfig
+|   |-- drivers-dma-at_hdmac.c:warning:Enum-value-ATC_IS_CYCLIC-not-described-in-enum-atc_status
+|   `-- drivers-dma-at_hdmac.c:warning:Enum-value-ATC_IS_PAUSED-not-described-in-enum-atc_status
+|-- hexagon-randconfig-r121-20240125
+|   |-- drivers-regulator-qcom_smd-regulator.c:sparse:sparse:symbol-smd_vreg_rpm-was-not-declared.-Should-it-be-static
+|   |-- drivers-usb-gadget-function-f_ncm.c:sparse:sparse:incorrect-type-in-assignment-(different-base-types)-expected-unsigned-short-usertype-max_segment_size-got-restricted-__le16-usertype
+|   `-- net-core-sock_diag.c:sparse:sparse:Using-plain-integer-as-NULL-pointer
+|-- mips-randconfig-r122-20240125
+|   `-- drivers-usb-cdns3-cdns3-gadget.c:sparse:sparse:restricted-__le32-degrades-to-integer
+|-- powerpc-randconfig-r132-20240125
+|   `-- drivers-regulator-qcom_smd-regulator.c:sparse:sparse:symbol-smd_vreg_rpm-was-not-declared.-Should-it-be-static
+|-- x86_64-randconfig-121-20240125
+|   `-- fs-proc-task_mmu.c:sparse:sparse:incorrect-type-in-argument-(different-address-spaces)-expected-struct-file-noderef-__rcu-f-got-struct-file
+`-- x86_64-randconfig-123-20240125
+    |-- include-linux-mm_inline.h:sparse:sparse:incorrect-type-in-argument-(different-address-spaces)-expected-struct-anon_vma_name-anon_name-got-struct-anon_vma_name-noderef-__rcu-anon_name
+    |-- mm-madvise.c:sparse:sparse:incorrect-type-in-argument-(different-address-spaces)-expected-struct-kref-kref-got-struct-kref-noderef-__rcu
+    |-- mm-madvise.c:sparse:sparse:incorrect-type-in-assignment-(different-address-spaces)-expected-struct-anon_vma_name-noderef-__rcu-anon_name-got-struct-anon_vma_name
+    `-- mm-madvise.c:sparse:sparse:incorrect-type-in-return-expression-(different-address-spaces)-expected-struct-anon_vma_name-got-struct-anon_vma_name-noderef-__rcu-anon_name
 
+elapsed time: 750m
+
+configs tested: 165
+configs skipped: 3
+
+tested configs:
+alpha                             allnoconfig   gcc  
+alpha                            allyesconfig   gcc  
+alpha                               defconfig   gcc  
+arc                              allmodconfig   gcc  
+arc                               allnoconfig   gcc  
+arc                              allyesconfig   gcc  
+arc                                 defconfig   gcc  
+arc                   randconfig-001-20240125   gcc  
+arc                   randconfig-002-20240125   gcc  
+arm                              allmodconfig   gcc  
+arm                               allnoconfig   gcc  
+arm                              allyesconfig   gcc  
+arm                                 defconfig   clang
+arm                   randconfig-001-20240125   gcc  
+arm                   randconfig-002-20240125   gcc  
+arm                   randconfig-003-20240125   gcc  
+arm                   randconfig-004-20240125   gcc  
+arm                        vexpress_defconfig   clang
+arm64                            allmodconfig   clang
+arm64                             allnoconfig   gcc  
+arm64                               defconfig   gcc  
+arm64                 randconfig-001-20240125   gcc  
+arm64                 randconfig-002-20240125   gcc  
+arm64                 randconfig-003-20240125   gcc  
+arm64                 randconfig-004-20240125   gcc  
+csky                             allmodconfig   gcc  
+csky                              allnoconfig   gcc  
+csky                             allyesconfig   gcc  
+csky                                defconfig   gcc  
+csky                  randconfig-001-20240125   gcc  
+csky                  randconfig-002-20240125   gcc  
+hexagon                          allmodconfig   clang
+hexagon                           allnoconfig   clang
+hexagon                          allyesconfig   clang
+hexagon                             defconfig   clang
+hexagon               randconfig-001-20240125   clang
+hexagon               randconfig-002-20240125   clang
+i386                             allmodconfig   clang
+i386                              allnoconfig   clang
+i386                             allyesconfig   clang
+i386         buildonly-randconfig-001-20240125   gcc  
+i386         buildonly-randconfig-002-20240125   gcc  
+i386         buildonly-randconfig-003-20240125   gcc  
+i386         buildonly-randconfig-004-20240125   gcc  
+i386         buildonly-randconfig-005-20240125   gcc  
+i386         buildonly-randconfig-006-20240125   gcc  
+i386                                defconfig   gcc  
+i386                  randconfig-001-20240125   gcc  
+i386                  randconfig-002-20240125   gcc  
+i386                  randconfig-003-20240125   gcc  
+i386                  randconfig-004-20240125   gcc  
+i386                  randconfig-005-20240125   gcc  
+i386                  randconfig-006-20240125   gcc  
+i386                  randconfig-011-20240125   clang
+i386                  randconfig-012-20240125   clang
+i386                  randconfig-013-20240125   clang
+i386                  randconfig-014-20240125   clang
+i386                  randconfig-015-20240125   clang
+i386                  randconfig-016-20240125   clang
+loongarch                        allmodconfig   gcc  
+loongarch                         allnoconfig   gcc  
+loongarch                           defconfig   gcc  
+loongarch             randconfig-001-20240125   gcc  
+loongarch             randconfig-002-20240125   gcc  
+m68k                             allmodconfig   gcc  
+m68k                              allnoconfig   gcc  
+m68k                             allyesconfig   gcc  
+m68k                         apollo_defconfig   gcc  
+m68k                                defconfig   gcc  
+microblaze                       allmodconfig   gcc  
+microblaze                        allnoconfig   gcc  
+microblaze                       allyesconfig   gcc  
+microblaze                          defconfig   gcc  
+mips                              allnoconfig   clang
+mips                             allyesconfig   gcc  
+mips                          rb532_defconfig   gcc  
+mips                           xway_defconfig   gcc  
+nios2                         3c120_defconfig   gcc  
+nios2                            allmodconfig   gcc  
+nios2                             allnoconfig   gcc  
+nios2                            allyesconfig   gcc  
+nios2                               defconfig   gcc  
+nios2                 randconfig-001-20240125   gcc  
+nios2                 randconfig-002-20240125   gcc  
+openrisc                          allnoconfig   gcc  
+openrisc                         allyesconfig   gcc  
+openrisc                            defconfig   gcc  
+parisc                           allmodconfig   gcc  
+parisc                            allnoconfig   gcc  
+parisc                           allyesconfig   gcc  
+parisc                              defconfig   gcc  
+parisc                randconfig-001-20240125   gcc  
+parisc                randconfig-002-20240125   gcc  
+parisc64                            defconfig   gcc  
+powerpc                          allmodconfig   clang
+powerpc                           allnoconfig   gcc  
+powerpc                          allyesconfig   clang
+powerpc                    amigaone_defconfig   gcc  
+powerpc                     kilauea_defconfig   clang
+powerpc                 mpc834x_itx_defconfig   gcc  
+powerpc                     rainier_defconfig   gcc  
+powerpc               randconfig-001-20240125   gcc  
+powerpc               randconfig-002-20240125   gcc  
+powerpc               randconfig-003-20240125   gcc  
+powerpc                    sam440ep_defconfig   gcc  
+powerpc64             randconfig-001-20240125   gcc  
+powerpc64             randconfig-002-20240125   gcc  
+powerpc64             randconfig-003-20240125   gcc  
+riscv                            allmodconfig   gcc  
+riscv                             allnoconfig   clang
+riscv                            allyesconfig   gcc  
+riscv                               defconfig   gcc  
+riscv                 randconfig-001-20240125   gcc  
+riscv                 randconfig-002-20240125   gcc  
+s390                             allmodconfig   gcc  
+s390                              allnoconfig   gcc  
+s390                             allyesconfig   gcc  
+s390                                defconfig   gcc  
+s390                  randconfig-001-20240125   clang
+s390                  randconfig-002-20240125   clang
+s390                       zfcpdump_defconfig   gcc  
+sh                               allmodconfig   gcc  
+sh                                allnoconfig   gcc  
+sh                               allyesconfig   gcc  
+sh                                  defconfig   gcc  
+sh                    randconfig-001-20240125   gcc  
+sh                    randconfig-002-20240125   gcc  
+sh                   sh7724_generic_defconfig   gcc  
+sh                              ul2_defconfig   gcc  
+sparc                            allmodconfig   gcc  
+sparc                             allnoconfig   gcc  
+sparc                               defconfig   gcc  
+sparc64                          allmodconfig   gcc  
+sparc64                          allyesconfig   gcc  
+sparc64                             defconfig   gcc  
+sparc64               randconfig-001-20240125   gcc  
+sparc64               randconfig-002-20240125   gcc  
+um                               allmodconfig   clang
+um                                allnoconfig   clang
+um                               allyesconfig   clang
+um                                  defconfig   gcc  
+um                             i386_defconfig   gcc  
+um                    randconfig-001-20240125   gcc  
+um                    randconfig-002-20240125   gcc  
+um                           x86_64_defconfig   gcc  
+x86_64                            allnoconfig   gcc  
+x86_64                           allyesconfig   clang
+x86_64       buildonly-randconfig-001-20240125   gcc  
+x86_64       buildonly-randconfig-002-20240125   gcc  
+x86_64       buildonly-randconfig-003-20240125   gcc  
+x86_64       buildonly-randconfig-004-20240125   gcc  
+x86_64       buildonly-randconfig-005-20240125   gcc  
+x86_64       buildonly-randconfig-006-20240125   gcc  
+x86_64                              defconfig   gcc  
+x86_64                randconfig-001-20240125   clang
+x86_64                randconfig-002-20240125   clang
+x86_64                randconfig-003-20240125   clang
+x86_64                randconfig-004-20240125   clang
+x86_64                randconfig-005-20240125   clang
+x86_64                randconfig-006-20240125   clang
+x86_64                          rhel-8.3-rust   clang
+xtensa                           alldefconfig   gcc  
+xtensa                            allnoconfig   gcc  
+xtensa                randconfig-001-20240125   gcc  
+xtensa                randconfig-002-20240125   gcc  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
