@@ -1,275 +1,124 @@
-Return-Path: <netdev+bounces-65784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D5A583BBBF
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:21:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FF9A83BBC4
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:22:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93FE11F226D7
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 08:21:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DED6F1F21FD3
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 08:22:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ABCA175BB;
-	Thu, 25 Jan 2024 08:21:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB5D2175A5;
+	Thu, 25 Jan 2024 08:22:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=pschenker.ch header.i=@pschenker.ch header.b="GYyg0/uN"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="VR9hxFam"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-8fa9.mail.infomaniak.ch (smtp-8fa9.mail.infomaniak.ch [83.166.143.169])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B14417588
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 08:21:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.166.143.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B47C417588;
+	Thu, 25 Jan 2024 08:22:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706170905; cv=none; b=XKfKNfD0S9UbiJ7Hbps166AJF26WbJjB3FbekzBmavGCW+Mc2CqkvEowGkO22Ti0VMDz/reGligI5xHBc178+yuacIUm9LmqBfBBluhxGQQX6LTVRO/UlZgeIUUJlWnlVrpVTAeR8W/e4chAk7e+QRmnJ03BR7cOm8r+TsmEx3U=
+	t=1706170961; cv=none; b=bUUMdRB+dt5RUZRjz7Ri82R9U/9lH3DPvFbsr93Y2HLtSZGSc+UhBuqWhj7HRq4kROiDxKo3+87eQDuTtSIg3IoOTY1L/Fm6131JGX/ZAZ+FLCmu0w+AFqGmH2NdHMlt1MTX8/Mmn561z+SylnOEr4yeXkfGmvdqsWnuwj+NC3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706170905; c=relaxed/simple;
-	bh=lQwaeL0A2+FvcWJHCYoyDlQd8pHosLsv5ulV7zKsCxE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=jcN1+q+yl2JmKmXbQJDvzxsH0ThYUVqxM3JJVFEv1YEMEOyIBySdAR1tChcK3Z2PsbaCuI7Xvy6PF7RYJd8JT1CNZensBYGsb+pbQLmLWwpQS+HQ+XSZNr4+OIz0VCpbL4wevjFMvcpqsbuToCLGz6ouGNj5gf0I5QMf08dJOZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pschenker.ch; spf=pass smtp.mailfrom=pschenker.ch; dkim=pass (1024-bit key) header.d=pschenker.ch header.i=@pschenker.ch header.b=GYyg0/uN; arc=none smtp.client-ip=83.166.143.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pschenker.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pschenker.ch
-Received: from smtp-4-0001.mail.infomaniak.ch (smtp-4-0001.mail.infomaniak.ch [10.7.10.108])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4TLD0S23sfzPwr;
-	Thu, 25 Jan 2024 09:05:44 +0100 (CET)
-Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4TLD0R3YS0zpG0;
-	Thu, 25 Jan 2024 09:05:43 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=pschenker.ch;
-	s=20220412; t=1706169944;
-	bh=lQwaeL0A2+FvcWJHCYoyDlQd8pHosLsv5ulV7zKsCxE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=GYyg0/uNxnvai7JtsowGmje90sgOvepYothuLcWGQqmEQQUMgo8NVYcR91gyFwKXZ
-	 zXB+8VbwKgK6pdONFV+rTxtSOmdDxzMh4PPU1Gfa7vIVjGyWbtbGPilqZa3P3ozhhG
-	 zjz/SjzhFGUeffSCEfVpbQx//DDrZexKpQWqtQN8=
-From: Philippe Schenker <dev@pschenker.ch>
-To: netdev@vger.kernel.org
-Cc: Conor Dooley <conor+dt@kernel.org>,
-	devicetree@vger.kernel.org,
-	Marek Vasut <marex@denx.de>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	Rob Herring <robh+dt@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Eric Dumazet <edumazet@google.com>,
-	stefan.portmann@impulsing.ch,
-	"David S . Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Philippe Schenker <philippe.schenker@impulsing.ch>
-Subject: [PATCH net-next v2 2/2] net: dsa: Add KSZ8567 switch support
-Date: Thu, 25 Jan 2024 09:05:04 +0100
-Message-Id: <20240125080504.62061-2-dev@pschenker.ch>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240125080504.62061-1-dev@pschenker.ch>
-References: <20240125080504.62061-1-dev@pschenker.ch>
+	s=arc-20240116; t=1706170961; c=relaxed/simple;
+	bh=kzl7T5i340HyxSsb6EuzdgzNJ2C7Gyw5WoLYTyLp2Sk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=irK2/ZNfkbwksKfv0hwwS659eUh3hRysN8UIoTogzf8mDUKufKqkH9PsurEIXg762rtC9k6GfTd2j2EvJacO4+vSPQnorhRq/z6T86TCSvPMAG4AGeUHBucTXbwXN0zyLPB5jqPp/0kS8yuLv/x/iCH4KKHq5fyhVosJLsGKXIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=VR9hxFam; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 8423C1BF20B;
+	Thu, 25 Jan 2024 08:22:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1706170956;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mfTST55I42VzaDvOMmCyzlbKGUX1F47dp8ViDve0Oew=;
+	b=VR9hxFamSIyqRfpdhMXd39umlqM0aoECc+duJd6cJREz0HlQyGlGRtsmdqXr/S2ezWfgy2
+	Rb4vMC7/Z1BdyaTxxmQZgA0fQyxbRnTIrKA5xDG5ilbNbIBFBPg27lkYT3c8qjySCWG6QA
+	oAaYT8Qh9NO6qFc+/Gc/Eq6sjHVG+cb8nI8b05agZuxtr1dK6sYeEknmLOVxIPqZ28hS0r
+	rkzjDwo7JCfe7YvWUS5Hu9eiciJGL+YBj3edR3MVpgD8qDuAYjWxX/UKZrPR9EMtzlOFy2
+	/mrkfdCYP5Z0093MTysFglWyp7SEGR2kcQ6bsC8XuTV1/NyGIIGxOv6ZkkHWWg==
+Date: Thu, 25 Jan 2024 09:22:25 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
+ linux-arm-kernel@lists.infradead.org, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Jesse Brandeburg
+ <jesse.brandeburg@intel.com>, Jonathan Corbet <corbet@lwn.net>, Marek
+ =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Piergiorgio Beruto
+ <piergiorgio.beruto@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?B?Tmljb2zDsg==?= Veronese <nicveronese@gmail.com>, Simon Horman
+ <horms@kernel.org>
+Subject: Re: [PATCH net-next v5 07/13] net: ethtool: Introduce a command to
+ list PHYs on an interface
+Message-ID: <20240125092225.45cdaa09@device-28.home>
+In-Reply-To: <1092441f-c347-4f61-8405-7cc8a07d5850@lunn.ch>
+References: <20231221180047.1924733-1-maxime.chevallier@bootlin.com>
+	<20231221180047.1924733-8-maxime.chevallier@bootlin.com>
+	<20240104153401.08ff9809@kernel.org>
+	<20240105104311.03a35622@device-28.home>
+	<2c955f94-7c95-4f66-b739-f0967ec9c171@lunn.ch>
+	<20240124145033.1c711fd1@device-28.home>
+	<1092441f-c347-4f61-8405-7cc8a07d5850@lunn.ch>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.39; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Infomaniak-Routing: alpha
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-From: Philippe Schenker <philippe.schenker@impulsing.ch>
+On Wed, 24 Jan 2024 17:54:53 +0100
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-This commit introduces support for the KSZ8567, a robust 7-port
-Ethernet switch. The KSZ8567 features two RGMII/MII/RMII interfaces,
-each capable of gigabit speeds, complemented by five 10/100 Mbps
-MAC/PHYs.
+> > > Another option might be to add PHY support to netdevsim. Add a debugfs
+> > > interface to allow you to create arbitrary PHY topologies? You can
+> > > then even add a test script.  
+> > 
+> > Sorry for the delayed answer, I just took a few hours to give it a try,
+> > and I was able to spin some very basic PHY support for the netdevsim,
+> > allowing to attach arbitrary instances of fixed_phy devices. I can
+> > therefore use that as a mean of testing the dump operation, I'll try to
+> > include that in the next iteration, that should pave the way for some
+> > testability of more PHY stuff hopefully.  
+> 
+> Great that you looked at this.
+> 
+> FYI: Jakub would like to see changes to netdevsim accompanied with
+> self tests making you of the features you add. There is also now a
+> build bot running the self tests against net-next, so these tests
+> should get run quite frequently.
 
-Signed-off-by: Philippe Schenker <philippe.schenker@impulsing.ch>
+No problem, I'll include these as well.
 
----
+I do face a problem with fixed_phy though now that I've played around
+with it. As fixed_phys share the same global MDIO bus, what can happen
+is that netdevsim-registered PHYs can starve the dummy MDIO bus by
+exhausting all 32 mdio addresses, preventing real interfaces from
+getting their own fixed-phy instance.
 
-Changes in v2:
-- Move the definition of KSZ8567 next to similar KSZ9567
+I'll probably register a dedicated mdio bus per netdevsim (or even
+per-phy, so that we can imagine controling the returned register
+values), let's see how it goes.
 
- drivers/net/dsa/microchip/ksz9477_i2c.c     |  4 ++
- drivers/net/dsa/microchip/ksz_common.c      | 42 ++++++++++++++++++++-
- drivers/net/dsa/microchip/ksz_common.h      |  1 +
- drivers/net/dsa/microchip/ksz_spi.c         |  5 +++
- include/linux/platform_data/microchip-ksz.h |  1 +
- 5 files changed, 52 insertions(+), 1 deletion(-)
+Thanks,
 
-diff --git a/drivers/net/dsa/microchip/ksz9477_i2c.c b/drivers/net/dsa/microchip/ksz9477_i2c.c
-index cac4a607e54a..82bebee4615c 100644
---- a/drivers/net/dsa/microchip/ksz9477_i2c.c
-+++ b/drivers/net/dsa/microchip/ksz9477_i2c.c
-@@ -103,6 +103,10 @@ static const struct of_device_id ksz9477_dt_ids[] = {
- 		.compatible = "microchip,ksz8563",
- 		.data = &ksz_switch_chips[KSZ8563]
- 	},
-+	{
-+		.compatible = "microchip,ksz8567",
-+		.data = &ksz_switch_chips[KSZ8567]
-+	},
- 	{
- 		.compatible = "microchip,ksz9567",
- 		.data = &ksz_switch_chips[KSZ9567]
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 245dfb7a7a31..77a0d7e86460 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -1476,6 +1476,38 @@ const struct ksz_chip_data ksz_switch_chips[] = {
- 		.gbit_capable = {true, true, true},
- 	},
- 
-+	[KSZ8567] = {
-+		.chip_id = KSZ8567_CHIP_ID,
-+		.dev_name = "KSZ8567",
-+		.num_vlans = 4096,
-+		.num_alus = 4096,
-+		.num_statics = 16,
-+		.cpu_ports = 0x7F,	/* can be configured as cpu port */
-+		.port_cnt = 7,		/* total port count */
-+		.port_nirqs = 3,
-+		.num_tx_queues = 4,
-+		.tc_cbs_supported = true,
-+		.tc_ets_supported = true,
-+		.ops = &ksz9477_dev_ops,
-+		.mib_names = ksz9477_mib_names,
-+		.mib_cnt = ARRAY_SIZE(ksz9477_mib_names),
-+		.reg_mib_cnt = MIB_COUNTER_NUM,
-+		.regs = ksz9477_regs,
-+		.masks = ksz9477_masks,
-+		.shifts = ksz9477_shifts,
-+		.xmii_ctrl0 = ksz9477_xmii_ctrl0,
-+		.xmii_ctrl1 = ksz9477_xmii_ctrl1,
-+		.supports_mii	= {false, false, false, false,
-+				   false, true, true},
-+		.supports_rmii	= {false, false, false, false,
-+				   false, true, true},
-+		.supports_rgmii = {false, false, false, false,
-+				   false, true, true},
-+		.internal_phy	= {true, true, true, true,
-+				   true, false, false},
-+		.gbit_capable	= {false, false, false, false, false, true, true},
-+	},
-+
- 	[KSZ9567] = {
- 		.chip_id = KSZ9567_CHIP_ID,
- 		.dev_name = "KSZ9567",
-@@ -2649,6 +2681,7 @@ static void ksz_port_teardown(struct dsa_switch *ds, int port)
- 
- 	switch (dev->chip_id) {
- 	case KSZ8563_CHIP_ID:
-+	case KSZ8567_CHIP_ID:
- 	case KSZ9477_CHIP_ID:
- 	case KSZ9563_CHIP_ID:
- 	case KSZ9567_CHIP_ID:
-@@ -2705,7 +2738,8 @@ static enum dsa_tag_protocol ksz_get_tag_protocol(struct dsa_switch *ds,
- 	    dev->chip_id == KSZ9563_CHIP_ID)
- 		proto = DSA_TAG_PROTO_KSZ9893;
- 
--	if (dev->chip_id == KSZ9477_CHIP_ID ||
-+	if (dev->chip_id == KSZ8567_CHIP_ID ||
-+	    dev->chip_id == KSZ9477_CHIP_ID ||
- 	    dev->chip_id == KSZ9896_CHIP_ID ||
- 	    dev->chip_id == KSZ9897_CHIP_ID ||
- 	    dev->chip_id == KSZ9567_CHIP_ID)
-@@ -2813,6 +2847,7 @@ static int ksz_max_mtu(struct dsa_switch *ds, int port)
- 	case KSZ8830_CHIP_ID:
- 		return KSZ8863_HUGE_PACKET_SIZE - VLAN_ETH_HLEN - ETH_FCS_LEN;
- 	case KSZ8563_CHIP_ID:
-+	case KSZ8567_CHIP_ID:
- 	case KSZ9477_CHIP_ID:
- 	case KSZ9563_CHIP_ID:
- 	case KSZ9567_CHIP_ID:
-@@ -2839,6 +2874,7 @@ static int ksz_validate_eee(struct dsa_switch *ds, int port)
- 
- 	switch (dev->chip_id) {
- 	case KSZ8563_CHIP_ID:
-+	case KSZ8567_CHIP_ID:
- 	case KSZ9477_CHIP_ID:
- 	case KSZ9563_CHIP_ID:
- 	case KSZ9567_CHIP_ID:
-@@ -3183,6 +3219,7 @@ static int ksz_switch_detect(struct ksz_device *dev)
- 		case KSZ9896_CHIP_ID:
- 		case KSZ9897_CHIP_ID:
- 		case KSZ9567_CHIP_ID:
-+		case KSZ8567_CHIP_ID:
- 		case LAN9370_CHIP_ID:
- 		case LAN9371_CHIP_ID:
- 		case LAN9372_CHIP_ID:
-@@ -3220,6 +3257,7 @@ static int ksz_cls_flower_add(struct dsa_switch *ds, int port,
- 
- 	switch (dev->chip_id) {
- 	case KSZ8563_CHIP_ID:
-+	case KSZ8567_CHIP_ID:
- 	case KSZ9477_CHIP_ID:
- 	case KSZ9563_CHIP_ID:
- 	case KSZ9567_CHIP_ID:
-@@ -3239,6 +3277,7 @@ static int ksz_cls_flower_del(struct dsa_switch *ds, int port,
- 
- 	switch (dev->chip_id) {
- 	case KSZ8563_CHIP_ID:
-+	case KSZ8567_CHIP_ID:
- 	case KSZ9477_CHIP_ID:
- 	case KSZ9563_CHIP_ID:
- 	case KSZ9567_CHIP_ID:
-@@ -4142,6 +4181,7 @@ static int ksz_parse_drive_strength(struct ksz_device *dev)
- 	case KSZ8794_CHIP_ID:
- 	case KSZ8765_CHIP_ID:
- 	case KSZ8563_CHIP_ID:
-+	case KSZ8567_CHIP_ID:
- 	case KSZ9477_CHIP_ID:
- 	case KSZ9563_CHIP_ID:
- 	case KSZ9567_CHIP_ID:
-diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-index 15612101a155..060c5de9aa05 100644
---- a/drivers/net/dsa/microchip/ksz_common.h
-+++ b/drivers/net/dsa/microchip/ksz_common.h
-@@ -187,6 +187,7 @@ struct ksz_device {
- /* List of supported models */
- enum ksz_model {
- 	KSZ8563,
-+	KSZ8567,
- 	KSZ8795,
- 	KSZ8794,
- 	KSZ8765,
-diff --git a/drivers/net/dsa/microchip/ksz_spi.c b/drivers/net/dsa/microchip/ksz_spi.c
-index 6f6d878e742c..c8166fb440ab 100644
---- a/drivers/net/dsa/microchip/ksz_spi.c
-+++ b/drivers/net/dsa/microchip/ksz_spi.c
-@@ -164,6 +164,10 @@ static const struct of_device_id ksz_dt_ids[] = {
- 		.compatible = "microchip,ksz8563",
- 		.data = &ksz_switch_chips[KSZ8563]
- 	},
-+	{
-+		.compatible = "microchip,ksz8567",
-+		.data = &ksz_switch_chips[KSZ8567]
-+	},
- 	{
- 		.compatible = "microchip,ksz9567",
- 		.data = &ksz_switch_chips[KSZ9567]
-@@ -204,6 +208,7 @@ static const struct spi_device_id ksz_spi_ids[] = {
- 	{ "ksz9893" },
- 	{ "ksz9563" },
- 	{ "ksz8563" },
-+	{ "ksz8567" },
- 	{ "ksz9567" },
- 	{ "lan9370" },
- 	{ "lan9371" },
-diff --git a/include/linux/platform_data/microchip-ksz.h b/include/linux/platform_data/microchip-ksz.h
-index f177416635a2..c4466e56d9d7 100644
---- a/include/linux/platform_data/microchip-ksz.h
-+++ b/include/linux/platform_data/microchip-ksz.h
-@@ -24,6 +24,7 @@
- 
- enum ksz_chip_id {
- 	KSZ8563_CHIP_ID = 0x8563,
-+	KSZ8567_CHIP_ID = 0x00856700,
- 	KSZ8795_CHIP_ID = 0x8795,
- 	KSZ8794_CHIP_ID = 0x8794,
- 	KSZ8765_CHIP_ID = 0x8765,
--- 
-2.34.1
-
+Maxime
 
