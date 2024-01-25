@@ -1,87 +1,87 @@
-Return-Path: <netdev+bounces-65733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4658F83B864
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 04:39:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE9E883B866
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 04:39:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 69CD71C22969
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 03:39:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1736E1C20DAE
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 03:39:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60D056FD1;
-	Thu, 25 Jan 2024 03:39:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 438C263DD;
+	Thu, 25 Jan 2024 03:39:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VHy9lIB/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TssiLz3E"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E2556FC8
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 03:39:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7331879CB
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 03:39:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706153962; cv=none; b=U4yThCC6J2SR80prrqcKIYU1dW9ojKOHn5taWITvTo/FhHM7uUycOtXM8XdR2Jb8H6Cb8iEEhRzDojpFo0efoANjevN9pMshXujSeDrC2pzizIxsguA+qGbbHhkadgyk7UdYb+cK57En6nmfx8KARcCwzjmzg8yyDMQXA9QOSnY=
+	t=1706153977; cv=none; b=SiD/lQ9d+8h2IhKyn/rmOIJ5WCPUrd8dCv1OMj54wOWjzSIrEY4niggXIQMKZqVOG22fCceQy2FK7y9BE/FnUpzFtPbGKUyISJ+ZQiZrxTw/gD9BvcbjLGnr/+iIvLmoSBp63cMm1A87oOx3tL0xeNsQKYc+vIXkQrIqwWoXvMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706153962; c=relaxed/simple;
-	bh=aYtraKeg/phW07/7iPMWoTxqzaJdJOv0+Sxt7exwBJQ=;
+	s=arc-20240116; t=1706153977; c=relaxed/simple;
+	bh=VTSduOFhTJtDTzA1HpaE0aKiopHWtMXEHoDG//QlxrY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dB99+kifJ2EwW77s2fT8kOcxaa8AleXJn+EW0E3ASzksklMvJPDRthz/NYgMMMQ1NfAPSORXzSrnHWyXdx/4D+zRTsa8Nlu2WzmbQgji/fE6wRVTv3lPoOCXrBJSH7Z/qZR3PkzW36KWDYR7iUAvAY94UvKQE9MRGdxrBSDuFOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VHy9lIB/; arc=none smtp.client-ip=170.10.133.124
+	 To:Cc:Content-Type; b=qPO93g7U32hpAoKbymNar6DDNfcW6M8cqoRxOka4pviqYS7ul/16H9BA50KHvXFNqHMXswG+w4ODIwA3mNRV37HCya7yFCj4jZlzyAofO89FtJFXiWQrA/BoK5EibFh74pfnaSeveW8BBflrjCfpG2UWEkXQmHQpvOtl7aKjnBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TssiLz3E; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706153958;
+	s=mimecast20190719; t=1706153974;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=7+kv1E8M93VST5z9hGMNp++MAPNLoKeq0RXuFtSVRPM=;
-	b=VHy9lIB/8j8ZlgqWfAC2o5Ee0qR3aT3XvK1ll3WmvcPm289JNJnb5DAdsuZO9OwfGz/bhd
-	pMNbO5sibE3T6LW/4Gztxp14fgw5AJQoKVboNCrzBXmLfeWJm/V/fOB9DTz4Tm6Jhstb1R
-	M6pEI0xgq37YtdpfKqJB559GfXE5VTY=
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
- [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=bjnJLRjUUnfsYys8p8NZDH9dTqQ5GmQ+Z9OLP5YvI3U=;
+	b=TssiLz3Eq6IFgVUf+0L0YhK7gwOZV2FvGE/zOgXRYFQJpUE5Jef3I7/CHZ1XICmKw5TGjk
+	UUQwwydElnx1+4uUIv0CFkWZosLKsdxzEyWdRAsn41W5Ns2nl8ZpYtU0g6iBfUpKBVGexs
+	k1O2D6Jay7anqpKexwlYviL1gwcl/wY=
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
+ [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-104-16_EUNbEM_iv8S-oKQvbHw-1; Wed, 24 Jan 2024 22:39:16 -0500
-X-MC-Unique: 16_EUNbEM_iv8S-oKQvbHw-1
-Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-5cf2714e392so329378a12.0
-        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 19:39:16 -0800 (PST)
+ us-mta-655-a_Y4QZwgNCCASSGwCdwukA-1; Wed, 24 Jan 2024 22:39:32 -0500
+X-MC-Unique: a_Y4QZwgNCCASSGwCdwukA-1
+Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-3bdcf1cbcdaso2090610b6e.3
+        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 19:39:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706153955; x=1706758755;
+        d=1e100.net; s=20230601; t=1706153971; x=1706758771;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7+kv1E8M93VST5z9hGMNp++MAPNLoKeq0RXuFtSVRPM=;
-        b=GSq8cGBEgF0E+AygLhx6Sl9mMUEBTuP1wYO4aEpMlkk3uYXZnVSjedRiie3P8TbXkH
-         jElRnHiTS4DnOdfLuzU2za1jJqPOT1+OjrHgZFRbe9rRKl08Xrv/EtA+heWO8EGRmvEZ
-         nru91iZTgDSKhhabNk7sRi1vqbQsKuEsbwxF6YqN8pAnE2CN5RGRRRYyn2qdCWCQr0O2
-         vR7n69ZuFy7mus3eYuVK3LnW5ZSi5yVoQeATtiVHg6/LJdw4sFNVxnNvH636uSW50/ZX
-         P0N9yTHyQF79SU5wnOFFm/dp656pnbvzfg0Hkv0DaVt8DfxFG7Sx/7UdEUAty9IrAKMN
-         KSQg==
-X-Gm-Message-State: AOJu0YyjO2kjVbv4xwjPX6t+K9I5eazoGaIli1SoUMs9avcck/SMszc7
-	P5jqZRQvL6tmPi4Jcd+elODTlgGjyaV2dQ6aBUfWgmsRDducIkQakIrniqlHvGgGNV85u5Xxz//
-	1HlJpjwA70WMIMIdlC7zr90rRvZCD8RbiebvijN521u5fZwzVcXPc5e5gwoK2j9jZzru8s1XvaQ
-	H1YHnEBWzUDTPdzj7C2bnHJJq3zmQ0
-X-Received: by 2002:a05:6a20:938d:b0:19a:f0ef:ffc with SMTP id x13-20020a056a20938d00b0019af0ef0ffcmr561792pzh.3.1706153954782;
-        Wed, 24 Jan 2024 19:39:14 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEVvYsNNKLu8vKw6h7D0IpqxiuwRhcQvL/n+p++mwu2Jx6DGQNuoinfcujLAu57LUqNpXdniTVSTxpEPUGA4Ms=
-X-Received: by 2002:a05:6a20:938d:b0:19a:f0ef:ffc with SMTP id
- x13-20020a056a20938d00b0019af0ef0ffcmr561774pzh.3.1706153954482; Wed, 24 Jan
- 2024 19:39:14 -0800 (PST)
+        bh=bjnJLRjUUnfsYys8p8NZDH9dTqQ5GmQ+Z9OLP5YvI3U=;
+        b=FCXM4LFSg35Qfr58SAhbQuHLccBZ1bQeIo+vA7rkgcZ3UOtf2UisTQuI2o6hljj82O
+         mHkvuyaIufSUfXSekTEnd7iAAiYmzX4XbQHaeUUltENnYlxl89lyylfStNa+2xAvaWMd
+         0xCPnZcefL4i8f1UqP3R26qNBV+rK3hTH3t4jpwTH8H9qF4+tMxRsSAFXHF4cKc2LHAa
+         /jmePuEdngFJ3yk31ZFZzHG8jhx6r2fy1evP54zingwUym5KKNXkEhCe3+GyTr/IKlPt
+         AG5Dy92qyFYga5jaSXehKwHdZXkyWjSu++ijzIfnFvvls8Uvo12rjSlnzDbTVLKYzDXE
+         5rdQ==
+X-Gm-Message-State: AOJu0YzpovdBDmdNnGejNJ/2aY/jr/fsCOvFn934y+keUH1Byhc8sRvz
+	KPngZ4WOKzszLf+HXJcCKt2rqgFSlt8RTYkwOg65PtnhdbRHlybKc62ip767cM+ssibtVsJ5Tm0
+	2ggXMtf55GU+Uc3FBGxkVRvB3xBQkYrFPhoj8IvJgccqwoAQUIwxdgihRBOBmqXXc/DavIfroLP
+	tjUhVRSxjXBTqfhOteKaFTknSGQjz6
+X-Received: by 2002:a05:6808:2187:b0:3bd:d7c5:942 with SMTP id be7-20020a056808218700b003bdd7c50942mr332290oib.110.1706153971626;
+        Wed, 24 Jan 2024 19:39:31 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHM6QTZ+7F881shndgGCv/cg0f6FiQMkj4LPmTtLichjZubQR7DermFohR8nJBxKhcGEAmYnsCeHi+4NE3cciA=
+X-Received: by 2002:a05:6808:2187:b0:3bd:d7c5:942 with SMTP id
+ be7-20020a056808218700b003bdd7c50942mr332270oib.110.1706153971319; Wed, 24
+ Jan 2024 19:39:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240116075924.42798-1-xuanzhuo@linux.alibaba.com> <20240116075924.42798-5-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <20240116075924.42798-5-xuanzhuo@linux.alibaba.com>
+References: <20240116075924.42798-1-xuanzhuo@linux.alibaba.com> <20240116075924.42798-6-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20240116075924.42798-6-xuanzhuo@linux.alibaba.com>
 From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 25 Jan 2024 11:39:03 +0800
-Message-ID: <CACGkMEtSnuo6yAsiFZkrv6bMaJtLXuLQtL-qvKn-Y_L_PLHdcw@mail.gmail.com>
-Subject: Re: [PATCH net-next 4/5] virtio_ring: introduce virtqueue_get_dma_premapped()
+Date: Thu, 25 Jan 2024 11:39:20 +0800
+Message-ID: <CACGkMEujO6EdmY_b2wPgG1uBo0DEWhLh81aEX4DHGMfCU7tzUw@mail.gmail.com>
+Subject: Re: [PATCH net-next 5/5] virtio_net: sq support premapped mode
 To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, 
 	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
@@ -95,156 +95,289 @@ Content-Transfer-Encoding: quoted-printable
 On Tue, Jan 16, 2024 at 3:59=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
 om> wrote:
 >
-> Introduce helper virtqueue_get_dma_premapped(), then the driver
-> can know whether dma unmap is needed.
+> If the xsk is enabling, the xsk tx will share the send queue.
+
+Any reason for this? Technically, virtio-net can work as other NIC
+like 256 queues. There could be some work like optimizing the
+interrupt allocations etc.
+
+> But the xsk requires that the send queue use the premapped mode.
+> So the send queue must support premapped mode.
+>
+> command: pktgen_sample01_simple.sh -i eth0 -s 16/1400 -d 10.0.0.123 -m 00=
+:16:3e:12:e1:3e -n 0 -p 100
+> machine:  ecs.ebmg6e.26xlarge of Aliyun
+> cpu: Intel(R) Xeon(R) Platinum 8269CY CPU @ 2.50GHz
+> iommu mode: intel_iommu=3Don iommu.strict=3D1 iommu=3Dnopt
+>
+>                       |        iommu off           |        iommu on
+> ----------------------|--------------------------------------------------=
+---
+>                       | 16         |  1400         | 16         | 1400
+> ----------------------|--------------------------------------------------=
+---
+> Before:               |1716796.00  |  1581829.00   | 390756.00  | 374493.=
+00
+> After(premapped off): |1733794.00  |  1576259.00   | 390189.00  | 378128.=
+00
+> After(premapped on):  |1707107.00  |  1562917.00   | 385667.00  | 373584.=
+00
 >
 > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 > ---
->  drivers/net/virtio/main.c       | 22 +++++++++-------------
->  drivers/net/virtio/virtio_net.h |  3 ---
->  drivers/virtio/virtio_ring.c    | 22 ++++++++++++++++++++++
->  include/linux/virtio.h          |  1 +
->  4 files changed, 32 insertions(+), 16 deletions(-)
+>  drivers/net/virtio/main.c       | 119 ++++++++++++++++++++++++++++----
+>  drivers/net/virtio/virtio_net.h |  10 ++-
+>  2 files changed, 116 insertions(+), 13 deletions(-)
 >
 > diff --git a/drivers/net/virtio/main.c b/drivers/net/virtio/main.c
-> index 186b2cf5d8fc..4fbf612da235 100644
+> index 4fbf612da235..53143f95a3a0 100644
 > --- a/drivers/net/virtio/main.c
 > +++ b/drivers/net/virtio/main.c
-> @@ -483,7 +483,7 @@ static void *virtnet_rq_get_buf(struct virtnet_rq *rq=
-, u32 *len, void **ctx)
->         void *buf;
+> @@ -168,13 +168,39 @@ static struct xdp_frame *ptr_to_xdp(void *ptr)
+>         return (struct xdp_frame *)((unsigned long)ptr & ~VIRTIO_XDP_FLAG=
+);
+>  }
 >
->         buf =3D virtqueue_get_buf_ctx(rq->vq, len, ctx);
-> -       if (buf && rq->do_dma)
-> +       if (buf && virtqueue_get_dma_premapped(rq->vq))
->                 virtnet_rq_unmap(rq, buf, *len);
+> +static void virtnet_sq_unmap_buf(struct virtnet_sq *sq, struct virtio_dm=
+a_head *dma)
+> +{
+> +       int i;
+> +
+> +       if (!dma)
+> +               return;
+> +
+> +       for (i =3D 0; i < dma->next; ++i)
+> +               virtqueue_dma_unmap_single_attrs(sq->vq,
+> +                                                dma->items[i].addr,
+> +                                                dma->items[i].length,
+> +                                                DMA_TO_DEVICE, 0);
+> +       dma->next =3D 0;
+> +}
+> +
+>  static void __free_old_xmit(struct virtnet_sq *sq, bool in_napi,
+>                             u64 *bytes, u64 *packets)
+>  {
+> +       struct virtio_dma_head *dma;
+>         unsigned int len;
+>         void *ptr;
 >
+> -       while ((ptr =3D virtqueue_get_buf(sq->vq, &len)) !=3D NULL) {
+> +       if (virtqueue_get_dma_premapped(sq->vq)) {
+
+Any chance this.can be false?
+
+> +               dma =3D &sq->dma.head;
+> +               dma->num =3D ARRAY_SIZE(sq->dma.items);
+> +               dma->next =3D 0;
+
+Btw, I found in the case of RX we have:
+
+virtnet_rq_alloc():
+
+                        alloc_frag->offset =3D sizeof(*dma);
+
+This seems to defeat frag coalescing when the memory is highly
+fragmented or high order allocation is disallowed.
+
+Any idea to solve this?
+
+> +       } else {
+> +               dma =3D NULL;
+> +       }
+> +
+> +       while ((ptr =3D virtqueue_get_buf_ctx_dma(sq->vq, &len, dma, NULL=
+)) !=3D NULL) {
+> +               virtnet_sq_unmap_buf(sq, dma);
+> +
+>                 if (!is_xdp_frame(ptr)) {
+>                         struct sk_buff *skb =3D ptr;
+>
+> @@ -572,16 +598,70 @@ static void *virtnet_rq_alloc(struct virtnet_rq *rq=
+, u32 size, gfp_t gfp)
 >         return buf;
-> @@ -496,7 +496,7 @@ static void virtnet_rq_init_one_sg(struct virtnet_rq =
-*rq, void *buf, u32 len)
->         u32 offset;
->         void *head;
+>  }
 >
-> -       if (!rq->do_dma) {
-> +       if (!virtqueue_get_dma_premapped(rq->vq)) {
->                 sg_init_one(rq->sg, buf, len);
->                 return;
->         }
-> @@ -526,7 +526,7 @@ static void *virtnet_rq_alloc(struct virtnet_rq *rq, =
-u32 size, gfp_t gfp)
+> -static void virtnet_rq_set_premapped(struct virtnet_info *vi)
+> +static void virtnet_set_premapped(struct virtnet_info *vi)
+>  {
+>         int i;
 >
->         head =3D page_address(alloc_frag->page);
+> -       /* disable for big mode */
+> -       if (!vi->mergeable_rx_bufs && vi->big_packets)
+> -               return;
+> +       for (i =3D 0; i < vi->max_queue_pairs; i++) {
+> +               virtqueue_set_dma_premapped(vi->sq[i].vq);
 >
-> -       if (rq->do_dma) {
-> +       if (virtqueue_get_dma_premapped(rq->vq)) {
->                 dma =3D head;
->
->                 /* new pages */
-> @@ -580,12 +580,8 @@ static void virtnet_rq_set_premapped(struct virtnet_=
-info *vi)
->         if (!vi->mergeable_rx_bufs && vi->big_packets)
->                 return;
->
-> -       for (i =3D 0; i < vi->max_queue_pairs; i++) {
-> -               if (virtqueue_set_dma_premapped(vi->rq[i].vq))
-> -                       continue;
-> -
-> -               vi->rq[i].do_dma =3D true;
-> -       }
-> +       for (i =3D 0; i < vi->max_queue_pairs; i++)
-> +               virtqueue_set_dma_premapped(vi->rq[i].vq);
+> -       for (i =3D 0; i < vi->max_queue_pairs; i++)
+> -               virtqueue_set_dma_premapped(vi->rq[i].vq);
+> +               /* TODO for big mode */
+
+Btw, how hard to support big mode? If we can do premapping for that
+code could be simplified.
+
+(There are vendors that doesn't support mergeable rx buffers).
+
+> +               if (vi->mergeable_rx_bufs || !vi->big_packets)
+> +                       virtqueue_set_dma_premapped(vi->rq[i].vq);
+> +       }
+> +}
+> +
+> +static void virtnet_sq_unmap_sg(struct virtnet_sq *sq, u32 num)
+> +{
+> +       struct scatterlist *sg;
+> +       u32 i;
+> +
+> +       for (i =3D 0; i < num; ++i) {
+> +               sg =3D &sq->sg[i];
+> +
+> +               virtqueue_dma_unmap_single_attrs(sq->vq,
+> +                                                sg->dma_address,
+> +                                                sg->length,
+> +                                                DMA_TO_DEVICE, 0);
+> +       }
+> +}
+> +
+> +static int virtnet_sq_map_sg(struct virtnet_sq *sq, u32 num)
+> +{
+> +       struct scatterlist *sg;
+> +       u32 i;
+> +
+> +       for (i =3D 0; i < num; ++i) {
+> +               sg =3D &sq->sg[i];
+> +               sg->dma_address =3D virtqueue_dma_map_single_attrs(sq->vq=
+, sg_virt(sg),
+> +                                                                sg->leng=
+th,
+> +                                                                DMA_TO_D=
+EVICE, 0);
+> +               if (virtqueue_dma_mapping_error(sq->vq, sg->dma_address))
+> +                       goto err;
+> +       }
+> +
+
+This seems nothing virtio-net specific, let's move it to the core?
+
+Thanks
+
+
+> +       return 0;
+> +
+> +err:
+> +       virtnet_sq_unmap_sg(sq, i);
+> +       return -ENOMEM;
+> +}
+> +
+> +static int virtnet_add_outbuf(struct virtnet_sq *sq, u32 num, void *data=
+)
+> +{
+> +       int ret;
+> +
+> +       if (virtqueue_get_dma_premapped(sq->vq)) {
+> +               ret =3D virtnet_sq_map_sg(sq, num);
+> +               if (ret)
+> +                       return -ENOMEM;
+> +       }
+> +
+> +       ret =3D virtqueue_add_outbuf(sq->vq, sq->sg, num, data, GFP_ATOMI=
+C);
+> +       if (ret && virtqueue_get_dma_premapped(sq->vq))
+> +               virtnet_sq_unmap_sg(sq, num);
+> +
+> +       return ret;
 >  }
 >
 >  static void free_old_xmit(struct virtnet_sq *sq, bool in_napi)
-> @@ -1643,7 +1639,7 @@ static int add_recvbuf_small(struct virtnet_info *v=
-i, struct virtnet_rq *rq,
->
->         err =3D virtqueue_add_inbuf_ctx(rq->vq, rq->sg, 1, buf, ctx, gfp)=
-;
->         if (err < 0) {
-> -               if (rq->do_dma)
-> +               if (virtqueue_get_dma_premapped(rq->vq))
->                         virtnet_rq_unmap(rq, buf, 0);
->                 put_page(virt_to_head_page(buf));
+> @@ -687,8 +767,7 @@ static int __virtnet_xdp_xmit_one(struct virtnet_info=
+ *vi,
+>                             skb_frag_size(frag), skb_frag_off(frag));
 >         }
-> @@ -1758,7 +1754,7 @@ static int add_recvbuf_mergeable(struct virtnet_inf=
-o *vi,
->         ctx =3D mergeable_len_to_ctx(len + room, headroom);
->         err =3D virtqueue_add_inbuf_ctx(rq->vq, rq->sg, 1, buf, ctx, gfp)=
-;
->         if (err < 0) {
-> -               if (rq->do_dma)
-> +               if (virtqueue_get_dma_premapped(rq->vq))
->                         virtnet_rq_unmap(rq, buf, 0);
->                 put_page(virt_to_head_page(buf));
+>
+> -       err =3D virtqueue_add_outbuf(sq->vq, sq->sg, nr_frags + 1,
+> -                                  xdp_to_ptr(xdpf), GFP_ATOMIC);
+> +       err =3D virtnet_add_outbuf(sq, nr_frags + 1, xdp_to_ptr(xdpf));
+>         if (unlikely(err))
+>                 return -ENOSPC; /* Caller handle free/refcnt */
+>
+> @@ -2154,7 +2233,7 @@ static int xmit_skb(struct virtnet_sq *sq, struct s=
+k_buff *skb)
+>                         return num_sg;
+>                 num_sg++;
 >         }
-> @@ -4007,7 +4003,7 @@ static void free_receive_page_frags(struct virtnet_=
-info *vi)
->         int i;
->         for (i =3D 0; i < vi->max_queue_pairs; i++)
->                 if (vi->rq[i].alloc_frag.page) {
-> -                       if (vi->rq[i].do_dma && vi->rq[i].last_dma)
-> +                       if (virtqueue_get_dma_premapped(vi->rq[i].vq) && =
-vi->rq[i].last_dma)
->                                 virtnet_rq_unmap(&vi->rq[i], vi->rq[i].la=
-st_dma, 0);
->                         put_page(vi->rq[i].alloc_frag.page);
->                 }
-> @@ -4035,7 +4031,7 @@ static void virtnet_rq_free_unused_bufs(struct virt=
-queue *vq)
->         rq =3D &vi->rq[i];
+> -       return virtqueue_add_outbuf(sq->vq, sq->sg, num_sg, skb, GFP_ATOM=
+IC);
+> +       return virtnet_add_outbuf(sq, num_sg, skb);
+>  }
 >
->         while ((buf =3D virtqueue_detach_unused_buf(vq)) !=3D NULL) {
-> -               if (rq->do_dma)
-> +               if (virtqueue_get_dma_premapped(rq->vq))
->                         virtnet_rq_unmap(rq, buf, 0);
+>  static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *de=
+v)
+> @@ -4011,9 +4090,25 @@ static void free_receive_page_frags(struct virtnet=
+_info *vi)
 >
->                 virtnet_rq_free_buf(vi, rq, buf);
+>  static void virtnet_sq_free_unused_bufs(struct virtqueue *vq)
+>  {
+> +       struct virtnet_info *vi =3D vq->vdev->priv;
+> +       struct virtio_dma_head *dma;
+> +       struct virtnet_sq *sq;
+> +       int i =3D vq2txq(vq);
+>         void *buf;
+>
+> -       while ((buf =3D virtqueue_detach_unused_buf(vq)) !=3D NULL) {
+> +       sq =3D &vi->sq[i];
+> +
+> +       if (virtqueue_get_dma_premapped(sq->vq)) {
+> +               dma =3D &sq->dma.head;
+> +               dma->num =3D ARRAY_SIZE(sq->dma.items);
+> +               dma->next =3D 0;
+> +       } else {
+> +               dma =3D NULL;
+> +       }
+> +
+> +       while ((buf =3D virtqueue_detach_unused_buf_dma(vq, dma)) !=3D NU=
+LL) {
+> +               virtnet_sq_unmap_buf(sq, dma);
+> +
+>                 if (!is_xdp_frame(buf))
+>                         dev_kfree_skb(buf);
+>                 else
+> @@ -4228,7 +4323,7 @@ static int init_vqs(struct virtnet_info *vi)
+>         if (ret)
+>                 goto err_free;
+>
+> -       virtnet_rq_set_premapped(vi);
+> +       virtnet_set_premapped(vi);
+>
+>         cpus_read_lock();
+>         virtnet_set_affinity(vi);
 > diff --git a/drivers/net/virtio/virtio_net.h b/drivers/net/virtio/virtio_=
 net.h
-> index b28a4d0a3150..066a2b9d2b3c 100644
+> index 066a2b9d2b3c..dda144cc91c7 100644
 > --- a/drivers/net/virtio/virtio_net.h
 > +++ b/drivers/net/virtio/virtio_net.h
-> @@ -115,9 +115,6 @@ struct virtnet_rq {
->
->         /* Record the last dma info to free after new pages is allocated.=
- */
->         struct virtnet_rq_dma *last_dma;
-> -
-> -       /* Do dma by self */
-> -       bool do_dma;
+> @@ -48,13 +48,21 @@ struct virtnet_rq_dma {
+>         u16 need_sync;
 >  };
 >
->  struct virtnet_info {
-> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-> index 2c5089d3b510..9092bcdebb53 100644
-> --- a/drivers/virtio/virtio_ring.c
-> +++ b/drivers/virtio/virtio_ring.c
-> @@ -2905,6 +2905,28 @@ int virtqueue_set_dma_premapped(struct virtqueue *=
-_vq)
->  }
->  EXPORT_SYMBOL_GPL(virtqueue_set_dma_premapped);
->
-> +/**
-> + * virtqueue_get_dma_premapped - get the vring premapped mode
-> + * @_vq: the struct virtqueue we're talking about.
-> + *
-> + * Get the premapped mode of the vq.
-> + *
-> + * Returns bool for the vq premapped mode.
-> + */
-> +bool virtqueue_get_dma_premapped(struct virtqueue *_vq)
-> +{
-> +       struct vring_virtqueue *vq =3D to_vvq(_vq);
-> +       bool premapped;
+> +struct virtnet_sq_dma {
+> +       struct virtio_dma_head head;
+> +       struct virtio_dma_item items[MAX_SKB_FRAGS + 2];
+> +};
 > +
-> +       START_USE(vq);
-> +       premapped =3D vq->premapped;
-> +       END_USE(vq);
-
-Why do we need to protect premapped like this? Is the user allowed to
-change it on the fly?
-
-Thanks
+>  /* Internal representation of a send virtqueue */
+>  struct virtnet_sq {
+>         /* Virtqueue associated with this virtnet_sq */
+>         struct virtqueue *vq;
+>
+>         /* TX: fragments + linear part + virtio header */
+> -       struct scatterlist sg[MAX_SKB_FRAGS + 2];
+> +       union {
+> +               struct scatterlist sg[MAX_SKB_FRAGS + 2];
+> +               struct virtnet_sq_dma dma;
+> +       };
+>
+>         /* Name of the send queue: output.$index */
+>         char name[16];
+> --
+> 2.32.0.3.g01195cf9f
+>
 
 
