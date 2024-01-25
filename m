@@ -1,203 +1,119 @@
-Return-Path: <netdev+bounces-65974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62B9783CBF8
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 20:11:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 74B8A83CC0C
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 20:19:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 34BBAB20C97
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 19:11:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F38B8B21314
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 19:18:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 141B61339B5;
-	Thu, 25 Jan 2024 19:11:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FFDA1350CE;
+	Thu, 25 Jan 2024 19:18:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="xkGoTpsB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF8D68472;
-	Thu, 25 Jan 2024 19:11:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A589E111AA
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 19:18:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706209886; cv=none; b=SgJ7UanpSduueN7KFDQgRYo/KBOnseudOKeKYl3sW/diWASl06+98OixjWy/KmHg60WqueA73/XTCZ8O349pqRfw84NyJfD+YyCl1dr7aZ6yrzrvXXT1o0nEuWmUs60oNuQ4k+hWjQGGh/3UEo7f/J8+Nxf7AyIVJNWr3c4vX88=
+	t=1706210336; cv=none; b=XvMlWroGhlJ5LPmXM2/jrtcwQ5X8QiwdHD0aSEVbwxh474dYFiA6JQdgisx58Sn4qV8+cLU0ayMTXu4Cgxrp4x8a4kx4uj/nVI4V7sgRA/zlxGkF10JDMTdr2234BKsEWibXv3uMOwBoaXL1HDgPj/d6Htf7bZlXAD3pEEjMrT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706209886; c=relaxed/simple;
-	bh=mYQWc3KGfKNeOJR4Q5QyR44QKXrOJ0Pv+qso7OMw0gM=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=IZ5waVRcuAtxcdQYVaauyXrk5oo7u2oGxZs5DnT5EEMXaYxsXdCEcJ84njtsC81lSvzDbLPejQKfpdKgAtftKoBPKtpWDluLLD/c7n+hy3T+8OH3I5vjmYYQeQ1IP0cuvp5OT0WpdL3WWVN3TTVnB46ruelVWmzULMRrZtHZ1EE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (31.173.86.50) by msexch01.omp.ru (10.188.4.12)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 25 Jan
- 2024 22:11:14 +0300
-Subject: Re: [PATCH net-next v2 0/2] Add HW checksum offload support for
- RZ/G2L GbEthernet IP
-To: Biju Das <biju.das.jz@bp.renesas.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-CC: Vincent Guittot <vincent.guittot@linaro.org>, <peterz@infradead.org>,
-	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>, Yoshihiro Shimoda
-	<yoshihiro.shimoda.uh@renesas.com>, Wolfram Sang
-	<wsa+renesas@sang-engineering.com>, Nikita Yushchenko
-	<nikita.yoush@cogentembedded.com>, <netdev@vger.kernel.org>,
-	<linux-renesas-soc@vger.kernel.org>, Geert Uytterhoeven
-	<geert+renesas@glider.be>, Prabhakar Mahadev Lad
-	<prabhakar.mahadev-lad.rj@bp.renesas.com>, Biju Das <biju.das.au@gmail.com>
-References: <20240124102115.132154-1-biju.das.jz@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <9fdd721a-6bd8-e62b-7cf4-cf6b8fe032a4@omp.ru>
-Date: Thu, 25 Jan 2024 22:11:14 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1706210336; c=relaxed/simple;
+	bh=lab1cc/BnvmVMoI/6a4oqJtvBk6zbJgk82AeHiJrUN8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NCHgw4yPWCsGVi69up/sXV+ypqzDZ8MIObykgdKZdM/DbwlNlo8YiMaBj1yF3TRMepvlbgf+jnHScoK21dMsjeYqNPaIk6KUlYjVEVlRX3Ky3dLdaydNwoTnVyOzsDQFFGFDb2bmb6pAjTSuXqag3URiXk4zytyoCA7a/df0iSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=xkGoTpsB; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1d71b62fa87so6949085ad.0
+        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 11:18:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1706210334; x=1706815134; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vgDFOq40XBBKNZXci2Ggytp+MQppzv/horYrfyyqlNM=;
+        b=xkGoTpsBKSeyMiBumtKh4wbRn2VTmJ1RYiyrJLR7wPRmja9/pDT16gqTYuRPzZqLJJ
+         1AocFj8myQJxoMvETzs9Wuumq+GTjvmmeUyMwcpZ6rdds9WTH+GOAL4vdXZFdjmk2dIx
+         kWYpwuQpBl8ZAs5S+MWDc9TVTVaB1WQQvHhnw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706210334; x=1706815134;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vgDFOq40XBBKNZXci2Ggytp+MQppzv/horYrfyyqlNM=;
+        b=mwtmvB4+Ald67fwOyud22/45VvTg6rJZ3rwCYJFmBzSTG6mla1dyB8VmYl5c/xrU+5
+         gQHMFfgHEtnEWk6eH7NRE95173weeCSqhQY8KQ3swW1TAJVFDjBr8nqrA3heHjCrA4H5
+         bd1urH2CwiJVmF+fWpCjtxv/rb9X6R1nWG1qjdZBHrvd/r0glUJ0qcnEHkvP/HdmeuVj
+         hpar50QKbz7tpx1lkkB1ZXIw7HBIc7x3f5HJpbc8v+mTE7Wmz6A0D6bhLKWCVsMQbZmY
+         JsF6CPsl77Bx3Bv4yPShiqGh9RzumSBQqLJfUsV/oW2tzjv0arutJFU2si4HKtpAzhdg
+         UMdQ==
+X-Gm-Message-State: AOJu0YxljtHxI6y0VChtJe2KAVWIoOW9pyMEtMWfYnKIugp/UrVn0fhn
+	U6h4uyVd5tAmSCae8Plu4R+qdiTdHtrU5GAPUcQqdkZydvH51QBhxmksqp6rnP4=
+X-Google-Smtp-Source: AGHT+IHdKHB94OhPgZOVY77ABy+eW7S+fOS7rs6rmsVrvHAqW+Nt5DJrWXeJyflcQ9xYvVmNTGX+MA==
+X-Received: by 2002:a17:902:ced0:b0:1d4:bd1f:e4b7 with SMTP id d16-20020a170902ced000b001d4bd1fe4b7mr29761plg.24.1706210334003;
+        Thu, 25 Jan 2024 11:18:54 -0800 (PST)
+Received: from localhost.localdomain ([2620:11a:c018:0:ea8:be91:8d1:f59b])
+        by smtp.gmail.com with ESMTPSA id n9-20020a170902d0c900b001d706c17af2sm12215017pln.268.2024.01.25.11.18.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Jan 2024 11:18:53 -0800 (PST)
+From: Joe Damato <jdamato@fastly.com>
+To: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: dhowells@redhat.com,
+	alexander@mihalicyn.com,
+	leitao@debian.org,
+	wuyun.abel@bytedance.com,
+	kuniyu@amazon.com,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	Joe Damato <jdamato@fastly.com>
+Subject: [PATCH net-next] net: print error if SO_BUSY_POLL_BUDGET is large
+Date: Thu, 25 Jan 2024 19:18:40 +0000
+Message-Id: <20240125191840.6740-1-jdamato@fastly.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240124102115.132154-1-biju.das.jz@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 01/25/2024 18:49:35
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 182947 [Jan 25 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.86.50 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.86.50 in (user) dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	lore.kernel.org:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.86.50
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 01/25/2024 18:55:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 1/25/2024 4:13:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Hello!
+When drivers call netif_napi_add_weight with a weight that is larger
+than NAPI_POLL_WEIGHT, the networking code allows the larger weight, but
+prints an error.
 
-On 1/24/24 1:21 PM, Biju Das wrote:
+Replicate this check for SO_BUSY_POLL_BUDGET; check if the user
+specified amount exceeds NAPI_POLL_WEIGHT, allow it anyway, but print an
+error.
 
-> This patch series aims to add HW checksum offload supported by TOE module
-> found on the RZ/G2L Gb ethernet IP.
+Signed-off-by: Joe Damato <jdamato@fastly.com>
+---
+ net/core/sock.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-   Your previous try was back in 2021, still the cover letter has the same
-issues (hm, I didn't point out those back then).
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 158dbdebce6a..ed243bd0dd77 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -1153,6 +1153,9 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
+ 			return -EPERM;
+ 		if (val < 0 || val > U16_MAX)
+ 			return -EINVAL;
++		if (val > NAPI_POLL_WEIGHT)
++			pr_err("SO_BUSY_POLL_BUDGET %u exceeds suggested maximum %u\n", val,
++			       NAPI_POLL_WEIGHT);
+ 		WRITE_ONCE(sk->sk_busy_poll_budget, val);
+ 		return 0;
+ #endif
+-- 
+2.25.1
 
-> The TOE has hw support for calculating IP header and TCP/UDP/ICMP checksum
-> for both IPV4 and IPV6.
-> 
-> For Rx, the result of checksum calculation is attached to last 4byte
-> of ethernet frames.
-
-   "For Rx, the 4-byte result of checksum calculation is attached to the
-Ethernet frames", you wanted to say?
-
-> First 2bytes is result of IPV4 header checksum
-> and next 2 bytes is TCP/UDP/ICMP.
-
-   TCP/UDP/ICMP checksum, you mean?
-
-> If frame does not have error "0000" attached to checksum calculation
-
-   "If a frame does not have checksum error, 0x0000 is attached as
-a checksum calculation result", you wanted to say?
-
-> result. For unsupported frames "ffff" is attached to checksum calculation
-
-   s/to/as/, again?
-
-> result. Cases like IPV6, IPV4 header is always set to "FFFF".
-
-   In case of an IPv6 packet, IPv4 checksum is always set to 0xFFFF",
-you wanted to say?
-
-> For Tx, the result of checksum calculation is set to the checksum field of
-> each IPv4 Header/TCP/UDP/ICMP of ethernet frames. For the unsupported
-> frames, those fields are not changed. If a transmission frame is an UDP
-> frame of IPv4 and its checksum value in the UDP header field is H’0000,
-
-   I think you can call it just UDPv4...
-
-> TOE does not calculate checksum for UDP part of this frame as it is
-> optional function as per standards.
-> 
-> Add Tx/Rx checksum offload supported by TOE for IPV4 and TCP/UDP protocols.
-> 
-> Results of iperf3 in Mbps
-> 
-> RZ/V2L:
-> TCP(Tx/Rx) results with checksum offload Enabled:	{921,932}
-> TCP(Tx/Rx) results with checksum offload Disabled:	{867,612}
-> 
-> UDP(Tx/Rx) results with checksum offload Enabled:	{950,946}
-> UDP(Tx/Rx) results with checksum offload Disabled:	{952,920}
-> 
-> RZ/G2L:
-> TCP(Tx/Rx) results with checksum offload Enabled:	{920,936}
-> TCP(Tx/Rx) results with checksum offload Disabled:	{871,626}
-> 
-> UDP(Tx/Rx) results with checksum offload Enabled:	{953,950}
-> UDP(Tx/Rx) results with checksum offload Disabled:	{954,920}
-> 
-> RZ/G2LC:
-> TCP(Tx/Rx) results with checksum offload Enabled:	{927,936}
-> TCP(Tx/Rx) results with checksum offload Disabled:	{889,626}
-> 
-> UDP(Tx/Rx) results with checksum offload Enabled:	{950,946}
-> UDP(Tx/Rx) results with checksum offload Disabled:	{949,944}
-
-   Too many figures, I think... :-)
-   How RZ/G2L SoC is different from RZ/G2LC?
-
-> v1->v2:
->  * Updated covering letter and results
->  * Fixed the sparse warnings for patch#1 by replacing __sum16->__wsum.
-> 
-> Note:
->  This patches are tested with [1] without the CPU performance is not good
-
-   Without CPU? I guess the performance would be 0. Seriously, this is
-hardly parseable... :-)
- 
->  [1] https://lore.kernel.org/all/20240117190545.596057-1-vincent.guittot@linaro.org/
-> 
-> Biju Das (2):
->   ravb: Add Rx checksum offload support
->   ravb: Add Tx checksum offload support
-
-   These summaries sound like you're adding checksum offload support for
-all supported SoCs while you only do that for those having GbEther...
-
-[...]
-
-MBR, Sergey
 
