@@ -1,168 +1,194 @@
-Return-Path: <netdev+bounces-65908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B05F83C4AD
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 15:27:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9179783C4BF
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 15:33:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 607CB1C21B07
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 14:27:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A4C628DD45
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 14:33:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8300363414;
-	Thu, 25 Jan 2024 14:27:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98D9B6E2B9;
+	Thu, 25 Jan 2024 14:33:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fRswz3St"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Oj4v/P8Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EABC7633F8;
-	Thu, 25 Jan 2024 14:27:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B5D123764
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 14:33:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706192873; cv=none; b=mDQZgHe0N2d/I7m/DL/tinyJNcy+tHgZGrt1FAzd+kGcF5WIMY4JS3L9tqo+ds1h7EUOKl33AnD2m3Sq5zhzaGIztu+mM7DxcWCbmaSRsqc6T1/CUqkMwV5deY56oYQ7k+uBpSI1hx1y1waF0Xoi24xrM1F1CHvZUETHeIH17Z4=
+	t=1706193214; cv=none; b=p3PVRSa5C81lyuuLEFBm9v8Wa7EflJDQlC0rbEgSZ9jpon88x7ju6j5FBVMQRm1i9yz05tvrjvgSbgf0nzwNWmWI5sS1S2lVuSFn3l1aFiYRwhef2LrXWJgcnFUfrGBErhiIarcc3/T+c3eKLEStTfD04YYOO0hnZ8SZVt+CY04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706192873; c=relaxed/simple;
-	bh=pn1ttRiCB3T62fLF7Yk/4dbLJNgue3vHQcDpuryZksk=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=PYz1EVYdah3Rfdb3fumJBOgPbNi9uwVorbaiHUL/W6iUAvH5nMpN/cSdrYYE86LSXtB4kKykwwLdGkiiztmcERwpMRe7eLaQEH11byKhXK3MqMgmZ6hP3XMTX+g/KRtbAcGCzK7cAJcmejUqmIfKgj+QYT5P8myMzbPrh7lZhO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fRswz3St; arc=none smtp.client-ip=209.85.219.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-dc239f84ba4so5885716276.3;
-        Thu, 25 Jan 2024 06:27:51 -0800 (PST)
+	s=arc-20240116; t=1706193214; c=relaxed/simple;
+	bh=qvMe7mslVvyKdS8ALu+5kWnyPXZEUk8FPTt+PB52UAk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GZOZorvU9fSz2YB4VWbJ5HnQblUT0RNS19sbezo4STgsweNgaiR3bmXelpJtdlDF/kyoI+ZK3a6qItL4cg2n9Xtid6RCJ35rGHrn0sD1VHdrzYEoHan2x2UtdQ6Qrf/tTMQ0S+6WutM72o6HM0F3wW0wuPo3KlhZIfglpZnO1g8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Oj4v/P8Z; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-29268441ef6so781295a91.0
+        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 06:33:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706192871; x=1706797671; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ezXZlwq89SJQWpRmFh+WSDEPjc1gF/PThwDrtXv1zJQ=;
-        b=fRswz3St7NR8hdWWVrJDinB3H4BZmGvm2LoZIFGSL3t324yx9pmoP8IWBOja8ySalx
-         5tH1NI94KOc+oP+GNDAJCLakVI+zNtwo7EMTf/dslETPm9CV/QaAyX5uLNj/6JLie1+a
-         1+Hlfr1v+9xxYMG8wXrv6PpT/7cwBF80Huf2NUyiI5JQ7kXsyK9gUsXOegN/Zp5jGc+e
-         5rbqo2vaCIimq0l856Xmv6Ncw+FTDuHxJq92+Gj2QjJxbFJDQlrH8cqQsuHidX8NqVyE
-         JWDEpSb2spGbB0AVd61dV4oNP7sCgMlKu6dC0WyhmCsUUM8zy0m6Iagsg0nfdBIsRxuG
-         3DMA==
+        d=broadcom.com; s=google; t=1706193211; x=1706798011; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=CYvVfGd+6GcH3ZAlE7uFHk7DgjkkpY877CKbjMwtYpo=;
+        b=Oj4v/P8Z359agAmP7SOoN91Y5T8E7zbo2JeYzeggqBfXUayigznS7K09RshvU5vdvl
+         Qzs9p2R6Im/5zBKicYbpKGkvVMFcJsMAJOIIZUzqEQCqGJ5nPkAExonO1YvEtrDxQ2pD
+         7rl6OxvvMq6SxXM849418uh6sOk1D/zs++vLg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706192871; x=1706797671;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ezXZlwq89SJQWpRmFh+WSDEPjc1gF/PThwDrtXv1zJQ=;
-        b=CxfN2E01MjmJ/QU7ksREwEGzXYtYF20MOUGlv+44Y6tQW/YkAtcqULpW0qspGteBNd
-         htB9rfIAKVEhd0ffVXA6IbDMzncg9VeOxc986stZLOYfF0sFvjkZRniKXZrTHEUMV1iE
-         5RQbw/tjGdHNNoGAWHD6c/t8URagke4NnIHw0I8zr3F9Wr3nPfyidWYb0AcnkrMmsz88
-         rvcgn+OUJeYhqFw2CW/zxlUTmOOCDcNjbJBs264b2bDsRJSkRQBfSvg8X0ZM0csSN+f7
-         4q198d0fkr9/garsLIFGv4YpbikXQzcUhVQcTxmWL7urlsRaZWV9r0gJ+dMoYaHraE7g
-         cLhA==
-X-Gm-Message-State: AOJu0YzZBsOjwovyHHjO8A+B29uM7Wy4/z1+LnYV8/KEADkQVYeNJ/Ps
-	9kH75016YQZZiMUGg872qUGGSdaHycqCJKVT7ZCwdw6P51PnMFiA
-X-Google-Smtp-Source: AGHT+IEEdvGNE9BU91woD3drQtobl5gLLHKAajS9wGwKgmPqG7H6diUKug955SL5Tz11roVbE/laSA==
-X-Received: by 2002:a05:6902:567:b0:dbd:b5a0:8494 with SMTP id a7-20020a056902056700b00dbdb5a08494mr1016673ybt.86.1706192870661;
-        Thu, 25 Jan 2024 06:27:50 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVMeYgb1GZEgqu7dAzNrxR/AHBJL6BW0hZ1MGLwfEQ3nWNy+SSWJikGsuPtPtYiPS0zODQ/kRXy/RhnbPC/i5Pdju0FUEG+audAA4OrU6btOXpXBw+qlHvmuB8GFt2vqRMZbxklQpnDo2FwwhZMnA2r04rhUkyfeRmM9F+b8ijTFxGwBjuJ9R8qs0bIWIPWz7Qtnt2hBn/MGib0ZrQMy5kU0n5pPtHThd5SbYHNwzLK2+JrLxj03uGL4HATY3LMyGJNDioHieTyjuRwgOkNZql3MupQT3imkzjj34j5oI8BWWc7yXdNJSc5hg==
-Received: from localhost (131.65.194.35.bc.googleusercontent.com. [35.194.65.131])
-        by smtp.gmail.com with ESMTPSA id ld29-20020a056214419d00b006869647d106sm3565091qvb.5.2024.01.25.06.27.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jan 2024 06:27:50 -0800 (PST)
-Date: Thu, 25 Jan 2024 09:27:50 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Shuah Khan <shuah@kernel.org>, 
- Willem de Bruijn <willemb@google.com>, 
- Lucas Karpinski <lkarpins@redhat.com>, 
- linux-kselftest@vger.kernel.org
-Message-ID: <65b26fe61346d_2b890a294b4@willemb.c.googlers.com.notmuch>
-In-Reply-To: <49d15fe58d9cd415ca96739b08c59c7cde5c3422.camel@redhat.com>
-References: <cover.1706131762.git.pabeni@redhat.com>
- <28e7af7c031557f691dc8045ee41dd549dd5e74c.1706131762.git.pabeni@redhat.com>
- <65b1b4e92df6_250560294f4@willemb.c.googlers.com.notmuch>
- <49d15fe58d9cd415ca96739b08c59c7cde5c3422.camel@redhat.com>
-Subject: Re: [PATCH net 1/3] selftests: net: remove dependency on ebpf tests
+        d=1e100.net; s=20230601; t=1706193211; x=1706798011;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CYvVfGd+6GcH3ZAlE7uFHk7DgjkkpY877CKbjMwtYpo=;
+        b=Y7vgQm2lcnxHKOeur3mWlb+6vE5HLvCwDUHGKQLuWbfDC8evDjUrcE5WytNLfv739D
+         y6xdT5uv5Ke7BTPY0CBnGZJjwwxlN7UhEgQN9nA5dCeC3gjH5+kEmXI7N5EcV1Je3/h2
+         RCBebCbk4tNOMdky7O3228CEjgtjjqiDRgzDQcfJ1whAWBcuVPsWJrFaSgCL9V+0/3cH
+         AC9N7FICYMs/CocqkOlDI/z2ypuWDl2ZeglBYOiRBZh/v/cYzS/ZuGLQOrAPD+l9EUXV
+         cKV+RAjDEuy3Y9bSZwsa+RMHfYtlVQhU1jVOkj7lkQvyZ+1NOZ+EY0M2HDTrILlNXzFL
+         mbOA==
+X-Gm-Message-State: AOJu0YxXnQ3mBk34gembASfsB4b5q05183oqDWEVR+tcnxUddjWj7Cae
+	NCi31d1fNCC/HKMEDrh+qoRTwc3V64wnObkaj3YH0LdZc7uU64mJIztcthqvkKpAqd1RBd5ufP2
+	DceKzvYVC6ctNK1STAy21rIeZdM3xSEAMpOm8A7DHRbB8zljeMJdU
+X-Google-Smtp-Source: AGHT+IHM+rj2pr829FWSDIV9eKwB1v3w4WKPwVzVczsyMtiOOeDh8lu2EHu7j3bDB33gmgKWw8mxDOlfEwt6pP/ZcpM=
+X-Received: by 2002:a17:90b:4ac5:b0:290:3e62:9299 with SMTP id
+ mh5-20020a17090b4ac500b002903e629299mr745291pjb.66.1706193210782; Thu, 25 Jan
+ 2024 06:33:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20240125134104.2045573-1-leitao@debian.org>
+In-Reply-To: <20240125134104.2045573-1-leitao@debian.org>
+From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Date: Thu, 25 Jan 2024 20:03:18 +0530
+Message-ID: <CALs4sv2U+3uu1Nz0Sf9_Ya6YKxK09WU=QH4VmO94FjC3iWX3rA@mail.gmail.com>
+Subject: Re: [PATCH net] bnxt_en: Make PTP timestamp HWRM more silent
+To: Breno Leitao <leitao@debian.org>
+Cc: Michael Chan <michael.chan@broadcom.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Richard Cochran <richardcochran@gmail.com>, gospo@broadcom.com, 
+	"open list:BROADCOM BNXT_EN 50 GIGABIT ETHERNET DRIVER" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000004625f6060fc610e0"
 
-Paolo Abeni wrote:
-> On Wed, 2024-01-24 at 20:10 -0500, Willem de Bruijn wrote:
-> > Paolo Abeni wrote:
-> > > Several net tests requires an XDP program build under the ebpf
-> > > directory, and error out if such program is not available.
-> > > 
-> > > That makes running successful net test hard, let's duplicate into the
-> > > net dir the [very small] program, re-using the existing rules to build
-> > > it, and finally dropping the bogus dependency.
-> > > 
-> > > Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> > > ---
-> > >  tools/testing/selftests/net/Makefile          |  5 +++--
-> > >  tools/testing/selftests/net/udpgro.sh         |  4 ++--
-> > >  tools/testing/selftests/net/udpgro_bench.sh   |  4 ++--
-> > >  tools/testing/selftests/net/udpgro_frglist.sh |  6 +++---
-> > >  tools/testing/selftests/net/udpgro_fwd.sh     |  2 +-
-> > >  tools/testing/selftests/net/veth.sh           |  4 ++--
-> > >  tools/testing/selftests/net/xdp_dummy.c       | 13 +++++++++++++
-> > >  7 files changed, 26 insertions(+), 12 deletions(-)
-> > >  create mode 100644 tools/testing/selftests/net/xdp_dummy.c
-> > > 
-> > > diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-> > > index 50818075e566..304d8b852ef0 100644
-> > > --- a/tools/testing/selftests/net/Makefile
-> > > +++ b/tools/testing/selftests/net/Makefile
-> > > @@ -84,6 +84,7 @@ TEST_PROGS += sctp_vrf.sh
-> > >  TEST_GEN_FILES += sctp_hello
-> > >  TEST_GEN_FILES += csum
-> > >  TEST_GEN_FILES += nat6to4.o
-> > > +TEST_GEN_FILES += xdp_dummy.o
-> > >  TEST_GEN_FILES += ip_local_port_range
-> > >  TEST_GEN_FILES += bind_wildcard
-> > >  TEST_PROGS += test_vxlan_mdb.sh
-> > > @@ -104,7 +105,7 @@ $(OUTPUT)/tcp_inq: LDLIBS += -lpthread
-> > >  $(OUTPUT)/bind_bhash: LDLIBS += -lpthread
-> > >  $(OUTPUT)/io_uring_zerocopy_tx: CFLAGS += -I../../../include/
-> > >  
-> > > -# Rules to generate bpf obj nat6to4.o
-> > > +# Rules to generate bpf objs
-> > >  CLANG ?= clang
-> > >  SCRATCH_DIR := $(OUTPUT)/tools
-> > >  BUILD_DIR := $(SCRATCH_DIR)/build
-> > > @@ -139,7 +140,7 @@ endif
-> > >  
-> > >  CLANG_SYS_INCLUDES = $(call get_sys_includes,$(CLANG),$(CLANG_TARGET_ARCH))
-> > >  
-> > > -$(OUTPUT)/nat6to4.o: nat6to4.c $(BPFOBJ) | $(MAKE_DIRS)
-> > > +$(OUTPUT)/nat6to4.o $(OUTPUT)/xdp_dummy.o: $(OUTPUT)/%.o : %.c $(BPFOBJ) | $(MAKE_DIRS)
-> > >  	$(CLANG) -O2 --target=bpf -c $< $(CCINCLUDE) $(CLANG_SYS_INCLUDES) -o $@
-> > 
-> > is the "$(OUTPUT)/%.o :" intentional or a leftover from editing?
-> 
-> Is intentional and AFAICS required to let this rule being selected when
-> the output directory is not an empty string (the target and the pre-req
-> will be in different directories).
+--0000000000004625f6060fc610e0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Thanks. I don't understand why. Sorry to harp on this small point, but
-you've verified that the build fails without? Is it perhaps due to that
-"$(MAKE_DIRS)" order-only-prerequisite? But nat6to4 on its own did not
-need this.
+On Thu, Jan 25, 2024 at 7:11=E2=80=AFPM Breno Leitao <leitao@debian.org> wr=
+ote:
+>
+> commit 056bce63c469 ("bnxt_en: Make PTP TX timestamp HWRM query silent")
+> changed a netdev_err() to netdev_WARN_ONCE().
+>
+> netdev_WARN_ONCE() is it generates a kernel WARNING, which is bad, for
+> the following reasons:
+>
+>  * You do not a kernel warning if the firmware queries are late
+>  * In busy networks, timestamp query failures fairly regularly
+>  * A WARNING message doesn't bring much value, since the code path
+> is clear.
+> (This was discussed in-depth in [1])
+>
+> Transform the netdev_WARN_ONCE() into a netdev_warn_once(), and print a
+> more well-behaved message, instead of a full WARN().
+>
+>         bnxt_en 0000:67:00.0 eth0: TS query for TX timer failed rc =3D ff=
+fffff5
+>
+> [1] Link: https://lore.kernel.org/all/ZbDj%2FFI4EJezcfd1@gmail.com/
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-Substition references could add a second colon in a rule, but
-otherwise I cannot find a reference to this repeated colon syntax.
+LGTM, however, you may still need to add a proper fixes tag.
 
-Don't waste time on my behalf if you're sure this is correct. I just
-can't add a reviewed tag if I don't understand it -- but that tag is
-hardly essential.
+--0000000000004625f6060fc610e0
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
+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
+OltyqaGBuzv+bJTUL+bmV7E4QBLIqGt4jVr1R9hJdH6KxXwJdyfHZ9C6qXmoe2NQhiFUyBOJ0wgk
+dB9Z1IU7nCwvNKYg2JMoJs93tIgbhPJg/D7pqW8gabkCAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZcGF2YW4uY2hlYmJpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUEV6y/89alKPoFbKUaJXsvWu5
+fdowDQYJKoZIhvcNAQELBQADggEBAEHSIB6g652wVb+r2YCmfHW47Jo+5TuCBD99Hla8PYhaWGkd
+9HIyD3NPhb6Vb6vtMWJW4MFGQF42xYRrAS4LZj072DuMotr79rI09pbOiWg0FlRRFt6R9vgUgebu
+pWSH7kmwVXcPtY94XSMMak4b7RSKig2mKbHDpD4bC7eGlwl5RxzYkgrHtMNRmHmQor5Nvqe52cFJ
+25Azqtwvjt5nbrEd81iBmboNTEnLaKuxbbCtLaMEP8xKeDjAKnNOqHUMps0AsQT8c0EGq39YHpjp
+Wn1l67VU0rMShbEFsiUf9WYgE677oinpdm0t2mdCjxr35tryxptoTZXKHDxr/Yy6l6ExggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwV/XkICjVscn4SNZMw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIJStwg0guiDa4IXE9ajM3ZvwN2YNMzuT
+jRJVPJWLGOj2MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDEy
+NTE0MzMzMVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQAujPng/E2dfwuQSGrKqoFttmT1KZKBSESikSqD5qVy5Etux8Y6
+Ct8WpXaEbi5iB8lshIeeDybrF8HrXlblcFPg9adTH2pY2NlOOjqc5gbU9EbTI9/3X6PqN1+zsGTK
+Bk4nyiTLM5rkPesuVbXROmJqu2Q1zgjQhSlZRUcSBDirpDDMHi7FBljV0Hv1TvnYzMeWpjvKKcfE
+TOz0DdATQVCAUv3aU4G7YEIWfY9YQlyI2MtxU9XK4rmHmFDwcDbNLORbQYMSTrV6YYwELviL7na4
+hqT1ZH020TdByj8wzxOAQunVdmLDVWi19aedXHzw5eiHqflNF7KbG+AZpsxCnSsa
+--0000000000004625f6060fc610e0--
 
