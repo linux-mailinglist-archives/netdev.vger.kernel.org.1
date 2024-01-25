@@ -1,110 +1,203 @@
-Return-Path: <netdev+bounces-65706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92B9B83B674
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 02:15:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCFFB83B687
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 02:26:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C603E1C20E92
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 01:15:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A6DE282562
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 01:26:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98DFFEA9;
-	Thu, 25 Jan 2024 01:15:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96D497E1;
+	Thu, 25 Jan 2024 01:26:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hMOeMQzy"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Yzh7DPss"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AA1D636;
-	Thu, 25 Jan 2024 01:15:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C52256FAD
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 01:26:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706145339; cv=none; b=H8zeMf5BG7W0c3jWJBR0v4hprAQzJ0RAA7O6rn7dOwGnTnazesryKjSiQqmNbNkByYJg40i3Scb8iNXVZIg+0KnetvJhpijiY++fa3Py4Fo+u7SA2f38IE/zNlL7pPjUzb0Ij4EmSESJ+rCtN9I89sFobsI+MZJbNuWk6t/nVdM=
+	t=1706145995; cv=none; b=RQZr7V+svKQ+YK88fEna3bOVWNK0EYPxsqKgUfjHLHvDBBS0QsxxX2kFVZD3knL8g7GCInSBtIFbZKNFYwzV/hEsGpglxFM2BoWViyihMiATkLY9q1OgjSuMp83d30dnspOJ49ZImTOAgiDO0U4anV6oOxyh+D2DILfWtRizKkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706145339; c=relaxed/simple;
-	bh=VBeXYBZis91k3cPZTSipANekOuqKDrI3JcgmDPQThqs=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=Lbko5CnOvAvXoVniAiTl7hhMHRs4/ej18TwCgSy+zj1HMZ70Us3GtNH810N7R2k9jmFggFU6I9Gb21/x43Pg8VTzrzbBVpq0fwq4BTrw2TsG5SvXKd73mD5o7Fz43txJLVLLM6gTgsSz8Q8sx6d3cA0jcBHRkHV9l+SXOvM427Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hMOeMQzy; arc=none smtp.client-ip=209.85.222.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-78315243c11so397158785a.3;
-        Wed, 24 Jan 2024 17:15:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706145337; x=1706750137; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wCGVYud7xBqXIPvanc3yk8t0TN4BtyxL4UlXQe7cir4=;
-        b=hMOeMQzyNrd9SM4EZ/rAPLM2tiO5t5vvLAnKh+SW0lymFn1e0ZA1zrCCpAzm+r9PrD
-         g1UOLs8+Yi/aCrbHrWJ2NBrLZwmAS+RNqbAdAX1o8l0I3agpxvBDqEh//t0orKLnkjQ8
-         6WZhziYxwuYMGO1B8kNYQJ25lIZGjWCSMNoEaWjLd3tOz4bQz69yyqJuk+mXXo1idLpf
-         tXEcKiSJAO7h2yXdb9pdI3kZz/5MismHy4M6bbJVvN0aBaYEebGV5v9axtUedSfvz8Qx
-         vjnQHfU7E0R6WT/7WVvaQ23dLyARTaOpZ7vlq785aWwIR2R4F7czmj9VSALNEWPMjweq
-         XWQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706145337; x=1706750137;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=wCGVYud7xBqXIPvanc3yk8t0TN4BtyxL4UlXQe7cir4=;
-        b=s2WLgZmudMHnBy2qgnZM6dOy8iTDqekLLCnq1m3te56TuSvFauQJegjQyM6rXYBecf
-         9umhkslgvKm4XV5ruq/F7arUjoM7yiB0ZXFpOdgsNW4qt9vJe97KnY9uCBIAFc3GZD+s
-         oPkBan0SnEk5cu/FkqsqX5t4TVLLVNehuodDGKxCov087VEo8/mDvWnIqJDYPPXHgYnF
-         9gX9tiQw6gnxoPg2yih/tlhSFKkJpt6kg8idyTTjgtMlwVO8ZF1Xla82CgjV4wfyMXxe
-         x2soSKirlCwDmob76Sf4f8+canswKFiShR6sqipzH2lw6Cd8KM/rspRWWjIOqws2Sk5H
-         6Epw==
-X-Gm-Message-State: AOJu0YyctMh5P1fTuNA6V2HchknwIjbAMpyHQ7WLWmH/Z351oM0yilWG
-	UmKTTQHvif2Z+i26j2pCqt4U7II1GdHfQ9iMOajVFiMDKpnuAQ6m
-X-Google-Smtp-Source: AGHT+IFun4XC6lyrcnVNQa6HrRGkVPucF6vHKipHAPYihwgQAQdR0pYMny2Iuc8d3KVUJbqDxJL4YQ==
-X-Received: by 2002:a05:620a:118d:b0:783:22a9:9cc1 with SMTP id b13-20020a05620a118d00b0078322a99cc1mr250965qkk.95.1706145336884;
-        Wed, 24 Jan 2024 17:15:36 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCXCQv5gX6FznkvSOr4WFqx8UOmndsJD0tCsfnbo+jyGyR5TtiLWeGnb/GFQRt4XmbnEnQ59EgAN+5q2CwM3nsT7NK/9ClnkItgx7HDlyxEHrt4k2WgO1x942dPfbHqClePaeH43RPo77KMLVB89mCEB5N59QQYmPnaHtXtEzPhCx0jYSXeBTDJdLKDUl2mgfd4TOv7hkPyp7ESbwDW+uHF8Xm5mJrJa8/NbweHrHzG3NZzvGkRigl8lWMqxsyjmC27ktGArKVjpqg==
-Received: from localhost (131.65.194.35.bc.googleusercontent.com. [35.194.65.131])
-        by smtp.gmail.com with ESMTPSA id v16-20020a05620a123000b0078391bc0fddsm4554851qkj.77.2024.01.24.17.15.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jan 2024 17:15:36 -0800 (PST)
-Date: Wed, 24 Jan 2024 20:15:36 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Shuah Khan <shuah@kernel.org>, 
- Willem de Bruijn <willemb@google.com>, 
- Lucas Karpinski <lkarpins@redhat.com>, 
- linux-kselftest@vger.kernel.org
-Message-ID: <65b1b6386e1da_2505602943@willemb.c.googlers.com.notmuch>
-In-Reply-To: <4d58900fb09cef42749cfcf2ad7f4b91a97d225c.1706131762.git.pabeni@redhat.com>
-References: <cover.1706131762.git.pabeni@redhat.com>
- <4d58900fb09cef42749cfcf2ad7f4b91a97d225c.1706131762.git.pabeni@redhat.com>
-Subject: Re: [PATCH net 3/3] selftests: net: explicitly wait for listener
- ready
+	s=arc-20240116; t=1706145995; c=relaxed/simple;
+	bh=/bG04frI+8AEtX1UkmXUckcVaY83ebVSVcY77KIMgF0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Jx9Ye8sL6u+2BOpzoai5Kjf4lANdAB0BqS51Ls8ax+1uILdfV0Eg8Ij01s0dpCemlRGD+eGHQh+KbIEU+sFUhZZ6wXQJj+uRwQoFzwgb/KVr9lvUw0EtJPI57dCoIgLKqv0ZtpRvyLp6Nu7PeiCJ4Dbdw5bNh0wx9IbRM1B9DFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Yzh7DPss; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <ca2ca170-b76c-4fc3-aa44-cae4a1e25aa4@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1706145991;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ALoEZM9RVE/tOlWK9AF2LXEypS3Bld3Rxux5elBLvf8=;
+	b=Yzh7DPss9iVKI7RV511dKJG2UWex+qR0YNUkFdNKTW6lvW9w+8xGoCD3U7bRfq+3aklkgl
+	VQRDF4Hl/dgEekNxkIbCM5CM41FImyn14RD/mHrrcFOgsESJ58Wa+KJYjNY7rzAvOTtQXX
+	SIIPQT1meee/i7A/TlSCgOqebv7N63g=
+Date: Wed, 24 Jan 2024 17:26:24 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+Subject: Re: [PATCH bpf-next v8 3/3] selftests: bpf: crypto skcipher algo
+ selftests
+Content-Language: en-US
+To: Vadim Fedorenko <vadfed@meta.com>
+Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+ bpf@vger.kernel.org, Victor Stewart <v@nametag.social>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>, Jakub Kicinski
+ <kuba@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>
+References: <20240115220803.1973440-1-vadfed@meta.com>
+ <20240115220803.1973440-3-vadfed@meta.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20240115220803.1973440-3-vadfed@meta.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Paolo Abeni wrote:
-> The UDP GRO forwarding test still hard-code an arbitrary pause
-> to wait for the UDP listener becoming ready in background.
-> 
-> That causes sporadic failures depending on the host load.
-> 
-> Replace the sleep with the existing helper waiting for the desired
-> port being exposed.
-> 
-> Fixes: a062260a9d5f ("selftests: net: add UDP GRO forwarding self-tests")
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+On 1/15/24 2:08 PM, Vadim Fedorenko wrote:
+> +static void deinit_afalg(void)
+> +{
+> +	if (tfmfd)
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+The test should be (tfmfd != -1) ?
+
+> +		close(tfmfd);
+> +	if (opfd)
+
+Same here.
+
+> +		close(opfd);
+> +}
+
+[ ... ]
+
+> +SEC("?fentry.s/bpf_fentry_test1")
+> +__failure __msg("Unreleased reference")
+
+The error message is not checked. Take a look at how other tests use RUN_TESTS.
+
+> +int BPF_PROG(crypto_acquire)
+> +{
+> +	struct bpf_crypto_ctx *cctx;
+> +	struct bpf_dynptr key = {};
+> +	int err = 0;
+> +
+> +	status = 0;
+> +
+> +	bpf_dynptr_from_mem(crypto_key, sizeof(crypto_key), 0, &key);
+> +	cctx = bpf_crypto_ctx_create("skcipher", "ecb(aes)", &key, 0, &err);
+> +
+> +	if (!cctx) {
+> +		status = err;
+> +		return 0;
+> +	}
+> +
+> +	cctx = bpf_crypto_ctx_acquire(cctx);
+> +	if (!cctx)
+> +		return -EINVAL;
+> +
+> +	bpf_crypto_ctx_release(cctx);
+> +
+> +	return 0;
+> +}
+> +
+> +SEC("tc")
+> +int decrypt_sanity(struct __sk_buff *skb)
+> +{
+> +	struct __crypto_ctx_value *v;
+> +	struct bpf_crypto_ctx *ctx;
+> +	struct bpf_dynptr psrc, pdst, iv;
+> +	int err;
+> +
+> +	err = skb_dynptr_validate(skb, &psrc);
+> +	if (err < 0) {
+> +		status = err;
+> +		return TC_ACT_SHOT;
+> +	}
+> +
+> +	v = crypto_ctx_value_lookup();
+> +	if (!v) {
+> +		status = -ENOENT;
+> +		return TC_ACT_SHOT;
+> +	}
+> +
+> +	ctx = v->ctx;
+> +	if (!ctx) {
+> +		status = -ENOENT;
+> +		return TC_ACT_SHOT;
+> +	}
+> +
+> +	bpf_dynptr_from_mem(dst, sizeof(dst), 0, &pdst);
+> +	/* iv dynptr has to be initialized with 0 size, but proper memory region
+> +	 * has to be provided anyway
+> +	 */
+> +	bpf_dynptr_from_mem(dst, 0, 0, &iv);
+
+It would be nice to allow passing NULL as an optional "iv" arg. It could be a 
+future improvement.
+
+Overall lgtm. Please add a cover letter in v4 and also the benchmark test that 
+was brought up a while back.
+
+> +
+> +	status = bpf_crypto_decrypt(ctx, &psrc, &pdst, &iv);
+> +
+> +	return TC_ACT_SHOT;
+> +}
+> +
+> +SEC("tc")
+> +int encrypt_sanity(struct __sk_buff *skb)
+> +{
+> +	struct __crypto_ctx_value *v;
+> +	struct bpf_crypto_ctx *ctx;
+> +	struct bpf_dynptr psrc, pdst, iv;
+> +	int err;
+> +
+> +	status = 0;
+> +
+> +	err = skb_dynptr_validate(skb, &psrc);
+> +	if (err < 0) {
+> +		status = err;
+> +		return TC_ACT_SHOT;
+> +	}
+> +
+> +	v = crypto_ctx_value_lookup();
+> +	if (!v) {
+> +		status = -ENOENT;
+> +		return TC_ACT_SHOT;
+> +	}
+> +
+> +	ctx = v->ctx;
+> +	if (!ctx) {
+> +		status = -ENOENT;
+> +		return TC_ACT_SHOT;
+> +	}
+> +
+> +	bpf_dynptr_from_mem(dst, sizeof(dst), 0, &pdst);
+> +	/* iv dynptr has to be initialized with 0 size, but proper memory region
+> +	 * has to be provided anyway
+> +	 */
+> +	bpf_dynptr_from_mem(dst, 0, 0, &iv);
+> +
+> +	status = bpf_crypto_encrypt(ctx, &psrc, &pdst, &iv);
+> +
+> +	return TC_ACT_SHOT;
+> +}
+> +
+> +char __license[] SEC("license") = "GPL";
+
 
