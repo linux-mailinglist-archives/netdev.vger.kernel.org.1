@@ -1,210 +1,117 @@
-Return-Path: <netdev+bounces-65782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CB0E83BB45
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:04:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01EAE83BBBE
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:21:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 62CE91C243F0
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 08:04:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8B0D2811AD
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 08:21:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15CDB15AF9;
-	Thu, 25 Jan 2024 08:04:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB48D13FFD;
+	Thu, 25 Jan 2024 08:21:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lPU8zeWE"
+	dkim=pass (1024-bit key) header.d=pschenker.ch header.i=@pschenker.ch header.b="uVZvbgkF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com [209.85.222.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-42af.mail.infomaniak.ch (smtp-42af.mail.infomaniak.ch [84.16.66.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FED314F86;
-	Thu, 25 Jan 2024 08:04:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF0D0175B9
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 08:21:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.16.66.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706169849; cv=none; b=CrcuNGkgshm52uyV1CAy4vUQV0x73cT8F/3yeIBC5NNpGg+Swo+YxOdXLFshVr9QGafk9I2oj5z61SrLn1j/lgpPa+mRfXg0SDhaO9X2IWm0HS2GV+NSlip6sLocNUMDdn3n7Smi73bMIrHgyHXKaOZthCTVSV1OP2T3/Xw64LU=
+	t=1706170904; cv=none; b=ulJnKdlv3HupkVfuCOCSrSl3kr1rmup+BOWjXPj/V2Baq8pQdr6JX/DtKVhTbEq+5HjZ5HLZNh9p+NAeFb4i2bK++7cx6syM9Cwp3MDo/CiWPhm6VO68+GfPuhh9enMJvnYhi6B5PztT2nBzCH0Sjoe4D8KlifQ77xgyM6TTiTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706169849; c=relaxed/simple;
-	bh=hDxamplBsotWbvMDQTn7mEvPUtyfVp6Jc+qhdCx6Xbo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jIZHSukcrAeTpZzPQ8R/tcR/equ1X5AiQX4jMoomKAE3eXWC6BGMj7cv7iL22/BUJo97haPhhlREgMpXajJEASvBUXZm4O0eE6SYbAzFa7ciCi/jXDBwoQMSPLkC19e15rZC9RknPoLQqCCDuhTQpGQ1I2Ee25dSF5Sd5c0VLtI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lPU8zeWE; arc=none smtp.client-ip=209.85.222.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f51.google.com with SMTP id a1e0cc1a2514c-7d53ea8024dso53685241.1;
-        Thu, 25 Jan 2024 00:04:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706169846; x=1706774646; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=sZT8/9PgZuTeh83+/QruKBnCl5NoqTcp1uIUCJ9u5aU=;
-        b=lPU8zeWEiwfnZEn66qirYRtCF0OW3I0ZqM+PfLzsTCy/u2nA+HiQNK+6fak/2RlXt6
-         5iM0PKjHCwTFnBq8cUWjXZbsH8hPSIW3wenwu24vAqY/EF93YSRlTRgc7JJrD0ISRXFI
-         HERaONjLOgl+5mg9w0OGFHaIW6ErXTeTgsw5/2meCl22Fca5lnJI1h7nrumOso1JyOZd
-         JPJYSXmA5azKF/D35a5WmtZ1G7oX376eFO9UQ+AB+U01/Uq64HQl/o4zL59Wdrrn0rXl
-         zH0qvXzHaOaCyc5nGxHR8BFvIWXDBP4Uv4/FSlxU/uH7MYUMkplZpNb5tSfVVXowiYLl
-         UY+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706169846; x=1706774646;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sZT8/9PgZuTeh83+/QruKBnCl5NoqTcp1uIUCJ9u5aU=;
-        b=J9ug/wBYtaKbDZ9sbzwxuJtcxz/QwKOg8QxgjZDYzAzk3xKPL2kmdzJo2VcAsxTXfU
-         bRrLGBOY5BnX9vgHKJ5JHklMLUZKkNAeUWTXhfuWyKzNz+S1qXYZoBis+qrcReoQtGS6
-         qFHPcOCAQiJh2UJH2gl1sh14NE51V2C/AiWybaj9UnSENmsUb21iet0LqdPqyTOwZyFF
-         +O99v1XDQdcAZTDcsnTYCWRGwVGnvGZSLq7BcxPMcyL4thPMf2WYRifXFLx6PxlwVcNn
-         Qxpv0gZdU7kvfhCGUyAO65lBMOf06oLkmtBHYRruKmVYWKJ4/O8dLeRYxIMAHUN1j5qQ
-         +aIw==
-X-Gm-Message-State: AOJu0YxuRPD2PpKFvhmS5XgfSgPcI4lxnDHMAYP1vrYSzkzFzwq2XtgR
-	MvxQrdXImHS49Te3Vb/PwduWTZEx8+r4Cg3Sdxjq+9AI9yp/GPaW4UBNo9/NKv7ndw65pcOJ5o9
-	vXrwErXn1lrnrk/IVKcYsfwnX+cU=
-X-Google-Smtp-Source: AGHT+IHDMdzd0L+gZ6HYMBNFVKRpe73Gf29LizjNJ6zEfGPhn2td090G9Il+wVVyBONa71BlB2aknf1MEFBlTnUpvpY=
-X-Received: by 2002:a67:f90e:0:b0:469:ac04:5553 with SMTP id
- t14-20020a67f90e000000b00469ac045553mr922677vsq.3.1706169846143; Thu, 25 Jan
- 2024 00:04:06 -0800 (PST)
+	s=arc-20240116; t=1706170904; c=relaxed/simple;
+	bh=Wwr/9VY0CuvcH7ywePcK0l0TShBy0NXgTb8eojUbKq0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qsnM9pof6zzA7D6Zxzp0DWJPr9oqziYJdKxdUbt2YGZMdXt4Rw3Wcneu3fNdGnxO3Ps8iBQkHXIC3dVMs6aTQ/ZTUYZBtaeP3U8qKyVRQFAw5Yybl8DsXG57RBSAfr81AB+/W9hwZdTW+0rOjN02i7JqZ6fjV3SNPKZAl7QOCM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pschenker.ch; spf=pass smtp.mailfrom=pschenker.ch; dkim=pass (1024-bit key) header.d=pschenker.ch header.i=@pschenker.ch header.b=uVZvbgkF; arc=none smtp.client-ip=84.16.66.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pschenker.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pschenker.ch
+Received: from smtp-4-0001.mail.infomaniak.ch (smtp-4-0001.mail.infomaniak.ch [10.7.10.108])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4TLD0R2qpqzVH7;
+	Thu, 25 Jan 2024 09:05:43 +0100 (CET)
+Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4TLD0P73LMzny1;
+	Thu, 25 Jan 2024 09:05:41 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=pschenker.ch;
+	s=20220412; t=1706169943;
+	bh=Wwr/9VY0CuvcH7ywePcK0l0TShBy0NXgTb8eojUbKq0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=uVZvbgkFPM2U+jrm09GDGJPALEzxJtSZhEup77eEx1CuQCjnL/ixkXrZyU+8t1SPU
+	 WMfh3qyG5ZUBsRRj86M/x63r/atchTEeOhMyuylJdeUhK1mYqStoq9Uk3t/pXIWFwN
+	 cut8XDiSo8CIE97PLUgXD8XH/ZSpgJD4mw5w+ilI=
+From: Philippe Schenker <dev@pschenker.ch>
+To: netdev@vger.kernel.org
+Cc: Conor Dooley <conor+dt@kernel.org>,
+	devicetree@vger.kernel.org,
+	Marek Vasut <marex@denx.de>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	Rob Herring <robh+dt@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Eric Dumazet <edumazet@google.com>,
+	stefan.portmann@impulsing.ch,
+	"David S . Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Philippe Schenker <philippe.schenker@impulsing.ch>,
+	Conor Dooley <conor.dooley@microchip.com>
+Subject: [PATCH net-next v2 1/2] dt-bindings: net: dsa: Add KSZ8567 switch support
+Date: Thu, 25 Jan 2024 09:05:03 +0100
+Message-Id: <20240125080504.62061-1-dev@pschenker.ch>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240124191602.566724-1-maciej.fijalkowski@intel.com> <20240124191602.566724-11-maciej.fijalkowski@intel.com>
-In-Reply-To: <20240124191602.566724-11-maciej.fijalkowski@intel.com>
-From: Magnus Karlsson <magnus.karlsson@gmail.com>
-Date: Thu, 25 Jan 2024 09:03:54 +0100
-Message-ID: <CAJ8uoz0ATqhepbBQLv0u-NVrEJeL1EZ-w+xTkW5cUeZGxCT6NA@mail.gmail.com>
-Subject: Re: [PATCH v6 bpf 10/11] i40e: set xdp_rxq_info::frag_size
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
-	andrii@kernel.org, netdev@vger.kernel.org, magnus.karlsson@intel.com, 
-	bjorn@kernel.org, echaudro@redhat.com, lorenzo@kernel.org, 
-	martin.lau@linux.dev, tirthendu.sarkar@intel.com, john.fastabend@gmail.com, 
-	horms@kernel.org, kuba@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Infomaniak-Routing: alpha
 
-On Wed, 24 Jan 2024 at 20:29, Maciej Fijalkowski
-<maciej.fijalkowski@intel.com> wrote:
->
-> i40e support XDP multi-buffer so it is supposed to use
-> __xdp_rxq_info_reg() instead of xdp_rxq_info_reg() and set the
-> frag_size. It can not be simply converted at existing callsite because
-> rx_buf_len could be un-initialized, so let us register xdp_rxq_info
-> within i40e_configure_rx_ring(), which happen to be called with already
-> initialized rx_buf_len value.
->
-> Commit 5180ff1364bc ("i40e: use int for i40e_status") converted 'err' to
-> int, so two variables to deal with return codes are not needed within
-> i40e_configure_rx_ring(). Remove 'ret' and use 'err' to handle status
-> from xdp_rxq_info registration.
+From: Philippe Schenker <philippe.schenker@impulsing.ch>
 
-Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
+This commit adds the dt-binding for KSZ8567, a robust 7-port
+Ethernet switch. The KSZ8567 features two RGMII/MII/RMII interfaces,
+each capable of gigabit speeds, complemented by five 10/100 Mbps
+MAC/PHYs.
 
-> Fixes: e213ced19bef ("i40e: add support for XDP multi-buffer Rx")
-> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> ---
->  drivers/net/ethernet/intel/i40e/i40e_main.c | 40 ++++++++++++---------
->  drivers/net/ethernet/intel/i40e/i40e_txrx.c |  9 -----
->  2 files changed, 24 insertions(+), 25 deletions(-)
->
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-> index ae8f9f135725..d3b00d8ed39a 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-> @@ -3588,40 +3588,48 @@ static int i40e_configure_rx_ring(struct i40e_ring *ring)
->         struct i40e_hmc_obj_rxq rx_ctx;
->         int err = 0;
->         bool ok;
-> -       int ret;
->
->         bitmap_zero(ring->state, __I40E_RING_STATE_NBITS);
->
->         /* clear the context structure first */
->         memset(&rx_ctx, 0, sizeof(rx_ctx));
->
-> -       if (ring->vsi->type == I40E_VSI_MAIN)
-> -               xdp_rxq_info_unreg_mem_model(&ring->xdp_rxq);
-> +       ring->rx_buf_len = vsi->rx_buf_len;
-> +
-> +       /* XDP RX-queue info only needed for RX rings exposed to XDP */
-> +       if (ring->vsi->type != I40E_VSI_MAIN)
-> +               goto skip;
-> +
-> +       if (!xdp_rxq_info_is_reg(&ring->xdp_rxq)) {
-> +               err = __xdp_rxq_info_reg(&ring->xdp_rxq, ring->netdev,
-> +                                        ring->queue_index,
-> +                                        ring->q_vector->napi.napi_id,
-> +                                        ring->rx_buf_len);
-> +               if (err)
-> +                       return err;
-> +       }
->
->         ring->xsk_pool = i40e_xsk_pool(ring);
->         if (ring->xsk_pool) {
-> -               ring->rx_buf_len =
-> -                 xsk_pool_get_rx_frame_size(ring->xsk_pool);
-> -               ret = xdp_rxq_info_reg_mem_model(&ring->xdp_rxq,
-> +               ring->rx_buf_len = xsk_pool_get_rx_frame_size(ring->xsk_pool);
-> +               err = xdp_rxq_info_reg_mem_model(&ring->xdp_rxq,
->                                                  MEM_TYPE_XSK_BUFF_POOL,
->                                                  NULL);
-> -               if (ret)
-> -                       return ret;
-> +               if (err)
-> +                       return err;
->                 dev_info(&vsi->back->pdev->dev,
->                          "Registered XDP mem model MEM_TYPE_XSK_BUFF_POOL on Rx ring %d\n",
->                          ring->queue_index);
->
->         } else {
-> -               ring->rx_buf_len = vsi->rx_buf_len;
-> -               if (ring->vsi->type == I40E_VSI_MAIN) {
-> -                       ret = xdp_rxq_info_reg_mem_model(&ring->xdp_rxq,
-> -                                                        MEM_TYPE_PAGE_SHARED,
-> -                                                        NULL);
-> -                       if (ret)
-> -                               return ret;
-> -               }
-> +               err = xdp_rxq_info_reg_mem_model(&ring->xdp_rxq,
-> +                                                MEM_TYPE_PAGE_SHARED,
-> +                                                NULL);
-> +               if (err)
-> +                       return err;
->         }
->
-> +skip:
->         xdp_init_buff(&ring->xdp, i40e_rx_pg_size(ring) / 2, &ring->xdp_rxq);
->
->         rx_ctx.dbuff = DIV_ROUND_UP(ring->rx_buf_len,
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_txrx.c b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-> index 1f0a0f13a334..0d7177083708 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-> @@ -1548,7 +1548,6 @@ void i40e_free_rx_resources(struct i40e_ring *rx_ring)
->  int i40e_setup_rx_descriptors(struct i40e_ring *rx_ring)
->  {
->         struct device *dev = rx_ring->dev;
-> -       int err;
->
->         u64_stats_init(&rx_ring->syncp);
->
-> @@ -1569,14 +1568,6 @@ int i40e_setup_rx_descriptors(struct i40e_ring *rx_ring)
->         rx_ring->next_to_process = 0;
->         rx_ring->next_to_use = 0;
->
-> -       /* XDP RX-queue info only needed for RX rings exposed to XDP */
-> -       if (rx_ring->vsi->type == I40E_VSI_MAIN) {
-> -               err = xdp_rxq_info_reg(&rx_ring->xdp_rxq, rx_ring->netdev,
-> -                                      rx_ring->queue_index, rx_ring->q_vector->napi.napi_id);
-> -               if (err < 0)
-> -                       return err;
-> -       }
-> -
->         rx_ring->xdp_prog = rx_ring->vsi->xdp_prog;
->
->         rx_ring->rx_bi =
-> --
-> 2.34.1
->
->
+This binding is necessary to set specific capabilities for this switch
+chip that are necessary due to the ksz dsa driver only accepting
+specific chip ids.
+The KSZ8567 is very similar to KSZ9567 however only containing 100 Mbps
+phys on its downstream ports.
+
+Signed-off-by: Philippe Schenker <philippe.schenker@impulsing.ch>
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
+
+---
+
+Changes in v2:
+- Describe in commit message why this is necessary
+
+ Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+index c963dc09e8e1..52acc15ebcbf 100644
+--- a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+@@ -31,6 +31,7 @@ properties:
+       - microchip,ksz9893
+       - microchip,ksz9563
+       - microchip,ksz8563
++      - microchip,ksz8567
+ 
+   reset-gpios:
+     description:
+-- 
+2.34.1
+
 
