@@ -1,156 +1,319 @@
-Return-Path: <netdev+bounces-65967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65968-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D328083CB35
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 19:34:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E4D183CB42
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 19:38:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03C9A1C25DD5
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 18:34:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2C671C23270
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 18:38:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 716951D68C;
-	Thu, 25 Jan 2024 18:33:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBF841BDD3;
+	Thu, 25 Jan 2024 18:38:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="j3Za+b+q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="axmpM1n/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63CAE8472;
-	Thu, 25 Jan 2024 18:33:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D52E31BDD6
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 18:38:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706207590; cv=none; b=fXsroKz+GO8iQwclJDIszhf4NaHsJdnNXfmZ9edhgijPU99iwM3MUucX39pKQ/eCtvCEZYqljkZK++12jRYSwtbZpuQhCuaBAQhcyn9i3/h04lkmD3k6poJ301DeTdhmz6/9c7ia70Diuab8t7eGU9XsXPfz3d9KFzBa+mr4HkQ=
+	t=1706207917; cv=none; b=W3Ix+c+7naxgCSz2Ru+ZGxfXDpL8JcpVLCCDiEwABr8CvElgVpl6RxBT8c+mXZdOtUmypus4vBvC7rQBtrLZH2ROgK7nEzbc5+uhxdokZbPnPxwR3PRnXcZC5qmVH9zhKc8r/jdmvpVG5QI2xwFDe07vD57ctdiyIfTqGoUzlr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706207590; c=relaxed/simple;
-	bh=X9g2XA4NppT+YGuEazcfPB3e27C9le9+RqHSEyar0lo=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
-	 In-Reply-To:Content-Type; b=YeC+c9wP8jjhQ/XDfTrOgMdGh9i2Jz70H5Qk73YxC/kwZ7QUnY/K3N9y/Iq3ZVgwoQlntuDPBU/QVFgVCri2BfV1K47Q0BFTjvtIZVjHdqbYIhoyW/1rApJuJmCyUQIwmv6LffniRxsQZFSAoskd1Vh5pRaCa/r6H26ZOext/ho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=j3Za+b+q; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40PHDXfO023662;
-	Thu, 25 Jan 2024 18:32:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:from:to:references
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=rtduzouzzoSoD527t39zRPaWPzfaEpx6N6wuAqAgPs8=; b=j3
-	Za+b+q8t4456lifVUBASJdEz3iCCtBR8P5ySUzru52NhLQgIFR/zOL9MXJXNAwX3
-	o+hOUapPxlliV82lrh3J55o6fTzxIZ7hJ+bdbI+F7cXjuX/M8y4AlSP3lPi39698
-	HaGI/+UnZJM4HEI7YcUyXLYSWTn3lfhCik3209GgKlPGcuqLRpeXYkxVAxvrr5aD
-	tuYCOspsj6jMJrfJ5ZIBdDUS5T93RGVXaVKu9sLuc2scNnvoRXqZJ8FzTli0WWCh
-	OhMvAySAOQvgzv9ZzmoRUBDb8COWI1S+g/epRyagkW03Cm1i18LdMpxPJFYd1bcC
-	QQF2W80F82Cn0ZhAUqZA==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3vuqra0wfw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 25 Jan 2024 18:32:55 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 40PIWsCq006259
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 25 Jan 2024 18:32:54 GMT
-Received: from [10.110.0.209] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Thu, 25 Jan
- 2024 10:32:53 -0800
-Message-ID: <d49f69f4-7f5c-498f-bb17-a636256d3245@quicinc.com>
-Date: Thu, 25 Jan 2024 10:32:53 -0800
+	s=arc-20240116; t=1706207917; c=relaxed/simple;
+	bh=9+0VeliAnObZvWWq5LZklkhahP4Wf8pvMsb61FVE8qQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mX0X7OEZsNJ84FE8TSMk8DKWEiZw68MqMhqr+rwgL4LtNBMCN7f5ADV1bpc0OQss5hk1GuU9Op0yD0uc7TWibHtq3ZIclk7KdcIwrLpKtTmMLe/XqP/y0Y6Ag/wuN+OVRcxHy+GgqoWWTsqej/XcRvmkNetR7N9bM6YYhgu3j2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=axmpM1n/; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5100c2f7a16so1098760e87.1
+        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 10:38:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706207914; x=1706812714; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Sb11i3THl9Gt95Z0EANAriupw4JmoIZ2LRwLbPzYqUY=;
+        b=axmpM1n/KaGukjRhX7lX226kdl+bi4r4oQOjIAJbq2bxWcFI8nq2SSPd4/97CS0Q3V
+         Qo72ETk23znzOSWwNVG45rpH+NradVwtRLx6Y/Sadm/1FI2SJCoZUifpJrhKN1lQV9ji
+         h0fHNWkXTilpJArf7FsX0sXn8DV1Yj61LzlPa5olqmm2u7aJa7jlwVipmdP3IoKV9RPV
+         pniTLHf/CeU/UCTiZ85V/6HMC/kekxf9yUy7grIdxEUIn5P8KlUz1j282Xx8MNvPhhTX
+         oSnIXSKZ6PJcM06fm3ooJyGc5Dzu3Ypd2snGhl1OMPH4fMjGBnKWtVg/2CnMah9Upe82
+         iJtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706207914; x=1706812714;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Sb11i3THl9Gt95Z0EANAriupw4JmoIZ2LRwLbPzYqUY=;
+        b=rwIMniBdh6kBwi7WcKrU0natUMxqIGOVW9OLw/vWZfSU2MhUFwOt8hYm/5goAVX2Sg
+         iAuuzByvc2lJSUlo6D5QSGp6goNgdYZe0NL30hTvXOLpVW4iZuJMR71vV8Y3pOEHJqmh
+         O6qtQk0mF4vIexFnjbcatFlNkiccvp8EthFpYdAFlNIe/oDd1yynw70Phs3MGQ4GvCwH
+         XrFFURWUgsM4UUipMuuBExujwJQT31DSKjRijOlgG33fF0pHgtqg2BlMxt6U448aA+H/
+         sGSjeB7id9IzVP9r2gigqpEwNW6VsBO2zT/xWgI7iZ9AZtwx+ovUtTP9nxqU42HULKDP
+         z/KA==
+X-Gm-Message-State: AOJu0Yz/Uy3G8c5XUVj+eLrJ6fNt9xycpOvpfMfs7mX7hMTP+5tunL0W
+	GAwDeEERvgYn29jnPsLQHI6OeAR8IpIQ0AJ6+DFC8xMLimLJ77dM
+X-Google-Smtp-Source: AGHT+IGQ+l/LIDxFsnUgQpyBNQ4omIE8Xrk/Lf8mjyn6Ay9OKBhWCoAqJSW0bGeDhlfJnjGtdzpeQw==
+X-Received: by 2002:a05:6512:3ba7:b0:50e:bc4f:19d3 with SMTP id g39-20020a0565123ba700b0050ebc4f19d3mr160407lfv.25.1706207913365;
+        Thu, 25 Jan 2024 10:38:33 -0800 (PST)
+Received: from mobilestation ([95.79.203.166])
+        by smtp.gmail.com with ESMTPSA id 6-20020ac24826000000b005101529beeesm426134lft.7.2024.01.25.10.38.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Jan 2024 10:38:32 -0800 (PST)
+Date: Thu, 25 Jan 2024 21:38:30 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
+	chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn, 
+	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
+Subject: Re: [PATCH net-next v7 7/9] net: stmmac: dwmac-loongson: Add GNET
+ support
+Message-ID: <72hx6yfvbxiuvkunzu2tvn6glum5rjrzqaxsswml2fe6j3537w@ahtfn7q64ffe>
+References: <cover.1702990507.git.siyanteng@loongson.cn>
+ <caf9e822c2f628f09e02760cfa81a1bd4af0b8d6.1702990507.git.siyanteng@loongson.cn>
+ <pbju43fy4upk32xcgrerkafnwjvs55p5x4kdaavhia4z7wjoqm@mk55pgs7eczz>
+ <ac7cc7fc-60fa-4624-b546-bb31cd5136cb@loongson.cn>
+ <ce51f055-7564-4921-b45a-c4a255a9d797@loongson.cn>
+ <xrdvmc25btov77hfum245rbrncv3vfbfeh4fbscvcvdy4q4qhk@juizwhie4gaj>
+ <44229f07-de98-4b47-a125-3301be185de6@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH wireless v2] nl80211/cfg80211: add nla_policy for S1G band
-Content-Language: en-US
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-To: Johannes Berg <johannes@sipsolutions.net>, Lin Ma <linma@zju.edu.cn>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <linux-wireless@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kvalo@kernel.org>
-References: <20240119151201.8670-1-linma@zju.edu.cn>
- <9e1db7f3-fd18-4b3b-a912-3cf6efd96fed@quicinc.com>
- <590fe2823d934af997c515640733eb8889b0560f.camel@sipsolutions.net>
- <d80ae6ae-e1f2-48ef-b18a-29b5ca62e64c@quicinc.com>
-In-Reply-To: <d80ae6ae-e1f2-48ef-b18a-29b5ca62e64c@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: IyX4pDl-EWRg6uBFMjQ3k44OVVGgWude
-X-Proofpoint-ORIG-GUID: IyX4pDl-EWRg6uBFMjQ3k44OVVGgWude
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-25_11,2024-01-25_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- adultscore=0 mlxlogscore=999 phishscore=0 lowpriorityscore=0 bulkscore=0
- spamscore=0 malwarescore=0 mlxscore=0 impostorscore=0 suspectscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2401190000 definitions=main-2401250133
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <44229f07-de98-4b47-a125-3301be185de6@loongson.cn>
 
-On 1/22/2024 10:33 AM, Jeff Johnson wrote:
-> On 1/20/2024 12:27 PM, Johannes Berg wrote:
->> On Fri, 2024-01-19 at 15:47 -0800, Jeff Johnson wrote:
->>>> --- a/net/wireless/nl80211.c
->>>> +++ b/net/wireless/nl80211.c
->>>> @@ -911,6 +911,7 @@ nl80211_match_band_rssi_policy[NUM_NL80211_BANDS] = {
->>>>  	[NL80211_BAND_5GHZ] = { .type = NLA_S32 },
->>>>  	[NL80211_BAND_6GHZ] = { .type = NLA_S32 },
->>>>  	[NL80211_BAND_60GHZ] = { .type = NLA_S32 },
->>>> +	[NL80211_BAND_S1GHZ] = { .type = NLA_S32 },
->>>>  	[NL80211_BAND_LC]    = { .type = NLA_S32 },
->>>>  };
->>>>  
->>> something is really suspicious since the NL80211_BAND_* enums are
->>> *value* enums, not attribute ID enums, and hence they should never be
->>> used in an nla_policy.
->>
->> Yeah, that's what it looks like first, but then they do get used
->> anyway...
->>
->>> what is actually using these as attribute IDs, noting that
->>> NL80211_BAND_2GHZ == 0 and hence cannot be used as an attribute ID
->>
->> Ohh. Good catch!
->>
->>> seems the logic that introduced this policy needs to be revisited.
->>>
->>
->> Let's just remove it?
->>
->> commit 1e1b11b6a1111cd9e8af1fd6ccda270a9fa3eacf
->> Author: vamsi krishna <vamsin@codeaurora.org>
->> Date:   Fri Feb 1 18:34:51 2019 +0530
->>
->>     nl80211/cfg80211: Specify band specific min RSSI thresholds with sched scan
->>
->>
->> As far as I can tell nothing is using that in the first place ...
->> Certainly not in the kernel, nor wpa_s, nor anything else I could find
->> really ...
->>
->> We can't completely revert it since we need the attribute number to stay
->> allocated, but that's all we cannot remove.
+On Thu, Jan 25, 2024 at 04:36:39PM +0800, Yanteng Si wrote:
 > 
-> I'm investigating this and will report back.
+> 在 2024/1/24 21:51, Serge Semin 写道:
+> > On Wed, Jan 24, 2024 at 05:21:03PM +0800, Yanteng Si wrote:
+> > > 在 2024/1/1 15:27, Yanteng Si 写道:
+> > > > 在 2023/12/21 10:34, Serge Semin 写道:
+> > > > > On Tue, Dec 19, 2023 at 10:26:47PM +0800, Yanteng Si wrote:
+> > > > > > Add Loongson GNET (GMAC with PHY) support. Current GNET does not
+> > > > > > support
+> > > > > > half duplex mode, and GNET on LS7A only supports ANE when speed
+> > > > > > is set to
+> > > > > > 1000M.
+> > > > > > 
+> > > > > > Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+> > > > > > Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+> > > > > > Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+> > > > > > ---
+> > > > > >    .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 79
+> > > > > > +++++++++++++++++++
+> > > > > >    .../ethernet/stmicro/stmmac/stmmac_ethtool.c  |  6 ++
+> > > > > >    include/linux/stmmac.h                        |  2 +
+> > > > > >    3 files changed, 87 insertions(+)
+> > > > > > 
+> > > > > > diff --git
+> > > > > > a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> > > > > > b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> > > > > > index 2c08d5495214..9e4953c7e4e0 100644
+> > > > > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> > > > > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> > > > > > @@ -168,6 +168,83 @@ static struct stmmac_pci_info
+> > > > > > loongson_gmac_pci_info = {
+> > > > > >        .config = loongson_gmac_config,
+> > > > > >    };
+> > > > > >    +static void loongson_gnet_fix_speed(void *priv, unsigned int
+> > > > > > speed, unsigned int mode)
+> > > > > > +{
+> > > > > > +    struct net_device *ndev = dev_get_drvdata(priv);
+> > > > > > +    struct stmmac_priv *ptr = netdev_priv(ndev);
+> > > > > > +
+> > > > > > +    /* The controller and PHY don't work well together.
+> > > > > > +     * We need to use the PS bit to check if the controller's status
+> > > > > > +     * is correct and reset PHY if necessary.
+> > > > > > +     */
+> > > > > > +    if (speed == SPEED_1000)
+> > > > > > +        if (readl(ptr->ioaddr + MAC_CTRL_REG) & (1 << 15) /* PS */)
+> > > > > > +            phy_restart_aneg(ndev->phydev);
+> > > > > {} around the outer if please.
+> > > > OK.
+> > > > > > +}
+> > > > > > +
+> > > > > > +static int loongson_gnet_data(struct pci_dev *pdev,
+> > > > > > +                  struct plat_stmmacenet_data *plat)
+> > > > > > +{
+> > > > > > +    loongson_default_data(pdev, plat);
+> > > > > > +
+> > > > > > +    plat->multicast_filter_bins = 256;
+> > > > > > +
+> > > > > > +    plat->mdio_bus_data->phy_mask = 0xfffffffb;
+> > > > > ~BIT(2)?
+> > > > I still need to confirm, please allow me to get back to you later.
+> > > Yes, that's fine.
+> 
 
-OK, I have investigated this and based upon the investigation this can
-be removed (except for keeping the now obsolete uapi bits). This was
-done in preparation for supporting a new Android interface in the
-out-of-tree Android driver, but that interface was subsequently
-withdrawn by Google.
+> Oops! A warning will be output:
+> 
+> drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c: In function
+> 'loongson_gnet_data':
+> drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c:463:41: warning:
+> conversion from
+> 
+> 'long unsigned int' to 'unsigned int' changes value from
+> '18446744073709551611' to '4294967291' [-Woverflow]
+>   463 |         plat->mdio_bus_data->phy_mask = ~BIT(2);
+>       |                                         ^
+> 
+> Unfortunately, we don't have an unsigned int macro for BIT(nr).
 
-Johannes, do you want to handle this? Or should I?
+Then the alternative ~(1 << 2) would be still more readable then the
+open-coded literal like 0xfffffffb. What would be even better than
+that:
 
-/jeff
+#define LOONGSON_GNET_PHY_ADDR		0x2
+...
+	plat->mdio_bus_data->phy_mask = ~(1 << LOONGSON_GNET_PHY_ADDR);
+...
 
+-Serge(y)
 
-
+> 
+> 
+> Thanks,
+> 
+> Yanteng
+> 
+> > 
+> > -Serge(y)
+> > 
+> > > 
+> > > Thanks,
+> > > 
+> > > Yanteng
+> > > 
+> > > 
+> > > > > > +
+> > > > > > +    plat->phy_addr = 2;
+> > > > > > +    plat->phy_interface = PHY_INTERFACE_MODE_INTERNAL;
+> > > > > > +
+> > > > > > +    plat->bsp_priv = &pdev->dev;
+> > > > > > +    plat->fix_mac_speed = loongson_gnet_fix_speed;
+> > > > > > +
+> > > > > > +    plat->dma_cfg->pbl = 32;
+> > > > > > +    plat->dma_cfg->pblx8 = true;
+> > > > > > +
+> > > > > > +    plat->clk_ref_rate = 125000000;
+> > > > > > +    plat->clk_ptp_rate = 125000000;
+> > > > > > +
+> > > > > > +    return 0;
+> > > > > > +}
+> > > > > > +
+> > > > > > +static int loongson_gnet_config(struct pci_dev *pdev,
+> > > > > > +                struct plat_stmmacenet_data *plat,
+> > > > > > +                struct stmmac_resources *res,
+> > > > > > +                struct device_node *np)
+> > > > > > +{
+> > > > > > +    int ret;
+> > > > > > +    u32 version = readl(res->addr + GMAC_VERSION);
+> > > > > > +
+> > > > > > +    switch (version & 0xff) {
+> > > > > > +    case DWLGMAC_CORE_1_00:
+> > > > > > +        ret = loongson_dwmac_config_multi_msi(pdev, plat, res, np, 8);
+> > > > > > +        break;
+> > > > > > +    default:
+> > > > > > +        ret = loongson_dwmac_config_legacy(pdev, plat, res, np);
+> > > > > Hm, do you have two versions of Loongson GNET? What does the second
+> > > > Yes.
+> > > > > one contain in the GMAC_VERSION register then? Can't you distinguish
+> > > > > them by the PCI IDs (device, subsystem, revision)?
+> > > > I'm afraid that's not possible.
+> > > > 
+> > > > Because they have the same pci id and revision.
+> > > > 
+> > > > 
+> > > > Thanks,
+> > > > 
+> > > > Yanteng
+> > > > 
+> > > > > -Serge(y)
+> > > > > 
+> > > > > > +        break;
+> > > > > > +    }
+> > > > > > +
+> > > > > > +    switch (pdev->revision) {
+> > > > > > +    case 0x00:
+> > > > > > +        plat->flags |=
+> > > > > > +            FIELD_PREP(STMMAC_FLAG_DISABLE_HALF_DUPLEX, 1) |
+> > > > > > +            FIELD_PREP(STMMAC_FLAG_DISABLE_FORCE_1000, 1);
+> > > > > > +        break;
+> > > > > > +    case 0x01:
+> > > > > > +        plat->flags |=
+> > > > > > +            FIELD_PREP(STMMAC_FLAG_DISABLE_HALF_DUPLEX, 1);
+> > > > > > +        break;
+> > > > > > +    default:
+> > > > > > +        break;
+> > > > > > +    }
+> > > > > > +
+> > > > > > +    return ret;
+> > > > > > +}
+> > > > > > +
+> > > > > > +static struct stmmac_pci_info loongson_gnet_pci_info = {
+> > > > > > +    .setup = loongson_gnet_data,
+> > > > > > +    .config = loongson_gnet_config,
+> > > > > > +};
+> > > > > > +
+> > > > > >    static int loongson_dwmac_probe(struct pci_dev *pdev,
+> > > > > >                    const struct pci_device_id *id)
+> > > > > >    {
+> > > > > > @@ -318,9 +395,11 @@ static
+> > > > > > SIMPLE_DEV_PM_OPS(loongson_dwmac_pm_ops, loongson_dwmac_suspend,
+> > > > > >                 loongson_dwmac_resume);
+> > > > > >      #define PCI_DEVICE_ID_LOONGSON_GMAC    0x7a03
+> > > > > > +#define PCI_DEVICE_ID_LOONGSON_GNET    0x7a13
+> > > > > >      static const struct pci_device_id loongson_dwmac_id_table[] = {
+> > > > > >        { PCI_DEVICE_DATA(LOONGSON, GMAC, &loongson_gmac_pci_info) },
+> > > > > > +    { PCI_DEVICE_DATA(LOONGSON, GNET, &loongson_gnet_pci_info) },
+> > > > > >        {}
+> > > > > >    };
+> > > > > >    MODULE_DEVICE_TABLE(pci, loongson_dwmac_id_table);
+> > > > > > diff --git
+> > > > > > a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> > > > > > b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> > > > > > index 8105ce47c6ad..d6939eb9a0d8 100644
+> > > > > > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> > > > > > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> > > > > > @@ -420,6 +420,12 @@ stmmac_ethtool_set_link_ksettings(struct
+> > > > > > net_device *dev,
+> > > > > >            return 0;
+> > > > > >        }
+> > > > > >    +    if (FIELD_GET(STMMAC_FLAG_DISABLE_FORCE_1000,
+> > > > > > priv->plat->flags)) {
+> > > > > > +        if (cmd->base.speed == SPEED_1000 &&
+> > > > > > +            cmd->base.autoneg != AUTONEG_ENABLE)
+> > > > > > +            return -EOPNOTSUPP;
+> > > > > > +    }
+> > > > > > +
+> > > > > >        return phylink_ethtool_ksettings_set(priv->phylink, cmd);
+> > > > > >    }
+> > > > > >    diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+> > > > > > index f07f79d50b06..067030cdb60f 100644
+> > > > > > --- a/include/linux/stmmac.h
+> > > > > > +++ b/include/linux/stmmac.h
+> > > > > > @@ -222,6 +222,8 @@ struct dwmac4_addrs {
+> > > > > >    #define STMMAC_FLAG_EN_TX_LPI_CLOCKGATING    BIT(11)
+> > > > > >    #define STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY    BIT(12)
+> > > > > >    #define STMMAC_FLAG_HAS_LGMAC            BIT(13)
+> > > > > > +#define STMMAC_FLAG_DISABLE_HALF_DUPLEX    BIT(14)
+> > > > > > +#define STMMAC_FLAG_DISABLE_FORCE_1000    BIT(15)
+> > > > > >      struct plat_stmmacenet_data {
+> > > > > >        int bus_id;
+> > > > > > -- 
+> > > > > > 2.31.4
+> > > > > > 
+> 
 
