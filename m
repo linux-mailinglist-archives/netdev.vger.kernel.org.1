@@ -1,156 +1,145 @@
-Return-Path: <netdev+bounces-65738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10ACF83B88C
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 05:01:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACBA683B88F
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 05:05:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8328E2840AC
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 04:01:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6506F286D6A
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 04:05:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2D6E6FD1;
-	Thu, 25 Jan 2024 04:01:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F148B6FB2;
+	Thu, 25 Jan 2024 04:04:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="JzPvh0mb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KamnQTBb"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2077.outbound.protection.outlook.com [40.107.92.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 229EC6FCA
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 04:00:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.77
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706155260; cv=fail; b=O4BcFZs4g8tHG0DvQqBPlxvsxTYQdVAuDHakcDIvQTlYDN/sIHaF+4/FLC8JalkYyAEpu2yYaOvtNJ/zE11ZfzNxJP5JXAOKALLYQNHCEV2OiXjAMHyZAoWvWBai2WEsK3UmOzi+iLTSb5qXI/fdARLKFoWsTWKHGDHvb46LOgQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706155260; c=relaxed/simple;
-	bh=HxvzL+sd7NkdmDTom3D/nDBowNb3xrHbUJn09J9UhPw=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SaaUKxYYBLXPfFVS31HDPj7ZU71rUz155Zvr9HlUIlXNkJxxAiFTYR4E9bBfUdoCqmgetexpHyCbwEzKg5C3nrVgjZIuPuX0qxu82ndmBP9Mn+yIaRw4cLQnWNG0QWiC0slW4yK87GAS8mU43Dh1DlXE2r4Mo343BYGRFuW3eXw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=JzPvh0mb; arc=fail smtp.client-ip=40.107.92.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Zth6Gn9k2pN7Xgg+sLJMSUzZGiYHVhdI7nTJYylGMuKoa2vtfOPVl+WCIFGM2oCUSGRCxWT/RziiRvZa9x7KGCAhjmuDjDzB7MJ7z7FOBTWuO/OhbfFHKR8q8eJMAW522iGDGXPDuyeblY8PY3AMwYnW1dybdApPL4j52mS7SvIgNmJ4KzrG1g5RtnzCFTKzt8d98ArtDPe7r4mKx+9Ax3DHGy21UT7rDl13jd3M0ad8953vtzDQaaTiTjnhWomr5P1oiD0zPI4ZNZA+3gUmJMzqn6J1e0fDCDW8CwJpYeGuuUaGQV603Kmm9/xjQwVz8VzwixhQijJvnNnu3AaeAw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QPcCzGdjzrz/2274vB4F1ajuRAmMWWbDWh/+huQR7Ks=;
- b=LZJcKRdUsg7TgsLjrertzVOCJ8pcSjBWPUMiB7SVxFKxxTygkmrVDfwGlUSzrlk9neldajFSBN1DqXNOPyqLlun5WqnWC6r7M8MxNtuDdUEwGzLVxI1so0awjWPLLDp8g137uQ9OdofqWIYwfHx2I2GVvZ926e1Y2g6gEwBTyt2tPS0cnipqpb1VkS4fcL5ymnSCtLguGqnMYvdXR4bYhrXdtFY43wsG4G59AH4E6Pt0jA6aXFGiN8OuZscYRD2gUjZQsOKX96hRLOE+hbB0qY1aWk6GjLyp/iBU/IExqIIiGYp4M3O5W2AYbQ60mbjyPZbTbzz/7jFDHzye/XBUPg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QPcCzGdjzrz/2274vB4F1ajuRAmMWWbDWh/+huQR7Ks=;
- b=JzPvh0mboeOpe8pCrmN5cM596s6Ip+xryduzylVAxeht43XxZsEO2Vn61RXIWXMiS7Xz9ieACMqFbOfJyrWNrESy4GPdlaCg1z99FpqgUBX+vqPG6zL8h/5fVhhRqFVf9z8663yi4IrOcB3j35GKuj0jBQJjpQxQR6sk2XsLKE1Ee2m/KJ4a/qIQZrR4sxbViS78U/OTiviSd71HB+bPZRQiZdf5jRLcBi0mPJ0mizeOEwtZE2pbrDY+AHgfs/zGCnAOKQtKq6dzobcSjrXMLoc0R2Ulvt1ncqlxWPXdna5dBaRmz84JdbCFAWP8fCcb7g0xrS4HPgRrkbnEWTmC7w==
-Received: from BYAPR05CA0043.namprd05.prod.outlook.com (2603:10b6:a03:74::20)
- by CH3PR12MB8076.namprd12.prod.outlook.com (2603:10b6:610:127::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.22; Thu, 25 Jan
- 2024 04:00:56 +0000
-Received: from SJ1PEPF00001CE1.namprd05.prod.outlook.com
- (2603:10b6:a03:74:cafe::e5) by BYAPR05CA0043.outlook.office365.com
- (2603:10b6:a03:74::20) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.21 via Frontend
- Transport; Thu, 25 Jan 2024 04:00:56 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- SJ1PEPF00001CE1.mail.protection.outlook.com (10.167.242.9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7202.16 via Frontend Transport; Thu, 25 Jan 2024 04:00:55 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 24 Jan
- 2024 20:00:43 -0800
-Received: from drhqmail202.nvidia.com (10.126.190.181) by
- drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.41; Wed, 24 Jan 2024 20:00:42 -0800
-Received: from vdi.nvidia.com (10.127.8.12) by mail.nvidia.com
- (10.126.190.181) with Microsoft SMTP Server id 15.2.986.41 via Frontend
- Transport; Wed, 24 Jan 2024 20:00:42 -0800
-From: William Tu <witu@nvidia.com>
-To: <netdev@vger.kernel.org>
-Subject: [PATCH net-next] Documentation: mlx5.rst: Add note for eswitch MD
-Date: Wed, 24 Jan 2024 20:00:41 -0800
-Message-ID: <20240125040041.5589-1-witu@nvidia.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AC487460
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 04:04:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706155498; cv=none; b=vBfbsSplUUA5fHJb2I915CszucHXcD5viUHG3Z4gO+h8hDLo7rEOmU2clBWNUNCxcL6PJNHfBNIIyYqzsG1lqxD047TyDr7Coh1/vWbcWYOAbHxx/Asc33q6pFH+dLAqN8qX36qM6V42DbSk9MKusin7f9Wez3G8pvK3FaQ9Kp8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706155498; c=relaxed/simple;
+	bh=+jJjIFs8DOwvqfpOW1gw01spBl3d5Ep0Q3GEcLHTE18=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UatHq65PJzeHbXhr8A8rZ/Nb7QLX5EAiLgtjjXdYEC88YkOY91G69fOy8lR+SXkN+87yjVsgvQ76cT7rcxwFxtLS8l8LhEmRUGQWv+F87NHGTGvYkLE0O3sq0qtoH4mlco8HdoEHZOQa2N1WTk56D/VxdfBGWUlLfoVe4wwdIMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KamnQTBb; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-6daa89a6452so4477971b3a.2
+        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 20:04:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706155496; x=1706760296; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0ykM1Gs7MCEy5v3PBMwDlq9kR8DEgFgkX/LUeg+tQdQ=;
+        b=KamnQTBbHpKfLi/xU8YS6y+8tnMejZdEI3BfhFzzOTZJZFhZyyqQkroPPrjktrtnHR
+         +vyxY3jPZWWXrH7yhQwsM2rLCuTOqK1MwIbZylLNAQb3GhfPeMaw6hOtKY6nub+inkdp
+         3ni6y+TzZXiSk8VocJBur4zYT3/KZv0i5pVf+1jRT3AuYDQeOK/arKPTelp64V2+mXjp
+         lr9Xvc7ghLwbMcimQZ3ggqlfmju4BcifMsOrwVhAbfy646KvVLIPFGpUY0bAflc/xdQ1
+         AJr6xVVl+7U6dxCh4ShBBREwaPBMTu3OZXTF0QIcqI63K081f1rW5/BzhwuELFWfjtl2
+         kghQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706155496; x=1706760296;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0ykM1Gs7MCEy5v3PBMwDlq9kR8DEgFgkX/LUeg+tQdQ=;
+        b=rSV6scVtsgnKlEntgTsTCeWqeFkBPyOnoCSxmSp6IGGtnOBPA5VTbsp1v8oVGorvIf
+         4pemt/T2+Qoc0Cg6VQFS8s87zLmInER/JP6GN73/KQ8I1zTWTNptsfv7zmVqDd/Dme9w
+         XQ9+APh/NCTgRIMyxay2IxXXRXMQE0S0GvdhQDBo0v48vQNn6yxisHISgMBqCklMnhjF
+         0TwI6WHxbO6wNaBI934GEhFp7iqVvLkE3XQPeUrCe+URtLWMp0Z0IOoERSdjDzppOc5H
+         nfxKNadnOeEOJSrsaZSydJiPTmQVpMbQSrew0EnasGN1psRt2HdJI+qF0LUj5icXlju2
+         2Y7A==
+X-Gm-Message-State: AOJu0YwpijkBAPNFDirrwEkWEsMbh5kdzaKp67hp30ZbXhAzgf1vdHqn
+	80nheJIrLeCeUQk8gvGYsg4t86wGpU99cm9+QQQkttAIuhJVAGbbHEWg3fa3+Q6zVC5I
+X-Google-Smtp-Source: AGHT+IFDGD6KIY/ZJuybIgcU53IwPJ1lIoYfP/JAGUm3DtWARwu670xA7RfMNYjh0sJ9HxaBRtng3g==
+X-Received: by 2002:a05:6a20:4387:b0:199:3fde:1226 with SMTP id i7-20020a056a20438700b001993fde1226mr405287pzl.46.1706155496360;
+        Wed, 24 Jan 2024 20:04:56 -0800 (PST)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id lh13-20020a170903290d00b001d7393f6917sm7014181plb.86.2024.01.24.20.04.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jan 2024 20:04:55 -0800 (PST)
+Date: Thu, 25 Jan 2024 12:04:52 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Benjamin Poirier <bpoirier@nvidia.com>
+Cc: netdev@vger.kernel.org, Shuah Khan <shuah@kernel.org>,
+	Jay Vosburgh <j.vosburgh@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>, Jiri Pirko <jiri@resnulli.us>
+Subject: Re: [PATCH net-next 2/6] selftests: bonding: Add
+ net/forwarding/lib.sh to TEST_INCLUDES
+Message-ID: <ZbHd5LuVs4-CjWiw@Laptop-X1>
+References: <20240124170222.261664-1-bpoirier@nvidia.com>
+ <20240124170222.261664-3-bpoirier@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CE1:EE_|CH3PR12MB8076:EE_
-X-MS-Office365-Filtering-Correlation-Id: 082dc83e-2370-4690-614b-08dc1d5a3b44
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	06HS8oe8c6Zml05yDI/gyKdHgIb1PhtuyQJJn/0R7+WLgk4oeTzOcg/arEUs/+P2L+qZ6x+EzLfuORzWxLnRrSxvX7NQ3V20fWBxtZ+2WAyAyYB4YkVCbkouzUvBWwRweUYQFCeYOwvJT4TxloOLNQfKNsPH8sjn1swbwd2iJtpUkqeMPy+sfBeQtNBSAg0c4gaQpfDkqWPiXX/5nYdeudHcWv2NgvLZViLr6VTR8WEtow9jgUqu/W0x/HI7MrcuL4qfCyVApnDpzuKe8JAG95x0axsZxSnzLghOrTGo8l/hZjSCcY9XXtxvMrTyjd+NxYTTGymLYVbMG5qlCpP7ZChzk67SjJ6MfTTMJcsd/7JM1evuI79fcM4Qfrq7Ki/oWbO557R24qjtpOo7rbFWU7h7F1xAAQYSomV6H7QOvTWMo5arAWiiFzS6gKStFsZZN5CErgPQYWRU1VwHDdJme518aiYgVxJzHpXwjUjxMpH0x9WaIXRkvx4WwGvY+zruy/KjuJWjh1Os1q2oah1xlZFmbPynIBQmNvZhuVPThOnQcN6aDUtZeIPEinwf2S9HLsLmjIATKjeXts93K38On2KJmEE4B61QBhGL4iVWhKqIYT6TWdwtm71aoFdYGH8lrebme9vtnQIhOpOhaUWt7Hb+uUs1c9P4dbpBKWlBn06k2jIx1v5X7f10HbfdLpO4SH1zmdkyTEdgU7ZU/EmH/e3T0xGlRlNiQ6BDgCIOW2PUoQgPv/kY1pmsJwFEH4Lt
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(39860400002)(346002)(376002)(396003)(230922051799003)(451199024)(64100799003)(1800799012)(186009)(82310400011)(46966006)(36840700001)(40470700004)(40480700001)(40460700003)(1076003)(70586007)(5660300002)(316002)(6916009)(36860700001)(426003)(8676002)(26005)(8936002)(336012)(2616005)(70206006)(2906002)(83380400001)(47076005)(356005)(7636003)(478600001)(36756003)(41300700001)(86362001)(7696005)(82740400003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jan 2024 04:00:55.8054
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 082dc83e-2370-4690-614b-08dc1d5a3b44
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00001CE1.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8076
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240124170222.261664-3-bpoirier@nvidia.com>
 
-Add a note when using esw_port_metadata. The parameter has runtime
-mode but setting it does not take effect immediately. Setting it must
-happen in legacy mode, and the port metadata takes effects when the
-switchdev mode is enabled.
+On Wed, Jan 24, 2024 at 12:02:18PM -0500, Benjamin Poirier wrote:
+> In order to avoid duplicated files when both the bonding and forwarding
+> tests are exported together, add net/forwarding/lib.sh to TEST_INCLUDES and
+> include it via its relative path.
+> 
+> Reviewed-by: Petr Machata <petrm@nvidia.com>
+> Tested-by: Petr Machata <petrm@nvidia.com>
+> Signed-off-by: Benjamin Poirier <bpoirier@nvidia.com>
+> ---
+>  tools/testing/selftests/drivers/net/bonding/Makefile        | 6 ++++--
+>  .../selftests/drivers/net/bonding/bond-eth-type-change.sh   | 2 +-
+>  .../testing/selftests/drivers/net/bonding/bond_topo_2d1c.sh | 2 +-
+>  .../testing/selftests/drivers/net/bonding/dev_addr_lists.sh | 2 +-
+>  .../drivers/net/bonding/mode-1-recovery-updelay.sh          | 2 +-
+>  .../drivers/net/bonding/mode-2-recovery-updelay.sh          | 2 +-
+>  .../selftests/drivers/net/bonding/net_forwarding_lib.sh     | 1 -
+>  7 files changed, 9 insertions(+), 8 deletions(-)
+>  delete mode 120000 tools/testing/selftests/drivers/net/bonding/net_forwarding_lib.sh
+> 
+> diff --git a/tools/testing/selftests/drivers/net/bonding/Makefile b/tools/testing/selftests/drivers/net/bonding/Makefile
+> index 8a72bb7de70f..1e10a1f06faf 100644
+> --- a/tools/testing/selftests/drivers/net/bonding/Makefile
+> +++ b/tools/testing/selftests/drivers/net/bonding/Makefile
+> @@ -15,7 +15,9 @@ TEST_PROGS := \
+>  TEST_FILES := \
+>  	lag_lib.sh \
+>  	bond_topo_2d1c.sh \
+> -	bond_topo_3d1c.sh \
+> -	net_forwarding_lib.sh
+> +	bond_topo_3d1c.sh
+> +
+> +TEST_INCLUDES := \
+> +	../../../net/forwarding/lib.sh
+>  
+>  include ../../../lib.mk
+> diff --git a/tools/testing/selftests/drivers/net/bonding/bond-eth-type-change.sh b/tools/testing/selftests/drivers/net/bonding/bond-eth-type-change.sh
+> index 862e947e17c7..8293dbc7c18f 100755
+> --- a/tools/testing/selftests/drivers/net/bonding/bond-eth-type-change.sh
+> +++ b/tools/testing/selftests/drivers/net/bonding/bond-eth-type-change.sh
+> @@ -11,7 +11,7 @@ ALL_TESTS="
+>  REQUIRE_MZ=no
+>  NUM_NETIFS=0
+>  lib_dir=$(dirname "$0")
+> -source "$lib_dir"/net_forwarding_lib.sh
+> +source "$lib_dir"/../../../net/forwarding/lib.sh
 
-Disable eswitch port metadata::
-  $ devlink dev param set pci/0000:06:00.0 name esw_port_metadata value \
-    false cmode runtime
-Change eswitch mode to switchdev mode where after choosing the metadata value::
-  $ devlink dev eswitch set pci/0000:06:00.0 mode switchdev
+I wonder if we should still call it lib_dir. Maybe
 
-Note that other mlx5 devlink runtime parameters, esw_multiport and
-flow_steering_mode, do not have this limitation.
+selftest_dir="$(dirname "$0")/../../.."
+source $selftest_dir/net/forwarding/lib.sh
 
-Signed-off-by: William Tu <witu@nvidia.com>
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
----
- Documentation/networking/devlink/mlx5.rst | 4 ++++
- 1 file changed, 4 insertions(+)
+But this is absolutely out of this patch set's scope :)
 
-diff --git a/Documentation/networking/devlink/mlx5.rst b/Documentation/networking/devlink/mlx5.rst
-index 3f70417cf792..16700c1bc963 100644
---- a/Documentation/networking/devlink/mlx5.rst
-+++ b/Documentation/networking/devlink/mlx5.rst
-@@ -105,6 +105,10 @@ parameters.
- 
-        When metadata is disabled, the above use cases will fail to initialize if
-        users try to enable them.
-+
-+       Note: Setting this parameter does not take effect immediately. Setting
-+       must happen in legacy mode and eswitch port metadata takes effect after
-+       enabling switchdev mode.
-    * - ``hairpin_num_queues``
-      - u32
-      - driverinit
--- 
-2.34.1
+Thanks
+Hangbin
 
 
