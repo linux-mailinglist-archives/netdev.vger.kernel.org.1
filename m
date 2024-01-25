@@ -1,132 +1,195 @@
-Return-Path: <netdev+bounces-65798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C35A83BCBB
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 10:06:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BA8383BCBE
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 10:06:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24B3B290F32
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:06:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F6511C28D79
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:06:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB6411B958;
-	Thu, 25 Jan 2024 09:00:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDCBF1BDF8;
+	Thu, 25 Jan 2024 09:03:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZmadJnP1"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="h7tPYbWL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F037F1B94F;
-	Thu, 25 Jan 2024 09:00:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB781BF42;
+	Thu, 25 Jan 2024 09:03:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706173253; cv=none; b=KzY8+dZAtuecX1spDjGokjhEIkwaA+KDtclRwBYYJiG0ZAnIHeFXBGEgL3vo9lYP71vMK2ioeECcFmoz2hwRApbYZ/AlceDWmPFbw+3nEGDzJpIUErYHIipjseGWSvGSReuu39ELxsewCniCRb4nM8Pr85bWQHlJb9oZxmC0b+8=
+	t=1706173426; cv=none; b=qaLEv3c7vbYe25aB7XGo4vbQAGnEMi7TCrZz/vPaxdsiaQzoalNaNGTOL/9Ox8Dyp7AnJL0ZlC2KsqsM5CnkQsxft3x3WWbSNZvLg+aXdU/5JhLSW4qs/pdhmX3fl/L/tLXFcWwmK3EWysv2O20EJWeH7rC5w+FmDIrXPWmSdPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706173253; c=relaxed/simple;
-	bh=LoxX9dBFXRpqezdseXqTieo5vgHDE3MP1dCNWiKdj1A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ds4/b4J27JhBoWGu27k8iMpC26r53v5lQnH+7bBdKz3ZFzU1YMHI9diwfXXrFPWSHmHFXrei4iqhOoofnNKI1b86Kbc+s9BLBbfFs7WybMo0j2E3X0rea+UCQ0rk1VJq3bSdecA6kX/4Y1s0BygA5ppYaE/JtMqTrMQpnNI17lc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZmadJnP1; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2cd33336b32so86647331fa.0;
-        Thu, 25 Jan 2024 01:00:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706173249; x=1706778049; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=MOVBMzL6UNqR3dH+kMM9JTuFe/LvTcnh2ksCh4OpNI4=;
-        b=ZmadJnP17HBHCqDQ9VD6hIdz4fO0nMZfPHXcFwznsiLJo4dlmxqX5O1Og6AycqNkkj
-         w/1EDibcTD+WfYIMtueSvYlqlGYZb1/2AEkXY/dVGlb9+jTVQHNJkaYTf/UdfoBk3Gbt
-         ZY1WN7dGb4pStVIAN9w/XOrfVZCp/wIgNs4jxP/vKnDHYrcBcAB5nMUPxjWcX8ek6pTI
-         PcZMJrHgLzowAoGKrZwF9frktYD4RNiIjD8zATCWNgJOo0tp9Gng6KetHH/5frd6dl5T
-         8dE1M3bRBg+aDckFXDlJ4W976lheg2ZkM9eUm/oj72hhh5/M2xcRfiJCvpUpu/lFdGpH
-         KM7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706173249; x=1706778049;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MOVBMzL6UNqR3dH+kMM9JTuFe/LvTcnh2ksCh4OpNI4=;
-        b=bF7YmQnR7hxkl04WHTi4EOIdSjrBTFGhTcLL0RaTNAbc8zPfHVw/s1t2pEhcy4IvQ5
-         ZR8NazaubtcKsMgbCw7I95PVNg/QFrRSYgLzl7s++WKzDUx9x/zWllwooFadeSlQ/nF6
-         oWzyL+omJFafg9TeteVI9+LoPwPL0kC7H7xwbO+j/4H7R9ULxUgX1fAJXdaeHCdf9Oqg
-         a/WX2sHi5qXYSX+H1gJLaDkt5/VPX5nOrMhPddTNgKEaNVhkuaCmSPWtgLU5+4aPiJ21
-         vF6pIkeHpkagyALjmvVsu7Zh85wKsbC9tISZfK38ewInA7w5lj7nB/PVfuJIQwdd02pO
-         1LYA==
-X-Gm-Message-State: AOJu0YxUtPbTb4l6NkWCcWBeljICblhRRYJ+tOZcnFb4NHk6OhORQQ8H
-	Vd6FJdtvO/wBdKmnxNiQKL9ePcx4I1oEuxQb8vIOMcLL5gSPamCB
-X-Google-Smtp-Source: AGHT+IFW7KOc59kAiJo0rL2JBDdWlpY0XQeY9OVlOIPhtZgE7XzytL23vqJ7or8rbMg6UXPpQkyxpA==
-X-Received: by 2002:a2e:a271:0:b0:2cd:7830:5796 with SMTP id k17-20020a2ea271000000b002cd78305796mr357550ljm.5.1706173249070;
-        Thu, 25 Jan 2024 01:00:49 -0800 (PST)
-Received: from skbuf ([188.25.255.36])
-        by smtp.gmail.com with ESMTPSA id u11-20020a056402110b00b00558aa40f914sm16938831edv.40.2024.01.25.01.00.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jan 2024 01:00:48 -0800 (PST)
-Date: Thu, 25 Jan 2024 11:00:46 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
-	Alvin =?utf-8?Q?=C5=A0ipraga?= <ALSI@bang-olufsen.dk>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dsa: remove OF-based MDIO bus registration
- from DSA core
-Message-ID: <20240125090046.jyggdontwkhthqjh@skbuf>
-References: <20240122053348.6589-1-arinc.unal@arinc9.com>
- <20240122053348.6589-1-arinc.unal@arinc9.com>
- <20240123154431.gwhufnatxjppnm64@skbuf>
- <d32d17ed-87b5-4032-b310-f387cea72837@arinc9.com>
+	s=arc-20240116; t=1706173426; c=relaxed/simple;
+	bh=UGFyWFrK2eV09kMnnOtyw3NvYNaY880yvB/i7zyrohg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AwKO/7E5uVdt7BlKP4ikELJ7qXEk7nlEe6K60IJjHQataFscaMzlM/PbCGWdMmhs0UnM/qd13mqwrRrGWv9x/9eFv4dhHC1v1slSd9NSKYMrlLTyut6OiqClG0TSmzC8fI5y8P3s9viUCxxipf0Umo8jZImdW5T3x9/4HebuLzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=h7tPYbWL; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 09E5FFF810;
+	Thu, 25 Jan 2024 09:03:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1706173415;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=amEwt+tQpUauBKOrLyvtckHhU3glK+LW1t8VaRaSQ+o=;
+	b=h7tPYbWLx9Q7CrUiyrSIru3rmmC7ljqz9v4hecMN6We9lJHJt3ADOKT6wl2tVfCo/0p+AW
+	K90922nu2/h2KHGXf3hDXz4zIjrh8zL9oj3Xf7ey77OyPp0WNCdpAkOC+A0FkPOdnC6O+T
+	iVE0LDx57uNcC0hLpN2SjlnXJvNOaZLot3NqjZaFdtS10wTT+rCIYEjUwVCr1LTocEig1U
+	sEtjySVDjU5UHzLu0eDKoh0FyNoW6TH6pdaKuj1ImWq3ANiRQpzMuUvNW5oYfBO5WphseI
+	P2k2vnTN4jtiEP4j+DKFnGYoCk5Hp+M3e1D/geBkG5xFgOGRop3MCsKD3XgBxg==
+Date: Thu, 25 Jan 2024 10:03:31 +0100
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Rob Herring <robh@kernel.org>
+Cc: Elad Nachman <enachman@marvell.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [EXT] [PATCH net-next] net: marvell,prestera: Fix example PCI
+ bus addressing
+Message-ID: <20240125100331.5d3ce739@xps-13>
+In-Reply-To: <20240123224324.GA2181680-robh@kernel.org>
+References: <20240122173514.935742-1-robh@kernel.org>
+	<BN9PR18MB4251944C1AE34057DACD7556DB742@BN9PR18MB4251.namprd18.prod.outlook.com>
+	<20240123224324.GA2181680-robh@kernel.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d32d17ed-87b5-4032-b310-f387cea72837@arinc9.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
 
-On Wed, Jan 24, 2024 at 08:30:11AM +0300, Arınç ÜNAL wrote:
-> On 23.01.2024 18:44, Vladimir Oltean wrote:
-> > On Mon, Jan 22, 2024 at 08:33:48AM +0300, Arınç ÜNAL wrote:
-> > > These subdrivers which control switches [with MDIO bus] probed on OF, will
-> > > lose the ability to register the MDIO bus OF-based:
-> > > 
-> > > drivers/net/dsa/b53/b53_common.c
-> > > drivers/net/dsa/lan9303-core.c
-> > > drivers/net/dsa/realtek/realtek-mdio.c
-> > > drivers/net/dsa/vitesse-vsc73xx-core.c
-> > > 
-> > > These subdrivers let the DSA core driver register the bus:
-> > > - ds->ops->phy_read() and ds->ops->phy_write() are present.
-> > > - ds->user_mii_bus is not populated.
-> > > 
-> > > The commit fe7324b93222 ("net: dsa: OF-ware slave_mii_bus") which brought
-> > > OF-based MDIO bus registration on the DSA core driver is reasonably recent
-> > > and, in this time frame, there have been no device trees in the Linux
-> > > repository that started describing the MDIO bus, or dt-bindings defining
-> > > the MDIO bus for the switches these subdrivers control. So I don't expect
-> > > any devices to be affected.
-> > 
-> > IIUC, Luiz made the original patch for the realtek switches. Shouldn't
-> > we wait until realtek registers ds->user_mii_bus on its own, before
-> > reverting? Otherwise, you're basically saying that Luiz made the DSA
-> > core patch without needing it.
-> 
-> My findings point to that. Luiz made the patch to optionally register the
-> MDIO bus of the MDIO controlled Realtek switches OF-based. So it's not
-> necessary to wait.
-> 
-> Arınç
+Hello,
 
-Well, Luiz is copied, he can ack or nack if so.
+> > > The example for PCI devices has some addressing errors. 'reg' is writ=
+ten as if
+> > > the parent bus is PCI, but the default bus for examples is 1 address =
+and size
+> > > cell. 'ranges' is defining config space with a size of 0. Generally, =
+config space
+> > > should not be defined in 'ranges', only PCI memory and I/O spaces. Fi=
+x these
+> > > issues by updating the values with made-up, but valid values.
+> > >=20
+> > > This was uncovered with recent dtschema changes.
+> > >=20
+> > > Signed-off-by: Rob Herring <robh@kernel.org>
+> > > ---
+> > >  Documentation/devicetree/bindings/net/marvell,prestera.yaml | 4 ++--
+> > >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > >=20
+> > > diff --git a/Documentation/devicetree/bindings/net/marvell,prestera.y=
+aml
+> > > b/Documentation/devicetree/bindings/net/marvell,prestera.yaml
+> > > index 5ea8b73663a5..16ff892f7bbd 100644
+> > > --- a/Documentation/devicetree/bindings/net/marvell,prestera.yaml
+> > > +++ b/Documentation/devicetree/bindings/net/marvell,prestera.yaml
+> > > @@ -78,8 +78,8 @@ examples:
+> > >      pcie@0 {
+> > >          #address-cells =3D <3>;
+> > >          #size-cells =3D <2>;
+> > > -        ranges =3D <0x0 0x0 0x0 0x0 0x0 0x0>;
+> > > -        reg =3D <0x0 0x0 0x0 0x0 0x0 0x0>;
+> > > +        ranges =3D <0x02000000 0x0 0x100000 0x10000000 0x0 0x0>;
+> > > +        reg =3D <0x0 0x1000>;
+> > >          device_type =3D "pci";
+> > >=20
+> > >          switch@0,0 {
+> > > --
+> > > 2.43.0
+> > >  =20
+> >=20
+> > This yaml has a mix-up of device P/N (belonging to AC3, BC2) and PCIe=20
+> > IDs (belonging to AC3X, Aldrin2)
+> > Looks like a part of the yaml was updated, and another part was not
+> >=20
+> > There is a reference here of actual usage of prestera switch device:
+> > https://github.com/dentproject/linux/blob/dent-linux-5.15.y/arch/arm64/=
+boot/dts/marvell/accton-as4564-26p.dts =20
+>=20
+> That doesn't match upstream at all...
+
+Yes, the DTS there are not up to date. I actually took mine (see below)
+from:
+https://github.com/dentproject/linux/blob/dent-linux-5.15.105/arch/arm64/bo=
+ot/dts/marvell/delta-tn48m.dts#L133
+and fixed the Prestera representation (a root node does not make any
+sense).
+
+> > So actual ranges and reg could be used instead of made up ones.
+> >=20
+> > But the actual real life dts places the prestera at the top level of=20
+> > the dts, not under pci.
+> >=20
+> > I am not aware of any dts/dtsi using such kind of switch node under=20
+> > pcie node, similar to the example given in the yaml file, and did not=20
+> > manage to find any under latest linux-next for both arm and arm64 dts=20
+> > directories (please correct me here if I am wrong). =20
+>=20
+> Don't know. It seems plausible.
+
+The DT where this is used is public but not upstream, it was derived
+from the above link:
+https://github.com/miquelraynal/linux/blob/onie/syseeprom-public/arch/arm64=
+/boot/dts/marvell/armada-7040-tn48m.dts#L316
+
+> > So the question here is if this pci example really necessary for the=20
+> > prestera device, or can be removed altogether (which is what I think is=
+ best to do). =20
+>=20
+> Miquel's commit adding indicates such devices exist. Why would he add=20
+> them otherwise?
+>=20
+> Anyways, I'm just fixing boilerplate to make the PCI bus properties=20
+> valid. Has nothing to do with this Marvell device really.
+
+I can't remember why the example in the schema is slightly different
+(must have seen an update) but here is the exact diff I used to get it
+working. Maybe the reg/ranges are loose though, TBH I've always been
+a bit lost by PCI DT properties.
+
++       pci@0,0 {
++               device_type =3D "pci";
++               reg =3D <0x0 0x0 0x0 0x0 0x0>;
++               ranges;
++               #address-cells =3D <3>;
++               #size-cells =3D <2>;
++               bus-range =3D <0x0 0x0>;
++
++               switch@0,0 {
++                       reg =3D <0x0 0x0 0x0 0x0 0x0>;
++                       compatible =3D "pci11ab,c80c";
+...
+
+Would something like this work better for the example?
+
+FYI the pci@0,0 node is a child of
+
+	CP11X_LABEL(pcie0): pcie@CP11X_PCIE0_BASE=20
+
+from armada-cp11x.dtsi (which is upstream).
+
+It defines the Prestera switch as attached through PCI on a TN48M
+Marvell based switch. There was a "whish" to get this DT upstream in
+the past but it needs to be updated a bit and no action like that was
+ever triggered. The reason why we want to describe it is that it
+exposes interesting NVMEM cells to the system (like MAC addresses).
+
+Thanks,
+Miqu=C3=A8l
 
