@@ -1,225 +1,181 @@
-Return-Path: <netdev+bounces-65956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98C1483CA64
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 18:59:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E33B83CA72
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 19:02:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CD3FFB22248
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 17:59:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BFE7B1F27304
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 18:02:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28122131E2B;
-	Thu, 25 Jan 2024 17:59:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="aoXEkDZo"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15CB213341D;
+	Thu, 25 Jan 2024 18:02:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from torres.zugschlus.de (torres.zugschlus.de [85.214.160.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 404FC79C7
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 17:59:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5CF76EB67
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 18:02:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.160.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706205561; cv=none; b=Pj2by5C88GU0AeLmRb00G6Aifz4IWu1fuDpj9PI8iGG8mnUT2mue/sl2F4EmglNrhw4yWnT/VApWAPS7XCj8/Q2lZd21ZRKS/+Suk1QSI8gJremsfXfueA43gKaml1iAbvWl1X215BOPAFXm8EOBZQ9OUhWW2H8qPSi6iooFU3s=
+	t=1706205724; cv=none; b=n3nyiUkYZUsNv6aX6BILt8TJe/NR770i59fQ5ipq1QmnDMXKOVQTPL8lN2ncO6sp+Mtk/2Kb8M5wCwTzrWp/wmNaLILHXOQXNyO1seQWgif+/SHKlVNVPV9fMiav+KdBJ63VXgOhlRH2AEztJp0WYKm3l7m9BkKoG4qtJquB1K4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706205561; c=relaxed/simple;
-	bh=HokMkpatYTT/5LYDKqsKvPpXb82sP0M5dZRdwLr8phI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nXwDWg/12iwSC9LKYlB3HL50aJBfkG3yaLUPjc75IJVQZOKrUy8iDPIIXZAtW4G1KF2kp0QDN6clabcoMx8DOxUFIFgU9BGMIcV2IL1ds0EahdbfHeWgdaXn+p7eA14mIpCYK9LkAg5OVn1c/tgjhOKWEr0415AXlbh7T6LxlBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=aoXEkDZo; arc=none smtp.client-ip=209.85.128.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-600094c5703so44120047b3.3
-        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 09:59:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1706205557; x=1706810357; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=opjATsJuWVgGXtTi8L7n0XRJuMOSvz9YdFs6O7o9uKM=;
-        b=aoXEkDZoZogjvJ1jQq6d6gxpWTkgys4xZ5P5/dX6T3/d5VTwsCFfVdtsEzGOWFK2Yx
-         MT8ktVcMRl3lEhs4hwRNhp59yiIfLATxtpv72VxSo2uxG7tNeZn/yJB+GZzFr471sS+h
-         6mkXfrrR1wQg5Xm+/mQ7JSZ2YrYEG/39fChzuNjyLJ88jGge22ZTld5UeSf6SSO36G6c
-         pD1bry4BiQhmoZhuen5XHjapInOjc/qcCzz4wZRl0ME28u2iszDTzsD0+JKx6XLIsAv5
-         0hr0l8nBfgte59x6NZbNKjo9cV/QXjDOAtBx1DSwxxN2kipl3pEBTNh0m+SDshNHg2FM
-         M87w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706205557; x=1706810357;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=opjATsJuWVgGXtTi8L7n0XRJuMOSvz9YdFs6O7o9uKM=;
-        b=V3HesrEtLDynq3FaBoXc2fUk82pMr+ZRF01NqYLQ2tRoP4obO0PbjP2l3/5hrzEA+g
-         xhBFYb8wH88D5tjLN5DZX5UkPMKJS1B0tEU8ZhSANDTPX34m/NBnRDds8LmKIK4XFvGi
-         Sim8J+JFV/PNIqE2NwfiyjuzpRJeswcJePXl54G9zKxrfr+uQkXkuHgIPZpGQQwzNxvR
-         VRz7D3enmwdvUggw+v+pPDqgGDFUBQD811Z58TrwcxsO+M6E0smYKbye2sdDkqDs6T6m
-         f9kHx/iVn/qpJzPswxTeS7EKALOIKgjFKLDyQ1cFy+7ztFw+Vlom6H9izbxsGI91G9MO
-         KEvQ==
-X-Gm-Message-State: AOJu0Yy1x5hoALlNdt1jO5JrbdgTab3kseiuPd4ICWG7KP7B5kCLMXG1
-	vmYMsdhItlL0eSAt3yCi1MpPcx8OLJpkTEt29LLEFd71t+fvzSwmWebJoc+bwP0fC9bmFnMd/U0
-	W/hl6lsYI9GxCko8VUkp8xyOuccE4ug+hwO2x
-X-Google-Smtp-Source: AGHT+IGowX0N08oawtn0KVs5HNCBLreoSrbxiEirCSRM/mLryIU4XmEt0t4iRjISyBGuukOKp9GGcXndPPoCtPmx7kg=
-X-Received: by 2002:a25:8246:0:b0:dc3:6b67:4998 with SMTP id
- d6-20020a258246000000b00dc36b674998mr167283ybn.114.1706205557120; Thu, 25 Jan
- 2024 09:59:17 -0800 (PST)
+	s=arc-20240116; t=1706205724; c=relaxed/simple;
+	bh=mLgNHGKLKeEJs1JAvBWl8le9l5hajd0AJBSbXb5Bm0U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mkh8HEPfK4WHlx0VKM4HzSfv1dicQvgvaYx+J7pe2U2Z51Vs7YPP8ucZhcqoSfFdJgGUVufiEGaMcuzpwJ5B4uiPZeUqUFgv+FQN/rAfq1ifScQNLR8qNyMbvBoJpfJc95Xv80jDcv7lJYjmNqSrPoAONswq7mRaz+HPks/9aRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zugschlus.de; spf=none smtp.mailfrom=zugschlus.de; arc=none smtp.client-ip=85.214.160.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zugschlus.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=zugschlus.de
+Received: from mh by torres.zugschlus.de with local (Exim 4.96)
+	(envelope-from <mh+netdev@zugschlus.de>)
+	id 1rT42m-000Ukl-0X;
+	Thu, 25 Jan 2024 19:01:40 +0100
+Date: Thu, 25 Jan 2024 19:01:40 +0100
+From: Marc Haber <mh+netdev@zugschlus.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: alexandre.torgue@foss.st.com, Jose Abreu <joabreu@synopsys.com>,
+	Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
+	Jisheng Zhang <jszhang@kernel.org>, netdev@vger.kernel.org
+Subject: Re: stmmac on Banana PI CPU stalls since Linux 6.6
+Message-ID: <ZbKiBKj7Ljkx6NCO@torres.zugschlus.de>
+References: <Za173PhviYg-1qIn@torres.zugschlus.de>
+ <8efb36c2-a696-4de7-b3d7-2238d4ab5ebb@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240122194801.152658-1-jhs@mojatatu.com> <20240122194801.152658-16-jhs@mojatatu.com>
- <6841ee07-40c6-9a67-a1a7-c04cbff84757@iogearbox.net> <CAM0EoMnjEpZrajgfKLQhsJjDANsdsZf3z2W8CT9FTMQDw2hGMw@mail.gmail.com>
- <a567ac93-2564-2235-b65f-d0940da076a5@iogearbox.net>
-In-Reply-To: <a567ac93-2564-2235-b65f-d0940da076a5@iogearbox.net>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Thu, 25 Jan 2024 12:59:04 -0500
-Message-ID: <CAM0EoM=XPJ96s3Y=ivrjH-crGb6hRu4hi90WB-O_SkxvLZNYpQ@mail.gmail.com>
-Subject: Re: [PATCH v10 net-next 15/15] p4tc: add P4 classifier
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com, 
-	namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com, 
-	Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, jiri@resnulli.us, 
-	xiyou.wangcong@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org, 
-	khalidm@nvidia.com, toke@redhat.com, mattyk@nvidia.com, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <8efb36c2-a696-4de7-b3d7-2238d4ab5ebb@lunn.ch>
+User-Agent: Mutt/2.2.12 (2023-09-09)
 
-On Thu, Jan 25, 2024 at 10:47=E2=80=AFAM Daniel Borkmann <daniel@iogearbox.=
-net> wrote:
->
-> On 1/24/24 3:40 PM, Jamal Hadi Salim wrote:
-> > On Wed, Jan 24, 2024 at 8:59=E2=80=AFAM Daniel Borkmann <daniel@iogearb=
-ox.net> wrote:
-> >> On 1/22/24 8:48 PM, Jamal Hadi Salim wrote:
-> [...]
-> >>>
-> >>> It should also be noted that it is feasible to split some of the ingr=
-ess
-> >>> datapath into XDP first and more into TC later (as was shown above fo=
-r
-> >>> example where the parser runs at XDP level). YMMV.
-> >>> Regardless of choice of which scheme to use, none of these will affec=
-t
-> >>> UAPI. It will all depend on whether you generate code to load on XDP =
-vs
-> >>> tc, etc.
-> >>>
-> >>> Co-developed-by: Victor Nogueira <victor@mojatatu.com>
-> >>> Signed-off-by: Victor Nogueira <victor@mojatatu.com>
-> >>> Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
-> >>> Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
-> >>> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> >>
-> >> My objections from last iterations still stand, and I also added a nak=
-,
-> >> so please do not just drop it with new revisions.. from the v10 as you
-> >> wrote you added further code but despite the various community feedbac=
-k
-> >> the design still stands as before, therefore:
-> >>
-> >> Nacked-by: Daniel Borkmann <daniel@iogearbox.net>
-> >
-> > We didnt make code changes - but did you read the cover letter and the
-> > extended commentary in this patch's commit log? We should have
-> > mentioned it in the changes log. It did respond to your comments.
-> > There's text that says "the filter manages the lifetime of the
-> > pipeline" - which in the future could include not only tc but XDP but
-> > also the hardware path (in the form of a file that gets loaded). I am
-> > not sure if that message is clear. Your angle being this is layer
-> > violation. In the last discussion i asked you for suggestions and we
-> > went the tcx route, which didnt make sense, and  then you didnt
-> > respond.
-> [...]
->
-> >> Also as mentioned earlier I don't think tc should hold references on
-> >> XDP programs in here. It doesn't make any sense aside from the fact
-> >> that the cls_p4 is also not doing anything with it. This is something
-> >> that a user space control plane should be doing i.e. managing a XDP
-> >> link on the target device.
-> >
-> > This is the same argument about layer violation that you made earlier.
-> > The filter manages the p4 pipeline - i.e it's not just about the ebpf
-> > blob(s) but for example in the future (discussions are still ongoing
-> > with vendors who have P4 NICs) a filter could be loaded to also
-> > specify the location of the hardware blob.
->
-> Ah, so there is a plan to eventually add HW offload support for cls_p4?
-> Or is this only specifiying a location of a blob through some opaque
-> cookie value from user space?
+Hi,
 
-Current thought process is it will be something along these lines (the
-commit provides more details):
+On Sun, Jan 21, 2024 at 10:52:56PM +0100, Andrew Lunn wrote:
+> On Sun, Jan 21, 2024 at 09:17:32PM +0100, Marc Haber wrote:
+> > Hi,
+> > 
+> > I am running a bunch of Banana Pis with Debian stable and unstable but
+> > with a bleeding edge kernel. Since kernel 6.6, especially the test
+> > system running Debian unstable is plagued by self-detected stalls on
+> > CPU. The system seems to continue running normally locally but doesn't
+> > answer on the network any more. Sometimes, after a few hours, things
+> > heal themselves.
+> > 
+> > Here is an example log output:
+> > [73929.363030] rcu: INFO: rcu_sched self-detected stall on CPU
+> > [73929.368653] rcu:     1-....: (5249 ticks this GP) idle=d15c/1/0x40000002 softirq=471343/471343 fqs=2625
+> > [73929.377796] rcu:     (t=5250 jiffies g=851349 q=113 ncpus=2)
+> > [73929.383205] CPU: 1 PID: 14512 Comm: atop Tainted: G             L     6.6.0-zgbpi-armmp-lpae+ #1
+> > [73929.383222] Hardware name: Allwinner sun7i (A20) Family
+> > [73929.383233] PC is at stmmac_get_stats64+0x64/0x20c [stmmac]
+> > [73929.383363] LR is at dev_get_stats+0x44/0x144
+> > [73929.383389] pc : [<bf126db0>]    lr : [<c09525e8>]    psr: 200f0013
+> > [73929.383401] sp : f0c59c78  ip : f0c59df8  fp : c2bb8000
+> > [73929.383412] r10: 00800001  r9 : c3443dd8  r8 : 00000143
+> > [73929.383423] r7 : 00000001  r6 : 00000000  r5 : c2bbb000  r4 : 00000001
+> > [73929.383434] r3 : 0004c891  r2 : c2bbae48  r1 : f0c59d30  r0 : c2bb8000
+> > [73929.383447] Flags: nzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment none
+> > [73929.383463] Control: 30c5387d  Table: 49b553c0  DAC: a7f66f60
+> > [73929.383486]  stmmac_get_stats64 [stmmac] from dev_get_stats+0x44/0x144
+> 
+> Hi Marc
+> 
+> https://elixir.bootlin.com/linux/v6.7.1/source/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c#L6949
 
-tc filter add block 22 ingress protocol all prio 1 p4 pname simple_l3 \
-   prog type hw filename "mypnameprog.o" ... \
-   prog type xdp obj $PARSER.o section parser/xdp pinned_link
-/sys/fs/bpf/mylink \
-   action bpf obj $PROGNAME.o section prog/tc-ingress
+That is just for reference to the source? Or am I supposed to do
+something with that link?
 
-These discussions are still ongoing - but that is the current
-consensus. Note: we are not pushing any code for that, but hope it
-paints the bigger picture....
-The idea is the cls p4 owns the lifetime of the pipeline. Installing
-the filter instantiates the p4 pipeline "simple_l3" and triggers a lot
-of the refcounts to make sure the pipeline and its components stays
-alive.
-There could be multiple such filters - when someone deletes the last
-filter, then it is safe to delete the pipeline.
-Essentially the filter manages the lifetime of the pipeline.
+> My _guess_ would be, its stuck in one of the loops which look like:
+> 
+> 		do {
+> 			start = u64_stats_fetch_begin(&txq_stats->syncp);
+> 			tx_packets = txq_stats->tx_packets;
+> 			tx_bytes   = txq_stats->tx_bytes;
+> 		} while (u64_stats_fetch_retry(&txq_stats->syncp, start));
+> 
+> Next time you get a backtrace, could you do:
+> 
+> make drivers/net/ethernet/stmicro/stmmac/stmmac_main.lst. You can then
+> use whatever it is reporting for:
 
-> > I would be happy with a suggestion that gets us moving forward with
-> > that context in mind.
->
-> My question on the above is mainly what does it bring you to hold a
-> reference on the XDP program? There is no guarantee that something else
-> will get loaded onto XDP, and then eventually the cls_p4 is the only
-> entity holding the reference but w/o 'purpose'. We do have BPF links
-> and the user space component orchestrating all this needs to create
-> and pin the BPF link in BPF fs, for example. An artificial reference
-> on XDP prog feels similar as if you'd hold a reference on an inode
-> out of tc.. Again, that should be delegated to the control plane you
-> have running interacting with the compiler which then manages and
-> loads its artifacts. What if you would also need to set up some
-> netfilter rules for the SW pipeline, would you then embed this too?
+I have checked out 2eb85b750512cc5dc5a93d5ff00e1f83b99651db (which is
+the first bad commit that the bisect eventually identified) and tried
+running:
 
-Sorry, a slight tangent first:
-P4 is self-contained, there are a handful of objects that are defined
-by the spec (externs, actions, tables, etc) and we model them in the
-patchset, so that part is self-contained. For the extra richness such
-as the netfilter example you quoted - based on my many years of
-experience deploying SDN - using daemons(sorry if i am reading too
-much in what I think you are implying) for control is not the best
-option i.e you need all kinds of coordination - for example where do
-you store state, what happens when the daemon dies, how do you
-graceful restarts etc. Based on that, if i can put things in the
-kernel (which is essentially a "perpetual daemon", unless the kernel
-crashes) it's a lot simpler to manage as a source of truth especially
-when there is not that much info. There is a limit when there are
-multiple pieces (to use your netfilter example) because you need
-another layer to coordinate things.
+[56/4504]mh@fan:~/linux/git/linux ((2eb85b750512...)) $ make BUILDARCH="amd64" ARCH="arm" KBUILD_DEBARCH="armhf" CROSS_COMPILE="arm-linux-gnueabihf-" drivers/net/ethernet/stmicro/stmmac/stmmac_main.lst
+  SYNC    include/config/auto.conf.cmd
+  SYSHDR  arch/arm/include/generated/uapi/asm/unistd-oabi.h
+  SYSHDR  arch/arm/include/generated/uapi/asm/unistd-eabi.h
+  HOSTCC  scripts/kallsyms
+  UPD     include/config/kernel.release
+  UPD     include/generated/uapi/linux/version.h
+  UPD     include/generated/utsrelease.h
+  SYSNR   arch/arm/include/generated/asm/unistd-nr.h
+  SYSTBL  arch/arm/include/generated/calls-oabi.S
+  SYSTBL  arch/arm/include/generated/calls-eabi.S
+  CC      scripts/mod/empty.o
+  MKELF   scripts/mod/elfconfig.h
+  HOSTCC  scripts/mod/modpost.o
+  CC      scripts/mod/devicetable-offsets.s
+  UPD     scripts/mod/devicetable-offsets.h
+  HOSTCC  scripts/mod/file2alias.o
+  HOSTCC  scripts/mod/sumversion.o
+  HOSTLD  scripts/mod/modpost
+  CC      kernel/bounds.s
+  CC      arch/arm/kernel/asm-offsets.s
+  UPD     include/generated/asm-offsets.h
+  CALL    scripts/checksyscalls.sh
+  CHKSHA1 include/linux/atomic/atomic-arch-fallback.h
+  CHKSHA1 include/linux/atomic/atomic-instrumented.h
+  MKLST   drivers/net/ethernet/stmicro/stmmac/stmmac_main.lst
+./scripts/makelst: 1: arithmetic expression: expecting EOF: "0x - 0x00000000"
+[57/4505]mh@fan:~/linux/git/linux ((2eb85b750512...)) $
 
-Re: the XDP part - our key reason is mostly managerial, in that the
-filter is the lifetime manager of the pipeline; and that if i dump
-that filter i can see all the details in regards to the pipeline(tc,
-XDP and in future hw, etc) in one spot. You are right, the link
-pinning is our protection from someone replacing the XDP prog (this
-was a tip from Toke in the early days) and the comparison of tc
-holding inode is apropos.
-There's some history: in the early days we were also using metadata
-which comes from the XDP program at the tc layer if more processing
-was to be done (and there was extra metadata which told us which XDP
-prog produced it which we would vet before trusting the metadata).
-Given all the above, we should still be able to hold this info without
-necessarily holding the extra refcount and be able to see this detail.
-So we can remove the refcounting.
+That is not what it was suppsoed to yield, right?
 
-cheers,
-jamal
+> 
+> PC is at stmmac_get_stats64+0x64/0x20c [stmmac]
+> 
+> to find where it is in the listing.
+> 
+> Once we know if its the RX or the TX loop, we have a better idea where
+> to look for an unbalanced u64_stats_update_begin() /
+> u64_stats_update_end().
+> 
+> > I am running a bisect attempt since before christmas, but since it takes
+> > up to a day for the issue to show themselves on a "bad" kernel, I'll let
+> > "good" kernels run for four days until I declare them good. That takes a
+> > lot of wall clock (or better, wall calendar) time.
+> 
+> You might be able to speed it up with:
+> 
+> while true ; do cat /proc/net/dev > /dev/null ; done
+> 
+> and iperf or similar to generate a lot of traffic.
 
-> Thanks,
-> Daniel
+My bisect eventually completed and identified
+2eb85b750512cc5dc5a93d5ff00e1f83b99651db as the first bad commit.
+Sadly, it doesnt contain any loops, no calls to u64_stats_update_begin()
+or u64_stats_update_end() or other suspicious things to the casual
+reader.
+
+I have backed out that commit out of 6.7.1 and have booted that kernel.
+Not long enough to be able to say something yet.
+
+Greetings
+Marc
+
+-- 
+-----------------------------------------------------------------------------
+Marc Haber         | "I don't trust Computers. They | Mailadresse im Header
+Leimen, Germany    |  lose things."    Winona Ryder | Fon: *49 6224 1600402
+Nordisch by Nature |  How to make an American Quilt | Fax: *49 6224 1600421
 
