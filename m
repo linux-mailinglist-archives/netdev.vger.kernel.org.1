@@ -1,211 +1,478 @@
-Return-Path: <netdev+bounces-65743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65744-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30F3883B8BE
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 05:47:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB8CC83B8C1
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 05:49:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CCBF91F23549
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 04:47:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3D702832F5
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 04:48:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BD2F6FD1;
-	Thu, 25 Jan 2024 04:47:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D5F579CF;
+	Thu, 25 Jan 2024 04:48:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="OIv92hqk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eV7QK4TR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A512179C3
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 04:47:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1574B79C6
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 04:48:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706158039; cv=none; b=Kul0aV0j1b0vQbZq7B6XUDc46OWUemenBTnO4iPefdHv3GCn4FXDbeCwDEtYhsMH3e6wHVsUEqTSjLIZFVSVDf0fcDAb2pLRoVIZPSdbUt3LdAlf7a5W+HQk+EdgI0Lrj6FAGmbrBOGstP3CrX90L83YiGqyJAKBwAp+bPQh/0A=
+	t=1706158135; cv=none; b=SFv5lAz/vOl4nHeNVQB7Cqq87yTvTgCfnA+sigfjAp0KB1Sumi9ZGpVPrt5HWORgrC91bdt2mX5LhsWwcfJ4vNHrtHTaWsDx667jCDOoxdbLQJhI2XMsaXln2/IJepvGc0jX+RY+Ph3DFsK/kZdmgDyzZjeZDFZCFr9iHY6ElCY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706158039; c=relaxed/simple;
-	bh=1qUkK75kqkFifXSrA2uVGRT/MEZnRhEqn+VesqGjPDU=;
+	s=arc-20240116; t=1706158135; c=relaxed/simple;
+	bh=6DdzQ2E9OeQMD4Ll7S27cDySmDqNA/T9HcWDxZD1J/8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sni4pup707k6V0W4GQpZ8SqjPrhTdyAesrhBCD29zf5ox/NkNm6yhRuaxi3UFf9Tl7SVCzK1UUhV52ivGqOEmIevAQ94/4nfpGod3OxtP4vgznzj/K2ZMpvnJjyEU3oQjSwUFf/nCDExluSWBK5S+eFjpVPyVFuJFX+Vzl2x2OA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=OIv92hqk; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-55a356f8440so7472436a12.2
-        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 20:47:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1706158035; x=1706762835; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=BjmO/NX9pWkNk2Ex4SbHme0YK0J7oKPDwQ65CcNbu0o=;
-        b=OIv92hqk+ceVM7nhHM4hm+SxU4gp74/pMXXF6LQbJoceUq1E8vOLP0/y/IHR8T+p9M
-         H71nJjept0PULL7WBimWwOM2PtbzoUcXj2+ZBAcGxcHwcBR9CXYZcheaSiATZ1XHyUg6
-         zO+Fimsd6Kx6zzURDfEmDFOJIQ+7MK51qQmpo=
+	 To:Cc:Content-Type; b=tNWmJI70NdmxwV/3RH1J1j64dZBJL532/hJhAR7yUTWAnFRKVW48au74AP3ZZyRYllGOkDPQ6fUraQriJUAq/wffujnbQvQW8Bec3iDI+p5DaCWvfa/Rj8Ucx5PPcCI+obZc7/KwCGM4HSQHQPU1EDPwOmC75H1Aya/Cb770Bkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eV7QK4TR; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706158133;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5DnZRXqjQvdY1jAfdan5L6v5dW2MXXnZETrlS+Qv9f4=;
+	b=eV7QK4TRVWuynFxTEz4I0ND3zGBKGiXdSlN9dI8fIMqszPhs5piQIWqVHcuV0u/Xis7btH
+	LldPe0G/XlDQH92W5cpkJ3vTlxrQKZU/3ek9M51eB7Mg+E2D62zgZwSiFXINpr7MWVDGK0
+	N8hcUDbCc/FSeLJ56J9OPb0koNWR4L4=
+Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com
+ [209.85.161.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-341-5ZZCF9_jOeKofqSW51QrOg-1; Wed, 24 Jan 2024 23:48:51 -0500
+X-MC-Unique: 5ZZCF9_jOeKofqSW51QrOg-1
+Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-598e2d7e22bso6631386eaf.3
+        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 20:48:51 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706158035; x=1706762835;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BjmO/NX9pWkNk2Ex4SbHme0YK0J7oKPDwQ65CcNbu0o=;
-        b=PsXYzbQQ8xkoRiGxXQkLWO8xGC601J46T0A1+PHwBkHnFqYAa6OwC81I4SY/xJRygS
-         R11usE64EzhZGVI7a51gGCP4q22S8Pq40ZOrLAr50DG5fVklXv805EjxDAZuVhCDdF/s
-         riGdRB85PSrGky42RbnKVnRs7qSugxH7Cz2TKk4fPYvvS0fAlEudoJZkxopinRCJOAiQ
-         1aeL2w7HmU6jl6PLZZwOI8N4JXfqbPLKqarVzn5P01vFjCypLsbUlW6iRxDDJXLt0qad
-         6t//X54R6jeRjIolCaufhnzydSH1ezlu4zdiktRRZWMLrpl0RrXwptdhRcVGIl/znoAa
-         gAmg==
-X-Gm-Message-State: AOJu0YxlZu9mTfVmwF3M01cFsAV33C+a1qTIvFgXU8LKg8yKJlmPrcf5
-	VeeQuuLrNI0y+06pmJB/Mz3N5ULdSOBqkBoRYYakopvAB5VnMRP5TI2xeWT936u4Xevk+VPED4z
-	okvu03KBSYOugR/KJqvvT8orvzwBc5IMEx1lt
-X-Google-Smtp-Source: AGHT+IFceDiWRbzhE97CzKavRIMPy4r2h7RcaICCvNEp4Iw1MxfCx1HtaDbMbxpzDKhVJ38GFPEJ1EdOidz3CIMxpXo=
-X-Received: by 2002:a05:6402:1747:b0:55c:304e:125a with SMTP id
- v7-20020a056402174700b0055c304e125amr173950edx.42.1706158035524; Wed, 24 Jan
- 2024 20:47:15 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706158130; x=1706762930;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5DnZRXqjQvdY1jAfdan5L6v5dW2MXXnZETrlS+Qv9f4=;
+        b=ZIzx6hRayX0tcRubqdQtUVoWCD+qn5kmOpcP0wpBg4fLa5p5GahVojk2xeNmSFOiwA
+         4acOSkFmzIERmFXSA4rdVMGag4/9beWtQA+WpEDptXgVhuLysLq81Vs0LDrFqWu6gqLb
+         +AnJLm+ob6l8kcMXzvZ8YEcV4Gf8nce6pWqPsgmdRchDfyEp0Z4UX8FE74bXhSE/RYBB
+         MW7SyRM+HZ1xFEAog8W11hJsLi01uFdrIagWnqn70Niukhwrdy8/4IjASsVcLVzNYgED
+         fRFCLQZrYDHvYnRmPTCicjHqhnC99Z0NoScaP10pKXfjTSXHOhORJkycYubY5hzAmEMR
+         CZ0w==
+X-Gm-Message-State: AOJu0YzS1oTYSmdv2c2qtb6zWScRTpO+qD8LETU36jTAD777h7pm9+qf
+	P1Qh8C2Npma1A1SadVIdYuM9DXI2ehkhBjCm1OI1W6DsIfmkDfJ2dqpzOH0DiM8x25ddqtkr5q/
+	Kefti8lWLf/K2gzKBvW03sgPkoeoOa9jWnE4A+HL0tGicyQKHIykh8rpLVN5whfJrw+JcUCROoL
+	tjn0RkyqcTv1BRNUujfhb6HmXQcSzA
+X-Received: by 2002:a05:6358:880a:b0:176:7d13:d70e with SMTP id hv10-20020a056358880a00b001767d13d70emr611995rwb.16.1706158130345;
+        Wed, 24 Jan 2024 20:48:50 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFddJIzi0ITLTVUmZVAdoejjTy2B/LClBNQ5q3+0akCp/DD67U3ZDcor5HcvQgQAKcj2DPfjkq9KQFUSYNFNKM=
+X-Received: by 2002:a05:6358:880a:b0:176:7d13:d70e with SMTP id
+ hv10-20020a056358880a00b001767d13d70emr611981rwb.16.1706158129995; Wed, 24
+ Jan 2024 20:48:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231212005122.2401-1-michael.chan@broadcom.com>
- <20231212005122.2401-14-michael.chan@broadcom.com> <ZbDj/FI4EJezcfd1@gmail.com>
- <CALs4sv3xWaOg63a3ZVPDSq8nf2E84XNNLC1L6fJe9zphuWpgYg@mail.gmail.com>
-In-Reply-To: <CALs4sv3xWaOg63a3ZVPDSq8nf2E84XNNLC1L6fJe9zphuWpgYg@mail.gmail.com>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Wed, 24 Jan 2024 20:47:03 -0800
-Message-ID: <CACKFLikNDhvtd9-98eD+Ah1Cr7MH3GkE+N8VucwBhTqYarcv-A@mail.gmail.com>
-Subject: Re: [PATCH net-next 13/13] bnxt_en: Make PTP TX timestamp HWRM query silent
-To: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Cc: Breno Leitao <leitao@debian.org>, davem@davemloft.net, netdev@vger.kernel.org, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, gospo@broadcom.com
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000aa7358060fbddffa"
-
---000000000000aa7358060fbddffa
+References: <1706089075-16084-1-git-send-email-wangyunjian@huawei.com>
+In-Reply-To: <1706089075-16084-1-git-send-email-wangyunjian@huawei.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 25 Jan 2024 12:48:38 +0800
+Message-ID: <CACGkMEu5PaBgh37X4KysoF9YB8qy6jM5W4G6sm+8fjrnK36KXA@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/2] tun: AF_XDP Rx zero-copy support
+To: Yunjian Wang <wangyunjian@huawei.com>
+Cc: mst@redhat.com, willemdebruijn.kernel@gmail.com, kuba@kernel.org, 
+	davem@davemloft.net, magnus.karlsson@intel.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, xudingke@huawei.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 24, 2024 at 7:35=E2=80=AFPM Pavan Chebbi <pavan.chebbi@broadcom=
-.com> wrote:
+On Wed, Jan 24, 2024 at 5:38=E2=80=AFPM Yunjian Wang <wangyunjian@huawei.co=
+m> wrote:
 >
-> On Wed, Jan 24, 2024 at 3:48=E2=80=AFPM Breno Leitao <leitao@debian.org> =
-wrote:
-> >
-> > Hello Michael, Pavan,
-> >
-> > On Mon, Dec 11, 2023 at 04:51:22PM -0800, Michael Chan wrote:
-> > > From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-> > >
-> > > In a busy network, especially with flow control enabled, we may
-> > > experience timestamp query failures fairly regularly. After a while,
-> > > dmesg may be flooded with timestamp query failure error messages.
-> > >
-> > > Silence the error message from the low level hwrm function that
-> > > sends the firmware message.  Change netdev_err() to netdev_WARN_ONCE(=
-)
-> > > if this FW call ever fails.
-> >
-> > This is starting to cause a warning now, which is not ideal, because
-> > this error-now-warning happens quite frequently in Meta's fleet.
-> >
-> > At the same time, we want to have our kernels running warninglessly.
-> > Moreover, the call stack displayed by the warning doesn't seem to be
-> > quite useful and doees not help to investigate "the problem", I _think_=
-.
-> >
-> > Is it OK to move it back to error, something as:
-> >
-> > -       netdev_WARN_ONCE(bp->dev,
-> > +       netdev_err_once(bp->dev,
-> >                          "TS query for TX timer failed rc =3D %x\n", rc=
-);
+> Now the zero-copy feature of AF_XDP socket is supported by some
+> drivers, which can reduce CPU utilization on the xdp program.
+> This patch set allows tun to support AF_XDP Rx zero-copy feature.
 >
-> Hi Breno, I think it is OK to change.
-> Would you be submitting a patch for this?
+> This patch tries to address this by:
+> - Use peek_len to consume a xsk->desc and get xsk->desc length.
+> - When the tun support AF_XDP Rx zero-copy, the vq's array maybe empty.
+> So add a check for empty vq's array in vhost_net_buf_produce().
+> - add XDP_SETUP_XSK_POOL and ndo_xsk_wakeup callback support
+> - add tun_put_user_desc function to copy the Rx data to VM
+
+Code explains themselves, let's explain why you need to do this.
+
+1) why you want to use peek_len
+2) for "vq's array", what does it mean?
+3) from the view of TUN/TAP tun_put_user_desc() is the TX path, so I
+guess you meant TX zerocopy instead of RX (as I don't see codes for
+RX?)
+
+A big question is how could you handle GSO packets from userspace/guests?
+
+>
+> Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
+> ---
+>  drivers/net/tun.c   | 165 +++++++++++++++++++++++++++++++++++++++++++-
+>  drivers/vhost/net.c |  18 +++--
+>  2 files changed, 176 insertions(+), 7 deletions(-)
+>
+> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> index afa5497f7c35..248b0f8e07d1 100644
+> --- a/drivers/net/tun.c
+> +++ b/drivers/net/tun.c
+> @@ -77,6 +77,7 @@
+>  #include <net/ax25.h>
+>  #include <net/rose.h>
+>  #include <net/6lowpan.h>
+> +#include <net/xdp_sock_drv.h>
+>
+>  #include <linux/uaccess.h>
+>  #include <linux/proc_fs.h>
+> @@ -145,6 +146,10 @@ struct tun_file {
+>         struct tun_struct *detached;
+>         struct ptr_ring tx_ring;
+>         struct xdp_rxq_info xdp_rxq;
+> +       struct xdp_desc desc;
+> +       /* protects xsk pool */
+> +       spinlock_t pool_lock;
+> +       struct xsk_buff_pool *pool;
+>  };
+>
+>  struct tun_page {
+> @@ -208,6 +213,8 @@ struct tun_struct {
+>         struct bpf_prog __rcu *xdp_prog;
+>         struct tun_prog __rcu *steering_prog;
+>         struct tun_prog __rcu *filter_prog;
+> +       /* tracks AF_XDP ZC enabled queues */
+> +       unsigned long *af_xdp_zc_qps;
+>         struct ethtool_link_ksettings link_ksettings;
+>         /* init args */
+>         struct file *file;
+> @@ -795,6 +802,8 @@ static int tun_attach(struct tun_struct *tun, struct =
+file *file,
+>
+>         tfile->queue_index =3D tun->numqueues;
+>         tfile->socket.sk->sk_shutdown &=3D ~RCV_SHUTDOWN;
+> +       tfile->desc.len =3D 0;
+> +       tfile->pool =3D NULL;
+>
+>         if (tfile->detached) {
+>                 /* Re-attach detached tfile, updating XDP queue_index */
+> @@ -989,6 +998,13 @@ static int tun_net_init(struct net_device *dev)
+>                 return err;
+>         }
+>
+> +       tun->af_xdp_zc_qps =3D bitmap_zalloc(MAX_TAP_QUEUES, GFP_KERNEL);
+> +       if (!tun->af_xdp_zc_qps) {
+> +               security_tun_dev_free_security(tun->security);
+> +               free_percpu(dev->tstats);
+> +               return -ENOMEM;
+> +       }
+> +
+>         tun_flow_init(tun);
+>
+>         dev->hw_features =3D NETIF_F_SG | NETIF_F_FRAGLIST |
+> @@ -1009,6 +1025,7 @@ static int tun_net_init(struct net_device *dev)
+>                 tun_flow_uninit(tun);
+>                 security_tun_dev_free_security(tun->security);
+>                 free_percpu(dev->tstats);
+> +               bitmap_free(tun->af_xdp_zc_qps);
+>                 return err;
+>         }
+>         return 0;
+> @@ -1222,11 +1239,77 @@ static int tun_xdp_set(struct net_device *dev, st=
+ruct bpf_prog *prog,
+>         return 0;
+>  }
+>
+> +static int tun_xsk_pool_enable(struct net_device *netdev,
+> +                              struct xsk_buff_pool *pool,
+> +                              u16 qid)
+> +{
+> +       struct tun_struct *tun =3D netdev_priv(netdev);
+> +       struct tun_file *tfile;
+> +       unsigned long flags;
+> +
+> +       rcu_read_lock();
+> +       tfile =3D rtnl_dereference(tun->tfiles[qid]);
+> +       if (!tfile) {
+> +               rcu_read_unlock();
+> +               return -ENODEV;
+> +       }
+> +
+> +       spin_lock_irqsave(&tfile->pool_lock, flags);
+> +       xsk_pool_set_rxq_info(pool, &tfile->xdp_rxq);
+> +       tfile->pool =3D pool;
+> +       spin_unlock_irqrestore(&tfile->pool_lock, flags);
+> +
+> +       rcu_read_unlock();
+> +       set_bit(qid, tun->af_xdp_zc_qps);
+> +
+> +       return 0;
+> +}
+> +
+> +static int tun_xsk_pool_disable(struct net_device *netdev, u16 qid)
+> +{
+> +       struct tun_struct *tun =3D netdev_priv(netdev);
+> +       struct tun_file *tfile;
+> +       unsigned long flags;
+> +
+> +       if (!test_bit(qid, tun->af_xdp_zc_qps))
+> +               return 0;
+> +
+> +       clear_bit(qid, tun->af_xdp_zc_qps);
+> +
+> +       rcu_read_lock();
+> +       tfile =3D rtnl_dereference(tun->tfiles[qid]);
+> +       if (!tfile) {
+> +               rcu_read_unlock();
+> +               return 0;
+> +       }
+> +
+> +       spin_lock_irqsave(&tfile->pool_lock, flags);
+> +       if (tfile->desc.len) {
+> +               xsk_tx_completed(tfile->pool, 1);
+> +               tfile->desc.len =3D 0;
+> +       }
+> +       tfile->pool =3D NULL;
+> +       spin_unlock_irqrestore(&tfile->pool_lock, flags);
+> +
+> +       rcu_read_unlock();
+> +       return 0;
+> +}
+> +
+> +int tun_xsk_pool_setup(struct net_device *dev, struct xsk_buff_pool *poo=
+l,
+> +                      u16 qid)
+> +{
+> +       return pool ? tun_xsk_pool_enable(dev, pool, qid) :
+> +               tun_xsk_pool_disable(dev, qid);
+> +}
+> +
+>  static int tun_xdp(struct net_device *dev, struct netdev_bpf *xdp)
+>  {
+>         switch (xdp->command) {
+>         case XDP_SETUP_PROG:
+>                 return tun_xdp_set(dev, xdp->prog, xdp->extack);
+> +       case XDP_SETUP_XSK_POOL:
+> +               return tun_xsk_pool_setup(dev, xdp->xsk.pool,
+> +                                          xdp->xsk.queue_id);
+>         default:
+>                 return -EINVAL;
+>         }
+> @@ -1331,6 +1414,19 @@ static int tun_xdp_tx(struct net_device *dev, stru=
+ct xdp_buff *xdp)
+>         return nxmit;
+>  }
+>
+> +static int tun_xsk_wakeup(struct net_device *dev, u32 qid, u32 flags)
+> +{
+> +       struct tun_struct *tun =3D netdev_priv(dev);
+> +       struct tun_file *tfile;
+> +
+> +       rcu_read_lock();
+> +       tfile =3D rcu_dereference(tun->tfiles[qid]);
+> +       if (tfile)
+> +               __tun_xdp_flush_tfile(tfile);
+> +       rcu_read_unlock();
+> +       return 0;
+> +}
+> +
+>  static const struct net_device_ops tap_netdev_ops =3D {
+>         .ndo_init               =3D tun_net_init,
+>         .ndo_uninit             =3D tun_net_uninit,
+> @@ -1347,6 +1443,7 @@ static const struct net_device_ops tap_netdev_ops =
+=3D {
+>         .ndo_get_stats64        =3D dev_get_tstats64,
+>         .ndo_bpf                =3D tun_xdp,
+>         .ndo_xdp_xmit           =3D tun_xdp_xmit,
+> +       .ndo_xsk_wakeup         =3D tun_xsk_wakeup,
+>         .ndo_change_carrier     =3D tun_net_change_carrier,
+>  };
+>
+> @@ -1404,7 +1501,8 @@ static void tun_net_initialize(struct net_device *d=
+ev)
+>                 /* Currently tun does not support XDP, only tap does. */
+>                 dev->xdp_features =3D NETDEV_XDP_ACT_BASIC |
+>                                     NETDEV_XDP_ACT_REDIRECT |
+> -                                   NETDEV_XDP_ACT_NDO_XMIT;
+> +                                   NETDEV_XDP_ACT_NDO_XMIT |
+> +                                   NETDEV_XDP_ACT_XSK_ZEROCOPY;
+>
+>                 break;
+>         }
+> @@ -2213,6 +2311,37 @@ static void *tun_ring_recv(struct tun_file *tfile,=
+ int noblock, int *err)
+>         return ptr;
+>  }
+>
+> +static ssize_t tun_put_user_desc(struct tun_struct *tun,
+> +                                struct tun_file *tfile,
+> +                                struct xdp_desc *desc,
+> +                                struct iov_iter *iter)
+> +{
+> +       size_t size =3D desc->len;
+> +       int vnet_hdr_sz =3D 0;
+> +       size_t ret;
+> +
+> +       if (tun->flags & IFF_VNET_HDR) {
+> +               struct virtio_net_hdr_mrg_rxbuf gso =3D { 0 };
+> +
+> +               vnet_hdr_sz =3D READ_ONCE(tun->vnet_hdr_sz);
+> +               if (unlikely(iov_iter_count(iter) < vnet_hdr_sz))
+> +                       return -EINVAL;
+> +               if (unlikely(copy_to_iter(&gso, sizeof(gso), iter) !=3D
+> +                            sizeof(gso)))
+> +                       return -EFAULT;
+> +               iov_iter_advance(iter, vnet_hdr_sz - sizeof(gso));
+> +       }
+> +
+> +       ret =3D copy_to_iter(xsk_buff_raw_get_data(tfile->pool, desc->add=
+r),
+> +                          size, iter) + vnet_hdr_sz;
+> +
+> +       preempt_disable();
+> +       dev_sw_netstats_tx_add(tun->dev, 1, ret);
+> +       preempt_enable();
+> +
+> +       return ret;
+> +}
+> +
+>  static ssize_t tun_do_read(struct tun_struct *tun, struct tun_file *tfil=
+e,
+>                            struct iov_iter *to,
+>                            int noblock, void *ptr)
+> @@ -2226,6 +2355,22 @@ static ssize_t tun_do_read(struct tun_struct *tun,=
+ struct tun_file *tfile,
+>         }
+>
+>         if (!ptr) {
+> +               /* Read frames from xsk's desc */
+> +               if (test_bit(tfile->queue_index, tun->af_xdp_zc_qps)) {
+> +                       spin_lock(&tfile->pool_lock);
+> +                       if (tfile->pool) {
+> +                               ret =3D tun_put_user_desc(tun, tfile, &tf=
+ile->desc, to);
+> +                               xsk_tx_completed(tfile->pool, 1);
+> +                               if (xsk_uses_need_wakeup(tfile->pool))
+> +                                       xsk_set_tx_need_wakeup(tfile->poo=
+l);
+> +                               tfile->desc.len =3D 0;
+> +                       } else {
+> +                               ret =3D -EBADFD;
+> +                       }
+> +                       spin_unlock(&tfile->pool_lock);
+> +                       return ret;
+> +               }
+> +
+>                 /* Read frames from ring */
+>                 ptr =3D tun_ring_recv(tfile, noblock, &err);
+>                 if (!ptr)
+> @@ -2311,6 +2456,7 @@ static void tun_free_netdev(struct net_device *dev)
+>
+>         BUG_ON(!(list_empty(&tun->disabled)));
+>
+> +       bitmap_free(tun->af_xdp_zc_qps);
+>         free_percpu(dev->tstats);
+>         tun_flow_uninit(tun);
+>         security_tun_dev_free_security(tun->security);
+> @@ -2666,7 +2812,19 @@ static int tun_peek_len(struct socket *sock)
+>         if (!tun)
+>                 return 0;
+>
+> -       ret =3D PTR_RING_PEEK_CALL(&tfile->tx_ring, tun_ptr_peek_len);
+> +       if (test_bit(tfile->queue_index, tun->af_xdp_zc_qps)) {
+> +               spin_lock(&tfile->pool_lock);
+> +               if (tfile->pool && xsk_tx_peek_desc(tfile->pool, &tfile->=
+desc)) {
+
+Does it mean if userspace doesn't peek, we can't read anything?
+
+We need to make sure syscall read works as well as vhost_net.
+
+> +                       xsk_tx_release(tfile->pool);
+> +                       ret =3D tfile->desc.len;
+> +                       /* The length of desc must be greater than 0 */
+> +                       if (!ret)
+> +                               xsk_tx_completed(tfile->pool, 1);
+> +               }
+> +               spin_unlock(&tfile->pool_lock);
+> +       } else {
+> +               ret =3D PTR_RING_PEEK_CALL(&tfile->tx_ring, tun_ptr_peek_=
+len);
+> +       }
+>         tun_put(tun);
+>
+>         return ret;
+> @@ -3469,8 +3627,11 @@ static int tun_chr_open(struct inode *inode, struc=
+t file * file)
+>
+>         mutex_init(&tfile->napi_mutex);
+>         RCU_INIT_POINTER(tfile->tun, NULL);
+> +       spin_lock_init(&tfile->pool_lock);
+>         tfile->flags =3D 0;
+>         tfile->ifindex =3D 0;
+> +       tfile->pool =3D NULL;
+> +       tfile->desc.len =3D 0;
+>
+>         init_waitqueue_head(&tfile->socket.wq.wait);
+>
+> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> index f2ed7167c848..a1f143ad2341 100644
+> --- a/drivers/vhost/net.c
+> +++ b/drivers/vhost/net.c
+> @@ -169,9 +169,10 @@ static int vhost_net_buf_is_empty(struct vhost_net_b=
+uf *rxq)
+>
+>  static void *vhost_net_buf_consume(struct vhost_net_buf *rxq)
+>  {
+> -       void *ret =3D vhost_net_buf_get_ptr(rxq);
+> -       ++rxq->head;
+> -       return ret;
+> +       if (rxq->tail =3D=3D rxq->head)
+> +               return NULL;
+> +
+> +       return rxq->queue[rxq->head++];
+>  }
+>
+>  static int vhost_net_buf_produce(struct vhost_net_virtqueue *nvq)
+> @@ -993,12 +994,19 @@ static void handle_tx(struct vhost_net *net)
+>
+>  static int peek_head_len(struct vhost_net_virtqueue *rvq, struct sock *s=
+k)
+>  {
+> +       struct socket *sock =3D sk->sk_socket;
+>         struct sk_buff *head;
+>         int len =3D 0;
+>         unsigned long flags;
+>
+> -       if (rvq->rx_ring)
+> -               return vhost_net_buf_peek(rvq);
+> +       if (rvq->rx_ring) {
+> +               len =3D vhost_net_buf_peek(rvq);
+> +               if (likely(len))
+> +                       return len;
+> +       }
+> +
+> +       if (sock->ops->peek_len)
+> +               return sock->ops->peek_len(sock);
+
+What prevents you from reusing the ptr_ring here? Then you don't need
+the above tricks.
+
+Thanks
+
+
+>
+>         spin_lock_irqsave(&sk->sk_receive_queue.lock, flags);
+>         head =3D skb_peek(&sk->sk_receive_queue);
+> --
+> 2.33.0
 >
 
-Why not netdev_warn_once()?  It will just print a message at the
-warning level without the stack trace.  I think we consider this
-condition to be just a warning and not an error.  Thanks.
-
---000000000000aa7358060fbddffa
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIF3ZR3cDo9eyvVJPP+RFIF3YC6wcF/BI
-dVecJ6CQPoa0MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDEy
-NTA0NDcxNVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQA1L8qm3ykmXUcE6dpwEluUDFX9glc10TdiATX4UOxPZKrZZjHL
-mbf0T1ZA/dCW9Ak8EwfDgWxhiPwwUwaCgoRdlTeFKZGjXBfgj+9XIb/tUKKqyjxGZemv553URu6J
-+798C+xcc8d61w/Aprm0A+tDmwsJJKOK3+XxQd12nxL0kzRFV3dYuzyqSQgGiUonJhaIVkZTIl8s
-WcvH+LJF4lEINBOHOhLeX3C/TOF1wz0U/nQAbTRJPVJw76fRFZIHF38s8qroHmKiw+CyVrbTLnP5
-8cw5fh9xypdeJ6a8g4zgzdF1y0HXRExEmcROjqA+8utZXkGkTM8I/bjZw8diSLF+
---000000000000aa7358060fbddffa--
 
