@@ -1,184 +1,132 @@
-Return-Path: <netdev+bounces-65803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4937E83BCDF
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 10:10:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C35A83BCBB
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 10:06:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A88BEB2A1F5
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:10:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24B3B290F32
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:06:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DB4F1BC5A;
-	Thu, 25 Jan 2024 09:06:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB6411B958;
+	Thu, 25 Jan 2024 09:00:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="F4zvZWNx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZmadJnP1"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2071.outbound.protection.outlook.com [40.107.94.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB2C71BC25;
-	Thu, 25 Jan 2024 09:06:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.71
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706173589; cv=fail; b=Xnk0G4rNgoestNgRXrREodjFr24d8cfctsvqPQ2arBPXLRHoSo0VOEZ5rN022gySvrQeoBN5fwoHS5fTah31hVVjvPAK+7ieEkrUhruqaDuDG1Vpi6NPy5NhL9saz4OJwuOxO2TV10p3ESdiXsad2PIcTi/jnLEkoSRPQuvztoY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706173589; c=relaxed/simple;
-	bh=2hlAnQYntbkug2Ce51mVzTlNp2T85FVikHnRhKUnHr8=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=rguFAQoe9Yssvq8eGJ6WINcidFQVono7mYGGRdPBgPqr8QPyCXyFAIejmcjDIL6aEtuDTMnAfRVatfaO6psFD4JtuaCiaYlSCQHrvLMXShkjQXaxCxuX3RQ3+WHENSHiAblVxxUHMn+yRjjdv3Txsd1EOJmLZCHR+TU4/Yulyhg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=F4zvZWNx; arc=fail smtp.client-ip=40.107.94.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QGSfAT/qxu49LFZOM+XKjaqPivBFb/YhB123JSixohh5heHzH2Ulh9RKsgQiOLAfeo+Dnf1gQkEm2JYmGPh3O+Iys2U1RkB+rXP/xNwTDr2kPMUCgNpAgfjYx92LjBUPrd2EnUADGmCxPdKH4mu/LIn23GH76wYmQUAv8cwDQ6YxJMXBg2dv18iL313XDfpy61lkBAN2tmeJLFj9cgzlnZRebO1XV2wCautv2f/4QXBCWyFJtpy8nXSJn6/hwk+3ZJcBZnJRzax9BV/l+BcHSTPkmfhHW6KHWJvJtzLOA6jyeIG4K3XfHIpRZF/vCDtZWexSzI3lvI5vmetDeJQAtA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QE10+q+bPQZ4yrk7ynqUBqEEcKpIvjkHNs/ynQw5bfA=;
- b=bvphcTou3LrAc97axXLfgRvoN7KtII9pfdH4orBUM9jr4jDoIePZkFDQbX0aq6NZ5KSniRKFNSx8gWMVupXpXY1/tNNC17hQ/XVotNy5xA+MmUuAe7ALHnIhHItxESk/cm5bozuP0/vxTdkjSE06CLC2TDN0T/TYHWn1qMmYmASpTWzupjrP6XxXvda6P2BIb3AnWaTu9bTrvJqMwEL2Ab58u1MlOeqmAYAkWjt36fT0SGRXrU0CqoXj6J4+oE8o9Zh9B78PZap43cZhwe5HS9WT7pKzP2uSdCWdi//9b6As0HzBRdcxQ2xK5SfBSU0Z3bSRsRsk4PQfsRpLHuL8AQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QE10+q+bPQZ4yrk7ynqUBqEEcKpIvjkHNs/ynQw5bfA=;
- b=F4zvZWNxdStL3sdiXw6p5tx6o7AtZ3Ncy8uoMZCWFhoQxNAmPGGonhSOqurlbv1IFUOszwVWmHKlH/IxqnTLSIUluESNHrRVNKjPJ2gKmXqXJl66Fwim/HKzCqYa7EnnztteTTWPyKHgzZYSv3n0fhkeKF0yuIanpVzHeZvoasnNepV7PzASSdrBSy2e2wLsYuFIL7O+SLbErymvHEkL5lKmq92Z71krQMXWgiHvszzpEj2tQzjSUz1uT6LICOYytBpsxrbbCtRXlhEhMSDScw7ysKsOjtirEjEHgwDR+1xmTzN9I58XqApume1MOndnhgY26Otcc9VScweeqs8iNw==
-Received: from DM6PR13CA0024.namprd13.prod.outlook.com (2603:10b6:5:bc::37) by
- DM4PR12MB5795.namprd12.prod.outlook.com (2603:10b6:8:62::9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7228.22; Thu, 25 Jan 2024 09:06:25 +0000
-Received: from CY4PEPF0000E9D8.namprd05.prod.outlook.com
- (2603:10b6:5:bc:cafe::8c) by DM6PR13CA0024.outlook.office365.com
- (2603:10b6:5:bc::37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.21 via Frontend
- Transport; Thu, 25 Jan 2024 09:06:25 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CY4PEPF0000E9D8.mail.protection.outlook.com (10.167.241.83) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7228.16 via Frontend Transport; Thu, 25 Jan 2024 09:06:24 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 25 Jan
- 2024 01:06:15 -0800
-Received: from yaviefel (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 25 Jan
- 2024 01:06:13 -0800
-References: <20240122091612.3f1a3e3d@kernel.org> <87fryonx35.fsf@nvidia.com>
- <20240123073412.063bc08e@kernel.org> <87y1cgm040.fsf@nvidia.com>
- <20240123093834.23ea172a@kernel.org>
-User-agent: mu4e 1.8.11; emacs 28.3
-From: Petr Machata <petrm@nvidia.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Petr Machata <petrm@nvidia.com>, Shuah Khan <shuah@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"netdev-driver-reviewers@vger.kernel.org"
-	<netdev-driver-reviewers@vger.kernel.org>, <linux-kselftest@vger.kernel.org>
-Subject: Re: [ANN] net-next is OPEN
-Date: Wed, 24 Jan 2024 12:06:00 +0100
-In-Reply-To: <20240123093834.23ea172a@kernel.org>
-Message-ID: <87ede5n5oc.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F037F1B94F;
+	Thu, 25 Jan 2024 09:00:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706173253; cv=none; b=KzY8+dZAtuecX1spDjGokjhEIkwaA+KDtclRwBYYJiG0ZAnIHeFXBGEgL3vo9lYP71vMK2ioeECcFmoz2hwRApbYZ/AlceDWmPFbw+3nEGDzJpIUErYHIipjseGWSvGSReuu39ELxsewCniCRb4nM8Pr85bWQHlJb9oZxmC0b+8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706173253; c=relaxed/simple;
+	bh=LoxX9dBFXRpqezdseXqTieo5vgHDE3MP1dCNWiKdj1A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ds4/b4J27JhBoWGu27k8iMpC26r53v5lQnH+7bBdKz3ZFzU1YMHI9diwfXXrFPWSHmHFXrei4iqhOoofnNKI1b86Kbc+s9BLBbfFs7WybMo0j2E3X0rea+UCQ0rk1VJq3bSdecA6kX/4Y1s0BygA5ppYaE/JtMqTrMQpnNI17lc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZmadJnP1; arc=none smtp.client-ip=209.85.208.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2cd33336b32so86647331fa.0;
+        Thu, 25 Jan 2024 01:00:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706173249; x=1706778049; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=MOVBMzL6UNqR3dH+kMM9JTuFe/LvTcnh2ksCh4OpNI4=;
+        b=ZmadJnP17HBHCqDQ9VD6hIdz4fO0nMZfPHXcFwznsiLJo4dlmxqX5O1Og6AycqNkkj
+         w/1EDibcTD+WfYIMtueSvYlqlGYZb1/2AEkXY/dVGlb9+jTVQHNJkaYTf/UdfoBk3Gbt
+         ZY1WN7dGb4pStVIAN9w/XOrfVZCp/wIgNs4jxP/vKnDHYrcBcAB5nMUPxjWcX8ek6pTI
+         PcZMJrHgLzowAoGKrZwF9frktYD4RNiIjD8zATCWNgJOo0tp9Gng6KetHH/5frd6dl5T
+         8dE1M3bRBg+aDckFXDlJ4W976lheg2ZkM9eUm/oj72hhh5/M2xcRfiJCvpUpu/lFdGpH
+         KM7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706173249; x=1706778049;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MOVBMzL6UNqR3dH+kMM9JTuFe/LvTcnh2ksCh4OpNI4=;
+        b=bF7YmQnR7hxkl04WHTi4EOIdSjrBTFGhTcLL0RaTNAbc8zPfHVw/s1t2pEhcy4IvQ5
+         ZR8NazaubtcKsMgbCw7I95PVNg/QFrRSYgLzl7s++WKzDUx9x/zWllwooFadeSlQ/nF6
+         oWzyL+omJFafg9TeteVI9+LoPwPL0kC7H7xwbO+j/4H7R9ULxUgX1fAJXdaeHCdf9Oqg
+         a/WX2sHi5qXYSX+H1gJLaDkt5/VPX5nOrMhPddTNgKEaNVhkuaCmSPWtgLU5+4aPiJ21
+         vF6pIkeHpkagyALjmvVsu7Zh85wKsbC9tISZfK38ewInA7w5lj7nB/PVfuJIQwdd02pO
+         1LYA==
+X-Gm-Message-State: AOJu0YxUtPbTb4l6NkWCcWBeljICblhRRYJ+tOZcnFb4NHk6OhORQQ8H
+	Vd6FJdtvO/wBdKmnxNiQKL9ePcx4I1oEuxQb8vIOMcLL5gSPamCB
+X-Google-Smtp-Source: AGHT+IFW7KOc59kAiJo0rL2JBDdWlpY0XQeY9OVlOIPhtZgE7XzytL23vqJ7or8rbMg6UXPpQkyxpA==
+X-Received: by 2002:a2e:a271:0:b0:2cd:7830:5796 with SMTP id k17-20020a2ea271000000b002cd78305796mr357550ljm.5.1706173249070;
+        Thu, 25 Jan 2024 01:00:49 -0800 (PST)
+Received: from skbuf ([188.25.255.36])
+        by smtp.gmail.com with ESMTPSA id u11-20020a056402110b00b00558aa40f914sm16938831edv.40.2024.01.25.01.00.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Jan 2024 01:00:48 -0800 (PST)
+Date: Thu, 25 Jan 2024 11:00:46 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+	Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	Alvin =?utf-8?Q?=C5=A0ipraga?= <ALSI@bang-olufsen.dk>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: dsa: remove OF-based MDIO bus registration
+ from DSA core
+Message-ID: <20240125090046.jyggdontwkhthqjh@skbuf>
+References: <20240122053348.6589-1-arinc.unal@arinc9.com>
+ <20240122053348.6589-1-arinc.unal@arinc9.com>
+ <20240123154431.gwhufnatxjppnm64@skbuf>
+ <d32d17ed-87b5-4032-b310-f387cea72837@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D8:EE_|DM4PR12MB5795:EE_
-X-MS-Office365-Filtering-Correlation-Id: 27b9d9df-426b-4b01-60f3-08dc1d84e859
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	MO1MhCWswr0o4Td07yr4Z6nbNXg7aVXJUWXCaA9THcq9lRoC0qv2NCPwJzv9J4J5t9zqJgUpH++wulv9shey6S+UbJPzILlcs/lXjRd1I3aQfr/Xs+ADdf2D3TJkt3+VPS2VCktIj059TKFus8091wJ2QJL0m8Ysef7QcN5gDBnJFnOwz19vK2UIBLCvMH1NA1MhBvFCEqYWfJrQ0paN99kp8AumONo07YhjIax8ILlv28FmMhBnXMK/PInIvmFcPXjtseMlugQ/wYXsFzFQb8cPy3VOkuI0rC5W/nHUPzBKbBG3prtzULlYI3CCTnolhDa2Or9ihIJ0ZQ7sfHDxaKvbYFdQvXkWX+XJieQNKMzBdxsaJDwcQtds/NrhnH+hefameTubSb8+2kbg3sZgPB70K8/zG+Apv/Mmq6FASyW4Y6h2bfWtx//OEZUF9pl+Vepz9eCuqWztkkvhfsgZbMPZTjYfAk/LUToYy9RYuDRkiFp4f1VNvz88zhQyG5/WBw79t7xmxXqaqp2CSPFceQMlFIbkcu1RC2ZVQm36J5lw3YtDsBf1VV6YQwUJ20Qj0IJ7fdKcRPA3QHDpHZg9hN6+y1lW1yQTee6b96ZtmDIGu5wqPho3+jtJJJZsQl3wAlXwyhV6AEAs2I1N2TKjoc3jWMnJDGfZw9x3+mst/z7OiYocgRzbOYbCz9+plBfIYQY65DlMNKFpJwAd8H/ksme7gYeBS6QGPXg8pNxTOoTXCWSqHkEWimggN8tPqJlmLKQ6wxlztIdhrmtOUJKRGg==
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(396003)(376002)(346002)(136003)(39860400002)(230922051799003)(451199024)(1800799012)(186009)(82310400011)(64100799003)(36840700001)(46966006)(40470700004)(47076005)(16526019)(2616005)(426003)(26005)(82740400003)(36860700001)(8676002)(336012)(5660300002)(4326008)(8936002)(41300700001)(2906002)(478600001)(966005)(6666004)(6916009)(54906003)(316002)(70206006)(70586007)(36756003)(86362001)(356005)(7636003)(40460700003)(40480700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jan 2024 09:06:24.9734
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 27b9d9df-426b-4b01-60f3-08dc1d84e859
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000E9D8.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5795
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d32d17ed-87b5-4032-b310-f387cea72837@arinc9.com>
 
+On Wed, Jan 24, 2024 at 08:30:11AM +0300, Arınç ÜNAL wrote:
+> On 23.01.2024 18:44, Vladimir Oltean wrote:
+> > On Mon, Jan 22, 2024 at 08:33:48AM +0300, Arınç ÜNAL wrote:
+> > > These subdrivers which control switches [with MDIO bus] probed on OF, will
+> > > lose the ability to register the MDIO bus OF-based:
+> > > 
+> > > drivers/net/dsa/b53/b53_common.c
+> > > drivers/net/dsa/lan9303-core.c
+> > > drivers/net/dsa/realtek/realtek-mdio.c
+> > > drivers/net/dsa/vitesse-vsc73xx-core.c
+> > > 
+> > > These subdrivers let the DSA core driver register the bus:
+> > > - ds->ops->phy_read() and ds->ops->phy_write() are present.
+> > > - ds->user_mii_bus is not populated.
+> > > 
+> > > The commit fe7324b93222 ("net: dsa: OF-ware slave_mii_bus") which brought
+> > > OF-based MDIO bus registration on the DSA core driver is reasonably recent
+> > > and, in this time frame, there have been no device trees in the Linux
+> > > repository that started describing the MDIO bus, or dt-bindings defining
+> > > the MDIO bus for the switches these subdrivers control. So I don't expect
+> > > any devices to be affected.
+> > 
+> > IIUC, Luiz made the original patch for the realtek switches. Shouldn't
+> > we wait until realtek registers ds->user_mii_bus on its own, before
+> > reverting? Otherwise, you're basically saying that Luiz made the DSA
+> > core patch without needing it.
+> 
+> My findings point to that. Luiz made the patch to optionally register the
+> MDIO bus of the MDIO controlled Realtek switches OF-based. So it's not
+> necessary to wait.
+> 
+> Arınç
 
-Jakub Kicinski <kuba@kernel.org> writes:
-
-> On Tue, 23 Jan 2024 18:04:19 +0100 Petr Machata wrote:
->> > Unless I'm doing it wrong and the sub-directories are supposed to
->> > inherit the parent directory's config? So net/forwarding/ should
->> > be built with net/'s config? I could not find the info in docs,
->> > does anyone know?  
->> 
->> I don't think they are, net/config defines CONFIG_VXLAN, but then the
->> vxlan tests still complain about unknown device type. Though maybe
->> there's another device type that it's missing...
->> 
->> What do I do to feed the config file to some build script to get a
->> kernel image to test? I can of course just do something like
->> cat config | xargs -n1 scripts/config -m, but I expect there's some
->> automation for it and I just can't find it.
->
-> The CI script is based on virtme-ng. So it does this:
->
-> # $target is net or net/forwarding or drivers/net/bonding etc.
-> make mrproper
-> vng -v -b -f tools/testing/selftests/$target
-
-Actually:
-
-# vng -v -b -f tools/testing/selftests/${target}/config
-
-Didn't know about vng, it's way cool!
-(Despite having used virtme for a long time.)
-
-> # build the scripts
-> make headers
-> make -C tools/testing/selftests/$target
->
-> vng -v -r arch/x86/boot/bzImage --user root
-> # inside the VM
-> make -C tools/testing/selftests TARGETS=$target run_tests
-
-I'm working my way through the selftests.
-
-> https://github.com/kuba-moo/nipa/blob/master/contest/remote/vmksft.py#L138
->
-> You're right, it definitely does not "inherit" net's config when
-> running forwarding/net. I can easily make it do so, but I'm not clear
->
-> what the expectation from the kselftest subsystem is. Because if other
-> testers (people testing stable, KernelCI etc. et.c) don't "inherit" we
-> better fill in the config completely so that the tests pass for
-> everyone.
-
-Oh, gotcha, the question was not whether it does, but whether it's
-supposed to. OK.
-
-IMHO not necessarily. net/config is for net/*.sh, net/forwarding/config
-for net/forwarding/*.sh. It's not a given that whatever is needed for
-net/ is needed for net/forwarding/ as well.
-
-It will also lead to simpler patches, where enabling config options in
-X/ doesn't imply checking for newly useless duplicities in X's child
-directories.
+Well, Luiz is copied, he can ack or nack if so.
 
