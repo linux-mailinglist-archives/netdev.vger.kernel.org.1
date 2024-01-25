@@ -1,95 +1,160 @@
-Return-Path: <netdev+bounces-65822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94B2283BDF0
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 10:52:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D138A83BD53
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 10:30:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C79F61C223BD
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:52:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8894F1F2D8C6
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9605F1BF2F;
-	Thu, 25 Jan 2024 09:52:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 038D41BDFA;
+	Thu, 25 Jan 2024 09:28:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79CCE1CD02;
-	Thu, 25 Jan 2024 09:52:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 262B31BF27;
+	Thu, 25 Jan 2024 09:28:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706176334; cv=none; b=t4G0eCK/5QtEKQ1pCDq7iHLytkQmeXXp7eB2VEVbcpz4Ru8joH3oah2HHSENrC3VxVvPL4c8qC7ADCP/Ew2JpBOHYvEUDOivM1Jrz1FxAvE9KN8Hv7CrH2Q3NBJQwF3po/f+B7b6+MmpVVVMUBcbvRhMtBASOayaDxaK0/0OYHw=
+	t=1706174936; cv=none; b=Zf1Akv7mbTTGODF5U1IdeCRtP0qqVDWoVWvnRTJBI4EuI/I2rcuIjiERYfQqq6f70JOh6LRuFIBg0pASGeMfuJE3kNDpuCaFLXdmGo4w0A0HX/VROcGoUkRVc/iuZwmxJftYgIEFr6vaUVJ7edn3kkx7wqftjZ6uDqtO9tSmYqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706176334; c=relaxed/simple;
-	bh=StG+/eVbGK2/dVKyODarUOD8vIXXM+MXKHc4ky+fXlY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PQh1rxRr1+6Ofv1SSeDZY4KWdRxI4pFGfpv/ncEX+MGF1tENok071lOJYNINzIr7NEvuZ0R6W1jqnhltCLyuM3G+qG1Y/kNjSlUeaJ9H7jiO2E8OMa4yAjjixvQaRD1qVZEmVxzTyd2ZIWHHbIaAVDBaqWuyyexij3If5lN5v+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1rSvxo-005s2C-0g; Thu, 25 Jan 2024 17:24:01 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 25 Jan 2024 17:24:12 +0800
-Date: Thu, 25 Jan 2024 17:24:12 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Vadim Fedorenko <vadfed@meta.com>, netdev@vger.kernel.org,
-	linux-crypto@vger.kernel.org, bpf@vger.kernel.org,
-	Victor Stewart <v@nametag.social>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Mykola Lysenko <mykolal@fb.com>
-Subject: Re: [PATCH bpf-next v8 2/3] bpf: crypto: add skcipher to bpf crypto
-Message-ID: <ZbIovBWdpDrwFw0V@gondor.apana.org.au>
-References: <20240115220803.1973440-1-vadfed@meta.com>
- <20240115220803.1973440-2-vadfed@meta.com>
- <dc3f48ee-2742-4c59-96a1-a06ffa1d7712@linux.dev>
+	s=arc-20240116; t=1706174936; c=relaxed/simple;
+	bh=4oi/mDvJ66W3EHJcJkd6l/BObOrE9wC8bVqVRycPZXw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Vd0aQ9L3dDL95q88bABdBJfvQp6407F3UedP2glwDYuwTQkYPG51WOmkMI+2pQOp6a9ulvOHB6IsTY7okbeaHUuiCpC8NuPI5wGfDFpcqZ2AP9FHWcc+w/LHqwzqCe21RFnalBDzLp+55HwEZdZ/lgg+Rg5HXSWd28p2ZnXx7AY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; arc=none smtp.client-ip=115.124.30.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=23;SR=0;TI=SMTPD_---0W.JurKr_1706174923;
+Received: from 30.221.129.223(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W.JurKr_1706174923)
+          by smtp.aliyun-inc.com;
+          Thu, 25 Jan 2024 17:28:44 +0800
+Message-ID: <d93bdf89-d724-4f2a-a3fc-f3a46e54202c@linux.alibaba.com>
+Date: Thu, 25 Jan 2024 17:28:43 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dc3f48ee-2742-4c59-96a1-a06ffa1d7712@linux.dev>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [REGRESSION] v6.8 SMC-D issues
+To: Alexandra Winter <wintera@linux.ibm.com>, wenjia@linux.ibm.com,
+ hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, jaka@linux.ibm.com,
+ Matthew Rosato <mjrosato@linux.ibm.com>
+Cc: Linux regressions mailing list <regressions@lists.linux.dev>,
+ borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
+ tonylu@linux.alibaba.com, raspl@linux.ibm.com, schnelle@linux.ibm.com,
+ guangguan.wang@linux.alibaba.com, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Halil Pasic <pasic@linux.ibm.com>
+References: <20231219142616.80697-1-guwen@linux.alibaba.com>
+ <20231219142616.80697-8-guwen@linux.alibaba.com>
+ <13579588-eb9d-4626-a063-c0b77ed80f11@linux.ibm.com>
+ <530afe45-ba6b-4970-a71c-1f1255f5fca9@linux.alibaba.com>
+ <8090bb34-1b70-43ea-ae13-df5d9a5eb761@linux.ibm.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <8090bb34-1b70-43ea-ae13-df5d9a5eb761@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jan 24, 2024 at 05:14:56PM -0800, Martin KaFai Lau wrote:
-> On 1/15/24 2:08 PM, Vadim Fedorenko wrote:
-> > Implement skcipher crypto in BPF crypto framework.
-> > 
-> > Signed-off-by: Vadim Fedorenko<vadfed@meta.com>
-> > ---
-> > v7 -> v8:
-> > - Move bpf_crypto_skcipher.c to crypto and make it part of
-> >    skcipher module. This way looks more natural and makes bpf crypto
-> >    proper modular. MAINTAINERS files is adjusted to make bpf part
-> >    belong to BPF maintainers.
-> > v6 - v7:
-> > - style issues
-> > v6:
-> > - introduce new file
-> > ---
-> >   MAINTAINERS                  |  8 ++++
-> >   crypto/Makefile              |  3 ++
-> >   crypto/bpf_crypto_skcipher.c | 82 ++++++++++++++++++++++++++++++++++++
+
+
+On 2024/1/25 16:26, Alexandra Winter wrote:
 > 
-> The changes are mostly isolated to the new bpf_crypto_skcipher.c file
-> addition to the crypto/ but still will be helpful to get an Ack from the
-> crypto maintainers (Herbert?).
+> 
+> On 25.01.24 05:59, Wen Gu wrote:
+>> After a while debug I found an elementary mistake of mine in
+>> b40584d ("net/smc: compatible with 128-bits extended GID of virtual ISM device")..
+>>
+>> The operator order in smcd_lgr_match() is not as expected. It will always return
+>> 'true' in remote-system case.
+>>
+>>   static bool smcd_lgr_match(struct smc_link_group *lgr,
+>> -                          struct smcd_dev *smcismdev, u64 peer_gid)
+>> +                          struct smcd_dev *smcismdev,
+>> +                          struct smcd_gid *peer_gid)
+>>   {
+>> -       return lgr->peer_gid == peer_gid && lgr->smcd == smcismdev;
+>> +       return lgr->peer_gid.gid == peer_gid->gid && lgr->smcd == smcismdev &&
+>> +               smc_ism_is_virtual(smcismdev) ?
+>> +               (lgr->peer_gid.gid_ext == peer_gid->gid_ext) : 1;
+>>   }
+>>
+>> Could you please try again with this patch? to see if this is the root cause.
+>> Really sorry for the inconvenience.
+>>
+>> diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
+>> index da6a8d9c81ea..c6a6ba56c9e3 100644
+>> --- a/net/smc/smc_core.c
+>> +++ b/net/smc/smc_core.c
+>> @@ -1896,8 +1896,8 @@ static bool smcd_lgr_match(struct smc_link_group *lgr,
+>>                             struct smcd_gid *peer_gid)
+>>   {
+>>          return lgr->peer_gid.gid == peer_gid->gid && lgr->smcd == smcismdev &&
+>> -               smc_ism_is_virtual(smcismdev) ?
+>> -               (lgr->peer_gid.gid_ext == peer_gid->gid_ext) : 1;
+>> +               (smc_ism_is_virtual(smcismdev) ?
+>> +                (lgr->peer_gid.gid_ext == peer_gid->gid_ext) : 1);
+>>   }
+>>
+>>
+>> Thanks,
+>> Wen Gu
+> 
+> Hello Wen Gu,
+> 
+> thank you for the quick resposne and for finding this nasty bug.
+> I can confirm that with your patch I do not see the issue anymore.
 
-Looks good to me.
+Thank you very much for your confirmation, Alexandra.
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+> Please send a fix to the mailing lists. See
+> https://docs.kernel.org/process/handling-regressions.html
+> for some tips.
+> 
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thank you. Will do.
+
+> May I propose that instead of adding the brackets, you change this function
+> to an if-then-else sequence for readability and maintainability?
+> I would still mention the missing brackets in the commit message, so
+> readers can quickly understand the issue.
+
+I agree. if-then-else will make it clearer. I will fix it like this:
+
+diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
+index da6a8d9c81ea..1d5bce82d4d8 100644
+--- a/net/smc/smc_core.c
++++ b/net/smc/smc_core.c
+@@ -1895,9 +1895,15 @@ static bool smcd_lgr_match(struct smc_link_group *lgr,
+                            struct smcd_dev *smcismdev,
+                            struct smcd_gid *peer_gid)
+  {
+-       return lgr->peer_gid.gid == peer_gid->gid && lgr->smcd == smcismdev &&
+-               smc_ism_is_virtual(smcismdev) ?
+-               (lgr->peer_gid.gid_ext == peer_gid->gid_ext) : 1;
++       if (lgr->peer_gid.gid != peer_gid->gid ||
++           lgr->smcd != smcismdev)
++               return false;
++
++       if (smc_ism_is_virtual(smcismdev) &&
++           lgr->peer_gid.gid_ext != peer_gid->gid_ext)
++               return false;
++
++       return true;
+  }
+
+Thanks again,
+Wen Gu
+
+> 
+> Thanks again for the quick response.
+> Sandy
 
