@@ -1,137 +1,183 @@
-Return-Path: <netdev+bounces-65812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2BF383BD21
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 10:22:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8210183BD27
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 10:23:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BF44283D3C
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:22:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BEE5E1C2147B
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:23:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD97B1BC3D;
-	Thu, 25 Jan 2024 09:22:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YqL2T9fK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C28F1BC3E;
+	Thu, 25 Jan 2024 09:22:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 106B61BDC3;
-	Thu, 25 Jan 2024 09:22:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 405471BF2A;
+	Thu, 25 Jan 2024 09:22:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706174561; cv=none; b=IcfWX9vOgWEsVv/Do5nj18hwn37xuxqPLI365OA4YWqSmksgSPAnNXEBTPEq1nV0RS7WekmZXbTGy34dbkWiglSqO3bCPD0r3JODFPVp73169Mu4Jf6s6XMR3K0MTusepcFEi3B4x89xpLIOcfZxSJXIbaOa/152bKnbmw8mpu8=
+	t=1706174569; cv=none; b=SimHrl9N83ixhwG6PLTmngWGvIECaYzTBKNk+gLwavzrwiS+JDvrnPbhnXXyJFI3EivYR1gkmaExD9qNoKVlpTan3Fj7ozmjq8EkboEVXZy/FXesRwa3k40MZWNE6IkVhXKn0h9fWbMxjwDDHXrW2kY47CgQMkup8Li5tLJ/5aY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706174561; c=relaxed/simple;
-	bh=bxot2MLwbGx+WPC8RaoJz1YWvtizCki2E8FaJi5WOzE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VjSL3xQcsdKUSUuammJy1Uthp3h5PZXfPrhIeJGtqXi/m5CNqpotTrHtKmneoRZy3LFfmHkT9wLxf36YFlxUGt3e4M7bJS12h1rug9eUjjb0CzCgqM0P9zuEpNt/6MX3oJGZTKtp55VsWIlJYYMJwA/02+GM+PSrajffL0NSaws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YqL2T9fK; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a2a17f3217aso628540966b.2;
-        Thu, 25 Jan 2024 01:22:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706174558; x=1706779358; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=68+k4SXoZiAs2Pfmb+T8MrZfPAp6t3J0ktPdjp0hv2Q=;
-        b=YqL2T9fKFZ430JaMoas57izwGE0KFt7P2u7RWMYeL7Ke3ilU9KQTdQrvDG2viRwESX
-         BuQKb+8xAJpQbQLkTqkCV7qginMkMdd4nxHtWmI3LDoReV+iGHIYGrHTwZYABVYfntP8
-         NyitbCXI5eGwAyIEyHrRvsjT+bKgtVM4PE8Lks/0/ckL/0XYkGHmEze3oXLWEtOZ+NA2
-         fvQL68vvh9aCxUiI4iIvboTTrr0zrQ+WsPzp2OdltEnWr51uUbfDsmrkjgzcwOqV55bH
-         yKSMby6kAW4uk9v30NaZyh2Wn0Dw3wU7oK1itVz46d3M6KmQt0S1L99Fg/bJdOpV69vW
-         JjTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706174558; x=1706779358;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=68+k4SXoZiAs2Pfmb+T8MrZfPAp6t3J0ktPdjp0hv2Q=;
-        b=kjXSoF6DsaOdrrA+AdsjfLTeHTRrWX3DkfJVS1+3RUu3xS6I8Jb14ER3nyjG5gvzA+
-         j2BN5IHT4LdhQ87tcKXtmOlgXcJouMS1tGBdB2qJrULIs7G3pAX1aFA3Ih6xREzAWp+G
-         7SZjbJxscS3vp4jESpAMLvr0oLUUxRIQKbAHBwo48IsIpid3SUQDs6/QaBwbUXKRK8Qz
-         3Isa6lcPjqR6Q/4cdbj4Q+bgy7JmtHkByy1K2wtAnyk5iAZE+E5A2rTQn0cnZN8ZAoda
-         wRlMy6deWsiKbuFj+e4/mYXxJ/iAUpmnnUN8W7ICJNGD4ccPyKjc/WkI1TlZHJh3/0m9
-         WfcQ==
-X-Gm-Message-State: AOJu0YzxYplXlGizPGUtMphamKkTxsLkqEikEeZgykup8Y1FHO4DyxuY
-	PUzynIyxX5NiDW9ErcCo5lIKxZUFgKYpUw2VFmynsP7g5IQwJ/u9
-X-Google-Smtp-Source: AGHT+IGb3kYbCaRZ+ZhuSYYXxrrQOg6MShvOglOKLYhAH70eCEZmTYRZfmR7UOLljeac6wIatBkRnA==
-X-Received: by 2002:a17:906:1ccf:b0:a30:fb95:9387 with SMTP id i15-20020a1709061ccf00b00a30fb959387mr407499ejh.75.1706174557914;
-        Thu, 25 Jan 2024 01:22:37 -0800 (PST)
-Received: from skbuf ([188.25.255.36])
-        by smtp.gmail.com with ESMTPSA id gw9-20020a170906f14900b00a311ab95fbdsm815922ejb.63.2024.01.25.01.22.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jan 2024 01:22:37 -0800 (PST)
-Date: Thu, 25 Jan 2024 11:22:34 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	David Bauer <mail@david-bauer.net>, mithat.guner@xeront.com,
-	erkin.bozoglu@xeront.com,
-	Luiz Angelo Daros de Luca <luizluca@gmail.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next] net: dsa: mt7530: support OF-based registration
- of switch MDIO bus
-Message-ID: <20240125092234.czwjwc3izmsl3ekr@skbuf>
-References: <20240122053431.7751-1-arinc.unal@arinc9.com>
+	s=arc-20240116; t=1706174569; c=relaxed/simple;
+	bh=kK/sE7Bf8IkQddBoucJPWhSDzG0QN37aXIj24ILXvcw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=LVhst/252CKCA/qQY4tV7OWKMlMS9buwOKsFWKpR/hLilNz1Vo+TvoZFg74Bh1aTM/Z+jmgBESTMTcb8h0rmFqlQ1nvU5CMnLbUCSGvONzE08UfsXKeFwxMoski/cAdq+mw08nl5kPZyWi3XoMljIuU/Td36fnefXwKsTtfwIVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4TLFhs0nP9z1vshR;
+	Thu, 25 Jan 2024 17:22:21 +0800 (CST)
+Received: from kwepemm600020.china.huawei.com (unknown [7.193.23.147])
+	by mail.maildlp.com (Postfix) with ESMTPS id 8C7B61A0172;
+	Thu, 25 Jan 2024 17:22:43 +0800 (CST)
+Received: from [10.174.179.160] (10.174.179.160) by
+ kwepemm600020.china.huawei.com (7.193.23.147) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 25 Jan 2024 17:22:42 +0800
+Message-ID: <531c536d-a7d1-2be5-10aa-8d6eb4dcb5c9@huawei.com>
+Date: Thu, 25 Jan 2024 17:22:41 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Subject: Re: SECURITY PROBLEM: Any user can crash the kernel with TCP ZEROCOPY
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>
+CC: Matthew Wilcox <willy@infradead.org>, <linux-mm@kvack.org>,
+	<linux-fsdevel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<akpm@linux-foundation.org>, <davem@davemloft.net>, <dsahern@kernel.org>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <arjunroy@google.com>,
+	<wangkefeng.wang@huawei.com>
+References: <20240119092024.193066-1-zhangpeng362@huawei.com>
+ <Zap7t9GOLTM1yqjT@casper.infradead.org>
+ <5106a58e-04da-372a-b836-9d3d0bd2507b@huawei.com>
+ <Za6SD48Zf0CXriLm@casper.infradead.org>
+ <CANn89iL4qUXsVDRNGgBOweZbJ6ErWMsH+EpOj-55Lky8JEEhqQ@mail.gmail.com>
+ <Za6h-tB7plgKje5r@casper.infradead.org>
+ <CANn89iJDNdOpb6L6PkrAcbGcsx6_v4VD0v2XFY77g7tEnJEXXQ@mail.gmail.com>
+ <4f78fea2-ced6-fc5a-c7f2-b33fcd226f06@huawei.com>
+ <CANn89iKbyTRvWEE-3TyVVwTa=N2KsiV73-__2ASktt2hrauQ0g@mail.gmail.com>
+ <d68f50a5-8d83-99ba-1a5a-7f119cd52029@huawei.com>
+ <CANn89iJSxsx_6oTM+ggo90vacNM33e_DpgJJg1HQRfkdj3ewqg@mail.gmail.com>
+From: "zhangpeng (AS)" <zhangpeng362@huawei.com>
+In-Reply-To: <CANn89iJSxsx_6oTM+ggo90vacNM33e_DpgJJg1HQRfkdj3ewqg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240122053431.7751-1-arinc.unal@arinc9.com>
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemm600020.china.huawei.com (7.193.23.147)
 
-On Mon, Jan 22, 2024 at 08:34:31AM +0300, Arınç ÜNAL wrote:
-> Currently the MDIO bus of the switches the MT7530 DSA subdriver controls
-> can only be registered as non-OF-based. Bring support for registering the
-> bus OF-based.
-> 
-> The subdrivers that control switches [with MDIO bus] probed on OF must
-> follow this logic to support all cases properly:
-> 
-> No switch MDIO bus defined: Populate ds->user_mii_bus, register the MDIO
-> bus, set the interrupts for PHYs if "interrupt-controller" is defined at
-> the switch node. This case should only be covered for the switches which
-> their dt-bindings documentation didn't document the MDIO bus from the
-> start. This is to keep supporting the device trees that do not describe the
-> MDIO bus on the device tree but the MDIO bus is being used nonetheless.
-> 
-> Switch MDIO bus defined: Don't populate ds->user_mii_bus, register the MDIO
-> bus, set the interrupts for PHYs if ["interrupt-controller" is defined at
-> the switch node and "interrupts" is defined at the PHY nodes under the
-> switch MDIO bus node].
-> 
-> Switch MDIO bus defined but explicitly disabled: If the device tree says
-> status = "disabled" for the MDIO bus, we shouldn't need an MDIO bus at all.
-> Instead, just exit as early as possible and do not call any MDIO API.
-> 
-> The use of ds->user_mii_bus is inappropriate when the MDIO bus of the
-> switch is described on the device tree [1], which is why we don't populate
-> ds->user_mii_bus in that case.
-> 
-> Link: https://lore.kernel.org/netdev/20231213120656.x46fyad6ls7sqyzv@skbuf/ [1]
-> Suggested-by: David Bauer <mail@david-bauer.net>
-> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-> ---
+On 2024/1/25 16:57, Eric Dumazet wrote:
 
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+> On Thu, Jan 25, 2024 at 3:18 AM zhangpeng (AS) <zhangpeng362@huawei.com> wrote:
+>> On 2024/1/24 18:11, Eric Dumazet wrote:
+>>
+>>> On Wed, Jan 24, 2024 at 10:30 AM zhangpeng (AS) <zhangpeng362@huawei.com> wrote:
+>>>> By using git-bisect, the patch that introduces this issue is 05255b823a617
+>>>> ("tcp: add TCP_ZEROCOPY_RECEIVE support for zerocopy receive."). v4.18-rc1.
+>>>>
+>>>> Currently, there are no other repro or c reproduction programs can reproduce
+>>>> the issue. The syz log used to reproduce the issue is as follows:
+>>>>
+>>>> r3 = socket$inet_tcp(0x2, 0x1, 0x0)
+>>>> mmap(&(0x7f0000ff9000/0x4000)=nil, 0x4000, 0x0, 0x12, r3, 0x0)
+>>>> r4 = socket$inet_tcp(0x2, 0x1, 0x0)
+>>>> bind$inet(r4, &(0x7f0000000000)={0x2, 0x4e24, @multicast1}, 0x10)
+>>>> connect$inet(r4, &(0x7f00000006c0)={0x2, 0x4e24, @empty}, 0x10)
+>>>> r5 = openat$dir(0xffffffffffffff9c, &(0x7f00000000c0)='./file0\x00',
+>>>> 0x181e42, 0x0)
+>>>> fallocate(r5, 0x0, 0x0, 0x85b8818)
+>>>> sendfile(r4, r5, 0x0, 0x3000)
+>>>> getsockopt$inet_tcp_TCP_ZEROCOPY_RECEIVE(r4, 0x6, 0x23,
+>>>> &(0x7f00000001c0)={&(0x7f0000ffb000/0x3000)=nil, 0x3000, 0x0, 0x0,
+>>>> 0x0, 0x0, 0x0, 0x0, 0x0}, &(0x7f0000000440)=0x10)
+>>>> r6 = openat$dir(0xffffffffffffff9c, &(0x7f00000000c0)='./file0\x00',
+>>>> 0x181e42, 0x0)
+>>>>
+>>> Could you try the following fix then ?
+>>>
+>>> (We also could remove the !skb_frag_off(frag) condition, as the
+>>> !PageCompound() is necessary it seems :/)
+>>>
+>>> Thanks a lot !
+>>>
+>>> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+>>> index 1baa484d21902d2492fc2830d960100dc09683bf..ee954ae7778a651a9da4de057e3bafe35a6e10d6
+>>> 100644
+>>> --- a/net/ipv4/tcp.c
+>>> +++ b/net/ipv4/tcp.c
+>>> @@ -1785,7 +1785,9 @@ static skb_frag_t *skb_advance_to_frag(struct
+>>> sk_buff *skb, u32 offset_skb,
+>>>
+>>>    static bool can_map_frag(const skb_frag_t *frag)
+>>>    {
+>>> -       return skb_frag_size(frag) == PAGE_SIZE && !skb_frag_off(frag);
+>>> +       return skb_frag_size(frag) == PAGE_SIZE &&
+>>> +              !skb_frag_off(frag) &&
+>>> +              !PageCompound(skb_frag_page(frag));
+>>>    }
+>>>
+>>>    static int find_next_mappable_frag(const skb_frag_t *frag,
+>> This patch doesn't fix this issue. The page cache that can trigger this issue
+>> doesn't necessarily need to be compound. 🙁
+> Ah, too bad :/
+>
+> So the issue is that the page had a mapping. I am no mm expert,
+> I am not sure if we need to add more tests (like testing various
+> illegal page flags) ?
+>
+> Can you test this ?
+>
+> (I am still  converting the repro into C)
+>
+> Thanks.
+>
+> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> index 1baa484d21902d2492fc2830d960100dc09683bf..2128015227a5066ea74b3911ecaefe7992da132f
+> 100644
+> --- a/net/ipv4/tcp.c
+> +++ b/net/ipv4/tcp.c
+> @@ -1785,7 +1785,17 @@ static skb_frag_t *skb_advance_to_frag(struct
+> sk_buff *skb, u32 offset_skb,
+>
+>   static bool can_map_frag(const skb_frag_t *frag)
+>   {
+> -       return skb_frag_size(frag) == PAGE_SIZE && !skb_frag_off(frag);
+> +       struct page *page;
+> +
+> +       if (skb_frag_size(frag) != PAGE_SIZE || skb_frag_off(frag))
+> +               return false;
+> +
+> +       page = skb_frag_page(frag);
+> +
+> +       if (PageCompound(page) || page->mapping)
+> +               return false;
+> +
+> +       return true;
+>   }
+>
+>   static int find_next_mappable_frag(const skb_frag_t *frag,
+
+This patch can fix this issue.
+
+In this scenario, page->mapping is inode->i_mapping of ext4,
+but VMA is tcp VMA. It's weird.
+
+If all the pages that need to be inserted by TCP zerocopy are
+page->mapping == NULL, this solution could be used.
+
+Thanks!
+
+-- 
+Best Regards,
+Peng
+
 
