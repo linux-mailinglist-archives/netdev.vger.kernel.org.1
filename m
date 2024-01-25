@@ -1,114 +1,83 @@
-Return-Path: <netdev+bounces-65793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD13683BC46
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:49:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A1D983BC56
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:52:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 970BD28A30B
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 08:49:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FE1E1F295CE
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 08:52:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F37881B954;
-	Thu, 25 Jan 2024 08:48:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NleBauai"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A84921B95A;
+	Thu, 25 Jan 2024 08:52:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E26D1B94F
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 08:48:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 857AC1B948;
+	Thu, 25 Jan 2024 08:52:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706172538; cv=none; b=rmnpzN1uK4PAzRYrBH3hntThxvxh/Xq445wBF/QJ6gB1m2p4ZdGi4nv5syCRJ9NA0xZFzUOIicuonnLvBu6RDAeC195LHIb2FRtWBzDjU1BpbgE62sQdNy0ZQQFXHKSMotBDA29qM8+VNL+XMUAQdXyBGObdogqDK8UzvQKb2A4=
+	t=1706172738; cv=none; b=tFCXsypiXjrW2HnPUwjb/DBgBOXgWr+Tk9835AXENwsL478I4aJfqi9CB8bv8NmR+MLI80pLIrkdFbrA7x28mE3TsKJkBXc0yCRQvnWXcygvIv7nEdqGIllz3ap8Q4PFB3BhWVAENHDRs+a3u1oBCss+V19vwvsOKXxZNMXy610=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706172538; c=relaxed/simple;
-	bh=ugVRvbXMqaaI04cZgFh3Eflw+q3XhgQV8p/8i4Mur6M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YAV3hrqAwCG7uYS1l5raDalgYF1+Oil2lY3ja2sFvbKVo7hYrrxcasQFuteiYKumUqa2QbeLhyL5Jebix7KFAPH+lut8As3e6ovpugN97/sZThk7CAX8BTKn6I6M1z074dZ5flWlHdy4lMi7DlSPSQyV1di7q6761Hnxy+yvSD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NleBauai; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-55818b7053eso11596a12.0
-        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 00:48:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706172535; x=1706777335; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=prP92GbmaxKiGBLaZVvyY/3do2YP+LsQqUWaXmO/hL8=;
-        b=NleBauaiYTamzNzcUgclMnqdr/dPtbzwr76WZXTikuIpV46orP0jMA/vHxEUjcuPLW
-         ltm+jGvt9yJePRQzwdgJBJOwzNdXam0mXMxaz3aDCnuopGM0aLBpUx1O6RiIn2sNSdGF
-         DvMexNEuzVU2Y5VfL2XPWVBM/OV38KaUVsorTJ0T0yNkTseJrNz/xB2PEzehPu5S+SNY
-         VMBfHjZMIHsHRZaosl4qfBYLDZmxf5/kyEXwaryMCB1ercjto8jdRqA4Axhvp+PL8N1I
-         0KM/5f8q4L0obj3uspTqVPMm9g4bzeJcxHYaxT3dDXDNobeUupk4Z2geULAgLI2btmIp
-         kbHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706172535; x=1706777335;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=prP92GbmaxKiGBLaZVvyY/3do2YP+LsQqUWaXmO/hL8=;
-        b=XkPqUTl6bsl8xnmXMkRuNDJkW2Ro4w4mWzP+Tu9fw2lZXCFJA7PI9gPD4rVrdl6/yH
-         LpH2hSOPUpfOJEdRk1o8+oCCiorSVc+SzPo3e5DcP3ADn53T91LvBd2JQdFIgr68zgBt
-         oeiSRDImfu1jTWdR4QaemgvM9wrqgxjqOwAKghDPgg1h6qNdiX62xpz3V452koEEeWCz
-         747XaDAHCdtYwNzBwdlk2KXqibaOTY0uSWchwKQCkXO8mZ5/rqYNE64kZGkk5luvnLaB
-         TBney6BOO0JDerzPihxhDcu+HXgxIfSbxm1jG3RGxh2UVPWDE60bdLr3c9pJ6LH/r2cW
-         xDcw==
-X-Gm-Message-State: AOJu0YxZ1LpIwcL9tgcHZYeyjiGq2b8z+D/zcrXl9POgHU2QUXuTxX6Q
-	nTrKrgqp3WufIiCvN2qwhqMgwHNBaKFbeBCQ5iETV/RvavrLOvWt8S9QaBHpruYTe0ADmIURw7S
-	8WGogwVty/x3BtFaJmpKSCYYwCQIAW8VMlQ92
-X-Google-Smtp-Source: AGHT+IEJS5MJHBuMVjXoGYBdRZxSQCog1ImgX5JUClFp0G1spvHjBWOHdlsQl6HXFAWavxeJgx9lK+EdYZQJ78edRuk=
-X-Received: by 2002:a05:6402:1d88:b0:55d:152:7d59 with SMTP id
- dk8-20020a0564021d8800b0055d01527d59mr58730edb.4.1706172535337; Thu, 25 Jan
- 2024 00:48:55 -0800 (PST)
+	s=arc-20240116; t=1706172738; c=relaxed/simple;
+	bh=TRrpOceO1ObHuQDpipuLsskP8G7fTPallXu16th2v2w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iTzAJjq/BkCq8mBy+763jvJOnuVLjbr2Z+Wtg4caSvKMz6E8xwz0ACDIunw8szJUine7RT0hpg2jXvvXtoOSbPb/xKQKPKdTwlEeZsiBJ3WHv/wh/Vc9diwZbWTqDR+tyET7yd5ItcV1D2cCfHCDvV94mNdStwIabJvUifAGz94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1rSvT1-0006uz-Mm; Thu, 25 Jan 2024 09:52:11 +0100
+Date: Thu, 25 Jan 2024 09:52:11 +0100
+From: Florian Westphal <fw@strlen.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	David Ahern <dsahern@kernel.org>, coreteam@netfilter.org,
+	"netdev-driver-reviewers@vger.kernel.org" <netdev-driver-reviewers@vger.kernel.org>,
+	Hangbin Liu <liuhangbin@gmail.com>, netfilter-devel@vger.kernel.org
+Subject: Re: [netfilter-core] [ANN] net-next is OPEN
+Message-ID: <20240125085211.GE31645@breakpoint.cc>
+References: <20240123072010.7be8fb83@kernel.org>
+ <d0e28c67-51ad-4da1-a6df-7ebdbd45cd2b@kernel.org>
+ <65b133e83f53e_225ba129414@willemb.c.googlers.com.notmuch>
+ <20240124082255.7c8f7c55@kernel.org>
+ <20240124090123.32672a5b@kernel.org>
+ <ZbFiF2HzyWHAyH00@calendula>
+ <20240124114057.1ca95198@kernel.org>
+ <ZbFsyEfMRt8S+ef1@calendula>
+ <20240124121343.6ce76eff@kernel.org>
+ <20240124210724.2b0e08ff@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <7c3643763b331e9a400e1874fe089193c99a1c3f.1706170897.git.pabeni@redhat.com>
-In-Reply-To: <7c3643763b331e9a400e1874fe089193c99a1c3f.1706170897.git.pabeni@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 25 Jan 2024 09:48:41 +0100
-Message-ID: <CANn89iKqShowy=xMi2KwthYB6gz9X5n9kcqwh_5-JBJ3-jnK+g@mail.gmail.com>
-Subject: Re: [PATCH net] selftests: net: add missing required classifier
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>, Maciej enczykowski <maze@google.com>, 
-	Lina Wang <lina.wang@mediatek.com>, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240124210724.2b0e08ff@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Thu, Jan 25, 2024 at 9:23=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> the udpgro_fraglist self-test uses the BPF classifiers, but the
-> current net self-test configuration does not include it, causing
-> CI failures:
->
->  # selftests: net: udpgro_frglist.sh
->  # ipv6
->  # tcp - over veth touching data
->  # -l 4 -6 -D 2001:db8::1 -t rx -4 -t
->  # Error: TC classifier not found.
->  # We have an error talking to the kernel
->  # Error: TC classifier not found.
->  # We have an error talking to the kernel
->
-> Add the missing knob.
->
-> Fixes: edae34a3ed92 ("selftests net: add UDP GRO fraglist + bpf self-test=
-s")
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Jakub Kicinski <kuba@kernel.org> wrote:
+> On Wed, 24 Jan 2024 12:13:43 -0800 Jakub Kicinski wrote:
+> > > if that is the nftables backend, it might be also that .config is
+> > > missing CONFIG_NF_TABLES and CONFIG_NFT_COMPAT there, among other
+> > > options.  
+> > 
+> > FWIW full config:
+> > 
+> > https://netdev-2.bots.linux.dev/vmksft-net-mp/results/435321/config
+> > 
+> > CONFIG_NFT_COMPAT was indeed missing! Let's see how it fares with it enabled.
+> 
+> NFT_COMPAT fixed a lot! One remaining warning comes from using 
+> -m length. Which NFT config do we need for that one?
 
-FYI, while looking at the gro test, I found that using strace was
-making it failing as well.
-
-Not sure about this one...
-
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+CONFIG_NETFILTER_XT_MATCH_LENGTH=m|y
 
