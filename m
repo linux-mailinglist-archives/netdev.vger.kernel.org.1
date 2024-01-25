@@ -1,164 +1,91 @@
-Return-Path: <netdev+bounces-65940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65942-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A6D283C932
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 18:04:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 155E683C95A
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 18:08:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 628BCB25B45
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 17:04:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B8441C25554
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 17:08:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDC92130E3E;
-	Thu, 25 Jan 2024 16:54:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A55813172B;
+	Thu, 25 Jan 2024 16:59:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bItXT9mS"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Mt/ittrQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0766814076E
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 16:54:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4801133426;
+	Thu, 25 Jan 2024 16:59:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706201673; cv=none; b=PDlJBuwVEAbWgf+bg6pYClwEJ2OYYvRYiUnpxQ3381l1iNrzaH2CZleR/MS7jBray/RrRI7aimZkpF9wThSmxzCQ2Lb5m+o9+npz2ayV7AxE7LEjDDA9zmsCbv/FheK/MnFmCmDyR8/1YOykB35nOPTDv8OC3XhLS9t9uQI9fsY=
+	t=1706201954; cv=none; b=UTKyzmYTV9xTPfbJLj2yteeZr51flkCx3ddxRt5pCfW5aruATUxB/hxQy3L/wvYxyD/Zcq6MvWqWnm0mIjtD3Mnh2SgQI90weQWUk2wFnYpDTJzCVIqDc+rhlwza2o11Tt/CGJKXsAKq0NDtPO7CIBxQ3qlsGNqU6+Nm8oCqoEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706201673; c=relaxed/simple;
-	bh=AmFC/UDCVQ9FVpKZ5PV0jQ6FNjF2TiWEq07uxUcYKu0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YK/eG+nhh/L08r/oYjQQfMbEvreFo/IKGf2S/+Z9ijRKe3QpUztPQncn/SzEOKpgecWqhp/NGsSmqFzwDI0aWVfMb7zVjABP8XIINBr11/D3nSkL8Y3bwGC2AIl2CKN7dsnnwWt59FmKSGF4LyYNMdrcg6avshm/kfIJ3I/Omts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bItXT9mS; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-55818b7053eso19563a12.0
-        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 08:54:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706201670; x=1706806470; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oOiXeojwLOXICuMt5BTSyUSoCml0QlNFyHPEHrk0k4U=;
-        b=bItXT9mSmSq3F4T5/UAvTptHVDAQMBlyokbQF7uhem9Z9H5h3WUt23odkyCTmf2nNs
-         UJGPG4OcrPnTVcg9XrpdZaJvd5U0vyWQeFM41jfdeliO2NZ0nICxG/LV294Cb0gtypwg
-         yNEFviIlJqc7cwfd0eN9Q5krDahatNIqVYzBY0sTpxD5Ep3dNXErcyHwr0e3NpAvpHD9
-         0uIseOEmoJAJ6yjWPpzdimzIFL+L+UPEmlKBkLohW4HMuPC+yMd3rMS5n19Iz6Qo6Ej2
-         h9+IfkH0TSnaoWGisY4Hz5QILC5YojuvFTexrcEcGMhVrU11tw4FwxDmdoTHeNc4nkfM
-         k/aw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706201670; x=1706806470;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oOiXeojwLOXICuMt5BTSyUSoCml0QlNFyHPEHrk0k4U=;
-        b=N4nw+m1NLed7HP4LUinEP6NMqBLlCjsNWaQ+ysm6myT4nWaY+zdmTqHuqwCIKZBNsT
-         vj+DvPHBGDZO40VZ6Us5PW3ucER8YCZj1BZ+BCjmmojq+f5ZklYjBIOVnZphMIl8mylX
-         prrmSJsCB5vG/Kkq39QsMezO4eWljpTodWgJRm02mek1wDpDWkAJ+csAQrRdxK50Tkd3
-         v2Pp8MxG/CaC+25w1fXoy5QQWH+TH0JLR6QCYc/WTbxmHlbO6Jg25jZBKNv2L21Pxa47
-         EghGPfeoBFl1W6qn1sBpWW+vKbcmKp8ZUYDMBOwI5fy5CoI3945w/G5UIKt2IBMjDm8L
-         VkXA==
-X-Gm-Message-State: AOJu0Yx6/xj+HHwQyEDAV5wL667goEFZaUSEbofvuZc2ixK7kRWzQlaQ
-	FzHXs/3Yz9P1UGjXEN0yhwzVv7F+Ryf6Ct4/gfIWJNQy7FpxWwP/SYyzxdjJLEPK24QCfrXzkKE
-	/Ycf5vzFufaNCUJqZgLBtmsYV5h2+hJLEanrk
-X-Google-Smtp-Source: AGHT+IE2z6ya/M/OiUUYRxn7uUuauoi1OOC2cn8v/ECFbMfBGDjI6n2fTEYDKPs48TdYcboyo2CW2Wt5Fy7VrwBeh4Q=
-X-Received: by 2002:a05:6402:c08:b0:55c:e69d:5d4e with SMTP id
- co8-20020a0564020c0800b0055ce69d5d4emr234145edb.0.1706201669987; Thu, 25 Jan
- 2024 08:54:29 -0800 (PST)
+	s=arc-20240116; t=1706201954; c=relaxed/simple;
+	bh=Fw8zkpgWbRgecvNR6KYdozr/aJucW2Q7H+2sM+Tocj8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dEdutGDmNOO72oKJC/Wa2J5tIoLuvN3kacIq7e8LPILfQsIzXz8SFC2exTeLTWRWGcAUvHij/6A5avYBGRwTtKghpUPjtOUeI29O12LxJwaNuT+3766xlAY+UFMCJpROkfDRBVDzvKnpqPC58WZxzxIlSJDoTrt4yQAaWMMdqOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Mt/ittrQ; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=EYYNnNB/ACJkHAzXIbkBzWfCnx4/ZTGkKYLvDGMO7II=; b=Mt/ittrQ413wEjpO6XByH96pAa
+	TlaJO1gLvV+h4vzxSPu3b4C4Y3DsBVCL6U5A6nR9mZqYlgQEaHDoq8gv1j7nR2JbyBL6OAv1cq9WD
+	/5wHkYUOWQHjQ9SBNULx3Dkf8WQ7eO+KlFLG5lJ/lY9LX3fY532sLLNm81vKCx/vPuXE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rT34E-0066Uo-Em; Thu, 25 Jan 2024 17:59:06 +0100
+Date: Thu, 25 Jan 2024 17:59:06 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Michal =?utf-8?B?Vm9rw6HEjQ==?= <michal.vokac@ysoft.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Christian Lamparter <chunkeey@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, petr.benes@ysoft.com
+Subject: Re: [PATCH net v2] net: dsa: qca8k: fix illegal usage of GPIO
+Message-ID: <2477cf4a-6824-4997-aef8-3f8e5f9b2399@lunn.ch>
+References: <1706096225-23468-1-git-send-email-michal.vokac@ysoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240125103317.2334989-1-edumazet@google.com> <ZbKHVt_wkIfjKJXB@casper.infradead.org>
- <ZbKH04PDW7NhImjV@casper.infradead.org>
-In-Reply-To: <ZbKH04PDW7NhImjV@casper.infradead.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 25 Jan 2024 17:54:18 +0100
-Message-ID: <CANn89iJAjEm47Cqt2=5fEnFFVNH-KQbemmqkEfJFUtJZ+c4QRQ@mail.gmail.com>
-Subject: Re: [PATCH net] tcp: add sanity checks to rx zerocopy
-To: Matthew Wilcox <willy@infradead.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, ZhangPeng <zhangpeng362@huawei.com>, 
-	Arjun Roy <arjunroy@google.com>, linux-mm@kvack.org, 
-	Andrew Morton <akpm@linux-foundation.org>, linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1706096225-23468-1-git-send-email-michal.vokac@ysoft.com>
 
-On Thu, Jan 25, 2024 at 5:09=E2=80=AFPM Matthew Wilcox <willy@infradead.org=
-> wrote:
->
->
-> Fixing email address for linux-mm.
->
-> On Thu, Jan 25, 2024 at 04:07:50PM +0000, Matthew Wilcox wrote:
-> > On Thu, Jan 25, 2024 at 10:33:17AM +0000, Eric Dumazet wrote:
-> > > +++ b/net/ipv4/tcp.c
-> > > @@ -1786,7 +1786,17 @@ static skb_frag_t *skb_advance_to_frag(struct =
-sk_buff *skb, u32 offset_skb,
-> > >
-> > >  static bool can_map_frag(const skb_frag_t *frag)
-> > >  {
-> > > -   return skb_frag_size(frag) =3D=3D PAGE_SIZE && !skb_frag_off(frag=
-);
-> > > +   struct page *page;
-> > > +
-> > > +   if (skb_frag_size(frag) !=3D PAGE_SIZE || skb_frag_off(frag))
-> > > +           return false;
-> > > +
-> > > +   page =3D skb_frag_page(frag);
-> > > +
-> > > +   if (PageCompound(page) || page->mapping)
-> > > +           return false;
-> >
-> > I'm not entirely sure why you're testing PageCompound here.  If a drive=
-r
-> > allocates a compound page, we'd still want to be able to insert it,
-> > right?
+> diff --git a/drivers/net/dsa/qca/qca8k-8xxx.c b/drivers/net/dsa/qca/qca8k-8xxx.c
+> index ec57d9d52072..3663de8f2617 100644
+> --- a/drivers/net/dsa/qca/qca8k-8xxx.c
+> +++ b/drivers/net/dsa/qca/qca8k-8xxx.c
+> @@ -2037,13 +2037,11 @@ qca8k_sw_probe(struct mdio_device *mdiodev)
+>  	priv->dev = &mdiodev->dev;
+>  	priv->info = of_device_get_match_data(priv->dev);
+>  
+> -	priv->reset_gpio = devm_gpiod_get_optional(priv->dev, "reset",
+> -						   GPIOD_ASIS);
+> +	priv->reset_gpio = devm_gpiod_get_optional(priv->dev, "reset", GPIOD_OUT_HIGH);
 
-I tried to get something that would be free of merge conflicts, up to linux=
--4.18
-I was not sure if I had to use compound_head(page) in order to test
-for the mapping ?
+Sorry, i should of pointed this out on the previous version. netdev
+kept with 80 character lines. That is why what you deleted was split
+over two lines, and what you add should also split at the same point.
 
-page =3D compound_head(page);
-if (page->mapping)
-     return false;
+    Andrew
 
-I guess that we would have to adjust the page pointer based on
-skb_frag_off(frag),
-right now we bail if skb_frag_off(frag) is not zero.
-
-I would leave this change for future kernels if there is interest.
-
-> >
-> > I have a feeling that we want to fix this in the VM layer.  There are
-> > some weird places calling vm_insert_page() and we should probably make
-> > them all fail.
-> >
-> > Something like this, perhaps?
-
-
-Perhaps, but backports to stable versions (without folio) would be a
-bit of a work ?
-
-> >
-> > diff --git a/mm/memory.c b/mm/memory.c
-> > index 1a60faad2e49..ae0abab56d38 100644
-> > --- a/mm/memory.c
-> > +++ b/mm/memory.c
-> > @@ -1871,6 +1871,10 @@ static int insert_page_into_pte_locked(struct vm=
-_area_struct *vma, pte_t *pte,
-> >
-> >       if (!pte_none(ptep_get(pte)))
-> >               return -EBUSY;
-> > +     if (folio->mapping &&
-> > +         ((addr - vma->vm_start) / PAGE_SIZE + vma->vm_pgoff) !=3D
-> > +         (folio->index + folio_page_idx(folio, page)))
-> > +             return -EINVAL;
-> >       /* Ok, finally just insert the thing.. */
-> >       folio_get(folio);
-> >       inc_mm_counter(vma->vm_mm, mm_counter_file(folio));
-> >
+---
+pw-bot: cr
 
