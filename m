@@ -1,104 +1,168 @@
-Return-Path: <netdev+bounces-65907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A44FC83C4A4
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 15:26:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B05F83C4AD
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 15:27:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B9251F260C8
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 14:26:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 607CB1C21B07
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 14:27:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E9D960269;
-	Thu, 25 Jan 2024 14:26:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8300363414;
+	Thu, 25 Jan 2024 14:27:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UpKpW/tj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fRswz3St"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F29C1634E2
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 14:26:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EABC7633F8;
+	Thu, 25 Jan 2024 14:27:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706192787; cv=none; b=n0Y97919GTl5DwcJ8LGZlv76DZBCID95npO0uavEa9scbAS7qy7t6U8G4McVLLOokLTC+kwBaxztx1eXue+z6LQlQMMEmXdeUmoSGf+KmT2kPO5XkriKo3m1QBm0KmG1uo1h6Uq9jpGHsOo3CcaWLY+uXYRcPWfmGAniwNzMAeI=
+	t=1706192873; cv=none; b=mDQZgHe0N2d/I7m/DL/tinyJNcy+tHgZGrt1FAzd+kGcF5WIMY4JS3L9tqo+ds1h7EUOKl33AnD2m3Sq5zhzaGIztu+mM7DxcWCbmaSRsqc6T1/CUqkMwV5deY56oYQ7k+uBpSI1hx1y1waF0Xoi24xrM1F1CHvZUETHeIH17Z4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706192787; c=relaxed/simple;
-	bh=fJsZLPIoXcIT/PKaNR3olhXn7PWwkI3//knXh7FJD7A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Di81DgYXRbgFRMeZmTzdaQpkosHWnyFo04CzTn+st6QGMBuOLXHBpWG4TYUYjWwd8SGxTKarJshNlHzXsliDd9eeqz/y9/TyBJoxJaPBAg7Idib5oxEfOqpBoIpQDFl6yHlTpvwIGqtzcsMt8H/ERrDGXqVgWlGd+eoKDLn2YL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UpKpW/tj; arc=none smtp.client-ip=209.85.218.51
+	s=arc-20240116; t=1706192873; c=relaxed/simple;
+	bh=pn1ttRiCB3T62fLF7Yk/4dbLJNgue3vHQcDpuryZksk=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=PYz1EVYdah3Rfdb3fumJBOgPbNi9uwVorbaiHUL/W6iUAvH5nMpN/cSdrYYE86LSXtB4kKykwwLdGkiiztmcERwpMRe7eLaQEH11byKhXK3MqMgmZ6hP3XMTX+g/KRtbAcGCzK7cAJcmejUqmIfKgj+QYT5P8myMzbPrh7lZhO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fRswz3St; arc=none smtp.client-ip=209.85.219.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a26fa294e56so692351866b.0
-        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 06:26:25 -0800 (PST)
+Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-dc239f84ba4so5885716276.3;
+        Thu, 25 Jan 2024 06:27:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706192784; x=1706797584; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fJsZLPIoXcIT/PKaNR3olhXn7PWwkI3//knXh7FJD7A=;
-        b=UpKpW/tjKveMu4Ju/TjKxch2h0chwPhbYUkNSJ1FwXxRWzMz4z4Eac3KpBqE0Q7ALp
-         qW9QVKJqZz0r/rD2IKAKtb5mG9x1P11FeezdNixVES7+M7u4bP1c/ogqkuwU4DZuMwq2
-         xEdX6A8AVe3XAbs0w6R4oZqek9nvoCwOr1aksfXM6cc6GrR3M1JNJpw0nKZj5hwkUUpL
-         eIb9jKE2pRbNFSzLy/McQPfcdwhFJcQV4wPiff/QJuRpN/JenTo7QZsDrOZNM1Tw+onm
-         DkYKZgTLiTin6l5Hocn0P30iO3kSWhyT+53/h7E1j+pvv/TAvQfk9dpGujky2ECjB8qx
-         82Hw==
+        d=gmail.com; s=20230601; t=1706192871; x=1706797671; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ezXZlwq89SJQWpRmFh+WSDEPjc1gF/PThwDrtXv1zJQ=;
+        b=fRswz3St7NR8hdWWVrJDinB3H4BZmGvm2LoZIFGSL3t324yx9pmoP8IWBOja8ySalx
+         5tH1NI94KOc+oP+GNDAJCLakVI+zNtwo7EMTf/dslETPm9CV/QaAyX5uLNj/6JLie1+a
+         1+Hlfr1v+9xxYMG8wXrv6PpT/7cwBF80Huf2NUyiI5JQ7kXsyK9gUsXOegN/Zp5jGc+e
+         5rbqo2vaCIimq0l856Xmv6Ncw+FTDuHxJq92+Gj2QjJxbFJDQlrH8cqQsuHidX8NqVyE
+         JWDEpSb2spGbB0AVd61dV4oNP7sCgMlKu6dC0WyhmCsUUM8zy0m6Iagsg0nfdBIsRxuG
+         3DMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706192784; x=1706797584;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fJsZLPIoXcIT/PKaNR3olhXn7PWwkI3//knXh7FJD7A=;
-        b=HSyP1z4of6mtnbe7paIvBdExcC3SID5DGb5wBN+VIqnxMpZcW8L7Y+ddqKSfiN0Hf5
-         03ZGOIjQ4pJouBnz7vUp0xbQxaa1IWheYMxBB+H9b8btHd2S55s/O1JzVSneXUaSA4FO
-         J3FkbB24zOgSgV8HCYHAyB5GVqYpwYMtqCImxJV2X6aGuAM0ieKXDXmoVwNgLOnPKTyX
-         nUQSgTOljI/FKH+2/MDQPKJ8IkrHkJcVgdbcUPBk4R8H5cBpwu67QVl1b7+xHjmWxFEJ
-         G7TldjexraAbial2x68r66YdDwgTW1zgSQEJSxUmySdRP0sSZtRuaAgfTuNigS2vEjf6
-         RUiw==
-X-Gm-Message-State: AOJu0YxUIlo9Eg9WA47XMKDihrajib/+waphokaNoDJgVF0xu3fiqb0E
-	QShh4z0gTcSeGtvRd2NaTHj+B/u8ifwqS/OGuTHVHS5X5HmDCYXA
-X-Google-Smtp-Source: AGHT+IGeZElJ0WPKik4Ye20RIkL04NkImcO5OOM0PDDEZ4c0KmIdOjl99/Zd1/Ajk3sSf7MDpaYj8g==
-X-Received: by 2002:a17:906:34ce:b0:a30:b7a5:c34e with SMTP id h14-20020a17090634ce00b00a30b7a5c34emr570190ejb.17.1706192783695;
-        Thu, 25 Jan 2024 06:26:23 -0800 (PST)
-Received: from ?IPV6:2001:b07:646f:4a4d:e17a:bd08:d035:d8c2? ([2001:b07:646f:4a4d:e17a:bd08:d035:d8c2])
-        by smtp.gmail.com with ESMTPSA id b24-20020a170906195800b00a2d5e914392sm1074152eje.110.2024.01.25.06.26.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Jan 2024 06:26:23 -0800 (PST)
-Message-ID: <5ac49f2f-f67c-4877-9536-3f6516a79b7d@gmail.com>
-Date: Thu, 25 Jan 2024 15:27:12 +0100
+        d=1e100.net; s=20230601; t=1706192871; x=1706797671;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ezXZlwq89SJQWpRmFh+WSDEPjc1gF/PThwDrtXv1zJQ=;
+        b=CxfN2E01MjmJ/QU7ksREwEGzXYtYF20MOUGlv+44Y6tQW/YkAtcqULpW0qspGteBNd
+         htB9rfIAKVEhd0ffVXA6IbDMzncg9VeOxc986stZLOYfF0sFvjkZRniKXZrTHEUMV1iE
+         5RQbw/tjGdHNNoGAWHD6c/t8URagke4NnIHw0I8zr3F9Wr3nPfyidWYb0AcnkrMmsz88
+         rvcgn+OUJeYhqFw2CW/zxlUTmOOCDcNjbJBs264b2bDsRJSkRQBfSvg8X0ZM0csSN+f7
+         4q198d0fkr9/garsLIFGv4YpbikXQzcUhVQcTxmWL7urlsRaZWV9r0gJ+dMoYaHraE7g
+         cLhA==
+X-Gm-Message-State: AOJu0YzZBsOjwovyHHjO8A+B29uM7Wy4/z1+LnYV8/KEADkQVYeNJ/Ps
+	9kH75016YQZZiMUGg872qUGGSdaHycqCJKVT7ZCwdw6P51PnMFiA
+X-Google-Smtp-Source: AGHT+IEEdvGNE9BU91woD3drQtobl5gLLHKAajS9wGwKgmPqG7H6diUKug955SL5Tz11roVbE/laSA==
+X-Received: by 2002:a05:6902:567:b0:dbd:b5a0:8494 with SMTP id a7-20020a056902056700b00dbdb5a08494mr1016673ybt.86.1706192870661;
+        Thu, 25 Jan 2024 06:27:50 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCVMeYgb1GZEgqu7dAzNrxR/AHBJL6BW0hZ1MGLwfEQ3nWNy+SSWJikGsuPtPtYiPS0zODQ/kRXy/RhnbPC/i5Pdju0FUEG+audAA4OrU6btOXpXBw+qlHvmuB8GFt2vqRMZbxklQpnDo2FwwhZMnA2r04rhUkyfeRmM9F+b8ijTFxGwBjuJ9R8qs0bIWIPWz7Qtnt2hBn/MGib0ZrQMy5kU0n5pPtHThd5SbYHNwzLK2+JrLxj03uGL4HATY3LMyGJNDioHieTyjuRwgOkNZql3MupQT3imkzjj34j5oI8BWWc7yXdNJSc5hg==
+Received: from localhost (131.65.194.35.bc.googleusercontent.com. [35.194.65.131])
+        by smtp.gmail.com with ESMTPSA id ld29-20020a056214419d00b006869647d106sm3565091qvb.5.2024.01.25.06.27.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Jan 2024 06:27:50 -0800 (PST)
+Date: Thu, 25 Jan 2024 09:27:50 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Lucas Karpinski <lkarpins@redhat.com>, 
+ linux-kselftest@vger.kernel.org
+Message-ID: <65b26fe61346d_2b890a294b4@willemb.c.googlers.com.notmuch>
+In-Reply-To: <49d15fe58d9cd415ca96739b08c59c7cde5c3422.camel@redhat.com>
+References: <cover.1706131762.git.pabeni@redhat.com>
+ <28e7af7c031557f691dc8045ee41dd549dd5e74c.1706131762.git.pabeni@redhat.com>
+ <65b1b4e92df6_250560294f4@willemb.c.googlers.com.notmuch>
+ <49d15fe58d9cd415ca96739b08c59c7cde5c3422.camel@redhat.com>
+Subject: Re: [PATCH net 1/3] selftests: net: remove dependency on ebpf tests
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next] taprio: validate TCA_TAPRIO_ATTR_FLAGS
- through policy instead of open-coding
-To: Simon Horman <horms@kernel.org>
-Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org
-References: <20240124092118.8078-1-alessandromarcolini99@gmail.com>
- <20240125120900.GM217708@kernel.org>
-Content-Language: en-US
-From: Alessandro Marcolini <alessandromarcolini99@gmail.com>
-In-Reply-To: <20240125120900.GM217708@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-On 1/25/24 13:09, Simon Horman wrote:
+Paolo Abeni wrote:
+> On Wed, 2024-01-24 at 20:10 -0500, Willem de Bruijn wrote:
+> > Paolo Abeni wrote:
+> > > Several net tests requires an XDP program build under the ebpf
+> > > directory, and error out if such program is not available.
+> > > 
+> > > That makes running successful net test hard, let's duplicate into the
+> > > net dir the [very small] program, re-using the existing rules to build
+> > > it, and finally dropping the bogus dependency.
+> > > 
+> > > Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> > > ---
+> > >  tools/testing/selftests/net/Makefile          |  5 +++--
+> > >  tools/testing/selftests/net/udpgro.sh         |  4 ++--
+> > >  tools/testing/selftests/net/udpgro_bench.sh   |  4 ++--
+> > >  tools/testing/selftests/net/udpgro_frglist.sh |  6 +++---
+> > >  tools/testing/selftests/net/udpgro_fwd.sh     |  2 +-
+> > >  tools/testing/selftests/net/veth.sh           |  4 ++--
+> > >  tools/testing/selftests/net/xdp_dummy.c       | 13 +++++++++++++
+> > >  7 files changed, 26 insertions(+), 12 deletions(-)
+> > >  create mode 100644 tools/testing/selftests/net/xdp_dummy.c
+> > > 
+> > > diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+> > > index 50818075e566..304d8b852ef0 100644
+> > > --- a/tools/testing/selftests/net/Makefile
+> > > +++ b/tools/testing/selftests/net/Makefile
+> > > @@ -84,6 +84,7 @@ TEST_PROGS += sctp_vrf.sh
+> > >  TEST_GEN_FILES += sctp_hello
+> > >  TEST_GEN_FILES += csum
+> > >  TEST_GEN_FILES += nat6to4.o
+> > > +TEST_GEN_FILES += xdp_dummy.o
+> > >  TEST_GEN_FILES += ip_local_port_range
+> > >  TEST_GEN_FILES += bind_wildcard
+> > >  TEST_PROGS += test_vxlan_mdb.sh
+> > > @@ -104,7 +105,7 @@ $(OUTPUT)/tcp_inq: LDLIBS += -lpthread
+> > >  $(OUTPUT)/bind_bhash: LDLIBS += -lpthread
+> > >  $(OUTPUT)/io_uring_zerocopy_tx: CFLAGS += -I../../../include/
+> > >  
+> > > -# Rules to generate bpf obj nat6to4.o
+> > > +# Rules to generate bpf objs
+> > >  CLANG ?= clang
+> > >  SCRATCH_DIR := $(OUTPUT)/tools
+> > >  BUILD_DIR := $(SCRATCH_DIR)/build
+> > > @@ -139,7 +140,7 @@ endif
+> > >  
+> > >  CLANG_SYS_INCLUDES = $(call get_sys_includes,$(CLANG),$(CLANG_TARGET_ARCH))
+> > >  
+> > > -$(OUTPUT)/nat6to4.o: nat6to4.c $(BPFOBJ) | $(MAKE_DIRS)
+> > > +$(OUTPUT)/nat6to4.o $(OUTPUT)/xdp_dummy.o: $(OUTPUT)/%.o : %.c $(BPFOBJ) | $(MAKE_DIRS)
+> > >  	$(CLANG) -O2 --target=bpf -c $< $(CCINCLUDE) $(CLANG_SYS_INCLUDES) -o $@
+> > 
+> > is the "$(OUTPUT)/%.o :" intentional or a leftover from editing?
+> 
+> Is intentional and AFAICS required to let this rule being selected when
+> the output directory is not an empty string (the target and the pre-req
+> will be in different directories).
 
-> Hi Alessandro,
->
-> Perhaps there was an uncommitted local change, but
-> I think an attribute is required as the second argument to
-> NL_SET_ERR_MSG_ATTR(). Without that I see this code fails to compile.
+Thanks. I don't understand why. Sorry to harp on this small point, but
+you've verified that the build fails without? Is it perhaps due to that
+"$(MAKE_DIRS)" order-only-prerequisite? But nat6to4 on its own did not
+need this.
 
-Hi Simon,
+Substition references could add a second colon in a rule, but
+otherwise I cannot find a reference to this repeated colon syntax.
 
-Yes, you're definitely right and I'm an idiot for not double checking the patch I was submitting. I'll send the correct version, thanks!
+Don't waste time on my behalf if you're sure this is correct. I just
+can't add a reviewed tag if I don't understand it -- but that tag is
+hardly essential.
 
 
