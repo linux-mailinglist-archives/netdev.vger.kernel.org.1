@@ -1,80 +1,63 @@
-Return-Path: <netdev+bounces-65876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65877-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84E5183C29E
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 13:35:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BECB383C2AE
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 13:40:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B85381C216F0
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 12:35:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75B3F293600
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 12:40:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF74148CD7;
-	Thu, 25 Jan 2024 12:34:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 443D04F21D;
+	Thu, 25 Jan 2024 12:40:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b="TJlznXiO"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="EY5cKp1/"
 X-Original-To: netdev@vger.kernel.org
-Received: from www530.your-server.de (www530.your-server.de [188.40.30.78])
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FA5F481BA;
-	Thu, 25 Jan 2024 12:34:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.30.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A74145BF4;
+	Thu, 25 Jan 2024 12:40:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706186082; cv=none; b=rXunSPnh6u+bpMpCdNNMcotQVOZams5BxYLJBn4PxDxs2n+1VU5b/qBgv2ABUVtcuBgNKOOvErfYQrCDpevP5q1D6kLBYHNAY1515myKdCZlQwvpgD1N24KIlQM6PLEyVdX7j5zaY27zXoQlCZWB/zVXTWf3QQTqeTNv2zi8cr8=
+	t=1706186441; cv=none; b=PiDCjurGl88dJyv904MusFzZiM95gECmfjWrXoSZkxYNU1WX9Pw9rcDxF9dBaWohpvhyhWf5EJP7aHNfD/DYYK/S37MgL+61lrrg5mz9VMWyYpHszJak7n9BWOyJzIRm4nFGjYIXLp6Wjmui+2fo6N03nKLxu+fgJjWwfvqVCdA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706186082; c=relaxed/simple;
-	bh=9hpKHMzKfhCYbcecGtWjsCp6NQXfEDCbwraey3X3VO0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=I6OCSWnoLAMXQRRktkv4ZG2hyCNvZfwhi7IXbJ+gSlmNRX1CD/AXPMXuqgaPNu2MuJaiK8cZzVHPkUThlS6G2YkK+lo1Smg+jpr3WW05GrRFVoNgHazp0HioAY28GMtbky2u1MQDCWGfLcqpSIf8lQ5obioYnsQ2bXadtPG9oGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com; spf=pass smtp.mailfrom=geanix.com; dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b=TJlznXiO; arc=none smtp.client-ip=188.40.30.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=geanix.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=geanix.com;
-	s=default2211; h=Content-Transfer-Encoding:MIME-Version:References:
-	In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=RGm3cvG/FSHbu0unNfOng+T3r1yzerASsV1ePVGWH6w=; b=TJlznXiO0cIAK+jP6jbhWJsSJH
-	krsnIMdXoKbYVw14uv1Den1gJgJLs14y6VMBaxKujr0M0eaKtSRsrIcuf+0MsWDPxjlq8QUM3JcyE
-	18eNxt3LT/nftstmpvXEi7xKXHS3x/hkBZvRl3Q1hUfivyojoSwbKt5uw2Ra4+siT+xCmLrs06QYm
-	nO3RTqfaH/VU5MkBZyCevNv4dXJwKpuQzXUyuqwujYVMYQj4QbY5Mj+kIaxZipDnny+ishJKGxdFO
-	RHYryUL20/e/0gcHBDOQvq8IbnKTvMxf247BAnlBtrlNoF105KN8VajjacSzeIN2YIZxLJuGuB3d4
-	yg4Krd6g==;
-Received: from sslproxy02.your-server.de ([78.47.166.47])
-	by www530.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <esben@geanix.com>)
-	id 1rSywI-0007QC-2M; Thu, 25 Jan 2024 13:34:38 +0100
-Received: from [185.17.218.86] (helo=localhost)
-	by sslproxy02.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <esben@geanix.com>)
-	id 1rSywH-0002CN-04; Thu, 25 Jan 2024 13:34:37 +0100
-From: Esben Haabendal <esben@geanix.com>
-To: netdev@vger.kernel.org,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	NXP Linux Team <linux-imx@nxp.com>
-Cc: linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
+	s=arc-20240116; t=1706186441; c=relaxed/simple;
+	bh=EdkMDFFWUiyjvHdtXKbhibX6ICrroCB3+YkEYJGcC3A=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TpSOsyiFS9AGiLrMFd2RNvAZ/awmrVgnQafpkWD6todr9AYRq23+FZ/7WQktcwHlrzbUhsWD1qKWPM/LokuplYqP+jO+V6zxz9TqauLGTM6cHcx6m6uYJFi6eWGtosN7IcTkaX3RMHu/yfsTzzsknLfeYWDnvdrtXlku8AhEMA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=EY5cKp1/; arc=none smtp.client-ip=115.124.30.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1706186434; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=Fst97h1pLSmFiX0qcjI14XwdvbW5bSFhMUKZrfvSZcQ=;
+	b=EY5cKp1/o5QGE/e2eePOnD5fPpDRFwjX2NrlTz+MmwzYn6Pkt6sfCCeKd6qkLw2unFfdYGhrrwls08aC3Y/60AkICpwbiM8C7+xFZit71TYHv7CIsRwtapnJV4q2/uQ9ChPv259JpUt2dcAY52mlTdDlphkHrE0BH3343XgJfE8=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0W.KUl5s_1706186356;
+Received: from localhost(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W.KUl5s_1706186356)
+          by smtp.aliyun-inc.com;
+          Thu, 25 Jan 2024 20:40:34 +0800
+From: Wen Gu <guwen@linux.alibaba.com>
+To: wintera@linux.ibm.com,
+	mjrosato@linux.ibm.com,
+	wenjia@linux.ibm.com,
+	jaka@linux.ibm.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: alibuda@linux.alibaba.com,
+	tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] net: stmmac: dwmac-imx: set TSO/TBS TX queues default settings
-Date: Thu, 25 Jan 2024 13:34:34 +0100
-Message-ID: <5606bb5f0b7566a20bb136b268dae89d22a48898.1706184304.git.esben@geanix.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1706184304.git.esben@geanix.com>
-References: <cover.1706184304.git.esben@geanix.com>
+Subject: [PATCH net] net/smc: fix incorrect SMC-D link group matching logic
+Date: Thu, 25 Jan 2024 20:39:16 +0800
+Message-Id: <20240125123916.77928-1-guwen@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,37 +65,49 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: esben@geanix.com
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27165/Thu Jan 25 10:51:15 2024)
 
-TSO and TBS cannot coexist. For now we set i.MX Ethernet QOS controller to use
-TX queue with TSO and the rest for TBS.
+The logic to determine if SMC-D link group matches is incorrect. The
+correct logic should be that it only returns true when the GID is the
+same, and the SMC-D device is the same and the extended GID is the same
+(in the case of virtual ISM).
 
-TX queues with TBS can support etf qdisc hw offload.
+It can be fixed by adding brackets around the conditional (or ternary)
+operator expression. But for better readability and maintainability, it
+has been changed to an if-else statement.
 
-Signed-off-by: Esben Haabendal <esben@geanix.com>
+Reported-by: Matthew Rosato <mjrosato@linux.ibm.com>
+Closes: https://lore.kernel.org/r/13579588-eb9d-4626-a063-c0b77ed80f11@linux.ibm.com
+Fixes: b40584d14570 ("net/smc: compatible with 128-bits extended GID of virtual ISM device")
+Link: https://lore.kernel.org/r/13579588-eb9d-4626-a063-c0b77ed80f11@linux.ibm.com
+Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
 ---
- drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ net/smc/smc_core.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-index 8f730ada71f9..c42e8f972833 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-@@ -353,6 +353,12 @@ static int imx_dwmac_probe(struct platform_device *pdev)
- 	if (data->flags & STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY)
- 		plat_dat->flags |= STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY;
- 
-+        for (int i = 0; i < plat_dat->tx_queues_to_use; i++) {
-+                /* Default TX Q0 to use TSO and rest TXQ for TBS */
-+                if (i > 0)
-+                        plat_dat->tx_queues_cfg[i].tbs_en = 1;
-+        }
+diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
+index 95cc95458e2d..e4c858411207 100644
+--- a/net/smc/smc_core.c
++++ b/net/smc/smc_core.c
+@@ -1877,9 +1877,15 @@ static bool smcd_lgr_match(struct smc_link_group *lgr,
+ 			   struct smcd_dev *smcismdev,
+ 			   struct smcd_gid *peer_gid)
+ {
+-	return lgr->peer_gid.gid == peer_gid->gid && lgr->smcd == smcismdev &&
+-		smc_ism_is_virtual(smcismdev) ?
+-		(lgr->peer_gid.gid_ext == peer_gid->gid_ext) : 1;
++	if (lgr->peer_gid.gid != peer_gid->gid ||
++	    lgr->smcd != smcismdev)
++		return false;
 +
- 	plat_dat->host_dma_width = dwmac->ops->addr_width;
- 	plat_dat->init = imx_dwmac_init;
- 	plat_dat->exit = imx_dwmac_exit;
++	if (smc_ism_is_virtual(smcismdev) &&
++	    lgr->peer_gid.gid_ext != peer_gid->gid_ext)
++		return false;
++
++	return true;
+ }
+ 
+ /* create a new SMC connection (and a new link group if necessary) */
 -- 
-2.43.0
+2.32.0.3.g01195cf9f
 
 
