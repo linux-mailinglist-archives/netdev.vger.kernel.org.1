@@ -1,144 +1,93 @@
-Return-Path: <netdev+bounces-65746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DB6183B8D5
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 06:00:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B02E83B8D7
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 06:00:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 654AEB22E16
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 05:00:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CF6A1C22C08
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 05:00:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3EC379EA;
-	Thu, 25 Jan 2024 04:59:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FEFD79EC;
+	Thu, 25 Jan 2024 05:00:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YE96pyIy"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AC6D10A01;
-	Thu, 25 Jan 2024 04:59:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67EF779E1;
+	Thu, 25 Jan 2024 05:00:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706158795; cv=none; b=TiK32AVS+HttDfHrxby7qlESrzxSdGMQYhopGuCnYdvLcveTeYagTXLXdnCtF9/1E/fWvg3ftnfkhnwrFhQpUFdHhOQhAW4dUdQvEnX5i/MgsfwkT7qOq9/+u3hk9PSiCKsS56/tTSlRuahZrTroMrMsZflUDDRz52eVxABciuQ=
+	t=1706158826; cv=none; b=HhkLOupBr6pHgyUBE9HnyoVjdpYnSNyxBx2+Q6TxeMplU60rVuWGjv7kXyDAPLGHHFennIEQaPp/SUaIQuja8JvkzdzdvYMlXcktpZ37jYPzijQT34HL0rKkNeICWt1A5io4PnMTjzPh3gUoTzoCA1CeOsG1XSyiWG6DOydKqiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706158795; c=relaxed/simple;
-	bh=MW15k4O5v9QsoPaQ81Bq5JTbJg1u8U4lt6OlGTG94sc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cXVhfV+1lRIngR1OrGpHwEPuipoD20eXl+kebxoOBzqCZul0WzbrVBRVl4vm0+puHOOILqCyn41S8P3eWJwRAV9vpcz6CXW/pYhddSvJ8QD+8qT418fQWr2e71RXkRYGGl8HN0GU9SolFbJ87vPsEf/jD1fttt/oYEU8K92EXv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; arc=none smtp.client-ip=115.124.30.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R611e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=23;SR=0;TI=SMTPD_---0W.J8HiD_1706158781;
-Received: from 30.221.129.223(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W.J8HiD_1706158781)
-          by smtp.aliyun-inc.com;
-          Thu, 25 Jan 2024 12:59:43 +0800
-Message-ID: <530afe45-ba6b-4970-a71c-1f1255f5fca9@linux.alibaba.com>
-Date: Thu, 25 Jan 2024 12:59:41 +0800
+	s=arc-20240116; t=1706158826; c=relaxed/simple;
+	bh=OOpECudB16BaNbre86p8JZ+UD6CaQR73+6tYwzCd7Zc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=splZjY7VjME8g3kYU/SAfyMrtqVXaF3hv+kWLPMMTu/St6FPiNsJj1i6sJs1CjwwWxEZTD6KaS9WIcOngAh0y0uHd2H5M8VITle5sJt1ETjU5TgfnGZRtJvzw609d8dfQRcjyGFLYlUGV8ZYrS5eMxFgXTgpgcDMhcYBk+B9Jo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YE96pyIy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9714BC433F1;
+	Thu, 25 Jan 2024 05:00:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706158825;
+	bh=OOpECudB16BaNbre86p8JZ+UD6CaQR73+6tYwzCd7Zc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=YE96pyIylmwVdK4lVqyDQgAIxqjnkNZ30wWVkAFqblhlOFr1+IzssjQ8aqPZ3MnAo
+	 Q92HcpeWM59772PBPuKwJy7zR5btHEUWfKVFs2T1PQ3cDZUkU6Ppgp4udZ0vETOdHM
+	 /a86D5vMYr6uzNh1kd0AsXDtVinByZnmF4C8SbEZELRPTRWV2+Ws/qDJT/KV91/Yoc
+	 cCF0xeziWGAZBLqWmNNTpn0GlgplxNG2Ky3/7r+pcv0sqRfqVMq9ENozI5ut+wN2py
+	 O4oJP38vJKth5bRB1MDZOESDtvwly4Q8+ckYaJQYVYoGacMwUa/HilHw+9CLIYbWtX
+	 xk3zn+G4+OSDw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7F16CDFF767;
+	Thu, 25 Jan 2024 05:00:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [REGRESSION] v6.8 SMC-D issues
-To: Alexandra Winter <wintera@linux.ibm.com>, wenjia@linux.ibm.com,
- hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, jaka@linux.ibm.com,
- Matthew Rosato <mjrosato@linux.ibm.com>
-Cc: Linux regressions mailing list <regressions@lists.linux.dev>,
- borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
- tonylu@linux.alibaba.com, raspl@linux.ibm.com, schnelle@linux.ibm.com,
- guangguan.wang@linux.alibaba.com, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Halil Pasic <pasic@linux.ibm.com>
-References: <20231219142616.80697-1-guwen@linux.alibaba.com>
- <20231219142616.80697-8-guwen@linux.alibaba.com>
- <13579588-eb9d-4626-a063-c0b77ed80f11@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <13579588-eb9d-4626-a063-c0b77ed80f11@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] fjes: fix memleaks in fjes_hw_setup
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170615882551.24307.2022533204169513521.git-patchwork-notify@kernel.org>
+Date: Thu, 25 Jan 2024 05:00:25 +0000
+References: <20240122172445.3841883-1-alexious@zju.edu.cn>
+In-Reply-To: <20240122172445.3841883-1-alexious@zju.edu.cn>
+To: Zhipeng Lu <alexious@zju.edu.cn>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, izumi.taku@jp.fujitsu.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
+Hello:
 
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On 2024/1/24 22:29, Alexandra Winter wrote:
-> Hello Wen Gu,
+On Tue, 23 Jan 2024 01:24:42 +0800 you wrote:
+> In fjes_hw_setup, it allocates several memory and delay the deallocation
+> to the fjes_hw_exit in fjes_probe through the following call chain:
 > 
-> our colleague Matthew reported that SMC-D is failing in certain scenarios on
-> kernel v6.8 (thx Matt!). He bisected it to
-> b40584d ("net/smc: compatible with 128-bits extended GID of virtual ISM device")
-> I think the root cause could also be somewhere else in the SMC-Dv2.1 patchset.
+> fjes_probe
+>   |-> fjes_hw_init
+>         |-> fjes_hw_setup
+>   |-> fjes_hw_exit
 > 
-> I was able to reproduce the issue on a 6.8.0-rc1 kernel.
-> I tested iperf over smc-d with:
-> smc_run iperf3 -s
-> smc_run iperf3 -c <IP@>
-> 
-> 1) Doing an iperf in a single system using 127.0.0.1 as IP@
-> (System A=iperf client=iperf server)
-> 2) Doing iperf to a remote system (System A=client; System B=iperf server)
-> 
-> The second iperf fails with an error message like:
-> "iperf3: error - unable to receive cookie at server: Bad file descriptor" on the server"
-> 
-> If I do first 2) (iperf to remote) and then 1) (iperf to local), then the
-> iperf to local fails.
-> 
-> I can do multiple iperf to the first server without problems.
-> 
-> I ran it on a debug server with KASAN, but got no reports in the Logfile.
-> 
-> I will try to debug further, but wanted to let you all know.
-> 
-> Kind regards
-> Alexandra
-> 
-> Reported-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> 
+> [...]
 
-Hi Alexandra and Matthew,
+Here is the summary with links:
+  - fjes: fix memleaks in fjes_hw_setup
+    https://git.kernel.org/netdev/net/c/f6cc4b6a3ae5
 
-Thank you very much for detailed description.
-
-I tried to reproduce this with loopback-ism, cut some checks so that the remote-system
-handshake can be done. After a while debug I found an elementary mistake of mine in
-b40584d ("net/smc: compatible with 128-bits extended GID of virtual ISM device")..
-
-The operator order in smcd_lgr_match() is not as expected. It will always return
-'true' in remote-system case.
-
-  static bool smcd_lgr_match(struct smc_link_group *lgr,
--                          struct smcd_dev *smcismdev, u64 peer_gid)
-+                          struct smcd_dev *smcismdev,
-+                          struct smcd_gid *peer_gid)
-  {
--       return lgr->peer_gid == peer_gid && lgr->smcd == smcismdev;
-+       return lgr->peer_gid.gid == peer_gid->gid && lgr->smcd == smcismdev &&
-+               smc_ism_is_virtual(smcismdev) ?
-+               (lgr->peer_gid.gid_ext == peer_gid->gid_ext) : 1;
-  }
-
-Could you please try again with this patch? to see if this is the root cause.
-Really sorry for the inconvenience.
-
-diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
-index da6a8d9c81ea..c6a6ba56c9e3 100644
---- a/net/smc/smc_core.c
-+++ b/net/smc/smc_core.c
-@@ -1896,8 +1896,8 @@ static bool smcd_lgr_match(struct smc_link_group *lgr,
-                            struct smcd_gid *peer_gid)
-  {
-         return lgr->peer_gid.gid == peer_gid->gid && lgr->smcd == smcismdev &&
--               smc_ism_is_virtual(smcismdev) ?
--               (lgr->peer_gid.gid_ext == peer_gid->gid_ext) : 1;
-+               (smc_ism_is_virtual(smcismdev) ?
-+                (lgr->peer_gid.gid_ext == peer_gid->gid_ext) : 1);
-  }
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Thanks,
-Wen Gu
 
