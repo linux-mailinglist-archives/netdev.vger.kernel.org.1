@@ -1,193 +1,116 @@
-Return-Path: <netdev+bounces-65820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9FCE83BDE0
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 10:50:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66CDD83BDEF
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 10:52:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C5F81F338F2
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:50:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8003A1C230A5
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:52:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AEAF1BF3B;
-	Thu, 25 Jan 2024 09:50:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD8731C6B2;
+	Thu, 25 Jan 2024 09:52:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58B6F1BF50
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 09:50:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 033651BF2F
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 09:51:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706176232; cv=none; b=e9OM6ETspo0RhmugptZnMymK8aH1fX7PHKlghLYCh8EYRLbhChrA3kJrwQ8wyFKi2KKiUIsAg+97LadBoHRET8yblAC7pgUkXQEKDcaVXRxTsxTYm7OamyBXU95CdRlRulfWmq79np8wWvIPAWBHi0HWCBnuA+KDZF32kTTGLPI=
+	t=1706176321; cv=none; b=mpuvr/oL/dsJGt+wlkpBUs//8jy4onBvOir3V+4WpPILjyOquYLzVBEXioQWAFHNkmBAJ3mNDfEg0PyjUkp6uFFR1j6Y8EK5f7lvLzxwziX0igyo2pFonL5b4Y4FnGgmcabTtvjrpGW6R+EUoQlQb6tTErd746ziUBbEsYbNv2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706176232; c=relaxed/simple;
-	bh=QkpDfmEjwjz7uDYWUc9o3qkr7AoT9Xo5ckBEv7hSUJc=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=mx6ceP2zCDpUx0XdE7gEj4y8sDeBBgcDbskYUN2r5wQ63V/TaCuwzr1OaDRGvU/X3u/OZI/BlCVsEVtZJcjfvQBvKpjpHRQAXCdA5yTscCNU1aWaP3V/gKNB2FJYgVJCRhSmTDn9sdhDn1qq+1gHhTiFEJQofArtyRaTSm5jaqM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7bbb3de4dcbso1016464639f.1
-        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 01:50:31 -0800 (PST)
+	s=arc-20240116; t=1706176321; c=relaxed/simple;
+	bh=0ZTW4a1bQ2OiA6LA5EpoPRlyj/RHJspj8XATgyLrU0g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EdPwHWwvgFP4VMPVH9aphE2XPHPXq981SqlSAa2kkoaMQQYCL9BJuw38kiXx0s8TpWzB5sPo0/U20yK2QmWJyGqayrhfGnNnn03S9FkJKCOw7vlcNlpZDaBKH23Y2OrY7OPDdQitAOqw13P1a7PyDJc7C6l+0HDzG2GBS9OdM80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a2e0be86878so103811566b.1
+        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 01:51:59 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706176230; x=1706781030;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2FCFO6nRQJ7i933l7/korO5m8D0tqulHAixtLMNxjZE=;
-        b=rYtE8aQ+IHz7Hfgv6llg1BvlKd7mMk0YlE+FekvgcVtNXFJRhDBQiQ0hVRR6/GbL2f
-         jWDgvoIf918JKoTYN0R1qtpRgy/Siv1T/UiHkbIzg/BAJWV4bByxq7E62W08x0Smx5bZ
-         3fVTOyk94Ip1mOnPdLj9gWG2hVQUxQVf98TI47ibOEu2vHc5BlFjdNyBaihp+6x0oTcj
-         z1awCM8cteqUYiQMo9Pr+FSzBBqnx6gSNsu8/pFhg40CxHCFbmCJz8TZk73+HuMIMU6g
-         Vw5NG8n1y0Y2GoVbszKVArgv0T2AJnvozD1avaSB1Tw6oxeWYgSh64PZPCuhNwwTAWV4
-         WdkQ==
-X-Gm-Message-State: AOJu0YxMsgnpjQMlnzdLlFIyyAVuJCnOGUXrmQHHxqkmerbPi4YjLMnM
-	f8vmFySVuPsfdPyD7Y42PUlSZVtr7vCcoqeWADmD6dBH9WnO459vrvNIVOY/5SWsgKMdHHcf3XS
-	TGYtqhKK/L0LlkKsR8jKPATyQRQaXn/kBmvqMDs3WzSesjP4ptVjGemI=
-X-Google-Smtp-Source: AGHT+IGOLStg2VfYUeovZDwOtvwRYL+cg9sQWYKVEeoaTLyC6hwKKfjkoZ8jxiqYPADIwn2rMZDbKp9EVe7tcBBe9jjcLAtXvwpl
+        d=1e100.net; s=20230601; t=1706176318; x=1706781118;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OYgzBlcJnu+v9spDBmTEjXD0OAEIxBQnl2jQO2RurBM=;
+        b=raa9++Kdi2WAQuPOdXpEZVFHumR7M3pXfKLNILnlFFN/4KL2WVWT1gjtjJlKhC/H7r
+         BBbvg9txoa6EPpeXYP9FgQ0R1IUa+C//GlDspW+94yzqdJlHVz45yQ9D31LleuDLJs5d
+         cN2g0Co/eGO86okr2BO4GAXCdUAP1tecwn+DRIG0vdemlg0d0A2W9Ukr+LMaYm3ZfW9y
+         9djkDFGcI23JJQAC6fF9hrd76J73ojzRmmT9cZRjYxc1O4EszVfZFHinK0RFJ3lIcFzl
+         1OjeXcoXd5Rcz5r5FimyLB/6R6n+TNsE4/WHRPyBsO3fzkHs4Up4OdK7GejftkuWJMnb
+         A2YA==
+X-Gm-Message-State: AOJu0Yw0H5YyEfHmPjJVNSb2J8+7yjZIbsOsgcxUUhSqfZOj8tM8T0M7
+	oz8iltGKM8vK5YLvEfAJs6mJ0WK1v/gNL8OKPk3BOtViFL5gClPz
+X-Google-Smtp-Source: AGHT+IEQsMzTWJY02VKGQBU4XFzfvqzBMchQuFLksqsximxiSyuACebACssJ4w9QdkyJ5gZ7rEA8HQ==
+X-Received: by 2002:a17:906:3a88:b0:a28:c04e:315b with SMTP id y8-20020a1709063a8800b00a28c04e315bmr685180ejd.13.1706176317799;
+        Thu, 25 Jan 2024 01:51:57 -0800 (PST)
+Received: from gmail.com (fwdproxy-cln-016.fbsv.net. [2a03:2880:31ff:10::face:b00c])
+        by smtp.gmail.com with ESMTPSA id cu15-20020a170906ba8f00b00a318cb84525sm255818ejd.216.2024.01.25.01.51.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Jan 2024 01:51:57 -0800 (PST)
+Date: Thu, 25 Jan 2024 01:51:55 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Cc: Michael Chan <michael.chan@broadcom.com>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, gospo@broadcom.com
+Subject: Re: [PATCH net-next 13/13] bnxt_en: Make PTP TX timestamp HWRM query
+ silent
+Message-ID: <ZbIvO+y+Pbnni/3N@gmail.com>
+References: <20231212005122.2401-1-michael.chan@broadcom.com>
+ <20231212005122.2401-14-michael.chan@broadcom.com>
+ <ZbDj/FI4EJezcfd1@gmail.com>
+ <CALs4sv3xWaOg63a3ZVPDSq8nf2E84XNNLC1L6fJe9zphuWpgYg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d8d:b0:362:910b:2345 with SMTP id
- h13-20020a056e021d8d00b00362910b2345mr101973ila.4.1706176230599; Thu, 25 Jan
- 2024 01:50:30 -0800 (PST)
-Date: Thu, 25 Jan 2024 01:50:30 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000026353b060fc21c07@google.com>
-Subject: [syzbot] [bpf?] general protection fault in btf_is_module
-From: syzbot <syzbot+1336f3d4b10bcda75b89@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, haoluo@google.com, john.fastabend@gmail.com, 
-	jolsa@kernel.org, kpsingh@kernel.org, linux-kernel@vger.kernel.org, 
-	martin.lau@linux.dev, netdev@vger.kernel.org, sdf@google.com, song@kernel.org, 
-	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CALs4sv3xWaOg63a3ZVPDSq8nf2E84XNNLC1L6fJe9zphuWpgYg@mail.gmail.com>
 
-Hello,
+On Thu, Jan 25, 2024 at 09:05:39AM +0530, Pavan Chebbi wrote:
+> On Wed, Jan 24, 2024 at 3:48 PM Breno Leitao <leitao@debian.org> wrote:
+> >
+> > Hello Michael, Pavan,
+> >
+> > On Mon, Dec 11, 2023 at 04:51:22PM -0800, Michael Chan wrote:
+> > > From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+> > >
+> > > In a busy network, especially with flow control enabled, we may
+> > > experience timestamp query failures fairly regularly. After a while,
+> > > dmesg may be flooded with timestamp query failure error messages.
+> > >
+> > > Silence the error message from the low level hwrm function that
+> > > sends the firmware message.  Change netdev_err() to netdev_WARN_ONCE()
+> > > if this FW call ever fails.
+> >
+> > This is starting to cause a warning now, which is not ideal, because
+> > this error-now-warning happens quite frequently in Meta's fleet.
+> >
+> > At the same time, we want to have our kernels running warninglessly.
+> > Moreover, the call stack displayed by the warning doesn't seem to be
+> > quite useful and doees not help to investigate "the problem", I _think_.
+> >
+> > Is it OK to move it back to error, something as:
+> >
+> > -       netdev_WARN_ONCE(bp->dev,
+> > +       netdev_err_once(bp->dev,
+> >                          "TS query for TX timer failed rc = %x\n", rc);
+> 
+> Hi Breno, I think it is OK to change.
 
-syzbot found the following issue on:
+> Would you be submitting a patch for this?
 
-HEAD commit:    d47b9f68d289 libbpf: Correct bpf_core_read.h comment wrt b..
-git tree:       bpf-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=104b1ef7e80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=719e6acaf392d56b
-dashboard link: https://syzkaller.appspot.com/bug?extid=1336f3d4b10bcda75b89
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10c1a53be80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1052cec3e80000
+Yes, let me send a patch. I will follow Michael's suggestion and use
+netdev_warn_once()
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/1a9b4a5622fb/disk-d47b9f68.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/dd68baeac4fd/vmlinux-d47b9f68.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/811ba9dc9ddf/bzImage-d47b9f68.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+1336f3d4b10bcda75b89@syzkaller.appspotmail.com
-
-general protection fault, probably for non-canonical address 0xdffffc000000001b: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x00000000000000d8-0x00000000000000df]
-CPU: 0 PID: 5064 Comm: syz-executor334 Not tainted 6.7.0-syzkaller-12348-gd47b9f68d289 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-RIP: 0010:btf_is_module+0x26/0x80 kernel/bpf/btf.c:7441
-Code: 00 eb f0 90 66 0f 1f 00 55 53 48 89 fb e8 92 24 de ff 48 8d bb d8 00 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <0f> b6 04 02 84 c0 74 02 7e 48 0f b6 ab d8 00 00 00 31 ff 89 ee e8
-RSP: 0018:ffffc900039ff828 EFLAGS: 00010206
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffffff81a07f47
-RDX: 000000000000001b RSI: ffffffff81a9fcfe RDI: 00000000000000d8
-RBP: ffffc900039ffaf0 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000004 R11: ffffffff8aa0008b R12: ffffc90000ae6038
-R13: ffffc90000ae6000 R14: 0000000000000000 R15: 0000000000000000
-FS:  000055555660b380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000001b6b398 CR3: 000000001aaae000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- check_struct_ops_btf_id kernel/bpf/verifier.c:20302 [inline]
- check_attach_btf_id kernel/bpf/verifier.c:20730 [inline]
- bpf_check+0x6cfe/0x9df0 kernel/bpf/verifier.c:20898
- bpf_prog_load+0x14dc/0x2310 kernel/bpf/syscall.c:2769
- __sys_bpf+0xbf7/0x4a00 kernel/bpf/syscall.c:5463
- __do_sys_bpf kernel/bpf/syscall.c:5567 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:5565 [inline]
- __x64_sys_bpf+0x78/0xc0 kernel/bpf/syscall.c:5565
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xd3/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-RIP: 0033:0x7f4dbbe514a9
-Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffe76acbe18 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-RAX: ffffffffffffffda RBX: 00007ffe76acbff8 RCX: 00007f4dbbe514a9
-RDX: 00000000000000a0 RSI: 00000000200009c0 RDI: 0000000000000005
-RBP: 00007f4dbbec4610 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
-R13: 00007ffe76acbfe8 R14: 0000000000000001 R15: 0000000000000001
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:btf_is_module+0x26/0x80 kernel/bpf/btf.c:7441
-Code: 00 eb f0 90 66 0f 1f 00 55 53 48 89 fb e8 92 24 de ff 48 8d bb d8 00 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <0f> b6 04 02 84 c0 74 02 7e 48 0f b6 ab d8 00 00 00 31 ff 89 ee e8
-RSP: 0018:ffffc900039ff828 EFLAGS: 00010206
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffffff81a07f47
-RDX: 000000000000001b RSI: ffffffff81a9fcfe RDI: 00000000000000d8
-RBP: ffffc900039ffaf0 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000004 R11: ffffffff8aa0008b R12: ffffc90000ae6038
-R13: ffffc90000ae6000 R14: 0000000000000000 R15: 0000000000000000
-FS:  000055555660b380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000001b6b398 CR3: 000000001aaae000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	00 eb                	add    %ch,%bl
-   2:	f0 90                	lock nop
-   4:	66 0f 1f 00          	nopw   (%rax)
-   8:	55                   	push   %rbp
-   9:	53                   	push   %rbx
-   a:	48 89 fb             	mov    %rdi,%rbx
-   d:	e8 92 24 de ff       	call   0xffde24a4
-  12:	48 8d bb d8 00 00 00 	lea    0xd8(%rbx),%rdi
-  19:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
-  20:	fc ff df
-  23:	48 89 fa             	mov    %rdi,%rdx
-  26:	48 c1 ea 03          	shr    $0x3,%rdx
-* 2a:	0f b6 04 02          	movzbl (%rdx,%rax,1),%eax <-- trapping instruction
-  2e:	84 c0                	test   %al,%al
-  30:	74 02                	je     0x34
-  32:	7e 48                	jle    0x7c
-  34:	0f b6 ab d8 00 00 00 	movzbl 0xd8(%rbx),%ebp
-  3b:	31 ff                	xor    %edi,%edi
-  3d:	89 ee                	mov    %ebp,%esi
-  3f:	e8                   	.byte 0xe8
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Thanks!
 
