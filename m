@@ -1,141 +1,117 @@
-Return-Path: <netdev+bounces-65846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65847-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F0EA83C059
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 12:10:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D2F483C061
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 12:11:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 928411C24959
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 11:10:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2601529D67A
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 11:11:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 052B91C6B8;
-	Thu, 25 Jan 2024 11:01:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CA0C5B5B2;
+	Thu, 25 Jan 2024 11:03:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O7WF2Ibo"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="u3SnLV4P";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="jBv6uUoT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 484591C16;
-	Thu, 25 Jan 2024 11:01:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C531B45038;
+	Thu, 25 Jan 2024 11:03:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706180513; cv=none; b=in5w3c6T9tDRzQ6XinlIUOCZfz5hG0f/teTfOlcmqSQ/y7vLUUXZGoBpPUR4LTjAjfkBh+POGLd1EhRbmH1wOTXJD8eetl559kkTe4rjtvwW37dwCiuSnCB/8lTZFttjoUvKGObgiNsMEqkH5wWJLDtfI5Op5lJNG2sxkFrhfyw=
+	t=1706180601; cv=none; b=a9S2AJ9+xkIyVjHiRkOF1yf9n7kJ7KQUvlDluNS7gSaMZYzbq+EtCq3hQJk5/FPXWHhPlfkZ5E+tf6k2DGPsaBUI/0ZmUs1EqzMm6+3KUxCZpfqirE2x2D9l2uPKnPqVJScjcJkA6fBkS2JAhMgBfmwqj4bufpe1qTaAuifEPnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706180513; c=relaxed/simple;
-	bh=CZvtojiC0XEHWqTBwc7RTmZP9uSs74MPCzz4IDlB2Xw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iAZxMiJhCdxNj82cRWnSk/5yIqAA+gMG2Nxxd1uhFKLDy+hq63ZvZAoklSsxsHm4GhWY1KV/j4MEkDis3JZZxVg34Hk48jwGb4a1Ie6NwIdrQfxEEVlxAXPH8Yg47HY4TEEvSdCVO68ZHvynHdEwx7M5YmtllmO/HS49xQ+6/vo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O7WF2Ibo; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5100fd7f71dso2386956e87.1;
-        Thu, 25 Jan 2024 03:01:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706180510; x=1706785310; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=miuHCVwgH0ReGM1PaYlhcfq7/djqKFtBuYNwdTBB2rs=;
-        b=O7WF2IboPkiL62qQinMC6InYGnmFuC7YfXkbagmlOav0nOg571nO+d0/d/Z7nfJMvB
-         pS+o8WKF4z/IM5RqQIQ7vY+bmSPxVkwnsgiP7g3C+HrxfPxChb92EErygT3wswTFANSc
-         Kf9NDTHOMnbiN2u3PKhwxm/No1/BGVx/ycFfTu+yqAX+1kOp9eifjUoszlVaS+SAIOyS
-         CUx9+ZfDFIxeHiuzNL659i5CfS8KXh9+44rOA8V9RTsUPOHJSYJmSyjFhcg6V8gImZM7
-         JRQ87+BY9cpDErYFW387suMC2yqN+YGD4r7xTLinj+V+I5UFeV1EaEDoEbVAwcxMhOLQ
-         4wpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706180510; x=1706785310;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=miuHCVwgH0ReGM1PaYlhcfq7/djqKFtBuYNwdTBB2rs=;
-        b=pHARuzsYnNdj3mSJVsfHjQhpIbLGwxkhD3as3NQ4K4dWteMQ6KNefd3bcqeYhECXCl
-         059KkhQSdQzuwmRFGzPLhgUmT8e9r0tdttcfG8fzZYE7uqhLMqG9gO7KTR+YmwCzQaxw
-         PIe4lIg95TUwdtbwytX10rOd5mdi4MBXXlf9B/DsdnJbcj9rZLJ54l+cGUQE3PNOkjhm
-         yJQB+fG2cGDcTSUqQW+xZ2pPJpI/zTZqCfITKfDSZ86ujIsuggJASFGfhZ0rrDPKeqCZ
-         AexquqHThLqc9b2VZGC9kyKqSCGHT0ft+yA8ePY5xJPMamraRK0N9qs6hSWuIcYDdY2w
-         zdDg==
-X-Gm-Message-State: AOJu0Yy/0MsjMs+2Xtsa0HFNRkkq+6cJS0Fu7hWIaS8FkgK6T4xy4DU/
-	dcTxhC0ry1ib0XBWBaqj6mlWeSvyAk9OFrglRyqwlX8coIQ7zTUs
-X-Google-Smtp-Source: AGHT+IFlB2MgGLnpQeRwCJpsgL6fLkk+sNLY3XK5121CEnUBfLxwPC5+nWSbyXBQ20M00lfQUDSEkQ==
-X-Received: by 2002:ac2:57c5:0:b0:50e:6317:54ab with SMTP id k5-20020ac257c5000000b0050e631754abmr324729lfo.42.1706180509935;
-        Thu, 25 Jan 2024 03:01:49 -0800 (PST)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id d14-20020a194f0e000000b0051006813733sm766441lfb.86.2024.01.25.03.01.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jan 2024 03:01:49 -0800 (PST)
-Date: Thu, 25 Jan 2024 14:01:46 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Furong Xu <0x1207@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Joao Pinto <jpinto@synopsys.com>, 
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, xfr@outlook.com, rock.xu@nio.com
-Subject: Re: [PATCH net] net: stmmac: xgmac: fix safety error descriptions
-Message-ID: <3aagjpld4v7u4cfj3lge5rg6v6ro3ehnstjz3jfculx3vdpbvd@4y3hw7v4idhp>
-References: <20240123085037.939471-1-0x1207@gmail.com>
- <ii3muj3nmhuo6s5hm3g7wuiubtyzr632klrcesubtuaoyifogb@ohmunpxvdtsv>
- <20240125103454.0000312a@gmail.com>
- <c37feb621fa3f7867af8d97ffe36f577966ba3ec.camel@redhat.com>
+	s=arc-20240116; t=1706180601; c=relaxed/simple;
+	bh=UGg3yUqQ314SNJxAbWSQJNKui6kWSnV25W5yvKL41k0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=a+6dJ7YIgb/AQwaxWcEpt7AN6Uk7aIslv0E8ZAIBnDZdDvyLTAjyAR0zxcxgaoEC3KHQm8tqdi9fMqInsbi3WGGvY7toia3pRyOCKzKy88WI/abqLYePg5F1MIY2rytmRkX1vDN2KZhBfpYTCMIwy/DSrUIbSFGkXXwdChi/qzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=u3SnLV4P; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=jBv6uUoT; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt.kanzenbach@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1706180597;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UGg3yUqQ314SNJxAbWSQJNKui6kWSnV25W5yvKL41k0=;
+	b=u3SnLV4PZaCoZGJ3bJ25IlxETtood5AIfwRHarpLIu0DQJKJiE320k6VU1EDkPJ7NBI7Ar
+	0D+Pg9k2f6KMRYV8Lff57+Y5aQzINaDvDVTZIbLkp/YzfM69+BgeTEDKiOmFjfMAyEfcUK
+	Mjs5UgUYahdJtJsYXpdFYuCX42E5hEjliwPuLNVgAc2mcYbV9Hpku24tAB17brXjx7CkKZ
+	MM6c8qD9QNaqQ2gFBcIpNK3Sb8Ti1z0fzUDZ+MM+vwLm+Dp+QEmWLG7lB2YGhHDHvMiepr
+	1kIG9HCKfZdAtQeuZp8Rsd55fSrq8vA9XaFT76XXuUSivIUjnyCF4PoNYdBKEQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1706180597;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UGg3yUqQ314SNJxAbWSQJNKui6kWSnV25W5yvKL41k0=;
+	b=jBv6uUoTeqQ7ZIsiv5KNrixbFEaklvqN2Pjq308Ul+wdRoYBuqemFgZS23br5QDL7WfJ/V
+	FloqYx5d/nfnYRDw==
+To: Esben Haabendal <esben@geanix.com>, netdev@vger.kernel.org, Alexandre
+ Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>
+Cc: linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/3] net: stmmac: Time Based Scheduling support for OF
+ platforms
+In-Reply-To: <b807c2a70dba9711376b265b6da5fb5ff14589aa.1706105494.git.esben@geanix.com>
+References: <b365dc6f756a3fad4dfaa2675c98f4078aba8a55.1706105494.git.esben@geanix.com>
+ <b807c2a70dba9711376b265b6da5fb5ff14589aa.1706105494.git.esben@geanix.com>
+Date: Thu, 25 Jan 2024 12:03:16 +0100
+Message-ID: <8734ulekuj.fsf@kurt.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c37feb621fa3f7867af8d97ffe36f577966ba3ec.camel@redhat.com>
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-On Thu, Jan 25, 2024 at 11:09:06AM +0100, Paolo Abeni wrote:
-> On Thu, 2024-01-25 at 10:34 +0800, Furong Xu wrote:
-> > On Wed, 24 Jan 2024 17:25:27 +0300
-> > Serge Semin <fancer.lancer@gmail.com> wrote:
-> > 
-> > > On Tue, Jan 23, 2024 at 04:50:37PM +0800, Furong Xu wrote:
-> > > > Commit 56e58d6c8a56 ("net: stmmac: Implement Safety Features in
-> > > > XGMAC core") prints safety error descriptions when safety error assert,
-> > > > but missed some special errors, and mixed correctable errors and
-> > > > uncorrectable errors together.
-> > > > This patch complete the error code list and print the type of errors.  
-> > > 
-> > > The XGMAC ECC Safety code has likely been just copied from the DW GMAC
-> > > v5 (DW QoS Eth) part. So this change is partly relevant to that code too. I
-> > > can't confirm that the special errors support is relevant to the DW
-> > > QoS Eth too (it likely is though), so what about splitting this patch
-> > > up into two:
-> > > 1. Elaborate the errors description for DW GMAC v5 and DW XGMAC.
-> > > 2. Add new ECC safety errors support.
-> > > ?
-> > > 
-> > > On the other hand if we were sure that both DW QoS Eth and XGMAC
-> > > safety features implementation match the ideal solution would be to
-> > > refactor out the common code into a dedicated module.
-> > > 
-> > > -Serge(y)
-> > > 
-> > 
-> > Checked XGMAC Version 3.20a and DW QoS Eth Version 5.20a, the safety error
-> > code definitions are not identical at all, they do have some differences,
-> > about more than 20 bits of status register are different.
-> > I think we should just leave them in individual implementations.
-> 
+--=-=-=
+Content-Type: text/plain
 
-> @Serge: given the above, would you still advice for splitting this
-> patch into 2?
+Hi,
 
-Preliminary I would still in insist on splitting up. I'll double check
-the patch and the Safety feature implementations in both devices and
-give more detailed response to Furong in an hour or so.
+On Wed Jan 24 2024, Esben Haabendal wrote:
+> This allows enabling TBS for TX queues by adding the
+> snps,time-based-scheduling property. You should check for support for this
+> on your particular controller before enabling. Typically, TX queue 0 does
+> not support TBS.
 
--Serge(y)
+More a general question: Do i see that correctly that Launch Time does
+not work for OF platforms (such as an imx93) at the moment, because the
+tbs_en property is not configured? Or why are these patches necessary?
 
-> 
-> Thanks,
-> 
-> Paolo
-> 
+Thanks,
+Kurt
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJSBAEBCgA8FiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmWyP/QeHGt1cnQua2Fu
+emVuYmFjaEBsaW51dHJvbml4LmRlAAoJEMGT0fKqRnOCL50QAJcDSvbiM7O1gNCH
+paOkpfL04tCHg41ccGCEEDcDNadgMVtdEupNV1xwikf5sNYd44FDXTm6U0ad1J5H
+Ub8/GbM+rGdz+5fSFRB+C/XX0r9VIhEHZg9QErNO5pTt2syYko2R4LobCvJMiAF7
+sGBskqeV/De7CcOkHwin3pjNYIUxAPluKqUnLKubxK9NEVfn9ZL122+5rqFyUAux
+N8S1KBvFC+QJ2iizSHPmf/99qmeJPbzyWVL10jqXsg5Xs+ZsOes7mVHXUe8x+e6I
+TVhsP5SO9q4XxHAqiuLoC56svb6MPpg0DOGL/adVOAL0y1YSWfgpLqQ8wjNgpniG
+jSDJnRL9rY8+VowQx9EtsExAemH2w8xfD71rjwTISJKSIsJskcc7pDb9wc3ck29D
+xlhhOHgrLgDOfAcHhwM2cQT3ebJD7tQU65yeedjC2hU1rKFXvcT2E7+Ia9cAne+k
+lxse7NTvbN6joDFwFKlJfCKC2Gs616WhK7tvomnzqzFnqle0bS6psW6ybkyLZvRb
+0lDeRdYPcnZj8SpxhV9XFkX1njmNkHNw7gJA5WEMQciLnGE1+IS5aiifXNLlALXA
+JbaEaQ3qSSivqh6Pa4kb87hGvh6gDRSo9LD8Uw7ViK9yXeSyrdsy8lEX07TbTj5t
+dwZF0yXrFem0vJsm9MBfjxTJpRZ+
+=1RFb
+-----END PGP SIGNATURE-----
+--=-=-=--
 
