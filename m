@@ -1,108 +1,149 @@
-Return-Path: <netdev+bounces-65946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65947-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A175583C9A7
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 18:16:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 498B183C9B2
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 18:17:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41C831F2A2BB
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 17:16:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF9571F2A351
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 17:17:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13C63137C49;
-	Thu, 25 Jan 2024 17:11:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06593131E4F;
+	Thu, 25 Jan 2024 17:15:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="N0U7gxV4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Txkf3O/b"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E2EC1C6A5
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 17:11:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF38113173F;
+	Thu, 25 Jan 2024 17:15:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706202684; cv=none; b=Wz1KLMDKAi2ZyoHSwqhZf2SK+ygwUMMI+xqKlnKcFSpOqfYQCtk5zgYfWwifvtl4YSvs4mR8ASUiWLK4K5HcMaCoXl0UYQ3lkbXXGgtksNYonXXUMnRpu7XDCb/WMpJR118zT7dhKfQXbAZU38GN33Lkyh8E262sj047tDCL2Zc=
+	t=1706202901; cv=none; b=asiRPTMshk5PCqoj45SfEjGxqJNJe+SbTlN7qdzgsW6ZY/unm4tmr9OpGKQxAz4ZFQ07pDd9kN8Lv5IMZKKj3F7Q7x5Xz+WngAY8Lztgka6enOnjskFGdWTDbpJT5yIsn/03iWwAfQtKRZkqLgGGftre59TUHAyH5uwMdyn4SVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706202684; c=relaxed/simple;
-	bh=nEOsNt6FFR1h3VkdNsbanGLxwjGlJ3VKJhYvlacD+Z0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jAQcNiGyesLpU4EHa/hJcvXo+p6vTVyFO4yNQAypoalEEVb3o/nQPke6gqZXYnMjpLjfcg8R7vknimliGiGBIighXRZsHLEEjbOgldIkcAF3LSzA5T/cpINOCBpHDqX+82kERUhh4rsaq7+rbEduw/LRaAews622vMn0XzttOCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=N0U7gxV4; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <081af630-ab5d-4502-a29a-a8577d414809@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706202677;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cwiSZZSX/ApevLiEYXtfnRTxSGnWM9HwOp5AgT3owUs=;
-	b=N0U7gxV4MpRvXxZcKiNEOu7DcT42hPeaN/Y2U6qOFPHSWeUEx4AgFNLBjp7qqagQPL5Oin
-	vS/FcFfWwyVinSJlI1TWDI/1iwAtorxSkT5HS1mkvoDa4w5K36G+wEdbCJp+CO7+M+5p6Y
-	yxIDgy4Ne25i2rLOl8VrcxMTq+AfUn4=
-Date: Thu, 25 Jan 2024 17:11:08 +0000
+	s=arc-20240116; t=1706202901; c=relaxed/simple;
+	bh=3dVf+vPXIdsPQhadKBnqSmffUhDAz2vQfQH/Y8KghKo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jH+e6bjtG2eUB+YcB2SbFZJIGI/CKirqZ15gJ7TbwH/2LljRJXw8hdWEw0kAn49su8BlOTpaLAUpZu7ul7cH5UyEe8c3f8an7lHaPLMhQSAzeIGj1P3mCMViHR2tDSWFI3V3IHvgwEqDk7/K4HC7pJ3q+I+CG3/GJGtZSoAUBEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Txkf3O/b; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FB71C433C7;
+	Thu, 25 Jan 2024 17:14:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706202901;
+	bh=3dVf+vPXIdsPQhadKBnqSmffUhDAz2vQfQH/Y8KghKo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Txkf3O/bU+w3xpkbVkgMMl8QUXBKPsrBmaVGJ73PJStKMIRdZZqS1btShnlKYSe4B
+	 3tWxt+neitpkeD6DPTmPIUV6ZB93graF8xd+2W1FuoHqZVfe3h0vR4YjO2jucAzK5y
+	 2apRC9G275s0VAckQ1rnOTKJLj8fI2J5p5OR32uU3NdIO0LvfNUgaLt0gBUvnsSowf
+	 plXpjO3La7ab9VYy8UASERjMOsLZ1L1jr8FdGdOFn5MP6r47IiDue4UFNF7/j8k4Zx
+	 ImdM51iNoWJfm+COzc+RPfgZT6UUCi5JAPHOGVraofBaXE5VDj5vhVyLzUjZFsjSlY
+	 S2yjAiaTH/QFA==
+Date: Thu, 25 Jan 2024 17:14:55 +0000
+From: Conor Dooley <conor@kernel.org>
+To: esben@geanix.com
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	devicetree@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/3] dt-bindings: net: snps,dwmac: Add
+ time-based-scheduling property
+Message-ID: <20240125-pebble-reproach-f550d00a2abb@spud>
+References: <b365dc6f756a3fad4dfaa2675c98f4078aba8a55.1706105494.git.esben@geanix.com>
+ <30ce8f45b8752c603acc861ebb2f18d74d2f8a07.1706105494.git.esben@geanix.com>
+ <20240124-reptilian-icing-a95b20f123be@spud>
+ <87bk99hj7q.fsf@geanix.com>
+ <3adf7908-be27-4125-ae5b-6f2eb6100304@linaro.org>
+ <877cjxhbkv.fsf@geanix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 2/2] net: stmmac: dwmac-imx: set TSO/TBS TX queues default
- settings
-Content-Language: en-US
-To: Esben Haabendal <esben@geanix.com>, netdev@vger.kernel.org,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Shawn Guo <shawnguo@kernel.org>,
- Sascha Hauer <s.hauer@pengutronix.de>,
- Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>, NXP Linux Team <linux-imx@nxp.com>
-Cc: linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, linux-kernel@vger.kernel.org
-References: <cover.1706184304.git.esben@geanix.com>
- <5606bb5f0b7566a20bb136b268dae89d22a48898.1706184304.git.esben@geanix.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <5606bb5f0b7566a20bb136b268dae89d22a48898.1706184304.git.esben@geanix.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="AsbEPBmbmpQjmWgj"
+Content-Disposition: inline
+In-Reply-To: <877cjxhbkv.fsf@geanix.com>
 
-On 25/01/2024 12:34, Esben Haabendal wrote:
-> TSO and TBS cannot coexist. For now we set i.MX Ethernet QOS controller to use
-> TX queue with TSO and the rest for TBS.
-> 
-> TX queues with TBS can support etf qdisc hw offload.
-> 
-> Signed-off-by: Esben Haabendal <esben@geanix.com>
-> ---
->   drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c | 6 ++++++
->   1 file changed, 6 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-> index 8f730ada71f9..c42e8f972833 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-> @@ -353,6 +353,12 @@ static int imx_dwmac_probe(struct platform_device *pdev)
->   	if (data->flags & STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY)
->   		plat_dat->flags |= STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY;
->   
-> +        for (int i = 0; i < plat_dat->tx_queues_to_use; i++) {
-> +                /* Default TX Q0 to use TSO and rest TXQ for TBS */
-> +                if (i > 0)
-> +                        plat_dat->tx_queues_cfg[i].tbs_en = 1;
-> +        }
-> +
 
-Just wonder why don't you start with i = 1 and remove 'if' completely?
-Keeping comment in place will make it understandable.
+--AsbEPBmbmpQjmWgj
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->   	plat_dat->host_dma_width = dwmac->ops->addr_width;
->   	plat_dat->init = imx_dwmac_init;
->   	plat_dat->exit = imx_dwmac_exit;
+On Thu, Jan 25, 2024 at 12:55:12PM +0100, esben@geanix.com wrote:
+> Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org> writes:
+>=20
+> > On 25/01/2024 10:10, esben@geanix.com wrote:
+> >> Conor Dooley <conor@kernel.org> writes:
+> >>=20
+> >>> On Wed, Jan 24, 2024 at 03:33:06PM +0100, Esben Haabendal wrote:
+> >>>> Time Based Scheduling can be enabled per TX queue, if supported by t=
+he
+> >>>> controller.
+> >>>
+> >>> If time based scheduling is not supported by the controller, then the
+> >>> property should not be present! The presence of a property like this
+> >>> should mean that the feature is supported, using it is up to the
+> >>> operating system.
+> >>>
+> >>> That said, why is this a property that should be in DT?
+> >>=20
+> >> It is added to the tx-queues-config object of snps,dwmac bindings. This
+> >> entire object is about configuration of the ethernet controller, which
+> >> is also what the purpose of the snps,time-based-scheduling.
+> >> So yes, it is not specifically about describing what the hardware is
+> >> capable of, but how the hardware is configured. It is a continuation of
+> >> the current driver design.
+> >>=20
+> >>> If support is per controller is it not sufficient to use the
+> >>> compatible to determine if this is supported?
+> >>=20
+> >> Are you suggesting to include the mapping from all supported compatible
+> >> controllers to which TX queues supports TBS in the driver code?  What
+> >> would the benefit of that compared to describing it explicitly in the
+> >> binding?
+> >
+> > The benefit is complying with DT bindings rules, saying that bindings
+> > describe hardware pieces, not drivers.
+>=20
+> Understood.
+>=20
+> >> And for the purpose of the above question, I am talking about it as if
+> >> the binding was describing the hardware capability and not the
+> >> configuration.
+> >
+> > "if"? You wrote it is for driver design...
+>=20
+> If you look at the current driver, all the devicetree bindings under
+> rx-queues-config and tx-queues-config are violating the DT binding
+> rules.
+> Cleaning up that requires quite some work and I guess will break
+> backwards compatibility to some extend.
 
+Let bygones be bygones. If something undesirable got in previously,
+breaking backwards compatibility there is not justified IMO.
+
+--AsbEPBmbmpQjmWgj
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZbKXDwAKCRB4tDGHoIJi
+0mZmAP9R7uQLuENcaLcze3yAlLCBg7nWplWJaCgWwS4IRXlV9gEAjX3MUDAdIDcP
+ALEQkpPnRg6hiT9y1JmMSKxla8Uclwg=
+=Q2qx
+-----END PGP SIGNATURE-----
+
+--AsbEPBmbmpQjmWgj--
 
