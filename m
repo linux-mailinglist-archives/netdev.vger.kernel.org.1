@@ -1,102 +1,76 @@
-Return-Path: <netdev+bounces-65751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6336683B8EF
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 06:10:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A67B283B8F6
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 06:14:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C0D7286803
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 05:10:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 13F1EB2145B
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 05:14:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71ADF79F6;
-	Thu, 25 Jan 2024 05:10:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 729DA79F9;
+	Thu, 25 Jan 2024 05:14:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fvGKlbKi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GEgYy0Fe"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AD948826;
-	Thu, 25 Jan 2024 05:10:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46CCC10971;
+	Thu, 25 Jan 2024 05:14:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706159427; cv=none; b=p1uXLYxsSLCRJJk9CDNPnS4hOjVVeMUXjjk4tHghmIKMtcaDqPXOlarIFnkbo2as0Anf1XjAc2PseFd+HN7Ived4MKGlpImUTZhDnwSzCnGP3k0t6B2mII8EWPUfp1qPOzlIbKqrdlGGDHu3uvCCtXvxgTTXs4etApLKqfTmboo=
+	t=1706159681; cv=none; b=RWlAnkGFFdxzfjjAplaMkGEjNUFl00MPAzAM+b4LUTuaRbkczPXx4GrHJgDWRMFF43F9NB9h2AfQbhOz7JIM2+Nn3Sz6eBF7ooJy9s6WbWuJ6zsIK7XnoDRgyqxaNAXeJqZq36AbjS/jz+6AgpuSDvi2R7eFc9QXwV46WodQoXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706159427; c=relaxed/simple;
-	bh=QC0301SrHzJHW9DYLg53H0SRvTyQVG4kPx+tfSccbSg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Nn+DIN3ShMuSVvCLCxQVxwuhdgqtoSP61rCVGWdpeqVbz8u/rN0EMCATrV9Q/T451JfzWK2VLJaErlmWHRnqMcYn9vC+yMhEkHGjSY6+zEf6TLxOzulc6ziQfvlWQvnRY8ehJXvnvHFQh+T0hH7QcwVNXN9YRPchwL9w1++9z/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fvGKlbKi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A6F67C43394;
-	Thu, 25 Jan 2024 05:10:26 +0000 (UTC)
+	s=arc-20240116; t=1706159681; c=relaxed/simple;
+	bh=Yn70t2s1fUq9MYJq0J8Q39cfckyZ4xFAxacYTMcniwU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=D6msOmbp1qfj38fNXWm2+sfGe82VEuT2UR7I5JiBDQoW6Fz3lWRvHVE3NgXJMBXj2oE/jgD9j/5ycZDyBHMDYISO3LBzLrYMDO376HkeQttdUxRIxbNDfJbfV5FqaoEW7TI3ERaSTSlyZfO3O1tRfKFtF/YpDxzk+sj9uJk8ENs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GEgYy0Fe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EAF8C433F1;
+	Thu, 25 Jan 2024 05:14:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706159426;
-	bh=QC0301SrHzJHW9DYLg53H0SRvTyQVG4kPx+tfSccbSg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fvGKlbKiyg/FMD5GZu6CON467TGlU4YfeNcohtxx8tM90qWYiBwBZElpQT1AR1azq
-	 /0bI/FFoSVqkBce6+Oz5EdDJSm5iCn/jc1H40t4AgZ5aBTBEZHCn5t4NvI8dBdD7Oj
-	 m7iwltY+vmQ6GQ3N5wJZxNyjioYkhr4gW+wq4pzk+iW2zJuzYEdIe5sR4OYLlVy2fh
-	 QBxevNvTuqfg8tUB2HtrwoAtSpKjFR1njYsehbPfD9zwh5pbXQC5Juj3qb57X/DA1B
-	 dvayIZJh436OJYPpZzESilCkX+FEbiV1mtEHh+aA8/rqDKcUdcWCZjULClx+9GJsRz
-	 l+ph35EsZbbzA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8FB83DFF767;
-	Thu, 25 Jan 2024 05:10:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1706159680;
+	bh=Yn70t2s1fUq9MYJq0J8Q39cfckyZ4xFAxacYTMcniwU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=GEgYy0Fehn+BGRy8yMjXTDWbG3IdSKwBi9k0vp90tA1984LZGhKm6zPLr/ONO13rj
+	 Jx2S9EYpDQp6gwQXDiQ8CJzovqHExsJRFaNX4jnE94bwMs0T6lHWY2bl6Gtbjbc/MB
+	 Jt0A8zFNruT0E1T/CvodWcnnSAw5Ml8jTthT8+9fojq2y8otF1vf8HYlwqBFq2ogYE
+	 SKwGwWpBK0HOwJ/pV2pOjTyEBP8VDrQU3AMkZHB/zD+dKuv8lkEGZhFD/FDpVLI1rk
+	 g0g+ZljOAVQhU9T7Na4r/DqWsPn7kwwVY3m0zxKCAC9cTRGDq/EJlHsJMSeDUn9vzK
+	 AxldPiu2xcF5Q==
+Date: Wed, 24 Jan 2024 21:14:39 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Matthew Wood <thepacketgeek@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, leitao@debian.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v1 2/8] net: netconsole: move netconsole_target
+ config_item to config_group
+Message-ID: <20240124211439.16db3c7b@kernel.org>
+In-Reply-To: <20240124174711.1906102-3-thepacketgeek@gmail.com>
+References: <20240124174711.1906102-1-thepacketgeek@gmail.com>
+	<20240124174711.1906102-3-thepacketgeek@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/6] netfilter: nf_tables: cleanup documentation
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170615942658.29950.2948954213736733610.git-patchwork-notify@kernel.org>
-Date: Thu, 25 Jan 2024 05:10:26 +0000
-References: <20240124191248.75463-2-pablo@netfilter.org>
-In-Reply-To: <20240124191248.75463-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, fw@strlen.de
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Wed, 24 Jan 2024 09:47:00 -0800 Matthew Wood wrote:
+>  #ifdef	CONFIG_NETCONSOLE_DYNAMIC
+> -	struct config_item	item;
+> +	struct config_group	group;
 
-This series was applied to netdev/net.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
+drivers/net/netconsole.c:111: warning: Function parameter or struct member 'group' not described in 'netconsole_target'
+drivers/net/netconsole.c:111: warning: Excess struct member 'item' description in 'netconsole_target'
 
-On Wed, 24 Jan 2024 20:12:43 +0100 you wrote:
-> From: George Guo <guodongtai@kylinos.cn>
-> 
-> - Correct comments for nlpid, family, udlen and udata in struct nft_table,
->   and afinfo is no longer a member of enum nft_set_class.
-> 
-> - Add comment for data in struct nft_set_elem.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,1/6] netfilter: nf_tables: cleanup documentation
-    https://git.kernel.org/netdev/net/c/b253d87fd78b
-  - [net,2/6] netfilter: nft_chain_filter: handle NETDEV_UNREGISTER for inet/ingress basechain
-    https://git.kernel.org/netdev/net/c/01acb2e8666a
-  - [net,3/6] netfilter: nft_limit: reject configurations that cause integer overflow
-    https://git.kernel.org/netdev/net/c/c9d9eb9c53d3
-  - [net,4/6] netfilter: nf_tables: restrict anonymous set and map names to 16 bytes
-    https://git.kernel.org/netdev/net/c/b462579b2b86
-  - [net,5/6] netfilter: nf_tables: reject QUEUE/DROP verdict parameters
-    https://git.kernel.org/netdev/net/c/f342de4e2f33
-  - [net,6/6] netfilter: nf_tables: validate NFPROTO_* family
-    https://git.kernel.org/netdev/net/c/d0009effa886
-
-You are awesome, thank you!
+kdoc needs fixing?
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
