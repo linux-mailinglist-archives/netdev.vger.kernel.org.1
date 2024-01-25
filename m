@@ -1,195 +1,162 @@
-Return-Path: <netdev+bounces-65858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4379B83C117
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 12:40:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F188A83C11B
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 12:40:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 697181C24046
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 11:40:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FFD71F2670D
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 11:40:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 727FC4F8B0;
-	Thu, 25 Jan 2024 11:36:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C2102C699;
+	Thu, 25 Jan 2024 11:38:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PSqj+YfC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aRPsuEp/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C404A5731D;
-	Thu, 25 Jan 2024 11:36:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69EB7249EF
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 11:38:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706182614; cv=none; b=uL+vNXcJYbPyx26PUxc/enJgqIXNqXBv9DVyhcK3gIxghRVbnz8q9ZHdVbpA0a/9pGbcZGrnQr3OK7mp0sjUpqihYgF5qrDW/UUITydS2KTXAw6l374IlVnTwSFHrGbfbMW2kH/OZie9RYSZ+e5XkDrj7NVTJE/E1I+W4XmywmY=
+	t=1706182713; cv=none; b=HDD3pY2XnIWflK903UVkPiCfeOdpWYj67ufyNYSwDfi9LeSYbDtfDYpstL8pHVxx0lbuiogsVy5F2w/IDxW8vVfqw51mjzClWu8iE9uDbvketVSv/9BkVix29R7ce2tws5ZrfHl87D2TDYKgDxlANpxp2qKa2eB4QrNYgJzWrrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706182614; c=relaxed/simple;
-	bh=9OP2AYCXD7CTzXDDBNhR6z28ox5cvhSWUThScGzrt+w=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bog0JRlwdCPUSVbuAXDdv39qB2Zu0Kc7gudh39RlLYC3h04vYNGGH7Ft8bAPobjNStoMmtMYWlkAw5EfhSEioESQCjyjjkp/kg+xun7iqFtdH/vcy8ojGsdwad/nRr06DhYNxAe0H/oFQDb7FMLoK1lXW2PY+pUozWFyvDOvI3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PSqj+YfC; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-40ea5653f6bso68137195e9.3;
-        Thu, 25 Jan 2024 03:36:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706182610; x=1706787410; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=DYXWEmKQIsLe7nv5ynnIoPrTMyRKUKUjaFaattLgh4Y=;
-        b=PSqj+YfC4dKUf3TITfNWqC9Y/OljlkLJ+hVYL0FhM/Dcot19NQxX5Bl20+5m+CbCZr
-         pkehB2n3JmKF1Orw3gmWgclhwkbtAP32k5jqNSZZR6LQzKHO+RzG2oij1r4OI9pilDge
-         3/A+HSO85uK/vA5IFoLokw6mDrRwoRZx8yeRheNPugJ2i9cKQ74vxLMQP1kyK7wnk3Zi
-         Aw3l1Ra0SMuAm09HX7g8FMpG57Wz4vuzU9g7MMQJ+tnajXF6loO0k/S72c3DwJSHRYxh
-         geu3YQVrUTWQ5ACxTXHsnpFhEORbR/uU+jkDboj1ZHfDf/HrSLMsla3QJXxatpEyoCYY
-         iBqA==
+	s=arc-20240116; t=1706182713; c=relaxed/simple;
+	bh=drA+12YZq+Mq5k6GI7zl2FZfOMAsg0hH/VF9nCe4F6g=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=mUwMS1YD2eb6PoEWX47ZJInRdGjTCL3gdXy2pfS4c+mhdCW8UvwRQP3Y6WhD9YWTSx3TgpAP+O2/f4T82OnPWhRnodBsXU3d014b1GG4jIZqE7WrTxom8bIHLS/Qz+eRJRhvVUIpogUh8QzN35A7LTND8KfT2J2f1O/8P7t3SIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aRPsuEp/; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706182711;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=FlztVln5G2ZA6SW7QM94JaPv1tWGirGxChPs5cJk/fY=;
+	b=aRPsuEp/ISV1csfFXj2c1ivG+3pNA7XtqvaTeuLiNdq1ZV1EeifyDRHaR62G1twy0zJ4Zb
+	n4EiLlaw/gwo+jC3TBO6UWw9IBVGE0fWU6qifshGNgflzUQljDYrRu8SA6+y7WGYHpXNGk
+	hpLwD6diYlMc+5Zw2eu1f4oOsT+QzEU=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-596-EycT1UkGPjKQijXY0_IACA-1; Thu, 25 Jan 2024 06:38:29 -0500
+X-MC-Unique: EycT1UkGPjKQijXY0_IACA-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40e476c518eso14248565e9.0
+        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 03:38:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706182610; x=1706787410;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DYXWEmKQIsLe7nv5ynnIoPrTMyRKUKUjaFaattLgh4Y=;
-        b=Qqyfdg3L0749d8eo4FDiphObPWzp4qLABYAKRu25lmiTfi4N+A+z+HJXmSgQr11n5C
-         82Opv8eDtwOP7wCwXKtt6Y5XP3G9LLw1oqTxmNlwic7gA7uC2InwLJuaCcVn5XV1WCoD
-         X+5HYW4z4YYlik5/EVvof2bGk/f0kFPrYxzxKZ9TSHEdGtTALzSgt0lo4BEANaTgor+O
-         HNlH+Anpr0LHNRw17cPIVQrKuXkdnLuNacHFQOJyx22wVUY7O0pvqay/Vy+7yBHzrnBV
-         HF/h2sMX65LFgyBo8WToVLvO+Y9KKs2eevvz1jtP2L+ToaWxAlA/r2m48+gquvrjDbRG
-         z9Gw==
-X-Gm-Message-State: AOJu0YxEpIzX1bWFJU6caXg8FfRuo/Nw8R79LSsdyOSYk1ZNhh0DX+0F
-	vjHdFQgn38AwKs+hyCHRTo3Y84hVvAj2BPX1pLtIUiofILhmFb+6
-X-Google-Smtp-Source: AGHT+IH+/n86D85sKsgvGlpJ6zoWcRtr5Zg1ujyeXp+NnFo+8QR08EJvB11lYtfkWyctEvjXABh0bg==
-X-Received: by 2002:a05:600c:6a90:b0:40e:5aa4:44f8 with SMTP id jl16-20020a05600c6a9000b0040e5aa444f8mr405862wmb.216.1706182609563;
-        Thu, 25 Jan 2024 03:36:49 -0800 (PST)
-Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id bl1-20020adfe241000000b0033935779a23sm10153265wrb.89.2024.01.25.03.36.48
+        d=1e100.net; s=20230601; t=1706182709; x=1706787509;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FlztVln5G2ZA6SW7QM94JaPv1tWGirGxChPs5cJk/fY=;
+        b=VUxm3SpFxKKjom4yyuQvdLR2FfiDumQs10M/AuT+WEKdtgclHVibeGtL2FmPIgmpnL
+         cCQVw5demChz5CbeKeHcKJxYWo8ncxerJr34HHwt5pSv1Hb57WnwlyDGKgMareJ8ME1l
+         T+lh9ow2Z0rBx8nzcdNK3CGzKHzVI3JaJgzdWKDsBp8jQgH1px+kU/HIx7MXtKP7e00W
+         jbw2X0pxMMnKFIJq6hWUmirhkIsSfL9opiNvBMD04nVOhCNmyuoxfSND3zpwvwh0mYlN
+         nmpTMFrwohwvU8Yfp9A/g4+tpay340N//e9RbbC0ueaXt786HXMR9ucq1/HlkxihJW52
+         aAVQ==
+X-Gm-Message-State: AOJu0YxxmFLQHi6GsR0/hLE3MqNWYQAYO23VcAdbBkjC/4vYwNox8i4A
+	Od9aG9KIgtre6+r1WKMAPEQWbyuf7+gsILHaufhxnOjDwBEy1XFV9MIkZPWlx5Svdfe+8W7jjro
+	2+ARu93zf6ERzO8iv8lsQNAGaEF13sMoJjxoKzhKfsrX9JFAM8PZAjw==
+X-Received: by 2002:a05:600c:3b24:b0:40e:8e43:4995 with SMTP id m36-20020a05600c3b2400b0040e8e434995mr1007101wms.0.1706182708742;
+        Thu, 25 Jan 2024 03:38:28 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFKN6At1vwCXC1PPYJPkSEfsNDLNk+lchULgOmczO3Z3bmzgp6eXnNNa1dWFzhWrG0jTw+gEw==
+X-Received: by 2002:a05:600c:3b24:b0:40e:8e43:4995 with SMTP id m36-20020a05600c3b2400b0040e8e434995mr1007089wms.0.1706182708366;
+        Thu, 25 Jan 2024 03:38:28 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-244-75.dyn.eolo.it. [146.241.244.75])
+        by smtp.gmail.com with ESMTPSA id v3-20020a05600c444300b0040ebfbff33csm2311266wmn.36.2024.01.25.03.38.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jan 2024 03:36:49 -0800 (PST)
-Message-ID: <65b247d1.df0a0220.12334.efd9@mx.google.com>
-X-Google-Original-Message-ID: <ZbJHzSCj8oGm-OJ3@Ansuel-xps.>
-Date: Thu, 25 Jan 2024 12:36:45 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Jie Luo <quic_luoj@quicinc.com>
-Cc: Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Robert Marko <robert.marko@sartura.hr>,
-	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>
-Subject: Re: [net-next PATCH 0/3] net: mdio-ipq4019: fix wrong default MDC
- rate
-References: <20240124213640.7582-1-ansuelsmth@gmail.com>
- <53445feb-a02c-4859-a993-ccf957208115@quicinc.com>
+        Thu, 25 Jan 2024 03:38:27 -0800 (PST)
+Message-ID: <ecf42dd37e90fec22edd16f64b55189a24147b21.camel@redhat.com>
+Subject: Re: [PATCH net] selftests: net: add missing required classifier
+From: Paolo Abeni <pabeni@redhat.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Jakub
+ Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>, Maciej
+ enczykowski <maze@google.com>,  Lina Wang <lina.wang@mediatek.com>,
+ linux-kselftest@vger.kernel.org
+Date: Thu, 25 Jan 2024 12:38:26 +0100
+In-Reply-To: <CANn89iKqShowy=xMi2KwthYB6gz9X5n9kcqwh_5-JBJ3-jnK+g@mail.gmail.com>
+References: 
+	<7c3643763b331e9a400e1874fe089193c99a1c3f.1706170897.git.pabeni@redhat.com>
+	 <CANn89iKqShowy=xMi2KwthYB6gz9X5n9kcqwh_5-JBJ3-jnK+g@mail.gmail.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <53445feb-a02c-4859-a993-ccf957208115@quicinc.com>
 
-On Thu, Jan 25, 2024 at 01:57:20PM +0800, Jie Luo wrote:
-> 
-> 
-> On 1/25/2024 5:36 AM, Christian Marangi wrote:
-> > This was a long journey to arrive and discover this problem.
-> > 
-> > To not waste too much char, there is a race problem with PHY and driver
-> > probe. This was observed with Aquantia PHY firmware loading.
-> > 
-> > With some hacks the race problem was workarounded but an interesting
-> > thing was notice. It took more than a minute for the firmware to load
-> > via MDIO.
-> > 
-> > This was strange as the same operation was done by UBoot in at max 5
-> > second and the same data was loaded.
-> > 
-> > A similar problem was observed on a mtk board that also had an
-> > Aquantia PHY where the load was very slow. It was notice that the cause
-> > was the MDIO bus running at a very low speed and the firmware
-> > was missing a property (present in mtk sdk) that set the right frequency
-> > to the MDIO bus.
-> > 
-> > It was fun to find that THE VERY SAME PROBLEM is present on IPQ in a
-> > different form. The MDIO apply internally a division to the feed clock
-> > resulting in the bus running at 390KHz instead of 6.25Mhz.
-> > 
-> > Searching around the web for some documentation and some include and
-> > analyzing the uboot codeflow resulted in the divider being set wrongly
-> > at /256 instead of /16 as the value was actually never set.
-> > Applying the value restore the original load time for the Aquantia PHY.
-> > 
-> > This series mainly handle this by adding support for the "clock-frequency"
-> > property.
-> > 
-> > Christian Marangi (3):
-> >    dt-bindings: net: ipq4019-mdio: document now supported clock-frequency
-> >    net: mdio: ipq4019: add support for clock-frequency property
-> >    arm64: dts: qcom: ipq8074: add clock-frequency to MDIO node
-> > 
-> >   .../bindings/net/qcom,ipq4019-mdio.yaml       | 10 +++
-> >   arch/arm64/boot/dts/qcom/ipq8074.dtsi         |  2 +
-> >   drivers/net/mdio/mdio-ipq4019.c               | 68 +++++++++++++++++--
-> >   3 files changed, 75 insertions(+), 5 deletions(-)
-> > 
-> 
-> Hi Christian,
-> Just a gentle reminder.
->
+On Thu, 2024-01-25 at 09:48 +0100, Eric Dumazet wrote:
+> On Thu, Jan 25, 2024 at 9:23=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> w=
+rote:
+> >=20
+> > the udpgro_fraglist self-test uses the BPF classifiers, but the
+> > current net self-test configuration does not include it, causing
+> > CI failures:
+> >=20
+> >  # selftests: net: udpgro_frglist.sh
+> >  # ipv6
+> >  # tcp - over veth touching data
+> >  # -l 4 -6 -D 2001:db8::1 -t rx -4 -t
+> >  # Error: TC classifier not found.
+> >  # We have an error talking to the kernel
+> >  # Error: TC classifier not found.
+> >  # We have an error talking to the kernel
+> >=20
+> > Add the missing knob.
+> >=20
+> > Fixes: edae34a3ed92 ("selftests net: add UDP GRO fraglist + bpf self-te=
+sts")
+> > Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+>=20
+> FYI, while looking at the gro test, I found that using strace was
+> making it failing as well.
 
-Hi Jie,
-hope you can understand my reason.
+It looks like the gro.sh (large) tests send the to-be-aggregate
+segments individually and relay on the gro flush timeout being large
+enough to fit all the relevant write operations. I suspect/hope
+something alike:
 
-> The MDIO frequency config is already added by the following patch series.
-> https://lore.kernel.org/netdev/28c8b31c-8dcb-4a19-9084-22c77a74b9a1@linaro.org/T/#m840cb8d269dca133c3ad3da3d112c63382ec2058
-> 
+---
+diff --git a/tools/testing/selftests/net/setup_veth.sh b/tools/testing/self=
+tests/net/setup_veth.sh
+index a9a1759e035c..1f78a87f6f37 100644
+--- a/tools/testing/selftests/net/setup_veth.sh
++++ b/tools/testing/selftests/net/setup_veth.sh
+@@ -11,7 +11,7 @@ setup_veth_ns() {
+        local -r ns_mac=3D"$4"
+=20
+        [[ -e /var/run/netns/"${ns_name}" ]] || ip netns add "${ns_name}"
+-       echo 100000 > "/sys/class/net/${ns_dev}/gro_flush_timeout"
++       echo 1000000 > "/sys/class/net/${ns_dev}/gro_flush_timeout"
+        ip link set dev "${ns_dev}" netns "${ns_name}" mtu 65535
+        ip -netns "${ns_name}" link set dev "${ns_dev}" up
+---=20
+should solve the sporadic issues.
 
-Wasn't aware of this, as I said in the cover letter this all comes by a
-problem we notice in the Aquantia firmware load that was slow as hell
-and we just notice the misconfiguration of the divisor.
+> Not sure about this one...
 
-The feature in this series is really a simple one and almost ready (I
-already have v2 ready for the request from Andrew to follow 802.3 spec)
-and we really need it ASAP as we are trying to move our ipq807x targets to
-upstream driver and finally start using the integrated firmware loading
-for Aquantia PHY.
+All the udpgro* test should write a single UDP GSO packet and let the
+veth segmenting it, hopefully slowing down either ends should not
+impact them - but I did not check yet!
 
-Also I can see some fundamental difference between the 2 patch, mainly
-in how the value is applied and setting a sane divisor by default
-instead of using 0xff. (probably Andrew would have pointed out the same
-thing in some later revision to your series)
+Perhaps even the gro.sh tests could be modified alike?
 
-Looking at the linked series I notice there are still some thing to
-polish and to clarify with DT and driver and I think it's only
-beneficial if this feature is worked separately as it's not only needed
-for ipq50xx but affects every user of this (ipq40xx, ipq807x, ipq60xx)
-and it would be a pitty to wait the entire ipq50xx series to be handled
-just to fix a long lasting misconfiguration on various SoC family.
+Cheers,
 
-Hope you can understand these reasons, it's all for the sake of making
-this driver more mature quicker.
+Paolo
 
-> This MDIO patch series will be updated to just keep the MDIO frequency
-> patch and DT document for this MDIO frequency property added.
-> 
-> For CMN PLL config will be moved to the CMN PLL clock driver and the UNIPHY
-> clock config will be moved the uniphy driver as suggested by
-> Sergey's suggestions.
-> 
-> Thanks.
-> 
-> 
-
--- 
-	Ansuel
 
