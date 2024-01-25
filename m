@@ -1,116 +1,309 @@
-Return-Path: <netdev+bounces-65896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95C2983C3E0
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 14:41:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D81183C40E
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 14:48:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D2EC292A44
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 13:41:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD79B1F267C1
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 13:48:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D46B55E5A;
-	Thu, 25 Jan 2024 13:41:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAD055A7BA;
+	Thu, 25 Jan 2024 13:48:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kzjw6Rev"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 802B94503F;
-	Thu, 25 Jan 2024 13:41:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E33F95A7B0;
+	Thu, 25 Jan 2024 13:48:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706190076; cv=none; b=hdAzTqlzQOefus8LhoPFJ90IOD/ajLc7dPHiK2tPxKeoQkKaDYTsDPhubdD/1D/8n+HlwOy021j9P+xssiUTxIebVVe88nO96ozlQt50tcGLwEFRMPA0LjvhK5V1ON1NQamINJFFwQx2N6o0Udk5VHpWvWavyHYWRQb6ZRIU1Lc=
+	t=1706190511; cv=none; b=KBmDY5rOOiDG8INW5kKXB3LczAAMRSOM+WPBGuCHIphdazrQY2t6VkbtWj7JU6SdkzqqE6rOP7X/z5PDNn9lKRLBJvW/coAp5wCJkfBnwSOtuOlYDr0T/bwf8Mb1Y31NlzdXqBQ8NQtk0SwC/mGoRDpIOOrejPf5LVBpQzLMlxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706190076; c=relaxed/simple;
-	bh=s7thh3IrEnKt/va13x2HmHZo7BtbjpTbPqnPXSHPl2Y=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NYmXzRRLO8D5UFcZu3pHOU9ILoHHw8k55rcikKfryA0ITHaXVaEFyhPVw4E7tjgSGI6wEEsIDaTDPeR49j0uiy/sTwHj+4bObupZzkMR1s1IxxfJAnnoq7n+381Pt8s81v0qpVpHoArl43RJwFl+whdLF1mdkuHVtwdyRc/vjIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1706190511; c=relaxed/simple;
+	bh=fgmTorFLFaU0VMBi44NDyz2rYmY8pepueD0f5QnMAyg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UYvCHpPWEB8obN5SceLIAnL64xiQJ+t1oF3IJDVuEMw/31OVHqPKNSqcwvr/5sOcZaW12UnQzYjGtCSJtdpJckqmfB4oNcvKtf3ow7JUsE1CaMDW+KrTkTCi59S38AHW2XifRqaRS450wwGwsmHmy0afdU4O6UXFm5R2OBXurRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kzjw6Rev; arc=none smtp.client-ip=209.85.208.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a3150c9568bso162729366b.1;
-        Thu, 25 Jan 2024 05:41:14 -0800 (PST)
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2cdfa8e69b5so73567381fa.0;
+        Thu, 25 Jan 2024 05:48:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706190508; x=1706795308; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/C2tExOyKm07kGJJDKhOXfKEbEgJDFItKOdJX+74LMA=;
+        b=Kzjw6RevN5dUcYclWX1VyiBLMu3IldWtdTTteYinMzl6mZfofoAZtKoqciz5+w1nUE
+         TPBCb38m8gxkqkoxKlfsVFpXpQMs4+w/9AO6VlYyQvv3Eiig9JeOC9MAAr7RN351CcsD
+         x03X0zJx3194JcAL5LwbA9VoRHUxVasiT3UjEkyv/AFRSn3aa87DIYM73ykzcZSoosT/
+         94/n9/6SyYPYRUZRxIW3EtPt8SULKDCepZH27NKHblZzTUpQDFEXdmXTRf0dAKZKpXah
+         3AYbq/Dv9h4khH565cOvKwqj1wnKecEp1vmDHRqkYutTU0S0iyyezHX1nAkFxcbd8AZ1
+         MFrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706190072; x=1706794872;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xIHT2FEEOX1ZJah2HSsYQgk3eFyVlJ0iWR+awgo71w8=;
-        b=d+kyXPbLJWlwEKLPXUsC9qrziYp8r8J9gbr5sRhWIwAkDjcCh68OjtoGsxxq2KbUn0
-         J5zRCYkEdNQDlcdesq/4nDCmcDqpyVA99EJSUGdxkOjsMqAr9Yx4EzTGdfXUF+0YXZ2T
-         wcEtK7psgiS2QHIHRGjP6p/FGU52nUgnaSu9sQd96esbhoaBQP2uDG62QAo0vwUzzDGy
-         In7f7KuoQyPt0OR0FhuiAEDXDFcTWwacecaplP6qaiD+bfoWrhmc5uuevPOkf6g0ZGSy
-         mopC7bjvOjEi1OKGNx9iqviXLsJnhzY7zr9HOogTCGazBFjF7tMnkpyZUSF3z+WTBr7s
-         DWcQ==
-X-Gm-Message-State: AOJu0YyHhizM6iBVZEitfyIBtstWiIaECLS/fbz4LYKBgaj5G3++szJe
-	bzWVKWSQmciovMrBoJd+Tj9MbnI2XOV3G2qSUAaM976flCa4CUa4
-X-Google-Smtp-Source: AGHT+IFrrc6UlUqnrfe72DtQ5Nit/8WYSmUDgAp71S3LZyV5+TdHGbJ/kzhuo5notPN5hL/jCgl51A==
-X-Received: by 2002:a17:906:b78c:b0:a2e:81d4:524e with SMTP id dt12-20020a170906b78c00b00a2e81d4524emr396447ejb.12.1706190072282;
-        Thu, 25 Jan 2024 05:41:12 -0800 (PST)
-Received: from localhost (fwdproxy-cln-012.fbsv.net. [2a03:2880:31ff:c::face:b00c])
-        by smtp.gmail.com with ESMTPSA id hu22-20020a170907a09600b00a318b8650bbsm471832ejc.9.2024.01.25.05.41.11
+        d=1e100.net; s=20230601; t=1706190508; x=1706795308;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/C2tExOyKm07kGJJDKhOXfKEbEgJDFItKOdJX+74LMA=;
+        b=ird9LpNqUA8GnkMwNabuLr3J6DCQMzbp67QKJO5dG4WBaqofpIzSgPzGcbAZzYYibT
+         /dNi5822K4v7j2HjFcs1dBX/UT1Dmft5bLcJYnCXjXPe9gRDIemmSHrsy2jIMZkT9cr3
+         0QjN1+LiwyXKLs5ue+Z2Bm/PQ5ifNfcAbqgGbvF2DY0UEwaS9lsXaFzLCcIqXAnNCR1E
+         No2B0JCJqv1gEyVOLedK6IwXPN58OxRuQndR1JdVUxbMbvaI9GuvLpnoCVQD+pbRFaNj
+         LOCnbelpTwAiSrpFkAqJIAfbSpu4SjMJSVCUb0bB45K6YE8N1ZMPMtCWLoRqwrqIb2fX
+         Nwxg==
+X-Gm-Message-State: AOJu0YwfdmD55qMCX/fLPupNb+pocXAKJW/agxK3eM9uUlDy4sFdLKSH
+	9vAXonYSroMap4jWGgOWOAqlpB5kYdIDtdqZHJG3xBpDkOoR477E
+X-Google-Smtp-Source: AGHT+IHiKoinOLqsPFox/XY+nniYFc50yjL1JfNhRaridaHruwwCIAJaoSJCYedVpj7jYE5TdKINVg==
+X-Received: by 2002:a19:5f58:0:b0:510:ec4:4ee4 with SMTP id a24-20020a195f58000000b005100ec44ee4mr314091lfj.152.1706190507526;
+        Thu, 25 Jan 2024 05:48:27 -0800 (PST)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id b5-20020ac247e5000000b005100cfedda5sm571015lfp.61.2024.01.25.05.48.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jan 2024 05:41:11 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-To: pavan.chebbi@broadcom.com,
-	Michael Chan <michael.chan@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>
-Cc: gospo@broadcom.com,
-	netdev@vger.kernel.org (open list:BROADCOM BNXT_EN 50 GIGABIT ETHERNET DRIVER),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net] bnxt_en: Make PTP timestamp HWRM more silent
-Date: Thu, 25 Jan 2024 05:41:03 -0800
-Message-Id: <20240125134104.2045573-1-leitao@debian.org>
-X-Mailer: git-send-email 2.34.1
+        Thu, 25 Jan 2024 05:48:27 -0800 (PST)
+Date: Thu, 25 Jan 2024 16:48:23 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Furong Xu <0x1207@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Joao Pinto <jpinto@synopsys.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, xfr@outlook.com, rock.xu@nio.com
+Subject: Re: [PATCH net] net: stmmac: xgmac: fix safety error descriptions
+Message-ID: <4coefc2fqtc2eoereds3rf7vudci5l7ahme2wydocjepk2wrwy@ncgwl3j3koyu>
+References: <20240123085037.939471-1-0x1207@gmail.com>
+ <ii3muj3nmhuo6s5hm3g7wuiubtyzr632klrcesubtuaoyifogb@ohmunpxvdtsv>
+ <20240125103454.0000312a@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240125103454.0000312a@gmail.com>
 
-commit 056bce63c469 ("bnxt_en: Make PTP TX timestamp HWRM query silent")
-changed a netdev_err() to netdev_WARN_ONCE().
+On Thu, Jan 25, 2024 at 10:34:54AM +0800, Furong Xu wrote:
+> On Wed, 24 Jan 2024 17:25:27 +0300
+> Serge Semin <fancer.lancer@gmail.com> wrote:
+> 
+> > On Tue, Jan 23, 2024 at 04:50:37PM +0800, Furong Xu wrote:
+> > > Commit 56e58d6c8a56 ("net: stmmac: Implement Safety Features in
+> > > XGMAC core") prints safety error descriptions when safety error assert,
+> > > but missed some special errors, and mixed correctable errors and
+> > > uncorrectable errors together.
+> > > This patch complete the error code list and print the type of errors.  
+> > 
+> > The XGMAC ECC Safety code has likely been just copied from the DW GMAC
+> > v5 (DW QoS Eth) part. So this change is partly relevant to that code too. I
+> > can't confirm that the special errors support is relevant to the DW
+> > QoS Eth too (it likely is though), so what about splitting this patch
+> > up into two:
+> > 1. Elaborate the errors description for DW GMAC v5 and DW XGMAC.
+> > 2. Add new ECC safety errors support.
+> > ?
+> > 
+> > On the other hand if we were sure that both DW QoS Eth and XGMAC
+> > safety features implementation match the ideal solution would be to
+> > refactor out the common code into a dedicated module.
+> > 
+> > -Serge(y)
+> > 
+> 
 
-netdev_WARN_ONCE() is it generates a kernel WARNING, which is bad, for
-the following reasons:
+> Checked XGMAC Version 3.20a and DW QoS Eth Version 5.20a, the safety error
+> code definitions are not identical at all, they do have some differences,
+> about more than 20 bits of status register are different.
+> I think we should just leave them in individual implementations.
 
- * You do not a kernel warning if the firmware queries are late
- * In busy networks, timestamp query failures fairly regularly
- * A WARNING message doesn't bring much value, since the code path
-is clear.
-(This was discussed in-depth in [1])
+For some reason you answered to the last part of my comment and
+completely ignored the first part which was the main point of my
+message.
 
-Transform the netdev_WARN_ONCE() into a netdev_warn_once(), and print a
-more well-behaved message, instead of a full WARN().
+Regarding the Safety Feature support implemented in QoS Eth and XGMAC
+STMMAC modules. You were wrong in using the statement "at all". Except
+the optional events enable/disable procedure introduced in the commit
+5ac712dcdfef ("net: stmmac: enable platform specific safety
+features"), there aren't many differences: at least the errors
+handling and report are identical, MTL and DMA error flags match, even
+MTL and DMA ECC/Safety IRQ flags match. The only difference is in the
+MTL/MAC DPP (Data Parity Protection) part which can be easily factored
+out based on the device ID should we attempt to refactor the safety
+feature code. See the attached html-diff for more details of what
+match and what is different.
 
-	bnxt_en 0000:67:00.0 eth0: TS query for TX timer failed rc = fffffff5
+Anyway I am not insisting on the refactoring. That was just a
+proposal, a more preferred alternative to simultaneously patching two
+parts of the drivers looking very much alike. Such refactoring would
+improve the code maintainability. The main point of my comment was to
+extend your patch for DW QoS Eth safety feature implementation too
+since some of the changes you introduced were useful for it too, and
+in splitting the patch up since your patch added new flags support
+which was unrelated change.  Thus your patch would turned into the
+two-patches patchset like this:
+[Patch 1] would provide an elaborated errors description for both DW
+QOS Eth (GMAC v5.x) and DW XGMAC.
+[Patch 2] would introduce the new ECC safety errors support.
 
-[1] Link: https://lore.kernel.org/all/ZbDj%2FFI4EJezcfd1@gmail.com/
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+See my further comments about the respective changes.
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-index adad188e38b8..cc07660330f5 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
-@@ -684,7 +684,7 @@ static void bnxt_stamp_tx_skb(struct bnxt *bp, struct sk_buff *skb)
- 		timestamp.hwtstamp = ns_to_ktime(ns);
- 		skb_tstamp_tx(ptp->tx_skb, &timestamp);
- 	} else {
--		netdev_WARN_ONCE(bp->dev,
-+		netdev_warn_once(bp->dev,
- 				 "TS query for TX timer failed rc = %x\n", rc);
- 	}
- 
--- 
-2.34.1
+> 
+> > > 
+> > > Fixes: 56e58d6c8a56 ("net: stmmac: Implement Safety Features in XGMAC core")
+> > > Signed-off-by: Furong Xu <0x1207@gmail.com>
+> > > ---
+> > >  .../ethernet/stmicro/stmmac/dwxgmac2_core.c   | 36 +++++++++----------
+> > >  1 file changed, 18 insertions(+), 18 deletions(-)
+> > > 
+> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> > > index eb48211d9b0e..ad812484059e 100644
+> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> > > @@ -748,29 +748,29 @@ static void dwxgmac3_handle_mac_err(struct net_device *ndev,
+> > >  }
+> > >  
+> > >  static const struct dwxgmac3_error_desc dwxgmac3_mtl_errors[32]= {
 
+> > > -	{ true, "TXCES", "MTL TX Memory Error" },
+> > > +	{ true, "TXCES", "MTL TX Memory Correctable Error" },
+
+Applicable for both IP-cores
+[Patch 1] +QoS, +XGMAC
+please apply this change to dwmac5.c too.
+
+> > >  	{ true, "TXAMS", "MTL TX Memory Address Mismatch Error" },
+
+> > > -	{ true, "TXUES", "MTL TX Memory Error" },
+> > > +	{ true, "TXUES", "MTL TX Memory Uncorrectable Error" },
+
+[Patch 1] +QoS, +XGMAC
+ditto
+
+> > >  	{ false, "UNKNOWN", "Unknown Error" }, /* 3 */
+
+> > > -	{ true, "RXCES", "MTL RX Memory Error" },
+> > > +	{ true, "RXCES", "MTL RX Memory Correctable Error" },
+
+[Patch 1] +QoS, +XGMAC
+ditto
+
+> > >  	{ true, "RXAMS", "MTL RX Memory Address Mismatch Error" },
+
+> > > -	{ true, "RXUES", "MTL RX Memory Error" },
+> > > +	{ true, "RXUES", "MTL RX Memory Uncorrectable Error" },
+
+[Patch 1] +QoS, +XGMAC
+ditto
+
+> > >  	{ false, "UNKNOWN", "Unknown Error" }, /* 7 */
+
+> > > -	{ true, "ECES", "MTL EST Memory Error" },
+> > > +	{ true, "ECES", "MTL EST Memory Correctable Error" },
+
+[Patch 1] +QoS, +XGMAC
+ditto
+
+> > >  	{ true, "EAMS", "MTL EST Memory Address Mismatch Error" },
+
+> > > -	{ true, "EUES", "MTL EST Memory Error" },
+> > > +	{ true, "EUES", "MTL EST Memory Uncorrectable Error" },
+
+[Patch 1] +QoS, +XGMAC
+ditto
+
+> > >  	{ false, "UNKNOWN", "Unknown Error" }, /* 11 */
+
+> > > -	{ true, "RPCES", "MTL RX Parser Memory Error" },
+> > > +	{ true, "RPCES", "MTL RX Parser Memory Correctable Error" },
+
+[Patch 1] +QoS, +XGMAC
+ditto
+
+> > >  	{ true, "RPAMS", "MTL RX Parser Memory Address Mismatch Error" },
+
+> > > -	{ true, "RPUES", "MTL RX Parser Memory Error" },
+> > > +	{ true, "RPUES", "MTL RX Parser Memory Uncorrectable Error" },
+
+[Patch 1] +QoS, +XGMAC
+ditto
+
+> > >  	{ false, "UNKNOWN", "Unknown Error" }, /* 15 */
+
+> > > -	{ false, "UNKNOWN", "Unknown Error" }, /* 16 */
+> > > -	{ false, "UNKNOWN", "Unknown Error" }, /* 17 */
+> > > -	{ false, "UNKNOWN", "Unknown Error" }, /* 18 */
+> > > +	{ true, "SCES", "MTL SGF GCL Memory Correctable Error" },
+> > > +	{ true, "SAMS", "MTL SGF GCL Memory Address Mismatch Error" },
+> > > +	{ true, "SUES", "MTL SGF GCL Memory Uncorrectable Error" },
+> > >  	{ false, "UNKNOWN", "Unknown Error" }, /* 19 */
+> > > -	{ false, "UNKNOWN", "Unknown Error" }, /* 20 */
+> > > -	{ false, "UNKNOWN", "Unknown Error" }, /* 21 */
+> > > -	{ false, "UNKNOWN", "Unknown Error" }, /* 22 */
+> > > +	{ true, "RXFCES", "MTL RXF Memory Correctable Error" },
+> > > +	{ true, "RXFAMS", "MTL RXF Memory Address Mismatch Error" },
+> > > +	{ true, "RXFUES", "MTL RXF Memory Uncorrectable Error" },
+
+This introduces the new flags support. Please move this change into a
+separate patch (Patch 2):
+[Patch 2] +XGMAC only.
+
+My DW QoS Eth v5.10a databook doesn't have these flags defined. If
+your 5.20a HW-manual have them described then please add them for DW
+QoS Eth too.
+
+> > >  	{ false, "UNKNOWN", "Unknown Error" }, /* 23 */
+> > >  	{ false, "UNKNOWN", "Unknown Error" }, /* 24 */
+> > >  	{ false, "UNKNOWN", "Unknown Error" }, /* 25 */
+> > > @@ -796,13 +796,13 @@ static void dwxgmac3_handle_mtl_err(struct net_device *ndev,
+> > >  }
+> > >  
+> > >  static const struct dwxgmac3_error_desc dwxgmac3_dma_errors[32]= {
+
+> > > -	{ true, "TCES", "DMA TSO Memory Error" },
+> > > +	{ true, "TCES", "DMA TSO Memory Correctable Error" },
+
+Applicable for both IP-cores
+[Patch 1] +QoS, +XGMAC
+please apply this change to dwmac5.c too.
+
+> > >  	{ true, "TAMS", "DMA TSO Memory Address Mismatch Error" },
+
+> > > -	{ true, "TUES", "DMA TSO Memory Error" },
+> > > +	{ true, "TUES", "DMA TSO Memory Uncorrectable Error" },
+
+[Patch 1] +QoS, +XGMAC
+ditto
+
+> > >  	{ false, "UNKNOWN", "Unknown Error" }, /* 3 */
+
+> > > -	{ true, "DCES", "DMA DCACHE Memory Error" },
+> > > +	{ true, "DCES", "DMA DCACHE Memory Correctable Error" },
+> > >  	{ true, "DAMS", "DMA DCACHE Address Mismatch Error" },
+> > > -	{ true, "DUES", "DMA DCACHE Memory Error" },
+> > > +	{ true, "DUES", "DMA DCACHE Memory Uncorrectable Error" },
+
+AFAICS applicable for XGMAC only
+[Patch 1] +XGMAC only.
+Once again, My DW QoS Eth v5.10a databook doesn't have these flags
+defined. So if your DW QoS Eth 5.20a HW-manual do have them described
+please add them for DW QoS Eth with the elaborated description in the
+framework of the Patch 2.
+
+-Serge(y)
+
+> > >  	{ false, "UNKNOWN", "Unknown Error" }, /* 7 */
+> > >  	{ false, "UNKNOWN", "Unknown Error" }, /* 8 */
+> > >  	{ false, "UNKNOWN", "Unknown Error" }, /* 9 */
+> > > -- 
+> > > 2.34.1
+> > > 
+> > >   
+> 
 
