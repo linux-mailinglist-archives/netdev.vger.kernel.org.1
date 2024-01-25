@@ -1,84 +1,59 @@
-Return-Path: <netdev+bounces-65815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94E0483BD5B
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 10:32:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A276C83BD61
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 10:32:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 485721F2E0B9
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:32:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 58BC41F2E0AE
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:32:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 661EA1C6B8;
-	Thu, 25 Jan 2024 09:29:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VRVpUuTh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A0D51BDE5;
+	Thu, 25 Jan 2024 09:29:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B018320B27;
-	Thu, 25 Jan 2024 09:29:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D268A1CD15;
+	Thu, 25 Jan 2024 09:29:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706174955; cv=none; b=bG3nL2Sj0cbSVnZ2Yh3t2MoGHx8CATt0UWMRLTxoKyet7EoPqhJ+IimjiQZIoVetZ/Jmw8ZrFg4IpqB6WAvr7ZZx+fALXxDnD+IaQ/GhNHvSF4qvoVwH2U4sPxlG1PoIcmTIrvdLIhWZNV/aPSzBe0nU2jtWGmZc5D1fD3EEuRg=
+	t=1706174991; cv=none; b=DuYIo4BrB9Evi7d2YZsVOKJRaPxFdiAvrNJPBd+ta3Kj3QSL5g8qSee2/GHlbACqM6JPM+ZR/GJqKwHdXj0qgv5wuQwv1aZTR9av3jQXtzsDSrHCt0ZyMq3Far5q6L0v2p9xwuk9hK5BqXH94VndiiCFNcvxI4I7oIF33Y/+uXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706174955; c=relaxed/simple;
-	bh=f0WH8mYyehhGdFrch/FhoI1euWmA1llvn3BltzJk/c4=;
+	s=arc-20240116; t=1706174991; c=relaxed/simple;
+	bh=8HtSjAB6qgMc15CF6i8kHSkllLp/aD5PDJeSxeq5RZ8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R3x+zxAkBTVaTjVIEYBJljnSlPwZJDz4UTvVPCpbv42EIXY1fgstRi/u6kE6O3aDMs4jGp3VhydzJo4ttUCU9LwTctGmYjO/NZghbTlfwpo1DgRGF6gjOGglfDP7FAGJ9l1J6uhAc0huSCmimZZ1TRwOjntW/5gdbgqG7A1A+AA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VRVpUuTh; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a3150c9568bso126109466b.1;
-        Thu, 25 Jan 2024 01:29:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706174952; x=1706779752; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ORIJE9f/z+ZprW7cvU+93rl1XYAcpcHTZAoKwb7UAN8=;
-        b=VRVpUuThNJrDjTYgKf6vO22YIyZi+oNs8Y/jqx0xQf96QSswiUub3hJG63p06DlX8v
-         EmvMHGvEB37jDTYF7PvQq+iikUD3QQw/DUltsUdnvu4cKBzPZ3gg6un1Lt7wvaqSegpA
-         1CXgzBHQppJQliXm7jFV6+mhH9iAITVDftAahi07l6IgrGYPNVCUcrRqXlUIp9RS7OnW
-         jcJ4GcXsxUMxJ2FhQxIv0MHQJ9g71D5HHHVo+IgsEM7+v2Pi13ctjhQbwqW8towHszzl
-         kcq0a01w+HmCucr6pgiSfXKsaj0PmOYiFRXW5A7n5nagU3hMhvTcL/VuNEC0qbY2JRq3
-         bNdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706174952; x=1706779752;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ORIJE9f/z+ZprW7cvU+93rl1XYAcpcHTZAoKwb7UAN8=;
-        b=k+OjBXCswDRZ1Izo2FcLf9TCeO5gItTmFkoWCl8phLhbnECukWFma0wsgbuhOnaMOu
-         88wNo0a0pyCPA1ZkNunXMxImx6YlWgunmQD13q5RnpzkNq56VDa7ooT/1O69NV/ti8nl
-         31XGvUq5i4E0mz6Q0oKUi6AErFgq7bN4UjG0Yf+3Q3fpYaP3qFs3JvenVziYNnaeihfE
-         aPl48C039RcrPoYR5TEKtfZiPKDXM5TvP4kXje6kQphlzMchQKWVfjuppC7v0ERbGpIy
-         II+7MkWjLexzbBBToqw0NJ5/uEW7vzUhXIpqsuyLPbqJe1YkaJOoxI08yYAnDQMJbc5l
-         Hfog==
-X-Gm-Message-State: AOJu0YxqbCz0I5nJJm3Xezv/UDhqFnp2EsrEPEXaynA934L3N+uFTeli
-	heoer0QctOz4SbOlxSt2qf0e7q0Tr3QbEfRQoKMvB5mMZmrjqOAl
-X-Google-Smtp-Source: AGHT+IExWFNGCj8bFUwy2D2zj58GEhzyTbrPM9rW1Uu9Oo1+KTW3AUkCmUyW46u3+HQvCsrrPWXfSQ==
-X-Received: by 2002:a17:907:9387:b0:a28:c8bd:fbfc with SMTP id cm7-20020a170907938700b00a28c8bdfbfcmr224236ejc.215.1706174951457;
-        Thu, 25 Jan 2024 01:29:11 -0800 (PST)
-Received: from skbuf ([188.25.255.36])
-        by smtp.gmail.com with ESMTPSA id k20-20020a17090646d400b00a30e0f7b4f3sm822210ejs.31.2024.01.25.01.29.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jan 2024 01:29:11 -0800 (PST)
-Date: Thu, 25 Jan 2024 11:29:09 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dsa: mt7530: select MEDIATEK_GE_PHY for
- NET_DSA_MT7530_MDIO
-Message-ID: <20240125092909.exaisdjkkgmc5fue@skbuf>
-References: <20240122053451.8004-1-arinc.unal@arinc9.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=VUB1hhliqS7+WkkIgYNOi+VbOszUFaSz9GBQx1IGmvmWK4ZvQhUxxHtcMjvYU9LTle5J0jtX8U9sjNG8qgeCft0sKAL6hQr74W6JsmM1abLO052cQrEVyoC/lq7g2P4KocYdBByMF9AmbISgE5VEhNx51GPacma3IZurk0xQ7s8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.41.52] (port=57586 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1rSw3K-007bw0-GV; Thu, 25 Jan 2024 10:29:44 +0100
+Date: Thu, 25 Jan 2024 10:29:41 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	David Ahern <dsahern@kernel.org>, coreteam@netfilter.org,
+	"netdev-driver-reviewers@vger.kernel.org" <netdev-driver-reviewers@vger.kernel.org>,
+	Hangbin Liu <liuhangbin@gmail.com>, netfilter-devel@vger.kernel.org
+Subject: Re: [netfilter-core] [ANN] net-next is OPEN
+Message-ID: <ZbIqBU9I009KVqZT@calendula>
+References: <20240123072010.7be8fb83@kernel.org>
+ <d0e28c67-51ad-4da1-a6df-7ebdbd45cd2b@kernel.org>
+ <65b133e83f53e_225ba129414@willemb.c.googlers.com.notmuch>
+ <20240124082255.7c8f7c55@kernel.org>
+ <20240124090123.32672a5b@kernel.org>
+ <ZbFiF2HzyWHAyH00@calendula>
+ <20240124114057.1ca95198@kernel.org>
+ <ZbFsyEfMRt8S+ef1@calendula>
+ <20240124121343.6ce76eff@kernel.org>
+ <20240124210724.2b0e08ff@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,33 +62,23 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240122053451.8004-1-arinc.unal@arinc9.com>
+In-Reply-To: <20240124210724.2b0e08ff@kernel.org>
+X-Spam-Score: -1.9 (-)
 
-On Mon, Jan 22, 2024 at 08:34:51AM +0300, Arınç ÜNAL wrote:
-> Quoting from commit 4223f8651287 ("net: dsa: mt7530: make NET_DSA_MT7530
-> select MEDIATEK_GE_PHY"):
+On Wed, Jan 24, 2024 at 09:07:24PM -0800, Jakub Kicinski wrote:
+> On Wed, 24 Jan 2024 12:13:43 -0800 Jakub Kicinski wrote:
+> > > if that is the nftables backend, it might be also that .config is
+> > > missing CONFIG_NF_TABLES and CONFIG_NFT_COMPAT there, among other
+> > > options.  
+> > 
+> > FWIW full config:
+> > 
+> > https://netdev-2.bots.linux.dev/vmksft-net-mp/results/435321/config
+> > 
+> > CONFIG_NFT_COMPAT was indeed missing! Let's see how it fares with it enabled.
 > 
-> Make MediaTek MT753x DSA driver enable MediaTek Gigabit PHYs driver to
-> properly control MT7530 and MT7531 switch PHYs.
-> 
-> A noticeable change is that the behaviour of switchport interfaces going
-> up-down-up-down is no longer there.
-> 
-> Now, the switch can be used without the PHYs but, at the moment, every
-> hardware design out there that I have seen uses them. For that, it would
-> make the most sense to force the selection of MEDIATEK_GE_PHY for the MDIO
-> interface which currently controls the MT7530 and MT7531 switches.
-> 
-> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-> ---
+> NFT_COMPAT fixed a lot! One remaining warning comes from using 
+> -m length. Which NFT config do we need for that one?
 
-I see MEDIATEK_GE_PHY only depends on NETDEVICES && PHYLIB, so it should
-have no problem being directly selected by a driver without breaking the
-build by causing unmet dependencies.
-
-I also see there is precedent with CONFIG_TXGBE selecting
-MARVELL_10G_PHY, CONFIG_R8169 selecting REALTEK_PHY, and others.
-
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+May I have a look at the logs? How does the error look like?
 
