@@ -1,252 +1,101 @@
-Return-Path: <netdev+bounces-65741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9965583B8A6
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 05:28:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6403183B8BD
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 05:46:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B970B23AAE
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 04:27:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B2AE1F2331B
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 04:46:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F39166FAE;
-	Thu, 25 Jan 2024 04:27:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 695C979C3;
+	Thu, 25 Jan 2024 04:46:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="dyPVqaQl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y7Qnn/TE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 356F479C1
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 04:27:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 351435C9A;
+	Thu, 25 Jan 2024 04:46:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706156871; cv=none; b=T2E3JI2e6/GzjCuPMguTGrOGEEieQ0UXA/xghtRCLA52EEYHZZQoWp7NVjyZwpjLtlXTcrGeMfFYk7NOUhC7lHow3jUBHqwOaEIhDmwZRQVNkGOdM76SH7Dbjj+F1XbEhZw0GZe1JqA7wMRCPcqYxg3TbG2I0LrrhP05tOFQS8E=
+	t=1706157975; cv=none; b=seJo5dJdeHWF/lXzhLU+79ApwIB56+R+dIHFErRBVFtQJvi5z/SNGD/frQgT/ZNfSnANPdUbZ8/hgHePQsc/Lu/+/YvdRC9F3nAei83pDIMij55HE6Ad+XsleskdtiLYn1NwS617okejELpqurzqUHin3vsI1yhELrph/GcnsrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706156871; c=relaxed/simple;
-	bh=lIfuTtl3aEsKWd1/M5iG6xOhbAb1ZbPoQeY3ffJT+Q8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D5E6bcPN56GPq7AybghC5eKPJ4w0nkyRjNQQiAC2eCkSJH+NmEiDPEXiDJaendxjPIS2wnotGEGuiyCWca9l7dSbNRiF/JXe2CApOvqlBGhpwWRDAi2Oye9egRpwAyPp2VjrCKN+9028YnIBgqm45kq6iDBnXTADGmV2s2IAxYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=dyPVqaQl; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6db9e52bbccso3998287b3a.3
-        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 20:27:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1706156869; x=1706761669; darn=vger.kernel.org;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MpH2KvFiU/STY59iJ6mG2mSK7bet26SLv0PAMIAM0Ao=;
-        b=dyPVqaQlUmcgNRSYSxzP1E5VmhAMzDARWg3sX4UdRDMLJZbVF5lpceW3hzAIIiv6M3
-         kChJW1UOatLQY3LoZFbA/vER6LJbvGVc4V0gPiz/dLGK3hLltLuY800UZS6fz5seb7Qy
-         Cwqp3TbngEFoyKE66aD3N5zLszD957gfsu5Vg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706156869; x=1706761669;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MpH2KvFiU/STY59iJ6mG2mSK7bet26SLv0PAMIAM0Ao=;
-        b=P1yHEkW5aCRjH+u4UUHfCvu8NmvjPDrlalDOd1OE8OC/7JiK1357iDnMaS7IhhABSM
-         ajMccVNEC/8DbsnZ6V3XkTqAUaks74mOtwLNbAHjekQOYQY1c7Rbqd8RlQ1MO5G9Jjws
-         k6M8YymKT3JNoIfRHmrLZ2g21USTO40LDAtQmuIajF2DTASwuXAaoFYhM7gQbeZwj0bN
-         k73iMCglT/CWRAU60It4YZgD8NJFoFOnaJB3ilSGA9zG7D+Sa4nkya4VOKKY+B0TAAwH
-         f9+CsN30PTqM7O6/VRbeO/GLHTHz6nR349Uf0gXPifGk3AlI0/nEVv0OHZaVaW7dqhbL
-         ma1A==
-X-Gm-Message-State: AOJu0Yz9ysRZAzeUptMCLvn+tGghajXcCIUSdvE0WCPWUNt3ByHDrizu
-	vkJqoQSbow7JnTTmvkPmlpJ+hjwxFDJCvdX6eXttq5oE1kqZlPDhcVniVaHVTII=
-X-Google-Smtp-Source: AGHT+IEMK60hM9+dvuHXVTLdv6XvNIPdbOe/Hr8XPAw+3D9QI2ixN0Ub2N/p6vZUgwOyj/PaRC9xhw==
-X-Received: by 2002:a17:902:d4cb:b0:1d5:e300:37bc with SMTP id o11-20020a170902d4cb00b001d5e30037bcmr404300plg.51.1706156869509;
-        Wed, 24 Jan 2024 20:27:49 -0800 (PST)
-Received: from fastly.com (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id q12-20020a170902c9cc00b001d7267934c7sm8806684pld.298.2024.01.24.20.27.48
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 24 Jan 2024 20:27:49 -0800 (PST)
-Date: Wed, 24 Jan 2024 20:27:46 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	chuck.lever@oracle.com, jlayton@kernel.org,
-	linux-api@vger.kernel.org, brauner@kernel.org, edumazet@google.com,
-	davem@davemloft.net, alexander.duyck@gmail.com,
-	sridhar.samudrala@intel.com, kuba@kernel.org, weiwan@google.com
-Subject: Re: [net-next v2 3/4] eventpoll: Add epoll ioctl for epoll_params
-Message-ID: <20240125042746.GA1294@fastly.com>
-References: <20240125003014.43103-1-jdamato@fastly.com>
- <20240125003014.43103-4-jdamato@fastly.com>
- <65b1cb7f73a6a_250560294bd@willemb.c.googlers.com.notmuch>
+	s=arc-20240116; t=1706157975; c=relaxed/simple;
+	bh=afcdbMWCY3eiWfPY0mb5JQNRODS7wAD1Xr74pJ57Yg0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UZjiFdB1C0gdN7swwPGnxBp9G60CAKoap6yGqyFTeAGNYJQXVqpXUZeh+HRpi0f6288KCPjbebqh2NpwEYXWpD6dC5H+h10fqgYRWnn0qc1Kv0Lfh8uEs5CKP40+pHbEQQZ9Nl8PSl48wUpwqeX5DUe6Knop1oYWIy167nLXGAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y7Qnn/TE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43DB4C433C7;
+	Thu, 25 Jan 2024 04:46:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706157974;
+	bh=afcdbMWCY3eiWfPY0mb5JQNRODS7wAD1Xr74pJ57Yg0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Y7Qnn/TESDf+xaJoWsAeBideYGSbmHr0wpovbhSqPdResbShIs8ehe1oURjSU+Wh7
+	 TgH5U+xisGL+tSJ7VpE6Jv9zBZrORuExpKw1uDsdxD+amaZ8DBlHreG38LpFdHzpWz
+	 r98hX1qpZx3J+sDoETMbIrx8uNF9pQSwjkrdX3sjqi+QEzKmVk1ZGJmJ8eiPPF5MmB
+	 e82UrSztqqdFhpFU4oiCNNPoR+N5XE+kQ4C3lSXe5Z3pUT6+1/rjY1waGhAQ6I8g7F
+	 8pH4fcksxRZ6upFm9+hYAWkzmACymbMAYzKXjTV2yp29oDDi8jX3J3Kx8yOgS2aN5H
+	 4oAWn7lUphhyg==
+Date: Wed, 24 Jan 2024 20:46:12 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Benjamin Poirier <bpoirier@nvidia.com>
+Cc: netdev@vger.kernel.org, Shuah Khan <shuah@kernel.org>, Jonathan Corbet
+ <corbet@lwn.net>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy Gospodarek
+ <andy@greyhouse.net>, Andrew Lunn <andrew@lunn.ch>, Florian Fainelli
+ <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, Jiri Pirko
+ <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Petr Machata
+ <petrm@nvidia.com>, Danielle Ratson <danieller@nvidia.com>, Nikolay
+ Aleksandrov <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>,
+ Johannes Nixdorf <jnixdorf-oss@avm.de>, Davide Caratti
+ <dcaratti@redhat.com>, Tobias Waldekranz <tobias@waldekranz.com>, Zahari
+ Doychev <zdoychev@maxlinear.com>, Hangbin Liu <liuhangbin@gmail.com>,
+ linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next 1/6] selftests: Introduce Makefile variable to
+ list shared bash scripts
+Message-ID: <20240124204612.4c688095@kernel.org>
+In-Reply-To: <20240124170222.261664-2-bpoirier@nvidia.com>
+References: <20240124170222.261664-1-bpoirier@nvidia.com>
+	<20240124170222.261664-2-bpoirier@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <65b1cb7f73a6a_250560294bd@willemb.c.googlers.com.notmuch>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 24, 2024 at 09:46:23PM -0500, Willem de Bruijn wrote:
-> Joe Damato wrote:
-> > Add an ioctl for getting and setting epoll_params. User programs can use
-> > this ioctl to get and set the busy poll usec time or packet budget
-> > params for a specific epoll context.
-> > 
-> > Signed-off-by: Joe Damato <jdamato@fastly.com>
-> 
-> Please be sure to include the lists and people suggested by
-> `get_maintainer.pl -f fs/eventpoll.c`.
+On Wed, 24 Jan 2024 12:02:17 -0500 Benjamin Poirier wrote:
+> --- a/Documentation/dev-tools/kselftest.rst
+> +++ b/Documentation/dev-tools/kselftest.rst
+> @@ -255,9 +255,19 @@ Contributing new tests (details)
+>  
+>     TEST_PROGS_EXTENDED, TEST_GEN_PROGS_EXTENDED mean it is the
+>     executable which is not tested by default.
+> +
+>     TEST_FILES, TEST_GEN_FILES mean it is the file which is used by
+>     test.
+>  
+> +   TEST_INCLUDES is similar to TEST_FILES, it lists files which should be
+> +   included when exporting or installing the tests, with the following
+> +   differences:
+> +   * symlinks to files in other directories are preserved
+> +   * the part of paths below tools/testing/selftests/ is preserved when copying
+> +     the files to the output directory
+> +   TEST_INCLUDES is meant to list dependencies located in other directories of
+> +   the selftests hierarchy.
+> +
 
-Thanks - I must have done something wrong when trying to get the maintainer
-list.
+I think that this chunk causes a warning when doing make htmldocs:
 
-Should I resend this v2? Not sure what the appropriate thing to do is in
-this case. My apologies.
+Documentation/dev-tools/kselftest.rst:267: WARNING: Unexpected indentation.
+Documentation/dev-tools/kselftest.rst:268: WARNING: Block quote ends without a blank line; unexpected unindent.
 
-> Adding ioctls is generally discouraged.
-> 
-> As this affects the behavior of epoll_wait, should this just be a
-> flag to (a new variant of) epoll_wait?
-
-I have no strong preference either way. It seems to me that adding a new
-system call is a fairly significant change vs adding an ioctl, but I am
-open to whatever is preferred by the maintainers.
-
-I have no idea who would need to weigh-in to make this decision.
-
-> Speaking from some experience with adding epoll_pwait2. I initially
-> there added a stateful change that would affect wait behavior. The
-> sensible feedback as the time was to just change the behavior of the
-> syscall it affected. Even if that requires a syscall (which is not
-> that different from an ioctl, if better defined).
-> 
-> The discussion in that thread may be informative to decide on API:
-> https://lwn.net/ml/linux-kernel/20201116161001.1606608-1-willemdebruijn.kernel@gmail.com/
-
-Interesting thread, thanks for sending.
-
-> Agreed on the overall principle that it is preferable to be able to
-> enable busypolling selectively. We already do for SO_BUSY_POLL and
-> sysctl busy_read.
-
-Thanks for taking a look and providing feedback.
-
->
-> > ---
-> >  .../userspace-api/ioctl/ioctl-number.rst      |  1 +
-> >  fs/eventpoll.c                                | 47 +++++++++++++++++++
-> >  include/uapi/linux/eventpoll.h                | 12 +++++
-> >  3 files changed, 60 insertions(+)
-> > 
-> > diff --git a/Documentation/userspace-api/ioctl/ioctl-number.rst b/Documentation/userspace-api/ioctl/ioctl-number.rst
-> > index 457e16f06e04..b33918232f78 100644
-> > --- a/Documentation/userspace-api/ioctl/ioctl-number.rst
-> > +++ b/Documentation/userspace-api/ioctl/ioctl-number.rst
-> > @@ -309,6 +309,7 @@ Code  Seq#    Include File                                           Comments
-> >  0x89  0B-DF  linux/sockios.h
-> >  0x89  E0-EF  linux/sockios.h                                         SIOCPROTOPRIVATE range
-> >  0x89  F0-FF  linux/sockios.h                                         SIOCDEVPRIVATE range
-> > +0x8A  00-1F  linux/eventpoll.h
-> >  0x8B  all    linux/wireless.h
-> >  0x8C  00-3F                                                          WiNRADiO driver
-> >                                                                       <http://www.winradio.com.au/>
-> > diff --git a/fs/eventpoll.c b/fs/eventpoll.c
-> > index 40bd97477b91..c1ee0fe01da1 100644
-> > --- a/fs/eventpoll.c
-> > +++ b/fs/eventpoll.c
-> > @@ -6,6 +6,8 @@
-> >   *  Davide Libenzi <davidel@xmailserver.org>
-> >   */
-> >  
-> > +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-> > +
-> >  #include <linux/init.h>
-> >  #include <linux/kernel.h>
-> >  #include <linux/sched/signal.h>
-> > @@ -869,6 +871,49 @@ static void ep_clear_and_put(struct eventpoll *ep)
-> >  		ep_free(ep);
-> >  }
-> >  
-> > +static long ep_eventpoll_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
-> > +{
-> > +	int ret;
-> > +	struct eventpoll *ep;
-> > +	struct epoll_params epoll_params;
-> > +	void __user *uarg = (void __user *) arg;
-> > +
-> > +	if (!is_file_epoll(file))
-> > +		return -EINVAL;
-> > +
-> > +	ep = file->private_data;
-> > +
-> > +	switch (cmd) {
-> > +#ifdef CONFIG_NET_RX_BUSY_POLL
-> > +	case EPIOCSPARAMS:
-> > +		if (copy_from_user(&epoll_params, uarg, sizeof(epoll_params)))
-> > +			return -EFAULT;
-> > +
-> > +		if (epoll_params.busy_poll_budget > NAPI_POLL_WEIGHT)
-> > +			pr_err("busy poll budget %u exceeds suggested maximum %u\n",
-> > +					epoll_params.busy_poll_budget, NAPI_POLL_WEIGHT);
-> > +
-> > +		ep->busy_poll_usecs = epoll_params.busy_poll_usecs;
-> > +		ep->busy_poll_budget = epoll_params.busy_poll_budget;
-> > +		return 0;
-> > +
-> > +	case EPIOCGPARAMS:
-> > +		memset(&epoll_params, 0, sizeof(epoll_params));
-> > +		epoll_params.busy_poll_usecs = ep->busy_poll_usecs;
-> > +		epoll_params.busy_poll_budget = ep->busy_poll_budget;
-> > +		if (copy_to_user(uarg, &epoll_params, sizeof(epoll_params)))
-> > +			return -EFAULT;
-> > +
-> > +		return 0;
-> > +#endif
-> > +	default:
-> > +		ret = -EINVAL;
-> > +		break;
-> > +	}
-> > +
-> > +	return ret;
-> > +}
-> > +
-> >  static int ep_eventpoll_release(struct inode *inode, struct file *file)
-> >  {
-> >  	struct eventpoll *ep = file->private_data;
-> > @@ -975,6 +1020,8 @@ static const struct file_operations eventpoll_fops = {
-> >  	.release	= ep_eventpoll_release,
-> >  	.poll		= ep_eventpoll_poll,
-> >  	.llseek		= noop_llseek,
-> > +	.unlocked_ioctl	= ep_eventpoll_ioctl,
-> > +	.compat_ioctl   = compat_ptr_ioctl,
-> >  };
-> >  
-> >  /*
-> > diff --git a/include/uapi/linux/eventpoll.h b/include/uapi/linux/eventpoll.h
-> > index cfbcc4cc49ac..8eb0fdbce995 100644
-> > --- a/include/uapi/linux/eventpoll.h
-> > +++ b/include/uapi/linux/eventpoll.h
-> > @@ -85,4 +85,16 @@ struct epoll_event {
-> >  	__u64 data;
-> >  } EPOLL_PACKED;
-> >  
-> > +struct epoll_params {
-> > +	u64 busy_poll_usecs;
-> > +	u16 busy_poll_budget;
-> > +
-> > +	/* for future fields */
-> > +	u8 data[118];
-> > +} EPOLL_PACKED;
-> > +
-> > +#define EPOLL_IOC_TYPE 0x8A
-> > +#define EPIOCSPARAMS _IOW(EPOLL_IOC_TYPE, 0x01, struct epoll_params)
-> > +#define EPIOCGPARAMS _IOR(EPOLL_IOC_TYPE, 0x02, struct epoll_params)
-> > +
-> >  #endif /* _UAPI_LINUX_EVENTPOLL_H */
-> > -- 
-> > 2.25.1
-> > 
-> 
-> 
+Could you double-check?
 
