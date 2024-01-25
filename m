@@ -1,85 +1,96 @@
-Return-Path: <netdev+bounces-65997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5821683CD3C
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 21:16:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BADC583CD66
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 21:26:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B57891F22731
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 20:16:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B783B20DCB
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 20:26:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8FA5136651;
-	Thu, 25 Jan 2024 20:16:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DFC8137C2B;
+	Thu, 25 Jan 2024 20:26:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b="twBKf6FR"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bArLd719"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.manjaro.org (mail.manjaro.org [116.203.91.91])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2381279C7
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 20:16:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.91.91
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57E5613540C;
+	Thu, 25 Jan 2024 20:26:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706213769; cv=none; b=E8+Jb8eNlQAHz5PDtpGAI3WVrE4xg3+b9zUTqqmJR04BVLTqrKV9sEUu3lcVJcGahxke5LgO8r6uvGinpvymlq6bgIDjTZwVUfrfvzeXCzLogTaLu3x6L1qf1HUVCDes1WLWhPnL2xRdSwAO1/M/4aA6pqTZxALlTqNflj9EhP8=
+	t=1706214401; cv=none; b=ll1sDJ92fbZgRoIDziNp5UB56IIolAXqMF9asdLiEttjmAdcxOf4RiUpjZx4XStkve4EI4evY/DgPdM+gtDTApeivajcgO2+jjCAIAfGpqxNoucDC8Gi7Z5NQNJwgCIlulv8nAg3bb0GEEKNIyV8pcFlhdnT0lzY4PKF1A0P7hY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706213769; c=relaxed/simple;
-	bh=4RdZ9J5MXeKwf7WAlNoAVVtnVU/ieNbokDNNyvedFJU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qTys4lV0gxlIOqhAVtqVZBbN/oBeijjjBGmtNDI6/n8uN5jhB2sPyLQ5RDPReB1w7bM6wUSDNj8N3PQXvTr4hdDWQpHBQmgaS/7cUv1dg8GYqRfWEr5Q6A46lesYfv5PaTCXE7sy6hIWKO4QiX8bVyEVkSSF1h1mC/SC5bwKHSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org; spf=pass smtp.mailfrom=manjaro.org; dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b=twBKf6FR; arc=none smtp.client-ip=116.203.91.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manjaro.org
-From: Tobias Schramm <t.schramm@manjaro.org>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manjaro.org; s=2021;
-	t=1706213757;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Z5A/5SzMwbcDNCjVJW8fzQYGvVC3KmAKUTtcphn+Ajo=;
-	b=twBKf6FRp7Qo75xTuJgYaK8U9Rqrq+WSdkAgOQ4tZxTwvk8sB1dppedF0lVVQZuBPOMUKR
-	zNLIX8bn8n1+Ve5uJzaKscoUZq6KpXjRBDsVh1rcT5U4oZJr6fV8FAZmuh5NWLrWMiCbDH
-	mDQdvswh5ljyhJGFHp8i37VTA6aG7z6nvpGH7DbpXJSdDCgHG1K+jWhX6w128kneLDqqXZ
-	OyUYBlrlrBdq1CJjdlcP4pAOga7cKDLdoG6/cz2hygC953DX9P0JEV0NFxJ8Ddjrk4iD5l
-	3ORT5cL9e5k+mQLa38mUTpaWTBXAHcdvx+1ncIoJsqRjfnUC1EofLeIyosqVTA==
-To: netdev@vger.kernel.org
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	Tobias Schramm <t.schramm@manjaro.org>
-Subject: [PATCH net-next] dt-bindings: nfc: ti,trf7970a: fix usage example
-Date: Thu, 25 Jan 2024 21:15:05 +0100
-Message-ID: <20240125201505.1117039-1-t.schramm@manjaro.org>
+	s=arc-20240116; t=1706214401; c=relaxed/simple;
+	bh=6Ci/ePnkDO+HzTkfbOrA1/SdnXyBeEgeJWRwOv8Bw0A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OLar/OhQIdi11f+GFD4p1ewq2PLU2MgByxyRHRvUd9zczYFmLVL9HOlpN3GWQ9vowM5P0H0LirvkbtmLV69ADe1vReapZ09/ASJkjXHbL35N+ebU/35U3zKawQuXJK/jH9Zf3V8FVQikWuoq6kt1/9vUxsZ0RB4vH1tYSz811aE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=bArLd719; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=cLj43Nh+nvdCTCdSIUxmh1BP+fwMrqS2+QveJHTLMOo=; b=bArLd719RSnaG1cB0oo1Ht8CZS
+	f5xPT15CoitJrMDQUkeSnjUxRsTsJ9b9LpBceS1o8WVbHKFbSCYhCkLeIEMkA6vpZTsTA34ECbIhD
+	sg1c58SoqHxHAgUxC6j7IShsBjuBSV1Ix88jZl9pOL2+dPHSPRkuA5lRmigDIgI0/Prs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rT6Ii-0067TW-La; Thu, 25 Jan 2024 21:26:16 +0100
+Date: Thu, 25 Jan 2024 21:26:16 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Danielle Ratson <danieller@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
+	linux@armlinux.org.uk, sdf@google.com, kory.maincent@bootlin.com,
+	maxime.chevallier@bootlin.com, vladimir.oltean@nxp.com,
+	przemyslaw.kitszel@intel.com, ahmed.zaki@intel.com,
+	richardcochran@gmail.com, shayagr@amazon.com,
+	paul.greenwalt@intel.com, jiri@resnulli.us,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	mlxsw@nvidia.com, petrm@nvidia.com, idosch@nvidia.com
+Subject: Re: [RFC PATCH net-next 1/9] ethtool: Add ethtool operation to write
+ to a transceiver module EEPROM
+Message-ID: <9eecccb0-a875-4dbc-b88c-5b2aad838305@lunn.ch>
+References: <20240122084530.32451-1-danieller@nvidia.com>
+ <20240122084530.32451-2-danieller@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Authentication-Results: ORIGINATING;
-	auth=pass smtp.auth=t.schramm@manjaro.org smtp.mailfrom=t.schramm@manjaro.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240122084530.32451-2-danieller@nvidia.com>
 
-The TRF7970A is a SPI device, not I2C.
+On Mon, Jan 22, 2024 at 10:45:22AM +0200, Danielle Ratson wrote:
+> From: Ido Schimmel <idosch@nvidia.com>
+> 
+> Ethtool can already retrieve information from a transceiver module
+> EEPROM by invoking the ethtool_ops::get_module_eeprom_by_page operation.
+> Add a corresponding operation that allows ethtool to write to a
+> transceiver module EEPROM.
+> 
+> The purpose of this operation is not to enable arbitrary read / write
+> access, but to allow the kernel to write to specific addresses as part
+> of transceiver module firmware flashing. In the future, more
+> functionality can be implemented on top of these read / write
+> operations.
 
-Signed-off-by: Tobias Schramm <t.schramm@manjaro.org>
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
----
- Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+My memory is dim, but i thought we decided that since the algorithm to
+program these modules is defined in the standard, all we need to do is
+pass the firmware blob, and have an in kernel implementation of the
+algorithm. There is no need to have an arbitrary write blob to module,
+which might, or might not be abused in the future.
 
-diff --git a/Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml b/Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml
-index 9cc236ec42f2..d0332eb76ad2 100644
---- a/Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml
-+++ b/Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml
-@@ -73,7 +73,7 @@ examples:
-     #include <dt-bindings/gpio/gpio.h>
-     #include <dt-bindings/interrupt-controller/irq.h>
- 
--    i2c {
-+    spi {
-         #address-cells = <1>;
-         #size-cells = <0>;
- 
--- 
-2.43.0
+Also, is the module functional while its firmware is being upgraded?
+Do we need to enforce the link is down?
 
+   Andrew
 
