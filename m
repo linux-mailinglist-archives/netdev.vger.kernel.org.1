@@ -1,156 +1,130 @@
-Return-Path: <netdev+bounces-65922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C67C183C733
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 16:48:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AF7B83C74A
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 16:51:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74CE228FDE0
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 15:48:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BE893B2500A
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 15:51:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5734874E03;
-	Thu, 25 Jan 2024 15:47:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A20537318F;
+	Thu, 25 Jan 2024 15:51:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="mMA1VRo8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AtKQmkDG"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 439837CF31;
-	Thu, 25 Jan 2024 15:47:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 376097318D
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 15:50:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706197656; cv=none; b=Rhgn1Tig+GpZXupcHdngMuZr/m3GLAvsxoKOl/7v7fze+g02jFUUvdwYieKHLOFYSDLeCSldhRYDWl+JwydtNp5/9cAWCAgxFbXvkiUnO5k6i7QC7equNCgbpKGB8Z5BbJPHvxgRGGfg40/tcVTk9RoNo5BiCYlQJ9opyjk0us4=
+	t=1706197860; cv=none; b=RFqjdTUInskALLpPS1IA1Cb7ENTcbvw7v1c+uro2rsnx5EAuIHT4kTyd5rnZv6+F9d7+QpthQM19tk7I5Cp5l1PWMWJW7VCL9Uas6dC8QhKjnU+Yr9K7nER7Xspf3VHlmMC++ulg77pmlK/OYWWP59w5+frDkX9k4zUw/cxr3mM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706197656; c=relaxed/simple;
-	bh=VahnD2WF97Gr+wP0g4hnDQOrIUwn3rdLtkIc/F/a1o0=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=nS+4EjQRMZa4AslaHvkju0vDl87nNDqjVU1aOEhqn8vldAVkQP1Bynj1MTzO5Q+0o7k26yLObKgjDkhVR6lWCCtlTPBjsbcC07wajoo7zecbXLaxWU8oMl9dv08gWExHb6Ml8xxQqIX14ws7y33aTASQYjAKtDnI5V9EFa8FsaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=mMA1VRo8; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=s6agdKzmNrctWvv3P+nld9yIlLBZSPLgtdmmZf/JoK0=; b=mMA1VRo8e1/yLM1e0j8sz3lYvj
-	8jBks6SbY+5CeZtAjxjXfDa0VcML9jh0NdgE5uKUN9JQP+ksisAqsC8IpxULWK9aw/6NbosDxPYtT
-	g71ffx4+ienI0Wo/65Xs+9UYXrjjcvqgHLHu6F3VZvFJ4+jZWo4AbUV1L03g+bGmnKFwQ8VKk1d3x
-	wH83cDKflKbbXkQvvX6o/Cd8ceesRiKG3/nqPGeqP1EGM8l4IY9YCAZ1n6vjs/UFukl61FJwkWQ5L
-	Qael6uJZs3mToEtuJ1x0n6BOSshtc0UKITCiVlFF79H9X57MDmzzbjcn4jPapA8EghMDxhaRKjFRj
-	+e1UNNkg==;
-Received: from sslproxy01.your-server.de ([78.46.139.224])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rT1wo-000Gtb-Ml; Thu, 25 Jan 2024 16:47:22 +0100
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy01.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rT1wn-000JWP-Ez; Thu, 25 Jan 2024 16:47:21 +0100
-Subject: Re: [PATCH v10 net-next 15/15] p4tc: add P4 classifier
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com,
- anjali.singhai@intel.com, namrata.limaye@intel.com, tom@sipanda.io,
- mleitner@redhat.com, Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com,
- jiri@resnulli.us, xiyou.wangcong@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, vladbu@nvidia.com,
- horms@kernel.org, khalidm@nvidia.com, toke@redhat.com, mattyk@nvidia.com,
- bpf@vger.kernel.org
-References: <20240122194801.152658-1-jhs@mojatatu.com>
- <20240122194801.152658-16-jhs@mojatatu.com>
- <6841ee07-40c6-9a67-a1a7-c04cbff84757@iogearbox.net>
- <CAM0EoMnjEpZrajgfKLQhsJjDANsdsZf3z2W8CT9FTMQDw2hGMw@mail.gmail.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <a567ac93-2564-2235-b65f-d0940da076a5@iogearbox.net>
-Date: Thu, 25 Jan 2024 16:47:20 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	s=arc-20240116; t=1706197860; c=relaxed/simple;
+	bh=4RxHy7YSci2h26nxzbNWXiDXHBNn30DIyoOjMx/uroU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Qe89pVhzfu3fX3r0uNexsDF9T7Kpgtgig2nvLoRtT+EznC/mTpc4drESN4crl7LQY9u7U3J47jj1LhQaykLy/4s9caOr8YxyGDBGqYUP5JzkoSSKq04YhBMUgGCRcB+i6+MABg6wFAqp91wrge/bOLdn896lQFv8KQAUjLiSSDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AtKQmkDG; arc=none smtp.client-ip=209.85.166.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3627d08a4daso15833555ab.1
+        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 07:50:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706197858; x=1706802658; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=t6Z/bz7j7CSWFMbs7+UxST9YRUHhGkrU6jBkq0mO0wg=;
+        b=AtKQmkDGEhnhmwkq6cE11dVzUgmOuk7oXiVAK+qe5eqgH93NLapBtwoTqehWuWHrJo
+         AhWWquB1HB5DdqksvK5fe+l2cxo+hD8tRL14v9qzGtmJ22zMiHonDkR2DDP1SzdqjavL
+         Nb1bm4ZAkvQChCop4u4FMdtvVmwflxSf+Nq3CYaNHFghcngYOqKNZeXHDPiO4Ccnz50y
+         9m+IvZnH42fZbV6MgMcjQdUjQUK4P1TW3psRbrN2PxmvFUOnYA6cv+XDaWcVf58mRW4E
+         rYIqYJIkx2bBqURfXLaAlurIt0xAH4e5B4o2e1YEmjWTqki32W9jx4TnrQKZrfJRlro7
+         pf7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706197858; x=1706802658;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=t6Z/bz7j7CSWFMbs7+UxST9YRUHhGkrU6jBkq0mO0wg=;
+        b=RgKYeTA+Pa77emTB/7TtZgL56ZwikKYQpVPe5AC0zszn0ITGqCTS3mwSCDjE8WSHEM
+         wsIETurdz6UPk+9ZYa0t4VIs/NuP0up9MD8o1i8BxbX7zJAz/bLPcobysHyzoGVHixbG
+         C+MNQlzFTKqKKu6jpDVBvrASxBisW0ExFBkVqe4alwL70kxBrf9HCMqStXT2P/fQvr98
+         tyEDF/lKJnFZMn+SV6pmXQBM7ISf6V99qTeSaFizqYfX+fiTfnrnt9/WpIPtp9CCqAmY
+         cZy/tT+eBuJqf3dZ00cVPp2OUEqggg5Wr/VnVWg7tVBiDrXkMRFwJ76ita5WTLsNpH6Q
+         kH2g==
+X-Gm-Message-State: AOJu0YzxArwfxcATESnUKddTNe9pgsUw5vMsBivW+yP8pxAyDimdCZ/K
+	RmzCSpjouLNSUsmeoDWPHYRCyFTfDS5Ypddb53qIikFrhmzXDKJ1wxm8uy7I
+X-Google-Smtp-Source: AGHT+IGt8IHOcXh6dsfWbc6eZgxkot4QjFDgsmoldt61OLzTk3WrHhdv+9A2DzaCABcIFlYVPDFTPw==
+X-Received: by 2002:a05:6e02:1066:b0:361:aa6d:f84e with SMTP id q6-20020a056e02106600b00361aa6df84emr1244554ilj.2.1706197858383;
+        Thu, 25 Jan 2024 07:50:58 -0800 (PST)
+Received: from ?IPV6:2601:282:1e82:2350:ddd8:edb3:1925:c8bf? ([2601:282:1e82:2350:ddd8:edb3:1925:c8bf])
+        by smtp.googlemail.com with ESMTPSA id o7-20020a92dac7000000b00362a24b0f47sm470511ilq.61.2024.01.25.07.50.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 Jan 2024 07:50:58 -0800 (PST)
+Message-ID: <1e2ff78d-d130-46d4-b7ad-31a0f6796e1a@gmail.com>
+Date: Thu, 25 Jan 2024 08:50:56 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAM0EoMnjEpZrajgfKLQhsJjDANsdsZf3z2W8CT9FTMQDw2hGMw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2] vxlan: add support for flowlab inherit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27165/Thu Jan 25 10:51:15 2024)
+To: Vincent Bernat <vincent@bernat.ch>, Ido Schimmel <idosch@idosch.org>,
+ Alce Lafranque <alce@lafranque.net>
+Cc: netdev@vger.kernel.org, stephen@networkplumber.org
+References: <20240120124418.26117-1-alce@lafranque.net>
+ <Za5eizfgzl5mwt50@shredder> <f24380fc-a346-4c81-ae78-e0828d40836e@gmail.com>
+ <1793b6c1-9dba-4794-ae0d-5eda4f6db663@bernat.ch>
+ <1fb36101-5a3c-4c81-8271-4002768fa0bd@gmail.com>
+ <41582fa0-1330-42c5-b4eb-44f70713e77e@bernat.ch>
+From: David Ahern <dsahern@gmail.com>
+In-Reply-To: <41582fa0-1330-42c5-b4eb-44f70713e77e@bernat.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 1/24/24 3:40 PM, Jamal Hadi Salim wrote:
-> On Wed, Jan 24, 2024 at 8:59 AM Daniel Borkmann <daniel@iogearbox.net> wrote:
->> On 1/22/24 8:48 PM, Jamal Hadi Salim wrote:
-[...]
->>>
->>> It should also be noted that it is feasible to split some of the ingress
->>> datapath into XDP first and more into TC later (as was shown above for
->>> example where the parser runs at XDP level). YMMV.
->>> Regardless of choice of which scheme to use, none of these will affect
->>> UAPI. It will all depend on whether you generate code to load on XDP vs
->>> tc, etc.
->>>
->>> Co-developed-by: Victor Nogueira <victor@mojatatu.com>
->>> Signed-off-by: Victor Nogueira <victor@mojatatu.com>
->>> Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
->>> Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
->>> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
->>
->> My objections from last iterations still stand, and I also added a nak,
->> so please do not just drop it with new revisions.. from the v10 as you
->> wrote you added further code but despite the various community feedback
->> the design still stands as before, therefore:
->>
->> Nacked-by: Daniel Borkmann <daniel@iogearbox.net>
+On 1/24/24 3:00 PM, Vincent Bernat wrote:
+> On 2024-01-23 17:19, David Ahern wrote:
 > 
-> We didnt make code changes - but did you read the cover letter and the
-> extended commentary in this patch's commit log? We should have
-> mentioned it in the changes log. It did respond to your comments.
-> There's text that says "the filter manages the lifetime of the
-> pipeline" - which in the future could include not only tc but XDP but
-> also the hardware path (in the form of a file that gets loaded). I am
-> not sure if that message is clear. Your angle being this is layer
-> violation. In the last discussion i asked you for suggestions and we
-> went the tcx route, which didnt make sense, and  then you didnt
-> respond.
-[...]
-
->> Also as mentioned earlier I don't think tc should hold references on
->> XDP programs in here. It doesn't make any sense aside from the fact
->> that the cls_p4 is also not doing anything with it. This is something
->> that a user space control plane should be doing i.e. managing a XDP
->> link on the target device.
+>>>>> My personal
+>>>>> preference would be to add a new keyword for the new attribute:
+>>>>>
+>>>>> # ip link set dev vx0 type vxlan flowlabel_policy inherit
+>>>>> # ip link set dev vx0 type vxlan flowlabel_policy fixed flowlabel 10
+>>>>>
+>>>>> But let's see what David thinks.
+>>>>>
+>>>>
+>>>> A new keyword for the new attribute seems like the most robust.
+>>>>
+>>>> That said, inherit is already used in several ip commands for dscp, ttl
+>>>> and flowlabel for example; I do not see a separate keyword - e.g.,
+>>>> ip6tunnel.c.
+>>>
+>>> The implementation for flowlabel was modeled along ttl. We did diverge
+>>> for kernel, we can diverge for iproute2 as well. However, I am unsure if
+>>> you say we should go for option A (new attribute) or option B (do like
+>>> for dscp/ttl).
+>>
+>> A divergent kernel API does not mean the command line for iproute2 needs
+>> to be divergent. Consistent syntax across ip commands is best from a
+>> user perspective. What are the downsides to making 'inherit' for
+>> flowlabel work for vxlan like it does for ip6tunnel, ip6tnl and gre6?
+>> Presumably inherit is relevant for geneve? (We really need to stop
+>> making these tweaks on a single protocol basis.)
 > 
-> This is the same argument about layer violation that you made earlier.
-> The filter manages the p4 pipeline - i.e it's not just about the ebpf
-> blob(s) but for example in the future (discussions are still ongoing
-> with vendors who have P4 NICs) a filter could be loaded to also
-> specify the location of the hardware blob.
+> Currently, the patch implements "inherit" without a new keyword, like
+> this is done for the other protocols. I don't really see a downside,
+> except the kernel could one day implement a policy that may be difficult
+> to express this way (inherit-during-the-day-fixed-during-the-night).
 
-Ah, so there is a plan to eventually add HW offload support for cls_p4?
-Or is this only specifiying a location of a blob through some opaque
-cookie value from user space?
-
-> I would be happy with a suggestion that gets us moving forward with
-> that context in mind.
-
-My question on the above is mainly what does it bring you to hold a
-reference on the XDP program? There is no guarantee that something else
-will get loaded onto XDP, and then eventually the cls_p4 is the only
-entity holding the reference but w/o 'purpose'. We do have BPF links
-and the user space component orchestrating all this needs to create
-and pin the BPF link in BPF fs, for example. An artificial reference
-on XDP prog feels similar as if you'd hold a reference on an inode
-out of tc.. Again, that should be delegated to the control plane you
-have running interacting with the compiler which then manages and
-loads its artifacts. What if you would also need to set up some
-netfilter rules for the SW pipeline, would you then embed this too?
-
-Thanks,
-Daniel
+Wouldn't other uses of inherit be subject to the same kind of problem?
+ie., my primary point is for consistency in behavior across commands.
 
