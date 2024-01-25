@@ -1,128 +1,177 @@
-Return-Path: <netdev+bounces-65787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0980E83BBE7
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:26:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9239383BC06
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:30:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7FEB28480C
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 08:26:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22F691F226DA
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 08:30:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4CD4175AD;
-	Thu, 25 Jan 2024 08:25:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E9E17736;
+	Thu, 25 Jan 2024 08:30:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GUD+RgJE"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="dSXT5p3h"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EC1117BD4
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 08:25:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A051717753;
+	Thu, 25 Jan 2024 08:30:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706171153; cv=none; b=av0+RhkKYbqW5noeOOnET+jIfFXVc4eUVfGEACGuzdr9ikIsFwwJVYdJxJdlrL08n+diw95mvFNbowvkXxj+pb+WWgcgOB9gdHO6muJx7ZgoxVghaPKWKUJ0q++fSy+QjYrYCv21wPCN9M1LR+LKAtsa3k4v7iqFNuMs/EWvnEI=
+	t=1706171415; cv=none; b=eVCZlTVO3cGg4hxpktIdrGqygsw8xQLj9zWCB8dRkmBMc2FMyCWdAPesS8ZZ78fmrc/V2MEA2aGwNOdo3J7xXv7yOcsulCa2eYoh78tz3uT3aO0B7gJztzEQz6ju38BcllYQGvWxZ62xoa0/YbVutiZaHBbGj9FjwLQIt3nEqNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706171153; c=relaxed/simple;
-	bh=9iZDsOrwFbNhFUiQrCQV8ZvnDuL4DsA+Z6fFe12B2C8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gsVtDMe8HKyDSa+c0r4ePpiFetE/I4m7IYcrR8LvVh4hSJKyaMz3CiJ+uoCKv9NP6kIwCkeZMcf+TgWhe/i/PqmomaOY7LEm2VgPU2EDkk+corHFX+biwAL8Gy6EhATqTwOWqzWqFsRhfvbr89rB7o0acnuLCCBk0KSjiE5rbls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GUD+RgJE; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706171151;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7yorbOu4W949PDf1wJwUQ2ZcnYgGGHn5INiZOwEc64I=;
-	b=GUD+RgJE8kn+l6+JdG8bZYM/cYbOZW7m4LFvh+/1TdMZzEWs2koWGb8fslhKAkmjQm626y
-	3lG491rA2y9MS/B2VuHUFehciB4tZ0mTiHeLxNNc4KNQx4u5UjD2Oib+Yb30FRQZZ1t+PR
-	jU787YrR/X7e27/aoJYjhcNqrHzCOvc=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-552-YvMldogvN2uRuese7VyoWg-1; Thu, 25 Jan 2024 03:25:48 -0500
-X-MC-Unique: YvMldogvN2uRuese7VyoWg-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a2eace36abdso276252866b.3
-        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 00:25:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706171147; x=1706775947;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7yorbOu4W949PDf1wJwUQ2ZcnYgGGHn5INiZOwEc64I=;
-        b=jP4RCiDBRTu0pwW7X4T5NjJnN26+GCh4QEsIjf15GrZUs9dskKXTbpUFd3WUsOr7B2
-         4NqIH6pgfdqL0nWf3qqqLHHKx0WeXutwNXYU4zJD6SmuEnh+x8hasGAn+nQbTJSG4tJN
-         baPCCEePHMMFX/MZrEgGYKROM8+V41abG4HytclzDXDn9Ppq2lHnZy6jQTxNQFR+zqYJ
-         UH1kSH87gZXfM6YlRSAbhElPw9a78/oFKayBElmGrH3vTom1Qb1vIRw5XJtDLxIYQKb0
-         K7NP7EZPusls6cJ13OAZ/9qzcyVefIB0U6Y9q54vUxTZeExXJTyIJlYsZhCP7khbUu36
-         g/MA==
-X-Gm-Message-State: AOJu0Yw4jl9OmtrDkqwdBInxz1n89/4NMBXYl62aqPwXdD1l8HHrZvYx
-	ppUBcUf7J0heGXVFDw3l441eQ83el/OPsAz6fRgbUOhyAiKY6aq8p//yLRUEdzrDEbX3uFFxZ4u
-	icfnRJP84fHZZ6SxwFpsGt6/ezf0JaT1qMMz2JntqfqGLwm1iNvlPKA==
-X-Received: by 2002:a17:906:194a:b0:a23:5672:735 with SMTP id b10-20020a170906194a00b00a2356720735mr200635eje.290.1706171147583;
-        Thu, 25 Jan 2024 00:25:47 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHtAmXQ4VLJ33gfVHQUvreFWKCVhdbCgy8sC+T+BXXLfj7avWyKayxGoOmLBlfAtzRcbKl+LA==
-X-Received: by 2002:a17:906:194a:b0:a23:5672:735 with SMTP id b10-20020a170906194a00b00a2356720735mr200626eje.290.1706171147221;
-        Thu, 25 Jan 2024 00:25:47 -0800 (PST)
-Received: from sgarzare-redhat (host-87-12-25-71.business.telecomitalia.it. [87.12.25.71])
-        by smtp.gmail.com with ESMTPSA id vb1-20020a170907d04100b00a3177f658afsm411613ejc.206.2024.01.25.00.25.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jan 2024 00:25:45 -0800 (PST)
-Date: Thu, 25 Jan 2024 09:25:43 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Arseniy Krasnov <avkrasnov@salutedevices.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
-	oxffffaa@gmail.com
-Subject: Re: [PATCH net-next v1] vsock/test: print type for SOCK_SEQPACKET
-Message-ID: <nsnvxue53rbvtyxwcouebcev6uk7izz62htxyqrngpfvl26qs2@jubx6oacqcck>
-References: <20240124193255.3417803-1-avkrasnov@salutedevices.com>
+	s=arc-20240116; t=1706171415; c=relaxed/simple;
+	bh=3XBWo2N7vPeYYFH5hJHHJ4R4cDBYgvyARsugBQmHXL4=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=ak7Ag7TCsVNgioU/Q7C3smx3VIn3Ab3rOgE2k+CzFchRHuMohEmf6fhv3jw4LyBaIzToK8rTETZGLGbl+wEVwVLOzVGN/lPBnJZ5JWF3ZLADWoP5A+tCsAs4yfBNuLalIrs1ltsNExnR8AtqlXjEK7qR8LWf4LZLxG1oJKkKtKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=dSXT5p3h; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40P7Ws7f020363;
+	Thu, 25 Jan 2024 08:30:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=jSTDG7pZUdM5R9gkBMPp9G3Ps4anJqutG/WR/2lOnuY=;
+ b=dSXT5p3hpWogxlGVlcqhXejmTsB0A8TpuQr7Sc3QwCyPtqesJcJJe9ssK0KkYR1JwyA2
+ l4MqVV9WxUYB/Lc0Yu6NU/njqocM9+XwRWg7kkrHl9IZ5MpaV4Uh/YAN6XM+5csSfKUz
+ vnf3jJUEkoTBPAxHyEfPugyuAWYy8GHnpSYLqiF3uugJoZoQU/YqUVNKRmmYTESQXnuU
+ 85LZnHcPtes4vCicYTM/EXRLMFOkuNik/AUPqGR9xzAXnfg4bBbi6cIMl4LXof+i0FA3
+ DBsm0UPnU2c5Xja7UCIy0L1YHkTr5p4wPzDvo22HDuD1fNBqj63/boaFSZgRCl3Dh4Im DA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vukbj18ef-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 25 Jan 2024 08:30:07 +0000
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40P85cuv022522;
+	Thu, 25 Jan 2024 08:30:06 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3vukbj183q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 25 Jan 2024 08:30:06 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 40P527pn010854;
+	Thu, 25 Jan 2024 08:27:03 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3vrrw03c88-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 25 Jan 2024 08:27:03 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 40P8R0G556754506
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 25 Jan 2024 08:27:00 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8897220043;
+	Thu, 25 Jan 2024 08:27:00 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0F95F20040;
+	Thu, 25 Jan 2024 08:27:00 +0000 (GMT)
+Received: from [9.152.224.38] (unknown [9.152.224.38])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 25 Jan 2024 08:27:00 +0000 (GMT)
+Message-ID: <8090bb34-1b70-43ea-ae13-df5d9a5eb761@linux.ibm.com>
+Date: Thu, 25 Jan 2024 09:26:59 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [REGRESSION] v6.8 SMC-D issues
+To: Wen Gu <guwen@linux.alibaba.com>, wenjia@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        jaka@linux.ibm.com, Matthew Rosato <mjrosato@linux.ibm.com>
+Cc: Linux regressions mailing list <regressions@lists.linux.dev>,
+        borntraeger@linux.ibm.com, svens@linux.ibm.com,
+        alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+        raspl@linux.ibm.com, schnelle@linux.ibm.com,
+        guangguan.wang@linux.alibaba.com, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Halil Pasic <pasic@linux.ibm.com>
+References: <20231219142616.80697-1-guwen@linux.alibaba.com>
+ <20231219142616.80697-8-guwen@linux.alibaba.com>
+ <13579588-eb9d-4626-a063-c0b77ed80f11@linux.ibm.com>
+ <530afe45-ba6b-4970-a71c-1f1255f5fca9@linux.alibaba.com>
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <530afe45-ba6b-4970-a71c-1f1255f5fca9@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: hL-eyvXh5IfeJnQxS3WvRFG4GCoUuQvl
+X-Proofpoint-GUID: d9-pXlaTopAnnCB5pTPeUJJRJKxMjHfa
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20240124193255.3417803-1-avkrasnov@salutedevices.com>
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-25_04,2024-01-24_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
+ spamscore=0 lowpriorityscore=0 mlxscore=0 malwarescore=0 phishscore=0
+ impostorscore=0 clxscore=1015 priorityscore=1501 mlxlogscore=999
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2401250057
 
-On Wed, Jan 24, 2024 at 10:32:55PM +0300, Arseniy Krasnov wrote:
->SOCK_SEQPACKET is supported for virtio transport, so do not interpret
->such type of socket as unknown.
->
->Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
->---
-> tools/testing/vsock/vsock_diag_test.c | 2 ++
-> 1 file changed, 2 insertions(+)
 
-Yeah, LGTM!
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+On 25.01.24 05:59, Wen Gu wrote:
+> After a while debug I found an elementary mistake of mine in
+> b40584d ("net/smc: compatible with 128-bits extended GID of virtual ISM device")..
+> 
+> The operator order in smcd_lgr_match() is not as expected. It will always return
+> 'true' in remote-system case.
+> 
+>  static bool smcd_lgr_match(struct smc_link_group *lgr,
+> -                          struct smcd_dev *smcismdev, u64 peer_gid)
+> +                          struct smcd_dev *smcismdev,
+> +                          struct smcd_gid *peer_gid)
+>  {
+> -       return lgr->peer_gid == peer_gid && lgr->smcd == smcismdev;
+> +       return lgr->peer_gid.gid == peer_gid->gid && lgr->smcd == smcismdev &&
+> +               smc_ism_is_virtual(smcismdev) ?
+> +               (lgr->peer_gid.gid_ext == peer_gid->gid_ext) : 1;
+>  }
+> 
+> Could you please try again with this patch? to see if this is the root cause.
+> Really sorry for the inconvenience.
+> 
+> diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
+> index da6a8d9c81ea..c6a6ba56c9e3 100644
+> --- a/net/smc/smc_core.c
+> +++ b/net/smc/smc_core.c
+> @@ -1896,8 +1896,8 @@ static bool smcd_lgr_match(struct smc_link_group *lgr,
+>                            struct smcd_gid *peer_gid)
+>  {
+>         return lgr->peer_gid.gid == peer_gid->gid && lgr->smcd == smcismdev &&
+> -               smc_ism_is_virtual(smcismdev) ?
+> -               (lgr->peer_gid.gid_ext == peer_gid->gid_ext) : 1;
+> +               (smc_ism_is_virtual(smcismdev) ?
+> +                (lgr->peer_gid.gid_ext == peer_gid->gid_ext) : 1);
+>  }
+> 
+> 
+> Thanks,
+> Wen Gu
 
->
->diff --git a/tools/testing/vsock/vsock_diag_test.c b/tools/testing/vsock/vsock_diag_test.c
->index 5e6049226b77..17aeba7cbd14 100644
->--- a/tools/testing/vsock/vsock_diag_test.c
->+++ b/tools/testing/vsock/vsock_diag_test.c
->@@ -39,6 +39,8 @@ static const char *sock_type_str(int type)
-> 		return "DGRAM";
-> 	case SOCK_STREAM:
-> 		return "STREAM";
->+	case SOCK_SEQPACKET:
->+		return "SEQPACKET";
-> 	default:
-> 		return "INVALID TYPE";
-> 	}
->-- 
->2.25.1
->
+Hello Wen Gu,
+
+thank you for the quick resposne and for finding this nasty bug.
+I can confirm that with your patch I do not see the issue anymore.
+Please send a fix to the mailing lists. See
+https://docs.kernel.org/process/handling-regressions.html
+for some tips.
+
+May I propose that instead of adding the brackets, you change this function 
+to an if-then-else sequence for readability and maintainability?
+I would still mention the missing brackets in the commit message, so
+readers can quickly understand the issue.
+
+Thanks again for the quick response.
+Sandy
 
 
