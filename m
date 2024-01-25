@@ -1,121 +1,167 @@
-Return-Path: <netdev+bounces-65774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1C3883BAA4
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 08:32:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EFC883BAAF
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 08:33:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79BAE282FE9
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 07:32:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3DFB1C2261F
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 07:33:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02B6C11C83;
-	Thu, 25 Jan 2024 07:32:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 391F211C83;
+	Thu, 25 Jan 2024 07:32:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="xY+5DeU1";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="GCdJrb8F"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iCn4OdhA"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CEAA11731
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 07:31:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BDC712E42
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 07:32:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706167919; cv=none; b=HtkJhBFvIUSOGJ/HCrdPctEfPO0BRx21JybH/5T2Wp3Ux+HUvlLfjSIc3qaoIRzNmx8HCCZ7mnfTsm5JXNSmXkbxo4591DWzShqkVI1JbOf8EPpJkZhlCBWjduYK6hx6qjaBFlBMZQiaxe7VpSNKY3KbJnin1e3ZXVZOrKTvicw=
+	t=1706167968; cv=none; b=fRVpvxz7bVZqHzpYkuBj6iKabQ+F1+ugTFNG36NUJh4CqNGbNSVvALTFsmZR/0CVDs6Mx5Kczfto8YYSZn3JREuveF4E5xfXbfS07j9O7TOk3GhtT0DUCwd5vDCnjTgLRqNP9cK4GhqRG0MR5Xt3GI1lQK0GO+WSEQMFTLHG03M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706167919; c=relaxed/simple;
-	bh=u0662KfdQOEoLQZUhjZ3QWxde3WlZWZoj3EEvJD5LzA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=GcdiwTNMcDOJw6MR5lFF5woa4EN/ErbBY8rBZkkJP8h7LveQiYRcQfAJolrlQXcKAFy5I7plDOqIAk9jjiSS0NTjKrA7HKIR49fN4lfSHZDWLOI2HG+8VlqFF6qBHPXIJN9puxltL8KcAz2YT3rHBS+DHiDPC1FP23BMXFsC0ck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=xY+5DeU1; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=GCdJrb8F; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1706167916;
+	s=arc-20240116; t=1706167968; c=relaxed/simple;
+	bh=9JiXuMU8md6ZQDJL87iGFXGWLogt4Me1Dar0m3LEe6Q=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=kjrPUhgAT4gdbfbl+gcTN8b3mdzOsELAA3PkJ2PZPGC7W7QIQhxSXVQ1jh6jmc9cqzKuQULT/iUZuX7GjaHDTpBKsrW6EB2FH+rl0Hd7UOr60hvtDo/Mwm9g86sQ5C1nqfzHlaPJUJIaRuwERgFACQatoKLDdAwTGXLL4ny0X3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iCn4OdhA; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706167965;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=u0662KfdQOEoLQZUhjZ3QWxde3WlZWZoj3EEvJD5LzA=;
-	b=xY+5DeU1rnSWh/i0TMXaAQWpBgKAtL8mzj13Do4RKlgCcs41CjcDNy19LaPjmzjgmJ2u60
-	TSHnU9DDoE1y7dGS7J/FdSOTyvRFvvmF+libzkt3BxzPwhcOupmUyx5Ag4pf0nmOWwwfXJ
-	hbERCCP2xtYVfkdkgSCzVias+PwY9BY318cYqwaNgceSzAIG4EFw6r4k/nsQIYzAT5rIsu
-	xnKKyHvXs+cYLf/wLU4R6X5qItZuXvJtnJngaHkyykN/V0hkrGBOvCIXd9qZofz9hL33Bd
-	PsY/Nl5yTsiDuCHtS9c86aJOf8K1Wgz2qaZCpHXAZnA02fBkPt2JdRYNtiQ2LA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1706167916;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=u0662KfdQOEoLQZUhjZ3QWxde3WlZWZoj3EEvJD5LzA=;
-	b=GCdJrb8FI6n+NzGDUr9ekXOVzS39IbpEOkVEYfUjSNFaHlHxXPLJ2Cr81ua8LpnsnjPpEE
-	MWuEW2TnymuqHeAw==
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, Vinicius Costa Gomes
- <vinicius.gomes@intel.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org, Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: Re: [PATCH v1 iwl-next] igc: Add support for LEDs on i225/i226
-In-Reply-To: <de659af0-807f-4176-a7c2-d8013d445f9e@lunn.ch>
-References: <20240124082408.49138-1-kurt@linutronix.de>
- <de659af0-807f-4176-a7c2-d8013d445f9e@lunn.ch>
-Date: Thu, 25 Jan 2024 08:31:54 +0100
-Message-ID: <87ede5eumt.fsf@kurt.kurt.home>
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=n/eiPmT0rgKP1yTY7bjh9FIJTWMSTGjIYT2E0cASlmE=;
+	b=iCn4OdhAJET7QpEK7vPcVLhSaFPP3pTc07MkYV6fNQmUjYgLUU5RLP4iu/UkNHq9vs9ROT
+	VAmWfpAVPzbfzojtwmBUJhjW5KAJitcpn5vN3nknVMZhgqkA5bn5nNCa9vpNdIe57LAKlC
+	ShzX1VmDP3KjdTojNecBMOmwl1n+Sr0=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-427-ruknxAgNNtyRuZ4QggHuVQ-1; Thu, 25 Jan 2024 02:32:43 -0500
+X-MC-Unique: ruknxAgNNtyRuZ4QggHuVQ-1
+Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-50e93545a26so1247853e87.0
+        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 23:32:42 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706167961; x=1706772761;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=n/eiPmT0rgKP1yTY7bjh9FIJTWMSTGjIYT2E0cASlmE=;
+        b=uaRWSZLx3CfGdTqAhUye2pRSW4nXBLjzqFZpk/zWb6+ELOp/gsFrKb8VL/tcU0jKCS
+         pSyFKFJBnPEUFlfZOilf7PTkmJtl5kejUD/PLyoGJoQfyrKiERt9YKEQOqRuhg7pLqvY
+         czW2TOK7vlPtHuEfgAjE0QrUQvFlEgG4cDVaMWCLOg3vP/MqWKcpsspu/7LiFDv4QAqO
+         t8X+UwqFmDF8A7EGsRiHOIZZMihUMzxJCctoD0iJyManKDv3M+Bru98RU5rLWMC6too3
+         RfpnCb86qqJUzIYTn3zhUNcIAXAcau9E6VpUKbUS0Y7X6TzUjUHnOdWVlU3B7WVngMlN
+         rNgg==
+X-Gm-Message-State: AOJu0YxGi8HXztLUE+RA/nHiCeWE7omvKcr5d1T8bespGMebobQOZvB9
+	LsiQJymiGcdy7hnlexkbc39OmrfUKC3te7LNB9HLHnXNdJSEfUNW7ch4WUvW2L9TFeZHhu4L15/
+	UXG8QV69bPeGLQeOppcxJNyN6brsQrSNHWgTpcuYwqTfKP9daUG5ndw==
+X-Received: by 2002:a19:6405:0:b0:510:1469:f68 with SMTP id y5-20020a196405000000b0051014690f68mr588322lfb.0.1706167961729;
+        Wed, 24 Jan 2024 23:32:41 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE6NsIZts08TDIRCakE0XTuaTYSDvB2BldmTG0ykdCRh4xn/b59qjVkB+qxquyzJoWjbvhmbA==
+X-Received: by 2002:a19:6405:0:b0:510:1469:f68 with SMTP id y5-20020a196405000000b0051014690f68mr588306lfb.0.1706167961359;
+        Wed, 24 Jan 2024 23:32:41 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-244-75.dyn.eolo.it. [146.241.244.75])
+        by smtp.gmail.com with ESMTPSA id p13-20020a05600c358d00b0040ea875a527sm1522057wmq.26.2024.01.24.23.32.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jan 2024 23:32:40 -0800 (PST)
+Message-ID: <49d15fe58d9cd415ca96739b08c59c7cde5c3422.camel@redhat.com>
+Subject: Re: [PATCH net 1/3] selftests: net: remove dependency on ebpf tests
+From: Paolo Abeni <pabeni@redhat.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Shuah Khan
+ <shuah@kernel.org>, Willem de Bruijn <willemb@google.com>, Lucas Karpinski
+ <lkarpins@redhat.com>,  linux-kselftest@vger.kernel.org
+Date: Thu, 25 Jan 2024 08:32:39 +0100
+In-Reply-To: <65b1b4e92df6_250560294f4@willemb.c.googlers.com.notmuch>
+References: <cover.1706131762.git.pabeni@redhat.com>
+	 <28e7af7c031557f691dc8045ee41dd549dd5e74c.1706131762.git.pabeni@redhat.com>
+	 <65b1b4e92df6_250560294f4@willemb.c.googlers.com.notmuch>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+On Wed, 2024-01-24 at 20:10 -0500, Willem de Bruijn wrote:
+> Paolo Abeni wrote:
+> > Several net tests requires an XDP program build under the ebpf
+> > directory, and error out if such program is not available.
+> >=20
+> > That makes running successful net test hard, let's duplicate into the
+> > net dir the [very small] program, re-using the existing rules to build
+> > it, and finally dropping the bogus dependency.
+> >=20
+> > Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> > ---
+> >  tools/testing/selftests/net/Makefile          |  5 +++--
+> >  tools/testing/selftests/net/udpgro.sh         |  4 ++--
+> >  tools/testing/selftests/net/udpgro_bench.sh   |  4 ++--
+> >  tools/testing/selftests/net/udpgro_frglist.sh |  6 +++---
+> >  tools/testing/selftests/net/udpgro_fwd.sh     |  2 +-
+> >  tools/testing/selftests/net/veth.sh           |  4 ++--
+> >  tools/testing/selftests/net/xdp_dummy.c       | 13 +++++++++++++
+> >  7 files changed, 26 insertions(+), 12 deletions(-)
+> >  create mode 100644 tools/testing/selftests/net/xdp_dummy.c
+> >=20
+> > diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selft=
+ests/net/Makefile
+> > index 50818075e566..304d8b852ef0 100644
+> > --- a/tools/testing/selftests/net/Makefile
+> > +++ b/tools/testing/selftests/net/Makefile
+> > @@ -84,6 +84,7 @@ TEST_PROGS +=3D sctp_vrf.sh
+> >  TEST_GEN_FILES +=3D sctp_hello
+> >  TEST_GEN_FILES +=3D csum
+> >  TEST_GEN_FILES +=3D nat6to4.o
+> > +TEST_GEN_FILES +=3D xdp_dummy.o
+> >  TEST_GEN_FILES +=3D ip_local_port_range
+> >  TEST_GEN_FILES +=3D bind_wildcard
+> >  TEST_PROGS +=3D test_vxlan_mdb.sh
+> > @@ -104,7 +105,7 @@ $(OUTPUT)/tcp_inq: LDLIBS +=3D -lpthread
+> >  $(OUTPUT)/bind_bhash: LDLIBS +=3D -lpthread
+> >  $(OUTPUT)/io_uring_zerocopy_tx: CFLAGS +=3D -I../../../include/
+> > =20
+> > -# Rules to generate bpf obj nat6to4.o
+> > +# Rules to generate bpf objs
+> >  CLANG ?=3D clang
+> >  SCRATCH_DIR :=3D $(OUTPUT)/tools
+> >  BUILD_DIR :=3D $(SCRATCH_DIR)/build
+> > @@ -139,7 +140,7 @@ endif
+> > =20
+> >  CLANG_SYS_INCLUDES =3D $(call get_sys_includes,$(CLANG),$(CLANG_TARGET=
+_ARCH))
+> > =20
+> > -$(OUTPUT)/nat6to4.o: nat6to4.c $(BPFOBJ) | $(MAKE_DIRS)
+> > +$(OUTPUT)/nat6to4.o $(OUTPUT)/xdp_dummy.o: $(OUTPUT)/%.o : %.c $(BPFOB=
+J) | $(MAKE_DIRS)
+> >  	$(CLANG) -O2 --target=3Dbpf -c $< $(CCINCLUDE) $(CLANG_SYS_INCLUDES) =
+-o $@
+>=20
+> is the "$(OUTPUT)/%.o :" intentional or a leftover from editing?
 
-On Wed Jan 24 2024, Andrew Lunn wrote:
-> On Wed, Jan 24, 2024 at 09:24:08AM +0100, Kurt Kanzenbach wrote:
->> Add support for LEDs on i225/i226. The LEDs can be controlled via sysfs
->> from user space using the netdev trigger. The LEDs are named as
->> igc-<bus><device>-<led> to be easily identified.
->>=20
->> Offloading activity and link speed is supported. Tested on Intel i225.
->
-> Nice to see something not driver by phylib/DSA making use of LEDs.
->
-> Is there no plain on/off support? Ideally we want that for software
-> blinking for when a mode is not supported.
+Is intentional and AFAICS required to let this rule being selected when
+the output directory is not an empty string (the target and the pre-req
+will be in different directories).
 
-Plain on and off is supported is supported, too. Should be possible to
-implement brightness_set().
+Cheers,
 
-Thanks,
-Kurt
+Paolo
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmWyDmsTHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzguiyD/9wI7NnFwQFyI+EIwhnBpOuhJ3ozKQR
-VIkRlgu5lJqpib5CgVW81zHqotEVY8xkViEoOKnvMffxRepA1+sZE1zqOoQiNNi9
-6BtyqbmaAqka+bUWs731orXX25xvP09PZ4UoYFqpNnXeFHFYgLGuNs6pIEf5Xaea
-MUF4oi5XK2ob2oUfZu/umw210oA8TYoF84hEwntQLf+Un8reypS7CCemeim6YQzB
-h2oYEe2Y+d3d3hZIoTceKfLVa5l9eyu5WmXc6tXzvTPAMlIteJzRELNe3ngJwm/d
-QN4uBm7A5UJ7nN4LOfZ0nGoOvHmsGJFQCFa4Uv0lrU7AmuM6G2gvPySAkKNUsFQG
-5sKREal5NgW/FZTj9pkEGekgtWMT+k+iIs8IBjN1lixMVTKu0Pu06TaKMaFkeiDR
-vsMtLwc4mHO9cj8C38eCGRpoOkEfqJeUD7CwdUNEfWRV0pb7SwbXuKCbU/FDLmgF
-IzCV2daYskm6BF71WQunGL/d8x3lT+2S+6ZzYmhvxF9AerU3sxcsF2F2p7L91Say
-NH9v2BnwUruN2acDZRGiMx03rNOjDxWLx+hP7CpupKzjaYs39nHrqi8bWQTQOrpD
-lb9xvEAN9fSRC9/XzK6GngSShTN5BFecDMa/navG4yBa1Ju00Uh5oj+P60gjWF6Z
-5UkFjRoE+ieGsQ==
-=Ncxy
------END PGP SIGNATURE-----
---=-=-=--
 
