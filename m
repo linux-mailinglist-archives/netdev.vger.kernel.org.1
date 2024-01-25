@@ -1,126 +1,183 @@
-Return-Path: <netdev+bounces-65696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65697-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8FE183B616
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 01:31:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5869183B620
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 01:38:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17E291C22169
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 00:31:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC44FB22428
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 00:38:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53977848D;
-	Thu, 25 Jan 2024 00:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5058962B;
+	Thu, 25 Jan 2024 00:38:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="wdCQHqEF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="q+KPlNZ1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C0AA6FB6
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 00:30:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD585C9A
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 00:38:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706142629; cv=none; b=p8WXOIj/JuXJnojXgyZvc2DeSzsp/E1MMzpbZhvbeXcOq+Ikn2Phb0ren61anfdUniSwLZWFT6uDlOiD22/CS4+yXoByLCj1PRmFKrhUeR2GURDr8tu4JLc2ez1AwiNjNete5suoahrvkqK8AAHW5WJibgi23RM2sBqDHrDcQbw=
+	t=1706143122; cv=none; b=ILOT2k+eAZELEVsU0CQ7s5mzfVEfkrLD7xEJID1acZyk3hwo+bGh4W3Cj27Tq+vzde5aQArQgbha9OEk9r1VQ5xKeMpaNTRq0FiJtWHu0O4Jf+ih99n769UYKsFEapPiO6LFV+nEMq7MTpxkDxoRkMJ/90nWfROFtTYZakKpW3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706142629; c=relaxed/simple;
-	bh=lab1cc/BnvmVMoI/6a4oqJtvBk6zbJgk82AeHiJrUN8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=XD4vxJ/yX1Lf2E1jrjjpN7HG6+4H2Lbb1CvaJ5Wmv7UESWKNDHiEezsuRUF2d7QgpiAyzD6fadOGTt6kFK1TVn0nmb5hDUj47ifds7nuXNqXb3pJs9FkjWYfk9w9z7ZYFJE8TGpZtxZu7dOwggnK8m0TsSE7RRF5NScxVdEegvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=wdCQHqEF; arc=none smtp.client-ip=209.85.166.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3627e9f1b80so12200885ab.1
-        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 16:30:27 -0800 (PST)
+	s=arc-20240116; t=1706143122; c=relaxed/simple;
+	bh=UXLqFLPksc8TBX/fRVryVJZhDzQr4mi4A1tE1ruVOXw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Content-Type; b=MDbSvXhf9r7ymZjjtmrxY13NedCwWXdCyXOhHVR0vkep+wV3OtBKXQybdHhhBqnu8Ji7HycM9o8VtGXeTWgX4tJp6PII2ahlSHR8fKzkXW8Fg/npPh72JqNybE+2dOx+TXKveoZ/il6FgMx71MX/FjHZ7G3lUOg0gJr5nOW5fFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aahila.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=q+KPlNZ1; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aahila.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6ddcf5f19b1so11693b3a.3
+        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 16:38:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1706142626; x=1706747426; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vgDFOq40XBBKNZXci2Ggytp+MQppzv/horYrfyyqlNM=;
-        b=wdCQHqEFj1fELd8jMSd1CTQLr6eZnzKB40m2nzPPjLQCZtci8aSyRLSuQjKZy9gT21
-         4DvQ9s+Ijra/BYPrcmyDDIzAN3lmuPPAbQTZTJsbE4567XCk3CZX8PoFmOxt6b/o1zBb
-         Mbp7YovlQ8q5/7ZE0oQy7vnrHLAiWXyW482mc=
+        d=google.com; s=20230601; t=1706143120; x=1706747920; darn=vger.kernel.org;
+        h=to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=qn8BdPFqvNPf3y3XhmI+SBitz5j0kIGn7Bzsh51rVlY=;
+        b=q+KPlNZ1MZXhnXm5hTYk0cIfz2cPAnNd82XquMh+Gg9MhCHJ4L1EFf85v5XZBf3Jc4
+         7Anl6kKF5qCtY3RlgcvezLN/azbI9NmM8GKonzFek05UXHC8KnU5hzQ/poIhWS6jARXj
+         RNTAy0042UCCtooXrO6CcH5P3l0CNHMuIYxZcm5IfYAWLc8q8J9wOAPCY2pRu1n/jR1b
+         6HyENu3a3U7u/G0M9EkFnjsrPrA2MLjXYXT59Us1kY+u4cfSvuXICsaaZfPUyG7alEUU
+         i/tUP9HwXtOp97t1Lc82W44gxMCYGcngem1IkJ/sDQBlZJDhsxWf8x3+0dP7bFq0d//O
+         +TXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706142626; x=1706747426;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vgDFOq40XBBKNZXci2Ggytp+MQppzv/horYrfyyqlNM=;
-        b=jENnDc6MJxEeWS5QeCssYAHoyEBXluABp2pbT5OPvYg49sVUjmIjwUNuNZTs9SIajp
-         3j7JbwHImMDQIiC+nAxzhtA71h92vhpHDIjNekcyZ8qpJKYPFjAYpGfetGDPKI0YeIrO
-         6Gp7al6fokIfK9IgZ7Z2OPokyW9X5Jj/U9bpuvhNL+akEbgElNSmP5XadZs+NgfQ6Jm+
-         CuDx8dYvD7I2cmoq/0OVlPnU5iAIdVgt79ujQTuXVrvctAjUhw5BnsJQu4n0y4P1xlhO
-         GweT5LU0yBbqs9ImcXJCB/tfVHlT6UYBl01tZqt2BJN3jbE44CStCJrzRdVShpsRYeZ9
-         ofsw==
-X-Gm-Message-State: AOJu0YwMt7v73CDYEEC+zy2Bln4WmfLoRwV8ek9WAPTfLCtmztafwsZb
-	DLOLoMSk4XIuAdNVLgtm4+G2eGiwSwxw0u1DGGXQDwN6Ws4cdIkddezjQEHnZnj3BCj8Yznw+5c
-	ylCobGmC1RcX171VO32v8/W1onEmn56ckCocQRhm7UPbMsw6xdxvD4z6C4FcNAdTA/1rr1s6zm2
-	e9UyJX6RNKURV4fGfMLSFHmzcNtYEvFdIrwzQ=
-X-Google-Smtp-Source: AGHT+IE9OMBwdVUF2LOwcQ/6fsfVNS4gRrjXRfy15GDSSC7Tq5Amb3vaXx8NekmcMrDZP656URMpnw==
-X-Received: by 2002:a92:b751:0:b0:361:abba:a7a4 with SMTP id c17-20020a92b751000000b00361abbaa7a4mr270859ilm.14.1706142626425;
-        Wed, 24 Jan 2024 16:30:26 -0800 (PST)
-Received: from localhost.localdomain ([2620:11a:c018:0:ea8:be91:8d1:f59b])
-        by smtp.gmail.com with ESMTPSA id w10-20020a63d74a000000b005cd945c0399sm12550486pgi.80.2024.01.24.16.30.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jan 2024 16:30:26 -0800 (PST)
-From: Joe Damato <jdamato@fastly.com>
-To: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: chuck.lever@oracle.com,
-	jlayton@kernel.org,
-	linux-api@vger.kernel.org,
-	brauner@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	alexander.duyck@gmail.com,
-	sridhar.samudrala@intel.com,
-	kuba@kernel.org,
-	weiwan@google.com,
-	Joe Damato <jdamato@fastly.com>
-Subject: [net-next v2 4/4] net: print error if SO_BUSY_POLL_BUDGET is large
-Date: Thu, 25 Jan 2024 00:30:14 +0000
-Message-Id: <20240125003014.43103-5-jdamato@fastly.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240125003014.43103-1-jdamato@fastly.com>
-References: <20240125003014.43103-1-jdamato@fastly.com>
+        d=1e100.net; s=20230601; t=1706143120; x=1706747920;
+        h=to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qn8BdPFqvNPf3y3XhmI+SBitz5j0kIGn7Bzsh51rVlY=;
+        b=qjqOkvec5XgAYMornydF3Diea4VOsethgmd+PGjDwdDWBCApluAQyV5Zn0UD2Uk5Mz
+         RCljoDNCFxOoKmcf7EgT9M7OJC2Ksb9m+zftxD5kiZnwWS8HwpBOfDUIhMEtqb4+0b7i
+         pP3wPfhADnEarOxJutElFwHdbGQO/yVMFjec9lALSJBD+b36ua7Ix4xYV5MPm1tMkhfV
+         fZDR/xdsz2UDvYUCf4S0d2FNYmCBeEMr3mLoEcYCJE0qLWsYjQR1vp2Xe3RNRSJC+idU
+         7ZvU8hamzTTXAauBjlWGmw5ZIIHsb1GPx0j+26UyRDQlOR/tAwYQfC4g1K5yB7CKsk5t
+         GHdw==
+X-Gm-Message-State: AOJu0YxAGeitU2Rduzmo3pEpXi6P8IlyxRpk4SaiSY5nwOfcQuvYMkST
+	m0xjZUMtD09yxeWpWQk9NfMyZFamEYsY85BA1ob17TB5DF1BUGyrNgZF4LDCnkxFWjX8om8Rh9B
+	QbA==
+X-Google-Smtp-Source: AGHT+IFa8Yq0GOgKUEbFmsa3YIW/J5CoVPcUUnAXHVJbLjsY5ctlLjWC3/Y4MB07S0ZXLnxh8t0tgnNqgsI=
+X-Received: from aahila.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2f3])
+ (user=aahila job=sendgmr) by 2002:a05:6a00:190d:b0:6dd:8444:d141 with SMTP id
+ y13-20020a056a00190d00b006dd8444d141mr6837pfi.4.1706143120068; Wed, 24 Jan
+ 2024 16:38:40 -0800 (PST)
+Date: Thu, 25 Jan 2024 00:38:16 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
+Message-ID: <20240125003816.1403636-1-aahila@google.com>
+Subject: [PATCH] ip/bond: add coupled_control support
+From: Aahil Awatramani <aahila@google.com>
+To: Aahil Awatramani <aahila@google.com>, Mahesh Bandewar <maheshb@google.com>, 
+	David Dillow <dillow@google.com>, Jay Vosburgh <j.vosburgh@gmail.com>, 
+	David Ahern <dsahern@gmail.com>, Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-When drivers call netif_napi_add_weight with a weight that is larger
-than NAPI_POLL_WEIGHT, the networking code allows the larger weight, but
-prints an error.
+coupled_control specifies whether the LACP state machine's MUX in the
+802.3ad mode should have separate Collecting and Distributing states per
+IEEE 802.1AX-2008 5.4.15 for coupled and independent control state.
 
-Replicate this check for SO_BUSY_POLL_BUDGET; check if the user
-specified amount exceeds NAPI_POLL_WEIGHT, allow it anyway, but print an
-error.
+By default this setting is on and does not separate the Collecting and
+Distributing states, maintaining the bond in coupled control. If set off,
+will toggle independent control state machine which will seperate
+Collecting and Distributing states.
 
-Signed-off-by: Joe Damato <jdamato@fastly.com>
+Signed-off-by: Aahil Awatramani <aahila@google.com>
 ---
- net/core/sock.c | 3 +++
- 1 file changed, 3 insertions(+)
+ include/uapi/linux/if_link.h |  1 +
+ ip/iplink_bond.c             | 26 +++++++++++++++++++++++++-
+ 2 files changed, 26 insertions(+), 1 deletion(-)
 
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 158dbdebce6a..ed243bd0dd77 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -1153,6 +1153,9 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
- 			return -EPERM;
- 		if (val < 0 || val > U16_MAX)
- 			return -EINVAL;
-+		if (val > NAPI_POLL_WEIGHT)
-+			pr_err("SO_BUSY_POLL_BUDGET %u exceeds suggested maximum %u\n", val,
-+			       NAPI_POLL_WEIGHT);
- 		WRITE_ONCE(sk->sk_busy_poll_budget, val);
- 		return 0;
- #endif
+diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
+index d17271fb..ff4ceeaf 100644
+--- a/include/uapi/linux/if_link.h
++++ b/include/uapi/linux/if_link.h
+@@ -1503,6 +1503,7 @@ enum {
+ 	IFLA_BOND_AD_LACP_ACTIVE,
+ 	IFLA_BOND_MISSED_MAX,
+ 	IFLA_BOND_NS_IP6_TARGET,
++	IFLA_BOND_COUPLED_CONTROL,
+ 	__IFLA_BOND_MAX,
+ };
+ 
+diff --git a/ip/iplink_bond.c b/ip/iplink_bond.c
+index 214244da..68bc157a 100644
+--- a/ip/iplink_bond.c
++++ b/ip/iplink_bond.c
+@@ -87,6 +87,12 @@ static const char *lacp_rate_tbl[] = {
+ 	NULL,
+ };
+ 
++static const char *coupled_control_tbl[] = {
++	"off",
++	"on",
++	NULL,
++};
++
+ static const char *ad_select_tbl[] = {
+ 	"stable",
+ 	"bandwidth",
+@@ -148,6 +154,7 @@ static void print_explain(FILE *f)
+ 		"                [ tlb_dynamic_lb TLB_DYNAMIC_LB ]\n"
+ 		"                [ lacp_rate LACP_RATE ]\n"
+ 		"                [ lacp_active LACP_ACTIVE]\n"
++		"                [ coupled_control COUPLED_CONTROL]\n"
+ 		"                [ ad_select AD_SELECT ]\n"
+ 		"                [ ad_user_port_key PORTKEY ]\n"
+ 		"                [ ad_actor_sys_prio SYSPRIO ]\n"
+@@ -162,6 +169,7 @@ static void print_explain(FILE *f)
+ 		"XMIT_HASH_POLICY := layer2|layer2+3|layer3+4|encap2+3|encap3+4|vlan+srcmac\n"
+ 		"LACP_ACTIVE := off|on\n"
+ 		"LACP_RATE := slow|fast\n"
++		"COUPLED_CONTROL := on|off\n"
+ 		"AD_SELECT := stable|bandwidth|count\n"
+ 	);
+ }
+@@ -176,7 +184,7 @@ static int bond_parse_opt(struct link_util *lu, int argc, char **argv,
+ {
+ 	__u8 mode, use_carrier, primary_reselect, fail_over_mac;
+ 	__u8 xmit_hash_policy, num_peer_notif, all_slaves_active;
+-	__u8 lacp_active, lacp_rate, ad_select, tlb_dynamic_lb;
++	__u8 lacp_active, lacp_rate, ad_select, tlb_dynamic_lb, coupled_control;
+ 	__u16 ad_user_port_key, ad_actor_sys_prio;
+ 	__u32 miimon, updelay, downdelay, peer_notify_delay, arp_interval, arp_validate;
+ 	__u32 arp_all_targets, resend_igmp, min_links, lp_interval;
+@@ -367,6 +375,13 @@ static int bond_parse_opt(struct link_util *lu, int argc, char **argv,
+ 
+ 			lacp_active = get_index(lacp_active_tbl, *argv);
+ 			addattr8(n, 1024, IFLA_BOND_AD_LACP_ACTIVE, lacp_active);
++		} else if (strcmp(*argv, "coupled_control") == 0) {
++			NEXT_ARG();
++			if (get_index(coupled_control_tbl, *argv) < 0)
++				invarg("invalid coupled_control", *argv);
++
++			coupled_control = get_index(coupled_control_tbl, *argv);
++			addattr8(n, 1024, IFLA_BOND_COUPLED_CONTROL, coupled_control);
+ 		} else if (matches(*argv, "ad_select") == 0) {
+ 			NEXT_ARG();
+ 			if (get_index(ad_select_tbl, *argv) < 0)
+@@ -659,6 +674,15 @@ static void bond_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
+ 			     lacp_rate);
+ 	}
+ 
++	if (tb[IFLA_BOND_COUPLED_CONTROL]) {
++		const char *coupled_control = get_name(coupled_control_tbl,
++						   rta_getattr_u8(tb[IFLA_BOND_COUPLED_CONTROL]));
++		print_string(PRINT_ANY,
++			     "coupled_control",
++			     "coupled_control %s ",
++			     coupled_control);
++	}
++
+ 	if (tb[IFLA_BOND_AD_SELECT]) {
+ 		const char *ad_select = get_name(ad_select_tbl,
+ 						 rta_getattr_u8(tb[IFLA_BOND_AD_SELECT]));
 -- 
-2.25.1
+2.43.0.429.g432eaa2c6b-goog
 
 
