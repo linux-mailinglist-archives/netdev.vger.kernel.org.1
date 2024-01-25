@@ -1,125 +1,140 @@
-Return-Path: <netdev+bounces-65864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0879283C154
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 12:53:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 523D683C160
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 12:55:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5EF328956C
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 11:53:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67DA41C22DD6
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 11:55:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94C0A2C69A;
-	Thu, 25 Jan 2024 11:53:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81EA23307B;
+	Thu, 25 Jan 2024 11:55:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WC1vINH1"
+	dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b="LaukGkcs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www530.your-server.de (www530.your-server.de [188.40.30.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 718CD1CABA
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 11:53:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6D9C481A1;
+	Thu, 25 Jan 2024 11:55:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.30.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706183604; cv=none; b=c6IRmNUff7dYa6yexUal+NjnhJk0N7ZQNZEFvhepM4igimg9iRuTicj4E4SAF8GXaBjrRQnx1Ch/kYJqkw12VuHRbtwCp2RcWyAUFsR00dbPYCdhjsfPwMhKAS5GDVWvDl/a2DSlQuEii7i0UqMJXtqdDGf/VlAD9vDrRSnHzxo=
+	t=1706183721; cv=none; b=rhHBZJnu2y3drFaih2kwuOrO3kybplYyV8mDwadIndio+xDVSJHrH8xYRFcBPbY+oiq0NPbIZ0z22ailTowuFA+OzqGKwN8InElbioSh3IuYBkRXju9OzwC4hu0Eu+wDcdsOzdndU7IIiGnZ/+ve38daapiIvO6KwbYujIfh5SU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706183604; c=relaxed/simple;
-	bh=h9mu/SRtva+3sHA+94qVBfMLNZBqZZ5vSWU3hU8vWQA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ktwJTtw1p4TKZwI9ZFN6duNGU6BLr+cr8ozl8TqNV8k3soKTf6JIqfAyx+aGRgFsvNeaD0Y8t7rAQ/d6oSKK75o4bPnKVCX0Lg5KttXt85Uf0b8v48szcY5jMWPGQhIMOgGC8nqInHEbHTMpHuZii2TbbQvfmwb7X8avcB/UznQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WC1vINH1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 813B1C433F1;
-	Thu, 25 Jan 2024 11:53:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706183604;
-	bh=h9mu/SRtva+3sHA+94qVBfMLNZBqZZ5vSWU3hU8vWQA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WC1vINH1bPG/0VkODv4Qx6BCl4vyaABchLnpyZoPEfAbbadwzZCeJv0R9wJlzfxrr
-	 G7AS20fAqh7l2RO6KjehNwNuyRNo4mlxwZcl8/UigMlT9lIG+pxbW3KxUmNJaF2TR6
-	 p/5l67kTbt/0YzvBNxXTiiY8NODH7R47y5kdjjeI812pOY1+I+GDfOvoufDKslxCsQ
-	 r9E44R2b++GzsOnL3AONqoO9sufnobiqxbJw+Zu3E8Y/oNMkM3d1uGAKp9elGLRzGB
-	 Br9UbStPiKPfLKFiX61xPEqqlXdgGC4uC+9HF7f6TjIWaEXiaGDTgP9oSwyetKXKpw
-	 4IXvXi2N+eIsw==
-Date: Thu, 25 Jan 2024 11:53:18 +0000
-From: Simon Horman <horms@kernel.org>
-To: Kurt Kanzenbach <kurt@linutronix.de>
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Andrew Lunn <andrew@lunn.ch>, Dan Carpenter <carpenter@linaro.org>
-Subject: Re: [PATCH v1 iwl-next] igc: Add support for LEDs on i225/i226
-Message-ID: <20240125115318.GI217708@kernel.org>
-References: <20240124082408.49138-1-kurt@linutronix.de>
- <20240124210855.GC217708@kernel.org>
- <87h6j1ev5j.fsf@kurt.kurt.home>
+	s=arc-20240116; t=1706183721; c=relaxed/simple;
+	bh=0/KtXWM+5DW4c3nEA6ICqAjrU+Do2pgeS89POdOEYsU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ULboprvX/U9H4zetJ4oH+ZBGrjpG+LBWevot5BO9T0KtRV8S8ZIjE+faSUtVyhbSP4Y/Y20Q0Lz4v5KBeczLwkspvQrFC1I+RJfmNM84YY/KG/HlW3hedmRDJPGrRPkBNPqoG2Hd0nCEuyh0GnhSYb24/hdLlajjxuf/+ygLhzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com; spf=pass smtp.mailfrom=geanix.com; dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b=LaukGkcs; arc=none smtp.client-ip=188.40.30.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=geanix.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=geanix.com;
+	s=default2211; h=Content-Type:MIME-Version:Message-ID:Date:References:
+	In-Reply-To:Subject:Cc:To:From:Sender:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=19ahVdd1QUjj/gfp0rYesJtgcE+kp9SEnJVob0r94EQ=; b=LaukGkcsHzUeZW5NLj7IJXgzZQ
+	ivjUU2g1KQCVPUuKm5qDxbGQvetBPb73CVDN4mQNYEnQNvrP1dRPzOV5Rs2ShqH6WrDH4BZEyD8p/
+	c81ueGK+idmgdWov8udfud6RWRhovZmbEzA2sBSF+TaAF7OMDsdP4uMM9JaYjBD38T9mOczg85XL5
+	eR8wYzvyI4Pavou9vASfNoQQ9+rzR21yrH+yXG7Gm4HDFC0Dm5S38YuF0kXQfykGaFoEL21Jxb94X
+	c5zURftVO4Ol71NqI/rRMUJJjAcSy+6/z3aRKMn9mHjj6XLzOAE92eZrHNuPZ3VkwzEmnlVKgQ2GP
+	gtD11bJw==;
+Received: from sslproxy03.your-server.de ([88.198.220.132])
+	by www530.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <esben@geanix.com>)
+	id 1rSyK9-0000LM-ID; Thu, 25 Jan 2024 12:55:13 +0100
+Received: from [185.17.218.86] (helo=localhost)
+	by sslproxy03.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <esben@geanix.com>)
+	id 1rSyK8-000MDh-Ot; Thu, 25 Jan 2024 12:55:12 +0100
+From: esben@geanix.com
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Conor Dooley <conor@kernel.org>,  devicetree@vger.kernel.org,  "David S.
+ Miller" <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Rob Herring
+ <robh+dt@kernel.org>,  Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>,  Conor Dooley <conor+dt@kernel.org>,
+  Alexandre Torgue <alexandre.torgue@foss.st.com>,  Giuseppe Cavallaro
+ <peppe.cavallaro@st.com>,  Jose Abreu <joabreu@synopsys.com>,
+  netdev@vger.kernel.org,  linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/3] dt-bindings: net: snps,dwmac: Add
+ time-based-scheduling property
+In-Reply-To: <3adf7908-be27-4125-ae5b-6f2eb6100304@linaro.org> (Krzysztof
+	Kozlowski's message of "Thu, 25 Jan 2024 10:19:45 +0100")
+References: <b365dc6f756a3fad4dfaa2675c98f4078aba8a55.1706105494.git.esben@geanix.com>
+	<30ce8f45b8752c603acc861ebb2f18d74d2f8a07.1706105494.git.esben@geanix.com>
+	<20240124-reptilian-icing-a95b20f123be@spud>
+	<87bk99hj7q.fsf@geanix.com>
+	<3adf7908-be27-4125-ae5b-6f2eb6100304@linaro.org>
+Date: Thu, 25 Jan 2024 12:55:12 +0100
+Message-ID: <877cjxhbkv.fsf@geanix.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87h6j1ev5j.fsf@kurt.kurt.home>
+Content-Type: text/plain
+X-Authenticated-Sender: esben@geanix.com
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27165/Thu Jan 25 10:51:15 2024)
 
-+ Dan Carpenter <carpenter@linaro.org>
+Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org> writes:
 
-On Thu, Jan 25, 2024 at 08:20:40AM +0100, Kurt Kanzenbach wrote:
-> On Wed Jan 24 2024, Simon Horman wrote:
-> > On Wed, Jan 24, 2024 at 09:24:08AM +0100, Kurt Kanzenbach wrote:
-> >
-> > ...
-> >
-> >> +static int igc_led_hw_control_set(struct led_classdev *led_cdev,
-> >> +				  unsigned long flags)
-> >> +{
-> >> +	struct igc_led_classdev *ldev = lcdev_to_igc_ldev(led_cdev);
-> >> +	struct igc_adapter *adapter = netdev_priv(ldev->netdev);
-> >> +	bool blink = false;
-> >> +	u32 mode;
-> >> +
-> >> +	if (flags & BIT(TRIGGER_NETDEV_LINK_10))
-> >> +		mode = IGC_LEDCTL_MODE_LINK_10;
-> >> +	if (flags & BIT(TRIGGER_NETDEV_LINK_100))
-> >> +		mode = IGC_LEDCTL_MODE_LINK_100;
-> >> +	if (flags & BIT(TRIGGER_NETDEV_LINK_1000))
-> >> +		mode = IGC_LEDCTL_MODE_LINK_1000;
-> >> +	if (flags & BIT(TRIGGER_NETDEV_LINK_2500))
-> >> +		mode = IGC_LEDCTL_MODE_LINK_2500;
-> >> +	if ((flags & BIT(TRIGGER_NETDEV_TX)) ||
-> >> +	    (flags & BIT(TRIGGER_NETDEV_RX)))
-> >> +		mode = IGC_LEDCTL_MODE_ACTIVITY;
-> >
-> > Hi Kurt,
-> >
-> > I guess this can't happen in practice,
-> > but if none of the conditions above are met,
-> > then mode is used uninitialised below.
-> 
-> Yes, it shouldn't happen, because the supported modes are
-> checked. However, mode can be initialized to off to avoid the warning.
+> On 25/01/2024 10:10, esben@geanix.com wrote:
+>> Conor Dooley <conor@kernel.org> writes:
+>> 
+>>> On Wed, Jan 24, 2024 at 03:33:06PM +0100, Esben Haabendal wrote:
+>>>> Time Based Scheduling can be enabled per TX queue, if supported by the
+>>>> controller.
+>>>
+>>> If time based scheduling is not supported by the controller, then the
+>>> property should not be present! The presence of a property like this
+>>> should mean that the feature is supported, using it is up to the
+>>> operating system.
+>>>
+>>> That said, why is this a property that should be in DT?
+>> 
+>> It is added to the tx-queues-config object of snps,dwmac bindings. This
+>> entire object is about configuration of the ethernet controller, which
+>> is also what the purpose of the snps,time-based-scheduling.
+>> So yes, it is not specifically about describing what the hardware is
+>> capable of, but how the hardware is configured. It is a continuation of
+>> the current driver design.
+>> 
+>>> If support is per controller is it not sufficient to use the
+>>> compatible to determine if this is supported?
+>> 
+>> Are you suggesting to include the mapping from all supported compatible
+>> controllers to which TX queues supports TBS in the driver code?  What
+>> would the benefit of that compared to describing it explicitly in the
+>> binding?
+>
+> The benefit is complying with DT bindings rules, saying that bindings
+> describe hardware pieces, not drivers.
 
-Thanks.
+Understood.
 
-> > Flagged by Smatch.
-> 
-> Out of curiosity how did you get the warning? I usually run `make W=1 C=1
-> M=...` before sending patches.
+>> And for the purpose of the above question, I am talking about it as if
+>> the binding was describing the hardware capability and not the
+>> configuration.
+>
+> "if"? You wrote it is for driver design...
 
-Probably there is a better way, but I run Smatch like this:
+If you look at the current driver, all the devicetree bindings under
+rx-queues-config and tx-queues-config are violating the DT binding
+rules.
+Cleaning up that requires quite some work and I guess will break
+backwards compatibility to some extend.
 
- .../smatch/smatch_scripts/kchecker a.c
+But that is another story.
 
-Smatch can be found here:
+I will respin the patch according to Conor's suggestion.
 
-  https://github.com/error27/smatch
-
-
-
+/Esben
 
