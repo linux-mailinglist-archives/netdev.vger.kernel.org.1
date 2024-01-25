@@ -1,94 +1,110 @@
-Return-Path: <netdev+bounces-66026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66010-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2636383CF8D
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 23:45:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D40AE83CF08
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 22:58:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59C8D1C22D25
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 22:45:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 133C91C25BDD
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 21:58:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4C01111A1;
-	Thu, 25 Jan 2024 22:44:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47B3F13AA30;
+	Thu, 25 Jan 2024 21:58:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="fjgNPb1k"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ib0P5DyJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07lb.world4you.com (mx07lb.world4you.com [81.19.149.117])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E29711185;
-	Thu, 25 Jan 2024 22:44:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.117
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E1B213AA2D
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 21:58:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706222697; cv=none; b=T2Na/5xZKmpsqk1GD/MnsxwWugz3AfcCjSLBWj7mv5C0jpXRl/2Katx/MoKWOb8Msp2K1zsRAoPm1zXd0DZLYJVyIdP8e4PMbFgPkTTzdUHZaRgoCwSO7T8MuGYLvd1SYeKcPOga+a6/jM5Q7vbpDg0SmXd0l13tsJ9W8Ye1rlU=
+	t=1706219886; cv=none; b=Wtv5L+Sv6HuBAHZPoCeo3Wjwl6XkXhNlpdgtoyqy71pEoi2SmvCZPna9XHlBerqzyLDGRBQaDcL6wp28yVG25CaCuBq+C0OLo4YxYUk32am1+jxFplXxMLz1iD6BDac00iLvXMS6EhAof+tz8GYo5h/E21fDr6q8otcVw3gdoKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706222697; c=relaxed/simple;
-	bh=mu300rQScOKkio8Mf2THNoDHU3+wIHUglcmCOY1wbj4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FsVQaSE6wU2Dwq7HOlUiocNlO+XDHtcGMlnr1FhInGxJE4izEfIHGLkOVmpoxUovJr/A19khm+wVqsS6fuRYUIVRTfVeBXNuFU7UE77zssyGVdLtIh9CgNMMWPfM7/rKLHKM0ciC0F8lFJ1KjhpFFOOW4KAnj5G12KcZsTszoVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=fjgNPb1k; arc=none smtp.client-ip=81.19.149.117
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=NeiUlbZNbRqE8MzxdONDlFkXjRIeAJLMSda+xK9MwfM=; b=fjgNPb1kts3MQ42h+vOHuuM/9L
-	uhNDOc9apVvgM5F8QOwLjhBaxww91uhkz9t7WmZKD9+gCrnGVY+8524gMP3Y4QoGyRZ31ZtulS10q
-	pMy51u3OJX+2Y2kF1sBa6ctbNBIWS3USX4fbgXnO9WgRpdIEZ0/RKtBoen/qjg/+2hnA=;
-Received: from [88.117.59.234] (helo=[10.0.0.160])
-	by mx07lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <gerhard@engleder-embedded.com>)
-	id 1rT7bl-00086f-1O;
-	Thu, 25 Jan 2024 22:50:01 +0100
-Message-ID: <4fe10d68-e48c-446f-96f7-157b85b1a6fb@engleder-embedded.com>
-Date: Thu, 25 Jan 2024 22:50:00 +0100
+	s=arc-20240116; t=1706219886; c=relaxed/simple;
+	bh=3JA/WmK1DJG/lsNo9CXReeHf651vlFcyJHbFVNZCQ1g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k/cSAtdXDRqgx8FLe2NRXfcC7pOERE+c5jCedmXOlCwnsnUvmC5FgsiG36oKCBSIWY8MbQWDSTliQitq0Xhi9I1RC12eVxUMUr5u2buTpJhjJxtlKtJ+ae0pKbaGUarQSW5VxElccqmK6FIG6AwjuUGIuvfuYkhIz5D9+DFddpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ib0P5DyJ; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706219884; x=1737755884;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=3JA/WmK1DJG/lsNo9CXReeHf651vlFcyJHbFVNZCQ1g=;
+  b=ib0P5DyJuUHCMIJGp/yceokPT2BBgxp/VVJHjTBbzjvu3xL9rYzhLqcd
+   XkrtZDHiCm4dc/EECRaj40lgW4IZGMxIaS6+9yXtk04vvJseHRRjBNN5F
+   oTOgeuCrDyEAXeo7GsYjO4HqgDhTy/Rd/AV19Ypvn1cNxYQFPUimndBNx
+   tzLRtfpebB+8E1Cf3PX/vicjqdaXLIj6MAtqi9F/APDqBuFSxf/2ITBig
+   wBvGNeHiJMEDDFW4EB5qXaZRe4H+EVA9PWuyQGuSNNkfiR1vmHfyV3c9r
+   f+ATS4muXDN+8PHN01IrbOv1/g/l9CEcAfsh3ylPMeMabSV/XRQI8WafB
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="9069073"
+X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
+   d="scan'208";a="9069073"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2024 13:58:03 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
+   d="scan'208";a="35239917"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orviesa001.jf.intel.com with ESMTP; 25 Jan 2024 13:58:03 -0800
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	richardcochran@gmail.com,
+	karol.kolacinski@intel.com,
+	jacob.e.keller@intel.com
+Subject: [PATCH net-next 0/7][pull request] ice: fix timestamping in reset process
+Date: Thu, 25 Jan 2024 13:57:48 -0800
+Message-ID: <20240125215757.2601799-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 2/2] tsnep: Fix XDP_RING_NEED_WAKEUP for empty fill
- ring
-To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- bpf@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
- bjorn@kernel.org, magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
- jonathan.lemon@gmail.com
-References: <20240123200918.61219-1-gerhard@engleder-embedded.com>
- <20240123200918.61219-3-gerhard@engleder-embedded.com>
- <41a9cd95c940aeb418f45a1d4e3ff4b0e8f62d5a.camel@redhat.com>
-Content-Language: en-US
-From: Gerhard Engleder <gerhard@engleder-embedded.com>
-In-Reply-To: <41a9cd95c940aeb418f45a1d4e3ff4b0e8f62d5a.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-AV-Do-Run: Yes
+Content-Transfer-Encoding: 8bit
 
-On 25.01.24 12:06, Paolo Abeni wrote:
-> On Tue, 2024-01-23 at 21:09 +0100, Gerhard Engleder wrote:
->> +	if (xsk_uses_need_wakeup(rx->xsk_pool)) {
->> +		int desc_available = tsnep_rx_desc_available(rx);
->> +
->> +		if (desc_available)
->> +			xsk_set_rx_need_wakeup(rx->xsk_pool);
->> +		else
->> +			xsk_clear_rx_need_wakeup(rx->xsk_pool);
->> +	}
->>   }
->>   
->>   static bool tsnep_pending(struct tsnep_queue *queue)
-> 
-> The patch LGTM, but there is a very similar chunk of code in
-> tsnep_rx_poll_zc(). You should consider a net-next follow-up
-> consolidating the code in a common helper.
+Karol Kolacinski says:
 
-I will do. Thanks!
+PTP reset process has multiple places where timestamping can end up in
+an incorrect state.
+
+This series introduces a proper state machine for PTP and refactors
+a large part of the code to ensure that timestamping does not break.
+
+The following are changes since commit 91374ba537bd60caa9ae052c9f1c0fe055b39149:
+  net: dsa: mt7530: support OF-based registration of switch MDIO bus
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 100GbE
+
+Jacob Keller (7):
+  ice: introduce PTP state machine
+  ice: pass reset type to PTP reset functions
+  ice: rename verify_cached to has_ready_bitmap
+  ice: don't check has_ready_bitmap in E810 functions
+  ice: rename ice_ptp_tx_cfg_intr
+  ice: factor out ice_ptp_rebuild_owner()
+  ice: stop destroying and reinitalizing Tx tracker during reset
+
+ drivers/net/ethernet/intel/ice/ice.h         |   1 -
+ drivers/net/ethernet/intel/ice/ice_ethtool.c |   2 +-
+ drivers/net/ethernet/intel/ice/ice_main.c    |   4 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.c     | 229 +++++++++++--------
+ drivers/net/ethernet/intel/ice/ice_ptp.h     |  34 ++-
+ 5 files changed, 164 insertions(+), 106 deletions(-)
+
+-- 
+2.41.0
+
 
