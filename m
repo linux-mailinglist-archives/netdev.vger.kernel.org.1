@@ -1,202 +1,250 @@
-Return-Path: <netdev+bounces-65732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0959A83B85C
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 04:36:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4658F83B864
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 04:39:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 62607B262DC
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 03:36:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 69CD71C22969
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 03:39:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 228D16FAE;
-	Thu, 25 Jan 2024 03:35:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60D056FD1;
+	Thu, 25 Jan 2024 03:39:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="DGEn2Waq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VHy9lIB/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A323B63D1
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 03:35:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E2556FC8
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 03:39:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706153754; cv=none; b=VaX//P/tsgmBAJzY5ud+Gjrb+BWuNK5+EVoL7bGC0iLZkdrwzEtqUAVMd56LaQfF4RsO2c/0psA3JG753Zow/x+0Fq/PPY32KtYOnImCdqqM00kcbPBrjB6imIFVca4gaO+lf5m3nS+emfKwGw6aOUxJhu7bVeP3Y+9+oEBiiS4=
+	t=1706153962; cv=none; b=U4yThCC6J2SR80prrqcKIYU1dW9ojKOHn5taWITvTo/FhHM7uUycOtXM8XdR2Jb8H6Cb8iEEhRzDojpFo0efoANjevN9pMshXujSeDrC2pzizIxsguA+qGbbHhkadgyk7UdYb+cK57En6nmfx8KARcCwzjmzg8yyDMQXA9QOSnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706153754; c=relaxed/simple;
-	bh=6nRO7tVIGS6NqjEUV32c0V89zXu/a/eSWSP8LlCHKFs=;
+	s=arc-20240116; t=1706153962; c=relaxed/simple;
+	bh=aYtraKeg/phW07/7iPMWoTxqzaJdJOv0+Sxt7exwBJQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cdlDFjZZ7xGYCfBWfQWRMF8AixP1N/7pZqPfhA+4r++Wza5HJHLylUX+gy9DSnG0XxJLEENK6DJ6CZC8jDvBNNA+FP5b8YNiUX7fxKn4uf/2pvYrET9k0ctTErlaV3UFOPH4/cCs+n+zYCokW8R3GtJoAz5Z9PMwPsyZ8QdMZpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=DGEn2Waq; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-6dc6f47302bso2930023b3a.1
-        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 19:35:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1706153752; x=1706758552; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=svoN3dIRvrN08U008NC40Yjwx21EPTFjkLlPLr6binY=;
-        b=DGEn2WaqQ01PJ6X1ELWBwpcmeZMVWyiRmU9S0XdRZiLKQzHguICR2PrO0ff4PUOyi9
-         Y1NJ3TJjtG27L06Y/B9hz5ZvYIkfsZcvJV9w6G4MlORSHL6vhG1+8jZviXuCOAze1U53
-         bAc/gMwuP544z2w9qLLftJfcjaXQK/w/9dEuQ=
+	 To:Cc:Content-Type; b=dB99+kifJ2EwW77s2fT8kOcxaa8AleXJn+EW0E3ASzksklMvJPDRthz/NYgMMMQ1NfAPSORXzSrnHWyXdx/4D+zRTsa8Nlu2WzmbQgji/fE6wRVTv3lPoOCXrBJSH7Z/qZR3PkzW36KWDYR7iUAvAY94UvKQE9MRGdxrBSDuFOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VHy9lIB/; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706153958;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7+kv1E8M93VST5z9hGMNp++MAPNLoKeq0RXuFtSVRPM=;
+	b=VHy9lIB/8j8ZlgqWfAC2o5Ee0qR3aT3XvK1ll3WmvcPm289JNJnb5DAdsuZO9OwfGz/bhd
+	pMNbO5sibE3T6LW/4Gztxp14fgw5AJQoKVboNCrzBXmLfeWJm/V/fOB9DTz4Tm6Jhstb1R
+	M6pEI0xgq37YtdpfKqJB559GfXE5VTY=
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
+ [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-104-16_EUNbEM_iv8S-oKQvbHw-1; Wed, 24 Jan 2024 22:39:16 -0500
+X-MC-Unique: 16_EUNbEM_iv8S-oKQvbHw-1
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-5cf2714e392so329378a12.0
+        for <netdev@vger.kernel.org>; Wed, 24 Jan 2024 19:39:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706153752; x=1706758552;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=svoN3dIRvrN08U008NC40Yjwx21EPTFjkLlPLr6binY=;
-        b=D2uaVCLZP4fpBWCSgVsSosD2rAvlPFHksiZDuA5WGZTD6GVlZ7TVB4lDrxZP7ogTwD
-         D3kCvRkrrFRFZzKFrGOTQlOXZptgTJiDnunOaav9uRVJuHgA9p2XFM45GGzj/C+fISdb
-         EHQDLqxIvES7KlyMWLopV0xCjdQlFSkXwEVL7twcyk2oU8ZjlfccopXMmqTlE5II0nBV
-         Trc89KUERDwcAjZ1H7qiXBPIszufuwTWsl/RlV38C5OtFvlTlBunewK5URfhpwpmRUwn
-         KNtG9LfuX7clyO3uAJfXxVu35yL8qT8iWEqhBvZaUudqHzA2g0VNi5JF4CCjQVGI5MAY
-         RwGA==
-X-Gm-Message-State: AOJu0YzWOVSHz7f638CQ9ViW8fJevHSu/Mbbe3QQw4rR9KFlWqTMfmdA
-	otN/IgniMugEpvdu+QlcCePdNqMcWZVBMylQdYrbuxQAZ9bozWtO8KuzXK4lNGvMBRyHfhzCHjS
-	th9fI+xzWcZC10RbcGit9tnv1m8cEKo+YTjz1
-X-Google-Smtp-Source: AGHT+IHdvgla9Vs6831gyqpqW+7dbwsrn1/Qftz1ZzBNEeVdjuPxx2UvGshrWzRRujZVx3mGsf4ycJhd8cEEpuxKPgI=
-X-Received: by 2002:a05:6a20:8e04:b0:19c:5272:a571 with SMTP id
- y4-20020a056a208e0400b0019c5272a571mr590463pzj.33.1706153751809; Wed, 24 Jan
- 2024 19:35:51 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706153955; x=1706758755;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7+kv1E8M93VST5z9hGMNp++MAPNLoKeq0RXuFtSVRPM=;
+        b=GSq8cGBEgF0E+AygLhx6Sl9mMUEBTuP1wYO4aEpMlkk3uYXZnVSjedRiie3P8TbXkH
+         jElRnHiTS4DnOdfLuzU2za1jJqPOT1+OjrHgZFRbe9rRKl08Xrv/EtA+heWO8EGRmvEZ
+         nru91iZTgDSKhhabNk7sRi1vqbQsKuEsbwxF6YqN8pAnE2CN5RGRRRYyn2qdCWCQr0O2
+         vR7n69ZuFy7mus3eYuVK3LnW5ZSi5yVoQeATtiVHg6/LJdw4sFNVxnNvH636uSW50/ZX
+         P0N9yTHyQF79SU5wnOFFm/dp656pnbvzfg0Hkv0DaVt8DfxFG7Sx/7UdEUAty9IrAKMN
+         KSQg==
+X-Gm-Message-State: AOJu0YyjO2kjVbv4xwjPX6t+K9I5eazoGaIli1SoUMs9avcck/SMszc7
+	P5jqZRQvL6tmPi4Jcd+elODTlgGjyaV2dQ6aBUfWgmsRDducIkQakIrniqlHvGgGNV85u5Xxz//
+	1HlJpjwA70WMIMIdlC7zr90rRvZCD8RbiebvijN521u5fZwzVcXPc5e5gwoK2j9jZzru8s1XvaQ
+	H1YHnEBWzUDTPdzj7C2bnHJJq3zmQ0
+X-Received: by 2002:a05:6a20:938d:b0:19a:f0ef:ffc with SMTP id x13-20020a056a20938d00b0019af0ef0ffcmr561792pzh.3.1706153954782;
+        Wed, 24 Jan 2024 19:39:14 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEVvYsNNKLu8vKw6h7D0IpqxiuwRhcQvL/n+p++mwu2Jx6DGQNuoinfcujLAu57LUqNpXdniTVSTxpEPUGA4Ms=
+X-Received: by 2002:a05:6a20:938d:b0:19a:f0ef:ffc with SMTP id
+ x13-20020a056a20938d00b0019af0ef0ffcmr561774pzh.3.1706153954482; Wed, 24 Jan
+ 2024 19:39:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231212005122.2401-1-michael.chan@broadcom.com>
- <20231212005122.2401-14-michael.chan@broadcom.com> <ZbDj/FI4EJezcfd1@gmail.com>
-In-Reply-To: <ZbDj/FI4EJezcfd1@gmail.com>
-From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Date: Thu, 25 Jan 2024 09:05:39 +0530
-Message-ID: <CALs4sv3xWaOg63a3ZVPDSq8nf2E84XNNLC1L6fJe9zphuWpgYg@mail.gmail.com>
-Subject: Re: [PATCH net-next 13/13] bnxt_en: Make PTP TX timestamp HWRM query silent
-To: Breno Leitao <leitao@debian.org>
-Cc: Michael Chan <michael.chan@broadcom.com>, davem@davemloft.net, netdev@vger.kernel.org, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, gospo@broadcom.com
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000056b959060fbce0a8"
-
---00000000000056b959060fbce0a8
+References: <20240116075924.42798-1-xuanzhuo@linux.alibaba.com> <20240116075924.42798-5-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20240116075924.42798-5-xuanzhuo@linux.alibaba.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 25 Jan 2024 11:39:03 +0800
+Message-ID: <CACGkMEtSnuo6yAsiFZkrv6bMaJtLXuLQtL-qvKn-Y_L_PLHdcw@mail.gmail.com>
+Subject: Re: [PATCH net-next 4/5] virtio_ring: introduce virtqueue_get_dma_premapped()
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, virtualization@lists.linux.dev, 
+	bpf@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 24, 2024 at 3:48=E2=80=AFPM Breno Leitao <leitao@debian.org> wr=
-ote:
+On Tue, Jan 16, 2024 at 3:59=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
+om> wrote:
 >
-> Hello Michael, Pavan,
+> Introduce helper virtqueue_get_dma_premapped(), then the driver
+> can know whether dma unmap is needed.
 >
-> On Mon, Dec 11, 2023 at 04:51:22PM -0800, Michael Chan wrote:
-> > From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-> >
-> > In a busy network, especially with flow control enabled, we may
-> > experience timestamp query failures fairly regularly. After a while,
-> > dmesg may be flooded with timestamp query failure error messages.
-> >
-> > Silence the error message from the low level hwrm function that
-> > sends the firmware message.  Change netdev_err() to netdev_WARN_ONCE()
-> > if this FW call ever fails.
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> ---
+>  drivers/net/virtio/main.c       | 22 +++++++++-------------
+>  drivers/net/virtio/virtio_net.h |  3 ---
+>  drivers/virtio/virtio_ring.c    | 22 ++++++++++++++++++++++
+>  include/linux/virtio.h          |  1 +
+>  4 files changed, 32 insertions(+), 16 deletions(-)
 >
-> This is starting to cause a warning now, which is not ideal, because
-> this error-now-warning happens quite frequently in Meta's fleet.
+> diff --git a/drivers/net/virtio/main.c b/drivers/net/virtio/main.c
+> index 186b2cf5d8fc..4fbf612da235 100644
+> --- a/drivers/net/virtio/main.c
+> +++ b/drivers/net/virtio/main.c
+> @@ -483,7 +483,7 @@ static void *virtnet_rq_get_buf(struct virtnet_rq *rq=
+, u32 *len, void **ctx)
+>         void *buf;
 >
-> At the same time, we want to have our kernels running warninglessly.
-> Moreover, the call stack displayed by the warning doesn't seem to be
-> quite useful and doees not help to investigate "the problem", I _think_.
+>         buf =3D virtqueue_get_buf_ctx(rq->vq, len, ctx);
+> -       if (buf && rq->do_dma)
+> +       if (buf && virtqueue_get_dma_premapped(rq->vq))
+>                 virtnet_rq_unmap(rq, buf, *len);
 >
-> Is it OK to move it back to error, something as:
+>         return buf;
+> @@ -496,7 +496,7 @@ static void virtnet_rq_init_one_sg(struct virtnet_rq =
+*rq, void *buf, u32 len)
+>         u32 offset;
+>         void *head;
 >
-> -       netdev_WARN_ONCE(bp->dev,
-> +       netdev_err_once(bp->dev,
->                          "TS query for TX timer failed rc =3D %x\n", rc);
+> -       if (!rq->do_dma) {
+> +       if (!virtqueue_get_dma_premapped(rq->vq)) {
+>                 sg_init_one(rq->sg, buf, len);
+>                 return;
+>         }
+> @@ -526,7 +526,7 @@ static void *virtnet_rq_alloc(struct virtnet_rq *rq, =
+u32 size, gfp_t gfp)
+>
+>         head =3D page_address(alloc_frag->page);
+>
+> -       if (rq->do_dma) {
+> +       if (virtqueue_get_dma_premapped(rq->vq)) {
+>                 dma =3D head;
+>
+>                 /* new pages */
+> @@ -580,12 +580,8 @@ static void virtnet_rq_set_premapped(struct virtnet_=
+info *vi)
+>         if (!vi->mergeable_rx_bufs && vi->big_packets)
+>                 return;
+>
+> -       for (i =3D 0; i < vi->max_queue_pairs; i++) {
+> -               if (virtqueue_set_dma_premapped(vi->rq[i].vq))
+> -                       continue;
+> -
+> -               vi->rq[i].do_dma =3D true;
+> -       }
+> +       for (i =3D 0; i < vi->max_queue_pairs; i++)
+> +               virtqueue_set_dma_premapped(vi->rq[i].vq);
+>  }
+>
+>  static void free_old_xmit(struct virtnet_sq *sq, bool in_napi)
+> @@ -1643,7 +1639,7 @@ static int add_recvbuf_small(struct virtnet_info *v=
+i, struct virtnet_rq *rq,
+>
+>         err =3D virtqueue_add_inbuf_ctx(rq->vq, rq->sg, 1, buf, ctx, gfp)=
+;
+>         if (err < 0) {
+> -               if (rq->do_dma)
+> +               if (virtqueue_get_dma_premapped(rq->vq))
+>                         virtnet_rq_unmap(rq, buf, 0);
+>                 put_page(virt_to_head_page(buf));
+>         }
+> @@ -1758,7 +1754,7 @@ static int add_recvbuf_mergeable(struct virtnet_inf=
+o *vi,
+>         ctx =3D mergeable_len_to_ctx(len + room, headroom);
+>         err =3D virtqueue_add_inbuf_ctx(rq->vq, rq->sg, 1, buf, ctx, gfp)=
+;
+>         if (err < 0) {
+> -               if (rq->do_dma)
+> +               if (virtqueue_get_dma_premapped(rq->vq))
+>                         virtnet_rq_unmap(rq, buf, 0);
+>                 put_page(virt_to_head_page(buf));
+>         }
+> @@ -4007,7 +4003,7 @@ static void free_receive_page_frags(struct virtnet_=
+info *vi)
+>         int i;
+>         for (i =3D 0; i < vi->max_queue_pairs; i++)
+>                 if (vi->rq[i].alloc_frag.page) {
+> -                       if (vi->rq[i].do_dma && vi->rq[i].last_dma)
+> +                       if (virtqueue_get_dma_premapped(vi->rq[i].vq) && =
+vi->rq[i].last_dma)
+>                                 virtnet_rq_unmap(&vi->rq[i], vi->rq[i].la=
+st_dma, 0);
+>                         put_page(vi->rq[i].alloc_frag.page);
+>                 }
+> @@ -4035,7 +4031,7 @@ static void virtnet_rq_free_unused_bufs(struct virt=
+queue *vq)
+>         rq =3D &vi->rq[i];
+>
+>         while ((buf =3D virtqueue_detach_unused_buf(vq)) !=3D NULL) {
+> -               if (rq->do_dma)
+> +               if (virtqueue_get_dma_premapped(rq->vq))
+>                         virtnet_rq_unmap(rq, buf, 0);
+>
+>                 virtnet_rq_free_buf(vi, rq, buf);
+> diff --git a/drivers/net/virtio/virtio_net.h b/drivers/net/virtio/virtio_=
+net.h
+> index b28a4d0a3150..066a2b9d2b3c 100644
+> --- a/drivers/net/virtio/virtio_net.h
+> +++ b/drivers/net/virtio/virtio_net.h
+> @@ -115,9 +115,6 @@ struct virtnet_rq {
+>
+>         /* Record the last dma info to free after new pages is allocated.=
+ */
+>         struct virtnet_rq_dma *last_dma;
+> -
+> -       /* Do dma by self */
+> -       bool do_dma;
+>  };
+>
+>  struct virtnet_info {
+> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> index 2c5089d3b510..9092bcdebb53 100644
+> --- a/drivers/virtio/virtio_ring.c
+> +++ b/drivers/virtio/virtio_ring.c
+> @@ -2905,6 +2905,28 @@ int virtqueue_set_dma_premapped(struct virtqueue *=
+_vq)
+>  }
+>  EXPORT_SYMBOL_GPL(virtqueue_set_dma_premapped);
+>
+> +/**
+> + * virtqueue_get_dma_premapped - get the vring premapped mode
+> + * @_vq: the struct virtqueue we're talking about.
+> + *
+> + * Get the premapped mode of the vq.
+> + *
+> + * Returns bool for the vq premapped mode.
+> + */
+> +bool virtqueue_get_dma_premapped(struct virtqueue *_vq)
+> +{
+> +       struct vring_virtqueue *vq =3D to_vvq(_vq);
+> +       bool premapped;
+> +
+> +       START_USE(vq);
+> +       premapped =3D vq->premapped;
+> +       END_USE(vq);
 
-Hi Breno, I think it is OK to change.
-Would you be submitting a patch for this?
+Why do we need to protect premapped like this? Is the user allowed to
+change it on the fly?
 
->
-> Thank you
+Thanks
 
---00000000000056b959060fbce0a8
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-OltyqaGBuzv+bJTUL+bmV7E4QBLIqGt4jVr1R9hJdH6KxXwJdyfHZ9C6qXmoe2NQhiFUyBOJ0wgk
-dB9Z1IU7nCwvNKYg2JMoJs93tIgbhPJg/D7pqW8gabkCAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZcGF2YW4uY2hlYmJpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUEV6y/89alKPoFbKUaJXsvWu5
-fdowDQYJKoZIhvcNAQELBQADggEBAEHSIB6g652wVb+r2YCmfHW47Jo+5TuCBD99Hla8PYhaWGkd
-9HIyD3NPhb6Vb6vtMWJW4MFGQF42xYRrAS4LZj072DuMotr79rI09pbOiWg0FlRRFt6R9vgUgebu
-pWSH7kmwVXcPtY94XSMMak4b7RSKig2mKbHDpD4bC7eGlwl5RxzYkgrHtMNRmHmQor5Nvqe52cFJ
-25Azqtwvjt5nbrEd81iBmboNTEnLaKuxbbCtLaMEP8xKeDjAKnNOqHUMps0AsQT8c0EGq39YHpjp
-Wn1l67VU0rMShbEFsiUf9WYgE677oinpdm0t2mdCjxr35tryxptoTZXKHDxr/Yy6l6ExggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwV/XkICjVscn4SNZMw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIG8CKHPoNLX9PnwAvpIDh//NBN1uaE8t
-Gz+Os3aMoi52MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDEy
-NTAzMzU1MlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBsQ+xHp4J6doklTREc7bkPhp2Cebz7XvhHaP5GFVHPQnTZB/Is
-EliYE0/DPl0aon1vfC1FGpJGJr+GEWZnMG33dlJBgQAfDQT97FlaZPhTaS6q/Fj9qvzDluTbMxbu
-TZqC4ensC9phAIlEzh3kJQpIuYUS9TwV6rd+KkUA2fPsWZD7hEzwxlLE6beJmhoKIJd4S94pW4RY
-vN+AdRSJgiTI7ox2+uvBps44SG/9pYC2AwUEFDElRECl6EY20iw/R1YGlnHEfsdO7oNyyP/Tz6lQ
-xzKelchtIfEi3p5Hu8u81NcO6YmR3ZkXOXgoLzXypUCiNfC9A+kunT9Shz/r2EXq
---00000000000056b959060fbce0a8--
 
