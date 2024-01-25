@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-65899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FF1383C41C
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 14:50:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5C6F83C433
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 14:59:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB0441F26BDB
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 13:50:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6535828B202
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 13:59:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 474055A7B1;
-	Thu, 25 Jan 2024 13:50:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14F0B6025F;
+	Thu, 25 Jan 2024 13:59:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A21DB5B202;
-	Thu, 25 Jan 2024 13:50:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42F654F605;
+	Thu, 25 Jan 2024 13:59:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706190651; cv=none; b=h1Nhqq3i9huB8aT4eRjn8mSJB7rTrthAoG1Rzlnaek6rRkLPEwh7yKbC8glAU9icelaqjJfISbpcbo+aezqKpV1jmnPgkWRfEM1i6ldbbdlfhnSHEVZGlXg1P/kJP/id7EEGkV4sGqJkSgkjaoyPBURK/W9VytdTASLlwuVDjyQ=
+	t=1706191173; cv=none; b=bJoy2DKn3co0xTW9xwkA8vlIKDmoZeRMjIdfwqCwNOnYvcq3w3vluD0qptQZXweEAUjQYHpAi8Qf0YXrU0Z5y++zrQlUEcUhv8wqE+S2ufcOsB+SPaW0C/Q5hGeXPCM3EbVYERy+G7uJXwekXx0nE6CDYtl0oDWnt77CnbIzOko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706190651; c=relaxed/simple;
-	bh=F/U5LhGNBmgteZeGVKoqIAELqkcV5qzrLt5Z3MmCb9w=;
+	s=arc-20240116; t=1706191173; c=relaxed/simple;
+	bh=8AGFVASptUqPJ/wFZGmb5DRTaVyYgd1A6i4rBvx5gco=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xq5RJgPLNrAV+vZOE1qObv6thktGbHw9Bs6pWWy49GsC7Ds+Jd4gjCRf6n76BggyF6Ecj8vW6aCFoep0xm12Ye3k4uEcHKcYeI9Eqwo+/veri+RQr2aJv4nY/rxEQL+kNyioPBUNtXzVQ//pkkrPXT99v3eEf1VNzT1FVIAWeWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.51
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ned/nTtgNwP6/zNi86WgBZSmQMdyo99D705Tw1/aVejWR5FIdaYWuhy3IvWfeXixFT69xImGshFyBBnWMdpld0ZYc8R03LnK2L23lmM645wILeJQAbOfA6V2eo7zejqVBPvSOgNl7Ja1GcchEX7QXXmcUJHcMeKTLn3gPkoD6rs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a28a6cef709so703628266b.1;
-        Thu, 25 Jan 2024 05:50:49 -0800 (PST)
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-557dcb0f870so8339455a12.2;
+        Thu, 25 Jan 2024 05:59:30 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706190648; x=1706795448;
+        d=1e100.net; s=20230601; t=1706191169; x=1706795969;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fHBFo+pVlE6vUm8V2rDw0OyWPlmP6lAjan69MnX7bZ4=;
-        b=KzE57ueBGvcd7SoTCEelmmpmFG/jSOkGuQ5WrGaaTMq56hPxmBOeQf3l+IQAvTqjvw
-         p7NMfNiur1o00rvYHFVtV3h5Sd59cOBY148yUk7Bxv+BqtZLFdbMUSqpczRcpMKXtEbo
-         YMYRWh600tmVMJuDwVGK+jK9LsmRqrWu9gIBpcRCeA8aVi+LePQqaSUtWrjkIc9cHHFv
-         AC+uG3197Q12uzOVjkCCMzqiUsuqTg6X4E/jdQY/NXPenWTpt6H3tdaAJc+HpemhVstH
-         JuTbsuQ28JZ02FqN+ehA5esVCseIDtyremQtVFqvhYQ3lxDY4R79xhNDsEBGbIcGrvYe
-         LdrA==
-X-Gm-Message-State: AOJu0Yxx/hZuT4lsillJPtl8uH/Gj9rQ65Tz/4Tn85uFlEo/bvwdElhQ
-	uopwuhbFgWLrNwNrPpThHLvaNylh7MBfKCtN0gSAxUihvdZng4pZ
-X-Google-Smtp-Source: AGHT+IENQs3qkbW6Z2O2Rx7IiRcujrk2SL8jPrIwcIHgjM9k8+74dxv+KUH+S67s2s6KGIgm0Oon/g==
-X-Received: by 2002:a17:906:c8c8:b0:a2d:ad36:a7a7 with SMTP id gc8-20020a170906c8c800b00a2dad36a7a7mr470492ejb.154.1706190647466;
-        Thu, 25 Jan 2024 05:50:47 -0800 (PST)
-Received: from gmail.com (fwdproxy-cln-009.fbsv.net. [2a03:2880:31ff:9::face:b00c])
-        by smtp.gmail.com with ESMTPSA id cu15-20020a170906ba8f00b00a318cb84525sm460471ejd.216.2024.01.25.05.50.46
+        bh=vRt1jnxtIkTBtnjcffX9r8OuG5owutFG9NfxVkKLTL8=;
+        b=oRe8GUJDdaXsB83Z4hno5dIdXM/kiWKNdH+4wO1H/YyHpgr2HBxgJ5+t/YhD/aH+4x
+         r35ndQ4ZbZy+zYZd6nGHUsC0N5BBAhq/rthHKDDrXyjrXbqP8unvgLFJnQtIfxAImfYY
+         9pMP3fNnw1YZfX92NyrESWNE/ux9uSbE2aodrw2uiL+8Yc6iP4ql0ebhwoXjrbkFId+G
+         RlJ76a1W/zacwRuv3z6XaVzoiY5qJU3J6UAPuAXTLQwraPHMZIgC+aCr7kb1ZRbuOghx
+         7/TdZERcvmnyn1vRaVl/QmfDMBP5v11blbI/klrCBztgJq4fruQ8B7GFjkBcBGXgg12e
+         tdaA==
+X-Gm-Message-State: AOJu0YysaSHtkO+vfJSZVw/ChI7VL7+PSFsybAfvPnqOoZ1azzXGWx6m
+	MSzlb+ht6N8QlWEygH3Y+7dW+EEoyk9c9laeV6oH9WJ8PsGqEkHR
+X-Google-Smtp-Source: AGHT+IHcBnHhMWlamXgWfDIupJ18TUEaQILIdLJYl3TEu2Pyr8TdTkS40pJLyPzQ2jikAdxQaVJMzg==
+X-Received: by 2002:a17:906:af66:b0:a30:e420:ef9 with SMTP id os6-20020a170906af6600b00a30e4200ef9mr459982ejb.148.1706191169215;
+        Thu, 25 Jan 2024 05:59:29 -0800 (PST)
+Received: from gmail.com (fwdproxy-cln-003.fbsv.net. [2a03:2880:31ff:3::face:b00c])
+        by smtp.gmail.com with ESMTPSA id hz5-20020a1709072ce500b00a2fd76dddebsm1042880ejc.35.2024.01.25.05.59.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jan 2024 05:50:47 -0800 (PST)
-Date: Thu, 25 Jan 2024 05:50:45 -0800
+        Thu, 25 Jan 2024 05:59:28 -0800 (PST)
+Date: Thu, 25 Jan 2024 05:59:26 -0800
 From: Breno Leitao <leitao@debian.org>
 To: Donald Hunter <donald.hunter@gmail.com>
 Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
@@ -63,11 +63,11 @@ Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
 	Jiri Pirko <jiri@resnulli.us>,
 	Alessandro Marcolini <alessandromarcolini99@gmail.com>,
 	donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v1 01/12] tools/net/ynl: Add --output-json arg
- to ynl cli
-Message-ID: <ZbJnNbX56eY3xcKK@gmail.com>
+Subject: Re: [PATCH net-next v1 11/12] tools/net/ynl: Add type info to struct
+ members in generated docs
+Message-ID: <ZbJpPuGP/GcZwhYZ@gmail.com>
 References: <20240123160538.172-1-donald.hunter@gmail.com>
- <20240123160538.172-2-donald.hunter@gmail.com>
+ <20240123160538.172-12-donald.hunter@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,13 +76,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240123160538.172-2-donald.hunter@gmail.com>
+In-Reply-To: <20240123160538.172-12-donald.hunter@gmail.com>
 
-On Tue, Jan 23, 2024 at 04:05:27PM +0000, Donald Hunter wrote:
-> The ynl cli currently emits python pretty printed structures which is
-> hard to consume. Add a new --output-json argument to emit JSON.
+On Tue, Jan 23, 2024 at 04:05:37PM +0000, Donald Hunter wrote:
+> Extend the ynl doc generator to include type information for struct
+> members, ignoring the pad type.
 > 
 > Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+> ---
+>  tools/net/ynl/ynl-gen-rst.py | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/net/ynl/ynl-gen-rst.py b/tools/net/ynl/ynl-gen-rst.py
+> index 262d88f88696..75c969d36b6a 100755
+> --- a/tools/net/ynl/ynl-gen-rst.py
+> +++ b/tools/net/ynl/ynl-gen-rst.py
+> @@ -189,12 +189,20 @@ def parse_operations(operations: List[Dict[str, Any]]) -> str:
+>  
+>  def parse_entries(entries: List[Dict[str, Any]], level: int) -> str:
+>      """Parse a list of entries"""
+> +    ignored = ["pad"]
+>      lines = []
+>      for entry in entries:
+>          if isinstance(entry, dict):
+>              # entries could be a list or a dictionary
+> +            field_name = entry.get("name", "")
+> +            if field_name in ignored:
+> +                continue
+> +            type_ = entry.get("type")
+> +            struct_ = entry.get("struct")
 
-Reviewed-by: Breno Leitao <leitao@debian.org>
+Where are you using this `struct_` variable ?
+
+Rest of the code it looks good.
 
