@@ -1,133 +1,98 @@
-Return-Path: <netdev+bounces-65719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF0DC83B710
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 03:19:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0092D83B717
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 03:23:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 489341F23CBE
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 02:19:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 831F7B243A7
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 02:23:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 241F11860;
-	Thu, 25 Jan 2024 02:18:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2739667C71;
+	Thu, 25 Jan 2024 02:23:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFE0E17C2;
-	Thu, 25 Jan 2024 02:18:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 302CD6AB9
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 02:23:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706149136; cv=none; b=sdU34sb6yA5W26BQlxnH6LYk3KS9MKSIMmChRYldACQl2nHJpiz2ozrEKUab0emJP9dbigwVMHEhTuX37jriuzOOlG5orbXvc77e+FHZYK0bdj5gBvb94o24E9iqhNhJA9Pg1WKDIOF4v4Z7kpJrHtjqudvm8TSBzxy24rwPjLo=
+	t=1706149416; cv=none; b=Kwubz4e2nP0Jl4+c9E8YUEXAJLtWTnhFsp6f42RG1an2GfWDDQpgGY81I/d3dCJckv4JwEqqcGOY01lkZRralv5710rWc15EZ3eadNa8Lhw5JkknhVoS70ptMI6Hb8rnMPXenjoVcrxEo1KfDXy6OOHowNgD0T6GeQV180wWFzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706149136; c=relaxed/simple;
-	bh=LKX/bcYsAYtUJv9o/sFrZ6ft2RE6lD34Ru8BlkGwnKE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=MppTwaKgM1dYJb5QYDOjfYpgOrHIlqq4RmeI7sOCX87Id9VS2XSDO2O9248EIytp25Po5LDpehf3MV9ohLN3c0bkYbpyZ9M5+l+kpu3iIOG2rm5UW/riFZ0W5J23Fwellk2l7JDaq3/nNyEYggjyqjQbQuW5CwLo4rs48sL5vwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4TL4Gm5RbKzXgdZ;
-	Thu, 25 Jan 2024 10:17:36 +0800 (CST)
-Received: from kwepemm600020.china.huawei.com (unknown [7.193.23.147])
-	by mail.maildlp.com (Postfix) with ESMTPS id 08343140444;
-	Thu, 25 Jan 2024 10:18:50 +0800 (CST)
-Received: from [10.174.179.160] (10.174.179.160) by
- kwepemm600020.china.huawei.com (7.193.23.147) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 25 Jan 2024 10:18:48 +0800
-Message-ID: <d68f50a5-8d83-99ba-1a5a-7f119cd52029@huawei.com>
-Date: Thu, 25 Jan 2024 10:18:48 +0800
+	s=arc-20240116; t=1706149416; c=relaxed/simple;
+	bh=muC2QoNmYe8mgtlBX3avcezW/0lWec2uIAI2S3/KjBs=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=EjOwV/n5zTTglmBs0TH+KJhoPpxrtD+B7AqfY4WQ5+m5ShoQ08QtfBP8uN8d3m/xRM9prOZxqO15GcO8heDyPqlnpVOnZjBKpuHMErX0NBFZzcLZrU0iedPw1DBFY70w6pYvPzCZfJU4KtUnaj0QSaXs+nNhYgegc3+6qNXNxqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.207.22.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas49t1706149300t799t63583
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [60.186.185.81])
+X-QQ-SSF:00400000000000F0FTF000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 2004138297236614635
+To: "'Simon Horman'" <horms@kernel.org>
+Cc: <davem@davemloft.net>,
+	<edumazet@google.com>,
+	<kuba@kernel.org>,
+	<pabeni@redhat.com>,
+	<linux@armlinux.org.uk>,
+	<andrew@lunn.ch>,
+	<netdev@vger.kernel.org>,
+	<mengyuanlou@net-swift.com>
+References: <20240124024525.26652-1-jiawenwu@trustnetic.com> <20240124024525.26652-3-jiawenwu@trustnetic.com> <20240124103438.GX254773@kernel.org>
+In-Reply-To: <20240124103438.GX254773@kernel.org>
+Subject: RE: [PATCH net-next v3 2/2] net: txgbe: use irq_domain for interrupt controller
+Date: Thu, 25 Jan 2024 10:21:40 +0800
+Message-ID: <02e301da4f35$3ae8d790$b0ba86b0$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: SECURITY PROBLEM: Any user can crash the kernel with TCP ZEROCOPY
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>
-CC: Matthew Wilcox <willy@infradead.org>, <linux-mm@kvack.org>,
-	<linux-fsdevel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<akpm@linux-foundation.org>, <davem@davemloft.net>, <dsahern@kernel.org>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <arjunroy@google.com>,
-	<wangkefeng.wang@huawei.com>
-References: <20240119092024.193066-1-zhangpeng362@huawei.com>
- <Zap7t9GOLTM1yqjT@casper.infradead.org>
- <5106a58e-04da-372a-b836-9d3d0bd2507b@huawei.com>
- <Za6SD48Zf0CXriLm@casper.infradead.org>
- <CANn89iL4qUXsVDRNGgBOweZbJ6ErWMsH+EpOj-55Lky8JEEhqQ@mail.gmail.com>
- <Za6h-tB7plgKje5r@casper.infradead.org>
- <CANn89iJDNdOpb6L6PkrAcbGcsx6_v4VD0v2XFY77g7tEnJEXXQ@mail.gmail.com>
- <4f78fea2-ced6-fc5a-c7f2-b33fcd226f06@huawei.com>
- <CANn89iKbyTRvWEE-3TyVVwTa=N2KsiV73-__2ASktt2hrauQ0g@mail.gmail.com>
-From: "zhangpeng (AS)" <zhangpeng362@huawei.com>
-In-Reply-To: <CANn89iKbyTRvWEE-3TyVVwTa=N2KsiV73-__2ASktt2hrauQ0g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600020.china.huawei.com (7.193.23.147)
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQHT0IcsVC1jEd0mWkvM15E6KW/F6gH1k6lZAbGk9e+w2Y76kA==
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-On 2024/1/24 18:11, Eric Dumazet wrote:
+On Wednesday, January 24, 2024 6:35 PM, Simon Horman wrote:
+> On Wed, Jan 24, 2024 at 10:45:25AM +0800, Jiawen Wu wrote:
+>=20
+> ...
+>=20
+> > +static int txgbe_misc_irq_domain_map(struct irq_domain *d,
+> > +				     unsigned int irq,
+> > +				     irq_hw_number_t hwirq)
+> > +{
+> > +	struct txgbe *txgbe =3D d->host_data;
+> > +
+> > +	irq_set_chip_data(irq, txgbe);
+> > +	irq_set_chip(irq, &txgbe->misc.chip);
+> > +	irq_set_nested_thread(irq, TRUE);
+>=20
+> Hi Jiawen Wu,
+>=20
+> 'TRUE' seems undefined, causing a build failure.
+> Should this be 'true' instead?
 
-> On Wed, Jan 24, 2024 at 10:30 AM zhangpeng (AS) <zhangpeng362@huawei.com> wrote:
->>
->> By using git-bisect, the patch that introduces this issue is 05255b823a617
->> ("tcp: add TCP_ZEROCOPY_RECEIVE support for zerocopy receive."). v4.18-rc1.
->>
->> Currently, there are no other repro or c reproduction programs can reproduce
->> the issue. The syz log used to reproduce the issue is as follows:
->>
->> r3 = socket$inet_tcp(0x2, 0x1, 0x0)
->> mmap(&(0x7f0000ff9000/0x4000)=nil, 0x4000, 0x0, 0x12, r3, 0x0)
->> r4 = socket$inet_tcp(0x2, 0x1, 0x0)
->> bind$inet(r4, &(0x7f0000000000)={0x2, 0x4e24, @multicast1}, 0x10)
->> connect$inet(r4, &(0x7f00000006c0)={0x2, 0x4e24, @empty}, 0x10)
->> r5 = openat$dir(0xffffffffffffff9c, &(0x7f00000000c0)='./file0\x00',
->> 0x181e42, 0x0)
->> fallocate(r5, 0x0, 0x0, 0x85b8818)
->> sendfile(r4, r5, 0x0, 0x3000)
->> getsockopt$inet_tcp_TCP_ZEROCOPY_RECEIVE(r4, 0x6, 0x23,
->> &(0x7f00000001c0)={&(0x7f0000ffb000/0x3000)=nil, 0x3000, 0x0, 0x0,
->> 0x0, 0x0, 0x0, 0x0, 0x0}, &(0x7f0000000440)=0x10)
->> r6 = openat$dir(0xffffffffffffff9c, &(0x7f00000000c0)='./file0\x00',
->> 0x181e42, 0x0)
->>
-> Could you try the following fix then ?
->
-> (We also could remove the !skb_frag_off(frag) condition, as the
-> !PageCompound() is necessary it seems :/)
->
-> Thanks a lot !
->
-> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> index 1baa484d21902d2492fc2830d960100dc09683bf..ee954ae7778a651a9da4de057e3bafe35a6e10d6
-> 100644
-> --- a/net/ipv4/tcp.c
-> +++ b/net/ipv4/tcp.c
-> @@ -1785,7 +1785,9 @@ static skb_frag_t *skb_advance_to_frag(struct
-> sk_buff *skb, u32 offset_skb,
->
->   static bool can_map_frag(const skb_frag_t *frag)
->   {
-> -       return skb_frag_size(frag) == PAGE_SIZE && !skb_frag_off(frag);
-> +       return skb_frag_size(frag) == PAGE_SIZE &&
-> +              !skb_frag_off(frag) &&
-> +              !PageCompound(skb_frag_page(frag));
->   }
->
->   static int find_next_mappable_frag(const skb_frag_t *frag,
+Oops. I built it with 'true' but sent the patch with 'TRUE'. =E2=98=B9
 
-This patch doesn't fix this issue. The page cache that can trigger this issue
-doesn't necessarily need to be compound. 🙁
-
--- 
-Best Regards,
-Peng
+>=20
+> > +	irq_set_noprobe(irq);
+> > +
+> > +	return 0;
+> > +}
+>=20
+> --
+> pw-bot: changes-requested
+>=20
 
 
