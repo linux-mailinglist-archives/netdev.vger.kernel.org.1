@@ -1,464 +1,826 @@
-Return-Path: <netdev+bounces-66023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3966A83CF83
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 23:37:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46A4783CF84
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 23:38:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE1EB298182
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 22:37:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6AE6B1C21BF5
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 22:38:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98FD31118A;
-	Thu, 25 Jan 2024 22:36:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFD75111A6;
+	Thu, 25 Jan 2024 22:37:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="R8lLUo6e"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VTpbOaZK"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2063.outbound.protection.outlook.com [40.107.102.63])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BB8910A3E
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 22:36:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.63
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706222196; cv=fail; b=b+Vetm3dVt/9n6i8MHPMT6o5gWtheb1gah/XlUDx/Bh2eL21tb9muHji/NayOmqJMQiUXyg/u7m5bkvSiYLLq3VaEWo84h6mWjQWg/MMYHfvlN0bUHMKoHPgynDNTlk+u9bt0WVYxWhfskNIpw30x/2WKMlGGLiW8nKtMXdpp24=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706222196; c=relaxed/simple;
-	bh=cEvy3C0HPvmhws+GsBAQcI5Lzg+fnTo73EuJ/HJtrI8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NYPVwL6IitsRDmbQ6/QJ9uIwTMgUYfHG3Q6/tRfGfvf7SJ8Lyp8Qy+ogQ1ge2La1r1q2+cvkvtxbxKk/pFIePWMucewzt+TawDfOba++WDyo1U/7Wv4I1Sr0D40OUniRMTf4VW9aTK7eeoqZOyPG1Eu1b0alKC9SBY9RH2xyl2M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=R8lLUo6e; arc=fail smtp.client-ip=40.107.102.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ktxbq3+QTC/nVx1ZeDRpQXZj0nlEFFAp/o4E+XcjckzVFO9J0xrdBzOK9KIgpZ2pX4QpG/OHkRRVil8aYndRiSuozT/oWr4Qk7zI92R6ntzZgpPOm3f3cWE4Nx6NMYHKSyntwK8JlNj5KcVGsXF1KI63C4T7yLHjGr6h1E4Rf88p519pa2405IU2scKWUK0GCe1CDcfKhmd18xYYyOJ9sCdFpb6R7ewsliJeBMyvy34i+fHzhwIXLvYUoeDbLsL7GaXXsBNVaySII8sx5Rv8maE2+cLh2Vll+QcQyy/lh8ObGzKItvc+7undw+ariH85mOrsKf7tVINrZNsYRmMOdw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QVvV1OseO5sA3J5Q1Rl/ltEMWyKwnEWuYtQFgamGNWI=;
- b=WWsnMewmmHuH/d8xa8n8Lmh/mlKjelznmcV9/27cKvIU1armBVp8ocIsNC3A2pBxgM/HHKVKu2jQQdExwntEypUqdjINfK0SbBjWPrmyi0MA8KGESGzYn1EPzfsEE6Vgd6sD5nbJSr5QUHL+DNqGuEHlzwCvWe1sMIuCBvY9Cttfjx9zGibPgeykjJ1bFMU2+UCPwY7xC4bEB20Fj6Mc2aCUXGbcYuOus8RU0FAZ93S3zWRGA5XC4Pi6qO0ijMAsnSvNwiTjaaTK3eXlw8hFK4KZG2XN0e6MDq9+D12rYGQfMdBbK5VgV3MN+rvA5uu1++t5G1W1YjDENzzHHK1+mQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.233) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QVvV1OseO5sA3J5Q1Rl/ltEMWyKwnEWuYtQFgamGNWI=;
- b=R8lLUo6enVUsup1eJb31eit20WNUAyyT06vssF4byV5L81xkXhjhZdcrsEFTWWdnPGZa0w/+2SrMKVZyvk4I1saPXgnn+FD9+xTDXiKGCHrqAMeLcr+kLxe+Y3CfjAQ4SB6T/IEH8PTlW4kIJURnnrL9X4g579z71bMacgRwS3avJOSthFcyvqnmJu/U5UHeimkJ3BdGli+zaaBjcPiYqTId9IrI/P4leLZ2nvIerf40uPpEFUOc9hTGzwh44E6A70ssIbWTjj/+pO0L33Oy71vbVjBFdvNwndTpQ88z4XwJXajvsoRosPLtwAAD3y34ME9zBjACEJhGrNulumE7mg==
-Received: from CH0PR03CA0211.namprd03.prod.outlook.com (2603:10b6:610:e7::6)
- by SJ2PR12MB8691.namprd12.prod.outlook.com (2603:10b6:a03:541::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.26; Thu, 25 Jan
- 2024 22:36:31 +0000
-Received: from CH2PEPF0000009D.namprd02.prod.outlook.com
- (2603:10b6:610:e7:cafe::16) by CH0PR03CA0211.outlook.office365.com
- (2603:10b6:610:e7::6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.24 via Frontend
- Transport; Thu, 25 Jan 2024 22:36:30 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.233) by
- CH2PEPF0000009D.mail.protection.outlook.com (10.167.244.25) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7228.16 via Frontend Transport; Thu, 25 Jan 2024 22:36:30 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
- (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 25 Jan
- 2024 14:36:18 -0800
-Received: from drhqmail201.nvidia.com (10.126.190.180) by
- drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.41; Thu, 25 Jan 2024 14:36:18 -0800
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
- (10.126.190.180) with Microsoft SMTP Server id 15.2.986.41 via Frontend
- Transport; Thu, 25 Jan 2024 14:36:18 -0800
-From: William Tu <witu@nvidia.com>
-To: <witu@nvidia.com>
-CC: <bodong@nvidia.com>, <jiri@nvidia.com>, <kuba@kernel.org>,
-	<netdev@vger.kernel.org>, <saeedm@nvidia.com>
-Subject: [RFC PATCH v3 net-next] Documentation: devlink: Add devlink-sd
-Date: Thu, 25 Jan 2024 14:36:17 -0800
-Message-ID: <20240125223617.7298-1-witu@nvidia.com>
-X-Mailer: git-send-email 2.37.1 (Apple Git-137.1)
-In-Reply-To: <20240125045624.68689-1-witu@nvidia.com>
-References: <20240125045624.68689-1-witu@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5213E11181
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 22:37:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706222237; cv=none; b=rLBn+cACyDdfEtooVZnve9FgaKsc25KgKqjDHfKCDp7kx3GOPtR7b7aD9pNKsHyQ+ykuOV505Mw4KwFXlNWYHa1K3kJv7+3R/3uw7y/g8d2ChL5cToY+NOOIC/Y8EFKZANtDaJCfbDnoYkbKBgGLol8kJLNVzP0fYjOzqFtPNL0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706222237; c=relaxed/simple;
+	bh=VPIXe5iGn4taUd8fRelqDB9jomlQWcwTODwJkKiBRjk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sxi/+S0/BgqHhDKMgoaXt+cdwYwzNRhnqlOYswPlHL82ntPThaGTyrCTP00mjhAaM2GyVt5cV3URQWOqBLWv6zpa+H26RR2kl0CVItVDXLCETQK2qB4w1/dBLsjxa30cJW70f63hiwWAut6qDKDVoqXudfPRbMUTokV0bgdcCXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VTpbOaZK; arc=none smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-681922a61baso10865766d6.1
+        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 14:37:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1706222234; x=1706827034; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9uEg1kG3BPdX5bDjdupQq7nT9H7YVY2yOM1H0VO06Go=;
+        b=VTpbOaZKq8wKlR3IEQ8kYzLTC8JC210XNZpLJybKaZENR0WFbtpL4tXaAjzOO+b2FM
+         jNm44xGMFbJ+ce9fjn4V5HfwNaburbcJGS1ciFejeoxEvuPuRKq2MgASi4iVqANOibxq
+         7kylcY7hyjHoDdgS+grVvPq+DVUrDxBauJDBwRtGmjPVPNt034qhSIYYimIbaPHUbXVR
+         RFFIc0n0c002bl5Vi3r8S21UPT8tH5NiXoBgRgrvGCiLFWtXQ6SOq1VK7t9JtUCYCxAk
+         iNPI+U2bIyXnFFchloGoJUTmnATpMImYsGbbjPksl4kFVxui31eH5movBFGbuHZFosOd
+         c1PA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706222234; x=1706827034;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9uEg1kG3BPdX5bDjdupQq7nT9H7YVY2yOM1H0VO06Go=;
+        b=d8zuO1XgGc57/ulRpuGMKYSIeCwadTtWxkt+6zR9DU+3mI+BQqv/rJmepN59omdnM5
+         HIrS+C/MDxbmyD9l33z3aJmNUMteNqIWZn0nyUylVm6KGyzFVyPjaLMgG7/ZhjsDTWxy
+         LgHcg9uXjf6ajrUZwdleSXI1ZxXIRoD3CFd+M9o2KaiufhQe+RUZDkC06SZK2N/+EAR4
+         yGuWxarWT6oF7NqiVzDnnt40rWkaGPSR29qcSfVWWs6cK8pzxuitMoRuB92eBUw/Ng9Z
+         uqnb6shZ7WIAl6NzFT7n61W5J1Ia1nnRGgLMxhca5kYaaNZ3+kM1jtD+AEqO/X6gZLPB
+         dMOg==
+X-Gm-Message-State: AOJu0YwYWUMzXEWkByFijJ0qSDQu3rAVVj3csjgYP32HBsehfxW5JRsG
+	KWG8SCE4y3nwmBoT/8PcK8UBeJj/r3Xx/gEDX6pxx75giFc4ny+RB7K4rcxmZIz+AVll9jExSif
+	rcbjRUFVzA1/FGpWCG0cZ3a2mATzRZDdjyFG3
+X-Google-Smtp-Source: AGHT+IH4xiISe+IMb9faiRwgAw13iBB23DCS/0m9W9speWcWouETuC7LAT9Z9ObM4VHc96w34Wbrz7R4LE4c18Gy6VU=
+X-Received: by 2002:a05:6214:1381:b0:685:52c7:1c0d with SMTP id
+ pp1-20020a056214138100b0068552c71c0dmr3514qvb.58.1706222233695; Thu, 25 Jan
+ 2024 14:37:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20240123235130.1982654-1-aahila@google.com> <4577.1706076998@famine>
+ <CAGfWUPwsh3xFK6JvT9p07eXD2j1V=B=kVNfPOWJj6L4SXyeyDA@mail.gmail.com>
+ <7770.1706120209@famine> <CAGfWUPzBP_jNxrHeTmmKw0LCCJxuV9MELoKUGCwP648gGE0PQA@mail.gmail.com>
+In-Reply-To: <CAGfWUPzBP_jNxrHeTmmKw0LCCJxuV9MELoKUGCwP648gGE0PQA@mail.gmail.com>
+From: Aahil Awatramani <aahila@google.com>
+Date: Thu, 25 Jan 2024 14:37:02 -0800
+Message-ID: <CAGfWUPz_J02VFTjCeqy6nnAvbDspwtj=VvviEd4Kkt5qJ454Ww@mail.gmail.com>
+Subject: Re: [PATCH net-next v5] bonding: Add independent control state machine
+To: Jay Vosburgh <jay.vosburgh@canonical.com>
+Cc: David Dillow <dave@thedillows.org>, Mahesh Bandewar <maheshb@google.com>, 
+	Hangbin Liu <liuhangbin@gmail.com>, Andy Gospodarek <andy@greyhouse.net>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Martin KaFai Lau <martin.lau@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF0000009D:EE_|SJ2PR12MB8691:EE_
-X-MS-Office365-Filtering-Correlation-Id: a65358d1-6318-41cc-4f8d-08dc1df6137e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	gjJHjwgUZgrPI8gVZpcmsuipOkdUVvduCSGQW8TGuS/3MgWKk3SOVTFBZ6J46WR/u37rnsJZMBFskteSTQkLea7WmVJZW25puSM9EOlKf81jw+J8Ej/kidRn4AtO0AtCWAcMjdQVCXby5vOmMcjtXoi0w2388w7+dQTlRRhmTmOzfqN3vyA0500Tv6MnESmm/QuF6w3FBXZa4b9xHKflHjY4FyUmq6ZN2SHfzFTYtoRTqq6dEsWo8OKox5BdaP7dVIiVqWps8nRepediZPDoMphRdaV7tIVEGsnytHnTR0HAtvhBNcCSscE+U2BAv3XxqqT9sZqsPeMwSZdxCc709b6WR3zeEJvDaTnlPnroBjJZ62z0E1bUmkby8NKQW8WUnb+jZZVMIbsmtBMpTdsTuM8XNhccecxvGj5W/nq+bEAZ9a9yKTrGRp305H1dvbMIydsiAu7c11lthuHj+ndM/2geShteiFY76EPNImSp3AQ7C4Ja5Hb+WHZk3yyiFZl9ssAdZNdrtkQqSWsMqqf5C4Ycl+/TSIiYygeUGvuWRIvkiOW0/bG36OwMc5E3YxUirumQpe5zAYEhpnXH9DyLEPTtzsTXbckHYUKdqnAvpd1YFM28YixOYH0coOzEl/l644gtueobCqetzOiLn6CO4iPR1sIk8MfROC/chFrYewEg3ktP2C82yopcK5ZJaQQ9Q/2faNZToGsoQliUCPXGkScQEmCdX/PeTpc04ogg2pA1Xhp/1t34K4rH2ibRvkZz
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(376002)(136003)(39860400002)(396003)(346002)(230922051799003)(82310400011)(451199024)(64100799003)(1800799012)(186009)(40470700004)(36840700001)(46966006)(7049001)(83380400001)(41300700001)(47076005)(26005)(336012)(426003)(2616005)(1076003)(107886003)(7636003)(36860700001)(8936002)(8676002)(4326008)(6862004)(6200100001)(5660300002)(478600001)(7696005)(2906002)(30864003)(356005)(82740400003)(54906003)(37006003)(70586007)(316002)(70206006)(36756003)(86362001)(40480700001)(40460700003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jan 2024 22:36:30.4566
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a65358d1-6318-41cc-4f8d-08dc1df6137e
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF0000009D.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8691
+Content-Transfer-Encoding: quoted-printable
 
-Add devlink-sd, shared descriptor, documentation. The devlink-sd
-mechanism is targeted for configuration of the shared rx descriptors
-that server as a descriptor pool for ethernet reprsentors (reps)
-to better utilize memory. Following operations are provided:
- * add/delete a shared descriptor pool
- * Configure the pool's properties
- * Bind/unbind a representor's rx channel to a descriptor pool
+> I also realised that I haven't appended coupled_control to procfs.
 
-Propose new devlink objects because existing solutions below do
-not fit our use cases:
-1) devlink params: Need to add many new params to support
-   the shared descriptor pool. It doesn't seem to be a good idea.
-2) devlink-sb (shared buffer): very similar to the API proposed in
-   this patch, but devlink-sb is used in ASIC hardware switch buffer
-   and switch's port. Here the use case is switchdev mode with
-   reprensentor ports and its rx queues.
+To clarify, I will hold off on adding coupled_control to procfs until reque=
+sted.
 
-Signed-off-by: William Tu <witu@nvidia.com>
-Change-Id: I1de0d9544ff8371955c6976b2d301b1630023100
----
-v3: read again myself and explain NAPI context and descriptor pool
-v2: work on Jiri's feedback
-- use more consistent device name, p0, pf0vf0, etc
-- several grammar and spelling errors
-- several changes to devlink sd api
-  - remove hex, remove sd show, make output 1:1 mapping, use
-  count instead of size, use "add" instead of "create"
-  - remove the use of "we"
-- remove the "default" and introduce "shared-descs" in switchdev mode
-- make description more consistent with definitions in ethtool,
-such as ring, channel, queue.
----
- .../networking/devlink/devlink-sd.rst         | 296 ++++++++++++++++++
- 1 file changed, 296 insertions(+)
- create mode 100644 Documentation/networking/devlink/devlink-sd.rst
+Thanks,
+Aahil
 
-diff --git a/Documentation/networking/devlink/devlink-sd.rst b/Documentation/networking/devlink/devlink-sd.rst
-new file mode 100644
-index 000000000000..e73587de9c50
---- /dev/null
-+++ b/Documentation/networking/devlink/devlink-sd.rst
-@@ -0,0 +1,296 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+==========================
-+Devlink Shared Descriptors
-+==========================
-+
-+Glossary
-+========
-+* REP port: Representor port
-+* RQ: Receive Queue or RX Queue
-+* WQE: Work Queue Entry
-+* IRQ: Interrupt Request
-+* Channel: A channel is an IRQ and the set of queues that can trigger
-+  that IRQ.  ``devlink-sd`` assumes one rx queue per channel.
-+* Descriptor: The data structure that describes a network packet.
-+  An RQ consists of multiple descriptors.
-+* NAPI context: New API context, associated with a device channel.
-+* Device Naming:
-+
-+  - Uplink representors: p<port_number>, ex: p0.
-+  - PF representors: pf<port_number>hpf, ex: pf0hpf.
-+  - VF representors: pf<port_number>vf<function_number>, ex: pf0vf1.
-+
-+Background
-+==========
-+The ``devlink-sd`` mechanism is targeted for the configuration of the
-+shared rx descriptors that host as a descriptor pool for ethernet
-+representors (reps) to better utilize memory. Following operations are
-+provided:
-+
-+* Add/delete a shared descriptor pool
-+* Configure the pool's properties
-+* Bind/unbind a representor's rx queue to a descriptor pool
-+
-+In switchdev mode, representors are slow-path ports that handle the
-+miss traffic, i.e., traffic not being forwarded by the hardware.
-+Representor ports are regular ethernet devices, with multiple channels
-+consuming DMA memory. Memory consumption of the representor
-+port's rx buffers can grow to several GB when scaling to 1k VFs reps.
-+For example, in mlx5 driver, each RQ, with a typical 1K descriptors,
-+consumes 3MB of DMA memory for packet buffer in descriptors, and with
-+four channels, it consumes 4 * 3MB * 1024 = 12GB of memory. Since rep
-+ports are for slow path traffic, most of these rep ports' rx DMA memory
-+is idle when flows are forwarded directly in hardware to VFs.
-+
-+A network device driver consists of several channels and each channel
-+represents an NAPI context and a set of queues that trigger that IRQ.
-+devlink-sd considers only the *regular* RX queue in each channel,
-+e.g., mlx5's non-regular RQs such as XSK RQ and drop RQ are not applicable
-+here. Each device driver receives packets by setting up RQ, and
-+each RQ receives packets by pre-allocating a dedicated set of rx
-+ring descriptors, with each descriptor pointing to a memory buffer.
-+The ``shared descriptor pool`` is a descriptor and buffer sharing
-+mechanism. It allows multiple RQs to use the rx ring descriptors
-+from the shared descriptor pool. In other words, the RQ no longer has
-+its own dedicated rx ring descriptors, which might be idle when there
-+is no traffic, but it consumes the descriptors from the descriptor
-+pool only when packets arrive.
-+
-+The shared descriptor pool contains rx descriptors and its memory
-+buffers. When multiple representors' RQs share the same pool of rx
-+descriptors, they share the same set of memory buffers. As a result,
-+the heavy-traffic representors can use all descriptors from the pool,
-+while the idle, no-traffic representor consumes no memory. All the
-+descriptors in the descriptor pool can be used by all the RQs. This
-+makes the descriptor memory usage more efficient.
-+
-+The diagram below first shows two representors with their own regular
-+RQ, and its rx descriptor ring and buffers, without using shared descriptor
-+pool::
-+
-+      +--------+            +--------+
-+      │ pf0vf1 │            │ pf0vf2 │
-+      │   RQ   │            │   RQ   │
-+      +--------+            +--------+
-+           │                     │
-+     +-----┴----------+    +-----┴----------+
-+     │ rx descriptors │    │ rx descriptors │
-+     │ and buffers    │    │ and buffers    │
-+     +----------------+    +----------------+
-+
-+With shared descriptors, the diagram below shows that two representors
-+can share the same descriptor pool::
-+
-+     +--------+            +--------+
-+     │ pf0vf1 │            │ pf0vf2 │
-+     │   RQ   │            │   RQ   │
-+     +----┬---+            +----┬---+
-+          │                     │
-+          +---------+  +--------+
-+                    │  │
-+              +-----┴--┴-------+
-+              │     shared     |
-+              | rx descriptors │
-+              │ and buffers    │
-+              +----------------+
-+
-+Both packets arrived for pf0vf1 and pf0vf2 are consuming the descriptors
-+and buffers in the pool. Once packets are passed to the upper Linux
-+network stack, the driver will refill the rx descriptor with a new buffer,
-+e.g., using the page_pool API.  Typically, a NAPI context is associated
-+with each channel of a device, and packet reception and refilling operations
-+happen in a NAPI context. Linux kernel guarantees that only one CPU at any
-+time can call NAPI poll for each napi struct. In the shared rx descriptors
-+case, a race condition happens when two NAPI contexts, scheduled to run
-+on two CPUs, are fetching or refilling descriptors from/to the same
-+shared descriptor pool. Thus, the shared descriptor pool should be either
-+protected by a lock, or in a better design, have a 1:1 mapping between
-+descriptor pool and NAPI context of a CPU (See examples below).
-+
-+API Overview
-+============
-+* Name:
-+   - devlink-sd : devlink shared descriptor configuration
-+* Synopsis:
-+   - devlink sd pool show [DEV]
-+   - devlink sd pool add DEV pool POOL_ID count DESCRIPTOR_NUM
-+   - devlink sd pool delete id POOL_ID
-+   - devlink sd port pool show [DEV]
-+   - devlink sd port pool bind DEV queue QUEUE_ID pool POOL_ID
-+   - devlink sd port pool unbind DEV queue QUEUE_ID
-+
-+Description
-+===========
-+ * devlink sd pool show - show shared descriptor pool and their
-+   attributes
-+
-+    - DEV - the devlink device that supports shared descriptor pool.  If
-+      this argument is omitted all available shared descriptor devices are
-+      listed.
-+
-+ * devlink sd pool add - add a shared descriptor pool and the driver
-+   allocates and returns descriptor pool id.
-+
-+    - DEV: the devlink device that supports shared descriptor pool.
-+    - count DESCRIPTOR_NUM: the number of descriptors in the pool.
-+
-+ * devlink sd pool delete - delete shared descriptor pool
-+
-+    - pool POOL_ID: the id of the shared descriptor pool to be deleted.
-+      Make sure no RX queue of any port is using the pool before deleting it.
-+
-+ * devlink sd port pool show - display port-pool mappings
-+
-+    - DEV: the devlink device that supports shared descriptor pool.
-+
-+ * devlink sd port pool bind - set the port-pool mapping
-+
-+    - DEV: the devlink device that supports shared descriptor pool.
-+    - queue QUEUE_ID: the index of the channel. Note that a representor
-+      might have multiple RX queues/channels, specify which queue id to
-+      map to the pool.
-+    - pool POOL_ID: the id of the shared descriptor pool to be mapped.
-+
-+ * devlink sd port pool unbind - unbind the port-pool mapping
-+
-+    - DEV: the devlink device that supports shared descriptor pool.
-+    - queue QUEUE_ID: the index of the RX queue/channel.
-+
-+ * devlink dev eswitch set DEV mode switchdev - enable or disable default
-+   port-pool mapping scheme
-+
-+    - DEV: the devlink device that supports shared descriptor pool.
-+    - shared-descs { enable | disable }: enable/disable default port-pool
-+      mapping scheme. See details below.
-+
-+
-+Example usage
-+=============
-+
-+.. code:: shell
-+
-+    # Enable switchdev mode for the device
-+    * devlink dev eswitch set pci/0000:08:00.0 mode switchdev
-+
-+    # Show devlink device
-+    $ devlink devlink show
-+        pci/0000:08:00.0
-+        pci/0000:08:00.1
-+
-+    # show existing descriptor pools
-+    $ devlink sd pool show pci/0000:08:00.0
-+        pci/0000:08:00.0: pool 11 count 2048
-+
-+    # Create a shared descriptor pool and 1024 descriptors, driver
-+    # allocates and returns the pool id 12
-+    $ devlink sd pool add pci/0000:08:00.0 count 1024
-+        pci/0000:08:00.0: pool 12 count 1024
-+
-+    # Now check the pool again
-+    $ devlink sd pool show pci/0000:08:00.0
-+        pci/0000:08:00.0: pool 11 count 2048
-+        pci/0000:08:00.0: pool 12 count 1024
-+
-+    # Bind a representor port, pf0vf1, queue 0 to the shared descriptor pool
-+    $ devlink sd port pool bind pf0vf1 queue 0 pool 12
-+
-+    # Bind a representor port, pf0vf2, queue 0 to the shared descriptor pool
-+    $ devlink sd port pool bind pf0vf2 queue 0 pool 12
-+
-+    # Show the rep port-pool mapping of pf0vf1
-+    $ devlink sd port pool show pci/0000:08:00.0/11
-+        pci/0000:08:00.0/11 queue 0 pool 12
-+
-+    # Show the rep port-pool mapping of pf0vf2
-+    $ devlink sd port pool show pf0vf2
-+    # or use the devlink port handle
-+    $ devlink sd port pool show pci/0000:08:00.0/22
-+        pci/0000:08:00.0/22 queue 0 pool 12
-+
-+    # To dump all ports mapping for a device
-+    $ devlink sd port pool show pci/0000:08:00.0
-+        pci/0000:08:00.0/11: queue 0 pool 12
-+        pci/0000:08:00.0/22: queue 0 pool 12
-+
-+    # Unbind a representor port, pf0vf1, queue 0 from the shared descriptor pool
-+    $ devlink sd port pool unbind pf0vf1 queue 0
-+    $ devlink sd port pool show pci/0000:08:00.0
-+        pci/0000:08:00.0/22: queue 0 pool 12
-+
-+Default Mapping Scheme
-+======================
-+The ``devlink-sd`` tries to be generic and fine-grained: allowing users
-+to create shared descriptor pools and bind them to representor ports, in
-+any mapping scheme they want. However, typically users don't want to
-+do this by themselves. For convenience, ``devlink-sd`` adds a default mapping
-+scheme as follows:
-+
-+.. code:: shell
-+
-+   # Create a shared descriptor pool for each rx queue of uplink
-+     representor, assume having two queues:
-+   $ devlink sd pool show p0
-+       pci/0000:08:00.0: pool 8 count 1024 # reserved for queue 0
-+       pci/0000:08:00.0: pool 9 count 1024 # reserved for queue 1
-+
-+   # Bind each representor port to its own shared descriptor pool, ex:
-+   $ devlink sb port pool show pf0vf1
-+        pci/0000:08:00.0/11: queue 0 pool 8
-+        pci/0000:08:00.0/11: queue 1 pool 9
-+
-+   $ devlink sb port pool show pf0vf2
-+        pci/0000:08:00.0/22: queue 0 pool 8
-+        pci/0000:08:00.0/22: queue 1 pool 9
-+
-+The diagram shows the default mapping with two representors, each with
-+two RX queues::
-+
-+     +--------+            +--------+     +--------+
-+     │   p0   │            │ pf0vf1 │     | pf0vf2 │
-+     │RQ0  RQ1│-------+    │RQ0  RQ1│     |RQ0  RQ1│
-+     +-+------+       |    +-+----+-+     +-+----+-+
-+       |              |      │    |         |    |
-+       |  +------------------+    |     to  |    |
-+       |  |           |           |      POOL-8  |
-+   +---v--v-+         |     +-----v--+           |
-+   │ POOL-8 |         |---> | POOL-9 |<----------+
-+   +--------+               +--------+
-+    NAPI-0                    NAPI-1
-+
-+The benefit of this default mapping is that it allows the p0, the uplink
-+representor, to receive packets that are destined for pf0vf1 and pf0vf2,
-+simply by polling the shared descriptor pools. In the above case, p0
-+has two NAPI contexts, NAPI-0 polls for RQ0 and NAPI-1 polls for RQ1.
-+Since the NAPI-0 receives packets by checking all the descriptors in
-+the POOL-0, and the POOL-0 contains packets also for pf0vf1 and pf0vf2,
-+polling POOL-1 can receive all the packets. As a result, uplink representors
-+become the single device that receives packets for other representors.
-+This makes managing pools and rx queues easier and since only one NAPI
-+can poll on one pool, there is no lock required to avoid contention.
-+
-+Example usage (Default)
-+=======================
-+
-+.. code:: shell
-+
-+    # Enable switchdev mode with additional *shared-descs* option
-+    * devlink dev eswitch set pci/0000:08:00.0 mode switchdev \
-+      shared-descs enable
-+
-+    # Assume two rx queues and one uplink device p0, and two reps pf0vf1 and pf0vf2
-+    $ devlink sd port pool show pci/0000:08:00.0
-+        pci/0000:08:00.0: queue 0 pool 8
-+        pci/0000:08:00.0: queue 1 pool 9
-+        pci/0000:08:00.0/11: queue 0 pool 8
-+        pci/0000:08:00.0/11: queue 1 pool 9
-+        pci/0000:08:00.0/22: queue 0 pool 8
-+        pci/0000:08:00.0/22: queue 1 pool 9
-+
-+    # Disable *shared-descs* option falls back to non-sharing
-+    * devlink dev eswitch set pci/0000:08:00.0 mode switchdev \
-+      shared-descs disable
-+
-+    # pool and port-pool mappings are cleared
-+    $ devlink sd port pool show pci/0000:08:00.0
-+
--- 
-2.37.1 (Apple Git-137.1)
-
+On Wed, Jan 24, 2024 at 4:38=E2=80=AFPM Aahil Awatramani <aahila@google.com=
+> wrote:
+>
+> >         Could you post it now?  They're logically parts of a single
+> > feature, so should go together.  As a practical matter, though, it's
+> > easier to test this patch with the iproute patch available.
+>
+> Sure, I have uploaded the patch for review, and also cc'd you on the emai=
+l.
+> I also realised that I haven't appended coupled_control to procfs.
+> Will add that change in v6.
+>
+> On Wed, Jan 24, 2024 at 10:16=E2=80=AFAM Jay Vosburgh
+> <jay.vosburgh@canonical.com> wrote:
+> >
+> > Aahil Awatramani <aahila@google.com> wrote:
+> >
+> > >>         Do you have a corresponding iproute2 patch to enable changin=
+g
+> > >> the coupled_control option?
+> > >
+> > >I do have the corresponding patch for iproute2 to enable changing
+> > >coupled_control, I planned to push that patch for review directly
+> > >after this one.
+> >
+> >         Could you post it now?  They're logically parts of a single
+> > feature, so should go together.  As a practical matter, though, it's
+> > easier to test this patch with the iproute patch available.
+> >
+> >         -J
+> >
+> > >
+> > >On Tue, Jan 23, 2024 at 10:16=E2=80=AFPM Jay Vosburgh
+> > ><jay.vosburgh@canonical.com> wrote:
+> > >>
+> > >> Aahil Awatramani <aahila@google.com> wrote:
+> > >>
+> > >> >Add support for the independent control state machine per IEEE
+> > >> >802.1AX-2008 5.4.15 in addition to the existing implementation of t=
+he
+> > >> >coupled control state machine.
+> > >> >
+> > >> >Introduces two new states, AD_MUX_COLLECTING and AD_MUX_DISTRIBUTIN=
+G in
+> > >> >the LACP MUX state machine for separated handling of an initial
+> > >> >Collecting state before the Collecting and Distributing state. This
+> > >> >enables a port to be in a state where it can receive incoming packe=
+ts
+> > >> >while not still distributing. This is useful for reducing packet lo=
+ss when
+> > >> >a port begins distributing before its partner is able to collect.
+> > >> >
+> > >> >Added new functions such as bond_set_slave_tx_disabled_flags and
+> > >> >bond_set_slave_rx_enabled_flags to precisely manage the port's coll=
+ecting
+> > >> >and distributing states. Previously, there was no dedicated method =
+to
+> > >> >disable TX while keeping RX enabled, which this patch addresses.
+> > >> >
+> > >> >Note that the regular flow process in the kernel's bonding driver r=
+emains
+> > >> >unaffected by this patch. The extension requires explicit opt-in by=
+ the
+> > >> >user (in order to ensure no disruptions for existing setups) via ne=
+tlink
+> > >> >support using the new bonding parameter coupled_control. The defaul=
+t value
+> > >> >for coupled_control is set to 1 so as to preserve existing behaviou=
+r.
+> > >>
+> > >>         Do you have a corresponding iproute2 patch to enable changin=
+g
+> > >> the coupled_control option?
+> > >>
+> > >>         -J
+> > >>
+> > >> >Signed-off-by: Aahil Awatramani <aahila@google.com>
+> > >> >
+> > >> >v5:
+> > >> >  Merge documentation patch with changes patch
+> > >> >  Add version history in comment description
+> > >> >v4:
+> > >> >  Remove inline references from c source files
+> > >> >v3:
+> > >> >  Edited commit description
+> > >> >  Edited documentation description
+> > >> >  Changed function names
+> > >> >  Only allow coupled_control change when the bond is down
+> > >> >v2:
+> > >> >  Removed sysfs changes
+> > >> >  Added documentation for new paramater
+> > >> >  Renamed parameter to coupled_control
+> > >> >  Update bond_set_slave_inactive_flags() with a 8023ad check
+> > >> >
+> > >> >---
+> > >> > Documentation/networking/bonding.rst |  12 ++
+> > >> > drivers/net/bonding/bond_3ad.c       | 157 +++++++++++++++++++++++=
+++--
+> > >> > drivers/net/bonding/bond_main.c      |   1 +
+> > >> > drivers/net/bonding/bond_netlink.c   |  16 +++
+> > >> > drivers/net/bonding/bond_options.c   |  28 ++++-
+> > >> > include/net/bond_3ad.h               |   2 +
+> > >> > include/net/bond_options.h           |   1 +
+> > >> > include/net/bonding.h                |  23 ++++
+> > >> > include/uapi/linux/if_link.h         |   1 +
+> > >> > tools/include/uapi/linux/if_link.h   |   1 +
+> > >> > 10 files changed, 234 insertions(+), 8 deletions(-)
+> > >> >
+> > >> >diff --git a/Documentation/networking/bonding.rst b/Documentation/n=
+etworking/bonding.rst
+> > >> >index f7a73421eb76..e774b48de9f5 100644
+> > >> >--- a/Documentation/networking/bonding.rst
+> > >> >+++ b/Documentation/networking/bonding.rst
+> > >> >@@ -444,6 +444,18 @@ arp_missed_max
+> > >> >
+> > >> >       The default value is 2, and the allowable range is 1 - 255.
+> > >> >
+> > >> >+coupled_control
+> > >> >+
+> > >> >+    Specifies whether the LACP state machine's MUX in the 802.3ad =
+mode
+> > >> >+    should have separate Collecting and Distributing states.
+> > >> >+
+> > >> >+    This is by implementing the independent control state machine =
+per
+> > >> >+    IEEE 802.1AX-2008 5.4.15 in addition to the existing coupled c=
+ontrol
+> > >> >+    state machine.
+> > >> >+
+> > >> >+    The default value is 1. This setting does not separate the Col=
+lecting
+> > >> >+    and Distributing states, maintaining the bond in coupled contr=
+ol.
+> > >> >+
+> > >> > downdelay
+> > >> >
+> > >> >       Specifies the time, in milliseconds, to wait before disablin=
+g
+> > >> >diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/b=
+ond_3ad.c
+> > >> >index c99ffe6c683a..f2942e8c6c91 100644
+> > >> >--- a/drivers/net/bonding/bond_3ad.c
+> > >> >+++ b/drivers/net/bonding/bond_3ad.c
+> > >> >@@ -106,6 +106,9 @@ static void ad_agg_selection_logic(struct aggre=
+gator *aggregator,
+> > >> > static void ad_clear_agg(struct aggregator *aggregator);
+> > >> > static void ad_initialize_agg(struct aggregator *aggregator);
+> > >> > static void ad_initialize_port(struct port *port, int lacp_fast);
+> > >> >+static void ad_enable_collecting(struct port *port);
+> > >> >+static void ad_disable_distributing(struct port *port,
+> > >> >+                                  bool *update_slave_arr);
+> > >> > static void ad_enable_collecting_distributing(struct port *port,
+> > >> >                                             bool *update_slave_arr=
+);
+> > >> > static void ad_disable_collecting_distributing(struct port *port,
+> > >> >@@ -171,9 +174,38 @@ static inline int __agg_has_partner(struct agg=
+regator *agg)
+> > >> >       return !is_zero_ether_addr(agg->partner_system.mac_addr_valu=
+e);
+> > >> > }
+> > >> >
+> > >> >+/**
+> > >> >+ * __disable_distributing_port - disable the port's slave for dist=
+ributing.
+> > >> >+ * Port will still be able to collect.
+> > >> >+ * @port: the port we're looking at
+> > >> >+ *
+> > >> >+ * This will disable only distributing on the port's slave.
+> > >> >+ */
+> > >> >+static void __disable_distributing_port(struct port *port)
+> > >> >+{
+> > >> >+      bond_set_slave_tx_disabled_flags(port->slave, BOND_SLAVE_NOT=
+IFY_LATER);
+> > >> >+}
+> > >> >+
+> > >> >+/**
+> > >> >+ * __enable_collecting_port - enable the port's slave for collecti=
+ng,
+> > >> >+ * if it's up
+> > >> >+ * @port: the port we're looking at
+> > >> >+ *
+> > >> >+ * This will enable only collecting on the port's slave.
+> > >> >+ */
+> > >> >+static void __enable_collecting_port(struct port *port)
+> > >> >+{
+> > >> >+      struct slave *slave =3D port->slave;
+> > >> >+
+> > >> >+      if (slave->link =3D=3D BOND_LINK_UP && bond_slave_is_up(slav=
+e))
+> > >> >+              bond_set_slave_rx_enabled_flags(slave, BOND_SLAVE_NO=
+TIFY_LATER);
+> > >> >+}
+> > >> >+
+> > >> > /**
+> > >> >  * __disable_port - disable the port's slave
+> > >> >  * @port: the port we're looking at
+> > >> >+ *
+> > >> >+ * This will disable both collecting and distributing on the port'=
+s slave.
+> > >> >  */
+> > >> > static inline void __disable_port(struct port *port)
+> > >> > {
+> > >> >@@ -183,6 +215,8 @@ static inline void __disable_port(struct port *=
+port)
+> > >> > /**
+> > >> >  * __enable_port - enable the port's slave, if it's up
+> > >> >  * @port: the port we're looking at
+> > >> >+ *
+> > >> >+ * This will enable both collecting and distributing on the port's=
+ slave.
+> > >> >  */
+> > >> > static inline void __enable_port(struct port *port)
+> > >> > {
+> > >> >@@ -193,10 +227,27 @@ static inline void __enable_port(struct port =
+*port)
+> > >> > }
+> > >> >
+> > >> > /**
+> > >> >- * __port_is_enabled - check if the port's slave is in active stat=
+e
+> > >> >+ * __port_move_to_attached_state - check if port should transition=
+ back to attached
+> > >> >+ * state.
+> > >> >+ * @port: the port we're looking at
+> > >> >+ */
+> > >> >+static bool __port_move_to_attached_state(struct port *port)
+> > >> >+{
+> > >> >+      if (!(port->sm_vars & AD_PORT_SELECTED) ||
+> > >> >+          (port->sm_vars & AD_PORT_STANDBY) ||
+> > >> >+          !(port->partner_oper.port_state & LACP_STATE_SYNCHRONIZA=
+TION) ||
+> > >> >+          !(port->actor_oper_port_state & LACP_STATE_SYNCHRONIZATI=
+ON))
+> > >> >+              port->sm_mux_state =3D AD_MUX_ATTACHED;
+> > >> >+
+> > >> >+      return port->sm_mux_state =3D=3D AD_MUX_ATTACHED;
+> > >> >+}
+> > >> >+
+> > >> >+/**
+> > >> >+ * __port_is_collecting_distributing - check if the port's slave i=
+s in the
+> > >> >+ * combined collecting/distributing state
+> > >> >  * @port: the port we're looking at
+> > >> >  */
+> > >> >-static inline int __port_is_enabled(struct port *port)
+> > >> >+static int __port_is_collecting_distributing(struct port *port)
+> > >> > {
+> > >> >       return bond_is_active_slave(port->slave);
+> > >> > }
+> > >> >@@ -942,6 +993,7 @@ static int ad_marker_send(struct port *port, st=
+ruct bond_marker *marker)
+> > >> >  */
+> > >> > static void ad_mux_machine(struct port *port, bool *update_slave_a=
+rr)
+> > >> > {
+> > >> >+      struct bonding *bond =3D __get_bond_by_port(port);
+> > >> >       mux_states_t last_state;
+> > >> >
+> > >> >       /* keep current State Machine state to compare later if it w=
+as
+> > >> >@@ -999,9 +1051,13 @@ static void ad_mux_machine(struct port *port,=
+ bool *update_slave_arr)
+> > >> >                       if ((port->sm_vars & AD_PORT_SELECTED) &&
+> > >> >                           (port->partner_oper.port_state & LACP_ST=
+ATE_SYNCHRONIZATION) &&
+> > >> >                           !__check_agg_selection_timer(port)) {
+> > >> >-                              if (port->aggregator->is_active)
+> > >> >-                                      port->sm_mux_state =3D
+> > >> >-                                          AD_MUX_COLLECTING_DISTRI=
+BUTING;
+> > >> >+                              if (port->aggregator->is_active) {
+> > >> >+                                      int state =3D AD_MUX_COLLECT=
+ING_DISTRIBUTING;
+> > >> >+
+> > >> >+                                      if (!bond->params.coupled_co=
+ntrol)
+> > >> >+                                              state =3D AD_MUX_COL=
+LECTING;
+> > >> >+                                      port->sm_mux_state =3D state=
+;
+> > >> >+                              }
+> > >> >                       } else if (!(port->sm_vars & AD_PORT_SELECTE=
+D) ||
+> > >> >                                  (port->sm_vars & AD_PORT_STANDBY)=
+) {
+> > >> >                               /* if UNSELECTED or STANDBY */
+> > >> >@@ -1019,11 +1075,45 @@ static void ad_mux_machine(struct port *por=
+t, bool *update_slave_arr)
+> > >> >                       }
+> > >> >                       break;
+> > >> >               case AD_MUX_COLLECTING_DISTRIBUTING:
+> > >> >+                      if (!__port_move_to_attached_state(port)) {
+> > >> >+                              /* if port state hasn't changed make
+> > >> >+                               * sure that a collecting distributi=
+ng
+> > >> >+                               * port in an active aggregator is e=
+nabled
+> > >> >+                               */
+> > >> >+                              if (port->aggregator->is_active &&
+> > >> >+                                  !__port_is_collecting_distributi=
+ng(port)) {
+> > >> >+                                      __enable_port(port);
+> > >> >+                                      *update_slave_arr =3D true;
+> > >> >+                              }
+> > >> >+                      }
+> > >> >+                      break;
+> > >> >+              case AD_MUX_COLLECTING:
+> > >> >+                      if (!__port_move_to_attached_state(port)) {
+> > >> >+                              if ((port->sm_vars & AD_PORT_SELECTE=
+D) &&
+> > >> >+                                  (port->partner_oper.port_state &=
+ LACP_STATE_SYNCHRONIZATION) &&
+> > >> >+                                  (port->partner_oper.port_state &=
+ LACP_STATE_COLLECTING)) {
+> > >> >+                                      port->sm_mux_state =3D AD_MU=
+X_DISTRIBUTING;
+> > >> >+                              } else {
+> > >> >+                                      /* If port state hasn't chan=
+ged, make sure that a collecting
+> > >> >+                                       * port is enabled for an ac=
+tive aggregator.
+> > >> >+                                       */
+> > >> >+                                      struct slave *slave =3D port=
+->slave;
+> > >> >+
+> > >> >+                                      if (port->aggregator->is_act=
+ive &&
+> > >> >+                                          bond_is_slave_rx_disable=
+d(slave)) {
+> > >> >+                                              ad_enable_collecting=
+(port);
+> > >> >+                                              *update_slave_arr =
+=3D true;
+> > >> >+                                      }
+> > >> >+                              }
+> > >> >+                      }
+> > >> >+                      break;
+> > >> >+              case AD_MUX_DISTRIBUTING:
+> > >> >                       if (!(port->sm_vars & AD_PORT_SELECTED) ||
+> > >> >                           (port->sm_vars & AD_PORT_STANDBY) ||
+> > >> >+                          !(port->partner_oper.port_state & LACP_S=
+TATE_COLLECTING) ||
+> > >> >                           !(port->partner_oper.port_state & LACP_S=
+TATE_SYNCHRONIZATION) ||
+> > >> >                           !(port->actor_oper_port_state & LACP_STA=
+TE_SYNCHRONIZATION)) {
+> > >> >-                              port->sm_mux_state =3D AD_MUX_ATTACH=
+ED;
+> > >> >+                              port->sm_mux_state =3D AD_MUX_COLLEC=
+TING;
+> > >> >                       } else {
+> > >> >                               /* if port state hasn't changed make
+> > >> >                                * sure that a collecting distributi=
+ng
+> > >> >@@ -1031,7 +1121,7 @@ static void ad_mux_machine(struct port *port,=
+ bool *update_slave_arr)
+> > >> >                                */
+> > >> >                               if (port->aggregator &&
+> > >> >                                   port->aggregator->is_active &&
+> > >> >-                                  !__port_is_enabled(port)) {
+> > >> >+                                  !__port_is_collecting_distributi=
+ng(port)) {
+> > >> >                                       __enable_port(port);
+> > >> >                                       *update_slave_arr =3D true;
+> > >> >                               }
+> > >> >@@ -1082,6 +1172,20 @@ static void ad_mux_machine(struct port *port=
+, bool *update_slave_arr)
+> > >> >                                                         update_sla=
+ve_arr);
+> > >> >                       port->ntt =3D true;
+> > >> >                       break;
+> > >> >+              case AD_MUX_COLLECTING:
+> > >> >+                      port->actor_oper_port_state |=3D LACP_STATE_=
+COLLECTING;
+> > >> >+                      port->actor_oper_port_state &=3D ~LACP_STATE=
+_DISTRIBUTING;
+> > >> >+                      port->actor_oper_port_state |=3D LACP_STATE_=
+SYNCHRONIZATION;
+> > >> >+                      ad_enable_collecting(port);
+> > >> >+                      ad_disable_distributing(port, update_slave_a=
+rr);
+> > >> >+                      port->ntt =3D true;
+> > >> >+                      break;
+> > >> >+              case AD_MUX_DISTRIBUTING:
+> > >> >+                      port->actor_oper_port_state |=3D LACP_STATE_=
+DISTRIBUTING;
+> > >> >+                      port->actor_oper_port_state |=3D LACP_STATE_=
+SYNCHRONIZATION;
+> > >> >+                      ad_enable_collecting_distributing(port,
+> > >> >+                                                        update_sla=
+ve_arr);
+> > >> >+                      break;
+> > >> >               default:
+> > >> >                       break;
+> > >> >               }
+> > >> >@@ -1906,6 +2010,45 @@ static void ad_initialize_port(struct port *=
+port, int lacp_fast)
+> > >> >       }
+> > >> > }
+> > >> >
+> > >> >+/**
+> > >> >+ * ad_enable_collecting - enable a port's receive
+> > >> >+ * @port: the port we're looking at
+> > >> >+ *
+> > >> >+ * Enable @port if it's in an active aggregator
+> > >> >+ */
+> > >> >+static void ad_enable_collecting(struct port *port)
+> > >> >+{
+> > >> >+      if (port->aggregator->is_active) {
+> > >> >+              struct slave *slave =3D port->slave;
+> > >> >+
+> > >> >+              slave_dbg(slave->bond->dev, slave->dev,
+> > >> >+                        "Enabling collecting on port %d (LAG %d)\n=
+",
+> > >> >+                        port->actor_port_number,
+> > >> >+                        port->aggregator->aggregator_identifier);
+> > >> >+              __enable_collecting_port(port);
+> > >> >+      }
+> > >> >+}
+> > >> >+
+> > >> >+/**
+> > >> >+ * ad_disable_distributing - disable a port's transmit
+> > >> >+ * @port: the port we're looking at
+> > >> >+ * @update_slave_arr: Does slave array need update?
+> > >> >+ */
+> > >> >+static void ad_disable_distributing(struct port *port, bool *updat=
+e_slave_arr)
+> > >> >+{
+> > >> >+      if (port->aggregator &&
+> > >> >+          !MAC_ADDRESS_EQUAL(&port->aggregator->partner_system,
+> > >> >+                             &(null_mac_addr))) {
+> > >> >+              slave_dbg(port->slave->bond->dev, port->slave->dev,
+> > >> >+                        "Disabling distributing on port %d (LAG %d=
+)\n",
+> > >> >+                        port->actor_port_number,
+> > >> >+                        port->aggregator->aggregator_identifier);
+> > >> >+              __disable_distributing_port(port);
+> > >> >+              /* Slave array needs an update */
+> > >> >+              *update_slave_arr =3D true;
+> > >> >+      }
+> > >> >+}
+> > >> >+
+> > >> > /**
+> > >> >  * ad_enable_collecting_distributing - enable a port's transmit/re=
+ceive
+> > >> >  * @port: the port we're looking at
+> > >> >diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/=
+bond_main.c
+> > >> >index 8e6cc0e133b7..30f4b0ff01c0 100644
+> > >> >--- a/drivers/net/bonding/bond_main.c
+> > >> >+++ b/drivers/net/bonding/bond_main.c
+> > >> >@@ -6331,6 +6331,7 @@ static int __init bond_check_params(struct bo=
+nd_params *params)
+> > >> >       params->ad_actor_sys_prio =3D ad_actor_sys_prio;
+> > >> >       eth_zero_addr(params->ad_actor_system);
+> > >> >       params->ad_user_port_key =3D ad_user_port_key;
+> > >> >+      params->coupled_control =3D 1;
+> > >> >       if (packets_per_slave > 0) {
+> > >> >               params->reciprocal_packets_per_slave =3D
+> > >> >                       reciprocal_value(packets_per_slave);
+> > >> >diff --git a/drivers/net/bonding/bond_netlink.c b/drivers/net/bondi=
+ng/bond_netlink.c
+> > >> >index cfa74cf8bb1a..29b4c3d1b9b6 100644
+> > >> >--- a/drivers/net/bonding/bond_netlink.c
+> > >> >+++ b/drivers/net/bonding/bond_netlink.c
+> > >> >@@ -122,6 +122,7 @@ static const struct nla_policy bond_policy[IFLA=
+_BOND_MAX + 1] =3D {
+> > >> >       [IFLA_BOND_PEER_NOTIF_DELAY]    =3D NLA_POLICY_FULL_RANGE(NL=
+A_U32, &delay_range),
+> > >> >       [IFLA_BOND_MISSED_MAX]          =3D { .type =3D NLA_U8 },
+> > >> >       [IFLA_BOND_NS_IP6_TARGET]       =3D { .type =3D NLA_NESTED }=
+,
+> > >> >+      [IFLA_BOND_COUPLED_CONTROL]     =3D { .type =3D NLA_U8 },
+> > >> > };
+> > >> >
+> > >> > static const struct nla_policy bond_slave_policy[IFLA_BOND_SLAVE_M=
+AX + 1] =3D {
+> > >> >@@ -549,6 +550,16 @@ static int bond_changelink(struct net_device *=
+bond_dev, struct nlattr *tb[],
+> > >> >                       return err;
+> > >> >       }
+> > >> >
+> > >> >+      if (data[IFLA_BOND_COUPLED_CONTROL]) {
+> > >> >+              int coupled_control =3D nla_get_u8(data[IFLA_BOND_CO=
+UPLED_CONTROL]);
+> > >> >+
+> > >> >+              bond_opt_initval(&newval, coupled_control);
+> > >> >+              err =3D __bond_opt_set(bond, BOND_OPT_COUPLED_CONTRO=
+L, &newval,
+> > >> >+                                   data[IFLA_BOND_COUPLED_CONTROL]=
+, extack);
+> > >> >+              if (err)
+> > >> >+                      return err;
+> > >> >+      }
+> > >> >+
+> > >> >       return 0;
+> > >> > }
+> > >> >
+> > >> >@@ -615,6 +626,7 @@ static size_t bond_get_size(const struct net_de=
+vice *bond_dev)
+> > >> >                                               /* IFLA_BOND_NS_IP6_=
+TARGET */
+> > >> >               nla_total_size(sizeof(struct nlattr)) +
+> > >> >               nla_total_size(sizeof(struct in6_addr)) * BOND_MAX_N=
+S_TARGETS +
+> > >> >+              nla_total_size(sizeof(u8)) +    /* IFLA_BOND_COUPLED=
+_CONTROL */
+> > >> >               0;
+> > >> > }
+> > >> >
+> > >> >@@ -774,6 +786,10 @@ static int bond_fill_info(struct sk_buff *skb,
+> > >> >                      bond->params.missed_max))
+> > >> >               goto nla_put_failure;
+> > >> >
+> > >> >+      if (nla_put_u8(skb, IFLA_BOND_COUPLED_CONTROL,
+> > >> >+                     bond->params.coupled_control))
+> > >> >+              goto nla_put_failure;
+> > >> >+
+> > >> >       if (BOND_MODE(bond) =3D=3D BOND_MODE_8023AD) {
+> > >> >               struct ad_info info;
+> > >> >
+> > >> >diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bondi=
+ng/bond_options.c
+> > >> >index f3f27f0bd2a6..4cdbc7e084f4 100644
+> > >> >--- a/drivers/net/bonding/bond_options.c
+> > >> >+++ b/drivers/net/bonding/bond_options.c
+> > >> >@@ -84,7 +84,8 @@ static int bond_option_ad_user_port_key_set(struc=
+t bonding *bond,
+> > >> >                                           const struct bond_opt_va=
+lue *newval);
+> > >> > static int bond_option_missed_max_set(struct bonding *bond,
+> > >> >                                     const struct bond_opt_value *n=
+ewval);
+> > >> >-
+> > >> >+static int bond_option_coupled_control_set(struct bonding *bond,
+> > >> >+                                         const struct bond_opt_val=
+ue *newval);
+> > >> >
+> > >> > static const struct bond_opt_value bond_mode_tbl[] =3D {
+> > >> >       { "balance-rr",    BOND_MODE_ROUNDROBIN,   BOND_VALFLAG_DEFA=
+ULT},
+> > >> >@@ -232,6 +233,12 @@ static const struct bond_opt_value bond_missed=
+_max_tbl[] =3D {
+> > >> >       { NULL,         -1,     0},
+> > >> > };
+> > >> >
+> > >> >+static const struct bond_opt_value bond_coupled_control_tbl[] =3D =
+{
+> > >> >+      { "on",  1,  BOND_VALFLAG_DEFAULT},
+> > >> >+      { "off", 0,  0},
+> > >> >+      { NULL,  -1, 0},
+> > >> >+};
+> > >> >+
+> > >> > static const struct bond_option bond_opts[BOND_OPT_LAST] =3D {
+> > >> >       [BOND_OPT_MODE] =3D {
+> > >> >               .id =3D BOND_OPT_MODE,
+> > >> >@@ -496,6 +503,15 @@ static const struct bond_option bond_opts[BOND=
+_OPT_LAST] =3D {
+> > >> >               .desc =3D "Delay between each peer notification on f=
+ailover event, in milliseconds",
+> > >> >               .values =3D bond_peer_notif_delay_tbl,
+> > >> >               .set =3D bond_option_peer_notif_delay_set
+> > >> >+      },
+> > >> >+      [BOND_OPT_COUPLED_CONTROL] =3D {
+> > >> >+              .id =3D BOND_OPT_COUPLED_CONTROL,
+> > >> >+              .name =3D "coupled_control",
+> > >> >+              .desc =3D "Opt into using coupled control MUX for LA=
+CP states",
+> > >> >+              .unsuppmodes =3D BOND_MODE_ALL_EX(BIT(BOND_MODE_8023=
+AD)),
+> > >> >+              .flags =3D BOND_OPTFLAG_IFDOWN,
+> > >> >+              .values =3D bond_coupled_control_tbl,
+> > >> >+              .set =3D bond_option_coupled_control_set,
+> > >> >       }
+> > >> > };
+> > >> >
+> > >> >@@ -1692,3 +1708,13 @@ static int bond_option_ad_user_port_key_set(=
+struct bonding *bond,
+> > >> >       bond->params.ad_user_port_key =3D newval->value;
+> > >> >       return 0;
+> > >> > }
+> > >> >+
+> > >> >+static int bond_option_coupled_control_set(struct bonding *bond,
+> > >> >+                                         const struct bond_opt_val=
+ue *newval)
+> > >> >+{
+> > >> >+      netdev_info(bond->dev, "Setting coupled_control to %s (%llu)=
+\n",
+> > >> >+                  newval->string, newval->value);
+> > >> >+
+> > >> >+      bond->params.coupled_control =3D newval->value;
+> > >> >+      return 0;
+> > >> >+}
+> > >> >diff --git a/include/net/bond_3ad.h b/include/net/bond_3ad.h
+> > >> >index c5e57c6bd873..9ce5ac2bfbad 100644
+> > >> >--- a/include/net/bond_3ad.h
+> > >> >+++ b/include/net/bond_3ad.h
+> > >> >@@ -54,6 +54,8 @@ typedef enum {
+> > >> >       AD_MUX_DETACHED,        /* mux machine */
+> > >> >       AD_MUX_WAITING,         /* mux machine */
+> > >> >       AD_MUX_ATTACHED,        /* mux machine */
+> > >> >+      AD_MUX_COLLECTING,      /* mux machine */
+> > >> >+      AD_MUX_DISTRIBUTING,    /* mux machine */
+> > >> >       AD_MUX_COLLECTING_DISTRIBUTING  /* mux machine */
+> > >> > } mux_states_t;
+> > >> >
+> > >> >diff --git a/include/net/bond_options.h b/include/net/bond_options.=
+h
+> > >> >index 69292ecc0325..473a0147769e 100644
+> > >> >--- a/include/net/bond_options.h
+> > >> >+++ b/include/net/bond_options.h
+> > >> >@@ -76,6 +76,7 @@ enum {
+> > >> >       BOND_OPT_MISSED_MAX,
+> > >> >       BOND_OPT_NS_TARGETS,
+> > >> >       BOND_OPT_PRIO,
+> > >> >+      BOND_OPT_COUPLED_CONTROL,
+> > >> >       BOND_OPT_LAST
+> > >> > };
+> > >> >
+> > >> >diff --git a/include/net/bonding.h b/include/net/bonding.h
+> > >> >index 5b8b1b644a2d..b61fb1aa3a56 100644
+> > >> >--- a/include/net/bonding.h
+> > >> >+++ b/include/net/bonding.h
+> > >> >@@ -148,6 +148,7 @@ struct bond_params {
+> > >> > #if IS_ENABLED(CONFIG_IPV6)
+> > >> >       struct in6_addr ns_targets[BOND_MAX_NS_TARGETS];
+> > >> > #endif
+> > >> >+      int coupled_control;
+> > >> >
+> > >> >       /* 2 bytes of padding : see ether_addr_equal_64bits() */
+> > >> >       u8 ad_actor_system[ETH_ALEN + 2];
+> > >> >@@ -167,6 +168,7 @@ struct slave {
+> > >> >       u8     backup:1,   /* indicates backup slave. Value correspo=
+nds with
+> > >> >                             BOND_STATE_ACTIVE and BOND_STATE_BACKU=
+P */
+> > >> >              inactive:1, /* indicates inactive slave */
+> > >> >+             rx_disabled:1, /* indicates whether slave's Rx is dis=
+abled */
+> > >> >              should_notify:1, /* indicates whether the state chang=
+ed */
+> > >> >              should_notify_link:1; /* indicates whether the link c=
+hanged */
+> > >> >       u8     duplex;
+> > >> >@@ -568,6 +570,14 @@ static inline void bond_set_slave_inactive_fla=
+gs(struct slave *slave,
+> > >> >               bond_set_slave_state(slave, BOND_STATE_BACKUP, notif=
+y);
+> > >> >       if (!slave->bond->params.all_slaves_active)
+> > >> >               slave->inactive =3D 1;
+> > >> >+      if (BOND_MODE(slave->bond) =3D=3D BOND_MODE_8023AD)
+> > >> >+              slave->rx_disabled =3D 1;
+> > >> >+}
+> > >> >+
+> > >> >+static inline void bond_set_slave_tx_disabled_flags(struct slave *=
+slave,
+> > >> >+                                               bool notify)
+> > >> >+{
+> > >> >+      bond_set_slave_state(slave, BOND_STATE_BACKUP, notify);
+> > >> > }
+> > >> >
+> > >> > static inline void bond_set_slave_active_flags(struct slave *slave=
+,
+> > >> >@@ -575,6 +585,14 @@ static inline void bond_set_slave_active_flags=
+(struct slave *slave,
+> > >> > {
+> > >> >       bond_set_slave_state(slave, BOND_STATE_ACTIVE, notify);
+> > >> >       slave->inactive =3D 0;
+> > >> >+      if (BOND_MODE(slave->bond) =3D=3D BOND_MODE_8023AD)
+> > >> >+              slave->rx_disabled =3D 0;
+> > >> >+}
+> > >> >+
+> > >> >+static inline void bond_set_slave_rx_enabled_flags(struct slave *s=
+lave,
+> > >> >+                                             bool notify)
+> > >> >+{
+> > >> >+      slave->rx_disabled =3D 0;
+> > >> > }
+> > >> >
+> > >> > static inline bool bond_is_slave_inactive(struct slave *slave)
+> > >> >@@ -582,6 +600,11 @@ static inline bool bond_is_slave_inactive(stru=
+ct slave *slave)
+> > >> >       return slave->inactive;
+> > >> > }
+> > >> >
+> > >> >+static inline bool bond_is_slave_rx_disabled(struct slave *slave)
+> > >> >+{
+> > >> >+      return slave->rx_disabled;
+> > >> >+}
+> > >> >+
+> > >> > static inline void bond_propose_link_state(struct slave *slave, in=
+t state)
+> > >> > {
+> > >> >       slave->link_new_state =3D state;
+> > >> >diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_l=
+ink.h
+> > >> >index 29ff80da2775..7a54fcff2eec 100644
+> > >> >--- a/include/uapi/linux/if_link.h
+> > >> >+++ b/include/uapi/linux/if_link.h
+> > >> >@@ -976,6 +976,7 @@ enum {
+> > >> >       IFLA_BOND_AD_LACP_ACTIVE,
+> > >> >       IFLA_BOND_MISSED_MAX,
+> > >> >       IFLA_BOND_NS_IP6_TARGET,
+> > >> >+      IFLA_BOND_COUPLED_CONTROL,
+> > >> >       __IFLA_BOND_MAX,
+> > >> > };
+> > >> >
+> > >> >diff --git a/tools/include/uapi/linux/if_link.h b/tools/include/uap=
+i/linux/if_link.h
+> > >> >index a0aa05a28cf2..f0d71b2a3f1e 100644
+> > >> >--- a/tools/include/uapi/linux/if_link.h
+> > >> >+++ b/tools/include/uapi/linux/if_link.h
+> > >> >@@ -974,6 +974,7 @@ enum {
+> > >> >       IFLA_BOND_AD_LACP_ACTIVE,
+> > >> >       IFLA_BOND_MISSED_MAX,
+> > >> >       IFLA_BOND_NS_IP6_TARGET,
+> > >> >+      IFLA_BOND_COUPLED_CONTROL,
+> > >> >       __IFLA_BOND_MAX,
+> > >> > };
+> > >> >
+> > >> >--
+> > >> >2.43.0.429.g432eaa2c6b-goog
+> > >> >
+> > >> >
+> >
+> > ---
+> >         -Jay Vosburgh, jay.vosburgh@canonical.com
 
