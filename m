@@ -1,105 +1,108 @@
-Return-Path: <netdev+bounces-65873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65875-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0966D83C27B
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 13:27:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C151B83C299
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 13:34:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6BE329156C
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 12:27:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79372291F56
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 12:34:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E765F45BF4;
-	Thu, 25 Jan 2024 12:27:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9AD617578;
+	Thu, 25 Jan 2024 12:34:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zb5oRwwy"
+	dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b="C4uh51dX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www530.your-server.de (www530.your-server.de [188.40.30.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8DBD482D0;
-	Thu, 25 Jan 2024 12:27:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0430481B9;
+	Thu, 25 Jan 2024 12:34:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.30.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706185642; cv=none; b=QjLN1xinvWRSkd+PhvQbTHmE2A1Y6h3ka9Z4GEkqNgAY9FfuPjXKaDOqYCkQjS9nNwx37CULP0TLTSiZ9bZ2zfkxSpQ045X8Y0CWYJK/HYFI7sXETuhy7u6MUB6MInE8txlj/Q8i5GfNX3CmxOyzvQ9OK+uI3jIkI2AxSFxj3gE=
+	t=1706186081; cv=none; b=CaVTsCNaphZAyAPd+iF+M0ipb9TMEGyaadvvqZ3paRux4fE2uQaYo67F9AF7Tjnq5Inxr2PL+y0TWzvc0Y4FoKbEt9+KxAdSZhVVJewKYcRCajwqUL/0OKe7LqPR32YmGoHGMeYpeqnCj4CVHMHtv2zj/M7qPLddrbjR1/3DCiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706185642; c=relaxed/simple;
-	bh=wh37IMxjc+9bQCZsbY1TgpxkregHG9E9PMlCKKotk7s=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=nLSlQHbCD2Kah3qlD6xcRSn9F5rRR33lYUSNCa8KXHPFfuDpOy85kzWnbCyp74t1IoFSBGtKa6Mu0NvWMzfL/8KKYWsuijIKWDV7srXa707+vyS9sIJ6rhYJof469ZZWwTVt3tUp+aC0lcc88Hg5qRUBagdWwNzs9V5QHPPRmOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zb5oRwwy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AC4FC433C7;
-	Thu, 25 Jan 2024 12:27:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706185641;
-	bh=wh37IMxjc+9bQCZsbY1TgpxkregHG9E9PMlCKKotk7s=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Zb5oRwwyg39VNJRcQcMUVEx/ehxJJIOETD2edb9eZCTcZhRTdomAvDAlqmGqdUcHT
-	 o1ddALaJhWhFW1b8UiXK3mOxQxCgvue/wmFUG681aAPSHRLCPZrfAzk/v7qJuDqcjh
-	 AqHylmRX4cXWRz+pSul/XGo9AeG+nh2m29aDuuK29Gsy4GsIWMNx5801Ts+ruTh7aB
-	 AfTsdyp7ujg2R9YvvcvXjEL/NnCR5hS5GpI2ozZUS7fr8q/HlAe94zqxIYQsaEi8Vg
-	 nB53ktzLb29nlnJcVDlO+HgMxFSKc4Mv0C30Ol3JZwWs+HwPBsvBpUver2rYtljGAU
-	 4spjAJSjcICew==
-From: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>
-To: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Mykola Lysenko <mykolal@fb.com>,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@rivosinc.com>,
-	linux-kselftest@vger.kernel.org,
+	s=arc-20240116; t=1706186081; c=relaxed/simple;
+	bh=uVcf0VNvF9r7eiInlL/b0K531ErmBBzf5AMiuPl0kog=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lutYZ74kEG4fpt3AkELnf3imsldciH8ErqP85kG/dloue+SZrueItRwceCtZOVHGyu8NeYedP5+Tlx97ucJgnelMJDfCbApdJpTCu9B4OI/NhTS9XLbxNKG9SvU7avh/fc9Lq4GE3iuXVvskz1Mntui3uNs9YJb8JM7tatyZ/14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com; spf=pass smtp.mailfrom=geanix.com; dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b=C4uh51dX; arc=none smtp.client-ip=188.40.30.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=geanix.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=geanix.com;
+	s=default2211; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:
+	Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=sqde1eKqHsDxcHA0c/L4ft5EXdAFyz1gweX/+ObrMwk=; b=C4uh51dX/XlieJ7zgcfHMe5mcN
+	D8vNmk2uDCQERTOxpyxoTZHeumltyyRkGjjR1sqbJRFuMD1DHu1xVFiHDeS6PgmREtdVdFqR/x1VO
+	NxRlLIBZSLzMBZM1e9ST8I+0fN3dQvMhKFsy7RBt3N3c6h+LuHfEZ9YqTb3Yj3okgSo4Hwnx4XzcM
+	ONKCH1hwNpVm8daIJEZ9i/u75L85PdldC+dxMyKofRdn4cUQWfwZqc/gkLLBWRX/aubRFbiFnnWzJ
+	BEJQejfpXwO7RTO6vJ52ilUe8WjJb4ag9PKC5sWFa/g7nU32tOWy7A3gC13/LtUohrfcQEz7IY1lF
+	k4bnULJA==;
+Received: from sslproxy02.your-server.de ([78.47.166.47])
+	by www530.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <esben@geanix.com>)
+	id 1rSywG-0007Pw-Hb; Thu, 25 Jan 2024 13:34:36 +0100
+Received: from [185.17.218.86] (helo=localhost)
+	by sslproxy02.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <esben@geanix.com>)
+	id 1rSywF-000258-JO; Thu, 25 Jan 2024 13:34:35 +0100
+From: Esben Haabendal <esben@geanix.com>
+To: netdev@vger.kernel.org,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	NXP Linux Team <linux-imx@nxp.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH bpf-next] selftests/bpf: Include runner extras for install target
-Date: Thu, 25 Jan 2024 13:27:15 +0100
-Message-Id: <20240125122715.1443022-1-bjorn@kernel.org>
-X-Mailer: git-send-email 2.40.1
+Subject: [PATCH 0/2] net: stmmac: dwmac-imx: Time Based Scheduling support
+Date: Thu, 25 Jan 2024 13:34:32 +0100
+Message-ID: 
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: esben@geanix.com
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27165/Thu Jan 25 10:51:15 2024)
 
-From: Björn Töpel <bjorn@rivosinc.com>
+This small patch series allows using TBS support of the i.MX Ethernet QOS
+controller for etf qdisc offload.
 
-When using the "install" or targets depending on install, e.g.
-"gen_tar", the "runner extras" weren't included for the BPF machine
-flavors.
+It is a rework of
+https://lore.kernel.org/all/20240124-reptilian-icing-a95b20f123be@spud/T/
 
-Make sure the necessary helper scripts/tools are added to
-corresponding BPF machine flavor.
+Changes since previous series:
 
-Signed-off-by: Björn Töpel <bjorn@rivosinc.com>
----
-tools/testing/selftests/bpf/Makefile | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+- Changed from using a devicetree binding for configuring TBS support to enable
+  it for all TX queues on supported i.MX Ethernet QOS controller. Other stmmac
+  controllers with TBS support will need to be updated with similar changes.
 
-diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftests/bpf/Makefile
-index fd15017ed3b1..a5e63ef78bf1 100644
---- a/tools/testing/selftests/bpf/Makefile
-+++ b/tools/testing/selftests/bpf/Makefile
-@@ -747,5 +747,15 @@ override define INSTALL_RULE
- 	@for DIR in $(TEST_INST_SUBDIRS); do		  \
- 		mkdir -p $(INSTALL_PATH)/$$DIR;   \
- 		rsync -a $(OUTPUT)/$$DIR/*.bpf.o $(INSTALL_PATH)/$$DIR;\
-+		rsync -a --copy-unsafe-links \
-+			$(OUTPUT)/$$DIR/bpf_testmod.ko \
-+			$(OUTPUT)/$$DIR/bpftool \
-+			$(OUTPUT)/$$DIR/ima_setup.sh \
-+			$(OUTPUT)/$$DIR/liburandom_read.so \
-+			$(OUTPUT)/$$DIR/sign-file \
-+			$(OUTPUT)/$$DIR/uprobe_multi \
-+			$(OUTPUT)/$$DIR/urandom_read \
-+			$(OUTPUT)/$$DIR/verify_sig_setup.sh \
-+			$(OUTPUT)/$$DIR/xdp_synproxy $(INSTALL_PATH)/$$DIR;\
- 	done
- endef
+Esben Haabendal (2):
+  net: stmmac: do not clear TBS enable bit on link up/down
+  net: stmmac: dwmac-imx: set TSO/TBS TX queues default settings
 
-base-commit: c8632acf193beac64bbdaebef013368c480bf74f
+ drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c   | 6 ++++++
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 3 +++
+ 2 files changed, 9 insertions(+)
+
 -- 
-2.40.1
+2.43.0
 
 
