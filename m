@@ -1,118 +1,94 @@
-Return-Path: <netdev+bounces-65929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4118383C791
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 17:10:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1927C83C7BB
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 17:18:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D2432B233C2
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 16:10:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C782A28A401
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 16:18:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4C891292E7;
-	Thu, 25 Jan 2024 16:10:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="rmGd0N8Z"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F07581292F3;
+	Thu, 25 Jan 2024 16:18:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40ED81292EA;
-	Thu, 25 Jan 2024 16:09:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3CCD7318E;
+	Thu, 25 Jan 2024 16:18:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706199000; cv=none; b=sf7KPwIykmxSxtgcFToKT5qYXygtWG+RI5QWUFxEK8FR3piUDWb/e5xDuuItME2VmAjxiqxzZeQr/Uyl6FlpjajBdYZj3d1zWNc+1tgf45iVuN4PrDD9PuZQt592yY0ftOw9ND49wZaCEZOELd980lSiwEzLXuuWOAyjzuNXjJ0=
+	t=1706199521; cv=none; b=P9eROeXNQ/gHsH7d0mapOC0lK/7seRwh4K7lZ+wplngqZ1g7ndlFaJt46lwWv5wqIKcg3wacMKx2WenT2194UpHtKY2wPEhBwoymMJP3MmxwABxtx9FWeGN62quf2OuzowVHhHyDDA6kWcEk5mJxet3tqDAm0EJJMXKJhmPWNdA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706199000; c=relaxed/simple;
-	bh=VAcxAAUle0UP8LX4Kr6jwChcisFpxl7tZH9DWxwQQro=;
+	s=arc-20240116; t=1706199521; c=relaxed/simple;
+	bh=9xmud3hWROwS5ZH7I5o8uHA2wJye2HObu5w653tAJfs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xd7dOXn+QgscAnMA1GodWmu5tDmUZVf4n1MFyS997T6j01MudX8cJZe9VUipKtbSLhMlnFpXU2YpBkNf1GADiwYboptsL7jIO00bJAfrtnOIrlNUfqQMksCiO0qc1VScZtqnAxBd4te2cSYhe9m//6kE9N+8AlnztrdMpecEhJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=rmGd0N8Z; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=RQikkIm2QnxXvz3fgLK+M6KVic4QhqcU+a/nOw4Ko44=; b=rmGd0N8ZuxoU0orIOY0DvsvKHI
-	vEsQrX6qIGcUW+dArNov8C5l6ql5HZTIZHoCUBU3VYWzbBx2g9hycWUHkvr0EiXuq23CuxyNR6Sfb
-	VDSpYTpYD7v9M6Fx10VBrhW8SgTAEWAEHoaCDKtXTr0sx8vjQNccYWWM+fp5ZaJAvVAZYFp/2G0OA
-	ZhmQp3LjcE6SIByY3fgzmF3+pFjetD7a7llX9AR6+pEPR82b1D/7zBPzkf8AApqLtFsgUyXJnv815
-	9CkMg2hSlTGWi6lF06BLi05ctqj2eZx+Rwv4KkAPG6xCDTcppa/S4S2rGGAQzpc12rtBHy7KQq4U2
-	QpskTG2w==;
-Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rT2Id-0000000ARmp-1ycD;
-	Thu, 25 Jan 2024 16:09:55 +0000
-Date: Thu, 25 Jan 2024 16:09:55 +0000
-From: Matthew Wilcox <willy@infradead.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=meIn8synbLtZVNZbuUGTA/dyzEZ9rMkyrQ5rDWuwnDmOJe1AN5BOyHrXzvY49okJ5ROTN1X8TRBMmW5Yjkwnhm28OtUOyqid/y3SUTQ/1cin/nXnkC0QUkRlpQBu04RPY1eu1j0OCfe9fsAY6sfh91pLdTyTfRLstv8FjgbXGbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.96.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1rT2Qi-0003de-0p;
+	Thu, 25 Jan 2024 16:18:16 +0000
+Date: Thu, 25 Jan 2024 16:18:07 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Neal Cardwell <ncardwell@google.com>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com, ZhangPeng <zhangpeng362@huawei.com>,
-	Arjun Roy <arjunroy@google.com>, linux-mm@kvack.org,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH net] tcp: add sanity checks to rx zerocopy
-Message-ID: <ZbKH04PDW7NhImjV@casper.infradead.org>
-References: <20240125103317.2334989-1-edumazet@google.com>
- <ZbKHVt_wkIfjKJXB@casper.infradead.org>
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, John Crispin <john@phrozen.org>
+Subject: Re: [PATCH net] net: dsa: mt7530: fix 10M/100M speed on MT7988 switch
+Message-ID: <ZbKJv84vGXInRIo1@makrotopia.org>
+References: <a5b04dfa8256d8302f402545a51ac4c626fdba25.1706071272.git.daniel@makrotopia.org>
+ <accda24c-9f12-4cfe-b532-a9c60ec97fca@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZbKHVt_wkIfjKJXB@casper.infradead.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <accda24c-9f12-4cfe-b532-a9c60ec97fca@arinc9.com>
 
+On Thu, Jan 25, 2024 at 12:49:19PM +0300, Arınç ÜNAL wrote:
+> On 24/01/2024 08:17, Daniel Golle wrote:
+> > Setup PMCR port register for actual speed and duplex on internally
+> > connected PHYs of the MT7988 built-in switch. This fixes links with
+> > speeds other than 1000M.
+> > 
+> > Fixes: ("110c18bfed414 net: dsa: mt7530: introduce driver for MT7988 built-in switch")
+> > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> 
+> Acked-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+> 
+> I'm wondering why we manually set speed and duplex for these interface
+> modes in the first place. I don't how it works for
+> PHY_INTERFACE_MODE_INTERNAL but, at least for PHY_INTERFACE_MODE_TRGMII and
+> 802.3z interfaces, phylink should already supply proper speed and duplex.
 
-Fixing email address for linux-mm.
+It's true that duplex should always be set to full-duplex already by
+phylink. However, speed could be 2500MBit/s (2500Base-X) or 2000MBit/s
+(?, TRGMII) and we yet need to program the PCR like if it was
+1000MBit/s.
 
-On Thu, Jan 25, 2024 at 04:07:50PM +0000, Matthew Wilcox wrote:
-> On Thu, Jan 25, 2024 at 10:33:17AM +0000, Eric Dumazet wrote:
-> > +++ b/net/ipv4/tcp.c
-> > @@ -1786,7 +1786,17 @@ static skb_frag_t *skb_advance_to_frag(struct sk_buff *skb, u32 offset_skb,
-> >  
-> >  static bool can_map_frag(const skb_frag_t *frag)
-> >  {
-> > -	return skb_frag_size(frag) == PAGE_SIZE && !skb_frag_off(frag);
-> > +	struct page *page;
-> > +
-> > +	if (skb_frag_size(frag) != PAGE_SIZE || skb_frag_off(frag))
-> > +		return false;
-> > +
-> > +	page = skb_frag_page(frag);
-> > +
-> > +	if (PageCompound(page) || page->mapping)
-> > +		return false;
-> 
-> I'm not entirely sure why you're testing PageCompound here.  If a driver
-> allocates a compound page, we'd still want to be able to insert it,
-> right?
-> 
-> I have a feeling that we want to fix this in the VM layer.  There are
-> some weird places calling vm_insert_page() and we should probably make
-> them all fail.
-> 
-> Something like this, perhaps?
-> 
-> diff --git a/mm/memory.c b/mm/memory.c
-> index 1a60faad2e49..ae0abab56d38 100644
-> --- a/mm/memory.c
-> +++ b/mm/memory.c
-> @@ -1871,6 +1871,10 @@ static int insert_page_into_pte_locked(struct vm_area_struct *vma, pte_t *pte,
->  
->  	if (!pte_none(ptep_get(pte)))
->  		return -EBUSY;
-> +	if (folio->mapping &&
-> +	    ((addr - vma->vm_start) / PAGE_SIZE + vma->vm_pgoff) !=
-> +	    (folio->index + folio_page_idx(folio, page)))
-> +		return -EINVAL;
->  	/* Ok, finally just insert the thing.. */
->  	folio_get(folio);
->  	inc_mm_counter(vma->vm_mm, mm_counter_file(folio));
-> 
+Regarding the INTERNAL case: it was added by mistake. In case of
+MT7988, all ports of the switch are connected via INTERNAL links,
+however, the PHYs still need adjustment of the PCR register just like
+on all other MT753x switches and the CPU port is setup elsewhere
+anyway.
 
