@@ -1,58 +1,87 @@
-Return-Path: <netdev+bounces-65794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A1D983BC56
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:52:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F08383BC5A
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:52:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FE1E1F295CE
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 08:52:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3E7B1F2A806
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 08:52:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A84921B95A;
-	Thu, 25 Jan 2024 08:52:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0ED71B95E;
+	Thu, 25 Jan 2024 08:52:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HVOLBNAH"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 857AC1B948;
-	Thu, 25 Jan 2024 08:52:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3E2A1BC23
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 08:52:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706172738; cv=none; b=tFCXsypiXjrW2HnPUwjb/DBgBOXgWr+Tk9835AXENwsL478I4aJfqi9CB8bv8NmR+MLI80pLIrkdFbrA7x28mE3TsKJkBXc0yCRQvnWXcygvIv7nEdqGIllz3ap8Q4PFB3BhWVAENHDRs+a3u1oBCss+V19vwvsOKXxZNMXy610=
+	t=1706172747; cv=none; b=CmHv9w6OFjPSm+W1QMpTkzOj0MReKjj9qhS6isZKKtx8Z6GJG+wcK/D8yXvKTaM9J+wehe5nu7+3+FfqSroJZNPxk1jyggURGIQFxFbOOns8Aih6a+mACuzpYb0c4PqWLq2STj9jWugjZPKZdjFWYFibg6LYsKkAXtWa/ZzeW0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706172738; c=relaxed/simple;
-	bh=TRrpOceO1ObHuQDpipuLsskP8G7fTPallXu16th2v2w=;
+	s=arc-20240116; t=1706172747; c=relaxed/simple;
+	bh=k2p6vgQQ/RAXPDiRE/JTyB/ah5UQEk6s51M/bFsBvoE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iTzAJjq/BkCq8mBy+763jvJOnuVLjbr2Z+Wtg4caSvKMz6E8xwz0ACDIunw8szJUine7RT0hpg2jXvvXtoOSbPb/xKQKPKdTwlEeZsiBJ3WHv/wh/Vc9diwZbWTqDR+tyET7yd5ItcV1D2cCfHCDvV94mNdStwIabJvUifAGz94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1rSvT1-0006uz-Mm; Thu, 25 Jan 2024 09:52:11 +0100
-Date: Thu, 25 Jan 2024 09:52:11 +0100
-From: Florian Westphal <fw@strlen.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	David Ahern <dsahern@kernel.org>, coreteam@netfilter.org,
-	"netdev-driver-reviewers@vger.kernel.org" <netdev-driver-reviewers@vger.kernel.org>,
-	Hangbin Liu <liuhangbin@gmail.com>, netfilter-devel@vger.kernel.org
-Subject: Re: [netfilter-core] [ANN] net-next is OPEN
-Message-ID: <20240125085211.GE31645@breakpoint.cc>
-References: <20240123072010.7be8fb83@kernel.org>
- <d0e28c67-51ad-4da1-a6df-7ebdbd45cd2b@kernel.org>
- <65b133e83f53e_225ba129414@willemb.c.googlers.com.notmuch>
- <20240124082255.7c8f7c55@kernel.org>
- <20240124090123.32672a5b@kernel.org>
- <ZbFiF2HzyWHAyH00@calendula>
- <20240124114057.1ca95198@kernel.org>
- <ZbFsyEfMRt8S+ef1@calendula>
- <20240124121343.6ce76eff@kernel.org>
- <20240124210724.2b0e08ff@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=e1uwTbEDwARIWpr8LFf6kVaj+HMkiW0n/WBmkq1YiWv8tXEjspOVwPmUFZjQZIzP6YPwZWRsis3IpXnPv/AoFW2lHsuuC5esAGnuWRDFyQPznFJMu4FwexmuC7N9Jx1Q6bc0Xd8hgIf0AbpaildvIFi/3APGsVPoQFq72x5/dUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HVOLBNAH; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706172743;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RIvhVbbUBp0xDkqN9EFINDsqzRK2vtIqnaFyFbvxcz4=;
+	b=HVOLBNAHyoXoJzDGW8jypv8cQloWNRhsST1igPxSCRwSgVaXKIKTk9eu7j1CoCkXTD/1Rg
+	1U7UFXq9WxUJ3TnEnoZ2pKLzxzrtuC//tNmfF8Ti9O+Pv4PQ+uKNFjphsnorK7EtmsAwBl
+	X/abS+B9gUCjc1aof+jlAH2KmV1MjRE=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-568-ovp_RUR7PhmRZfnpYej54w-1; Thu, 25 Jan 2024 03:52:21 -0500
+X-MC-Unique: ovp_RUR7PhmRZfnpYej54w-1
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-683699fede9so85715946d6.0
+        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 00:52:21 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706172741; x=1706777541;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RIvhVbbUBp0xDkqN9EFINDsqzRK2vtIqnaFyFbvxcz4=;
+        b=F5SGlsl/WnQAr48LqoSmEkEVS0ol05pz+zoaOfT/Gq4s40Oh8jmfzi/On/8CIpWZzZ
+         mZb140rfwtJ2Eqd0w+/cXstT2uhoFlKdZn5crXLwfOVjrs/N+G5ObFwjHWiKEoXZZzW9
+         a9MezfCGl0WPHiMqT6z/tUoi8tXXW9aKeoYkpuTQ7Fo74no3tfFIU7FDUjAWr0pS8spY
+         UNGuB44YujpkxlmeNIUpNwlcfLdt8Wj9qxGTlX0SoYTD3K8vw8TlWMC8dQ2qRfiH9Csv
+         cCA9e9Ffjnt/5ind1NVwBRuINDJ1LCNXjvqnHlCjsq1hl4IOnA/2uLf5E9S/z0BAL8RZ
+         kolw==
+X-Gm-Message-State: AOJu0YzliVyLDKKGr3v085p7orH2dU8n7FnXoiITAheFPDus4k/A5POy
+	lB+hAWYG7l57roq++TaadGCEvQb5O4Udzl5d9NjktrqNxucPSJmoB/IxonQsfn3qEQDWVE9r4d6
+	6q9lBhydGRl6bUHxjOexU+d1dFml6FbNJCUBsdJ4DDsh6urfSUvXIfg==
+X-Received: by 2002:a05:6214:2b09:b0:685:3444:4ee with SMTP id jx9-20020a0562142b0900b00685344404eemr686909qvb.89.1706172741538;
+        Thu, 25 Jan 2024 00:52:21 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHg3Tn6pQa0lndCQs5ycOlaqdnrfYc2D/GxlqryQE6ZGT5VDCr7Pq3ggUwd1eeQFdOE1BBzgg==
+X-Received: by 2002:a05:6214:2b09:b0:685:3444:4ee with SMTP id jx9-20020a0562142b0900b00685344404eemr686900qvb.89.1706172741246;
+        Thu, 25 Jan 2024 00:52:21 -0800 (PST)
+Received: from localhost ([81.56.90.2])
+        by smtp.gmail.com with ESMTPSA id i3-20020ad44ba3000000b0068198012890sm5243372qvw.66.2024.01.25.00.52.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Jan 2024 00:52:20 -0800 (PST)
+Date: Thu, 25 Jan 2024 09:52:18 +0100
+From: Davide Caratti <dcaratti@redhat.com>
+To: Pedro Tammela <pctammela@mojatatu.com>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
+	jiri@resnulli.us, shuah@kernel.org, kuba@kernel.org,
+	vladimir.oltean@nxp.com, edumazet@google.com, pabeni@redhat.com,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v2 0/5] selftests: tc-testing: misc changes for
+ tdc
+Message-ID: <ZbIhQiUmk5FbyCc9@dcaratti.users.ipa.redhat.com>
+References: <20240124181933.75724-1-pctammela@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,23 +90,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240124210724.2b0e08ff@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20240124181933.75724-1-pctammela@mojatatu.com>
 
-Jakub Kicinski <kuba@kernel.org> wrote:
-> On Wed, 24 Jan 2024 12:13:43 -0800 Jakub Kicinski wrote:
-> > > if that is the nftables backend, it might be also that .config is
-> > > missing CONFIG_NF_TABLES and CONFIG_NFT_COMPAT there, among other
-> > > options.  
-> > 
-> > FWIW full config:
-> > 
-> > https://netdev-2.bots.linux.dev/vmksft-net-mp/results/435321/config
-> > 
-> > CONFIG_NFT_COMPAT was indeed missing! Let's see how it fares with it enabled.
+On Wed, Jan 24, 2024 at 03:19:28PM -0300, Pedro Tammela wrote:
+> Patches 1 and 3 are fixes for tdc that were discovered when running it
+> using defconfig + tc-testing config and against the latest iproute2.
 > 
-> NFT_COMPAT fixed a lot! One remaining warning comes from using 
-> -m length. Which NFT config do we need for that one?
+> Patch 2 improves the taprio tests.
+> 
+> Patch 4 enables all tdc tests.
+> 
+> Patch 5 fixes the return code of tdc for when a test fails
+> setup/teardown.
+> 
+> v1->v2: Suggestions by Davide
+>
 
-CONFIG_NETFILTER_XT_MATCH_LENGTH=m|y
+for the series,
+
+Reviewed-by: Davide Caratti <dcaratti@redhat.com> 
+
+thanks!
+-- 
+davide
+
 
