@@ -1,92 +1,193 @@
-Return-Path: <netdev+bounces-65819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65820-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C073983BDDA
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 10:49:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C9FCE83BDE0
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 10:50:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 611921F33883
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:49:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C5F81F338F2
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 09:50:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F05F1BF33;
-	Thu, 25 Jan 2024 09:49:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="Xv9q88tE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AEAF1BF3B;
+	Thu, 25 Jan 2024 09:50:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB0021CA81;
-	Thu, 25 Jan 2024 09:49:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58B6F1BF50
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 09:50:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706176175; cv=none; b=bbcZ/0j7wIRUDOtF3xwuN4XvP2g9zQA6P4sz6Y9Bj7LXWbRkvfT2TQG7qZbS4DKKsfT/1ebkGMvP7KXuFL49iRbVk2YlGhDX7zoi/aXHwClCOSu/jcsLmLKutUzTijd+f28g3G/oYaKx8toNHfl80oVcNYc8GFXr9G/MDtc7dRs=
+	t=1706176232; cv=none; b=e9OM6ETspo0RhmugptZnMymK8aH1fX7PHKlghLYCh8EYRLbhChrA3kJrwQ8wyFKi2KKiUIsAg+97LadBoHRET8yblAC7pgUkXQEKDcaVXRxTsxTYm7OamyBXU95CdRlRulfWmq79np8wWvIPAWBHi0HWCBnuA+KDZF32kTTGLPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706176175; c=relaxed/simple;
-	bh=JodpOLAPwczmZ4a6VZMuVd4PZAjoFOUygw/5EqMMmN0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=o0uEholvpEwy6atden4mMixSpSaINeiJiw4ke0dXpd9Rt/YwlRfO+7Qo6LOtapsurMow3ufJVXSqCT8VbsqMkxKnhjTkpWtOgUWUdyYqVYOPTmU0hwSCmMDxndn7yBpbQ0lJ86HpLTTSlHmTC2U29rgRHyczzkikrJFD5jfWVME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=Xv9q88tE; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 8B8F14000D;
-	Thu, 25 Jan 2024 09:49:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1706176164;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4spzynnZLzSXpZvD9M1NQEXqK2+5EzKlAxOSnoAYggE=;
-	b=Xv9q88tEhpXwElHUBolfyOODB7HD7meHv1GR2s55oHM7A4OEjiWUqYzOFj8ciEdBzd44cO
-	7DtlbABxYZ2vHFqx+n2QG0dgRKKIXy+iQ3u5T1hYXKi3aILRBwZEmjlN52xaLEikx9OOkS
-	I2rRUS8pg6d7naLcCKGAVX8UVslHemONhgc8dqjmMqumdHGfhwQvyofeXBUOod+b54YSah
-	bh7oM53p3eRvj8tG/acVjEZ2+A5lU3yYfebD8Kj2YnwUOPUyPjfYBq7vmhCh07/AnwYwtN
-	ulNUGSGzpXLZXyALFeCVlleyTW5HYZdDQqImSNiGSJBP9NAkHB3jqZVwxsmcGA==
-Message-ID: <accda24c-9f12-4cfe-b532-a9c60ec97fca@arinc9.com>
-Date: Thu, 25 Jan 2024 12:49:19 +0300
+	s=arc-20240116; t=1706176232; c=relaxed/simple;
+	bh=QkpDfmEjwjz7uDYWUc9o3qkr7AoT9Xo5ckBEv7hSUJc=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=mx6ceP2zCDpUx0XdE7gEj4y8sDeBBgcDbskYUN2r5wQ63V/TaCuwzr1OaDRGvU/X3u/OZI/BlCVsEVtZJcjfvQBvKpjpHRQAXCdA5yTscCNU1aWaP3V/gKNB2FJYgVJCRhSmTDn9sdhDn1qq+1gHhTiFEJQofArtyRaTSm5jaqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7bbb3de4dcbso1016464639f.1
+        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 01:50:31 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706176230; x=1706781030;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2FCFO6nRQJ7i933l7/korO5m8D0tqulHAixtLMNxjZE=;
+        b=rYtE8aQ+IHz7Hfgv6llg1BvlKd7mMk0YlE+FekvgcVtNXFJRhDBQiQ0hVRR6/GbL2f
+         jWDgvoIf918JKoTYN0R1qtpRgy/Siv1T/UiHkbIzg/BAJWV4bByxq7E62W08x0Smx5bZ
+         3fVTOyk94Ip1mOnPdLj9gWG2hVQUxQVf98TI47ibOEu2vHc5BlFjdNyBaihp+6x0oTcj
+         z1awCM8cteqUYiQMo9Pr+FSzBBqnx6gSNsu8/pFhg40CxHCFbmCJz8TZk73+HuMIMU6g
+         Vw5NG8n1y0Y2GoVbszKVArgv0T2AJnvozD1avaSB1Tw6oxeWYgSh64PZPCuhNwwTAWV4
+         WdkQ==
+X-Gm-Message-State: AOJu0YxMsgnpjQMlnzdLlFIyyAVuJCnOGUXrmQHHxqkmerbPi4YjLMnM
+	f8vmFySVuPsfdPyD7Y42PUlSZVtr7vCcoqeWADmD6dBH9WnO459vrvNIVOY/5SWsgKMdHHcf3XS
+	TGYtqhKK/L0LlkKsR8jKPATyQRQaXn/kBmvqMDs3WzSesjP4ptVjGemI=
+X-Google-Smtp-Source: AGHT+IGOLStg2VfYUeovZDwOtvwRYL+cg9sQWYKVEeoaTLyC6hwKKfjkoZ8jxiqYPADIwn2rMZDbKp9EVe7tcBBe9jjcLAtXvwpl
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: dsa: mt7530: fix 10M/100M speed on MT7988 switch
-Content-Language: en-GB
-To: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
- Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
- <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-Cc: John Crispin <john@phrozen.org>
-References: <a5b04dfa8256d8302f402545a51ac4c626fdba25.1706071272.git.daniel@makrotopia.org>
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <a5b04dfa8256d8302f402545a51ac4c626fdba25.1706071272.git.daniel@makrotopia.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
+X-Received: by 2002:a05:6e02:1d8d:b0:362:910b:2345 with SMTP id
+ h13-20020a056e021d8d00b00362910b2345mr101973ila.4.1706176230599; Thu, 25 Jan
+ 2024 01:50:30 -0800 (PST)
+Date: Thu, 25 Jan 2024 01:50:30 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000026353b060fc21c07@google.com>
+Subject: [syzbot] [bpf?] general protection fault in btf_is_module
+From: syzbot <syzbot+1336f3d4b10bcda75b89@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, haoluo@google.com, john.fastabend@gmail.com, 
+	jolsa@kernel.org, kpsingh@kernel.org, linux-kernel@vger.kernel.org, 
+	martin.lau@linux.dev, netdev@vger.kernel.org, sdf@google.com, song@kernel.org, 
+	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On 24/01/2024 08:17, Daniel Golle wrote:
-> Setup PMCR port register for actual speed and duplex on internally
-> connected PHYs of the MT7988 built-in switch. This fixes links with
-> speeds other than 1000M.
-> 
-> Fixes: ("110c18bfed414 net: dsa: mt7530: introduce driver for MT7988 built-in switch")
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+Hello,
 
-Acked-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+syzbot found the following issue on:
 
-I'm wondering why we manually set speed and duplex for these interface
-modes in the first place. I don't how it works for
-PHY_INTERFACE_MODE_INTERNAL but, at least for PHY_INTERFACE_MODE_TRGMII and
-802.3z interfaces, phylink should already supply proper speed and duplex.
+HEAD commit:    d47b9f68d289 libbpf: Correct bpf_core_read.h comment wrt b..
+git tree:       bpf-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=104b1ef7e80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=719e6acaf392d56b
+dashboard link: https://syzkaller.appspot.com/bug?extid=1336f3d4b10bcda75b89
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10c1a53be80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1052cec3e80000
 
-Arınç
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/1a9b4a5622fb/disk-d47b9f68.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/dd68baeac4fd/vmlinux-d47b9f68.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/811ba9dc9ddf/bzImage-d47b9f68.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+1336f3d4b10bcda75b89@syzkaller.appspotmail.com
+
+general protection fault, probably for non-canonical address 0xdffffc000000001b: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x00000000000000d8-0x00000000000000df]
+CPU: 0 PID: 5064 Comm: syz-executor334 Not tainted 6.7.0-syzkaller-12348-gd47b9f68d289 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+RIP: 0010:btf_is_module+0x26/0x80 kernel/bpf/btf.c:7441
+Code: 00 eb f0 90 66 0f 1f 00 55 53 48 89 fb e8 92 24 de ff 48 8d bb d8 00 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <0f> b6 04 02 84 c0 74 02 7e 48 0f b6 ab d8 00 00 00 31 ff 89 ee e8
+RSP: 0018:ffffc900039ff828 EFLAGS: 00010206
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffffff81a07f47
+RDX: 000000000000001b RSI: ffffffff81a9fcfe RDI: 00000000000000d8
+RBP: ffffc900039ffaf0 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000004 R11: ffffffff8aa0008b R12: ffffc90000ae6038
+R13: ffffc90000ae6000 R14: 0000000000000000 R15: 0000000000000000
+FS:  000055555660b380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000001b6b398 CR3: 000000001aaae000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ check_struct_ops_btf_id kernel/bpf/verifier.c:20302 [inline]
+ check_attach_btf_id kernel/bpf/verifier.c:20730 [inline]
+ bpf_check+0x6cfe/0x9df0 kernel/bpf/verifier.c:20898
+ bpf_prog_load+0x14dc/0x2310 kernel/bpf/syscall.c:2769
+ __sys_bpf+0xbf7/0x4a00 kernel/bpf/syscall.c:5463
+ __do_sys_bpf kernel/bpf/syscall.c:5567 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5565 [inline]
+ __x64_sys_bpf+0x78/0xc0 kernel/bpf/syscall.c:5565
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xd3/0x250 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+RIP: 0033:0x7f4dbbe514a9
+Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffe76acbe18 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+RAX: ffffffffffffffda RBX: 00007ffe76acbff8 RCX: 00007f4dbbe514a9
+RDX: 00000000000000a0 RSI: 00000000200009c0 RDI: 0000000000000005
+RBP: 00007f4dbbec4610 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+R13: 00007ffe76acbfe8 R14: 0000000000000001 R15: 0000000000000001
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:btf_is_module+0x26/0x80 kernel/bpf/btf.c:7441
+Code: 00 eb f0 90 66 0f 1f 00 55 53 48 89 fb e8 92 24 de ff 48 8d bb d8 00 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <0f> b6 04 02 84 c0 74 02 7e 48 0f b6 ab d8 00 00 00 31 ff 89 ee e8
+RSP: 0018:ffffc900039ff828 EFLAGS: 00010206
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffffff81a07f47
+RDX: 000000000000001b RSI: ffffffff81a9fcfe RDI: 00000000000000d8
+RBP: ffffc900039ffaf0 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000004 R11: ffffffff8aa0008b R12: ffffc90000ae6038
+R13: ffffc90000ae6000 R14: 0000000000000000 R15: 0000000000000000
+FS:  000055555660b380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000001b6b398 CR3: 000000001aaae000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	00 eb                	add    %ch,%bl
+   2:	f0 90                	lock nop
+   4:	66 0f 1f 00          	nopw   (%rax)
+   8:	55                   	push   %rbp
+   9:	53                   	push   %rbx
+   a:	48 89 fb             	mov    %rdi,%rbx
+   d:	e8 92 24 de ff       	call   0xffde24a4
+  12:	48 8d bb d8 00 00 00 	lea    0xd8(%rbx),%rdi
+  19:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+  20:	fc ff df
+  23:	48 89 fa             	mov    %rdi,%rdx
+  26:	48 c1 ea 03          	shr    $0x3,%rdx
+* 2a:	0f b6 04 02          	movzbl (%rdx,%rax,1),%eax <-- trapping instruction
+  2e:	84 c0                	test   %al,%al
+  30:	74 02                	je     0x34
+  32:	7e 48                	jle    0x7c
+  34:	0f b6 ab d8 00 00 00 	movzbl 0xd8(%rbx),%ebp
+  3b:	31 ff                	xor    %edi,%edi
+  3d:	89 ee                	mov    %ebp,%esi
+  3f:	e8                   	.byte 0xe8
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
