@@ -1,185 +1,203 @@
-Return-Path: <netdev+bounces-65972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF4EA83CBE8
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 20:07:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8F9E83CBF6
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 20:11:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3E4CEB2348A
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 19:07:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 836C528C971
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 19:11:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFD72130E52;
-	Thu, 25 Jan 2024 19:07:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BUGtQ9dw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 977AE132C18;
+	Thu, 25 Jan 2024 19:11:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 052EE13472F;
-	Thu, 25 Jan 2024 19:07:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E15648472;
+	Thu, 25 Jan 2024 19:11:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706209642; cv=none; b=amXsiaFeK6HCTQuzhMIMli2115OmGr339jGuu9Pso/W7PQ+B1ntLMzs4dvQj3W4vc7jMIXIfOJcSE2BX5bT6eKcToS0+toO6RNNbp4+Wgx9MghFJujN34+GKMI0DpTtCyye2VduOAhHrXxviC3f7zRp2kuHznhdw4qqam9LvLY8=
+	t=1706209869; cv=none; b=etsi7/VC9EL5fupsph5m592kbXMDbRWZBVyTfReq31Z+xlbHB99e+DsFTbbtYOdpFZPLFymJSwEq6KDya66xDignFJiDnUFbCJKbJUdit2eQxRA0UgLS3GplDrhqIbpND5BqKce9HHTOItjXO2VNuLeVyWnsxihGveQMiI+10GQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706209642; c=relaxed/simple;
-	bh=RnD7tYCwHSLN/q0PwDQwMfAmXnWnTGqNIuvwuelXl9s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G5cNLAqO0nt+8N9ezYDq4Urj6sL3aebYg2VXHsZg/MP2LiThNTafyuypgmFL0zCPG+G0SwdpsfMF63Ktmw9RTJracI+BEdQezj5qi1wJHDrlnJXEMAlX2pgGWtH3Rw9oUIF/IxkcvJM6GQklAETnzqM3QJbshT3yph826Qz50sU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BUGtQ9dw; arc=none smtp.client-ip=209.85.208.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2cf354613easo13908031fa.1;
-        Thu, 25 Jan 2024 11:07:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706209639; x=1706814439; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TXr+6RTm2y0jFaSgxtjxgqNsWNZTUA5ivbr5rQKXoKM=;
-        b=BUGtQ9dwSOUYnSSRj1j91Cnssy5HvVDYYNzVDsUzyg10r3S2GpjXZFpIR/d+fi1JhW
-         BXCK8yrE6e/A9gBvO9XAGuRwLDhX5xOMOdj8RaU/vgzNC2mDbbM1YGNyDes4W9UGMMr2
-         PVeuCu9FM5r9yBdnPgd/mKWQ8xfRwmjOtzYNoY+bZIV5VhVfTllpYeYqNDicohhfiOPl
-         qh2n4YIWIIGKMqpx+7+6FiV3OkygodtpdMniyzgw2l+Q8gx65ED4lT34UR3FOsArR/eR
-         LCTwypBCqe87gHzfKu8Lwbir56wuzFWcqDLsNazkSti0ZLQE3PBYKEfYBlJ8CI99g/iK
-         KqEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706209639; x=1706814439;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TXr+6RTm2y0jFaSgxtjxgqNsWNZTUA5ivbr5rQKXoKM=;
-        b=dYTLzgXin8rECAxAxiFqNNq2S3CCFpzCSa7vBaKq90uYE93H6ykznCDMPjsVnei/gD
-         R+VLz7REUPhRHo4muCSLXMSIzrF8e8PVYIJuGThfCl9mxKl7brYOEiSdcrn8ac2RkBF1
-         fyBy/GpRfK5JiMTKNETlve9KlP7QgbFouPsuItklBR0QBTDH7N86B3n7LJpUYIgZBgFR
-         XhNr5cwflUYQpfYYJwTxIw0QAszBPUSdDp9IafIVokbLQnm2QcYqCT3lotxi7lmdwscp
-         ayYnaL/WK+eVuW2iM1r4UaspjyFDow3/NBJuBcnMdA1x097ufbRbWNESF7E0JCVQgqZx
-         G9+g==
-X-Gm-Message-State: AOJu0YzWyBBPMEjYwIbh7N2F+z4gwi2jFBD0QwvPgLvm4xMCV3PgEh/f
-	dOJ+KysrzN9H94hAhRP17JJfWdCgQuPeWrYkB23A6EHSRvxjO13W
-X-Google-Smtp-Source: AGHT+IGRO7XLqxNPmXpytHm/jv8xSj2MEwW928f4bFwxrqq6A1bFNX0EYOUDQ4O2bEA5tfrTPBuSyg==
-X-Received: by 2002:a2e:be1f:0:b0:2cd:a311:6aec with SMTP id z31-20020a2ebe1f000000b002cda3116aecmr115609ljq.21.1706209638688;
-        Thu, 25 Jan 2024 11:07:18 -0800 (PST)
-Received: from mobilestation ([95.79.203.166])
-        by smtp.gmail.com with ESMTPSA id l15-20020a2ea30f000000b002cf1033e8bdsm363582lje.30.2024.01.25.11.07.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jan 2024 11:07:18 -0800 (PST)
-Date: Thu, 25 Jan 2024 22:07:15 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Furong Xu <0x1207@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Joao Pinto <jpinto@synopsys.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, xfr@outlook.com, rock.xu@nio.com
-Subject: Re: [PATCH net] net: stmmac: xgmac: fix handling of DPP safety error
- for DMA channels
-Message-ID: <czebrzszux2gdik3ey54tr3iewsxs4hjom432eb527jcpftnnr@ftiiwofakorj>
-References: <20240123095006.979437-1-0x1207@gmail.com>
- <vsert76o6lxxc676tjiiikir577qobfonyo6sgo5eek6alzxlo@tb6hq5s2qcsp>
- <20240125105620.000040b7@gmail.com>
+	s=arc-20240116; t=1706209869; c=relaxed/simple;
+	bh=rG0wyz2mZz0eyrwCAT1LdluCvKQNeMLcaSOnUATCrQg=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=i5l4XtdMD7UIDyE/HYV3YuwxdG4QOT8nHtS60M2rUNh+WKGcVoYtt0nwkyUl7cT/M8KNfXwPfWTi4EyFO5/L3hgrMtmOFnmtgsl0OFKP1c4xz2g+IT1UofjuF+sPno4zL59jZgoY0zmtNLthlDvagaYgPf0zHBx3H48I6dacKLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.105] (31.173.86.50) by msexch01.omp.ru (10.188.4.12)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 25 Jan
+ 2024 22:10:55 +0300
+Subject: Re: [PATCH net-next v2 0/2] Add HW checksum offload support for
+ RZ/G2L GbEthernet IP
+To: Biju Das <biju.das.jz@bp.renesas.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: Vincent Guittot <vincent.guittot@linaro.org>, <peterz@infradead.org>,
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>, Yoshihiro Shimoda
+	<yoshihiro.shimoda.uh@renesas.com>, Wolfram Sang
+	<wsa+renesas@sang-engineering.com>, Nikita Yushchenko
+	<nikita.yoush@cogentembedded.com>, <netdev@vger.kernel.org>,
+	<linux-renesas-soc@vger.kernel.org>, Geert Uytterhoeven
+	<geert+renesas@glider.be>, Prabhakar Mahadev Lad
+	<prabhakar.mahadev-lad.rj@bp.renesas.com>, Biju Das <biju.das.au@gmail.com>
+References: <20240124102115.132154-1-biju.das.jz@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <5245e582-5eea-ccdf-2ba3-fda58e261172@omp.ru>
+Date: Thu, 25 Jan 2024 22:10:55 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240125105620.000040b7@gmail.com>
+In-Reply-To: <20240124102115.132154-1-biju.das.jz@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 01/25/2024 18:49:35
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 182947 [Jan 25 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.86.50 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.86.50 in (user) dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	lore.kernel.org:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.86.50
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 01/25/2024 18:55:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 1/25/2024 4:13:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Thu, Jan 25, 2024 at 10:56:20AM +0800, Furong Xu wrote:
-> On Wed, 24 Jan 2024 17:36:10 +0300
-> Serge Semin <fancer.lancer@gmail.com> wrote:
+Hello!
+
+On 1/24/24 1:21 PM, Biju Das wrote:
+
+> This patch series aims to add HW checksum offload supported by TOE module
+> found on the RZ/G2L Gb ethernet IP.
+
+   Your previous try was back in 2021, still the cover letter has the same
+issues (hm, I didn't point out those back then).
+
+> The TOE has hw support for calculating IP header and TCP/UDP/ICMP checksum
+> for both IPV4 and IPV6.
 > 
-> > On Tue, Jan 23, 2024 at 05:50:06PM +0800, Furong Xu wrote:
-> > > Commit 56e58d6c8a56 ("net: stmmac: Implement Safety Features in
-> > > XGMAC core") checks and reports safety errors, but leaves the
-> > > Data Path Parity Errors for each channel in DMA unhandled at all, lead to
-> > > a storm of interrupt.
-> > > Fix it by checking and clearing the DMA_DPP_Interrupt_Status register.
-> > > 
-> > > Fixes: 56e58d6c8a56 ("net: stmmac: Implement Safety Features in XGMAC core")
-> > > Signed-off-by: Furong Xu <0x1207@gmail.com>
-> > > ---
-> > >  drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h      | 1 +
-> > >  drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c | 6 ++++++
-> > >  2 files changed, 7 insertions(+)
-> > > 
-> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> > > index 207ff1799f2c..188e11683136 100644
-> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> > > @@ -385,6 +385,7 @@
-> > >  #define XGMAC_DCEIE			BIT(1)
-> > >  #define XGMAC_TCEIE			BIT(0)
-> > >  #define XGMAC_DMA_ECC_INT_STATUS	0x0000306c
-> > > +#define XGMAC_DMA_DPP_INT_STATUS	0x00003074
-> > >  #define XGMAC_DMA_CH_CONTROL(x)		(0x00003100 + (0x80 * (x)))
-> > >  #define XGMAC_SPH			BIT(24)
-> > >  #define XGMAC_PBLx8			BIT(16)
-> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> > > index eb48211d9b0e..874e85b499e2 100644
-> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> > > @@ -745,6 +745,12 @@ static void dwxgmac3_handle_mac_err(struct net_device *ndev,
-> > >  
-> > >  	dwxgmac3_log_error(ndev, value, correctable, "MAC",
-> > >  			   dwxgmac3_mac_errors, STAT_OFF(mac_errors), stats);
-> > > +
-> > > +	value = readl(ioaddr + XGMAC_DMA_DPP_INT_STATUS);
-> > > +	writel(value, ioaddr + XGMAC_DMA_DPP_INT_STATUS);
-> > > +
-> > > +	if (value)
-> > > +		netdev_err(ndev, "Found DMA_DPP error, status: 0x%x\n", value);  
-> > 
-> > 1. Why not to implement this in the same way as the rest of the safety
-> > errors handle code? (with the flags described by the
-> > dwxgmac3_error_desc-based table and the respective counters being
-> > incremented should the errors were detected)
-> > 
+> For Rx, the result of checksum calculation is attached to last 4byte
+> of ethernet frames.
 
-> XGMAC_DMA_DPP_INT_STATUS is just a bitmap of DMA RX and TX channels,
-> bottom 16 bits for 16 DMA TX channels and top 16 bits for 16 DMA RX channels.
-> No other descriptions.
+   "For Rx, the 4-byte result of checksum calculation is attached to the
+Ethernet frames", you wanted to say?
+
+> First 2bytes is result of IPV4 header checksum
+> and next 2 bytes is TCP/UDP/ICMP.
+
+   TCP/UDP/ICMP checksum, you mean?
+
+> If frame does not have error "0000" attached to checksum calculation
+
+   "If a frame does not have error, 0x0000 is attached as a checksum
+calculation result", you wanted to say?
+
+> result. For unsupported frames "ffff" is attached to checksum calculation
+
+   s/to/as/, again?
+
+> result. Cases like IPV6, IPV4 header is always set to "FFFF".
+
+   In case of an IPv6 packet, IPv4 checksum is always set to 0xFFFF",
+you wanted to say?
+
+> For Tx, the result of checksum calculation is set to the checksum field of
+> each IPv4 Header/TCP/UDP/ICMP of ethernet frames. For the unsupported
+> frames, those fields are not changed. If a transmission frame is an UDP
+> frame of IPv4 and its checksum value in the UDP header field is H’0000,
+
+   I think you can call it just UDPv4...
+
+> TOE does not calculate checksum for UDP part of this frame as it is
+> optional function as per standards.
 > 
-> And the counters should be updated, I will send a new patch.
-
-Ok. I'll wait for this patch v2 then with the counters fixed. Please
-also note that you are adding the _DMA_ DPP events handling support.
-Thus the more suitable place for this change would be
-dwmac5_handle_dma_err().
-
+> Add Tx/Rx checksum offload supported by TOE for IPV4 and TCP/UDP protocols.
 > 
-> > 2. I don't see this IRQ being enabled in the dwxgmac3_safety_feat_config()
-> > method. How come the respective event has turned to be triggered
-> > anyway?
-> This error report is enabled by default, and cannot be disabled or marked(as Synopsys Databook says).
-> What we can do is clearing it when it asserts.
-
-This sounds so strange that I can barely believe in it. The DW QoS Eth
-MTL DPP feature can be enabled/disabled, but the DW XGMAC DMA DPP
-can't? This doesn't look logical. What's the point in having a never
-maskable IRQ for not that much crucial but optional feature? Moreover
-DPP adds some data flow overhead. If we are sure that no problem with
-the device data paths, then it seems redundant to have it always
-enabled. So I guess it must be switchable. Are you completely sure it
-isn't?
-
--Serge(y)
-
-> > 
-> > -Serge(y) 
-> > 
-> > >  }
-> > >  
-> > >  static const struct dwxgmac3_error_desc dwxgmac3_mtl_errors[32]= {
-> > > -- 
-> > > 2.34.1
-> > > 
-> > >   
+> Results of iperf3 in Mbps
 > 
+> RZ/V2L:
+> TCP(Tx/Rx) results with checksum offload Enabled:	{921,932}
+> TCP(Tx/Rx) results with checksum offload Disabled:	{867,612}
+> 
+> UDP(Tx/Rx) results with checksum offload Enabled:	{950,946}
+> UDP(Tx/Rx) results with checksum offload Disabled:	{952,920}
+> 
+> RZ/G2L:
+> TCP(Tx/Rx) results with checksum offload Enabled:	{920,936}
+> TCP(Tx/Rx) results with checksum offload Disabled:	{871,626}
+> 
+> UDP(Tx/Rx) results with checksum offload Enabled:	{953,950}
+> UDP(Tx/Rx) results with checksum offload Disabled:	{954,920}
+> 
+> RZ/G2LC:
+> TCP(Tx/Rx) results with checksum offload Enabled:	{927,936}
+> TCP(Tx/Rx) results with checksum offload Disabled:	{889,626}
+> 
+> UDP(Tx/Rx) results with checksum offload Enabled:	{950,946}
+> UDP(Tx/Rx) results with checksum offload Disabled:	{949,944}
+
+   Too many figures, I think... :-)
+   How RZ/G2L SoC is different from RZ/G2LC?
+
+> v1->v2:
+>  * Updated covering letter and results
+>  * Fixed the sparse warnings for patch#1 by replacing __sum16->__wsum.
+> 
+> Note:
+>  This patches are tested with [1] without the CPU performance is not good
+
+   Without CPU? I guess the performance would be 0. Seriously, this is
+hardly parseable... :-)
+ 
+>  [1] https://lore.kernel.org/all/20240117190545.596057-1-vincent.guittot@linaro.org/
+> 
+> Biju Das (2):
+>   ravb: Add Rx checksum offload support
+>   ravb: Add Tx checksum offload support
+
+   These summaries sound like you're adding checksum offload support for
+all supported SoCs while you only do that for those having GbEther...
+
+[...]
+
+MBR, Sergey
 
