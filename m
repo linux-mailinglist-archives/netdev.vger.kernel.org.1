@@ -1,48 +1,73 @@
-Return-Path: <netdev+bounces-65964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8161883CAAC
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 19:17:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5432D83CAB4
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 19:21:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 190E91F27D15
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 18:17:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A33BFB25978
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 18:21:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55D9D1350D3;
-	Thu, 25 Jan 2024 18:17:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27AA5133983;
+	Thu, 25 Jan 2024 18:21:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Flq+APtc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mjzcikZc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 324C11350CE
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 18:17:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2A0210A12
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 18:21:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706206645; cv=none; b=aFOCmuYY6YeXltsuhOi4oGBz3dc8Wi25pzz3t67JaC0k3ZB6nJstvNyzJAeaifH+hkk/IMuToH63Ohbsa44EkiIYYqgFivRN21ihse8zMhyCOnDEfA6daT1pTHguYFiqvhq7/aApCYCYk6dp5B5Dx0QxuIvfhmQ94Wi0nT4mDP8=
+	t=1706206862; cv=none; b=JpJyysZwLjyrYtbNkmrzchDslihSMQlvVRMaFPxHPm7kM6dCDzc493pM0b3gSokJFRaKtRYH0ibjlXGXyfLXzxEmm0tbt+J/5wEwX1irdFhj5eIxVWCpQVhn8Il+lA1J72CRfAB3j4CiR3eZy0gl/6fZw6aHBoAzIncY7b8oBhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706206645; c=relaxed/simple;
-	bh=Wawne1ixIMQZu5OBhwLWFcX8DyEiYhBqbXmeuPs95e4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HLTsp+Do4neH44CQ+DFpEf9IjHGpTun4LEqeox1YpGVGAQsCfvL7WuaJ0nXPycDynUunCF0prKbZWWKxUD+HjGOUrhLk5wyWZORdtfIcg7K5WkWoJbYsHLGucqfXSqT0UYn7BWx4zSbPwGdhbtMfZJtdFybVXplqq71b5BpRoKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Flq+APtc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7511CC433C7;
-	Thu, 25 Jan 2024 18:17:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706206643;
-	bh=Wawne1ixIMQZu5OBhwLWFcX8DyEiYhBqbXmeuPs95e4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Flq+APtcNzcK/6f6zoX+SXBOx+ibPxLcc+nPeaGDdjzIBLajldfR1a9xrVlrZT9b3
-	 yoPcsmJ2DBecOs4Ky0ER5yMW66bewUIyNOSx1NIDhWiCx//NREok72YABDh0FuBJnu
-	 4qIVMg7ywI7gP3iHkxEk+8G1IfRirCkVtldo9cqzSMnDzqYJbACrkZ4z89L6MCoq0O
-	 l/obPrrnzP31bAqmGKYhG30zujH2HfHa1VJVkvzp6ZCeyPA6XpYv3f/TXj1yHDY5Er
-	 A8IXwEXYLcx+IENOA9eZQ2x+h1zA/LitxmYZ9ipVjUOv63Uz3L6brUO9HM2uiu/bIv
-	 qQ8p/QvQN5tdw==
-Message-ID: <90d26f2c-c798-43f6-bbbb-9319a2fe445d@kernel.org>
-Date: Thu, 25 Jan 2024 11:17:22 -0700
+	s=arc-20240116; t=1706206862; c=relaxed/simple;
+	bh=Dgjspa0IUCw/GjUtRtv6shH9ECPHfZwj0AvOxZTYjgI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=MD3bkmgwX7tpIBOVaJIvrGAe1o2Ve75bkxfwmDDSeaZ1dwHPUNq5audoazJGQGm18lEPfOsQhAYBT/8E/W7dmsztrl4yrsENIEelvsR24gzAXNh/ZKZZt9NO0hFZo5vONkchAvLrRrHtvRL69ePFhVtNgDfIxyTM+ON+7udCJhg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mjzcikZc; arc=none smtp.client-ip=209.85.166.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-7bfbe61859dso39185539f.1
+        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 10:21:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706206859; x=1706811659; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VcM5CjcQVWweq2asWoGSAcigp43UdnJ0Pqz7x32rGgY=;
+        b=mjzcikZcc0wEYPqM4rPYq+T0Tw8gZTPdsvTrfVPDb4aei+o2X6Y7XdD5aGfT/mS2wR
+         EIzmbMcsTwgarJsZ2keIVeTERk9qMABWV5e67xs1hz6i8lRQbzfgQNXYUiDY5sOBlv+5
+         xG3JiUthEw01qZ3gWfEsQGFpUrowm8+/hBFq/4hFOkmKcFroLTWQ8it/RYOc6qdc3kUN
+         WJ1v1ph4Tiu5FmXF63yZNlRQWW5JoG5T+BNcpurSAiUhEZ1X9D8Pl+cQNyBQPUCG3iaz
+         J0B0azsBCcD5prFVVdWrBXerT6bQ2VW1j3oSCzlS84CogQzXuBky/ayZd3J3DW2h6GG4
+         7xZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706206859; x=1706811659;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VcM5CjcQVWweq2asWoGSAcigp43UdnJ0Pqz7x32rGgY=;
+        b=iRfMYbBqmcFZo2M2NHOOm6fNhSMzoafQj0UNkaHJVYPRK0/OvSKkMVjt8Aoc6Sr4FT
+         g0md5H+xBMA6aHDojVx5oRMG5ujvsbaaZXpWA749+hVh30fTcB9Nx9GhKwtWIDNmZmWv
+         6X1iCfBrrvpmugHdi6XNut58Fn42OiVNlD9Umxh7OmJ97o+3+kdh/WyXneFs2iGAP6/9
+         Dg2tOV+xGFEyKHI0Ctk4AXYDTBTz12fyfZ941mKZMV1udTbrUQJd5PenFjDaTh5uKe3S
+         aMy9UwP2rfftTrThK8096E8hRXd30D5OXHLn8Tfdb9xz6lKK7gbK/4jRxrMmmrDAfV7x
+         1dMg==
+X-Gm-Message-State: AOJu0YyXI9TNIdFApsr5k9VGOYlZAFgVDdBlPdn8BJl69TAiOx18EwnK
+	cjKfCqsDO1x1xRib8AxrWBFZPF5WRhsbErH25vAdzZ2kVBD503/X0p3S5EbY
+X-Google-Smtp-Source: AGHT+IFpTBzkJghJ4yKTARmhe55qQLmzo+BCDBCyI7/CMZqcQB49yTOvFgwlNzP+8fgGhY3Y3UkpyA==
+X-Received: by 2002:a05:6602:21da:b0:7bf:9ab4:5978 with SMTP id c26-20020a05660221da00b007bf9ab45978mr158542ioc.25.1706206859570;
+        Thu, 25 Jan 2024 10:20:59 -0800 (PST)
+Received: from ?IPV6:2601:282:1e82:2350:ddd8:edb3:1925:c8bf? ([2601:282:1e82:2350:ddd8:edb3:1925:c8bf])
+        by smtp.googlemail.com with ESMTPSA id r12-20020a02c84c000000b0046eda09d55esm2749151jao.179.2024.01.25.10.20.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 Jan 2024 10:20:59 -0800 (PST)
+Message-ID: <08d60060-ee2b-436f-9dcc-8aad1c8c35a1@gmail.com>
+Date: Thu, 25 Jan 2024 11:20:58 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,59 +75,57 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iproute2-next v2] m_mirred: Allow mirred to block
+Subject: Re: [6.6.x REGRESSION][BISECTED] dev_snmp6: broken Ip6OutOctets
+ accounting for forwarded IPv6 packets
 Content-Language: en-US
-To: Victor Nogueira <victor@mojatatu.com>, stephen@networkplumber.org,
+To: Jakub Kicinski <kuba@kernel.org>, heng guo <heng.guo@windriver.com>,
  netdev@vger.kernel.org
-Cc: kernel@mojatatu.com
-References: <20240123213811.81337-1-victor@mojatatu.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240123213811.81337-1-victor@mojatatu.com>
+References: <ZauRBl7zXWQRVZnl@pc11.op.pod.cz>
+ <20240124123006.26bad16c@kernel.org>
+ <61d1b53f-2879-4f9f-bd68-01333a892c02@gmail.com>
+ <493d90b0-53f8-487e-8e0f-49f1dce65d58@windriver.com>
+ <20240124174652.670af8d9@kernel.org> <ZbIEDFETblTqqCWm@pc11.op.pod.cz>
+ <ZbJ5Wfx7jNfXBpAP@pc11.op.pod.cz>
+From: David Ahern <dsahern@gmail.com>
+In-Reply-To: <ZbJ5Wfx7jNfXBpAP@pc11.op.pod.cz>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 1/23/24 2:38 PM, Victor Nogueira wrote:
-> So far the mirred action has dealt with syntax that handles
-> mirror/redirection for netdev. A matching packet is redirected or mirrored
-> to a target netdev.
+On 1/25/24 8:08 AM, Vitezslav Samel wrote:
+> On Thu, Jan 25, 2024 at 07:47:40 +0100, Vitezslav Samel wrote:
+>> On Wed, Jan 24, 2024 at 17:46:52 -0800, Jakub Kicinski wrote:
+>>> On Thu, 25 Jan 2024 08:37:11 +0800 heng guo wrote:
+>>>>>> Heng Guo, David, any thoughts on this? Revert?  
+>>>>> Revert is best; Heng Guo can revisit the math and try again.
+>>>>>
+>>>>> The patch in question basically negated IPSTATS_MIB_OUTOCTETS; I see it
+>>>>> shown in proc but never bumped in the datapath.  
+>>>> [HG]: Yes please revert it. I verified the patch on ipv4, seems I should 
+>>>> not touch the codes to ipv6. Sorry for it.
+>>>
+>>> Would you mind sending a patch with a revert, explaining the situation,
+>>> the right Fixes tag and a link to Vitezslav's report?
+>>
+>>   I took a look at current master and found that there is yet another
+>> commit since 6.6.x which touches this area: commit b4a11b2033b7 by Heng Guo
+>> ("net: fix IPSTATS_MIB_OUTPKGS increment in OutForwDatagrams"). It went
+>> in v6.7-rc1.
+>>
+>>   I will test current master this afternoon and report back.
 > 
-> In this patch we enable mirred to mirror to a tc block as well.
-> IOW, the new syntax looks as follows:
-> ... mirred <ingress | egress> <mirror | redirect> [index INDEX] < <blockid BLOCKID> | <dev <devname>> >
+>   Test 1: Linus' current master: IPv6 octets accounting is OK
+>   Test 2: 6.6.13 with b4a11b2033b7 ("net: fix IPSTATS_MIB_OUTPKGS
+>           increment in OutForwDatagrams") on top is also OK.
 > 
-> Examples of mirroring or redirecting to a tc block:
-> $ tc filter add block 22 protocol ip pref 25 \
->   flower dst_ip 192.168.0.0/16 action mirred egress mirror blockid 22
+>   Seems like my problem was solved in master already, but
+> it still exists in 6.6.y. IMHO commit b4a11b2033b7 should be
+> marked as for-stable-6.6.y and forwarded to GregKH. AFAIK only 6.6.y
+> stable tree is affected.
 > 
-> $ tc filter add block 22 protocol ip pref 25 \
->   flower dst_ip 10.10.10.10/32 action mirred egress redirect blockid 22
-> 
-> Co-developed-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
-> Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
-> Signed-off-by: Victor Nogueira <victor@mojatatu.com>
-> ---
-> v1 -> v2:
-> 
-> - Add required changes to mirred's man page
-> - Drop usage of the deprecated matches function in new code
-> 
->  man/man8/tc-mirred.8 | 24 +++++++++++++++--
->  tc/m_mirred.c        | 62 +++++++++++++++++++++++++++++++++++---------
->  2 files changed, 72 insertions(+), 14 deletions(-)
-> 
+>   But beware: I only tested my specific problem and I don't know if the
+> commit with fix doesn't break anything else.
 
-
-> +			} else if ((redir || mirror)) {
-> +				if (strcmp(*argv, "blockid") == 0) {
-> +					if (strlen(d)) {
-> +						fprintf(stderr,
-> +							"Mustn't specify blockid and dev simultaneously\n");
-
-I fixed the error messages to avoid use of contractions
-
-applied to iproute2-next
-
-
+Only reported problem, so with b4a11b2033b7 backported to stable we
+should be good. Thanks for the testing of various releases to isolate
+the problem.
 
