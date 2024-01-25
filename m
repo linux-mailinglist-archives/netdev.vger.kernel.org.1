@@ -1,88 +1,117 @@
-Return-Path: <netdev+bounces-65970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 253E883CB48
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 19:40:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BE0B83CB50
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 19:41:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58D4D1C25D6E
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 18:40:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20DC41F22B5C
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 18:41:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9946E133994;
-	Thu, 25 Jan 2024 18:40:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAA761F60A;
+	Thu, 25 Jan 2024 18:41:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="hfPIS3KF"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="efaPwzef"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 453F11BDD6;
-	Thu, 25 Jan 2024 18:40:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67C108472
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 18:41:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706208012; cv=none; b=fdohhGciMGH/iFwPkFA+NUIf7erkVjLhTn6OMnOdxD0Mo8+R6iEil7NbEGt5oSG/lWjeP4lEiYkusegYGE5qUpSKEMZvRi1kQpAzK+hA4Qc4bMUdoxvJNtAGQeZxF+u0/kCxWyZBQLgBe6ojN4zyyjmMPJ6RHe2gp76nVFaLiw0=
+	t=1706208091; cv=none; b=C3U0Ji5Z9wzFanA0Wr0CJQPSehv8Woxs8tCArrwQLyY/4rrvMnyRRAgJAJ4yZRJg58LrZjdbxpBTm9h8wSZMRvylYoC5zvfzBkx7wXWXHR7EI+54IUz4MPeGgNFeueQ8yKjz/8wZfp1ztxQf9Tb5GYkLSbk+YtTWmN+TItQuRTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706208012; c=relaxed/simple;
-	bh=gPo85dRXsQng8Kc2yz5uMF26Tfq8l5cUAj+CcLKGQZM=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=QCnBBxoHI6wTyCHRsUsLNeIUcL9t8s3f4wW1ygskiLpks78Au9oR8icUptf2zyyuuU1FO/T2CjYoRPTqgPpHLMM5zc/HtcxCkMVhBCnJBMAk5tKm3H6plEGVf9QH9E+x1kE4HN8qPIUU+aARJPJjBcBHUSwHLsdHDG/vHW7/Tpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=hfPIS3KF; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+	s=arc-20240116; t=1706208091; c=relaxed/simple;
+	bh=6NDbDFa8Oz3LGG4Z3DotWywd8m70TbFflwB0EctoUng=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E0E9mAyhBfU1S4uIJaPrBw0vriBBAd/g5za/n6skWpGu8DlPSvMmWd2zYQXvDiq2ETuifkODbqVMaoR+5i4aQQ8J/YZNBOEL3o6W0nDc+7e9C9YxEeHuFDqz8lVvKiMWIlr9AMykXBAKtoXk+Jf3npaB+RBQ4P82gl2Lzl2VYwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=efaPwzef; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:To:From:Subject:Message-ID:Sender:
-	Reply-To:Cc:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=gPo85dRXsQng8Kc2yz5uMF26Tfq8l5cUAj+CcLKGQZM=;
-	t=1706208010; x=1707417610; b=hfPIS3KFkiZUT6fwHEAiuWt+vuojHboyy34m3+TCnngS5qF
-	NqjFxky9pnTXnj1XLt2QYhr7akZZEKhsY/PPgqLHZiIj4C6ijqt4WgQmA+voWsww4fNUc8/ajkUvH
-	QOHdfKGeHyUntUHTKiCuIuKIqGdeUhsEWWccErN5gcn2azkUgxeh9wHjQFue/7x5J1sTD3037cBBm
-	idCU8VUuhT9Mb4lAePC1yc9Ogx/gXW3FTZ+Jb6E8Bo/BrcVlBD2QhwaZKCzXSCAlTilVyn1nARude
-	uZQEvFEap7Ul3XmhZ32fLV/UNUMcF7GiRQSo8QmrBL2iu04uGf1kQJPwxN6i9uVQ==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1rT4dr-0000000028p-3cQ3;
-	Thu, 25 Jan 2024 19:40:00 +0100
-Message-ID: <008b0c43d963276453f4913da0fb95fb29e5d4ff.camel@sipsolutions.net>
-Subject: Re: [PATCH wireless v2] nl80211/cfg80211: add nla_policy for S1G
- band
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Jeff Johnson <quic_jjohnson@quicinc.com>, Lin Ma <linma@zju.edu.cn>, 
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com,  linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-  linux-kernel@vger.kernel.org, kvalo@kernel.org
-Date: Thu, 25 Jan 2024 19:39:58 +0100
-In-Reply-To: <d49f69f4-7f5c-498f-bb17-a636256d3245@quicinc.com>
-References: <20240119151201.8670-1-linma@zju.edu.cn>
-	 <9e1db7f3-fd18-4b3b-a912-3cf6efd96fed@quicinc.com>
-	 <590fe2823d934af997c515640733eb8889b0560f.camel@sipsolutions.net>
-	 <d80ae6ae-e1f2-48ef-b18a-29b5ca62e64c@quicinc.com>
-	 <d49f69f4-7f5c-498f-bb17-a636256d3245@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=iOgYNddn5x23XPlnk1Ee15ii2Dew59eyYt712ID8gtE=; b=efaPwzef9Lj/e5HNafAKVey11D
+	Vbs6BNdHVyYwcrG2ftGy8linKPgH4P3OKkzE1gqXtHu/YIAABLTG4EwoHM0DjySFXvbtlwsb5sGjG
+	/3KjwXdak72wkWdaiq/vIOx5d/C/4pDlYTbIGj1cgJiDCrWarNN18bdKrqdycyHvErRZPL9dNAyi7
+	c2suUZdwrc1qE+0BDLUDoEOnF/XpdQx5YGke3uuyhfXQzP885Ji2+wi58DPUJgvMvuQvWGK1YwdES
+	nMqDxRMp8cat93MdTBWNJbZxmwgFeM/UH8uUFoP6m8aUxoLBdBBnVHBP2rSPVN4w5trnH5yrwAmve
+	sDer44bw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42798)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rT4f3-0001Kn-1E;
+	Thu, 25 Jan 2024 18:41:13 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rT4ey-00015B-Sf; Thu, 25 Jan 2024 18:41:08 +0000
+Date: Thu, 25 Jan 2024 18:41:08 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Yanteng Si <siyanteng@loongson.cn>, andrew@lunn.ch,
+	hkallweit1@gmail.com, peppe.cavallaro@st.com,
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+	Jose.Abreu@synopsys.com, chenhuacai@loongson.cn,
+	guyinggang@loongson.cn, netdev@vger.kernel.org,
+	chris.chenfeiyang@gmail.com
+Subject: Re: [PATCH net-next v7 7/9] net: stmmac: dwmac-loongson: Add GNET
+ support
+Message-ID: <ZbKrRL9W5D1kGn0F@shell.armlinux.org.uk>
+References: <cover.1702990507.git.siyanteng@loongson.cn>
+ <caf9e822c2f628f09e02760cfa81a1bd4af0b8d6.1702990507.git.siyanteng@loongson.cn>
+ <pbju43fy4upk32xcgrerkafnwjvs55p5x4kdaavhia4z7wjoqm@mk55pgs7eczz>
+ <ac7cc7fc-60fa-4624-b546-bb31cd5136cb@loongson.cn>
+ <ce51f055-7564-4921-b45a-c4a255a9d797@loongson.cn>
+ <xrdvmc25btov77hfum245rbrncv3vfbfeh4fbscvcvdy4q4qhk@juizwhie4gaj>
+ <44229f07-de98-4b47-a125-3301be185de6@loongson.cn>
+ <72hx6yfvbxiuvkunzu2tvn6glum5rjrzqaxsswml2fe6j3537w@ahtfn7q64ffe>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <72hx6yfvbxiuvkunzu2tvn6glum5rjrzqaxsswml2fe6j3537w@ahtfn7q64ffe>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, 2024-01-25 at 10:32 -0800, Jeff Johnson wrote:
->=20
-> OK, I have investigated this and based upon the investigation this can
-> be removed (except for keeping the now obsolete uapi bits). This was
-> done in preparation for supporting a new Android interface in the
-> out-of-tree Android driver, but that interface was subsequently
-> withdrawn by Google.
->=20
-> Johannes, do you want to handle this? Or should I?
+On Thu, Jan 25, 2024 at 09:38:30PM +0300, Serge Semin wrote:
+> On Thu, Jan 25, 2024 at 04:36:39PM +0800, Yanteng Si wrote:
+> > drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c: In function
+> > 'loongson_gnet_data':
+> > drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c:463:41: warning:
+> > conversion from
+> > 
+> > 'long unsigned int' to 'unsigned int' changes value from
+> > '18446744073709551611' to '4294967291' [-Woverflow]
+> >   463 |         plat->mdio_bus_data->phy_mask = ~BIT(2);
+> >       |                                         ^
+> > 
+> > Unfortunately, we don't have an unsigned int macro for BIT(nr).
+> 
+> Then the alternative ~(1 << 2) would be still more readable then the
+> open-coded literal like 0xfffffffb. What would be even better than
+> that:
+> 
+> #define LOONGSON_GNET_PHY_ADDR		0x2
+> ...
+> 	plat->mdio_bus_data->phy_mask = ~(1 << LOONGSON_GNET_PHY_ADDR);
 
-Would be great if you could send a patch, thanks!
+	plat->mdio_bus_data->phy_mask = ~(u32)BIT(2);
 
-johannes
+would also work.
+
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
