@@ -1,200 +1,116 @@
-Return-Path: <netdev+bounces-65895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A549283C38D
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 14:24:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95C2983C3E0
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 14:41:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EBB31F263BC
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 13:24:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D2EC292A44
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 13:41:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C369B50A69;
-	Thu, 25 Jan 2024 13:23:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Q3bdEWKl"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D46B55E5A;
+	Thu, 25 Jan 2024 13:41:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BE554F89A;
-	Thu, 25 Jan 2024 13:23:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 802B94503F;
+	Thu, 25 Jan 2024 13:41:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706189037; cv=none; b=MygzytJ4ItdLadD4aSZ06n+ZCv/MhyHhGTVhDvj0Axx45Ds9uQzhRf/7pZTRnO9acb3metEAaPR2/nHyU7PpLVoFZKnEoxRXsZy5WwmjvOd5z7aWWMnRdIVXPW7oMtwC5dM0nnsQiN7jNwnf4WAaCqzcZd4PqMYAZ0dmzvigd6s=
+	t=1706190076; cv=none; b=hdAzTqlzQOefus8LhoPFJ90IOD/ajLc7dPHiK2tPxKeoQkKaDYTsDPhubdD/1D/8n+HlwOy021j9P+xssiUTxIebVVe88nO96ozlQt50tcGLwEFRMPA0LjvhK5V1ON1NQamINJFFwQx2N6o0Udk5VHpWvWavyHYWRQb6ZRIU1Lc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706189037; c=relaxed/simple;
-	bh=XtQw4AFgGYzqIH/Xew9U1aJm1yzGt9kNKPGGaSBjoEM=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m3YB8zMyx6G7BvlX73NHyA9JTGxAvsWBPs0zsFw5VPGmipoqoPa1XgnZFRtRkkyUTZb7q9iIzhGfVQGv0d7CHzRBzLlqF3kEVEGM5+hf7C+Qoywpdy3W3gvM5uWyLj4/IHHHc+RHhTVZhIWpfdNXhnmspn7qTz5Io3kKPyMcoM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Q3bdEWKl; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1706189035; x=1737725035;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=XtQw4AFgGYzqIH/Xew9U1aJm1yzGt9kNKPGGaSBjoEM=;
-  b=Q3bdEWKlPzwXvXbvENGdjtWt0xCKMfgAwVIcVEUUCHbt0q//Si3NH2R5
-   mp4qCGL659W2d0aYKWfT1DhFLEDQs4b02EtDBok4+EHDw9cXOHWqllqkW
-   88OBrPM9VVFiIOiVUwvqES+YgZH1UDXT8+9OQs5En3rM5gttgR/DrYFDc
-   6G+0A3zEeiOPKYiwhMf8a1sHIXKi0pKo7w8sVwcboKO1FPfc2l345XhP5
-   iBHvTWIiUnAanGFL4nNdNIZOuli/RXzdJJnBPYkZKJ4siWGnfmH3vv/pa
-   s5pmBP14xlf0eRWNCoin6459cEWi9c8JRazHwSlhd47c6+WME2tFAW1nH
-   g==;
-X-CSE-ConnectionGUID: FhQ+gd6DRlilwd5DcEURwA==
-X-CSE-MsgGUID: LmCRtipWROiYABA1X/70Kw==
-X-IronPort-AV: E=Sophos;i="6.05,216,1701154800"; 
-   d="asc'?scan'208";a="15279352"
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Jan 2024 06:23:52 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 25 Jan 2024 06:23:38 -0700
-Received: from wendy (10.10.85.11) by chn-vm-ex04.mchp-main.com (10.10.85.152)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Frontend
- Transport; Thu, 25 Jan 2024 06:23:35 -0700
-Date: Thu, 25 Jan 2024 13:22:57 +0000
-From: Conor Dooley <conor.dooley@microchip.com>
-To: Vladimir Oltean <olteanv@gmail.com>
-CC: Conor Dooley <conor@kernel.org>, Philippe Schenker <dev@pschenker.ch>,
-	<netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, Conor Dooley
-	<conor+dt@kernel.org>, Woojung Huh <woojung.huh@microchip.com>,
-	<linux-kernel@vger.kernel.org>, <UNGLinuxDriver@microchip.com>, Marek Vasut
-	<marex@denx.de>, Florian Fainelli <f.fainelli@gmail.com>,
-	<devicetree@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, "David S .
- Miller" <davem@davemloft.net>, Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>, Jakub Kicinski <kuba@kernel.org>,
-	"Andrew Lunn" <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>
-Subject: Re: [PATCH net-next v1 1/2] dt-bindings: net: dsa: Add KSZ8567
- switch support
-Message-ID: <20240125-neurotic-bouncing-82df9cfc2fa3@wendy>
-References: <20240123135014.614858-1-dev@pschenker.ch>
- <20240123-ripening-tabby-b97785375990@spud>
- <b2e232de11cee47a5932fccc2d151a9c7c276784.camel@pschenker.ch>
- <20240123-atlas-dart-7e955e7e24e5@spud>
- <979b1e77b5bb62463d52e7b9d3f9ca1415f4006a.camel@pschenker.ch>
- <20240123-carpool-avatar-c1e51ab3cc32@spud>
- <20240125095719.2nu3u3auwdcmouaw@skbuf>
+	s=arc-20240116; t=1706190076; c=relaxed/simple;
+	bh=s7thh3IrEnKt/va13x2HmHZo7BtbjpTbPqnPXSHPl2Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NYmXzRRLO8D5UFcZu3pHOU9ILoHHw8k55rcikKfryA0ITHaXVaEFyhPVw4E7tjgSGI6wEEsIDaTDPeR49j0uiy/sTwHj+4bObupZzkMR1s1IxxfJAnnoq7n+381Pt8s81v0qpVpHoArl43RJwFl+whdLF1mdkuHVtwdyRc/vjIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a3150c9568bso162729366b.1;
+        Thu, 25 Jan 2024 05:41:14 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706190072; x=1706794872;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xIHT2FEEOX1ZJah2HSsYQgk3eFyVlJ0iWR+awgo71w8=;
+        b=d+kyXPbLJWlwEKLPXUsC9qrziYp8r8J9gbr5sRhWIwAkDjcCh68OjtoGsxxq2KbUn0
+         J5zRCYkEdNQDlcdesq/4nDCmcDqpyVA99EJSUGdxkOjsMqAr9Yx4EzTGdfXUF+0YXZ2T
+         wcEtK7psgiS2QHIHRGjP6p/FGU52nUgnaSu9sQd96esbhoaBQP2uDG62QAo0vwUzzDGy
+         In7f7KuoQyPt0OR0FhuiAEDXDFcTWwacecaplP6qaiD+bfoWrhmc5uuevPOkf6g0ZGSy
+         mopC7bjvOjEi1OKGNx9iqviXLsJnhzY7zr9HOogTCGazBFjF7tMnkpyZUSF3z+WTBr7s
+         DWcQ==
+X-Gm-Message-State: AOJu0YyHhizM6iBVZEitfyIBtstWiIaECLS/fbz4LYKBgaj5G3++szJe
+	bzWVKWSQmciovMrBoJd+Tj9MbnI2XOV3G2qSUAaM976flCa4CUa4
+X-Google-Smtp-Source: AGHT+IFrrc6UlUqnrfe72DtQ5Nit/8WYSmUDgAp71S3LZyV5+TdHGbJ/kzhuo5notPN5hL/jCgl51A==
+X-Received: by 2002:a17:906:b78c:b0:a2e:81d4:524e with SMTP id dt12-20020a170906b78c00b00a2e81d4524emr396447ejb.12.1706190072282;
+        Thu, 25 Jan 2024 05:41:12 -0800 (PST)
+Received: from localhost (fwdproxy-cln-012.fbsv.net. [2a03:2880:31ff:c::face:b00c])
+        by smtp.gmail.com with ESMTPSA id hu22-20020a170907a09600b00a318b8650bbsm471832ejc.9.2024.01.25.05.41.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Jan 2024 05:41:11 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+To: pavan.chebbi@broadcom.com,
+	Michael Chan <michael.chan@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>
+Cc: gospo@broadcom.com,
+	netdev@vger.kernel.org (open list:BROADCOM BNXT_EN 50 GIGABIT ETHERNET DRIVER),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net] bnxt_en: Make PTP timestamp HWRM more silent
+Date: Thu, 25 Jan 2024 05:41:03 -0800
+Message-Id: <20240125134104.2045573-1-leitao@debian.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="RBdbisQWjGXr+kKp"
-Content-Disposition: inline
-In-Reply-To: <20240125095719.2nu3u3auwdcmouaw@skbuf>
+Content-Transfer-Encoding: 8bit
 
---RBdbisQWjGXr+kKp
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+commit 056bce63c469 ("bnxt_en: Make PTP TX timestamp HWRM query silent")
+changed a netdev_err() to netdev_WARN_ONCE().
 
-On Thu, Jan 25, 2024 at 11:57:19AM +0200, Vladimir Oltean wrote:
-> Hi Conor,
->=20
-> On Tue, Jan 23, 2024 at 06:37:55PM +0000, Conor Dooley wrote:
-> > On Tue, Jan 23, 2024 at 06:30:16PM +0100, Philippe Schenker wrote:
-> > > > > Hi Conor, Thanks for your message!
-> > > > >=20
-> > > > > I need the compatible to make sure the correct ID of the switch is
-> > > > > being set in the driver as well as its features.
-> > > >=20
-> > > > Are the features of this switch such that a driver for another ksz
-> > > > switch would not work (even in a limited capacity) with the 8567?
-> > > > Things like the register map changing or some feature being removed
-> > > > are
-> > > > examples of why it may not work.
-> > >=20
-> > > Yes the ksz dsa driver is made so that it checks the ID of the attach=
-ed
-> > > chip and refuses to work if it doesn't match. [1]
-> >=20
-> > That sounds counter productive to be honest. Why does the driver not
-> > trust that the dt is correct? I saw this recently in some IIO drivers,
-> > but it was shot down for this sort of reason.
->=20
-> If the hardware provides device ID registers, what is the best practice
-> in reconciling them with the compatible string?
->=20
-> I see 2 extreme cases. Ethernet PHY devices seem to blindly trust the
-> PHY ID from the "ethernet-phy-idXXXX.XXXX" compatible string, and phylib
-> won't read the PHY ID from the standard MDIO registers when this is prese=
-nt.
-> Whereas PCI seems to completely disregard the vendor ID and device ID
-> from the "pciXXXX,XXXX" compatible string of function OF nodes. Both
-> these subsystems have the "compatible" string optional.
+netdev_WARN_ONCE() is it generates a kernel WARNING, which is bad, for
+the following reasons:
 
-The software is free to do either, even if the compatible is a mandatory
-property. Which is the right thing to do varies though. In your first
-example, the compatible might be used because the standard MDIO
-registers do not provide that function for whatever reason and therefore
-cannot be read. Or there might be some shenzen market ripoff of another
-device that it claims to be in its ID registers but has some
-incompatible difference in the programming model.
+ * You do not a kernel warning if the firmware queries are late
+ * In busy networks, timestamp query failures fairly regularly
+ * A WARNING message doesn't bring much value, since the code path
+is clear.
+(This was discussed in-depth in [1])
 
-In general though, if a device can self identify, I would be inclined to
-value the self identification over that provided by the devicetree.
+Transform the netdev_WARN_ONCE() into a netdev_warn_once(), and print a
+more well-behaved message, instead of a full WARN().
 
-My comments here were because of the default in the switch statement
-that rejects probe if the ID is unknown as it excludes the use of
-fallback compatibles.
+	bnxt_en 0000:67:00.0 eth0: TS query for TX timer failed rc = fffffff5
 
-In this particular case, and maybe some historical reasons prevent this
-that I am unaware of, I would read the ID of the device and if that is
-an ID that the driver is aware of, treat that as the truth. As far as I
-can tell from my quick look, the driver does this.
+[1] Link: https://lore.kernel.org/all/ZbDj%2FFI4EJezcfd1@gmail.com/
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The first potential mismatch then is where the ID is, but does not match
-what the DT claims the device is. As I said, I'd be inclined to trust
-the self identification here, but I can at least understand rejection of
-probe. Again from a quick look, the driver seems to trust the self
-identification.
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+index adad188e38b8..cc07660330f5 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+@@ -684,7 +684,7 @@ static void bnxt_stamp_tx_skb(struct bnxt *bp, struct sk_buff *skb)
+ 		timestamp.hwtstamp = ns_to_ktime(ns);
+ 		skb_tstamp_tx(ptp->tx_skb, &timestamp);
+ 	} else {
+-		netdev_WARN_ONCE(bp->dev,
++		netdev_warn_once(bp->dev,
+ 				 "TS query for TX timer failed rc = %x\n", rc);
+ 	}
+ 
+-- 
+2.34.1
 
-If the driver don't recognise the ID then I would treat the device as if
-it is what the match data says it is, so that fallback compatibles would
-work. This is the case that this driver does not allow.
-
-> I could see an advantage in using a precise device ID in the compatible
-> string, rather than just one from which the _location_ of the device ID
-> can be deduced, because the precise compatible string allows for much
-> finer grained static analysis in the schema for the device. In case of a
-> switch, that is the number of ports, supported interface modes for each
-> port, etc. With an imprecise device ID, you don't know what you really
-> get until you boot the board.
-
-That is true, I think it is pretty desirable (although admittedly I am
-rather biased) to add specific compatibles for validation reasons even
-if the drivers make no use of them. Generally new bindings for such
-cases require a fair bit of justification, but its harder to stop the
-proliferation of existing cases, without retrofitting specific
-compatibles to the dts users (in addition to the generic one), and
-disallowing the generic compatible in isolation.
-
-> > And despite the email, I have nothing to do with these switches, I am
-> > just a sucker that signed up to review dt-bindings...
->=20
-> Same here, just a sucker with some switches and not many clues about
-> other things :)
-
---RBdbisQWjGXr+kKp
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZbJgsQAKCRB4tDGHoIJi
-0g40AQDGGJiI9eFtvksB9tc8NzEdF65pooUYjZujzYiwNOQE6gD/Q054FlhO3uQS
-kX6APqtvzO1BU5Eu/HPGNXZEN1sazgE=
-=1g+r
------END PGP SIGNATURE-----
-
---RBdbisQWjGXr+kKp--
 
