@@ -1,127 +1,161 @@
-Return-Path: <netdev+bounces-65690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2247E83B5BF
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 00:52:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA75383B5E3
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 01:10:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 565791C22626
-	for <lists+netdev@lfdr.de>; Wed, 24 Jan 2024 23:52:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 81FBB1F21F8A
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 00:10:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55E42136662;
-	Wed, 24 Jan 2024 23:52:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCB64385;
+	Thu, 25 Jan 2024 00:10:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g2agXMOA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cuOvSBm7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E7B012C532;
-	Wed, 24 Jan 2024 23:52:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFC327F;
+	Thu, 25 Jan 2024 00:10:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706140323; cv=none; b=k0/Z4neq4U9PaVSHJS3+w4mBiO/Dxk7lrXbJPLFOgPkGf5NRZyVw+8Xe+UnQP/6gO8bOqvZPV7AUKfz6jS3nUaO3sZDAoRt9ssts7RdVXcs1i/7K29WLGlqC3Ow7VsRBGQnroHOzpxrN8ZlolepnnM9aHRNMj0ClWak03+Z9zsM=
+	t=1706141435; cv=none; b=sNcWajb/00H4FJ+vghEu6lfiMuX757VkVEu51GgMAEo1G3koGM8V/prAwseCz5UwqtnxFDhlAzqzyrcvIqJ3EKxXsV9U3E/NHdnmok2xfqwtiy0u4MHK+rTdy5mR0/1Ph6NkLsKIAqqvGSXWkIzObFheAKx/u3heFOI07sRA5Vs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706140323; c=relaxed/simple;
-	bh=2hvgdzr1IGarJ27oIm3E8HanMERu9rz9t2mfRppxYlE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VkIsLtGomhZT3uYVxDxiFRVnteRbIObYqIEUy9P4730Jh1gTElpeUXxzIGJ6GRP4M8gfXxjuimYwG8RTSUaRy8qLyjw4jm5iKKMUMeI5Jq5ZkAlINGvVEYUBX55pztQCEiXbfBWXIFUkYpd3QFgxhZZPJiUYabWBTU/toJxF8kM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g2agXMOA; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-40eced4c61eso1271455e9.2;
-        Wed, 24 Jan 2024 15:52:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706140319; x=1706745119; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DU9iRQihqU5HWSAWqNEeyXIpwWSEprclpxP8SAr15HE=;
-        b=g2agXMOAB+g5C7L4/GQB4szm6BDmYXcIV46SN6JuMwZSmXMntahOmY/ka1TMK4olmP
-         SAWu72KIMaU6UauDet+I9WiCOUXXfMdx2Clzok1fC6DghbMX78WGHvrxG6ZXqGlQ+tLX
-         pL2jqEDdXIwDza1CycEdONk8sJD+yD2SmvNVbgh2V5k47pv5sFvnef3WfOjqbOu17Xvf
-         uccApHc8CF2mjeiGcFVVQqIRg0ekBFJGja+16Mk3dJ30tGBGMZcVjJfHiaUJVunSa4VB
-         SkVt6pHGry6xjtinbjBbp8FmAjHBAivpuCoHonhhqabGhzDoLw7D5s+0S+E6RVGVfskq
-         N+nA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706140319; x=1706745119;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DU9iRQihqU5HWSAWqNEeyXIpwWSEprclpxP8SAr15HE=;
-        b=ug9Gl3l1X9Co9oX6WItJVfMdLROyRCkeM1arQpXy6cZ27wU1brJe9Nz8loU/FKC8MV
-         NxFlkw9QIqinDyUN3Rk0jdmkxFJTdgJ1wNja0JZHDS4LFX/RXdcZ20AwdvyPMFY39bn7
-         9TMukvcHYOB2s67VLO34ALhxJ7rNB+LcuaR1FtVcmSpiJEGokNwYDbp5u5ugX89sGVfx
-         dx+ALWUPPeXhub3+oWngt7/UXwEWg3hY44HI+xGTwTRzZRtnhra1oCADmCilMUJVNySf
-         anbs727YjE1tzzrSVwg12n+Ura0tH0k8vZWypNsAIwdRw/75Jmgw+UsKI3AbNPniZG76
-         4MHg==
-X-Gm-Message-State: AOJu0YwP0ozVrwqgtXV6+jhVznZBuUOuai/FFdyljdeN/YM9pQANyMu8
-	WU/E/In6HPukTZdaiUWp8avM8z4mk/M6MUF2JgBxPY5CgkDt/ljR
-X-Google-Smtp-Source: AGHT+IFxQHOLea1eetID+KyENChxIEPJZkriCmk0tfuIx7gkpJgAOnVd5FJKWUfpySdW8ZEw1pxmkA==
-X-Received: by 2002:a05:600c:450:b0:40e:4d21:6729 with SMTP id s16-20020a05600c045000b0040e4d216729mr2008839wmb.71.1706140319198;
-        Wed, 24 Jan 2024 15:51:59 -0800 (PST)
-Received: from [10.83.37.178] ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id r20-20020a05600c459400b0040e527602c8sm597192wmo.9.2024.01.24.15.51.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Jan 2024 15:51:58 -0800 (PST)
-Message-ID: <6fc2ff95-35c6-4962-a299-3f520df7d4b3@gmail.com>
-Date: Wed, 24 Jan 2024 23:51:52 +0000
+	s=arc-20240116; t=1706141435; c=relaxed/simple;
+	bh=KfsJCFihgat+fHBz9kmkoUU7Cl7fXKrRxZVnIx/ceUM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=V885/MZQTtm8VLCKEIIPHODHxP3RF93DOxNxDm7bvAwn8yvfmbCjuCNpmTXnhRLgoP9ToJxGz3ZvddprmN8NufBRAgvF19xO5WIVzUWDbWBmEbjPQNZXcQhAmc8eUlCbJN2bFXM33d2xPmUXda+YPpfYspzrgI8iBCcVqk4OcAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cuOvSBm7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2468BC433C7;
+	Thu, 25 Jan 2024 00:10:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706141435;
+	bh=KfsJCFihgat+fHBz9kmkoUU7Cl7fXKrRxZVnIx/ceUM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=cuOvSBm72sNf61zmLyzqiaquPTNavPhdhg/1Rft9wR1qb1Nd4+4Y8xafn3FLHYnh5
+	 yIz1w1Jl/cS2gn0I65yCCqSRY4P3UBG7sS5jMR6V4O3dJ1Vy4Bld8fGvVAY8EjX9CM
+	 kF2+RuXUEIfyu286h3uoLzel6Nw+QRR9UQTWAOdsCW+73BHzx2lnXqd3KqRhECtdP/
+	 xdi3sbrUDxNfMoZnDtfJjnhSY9yV8UtBwF2nXZpjPXjO4lNXiPO4NiQmrH27aHlxyZ
+	 omuEEWxJnP9RqvsmMyqDYZGAVPycfdsg7L6KA6M95Q9SBNCQ6w4/f5nYn73c2IrQ11
+	 TgHhp7PB8VCVQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0266AD8C966;
+	Thu, 25 Jan 2024 00:10:35 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] selftests: tcp_ao: set the timeout to 2 minutes
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- shuah@kernel.org, linux-kselftest@vger.kernel.org
-References: <20240124233630.1977708-1-kuba@kernel.org>
-Content-Language: en-US
-From: Dmitry Safonov <0x7f454c46@gmail.com>
-In-Reply-To: <20240124233630.1977708-1-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 bpf-next 00/30] BPF token
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170614143500.20623.3003025793272945482.git-patchwork-notify@kernel.org>
+Date: Thu, 25 Jan 2024 00:10:35 +0000
+References: <20240124022127.2379740-1-andrii@kernel.org>
+In-Reply-To: <20240124022127.2379740-1-andrii@kernel.org>
+To: Andrii Nakryiko <andrii@kernel.org>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, paul@paul-moore.com,
+ brauner@kernel.org, torvalds@linux-foundation.org,
+ linux-fsdevel@vger.kernel.org, linux-security-module@vger.kernel.org,
+ kernel-team@meta.com
 
-On 1/24/24 23:36, Jakub Kicinski wrote:
-> The default timeout for tests is 45sec, bench-lookups_ipv6
-> seems to take around 50sec when running in a VM without
-> HW acceleration. Give it a 2x margin and set the timeout
-> to 120sec.
+Hello:
+
+This series was applied to bpf/bpf-next.git (master)
+by Andrii Nakryiko <andrii@kernel.org>:
+
+On Tue, 23 Jan 2024 18:20:57 -0800 you wrote:
+> This patch set is a combination of three BPF token-related patch sets ([0],
+> [1], [2]) with fixes ([3]) to kernel-side token_fd passing APIs incorporated
+> into relevant patches, bpf_token_capable() changes requested by
+> Christian Brauner, and necessary libbpf and BPF selftests side adjustments.
 > 
-> Fixes: d1066c9c58d4 ("selftests/net: Add test/benchmark for removing MKTs")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-
-Thanks!
-Reviewed-by: Dmitry Safonov <0x7f454c46@gmail.com>
-
-> ---
-> Long story short I looked at the output for bench-lookups_ipv6
-> and it seems to be a trivial timeout problem. With this we're at
-> 22/24 passing for TCP AO, the reset case failures aren't as obvious...
-
-I'll fix and send a patch for rst selftests on Thursday/Friday :)
-
-> CC: shuah@kernel.org
-> CC: 0x7f454c46@gmail.com
-> CC: linux-kselftest@vger.kernel.org
-> ---
->  tools/testing/selftests/net/tcp_ao/settings | 1 +
->  1 file changed, 1 insertion(+)
->  create mode 100644 tools/testing/selftests/net/tcp_ao/settings
+> This patch set introduces an ability to delegate a subset of BPF subsystem
+> functionality from privileged system-wide daemon (e.g., systemd or any other
+> container manager) through special mount options for userns-bound BPF FS to
+> a *trusted* unprivileged application. Trust is the key here. This
+> functionality is not about allowing unconditional unprivileged BPF usage.
+> Establishing trust, though, is completely up to the discretion of respective
+> privileged application that would create and mount a BPF FS instance with
+> delegation enabled, as different production setups can and do achieve it
+> through a combination of different means (signing, LSM, code reviews, etc),
+> and it's undesirable and infeasible for kernel to enforce any particular way
+> of validating trustworthiness of particular process.
 > 
-> diff --git a/tools/testing/selftests/net/tcp_ao/settings b/tools/testing/selftests/net/tcp_ao/settings
-> new file mode 100644
-> index 000000000000..6091b45d226b
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/tcp_ao/settings
-> @@ -0,0 +1 @@
-> +timeout=120
+> [...]
 
-Thanks,
-             Dmitry
+Here is the summary with links:
+  - [v2,bpf-next,01/30] bpf: align CAP_NET_ADMIN checks with bpf_capable() approach
+    https://git.kernel.org/bpf/bpf-next/c/1310957bfe65
+  - [v2,bpf-next,02/30] bpf: add BPF token delegation mount options to BPF FS
+    https://git.kernel.org/bpf/bpf-next/c/e43831fe57bb
+  - [v2,bpf-next,03/30] bpf: introduce BPF token object
+    https://git.kernel.org/bpf/bpf-next/c/5263a65a6ac2
+  - [v2,bpf-next,04/30] bpf: add BPF token support to BPF_MAP_CREATE command
+    https://git.kernel.org/bpf/bpf-next/c/18c9f8248366
+  - [v2,bpf-next,05/30] bpf: add BPF token support to BPF_BTF_LOAD command
+    https://git.kernel.org/bpf/bpf-next/c/6f19475e52cc
+  - [v2,bpf-next,06/30] bpf: add BPF token support to BPF_PROG_LOAD command
+    https://git.kernel.org/bpf/bpf-next/c/5880ef9dc52a
+  - [v2,bpf-next,07/30] bpf: take into account BPF token when fetching helper protos
+    https://git.kernel.org/bpf/bpf-next/c/b1099b53eee6
+  - [v2,bpf-next,08/30] bpf: consistently use BPF token throughout BPF verifier logic
+    https://git.kernel.org/bpf/bpf-next/c/3f042d22873b
+  - [v2,bpf-next,09/30] bpf,lsm: refactor bpf_prog_alloc/bpf_prog_free LSM hooks
+    https://git.kernel.org/bpf/bpf-next/c/d2fd2efe9797
+  - [v2,bpf-next,10/30] bpf,lsm: refactor bpf_map_alloc/bpf_map_free LSM hooks
+    https://git.kernel.org/bpf/bpf-next/c/a60dd8f5232a
+  - [v2,bpf-next,11/30] bpf,lsm: add BPF token LSM hooks
+    https://git.kernel.org/bpf/bpf-next/c/736762bc089d
+  - [v2,bpf-next,12/30] libbpf: add bpf_token_create() API
+    https://git.kernel.org/bpf/bpf-next/c/aa6385965f34
+  - [v2,bpf-next,13/30] libbpf: add BPF token support to bpf_map_create() API
+    https://git.kernel.org/bpf/bpf-next/c/8b7971beaa5f
+  - [v2,bpf-next,14/30] libbpf: add BPF token support to bpf_btf_load() API
+    https://git.kernel.org/bpf/bpf-next/c/3f06a307a8ae
+  - [v2,bpf-next,15/30] libbpf: add BPF token support to bpf_prog_load() API
+    https://git.kernel.org/bpf/bpf-next/c/34ace19d6c52
+  - [v2,bpf-next,16/30] selftests/bpf: add BPF token-enabled tests
+    https://git.kernel.org/bpf/bpf-next/c/3d8da8a12fcd
+  - [v2,bpf-next,17/30] bpf,selinux: allocate bpf_security_struct per BPF token
+    https://git.kernel.org/bpf/bpf-next/c/f78006420686
+  - [v2,bpf-next,18/30] bpf: fail BPF_TOKEN_CREATE if no delegation option was set on BPF FS
+    https://git.kernel.org/bpf/bpf-next/c/ef4fc8918e7a
+  - [v2,bpf-next,19/30] bpf: support symbolic BPF FS delegation mount options
+    https://git.kernel.org/bpf/bpf-next/c/e45dac29dc87
+  - [v2,bpf-next,20/30] selftests/bpf: utilize string values for delegate_xxx mount options
+    https://git.kernel.org/bpf/bpf-next/c/9d4ebc33d665
+  - [v2,bpf-next,21/30] libbpf: split feature detectors definitions from cached results
+    https://git.kernel.org/bpf/bpf-next/c/05d51b9f2c99
+  - [v2,bpf-next,22/30] libbpf: further decouple feature checking logic from bpf_object
+    https://git.kernel.org/bpf/bpf-next/c/0c2bd7588e5d
+  - [v2,bpf-next,23/30] libbpf: move feature detection code into its own file
+    https://git.kernel.org/bpf/bpf-next/c/df7f8d83b298
+  - [v2,bpf-next,24/30] libbpf: wire up token_fd into feature probing logic
+    https://git.kernel.org/bpf/bpf-next/c/5955455b74bd
+  - [v2,bpf-next,25/30] libbpf: wire up BPF token support at BPF object level
+    https://git.kernel.org/bpf/bpf-next/c/4ba1dbeb6982
+  - [v2,bpf-next,26/30] selftests/bpf: add BPF object loading tests with explicit token passing
+    https://git.kernel.org/bpf/bpf-next/c/b2f72bbb2857
+  - [v2,bpf-next,27/30] selftests/bpf: add tests for BPF object load with implicit token
+    https://git.kernel.org/bpf/bpf-next/c/d4e4ea903a04
+  - [v2,bpf-next,28/30] libbpf: support BPF token path setting through LIBBPF_BPF_TOKEN_PATH envvar
+    https://git.kernel.org/bpf/bpf-next/c/e296ff93f7e9
+  - [v2,bpf-next,29/30] selftests/bpf: add tests for LIBBPF_BPF_TOKEN_PATH envvar
+    https://git.kernel.org/bpf/bpf-next/c/d168bbfbf776
+  - [v2,bpf-next,30/30] selftests/bpf: incorporate LSM policy to token-based tests
+    https://git.kernel.org/bpf/bpf-next/c/6b9a115dbde0
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
