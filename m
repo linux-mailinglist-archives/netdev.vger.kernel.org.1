@@ -1,57 +1,59 @@
-Return-Path: <netdev+bounces-65708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 079B283B6CF
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 02:45:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86ECE83B6D1
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 02:46:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8AF7FB22705
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 01:45:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 320961F22408
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 01:46:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D7E0A3D;
-	Thu, 25 Jan 2024 01:45:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B99BA3D;
+	Thu, 25 Jan 2024 01:46:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oXom1+Jy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cw/R03sD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D22F1369;
-	Thu, 25 Jan 2024 01:45:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15DB3136F
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 01:46:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706147149; cv=none; b=YWimmu1Ce8smdRC8icX9YQZT5uToJYWtgKRvxNXEULT8eepmhL2TJSdk0W/vPbz062Xwb95flLpvhceBv0/bo2mjRv5tNeOq2ByvjNnx4eQCM5zEh9BMCZ8xpPt4+KfZTj0pIA2jJWyd8XU+aTA5RFzD06EykQXIWCB5dNJGPXk=
+	t=1706147214; cv=none; b=G8eaFYHmCD2/sVqI4QbgNWClYQTEjzMjm5fy1lRFStQA922yNcMMRuiXYXeWBOvYtLHLzAIjVMyzQbc2u+RmjZ3QcLvQprwwLg9vEG3v6TJsvVJSiEIqPP7ZJpiwffv5fHEN+HwtXAwZH2p1CYoG3TOIP3hmNYdi4H04ySDobSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706147149; c=relaxed/simple;
-	bh=AHVxcRAPR6j6IDs89kAwDqotYq3t/0Kc95kcISPXyck=;
+	s=arc-20240116; t=1706147214; c=relaxed/simple;
+	bh=DxNHxjQDkc1QD619p/JjXngvCug49O1ClJEFlQM5+t0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oqlZgTag4TXUuM9GyCwm6CoQI+vjXnAsWyi8FxFQ5XDj/Z7H3hD2nD3TRaUudRpec7V1y4rml6A+MTMZyazlbNeDDZLpWYe4DZ8XjntWwmLLyNk1m90q0XCCraLSg/VslJcCTWKxW9dZIz619wcSc2a5TvWD8tyzBuAXVfOzYq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oXom1+Jy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9192FC433F1;
-	Thu, 25 Jan 2024 01:45:48 +0000 (UTC)
+	 MIME-Version:Content-Type; b=KD9yAG/7xdKzYHbLZZfJQsHaLWDDX50DzlhtVk6cAzV67uT2VfmuHlSeLN/HU2Tx7qNNG+uagEqEWyN70Q+Wm99uznUxiTz006nmtrGUi36omYuB8rVSk2cF9/vX+D3rO/2vdXXpGHVdCevfWP0ZDyGQdXCWZR+icBW2OJ6Q/Cs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cw/R03sD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56AA2C433F1;
+	Thu, 25 Jan 2024 01:46:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706147149;
-	bh=AHVxcRAPR6j6IDs89kAwDqotYq3t/0Kc95kcISPXyck=;
+	s=k20201202; t=1706147213;
+	bh=DxNHxjQDkc1QD619p/JjXngvCug49O1ClJEFlQM5+t0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oXom1+Jyy95p+9ZapmImf9CsVaPyt5ZfVCADIqTGwbhUHmNpXnJrpXjm6wwrZRFn2
-	 RxFLVojakgH7We3m+d7qL1ZOSj5Qgbn5x/yMjJH7rjx/t5gTiF+bQafltjxm0k2A2g
-	 GzvESYT2MK7cb5e4ZJXj3dZLXQNYr8CMsFTGM2lnvahncYiIJAQ163LP5fIYlR60My
-	 v3nLd26TREm+SO+WpV5unGsdlX0+hPqcwbCwmf5h0p9T5BksNmOVT1kLdcMEcP6Psa
-	 VLgqTaPGEd6HJBbdpm4lodn/SmcAwzupKy/P1/cv519tGNs7W8lJiaZyC09KAQMJoo
-	 i4lAYa6Pd1JVg==
-Date: Wed, 24 Jan 2024 17:45:47 -0800
+	b=Cw/R03sDT3a4KP4V1vkgxobrpvyAZq/yPRCufPOlupLytQH0sxBh9vQSxoRbYrI/5
+	 LuT8rCLPvRc0nUBp0yGH4rqfrbrUlAH55dSiC/DU+jjDDHdM+0BS2Q7Ynu8ZHfK940
+	 F0SU+wpOFb6+kjSQesG8/LQnd0fr2NzuGHYase9EkBjtoIoY+2iuX+8Zf70VMYMkdo
+	 jyAGsOAeT0G5VEzTJUbZb/gScZHFlnwwrw53FL5P5rWCgG1TDhYeU3Z3tRskhwXuOf
+	 VsVscJrP12wQRkvkudLZGgs6dvIJCzerM/8oR1mB/fpn6FfyzM0fQC3xGW29625QZc
+	 e0a5oBgcGuJyw==
+Date: Wed, 24 Jan 2024 17:46:52 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Shuah Khan <shuah@kernel.org>, Willem de
- Bruijn <willemb@google.com>, Lucas Karpinski <lkarpins@redhat.com>,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net 0/3] selftests: net: a few fixes
-Message-ID: <20240124174547.3325d7bb@kernel.org>
-In-Reply-To: <cover.1706131762.git.pabeni@redhat.com>
-References: <cover.1706131762.git.pabeni@redhat.com>
+To: heng guo <heng.guo@windriver.com>
+Cc: David Ahern <dsahern@gmail.com>, Vitezslav Samel <vitezslav@samel.cz>,
+ netdev@vger.kernel.org
+Subject: Re: [6.6.x REGRESSION][BISECTED] dev_snmp6: broken Ip6OutOctets
+ accounting for forwarded IPv6 packets
+Message-ID: <20240124174652.670af8d9@kernel.org>
+In-Reply-To: <493d90b0-53f8-487e-8e0f-49f1dce65d58@windriver.com>
+References: <ZauRBl7zXWQRVZnl@pc11.op.pod.cz>
+	<20240124123006.26bad16c@kernel.org>
+	<61d1b53f-2879-4f9f-bd68-01333a892c02@gmail.com>
+	<493d90b0-53f8-487e-8e0f-49f1dce65d58@windriver.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,32 +63,15 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 24 Jan 2024 22:33:19 +0100 Paolo Abeni wrote:
-> This series address self-tests failures for udp gro-related tests.
-> 
-> The first patch addresses the main problem I observe locally - the XDP
-> program required by such tests, xdp_dummy, is currently build in the
-> ebpf self-tests directory, not available if/when the user targets net
-> only. Arguably is more a refactor than a fix, but still targeting net
-> to hopefully 
-> 
-> The second patch fixes the integration of such tests with the build
-> system.
-> 
-> Patch 3/3 fixes sporadic failures due to races.
-> 
-> Tested with:
-> 
-> make -C tools/testing/selftests/ TARGETS=net install
-> ./tools/testing/selftests/kselftest_install/run_kselftest.sh \
-> 	-t "net:udpgro_bench.sh net:udpgro.sh net:udpgro_fwd.sh \
-> 	    net:udpgro_frglist.sh net:veth.sh"
-> 
-> no failures.
+On Thu, 25 Jan 2024 08:37:11 +0800 heng guo wrote:
+> >> Heng Guo, David, any thoughts on this? Revert?  
+> > Revert is best; Heng Guo can revisit the math and try again.
+> >
+> > The patch in question basically negated IPSTATS_MIB_OUTOCTETS; I see it
+> > shown in proc but never bumped in the datapath.  
+> [HG]: Yes please revert it. I verified the patch on ipv4, seems I should 
+> not touch the codes to ipv6. Sorry for it.
 
-This series got into net-next-2024-01-25--00-00, looking at the outputs
-it turns out that the iproute2 was crashing somewhere in libbpf :(
-I rebuilt latest iproute2 without libbpf support. It loads xdp_dummy.o
-just fine, so hopefully that's good enough for now, we'll see for sure
-in about 3 hours :)
+Would you mind sending a patch with a revert, explaining the situation,
+the right Fixes tag and a link to Vitezslav's report?
 
