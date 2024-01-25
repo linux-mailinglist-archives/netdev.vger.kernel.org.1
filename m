@@ -1,112 +1,112 @@
-Return-Path: <netdev+bounces-65911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C01683C5EF
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 16:01:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E433383C5F5
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 16:01:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8BE5294F38
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 15:01:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B0801F26962
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 15:01:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C799074E22;
-	Thu, 25 Jan 2024 14:55:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E385633F0;
+	Thu, 25 Jan 2024 14:58:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="EpvjCKwl"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="QSH+IOcz"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED11D6EB60;
-	Thu, 25 Jan 2024 14:55:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CEBE3A1B6
+	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 14:58:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706194544; cv=none; b=TfHbjxJpzCMs1W4rnb/n9QJjsZIcM+dxCSYVf6nuH4n/dN5RLSJgM2u5RM94Yyr7EvQHN22yK3efh5hP7ziQIbhHQXEwT2i8ywy/u21yH/nbVBtuiCF/4rWiWd7q7EWZDkL43mLOSNE1HvH4vBKkAsTXFOGZEQoNro+DSE57UAY=
+	t=1706194716; cv=none; b=mXYuwTNBpW24xy/NBon4YShAcwAFtdJCEz9LD25ZNKxf/7pn5STeoaSoIEYsXWs5kJch9LouRhDemYNrQOhfFXhmdPMt/GZWQiv212Ca5/H0HhLT94Yp0ZE2/5O3j1VFtHgXl/4qb0qCuLucPRLMywnx5gp8L1SSoCK1QqO7khg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706194544; c=relaxed/simple;
-	bh=JEbWPGJoVxXkCPlY2N2gRaepeDuuUIkTKLF49tTQ8bA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EhxmKCHqao9oEdaq2f3HCTswZaBHwZOo/XbScoKZsLnnVVDdNdH8nRYPZhHDvQ+gsXuypbJTnPnQR3dBIgKxVrW70x83xodBnOVBcZZVjqaakARFz8pkVx7JDk/JVTMsrxasmRJUUyXnd9MbTAFOciOFL8rVeifbB/9LXOQZH6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=EpvjCKwl; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 5B7C81C0005;
-	Thu, 25 Jan 2024 14:55:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1706194534;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rOXw2F4HOX1jsfGrMOQ0fTfoQB2N+gMMyWWg0nyWkCQ=;
-	b=EpvjCKwl7Q8SwvFI8zqihspTA1z2XjgIEciir2R84jedLntJeaIpPrAtGz/Qr274VvwOod
-	2hl4aMaOEpCVsNDuXE+xLf3FxiZyrWMZ18QR87NYWQSz8+OBjqg1BJ7vDA4es8EMu5CXXN
-	WiukllJA6xWqE/MV9Td1Zg7jYkRDc6iPjLtQ7c+7K6x1esNzmgS1zpTuN7LfG/jWRcqNl+
-	y16ujo1TA+dxaSrFhodt39POku+0thavXYL6jAd91LzY2k+xHOX/E+f9r1rn5kBgC72BMA
-	QOugQRVz26gFWhGiGPVyeBn7a1VqGAjHLndluNhFI3S5c+0rGPVGS1pLA44tGw==
-Date: Thu, 25 Jan 2024 15:55:32 +0100
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Breno Leitao <leitao@debian.org>
-Cc: kuba@kernel.org, davem@davemloft.net, abeni@redhat.com,
- edumazet@google.com, Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt
- <stefan@datenfreihafen.org>, Paolo Abeni <pabeni@redhat.com>,
- dsahern@kernel.org, weiwan@google.com, "open list:IEEE 802.15.4 SUBSYSTEM"
- <linux-wpan@vger.kernel.org>, "open list:NETWORKING [GENERAL]"
- <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 02/22] net: fill in MODULE_DESCRIPTION()s for
- ieee802154
-Message-ID: <20240125155532.285a2bbd@xps-13>
-In-Reply-To: <ZbIxYnEbFXi6NBMU@gmail.com>
-References: <20240122184543.2501493-1-leitao@debian.org>
-	<20240122184543.2501493-3-leitao@debian.org>
-	<20240124175158.7c8b9490@xps-13>
-	<ZbIxYnEbFXi6NBMU@gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1706194716; c=relaxed/simple;
+	bh=rd6oVQa+k79eRxijjYNuA9nITD36Vt//Tdbgl8Y9V0s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=SSsdhIw0u2otY75xdcDoGmhEjcxlBX/tG53LVx34C7+q/GJASjCnin7LWayY98RJITE8VTC6gEao89U/GErz9mOnogHjPrnMaN6F+3l7VbJ2xEe4RQm/OBtxHxsJ6qL2gPCzKysOB8DyHE7gCcdPip+VODY0NNzErCTv1K5CKw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=QSH+IOcz; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40P5MMgO001493;
+	Thu, 25 Jan 2024 06:58:20 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=pfpt0220;
+	 bh=1AI9tTIT4DZn/0HfsAZ6EULmpHvXVdOqQb84r6NaMZY=; b=QSH+IOczlpcN
+	Nd6ZjX/zTtmBzBljCqZGX0fgLIHrfyLWYdTY53ixdTdmV3ywc590HbGWWUuBYiVs
+	h1NBoK7ucOQJeFh4I0Pmwv1elPGlFhnuBWQR8gjth26+BsUkXeiuucjhYw3cfSOU
+	9lTW3E28GYGYs9AVuPrwxQ044eCHCHNq3tDpMT8l5xdJJDm5ec2EmC52iaej1/xW
+	vffGM0xOFRIxjcx0I0mWrOHPs39JuE6F+jR05mCs87DPAJ1USsR0Sdlk5HLSLw4U
+	ZxeMGZUzmYx4x9D1qMyTT5F1Adl7SgsM+j2VToQVq6lOkNziXp6HuynDfBBROaSs
+	Z01k6datlQ==
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3vuhehswh8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Thu, 25 Jan 2024 06:58:19 -0800 (PST)
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 25 Jan
+ 2024 06:58:18 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Thu, 25 Jan 2024 06:58:18 -0800
+Received: from [10.9.8.28] (unknown [10.9.8.28])
+	by maili.marvell.com (Postfix) with ESMTP id AA6243F7044;
+	Thu, 25 Jan 2024 06:58:12 -0800 (PST)
+Message-ID: <02c93063-a6a3-8992-38dc-b978529736c4@marvell.com>
+Date: Thu, 25 Jan 2024 15:58:10 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: miquel.raynal@bootlin.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [EXT] Aquantia ethernet driver suspend/resume issues
+To: Peter Waller <p@pwaller.net>
+CC: Jakub Kicinski <kuba@kernel.org>,
+        Linus Torvalds
+	<torvalds@linux-foundation.org>,
+        Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>,
+        Netdev <netdev@vger.kernel.org>
+References: <3b607ba8-ef5a-56b3-c907-694c0bde437c@marvell.com>
+ <E8060D65-F6C2-4AF5-AE3F-8ED8A30F95EF@pwaller.net>
+ <32a0ccb2-9570-4099-961c-6a53e1a553d7@pwaller.net>
+Content-Language: en-US
+From: Igor Russkikh <irusskikh@marvell.com>
+In-Reply-To: <32a0ccb2-9570-4099-961c-6a53e1a553d7@pwaller.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-ORIG-GUID: VgzmYXV5kxHpWpjVPFqiFXNXTWAGUUrT
+X-Proofpoint-GUID: VgzmYXV5kxHpWpjVPFqiFXNXTWAGUUrT
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-25_08,2024-01-25_01,2023-05-22_02
 
-Hi Breno,
 
-leitao@debian.org wrote on Thu, 25 Jan 2024 02:01:06 -0800:
 
-> Hello Miqu=C3=A8l,
->=20
-> On Wed, Jan 24, 2024 at 05:51:58PM +0100, Miquel Raynal wrote:
-> > Hi Breno,
-> >=20
-> > leitao@debian.org wrote on Mon, 22 Jan 2024 10:45:23 -0800:
-> >  =20
-> > > W=3D1 builds now warn if module is built without a MODULE_DESCRIPTION=
-().
-> > > Add descriptions to ieee802154 modules.
-> > >=20
-> > > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > > Acked-by: Stefan Schmidt <stefan@datenfreihafen.org> =20
-> >=20
-> > I just see the v2 now. Please use "v2" in your commit title using -v or
-> > git-format-patch. =20
->=20
-> Sorry, I am not sure I followed what you meant.  I've sent the v2, which
-> contains the 'v2' _tag_:
+On 1/23/2024 10:02 PM, Peter Waller wrote:
+> Here's part of the log, I can provide more off list if it helps. - Peter
+> 
+> <n>.678900 atlantic 0000:0c:00.0: AMD-Vi: Event logged [IO_PAGE_FAULT
+> domain=0x0014 address=0xfc80b000 flags=0x0020]
+> <n>.679124 atlantic 0000:0c:00.0: AMD-Vi: Event logged [IO_PAGE_FAULT
+> domain=0x0014 address=0xffeae520 flags=0x0020]
+> <n>.679270 atlantic 0000:0c:00.0: AMD-Vi: Event logged [IO_PAGE_FAULT
+> domain=0x0014 address=0xfc80c000 flags=0x0020]
+> <n>.679411 atlantic 0000:0c:00.0: AMD-Vi: Event logged [IO_PAGE_FAULT
+> domain=0x0014 address=0xffeae530 flags=0x0020]
 
-I believe *this* is a v2 because you fixed your initial patch,
-following Stefan's suggestion.
+Thanks, these looks like descriptor prefetch accesses (those aligned by 0x10), and packet page accesses (aligned by 0x1000).
+Overall strange, because driver normally deinit all the device activities, not to access host memory after unmapping.
 
-Anyway, it's fine for me to merge this patch through net directly (I
-don't know if net maintainers want W=3D1 fixes to go through net or
-net-next) so:
+I will check if there any potential flaws exist.
 
-Acked-by: Miquel Raynal <miquel.raynal@bootlin.com>
-
-Thanks,
-Miqu=C3=A8l
+Regards,
+  Igor
 
