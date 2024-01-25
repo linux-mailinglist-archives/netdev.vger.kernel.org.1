@@ -1,290 +1,163 @@
-Return-Path: <netdev+bounces-65765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA34E83BA2A
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 07:40:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A751A83BA2C
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 07:40:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3D9FCB22383
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 06:40:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC87B1C24F5A
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 06:40:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7098D11C92;
-	Thu, 25 Jan 2024 06:33:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B1F310A34;
+	Thu, 25 Jan 2024 06:34:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="dqBc5CC8"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1A8518EB1;
-	Thu, 25 Jan 2024 06:33:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FF891946B;
+	Thu, 25 Jan 2024 06:34:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706164405; cv=none; b=Swc7YnH7h5D+zDIWtsERXTgrkrsNq8qCTkEKbmUVTf5YVab526vUh1CJQyTsUawX35X3m0lcuZgwJTATQyck8qzwloO0LH9Ayr+rOdVshH01AoyHly8OSAaKrw6wLDrY9G5ri4c8hG7Jp7B4g0TGWLFeooVbhCrpblPp0CCO34A=
+	t=1706164486; cv=none; b=fllyMu640RPUga4ftecCbMbmObtgbJlY8fogRAj/mBnwEhbpjQBi0YFtZVB6M6Yn0K28mjELojkAlRF/jKi+Y5Aa4JC2moDQLYF/orb9l+W+whao3WRdm5m3v1NLi7mCxmfl/CopkAIUST1IUKAndPF5WmFRTYvldC9B6RJ0WJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706164405; c=relaxed/simple;
-	bh=xpZPXlMW7n/D1AT3I3ovpe1WmE5cWJU/fLRUROSX7zk=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=DoEa4Mja/TdeSTCk8CbxZvE1i98Wo69WYC99A5RenZocnDH8x8JhAmwH1K/wM6go7IdizxGdYcikzuqBmuD5dUBMX7EJ5LUt4enA42eaNKtoqG6clh5S9qm4g8AXTG/fE1d7AJTT6yKLEVUy9Z6ix7kVdGVVRyjpmXkugrmXGik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; arc=none smtp.client-ip=115.124.30.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R571e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0W.JJURr_1706164399;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W.JJURr_1706164399)
-          by smtp.aliyun-inc.com;
-          Thu, 25 Jan 2024 14:33:20 +0800
-Message-ID: <1706163935.2439404-5-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next 0/5] virtio-net: sq support premapped mode
-Date: Thu, 25 Jan 2024 14:25:35 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- virtualization@lists.linux.dev,
- bpf@vger.kernel.org
-References: <20240116075924.42798-1-xuanzhuo@linux.alibaba.com>
- <CACGkMEuvubWfg8Wc+=eNqg1rHR+PD6jsH7_QEJV6=S+DUVdThQ@mail.gmail.com>
- <1706161325.4430635-1-xuanzhuo@linux.alibaba.com>
- <1706161768.900584-2-xuanzhuo@linux.alibaba.com>
- <CACGkMEug-=C+VQhkMYSgUKMC==04m7-uem_yC21bgGkKZh845w@mail.gmail.com>
-In-Reply-To: <CACGkMEug-=C+VQhkMYSgUKMC==04m7-uem_yC21bgGkKZh845w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1706164486; c=relaxed/simple;
+	bh=FnfkkqccHSe0lKQ47tUgp/K/MjJqKcuMOvpOHtx7vHQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dWJZpu4sD5GNWTtZMqdlsaFekFosaN/oDPKP4SKjdeAhfMxOF34qQfNkQ+Ot95+IQpj/I4zCSPeLHdeRKqdXE/+8gTQtW2ReoefRx0Nk7twn+bDdbPSlnAkrKxN4pPkciiaAzX7PON3RkDTXMrRl9HsbRbFkSQkNxVoTngzUldo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=dqBc5CC8; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40P5MPQ1001531;
+	Wed, 24 Jan 2024 22:34:23 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=pfpt0220; bh=ssg5R7IX
+	Q2HBVRLi5pUL1ySvNdQLzs4POVDyrzaTEhY=; b=dqBc5CC89YRo++f/711tBC3e
+	ZaUFIXb/14lwr+xc/nXUhnPoOF7sKOg2uoJ+vvMMl6mAKnMqm2GB8Hm4zbDiY7N7
+	s/u8+d7ZfxEWMOGEHJTHayIgPAY7qNHkz/Yl7qyn6X4dADBiozpXCelGHQmyJPhB
+	6SpVNeiYCozupjmRJtq8X4qLdWwmTYCq25AhmWDJ0mRI91cPtiwUqnlWxvyLEswD
+	ShJRSzf/YaO5TP0qSrXOzgCDniXPK3mzI5bhodhjVEGCwQeeLPeI33uYSycHQNil
+	08icxJWubQv6lLjNJY0kYWVqLSPCWhb4OdtNrI9i81gegXiT+fJSMq6smirfgA==
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3vuhehr68y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Wed, 24 Jan 2024 22:34:23 -0800 (PST)
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 24 Jan
+ 2024 22:34:21 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Wed, 24 Jan 2024 22:34:21 -0800
+Received: from marvell-OptiPlex-7090.marvell.com (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id A46B63F7084;
+	Wed, 24 Jan 2024 22:34:17 -0800 (PST)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <sbhatta@marvell.com>,
+        <gakula@marvell.com>, <hkelam@marvell.com>, <bcreeley@amd.com>,
+        <sumang@marvell.com>, Ratheesh Kannoth <rkannoth@marvell.com>
+Subject: [PATCH net v1] octeontx2-af: Initialize bitmap arrays.
+Date: Thu, 25 Jan 2024 12:04:14 +0530
+Message-ID: <20240125063414.3930526-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: VCY6_cWjsCGYtF3_szK6QmATNm1RkP99
+X-Proofpoint-GUID: VCY6_cWjsCGYtF3_szK6QmATNm1RkP99
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-25_02,2024-01-24_01,2023-05-22_02
 
-On Thu, 25 Jan 2024 14:14:58 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Thu, Jan 25, 2024 at 1:52=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
-.com> wrote:
-> >
-> > On Thu, 25 Jan 2024 13:42:05 +0800, Xuan Zhuo <xuanzhuo@linux.alibaba.c=
-om> wrote:
-> > > On Thu, 25 Jan 2024 11:39:28 +0800, Jason Wang <jasowang@redhat.com> =
-wrote:
-> > > > On Tue, Jan 16, 2024 at 3:59=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.a=
-libaba.com> wrote:
-> > > > >
-> > > > > This is the second part of virtio-net support AF_XDP zero copy.
-> > > > >
-> > > > > The whole patch set
-> > > > > http://lore.kernel.org/all/20231229073108.57778-1-xuanzhuo@linux.=
-alibaba.com
-> > > > >
-> > > > > ## About the branch
-> > > > >
-> > > > > This patch set is pushed to the net-next branch, but some patches=
- are about
-> > > > > virtio core. Because the entire patch set for virtio-net to suppo=
-rt AF_XDP
-> > > > > should be pushed to net-next, I hope these patches will be merged=
- into net-next
-> > > > > with the virtio core maintains's Acked-by.
-> > > > >
-> > > > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
-> > > > >
-> > > > > ## AF_XDP
-> > > > >
-> > > > > XDP socket(AF_XDP) is an excellent bypass kernel network framewor=
-k. The zero
-> > > > > copy feature of xsk (XDP socket) needs to be supported by the dri=
-ver. The
-> > > > > performance of zero copy is very good. mlx5 and intel ixgbe alrea=
-dy support
-> > > > > this feature, This patch set allows virtio-net to support xsk's z=
-erocopy xmit
-> > > > > feature.
-> > > > >
-> > > > > At present, we have completed some preparation:
-> > > > >
-> > > > > 1. vq-reset (virtio spec and kernel code)
-> > > > > 2. virtio-core premapped dma
-> > > > > 3. virtio-net xdp refactor
-> > > > >
-> > > > > So it is time for Virtio-Net to complete the support for the XDP =
-Socket
-> > > > > Zerocopy.
-> > > > >
-> > > > > Virtio-net can not increase the queue num at will, so xsk shares =
-the queue with
-> > > > > kernel.
-> > > > >
-> > > > > On the other hand, Virtio-Net does not support generate interrupt=
- from driver
-> > > > > manually, so when we wakeup tx xmit, we used some tips. If the CP=
-U run by TX
-> > > > > NAPI last time is other CPUs, use IPI to wake up NAPI on the remo=
-te CPU. If it
-> > > > > is also the local CPU, then we wake up napi directly.
-> > > > >
-> > > > > This patch set includes some refactor to the virtio-net to let th=
-at to support
-> > > > > AF_XDP.
-> > > > >
-> > > > > ## performance
-> > > > >
-> > > > > ENV: Qemu with vhost-user(polling mode).
-> > > > > Host CPU: Intel(R) Xeon(R) Platinum 8163 CPU @ 2.50GHz
-> > > > >
-> > > > > ### virtio PMD in guest with testpmd
-> > > > >
-> > > > > testpmd> show port stats all
-> > > > >
-> > > > >  ######################## NIC statistics for port 0 #############=
-###########
-> > > > >  RX-packets: 19531092064 RX-missed: 0     RX-bytes: 1093741155584
-> > > > >  RX-errors: 0
-> > > > >  RX-nombuf: 0
-> > > > >  TX-packets: 5959955552 TX-errors: 0     TX-bytes: 371030645664
-> > > > >
-> > > > >
-> > > > >  Throughput (since last show)
-> > > > >  Rx-pps:   8861574     Rx-bps:  3969985208
-> > > > >  Tx-pps:   8861493     Tx-bps:  3969962736
-> > > > >  ################################################################=
-############
-> > > > >
-> > > > > ### AF_XDP PMD in guest with testpmd
-> > > > >
-> > > > > testpmd> show port stats all
-> > > > >
-> > > > >   ######################## NIC statistics for port 0  ###########=
-#############
-> > > > >   RX-packets: 68152727   RX-missed: 0          RX-bytes:  3816552=
-712
-> > > > >   RX-errors: 0
-> > > > >   RX-nombuf:  0
-> > > > >   TX-packets: 68114967   TX-errors: 33216      TX-bytes:  3814438=
-152
-> > > > >
-> > > > >   Throughput (since last show)
-> > > > >   Rx-pps:      6333196          Rx-bps:   2837272088
-> > > > >   Tx-pps:      6333227          Tx-bps:   2837285936
-> > > > >   ###############################################################=
-#############
-> > > > >
-> > > > > But AF_XDP consumes more CPU for tx and rx napi(100% and 86%).
-> > > > >
-> > > > > ## maintain
-> > > > >
-> > > > > I am currently a reviewer for virtio-net. I commit to maintain AF=
-_XDP support in
-> > > > > virtio-net.
-> > > > >
-> > > > > Please review.
-> > > > >
-> > > >
-> > > > Rethink of the whole design, I have one question:
-> > > >
-> > > > The reason we need to store DMA information is to harden the virtqu=
-eue
-> > > > to make sure the DMA unmap is safe. This seems redundant when the
-> > > > buffer were premapped by the driver, for example:
-> > > >
-> > > > Receive queue maintains DMA information, so it doesn't need desc_ex=
-tra to work.
-> > > >
-> > > > So can we simply
-> > > >
-> > > > 1) when premapping is enabled, store DMA information by driver itse=
-lf
-> > >
-> > > YES. this is simpler. And this is more convenience.
-> > > But the driver must allocate memory to store the dma info.
->
-> Right, and this looks like the common practice for most of the NIC driver=
-s.
->
-> > >
-> > > > 2) don't store DMA information in desc_extra
-> > >
-> > > YES. But the desc_extra memory is wasted. The "next" item is used.
-> > > Do you think should we free the desc_extra when the vq is premapped m=
-ode?
-> >
-> >
-> > struct vring_desc_extra {
-> >         dma_addr_t addr;                /* Descriptor DMA addr. */
-> >         u32 len;                        /* Descriptor length. */
-> >         u16 flags;                      /* Descriptor flags. */
-> >         u16 next;                       /* The next desc state in a lis=
-t. */
-> > };
-> >
-> >
-> > The flags and the next are used whatever premapped or not.
-> >
-> > So I think we can add a new array to store the addr and len.
->
-> Yes.
->
-> > If the vq is premappd, the memory can be freed.
->
-> Then we need to make sure the premapped is set before find_vqs() etc.
+kmalloc_array() without __GFP_ZERO flag does not initializes
+memory to zero.  This causes issues with bitmap. Use __GFP_ZERO
+to fix the issue.
 
+Fixes: dd7842878633 ("octeontx2-af: Add new devlink param to configure maximum usable NIX block LFs")
+Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
 
-Yes. We can start from the parameters of the find_vqs().
+ChangeLogs:
+v0 -> v1: Removed devm_kcalloc()._
+---
+ .../ethernet/marvell/octeontx2/af/rvu_npc.c   | 20 ++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
 
-But actually we can free the dma array when the driver sets premapped mode.
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+index 167145bdcb75..b56def17a2ba 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+@@ -1905,12 +1905,13 @@ int npc_mcam_rsrcs_init(struct rvu *rvu, int blkaddr)
+ 
+ 	/* Allocate bitmaps for managing MCAM entries */
+ 	mcam->bmap = kmalloc_array(BITS_TO_LONGS(mcam->bmap_entries),
+-				   sizeof(long), GFP_KERNEL);
++				   sizeof(long), GFP_KERNEL | __GFP_ZERO);
+ 	if (!mcam->bmap)
+ 		return -ENOMEM;
+ 
+ 	mcam->bmap_reverse = kmalloc_array(BITS_TO_LONGS(mcam->bmap_entries),
+-					   sizeof(long), GFP_KERNEL);
++					   sizeof(long),
++					   GFP_KERNEL | __GFP_ZERO);
+ 	if (!mcam->bmap_reverse)
+ 		goto free_bmap;
+ 
+@@ -1918,7 +1919,8 @@ int npc_mcam_rsrcs_init(struct rvu *rvu, int blkaddr)
+ 
+ 	/* Alloc memory for saving entry to RVU PFFUNC allocation mapping */
+ 	mcam->entry2pfvf_map = kmalloc_array(mcam->bmap_entries,
+-					     sizeof(u16), GFP_KERNEL);
++					     sizeof(u16),
++					     GFP_KERNEL | __GFP_ZERO);
+ 	if (!mcam->entry2pfvf_map)
+ 		goto free_bmap_reverse;
+ 
+@@ -1942,7 +1944,8 @@ int npc_mcam_rsrcs_init(struct rvu *rvu, int blkaddr)
+ 		goto free_entry_map;
+ 
+ 	mcam->cntr2pfvf_map = kmalloc_array(mcam->counters.max,
+-					    sizeof(u16), GFP_KERNEL);
++					    sizeof(u16),
++					    GFP_KERNEL | __GFP_ZERO);
+ 	if (!mcam->cntr2pfvf_map)
+ 		goto free_cntr_bmap;
+ 
+@@ -1950,18 +1953,21 @@ int npc_mcam_rsrcs_init(struct rvu *rvu, int blkaddr)
+ 	 * counter's reference count.
+ 	 */
+ 	mcam->entry2cntr_map = kmalloc_array(mcam->bmap_entries,
+-					     sizeof(u16), GFP_KERNEL);
++					     sizeof(u16),
++					     GFP_KERNEL | __GFP_ZERO);
+ 	if (!mcam->entry2cntr_map)
+ 		goto free_cntr_map;
+ 
+ 	mcam->cntr_refcnt = kmalloc_array(mcam->counters.max,
+-					  sizeof(u16), GFP_KERNEL);
++					  sizeof(u16),
++					  GFP_KERNEL | __GFP_ZERO);
+ 	if (!mcam->cntr_refcnt)
+ 		goto free_entry_cntr_map;
+ 
+ 	/* Alloc memory for saving target device of mcam rule */
+ 	mcam->entry2target_pffunc = kmalloc_array(mcam->total_entries,
+-						  sizeof(u16), GFP_KERNEL);
++						  sizeof(u16),
++						  GFP_KERNEL | __GFP_ZERO);
+ 	if (!mcam->entry2target_pffunc)
+ 		goto free_cntr_refcnt;
+ 
+-- 
+2.25.1
 
->
-> >
-> > struct vring_desc_extra {
-> >         u16 flags;                      /* Descriptor flags. */
-> >         u16 next;                       /* The next desc state in a lis=
-t. */
-> > };
-> >
-> > struct vring_desc_dma {
-> >         dma_addr_t addr;                /* Descriptor DMA addr. */
-> >         u32 len;                        /* Descriptor length. */
-> > };
-> >
-> > Thanks.
-
-As we discussed, you may wait my next patch set of the new design.
-
-Could you review the first patch set of this serial.
-http://lore.kernel.org/all/20240116062842.67874-1-xuanzhuo@linux.alibaba.com
-
-I work on top of this.
-
-PS.
-
-There is another patch set "device stats". I hope that is in your list.
-
-http://lore.kernel.org/all/20231226073103.116153-1-xuanzhuo@linux.alibaba.c=
-om
-
-Thanks.
-
-
->
-> Thanks
->
-> >
-> > >
-> > > Thanks.
-> > >
-> > >
-> > > >
-> > > > Would this be simpler?
-> > > >
-> > > > Thanks
-> > > >
-> >
->
 
