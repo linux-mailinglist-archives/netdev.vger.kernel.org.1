@@ -1,122 +1,111 @@
-Return-Path: <netdev+bounces-65703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-65704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E40083B669
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 02:10:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E268A83B66D
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 02:14:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 607451C232BD
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 01:10:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AB101F231DB
+	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 01:14:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CD49A3D;
-	Thu, 25 Jan 2024 01:10:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1850636;
+	Thu, 25 Jan 2024 01:14:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xXgyw593"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="giMitBrp"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A8CB1388
-	for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 01:10:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 428DF7E1;
+	Thu, 25 Jan 2024 01:14:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706145048; cv=none; b=WHbK/PzaoqqW3lNsNoK8uX5jvWVopsc3/UbxTvkNwSWMjUtRIYocXGEl8IFNIJph0LujYcQO3Kfu+27UiiLnqjrYGPT+scKsqztWxDSur5paTFowJmXn1AQssVTNNdapz1avbhDpCbkdZ9Jsgaig2pajD+AtKMN5XnDWaI6lcR4=
+	t=1706145283; cv=none; b=rO9ZCl/JkckeHZqssS3f0lwyjjNPd/teO6RvZX/hi7mAtIrV2ENc5hs9xTAuHpXmiLt01LOL4WUfDWoLXh30kxJTr5RaIVke1D+q7febatcuyjIlp5olD5on+NgRj8xxyO70GAcBQx69imq0zkXl7he+ii31b0oWHbZeOGDy3FQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706145048; c=relaxed/simple;
-	bh=YSmNdao5oCJmifyqKsSslrmcBNw0WJeOD4CISXYXUEI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z1nVhiCP2zlZvqIYCGcd7us/KFbfjgrdEtSerS6oehdw1BvSg6LEEMg6JDmpjW7j/XjxGAMyIcSti5wtf661W6EVd8o0lQB1341JpvtaNmhfiwUueDkxg4AmFEWh33QRm2f1WLKnvotyV+Eqfjl8qgxR3U7epiAN/O8qaKnZunE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xXgyw593; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <3d2d5f4e-c554-4648-bcec-839d83585123@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706145044;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mug9Qt3e1sskjplGiWS6K0cXwUdVu3n5UfoIEbNRZc4=;
-	b=xXgyw593u2RlFddy2YvBUGv52hw1nKqfSIKQWusNjz6ctTrMaKSoOyFHEouf3gqRQXTXk6
-	fewoo4R2i8f85gVcUQ8lvCGPc4oJO+nLIY8ylG7wdu/rLakC+nAaQCEP+zCfAMS6dCtKs2
-	QgW79OlVLFCb3as9auJudWD1SGHulas=
-Date: Wed, 24 Jan 2024 17:10:36 -0800
+	s=arc-20240116; t=1706145283; c=relaxed/simple;
+	bh=4eJDk7SCyhBAWsspn3WX2rYSinm3641zxcsUTAczkr4=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=KDKfBHq8kAnIXJla6T4knsUeCMPJNaNaZTKvrFzqCK7iQ1klCyLFO4xIS38oVXck+Z7RDP/HgdlXESL/6KQ/0XRdWZJMn3Wgd05MowokIV5tILmgP34eWRKnJk3QFU/znl2AkvVKxRIgiZDEmkUF5XCwPhXf3SP5Es8CnRKIWH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=giMitBrp; arc=none smtp.client-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-783293278adso484239485a.3;
+        Wed, 24 Jan 2024 17:14:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706145281; x=1706750081; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dEEoV1vBb0TIK2qwBs8KyfYWP/kHbN2hQHqURDl2Ve8=;
+        b=giMitBrp4/L066jHbINcRWAdfDIqAKeqQkMy0B/8GwS7Jxl+iczVRxW32Y5EqIMXJj
+         KKg07olJsQZiel9jVYKa5twudxAHV9f3iWmHiEwzEJrfJC/4vaCCbixeAAislPvBPgvI
+         gXuf8kiYD47PgG+Jyk5khegkH5jlsgMX/adBQnfrfB2OcUPCxbB1e6Zyk9S7BumpxHpi
+         +N+KZOY1Uy7o188WSY5/otq/XN2zY0Vb7UYSqZ80yOiPOBldYNiZTN2onjNvyA5kT5fm
+         2+3iZlLYAdkInyr+lfJKb53Zz09bV3Z6R7XQqT9yU1JaqjWkBr4QNuBqLXB2KmcRbLAr
+         ehOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706145281; x=1706750081;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=dEEoV1vBb0TIK2qwBs8KyfYWP/kHbN2hQHqURDl2Ve8=;
+        b=WMs0p2CqL4todYcNpNtx27ixsfjBtEqy7/ggWmVW+EyzdBY5oJApGrFaOzsdkRgXdT
+         31JP5XvmHrftNtnq9a0cGEmlXBNS4M09ZrJfaPl5Z8lH78En9tsEVk4hAa6ZdF0BlPcv
+         dGO61Cz6vjH7hPEFmD/Azo+DjH6d6K6wwBGttrNozOyiRylj/fx14QBtVKlXAv/420NZ
+         vVd7KYbtPe9v5dV/6Qs/t10yzZCbrYvguXG5YaP+mCUhArjbVy9azCUO9pIza4u8NEs1
+         u4Cb68uK3Pmw8lY/tW069izr/D45jcP42CjmOXxY3CE+qWClwYrALkQsDGSVkqABrg6O
+         gCiw==
+X-Gm-Message-State: AOJu0Yyn5p1VKTQVWNNHaVa2fHksnWzCDGbxQYNgtvo4XlpcR/h13WV7
+	QtutnJ8UsNdIjbn5fc3FR5x2uId997HbL6RSQJGk+U6+XVy7Wp8t
+X-Google-Smtp-Source: AGHT+IE91R3HP6pxlPwZbdz2PFmfKwP6xuMZE0pgA7VFdNMjKkrV/6imuKfNuaVwanfDRJ96AMoyQA==
+X-Received: by 2002:a05:620a:b01:b0:783:afd1:3e71 with SMTP id t1-20020a05620a0b0100b00783afd13e71mr340897qkg.38.1706145281157;
+        Wed, 24 Jan 2024 17:14:41 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCWYndJkIn0XrLvIMs0cq075xtJEBXCojSZPxocMjqxq85HeqLYk9BEUxwQ2FVn8vnR2XBeuCCktzgAi6awKir64YTO+T81lEfInrsiW3hAJmMtEdaYsCxefy0mWFKRG+iCRjOVBYjBRtNBIztzvjOxvSl8Pqpirz0o8LTTdDAu214QMoRydJsw8Q2WlwqgjpO1FbE3zEGponHZcWjZNslTzC36JBGIh4KsGjxJWSkS0HmJWAQc2taI34JD+Wbjah4Ny6FDWs8qQPw==
+Received: from localhost (131.65.194.35.bc.googleusercontent.com. [35.194.65.131])
+        by smtp.gmail.com with ESMTPSA id k5-20020a05620a07e500b00783b74d9456sm833299qkk.9.2024.01.24.17.14.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jan 2024 17:14:40 -0800 (PST)
+Date: Wed, 24 Jan 2024 20:14:40 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>, 
+ netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Lucas Karpinski <lkarpins@redhat.com>, 
+ linux-kselftest@vger.kernel.org
+Message-ID: <65b1b6008b6e9_250560294c3@willemb.c.googlers.com.notmuch>
+In-Reply-To: <076e8758e21ff2061cc9f81640e7858df775f0a9.1706131762.git.pabeni@redhat.com>
+References: <cover.1706131762.git.pabeni@redhat.com>
+ <076e8758e21ff2061cc9f81640e7858df775f0a9.1706131762.git.pabeni@redhat.com>
+Subject: Re: [PATCH net 2/3] selftests: net: included needed helper in the
+ install targets
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v8 1/3] bpf: make common crypto API for TC/XDP
- programs
-Content-Language: en-US
-To: Vadim Fedorenko <vadfed@meta.com>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
- bpf@vger.kernel.org, Victor Stewart <v@nametag.social>,
- Jakub Kicinski <kuba@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Herbert Xu <herbert@gondor.apana.org.au>
-References: <20240115220803.1973440-1-vadfed@meta.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20240115220803.1973440-1-vadfed@meta.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 1/15/24 2:08 PM, Vadim Fedorenko wrote:
-> +static int bpf_crypto_crypt(const struct bpf_crypto_ctx *ctx,
-> +			    const struct bpf_dynptr_kern *src,
-> +			    struct bpf_dynptr_kern *dst,
-> +			    const struct bpf_dynptr_kern *siv,
-> +			    bool decrypt)
-> +{
-> +	u32 src_len, dst_len, siv_len;
-> +	const u8 *psrc;
-> +	u8 *pdst, *piv;
-> +	int err;
-> +
-> +	if (ctx->type->get_flags(ctx->tfm) & CRYPTO_TFM_NEED_KEY)
+Paolo Abeni wrote:
+> The blamed commit below introduce a dependency in some net self-tests
+> towards a newly introduce helper script.
+> 
+> Such script is currently not included into the TEST_PROGS_EXTENDED list
+> and thus is not installed, causing failure for the relevant tests when
+> executed from the install dir.
+> 
+> Fix the issue updating the install targets.
+> 
+> Fixes: 3bdd9fd29cb0 ("selftests/net: synchronize udpgro tests' tx and rx connection")
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 
-nit. Does the indirect call get_flags() return different values?
-Should it be rejected earlier, e.g. in bpf_crypto_ctx_create()?
-
-> +		return -EINVAL;
-> +
-> +	if (__bpf_dynptr_is_rdonly(dst))
-> +		return -EINVAL;
-> +
-> +	siv_len = __bpf_dynptr_size(siv);
-> +	src_len = __bpf_dynptr_size(src);
-> +	dst_len = __bpf_dynptr_size(dst);
-> +	if (!src_len || !dst_len)
-> +		return -EINVAL;
-> +
-> +	if (siv_len != (ctx->type->ivsize(ctx->tfm) + ctx->type->statesize(ctx->tfm)))
-
-Same here, two indirect calls per en/decrypt kfunc call. Does the return value 
-change?
-
-> +		return -EINVAL;
-> +
-> +	psrc = __bpf_dynptr_data(src, src_len);
-> +	if (!psrc)
-> +		return -EINVAL;
-> +	pdst = __bpf_dynptr_data_rw(dst, dst_len);
-> +	if (!pdst)
-> +		return -EINVAL;
-> +
-> +	piv = siv_len ? __bpf_dynptr_data_rw(siv, siv_len) : NULL;
-> +	if (siv_len && !piv)
-> +		return -EINVAL;
-> +
-> +	err = decrypt ? ctx->type->decrypt(ctx->tfm, psrc, pdst, src_len, piv)
-> +		      : ctx->type->encrypt(ctx->tfm, psrc, pdst, src_len, piv);
-> +
-> +	return err;
-> +}
-
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
