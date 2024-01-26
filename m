@@ -1,118 +1,133 @@
-Return-Path: <netdev+bounces-66208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F06883DFE4
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 18:21:47 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60A9783DFEF
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 18:23:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E2AC21F22167
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 17:21:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0288BB20D0D
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 17:23:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A34141EB57;
-	Fri, 26 Jan 2024 17:21:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B6DB1EB55;
+	Fri, 26 Jan 2024 17:23:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DGN2MhwY"
 X-Original-To: netdev@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E5B01EB45;
-	Fri, 26 Jan 2024 17:21:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46F8720309;
+	Fri, 26 Jan 2024 17:23:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706289692; cv=none; b=rulr+klGCW4qaPVvs964eg5szPpZERXf945MWfwktgDcXTyd/GIo50EUKvIh1zfh2nTOWCbJv4ik6Mgb+SEDx1vpXydavRyteRI6qwfN1zM26NeCDpobshoo4GvZXNr8f6YDoTlBoJt9+daACm6uqjsIQxECBK1UPvtcp0Ul6Zc=
+	t=1706289829; cv=none; b=Co5zhZ5ORxPgU0BIX6jZs5Af9UbA2EwAA0a5FuZFXtS4uETP2Q5k6CsEB+zz0GiHigUoRhwKfoA6UV8Lw/stqIu4eMnod+xZl5b9O6Qc0XFRGeEllT7oq61Uzm0Lainzl062xhKOx3j0uPDSyqsvZ6Pn0+H6Cse/w76i3RYfA7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706289692; c=relaxed/simple;
-	bh=f+GiwjdOekcSqEi3/DLPCaEvvf4ah7db8RL/lfaPNZ4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cGjwVIv5FUTX2ruMfmUEc1j2hDEk83iCy36YFJpY1qf8nAw4cMRmUBjnTk84v0akjjaO76/q5aCUkABFU/OLWPnu7sunTGAhL6acMvCnVSg6XW4v3Lk8qDki2RM4PKlLUOqYUn2GMF2qglQPyxsdHify1nFWesHuxogPqT7CAK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1111D1FB;
-	Fri, 26 Jan 2024 09:22:14 -0800 (PST)
-Received: from [10.1.196.40] (e121345-lin.cambridge.arm.com [10.1.196.40])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 782C13F762;
-	Fri, 26 Jan 2024 09:21:26 -0800 (PST)
-Message-ID: <0cf72c00-21d9-4f1a-be14-80336da5dff4@arm.com>
-Date: Fri, 26 Jan 2024 17:21:24 +0000
+	s=arc-20240116; t=1706289829; c=relaxed/simple;
+	bh=tSMX1Ae/bCy8FGpCcBWLPQYfg2LBDt1gaBUpHaOLi0k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GoWVy8kDl7CDf+nGNVTX1nENFY6pMCJxanId3sg9MkTl7VlC1N0/8omrITeqn4pDE1wfMjDdnYgdJUd8oSMUHeF8YmpFmUVo4fmWkvWiOcxqeegaCzlqBo4hqgb5qv+00WK6gq0dHshrmDungGDNRn4xslW+f9iHbo+SsADGiQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DGN2MhwY; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706289828; x=1737825828;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=tSMX1Ae/bCy8FGpCcBWLPQYfg2LBDt1gaBUpHaOLi0k=;
+  b=DGN2MhwY1qzdGQQuouBLgsHjbAKjNxJZVCkyR7K+a56/QEpmlAHljgcy
+   8TmhZ/wyano9KvxRn+onRjs3F5ZktguIiFrTVzJvZsmlmUa31YYKuSU6S
+   j+xiEjYRYIbPWqV28jBH6n8JM/mLhzqbje77Qtb87Rp6y8RrM2vOe783X
+   CXm8SHD6/3xym+wv1qh5mzUh8PYZf6BI59nB3pDFF48UZ2vI4u8QxwqTY
+   KwVyEmwVmxBOB7FNbuKN6UbLyyj2fkTliZef6pxF8xmThPQRzG7+JBCn8
+   7G7V+/HURLZvsQNW/HD2s2IX/4R5z+dcM+6nU2Jd40yjtPxjLntATwHsz
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="9900855"
+X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
+   d="scan'208";a="9900855"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 09:23:47 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="960260973"
+X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
+   d="scan'208";a="960260973"
+Received: from turnipsi.fi.intel.com (HELO kekkonen.fi.intel.com) ([10.237.72.44])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 09:23:39 -0800
+Received: from kekkonen.localdomain (localhost [127.0.0.1])
+	by kekkonen.fi.intel.com (Postfix) with SMTP id BC8AF11FBD1;
+	Fri, 26 Jan 2024 19:23:36 +0200 (EET)
+Date: Fri, 26 Jan 2024 17:23:36 +0000
+From: Sakari Ailus <sakari.ailus@linux.intel.com>
+To: Alex Elder <elder@ieee.org>
+Cc: linux-pm@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	laurent.pinchart@ideasonboard.com,
+	Jacek Lawrynowicz <jacek.lawrynowicz@linux.intel.com>,
+	Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+	David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>,
+	Lucas De Marchi <lucas.demarchi@intel.com>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	Paul Elder <paul.elder@ideasonboard.com>,
+	Alex Elder <elder@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	Mark Brown <broonie@kernel.org>, dri-devel@lists.freedesktop.org,
+	intel-gfx@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
+	linux-media@vger.kernel.org, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-sound@vger.kernel.org
+Subject: Re: [PATCH v3 1/2] pm: runtime: Simplify pm_runtime_get_if_active()
+ usage
+Message-ID: <ZbPqmA4GkunkJqb0@kekkonen.localdomain>
+References: <20240122114121.56752-1-sakari.ailus@linux.intel.com>
+ <20240122114121.56752-2-sakari.ailus@linux.intel.com>
+ <912d4439-86cd-4060-a66d-baba5fa2bdec@ieee.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/7] dma: avoid expensive redundant calls for
- sync operations
-Content-Language: en-GB
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Christoph Hellwig <hch@lst.de>,
- Marek Szyprowski <m.szyprowski@samsung.com>, Joerg Roedel <joro@8bytes.org>,
- Will Deacon <will@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>,
- Magnus Karlsson <magnus.karlsson@intel.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Alexander Duyck <alexanderduyck@fb.com>, bpf@vger.kernel.org,
- netdev@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <20240126135456.704351-1-aleksander.lobakin@intel.com>
- <20240126135456.704351-3-aleksander.lobakin@intel.com>
- <0f6f550c-3eee-46dc-8c42-baceaa237610@arm.com>
- <7ff3cf5d-b3ff-4b52-9031-30a1cb71c0c9@intel.com>
-From: Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <7ff3cf5d-b3ff-4b52-9031-30a1cb71c0c9@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <912d4439-86cd-4060-a66d-baba5fa2bdec@ieee.org>
 
-On 26/01/2024 4:45 pm, Alexander Lobakin wrote:
-> From: Robin Murphy <robin.murphy@arm.com>
-> Date: Fri, 26 Jan 2024 15:48:54 +0000
-> 
->> On 26/01/2024 1:54 pm, Alexander Lobakin wrote:
->>> From: Eric Dumazet <edumazet@google.com>
->>>
->>> Quite often, NIC devices do not need dma_sync operations on x86_64
->>> at least.
->>> Indeed, when dev_is_dma_coherent(dev) is true and
->>> dev_use_swiotlb(dev) is false, iommu_dma_sync_single_for_cpu()
->>> and friends do nothing.
->>>
->>> However, indirectly calling them when CONFIG_RETPOLINE=y consumes about
->>> 10% of cycles on a cpu receiving packets from softirq at ~100Gbit rate.
->>> Even if/when CONFIG_RETPOLINE is not set, there is a cost of about 3%.
->>>
->>> Add dev->skip_dma_sync boolean which is set during the device
->>> initialization depending on the setup: dev_is_dma_coherent() for direct
->>> DMA, !(sync_single_for_device || sync_single_for_cpu) or positive result
->>> from the new callback, dma_map_ops::can_skip_sync for non-NULL DMA ops.
->>> Then later, if/when swiotlb is used for the first time, the flag
->>> is turned off, from swiotlb_tbl_map_single().
->>
->> I think you could probably just promote the dma_uses_io_tlb flag from
->> SWIOTLB_DYNAMIC to a general SWIOTLB thing to serve this purpose now.
-> 
-> Nice catch!
-> 
->>
->> Similarly I don't think a new op is necessary now that we have
->> dma_map_ops.flags. A simple static flag to indicate that sync may be> skipped under the same conditions as implied for dma-direct - i.e.
->> dev_is_dma_coherent(dev) && !dev->dma_use_io_tlb - seems like it ought
->> to suffice.
-> 
-> In my initial implementation, I used a new dma_map_ops flag, but then I
-> realized different DMA ops may require or not require syncing under
-> different conditions, not only dev_is_dma_coherent().
-> Or am I wrong and they would always be the same?
+Hi Alex,
 
-I think it's safe to assume that, as with P2P support, this will only 
-matter for dma-direct and iommu-dma for the foreseeable future, and 
-those do currently share the same conditions as above. Thus we may as 
-well keep things simple for now, and if anything ever does have cause to 
-change, it can be the future's problem to keep this mechanism working as 
-intended.
+On Fri, Jan 26, 2024 at 09:12:02AM -0600, Alex Elder wrote:
+> On 1/22/24 5:41 AM, Sakari Ailus wrote:
+> > There are two ways to opportunistically increment a device's runtime PM
+> > usage count, calling either pm_runtime_get_if_active() or
+> > pm_runtime_get_if_in_use(). The former has an argument to tell whether to
+> > ignore the usage count or not, and the latter simply calls the former with
+> > ign_usage_count set to false. The other users that want to ignore the
+> > usage_count will have to explitly set that argument to true which is a bit
+> > cumbersome.
+> > 
+> > To make this function more practical to use, remove the ign_usage_count
+> > argument from the function. The main implementation is renamed as
+> > pm_runtime_get_conditional().
+> > 
+> > Signed-off-by: Sakari Ailus <sakari.ailus@linux.intel.com>
+> > Reviewed-by: Alex Elder <elder@linaro.org> # drivers/net/ipa/ipa_smp2p.c
+> 
+> I actually intended my "Reviewed-by" to cover the entire patch.  I
+> checked every caller and they all looked good to me.
 
-Thanks,
-Robin.
+Thanks, I'll drop the file name. AFAIR it was just below that file, so I
+added it, but I could be wrong, too.
+
+v5 will also squash the 2nd patch of v4 into this one
+<URL:https://lore.kernel.org/linux-pm/ZbBAWROxRKE8Y8VU@kekkonen.localdomain/T/#m76d34e679e12d8536a20eb29af6e826e2a85a24b>,
+I hope that's fine.
+
+-- 
+Kind regards,
+
+Sakari Ailus
 
