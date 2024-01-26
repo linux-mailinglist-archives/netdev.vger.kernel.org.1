@@ -1,143 +1,167 @@
-Return-Path: <netdev+bounces-66190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6997F83DD8B
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 16:32:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AE1F83DDA0
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 16:37:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 973421C20E3D
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 15:32:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B931DB22FCC
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 15:37:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBA341CF99;
-	Fri, 26 Jan 2024 15:32:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C21EA1CF98;
+	Fri, 26 Jan 2024 15:37:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PTZLcy5+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l67yu1d9"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 400331B970
-	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 15:32:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D5231CD26;
+	Fri, 26 Jan 2024 15:37:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706283169; cv=none; b=ZH/NJhNHNN6qb5BQLiZL+z0ll/bnnDKPKGTDVs+X/tv9LSgiII9URCBBAzQ8bjyGN93W4D1aw1fCBaOytDagCAfeadRg/ZWfWYBf5dN8ItoeRSYO3OVB2ergxTcyaGC3tfnMWjYfCUkxIP38qRfHy9p6WSxeaIKaNXOS9WNV6ig=
+	t=1706283469; cv=none; b=dSJLvCG8KbRMiewP7qR+uDJu1b07JT2amihvUSj8v1AH7Rc5wYox+rhVA4jl9BAYLJrnRphpbCRoVk5N9L3w/ITNlR54fSlOsYXjgTWT+z0HQPRS/o5powSIJRDtknxT9salLheBpWe9EbmzXR0kckDh3PwDSmKszeangyGz66U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706283169; c=relaxed/simple;
-	bh=FxtrTLuAtobU9c5Uuzr2k+Bt7kukoAuCqMt/p1GBekw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eKXJNQrQJLb1nBZ8tdxs6lrM/53DKHhZ3En7skZzTJXROsPpocZMyoIn9B0dMtloZ5mHyEJAu7N3SfU3HhnCs/nvxBjOEzVkubAeQpR2Lo1AjNp2aI3XlX+lwpJR7CZXbeon1HttggPA8V8A9Ka2QDV3mwE5tB0CJQZKzJILU7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PTZLcy5+; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706283166;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=jlScfBpbgS69/8IaB6mNjO+RqTpFY3VAGajIs+lucxw=;
-	b=PTZLcy5+fZ0wWU9Gk438two7yRymKDNiqapYvhMzkq94Wjna6EFrDoS2r9MSXD5Wv7YykL
-	ytvpV+/If6vFFt6Y7JFwcWzVEsSBu3stjlSDzbd5GPxMU5yj7FUa+J2NsPEP4tjumMCKWJ
-	B6OhvsDInKrDyRd8B/gNZiO91uFQA0A=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-582-u7TQBo5bOQupqDM2VCqIUw-1; Fri, 26 Jan 2024 10:32:43 -0500
-X-MC-Unique: u7TQBo5bOQupqDM2VCqIUw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C4D8488FC31;
-	Fri, 26 Jan 2024 15:32:42 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.224.112])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 9EE652166B33;
-	Fri, 26 Jan 2024 15:32:40 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Xin Long <lucien.xin@gmail.com>,
-	Florian Westphal <fw@strlen.de>,
-	Aaron Conole <aconole@redhat.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net] selftests: net: add missing config for big tcp tests
-Date: Fri, 26 Jan 2024 16:32:36 +0100
-Message-ID: <21630ecea872fea13f071342ac64ef52a991a9b5.1706282943.git.pabeni@redhat.com>
+	s=arc-20240116; t=1706283469; c=relaxed/simple;
+	bh=o9PbZ6qTkUkkoOd5FrVKVyruIlMkOqYiBzgq/Uwmp10=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=nx78X6B3F4WRKudwyIxnUf34MZXMchus0X3Zj/W96EyFq3JX+5oo7tDIQTrLr6/x54RJwzbD4P+lSswX++2MQZNvU1+Tt2/h7W8lddsrOQmEYMTIhQCuloAE+O0lOUC0C7kZ3GsgCk/Hj4uB3Hfhh4B3xORLxKidAgTaA7W0VoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l67yu1d9; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-5d3912c9a83so317582a12.3;
+        Fri, 26 Jan 2024 07:37:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706283467; x=1706888267; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ayw4r0Wmkcdsa6cA6rwExvEfPd3csfaaOOWLYyKhGg4=;
+        b=l67yu1d9g29PUhhojMZxM7HUr25kXdg+NkfKkgIkkED1Z34Gz/NNkpFzg8+h/jAsAQ
+         gKFLE/Mu5/gAjLcWzUyfPlRYC6P2Aw3XhqVtVWFj622B2of73m1R/WrufW8n8i3UHObg
+         9V+FBqELBqkpQPUL0FAAvFgvzYreb5KwfO3C/Aoz6Q2VXnyhI6rQj4tM8X6Mixk1xT5p
+         LyCu/+g+x/Y9svsO2w6zJEXuMCmMNbeSuGfCmFVHhE2om3ptJr985Fb9f++OWTAzyzph
+         gTGQQZLoqIBTsyIsIexvRDSkqJrYNP61QKlra9ejDT6I+nQpzey6I3u1mqIu3sDK1Y2h
+         C6IQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706283467; x=1706888267;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ayw4r0Wmkcdsa6cA6rwExvEfPd3csfaaOOWLYyKhGg4=;
+        b=DLYGcDifmCFiO8C993CkLkGycsxOccsee/GvvNR/Wip4yy0X/6/mbbVPC5ZDYr3cve
+         ihAYYpFY3C6M70LBYI8h0tJXfq+IdU7KEBQ/3hwDySB0A2tA8suz07tQQmvq1yD4WtXv
+         nvdkrAY2rLh2bwWYvfj5gNQwgkwPdP2Y+TtdHRnidrfRYLjf3YdAfiEoJQIUausfefP7
+         D2/E7g39qF2OQqQaU1BfIMj0/bzWyT2grh6MYonYeRjymrUzVnnVs9up3LU4CoUel8Yh
+         kAj4thA9Y8fFYgyaqmR0lpIZBXc6nO8Eb1Pq1k1KgMJr6piD7QcBa791HoghnxWNLUSU
+         PJCw==
+X-Gm-Message-State: AOJu0YznAJON1jVxbYa5IPToaZFmJSyUg+X4qzxbDUyuJfVpP5/Sg4/V
+	f32pSMKhops8ZqplWnnCJFcXC7McfzFfLAINjHOUL+XJBevaeOH6
+X-Google-Smtp-Source: AGHT+IErRpi8O9/RaHPT0VXt1dOGf9juvVtykqoUqaL+CyHtLSnUodwPjG+TpPZKPKlf4nFFqmjUtw==
+X-Received: by 2002:a05:6a20:bf04:b0:19c:18b6:8d71 with SMTP id gc4-20020a056a20bf0400b0019c18b68d71mr962127pzb.72.1706283467376;
+        Fri, 26 Jan 2024 07:37:47 -0800 (PST)
+Received: from localhost ([98.97.32.4])
+        by smtp.gmail.com with ESMTPSA id f8-20020a056a001ac800b006dde10cb03esm1222402pfv.151.2024.01.26.07.37.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Jan 2024 07:37:46 -0800 (PST)
+Date: Fri, 26 Jan 2024 07:37:45 -0800
+From: John Fastabend <john.fastabend@gmail.com>
+To: Jakub Sitnicki <jakub@cloudflare.com>, 
+ John Fastabend <john.fastabend@gmail.com>
+Cc: bpf@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ andrii@kernel.org
+Message-ID: <65b3d1c9e2c4_15499720899@john.notmuch>
+In-Reply-To: <874jf0ffza.fsf@cloudflare.com>
+References: <20240124185403.1104141-1-john.fastabend@gmail.com>
+ <20240124185403.1104141-2-john.fastabend@gmail.com>
+ <874jf0ffza.fsf@cloudflare.com>
+Subject: Re: [PATCH bpf-next v2 1/4] bpf: sockmap, add test for sk_msg prog
+ pop msg helper
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-The big_tcp test-case requires a few kernel knobs currently
-not specified in the net selftests config, causing the
-following failure:
+Jakub Sitnicki wrote:
+> On Wed, Jan 24, 2024 at 10:54 AM -08, John Fastabend wrote:
+> > For msg_pop sk_msg helpers we only have older tests in test_sockmap, but
+> > these are showing their age. They don't use any of the newer style BPF
+> > and also require running test_sockmap. Lets use the prog_test framework
+> > and add a test for msg_pop.
+> >
+> > This is a much nicer test env using newer style BPF. We can
+> > extend this to support all the other helpers shortly.
+> >
+> > The bpf program is a template that lets us run through all the helpers
+> > so we can cover not just pop, but all the other helpers as well.
+> >
+> > Signed-off-by: John Fastabend <john.fastabend@gmail.com>
+> > ---
+> >  .../bpf/prog_tests/sockmap_helpers.h          |  10 +
+> >  .../bpf/prog_tests/sockmap_msg_helpers.c      | 210 ++++++++++++++++++
+> >  .../bpf/progs/test_sockmap_msg_helpers.c      |  52 +++++
+> >  3 files changed, 272 insertions(+)
+> >  create mode 100644 tools/testing/selftests/bpf/prog_tests/sockmap_msg_helpers.c
+> >  create mode 100644 tools/testing/selftests/bpf/progs/test_sockmap_msg_helpers.c
+> >
+> 
+> [...]
+> 
+> > diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_msg_helpers.c b/tools/testing/selftests/bpf/prog_tests/sockmap_msg_helpers.c
+> > new file mode 100644
+> > index 000000000000..9ffe02f45808
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/bpf/prog_tests/sockmap_msg_helpers.c
+> > @@ -0,0 +1,210 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +// Copyright (c) 2020 Cloudflare
+> 
+> Thanks, but we can't take the credit for this brand new file ;-)
 
-  # selftests: net: big_tcp.sh
-  # Error: Failed to load TC action module.
-  # We have an error talking to the kernel
-...
-  # Testing for BIG TCP:
-  # CLI GSO | GW GRO | GW GSO | SER GRO
-  # ./big_tcp.sh: line 107: test: !=: unary operator expected
-...
-  # on        on       on       on      : [FAIL_on_link1]
+Ah yep seems I cut'n'pasted it from one of your files. I'll
+update it.
 
-Add the missing configs
+> 
+> > +#include <error.h>
+> > +#include <netinet/tcp.h>
+> > +#include <sys/epoll.h>
+> > +
+> > +#include "test_progs.h"
+> > +#include "test_sockmap_msg_helpers.skel.h"
+> > +#include "sockmap_helpers.h"
+> > +
+> > +#define TCP_REPAIR		19	/* TCP sock is under repair right now */
+> > +
+> > +#define TCP_REPAIR_ON		1
+> > +#define TCP_REPAIR_OFF_NO_WP	-1	/* Turn off without window probes */
+> 
+> These defines are not unused by this module. Copy-pasted by mistake?
 
-Fixes: 6bb382bcf742 ("selftests: add a selftest for big tcp")
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
----
- tools/testing/selftests/net/config | 5 +++++
- 1 file changed, 5 insertions(+)
+Yep first iteration I used these will drop them. Thanks.
 
-diff --git a/tools/testing/selftests/net/config b/tools/testing/selftests/net/config
-index b511f43cd197..c0e8482f82d3 100644
---- a/tools/testing/selftests/net/config
-+++ b/tools/testing/selftests/net/config
-@@ -29,6 +29,7 @@ CONFIG_NF_NAT=m
- CONFIG_IP6_NF_IPTABLES=m
- CONFIG_IP_NF_IPTABLES=m
- CONFIG_IP6_NF_NAT=m
-+CONFIG_IP6_NF_RAW=m
- CONFIG_IP_NF_NAT=m
- CONFIG_IPV6_GRE=m
- CONFIG_IPV6_SEG6_LWTUNNEL=y
-@@ -41,9 +42,11 @@ CONFIG_MACVLAN=y
- CONFIG_MACVTAP=y
- CONFIG_MPLS=y
- CONFIG_MPTCP=y
-+CONFIG_IP_NF_RAW=m
- CONFIG_NF_TABLES=m
- CONFIG_NF_TABLES_IPV6=y
- CONFIG_NF_TABLES_IPV4=y
-+CONFIG_NF_FLOW_TABLE=m
- CONFIG_NFT_NAT=m
- CONFIG_NET_ACT_GACT=m
- CONFIG_NET_CLS_BASIC=m
-@@ -71,6 +74,7 @@ CONFIG_NET_CLS_FLOWER=m
- CONFIG_NET_CLS_BPF=m
- CONFIG_NET_ACT_TUNNEL_KEY=m
- CONFIG_NET_ACT_MIRRED=m
-+CONFIG_NET_ACT_CT=m
- CONFIG_BAREUDP=m
- CONFIG_IPV6_IOAM6_LWTUNNEL=y
- CONFIG_CRYPTO_SM4_GENERIC=y
-@@ -79,5 +83,6 @@ CONFIG_TUN=y
- CONFIG_VXLAN=m
- CONFIG_IP_SCTP=m
- CONFIG_NETFILTER_XT_MATCH_POLICY=m
-+CONFIG_NETFILTER_XT_MATCH_LENGTH=m
- CONFIG_CRYPTO_ARIA=y
- CONFIG_XFRM_INTERFACE=m
--- 
-2.43.0
+> 
+> [...]
+> 
+> > diff --git a/tools/testing/selftests/bpf/progs/test_sockmap_msg_helpers.c b/tools/testing/selftests/bpf/progs/test_sockmap_msg_helpers.c
+> > new file mode 100644
+> > index 000000000000..c721a00b6001
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/bpf/progs/test_sockmap_msg_helpers.c
+> > @@ -0,0 +1,52 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +// Copyright (c) 2020 Cloudflare
+> 
+> ^ :-)
+> 
+> [...]
+
 
 
