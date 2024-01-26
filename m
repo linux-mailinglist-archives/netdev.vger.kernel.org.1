@@ -1,86 +1,151 @@
-Return-Path: <netdev+bounces-66268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A66E83E290
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 20:32:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F92A83E2C5
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 20:42:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD1111C220EF
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 19:32:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 053171F21C9B
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 19:42:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22F6622EFC;
-	Fri, 26 Jan 2024 19:31:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0628D225AC;
+	Fri, 26 Jan 2024 19:42:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CeFX1CME"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="EG2200uO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3ADE22EF9
-	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 19:31:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 662D2224C2
+	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 19:42:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706297518; cv=none; b=RY7NGd3z6IBKibusWmsZKV8zMM6ThcCGBRof/rLgSG3rgdIJZCPcugOphU/MHLyyiGG60ayQ2H1j4mbQg9Ug2NZi6OiciGuU3wQgmsd8hXIl9iZtllcqjj+AP97v83pSI+3dRdaHGFhuKDLnqZgvXrm+9O7Jdi6TbNFUXcEZiN4=
+	t=1706298169; cv=none; b=LnPbS1VgjGPXy0nufRQGYTgtW12tzxLD1LUGljV+rgO3r3qiq8FFzcLo4EKa8V/+Ss5pNnk1t7zzasoH37mLIOaRfhTqXuU4BF+utmmJfw+BEHugZcoxKXMCFodPW/RLfD430njz+lrseMtE8hosXEMB8ke1EyMkKt+G5sYqzDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706297518; c=relaxed/simple;
-	bh=0/gi19UjEgJe4xm59PJQWWgwTm1xGi9jlTcxXelyEr4=;
+	s=arc-20240116; t=1706298169; c=relaxed/simple;
+	bh=l+Dvtec0Umm6fy+Pe70Xk2fhp3AdoGWxoMdBqZkcrNo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JgA/YIjuojWsauCHsFw71+1mE5UWvBtChM0UoLe0n+wllUS7/POuIC2UuuxchuXK7y0BVl9pDu5TZY4aa0eN/eezVoMYuMzX4G/GCRwbjniRPnSBBDSr8CBg9lrFfRU1nqVRZVk6BOxEfzuBDHnGR8LKcOj6IhLjwYkaHppF0SI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CeFX1CME; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1B4FC433F1;
-	Fri, 26 Jan 2024 19:31:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706297517;
-	bh=0/gi19UjEgJe4xm59PJQWWgwTm1xGi9jlTcxXelyEr4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CeFX1CME2O6T9rk7uTOsI66c0vGvv958hv7NxrVDQBRwFFcmX1ud4nxVb7paO4/ZI
-	 lTgqLTrTC3JfOmY2NNgQN0RHXFDwKuByEN/zhWq5U7Hjls1BjtqdVGEHLmLO+xIThc
-	 B5GpEqEBo2n0B0jgACIEmPkyfFksByd7yHfYEsAAM67aM6XhqDNCEN8SAyRoRpQfQj
-	 bAQH4oFFDiNres/dr6gNfByN9L/VyRuF0u31TfsPKr507BXq+bYhFqWqA/6D2NpL0c
-	 HrY0juRMXjlF7MA8TselGrtlISgMy/f9x3gtOFeOD8N6WZK+zywf1+YKQHWHAWpQ0T
-	 uhZwHrnRx2nAQ==
-Date: Fri, 26 Jan 2024 19:31:52 +0000
-From: Simon Horman <horms@kernel.org>
-To: Wojciech Drewek <wojciech.drewek@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	jiri@resnulli.us, przemyslaw.kitszel@intel.com,
-	vadim.fedorenko@linux.dev, paul.m.stillwell.jr@intel.com
-Subject: Re: [PATCH iwl-next v2] ice: Remove and readd netdev during devlink
- reload
-Message-ID: <20240126193152.GC401354@kernel.org>
-References: <20240125085459.13096-1-wojciech.drewek@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=H+1fE46WKQhq6Ha0cDuLCtsgRhCNyKkyyowy7iLGlWHLq0I0Cjzu/Dr817eo5rudeo3Kku0PdfvgGuqW9bHkWCDvEl1rOw9orR7LUkn/z1z7/ThXaAxaUZe5NuMa3hdc5MALSYgYpn2x3f0DWDZ4Wp2HykyBKz6iGRwd/nDmrRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=EG2200uO; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1d7858a469aso5649035ad.2
+        for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 11:42:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1706298168; x=1706902968; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=5DMkPLX96PHJXiX9+65dx4WF+ILk2GGzs/YrGWKt/0o=;
+        b=EG2200uO/gY1IdvrLAQic9oA8GXB7x+gZgLh+zPWJzQF0BHx0ztyeEaq6ARglNg8Ay
+         XXogGsCfh+mWSuv5K1l8nnGjxeYbZC1tNy0Mz5evCBZQu4TSVlP7W5i8k/6dbCoWW3JC
+         S2a0LExse0eDY7nxKfFayJBR5vJLC+kNVdGpA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706298168; x=1706902968;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5DMkPLX96PHJXiX9+65dx4WF+ILk2GGzs/YrGWKt/0o=;
+        b=oVRmkBAXdcSh4GbUQbZyRjoVeXwNmDJzVfHfXjaUrhzCiPtSw4cv8uJwEJaiTAfwso
+         VqDi+IX+TEFOvizUPEQ7KOdii/T5IOFS9r3+q9JKRraIS97rovUzyAmcph7kkS5tPecU
+         h4/Dmr5zNuBrxH4i0xQWU3B5IHcXmn6DyIJ8PQXB4F/fvsAGkOCSkoNA4+nAZO6Bb5PC
+         6rm0o3MOLF6ffJGXGy2ZaRbNucD5Im4bt93ReeyKeN1PKSHeWh2IApyORDVLcn6XXURS
+         c+WtYaHHsk6VvQWUF9XGm+MDGPBwNKWy4V2WuWAAhsHpfdG9yOF6WKGg+Wl5BgwX4bCF
+         Ea5g==
+X-Gm-Message-State: AOJu0Yx3BY6ybecQspYDp2wVKSIZO+Dte0dEhy0C7wJrYHIWHfQGdBVj
+	ReT1Qep5uKYdJe255hLWs0lCelCr0T4bxQpUy0FdpRFuQRFhRqwxvbZDx3YleQ==
+X-Google-Smtp-Source: AGHT+IFHN4j5JWPgqLRncyxuWDXfih88qvcwRs7KGjN10AwjsNYqiHieHRDFcg8FReSFNd6bMel2XQ==
+X-Received: by 2002:a17:902:a585:b0:1d7:1c88:71f6 with SMTP id az5-20020a170902a58500b001d71c8871f6mr246392plb.139.1706298167739;
+        Fri, 26 Jan 2024 11:42:47 -0800 (PST)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id kn11-20020a170903078b00b001d6f04f2b5dsm1292497plb.30.2024.01.26.11.42.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Jan 2024 11:42:47 -0800 (PST)
+Date: Fri, 26 Jan 2024 11:42:46 -0800
+From: Kees Cook <keescook@chromium.org>
+To: Eugenio Perez Martin <eperezma@redhat.com>
+Cc: linux-hardening@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 32/82] vringh: Refactor intentional wrap-around
+ calculation
+Message-ID: <202401261142.C23C2EC9@keescook>
+References: <20240122235208.work.748-kees@kernel.org>
+ <20240123002814.1396804-32-keescook@chromium.org>
+ <CAJaqyWdGAb088DxKq4ELBeir=PGrqkRuQ0FYkTBwKkfJa4SWbQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240125085459.13096-1-wojciech.drewek@intel.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJaqyWdGAb088DxKq4ELBeir=PGrqkRuQ0FYkTBwKkfJa4SWbQ@mail.gmail.com>
 
-On Thu, Jan 25, 2024 at 09:54:59AM +0100, Wojciech Drewek wrote:
-> Recent changes to the devlink reload (commit 9b2348e2d6c9
-> ("devlink: warn about existing entities during reload-reinit"))
-> force the drivers to destroy devlink ports during reinit.
-> Adjust ice driver to this requirement, unregister netdvice, destroy
-> devlink port. ice_init_eth() was removed and all the common code
-> between probe and reload was moved to ice_load().
+On Fri, Jan 26, 2024 at 08:31:04PM +0100, Eugenio Perez Martin wrote:
+> On Tue, Jan 23, 2024 at 2:42 AM Kees Cook <keescook@chromium.org> wrote:
+> >
+> > In an effort to separate intentional arithmetic wrap-around from
+> > unexpected wrap-around, we need to refactor places that depend on this
+> > kind of math. One of the most common code patterns of this is:
+> >
+> >         VAR + value < VAR
+> >
+> > Notably, this is considered "undefined behavior" for signed and pointer
+> > types, which the kernel works around by using the -fno-strict-overflow
+> > option in the build[1] (which used to just be -fwrapv). Regardless, we
+> > want to get the kernel source to the position where we can meaningfully
+> > instrument arithmetic wrap-around conditions and catch them when they
+> > are unexpected, regardless of whether they are signed[2], unsigned[3],
+> > or pointer[4] types.
+> >
+> > Refactor open-coded unsigned wrap-around addition test to use
+> > check_add_overflow(), retaining the result for later usage (which removes
+> > the redundant open-coded addition). This paves the way to enabling the
+> > unsigned wrap-around sanitizer[2] in the future.
+> >
+> > Link: https://git.kernel.org/linus/68df3755e383e6fecf2354a67b08f92f18536594 [1]
+> > Link: https://github.com/KSPP/linux/issues/26 [2]
+> > Link: https://github.com/KSPP/linux/issues/27 [3]
+> > Link: https://github.com/KSPP/linux/issues/344 [4]
+> > Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> > Cc: Jason Wang <jasowang@redhat.com>
+> > Cc: kvm@vger.kernel.org
+> > Cc: virtualization@lists.linux.dev
+> > Cc: netdev@vger.kernel.org
+> > Signed-off-by: Kees Cook <keescook@chromium.org>
+> > ---
+> >  drivers/vhost/vringh.c | 8 +++++---
+> >  1 file changed, 5 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+> > index 7b8fd977f71c..07442f0a52bd 100644
+> > --- a/drivers/vhost/vringh.c
+> > +++ b/drivers/vhost/vringh.c
+> > @@ -145,6 +145,8 @@ static inline bool range_check(struct vringh *vrh, u64 addr, size_t *len,
+> >                                bool (*getrange)(struct vringh *,
+> >                                                 u64, struct vringh_range *))
+> >  {
+> > +       u64 sum;
 > 
-> During devlink reload we can't take devl_lock (it's already taken)
-> and in ice_probe() we have to lock it. Use devl_* variant of the API
-> which does not acquire and release devl_lock. Guard ice_load()
-> with devl_lock only in case of probe.
+> I understand this is part of a bulk change so little time to think
+> about names :). But what about "end" or similar?
 > 
-> Introduce ice_debugfs_fwlog_deinit() in order to release PF's
-> debugfs entries. Move ice_debugfs_exit() call to ice_module_exit().
-> 
-> Suggested-by: Jiri Pirko <jiri@nvidia.com>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
+> Either way,
+> Acked-by: Eugenio Pérez <eperezma@redhat.com>
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Thanks! Yeah, you are not alone in suggesting "end" in a several of
+these patches. :)
 
+-Kees
+
+-- 
+Kees Cook
 
