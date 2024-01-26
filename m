@@ -1,100 +1,228 @@
-Return-Path: <netdev+bounces-66136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A8A183D729
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 11:02:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15F7383D72D
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 11:03:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B6661F29BFB
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 10:02:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 71EC41F29C13
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 10:02:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D93C664BA;
-	Fri, 26 Jan 2024 09:11:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E981C66B3F;
+	Fri, 26 Jan 2024 09:12:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="lIcsnqVZ"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="CFE0E9XX"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0478F62A07;
-	Fri, 26 Jan 2024 09:11:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24CCC65BBB;
+	Fri, 26 Jan 2024 09:12:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706260303; cv=none; b=eLPZQF5O8HhNzJnlyFzztvSfUOU2Wu1/Yk+lF1IkHVsFByO5dNYDoVj8cDr5/5Otenfekocsw0I84alkGQMTirun+5ysjzWQqGTi8fJoYFyqb8Sagdqd7pcpuFiQq97mYe1hF/nXTcF53L/iNk2NCiU+b035gKWyXYvTsOYfAFo=
+	t=1706260373; cv=none; b=kpRRRBQ87m5DPN80MHQG5yUUhz6c33z3w3KyQmAJkcZ3CqM61YpO1XOVDwqMC6mWwXSr5oili88wrD3DFRjQQfccqM8SFT9kHex/aYoHDFM995yIhE9GvgGhNvBM038T5prrbv9utpwsA2ozoZtwBfM5GKwkLJTHTixWmyJK9Lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706260303; c=relaxed/simple;
-	bh=HQvA7txAM0VbjWGr4LJphGRjOmXxRxHM+67/LKlzezU=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EgOF25uYsoNfMmlhMh2a1cWs+XbiMqcYOoURu2UW+B0pmTMadyMHOJ/KgufyD1jhouVJ2Y/2Yc9oCE0WXNgNBZTSlf2KvquKJg1wWUYR14ovd4x6XiLxaS4Ifp4FqFO87DxEdoB/hSzfFSEtj5WFybWp2zmgO7yn/+He0LqNnqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=lIcsnqVZ; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 4D2AA20842;
-	Fri, 26 Jan 2024 10:11:39 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id CndKI7aQloY4; Fri, 26 Jan 2024 10:11:38 +0100 (CET)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	s=arc-20240116; t=1706260373; c=relaxed/simple;
+	bh=ZoRSJvoWqKga1SG2FFzE2w6OD+wWH46tFmixAACobBI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NymuNqwF7EIStNPPzfo6ysjo0T1xChGXF+nYUOmVutnwSMROdmOVyMwtMBQUIGpKEaZZQsBZ0XRcKcboqmjPMpVxkPNsPta6Tt1qfYCjRIqxq5A+3s8HWc8vCWgMB/aj/R+i4tglXTvWGI8MCMNrxFbiq9gCWWGojur7mf6usSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=CFE0E9XX; arc=none smtp.client-ip=46.235.227.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1706260370;
+	bh=ZoRSJvoWqKga1SG2FFzE2w6OD+wWH46tFmixAACobBI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=CFE0E9XXR9BWxs45HlGn7FRIOAj7TxaAi78vLgkJJbntjVkegYxIJ2ZIByVPlrRCM
+	 8UGtochIV68ovE5QoG+zzAS0OIzy5Kbj86EiqA3NgXQL8Bt9hjnLyPzg0o7Cin8+ot
+	 VNWTOx9qO16+aPEHIFL0TJ+vwHh2wqdSGeS9SbNWL+hGZbR1n1E5nHZyKl11AVd7zZ
+	 hadui7C8Gv4rcFkeidmOzxTqKO3asz/XZUm2zjYqpguY5Cr5UYMCcl8voFmLn9G6CE
+	 GEn/BBbP/HhwypxMtQPK+qtDEHfPos50OH1vm3tHZGt4VnqiQK0oqol4voiNP6yGQF
+	 ExZYWNJedohGQ==
+Received: from [100.113.186.2] (cola.collaboradmins.com [195.201.22.229])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id E66BE207D5;
-	Fri, 26 Jan 2024 10:11:37 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com E66BE207D5
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1706260297;
-	bh=5zl+RvElPeyXc8dtCAn1Ij7w5kurFf0vU0RzJY2hrgU=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=lIcsnqVZMLCHUu2wiQl7KF3cC+kRpjkze2orphN2eMPN1VstOVPHOCA/lI+qVIMCr
-	 +qichnp9QpCbPtnlfZ7WouykS/C025RqrNWfTUKYLvGaQhchb0OPV/b4+Wb5b1O5PO
-	 XpqQVmDUJEowEij6i/8rm01kL5WguFPViKn/6ZFCMq3U5PpepQFa7ulzGXEF3mn2cX
-	 fe/pNmIANdVFT8LqpWagz1vbSn1kjjBF6W4A6k83BqBpPBtd/fvwI/HABHZZgHjZPO
-	 qSein44YaUmQXo7aS5V5QMywKlrWQH84FdqxUJvvQUc5yaskaSnHSH8vmoIHpuPq21
-	 1GHiyG3vEKCPA==
-Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
-	by mailout2.secunet.com (Postfix) with ESMTP id DD878800050;
-	Fri, 26 Jan 2024 10:11:37 +0100 (CET)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 26 Jan 2024 10:11:37 +0100
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 26 Jan
- 2024 10:11:37 +0100
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 100123182D6D; Fri, 26 Jan 2024 10:11:37 +0100 (CET)
-Date: Fri, 26 Jan 2024 10:11:36 +0100
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Kunwu Chan <chentao@kylinos.cn>
-CC: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-	<dsahern@kernel.org>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH ipsec-next] xfrm6_tunnel: Use KMEM_CACHE instead of
- kmem_cache_create
-Message-ID: <ZbN3SOlsVN0dbL/m@gauss3.secunet.de>
-References: <20240124063150.466037-1-chentao@kylinos.cn>
+	(Authenticated sender: kholk11)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 7EB853782072;
+	Fri, 26 Jan 2024 09:12:49 +0000 (UTC)
+Message-ID: <dc6f77bd-6671-43eb-8658-626b2591415d@collabora.com>
+Date: Fri, 26 Jan 2024 10:12:48 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240124063150.466037-1-chentao@kylinos.cn>
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] dt-bindings: net: bluetooth: Add MediaTek MT7921S
+ SDIO Bluetooth
+Content-Language: en-US
+To: Chen-Yu Tsai <wenst@chromium.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
+ <matthias.bgg@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ linux-mediatek@lists.infradead.org, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20240125095240.2308340-1-wenst@chromium.org>
+ <20240125095240.2308340-2-wenst@chromium.org>
+ <68249675-4081-48d9-abbb-1b2e49894fae@collabora.com>
+ <CAGXv+5GG+Ko4nZKCvpQ2TnjeHDKWi5qS_SWAgLcrZ6fn_ySiug@mail.gmail.com>
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+In-Reply-To: <CAGXv+5GG+Ko4nZKCvpQ2TnjeHDKWi5qS_SWAgLcrZ6fn_ySiug@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jan 24, 2024 at 02:31:50PM +0800, Kunwu Chan wrote:
-> Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
-> to simplify the creation of SLAB caches.
+Il 26/01/24 04:26, Chen-Yu Tsai ha scritto:
+> On Thu, Jan 25, 2024 at 7:39 PM AngeloGioacchino Del Regno
+> <angelogioacchino.delregno@collabora.com> wrote:
+>>
+>> Il 25/01/24 10:52, Chen-Yu Tsai ha scritto:
+>>> The MediaTek MT7921S is a WiFi/Bluetooth combo chip that works over
+>>> SDIO. While the Bluetooth function is fully discoverable, the chip
+>>> has a pin that can reset just the Bluetooth side, as opposed to the
+>>> full chip. This needs to be described in the device tree.
+>>>
+>>> Add a device tree binding for MT7921S Bluetooth over SDIO specifically
+>>> ot document the reset line.
+>>>
+>>> Cc: Sean Wang <sean.wang@mediatek.com>
+>>> Signed-off-by: Chen-Yu Tsai <wenst@chromium.org>
+>>> ---
+>>>    .../bluetooth/mediatek,mt7921s-bluetooth.yaml | 49 +++++++++++++++++++
+>>>    MAINTAINERS                                   |  1 +
+>>>    2 files changed, 50 insertions(+)
+>>>    create mode 100644 Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml
+>>>
+>>> diff --git a/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml
+>>> new file mode 100644
+>>> index 000000000000..bbe240e7cc40
+>>> --- /dev/null
+>>> +++ b/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml
+>>> @@ -0,0 +1,49 @@
+>>> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+>>> +%YAML 1.2
+>>> +---
+>>> +$id: http://devicetree.org/schemas/net/bluetooth/mediatek,mt7921s-bluetooth.yaml#
+>>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>>> +
+>>> +title: MediaTek MT7921S Bluetooth
+>>> +
+>>
+>> title:
+>>
+>> maintainers:
+>>
+>> description:
+>>
+>> ... and then, you missed
+>>
+>> allOf:
+>>     - $ref: bluetooth-controller.yaml#
 > 
-> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+> (facepalm)
+> 
+>> Everything else looks good.
+>>
+>> Cheers,
+>> Angelo
+>>
+>>> +description:
+>>
+>> MT7921S is a (dual?) SDIO-attached dual-radio WiFi+Bluetooth combo chip;
+>> this chip has two dedicated reset lines, one of which is used to reset
+>> the Bluetooth core.
+>> The WiFi part of this chip is described in ....where? :-)
+> 
+> The function itself is fully probable and the implementation doesn't make
+> use of the WiFi's reset line, so I don't see any reason to describe it?
+> I don't actually know what the reset line does in the chip hardware.
+> This patch is just described what is already used.
+> 
+>>> +  This binding describes the Bluetooth side of the SDIO-attached MT7921S
+>>> +  WiFi+Bluetooth combo chips. These chips are dual-radio chips supporting
+>>> +  WiFi and Bluetooth. Bluetooth works over SDIO just like WiFi. Bluetooth
+>>> +  has its own reset line, separate from WiFi, which can be used to reset
+>>> +  the Bluetooth core.
+>>> +
+>>> +maintainers:
+>>> +  - Sean Wang <sean.wang@mediatek.com>
+>>> +
+>>> +properties:
+>>> +  compatible:
+>>> +    enum:
+>>> +      - mediatek,mt7921s-bluetooth
+>>> +  reg:
+>>> +    const: 2
+>>> +
+>>> +  reset-gpios:
+>>> +    maxItems: 1
+>>> +    description: A GPIO line connected to the Bluetooth subsystem reset line.
+>>> +      Typically the W_DISABLE2# pin on M.2 E-key modules. If present this
+>>> +      shall be flagged as active low.
+>>
+>> description:
+>>     An active-low reset line connected for the Bluetooth core;
+> 
+> connected to?
 
-Applied, thanks a lot!
+Eh yes, sorry - I edited that statement multiple times and that "for" stuck
+there for reasons :-)
+
+> 
+>>     on typical M.2 Key-E modules this is the W_DISABLE2# pin.
+> 
+> Otherwise this looks better. Thanks.
+
+You're welcome!
+
+Cheers!
+
+> 
+> 
+> ChenYu
+> 
+>> Cheers,
+>> Angelo
+>>
+>>> +
+>>> +required:
+>>> +  - compatible
+>>> +  - reg
+>>> +
+>>> +additionalProperties: false
+>>> +
+>>> +examples:
+>>> +  - |
+>>> +    mmc {
+>>> +        #address-cells = <1>;
+>>> +        #size-cells = <0>;
+>>> +
+>>> +        bluetooth@2 {
+>>> +            compatible = "mediatek,mt7921s-bluetooth";
+>>> +            reg = <2>;
+>>> +            reset-gpios = <&pio 8 GPIO_ACTIVE_LOW>;
+>>> +        };
+>>> +    };
+>>> diff --git a/MAINTAINERS b/MAINTAINERS
+>>> index b64a64ca7916..662957146852 100644
+>>> --- a/MAINTAINERS
+>>> +++ b/MAINTAINERS
+>>> @@ -13657,6 +13657,7 @@ M:    Sean Wang <sean.wang@mediatek.com>
+>>>    L:  linux-bluetooth@vger.kernel.org
+>>>    L:  linux-mediatek@lists.infradead.org (moderated for non-subscribers)
+>>>    S:  Maintained
+>>> +F:   Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml
+>>>    F:  Documentation/devicetree/bindings/net/mediatek-bluetooth.txt
+>>>    F:  drivers/bluetooth/btmtkuart.c
+>>>
+>>
+
+
 
