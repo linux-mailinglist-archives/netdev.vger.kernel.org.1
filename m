@@ -1,150 +1,157 @@
-Return-Path: <netdev+bounces-66077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66078-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B3C583D282
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 03:23:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 727FA83D284
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 03:24:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 275E628BA69
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 02:23:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F01A3B2884A
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 02:24:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3244E6AD6;
-	Fri, 26 Jan 2024 02:22:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38C1979D9;
+	Fri, 26 Jan 2024 02:24:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FwzYdiRU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="akbUioO4"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C897B665
-	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 02:22:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 154686AD6
+	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 02:24:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706235760; cv=none; b=RcmaTtZtQTOiyNxR7A7cxVpftYSECAfNc6SPxCzxggTZWLVUgH/QnrjQ7KXzYy3V2riFRaVwSo6nApGippso05ItAnAv3ufwGggqHQxcwiV+FwqKkhLtWA0XJ3xbj0vZzJ4Y2ihGJxBq4SSUPKRlERcPSQxAFtGFQm91sKWkxWE=
+	t=1706235845; cv=none; b=nCsStQQvE6JJMivaZwmxnfLeIHu9/4BRgCvqxOK0nAn+yxpmG8l/s/ERrgbq5XpwhtClW1R9XsRvO4vYdbAaFk5Xb0n5wG5PVp182sh0GbOphnI/z66HhYJ8tejuB3r0zIK2PZC48gvjuxBa9RbpsCSUU4oX7HiWEqUIRF7NusM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706235760; c=relaxed/simple;
-	bh=OSYvZZpa+i3aP3yhhJ+vWAyL9KyBP8AFdARoqG6lphE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XMomAYakeUXesgMMeKXz8PggzpEIxKsSVYNOWiksHNJAYvwVfslKSa/IQlGWWyfjmbICgzYncl64/O/D+Z0KGKkBgem5KoUwpdcAVBaGiNjRECUCVW/t00PlBV+i2KlTUCWHxEcbBLg9ZHO4VvnUgA4zrblL2ZUryAhE3yMvqFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FwzYdiRU; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <01fdb720-c0dc-495d-a42d-756aa2bf4455@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706235756;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=w5phVj9ffB9yqD140riS9TxGoMxQ06uZ9IH/spt6YXY=;
-	b=FwzYdiRUvF9YtYtKY01Iuc+anl9MEJ0VpucsoC2yofBYE79RvgK088GyCa9lgvA2Ulv2If
-	Fcep7tmyOY/s/VKNwtaBaUhA35M/iohQy7547eGxYyBcBWLOA/Y/Gy3PBekwOZHVnpAY9y
-	ofbP2WeOt19dBxBLrmR7DseyaApSIqY=
-Date: Thu, 25 Jan 2024 18:22:31 -0800
+	s=arc-20240116; t=1706235845; c=relaxed/simple;
+	bh=aEUlbcw885E3qQFoqD4WobwiAkc1qMyIH1rqMgxxa7E=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fMplT5/uduTLaLa1wgap5RqeX7iyz0YG/jg4d+5bicYRd7JV+drwKcCEzREVHlfEj3Xg/yIVi9/OVsV2RHdXbBZhnUCm9vZ7yrDKrpu5xxgxfEAdOL5lp04ojtWaFh/HA3OZUo92dmwZkLul4bkAEYD+5BrBD5rwmBX0bVzppkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=akbUioO4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5089BC433C7;
+	Fri, 26 Jan 2024 02:24:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706235844;
+	bh=aEUlbcw885E3qQFoqD4WobwiAkc1qMyIH1rqMgxxa7E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=akbUioO4Am985o6ANEfOhgLq5qgFmW7v7gBjlimxl0EIx0EcGazRNXlm+DJXnI3YA
+	 RuLVlm9c7qy2tZQQ18R8w/tofS1dFeqIy4iHzW+NuMfjV3erppaqVfnd2kuZ8wtw5Y
+	 WZSi6TWwhhAoDn7f9A3qvodDVfpVTSupB2EVU2P115TtpGf0771aWgKOdHoAv6kYu6
+	 HI3W1KDkWnkPtuXMLp869/rmWCLmK4Y2vs5X2wu531WL89CFXkGG+DUU9KNFkTr/8D
+	 ABiZjOgL13glrfnCbJMXbxhZtgvkMrKHQga6wtE/Ie1JDrFkbPC6+X7iVtftY3qGNb
+	 SmKiYgCBzhVpA==
+Date: Thu, 25 Jan 2024 18:24:03 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: David Wei <dw@davidwei.uk>
+Cc: Jiri Pirko <jiri@resnulli.us>, Sabrina Dubroca <sd@queasysnail.net>,
+ netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v6 1/4] netdevsim: allow two netdevsim ports to
+ be connected
+Message-ID: <20240125182403.13c4475b@kernel.org>
+In-Reply-To: <20240126012357.535494-2-dw@davidwei.uk>
+References: <20240126012357.535494-1-dw@davidwei.uk>
+	<20240126012357.535494-2-dw@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC PATCH v7 1/8] net_sched: Introduce eBPF based Qdisc
-Content-Language: en-US
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, yangpeihao@sjtu.edu.cn, toke@redhat.com,
- jhs@mojatatu.com, jiri@resnulli.us, sdf@google.com,
- xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com, netdev@vger.kernel.org
-References: <cover.1705432850.git.amery.hung@bytedance.com>
- <232881645a5c4c05a35df4ff1f08a19ef9a02662.1705432850.git.amery.hung@bytedance.com>
- <0484f7f7-715f-4084-b42d-6d43ebb5180f@linux.dev>
- <CAMB2axM1TVw05jZsFe7TsKKRN8jw=YOwu-+rA9bOAkOiCPyFqQ@mail.gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <CAMB2axM1TVw05jZsFe7TsKKRN8jw=YOwu-+rA9bOAkOiCPyFqQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 1/23/24 9:22 PM, Amery Hung wrote:
->> I looked at the high level of the patchset. The major ops that it wants to be
->> programmable in bpf is the ".enqueue" and ".dequeue" (+ ".init" and ".reset" in
->> patch 4 and patch 5).
->>
->> This patch adds a new prog type BPF_PROG_TYPE_QDISC, four attach types (each for
->> ".enqueue", ".dequeue", ".init", and ".reset"), and a new "bpf_qdisc_ctx" in the
->> uapi. It is no long an acceptable way to add new bpf extension.
->>
->> Can the ".enqueue", ".dequeue", ".init", and ".reset" be completely implemented
->> in bpf (with the help of new kfuncs if needed)? Then a struct_ops for Qdisc_ops
->> can be created. The bpf Qdisc_ops can be loaded through the existing struct_ops api.
->>
-> Partially. If using struct_ops, I think we'll need another structure
-> like the following in bpf qdisc to be implemented with struct_ops bpf:
-> 
-> struct bpf_qdisc_ops {
->      int (*enqueue) (struct sk_buff *skb)
->      void (*dequeue) (void)
->      void (*init) (void)
->      void (*reset) (void)
-> };
-> 
-> Then, Qdisc_ops will wrap around them to handle things that cannot be
-> implemented with bpf (e.g., sch_tree_lock, returning a skb ptr).
+On Thu, 25 Jan 2024 17:23:54 -0800 David Wei wrote:
+> diff --git a/drivers/net/netdevsim/bus.c b/drivers/net/netdevsim/bus.c
+> index bcbc1e19edde..be8ac2e60c69 100644
+> --- a/drivers/net/netdevsim/bus.c
+> +++ b/drivers/net/netdevsim/bus.c
+> @@ -232,9 +232,81 @@ del_device_store(const struct bus_type *bus, const char *buf, size_t count)
+>  }
+>  static BUS_ATTR_WO(del_device);
+>  
+> +static ssize_t link_device_store(const struct bus_type *bus, const char *buf, size_t count)
+> +{
+> +	unsigned int netnsid_a, netnsid_b, ifidx_a, ifidx_b;
+> +	struct netdevsim *nsim_a, *nsim_b;
+> +	struct net_device *dev_a, *dev_b;
+> +	struct net *ns_a, *ns_b;
+> +	int err;
+> +
+> +	err = sscanf(buf, "%u %u %u %u", &netnsid_a, &ifidx_a, &netnsid_b, &ifidx_b);
 
-We can see how those limitations (calling sch_tree_lock() and returning a ptr) 
-can be addressed in bpf. This will also help other similar use cases.
+I'd go for "%u:%u %u:%u" to make the 'grouping' of netns and ifindex
+more obvious. But no strong feelings.
 
-Other than sch_tree_lock and returning a ptr from a bpf prog. What else do you 
-see that blocks directly implementing the enqueue/dequeue/init/reset in the 
-struct Qdisc_ops?
+> +	if (err != 4) {
+> +		pr_err("Format for linking two devices is \"netnsid_a ifidx_a netnsid_b ifidx_b\" (uint uint unit uint).\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	err = -EINVAL;
+> +	rtnl_lock();
+> +	ns_a = get_net_ns_by_id(current->nsproxy->net_ns, netnsid_a);
+> +	if (!ns_a) {
+> +		pr_err("Could not find netns with id: %d\n", netnsid_a);
+> +		goto out_unlock_rtnl;
+> +	}
+> +
+> +	dev_a = dev_get_by_index(ns_a, ifidx_a);
 
-Have you thought above ".priv_size"? It is now fixed to sizeof(struct 
-bpf_sched_data). It should be useful to allow the bpf prog to store its own data 
-there?
+since you're under rtnl_lock you can use __get_device_by_index(),
+it doesn't increase the refcount so you won't have to worry about
+releasing it.
 
-> 
->> If other ops (like ".dump", ".dump_stats"...) do not have good use case to be
->> programmable in bpf, it can stay with the kernel implementation for now and only
->> allows the userspace to load the a bpf Qdisc_ops with .equeue/dequeue/init/reset
->> implemented.
->>
->> You mentioned in the cover letter that:
->> "Current struct_ops attachment model does not seem to support replacing only
->> functions of a specific instance of a module, but I might be wrong."
->>
->> I assumed you meant allow bpf to replace only "some" ops of the Qdisc_ops? Yes,
->> it can be done through the struct_ops's ".init_member". Take a look at
->> bpf_tcp_ca_init_member. The kernel can assign the kernel implementation for
->> ".dump" (for example) when loading the bpf Qdisc_ops.
->>
-> I have no problem with partially replacing a struct, which like you
-> mentioned has been demonstrated by congestion control or sched_ext.
-> What I am not sure about is the ability to create multiple bpf qdiscs,
-> where each has different ".enqueue", ".dequeue", and so on. I like the
-> struct_ops approach and would love to try it if struct_ops support
-> this.
+> +	if (!dev_a) {
+> +		pr_err("Could not find device with ifindex %d in netnsid %d\n", ifidx_a, netnsid_a);
+> +		goto out_put_netns_a;
+> +	}
+> +
+> +	if (!netdev_is_nsim(dev_a)) {
+> +		pr_err("Device with ifindex %d in netnsid %d is not a netdevsim\n", ifidx_a, netnsid_a);
+> +		goto out_put_dev_a;
+> +	}
+> +
+> +	ns_b = get_net_ns_by_id(current->nsproxy->net_ns, netnsid_b);
+> +	if (!ns_b) {
+> +		pr_err("Could not find netns with id: %d\n", netnsid_b);
+> +		goto out_put_dev_a;
+> +	}
+> +
+> +	dev_b = dev_get_by_index(ns_b, ifidx_b);
+> +	if (!dev_b) {
+> +		pr_err("Could not find device with ifindex %d in netnsid %d\n", ifidx_b, netnsid_b);
+> +		goto out_put_netns_b;
+> +	}
+> +
+> +	if (!netdev_is_nsim(dev_b)) {
+> +		pr_err("Device with ifindex %d in netnsid %d is not a netdevsim\n", ifidx_b, netnsid_b);
+> +		goto out_put_dev_b;
+> +	}
+> +
+> +	err = 0;
+> +	nsim_a = netdev_priv(dev_a);
+> +	nsim_b = netdev_priv(dev_b);
+> +	rcu_assign_pointer(nsim_a->peer, nsim_b);
+> +	rcu_assign_pointer(nsim_b->peer, nsim_a);
 
-The need for allowing different ".enqueue/.dequeue/..." bpf 
-(BPF_PROG_TYPE_QDISC) programs loaded into different qdisc instances is because 
-there is only one ".id == bpf" Qdisc_ops native kernel implementation which is 
-then because of the limitation you mentioned above?
+Shouldn't we check if peer is NULL? Otherwise we can get into weird
+situations where we link A<>B then B<>C and then the pointers look like
+this A->B<>C. When B gets freed A's pointer won't get cleared.
 
-Am I understanding your reason correctly on why it requires to load different 
-bpf prog for different qdisc instances?
-
-If the ".enqueue/.dequeue/..." in the "struct Qdisc_ops" can be directly 
-implemented in bpf prog itself, it can just load another bpf struct_ops which 
-has a different ".enqueue/.dequeue/..." implementation:
-
-#> bpftool struct_ops register bpf_simple_fq_v1.bpf.o
-#> bpftool struct_ops register bpf_simple_fq_v2.bpf.o
-#> bpftool struct_ops register bpf_simple_fq_xyz.bpf.o
-
- From reading the test bpf prog, I think the set is on a good footing. Instead 
-of working around the limitation by wrapping the bpf prog in a predefined 
-"struct Qdisc_ops sch_bpf_qdisc_ops", lets first understand what is missing in 
-bpf and see how we could address them.
-
-
+> +out_put_dev_b:
+> +	dev_put(dev_b);
+> +out_put_netns_b:
+> +	put_net(ns_b);
+> +out_put_dev_a:
+> +	dev_put(dev_a);
+> +out_put_netns_a:
+> +	put_net(ns_a);
+> +out_unlock_rtnl:
+> +	rtnl_unlock();
+> +
+> +	return !err ? count : err;
+> +}
+> +static BUS_ATTR_WO(link_device);
 
