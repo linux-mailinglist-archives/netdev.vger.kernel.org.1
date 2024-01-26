@@ -1,115 +1,96 @@
-Return-Path: <netdev+bounces-66154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66155-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6FB083D86E
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 11:49:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FE3D83D881
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 11:54:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 038F11C243CC
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 10:49:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D49DB1F28719
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 10:54:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1B5312B6C;
-	Fri, 26 Jan 2024 10:49:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ysoft.com header.i=@ysoft.com header.b="BIHv0kK5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8244F134A9;
+	Fri, 26 Jan 2024 10:54:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from uho.ysoft.cz (uho.ysoft.cz [81.19.3.130])
+Received: from torres.zugschlus.de (torres.zugschlus.de [85.214.160.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01CF5D30B;
-	Fri, 26 Jan 2024 10:49:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.3.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7700713AC9
+	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 10:54:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.160.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706266184; cv=none; b=ZJDdkeubxyU3ODCEd0aF5Qz0NqkjDbGN8aL9iBmWrwuBKCA4eJyVuT5UQj9gAw3LNDyuwMY0iNqwYv8Cu4Oveu7OEk8I8OyN6hATv1xjqBj0n5fd5rnZNPZogQUXvGXRKA4Ho/CPogY1XnLls/IkhIO1aMZHhw9BbmjsAb3TZSs=
+	t=1706266472; cv=none; b=ZY9ESMyNO7AfDrBms+NBwZLZRrodEKO2i8u1sm6/pMKOq/dCyrK3h2UNr2gsUzIJJm9Tj2mQDMJ0jhIfQeNt+oWXJudWcCqvY0b2/0rRjci90Q5gvKc8EIJnmAah5wsCJrJ7SpCTGkJrZtOSso3w0/OPMjz09qFTBMK4EUDsftE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706266184; c=relaxed/simple;
-	bh=E1yEn/F9bwmHLCpl/6OPcGlQhqadbJlj7TMLIPNylCw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=kiGhcEOU7a6O2sjD+Iemk747vNA4NeQl7b0NpfSEj0zd/LhbV1IOM1EIIBbUsCnMbmRW7/LAoEDqbauUCNZZlGrsUcwSMVpODxO4nsquGkFY6veOB0qbzZ7JvMVWm6fIEqPtD0xJ2BbLwfT1VHtNxklf25kiWZ7WnLSvqJcreMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ysoft.com; spf=pass smtp.mailfrom=ysoft.com; dkim=pass (1024-bit key) header.d=ysoft.com header.i=@ysoft.com header.b=BIHv0kK5; arc=none smtp.client-ip=81.19.3.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ysoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ysoft.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ysoft.com;
-	s=20160406-ysoft-com; t=1706266180;
-	bh=NuAQ3P3OcHowxwqmPPTvuYfMUdpPDuv0q5L9YgWTHz4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=BIHv0kK5nwyMwURrz4dVMfTbofViqg3lnGfaLM1byyEJ6ESIHIg5+VnSkQViOgU0A
-	 CTYfXwjzYAbPFd86zm1cY1ncKC0xZoQIkh5pX+Q6/4+OitBt+MGQt+iHU+11f6S+Ko
-	 du0wTlbHMaD3qAdfuv9RTeAshoUm3GvSSmh6gFE0=
-Received: from iota-build.ysoft.local (unknown [10.1.5.151])
-	by uho.ysoft.cz (Postfix) with ESMTP id 9B060A0717;
-	Fri, 26 Jan 2024 11:49:40 +0100 (CET)
-From: =?UTF-8?q?Michal=20Vok=C3=A1=C4=8D?= <michal.vokac@ysoft.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
-	Christian Lamparter <chunkeey@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	petr.benes@ysoft.com,
-	=?UTF-8?q?Michal=20Vok=C3=A1=C4=8D?= <michal.vokac@ysoft.com>
-Subject: [PATCH net v3] net: dsa: qca8k: fix illegal usage of GPIO
-Date: Fri, 26 Jan 2024 11:49:35 +0100
-Message-Id: <1706266175-3408-1-git-send-email-michal.vokac@ysoft.com>
-X-Mailer: git-send-email 2.1.4
+	s=arc-20240116; t=1706266472; c=relaxed/simple;
+	bh=GYp8mOFv3Y7lroQXDbo/yKwrPnUi0bxeRCA+pBoxK8U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NfU+YphVrQfXbpopsHNqT6/YnImaMXrr0+VW/I9Ru/+1orHo3RdmhhEHUJa7VIfWzY0z8JCfyQX2tegZZFvVzkwXfNqqzYp3ZoBWAqPR/Bo9khmnZZiuWAPI1vOG/48NeiX+Q4lwMCYUINsMLGm9amIfgwGc97Ewfn1h1Pz2kCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zugschlus.de; spf=none smtp.mailfrom=zugschlus.de; arc=none smtp.client-ip=85.214.160.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zugschlus.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=zugschlus.de
+Received: from mh by torres.zugschlus.de with local (Exim 4.96)
+	(envelope-from <mh+netdev@zugschlus.de>)
+	id 1rTJqm-000tgw-1K;
+	Fri, 26 Jan 2024 11:54:20 +0100
+Date: Fri, 26 Jan 2024 11:54:20 +0100
+From: Marc Haber <mh+netdev@zugschlus.de>
+To: Petr =?utf-8?B?VGVzYcWZw61r?= <petr@tesarici.cz>
+Cc: Florian Fainelli <f.fainelli@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	alexandre.torgue@foss.st.com, Jose Abreu <joabreu@synopsys.com>,
+	Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
+	Jisheng Zhang <jszhang@kernel.org>, netdev@vger.kernel.org
+Subject: Re: stmmac on Banana PI CPU stalls since Linux 6.6
+Message-ID: <ZbOPXAFfWujlk20q@torres.zugschlus.de>
+References: <Za173PhviYg-1qIn@torres.zugschlus.de>
+ <8efb36c2-a696-4de7-b3d7-2238d4ab5ebb@lunn.ch>
+ <ZbKiBKj7Ljkx6NCO@torres.zugschlus.de>
+ <229642a6-3bbb-4ec8-9240-7b8e3dc57345@lunn.ch>
+ <99682651-06b4-4c69-b693-a0a06947b2ca@gmail.com>
+ <20240126085122.21e0a8a2@meshulam.tesarici.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240126085122.21e0a8a2@meshulam.tesarici.cz>
+User-Agent: Mutt/2.2.12 (2023-09-09)
 
-When working with GPIO, its direction must be set either when the GPIO is
-requested by gpiod_get*() or later on by one of the gpiod_direction_*()
-functions. Neither of this is done here which results in undefined
-behavior on some systems.
+On Fri, Jan 26, 2024 at 08:51:22AM +0100, Petr Tesařík wrote:
+> On Thu, 25 Jan 2024 12:00:46 -0800
+> Florian Fainelli <f.fainelli@gmail.com> wrote:
+> > Did not Petr try to address the same problem essentially:
+> > 
+> > https://lore.kernel.org/netdev/20240105091556.15516-1-petr@tesarici.cz/
+> > 
+> > this was not deemed the proper solution and I don't think one has been 
+> > posted since then, but it looks about your issue here Marc.
+> 
+> Yes, it looks like the same issue I ran into on my NanoPi. I'm sorry
+> I've been busy with other things lately, so I could not test and submit
+> my changes.
 
-As the reset GPIO is used right after it is requested here, it makes sense
-to configure it as GPIOD_OUT_HIGH right away. With that, the following
-gpiod_set_value_cansleep(1) becomes redundant and can be safely
-removed.
+Is it worth trying your patch from the message cited above, knowing that
+is not the final solution?
 
-Fixes: a653f2f538f9 ("net: dsa: qca8k: introduce reset via gpio feature")
-Signed-off-by: Michal Vokáč <michal.vokac@ysoft.com>
----
-Changes in v3:
-- Keep line length under 80 characters for netdev changes
+> I hope I can find some time for this bug again during the coming weekend
+> (it's not for my day job). It's motivating to know that I'm not the
+> only affected person on the planet. ;-)
 
-Changes in v2:
-- Remove the now redundant gpiod_set_value_cansleep(1) call.
+I am ready to test if you want me to ;-)
 
- drivers/net/dsa/qca/qca8k-8xxx.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Greetings
+Marc
 
-diff --git a/drivers/net/dsa/qca/qca8k-8xxx.c b/drivers/net/dsa/qca/qca8k-8xxx.c
-index ec57d9d52072..c247ab09874c 100644
---- a/drivers/net/dsa/qca/qca8k-8xxx.c
-+++ b/drivers/net/dsa/qca/qca8k-8xxx.c
-@@ -2038,12 +2038,11 @@ qca8k_sw_probe(struct mdio_device *mdiodev)
- 	priv->info = of_device_get_match_data(priv->dev);
- 
- 	priv->reset_gpio = devm_gpiod_get_optional(priv->dev, "reset",
--						   GPIOD_ASIS);
-+						   GPIOD_OUT_HIGH);
- 	if (IS_ERR(priv->reset_gpio))
- 		return PTR_ERR(priv->reset_gpio);
- 
- 	if (priv->reset_gpio) {
--		gpiod_set_value_cansleep(priv->reset_gpio, 1);
- 		/* The active low duration must be greater than 10 ms
- 		 * and checkpatch.pl wants 20 ms.
- 		 */
 -- 
-2.1.4
-
+-----------------------------------------------------------------------------
+Marc Haber         | "I don't trust Computers. They | Mailadresse im Header
+Leimen, Germany    |  lose things."    Winona Ryder | Fon: *49 6224 1600402
+Nordisch by Nature |  How to make an American Quilt | Fax: *49 6224 1600421
 
