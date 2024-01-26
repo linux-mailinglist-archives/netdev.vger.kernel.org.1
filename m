@@ -1,173 +1,169 @@
-Return-Path: <netdev+bounces-66146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 478E383D817
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 11:28:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AA2083D820
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 11:29:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AD9A1C2B3E5
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 10:28:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36E812974F5
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 10:29:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C818F1B809;
-	Fri, 26 Jan 2024 10:07:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 136A11401F;
+	Fri, 26 Jan 2024 10:12:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pgENvXO9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BI36CV8s"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93A951B7E4;
-	Fri, 26 Jan 2024 10:07:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F2B61BF43
+	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 10:12:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706263666; cv=none; b=mN07cD1UTsAbXluCkb3OcEroAzNKhN8qqk3SG3MjdYWANI6vx3YAg5V53FXC7PTDTgWJTpV8aEDsRgpHfAB4LCQ84jSsGe1KwTijyFANkh9emIo/08PGXjAxajiiLNvUZBv5s8cap2ZcoWl4eNJxuaKH1wKtwtEKEW+FVHvPFyA=
+	t=1706263979; cv=none; b=liInvvfQLK/vPAImQQohuMM6fwET9DYDVypEVrIbfa/5qPZVamA+tYFg5iaoKUwJsRoeDcceCFL24kwJhmLGzkxtMmjpMvfsB/yU6ZdkWyMI1ok4cR87HamO9md8Ae65tpbleSTBLE/8+5OM+Pyh9x44+u0Dyo33SpiJsUksAc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706263666; c=relaxed/simple;
-	bh=cyYc4oQhxrcpBf/N4DGlh5NOYSWJmxszPTa3U/wWji8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OqFcmhOqCtkCzjlJgxL7B3WMy1+R/p0wklsI4P9BIhnF3RP3B79o8rGFArJ/RVQGRkXyV92W3d4Z5k0mW/DKigcboYgjf++C3TVb88SZvFYgIGw8fGAPu2sjRz6/NTlo7M9C3CjffFv6vEcD/JcZUK4C/xaCHJgn+S2vWanUXKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pgENvXO9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43945C433C7;
-	Fri, 26 Jan 2024 10:07:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706263666;
-	bh=cyYc4oQhxrcpBf/N4DGlh5NOYSWJmxszPTa3U/wWji8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pgENvXO9hI7spLW3wf1MzB2Q6oM4DtwvHG6wIOFrdFl4kpUuX6k6zL0H8taBiBYQL
-	 Jn3WN12lVFujvNdirTFsDuBoDDc9KrdUhKiH5ZVm2I5jEvgmTjqUE+r0wFNPyzoKG4
-	 +zGiY258mpFxvAJ2YneWv5SF70ZksYPUKftNdiRL12cjyZNvf9GYGDmxKCQ81A/zMv
-	 h74k2ZxqXVICdueT2n8sDC4t6+z1c2VEjvdnoCif6mlshsG8dYB+yOI+uIh3Cba9vk
-	 14afPTHMAOgQp0YOYmjxnsf6nir+LQSBnNBV7CYJk2bAJCJh++4WfUK9POqEHkZtaJ
-	 uCheOlKVICS6w==
-Date: Fri, 26 Jan 2024 11:07:36 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, chuck.lever@oracle.com, 
-	jlayton@kernel.org, linux-api@vger.kernel.org, edumazet@google.com, 
-	davem@davemloft.net, alexander.duyck@gmail.com, sridhar.samudrala@intel.com, 
-	kuba@kernel.org, willemdebruijn.kernel@gmail.com, weiwan@google.com, 
-	Jonathan Corbet <corbet@lwn.net>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Jan Kara <jack@suse.cz>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Nathan Lynch <nathanl@linux.ibm.com>, Steve French <stfrench@microsoft.com>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, Jiri Slaby <jirislaby@kernel.org>, 
-	Julien Panis <jpanis@baylibre.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Andrew Waterman <waterman@eecs.berkeley.edu>, Thomas Huth <thuth@redhat.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, 
-	"open list:FILESYSTEMS (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>
-Subject: Re: [PATCH net-next v3 3/3] eventpoll: Add epoll ioctl for
- epoll_params
-Message-ID: <20240126-kribbeln-sonnabend-35dcb3d1fc48@brauner>
-References: <20240125225704.12781-1-jdamato@fastly.com>
- <20240125225704.12781-4-jdamato@fastly.com>
- <2024012551-anyone-demeaning-867b@gregkh>
- <20240126001128.GC1987@fastly.com>
- <2024012525-outdoors-district-2660@gregkh>
- <20240126023630.GA1235@fastly.com>
+	s=arc-20240116; t=1706263979; c=relaxed/simple;
+	bh=/5yfAr/RntdBSIKdrpsJAd4vk4e6HCgLOuU8HL7aqRw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dKKa5wbfINu7qBXHMD/75OGOF1WGoS6gBnKahyKIKX6zhsk4OT1866LspcE88wT2jkc/90hMWsKlJMJvTvg49krzEjVPnb2t+MCXVOfi1x4Xa/PmE7JbtwydCTDwNy2kQ/JvJsVyxGpujEOyiEoixI/8Gd7H9g5iAnZtJr/h9e4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BI36CV8s; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-50e6c0c0c6bso50879e87.0
+        for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 02:12:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706263975; x=1706868775; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OwGLDP/ShF46MV5S8tZnfLEnUP0PzEjFne7dn85EbpA=;
+        b=BI36CV8sHz4wRB1mpE8v2F7CS27n0DcNM+wNi8E3PGsbmeTSiNLJhJNe/T7iw8iLj2
+         PzTfDzWDG1j2upUg33GhdmuwYOCaGRPg09+pIsHq9tvQN1VcbQ8SGIGNXfLyUZEAGjuG
+         0vEtDgdOndrHJ8XDnBNuf0ZynFD+ImPeFJOppf59f5suiKUr8xcwNF59NH3hzT4Gq/EF
+         sS3pX7gE89DiYn27QJVPzAlQUDFMF3YM+ZxLfrkSICrkWQKAUui9W7VLFLRU6Y4xVeBa
+         RwT23kuT+gpP2ViimPp5nOyUtg1k+Pr7Cuw+2a6Aa5VHpK2RQuAoMedIm8R7wMphnuRX
+         Xyng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706263975; x=1706868775;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OwGLDP/ShF46MV5S8tZnfLEnUP0PzEjFne7dn85EbpA=;
+        b=ZyNYcUGKPc0H2z1MyjIxlhbfyFUpDuT9i/Y01LL/jvHonF2WN3D1yEFKbLbbYYbK6l
+         BE8dgKr7IzmUbnnizZ38iTXLKl8lNEtCKyCOHigPc1Y37ZU9o8XpxfLm3CJiFULy5Fa1
+         Jf1S4wUR+j9LnHsCWIwjyw8ioMYtFk7oQYkwYqOIaVydFKfwvJafP4fx3es/JshD0+NG
+         qzdwda2MkL+0KbTd2XmBuOlOOkD4Nlmy8DrejJ3+12agYhcC+X0OyBdhmQo3+T1NQeIq
+         lG0r8iCnOtijSeibZ6j/x4xsfaNomxAR5EKGU4HAtOg+7FJv1l6RyrjLKBXdDdnOja6r
+         c2ow==
+X-Gm-Message-State: AOJu0YyeFOG0LM6b4vbxiSHh0m7hBnuzM7C0c5HzsaNytGnyIz0z0dul
+	52ok4xZfm/vfN0hjgLFN0bhWBxkaOs+2wkAh/lCO+/ZQCCIl2TVpmUnL0PlIWutJCc74
+X-Google-Smtp-Source: AGHT+IHBoU+AbhZ8iqIgFVR6Xc5ykjJR3UGlBkJX0CHerS6OLb90h1TsVjppUKmOHesbFe6dSN0sAg==
+X-Received: by 2002:a19:641e:0:b0:50e:7fb1:6456 with SMTP id y30-20020a19641e000000b0050e7fb16456mr1424048lfb.4.1706263974848;
+        Fri, 26 Jan 2024 02:12:54 -0800 (PST)
+Received: from localhost.localdomain ([83.217.201.225])
+        by smtp.gmail.com with ESMTPSA id cf3-20020a056512280300b005101392d314sm131465lfb.150.2024.01.26.02.12.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Jan 2024 02:12:54 -0800 (PST)
+From: Denis Kirjanov <kirjanov@gmail.com>
+X-Google-Original-From: Denis Kirjanov <dkirjanov@suse.de>
+To: stephen@networkplumber.org
+Cc: netdev@vger.kernel.org,
+	Denis Kirjanov <denis.kirjanov@suse.com>,
+	Denis Kirjanov <dkirjanov@suse.de>
+Subject: [PATCH iproute2] ifstat: make load_info() more verbose on error
+Date: Fri, 26 Jan 2024 05:08:55 -0500
+Message-Id: <20240126100855.1004-1-dkirjanov@suse.de>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240126023630.GA1235@fastly.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jan 25, 2024 at 06:36:30PM -0800, Joe Damato wrote:
-> On Thu, Jan 25, 2024 at 04:23:58PM -0800, Greg Kroah-Hartman wrote:
-> > On Thu, Jan 25, 2024 at 04:11:28PM -0800, Joe Damato wrote:
-> > > On Thu, Jan 25, 2024 at 03:21:46PM -0800, Greg Kroah-Hartman wrote:
-> > > > On Thu, Jan 25, 2024 at 10:56:59PM +0000, Joe Damato wrote:
-> > > > > +struct epoll_params {
-> > > > > +	u64 busy_poll_usecs;
-> > > > > +	u16 busy_poll_budget;
-> > > > > +
-> > > > > +	/* for future fields */
-> > > > > +	u8 data[118];
-> > > > > +} EPOLL_PACKED;
-> > > > 
-> > > > variables that cross the user/kernel boundry need to be __u64, __u16,
-> > > > and __u8 here.
-> > > 
-> > > I'll make that change for the next version, thank you.
-> > > 
-> > > > And why 118?
-> > > 
-> > > I chose this arbitrarily. I figured that a 128 byte struct would support 16
-> > > u64s in the event that other fields needed to be added in the future. 118
-> > > is what was left after the existing fields. There's almost certainly a
-> > > better way to do this - or perhaps it is unnecessary as per your other
-> > > message.
-> > > 
-> > > I am not sure if leaving extra space in the struct is a recommended
-> > > practice for ioctls or not - I thought I noticed some code that did and
-> > > some that didn't in the kernel so I err'd on the side of leaving the space
-> > > and probably did it in the worst way possible.
-> > 
-> > It's not really a good idea unless you know exactly what you are going
-> > to do with it.  Why not just have a new ioctl if you need new
-> > information in the future?  That's simpler, right?
-> 
-> Sure, that makes sense to me. I'll remove it in the v4 alongside the other
-> changes you've requested.
+From: Denis Kirjanov <denis.kirjanov@suse.com>
 
-Fwiw, we do support extensible ioctls since they encode the size. Take a
-look at kernel/seccomp.c. It's a clean extensible interface built on top
-of the copy_struct_from_user() pattern we added for system calls
-(openat(), clone3() etc.):
+convert frprintf calls to perror() so the caller
+can see the reason of an error
 
-static long seccomp_notify_ioctl(struct file *file, unsigned int cmd,
-                                 unsigned long arg)
-{
-        struct seccomp_filter *filter = file->private_data;
-        void __user *buf = (void __user *)arg;
+Signed-off-by: Denis Kirjanov <dkirjanov@suse.de>
+---
+ misc/ifstat.c | 24 ++++++++++++++++--------
+ 1 file changed, 16 insertions(+), 8 deletions(-)
 
-        /* Fixed-size ioctls */
-        switch (cmd) {
-        case SECCOMP_IOCTL_NOTIF_RECV:
-                return seccomp_notify_recv(filter, buf);
-        case SECCOMP_IOCTL_NOTIF_SEND:
-                return seccomp_notify_send(filter, buf);
-        case SECCOMP_IOCTL_NOTIF_ID_VALID_WRONG_DIR:
-        case SECCOMP_IOCTL_NOTIF_ID_VALID:
-                return seccomp_notify_id_valid(filter, buf);
-        case SECCOMP_IOCTL_NOTIF_SET_FLAGS:
-                return seccomp_notify_set_flags(filter, arg);
-        }
-
-        /* Extensible Argument ioctls */
-#define EA_IOCTL(cmd)   ((cmd) & ~(IOC_INOUT | IOCSIZE_MASK))
-        switch (EA_IOCTL(cmd)) {
-        case EA_IOCTL(SECCOMP_IOCTL_NOTIF_ADDFD):
-                return seccomp_notify_addfd(filter, buf, _IOC_SIZE(cmd));
-        default:
-                return -EINVAL;
-        }
-}
-
-static long seccomp_notify_addfd(struct seccomp_filter *filter,
-                                 struct seccomp_notif_addfd __user *uaddfd,
-                                 unsigned int size)
-{
-        struct seccomp_notif_addfd addfd;
-        struct seccomp_knotif *knotif;
-        struct seccomp_kaddfd kaddfd;
-        int ret;
-
-        BUILD_BUG_ON(sizeof(addfd) < SECCOMP_NOTIFY_ADDFD_SIZE_VER0);
-        BUILD_BUG_ON(sizeof(addfd) != SECCOMP_NOTIFY_ADDFD_SIZE_LATEST);
-
-        if (size < SECCOMP_NOTIFY_ADDFD_SIZE_VER0 || size >= PAGE_SIZE)
-                return -EINVAL;
-
-        ret = copy_struct_from_user(&addfd, sizeof(addfd), uaddfd, size);
-        if (ret)
-                return ret;
-
-
-
+diff --git a/misc/ifstat.c b/misc/ifstat.c
+index f6f9ba50..721f4914 100644
+--- a/misc/ifstat.c
++++ b/misc/ifstat.c
+@@ -117,16 +117,20 @@ static int get_nlmsg_extended(struct nlmsghdr *m, void *arg)
+ 		return 0;
+ 
+ 	len -= NLMSG_LENGTH(sizeof(*ifsm));
+-	if (len < 0)
++	if (len < 0) {
++		errno = EINVAL;
+ 		return -1;
++	}
+ 
+ 	parse_rtattr(tb, IFLA_STATS_MAX, IFLA_STATS_RTA(ifsm), len);
+ 	if (tb[filter_type] == NULL)
+ 		return 0;
+ 
+ 	n = malloc(sizeof(*n));
+-	if (!n)
+-		abort();
++	if (!n) {
++		errno = ENOMEM;
++		return -1;
++	}
+ 
+ 	n->ifindex = ifsm->ifindex;
+ 	n->name = strdup(ll_index_to_name(ifsm->ifindex));
+@@ -161,8 +165,10 @@ static int get_nlmsg(struct nlmsghdr *m, void *arg)
+ 		return 0;
+ 
+ 	len -= NLMSG_LENGTH(sizeof(*ifi));
+-	if (len < 0)
++	if (len < 0) {
++		errno = EINVAL;
+ 		return -1;
++	}
+ 
+ 	if (!(ifi->ifi_flags&IFF_UP))
+ 		return 0;
+@@ -172,8 +178,10 @@ static int get_nlmsg(struct nlmsghdr *m, void *arg)
+ 		return 0;
+ 
+ 	n = malloc(sizeof(*n));
+-	if (!n)
+-		abort();
++	if (!n) {
++		errno = ENOMEM;
++		return -1;
++	}
+ 	n->ifindex = ifi->ifi_index;
+ 	n->name = strdup(RTA_DATA(tb[IFLA_IFNAME]));
+ 	memcpy(&n->ival, RTA_DATA(tb[IFLA_STATS]), sizeof(n->ival));
+@@ -204,7 +212,7 @@ static void load_info(void)
+ 		}
+ 
+ 		if (rtnl_dump_filter(&rth, get_nlmsg_extended, NULL) < 0) {
+-			fprintf(stderr, "Dump terminated\n");
++			perror("Dump terminated\n");
+ 			exit(1);
+ 		}
+ 	} else {
+@@ -214,7 +222,7 @@ static void load_info(void)
+ 		}
+ 
+ 		if (rtnl_dump_filter(&rth, get_nlmsg, NULL) < 0) {
+-			fprintf(stderr, "Dump terminated\n");
++			perror("Dump terminated\n");
+ 			exit(1);
+ 		}
+ 	}
+-- 
+2.30.2
 
 
