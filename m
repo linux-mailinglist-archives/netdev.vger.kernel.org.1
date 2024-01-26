@@ -1,79 +1,90 @@
-Return-Path: <netdev+bounces-66169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70CDE83DA97
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 14:16:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AEAC83DA9B
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 14:17:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A14A1F23B4E
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 13:16:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B1C51F2183A
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 13:17:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 369281B801;
-	Fri, 26 Jan 2024 13:16:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2139F1B7F9;
+	Fri, 26 Jan 2024 13:17:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4jIEQT8Y"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="NN5fv+lT"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A16F01B7F9;
-	Fri, 26 Jan 2024 13:15:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C9C41B7ED;
+	Fri, 26 Jan 2024 13:17:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706274960; cv=none; b=t/4uly3gUmErHY+3hePjs5nIasG4U3y10pQeOYQiyOXcMzuweG6FT9fdt1Y1u8KKCDO/qyS98mP8yHQGtZndC0q3SWdk02zpan9M2a42VKG9AiCsqVmahMP/6JWX3jNqSH9x6D3fMs1a85DrQ+6rf3f/sXiF+6jMRG+/d5bqmoE=
+	t=1706275060; cv=none; b=SQJKKbPVu1k1ASq5838wVwNHf68osZm1nCXTrAc04PAntCSDwvzejzqMKN9PMOKLH/vOMWO0sKlwvj+qqQpTHwz5QxY+fYImWKQX9jVAL/qNmI5xgzG+NJjA7+RnNOgrwZNz6HSDqTRBgAHeeHeF9e+A69khglgWO59xy1n3qnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706274960; c=relaxed/simple;
-	bh=FGY+lD+y60lvRkLTTesPfWuaivVUyv7pYO/2UAczccA=;
+	s=arc-20240116; t=1706275060; c=relaxed/simple;
+	bh=NlQuNlflVT/LmukzQGVyl9V41C+YgjahNb0jnYT9yrg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TH6WWTKh1+LVvazY9wPif5HvmyDRqAen9ypaY0uljRII0ysC4Wk9USRDsxTgN2i/xpny93V0lgTr5dfCjJ1soRVwU8vPIGe5U2sRAtGaJlVCdgcpZdmF11flVv0HX3Hi6KooH8kEbjMh6Gs8wkOAKaP17e/6wGfkfm9w0cTcNOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4jIEQT8Y; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=sa1rQ9QEEkUcdphbrFbf3hKfYyT0pmHIrrbrTq0OND/KGc6o8QiqbwCjLHF1pZ4JMLqjkjPxRHtuay/rlxX438WAIIY7zfLaqY9LZHrLzuUl3Vjv219MAQ6R3ci7me4d+5A/TcXIjsOT9hTeRPrkbu+bH4f6U/ZsBNJMdT+r5KM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=NN5fv+lT; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=50z3iua35YdHF3I4F9KF6AiAKfWmqunUUJx8CeyD42I=; b=4jIEQT8Y909onTWoy8B8fayYei
-	/1O+LlSWYYQgibr7K/vjXYCTR0szYmjhB/dEQOVyysqtaDy3RIY93Am++wBoL7QyCLHOWmfw9N62W
-	HcPVV/KiX3odBWaQkRjIx4YlAWtux1XRbQ7Lu+EDpMqbns4mpneZewmbWX7hv/ncYPlI=;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=dBeM8KjZ3a0EMDvqT9tXv1BytxLZNqA83/cMmPhrQCw=; b=NN
+	5fv+lTjbEXcXQKrRSLN0bAVAH8MBxuR5SeUM4YqvIt+kW/Zq7KPBPjZAtpXM3yZJBEsCTLMKdfPPe
+	iPJYz+3SpYQ4mtWEGbTrnZn54Dg4Q82F0U1Uey7bC3B5LCN+nMVsVfb4a/EOVP+qcxof4KKJ9U+/7
+	6Swl7FGffzQhbbg=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rTM3X-006AmJ-5i; Fri, 26 Jan 2024 14:15:39 +0100
-Date: Fri, 26 Jan 2024 14:15:39 +0100
+	id 1rTM5L-006Anh-QP; Fri, 26 Jan 2024 14:17:31 +0100
+Date: Fri, 26 Jan 2024 14:17:31 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Horatiu Vultur <horatiu.vultur@microchip.com>, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, richardcochran@gmail.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	UNGLinuxDriver@microchip.com,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Divya Koppera <divya.koppera@microchip.com>
-Subject: Re: [PATCH net-next] net: micrel: Fix set/get PHC time for lan8814
-Message-ID: <a962b46c-343d-411b-9152-514b35aa4f00@lunn.ch>
-References: <20240126073042.1845153-1-horatiu.vultur@microchip.com>
- <8da0a157-6a09-4d82-ad36-7428fdb27f9b@linux.dev>
+To: Michal =?utf-8?B?Vm9rw6HEjQ==?= <michal.vokac@ysoft.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Christian Lamparter <chunkeey@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, petr.benes@ysoft.com
+Subject: Re: [PATCH net v3] net: dsa: qca8k: fix illegal usage of GPIO
+Message-ID: <22d3d3fd-223b-4b33-9911-1dc4d6809075@lunn.ch>
+References: <1706266175-3408-1-git-send-email-michal.vokac@ysoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <8da0a157-6a09-4d82-ad36-7428fdb27f9b@linux.dev>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1706266175-3408-1-git-send-email-michal.vokac@ysoft.com>
 
-> > +	*sec |= lanphy_read_page_reg(phydev, 4, PTP_CLOCK_READ_SEC_MID);
+On Fri, Jan 26, 2024 at 11:49:35AM +0100, Michal Vokáč wrote:
+> When working with GPIO, its direction must be set either when the GPIO is
+> requested by gpiod_get*() or later on by one of the gpiod_direction_*()
+> functions. Neither of this is done here which results in undefined
+> behavior on some systems.
 > 
-> lanphy_read_page_reg returns int, but only 16 bits have meanings here.
-> Is it safe to assume that other 16 bits will be zeros always?
+> As the reset GPIO is used right after it is requested here, it makes sense
+> to configure it as GPIOD_OUT_HIGH right away. With that, the following
+> gpiod_set_value_cansleep(1) becomes redundant and can be safely
+> removed.
+> 
+> Fixes: a653f2f538f9 ("net: dsa: qca8k: introduce reset via gpio feature")
+> Signed-off-by: Michal Vokáč <michal.vokac@ysoft.com>
 
-Yes. __phy_read() should only return a negative error code, or a value
-which fits in a u16. If any of the top bits are set, its a bug in the
-MDIO driver which needs finding and fixing.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-     Andrew
+    Andrew
 
