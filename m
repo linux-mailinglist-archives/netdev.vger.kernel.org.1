@@ -1,151 +1,146 @@
-Return-Path: <netdev+bounces-66269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F92A83E2C5
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 20:42:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F02C83E2E8
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 20:49:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 053171F21C9B
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 19:42:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3439D284A07
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 19:49:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0628D225AC;
-	Fri, 26 Jan 2024 19:42:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D365E2233B;
+	Fri, 26 Jan 2024 19:49:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="EG2200uO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DPw8JiUn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 662D2224C2
-	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 19:42:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44A6322609;
+	Fri, 26 Jan 2024 19:49:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706298169; cv=none; b=LnPbS1VgjGPXy0nufRQGYTgtW12tzxLD1LUGljV+rgO3r3qiq8FFzcLo4EKa8V/+Ss5pNnk1t7zzasoH37mLIOaRfhTqXuU4BF+utmmJfw+BEHugZcoxKXMCFodPW/RLfD430njz+lrseMtE8hosXEMB8ke1EyMkKt+G5sYqzDA=
+	t=1706298571; cv=none; b=X0GKxkPM/KBy3KT8CtxU7Xph23DpsWLTCrpOkhfKYrFsBhfUAdnj2T0hWJXemjveDXQ00JfKkIDO2U3lGJdO0GjGznGAl9armeXFn9mUeF6xjPvwSbfWC4HaYIC6JAfy7xQFBZzCcAwoN9TCriGfPFxff/+DH/CApdL1hUKrq4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706298169; c=relaxed/simple;
-	bh=l+Dvtec0Umm6fy+Pe70Xk2fhp3AdoGWxoMdBqZkcrNo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H+1fE46WKQhq6Ha0cDuLCtsgRhCNyKkyyowy7iLGlWHLq0I0Cjzu/Dr817eo5rudeo3Kku0PdfvgGuqW9bHkWCDvEl1rOw9orR7LUkn/z1z7/ThXaAxaUZe5NuMa3hdc5MALSYgYpn2x3f0DWDZ4Wp2HykyBKz6iGRwd/nDmrRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=EG2200uO; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1d7858a469aso5649035ad.2
-        for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 11:42:48 -0800 (PST)
+	s=arc-20240116; t=1706298571; c=relaxed/simple;
+	bh=Wuer9su/jiFsi5sYQQisMPWnekUj/IpB602cKYYl9qs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tjvJKnll9JrBlJ2u1e+wlWEvM+j7Jw0D6TAtqDamJLKGUoNvRKQBTawIO/0O2V4iTmGGlutNdrwwM3CBbZxkKbc1jrn63Ou/FUvKgwfCj0UIDlwcYIrvjfjP1eXyM8rDp8MSsDzBMS0iaxRjc/s9npul+UEef+iTx2k1E1vaDVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DPw8JiUn; arc=none smtp.client-ip=209.85.219.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-dc22ade26d8so663141276.1;
+        Fri, 26 Jan 2024 11:49:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1706298168; x=1706902968; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=5DMkPLX96PHJXiX9+65dx4WF+ILk2GGzs/YrGWKt/0o=;
-        b=EG2200uO/gY1IdvrLAQic9oA8GXB7x+gZgLh+zPWJzQF0BHx0ztyeEaq6ARglNg8Ay
-         XXogGsCfh+mWSuv5K1l8nnGjxeYbZC1tNy0Mz5evCBZQu4TSVlP7W5i8k/6dbCoWW3JC
-         S2a0LExse0eDY7nxKfFayJBR5vJLC+kNVdGpA=
+        d=gmail.com; s=20230601; t=1706298569; x=1706903369; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q3iGNpQrB4LeEkd0Y+eOnO8OG2sepjM86FGBNNoLgBw=;
+        b=DPw8JiUnEoeYDVvTJFCrqCDhz6P4j9LKKAsDNCcutGe5Kzf5BmE862Yxi3Dh4Qmf0D
+         Lj5kxtCUBY7CNupQo3a3zesxEuZEpxeTz6vaBCSyOZlmUXUF0QRLTQaGE4T/VwyL9SxS
+         cMyI9vjio/OVe9G60BAffILTmVyvS1O0nLCXnSrNvI8nH6YVztwQC3GMvU632Qs7pNU5
+         Mo4G1iuWF/cnQQ4JZUYdq3IF/v3V/RKu6hBAEql9OYmiJpOzFtgCNd0MkC/UB5Fl33CJ
+         h62ApoW4TBQ6vwQ4WjWj9fbT+QOj5g/KSXuq6mdvYbW43B9qTdSPKZWmfZRQaYDpM8an
+         jzog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706298168; x=1706902968;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5DMkPLX96PHJXiX9+65dx4WF+ILk2GGzs/YrGWKt/0o=;
-        b=oVRmkBAXdcSh4GbUQbZyRjoVeXwNmDJzVfHfXjaUrhzCiPtSw4cv8uJwEJaiTAfwso
-         VqDi+IX+TEFOvizUPEQ7KOdii/T5IOFS9r3+q9JKRraIS97rovUzyAmcph7kkS5tPecU
-         h4/Dmr5zNuBrxH4i0xQWU3B5IHcXmn6DyIJ8PQXB4F/fvsAGkOCSkoNA4+nAZO6Bb5PC
-         6rm0o3MOLF6ffJGXGy2ZaRbNucD5Im4bt93ReeyKeN1PKSHeWh2IApyORDVLcn6XXURS
-         c+WtYaHHsk6VvQWUF9XGm+MDGPBwNKWy4V2WuWAAhsHpfdG9yOF6WKGg+Wl5BgwX4bCF
-         Ea5g==
-X-Gm-Message-State: AOJu0Yx3BY6ybecQspYDp2wVKSIZO+Dte0dEhy0C7wJrYHIWHfQGdBVj
-	ReT1Qep5uKYdJe255hLWs0lCelCr0T4bxQpUy0FdpRFuQRFhRqwxvbZDx3YleQ==
-X-Google-Smtp-Source: AGHT+IFHN4j5JWPgqLRncyxuWDXfih88qvcwRs7KGjN10AwjsNYqiHieHRDFcg8FReSFNd6bMel2XQ==
-X-Received: by 2002:a17:902:a585:b0:1d7:1c88:71f6 with SMTP id az5-20020a170902a58500b001d71c8871f6mr246392plb.139.1706298167739;
-        Fri, 26 Jan 2024 11:42:47 -0800 (PST)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id kn11-20020a170903078b00b001d6f04f2b5dsm1292497plb.30.2024.01.26.11.42.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jan 2024 11:42:47 -0800 (PST)
-Date: Fri, 26 Jan 2024 11:42:46 -0800
-From: Kees Cook <keescook@chromium.org>
-To: Eugenio Perez Martin <eperezma@redhat.com>
-Cc: linux-hardening@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 32/82] vringh: Refactor intentional wrap-around
- calculation
-Message-ID: <202401261142.C23C2EC9@keescook>
-References: <20240122235208.work.748-kees@kernel.org>
- <20240123002814.1396804-32-keescook@chromium.org>
- <CAJaqyWdGAb088DxKq4ELBeir=PGrqkRuQ0FYkTBwKkfJa4SWbQ@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1706298569; x=1706903369;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Q3iGNpQrB4LeEkd0Y+eOnO8OG2sepjM86FGBNNoLgBw=;
+        b=PR+RTCj1P9d7qxRUcTXwS1OF15etbxzlin4nejvcbnEYxPHz5vRgMWWK91KgpHBgms
+         o1acABw1Dd8LD4nU3WkmmSF3sujaZRAFxgn98TRDU3Zy8OW9t66h+U4rMAUZuFJlLQ15
+         XE7akyDATmyEpGuWUoT9elh8SWENe4TZseISCzbIxqVHE15vuzcEMhrc7NREINadhvDG
+         N5eXf45g1Hh94qbwHTJlVrYEtXpb/aqMETeBbiqa41PeoXiPt6+BEZhP66dgDoAewbyU
+         8nB8L1KYHs1s+rq6qmmsNYxG+hixTxGEXW6olL5GgC/qxSYwB539OycjxcNLPC35XZMB
+         FqLA==
+X-Gm-Message-State: AOJu0Ywz99k6GlaneWqjCygQGBbRLky9wdiTmf0RLJkoQV0H9u+TF5Ac
+	Hq76TvuksIbQXBWuAYqTy8Bjd3Ufqvqdc6pyIITUnNoirLNqS+urCxqq9CEpT+EEgS1ECHZbDWh
+	FdDFVNO2tyu8shZbEjLtlfAjPXsg=
+X-Google-Smtp-Source: AGHT+IHlg4G2/exAQDXNcyzMTeRXf+qek0XjfiGpyFHfZtMMbQj4c6ipRWY3ryT/rlixIdgxmwDjgxcN9EtjG0+KCdw=
+X-Received: by 2002:a05:6902:220e:b0:dc2:234d:214d with SMTP id
+ dm14-20020a056902220e00b00dc2234d214dmr450594ybb.40.1706298568024; Fri, 26
+ Jan 2024 11:49:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJaqyWdGAb088DxKq4ELBeir=PGrqkRuQ0FYkTBwKkfJa4SWbQ@mail.gmail.com>
+References: <cover.1705432850.git.amery.hung@bytedance.com>
+ <52a0e08033292a88865aab37b0b3bd294b93e13c.1705432850.git.amery.hung@bytedance.com>
+ <1f48019a-fb72-324c-7626-ba5ccb9307b0@iogearbox.net>
+In-Reply-To: <1f48019a-fb72-324c-7626-ba5ccb9307b0@iogearbox.net>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Fri, 26 Jan 2024 11:49:17 -0800
+Message-ID: <CAMB2axPPxq5yF21e-V-JJBoZO4C+EKABCcM2GnEsVZLSecNurw@mail.gmail.com>
+Subject: Re: [RFC PATCH v7 7/8] samples/bpf: Add an example of bpf fq qdisc
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, yangpeihao@sjtu.edu.cn, 
+	toke@redhat.com, jhs@mojatatu.com, jiri@resnulli.us, sdf@google.com, 
+	xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 26, 2024 at 08:31:04PM +0100, Eugenio Perez Martin wrote:
-> On Tue, Jan 23, 2024 at 2:42 AM Kees Cook <keescook@chromium.org> wrote:
+On Wed, Jan 24, 2024 at 2:29=E2=80=AFAM Daniel Borkmann <daniel@iogearbox.n=
+et> wrote:
+>
+> On 1/17/24 10:56 PM, Amery Hung wrote:
+> > tc_sch_fq.bpf.c
+> > A simple bpf fair queueing (fq) qdisc that gives each flow a euqal chan=
+ce
+> > to transmit data. The qdisc respects the timestamp in a skb set by an
+> > clsact rate limiter. It can also inform the rate limiter about packet d=
+rop
+> > when enabled to adjust timestamps. The implementation does not prevent =
+hash
+> > collision of flows nor does it recycle flows.
 > >
-> > In an effort to separate intentional arithmetic wrap-around from
-> > unexpected wrap-around, we need to refactor places that depend on this
-> > kind of math. One of the most common code patterns of this is:
+> > tc_sch_fq.c
+> > A user space program to load and attach the eBPF-based fq qdisc, which
+> > by default add the bpf fq to the loopback device, but can also add to o=
+ther
+> > dev and class with '-d' and '-p' options.
 > >
-> >         VAR + value < VAR
-> >
-> > Notably, this is considered "undefined behavior" for signed and pointer
-> > types, which the kernel works around by using the -fno-strict-overflow
-> > option in the build[1] (which used to just be -fwrapv). Regardless, we
-> > want to get the kernel source to the position where we can meaningfully
-> > instrument arithmetic wrap-around conditions and catch them when they
-> > are unexpected, regardless of whether they are signed[2], unsigned[3],
-> > or pointer[4] types.
-> >
-> > Refactor open-coded unsigned wrap-around addition test to use
-> > check_add_overflow(), retaining the result for later usage (which removes
-> > the redundant open-coded addition). This paves the way to enabling the
-> > unsigned wrap-around sanitizer[2] in the future.
-> >
-> > Link: https://git.kernel.org/linus/68df3755e383e6fecf2354a67b08f92f18536594 [1]
-> > Link: https://github.com/KSPP/linux/issues/26 [2]
-> > Link: https://github.com/KSPP/linux/issues/27 [3]
-> > Link: https://github.com/KSPP/linux/issues/344 [4]
-> > Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> > Cc: Jason Wang <jasowang@redhat.com>
-> > Cc: kvm@vger.kernel.org
-> > Cc: virtualization@lists.linux.dev
-> > Cc: netdev@vger.kernel.org
-> > Signed-off-by: Kees Cook <keescook@chromium.org>
+> > To test the bpf fq qdisc with the EDT rate limiter:
+> > $ tc qdisc add dev lo clsact
+> > $ tc filter add dev lo egress bpf obj tc_clsact_edt.bpf.o sec classifie=
+r
+> > $ ./tc_sch_fq -s
+>
+> Would be nice if you also include a performance comparison (did you do
+> production tests with it?) with side-by-side to native fq and if you see
+> a delta elaborate on what would be needed to address it.
+
+I did a simple test by adding a fq to the loopback device and then
+sending a single stream traffic via iperf. The bpf implementation of
+fq achieves 90% throughput compared with the native one.
+
+I think the overhead mainly comes from allocating bpf objects (struct
+skb_node) to store skb kptrs. This part can be removed if bpf
+list/rbtree recognizes skb->list/rbnode. On the kfunc implementation
+side, I think we can do it by saving struct bpf_rb_node_kern into
+skb->rb_node and skb->cb. I haven't looked into the verifier to see
+what needs to be done.
+
+I will move the test cases from samples to selftests and include more
+testing in the next patchset.
+
+>
+> > Signed-off-by: Amery Hung <amery.hung@bytedance.com>
 > > ---
-> >  drivers/vhost/vringh.c | 8 +++++---
-> >  1 file changed, 5 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-> > index 7b8fd977f71c..07442f0a52bd 100644
-> > --- a/drivers/vhost/vringh.c
-> > +++ b/drivers/vhost/vringh.c
-> > @@ -145,6 +145,8 @@ static inline bool range_check(struct vringh *vrh, u64 addr, size_t *len,
-> >                                bool (*getrange)(struct vringh *,
-> >                                                 u64, struct vringh_range *))
-> >  {
-> > +       u64 sum;
-> 
-> I understand this is part of a bulk change so little time to think
-> about names :). But what about "end" or similar?
-> 
-> Either way,
-> Acked-by: Eugenio Pérez <eperezma@redhat.com>
-
-Thanks! Yeah, you are not alone in suggesting "end" in a several of
-these patches. :)
-
--Kees
-
--- 
-Kees Cook
+> >   samples/bpf/Makefile            |   8 +-
+> >   samples/bpf/bpf_experimental.h  | 134 +++++++
+> >   samples/bpf/tc_clsact_edt.bpf.c | 103 +++++
+> >   samples/bpf/tc_sch_fq.bpf.c     | 666 +++++++++++++++++++++++++++++++=
++
+> >   samples/bpf/tc_sch_fq.c         | 321 +++++++++++++++
+> >   5 files changed, 1231 insertions(+), 1 deletion(-)
+> >   create mode 100644 samples/bpf/bpf_experimental.h
+> >   create mode 100644 samples/bpf/tc_clsact_edt.bpf.c
+> >   create mode 100644 samples/bpf/tc_sch_fq.bpf.c
+> >   create mode 100644 samples/bpf/tc_sch_fq.c
 
