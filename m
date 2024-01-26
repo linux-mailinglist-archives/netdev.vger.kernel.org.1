@@ -1,84 +1,143 @@
-Return-Path: <netdev+bounces-66189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55F9783DD71
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 16:27:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6997F83DD8B
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 16:32:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ECCB6B287D2
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 15:27:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 973421C20E3D
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 15:32:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0905D1D539;
-	Fri, 26 Jan 2024 15:26:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBA341CF99;
+	Fri, 26 Jan 2024 15:32:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UM5SEB+u"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PTZLcy5+"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C32B1D522
-	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 15:26:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 400331B970
+	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 15:32:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706282772; cv=none; b=s8UJ98UJNa2MDRJnJxptn5Iy+1qRyL63yJrVCHtB21UyFzRZQnzDV2iel1mPx3DaGQYl5vrZaP0/rPfe3uSfdfa+NZ//gZQRaGyTDrgBErBeFnUdCoXxWOH/wkY0yw4MMRzhesKTzfqtR3Vc4QBybRLDQvfNXD5CKxc/3rkVs9Q=
+	t=1706283169; cv=none; b=ZH/NJhNHNN6qb5BQLiZL+z0ll/bnnDKPKGTDVs+X/tv9LSgiII9URCBBAzQ8bjyGN93W4D1aw1fCBaOytDagCAfeadRg/ZWfWYBf5dN8ItoeRSYO3OVB2ergxTcyaGC3tfnMWjYfCUkxIP38qRfHy9p6WSxeaIKaNXOS9WNV6ig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706282772; c=relaxed/simple;
-	bh=9Qc4d5sEmbHsESq4fFjTmGiC96Oi9yFdgok9xRrMQeo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qCdgs3kJhCsOSkua3LX5TU8cjRXDonWCI3Ol+j/oT+dtPcrULqmdEEtVTnQICar51oLovWeZYP2Q6M+bqYkfiGR0gldIr3ZLL6zuTpHkNlhFAru6PdBAooFS9KeaNYUrE3Wz2Zib5P6l2D73+kAYOqtj2f2f5D3jq4ImjC1hXqM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UM5SEB+u; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <c554f7e6-7ed9-4298-b9f3-3f49a331fd07@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706282769;
+	s=arc-20240116; t=1706283169; c=relaxed/simple;
+	bh=FxtrTLuAtobU9c5Uuzr2k+Bt7kukoAuCqMt/p1GBekw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eKXJNQrQJLb1nBZ8tdxs6lrM/53DKHhZ3En7skZzTJXROsPpocZMyoIn9B0dMtloZ5mHyEJAu7N3SfU3HhnCs/nvxBjOEzVkubAeQpR2Lo1AjNp2aI3XlX+lwpJR7CZXbeon1HttggPA8V8A9Ka2QDV3mwE5tB0CJQZKzJILU7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PTZLcy5+; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706283166;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=b/XtWJSlEPajpPJBC99SxXmFSOIVYebBbltEyKIScQo=;
-	b=UM5SEB+uF0i9MwWGor56/zRWlvXexakJGaSGya26mfWheRo0UKehMh77jBib4gCEtOMBpj
-	2edm+1ll+UjjnLXdmi+8AUYzUWZvXoY615OJBG0dxzhvnzpRn2Ql0tw6HJCOSo5/TDz6wK
-	3q8pJutBcghviqdvk+XqGOV536ctwB0=
-Date: Fri, 26 Jan 2024 15:26:00 +0000
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=jlScfBpbgS69/8IaB6mNjO+RqTpFY3VAGajIs+lucxw=;
+	b=PTZLcy5+fZ0wWU9Gk438two7yRymKDNiqapYvhMzkq94Wjna6EFrDoS2r9MSXD5Wv7YykL
+	ytvpV+/If6vFFt6Y7JFwcWzVEsSBu3stjlSDzbd5GPxMU5yj7FUa+J2NsPEP4tjumMCKWJ
+	B6OhvsDInKrDyRd8B/gNZiO91uFQA0A=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-582-u7TQBo5bOQupqDM2VCqIUw-1; Fri, 26 Jan 2024 10:32:43 -0500
+X-MC-Unique: u7TQBo5bOQupqDM2VCqIUw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C4D8488FC31;
+	Fri, 26 Jan 2024 15:32:42 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.224.112])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 9EE652166B33;
+	Fri, 26 Jan 2024 15:32:40 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Xin Long <lucien.xin@gmail.com>,
+	Florian Westphal <fw@strlen.de>,
+	Aaron Conole <aconole@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net] selftests: net: add missing config for big tcp tests
+Date: Fri, 26 Jan 2024 16:32:36 +0100
+Message-ID: <21630ecea872fea13f071342ac64ef52a991a9b5.1706282943.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next] net: micrel: Fix set/get PHC time for lan8814
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Horatiu Vultur <horatiu.vultur@microchip.com>, hkallweit1@gmail.com,
- linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, richardcochran@gmail.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- UNGLinuxDriver@microchip.com,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Divya Koppera <divya.koppera@microchip.com>
-References: <20240126073042.1845153-1-horatiu.vultur@microchip.com>
- <8da0a157-6a09-4d82-ad36-7428fdb27f9b@linux.dev>
- <a962b46c-343d-411b-9152-514b35aa4f00@lunn.ch>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <a962b46c-343d-411b-9152-514b35aa4f00@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-On 26/01/2024 13:15, Andrew Lunn wrote:
->>> +	*sec |= lanphy_read_page_reg(phydev, 4, PTP_CLOCK_READ_SEC_MID);
->>
->> lanphy_read_page_reg returns int, but only 16 bits have meanings here.
->> Is it safe to assume that other 16 bits will be zeros always?
-> 
-> Yes. __phy_read() should only return a negative error code, or a value
-> which fits in a u16. If any of the top bits are set, its a bug in the
-> MDIO driver which needs finding and fixing.
+The big_tcp test-case requires a few kernel knobs currently
+not specified in the net selftests config, causing the
+following failure:
 
-Got it. Thanks Andrew
+  # selftests: net: big_tcp.sh
+  # Error: Failed to load TC action module.
+  # We have an error talking to the kernel
+...
+  # Testing for BIG TCP:
+  # CLI GSO | GW GRO | GW GSO | SER GRO
+  # ./big_tcp.sh: line 107: test: !=: unary operator expected
+...
+  # on        on       on       on      : [FAIL_on_link1]
+
+Add the missing configs
+
+Fixes: 6bb382bcf742 ("selftests: add a selftest for big tcp")
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+---
+ tools/testing/selftests/net/config | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/tools/testing/selftests/net/config b/tools/testing/selftests/net/config
+index b511f43cd197..c0e8482f82d3 100644
+--- a/tools/testing/selftests/net/config
++++ b/tools/testing/selftests/net/config
+@@ -29,6 +29,7 @@ CONFIG_NF_NAT=m
+ CONFIG_IP6_NF_IPTABLES=m
+ CONFIG_IP_NF_IPTABLES=m
+ CONFIG_IP6_NF_NAT=m
++CONFIG_IP6_NF_RAW=m
+ CONFIG_IP_NF_NAT=m
+ CONFIG_IPV6_GRE=m
+ CONFIG_IPV6_SEG6_LWTUNNEL=y
+@@ -41,9 +42,11 @@ CONFIG_MACVLAN=y
+ CONFIG_MACVTAP=y
+ CONFIG_MPLS=y
+ CONFIG_MPTCP=y
++CONFIG_IP_NF_RAW=m
+ CONFIG_NF_TABLES=m
+ CONFIG_NF_TABLES_IPV6=y
+ CONFIG_NF_TABLES_IPV4=y
++CONFIG_NF_FLOW_TABLE=m
+ CONFIG_NFT_NAT=m
+ CONFIG_NET_ACT_GACT=m
+ CONFIG_NET_CLS_BASIC=m
+@@ -71,6 +74,7 @@ CONFIG_NET_CLS_FLOWER=m
+ CONFIG_NET_CLS_BPF=m
+ CONFIG_NET_ACT_TUNNEL_KEY=m
+ CONFIG_NET_ACT_MIRRED=m
++CONFIG_NET_ACT_CT=m
+ CONFIG_BAREUDP=m
+ CONFIG_IPV6_IOAM6_LWTUNNEL=y
+ CONFIG_CRYPTO_SM4_GENERIC=y
+@@ -79,5 +83,6 @@ CONFIG_TUN=y
+ CONFIG_VXLAN=m
+ CONFIG_IP_SCTP=m
+ CONFIG_NETFILTER_XT_MATCH_POLICY=m
++CONFIG_NETFILTER_XT_MATCH_LENGTH=m
+ CONFIG_CRYPTO_ARIA=y
+ CONFIG_XFRM_INTERFACE=m
+-- 
+2.43.0
 
 
