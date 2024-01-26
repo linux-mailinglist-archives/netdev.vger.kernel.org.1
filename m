@@ -1,82 +1,72 @@
-Return-Path: <netdev+bounces-66106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D57F583D418
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 07:01:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F28AF83D419
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 07:02:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 666CEB24381
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 06:01:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9AC4C1F25600
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 06:02:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8AC5C128;
-	Fri, 26 Jan 2024 06:01:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FEsZSgps"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23D53C133;
+	Fri, 26 Jan 2024 06:02:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B497AD2FF;
-	Fri, 26 Jan 2024 06:01:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B478FC128;
+	Fri, 26 Jan 2024 06:02:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706248877; cv=none; b=Ji3R3Tkyu9u7PHS2P8LXXIE+sVDQx0fLSvG/H5Hd6oID6oBdg9g8M/Y/Jkh7piRAuwW3bpWKEfOf4wLLqIMqEos43/dP6ryBapqGzDiDk8liZgJhg/0rpxniiUMMeqkXgLqFTRfU980zIMWn+KF0yzNLBPBAl9eI1nUoU9H1o0Q=
+	t=1706248969; cv=none; b=g3CmNa8KBLqFQFZ/NBxxyUaKgmQd+aFwo2VN5ycOcFQJADM5MPFU6L/jnz3abxStR9OF3OHN405B6Wh8OfGMSIwIfwPu/QL0EttSveUeHfS4SiPvWvtOI5FcOp+MO0IpCCS2LZXgyfHfsf4k9IfqPtRhk8S/A+gokK4THCNVS+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706248877; c=relaxed/simple;
-	bh=WvRQN6apuTFdmllfWsGSib4xTmlTxxmL797lDKQp9ys=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=tTYvNIU2RzcTiO/YQEYPOaSqLZ/L3MqEM8N3KQM9Jb6MW08Fybb9/SYJ0LbrIJGomxb1rM3NnNwudepiIzsuTe74cEX+OzMftydfcctGw1xCEVOe7BWfiKPaCSlRZVHkueuqT/i/ZGNRi9GKPNZNKuWdA4jrXV018wj4jY3Uh5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FEsZSgps; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2194CC433F1;
-	Fri, 26 Jan 2024 06:01:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706248877;
-	bh=WvRQN6apuTFdmllfWsGSib4xTmlTxxmL797lDKQp9ys=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=FEsZSgpss8BlqvPcClEtcMUWS6iCG9AEJh0B/YOV95p0qSvhINOWoRMyHKTQygpm7
-	 zAqn+iQf9WyJfd9HLa3AD41A/cyyJTzSkHKcxB74MOH8BG+4p7CP4KNf0sTfatUzBU
-	 jie+u7K0SjvEWtGxIs2KLM33wxh/aANjkVl8vJPkMPYFR0SIkJbtRnX5vpM3jRzjk6
-	 5rklBIrsjGgPNShactkUgSuQFlbxM/d1yKhjQfvlnqyQZd7SE4utYcuKlaxig50dM9
-	 Wd+6R7Dsnf/DGiBEFUonCOI7Jh7cI3pee2JpkYmfLJhJr7e82J7JAbhvrsvMFHxaqG
-	 kTuQSzybtUPHg==
-From: Kalle Valo <kvalo@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Arend van Spriel <arend.vanspriel@broadcom.com>,
-  netdev@vger.kernel.org,  linux-wireless@vger.kernel.org
-Subject: Re: pull-request: wireless-next-2024-01-25
-References: <20240125104030.B6CA6C433C7@smtp.kernel.org>
-	<20240125165128.7e43a1f3@kernel.org>
-Date: Fri, 26 Jan 2024 08:01:13 +0200
-In-Reply-To: <20240125165128.7e43a1f3@kernel.org> (Jakub Kicinski's message of
-	"Thu, 25 Jan 2024 16:51:28 -0800")
-Message-ID: <87r0i4zl92.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1706248969; c=relaxed/simple;
+	bh=IL9oMDaClY0uotAhvsBw9ZIFBnxI1w+GXSWMxgTnCS4=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=BUUAkkzkcC4I8ISzLMc8Ixia3JSXfCWD+9IgEhlYAT9wlLzqkflDvqEpZ9azHWCOhDfvwRl/GSnxN2pVijKe+ictepyUhzVWqsedI/IEL4HdSX4gXSi/aavRfYZX83buCyMz962uDnbAvuJwmgDndQGm3zqbfed44qY3AmxZYkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; arc=none smtp.client-ip=80.237.130.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+	id 1rTFIZ-0007tI-Uv; Fri, 26 Jan 2024 07:02:44 +0100
+Message-ID: <3bfb5c07-664e-49cd-a470-635a36bcf806@leemhuis.info>
+Date: Fri, 26 Jan 2024 07:02:43 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+From: Thorsten Leemhuis <regressions@leemhuis.info>
+Subject: Consider picking up "tpm: Enable hwrng only for Pluton on AMD CPUs"
+ rather sooner than later
+To: "stable@vger.kernel.org" <stable@vger.kernel.org>,
+ Greg KH <gregkh@linuxfoundation.org>
+Cc: Sasha Levin <sashal@kernel.org>,
+ Linux kernel regressions list <regressions@lists.linux.dev>,
+ LKML <linux-kernel@vger.kernel.org>, netdev <netdev@vger.kernel.org>,
+ Kalle Valo <kvalo@kernel.org>, Benjamin Berg <benjamin.berg@intel.com>
+Content-Language: en-US, de-DE
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1706248966;a7456984;
+X-HE-SMSGID: 1rTFIZ-0007tI-Uv
 
-Jakub Kicinski <kuba@kernel.org> writes:
+Hi stable team, JFYI, yesterdays mainline commit 556857aa1d0855 ("wifi:
+ath11k: rely on mac80211 debugfs handling for vif") from Benjamin
+contains no stable tag, but a Fixes: tag for a 6.7 commit. So it guess
+you will pick it up anyway. Might be worth picking up rather sooner than
+later, as it fixes a regression that according to Kalle causes ath11k to
+crash during suspend:
+https://lore.kernel.org/all/874jfjiolh.fsf@kernel.org/
+https://bugzilla.kernel.org/show_bug.cgi?id=218364
 
-> On Thu, 25 Jan 2024 10:40:30 +0000 (UTC) Kalle Valo wrote:
->> The first "new features" pull request for v6.9. We have only driver
->> changes this time and most of them are for Realtek drivers. Really
->> nice to see activity in Broadcom drivers again.
->
-> minor thing for a follow up:
->
-> drivers/net/wireless/broadcom/brcm80211/brcmfmac/fwil.c:432:49:
-> warning: no newline at end of file
-
-Oh, sorry about that. Any tips how to detect this?
-
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+--
+Everything you wanna know about Linux kernel regression tracking:
+https://linux-regtracking.leemhuis.info/about/#tldr
+That page also explains what to do if mails like this annoy you.
 
