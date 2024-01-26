@@ -1,94 +1,71 @@
-Return-Path: <netdev+bounces-66042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBF0B83D138
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 01:04:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D253F83D13B
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 01:04:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A7631C21B4E
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 00:04:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1099A1C244A2
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 00:04:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E97D17FD;
-	Fri, 26 Jan 2024 00:00:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="erRpv4BS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3219E63A1;
+	Fri, 26 Jan 2024 00:01:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25F348F44;
-	Fri, 26 Jan 2024 00:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF17317E9;
+	Fri, 26 Jan 2024 00:01:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706227228; cv=none; b=g0CaccTYNTXUDBnEti6PZBi3AqO07N1qPdGPvZLm7xZRWuulHKX886y7HkkTuToZ+sfTwR4NbeRjNXLqJl4GljRGlLNYGtvgq3127uf3CMuiuNjz8VwRhK+dEgai7vwLBnBW5OYiMj5M8gnRFKRRdl3wVHoS8l9jWWMMn0wcnME=
+	t=1706227277; cv=none; b=EcMpxD8k2m5jeChx32NiG0A+rnLNYKYLrwxGSaV5m4xMGtPUr/bDO4z6eXluxC9Si/K5IOEwHo7g2RpSfZk5HiTPChl4s244Y/rYbUg+SWuVSLnJI0ih/G0UWYY/auo3DjpdnDeLlEh6kkSdTZtjuFrH1hEDgnLb/is4Xh4dIeg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706227228; c=relaxed/simple;
-	bh=xL9/ASUgp8AWn/fjHqtBmmnVIVRdMxEudz4VhTRhTSc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JdFt+p5UOdqA/q3unkRSnXEDp1N2zOCi43jgZL1+xpZv55e1kZP8B99FF8aTCynwMkDUFmhjsPXVWBrIH7twLASjcKxuTWsdYzI701GCqEuSql3PSEJXUSgTGp/JALw8ruoyy5Z5Zy+7Xwbm1J0HxSX6pERe9KOwh3bTPGdizfs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=erRpv4BS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 87078C43330;
-	Fri, 26 Jan 2024 00:00:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706227227;
-	bh=xL9/ASUgp8AWn/fjHqtBmmnVIVRdMxEudz4VhTRhTSc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=erRpv4BSLpOsNgIiHG9guU4oZanZWr9+q+VPIqwBSXY+xQ91eKAughUN1P/vcm3Bg
-	 oiL6N2zea997hpgjTnzpnXfFNBPcZ3dYW7c3SFt6ARB/zW20OWcDubRWTsgaJIMe7l
-	 XJOSZXP5S7G88FJVM2I4CU0fuPiYDLNSXxA57qUUFofP8ltkaXWaKCQaOfAddZ+uNY
-	 mqOyghIhDmY82smZ2UMksDQwkCeJWhrdLx0638Kn0QN91Ko++yL+8ukdgfyr/3l1H4
-	 pUZWbDbGoHVpzNO2LcntcY9gqGxY61tulMs5Zi409jS/M1/HGWvigz5JwDLp+oHNVV
-	 qQrggWBXjsSyw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6D90FD8C962;
-	Fri, 26 Jan 2024 00:00:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1706227277; c=relaxed/simple;
+	bh=kz5N6UcXZ8zTFkw6qYL1rBe1E5Mmjq+n97THucvoBdg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tkSHHRxpFk5Hy/QJl1HSUdS5bSd3IHwy4xHgKqCi7H/LBstopvoEFr7sn8IpvuBeOCEKPkv6UDTDZ9qhKZ3ToCjc4KlDkFTzjKJ3O+9OQExZ2AciZ7MG9ZdD/nyO3/ewJnB3mLmb1JTRwdYIBBTMjtPx82+6jdeS9CzT041wmpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1rT9eb-0003bT-Py; Fri, 26 Jan 2024 01:01:05 +0100
+Date: Fri, 26 Jan 2024 01:01:05 +0100
+From: Florian Westphal <fw@strlen.de>
+To: Xin Long <lucien.xin@gmail.com>
+Cc: network dev <netdev@vger.kernel.org>, netfilter-devel@vger.kernel.org,
+	linux-sctp@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Subject: Re: [PATCH nf] netfilter: check SCTP_CID_SHUTDOWN_ACK for vtag
+ setting in sctp_new
+Message-ID: <20240126000105.GC29056@breakpoint.cc>
+References: <28d65b0749b8c1a8ae369eec6021248659ba810c.1706221786.git.lucien.xin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] selftests: tcp_ao: add a config file
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170622722744.27026.5244575719322762458.git-patchwork-notify@kernel.org>
-Date: Fri, 26 Jan 2024 00:00:27 +0000
-References: <20240124192550.1865743-1-kuba@kernel.org>
-In-Reply-To: <20240124192550.1865743-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, shuah@kernel.org, 0x7f454c46@gmail.com,
- linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <28d65b0749b8c1a8ae369eec6021248659ba810c.1706221786.git.lucien.xin@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 24 Jan 2024 11:25:50 -0800 you wrote:
-> Still a bit unclear whether each directory should have its own
-> config file, but assuming they should lets add one for tcp_ao.
+Xin Long <lucien.xin@gmail.com> wrote:
+> The annotation says in sctp_new(): "If it is a shutdown ack OOTB packet, we
+> expect a return shutdown complete, otherwise an ABORT Sec 8.4 (5) and (8)".
+> However, it does not check SCTP_CID_SHUTDOWN_ACK before setting vtag[REPLY]
+> in the conntrack entry(ct).
 > 
-> The following tests still fail with this config in place:
->  - rst_ipv4,
->  - rst_ipv6,
->  - bench-lookups_ipv6.
-> other 21 pass.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net] selftests: tcp_ao: add a config file
-    https://git.kernel.org/netdev/net/c/b64787840080
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+> Because of that, if the ct in Router disappears for some reason in [1]
+> with the packet sequence like below:
+ 
+Seems to be day 0 bug, so
+Fixes: 9fb9cbb1082d ("[NETFILTER]: Add nf_conntrack subsystem.")
 
