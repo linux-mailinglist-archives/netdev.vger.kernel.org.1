@@ -1,118 +1,79 @@
-Return-Path: <netdev+bounces-66165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 436CF83DA83
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 14:05:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70CDE83DA97
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 14:16:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DB6E1B2B0DC
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 13:05:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A14A1F23B4E
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 13:16:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D83C1B7F3;
-	Fri, 26 Jan 2024 13:05:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 369281B801;
+	Fri, 26 Jan 2024 13:16:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="3Uhbhcg7";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="12qfUbjT"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4jIEQT8Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C14CE1B599;
-	Fri, 26 Jan 2024 13:05:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A16F01B7F9;
+	Fri, 26 Jan 2024 13:15:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706274326; cv=none; b=ZHJ89n3IeIP204bM/0YCA4/cHJnVXAP2c1TdtvaY/sHzttdBk1QAWSNIPhVLt+12k2jqh9APv5Ycknjxtc5iPhYNLKiM7qXqF8uWBUc5NQCo7fL5sJ/yFOUhn9/OSJsUUy5ogwQzB0py0s2pI9he2fI+C3ZOauLsnQbzqB7G1tM=
+	t=1706274960; cv=none; b=t/4uly3gUmErHY+3hePjs5nIasG4U3y10pQeOYQiyOXcMzuweG6FT9fdt1Y1u8KKCDO/qyS98mP8yHQGtZndC0q3SWdk02zpan9M2a42VKG9AiCsqVmahMP/6JWX3jNqSH9x6D3fMs1a85DrQ+6rf3f/sXiF+6jMRG+/d5bqmoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706274326; c=relaxed/simple;
-	bh=Nr8QKXIT9eS/FyyD/NH8+PF7e0exuuXWzw58fkOb0Tw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=LfS0P1aPOmAL7MRDtlwww/RHMDOl/kZ96X07slg/3cgYN8FmIQ9w6SUsqyfoFw82O5aJm6z5Lwq5HMdGtDkw0wbTx3Y8SRTi4NXQ9m84SlpcqXjTme7qlQ9B1R/9VWLt6tqJhtEPGqCNOhC0+GPx0frPmSzCx8ntMz2/yjCZuuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=3Uhbhcg7; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=12qfUbjT; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1706274323;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Nr8QKXIT9eS/FyyD/NH8+PF7e0exuuXWzw58fkOb0Tw=;
-	b=3Uhbhcg7EaINbhkZZsqTT4dahBwElAFdmYSv4WTRtFnJ2Gk5VEtDVrCXxj5VQC5QU6DICG
-	Zk++iotOh+WSjveTl+Rj/zatNPKA49mwawGn0M58UEnTjGv+aarSi+Gj+slsDRdkrUZVdF
-	N/dYwYnc72/eNLu01AwWMx4B4Y/Dg26Dw5xao552cBYqE/buzyMOKDiy5yxuH+3GXLeniM
-	eoD8AX1hYOR23j72x2yaXVzFg66dfdX98MGM2vCOF4QeHgC6xlTnVXrQfCeprdqmh9nHuY
-	0l0BTb+/c7vnGF8a1JpiCzTaWWohqYAJEVmIVffoXr6nOumo/OI1TZxMjHuaVw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1706274323;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Nr8QKXIT9eS/FyyD/NH8+PF7e0exuuXWzw58fkOb0Tw=;
-	b=12qfUbjTTs06WtM/BZ2qEmPP4CDsQDtjCiphcmppyP7CsZPkkOX3VfvQDdmST9wOhYxG8a
-	D3WhyJAojGBjHVDw==
-To: Esben Haabendal <esben@geanix.com>, netdev@vger.kernel.org, Alexandre
- Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
- <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>, NXP Linux Team <linux-imx@nxp.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>
-Cc: Rohan G Thomas <rohan.g.thomas@intel.com>, "Abhishek Chauhan (ABC)"
- <quic_abchauha@quicinc.com>, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] net: stmmac: dwmac-imx: set TSO/TBS TX queues
- default settings
-In-Reply-To: <379f79687ca4a7d0394a04d14fb3890ce257e706.1706256158.git.esben@geanix.com>
-References: <cover.1706256158.git.esben@geanix.com>
- <379f79687ca4a7d0394a04d14fb3890ce257e706.1706256158.git.esben@geanix.com>
-Date: Fri, 26 Jan 2024 14:05:19 +0100
-Message-ID: <87sf2kmei8.fsf@kurt.kurt.home>
+	s=arc-20240116; t=1706274960; c=relaxed/simple;
+	bh=FGY+lD+y60lvRkLTTesPfWuaivVUyv7pYO/2UAczccA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TH6WWTKh1+LVvazY9wPif5HvmyDRqAen9ypaY0uljRII0ysC4Wk9USRDsxTgN2i/xpny93V0lgTr5dfCjJ1soRVwU8vPIGe5U2sRAtGaJlVCdgcpZdmF11flVv0HX3Hi6KooH8kEbjMh6Gs8wkOAKaP17e/6wGfkfm9w0cTcNOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4jIEQT8Y; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=50z3iua35YdHF3I4F9KF6AiAKfWmqunUUJx8CeyD42I=; b=4jIEQT8Y909onTWoy8B8fayYei
+	/1O+LlSWYYQgibr7K/vjXYCTR0szYmjhB/dEQOVyysqtaDy3RIY93Am++wBoL7QyCLHOWmfw9N62W
+	HcPVV/KiX3odBWaQkRjIx4YlAWtux1XRbQ7Lu+EDpMqbns4mpneZewmbWX7hv/ncYPlI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rTM3X-006AmJ-5i; Fri, 26 Jan 2024 14:15:39 +0100
+Date: Fri, 26 Jan 2024 14:15:39 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Horatiu Vultur <horatiu.vultur@microchip.com>, hkallweit1@gmail.com,
+	linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, richardcochran@gmail.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	UNGLinuxDriver@microchip.com,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Divya Koppera <divya.koppera@microchip.com>
+Subject: Re: [PATCH net-next] net: micrel: Fix set/get PHC time for lan8814
+Message-ID: <a962b46c-343d-411b-9152-514b35aa4f00@lunn.ch>
+References: <20240126073042.1845153-1-horatiu.vultur@microchip.com>
+ <8da0a157-6a09-4d82-ad36-7428fdb27f9b@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8da0a157-6a09-4d82-ad36-7428fdb27f9b@linux.dev>
 
---=-=-=
-Content-Type: text/plain
+> > +	*sec |= lanphy_read_page_reg(phydev, 4, PTP_CLOCK_READ_SEC_MID);
+> 
+> lanphy_read_page_reg returns int, but only 16 bits have meanings here.
+> Is it safe to assume that other 16 bits will be zeros always?
 
-On Fri Jan 26 2024, Esben Haabendal wrote:
-> TSO and TBS cannot coexist. For now we set i.MX Ethernet QOS controller to
-> use the first TX queue with TSO and the rest for TBS.
->
-> TX queues with TBS can support etf qdisc hw offload.
->
-> Signed-off-by: Esben Haabendal <esben@geanix.com>
+Yes. __phy_read() should only return a negative error code, or a value
+which fits in a u16. If any of the top bits are set, its a bug in the
+MDIO driver which needs finding and fixing.
 
-Thanks for fixing this,
-
-Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmWzrg8THGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgsR4EACAixCTExVVvJKDoEaA5WUUXJCVboIg
-jdMPpZgrqtDW5yPCCZ4KJYSGxhvinkc1aBi3M+SUwHodKYbLHea/0un3H9d4ejJp
-Y4ly+Y5bJSquL/Hj53W0RsnNcsFDUN51un1at8EukUfGWBPoYJqsDG97KUvGF9sg
-fb1pP0JuXOeUhKp3Mp2+e0sFjAhQwQrfGzSRnHkmRpModiKfysal3sLzynuLc1yV
-YuqsHvoJLnlYdKIF9d8Cs6V5vZ0Qhxr59PGD7x/Drf/YLF/JZIKSNzTMpYzuD1zM
-Ojed8Tyk5CBjNpb2+zX2Emce8m+bziw5XEUJ0xf/HpXUFBoyUwbYBYSRyFbNZsNP
-h7cwZhBtybYzO49wVaaYC+1S/Y38/REMMVgh5sRBo35WFiVPtrVs+R3Q8Y69JXaw
-87bA0z0iCQIHNUiId+exblegAj5wn+X1GfUCWoAcbOH9GgyrvEnmU7MxwEEBgPTZ
-clROPBVOFdnCh6wenznF92XKJK/mmmDbUXw3me/DkYh4OwnVZ9ROgFDHxWIn2P6O
-st/SsoqbfdOZmNTFnRit3EWhUbVozx/Ml8wAitITfbCBuwKl41mN3rR2sWtJHWtK
-840sKRtZoGO5qoFk5L7of1cCKWQalUqlpqbBhBrIxlx8qw81Nt4gTvE0Fa80c6Cv
-YU+SenSIi7lCxA==
-=/9bz
------END PGP SIGNATURE-----
---=-=-=--
+     Andrew
 
