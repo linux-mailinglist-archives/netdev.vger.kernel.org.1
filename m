@@ -1,302 +1,382 @@
-Return-Path: <netdev+bounces-66185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12E8183DCFE
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 16:01:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 121F783DD1E
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 16:12:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 872E41F22CC9
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 15:01:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92FF01F2336F
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 15:12:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AA8A1CD1F;
-	Fri, 26 Jan 2024 15:01:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4D201CFAD;
+	Fri, 26 Jan 2024 15:12:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gsrRc/qs"
+	dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b="Tf8kk8Qc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E3BA1CA90
-	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 15:01:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EC5B1CFAE
+	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 15:12:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706281306; cv=none; b=hSXcl2ejpe3MU0WShZu0UIUfvr52KGGWEOWn3TvJW54GxQ42cHwWs5RdVBrHwkcYE8MosuXUzgDI8ML+Za5wa/+MEg9VES/qIJ8n/iKUKqlsKQlMHQSdaJUGWTECoA+VToTBnx+QysusmOyLgFxxh2ePpcJ82oWrvflJ9fLgNAE=
+	t=1706281928; cv=none; b=s1zmQAO/wE4VN5LPC4eUxeStBKtnv5wtEkgrPl+axefNrRKrEs5ZzDw/Igv3hdYc57WEzQd1udtU2p67hfa3OT4pQut/OVTgaDMEHRA3Wp1T4OrRdv+D6IgvaeKh0+DioqF2LMCZKmzR+R8r9QSYVr0IcD4NqDxEP6s6ofjgJnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706281306; c=relaxed/simple;
-	bh=mch118Egy+c0/5fcHzKnIUBEQE6hvM6wsht86vzekuU=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=T4LBX88+4xEQaVT6j6PPt9IPWUZ2olTdiOgUU4gJOvFL6WsheuVprmSGdSDw5zH25QDk2PMJw9sj+F7jkOSLcyMO48WgGqu6+VggG5LWDCuosd6qv3fqtZNqH6O2oLnGO4X/NRW86eEFrfg7VerrP6Ghu7kYUzckPHypRnqwF4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gsrRc/qs; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-40ed356a6ecso3764935e9.2
-        for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 07:01:44 -0800 (PST)
+	s=arc-20240116; t=1706281928; c=relaxed/simple;
+	bh=ZAknykhh6i+je3+8AduXaKwQ0/X3ywI2rznDeTP3kAE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Rl1viWeR7UFoYHP0YYJ+0KFNPXldLWsJipeprAVOVMvx0kn3zzRcvhqrIZx4A4NRBP2oHG6oPDNL/EbIrCpFyHWpqGK0uupRKCftg9dDc/AYD0GYjiidxpqtJjkLYLU20CEGNz9cCdI/rQuVCQ8F02TZkjSM6StjG1al8durROw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org; spf=pass smtp.mailfrom=ieee.org; dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b=Tf8kk8Qc; arc=none smtp.client-ip=209.85.166.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ieee.org
+Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-7bf2ab2c4caso17038539f.3
+        for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 07:12:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706281302; x=1706886102; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+9c1LLSQ/32TVCCdUunJf0+XJx1x6vqstR/taqLvPUk=;
-        b=gsrRc/qsKsK520YLfbWv4QvLYQoLwMv5HIklHTYwNFW1NNtWNHRjTYQ/EUDXJeFDMk
-         PPbOLp/RA49Svwt27bSLz/AVvhPFy0wLcXu9uYNRasqGv0WyLmwA6C3X5M8bdh+cF1Dc
-         0+SttEqE5bfgY49qx2mAFu0Q3bjfWGy75pyXVCgeABSfs8xlcYKM+Bo/C5G7rKFN3kmt
-         t7QvWa3+6S36atFs+t8zWtjmbq56dyQziWSGc4vWg8vrFgbAb0fbYu8GCJfZwiV8nnGi
-         t0Kb9wR29HTDinZoyYEo205ljbw56Lc8jIBTxOwyraKuYiPqL5E6TD/GIBmeQV0Fipra
-         KqBQ==
+        d=ieee.org; s=google; t=1706281924; x=1706886724; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FmAGKlbUHD7/NpuouXn5/t0Fv7r/tBW38trG+EcklCI=;
+        b=Tf8kk8QcqXWgvir1iNWT58kPSMqQMcc31G44n/mghDOr55lgoc8NBuPSl4I+8OZLyN
+         OdhCNgp2NUVNPjqISHDLICpqUM4b6WptAw1L90/YQi4yz9ZDBJUMVd5XfnXkk7/4wdHg
+         LoFURwDHVekXBnPvmekSNF5f0Hq2Z8q/6cq0c=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706281302; x=1706886102;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+9c1LLSQ/32TVCCdUunJf0+XJx1x6vqstR/taqLvPUk=;
-        b=wraIzT9Jpp4qnMNdcBQAWWtloKHGwLGzBIY5DRN2IQDmc1a8EwOUtvcqTTJjMwcnYr
-         nhMeH3w9oE+gxU+gFub2UDp109XAFIcpNiKoPWgTSeK0R71lclYw5wwWUAEhMBnZ2yeR
-         l7JbHvLOWCQmhtVwJx3D/fjlezuo6qIXXJ5KsiHeqrmPSDS0jgTjalMcf7tPivw/xWnM
-         uijeXKgt9d6ZbXvMWHZ7HwNO9ae/S7c7/VPp20ZerwUbd28XlSfyVYcBBCvv2rCd/Q75
-         /guFcwhEI/C8DbvwhQ4bZkNKjAwZsEXiELPayJNFLTINnzkTi2ZB4HiwiRkZMJBFDhqL
-         m3UA==
-X-Gm-Message-State: AOJu0Yz2u1/JxvCSyhYq5qEpxtuR+YUEjSD68KFImm4J9Io9QvH10CbO
-	TpyxJbMOdDcHCs7NUjKGHCKFH/0kRQIScN3G9NJbKTzzlSeAvlhb
-X-Google-Smtp-Source: AGHT+IF8osIDvqG5qXdUZY6ub7Yk5Q9iu+d6oXO0hLFeYLvsNU2gJ4WTzh0Miulw+iFTnxiODz0+lA==
-X-Received: by 2002:a05:600c:1395:b0:40e:5f10:4f1d with SMTP id u21-20020a05600c139500b0040e5f104f1dmr2081033wmf.21.1706281301567;
-        Fri, 26 Jan 2024 07:01:41 -0800 (PST)
-Received: from smtpclient.apple ([178.254.237.20])
-        by smtp.gmail.com with ESMTPSA id f19-20020a05600c155300b0040e541ddcb1sm2144522wmg.33.2024.01.26.07.01.41
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 26 Jan 2024 07:01:41 -0800 (PST)
-Content-Type: text/plain;
-	charset=utf-8
+        d=1e100.net; s=20230601; t=1706281924; x=1706886724;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FmAGKlbUHD7/NpuouXn5/t0Fv7r/tBW38trG+EcklCI=;
+        b=L3kr+HA8pxGG5v/4vm2q89XhZPgd/eYwrZlNTr9ofcHt/2Mto55lsH/RiNVkHoWe/1
+         tA0c2vGBfoTHWJDUlyawl6g6NrBrPwQ6i38BA+fdCF/JgMmzu5/oLC6Ep+uSa2tUBhBY
+         3n9vMLJc3+8wUiMZD1yMyURZi9Bun3UGy6Q46UU2gtxlnJ2hYxdf1aBLb/0JSmARe3+1
+         s1++hM8mkH8yeHtjXqkoKzkK7wOIq9kr9XwTLvAJGWRPTRk3r6KFPtgsxA6aHBLH1WoZ
+         umwMGwZChOlaFRyQ9Rnjvw7TwcazFJIO2A0sYkscLDlSEJ+NGD7VvfAgv2v7otl1Hu7o
+         1X6Q==
+X-Gm-Message-State: AOJu0Ywps5eDCC3bteOpD10hwWRBQcMiZFnf6GplS9W/B+UEC7HfLYRr
+	XGdFKIUe0rwwR9UfGyx8uxaBE/+6r4NPfxI/3yC25EtuQiWLH9qWDDSENCW84Q==
+X-Google-Smtp-Source: AGHT+IFrpj53ocxz4PIP+a6fhHNRuGa1zpehIftPdeKqCH8RZGrYTbgHmY9g2zpssARQH7gl5y/zrA==
+X-Received: by 2002:a5d:9550:0:b0:7be:f7e5:44fc with SMTP id a16-20020a5d9550000000b007bef7e544fcmr2094553ios.21.1706281924568;
+        Fri, 26 Jan 2024 07:12:04 -0800 (PST)
+Received: from [172.22.22.28] (c-98-61-227-136.hsd1.mn.comcast.net. [98.61.227.136])
+        by smtp.googlemail.com with ESMTPSA id c20-20020a056602335400b007bc3f75039dsm395844ioz.29.2024.01.26.07.12.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 26 Jan 2024 07:12:04 -0800 (PST)
+Message-ID: <912d4439-86cd-4060-a66d-baba5fa2bdec@ieee.org>
+Date: Fri, 26 Jan 2024 09:12:02 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.400.31\))
-Subject: Re: [RFC,net-next] tcp: add support for read with offset when using
- MSG_PEEK
-From: Martin Zaharinov <micron10@gmail.com>
-In-Reply-To: <9522107c-90bd-e803-4397-16a357613a22@redhat.com>
-Date: Fri, 26 Jan 2024 17:01:30 +0200
-Cc: netdev <netdev@vger.kernel.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <04E4B322-2179-4734-AA7D-E628526D6615@gmail.com>
-References: <F0655F8D-EBEB-403E-BA89-0C8AAAE56E1D@gmail.com>
- <b17a1cda-2a3e-2a79-ff88-7f7fe3c30f37@redhat.com>
- <BDDD81F3-146F-4DCB-9B47-3BF0618607CD@gmail.com>
- <9522107c-90bd-e803-4397-16a357613a22@redhat.com>
-To: Jon Maloy <jmaloy@redhat.com>
-X-Mailer: Apple Mail (2.3774.400.31)
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/2] pm: runtime: Simplify pm_runtime_get_if_active()
+ usage
+Content-Language: en-US
+To: Sakari Ailus <sakari.ailus@linux.intel.com>, linux-pm@vger.kernel.org
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ laurent.pinchart@ideasonboard.com,
+ Jacek Lawrynowicz <jacek.lawrynowicz@linux.intel.com>,
+ Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>,
+ Jani Nikula <jani.nikula@linux.intel.com>,
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>,
+ Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+ David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>,
+ Lucas De Marchi <lucas.demarchi@intel.com>,
+ =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ Paul Elder <paul.elder@ideasonboard.com>, Alex Elder <elder@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ Mark Brown <broonie@kernel.org>, dri-devel@lists.freedesktop.org,
+ intel-gfx@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
+ linux-media@vger.kernel.org, netdev@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-sound@vger.kernel.org
+References: <20240122114121.56752-1-sakari.ailus@linux.intel.com>
+ <20240122114121.56752-2-sakari.ailus@linux.intel.com>
+From: Alex Elder <elder@ieee.org>
+In-Reply-To: <20240122114121.56752-2-sakari.ailus@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Jon
+On 1/22/24 5:41 AM, Sakari Ailus wrote:
+> There are two ways to opportunistically increment a device's runtime PM
+> usage count, calling either pm_runtime_get_if_active() or
+> pm_runtime_get_if_in_use(). The former has an argument to tell whether to
+> ignore the usage count or not, and the latter simply calls the former with
+> ign_usage_count set to false. The other users that want to ignore the
+> usage_count will have to explitly set that argument to true which is a bit
+> cumbersome.
+> 
+> To make this function more practical to use, remove the ign_usage_count
+> argument from the function. The main implementation is renamed as
+> pm_runtime_get_conditional().
+> 
+> Signed-off-by: Sakari Ailus <sakari.ailus@linux.intel.com>
+> Reviewed-by: Alex Elder <elder@linaro.org> # drivers/net/ipa/ipa_smp2p.c
 
-For now run release v2 : =
-https://patchwork.kernel.org/project/netdevbpf/patch/20240120165218.228330=
-2-1-jmaloy@redhat.com/
+I actually intended my "Reviewed-by" to cover the entire patch.  I
+checked every caller and they all looked good to me.
 
-and work without any problem.
-If i see any will update you.
+					-Alex
 
-Thanks
-Martin
-
-> On 17 Jan 2024, at 18:33, Jon Maloy <jmaloy@redhat.com> wrote:
->=20
->=20
->=20
-> On 2024-01-15 23:59, Martin Zaharinov wrote:
->> Hi Jon,
->>=20
->> yes same here in our test lab where have one test user all is fine .
->>=20
->> But when install kernel on production server with 500 users (ppp) and =
-400-500mbit/s traffic machine crash with this bug log.
->> Its run as isp router firewall + shapers =E2=80=A6
-> Just to get it straight, does it crash when you are running your test =
-program on top of that heavily loaded machine, or does it just happen =
-randomly when the patch is present?
->=20
-> ////jon
->=20
->=20
->=20
->=20
->>=20
->> m.
->>=20
->>> On 16 Jan 2024, at 0:41, Jon Maloy <jmaloy@redhat.com> wrote:
->>>=20
->>>=20
->>>=20
->>> On 2024-01-15 16:51, Martin Zaharinov wrote:
->>>> Hi Jon
->>>>=20
->>>> After apply the patch on kernel 6.7.0 system hang with this bug =
-report :
->>> Hmm,
->>> I have been running this for weeks without any problems, on x86_64 =
-with current net and net-next.
->>> There must be some difference between our kernels.
->>> Which configuration are you using?
->>> It would also be interesting to see your test program.
->>>=20
->>> Regards
->>> ///jon
->>>=20
->>>=20
->>>> Jan 15 22:27:39 6.7.0,1,863,194879739,-,caller=3DT3523;BUG: unable =
-to handle page fault for address: 00007fff333174e0
->>>> Jan 15 22:27:39 6.7.0,1,864,194879876,-,caller=3DT3523;#PF: =
-supervisor read access in kernel mode
->>>> Jan 15 22:27:39 6.7.0,1,865,194879976,-,caller=3DT3523;#PF: =
-error_code(0x0001) - permissions violation
->>>> Jan 15 22:27:39 6.7.0,6,866,194880075,-,caller=3DT3523;PGD =
-107cbd067 P4D 107cbd067 PUD 22055d067 PMD 10a384067 PTE 8000000228b00067
->>>> Jan 15 22:27:39 6.7.0,4,867,194880202,-,caller=3DT3523;Oops: 0001 =
-[#1] SMP
->>>> Jan 15 22:27:39 6.7.0,4,868,194880297,-,caller=3DT3523;CPU: 12 PID: =
-3523 Comm: server-nft Tainted: G           O       6.7.0 #1
->>>> Jan 15 22:27:39 6.7.0,4,869,194880420,-,caller=3DT3523;Hardware =
-name: To Be Filled By O.E.M. To Be Filled By O.E.M./EP2C612D8, BIOS =
-P2.30 04/30/2018
->>>> Jan 15 22:27:39 6.7.0,4,870,194880547,-,caller=3DT3523;RIP: =
-0010:tcp_recvmsg_locked+0x498/0xea0
->>>> Jan 15 22:27:39 6.7.0,4,871,194880709,-,caller=3DT3523;Code: a3 07 =
-00 00 80 fa 02 0f 84 88 07 00 00 84 d2 0f 84 f1 04 00 00 41 8b 8c 24 d8 =
-05 00 00 49 8b 53 20 4c 8d 7c 24 44 89 4c 24 44 <48> 83 3a 00 0f 85 e5 =
-fb ff ff 49 8b 73 30 48 83 fe 01 0f 86 c4 04
->>>> Jan 15 22:27:39 6.7.0,4,872,194880876,-,caller=3DT3523;RSP: =
-0018:ffffa47b01307d00 EFLAGS: 00010202
->>>> Jan 15 22:27:39 6.7.0,4,873,194880975,-,caller=3DT3523;RAX: =
-0000000000000002 RBX: ffff8cf8c3209800 RCX: 00000000a87ac03c
->>>> Jan 15 22:27:39 6.7.0,4,874,194881096,-,caller=3DT3523;RDX: =
-00007fff333174e0 RSI: ffffa47b01307e18 RDI: ffff8cf8c3209800
->>>> Jan 15 22:27:39 6.7.0,4,875,194881217,-,caller=3DT3523;RBP: =
-ffffa47b01307d78 R08: ffffa47b01307d90 R09: ffffa47b01307d8c
->>>> Jan 15 22:27:39 6.7.0,4,876,194881338,-,caller=3DT3523;R10: =
-0000000000000002 R11: ffffa47b01307e18 R12: ffff8cf8c3209800
->>>> Jan 15 22:27:39 6.7.0,4,877,194881458,-,caller=3DT3523;R13: =
-0000000000000000 R14: 0000000000000000 R15: ffffa47b01307d44
->>>> Jan 15 22:27:39 6.7.0,4,878,194881579,-,caller=3DT3523;FS:  =
-00007f4941b0ad80(0000) GS:ffff8d001f900000(0000) knlGS:0000000000000000
->>>> Jan 15 22:27:39 6.7.0,4,879,194881703,-,caller=3DT3523;CS:  0010 =
-DS: 0000 ES: 0000 CR0: 0000000080050033
->>>> Jan 15 22:27:39 6.7.0,4,880,194881802,-,caller=3DT3523;CR2: =
-00007fff333174e0 CR3: 000000010df04002 CR4: 00000000003706f0
->>>> Jan 15 22:27:39 6.7.0,4,881,194881922,-,caller=3DT3523;DR0: =
-0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->>>> Jan 15 22:27:39 6.7.0,4,882,194882043,-,caller=3DT3523;DR3: =
-0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->>>> Jan 15 22:27:39 6.7.0,4,883,194882164,-,caller=3DT3523;Call Trace:
->>>> Jan 15 22:27:39 6.7.0,4,884,194882257,-,caller=3DT3523; <TASK>
->>>> Jan 15 22:27:39 6.7.0,4,885,194882347,-,caller=3DT3523; ? =
-__die+0xe4/0xf0
->>>> Jan 15 22:27:39 6.7.0,4,886,194882442,-,caller=3DT3523; ? =
-page_fault_oops+0x144/0x3e0
->>>> Jan 15 22:27:39 6.7.0,4,887,194882539,-,caller=3DT3523; ? =
-zap_pte_range+0x6a4/0xdc0
->>>> Jan 15 22:27:39 6.7.0,4,888,194882638,-,caller=3DT3523; ? =
-exc_page_fault+0x5d/0xa0
->>>> Jan 15 22:27:39 6.7.0,4,889,194882736,-,caller=3DT3523; ? =
-asm_exc_page_fault+0x22/0x30
->>>> Jan 15 22:27:39 6.7.0,4,890,194882834,-,caller=3DT3523; ? =
-tcp_recvmsg_locked+0x498/0xea0
->>>> Jan 15 22:27:39 6.7.0,4,891,194882931,-,caller=3DT3523; ? =
-__call_rcu_common.constprop.0+0xbc/0x770
->>>> Jan 15 22:27:39 6.7.0,4,892,194883031,-,caller=3DT3523; ? =
-rcu_nocb_flush_bypass.part.0+0xec/0x120
->>>> Jan 15 22:27:39 6.7.0,4,893,194883133,-,caller=3DT3523; =
-tcp_recvmsg+0x5c/0x1e0
->>>> Jan 15 22:27:39 6.7.0,4,894,194883228,-,caller=3DT3523; =
-inet_recvmsg+0x2a/0x90
->>>> Jan 15 22:27:39 6.7.0,4,895,194883325,-,caller=3DT3523; =
-__sys_recvfrom+0x15e/0x200
->>>> Jan 15 22:27:39 6.7.0,4,896,194883423,-,caller=3DT3523; ? =
-wait_task_zombie+0xee/0x410
->>>> Jan 15 22:27:39 6.7.0,4,897,194883539,-,caller=3DT3523; ? =
-remove_wait_queue+0x1b/0x60
->>>> Jan 15 22:27:39 6.7.0,4,898,194883635,-,caller=3DT3523; ? =
-do_wait+0x93/0xa0
->>>> Jan 15 22:27:39 6.7.0,4,899,194883729,-,caller=3DT3523; ? =
-__x64_sys_poll+0xa7/0x170
->>>> Jan 15 22:27:39 6.7.0,4,900,194883825,-,caller=3DT3523; =
-__x64_sys_recvfrom+0x1b/0x20
->>>> Jan 15 22:27:39 6.7.0,4,901,194883921,-,caller=3DT3523; =
-do_syscall_64+0x2c/0xa0
->>>> Jan 15 22:27:39 6.7.0,4,902,194884018,-,caller=3DT3523; =
-entry_SYSCALL_64_after_hwframe+0x46/0x4e
->>>> Jan 15 22:27:39 6.7.0,4,903,194884116,-,caller=3DT3523;RIP: =
-0033:0x7f4941fe92a9
->>>> Jan 15 22:27:39 6.7.0,4,904,194884210,-,caller=3DT3523;Code: 0c 00 =
-64 c7 02 02 00 00 00 eb bf 66 0f 1f 44 00 00 80 3d a9 e0 0c 00 00 41 89 =
-ca 74 1c 45 31 c9 45 31 c0 b8 2d 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 =
-67 c3 66 0f 1f 44 00 00 55 48 83 ec 20 48 89
->>>> Jan 15 22:27:39 6.7.0,4,905,194884377,-,caller=3DT3523;RSP: =
-002b:00007fff33317468 EFLAGS: 00000246 ORIG_RAX: 000000000000002d
->>>> Jan 15 22:27:39 6.7.0,4,906,194884499,-,caller=3DT3523;RAX: =
-ffffffffffffffda RBX: 00007fff333174e0 RCX: 00007f4941fe92a9
->>>> Jan 15 22:27:39 6.7.0,4,907,194884620,-,caller=3DT3523;RDX: =
-0000000000000001 RSI: 00007fff333174e0 RDI: 0000000000000005
->>>> Jan 15 22:27:39 6.7.0,4,908,194884740,-,caller=3DT3523;RBP: =
-00007fff33317550 R08: 0000000000000000 R09: 0000000000000000
->>>> Jan 15 22:27:39 6.7.0,4,909,194884860,-,caller=3DT3523;R10: =
-0000000000000002 R11: 0000000000000246 R12: 0000000000000000
->>>> Jan 15 22:27:39 6.7.0,4,910,194884980,-,caller=3DT3523;R13: =
-0000000000000000 R14: 0000000000000000 R15: 00007f49418850a0
->>>> Jan 15 22:27:39 6.7.0,4,911,194885101,-,caller=3DT3523; </TASK>
->>>> Jan 15 22:27:39 6.7.0,4,912,194885191,-,caller=3DT3523;Modules =
-linked in: nft_limit pppoe pppox ppp_generic slhc nft_ct nft_nat =
-nft_chain_nat nf_tables netconsole coretemp bonding igb i2c_algo_bit =
-i40e ixgbe mdio nf_nat_sip nf_conntrack_sip nf_nat_pptp =
-nf_conntrack_pptp nf_nat_tftp nf_conntrack_tftp nf_nat_ftp =
-nf_conntrack_ftp nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 =
-ipmi_si ipmi_devintf ipmi_msghandler rtc_cmos aesni_intel crypto_simd =
-cryptd
->>>> Jan 15 22:27:39 6.7.0,4,913,194885507,-,caller=3DT3523;CR2: =
-00007fff333174e0
->>>> Jan 15 22:27:39 6.7.0,4,914,194885602,-,caller=3DT3523;---[ end =
-trace 0000000000000000 ]---
->>>> Jan 15 22:27:39 6.7.0,4,915,194885698,-,caller=3DT3523;RIP: =
-0010:tcp_recvmsg_locked+0x498/0xea0
->>>> Jan 15 22:27:39 6.7.0,4,916,194885797,-,caller=3DT3523;Code: a3 07 =
-00 00 80 fa 02 0f 84 88 07 00 00 84 d2 0f 84 f1 04 00 00 41 8b 8c 24 d8 =
-05 00 00 49 8b 53 20 4c 8d 7c 24 44 89 4c 24 44 <48> 83 3a 00 0f 85 e5 =
-fb ff ff 49 8b 73 30 48 83 fe 01 0f 86 c4 04
->>>> Jan 15 22:27:39 6.7.0,4,917,194887079,-,caller=3DT3523;RSP: =
-0018:ffffa47b01307d00 EFLAGS: 00010202
->>>> Jan 15 22:27:39 6.7.0,4,918,194887177,-,caller=3DT3523;RAX: =
-0000000000000002 RBX: ffff8cf8c3209800 RCX: 00000000a87ac03c
->>>> Jan 15 22:27:39 6.7.0,4,919,194887298,-,caller=3DT3523;RDX: =
-00007fff333174e0 RSI: ffffa47b01307e18 RDI: ffff8cf8c3209800
->>>> Jan 15 22:27:39 6.7.0,4,920,194887418,-,caller=3DT3523;RBP: =
-ffffa47b01307d78 R08: ffffa47b01307d90 R09: ffffa47b01307d8c
->>>> Jan 15 22:27:39 6.7.0,4,921,194887538,-,caller=3DT3523;R10: =
-0000000000000002 R11: ffffa47b01307e18 R12: ffff8cf8c3209800
->>>> Jan 15 22:27:39 6.7.0,4,922,194887658,-,caller=3DT3523;R13: =
-0000000000000000 R14: 0000000000000000 R15: ffffa47b01307d44
->>>> Jan 15 22:27:39 6.7.0,4,923,194887779,-,caller=3DT3523;FS:  =
-00007f4941b0ad80(0000) GS:ffff8d001f900000(0000) knlGS:0000000000000000
->>>> Jan 15 22:27:39 6.7.0,4,924,194887901,-,caller=3DT3523;CS:  0010 =
-DS: 0000 ES: 0000 CR0: 0000000080050033
->>>> Jan 15 22:27:39 6.7.0,4,925,194888000,-,caller=3DT3523;CR2: =
-00007fff333174e0 CR3: 000000010df04002 CR4: 00000000003706f0
->>>> Jan 15 22:27:39 6.7.0,4,926,194888120,-,caller=3DT3523;DR0: =
-0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->>>> Jan 15 22:27:39 6.7.0,4,927,194888240,-,caller=3DT3523;DR3: =
-0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->>>> Jan 15 22:27:39 6.7.0,0,928,194888360,-,caller=3DT3523;Kernel panic =
-- not syncing: Fatal exception
->>>> Jan 15 22:27:40 6.7.0,0,929,195391096,-,caller=3DT3523;Kernel =
-Offset: 0x1f000000 from 0xffffffff81000000 (relocation range: =
-0xffffffff80000000-0xffffffffbfffffff)
->>>> Jan 15 22:27:40 6.7.0,0,930,195391224,-,caller=3DT3523;Rebooting in =
-10 seconds..
->>>>=20
->>>>=20
->>>>=20
->>>> m.
->>>>=20
->=20
+> Reviewed-by: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+> Acked-by: Takashi Iwai <tiwai@suse.de> # sound/
+> Reviewed-by: Jacek Lawrynowicz <jacek.lawrynowicz@linux.intel.com> # drivers/accel/ivpu/
+> Acked-by: Rodrigo Vivi <rodrigo.vivi@intel.com> # drivers/gpu/drm/i915/
+> Reviewed-by: Rodrigo Vivi <rodrigo.vivi@intel.com>
+> ---
+>   Documentation/power/runtime_pm.rst      |  5 ++--
+>   drivers/accel/ivpu/ivpu_pm.c            |  2 +-
+>   drivers/base/power/runtime.c            | 10 +++++---
+>   drivers/gpu/drm/i915/intel_runtime_pm.c |  2 +-
+>   drivers/gpu/drm/xe/xe_pm.c              |  2 +-
+>   drivers/media/i2c/ccs/ccs-core.c        |  2 +-
+>   drivers/media/i2c/ov64a40.c             |  2 +-
+>   drivers/media/i2c/thp7312.c             |  2 +-
+>   drivers/net/ipa/ipa_smp2p.c             |  2 +-
+>   drivers/pci/pci.c                       |  2 +-
+>   include/linux/pm_runtime.h              | 32 +++++++++++++++++++++----
+>   sound/hda/hdac_device.c                 |  2 +-
+>   12 files changed, 45 insertions(+), 20 deletions(-)
+> 
+> diff --git a/Documentation/power/runtime_pm.rst b/Documentation/power/runtime_pm.rst
+> index 65b86e487afe..da99379071a4 100644
+> --- a/Documentation/power/runtime_pm.rst
+> +++ b/Documentation/power/runtime_pm.rst
+> @@ -396,10 +396,9 @@ drivers/base/power/runtime.c and include/linux/pm_runtime.h:
+>         nonzero, increment the counter and return 1; otherwise return 0 without
+>         changing the counter
+>   
+> -  `int pm_runtime_get_if_active(struct device *dev, bool ign_usage_count);`
+> +  `int pm_runtime_get_if_active(struct device *dev);`
+>       - return -EINVAL if 'power.disable_depth' is nonzero; otherwise, if the
+> -      runtime PM status is RPM_ACTIVE, and either ign_usage_count is true
+> -      or the device's usage_count is non-zero, increment the counter and
+> +      runtime PM status is RPM_ACTIVE, increment the counter and
+>         return 1; otherwise return 0 without changing the counter
+>   
+>     `void pm_runtime_put_noidle(struct device *dev);`
+> diff --git a/drivers/accel/ivpu/ivpu_pm.c b/drivers/accel/ivpu/ivpu_pm.c
+> index 0af8864cb3b5..c6d93c7a1c58 100644
+> --- a/drivers/accel/ivpu/ivpu_pm.c
+> +++ b/drivers/accel/ivpu/ivpu_pm.c
+> @@ -292,7 +292,7 @@ int ivpu_rpm_get_if_active(struct ivpu_device *vdev)
+>   {
+>   	int ret;
+>   
+> -	ret = pm_runtime_get_if_active(vdev->drm.dev, false);
+> +	ret = pm_runtime_get_if_in_use(vdev->drm.dev);
+>   	drm_WARN_ON(&vdev->drm, ret < 0);
+>   
+>   	return ret;
+> diff --git a/drivers/base/power/runtime.c b/drivers/base/power/runtime.c
+> index 05793c9fbb84..b4cb3f19b0d8 100644
+> --- a/drivers/base/power/runtime.c
+> +++ b/drivers/base/power/runtime.c
+> @@ -1176,7 +1176,7 @@ int __pm_runtime_resume(struct device *dev, int rpmflags)
+>   EXPORT_SYMBOL_GPL(__pm_runtime_resume);
+>   
+>   /**
+> - * pm_runtime_get_if_active - Conditionally bump up device usage counter.
+> + * pm_runtime_get_conditional - Conditionally bump up device usage counter.
+>    * @dev: Device to handle.
+>    * @ign_usage_count: Whether or not to look at the current usage counter value.
+>    *
+> @@ -1196,8 +1196,12 @@ EXPORT_SYMBOL_GPL(__pm_runtime_resume);
+>    *
+>    * The caller is responsible for decrementing the runtime PM usage counter of
+>    * @dev after this function has returned a positive value for it.
+> + *
+> + * This function is not primarily intended for use in drivers, most of which are
+> + * better served by either pm_runtime_get_if_active() or
+> + * pm_runtime_get_if_in_use() instead.
+>    */
+> -int pm_runtime_get_if_active(struct device *dev, bool ign_usage_count)
+> +int pm_runtime_get_conditional(struct device *dev, bool ign_usage_count)
+>   {
+>   	unsigned long flags;
+>   	int retval;
+> @@ -1218,7 +1222,7 @@ int pm_runtime_get_if_active(struct device *dev, bool ign_usage_count)
+>   
+>   	return retval;
+>   }
+> -EXPORT_SYMBOL_GPL(pm_runtime_get_if_active);
+> +EXPORT_SYMBOL_GPL(pm_runtime_get_conditional);
+>   
+>   /**
+>    * __pm_runtime_set_status - Set runtime PM status of a device.
+> diff --git a/drivers/gpu/drm/i915/intel_runtime_pm.c b/drivers/gpu/drm/i915/intel_runtime_pm.c
+> index 860b51b56a92..b5f8abd2a22b 100644
+> --- a/drivers/gpu/drm/i915/intel_runtime_pm.c
+> +++ b/drivers/gpu/drm/i915/intel_runtime_pm.c
+> @@ -246,7 +246,7 @@ static intel_wakeref_t __intel_runtime_pm_get_if_active(struct intel_runtime_pm
+>   		 * function, since the power state is undefined. This applies
+>   		 * atm to the late/early system suspend/resume handlers.
+>   		 */
+> -		if (pm_runtime_get_if_active(rpm->kdev, ignore_usecount) <= 0)
+> +		if (pm_runtime_get_conditional(rpm->kdev, ignore_usecount) <= 0)
+>   			return 0;
+>   	}
+>   
+> diff --git a/drivers/gpu/drm/xe/xe_pm.c b/drivers/gpu/drm/xe/xe_pm.c
+> index b429c2876a76..dd110058bf74 100644
+> --- a/drivers/gpu/drm/xe/xe_pm.c
+> +++ b/drivers/gpu/drm/xe/xe_pm.c
+> @@ -330,7 +330,7 @@ int xe_pm_runtime_put(struct xe_device *xe)
+>   
+>   int xe_pm_runtime_get_if_active(struct xe_device *xe)
+>   {
+> -	return pm_runtime_get_if_active(xe->drm.dev, true);
+> +	return pm_runtime_get_if_active(xe->drm.dev);
+>   }
+>   
+>   void xe_pm_assert_unbounded_bridge(struct xe_device *xe)
+> diff --git a/drivers/media/i2c/ccs/ccs-core.c b/drivers/media/i2c/ccs/ccs-core.c
+> index e21287d50c15..e1ae0f9fad43 100644
+> --- a/drivers/media/i2c/ccs/ccs-core.c
+> +++ b/drivers/media/i2c/ccs/ccs-core.c
+> @@ -674,7 +674,7 @@ static int ccs_set_ctrl(struct v4l2_ctrl *ctrl)
+>   		break;
+>   	}
+>   
+> -	pm_status = pm_runtime_get_if_active(&client->dev, true);
+> +	pm_status = pm_runtime_get_if_active(&client->dev);
+>   	if (!pm_status)
+>   		return 0;
+>   
+> diff --git a/drivers/media/i2c/ov64a40.c b/drivers/media/i2c/ov64a40.c
+> index 4fba4c2cb064..541bf74581d2 100644
+> --- a/drivers/media/i2c/ov64a40.c
+> +++ b/drivers/media/i2c/ov64a40.c
+> @@ -3287,7 +3287,7 @@ static int ov64a40_set_ctrl(struct v4l2_ctrl *ctrl)
+>   					 exp_max, 1, exp_val);
+>   	}
+>   
+> -	pm_status = pm_runtime_get_if_active(ov64a40->dev, true);
+> +	pm_status = pm_runtime_get_if_active(ov64a40->dev);
+>   	if (!pm_status)
+>   		return 0;
+>   
+> diff --git a/drivers/media/i2c/thp7312.c b/drivers/media/i2c/thp7312.c
+> index 2806887514dc..19bd923a7315 100644
+> --- a/drivers/media/i2c/thp7312.c
+> +++ b/drivers/media/i2c/thp7312.c
+> @@ -1052,7 +1052,7 @@ static int thp7312_s_ctrl(struct v4l2_ctrl *ctrl)
+>   	if (ctrl->flags & V4L2_CTRL_FLAG_INACTIVE)
+>   		return -EINVAL;
+>   
+> -	if (!pm_runtime_get_if_active(thp7312->dev, true))
+> +	if (!pm_runtime_get_if_active(thp7312->dev))
+>   		return 0;
+>   
+>   	switch (ctrl->id) {
+> diff --git a/drivers/net/ipa/ipa_smp2p.c b/drivers/net/ipa/ipa_smp2p.c
+> index 5620dc271fac..cbf3d4761ce3 100644
+> --- a/drivers/net/ipa/ipa_smp2p.c
+> +++ b/drivers/net/ipa/ipa_smp2p.c
+> @@ -92,7 +92,7 @@ static void ipa_smp2p_notify(struct ipa_smp2p *smp2p)
+>   		return;
+>   
+>   	dev = &smp2p->ipa->pdev->dev;
+> -	smp2p->power_on = pm_runtime_get_if_active(dev, true) > 0;
+> +	smp2p->power_on = pm_runtime_get_if_active(dev) > 0;
+>   
+>   	/* Signal whether the IPA power is enabled */
+>   	mask = BIT(smp2p->enabled_bit);
+> diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
+> index d8f11a078924..f8293ae71389 100644
+> --- a/drivers/pci/pci.c
+> +++ b/drivers/pci/pci.c
+> @@ -2510,7 +2510,7 @@ static void pci_pme_list_scan(struct work_struct *work)
+>   			 * If the device is in a low power state it
+>   			 * should not be polled either.
+>   			 */
+> -			pm_status = pm_runtime_get_if_active(dev, true);
+> +			pm_status = pm_runtime_get_if_active(dev);
+>   			if (!pm_status)
+>   				continue;
+>   
+> diff --git a/include/linux/pm_runtime.h b/include/linux/pm_runtime.h
+> index 7c9b35448563..a212b3008ade 100644
+> --- a/include/linux/pm_runtime.h
+> +++ b/include/linux/pm_runtime.h
+> @@ -72,7 +72,8 @@ extern int pm_runtime_force_resume(struct device *dev);
+>   extern int __pm_runtime_idle(struct device *dev, int rpmflags);
+>   extern int __pm_runtime_suspend(struct device *dev, int rpmflags);
+>   extern int __pm_runtime_resume(struct device *dev, int rpmflags);
+> -extern int pm_runtime_get_if_active(struct device *dev, bool ign_usage_count);
+> +extern int pm_runtime_get_conditional(struct device *dev,
+> +					bool ign_usage_count);
+>   extern int pm_schedule_suspend(struct device *dev, unsigned int delay);
+>   extern int __pm_runtime_set_status(struct device *dev, unsigned int status);
+>   extern int pm_runtime_barrier(struct device *dev);
+> @@ -94,16 +95,33 @@ extern void pm_runtime_release_supplier(struct device_link *link);
+>   
+>   extern int devm_pm_runtime_enable(struct device *dev);
+>   
+> +/**
+> + * pm_runtime_get_if_active - Bump up runtime PM usage counter if the device is
+> + *			      in active state
+> + * @dev: Target device.
+> + *
+> + * Increment the runtime PM usage counter of @dev if its runtime PM status is
+> + * %RPM_ACTIVE, in which case it returns 1. If the device is in a different
+> + * state, 0 is returned. -EINVAL is returned if runtime PM is disabled for the
+> + * device.
+> + */
+> +static inline int pm_runtime_get_if_active(struct device *dev)
+> +{
+> +	return pm_runtime_get_conditional(dev, true);
+> +}
+> +
+>   /**
+>    * pm_runtime_get_if_in_use - Conditionally bump up runtime PM usage counter.
+>    * @dev: Target device.
+>    *
+>    * Increment the runtime PM usage counter of @dev if its runtime PM status is
+> - * %RPM_ACTIVE and its runtime PM usage counter is greater than 0.
+> + * %RPM_ACTIVE and its runtime PM usage counter is greater than 0, in which case
+> + * it returns 1. If the device is in a different state or its usage_count is 0,
+> + * 0 is returned. -EINVAL is returned if runtime PM is disabled for the device.
+>    */
+>   static inline int pm_runtime_get_if_in_use(struct device *dev)
+>   {
+> -	return pm_runtime_get_if_active(dev, false);
+> +	return pm_runtime_get_conditional(dev, false);
+>   }
+>   
+>   /**
+> @@ -275,8 +293,12 @@ static inline int pm_runtime_get_if_in_use(struct device *dev)
+>   {
+>   	return -EINVAL;
+>   }
+> -static inline int pm_runtime_get_if_active(struct device *dev,
+> -					   bool ign_usage_count)
+> +static inline int pm_runtime_get_if_active(struct device *dev)
+> +{
+> +	return -EINVAL;
+> +}
+> +static inline int pm_runtime_get_conditional(struct device *dev,
+> +					     bool ign_usage_count)
+>   {
+>   	return -EINVAL;
+>   }
+> diff --git a/sound/hda/hdac_device.c b/sound/hda/hdac_device.c
+> index 7f7b67fe1b65..068c16e52dff 100644
+> --- a/sound/hda/hdac_device.c
+> +++ b/sound/hda/hdac_device.c
+> @@ -612,7 +612,7 @@ EXPORT_SYMBOL_GPL(snd_hdac_power_up_pm);
+>   int snd_hdac_keep_power_up(struct hdac_device *codec)
+>   {
+>   	if (!atomic_inc_not_zero(&codec->in_pm)) {
+> -		int ret = pm_runtime_get_if_active(&codec->dev, true);
+> +		int ret = pm_runtime_get_if_active(&codec->dev);
+>   		if (!ret)
+>   			return -1;
+>   		if (ret < 0)
 
 
