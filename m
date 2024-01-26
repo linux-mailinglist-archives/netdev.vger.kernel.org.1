@@ -1,233 +1,155 @@
-Return-Path: <netdev+bounces-66156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74DE583D8CA
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 12:00:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F88D83D93A
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 12:21:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 00B631F291FD
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 11:00:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E767AB36806
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 10:07:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C7F410A3F;
-	Fri, 26 Jan 2024 11:00:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC52614AA5;
+	Fri, 26 Jan 2024 09:25:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UfhbPwDC"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UaGeNCGt"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80AD6134C4
-	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 11:00:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A99841BF45
+	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 09:25:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706266840; cv=none; b=jDIHnEbM7SEfcgWeXZBmhTiPJMwmc+gy+Q09bYxNUVeLgI3y7NkdFesfS4Wl7fVtA/joOkRsE4jvI2jsT1nv5jIvXHYGilsa9y/uVv0CIhAgNmLPDvb7TEPrPIhJKfYOxjZZb3lE+08WtQsuq9yOrbRv52otKFFCxacefdTdakA=
+	t=1706261144; cv=none; b=Uo8HtPG9tRtwdtXBLpe+wu2c4ezVhb6lrSHRRfMtBk03Ud3Qk3THup+pnHcemlkVFV6xyk7tKbHOc+6YrMMYHNW3WD43UgTSOA6a+ruMUZGcJKz72EZplbxBisk/gWc3G4wewn4BKA59xjnxdyagEnx5unI6hyYLMe1WJ8tg5DE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706266840; c=relaxed/simple;
-	bh=iwaEjyQISX8oRt+7rdSg7FwouBhL5OwhhJgvvuCvF/Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WKy/pihWPYLLrBdXTeqMQwqv1bAEdF0balTrl2RcaQrjQc3j92tJFU3QIaXMI8x4vYlB+DVKOIp6IMVAE7DHhZX5BtpYVdA4ItokTbTmPMGsCl2rtrAFNWhKfhmOBH04x9nZF3VsgDwD2EraUyD+p5TNZwFy+jSt2PdUKDyrXy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UfhbPwDC; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <8da0a157-6a09-4d82-ad36-7428fdb27f9b@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706266822;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ms/Iujyw2CJDI4xIWrn3lHPH9AmsLQ9BJPRb9vIIWTw=;
-	b=UfhbPwDCLTBEi7XVrl2nUrql9KByyo8mpcqL6+h35BLeHk6xdOffcL/IHjyUi4ebkdVfYC
-	4QeS81/itoTEbQ2DgHCElCV3SNOYgn+1p3aF3bzvQGc65ARhLZeL3p5/vEcj807UJ2z2ZZ
-	RwblP3Rn1nAx3Pk0KNjO289hASALJgs=
-Date: Fri, 26 Jan 2024 11:00:16 +0000
+	s=arc-20240116; t=1706261144; c=relaxed/simple;
+	bh=O/szxyErE4SVpTzsMD1nzmvzsl6leaj4YKpQfDeSMu0=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type; b=PBuMylzVsRUSD6K12qwMC+Zrh1BT99SIIODm0S5FzsQVNtWZKMheRCxoyRC+zS8+DZyz8pWspGgzoJ4BBgxm17YVlmvg+UlzktGS4p6wYMhxMZK6WiwhSfnxdg9rth0kzjnnmS6/9bYwhxIAXyeuoRCzMlcDMc0dy8FGblsUaoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=UaGeNCGt; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
+	To:Subject:From:MIME-Version:Date:Message-ID:Sender:Reply-To:Cc:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=Ap9WzIljNUu3jMuK/ZahQACNZoHaidADRP7tUxBNUMU=; b=UaGeNCGtcR3DiPGH5ZFVPCZR7u
+	6yQ9gq9jfZKJA5hf6/AkYeZ9yVqAYOxtXTbab4k9piXLwFkJaGKDPQhD5RjSXIb5HgRwkW7NrBmEF
+	QhvUpe/tkH2x8CO6Hmmkxq6Wj+JDWLGZVNERLmfaZ6FXQUA7LEuD2rQKZa/RIuBoT2WWaAYeRbhKB
+	kB0NsqBVoBl9CQ/tSa86v+aQ4DMMjaAO/cVSJTWM6qzOKCeYNZp3alupmC46ooB/B6/ml4OK6W8QR
+	nc7rWLGiQRdAiw8zASc5JnJpBnamvaj14jiJB/ve9V1UDU5PKkHA1heIYQCzjULhEpZ5MbHCMdfb+
+	sHfktXjA==;
+Received: from fpd2fa7e2a.ap.nuro.jp ([210.250.126.42] helo=[192.168.1.6])
+	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rTISu-0000000D9tb-0yRp;
+	Fri, 26 Jan 2024 09:25:37 +0000
+Message-ID: <1f5ffc7d-4b2e-4f07-bc7e-97d49ccff28c@infradead.org>
+Date: Fri, 26 Jan 2024 18:25:31 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next] net: micrel: Fix set/get PHC time for lan8814
+User-Agent: Mozilla Thunderbird
+From: Geoff Levand <geoff@infradead.org>
+Subject: [PATCH net] ps3/gelic: Fix SKB allocation
+To: sambat goson <sombat3960@gmail.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ "David S. Miller" <davem@davemloft.net>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
 Content-Language: en-US
-To: Horatiu Vultur <horatiu.vultur@microchip.com>, andrew@lunn.ch,
- hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- richardcochran@gmail.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- UNGLinuxDriver@microchip.com,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Divya Koppera <divya.koppera@microchip.com>
-References: <20240126073042.1845153-1-horatiu.vultur@microchip.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20240126073042.1845153-1-horatiu.vultur@microchip.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 26/01/2024 07:30, Horatiu Vultur wrote:
-> When setting or getting PHC time, the higher bits of the second time (>32
-> bits) they were ignored. Meaning that setting some time in the future like
-> year 2150, it was failing to set this.
-> 
-> The issue can be reproduced like this:
-> 
->   # phc_ctl /dev/ptp1 set 10000000000
->   phc_ctl[12.290]: set clock time to 10000000000.000000000 or Sat Nov 20 17:46:40 2286
-> 
->   # phc_ctl /dev/ptp1 get
->   phc_ctl[15.309]: clock time is 1410065411.018055420 or Sun Sep  7 04:50:11 2014
-> 
-> Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
-> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> Reviewed-by: Divya Koppera <divya.koppera@microchip.com>
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> 
-> ---
-> Based on discussion here [1], this patch from the series was changed
-> to target net-next instead of net.
-> 
-> [1] https://lore.kernel.org/netdev/20240119082103.edy647tbf2akokjy@DEN-DL-M31836.microchip.com/T/#m88b55103ee8c05599f2fa02c1588e195d95d6a49
-> ---
->   drivers/net/phy/micrel.c | 61 +++++++++++++++++++---------------------
->   1 file changed, 29 insertions(+), 32 deletions(-)
-> 
-> diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-> index dad720138baaf..40bea9293ddd7 100644
-> --- a/drivers/net/phy/micrel.c
-> +++ b/drivers/net/phy/micrel.c
-> @@ -154,11 +154,13 @@
->   #define PTP_CMD_CTL_PTP_LTC_STEP_SEC_		BIT(5)
->   #define PTP_CMD_CTL_PTP_LTC_STEP_NSEC_		BIT(6)
->   
-> +#define PTP_CLOCK_SET_SEC_HI			0x0205
->   #define PTP_CLOCK_SET_SEC_MID			0x0206
->   #define PTP_CLOCK_SET_SEC_LO			0x0207
->   #define PTP_CLOCK_SET_NS_HI			0x0208
->   #define PTP_CLOCK_SET_NS_LO			0x0209
->   
-> +#define PTP_CLOCK_READ_SEC_HI			0x0229
->   #define PTP_CLOCK_READ_SEC_MID			0x022A
->   #define PTP_CLOCK_READ_SEC_LO			0x022B
->   #define PTP_CLOCK_READ_NS_HI			0x022C
-> @@ -2592,35 +2594,31 @@ static bool lan8814_rxtstamp(struct mii_timestamper *mii_ts, struct sk_buff *skb
->   }
->   
->   static void lan8814_ptp_clock_set(struct phy_device *phydev,
-> -				  u32 seconds, u32 nano_seconds)
-> +				  time64_t sec, u32 nsec)
->   {
-> -	u32 sec_low, sec_high, nsec_low, nsec_high;
-> -
-> -	sec_low = seconds & 0xffff;
-> -	sec_high = (seconds >> 16) & 0xffff;
-> -	nsec_low = nano_seconds & 0xffff;
-> -	nsec_high = (nano_seconds >> 16) & 0x3fff;
-> -
-> -	lanphy_write_page_reg(phydev, 4, PTP_CLOCK_SET_SEC_LO, sec_low);
-> -	lanphy_write_page_reg(phydev, 4, PTP_CLOCK_SET_SEC_MID, sec_high);
-> -	lanphy_write_page_reg(phydev, 4, PTP_CLOCK_SET_NS_LO, nsec_low);
-> -	lanphy_write_page_reg(phydev, 4, PTP_CLOCK_SET_NS_HI, nsec_high);
-> +	lanphy_write_page_reg(phydev, 4, PTP_CLOCK_SET_SEC_LO, lower_16_bits(sec));
-> +	lanphy_write_page_reg(phydev, 4, PTP_CLOCK_SET_SEC_MID, upper_16_bits(sec));
-> +	lanphy_write_page_reg(phydev, 4, PTP_CLOCK_SET_SEC_HI, upper_32_bits(sec));
-> +	lanphy_write_page_reg(phydev, 4, PTP_CLOCK_SET_NS_LO, lower_16_bits(nsec));
-> +	lanphy_write_page_reg(phydev, 4, PTP_CLOCK_SET_NS_HI, upper_16_bits(nsec));
->   
->   	lanphy_write_page_reg(phydev, 4, PTP_CMD_CTL, PTP_CMD_CTL_PTP_CLOCK_LOAD_);
->   }
->   
->   static void lan8814_ptp_clock_get(struct phy_device *phydev,
-> -				  u32 *seconds, u32 *nano_seconds)
-> +				  time64_t *sec, u32 *nsec)
->   {
->   	lanphy_write_page_reg(phydev, 4, PTP_CMD_CTL, PTP_CMD_CTL_PTP_CLOCK_READ_);
->   
-> -	*seconds = lanphy_read_page_reg(phydev, 4, PTP_CLOCK_READ_SEC_MID);
-> -	*seconds = (*seconds << 16) |
-> -		   lanphy_read_page_reg(phydev, 4, PTP_CLOCK_READ_SEC_LO);
-> +	*sec = lanphy_read_page_reg(phydev, 4, PTP_CLOCK_READ_SEC_HI);
-> +	*sec <<= 16;
-> +	*sec |= lanphy_read_page_reg(phydev, 4, PTP_CLOCK_READ_SEC_MID);
+Commit 3ce4f9c3fbb3 ("net/ps3_gelic_net: Add gelic_descr structures")
+of 6.8-rc1 did not set up the ps3 gelic network SKB's correctly,
+resulting in a kernel panic.
+    
+This fix changes the way the napi buffer and corresponding SKB are
+allocated and managed.
+    
+Reported-by: sambat goson <sombat3960@gmail.com>
+Fixes: 3ce4f9c3fbb3 ("net/ps3_gelic_net: Add gelic_descr structures")
+Signed-off-by: Geoff Levand <geoff@infradead.org>
 
-lanphy_read_page_reg returns int, but only 16 bits have meanings here.
-Is it safe to assume that other 16 bits will be zeros always?
-There are some more spots of this template in the function.
-
-> +	*sec <<= 16;
-> +	*sec |= lanphy_read_page_reg(phydev, 4, PTP_CLOCK_READ_SEC_LO);
->   
-
-
-> -	*nano_seconds = lanphy_read_page_reg(phydev, 4, PTP_CLOCK_READ_NS_HI);
-> -	*nano_seconds = ((*nano_seconds & 0x3fff) << 16) |
-> -			lanphy_read_page_reg(phydev, 4, PTP_CLOCK_READ_NS_LO);
-> +	*nsec = lanphy_read_page_reg(phydev, 4, PTP_CLOCK_READ_NS_HI);
-> +	*nsec <<= 16;
-> +	*nsec |= lanphy_read_page_reg(phydev, 4, PTP_CLOCK_READ_NS_LO);
->   }
->   
->   static int lan8814_ptpci_gettime64(struct ptp_clock_info *ptpci,
-> @@ -2630,7 +2628,7 @@ static int lan8814_ptpci_gettime64(struct ptp_clock_info *ptpci,
->   							  ptp_clock_info);
->   	struct phy_device *phydev = shared->phydev;
->   	u32 nano_seconds;
-> -	u32 seconds;
-> +	time64_t seconds;
->   
->   	mutex_lock(&shared->shared_lock);
->   	lan8814_ptp_clock_get(phydev, &seconds, &nano_seconds);
-> @@ -2660,38 +2658,37 @@ static void lan8814_ptp_clock_step(struct phy_device *phydev,
->   {
->   	u32 nano_seconds_step;
->   	u64 abs_time_step_ns;
-> -	u32 unsigned_seconds;
-> +	time64_t set_seconds;
->   	u32 nano_seconds;
->   	u32 remainder;
->   	s32 seconds;
->   
->   	if (time_step_ns >  15000000000LL) {
->   		/* convert to clock set */
-> -		lan8814_ptp_clock_get(phydev, &unsigned_seconds, &nano_seconds);
-> -		unsigned_seconds += div_u64_rem(time_step_ns, 1000000000LL,
-> -						&remainder);
-> +		lan8814_ptp_clock_get(phydev, &set_seconds, &nano_seconds);
-> +		set_seconds += div_u64_rem(time_step_ns, 1000000000LL,
-> +					   &remainder);
->   		nano_seconds += remainder;
->   		if (nano_seconds >= 1000000000) {
-> -			unsigned_seconds++;
-> +			set_seconds++;
->   			nano_seconds -= 1000000000;
->   		}
-> -		lan8814_ptp_clock_set(phydev, unsigned_seconds, nano_seconds);
-> +		lan8814_ptp_clock_set(phydev, set_seconds, nano_seconds);
->   		return;
->   	} else if (time_step_ns < -15000000000LL) {
->   		/* convert to clock set */
->   		time_step_ns = -time_step_ns;
->   
-> -		lan8814_ptp_clock_get(phydev, &unsigned_seconds, &nano_seconds);
-> -		unsigned_seconds -= div_u64_rem(time_step_ns, 1000000000LL,
-> -						&remainder);
-> +		lan8814_ptp_clock_get(phydev, &set_seconds, &nano_seconds);
-> +		set_seconds -= div_u64_rem(time_step_ns, 1000000000LL,
-> +					   &remainder);
->   		nano_seconds_step = remainder;
->   		if (nano_seconds < nano_seconds_step) {
-> -			unsigned_seconds--;
-> +			set_seconds--;
->   			nano_seconds += 1000000000;
->   		}
->   		nano_seconds -= nano_seconds_step;
-> -		lan8814_ptp_clock_set(phydev, unsigned_seconds,
-> -				      nano_seconds);
-> +		lan8814_ptp_clock_set(phydev, set_seconds, nano_seconds);
->   		return;
->   	}
->   
-
+diff --git a/drivers/net/ethernet/toshiba/ps3_gelic_net.c b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
+index d5b75af163d3..1870f173e850 100644
+--- a/drivers/net/ethernet/toshiba/ps3_gelic_net.c
++++ b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
+@@ -375,20 +375,16 @@ static int gelic_card_init_chain(struct gelic_card *card,
+ static int gelic_descr_prepare_rx(struct gelic_card *card,
+ 				  struct gelic_descr *descr)
+ {
+-	static const unsigned int rx_skb_size =
+-		ALIGN(GELIC_NET_MAX_FRAME, GELIC_NET_RXBUF_ALIGN) +
+-		GELIC_NET_RXBUF_ALIGN - 1;
++	static const unsigned int napi_buff_size =
++		round_up(GELIC_NET_MAX_FRAME, GELIC_NET_RXBUF_ALIGN);
++
++	struct device *dev = ctodev(card);
+ 	dma_addr_t cpu_addr;
+-	int offset;
++	void *napi_buff;
+ 
+ 	if (gelic_descr_get_status(descr) !=  GELIC_DESCR_DMA_NOT_IN_USE)
+-		dev_info(ctodev(card), "%s: ERROR status\n", __func__);
++		dev_info(dev, "%s: ERROR status\n", __func__);
+ 
+-	descr->skb = netdev_alloc_skb(*card->netdev, rx_skb_size);
+-	if (!descr->skb) {
+-		descr->hw_regs.payload.dev_addr = 0; /* tell DMAC don't touch memory */
+-		return -ENOMEM;
+-	}
+ 	descr->hw_regs.dmac_cmd_status = 0;
+ 	descr->hw_regs.result_size = 0;
+ 	descr->hw_regs.valid_size = 0;
+@@ -397,24 +393,33 @@ static int gelic_descr_prepare_rx(struct gelic_card *card,
+ 	descr->hw_regs.payload.size = 0;
+ 	descr->skb = NULL;
+ 
+-	offset = ((unsigned long)descr->skb->data) &
+-		(GELIC_NET_RXBUF_ALIGN - 1);
+-	if (offset)
+-		skb_reserve(descr->skb, GELIC_NET_RXBUF_ALIGN - offset);
+-	/* io-mmu-map the skb */
+-	cpu_addr = dma_map_single(ctodev(card), descr->skb->data,
+-				  GELIC_NET_MAX_FRAME, DMA_FROM_DEVICE);
+-	descr->hw_regs.payload.dev_addr = cpu_to_be32(cpu_addr);
+-	if (dma_mapping_error(ctodev(card), cpu_addr)) {
+-		dev_kfree_skb_any(descr->skb);
++	napi_buff = napi_alloc_frag_align(napi_buff_size,
++		GELIC_NET_RXBUF_ALIGN);
++
++	if (unlikely(!napi_buff)) {
++		return -ENOMEM;
++	}
++
++	descr->skb = napi_build_skb(napi_buff, napi_buff_size);
++
++	if (unlikely(!descr->skb)) {
++		skb_free_frag(napi_buff);
++		return -ENOMEM;
++	}
++
++	cpu_addr = dma_map_single(dev, napi_buff, napi_buff_size,
++		DMA_FROM_DEVICE);
++
++	if (dma_mapping_error(dev, cpu_addr)) {
++		skb_free_frag(napi_buff);
+ 		descr->skb = NULL;
+-		dev_info(ctodev(card),
+-			 "%s:Could not iommu-map rx buffer\n", __func__);
++		dev_err_once(dev, "%s:Could not iommu-map rx buffer\n",
++			__func__);
+ 		gelic_descr_set_status(descr, GELIC_DESCR_DMA_NOT_IN_USE);
+ 		return -ENOMEM;
+ 	}
+ 
+-	descr->hw_regs.payload.size = cpu_to_be32(GELIC_NET_MAX_FRAME);
++	descr->hw_regs.payload.size = cpu_to_be32(napi_buff_size);
+ 	descr->hw_regs.payload.dev_addr = cpu_to_be32(cpu_addr);
+ 
+ 	gelic_descr_set_status(descr, GELIC_DESCR_DMA_CARDOWNED);
 
