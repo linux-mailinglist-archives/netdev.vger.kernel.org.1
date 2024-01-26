@@ -1,118 +1,128 @@
-Return-Path: <netdev+bounces-66123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86B9D83D557
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 10:04:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA4BD83D5E0
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 10:17:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7D60B224D8
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 09:04:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A8B91F22BE6
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 09:17:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 457CD6088B;
-	Fri, 26 Jan 2024 07:51:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06D8977F39;
+	Fri, 26 Jan 2024 08:32:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ClG0zG9k"
 X-Original-To: netdev@vger.kernel.org
-Received: from sgoci-sdnproxy-4.icoremail.net (sgoci-sdnproxy-4.icoremail.net [129.150.39.64])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BF4F12E6F;
-	Fri, 26 Jan 2024 07:51:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.150.39.64
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCD4D1CFAE;
+	Fri, 26 Jan 2024 08:32:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706255515; cv=none; b=o1COZYTElVuKZO4cNJWbUklt4k6b3e0hyOTw4kUXjxCvAY7tLcK++NXKNffd5Z5vrvdj6ZaKuG/+fVzplmrNqFQuJ5BteL5hN9PKvzNx4ous0XsRmGUsQ+zXXPKWLE4HZss4YdoD0NGqbwR5nqR6qlIcUzN7iC4Obgcez2DYdIU=
+	t=1706257945; cv=none; b=shghj+TrjiJmFq15ruMASMJw+j9VgDj5rwH1Kc4JzCzI/N/DUFEFwkb3Gew96lWfGarPgczr8nmVLUlexqlZl6pW8TaQ2hBCG/8hY6XE5LavT23QKsznVEoWn944BBwmbJ0QEl/9ylTejmEz9LgbVkHkHolWAnkxYaDcIw7sICo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706255515; c=relaxed/simple;
-	bh=9DBU9Gswb97RBzmM1XvhxENDBjdiwrvxJeYFm2Gdu+Y=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=C5NE/G96H6CaLbLHR7dkOFTu6w54OsrQ4ow5ff3a6XzmRx0rpIjU0GJ3f1XjqIeSaZO2zbeO53AuNPXWIUYdTMP27hdVVMDAYQMhLSnEbTtm5DxFjMima57dJfg5pIYMuYyJmxjvRdTxvnhM+7GMVyNKhVlcqZ3cm50QAlwWaR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=129.150.39.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from luzhipeng.223.5.5.5 (unknown [115.200.227.226])
-	by mail-app2 (Coremail) with SMTP id by_KCgDnKKiGZLNlK1TZAA--.20140S2;
-	Fri, 26 Jan 2024 15:51:35 +0800 (CST)
-From: Zhipeng Lu <alexious@zju.edu.cn>
-To: alexious@zju.edu.cn
-Cc: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] net: ipv4: fix a memleak in ip_setup_cork
-Date: Fri, 26 Jan 2024 15:51:27 +0800
-Message-Id: <20240126075127.2825068-1-alexious@zju.edu.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1706257945; c=relaxed/simple;
+	bh=wstLSSz3qMGDQxUYzW+IHsUCg9UT58andHSX7WC1dOA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ISCCXF60ksxA7reHb2yalTH89RJ25gzCBObO0UJUbg0D9ioMvvWM26/PldkL0uknvQDqx5nQtn5eBAbPBjBog9mhYr368vRLBOI4AUCKrnfSgm+EXSIOZ7BsaW18Dd9XcpHxAZ1+tNVC59ptt2LNhGLEL2imiESkVJKUrZuLeq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ClG0zG9k; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCC2BC433F1;
+	Fri, 26 Jan 2024 08:32:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706257945;
+	bh=wstLSSz3qMGDQxUYzW+IHsUCg9UT58andHSX7WC1dOA=;
+	h=Date:From:To:Cc:Subject:From;
+	b=ClG0zG9k5IMq0O5zUgX7DQVolc1NIz4ZcQ4BZwOfNsuOjQ0TRHPthT4u5pvvVM/LL
+	 35kt2P0Zwt/YyQT8ILDOA3jHWeL2/oenVPShooFxHoOG5XP0OESHRGRnQgoWS/VEyh
+	 YsBTnamXcWdV53UvCANE0ryGhcj+2lI1wWLgKTxn5JHby7pudKrN4c+l1evWyVjaSL
+	 2QTDpzVmdFORUulHfrTCWwYLQ5ovXxqfskd8BXf/ORMi6j049L0+uCewvKH33oxYHB
+	 jyUfTxDhEbBz/tBXhKCgm4Uduuxl/VhoIgWITu6ZfR8KsWsJW+C6TN4sKRGDCzBPcF
+	 JmOmUr2w+UPrQ==
+Date: Fri, 26 Jan 2024 09:32:20 +0100
+From: Helge Deller <deller@kernel.org>
+To: "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-parisc@vger.kernel.org
+Subject: [PATCH v2] [net] ipv6: Ensure natural alignment of const ipv6
+ loopback and router addresses
+Message-ID: <ZbNuFM1bFqoH-UoY@p100>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:by_KCgDnKKiGZLNlK1TZAA--.20140S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Ww1fGF1xJr13Zw4DCw1DGFg_yoW8GFW7pF
-	n0ga45JrW8Xr12gFnrtFWrZF1fKw1vyFy8urWaya4ay3Wktry5tF18KrWa9Fya9Fs7Cw1f
-	Aa4ft345ur48ZFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkl14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26rxl
-	6s0DM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v26r12
-	6r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
-	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
-	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
-	WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
-	IxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbSfO7UUUU
-	U==
-X-CM-SenderInfo: qrsrjiarszq6lmxovvfxof0/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-When inetdev_valid_mtu fails, cork->opt should be freed if it is
-allocated in ip_setup_cork. Otherwise there could be a memleak.
+On a parisc64 kernel I sometimes notice this kernel warning:
+Kernel unaligned access to 0x40ff8814 at ndisc_send_skb+0xc0/0x4d8
 
-Fixes: 501a90c94510 ("inet: protect against too small mtu values.")
-Signed-off-by: Zhipeng Lu <alexious@zju.edu.cn>
+The address 0x40ff8814 points to the in6addr_linklocal_allrouters
+variable and the warning simply means that some ipv6 function tries to
+read a 64-bit word directly from the not-64-bit aligned
+in6addr_linklocal_allrouters variable.
+
+Unaligned accesses are non-critical as the architecture or exception
+handlers usually will fix it up at runtime. Nevertheless it may trigger
+a performance penality for some architectures. For details read the
+"unaligned-memory-access" kernel documentation.
+
+The patch below ensures that the ipv6 loopback and router addresses will
+always be naturally aligned. This prevents the unaligned accesses for
+all architectures.
+
+Signed-off-by: Helge Deller <deller@gmx.de>
+Fixes: 034dfc5df99eb ("ipv6: export in6addr_loopback to modules")
+Acked-by: Paolo Abeni <pabeni@redhat.com>
+
+--
+v2:
+- Added A-b from Paolo
+- Rephrased parts of commit message
+- resent with [net] tag
+
 ---
- net/ipv4/ip_output.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
-
-diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-index b06f678b03a1..3215ea07d398 100644
---- a/net/ipv4/ip_output.c
-+++ b/net/ipv4/ip_output.c
-@@ -1282,6 +1282,7 @@ static int ip_setup_cork(struct sock *sk, struct inet_cork *cork,
- {
- 	struct ip_options_rcu *opt;
- 	struct rtable *rt;
-+	int free_opt = 0;
+diff --git a/net/ipv6/addrconf_core.c b/net/ipv6/addrconf_core.c
+index 507a8353a6bd..813e009b4d0e 100644
+--- a/net/ipv6/addrconf_core.c
++++ b/net/ipv6/addrconf_core.c
+@@ -220,19 +220,26 @@ const struct ipv6_stub *ipv6_stub __read_mostly = &(struct ipv6_stub) {
+ EXPORT_SYMBOL_GPL(ipv6_stub);
  
- 	rt = *rtp;
- 	if (unlikely(!rt))
-@@ -1297,6 +1298,7 @@ static int ip_setup_cork(struct sock *sk, struct inet_cork *cork,
- 					    sk->sk_allocation);
- 			if (unlikely(!cork->opt))
- 				return -ENOBUFS;
-+			free_opt = 1;
- 		}
- 		memcpy(cork->opt, &opt->opt, sizeof(struct ip_options) + opt->opt.optlen);
- 		cork->flags |= IPCORK_OPT;
-@@ -1306,8 +1308,13 @@ static int ip_setup_cork(struct sock *sk, struct inet_cork *cork,
- 	cork->fragsize = ip_sk_use_pmtu(sk) ?
- 			 dst_mtu(&rt->dst) : READ_ONCE(rt->dst.dev->mtu);
+ /* IPv6 Wildcard Address and Loopback Address defined by RFC2553 */
+-const struct in6_addr in6addr_loopback = IN6ADDR_LOOPBACK_INIT;
++const struct in6_addr in6addr_loopback __aligned(BITS_PER_LONG/8)
++	= IN6ADDR_LOOPBACK_INIT;
+ EXPORT_SYMBOL(in6addr_loopback);
+-const struct in6_addr in6addr_any = IN6ADDR_ANY_INIT;
++const struct in6_addr in6addr_any __aligned(BITS_PER_LONG/8)
++	= IN6ADDR_ANY_INIT;
+ EXPORT_SYMBOL(in6addr_any);
+-const struct in6_addr in6addr_linklocal_allnodes = IN6ADDR_LINKLOCAL_ALLNODES_INIT;
++const struct in6_addr in6addr_linklocal_allnodes __aligned(BITS_PER_LONG/8)
++	= IN6ADDR_LINKLOCAL_ALLNODES_INIT;
+ EXPORT_SYMBOL(in6addr_linklocal_allnodes);
+-const struct in6_addr in6addr_linklocal_allrouters = IN6ADDR_LINKLOCAL_ALLROUTERS_INIT;
++const struct in6_addr in6addr_linklocal_allrouters __aligned(BITS_PER_LONG/8)
++	= IN6ADDR_LINKLOCAL_ALLROUTERS_INIT;
+ EXPORT_SYMBOL(in6addr_linklocal_allrouters);
+-const struct in6_addr in6addr_interfacelocal_allnodes = IN6ADDR_INTERFACELOCAL_ALLNODES_INIT;
++const struct in6_addr in6addr_interfacelocal_allnodes __aligned(BITS_PER_LONG/8)
++	= IN6ADDR_INTERFACELOCAL_ALLNODES_INIT;
+ EXPORT_SYMBOL(in6addr_interfacelocal_allnodes);
+-const struct in6_addr in6addr_interfacelocal_allrouters = IN6ADDR_INTERFACELOCAL_ALLROUTERS_INIT;
++const struct in6_addr in6addr_interfacelocal_allrouters __aligned(BITS_PER_LONG/8)
++	= IN6ADDR_INTERFACELOCAL_ALLROUTERS_INIT;
+ EXPORT_SYMBOL(in6addr_interfacelocal_allrouters);
+-const struct in6_addr in6addr_sitelocal_allrouters = IN6ADDR_SITELOCAL_ALLROUTERS_INIT;
++const struct in6_addr in6addr_sitelocal_allrouters __aligned(BITS_PER_LONG/8)
++	= IN6ADDR_SITELOCAL_ALLROUTERS_INIT;
+ EXPORT_SYMBOL(in6addr_sitelocal_allrouters);
  
--	if (!inetdev_valid_mtu(cork->fragsize))
-+	if (!inetdev_valid_mtu(cork->fragsize)) {
-+		if (opt && free_opt) {
-+			kfree(cork->opt);
-+			cork->opt = NULL;
-+		}
- 		return -ENETUNREACH;
-+	}
- 
- 	cork->gso_size = ipc->gso_size;
- 
--- 
-2.34.1
+ static void snmp6_free_dev(struct inet6_dev *idev)
 
 
