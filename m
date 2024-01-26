@@ -1,208 +1,275 @@
-Return-Path: <netdev+bounces-66202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAF7583DF41
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 17:53:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9500383DF48
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 17:55:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CEC631C219D2
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 16:53:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D0EE28AE88
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 16:55:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42AEE1E883;
-	Fri, 26 Jan 2024 16:52:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C2151D545;
+	Fri, 26 Jan 2024 16:55:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="ILll+VHl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="le3gI6gs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3870A1E87E
-	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 16:52:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D4C31DDFF
+	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 16:55:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706287945; cv=none; b=M1otFm/c3grGqCvM25fXIj8DHwbbky06ISEiJrkDFTVp+RS1Bj44JpQe0TUrsuCjrXzaJZ2JgnpcriEP4UfbWa9N/GijMt6tmNZItmNpVbCMcI+v221588AVPRh6zVUTcGqlRaBKfEyya3oIhaMwHxQi8L7qvHvdKdxUz26VT0s=
+	t=1706288137; cv=none; b=i12dqUw2LUJ2T3UT1xp7zcSYsMN/bqEy1pehf2COW9xsauLyyva7A+JlcRAs+//KEv8+d9y803SCmt9+66Tr0GS5RObEOX+vPTBDwM5KQvRf1ofplTJ5cxIfuTmOZ0QmtYjtE8bQRVywIQjtXmBqeyajyFy6BEGOp2cbofa/riQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706287945; c=relaxed/simple;
-	bh=Dnv9cSVt3mJm2zXgTEcexEXzzt81rjMJ6iELIuEksY4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d2zWGb402dMxQYyXgbi9FIoPhcH6xeRsWui8K3Q5JOl2HpHiuPyZ1XicmnAx6PYxGv3FkvelUSA8H6jJoXVSzHtb8e/vVoaze1aJSonNFRnG1aKqOFuYnJZdPh18KU007BTHxHytIhL+DleAMtOWT4kFPcDWJ70UdXA7gXNY15o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=ILll+VHl; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1d74045c463so4423115ad.3
-        for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 08:52:23 -0800 (PST)
+	s=arc-20240116; t=1706288137; c=relaxed/simple;
+	bh=to3AMIdCzU1ONg6Gc+1QoiFHicVNSJGE+6LHESOC/DI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=qeFavSznHrJuqI+6ABF2mFphYEh0vtAZpS1V8eyF4cP5hvTjRvgWtBskBmnKEji+bgGio2mrzjCIr2P5jeg0sgelGMEr9knYIRpxnSOWAF7b9Yq/jBBcnbEaeuBWF8rnQuOwSnDJoX5Fa0bWqPX5dQTiozlr1NqSciQDUOWyNiE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=le3gI6gs; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5e6f42b1482so9394377b3.3
+        for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 08:55:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1706287942; x=1706892742; darn=vger.kernel.org;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dkzp/MtILUxvbC4PPb3TNi915LSTtGzwh5axhWkAsDw=;
-        b=ILll+VHl3e8nHt32s8rcphibTE8zcCxNrcaWCDeW/t1IwajhFIp9teHBG9iwFVgV4+
-         zqVhmpkybIHRQ0Lk6RIX9WC/TfVQ7nvFyTzeVMq9tmBvHo6N+YXvJ5+AwPBa4S8MR+LH
-         fWgi5qbLVwstWMAz9PSpTQLoReQcvDccgkPnc=
+        d=google.com; s=20230601; t=1706288134; x=1706892934; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=894J2N35ih9rZEofrThIjb89oVvLwKoFQH3nMlssfSk=;
+        b=le3gI6gs/RSOwXL/D7/jChWcTom3fhJSjFN+ep8JxDk6TYeqN726gI7oqive4CM2WA
+         yhpWRS/GioLWGcY4sgj4FGcXgGpQRUUcZQ65K3gA5M6zqSNqQTwo9Q2S8g8JDnKX3lKD
+         ew+BP5gRjoJF0wi9hFlJdwLka7FY84DmykmhPCuQlk6ziY64IoVx+qRY9ErEfs7HcZWO
+         zVLNti3oloEsFPi09EjiG9g999RGGwx1PuY4aXkcXCif0wx3rUId3GW4Ceem3OzDbcb+
+         sFj838GJ7N9RZuo/P3u0jeh6e5aJ5cSITCCVzesEddT0FdlZPdCHBGqmRPt6z/7cRWZX
+         Llpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706287942; x=1706892742;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dkzp/MtILUxvbC4PPb3TNi915LSTtGzwh5axhWkAsDw=;
-        b=k+FbmKKXy9cru5xp4NTYyonO5hXwthxg1ANZqXdO13mkG/IcIByqoqPcfam3k5Rypq
-         YR+8KnYeLqOCgUPxh8JD+Yufjpce30Mr7Fg/lfY5UhOX9U1AweVD/hNJBBlbtK5dzrJo
-         jcXR0De/lYVLMVnz1nZgNLW0a0KNEx1PmQPzHZzCc3cffpL7WA3c0IpxKeoazbTvIJIB
-         6fr+ky1rY1PRS8AEWpnWE1M3Fvk7T4qF2OqXxlZQjG2/UKxB/klDqtfUbbsisBtRbHAV
-         mKxdg5w67IBwdIUmM1Kg5r6jT3VhDJEM8JtZbo9tk481kQ66GKDhU6sHSTQgSca+8e/y
-         bl5A==
-X-Gm-Message-State: AOJu0YwZJdcG873c3A9CCtI/JkRelanQX/h1UufYMECB06hZf7XAWDQl
-	Tg9ymmdVO8zA+btJWLKMR1LvV5YHkheS8tnOQRuQsRSxxsqDPoJwT9G+7recvH8=
-X-Google-Smtp-Source: AGHT+IHgj/pRnInI6b+fMAlPmGcScOkEnr7055JlkDCNg5VW+RV4Jaw8m+wCe/hCGF7ydceuuPjpSg==
-X-Received: by 2002:a17:902:6b01:b0:1d8:8b23:c6db with SMTP id o1-20020a1709026b0100b001d88b23c6dbmr32679plk.5.1706287942618;
-        Fri, 26 Jan 2024 08:52:22 -0800 (PST)
-Received: from fastly.com (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id z5-20020a1709028f8500b001d7222d8caasm1151944plo.50.2024.01.26.08.52.20
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 26 Jan 2024 08:52:22 -0800 (PST)
-Date: Fri, 26 Jan 2024 08:52:18 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	chuck.lever@oracle.com, jlayton@kernel.org,
-	linux-api@vger.kernel.org, edumazet@google.com, davem@davemloft.net,
-	alexander.duyck@gmail.com, sridhar.samudrala@intel.com,
-	kuba@kernel.org, willemdebruijn.kernel@gmail.com, weiwan@google.com,
-	Jonathan Corbet <corbet@lwn.net>,
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nathan Lynch <nathanl@linux.ibm.com>,
-	Steve French <stfrench@microsoft.com>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Jiri Slaby <jirislaby@kernel.org>,
-	Julien Panis <jpanis@baylibre.com>, Arnd Bergmann <arnd@arndb.de>,
-	Andrew Waterman <waterman@eecs.berkeley.edu>,
-	Thomas Huth <thuth@redhat.com>, Palmer Dabbelt <palmer@dabbelt.com>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	"open list:FILESYSTEMS (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>
-Subject: Re: [PATCH net-next v3 3/3] eventpoll: Add epoll ioctl for
- epoll_params
-Message-ID: <20240126165217.GA1463@fastly.com>
-References: <20240125225704.12781-1-jdamato@fastly.com>
- <20240125225704.12781-4-jdamato@fastly.com>
- <2024012551-anyone-demeaning-867b@gregkh>
- <20240126001128.GC1987@fastly.com>
- <2024012525-outdoors-district-2660@gregkh>
- <20240126023630.GA1235@fastly.com>
- <20240126-kribbeln-sonnabend-35dcb3d1fc48@brauner>
+        d=1e100.net; s=20230601; t=1706288134; x=1706892934;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=894J2N35ih9rZEofrThIjb89oVvLwKoFQH3nMlssfSk=;
+        b=fRCcqQA/iJASPDRw/IATiopSSTzjNzHZIGXAO481Kr0clje6jsxK0FzVkRIBopm11V
+         be7X8IhHfVbaAL1Tkt3BpLM4GugaiJQZMyLMe/gcFZmuO4GCu9ujviJg3+tvA2LBabxD
+         z9Fbm70hrCU8Tx6VNMt98xts4piuDzsCja9GaNYyGWRmJDwtQeLzRPVN/+nSKcLCBRcz
+         /S7KjcbDwO+lC/fcgjKG6+2bgnqW8phJbR98fKb12c4WDGyL/Uzj8exDGVjCaM8uL6R2
+         CEB+9Ls+QxwQeObhbpwD2gsEQQF4E3GGAxdWsBKB5v+tlBXgoPMWOYjJTDTEjaKUS+jt
+         antw==
+X-Gm-Message-State: AOJu0YzEnm57pr9bYQdweorVAGJ9QtEsA5+vi+HkOIg16hJxBb6eAtuJ
+	BMc6fnLrtEmZDQLfVPaEO5CzI1aH7VgdJPX0lslgFAyDDyJZX0fvCJ204zIKj3y1l49qyr6EqvG
+	nxiXOByZLiQ==
+X-Google-Smtp-Source: AGHT+IH5bwRuiYGHgKnGfbNI/EaNrP6qBxLLrYWTwSzTiM6hQO73g+zlWefisGEytdCF+x/g4+kPwyOmlP76dQ==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:e07:b0:dc2:4fb7:5afe with SMTP
+ id df7-20020a0569020e0700b00dc24fb75afemr29252ybb.11.1706288134355; Fri, 26
+ Jan 2024 08:55:34 -0800 (PST)
+Date: Fri, 26 Jan 2024 16:55:32 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240126-kribbeln-sonnabend-35dcb3d1fc48@brauner>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
+Message-ID: <20240126165532.3396702-1-edumazet@google.com>
+Subject: [PATCH net] llc: call sock_orphan() at release time
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot+32b89eaa102b372ff76d@syzkaller.appspotmail.com, 
+	Eric Biggers <ebiggers@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Jan 26, 2024 at 11:07:36AM +0100, Christian Brauner wrote:
-> On Thu, Jan 25, 2024 at 06:36:30PM -0800, Joe Damato wrote:
-> > On Thu, Jan 25, 2024 at 04:23:58PM -0800, Greg Kroah-Hartman wrote:
-> > > On Thu, Jan 25, 2024 at 04:11:28PM -0800, Joe Damato wrote:
-> > > > On Thu, Jan 25, 2024 at 03:21:46PM -0800, Greg Kroah-Hartman wrote:
-> > > > > On Thu, Jan 25, 2024 at 10:56:59PM +0000, Joe Damato wrote:
-> > > > > > +struct epoll_params {
-> > > > > > +	u64 busy_poll_usecs;
-> > > > > > +	u16 busy_poll_budget;
-> > > > > > +
-> > > > > > +	/* for future fields */
-> > > > > > +	u8 data[118];
-> > > > > > +} EPOLL_PACKED;
-> > > > > 
-> > > > > variables that cross the user/kernel boundry need to be __u64, __u16,
-> > > > > and __u8 here.
-> > > > 
-> > > > I'll make that change for the next version, thank you.
-> > > > 
-> > > > > And why 118?
-> > > > 
-> > > > I chose this arbitrarily. I figured that a 128 byte struct would support 16
-> > > > u64s in the event that other fields needed to be added in the future. 118
-> > > > is what was left after the existing fields. There's almost certainly a
-> > > > better way to do this - or perhaps it is unnecessary as per your other
-> > > > message.
-> > > > 
-> > > > I am not sure if leaving extra space in the struct is a recommended
-> > > > practice for ioctls or not - I thought I noticed some code that did and
-> > > > some that didn't in the kernel so I err'd on the side of leaving the space
-> > > > and probably did it in the worst way possible.
-> > > 
-> > > It's not really a good idea unless you know exactly what you are going
-> > > to do with it.  Why not just have a new ioctl if you need new
-> > > information in the future?  That's simpler, right?
-> > 
-> > Sure, that makes sense to me. I'll remove it in the v4 alongside the other
-> > changes you've requested.
-> 
-> Fwiw, we do support extensible ioctls since they encode the size. Take a
-> look at kernel/seccomp.c. It's a clean extensible interface built on top
-> of the copy_struct_from_user() pattern we added for system calls
-> (openat(), clone3() etc.):
-> 
-> static long seccomp_notify_ioctl(struct file *file, unsigned int cmd,
->                                  unsigned long arg)
-> {
->         struct seccomp_filter *filter = file->private_data;
->         void __user *buf = (void __user *)arg;
-> 
->         /* Fixed-size ioctls */
->         switch (cmd) {
->         case SECCOMP_IOCTL_NOTIF_RECV:
->                 return seccomp_notify_recv(filter, buf);
->         case SECCOMP_IOCTL_NOTIF_SEND:
->                 return seccomp_notify_send(filter, buf);
->         case SECCOMP_IOCTL_NOTIF_ID_VALID_WRONG_DIR:
->         case SECCOMP_IOCTL_NOTIF_ID_VALID:
->                 return seccomp_notify_id_valid(filter, buf);
->         case SECCOMP_IOCTL_NOTIF_SET_FLAGS:
->                 return seccomp_notify_set_flags(filter, arg);
->         }
-> 
->         /* Extensible Argument ioctls */
-> #define EA_IOCTL(cmd)   ((cmd) & ~(IOC_INOUT | IOCSIZE_MASK))
->         switch (EA_IOCTL(cmd)) {
->         case EA_IOCTL(SECCOMP_IOCTL_NOTIF_ADDFD):
->                 return seccomp_notify_addfd(filter, buf, _IOC_SIZE(cmd));
->         default:
->                 return -EINVAL;
->         }
-> }
-> 
-> static long seccomp_notify_addfd(struct seccomp_filter *filter,
->                                  struct seccomp_notif_addfd __user *uaddfd,
->                                  unsigned int size)
-> {
->         struct seccomp_notif_addfd addfd;
->         struct seccomp_knotif *knotif;
->         struct seccomp_kaddfd kaddfd;
->         int ret;
-> 
->         BUILD_BUG_ON(sizeof(addfd) < SECCOMP_NOTIFY_ADDFD_SIZE_VER0);
->         BUILD_BUG_ON(sizeof(addfd) != SECCOMP_NOTIFY_ADDFD_SIZE_LATEST);
-> 
->         if (size < SECCOMP_NOTIFY_ADDFD_SIZE_VER0 || size >= PAGE_SIZE)
->                 return -EINVAL;
-> 
->         ret = copy_struct_from_user(&addfd, sizeof(addfd), uaddfd, size);
->         if (ret)
->                 return ret;
+syzbot reported an interesting trace [1] caused by a stale sk->sk_wq
+pointer in a closed llc socket.
 
-Thanks; that's a really helpful note and example.
+In commit ff7b11aa481f ("net: socket: set sock->sk to NULL after
+calling proto_ops::release()") Eric Biggers hinted that some protocols
+are missing a sock_orphan(), we need to perform a full audit.
 
-I'm inclined to believe that new fields probably won't be needed for a
-while, but if they are: an extensible ioctl could be added in the future
-to deal with that problem at that point.
+In net-next, I plan to clear sock->sk from sock_orphan() and
+amend Eric patch to add a warning.
 
-Thanks,
-Joe
+[1]
+ BUG: KASAN: slab-use-after-free in list_empty include/linux/list.h:373 [inline]
+ BUG: KASAN: slab-use-after-free in waitqueue_active include/linux/wait.h:127 [inline]
+ BUG: KASAN: slab-use-after-free in sock_def_write_space_wfree net/core/sock.c:3384 [inline]
+ BUG: KASAN: slab-use-after-free in sock_wfree+0x9a8/0x9d0 net/core/sock.c:2468
+Read of size 8 at addr ffff88802f4fc880 by task ksoftirqd/1/27
+
+CPU: 1 PID: 27 Comm: ksoftirqd/1 Not tainted 6.8.0-rc1-syzkaller-00049-g6098d87eaf31 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Call Trace:
+ <TASK>
+  __dump_stack lib/dump_stack.c:88 [inline]
+  dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
+  print_address_description mm/kasan/report.c:377 [inline]
+  print_report+0xc4/0x620 mm/kasan/report.c:488
+  kasan_report+0xda/0x110 mm/kasan/report.c:601
+  list_empty include/linux/list.h:373 [inline]
+  waitqueue_active include/linux/wait.h:127 [inline]
+  sock_def_write_space_wfree net/core/sock.c:3384 [inline]
+  sock_wfree+0x9a8/0x9d0 net/core/sock.c:2468
+  skb_release_head_state+0xa3/0x2b0 net/core/skbuff.c:1080
+  skb_release_all net/core/skbuff.c:1092 [inline]
+  napi_consume_skb+0x119/0x2b0 net/core/skbuff.c:1404
+  e1000_unmap_and_free_tx_resource+0x144/0x200 drivers/net/ethernet/intel/e1000/e1000_main.c:1970
+  e1000_clean_tx_irq drivers/net/ethernet/intel/e1000/e1000_main.c:3860 [inline]
+  e1000_clean+0x4a1/0x26e0 drivers/net/ethernet/intel/e1000/e1000_main.c:3801
+  __napi_poll.constprop.0+0xb4/0x540 net/core/dev.c:6576
+  napi_poll net/core/dev.c:6645 [inline]
+  net_rx_action+0x956/0xe90 net/core/dev.c:6778
+  __do_softirq+0x21a/0x8de kernel/softirq.c:553
+  run_ksoftirqd kernel/softirq.c:921 [inline]
+  run_ksoftirqd+0x31/0x60 kernel/softirq.c:913
+  smpboot_thread_fn+0x660/0xa10 kernel/smpboot.c:164
+  kthread+0x2c6/0x3a0 kernel/kthread.c:388
+  ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+  ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+ </TASK>
+
+Allocated by task 5167:
+  kasan_save_stack+0x33/0x50 mm/kasan/common.c:47
+  kasan_save_track+0x14/0x30 mm/kasan/common.c:68
+  unpoison_slab_object mm/kasan/common.c:314 [inline]
+  __kasan_slab_alloc+0x81/0x90 mm/kasan/common.c:340
+  kasan_slab_alloc include/linux/kasan.h:201 [inline]
+  slab_post_alloc_hook mm/slub.c:3813 [inline]
+  slab_alloc_node mm/slub.c:3860 [inline]
+  kmem_cache_alloc_lru+0x142/0x6f0 mm/slub.c:3879
+  alloc_inode_sb include/linux/fs.h:3019 [inline]
+  sock_alloc_inode+0x25/0x1c0 net/socket.c:308
+  alloc_inode+0x5d/0x220 fs/inode.c:260
+  new_inode_pseudo+0x16/0x80 fs/inode.c:1005
+  sock_alloc+0x40/0x270 net/socket.c:634
+  __sock_create+0xbc/0x800 net/socket.c:1535
+  sock_create net/socket.c:1622 [inline]
+  __sys_socket_create net/socket.c:1659 [inline]
+  __sys_socket+0x14c/0x260 net/socket.c:1706
+  __do_sys_socket net/socket.c:1720 [inline]
+  __se_sys_socket net/socket.c:1718 [inline]
+  __x64_sys_socket+0x72/0xb0 net/socket.c:1718
+  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+  do_syscall_64+0xd3/0x250 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+Freed by task 0:
+  kasan_save_stack+0x33/0x50 mm/kasan/common.c:47
+  kasan_save_track+0x14/0x30 mm/kasan/common.c:68
+  kasan_save_free_info+0x3f/0x60 mm/kasan/generic.c:640
+  poison_slab_object mm/kasan/common.c:241 [inline]
+  __kasan_slab_free+0x121/0x1b0 mm/kasan/common.c:257
+  kasan_slab_free include/linux/kasan.h:184 [inline]
+  slab_free_hook mm/slub.c:2121 [inline]
+  slab_free mm/slub.c:4299 [inline]
+  kmem_cache_free+0x129/0x350 mm/slub.c:4363
+  i_callback+0x43/0x70 fs/inode.c:249
+  rcu_do_batch kernel/rcu/tree.c:2158 [inline]
+  rcu_core+0x819/0x1680 kernel/rcu/tree.c:2433
+  __do_softirq+0x21a/0x8de kernel/softirq.c:553
+
+Last potentially related work creation:
+  kasan_save_stack+0x33/0x50 mm/kasan/common.c:47
+  __kasan_record_aux_stack+0xba/0x100 mm/kasan/generic.c:586
+  __call_rcu_common.constprop.0+0x9a/0x7b0 kernel/rcu/tree.c:2683
+  destroy_inode+0x129/0x1b0 fs/inode.c:315
+  iput_final fs/inode.c:1739 [inline]
+  iput.part.0+0x560/0x7b0 fs/inode.c:1765
+  iput+0x5c/0x80 fs/inode.c:1755
+  dentry_unlink_inode+0x292/0x430 fs/dcache.c:400
+  __dentry_kill+0x1ca/0x5f0 fs/dcache.c:603
+  dput.part.0+0x4ac/0x9a0 fs/dcache.c:845
+  dput+0x1f/0x30 fs/dcache.c:835
+  __fput+0x3b9/0xb70 fs/file_table.c:384
+  task_work_run+0x14d/0x240 kernel/task_work.c:180
+  exit_task_work include/linux/task_work.h:38 [inline]
+  do_exit+0xa8a/0x2ad0 kernel/exit.c:871
+  do_group_exit+0xd4/0x2a0 kernel/exit.c:1020
+  __do_sys_exit_group kernel/exit.c:1031 [inline]
+  __se_sys_exit_group kernel/exit.c:1029 [inline]
+  __x64_sys_exit_group+0x3e/0x50 kernel/exit.c:1029
+  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+  do_syscall_64+0xd3/0x250 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+The buggy address belongs to the object at ffff88802f4fc800
+ which belongs to the cache sock_inode_cache of size 1408
+The buggy address is located 128 bytes inside of
+ freed 1408-byte region [ffff88802f4fc800, ffff88802f4fcd80)
+
+The buggy address belongs to the physical page:
+page:ffffea0000bd3e00 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x2f4f8
+head:ffffea0000bd3e00 order:3 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+anon flags: 0xfff00000000840(slab|head|node=0|zone=1|lastcpupid=0x7ff)
+page_type: 0xffffffff()
+raw: 00fff00000000840 ffff888013b06b40 0000000000000000 0000000000000001
+raw: 0000000000000000 0000000080150015 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 3, migratetype Reclaimable, gfp_mask 0xd20d0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC|__GFP_RECLAIMABLE), pid 4956, tgid 4956 (sshd), ts 31423924727, free_ts 0
+  set_page_owner include/linux/page_owner.h:31 [inline]
+  post_alloc_hook+0x2d0/0x350 mm/page_alloc.c:1533
+  prep_new_page mm/page_alloc.c:1540 [inline]
+  get_page_from_freelist+0xa28/0x3780 mm/page_alloc.c:3311
+  __alloc_pages+0x22f/0x2440 mm/page_alloc.c:4567
+  __alloc_pages_node include/linux/gfp.h:238 [inline]
+  alloc_pages_node include/linux/gfp.h:261 [inline]
+  alloc_slab_page mm/slub.c:2190 [inline]
+  allocate_slab mm/slub.c:2354 [inline]
+  new_slab+0xcc/0x3a0 mm/slub.c:2407
+  ___slab_alloc+0x4af/0x19a0 mm/slub.c:3540
+  __slab_alloc.constprop.0+0x56/0xa0 mm/slub.c:3625
+  __slab_alloc_node mm/slub.c:3678 [inline]
+  slab_alloc_node mm/slub.c:3850 [inline]
+  kmem_cache_alloc_lru+0x379/0x6f0 mm/slub.c:3879
+  alloc_inode_sb include/linux/fs.h:3019 [inline]
+  sock_alloc_inode+0x25/0x1c0 net/socket.c:308
+  alloc_inode+0x5d/0x220 fs/inode.c:260
+  new_inode_pseudo+0x16/0x80 fs/inode.c:1005
+  sock_alloc+0x40/0x270 net/socket.c:634
+  __sock_create+0xbc/0x800 net/socket.c:1535
+  sock_create net/socket.c:1622 [inline]
+  __sys_socket_create net/socket.c:1659 [inline]
+  __sys_socket+0x14c/0x260 net/socket.c:1706
+  __do_sys_socket net/socket.c:1720 [inline]
+  __se_sys_socket net/socket.c:1718 [inline]
+  __x64_sys_socket+0x72/0xb0 net/socket.c:1718
+  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+  do_syscall_64+0xd3/0x250 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+page_owner free stack trace missing
+
+Memory state around the buggy address:
+ ffff88802f4fc780: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff88802f4fc800: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff88802f4fc880: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                   ^
+ ffff88802f4fc900: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88802f4fc980: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+
+Fixes: 43815482370c ("net: sock_def_readable() and friends RCU conversion")
+Reported-and-tested-by: syzbot+32b89eaa102b372ff76d@syzkaller.appspotmail.com
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Eric Biggers <ebiggers@google.com>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
+---
+ net/llc/af_llc.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/net/llc/af_llc.c b/net/llc/af_llc.c
+index 20551cfb7da6d8dd098c906477895e26c080fe32..fde1140d899efc7ba02e6bc3998cb857ef30df14 100644
+--- a/net/llc/af_llc.c
++++ b/net/llc/af_llc.c
+@@ -226,6 +226,8 @@ static int llc_ui_release(struct socket *sock)
+ 	}
+ 	netdev_put(llc->dev, &llc->dev_tracker);
+ 	sock_put(sk);
++	sock_orphan(sk);
++	sock->sk = NULL;
+ 	llc_sk_free(sk);
+ out:
+ 	return 0;
+-- 
+2.43.0.429.g432eaa2c6b-goog
+
 
