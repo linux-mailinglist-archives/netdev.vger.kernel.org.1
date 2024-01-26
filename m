@@ -1,201 +1,215 @@
-Return-Path: <netdev+bounces-66117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BD4083D483
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 08:51:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAE1383D518
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 09:58:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E36A1C2450C
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 07:51:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2FC9F1F21A95
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 08:58:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F41714A90;
-	Fri, 26 Jan 2024 06:37:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82CBE45965;
+	Fri, 26 Jan 2024 07:27:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="SK1BjDZr"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Fw4e8BGc";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="8mBylZ2M";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Fw4e8BGc";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="8mBylZ2M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A91CC8DE
-	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 06:37:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D68A52A1B0;
+	Fri, 26 Jan 2024 07:27:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706251050; cv=none; b=FHjYahaTB0CkKJZkvFw5yaqydScH//w0+MwjITc+k/21p4qSR/Nfe2jdc+rLaCEtSD8fMMxz9veL6hGbUXfcSsbJPdUogDKfd53Lvi5rYFn3ohFaHiiJnacN6P9e/pWfqpwF/4UFWne6ViFNhlelVjl97IcP/aZT9SYboOne35E=
+	t=1706254061; cv=none; b=iqsO1XLANmnIjmewAeQaaKvAYKiTSUq2TkTrgeRHkagFnQ9DkuTIK+HnwVD2sFeTLuHdyfpIslgamJwLxCVU9zy5L+Eiv0zHRDWv1H8f8+TRtiKU1mlfseYAy0se5GUYhnT+A8cJWpnltqwOCW1dHqSBeGSvGaijfFDLZzImNtM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706251050; c=relaxed/simple;
-	bh=ySD36GLW2TyLWqbun+jwNCf/EA3cuqP7LzWUkNQzmTo=;
-	h=From:To:CC:Date:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=KM8QWIVONSV4ZXdDLyA4swUr36Oaccfam5agZHhiXAfRj7mi0D0QUb0SW5YrpyYD5RgpOlNQmx5mTzX5UH9S2bT6qqQfDx3WBHynz7EVJ+wAbmLviQHNc+u3tD62FiEGMnDSuS6DgT4M8MgHWVUCLI9kyX0VRUYVnrwVqruJqVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=SK1BjDZr; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-40e7065b7bdso372375e9.3
-        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 22:37:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1706251046; x=1706855846; darn=vger.kernel.org;
-        h=mime-version:subject:user-agent:references:in-reply-to:message-id
-         :date:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=FeVWXpN2B8w5L4OHtFWBJ4OOJBGHhV+TfbLhetxb/qY=;
-        b=SK1BjDZrlfmDm0S1Ri1cvtdXE++VEonGSiVGap9Eo6coOlexXK9PMaIsaxZO3bFUat
-         2GcftOLmLBbqZ/RqZp99p2q20/tfNYLPjGZN0cnozRvxUvr0bM0/uadXC2lne4HvBZee
-         bWWCaRZGdtm40Yt8L9QU11Ks1GoLYFOgeCHmg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706251046; x=1706855846;
-        h=mime-version:subject:user-agent:references:in-reply-to:message-id
-         :date:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FeVWXpN2B8w5L4OHtFWBJ4OOJBGHhV+TfbLhetxb/qY=;
-        b=IjhPfDVcHVXGLuZ7EUYOZiP1yd18UxLq3iMhepVBV/axlTy8vEQWySU0pPzQPhZWTN
-         RJ6WvN3POr2fCLXrv2+J4WzY5UyXp59lABxuxUQ67yVJVm379bIklKD2RlQ2lq9wHWr6
-         Tz5/AI+qGoVIcfsPe52n6XdiIS7hMm7NJEc8NuJDY+KbwD2CGdrKcFiy5KvUM3wI97Ut
-         KgeIPGwFgrkJPQdFvWM5bXkQnovIe8HfkpJz+GrGwf1bArTEJhsUbOAYo8zIEV45CNI1
-         fFWS0mpgcFH+0nmi2ojYHRbsEbGnBO/OmotQ8cmydhNjsPNCd8IdTN4tmN8Zkp9sTbAs
-         YfrA==
-X-Gm-Message-State: AOJu0YymN+hwgXkmpUAlZo3Hixce6HjU5JpY0oRbsdk6qr9tZufGR0hM
-	9PXzvBvY7fKp/XeAgdiLPs+cI9BfMcLUyYZsA3LciwAR/Bwph/a0VKuNTE8X22UNBYPd7I2BNPc
-	jqCIQ
-X-Google-Smtp-Source: AGHT+IFEJmOupMb8qbxpjhHGasgIUH8t3cvCZ9qaSJJtW68L1GBhXtzhDkd1zCdAWUlqrjc/0YZWFg==
-X-Received: by 2002:a05:600c:2309:b0:40e:5422:5514 with SMTP id 9-20020a05600c230900b0040e54225514mr321548wmo.237.1706251046429;
-        Thu, 25 Jan 2024 22:37:26 -0800 (PST)
-Received: from [10.230.35.166] ([192.19.148.250])
-        by smtp.gmail.com with ESMTPSA id az32-20020a05600c602000b0040ed4d97b16sm1764152wmb.12.2024.01.25.22.37.24
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 25 Jan 2024 22:37:24 -0800 (PST)
-From: Arend Van Spriel <arend.vanspriel@broadcom.com>
-To: Kalle Valo <kvalo@kernel.org>, Jakub Kicinski <kuba@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-wireless@vger.kernel.org>
-Date: Fri, 26 Jan 2024 07:37:23 +0100
-Message-ID: <18d447cc0b8.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
-In-Reply-To: <87r0i4zl92.fsf@kernel.org>
-References: <20240125104030.B6CA6C433C7@smtp.kernel.org>
- <20240125165128.7e43a1f3@kernel.org>
- <87r0i4zl92.fsf@kernel.org>
-User-Agent: AquaMail/1.49.2 (build: 104902408)
-Subject: Re: pull-request: wireless-next-2024-01-25
+	s=arc-20240116; t=1706254061; c=relaxed/simple;
+	bh=GINjbe2szq535SXFdiGwXNCMoePT2lkGqtDutSceO/Y=;
+	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
+	 References:Date:Message-id; b=pyAG+aK5TjFmYrgj+OwGVOrks4IoT0oSDFsKe53MVv1ZPrf5hw39YgDHRjygPv2h5vYGNViw4aw6xVajFsPnxt1FkuNrlBzpnmB55Pz0a6P4zdSxRhkePS18idZ98NFa6NP9z20niof1q9LvgBokaJRw1pLgSfMwINlFK0dFdqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Fw4e8BGc; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=8mBylZ2M; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Fw4e8BGc; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=8mBylZ2M; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 7A66B1FB65;
+	Fri, 26 Jan 2024 07:27:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1706254056; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=z/2ZWD0aX6DVLsqYxQrCHNgwHrQVXAkUwctAhMPow9I=;
+	b=Fw4e8BGcWSZd8D6WB8hvPrizDOjApux9P1uDEkD/VwBar6DeCCwzCglGbRQARq4c9LcmIk
+	Kk/1zdRnaW54DRqWRIaabLby0kepHsmWBV9UyPJhDVtPq/bbE4RGCKaN0iK68iToh2R+EH
+	ATDnHTTOJ12Bw+EMmMvEDx1fiIjM4ro=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1706254056;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=z/2ZWD0aX6DVLsqYxQrCHNgwHrQVXAkUwctAhMPow9I=;
+	b=8mBylZ2M2Ew22jXrdXxN10nZuuPNQwJhEncNYQyJgv2cGpo3XwdREcYw5Nej+9AK+LqVQx
+	flC0mL2LKNPkZICA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1706254056; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=z/2ZWD0aX6DVLsqYxQrCHNgwHrQVXAkUwctAhMPow9I=;
+	b=Fw4e8BGcWSZd8D6WB8hvPrizDOjApux9P1uDEkD/VwBar6DeCCwzCglGbRQARq4c9LcmIk
+	Kk/1zdRnaW54DRqWRIaabLby0kepHsmWBV9UyPJhDVtPq/bbE4RGCKaN0iK68iToh2R+EH
+	ATDnHTTOJ12Bw+EMmMvEDx1fiIjM4ro=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1706254056;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=z/2ZWD0aX6DVLsqYxQrCHNgwHrQVXAkUwctAhMPow9I=;
+	b=8mBylZ2M2Ew22jXrdXxN10nZuuPNQwJhEncNYQyJgv2cGpo3XwdREcYw5Nej+9AK+LqVQx
+	flC0mL2LKNPkZICA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E3B6A134C3;
+	Fri, 26 Jan 2024 07:27:33 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([10.150.64.162])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id NQi8JuVes2WrZQAAD6G6ig
+	(envelope-from <neilb@suse.de>); Fri, 26 Jan 2024 07:27:33 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000089b2e1060fd3876d"
+From: "NeilBrown" <neilb@suse.de>
+To: "Chuck Lever III" <chuck.lever@oracle.com>
+Cc: "Jeff Layton" <jlayton@kernel.org>,
+ "Lorenzo Bianconi" <lorenzo@kernel.org>,
+ "Linux NFS Mailing List" <linux-nfs@vger.kernel.org>,
+ "Lorenzo Bianconi" <lorenzo.bianconi@redhat.com>,
+ "Jakub Kicinski" <kuba@kernel.org>, "Simon Horman" <horms@kernel.org>,
+ "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Subject: Re: [PATCH v6 3/3] NFSD: add write_ports to netlink command
+In-reply-to: <DAB30AAE-41F5-4FC5-AA14-E7E06BB389B5@oracle.com>
+References: <cover.1705771400.git.lorenzo@kernel.org>,
+ <f7c42dae2b232b3b06e54ceb3f00725893973e02.1705771400.git.lorenzo@kernel.org>,
+ <9e3ae337dcf168c60c4cfd51aa0b2fc7b24bcbfb.camel@kernel.org>,
+ <170595930799.23031.17998490973211605470@noble.neil.brown.name>,
+ <Za7zHvPJdei/vWm4@tissot.1015granger.net>, <Za-N6BxOMXTGyxmW@lore-desk>,
+ <85b02061798a1b750a87b0302681b86651d0c7a3.camel@kernel.org>,
+ <Za-9P0NjlIsc1PcE@lore-desk>,
+ <3f035d3bc494ec03b83ae237e407c42f2ddc4c53.camel@kernel.org>,
+ <ZbDdzwvP6-O2zosC@lore-desk>,
+ <8fabd83caa0d44369853a4040a89c069f9b0f935.camel@kernel.org>,
+ <917EC07C-C9D9-4CF2-9ACB-DCA2676DFF67@oracle.com>,
+ <170622264103.21664.16941742935452333478@noble.neil.brown.name>,
+ <DAB30AAE-41F5-4FC5-AA14-E7E06BB389B5@oracle.com>
+Date: Fri, 26 Jan 2024 18:27:27 +1100
+Message-id: <170625404709.21664.1810481700674698939@noble.neil.brown.name>
+X-Spam-Level: 
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=Fw4e8BGc;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=8mBylZ2M
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-9.51 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	 FROM_HAS_DN(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 MIME_GOOD(-0.10)[text/plain];
+	 DWL_DNSWL_HI(-3.50)[suse.de:dkim];
+	 RCVD_DKIM_ARC_DNSWL_HI(-1.00)[];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 DKIM_TRACE(0.00)[suse.de:+];
+	 MX_GOOD(-0.01)[];
+	 RCPT_COUNT_SEVEN(0.00)[8];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:email];
+	 TO_DN_ALL(0.00)[];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 NEURAL_HAM_SHORT(-0.20)[-1.000];
+	 RCVD_IN_DNSWL_HI(-0.50)[2a07:de40:b281:104:10:150:64:97:from];
+	 RCVD_TLS_ALL(0.00)[];
+	 BAYES_HAM(-3.00)[100.00%]
+X-Spam-Score: -9.51
+X-Rspamd-Queue-Id: 7A66B1FB65
+X-Spam-Flag: NO
 
---00000000000089b2e1060fd3876d
-Content-Type: text/plain; format=flowed; charset="us-ascii"
-Content-Transfer-Encoding: 8bit
+On Fri, 26 Jan 2024, Chuck Lever III wrote:
+>=20
+>=20
+> > On Jan 25, 2024, at 5:44=E2=80=AFPM, NeilBrown <neilb@suse.de> wrote:
+> >=20
+> > On Thu, 25 Jan 2024, Chuck Lever III wrote:
+> >>=20
+> >>=20
+> >>> On Jan 24, 2024, at 6:24=E2=80=AFAM, Jeff Layton <jlayton@kernel.org> w=
+rote:
+> >>>=20
+> >>> On Wed, 2024-01-24 at 10:52 +0100, Lorenzo Bianconi wrote:
+> >>>> [...]
+> >>>>>=20
+> >>>>> That's a great question. We do need to properly support the -H option=
+ to
+> >>>>> rpc.nfsd. What we do today is look up the hostname or address using
+> >>>>> getaddrinfo, and then open a listening socket for that address and th=
+en
+> >>>>> pass that fd down to the kernel, which I think then takes the socket =
+and
+> >>>>> sticks it on sv_permsocks.
+> >>>>>=20
+> >>>>> All of that seems a bit klunky. Ideally, I'd say the best thing would=
+ be
+> >>>>> to allow userland to pass the sockaddr we look up directly via netlin=
+k,
+> >>>>> and then let the kernel open the socket. That will probably mean
+> >>>>> refactoring some of the svc_xprt_create machinery to take a sockaddr,
+> >>>>> but I don't think it looks too hard to do.
+> >>>>=20
+> >>>> Do we already have a specific use case for it? I think we can even add=
+ it
+> >>>> later when we have a defined use case for it on top of the current ser=
+ies.
+> >>>>=20
+> >>>=20
+> >>> Yes:
+> >>>=20
+> >>> rpc.nfsd -H makes nfsd listen on a particular address and port. By
+> >>> passing down the sockaddr instead of an already-opened socket
+> >>> descriptor, we can achieve the goal without having to open sockets in
+> >>> userland.
+> >>=20
+> >> Tearing down a listener that was created that way would be a
+> >> use case for:
+> >=20
+> > Only if it was actually useful.
+> > Have you *ever* wanted to do that?  Or heard from anyone else who did?
+>=20
+> Container shutdown will want to clear out any listener
+> that might have been created during the container's
+> lifetime. How is that done today? Is that simply handled
+> by net namespace tear-down?
 
-On January 26, 2024 7:01:18 AM Kalle Valo <kvalo@kernel.org> wrote:
+Yes.  When the last thread in a netns exits, nfsd_last_thread() is
+called which closes all sockets.
 
-> Jakub Kicinski <kuba@kernel.org> writes:
->
->> On Thu, 25 Jan 2024 10:40:30 +0000 (UTC) Kalle Valo wrote:
->>> The first "new features" pull request for v6.9. We have only driver
->>> changes this time and most of them are for Realtek drivers. Really
->>> nice to see activity in Broadcom drivers again.
->>
->> minor thing for a follow up:
->>
->> drivers/net/wireless/broadcom/brcm80211/brcmfmac/fwil.c:432:49:
->> warning: no newline at end of file
->
-> Oh, sorry about that. Any tips how to detect this?
-
-I thought checkpatch would signal that or is it a sparse warning. Anyway, I 
-can fix it.
-
-Gr. AvS
-
-> --
-> https://patchwork.kernel.org/project/linux-wireless/list/
->
-> https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
-
-
-
-
---00000000000089b2e1060fd3876d
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-2Gzj3QNJRLsZu1TLyOyBBIr/BE7UiY3RabgRzknBGAPmzhS+fmyM8OtM5BYBsFBrSUFtZZO2p/tf
-Nbc24J2zf2peoZ8MK+7WQqummYlOnz+FyDkA9EybeNMcS5C+xi/PAgMBAAGjggHdMIIB2TAOBgNV
-HQ8BAf8EBAMCBaAwgaMGCCsGAQUFBwEBBIGWMIGTME4GCCsGAQUFBzAChkJodHRwOi8vc2VjdXJl
-Lmdsb2JhbHNpZ24uY29tL2NhY2VydC9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcnQwQQYI
-KwYBBQUHMAGGNWh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24y
-Y2EyMDIwME0GA1UdIARGMEQwQgYKKwYBBAGgMgEoCjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3
-dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAJBgNVHRMEAjAAMEkGA1UdHwRCMEAwPqA8oDqG
-OGh0dHA6Ly9jcmwuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3Js
-MCcGA1UdEQQgMB6BHGFyZW5kLnZhbnNwcmllbEBicm9hZGNvbS5jb20wEwYDVR0lBAwwCgYIKwYB
-BQUHAwQwHwYDVR0jBBgwFoAUljPR5lgXWzR1ioFWZNW+SN6hj88wHQYDVR0OBBYEFIikAXd8CEtv
-ZbDflDRnf3tuStPuMA0GCSqGSIb3DQEBCwUAA4IBAQCdS5XCYx6k2GGZui9DlFsFm75khkqAU7rT
-zBX04sJU1+B1wtgmWTVIzW7ugdtDZ4gzaV0S9xRhpDErjJaltxPbCylb1DEsLj+AIvBR34caW6ZG
-sQk444t0HPb29HnWYj+OllIGMbdJWr0/P95ZrKk2bP24ub3ZP/8SyzrohfIba9WZKMq6g2nTLZE3
-BtkeSGJx/8dy0h8YmRn+adOrxKXHxhSL8BNn8wsmIZyYWe6fRcBtO3Ks2DOLyHCdkoFlN8x9VUQF
-N2ulEgqCbRKkx+qNirW86eF138lr1gRxzclu/38ko//MmkAYR/+hP3WnBll7zbpIt0jc9wyFkSqH
-p8a1MYICbTCCAmkCAQEwazBbMQswCQYDVQQGEwJCRTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1z
-YTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMgUGVyc29uYWxTaWduIDIgQ0EgMjAyMAIMTv1t
-bpIzNUky46LXMA0GCWCGSAFlAwQCAQUAoIHUMC8GCSqGSIb3DQEJBDEiBCD7htbznbaXWIxlTr35
-7D9fDcdrYo8ToHxH4QXUL8VytTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJ
-BTEPFw0yNDAxMjYwNjM3MjZaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZIAWUDBAEqMAsGCWCGSAFl
-AwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEKMAsGCSqGSIb3DQEBBzAL
-BglghkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEAxjLhomG9Go63PUaGXUZCIppOUNM1DcYRmZLM
-mQkGHTN/63JIm7vw4xpNi3fmUXWUwjuS5wq7XOYntjGCvKPr8bWNzNeFekI6xpHeGHSRGlwwmJRA
-yEnqhqT4Hd4AeawRj94fKzrmbGdCT9JX2ZvRH5iLC/bRTC8vX8xJCi50Z7gtDDBW7XHzeKCJtetw
-0Mrlt00+H6TgrW4tORlPqM3BSvej6HHC2r5UgGyyZPO8MpyMACBnOo75R0SLjnxcAmLHEaAIGEdT
-bapzsY+oEoGuLyBCKAD0HqV3da8hYBY7jf2BeFZTe9TPvCtHwNq01LqRPEaRFt4MVfMTl/TL8x6k
-/w==
---00000000000089b2e1060fd3876d--
+NeilBrown
 
