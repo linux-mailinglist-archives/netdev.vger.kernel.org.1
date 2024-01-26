@@ -1,402 +1,236 @@
-Return-Path: <netdev+bounces-66178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A35283DB51
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 14:58:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6309683DB5F
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 14:59:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C2198B277A7
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 13:58:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BAE7F1F24A6D
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 13:59:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9DEA1DA30;
-	Fri, 26 Jan 2024 13:56:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01C261BDD6;
+	Fri, 26 Jan 2024 13:58:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="V/58+9Jk"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="TyW1rWFh";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="YCPpoiaf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77D2F1D6B8;
-	Fri, 26 Jan 2024 13:56:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706277387; cv=none; b=RC4uJBVTiUJnUs5TfhaEoyxoC0gxRxsz3S9UfwqWtK8QQbdM/P4LhWHFjojEU5GWzCTtQRQdLHV9iwj/aiOY4izjNvjbnTEF6LgaIWPbW+79ZYj1gI4bHbYJAiV3epV+6Ue8NlxYExPDjc84xYdo7XA6yd5eoNwgOdo0H02Zs2Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706277387; c=relaxed/simple;
-	bh=WK3WClBQhuckX5lChmR8+KLM63rB0M/eKWd6TlGpLH0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BxvS3mklLJKA2IRdFApWxvvzm2Ae1srSyOzhyTifsdukBpVaV9jorjCdUiOF4qvyC5f3uvefkN+mmkJvwOprdHGvBlPJd4hE4l558AuWiihyANwga2oLE9l6Dnv2cZaecAxEccDag5Hfzf7PCSSftH72AMUWxliwSXtgsmqZLkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=V/58+9Jk; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706277386; x=1737813386;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=WK3WClBQhuckX5lChmR8+KLM63rB0M/eKWd6TlGpLH0=;
-  b=V/58+9JktuDWZCiVCrUztclp4NW5YowOI7Udjr5x6oOXGAYla38K9V9s
-   jDkCWNMw83adgWjqwQF86b03Ifq0Q3NKKcElUaYRdCfIKdd0YWxPZBJX5
-   R0We1UYiXr70VuS08A/qylAa9JPG58m+3gEiY8YgFPoV98hOr0rzYajGJ
-   l8TmhYRYyG7MVi7qnWrneqtK4UvogezsAh6DR7wxqyjPCp7lf7pCHKE9r
-   2MS8I3Hw8nb+7ras/Ze1IqeMrGcjNMLRmhLkpWPCoAWrqLu8ZmHTWq4pf
-   JitKcktnuHOi8ncic77HkLrSzenhxwgfRhSg16I+bQ6jPTSOuT8rGC8mB
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="15998566"
-X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="15998566"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 05:56:25 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="821143062"
-X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="821143062"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by orsmga001.jf.intel.com with ESMTP; 26 Jan 2024 05:56:19 -0800
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Alexander Duyck <alexanderduyck@fb.com>,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	iommu@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 7/7] xsk: use generic DMA sync shortcut instead of a custom one
-Date: Fri, 26 Jan 2024 14:54:56 +0100
-Message-ID: <20240126135456.704351-8-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240126135456.704351-1-aleksander.lobakin@intel.com>
-References: <20240126135456.704351-1-aleksander.lobakin@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 654091BDFF;
+	Fri, 26 Jan 2024 13:58:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706277519; cv=fail; b=H2QEsb3+6iaRijmJLbOYIo2P3CtOjsGErroewCdwYGXWYm678kVEsoz3mfbnIWdx25CGSJSIiYoqqDMgnNijnzLC558ogbxhPDGGGJl4IDo9clICE8nOZrLIJRwatXHOhCtp3daVJOTF7Yqci4zy0HZZ7tfMeRxRM6tQRU8eVTY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706277519; c=relaxed/simple;
+	bh=r/VcfnD6P5eOmPsC+1NpL0fFpyYXKhmEVyLCK78Xh3U=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=uFxXnhhHeIlbUl2hp+aj32nTETQ2vcQjd43cAB2o+M/b5foFG5xaRK+61sPiC2Hwc3vnJievQH5KdvLpw22+4o1hwwUZw8luZt1+m83aedQG+SbGo6JEdzJwpnR8tKiQ1kPio1zgGTKUMxHGMa33AV+9QcwhXNy+Fb9Yl1fJhMM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=TyW1rWFh; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=YCPpoiaf; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 40QD5gfK029444;
+	Fri, 26 Jan 2024 13:58:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-id : content-transfer-encoding : mime-version; s=corp-2023-11-20;
+ bh=r/VcfnD6P5eOmPsC+1NpL0fFpyYXKhmEVyLCK78Xh3U=;
+ b=TyW1rWFh206gjc4BhyKAVUnwKhehON2Tr/P7z4T8kLWOSquvLr3h0MfQlJ46P5Y1LJs+
+ ZkudxrcN/wMBhOVjpXL41/XY3xNlobl7AhCcKR1SjMp0Xha422Fzz93FbD8qsfyxzh9r
+ e24Jw2mPwOQYIuBfECOAr1rPs+OhlLanrJAKFbPo1NE+zvvEZlxaWeGmRn1h5lT3vyiq
+ /c0xWTQ+0skoLl2y5y/4q5UWcEQw8DyQ3o/quzmRfo/pS3VUQqUgsXsj8Jv6Mli+0+yP
+ uN6UJoV2j6M5y/nuf4lTsFb77OW8lLrGtTcXlUpswrYDOzPIx1zhCzvMOrX3vsI0l+LV 9A== 
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3vr79ntca2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 26 Jan 2024 13:58:28 +0000
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 40QBY2TW011769;
+	Fri, 26 Jan 2024 13:58:26 GMT
+Received: from nam04-dm6-obe.outbound.protection.outlook.com (mail-dm6nam04lp2040.outbound.protection.outlook.com [104.47.73.40])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3vs327ds62-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 26 Jan 2024 13:58:26 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=oSm/6ChrSELwJVF9HO0ZOVilNNVs75N9FfHvL/1VpoTDloi3c6BEY7Rxg56N93GhIynbgmPbLOnu9pTlhUFbB+OGov3V/+xUhJo7rSu0FkhQbhsBHt7WIQt3K/j1bBomozqfhsZq98r1vxhsMNfqDA63F3zY5eS7EI59r7aDR1eZVTY21I8CZe8hJUeZSn41irdqDSIvgqx18HI2VLno3b9JogbXxnMXSaHJJELbvC6+iSGhwWefkXhmfTjuS7GtQvdIN/h0zTdJluXOqgQxfqR9RM0FoGHl6WiYLuv+Ce5AMMaRav8qOKjq704jyWLkALas+AS2e8iciot+towNsw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=r/VcfnD6P5eOmPsC+1NpL0fFpyYXKhmEVyLCK78Xh3U=;
+ b=k/fFVECMF1nVHvXheXwa0KObzM+iGTTdR99SfHGkDsyRXsZdl3X98GtaZEQFL7E2D8soGcs0IP/KkiQe0B2/beKW8Zcg7bjKOe9p/+0eKM3efsfNIIDZbm+yvV6a/2HTNHxb+UScZoCYRKaYij4EiryFKHYDEFnqiS7efOOYMVE13KGV/bLrEeplOvLlkETYmSFTcCL6C4J+5wt50Ktz1anCg21GglGeCIwWjQnSavq974bIs92C0AkV7EV/mTXQ2asdpEPmGPPZcbCzUaIIonIK48FkNvkQ5X1oyrB/6PV7FMfZKQWdpo7e+JRK9cVktNMzhRCsbYbDSiKZef+y0A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=r/VcfnD6P5eOmPsC+1NpL0fFpyYXKhmEVyLCK78Xh3U=;
+ b=YCPpoiafNKQTvpz7EfsyFkKA9+VylBmrcTenqwtcjwRjfy+OZJXvdSkXtlur2n0Q+gKFvtnlYg//XRPqM8etTXgACvtMhHzRQ/5JJ+p+/PPsSFUkffVFgkz6ywzVlsfc5K6WZ5ECiWGtckq5yiAVil0w5fw11vhBGpGyUugtfwU=
+Received: from BN0PR10MB5128.namprd10.prod.outlook.com (2603:10b6:408:117::24)
+ by IA0PR10MB7668.namprd10.prod.outlook.com (2603:10b6:208:492::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.27; Fri, 26 Jan
+ 2024 13:58:24 +0000
+Received: from BN0PR10MB5128.namprd10.prod.outlook.com
+ ([fe80::ed:9f6b:7944:a2fa]) by BN0PR10MB5128.namprd10.prod.outlook.com
+ ([fe80::ed:9f6b:7944:a2fa%6]) with mapi id 15.20.7228.027; Fri, 26 Jan 2024
+ 13:58:24 +0000
+From: Chuck Lever III <chuck.lever@oracle.com>
+To: Neil Brown <neilb@suse.de>
+CC: Jeff Layton <jlayton@kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        Lorenzo Bianconi
+	<lorenzo.bianconi@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>, Simon Horman
+	<horms@kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Subject: Re: [PATCH v6 3/3] NFSD: add write_ports to netlink command
+Thread-Topic: [PATCH v6 3/3] NFSD: add write_ports to netlink command
+Thread-Index: 
+ AQHaS8bpZ9RzO76t8E+mXe8FqSN12LDl2fGAgACEPYCAABdWAIAAuIYAgAAV2ICAACKWgIAAEuAAgAFFH4CAABm8AIAAKhqAgAImIICAAP9uAA==
+Date: Fri, 26 Jan 2024 13:58:24 +0000
+Message-ID: <B85C6ED2-E2F6-4224-883A-E7DAB54EFF09@oracle.com>
+References: <cover.1705771400.git.lorenzo@kernel.org>
+ <f7c42dae2b232b3b06e54ceb3f00725893973e02.1705771400.git.lorenzo@kernel.org>
+ <9e3ae337dcf168c60c4cfd51aa0b2fc7b24bcbfb.camel@kernel.org>
+ <170595930799.23031.17998490973211605470@noble.neil.brown.name>
+ <Za7zHvPJdei/vWm4@tissot.1015granger.net> <Za-N6BxOMXTGyxmW@lore-desk>
+ <85b02061798a1b750a87b0302681b86651d0c7a3.camel@kernel.org>
+ <Za-9P0NjlIsc1PcE@lore-desk>
+ <3f035d3bc494ec03b83ae237e407c42f2ddc4c53.camel@kernel.org>
+ <ZbDdzwvP6-O2zosC@lore-desk>
+ <8fabd83caa0d44369853a4040a89c069f9b0f935.camel@kernel.org>
+ <917EC07C-C9D9-4CF2-9ACB-DCA2676DFF67@oracle.com>
+ <170622264103.21664.16941742935452333478@noble.neil.brown.name>
+In-Reply-To: <170622264103.21664.16941742935452333478@noble.neil.brown.name>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-mailer: Apple Mail (2.3774.300.61.1.2)
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN0PR10MB5128:EE_|IA0PR10MB7668:EE_
+x-ms-office365-filtering-correlation-id: 11dc7a12-4f0b-468b-55a0-08dc1e76dd56
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 
+ PWaoC2rWmiiyGJm1sGB/70pT2LNWM51uJTyzqwMOOJYWSc4bHmezClgs+AfOUMijqSg5pXvqDCeY0Pp7KEv3RF/gAf8s0bJYZWGQZIZkqbIU6LldAnJB6N1AtmdYZBtUd0uo65MMaBY/lfFlYvRuCcKhjXzn14RE8cvsNbC5Du9sWrjJMbgYPXQ+XUIMAzGGcaABuhQZfYYTxOR+X6C7+U0rfUmlond2u+TZKxk1CqXj+WTpDmDLAEPUsXjgFkz+vgbuQtINxfekAE6pcfEw9Y56rmeBQDkeE7aFkryfIno5atqNPuK+l6ibxibg/lDtkJ4XP0iYKaszShADgUHY9fk8ZqGmkdMrCOHZmCIE91zTRY2HZCuAl5GCaW2plOfhaEo0KGVU9BboLSFdM92AG4ge2ebnVlXiC4xvsJyVT14f2YhkSe0WgL45xBztZqYHiCfXRlPO5+N+bhfcsRvmGuD6hdcUQc6Gp2yTOvzDIGYbiWZWFgu8r+vVTA8Jic5hojbToA9l22tq/DPc25dLc+YRtlTGiyI7Z/23mTL1yegnS6/tRLRAZD4XRa7b+UF/Tfc8eqNQJhhcCHcZVsYvhZiY2Ti6d4AHuqQ50rLt1PbThblxpN2rEColeLA9fmkOZZmzET0Om+zfAKoP9wh1Tw==
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR10MB5128.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(39860400002)(136003)(366004)(346002)(230922051799003)(1800799012)(64100799003)(451199024)(186009)(66899024)(83380400001)(41300700001)(33656002)(36756003)(86362001)(38070700009)(38100700002)(6486002)(53546011)(122000001)(6506007)(26005)(6512007)(2616005)(6916009)(91956017)(5660300002)(66446008)(54906003)(71200400001)(66946007)(478600001)(64756008)(66556008)(66476007)(2906002)(76116006)(4326008)(8676002)(316002)(8936002)(45980500001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?utf-8?B?SVBOekdoQ2FkeEU1aVFhaUx6ZzZxSjRJbU9wQjBMVXR3ZG9vc29kVGR2NHkv?=
+ =?utf-8?B?ekR6TmJOSGpreTJ4TmNuZkZNQjZKL3Jpbis4SWd1V0lNV0JlZTZNTmo0Vy94?=
+ =?utf-8?B?cnorUWlGYXR6TTIySnoxTElrZjNHc3M4RU5Ld0VWZHpDTGpTQVNER3M2MEVv?=
+ =?utf-8?B?OWhOSGtOS0x4cUxHRmRHZEQ5bHJ0WXNweEs2YlFNQWZnUm5Kd3FCUXA2VE5U?=
+ =?utf-8?B?RCtadDZENnpoT1JZY1F4VkN5UUVvbVBCZHF6eXVuSE4zRFZHaUk3QS9IcjZr?=
+ =?utf-8?B?R2VxMUhrcUtMWnJuaEFWdFhadDBiOGdhUythcks3QUk0ei84RGVMdmlwTkdR?=
+ =?utf-8?B?MjRRMkl1Z1BzZ2hBZWNMOFppYWFXOUlBbXFhNGlSb05hZXdGTGVaVm9WVDU2?=
+ =?utf-8?B?Q2ZocThDU3JQaVNObmhOazlCZVVLUVMzYUsyUjljRUdDZjdzNVh1Q1JCcG9N?=
+ =?utf-8?B?dVRIVEs2Qk4vUmV1MlBRYXd6VmQzalNycmMzd0hIekpxa2dzZGJiZmEyOXlH?=
+ =?utf-8?B?WUJVZW9iKzVuL1RXeHpzbjl4TTJZSUZ1Y3FNNG5HeUxPenBOTDcyK3hXd3pJ?=
+ =?utf-8?B?T3RrNS9FcXZyY29xUUJtd0wvS2FYMUFxRTZjUk83L3Nnc2Q3TU1pRDNQOVRO?=
+ =?utf-8?B?dUV2UllqbVVpdk9GUGJ6aC9zVE9KOE1GRDByMndmeWQwdkdmU0w1YWxuY2Nr?=
+ =?utf-8?B?b0JWQzcraHpsaW9scmY1T2phb0pUeUdYWWhPVGhFYlpOTmFYZ0hIaCtrMzVx?=
+ =?utf-8?B?K0ptcjBXMEFaTnVNdnBRWXBaa0NSUFhBNG1kSmt4UW1yNDZ2ek9tVHNJMFdB?=
+ =?utf-8?B?WElvSUk0SEFSU2ZuR2xSNmNCYVIrL1BZSlEvbDloSVBKdk1tcjF2b3hHS0R5?=
+ =?utf-8?B?THl3WGRiYm82elFGV2gxNnZWTWV0L2hEWDR1WjNzcVZmYnVuS2RNalRHUCtS?=
+ =?utf-8?B?MTdzdUNrS3c5OCtXMlRSdFVsYmRudUd5M08xWm5neHI3YjhUSHZPNTdMOXdV?=
+ =?utf-8?B?Tzl2Y0JHR05tNjNWR0VoVjk5ejVLK3F2ekNaOUdwQUZzRU42aFg2MFlUTTBu?=
+ =?utf-8?B?bUlzdnRjcUxUby9JOTI5c0UzVWJBODlnRCtaeWdHK1JBdlJJSzdHeGFHVVZY?=
+ =?utf-8?B?VTBGWlVTOHgvZHpRaEFqYkFMbnBaWlkvaENMcTNyMzNmS0lhZHkydEREcFBW?=
+ =?utf-8?B?NVc5ckloWWRWN1pMcnBEUVVGUDJMWVhEOWNOVmc4VSt3OEpxa29wSE5wLzB5?=
+ =?utf-8?B?MnQ3cDRZcWV2KzZUZmk1Zm9NcS9Rek1mM0crM04rY2FTQ1NtK3pzNzRjZmFa?=
+ =?utf-8?B?VTR0b3NqTGlEcVh4MVlWMXE5eHl4VzNtVkR4OWwwUTQ2eVJHK2VObS9UU3Bv?=
+ =?utf-8?B?cENsMmhub3FWdlBuZTRydzFtQ2d1aU05QXREdkZrQS8yai9JZ0ZvSlR1V09n?=
+ =?utf-8?B?WG94SjRPd1FJK3RGdGNkQXN4dXdEVnNBN2pMdmVWTmF5SmZCc3M0am5oTHdh?=
+ =?utf-8?B?MGt1YTRlM3lOVUJrSy9UTXgycTBNNE5FczJKYW1pTkF6emZTVVlycTNGUnFZ?=
+ =?utf-8?B?VFRtMFdkeXdRTFFCd1ljQ09EMWg3QVBRYVRESzZ4VVNuSnlVSDg2dFd5T1pU?=
+ =?utf-8?B?WkFYOUEwSUJBL0dXcVc4T2krdGJEejB1N0NwZFhLcEJYUVVGSU14aEtJVk1J?=
+ =?utf-8?B?bjZDSU1tekl0T011V1hQb2s2UUNhTkxYTHYzTFE3QldQNFg2dlBqOUwwaGs3?=
+ =?utf-8?B?My8wK3NEaHNNb083NVhNMG9RdmZ0WStpTzVwSUhrY3BuaU9aMmU4SXJ4NU9i?=
+ =?utf-8?B?NVZsVXZoOEZxbHJDZWVVTVdFcnRmR2hZUUw5cEZYVlczdndtNU1DNWxMUVht?=
+ =?utf-8?B?emlNVm0rTlliOXdJa0hpWDFnakxYa3piSnR6cjFHZDZiYmNKVEF6a1Fna3R2?=
+ =?utf-8?B?QWNqRjk2bkd1cXh3MGVGMnpieW5vOW4rRDJSanpTWm5DajRuMUZwSVlvNmlJ?=
+ =?utf-8?B?V045STFYWHVXQ2J4bkpIV2lSYWI3K3BKNTJNWHdNMktwNGIxNXJ3TUd4YW5k?=
+ =?utf-8?B?SStDRjVJU3k1QWkzNTAyOHpVV1d5Y29nL24yb3R6NGJVVHI2WVhrNVRralZk?=
+ =?utf-8?B?OXdyTkxVZUl3dk1EQkdrN05Zb1FRREd3L0N1OW03c29JY0NEVVJBSjJpMmN3?=
+ =?utf-8?B?Z1E9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <06D0A05B34E8A846A99756CFA6D39120@namprd10.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
+	VVtEqSmDNQQEtNsa9lbU1GsaeSnpnLPkZ3IpujcCAiiV12Tim76ikZh3Uhx2zXuQsZoN0J4u81SKZ23qZ5oLS3miUSFMvK2edHtZ2WTNZgSyUgEVa+cCG5C/ehsY96LHZNLxPIEM/IsuwJkSAI2f7tfhX36DzmGmZ3LbCXy/NUd1nR+63m22Ycf3Ci1oRPBVR1NjKzVb2Z087Rs7bN41LLg71n4dKudR5t7WaN/bsRkX1GgJ2oKItJSqSHdSLDpjuDoimITRMhFWbbuNxUfL/2tB/NpJL0GTSh6w+kSTROQoefp6ff1p/ZZLN2xvYLW+4AL7Vt2xIH4I2WaC7WokxlwJwHRUxWZYvf1/XlYr7pycC3F+VG/GI1TQArGAayc7SVw7qHN0ynyZKEoGAqii4izcEu8AbLNc5Bb9M8aaTHknZNCN99Q0NeknOZwzchKgiDaPCMmSxBXc9zbixFBFYJomEjgBVMu2JWbTErrO/uP1EcrAaH2LTZ0Kf8FeffcUk+s5D9Z1KIbdl7nw43DMWpF7vW6Jx0Y/yOJySWX2XmFmjGcrXqHP4h8oQ4GIgvshjh2Heg+vZljTBMfB0Kxm4irbGB4LRzOzCJ82R9n5EGk=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN0PR10MB5128.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 11dc7a12-4f0b-468b-55a0-08dc1e76dd56
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jan 2024 13:58:24.7859
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: SzTzXuDASmN1tf/KdIMtiWRTDQN33jIc0L5tMNuva6PjdFkIPkjEnELDU1mrYD24cAfDdaF67BSW09T/ZrwNMA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR10MB7668
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-25_14,2024-01-25_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 suspectscore=0
+ phishscore=0 malwarescore=0 mlxscore=0 mlxlogscore=637 spamscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2401260102
+X-Proofpoint-GUID: YYT7tNc98wdKEuZmPqdAH89SSrarjRlY
+X-Proofpoint-ORIG-GUID: YYT7tNc98wdKEuZmPqdAH89SSrarjRlY
 
-XSk infra's been using its own DMA sync shortcut to try avoiding
-redundant function calls. Now that there is a generic one, remove
-the custom implementation and rely on the generic helpers.
-xsk_buff_dma_sync_for_cpu() doesn't need the second argument anymore,
-remove it.
-
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- include/net/xdp_sock_drv.h                    |  7 ++---
- include/net/xsk_buff_pool.h                   | 13 ++-------
- drivers/net/ethernet/engleder/tsnep_main.c    |  2 +-
- .../net/ethernet/freescale/dpaa2/dpaa2-xsk.c  |  2 +-
- drivers/net/ethernet/intel/i40e/i40e_xsk.c    |  2 +-
- drivers/net/ethernet/intel/ice/ice_xsk.c      |  2 +-
- drivers/net/ethernet/intel/igc/igc_main.c     |  2 +-
- drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c  |  2 +-
- .../ethernet/mellanox/mlx5/core/en/xsk/rx.c   |  4 +--
- .../net/ethernet/mellanox/mlx5/core/en_rx.c   |  2 +-
- drivers/net/ethernet/netronome/nfp/nfd3/xsk.c |  2 +-
- .../net/ethernet/stmicro/stmmac/stmmac_main.c |  2 +-
- net/xdp/xsk_buff_pool.c                       | 29 +++----------------
- 13 files changed, 20 insertions(+), 51 deletions(-)
-
-diff --git a/include/net/xdp_sock_drv.h b/include/net/xdp_sock_drv.h
-index c9aec9ab6191..0a5dca2b2b3f 100644
---- a/include/net/xdp_sock_drv.h
-+++ b/include/net/xdp_sock_drv.h
-@@ -219,13 +219,10 @@ static inline struct xsk_tx_metadata *xsk_buff_get_metadata(struct xsk_buff_pool
- 	return meta;
- }
- 
--static inline void xsk_buff_dma_sync_for_cpu(struct xdp_buff *xdp, struct xsk_buff_pool *pool)
-+static inline void xsk_buff_dma_sync_for_cpu(struct xdp_buff *xdp)
- {
- 	struct xdp_buff_xsk *xskb = container_of(xdp, struct xdp_buff_xsk, xdp);
- 
--	if (!pool->dma_need_sync)
--		return;
--
- 	xp_dma_sync_for_cpu(xskb);
- }
- 
-@@ -402,7 +399,7 @@ static inline struct xsk_tx_metadata *xsk_buff_get_metadata(struct xsk_buff_pool
- 	return NULL;
- }
- 
--static inline void xsk_buff_dma_sync_for_cpu(struct xdp_buff *xdp, struct xsk_buff_pool *pool)
-+static inline void xsk_buff_dma_sync_for_cpu(struct xdp_buff *xdp)
- {
- }
- 
-diff --git a/include/net/xsk_buff_pool.h b/include/net/xsk_buff_pool.h
-index 99dd7376df6a..b61e787a0ee5 100644
---- a/include/net/xsk_buff_pool.h
-+++ b/include/net/xsk_buff_pool.h
-@@ -43,7 +43,6 @@ struct xsk_dma_map {
- 	refcount_t users;
- 	struct list_head list; /* Protected by the RTNL_LOCK */
- 	u32 dma_pages_cnt;
--	bool dma_need_sync;
- };
- 
- struct xsk_buff_pool {
-@@ -82,7 +81,6 @@ struct xsk_buff_pool {
- 	u8 tx_metadata_len; /* inherited from umem */
- 	u8 cached_need_wakeup;
- 	bool uses_need_wakeup;
--	bool dma_need_sync;
- 	bool unaligned;
- 	bool tx_sw_csum;
- 	void *addrs;
-@@ -155,21 +153,16 @@ static inline dma_addr_t xp_get_frame_dma(struct xdp_buff_xsk *xskb)
- 	return xskb->frame_dma;
- }
- 
--void xp_dma_sync_for_cpu_slow(struct xdp_buff_xsk *xskb);
- static inline void xp_dma_sync_for_cpu(struct xdp_buff_xsk *xskb)
- {
--	xp_dma_sync_for_cpu_slow(xskb);
-+	dma_sync_single_for_cpu(xskb->pool->dev, xskb->dma,
-+				xskb->pool->frame_len, DMA_BIDIRECTIONAL);
- }
- 
--void xp_dma_sync_for_device_slow(struct xsk_buff_pool *pool, dma_addr_t dma,
--				 size_t size);
- static inline void xp_dma_sync_for_device(struct xsk_buff_pool *pool,
- 					  dma_addr_t dma, size_t size)
- {
--	if (!pool->dma_need_sync)
--		return;
--
--	xp_dma_sync_for_device_slow(pool, dma, size);
-+	dma_sync_single_for_device(pool->dev, dma, size, DMA_BIDIRECTIONAL);
- }
- 
- /* Masks for xdp_umem_page flags.
-diff --git a/drivers/net/ethernet/engleder/tsnep_main.c b/drivers/net/ethernet/engleder/tsnep_main.c
-index ae0b8b37b9bf..12a92e436d0b 100644
---- a/drivers/net/ethernet/engleder/tsnep_main.c
-+++ b/drivers/net/ethernet/engleder/tsnep_main.c
-@@ -1571,7 +1571,7 @@ static int tsnep_rx_poll_zc(struct tsnep_rx *rx, struct napi_struct *napi,
- 		length = __le32_to_cpu(entry->desc_wb->properties) &
- 			 TSNEP_DESC_LENGTH_MASK;
- 		xsk_buff_set_size(entry->xdp, length - ETH_FCS_LEN);
--		xsk_buff_dma_sync_for_cpu(entry->xdp, rx->xsk_pool);
-+		xsk_buff_dma_sync_for_cpu(entry->xdp);
- 
- 		/* RX metadata with timestamps is in front of actual data,
- 		 * subtract metadata size to get length of actual data and
-diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-xsk.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-xsk.c
-index 051748b997f3..a466c2379146 100644
---- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-xsk.c
-+++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-xsk.c
-@@ -55,7 +55,7 @@ static u32 dpaa2_xsk_run_xdp(struct dpaa2_eth_priv *priv,
- 	xdp_set_data_meta_invalid(xdp_buff);
- 	xdp_buff->rxq = &ch->xdp_rxq;
- 
--	xsk_buff_dma_sync_for_cpu(xdp_buff, ch->xsk_pool);
-+	xsk_buff_dma_sync_for_cpu(xdp_buff);
- 	xdp_act = bpf_prog_run_xdp(xdp_prog, xdp_buff);
- 
- 	/* xdp.data pointer may have changed */
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_xsk.c b/drivers/net/ethernet/intel/i40e/i40e_xsk.c
-index 11500003af0d..d20ce517426e 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_xsk.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_xsk.c
-@@ -483,7 +483,7 @@ int i40e_clean_rx_irq_zc(struct i40e_ring *rx_ring, int budget)
- 
- 		bi = *i40e_rx_bi(rx_ring, next_to_process);
- 		xsk_buff_set_size(bi, size);
--		xsk_buff_dma_sync_for_cpu(bi, rx_ring->xsk_pool);
-+		xsk_buff_dma_sync_for_cpu(bi);
- 
- 		if (!first)
- 			first = bi;
-diff --git a/drivers/net/ethernet/intel/ice/ice_xsk.c b/drivers/net/ethernet/intel/ice/ice_xsk.c
-index 8b81a1677045..5d4aabf7e1b1 100644
---- a/drivers/net/ethernet/intel/ice/ice_xsk.c
-+++ b/drivers/net/ethernet/intel/ice/ice_xsk.c
-@@ -892,7 +892,7 @@ int ice_clean_rx_irq_zc(struct ice_rx_ring *rx_ring, int budget)
- 				   ICE_RX_FLX_DESC_PKT_LEN_M;
- 
- 		xsk_buff_set_size(xdp, size);
--		xsk_buff_dma_sync_for_cpu(xdp, xsk_pool);
-+		xsk_buff_dma_sync_for_cpu(xdp);
- 
- 		if (!first) {
- 			first = xdp;
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index ba8d3fe186ae..ad9ebbd9d61d 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -2817,7 +2817,7 @@ static int igc_clean_rx_irq_zc(struct igc_q_vector *q_vector, const int budget)
- 		}
- 
- 		bi->xdp->data_end = bi->xdp->data + size;
--		xsk_buff_dma_sync_for_cpu(bi->xdp, ring->xsk_pool);
-+		xsk_buff_dma_sync_for_cpu(bi->xdp);
- 
- 		res = __igc_xdp_run_prog(adapter, prog, bi->xdp);
- 		switch (res) {
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
-index 59798bc33298..ebda0cebe910 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
-@@ -304,7 +304,7 @@ int ixgbe_clean_rx_irq_zc(struct ixgbe_q_vector *q_vector,
- 		}
- 
- 		bi->xdp->data_end = bi->xdp->data + size;
--		xsk_buff_dma_sync_for_cpu(bi->xdp, rx_ring->xsk_pool);
-+		xsk_buff_dma_sync_for_cpu(bi->xdp);
- 		xdp_res = ixgbe_run_xdp_zc(adapter, rx_ring, bi->xdp);
- 
- 		if (likely(xdp_res & (IXGBE_XDP_TX | IXGBE_XDP_REDIR))) {
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/rx.c
-index b8dd74453655..1b7132fa70de 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/rx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/rx.c
-@@ -270,7 +270,7 @@ struct sk_buff *mlx5e_xsk_skb_from_cqe_mpwrq_linear(struct mlx5e_rq *rq,
- 	/* mxbuf->rq is set on allocation, but cqe is per-packet so set it here */
- 	mxbuf->cqe = cqe;
- 	xsk_buff_set_size(&mxbuf->xdp, cqe_bcnt);
--	xsk_buff_dma_sync_for_cpu(&mxbuf->xdp, rq->xsk_pool);
-+	xsk_buff_dma_sync_for_cpu(&mxbuf->xdp);
- 	net_prefetch(mxbuf->xdp.data);
- 
- 	/* Possible flows:
-@@ -319,7 +319,7 @@ struct sk_buff *mlx5e_xsk_skb_from_cqe_linear(struct mlx5e_rq *rq,
- 	/* mxbuf->rq is set on allocation, but cqe is per-packet so set it here */
- 	mxbuf->cqe = cqe;
- 	xsk_buff_set_size(&mxbuf->xdp, cqe_bcnt);
--	xsk_buff_dma_sync_for_cpu(&mxbuf->xdp, rq->xsk_pool);
-+	xsk_buff_dma_sync_for_cpu(&mxbuf->xdp);
- 	net_prefetch(mxbuf->xdp.data);
- 
- 	prog = rcu_dereference(rq->xdp_prog);
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-index d601b5faaed5..5e5d9fd0bfd5 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-@@ -917,7 +917,7 @@ INDIRECT_CALLABLE_SCOPE bool mlx5e_post_rx_wqes(struct mlx5e_rq *rq)
- 
- 	if (!rq->xsk_pool) {
- 		count = mlx5e_refill_rx_wqes(rq, head, wqe_bulk);
--	} else if (likely(!rq->xsk_pool->dma_need_sync)) {
-+	} else if (likely(dma_skip_sync(rq->pdev))) {
- 		mlx5e_xsk_free_rx_wqes(rq, head, wqe_bulk);
- 		count = mlx5e_xsk_alloc_rx_wqes_batched(rq, head, wqe_bulk);
- 	} else {
-diff --git a/drivers/net/ethernet/netronome/nfp/nfd3/xsk.c b/drivers/net/ethernet/netronome/nfp/nfd3/xsk.c
-index 45be6954d5aa..01cfa9cc1b5e 100644
---- a/drivers/net/ethernet/netronome/nfp/nfd3/xsk.c
-+++ b/drivers/net/ethernet/netronome/nfp/nfd3/xsk.c
-@@ -184,7 +184,7 @@ nfp_nfd3_xsk_rx(struct nfp_net_rx_ring *rx_ring, int budget,
- 		xrxbuf->xdp->data += meta_len;
- 		xrxbuf->xdp->data_end = xrxbuf->xdp->data + pkt_len;
- 		xdp_set_data_meta_invalid(xrxbuf->xdp);
--		xsk_buff_dma_sync_for_cpu(xrxbuf->xdp, r_vec->xsk_pool);
-+		xsk_buff_dma_sync_for_cpu(xrxbuf->xdp);
- 		net_prefetch(xrxbuf->xdp->data);
- 
- 		if (meta_len) {
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index b334eb16da23..39834dc4ba88 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -5310,7 +5310,7 @@ static int stmmac_rx_zc(struct stmmac_priv *priv, int limit, u32 queue)
- 
- 		/* RX buffer is good and fit into a XSK pool buffer */
- 		buf->xdp->data_end = buf->xdp->data + buf1_len;
--		xsk_buff_dma_sync_for_cpu(buf->xdp, rx_q->xsk_pool);
-+		xsk_buff_dma_sync_for_cpu(buf->xdp);
- 
- 		prog = READ_ONCE(priv->xdp_prog);
- 		res = __stmmac_xdp_run_prog(priv, prog, buf->xdp);
-diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
-index ce60ecd48a4d..ecea2a329b1d 100644
---- a/net/xdp/xsk_buff_pool.c
-+++ b/net/xdp/xsk_buff_pool.c
-@@ -338,7 +338,6 @@ static struct xsk_dma_map *xp_create_dma_map(struct device *dev, struct net_devi
- 
- 	dma_map->netdev = netdev;
- 	dma_map->dev = dev;
--	dma_map->dma_need_sync = false;
- 	dma_map->dma_pages_cnt = nr_pages;
- 	refcount_set(&dma_map->users, 1);
- 	list_add(&dma_map->list, &umem->xsk_dma_list);
-@@ -424,7 +423,6 @@ static int xp_init_dma_info(struct xsk_buff_pool *pool, struct xsk_dma_map *dma_
- 
- 	pool->dev = dma_map->dev;
- 	pool->dma_pages_cnt = dma_map->dma_pages_cnt;
--	pool->dma_need_sync = dma_map->dma_need_sync;
- 	memcpy(pool->dma_pages, dma_map->dma_pages,
- 	       pool->dma_pages_cnt * sizeof(*pool->dma_pages));
- 
-@@ -460,8 +458,6 @@ int xp_dma_map(struct xsk_buff_pool *pool, struct device *dev,
- 			__xp_dma_unmap(dma_map, attrs);
- 			return -ENOMEM;
- 		}
--		if (dma_need_sync(dev, dma))
--			dma_map->dma_need_sync = true;
- 		dma_map->dma_pages[i] = dma;
- 	}
- 
-@@ -557,11 +553,9 @@ struct xdp_buff *xp_alloc(struct xsk_buff_pool *pool)
- 	xskb->xdp.data_meta = xskb->xdp.data;
- 	xskb->xdp.flags = 0;
- 
--	if (pool->dma_need_sync) {
--		dma_sync_single_range_for_device(pool->dev, xskb->dma, 0,
--						 pool->frame_len,
--						 DMA_BIDIRECTIONAL);
--	}
-+	dma_sync_single_for_device(pool->dev, xskb->dma, pool->frame_len,
-+				   DMA_BIDIRECTIONAL);
-+
- 	return &xskb->xdp;
- }
- EXPORT_SYMBOL(xp_alloc);
-@@ -633,7 +627,7 @@ u32 xp_alloc_batch(struct xsk_buff_pool *pool, struct xdp_buff **xdp, u32 max)
- {
- 	u32 nb_entries1 = 0, nb_entries2;
- 
--	if (unlikely(pool->dma_need_sync)) {
-+	if (unlikely(!dma_skip_sync(pool->dev))) {
- 		struct xdp_buff *buff;
- 
- 		/* Slow path */
-@@ -693,18 +687,3 @@ dma_addr_t xp_raw_get_dma(struct xsk_buff_pool *pool, u64 addr)
- 		(addr & ~PAGE_MASK);
- }
- EXPORT_SYMBOL(xp_raw_get_dma);
--
--void xp_dma_sync_for_cpu_slow(struct xdp_buff_xsk *xskb)
--{
--	dma_sync_single_range_for_cpu(xskb->pool->dev, xskb->dma, 0,
--				      xskb->pool->frame_len, DMA_BIDIRECTIONAL);
--}
--EXPORT_SYMBOL(xp_dma_sync_for_cpu_slow);
--
--void xp_dma_sync_for_device_slow(struct xsk_buff_pool *pool, dma_addr_t dma,
--				 size_t size)
--{
--	dma_sync_single_range_for_device(pool->dev, dma, 0,
--					 size, DMA_BIDIRECTIONAL);
--}
--EXPORT_SYMBOL(xp_dma_sync_for_device_slow);
--- 
-2.43.0
-
+DQoNCj4gT24gSmFuIDI1LCAyMDI0LCBhdCA1OjQ04oCvUE0sIE5laWxCcm93biA8bmVpbGJAc3Vz
+ZS5kZT4gd3JvdGU6DQo+IA0KPiBPbiBUaHUsIDI1IEphbiAyMDI0LCBDaHVjayBMZXZlciBJSUkg
+d3JvdGU6DQo+PiANCj4+IA0KPj4+IE9uIEphbiAyNCwgMjAyNCwgYXQgNjoyNOKAr0FNLCBKZWZm
+IExheXRvbiA8amxheXRvbkBrZXJuZWwub3JnPiB3cm90ZToNCj4+PiANCj4+PiBPbiBXZWQsIDIw
+MjQtMDEtMjQgYXQgMTA6NTIgKzAxMDAsIExvcmVuem8gQmlhbmNvbmkgd3JvdGU6DQo+Pj4+IFsu
+Li5dDQo+Pj4+PiANCj4+Pj4+IFRoYXQncyBhIGdyZWF0IHF1ZXN0aW9uLiBXZSBkbyBuZWVkIHRv
+IHByb3Blcmx5IHN1cHBvcnQgdGhlIC1IIG9wdGlvbiB0bw0KPj4+Pj4gcnBjLm5mc2QuIFdoYXQg
+d2UgZG8gdG9kYXkgaXMgbG9vayB1cCB0aGUgaG9zdG5hbWUgb3IgYWRkcmVzcyB1c2luZw0KPj4+
+Pj4gZ2V0YWRkcmluZm8sIGFuZCB0aGVuIG9wZW4gYSBsaXN0ZW5pbmcgc29ja2V0IGZvciB0aGF0
+IGFkZHJlc3MgYW5kIHRoZW4NCj4+Pj4+IHBhc3MgdGhhdCBmZCBkb3duIHRvIHRoZSBrZXJuZWws
+IHdoaWNoIEkgdGhpbmsgdGhlbiB0YWtlcyB0aGUgc29ja2V0IGFuZA0KPj4+Pj4gc3RpY2tzIGl0
+IG9uIHN2X3Blcm1zb2Nrcy4NCj4+Pj4+IA0KPj4+Pj4gQWxsIG9mIHRoYXQgc2VlbXMgYSBiaXQg
+a2x1bmt5LiBJZGVhbGx5LCBJJ2Qgc2F5IHRoZSBiZXN0IHRoaW5nIHdvdWxkIGJlDQo+Pj4+PiB0
+byBhbGxvdyB1c2VybGFuZCB0byBwYXNzIHRoZSBzb2NrYWRkciB3ZSBsb29rIHVwIGRpcmVjdGx5
+IHZpYSBuZXRsaW5rLA0KPj4+Pj4gYW5kIHRoZW4gbGV0IHRoZSBrZXJuZWwgb3BlbiB0aGUgc29j
+a2V0LiBUaGF0IHdpbGwgcHJvYmFibHkgbWVhbg0KPj4+Pj4gcmVmYWN0b3Jpbmcgc29tZSBvZiB0
+aGUgc3ZjX3hwcnRfY3JlYXRlIG1hY2hpbmVyeSB0byB0YWtlIGEgc29ja2FkZHIsDQo+Pj4+PiBi
+dXQgSSBkb24ndCB0aGluayBpdCBsb29rcyB0b28gaGFyZCB0byBkby4NCj4+Pj4gDQo+Pj4+IERv
+IHdlIGFscmVhZHkgaGF2ZSBhIHNwZWNpZmljIHVzZSBjYXNlIGZvciBpdD8gSSB0aGluayB3ZSBj
+YW4gZXZlbiBhZGQgaXQNCj4+Pj4gbGF0ZXIgd2hlbiB3ZSBoYXZlIGEgZGVmaW5lZCB1c2UgY2Fz
+ZSBmb3IgaXQgb24gdG9wIG9mIHRoZSBjdXJyZW50IHNlcmllcy4NCj4+Pj4gDQo+Pj4gDQo+Pj4g
+WWVzOg0KPj4+IA0KPj4+IHJwYy5uZnNkIC1IIG1ha2VzIG5mc2QgbGlzdGVuIG9uIGEgcGFydGlj
+dWxhciBhZGRyZXNzIGFuZCBwb3J0LiBCeQ0KPj4+IHBhc3NpbmcgZG93biB0aGUgc29ja2FkZHIg
+aW5zdGVhZCBvZiBhbiBhbHJlYWR5LW9wZW5lZCBzb2NrZXQNCj4+PiBkZXNjcmlwdG9yLCB3ZSBj
+YW4gYWNoaWV2ZSB0aGUgZ29hbCB3aXRob3V0IGhhdmluZyB0byBvcGVuIHNvY2tldHMgaW4NCj4+
+PiB1c2VybGFuZC4NCj4+IA0KPj4gVGVhcmluZyBkb3duIGEgbGlzdGVuZXIgdGhhdCB3YXMgY3Jl
+YXRlZCB0aGF0IHdheSB3b3VsZCBiZSBhDQo+PiB1c2UgY2FzZSBmb3I6DQo+IA0KPiBPbmx5IGlm
+IGl0IHdhcyBhY3R1YWxseSB1c2VmdWwuDQo+IEhhdmUgeW91ICpldmVyKiB3YW50ZWQgdG8gZG8g
+dGhhdD8gIE9yIGhlYXJkIGZyb20gYW55b25lIGVsc2Ugd2hvIGRpZD8NCg0KQW5vdGhlciBwb3Nz
+aWJpbGl0eSBpcyByZW1vdmluZyBhIGxpc3RlbmVyIHdoZW4gdW5wbHVnZ2luZyBhDQpuZXR3b3Jr
+IGRldmljZS4gVGhhdCBhbHNvIG1pZ2h0IGJlIGF1dG9tYXRpYyBhbHJlYWR5Lg0KDQpCdXQgaGV5
+LCB3ZSBkb24ndCBoYXZlIHRoaXMga2luZCBvZiBhZG1pbmlzdHJhdGl2ZSBjYXBhYmlsaXR5DQp0
+b2RheSwgc28gdGhlcmUncyBubyBuZWVkIHRvIGFkZCBpdCBpbiBhIGZpcnN0IHBhc3Mgb2YgdGhp
+cw0KbmV3IGludGVyZmFjZSBlaXRoZXIuIEknbSBoYXBweSB0byB3YWl0IGFuZCBzZWUuDQoNCg0K
+Pj4+IERvIHdlIGV2ZXIgd2FudC9uZWVkIHRvIHJlbW92ZSBsaXN0ZW5pbmcgc29ja2V0cz8NCj4+
+PiBOb3JtYWwgcHJhY3RpY2Ugd2hlbiBtYWtpbmcgYW55IGNoYW5nZXMgaXMgdG8gc3RvcCBhbmQg
+cmVzdGFydCB3aGVyZQ0KPj4+ICJzdG9wIiByZW1vdmVzIGFsbCBzb2NrZXRzLCB1bmV4cG9ydHMg
+YWxsIGZpbGVzeXN0ZW1zLCBkaXNhYmxlcyBhbGwNCj4+PiB2ZXJzaW9ucy4NCg0KDQotLQ0KQ2h1
+Y2sgTGV2ZXINCg0KDQo=
 
