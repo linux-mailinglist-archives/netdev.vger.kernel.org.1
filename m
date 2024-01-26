@@ -1,101 +1,77 @@
-Return-Path: <netdev+bounces-66265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DB1783E27B
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 20:27:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30D0483E27F
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 20:28:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18A682838DA
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 19:27:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 379FEB241F7
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 19:28:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5CE8224E6;
-	Fri, 26 Jan 2024 19:27:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 351F822313;
+	Fri, 26 Jan 2024 19:28:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="xXcRyGxD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BBncn/Hx"
 X-Original-To: netdev@vger.kernel.org
-Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88722224F9;
-	Fri, 26 Jan 2024 19:27:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EAAC224C9
+	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 19:28:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706297273; cv=none; b=B0vpQXYIR/HQg3s7sza+v/doVS4E0HN84ga3XuiZoezXW+WOby/bVYvpCuKFtPSyCo0GS74fIMKIEV5M60Oz/eV0TWog9JTeNbL7P8gQ5rOk4sa4etlvWkbroMya+AkCnjlI+5SnNXw+ELNSljxllnqhKjGjg3xBTWurPdJjmGo=
+	t=1706297311; cv=none; b=bCa7wddjaLVeN5QKuEhVcNna2Z+I9qZChOdN3bXDx0B7fmEZZu5Zm+Ov2csvOA1C5TofnhPaU2RLIdvbEa4Hwjluuuzx+Iohr+NwUur/WNlTIdp8mS/pekZQQcwsXe/UqRanTQcnJhZF767875L93lrxXrAkNvtH4MH5R9etwiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706297273; c=relaxed/simple;
-	bh=NW9/Y1sMfKulS8DYavETlMP6KBNa2HphYFT4fmqYhiQ=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=tjoqJySl7IQ8+g4R7bULuLG2OLlKg+5v8lKPVYWrirVEuEsY2K2g1XZUUjXnquPmtwq7RSOuo43Rjzq2hAlVW/4yrngZ6jvrWUVO/VY+CbHSdrzIChmp84RyFNVILJmPjuGL/0WjfyjEcw7NtUWgGlQ0RZLXexEM6w+CfVn7zN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=xXcRyGxD; arc=none smtp.client-ip=46.235.227.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1706297269;
-	bh=NW9/Y1sMfKulS8DYavETlMP6KBNa2HphYFT4fmqYhiQ=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=xXcRyGxDv0Xqsfg6pHpA2QSKTxLhBF71dFtSwBxKkRD8WdBl+q42Mf+z8zNhPnrkX
-	 xdkwzX62vOt84LBzrWfOeuzAhL7S9sseI8UAQgkpEK4KLkBrSgD944tYNZ4RkWuh/c
-	 Y7VDLOVx+50q7qhGZ5jmgnKrO0/L5htnhq+3umjBlAZ70LYGpEebSnXGhQqsVRa23B
-	 FmjXach9aOc1ngY4CPsVGyHYZ5Gczki6wZaTL48GzWbbSJBEXCB5fUGE5pzTWuci1p
-	 L1EDNz+kWeoFwe5z3ft24OjFNxWe9+guyNdJuA7Rk/QJsKySv+Xnt9rljpcL7XWq5S
-	 2UD7pnP/iZjHw==
-Received: from [100.115.223.179] (cola.collaboradmins.com [195.201.22.229])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: cristicc)
-	by madrid.collaboradmins.com (Postfix) with ESMTPSA id E22ED3780022;
-	Fri, 26 Jan 2024 19:27:47 +0000 (UTC)
-Message-ID: <920e764c-4fa3-4298-bb49-d31416fc3dd6@collabora.com>
-Date: Fri, 26 Jan 2024 21:27:47 +0200
+	s=arc-20240116; t=1706297311; c=relaxed/simple;
+	bh=7974xib4xeSwplcx7sKFjHDlYKJEpvVlCDf64+oeaXo=;
+	h=From:To:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=fcd2jL/QAav7t41iSh9Go3Tjt9DKtp30cM/Rk5WuWL26kfFLHYeBkA+9c7WPtlSijtOIrFT+ot8jkUGN/MmAErgNOMtiC9jXoQh3Dt9vz78Q0xsmO41MDzooc1ta/3serL8AP4VToHzdHyO2msW+qIEqaSysF6uSBt414K14QgA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BBncn/Hx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67262C433F1;
+	Fri, 26 Jan 2024 19:28:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706297310;
+	bh=7974xib4xeSwplcx7sKFjHDlYKJEpvVlCDf64+oeaXo=;
+	h=From:To:Subject:In-Reply-To:References:Date:From;
+	b=BBncn/HxRpgmvbQDtBDNtWACGpfrJMR9Grp24xzTIkWa246DAJUgazQ+iP0bBMGf5
+	 V0eaeNdCtMWqZiKb0l7tMnLT/pfu05Nh7O2b6I0tIy96Xvvukl9vdq5hXMglx4J6Xx
+	 +kcHy7DL8wfyNsFj3g6BxIesGPvD/QBHwHKgHBEuhDDNvllcXJUiUWMfafzYxGFZqG
+	 BYoXlgkeZp2nXHBMwLHzqkIGiTOiXM/FeuWdvyt4MxtCjKCl56oNGRtvYX00Bw8EYn
+	 VfexapbFYnZLB01taEyKOfvDrofcpseY891ImpsX5OEQQCnXqo6pceNpGz/oZeDux0
+	 /jcFf7CNqUFwA==
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id AF8751089B3A; Fri, 26 Jan 2024 20:28:27 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
+To: Pavel Vazharov <pavel@x3me.net>, netdev@vger.kernel.org
+Subject: Re: Need of advice for XDP sockets on top of the interfaces behind
+ a Linux bonding device
+In-Reply-To: <CAJEV1ijxNyPTwASJER1bcZzS9nMoZJqfR86nu_3jFFVXzZQ4NA@mail.gmail.com>
+References: <CAJEV1ijxNyPTwASJER1bcZzS9nMoZJqfR86nu_3jFFVXzZQ4NA@mail.gmail.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Fri, 26 Jan 2024 20:28:27 +0100
+Message-ID: <87y1cb28tg.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 0/2] StarFive DWMAC support for JH7100
-Content-Language: en-US
-From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
-To: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Emil Renner Berthing <kernel@esmil.dk>,
- Samin Guo <samin.guo@starfivetech.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>, Andrew Lunn <andrew@lunn.ch>,
- Jacob Keller <jacob.e.keller@intel.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, kernel@collabora.com
-References: <20240126191319.1209821-1-cristian.ciocaltea@collabora.com>
-In-Reply-To: <20240126191319.1209821-1-cristian.ciocaltea@collabora.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-Please ignore this and use the RESEND version [1], as the binding patch 
-was not correctly updated with the latest tags.
+Pavel Vazharov <pavel@x3me.net> writes:
 
-Sorry for the noise,
-Cristian
+> 3. If the above scheme is supposed to work then is the bonding logic
+> (LACP management traffic) affected by the access pattern of the XDP
+> sockets? I mean, the order of Rx/Tx operations on the XDP sockets or
+> something like that.
 
-[1] https://lore.kernel.org/lkml/20240126192128.1210579-1-cristian.ciocaltea@collabora.com/
+Well, it will be up to your application to ensure that it is not. The
+XDP program will run before the stack sees the LACP management traffic,
+so you will have to take some measure to ensure that any such management
+traffic gets routed to the stack instead of to the DPDK application. My
+immediate guess would be that this is the cause of those warnings?
 
-On 1/26/24 21:13, Cristian Ciocaltea wrote:
-> This is just a subset of the initial patch series [1] adding networking
-> support for StarFive JH7100 SoC.
-> 
-> [1]: https://lore.kernel.org/lkml/20231218214451.2345691-1-cristian.ciocaltea@collabora.com/
-> 
-> Changes in v4:
->  - Rebased series onto next-20240125
->  - Added R-b tag from Rob in PATCH 1
->  - v3:
->    https://lore.kernel.org/lkml/20231222101001.2541758-1-cristian.ciocaltea@collabora.com/
+-Toke
 
