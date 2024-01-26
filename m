@@ -1,87 +1,105 @@
-Return-Path: <netdev+bounces-66274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4439283E340
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 21:19:43 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB3DE83E353
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 21:24:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00E45287E4D
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 20:19:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 279AFB21AE3
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 20:24:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC1D922EFD;
-	Fri, 26 Jan 2024 20:19:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BCA322F04;
+	Fri, 26 Jan 2024 20:24:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="itgfnOi4"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="J64cU7AZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7371F2376C;
-	Fri, 26 Jan 2024 20:19:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B98622EF4
+	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 20:24:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706300370; cv=none; b=avFuiJr+9QuRZDA7G8WBuCHrYl0LFdInorIotXX/0hePGbx3pHvu+jAZ61OnD1rj+HSVpj3tciyoe+CC+w6FRALQlHuQZIPPG1kA/7IdLXtz6kRj4Q52l4MfUmyb0PSskG3yrTP7kec4l7Th7FFW8O+t/hUoWPu/ZK5duZFQE/Y=
+	t=1706300682; cv=none; b=f4LbF5vs1hr/rURmrhhJm1Um+To3VPA2X07vz8FAw9r8NqYi2p4tpvsmC+psLVwPjMAY9F/2ti6wkzvXG1ykeX3MNfGnweP7tCuLWnGLRoOf1KRoVRE+TPnLQEgzOdW3So4GchVpVC+lTXj+xe19aypsda+pP9Ql8cFQqMUd4Iw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706300370; c=relaxed/simple;
-	bh=awpRcgfVITqJmr4m6h4D7QiLDSW/PQz0VRDDLkPva8Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VagifDht05tJt4QfInTPx8qyGlcb3jF2KYJM0rcNIUlWmX0yQErRUOjb8oTk10bsP6oDk1ElXCRy/+/6H0k9sLjsP6hCU8HzVc0hyliYdGoW9f8FTTsX6vJ2Bdh9+fzvZX5eMOfvD1XpxbxDz/PwKPvnqRk3GnqhLxoj/WoXIbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=itgfnOi4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42C85C433C7;
-	Fri, 26 Jan 2024 20:19:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706300369;
-	bh=awpRcgfVITqJmr4m6h4D7QiLDSW/PQz0VRDDLkPva8Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=itgfnOi4w6ElrBtPlbwuYXt71w4C7FIgEdFIdykJMv2Tu/jW8Ums3HKR64Hl1v48o
-	 YxQ0t5yC9Lfg3pfiobJ7IlXjPeLofQVmw8PiR2mqxQQKGaip8sPjNNk+od/1Fe2Lyc
-	 yoJZJ33BUdCEV3fwOZCWHuvrUEDXC6c19kPHOFv8WfLBqDHsj6CwxRZwDo7RMY0Y1/
-	 qRIeTFzLCrJD9QBQZ47+XsD2UR1gYLLhhStXkMQ6VRaXcMkXb6L9UR7/LZcQO3xl5w
-	 6MuD9tVdSVx56gTAuwxVJ1h2AeHMLQm2YvlrEMHDnHhv6FAioR2rzf8XeIRqhvgZch
-	 YlFCZ4monKulQ==
-Date: Fri, 26 Jan 2024 12:19:28 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: rohan.g.thomas@intel.com
-Cc: esben@geanix.com, alexandre.torgue@foss.st.com, conor+dt@kernel.org,
- davem@davemloft.net, devicetree@vger.kernel.org, edumazet@google.com,
- fancer.lancer@gmail.com, joabreu@synopsys.com,
- krzysztof.kozlowski+dt@linaro.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- mcoquelin.stm32@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com,
- peppe.cavallaro@st.com, robh@kernel.org
-Subject: Re: [PATCH net-next 1/2] dt-bindings: net: snps,dwmac: Time Based
- Scheduling
-Message-ID: <20240126121928.48a44327@kernel.org>
-In-Reply-To: <20240126173634.13162-1-rohan.g.thomas@intel.com>
-References: <87msss4gtj.fsf@geanix.com>
-	<20240126173634.13162-1-rohan.g.thomas@intel.com>
+	s=arc-20240116; t=1706300682; c=relaxed/simple;
+	bh=aacVZUW/5mGUDYhkkYBJUGL/Gh8Ctd/YyoFEal95FVc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=c28j2h97Ugx/qlv1PbCElQ+HIbnojF4mLUBvlURoiWmM81ZEAmAclRW3c5bnlBZZCKfM1ElqnspjTc1V+bYMr3D26Crq4L89N2RgL1eAdYbya0DkQ8InTSAJo229BXzckZejVe5h+4LvnYuMpCfodw/tktQul4EGw5gqhThAXqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=J64cU7AZ; arc=none smtp.client-ip=91.218.175.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <9f8343c3-7403-4346-9973-1b4421e3ad7d@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1706300677;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=x8oebQaftQNT6LeEHr7TKK0RzE3dlOdRvYdiT9hpg60=;
+	b=J64cU7AZQmfIOteP1Arx1fIFb/l+unLnQLiVc+IckZodSv/fH3ql/JCtI81f4qbE5AsP17
+	ROb9SXlR92gYbuPHBDIXPDL4wxR3Cc1Y+h0jmiucTF/uSLsONdhB3B3JNMj2k5jl50vCpa
+	hT3rq4jcrGqua93Dtgvvn4I1yp+6Ll4=
+Date: Fri, 26 Jan 2024 20:24:29 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [PATCH v2 2/2] net: stmmac: dwmac-imx: set TSO/TBS TX queues
+ default settings
+Content-Language: en-US
+To: Esben Haabendal <esben@geanix.com>, netdev@vger.kernel.org,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Shawn Guo <shawnguo@kernel.org>,
+ Sascha Hauer <s.hauer@pengutronix.de>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>, NXP Linux Team <linux-imx@nxp.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>
+Cc: Rohan G Thomas <rohan.g.thomas@intel.com>,
+ "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <cover.1706256158.git.esben@geanix.com>
+ <379f79687ca4a7d0394a04d14fb3890ce257e706.1706256158.git.esben@geanix.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <379f79687ca4a7d0394a04d14fb3890ce257e706.1706256158.git.esben@geanix.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Sat, 27 Jan 2024 01:36:34 +0800 rohan.g.thomas@intel.com wrote:
-> > The tricky part here is that the whole devicetree bindings story for the
-> > stmmac driver is filled with such configuration choices. As such, it is
-> > only natural to add the property you are suggesting here. I completely
-> > agree. But you can also argue that it is "wrong", because it does not
-> > just describe the hardware, but also a configuration choice.  
+On 26/01/2024 09:10, Esben Haabendal wrote:
+> TSO and TBS cannot coexist. For now we set i.MX Ethernet QOS controller to
+> use the first TX queue with TSO and the rest for TBS.
 > 
-> Isn't this requirement of using enhanced tx desc instead of normal tx
-> desc to support TBS is specific to Synopsys IP? Switching from
-> normal desc to enhanced desc at the time of tc-etf qdisc offload
-> cannot be done without traffic disruption, which I don't think is
-> acceptable. Since this behavior is IP specific, can we consider
-> this as an OS configuration choice?
+> TX queues with TBS can support etf qdisc hw offload.
+> 
+> Signed-off-by: Esben Haabendal <esben@geanix.com>
+> ---
+>   drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c | 4 ++++
+>   1 file changed, 4 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
+> index 8f730ada71f9..6b65420e11b5 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
+> @@ -353,6 +353,10 @@ static int imx_dwmac_probe(struct platform_device *pdev)
+>   	if (data->flags & STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY)
+>   		plat_dat->flags |= STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY;
+>   
+> +	/* Default TX Q0 to use TSO and rest TXQ for TBS */
+> +	for (int i = 1; i < plat_dat->tx_queues_to_use; i++)
+> +		plat_dat->tx_queues_cfg[i].tbs_en = 1;
+> +
+>   	plat_dat->host_dma_width = dwmac->ops->addr_width;
+>   	plat_dat->init = imx_dwmac_init;
+>   	plat_dat->exit = imx_dwmac_exit;
 
-Why is traffic disruption not acceptable when TBS gets turned on?
-User has to install the right qdisc to enable TBS, I presume,
-installing qdiscs destroys the old ones which also leads to packet
-drops.
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
