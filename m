@@ -1,91 +1,150 @@
-Return-Path: <netdev+bounces-66076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1029B83D27B
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 03:20:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B3C583D282
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 03:23:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2076285BC3
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 02:20:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 275E628BA69
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 02:23:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 382408C01;
-	Fri, 26 Jan 2024 02:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3244E6AD6;
+	Fri, 26 Jan 2024 02:22:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="suxbKIO4"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FwzYdiRU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 132728BF3
-	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 02:20:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C897B665
+	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 02:22:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706235625; cv=none; b=LnEcQ5mc7T94alC4YE6DGaSvH0WxlsFHthYRhr7DJEqo0XNcaGxS0N2mngXmoTbKoJha6PPMmGUnyhwqjuCU/yRdRgkM6tMYb1+e/T6wNEeIAKYzjoO4PzsgqnmVKXkWVP0GDRvM0x3eumoUgdgIVxmAUAdBM375myJBrwLhS5U=
+	t=1706235760; cv=none; b=RcmaTtZtQTOiyNxR7A7cxVpftYSECAfNc6SPxCzxggTZWLVUgH/QnrjQ7KXzYy3V2riFRaVwSo6nApGippso05ItAnAv3ufwGggqHQxcwiV+FwqKkhLtWA0XJ3xbj0vZzJ4Y2ihGJxBq4SSUPKRlERcPSQxAFtGFQm91sKWkxWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706235625; c=relaxed/simple;
-	bh=eP+p/DmWAnVbSOV+4kVrZm+VluXUVkbb9XtJQZz4biA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=u0nGdXDE1kbXraADIqpTKT/gEuWP9rqsflKhPnc19pOEXqitHghx0S0K44cjZ+wPduvbgSW8nRuopef0qE7Veex4z7YmnTZ06l9vAzEbGpErYMvv5kDT4VA0+PJruKV4cGv34eOr8/DII1iExRnmhbPkzY6VoS9xsaEY5ubxXQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=suxbKIO4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8B819C433B2;
-	Fri, 26 Jan 2024 02:20:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706235624;
-	bh=eP+p/DmWAnVbSOV+4kVrZm+VluXUVkbb9XtJQZz4biA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=suxbKIO49y5QS9aHE1kcYRXzR0XZ2nl/CHR/HMbvWCz7qH/dx/atT6YZfyJfm7ugT
-	 K4mGxWd1yB5k/3dZrR3gz/Nw0tYLFh84tB/su+SP0lDQvmwsfhA+TdQeQVASvpVk3n
-	 YPFQWIkRYCyj/Nl/ppcc7FH3ErQTLPqoCHX1oUzb0UFKCcEo8x0K3aj5NTtwIDN9lB
-	 k3GGeI4bFH63wNjrozwTzmuf6InwN7gxuxppjUDNxcsF26D8YNEipOnHT/sq/X/PyH
-	 FLncky4I3yBixnN7JA/nYNVfc5HLm/rkjrO1ys43qJJov+qza200GQ0niJAtl15oTR
-	 /YfrjQ4UQAuWA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 78277DFF765;
-	Fri, 26 Jan 2024 02:20:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1706235760; c=relaxed/simple;
+	bh=OSYvZZpa+i3aP3yhhJ+vWAyL9KyBP8AFdARoqG6lphE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XMomAYakeUXesgMMeKXz8PggzpEIxKsSVYNOWiksHNJAYvwVfslKSa/IQlGWWyfjmbICgzYncl64/O/D+Z0KGKkBgem5KoUwpdcAVBaGiNjRECUCVW/t00PlBV+i2KlTUCWHxEcbBLg9ZHO4VvnUgA4zrblL2ZUryAhE3yMvqFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FwzYdiRU; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <01fdb720-c0dc-495d-a42d-756aa2bf4455@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1706235756;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=w5phVj9ffB9yqD140riS9TxGoMxQ06uZ9IH/spt6YXY=;
+	b=FwzYdiRUvF9YtYtKY01Iuc+anl9MEJ0VpucsoC2yofBYE79RvgK088GyCa9lgvA2Ulv2If
+	Fcep7tmyOY/s/VKNwtaBaUhA35M/iohQy7547eGxYyBcBWLOA/Y/Gy3PBekwOZHVnpAY9y
+	ofbP2WeOt19dBxBLrmR7DseyaApSIqY=
+Date: Thu, 25 Jan 2024 18:22:31 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] tsnep: Add link down PHY loopback support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170623562448.30678.17765943047613405864.git-patchwork-notify@kernel.org>
-Date: Fri, 26 Jan 2024 02:20:24 +0000
-References: <20240123200151.60848-1-gerhard@engleder-embedded.com>
-In-Reply-To: <20240123200151.60848-1-gerhard@engleder-embedded.com>
-To: Gerhard Engleder <gerhard@engleder-embedded.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com, pabeni@redhat.com
+Subject: Re: [RFC PATCH v7 1/8] net_sched: Introduce eBPF based Qdisc
+Content-Language: en-US
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, yangpeihao@sjtu.edu.cn, toke@redhat.com,
+ jhs@mojatatu.com, jiri@resnulli.us, sdf@google.com,
+ xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com, netdev@vger.kernel.org
+References: <cover.1705432850.git.amery.hung@bytedance.com>
+ <232881645a5c4c05a35df4ff1f08a19ef9a02662.1705432850.git.amery.hung@bytedance.com>
+ <0484f7f7-715f-4084-b42d-6d43ebb5180f@linux.dev>
+ <CAMB2axM1TVw05jZsFe7TsKKRN8jw=YOwu-+rA9bOAkOiCPyFqQ@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <CAMB2axM1TVw05jZsFe7TsKKRN8jw=YOwu-+rA9bOAkOiCPyFqQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue, 23 Jan 2024 21:01:51 +0100 you wrote:
-> PHY loopback turns off link state change signalling. Therefore, the
-> loopback only works if the link is already up before the PHY loopback is
-> activated.
+On 1/23/24 9:22 PM, Amery Hung wrote:
+>> I looked at the high level of the patchset. The major ops that it wants to be
+>> programmable in bpf is the ".enqueue" and ".dequeue" (+ ".init" and ".reset" in
+>> patch 4 and patch 5).
+>>
+>> This patch adds a new prog type BPF_PROG_TYPE_QDISC, four attach types (each for
+>> ".enqueue", ".dequeue", ".init", and ".reset"), and a new "bpf_qdisc_ctx" in the
+>> uapi. It is no long an acceptable way to add new bpf extension.
+>>
+>> Can the ".enqueue", ".dequeue", ".init", and ".reset" be completely implemented
+>> in bpf (with the help of new kfuncs if needed)? Then a struct_ops for Qdisc_ops
+>> can be created. The bpf Qdisc_ops can be loaded through the existing struct_ops api.
+>>
+> Partially. If using struct_ops, I think we'll need another structure
+> like the following in bpf qdisc to be implemented with struct_ops bpf:
 > 
-> Ensure that PHY loopback works even if the link is not already up during
-> activation by calling netif_carrier_on() explicitly.
+> struct bpf_qdisc_ops {
+>      int (*enqueue) (struct sk_buff *skb)
+>      void (*dequeue) (void)
+>      void (*init) (void)
+>      void (*reset) (void)
+> };
 > 
-> [...]
+> Then, Qdisc_ops will wrap around them to handle things that cannot be
+> implemented with bpf (e.g., sch_tree_lock, returning a skb ptr).
 
-Here is the summary with links:
-  - [net-next] tsnep: Add link down PHY loopback support
-    https://git.kernel.org/netdev/net-next/c/5f76499fb541
+We can see how those limitations (calling sch_tree_lock() and returning a ptr) 
+can be addressed in bpf. This will also help other similar use cases.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Other than sch_tree_lock and returning a ptr from a bpf prog. What else do you 
+see that blocks directly implementing the enqueue/dequeue/init/reset in the 
+struct Qdisc_ops?
+
+Have you thought above ".priv_size"? It is now fixed to sizeof(struct 
+bpf_sched_data). It should be useful to allow the bpf prog to store its own data 
+there?
+
+> 
+>> If other ops (like ".dump", ".dump_stats"...) do not have good use case to be
+>> programmable in bpf, it can stay with the kernel implementation for now and only
+>> allows the userspace to load the a bpf Qdisc_ops with .equeue/dequeue/init/reset
+>> implemented.
+>>
+>> You mentioned in the cover letter that:
+>> "Current struct_ops attachment model does not seem to support replacing only
+>> functions of a specific instance of a module, but I might be wrong."
+>>
+>> I assumed you meant allow bpf to replace only "some" ops of the Qdisc_ops? Yes,
+>> it can be done through the struct_ops's ".init_member". Take a look at
+>> bpf_tcp_ca_init_member. The kernel can assign the kernel implementation for
+>> ".dump" (for example) when loading the bpf Qdisc_ops.
+>>
+> I have no problem with partially replacing a struct, which like you
+> mentioned has been demonstrated by congestion control or sched_ext.
+> What I am not sure about is the ability to create multiple bpf qdiscs,
+> where each has different ".enqueue", ".dequeue", and so on. I like the
+> struct_ops approach and would love to try it if struct_ops support
+> this.
+
+The need for allowing different ".enqueue/.dequeue/..." bpf 
+(BPF_PROG_TYPE_QDISC) programs loaded into different qdisc instances is because 
+there is only one ".id == bpf" Qdisc_ops native kernel implementation which is 
+then because of the limitation you mentioned above?
+
+Am I understanding your reason correctly on why it requires to load different 
+bpf prog for different qdisc instances?
+
+If the ".enqueue/.dequeue/..." in the "struct Qdisc_ops" can be directly 
+implemented in bpf prog itself, it can just load another bpf struct_ops which 
+has a different ".enqueue/.dequeue/..." implementation:
+
+#> bpftool struct_ops register bpf_simple_fq_v1.bpf.o
+#> bpftool struct_ops register bpf_simple_fq_v2.bpf.o
+#> bpftool struct_ops register bpf_simple_fq_xyz.bpf.o
+
+ From reading the test bpf prog, I think the set is on a good footing. Instead 
+of working around the limitation by wrapping the bpf prog in a predefined 
+"struct Qdisc_ops sch_bpf_qdisc_ops", lets first understand what is missing in 
+bpf and see how we could address them.
 
 
 
