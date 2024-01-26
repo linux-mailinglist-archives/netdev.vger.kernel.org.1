@@ -1,165 +1,118 @@
-Return-Path: <netdev+bounces-66122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66123-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B442E83D555
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 10:04:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86B9D83D557
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 10:04:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D43D281234
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 09:04:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7D60B224D8
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 09:04:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3119A60876;
-	Fri, 26 Jan 2024 07:51:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tesarici.cz header.i=@tesarici.cz header.b="fGDQIfac"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 457CD6088B;
+	Fri, 26 Jan 2024 07:51:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from bee.tesarici.cz (bee.tesarici.cz [77.93.223.253])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B6F912E6F
-	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 07:51:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=77.93.223.253
+Received: from sgoci-sdnproxy-4.icoremail.net (sgoci-sdnproxy-4.icoremail.net [129.150.39.64])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BF4F12E6F;
+	Fri, 26 Jan 2024 07:51:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.150.39.64
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706255497; cv=none; b=ScG05yxYW/Gc6j0qXFWJEThOXNZbTZLkMUHCIN2gKy8LdbpkdrL8FlyXMJO279+VOIqtp+a/s7P0eWIp6iMUNqJ52tniimNfOfDclJKomgXqbPbWmGt9uF/rckoLfN+3OpkE3OW165cdiHXycmfNEFDRZW7ktVCu7IBTxNCU/QE=
+	t=1706255515; cv=none; b=o1COZYTElVuKZO4cNJWbUklt4k6b3e0hyOTw4kUXjxCvAY7tLcK++NXKNffd5Z5vrvdj6ZaKuG/+fVzplmrNqFQuJ5BteL5hN9PKvzNx4ous0XsRmGUsQ+zXXPKWLE4HZss4YdoD0NGqbwR5nqR6qlIcUzN7iC4Obgcez2DYdIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706255497; c=relaxed/simple;
-	bh=NlPJC69CvZCI6rU+2Z40ltj34AwzuC9fpSCO22pXkkE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZjooVv1tKAuurL13ctUMU+23VNw8+SiuzvAgEaqgMORN4QapeXx+Co3krVNdoBkWCD646cE/6WQjl3WwxeR2+P7QgoipPJtbQkwCSwTzR+BqlCYuaKS4qFpoT/bcbZD+Gjwtfk4vXIhxq0iIZ2Eo50rzsp4hPlFe75vOYi0pXG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tesarici.cz; spf=pass smtp.mailfrom=tesarici.cz; dkim=pass (2048-bit key) header.d=tesarici.cz header.i=@tesarici.cz header.b=fGDQIfac; arc=none smtp.client-ip=77.93.223.253
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tesarici.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tesarici.cz
-Received: from meshulam.tesarici.cz (dynamic-2a00-1028-83b8-1e7a-4427-cc85-6706-c595.ipv6.o2.cz [IPv6:2a00:1028:83b8:1e7a:4427:cc85:6706:c595])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by bee.tesarici.cz (Postfix) with ESMTPSA id 69CAC18BE7D;
-	Fri, 26 Jan 2024 08:51:23 +0100 (CET)
-Authentication-Results: mail.tesarici.cz; dmarc=fail (p=none dis=none) header.from=tesarici.cz
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tesarici.cz; s=mail;
-	t=1706255483; bh=NlPJC69CvZCI6rU+2Z40ltj34AwzuC9fpSCO22pXkkE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fGDQIfacHYrl6gY7ZP+NQuNtoHp2q99ClPjRaXFdsZaVmxjk/pRjwPgvKLp6VqsQK
-	 RIxXc2rsEslr4ZMKj3QCGhKJrZ9Jh3q9yygyJA6RLCAGq2DOYfhLFTf8UvvqkHxmTT
-	 +GTpfz4GJHwKaq39+oxi/5mJtfK6Fx8ghu427XsgIPQCk2/zh8m8V3QTzqCY4xqA1z
-	 i2XBb3QRxj2betSQD7sc6z15Sw9YtI3pI+sis+I8/asTxtzFy6ZDaz7L/3uaQXQlqR
-	 QCxQ+2eA4IHMhxvEptKyZ5/fMTn8/LvUc1KblZccnVrgfS4QfPegTsAMEx+nWLUNMJ
-	 0qY47CSikt4+A==
-Date: Fri, 26 Jan 2024 08:51:22 +0100
-From: Petr =?UTF-8?B?VGVzYcWZw61r?= <petr@tesarici.cz>
-To: Florian Fainelli <f.fainelli@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Marc Haber <mh+netdev@zugschlus.de>,
- alexandre.torgue@foss.st.com, Jose Abreu <joabreu@synopsys.com>, Chen-Yu
- Tsai <wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel
- Holland <samuel@sholland.org>, Jisheng Zhang <jszhang@kernel.org>,
- netdev@vger.kernel.org
-Subject: Re: stmmac on Banana PI CPU stalls since Linux 6.6
-Message-ID: <20240126085122.21e0a8a2@meshulam.tesarici.cz>
-In-Reply-To: <99682651-06b4-4c69-b693-a0a06947b2ca@gmail.com>
-References: <Za173PhviYg-1qIn@torres.zugschlus.de>
-	<8efb36c2-a696-4de7-b3d7-2238d4ab5ebb@lunn.ch>
-	<ZbKiBKj7Ljkx6NCO@torres.zugschlus.de>
-	<229642a6-3bbb-4ec8-9240-7b8e3dc57345@lunn.ch>
-	<99682651-06b4-4c69-b693-a0a06947b2ca@gmail.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.39; x86_64-suse-linux-gnu)
+	s=arc-20240116; t=1706255515; c=relaxed/simple;
+	bh=9DBU9Gswb97RBzmM1XvhxENDBjdiwrvxJeYFm2Gdu+Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=C5NE/G96H6CaLbLHR7dkOFTu6w54OsrQ4ow5ff3a6XzmRx0rpIjU0GJ3f1XjqIeSaZO2zbeO53AuNPXWIUYdTMP27hdVVMDAYQMhLSnEbTtm5DxFjMima57dJfg5pIYMuYyJmxjvRdTxvnhM+7GMVyNKhVlcqZ3cm50QAlwWaR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=129.150.39.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from luzhipeng.223.5.5.5 (unknown [115.200.227.226])
+	by mail-app2 (Coremail) with SMTP id by_KCgDnKKiGZLNlK1TZAA--.20140S2;
+	Fri, 26 Jan 2024 15:51:35 +0800 (CST)
+From: Zhipeng Lu <alexious@zju.edu.cn>
+To: alexious@zju.edu.cn
+Cc: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] net: ipv4: fix a memleak in ip_setup_cork
+Date: Fri, 26 Jan 2024 15:51:27 +0800
+Message-Id: <20240126075127.2825068-1-alexious@zju.edu.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:by_KCgDnKKiGZLNlK1TZAA--.20140S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Ww1fGF1xJr13Zw4DCw1DGFg_yoW8GFW7pF
+	n0ga45JrW8Xr12gFnrtFWrZF1fKw1vyFy8urWaya4ay3Wktry5tF18KrWa9Fya9Fs7Cw1f
+	Aa4ft345ur48ZFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkl14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26rxl
+	6s0DM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
+	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v26r12
+	6r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
+	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
+	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+	WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
+	IxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbSfO7UUUU
+	U==
+X-CM-SenderInfo: qrsrjiarszq6lmxovvfxof0/
 
-On Thu, 25 Jan 2024 12:00:46 -0800
-Florian Fainelli <f.fainelli@gmail.com> wrote:
+When inetdev_valid_mtu fails, cork->opt should be freed if it is
+allocated in ip_setup_cork. Otherwise there could be a memleak.
 
-> On 1/25/24 11:54, Andrew Lunn wrote:
-> >> I have checked out 2eb85b750512cc5dc5a93d5ff00e1f83b99651db (which is
-> >> the first bad commit that the bisect eventually identified) and tried
-> >> running:
-> >>
-> >> [56/4504]mh@fan:~/linux/git/linux ((2eb85b750512...)) $ make BUILDARCH="amd64" ARCH="arm" KBUILD_DEBARCH="armhf" CROSS_COMPILE="arm-linux-gnueabihf-" drivers/net/ethernet/stmicro/stmmac/stmmac_main.lst
-> >>    SYNC    include/config/auto.conf.cmd
-> >>    SYSHDR  arch/arm/include/generated/uapi/asm/unistd-oabi.h
-> >>    SYSHDR  arch/arm/include/generated/uapi/asm/unistd-eabi.h
-> >>    HOSTCC  scripts/kallsyms
-> >>    UPD     include/config/kernel.release
-> >>    UPD     include/generated/uapi/linux/version.h
-> >>    UPD     include/generated/utsrelease.h
-> >>    SYSNR   arch/arm/include/generated/asm/unistd-nr.h
-> >>    SYSTBL  arch/arm/include/generated/calls-oabi.S
-> >>    SYSTBL  arch/arm/include/generated/calls-eabi.S
-> >>    CC      scripts/mod/empty.o
-> >>    MKELF   scripts/mod/elfconfig.h
-> >>    HOSTCC  scripts/mod/modpost.o
-> >>    CC      scripts/mod/devicetable-offsets.s
-> >>    UPD     scripts/mod/devicetable-offsets.h
-> >>    HOSTCC  scripts/mod/file2alias.o
-> >>    HOSTCC  scripts/mod/sumversion.o
-> >>    HOSTLD  scripts/mod/modpost
-> >>    CC      kernel/bounds.s
-> >>    CC      arch/arm/kernel/asm-offsets.s
-> >>    UPD     include/generated/asm-offsets.h
-> >>    CALL    scripts/checksyscalls.sh
-> >>    CHKSHA1 include/linux/atomic/atomic-arch-fallback.h
-> >>    CHKSHA1 include/linux/atomic/atomic-instrumented.h
-> >>    MKLST   drivers/net/ethernet/stmicro/stmmac/stmmac_main.lst
-> >> ./scripts/makelst: 1: arithmetic expression: expecting EOF: "0x - 0x00000000"
-> >> [57/4505]mh@fan:~/linux/git/linux ((2eb85b750512...)) $
-> >>
-> >> That is not what it was suppsoed to yield, right?  
-> > 
-> > No. But did it actually generate
-> > drivers/net/ethernet/stmicro/stmmac/stmmac_main.lst Sometime errors
-> > like this are not always fatal.
-> >   
-> >> My bisect eventually completed and identified
-> >> 2eb85b750512cc5dc5a93d5ff00e1f83b99651db as the first bad commit.  
-> > 
-> > I can make a guess.
-> > 
-> > -       memset(&priv->xstats, 0, sizeof(struct stmmac_extra_stats));
-> > 
-> > Its removed, not moved later. Deep within this structure is the
-> > stmmac_txq_stats and stmmac_rxq_stats which this function is supposed
-> > to return, and the two syncp variables are in it as well.
-> > 
-> > My guess is, they have an invalid state, when this memset is missing.
-> > 
-> > Try putting the memset back.
-> > 
-> > I also guess that is not the real fix, there are missing calls to
-> > u64_stats_init().  
-> 
-> Did not Petr try to address the same problem essentially:
-> 
-> https://lore.kernel.org/netdev/20240105091556.15516-1-petr@tesarici.cz/
-> 
-> this was not deemed the proper solution and I don't think one has been 
-> posted since then, but it looks about your issue here Marc.
+Fixes: 501a90c94510 ("inet: protect against too small mtu values.")
+Signed-off-by: Zhipeng Lu <alexious@zju.edu.cn>
+---
+ net/ipv4/ip_output.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-Yes, it looks like the same issue I ran into on my NanoPi. I'm sorry
-I've been busy with other things lately, so I could not test and submit
-my changes.
+diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
+index b06f678b03a1..3215ea07d398 100644
+--- a/net/ipv4/ip_output.c
++++ b/net/ipv4/ip_output.c
+@@ -1282,6 +1282,7 @@ static int ip_setup_cork(struct sock *sk, struct inet_cork *cork,
+ {
+ 	struct ip_options_rcu *opt;
+ 	struct rtable *rt;
++	int free_opt = 0;
+ 
+ 	rt = *rtp;
+ 	if (unlikely(!rt))
+@@ -1297,6 +1298,7 @@ static int ip_setup_cork(struct sock *sk, struct inet_cork *cork,
+ 					    sk->sk_allocation);
+ 			if (unlikely(!cork->opt))
+ 				return -ENOBUFS;
++			free_opt = 1;
+ 		}
+ 		memcpy(cork->opt, &opt->opt, sizeof(struct ip_options) + opt->opt.optlen);
+ 		cork->flags |= IPCORK_OPT;
+@@ -1306,8 +1308,13 @@ static int ip_setup_cork(struct sock *sk, struct inet_cork *cork,
+ 	cork->fragsize = ip_sk_use_pmtu(sk) ?
+ 			 dst_mtu(&rt->dst) : READ_ONCE(rt->dst.dev->mtu);
+ 
+-	if (!inetdev_valid_mtu(cork->fragsize))
++	if (!inetdev_valid_mtu(cork->fragsize)) {
++		if (opt && free_opt) {
++			kfree(cork->opt);
++			cork->opt = NULL;
++		}
+ 		return -ENETUNREACH;
++	}
+ 
+ 	cork->gso_size = ipc->gso_size;
+ 
+-- 
+2.34.1
 
-Essentially, the write side of the statistics seqlock is not protected
-and will eventually miss an increment, causing the read side to spin
-forever. The final plan is to split the statistics into three parts:
-
-1. fields updated only under the tx queue lock,
-2. fields updated only during NAPI poll,
-3. fields updated only from interrupt context,
-
-The first two groups can each have its own seqlock. The third group
-(actually a single counter) can be converted to a per-CPU variable. The
-read side will then aggregate the values as appropriate.
-
-I hope I can find some time for this bug again during the coming weekend
-(it's not for my day job). It's motivating to know that I'm not the
-only affected person on the planet. ;-)
-
-Petr T
 
