@@ -1,146 +1,96 @@
-Return-Path: <netdev+bounces-66270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66271-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F02C83E2E8
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 20:49:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7741E83E2FA
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 20:56:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3439D284A07
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 19:49:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1355C1F22DA9
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 19:56:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D365E2233B;
-	Fri, 26 Jan 2024 19:49:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8B0F224D7;
+	Fri, 26 Jan 2024 19:55:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DPw8JiUn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uc/Htt40"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44A6322609;
-	Fri, 26 Jan 2024 19:49:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A93E241E5;
+	Fri, 26 Jan 2024 19:55:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706298571; cv=none; b=X0GKxkPM/KBy3KT8CtxU7Xph23DpsWLTCrpOkhfKYrFsBhfUAdnj2T0hWJXemjveDXQ00JfKkIDO2U3lGJdO0GjGznGAl9armeXFn9mUeF6xjPvwSbfWC4HaYIC6JAfy7xQFBZzCcAwoN9TCriGfPFxff/+DH/CApdL1hUKrq4w=
+	t=1706298953; cv=none; b=X2jBt62nqL2GCPtEmDerMyai5LAGouhyZRn3f+IIJzMhDnSvUFDDEl0Ys3KMmkeF8XaWMHpsa/74h0PxeWPISCSVa+Mg/AgwUrsJZl5Wfb71aqEZmCXO/unb6/DAD0xArFgcH79eRYowB0VOa0gRx4zV1neaPOeizCvrh7g79V8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706298571; c=relaxed/simple;
-	bh=Wuer9su/jiFsi5sYQQisMPWnekUj/IpB602cKYYl9qs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tjvJKnll9JrBlJ2u1e+wlWEvM+j7Jw0D6TAtqDamJLKGUoNvRKQBTawIO/0O2V4iTmGGlutNdrwwM3CBbZxkKbc1jrn63Ou/FUvKgwfCj0UIDlwcYIrvjfjP1eXyM8rDp8MSsDzBMS0iaxRjc/s9npul+UEef+iTx2k1E1vaDVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DPw8JiUn; arc=none smtp.client-ip=209.85.219.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-dc22ade26d8so663141276.1;
-        Fri, 26 Jan 2024 11:49:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706298569; x=1706903369; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Q3iGNpQrB4LeEkd0Y+eOnO8OG2sepjM86FGBNNoLgBw=;
-        b=DPw8JiUnEoeYDVvTJFCrqCDhz6P4j9LKKAsDNCcutGe5Kzf5BmE862Yxi3Dh4Qmf0D
-         Lj5kxtCUBY7CNupQo3a3zesxEuZEpxeTz6vaBCSyOZlmUXUF0QRLTQaGE4T/VwyL9SxS
-         cMyI9vjio/OVe9G60BAffILTmVyvS1O0nLCXnSrNvI8nH6YVztwQC3GMvU632Qs7pNU5
-         Mo4G1iuWF/cnQQ4JZUYdq3IF/v3V/RKu6hBAEql9OYmiJpOzFtgCNd0MkC/UB5Fl33CJ
-         h62ApoW4TBQ6vwQ4WjWj9fbT+QOj5g/KSXuq6mdvYbW43B9qTdSPKZWmfZRQaYDpM8an
-         jzog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706298569; x=1706903369;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Q3iGNpQrB4LeEkd0Y+eOnO8OG2sepjM86FGBNNoLgBw=;
-        b=PR+RTCj1P9d7qxRUcTXwS1OF15etbxzlin4nejvcbnEYxPHz5vRgMWWK91KgpHBgms
-         o1acABw1Dd8LD4nU3WkmmSF3sujaZRAFxgn98TRDU3Zy8OW9t66h+U4rMAUZuFJlLQ15
-         XE7akyDATmyEpGuWUoT9elh8SWENe4TZseISCzbIxqVHE15vuzcEMhrc7NREINadhvDG
-         N5eXf45g1Hh94qbwHTJlVrYEtXpb/aqMETeBbiqa41PeoXiPt6+BEZhP66dgDoAewbyU
-         8nB8L1KYHs1s+rq6qmmsNYxG+hixTxGEXW6olL5GgC/qxSYwB539OycjxcNLPC35XZMB
-         FqLA==
-X-Gm-Message-State: AOJu0Ywz99k6GlaneWqjCygQGBbRLky9wdiTmf0RLJkoQV0H9u+TF5Ac
-	Hq76TvuksIbQXBWuAYqTy8Bjd3Ufqvqdc6pyIITUnNoirLNqS+urCxqq9CEpT+EEgS1ECHZbDWh
-	FdDFVNO2tyu8shZbEjLtlfAjPXsg=
-X-Google-Smtp-Source: AGHT+IHlg4G2/exAQDXNcyzMTeRXf+qek0XjfiGpyFHfZtMMbQj4c6ipRWY3ryT/rlixIdgxmwDjgxcN9EtjG0+KCdw=
-X-Received: by 2002:a05:6902:220e:b0:dc2:234d:214d with SMTP id
- dm14-20020a056902220e00b00dc2234d214dmr450594ybb.40.1706298568024; Fri, 26
- Jan 2024 11:49:28 -0800 (PST)
+	s=arc-20240116; t=1706298953; c=relaxed/simple;
+	bh=WYU54tXCE/E8uLezCkBmXEQo+LCP1yBck4p57AJ0Nug=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jMCtNoJ5BDWqhKG+RA5Jzw3hE+1FRjqvfhzMVupTDNIe7PWne6LFVW91oxsdCS/JzRPHhzVspM1ce6Sv5IFcUeXOQu5d0f7bIdyqWN/Mpmmndq+EUJXm6IOKl+Tuzak+61KgF3R2pTU0+m0HO7Ce1ctdVVyInovUY4FtPfI9v74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uc/Htt40; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99C32C433C7;
+	Fri, 26 Jan 2024 19:55:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706298953;
+	bh=WYU54tXCE/E8uLezCkBmXEQo+LCP1yBck4p57AJ0Nug=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Uc/Htt40d5WwgKbv+jbMRfUP85FOGtqEu9GqifPtfoS1QeWQ/L+X56t6Ro+EGobms
+	 I27j9xlGEgpXr5eBVwfQgr1Ie5qG/sspu8DBIIM5fqSiqYGnk2J7P9TpmVOcNxxp8v
+	 2VzDO0FX4q2drD7EKLUb55BiWT6byu/VwvvN4K/UDs72HIJxLCN+2P1z3iwlIPbRSS
+	 pg14c21730MY7DrVOWj5afRVTeTosV7iSDZpf1ga2zU/zT7enkyRgt5AX6we5WAaX9
+	 XlFOJtOHr4wqHPGT48/kLoLPOFb/Ig+f+7WUDZv5xilqXiyDcWr6Ngu0bno9zXRIJZ
+	 8+46X5QdIpmvA==
+Date: Fri, 26 Jan 2024 11:55:51 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Shuah Khan <shuah@kernel.org>, Xin Long
+ <lucien.xin@gmail.com>, Florian Westphal <fw@strlen.de>, Aaron Conole
+ <aconole@redhat.com>, Nikolay Aleksandrov <razor@blackwall.org>,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net] selftests: net: add missing config for big tcp
+ tests
+Message-ID: <20240126115551.176e3888@kernel.org>
+In-Reply-To: <21630ecea872fea13f071342ac64ef52a991a9b5.1706282943.git.pabeni@redhat.com>
+References: <21630ecea872fea13f071342ac64ef52a991a9b5.1706282943.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1705432850.git.amery.hung@bytedance.com>
- <52a0e08033292a88865aab37b0b3bd294b93e13c.1705432850.git.amery.hung@bytedance.com>
- <1f48019a-fb72-324c-7626-ba5ccb9307b0@iogearbox.net>
-In-Reply-To: <1f48019a-fb72-324c-7626-ba5ccb9307b0@iogearbox.net>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Fri, 26 Jan 2024 11:49:17 -0800
-Message-ID: <CAMB2axPPxq5yF21e-V-JJBoZO4C+EKABCcM2GnEsVZLSecNurw@mail.gmail.com>
-Subject: Re: [RFC PATCH v7 7/8] samples/bpf: Add an example of bpf fq qdisc
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, yangpeihao@sjtu.edu.cn, 
-	toke@redhat.com, jhs@mojatatu.com, jiri@resnulli.us, sdf@google.com, 
-	xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 24, 2024 at 2:29=E2=80=AFAM Daniel Borkmann <daniel@iogearbox.n=
-et> wrote:
->
-> On 1/17/24 10:56 PM, Amery Hung wrote:
-> > tc_sch_fq.bpf.c
-> > A simple bpf fair queueing (fq) qdisc that gives each flow a euqal chan=
-ce
-> > to transmit data. The qdisc respects the timestamp in a skb set by an
-> > clsact rate limiter. It can also inform the rate limiter about packet d=
-rop
-> > when enabled to adjust timestamps. The implementation does not prevent =
-hash
-> > collision of flows nor does it recycle flows.
-> >
-> > tc_sch_fq.c
-> > A user space program to load and attach the eBPF-based fq qdisc, which
-> > by default add the bpf fq to the loopback device, but can also add to o=
-ther
-> > dev and class with '-d' and '-p' options.
-> >
-> > To test the bpf fq qdisc with the EDT rate limiter:
-> > $ tc qdisc add dev lo clsact
-> > $ tc filter add dev lo egress bpf obj tc_clsact_edt.bpf.o sec classifie=
-r
-> > $ ./tc_sch_fq -s
->
-> Would be nice if you also include a performance comparison (did you do
-> production tests with it?) with side-by-side to native fq and if you see
-> a delta elaborate on what would be needed to address it.
+On Fri, 26 Jan 2024 16:32:36 +0100 Paolo Abeni wrote:
+> The big_tcp test-case requires a few kernel knobs currently
+> not specified in the net selftests config, causing the
+> following failure:
+> 
+>   # selftests: net: big_tcp.sh
+>   # Error: Failed to load TC action module.
+>   # We have an error talking to the kernel
+> ...
+>   # Testing for BIG TCP:
+>   # CLI GSO | GW GRO | GW GSO | SER GRO
+>   # ./big_tcp.sh: line 107: test: !=: unary operator expected
+> ...
+>   # on        on       on       on      : [FAIL_on_link1]
+> 
+> Add the missing configs
+> 
+> Fixes: 6bb382bcf742 ("selftests: add a selftest for big tcp")
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 
-I did a simple test by adding a fq to the loopback device and then
-sending a single stream traffic via iperf. The bpf implementation of
-fq achieves 90% throughput compared with the native one.
+Ah, great, I was missing RF_RAW in the local hack.
+I applied manually because looks like this change is on top of
+something:
 
-I think the overhead mainly comes from allocating bpf objects (struct
-skb_node) to store skb kptrs. This part can be removed if bpf
-list/rbtree recognizes skb->list/rbnode. On the kfunc implementation
-side, I think we can do it by saving struct bpf_rb_node_kern into
-skb->rb_node and skb->cb. I haven't looked into the verifier to see
-what needs to be done.
+patching file tools/testing/selftests/net/config
+Hunk #3 succeeded at 73 with fuzz 1 (offset -1 lines).
+Hunk #4 succeeded at 82 (offset -1 lines).
 
-I will move the test cases from samples to selftests and include more
-testing in the next patchset.
-
->
-> > Signed-off-by: Amery Hung <amery.hung@bytedance.com>
-> > ---
-> >   samples/bpf/Makefile            |   8 +-
-> >   samples/bpf/bpf_experimental.h  | 134 +++++++
-> >   samples/bpf/tc_clsact_edt.bpf.c | 103 +++++
-> >   samples/bpf/tc_sch_fq.bpf.c     | 666 +++++++++++++++++++++++++++++++=
-+
-> >   samples/bpf/tc_sch_fq.c         | 321 +++++++++++++++
-> >   5 files changed, 1231 insertions(+), 1 deletion(-)
-> >   create mode 100644 samples/bpf/bpf_experimental.h
-> >   create mode 100644 samples/bpf/tc_clsact_edt.bpf.c
-> >   create mode 100644 samples/bpf/tc_sch_fq.bpf.c
-> >   create mode 100644 samples/bpf/tc_sch_fq.c
+While at it I reordered the values a little bit to be closer to what 
+I think would get us closer to alphasort. Hope you don't mind.
 
