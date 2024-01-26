@@ -1,179 +1,144 @@
-Return-Path: <netdev+bounces-66138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44B7583D731
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 11:03:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4B5283D76D
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 11:09:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF4521F2B403
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 10:03:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2E2929FB5E
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 10:06:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A2FB63A;
-	Fri, 26 Jan 2024 09:13:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 036C81B582;
+	Fri, 26 Jan 2024 09:22:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="uBTAk+9P"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NKiNFbKP"
 X-Original-To: netdev@vger.kernel.org
-Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF87D6772A;
-	Fri, 26 Jan 2024 09:13:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 724341B94D
+	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 09:22:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706260424; cv=none; b=eK2aZ3l3kIGT8Z3e0Lge1Jsh/+TkLLnKxPUfy/UoFMzuUgPNr5WdY66iVG/jH6UMvmrcjvwEp3A0c4wLRzZR85NpoFkepgoZ4InQXSQrdeJQOh44qYYvD28ciQbThE98eot0tX7m/HgAUDU4rGOMKbUKDpNkXhymSHL0/YHWvas=
+	t=1706260927; cv=none; b=CqI8+xKchB5uqFMEybtvhZ4rCCkKlf+yeQuXNgBRJjvhp4GT3NJLNA9vmITzIChx/DR+sN6JMQG9Gk48EbiUF390fub9DKYEnoOWTdHgMG/gVdYo5ZBUnjDChZcBdpbzPRn4R/4r7ahnmNe0Vb2h7JsG84TwpkS64TpLBBNz0i8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706260424; c=relaxed/simple;
-	bh=ixHA4ByvJdYwI4VG4upsmomgkVlzfaNWXloCbrP7WpE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Dqzhx+/d1IT6jcbBCAV4kkBPh56bCFMwGbp+qrECsfpJbSRO5jNdt2LZ6tmFLx3Xewba71aQuMGAbkesmEB5rqZ1MrXQE/o8QJp2WguKZJhnCW/3IZA1s1X5fpTEbX6SV1ziBauDNDqCE0U7i7qsBJySLfx7G28FVujyYRR4FL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=uBTAk+9P; arc=none smtp.client-ip=46.235.227.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1706260421;
-	bh=ixHA4ByvJdYwI4VG4upsmomgkVlzfaNWXloCbrP7WpE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=uBTAk+9PlPa/wc0i6kX1JN/PCLrIrGXTAg4pE6Yb8HZ841bcL1/8hVSbFpjUzDrNS
-	 Xdz97p6c9l6hSg01dkMz8HYQhvP9hSBtrYOcoJFiRP2DJtHKU2sOR9o9Ku+yrdfFAt
-	 tHo7bZnc2fAkzgIu1DBJKIP2x4CU9uzjvjdvwcjRE4criuNib1zB/MXOawjUo+JMke
-	 wujOIMXPvYxOQtweBNYBOVSvMet1rUIotg/0ro6h0IJTkZOCOKWYSVPd3zBUH5Khib
-	 hkH7op4BoBDZ6mgXJx3inkYmJFew32r2Ba7R65I+fDD4iiQmTr2c2ynXx7SQkNWOSU
-	 kwJR5SQa7Wydg==
-Received: from [100.113.186.2] (cola.collaboradmins.com [195.201.22.229])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: kholk11)
-	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 528853782072;
-	Fri, 26 Jan 2024 09:13:40 +0000 (UTC)
-Message-ID: <69af3310-3e6f-4730-bebc-44d5e29498b6@collabora.com>
-Date: Fri, 26 Jan 2024 10:13:40 +0100
+	s=arc-20240116; t=1706260927; c=relaxed/simple;
+	bh=8VuQJQ/LbKKyBH8L8aOeX+wDqokfhQNjKOn0vYiJ47M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YgqbHefO/5rXu/7I92b3hij/O2dfjUjkluW5h1PWenPKPFiYZ2daalFoU18gKH63Byy14yCs9v2eJRmh4wKEVtLCxhlGyjg3Ocr12XSVvHG9fenCapyq/aR5z6wLjOgHTKeYU944C3FVzLm1lWloC8YwPrjqgFRombPdcrm9mcY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NKiNFbKP; arc=none smtp.client-ip=209.85.167.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-3bda5be862eso332184b6e.0
+        for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 01:22:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706260925; x=1706865725; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3liS84clJwp9yv2JprNwEDWQHC6chMV+FL0K4jjBCCA=;
+        b=NKiNFbKPwebc44SXj+s6pOSjX6SUxLTNQgeQ4eg4V9Mpj9NBezHnP5opKZd8DS/3Uw
+         Qn/3V35HdfXbzEqng/6s96AiW+o11gA8KQ3atWJ3y2jyZZY5cGdU1Nto31giV204NwMu
+         7DvHXamjXmvx2ZWPe+nV7vd+nZ9+kjwqHvsfCRCNHW6LU9nj0AG+RSWnAv1+6DMsua7h
+         HdSAlb2faMeOYfryeIfNxTHkhGF0DMWiW8rlLqCZMUL8nrk7wX41WM+oX4sqzkxeiylc
+         Os2QwS/JaFMOL/VqO5mSTuEkKC5FlDYkGNz8dA2YuJoaOGIMmhgJaFuGzNbkzsfa8UmO
+         7bJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706260925; x=1706865725;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3liS84clJwp9yv2JprNwEDWQHC6chMV+FL0K4jjBCCA=;
+        b=wC2HQbZhS5SwrIGLOwScHFt4wM2PEPdnrGaP8/DEWtJZuDmG4oqdq5MVqRF/BaoX2W
+         X4KL39i0RECTXME8Pwng7H4Ki8HvqC8G7Tj9yUtBBgPoOoEpxdrrOZkFBdXaBPWGWRc4
+         pbx7ytGxFMCwUyT5I7m4e1onjy1uZr5hMaHmC9h3u3b5OasW3bJ7YesTdel6IYptCMs2
+         oKkvrzzJrDusMjsAYLd6jRdsOWbHk4juciMNSSjo5jjuOI5zhH6p3dX6amPRID+YUg3i
+         PSRAoIOpkQPHWxbGV8968mfb0l0S0yhPxhkN6YPe1Osa+hkeBbAvnbO9XQsUFa1A612T
+         Jf2A==
+X-Gm-Message-State: AOJu0YymTJuCpQ8Ax7BzA1V9HNHP0XSnuSTEnUe5QlM7nh5MUBLejuDv
+	gxPwZ1gPdemER9sHWw0CvXYd1j0IRuPsx44Qdg4oaPCrr859NOx8
+X-Google-Smtp-Source: AGHT+IHRuoZIwLzZlCGIz9JXGEA1cA5HXBYDolAP8hbyCOAiSbVCekv/YLd2CwTRq/o3g/e0H5aVAQ==
+X-Received: by 2002:a05:6808:628a:b0:3bd:df10:9cd3 with SMTP id du10-20020a056808628a00b003bddf109cd3mr1104200oib.97.1706260925428;
+        Fri, 26 Jan 2024 01:22:05 -0800 (PST)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id e17-20020aa79811000000b006da022d1bc8sm726277pfl.25.2024.01.26.01.22.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Jan 2024 01:22:04 -0800 (PST)
+Date: Fri, 26 Jan 2024 17:22:00 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <j.vosburgh@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>, Liang Li <liali@redhat.com>
+Subject: Re: [PATCH net-next 1/4] selftests/net/forwarding: add slowwait
+ functions
+Message-ID: <ZbN5uAeqEKJth5Jv@Laptop-X1>
+References: <20240124095814.1882509-1-liuhangbin@gmail.com>
+ <20240124095814.1882509-2-liuhangbin@gmail.com>
+ <31c8afe0-86fe-4b39-ba7d-a26d157972c9@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/2] dt-bindings: net: bluetooth: Add MediaTek MT7921S
- SDIO Bluetooth
-Content-Language: en-US
-To: Chen-Yu Tsai <wenst@chromium.org>, Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>
-Cc: Sean Wang <sean.wang@mediatek.com>, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org, linux-mediatek@lists.infradead.org,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org
-References: <20240126063500.2684087-1-wenst@chromium.org>
- <20240126063500.2684087-2-wenst@chromium.org>
-From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-In-Reply-To: <20240126063500.2684087-2-wenst@chromium.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <31c8afe0-86fe-4b39-ba7d-a26d157972c9@intel.com>
 
-Il 26/01/24 07:34, Chen-Yu Tsai ha scritto:
-> The MediaTek MT7921S is a WiFi/Bluetooth combo chip that works over
-> SDIO. While the Bluetooth function is fully discoverable, the chip
-> has a pin that can reset just the Bluetooth side, as opposed to the
-> full chip. This needs to be described in the device tree.
+Hi Przemek,
+
+Thanks for your review.
+
+On Wed, Jan 24, 2024 at 02:25:57PM +0100, Przemek Kitszel wrote:
+> > +# timeout in seconds
+> > +slowwait()
+> > +{
+> > +	local timeout=$1; shift
+> > +
+> > +	local start_time="$(date -u +%s)"
+> > +	while true
+> > +	do
+> > +		local out
+> > +		out=$("$@")
+> > +		local ret=$?
+> > +		if ((!ret)); then
 > 
-> Add a device tree binding for MT7921S Bluetooth over SDIO specifically
-> ot document the reset line.
+> it would be nice to have some exit code used (or just reserved) for
+> "operation failed, no need to wait, fail the test please"
+> similar to the xargs, eg:
+>               126    if the command cannot be run
+
+Return directly instead of wait may confuse the caller. Maybe we can
+add a parameter and let user decide whether to wait if return some value.
+e.g.
+
+slowwait nowait 126 $timeout $commands
+
 > 
-> Cc: Sean Wang <sean.wang@mediatek.com>
-> Signed-off-by: Chen-Yu Tsai <wenst@chromium.org>
-
-Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-
-> ---
-> Changes since v1:
-> - Reworded descriptions
-> - Moved binding maintainer section before description
-> - Added missing reference to bluetooth-controller.yaml
-> - Added missing GPIO header to example
+> > +			echo -n "$out"
+> > +			return 0
+> > +		fi
+> > +
+> > +		local current_time="$(date -u +%s)"
+> > +		if ((current_time - start_time > timeout)); then
+> > +			echo -n "$out"
+> > +			return 1
+> > +		fi
+> > +
+> > +		sleep 1
 > 
->   .../bluetooth/mediatek,mt7921s-bluetooth.yaml | 53 +++++++++++++++++++
->   MAINTAINERS                                   |  1 +
->   2 files changed, 54 insertions(+)
->   create mode 100644 Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml
+> I see that `sleep 1` is simplest correct impl, but it's tempting to
+> suggest exponential back-off, perhaps with saturation at 15
 > 
-> diff --git a/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml
-> new file mode 100644
-> index 000000000000..ff11c95c816c
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml
-> @@ -0,0 +1,53 @@
-> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/bluetooth/mediatek,mt7921s-bluetooth.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: MediaTek MT7921S Bluetooth
-> +
-> +maintainers:
-> +  - Sean Wang <sean.wang@mediatek.com>
-> +
-> +description:
-> +  MT7921S is an SDIO-attached dual-radio WiFi+Bluetooth Combo chip; each
-> +  function is its own SDIO function on a shared SDIO interface. The chip
-> +  has two dedicated reset lines, one for each function core.
-> +  This binding only covers the Bluetooth part of the chip.
-> +
-> +allOf:
-> +  - $ref: bluetooth-controller.yaml#
-> +
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - mediatek,mt7921s-bluetooth
-> +  reg:
-> +    const: 2
-> +
-> +  reset-gpios:
-> +    maxItems: 1
-> +    description:
-> +      An active-low reset line for the Bluetooth core; on typical M.2
-> +      key E modules this is the W_DISABLE2# pin.
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    #include <dt-bindings/gpio/gpio.h>
-> +
-> +    mmc {
-> +        #address-cells = <1>;
-> +        #size-cells = <0>;
-> +
-> +        bluetooth@2 {
-> +            compatible = "mediatek,mt7921s-bluetooth";
-> +            reg = <2>;
-> +            reset-gpios = <&pio 8 GPIO_ACTIVE_LOW>;
-> +        };
-> +    };
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index b64a64ca7916..662957146852 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -13657,6 +13657,7 @@ M:	Sean Wang <sean.wang@mediatek.com>
->   L:	linux-bluetooth@vger.kernel.org
->   L:	linux-mediatek@lists.infradead.org (moderated for non-subscribers)
->   S:	Maintained
-> +F:	Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml
->   F:	Documentation/devicetree/bindings/net/mediatek-bluetooth.txt
->   F:	drivers/bluetooth/btmtkuart.c
->   
+> (but then you will have to cap last sleep to don't exceed timeout by
+> more than 1).
 
+Do you mean sleep longer when cmd exec failed? I'm not sure if it's a good
+idea as the caller still wants to return ASAP when cmd exec succeeds.
 
-
+Thanks
+Hangbin
 
