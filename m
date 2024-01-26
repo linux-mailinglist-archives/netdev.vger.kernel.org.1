@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-66129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC3DD83D70B
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 10:58:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 320BC83D70D
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 10:58:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A40F29B9F1
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 09:58:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 844851F2B6E9
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 09:58:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81CD160EFD;
-	Fri, 26 Jan 2024 09:08:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CC3B61698;
+	Fri, 26 Jan 2024 09:08:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b="qhQ+aznB"
+	dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b="y6BD1jbe"
 X-Original-To: netdev@vger.kernel.org
 Received: from www530.your-server.de (www530.your-server.de [188.40.30.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76DC860ED5;
-	Fri, 26 Jan 2024 09:08:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF5C8612D3;
+	Fri, 26 Jan 2024 09:08:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.30.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706260134; cv=none; b=e15QsUn5GXgw0Zld4O4x90xB+wmZUl0aV0ABTpcXEnU4Sjoh+OrNLaG6kXmiLpZTiO57+7qpIs7KyOlMjZy/gJ37OSlkhWjJa3a9e+PFIrPjsunt/Ux9Zn7vUwA+Wih9vhlmVE7XigFSqURlU9SG4g/P+2h+j53h10YbpOyeHXQ=
+	t=1706260136; cv=none; b=NIa/NgzXTbOxvctApzrxWPV9Dxsyduth/Jr14doH57PFZKo5DyLiluy1D9t+4vfHTsegH5Bc+0Gz0o+Nq+ijzf4goh02RbyZgbKF7lPmxR4wgl5vjIluurllZ0b7fX9Wvad03zPFJ7+kdk6EzqAAPfIOHLJnh0xBbEUBkE405js=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706260134; c=relaxed/simple;
-	bh=+iBdilf2oAlb3QWslakRcDz4Slj2S/vo74OJbOpf7io=;
+	s=arc-20240116; t=1706260136; c=relaxed/simple;
+	bh=Y6ysjC80/3HxVZG5UJcj5X7tUQusPEe/JH3Lz24bfkk=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=u+AS+h6e+EB6kzV+2NBhUL8CsyW36hXqgqG0oVd0hiOPutyNizo8iZ/+ULEBPVagOJyF9mIN23mHmuC11Wg+xobX9wrdxLJiG3cCW24ApN0fqxiaggdZrZIfblbJKRs3lBUAeH2kuTLwDiH6feBDtyWxFzSU18kW8aBhWkGP4ZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com; spf=pass smtp.mailfrom=geanix.com; dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b=qhQ+aznB; arc=none smtp.client-ip=188.40.30.78
+	 MIME-Version:Content-Type; b=QXS1nDfN4VzNlr8YXHfnMxWrZxL0xQOnFA7LCpVPE0rO5X+F8mNBZTUVBUFyeanj8+RhMhdEkDA/fp5cizd13s9FPkN5Gt4OYSMkZi0UBxXuXef242eCevrk8TVdD6XH3Sn57XaMdTr5gefV4CQG5hVsOV9sRt0/Q3i7DRLfTMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com; spf=pass smtp.mailfrom=geanix.com; dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b=y6BD1jbe; arc=none smtp.client-ip=188.40.30.78
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=geanix.com
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=geanix.com;
@@ -36,46 +36,39 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=geanix.com;
 	In-Reply-To:Subject:Cc:To:From:Sender:Reply-To:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
 	Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=PUfxJlZFVfmPhNLMt5rpstbfpKShoNxijw+jhoG4IIQ=; b=qhQ+aznBBExDH5jZPmD78Y4aEl
-	8AGLUycpgv2X48qKwFSdTpu0TvBGX9DeIgtBi5WsujLd4bS2Zhk4nuIPMCzzn6BV6Rq/1n/gIHCm9
-	nKxz8qwTLQqzd7B/VcTl/eteW1uBuGjqqU86wiZHpJmgO0casflUaxMcIU4jm2gSgiQ9k/F9z0d3d
-	Vt3wBK2LJbhhJQMrLaTejZOB+mnXokTB0YMlfid+Gur3Yke93LIfiRTEYkVfO3nvd7PPOKVtIpRUo
-	5kpwVCPRUpwGSjB6tJoQv7rr4mBywoyWdNKNRQyqDzmlOqPzNONvwV8T24J3sjRxSEY1OvewUg1KY
-	476+OxDA==;
-Received: from sslproxy01.your-server.de ([78.46.139.224])
+	bh=oxqeIC7ttI03nT3m0P4jBVoLhILJzKjA4P3WHMGd76k=; b=y6BD1jbex9IqxWEA69pQNSDqVH
+	D0wyfPojU3G20lcfmkgh3caXY+0zFvYLv8Y5ekKvYk9Ppu/iicTshnhlNd6NBaeici2ZeXDVcxXCU
+	k+TP8tVNpunouS3ayFL2Cw09SDIPo2PKzfFcbVOxEEEsEo/zrDk3orOmQ0Nx21nmSsgRDWNwwhBwN
+	60ITWFGCgRmafdPAtkvowwFvFy8M5vFjS5Gs0i0L+NZnlSBJvKlszD7L4VwZDvxifQ4L+ZbW2+b+E
+	DOGfioj//Pvxrra8sLl9Z0B+7VRS25gox0tt9/4M/Ni8+duLziTaxVw4O93SbzVoB/VL+S2iJXOmE
+	O46vT+NQ==;
+Received: from sslproxy03.your-server.de ([88.198.220.132])
 	by www530.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <esben@geanix.com>)
-	id 1rTHoA-000CBk-GH; Fri, 26 Jan 2024 09:43:30 +0100
+	id 1rTHx4-000DSM-8S; Fri, 26 Jan 2024 09:52:42 +0100
 Received: from [87.49.42.9] (helo=localhost)
-	by sslproxy01.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	by sslproxy03.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <esben@geanix.com>)
-	id 1rTHo9-000Kqi-0v; Fri, 26 Jan 2024 09:43:29 +0100
+	id 1rTHx3-000LGD-7I; Fri, 26 Jan 2024 09:52:41 +0100
 From: Esben Haabendal <esben@geanix.com>
-To: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
-Cc: Rohan G Thomas <rohan.g.thomas@intel.com>,  "David S . Miller"
- <davem@davemloft.net>,  Alexandre Torgue <alexandre.torgue@foss.st.com>,
-  "Jose Abreu" <joabreu@synopsys.com>,  Eric Dumazet <edumazet@google.com>,
-  "Jakub Kicinski" <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
-  Maxime Coquelin <mcoquelin.stm32@gmail.com>,  Rob Herring
- <robh+dt@kernel.org>,  "Krzysztof Kozlowski"
- <krzysztof.kozlowski+dt@linaro.org>,  Conor Dooley <conor+dt@kernel.org>,
-  Giuseppe Cavallaro <peppe.cavallaro@st.com>,  "Serge Semin"
- <fancer.lancer@gmail.com>,  Andrew Halaney <ahalaney@redhat.com>,
-  <elder@linaro.org>,  <netdev@vger.kernel.org>,
-  <linux-stm32@st-md-mailman.stormreply.com>,
-  <linux-arm-kernel@lists.infradead.org>,  <devicetree@vger.kernel.org>,
-  <linux-kernel@vger.kernel.org>,  <quic_bhaviks@quicinc.com>,
-  <kernel.upstream@quicinc.com>
-Subject: Re: [PATCH net-next 2/2] net: stmmac: TBS support for platform driver
-In-Reply-To: <92892988-bb77-4075-812e-19f6112f436e@quicinc.com> (Abhishek
-	Chauhan's message of "Wed, 10 Jan 2024 12:19:29 -0800")
-References: <20230927130919.25683-1-rohan.g.thomas@intel.com>
-	<20230927130919.25683-3-rohan.g.thomas@intel.com>
-	<92892988-bb77-4075-812e-19f6112f436e@quicinc.com>
-Date: Fri, 26 Jan 2024 09:43:28 +0100
-Message-ID: <87r0i44h8v.fsf@geanix.com>
+To: rohan.g.thomas@intel.com
+Cc: robh@kernel.org,  alexandre.torgue@foss.st.com,  conor+dt@kernel.org,
+  davem@davemloft.net,  devicetree@vger.kernel.org,  edumazet@google.com,
+  fancer.lancer@gmail.com,  joabreu@synopsys.com,
+  krzysztof.kozlowski+dt@linaro.org,  kuba@kernel.org,
+  linux-arm-kernel@lists.infradead.org,  linux-kernel@vger.kernel.org,
+  linux-stm32@st-md-mailman.stormreply.com,  mcoquelin.stm32@gmail.com,
+  netdev@vger.kernel.org,  pabeni@redhat.com,  peppe.cavallaro@st.com
+Subject: Re: [PATCH net-next 1/2] dt-bindings: net: snps,dwmac: Time Based
+ Scheduling
+In-Reply-To: <20230929051758.21492-1-rohan.g.thomas@intel.com> (rohan g.
+	thomas's message of "Fri, 29 Sep 2023 13:17:58 +0800")
+References: <20230928180942.GA932326-robh@kernel.org>
+	<20230929051758.21492-1-rohan.g.thomas@intel.com>
+Date: Fri, 26 Jan 2024 09:52:40 +0100
+Message-ID: <87msss4gtj.fsf@geanix.com>
 User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -87,58 +80,105 @@ Content-Type: text/plain
 X-Authenticated-Sender: esben@geanix.com
 X-Virus-Scanned: Clear (ClamAV 0.103.10/27165/Thu Jan 25 10:51:15 2024)
 
-"Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com> writes:
+rohan.g.thomas@intel.com writes:
 
-> Qualcomm had similar discussions with respect to enabling of TBS for a
-> particular queue. We had similar discussion on these terms yesterday
-> with Redhat. Adding Andrew from Redhat here
+> From: Rohan G Thomas <rohan.g.thomas@intel.com>
 >
-> What we discovered as part of the discussions is listed below.
+> On Wed, Sep 27, 2023 at 09:09:18PM +0800, Rohan G Thomas wrote:
+>>> Add new property tbs-enabled to enable Time Based Scheduling(TBS)
+>>
+>>That's not the property you added.
+>>
+>>> support per Tx queues. TBS feature can be enabled later using ETF
+>>> qdisc but for only those queues that have TBS support enabled.
+>>
+>>This property defines capable or enabled? 
 >
-> 1. Today upstream stmmac code is designed in such a way that TBS flag
-> is put as part of queue configurations(see below snippet) and as well
-> know that stmmac queue configuration comes from the dtsi file.
+> This property is to enable TBS support for any Tx queue. Why this
+> added is because I think TBS need not be enabled for all capable
+> Tx queues(Tx DMA channels) because of the following hw limitations.
+> 1. As per DWMAC QoS and DWXGMAC databooks, TBS cannot coexist with
+> TSO. So TBS cannot be enabled for a Tx queue which is for TSO. 
+> 2. Also as per DWXGMAC databook, "Do not enable time-based scheduling
+> (or enhanced descriptors) for the channel for which TSO or transmit
+> timestamp or one-step timestamping control correction feature is
+> enabled".
+> 3. As per DWXGMAC databook, "Use separate channel (without TBS
+> enabled) for time critical traffic. Mixing such traffic with TBS
+> enabled traffic can cause delays in transmitting time critical
+> traffic."
+> More explanation below...
 >
-> //ndo_open => stmmac_open
-> int tbs_en = priv->plat->tx_queues_cfg[chan].tbs_en;(comes from tx_queues_cfg)
+>>
+>>Seems like OS configuration and policy.
 >
-> /* Setup per-TXQ tbs flag before TX descriptor alloc */
-> tx_q->tbs |= tbs_en ? STMMAC_TBS_AVAIL : 0;
+> Tx queues need to be configured for TBS during hw setup itself as
+> special enhanced descriptors are used by the hw for TBS support
+> enabled queues. Switching between enhanced and normal descriptors on
+> run is not feasible. So this flag is for enabling "Enhanced
+> Descriptors for Time Based Scheduling". This I think is a hw specific
+> requirement.
+
+Support for enhanced descriptors is definitely hardware specific.
+Enabling the use of enhanced descriptors is a configuration choice.
+
+The tricky part here is that the whole devicetree bindings story for the
+stmmac driver is filled with such configuration choices. As such, it is
+only natural to add the property you are suggesting here. I completely
+agree. But you can also argue that it is "wrong", because it does not
+just describe the hardware, but also a configuration choice.
+
+>>Doesn't eh DWMAC have capability registers for supported features? Or
+>>did they forget per queue capabilities?
 >
-> 2. There is a no way to do this dynamically from user space because we don't have any 
-> API exposed which can do it from user space
+> Yes, capability registers are available. For DWMAC5 IP, if TBSSEL bit
+> is set, then TBS is supported by all Tx queues.
 
-Not now. But why not extend ethtool API to allow enabling TBS for
-supported controllers?
+Not true. Some NXP imx8 and imx9 chips support Synopsys MAC 5.10a IP,
+and does not support TBS for queue 0. And they have TBSSEL bit set, but
+no TBS_CH support.
 
-> and also TBS rely on special descriptors aka enhanced desc this cannot
-> be done run time and stmmac has to be aware of it before we do
-> DMA/MAC/MTL start.
-
-Isn't this somewhat similar to changing the RX/TX ring parameters, which
-I believe also is quite difficult to do at run time, and ethtool
-therefore requires the interface to be down in oroer to change them?
-
-> To do this dynamically would only mean stopping DMA/MAC/MTL realloc
-> resources for enhanced desc and the starting MAC/DMA/MTL. This means
-> we are disrupting other traffic(By stopping MAC block).
-
-Yes. But you would be disrupting traffic less than by requiring a
-complete reboot of the target which is needed if the devicetree must be
-changed.
-
-> 3. I dont think there is a way we can enable this dynamically today. I
-> would like upstream community to share your thoughts as well.
-
-Hereby done. Could we investigate the possibility of using ethtool to
-change TBS enable/disable "run-time"?
-
-> 4. I agree with Rohan's patch here and want upstream community to
-> accept it. This will allow use to configure the queues where TBS needs
-> to be enabled as hardcoding in the code unless upstream has better way
-> to this using userspace.
+> For DWXGMAC IP, if TBSSEL bit is set, then TBS is supported by TBS_CH
+> number of Tx queues starting from the highest Tx queue. But because of
+> the hw limitations mentioned above, TBS cannot be enabled for all
+> capable queues.
 >
-> Please let us know if you think otherwise. 
-
-/Esben
+>>
+>>> 
+>>> Commit 7eadf57290ec ("net: stmmac: pci: Enable TBS on GMAC5 IPK PCI
+>>> entry") enables similar support from the stmmac pci driver.
+>>
+>>Why does unconditionally enabling TBS work there, but not here?
+>
+> There, Tx queue 0 is not enabled for TBS as it is used for TSO.
+>
+>>
+>>> 
+>>> Signed-off-by: Rohan G Thomas <rohan.g.thomas@intel.com>
+>>> ---
+>>>  Documentation/devicetree/bindings/net/snps,dwmac.yaml | 8 ++++++++
+>>>  1 file changed, 8 insertions(+)
+>>> 
+>> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/>devicetree/bindings/net/snps,dwmac.yaml
+>>> index 5c2769dc689a..db1eb0997602 100644
+>>> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+>>> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+>>> @@ -399,6 +399,14 @@ properties:
+>>>              type: boolean
+>>>              description: TX checksum offload is unsupported by the TX queue.
+>>>  
+>>> +          snps,tbs-enabled:
+>>> +            type: boolean
+>>> +            description:
+>>> +              Enable Time Based Scheduling(TBS) support for the TX queue. TSO and
+>>> +              TBS cannot be supported by a queue at the same time. If TSO support
+>>> +              is enabled, then default TX queue 0 for TSO and in that case don't
+>>> +              enable TX queue 0 for TBS.
+>>> +
+>>>          allOf:
+>>>            - if:
+>>>                required:
+>>> -- 
+>>> 2.26.2
+>>> 
 
