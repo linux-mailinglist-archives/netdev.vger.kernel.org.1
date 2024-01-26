@@ -1,81 +1,119 @@
-Return-Path: <netdev+bounces-66260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4CBC83E259
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 20:17:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B8DE83E261
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 20:21:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 758F61F21292
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 19:17:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD0E128568C
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 19:21:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A32EA20B29;
-	Fri, 26 Jan 2024 19:17:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AB59224D8;
+	Fri, 26 Jan 2024 19:21:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jjzRcO58"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="JSDjQkFE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E4A91DDEA
-	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 19:17:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C766224CC;
+	Fri, 26 Jan 2024 19:21:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706296666; cv=none; b=bKagE7sWMrLPd7m6lEOKbMaDaJkTWNAZJfebcXfieJQnwHj98PcX3MO91qE/iLRit7G3r/awH/6wvnGkHuUH8NZwR6Qhxb1mfdMU/EAwwA0p8HgxcAFByMGTAU5ev3D1aBmLf/J/vKyXhJihQHogv1+N0eY21ncHp1YW/+GF1AY=
+	t=1706296906; cv=none; b=VmegwvEA/fyNQbmJqZsz3CZ7GijCbVLXKo/0bSZA0FS4Z8/+jbvRFKEmiNW6sX5DotxgMlmK9scan4yXPXM/VUvfY9pUMKMwnHdD+m+RiOTN29kOsvtiSwlgSEtQ794S94pzJfCsgTbZxY7PQwzg47dYpOV/7d0QSyxkACbpK7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706296666; c=relaxed/simple;
-	bh=ANvJg7I6RIVftpiUyOnLxnc9j2xgbvD9gbI5LfkeH/E=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=a+2phDX9Xm+LGkyxMI1bBNA4cVgTTGGYgL4lIfkuKav9tGdi08SJq+2mOVZYJIBfHNDi/Xaf9Ot2ul3q5sQegALsplcr8Bs9Rej0pJpgupw60nHWXY7WDzt4cdIsMSPd2KBO7DmMg9yaNLiLFdPPfkm/yfVypWqQDMzBYUMom/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jjzRcO58; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1865C433C7;
-	Fri, 26 Jan 2024 19:17:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706296665;
-	bh=ANvJg7I6RIVftpiUyOnLxnc9j2xgbvD9gbI5LfkeH/E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jjzRcO58c21tn9T2s7yDNIeuL0XnUwKyLAEgjYSLHhI9p39THdTM/WrXlUwqDO6rN
-	 e92xnel4R0kGb2ACMfLKjMGObU1kNkXgQKpU+2EJn6Ml2ODKDnSKUQlyb841Kh9YMM
-	 qvNGlHB9WAeqikxQFe5FPjhKn5nezPWLNufDQMnF494CWYsplKgYbz1pwZzBIH8LvG
-	 ZojmyV9MC7oukJoyT47DMJVhGx+CAgJyVyBIT7nkAp7P/CyerqjOksylNzTb6AFGSR
-	 SJEZ2I6SJNVMOSCNBTNzFm0K/+sNpsn0Avy938ex7UMl67xLM4fhBhwlE9nx/WGKp5
-	 qX/yWK4QtXYKA==
-Date: Fri, 26 Jan 2024 11:17:44 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Wei <dw@davidwei.uk>
-Cc: Jiri Pirko <jiri@resnulli.us>, Sabrina Dubroca <sd@queasysnail.net>,
- netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v6 1/4] netdevsim: allow two netdevsim ports to
- be connected
-Message-ID: <20240126111744.7f2dd7a3@kernel.org>
-In-Reply-To: <d1aae414-6225-4a1f-86dd-c185ebfa978f@davidwei.uk>
-References: <20240126012357.535494-1-dw@davidwei.uk>
-	<20240126012357.535494-2-dw@davidwei.uk>
-	<20240125182403.13c4475b@kernel.org>
-	<d1aae414-6225-4a1f-86dd-c185ebfa978f@davidwei.uk>
+	s=arc-20240116; t=1706296906; c=relaxed/simple;
+	bh=7mhZb9ygDhp+lMS6hHQyI5VsLJG0EHa6YD7w0sZalvQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WJ1Qw0JFjOWHkWlLR5jPPdz49XWM0sjhGZoDYqkc4RlLLRsGA1V8fL2ucWNOzhocF/fD94dJCWxp5U427/IfJlqJoskHbFOwg1Mvmz5XnQVkX/i0VlT6eiMK/PrY+812D00tz1uBiJVZg6GUOUrOMJg+H0F6F1oWVsB4bWpzER4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=JSDjQkFE; arc=none smtp.client-ip=46.235.227.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1706296902;
+	bh=7mhZb9ygDhp+lMS6hHQyI5VsLJG0EHa6YD7w0sZalvQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=JSDjQkFEorkj0X7MovCc69VTRxUVTLipp8ZQ5q3/F9LdC4wnu9pTKnOOyxVvaMfiJ
+	 afIb6JAeT9JejAjy0wYdKPc2eAJQAAIOe7OImaa0oWxdFXPaKadl+2i+xzs8kXGnuF
+	 j0eeChNMiKHCZcQ0slCgaCqaMw4weHpCT6198egLV01r/PvwArCenBXakgyYbOEtJj
+	 Ii5O+8ZH+H79d1DKp7lityrXR1PWy6DcGnnGEeIBCHA1xCl2DAExuca3K8sQKFgeRQ
+	 T2NzcFas/csoJ9LqOmKbNb7bJNMlvp1TVZyf/xel61spqiX83sBaBmSfRNj5abDkmg
+	 HVgm03/CdX1vQ==
+Received: from localhost (cola.collaboradmins.com [195.201.22.229])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: cristicc)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id EC9363780022;
+	Fri, 26 Jan 2024 19:21:41 +0000 (UTC)
+From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Samin Guo <samin.guo@starfivetech.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jacob Keller <jacob.e.keller@intel.com>
+Cc: netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	kernel@collabora.com
+Subject: [RESEND PATCH v4 0/2] StarFive DWMAC support for JH7100
+Date: Fri, 26 Jan 2024 21:21:24 +0200
+Message-ID: <20240126192128.1210579-1-cristian.ciocaltea@collabora.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Fri, 26 Jan 2024 10:54:35 -0800 David Wei wrote:
-> > since you're under rtnl_lock you can use __get_device_by_index(),
-> > it doesn't increase the refcount so you won't have to worry about
-> > releasing it.  
-> 
-> Ah, I will change this. Is this true in general i.e. if I hold some big
-> lock then I can use versions of functions that do not modify refcounts?
+This is just a subset of the initial patch series [1] adding networking
+support for StarFive JH7100 SoC.
 
-I don't think so, generally you can ignore refcounts if you're holding
-the lock protecting the table in which the object is registered while
-it is alive, and you just looked it up in that table... if that makes
-sense.
+[1]: https://lore.kernel.org/lkml/20231218214451.2345691-1-cristian.ciocaltea@collabora.com/
 
-netdev lifetime is a bit unusual in how much the rtnl_lock protects.
+Changes in v4:
+ - Rebased series onto next-20240125
+ - Added R-b tag from Rob in PATCH 1
+ - v3:
+   https://lore.kernel.org/lkml/20231222101001.2541758-1-cristian.ciocaltea@collabora.com/
+
+Changes in v3:
+ - Optimized jh7110 resets & reset-names properties (Rob)
+ - Added R-b tag from Jacob in PATCH 1
+ - v2:
+   https://lore.kernel.org/lkml/20231220002824.2462655-1-cristian.ciocaltea@collabora.com/
+
+Changes in v2:
+ - Add the missing binding patch (Conor)
+ - v1:
+   https://lore.kernel.org/lkml/20231219231040.2459358-1-cristian.ciocaltea@collabora.com/
+
+Cristian Ciocaltea (2):
+  dt-bindings: net: starfive,jh7110-dwmac: Add JH7100 SoC compatible
+  net: stmmac: dwmac-starfive: Add support for JH7100 SoC
+
+ .../devicetree/bindings/net/snps,dwmac.yaml   | 11 +--
+ .../bindings/net/starfive,jh7110-dwmac.yaml   | 72 +++++++++++++------
+ drivers/net/ethernet/stmicro/stmmac/Kconfig   |  6 +-
+ .../ethernet/stmicro/stmmac/dwmac-starfive.c  | 32 +++++++--
+ 4 files changed, 88 insertions(+), 33 deletions(-)
+
+-- 
+2.43.0
+
 
