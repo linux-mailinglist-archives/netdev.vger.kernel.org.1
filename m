@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-66311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05F9F83E5A1
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 23:38:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E106783E5A2
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 23:38:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0A1B281E73
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 22:38:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96BD01F251B2
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 22:38:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DEE457327;
-	Fri, 26 Jan 2024 22:37:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 028E656B70;
+	Fri, 26 Jan 2024 22:37:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ubVg7Jle"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gKXM073E"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A75A5579B
-	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 22:37:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2ED751024
+	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 22:37:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706308628; cv=none; b=qYMH3X8+5ltyPtAGklnIOqQqVhdIkZNob+0P0+5Bxi7JEZ5jccvtOGKJzQD6Jye/cA9NCgwqWB/Ulascm+6I6YvZw++ODSYEBUXwAjAc0bLnF4YqksCFmGLLc1uEvbPygrqSc69+umnOQIxpaqDUUr+eHBF2UfLWdU1oABeoXHg=
+	t=1706308629; cv=none; b=b3I4dDIUqr3BNYnUoGcoh9Sg/XhRurovBWZyzk/griM52iXBewe5j50EF3WTjQssT/R8sR7WXHrYxGyaD4W7NU1JDx2AC9RHnrnECLN9TfzGEtyfqKv32/CZ23owQMR2ryHopbn/pX1yJPBCTx+GJ0tz4K5rfMhRTmtsbvFJIdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706308628; c=relaxed/simple;
-	bh=EtJCnlUQ+/lcfWm2qky+KCm7H4BTHXhsSyU+FmhFrYo=;
+	s=arc-20240116; t=1706308629; c=relaxed/simple;
+	bh=Ars+QwO+yKKX8DHQIcvpOtaIIspa+mTb1s5wBZB/tQo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DrP0Kqs0/w5Tj6u3uh41/o7tkvnO1sXMbGawpXB0nIQLu50AiNKAfGDdYGrqkfRzNxtasKirAoXd09Z0x3vpOJyU9GyPq2+XG98gqtnNqdMp7yKrAFZbY4YjJxiyzV1ZFVH0Yvg6oSQ9KeSHwY3kgV5h4YJuMwDjtrYZbrMEshU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ubVg7Jle; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09A30C43394;
-	Fri, 26 Jan 2024 22:37:07 +0000 (UTC)
+	 MIME-Version; b=sv1/MoyUw6ynG8DdjHBvARetbQ0dn/a3fMuDPUVOO+NY/9dHcr5z51c5oMMNj9wzS/JQa3vHKTFk0BHjwS4AKdqefvyAS0bkPEdeaspUub01GC3G1mdVLEeOTyJ2FBqEa6vt0voenOkzctFLQMQb/hj1ZfZKrc2Xwx9rt93DbBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gKXM073E; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85D7AC433F1;
+	Fri, 26 Jan 2024 22:37:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706308628;
-	bh=EtJCnlUQ+/lcfWm2qky+KCm7H4BTHXhsSyU+FmhFrYo=;
+	s=k20201202; t=1706308629;
+	bh=Ars+QwO+yKKX8DHQIcvpOtaIIspa+mTb1s5wBZB/tQo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ubVg7JleCjpmg/o1L0cPsP2+wguc/2uuThbdVR7cWYnvOVnf0oA32UHvn1JqQOCYh
-	 +tDfpi3BwPESj3SVlkTzMiW4XtDyPArW8BeFYdjEm0VnZ1KnIDWhnywShQYaTo6ZLN
-	 EQx8ZcNCJQcPJPEKVOVowfGf/RF80GbAVT2PmhdOhXREN0WvEFK54layAxIgeTu1dK
-	 g+ExWqlNZKcYUc7nX3AZshlc/4n6v//2KzzyqtJ9YX4ljm8QWadCw6JLmjlaQiu5f4
-	 UVjLsuP1GejrYGjUrlF4GxU0Is7D/Rp9EoJ9bJKJxo6i1luUnhwC2t3QmKuz5VyUNB
-	 xC5iZVfSwBs6g==
+	b=gKXM073ELS/ksedw1uPuZWh1mNmTRyYscZ5mKmnsH6ZHf9jKDoC1jkdAHz3OUWLH5
+	 lNLaBg+A8o5EVwoj0lFBQ9uGO8uyv6mopmp+EMazMZByZxzAzEAHzfTcdnzLgUckTE
+	 HVdrluE51GMT9OmVc+RWyacevOcOpGOY58OHTZZ69p6Af3Y6cgZZAJZvanRqZQaoRN
+	 FxPl3NnhtagTGsCits6vjZZNJ2TW3P1WbnsXK6Tbu5jZw0LNKgXSp7otBtoA/Y48vl
+	 BnLhwet2wka5CFk7iAem+ZtwiMks603yQ0GHJwA9KV5268lPjH38G/dUahws2jTT/X
+	 cdtU4Mb2Xpg+Q==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -52,9 +52,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>,
 	Carolina Jubran <cjubran@nvidia.com>
-Subject: [net-next 14/15] net/mlx5e: XSK, Exclude tailroom from non-linear SKBs memory calculations
-Date: Fri, 26 Jan 2024 14:36:15 -0800
-Message-ID: <20240126223616.98696-15-saeed@kernel.org>
+Subject: [net-next 15/15] net/mlx5e: XDP, Exclude headroom and tailroom from memory calculations
+Date: Fri, 26 Jan 2024 14:36:16 -0800
+Message-ID: <20240126223616.98696-16-saeed@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240126223616.98696-1-saeed@kernel.org>
 References: <20240126223616.98696-1-saeed@kernel.org>
@@ -68,53 +68,55 @@ Content-Transfer-Encoding: 8bit
 
 From: Carolina Jubran <cjubran@nvidia.com>
 
-Packet data buffers lack reserved headroom or tailroom,
-and SKBs are allocated on a side memory when needed.
+In the case of XDP Multi-Buffer with Striding RQ, an extra
+page is allocated for the linear part of non-linear SKBs.
 
-Exclude the tailroom from the SKB size calculations.
+Including headroom and tailroom in the calculation may
+result in an unnecessary increase in the amount of memory
+allocated. This could be critical, particularly for large
+MTUs (e.g. 7975B) and large RQ sizes (e.g. 8192).
+
+In this case, the requested page pool size is 64K, but
+32K would be sufficient. This causes a failure due to
+exceeding the page pool size limit of 32K.
+
+Exclude headroom and tailroom from SKB size calculations
+to reduce page pool size.
 
 Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
 Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../net/ethernet/mellanox/mlx5/core/en/params.c   | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/en/params.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/params.c b/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
-index 5d213a9886f1..b9d39ef8053c 100644
+index b9d39ef8053c..5757f4f10c12 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
-@@ -240,11 +240,14 @@ static u32 mlx5e_rx_get_linear_sz_xsk(struct mlx5e_params *params,
- 	return xsk->headroom + hw_mtu;
- }
- 
--static u32 mlx5e_rx_get_linear_sz_skb(struct mlx5e_params *params, bool xsk)
-+static u32 mlx5e_rx_get_linear_sz_skb(struct mlx5e_params *params, bool no_head_tail_room)
+@@ -257,6 +257,7 @@ static u32 mlx5e_rx_get_linear_stride_sz(struct mlx5_core_dev *mdev,
+ 					 struct mlx5e_xsk_param *xsk,
+ 					 bool mpwqe)
  {
--	/* SKBs built on XDP_PASS on XSK RQs don't have headroom. */
--	u16 headroom = xsk ? 0 : mlx5e_get_linear_rq_headroom(params, NULL);
- 	u32 hw_mtu = MLX5E_SW2HW_MTU(params, params->sw_mtu);
-+	u16 headroom;
++	bool no_head_tail_room;
+ 	u32 sz;
+ 
+ 	/* XSK frames are mapped as individual pages, because frames may come in
+@@ -265,7 +266,13 @@ static u32 mlx5e_rx_get_linear_stride_sz(struct mlx5_core_dev *mdev,
+ 	if (xsk)
+ 		return mpwqe ? 1 << mlx5e_mpwrq_page_shift(mdev, xsk) : PAGE_SIZE;
+ 
+-	sz = roundup_pow_of_two(mlx5e_rx_get_linear_sz_skb(params, false));
++	no_head_tail_room = params->xdp_prog && mpwqe && !mlx5e_rx_is_linear_skb(mdev, params, xsk);
 +
-+	if (no_head_tail_room)
-+		return SKB_DATA_ALIGN(hw_mtu);
-+	headroom = mlx5e_get_linear_rq_headroom(params, NULL);
++	/* When no_head_tail_room is set, headroom and tailroom are excluded from skb calculations.
++	 * no_head_tail_room should be set in the case of XDP with Striding RQ
++	 * when SKB is not linear. This is because another page is allocated for the linear part.
++	 */
++	sz = roundup_pow_of_two(mlx5e_rx_get_linear_sz_skb(params, no_head_tail_room));
  
- 	return MLX5_SKB_FRAG_SZ(headroom + hw_mtu);
- }
-@@ -289,7 +292,11 @@ bool mlx5e_rx_is_linear_skb(struct mlx5_core_dev *mdev,
- 	if (params->packet_merge.type != MLX5E_PACKET_MERGE_NONE)
- 		return false;
- 
--	/* Both XSK and non-XSK cases allocate an SKB on XDP_PASS. Packet data
-+	/* Call mlx5e_rx_get_linear_sz_skb with the no_head_tail_room parameter set
-+	 * to exclude headroom and tailroom from calculations.
-+	 * no_head_tail_room is true when SKB is built on XDP_PASS on XSK RQs
-+	 * since packet data buffers don't have headroom and tailroom resreved for the SKB.
-+	 * Both XSK and non-XSK cases allocate an SKB on XDP_PASS. Packet data
- 	 * must fit into a CPU page.
- 	 */
- 	if (mlx5e_rx_get_linear_sz_skb(params, xsk) > PAGE_SIZE)
+ 	/* XDP in mlx5e doesn't support multiple packets per page.
+ 	 * Do not assume sz <= PAGE_SIZE if params->xdp_prog is set.
 -- 
 2.43.0
 
