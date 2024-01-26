@@ -1,205 +1,112 @@
-Return-Path: <netdev+bounces-66128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D02383D706
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 10:57:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EB8883D752
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 11:07:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DDE81B316D0
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 09:55:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 110D2B30CC2
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 10:01:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 473EE604A9;
-	Fri, 26 Jan 2024 09:05:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D94464CFF;
+	Fri, 26 Jan 2024 09:10:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b="EBsO9U80"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www530.your-server.de (www530.your-server.de [188.40.30.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40F7360265
-	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 09:05:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C190D657AA;
+	Fri, 26 Jan 2024 09:10:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.30.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706259931; cv=none; b=C0TJnukPUn9dtPwJwshAR9sPMpvTrIAQ6W6Nb8o4s4SCM/NoqVI6Hiw/8DC9caVfCXjoKzIWStoWaPsSWsavnKLjY+1dYmmRPTxVXkWJobZztLQi1ecXLRsKQ3dijlXiMRuu0HjCFIJ/zpbeqbISi4dF8QkhuRqCsutFj/Z6ZAk=
+	t=1706260254; cv=none; b=S6LD5GSbHfp7rLFGE7AesSgUu23B4eyTptPX6DBOl7cafkvcWRBbV80KhIE7KBpIR6eksSral1+zHZcprnFCtWX1qA47S+BBMg/oQlOyJCVVdb9GtWk7m5VVTaePhFqHIlQrSkj8IOfs+g4pKZ13VlViQ6M9Lu7lfBCda/QYuJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706259931; c=relaxed/simple;
-	bh=T9wpoH0F1cIP8eVCnBQyB/bvSH/l99a66hT/RBmiLG4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=O389zo94uKQgn60b5okwu9hvloZormcmA2/vYcpXHXfL6qB5lNeC22EM1g9+g/lGmWV+xW4wduHzE0TP6GlM8FJprQ1NDfx5xtPyc3Z3Ji6bGH9FUVD8KF5gWge313m88L76k0dLiBVmWom4RrbGiQsqjZj/IsRfgRJ4kt1w/eo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7becfc75cd4so11264139f.3
-        for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 01:05:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706259928; x=1706864728;
-        h=content-transfer-encoding:to:from:subject:message-id:date
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=spc1ShxOmdgB1pC4pVuSbJpCr0hgxztE/zkQiLNA1BA=;
-        b=Y2ND5Xc3w5yuVPAGE/IJns/yXPnAPso6cGNowVVTbapV/Eog1AHZXCjrQGA4IxEQkP
-         Ayvf9Ls2J6uXZlGh6oOBzGqm8kG37rw/zBXZRCmjwNQZ2uBka3ihLpUwisl1tTbowI3K
-         nlxiiP8K58RL8YYbGWTYFwxMTvGof+keNRx8b/GRBmzcoyW4VHq3mCDwiEbqcvE41D/X
-         KGmk5j2/e9PdoNUz2JGl2fW50JHPy+Of+u0oFNjMJTVLxr4jZBSuC1mNNkyIqzoJsZi6
-         NwsVfnViKfhioCC88fBGvc6yIlo8tc+Qv99fyrE7KD5AxcEO2HFEZxzNjaVa6cXrXD7r
-         Vu3g==
-X-Gm-Message-State: AOJu0YzEhZDthgV94ZvJ9LqTDhc8c08ZBjU3zV/Kcu6lbRnMWO99Gyxo
-	PPXkO2JCsz0sfD6NWNHKLhSiFBOKnI3Y8vaca5hWOkv2BU1ZoLVqJAor8dauIQ3LtGhPNaQgAXw
-	Oc4PvWaQkpXnfhhYy5sSu/HdMoaexQzyVfc2QRoOCJ0nCsIcrDpRfoGE=
-X-Google-Smtp-Source: AGHT+IHkbZUO6XeiPdqbgZ81JcfuzhhS+rfbSkGWl/OfSYFJsF50hYFc2QlOeN4HJWElFBahgMEfpsWHgH1d9zPXSqNXmaddU+mo
+	s=arc-20240116; t=1706260254; c=relaxed/simple;
+	bh=bIj1eE760427Rui5D3HzwJTUewZhLMvbS+Am7GYCxMY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FjHCYN1RQ0uiOaQj8g0iMc8op47+RfgMTslJHJQGI2Sgg+dW2i2yhPKf8G76uIJhjLraP3GqPzdZbNBix/QS9rN4dFdd9iVkv8MRedOROnlcfwrbQv6AXGp+dOu+cFHpDrSQy33vsXSWoc806WLysN+qOp71r5jA65UE0QsQtEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com; spf=pass smtp.mailfrom=geanix.com; dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b=EBsO9U80; arc=none smtp.client-ip=188.40.30.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=geanix.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=geanix.com;
+	s=default2211; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:
+	Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=+cDUpkRwZoCkGrsowLN1EeXEXa9KYx2yEQLWfgGSS0g=; b=EBsO9U80tIz2vVWWhX2O2mkFeo
+	W1/pNVUwN8m3YVj860izyitoW9TWdbGmhX/sequIUI5EJG8xKexT9iLopnmTSCvVA5DrNtluIyiXd
+	9lCzil/59/i6zAbwa61oL50g5l7EtILCaP2mdOzt4epvtqYCS7M21MPiZFOfejEdycryxS8RB8DIE
+	/VRdBMe7vyWo0mNERPbc77P2yHwW2v5WqMtnTyi5VOq7vAnbr/KIXEdTU9eNXEYh8ifZRxCsCtnlg
+	4f6ZPk/ZGc+ALAb5CUedtTS/Jig6vEH3qOKW4TPm3FqFm3DmA/SUGxsVjx4xC3+lazDNCslNYbGih
+	Yn5kBbXw==;
+Received: from sslproxy04.your-server.de ([78.46.152.42])
+	by www530.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <esben@geanix.com>)
+	id 1rTIEX-000Gf6-In; Fri, 26 Jan 2024 10:10:45 +0100
+Received: from [87.49.42.9] (helo=localhost)
+	by sslproxy04.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <esben@geanix.com>)
+	id 1rTIEW-0004KL-6V; Fri, 26 Jan 2024 10:10:44 +0100
+From: Esben Haabendal <esben@geanix.com>
+To: netdev@vger.kernel.org,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	NXP Linux Team <linux-imx@nxp.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-kernel@vger.kernel.org,
+	Rohan G Thomas <rohan.g.thomas@intel.com>,
+	"Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>,
+	linux-mediatek@lists.infradead.org
+Subject: [PATCH v2 0/2] net: stmmac: dwmac-imx: Time Based Scheduling support
+Date: Fri, 26 Jan 2024 10:10:40 +0100
+Message-ID: <cover.1706256158.git.esben@geanix.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a02:cacd:0:b0:46e:668b:58d7 with SMTP id
- f13-20020a02cacd000000b0046e668b58d7mr7716jap.0.1706259928470; Fri, 26 Jan
- 2024 01:05:28 -0800 (PST)
-Date: Fri, 26 Jan 2024 01:05:28 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000ee5c6c060fd59890@google.com>
-Subject: [syzbot] [net?] [v9fs?] WARNING: refcount bug in p9_req_put (3)
-From: syzbot <syzbot+d99d2414db66171fccbb@syzkaller.appspotmail.com>
-To: asmadeus@codewreck.org, ericvh@kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux_oss@crudebyte.com, lucho@ionkov.net, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com, v9fs@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: esben@geanix.com
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27165/Thu Jan 25 10:51:15 2024)
 
-Hello,
+This small patch series allows using TBS support of the i.MX Ethernet QOS
+controller for etf qdisc offload.
+It achieves this in a similar manner that it is done in dwmac-intel.c,
+dwmac-mediatek.c and stmmac_pci.c.
 
-syzbot found the following issue on:
+Changes since v1:
 
-HEAD commit:    4fbbed787267 Merge tag 'timers-core-2024-01-21' of git://g.=
-.
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=3D11bfbdc7e80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3D4059ab9bf06b6ce=
-b
-dashboard link: https://syzkaller.appspot.com/bug?extid=3Dd99d2414db66171fc=
-cbb
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Deb=
-ian) 2.40
-userspace arch: i386
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc=
-7510fe41f/non_bootable_disk-4fbbed78.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/13a98041382d/vmlinux-=
-4fbbed78.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/0a02086862ee/bzI=
-mage-4fbbed78.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit=
-:
-Reported-by: syzbot+d99d2414db66171fccbb@syzkaller.appspotmail.com
-
-9p: Unknown Cache mode or invalid value fsca=EF=BF=BDhe
-9pnet: Tag 65535 still in use
-------------[ cut here ]------------
-refcount_t: underflow; use-after-free.
-WARNING: CPU: 3 PID: 30609 at lib/refcount.c:28 refcount_warn_saturate+0x14=
-a/0x210 lib/refcount.c:28
-Modules linked in:
-CPU: 3 PID: 30609 Comm: syz-executor.1 Not tainted 6.7.0-syzkaller-13004-g4=
-fbbed787267 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16=
-.2-1 04/01/2014
-RIP: 0010:refcount_warn_saturate+0x14a/0x210 lib/refcount.c:28
-Code: ff 89 de e8 e8 af 1e fd 84 db 0f 85 66 ff ff ff e8 ab b4 1e fd c6 05 =
-1b 87 bb 0a 01 90 48 c7 c7 c0 70 2f 8b e8 97 a9 e4 fc 90 <0f> 0b 90 90 e9 4=
-3 ff ff ff e8 88 b4 1e fd 0f b6 1d f6 86 bb 0a 31
-RSP: 0018:ffffc9000345f9b0 EFLAGS: 00010286
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffc90006349000
-RDX: 0000000000040000 RSI: ffffffff814e1906 RDI: 0000000000000001
-RBP: ffff8880687d59a0 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000001 R12: ffffc9000345fa48
-R13: ffff8880687d59a0 R14: ffff888026a9d800 R15: 1ffff9200068bf41
-FS:  0000000000000000(0000) GS:ffff88802c900000(0063) knlGS:00000000f7ff1b4=
-0
-CS:  0010 DS: 002b ES: 002b CR0: 0000000080050033
-CR2: 0000000020003000 CR3: 000000006eb7c000 CR4: 0000000000350ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- __refcount_sub_and_test include/linux/refcount.h:272 [inline]
- __refcount_dec_and_test include/linux/refcount.h:304 [inline]
- refcount_dec_and_test include/linux/refcount.h:322 [inline]
- p9_req_put+0x1f0/0x250 net/9p/client.c:401
- p9_tag_cleanup net/9p/client.c:428 [inline]
- p9_client_destroy+0x226/0x480 net/9p/client.c:1073
- v9fs_session_init+0xba5/0x1a80 fs/9p/v9fs.c:490
- v9fs_mount+0xc6/0xcd0 fs/9p/vfs_super.c:123
- legacy_get_tree+0x109/0x220 fs/fs_context.c:662
- vfs_get_tree+0x8c/0x370 fs/super.c:1784
- do_new_mount fs/namespace.c:3352 [inline]
- path_mount+0x14e6/0x1f20 fs/namespace.c:3679
- do_mount fs/namespace.c:3692 [inline]
- __do_sys_mount fs/namespace.c:3898 [inline]
- __se_sys_mount fs/namespace.c:3875 [inline]
- __ia32_sys_mount+0x291/0x310 fs/namespace.c:3875
- do_syscall_32_irqs_on arch/x86/entry/common.c:165 [inline]
- __do_fast_syscall_32+0x79/0x110 arch/x86/entry/common.c:321
- do_fast_syscall_32+0x33/0x70 arch/x86/entry/common.c:346
- entry_SYSENTER_compat_after_hwframe+0x70/0x7a
-RIP: 0023:0xf7ff6579
-Code: b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 =
-00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 9=
-0 90 90 8d b4 26 00 00 00 00 8d b4 26 00 00 00 00
-RSP: 002b:00000000f7ff15ac EFLAGS: 00000292 ORIG_RAX: 0000000000000015
-RAX: ffffffffffffffda RBX: 00000000200001c0 RCX: 0000000020000480
-RDX: 00000000200004c0 RSI: 0000000000000404 RDI: 0000000020001080
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000292 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
-----------------
-Code disassembly (best guess), 2 bytes skipped:
-   0:	10 06                	adc    %al,(%rsi)
-   2:	03 74 b4 01          	add    0x1(%rsp,%rsi,4),%esi
-   6:	10 07                	adc    %al,(%rdi)
-   8:	03 74 b0 01          	add    0x1(%rax,%rsi,4),%esi
-   c:	10 08                	adc    %cl,(%rax)
-   e:	03 74 d8 01          	add    0x1(%rax,%rbx,8),%esi
-  1e:	00 51 52             	add    %dl,0x52(%rcx)
-  21:	55                   	push   %rbp
-  22:	89 e5                	mov    %esp,%ebp
-  24:	0f 34                	sysenter
-  26:	cd 80                	int    $0x80
-* 28:	5d                   	pop    %rbp <-- trapping instruction
-  29:	5a                   	pop    %rdx
-  2a:	59                   	pop    %rcx
-  2b:	c3                   	ret
-  2c:	90                   	nop
-  2d:	90                   	nop
-  2e:	90                   	nop
-  2f:	90                   	nop
-  30:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
-  37:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
+- Simplified for loop by starting at index 1.
+- Fixed problem with indentation.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Esben Haabendal (2):
+  net: stmmac: do not clear TBS enable bit on link up/down
+  net: stmmac: dwmac-imx: set TSO/TBS TX queues default settings
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+ drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c   | 4 ++++
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 3 +++
+ 2 files changed, 7 insertions(+)
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+-- 
+2.43.0
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
