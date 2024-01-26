@@ -1,131 +1,138 @@
-Return-Path: <netdev+bounces-66196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45DDD83DE11
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 16:55:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 814DE83DE3E
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 17:03:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A7112B213D1
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 15:55:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3606A1F21F91
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 16:03:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3A351CFBC;
-	Fri, 26 Jan 2024 15:55:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B63211D549;
+	Fri, 26 Jan 2024 16:03:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=x3me.net header.i=@x3me.net header.b="JydDJpU/"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="me5TcXcA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BF9B1D52D
-	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 15:55:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 910B61CD1F;
+	Fri, 26 Jan 2024 16:03:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706284514; cv=none; b=HDdgqX0M0/rDAfDWt+APogvAoIqRxeXsAZ6JthceKHwMSit8SJdIDS0SQ9OXlc34hE8AIpnfiuPJwrseeWxllOArBOOy2p/w5DMGnSTH5ftQVPOYnmFrFyaBjVOkBBTQYFbNiQe2gQShfcTO2/vpuiEwqmm5i9dt9Uurhx4EqAA=
+	t=1706285031; cv=none; b=Hp9o6/sVIj0K8uRkseTmGvE3pHJyxRCtYSuErX+DPCpWem7HLpp3HPsngDfudTcTLZu4pE5nA1TDaAzJ58TZUh6vbNCaqVOSutVwiTSkPjffwQq7Hp53jhVvVUo5VdlUKRU9w+EKal/roTUYfU5nP6Z+5MvyfOgVaz37WQcooyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706284514; c=relaxed/simple;
-	bh=3lYgZp347K4vTTTOiB2qjtOQzvKBmqK24fKo8PVGArY=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=u2uk44sYa9hZGfV0dLYkIhx5Z1u5KBFuTKqeiUJXA17o+dkd+s59ZQF6wt0VMtboFtCJnm4/0nN4D3BjJ0UbXDJr5D6jVHiOPqIIEogoZb8p3Z1m3zT7A716hFlWbXyK9/TsFk/VfkqtM+OFc0ZoIng6yXgnKMSqU/vlO4D1MEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=x3me.net; spf=pass smtp.mailfrom=x3me.net; dkim=pass (2048-bit key) header.d=x3me.net header.i=@x3me.net header.b=JydDJpU/; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=x3me.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=x3me.net
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-40ea5653f6bso9422355e9.3
-        for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 07:55:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=x3me.net; s=google; t=1706284510; x=1706889310; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=3lYgZp347K4vTTTOiB2qjtOQzvKBmqK24fKo8PVGArY=;
-        b=JydDJpU/ZKQ5smFhLzxlmRbAnz8hv412Y96oVnxe4lbm0yzeU8/1UPIgRKqgoUywBT
-         i9KYfR+EJ9uXT+TWhAntkcyTCYZJRfSRLo3cgBimTbS7DG5n4sYDPe3Csr4suVQMw3hN
-         IMvTiyEZleDR5cEOPpK3NGFR2pKuxXAYRwaiVsygVtX1qEcD04NJ1TB+ZrLxlT74IgWX
-         lf2CTPO7MOHZ1RshGX+sDCFXt19QU+DGoNGRg3BKLdcBE8kUaZV/9pwCa5o+vu6faSyd
-         OzUnMY2JdZpT9qfuEMR/p0FuBuZFTkbpfM1NQ5bxowyj5xnh7TsoLT9jkyglUbKb4YW3
-         VesA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706284510; x=1706889310;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3lYgZp347K4vTTTOiB2qjtOQzvKBmqK24fKo8PVGArY=;
-        b=NjgKCIZK2xLWCHnaI3ghdFTNm9pl6sR9RfykTo+iphGZ2DSDmyGplfQ+uTjPo1T9kQ
-         6KLyhJ2Dx1uxT0ytxLxBzU4vrN9sO1EMX7dXpJ9w4ilasYpvtu2MRY1Nyl3v358gxokP
-         bR+VJRX6WPRIev15mGbKlt5NiFEzoXZx48nBjhc0PHkemo5xjjfrmz8RdBqNn4dAtSro
-         jirc9fVOTGfVHFJkF1NuxBfPZMH4gBPo26omRYEyg1KNlCPJxxJHdeH4g4qpBghFkYni
-         Z4KzhceL4lMB/iYBga1j4VYQV6UXv7c0UZb05MeQ3APQNqF/t/yoqADMb2L5Xh/zaeqm
-         7fzw==
-X-Gm-Message-State: AOJu0YzLdnFjfApvbhoFmuLVN7lc85zELkEKqRppP060hhYw4aYliRjN
-	ZhLjDYTzmUZPW4NRaGV92WayHrNwnPUcKnPSEMQPqe1OpoxUiSg+gK07FAEFNF/HkM/mjapLrCl
-	77Io5ExDw+8n7LiIPT2Y2x2ihDQt2/aR3wdMuAFR897OEMmVGnK4=
-X-Google-Smtp-Source: AGHT+IFkQt5nIqW+dbgjyXjH5Xw4PEm1cQcBJxc08p2lx3fOD9Cpo3POMOBgKNe/rC7fcoRRD7AsfCUqRB8gmpoBE+c=
-X-Received: by 2002:a05:600c:b97:b0:40e:da5f:7152 with SMTP id
- fl23-20020a05600c0b9700b0040eda5f7152mr734056wmb.239.1706284509890; Fri, 26
- Jan 2024 07:55:09 -0800 (PST)
+	s=arc-20240116; t=1706285031; c=relaxed/simple;
+	bh=a2FDYa8SVRiWVcXHltyA+EbeAgkQBMuaOsQcBHD69JU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=F6+OIYnBtdyITwdNppWMpTou6kvpfpp/tyMzwGoENivKt5l6afONUuwurwFTK9UE3ZOua4eKKKZHgX2zfIL6qhNsrWTfO/ipfSDmexpwmHyRXRMN4K7fmR9DBsJ3crA/AMcstqouItK/+c4RFGI+KAGQly+MLDGp49ec35Km/Gw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=me5TcXcA; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40QFHQ8J009101;
+	Fri, 26 Jan 2024 16:03:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=BliTP1l+lG2LEeQXattTsm7SacSHWHKJM/bBgLnOkW0=; b=me
+	5TcXcAkB5GNCBEM/HO4zzJXYg9veoD5ZbhvIPDCo/SbXaWW7a+Fuk56GsX62n2Fu
+	XPVM+q1HQqan9FU7nOyaayBTDQuiUptBQ6Kl5RtCWH4Vm14zIwCeRtZaNVpmwuIM
+	MY1uWufjqhMuARCjUOdyGUZGs6uovZCTAp7TRqpP51BI1SMFK1wNm85J+cRIaqjl
+	39Ad7ODwP26atcw7iNfKRdrZzQftqEoeIMm4Die4Im/G72Y5qpypalIJ+1f0+9hY
+	vrYai0NOOFahOnUhJhl6gks/yNzG4DePpycyMkGAn7laE8zJlwjK/hHG58PhMQrc
+	lwlm/mamK49knkVAKZTQ==
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3vv8e88y5g-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 26 Jan 2024 16:03:27 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 40QG3QZ2015720
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 26 Jan 2024 16:03:26 GMT
+Received: from [10.253.33.199] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Fri, 26 Jan
+ 2024 08:03:21 -0800
+Message-ID: <5d778fc0-864c-4e91-9722-1e39551ffc45@quicinc.com>
+Date: Sat, 27 Jan 2024 00:03:19 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Pavel Vazharov <pavel@x3me.net>
-Date: Fri, 26 Jan 2024 17:54:59 +0200
-Message-ID: <CAJEV1ijxNyPTwASJER1bcZzS9nMoZJqfR86nu_3jFFVXzZQ4NA@mail.gmail.com>
-Subject: Need of advice for XDP sockets on top of the interfaces behind a
- Linux bonding device
-To: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next PATCH 0/3] net: mdio-ipq4019: fix wrong default MDC
+ rate
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Christian Marangi <ansuelsmth@gmail.com>, Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio
+	<konrad.dybcio@linaro.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Robert Marko <robert.marko@sartura.hr>,
+        <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Sergey Ryazanov <ryazanov.s.a@gmail.com>
+References: <20240124213640.7582-1-ansuelsmth@gmail.com>
+ <53445feb-a02c-4859-a993-ccf957208115@quicinc.com>
+ <f8a9e328-5284-4f24-be5d-7e9804869ecd@lunn.ch>
+From: Jie Luo <quic_luoj@quicinc.com>
+In-Reply-To: <f8a9e328-5284-4f24-be5d-7e9804869ecd@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: hkBudbvisV_pQZDINTb_7j5f9k_yVKxx
+X-Proofpoint-ORIG-GUID: hkBudbvisV_pQZDINTb_7j5f9k_yVKxx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-25_14,2024-01-25_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
+ spamscore=0 malwarescore=0 priorityscore=1501 mlxlogscore=573
+ impostorscore=0 lowpriorityscore=0 suspectscore=0 bulkscore=0
+ clxscore=1015 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2401190000 definitions=main-2401260118
 
-Hi there,
 
-We've a DPDK application which runs on top of XDP sockets, using the
-DPDK AF_XDP driver. It was a pure DPDK application but lately it was
-migrated to run on top of XDP sockets because we need to split the
-traffic entering the machine between the DPDK application and other
-"standard-Linux" applications running on the same machine.
-The application seems to work OK when working on a single port.
-However, running on the interfaces behind a bonding device causes the
-remote device (switch) to start reporting: "The member of the LACP
-mode Eth-Trunk interface received an abnormal LACPDU, which may be
-caused by optical fiber misconnection" and the bonding stops working.
-Note that the application needs to work with multiple queues and thus
-the XDP sockets are not bound to the bonding device but to the
-physical interfaces behind the bonding device. As far as I checked the
-bonding device supports binding only a single XDP socket and makes it
-unusable for our purposes.
-In the concrete example, there are 3 physical ports in bonding and
-each port is set up to have 16 Rx/Tx (combined) queues. The
-application (the DPDK layer) opens an XDP socket for each queue of the
-physical ports (Basically the DPDK layer creates 3 virtual af_xdp
-devices and each one of them has Rx/Tx 16 queues where each queue is
-actually an XDP socket). I've run the application in different
-threading scenarios but each one of them exhibit the above problem:
-- single thread - where all of the Rx/Tx on the queues is handled by a
-single thread
-- two threads - where the first thread handles Rx/Tx on (dev:0
-queues:0-15) and (dev:1 queues:0-7) and the second thread handles
-Rx/Tx on (dev:1 queues:8-15) and (dev:2 queues:0-15).
-- three threads - where the first thread handles Rx/Tx on (dev:0
-queues:0-15), the second thread handles Rx/Tx on (dev:1 queues:0-15),
-the third thread handles Rx/Tx on (dev:2 queues:0-15).
-I've tried with and without busy polling in the above threading
-schemes and the problem was still there.
 
-Related to the above, I've the following questions:
-1. Is it possible to use multiple XDP sockets with a bonding device? I
-mean, if we use the above example, will it be possible to open 16 XDP
-sockets on top of the bonding device which has 3 ports and each have
-16 Rx/Tx queues.
-2. If point 1 is not possible then is the above scheme supposed to
-work in general or is it not right to bind the XDP sockets to the
-queues of the underlying physical ports?
-3. If the above scheme is supposed to work then is the bonding logic
-(LACP management traffic) affected by the access pattern of the XDP
-sockets? I mean, the order of Rx/Tx operations on the XDP sockets or
-something like that.
+On 1/26/2024 1:18 AM, Andrew Lunn wrote:
+>> Hi Christian,
+>> Just a gentle reminder.
+>>
+>> The MDIO frequency config is already added by the following patch series.
+>> https://lore.kernel.org/netdev/28c8b31c-8dcb-4a19-9084-22c77a74b9a1@linaro.org/T/#m840cb8d269dca133c3ad3da3d112c63382ec2058
+> 
+> I admit this version was posted first. However, its embedded in a
+> patch series which is not making much progress, and i doubt will make
+> progress any time soon.
+> 
+> If you really want your version to be used, please split it out into a
+> standalone patch series adding just MDIO clock-frequency support, with
+> its binding, and nothing else.
+> 
+>      Andrew
 
-Any other advice on what I should check again or change or research is
-greatly appreciated.
+Hi Andrew,
+We will rework the patch series to include only MDIO frequency related
+function and frequency dt binding, and post the updated patch series
+on the Monday/Tuesday of next week. We will work with Christian to 
+ensure he can re-use this patch as well.
 
-Regards,
-Pavel.
+Thanks
 
