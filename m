@@ -1,135 +1,144 @@
-Return-Path: <netdev+bounces-66126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A62A783D5E6
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 10:18:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC3DD83D70B
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 10:58:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 460C51F2821D
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 09:18:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A40F29B9F1
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 09:58:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3323A1CF8C;
-	Fri, 26 Jan 2024 08:37:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81CD160EFD;
+	Fri, 26 Jan 2024 09:08:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Y1XN9KY+";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="b14yElSz"
+	dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b="qhQ+aznB"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from www530.your-server.de (www530.your-server.de [188.40.30.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 950001A71F
-	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 08:37:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76DC860ED5;
+	Fri, 26 Jan 2024 09:08:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.30.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706258247; cv=none; b=EhaSdYDpWHunlJGc8YTPgQpSinlxOMRjbkTHmXmQDit5EgQMh9/rbz7rpDLxxNDjPxhd5plawm/m0uvt0MUdS3CJ+zgOPa/oYhV2I9WZgBNBMTqxI7KGdtuZo7TU4ZhKfM11nwwcRwC19BKrUKij2YJfXLy6A0ECcRnaBy7uSss=
+	t=1706260134; cv=none; b=e15QsUn5GXgw0Zld4O4x90xB+wmZUl0aV0ABTpcXEnU4Sjoh+OrNLaG6kXmiLpZTiO57+7qpIs7KyOlMjZy/gJ37OSlkhWjJa3a9e+PFIrPjsunt/Ux9Zn7vUwA+Wih9vhlmVE7XigFSqURlU9SG4g/P+2h+j53h10YbpOyeHXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706258247; c=relaxed/simple;
-	bh=X0SiHFkiWKAhDPmg71AH4QepY4u+nFwTSDqxTdOMzWk=;
+	s=arc-20240116; t=1706260134; c=relaxed/simple;
+	bh=+iBdilf2oAlb3QWslakRcDz4Slj2S/vo74OJbOpf7io=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=SQKMK12L8UOihSROixABr8eLQW4RsUlHGsBb3PzaOjaia9sIkekWlLmmWuN4TcviUSebPnV1moFhTQd1mwHcSJ6D9FyzmcfApn38FnkV5IO0KML5DPn39xad6xUQxE5+VPf0JpCPtTOWU3b23E68zov1bhpGa1KMguMRAnf0ahg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Y1XN9KY+; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=b14yElSz; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1706258243;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=X0SiHFkiWKAhDPmg71AH4QepY4u+nFwTSDqxTdOMzWk=;
-	b=Y1XN9KY+Zez1/kABUGhTpJkU34KqkcIla1oU/I3WlGX5pktP1jFkmDOMCYZLDjHZ0/RFeR
-	9BTV0VylKIpim6M3icMN1FzNERTjmp5jFe+KI7OFHn9H6gyPWGk74+/3qPGOPJP7XDyWmN
-	LKg8R1WwblRon9FFG7rWphdzCDpACL9PgafFfXVJiSRdkN/hsopGdigr8NdC/ivai1Y+ow
-	1KLH9QSvrdqG58yIyP4AYLpz0U4ZWxyP94cDtPYE/XFB7WuSrcqOAIOKaXK7+aHynJ+tYr
-	mXwOKgey68/NSH6Uk6TkWPEkHJQtGkxh6qqu3Ut0LYSHEWBDjuwxPrSrgKpI9Q==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1706258243;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=X0SiHFkiWKAhDPmg71AH4QepY4u+nFwTSDqxTdOMzWk=;
-	b=b14yElSzKVIyJw270bzJi4GidrzEs6/pg81dP08mL75cAW2NiAjVKl8ggd65nAPJCjicaV
-	OBcilCkleEajx0CA==
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, Vinicius Costa Gomes
- <vinicius.gomes@intel.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org, Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: Re: [PATCH v1 iwl-next] igc: Add support for LEDs on i225/i226
-In-Reply-To: <2caec578-a268-4e82-95df-9573a52d6b7b@lunn.ch>
-References: <20240124082408.49138-1-kurt@linutronix.de>
- <de659af0-807f-4176-a7c2-d8013d445f9e@lunn.ch>
- <87ede5eumt.fsf@kurt.kurt.home>
- <2caec578-a268-4e82-95df-9573a52d6b7b@lunn.ch>
-Date: Fri, 26 Jan 2024 09:37:22 +0100
-Message-ID: <87y1cch4n1.fsf@kurt.kurt.home>
+	 MIME-Version:Content-Type; b=u+AS+h6e+EB6kzV+2NBhUL8CsyW36hXqgqG0oVd0hiOPutyNizo8iZ/+ULEBPVagOJyF9mIN23mHmuC11Wg+xobX9wrdxLJiG3cCW24ApN0fqxiaggdZrZIfblbJKRs3lBUAeH2kuTLwDiH6feBDtyWxFzSU18kW8aBhWkGP4ZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com; spf=pass smtp.mailfrom=geanix.com; dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b=qhQ+aznB; arc=none smtp.client-ip=188.40.30.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=geanix.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=geanix.com;
+	s=default2211; h=Content-Type:MIME-Version:Message-ID:Date:References:
+	In-Reply-To:Subject:Cc:To:From:Sender:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=PUfxJlZFVfmPhNLMt5rpstbfpKShoNxijw+jhoG4IIQ=; b=qhQ+aznBBExDH5jZPmD78Y4aEl
+	8AGLUycpgv2X48qKwFSdTpu0TvBGX9DeIgtBi5WsujLd4bS2Zhk4nuIPMCzzn6BV6Rq/1n/gIHCm9
+	nKxz8qwTLQqzd7B/VcTl/eteW1uBuGjqqU86wiZHpJmgO0casflUaxMcIU4jm2gSgiQ9k/F9z0d3d
+	Vt3wBK2LJbhhJQMrLaTejZOB+mnXokTB0YMlfid+Gur3Yke93LIfiRTEYkVfO3nvd7PPOKVtIpRUo
+	5kpwVCPRUpwGSjB6tJoQv7rr4mBywoyWdNKNRQyqDzmlOqPzNONvwV8T24J3sjRxSEY1OvewUg1KY
+	476+OxDA==;
+Received: from sslproxy01.your-server.de ([78.46.139.224])
+	by www530.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <esben@geanix.com>)
+	id 1rTHoA-000CBk-GH; Fri, 26 Jan 2024 09:43:30 +0100
+Received: from [87.49.42.9] (helo=localhost)
+	by sslproxy01.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <esben@geanix.com>)
+	id 1rTHo9-000Kqi-0v; Fri, 26 Jan 2024 09:43:29 +0100
+From: Esben Haabendal <esben@geanix.com>
+To: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
+Cc: Rohan G Thomas <rohan.g.thomas@intel.com>,  "David S . Miller"
+ <davem@davemloft.net>,  Alexandre Torgue <alexandre.torgue@foss.st.com>,
+  "Jose Abreu" <joabreu@synopsys.com>,  Eric Dumazet <edumazet@google.com>,
+  "Jakub Kicinski" <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
+  Maxime Coquelin <mcoquelin.stm32@gmail.com>,  Rob Herring
+ <robh+dt@kernel.org>,  "Krzysztof Kozlowski"
+ <krzysztof.kozlowski+dt@linaro.org>,  Conor Dooley <conor+dt@kernel.org>,
+  Giuseppe Cavallaro <peppe.cavallaro@st.com>,  "Serge Semin"
+ <fancer.lancer@gmail.com>,  Andrew Halaney <ahalaney@redhat.com>,
+  <elder@linaro.org>,  <netdev@vger.kernel.org>,
+  <linux-stm32@st-md-mailman.stormreply.com>,
+  <linux-arm-kernel@lists.infradead.org>,  <devicetree@vger.kernel.org>,
+  <linux-kernel@vger.kernel.org>,  <quic_bhaviks@quicinc.com>,
+  <kernel.upstream@quicinc.com>
+Subject: Re: [PATCH net-next 2/2] net: stmmac: TBS support for platform driver
+In-Reply-To: <92892988-bb77-4075-812e-19f6112f436e@quicinc.com> (Abhishek
+	Chauhan's message of "Wed, 10 Jan 2024 12:19:29 -0800")
+References: <20230927130919.25683-1-rohan.g.thomas@intel.com>
+	<20230927130919.25683-3-rohan.g.thomas@intel.com>
+	<92892988-bb77-4075-812e-19f6112f436e@quicinc.com>
+Date: Fri, 26 Jan 2024 09:43:28 +0100
+Message-ID: <87r0i44h8v.fsf@geanix.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
-
---=-=-=
 Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+X-Authenticated-Sender: esben@geanix.com
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27165/Thu Jan 25 10:51:15 2024)
 
-On Thu Jan 25 2024, Andrew Lunn wrote:
-> On Thu, Jan 25, 2024 at 08:31:54AM +0100, Kurt Kanzenbach wrote:
->> On Wed Jan 24 2024, Andrew Lunn wrote:
->> > On Wed, Jan 24, 2024 at 09:24:08AM +0100, Kurt Kanzenbach wrote:
->> >> Add support for LEDs on i225/i226. The LEDs can be controlled via sys=
-fs
->> >> from user space using the netdev trigger. The LEDs are named as
->> >> igc-<bus><device>-<led> to be easily identified.
->> >>=20
->> >> Offloading activity and link speed is supported. Tested on Intel i225.
->> >
->> > Nice to see something not driver by phylib/DSA making use of LEDs.
->> >
->> > Is there no plain on/off support? Ideally we want that for software
->> > blinking for when a mode is not supported.
->>=20
->> Plain on and off is supported is supported, too. Should be possible to
->> implement brightness_set().
+"Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com> writes:
+
+> Qualcomm had similar discussions with respect to enabling of TBS for a
+> particular queue. We had similar discussion on these terms yesterday
+> with Redhat. Adding Andrew from Redhat here
 >
-> Great.
+> What we discovered as part of the discussions is listed below.
 >
-> Its actually better to first implement brightness_set(). That gives
-> you full support for everything the netdev trigger has. Then add
-> offload, which is optional, and will fall back to software for modes
-> which cannot be offloaded.
+> 1. Today upstream stmmac code is designed in such a way that TBS flag
+> is put as part of queue configurations(see below snippet) and as well
+> know that stmmac queue configuration comes from the dtsi file.
+>
+> //ndo_open => stmmac_open
+> int tbs_en = priv->plat->tx_queues_cfg[chan].tbs_en;(comes from tx_queues_cfg)
+>
+> /* Setup per-TXQ tbs flag before TX descriptor alloc */
+> tx_q->tbs |= tbs_en ? STMMAC_TBS_AVAIL : 0;
+>
+> 2. There is a no way to do this dynamically from user space because we don't have any 
+> API exposed which can do it from user space
 
-Understood. I'll do that.
+Not now. But why not extend ethtool API to allow enabling TBS for
+supported controllers?
 
-Thanks,
-Kurt
+> and also TBS rely on special descriptors aka enhanced desc this cannot
+> be done run time and stmmac has to be aware of it before we do
+> DMA/MAC/MTL start.
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
+Isn't this somewhat similar to changing the RX/TX ring parameters, which
+I believe also is quite difficult to do at run time, and ethtool
+therefore requires the interface to be down in oroer to change them?
 
------BEGIN PGP SIGNATURE-----
+> To do this dynamically would only mean stopping DMA/MAC/MTL realloc
+> resources for enhanced desc and the starting MAC/DMA/MTL. This means
+> we are disrupting other traffic(By stopping MAC block).
 
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmWzb0ITHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgh8tEACuu9QsIaTI4/ZbjIT+yLekZ5GSd91w
-xHK647qj4dpL1hObVIimTobuL8qKH5ZOoRRT+kIp8crjnZh7xFFAtfY4frCSa/7g
-SizPhBVmSGg/sKV6TnYUsKvuVVgp54jAz+KWx/OLE5cnQQSFcpqyk+c0PuV/xQZr
-lS2+yIQz0ucK4GuqM6hJ1xjR+p0VtaSFoUASKAu7wZbWaAe42KDW8zsWibvnBLCw
-zx8fBDtxHI/Rf+E6YLpfKkd9+3AVO39Zvp2m9kRipdULXvyul8mBjfiU7K0/pYbP
-rMbYxlicLgzFDyYE2Q87cEiUnhWLmHmuQiI9dRMKGcPmC2nfkIN/eZ4Qky5nt7pD
-RrGz8AWT81a/NAorTXh59WikubTUpA61S5krIOb6eMKbyd4bJ0g4Rz2Yj45u1Z5T
-ypOBLdt7NJnqdKe4Yn9vHZyP89HdIp0JgSrPoXGzsw0l4YLY8lEUuK44YFzenC9U
-ZINUmQKRHVSfHtSvwLOPMMMO5tnwC7+gxJLaHFCyy0rhsDmoyZqhBDnnfPRCpa+M
-OVxzNqgfebn7m5eh8/77FdPabZZS6YipbU7I2dz/tSKfhK6WHoPYQmYPlyJJZMqU
-ivBR5sQ8NuJGVrrk+sb/rPPYmnGEydedu7Qkiq61KxYyW+n5sPpsiMptgBLW+FuF
-YO+3hg52d+Ji6Q==
-=ref4
------END PGP SIGNATURE-----
---=-=-=--
+Yes. But you would be disrupting traffic less than by requiring a
+complete reboot of the target which is needed if the devicetree must be
+changed.
+
+> 3. I dont think there is a way we can enable this dynamically today. I
+> would like upstream community to share your thoughts as well.
+
+Hereby done. Could we investigate the possibility of using ethtool to
+change TBS enable/disable "run-time"?
+
+> 4. I agree with Rohan's patch here and want upstream community to
+> accept it. This will allow use to configure the queues where TBS needs
+> to be enabled as hardcoding in the code unless upstream has better way
+> to this using userspace.
+>
+> Please let us know if you think otherwise. 
+
+/Esben
 
