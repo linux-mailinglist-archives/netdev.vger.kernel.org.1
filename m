@@ -1,227 +1,171 @@
-Return-Path: <netdev+bounces-66152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2089F83D8CC
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 12:00:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17FB683D86D
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 11:49:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C9C74B3AE6F
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 10:40:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C72C6281ECE
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 10:49:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3959C11CBD;
-	Fri, 26 Jan 2024 10:40:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JN/9v/b6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB091125D9;
+	Fri, 26 Jan 2024 10:49:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from torres.zugschlus.de (torres.zugschlus.de [85.214.160.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56A7910A34
-	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 10:40:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92EBC13FE4
+	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 10:49:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.160.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706265639; cv=none; b=QrCcAFUPyfTs8gRpxwMC5Ix3kcBJuI4zliT1rPlubmNVOjJjir+BHjw3mJRqMKnQcakYJ1+HT10Pk/D+qDNoBy56C59YmHFzoX2jnwJyg/nmIkQ35P+sWmQUyW3yjSUm4yKjzz487O92NnNOL2v4RIIbl8xLmXSyUOLTzOnMpq4=
+	t=1706266156; cv=none; b=axJfyxYC3z85fofwrLsPdUiU5rrI6I44VjqQ+qiMqslkPqnh353AAAaDeXKoUWE3BwgW24IYgreg745EsTwrj6g0cEzUpjINDxYrwHhn0/z9Gs9L86ZU2CobIg2jsPEJtNCOahzgQXAC4VWx5j3KcqF5cToU9NWtPFhGVQLczLM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706265639; c=relaxed/simple;
-	bh=gl1zEWtHpPeGeDv2YH2Awyz9rES2JmI4GPlsLZI4GRE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cEoM5SkqTaE/m5/z2LraP19OSX0mvStYA0ENzKY/sa8oFTJRWTDFYJF08JuIgecKwmkOFS7q5wpV4A3o4es1PnSqjE0ElriFLulk7TgdhKp6zrHVg66hVGSlUPA+YHnDGkqEGQM55J1ETQVDLdhWpswT6DLa9bkwQSC0t4/tLqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=JN/9v/b6; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a26ed1e05c7so18482766b.2
-        for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 02:40:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1706265635; x=1706870435; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+rxdOPY25LMe3+An1qLrkEz9HXwYecZgDaBwRDQOLTk=;
-        b=JN/9v/b6bfhRv+ad8z2W0EecINVR7cuoqgaGxpLq90C/WQ996qMjvsrlDV2eGq0zVI
-         zYQuDa1P7oWCf5LEK2rZxAtCxxNhllTGe2+hqYA1yj11UXN+yxUwwmpxaTuDVZ71YGoT
-         4eEAfkQ0CxMlyKziAuq3nMBrIIgDWO2dMl/4ApRIIyHVqRyZI4zcQ1qv2q44FlVT7zp5
-         SYrO4C40QAS4U+KEkJ0tbeu8gMXIShlpA902AkAQ1baYvD0yeDxfREVOHcDP/ljcuPx4
-         ChrAHLYkYFtGKGOepuM52YIQONquspZXH962YqD/l0lV4q+yIcKbidaRm/dcbILNU98x
-         UxGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706265635; x=1706870435;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+rxdOPY25LMe3+An1qLrkEz9HXwYecZgDaBwRDQOLTk=;
-        b=jHiZ0gp4mBaZgcHebSgc1NT2mEMcZPY6Drd5BuOPSK0T5NW7dwjq2zakl4hkuJuKHu
-         5lNkiybugFuQ44NAo1e+GgPPnmFi/hIuhAOvvsIFCQCa1J0aOnR4n85s80qJxamU2WpP
-         NGT9J/bEDgIMHJnnvq12ivSMADS6CiwnERIaaggFX40Se6q0I+KNmGHx0b2BHS/rXBSa
-         mEZamOjEuaaCSuVVQhNsiK33IYg0A0MPA307BQy75Gw3rIeqNN8MaRByAzlKeWg3uOrc
-         bWYpQGj7EY6TSe1etUFP6g2B+/OqA/eH79Sh641QZ/wgDS7WUt8XIdKrZGNBdHRYAA9k
-         gsmQ==
-X-Gm-Message-State: AOJu0Yx/8sZNDIy2GHpGL2aX0LX5BgCjO3Ry78FOzjwIPhk2Dg8DU64t
-	O7QC0PYxUuvdeKfFfSURTgAj1GgiN4S5UtkYkEqNzPYtBznvNTBob5dq7HfbXkQ=
-X-Google-Smtp-Source: AGHT+IHBN1TTtd9Ev4I2l2QrNfpfRANY5sgU8gNdV3XTN7GgSafm/gXyF9GHt26emVq30MO7rwBqzQ==
-X-Received: by 2002:a17:906:37d0:b0:a31:8008:cece with SMTP id o16-20020a17090637d000b00a318008cecemr416174ejc.6.1706265635415;
-        Fri, 26 Jan 2024 02:40:35 -0800 (PST)
-Received: from [192.168.1.20] ([178.197.215.66])
-        by smtp.gmail.com with ESMTPSA id un8-20020a170907cb8800b00a2fb9c0337esm476980ejc.112.2024.01.26.02.40.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 26 Jan 2024 02:40:34 -0800 (PST)
-Message-ID: <74b9f249-fcb4-4338-bf7b-8477de6c935c@linaro.org>
-Date: Fri, 26 Jan 2024 11:40:32 +0100
+	s=arc-20240116; t=1706266156; c=relaxed/simple;
+	bh=bkQpIPvys+JQRnDnCIXJmCYtSf+t3Ia+vj0ZsE9CRhI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XVLtBkKsynTa0hdB5h4MoTDXl9GlQ55xR17WDQXs1jl7Qu/fjmjJejiJudrGd8OlOi5LNZhiNivFNSrsaQVJMcJikESkeNTLQlhEbJb7LVL0XTCS0pHcZqkpmFBkM21Sleit3FakNHgG01T38nNxSYQNjMoEAYJY5HloXYgJz3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zugschlus.de; spf=none smtp.mailfrom=zugschlus.de; arc=none smtp.client-ip=85.214.160.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zugschlus.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=zugschlus.de
+Received: from mh by torres.zugschlus.de with local (Exim 4.96)
+	(envelope-from <mh+netdev@zugschlus.de>)
+	id 1rTJlb-000taO-1d;
+	Fri, 26 Jan 2024 11:48:59 +0100
+Date: Fri, 26 Jan 2024 11:48:59 +0100
+From: Marc Haber <mh+netdev@zugschlus.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: alexandre.torgue@foss.st.com, Jose Abreu <joabreu@synopsys.com>,
+	Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
+	Jisheng Zhang <jszhang@kernel.org>, netdev@vger.kernel.org
+Subject: Re: stmmac on Banana PI CPU stalls since Linux 6.6
+Message-ID: <ZbOOG_yyCUgK_2b1@torres.zugschlus.de>
+References: <Za173PhviYg-1qIn@torres.zugschlus.de>
+ <8efb36c2-a696-4de7-b3d7-2238d4ab5ebb@lunn.ch>
+ <ZbKiBKj7Ljkx6NCO@torres.zugschlus.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/2] dt-bindings: net: bluetooth: Add MediaTek MT7921S
- SDIO Bluetooth
-Content-Language: en-US
-To: Chen-Yu Tsai <wenst@chromium.org>, Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
- <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: Sean Wang <sean.wang@mediatek.com>, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org, linux-mediatek@lists.infradead.org,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org
-References: <20240126063500.2684087-1-wenst@chromium.org>
- <20240126063500.2684087-2-wenst@chromium.org>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20240126063500.2684087-2-wenst@chromium.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ZbKiBKj7Ljkx6NCO@torres.zugschlus.de>
+User-Agent: Mutt/2.2.12 (2023-09-09)
 
-On 26/01/2024 07:34, Chen-Yu Tsai wrote:
-> The MediaTek MT7921S is a WiFi/Bluetooth combo chip that works over
-> SDIO. While the Bluetooth function is fully discoverable, the chip
-> has a pin that can reset just the Bluetooth side, as opposed to the
-> full chip. This needs to be described in the device tree.
+On Thu, Jan 25, 2024 at 07:01:40PM +0100, Marc Haber wrote:
+> On Sun, Jan 21, 2024 at 10:52:56PM +0100, Andrew Lunn wrote:
+> > On Sun, Jan 21, 2024 at 09:17:32PM +0100, Marc Haber wrote:
+> > > Hi,
+> > > 
+> > > I am running a bunch of Banana Pis with Debian stable and unstable but
+> > > with a bleeding edge kernel. Since kernel 6.6, especially the test
+> > > system running Debian unstable is plagued by self-detected stalls on
+> > > CPU. The system seems to continue running normally locally but doesn't
+> > > answer on the network any more. Sometimes, after a few hours, things
+> > > heal themselves.
+> > > 
+> > > Here is an example log output:
+> > > [73929.363030] rcu: INFO: rcu_sched self-detected stall on CPU
+> > > [73929.368653] rcu:     1-....: (5249 ticks this GP) idle=d15c/1/0x40000002 softirq=471343/471343 fqs=2625
+> > > [73929.377796] rcu:     (t=5250 jiffies g=851349 q=113 ncpus=2)
+> > > [73929.383205] CPU: 1 PID: 14512 Comm: atop Tainted: G             L     6.6.0-zgbpi-armmp-lpae+ #1
+> > > [73929.383222] Hardware name: Allwinner sun7i (A20) Family
+> > > [73929.383233] PC is at stmmac_get_stats64+0x64/0x20c [stmmac]
+> > > [73929.383363] LR is at dev_get_stats+0x44/0x144
+> > > [73929.383389] pc : [<bf126db0>]    lr : [<c09525e8>]    psr: 200f0013
+> > > [73929.383401] sp : f0c59c78  ip : f0c59df8  fp : c2bb8000
+> > > [73929.383412] r10: 00800001  r9 : c3443dd8  r8 : 00000143
+> > > [73929.383423] r7 : 00000001  r6 : 00000000  r5 : c2bbb000  r4 : 00000001
+> > > [73929.383434] r3 : 0004c891  r2 : c2bbae48  r1 : f0c59d30  r0 : c2bb8000
+> > > [73929.383447] Flags: nzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment none
+> > > [73929.383463] Control: 30c5387d  Table: 49b553c0  DAC: a7f66f60
+> > > [73929.383486]  stmmac_get_stats64 [stmmac] from dev_get_stats+0x44/0x144
+> > 
+> > Hi Marc
+> > 
+> > https://elixir.bootlin.com/linux/v6.7.1/source/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c#L6949
 > 
-> Add a device tree binding for MT7921S Bluetooth over SDIO specifically
-> ot document the reset line.
-
-s/ot/to/
-
+> That is just for reference to the source? Or am I supposed to do
+> something with that link?
 > 
-> Cc: Sean Wang <sean.wang@mediatek.com>
-> Signed-off-by: Chen-Yu Tsai <wenst@chromium.org>
-> ---
-> Changes since v1:
-> - Reworded descriptions
-> - Moved binding maintainer section before description
-> - Added missing reference to bluetooth-controller.yaml
-> - Added missing GPIO header to example
+> > My _guess_ would be, its stuck in one of the loops which look like:
+> > 
+> > 		do {
+> > 			start = u64_stats_fetch_begin(&txq_stats->syncp);
+> > 			tx_packets = txq_stats->tx_packets;
+> > 			tx_bytes   = txq_stats->tx_bytes;
+> > 		} while (u64_stats_fetch_retry(&txq_stats->syncp, start));
+> > 
+> > Next time you get a backtrace, could you do:
+> > 
+> > make drivers/net/ethernet/stmicro/stmmac/stmmac_main.lst. You can then
+> > use whatever it is reporting for:
+
+So, if I have in my current backtrace:
+PC is at stmmac_get_stats64+0x48/0x20c [stmmac]
+I look in the generated stmmac_main.lst for the function
+stmmac_get_stats:
+00005e9c <stmmac_get_stats64>:
+{
+    5e9c:       e92d47f0        push    {r4, r5, r6, r7, r8, r9, sl, lr}
+    5ea0:       e52de004        push    {lr}            @ (str lr, [sp, #-4]!)
+    5ea4:       ebfffffe        bl      0 <__gnu_mcount_nc>
+                        5ea4: R_ARM_CALL        __gnu_mcount_nc
+        u32 tx_cnt = priv->plat->tx_queues_to_use;
+    5ea8:       e2805a03        add     r5, r0, #12288  @ 0x3000
+    5eac:       e59535c0        ldr     r3, [r5, #1472] @ 0x5c0
+    5eb0:       e5937078        ldr     r7, [r3, #120]  @ 0x78
+        u32 rx_cnt = priv->plat->rx_queues_to_use;
+    5eb4:       e5934074        ldr     r4, [r3, #116]  @ 0x74
+        for (q = 0; q < tx_cnt; q++) {
+    5eb8:       e3570000        cmp     r7, #0
+    5ebc:       12802db9        addne   r2, r0, #11840  @ 0x2e40
+    5ec0:       12822008        addne   r2, r2, #8
+    5ec4:       13a06000        movne   r6, #0
+    5ec8:       1a00000b        bne     5efc <stmmac_get_stats64+0x60>
+    5ecc:       ea000026        b       5f6c <stmmac_get_stats64+0xd0>
+        local_irq_restore(flags);
+}
+
+the address in the first line is the base address, so the line in
+question is 0x5e9c+0x48=0x5ee4, which is already outside the function?!
+
+> My bisect eventually completed and identified
+> 2eb85b750512cc5dc5a93d5ff00e1f83b99651db as the first bad commit.
+> Sadly, it doesnt contain any loops, no calls to u64_stats_update_begin()
+> or u64_stats_update_end() or other suspicious things to the casual
+> reader.
 > 
->  .../bluetooth/mediatek,mt7921s-bluetooth.yaml | 53 +++++++++++++++++++
->  MAINTAINERS                                   |  1 +
->  2 files changed, 54 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml
-> new file mode 100644
-> index 000000000000..ff11c95c816c
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml
-> @@ -0,0 +1,53 @@
-> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/bluetooth/mediatek,mt7921s-bluetooth.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: MediaTek MT7921S Bluetooth
-> +
-> +maintainers:
-> +  - Sean Wang <sean.wang@mediatek.com>
-> +
-> +description:
-> +  MT7921S is an SDIO-attached dual-radio WiFi+Bluetooth Combo chip; each
-> +  function is its own SDIO function on a shared SDIO interface. The chip
-> +  has two dedicated reset lines, one for each function core.
-> +  This binding only covers the Bluetooth part of the chip.
-> +
-> +allOf:
-> +  - $ref: bluetooth-controller.yaml#
-> +
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - mediatek,mt7921s-bluetooth
+> I have backed out that commit out of 6.7.1 and have booted that kernel.
+> Not long enough to be able to say something yet.
 
-Can it be also WiFi on separate bus? How many device nodes do you need
-for this device?
+That didn't fix the hangs, PC is at
+stmmac_get_stats64+0x34/0x20c
+stmmac_get_stats64+0x38/0x20c
+stmmac_get_stats64+0x3c/0x20c
+stmmac_get_stats64+0x40/0x20c
+stmmac_get_stats64+0x44/0x20c
+stmmac_get_stats64+0x48/0x20c
+stmmac_get_stats64+0x4c/0x20c
+stmmac_get_stats64+0x50/0x20c
+stmmac_get_stats64+0x54/0x20c
+stmmac_get_stats64+0x58/0x20c
+stmmac_get_stats64+0x5c/0x20c
+stmmac_get_stats64+0x60/0x20c
+stmmac_get_stats64+0x64/0x20c
+(sorted, uniq, about 66 instances in about 18 hours)
 
-Missing blank line.
+Greetings
+Marc
 
-
-> +  reg:
-> +    const: 2
-> +
-> +  reset-gpios:
-> +    maxItems: 1
-> +    description:
-> +      An active-low reset line for the Bluetooth core; on typical M.2
-> +      key E modules this is the W_DISABLE2# pin.
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +
-> +additionalProperties: false
-
-Instead 'unevaluatedProperties: false'
-
-
-Best regards,
-Krzysztof
-
+-- 
+-----------------------------------------------------------------------------
+Marc Haber         | "I don't trust Computers. They | Mailadresse im Header
+Leimen, Germany    |  lose things."    Winona Ryder | Fon: *49 6224 1600402
+Nordisch by Nature |  How to make an American Quilt | Fax: *49 6224 1600421
 
