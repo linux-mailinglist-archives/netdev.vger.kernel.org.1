@@ -1,155 +1,175 @@
-Return-Path: <netdev+bounces-66214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFCE483E05A
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 18:36:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A889F83E07B
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 18:38:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A58FE1F2532C
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 17:36:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D88501C21DFE
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 17:38:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0EA42031C;
-	Fri, 26 Jan 2024 17:36:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42C2B1E881;
+	Fri, 26 Jan 2024 17:38:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CQDJjSGe"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="f1+j2jRx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07222AD53;
-	Fri, 26 Jan 2024 17:36:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBA67208A0
+	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 17:38:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706290605; cv=none; b=VIfmLOG15Ce0QwdfAEhoDjk1Z3lcaSv+eIyyrxWHsXef2k6+Qi+qtsL8umnn3GiiUcL81Y+oXf78uKZHTmSPogGrrn6qNttZ0xsuymXvueeU2Ndf/VHq+5FcYBqzTwXlKJvFwiSnSh5CeINf90+ru9yDC/Q4sk4L9FE4q9ZMk58=
+	t=1706290728; cv=none; b=McivuLaMKPqT/snWpMBtbjG7WZyrvETS65AnbhhXBiGaCQlKe/xZ59EvQcbUDOE10kbS0prGmqZxvXVAAhdSV4ofjg5HdXk2kE0GY+/y82iwjhHWtWxK5LKZSr/g+e53G5bpIrJ6fdsYUlnxOjENN46V1P0vFIEexoiSxrxydVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706290605; c=relaxed/simple;
-	bh=ieTfurtfat+pVfBbfHgnr7Gb/OnUunNsdTZt3fG9fSs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=DXdhiX8bzL6BeKEyGM/cNFKPOWpXJQn/BbqPqFm2IEPZq10vnth2QYbPXViheQbskSs94BfjBCO9AaDBIC1WoyelMJn6D+PbEckdG3E66fv0arFzscgvxLzrG7EitMaA7+S/t4ZRm2o2y88YPYtCZOPYj/WOXBoXnjaJsBN7/C0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CQDJjSGe; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706290604; x=1737826604;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=ieTfurtfat+pVfBbfHgnr7Gb/OnUunNsdTZt3fG9fSs=;
-  b=CQDJjSGe0sS/Q3TTyj7EM7zAc7KVtoh7oFmUINmt6XSLnWHQDycD38A7
-   Xrl07vsZJZEid4lnMxvLtqmlq8cQ6YwkFjrdsf+4D7E4PZ7Dx7rxK/V7G
-   uv6JXgSJhIAiFG2bDZSq58z8VVvod5TT/vUJ+CxJvwlkoThh+aIxmyY/x
-   7PnPwVnINQoqXdMa8qNnlFGh2/IwMAgAgnF332AgGkEs1vzMyRfnhiU0E
-   Tdze4QnhA+YxE5AbfHPkE6/x2iBD6LMjIR99ZHSARLwVSW4zIlmP0EXnF
-   tHXcztWxcqUo4HOPs9smiThHQwhltf7h6D4OBF9V7NVwr0WwJxbadtrMd
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="15886426"
-X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="15886426"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 09:36:43 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="930424527"
-X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="930424527"
-Received: from ppglcf2090.png.intel.com ([10.126.160.96])
-  by fmsmga001.fm.intel.com with ESMTP; 26 Jan 2024 09:36:37 -0800
-From: rohan.g.thomas@intel.com
-To: esben@geanix.com
-Cc: alexandre.torgue@foss.st.com,
-	conor+dt@kernel.org,
-	davem@davemloft.net,
-	devicetree@vger.kernel.org,
-	edumazet@google.com,
-	fancer.lancer@gmail.com,
-	joabreu@synopsys.com,
-	krzysztof.kozlowski+dt@linaro.org,
-	kuba@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	mcoquelin.stm32@gmail.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	peppe.cavallaro@st.com,
-	robh@kernel.org,
-	rohan.g.thomas@intel.com
-Subject: RE: [PATCH net-next 1/2] dt-bindings: net: snps,dwmac: Time Based Scheduling
-Date: Sat, 27 Jan 2024 01:36:34 +0800
-Message-Id: <20240126173634.13162-1-rohan.g.thomas@intel.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <87msss4gtj.fsf@geanix.com>
-References: <87msss4gtj.fsf@geanix.com>
+	s=arc-20240116; t=1706290728; c=relaxed/simple;
+	bh=ofuQOEbQQFzE0GCfYJoMi9Q3uD0EeA4A29bglOPy/LA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=T26MT+enFNfWAJMEkx1ZLe4k/YRDS5KA3q0Fhpfd8aR9c4O+felpLLYdwCPEn7fOW1zdj3tuUclUI6irSMyH8PogtY1gsaELQq3JiqkAOdH7gFryxlt8YsUiHijg0+x+w4VZFxv9FPsleCb/3VeW7WPlXvNkhyuMQuPTcqvKslE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=f1+j2jRx; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <d15e44d8-941a-4da6-ae8a-c4e031623e0f@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1706290723;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hrNyYEKOGi6GDPwxj18KT3Z3avOcsu6ZH6V/ZzqbE58=;
+	b=f1+j2jRxHnceOOU3X1qIJXeHPH/lliU0My8D+iJacSp615kLkXvFZoouPy+6aEwjSzpE36
+	xUsCDywGERV9zVuMMfcKS9V4swaD6V24uAfHekt4L6/B299PzoKs718N7UOOMYmoWF68ap
+	pvhp8ZGZon06J23aL3HWECXI7Q3iPU0=
+Date: Fri, 26 Jan 2024 17:38:36 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH bpf-next v8 1/3] bpf: make common crypto API for TC/XDP
+ programs
+Content-Language: en-US
+To: Martin KaFai Lau <martin.lau@linux.dev>, Vadim Fedorenko <vadfed@meta.com>
+Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+ bpf@vger.kernel.org, Victor Stewart <v@nametag.social>,
+ Jakub Kicinski <kuba@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>
+References: <20240115220803.1973440-1-vadfed@meta.com>
+ <3d2d5f4e-c554-4648-bcec-839d83585123@linux.dev>
+ <a682b902-37a2-4d43-8f39-56ca213f6663@linux.dev>
+ <cec469f4-2fd0-479a-8919-0d5578687fb2@linux.dev>
+ <f70e2d1e-b17d-44c2-9077-51afa9f4f05e@linux.dev>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <f70e2d1e-b17d-44c2-9077-51afa9f4f05e@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-From: Rohan G Thomas <rohan.g.thomas@intel.com>
-
-On Fri, 26 Jan 2024 09:52:40 +0100, Esben Haabendal wrote:
-Hi Esben,
-
-Thanks for your comments. Like to get some clarification on a few
-things.
-
-> >>
-> >>Seems like OS configuration and policy.
-> >
-> > Tx queues need to be configured for TBS during hw setup itself as
-> > special enhanced descriptors are used by the hw for TBS support
-> > enabled queues. Switching between enhanced and normal descriptors on
-> > run is not feasible. So this flag is for enabling "Enhanced
-> > Descriptors for Time Based Scheduling". This I think is a hw specific
-> > requirement.
+On 26/01/2024 10:30, Vadim Fedorenko wrote:
+> On 25/01/2024 22:34, Martin KaFai Lau wrote:
+>> On 1/25/24 3:19 AM, Vadim Fedorenko wrote:
+>>> On 25/01/2024 01:10, Martin KaFai Lau wrote:
+>>>> On 1/15/24 2:08 PM, Vadim Fedorenko wrote:
+>>>>> +static int bpf_crypto_crypt(const struct bpf_crypto_ctx *ctx,
+>>>>> +                const struct bpf_dynptr_kern *src,
+>>>>> +                struct bpf_dynptr_kern *dst,
+>>>>> +                const struct bpf_dynptr_kern *siv,
+>>>>> +                bool decrypt)
+>>>>> +{
+>>>>> +    u32 src_len, dst_len, siv_len;
+>>>>> +    const u8 *psrc;
+>>>>> +    u8 *pdst, *piv;
+>>>>> +    int err;
+>>>>> +
+>>>>> +    if (ctx->type->get_flags(ctx->tfm) & CRYPTO_TFM_NEED_KEY)
+>>>>
+>>>> nit. Does the indirect call get_flags() return different values?
+>>>> Should it be rejected earlier, e.g. in bpf_crypto_ctx_create()?
+>>>
+>>> Well, that is the common pattern in crypto subsys to check flags.
+>>> But after looking at it second time, I think I have to refactor this
+>>> part. CRYPTO_TFM_NEED_KEY is set during tfm creation if algo requires
+>>> the key. And it's freed when the key setup is successful. As there is no
+>>> way bpf programs can modify tfm directly we can move this check to
+>>> bpf_crypto_ctx_create() to key setup part and avoid indirect call in 
+>>> this place.
+>>>>
+>>>>> +        return -EINVAL;
+>>>>> +
+>>>>> +    if (__bpf_dynptr_is_rdonly(dst))
+>>>>> +        return -EINVAL;
+>>>>> +
+>>>>> +    siv_len = __bpf_dynptr_size(siv);
+>>>>> +    src_len = __bpf_dynptr_size(src);
+>>>>> +    dst_len = __bpf_dynptr_size(dst);
+>>>>> +    if (!src_len || !dst_len)
+>>>>> +        return -EINVAL;
+>>>>> +
+>>>>> +    if (siv_len != (ctx->type->ivsize(ctx->tfm) + 
+>>>>> ctx->type->statesize(ctx->tfm)))
+>>>>
+>>>> Same here, two indirect calls per en/decrypt kfunc call. Does the 
+>>>> return value change?
+>>>
+>>> I have to check the size of IV provided by the caller, and then to avoid
+>>> indirect calls I have to store these values somewhere in ctx. It gives a
+>>> direct access to these values to bpf programs, which can potentially
+>>> abuse them. Not sure if it's good to open such opportunity.
+>>
+>> I don't think it makes any difference considering tfm has already been 
+>> accessible in ctx->tfm.
 > 
-> Support for enhanced descriptors is definitely hardware specific.
-> Enabling the use of enhanced descriptors is a configuration choice.
+> Fair. I'll do it then.
 > 
-> The tricky part here is that the whole devicetree bindings story for the
-> stmmac driver is filled with such configuration choices. As such, it is
-> only natural to add the property you are suggesting here. I completely
-> agree. But you can also argue that it is "wrong", because it does not
-> just describe the hardware, but also a configuration choice.
-
-Isn't this requirement of using enhanced tx desc instead of normal tx
-desc to support TBS is specific to Synopsys IP? Switching from
-normal desc to enhanced desc at the time of tc-etf qdisc offload
-cannot be done without traffic disruption, which I don't think is
-acceptable. Since this behavior is IP specific, can we consider
-this as an OS configuration choice?
-
-Agreed that this feature(use of enhanced desc) can be enabled from
-glue drivers. But I added this dt property, thinking this feature is
-specific and common to DWMAC core and we can enable this feature for
-stmmac platform driver without a glue driver. If this is not
-acceptable, I can think of doing this from the glue driver.
-
-> >>Doesn't eh DWMAC have capability registers for supported features? Or
-> >>did they forget per queue capabilities?
-> >
-> > Yes, capability registers are available. For DWMAC5 IP, if TBSSEL bit
-> > is set, then TBS is supported by all Tx queues.
+>> A noob question, what secret is in the siv len?
 > 
-> Not true. Some NXP imx8 and imx9 chips support Synopsys MAC 5.10a IP,
-> and does not support TBS for queue 0. And they have TBSSEL bit set, but
-> no TBS_CH support.
+> No secrets in the values themself. The problem I see is that user (bpf
+> program) can adjust them to avoid proper validation and then pass
+> smaller buffer and trigger read/write out-of-bounds.
 
-AFAIU from Synopsys DWMAC5 Databook, all queues support TBS. But TBS
-cannot coexist with TSO. So all glue drivers enabling TBS feature
-avoid queue 0 to support TSO. Please correct me if I'm wrong.
+I've done more tests, and looks like verifier will block programs that
+are trying to write directly to the struct. In this case no abuse is
+possible and it's safe to export the value into ctx and avoid indirect
+calls.
 
 > 
-> > For DWXGMAC IP, if TBSSEL bit is set, then TBS is supported by TBS_CH
-> > number of Tx queues starting from the highest Tx queue. But because of
-> > the hw limitations mentioned above, TBS cannot be enabled for all
-> > capable queues.
-> >
+>> btw, unrelated, based on the selftest in patch 3, is it supporting any 
+>> siv_len > 0 for now?
+> 
+> Well, it should. I see no reasons not to support it. But to test it
+> properly another cipher should be used. I'll think about extending tests
+> 
+>>
+>>>
+>>>>
+>>>>> +        return -EINVAL;
+>>>>> +
+>>>>> +    psrc = __bpf_dynptr_data(src, src_len);
+>>>>> +    if (!psrc)
+>>>>> +        return -EINVAL;
+>>>>> +    pdst = __bpf_dynptr_data_rw(dst, dst_len);
+>>>>> +    if (!pdst)
+>>>>> +        return -EINVAL;
+>>>>> +
+>>>>> +    piv = siv_len ? __bpf_dynptr_data_rw(siv, siv_len) : NULL;
+>>>>> +    if (siv_len && !piv)
+>>>>> +        return -EINVAL;
+>>>>> +
+>>>>> +    err = decrypt ? ctx->type->decrypt(ctx->tfm, psrc, pdst, 
+>>>>> src_len, piv)
+>>>>> +              : ctx->type->encrypt(ctx->tfm, psrc, pdst, src_len, 
+>>>>> piv);
+>>>>> +
+>>>>> +    return err;
+>>>>> +}
+>>>>
+>>>
+>>
+> 
 
-BR,
-Rohan
 
