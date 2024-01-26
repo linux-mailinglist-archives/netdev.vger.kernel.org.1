@@ -1,170 +1,94 @@
-Return-Path: <netdev+bounces-66041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66042-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E7F083D102
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 00:58:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DBF0B83D138
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 01:04:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7201F1C24687
-	for <lists+netdev@lfdr.de>; Thu, 25 Jan 2024 23:58:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A7631C21B4E
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 00:04:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2BB618EC3;
-	Thu, 25 Jan 2024 23:57:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E97D17FD;
+	Fri, 26 Jan 2024 00:00:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="erRpv4BS"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B53818C38;
-	Thu, 25 Jan 2024 23:57:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25F348F44;
+	Fri, 26 Jan 2024 00:00:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706227056; cv=none; b=KKWPfYuLYtEj/0rvnSEVrqYHfF1WzujPQY8L8J9BsmAzF4qr7zPbiBjkSnPB88EKPDoMtv3CyPyr98ha+TrasUPw8tkDGoMzGRChykd16obPiER0sK2D4hXSsxvs4uvrEHu9xMKqTR2yoK6VGGHO67c9gLOJ0zkBj0zCXw8CYUc=
+	t=1706227228; cv=none; b=g0CaccTYNTXUDBnEti6PZBi3AqO07N1qPdGPvZLm7xZRWuulHKX886y7HkkTuToZ+sfTwR4NbeRjNXLqJl4GljRGlLNYGtvgq3127uf3CMuiuNjz8VwRhK+dEgai7vwLBnBW5OYiMj5M8gnRFKRRdl3wVHoS8l9jWWMMn0wcnME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706227056; c=relaxed/simple;
-	bh=HVwNsG4ex09BIiqCIlusj2ZhDSWkoJndoDRFh/vuS4Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H/qsBRoe31+4qgrRPXCNDhYpj7V7/NDt7DSpvupOQDv2e/vHKUHDYNXrleT0iAV8oL5XRs5VjJ120EoRgYdtGggWhepKmRTl3qoHtnxBgis8dEQMTyKCf3rPkyx/gIY/KaJBseRg7TJ8tdLOV9RW3W19wQh3AL8k7mx4+s7GmwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.96.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1rT9ax-0005RZ-26;
-	Thu, 25 Jan 2024 23:57:19 +0000
-Date: Thu, 25 Jan 2024 23:57:08 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, John Crispin <john@phrozen.org>
-Subject: Re: [PATCH net] net: dsa: mt7530: fix 10M/100M speed on MT7988 switch
-Message-ID: <ZbL1VEcH3RgHZKsq@makrotopia.org>
-References: <a5b04dfa8256d8302f402545a51ac4c626fdba25.1706071272.git.daniel@makrotopia.org>
- <accda24c-9f12-4cfe-b532-a9c60ec97fca@arinc9.com>
- <ZbKJv84vGXInRIo1@makrotopia.org>
- <99a038f3-18d2-44ca-8135-1faf7a37892a@arinc9.com>
+	s=arc-20240116; t=1706227228; c=relaxed/simple;
+	bh=xL9/ASUgp8AWn/fjHqtBmmnVIVRdMxEudz4VhTRhTSc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=JdFt+p5UOdqA/q3unkRSnXEDp1N2zOCi43jgZL1+xpZv55e1kZP8B99FF8aTCynwMkDUFmhjsPXVWBrIH7twLASjcKxuTWsdYzI701GCqEuSql3PSEJXUSgTGp/JALw8ruoyy5Z5Zy+7Xwbm1J0HxSX6pERe9KOwh3bTPGdizfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=erRpv4BS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 87078C43330;
+	Fri, 26 Jan 2024 00:00:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706227227;
+	bh=xL9/ASUgp8AWn/fjHqtBmmnVIVRdMxEudz4VhTRhTSc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=erRpv4BSLpOsNgIiHG9guU4oZanZWr9+q+VPIqwBSXY+xQ91eKAughUN1P/vcm3Bg
+	 oiL6N2zea997hpgjTnzpnXfFNBPcZ3dYW7c3SFt6ARB/zW20OWcDubRWTsgaJIMe7l
+	 XJOSZXP5S7G88FJVM2I4CU0fuPiYDLNSXxA57qUUFofP8ltkaXWaKCQaOfAddZ+uNY
+	 mqOyghIhDmY82smZ2UMksDQwkCeJWhrdLx0638Kn0QN91Ko++yL+8ukdgfyr/3l1H4
+	 pUZWbDbGoHVpzNO2LcntcY9gqGxY61tulMs5Zi409jS/M1/HGWvigz5JwDLp+oHNVV
+	 qQrggWBXjsSyw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6D90FD8C962;
+	Fri, 26 Jan 2024 00:00:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <99a038f3-18d2-44ca-8135-1faf7a37892a@arinc9.com>
+Subject: Re: [PATCH net] selftests: tcp_ao: add a config file
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170622722744.27026.5244575719322762458.git-patchwork-notify@kernel.org>
+Date: Fri, 26 Jan 2024 00:00:27 +0000
+References: <20240124192550.1865743-1-kuba@kernel.org>
+In-Reply-To: <20240124192550.1865743-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, shuah@kernel.org, 0x7f454c46@gmail.com,
+ linux-kselftest@vger.kernel.org
 
-On Fri, Jan 26, 2024 at 01:44:57AM +0300, Arınç ÜNAL wrote:
-> On 25.01.2024 19:18, Daniel Golle wrote:
-> > On Thu, Jan 25, 2024 at 12:49:19PM +0300, Arınç ÜNAL wrote:
-> > > On 24/01/2024 08:17, Daniel Golle wrote:
-> > > > Setup PMCR port register for actual speed and duplex on internally
-> > > > connected PHYs of the MT7988 built-in switch. This fixes links with
-> > > > speeds other than 1000M.
-> > > > 
-> > > > Fixes: ("110c18bfed414 net: dsa: mt7530: introduce driver for MT7988 built-in switch")
-> > > > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> > > 
-> > > Acked-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-> > > 
-> > > I'm wondering why we manually set speed and duplex for these interface
-> > > modes in the first place. I don't how it works for
-> > > PHY_INTERFACE_MODE_INTERNAL but, at least for PHY_INTERFACE_MODE_TRGMII and
-> > > 802.3z interfaces, phylink should already supply proper speed and duplex.
-> > 
-> > It's true that duplex should always be set to full-duplex already by
-> > phylink. However, speed could be 2500MBit/s (2500Base-X) or 2000MBit/s
-> > (?, TRGMII) and we yet need to program the PCR like if it was
-> > 1000MBit/s.
-> > 
-> > Regarding the INTERNAL case: it was added by mistake. In case of
-> > MT7988, all ports of the switch are connected via INTERNAL links,
-> > however, the PHYs still need adjustment of the PCR register just like
-> > on all other MT753x switches and the CPU port is setup elsewhere
-> > anyway.
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 24 Jan 2024 11:25:50 -0800 you wrote:
+> Still a bit unclear whether each directory should have its own
+> config file, but assuming they should lets add one for tcp_ao.
 > 
-> It's not necessarily PHYs needing adjustment of the port MAC control
-> register.
-
-It's not the PHYs which need adjustment but the MAC PMCR register which
-does.
-
-> After reset, speed, duplex mode, etc. will be determined by polling
-> the PHY connected to the switch MAC.
-
-Yes, but as it is a DSA driver we don't use **hardware** PHY polling
-and keep that off. Instead, PHY interrupts or software PHY polling is
-used to have Linux determine the link properties.
-We're then forcing these properties on the MAC port of the switch.
-
-> on the PMCR because we're also configuring switch MACs that are not
-> connected to PHYs, meaning the switch cannot determine these properties by
-> polling a PHY.
-
-The switch **never** determines these properties itself when using the
-DSA driver. It has a facility to do so, and yes, when accessing
-Ethernet in U-Boot or when using the 'swconfig'-based driver then this
-facility is used. But, I repeat, when using DSA we do not use hardware
-PHY polling. We poll (or rather: react to interrupts) in software
-instead.
-
+> The following tests still fail with this config in place:
+>  - rst_ipv4,
+>  - rst_ipv6,
+>  - bench-lookups_ipv6.
+> other 21 pass.
 > 
-> From what I understand, this code block is for overriding the speed and
-> duplex variables to make the operations on the PMCR below work. It seems
-> that this is actually only useful for PHY_INTERFACE_MODE_2500BASEX.
-> PHY_INTERFACE_MODE_TRGMII is given SPEED_1000 by
-> drivers/net/phy/phylink.c:phylink_interface_max_speed().
-> PHY_INTERFACE_MODE_2500BASEX is given SPEED_2500. Overriding the duplex
-> variable looks unnecessary.
-> 
-> Your patch here doesn't affect CPU ports because MT7531 and MT7988 PMCRs
+> [...]
 
-This patch does not intend to affect the CPU port. As I've already
-said in my previous reply "[...] the CPU port is setup elsewhere
-anyway."
+Here is the summary with links:
+  - [net] selftests: tcp_ao: add a config file
+    https://git.kernel.org/netdev/net/c/b64787840080
 
-Maybe it wasn't clear, but I meant that the CPU port settings are
-intentionally unaffected by this patch.
-
-It is intended to affect user ports which with phy-mode = "internal";
-set in DTS -- here we **do** need to set PMCR according the external
-link speed and duplex.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-> are configured with cpu_port_config before mt753x_phylink_mac_link_up(),
-> and PHY_INTERFACE_MODE_INTERNAL is not used for MT7530 which, for MT7530,
-> PMCRs will be set only on mt753x_phylink_mac_link_up().
-> 
-> PMCR_FORCE_SPEED_1000 is set on cpu_port_config. If someone were to get rid
-> of cpu_port_config because of its utter uselessness, PMCR_FORCE_SPEED_1000
-> would not be set, causing the link between port 6 MAC and SoC MAC to break.
-> 
-> In conclusion, I will add "case SPEED_10000:" to the operations where the
-> speed and EEE bits are set on my patch for getting rid of cpu_port_config.
-
-PMCR needs to be set according to actual link speed for built-in TP
-PHYs. This is true for all mt7530 variants including MT7988.
-
-Maybe the confusion here is that on MT7988 we use 'internal' phy-mode
-for both, the switch CPU port's link to mtk_eth_soc gmac0 as well as
-the links to the 4 built-in 1GE switch PHYs.
-
-The latter were affected by wrongly overriding speed and duplex in
-case phy-mode is set to "internal", which should not have been put
-there (by me) in first place.
-
-Let's just remove it, ok?
 
