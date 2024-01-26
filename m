@@ -1,90 +1,159 @@
-Return-Path: <netdev+bounces-66170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AEAC83DA9B
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 14:17:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CA6883DB38
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 14:56:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B1C51F2183A
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 13:17:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20C3C290DE3
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 13:56:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2139F1B7F9;
-	Fri, 26 Jan 2024 13:17:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 961D61B961;
+	Fri, 26 Jan 2024 13:55:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="NN5fv+lT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GgwJmQ2g"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C9C41B7ED;
-	Fri, 26 Jan 2024 13:17:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE99D1B955;
+	Fri, 26 Jan 2024 13:55:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706275060; cv=none; b=SQJKKbPVu1k1ASq5838wVwNHf68osZm1nCXTrAc04PAntCSDwvzejzqMKN9PMOKLH/vOMWO0sKlwvj+qqQpTHwz5QxY+fYImWKQX9jVAL/qNmI5xgzG+NJjA7+RnNOgrwZNz6HSDqTRBgAHeeHeF9e+A69khglgWO59xy1n3qnw=
+	t=1706277355; cv=none; b=nrFgEUXjSmc5gCSbJGzllf2ylhd6yECDLuP4SapIYJhon+JZ+/EOnPjU7aF5uHQHewB8r/F60lRFBlYgPbedJNFpFAHZxAmQ4asvRAnGt0AMBeUOPoWgRpzS5w9UcTOytQATcCZMC7h4b1so3VoLCiSYNX3pOiTRmIOULMRGZqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706275060; c=relaxed/simple;
-	bh=NlQuNlflVT/LmukzQGVyl9V41C+YgjahNb0jnYT9yrg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sa1rQ9QEEkUcdphbrFbf3hKfYyT0pmHIrrbrTq0OND/KGc6o8QiqbwCjLHF1pZ4JMLqjkjPxRHtuay/rlxX438WAIIY7zfLaqY9LZHrLzuUl3Vjv219MAQ6R3ci7me4d+5A/TcXIjsOT9hTeRPrkbu+bH4f6U/ZsBNJMdT+r5KM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=NN5fv+lT; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=dBeM8KjZ3a0EMDvqT9tXv1BytxLZNqA83/cMmPhrQCw=; b=NN
-	5fv+lTjbEXcXQKrRSLN0bAVAH8MBxuR5SeUM4YqvIt+kW/Zq7KPBPjZAtpXM3yZJBEsCTLMKdfPPe
-	iPJYz+3SpYQ4mtWEGbTrnZn54Dg4Q82F0U1Uey7bC3B5LCN+nMVsVfb4a/EOVP+qcxof4KKJ9U+/7
-	6Swl7FGffzQhbbg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rTM5L-006Anh-QP; Fri, 26 Jan 2024 14:17:31 +0100
-Date: Fri, 26 Jan 2024 14:17:31 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Michal =?utf-8?B?Vm9rw6HEjQ==?= <michal.vokac@ysoft.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1706277355; c=relaxed/simple;
+	bh=imVjlmmk3YaSrnGHNgfVdxJTZcpjli9usBMpCEom9t8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AHFPjEO0nujdGmjuy76JkD85ZjKjMu479ahW+kODmePv4hcXJcEuX/bu9Etoq4IKV0rUrKoQhYM4EegqO4yhwdiIIeRlWY6NNKsa+DS1jQEfDBtsDu/t6oAapmAbn0D6edgPqI5ualuTeQEsvXI/XOUDnhvfoFiKjgrM1IOy8lA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GgwJmQ2g; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706277354; x=1737813354;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=imVjlmmk3YaSrnGHNgfVdxJTZcpjli9usBMpCEom9t8=;
+  b=GgwJmQ2ge/TptGQGtLvgssofIs7/MImcTQj7eqOaaiGMmYPRUeyYSOGY
+   7vtpIjTWsFxzRwAcvmrRm2sMKARTio1iRt6Ut/53hwSl5HanlGkpmSiJJ
+   Q+s6suqqk2XJkLjIOWBSvwy9kjqR3MZ2qpjQ5p6Hy/uWLPltHSkesWiWE
+   efojdEUvt8KZJ736OGRXl8A1PvH2ftuZ8B94dBosk5/6gKvwEK4apvebf
+   l0QOaJE2vBXIar/HpG8Zi64FcagKGVfoIcKTb1uYmuLTe8J5kSeyW5tC4
+   ZJ7rUYX8ZgH4GcVOJbNoRBuFm6XG81+LtEMz6aiiPpgFZDsykUksXd7RN
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="15998390"
+X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
+   d="scan'208";a="15998390"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 05:55:53 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="821142817"
+X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
+   d="scan'208";a="821142817"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by orsmga001.jf.intel.com with ESMTP; 26 Jan 2024 05:55:47 -0800
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Christian Lamparter <chunkeey@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, petr.benes@ysoft.com
-Subject: Re: [PATCH net v3] net: dsa: qca8k: fix illegal usage of GPIO
-Message-ID: <22d3d3fd-223b-4b33-9911-1dc4d6809075@lunn.ch>
-References: <1706266175-3408-1-git-send-email-michal.vokac@ysoft.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	iommu@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 0/7] dma: skip calling no-op sync ops when possible
+Date: Fri, 26 Jan 2024 14:54:49 +0100
+Message-ID: <20240126135456.704351-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <1706266175-3408-1-git-send-email-michal.vokac@ysoft.com>
 
-On Fri, Jan 26, 2024 at 11:49:35AM +0100, Michal Vokáč wrote:
-> When working with GPIO, its direction must be set either when the GPIO is
-> requested by gpiod_get*() or later on by one of the gpiod_direction_*()
-> functions. Neither of this is done here which results in undefined
-> behavior on some systems.
-> 
-> As the reset GPIO is used right after it is requested here, it makes sense
-> to configure it as GPIOD_OUT_HIGH right away. With that, the following
-> gpiod_set_value_cansleep(1) becomes redundant and can be safely
-> removed.
-> 
-> Fixes: a653f2f538f9 ("net: dsa: qca8k: introduce reset via gpio feature")
-> Signed-off-by: Michal Vokáč <michal.vokac@ysoft.com>
+The series grew from Eric's idea and patch at [0]. The idea of using the
+shortcut for direct DMA as well belongs to Chris.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+When an architecture doesn't need DMA synchronization and the buffer is
+not an SWIOTLB buffer, most of times the kernel and the drivers end up
+calling DMA sync operations for nothing.
+Even when DMA is direct, this involves a good non-inline call ladder and
+eats a bunch of CPU time. With IOMMU, this results in calling indirect
+calls on hotpath just to check what is already known and return.
+XSk is been using a custom shortcut for that for quite some time.
+I recently wanted to introduce a similar one for Page Pool. Let's combine
+all this into one generic shortcut, which would cover all DMA sync ops
+and all types of DMA (direct, IOMMU, ...).
 
-    Andrew
+* #1 adds stub inlines to be able to skip DMA sync ops or even compile
+     them out when not needed.
+* #2 adds the generic shortcut and enables it for direct DMA.
+* #3 adds ability to skip DMA syncs behind an IOMMU.
+* #4-5 are just cleanups for Page Pool to avoid merge conflicts in future.
+* #6 checks for the shortcut as early as possible in the Page Pool code to
+     make sure no cycles wasted.
+* #7 replaces XSk's shortcut with the generic one.
+
+On 100G NIC, the result is +3-5% for direct DMA and +10-11% for IOMMU.
+As a bonus, XSk core now allows batched buffer allocations for IOMMU
+setups.
+If the shortcut is not available on some system, there should be no
+visible performance regressions.
+
+[0] https://lore.kernel.org/netdev/20221115182841.2640176-1-edumazet@google.com
+
+Alexander Lobakin (5):
+  dma: compile-out DMA sync op calls when not used
+  page_pool: make sure frag API fields don't span between cachelines
+  page_pool: don't use driver-set flags field directly
+  page_pool: check for DMA sync shortcut earlier
+  xsk: use generic DMA sync shortcut instead of a custom one
+
+Eric Dumazet (2):
+  dma: avoid expensive redundant calls for sync operations
+  iommu/dma: avoid expensive indirect calls for sync operations
+
+ kernel/dma/Kconfig                            |   4 +
+ include/net/page_pool/types.h                 |  21 +++-
+ include/linux/device.h                        |   5 +
+ include/linux/dma-map-ops.h                   |  17 +++
+ include/linux/dma-mapping.h                   | 100 +++++++++++++-----
+ include/net/xdp_sock_drv.h                    |   7 +-
+ include/net/xsk_buff_pool.h                   |  13 +--
+ drivers/base/dd.c                             |   2 +
+ drivers/iommu/dma-iommu.c                     |   1 +
+ drivers/net/ethernet/engleder/tsnep_main.c    |   2 +-
+ .../net/ethernet/freescale/dpaa2/dpaa2-xsk.c  |   2 +-
+ drivers/net/ethernet/intel/i40e/i40e_xsk.c    |   2 +-
+ drivers/net/ethernet/intel/ice/ice_xsk.c      |   2 +-
+ drivers/net/ethernet/intel/igc/igc_main.c     |   2 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c  |   2 +-
+ .../ethernet/mellanox/mlx5/core/en/xsk/rx.c   |   4 +-
+ .../net/ethernet/mellanox/mlx5/core/en_rx.c   |   2 +-
+ drivers/net/ethernet/netronome/nfp/nfd3/xsk.c |   2 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c |   2 +-
+ kernel/dma/mapping.c                          |  60 ++++++++---
+ kernel/dma/swiotlb.c                          |  14 +++
+ net/core/page_pool.c                          |  67 +++++++-----
+ net/xdp/xsk_buff_pool.c                       |  29 +----
+ 23 files changed, 237 insertions(+), 125 deletions(-)
+
+-- 
+2.43.0
+
 
