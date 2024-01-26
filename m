@@ -1,215 +1,237 @@
-Return-Path: <netdev+bounces-66089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 932AD83D2E4
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 04:14:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54B2D83D2F2
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 04:26:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A29328D1BD
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 03:14:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD521290065
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 03:26:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78148B677;
-	Fri, 26 Jan 2024 03:14:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFB83B654;
+	Fri, 26 Jan 2024 03:26:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UY6cAI2n"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="KvuGBhh+"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B314AD53
-	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 03:13:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58CC9A95E
+	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 03:26:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706238841; cv=none; b=DesFg/BAcsTX2UxZoGfeznMAY8JlNbjR/s42GGrNFJa9sKRzoelHPi706IGwE1+vE+/hz0NykNmzg2UUWRtGn3kf21FwJ711wXy+PEQ6ORg4GZp5knKXjO6zOU5KiZ9QiSOFBtp2pm4y4V2XEmaszn4rou4xvv0RF1CnjKuPJeg=
+	t=1706239600; cv=none; b=DwtI1FcQUEd9Q4BLx2GT0aYQd2TRFj3UBMayUY+puto+LPtQAL047DzRK+LZV46mT9eBeVyTNZ5yRZEZhGEG2d4jrIrNmvX+MSnOkzDt4BFYLKUvVnKZuboV7RYJOLN/eLDpaQrtBd8FiR8j/UCQDSV2E9P3ebYLf0tV9fwtFdA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706238841; c=relaxed/simple;
-	bh=XtiKU91260sTE9LXDpOYClr9EsKTlZQRf4Ge1zxEBHc=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=GEksxQ4tgIHZLMKm5tQNp3XEvknqGqdQd5/C0l0v+X6wsmyUlnaDLEv58XN8klGQBrh2hb+qxGeQZCyaILMSzomvU3HA1EziQSozYyG1OwP6arGfnf56fpac7Izn3/fX5B07NuzK2HNPDyy9F8Fqr5J9g+gX+lTxt75MYkrCGp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UY6cAI2n; arc=none smtp.client-ip=95.215.58.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <68ebd92e-cf7a-43af-af71-386495606d90@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706238837;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7Gy15I7xMvKA2vgK/nMLjkz4GT3dS1zeHc8GorjJvwo=;
-	b=UY6cAI2nBiqHEBjBnC2JefTmHnvMgdN15vUQzrK3goo8IRfT+XLfDCOO0yNT4+9oGPFX/G
-	CFLdpEMsGB0Ner2EoviVGo4i4RKKR8sime1AJF8hqbzHk6/ZUMpVVeftfKvagpUjKxZRMP
-	xG+hS6yR5etzqwI3m1Nx4arcfY08Kuw=
-Date: Fri, 26 Jan 2024 11:13:48 +0800
+	s=arc-20240116; t=1706239600; c=relaxed/simple;
+	bh=g4i+w63+sy9yYZPW+kGZdrOYodleOa12DosNrHLn0ww=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=f9MihumT5toNLV25rib+3Df+B6RDqhuTJ4/72xV3dubGWC9NKThGN7ZpmLfPRsgjvmnlmJ5CW9sAMOdA3/bimZuWvee65M7/WHNdgnu2ODVpHZIgcc3GCbwj60rsrfZDm+rQMyi1L7aPlTSpH79OJIbyFo1JCPwXIkUK5hqtbvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=KvuGBhh+; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2cf2b218c62so29851311fa.2
+        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 19:26:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1706239596; x=1706844396; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9WyUC6MmB08/BiaNWVTf9K2ZnTvIR5FpF1Gb9asD+uw=;
+        b=KvuGBhh+zU0JKA19AEukbWG8KwvsdTj+hxPNAe3MX67kOBoX/+UQLmq0/N36s3XB6v
+         f54yUKT7P3+avfVhCQj6yLZRfiFNNVDPHl244RJUtuM5qRLA+RMYoSXF98Pg7oI6wTzK
+         q4uUbAUvTsF3XpTiADM6w9cgFXm4Bic4DZ9hc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706239596; x=1706844396;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9WyUC6MmB08/BiaNWVTf9K2ZnTvIR5FpF1Gb9asD+uw=;
+        b=qFSP7eVR4N4UMg/5sJk2fYkKYHuNi/NOxa26swZJBUlMeDcbVhzSgMS3rX4y8ULO9X
+         c6hJ1XaAxqGFCJNlSAGLTVuUidOTfYcPsS4aMhc4oiBfnmckhVUU+6iX71KZhtEG1T1L
+         hU7usedls5q4+VNPPzBxpZ+9DbbLGiO8LhbqNOur/xuPeF6NzfbhBbl6T/kYIEIgikYJ
+         eMeiEmN9lt5UvEQKtm/qBof5457y6MCVSC9/Lgr0Edzr1AEW2pna58s5iux7TQHVqZ/N
+         ExzeBRVExFA8pruRSCiU4tCHJzbIuz4VSoWpe3gERkbhNit/vKcF8sxn8Ow6JQBhMzvr
+         JC4A==
+X-Gm-Message-State: AOJu0YwP43TMhz7Kp8MfDrIsjw750bahUDpndlhacY8ugGgIE3f458xM
+	ZAAsfNxB7k2nkPBw8yC4bO+4cJHrHRCn+zNP/aUTo+rY6gedTXxSmuRnfqaLScxnL4jxlV6fmN4
+	lLYir3XzTdiFa2pTF8m5nBoBRw3aUeFlTFJSN
+X-Google-Smtp-Source: AGHT+IEDjNQzwVaWPwAv+h5mtaVgEfszPvfXWHkJHOd/8GLlNf7ga0naC1J+rIBTXRI404s6h2BKMm+4EmCTd7dMJ8I=
+X-Received: by 2002:a05:651c:b1f:b0:2cc:a569:48d with SMTP id
+ b31-20020a05651c0b1f00b002cca569048dmr210919ljr.44.1706239596392; Thu, 25 Jan
+ 2024 19:26:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/1] virtio_net: Add timeout handler to avoid kernel hang
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Jason Wang <jasowang@redhat.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heng Qi <hengqi@linux.alibaba.com>,
- Paolo Abeni <pabeni@redhat.com>, Zhu Yanjun <yanjun.zhu@intel.com>,
- mst@redhat.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- virtualization@lists.linux.dev, netdev@vger.kernel.org
-References: <20240115012918.3081203-1-yanjun.zhu@intel.com>
- <ea230712e27af2c8d2d77d1087e45ecfa86abb31.camel@redhat.com>
- <667a9520-a53f-40a2-810a-6c1e45146589@linux.dev>
- <7dd89fc0-f31e-4f83-9c02-58ee67c2d436@linux.alibaba.com>
- <430b899c-aed4-419d-8ae8-544bb9bec5d9@lunn.ch>
- <64270652-8e0c-4db7-b245-b970d9588918@linux.dev>
- <CACGkMEs18hjxiZRDT5-+PMDHkLbEyiviafGiCWsAE6CGBrj+9g@mail.gmail.com>
- <1705895881.6990144-1-xuanzhuo@linux.alibaba.com>
- <CACGkMEvvn76w+BZArOWK-c1gsqNNx6bH8HPoqPAqpJG_7EYntA@mail.gmail.com>
- <1705904164.7020166-3-xuanzhuo@linux.alibaba.com>
- <CACGkMEsTT7hrm2QWZq-NasfVAJHsUoZq5hijvLE_jY+2YyKytg@mail.gmail.com>
- <CACGkMEt4zyESemjPwZtD5d4d00jtorY0qR5vM9y96NZzKkdj8A@mail.gmail.com>
- <1705906930.2143333-5-xuanzhuo@linux.alibaba.com>
- <e46d04d7-4eb7-4fcd-821a-d558c07531b7@linux.dev>
-In-Reply-To: <e46d04d7-4eb7-4fcd-821a-d558c07531b7@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20240125095240.2308340-1-wenst@chromium.org> <20240125095240.2308340-2-wenst@chromium.org>
+ <68249675-4081-48d9-abbb-1b2e49894fae@collabora.com>
+In-Reply-To: <68249675-4081-48d9-abbb-1b2e49894fae@collabora.com>
+From: Chen-Yu Tsai <wenst@chromium.org>
+Date: Fri, 26 Jan 2024 11:26:25 +0800
+Message-ID: <CAGXv+5GG+Ko4nZKCvpQ2TnjeHDKWi5qS_SWAgLcrZ6fn_ySiug@mail.gmail.com>
+Subject: Re: [PATCH 1/2] dt-bindings: net: bluetooth: Add MediaTek MT7921S
+ SDIO Bluetooth
+To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, Sean Wang <sean.wang@mediatek.com>, 
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-mediatek@lists.infradead.org, devicetree@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-在 2024/1/26 11:11, Zhu Yanjun 写道:
+On Thu, Jan 25, 2024 at 7:39=E2=80=AFPM AngeloGioacchino Del Regno
+<angelogioacchino.delregno@collabora.com> wrote:
 >
+> Il 25/01/24 10:52, Chen-Yu Tsai ha scritto:
+> > The MediaTek MT7921S is a WiFi/Bluetooth combo chip that works over
+> > SDIO. While the Bluetooth function is fully discoverable, the chip
+> > has a pin that can reset just the Bluetooth side, as opposed to the
+> > full chip. This needs to be described in the device tree.
+> >
+> > Add a device tree binding for MT7921S Bluetooth over SDIO specifically
+> > ot document the reset line.
+> >
+> > Cc: Sean Wang <sean.wang@mediatek.com>
+> > Signed-off-by: Chen-Yu Tsai <wenst@chromium.org>
+> > ---
+> >   .../bluetooth/mediatek,mt7921s-bluetooth.yaml | 49 ++++++++++++++++++=
++
+> >   MAINTAINERS                                   |  1 +
+> >   2 files changed, 50 insertions(+)
+> >   create mode 100644 Documentation/devicetree/bindings/net/bluetooth/me=
+diatek,mt7921s-bluetooth.yaml
+> >
+> > diff --git a/Documentation/devicetree/bindings/net/bluetooth/mediatek,m=
+t7921s-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/med=
+iatek,mt7921s-bluetooth.yaml
+> > new file mode 100644
+> > index 000000000000..bbe240e7cc40
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-=
+bluetooth.yaml
+> > @@ -0,0 +1,49 @@
+> > +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+> > +%YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/net/bluetooth/mediatek,mt7921s-blue=
+tooth.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +
+> > +title: MediaTek MT7921S Bluetooth
+> > +
 >
-> 在 2024/1/22 15:02, Xuan Zhuo 写道:
->> On Mon, 22 Jan 2024 14:58:09 +0800, Jason Wang<jasowang@redhat.com>  wrote:
->>> On Mon, Jan 22, 2024 at 2:55 PM Jason Wang<jasowang@redhat.com>  wrote:
->>>> On Mon, Jan 22, 2024 at 2:20 PM Xuan Zhuo<xuanzhuo@linux.alibaba.com>  wrote:
->>>>> On Mon, 22 Jan 2024 12:16:27 +0800, Jason Wang<jasowang@redhat.com>  wrote:
->>>>>> On Mon, Jan 22, 2024 at 12:00 PM Xuan Zhuo<xuanzhuo@linux.alibaba.com>  wrote:
->>>>>>> On Mon, 22 Jan 2024 11:14:30 +0800, Jason Wang<jasowang@redhat.com>  wrote:
->>>>>>>> On Mon, Jan 22, 2024 at 10:12 AM Zhu Yanjun<yanjun.zhu@linux.dev>  wrote:
->>>>>>>>> 在 2024/1/20 1:29, Andrew Lunn 写道:
->>>>>>>>>>>>>>         while (!virtqueue_get_buf(vi->cvq, &tmp) &&
->>>>>>>>>>>>>> -           !virtqueue_is_broken(vi->cvq))
->>>>>>>>>>>>>> +           !virtqueue_is_broken(vi->cvq)) {
->>>>>>>>>>>>>> +        if (timeout)
->>>>>>>>>>>>>> +            timeout--;
->>>>>>>>>>>>> This is not really a timeout, just a loop counter. 200 iterations could
->>>>>>>>>>>>> be a very short time on reasonable H/W. I guess this avoid the soft
->>>>>>>>>>>>> lockup, but possibly (likely?) breaks the functionality when we need to
->>>>>>>>>>>>> loop for some non negligible time.
->>>>>>>>>>>>>
->>>>>>>>>>>>> I fear we need a more complex solution, as mentioned by Micheal in the
->>>>>>>>>>>>> thread you quoted.
->>>>>>>>>>>> Got it. I also look forward to the more complex solution to this problem.
->>>>>>>>>>> Can we add a device capability (new feature bit) such as ctrq_wait_timeout
->>>>>>>>>>> to get a reasonable timeout？
->>>>>>>>>> The usual solution to this is include/linux/iopoll.h. If you can sleep
->>>>>>>>>> read_poll_timeout() otherwise read_poll_timeout_atomic().
->>>>>>>>> I read carefully the functions read_poll_timeout() and
->>>>>>>>> read_poll_timeout_atomic(). The timeout is set by the caller of the 2
->>>>>>>>> functions.
->>>>>>>> FYI, in order to avoid a swtich of atomic or not, we need convert rx
->>>>>>>> mode setting to workqueue first:
->>>>>>>>
->>>>>>>> https://www.mail-archive.com/virtualization@lists.linux-foundation.org/msg60298.html
->>>>>>>>
->>>>>>>>> As such, can we add a module parameter to customize this timeout value
->>>>>>>>> by the user?
->>>>>>>> Who is the "user" here, or how can the "user" know the value?
->>>>>>>>
->>>>>>>>> Or this timeout value is stored in device register, virtio_net driver
->>>>>>>>> will read this timeout value at initialization?
->>>>>>>> See another thread. The design needs to be general, or you can post a RFC.
->>>>>>>>
->>>>>>>> In another thought, we've already had a tx watchdog, maybe we can have
->>>>>>>> something similar to cvq and use timeout + reset in that case.
->>>>>>> But we may block by the reset ^_^ if the device is broken?
->>>>>> I mean vq reset here.
->>>>> I see.
->>>>>
->>>>> I mean when the deivce is broken, the vq reset also many be blocked.
->>>>>
->>>>>          void vp_modern_set_queue_reset(struct virtio_pci_modern_device *mdev, u16 index)
->>>>>          {
->>>>>                  struct virtio_pci_modern_common_cfg __iomem *cfg;
->>>>>
->>>>>                  cfg = (struct virtio_pci_modern_common_cfg __iomem *)mdev->common;
->>>>>
->>>>>                  vp_iowrite16(index, &cfg->cfg.queue_select);
->>>>>                  vp_iowrite16(1, &cfg->queue_reset);
->>>>>
->>>>>                  while (vp_ioread16(&cfg->queue_reset))
->>>>>                          msleep(1);
->>>>>
->>>>>                  while (vp_ioread16(&cfg->cfg.queue_enable))
->>>>>                          msleep(1);
->>>>>          }
->>>>>          EXPORT_SYMBOL_GPL(vp_modern_set_queue_reset);
->>>>>
->>>>> In this function, for the broken device, we can not expect something.
->>>> Yes, it's best effort, there's no guarantee then. But it doesn't harm to try.
->>>>
->>>> Thanks
->>>>
->>>>>> It looks like we have multiple goals here
->>>>>>
->>>>>> 1) avoid lockups, using workqueue + cond_resched() seems to be
->>>>>> sufficient, it has issue but nothing new
->>>>>> 2) recover from the unresponsive device, the issue for timeout is that
->>>>>> it needs to deal with false positives
->>>>> I agree.
->>>>>
->>>>> But I want to add a new goal, cvq async. In the netdim, we will
->>>>> send many requests via the cvq, so the cvq async will be nice.
->>> Then you need an interrupt for cvq.
->>>
->>> FYI, I've posted a series that use interrupt for cvq in the past:
->>>
->>> https://lore.kernel.org/lkml/6026e801-6fda-fee9-a69b-d06a80368621@redhat.com/t/
->> I know this. But the interrupt maybe not a good solution without new space.
->>
->>> Haven't found time in working on this anymore, maybe we can start from
->>> this or not.
->> I said async, but my aim is to put many requests to the cvq before getting the
->> response.
->>
->> Heng Qi posted thishttps://lore.kernel.org/all/1705410693-118895-4-git-send-email-hengqi@linux.alibaba.com/
-
-Sorry. This mail is rejected by netdev maillist. So I have to resend it.
-
-
-Thanks a lot. I read Heng Qi's commits carefully. This patch series are 
-similiar with the NIC feature xmit_more.
-
-But if cvq command is urgent, can we let this urgent cvq command be 
-passed ASAP?
-
-I mean, can we set a flag similar to xmit_more? if cvq command is not 
-urgent, it can be queued. If it is urgent,
-
-this cvq command is passed ASAP.
-
-Zhu Yanjun
-
-> Zhu Yanjun
+> title:
 >
->> Thanks.
->>
->>
->>> Thanks
->>>
->>>>> Thanks.
->>>>>
->>>>>
->>>>>> Thanks
->>>>>>
->>>>>>> Thanks.
->>>>>>>
->>>>>>>
->>>>>>>> Thans
->>>>>>>>
->>>>>>>>> Zhu Yanjun
->>>>>>>>>
->>>>>>>>>>        Andrew
+> maintainers:
+>
+> description:
+>
+> ... and then, you missed
+>
+> allOf:
+>    - $ref: bluetooth-controller.yaml#
+
+(facepalm)
+
+> Everything else looks good.
+>
+> Cheers,
+> Angelo
+>
+> > +description:
+>
+> MT7921S is a (dual?) SDIO-attached dual-radio WiFi+Bluetooth combo chip;
+> this chip has two dedicated reset lines, one of which is used to reset
+> the Bluetooth core.
+> The WiFi part of this chip is described in ....where? :-)
+
+The function itself is fully probable and the implementation doesn't make
+use of the WiFi's reset line, so I don't see any reason to describe it?
+I don't actually know what the reset line does in the chip hardware.
+This patch is just described what is already used.
+
+> > +  This binding describes the Bluetooth side of the SDIO-attached MT792=
+1S
+> > +  WiFi+Bluetooth combo chips. These chips are dual-radio chips support=
+ing
+> > +  WiFi and Bluetooth. Bluetooth works over SDIO just like WiFi. Blueto=
+oth
+> > +  has its own reset line, separate from WiFi, which can be used to res=
+et
+> > +  the Bluetooth core.
+> > +
+> > +maintainers:
+> > +  - Sean Wang <sean.wang@mediatek.com>
+> > +
+> > +properties:
+> > +  compatible:
+> > +    enum:
+> > +      - mediatek,mt7921s-bluetooth
+> > +  reg:
+> > +    const: 2
+> > +
+> > +  reset-gpios:
+> > +    maxItems: 1
+> > +    description: A GPIO line connected to the Bluetooth subsystem rese=
+t line.
+> > +      Typically the W_DISABLE2# pin on M.2 E-key modules. If present t=
+his
+> > +      shall be flagged as active low.
+>
+> description:
+>    An active-low reset line connected for the Bluetooth core;
+
+connected to?
+
+>    on typical M.2 Key-E modules this is the W_DISABLE2# pin.
+
+Otherwise this looks better. Thanks.
+
+
+ChenYu
+
+> Cheers,
+> Angelo
+>
+> > +
+> > +required:
+> > +  - compatible
+> > +  - reg
+> > +
+> > +additionalProperties: false
+> > +
+> > +examples:
+> > +  - |
+> > +    mmc {
+> > +        #address-cells =3D <1>;
+> > +        #size-cells =3D <0>;
+> > +
+> > +        bluetooth@2 {
+> > +            compatible =3D "mediatek,mt7921s-bluetooth";
+> > +            reg =3D <2>;
+> > +            reset-gpios =3D <&pio 8 GPIO_ACTIVE_LOW>;
+> > +        };
+> > +    };
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index b64a64ca7916..662957146852 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -13657,6 +13657,7 @@ M:    Sean Wang <sean.wang@mediatek.com>
+> >   L:  linux-bluetooth@vger.kernel.org
+> >   L:  linux-mediatek@lists.infradead.org (moderated for non-subscribers=
+)
+> >   S:  Maintained
+> > +F:   Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-=
+bluetooth.yaml
+> >   F:  Documentation/devicetree/bindings/net/mediatek-bluetooth.txt
+> >   F:  drivers/bluetooth/btmtkuart.c
+> >
+>
 
