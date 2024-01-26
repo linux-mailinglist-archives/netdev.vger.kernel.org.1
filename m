@@ -1,140 +1,77 @@
-Return-Path: <netdev+bounces-66069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E67783D206
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 02:24:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AE2F83D210
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 02:28:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3EBDB21DEB
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 01:24:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 344631C234D8
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 01:28:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65FDC6FC5;
-	Fri, 26 Jan 2024 01:24:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62ECA64C;
+	Fri, 26 Jan 2024 01:28:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="tbikyoYp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="axsI+Ry9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD79E4687
-	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 01:24:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C2E1EBE;
+	Fri, 26 Jan 2024 01:28:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706232247; cv=none; b=PEti12VESbYD5682ZSreKirzaUfImLYWWR7iwgmJeCxKQ6TvE+7/6x3+jagyLpZ0lslaTf3AFjbEyuDkvk5shpnE/Er20U5RzDwYvrXi8rrgpDcNzrLktFjsqDwl48par5MXTCC4ZevR+ySY4gGCtNesTQXa7qShZ1x4kMKm/Wo=
+	t=1706232485; cv=none; b=Pla/Z9MvQypHY+fG/6mp6Z0PNRBt108bf591tOzUotmzDH1ItaVnLEcfXXlylRUq0kugMupD3x/Y5YqAAV47JQBZzLVEAd0+urkRUDmV9AZdxs8jT2FnOZ9m46veZ/CwIeoELvcsYAxNtk9BW65z1yG8Xjgnq2R448D2gRLoh28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706232247; c=relaxed/simple;
-	bh=eCjWuhzdddCrMZiFX6ANjmJWjtgIDAgjsgKRZp3Q99E=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=hmVGpAnQWhI3oQo43ezreZbXX1MUBrpLcfK1gBfEoOmNlmqYoefgcgbH5f2OBy/gKlSOPmTIAeOWWGAiAD0TkpTvm9ztEmEE71twy+QmPHEp7Mur0XJpv5AP8u9K3xeg3dmShdS0W7CDxGBJoKSg0aAZ7hjRQNYdnKrleQz6Lys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=tbikyoYp; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1d893950211so5893385ad.0
-        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 17:24:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1706232244; x=1706837044; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=t6CX8D0lpq6HiM0LfR6MAxAUUlJjyu7IdjFJ5kI3qyM=;
-        b=tbikyoYpd2o6RlvvCEKU3iMhH54O35e2iV4SqCceGnf5KEtbcN0PLJ4gJAbMvTGCeK
-         TIL3eEMpmYrljL76iuLaK4/xTSFQ9qvzLBmQmLES7ccFrRIWR6frSxLRpb+k6AThmFKp
-         /dSKxyD2VhEKM6jKY80UGnypEvLHxOmIQ1bY/zveFB9cbJRULpobj7/SyNwLgVqrPlak
-         xQxb9JgE3fikUblnAaJ0yX1QGA7b1vO316E7npZkTkcJDDwViItwtrnjXUknJHnGTy8B
-         626jQ1+5MyiVKc0iozoT56/ia2cEWjcP4EPm75FCFGnQ0WG7eVBlcoAmCvvrh6ZF0Fzg
-         /8zw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706232244; x=1706837044;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=t6CX8D0lpq6HiM0LfR6MAxAUUlJjyu7IdjFJ5kI3qyM=;
-        b=hrjfZSTzakiwnOMIxyzzaPAvEF02OiJoBArI7fKu9eNSYWugx0Rf6fXozMIN1YDTpa
-         FOrRueV6+IgXxpRgN4Y996nyE15/P32nUDXzAppvsZ6IIPgo3ze3n/AnHL836NyOotg+
-         JEnbXKqXYWdJ/zRUG0fyBGiY0t4CtqfTeEjECRt1SiLP1x7fy322iF3nhnj5TnQXZNtD
-         6Ntr/82QeS8hvINqZWJBWk2HtQIKnYmBhD7KJlJhtdH7ILwS3IqThj77yWGmvmm93IU5
-         KyFfEfMVsKT0/DCFR0SMZRrtVRNzOwZeS+/P8EaYIVK0Yh+z3XIFqbxykkz0UGoOwpev
-         Ud+w==
-X-Gm-Message-State: AOJu0Yz9WPXEmYXNLPjUjWgdpiwGowYgziVV1XDulF2FZxUIjBmGt0Sl
-	R3ewy4YN3wc5QCh3Lg/Mb5uHOsw2rbsyZ08d6cpeCfpnVlvGte8A1QO3z1NGu5E=
-X-Google-Smtp-Source: AGHT+IHbmlADsrnFRBINz+pLzcqL2xK6k8ZUNw6nlBqsHxIAUAD/tguq3pmhgL0FSgCQsL/xDdx9dw==
-X-Received: by 2002:a17:902:e743:b0:1d5:c1c4:7f05 with SMTP id p3-20020a170902e74300b001d5c1c47f05mr670335plf.3.1706232244095;
-        Thu, 25 Jan 2024 17:24:04 -0800 (PST)
-Received: from localhost (fwdproxy-prn-119.fbsv.net. [2a03:2880:ff:77::face:b00c])
-        by smtp.gmail.com with ESMTPSA id v7-20020a170903238700b001d72817a62dsm114362plh.264.2024.01.25.17.24.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jan 2024 17:24:03 -0800 (PST)
-From: David Wei <dw@davidwei.uk>
-To: Jakub Kicinski <kuba@kernel.org>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next v6 4/4] netdevsim: add Makefile for selftests
-Date: Thu, 25 Jan 2024 17:23:57 -0800
-Message-Id: <20240126012357.535494-5-dw@davidwei.uk>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20240126012357.535494-1-dw@davidwei.uk>
-References: <20240126012357.535494-1-dw@davidwei.uk>
+	s=arc-20240116; t=1706232485; c=relaxed/simple;
+	bh=bZlX9cUI6w67vtkj69iIAjpu7YMBHhLSx3TrsQFcCVA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tWB+raCLJHwkzJuwcreniR67WfOVMD1M3f5m/cTCtCgE/A3xD5hWLZaaXsicW7WLBOAPh0xe9XhYaMY/7aaI9xpzOUiXzH0noKVeT0GTkIZdzjqgfZ4amYVFtv603fzsQ5TxhKexgJnhWEFZBADnX1CA4q9WIX6lCdWwVT+FqJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=axsI+Ry9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FEF5C433F1;
+	Fri, 26 Jan 2024 01:28:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706232484;
+	bh=bZlX9cUI6w67vtkj69iIAjpu7YMBHhLSx3TrsQFcCVA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=axsI+Ry9/nH8tehj4XSMn0DSClxkGB1iHb+8GWqKbL4B9TzOgERO7oYCN63NbNmjN
+	 9AbkuMOxK59KYJx/duEk8WFxf3Ai4TpJbPhPbuTR59Z5DEPkb0S3PXsYVg86kHOC0Q
+	 Q4/mbEVroaZv3l30ALMalMRjJoalAjEoARsd4E4vbH1KqJijt8oZ0fR3jURH8/H8y/
+	 bVnmh1WcegGz+tzEIbyOYCPjfvxJoypgFN267niTZ3uhlxVzEIpORfIhqtxBBzZtaT
+	 sn7Eamo9AgbUhlIOyPsHD3Ctv3J4K7F6v0laatull0f2QrQKsjxoUz32tCFCMemFH5
+	 DtEwarYLWAfAg==
+Date: Thu, 25 Jan 2024 17:28:03 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Sai Krishna <saikrishnag@marvell.com>
+Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <sgoutham@marvell.com>, <gakula@marvell.com>, <hkelam@marvell.com>,
+ <sbhatta@marvell.com>
+Subject: Re: [net-next PATCH] octeontx2-pf: Reset MAC stats during probe
+Message-ID: <20240125172803.01189ac4@kernel.org>
+In-Reply-To: <20240125110601.124209-1-saikrishnag@marvell.com>
+References: <20240125110601.124209-1-saikrishnag@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Add a Makefile for netdevsim selftests and add selftests path to
-MAINTAINERS
+On Thu, 25 Jan 2024 16:36:01 +0530 Sai Krishna wrote:
+> Reset CGX/RPM MAC HW statistics at the time of driver probe()
+> 
+> Also added a devlink option to do the same at runtime, this will be
+> helpful during debug.
+> 
+> Usage: Reset MAC stats
+> devlink dev param  set  pci/0002:03:00.0 name mac_stats_reset value true
+> cmode runtime
 
-Signed-off-by: David Wei <dw@davidwei.uk>
----
- MAINTAINERS                                    |  1 +
- .../selftests/drivers/net/netdevsim/Makefile   | 18 ++++++++++++++++++
- 2 files changed, 19 insertions(+)
- create mode 100644 tools/testing/selftests/drivers/net/netdevsim/Makefile
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 8709c7cd3656..6b3608db5bda 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -15061,6 +15061,7 @@ NETDEVSIM
- M:	Jakub Kicinski <kuba@kernel.org>
- S:	Maintained
- F:	drivers/net/netdevsim/*
-+F:	tools/testing/selftests/drivers/net/netdevsim/*
- 
- NETEM NETWORK EMULATOR
- M:	Stephen Hemminger <stephen@networkplumber.org>
-diff --git a/tools/testing/selftests/drivers/net/netdevsim/Makefile b/tools/testing/selftests/drivers/net/netdevsim/Makefile
-new file mode 100644
-index 000000000000..5bace0b7fb57
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/netdevsim/Makefile
-@@ -0,0 +1,18 @@
-+# SPDX-License-Identifier: GPL-2.0+ OR MIT
-+
-+TEST_PROGS = devlink.sh \
-+	devlink_in_netns.sh \
-+	devlink_trap.sh \
-+	ethtool-coalesce.sh \
-+	ethtool-fec.sh \
-+	ethtool-pause.sh \
-+	ethtool-ring.sh \
-+	fib.sh \
-+	hw_stats_l3.sh \
-+	nexthop.sh \
-+	peer.sh \
-+	psample.sh \
-+	tc-mq-visibility.sh \
-+	udp_tunnel_nic.sh \
-+
-+include ../../../lib.mk
--- 
-2.39.3
-
+Where are the stats reported? It'd be more intuitive to add the ability
+to reset stats to whatever interface is used to report them. Or one of
+your reset interfaces (devlink dev reload).
 
