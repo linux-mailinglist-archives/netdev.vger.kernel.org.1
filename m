@@ -1,105 +1,186 @@
-Return-Path: <netdev+bounces-66275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB3DE83E353
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 21:24:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2E2F83E38A
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 22:00:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 279AFB21AE3
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 20:24:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 582B61F2520E
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 21:00:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BCA322F04;
-	Fri, 26 Jan 2024 20:24:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="J64cU7AZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D657E2374C;
+	Fri, 26 Jan 2024 21:00:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B98622EF4
-	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 20:24:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7578D249EC;
+	Fri, 26 Jan 2024 21:00:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706300682; cv=none; b=f4LbF5vs1hr/rURmrhhJm1Um+To3VPA2X07vz8FAw9r8NqYi2p4tpvsmC+psLVwPjMAY9F/2ti6wkzvXG1ykeX3MNfGnweP7tCuLWnGLRoOf1KRoVRE+TPnLQEgzOdW3So4GchVpVC+lTXj+xe19aypsda+pP9Ql8cFQqMUd4Iw=
+	t=1706302840; cv=none; b=PQsaPMwvdv5YLi5uloI8qDUDNg2FeZMTlXcXGDH9MY+b3MEzDplOJCKj1kba+NKHfPv5igt2wC9H5I+QD5uYOo55YpRDVqkcUySnd0Xt19qDsSbtWC6kBy/J7+FEIqyRI5DbJuMnV2CicB7adAyw8M3+fOQGdWOsk1S2Wvd9pfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706300682; c=relaxed/simple;
-	bh=aacVZUW/5mGUDYhkkYBJUGL/Gh8Ctd/YyoFEal95FVc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=c28j2h97Ugx/qlv1PbCElQ+HIbnojF4mLUBvlURoiWmM81ZEAmAclRW3c5bnlBZZCKfM1ElqnspjTc1V+bYMr3D26Crq4L89N2RgL1eAdYbya0DkQ8InTSAJo229BXzckZejVe5h+4LvnYuMpCfodw/tktQul4EGw5gqhThAXqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=J64cU7AZ; arc=none smtp.client-ip=91.218.175.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <9f8343c3-7403-4346-9973-1b4421e3ad7d@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706300677;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x8oebQaftQNT6LeEHr7TKK0RzE3dlOdRvYdiT9hpg60=;
-	b=J64cU7AZQmfIOteP1Arx1fIFb/l+unLnQLiVc+IckZodSv/fH3ql/JCtI81f4qbE5AsP17
-	ROb9SXlR92gYbuPHBDIXPDL4wxR3Cc1Y+h0jmiucTF/uSLsONdhB3B3JNMj2k5jl50vCpa
-	hT3rq4jcrGqua93Dtgvvn4I1yp+6Ll4=
-Date: Fri, 26 Jan 2024 20:24:29 +0000
+	s=arc-20240116; t=1706302840; c=relaxed/simple;
+	bh=CXgc0JmqWScFz/gV3042EpSrbQV32DXfyhpoAl1QqUs=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=CvBq/nwQMxznyQmucT3nyiY8yHlYT8VLKgFCd9JJ6mwlb633XVlVwGCMxzbvhJ6R9lggDhpeT6Mn2Gdru/989oi5hSK5riy7IbAaCEtI60Jp2/Wb4Usb6PQRbR1ib7TQenU1fZdHnai+fKJ5e4Fz0e65PkIrskofN/GqaMUvROk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.105] (31.173.87.141) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Sat, 27 Jan
+ 2024 00:00:21 +0300
+Subject: Re: [PATCH net-next v2 2/2] ravb: Add Tx checksum offload support
+To: Biju Das <biju.das.jz@bp.renesas.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>, Yoshihiro Shimoda
+	<yoshihiro.shimoda.uh@renesas.com>, Wolfram Sang
+	<wsa+renesas@sang-engineering.com>, Nikita Yushchenko
+	<nikita.yoush@cogentembedded.com>, <netdev@vger.kernel.org>,
+	<linux-renesas-soc@vger.kernel.org>, Geert Uytterhoeven
+	<geert+renesas@glider.be>, Prabhakar Mahadev Lad
+	<prabhakar.mahadev-lad.rj@bp.renesas.com>, Biju Das <biju.das.au@gmail.com>
+References: <20240124102115.132154-1-biju.das.jz@bp.renesas.com>
+ <20240124102115.132154-3-biju.das.jz@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <fb8302e3-8491-09d0-3f94-1599bbe42743@omp.ru>
+Date: Sat, 27 Jan 2024 00:00:20 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 2/2] net: stmmac: dwmac-imx: set TSO/TBS TX queues
- default settings
+In-Reply-To: <20240124102115.132154-3-biju.das.jz@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-To: Esben Haabendal <esben@geanix.com>, netdev@vger.kernel.org,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Shawn Guo <shawnguo@kernel.org>,
- Sascha Hauer <s.hauer@pengutronix.de>,
- Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>, NXP Linux Team <linux-imx@nxp.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>
-Cc: Rohan G Thomas <rohan.g.thomas@intel.com>,
- "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <cover.1706256158.git.esben@geanix.com>
- <379f79687ca4a7d0394a04d14fb3890ce257e706.1706256158.git.esben@geanix.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <379f79687ca4a7d0394a04d14fb3890ce257e706.1706256158.git.esben@geanix.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 01/26/2024 20:51:42
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 182973 [Jan 26 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.87.141 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.87.141
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 01/26/2024 20:56:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 1/26/2024 4:55:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On 26/01/2024 09:10, Esben Haabendal wrote:
-> TSO and TBS cannot coexist. For now we set i.MX Ethernet QOS controller to
-> use the first TX queue with TSO and the rest for TBS.
+On 1/24/24 1:21 PM, Biju Das wrote:
+
+> TOE has hw support for calculating IP header and TCP/UDP/ICMP checksum for
+
+   s/hw/hardware/, please...
+
+> both IPV4 and IPV6.
 > 
-> TX queues with TBS can support etf qdisc hw offload.
+> Add Tx checksum offload supported by TOE for IPv4 and TCP/UDP.
 > 
-> Signed-off-by: Esben Haabendal <esben@geanix.com>
-> ---
->   drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c | 4 ++++
->   1 file changed, 4 insertions(+)
+> For Tx, the result of checksum calculation is set to the checksum field of
+> each IPv4 Header/TCP/UDP/ICMP of ethernet frames. For the unsupported
+> frames, those fields are not changed. If a transmission frame is an UDP
+> frame of IPv4 and its checksum value in the UDP header field is H’0000,
+> TOE does not calculate checksum for UDP part of this frame as it is
+> optional function as per standards.
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-> index 8f730ada71f9..6b65420e11b5 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-> @@ -353,6 +353,10 @@ static int imx_dwmac_probe(struct platform_device *pdev)
->   	if (data->flags & STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY)
->   		plat_dat->flags |= STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY;
->   
-> +	/* Default TX Q0 to use TSO and rest TXQ for TBS */
-> +	for (int i = 1; i < plat_dat->tx_queues_to_use; i++)
-> +		plat_dat->tx_queues_cfg[i].tbs_en = 1;
+> We can test this functionality by the below commands
+> 
+> ethtool -K eth0 tx on --> to turn on Tx checksum offload
+> ethtool -K eth0 tx off --> to turn off Tx checksum offload
+> 
+> Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
+[...]
+
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index 59c7bedacef6..3c748a54fae0 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> @@ -29,6 +29,7 @@
+>  #include <linux/spinlock.h>
+>  #include <linux/reset.h>
+>  #include <linux/math64.h>
+> +#include <net/ip.h>
+
+   What do you need from that header, BTW?
+
+[...]
+> @@ -1990,6 +2001,39 @@ static void ravb_tx_timeout_work(struct work_struct *work)
+>  	rtnl_unlock();
+>  }
+>  
+> +static bool ravb_is_tx_checksum_offload_gbeth_possible(struct sk_buff *skb)
+
+   I'd suggest s/th shorter and more consistent with the used naming,
+like ravb_tx_csum_possible_gbeth()...
+
+> +{
+> +	struct iphdr *ip = ip_hdr(skb);
 > +
->   	plat_dat->host_dma_width = dwmac->ops->addr_width;
->   	plat_dat->init = imx_dwmac_init;
->   	plat_dat->exit = imx_dwmac_exit;
+> +	/* TODO: Need to add support for VLAN tag 802.1Q */
+> +	if (skb_vlan_tag_present(skb))
+> +		return false;
+> +
+> +	/* TODO: Need to add HW checksum for IPV6 */
+> +	if (skb->protocol != htons(ETH_P_IP))
+> +		return false;
 
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+   So maybe we need to report just NETIF_F_IP_CSUM, not NETIF_F_HW_CSUM
+ATM?
+
+> +
+> +	switch (ip->protocol) {
+> +	case IPPROTO_TCP:
+> +		break;
+> +	case IPPROTO_UDP:
+> +		/* If the checksum value in the UDP header field is “H’0000”,
+
+   Use 0x0000 or just 0, please. I don't know where Renesas found this
+weird hex notation...
+
+[...]
+> @@ -2005,6 +2049,11 @@ static netdev_tx_t ravb_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+>  	u32 entry;
+>  	u32 len;
+>  
+> +	if (skb->ip_summed == CHECKSUM_PARTIAL) {
+> +		if (!ravb_is_tx_checksum_offload_gbeth_possible(skb))
+
+   I'd collapse those 2 *if* statements...
+
+[...]
+
+MBR, Sergey
 
