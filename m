@@ -1,212 +1,148 @@
-Return-Path: <netdev+bounces-66056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A55A783D1C1
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 01:55:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CAA283D1DD
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 02:04:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3543C1F24932
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 00:55:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E7DE1C217A4
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 01:04:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AAB210F5;
-	Fri, 26 Jan 2024 00:55:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 233DD38C;
+	Fri, 26 Jan 2024 01:04:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="cXlvFKYY"
+	dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b="nAO/x5w3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
+Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 168D5629
-	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 00:55:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 434AAEC3
+	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 01:04:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706230512; cv=none; b=Ang1jN/T/6jh4K3KRuv7RkZt7RF0tk+go6KFZgoBYdhM5Ca+2L9PPca+HalAMj06H1eCiR7A5E+hCftM1e8nrpBcTWwoRK1fp5mZB08tpiffJS+c3pVtJtPxOzJM5cFV6DGKIiyRA2NT74vszWe9LvaCKx49niDekD/O598Rxlo=
+	t=1706231054; cv=none; b=PCOcbRaraAqYIaI8RGDvCrq1N3HB5uD5w3O0oeTQw+cMXfFHjVbSNPgAT1l1kX7c6rHd0+UQANtjcZGpHMD25uhuvst5Xv41rpvAOlosQ3Fl0RqH7wxs0JrMv4BQIe4DODMu5OOdXljbiy9bEJMaJtjutdafocM/MzvdUBNHqmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706230512; c=relaxed/simple;
-	bh=woblf5qNFHrtXcpv2ZP53wuaAZhx3ECN/TDEQZ6mz3o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EQuAsHtJKBs1dN0ZEBlX4eLRQpBoZVWn64abmkbU7aTziVVKRTF+do3WDEaiiPR2ODZmI59iz1MnV6f9LSxkaP0B/fx/6rfi1/m6T+DIGT1vVt8+UXCW4KSQElmDAjbClp7Gjm8mCJzqwVePNzVx7hT2vcULmx63rIIMq6H0qGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=cXlvFKYY; arc=none smtp.client-ip=209.85.160.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-20757468411so4834736fac.3
-        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 16:55:09 -0800 (PST)
+	s=arc-20240116; t=1706231054; c=relaxed/simple;
+	bh=IMhLnx9xbW48kwVMOCYB/mfHRVdRLA2M1LkvQ2JdkU8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hY0cB6G9uXK7c5px0OQwXu2pb+Ql0S+sdrMnAhhpqmb/22+PDDBPQ8Q6CcOqfyTWZZLAB3KIF7sUjYBaKRhiTu5FDnBi3IHZEboSLCOSvEEMmF16MefWLpkt4zQ+zRMxxIDPxkubu8AYt5az4TcQ3ZqxAY1nbzmao/B8zHIKHdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu; spf=pass smtp.mailfrom=umich.edu; dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b=nAO/x5w3; arc=none smtp.client-ip=209.85.210.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=umich.edu
+Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-6e0cc84fe4dso134728a34.2
+        for <netdev@vger.kernel.org>; Thu, 25 Jan 2024 17:04:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1706230509; x=1706835309; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nBYHdpy2T+P9z5bpa228oc6wr1+9JH26Mg1COdKLLrI=;
-        b=cXlvFKYYNYfFXDH07WZqAl091+w+1N93HPVe43n0bXHTxvpmeE2wrWueS0dPKknPpM
-         c8L8pOalNHvL7hqr4mVPEBWqWNrobL2iTMsjDGnKgX8YQ4tKesXZdDkxNXz6EMwHDlVK
-         QTYDcTbpsLg2FMm/e90lhmwdA9vdnxO6DjD0I=
+        d=umich.edu; s=google-2016-06-03; t=1706231050; x=1706835850; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5PL64YswD7CFiTUaHpI0NdxPc3Rjg3ZkzZFm8JxzGTk=;
+        b=nAO/x5w39TLkT+3EBoNqTq8WN5rGvV/fuF0Y4n7Kx88IvuSzMl1b9SNaNr9XoFR/Yf
+         OCoXYLA/StHvl+vRzZMmoa7Wu9rqfoUJQfpa/Ap7vcaUXyA2g4OSnif6OEI30ocgWeAE
+         3a3j0YVNEIXHkin2kSZJXeWaZX322q6+CMTtcwKcmB/Vk3I5667tZMXwg4KtadlulEHV
+         E9AH/gmKlaS9IKLzQ5O3Sh6MRjh75ULPtnAYgYS7gZgEjpF7MQ9UXrtDCQXS+g55OJj0
+         D6hTnJtuB8xeCC8kRw9UgOrHcViHzfknmft60sMeqZGw7D9LuUrKz9hvmwRA6+qyZ2Jn
+         ohuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706230509; x=1706835309;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nBYHdpy2T+P9z5bpa228oc6wr1+9JH26Mg1COdKLLrI=;
-        b=XRX2c0zbI5akp+tgg8rXle1Ni68s3+BdlGHqVBV7hNe1VCcXT4e1Xxxp53yZI0+quh
-         7zwvUeOyg0CFaTj0k/sHIHtPF3ca5ePlxrSVDzTmYffRJrdvDXIQSq2sud3XQYnbRlmB
-         swyy9JNi+HCGvZ7flr/jJ5zG36M2dAN80LttNrBj1xtYDOzfuwKG06kT7sVwYZBvhF0H
-         XRJ45gkoxKQolHMBYF8EMYUgmQljvyXJgjhrtXgNNHxyqLK6DxdvC54tjEM0zP99zaJl
-         YXwqvkgep3qWwk0evEQfq1jv5qAFzahdHgaMC5NbT6F23y5V4+3cmmx76TlS9pWefxXF
-         aQJA==
-X-Gm-Message-State: AOJu0Yyn37VyT03gMIwv6ff9X4IMqpYiZs6jDRVADrknBs9WfnNmc2xD
-	Wnli3Ge84IiX6NYl/Rb8z+/I0db2RGZVvuww3pJ/TvYqaM2O0E1QZ3VdsmCMYg==
-X-Google-Smtp-Source: AGHT+IF0Jl0JD2X5TRBfnUOQ23MioJtaZ+KrnLymlf81R1TXF1fF3AkWzi0nZH9y9GgU2w267j/Zsg==
-X-Received: by 2002:a05:6871:7a2:b0:214:cf50:83a8 with SMTP id o34-20020a05687107a200b00214cf5083a8mr549113oap.31.1706230509086;
-        Thu, 25 Jan 2024 16:55:09 -0800 (PST)
-Received: from [192.168.0.212] ([50.47.85.47])
-        by smtp.gmail.com with ESMTPSA id l17-20020a635b51000000b005cd64ff9a42sm117219pgm.64.2024.01.25.16.55.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Jan 2024 16:55:08 -0800 (PST)
-Message-ID: <b10eeb5f-bde5-4932-bdc5-c313ea832e0e@broadcom.com>
-Date: Thu, 25 Jan 2024 16:55:05 -0800
+        d=1e100.net; s=20230601; t=1706231050; x=1706835850;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5PL64YswD7CFiTUaHpI0NdxPc3Rjg3ZkzZFm8JxzGTk=;
+        b=nkvrA9sq5vh4ddCoyCbvLTYQzLGBPChMah9vQ9/CUkUGwrLU1y2hGZuL+2BhUhiC+j
+         4BLpz4RVs3EH9Rjlxuf0HABBy3dISns7eguYm/us8kul7KNgPDpUGAGFJixk/VGe8Lsh
+         fVxsBj03cBZ8aUx/oHFh2tEAXTH272692n5SsLu1JCBWVj2CmnisufdKY/luQAgDEs7D
+         ftFT3A2JPz/eH9NUE4ywtifxnCFmcfSrdFI3ypLL04K6OYl45R912OFz5AHd7NDd2zQz
+         TvwkqKoB3XgWEoZTJ4YnYnNL6c83OAqdRykKvZwDm0VRRJC/wx2pYLy0n3pLL2iheGn4
+         0qzw==
+X-Gm-Message-State: AOJu0YyxqRP5oOdBfZVXJSbBL4Qc/oBDbkX/FJfStiA7Xg5zlwyWBUe8
+	Od4YhW4P6Tc51J1Yg/tDisTJ4ZiiY5MY0BE8P5tJmczWR8qzEamnBxO5a5zD45xd4PNUVg3PKTG
+	M1pNLCux912fNvX3zMPjl1A00k0hgL8G+EmE5FA==
+X-Google-Smtp-Source: AGHT+IHDekCPRm2mSK6qL8gb1p+BYNr4/QRFxWvi7ZWDLrj473whl/qU/+4rlNuzJAVEmy4Lh1125xijVk9aix9Qr9k=
+X-Received: by 2002:a9d:799a:0:b0:6dd:dffa:ef68 with SMTP id
+ h26-20020a9d799a000000b006dddffaef68mr612112otm.71.1706231050156; Thu, 25 Jan
+ 2024 17:04:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 7/7] x86/vmware: Add TDX hypercall support
-Content-Language: en-US
-To: "H. Peter Anvin" <hpa@zytor.com>, Dave Hansen <dave.hansen@intel.com>,
- linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, bp@alien8.de,
- dave.hansen@linux.intel.com, mingo@redhat.com, tglx@linutronix.de
-Cc: x86@kernel.org, netdev@vger.kernel.org, richardcochran@gmail.com,
- linux-input@vger.kernel.org, dmitry.torokhov@gmail.com, zackr@vmware.com,
- linux-graphics-maintainer@vmware.com, pv-drivers@vmware.com,
- namit@vmware.com, timothym@vmware.com, akaher@vmware.com, jsipek@vmware.com,
- dri-devel@lists.freedesktop.org, daniel@ffwll.ch, airlied@gmail.com,
- tzimmermann@suse.de, mripard@kernel.org, maarten.lankhorst@linux.intel.com,
- horms@kernel.org, kirill.shutemov@linux.intel.com
-References: <20240109084052.58661-1-amakhalov@vmware.com>
- <20240109084052.58661-8-amakhalov@vmware.com>
- <ff370e42-f48b-4c62-9b44-9d4031cd78b0@intel.com>
- <4CF87BC4-E8C8-4584-A275-5A985D5A18A1@zytor.com>
- <c01cecef-db06-49d8-aa2e-548908c65861@broadcom.com>
- <351B1153-9CBE-4774-9FAF-770F9F36856E@zytor.com>
-From: Alexey Makhalov <alexey.makhalov@broadcom.com>
-Autocrypt: addr=alexey.makhalov@broadcom.com; keydata=
- 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 EuY0
-In-Reply-To: <351B1153-9CBE-4774-9FAF-770F9F36856E@zytor.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240125014502.3527275-1-fujita.tomonori@gmail.com>
+ <20240125014502.3527275-2-fujita.tomonori@gmail.com> <4573a237-dd18-4ea0-8de4-8b465eb856c7@lunn.ch>
+In-Reply-To: <4573a237-dd18-4ea0-8de4-8b465eb856c7@lunn.ch>
+From: Trevor Gross <tmgross@umich.edu>
+Date: Thu, 25 Jan 2024 19:03:58 -0600
+Message-ID: <CALNs47svLHD3=LFrhi=zf4hdr--e6hGjTzT5X_U9yd8q5r7G7g@mail.gmail.com>
+Subject: Re: [PATCH net-next] rust: phy: use VTABLE_DEFAULT_ERROR
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Jan 25, 2024 at 11:42=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote=
+:
+> > @@ -580,12 +580,12 @@ pub trait Driver {
+> >
+> >      /// Issues a PHY software reset.
+> >      fn soft_reset(_dev: &mut Device) -> Result {
+> > -        Err(code::ENOTSUPP)
+> > +        kernel::build_error(VTABLE_DEFAULT_ERROR)
+> >      }
+>
+> Dumb question, which i should probably duckduckgo myself.
+>
+> Why is it called VTABLE_DEFAULT_ERROR and not
+> VTABLE_NOT_SUPPORTED_ERROR?
+>
+> Looking through the C code my guess would be -EINVAL would be the
+> default, or maybe 0.
+>
+> The semantics of ENOTSUPP can also vary. Its often not an actual
+> error, it just a means to indicate its not supported, and the caller
+> might decide to do something different as a result. One typical use in
+> the network stack is offloading functionality to hardware.
+> e.g. blinking the LEDs on the RJ45 connected. The driver could be
+> asked to blink to show activity of a received packet. Some hardware
+> can only indicate activity for both receive and transmit, so the
+> driver would return -EOPNOTSUPP. Software blinking would then be used
+> instead of hardware blinking.
+>
+>          Andrew
 
+`build_error` is a bit special and is implemented as follows:
 
-On 1/22/24 4:17 PM, H. Peter Anvin wrote:
-> On January 22, 2024 4:04:33 PM PST, Alexey Makhalov <alexey.makhalov@broadcom.com> wrote:
->>
->>
->> On 1/22/24 10:28 AM, H. Peter Anvin wrote:
->>> On January 22, 2024 8:32:22 AM PST, Dave Hansen <dave.hansen@intel.com> wrote:
->>>> On 1/9/24 00:40, Alexey Makhalov wrote:
->>>>> +#ifdef CONFIG_INTEL_TDX_GUEST
->>>>> +unsigned long vmware_tdx_hypercall(unsigned long cmd,
->>>>> +				   struct tdx_module_args *args)
->>>>> +{
->>>>> +	if (!hypervisor_is_type(X86_HYPER_VMWARE))
->>>>> +		return ULONG_MAX;
->>>>> +
->>>>> +	if (cmd & ~VMWARE_CMD_MASK) {
->>>>> +		pr_warn_once("Out of range command %lx\n", cmd);
->>>>> +		return ULONG_MAX;
->>>>> +	}
->>>>> +
->>>>> +	args->r10 = VMWARE_TDX_VENDOR_LEAF;
->>>>> +	args->r11 = VMWARE_TDX_HCALL_FUNC;
->>>>> +	args->r12 = VMWARE_HYPERVISOR_MAGIC;
->>>>> +	args->r13 = cmd;
->>>>> +	args->r15 = 0; /* CPL */
->>>>> +
->>>>> +	__tdx_hypercall(args);
->>>>> +
->>>>> +	return args->r12;
->>>>> +}
->>>>> +EXPORT_SYMBOL_GPL(vmware_tdx_hypercall);
->>>>> +#endif
->>>>
->>>> This is the kind of wrapper that I was hoping for.  Thanks.
->>>>
->>>> Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
->>>>
->>>
->>> I'm slightly confused by this TBH.
->>>
->>> Why are the arguments passed in as a structure, which is modified by the wrapper to boot? This is analogous to a system call interface.
->>>
->>> Furthermore, this is an out-of-line function; it should never be called with !X86_HYPER_VMWARE or you are introducing overhead for other hypervisors; I believe a pr_warn_once() is in order at least, just as you have for the out-of-range test.
->>>
->>
->> This patch series introduces vmware_hypercall family of functions similar to kvm_hypercall. Similarity: both vmware and kvm implementations are static inline functions and both of them use __tdx_hypercall (global not exported symbol). Difference: kvm_hypercall functions are used _only_ within the kernel, but vmware_hypercall are also used by modules.
->> Exporting __tdx_hypercall function is an original Dave's concern.
->> So we ended up with exporting wrapper, not generic, but VMware specific with added checks against arbitrary use.
->> vmware_tdx_hypercall is not designed for !X86_HYPER_VMWARE callers. But such a calls are not forbidden.
->> Arguments in a structure is an API for __tdx_hypercall(). Input and output argument handling are done by vmware_hypercall callers, while VMware specific dress up is inside the wrapper.
->>
->> Peter, do you think code comments are required to make it clear for the reader?
->>
->>
-> 
-> TBH that explanation didn't make much sense to me...
+1. If called in a `const fn`, it will fail the build
+2. If the build_error symbol is in a final binary, tooling should
+detect this and raise some kind of error (config
+RUST_BUILD_ASSERT_ALLOW, not exactly positive how this is implemented)
+3. If called at runtime, something is very unexpected so we panic
 
-Peter,
+To make a trait function optional in rust, you need to provide a
+default (since all functions in a trait must always be callable). But
+if the C side can handle a null function pointer, it's better to just
+set that instead of reimplementing the default from Rust.
 
-I would like to understand your concerns.
+So it's up to the abstraction to set these fields to NULL/None if not
+implemented, e.g. from create_phy_driver in phy.rs:
 
-1. Are you suggesting to move structure (tdx parameters) initialization 
-in one please, instead of one part there another part here? Do you 
-prefer to pass all arguments as is to vmware_tdx_hypercall() and only 
-define tdx_module_args there?
+        soft_reset: if T::HAS_SOFT_RESET {
+            Some(Adapter::<T>::soft_reset_callback)
+        } else {
+            None
+        },
 
-2. And second suggestion is to add pr_warn_once under "if 
-(!hypervisor_is_type(X86_HYPER_VMWARE))" ?
+If an abstraction does this wrong and tries to assign a default
+function when it would be better to get a null pointer, then we get
+the build error. So this is something that would pop up if the
+abstraction is done wrong, not just if somebody writes a bad phy
+driver.
 
---Alexey
+VTABLE_DEFAULT_ERROR isn't a kernel errno, it's a string printed to be
+printed by build_error or the tooling.
+
+- Trevor
 
