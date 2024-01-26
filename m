@@ -1,105 +1,123 @@
-Return-Path: <netdev+bounces-66206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6B8B83DFD4
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 18:20:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47D3C83DFE1
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 18:21:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D34C1F23737
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 17:20:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C2D51C20C2E
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 17:21:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36DA21EB41;
-	Fri, 26 Jan 2024 17:17:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1455621102;
+	Fri, 26 Jan 2024 17:20:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cequ4ljg"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BkXyBCBQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C00022031C
-	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 17:17:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60D7320DFC
+	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 17:20:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706289461; cv=none; b=mjP+1uVW750a8tpfcKDG7NGX4ZxY5qq+x5/n4TueL7Hz1tdxA6GxozxSIZTiReMfR3WPJeEpDOUipGaccTOuJg7QlFNYguR58obdD9Vd4yOY7a7vYK2GQoiCk3EBm4JVTm5SdGgmpvpe8LJXyb84FVEbooY4OTc0UFo/Hlw+ejA=
+	t=1706289617; cv=none; b=FpTz2U3cNdlE6dVLJgo1kA3nQJnSZtclPJg1QSUwogGMm86+TT4bkEh+/NddpyN3x2mshJT/vmIaziTYmNACg0EHJKgwmR6GRxAed0RUeWClTj4XWmgLTOfNQqnrFFtQdx3Q2izFVebNYg3NolxdkFtXggKK5EHHzmmYkUgUgUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706289461; c=relaxed/simple;
-	bh=Uy4Tppe413jOQGBceN0KQ2oIFgmubM6tH7atW1oQXJ8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TF+gfhH08/DSmExTGnSjMOGCiNJ6blba6a3ub8VsP9hB1iW1zhPt9MbxseC3dj8gU4VejNPPtj0qAwSB/zxfBMOVFoWj1/7QpiHFrFzOZf7xz6rQ1G78SVb2N2bKSoHXfsLxNdyp7Cj6wkGKisM5ceqNtzKtvOFoYGOUG1mMBak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cequ4ljg; arc=none smtp.client-ip=209.85.166.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-7bfcc7d196aso16926639f.3
-        for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 09:17:39 -0800 (PST)
+	s=arc-20240116; t=1706289617; c=relaxed/simple;
+	bh=73loVm8ly7qdwE39+2h0z6ktV12Cx5r1ZMgjVHoK8hc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TKq14Dq/pIXEXyiG092jLvE5+TGh79X3/lm+h/OAfEGxxAN5emRCZj1Dc9e0Sa2GtaLb5LGB2G7OQFjmPVqF8Nr3i5VgOpZzjcRj5RnTCgdP6JgcEDo3uxyMRH7Y1yona71PPk9GUlAAy3VdH+QtRzf6EMAfbWBH/xgwuETKH0s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=BkXyBCBQ; arc=none smtp.client-ip=209.85.128.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-5ffee6e8770so11109997b3.0
+        for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 09:20:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706289459; x=1706894259; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Uy4Tppe413jOQGBceN0KQ2oIFgmubM6tH7atW1oQXJ8=;
-        b=cequ4ljgs90oLCdC1CjLsiqunrisdl2NagsU0yGEfg7AXA8nvumQyNTv3ZVjdncgUA
-         /X2oEdnfT9T6OkmEEQ8CDPaBUqOsiqJoFLaLkzJ+LNVXBNyw//Ls6ESkUAvYtCqrRvHa
-         QEPIJIBiKi39zA5zDA3q+/IrDtKnK6qtSiMeY4u69q1VFyHQjrJoUlKQ0jooEAc+8G+3
-         wK8UUbyQZ2nYm2zCxPrkNrhZaEF+NNK7Ah5IZQI1qqYzq99Ni8vmXR/6BuwEeYTIZOti
-         yeN95pBJiIrdCA/kgU9EbmZrSYieF3t/M8oNAoulvs7CLORX+92+NjKlQotL4kUnXVwq
-         0vrw==
+        d=linaro.org; s=google; t=1706289614; x=1706894414; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=DfcOf0udxUc+w1U/rSjRqEr06RAjRh2n5t1k3e8n0LY=;
+        b=BkXyBCBQqJdFREGuiWymbR00OFuInOFGFYHdQAkSb1pflyPQrMoS5J7cvnxuoBaFq9
+         +miE5T6kT1RehTmU2ok8H4TDzTxUODUZ9LVDhi5RKPwo8/IZKrGd2WiHfSFdoR3JWqF9
+         iu8iRp+YyG5NYSoZYT+ospvsCI4tcLvS6eY+dlRdkX+zFN9umpGKiPPgRkLA5YRPm3pY
+         +Yosf5AoLlplqntUxaC/JI+SD4dv6Qx10aVCbUKm6lTMOQTTt1AvCHeq3LhjQeh9fPzH
+         mzPjUSLTquiXuEfhVuCtx/xTkHyCz+xIS+0wZCIZ+s2apSF7WB84zcaggRd0g+Hq9CtC
+         uItw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706289459; x=1706894259;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Uy4Tppe413jOQGBceN0KQ2oIFgmubM6tH7atW1oQXJ8=;
-        b=aU7/usLTxpvwWXWOSiLBIj8FtqTJ13IiLTqC0guCSglotRY5L7sf/YWA3OY3HwWZkt
-         nTu2L9orH97TjZOwqM+bY2026hr/pWPwP4bomAW0DRzRjVGcHF/ZufNOjOxWjnDXWatO
-         obQuwiZw/yNDvL2j1hzgH0WyBOPM6/jpYX4+JafurBoeQpb8I0W/m4tr6Zg25BvvpxR8
-         ynp/0hUdaV6h1PEhO3G8pWo6Oz0TuA0RLOqm79ddpFXFmXXbINtvREJXKBotTxg1xI8I
-         YyKeVud4n8QoSkrSnbhWpZZfXGwtCYtvxjCFJqR+ffTcweKA8gyB+I8wuPtbwrraRnTQ
-         0ONg==
-X-Gm-Message-State: AOJu0YwBH+rZ6fxE+O+vD7l+JjIVbRXua/3ikirztko7HODvfzpL/KsM
-	Ib6z04ftbKHt1aV9FnyCAVnhlF9yE6YrQU6tyMY7ItWhn8d0FCSd0ULA2J9E
-X-Google-Smtp-Source: AGHT+IGUjMoWkciTscVyQSfzEIwOoz9zdl/i2gnz/lq7QPE6qaI2QNq8S91kHNVvN/aZWBgdYHkEdQ==
-X-Received: by 2002:a05:6e02:1251:b0:361:a7ff:f569 with SMTP id j17-20020a056e02125100b00361a7fff569mr72243ilq.7.1706289458751;
-        Fri, 26 Jan 2024 09:17:38 -0800 (PST)
-Received: from ?IPV6:2601:282:1e82:2350:ddd8:edb3:1925:c8bf? ([2601:282:1e82:2350:ddd8:edb3:1925:c8bf])
-        by smtp.googlemail.com with ESMTPSA id bf6-20020a056e02308600b00362b4d251a5sm186557ilb.25.2024.01.26.09.17.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 26 Jan 2024 09:17:38 -0800 (PST)
-Message-ID: <fa8e2b04-5ddf-4121-be34-c57690f06c63@gmail.com>
-Date: Fri, 26 Jan 2024 10:17:36 -0700
+        d=1e100.net; s=20230601; t=1706289614; x=1706894414;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DfcOf0udxUc+w1U/rSjRqEr06RAjRh2n5t1k3e8n0LY=;
+        b=KT0YTrMeR2qDCrilCrbMgGGawHs7Srq9AfV+fUBXkj6gwylrT+Nkci5S9yszXvmBij
+         W6qws5fam+WjfB6PjlOYLeXLEJp1Xho031u8X4uhaPrhGrqkglvVRpIoNUUfLZaMD2I0
+         MkF2YhtgXvzxPDIGNcYWy+W4/0HgPM+s1yWDi6QOMjIddBri1IlgIYETBMzx1Lecn5at
+         gU9qJ2ZAdTLmymGhHTfjsiqvxKnXON57akJuSZq3jkvve/E3GS4TVnoxLOPf93R7Owv7
+         aMLag6S6+iPqFaSG/iz6hcPGazfI+F6vpq8RF4qTC3Pmvb/Vskyw/uMsgwwHGsCdx8JB
+         Z/aQ==
+X-Gm-Message-State: AOJu0Yy+QSskygwjDUeeNThP5rLv64G0enBRtxy1Ugp7Iht4VncRLISc
+	tAQ1V8yICYA6BZqiL/S54FK6EU9PjIyDPAHuMewGabJAlVyTJwkZBuRypfDRNY1TQsoGs/LdNbT
+	jtLb3C220jzAk5+HQRd82hFE6fibBPbMvq5svuA==
+X-Google-Smtp-Source: AGHT+IGa+zspZThxi9oRy2oS248JEsOPKalw83o4vIHdlm+VhTwbKv49+h1a4t3B8lhSzO3bv/j1ohqxDrsg6+8ov90=
+X-Received: by 2002:a05:690c:f8f:b0:5ff:4987:4ef3 with SMTP id
+ df15-20020a05690c0f8f00b005ff49874ef3mr211891ywb.24.1706289614301; Fri, 26
+ Jan 2024 09:20:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iproute2] vxlan: add support for flowlab inherit
-Content-Language: en-US
-To: Vincent Bernat <vincent@bernat.ch>, Ido Schimmel <idosch@idosch.org>,
- Alce Lafranque <alce@lafranque.net>
-Cc: netdev@vger.kernel.org, stephen@networkplumber.org
-References: <20240120124418.26117-1-alce@lafranque.net>
- <Za5eizfgzl5mwt50@shredder> <f24380fc-a346-4c81-ae78-e0828d40836e@gmail.com>
- <1793b6c1-9dba-4794-ae0d-5eda4f6db663@bernat.ch>
- <1fb36101-5a3c-4c81-8271-4002768fa0bd@gmail.com>
- <41582fa0-1330-42c5-b4eb-44f70713e77e@bernat.ch>
- <1e2ff78d-d130-46d4-b7ad-31a0f6796e1a@gmail.com>
- <e60e2cc1-02c0-452b-8bb1-b2fb741e7b43@bernat.ch>
-From: David Ahern <dsahern@gmail.com>
-In-Reply-To: <e60e2cc1-02c0-452b-8bb1-b2fb741e7b43@bernat.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20240124213640.7582-1-ansuelsmth@gmail.com> <53445feb-a02c-4859-a993-ccf957208115@quicinc.com>
+ <f8a9e328-5284-4f24-be5d-7e9804869ecd@lunn.ch> <5d778fc0-864c-4e91-9722-1e39551ffc45@quicinc.com>
+In-Reply-To: <5d778fc0-864c-4e91-9722-1e39551ffc45@quicinc.com>
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date: Fri, 26 Jan 2024 19:20:03 +0200
+Message-ID: <CAA8EJppUGH1pMg579nJmG2iTHGsOJdgDL93kfOvKofANTGGdHw@mail.gmail.com>
+Subject: Re: [net-next PATCH 0/3] net: mdio-ipq4019: fix wrong default MDC rate
+To: Jie Luo <quic_luoj@quicinc.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Christian Marangi <ansuelsmth@gmail.com>, Andy Gross <agross@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Robert Marko <robert.marko@sartura.hr>, linux-arm-msm@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Sergey Ryazanov <ryazanov.s.a@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 1/25/24 11:28 PM, Vincent Bernat wrote:
-> Honestly, I have a hard time finding a real downside. The day we need to
-> specify both a value and a policy, it will still be time to introduce a
-> new keyword. For now, it seems better to be consistent with the other
-> protocols and with the other keywords (ttl, for example) using the same
-> approach.
+On Fri, 26 Jan 2024 at 18:03, Jie Luo <quic_luoj@quicinc.com> wrote:
+>
+>
+>
+> On 1/26/2024 1:18 AM, Andrew Lunn wrote:
+> >> Hi Christian,
+> >> Just a gentle reminder.
+> >>
+> >> The MDIO frequency config is already added by the following patch series.
+> >> https://lore.kernel.org/netdev/28c8b31c-8dcb-4a19-9084-22c77a74b9a1@linaro.org/T/#m840cb8d269dca133c3ad3da3d112c63382ec2058
+> >
+> > I admit this version was posted first. However, its embedded in a
+> > patch series which is not making much progress, and i doubt will make
+> > progress any time soon.
+> >
+> > If you really want your version to be used, please split it out into a
+> > standalone patch series adding just MDIO clock-frequency support, with
+> > its binding, and nothing else.
+> >
+> >      Andrew
+>
+> Hi Andrew,
+> We will rework the patch series to include only MDIO frequency related
+> function and frequency dt binding, and post the updated patch series
+> on the Monday/Tuesday of next week. We will work with Christian to
+> ensure he can re-use this patch as well.
 
-ok. let's move forward without the new keyword with the understanding it
-is not perfect, but at least consistent across commands should a problem
-arise. Consistency allows simpler workarounds.
+Can you do the other way around: rebase your patches on top of Chritian's work?
+
+-- 
+With best wishes
+Dmitry
 
