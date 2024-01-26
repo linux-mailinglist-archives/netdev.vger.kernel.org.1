@@ -1,107 +1,166 @@
-Return-Path: <netdev+bounces-66150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66151-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD68483D83E
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 11:32:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E1F7C83D84B
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 11:34:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 69BA61F2D819
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 10:32:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DD521F28535
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 10:34:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAE631A731;
-	Fri, 26 Jan 2024 10:20:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AECB175AE;
+	Fri, 26 Jan 2024 10:31:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="ZkJxiWNq"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wX446PTZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B41841EB3C
-	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 10:19:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C3C1759D
+	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 10:30:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706264402; cv=none; b=uykE0YItuT8/4dvPPbSqjfpIzEgR4S5T8hilV2ky+Dc2oHbeMEQaVibdmDQozA0Y++H4P3vM630lKFmJcXwodpeQhd3WfaDEnxCYsv82u+u88B337LBzt6YYCMVNYdb+4gOLvanW0ilMzceOe2ehbU5dnnl/dJ6IS9AKpVva2QM=
+	t=1706265060; cv=none; b=LgT0JhfPoPZWUnayErJaCqvUWuIP0NokvnvqpDMceQ6SAhqstzorfqENohlSy2l/ebvMcNKmTSd1YglSYdastuGXChYqFdlv8GJzm0G+IdoCQjzPL3Gz9k807SOgTukpKucMiVK9xgORXmyBhvm5Ov6kHuG5YQb6qIOlXu2OG6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706264402; c=relaxed/simple;
-	bh=6GLPo60gqGu2Od60A7VCHfjR7l+P8Lk70OlAEqztLpE=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h/bqX0fBM2u6xxtO0QcRbBLEtQkHo96FH9OMU1ngQuRxcXHZ38oJD6PEyLWXuoPRV4BwvEMJsB8CZfgjcf4QY2emP2uhUIl39Nx29ivFB07hN125y8iP8toveIOGPbdc1h1j0tH1jwc99OCbJmP4CrGqiAqKZNpHhtda7qLTvGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=ZkJxiWNq; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 5F6A320612;
-	Fri, 26 Jan 2024 11:19:57 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pwQwreEPfhZH; Fri, 26 Jan 2024 11:19:56 +0100 (CET)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id D212A2058E;
-	Fri, 26 Jan 2024 11:19:56 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com D212A2058E
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1706264396;
-	bh=IP+WAf2vTms3bhf9HdZdKdU5ClpflLuel6gG09g85hQ=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=ZkJxiWNqBERqPR5Q/w+hIXePhP0xNaLZzgXm0+Werk5Oj/GzItPxLCa0dg9Ts23Cs
-	 3eX2bNWaoQt2yhZz+WVgvE95mtDRllgdhYq4oj7UIAQs7Et/qSsjyxqLENuzXa2krR
-	 Q5Duxoi3XqHdi+5T2hZyk+b6xawyaPoSUpTbfWQdlSfHzuGEvq2sV8FxTZb6JR3HO/
-	 WyJotyXWKaOPoj0nyecPjX8O4WailPP7We7IjcLHrQbvrLugnxU9fY8XLESr0oQgxH
-	 XImviQrBdoVasoWFdmZRrWUGazqoTFjVHGl4i9NXCuRvc6KhTS3Don6K4WjID4KfuR
-	 LG6Bi4FhX4cSA==
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout2.secunet.com (Postfix) with ESMTP id CA70580004A;
-	Fri, 26 Jan 2024 11:19:56 +0100 (CET)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 26 Jan 2024 11:19:56 +0100
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 26 Jan
- 2024 11:19:56 +0100
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 00E9E3182A56; Fri, 26 Jan 2024 11:19:55 +0100 (CET)
-Date: Fri, 26 Jan 2024 11:19:55 +0100
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Saeed Mahameed <saeed@kernel.org>
-CC: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Saeed
- Mahameed" <saeedm@nvidia.com>, <netdev@vger.kernel.org>, Tariq Toukan
-	<tariqt@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Mike Yu
-	<yumike@google.com>
-Subject: Re: [PATCH net] xfrm: Pass UDP encapsulation in TX packet offload
-Message-ID: <ZbOHS5lkH7k9LYy5@gauss3.secunet.de>
-References: <20240124081354.111307-1-saeed@kernel.org>
+	s=arc-20240116; t=1706265060; c=relaxed/simple;
+	bh=8lg/b7eX807+j1J3wZYy8O4FO7Zd4a5U1Nff7rJUlWM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Yp3jm6Zt+v5HCLiCcgdEpIKkTd8qF8fN1GKb0MNDTxTEm5fnpMPIlJCGH/fhSorLeFPA+F+b+DqLGSR2wLo2wOWzofUpm5FGz6kd79mZPJaG7y48tPsK9bExVRJ5hkEQpUGmm7ND3thixccigOqVlvcG//Npt+F11WQQojw5gFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wX446PTZ; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <f70e2d1e-b17d-44c2-9077-51afa9f4f05e@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1706265056;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GQ5cQQbN07W3Mr8WJy7OQCLh5hYQXPQPQN6G40syBwQ=;
+	b=wX446PTZNwlaRGbnarns756kx9vXUVcwAQ0IMJWhtOzdLSXSNzC5yv3VXQY/VD63MpQsF0
+	MKtrioPpboc/H4N6vRPsJK8ORZO8CnpZ5Q+/D5/9D4CP1vcl9Kb09wsj0R5dJK44gDM0PY
+	0yeMrn/aLlSjNM68CEv2zt1y1Htxt4Y=
+Date: Fri, 26 Jan 2024 10:30:50 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240124081354.111307-1-saeed@kernel.org>
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+Subject: Re: [PATCH bpf-next v8 1/3] bpf: make common crypto API for TC/XDP
+ programs
+Content-Language: en-US
+To: Martin KaFai Lau <martin.lau@linux.dev>, Vadim Fedorenko <vadfed@meta.com>
+Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+ bpf@vger.kernel.org, Victor Stewart <v@nametag.social>,
+ Jakub Kicinski <kuba@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>
+References: <20240115220803.1973440-1-vadfed@meta.com>
+ <3d2d5f4e-c554-4648-bcec-839d83585123@linux.dev>
+ <a682b902-37a2-4d43-8f39-56ca213f6663@linux.dev>
+ <cec469f4-2fd0-479a-8919-0d5578687fb2@linux.dev>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <cec469f4-2fd0-479a-8919-0d5578687fb2@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jan 24, 2024 at 12:13:54AM -0800, Saeed Mahameed wrote:
-> From: Leon Romanovsky <leonro@nvidia.com>
+On 25/01/2024 22:34, Martin KaFai Lau wrote:
+> On 1/25/24 3:19 AM, Vadim Fedorenko wrote:
+>> On 25/01/2024 01:10, Martin KaFai Lau wrote:
+>>> On 1/15/24 2:08 PM, Vadim Fedorenko wrote:
+>>>> +static int bpf_crypto_crypt(const struct bpf_crypto_ctx *ctx,
+>>>> +                const struct bpf_dynptr_kern *src,
+>>>> +                struct bpf_dynptr_kern *dst,
+>>>> +                const struct bpf_dynptr_kern *siv,
+>>>> +                bool decrypt)
+>>>> +{
+>>>> +    u32 src_len, dst_len, siv_len;
+>>>> +    const u8 *psrc;
+>>>> +    u8 *pdst, *piv;
+>>>> +    int err;
+>>>> +
+>>>> +    if (ctx->type->get_flags(ctx->tfm) & CRYPTO_TFM_NEED_KEY)
+>>>
+>>> nit. Does the indirect call get_flags() return different values?
+>>> Should it be rejected earlier, e.g. in bpf_crypto_ctx_create()?
+>>
+>> Well, that is the common pattern in crypto subsys to check flags.
+>> But after looking at it second time, I think I have to refactor this
+>> part. CRYPTO_TFM_NEED_KEY is set during tfm creation if algo requires
+>> the key. And it's freed when the key setup is successful. As there is no
+>> way bpf programs can modify tfm directly we can move this check to
+>> bpf_crypto_ctx_create() to key setup part and avoid indirect call in 
+>> this place.
+>>>
+>>>> +        return -EINVAL;
+>>>> +
+>>>> +    if (__bpf_dynptr_is_rdonly(dst))
+>>>> +        return -EINVAL;
+>>>> +
+>>>> +    siv_len = __bpf_dynptr_size(siv);
+>>>> +    src_len = __bpf_dynptr_size(src);
+>>>> +    dst_len = __bpf_dynptr_size(dst);
+>>>> +    if (!src_len || !dst_len)
+>>>> +        return -EINVAL;
+>>>> +
+>>>> +    if (siv_len != (ctx->type->ivsize(ctx->tfm) + 
+>>>> ctx->type->statesize(ctx->tfm)))
+>>>
+>>> Same here, two indirect calls per en/decrypt kfunc call. Does the 
+>>> return value change?
+>>
+>> I have to check the size of IV provided by the caller, and then to avoid
+>> indirect calls I have to store these values somewhere in ctx. It gives a
+>> direct access to these values to bpf programs, which can potentially
+>> abuse them. Not sure if it's good to open such opportunity.
 > 
-> In addition to citied commit in Fixes line, allow UDP encapsulation in
-> TX path too.
-> 
-> Fixes: 89edf40220be ("xfrm: Support UDP encapsulation in packet offload mode")
-> CC: Steffen Klassert <steffen.klassert@secunet.com> 
-> Reported-by: Mike Yu <yumike@google.com>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+> I don't think it makes any difference considering tfm has already been 
+> accessible in ctx->tfm.
 
-Applied, thanks everyone!
+Fair. I'll do it then.
+
+> A noob question, what secret is in the siv len?
+
+No secrets in the values themself. The problem I see is that user (bpf
+program) can adjust them to avoid proper validation and then pass
+smaller buffer and trigger read/write out-of-bounds.
+
+> btw, unrelated, based on the selftest in patch 3, is it supporting any 
+> siv_len > 0 for now?
+
+Well, it should. I see no reasons not to support it. But to test it
+properly another cipher should be used. I'll think about extending tests
+
+> 
+>>
+>>>
+>>>> +        return -EINVAL;
+>>>> +
+>>>> +    psrc = __bpf_dynptr_data(src, src_len);
+>>>> +    if (!psrc)
+>>>> +        return -EINVAL;
+>>>> +    pdst = __bpf_dynptr_data_rw(dst, dst_len);
+>>>> +    if (!pdst)
+>>>> +        return -EINVAL;
+>>>> +
+>>>> +    piv = siv_len ? __bpf_dynptr_data_rw(siv, siv_len) : NULL;
+>>>> +    if (siv_len && !piv)
+>>>> +        return -EINVAL;
+>>>> +
+>>>> +    err = decrypt ? ctx->type->decrypt(ctx->tfm, psrc, pdst, 
+>>>> src_len, piv)
+>>>> +              : ctx->type->encrypt(ctx->tfm, psrc, pdst, src_len, 
+>>>> piv);
+>>>> +
+>>>> +    return err;
+>>>> +}
+>>>
+>>
+> 
+
 
