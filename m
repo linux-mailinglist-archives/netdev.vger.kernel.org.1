@@ -1,133 +1,99 @@
-Return-Path: <netdev+bounces-66209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60A9783DFEF
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 18:23:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95AA383DFF7
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 18:25:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0288BB20D0D
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 17:23:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8C6D1C23E9F
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 17:25:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B6DB1EB55;
-	Fri, 26 Jan 2024 17:23:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACF512030F;
+	Fri, 26 Jan 2024 17:24:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DGN2MhwY"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LlDhnZRv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46F8720309;
-	Fri, 26 Jan 2024 17:23:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815AA1F5FD
+	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 17:24:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706289829; cv=none; b=Co5zhZ5ORxPgU0BIX6jZs5Af9UbA2EwAA0a5FuZFXtS4uETP2Q5k6CsEB+zz0GiHigUoRhwKfoA6UV8Lw/stqIu4eMnod+xZl5b9O6Qc0XFRGeEllT7oq61Uzm0Lainzl062xhKOx3j0uPDSyqsvZ6Pn0+H6Cse/w76i3RYfA7M=
+	t=1706289899; cv=none; b=aThqZsrRfQKqC8BU/ocFJovNFPxhma6aQTzkREDOWrTRYBbdCMPNkEeMlo5suoiq3U/IcFZEj8xiXuxUoMQNS3qXyWSYmM++OiHbK4AjZ+iUqu5yqyv6NkrOh1DRrgIOwy18/sajfbSIv+95XgSU38QbcZaSGnMzG2UL8IxhDro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706289829; c=relaxed/simple;
-	bh=tSMX1Ae/bCy8FGpCcBWLPQYfg2LBDt1gaBUpHaOLi0k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GoWVy8kDl7CDf+nGNVTX1nENFY6pMCJxanId3sg9MkTl7VlC1N0/8omrITeqn4pDE1wfMjDdnYgdJUd8oSMUHeF8YmpFmUVo4fmWkvWiOcxqeegaCzlqBo4hqgb5qv+00WK6gq0dHshrmDungGDNRn4xslW+f9iHbo+SsADGiQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DGN2MhwY; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706289828; x=1737825828;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=tSMX1Ae/bCy8FGpCcBWLPQYfg2LBDt1gaBUpHaOLi0k=;
-  b=DGN2MhwY1qzdGQQuouBLgsHjbAKjNxJZVCkyR7K+a56/QEpmlAHljgcy
-   8TmhZ/wyano9KvxRn+onRjs3F5ZktguIiFrTVzJvZsmlmUa31YYKuSU6S
-   j+xiEjYRYIbPWqV28jBH6n8JM/mLhzqbje77Qtb87Rp6y8RrM2vOe783X
-   CXm8SHD6/3xym+wv1qh5mzUh8PYZf6BI59nB3pDFF48UZ2vI4u8QxwqTY
-   KwVyEmwVmxBOB7FNbuKN6UbLyyj2fkTliZef6pxF8xmThPQRzG7+JBCn8
-   7G7V+/HURLZvsQNW/HD2s2IX/4R5z+dcM+6nU2Jd40yjtPxjLntATwHsz
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="9900855"
-X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="9900855"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 09:23:47 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="960260973"
-X-IronPort-AV: E=Sophos;i="6.05,216,1701158400"; 
-   d="scan'208";a="960260973"
-Received: from turnipsi.fi.intel.com (HELO kekkonen.fi.intel.com) ([10.237.72.44])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2024 09:23:39 -0800
-Received: from kekkonen.localdomain (localhost [127.0.0.1])
-	by kekkonen.fi.intel.com (Postfix) with SMTP id BC8AF11FBD1;
-	Fri, 26 Jan 2024 19:23:36 +0200 (EET)
-Date: Fri, 26 Jan 2024 17:23:36 +0000
-From: Sakari Ailus <sakari.ailus@linux.intel.com>
-To: Alex Elder <elder@ieee.org>
-Cc: linux-pm@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	laurent.pinchart@ideasonboard.com,
-	Jacek Lawrynowicz <jacek.lawrynowicz@linux.intel.com>,
-	Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-	David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>,
-	Lucas De Marchi <lucas.demarchi@intel.com>,
-	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
-	Paul Elder <paul.elder@ideasonboard.com>,
-	Alex Elder <elder@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	Mark Brown <broonie@kernel.org>, dri-devel@lists.freedesktop.org,
-	intel-gfx@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
-	linux-media@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-sound@vger.kernel.org
-Subject: Re: [PATCH v3 1/2] pm: runtime: Simplify pm_runtime_get_if_active()
- usage
-Message-ID: <ZbPqmA4GkunkJqb0@kekkonen.localdomain>
-References: <20240122114121.56752-1-sakari.ailus@linux.intel.com>
- <20240122114121.56752-2-sakari.ailus@linux.intel.com>
- <912d4439-86cd-4060-a66d-baba5fa2bdec@ieee.org>
+	s=arc-20240116; t=1706289899; c=relaxed/simple;
+	bh=CaUCcoIae3ZPre9f2gHK4/kaL8gJqS2UbT/T4e+eSNA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YigSxMATA5MpgaWd3HGbln79l6CCKu0Wjy/n/LB1L8Bms60nLdeO2ZrNnnT6bV6CtDH2v0DmAUf4IiKoXdQhQpfftoUvKyPvtjx9Ra+km8Te7/b4LGsuYi5SRRUZu4nSUmy0uOmd+hpjh5dsgjpaF8LULUwgCL/lJVbvMobCOMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=LlDhnZRv; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-40eb033c1b0so10016925e9.2
+        for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 09:24:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1706289896; x=1706894696; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=CaUCcoIae3ZPre9f2gHK4/kaL8gJqS2UbT/T4e+eSNA=;
+        b=LlDhnZRv1bieVh9ZqKzuEnSxbN82CMzZrT43ufc+WsKnmUhvfFdPwZ/BSUXP4jOWRQ
+         296PEcNdXptdKOuO3Wq5m/FE2PG6dWvW9OWKcnn10BdcDBFNhAqFLtUoWHLaheG6QEVb
+         1Q5ExtYFiaS0cI5o4nYDWkV90CRd/T4PmjjbuJAX7X7b8SzCNf/OCFvisopSpkNcvYsx
+         JtdTMjNsqQxDVue+BmmqnKfOkfKThZOEKh2/VneedWaB4D0xb9P9rFDiIfRfCeaq005G
+         LEQXWlmyCy3I73yOuXicpIE1MIap45LkniBDrlI8I5KP7S3yz1QU/jlaRxjrRHZQrBIw
+         LZBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706289896; x=1706894696;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CaUCcoIae3ZPre9f2gHK4/kaL8gJqS2UbT/T4e+eSNA=;
+        b=V7ZDxSW+2VqZGC4ROdI3sxSqB1mXjTUFib+Oy5vvuk9v5O2ceJbmGcDlgtCSpXJi4C
+         tZZkewhS/+Lvj3gqrl9s/hh9j6yeESMq2JkqsjZTephOxzGmhrfLgmLSWKBJOe58gnd2
+         6RJob/JZDYt0GU5TQYS2t68zE2x7XkJn3XmUMAMpM3OlHqP3eA3CQzNQV/ftcRkijhCt
+         40SizjNEHx1YJf4G8fM5Gxc21PgGLYlvbO6Lp+pLUX3nGBEqkmOnO7uhaj2yQ6CcOYY9
+         IVjpeJmuKTHvyTGZhaJrvmDNIBqv/oKRoUN0Gsl1mv7hMCaDvwQpNhtkWVCEP/YEDj83
+         v96Q==
+X-Gm-Message-State: AOJu0YzbWazgZ2N8PC/tVpCukdePVvz3B8bDFFaWTwTf/I5xFGtA1TL4
+	QAsBg/6vsUABwjmph/0l3SAfbOr0YWX66CMXdfgQo8/ui5BeevV7WRpSypMKoIUdDkEc5miouYp
+	it+B+Zbs0ORXqYnj+X5eDWtxnGptne6j5QOY2doH1BWy1nnnf9Bg=
+X-Google-Smtp-Source: AGHT+IE//xJ776tfB0WqJHvKAhOsmhLKqp6g4ekELnrxzpz/eAcMLPXZZ3Ihfz23L3awpNlhL7nMT3LM1Sxf7IRvmac=
+X-Received: by 2002:a05:600c:1e28:b0:40e:863c:b647 with SMTP id
+ ay40-20020a05600c1e2800b0040e863cb647mr81847wmb.145.1706289895786; Fri, 26
+ Jan 2024 09:24:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <912d4439-86cd-4060-a66d-baba5fa2bdec@ieee.org>
+References: <20240124170010.19445-1-songjinjian@hotmail.com> <MEYP282MB2697FB6601DC1A323ADBC036BB7B2@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
+In-Reply-To: <MEYP282MB2697FB6601DC1A323ADBC036BB7B2@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
+From: Loic Poulain <loic.poulain@linaro.org>
+Date: Fri, 26 Jan 2024 18:24:19 +0100
+Message-ID: <CAMZdPi_2twk+AC3QrwK78Buw3Z592JOx0B+ewU5UbR3pG-GjEQ@mail.gmail.com>
+Subject: Re: [net-next v6 1/4] wwan: core: Add WWAN fastboot port type
+To: Jinjian Song <songjinjian@hotmail.com>
+Cc: netdev@vger.kernel.org, chandrashekar.devegowda@intel.com, 
+	chiranjeevi.rapolu@linux.intel.com, haijun.liu@mediatek.com, 
+	m.chetan.kumar@linux.intel.com, ricardo.martinez@linux.intel.com, 
+	ryazanov.s.a@gmail.com, johannes@sipsolutions.net, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	linux-kernel@vger.kernel.com, vsankar@lenovo.com, danielwinkler@google.com, 
+	nmarupaka@google.com, joey.zhao@fibocom.com, liuqf@fibocom.com, 
+	felix.yan@fibocom.com, Jinjian Song <jinjian.song@fibocom.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Alex,
+On Wed, 24 Jan 2024 at 18:00, Jinjian Song <songjinjian@hotmail.com> wrote:
+>
+> From: Jinjian Song <jinjian.song@fibocom.com>
+>
+> Add a new WWAN port that connects to the device fastboot protocol
+> interface.
+>
+> Signed-off-by: Jinjian Song <jinjian.song@fibocom.com>
 
-On Fri, Jan 26, 2024 at 09:12:02AM -0600, Alex Elder wrote:
-> On 1/22/24 5:41 AM, Sakari Ailus wrote:
-> > There are two ways to opportunistically increment a device's runtime PM
-> > usage count, calling either pm_runtime_get_if_active() or
-> > pm_runtime_get_if_in_use(). The former has an argument to tell whether to
-> > ignore the usage count or not, and the latter simply calls the former with
-> > ign_usage_count set to false. The other users that want to ignore the
-> > usage_count will have to explitly set that argument to true which is a bit
-> > cumbersome.
-> > 
-> > To make this function more practical to use, remove the ign_usage_count
-> > argument from the function. The main implementation is renamed as
-> > pm_runtime_get_conditional().
-> > 
-> > Signed-off-by: Sakari Ailus <sakari.ailus@linux.intel.com>
-> > Reviewed-by: Alex Elder <elder@linaro.org> # drivers/net/ipa/ipa_smp2p.c
-> 
-> I actually intended my "Reviewed-by" to cover the entire patch.  I
-> checked every caller and they all looked good to me.
-
-Thanks, I'll drop the file name. AFAIR it was just below that file, so I
-added it, but I could be wrong, too.
-
-v5 will also squash the 2nd patch of v4 into this one
-<URL:https://lore.kernel.org/linux-pm/ZbBAWROxRKE8Y8VU@kekkonen.localdomain/T/#m76d34e679e12d8536a20eb29af6e826e2a85a24b>,
-I hope that's fine.
-
--- 
-Kind regards,
-
-Sakari Ailus
+Reviewed-by: Loic Poulain <loic.poulain@linaro.org>
 
