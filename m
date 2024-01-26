@@ -1,96 +1,79 @@
-Return-Path: <netdev+bounces-66062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C69EE83D1FA
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 02:20:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45C8E83D1FF
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 02:23:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 353DDB260B2
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 01:20:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 77C1E1C21790
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 01:23:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B65A0EC3;
-	Fri, 26 Jan 2024 01:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C638764C;
+	Fri, 26 Jan 2024 01:22:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r64hxKWq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QbX2GfKh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 932C94430
-	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 01:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DBD710E9;
+	Fri, 26 Jan 2024 01:22:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706232027; cv=none; b=jPSdYPs2mfQQqJ1KMqeBm1N26ClOoDbft3u80IZTWjO7iz1DFsp9i51IPp77LOLeEq1IdAfuHVVf582QFjNnv6lktpUlrvEDGxTaBa8QuPGqnc7FmK/+OZKgABcT+qxCl2s/+d31KMUkI5I/5GeUEfV/dGgjLiJ8tqk8pHpPxcU=
+	t=1706232175; cv=none; b=oZ4ko+f8TSRk3fkHzZ9fiZ4Lqin18mOe6Ip0ASLfHsqTb6mtzGvex1vdsDm69v+WOtR8U+V4pvjja6YKggBiqtq2GVTsZXZ/vPz0dnfLR+OQyAxplCD6IRjS8nkmMn1la+XI5qpKA6TiHOWtvWqPoWsgoKc4k5CakR2BdzQp75E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706232027; c=relaxed/simple;
-	bh=TsNfnW+nCkKOSG/MWTFa/UaZcAj73mhR/ME8Pw0lERY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=tugIrEBPgNwawak9QO9JwuD2Z8asYjZTLN3cwxgnc8r/5IT0k69JydqwtRxdlKekugheI2YLZdbsDPbWCJyEktV1GcigHK4xM+FsLj7ufIMkt7VXd0MCq92ple5eb4odV+oH/bNbm+0HBMDBmv7oBAaF7ql8UKvFRRBvNO9bL0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r64hxKWq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1B545C433A6;
-	Fri, 26 Jan 2024 01:20:27 +0000 (UTC)
+	s=arc-20240116; t=1706232175; c=relaxed/simple;
+	bh=Hk9/gpwL/FH2xmnit/2UJvfVqasuwOB//G3xIDeSRXY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PVoQmIGTHsm3tJcBnrVgYPpQCXIRktMxIGRIsgxonkwP4gmhp9OjUQNEboJdLNSffxpFMs5Hg+yWFEgG9CUXtoxAfyQoP9HfzDjV2HiRplSdhWmZ79qBMxGsAqFLNpjqpX1fPFhm18PKjeJ+Lc22BmKke98yv7cysKUB2REOD8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QbX2GfKh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3997C433C7;
+	Fri, 26 Jan 2024 01:22:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706232027;
-	bh=TsNfnW+nCkKOSG/MWTFa/UaZcAj73mhR/ME8Pw0lERY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=r64hxKWqEkIiFd4//Y43ya0hERmSy3PVDW9iPStUvf7RKadmGVFKHkliF2qLqFjHk
-	 Qz0DCAZB3pId99Mu9vUvNheGD5GXZtrp9Uk0vPV9XG7TNTYyP67uM2zAnrGhX9e414
-	 C9+0wWOQzxjbvgseYXX4x9r8x7F22jVmZHq70dogNbbS5HYrR5VbfF/ppmtfOY30EH
-	 2NRbk57e5kgvApwcSaN9rtIXERAI9Un8myQHDuGQlvK68sj/llG2g/QKykfkE4ZY/4
-	 q6v11o7MowJ17GKXEZXvAuM0SZ78y17ppLY2Zo6mtxi8xmryj6XJB8PmKkRWQHxHHz
-	 kauGYJjsfhLrw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 06DBBDFF767;
-	Fri, 26 Jan 2024 01:20:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1706232175;
+	bh=Hk9/gpwL/FH2xmnit/2UJvfVqasuwOB//G3xIDeSRXY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QbX2GfKhc5hZC6h46CHXmhCNSbMB8gJ/J4nLe6qNyA1qja9Bx/1+7GMkkTu7Vrkqo
+	 2B1vx1tOGSpm3V8/KYFG+mBy621FwOkM5v5A6zENUMsqvkzEJLgMfZ/HNq664U8tkP
+	 Nr4prtIK2SqWcBWyaxLsUhZlvjwcVKkki/Q4vBkuCUsOgMMy4HqX5xPpxEECJly+aA
+	 D3N2ZmkRivt4zCmOGAHEVuKM27BJGqiVonKPbSuqcpcf3eztESC17H/FzAlpdGT4wL
+	 8qEN1M9Os2zV8uf7+5rAddkolgppNsYnFmpbp2TJIesGiMlXOl4MCg/9td0zCyC+UL
+	 ZL8+JdfmnpD4g==
+Date: Thu, 25 Jan 2024 17:22:53 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Esben Haabendal <esben@geanix.com>
+Cc: netdev@vger.kernel.org, Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, Shawn Guo <shawnguo@kernel.org>,
+ Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix Kernel Team
+ <kernel@pengutronix.de>, Fabio Estevam <festevam@gmail.com>, NXP Linux Team
+ <linux-imx@nxp.com>, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] net: stmmac: dwmac-imx: set TSO/TBS TX queues
+ default settings
+Message-ID: <20240125172253.3fe50cfc@kernel.org>
+In-Reply-To: <5606bb5f0b7566a20bb136b268dae89d22a48898.1706184304.git.esben@geanix.com>
+References: <cover.1706184304.git.esben@geanix.com>
+	<5606bb5f0b7566a20bb136b268dae89d22a48898.1706184304.git.esben@geanix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/3] selftests: Updates to fcnal-test for autoamted
- environment
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170623202702.2360.14065316965878551084.git-patchwork-notify@kernel.org>
-Date: Fri, 26 Jan 2024 01:20:27 +0000
-References: <20240124214117.24687-1-dsahern@kernel.org>
-In-Reply-To: <20240124214117.24687-1-dsahern@kernel.org>
-To: David Ahern <dsahern@kernel.org>
-Cc: netdev@vger.kernel.org, kuba@kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Thu, 25 Jan 2024 13:34:34 +0100 Esben Haabendal wrote:
+> +        for (int i = 0; i < plat_dat->tx_queues_to_use; i++) {
+> +                /* Default TX Q0 to use TSO and rest TXQ for TBS */
+> +                if (i > 0)
+> +                        plat_dat->tx_queues_cfg[i].tbs_en = 1;
+> +        }
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 24 Jan 2024 14:41:14 -0700 you wrote:
-> The first patch updates the PATH for fcnal-test.sh to find the nettest
-> binary when invoked at the top-level directory via
->    make -C tools/testing/selftests TARGETS=net run_tests
-> 
-> Second patch fixes a bug setting the ping_group; it has a compound value
-> and that value is not traversing the various helper functions in tact.
-> Fix by creating a helper specific to setting it.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,1/3] selftest: Update PATH for nettest in fcnal-test
-    https://git.kernel.org/netdev/net-next/c/ad9b701aed48
-  - [net-next,2/3] selftest: Fix set of ping_group_range in fcnal-test
-    https://git.kernel.org/netdev/net-next/c/79bf0d4a07d4
-  - [net-next,3/3] selftest: Show expected and actual return codes for test failures in fcnal-test
-    https://git.kernel.org/netdev/net-next/c/70863c902d76
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+checkpatch points out this code is indented with spaces.
+Please use tabs.
 
