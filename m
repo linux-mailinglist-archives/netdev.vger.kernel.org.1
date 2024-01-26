@@ -1,215 +1,110 @@
-Return-Path: <netdev+bounces-66118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66119-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAE1383D518
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 09:58:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9481883D519
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 09:58:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2FC9F1F21A95
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 08:58:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 43F4A1F220A7
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 08:58:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82CBE45965;
-	Fri, 26 Jan 2024 07:27:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Fw4e8BGc";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="8mBylZ2M";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Fw4e8BGc";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="8mBylZ2M"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE63345C1F;
+	Fri, 26 Jan 2024 07:27:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D68A52A1B0;
-	Fri, 26 Jan 2024 07:27:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D492111A2;
+	Fri, 26 Jan 2024 07:27:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=206.189.21.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706254061; cv=none; b=iqsO1XLANmnIjmewAeQaaKvAYKiTSUq2TkTrgeRHkagFnQ9DkuTIK+HnwVD2sFeTLuHdyfpIslgamJwLxCVU9zy5L+Eiv0zHRDWv1H8f8+TRtiKU1mlfseYAy0se5GUYhnT+A8cJWpnltqwOCW1dHqSBeGSvGaijfFDLZzImNtM=
+	t=1706254079; cv=none; b=DxpBjua+mgiTaGdSLubcczDOGD+CJVhDfjxR6bqvNc1D4omJzd1R5ESlvS6Yse8XCR3AvXSrqoFdkCjUqRD0degjSPP0cOHBB2fNqjwtweJOo6MS1gMuZczNmA/paz93KDNQwwI4CoSdvvU/I0cQMom0EddSnNnIWJCO4Gr823k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706254061; c=relaxed/simple;
-	bh=GINjbe2szq535SXFdiGwXNCMoePT2lkGqtDutSceO/Y=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
-	 References:Date:Message-id; b=pyAG+aK5TjFmYrgj+OwGVOrks4IoT0oSDFsKe53MVv1ZPrf5hw39YgDHRjygPv2h5vYGNViw4aw6xVajFsPnxt1FkuNrlBzpnmB55Pz0a6P4zdSxRhkePS18idZ98NFa6NP9z20niof1q9LvgBokaJRw1pLgSfMwINlFK0dFdqM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Fw4e8BGc; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=8mBylZ2M; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Fw4e8BGc; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=8mBylZ2M; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 7A66B1FB65;
-	Fri, 26 Jan 2024 07:27:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1706254056; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=z/2ZWD0aX6DVLsqYxQrCHNgwHrQVXAkUwctAhMPow9I=;
-	b=Fw4e8BGcWSZd8D6WB8hvPrizDOjApux9P1uDEkD/VwBar6DeCCwzCglGbRQARq4c9LcmIk
-	Kk/1zdRnaW54DRqWRIaabLby0kepHsmWBV9UyPJhDVtPq/bbE4RGCKaN0iK68iToh2R+EH
-	ATDnHTTOJ12Bw+EMmMvEDx1fiIjM4ro=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1706254056;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=z/2ZWD0aX6DVLsqYxQrCHNgwHrQVXAkUwctAhMPow9I=;
-	b=8mBylZ2M2Ew22jXrdXxN10nZuuPNQwJhEncNYQyJgv2cGpo3XwdREcYw5Nej+9AK+LqVQx
-	flC0mL2LKNPkZICA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1706254056; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=z/2ZWD0aX6DVLsqYxQrCHNgwHrQVXAkUwctAhMPow9I=;
-	b=Fw4e8BGcWSZd8D6WB8hvPrizDOjApux9P1uDEkD/VwBar6DeCCwzCglGbRQARq4c9LcmIk
-	Kk/1zdRnaW54DRqWRIaabLby0kepHsmWBV9UyPJhDVtPq/bbE4RGCKaN0iK68iToh2R+EH
-	ATDnHTTOJ12Bw+EMmMvEDx1fiIjM4ro=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1706254056;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=z/2ZWD0aX6DVLsqYxQrCHNgwHrQVXAkUwctAhMPow9I=;
-	b=8mBylZ2M2Ew22jXrdXxN10nZuuPNQwJhEncNYQyJgv2cGpo3XwdREcYw5Nej+9AK+LqVQx
-	flC0mL2LKNPkZICA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E3B6A134C3;
-	Fri, 26 Jan 2024 07:27:33 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([10.150.64.162])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id NQi8JuVes2WrZQAAD6G6ig
-	(envelope-from <neilb@suse.de>); Fri, 26 Jan 2024 07:27:33 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1706254079; c=relaxed/simple;
+	bh=5QnklExlc4DdUFMJs23OBWqLW5U2p8WOgQXGSW6e8qQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
+	 MIME-Version:Message-ID; b=SRPoV/ZJN+K62sSXR7inKULSJz0tB6Se3rmHzd8oSAcycHzZs8Dlkrs07kZ/cCAMyY8Qe9dWFChkmatUaTumrWT0xyQIJKjkwTIzlFoWaAPzShOIFGVTaXddD0bKw7cj6olFgyCqXuL3rIIPhkfrdj9fjrhy82LfvGS/MhV+69g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=206.189.21.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from alexious$zju.edu.cn ( [124.90.105.91] ) by
+ ajax-webmail-mail-app4 (Coremail) ; Fri, 26 Jan 2024 15:27:35 +0800
+ (GMT+08:00)
+Date: Fri, 26 Jan 2024 15:27:35 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: alexious@zju.edu.cn
+To: "Simon Horman" <horms@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	"Eric Dumazet" <edumazet@google.com>,
+	"Jakub Kicinski" <kuba@kernel.org>,
+	"Paolo Abeni" <pabeni@redhat.com>,
+	"Taku Izumi" <izumi.taku@jp.fujitsu.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: Re: [PATCH] fjes: fix memleaks in fjes_hw_setup
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2023.4-cmXT5 build
+ 20231205(37e20f0e) Copyright (c) 2002-2024 www.mailtech.cn
+ mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
+In-Reply-To: <20240122210538.GJ126470@kernel.org>
+References: <20240122172445.3841883-1-alexious@zju.edu.cn>
+ <20240122210538.GJ126470@kernel.org>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "NeilBrown" <neilb@suse.de>
-To: "Chuck Lever III" <chuck.lever@oracle.com>
-Cc: "Jeff Layton" <jlayton@kernel.org>,
- "Lorenzo Bianconi" <lorenzo@kernel.org>,
- "Linux NFS Mailing List" <linux-nfs@vger.kernel.org>,
- "Lorenzo Bianconi" <lorenzo.bianconi@redhat.com>,
- "Jakub Kicinski" <kuba@kernel.org>, "Simon Horman" <horms@kernel.org>,
- "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Subject: Re: [PATCH v6 3/3] NFSD: add write_ports to netlink command
-In-reply-to: <DAB30AAE-41F5-4FC5-AA14-E7E06BB389B5@oracle.com>
-References: <cover.1705771400.git.lorenzo@kernel.org>,
- <f7c42dae2b232b3b06e54ceb3f00725893973e02.1705771400.git.lorenzo@kernel.org>,
- <9e3ae337dcf168c60c4cfd51aa0b2fc7b24bcbfb.camel@kernel.org>,
- <170595930799.23031.17998490973211605470@noble.neil.brown.name>,
- <Za7zHvPJdei/vWm4@tissot.1015granger.net>, <Za-N6BxOMXTGyxmW@lore-desk>,
- <85b02061798a1b750a87b0302681b86651d0c7a3.camel@kernel.org>,
- <Za-9P0NjlIsc1PcE@lore-desk>,
- <3f035d3bc494ec03b83ae237e407c42f2ddc4c53.camel@kernel.org>,
- <ZbDdzwvP6-O2zosC@lore-desk>,
- <8fabd83caa0d44369853a4040a89c069f9b0f935.camel@kernel.org>,
- <917EC07C-C9D9-4CF2-9ACB-DCA2676DFF67@oracle.com>,
- <170622264103.21664.16941742935452333478@noble.neil.brown.name>,
- <DAB30AAE-41F5-4FC5-AA14-E7E06BB389B5@oracle.com>
-Date: Fri, 26 Jan 2024 18:27:27 +1100
-Message-id: <170625404709.21664.1810481700674698939@noble.neil.brown.name>
-X-Spam-Level: 
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=Fw4e8BGc;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=8mBylZ2M
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-9.51 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	 FROM_HAS_DN(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 MIME_GOOD(-0.10)[text/plain];
-	 DWL_DNSWL_HI(-3.50)[suse.de:dkim];
-	 RCVD_DKIM_ARC_DNSWL_HI(-1.00)[];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 DKIM_TRACE(0.00)[suse.de:+];
-	 MX_GOOD(-0.01)[];
-	 RCPT_COUNT_SEVEN(0.00)[8];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:email];
-	 TO_DN_ALL(0.00)[];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 NEURAL_HAM_SHORT(-0.20)[-1.000];
-	 RCVD_IN_DNSWL_HI(-0.50)[2a07:de40:b281:104:10:150:64:97:from];
-	 RCVD_TLS_ALL(0.00)[];
-	 BAYES_HAM(-3.00)[100.00%]
-X-Spam-Score: -9.51
-X-Rspamd-Queue-Id: 7A66B1FB65
-X-Spam-Flag: NO
+Message-ID: <9c63817.dd25.18d44aab80c.Coremail.alexious@zju.edu.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:cS_KCgB3k4LoXrNlOyemAA--.13255W
+X-CM-SenderInfo: qrsrjiarszq6lmxovvfxof0/1tbiAg0MAGWyq+MR-wAAsy
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
 
-On Fri, 26 Jan 2024, Chuck Lever III wrote:
->=20
->=20
-> > On Jan 25, 2024, at 5:44=E2=80=AFPM, NeilBrown <neilb@suse.de> wrote:
-> >=20
-> > On Thu, 25 Jan 2024, Chuck Lever III wrote:
-> >>=20
-> >>=20
-> >>> On Jan 24, 2024, at 6:24=E2=80=AFAM, Jeff Layton <jlayton@kernel.org> w=
-rote:
-> >>>=20
-> >>> On Wed, 2024-01-24 at 10:52 +0100, Lorenzo Bianconi wrote:
-> >>>> [...]
-> >>>>>=20
-> >>>>> That's a great question. We do need to properly support the -H option=
- to
-> >>>>> rpc.nfsd. What we do today is look up the hostname or address using
-> >>>>> getaddrinfo, and then open a listening socket for that address and th=
-en
-> >>>>> pass that fd down to the kernel, which I think then takes the socket =
-and
-> >>>>> sticks it on sv_permsocks.
-> >>>>>=20
-> >>>>> All of that seems a bit klunky. Ideally, I'd say the best thing would=
- be
-> >>>>> to allow userland to pass the sockaddr we look up directly via netlin=
-k,
-> >>>>> and then let the kernel open the socket. That will probably mean
-> >>>>> refactoring some of the svc_xprt_create machinery to take a sockaddr,
-> >>>>> but I don't think it looks too hard to do.
-> >>>>=20
-> >>>> Do we already have a specific use case for it? I think we can even add=
- it
-> >>>> later when we have a defined use case for it on top of the current ser=
-ies.
-> >>>>=20
-> >>>=20
-> >>> Yes:
-> >>>=20
-> >>> rpc.nfsd -H makes nfsd listen on a particular address and port. By
-> >>> passing down the sockaddr instead of an already-opened socket
-> >>> descriptor, we can achieve the goal without having to open sockets in
-> >>> userland.
-> >>=20
-> >> Tearing down a listener that was created that way would be a
-> >> use case for:
-> >=20
-> > Only if it was actually useful.
-> > Have you *ever* wanted to do that?  Or heard from anyone else who did?
->=20
-> Container shutdown will want to clear out any listener
-> that might have been created during the container's
-> lifetime. How is that done today? Is that simply handled
-> by net namespace tear-down?
-
-Yes.  When the last thread in a netns exits, nfsd_last_thread() is
-called which closes all sockets.
-
-NeilBrown
+PiBPbiBUdWUsIEphbiAyMywgMjAyNCBhdCAwMToyNDo0MkFNICswODAwLCBaaGlwZW5nIEx1IHdy
+b3RlOgo+ID4gSW4gZmplc19od19zZXR1cCwgaXQgYWxsb2NhdGVzIHNldmVyYWwgbWVtb3J5IGFu
+ZCBkZWxheSB0aGUgZGVhbGxvY2F0aW9uCj4gPiB0byB0aGUgZmplc19od19leGl0IGluIGZqZXNf
+cHJvYmUgdGhyb3VnaCB0aGUgZm9sbG93aW5nIGNhbGwgY2hhaW46Cj4gPiAKPiA+IGZqZXNfcHJv
+YmUKPiA+ICAgfC0+IGZqZXNfaHdfaW5pdAo+ID4gICAgICAgICB8LT4gZmplc19od19zZXR1cAo+
+ID4gICB8LT4gZmplc19od19leGl0Cj4gPiAKPiA+IEhvd2V2ZXIsIHdoZW4gZmplc19od19zZXR1
+cCBmYWlscywgZmplc19od19leGl0IHdvbid0IGJlIGNhbGxlZCBhbmQgdGh1cwo+ID4gYWxsIHRo
+ZSByZXNvdXJjZXMgYWxsb2NhdGVkIGluIGZqZXNfaHdfc2V0dXAgd2lsbCBiZSBsZWFrZWQuIElu
+IHRoaXMKPiA+IHBhdGNoLCB3ZSBmcmVlIHRob3NlIHJlc291cmNlcyBpbiBmamVzX2h3X3NldHVw
+IGFuZCBwcmV2ZW50cyBzdWNoIGxlYWtzLgo+ID4gCj4gPiBGaXhlczogMmZjYmNhNjg3NzAyICgi
+ZmplczogcGxhdGZvcm1fZHJpdmVyJ3MgLnByb2JlIGFuZCAucmVtb3ZlIHJvdXRpbmUiKQo+ID4g
+U2lnbmVkLW9mZi1ieTogWmhpcGVuZyBMdSA8YWxleGlvdXNAemp1LmVkdS5jbj4KPiAKPiBIaSBa
+aGlwZW5nIEx1LAo+IAo+IEl0IGxvb2tzIGxpa2UgdGhlIGxhc3Qgbm9uLXRyaXZpYWwgY2hhbmdl
+IHRvIHRoaXMgZHJpdmVyIHdhcyBpbiAyMDE2Lgo+IFNvIHBlcmhhcHMgaXQgaXMgYmV0dGVyIHRv
+IGxlYXZlIGl0IGJlLgo+IAo+IEJ1dCBpZiBub3QsIHRoaXMgcGF0Y2ggZG9lcyBsb29rIGNvcnJl
+Y3QgdG8gbWUuCj4gCj4gUmV2aWV3ZWQtYnk6IFNpbW9uIEhvcm1hbiA8aG9ybXNAa2VybmVsLm9y
+Zz4KCkkgdGhpbmsgdGhpcyBwYXRjaCBkb2Vzbid0IGNoYW5nZSBhIGxvdCBzaW5jZSBpdCBqdXN0
+IHJlZmFjdG9yIHRoZSBkZWFsbG9jYXRpb24Kd2F5cyBpbnRvIHVud2luZCBsYWRkZXJzIHdoaWxl
+IGZpeCBhIG1lbWxlYWsuCgo+IAo+IC4uLgo+IAo+ID4gQEAgLTI3Myw2ICsyNzcsMjUgQEAgc3Rh
+dGljIGludCBmamVzX2h3X3NldHVwKHN0cnVjdCBmamVzX2h3ICpodykKPiA+ICAJZmplc19od19p
+bml0X2NvbW1hbmRfcmVnaXN0ZXJzKGh3LCAmcGFyYW0pOwo+ID4gIAo+ID4gIAlyZXR1cm4gMDsK
+PiA+ICsKPiA+ICtmcmVlX2VwYnVmOgo+ID4gKwlmb3IgKGVwaWR4ID0gMDsgZXBpZHggPCBody0+
+bWF4X2VwaWQgOyBlcGlkeCsrKSB7Cj4gPiArCQlpZiAoZXBpZHggPT0gaHctPm15X2VwaWQpCj4g
+PiArCQkJY29udGludWU7Cj4gPiArCQlmamVzX2h3X2ZyZWVfZXBidWYoJmh3LT5lcF9zaG1faW5m
+b1tlcGlkeF0udHgpOwo+ID4gKwkJZmplc19od19mcmVlX2VwYnVmKCZody0+ZXBfc2htX2luZm9b
+ZXBpZHhdLnJ4KTsKPiA+ICsJfQo+ID4gKwlmamVzX2h3X2ZyZWVfc2hhcmVkX3N0YXR1c19yZWdp
+b24oaHcpOwo+ID4gK2ZyZWVfcmVzX2J1ZjoKPiA+ICsJa2ZyZWUoaHctPmh3X2luZm8ucmVzX2J1
+Zik7Cj4gPiArCWh3LT5od19pbmZvLnJlc19idWYgPSBOVUxMOwo+ID4gK2ZyZWVfcmVxX2J1ZjoK
+PiA+ICsJa2ZyZWUoaHctPmh3X2luZm8ucmVxX2J1Zik7Cj4gPiArCWh3LT5od19pbmZvLnJlcV9i
+dWYgPSBOVUxMOwo+ID4gK2ZyZWVfZXBfaW5mbzoKPiA+ICsJa2ZyZWUoaHctPmVwX3NobV9pbmZv
+KTsKPiA+ICsJaHctPmVwX3NobV9pbmZvID0gTlVMTDsKPiA+ICsJcmV0dXJuIHJlc3VsdDsKPiAK
+PiBGV0lJVywgSSdtIG5vdCBzdXJlIGl0IGlzIG5lY2Vzc2FyeSB0byBzZXQgdGhlc2UgcG9pbnRl
+cnMgTlVMTCwKPiBhbHRob3VnaCBpdCBkb2Vzbid0IGRvIGFueSBoYXJtLgoKSSBzZXQgdGhlc2Ug
+cG9pbnRlcnMgdG8gTlVMTCBzaW5jZSBpdHMgY2xlYW4gdXAgZnVuY3Rpb24gZmplc19od19jbGVh
+bnVwCmRvIHNvLiBQZXJzb25hbGx5LCBJIHRlbmQgdG8gZm9sbG93aW5nIHRoZSBleGlzdGluZyBj
+b2RlIHN0eWxlIGluIHRoZSAKc2FtZSBtb2R1bGUuCgo+IAo+IEFsc28sIGlmIHRoaXMgZnVuY3Rp
+b24gcmV0dXJucyBhbiBlcnJvciwKPiBkb2VzIHRoZSBjYWxsZXIgKGZqZXNfaHdfaW5pdCgpKSBs
+ZWFrIGh3LT5od19pbmZvLnRyYWNlPwoKV2VsbCwgeWVzLCBpdCdzIGEgbGl0dGxlIGJpdCB3aXJl
+ZCB0aGF0IGZqZXNfaHdfaW5pdCBkb2Vzbid0IGhhbmRsZSAKZXJyb3JzIG9mIGZqZXNfaHdfc2V0
+dXAgYW5kIHZ6YWxsb2Mgb2YgaHctPmh3X2luZm8udHJhY2UgYXMgbm9ybWFsCmZ1bmN0aW9ucyBk
+by4KTWF5YmUgYW5vdGhlciBwYXRjaCBuZWVkIHRvIGJlIHN1Ym1pdHRlZCB0byBkZWFsIHdpdGgg
+dGhpcyBwcm9ibGVtLgoKPiAKPiA+ICB9Cj4gPiAgCj4gPiAgc3RhdGljIHZvaWQgZmplc19od19j
+bGVhbnVwKHN0cnVjdCBmamVzX2h3ICpodykKPiA+IC0tIAo+ID4gMi4zNC4xCj4gPiAK
 
