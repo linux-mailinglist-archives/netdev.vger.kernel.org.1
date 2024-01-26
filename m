@@ -1,161 +1,196 @@
-Return-Path: <netdev+bounces-66111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE71983D457
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 07:52:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 044CA83D484
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 08:51:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C781B1F22A50
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 06:52:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0427D288CAD
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 07:51:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6F5A125DE;
-	Fri, 26 Jan 2024 06:16:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF3E2125AB;
+	Fri, 26 Jan 2024 06:28:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="ePfzeFk3";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="IvOGos/q"
+	dkim=pass (2048-bit key) header.d=bernat.ch header.i=@bernat.ch header.b="snpsI9ya";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="uCY10h2P"
 X-Original-To: netdev@vger.kernel.org
 Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB550C8E0;
-	Fri, 26 Jan 2024 06:16:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A042B849C
+	for <netdev@vger.kernel.org>; Fri, 26 Jan 2024 06:28:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.111.4.28
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706249814; cv=none; b=HacFVSYpeV+uCZoDxnucS3zqZb6hCahARQgyf6LzDHOUMEhJgVl6udd64MpK12g3+DLYOQuYTAfcfidKLVVzYuH/kM5+ewNfjUmn4xakFKqsQkJzGVyrUwflcrEk5pLQ2JEJ9V+UZGW1N2SW9DoA3PCmD9/P5TFHRQb2g+ftp0U=
+	t=1706250521; cv=none; b=DlHD3K1bifuc6tsE5a2RV5iiK2p+Az0XEjwWsILdUaF0vHvLDlKtH/KqxfxcxKcEuzSsmLkjJ1todRQIYGiUdhMaFo2OWeGX31mecIql+/TR4/yEJUvtmGwm9IOo5kExpkcINp2k2ARk6iK8MG1VElQ+HSClBtrm1WXQQhvBj/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706249814; c=relaxed/simple;
-	bh=UCN1lRs2vRBEnt1CbTI+f6sZAAmHopJNCxiLao/UQMI=;
-	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
-	 Subject:Content-Type; b=R5CiVlS5xGP3MxaDQRXYfvweUxuEvTmU/S7pO0CIN/bsU+qDVeCT5kZIU7QwrH9HZGDsEp49wvnQhepzZgV6uA+YUnfUuca7hEzXDHl0+1U8O0RS51cgrhKvZuiT1+0/eTU+yF2Xxkwm8FtR2LecxtCnzfGgc5HhwvjvwgCcwww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=ePfzeFk3; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=IvOGos/q; arc=none smtp.client-ip=66.111.4.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1706250521; c=relaxed/simple;
+	bh=ad0kpR9iULl2DfHdCM5l2R5z1+A2Bhcd9+5UqkbPGiE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WvWZMQAalyCJwnswNaCk8l/53WaF5Wg6kL4uUXCWiS6y0dtD1iTSUVFVZjzvLOcQ6IM74WcInCeqiR5uHB/QqvbWbjHMQJd9gSJ1b3Asnw/kYcAN4pB+eLrHqT8CTqvDeS7159kXbD+GIET/ASMQ2dv8DR0SEV6NKgnZ0KJXABc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bernat.ch; spf=pass smtp.mailfrom=bernat.ch; dkim=pass (2048-bit key) header.d=bernat.ch header.i=@bernat.ch header.b=snpsI9ya; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=uCY10h2P; arc=none smtp.client-ip=66.111.4.28
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bernat.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bernat.ch
 Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailout.nyi.internal (Postfix) with ESMTP id E8B565C0154;
-	Fri, 26 Jan 2024 01:16:51 -0500 (EST)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Fri, 26 Jan 2024 01:16:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm2; t=1706249811; x=1706336211; bh=8lgdoSvIDi
-	CRr6hQ1g1iPHkPUjc4Fdr/FoYIzZbtZC8=; b=ePfzeFk3bfvNIDY3cdNxgVlKB/
-	Lx7zmBsYKYiBfzuz3dN3XN5LFcp/peY05lJbnFF9f894gJWVcLGYcgDfuwAHXKEd
-	mbCtNBjfdmUVW+tfntX2fc/qdF64CxSqYFtjH+Sk0X4j7N3gfPcp+zC27YHro4ei
-	Wx5U92unsndmymme9SyFYwXjm2Jc8Ogq5tIs8bjasCNJClWgWHe5k9ecLBj4Rjw9
-	6/520Hut0cnxKzcBGRvH2hvYK04phRAEKtH7nnKCVUAs+vMZOzNWvA+Ga/ysKY7P
-	2zl0ivFj2Ebjt+umwRQLDL8wLXL364spUAF+owxMr/1SUDi8pBG3VjNmaYoA==
+	by mailout.nyi.internal (Postfix) with ESMTP id 8FFA25C016C;
+	Fri, 26 Jan 2024 01:28:38 -0500 (EST)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute5.internal (MEProxy); Fri, 26 Jan 2024 01:28:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bernat.ch; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1706250518;
+	 x=1706336918; bh=2apXPwBudnAqwTmoFumlNwhOQ/9DSn7RYHWKWNlMQRc=; b=
+	snpsI9yamomTMclQg8TCYrMcTZK+Y260ayfuoqDH8Leem+uga1YdfHHImYYcEdmC
+	wDtn58IIJWXezfCdkjWeMopTUr0m+JD8DhTZjGix4NMWTyH0r7+/lriwBoYyN82n
+	VUsvEEhDuG7PkKeh9wWJ0NIxfYX74ABU40uf84Wq8bk8ZkWQxhd67Vvoq9ei1E8D
+	+jY/hG6Kdqfma+y6ymcGadV19SaHbEtoNL3G0wObTLbX8Cdz2s1ia5ic1G70nBHP
+	dDAu/JSnSri0u64t7WC6SqkeKwxnoh7sMPxtshisSB6DJEvQWLmQDOfPhFyIDTn7
+	aVLyHzGWzyqfahuW8s0/Zg==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm3; t=1706249811; x=1706336211; bh=8lgdoSvIDiCRr6hQ1g1iPHkPUjc4
-	Fdr/FoYIzZbtZC8=; b=IvOGos/qDPTlf+NWtENxCwSBzGrQvo+skHIemNF8klsC
-	3Gcfe+n0TlgFDdYiWWw4RiHvwJcPwxPs44qA8kmE9GkV9tlzOKEWXAFc6Sw0wQxR
-	IgGq2VDAQl5yhsLbBDuI46BP/nVMH8A0wTrCZhK9sHePXFcZD3rhfNNKlrSOtrFj
-	8x4xN+uTW5aS/9JGdgjeC2k7X5HhAZOlVpwqwAxvqTv/j7FGET6iNxGTXFD/cIXG
-	U4lgG0XOFg/5EhMLaA3FEyiWPN3/8IV49WGHDCkahiPsim4HqQQUEfFxMgvQSp9j
-	9hs/3pt4Lgfk8S2/5sxt0z6fLDg9pzrDCWLWbPbgSA==
-X-ME-Sender: <xms:Uk6zZW2dejTe01OAVCXOuMD8u733oPaxdBo2pmqJmD7jfTqwBpRTZw>
-    <xme:Uk6zZZERF3ClcOxNj8DRq3W7NjYlJCmIYGDCW8G2rlCfzr-Lg9FZ-P6IpopB5oyVS
-    jCI6OXn05sdIQJaKXE>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdeliedgledtucetufdoteggodetrfdotf
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1706250518; x=
+	1706336918; bh=2apXPwBudnAqwTmoFumlNwhOQ/9DSn7RYHWKWNlMQRc=; b=u
+	CY10h2PSvKUhwpx3/xMCaSXHJia74LI5I0rrIi0Mbu90m/UxsNa/H2hr2bIpGyDi
+	uib/mONBzQEMTMkX+oSwcAF1jj5bCUJVG8n8sMgPuJ3wo1ISQs2HD0S7Q9rWEPMK
+	Zyno53Z8XVpF/UhtV8n4tuqdzfONzvAE0veUPrcZwH6PV3QgjIIKx7XuYm4f3ECT
+	lv2wtotlxK3aZgIwwVIUipz7MtRFMBksMDcv0EMZio4ItscyaBAjjuFbJCNeea/d
+	aeWDnoxuc9c+y5XfZ/z2FIVctMXX7VyT+k3I49cNDr1eH0qPTymi/zu8zMIQ7hhQ
+	3FR2XDTy11ziR1Euau5cg==
+X-ME-Sender: <xms:FlGzZUvQGAiGms-HtUcP8_1wiWBpC7qsUi_2HXEqu-0E9bODo5YdSg>
+    <xme:FlGzZRcuzhSeZOh3quhSJKwq-2SAtQfsrWJq3xB_uuBrOf52qn2uOjMRyRAfgQ3Xs
+    rn8RxjW027hpVb7r8w>
+X-ME-Received: <xmr:FlGzZfyhxn_6AyG-R7o0ZwxAzkukqa3aryNsqDJjC4_1K4FhzzcDxonEdizeGXVPePwOfSDAxehEG8_e7TQTKr9lagXZYoguVQmmwLYWdFY>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdeliedgleefucetufdoteggodetrfdotf
     fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
     uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
-    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
-    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
-    teffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
-    hrnhgusegrrhhnuggsrdguvg
-X-ME-Proxy: <xmx:Uk6zZe4Yp1okF1C4JYucisdIq20LY_P-zMWvYPrfGvBmEMgQvRvdLg>
-    <xmx:Uk6zZX3d1l0OUejuyAQUgKeHpLiwBLMmkktFgGrTYXYj-EVCMBL5kA>
-    <xmx:Uk6zZZFg-tARBEmI6xNqSoBO8RFO-i6UWHPI3h_AqikWyPJfvv7H7A>
-    <xmx:U06zZcZgYj-KYDVFq28393AFgHiuOL2lcJsHDHS4quqhlSpdzJREhg>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 2AD2CB6008D; Fri, 26 Jan 2024 01:16:50 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.11.0-alpha0-119-ga8b98d1bd8-fm-20240108.001-ga8b98d1b
+    cujfgurhepkfffgggfuffvvehfhfgjtgfgsehtjeertddtvdejnecuhfhrohhmpeggihhn
+    tggvnhhtuceuvghrnhgrthcuoehvihhntggvnhhtsegsvghrnhgrthdrtghhqeenucggtf
+    frrghtthgvrhhnpeehveekuedtieeltdffleduheetgeduffejffdtlefftedtgfekueel
+    fffgudekhfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhroh
+    hmpehvihhntggvnhhtsegsvghrnhgrthdrtghh
+X-ME-Proxy: <xmx:FlGzZXPMTv7FGd-4Ty5giVB_4M7nUk5fFeuhpCYGlYfEywRheDCM0g>
+    <xmx:FlGzZU8jhIMQfTZ28nQr-LAaXEVi7N9KXRaOHRwmpMYrBuwM8j19Rg>
+    <xmx:FlGzZfWetkYA0iJf0Ko0rwvEqGXo41hXfrNLi8PBBzywPqi2CMllAQ>
+    <xmx:FlGzZTYOVpSoHQHGedFvLml3JYY1vH6d5NI0v-oLrRE7rSm45I5PmA>
+Feedback-ID: id69944f0:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 26 Jan 2024 01:28:37 -0500 (EST)
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	by wally.luffy.cx (Postfix) with ESMTP id 9A7D85F803;
+	Fri, 26 Jan 2024 07:28:35 +0100 (CET)
+Message-ID: <e60e2cc1-02c0-452b-8bb1-b2fb741e7b43@bernat.ch>
+Date: Fri, 26 Jan 2024 07:28:35 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <57b62135-2159-493d-a6bb-47d5be55154a@app.fastmail.com>
-In-Reply-To: <20240126023630.GA1235@fastly.com>
-References: <20240125225704.12781-1-jdamato@fastly.com>
- <20240125225704.12781-4-jdamato@fastly.com>
- <2024012551-anyone-demeaning-867b@gregkh> <20240126001128.GC1987@fastly.com>
- <2024012525-outdoors-district-2660@gregkh> <20240126023630.GA1235@fastly.com>
-Date: Fri, 26 Jan 2024 07:16:29 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Joe Damato" <jdamato@fastly.com>,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>
-Cc: linux-kernel@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
- "Chuck Lever" <chuck.lever@oracle.com>,
- "Jeff Layton" <jlayton@kernel.org>, linux-api@vger.kernel.org,
- "Christian Brauner" <brauner@kernel.org>,
- "Eric Dumazet" <edumazet@google.com>,
- "David S . Miller" <davem@davemloft.net>, alexander.duyck@gmail.com,
- "Sridhar Samudrala" <sridhar.samudrala@intel.com>,
- "Jakub Kicinski" <kuba@kernel.org>,
- "Willem de Bruijn" <willemdebruijn.kernel@gmail.com>, weiwan@google.com,
- "Jonathan Corbet" <corbet@lwn.net>,
- "Alexander Viro" <viro@zeniv.linux.org.uk>, "Jan Kara" <jack@suse.cz>,
- "Michael Ellerman" <mpe@ellerman.id.au>,
- "Nathan Lynch" <nathanl@linux.ibm.com>,
- "Steve French" <stfrench@microsoft.com>,
- "Thomas Zimmermann" <tzimmermann@suse.de>,
- "Jiri Slaby" <jirislaby@kernel.org>,
- "Julien Panis" <jpanis@baylibre.com>,
- "Andrew Waterman" <waterman@eecs.berkeley.edu>,
- "Thomas Huth" <thuth@redhat.com>, "Palmer Dabbelt" <palmer@dabbelt.com>,
- "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
- "open list:FILESYSTEMS (VFS and infrastructure)"
- <linux-fsdevel@vger.kernel.org>
-Subject: Re: [PATCH net-next v3 3/3] eventpoll: Add epoll ioctl for epoll_params
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2] vxlan: add support for flowlab inherit
+To: David Ahern <dsahern@gmail.com>, Ido Schimmel <idosch@idosch.org>,
+ Alce Lafranque <alce@lafranque.net>
+Cc: netdev@vger.kernel.org, stephen@networkplumber.org
+References: <20240120124418.26117-1-alce@lafranque.net>
+ <Za5eizfgzl5mwt50@shredder> <f24380fc-a346-4c81-ae78-e0828d40836e@gmail.com>
+ <1793b6c1-9dba-4794-ae0d-5eda4f6db663@bernat.ch>
+ <1fb36101-5a3c-4c81-8271-4002768fa0bd@gmail.com>
+ <41582fa0-1330-42c5-b4eb-44f70713e77e@bernat.ch>
+ <1e2ff78d-d130-46d4-b7ad-31a0f6796e1a@gmail.com>
+Content-Language: en-US, fr
+From: Vincent Bernat <vincent@bernat.ch>
+Autocrypt: addr=vincent@bernat.ch;
+ keydata= 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
+In-Reply-To: <1e2ff78d-d130-46d4-b7ad-31a0f6796e1a@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jan 26, 2024, at 03:36, Joe Damato wrote:
-> On Thu, Jan 25, 2024 at 04:23:58PM -0800, Greg Kroah-Hartman wrote:
->> On Thu, Jan 25, 2024 at 04:11:28PM -0800, Joe Damato wrote:
->> > On Thu, Jan 25, 2024 at 03:21:46PM -0800, Greg Kroah-Hartman wrote:
->> > > On Thu, Jan 25, 2024 at 10:56:59PM +0000, Joe Damato wrote:
->> > > > +struct epoll_params {
->> > > > +	u64 busy_poll_usecs;
->> > > > +	u16 busy_poll_budget;
->> > > > +
->> > > > +	/* for future fields */
->> > > > +	u8 data[118];
->> > > > +} EPOLL_PACKED;
->> > > 
->
-> Sure, that makes sense to me. I'll remove it in the v4 alongside the other
-> changes you've requested.
->
-> Thanks for your time and patience reviewing my code. I greatly appreciate
-> your helpful comments and feedback.
+On 2024-01-25 16:50, David Ahern wrote:
 
-Note that you should still pad the structure to its normal
-alignment. On non-x86 targets this would currently mean a
-multiple of 64 bits.
+>>>>>> My personal
+>>>>>> preference would be to add a new keyword for the new attribute:
+>>>>>>
+>>>>>> # ip link set dev vx0 type vxlan flowlabel_policy inherit
+>>>>>> # ip link set dev vx0 type vxlan flowlabel_policy fixed flowlabel 10
+>>>>>>
+>>>>>> But let's see what David thinks.
+>>>>>>
+>>>>>
+>>>>> A new keyword for the new attribute seems like the most robust.
+>>>>>
+>>>>> That said, inherit is already used in several ip commands for dscp, ttl
+>>>>> and flowlabel for example; I do not see a separate keyword - e.g.,
+>>>>> ip6tunnel.c.
+>>>>
+>>>> The implementation for flowlabel was modeled along ttl. We did diverge
+>>>> for kernel, we can diverge for iproute2 as well. However, I am unsure if
+>>>> you say we should go for option A (new attribute) or option B (do like
+>>>> for dscp/ttl).
+>>>
+>>> A divergent kernel API does not mean the command line for iproute2 needs
+>>> to be divergent. Consistent syntax across ip commands is best from a
+>>> user perspective. What are the downsides to making 'inherit' for
+>>> flowlabel work for vxlan like it does for ip6tunnel, ip6tnl and gre6?
+>>> Presumably inherit is relevant for geneve? (We really need to stop
+>>> making these tweaks on a single protocol basis.)
+>>
+>> Currently, the patch implements "inherit" without a new keyword, like
+>> this is done for the other protocols. I don't really see a downside,
+>> except the kernel could one day implement a policy that may be difficult
+>> to express this way (inherit-during-the-day-fixed-during-the-night).
+> 
+> Wouldn't other uses of inherit be subject to the same kind of problem?
+> ie., my primary point is for consistency in behavior across commands.
 
-I would suggest dropping the EPOLL_PACKED here entirely and
-just using a fully aligned structure on all architectures, like
-
-struct epoll_params {
-      __aligned_u64 busy_poll_usecs;
-      __u16 busy_poll_budget;
-      __u8 __pad[6];
-};
-
-The explicit padding can help avoid leaking stack data when
-a structure is copied back from kernel to userspace, so I would
-just always use it in ioctl data structures.
-
-      Arnd
+Honestly, I have a hard time finding a real downside. The day we need to 
+specify both a value and a policy, it will still be time to introduce a 
+new keyword. For now, it seems better to be consistent with the other 
+protocols and with the other keywords (ttl, for example) using the same 
+approach.
 
