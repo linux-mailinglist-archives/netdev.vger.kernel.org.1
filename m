@@ -1,98 +1,173 @@
-Return-Path: <netdev+bounces-66145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66146-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62E4383D80C
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 11:27:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 478E383D817
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 11:28:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9512E1C2D311
-	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 10:27:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AD9A1C2B3E5
+	for <lists+netdev@lfdr.de>; Fri, 26 Jan 2024 10:28:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6318914013;
-	Fri, 26 Jan 2024 10:05:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C818F1B809;
+	Fri, 26 Jan 2024 10:07:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jGiHmGxe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pgENvXO9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C12312B87;
-	Fri, 26 Jan 2024 10:05:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93A951B7E4;
+	Fri, 26 Jan 2024 10:07:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706263521; cv=none; b=P0u7cpSyHXXtCOFAoWW1zQ5aOhtOCVoJfBu6QnyRZdM2IeHv2jjvVtfeKwSqIYE8V/hsQNJPfldbd+JISv4RBnDgkKLttomFqy9CIGfvBN0W4W3wbp+XGlXNMcEwBQhql98zc2xGoFFVARX7iJamRvtm2F5dNuulYsuiew/6S2o=
+	t=1706263666; cv=none; b=mN07cD1UTsAbXluCkb3OcEroAzNKhN8qqk3SG3MjdYWANI6vx3YAg5V53FXC7PTDTgWJTpV8aEDsRgpHfAB4LCQ84jSsGe1KwTijyFANkh9emIo/08PGXjAxajiiLNvUZBv5s8cap2ZcoWl4eNJxuaKH1wKtwtEKEW+FVHvPFyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706263521; c=relaxed/simple;
-	bh=uyP5ZbF0hrbr8WdAOISa8u9+m+tzWtPAP+RP3OpzU+s=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=mqJOkIEcc76VV47YQBEXAgfmoBYFAHrIxFgGpLjdcaMD1yckzayvZTTx2leYGnuvHEqh4f/X1xJMrvt9J+FJBm9O5xWvICUnIzn67oVDgbLgsD8UfKMupJPjAD+XzZrTL271PxhnkDnAEh2QrJbUDklIaYtw0ZQ5TV+1QhvrWEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jGiHmGxe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6643C433C7;
-	Fri, 26 Jan 2024 10:05:19 +0000 (UTC)
+	s=arc-20240116; t=1706263666; c=relaxed/simple;
+	bh=cyYc4oQhxrcpBf/N4DGlh5NOYSWJmxszPTa3U/wWji8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OqFcmhOqCtkCzjlJgxL7B3WMy1+R/p0wklsI4P9BIhnF3RP3B79o8rGFArJ/RVQGRkXyV92W3d4Z5k0mW/DKigcboYgjf++C3TVb88SZvFYgIGw8fGAPu2sjRz6/NTlo7M9C3CjffFv6vEcD/JcZUK4C/xaCHJgn+S2vWanUXKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pgENvXO9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43945C433C7;
+	Fri, 26 Jan 2024 10:07:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706263520;
-	bh=uyP5ZbF0hrbr8WdAOISa8u9+m+tzWtPAP+RP3OpzU+s=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=jGiHmGxeK34DIok8m3O6VgzgY393BaePdESRKjqrLRYDN0BWEUJnnHRUnJTP/u9Km
-	 jkfmT0HWR0BWUbisnDmDKSyp3llIkKNh/CWob7/+TcC8LRDpY+2wMFsMH5TFSgbaJG
-	 2lk5Dwh7ef1VfJxOwZ2uehBOA82J+R5KL9lqb+s2jtQX/n1aF5Yv/Gyap907uhzv7e
-	 j/0A2OyXNvUb6Js6tJtWDGbIxiKWDhLdDzgj/5V00GH+mvnZJcLVUOGHuKikqydbS7
-	 X8aOYDKUckj77etc8KnUuBN9ROL7oDHrMJmPYMpMutPnKTo3+/j0EHtJDQcu/Hc7Ak
-	 B1jSmrTV1pwlA==
-From: Kalle Valo <kvalo@kernel.org>
-To: Arend Van Spriel <arend.vanspriel@broadcom.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,  <netdev@vger.kernel.org>,
-  <linux-wireless@vger.kernel.org>
-Subject: Re: pull-request: wireless-next-2024-01-25
-References: <20240125104030.B6CA6C433C7@smtp.kernel.org>
-	<20240125165128.7e43a1f3@kernel.org> <87r0i4zl92.fsf@kernel.org>
-	<18d447cc0b8.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
-Date: Fri, 26 Jan 2024 12:05:17 +0200
-In-Reply-To: <18d447cc0b8.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
-	(Arend Van Spriel's message of "Fri, 26 Jan 2024 07:37:23 +0100")
-Message-ID: <877cjwz9ya.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=k20201202; t=1706263666;
+	bh=cyYc4oQhxrcpBf/N4DGlh5NOYSWJmxszPTa3U/wWji8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pgENvXO9hI7spLW3wf1MzB2Q6oM4DtwvHG6wIOFrdFl4kpUuX6k6zL0H8taBiBYQL
+	 Jn3WN12lVFujvNdirTFsDuBoDDc9KrdUhKiH5ZVm2I5jEvgmTjqUE+r0wFNPyzoKG4
+	 +zGiY258mpFxvAJ2YneWv5SF70ZksYPUKftNdiRL12cjyZNvf9GYGDmxKCQ81A/zMv
+	 h74k2ZxqXVICdueT2n8sDC4t6+z1c2VEjvdnoCif6mlshsG8dYB+yOI+uIh3Cba9vk
+	 14afPTHMAOgQp0YOYmjxnsf6nir+LQSBnNBV7CYJk2bAJCJh++4WfUK9POqEHkZtaJ
+	 uCheOlKVICS6w==
+Date: Fri, 26 Jan 2024 11:07:36 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Joe Damato <jdamato@fastly.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, chuck.lever@oracle.com, 
+	jlayton@kernel.org, linux-api@vger.kernel.org, edumazet@google.com, 
+	davem@davemloft.net, alexander.duyck@gmail.com, sridhar.samudrala@intel.com, 
+	kuba@kernel.org, willemdebruijn.kernel@gmail.com, weiwan@google.com, 
+	Jonathan Corbet <corbet@lwn.net>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Jan Kara <jack@suse.cz>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Nathan Lynch <nathanl@linux.ibm.com>, Steve French <stfrench@microsoft.com>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, Jiri Slaby <jirislaby@kernel.org>, 
+	Julien Panis <jpanis@baylibre.com>, Arnd Bergmann <arnd@arndb.de>, 
+	Andrew Waterman <waterman@eecs.berkeley.edu>, Thomas Huth <thuth@redhat.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, 
+	"open list:FILESYSTEMS (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>
+Subject: Re: [PATCH net-next v3 3/3] eventpoll: Add epoll ioctl for
+ epoll_params
+Message-ID: <20240126-kribbeln-sonnabend-35dcb3d1fc48@brauner>
+References: <20240125225704.12781-1-jdamato@fastly.com>
+ <20240125225704.12781-4-jdamato@fastly.com>
+ <2024012551-anyone-demeaning-867b@gregkh>
+ <20240126001128.GC1987@fastly.com>
+ <2024012525-outdoors-district-2660@gregkh>
+ <20240126023630.GA1235@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240126023630.GA1235@fastly.com>
 
-Arend Van Spriel <arend.vanspriel@broadcom.com> writes:
+On Thu, Jan 25, 2024 at 06:36:30PM -0800, Joe Damato wrote:
+> On Thu, Jan 25, 2024 at 04:23:58PM -0800, Greg Kroah-Hartman wrote:
+> > On Thu, Jan 25, 2024 at 04:11:28PM -0800, Joe Damato wrote:
+> > > On Thu, Jan 25, 2024 at 03:21:46PM -0800, Greg Kroah-Hartman wrote:
+> > > > On Thu, Jan 25, 2024 at 10:56:59PM +0000, Joe Damato wrote:
+> > > > > +struct epoll_params {
+> > > > > +	u64 busy_poll_usecs;
+> > > > > +	u16 busy_poll_budget;
+> > > > > +
+> > > > > +	/* for future fields */
+> > > > > +	u8 data[118];
+> > > > > +} EPOLL_PACKED;
+> > > > 
+> > > > variables that cross the user/kernel boundry need to be __u64, __u16,
+> > > > and __u8 here.
+> > > 
+> > > I'll make that change for the next version, thank you.
+> > > 
+> > > > And why 118?
+> > > 
+> > > I chose this arbitrarily. I figured that a 128 byte struct would support 16
+> > > u64s in the event that other fields needed to be added in the future. 118
+> > > is what was left after the existing fields. There's almost certainly a
+> > > better way to do this - or perhaps it is unnecessary as per your other
+> > > message.
+> > > 
+> > > I am not sure if leaving extra space in the struct is a recommended
+> > > practice for ioctls or not - I thought I noticed some code that did and
+> > > some that didn't in the kernel so I err'd on the side of leaving the space
+> > > and probably did it in the worst way possible.
+> > 
+> > It's not really a good idea unless you know exactly what you are going
+> > to do with it.  Why not just have a new ioctl if you need new
+> > information in the future?  That's simpler, right?
+> 
+> Sure, that makes sense to me. I'll remove it in the v4 alongside the other
+> changes you've requested.
 
-> On January 26, 2024 7:01:18 AM Kalle Valo <kvalo@kernel.org> wrote:
->
->> Jakub Kicinski <kuba@kernel.org> writes:
->>
->>> On Thu, 25 Jan 2024 10:40:30 +0000 (UTC) Kalle Valo wrote:
->>>> The first "new features" pull request for v6.9. We have only driver
->>>> changes this time and most of them are for Realtek drivers. Really
->>>> nice to see activity in Broadcom drivers again.
->>>
->>> minor thing for a follow up:
->>>
->>> drivers/net/wireless/broadcom/brcm80211/brcmfmac/fwil.c:432:49:
->>> warning: no newline at end of file
->>
->> Oh, sorry about that. Any tips how to detect this?
->
-> I thought checkpatch would signal that or is it a sparse warning.
+Fwiw, we do support extensible ioctls since they encode the size. Take a
+look at kernel/seccomp.c. It's a clean extensible interface built on top
+of the copy_struct_from_user() pattern we added for system calls
+(openat(), clone3() etc.):
 
-I don't run checkpatch except for ath10k/ath11k/ath12k, too much noise.
-I ended up adding this to my script:
+static long seccomp_notify_ioctl(struct file *file, unsigned int cmd,
+                                 unsigned long arg)
+{
+        struct seccomp_filter *filter = file->private_data;
+        void __user *buf = (void __user *)arg;
 
-for file in $(git ls-tree -r --name-only HEAD drivers/net/wireless/ net/wireless/ net/mac80211/); do if [ "$(tail -c 1 $file | cat -E)" != "$" ]; then echo $file: no newline at end of file; fi; done
+        /* Fixed-size ioctls */
+        switch (cmd) {
+        case SECCOMP_IOCTL_NOTIF_RECV:
+                return seccomp_notify_recv(filter, buf);
+        case SECCOMP_IOCTL_NOTIF_SEND:
+                return seccomp_notify_send(filter, buf);
+        case SECCOMP_IOCTL_NOTIF_ID_VALID_WRONG_DIR:
+        case SECCOMP_IOCTL_NOTIF_ID_VALID:
+                return seccomp_notify_id_valid(filter, buf);
+        case SECCOMP_IOCTL_NOTIF_SET_FLAGS:
+                return seccomp_notify_set_flags(filter, arg);
+        }
 
-> Anyway, I can fix it.
+        /* Extensible Argument ioctls */
+#define EA_IOCTL(cmd)   ((cmd) & ~(IOC_INOUT | IOCSIZE_MASK))
+        switch (EA_IOCTL(cmd)) {
+        case EA_IOCTL(SECCOMP_IOCTL_NOTIF_ADDFD):
+                return seccomp_notify_addfd(filter, buf, _IOC_SIZE(cmd));
+        default:
+                return -EINVAL;
+        }
+}
 
-Thanks!
+static long seccomp_notify_addfd(struct seccomp_filter *filter,
+                                 struct seccomp_notif_addfd __user *uaddfd,
+                                 unsigned int size)
+{
+        struct seccomp_notif_addfd addfd;
+        struct seccomp_knotif *knotif;
+        struct seccomp_kaddfd kaddfd;
+        int ret;
 
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
+        BUILD_BUG_ON(sizeof(addfd) < SECCOMP_NOTIFY_ADDFD_SIZE_VER0);
+        BUILD_BUG_ON(sizeof(addfd) != SECCOMP_NOTIFY_ADDFD_SIZE_LATEST);
 
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+        if (size < SECCOMP_NOTIFY_ADDFD_SIZE_VER0 || size >= PAGE_SIZE)
+                return -EINVAL;
+
+        ret = copy_struct_from_user(&addfd, sizeof(addfd), uaddfd, size);
+        if (ret)
+                return ret;
+
+
+
+
 
