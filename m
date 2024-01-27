@@ -1,105 +1,98 @@
-Return-Path: <netdev+bounces-66386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6564683EC9A
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 11:08:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8782D83ECA1
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 11:09:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21BA0284582
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 10:08:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44E7228512D
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 10:09:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 363B31EB3F;
-	Sat, 27 Jan 2024 10:08:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBC1E1E88B;
+	Sat, 27 Jan 2024 10:09:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="KfOkAHNx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I7DpGUGb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.3])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F2FA1EA72;
-	Sat, 27 Jan 2024 10:07:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A529021118;
+	Sat, 27 Jan 2024 10:09:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706350082; cv=none; b=nAq5XnB07pblssRw3iJiIoYmHquSsU9HK8QxYfWb1V3l621XRk6+WcRgnP0iL62mxqelK8xiBC2DnvaUbEYW+5WxmU4FUmNu+QkHU0OnUozpJ+3TsuxlIN4lnQGgA1Da2iza/rBm8jW3OtY1JhFr/dXufh6Nz3VZJYPzkVCLLsI=
+	t=1706350142; cv=none; b=KEjVoXeUAMpqpJTixGm6ODb8caSYuPRZ1Y/JGuxwLYB+NbMw7GyUezXMumkWXVkYIpLwCHXB6Pn7/qkp0095tVr5e8MuHh46PNOgcNzHW/VeHVRd6J2sZ1rukFYtnJLE/IqSYtWC62OXyfgLk3kjpbQHgzI4cu6VWTzBI+HWhqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706350082; c=relaxed/simple;
-	bh=bBw75j9IqFgnIbLcow/2PLqrMy0+1Vb6FnaPfM8nBGU=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=WUlzwYAb3RPecZHo5a5OVwB9wvyMl8h0DBpCoDK1NOG4sPtjy3dNhK2eVYHHOQi2d/KVxbsfeOgBzEUWTo5+ck4J/lfh2sZCQNB7LiEFx86oyIWca5QAHKsVzboj15ui9kCoSNZ5rKQKLIOx4vfa5pEIwI4ekT0UpWPdtU589wk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=KfOkAHNx; arc=none smtp.client-ip=212.227.15.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
-	t=1706350033; x=1706954833; i=markus.elfring@web.de;
-	bh=bBw75j9IqFgnIbLcow/2PLqrMy0+1Vb6FnaPfM8nBGU=;
-	h=X-UI-Sender-Class:Date:To:Cc:References:Subject:From:
-	 In-Reply-To;
-	b=KfOkAHNxxuZ9iWWuu+OUG97AQblwOQIOaoSk0kAFqNoachBFbxkHhAWpe741trbC
-	 7ZeSrwEs12mqXojMfgmzlJDyepSfgfymzq097IoLeDo+Eqzr0z/YUxKY6EciKWWTy
-	 Afs+LR6NI8Rf/bLQdDuwUt+xFMy1vFnZoHaGeGM6OCS6aJTHifmJJl5HICl4ldxDL
-	 yC4wajXcBefUxC98ILQbVrWt2wbwPcuH/+Xyp+lWCLpX4sggo8DNI22pVXfs+absA
-	 cEz9t/gbQk5ccWPn2tanbMUC1rMAJEaEOPNByaoF57og78LIzdeNe9XmL7MZzx88s
-	 +NR/eUguEMFY5N9PIg==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.81.95]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MlLE9-1qmwnM0rK1-00lTfE; Sat, 27
- Jan 2024 11:07:13 +0100
-Message-ID: <60e674ca-6018-4f4e-a0b1-d8e27f4cee3a@web.de>
-Date: Sat, 27 Jan 2024 11:07:00 +0100
+	s=arc-20240116; t=1706350142; c=relaxed/simple;
+	bh=S9BS/+g4oILp6iKIv7aziRZFylhE+ko3fNGK/iHil3A=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=K78T4+NkSwRhnLaWmwD9h4Jl8aUGaNIWSS4G4xD54KbVhDFFr8Erwu4SsqeSSHAMyvgo8UMCmz47qq70X6e6n7Vk7g57HVj9RnO9o4tf8uuvxnMVVDuTX3Fogj/zhSWA5A1zshz00Ps0HEtA6p2lA98TzJlwEGOu8dIOFMWWRHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I7DpGUGb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 456EDC433F1;
+	Sat, 27 Jan 2024 10:09:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706350142;
+	bh=S9BS/+g4oILp6iKIv7aziRZFylhE+ko3fNGK/iHil3A=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=I7DpGUGbXy/Ew4Ayg88bMJmE9NwJWHrj10GEYlkob4pWPc4BShVQAsvNkjC4XLhlG
+	 getqNTNPIQWBA3qs5Nd94J6bjwB9TCyCbdJeIHf7kPfzOHjrY6viBmDgRkuukWUyBK
+	 0qlL9kry9TzTrqFgW/ZXY1P08f6IaIyLpd+ABhprYKPSuh5JheJDZK7cXHxg5zD0nz
+	 PBw8e71kpmaH1rsKZeGiAstGV1PQ1DOP/MrJySycPuFDpRuz6oXimkYKYa40YpfhMj
+	 iRCmCA51PGQZNjmF8WFq9bRkgOHVUORFtbNBpXNiC0hitahjawoj4IvQTXTc+o78vV
+	 pRldn+w4HkMYQ==
+From: Kalle Valo <kvalo@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Arend Van Spriel <arend.vanspriel@broadcom.com>,
+  <netdev@vger.kernel.org>,  <linux-wireless@vger.kernel.org>
+Subject: Re: pull-request: wireless-next-2024-01-25
+References: <20240125104030.B6CA6C433C7@smtp.kernel.org>
+	<20240125165128.7e43a1f3@kernel.org> <87r0i4zl92.fsf@kernel.org>
+	<18d447cc0b8.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
+	<877cjwz9ya.fsf@kernel.org> <20240126105255.5476cf85@kernel.org>
+Date: Sat, 27 Jan 2024 12:08:59 +0200
+In-Reply-To: <20240126105255.5476cf85@kernel.org> (Jakub Kicinski's message of
+	"Fri, 26 Jan 2024 10:52:55 -0800")
+Message-ID: <87mssrxf44.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Kunwu Chan <chentao@kylinos.cn>, netdev@vger.kernel.org,
- kernel-janitors@vger.kernel.org, David Ahern <dsahern@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Steffen Klassert <steffen.klassert@secunet.com>
-Cc: LKML <linux-kernel@vger.kernel.org>
-References: <20240124063150.466037-1-chentao@kylinos.cn>
-Subject: Re: [PATCH ipsec-next] xfrm6_tunnel: Use KMEM_CACHE() instead of
- kmem_cache_create()
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20240124063150.466037-1-chentao@kylinos.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:dNrUMlzmaXK4pxFerqVzZOWEGdnTq3ZTolScq2NlNQzW2IO/0dD
- 3SLOvXI1IA+tCzdYJam16bg2Q77VFIIfFQlBE0yHdpME9HAt0EYNpuYWl4yH2Zy/a+TTs/8
- DCYc+EnSYfvQanO2BK+X7wm+Ay39k4LjeaUTS3CHpl7rtMtXg9rqpJvMwHICFeBg43sIn+/
- g/vZhVVN0KN7/TX1mcSzg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:WrYeNNe5XXo=;vPbqom3K9Tel6t4CdK2X0uZEsAf
- hPYbceZrOiTyMrlMTFsWtcNz3ONXBCFw2MyT99DC5d/9uTA1B2FXV/qTZYzQ1Zw+JgqF94SLw
- 624O4Cced59N9+KcLFFbY29q91vdsbsMlOT0Bc4JEDKT7VHylQ2lk4T4COY54jiypwLxN7/aL
- RZrbHNUevZva/MmQVAQSE1Gx+qfkfM2Yn9hEk4w9lnP01VKYCy49HqRfrcDjxbvVIn/l5cfg/
- G1Af8GMVPlElsQ7FN1frclZz4jUsRQ0ADIJtcM/k7iw+CS/Ez5mho4/2ztiZqUwnaRfvjU8oz
- ff5nSTR/KoE9L7fgATvhxTupMlsYR7m8t6gyKVreVkoUV01SuCdNs4/RL12CIVfbco0B+CM4I
- yggYX2SWipBb737abxfvQqB4sWffSouTDwQojeqMvlgiw6zj4jMNkEkXNErTMYOzlWYbD2bio
- GxuPRw4AhPo3lcSAn9DF1k8eGgoRnM8kvrCTYA8IFqeXhEn1trzlgML7gYorLP09BA6jGwjAI
- LjpNPqSQQsebmYTtjypxxPEZQES5RvsgeBVkTzZguTtqpKpsCyQoLAPCOTd1d5tugi5/ibUB3
- XEWvhKSslPPXuJqgy4dLFpX58EegQt+eC/Mx3luTpLsTL0K5P28NB0I262ZPU+3/q4qCeN/24
- i+CbjNW1ixiSuWab0wzGuMwLjsf2bDqnhPbihhxzUnqXng1yeMzHsQqN7/Zv1vItB14cZjmNR
- voiuupNor9Kvc+q43Qh4qy1JHUWbIc+QgQwImQyQ7kgBGOrymDitR2vxdL6+jXthQ6/vYAw8y
- Xh+UhftlB+mcFKr1RRt9uPUL8x2a3rHph9xSmc0flQ+sYrGw5mLmfI9hAXXk/tcqHfOU9jIFK
- 1N+2O3uHqNfZFu57KQO9M3ULGwDgpC2grY85cuH3D989fJXmeLrDgu2NAQtPtcHYL8PPnH5UB
- 6AHzbQ==
+Content-Type: text/plain
 
-> Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
-> to simplify the creation of SLAB caches.
+Jakub Kicinski <kuba@kernel.org> writes:
 
-I suggest to replace the word =E2=80=9Cnew=E2=80=9D by a reference to the =
-commit 8eb8284b412906181357c2b0110d879d5af95e52
-("usercopy: Prepare for usercopy whitelisting").
+> On Fri, 26 Jan 2024 12:05:17 +0200 Kalle Valo wrote:
+>> > I thought checkpatch would signal that or is it a sparse warning.  
+>> 
+>> I don't run checkpatch except for ath10k/ath11k/ath12k, too much noise.
+>> I ended up adding this to my script:
+>
+> We run build with sparse and W=1 and then diff the number of warnings 
+> to weed out the pre-existing ones, FWIW. 
 
-See also related background information from 2017-06-10.
+So for wireless and wireless-next I now check W=1 warnings every time I
+push. We are mostly warning free now but I'm not checking the linker
+warnings, for example the current MODULE_DESCRIPTION() warnings.
 
-Regards,
-Markus
+It's really annoying, and extra work, that people enable new W=1
+warnings before fixing them. Could we somehow push back on those and
+require that warnings are fixed before enabling with W=1 level?
+
+In wireless there is a significant number of sparse warnings. I have
+tried the cleanup people to fix them but it seems there's no interest,
+instead we get to receive pointless cleanups wasting our time. <loud sigh>
+
+BTW the 'no new line at end of file' warning is indeed from sparse, like
+Arend suspected:
+
+drivers/net/wireless/broadcom/brcm80211/brcmfmac/fwil.c:432:49: warning: no newline at end of file
+
+-- 
+https://patchwork.kernel.org/project/linux-wireless/list/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
