@@ -1,176 +1,112 @@
-Return-Path: <netdev+bounces-66421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 610BF83EE8C
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 17:26:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42D4D83EEC3
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 17:45:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DAD041F24ACB
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 16:26:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 756061C20D37
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 16:45:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76EBD2CCB3;
-	Sat, 27 Jan 2024 16:20:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 010E12562A;
+	Sat, 27 Jan 2024 16:45:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jF3MusBl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OwVw/SIs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4589060DC9;
-	Sat, 27 Jan 2024 16:20:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 571972C68C
+	for <netdev@vger.kernel.org>; Sat, 27 Jan 2024 16:45:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706372456; cv=none; b=PY+KhNjxBkJyXQwJaEiHMoOE6HoxG+DZUGYnS0Y2ZNzWVGfhablMNLHAKsdvlp84bXpuLoO0566ZWxkD/brWyJFCO2jNGHz+lOubJiwzWAd5+0y9OBRbuADo0CwmyBfMgoc/KYN/C2aZCs5JeCbytX/dMfQN9FHgosaDV9MWBa8=
+	t=1706373931; cv=none; b=K30BLdENMPwXsvYD6/FLMKE97ta5DnGh8WMYed1LEQAgAfI+TTtMgoqNGLintWqk9gejpK1cAaj81tMDg1SsCukiWAg2c7VIlcp/Gt901n7k16HYAqqmfRcjplcgK0YTqptrTNexZw/fBDyHJJaKYb0v0yO2mhRez7/oAWMrva0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706372456; c=relaxed/simple;
-	bh=vuJqFnZtTpTssMFoMa9G7Fw9QNg4vClPrMPI4Vl+fQo=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=fafJxih7yCJwLVqGxaNM4DGQWx80i4IBNBWBGI3YjxUljNFdb+Ajn6UyfUoFh/pYQW1qvWtk7VOLERAZEMIPMI0hSdH9i2zcPtaDbobR1FO4g2PEH1ZIceyyRpz1WphrNYGgkwaHCckgfUX40bAIML/9vFBOUCYoTXvzTWotA0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jF3MusBl; arc=none smtp.client-ip=209.85.219.44
+	s=arc-20240116; t=1706373931; c=relaxed/simple;
+	bh=cfT0XsZ1RKgVSNGVBlfjqBRH8lYWGcNgbF36jrHoTHY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OfWTsEMTTCduM00rAYS0BWD7mx89RoRv6MoYvM6JKEEHjwXr053n0KD84XWothRTo6BlNRgFNouS5KiYrAL998MHuNKge4V0942Xsv/x2TYtlebsmMoWtYSvFJkNOxX3D/zHEZDhdzl8us5HQsXIjJOqjotwbrUMA64gWIAIKfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OwVw/SIs; arc=none smtp.client-ip=209.85.221.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-68c37bf73aaso9925036d6.2;
-        Sat, 27 Jan 2024 08:20:52 -0800 (PST)
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3392b12dd21so1570269f8f.0
+        for <netdev@vger.kernel.org>; Sat, 27 Jan 2024 08:45:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706372452; x=1706977252; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=khozqR2J5qyGoQPqSuwAokWTqr1QO39YPwi2HTUl2g4=;
-        b=jF3MusBlQFXatW7qXIZGK2UaaN+1M9baONpaP/BIfrGdix5COoJp+mc1fQNsL24Qjw
-         xV+ASIUQhjc27doTnXRWVUUDo4UTFylG1IvsrJO87Q5dHCG+n8AGEfLocqIv2cy52a3J
-         s+7KIxvm54f+DLC5SlDlbOOf0qtfQyGqG+bFxFjpMSFO59AVQamlcSxC5v/XesvaS8m1
-         qA2uPtTbqdRtSE5Ks3IByQb1GLaKmd/lHk/e+S0DIiGj3VDirSN3oMv1bz9mOZTIOY7T
-         x5f++Yx5wtyqyyC0QpTHvTDnbBZpJsX3VKqkVbfyu3kpyHXXiVyN7c3saEkOT0i75cXN
-         /Xlw==
+        d=gmail.com; s=20230601; t=1706373928; x=1706978728; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=v/W7oUJ2HhNaOAurMi2PWx60uv0Y/uRQwn4EL2qMDdM=;
+        b=OwVw/SIsNKhvR6uZSrEOJ6ekpYFAmi7/M5lKPyVSRh53TIN9nN0X5L/Cg6ZBgvaKH4
+         PU8mOANUQGhCSPajcllDD2HMPN39s/Nq1RaDP5rl/uiI/wk6GjrVJk9Vf1KlQxNgFDOV
+         AtfeWU/NZI1y2EjtGr/Q1pJYypuS+KZaC13NDrz7sKQAxLAYdu2vVlqz6H0BUq4EbM+6
+         NQ2wAbS+EVBv0K4pvtNXZinmLMf/wOtbbN9RvfHPq/s/K6pYd7X6Xgw2r+OzQqrMdZO6
+         iqbTnMFI2EKRGqFG/Lk4aKjM1ZJAI3fM/cEaK/irMUDIQVaEgR/K90kyXIF4dk/b9uum
+         bulw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706372452; x=1706977252;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=khozqR2J5qyGoQPqSuwAokWTqr1QO39YPwi2HTUl2g4=;
-        b=JoNYKuC6NP42vw6qW6PekBOYr5OEQbp4p+HS0HreG7Db5PElSjZROKze6RSFhL5q6W
-         TfvNNzGD7nRKjG6D20runw8xszcZSZrspayeOzp3oaGUO7qL6HYOD5PU+H5375hItqQs
-         TPd14NmdavbSl0xbYv2z4pbfUUBina1hbeSraKuiMEzfuG7P5VYmLrth1xtm4nsHQdUp
-         HjxVz2z3YnwpDCbKFq/Y16aW/x1zYIuK5lJEsL/3+6HMbmF/Sf0cPbDoKpLpVdYaJn3d
-         kddguNUGcdQWG+XKp7Dep/kd9SxjIzBJFqvKsv4Pq1NSRIxsRB52QmD/iB+j1+8kRpSk
-         P5eg==
-X-Gm-Message-State: AOJu0YxRSBZsHQPEy47QB6CyuzKn62Pd1gU3QdKYJ+vplNj4V0XFbe8B
-	QvAxxjAtoEfyFVUbLRpxBAid54PtCbXKRLnJ0axAVBajaxPl/cPz
-X-Google-Smtp-Source: AGHT+IEtYpnrWB7Pm3yuX4jPsKtMVMAT7CxIrt/thqrPJmnt6o0+3z1I+ItZujRzlRejHx8eF/YXDg==
-X-Received: by 2002:a05:6214:d4b:b0:67f:c133:3922 with SMTP id 11-20020a0562140d4b00b0067fc1333922mr2597732qvr.129.1706372452055;
-        Sat, 27 Jan 2024 08:20:52 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCU3+LBrHc5Zp2e/HJFvVOcowk2itTDRWVCeBu9FGgIoLhx1ERum609+VtwSXCmHZuqS5yjQCmPIOTKaPjOQe/dQTVYgq22FobAr2B/krJF/ABfPP6m7x4EnV1WSKu3Favw3R/CbLgjf5/KoV1SK7vMijxAF6bl7l3CjFbqXYhiVyfr3NdcT1IalWJrnDIDvwQXAH+8vMcCn58UmXIbIdpGi+QIRmYUiAKDZeK8dweFrlaJHhu4odqc7bkwALp38FVz8uctVXmeUDwB2/lw9r84h8fC5wfZhacmiPwbaeYB3uK3FMUsy8WMyqwZXvQ662JodMK+Ckz8Vlrh7uJX+WpaEhUDH4HWu9luhqqgzcCnUIez7adveWXYigeEOT6Zs2Evn+zFaqWUOPBcTgbt4mcOuWRmZGrpy3P4iXeTwtZWOD0UK0KTMIWxIPwu4cEAA2yoetHwyrCqg1YG4B4J6RX3Q7rnAuGmWy0F4Gy6JaivBNAUqAkkiQZgBXJpME8ViDxeKurO8zLRLDOGIuFJPQ88yzzDp/OTK3y5gqH5eSq8NpgoEKKTj1WZFsCugbWRMRWNXvOegG169A2OY8YlYSBY4PUT5sbUgfxPMVKXw9UCzIkqmEqs1SBrOvjAuDw1VaUfY1RD1QerhxTAoKJLFboH6DAaoR5tB7H6C1ZgOQC0MGvtl5XP66jVYbk3z4nIo7ssbaJuvZFei+ixltrx+QSNWmB6p9dDBN4po1+Vyn1pRQo8ZgWv/HC+BAFi/v8Gywoc8ablY6S2+UpeRQTwJHYvapimI5O/v3A//4++ejuPmhlC+hAFzmidM7s5mCcyBZchB8mGo1SGwUnUTcXnlopGASubLZKb11JA4GUSgJYN7obbCcauHOF5YwR9g7BW1x1AfpwyR0pDLQzI6wG4HgQG9mxfQlJ0QswjplomeljUhaHVAE0x1mVra5t3f
-Received: from localhost (131.65.194.35.bc.googleusercontent.com. [35.194.65.131])
-        by smtp.gmail.com with ESMTPSA id ly9-20020a0562145c0900b0068509353fb6sm991500qvb.133.2024.01.27.08.20.51
+        d=1e100.net; s=20230601; t=1706373928; x=1706978728;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=v/W7oUJ2HhNaOAurMi2PWx60uv0Y/uRQwn4EL2qMDdM=;
+        b=kNZyeXk53L0Wi7MqChFYmAVJ72aMbUaDivH2+Vajtz09fTijSqRr6S/ICX6SKYp4Zu
+         16WrLaxz2WwRVy2TEILEmF4D63dls21qgBVgkmhsqF3rk5uaHhm8HIoRCw+Rd2ebMKgt
+         kKN9V0aU3oy/W8sAwRfWNSK1nHr58sUNLmJQT7T8Q0HXxVAKDI0poZmUtzIdXWN9oZl6
+         JBGUFxmssieewM+ZNcUiiFnX4WYrUoCikDP7kAt01/z1JI4R820Z/dEUAILcYGfzJ9oe
+         ov80b9wFYVw/gHMMN8a+h7XIbWtkeHa5a80cubX1p722VU5x2vMVXdfZruQQsWfRq2YG
+         gh/Q==
+X-Gm-Message-State: AOJu0YyJJ1VSQ5ODp3MFdt4U2VojSX9dFVcyrBq++24FbcACtipA3yWe
+	SFzW97obEyqle6oSJ2ScV8/K6zFsXhwBlzqFnQkoC0jAn7HKJRcSsdVwZ27YCOY=
+X-Google-Smtp-Source: AGHT+IHE7N7gSLzWCPERE8jy2D0sILXM4jKrm4Ci0pHbQYFp6Utbii+aCg2mkKXpD8TB/wm+igIj7w==
+X-Received: by 2002:a5d:59ac:0:b0:337:c4d2:473a with SMTP id p12-20020a5d59ac000000b00337c4d2473amr1327908wrr.69.1706373928072;
+        Sat, 27 Jan 2024 08:45:28 -0800 (PST)
+Received: from lenovo-lap.localdomain (85-250-47-161.bb.netvision.net.il. [85.250.47.161])
+        by smtp.googlemail.com with ESMTPSA id r14-20020a5d498e000000b003392bbeeed3sm3806158wrq.47.2024.01.27.08.45.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 27 Jan 2024 08:20:51 -0800 (PST)
-Date: Sat, 27 Jan 2024 11:20:51 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Joe Damato <jdamato@fastly.com>, 
- linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org
-Cc: chuck.lever@oracle.com, 
- jlayton@kernel.org, 
- linux-api@vger.kernel.org, 
- brauner@kernel.org, 
- edumazet@google.com, 
- davem@davemloft.net, 
- alexander.duyck@gmail.com, 
- sridhar.samudrala@intel.com, 
- kuba@kernel.org, 
- willemdebruijn.kernel@gmail.com, 
- weiwan@google.com, 
- Joe Damato <jdamato@fastly.com>, 
- Alexander Viro <viro@zeniv.linux.org.uk>, 
- Andrew Waterman <waterman@eecs.berkeley.edu>, 
- Arnd Bergmann <arnd@arndb.de>, 
- Dominik Brodowski <linux@dominikbrodowski.net>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- Jan Kara <jack@suse.cz>, 
- Jiri Slaby <jirislaby@kernel.org>, 
- Jonathan Corbet <corbet@lwn.net>, 
- Julien Panis <jpanis@baylibre.com>, 
- linux-doc@vger.kernel.org (open list:DOCUMENTATION), 
- "(open list:FILESYSTEMS \\(VFS and infrastructure\\))" <linux-fsdevel@vger.kernel.org>, 
- Michael Ellerman <mpe@ellerman.id.au>, 
- Nathan Lynch <nathanl@linux.ibm.com> (open list:FILESYSTEMS \(VFS and infrastructure\)), 
- Palmer Dabbelt <palmer@dabbelt.com>, 
- Steve French <stfrench@microsoft.com>, 
- Thomas Huth <thuth@redhat.com>, 
- Thomas Zimmermann <tzimmermann@suse.de>
-Message-ID: <65b52d6381de7_3a9e0b2943d@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240125225704.12781-1-jdamato@fastly.com>
-References: <20240125225704.12781-1-jdamato@fastly.com>
-Subject: Re: [PATCH net-next v3 0/3] Per epoll context busy poll support
+        Sat, 27 Jan 2024 08:45:27 -0800 (PST)
+From: Yedaya Katsman <yedaya.ka@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Taehee Yoo <ap420073@gmail.com>,
+	David Ahern <dsahern@gmail.com>,
+	Yedaya Katsman <yedaya.ka@gmail.com>
+Subject: [PATCH] ip: remove non-existent amt subcommand from usage
+Date: Sat, 27 Jan 2024 18:45:08 +0200
+Message-Id: <20240127164508.14394-1-yedaya.ka@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Joe Damato wrote:
-> Greetings:
-> 
-> Welcome to v3. Cover letter updated from v2 to explain why ioctl and
-> adjusted my cc_cmd to try to get the correct people in addition to folks
-> who were added in v1 & v2. Labeled as net-next because it seems networking
-> related to me even though it is fs code.
-> 
-> TL;DR This builds on commit bf3b9f6372c4 ("epoll: Add busy poll support to
-> epoll with socket fds.") by allowing user applications to enable
-> epoll-based busy polling and set a busy poll packet budget on a per epoll
-> context basis.
-> 
-> This makes epoll-based busy polling much more usable for user
-> applications than the current system-wide sysctl and hardcoded budget.
-> 
-> To allow for this, two ioctls have been added for epoll contexts for
-> getting and setting a new struct, struct epoll_params.
-> 
-> ioctl was chosen vs a new syscall after reviewing a suggestion by Willem
-> de Bruijn [1]. I am open to using a new syscall instead of an ioctl, but it
-> seemed that: 
->   - Busy poll affects all existing epoll_wait and epoll_pwait variants in
->     the same way, so new verions of many syscalls might be needed. It
+Commit 6e15d27aae94 ("ip: add AMT support") added "amt" to the list
+of "first level" commands list, which isn't correct, as it isn't present
+in the cmds list. remove it from the usage help.
 
-There is no need to support a new feature on legacy calls. Applications have
-to be upgraded to the new ioctl, so they can also be upgraded to the latest
-epoll_wait variant.
+Fixes: 6e15d27aae94 ("ip: add AMT support")
+Signed-off-by: Yedaya Katsman <yedaya.ka@gmail.com>
+---
+ ip/ip.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-epoll_pwait extends epoll_wait with a sigmask.
-epoll_pwait2 extends extends epoll_pwait with nsec resolution timespec.
-Since they are supersets, nothing is lots by limiting to the most recent API.
-
-In the discussion of epoll_pwait2 the addition of a forward looking flags
-argument was discussed, but eventually dropped. Based on the argument that
-adding a syscall is not a big task and does not warrant preemptive code.
-This decision did receive a suitably snarky comment from Jonathan Corbet [1].
-
-It is definitely more boilerplate, but essentially it is as feasible to add an
-epoll_pwait3 that takes an optional busy poll argument. In which case, I also
-believe that it makes more sense to configure the behavior of the syscall
-directly, than through another syscall and state stored in the kernel.
-
-I don't think that the usec fine grain busy poll argument is all that useful.
-Documentation always suggests setting it to 50us or 100us, based on limited
-data. Main point is to set it to exceed the round-trip delay of whatever the
-process is trying to wait on. Overestimating is not costly, as the call
-returns as soon as the condition is met. An epoll_pwait3 flag EPOLL_BUSY_POLL
-with default 100us might be sufficient.
-
-[1] https://lwn.net/Articles/837816/
-
-
->     seems much simpler for users to use the correct
->     epoll_wait/epoll_pwait for their app and add a call to ioctl to enable
->     or disable busy poll as needed. This also probably means less work to
->     get an existing epoll app using busy poll.
+diff --git a/ip/ip.c b/ip/ip.c
+index 860ff957..39bea69b 100644
+--- a/ip/ip.c
++++ b/ip/ip.c
+@@ -61,8 +61,8 @@ static void usage(void)
+ 	fprintf(stderr,
+ 		"Usage: ip [ OPTIONS ] OBJECT { COMMAND | help }\n"
+ 		"       ip [ -force ] -batch filename\n"
+-		"where  OBJECT := { address | addrlabel | amt | fou | help | ila | ioam | l2tp |\n"
+-		"                   link | macsec | maddress | monitor | mptcp | mroute | mrule |\n"
++		"where  OBJECT := { address | addrlabel | fou | help | ila | ioam | l2tp | link |\n"
++		"                   macsec | maddress | monitor | mptcp | mroute | mrule |\n"
+ 		"                   neighbor | neighbour | netconf | netns | nexthop | ntable |\n"
+ 		"                   ntbl | route | rule | sr | tap | tcpmetrics |\n"
+ 		"                   token | tunnel | tuntap | vrf | xfrm }\n"
+-- 
+2.34.1
 
 
