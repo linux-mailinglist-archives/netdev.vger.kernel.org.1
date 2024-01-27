@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-66378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0839083EB48
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 06:30:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C66CE83EB52
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 06:40:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5DBD285060
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 05:30:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFEF9283474
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 05:40:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5CB314002;
-	Sat, 27 Jan 2024 05:30:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EE3514288;
+	Sat, 27 Jan 2024 05:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wf/RATHE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sCiAbR+t"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B515C11CBB;
-	Sat, 27 Jan 2024 05:30:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 166227F;
+	Sat, 27 Jan 2024 05:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706333451; cv=none; b=uXFWtLp757QW5EVECjTmid8miSitM2NsDRZ8uMypvt4LSZwhBbaT1uDD9ysCBecB8WMvkkeJUbMqtws+uU9NrvWDaJsGyX+6FFjo1K7AoHL8S/XqQdAr5bRdBrID08YQMuM5jTvQHHmIkLuznHC13CRB+GHwKll+42nykVNI1WI=
+	t=1706334028; cv=none; b=nEzqt0WocrFMo2+B4JfR6kGefbEaTUGHtzILD1sVdLC8NNle6QGIHXAYCwi/NBBxvr2/AwW4xCVipMHbZMwZx6BHHv5pJV8V4l8k2vvOcPbshDJ64xJP4HVzIFmDLkJODaGr/ODuaMoYX0o/DqX8epFg/jvPbHS5d0Qnf8FWMws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706333451; c=relaxed/simple;
-	bh=q2/ahvhEv1173FX0pjJ79EAzXPQvy6pIWitcla6khk0=;
+	s=arc-20240116; t=1706334028; c=relaxed/simple;
+	bh=9ZTfUtMn1a338N0HPReMh7C0UyVheHoUSbQsZXZyiG8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=q/TOjI91/QdZECIMMQXl54FdcfZdDPVFrRKRz6cVl5T7zCPMgyKP3A4G4ZVtFAAkMci+wHiLThxqdxZyjLQB6Kw7j8NgMImM9hfQZtm1UqXHvm3K2N1C0jqPnKH2+aRKZDsDLkMyXujimP0QwwrBt1kJXiFIfPPVVXZl4EYp+KQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wf/RATHE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1CD84C433F1;
-	Sat, 27 Jan 2024 05:30:51 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=NPpf5VKJXwzjqQ1k1JrF164+nOtXRgOACh418bJi1ampDmMU8cmtbGTq+ArVU/l7BXSA9tGPEOBxfUsy3F6oqmjn9Xp1mq+5yhZoQf+IiSkb+YSTa1/ji7fa1NUbpssvY8z1tcyUBbptzSyAxFS+vAhF+X04EBUoWEKdfaesuqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sCiAbR+t; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 699E0C43390;
+	Sat, 27 Jan 2024 05:40:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706333451;
-	bh=q2/ahvhEv1173FX0pjJ79EAzXPQvy6pIWitcla6khk0=;
+	s=k20201202; t=1706334027;
+	bh=9ZTfUtMn1a338N0HPReMh7C0UyVheHoUSbQsZXZyiG8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Wf/RATHEVrp72410KUFGbYBVlelknYEK+8lm86F56EIgE9LTjYbC8qxEn0XIk4MbM
-	 4+e3+yzsbjHUtD4XNXQlDrPAiTsTQVig/d+ppCNa1H67309eh8+vMp4xojZsdxM1BJ
-	 g4HLQ+5gz+XwB5iR81L6/1Md9eUxJgjZA/n3S6dh83vEuEj3V11g7MEIr2VIJiMWF+
-	 GqSoKRVNDdFy1jseTl00XKRdSfZpF29sdJGIU56ZHssLFeog+MTw2qVfoeENYMpjhn
-	 iW4wNTLCtWIhGkiGaTgjIwKxPX6V6WMNxqLVk14hxnjzE6aQ5uU0+ZPT+bPJtSlaVc
-	 ZtzzmfZ4tC+DA==
+	b=sCiAbR+thSAuApUEJKyoQCHu1r9hIzgVvJGE4EF0434TCeco2LtGfIbx2476vPudE
+	 NNu/2sD8/CTsQSTHNGmpJOFLF9xU7tsQ+W1r+dpm8O5N3pg0LPhreE7F0l2ksHWZI1
+	 qeWVSKYf4T38wwqo6HJ5jwx2pnS0lXvcVKA8k6lzDMlSW7p5geybMhWRIYDVnBm6V9
+	 eSBBF2gbhWpY+/AhnPMIbU7D9fGxQBFdvg8gH5xa4FNmK5jWRMwegCayKSrf1kPuJA
+	 nyksAWWNQ5KGxiNsJuza2cwSxkOk4lIxy0Q6WLgJDFeTz+RfLDT/iDwqlPft0nPjmQ
+	 kaopvDt+Qlp2Q==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 041D6DFF760;
-	Sat, 27 Jan 2024 05:30:51 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4F132DFF762;
+	Sat, 27 Jan 2024 05:40:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,36 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: bpf-next 2024-01-26
+Subject: Re: [PATCH net-next v4 0/3] net: dsa: microchip: implement PHY loopback 
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170633345101.30319.5253057277440239881.git-patchwork-notify@kernel.org>
-Date: Sat, 27 Jan 2024 05:30:51 +0000
-References: <20240126215710.19855-1-daniel@iogearbox.net>
-In-Reply-To: <20240126215710.19855-1-daniel@iogearbox.net>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
- netdev@vger.kernel.org, bpf@vger.kernel.org
+ <170633402732.3753.3039393822972314797.git-patchwork-notify@kernel.org>
+Date: Sat, 27 Jan 2024 05:40:27 +0000
+References: <20240124123314.734815-1-o.rempel@pengutronix.de>
+In-Reply-To: <20240124123314.734815-1-o.rempel@pengutronix.de>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: davem@davemloft.net, andrew@lunn.ch, edumazet@google.com,
+ f.fainelli@gmail.com, kuba@kernel.org, pabeni@redhat.com, olteanv@gmail.com,
+ woojung.huh@microchip.com, arun.ramadoss@microchip.com,
+ kernel@pengutronix.de, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ UNGLinuxDriver@microchip.com, san@skov.dk
 
 Hello:
 
-This pull request was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 26 Jan 2024 22:57:10 +0100 you wrote:
-> Hi David, hi Jakub, hi Paolo, hi Eric,
+On Wed, 24 Jan 2024 13:33:11 +0100 you wrote:
+> changes v4:
+> - add Acked-by: Arun Ramadoss <arun.ramadoss@microchip.com> to patch 3
+> - add Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com> to patch 3
 > 
-> The following pull-request contains BPF updates for your *net-next* tree.
-> 
-> We've added 107 non-merge commits during the last 4 day(s) which contain
-> a total of 101 files changed, 6009 insertions(+), 1260 deletions(-).
+> changes v3:
+> - add Acked-by: Arun Ramadoss <arun.ramadoss@microchip.com> to first 2
+>   patches
+> - move ksz879x specific loopback handling to separate functions
 > 
 > [...]
 
 Here is the summary with links:
-  - pull-request: bpf-next 2024-01-26
-    https://git.kernel.org/netdev/net-next/c/92046e83c07b
+  - [net-next,v4,1/3] net: dsa: microchip: ksz8: move BMCR specific code to separate function
+    https://git.kernel.org/netdev/net-next/c/0c657f860e67
+  - [net-next,v4,2/3] net: dsa: microchip: Remove redundant optimization in ksz8_w_phy_bmcr
+    https://git.kernel.org/netdev/net-next/c/d1b7d0d85d59
+  - [net-next,v4,3/3] net: dsa: microchip: implement PHY loopback configuration for KSZ8794 and KSZ8873
+    https://git.kernel.org/netdev/net-next/c/9e62bed6e105
 
 You are awesome, thank you!
 -- 
