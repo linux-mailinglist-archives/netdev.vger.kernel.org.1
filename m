@@ -1,119 +1,164 @@
-Return-Path: <netdev+bounces-66437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA4E183F060
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 23:00:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 25E9D83F10D
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 23:49:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CF4EFB22D26
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 22:00:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B3B03B25A0F
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 22:49:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F54417BA3;
-	Sat, 27 Jan 2024 22:00:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 486EA1E52B;
+	Sat, 27 Jan 2024 22:49:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="fAlpRsG9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ooc40oFl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B11A1B5B2
-	for <netdev@vger.kernel.org>; Sat, 27 Jan 2024 22:00:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 598331E536
+	for <netdev@vger.kernel.org>; Sat, 27 Jan 2024 22:49:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.134.136.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706392845; cv=none; b=qe1vb3dquO5oP42Iu/ELO90iCVosoof8iO6FGNIhQEA3lWV6aq0OjwTMud7Mb+dZC4iAObohHrMZpfNAwQur23OJz6IwCv40oiy4FmL06033R8jJ0bm+AIhgyLrKOvaUgG8mNJ4WahTs/XOiEoMpzUcE3BW931u3XpJRAQiJjdc=
+	t=1706395749; cv=none; b=vFDeXa4E4m3SEPQsbOSAxeq2Mn/DhkmJvtlarVZYUMyUs6DxXwCCvFh2qqDdhhTaKdnoRTUnemUF+VElCI5cExjhv+LTzBaLwpTRMYhdYQudF+Y+O0lmT7RbWOjvnvWBIMrTwX4P9XDrO959DCo3i/3fdzc5LuxbI5k1NPo2jqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706392845; c=relaxed/simple;
-	bh=JXTVBbTpG7x6c23I9DG7ogFp0evjgxw0Tb+0NyE3UzU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dBLuL2X1VmiEqx5Xu090ilidLbEJzmWgQ1qUab8zxP0QPJ9pULBDhba9Y9iWtpyWguMsO76yuvlcEEDXbciQcoJWkAlMvZ/I1uNCrjddvHBAhtI2FN0pAsAa6T2OeyrQrc+/JVMzXCCnZKouGq4pFebCeN8eq6SziSgdJ1OQFMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=fAlpRsG9; arc=none smtp.client-ip=209.85.216.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-290b1e19101so2094850a91.0
-        for <netdev@vger.kernel.org>; Sat, 27 Jan 2024 14:00:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1706392842; x=1706997642; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=tJIBkulCfrODe4p0bfVjWAj0VgBK7yFAiMuhrhx77cI=;
-        b=fAlpRsG9VNqgM5fNhThNTO+mgEE2sg0s5Mq50L1xwcak7FPLGSHJf1c584y3WOizo3
-         i8OQfGidYc1Zm1sSVuA9W7ocC1zFxaGkyloqdtjSlfiXSLIUBIvvzTepG0xWjErxH7FM
-         gzJZREAjpkk9y6HvDj3pvcOk37WMxz45+ohjhnKt+zUsOkDQoK+/GSBB5hGR63Y6FbAH
-         3hY7bBxql5prDLLVhgKfaUHF3NbFpA3P8KHfOYdpZu9ZYBf6ppP1zE43HNP8jc7nklOy
-         WmMZSPqGwT+Ex/Jz6A+cJT/n832Mk4XeKExYXYnLNR67dakappuYbT0XiFOcUZmbhI1U
-         jykQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706392842; x=1706997642;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tJIBkulCfrODe4p0bfVjWAj0VgBK7yFAiMuhrhx77cI=;
-        b=WP/vs9fIlLf3GzHT5Qe5nwylpteJzNUftUo47EilYPlMsSnNQA7NRZvQWLuGkXW/5W
-         pWnNC30UtqaDLjNWfVdjVBoWgvMPAO19qFwo/wbFQyUOCCsxemPaJLIsOo3wmiCHWc6g
-         mU58zW3LrpiuOkVz2/VrYEOoWGGvLqSMFGE7fM6ksMStqiZUaqk6KeKkc27NJ4dWnd/e
-         Dekio+nYSB2v8GkWqGOvbvUdQis6wnIBJxo1cauwJrEkThVSyVXz5m/NeCqw7KXiuBun
-         Hmzc4TQHp0GhTbyOOUB8jMZyzz7wrJ19xCWxwsNaWyMt/uTDPxozry3caOlExRjr/lst
-         mtHg==
-X-Gm-Message-State: AOJu0YwbyPmC/+OUDEbkRNioEfox3FBKO70uC+yWRT6PWc9IzQ7QA+kY
-	E2VIkESonKiwxnosfD2clMsf7wiphNlkClU3u6b0kWRosubOZ/0wR6NAjXU1rOwXZ3qUm45Lm2F
-	jAcs=
-X-Google-Smtp-Source: AGHT+IHHPI640id9eU2uuT7mBZdxzzdUp33fZxw7t1AEgZSd4x3emb7fYV5FbUUvN3EVUm7kdecUCg==
-X-Received: by 2002:a17:90a:e296:b0:28f:f73a:b48b with SMTP id d22-20020a17090ae29600b0028ff73ab48bmr3811316pjz.23.1706392842051;
-        Sat, 27 Jan 2024 14:00:42 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id 80-20020a630253000000b005d6bdb93070sm2905019pgc.84.2024.01.27.14.00.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 27 Jan 2024 14:00:41 -0800 (PST)
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: netdev@vger.kernel.org
-Cc: Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH iproute2] bpf: fix warning from basename()
-Date: Sat, 27 Jan 2024 14:00:32 -0800
-Message-ID: <20240127220032.5347-1-stephen@networkplumber.org>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1706395749; c=relaxed/simple;
+	bh=lU1LsnoY/AjObB6vlgiL4qIFVyJDnA7AnrXnRq0imGQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hn3gSsH8tPFmVU7s61qM8BIfY4su+PvuAfEW0MVLwgeo5M0d34OWC4T6KV//0cgYN6zYebUpDORKCw4uqMgoZVYx7pRe6kCxfcxDki69VxADpamuc3lpwfQwzr8f91ZQWV7SavVMv8kUJjWUqSjEKKF+FWVw8FVNsx0U6TtZWFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ooc40oFl; arc=none smtp.client-ip=134.134.136.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706395747; x=1737931747;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=lU1LsnoY/AjObB6vlgiL4qIFVyJDnA7AnrXnRq0imGQ=;
+  b=Ooc40oFlvF2zbd84araxoc/587ULyFaK7giWgW8WMK1ZHx9qrZZ4Wdoo
+   5XUnz0MNFEmVKrvi9+uUdSiYHdEpVr+mX+9eaEEU8XZ+8b3N563WX4h06
+   UxQ0/z4obDN/O+BWkBdCwjOpq3NSkoeFvXu/9eaVKyelpswvWDq6GuEi9
+   3G3aWogee+NVHHOdHoilon5U+GPe55gTewqYlCMp7PzbacPTZsJNpQtM+
+   qwqBmrNCaj8wMAsm5m+EXjp5fJuD6z4E7ESGpSekgsauBenSZXtP2d0DY
+   poCpEydw2lSFIWcx7ZxwCajKiUI9Ko34kInRx2Csn3kl0WHhsaPoHglzs
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10966"; a="393147535"
+X-IronPort-AV: E=Sophos;i="6.05,220,1701158400"; 
+   d="scan'208";a="393147535"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jan 2024 14:49:06 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,220,1701158400"; 
+   d="scan'208";a="29152736"
+Received: from lkp-server01.sh.intel.com (HELO 370188f8dc87) ([10.239.97.150])
+  by orviesa002.jf.intel.com with ESMTP; 27 Jan 2024 14:49:05 -0800
+Received: from kbuild by 370188f8dc87 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rTrTx-0002oo-33;
+	Sat, 27 Jan 2024 22:49:01 +0000
+Date: Sun, 28 Jan 2024 06:48:51 +0800
+From: kernel test robot <lkp@intel.com>
+To: David Wei <dw@davidwei.uk>, Jakub Kicinski <kuba@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>, Sabrina Dubroca <sd@queasysnail.net>,
+	netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v7 1/4] netdevsim: allow two netdevsim ports to
+ be connected
+Message-ID: <202401280644.lnmk82jI-lkp@intel.com>
+References: <20240127040354.944744-2-dw@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240127040354.944744-2-dw@davidwei.uk>
 
-The function basename() expects a mutable character string,
-which now causes a warning:
+Hi David,
 
-bpf_legacy.c: In function ‘bpf_load_common’:
-bpf_legacy.c:975:38: warning: passing argument 1 of ‘__xpg_basename’ discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
-  975 |                          basename(cfg->object), cfg->mode == EBPF_PINNED ?
-      |                                   ~~~^~~~~~~~
-In file included from bpf_legacy.c:21:
-/usr/include/libgen.h:34:36: note: expected ‘char *’ but argument is of type ‘const char *’
-   34 | extern char *__xpg_basename (char *__path) __THROW;
+kernel test robot noticed the following build warnings:
 
-Fixes: f20ff2f19552 ("bpf: keep parsed program mode in struct bpf_cfg_in")
-Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
----
- lib/bpf_legacy.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+[auto build test WARNING on net-next/main]
 
-diff --git a/lib/bpf_legacy.c b/lib/bpf_legacy.c
-index 741eec8d4d63..c8da4a3e6b65 100644
---- a/lib/bpf_legacy.c
-+++ b/lib/bpf_legacy.c
-@@ -972,8 +972,8 @@ int bpf_load_common(struct bpf_cfg_in *cfg, const struct bpf_cfg_ops *ops,
- 		ops->cbpf_cb(nl, cfg->opcodes, cfg->n_opcodes);
- 	if (cfg->mode == EBPF_OBJECT || cfg->mode == EBPF_PINNED) {
- 		snprintf(annotation, sizeof(annotation), "%s:[%s]",
--			 basename(cfg->object), cfg->mode == EBPF_PINNED ?
--			 "*fsobj" : cfg->section);
-+			 basename(strdupa(cfg->object)),
-+			 cfg->mode == EBPF_PINNED ? "*fsobj" : cfg->section);
- 		ops->ebpf_cb(nl, cfg->prog_fd, annotation);
- 	}
- 
+url:    https://github.com/intel-lab-lkp/linux/commits/David-Wei/netdevsim-allow-two-netdevsim-ports-to-be-connected/20240127-121234
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240127040354.944744-2-dw%40davidwei.uk
+patch subject: [PATCH net-next v7 1/4] netdevsim: allow two netdevsim ports to be connected
+config: x86_64-randconfig-r122-20240127 (https://download.01.org/0day-ci/archive/20240128/202401280644.lnmk82jI-lkp@intel.com/config)
+compiler: gcc-9 (Debian 9.3.0-22) 9.3.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240128/202401280644.lnmk82jI-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202401280644.lnmk82jI-lkp@intel.com/
+
+sparse warnings: (new ones prefixed by >>)
+>> drivers/net/netdevsim/bus.c:349:14: sparse: sparse: incorrect type in assignment (different address spaces) @@     expected struct netdevsim *peer @@     got struct netdevsim [noderef] __rcu *peer @@
+   drivers/net/netdevsim/bus.c:349:14: sparse:     expected struct netdevsim *peer
+   drivers/net/netdevsim/bus.c:349:14: sparse:     got struct netdevsim [noderef] __rcu *peer
+
+vim +349 drivers/net/netdevsim/bus.c
+
+   311	
+   312	static ssize_t unlink_device_store(const struct bus_type *bus, const char *buf, size_t count)
+   313	{
+   314		struct netdevsim *nsim, *peer;
+   315		unsigned int netnsid, ifidx;
+   316		struct net_device *dev;
+   317		struct net *ns;
+   318		int err;
+   319	
+   320		err = sscanf(buf, "%u:%u", &netnsid, &ifidx);
+   321		if (err != 2) {
+   322			pr_err("Format for unlinking a device is \"netnsid:ifidx\" (uint uint).\n");
+   323			return -EINVAL;
+   324		}
+   325	
+   326		err = -EINVAL;
+   327		rtnl_lock();
+   328		ns = get_net_ns_by_id(current->nsproxy->net_ns, netnsid);
+   329		if (!ns) {
+   330			pr_err("Could not find netns with id: %u\n", netnsid);
+   331			goto out_unlock_rtnl;
+   332		}
+   333	
+   334		dev = __dev_get_by_index(ns, ifidx);
+   335		if (!dev) {
+   336			pr_err("Could not find device with ifindex %u in netnsid %u\n", ifidx, netnsid);
+   337			goto out_put_netns;
+   338		}
+   339	
+   340		if (!netdev_is_nsim(dev)) {
+   341			pr_err("Device with ifindex %u in netnsid %u is not a netdevsim\n", ifidx, netnsid);
+   342			goto out_put_netns;
+   343		}
+   344	
+   345		err = 0;
+   346		nsim = netdev_priv(dev);
+   347		if (!nsim->peer)
+   348			goto out_put_netns;
+ > 349		peer = nsim->peer;
+   350	
+   351		RCU_INIT_POINTER(nsim->peer, NULL);
+   352		RCU_INIT_POINTER(peer->peer, NULL);
+   353	
+   354	out_put_netns:
+   355		put_net(ns);
+   356	out_unlock_rtnl:
+   357		rtnl_unlock();
+   358	
+   359		return !err ? count : err;
+   360	}
+   361	static BUS_ATTR_WO(unlink_device);
+   362	
+
 -- 
-2.43.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
