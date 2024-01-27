@@ -1,76 +1,75 @@
-Return-Path: <netdev+bounces-66341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5ECB783E8F2
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 02:27:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 714DC83E8F7
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 02:28:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 50D931C23DA3
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 01:27:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76DA01C2414F
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 01:28:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00EBA79E4;
-	Sat, 27 Jan 2024 01:27:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A7968F59;
+	Sat, 27 Jan 2024 01:28:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XuycoVZQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o7D4mO0w"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC2328F6D;
-	Sat, 27 Jan 2024 01:27:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51C3F79CD;
+	Sat, 27 Jan 2024 01:28:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706318841; cv=none; b=D8RxWZRGCMBVfGGS/yqe8loS7kNA9Nvi+rlektblWbGvmPBN7pFMmFjn2lsMydCZd+spQsokTUAFSnxgFCOmXu9nMOqpBy2jPk+JYSDmjDt1NxDwe4y7uy7L4nYFdk9eKTGR8fK5gPZ0d3GeP287yeOPa4lKbLh19pEoX5BWEvw=
+	t=1706318901; cv=none; b=aknrSkxTRrfcqv2bneiZrjSyZLVrEMkhCuj09rR2IBTeXJYStccQG/lkamLjNdUc2MHvn142VMZx4GYU9zx8IpJRr+mmh+WSTt2lsH5e9tzKTTziGDWz1Y7QblWvGb3foiYuRHYJCqOTrXM3JSZMi1jVpElCcKIBFixkUi/Z/Bk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706318841; c=relaxed/simple;
-	bh=6j7ldOY0z2Dy6Mx0aFNXfvDzOKct/0FiBiEEaBDJVVc=;
+	s=arc-20240116; t=1706318901; c=relaxed/simple;
+	bh=xfOkGCrUUYiorc9miYCmzuEaIH+fJKBI12AbPGRHlK8=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=et4Jx9wNYomxRsta0VMoFnI2wSFBsajwOsOHAEU9I7E3BFu9IRHj8RGL99gkYQ4jgFcOFuIxhyLbDyMnm5N++FDEDWHP9a8k9EkPzt/U+s2rnrHj2OViwUyvg1iBATD3idAaQ3DbRfDV+3gcFrkkcmghcLTfN2Qi0FITiNbHK6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XuycoVZQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 051B9C43394;
-	Sat, 27 Jan 2024 01:27:20 +0000 (UTC)
+	 MIME-Version:Content-Type; b=q5u7gLD/Dv5ddyLdslNfFvK1AemnJy0bIkobNIeaYwHWQyN3Ebbz5J5KoJ04cYC8k/82K+tKawiv1Xzum1lw5mYuhAloyKNsT8j/6Xt9f3JU+AMM50SR9DfXaL7ijIyETm1L2G5g7e19w6OGLP+cxDfAKubEDPctKOI865hqOkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o7D4mO0w; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 874D7C433F1;
+	Sat, 27 Jan 2024 01:28:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706318841;
-	bh=6j7ldOY0z2Dy6Mx0aFNXfvDzOKct/0FiBiEEaBDJVVc=;
+	s=k20201202; t=1706318900;
+	bh=xfOkGCrUUYiorc9miYCmzuEaIH+fJKBI12AbPGRHlK8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XuycoVZQcAX+YMGCP8hH7xKBfZBFekMjy7Ay7QX+EsypdCq34cDtBPI3appGlPLlo
-	 snCbRcoAMXU/LTNr9kDDVD5xHL85bTJCiT0MwH+AoaUSadmvdouJb70SsEEo2KZV1K
-	 2lzcXPrA/y/5ff7fR0QfknF1+6LDbgdpXWT0nTkZkzvTuouSHT4zbFHk4ugg1FCXvP
-	 oybobEhT8W1JRmGibeU98ywdmZSmKzzQIllM5sG9hoQGVRGI7vYiOGCtD2Cw4HbAw/
-	 W/kLeGhw87bwSZrXxHABjw6D+Bc0jsgybkQupL0Q1fTOrO5L9J4UO7fuT1ZMwItWvn
-	 S4+q3vmwwF7WQ==
-Date: Fri, 26 Jan 2024 17:27:20 -0800
+	b=o7D4mO0wI4uA9XKdw0iv0g9dSa+bUTl5DxPYvJQzgym9lftVT7Q0fX7RkEuWVkcuG
+	 4gmDQmxSefVlIFIuhWrsSA/gOA2ENnjLaGY/N8ttcnVIbxrTbKh7jlOS01Gm1ANiOB
+	 8UjO9qKbDfO5JOiS8sPtr8onAn87PeNyRWeMshj0DZc6xAnqjgBQsh41Lb9VD1ajis
+	 Z8hZOZibxw6o/+zj4a8yFi3vW/IP6lCIpdm0evo66j1Vg+L43kMFWY1rW8rqDjC3VX
+	 1ED03HaLdoZWhwV0yyThUCB9723OO/aBMakPm6UQLBkwvB2hsoZ86iYqZ5ncI+7PQ/
+	 nfIdR4rivuT1w==
+Date: Fri, 26 Jan 2024 17:28:19 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Linus =?UTF-8?B?TMO8c3Npbmc=?= <linus.luessing@c0d3.blue>
-Cc: netdev@vger.kernel.org, bridge@lists.linux.dev,
- b.a.t.m.a.n@lists.open-mesh.org, linux-kernel@vger.kernel.org, Roopa Prabhu
- <roopa@nvidia.com>, Nikolay Aleksandrov <razor@blackwall.org>, "David S .
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net] bridge: mcast: fix disabled snooping after long
- uptime
-Message-ID: <20240126172720.716689b6@kernel.org>
-In-Reply-To: <20240126143607.5649-1-linus.luessing@c0d3.blue>
-References: <20240126143607.5649-1-linus.luessing@c0d3.blue>
+To: allison.henderson@oracle.com
+Cc: netdev@vger.kernel.org, rds-devel@oss.oracle.com,
+ linux-rdma@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
+ davem@davemloft.net, santosh.shilimkar@oracle.com
+Subject: Re: [PATCH UPSTREAM 1/1] rds: Fix possible deadlock in
+ rds_message_put
+Message-ID: <20240126172819.4cc13dd4@kernel.org>
+In-Reply-To: <20240126172652.241017-1-allison.henderson@oracle.com>
+References: <20240126172652.241017-1-allison.henderson@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, 26 Jan 2024 15:36:07 +0100 Linus L=C3=BCssing wrote:
-> +static inline void br_multicast_query_delay_expired(struct timer_list *t)
-> +{
-> +}
+On Fri, 26 Jan 2024 10:26:52 -0700 allison.henderson@oracle.com wrote:
+> +	if (to_drop) {
+> +		rds_inc_put(to_drop);
+> +
+>  	rdsdebug("inc %p rs %p still %d dropped %d\n", inc, rs, ret, drop);
+>  	return ret;
+>  }
 
-nit: let's drop the inline, if it's to suppress a compiler warning
-under some configurations - it's better to put an explicit #ifdef
-around it.
---=20
+This does not build..
+-- 
 pw-bot: cr
 
