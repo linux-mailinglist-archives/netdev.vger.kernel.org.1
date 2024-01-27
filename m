@@ -1,100 +1,86 @@
-Return-Path: <netdev+bounces-66379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66380-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C66CE83EB52
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 06:40:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1363783EB6A
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 07:18:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFEF9283474
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 05:40:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4E822843DC
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 06:18:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EE3514288;
-	Sat, 27 Jan 2024 05:40:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sCiAbR+t"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C180171AB;
+	Sat, 27 Jan 2024 06:18:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bg4.exmail.qq.com (bg4.exmail.qq.com [43.154.54.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 166227F;
-	Sat, 27 Jan 2024 05:40:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD82CB665
+	for <netdev@vger.kernel.org>; Sat, 27 Jan 2024 06:18:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.154.54.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706334028; cv=none; b=nEzqt0WocrFMo2+B4JfR6kGefbEaTUGHtzILD1sVdLC8NNle6QGIHXAYCwi/NBBxvr2/AwW4xCVipMHbZMwZx6BHHv5pJV8V4l8k2vvOcPbshDJ64xJP4HVzIFmDLkJODaGr/ODuaMoYX0o/DqX8epFg/jvPbHS5d0Qnf8FWMws=
+	t=1706336291; cv=none; b=ToVOoaKyuL37MFknr/wNdYh2/yPEd6p010N59Hz+TSppsHZhBeEwIp9lLR1L33TWMvSHEbtfeBdzN+C0NvxYUm5CqlldvpdW2f2uhY/6ks+2x9yvApIUcylMLKoJL51QBBJis6g8HvTDo3ELA3K38fOPFWoUTgNaAAlEsRR4nmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706334028; c=relaxed/simple;
-	bh=9ZTfUtMn1a338N0HPReMh7C0UyVheHoUSbQsZXZyiG8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=NPpf5VKJXwzjqQ1k1JrF164+nOtXRgOACh418bJi1ampDmMU8cmtbGTq+ArVU/l7BXSA9tGPEOBxfUsy3F6oqmjn9Xp1mq+5yhZoQf+IiSkb+YSTa1/ji7fa1NUbpssvY8z1tcyUBbptzSyAxFS+vAhF+X04EBUoWEKdfaesuqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sCiAbR+t; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 699E0C43390;
-	Sat, 27 Jan 2024 05:40:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706334027;
-	bh=9ZTfUtMn1a338N0HPReMh7C0UyVheHoUSbQsZXZyiG8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=sCiAbR+thSAuApUEJKyoQCHu1r9hIzgVvJGE4EF0434TCeco2LtGfIbx2476vPudE
-	 NNu/2sD8/CTsQSTHNGmpJOFLF9xU7tsQ+W1r+dpm8O5N3pg0LPhreE7F0l2ksHWZI1
-	 qeWVSKYf4T38wwqo6HJ5jwx2pnS0lXvcVKA8k6lzDMlSW7p5geybMhWRIYDVnBm6V9
-	 eSBBF2gbhWpY+/AhnPMIbU7D9fGxQBFdvg8gH5xa4FNmK5jWRMwegCayKSrf1kPuJA
-	 nyksAWWNQ5KGxiNsJuza2cwSxkOk4lIxy0Q6WLgJDFeTz+RfLDT/iDwqlPft0nPjmQ
-	 kaopvDt+Qlp2Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4F132DFF762;
-	Sat, 27 Jan 2024 05:40:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1706336291; c=relaxed/simple;
+	bh=W87pCcf7DhQ6QauO+qK/YLZNmloMmrL/KdEZQd2hFr4=;
+	h=From:To:Subject:Mime-Version:Content-Type:Date:Message-ID; b=pzBLPl0Yt6ye6Qle7vPoXSsOHI6NAqhxP/iWXbpKCvKAGFkpEMhmbH3bAcFSLKI8onZLaGuKBkaJKcHS7zqPsD2uTs+4+/cLTDcMZwFqwHSWSjBGjf9tveQyHSnZOUvoy4d4q4wOV4ZB0uou7ax3LcV7iXxxzHQeGHPFUIJgF34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=smail.nju.edu.cn; spf=pass smtp.mailfrom=smail.nju.edu.cn; arc=none smtp.client-ip=43.154.54.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=smail.nju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=smail.nju.edu.cn
+X-QQ-GoodBg: 2
+X-BAN-DOWNLOAD: 1
+X-BAN-SHARE: 1
+X-QQ-SSF: 00400000000000F0
+X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
+X-QQ-FEAT: ILHsT53NKPj/LiHDt1+y1XznLHkZZf2uvgWXgf6Pb0tJCgu0SMEKyvb5wlLR4
+	q49YqnLV2sXYr1iXwImx4LZru9r0mdpWcukEmfxJY7T9usvIyrxTfNumoj2TrUoehmny44A
+	GjT4EFxlmX71HFYuJYFsSwHIePf5fd8T5TyrjsXFnrbCuI04V3va3T7CHOQO5mmqcJF1Qit
+	GkQDU53TA1cqI80vIYqq25UpMl7lt2VF07mzUve/PVytBrSOQRV5soNHTV3v+s9zMYLGV7W
+	82Uupoa+ESwj+zG9hCvQes/quObbV67eAbha5n5DRvXc9/Bh6IjaBq1+2iZhzSlo+aP4qVB
+	S1RzBulaGoV5h7E8sq2kA2VbTX85+BOmUHrZeKU12afBdNT28k=
+X-QQ-BUSINESS-ORIGIN: 2
+X-QQ-Originating-IP: AODbB5neAqU9hdf4HQV7mHwzb0Gwpuivre2KHH7Mooo=
+X-QQ-STYLE: 
+X-QQ-mid: t7gz7a-0t1706336280t4934149
+From: "=?utf-8?B?6ZmI5ZiJ5piA?=" <jiayunchen@smail.nju.edu.cn>
+To: "=?utf-8?B?bmV0ZGV2?=" <netdev@vger.kernel.org>
+Subject: Report on Abnormal Behavior of "ip help" Command
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4 0/3] net: dsa: microchip: implement PHY loopback 
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170633402732.3753.3039393822972314797.git-patchwork-notify@kernel.org>
-Date: Sat, 27 Jan 2024 05:40:27 +0000
-References: <20240124123314.734815-1-o.rempel@pengutronix.de>
-In-Reply-To: <20240124123314.734815-1-o.rempel@pengutronix.de>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: davem@davemloft.net, andrew@lunn.ch, edumazet@google.com,
- f.fainelli@gmail.com, kuba@kernel.org, pabeni@redhat.com, olteanv@gmail.com,
- woojung.huh@microchip.com, arun.ramadoss@microchip.com,
- kernel@pengutronix.de, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- UNGLinuxDriver@microchip.com, san@skov.dk
+Mime-Version: 1.0
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: base64
+Date: Sat, 27 Jan 2024 14:17:59 +0800
+X-Priority: 3
+Message-ID: <tencent_4889D8DA6825DFE26A4EE1B5@qq.com>
+X-QQ-MIME: TCMime 1.0 by Tencent
+X-Mailer: QQMail 2.x
+X-QQ-Mailer: QQMail 2.x
+X-BIZMAIL-ID: 14541606569405519984
+X-QQ-SENDSIZE: 520
+Received: from qq.com (unknown [127.0.0.1])
+	by smtp.qq.com (ESMTP) with SMTP
+	id ; Sat, 27 Jan 2024 14:18:01 +0800 (CST)
+Feedback-ID: t:smail.nju.edu.cn:qybglogicsvrgz:qybglogicsvrgz5a-1
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 24 Jan 2024 13:33:11 +0100 you wrote:
-> changes v4:
-> - add Acked-by: Arun Ramadoss <arun.ramadoss@microchip.com> to patch 3
-> - add Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com> to patch 3
-> 
-> changes v3:
-> - add Acked-by: Arun Ramadoss <arun.ramadoss@microchip.com> to first 2
->   patches
-> - move ksz879x specific loopback handling to separate functions
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v4,1/3] net: dsa: microchip: ksz8: move BMCR specific code to separate function
-    https://git.kernel.org/netdev/net-next/c/0c657f860e67
-  - [net-next,v4,2/3] net: dsa: microchip: Remove redundant optimization in ksz8_w_phy_bmcr
-    https://git.kernel.org/netdev/net-next/c/d1b7d0d85d59
-  - [net-next,v4,3/3] net: dsa: microchip: implement PHY loopback configuration for KSZ8794 and KSZ8873
-    https://git.kernel.org/netdev/net-next/c/9e62bed6e105
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+VG8gd2hvbSBpdCBtYXkgY29uY2VybiwNCg0KSSBob3BlIHRoaXMgZW1haWwgZmluZHMgeW91
+IHdlbGwuIEkgYW0gd3JpdGluZyB0byByZXBvcnQgYSBiZWhhdmlvciB3aGljaCBzZWVtcyB0
+byBiZSBhYm5vcm1hbC4gSSBoYXZlIG9ic2VydmVkICJpcCBoZWxwIiByZXR1cm5zIC0xICgy
+NTUpLCBldmVuIGlmIHRoZSBoZWxwIGluZm9ybWF0aW9uIGlzIHByaW50ZWQgdG8gdGhlIHRl
+cm1pbmFsIHN1Y2Nlc3NmdWxseS4NCg0KVGhpcyBpcyBwb3RlbnRpYWxseSBjYXVzaW5nIHRy
+b3VibGUgd2hlbiB3ZSdyZSBhdXRvbWF0aWNhbGx5IGNoZWNraW5nIHdoZXRoZXIgYSB0b29s
+IGlzIGJhc2ljYWxseSB3b3JraW5nLCBieSBjaGVja2luZyBpdHMgcmV0dXJuIGNvZGUgKG5v
+cm1hbGx5LCBsaWtlIGNvcmV1dGlscyB0b29scywgLS1oZWxwIHJldHVybnMgMCkuIElzIHRo
+YXQgYmV0dGVyIHRvIG1ha2UgaXQgcmV0dXJuIDAgb24gaGVscCwgb3Iga2VlcCAtMSB0byBt
+YWtlIGl0IGJhY2t3YXJkIGNvbXBhdGlibGU/DQoNClRoZSBpbmZvcm1hdGlvbiBvbiBteSB3
+b3JraW5nIGVudmlyb25tZW50IGlzOiBVYnVudHUyMi4wNCwgaXByb3V0ZTItNS4xNS4wLCBs
+aWJicGYgMC41LjAuDQoNClRoYW5rIHlvdSBmb3IgeW91ciB0aW1lIGFuZCBlZmZvcnRzLCBJ
+IGFtIGxvb2tpbmcgZm9yd2FyZCB0byB5b3VyIHJlcGx5Lg0KDQpCZXN0IHJlZ2FyZHMsDQpD
+aGVuIEppYXl1bg==
 
 
