@@ -1,128 +1,139 @@
-Return-Path: <netdev+bounces-66382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEA7283EC36
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 10:03:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE2EF83EC51
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 10:34:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 80D79B2220C
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 09:03:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2724B283074
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 09:34:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE34D1DFEB;
-	Sat, 27 Jan 2024 09:03:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NJFemUh5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC6581E892;
+	Sat, 27 Jan 2024 09:34:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EABC7F;
-	Sat, 27 Jan 2024 09:03:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC9871EB21;
+	Sat, 27 Jan 2024 09:34:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706346209; cv=none; b=tudypocM4OGpn3+PzQ6j22kTgUicy2qM60qXhnQwXYXSYCJW8fH9zxRpccVMakH2YfCWLqxhld6CHUd0hKoU7NAfrkqAhk4Lh/+J7ZnWtZdYSrRotwGAwGSNcaqZBrWt57x9ToQCNnvbZu0FhvsRRyZbJmgVyYvFHCie7Cpj9Jc=
+	t=1706348063; cv=none; b=eHP7MTW/Ge2AAukZnSOOuM5BgQ4mWnY4SDMqyDCntzMMlbbMjUItGV5zkXl2s1te4EoomMah4/kWjfrFLiJTW1GVvHQoBzXLRTYBDoB6ZWtGW4DVMpqos3ybe4IOA7RyPrNDbkshl2nZJvnzukNzY/kJD+63pquggLv15KYleJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706346209; c=relaxed/simple;
-	bh=yg/Y2lPHCXw+ApriwYjx7xRqzTngKb2FdtskFU96fy4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=t2YuY6ceXhaJYQfpvSM9ybC53BmTD1Hqb2ExuoP76FtUFFDtdW/4yslNF6K9GcrvUKNF2086VZE6KFm9Ant37wpHjnFjSR2dptowPWJljqb1/ua8ZVFO/YkpjbLC1cYhFKZqkycYaFMTgkpKvjAurtpUGupdsFyalB1idMovwZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NJFemUh5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B31A6C433F1;
-	Sat, 27 Jan 2024 09:03:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706346209;
-	bh=yg/Y2lPHCXw+ApriwYjx7xRqzTngKb2FdtskFU96fy4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=NJFemUh5XosxEzuQNYr3ZBJxlqQ88LeyRThWQPYHhcBd46I/Ha71V2zIDrpWwj/MY
-	 EsXjF9jf85sFYjJqroHoV/XVk1x3zTb5rN/b2ZmgAH35P2eFALCd3qsoxqchHK3NRC
-	 rcuN4tcEBcihc5qfYkufSpRehgZSWYRzEWup5xUr+XMZ3lXWcWk6pGbeMV/Y1asZnB
-	 8Vf5RSM+8smD09u4yHzl6W7LMVppvovI3ad3Kmb7zu7o9vNNfFQXNZKY/tNk6N26S0
-	 nVLllaA54+Ghqv+biNjbI95CloERJfE7oXByp5kUnhCRb4niUoL10fPw03vgH/0Dsm
-	 UJ57YxXzKwe9g==
-From: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Mykola
- Lysenko <mykolal@fb.com>, bpf@vger.kernel.org, netdev@vger.kernel.org,
- =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@rivosinc.com>,
- linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH bpf-next v2] selftests/bpf: Include runner extras for
- install target
-In-Reply-To: <CAEf4BzaewwHQn7xBgiuckH3xbRHGc6GxvAq6rXf6Ep+KDWDEFg@mail.gmail.com>
-References: <20240125160502.1512422-1-bjorn@kernel.org>
- <CAEf4BzaewwHQn7xBgiuckH3xbRHGc6GxvAq6rXf6Ep+KDWDEFg@mail.gmail.com>
-Date: Sat, 27 Jan 2024 10:03:25 +0100
-Message-ID: <87r0i34082.fsf@all.your.base.are.belong.to.us>
+	s=arc-20240116; t=1706348063; c=relaxed/simple;
+	bh=jWWHAvPyYDmqWSnWLY25KtBJxBARbNBlduXIIg7JPi4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=eyiOs8KiP29kFiIRBGWsDITVFR+AvKyAISGISYAEtmkoL9s68tMoguz4xZ+Lrw8LOFuomAV+srZVc3LBGdenmTq2Y1rweGdXnwJMaISlb7lBiyVUuV0+lJXWkDlGpKb61ojDocKC8Gf+CD/Vf1/ZfyJ9MovyesdeVODVj2hkb3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4TMTqt3f6XzvVKf;
+	Sat, 27 Jan 2024 17:32:42 +0800 (CST)
+Received: from dggpemm500008.china.huawei.com (unknown [7.185.36.136])
+	by mail.maildlp.com (Postfix) with ESMTPS id E0421180079;
+	Sat, 27 Jan 2024 17:34:17 +0800 (CST)
+Received: from dggpemm500008.china.huawei.com (7.185.36.136) by
+ dggpemm500008.china.huawei.com (7.185.36.136) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Sat, 27 Jan 2024 17:34:17 +0800
+Received: from dggpemm500008.china.huawei.com ([7.185.36.136]) by
+ dggpemm500008.china.huawei.com ([7.185.36.136]) with mapi id 15.01.2507.035;
+ Sat, 27 Jan 2024 17:34:17 +0800
+From: wangyunjian <wangyunjian@huawei.com>
+To: wangyunjian <wangyunjian@huawei.com>, Jason Wang <jasowang@redhat.com>
+CC: "mst@redhat.com" <mst@redhat.com>, "willemdebruijn.kernel@gmail.com"
+	<willemdebruijn.kernel@gmail.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>, "magnus.karlsson@intel.com"
+	<magnus.karlsson@intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, xudingke
+	<xudingke@huawei.com>
+Subject: RE: [PATCH net-next 2/2] tun: AF_XDP Rx zero-copy support
+Thread-Topic: [PATCH net-next 2/2] tun: AF_XDP Rx zero-copy support
+Thread-Index: AQHaTqkDLHSSzcU2CESolpkubpTJa7DpcBcAgAD60ACAAvY/kA==
+Date: Sat, 27 Jan 2024 09:34:17 +0000
+Message-ID: <156030296fea4f7abef6ab7155ba2e32@huawei.com>
+References: <1706089075-16084-1-git-send-email-wangyunjian@huawei.com>
+ <CACGkMEu5PaBgh37X4KysoF9YB8qy6jM5W4G6sm+8fjrnK36KXA@mail.gmail.com>
+ <ad74a361d5084c62a89f7aa276273649@huawei.com>
+In-Reply-To: <ad74a361d5084c62a89f7aa276273649@huawei.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-Andrii Nakryiko <andrii.nakryiko@gmail.com> writes:
-
-> On Thu, Jan 25, 2024 at 8:05=E2=80=AFAM Bj=C3=B6rn T=C3=B6pel <bjorn@kern=
-el.org> wrote:
->>
->> From: Bj=C3=B6rn T=C3=B6pel <bjorn@rivosinc.com>
->>
->> When using the "install" or targets depending on install, e.g.
->> "gen_tar", the "runner extras" weren't included for the BPF machine
->> flavors.
->>
->> Make sure the necessary helper scripts/tools are added to
->> corresponding BPF machine flavor.
->>
->> Signed-off-by: Bj=C3=B6rn T=C3=B6pel <bjorn@rivosinc.com>
->> ---
->> v2: Added btf_dump_test_case files
->> ---
->> tools/testing/selftests/bpf/Makefile | 18 +++++++++++++++---
->>  1 file changed, 15 insertions(+), 3 deletions(-)
->>
->> diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selfte=
-sts/bpf/Makefile
->> index fd15017ed3b1..d5cff32997b3 100644
->> --- a/tools/testing/selftests/bpf/Makefile
->> +++ b/tools/testing/selftests/bpf/Makefile
->> @@ -744,8 +744,20 @@ EXTRA_CLEAN :=3D $(TEST_CUSTOM_PROGS) $(SCRATCH_DIR=
-) $(HOST_SCRATCH_DIR)     \
->>  DEFAULT_INSTALL_RULE :=3D $(INSTALL_RULE)
->>  override define INSTALL_RULE
->>         $(DEFAULT_INSTALL_RULE)
->> -       @for DIR in $(TEST_INST_SUBDIRS); do              \
->> -               mkdir -p $(INSTALL_PATH)/$$DIR;   \
->> -               rsync -a $(OUTPUT)/$$DIR/*.bpf.o $(INSTALL_PATH)/$$DIR;\
->> +       @for DIR in $(TEST_INST_SUBDIRS); do                    \
->> +               mkdir -p $(INSTALL_PATH)/$$DIR;                 \
->> +               rsync -a --copy-unsafe-links                    \
->> +                       $(OUTPUT)/$$DIR/bpf_testmod.ko          \
->> +                       $(OUTPUT)/$$DIR/bpftool                 \
->> +                       $(OUTPUT)/$$DIR/ima_setup.sh            \
->> +                       $(OUTPUT)/$$DIR/liburandom_read.so      \
->> +                       $(OUTPUT)/$$DIR/sign-file               \
->> +                       $(OUTPUT)/$$DIR/uprobe_multi            \
->> +                       $(OUTPUT)/$$DIR/urandom_read            \
->> +                       $(OUTPUT)/$$DIR/verify_sig_setup.sh     \
->> +                       $(OUTPUT)/$$DIR/xdp_synproxy            \
->> +                       $(OUTPUT)/$$DIR/btf_dump_test_case_*.c  \
->> +                       $(OUTPUT)/$$DIR/*.bpf.o                 \
->> +                       $(INSTALL_PATH)/$$DIR;                  \
->
-> My concern is that this will get out of sync and will go unnoticed
-> next time we add another "extra" file. We have TRUNNER_EXTRA_FILES,
-> should we use that list to keep these extras in fewer places?
-
-Yeah, you're completely right -- this was a lazy approach. I'll spin a
-more robust v3.
-
-
-Cheers,
-Bj=C3=B6rn
+PiA+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4gRnJvbTogSmFzb24gV2FuZyBbbWFp
+bHRvOmphc293YW5nQHJlZGhhdC5jb21dDQo+ID4gU2VudDogVGh1cnNkYXksIEphbnVhcnkgMjUs
+IDIwMjQgMTI6NDkgUE0NCj4gPiBUbzogd2FuZ3l1bmppYW4gPHdhbmd5dW5qaWFuQGh1YXdlaS5j
+b20+DQo+ID4gQ2M6IG1zdEByZWRoYXQuY29tOyB3aWxsZW1kZWJydWlqbi5rZXJuZWxAZ21haWwu
+Y29tOyBrdWJhQGtlcm5lbC5vcmc7DQo+ID4gZGF2ZW1AZGF2ZW1sb2Z0Lm5ldDsgbWFnbnVzLmth
+cmxzc29uQGludGVsLmNvbTsNCj4gPiBuZXRkZXZAdmdlci5rZXJuZWwub3JnOyBsaW51eC1rZXJu
+ZWxAdmdlci5rZXJuZWwub3JnOw0KPiA+IGt2bUB2Z2VyLmtlcm5lbC5vcmc7IHZpcnR1YWxpemF0
+aW9uQGxpc3RzLmxpbnV4LmRldjsgeHVkaW5na2UNCj4gPiA8eHVkaW5na2VAaHVhd2VpLmNvbT4N
+Cj4gPiBTdWJqZWN0OiBSZTogW1BBVENIIG5ldC1uZXh0IDIvMl0gdHVuOiBBRl9YRFAgUnggemVy
+by1jb3B5IHN1cHBvcnQNCj4gPg0KPiA+IE9uIFdlZCwgSmFuIDI0LCAyMDI0IGF0IDU6MzjigK9Q
+TSBZdW5qaWFuIFdhbmcNCj4gPHdhbmd5dW5qaWFuQGh1YXdlaS5jb20+DQo+ID4gd3JvdGU6DQo+
+ID4gPg0KPiA+ID4gTm93IHRoZSB6ZXJvLWNvcHkgZmVhdHVyZSBvZiBBRl9YRFAgc29ja2V0IGlz
+IHN1cHBvcnRlZCBieSBzb21lDQo+ID4gPiBkcml2ZXJzLCB3aGljaCBjYW4gcmVkdWNlIENQVSB1
+dGlsaXphdGlvbiBvbiB0aGUgeGRwIHByb2dyYW0uDQo+ID4gPiBUaGlzIHBhdGNoIHNldCBhbGxv
+d3MgdHVuIHRvIHN1cHBvcnQgQUZfWERQIFJ4IHplcm8tY29weSBmZWF0dXJlLg0KPiA+ID4NCj4g
+PiA+IFRoaXMgcGF0Y2ggdHJpZXMgdG8gYWRkcmVzcyB0aGlzIGJ5Og0KPiA+ID4gLSBVc2UgcGVl
+a19sZW4gdG8gY29uc3VtZSBhIHhzay0+ZGVzYyBhbmQgZ2V0IHhzay0+ZGVzYyBsZW5ndGguDQo+
+ID4gPiAtIFdoZW4gdGhlIHR1biBzdXBwb3J0IEFGX1hEUCBSeCB6ZXJvLWNvcHksIHRoZSB2cSdz
+IGFycmF5IG1heWJlIGVtcHR5Lg0KPiA+ID4gU28gYWRkIGEgY2hlY2sgZm9yIGVtcHR5IHZxJ3Mg
+YXJyYXkgaW4gdmhvc3RfbmV0X2J1Zl9wcm9kdWNlKCkuDQo+ID4gPiAtIGFkZCBYRFBfU0VUVVBf
+WFNLX1BPT0wgYW5kIG5kb194c2tfd2FrZXVwIGNhbGxiYWNrIHN1cHBvcnQNCj4gPiA+IC0gYWRk
+IHR1bl9wdXRfdXNlcl9kZXNjIGZ1bmN0aW9uIHRvIGNvcHkgdGhlIFJ4IGRhdGEgdG8gVk0NCj4g
+Pg0KPiA+IENvZGUgZXhwbGFpbnMgdGhlbXNlbHZlcywgbGV0J3MgZXhwbGFpbiB3aHkgeW91IG5l
+ZWQgdG8gZG8gdGhpcy4NCj4gPg0KPiA+IDEpIHdoeSB5b3Ugd2FudCB0byB1c2UgcGVla19sZW4N
+Cj4gPiAyKSBmb3IgInZxJ3MgYXJyYXkiLCB3aGF0IGRvZXMgaXQgbWVhbj8NCj4gPiAzKSBmcm9t
+IHRoZSB2aWV3IG9mIFRVTi9UQVAgdHVuX3B1dF91c2VyX2Rlc2MoKSBpcyB0aGUgVFggcGF0aCwg
+c28gSQ0KPiA+IGd1ZXNzIHlvdSBtZWFudCBUWCB6ZXJvY29weSBpbnN0ZWFkIG9mIFJYIChhcyBJ
+IGRvbid0IHNlZSBjb2RlcyBmb3INCj4gPiBSWD8pDQo+IA0KPiBPSywgSSBhZ3JlZSBhbmQgdXNl
+IFRYIHplcm9jb3B5IGluc3RlYWQgb2YgUlggemVyb2NvcHkuIEkgbWVhbnQgUlggemVyb2NvcHkN
+Cj4gZnJvbSB0aGUgdmlldyBvZiB2aG9zdC1uZXQuDQo+IA0KPiA+DQo+ID4gQSBiaWcgcXVlc3Rp
+b24gaXMgaG93IGNvdWxkIHlvdSBoYW5kbGUgR1NPIHBhY2tldHMgZnJvbSB1c2Vyc3BhY2UvZ3Vl
+c3RzPw0KPiANCj4gTm93IGJ5IGRpc2FibGluZyBWTSdzIFRTTyBhbmQgY3N1bSBmZWF0dXJlLiBY
+RFAgZG9lcyBub3Qgc3VwcG9ydCBHU08NCj4gcGFja2V0cy4NCj4gSG93ZXZlciwgdGhpcyBmZWF0
+dXJlIGNhbiBiZSBhZGRlZCBvbmNlIFhEUCBzdXBwb3J0cyBpdCBpbiB0aGUgZnV0dXJlLg0KPiAN
+Cj4gPg0KPiA+ID4NCj4gPiA+IFNpZ25lZC1vZmYtYnk6IFl1bmppYW4gV2FuZyA8d2FuZ3l1bmpp
+YW5AaHVhd2VpLmNvbT4NCj4gPiA+IC0tLQ0KPiA+ID4gIGRyaXZlcnMvbmV0L3R1bi5jICAgfCAx
+NjUNCj4gPiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLQ0KPiA+
+ID4gIGRyaXZlcnMvdmhvc3QvbmV0LmMgfCAgMTggKysrLS0NCj4gPiA+ICAyIGZpbGVzIGNoYW5n
+ZWQsIDE3NiBpbnNlcnRpb25zKCspLCA3IGRlbGV0aW9ucygtKQ0KDQpbLi4uXQ0KDQo+ID4gPg0K
+PiA+ID4gIHN0YXRpYyBpbnQgcGVla19oZWFkX2xlbihzdHJ1Y3Qgdmhvc3RfbmV0X3ZpcnRxdWV1
+ZSAqcnZxLCBzdHJ1Y3QNCj4gPiA+IHNvY2sNCj4gPiA+ICpzaykgIHsNCj4gPiA+ICsgICAgICAg
+c3RydWN0IHNvY2tldCAqc29jayA9IHNrLT5za19zb2NrZXQ7DQo+ID4gPiAgICAgICAgIHN0cnVj
+dCBza19idWZmICpoZWFkOw0KPiA+ID4gICAgICAgICBpbnQgbGVuID0gMDsNCj4gPiA+ICAgICAg
+ICAgdW5zaWduZWQgbG9uZyBmbGFnczsNCj4gPiA+DQo+ID4gPiAtICAgICAgIGlmIChydnEtPnJ4
+X3JpbmcpDQo+ID4gPiAtICAgICAgICAgICAgICAgcmV0dXJuIHZob3N0X25ldF9idWZfcGVlayhy
+dnEpOw0KPiA+ID4gKyAgICAgICBpZiAocnZxLT5yeF9yaW5nKSB7DQo+ID4gPiArICAgICAgICAg
+ICAgICAgbGVuID0gdmhvc3RfbmV0X2J1Zl9wZWVrKHJ2cSk7DQo+ID4gPiArICAgICAgICAgICAg
+ICAgaWYgKGxpa2VseShsZW4pKQ0KPiA+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgcmV0dXJu
+IGxlbjsNCj4gPiA+ICsgICAgICAgfQ0KPiA+ID4gKw0KPiA+ID4gKyAgICAgICBpZiAoc29jay0+
+b3BzLT5wZWVrX2xlbikNCj4gPiA+ICsgICAgICAgICAgICAgICByZXR1cm4gc29jay0+b3BzLT5w
+ZWVrX2xlbihzb2NrKTsNCj4gPg0KPiA+IFdoYXQgcHJldmVudHMgeW91IGZyb20gcmV1c2luZyB0
+aGUgcHRyX3JpbmcgaGVyZT8gVGhlbiB5b3UgZG9uJ3QgbmVlZA0KPiA+IHRoZSBhYm92ZSB0cmlj
+a3MuDQo+IA0KPiBUaGFuayB5b3UgZm9yIHlvdXIgc3VnZ2VzdGlvbi4gSSB3aWxsIGNvbnNpZGVy
+IGhvdyB0byByZXVzZSB0aGUgcHRyX3JpbmcuDQoNCklmIHB0cl9yaW5nIGlzIHVzZWQgdG8gdHJh
+bnNmZXIgeGRwX2Rlc2NzLCB0aGVyZSBpcyBhIHByb2JsZW06IEFmdGVyIHNvbWUNCnhkcF9kZXNj
+cyBhcmUgb2J0YWluZWQgdGhyb3VnaCB4c2tfdHhfcGVla19kZXNjKCksIHRoZSBkZXNjcyBtYXkg
+ZmFpbA0KdG8gYmUgYWRkZWQgdG8gcHRyX3JpbmcuIEhvd2V2ZXIsIG5vIEFQSSBpcyBhdmFpbGFi
+bGUgdG8gaW1wbGVtZW50IHRoZQ0Kcm9sbGJhY2sgZnVuY3Rpb24uDQoNClRoYW5rcw0KDQo+IA0K
+PiA+DQo+ID4gVGhhbmtzDQo+ID4NCj4gPg0KPiA+ID4NCj4gPiA+ICAgICAgICAgc3Bpbl9sb2Nr
+X2lycXNhdmUoJnNrLT5za19yZWNlaXZlX3F1ZXVlLmxvY2ssIGZsYWdzKTsNCj4gPiA+ICAgICAg
+ICAgaGVhZCA9IHNrYl9wZWVrKCZzay0+c2tfcmVjZWl2ZV9xdWV1ZSk7DQo+ID4gPiAtLQ0KPiA+
+ID4gMi4zMy4wDQo+ID4gPg0KDQo=
 
