@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-66373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 738D083EB2E
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 06:10:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B807C83EB2D
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 06:10:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 232681F24787
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 05:10:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9AC5C1C22D28
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 05:10:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42D9213FFB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DE8113AE3;
 	Sat, 27 Jan 2024 05:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WrCJkq1P"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WG1HZCq1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ED3613FE0
-	for <netdev@vger.kernel.org>; Sat, 27 Jan 2024 05:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EACD212B6B;
+	Sat, 27 Jan 2024 05:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706332230; cv=none; b=KbWg0xyjyq3dXmk8qohsuOQiolRpyWCJ7P0aU7DxleNErgFsQaQkQh8acn7ExTiMZSzD5gMxUnkelbl2kXURNSFltrD+WdWPG/y3b41yc0xpfy953cO6Z2/LlEoiVxo5kwQX8LlO0kJxokFzbOAilq23/yMsedRWPtcxGsUhtaY=
+	t=1706332230; cv=none; b=PnF6BTQ6ZhhfB1Yuwj9lNB/h9fdL/KNCmQc9Zc9crI8J+EtpYtAaIWWPEkhKpXS+0rdgwoHwIDrVwyW3wqRmIkaP5hNz/wiFSlBQEYhIwkgEpnO+Zl8nlNqsPAnH+J92sr+F5vYMHrGb4eFAYdWP+8k6G+5vd2VXzs1J70MLX90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1706332230; c=relaxed/simple;
-	bh=RJT2Y0WdnmAYahzEiiAmr4lFTMx13C/vt5K2KmEPb/Q=;
+	bh=c8OkF864VgYeRw7woWIVPNPvS2Vc3lcwaCYuza37+p4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FIhqaNq3cH2Mf0rDrdW6nI/QceJuK4yiiLIXZROFBVYSQkcvdjaSzk1MY+Wi6vaAzE2fqA6Mwo34HLu4bl4aBCg3Vqke/F6fckbXzjeLhpJ1EGXgsiaciUZe0VNuHwZgoNy3r07mpN58GH5ffqvysbje43brI4rXToSxjVNyDlc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WrCJkq1P; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9D638C433F1;
+	 In-Reply-To:To:Cc; b=WYkAowAYBdJDyP0ux3wTTxNKUuJ4tvT+2ndZFHY7LFUgRTTmg8+7tMiBC3j9vuwMGJ5t7jdv+H0C4EQm3+dqefuDNy6aCqZ8+k2f6GwSomlY4LbyGmKANbY7pkkwrUPd99QmKAKgIN9PMkK7GkNjAx9xaMd2FQIKqlZ0EJTdCds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WG1HZCq1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B0ECBC43399;
 	Sat, 27 Jan 2024 05:10:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1706332229;
-	bh=RJT2Y0WdnmAYahzEiiAmr4lFTMx13C/vt5K2KmEPb/Q=;
+	bh=c8OkF864VgYeRw7woWIVPNPvS2Vc3lcwaCYuza37+p4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WrCJkq1P/aX7XpVz4uweH2ocShWWdcu9SzTngLBRtfuZnECuoezS9KiMa1t48AGqh
-	 ya05+CKSt4Jt/MEiXQaQl1mnJAu+wYR9AbTftQSMH/pq3rAYlhADQvO2uxOoXL6tol
-	 ernEdahh0GozHPT52YM+IA2aubx2+oOKS3qHbN8oxod9asYTQkfPIw59v7i53eD6wY
-	 +61B760uMg8Kroeto5XDFofiXS73S2SGTr6Y0eY2In88loU7F9kEfkH0ANCd1THkbc
-	 o4trVHTvHLEFzRJc7bgW1SNi35OZhxWH/APZHSh2IQFu8/ZBhnfLWNCW1H8Dzff/Lm
-	 h/a/oYMJdZXlw==
+	b=WG1HZCq1oG/F3L2KKL7tao9SUb16qJs9lwaLs1tt8NXZIew3RCW3tw9wp2chAHE47
+	 MJ4fYs+saBtS/pOsjSvJCBsnP7oFdDRCF3vA9k+HOBuuIEMceevgRZ+RR0bWBwfG7p
+	 pAzg1JuBZxwz7whiA0TRZSSOjwAVlhxI0T1KF2VxcZPp+xn1IB+YZYQRW18COIGkUm
+	 HgRzvvfesaUMaTrMgm2PIlveAHDEDS6g7vdakI3S9w7EHoyyDY87yn3GJj/LMlUts0
+	 tIeblo0ltYqt2YiG0+L7BWnxNpF3taN0ADoIS17LwaU/RIcRmZxQuMpDL/DfMxJsNV
+	 XGHzfnvfqRV9w==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7EAA8DFF760;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 94504D8C97E;
 	Sat, 27 Jan 2024 05:10:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,45 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v5 net-next 0/5] af_unix: Random improvements for GC.
+Subject: Re: [PATCH v2] drivers/ptp: Convert snprintf to sysfs_emit
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170633222951.22327.8113682508825854536.git-patchwork-notify@kernel.org>
+ <170633222960.22327.6975138327319151209.git-patchwork-notify@kernel.org>
 Date: Sat, 27 Jan 2024 05:10:29 +0000
-References: <20240123170856.41348-1-kuniyu@amazon.com>
-In-Reply-To: <20240123170856.41348-1-kuniyu@amazon.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, ivan@cloudflare.com, kuni1840@gmail.com,
+References: <20240125015329.123023-1-lizhijian@fujitsu.com>
+In-Reply-To: <20240125015329.123023-1-lizhijian@fujitsu.com>
+To: Li Zhijian <lizhijian@fujitsu.com>
+Cc: linux-kernel@vger.kernel.org, kuba@kernel.org, richardcochran@gmail.com,
  netdev@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 23 Jan 2024 09:08:51 -0800 you wrote:
-> If more than 16000 inflight AF_UNIX sockets exist on a host, each
-> sendmsg() will be forced to wait for unix_gc() even if a process
-> is not sending any FD.
+On Thu, 25 Jan 2024 09:53:29 +0800 you wrote:
+> Per filesystems/sysfs.rst, show() should only use sysfs_emit()
+> or sysfs_emit_at() when formatting the value to be returned to user space.
 > 
-> This series tries not to impose such a penalty on sane users who
-> do not send AF_UNIX FDs or do not have inflight sockets more than
-> SCM_MAX_FD * 8.
+> coccinelle complains that there are still a couple of functions that use
+> snprintf(). Convert them to sysfs_emit().
+> 
+> > ./drivers/ptp/ptp_sysfs.c:27:8-16: WARNING: please use sysfs_emit
 > 
 > [...]
 
 Here is the summary with links:
-  - [v5,net-next,1/5] af_unix: Annotate data-race of gc_in_progress in wait_for_unix_gc().
-    https://git.kernel.org/netdev/net-next/c/31e03207119a
-  - [v5,net-next,2/5] af_unix: Do not use atomic ops for unix_sk(sk)->inflight.
-    https://git.kernel.org/netdev/net-next/c/97af84a6bba2
-  - [v5,net-next,3/5] af_unix: Return struct unix_sock from unix_get_socket().
-    https://git.kernel.org/netdev/net-next/c/5b17307bd078
-  - [v5,net-next,4/5] af_unix: Run GC on only one CPU.
-    https://git.kernel.org/netdev/net-next/c/8b90a9f819dc
-  - [v5,net-next,5/5] af_unix: Try to run GC async.
-    https://git.kernel.org/netdev/net-next/c/d9f21b361333
+  - [v2] drivers/ptp: Convert snprintf to sysfs_emit
+    https://git.kernel.org/netdev/net-next/c/8d0293302dfb
 
 You are awesome, thank you!
 -- 
