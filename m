@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-66398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFAF083ED47
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 14:26:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A086683ED48
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 14:26:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D66C1F22847
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 13:26:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C565F1C210E4
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 13:26:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB0B62557A;
-	Sat, 27 Jan 2024 13:26:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9487325605;
+	Sat, 27 Jan 2024 13:26:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QfY1m8JX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P1im7GgN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B651288AE
-	for <netdev@vger.kernel.org>; Sat, 27 Jan 2024 13:26:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB65A8831
+	for <netdev@vger.kernel.org>; Sat, 27 Jan 2024 13:26:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706361970; cv=none; b=LSqsRN0VzC93RUWkKU5atwbGrxm2RCtbWcfKMu72mFqmnqHvnh9danEfzccp0ICkgF0wmkiLM3oHNlHWeIa/mCzTaBFXbpYmHVS2s+FFTZYywvVDHcG8/xnwPY6TKBZ0fNrwC0PwHDwBVpvaW8FL+Xcbam8A/PBlNvHOPs8BadI=
+	t=1706362014; cv=none; b=MInKveXSwsc0zvteisS9UZs/fmfdvrP898bv+849B1/4fPkmwthJUU0RW5G5/CgID5D7NvlWn9UWIxNgoyS1qsiNO/vPnq5HHIwf6DRXYukO6A/G96bQ1h4/VD4+g6FoUJTEfU7Ub+CEiikWZP/EXTFM07Nbio+kqDMUJLEv064=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706361970; c=relaxed/simple;
-	bh=iz9J6M26ufNvZvK4WV0jBufbcF5Xc6h6BkEX3JzXixs=;
+	s=arc-20240116; t=1706362014; c=relaxed/simple;
+	bh=O+evovscE1xZusCWBA6PGu9k3ENegClBMa+eeFz0GHc=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=b8Z3u2syV4O7k6ljJenpVrTI8npPjgRI1znk3GA+xqB81JVulmE6xM6bl1CoVW9fZkcFI6Ryl9iIOeTHULZDVEF8InQlFt4uF6CJcRufGaZUM9uVPRgqv9ew9+kLhVxHT5mmL1Sh5Oo0yMMl1JKdzfvkPNkgzZB6J6GnxcbK6oo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QfY1m8JX; arc=none smtp.client-ip=209.85.128.51
+	 In-Reply-To:Content-Type; b=CdqqRtIODIK92bmktStZf3FysaVPL5gLUUnnJr98H0TpH4kxyWEKBBcPEEdNJjYWAPYTtJgaQkg1mn8LRwf2Do+JTMDv57x4BUGH9PdxhnccdrvPdrpEvhUn+ZhEKOoPj/hYpCSPO52lguUC0itk3vFE+F8Fmu3kultaytPR4ok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P1im7GgN; arc=none smtp.client-ip=209.85.128.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-40ef0908c84so1495275e9.0
-        for <netdev@vger.kernel.org>; Sat, 27 Jan 2024 05:26:08 -0800 (PST)
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-40e913e3f03so19951785e9.3
+        for <netdev@vger.kernel.org>; Sat, 27 Jan 2024 05:26:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706361967; x=1706966767; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706362011; x=1706966811; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
          :from:content-language:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=zjYZmyLvYvgL6GepoRgchL00RhldpBQuzdMcY7BhdhE=;
-        b=QfY1m8JXfijYayvvIK+31jCOqhQP91TT2mYzV+JQ3K90PH8daHlc8Qr2WAkrWCSqJF
-         ubtB7LSLrE5wX9v933ee3WOmvzCzSi1A2u9z5pkC92ewN3pwTc6RlvzfO/cvcXa7iKCo
-         iCsj4SIMxf2zHgHrd/ZqAFkzdz/d40jGNEpPc8ERaX2zP68RCDC9qqE11wuwELDkimDv
-         j3Y7zanQq5GIP7kFFYts2iYfEOhp0r2TzpxHvUXenqkImWHEh1iUY/GG4/ashm/kHgNW
-         WCTj5DvqqH+MfUY/zFDM8Ei2x9Q6YQiAqCu5KNd52ZaCAPPMljmMoLbhT/n7sOtFjB78
-         NJGA==
+        bh=c2Yxm79+6+FK/awDAUlmcWMBGSPy/7KP13rKHZaKYJc=;
+        b=P1im7GgNxIHUpNv6oKWDxmd8P5weg6BS83ByTFvobLTIYKbOtz0GG62X3e7LCJCKoJ
+         Us4hBGqXAXOM+hAoFSNKOpJAXu+vwlyGkq3eHi/98QZdtrv/XveIHwFzydkqK9dhsTp5
+         J5V5eaVSGU45Eh42568pEKMRst3AUqc7Tg8W2gBrTQHXGf8BgCxUIBuzpLWQV878a274
+         n2Y0IyHQydmFJlS1Y0e1uMqMoPlWWQFpcG9/k+1rSAT3yY924KLbcwLuONrKKkgGgmih
+         pKWC0kEIsXWaZSaDVMYCuy3RwEGuMdsUfRuA/tKYkDVzw3ZQad0YB+4i25v4mXlvH9yg
+         vaWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706361967; x=1706966767;
+        d=1e100.net; s=20230601; t=1706362011; x=1706966811;
         h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
          :from:content-language:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=zjYZmyLvYvgL6GepoRgchL00RhldpBQuzdMcY7BhdhE=;
-        b=ZdyIzASxv9+T/F0RRETHpbFoo5qdwMmP09Pq6Lns7SSlXDWemoCoxcfKznlnPgI4EF
-         ZbrVceKaDHIExwnGdous74yohZGmWi3XJYDuShB65JvI8bVbZ4cshI3f9DSsBFyZCKYu
-         JtWDIyndh43v+4g954sALhjsOGEFaHl/Q1s89ArwfrGtmzQXKspv7mj6tFWmXCYe6yCT
-         hi5MiGyKKeY0x4wqlxbFl0+y5oB2F94fYhYbNRWq3q4Raae2B1cBJl+Gi8hck3pzjP87
-         DnbE4OG8H/gjLv+yFjRXzD/UqYGWQtFR/zK0C7SwwxYn+KhWcaBr9esbsQbWQwrKP1xh
-         Wydg==
-X-Gm-Message-State: AOJu0YyK4zbEb0Me5cljfW8icJRtsHS3l+pa3Z4h+R+FB8vb6n3iPGR6
-	Y5cZG3MdvQ//k3DZDY4MGlvgp7iEBQV22vnjYVrDnXtR+eYgL0mf
-X-Google-Smtp-Source: AGHT+IEwu0KjpWYQjAgHEIDcPHro/yFCapj3yTAeVDLEx43Mj9HPN84vLs/Aw6vR754Lw5z3jxHE2Q==
-X-Received: by 2002:a05:600c:310d:b0:40e:ce97:445c with SMTP id g13-20020a05600c310d00b0040ece97445cmr1268371wmo.13.1706361967178;
-        Sat, 27 Jan 2024 05:26:07 -0800 (PST)
+        bh=c2Yxm79+6+FK/awDAUlmcWMBGSPy/7KP13rKHZaKYJc=;
+        b=nzpGJy7bMv21IQB/0g9+I5XRGBVaqZVNacFscq1LRHRLewKtJYbg4SLYWr29EtRLCL
+         xmMYGJHBmH4GqlgW5Z3TUUnlxfjujqTlAhOoStZPTxxx5hsx27vLSty8mdzu++RcDbED
+         BlIsX+V+z4sWxowpv3f1jCK9i9oWwfvG0Wa5wvj4jLSkDmo6pwH3MjfijazfUz6JSLgC
+         HDC0+BmmCB4DMlFwU7i9AZA+auZv+Lm/PRBRfQsABItZov8gcrkLGzW0X/U0Q2bEy1He
+         oAfqdbe6KJHh1WfBocN1zFrh+V8tbcImlRpdziXQjxkzGAXAgdV5MMmGmRIA27WV1ztp
+         wVAw==
+X-Gm-Message-State: AOJu0YwzAd1U0lcbpgYFt5cgw7Dx3k3W/mxDplUhFyUs9az8xtIeD1cM
+	KuiIhJRZx09qJjSbTm8E26Dgl/uy7+uyEzPYaI5TBruPO58rCjaP
+X-Google-Smtp-Source: AGHT+IGSfh2iLfhLSvSGMzMBHQK0PBzMOTtprdOWWU4oxbF9mKLYTVj7A8CEccvKBDfiBRKWlUyZwg==
+X-Received: by 2002:a05:600c:468f:b0:40e:cd0e:f749 with SMTP id p15-20020a05600c468f00b0040ecd0ef749mr1370279wmo.28.1706362010743;
+        Sat, 27 Jan 2024 05:26:50 -0800 (PST)
 Received: from ?IPV6:2a01:c23:b938:5400:11ba:857c:4df8:38b0? (dynamic-2a01-0c23-b938-5400-11ba-857c-4df8-38b0.c23.pool.telefonica.de. [2a01:c23:b938:5400:11ba:857c:4df8:38b0])
-        by smtp.googlemail.com with ESMTPSA id z7-20020a05600c0a0700b0040eccfa8a36sm4732850wmp.27.2024.01.27.05.26.06
+        by smtp.googlemail.com with ESMTPSA id z7-20020a05600c0a0700b0040eccfa8a36sm4732850wmp.27.2024.01.27.05.26.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 27 Jan 2024 05:26:06 -0800 (PST)
-Message-ID: <23d684d4-7e3a-4b3f-8b73-11d954b1a375@gmail.com>
-Date: Sat, 27 Jan 2024 14:26:06 +0100
+        Sat, 27 Jan 2024 05:26:50 -0800 (PST)
+Message-ID: <2efec044-879a-4466-a2c6-7c7a0512c569@gmail.com>
+Date: Sat, 27 Jan 2024 14:26:50 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,8 +76,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next v4 2/6] ethtool: switch back from ethtool_keee to
- ethtool_eee for ioctl
+Subject: [PATCH net-next v4 3/6] ethtool: adjust struct ethtool_keee to kernel
+ needs
 Content-Language: en-US
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>,
@@ -133,105 +133,77 @@ In-Reply-To: <7d82de21-9bde-4f66-99ce-f03ff994ef34@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-In order to later extend struct ethtool_keee, we have to decouple it
-from the userspace format represented by struct ethtool_eee.
-Therefore switch back to struct ethtool_eee, representing the userspace
-format, and add conversion between ethtool_eee and ethtool_keee.
-Struct ethtool_keee will be changed in follow-up patches, therefore
-don't do a *keee = *eee here.
-Member cmd isn't copied, because it's not used, and we'll remove
-it in the next patch of this series. In addition omit setting cmd
-to ETHTOOL_GEEE in the ioctl response, userspace ethtool isn't
-interested in it.
+This patch changes the following in struct ethtool_keee
+- remove member cmd, it's not needed on kernel side
+- remove reserved fields
+- switch the semantically boolean members to type bool
 
+We don't have to change any user of the boolean members due to the
+implicit casting from/to bool. A small change is needed where a
+pointer to bool members is used, in addition remove few now unneeded
+double negations.
+
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- net/ethtool/ioctl.c | 48 ++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 39 insertions(+), 9 deletions(-)
+ include/linux/ethtool.h |  8 +++-----
+ net/ethtool/eee.c       | 12 ++++++------
+ 2 files changed, 9 insertions(+), 11 deletions(-)
 
-diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-index b02ca72f4..46c29b369 100644
---- a/net/ethtool/ioctl.c
-+++ b/net/ethtool/ioctl.c
-@@ -1508,22 +1508,50 @@ static int ethtool_set_wol(struct net_device *dev, char __user *useraddr)
- 	return 0;
- }
+diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+index a850bab84..14549cb9e 100644
+--- a/include/linux/ethtool.h
++++ b/include/linux/ethtool.h
+@@ -223,15 +223,13 @@ __ethtool_get_link_ksettings(struct net_device *dev,
+ 			     struct ethtool_link_ksettings *link_ksettings);
  
-+static void eee_to_keee(struct ethtool_keee *keee,
-+			const struct ethtool_eee *eee)
-+{
-+	memset(keee, 0, sizeof(*keee));
-+
-+	keee->supported = eee->supported;
-+	keee->advertised = eee->advertised;
-+	keee->lp_advertised = eee->lp_advertised;
-+	keee->eee_active = eee->eee_active;
-+	keee->eee_enabled = eee->eee_enabled;
-+	keee->tx_lpi_enabled = eee->tx_lpi_enabled;
-+	keee->tx_lpi_timer = eee->tx_lpi_timer;
-+}
-+
-+static void keee_to_eee(struct ethtool_eee *eee,
-+			const struct ethtool_keee *keee)
-+{
-+	memset(eee, 0, sizeof(*eee));
-+
-+	eee->supported = keee->supported;
-+	eee->advertised = keee->advertised;
-+	eee->lp_advertised = keee->lp_advertised;
-+	eee->eee_active = keee->eee_active;
-+	eee->eee_enabled = keee->eee_enabled;
-+	eee->tx_lpi_enabled = keee->tx_lpi_enabled;
-+	eee->tx_lpi_timer = keee->tx_lpi_timer;
-+}
-+
- static int ethtool_get_eee(struct net_device *dev, char __user *useraddr)
- {
--	struct ethtool_keee edata;
-+	struct ethtool_keee keee;
-+	struct ethtool_eee eee;
- 	int rc;
+ struct ethtool_keee {
+-	u32	cmd;
+ 	u32	supported;
+ 	u32	advertised;
+ 	u32	lp_advertised;
+-	u32	eee_active;
+-	u32	eee_enabled;
+-	u32	tx_lpi_enabled;
+ 	u32	tx_lpi_timer;
+-	u32	reserved[2];
++	bool	tx_lpi_enabled;
++	bool	eee_active;
++	bool	eee_enabled;
+ };
  
- 	if (!dev->ethtool_ops->get_eee)
- 		return -EOPNOTSUPP;
+ struct kernel_ethtool_coalesce {
+diff --git a/net/ethtool/eee.c b/net/ethtool/eee.c
+index 21b0e845a..ac9f694ff 100644
+--- a/net/ethtool/eee.c
++++ b/net/ethtool/eee.c
+@@ -98,10 +98,10 @@ static int eee_fill_reply(struct sk_buff *skb,
+ 	if (ret < 0)
+ 		return ret;
  
--	memset(&edata, 0, sizeof(struct ethtool_keee));
--	edata.cmd = ETHTOOL_GEEE;
--	rc = dev->ethtool_ops->get_eee(dev, &edata);
--
-+	memset(&keee, 0, sizeof(keee));
-+	rc = dev->ethtool_ops->get_eee(dev, &keee);
- 	if (rc)
- 		return rc;
+-	if (nla_put_u8(skb, ETHTOOL_A_EEE_ACTIVE, !!eee->eee_active) ||
+-	    nla_put_u8(skb, ETHTOOL_A_EEE_ENABLED, !!eee->eee_enabled) ||
++	if (nla_put_u8(skb, ETHTOOL_A_EEE_ACTIVE, eee->eee_active) ||
++	    nla_put_u8(skb, ETHTOOL_A_EEE_ENABLED, eee->eee_enabled) ||
+ 	    nla_put_u8(skb, ETHTOOL_A_EEE_TX_LPI_ENABLED,
+-		       !!eee->tx_lpi_enabled) ||
++		       eee->tx_lpi_enabled) ||
+ 	    nla_put_u32(skb, ETHTOOL_A_EEE_TX_LPI_TIMER, eee->tx_lpi_timer))
+ 		return -EMSGSIZE;
  
--	if (copy_to_user(useraddr, &edata, sizeof(edata)))
-+	keee_to_eee(&eee, &keee);
-+	if (copy_to_user(useraddr, &eee, sizeof(eee)))
- 		return -EFAULT;
- 
- 	return 0;
-@@ -1531,16 +1559,18 @@ static int ethtool_get_eee(struct net_device *dev, char __user *useraddr)
- 
- static int ethtool_set_eee(struct net_device *dev, char __user *useraddr)
- {
--	struct ethtool_keee edata;
-+	struct ethtool_keee keee;
-+	struct ethtool_eee eee;
- 	int ret;
- 
- 	if (!dev->ethtool_ops->set_eee)
- 		return -EOPNOTSUPP;
- 
--	if (copy_from_user(&edata, useraddr, sizeof(edata)))
-+	if (copy_from_user(&eee, useraddr, sizeof(eee)))
- 		return -EFAULT;
- 
--	ret = dev->ethtool_ops->set_eee(dev, &edata);
-+	eee_to_keee(&keee, &eee);
-+	ret = dev->ethtool_ops->set_eee(dev, &keee);
- 	if (!ret)
- 		ethtool_notify(dev, ETHTOOL_MSG_EEE_NTF, NULL);
- 	return ret;
+@@ -145,9 +145,9 @@ ethnl_set_eee(struct ethnl_req_info *req_info, struct genl_info *info)
+ 				    link_mode_names, info->extack, &mod);
+ 	if (ret < 0)
+ 		return ret;
+-	ethnl_update_bool32(&eee.eee_enabled, tb[ETHTOOL_A_EEE_ENABLED], &mod);
+-	ethnl_update_bool32(&eee.tx_lpi_enabled,
+-			    tb[ETHTOOL_A_EEE_TX_LPI_ENABLED], &mod);
++	ethnl_update_bool(&eee.eee_enabled, tb[ETHTOOL_A_EEE_ENABLED], &mod);
++	ethnl_update_bool(&eee.tx_lpi_enabled, tb[ETHTOOL_A_EEE_TX_LPI_ENABLED],
++			  &mod);
+ 	ethnl_update_u32(&eee.tx_lpi_timer, tb[ETHTOOL_A_EEE_TX_LPI_TIMER],
+ 			 &mod);
+ 	if (!mod)
 -- 
 2.43.0
 
