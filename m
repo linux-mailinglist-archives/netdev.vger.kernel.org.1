@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-66400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 785E783ED4B
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 14:28:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01CC483ED4C
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 14:29:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8207D1C210B9
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 13:28:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86B0F28442D
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 13:29:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B7A52560C;
-	Sat, 27 Jan 2024 13:28:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C735B25614;
+	Sat, 27 Jan 2024 13:29:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ih/P0EY0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OlBFy+Qu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5AC025765
-	for <netdev@vger.kernel.org>; Sat, 27 Jan 2024 13:28:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC0D225605
+	for <netdev@vger.kernel.org>; Sat, 27 Jan 2024 13:29:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706362133; cv=none; b=ROixpQFWSwXFXtMfeUN576KIsRTlVng+zLBim94OjsDh/lxgvqIuZ6HSDBUgEPbwSP/hrUpSA1w7jRyf8KFzN4ZM1tjjKa12xSdeXL7uumW7lwyRkkk+5ls/UNr2vzKk57tBNTm29nyycwSxbUCpFNsrU44/P7/bp317VcPqKok=
+	t=1706362177; cv=none; b=CCOoydQcaweyK/0W/PfyzvtLYAxlVNtdUmaGW2YRnLSwbJYPWfvwigwbWNdaHp2jqK1yVGqL5wYZnLCsfn8SVhDsTiH3AAy0Kjx3zoBh5WOBG1N4+7F7ujhr6BKtEpaFR+WWTziyArSaHz5w2t9epwsN7hP48zYqju1ygyRosLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706362133; c=relaxed/simple;
-	bh=KHqM62fAJzAOmaxJ10/iKOQhOE6ncJVaMEMUbi+1HCk=;
+	s=arc-20240116; t=1706362177; c=relaxed/simple;
+	bh=Kv+Dtl517OAR9A45mxa+2nPZUxLDbOZFEqRCo9HwzSs=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Xl9guxT4IOXbejOWVIKZh/5Tc+OdZbYoMrABBPsWCHpoXdkRykZJi1lo72moV7l0dinFvP2dl5t7CjN2AKwnhv3FSBIh5dawE84uiN6a+fvFPYzrFTqzDcjJoJqg2joYAIsvDStNjoUbVI6YPzadPlKDCBuIOuuaXzdBUmTwTu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ih/P0EY0; arc=none smtp.client-ip=209.85.128.42
+	 In-Reply-To:Content-Type; b=mdlZv67Y2hnBftWTioL27zq9bkTkGcw1IIyPXLnAE++OAbX7DH7Eau2t3vN1tbUoJi39ZPpBh194NuQhxUjq6TqAcIEIKNOBzEDb+3Fn8YkBGHVh1C3IqJLn5W9n8BaPbT5JGNASSIGtjH9qSUO8lpMTT3MsCllkRk2wB5UVZQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OlBFy+Qu; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-40ee705e9bfso17000815e9.0
-        for <netdev@vger.kernel.org>; Sat, 27 Jan 2024 05:28:50 -0800 (PST)
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-40e7065b7bdso24375445e9.3
+        for <netdev@vger.kernel.org>; Sat, 27 Jan 2024 05:29:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706362129; x=1706966929; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706362174; x=1706966974; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
          :from:content-language:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=zXsRjBzVwKauKpOf4ElYR/H3iRDRSHGM/cJ83kZ+rAw=;
-        b=ih/P0EY0S4KDlfWNcioid9YVs393+23/uo24bSQLucQmPj9wWIFAAO0WvfiDVd1Y0A
-         j2ClcyHmkHHYsPAms7etJkmnCVrnivUTVPkxIqBzkVjEU48vS5lNUGjZaGhQ6kzi3m9Q
-         L2gpcvMZeSsPF0cJ3ySbpkdkB5OzS0LFRbR/TtGf8uGc2NdcMSAila3RZsV+d+01ba8L
-         SgPjURuKfmVDlhYBTM+MMXhA9s4zZsEiHImwKa6swmYKnGMpz4AeSPrb/yQSKJXE9UXk
-         ihRu1TZKoZqQ+NWcs0D6mMwbtFDMFgXUZpaBifWvrbCbUdViQ0KLja5nK5HbRB925c+P
-         Tedg==
+        bh=YiyjZT4FjG46ykY17ul015oOsHoiFXFS6O/wHz4L0oI=;
+        b=OlBFy+QuPrSlw5OR/j2ymnTJke+H5IYO8XSjp3dk8HQwAcwepxFkFbSbeh7z45XjhL
+         al0IGqGS2n6EsQWpI+H0fXEMwDutwWMJugYLpTP0bqIoTQscVJZdzvex9EWXl+Y0AwaM
+         +AVgRZL2y9yHO5WOf+nBurVfYG69yB+EPlTRle5x2LDFJTgvSdxYogf7rnExHzt/6Wx4
+         Dt43sp4LkXP7KlQ9MR5AbszFiPT1LTyK5obqiIT/Siig8LQzYZdXTDLDMLI9LKvKEa+D
+         J+avOIDfVXIUTrb2EOj6We83LLp3ahtNNf/xkGzJ1/dLIVEGeut45gsWj1z23HGGHjFu
+         MsiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706362129; x=1706966929;
+        d=1e100.net; s=20230601; t=1706362174; x=1706966974;
         h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
          :from:content-language:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=zXsRjBzVwKauKpOf4ElYR/H3iRDRSHGM/cJ83kZ+rAw=;
-        b=i3skOnA7kZn3rmh6l1VWWmBuXDAD4Tj36ql7EyyPjYyhORhSOKT9En/CT6yk3tYB/f
-         d/ipwM7DhwuPIqBJ0pjSGwpI/cf6uWSvX6iQXIq05bytFSUHb4/xAnQ7DUhX7p4xfr4n
-         RO3AxviJ8O7DZY/Pfk1N2Z2AdU4goQp+28FcWcjRDsjyqcH7ghj5qShspbKmIt3PlMlS
-         nOGGEfL6nUJ59XflKEdNghWok6LM1z1mWuWAk85Lkhnx6PGQOE28k6r/lf77cXPadNQQ
-         eIyj3DppX7QzAJpSCMYic14FAGcKFIf+FH6TANZRFzYEHDElk7dERPk/6Z1TCDbo5/Od
-         ePTQ==
-X-Gm-Message-State: AOJu0YzXk3+uiPL1CWxEoahZJMNhi0BtzYhzVlJ5D04qkZ6bAxhGLQIE
-	N71fASSD2Sd0i0eT9o3CtrAjLQ8HDGki3JRdX64uax114iQLyyTg
-X-Google-Smtp-Source: AGHT+IGoaUkzBVHVxoCXiZN7iRIxgiWqCaf83VCqikN33OGsLhs80c6FBBeefbld57yS/nxgj4dtGg==
-X-Received: by 2002:a05:600c:1f83:b0:40e:7610:f2e2 with SMTP id je3-20020a05600c1f8300b0040e7610f2e2mr1167033wmb.14.1706362128578;
-        Sat, 27 Jan 2024 05:28:48 -0800 (PST)
+        bh=YiyjZT4FjG46ykY17ul015oOsHoiFXFS6O/wHz4L0oI=;
+        b=Jx/nS77OlA4gIY3Ca09NvVY+uHB6ojruGM/VfKbCbT1FQBgOGRfipBKIUqSQgoj6u8
+         nVi417Xiglt4s2tnf1aYo0MD+5Z40Sn001A5d5kgwBws+opyYtUnIgJfhvKMNkL5uAW+
+         ZHjQNZ2V3SO5W/42akpD63XI7XqflmCe0ZUkY9potAc+cvtxgl4U517qPN95VD/Nnawb
+         4BnkcEwAyfHNZYdO/fdCKowcHKoVlgDm1PSqDuSi8aaoOujZWGCv+NGtMe3kfZxiNEAj
+         xeVZLPh29fU7oKn4yBq1JCqFmIPUQkSAby0CgUvHEL/CiNtK2BRXsiNoS2NvB5HVgs8x
+         EwUw==
+X-Gm-Message-State: AOJu0YxcvcZNl4usxZkC77C63a7dcp/CeclKp5pAdRVNOw+zCqgzm0uP
+	Fc8To1MOfnRVxKAaOhaN/dcptmZROmsroGywXWA314HCL/oUmutR2iusJ0hQ
+X-Google-Smtp-Source: AGHT+IFt9dECqZZb/DMs3+aAQy/aOXajfar+PYGK17FkWS3mE7nsTUUY+C6P/R7G/duMuXChIsyKmQ==
+X-Received: by 2002:a5d:6990:0:b0:337:c3cc:5b89 with SMTP id g16-20020a5d6990000000b00337c3cc5b89mr852220wru.104.1706362173959;
+        Sat, 27 Jan 2024 05:29:33 -0800 (PST)
 Received: from ?IPV6:2a01:c23:b938:5400:11ba:857c:4df8:38b0? (dynamic-2a01-0c23-b938-5400-11ba-857c-4df8-38b0.c23.pool.telefonica.de. [2a01:c23:b938:5400:11ba:857c:4df8:38b0])
-        by smtp.googlemail.com with ESMTPSA id fa7-20020a05600c518700b0040ec6d7420csm8537514wmb.14.2024.01.27.05.28.47
+        by smtp.googlemail.com with ESMTPSA id fa7-20020a05600c518700b0040ec6d7420csm8537514wmb.14.2024.01.27.05.29.33
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 27 Jan 2024 05:28:48 -0800 (PST)
-Message-ID: <3d4f2051-90ab-4aa7-bce8-3622cbfd27aa@gmail.com>
-Date: Sat, 27 Jan 2024 14:28:47 +0100
+        Sat, 27 Jan 2024 05:29:33 -0800 (PST)
+Message-ID: <9995ba73-2a37-45e6-ae3d-2c43cf1ba909@gmail.com>
+Date: Sat, 27 Jan 2024 14:29:33 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,8 +76,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next v4 4/6] ethtool: add suffix _u32 to legacy bitmap
- members of struct ethtool_keee
+Subject: [PATCH net-next v4 5/6] ethtool: add linkmode bitmap support to
+ struct ethtool_keee
 Content-Language: en-US
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>,
@@ -133,786 +133,206 @@ In-Reply-To: <7d82de21-9bde-4f66-99ce-f03ff994ef34@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-This is in preparation of using the existing names for linkmode
-bitmaps.
+Add linkmode bitmap members to struct ethtool_keee, but keep the legacy
+u32 bitmaps for compatibility with existing drivers.
+Use linkmode "supported" not being empty as indicator that a user wants
+to use the linkmode bitmap members instead of the legacy bitmaps.
 
-Suggested-by: Andrew Lunn <andrew@lunn.ch>
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
-v4:
-- fix missing replacement
+v3:
+- after adding patch 4, use the old names for the linkmode bitmap members
 ---
- .../ethernet/aquantia/atlantic/aq_ethtool.c   |  8 +++---
- .../ethernet/broadcom/bnx2x/bnx2x_ethtool.c   |  8 +++---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 12 ++++----
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 14 +++++-----
- drivers/net/ethernet/broadcom/tg3.c           | 22 +++++++--------
- drivers/net/ethernet/intel/e1000e/ethtool.c   | 10 +++----
- .../net/ethernet/intel/i40e/i40e_ethtool.c    | 10 +++----
- drivers/net/ethernet/intel/igb/igb_ethtool.c  | 20 ++++++-------
- drivers/net/ethernet/intel/igc/igc_ethtool.c  | 12 ++++----
- .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  | 18 ++++++------
- .../net/ethernet/qlogic/qede/qede_ethtool.c   | 28 +++++++++----------
- drivers/net/phy/phy-c45.c                     | 12 ++++----
- drivers/net/usb/ax88179_178a.c                | 10 +++----
- drivers/net/usb/r8152.c                       | 14 +++++-----
- include/linux/ethtool.h                       |  6 ++--
- net/ethtool/eee.c                             | 16 +++++------
- net/ethtool/ioctl.c                           | 12 ++++----
- 17 files changed, 116 insertions(+), 116 deletions(-)
+ include/linux/ethtool.h |  3 +++
+ net/ethtool/common.c    |  5 +++++
+ net/ethtool/common.h    |  1 +
+ net/ethtool/eee.c       | 49 +++++++++++++++++++++++++++++------------
+ net/ethtool/ioctl.c     | 27 ++++++++++++++++++++---
+ 5 files changed, 68 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c b/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c
-index be865776d..6b454eb7a 100644
---- a/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c
-+++ b/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c
-@@ -713,14 +713,14 @@ static int aq_ethtool_get_eee(struct net_device *ndev, struct ethtool_keee *eee)
- 	if (err < 0)
- 		return err;
- 
--	eee->supported = eee_mask_to_ethtool_mask(supported_rates);
-+	eee->supported_u32 = eee_mask_to_ethtool_mask(supported_rates);
- 
- 	if (aq_nic->aq_nic_cfg.eee_speeds)
--		eee->advertised = eee->supported;
-+		eee->advertised_u32 = eee->supported_u32;
- 
--	eee->lp_advertised = eee_mask_to_ethtool_mask(rate);
-+	eee->lp_advertised_u32 = eee_mask_to_ethtool_mask(rate);
- 
--	eee->eee_enabled = !!eee->advertised;
-+	eee->eee_enabled = !!eee->advertised_u32;
- 
- 	eee->tx_lpi_enabled = eee->eee_enabled;
- 	if ((supported_rates & rate) & AQ_NIC_RATE_EEE_MSK)
-diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
-index c9afb9203..6cabf405d 100644
---- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
-@@ -2120,14 +2120,14 @@ static int bnx2x_get_eee(struct net_device *dev, struct ethtool_keee *edata)
- 
- 	eee_cfg = bp->link_vars.eee_status;
- 
--	edata->supported =
-+	edata->supported_u32 =
- 		bnx2x_eee_to_adv((eee_cfg & SHMEM_EEE_SUPPORTED_MASK) >>
- 				 SHMEM_EEE_SUPPORTED_SHIFT);
- 
--	edata->advertised =
-+	edata->advertised_u32 =
- 		bnx2x_eee_to_adv((eee_cfg & SHMEM_EEE_ADV_STATUS_MASK) >>
- 				 SHMEM_EEE_ADV_STATUS_SHIFT);
--	edata->lp_advertised =
-+	edata->lp_advertised_u32 =
- 		bnx2x_eee_to_adv((eee_cfg & SHMEM_EEE_LP_ADV_STATUS_MASK) >>
- 				 SHMEM_EEE_LP_ADV_STATUS_SHIFT);
- 
-@@ -2162,7 +2162,7 @@ static int bnx2x_set_eee(struct net_device *dev, struct ethtool_keee *edata)
- 		return -EOPNOTSUPP;
- 	}
- 
--	advertised = bnx2x_adv_to_eee(edata->advertised,
-+	advertised = bnx2x_adv_to_eee(edata->advertised_u32,
- 				      SHMEM_EEE_ADV_STATUS_SHIFT);
- 	if ((advertised != (eee_cfg & SHMEM_EEE_ADV_STATUS_MASK))) {
- 		DP(BNX2X_MSG_ETHTOOL,
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index d7626c26f..fde32b32f 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -10624,7 +10624,7 @@ static int bnxt_hwrm_phy_qcaps(struct bnxt *bp)
- 		struct ethtool_keee *eee = &bp->eee;
- 		u16 fw_speeds = le16_to_cpu(resp->supported_speeds_eee_mode);
- 
--		eee->supported = _bnxt_fw_to_ethtool_adv_spds(fw_speeds, 0);
-+		eee->supported_u32 = _bnxt_fw_to_ethtool_adv_spds(fw_speeds, 0);
- 		bp->lpi_tmr_lo = le32_to_cpu(resp->tx_lpi_timer_low) &
- 				 PORT_PHY_QCAPS_RESP_TX_LPI_TIMER_LOW_MASK;
- 		bp->lpi_tmr_hi = le32_to_cpu(resp->valid_tx_lpi_timer_high) &
-@@ -10775,7 +10775,7 @@ int bnxt_update_link(struct bnxt *bp, bool chng_link_state)
- 			eee->eee_active = 1;
- 			fw_speeds = le16_to_cpu(
- 				resp->link_partner_adv_eee_link_speed_mask);
--			eee->lp_advertised =
-+			eee->lp_advertised_u32 =
- 				_bnxt_fw_to_ethtool_adv_spds(fw_speeds, 0);
- 		}
- 
-@@ -10786,7 +10786,7 @@ int bnxt_update_link(struct bnxt *bp, bool chng_link_state)
- 				eee->eee_enabled = 1;
- 
- 			fw_speeds = le16_to_cpu(resp->adv_eee_link_speed_mask);
--			eee->advertised =
-+			eee->advertised_u32 =
- 				_bnxt_fw_to_ethtool_adv_spds(fw_speeds, 0);
- 
- 			if (resp->eee_config_phy_addr &
-@@ -10969,7 +10969,7 @@ static void bnxt_hwrm_set_eee(struct bnxt *bp,
- 			flags |= PORT_PHY_CFG_REQ_FLAGS_EEE_TX_LPI_DISABLE;
- 
- 		req->flags |= cpu_to_le32(flags);
--		eee_speeds = bnxt_get_fw_auto_link_speeds(eee->advertised);
-+		eee_speeds = bnxt_get_fw_auto_link_speeds(eee->advertised_u32);
- 		req->eee_link_speed_mask = cpu_to_le16(eee_speeds);
- 		req->tx_lpi_timer = cpu_to_le32(eee->tx_lpi_timer);
- 	} else {
-@@ -11336,8 +11336,8 @@ static bool bnxt_eee_config_ok(struct bnxt *bp)
- 			eee->eee_enabled = 0;
- 			return false;
- 		}
--		if (eee->advertised & ~advertising) {
--			eee->advertised = advertising & eee->supported;
-+		if (eee->advertised_u32 & ~advertising) {
-+			eee->advertised_u32 = advertising & eee->supported_u32;
- 			return false;
- 		}
- 	}
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index d6a8577d6..481b835a7 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -3919,16 +3919,16 @@ static int bnxt_set_eee(struct net_device *dev, struct ethtool_keee *edata)
- 			edata->tx_lpi_timer = eee->tx_lpi_timer;
- 		}
- 	}
--	if (!edata->advertised) {
--		edata->advertised = advertising & eee->supported;
--	} else if (edata->advertised & ~advertising) {
-+	if (!edata->advertised_u32) {
-+		edata->advertised_u32 = advertising & eee->supported_u32;
-+	} else if (edata->advertised_u32 & ~advertising) {
- 		netdev_warn(dev, "EEE advertised %x must be a subset of autoneg advertised speeds %x\n",
--			    edata->advertised, advertising);
-+			    edata->advertised_u32, advertising);
- 		rc = -EINVAL;
- 		goto eee_exit;
- 	}
- 
--	eee->advertised = edata->advertised;
-+	eee->advertised_u32 = edata->advertised_u32;
- 	eee->tx_lpi_enabled = edata->tx_lpi_enabled;
- 	eee->tx_lpi_timer = edata->tx_lpi_timer;
- eee_ok:
-@@ -3954,12 +3954,12 @@ static int bnxt_get_eee(struct net_device *dev, struct ethtool_keee *edata)
- 		/* Preserve tx_lpi_timer so that the last value will be used
- 		 * by default when it is re-enabled.
- 		 */
--		edata->advertised = 0;
-+		edata->advertised_u32 = 0;
- 		edata->tx_lpi_enabled = 0;
- 	}
- 
- 	if (!bp->eee.eee_active)
--		edata->lp_advertised = 0;
-+		edata->lp_advertised_u32 = 0;
- 
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
-index 11054177c..f644a9131 100644
---- a/drivers/net/ethernet/broadcom/tg3.c
-+++ b/drivers/net/ethernet/broadcom/tg3.c
-@@ -2362,13 +2362,13 @@ static void tg3_eee_pull_config(struct tg3 *tp, struct ethtool_keee *eee)
- 	/* Pull lp advertised settings */
- 	if (tg3_phy_cl45_read(tp, MDIO_MMD_AN, MDIO_AN_EEE_LPABLE, &val))
- 		return;
--	dest->lp_advertised = mmd_eee_adv_to_ethtool_adv_t(val);
-+	dest->lp_advertised_u32 = mmd_eee_adv_to_ethtool_adv_t(val);
- 
- 	/* Pull advertised and eee_enabled settings */
- 	if (tg3_phy_cl45_read(tp, MDIO_MMD_AN, MDIO_AN_EEE_ADV, &val))
- 		return;
- 	dest->eee_enabled = !!val;
--	dest->advertised = mmd_eee_adv_to_ethtool_adv_t(val);
-+	dest->advertised_u32 = mmd_eee_adv_to_ethtool_adv_t(val);
- 
- 	/* Pull tx_lpi_enabled */
- 	val = tr32(TG3_CPMU_EEE_MODE);
-@@ -4364,9 +4364,9 @@ static int tg3_phy_autoneg_cfg(struct tg3 *tp, u32 advertise, u32 flowctrl)
- 
- 		if (!tp->eee.eee_enabled) {
- 			val = 0;
--			tp->eee.advertised = 0;
-+			tp->eee.advertised_u32 = 0;
- 		} else {
--			tp->eee.advertised = advertise &
-+			tp->eee.advertised_u32 = advertise &
- 					     (ADVERTISED_100baseT_Full |
- 					      ADVERTISED_1000baseT_Full);
- 		}
-@@ -4626,13 +4626,13 @@ static bool tg3_phy_eee_config_ok(struct tg3 *tp)
- 	tg3_eee_pull_config(tp, &eee);
- 
- 	if (tp->eee.eee_enabled) {
--		if (tp->eee.advertised != eee.advertised ||
-+		if (tp->eee.advertised_u32 != eee.advertised_u32 ||
- 		    tp->eee.tx_lpi_timer != eee.tx_lpi_timer ||
- 		    tp->eee.tx_lpi_enabled != eee.tx_lpi_enabled)
- 			return false;
- 	} else {
- 		/* EEE is disabled but we're advertising */
--		if (eee.advertised)
-+		if (eee.advertised_u32)
- 			return false;
- 	}
- 
-@@ -14189,7 +14189,7 @@ static int tg3_set_eee(struct net_device *dev, struct ethtool_keee *edata)
- 		return -EOPNOTSUPP;
- 	}
- 
--	if (edata->advertised != tp->eee.advertised) {
-+	if (edata->advertised_u32 != tp->eee.advertised_u32) {
- 		netdev_warn(tp->dev,
- 			    "Direct manipulation of EEE advertisement is not supported\n");
- 		return -EINVAL;
-@@ -15655,10 +15655,10 @@ static int tg3_phy_probe(struct tg3 *tp)
- 	      tg3_chip_rev_id(tp) != CHIPREV_ID_57765_A0))) {
- 		tp->phy_flags |= TG3_PHYFLG_EEE_CAP;
- 
--		tp->eee.supported = SUPPORTED_100baseT_Full |
--				    SUPPORTED_1000baseT_Full;
--		tp->eee.advertised = ADVERTISED_100baseT_Full |
--				     ADVERTISED_1000baseT_Full;
-+		tp->eee.supported_u32 = SUPPORTED_100baseT_Full |
-+					SUPPORTED_1000baseT_Full;
-+		tp->eee.advertised_u32 = ADVERTISED_100baseT_Full |
-+					 ADVERTISED_1000baseT_Full;
- 		tp->eee.eee_enabled = 1;
- 		tp->eee.tx_lpi_enabled = 1;
- 		tp->eee.tx_lpi_timer = TG3_CPMU_DBTMR1_LNKIDLE_2047US;
-diff --git a/drivers/net/ethernet/intel/e1000e/ethtool.c b/drivers/net/ethernet/intel/e1000e/ethtool.c
-index 343f54b2b..ff243ae71 100644
---- a/drivers/net/ethernet/intel/e1000e/ethtool.c
-+++ b/drivers/net/ethernet/intel/e1000e/ethtool.c
-@@ -2223,16 +2223,16 @@ static int e1000e_get_eee(struct net_device *netdev, struct ethtool_keee *edata)
- 	ret_val = e1000_read_emi_reg_locked(hw, cap_addr, &phy_data);
- 	if (ret_val)
- 		goto release;
--	edata->supported = mmd_eee_cap_to_ethtool_sup_t(phy_data);
-+	edata->supported_u32 = mmd_eee_cap_to_ethtool_sup_t(phy_data);
- 
- 	/* EEE Advertised */
--	edata->advertised = mmd_eee_adv_to_ethtool_adv_t(adapter->eee_advert);
-+	edata->advertised_u32 = mmd_eee_adv_to_ethtool_adv_t(adapter->eee_advert);
- 
- 	/* EEE Link Partner Advertised */
- 	ret_val = e1000_read_emi_reg_locked(hw, lpa_addr, &phy_data);
- 	if (ret_val)
- 		goto release;
--	edata->lp_advertised = mmd_eee_adv_to_ethtool_adv_t(phy_data);
-+	edata->lp_advertised_u32 = mmd_eee_adv_to_ethtool_adv_t(phy_data);
- 
- 	/* EEE PCS Status */
- 	ret_val = e1000_read_emi_reg_locked(hw, pcs_stat_addr, &phy_data);
-@@ -2283,12 +2283,12 @@ static int e1000e_set_eee(struct net_device *netdev, struct ethtool_keee *edata)
- 		return -EINVAL;
- 	}
- 
--	if (edata->advertised & ~(ADVERTISE_100_FULL | ADVERTISE_1000_FULL)) {
-+	if (edata->advertised_u32 & ~(ADVERTISE_100_FULL | ADVERTISE_1000_FULL)) {
- 		e_err("EEE advertisement supports only 100TX and/or 1000T full-duplex\n");
- 		return -EINVAL;
- 	}
- 
--	adapter->eee_advert = ethtool_adv_to_mmd_eee_adv_t(edata->advertised);
-+	adapter->eee_advert = ethtool_adv_to_mmd_eee_adv_t(edata->advertised_u32);
- 
- 	hw->dev_spec.ich8lan.eee_disable = !edata->eee_enabled;
- 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-index 9dfda3c48..1b5473358 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-@@ -5664,16 +5664,16 @@ static int i40e_get_eee(struct net_device *netdev, struct ethtool_keee *edata)
- 	if (phy_cfg.eee_capability == 0)
- 		return -EOPNOTSUPP;
- 
--	edata->supported = SUPPORTED_Autoneg;
--	edata->lp_advertised = edata->supported;
-+	edata->supported_u32 = SUPPORTED_Autoneg;
-+	edata->lp_advertised_u32 = edata->supported_u32;
- 
- 	/* Get current configuration */
- 	status = i40e_aq_get_phy_capabilities(hw, false, false, &phy_cfg, NULL);
- 	if (status)
- 		return -EAGAIN;
- 
--	edata->advertised = phy_cfg.eee_capability ? SUPPORTED_Autoneg : 0U;
--	edata->eee_enabled = !!edata->advertised;
-+	edata->advertised_u32 = phy_cfg.eee_capability ? SUPPORTED_Autoneg : 0U;
-+	edata->eee_enabled = !!edata->advertised_u32;
- 	edata->tx_lpi_enabled = pf->stats.tx_lpi_status;
- 
- 	edata->eee_active = pf->stats.tx_lpi_status && pf->stats.rx_lpi_status;
-@@ -5691,7 +5691,7 @@ static int i40e_is_eee_param_supported(struct net_device *netdev,
- 		u32 value;
- 		const char *name;
- 	} param[] = {
--		{edata->advertised & ~SUPPORTED_Autoneg, "advertise"},
-+		{edata->advertised_u32 & ~SUPPORTED_Autoneg, "advertise"},
- 		{edata->tx_lpi_timer, "tx-timer"},
- 		{edata->tx_lpi_enabled != pf->stats.tx_lpi_status, "tx-lpi"}
- 	};
-diff --git a/drivers/net/ethernet/intel/igb/igb_ethtool.c b/drivers/net/ethernet/intel/igb/igb_ethtool.c
-index 778d1e6cf..b87b23d21 100644
---- a/drivers/net/ethernet/intel/igb/igb_ethtool.c
-+++ b/drivers/net/ethernet/intel/igb/igb_ethtool.c
-@@ -3038,10 +3038,10 @@ static int igb_get_eee(struct net_device *netdev, struct ethtool_keee *edata)
- 	    (hw->phy.media_type != e1000_media_type_copper))
- 		return -EOPNOTSUPP;
- 
--	edata->supported = (SUPPORTED_1000baseT_Full |
--			    SUPPORTED_100baseT_Full);
-+	edata->supported_u32 = (SUPPORTED_1000baseT_Full |
-+				SUPPORTED_100baseT_Full);
- 	if (!hw->dev_spec._82575.eee_disable)
--		edata->advertised =
-+		edata->advertised_u32 =
- 			mmd_eee_adv_to_ethtool_adv_t(adapter->eee_advert);
- 
- 	/* The IPCNFG and EEER registers are not supported on I354. */
-@@ -3068,7 +3068,7 @@ static int igb_get_eee(struct net_device *netdev, struct ethtool_keee *edata)
- 		if (ret_val)
- 			return -ENODATA;
- 
--		edata->lp_advertised = mmd_eee_adv_to_ethtool_adv_t(phy_data);
-+		edata->lp_advertised_u32 = mmd_eee_adv_to_ethtool_adv_t(phy_data);
- 		break;
- 	case e1000_i354:
- 	case e1000_i210:
-@@ -3079,7 +3079,7 @@ static int igb_get_eee(struct net_device *netdev, struct ethtool_keee *edata)
- 		if (ret_val)
- 			return -ENODATA;
- 
--		edata->lp_advertised = mmd_eee_adv_to_ethtool_adv_t(phy_data);
-+		edata->lp_advertised_u32 = mmd_eee_adv_to_ethtool_adv_t(phy_data);
- 
- 		break;
- 	default:
-@@ -3099,7 +3099,7 @@ static int igb_get_eee(struct net_device *netdev, struct ethtool_keee *edata)
- 		edata->eee_enabled = false;
- 		edata->eee_active = false;
- 		edata->tx_lpi_enabled = false;
--		edata->advertised &= ~edata->advertised;
-+		edata->advertised_u32 &= ~edata->advertised_u32;
- 	}
- 
- 	return 0;
-@@ -3138,14 +3138,14 @@ static int igb_set_eee(struct net_device *netdev,
- 			return -EINVAL;
- 		}
- 
--		if (!edata->advertised || (edata->advertised &
-+		if (!edata->advertised_u32 || (edata->advertised_u32 &
- 		    ~(ADVERTISE_100_FULL | ADVERTISE_1000_FULL))) {
- 			dev_err(&adapter->pdev->dev,
- 				"EEE Advertisement supports only 100Tx and/or 100T full duplex\n");
- 			return -EINVAL;
- 		}
--		adv100m_eee = !!(edata->advertised & ADVERTISE_100_FULL);
--		adv1g_eee = !!(edata->advertised & ADVERTISE_1000_FULL);
-+		adv100m_eee = !!(edata->advertised_u32 & ADVERTISE_100_FULL);
-+		adv1g_eee = !!(edata->advertised_u32 & ADVERTISE_1000_FULL);
- 
- 	} else if (!edata->eee_enabled) {
- 		dev_err(&adapter->pdev->dev,
-@@ -3153,7 +3153,7 @@ static int igb_set_eee(struct net_device *netdev,
- 		return -EINVAL;
- 	}
- 
--	adapter->eee_advert = ethtool_adv_to_mmd_eee_adv_t(edata->advertised);
-+	adapter->eee_advert = ethtool_adv_to_mmd_eee_adv_t(edata->advertised_u32);
- 	if (hw->dev_spec._82575.eee_disable != !edata->eee_enabled) {
- 		hw->dev_spec._82575.eee_disable = !edata->eee_enabled;
- 		adapter->flags |= IGB_FLAG_EEE;
-diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-index f2dcfe920..7f844e967 100644
---- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
-+++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-@@ -1630,11 +1630,11 @@ static int igc_ethtool_get_eee(struct net_device *netdev,
- 	u32 eeer;
- 
- 	if (hw->dev_spec._base.eee_enable)
--		edata->advertised =
-+		edata->advertised_u32 =
- 			mmd_eee_adv_to_ethtool_adv_t(adapter->eee_advert);
- 
- 	*edata = adapter->eee;
--	edata->supported = SUPPORTED_Autoneg;
-+	edata->supported_u32 = SUPPORTED_Autoneg;
- 
- 	eeer = rd32(IGC_EEER);
- 
-@@ -1647,8 +1647,8 @@ static int igc_ethtool_get_eee(struct net_device *netdev,
- 
- 	edata->eee_enabled = hw->dev_spec._base.eee_enable;
- 
--	edata->advertised = SUPPORTED_Autoneg;
--	edata->lp_advertised = SUPPORTED_Autoneg;
-+	edata->advertised_u32 = SUPPORTED_Autoneg;
-+	edata->lp_advertised_u32 = SUPPORTED_Autoneg;
- 
- 	/* Report correct negotiated EEE status for devices that
- 	 * wrongly report EEE at half-duplex
-@@ -1657,7 +1657,7 @@ static int igc_ethtool_get_eee(struct net_device *netdev,
- 		edata->eee_enabled = false;
- 		edata->eee_active = false;
- 		edata->tx_lpi_enabled = false;
--		edata->advertised &= ~edata->advertised;
-+		edata->advertised_u32 &= ~edata->advertised_u32;
- 	}
- 
- 	return 0;
-@@ -1699,7 +1699,7 @@ static int igc_ethtool_set_eee(struct net_device *netdev,
- 		return -EINVAL;
- 	}
- 
--	adapter->eee_advert = ethtool_adv_to_mmd_eee_adv_t(edata->advertised);
-+	adapter->eee_advert = ethtool_adv_to_mmd_eee_adv_t(edata->advertised_u32);
- 	if (hw->dev_spec._base.eee_enable != edata->eee_enabled) {
- 		hw->dev_spec._base.eee_enable = edata->eee_enabled;
- 		adapter->flags |= IGC_FLAG_EEE;
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-index 0aa73519a..ca69a8221 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-@@ -3436,27 +3436,27 @@ ixgbe_get_eee_fw(struct ixgbe_adapter *adapter, struct ethtool_keee *edata)
- 	if (rc)
- 		return rc;
- 
--	edata->lp_advertised = 0;
-+	edata->lp_advertised_u32 = 0;
- 	for (i = 0; i < ARRAY_SIZE(ixgbe_lp_map); ++i) {
- 		if (info[0] & ixgbe_lp_map[i].lp_advertised)
--			edata->lp_advertised |= ixgbe_lp_map[i].mac_speed;
-+			edata->lp_advertised_u32 |= ixgbe_lp_map[i].mac_speed;
- 	}
- 
--	edata->supported = 0;
-+	edata->supported_u32 = 0;
- 	for (i = 0; i < ARRAY_SIZE(ixgbe_ls_map); ++i) {
- 		if (hw->phy.eee_speeds_supported & ixgbe_ls_map[i].mac_speed)
--			edata->supported |= ixgbe_ls_map[i].supported;
-+			edata->supported_u32 |= ixgbe_ls_map[i].supported;
- 	}
- 
--	edata->advertised = 0;
-+	edata->advertised_u32 = 0;
- 	for (i = 0; i < ARRAY_SIZE(ixgbe_ls_map); ++i) {
- 		if (hw->phy.eee_speeds_advertised & ixgbe_ls_map[i].mac_speed)
--			edata->advertised |= ixgbe_ls_map[i].supported;
-+			edata->advertised_u32 |= ixgbe_ls_map[i].supported;
- 	}
- 
--	edata->eee_enabled = !!edata->advertised;
-+	edata->eee_enabled = !!edata->advertised_u32;
- 	edata->tx_lpi_enabled = edata->eee_enabled;
--	if (edata->advertised & edata->lp_advertised)
-+	if (edata->advertised_u32 & edata->lp_advertised_u32)
- 		edata->eee_active = true;
- 
- 	return 0;
-@@ -3504,7 +3504,7 @@ static int ixgbe_set_eee(struct net_device *netdev, struct ethtool_keee *edata)
- 			return -EINVAL;
- 		}
- 
--		if (eee_data.advertised != edata->advertised) {
-+		if (eee_data.advertised_u32 != edata->advertised_u32) {
- 			e_err(drv,
- 			      "Setting EEE advertised speeds is not supported\n");
- 			return -EINVAL;
-diff --git a/drivers/net/ethernet/qlogic/qede/qede_ethtool.c b/drivers/net/ethernet/qlogic/qede/qede_ethtool.c
-index 77491fb64..dfa15619f 100644
---- a/drivers/net/ethernet/qlogic/qede/qede_ethtool.c
-+++ b/drivers/net/ethernet/qlogic/qede/qede_ethtool.c
-@@ -1790,17 +1790,17 @@ static int qede_get_eee(struct net_device *dev, struct ethtool_keee *edata)
- 	}
- 
- 	if (current_link.eee.adv_caps & QED_EEE_1G_ADV)
--		edata->advertised = ADVERTISED_1000baseT_Full;
-+		edata->advertised_u32 = ADVERTISED_1000baseT_Full;
- 	if (current_link.eee.adv_caps & QED_EEE_10G_ADV)
--		edata->advertised |= ADVERTISED_10000baseT_Full;
-+		edata->advertised_u32 |= ADVERTISED_10000baseT_Full;
- 	if (current_link.sup_caps & QED_EEE_1G_ADV)
--		edata->supported = ADVERTISED_1000baseT_Full;
-+		edata->supported_u32 = ADVERTISED_1000baseT_Full;
- 	if (current_link.sup_caps & QED_EEE_10G_ADV)
--		edata->supported |= ADVERTISED_10000baseT_Full;
-+		edata->supported_u32 |= ADVERTISED_10000baseT_Full;
- 	if (current_link.eee.lp_adv_caps & QED_EEE_1G_ADV)
--		edata->lp_advertised = ADVERTISED_1000baseT_Full;
-+		edata->lp_advertised_u32 = ADVERTISED_1000baseT_Full;
- 	if (current_link.eee.lp_adv_caps & QED_EEE_10G_ADV)
--		edata->lp_advertised |= ADVERTISED_10000baseT_Full;
-+		edata->lp_advertised_u32 |= ADVERTISED_10000baseT_Full;
- 
- 	edata->tx_lpi_timer = current_link.eee.tx_lpi_timer;
- 	edata->eee_enabled = current_link.eee.enable;
-@@ -1832,20 +1832,20 @@ static int qede_set_eee(struct net_device *dev, struct ethtool_keee *edata)
- 	memset(&params, 0, sizeof(params));
- 	params.override_flags |= QED_LINK_OVERRIDE_EEE_CONFIG;
- 
--	if (!(edata->advertised & (ADVERTISED_1000baseT_Full |
--				   ADVERTISED_10000baseT_Full)) ||
--	    ((edata->advertised & (ADVERTISED_1000baseT_Full |
--				   ADVERTISED_10000baseT_Full)) !=
--	     edata->advertised)) {
-+	if (!(edata->advertised_u32 & (ADVERTISED_1000baseT_Full |
-+				       ADVERTISED_10000baseT_Full)) ||
-+	    ((edata->advertised_u32 & (ADVERTISED_1000baseT_Full |
-+				       ADVERTISED_10000baseT_Full)) !=
-+	     edata->advertised_u32)) {
- 		DP_VERBOSE(edev, QED_MSG_DEBUG,
- 			   "Invalid advertised capabilities %d\n",
--			   edata->advertised);
-+			   edata->advertised_u32);
- 		return -EINVAL;
- 	}
- 
--	if (edata->advertised & ADVERTISED_1000baseT_Full)
-+	if (edata->advertised_u32 & ADVERTISED_1000baseT_Full)
- 		params.eee.adv_caps = QED_EEE_1G_ADV;
--	if (edata->advertised & ADVERTISED_10000baseT_Full)
-+	if (edata->advertised_u32 & ADVERTISED_10000baseT_Full)
- 		params.eee.adv_caps |= QED_EEE_10G_ADV;
- 	params.eee.enable = edata->eee_enabled;
- 	params.eee.tx_lpi_enable = edata->tx_lpi_enabled;
-diff --git a/drivers/net/phy/phy-c45.c b/drivers/net/phy/phy-c45.c
-index adee5e712..99c84af25 100644
---- a/drivers/net/phy/phy-c45.c
-+++ b/drivers/net/phy/phy-c45.c
-@@ -1463,12 +1463,12 @@ int genphy_c45_ethtool_get_eee(struct phy_device *phydev,
- 	data->eee_enabled = is_enabled;
- 	data->eee_active = ret;
- 
--	if (!ethtool_convert_link_mode_to_legacy_u32(&data->supported,
-+	if (!ethtool_convert_link_mode_to_legacy_u32(&data->supported_u32,
- 						     phydev->supported_eee))
- 		overflow = true;
--	if (!ethtool_convert_link_mode_to_legacy_u32(&data->advertised, adv))
-+	if (!ethtool_convert_link_mode_to_legacy_u32(&data->advertised_u32, adv))
- 		overflow = true;
--	if (!ethtool_convert_link_mode_to_legacy_u32(&data->lp_advertised, lp))
-+	if (!ethtool_convert_link_mode_to_legacy_u32(&data->lp_advertised_u32, lp))
- 		overflow = true;
- 
- 	if (overflow)
-@@ -1495,11 +1495,11 @@ int genphy_c45_ethtool_set_eee(struct phy_device *phydev,
- 	int ret;
- 
- 	if (data->eee_enabled) {
--		if (data->advertised) {
-+		if (data->advertised_u32) {
- 			__ETHTOOL_DECLARE_LINK_MODE_MASK(adv);
- 
- 			ethtool_convert_legacy_u32_to_link_mode(adv,
--								data->advertised);
-+								data->advertised_u32);
- 			linkmode_andnot(adv, adv, phydev->supported_eee);
- 			if (!linkmode_empty(adv)) {
- 				phydev_warn(phydev, "At least some EEE link modes are not supported.\n");
-@@ -1507,7 +1507,7 @@ int genphy_c45_ethtool_set_eee(struct phy_device *phydev,
- 			}
- 
- 			ethtool_convert_legacy_u32_to_link_mode(phydev->advertising_eee,
--								data->advertised);
-+								data->advertised_u32);
- 		} else {
- 			linkmode_copy(phydev->advertising_eee,
- 				      phydev->supported_eee);
-diff --git a/drivers/net/usb/ax88179_178a.c b/drivers/net/usb/ax88179_178a.c
-index 3922a9afd..d6168eaa2 100644
---- a/drivers/net/usb/ax88179_178a.c
-+++ b/drivers/net/usb/ax88179_178a.c
-@@ -676,21 +676,21 @@ ax88179_ethtool_get_eee(struct usbnet *dev, struct ethtool_keee *data)
- 					    MDIO_MMD_PCS);
- 	if (val < 0)
- 		return val;
--	data->supported = mmd_eee_cap_to_ethtool_sup_t(val);
-+	data->supported_u32 = mmd_eee_cap_to_ethtool_sup_t(val);
- 
- 	/* Get advertisement EEE */
- 	val = ax88179_phy_read_mmd_indirect(dev, MDIO_AN_EEE_ADV,
- 					    MDIO_MMD_AN);
- 	if (val < 0)
- 		return val;
--	data->advertised = mmd_eee_adv_to_ethtool_adv_t(val);
-+	data->advertised_u32 = mmd_eee_adv_to_ethtool_adv_t(val);
- 
- 	/* Get LP advertisement EEE */
- 	val = ax88179_phy_read_mmd_indirect(dev, MDIO_AN_EEE_LPABLE,
- 					    MDIO_MMD_AN);
- 	if (val < 0)
- 		return val;
--	data->lp_advertised = mmd_eee_adv_to_ethtool_adv_t(val);
-+	data->lp_advertised_u32 = mmd_eee_adv_to_ethtool_adv_t(val);
- 
- 	return 0;
- }
-@@ -698,7 +698,7 @@ ax88179_ethtool_get_eee(struct usbnet *dev, struct ethtool_keee *data)
- static int
- ax88179_ethtool_set_eee(struct usbnet *dev, struct ethtool_keee *data)
- {
--	u16 tmp16 = ethtool_adv_to_mmd_eee_adv_t(data->advertised);
-+	u16 tmp16 = ethtool_adv_to_mmd_eee_adv_t(data->advertised_u32);
- 
- 	return ax88179_phy_write_mmd_indirect(dev, MDIO_AN_EEE_ADV,
- 					      MDIO_MMD_AN, tmp16);
-@@ -1663,7 +1663,7 @@ static int ax88179_reset(struct usbnet *dev)
- 	ax88179_disable_eee(dev);
- 
- 	ax88179_ethtool_get_eee(dev, &eee_data);
--	eee_data.advertised = 0;
-+	eee_data.advertised_u32 = 0;
- 	ax88179_ethtool_set_eee(dev, &eee_data);
- 
- 	/* Restart autoneg */
-diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-index dc163b766..3d806b3ff 100644
---- a/drivers/net/usb/r8152.c
-+++ b/drivers/net/usb/r8152.c
-@@ -8938,16 +8938,16 @@ static int r8152_get_eee(struct r8152 *tp, struct ethtool_keee *eee)
- 
- 	eee->eee_enabled = tp->eee_en;
- 	eee->eee_active = !!(supported & adv & lp);
--	eee->supported = supported;
--	eee->advertised = tp->eee_adv;
--	eee->lp_advertised = lp;
-+	eee->supported_u32 = supported;
-+	eee->advertised_u32 = tp->eee_adv;
-+	eee->lp_advertised_u32 = lp;
- 
- 	return 0;
- }
- 
- static int r8152_set_eee(struct r8152 *tp, struct ethtool_keee *eee)
- {
--	u16 val = ethtool_adv_to_mmd_eee_adv_t(eee->advertised);
-+	u16 val = ethtool_adv_to_mmd_eee_adv_t(eee->advertised_u32);
- 
- 	tp->eee_en = eee->eee_enabled;
- 	tp->eee_adv = val;
-@@ -8973,9 +8973,9 @@ static int r8153_get_eee(struct r8152 *tp, struct ethtool_keee *eee)
- 
- 	eee->eee_enabled = tp->eee_en;
- 	eee->eee_active = !!(supported & adv & lp);
--	eee->supported = supported;
--	eee->advertised = tp->eee_adv;
--	eee->lp_advertised = lp;
-+	eee->supported_u32 = supported;
-+	eee->advertised_u32 = tp->eee_adv;
-+	eee->lp_advertised_u32 = lp;
- 
- 	return 0;
- }
 diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-index 14549cb9e..89807c30f 100644
+index 89807c30f..b90c33607 100644
 --- a/include/linux/ethtool.h
 +++ b/include/linux/ethtool.h
-@@ -223,9 +223,9 @@ __ethtool_get_link_ksettings(struct net_device *dev,
+@@ -223,6 +223,9 @@ __ethtool_get_link_ksettings(struct net_device *dev,
  			     struct ethtool_link_ksettings *link_ksettings);
  
  struct ethtool_keee {
--	u32	supported;
--	u32	advertised;
--	u32	lp_advertised;
-+	u32	supported_u32;
-+	u32	advertised_u32;
-+	u32	lp_advertised_u32;
- 	u32	tx_lpi_timer;
- 	bool	tx_lpi_enabled;
- 	bool	eee_active;
++	__ETHTOOL_DECLARE_LINK_MODE_MASK(supported);
++	__ETHTOOL_DECLARE_LINK_MODE_MASK(advertised);
++	__ETHTOOL_DECLARE_LINK_MODE_MASK(lp_advertised);
+ 	u32	supported_u32;
+ 	u32	advertised_u32;
+ 	u32	lp_advertised_u32;
+diff --git a/net/ethtool/common.c b/net/ethtool/common.c
+index 6b2a360dc..ce486cec3 100644
+--- a/net/ethtool/common.c
++++ b/net/ethtool/common.c
+@@ -712,3 +712,8 @@ ethtool_forced_speed_maps_init(struct ethtool_forced_speed_map *maps, u32 size)
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(ethtool_forced_speed_maps_init);
++
++bool ethtool_eee_use_linkmodes(const struct ethtool_keee *eee)
++{
++	return !linkmode_empty(eee->supported);
++}
+diff --git a/net/ethtool/common.h b/net/ethtool/common.h
+index 28b8aaaf9..0f2b5f7ea 100644
+--- a/net/ethtool/common.h
++++ b/net/ethtool/common.h
+@@ -55,5 +55,6 @@ int ethtool_get_module_eeprom_call(struct net_device *dev,
+ 				   struct ethtool_eeprom *ee, u8 *data);
+ 
+ bool __ethtool_dev_mm_supported(struct net_device *dev);
++bool ethtool_eee_use_linkmodes(const struct ethtool_keee *eee);
+ 
+ #endif /* _ETHTOOL_COMMON_H */
 diff --git a/net/ethtool/eee.c b/net/ethtool/eee.c
-index ac9f694ff..ca56f2817 100644
+index ca56f2817..db6faa18f 100644
 --- a/net/ethtool/eee.c
 +++ b/net/ethtool/eee.c
-@@ -5,7 +5,7 @@
- #include "bitset.h"
- 
- #define EEE_MODES_COUNT \
--	(sizeof_field(struct ethtool_keee, supported) * BITS_PER_BYTE)
-+	(sizeof_field(struct ethtool_keee, supported_u32) * BITS_PER_BYTE)
- 
- struct eee_req_info {
- 	struct ethnl_req_info		base;
-@@ -52,19 +52,19 @@ static int eee_reply_size(const struct ethnl_req_info *req_base,
- 	int len = 0;
+@@ -30,6 +30,7 @@ static int eee_prepare_data(const struct ethnl_req_info *req_base,
+ {
+ 	struct eee_reply_data *data = EEE_REPDATA(reply_base);
+ 	struct net_device *dev = reply_base->dev;
++	struct ethtool_keee *eee = &data->eee;
  	int ret;
  
--	BUILD_BUG_ON(sizeof(eee->advertised) * BITS_PER_BYTE !=
-+	BUILD_BUG_ON(sizeof(eee->advertised_u32) * BITS_PER_BYTE !=
- 		     EEE_MODES_COUNT);
--	BUILD_BUG_ON(sizeof(eee->lp_advertised) * BITS_PER_BYTE !=
-+	BUILD_BUG_ON(sizeof(eee->lp_advertised_u32) * BITS_PER_BYTE !=
+ 	if (!dev->ethtool_ops->get_eee)
+@@ -37,9 +38,18 @@ static int eee_prepare_data(const struct ethnl_req_info *req_base,
+ 	ret = ethnl_ops_begin(dev);
+ 	if (ret < 0)
+ 		return ret;
+-	ret = dev->ethtool_ops->get_eee(dev, &data->eee);
++	ret = dev->ethtool_ops->get_eee(dev, eee);
+ 	ethnl_ops_complete(dev);
+ 
++	if (!ret && !ethtool_eee_use_linkmodes(eee)) {
++		ethtool_convert_legacy_u32_to_link_mode(eee->supported,
++							eee->supported_u32);
++		ethtool_convert_legacy_u32_to_link_mode(eee->advertised,
++							eee->advertised_u32);
++		ethtool_convert_legacy_u32_to_link_mode(eee->lp_advertised,
++							eee->lp_advertised_u32);
++	}
++
+ 	return ret;
+ }
+ 
+@@ -58,14 +68,16 @@ static int eee_reply_size(const struct ethnl_req_info *req_base,
  		     EEE_MODES_COUNT);
  
  	/* MODES_OURS */
--	ret = ethnl_bitset32_size(&eee->advertised, &eee->supported,
-+	ret = ethnl_bitset32_size(&eee->advertised_u32, &eee->supported_u32,
- 				  EEE_MODES_COUNT, link_mode_names, compact);
+-	ret = ethnl_bitset32_size(&eee->advertised_u32, &eee->supported_u32,
+-				  EEE_MODES_COUNT, link_mode_names, compact);
++	ret = ethnl_bitset_size(eee->advertised, eee->supported,
++				__ETHTOOL_LINK_MODE_MASK_NBITS,
++				link_mode_names, compact);
  	if (ret < 0)
  		return ret;
  	len += ret;
  	/* MODES_PEERS */
--	ret = ethnl_bitset32_size(&eee->lp_advertised, NULL,
-+	ret = ethnl_bitset32_size(&eee->lp_advertised_u32, NULL,
- 				  EEE_MODES_COUNT, link_mode_names, compact);
+-	ret = ethnl_bitset32_size(&eee->lp_advertised_u32, NULL,
+-				  EEE_MODES_COUNT, link_mode_names, compact);
++	ret = ethnl_bitset_size(eee->lp_advertised, NULL,
++				__ETHTOOL_LINK_MODE_MASK_NBITS,
++				link_mode_names, compact);
  	if (ret < 0)
  		return ret;
-@@ -88,12 +88,12 @@ static int eee_fill_reply(struct sk_buff *skb,
+ 	len += ret;
+@@ -87,14 +99,16 @@ static int eee_fill_reply(struct sk_buff *skb,
+ 	const struct ethtool_keee *eee = &data->eee;
  	int ret;
  
- 	ret = ethnl_put_bitset32(skb, ETHTOOL_A_EEE_MODES_OURS,
--				 &eee->advertised, &eee->supported,
-+				 &eee->advertised_u32, &eee->supported_u32,
- 				 EEE_MODES_COUNT, link_mode_names, compact);
+-	ret = ethnl_put_bitset32(skb, ETHTOOL_A_EEE_MODES_OURS,
+-				 &eee->advertised_u32, &eee->supported_u32,
+-				 EEE_MODES_COUNT, link_mode_names, compact);
++	ret = ethnl_put_bitset(skb, ETHTOOL_A_EEE_MODES_OURS,
++			       eee->advertised, eee->supported,
++			       __ETHTOOL_LINK_MODE_MASK_NBITS,
++			       link_mode_names, compact);
  	if (ret < 0)
  		return ret;
- 	ret = ethnl_put_bitset32(skb, ETHTOOL_A_EEE_MODES_PEER,
--				 &eee->lp_advertised, NULL, EEE_MODES_COUNT,
-+				 &eee->lp_advertised_u32, NULL, EEE_MODES_COUNT,
- 				 link_mode_names, compact);
- 	if (ret < 0)
- 		return ret;
-@@ -140,7 +140,7 @@ ethnl_set_eee(struct ethnl_req_info *req_info, struct genl_info *info)
+-	ret = ethnl_put_bitset32(skb, ETHTOOL_A_EEE_MODES_PEER,
+-				 &eee->lp_advertised_u32, NULL, EEE_MODES_COUNT,
+-				 link_mode_names, compact);
++	ret = ethnl_put_bitset(skb, ETHTOOL_A_EEE_MODES_PEER,
++			       eee->lp_advertised, NULL,
++			       __ETHTOOL_LINK_MODE_MASK_NBITS,
++			       link_mode_names, compact);
  	if (ret < 0)
  		return ret;
  
--	ret = ethnl_update_bitset32(&eee.advertised, EEE_MODES_COUNT,
-+	ret = ethnl_update_bitset32(&eee.advertised_u32, EEE_MODES_COUNT,
- 				    tb[ETHTOOL_A_EEE_MODES_OURS],
- 				    link_mode_names, info->extack, &mod);
+@@ -140,9 +154,16 @@ ethnl_set_eee(struct ethnl_req_info *req_info, struct genl_info *info)
  	if (ret < 0)
+ 		return ret;
+ 
+-	ret = ethnl_update_bitset32(&eee.advertised_u32, EEE_MODES_COUNT,
+-				    tb[ETHTOOL_A_EEE_MODES_OURS],
+-				    link_mode_names, info->extack, &mod);
++	if (ethtool_eee_use_linkmodes(&eee)) {
++		ret = ethnl_update_bitset(eee.advertised,
++					  __ETHTOOL_LINK_MODE_MASK_NBITS,
++					  tb[ETHTOOL_A_EEE_MODES_OURS],
++					  link_mode_names, info->extack, &mod);
++	} else {
++		ret = ethnl_update_bitset32(&eee.advertised_u32, EEE_MODES_COUNT,
++					    tb[ETHTOOL_A_EEE_MODES_OURS],
++					    link_mode_names, info->extack, &mod);
++	}
+ 	if (ret < 0)
+ 		return ret;
+ 	ethnl_update_bool(&eee.eee_enabled, tb[ETHTOOL_A_EEE_ENABLED], &mod);
 diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-index 46c29b369..5b2ca72e3 100644
+index 5b2ca72e3..1763e8b69 100644
 --- a/net/ethtool/ioctl.c
 +++ b/net/ethtool/ioctl.c
-@@ -1513,9 +1513,9 @@ static void eee_to_keee(struct ethtool_keee *keee,
- {
- 	memset(keee, 0, sizeof(*keee));
- 
--	keee->supported = eee->supported;
--	keee->advertised = eee->advertised;
--	keee->lp_advertised = eee->lp_advertised;
-+	keee->supported_u32 = eee->supported;
-+	keee->advertised_u32 = eee->advertised;
-+	keee->lp_advertised_u32 = eee->lp_advertised;
- 	keee->eee_active = eee->eee_active;
+@@ -1520,6 +1520,13 @@ static void eee_to_keee(struct ethtool_keee *keee,
  	keee->eee_enabled = eee->eee_enabled;
  	keee->tx_lpi_enabled = eee->tx_lpi_enabled;
-@@ -1527,9 +1527,9 @@ static void keee_to_eee(struct ethtool_eee *eee,
+ 	keee->tx_lpi_timer = eee->tx_lpi_timer;
++
++	ethtool_convert_legacy_u32_to_link_mode(keee->supported,
++						eee->supported);
++	ethtool_convert_legacy_u32_to_link_mode(keee->advertised,
++						eee->advertised);
++	ethtool_convert_legacy_u32_to_link_mode(keee->lp_advertised,
++						eee->lp_advertised);
+ }
+ 
+ static void keee_to_eee(struct ethtool_eee *eee,
+@@ -1527,13 +1534,27 @@ static void keee_to_eee(struct ethtool_eee *eee,
  {
  	memset(eee, 0, sizeof(*eee));
  
--	eee->supported = keee->supported;
--	eee->advertised = keee->advertised;
--	eee->lp_advertised = keee->lp_advertised;
-+	eee->supported = keee->supported_u32;
-+	eee->advertised = keee->advertised_u32;
-+	eee->lp_advertised = keee->lp_advertised_u32;
+-	eee->supported = keee->supported_u32;
+-	eee->advertised = keee->advertised_u32;
+-	eee->lp_advertised = keee->lp_advertised_u32;
  	eee->eee_active = keee->eee_active;
  	eee->eee_enabled = keee->eee_enabled;
  	eee->tx_lpi_enabled = keee->tx_lpi_enabled;
+ 	eee->tx_lpi_timer = keee->tx_lpi_timer;
++
++	if (ethtool_eee_use_linkmodes(keee)) {
++		bool overflow;
++
++		overflow = !ethtool_convert_link_mode_to_legacy_u32(&eee->supported,
++								    keee->supported);
++		ethtool_convert_link_mode_to_legacy_u32(&eee->advertised,
++							keee->advertised);
++		ethtool_convert_link_mode_to_legacy_u32(&eee->lp_advertised,
++							keee->lp_advertised);
++		if (overflow)
++			pr_warn("Ethtool ioctl interface doesn't support passing EEE linkmodes beyond bit 32\n");
++	} else {
++		eee->supported = keee->supported_u32;
++		eee->advertised = keee->advertised_u32;
++		eee->lp_advertised = keee->lp_advertised_u32;
++	}
+ }
+ 
+ static int ethtool_get_eee(struct net_device *dev, char __user *useraddr)
 -- 
 2.43.0
 
