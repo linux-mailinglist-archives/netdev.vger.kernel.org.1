@@ -1,57 +1,68 @@
-Return-Path: <netdev+bounces-66342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66343-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 714DC83E8F7
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 02:28:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57E7183E8F9
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 02:29:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76DA01C2414F
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 01:28:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14B71286141
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 01:29:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A7968F59;
-	Sat, 27 Jan 2024 01:28:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D33C8F40;
+	Sat, 27 Jan 2024 01:29:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o7D4mO0w"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q8aYe+lu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51C3F79CD;
-	Sat, 27 Jan 2024 01:28:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA7816138;
+	Sat, 27 Jan 2024 01:29:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706318901; cv=none; b=aknrSkxTRrfcqv2bneiZrjSyZLVrEMkhCuj09rR2IBTeXJYStccQG/lkamLjNdUc2MHvn142VMZx4GYU9zx8IpJRr+mmh+WSTt2lsH5e9tzKTTziGDWz1Y7QblWvGb3foiYuRHYJCqOTrXM3JSZMi1jVpElCcKIBFixkUi/Z/Bk=
+	t=1706318975; cv=none; b=HFKB1/vcSry5G47onLscjBKChUe2TkH1S538ykTmu4RxOIm3I4sc3vvVVsdT2whei7qtK8m6b3rLQppA83VLgq62VqCXJcxyZoNeWplu2qFOqMOPvNVQGHx5l+CLuzylsF3OGgcjIO6jmAICQugQ0aJrlMb45Ce/r6s7HKFcMWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706318901; c=relaxed/simple;
-	bh=xfOkGCrUUYiorc9miYCmzuEaIH+fJKBI12AbPGRHlK8=;
+	s=arc-20240116; t=1706318975; c=relaxed/simple;
+	bh=ElSoXg1OfPbh1Sqb/lekb9GiMTTdEi7xVmIVe2Apz7k=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=q5u7gLD/Dv5ddyLdslNfFvK1AemnJy0bIkobNIeaYwHWQyN3Ebbz5J5KoJ04cYC8k/82K+tKawiv1Xzum1lw5mYuhAloyKNsT8j/6Xt9f3JU+AMM50SR9DfXaL7ijIyETm1L2G5g7e19w6OGLP+cxDfAKubEDPctKOI865hqOkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o7D4mO0w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 874D7C433F1;
-	Sat, 27 Jan 2024 01:28:20 +0000 (UTC)
+	 MIME-Version:Content-Type; b=sLIr4bhn8igVr7UO3nHAxPMmOhw0ZJPjfgFmv2yJX8+45D+oj6mHEavPnscYEnhSsGApmt7Qqpopei35HHulnZDOQHZD0WEiYF6XWQmyMjZICG6NfxI61mBmZpTTw94tStYCQGAHJ9pgTG+1ICxBA0YKyQI0UUCDmH+hGnGstac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q8aYe+lu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C13CAC433F1;
+	Sat, 27 Jan 2024 01:29:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706318900;
-	bh=xfOkGCrUUYiorc9miYCmzuEaIH+fJKBI12AbPGRHlK8=;
+	s=k20201202; t=1706318974;
+	bh=ElSoXg1OfPbh1Sqb/lekb9GiMTTdEi7xVmIVe2Apz7k=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=o7D4mO0wI4uA9XKdw0iv0g9dSa+bUTl5DxPYvJQzgym9lftVT7Q0fX7RkEuWVkcuG
-	 4gmDQmxSefVlIFIuhWrsSA/gOA2ENnjLaGY/N8ttcnVIbxrTbKh7jlOS01Gm1ANiOB
-	 8UjO9qKbDfO5JOiS8sPtr8onAn87PeNyRWeMshj0DZc6xAnqjgBQsh41Lb9VD1ajis
-	 Z8hZOZibxw6o/+zj4a8yFi3vW/IP6lCIpdm0evo66j1Vg+L43kMFWY1rW8rqDjC3VX
-	 1ED03HaLdoZWhwV0yyThUCB9723OO/aBMakPm6UQLBkwvB2hsoZ86iYqZ5ncI+7PQ/
-	 nfIdR4rivuT1w==
-Date: Fri, 26 Jan 2024 17:28:19 -0800
+	b=Q8aYe+luF85eo5Bn6p9MDVNaqJTSmVrMDU8Te+iZh6MoIXtUx7yU/7HibM/qkKlfH
+	 fd6nUga4/oX4sogill72uDhMn+aOa+D5dWfofiQmQU59PPkbjP25iYya2+BLXQCY90
+	 l7iFMkEL4O6iVt3P7ODMYFwFtWfu5Ei7Ero+ax64ogKtL5k3riLKB/07SjKstSgzX4
+	 eyb+PXoy4uNOGr2cQNXxzgON99qtWhKZKegODG4dzMQ8nlnL4mhi6es1kg4NyeTf7H
+	 wFUOOaTQxOsUHcx2wCldyt8BZE8pKv+hikjzNv0GfFcEmAHo/bj987iSgVjlTpT6nN
+	 zxIP3uzVXfYwg==
+Date: Fri, 26 Jan 2024 17:29:32 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: allison.henderson@oracle.com
-Cc: netdev@vger.kernel.org, rds-devel@oss.oracle.com,
- linux-rdma@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
- davem@davemloft.net, santosh.shilimkar@oracle.com
-Subject: Re: [PATCH UPSTREAM 1/1] rds: Fix possible deadlock in
- rds_message_put
-Message-ID: <20240126172819.4cc13dd4@kernel.org>
-In-Reply-To: <20240126172652.241017-1-allison.henderson@oracle.com>
-References: <20240126172652.241017-1-allison.henderson@oracle.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn
+ <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
+ linux-arm-kernel@lists.infradead.org, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Jesse Brandeburg
+ <jesse.brandeburg@intel.com>, Jonathan Corbet <corbet@lwn.net>, Marek
+ =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Piergiorgio Beruto
+ <piergiorgio.beruto@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?B?Tmljb2zDsg==?= Veronese <nicveronese@gmail.com>, Simon Horman
+ <horms@kernel.org>
+Subject: Re: [PATCH net-next v6 00/13] Introduce PHY listing and
+ link_topology tracking
+Message-ID: <20240126172932.326f6b03@kernel.org>
+In-Reply-To: <20240126183851.2081418-1-maxime.chevallier@bootlin.com>
+References: <20240126183851.2081418-1-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,15 +72,21 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 26 Jan 2024 10:26:52 -0700 allison.henderson@oracle.com wrote:
-> +	if (to_drop) {
-> +		rds_inc_put(to_drop);
-> +
->  	rdsdebug("inc %p rs %p still %d dropped %d\n", inc, rs, ret, drop);
->  	return ret;
->  }
+On Fri, 26 Jan 2024 19:38:37 +0100 Maxime Chevallier wrote:
+> Most of the changes were from Jakub's and Russell's reviews, the main
+> point being a rework of the netlink API, removing uneeded nests and
+> cleaning-up the dump code. Thanks's Jakub for all the tips, hopefulle
+> the API is cleaner now.
 
-This does not build..
+Didn't get a chance to look today, sorry, but it appears to break
+allmodconfig build:
+
+ld: net/core/dev.o: in function `free_netdev':
+dev.c:(.text+0x76e1): undefined reference to `phy_link_topo_destroy'
+ld: net/core/dev.o: in function `alloc_netdev_mqs':
+dev.c:(.text+0x79c2): undefined reference to `phy_link_topo_create'
+
+so maybe fix up and post v7?
 -- 
 pw-bot: cr
 
