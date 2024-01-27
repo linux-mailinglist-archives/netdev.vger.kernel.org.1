@@ -1,200 +1,180 @@
-Return-Path: <netdev+bounces-66392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5CDC83ECFB
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 12:52:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFD1883ED23
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 14:04:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DD1A1C216B1
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 11:52:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D4EC28529D
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 13:04:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6750F2030A;
-	Sat, 27 Jan 2024 11:51:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3828F25576;
+	Sat, 27 Jan 2024 13:04:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kKjJvqJo"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="HMaB8xqJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27C2A210EC;
-	Sat, 27 Jan 2024 11:51:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F4789470;
+	Sat, 27 Jan 2024 13:04:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706356318; cv=none; b=NaHK+KSvwrr6q8cQGd3eHQsGriuwMGavp0d1s+STu3W+sOcXLKLMk39aoqC9XjYCQQifqK5P0OBkpbC8YPsy1tjKdlkvWroLuQylxerqYE0WVVpLhBC2HaKRMjL7fT4Fd42Jkx2AH+7dDoBMQ1LIT6ZXjf1nqcugiju8H5pjd0I=
+	t=1706360669; cv=none; b=OHzOpGkdKpt3V4ExIJqDUvmnZbEoiiNLdtF5nOuzWJuXkfMkb7jTkPP2z+6dn+FmtvZ5wpCAxic+P0TjUhE12xHg1aP3qRc/akL1aS1pddV0iDJj5haRC93XdPhLy7izmyiSvw3o9tvY/8OBcTQN/2TdVpBofQKxuNvTBfNnZXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706356318; c=relaxed/simple;
-	bh=jnRrxh/V+RN3sG5q2rcPRKXGLcZ1nvL8YBZ6HRmzutg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=okLADENkQRrebdI6iq9H9B/ayAtm8Xw8BaVsac/BKAOwl8i+w8FSt6Fe3qynQPaJpQ7FurcGyDVyF7JAbkYe2CK5rriLZ9da1XydPcLd1kXEVRunyKZSvdsB40am7Qz7X4ia15fSb3UJjXwp0C8XKeRru2nRNUvmke3XBO9klOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kKjJvqJo; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706356316; x=1737892316;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=jnRrxh/V+RN3sG5q2rcPRKXGLcZ1nvL8YBZ6HRmzutg=;
-  b=kKjJvqJopo4hqf3Uabeo/RcCZtXKRZQym63+ab+lxAT/C9Gt+dRlXqNS
-   ABO0la27n9hTVWnF7poeBM68QQYNz45aEU5KEYySsyfGwvBq33VLbqUA/
-   ek0KZ68jrtkvpR5uq7JeB46xEYgWWZbw4rixZpMSabqgqpPTxOaGqSs+z
-   pwSOPSnIzbhUtLOmnOkeYyRL/BxCCxN8k5U1ZuUGusddtlLiNBH8XUdvA
-   Y+hLk1ncbQs4FPAiaK3I6QAjwGxB6MBw+l5YJigQhtfNfRMtsJWH6b0+Z
-   AuWfX3dBfAmzpZUbnoz5CqMIvSU/reA4je0KqaIM5zYmgjT1lvEGDnYgq
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10964"; a="9788321"
-X-IronPort-AV: E=Sophos;i="6.05,220,1701158400"; 
-   d="scan'208";a="9788321"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jan 2024 03:51:55 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,220,1701158400"; 
-   d="scan'208";a="21626178"
-Received: from lkp-server01.sh.intel.com (HELO 370188f8dc87) ([10.239.97.150])
-  by fmviesa002.fm.intel.com with ESMTP; 27 Jan 2024 03:51:50 -0800
-Received: from kbuild by 370188f8dc87 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rThDx-0002HM-0h;
-	Sat, 27 Jan 2024 11:51:49 +0000
-Date: Sat, 27 Jan 2024 19:51:33 +0800
-From: kernel test robot <lkp@intel.com>
-To: Yunjian Wang <wangyunjian@huawei.com>, mst@redhat.com,
-	willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-	kuba@kernel.org, davem@davemloft.net, magnus.karlsson@intel.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, virtualization@lists.linux.dev,
-	xudingke@huawei.com, Yunjian Wang <wangyunjian@huawei.com>
-Subject: Re: [PATCH net-next 2/2] tun: AF_XDP Rx zero-copy support
-Message-ID: <202401271943.bs1GPeEU-lkp@intel.com>
-References: <1706089075-16084-1-git-send-email-wangyunjian@huawei.com>
+	s=arc-20240116; t=1706360669; c=relaxed/simple;
+	bh=ezGjLX/KGCvKrdFlYhkTSrLIz9F/ChMEXBwpfDh019g=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=H3jNEHXT1z/xCmGkGtH5s1xeaR/IVLkWiKWSI9Dl8MSDrO+OIpzaPuME7H7W8LbuFPGB0N7LLk+DypvqKG5hn2PnJmn9mu9uwsTjVE9/ho1mgg2mWv9FzRzQ4nW1C5ATkWSA82r0YiHOpafca3OMdqfKjYiRIkI7kZesaq+5g4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=HMaB8xqJ; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40RCxpbl001346;
+	Sat, 27 Jan 2024 13:04:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	from:to:cc:subject:date:message-id; s=qcppdkim1; bh=6oebARhWnbWU
+	R8eKVVvlJcocYHJTcYCqahQxWhiBad0=; b=HMaB8xqJ9VBO09LxitQsHPjqo4eU
+	nHql5VcTIerEBoOYBhoEy5mfoDQ5DnM5+htqCHATo4CvqHduCjbjjR/yAEGrrbcX
+	WbWjbbbU2G0JahoXEi07W84d619FI5TWonzTuc4MM3yYYgPwjGtGc31cY3uaR6n1
+	U0WFs3x9EWXGCk8nIWyJ/j+c9UzI/tgXH4KLjynl7YIS2B7sKNj5fjQ7of9UrYW/
+	cCXBUGxAvqDT1N5FgQbeAHF8NNHN1iTu86NBtVHfWFPTtHF8Fl48DqGRUA+SpKvi
+	MUwlak0zHdSPnECgXS9HR+LL49GqmB5Rg/A6RyD+6UFzKb5Flp6kjBCRVQ==
+Received: from apblrppmta02.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3vvq6sgrrm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 27 Jan 2024 13:04:07 +0000 (GMT)
+Received: from pps.filterd (APBLRPPMTA02.qualcomm.com [127.0.0.1])
+	by APBLRPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 40RD44xr032026;
+	Sat, 27 Jan 2024 13:04:04 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 3vvtwkh1yy-1;
+	Sat, 27 Jan 2024 13:04:04 +0000
+Received: from APBLRPPMTA02.qualcomm.com (APBLRPPMTA02.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 40RD43ad032020;
+	Sat, 27 Jan 2024 13:04:03 GMT
+Received: from hu-maiyas-hyd.qualcomm.com (hu-snehshah-hyd.qualcomm.com [10.147.246.35])
+	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 40RD43rP032019;
+	Sat, 27 Jan 2024 13:04:03 +0000
+Received: by hu-maiyas-hyd.qualcomm.com (Postfix, from userid 2319345)
+	id A7D185013A4; Sat, 27 Jan 2024 18:34:02 +0530 (+0530)
+From: Sneh Shah <quic_snehshah@quicinc.com>
+To: Vinod Koul <vkoul@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Jose Abreu <joabreu@synopsys.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Cc: Sneh Shah <quic_snehshah@quicinc.com>, kernel@quicinc.com,
+        Andrew Halaney <ahalaney@redhat.com>
+Subject: [PATCH net-next] net: stmmac: dwmac-qcom-ethqos: Add support for pm ops
+Date: Sat, 27 Jan 2024 18:33:27 +0530
+Message-Id: <20240127130327.22443-1-quic_snehshah@quicinc.com>
+X-Mailer: git-send-email 2.17.1
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: hfW17_9FU6EIZ5OE24pmXqy0sXMCugSJ
+X-Proofpoint-ORIG-GUID: hfW17_9FU6EIZ5OE24pmXqy0sXMCugSJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-25_14,2024-01-25_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
+ phishscore=0 adultscore=0 clxscore=1015 malwarescore=0 priorityscore=1501
+ suspectscore=0 mlxscore=0 lowpriorityscore=0 mlxlogscore=999
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2401190000 definitions=main-2401270097
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1706089075-16084-1-git-send-email-wangyunjian@huawei.com>
 
-Hi Yunjian,
+Add qcom ethqos specific runtime and system sleep pm ops.
+As part of system sleep qcom ethqos needs to disable all clocks.
+This ops will be extended further with qcom specific features.
 
-kernel test robot noticed the following build warnings:
+Signed-off-by: Sneh Shah <quic_snehshah@quicinc.com>
+---
+ .../stmicro/stmmac/dwmac-qcom-ethqos.c        | 51 ++++++++++++++++++-
+ 1 file changed, 50 insertions(+), 1 deletion(-)
 
-[auto build test WARNING on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Yunjian-Wang/xsk-Remove-non-zero-dma_page-check-in-xp_assign_dev/20240124-174011
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/1706089075-16084-1-git-send-email-wangyunjian%40huawei.com
-patch subject: [PATCH net-next 2/2] tun: AF_XDP Rx zero-copy support
-config: um-allmodconfig (https://download.01.org/0day-ci/archive/20240127/202401271943.bs1GPeEU-lkp@intel.com/config)
-compiler: clang version 18.0.0git (https://github.com/llvm/llvm-project a31a60074717fc40887cfe132b77eec93bedd307)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240127/202401271943.bs1GPeEU-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202401271943.bs1GPeEU-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   In file included from drivers/net/tun.c:44:
-   In file included from include/linux/skbuff.h:17:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:12:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/um/include/asm/hardirq.h:5:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/um/include/asm/io.h:24:
-   include/asm-generic/io.h:547:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     547 |         val = __raw_readb(PCI_IOBASE + addr);
-         |                           ~~~~~~~~~~ ^
-   include/asm-generic/io.h:560:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     560 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
-      37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
-         |                                                   ^
-   In file included from drivers/net/tun.c:44:
-   In file included from include/linux/skbuff.h:17:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:12:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/um/include/asm/hardirq.h:5:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/um/include/asm/io.h:24:
-   include/asm-generic/io.h:573:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     573 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
-      35 | #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
-         |                                                   ^
-   In file included from drivers/net/tun.c:44:
-   In file included from include/linux/skbuff.h:17:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:12:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/um/include/asm/hardirq.h:5:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/um/include/asm/io.h:24:
-   include/asm-generic/io.h:584:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     584 |         __raw_writeb(value, PCI_IOBASE + addr);
-         |                             ~~~~~~~~~~ ^
-   include/asm-generic/io.h:594:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     594 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   include/asm-generic/io.h:604:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     604 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   include/asm-generic/io.h:692:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     692 |         readsb(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:700:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     700 |         readsw(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:708:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     708 |         readsl(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:717:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     717 |         writesb(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
-   include/asm-generic/io.h:726:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     726 |         writesw(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
-   include/asm-generic/io.h:735:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     735 |         writesl(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
->> drivers/net/tun.c:1298:5: warning: no previous prototype for function 'tun_xsk_pool_setup' [-Wmissing-prototypes]
-    1298 | int tun_xsk_pool_setup(struct net_device *dev, struct xsk_buff_pool *pool,
-         |     ^
-   drivers/net/tun.c:1298:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-    1298 | int tun_xsk_pool_setup(struct net_device *dev, struct xsk_buff_pool *pool,
-         | ^
-         | static 
-   13 warnings generated.
-
-
-vim +/tun_xsk_pool_setup +1298 drivers/net/tun.c
-
-  1297	
-> 1298	int tun_xsk_pool_setup(struct net_device *dev, struct xsk_buff_pool *pool,
-  1299			       u16 qid)
-  1300	{
-  1301		return pool ? tun_xsk_pool_enable(dev, pool, qid) :
-  1302			tun_xsk_pool_disable(dev, qid);
-  1303	}
-  1304	
-
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+index 31631e3f89d0..cba601ee9e01 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+@@ -720,6 +720,55 @@ static void ethqos_ptp_clk_freq_config(struct stmmac_priv *priv)
+ 	netdev_dbg(priv->dev, "PTP rate %d\n", plat_dat->clk_ptp_rate);
+ }
+ 
++static int qcom_ethqos_runtime_suspend(struct device *dev)
++{
++	struct net_device *ndev = dev_get_drvdata(dev);
++	struct stmmac_priv *priv = netdev_priv(ndev);
++
++	return stmmac_bus_clks_config(priv, false);
++}
++
++static int qcom_ethqos_runtime_resume(struct device *dev)
++{
++	struct net_device *ndev = dev_get_drvdata(dev);
++	struct stmmac_priv *priv = netdev_priv(ndev);
++
++	return stmmac_bus_clks_config(priv, true);
++}
++
++static int qcom_ethqos_suspend(struct device *dev)
++{
++	struct net_device *ndev = dev_get_drvdata(dev);
++	struct stmmac_priv *priv = netdev_priv(ndev);
++	int ret;
++
++	if (!ndev || !netif_running(ndev))
++		return -EINVAL;
++
++	ret = stmmac_suspend(dev);
++
++	return stmmac_bus_clks_config(priv, false);
++}
++
++static int qcom_ethqos_resume(struct device *dev)
++{
++	struct net_device *ndev = dev_get_drvdata(dev);
++	struct stmmac_priv *priv = netdev_priv(ndev);
++	int ret;
++
++	if (!ndev || !netif_running(ndev))
++		return -EINVAL;
++
++	stmmac_bus_clks_config(priv, true);
++
++	return stmmac_resume(dev);
++}
++
++const struct dev_pm_ops qcom_ethqos_pm_ops = {
++	SET_SYSTEM_SLEEP_PM_OPS(qcom_ethqos_suspend, qcom_ethqos_resume)
++	SET_RUNTIME_PM_OPS(qcom_ethqos_runtime_suspend, qcom_ethqos_runtime_resume, NULL)
++};
++
+ static int qcom_ethqos_probe(struct platform_device *pdev)
+ {
+ 	struct device_node *np = pdev->dev.of_node;
+@@ -838,7 +887,7 @@ static struct platform_driver qcom_ethqos_driver = {
+ 	.probe  = qcom_ethqos_probe,
+ 	.driver = {
+ 		.name           = "qcom-ethqos",
+-		.pm		= &stmmac_pltfr_pm_ops,
++		.pm		= &qcom_ethqos_pm_ops,
+ 		.of_match_table = qcom_ethqos_match,
+ 	},
+ };
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.17.1
+
 
