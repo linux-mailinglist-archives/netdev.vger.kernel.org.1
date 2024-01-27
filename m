@@ -1,59 +1,82 @@
-Return-Path: <netdev+bounces-66352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F28CD83E99F
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 03:15:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43F3883E9BE
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 03:32:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5D641B254A0
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 02:15:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2BE32874CD
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 02:32:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CCA213AE2;
-	Sat, 27 Jan 2024 02:08:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D244AA50;
+	Sat, 27 Jan 2024 02:32:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qJ+Rs5He"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OXyYgYsH"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 751AF154A6
-	for <netdev@vger.kernel.org>; Sat, 27 Jan 2024 02:08:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A1A2B65D;
+	Sat, 27 Jan 2024 02:32:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706321328; cv=none; b=Ndjks0gEaDJRMylWocMoYoSorcQK8Wq+TQAR4Xbh1ok4AKhLjAHlH3g+HO6YBYY4iPAMLLRn7dQ1H9kyTBjqBdhIF9nh4JpaJ7IPhjOJXQfUauLAqQN0B+bTjGpxzRwq4cSkUbVdrECsc7a68rs3u108tjUAu2cnzediXKqAUpI=
+	t=1706322744; cv=none; b=e4b5EzqECp+d8KSFhE0qcOl7M2Z4g/ssX9B98amL52mCO/2XnLk94WOI5JK4+QStCZLrEIlQ4czl3jaAnQ1NSS34ogghZIUZwJMBE705uVVJM+R+0rQ9yYMDEMUjArXOXZUjf1NjUDzNalolOf13aL3XwFfkESZyw+IWYRunKb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706321328; c=relaxed/simple;
-	bh=WEGpc0xxaxj2AY+Xn8ROwEZelU+zXk/EivX8ekFZmeA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WM3HiLZvkWcgYXV48scmJOUGI2kjehlbu8GM/i+QfkUUOgm9+qBahJwvu22OC3d7yhRr8QEVsnwo3GfG4d0oQ1M/e4/lHI6xLYe7I6X7ooFS3EJ25v0QD0OXuIWy3waNIiHlwHo9YF8a72sGKPFXr+YTPDRZe4CPXYkV3QhigNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qJ+Rs5He; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706321324;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uLB5skfy3BEv0JbsXyQzZFD+57i+sZEpeM1MJI3SUiw=;
-	b=qJ+Rs5Hetw76AhWzqkBqPEZ/rwuaoaVg6aS11PxBaqriW5WPXxSENcSnZNZXM1c6eVbqmM
-	HjfsYmTkTsHI6SIAhoLt7RahUYWkpTQ2q28spAAEQ3SMoy/8FpcbppN6VBQqYXblzzV86c
-	YEZMI0JmVQa5R1JwUH/xLTa6AQ/1YSA=
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org
-Cc: Kent Overstreet <kent.overstreet@linux.dev>,
-	peterz@infradead.org,
-	boqun.feng@gmail.com
-Subject: [PATCH 4/4] af_unix: convert to lock_cmp_fn
-Date: Fri, 26 Jan 2024 21:08:31 -0500
-Message-ID: <20240127020833.487907-5-kent.overstreet@linux.dev>
-In-Reply-To: <20240127020833.487907-1-kent.overstreet@linux.dev>
-References: <20240127020833.487907-1-kent.overstreet@linux.dev>
+	s=arc-20240116; t=1706322744; c=relaxed/simple;
+	bh=r7RAxwquJVP5asbAoDhEWhNoTCGJG26QY0llMRexe80=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RCHHziCr/aeon25Z9zWgjbejJUs5AixumVoSakfmfFLY+HnTCaLNJS4dGO/gktEy6u2PCZ7W+qWm+GHR00PU1hd9bWBu9DpaVlZbefVD63Pt8E8b4Gjs3Nk+LyQrIpsrMlxgcIPyzf+aKlnMggdRQYoorV0E3UhBStcsF+0dttw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OXyYgYsH; arc=none smtp.client-ip=209.85.219.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-680b1335af6so20440816d6.1;
+        Fri, 26 Jan 2024 18:32:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706322742; x=1706927542; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3Ji269MoVqaoZ+crSZez3EPRGEYWBb0tQGgumN9NBik=;
+        b=OXyYgYsHTlw49drir6bETGz0nY+k2Y2N4CfcAmBTPbzy/dHGRQHKwNj5JA3437Lui2
+         vx0yg1YOyHIo6rIi8Em4lYlj2XlqwlcG0ryfjicoPqBEHdXo7DR5oYhPlBkYBG2RovPN
+         lHyjyTIjTww6yFS9wDH6E+kbfv2ngnqlaR7mJojHOBi4SXR47SLNt/JNxwYdIYt126/A
+         pelAcD55P7hE70JnZz0ikqmsa3w0mIHFMd6l1KeMTHdhvH0Ijtxrh6j36raH5dcf2BtH
+         wXXPd5kKdDncyqA4b9Rtdq4iswQa3kROdfSpDtQQ3XJmMseTBAdMM6VyeEGhmJrfDfSm
+         a+fA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706322742; x=1706927542;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3Ji269MoVqaoZ+crSZez3EPRGEYWBb0tQGgumN9NBik=;
+        b=gDtOn3AEBqt8KMUbIaNtmn1GzmGTGOnJ9HjQu/CSvgUCcCkFINflxfOniY10Isjvea
+         kn3RG8UonqOJq9HhK2p1IbA52GkqO/53CkfWJfGO8Le4plES6SXsOPmHlCjm98xd2D4y
+         6rVZWVnroFIs4Uz6TVhAVDHKq9bWd7NSL9SkYoXaBlTVzVnNzl4QQLXhGH5WeSdyCPMX
+         uZbrmAbSzxQL+gTh2taLXlTKkSQ18k8kp6tf2YFu+0Fn5mDBNIffORkflG7ns6tG5XfP
+         lrxKLLAT48/9RJ7UMBubyGJjVBqIpcLrmUjjDnIEIjScpFlXBsqojDUw0geRWBcoQI7L
+         WcNQ==
+X-Gm-Message-State: AOJu0YwsrNJ5GNuDSHhswCV5+UmghXSdErVxf7x0A/8hb31VInNPtvn6
+	4JM6LXpCby6Dh9kzKHv0xVzemvBnpURZKO3gtUIWB/hlv3fVAFQvnZZTVVWC
+X-Google-Smtp-Source: AGHT+IEW/cKR+QgbsF6tBE6UZV1sdPCV+cbFdVwauRAC0X1wn/CvvRVxmBLKE0xjqBtEzJXKssQMyQ==
+X-Received: by 2002:a0c:9d47:0:b0:681:96fd:8b97 with SMTP id n7-20020a0c9d47000000b0068196fd8b97mr2499705qvf.64.1706322742130;
+        Fri, 26 Jan 2024 18:32:22 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCXd5cTdLVaK8xHJhiHYZMg8F7fukntKEX8Q/fYIftDku0pdHnoD0Aawy9xis2f5PRn1tPu2rUwbcc6TQnFV81GCY7tqi7aRaEiKIXjzEtRV8JF3I3FpsR/8qBHrB3QXibpvfkyd4Jf+xS8V131Hh+H1Lr8MxO/BogkIo7iYBJxyL4Qh5hKEpTDYJue4mGI5MciYfCQBjAxsuf+ejFU=
+Received: from willemb.c.googlers.com.com (131.65.194.35.bc.googleusercontent.com. [35.194.65.131])
+        by smtp.gmail.com with ESMTPSA id d20-20020a0cdb14000000b00681617e4a72sm1020770qvk.68.2024.01.26.18.32.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Jan 2024 18:32:21 -0800 (PST)
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	linux-kselftest@vger.kernel.org,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH net-next] selftests/net: calibrate txtimestamp
+Date: Fri, 26 Jan 2024 21:31:51 -0500
+Message-ID: <20240127023212.3746239-1-willemdebruijn.kernel@gmail.com>
+X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,113 +84,61 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-Kill
- - unix_state_lock_nested
- - _nested usage for net->unx.table.locks[].
+From: Willem de Bruijn <willemb@google.com>
 
-replace both with lock_set_cmp_fn_ptr_order(&u->lock).
+The test sends packets and compares enqueue, transmit and Ack
+timestamps with expected values. It installs netem delays to increase
+latency between these points.
 
-The lock ordering in sk_diag_dump_icons() looks suspicious; this may
-turn up a real issue.
+The test proves flaky in virtual environment (vng). Increase the
+delays to reduce variance. Scale measurement tolerance accordingly.
 
-Cc: netdev@vger.kernel.org
-Signed-off-by: Kent Overstreet <kent.overstreet@linux.dev>
+Time sensitive tests are difficult to calibrate. Increasing delays 10x
+also increases runtime 10x, for one. And it may still prove flaky at
+some rate.
+
+Signed-off-by: Willem de Bruijn <willemb@google.com>
 ---
- include/net/af_unix.h |  3 ---
- net/unix/af_unix.c    | 20 ++++++++------------
- net/unix/diag.c       |  2 +-
- 3 files changed, 9 insertions(+), 16 deletions(-)
+ tools/testing/selftests/net/txtimestamp.sh | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/include/net/af_unix.h b/include/net/af_unix.h
-index 49c4640027d8..4eff0a089640 100644
---- a/include/net/af_unix.h
-+++ b/include/net/af_unix.h
-@@ -48,9 +48,6 @@ struct scm_stat {
+diff --git a/tools/testing/selftests/net/txtimestamp.sh b/tools/testing/selftests/net/txtimestamp.sh
+index 31637769f59f..25baca4b148e 100755
+--- a/tools/testing/selftests/net/txtimestamp.sh
++++ b/tools/testing/selftests/net/txtimestamp.sh
+@@ -8,13 +8,13 @@ set -e
  
- #define unix_state_lock(s)	spin_lock(&unix_sk(s)->lock)
- #define unix_state_unlock(s)	spin_unlock(&unix_sk(s)->lock)
--#define unix_state_lock_nested(s) \
--				spin_lock_nested(&unix_sk(s)->lock, \
--				SINGLE_DEPTH_NESTING)
+ setup() {
+ 	# set 1ms delay on lo egress
+-	tc qdisc add dev lo root netem delay 1ms
++	tc qdisc add dev lo root netem delay 10ms
  
- /* The AF_UNIX socket */
- struct unix_sock {
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index d013de3c5490..1a0d273799c1 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -170,7 +170,7 @@ static void unix_table_double_lock(struct net *net,
- 		swap(hash1, hash2);
+ 	# set 2ms delay on ifb0 egress
+ 	modprobe ifb
+ 	ip link add ifb_netem0 type ifb
+ 	ip link set dev ifb_netem0 up
+-	tc qdisc add dev ifb_netem0 root netem delay 2ms
++	tc qdisc add dev ifb_netem0 root netem delay 20ms
  
- 	spin_lock(&net->unx.table.locks[hash1]);
--	spin_lock_nested(&net->unx.table.locks[hash2], SINGLE_DEPTH_NESTING);
-+	spin_lock(&net->unx.table.locks[hash2]);
+ 	# redirect lo ingress through ifb0 egress
+ 	tc qdisc add dev lo handle ffff: ingress
+@@ -24,9 +24,11 @@ setup() {
  }
  
- static void unix_table_double_unlock(struct net *net,
-@@ -997,6 +997,7 @@ static struct sock *unix_create1(struct net *net, struct socket *sock, int kern,
- 	u->path.dentry = NULL;
- 	u->path.mnt = NULL;
- 	spin_lock_init(&u->lock);
-+	lock_set_cmp_fn_ptr_order(&u->lock);
- 	atomic_long_set(&u->inflight, 0);
- 	INIT_LIST_HEAD(&u->link);
- 	mutex_init(&u->iolock); /* single task reading lock */
-@@ -1340,17 +1341,11 @@ static int unix_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
+ run_test_v4v6() {
+-	# SND will be delayed 1000us
+-	# ACK will be delayed 6000us: 1 + 2 ms round-trip
+-	local -r args="$@ -v 1000 -V 6000"
++	# SND will be delayed 10ms
++	# ACK will be delayed 60ms: 10 + 20 ms round-trip
++	# allow +/- tolerance of 8ms
++	# wait for ACK to be queued
++	local -r args="$@ -v 10000 -V 60000 -t 8000 -S 80000"
  
- static void unix_state_double_lock(struct sock *sk1, struct sock *sk2)
- {
--	if (unlikely(sk1 == sk2) || !sk2) {
--		unix_state_lock(sk1);
--		return;
--	}
--	if (sk1 < sk2) {
-+	if (sk1 > sk2)
-+		swap(sk1, sk2);
-+	if (sk1 && sk1 != sk2)
- 		unix_state_lock(sk1);
--		unix_state_lock_nested(sk2);
--	} else {
--		unix_state_lock(sk2);
--		unix_state_lock_nested(sk1);
--	}
-+	unix_state_lock(sk2);
- }
- 
- static void unix_state_double_unlock(struct sock *sk1, struct sock *sk2)
-@@ -1591,7 +1586,7 @@ static int unix_stream_connect(struct socket *sock, struct sockaddr *uaddr,
- 		goto out_unlock;
- 	}
- 
--	unix_state_lock_nested(sk);
-+	unix_state_lock(sk);
- 
- 	if (sk->sk_state != st) {
- 		unix_state_unlock(sk);
-@@ -3575,6 +3570,7 @@ static int __net_init unix_net_init(struct net *net)
- 
- 	for (i = 0; i < UNIX_HASH_SIZE; i++) {
- 		spin_lock_init(&net->unx.table.locks[i]);
-+		lock_set_cmp_fn_ptr_order(&net->unx.table.locks[i]);
- 		INIT_HLIST_HEAD(&net->unx.table.buckets[i]);
- 	}
- 
-diff --git a/net/unix/diag.c b/net/unix/diag.c
-index bec09a3a1d44..8ab5e2217e4c 100644
---- a/net/unix/diag.c
-+++ b/net/unix/diag.c
-@@ -84,7 +84,7 @@ static int sk_diag_dump_icons(struct sock *sk, struct sk_buff *nlskb)
- 			 * queue lock. With the other's queue locked it's
- 			 * OK to lock the state.
- 			 */
--			unix_state_lock_nested(req);
-+			unix_state_lock(req);
- 			peer = unix_sk(req)->peer;
- 			buf[i++] = (peer ? sock_i_ino(peer) : 0);
- 			unix_state_unlock(req);
+ 	./txtimestamp ${args} -4 -L 127.0.0.1
+ 	./txtimestamp ${args} -6 -L ::1
 -- 
-2.43.0
+2.43.0.429.g432eaa2c6b-goog
 
 
