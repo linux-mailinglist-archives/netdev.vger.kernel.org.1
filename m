@@ -1,131 +1,119 @@
-Return-Path: <netdev+bounces-66436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F38C983EFC0
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 20:32:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA4E183F060
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 23:00:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA5CC1F21C3D
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 19:32:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CF4EFB22D26
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 22:00:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAFFC2E41A;
-	Sat, 27 Jan 2024 19:32:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F54417BA3;
+	Sat, 27 Jan 2024 22:00:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="1gf57pjy"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="fAlpRsG9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F1B92EB10
-	for <netdev@vger.kernel.org>; Sat, 27 Jan 2024 19:32:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B11A1B5B2
+	for <netdev@vger.kernel.org>; Sat, 27 Jan 2024 22:00:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706383950; cv=none; b=h8R6AX+Hkyug+1barUKPSImYyhgVGFYFLHrLbI/4qeG91Y7uEVRyweUKF6Wdk8ezulpg4+Xb+gH55xpe37zQYL6F3TaDoeiKClD+Z5gUrLmGVvPbhLCv5fHpNj+/xAWPI5bHTKP1S8qXgAaDBKrOe1NnhU/1dCe8yXfd91RRFuA=
+	t=1706392845; cv=none; b=qe1vb3dquO5oP42Iu/ELO90iCVosoof8iO6FGNIhQEA3lWV6aq0OjwTMud7Mb+dZC4iAObohHrMZpfNAwQur23OJz6IwCv40oiy4FmL06033R8jJ0bm+AIhgyLrKOvaUgG8mNJ4WahTs/XOiEoMpzUcE3BW931u3XpJRAQiJjdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706383950; c=relaxed/simple;
-	bh=OFosktua+nK1lqL1BScwNQWTYhvw0nvKXrNIUt/Ki8s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VBTOmcJTnkTrD5tYEmlkPSbhcqPW9nACKNHBGkkUpH0Dk8bcBHF5Pv4hV9jGBMZ/Fv0B4Kd0F6qibNKIs43ZYRaGLOo1gyPzjzA3KD+yl5P13W14h0PhZoCvWe+FbVnAe9LWK3ztbIfa8fmoAmQoSzHv60OAi8qbRRltdWkmn5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=1gf57pjy; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-40e7e2e04f0so22719385e9.1
-        for <netdev@vger.kernel.org>; Sat, 27 Jan 2024 11:32:28 -0800 (PST)
+	s=arc-20240116; t=1706392845; c=relaxed/simple;
+	bh=JXTVBbTpG7x6c23I9DG7ogFp0evjgxw0Tb+0NyE3UzU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dBLuL2X1VmiEqx5Xu090ilidLbEJzmWgQ1qUab8zxP0QPJ9pULBDhba9Y9iWtpyWguMsO76yuvlcEEDXbciQcoJWkAlMvZ/I1uNCrjddvHBAhtI2FN0pAsAa6T2OeyrQrc+/JVMzXCCnZKouGq4pFebCeN8eq6SziSgdJ1OQFMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=fAlpRsG9; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-290b1e19101so2094850a91.0
+        for <netdev@vger.kernel.org>; Sat, 27 Jan 2024 14:00:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1706383947; x=1706988747; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gEpUxuHvkxdnVuo1JHby3iXUNzNjMXHPh3NuTZ9HCOY=;
-        b=1gf57pjy7tEUx1Chg08s81C4tQa2d+Rro1DSGA9fitH4uYeb7fZZh2d/nnFMRL07As
-         W/9HsVT8/ngJNKtnLmmx/0BLgqljmzTKFPToVEe2gMXI5Jgi/2AMpMH7uFVKNgUmD3aV
-         MDcEk6/F2XoSMDfvbwCmm5JqEEm3lKfl3IzB59HEaLhFufnK4+6F+n8kQQ0VW6377HYz
-         VAiwVSiPozRIExjW+xFO/k6YOcDIq7eBjLm6xG/3jnE9zvOtIjRW5bgtTJvQG5ChV0h3
-         6yVql69ze5ipRydSah9ZukK5VHxYAAJcj0hUWzpi5Qf5I7X6FD6aOnFi8JVlis7Ce3t3
-         N4qA==
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1706392842; x=1706997642; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=tJIBkulCfrODe4p0bfVjWAj0VgBK7yFAiMuhrhx77cI=;
+        b=fAlpRsG9VNqgM5fNhThNTO+mgEE2sg0s5Mq50L1xwcak7FPLGSHJf1c584y3WOizo3
+         i8OQfGidYc1Zm1sSVuA9W7ocC1zFxaGkyloqdtjSlfiXSLIUBIvvzTepG0xWjErxH7FM
+         gzJZREAjpkk9y6HvDj3pvcOk37WMxz45+ohjhnKt+zUsOkDQoK+/GSBB5hGR63Y6FbAH
+         3hY7bBxql5prDLLVhgKfaUHF3NbFpA3P8KHfOYdpZu9ZYBf6ppP1zE43HNP8jc7nklOy
+         WmMZSPqGwT+Ex/Jz6A+cJT/n832Mk4XeKExYXYnLNR67dakappuYbT0XiFOcUZmbhI1U
+         jykQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706383947; x=1706988747;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gEpUxuHvkxdnVuo1JHby3iXUNzNjMXHPh3NuTZ9HCOY=;
-        b=KxjNHgpC+8ufg657wD5OcoYT1PNdxqAJiYK+tEPRd3kI5KWLNQI++WmYXQw27Ta9tw
-         QOQge7swozPT0KFZduGf4JhWqyYWPuIcP6ImghEZTcJfqPWcenmLvydtYQPOXGZZ2MIw
-         A01e58IsvsZuoqdbIodnJTNL42///lmUXjjILhlnjFeATAUd9QqIyftSza7fdDeVhiuN
-         0eo4pK2emGL459hEWnRjk1vbbOBM7rxnEuwmOxixmf1NMraBF/sYi4MuiYCxbnFpwDhS
-         IiaF7uRRN10D3HFodObdgV1gcwurc/3+70W+cvJkD5d4KhPIwSVSyJdLGMYV9aAvOPkk
-         l76g==
-X-Gm-Message-State: AOJu0Yyl9f/QZg3dKyx+iRaJoaXqaA1Az4b8I5LMlGgJejc3UyQRrMSS
-	Gw9nbgx2g30peM92cn3eeS/8buv2pT3+TXnF0sudoayPTh41Xg1LQXaq4/brCEU=
-X-Google-Smtp-Source: AGHT+IFIburJoW4BFrmc+K2ya7vO19XpEC4+2WG74/eThfZcJLQyym2s9GswrAXPsaEejM+mq4MJwg==
-X-Received: by 2002:a05:600c:3493:b0:40e:ef00:af57 with SMTP id a19-20020a05600c349300b0040eef00af57mr1308153wmq.36.1706383947218;
-        Sat, 27 Jan 2024 11:32:27 -0800 (PST)
-Received: from [192.168.0.161] ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id a11-20020a05600c348b00b0040eef2aed28sm1999515wmq.23.2024.01.27.11.32.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 27 Jan 2024 11:32:26 -0800 (PST)
-Message-ID: <43a266e9-7cde-472a-9846-c16756be8c09@blackwall.org>
-Date: Sat, 27 Jan 2024 21:32:25 +0200
+        d=1e100.net; s=20230601; t=1706392842; x=1706997642;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tJIBkulCfrODe4p0bfVjWAj0VgBK7yFAiMuhrhx77cI=;
+        b=WP/vs9fIlLf3GzHT5Qe5nwylpteJzNUftUo47EilYPlMsSnNQA7NRZvQWLuGkXW/5W
+         pWnNC30UtqaDLjNWfVdjVBoWgvMPAO19qFwo/wbFQyUOCCsxemPaJLIsOo3wmiCHWc6g
+         mU58zW3LrpiuOkVz2/VrYEOoWGGvLqSMFGE7fM6ksMStqiZUaqk6KeKkc27NJ4dWnd/e
+         Dekio+nYSB2v8GkWqGOvbvUdQis6wnIBJxo1cauwJrEkThVSyVXz5m/NeCqw7KXiuBun
+         Hmzc4TQHp0GhTbyOOUB8jMZyzz7wrJ19xCWxwsNaWyMt/uTDPxozry3caOlExRjr/lst
+         mtHg==
+X-Gm-Message-State: AOJu0YwbyPmC/+OUDEbkRNioEfox3FBKO70uC+yWRT6PWc9IzQ7QA+kY
+	E2VIkESonKiwxnosfD2clMsf7wiphNlkClU3u6b0kWRosubOZ/0wR6NAjXU1rOwXZ3qUm45Lm2F
+	jAcs=
+X-Google-Smtp-Source: AGHT+IHHPI640id9eU2uuT7mBZdxzzdUp33fZxw7t1AEgZSd4x3emb7fYV5FbUUvN3EVUm7kdecUCg==
+X-Received: by 2002:a17:90a:e296:b0:28f:f73a:b48b with SMTP id d22-20020a17090ae29600b0028ff73ab48bmr3811316pjz.23.1706392842051;
+        Sat, 27 Jan 2024 14:00:42 -0800 (PST)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id 80-20020a630253000000b005d6bdb93070sm2905019pgc.84.2024.01.27.14.00.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 27 Jan 2024 14:00:41 -0800 (PST)
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>
+Subject: [PATCH iproute2] bpf: fix warning from basename()
+Date: Sat, 27 Jan 2024 14:00:32 -0800
+Message-ID: <20240127220032.5347-1-stephen@networkplumber.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] bridge: mcast: fix disabled snooping after long
- uptime
-Content-Language: en-US
-To: =?UTF-8?Q?Linus_L=C3=BCssing?= <linus.luessing@c0d3.blue>,
- netdev@vger.kernel.org
-Cc: bridge@lists.linux.dev, b.a.t.m.a.n@lists.open-mesh.org,
- linux-kernel@vger.kernel.org, Roopa Prabhu <roopa@nvidia.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-References: <20240127175033.9640-1-linus.luessing@c0d3.blue>
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20240127175033.9640-1-linus.luessing@c0d3.blue>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 27/01/2024 19:50, Linus Lüssing wrote:
-> The original idea of the delay_time check was to not apply multicast
-> snooping too early when an MLD querier appears. And to instead wait at
-> least for MLD reports to arrive before switching from flooding to group
-> based, MLD snooped forwarding, to avoid temporary packet loss.
-> 
-> However in a batman-adv mesh network it was noticed that after 248 days of
-> uptime 32bit MIPS based devices would start to signal that they had
-> stopped applying multicast snooping due to missing queriers - even though
-> they were the elected querier and still sending MLD queries themselves.
-> 
-> While time_is_before_jiffies() generally is safe against jiffies
-> wrap-arounds, like the code comments in jiffies.h explain, it won't
-> be able to track a difference larger than ULONG_MAX/2. With a 32bit
-> large jiffies and one jiffies tick every 10ms (CONFIG_HZ=100) on these MIPS
-> devices running OpenWrt this would result in a difference larger than
-> ULONG_MAX/2 after 248 (= 2^32/100/60/60/24/2) days and
-> time_is_before_jiffies() would then start to return false instead of
-> true. Leading to multicast snooping not being applied to multicast
-> packets anymore.
-> 
-> Fix this issue by using a proper timer_list object which won't have this
-> ULONG_MAX/2 difference limitation.
-> 
-> Fixes: b00589af3b04 ("bridge: disable snooping if there is no querier")
-> Signed-off-by: Linus Lüssing <linus.luessing@c0d3.blue>
-> ---
-> Changelog v2:
-> * removed "inline" from br_multicast_query_delay_expired()
-> 
->  net/bridge/br_multicast.c | 20 +++++++++++++++-----
->  net/bridge/br_private.h   |  4 ++--
->  2 files changed, 17 insertions(+), 7 deletions(-)
-> 
+The function basename() expects a mutable character string,
+which now causes a warning:
 
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+bpf_legacy.c: In function ‘bpf_load_common’:
+bpf_legacy.c:975:38: warning: passing argument 1 of ‘__xpg_basename’ discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+  975 |                          basename(cfg->object), cfg->mode == EBPF_PINNED ?
+      |                                   ~~~^~~~~~~~
+In file included from bpf_legacy.c:21:
+/usr/include/libgen.h:34:36: note: expected ‘char *’ but argument is of type ‘const char *’
+   34 | extern char *__xpg_basename (char *__path) __THROW;
+
+Fixes: f20ff2f19552 ("bpf: keep parsed program mode in struct bpf_cfg_in")
+Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+---
+ lib/bpf_legacy.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/bpf_legacy.c b/lib/bpf_legacy.c
+index 741eec8d4d63..c8da4a3e6b65 100644
+--- a/lib/bpf_legacy.c
++++ b/lib/bpf_legacy.c
+@@ -972,8 +972,8 @@ int bpf_load_common(struct bpf_cfg_in *cfg, const struct bpf_cfg_ops *ops,
+ 		ops->cbpf_cb(nl, cfg->opcodes, cfg->n_opcodes);
+ 	if (cfg->mode == EBPF_OBJECT || cfg->mode == EBPF_PINNED) {
+ 		snprintf(annotation, sizeof(annotation), "%s:[%s]",
+-			 basename(cfg->object), cfg->mode == EBPF_PINNED ?
+-			 "*fsobj" : cfg->section);
++			 basename(strdupa(cfg->object)),
++			 cfg->mode == EBPF_PINNED ? "*fsobj" : cfg->section);
+ 		ops->ebpf_cb(nl, cfg->prog_fd, annotation);
+ 	}
+ 
+-- 
+2.43.0
 
 
