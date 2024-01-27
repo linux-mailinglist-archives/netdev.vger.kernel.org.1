@@ -1,106 +1,190 @@
-Return-Path: <netdev+bounces-66419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3489883EE36
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 17:06:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B309583EE53
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 17:18:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF18E28416A
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 16:06:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D82431C21BA4
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 16:18:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 649792942C;
-	Sat, 27 Jan 2024 16:06:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35C402C861;
+	Sat, 27 Jan 2024 16:18:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NUpjuXyY"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gZ8ff1Xz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5EE525764;
-	Sat, 27 Jan 2024 16:06:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67BDF2C6B0;
+	Sat, 27 Jan 2024 16:18:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706371586; cv=none; b=C5wZioUn2McsQuct9TzyLigrAui2iHN4PUcqJLi86Il7OMtvF8E0SrzFpTAnTOKIEsWOEcgItS+KundiRfWZ23OWxKOtRVuONsgpqaQuuG8jnjcjkCPOBYLc2Hf7I5kNgSA+bZNrJ811yzURYRA52SfSvJPKRRt+Y0WIW7nmkp0=
+	t=1706372308; cv=none; b=NQjNXBIfiMfXt2FkALY12Htxg+7J1PZRNBjDj6Qm0+WudR48lY7u0ZQp/rb6nT3YTqXyCnFNS/mp7st2aINfnX1/x5BQvu+S33sOaML2mB1pryQA/GhCGp66sMmXVX0E/146cgP61VgVxenxTMn3YX1lraKJLyxw1+PqH9Iy48I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706371586; c=relaxed/simple;
-	bh=0b+Fc0OLP1xwiUwEjb+UIjcwfA3RtHX+defXLD+CgN0=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=ZxWs++s8ypC7ckOPuNk3nLWLLTpuie5C7A4c0D/Bu5coTCfG3diviTcRqwtESsi8ynUKsol1SULzL5z/Dq2tkifp59iIePAWXZiCbjFxV0WI7XVuG4v8LY7nE/TUgbBEJvUvmFTf+AFcs/3wz92NJdjsA9M+wyiSQAKLv6OyWuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NUpjuXyY; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-42a8af3c10cso6491121cf.0;
-        Sat, 27 Jan 2024 08:06:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706371584; x=1706976384; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=790nGr4fxuNI+xFbDQMERosAfDIXV6m5tYkf7fACxZw=;
-        b=NUpjuXyYSp0+aGjoHwtYAszHL1NpfVIcn3iBRJEc5wgQJPusY3ps/giDY/GsucDNpB
-         8Y211LQNJHWJIs3AY4U2gUYHs0FL4gemX7NvYAs+AyMiSnVMgUQJqyss4EF+VS7oWujR
-         aBmN2skhzcbeM+fQMNCALKB0FGcf1ZIowXnzIPAtr3UBojLysRxVixRw0zY5KG8hqj66
-         bklyMo9qIHqBMFgEGh00HctHiJiCw2l3e8XsMu0Xidh2pHcmDX9+OYcW6p3fz/Jn2BFV
-         pWrGhRe3uQgYhrkuqzwjFH5T6MzG+9bZHBLZn493qfweGEhAd2cZgFgmISzikw2XseIo
-         09nQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706371584; x=1706976384;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=790nGr4fxuNI+xFbDQMERosAfDIXV6m5tYkf7fACxZw=;
-        b=VO1CYhyMQ7J4IeUgqPzoJUdcqhg8Nb+wlPUDdCrYPb7EWiRlc74iGeGHhDaJL/jF3j
-         LU/fxoN6qPi0fAWdLOS6Qasm7ypXuJpMMjfWE1SivAQKpTRqeSzwDBNGMVCa3oVBQkkV
-         PITfOLEpB4B2DwZ4yfvR+u2hl/MdyPAJQYCQI0m3vzdoyjqcUOgjwjWBszdTlV0tMVEd
-         GK1F+CjPcIln7dWJ7PztRqLOg11lDUdJL/xxmXgLywkkRl2NZz3hN3ZVcucsc8eOZQir
-         YNKMpV+Efob9x9UqtEM9+zsEW6zFDHy9uohxY0PT9lV+SvL09IkGN/b4mNCFMtDu7++Y
-         w/5w==
-X-Gm-Message-State: AOJu0YwnzJjdapKxm8+voqbM+pzcK7xw13XeHf8rRdbL7gDcAzNaultI
-	uMBRFufGzcPDpKoPDypFA/4NDKP+DLx97FrrZWDSvufb3ca2RZu+
-X-Google-Smtp-Source: AGHT+IG0+AooEdjbaiRETSdlbpv3v7HbGI1Ln+Yg6nAdJy9JxDZouPHu3lqF7ipIO61LQTEUrccCkg==
-X-Received: by 2002:a05:622a:a14:b0:42a:1609:eb18 with SMTP id bv20-20020a05622a0a1400b0042a1609eb18mr3302103qtb.137.1706371583752;
-        Sat, 27 Jan 2024 08:06:23 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVEBxehnMrRblNcAuiLMMuHsvcuOHhNlyAwKue0whF98IUpc+Dfo4VsiCySh6iRJU6Hf4lnwwU4b3X+CvN5+8WKQN5/LB4gyuDbPy/FlvNPa1jlQ3NpLNcSlJrHwxW+axJH6//q0hF4ZoFoQ//tNafu1LKteFjFCp3cUu+ZjHwOdXs44r3DsiS9Jkv/p6HHIt3m3mCbKV89uhPjoJF0t4/W0X/0cOkZXRUKIw4FvfoWs2l8qEzwkHxsIBaCb66LmMUErMopXUfv/RtAA91fFaVSOSUszXjl6aiuzIbmBZkULtZuxNdVXvAs
-Received: from localhost (131.65.194.35.bc.googleusercontent.com. [35.194.65.131])
-        by smtp.gmail.com with ESMTPSA id s40-20020a05622a1aa800b004281ce041f6sm1633997qtc.21.2024.01.27.08.06.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 27 Jan 2024 08:06:23 -0800 (PST)
-Date: Sat, 27 Jan 2024 11:06:22 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Stephen Hemminger <stephen@networkplumber.org>, 
- netdev@vger.kernel.org
-Cc: Stephen Hemminger <stephen@networkplumber.org>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Wang <jasowang@redhat.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- linux-kernel@vger.kernel.org (open list)
-Message-ID: <65b529fee37d5_3a9e0b294d9@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240126002550.169608-1-stephen@networkplumber.org>
-References: <20240126002550.169608-1-stephen@networkplumber.org>
-Subject: Re: [PATCH] net/tun: use reciprocal_scale
+	s=arc-20240116; t=1706372308; c=relaxed/simple;
+	bh=IbQ9l1hVz0C4qu+GOHbCmVmS3NyAmVNSZ0QYxsyHvWY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BRkgg6UKbHO6hYHOjdM+RVY/4tI617Kx0ui8FFkMx79NXJvW6w5n5J4X2o4eY8LwXKtTYBFBHHsXeGgSmrv11WnyRcqzab12UQqRNwEvSmEibgtsL5M3KX+v1ZQaZzBAoDORgIEwqdAIx5CB9sCJCJhgSWaqxiK5kVIZx4qQJwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=gZ8ff1Xz; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=XJWCJ9vnXiZ+XqThJeYYorMwdW5v3gaxGN+6WmhiHKk=; b=gZ8ff1Xz3PUauddr4U1OYkNbBF
+	JO1AM5nKecFduDggbJlEuYM6mCViFVERLdq6Hec2vQSokyp9Brq0xTY1I7nby8/oxT1h02zZA+qj0
+	z2qAMYnaQRPm0xyn7gt4Or+aiq96ZRZa7p+WcfLRS14D1giBH8ATF6keqkqCCxKmSaxx/VIeYuYgk
+	D+p9F5AvsfCLhr8wkEgMAggxT0G7MsGhqEryaN7FapSqtSYTmG4Le9waGcU0lIPvfyChr+6gpA9g/
+	ZWNFBO1iwPADLs8GaQDX0fJ0OBr+BRg2+THSDb9wVhWm4JzdW3iIGw/4r+pLTFMpI5EoUojksJPHS
+	H+xD9tgA==;
+Received: from [50.53.50.0] (helo=[192.168.254.15])
+	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rTlNx-00000007jwf-1v9i;
+	Sat, 27 Jan 2024 16:18:25 +0000
+Message-ID: <365902d0-c5cd-48a0-b779-ef48913297b6@infradead.org>
+Date: Sat, 27 Jan 2024 08:18:22 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Linux Kernel Bug] UBSAN: array-index-out-of-bounds in
+ rds_cmsg_recv
+Content-Language: en-US
+To: Allison Henderson <allison.henderson@oracle.com>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Santosh Shilimkar <santosh.shilimkar@oracle.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "yanjun.zhu@linux.dev" <yanjun.zhu@linux.dev>,
+ "chenyuan0y@gmail.com" <chenyuan0y@gmail.com>
+Cc: "zzjas98@gmail.com" <zzjas98@gmail.com>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "syzkaller@googlegroups.com"
+ <syzkaller@googlegroups.com>
+References: <CALGdzuoVdq-wtQ4Az9iottBqC5cv9ZhcE5q8N7LfYFvkRsOVcw@mail.gmail.com>
+ <27319d3d-61dd-41e3-be6c-ccc08b9b3688@linux.dev>
+ <c4cd5048-1838-4464-ba79-26cc595e380f@infradead.org>
+ <9f7eb287-543f-4865-90ca-b853e04ff126@linux.dev>
+ <8dc57a5a51783495878c9f43f2fc39d6898dd043.camel@oracle.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <8dc57a5a51783495878c9f43f2fc39d6898dd043.camel@oracle.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Stephen Hemminger wrote:
-> Use the inline function reciprocal_scale rather than open coding
-> the scale optimization.  Also, remove unnecessary initializations.
-> Resulting compiled code is unchanged (according to godbolt).
+
+
+On 1/26/24 16:00, Allison Henderson wrote:
+> On Mon, 2024-01-22 at 16:49 +0800, Zhu Yanjun wrote:
+>> 在 2024/1/22 13:48, Randy Dunlap 写道:
+>>> Hi,
+>>>
+>>>
+>>> On 1/21/24 00:34, Zhu Yanjun wrote:
+>>>> 在 2024/1/19 22:29, Chenyuan Yang 写道:
+>>>>> Dear Linux Kernel Developers for Network RDS,
+>>>>>
+>>>>> We encountered "UBSAN: array-index-out-of-bounds in
+>>>>> rds_cmsg_recv"
+>>>>> when testing the RDS with our generated specifications. The C
+>>>>> reproduce program and logs for this crash are attached.
+>>>>>
+>>>>> This crash happens when RDS receives messages by using
+>>>>> `rds_cmsg_recv`, which reads the `j+1` index of the array
+>>>>> `inc->i_rx_lat_trace`
+>>>>> (
+>>>>> https://urldefense.com/v3/__https://elixir.bootlin.com/linux/v6.
+>>>>> 7/source/net/rds/recv.c*L585__;Iw!!ACWV5N9M2RV99hQ!J8QGG3fi_O0g
+>>>>> 6p3oOboqNj5BuTcMuLuF-7-
+>>>>> SATmNj8EFTKyC68co6cnoG6LQzY1lJ9M_XA6voErOfj-qXTq3BSnW21Tk$ ).
+>>>>> The length of `inc->i_rx_lat_trace` array is 4 (defined by
+>>>>> `RDS_RX_MAX_TRACES`,
+>>>>> https://urldefense.com/v3/__https://elixir.bootlin.com/linux/v6.7/source/net/rds/rds.h*L289__;Iw!!ACWV5N9M2RV99hQ!J8QGG3fi_O0g6p3oOboqNj5BuTcMuLuF-7-SATmNj8EFTKyC68co6cnoG6LQzY1lJ9M_XA6voErOfj-qXTq3BYX3yVFo$
+>>>>>  ) while
+>>>>> `j` is the value stored in another array `rs->rs_rx_trace`
+>>>>> (
+>>>>> https://urldefense.com/v3/__https://elixir.bootlin.com/linux/v6.
+>>>>> 7/source/net/rds/recv.c*L583__;Iw!!ACWV5N9M2RV99hQ!J8QGG3fi_O0g
+>>>>> 6p3oOboqNj5BuTcMuLuF-7-
+>>>>> SATmNj8EFTKyC68co6cnoG6LQzY1lJ9M_XA6voErOfj-qXTq3BVTaaNkx$ ),
+>>>>> which is sent from others and could be arbitrary value.
+>>>>
+>>>> I recommend to use the latest rds to make tests. The rds in linux
+>>>> kernel upstream is too old. The rds in oracle linux is newer.
+>>>
+>>> Why is the upstream kernel lagging behind?  Is the RDS maintainer
+>>> going
+>>> to submit patches to update mainline?
+>>
+>> When I was in Oracle and worked with RDS, I have planned to upgrade 
+>> kernel rds to the latest. But after I submitted several patch series,
+>> Oracle Developing Center of China was shutdown. I can not finish the 
+>> plan. But the UEK kernel in Oracle linux has the latest RDS.
+>>
+>> If you want to make tests with rds, I recommend to use UEK kernel in 
+>> Oracle Linux.
+>>
+>> Or you can install UEK kernel in RedHat. IMO, this UEK kernel can
+>> also 
+>> work in RedHat Linux.
+>>
+>> Zhu Yanjun
 > 
-> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+> The challenge with updateing rds in upstream is that the uek rds
+> diverged from upstream a long time ago.  So most of the uek patches
+> wont apply very well with a pretty big revert to bring it back to the
+> point of divergence.  It not entirly clear how much rds is used outside
+> of oracle linux, but we are looking at how we might go about updating
+> at least the rds_tcp module, as we think this area would have less
+> patching conflicts, and may be of more interest to community folks. 
+> This is still very much a work in progress though, and still undergoing
+> a lot of investigation, so Zhu is likley correct in that for now it's
+> probably best to simply use a uek kernel if you are just wanting to
+> develop test cases.
+> 
+> Zhu, I was unaware that an effort had been submitted, but I am still
+> very much learning rds.  If you want to point me to your set, I would
+> be happy to study it even if it was submitted a long time ago.  Thanks!
+> 
+> Allison
 
-Targeting net-next
+Thanks for the update.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+> 
+>>
+>>>
+>>> Thanks.
+>>>
+>>>> Zhu Yanjun
+>>>>
+>>>>>
+>>>>> This crash might be exploited to read the value out-of-bound
+>>>>> from the
+>>>>> array by setting arbitrary values for the array `rs-
+>>>>>> rs_rx_trace`.
+>>>>>
+>>>>> If you have any questions or require more information, please
+>>>>> feel
+>>>>> free to contact us.
+>>>>>
+>>>>> Best,
+>>>>> Chenyuan
+>>>>
+>>>>
+>>>
+>>
+>>
+> 
+
+-- 
+#Randy
 
