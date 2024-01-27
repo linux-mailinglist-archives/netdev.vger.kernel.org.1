@@ -1,161 +1,1126 @@
-Return-Path: <netdev+bounces-66434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6122483EF92
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 19:51:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EBD283EFA8
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 20:07:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6EE741C21221
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 18:51:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49EC4B227F5
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 19:07:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26B6F2D05B;
-	Sat, 27 Jan 2024 18:51:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FEE42E40E;
+	Sat, 27 Jan 2024 19:07:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hLeeNu4v"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VOyaatE+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 626DE28699;
-	Sat, 27 Jan 2024 18:51:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9DDA2D058;
+	Sat, 27 Jan 2024 19:06:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706381495; cv=none; b=YMZQgRw5VJZ75E7QBwU+b5myCAy8F+2GDrj/08VWq18sBjGsuzynyKI44l5A0p7WKgbnY9RCQtZiL37Uty2nFjnyccWCykyKoUPZJnJIUv5cgeN57610PsK5iaIwXxyC1yE1WPoSPYPtzBy9fYmGFJgNd2V2QLr2WuLBkCY/t44=
+	t=1706382420; cv=none; b=HLwCH1KLHG82zwcjyvI/PSDQ4N5yd5OYQ4p9zE9FNnLPvNbwM2ZMb1q6X2ML0PHy6cw+NgRte2KJ3ooCMepaKTyK5l+ya9S9YP3lNF6Ts7CZw52qnUYEH5As3mlqNJy3cCD+Nrzrf2jp7OWXDlxKMLObOpcgp+b5Ek9CC7TU4UA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706381495; c=relaxed/simple;
-	bh=3IzUgfgIvf/pq6M8C0PMcE1lUhqWfgECUFsKfvIBavQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QQP+vEmIHh9zaiitlDU3ENeCapy8M7O7yik0aYmdK6t1wW083okjbeVtnjH+hSaB4IFgTONmR5y2oGAI2kDvc19PxrNmH2OvXC6706X4dVJtDoB5GKHmtyho375HEUQeXmw5NvcFGzDT+maB/z0jc5hDSRZqUmBl/ttlLPnn4Wc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hLeeNu4v; arc=none smtp.client-ip=209.85.218.48
+	s=arc-20240116; t=1706382420; c=relaxed/simple;
+	bh=VAk1ndah4XcwbsjdKyWGn/I749e0iRrH4PcKvrIOQpg=;
+	h=Message-ID:Date:From:To:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jV7ttZp4EVPHNbcyLJJ9yVUJskWG/lD3J593fK9U/mFN71Qg19UwnsNcxDMqxJpVRswdB1FmxiM0Tl1Z/a4v0vCw4n1OaUPeDWvQUHVSFiKunJOVDui0Gxc5x+UwAD24CwVUlAXKICPps842+yyykqMztjZk6Ks3pUEcF3VoBxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VOyaatE+; arc=none smtp.client-ip=209.85.221.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a350a021120so141743166b.1;
-        Sat, 27 Jan 2024 10:51:33 -0800 (PST)
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-33ae74e5394so79359f8f.3;
+        Sat, 27 Jan 2024 11:06:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706381491; x=1706986291; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hy8KhttmqxVvGNDMP3oJ+83x46tasxIHLpphRe5VYo4=;
-        b=hLeeNu4vZHjW/Sp6VqzDvqQ9H8fbIJBXDBOEOfl2/sYpp2vbOknIwGa/2Uq/qctFfi
-         v5iCKqLVBD5FoSDyO4ALFRWxBYZL/aTD1Q75sx6J7yqNIP+4lhZ93Uy1Ps/z/OfKT/pK
-         lmDUliKbnv1gZ+7QqUSSkQKdZhZxd0/TjlL5w6g9DChKe5N5RtbolQhwOMh5diFmWUAV
-         U3CIkQ5w85W7dSAMVFwU5WXgXFLjhVMH5YnBkqT2bUUMSX3Qm46mj8+xg9LxtrwHPViC
-         czdWLEkzh0OWgQIUkKdO4VNL/cbeKdo0cMifvvRna5CyT3CbPgK7kqf1DohoOv1GTCN1
-         tbNA==
+        d=gmail.com; s=20230601; t=1706382416; x=1706987216; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:to
+         :from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=pgCIJez2MxWlS+0vIhZ+LDaK1hbX6UBZRVNBG+vS6oA=;
+        b=VOyaatE+RgQzP+pp9CYC4iS9HD70DM4DGh/dGCPU87wJqt1cWid4zi6JOzEd10jTku
+         rX1426rREgEeHOz1h5iy+pRhNCdGkgbYS/mjxalLPHivZi7H+DhJseSdKG5byv1UL7+H
+         4YFk0Fb6S5J3+bXv10bJ9QAv0wtIgTxhQDBHsOFtxJI8DZI3KCG6dGaSsC6H7UXLr36L
+         UBVScfSqaIwEJWsjJTqDD6i3KGFip2e3y4YBKT/+WdbX8FFXT0TgvpGwvSj1UFHY9N5V
+         SvaSy5BhPpNHM+gwsax99Jhm4bChC20j2LqX6/Fmf4LqJZB591YnLg3WHzcMnuRjHkix
+         DwWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706381491; x=1706986291;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hy8KhttmqxVvGNDMP3oJ+83x46tasxIHLpphRe5VYo4=;
-        b=fHcnK4Kbl+oTH7ZJH7FXktcYJVigb7wemgJVB2wNmCM5lpr9//77tLDP0Z7rtpFMuE
-         CCMnHc/9ivlHZb7ELaw++lAXz8iXMUNXvkLjHuiBnz88Sb0LS3JGjlYvpUc6HCTPn4Z1
-         Xu1Rfh3Gjn1/KWK4uPejmOJVLWo0KGbF/Gcv+G0bTARpb6n5FJUe4owLr37rhrnUiOnn
-         +W+gNlKGHvGLkri9paomZITPbbvXVVXHm8se31T+bbjfAY3y9dApQpDLs4a+JuAOGHVz
-         UbihH27aYKFYMuunYI4YAJN3/f+wf0jo6ptG92w1PxnAdXI9xBcx/8WdP2Fy9Emwt/1v
-         hAZA==
-X-Gm-Message-State: AOJu0YyX/NDYF6nRVpsWt8gB0r+P0C7gyj3WMN3aA3Q0zMRkNeeYqyhN
-	IpejgCgImO2pxgwvmB9kX93VwllqyGc0QkLmDJO1/m+jaOpciV+M
-X-Google-Smtp-Source: AGHT+IFHAWgGZbshiiR5jOUU1BKfHM42cM2HOuxjD2inVbkoc6ReEzRNm5Ht0W6PDBOCfTEV9YSHDQ==
-X-Received: by 2002:a17:906:f146:b0:a35:64ff:4817 with SMTP id gw6-20020a170906f14600b00a3564ff4817mr485460ejb.0.1706381491182;
-        Sat, 27 Jan 2024 10:51:31 -0800 (PST)
-Received: from [192.168.159.171] (93-40-83-91.ip37.fastwebnet.it. [93.40.83.91])
-        by smtp.gmail.com with ESMTPSA id rg9-20020a1709076b8900b00a354e4d3449sm694600ejc.120.2024.01.27.10.51.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 27 Jan 2024 10:51:30 -0800 (PST)
-Message-ID: <fcf9630e-26fd-4474-a791-68c548a425b6@gmail.com>
-Date: Sat, 27 Jan 2024 19:52:20 +0100
+        d=1e100.net; s=20230601; t=1706382416; x=1706987216;
+        h=in-reply-to:content-disposition:mime-version:references:subject:to
+         :from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pgCIJez2MxWlS+0vIhZ+LDaK1hbX6UBZRVNBG+vS6oA=;
+        b=nZsX45DJzLROTmkaR42zAqc++lnumcGV84pGsfS22lBsbzo1tQwvk/O/JXXpWbRcvH
+         +fUhe9GxJkkeygISEpXEvAZlDx5rRGUIvVKJtMElrbagDAcUVpwjtsMe35ftGhqS+fsk
+         3GatkXQYsE4dxASnGwluZ/ajMYcpT9mWebN8TqQImPIeOVRTmdgdLumIiRAmjAu8d/Pr
+         SZ4xq3ToTMt3PBt4A3u7jw+B/JFFImCSqqE/2Kbj33UpYbyVS8MfHliLz2ApT+cYMdsf
+         6Hy/IpiDHmVT+sL60JVJFKljm3+kjJE7yKzT2aArlcC1m9UnWe2k2ZnROnGsdPNOJ184
+         XEZw==
+X-Gm-Message-State: AOJu0YyfIdEgxaotqvpgjPHDRKEe5nN+b4bdLQ97QMWGZCJFqYbhfb6v
+	wOZ5Q7GNZ1tOfqBM8hrBTCw5PiND66uUgpUXvWhguXtgsZqLMOcp
+X-Google-Smtp-Source: AGHT+IFq1ZxtGBZbNZG3rojvYPV/7zvdXXkIj1MgNF6L4zmrZcbq6L8S+7u5/qeXrp958aag8itWmw==
+X-Received: by 2002:adf:ec52:0:b0:33a:e36f:e843 with SMTP id w18-20020adfec52000000b0033ae36fe843mr2070345wrn.38.1706382415327;
+        Sat, 27 Jan 2024 11:06:55 -0800 (PST)
+Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.gmail.com with ESMTPSA id bj12-20020a0560001e0c00b00337d6f0013esm590472wrb.107.2024.01.27.11.06.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 27 Jan 2024 11:06:54 -0800 (PST)
+Message-ID: <65b5544e.050a0220.86866.2828@mx.google.com>
+X-Google-Original-Message-ID: <ZbVSQIYqOgMafdO9@Ansuel-xps.>
+Date: Sat, 27 Jan 2024 19:58:08 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org
+Subject: Re: [net-next PATCH v2 4/5] net: phy: qcom: move additional
+ functions to shared library
+References: <20240127144252.24767-1-ansuelsmth@gmail.com>
+ <20240127144252.24767-5-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v1 02/12] tools/net/ynl: Support sub-messages in
- nested attribute spaces
-To: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
- Jacob Keller <jacob.e.keller@intel.com>, Breno Leitao <leitao@debian.org>,
- Jiri Pirko <jiri@resnulli.us>, donald.hunter@redhat.com
-References: <20240123160538.172-1-donald.hunter@gmail.com>
- <20240123160538.172-3-donald.hunter@gmail.com>
- <20240123161804.3573953d@kernel.org> <m2ede7xeas.fsf@gmail.com>
- <20240124073228.0e939e5c@kernel.org> <m2ttn0w9fa.fsf@gmail.com>
- <20240126105055.2200dc36@kernel.org> <m2jznuwv7g.fsf@gmail.com>
-Content-Language: en-US
-From: Alessandro Marcolini <alessandromarcolini99@gmail.com>
-In-Reply-To: <m2jznuwv7g.fsf@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240127144252.24767-5-ansuelsmth@gmail.com>
 
+On Sat, Jan 27, 2024 at 03:42:44PM +0100, Christian Marangi wrote:
+> Move additional functions to shared library in preparation for qca808x
+> PHY Family to be detached from at803x driver.
+> 
+> Only the shared defines are moved to the shared qcom.h header.
+> 
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> ---
+>  drivers/net/phy/qcom/at803x.c       | 428 +---------------------------
+>  drivers/net/phy/qcom/qcom-phy-lib.c | 376 ++++++++++++++++++++++++
+>  drivers/net/phy/qcom/qcom.h         |  84 ++++++
+>  3 files changed, 463 insertions(+), 425 deletions(-)
+> 
+> diff --git a/drivers/net/phy/qcom/at803x.c b/drivers/net/phy/qcom/at803x.c
+> index 638babc50df1..442060793854 100644
+> --- a/drivers/net/phy/qcom/at803x.c
+> +++ b/drivers/net/phy/qcom/at803x.c
+> @@ -24,65 +24,11 @@
+>  
+>  #include "qcom.h"
+>  
+> -#define AT803X_SPECIFIC_FUNCTION_CONTROL	0x10
+> -#define AT803X_SFC_ASSERT_CRS			BIT(11)
+> -#define AT803X_SFC_FORCE_LINK			BIT(10)
+> -#define AT803X_SFC_MDI_CROSSOVER_MODE_M		GENMASK(6, 5)
+> -#define AT803X_SFC_AUTOMATIC_CROSSOVER		0x3
+> -#define AT803X_SFC_MANUAL_MDIX			0x1
+> -#define AT803X_SFC_MANUAL_MDI			0x0
+> -#define AT803X_SFC_SQE_TEST			BIT(2)
+> -#define AT803X_SFC_POLARITY_REVERSAL		BIT(1)
+> -#define AT803X_SFC_DISABLE_JABBER		BIT(0)
+> -
+> -#define AT803X_SPECIFIC_STATUS			0x11
+> -#define AT803X_SS_SPEED_MASK			GENMASK(15, 14)
+> -#define AT803X_SS_SPEED_1000			2
+> -#define AT803X_SS_SPEED_100			1
+> -#define AT803X_SS_SPEED_10			0
+> -#define AT803X_SS_DUPLEX			BIT(13)
+> -#define AT803X_SS_SPEED_DUPLEX_RESOLVED		BIT(11)
+> -#define AT803X_SS_MDIX				BIT(6)
+> -
+> -#define QCA808X_SS_SPEED_MASK			GENMASK(9, 7)
+> -#define QCA808X_SS_SPEED_2500			4
 
-On 1/27/24 18:18, Donald Hunter wrote:
-> Jakub Kicinski <kuba@kernel.org> writes:
->> Is it possible to check at which "level" of the chainmap the key was
->> found? If so we can also construct a 'chainmap of attr sets' and make
->> sure that the key level == attr set level. I.e. that we got a hit at
->> the first level which declares a key of that name.
->>
->> More crude option - we could construct a list of dicts (the levels
->> within the chainmap) and keys they can't contain. Once we got a hit
->> for a sub-message key at level A, all dicts currently on top of A
->> are not allowed to add that key. Once we're done with the message we
->> scan thru the list and make sure the keys haven't appeared?
->>
->> Another random thought, should we mark the keys which can "descend"
->> somehow? IDK, put a ~ in front?
->>
->> 	selector: ~kind
->>
->> or some other char?
-> Okay, so I think the behaviour we need is to either search current scope
-> or search the outermost scope. My suggestion would be to replace the
-> ChainMap approach with just choosing between current and outermost
-> scope. The unusual case is needing to search the outermost scope so
-> using a prefix e.g. '/' for that would work.
->
-> We can have 'selector: kind' continue to refer to current scope and then
-> have 'selector: /kind' refer to the outermost scope.
->
-> If we run into a case that requires something other than current or
-> outermost then we could add e.g. '../kind' so that the scope to search
-> is always explicitly identified.
+This was an intended remove and should be removed in patch 5 instead and
+cause build fail on testing this single patch.
 
-Wouldn't add different chars in front of the selctor value be confusing?
+Will fix in v3, sorry for the noise!
 
-IMHO the solution of using a ChainMap with levels could be an easier solution. We could just modify the __getitem__() method to output both the value and the level, and the get() method to add the chance to specify a level (in our case the level found in the spec) and error out if the specified level doesn't match with the found one. Something like this:
+> -
+> -#define AT803X_INTR_ENABLE			0x12
+> -#define AT803X_INTR_ENABLE_AUTONEG_ERR		BIT(15)
+> -#define AT803X_INTR_ENABLE_SPEED_CHANGED	BIT(14)
+> -#define AT803X_INTR_ENABLE_DUPLEX_CHANGED	BIT(13)
+> -#define AT803X_INTR_ENABLE_PAGE_RECEIVED	BIT(12)
+> -#define AT803X_INTR_ENABLE_LINK_FAIL		BIT(11)
+> -#define AT803X_INTR_ENABLE_LINK_SUCCESS		BIT(10)
+> -#define AT803X_INTR_ENABLE_LINK_FAIL_BX		BIT(8)
+> -#define AT803X_INTR_ENABLE_LINK_SUCCESS_BX	BIT(7)
+> -#define AT803X_INTR_ENABLE_WIRESPEED_DOWNGRADE	BIT(5)
+> -#define AT803X_INTR_ENABLE_POLARITY_CHANGED	BIT(1)
+> -#define AT803X_INTR_ENABLE_WOL			BIT(0)
+> -
+> -#define AT803X_INTR_STATUS			0x13
+> -
+> -#define AT803X_SMART_SPEED			0x14
+> -#define AT803X_SMART_SPEED_ENABLE		BIT(5)
+> -#define AT803X_SMART_SPEED_RETRY_LIMIT_MASK	GENMASK(4, 2)
+> -#define AT803X_SMART_SPEED_BYPASS_TIMER		BIT(1)
+> -#define AT803X_CDT				0x16
+> -#define AT803X_CDT_MDI_PAIR_MASK		GENMASK(9, 8)
+> -#define AT803X_CDT_ENABLE_TEST			BIT(0)
+> -#define AT803X_CDT_STATUS			0x1c
+> -#define AT803X_CDT_STATUS_STAT_NORMAL		0
+> -#define AT803X_CDT_STATUS_STAT_SHORT		1
+> -#define AT803X_CDT_STATUS_STAT_OPEN		2
+> -#define AT803X_CDT_STATUS_STAT_FAIL		3
+> -#define AT803X_CDT_STATUS_STAT_MASK		GENMASK(9, 8)
+> -#define AT803X_CDT_STATUS_DELTA_TIME_MASK	GENMASK(7, 0)
+>  #define AT803X_LED_CONTROL			0x18
+>  
+>  #define AT803X_PHY_MMD3_WOL_CTRL		0x8012
+>  #define AT803X_WOL_EN				BIT(5)
+> -#define AT803X_LOC_MAC_ADDR_0_15_OFFSET		0x804C
+> -#define AT803X_LOC_MAC_ADDR_16_31_OFFSET	0x804B
+> -#define AT803X_LOC_MAC_ADDR_32_47_OFFSET	0x804A
+> +
+>  #define AT803X_REG_CHIP_CONFIG			0x1f
+>  #define AT803X_BT_BX_REG_SEL			0x8000
+>  
+> @@ -138,10 +84,6 @@
+>  #define AT803X_CLK_OUT_STRENGTH_HALF		1
+>  #define AT803X_CLK_OUT_STRENGTH_QUARTER		2
+>  
+> -#define AT803X_DEFAULT_DOWNSHIFT		5
+> -#define AT803X_MIN_DOWNSHIFT			2
+> -#define AT803X_MAX_DOWNSHIFT			9
+> -
+>  #define AT803X_MMD3_SMARTEEE_CTL1		0x805b
+>  #define AT803X_MMD3_SMARTEEE_CTL2		0x805c
+>  #define AT803X_MMD3_SMARTEEE_CTL3		0x805d
+> @@ -158,6 +100,8 @@
+>  
+>  #define QCA9561_PHY_ID				0x004dd042
+>  
+> +#define AT803X_SS_SPEED_MASK			GENMASK(15, 14)
+> +
+>  #define AT803X_PAGE_FIBER			0
+>  #define AT803X_PAGE_COPPER			1
+>  
+> @@ -366,11 +310,6 @@ MODULE_DESCRIPTION("Qualcomm Atheros AR803x and QCA808X PHY driver");
+>  MODULE_AUTHOR("Matus Ujhelyi");
+>  MODULE_LICENSE("GPL");
+>  
+> -struct at803x_ss_mask {
+> -	u16 speed_mask;
+> -	u8 speed_shift;
+> -};
+> -
+>  struct at803x_priv {
+>  	int flags;
+>  	u16 clk_25m_reg;
+> @@ -470,80 +409,6 @@ static void at803x_context_restore(struct phy_device *phydev,
+>  	phy_write(phydev, AT803X_LED_CONTROL, context->led_control);
+>  }
+>  
+> -static int at803x_set_wol(struct phy_device *phydev,
+> -			  struct ethtool_wolinfo *wol)
+> -{
+> -	int ret, irq_enabled;
+> -
+> -	if (wol->wolopts & WAKE_MAGIC) {
+> -		struct net_device *ndev = phydev->attached_dev;
+> -		const u8 *mac;
+> -		unsigned int i;
+> -		static const unsigned int offsets[] = {
+> -			AT803X_LOC_MAC_ADDR_32_47_OFFSET,
+> -			AT803X_LOC_MAC_ADDR_16_31_OFFSET,
+> -			AT803X_LOC_MAC_ADDR_0_15_OFFSET,
+> -		};
+> -
+> -		if (!ndev)
+> -			return -ENODEV;
+> -
+> -		mac = (const u8 *)ndev->dev_addr;
+> -
+> -		if (!is_valid_ether_addr(mac))
+> -			return -EINVAL;
+> -
+> -		for (i = 0; i < 3; i++)
+> -			phy_write_mmd(phydev, MDIO_MMD_PCS, offsets[i],
+> -				      mac[(i * 2) + 1] | (mac[(i * 2)] << 8));
+> -
+> -		/* Enable WOL interrupt */
+> -		ret = phy_modify(phydev, AT803X_INTR_ENABLE, 0, AT803X_INTR_ENABLE_WOL);
+> -		if (ret)
+> -			return ret;
+> -	} else {
+> -		/* Disable WOL interrupt */
+> -		ret = phy_modify(phydev, AT803X_INTR_ENABLE, AT803X_INTR_ENABLE_WOL, 0);
+> -		if (ret)
+> -			return ret;
+> -	}
+> -
+> -	/* Clear WOL status */
+> -	ret = phy_read(phydev, AT803X_INTR_STATUS);
+> -	if (ret < 0)
+> -		return ret;
+> -
+> -	/* Check if there are other interrupts except for WOL triggered when PHY is
+> -	 * in interrupt mode, only the interrupts enabled by AT803X_INTR_ENABLE can
+> -	 * be passed up to the interrupt PIN.
+> -	 */
+> -	irq_enabled = phy_read(phydev, AT803X_INTR_ENABLE);
+> -	if (irq_enabled < 0)
+> -		return irq_enabled;
+> -
+> -	irq_enabled &= ~AT803X_INTR_ENABLE_WOL;
+> -	if (ret & irq_enabled && !phy_polling_mode(phydev))
+> -		phy_trigger_machine(phydev);
+> -
+> -	return 0;
+> -}
+> -
+> -static void at803x_get_wol(struct phy_device *phydev,
+> -			   struct ethtool_wolinfo *wol)
+> -{
+> -	int value;
+> -
+> -	wol->supported = WAKE_MAGIC;
+> -	wol->wolopts = 0;
+> -
+> -	value = phy_read(phydev, AT803X_INTR_ENABLE);
+> -	if (value < 0)
+> -		return;
+> -
+> -	if (value & AT803X_INTR_ENABLE_WOL)
+> -		wol->wolopts |= WAKE_MAGIC;
+> -}
+> -
+>  static int at803x_suspend(struct phy_device *phydev)
+>  {
+>  	int value;
+> @@ -816,73 +681,6 @@ static int at803x_config_init(struct phy_device *phydev)
+>  	return phy_modify(phydev, MII_ADVERTISE, MDIO_AN_CTRL1_XNP, 0);
+>  }
+>  
+> -static int at803x_ack_interrupt(struct phy_device *phydev)
+> -{
+> -	int err;
+> -
+> -	err = phy_read(phydev, AT803X_INTR_STATUS);
+> -
+> -	return (err < 0) ? err : 0;
+> -}
+> -
+> -static int at803x_config_intr(struct phy_device *phydev)
+> -{
+> -	int err;
+> -	int value;
+> -
+> -	value = phy_read(phydev, AT803X_INTR_ENABLE);
+> -
+> -	if (phydev->interrupts == PHY_INTERRUPT_ENABLED) {
+> -		/* Clear any pending interrupts */
+> -		err = at803x_ack_interrupt(phydev);
+> -		if (err)
+> -			return err;
+> -
+> -		value |= AT803X_INTR_ENABLE_AUTONEG_ERR;
+> -		value |= AT803X_INTR_ENABLE_SPEED_CHANGED;
+> -		value |= AT803X_INTR_ENABLE_DUPLEX_CHANGED;
+> -		value |= AT803X_INTR_ENABLE_LINK_FAIL;
+> -		value |= AT803X_INTR_ENABLE_LINK_SUCCESS;
+> -
+> -		err = phy_write(phydev, AT803X_INTR_ENABLE, value);
+> -	} else {
+> -		err = phy_write(phydev, AT803X_INTR_ENABLE, 0);
+> -		if (err)
+> -			return err;
+> -
+> -		/* Clear any pending interrupts */
+> -		err = at803x_ack_interrupt(phydev);
+> -	}
+> -
+> -	return err;
+> -}
+> -
+> -static irqreturn_t at803x_handle_interrupt(struct phy_device *phydev)
+> -{
+> -	int irq_status, int_enabled;
+> -
+> -	irq_status = phy_read(phydev, AT803X_INTR_STATUS);
+> -	if (irq_status < 0) {
+> -		phy_error(phydev);
+> -		return IRQ_NONE;
+> -	}
+> -
+> -	/* Read the current enabled interrupts */
+> -	int_enabled = phy_read(phydev, AT803X_INTR_ENABLE);
+> -	if (int_enabled < 0) {
+> -		phy_error(phydev);
+> -		return IRQ_NONE;
+> -	}
+> -
+> -	/* See if this was one of our enabled interrupts */
+> -	if (!(irq_status & int_enabled))
+> -		return IRQ_NONE;
+> -
+> -	phy_trigger_machine(phydev);
+> -
+> -	return IRQ_HANDLED;
+> -}
+> -
+>  static void at803x_link_change_notify(struct phy_device *phydev)
+>  {
+>  	/*
+> @@ -908,69 +706,6 @@ static void at803x_link_change_notify(struct phy_device *phydev)
+>  	}
+>  }
+>  
+> -static int at803x_read_specific_status(struct phy_device *phydev,
+> -				       struct at803x_ss_mask ss_mask)
+> -{
+> -	int ss;
+> -
+> -	/* Read the AT8035 PHY-Specific Status register, which indicates the
+> -	 * speed and duplex that the PHY is actually using, irrespective of
+> -	 * whether we are in autoneg mode or not.
+> -	 */
+> -	ss = phy_read(phydev, AT803X_SPECIFIC_STATUS);
+> -	if (ss < 0)
+> -		return ss;
+> -
+> -	if (ss & AT803X_SS_SPEED_DUPLEX_RESOLVED) {
+> -		int sfc, speed;
+> -
+> -		sfc = phy_read(phydev, AT803X_SPECIFIC_FUNCTION_CONTROL);
+> -		if (sfc < 0)
+> -			return sfc;
+> -
+> -		speed = ss & ss_mask.speed_mask;
+> -		speed >>= ss_mask.speed_shift;
+> -
+> -		switch (speed) {
+> -		case AT803X_SS_SPEED_10:
+> -			phydev->speed = SPEED_10;
+> -			break;
+> -		case AT803X_SS_SPEED_100:
+> -			phydev->speed = SPEED_100;
+> -			break;
+> -		case AT803X_SS_SPEED_1000:
+> -			phydev->speed = SPEED_1000;
+> -			break;
+> -		case QCA808X_SS_SPEED_2500:
+> -			phydev->speed = SPEED_2500;
+> -			break;
+> -		}
+> -		if (ss & AT803X_SS_DUPLEX)
+> -			phydev->duplex = DUPLEX_FULL;
+> -		else
+> -			phydev->duplex = DUPLEX_HALF;
+> -
+> -		if (ss & AT803X_SS_MDIX)
+> -			phydev->mdix = ETH_TP_MDI_X;
+> -		else
+> -			phydev->mdix = ETH_TP_MDI;
+> -
+> -		switch (FIELD_GET(AT803X_SFC_MDI_CROSSOVER_MODE_M, sfc)) {
+> -		case AT803X_SFC_MANUAL_MDI:
+> -			phydev->mdix_ctrl = ETH_TP_MDI;
+> -			break;
+> -		case AT803X_SFC_MANUAL_MDIX:
+> -			phydev->mdix_ctrl = ETH_TP_MDI_X;
+> -			break;
+> -		case AT803X_SFC_AUTOMATIC_CROSSOVER:
+> -			phydev->mdix_ctrl = ETH_TP_MDI_AUTO;
+> -			break;
+> -		}
+> -	}
+> -
+> -	return 0;
+> -}
+> -
+>  static int at803x_read_status(struct phy_device *phydev)
+>  {
+>  	struct at803x_ss_mask ss_mask = { 0 };
+> @@ -1006,50 +741,6 @@ static int at803x_read_status(struct phy_device *phydev)
+>  	return 0;
+>  }
+>  
+> -static int at803x_config_mdix(struct phy_device *phydev, u8 ctrl)
+> -{
+> -	u16 val;
+> -
+> -	switch (ctrl) {
+> -	case ETH_TP_MDI:
+> -		val = AT803X_SFC_MANUAL_MDI;
+> -		break;
+> -	case ETH_TP_MDI_X:
+> -		val = AT803X_SFC_MANUAL_MDIX;
+> -		break;
+> -	case ETH_TP_MDI_AUTO:
+> -		val = AT803X_SFC_AUTOMATIC_CROSSOVER;
+> -		break;
+> -	default:
+> -		return 0;
+> -	}
+> -
+> -	return phy_modify_changed(phydev, AT803X_SPECIFIC_FUNCTION_CONTROL,
+> -			  AT803X_SFC_MDI_CROSSOVER_MODE_M,
+> -			  FIELD_PREP(AT803X_SFC_MDI_CROSSOVER_MODE_M, val));
+> -}
+> -
+> -static int at803x_prepare_config_aneg(struct phy_device *phydev)
+> -{
+> -	int ret;
+> -
+> -	ret = at803x_config_mdix(phydev, phydev->mdix_ctrl);
+> -	if (ret < 0)
+> -		return ret;
+> -
+> -	/* Changes of the midx bits are disruptive to the normal operation;
+> -	 * therefore any changes to these registers must be followed by a
+> -	 * software reset to take effect.
+> -	 */
+> -	if (ret == 1) {
+> -		ret = genphy_soft_reset(phydev);
+> -		if (ret < 0)
+> -			return ret;
+> -	}
+> -
+> -	return 0;
+> -}
+> -
+>  static int at803x_config_aneg(struct phy_device *phydev)
+>  {
+>  	struct at803x_priv *priv = phydev->priv;
+> @@ -1065,80 +756,6 @@ static int at803x_config_aneg(struct phy_device *phydev)
+>  	return genphy_config_aneg(phydev);
+>  }
+>  
+> -static int at803x_get_downshift(struct phy_device *phydev, u8 *d)
+> -{
+> -	int val;
+> -
+> -	val = phy_read(phydev, AT803X_SMART_SPEED);
+> -	if (val < 0)
+> -		return val;
+> -
+> -	if (val & AT803X_SMART_SPEED_ENABLE)
+> -		*d = FIELD_GET(AT803X_SMART_SPEED_RETRY_LIMIT_MASK, val) + 2;
+> -	else
+> -		*d = DOWNSHIFT_DEV_DISABLE;
+> -
+> -	return 0;
+> -}
+> -
+> -static int at803x_set_downshift(struct phy_device *phydev, u8 cnt)
+> -{
+> -	u16 mask, set;
+> -	int ret;
+> -
+> -	switch (cnt) {
+> -	case DOWNSHIFT_DEV_DEFAULT_COUNT:
+> -		cnt = AT803X_DEFAULT_DOWNSHIFT;
+> -		fallthrough;
+> -	case AT803X_MIN_DOWNSHIFT ... AT803X_MAX_DOWNSHIFT:
+> -		set = AT803X_SMART_SPEED_ENABLE |
+> -		      AT803X_SMART_SPEED_BYPASS_TIMER |
+> -		      FIELD_PREP(AT803X_SMART_SPEED_RETRY_LIMIT_MASK, cnt - 2);
+> -		mask = AT803X_SMART_SPEED_RETRY_LIMIT_MASK;
+> -		break;
+> -	case DOWNSHIFT_DEV_DISABLE:
+> -		set = 0;
+> -		mask = AT803X_SMART_SPEED_ENABLE |
+> -		       AT803X_SMART_SPEED_BYPASS_TIMER;
+> -		break;
+> -	default:
+> -		return -EINVAL;
+> -	}
+> -
+> -	ret = phy_modify_changed(phydev, AT803X_SMART_SPEED, mask, set);
+> -
+> -	/* After changing the smart speed settings, we need to perform a
+> -	 * software reset, use phy_init_hw() to make sure we set the
+> -	 * reapply any values which might got lost during software reset.
+> -	 */
+> -	if (ret == 1)
+> -		ret = phy_init_hw(phydev);
+> -
+> -	return ret;
+> -}
+> -
+> -static int at803x_get_tunable(struct phy_device *phydev,
+> -			      struct ethtool_tunable *tuna, void *data)
+> -{
+> -	switch (tuna->id) {
+> -	case ETHTOOL_PHY_DOWNSHIFT:
+> -		return at803x_get_downshift(phydev, data);
+> -	default:
+> -		return -EOPNOTSUPP;
+> -	}
+> -}
+> -
+> -static int at803x_set_tunable(struct phy_device *phydev,
+> -			      struct ethtool_tunable *tuna, const void *data)
+> -{
+> -	switch (tuna->id) {
+> -	case ETHTOOL_PHY_DOWNSHIFT:
+> -		return at803x_set_downshift(phydev, *(const u8 *)data);
+> -	default:
+> -		return -EOPNOTSUPP;
+> -	}
+> -}
+> -
+>  static int at803x_cable_test_result_trans(u16 status)
+>  {
+>  	switch (FIELD_GET(AT803X_CDT_STATUS_STAT_MASK, status)) {
+> @@ -1170,45 +787,6 @@ static bool at803x_cdt_fault_length_valid(u16 status)
+>  	return false;
+>  }
+>  
+> -static int at803x_cdt_fault_length(int dt)
+> -{
+> -	/* According to the datasheet the distance to the fault is
+> -	 * DELTA_TIME * 0.824 meters.
+> -	 *
+> -	 * The author suspect the correct formula is:
+> -	 *
+> -	 *   fault_distance = DELTA_TIME * (c * VF) / 125MHz / 2
+> -	 *
+> -	 * where c is the speed of light, VF is the velocity factor of
+> -	 * the twisted pair cable, 125MHz the counter frequency and
+> -	 * we need to divide by 2 because the hardware will measure the
+> -	 * round trip time to the fault and back to the PHY.
+> -	 *
+> -	 * With a VF of 0.69 we get the factor 0.824 mentioned in the
+> -	 * datasheet.
+> -	 */
+> -	return (dt * 824) / 10;
+> -}
+> -
+> -static int at803x_cdt_start(struct phy_device *phydev,
+> -			    u32 cdt_start)
+> -{
+> -	return phy_write(phydev, AT803X_CDT, cdt_start);
+> -}
+> -
+> -static int at803x_cdt_wait_for_completion(struct phy_device *phydev,
+> -					  u32 cdt_en)
+> -{
+> -	int val, ret;
+> -
+> -	/* One test run takes about 25ms */
+> -	ret = phy_read_poll_timeout(phydev, AT803X_CDT, val,
+> -				    !(val & cdt_en),
+> -				    30000, 100000, true);
+> -
+> -	return ret < 0 ? ret : 0;
+> -}
+> -
+>  static int at803x_cable_test_one_pair(struct phy_device *phydev, int pair)
+>  {
+>  	static const int ethtool_pair[] = {
+> diff --git a/drivers/net/phy/qcom/qcom-phy-lib.c b/drivers/net/phy/qcom/qcom-phy-lib.c
+> index 7192184429b7..e0295d4b4a51 100644
+> --- a/drivers/net/phy/qcom/qcom-phy-lib.c
+> +++ b/drivers/net/phy/qcom/qcom-phy-lib.c
+> @@ -3,6 +3,9 @@
+>  #include <linux/phy.h>
+>  #include <linux/module.h>
+>  
+> +#include <linux/netdevice.h>
+> +#include <linux/etherdevice.h>
+> +
+>  #include "qcom.h"
+>  
+>  MODULE_DESCRIPTION("Qualcomm PHY driver Common Functions");
+> @@ -51,3 +54,376 @@ int at803x_debug_reg_write(struct phy_device *phydev, u16 reg, u16 data)
+>  	return phy_write(phydev, AT803X_DEBUG_DATA, data);
+>  }
+>  EXPORT_SYMBOL_GPL(at803x_debug_reg_write);
+> +
+> +int at803x_set_wol(struct phy_device *phydev,
+> +		   struct ethtool_wolinfo *wol)
+> +{
+> +	int ret, irq_enabled;
+> +
+> +	if (wol->wolopts & WAKE_MAGIC) {
+> +		struct net_device *ndev = phydev->attached_dev;
+> +		const u8 *mac;
+> +		unsigned int i;
+> +		static const unsigned int offsets[] = {
+> +			AT803X_LOC_MAC_ADDR_32_47_OFFSET,
+> +			AT803X_LOC_MAC_ADDR_16_31_OFFSET,
+> +			AT803X_LOC_MAC_ADDR_0_15_OFFSET,
+> +		};
+> +
+> +		if (!ndev)
+> +			return -ENODEV;
+> +
+> +		mac = (const u8 *)ndev->dev_addr;
+> +
+> +		if (!is_valid_ether_addr(mac))
+> +			return -EINVAL;
+> +
+> +		for (i = 0; i < 3; i++)
+> +			phy_write_mmd(phydev, MDIO_MMD_PCS, offsets[i],
+> +				      mac[(i * 2) + 1] | (mac[(i * 2)] << 8));
+> +
+> +		/* Enable WOL interrupt */
+> +		ret = phy_modify(phydev, AT803X_INTR_ENABLE, 0, AT803X_INTR_ENABLE_WOL);
+> +		if (ret)
+> +			return ret;
+> +	} else {
+> +		/* Disable WOL interrupt */
+> +		ret = phy_modify(phydev, AT803X_INTR_ENABLE, AT803X_INTR_ENABLE_WOL, 0);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+> +	/* Clear WOL status */
+> +	ret = phy_read(phydev, AT803X_INTR_STATUS);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	/* Check if there are other interrupts except for WOL triggered when PHY is
+> +	 * in interrupt mode, only the interrupts enabled by AT803X_INTR_ENABLE can
+> +	 * be passed up to the interrupt PIN.
+> +	 */
+> +	irq_enabled = phy_read(phydev, AT803X_INTR_ENABLE);
+> +	if (irq_enabled < 0)
+> +		return irq_enabled;
+> +
+> +	irq_enabled &= ~AT803X_INTR_ENABLE_WOL;
+> +	if (ret & irq_enabled && !phy_polling_mode(phydev))
+> +		phy_trigger_machine(phydev);
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(at803x_set_wol);
+> +
+> +void at803x_get_wol(struct phy_device *phydev,
+> +		    struct ethtool_wolinfo *wol)
+> +{
+> +	int value;
+> +
+> +	wol->supported = WAKE_MAGIC;
+> +	wol->wolopts = 0;
+> +
+> +	value = phy_read(phydev, AT803X_INTR_ENABLE);
+> +	if (value < 0)
+> +		return;
+> +
+> +	if (value & AT803X_INTR_ENABLE_WOL)
+> +		wol->wolopts |= WAKE_MAGIC;
+> +}
+> +EXPORT_SYMBOL_GPL(at803x_get_wol);
+> +
+> +int at803x_ack_interrupt(struct phy_device *phydev)
+> +{
+> +	int err;
+> +
+> +	err = phy_read(phydev, AT803X_INTR_STATUS);
+> +
+> +	return (err < 0) ? err : 0;
+> +}
+> +EXPORT_SYMBOL_GPL(at803x_ack_interrupt);
+> +
+> +int at803x_config_intr(struct phy_device *phydev)
+> +{
+> +	int err;
+> +	int value;
+> +
+> +	value = phy_read(phydev, AT803X_INTR_ENABLE);
+> +
+> +	if (phydev->interrupts == PHY_INTERRUPT_ENABLED) {
+> +		/* Clear any pending interrupts */
+> +		err = at803x_ack_interrupt(phydev);
+> +		if (err)
+> +			return err;
+> +
+> +		value |= AT803X_INTR_ENABLE_AUTONEG_ERR;
+> +		value |= AT803X_INTR_ENABLE_SPEED_CHANGED;
+> +		value |= AT803X_INTR_ENABLE_DUPLEX_CHANGED;
+> +		value |= AT803X_INTR_ENABLE_LINK_FAIL;
+> +		value |= AT803X_INTR_ENABLE_LINK_SUCCESS;
+> +
+> +		err = phy_write(phydev, AT803X_INTR_ENABLE, value);
+> +	} else {
+> +		err = phy_write(phydev, AT803X_INTR_ENABLE, 0);
+> +		if (err)
+> +			return err;
+> +
+> +		/* Clear any pending interrupts */
+> +		err = at803x_ack_interrupt(phydev);
+> +	}
+> +
+> +	return err;
+> +}
+> +EXPORT_SYMBOL_GPL(at803x_config_intr);
+> +
+> +irqreturn_t at803x_handle_interrupt(struct phy_device *phydev)
+> +{
+> +	int irq_status, int_enabled;
+> +
+> +	irq_status = phy_read(phydev, AT803X_INTR_STATUS);
+> +	if (irq_status < 0) {
+> +		phy_error(phydev);
+> +		return IRQ_NONE;
+> +	}
+> +
+> +	/* Read the current enabled interrupts */
+> +	int_enabled = phy_read(phydev, AT803X_INTR_ENABLE);
+> +	if (int_enabled < 0) {
+> +		phy_error(phydev);
+> +		return IRQ_NONE;
+> +	}
+> +
+> +	/* See if this was one of our enabled interrupts */
+> +	if (!(irq_status & int_enabled))
+> +		return IRQ_NONE;
+> +
+> +	phy_trigger_machine(phydev);
+> +
+> +	return IRQ_HANDLED;
+> +}
+> +EXPORT_SYMBOL_GPL(at803x_handle_interrupt);
+> +
+> +int at803x_read_specific_status(struct phy_device *phydev,
+> +				struct at803x_ss_mask ss_mask)
+> +{
+> +	int ss;
+> +
+> +	/* Read the AT8035 PHY-Specific Status register, which indicates the
+> +	 * speed and duplex that the PHY is actually using, irrespective of
+> +	 * whether we are in autoneg mode or not.
+> +	 */
+> +	ss = phy_read(phydev, AT803X_SPECIFIC_STATUS);
+> +	if (ss < 0)
+> +		return ss;
+> +
+> +	if (ss & AT803X_SS_SPEED_DUPLEX_RESOLVED) {
+> +		int sfc, speed;
+> +
+> +		sfc = phy_read(phydev, AT803X_SPECIFIC_FUNCTION_CONTROL);
+> +		if (sfc < 0)
+> +			return sfc;
+> +
+> +		speed = ss & ss_mask.speed_mask;
+> +		speed >>= ss_mask.speed_shift;
+> +
+> +		switch (speed) {
+> +		case AT803X_SS_SPEED_10:
+> +			phydev->speed = SPEED_10;
+> +			break;
+> +		case AT803X_SS_SPEED_100:
+> +			phydev->speed = SPEED_100;
+> +			break;
+> +		case AT803X_SS_SPEED_1000:
+> +			phydev->speed = SPEED_1000;
+> +			break;
+> +		case QCA808X_SS_SPEED_2500:
+> +			phydev->speed = SPEED_2500;
+> +			break;
+> +		}
+> +		if (ss & AT803X_SS_DUPLEX)
+> +			phydev->duplex = DUPLEX_FULL;
+> +		else
+> +			phydev->duplex = DUPLEX_HALF;
+> +
+> +		if (ss & AT803X_SS_MDIX)
+> +			phydev->mdix = ETH_TP_MDI_X;
+> +		else
+> +			phydev->mdix = ETH_TP_MDI;
+> +
+> +		switch (FIELD_GET(AT803X_SFC_MDI_CROSSOVER_MODE_M, sfc)) {
+> +		case AT803X_SFC_MANUAL_MDI:
+> +			phydev->mdix_ctrl = ETH_TP_MDI;
+> +			break;
+> +		case AT803X_SFC_MANUAL_MDIX:
+> +			phydev->mdix_ctrl = ETH_TP_MDI_X;
+> +			break;
+> +		case AT803X_SFC_AUTOMATIC_CROSSOVER:
+> +			phydev->mdix_ctrl = ETH_TP_MDI_AUTO;
+> +			break;
+> +		}
+> +	}
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(at803x_read_specific_status);
+> +
+> +int at803x_config_mdix(struct phy_device *phydev, u8 ctrl)
+> +{
+> +	u16 val;
+> +
+> +	switch (ctrl) {
+> +	case ETH_TP_MDI:
+> +		val = AT803X_SFC_MANUAL_MDI;
+> +		break;
+> +	case ETH_TP_MDI_X:
+> +		val = AT803X_SFC_MANUAL_MDIX;
+> +		break;
+> +	case ETH_TP_MDI_AUTO:
+> +		val = AT803X_SFC_AUTOMATIC_CROSSOVER;
+> +		break;
+> +	default:
+> +		return 0;
+> +	}
+> +
+> +	return phy_modify_changed(phydev, AT803X_SPECIFIC_FUNCTION_CONTROL,
+> +			  AT803X_SFC_MDI_CROSSOVER_MODE_M,
+> +			  FIELD_PREP(AT803X_SFC_MDI_CROSSOVER_MODE_M, val));
+> +}
+> +EXPORT_SYMBOL_GPL(at803x_config_mdix);
+> +
+> +int at803x_prepare_config_aneg(struct phy_device *phydev)
+> +{
+> +	int ret;
+> +
+> +	ret = at803x_config_mdix(phydev, phydev->mdix_ctrl);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	/* Changes of the midx bits are disruptive to the normal operation;
+> +	 * therefore any changes to these registers must be followed by a
+> +	 * software reset to take effect.
+> +	 */
+> +	if (ret == 1) {
+> +		ret = genphy_soft_reset(phydev);
+> +		if (ret < 0)
+> +			return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(at803x_prepare_config_aneg);
+> +
+> +static int at803x_get_downshift(struct phy_device *phydev, u8 *d)
+> +{
+> +	int val;
+> +
+> +	val = phy_read(phydev, AT803X_SMART_SPEED);
+> +	if (val < 0)
+> +		return val;
+> +
+> +	if (val & AT803X_SMART_SPEED_ENABLE)
+> +		*d = FIELD_GET(AT803X_SMART_SPEED_RETRY_LIMIT_MASK, val) + 2;
+> +	else
+> +		*d = DOWNSHIFT_DEV_DISABLE;
+> +
+> +	return 0;
+> +}
+> +
+> +static int at803x_set_downshift(struct phy_device *phydev, u8 cnt)
+> +{
+> +	u16 mask, set;
+> +	int ret;
+> +
+> +	switch (cnt) {
+> +	case DOWNSHIFT_DEV_DEFAULT_COUNT:
+> +		cnt = AT803X_DEFAULT_DOWNSHIFT;
+> +		fallthrough;
+> +	case AT803X_MIN_DOWNSHIFT ... AT803X_MAX_DOWNSHIFT:
+> +		set = AT803X_SMART_SPEED_ENABLE |
+> +		      AT803X_SMART_SPEED_BYPASS_TIMER |
+> +		      FIELD_PREP(AT803X_SMART_SPEED_RETRY_LIMIT_MASK, cnt - 2);
+> +		mask = AT803X_SMART_SPEED_RETRY_LIMIT_MASK;
+> +		break;
+> +	case DOWNSHIFT_DEV_DISABLE:
+> +		set = 0;
+> +		mask = AT803X_SMART_SPEED_ENABLE |
+> +		       AT803X_SMART_SPEED_BYPASS_TIMER;
+> +		break;
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +
+> +	ret = phy_modify_changed(phydev, AT803X_SMART_SPEED, mask, set);
+> +
+> +	/* After changing the smart speed settings, we need to perform a
+> +	 * software reset, use phy_init_hw() to make sure we set the
+> +	 * reapply any values which might got lost during software reset.
+> +	 */
+> +	if (ret == 1)
+> +		ret = phy_init_hw(phydev);
+> +
+> +	return ret;
+> +}
+> +
+> +int at803x_get_tunable(struct phy_device *phydev,
+> +		       struct ethtool_tunable *tuna, void *data)
+> +{
+> +	switch (tuna->id) {
+> +	case ETHTOOL_PHY_DOWNSHIFT:
+> +		return at803x_get_downshift(phydev, data);
+> +	default:
+> +		return -EOPNOTSUPP;
+> +	}
+> +}
+> +EXPORT_SYMBOL_GPL(at803x_get_tunable);
+> +
+> +int at803x_set_tunable(struct phy_device *phydev,
+> +		       struct ethtool_tunable *tuna, const void *data)
+> +{
+> +	switch (tuna->id) {
+> +	case ETHTOOL_PHY_DOWNSHIFT:
+> +		return at803x_set_downshift(phydev, *(const u8 *)data);
+> +	default:
+> +		return -EOPNOTSUPP;
+> +	}
+> +}
+> +EXPORT_SYMBOL_GPL(at803x_set_tunable);
+> +
+> +int at803x_cdt_fault_length(int dt)
+> +{
+> +	/* According to the datasheet the distance to the fault is
+> +	 * DELTA_TIME * 0.824 meters.
+> +	 *
+> +	 * The author suspect the correct formula is:
+> +	 *
+> +	 *   fault_distance = DELTA_TIME * (c * VF) / 125MHz / 2
+> +	 *
+> +	 * where c is the speed of light, VF is the velocity factor of
+> +	 * the twisted pair cable, 125MHz the counter frequency and
+> +	 * we need to divide by 2 because the hardware will measure the
+> +	 * round trip time to the fault and back to the PHY.
+> +	 *
+> +	 * With a VF of 0.69 we get the factor 0.824 mentioned in the
+> +	 * datasheet.
+> +	 */
+> +	return (dt * 824) / 10;
+> +}
+> +EXPORT_SYMBOL_GPL(at803x_cdt_fault_length);
+> +
+> +int at803x_cdt_start(struct phy_device *phydev, u32 cdt_start)
+> +{
+> +	return phy_write(phydev, AT803X_CDT, cdt_start);
+> +}
+> +EXPORT_SYMBOL_GPL(at803x_cdt_start);
+> +
+> +int at803x_cdt_wait_for_completion(struct phy_device *phydev,
+> +				   u32 cdt_en)
+> +{
+> +	int val, ret;
+> +
+> +	/* One test run takes about 25ms */
+> +	ret = phy_read_poll_timeout(phydev, AT803X_CDT, val,
+> +				    !(val & cdt_en),
+> +				    30000, 100000, true);
+> +
+> +	return ret < 0 ? ret : 0;
+> +}
+> +EXPORT_SYMBOL_GPL(at803x_cdt_wait_for_completion);
+> diff --git a/drivers/net/phy/qcom/qcom.h b/drivers/net/phy/qcom/qcom.h
+> index 8eb476d7c282..344f8c01d5b8 100644
+> --- a/drivers/net/phy/qcom/qcom.h
+> +++ b/drivers/net/phy/qcom/qcom.h
+> @@ -1,5 +1,61 @@
+>  /* SPDX-License-Identifier: GPL-2.0 */
+>  
+> +#define AT803X_SPECIFIC_FUNCTION_CONTROL	0x10
+> +#define AT803X_SFC_ASSERT_CRS			BIT(11)
+> +#define AT803X_SFC_FORCE_LINK			BIT(10)
+> +#define AT803X_SFC_MDI_CROSSOVER_MODE_M		GENMASK(6, 5)
+> +#define AT803X_SFC_AUTOMATIC_CROSSOVER		0x3
+> +#define AT803X_SFC_MANUAL_MDIX			0x1
+> +#define AT803X_SFC_MANUAL_MDI			0x0
+> +#define AT803X_SFC_SQE_TEST			BIT(2)
+> +#define AT803X_SFC_POLARITY_REVERSAL		BIT(1)
+> +#define AT803X_SFC_DISABLE_JABBER		BIT(0)
+> +
+> +#define AT803X_SPECIFIC_STATUS			0x11
+> +#define AT803X_SS_SPEED_1000			2
+> +#define AT803X_SS_SPEED_100			1
+> +#define AT803X_SS_SPEED_10			0
+> +#define AT803X_SS_DUPLEX			BIT(13)
+> +#define AT803X_SS_SPEED_DUPLEX_RESOLVED		BIT(11)
+> +#define AT803X_SS_MDIX				BIT(6)
+> +
+> +#define QCA808X_SS_SPEED_2500			4
+> +
+> +#define AT803X_INTR_ENABLE			0x12
+> +#define AT803X_INTR_ENABLE_AUTONEG_ERR		BIT(15)
+> +#define AT803X_INTR_ENABLE_SPEED_CHANGED	BIT(14)
+> +#define AT803X_INTR_ENABLE_DUPLEX_CHANGED	BIT(13)
+> +#define AT803X_INTR_ENABLE_PAGE_RECEIVED	BIT(12)
+> +#define AT803X_INTR_ENABLE_LINK_FAIL		BIT(11)
+> +#define AT803X_INTR_ENABLE_LINK_SUCCESS		BIT(10)
+> +#define AT803X_INTR_ENABLE_LINK_FAIL_BX		BIT(8)
+> +#define AT803X_INTR_ENABLE_LINK_SUCCESS_BX	BIT(7)
+> +#define AT803X_INTR_ENABLE_WIRESPEED_DOWNGRADE	BIT(5)
+> +#define AT803X_INTR_ENABLE_POLARITY_CHANGED	BIT(1)
+> +#define AT803X_INTR_ENABLE_WOL			BIT(0)
+> +
+> +#define AT803X_INTR_STATUS			0x13
+> +
+> +#define AT803X_SMART_SPEED			0x14
+> +#define AT803X_SMART_SPEED_ENABLE		BIT(5)
+> +#define AT803X_SMART_SPEED_RETRY_LIMIT_MASK	GENMASK(4, 2)
+> +#define AT803X_SMART_SPEED_BYPASS_TIMER		BIT(1)
+> +
+> +#define AT803X_CDT				0x16
+> +#define AT803X_CDT_MDI_PAIR_MASK		GENMASK(9, 8)
+> +#define AT803X_CDT_ENABLE_TEST			BIT(0)
+> +#define AT803X_CDT_STATUS			0x1c
+> +#define AT803X_CDT_STATUS_STAT_NORMAL		0
+> +#define AT803X_CDT_STATUS_STAT_SHORT		1
+> +#define AT803X_CDT_STATUS_STAT_OPEN		2
+> +#define AT803X_CDT_STATUS_STAT_FAIL		3
+> +#define AT803X_CDT_STATUS_STAT_MASK		GENMASK(9, 8)
+> +#define AT803X_CDT_STATUS_DELTA_TIME_MASK	GENMASK(7, 0)
+> +
+> +#define AT803X_LOC_MAC_ADDR_0_15_OFFSET		0x804C
+> +#define AT803X_LOC_MAC_ADDR_16_31_OFFSET	0x804B
+> +#define AT803X_LOC_MAC_ADDR_32_47_OFFSET	0x804A
+> +
+>  #define AT803X_DEBUG_ADDR			0x1D
+>  #define AT803X_DEBUG_DATA			0x1E
+>  
+> @@ -16,6 +72,10 @@
+>  #define   AT803X_DEBUG_HIB_CTRL_EN_ANY_CHANGE	BIT(13)
+>  #define   AT803X_DEBUG_HIB_CTRL_PS_HIB_EN	BIT(15)
+>  
+> +#define AT803X_DEFAULT_DOWNSHIFT		5
+> +#define AT803X_MIN_DOWNSHIFT			2
+> +#define AT803X_MAX_DOWNSHIFT			9
+> +
+>  enum stat_access_type {
+>  	PHY,
+>  	MMD
+> @@ -28,7 +88,31 @@ struct at803x_hw_stat {
+>  	enum stat_access_type access_type;
+>  };
+>  
+> +struct at803x_ss_mask {
+> +	u16 speed_mask;
+> +	u8 speed_shift;
+> +};
+> +
+>  int at803x_debug_reg_read(struct phy_device *phydev, u16 reg);
+>  int at803x_debug_reg_mask(struct phy_device *phydev, u16 reg,
+>  			  u16 clear, u16 set);
+>  int at803x_debug_reg_write(struct phy_device *phydev, u16 reg, u16 data);
+> +int at803x_set_wol(struct phy_device *phydev,
+> +		   struct ethtool_wolinfo *wol);
+> +void at803x_get_wol(struct phy_device *phydev,
+> +		    struct ethtool_wolinfo *wol);
+> +int at803x_ack_interrupt(struct phy_device *phydev);
+> +int at803x_config_intr(struct phy_device *phydev);
+> +irqreturn_t at803x_handle_interrupt(struct phy_device *phydev);
+> +int at803x_read_specific_status(struct phy_device *phydev,
+> +				struct at803x_ss_mask ss_mask);
+> +int at803x_config_mdix(struct phy_device *phydev, u8 ctrl);
+> +int at803x_prepare_config_aneg(struct phy_device *phydev);
+> +int at803x_get_tunable(struct phy_device *phydev,
+> +		       struct ethtool_tunable *tuna, void *data);
+> +int at803x_set_tunable(struct phy_device *phydev,
+> +		       struct ethtool_tunable *tuna, const void *data);
+> +int at803x_cdt_fault_length(int dt);
+> +int at803x_cdt_start(struct phy_device *phydev, u32 cdt_start);
+> +int at803x_cdt_wait_for_completion(struct phy_device *phydev,
+> +				   u32 cdt_en);
+> -- 
+> 2.43.0
+> 
 
-from collections import ChainMap
-
-class LevelChainMap(ChainMap):
-    def __getitem__(self, key):
-        for mapping in self.maps:
-            try:
-                return mapping[key], self.maps[::-1].index(mapping)
-            except KeyError:
-                pass
-        return self.__missing__(key)
-
-    def get(self, key, default=None, level=None):
-        val, lvl = self[key] if key in self else (default, None)
-        if level:
-            if lvl != level:
-                raise Exception("Level mismatch")
-        return val, lvl
-
-# example usage
-c = LevelChainMap({'a':1}, {'inner':{'a':1}}, {'outer': {'inner':{'a':1}}})
-print(c.get('a', level=2))
-print(c.get('a', level=1)) #raise err
-
-This will leave the spec as it is and will require small changes.
-
-What do you think?
-
+-- 
+	Ansuel
 
