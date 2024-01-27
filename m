@@ -1,105 +1,140 @@
-Return-Path: <netdev+bounces-66390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66391-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0107483ECB7
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 11:35:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DBD883ECCE
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 12:10:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 177A11C219E7
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 10:35:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 167581F22F56
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 11:10:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A35831EB3C;
-	Sat, 27 Jan 2024 10:35:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ED01200BA;
+	Sat, 27 Jan 2024 11:10:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="R8gHkGqw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DMAcoNUf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0A6D11CBA;
-	Sat, 27 Jan 2024 10:35:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D94E1EB35;
+	Sat, 27 Jan 2024 11:10:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706351740; cv=none; b=htL31F0p0Mkm9jDUHTp+ifAZeLucSzxt2VrSHNIZtccPi446EQ+Hs72soobEjWZSuajeEyovm8wYZqd4FM3t85bkeP3K86u4QELBrXjEQ85SMuY2Nk9yuM2ftAghuiVdSfEvSzF1pHPp9Jb9OEq4g0X+G90b1emaoR/D6Itb5Vk=
+	t=1706353844; cv=none; b=eTXL6NA/M0Dlk9QWdTIr4vV7IueR4VRItpUW8yeGmFSp2cf5SosGBVe1nxVHCzuioRGqcVI5TGvkuWuMCI9qx8QpHCleO3mPi8OKop/XmlU2EUKHNlePY8i05vkvRXluLSGEULG2C5IfND3IUTAAwsgXTlsbTP3xLSBKtKAD4jQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706351740; c=relaxed/simple;
-	bh=bBw75j9IqFgnIbLcow/2PLqrMy0+1Vb6FnaPfM8nBGU=;
-	h=Message-ID:Date:MIME-Version:To:References:Subject:From:Cc:
-	 In-Reply-To:Content-Type; b=ZEF3ETJmoUlFg7+pS4F1cHq6h0EALDtRf7aZYsTxgRiEnN9FBKq4F36nAJNPDJiYU0+OXU0A+vc/NYT5p730Sxq9Qdtoxoc4E13A5FsBLxyG55BOXzpjk6vxs/G/uwSFsHIwz8hjUSNgh908FJ2HCcJGNXXYNmtmyzVRbAcSyaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=R8gHkGqw; arc=none smtp.client-ip=212.227.15.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
-	t=1706351703; x=1706956503; i=markus.elfring@web.de;
-	bh=bBw75j9IqFgnIbLcow/2PLqrMy0+1Vb6FnaPfM8nBGU=;
-	h=X-UI-Sender-Class:Date:To:References:Subject:From:Cc:
-	 In-Reply-To;
-	b=R8gHkGqwm3Vw6BI9+PPK3bU00tIc5S/VlKUKmRx+VVchrkvx30esPB5/bcTj81z/
-	 NiVtb1w8C24Yvjn/3aHwCIZFKLxF0tstKi0I6WpW6rdWpJazIWAbXVyTmTM512dKY
-	 aluzYKK/HO5yxK4zYxrQOvr4fq5uSsfbm8hJaW6dlqhHhlc/OEMLqg3rNuzpgCw16
-	 VX/ExCsYxqGM204aGGhw7Q8nSBxDMuEOc0pdbaaOBReScXIQGmySyRcz2OSgq9aOI
-	 WTwUl0dglHzYh9fFS+iWY6ekrNAeuY86SWZTi5BhmZpw5JCrRQ939V5GnJLp2/xzB
-	 WlJ4LhV7zqhlohqn4Q==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.81.95]) by smtp.web.de (mrweb006
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MT7WN-1reMC81YnH-00Uaiv; Sat, 27
- Jan 2024 11:35:03 +0100
-Message-ID: <72f6297c-99ea-4f92-b049-1a33fa864cf5@web.de>
-Date: Sat, 27 Jan 2024 11:34:59 +0100
+	s=arc-20240116; t=1706353844; c=relaxed/simple;
+	bh=lWD3Yu/iWduUcZjUVmjkV6YLZ0ZkiCzd01DXVfzdL0o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=R7OZFYNN8G0235VbyOgnF7syzsEVJCizYU9X64SRjomzg0s0LNaZAwrMC3ePg2ZDfoLyZl5BIJXey9jHjlN5ejhVa0mpPl7GTtzXrs6n42xL7qQ+OHpDaovysIhhIqcAqbOUQg4Vu8XKHrpAD1XaQcSuWNoVFtgpFOXjgDnRvkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DMAcoNUf; arc=none smtp.client-ip=209.85.219.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-db4364ecd6aso939505276.2;
+        Sat, 27 Jan 2024 03:10:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706353841; x=1706958641; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lWD3Yu/iWduUcZjUVmjkV6YLZ0ZkiCzd01DXVfzdL0o=;
+        b=DMAcoNUfSuaS0dLOMq2X0RwumUb31UhTyf8pW2+JbpdqavBUY2jHaC3sWFdQaj6PZH
+         qS4WEAo2huhjafaWOEVN1/x+VUyoGHSie6n6qql3zAZ3jqIuLQjKQSjGzWDptF+m3W3q
+         H/aIfRVdIhM21XC+orP0/K3ygvsLyE3B+wTkHhTK+yOiCDCBBhlOlzSo9E501/hSkLlI
+         0zg5UESlY21kXpHrgZm0sZZhJmg3A1Twv76lruXpaLEgEPp7+iXpi/sPrHh8SvmhOxeB
+         c5C7h9Vfn9YVmexucAcXAYqQm/N92aG2GLSkEmZPYN/HOso3cnxqL+QE6HSjA9oCPwtP
+         /fIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706353841; x=1706958641;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lWD3Yu/iWduUcZjUVmjkV6YLZ0ZkiCzd01DXVfzdL0o=;
+        b=PhnABC+/8j16JNhnOTDdR7E4suIVEfAo9rSyzncD5SO3ovbgU+nOQNj5JM2u6/1t2y
+         gYQIPbqDU14xkE1hvbLQUEipeErobcPVA/uatLhhMdLPBcXSlDYiZMq0tY0qnSsEjhjG
+         A7Q5zplILs4DLHIxnohcgdHcBApzm/J+CD9wlRiIM3FQHe+Z6n9M3ecQQrHguw0DPHEk
+         cl0IfEhDKdShsuDFouKvK5sVl6l6fGtbfU3YPBavSkjcUFEmnyrK80pu0Dwus5/R5sSF
+         p7TAslDBLdPijX7XTBQ5WsnuldQ9uBX0mujRjaI3s4nT8rOB5joXh/zGJ4LnvRaPVPKo
+         LdJw==
+X-Gm-Message-State: AOJu0Yw0MHjMcbQtqP9c8TEPci65gib6TnyaTFZlm5E54XOTsAUtMj4v
+	+dZ/Z9NwecQIZh+67PUvMzYWZcLbdGI98JUU5X3a3BDtV4IB1AWIqso4H31prZJ+fduU4frXjFY
+	MBSBzY3aAG0D0HWwjCgfLjfjTvNg=
+X-Google-Smtp-Source: AGHT+IE1vSzKK+O91qDqFt2y1OcufDzXdBHUga3KuwXkrrUbqgzpQs+SDOyDthoUk8FPoeOW8XBic/ie3g07/2XopM4=
+X-Received: by 2002:a25:8141:0:b0:dc2:4ab7:3d81 with SMTP id
+ j1-20020a258141000000b00dc24ab73d81mr727861ybm.96.1706353841483; Sat, 27 Jan
+ 2024 03:10:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Kunwu Chan <chentao@kylinos.cn>, coreteam@netfilter.org,
- netfilter-devel@vger.kernel.org, netdev@vger.kernel.org,
- kernel-janitors@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Florian Westphal <fw@strlen.de>,
- Jakub Kicinski <kuba@kernel.org>, Jozsef Kadlecsik <kadlec@netfilter.org>,
- Pablo Neira Ayuso <pablo@netfilter.org>, Paolo Abeni <pabeni@redhat.com>
-References: <20240123024631.396631-1-chentao@kylinos.cn>
-Subject: Re: [PATCH nf-next] netfilter: nf_conncount: Use KMEM_CACHE() instead
- of kmem_cache_create()
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-Cc: LKML <linux-kernel@vger.kernel.org>, Simon Horman <horms@kernel.org>
-In-Reply-To: <20240123024631.396631-1-chentao@kylinos.cn>
-Content-Type: text/plain; charset=UTF-8
+References: <20240126045220.861125-1-hayatake396@gmail.com> <fb90ae9c-1f83-424c-878a-8b7e472bb6f0@molgen.mpg.de>
+In-Reply-To: <fb90ae9c-1f83-424c-878a-8b7e472bb6f0@molgen.mpg.de>
+From: takeru hayasaka <hayatake396@gmail.com>
+Date: Sat, 27 Jan 2024 20:10:30 +0900
+Message-ID: <CADFiAcKJyZPDbbLoH11OpaLA5+ny-QmakN5d3KvAO5A_zQbfAg@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [PATCH net-next v3] ethtool: ice: Support for
+ RSS settings to GTP from ethtool
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	linux-doc@vger.kernel.org, vladimir.oltean@nxp.com, 
+	linux-kernel@vger.kernel.org, laforge@gnumonks.org, 
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	mailhol.vincent@wanadoo.fr
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:9pUtgJwNPHO1FUc7Q6gwWDK324oGPWcIa8GDBsiT0bDwz8Q57ch
- 48FajJ83+dQzUMagRk8tTnNdyGCXarlXje2J8EQXwCfqVTGUm5OyLfgx28Rm52yTuCwoYqR
- kOLSqYFweLsEyi1dc/8vfrncn2FIMw9Y0/XCgDJGbcrzPdPcTI8k58dgWTsqHWcJTitX7hQ
- /Q0e86go0eCnPeNBfO04A==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:fbPKtf/JPZY=;sgJWmdXtWZFvN7UxGJ2XVWET5uf
- 0rjAClmMxvbIQhxLMWsgG9If2ddardVD1W5qH8kFq5elE+jt2ESUlAxd0/16LNJkahxamOpHM
- rBFOayVIBCSE7penEwQopZZIZxWAqO8uRle454OGP8G5GfEGXDAmaWtld8NDWrVA394lwe4kJ
- +goe2b3rOZ5g5HPEyt9n3bO1larbB1mAGQr1EZeZnV0tr6fArRU20tqvWy7mZ/puC9EI3YhE9
- GsJBDSNiP2hi9OCJeNSjI78UBHYYhfloZ3ndVNT1W1x2F59X0HKHivp/HtNIBq24/5ElRUvx6
- 7bXKNIiZY5Cjqnd2Kx9ylpFVV4OFCOyuE0Da2pLlevE+yawJgJfItmzCaAqECzOj92wGbetrE
- BcmqanflwVvoM5IYqkZblx2POmitvm5bbngGqvF6UqrbaNzmVq4SAzoKduXnbmbVI103Weibn
- NRLqyQXan0zsiDHR9Z26xeRUXsIoBqTDpZ1B0K2OblQwDjZkFVypsBvuiREQirP2qdL5muvjJ
- sJWdPoyExdgorIqH2ZfOmdy4I7+dYMrwS9LqvdJoYlgW8esT6qZkcmqGITZaTNRZ5A2q+UQXv
- MvhShA+G9zFEqsYMPvoCYnQVUZaAAjeDoEeMzu9j9+VBYLaBp0ucA+6+/7meIs1URUrRion69
- CAiMwOtHjZjqKbIA0vsxR5atMQqbfcofJHLYNX+ZOsvtZy+RGZ7BOE/n23Ebn0R6mq5Ogl7rm
- is6ITHQP2x4Tf1TUUJotyGCHWh3T9faJwTs0iwh6qhjOy5HL0PbVKluAd2DYWv+yGMK1ZyMZO
- j2602NkPUGPIV0IUWqMGcAmTjoH1GVt2OJnCh1a28ZhBV6MA8Q0V4MpBDec/Gln3svwYROLeK
- ApHoM467gZG/m8dR2DVChHp2F4ih4qWWIfw6GNGnLEUq/oxkkTz6LoKDg3JHahUTSLWqxbdL5
- ZdSUSw==
 
-> Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
-> to simplify the creation of SLAB caches.
+Hi Paul-san
 
-I suggest to replace the word =E2=80=9Cnew=E2=80=9D by a reference to the =
-commit 8eb8284b412906181357c2b0110d879d5af95e52
-("usercopy: Prepare for usercopy whitelisting").
+> This patch was sent at least four(?) times to the mailing list.
 
-See also related background information from 2017-06-10.
+Oh, I apologize for that. I had sent it several times due to issues
+caught by the CI.
+I wasn't aware of the proper etiquette, so your guidance is much appreciate=
+d!
+I will tag it as `[PATCH net-next v3 RESENT]` next time.
 
-Regards,
-Markus
+> Should you sent another iteration, please do not break lines, just becaus=
+e a sentence ends, and please add a blank line between paragraphs.
+
+Understood. I will make sure to do that!
+
+Takeru
+
+2024=E5=B9=B41=E6=9C=8826=E6=97=A5(=E9=87=91) 20:12 Paul Menzel <pmenzel@mo=
+lgen.mpg.de>:
+>
+> Dear Takeru,
+>
+>
+> This patch was sent at least four(?) times to the mailing list. Could
+> you please sent a patch tagged with [RESENT] or a v4, so there won=E2=80=
+=99t be
+> several replies to different threads.
+>
+> One nit below:
+>
+> Am 26.01.24 um 05:52 schrieb Takeru Hayasaka:
+> > This is a patch that enables RSS functionality for GTP packets using
+> > ethtool.
+> > A user can include her TEID and make RSS work for GTP-U over IPv4 by
+> > doing the following:
+> > `ethtool -N ens3 rx-flow-hash gtpu4 sde`
+> > In addition to gtpu(4|6), we now support gtpc(4|6),gtpc(4|6)t,gtpu(4|6)=
+e,
+> > gtpu(4|6)u, and gtpu(4|6)d.
+>
+> Should you sent another iteration, please do not break lines, just
+> because a sentence ends, and please add a blank line between paragraphs.
+>
+> [=E2=80=A6]
+>
+>
+> Kind regards,
+>
+> Paul
 
