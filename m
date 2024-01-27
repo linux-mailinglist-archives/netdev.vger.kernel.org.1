@@ -1,81 +1,96 @@
-Return-Path: <netdev+bounces-66368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE02883EB08
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 05:39:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C27783EB0A
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 05:40:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6ECC0286842
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 04:39:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C40401F247F7
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 04:40:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F090B677;
-	Sat, 27 Jan 2024 04:39:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DC2C125B0;
+	Sat, 27 Jan 2024 04:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QUNl/hnT"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XAbgo4Jo"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 106E8125A1
-	for <netdev@vger.kernel.org>; Sat, 27 Jan 2024 04:39:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52957125A1;
+	Sat, 27 Jan 2024 04:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706330358; cv=none; b=TYzkgXOniNxzT8MnRdtQM/5aCrTM1o3JZRBK8v1wVXqIWhH/Iah0VALWGXiU2ixrTSfNFZlIps6yeOat7QvBXREHWL/lsH+rRQ142hwmZIt53w3iam+bz3IxCLMm4bs8RJaB+1E8fD2KnoFkIAIxkSQ7YEEwJDkzHkvmfcfesOY=
+	t=1706330427; cv=none; b=FlLNeYSKaLLkgEep933zmfHS/MYrkTU+ObCod8NGkkbiuRkWkCcj3vLZaSovKy4jBYQz8DAHV4nW/W0TTl5JVE+qQHKn8Bl6K5hIGwZl0cUxHLKjsW8spmboahkwNoi+FZrQ3m2knxE+Ke0id9EwSPkwcMit2uQhrfA1hh+uCQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706330358; c=relaxed/simple;
-	bh=4fiw/01Z3QjOocm+IxwZg514WqdmPhoeamFKd+Hs0Ck=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Pz8p6EXIEBQNuuixGrwsRghy2Vs1qDoxIEcoasZnYLyrBrFrn5BWmCbg43Bfs56ztL6gC2XLm+RTtRgD/l3ENxGBTAvP+REc9h1wwfNH/jndGsPXMAsARKeWGrc99p/2jIo81qvFzJo6BHSzQirKAH94yrQAkoDvidsGkqsCjz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QUNl/hnT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 575E3C433C7;
-	Sat, 27 Jan 2024 04:39:17 +0000 (UTC)
+	s=arc-20240116; t=1706330427; c=relaxed/simple;
+	bh=Fa54+stwdOC7SyjNCmWKpZ6BNsnqZ7X6lOOGTr9GTOY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=AVv0SFaqVmLl/rzGpMaojTNSMbSsAHHNpGdDVVQRPJMGFSxEKut7Y8PuPcU6RYicXWmhWqtvc83aJy22ZTp4+CdCrxO/mhrmR0ibq7BmJUiQ63z1gaD5Uj7M85sB9Z9/cVQxPjqXtXyV9ElNEckveVOFE/5ptZ2TQU7NKEP4isM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XAbgo4Jo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BE59EC433F1;
+	Sat, 27 Jan 2024 04:40:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706330357;
-	bh=4fiw/01Z3QjOocm+IxwZg514WqdmPhoeamFKd+Hs0Ck=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QUNl/hnTBQ0UjgYdgq0GETXGDpJbxnquv18MIPpZyIgGAOyfDv7+saeSLOYP/cnZ5
-	 mDqU+/lBIOnPh3dgUgVaOxUVMTuNQF5dPbQojL9uS5L1Ddwi6A6kPfT8kz/j7CF5xb
-	 3Av0sh7IeEhx2whRnfvuGjh+OeBUo1kGoDkxSc0KxXw1dudIme9hCo6MEpyn+sVmfG
-	 BY85Dy9IX2FjEUhnm6mtiiVopFrPTQ4EYO0I25YoBk8PXwYIF/L8nEW9m3vFAvA70S
-	 O+q1FfLejFqRaG2v7W04dZdh/I67TF463Sy99Z9YMg/A2DPmMjMJBtjFJ3yySEnj9u
-	 +FAFVd85nL7Sw==
-Date: Fri, 26 Jan 2024 20:39:16 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Pavel Vazharov <pavel@x3me.net>
-Cc: Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@kernel.org>,
- netdev@vger.kernel.org
-Subject: Re: Need of advice for XDP sockets on top of the interfaces behind
- a Linux bonding device
-Message-ID: <20240126203916.1e5c2eee@kernel.org>
-In-Reply-To: <CAJEV1igULtS-e0sBd3G=P1AHr8nqTd3kT+0xc8BL2vAfDM_TuA@mail.gmail.com>
-References: <CAJEV1ijxNyPTwASJER1bcZzS9nMoZJqfR86nu_3jFFVXzZQ4NA@mail.gmail.com>
-	<87y1cb28tg.fsf@toke.dk>
-	<CAJEV1igULtS-e0sBd3G=P1AHr8nqTd3kT+0xc8BL2vAfDM_TuA@mail.gmail.com>
+	s=k20201202; t=1706330426;
+	bh=Fa54+stwdOC7SyjNCmWKpZ6BNsnqZ7X6lOOGTr9GTOY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=XAbgo4JoVubLqSfkxGeZEBZv/j8kHykk6Jle3TD4/XhK90SxqMQZcbhDd3PBcoGqn
+	 IEumJBPwYwFbJaPa7pEs0YJn6EwoiCdDaT6QDKXQtwE8BdOLb91nvIy9mUl/5RPjNs
+	 JarAmakm0gn5iA3l3qLkHBGqVoKFLj1xiDGdZFJLkJk9yEjyXDm/PxoadL+UEf7POf
+	 84QtfozdGiSIQNtP4LEwEqG8wt35J8gANMnAekANRz0r8DDNwJChQgRvICXliwHVJX
+	 rzFIqVuov+ws0BgJZi+1dD5H5Ja6KcvhIvP0aiB1Z73JwrzWqVHnpCYWi+A97aGqER
+	 UJAUdNM3Gs1yA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A27E5D8C962;
+	Sat, 27 Jan 2024 04:40:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: dsa: mt7530: select MEDIATEK_GE_PHY for
+ NET_DSA_MT7530_MDIO
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170633042666.8750.8620962707423438801.git-patchwork-notify@kernel.org>
+Date: Sat, 27 Jan 2024 04:40:26 +0000
+References: <20240122053451.8004-1-arinc.unal@arinc9.com>
+In-Reply-To: <20240122053451.8004-1-arinc.unal@arinc9.com>
+To: =?utf-8?b?QXLEsW7DpyDDnE5BTCA8YXJpbmMudW5hbEBhcmluYzkuY29tPg==?=@codeaurora.org
+Cc: andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-On Sat, 27 Jan 2024 05:58:55 +0200 Pavel Vazharov wrote:
-> > Well, it will be up to your application to ensure that it is not. The
-> > XDP program will run before the stack sees the LACP management traffic,
-> > so you will have to take some measure to ensure that any such management
-> > traffic gets routed to the stack instead of to the DPDK application. My
-> > immediate guess would be that this is the cause of those warnings?
->
-> Thank you for the response.
-> I already checked the XDP program.
-> It redirects particular pools of IPv4 (TCP or UDP) traffic to the application.
-> Everything else is passed to the Linux kernel.
-> However, I'll check it again. Just to be sure.
+Hello:
 
-What device driver are you using, if you don't mind sharing?
-The pass thru code path may be much less well tested in AF_XDP
-drivers.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 22 Jan 2024 08:34:51 +0300 you wrote:
+> Quoting from commit 4223f8651287 ("net: dsa: mt7530: make NET_DSA_MT7530
+> select MEDIATEK_GE_PHY"):
+> 
+> Make MediaTek MT753x DSA driver enable MediaTek Gigabit PHYs driver to
+> properly control MT7530 and MT7531 switch PHYs.
+> 
+> A noticeable change is that the behaviour of switchport interfaces going
+> up-down-up-down is no longer there.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next] net: dsa: mt7530: select MEDIATEK_GE_PHY for NET_DSA_MT7530_MDIO
+    https://git.kernel.org/netdev/net-next/c/fb4bb62aaac7
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
