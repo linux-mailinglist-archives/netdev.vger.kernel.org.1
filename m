@@ -1,59 +1,55 @@
-Return-Path: <netdev+bounces-66346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31F0083E932
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 03:02:09 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 811CA83E993
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 03:14:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 656011C2325D
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 02:02:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 08FEEB216F0
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 02:14:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B040125B0;
-	Sat, 27 Jan 2024 02:01:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C15C5C154;
+	Sat, 27 Jan 2024 02:08:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cJsdlIWY"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OSEMzeJT"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACC7BBE48
-	for <netdev@vger.kernel.org>; Sat, 27 Jan 2024 02:01:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B65C125A6
+	for <netdev@vger.kernel.org>; Sat, 27 Jan 2024 02:08:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706320887; cv=none; b=ni4J4h+7sO1ieeMRNlXLbXtBU6Edwb2MZQrPfofuDK+/YzscFH0Grs8y79eyiB79tN0Q5nL2kAXm+/CEvD66VzLe0ErhEQKoYIUi868KY7Eda+B5QTgh7/S0zhgrejSFlgHbIUyav8Kvt7Z7KEUPJ5elIiH6v25Qe+SPZg3JzhM=
+	t=1706321323; cv=none; b=GZvLrjX2pqGZ8achTmyh8xwIqu8DLQjv/jRpday3mhEvqi807lbVDkW0OBXdMyQviN03rOPvcYRC1W6MKD5ISaIc5cZOx7SICCHoW/rEjYlXI7cQVOVNgDC5V+ZZzQt3iHtX4Epfjx93f5va0YpyWzqogqq3R/QxvIdyZ/BaYYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706320887; c=relaxed/simple;
-	bh=WEGpc0xxaxj2AY+Xn8ROwEZelU+zXk/EivX8ekFZmeA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=O7h7d7wuo2dlOMnukS5b+eCSV5YDbmJsRGQneniTBkHw9LnJv04VFDPdzAkA9G8t5iMwpi3H+NkKg8bQXPY3Sk7utp5lDM6T7+/VBOokQIQao03h0gGeqw9ugyIRbqcMUelXAeYx8SaznBozT1JjXlue4+gY/TH+KFSJuyrb4EE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cJsdlIWY; arc=none smtp.client-ip=95.215.58.179
+	s=arc-20240116; t=1706321323; c=relaxed/simple;
+	bh=iy4bbPlcTHR5BujKxgwpeH6pLrpzI4Fhpz5iOUvrDBk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ecgHV5zhjCfiX09MMka+dTLLknlgM6i0zOLBUT4u8C39y+C9ctfHmyu03ETmnPSvQQ3+3N6n1FUkd4IkpPJynrNQnBX7g3w8xhjHIDFc27mWRXuFEqPPhM62ltHcEH6EdlLuU1bE1MtwRb+S4ImnlYS1hKmoJyvyuCj2NJqaBqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OSEMzeJT; arc=none smtp.client-ip=95.215.58.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706320883;
+	t=1706321320;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uLB5skfy3BEv0JbsXyQzZFD+57i+sZEpeM1MJI3SUiw=;
-	b=cJsdlIWYIbH3uvx9fpJeoELDRif4ZO6HQhkaqt/fjfF51RPc2TxcvlavZ2oegJqg0odAmV
-	PB5Gpc3EYMzJCvBjElu/YDmgzpSL/D4M7eNj1ZL+ocQSL2k5AZf4AWyjdDoShDumlUzx5J
-	TRyWFsQ76zG0xGqPFwUYks0nwemHdTk=
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=3mxHfQelYlqL6oP1Hnoe6QZezCLAhWkLAbAnrEYZUDY=;
+	b=OSEMzeJTWSmablzulvFvVfNX5hGQRamLGo2HX4EUeO9P2OMLBXPodf+HaSi4Ws2B10k6FB
+	LFdSHAH/6v9tW82PDrv8NhWtuj3XCcRtl9PWY27sYpY2Lbr7fmLbShK9BjrQyPNEZ5BKeG
+	R6aEmWU7ZAd9wBrxp91RNt6GZyYPJP0=
 From: Kent Overstreet <kent.overstreet@linux.dev>
 To: linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
-	linux-fsdevel@vgerkernel.org
+	linux-fsdevel@vger.kernel.org
 Cc: Kent Overstreet <kent.overstreet@linux.dev>,
 	peterz@infradead.org,
 	boqun.feng@gmail.com
-Subject: [PATCH 4/4] af_unix: convert to lock_cmp_fn
-Date: Fri, 26 Jan 2024 21:01:08 -0500
-Message-ID: <20240127020111.487218-5-kent.overstreet@linux.dev>
-In-Reply-To: <20240127020111.487218-1-kent.overstreet@linux.dev>
-References: <20240127020111.487218-1-kent.overstreet@linux.dev>
+Subject: [PATCH 0/4] lockdep cmp fn conversions
+Date: Fri, 26 Jan 2024 21:08:27 -0500
+Message-ID: <20240127020833.487907-1-kent.overstreet@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,110 +59,32 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Kill
- - unix_state_lock_nested
- - _nested usage for net->unx.table.locks[].
+rationale:
+*_lock_nested() is fundamentally broken - in order for lockdep to work
+we need to be able to check that we're following some defined ordering,
+and it's not possible to define a total ordering of an arbitrary number
+of objects with only a small fixed size enum.
 
-replace both with lock_set_cmp_fn_ptr_order(&u->lock).
+so it needs to go. awhile back I added the ability to set a comparison
+function for a lock class, and this is the start of hopefully a slow
+steady trickle of patches as time allows to convert code to use it.
 
-The lock ordering in sk_diag_dump_icons() looks suspicious; this may
-turn up a real issue.
+Kent Overstreet (4):
+  fs/pipe: Convert to lockdep_cmp_fn
+  pktcdvd: kill mutex_lock_nested() usage
+  net: Convert sk->sk_peer_lock to lock_set_cmp_fn_ptr_order()
+  af_unix: convert to lock_cmp_fn
 
-Cc: netdev@vger.kernel.org
-Signed-off-by: Kent Overstreet <kent.overstreet@linux.dev>
----
- include/net/af_unix.h |  3 ---
- net/unix/af_unix.c    | 20 ++++++++------------
- net/unix/diag.c       |  2 +-
- 3 files changed, 9 insertions(+), 16 deletions(-)
+ drivers/block/pktcdvd.c  |  8 ++---
+ fs/pipe.c                | 77 ++++++++++++++++------------------------
+ include/linux/lockdep.h  |  3 ++
+ include/net/af_unix.h    |  3 --
+ kernel/locking/lockdep.c |  6 ++++
+ net/core/sock.c          |  1 +
+ net/unix/af_unix.c       | 24 ++++++-------
+ net/unix/diag.c          |  2 +-
+ 8 files changed, 55 insertions(+), 69 deletions(-)
 
-diff --git a/include/net/af_unix.h b/include/net/af_unix.h
-index 49c4640027d8..4eff0a089640 100644
---- a/include/net/af_unix.h
-+++ b/include/net/af_unix.h
-@@ -48,9 +48,6 @@ struct scm_stat {
- 
- #define unix_state_lock(s)	spin_lock(&unix_sk(s)->lock)
- #define unix_state_unlock(s)	spin_unlock(&unix_sk(s)->lock)
--#define unix_state_lock_nested(s) \
--				spin_lock_nested(&unix_sk(s)->lock, \
--				SINGLE_DEPTH_NESTING)
- 
- /* The AF_UNIX socket */
- struct unix_sock {
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index d013de3c5490..1a0d273799c1 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -170,7 +170,7 @@ static void unix_table_double_lock(struct net *net,
- 		swap(hash1, hash2);
- 
- 	spin_lock(&net->unx.table.locks[hash1]);
--	spin_lock_nested(&net->unx.table.locks[hash2], SINGLE_DEPTH_NESTING);
-+	spin_lock(&net->unx.table.locks[hash2]);
- }
- 
- static void unix_table_double_unlock(struct net *net,
-@@ -997,6 +997,7 @@ static struct sock *unix_create1(struct net *net, struct socket *sock, int kern,
- 	u->path.dentry = NULL;
- 	u->path.mnt = NULL;
- 	spin_lock_init(&u->lock);
-+	lock_set_cmp_fn_ptr_order(&u->lock);
- 	atomic_long_set(&u->inflight, 0);
- 	INIT_LIST_HEAD(&u->link);
- 	mutex_init(&u->iolock); /* single task reading lock */
-@@ -1340,17 +1341,11 @@ static int unix_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
- 
- static void unix_state_double_lock(struct sock *sk1, struct sock *sk2)
- {
--	if (unlikely(sk1 == sk2) || !sk2) {
--		unix_state_lock(sk1);
--		return;
--	}
--	if (sk1 < sk2) {
-+	if (sk1 > sk2)
-+		swap(sk1, sk2);
-+	if (sk1 && sk1 != sk2)
- 		unix_state_lock(sk1);
--		unix_state_lock_nested(sk2);
--	} else {
--		unix_state_lock(sk2);
--		unix_state_lock_nested(sk1);
--	}
-+	unix_state_lock(sk2);
- }
- 
- static void unix_state_double_unlock(struct sock *sk1, struct sock *sk2)
-@@ -1591,7 +1586,7 @@ static int unix_stream_connect(struct socket *sock, struct sockaddr *uaddr,
- 		goto out_unlock;
- 	}
- 
--	unix_state_lock_nested(sk);
-+	unix_state_lock(sk);
- 
- 	if (sk->sk_state != st) {
- 		unix_state_unlock(sk);
-@@ -3575,6 +3570,7 @@ static int __net_init unix_net_init(struct net *net)
- 
- 	for (i = 0; i < UNIX_HASH_SIZE; i++) {
- 		spin_lock_init(&net->unx.table.locks[i]);
-+		lock_set_cmp_fn_ptr_order(&net->unx.table.locks[i]);
- 		INIT_HLIST_HEAD(&net->unx.table.buckets[i]);
- 	}
- 
-diff --git a/net/unix/diag.c b/net/unix/diag.c
-index bec09a3a1d44..8ab5e2217e4c 100644
---- a/net/unix/diag.c
-+++ b/net/unix/diag.c
-@@ -84,7 +84,7 @@ static int sk_diag_dump_icons(struct sock *sk, struct sk_buff *nlskb)
- 			 * queue lock. With the other's queue locked it's
- 			 * OK to lock the state.
- 			 */
--			unix_state_lock_nested(req);
-+			unix_state_lock(req);
- 			peer = unix_sk(req)->peer;
- 			buf[i++] = (peer ? sock_i_ino(peer) : 0);
- 			unix_state_unlock(req);
 -- 
 2.43.0
 
