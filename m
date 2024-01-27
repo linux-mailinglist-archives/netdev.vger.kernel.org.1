@@ -1,147 +1,148 @@
-Return-Path: <netdev+bounces-66355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FBF983E9C1
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 03:33:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 662BF83EA89
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 04:21:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E6511F27642
-	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 02:33:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 114E51F24C66
+	for <lists+netdev@lfdr.de>; Sat, 27 Jan 2024 03:21:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F39B065C;
-	Sat, 27 Jan 2024 02:33:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D073ABE7F;
+	Sat, 27 Jan 2024 03:21:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W0Rqz6hb"
+	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="xqH1Y6Kz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-40134.protonmail.ch (mail-40134.protonmail.ch [185.70.40.134])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C2F428F5;
-	Sat, 27 Jan 2024 02:33:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE1BDBA34
+	for <netdev@vger.kernel.org>; Sat, 27 Jan 2024 03:21:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.134
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706322794; cv=none; b=VvQVxkqSNfzG2JH9i6QpPHkybV9FX0SydWNMyCgYQVB8tC4H/Ni1u3qyK/1WP38qzvN4UqwUTPzWtoRe64JniczK35YwCJsbx7fiGIi8+CyJ8Y8IdDUG+oAEgXTHR8uWHhEut23dP3WdYFHDjRAuFZ83juNc5PqXsctJ5yNDt4Y=
+	t=1706325696; cv=none; b=gnQGX3doTX4DOf+DsxYwxddQ4x2dAq7xKqjHEmo3KlnvpOmqbyX5HJtnQWj3UdNPWrALWR3equLiyo5ypmJJJQGPZTqoclC0BRCx+blvWQiu8zwq/v4u9xEpyPGgCfOb0LZFdM6DQ4rE8k3xdvxcS4UlIaTAL5+lCQJYHWp0t5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706322794; c=relaxed/simple;
-	bh=C8ISVwuWHIOy++6drAVyvozcTyVp01A+kVBhAZT4Kbs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qxWJqEvLsUYjx6lnAyuCIhUfDE/QY1m2rRXYI+5N9XJz+s9yXUR9ZEwBOReigsZuzueOFy50fughbfNB/DEL4bLPrORcqi3F6vzbQHX1bDbfYcCSNcf4ia++jdxh9CXYrzNeKDglI11EAnG4OYtDHgxz+ExwLDNLaKVYF1MQKPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W0Rqz6hb; arc=none smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-42a8af3c10cso1885111cf.0;
-        Fri, 26 Jan 2024 18:33:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706322792; x=1706927592; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ebj/u0RaDMnkItOkG6xsV7v4uVxC3HRI3/eC3yZlwtc=;
-        b=W0Rqz6hbvJwG9uhr450lY0MOb8h6vF5mIw/29hCImtRPblX2AiqdfsSYfytnseVaJL
-         Vc0uoVCj3TDOxCAqkO5VzFGtmsfDw7mH3asG9jDZCRuG1zKC9QtXFAgto5Lpd1rDjHr3
-         7OpaApvsQEIDZvhEG6WS2PmQZk41/WeQ/7pUguukykqKHcIkyV90nVcLjk1v/90jUvfR
-         i5vEJ00HH2PAH3uFc8BLQ4YpORrx2eCf6TrEMRsYohpm2eMP/gyn5Z3iWmLlSgZwAUxg
-         UuUwoY/jnTvjRqhDoWYuet+v9mv+lJd2d1EnlM6WFRB0IG03yxzJ2CKv7wFdirj3k10v
-         s32A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706322792; x=1706927592;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ebj/u0RaDMnkItOkG6xsV7v4uVxC3HRI3/eC3yZlwtc=;
-        b=hrSqHn9omqkDb5XJgnI5fZW3nwWoAiZRuY3Hadyb13Aj9MhpDG/A6llAQUi/kfJMGK
-         uc2TBmwYrv+5YCUZtHXyHtlkor1gu191HheD11QnMcgaAf+ygNPoDu2VQQtaKWt6C86F
-         xkWNKg/j7BwcIwwtlXETCsrFHR0dK1UUok3ZXwnPP0MbVh02ROfyVNqFULA4gFIDHwm2
-         nphV0+fFUNBn9KP/4UmsRM5KO2WNTr2pxUL8u+GmsYX+MdGg+1Vlx8aAdtMwDhp4VtJL
-         VThNlmn/GhPqf6AFnp4EYNu2gGfJX94BMQpMGPmyKuNwSFw1HOmWIXTcyqNvHavN6CqF
-         B2GA==
-X-Gm-Message-State: AOJu0YyHZqA9mu9a3PefeSvM+6P/MKKSfBh4ElkHQoNSEQnGq1zBX0c7
-	Md1Qlw2awxjtd8RbkQZpe31bISR1CCvDDd1N6EhaJXMYazIJuIG6kkGNvHUa
-X-Google-Smtp-Source: AGHT+IEKjEAqpJT889TV+z+M5vooLQ1IFU50yZKze+NsEDmuiY1wp6soe5giuZz1NxdDmyEynrVasg==
-X-Received: by 2002:a05:622a:1485:b0:42a:6d3e:6b13 with SMTP id t5-20020a05622a148500b0042a6d3e6b13mr1048357qtx.74.1706322792173;
-        Fri, 26 Jan 2024 18:33:12 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVbYvcY13SWFodmSqxeAgtJ4YBzoiGQZ/VcK1jqbpCDDPDlj/g9+sSs8shVdNyV0Eke2N2hX89RCdxxHqTM1aAsRlA+KhC8bQ2SYOUHdHaVj1uMBiCIpDSqbW7F0hnx9t9LCPFa4/kgOUK+qgqc7/cpplzO4PWOry5PqgGEA/jtEJjiMyiUV+D6btWlo7N6yzUyHH9XFVskb9SCfK0=
-Received: from willemb.c.googlers.com.com (131.65.194.35.bc.googleusercontent.com. [35.194.65.131])
-        by smtp.gmail.com with ESMTPSA id q17-20020a05622a031100b00419732075b4sm1073321qtw.84.2024.01.26.18.33.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jan 2024 18:33:11 -0800 (PST)
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	linux-kselftest@vger.kernel.org,
-	Willem de Bruijn <willemb@google.com>
-Subject: [PATCH net-next] selftests/net: calibrate fq_band_pktlimit
-Date: Fri, 26 Jan 2024 21:33:03 -0500
-Message-ID: <20240127023309.3746523-1-willemdebruijn.kernel@gmail.com>
-X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
+	s=arc-20240116; t=1706325696; c=relaxed/simple;
+	bh=swUlTqvn833cLHhUHmUuWd12Cvnrh/3sSg3/RxNnToI=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=fU2qTD1klWADhXawpQ8lN++/uKHaDuDx+/X66PVHC2bTbYT1BxSpvTPvkjth7p9C/by6U9ZukNXsvbzNEZiKWd2zBCE06DzVW/o4IdyZd4Szj31DUUDl2xNZCzgOVSfRuHSdwUs+SqA2z9ZT//aOanS0W7+ek4vamRgZSTUFsro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=xqH1Y6Kz; arc=none smtp.client-ip=185.70.40.134
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+	s=protonmail3; t=1706325687; x=1706584887;
+	bh=zo7WPA6m4On219C49bdnFWajxsWtriZPFto+n7Ao+W0=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=xqH1Y6Kz533PuiWbOUu3E5ICObl6Lj6ka2tsHXeVjgOmBofb0CcDTjh4x9EpOV6yS
+	 yRJvVk4eC1OabSn1t/8Rg7G6s3AFGqd1BiSxuHDypK7dEPW8roasVpLunqzVonMIOk
+	 ehLgtS/7EJ2O6UdU6MFTuIiwxWPxd4rjokIUPrXRpFD6bEoWkuNeI7H4+Q8ZX1ZgQ/
+	 fgnwffdoBacsk6iQUgqhyE1xzMu+hsTdPTpIOYTLbLkyy0IXjgLFFcVJSiJrh9yBai
+	 U1BivUVYPAj+A7kzcNOzPP98WwZuqMvgarsXszF7kCUe5JqelQu6JfIVWqTKkBbp+1
+	 89Xn08yZfRX7g==
+Date: Sat, 27 Jan 2024 03:21:09 +0000
+To: tipc-discussion@lists.sourceforge.net
+From: Carlos Ortiz <jmp0x29A@protonmail.com>
+Cc: skhan@linuxfoundation.org, Carlos Ortiz <jmp0x29A@protonmail.com>, Jon Maloy <jmaloy@redhat.com>, Ying Xue <ying.xue@windriver.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] net/tipc: Remove Documentation Warnings for `Excess struct member`
+Message-ID: <20240127032058.3030-1-jmp0x29A@protonmail.com>
+Feedback-ID: 24524753:user:proton
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature"; micalg=pgp-sha256; boundary="------8a7865ae482313782a62a2e5020667e351c62284c97e1e61b255d216c997144a"; charset=utf-8
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------8a7865ae482313782a62a2e5020667e351c62284c97e1e61b255d216c997144a
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+From: Carlos Ortiz <jmp0x29A@protonmail.com>
+To: tipc-discussion@lists.sourceforge.net
+Cc: skhan@linuxfoundation.org,
+	Carlos Ortiz <jmp0x29A@protonmail.com>,
+	Jon Maloy <jmaloy@redhat.com>,
+	Ying Xue <ying.xue@windriver.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org (open list:TIPC NETWORK LAYER),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH] net/tipc: Remove Documentation Warnings for `Excess struct member`
+Date: Fri, 26 Jan 2024 21:20:56 -0600
+Message-ID: <20240127032058.3030-1-jmp0x29A@protonmail.com>
+X-Mailer: git-send-email 2.43.0
+MIME-Version: 1.0
 
-From: Willem de Bruijn <willemb@google.com>
+As far as I can tell,the struct `inputq` and `namedq` were never part of the `tipc_node`,
+therefor removing the documentation comments this will make the warnings for ./net/tipc/node.c when
+running `make htmldocs` to be gone.
 
-This test validates per-band packet limits in FQ. Packets are dropped
-rather than enqueued if the limit for their band is reached.
+For socket.c, and documentation comment was added on commit 365ad353c2564bba8835290061308ba825166b3a
+but the struct member was not added in addition of removing `blocking_link` also move `dupl_rcvcnt`
+documentations a few lines up to match the struct member order.
 
-This test is timing sensitive. It queues packets in FQ with a future
-delivery time to fill the qdisc.
-
-The test failed in a virtual environment (vng). Increase the delays
-to make it more tolerant to environments with timing variance.
-
-Signed-off-by: Willem de Bruijn <willemb@google.com>
+Signed-off-by: Carlos Ortiz <jmp0x29A@protonmail.com>
 ---
- tools/testing/selftests/net/fq_band_pktlimit.sh | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ net/tipc/node.c   | 2 --
+ net/tipc/socket.c | 3 +--
+ 2 files changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/tools/testing/selftests/net/fq_band_pktlimit.sh b/tools/testing/selftests/net/fq_band_pktlimit.sh
-index 24b77bdf41ff..977070ed42b3 100755
---- a/tools/testing/selftests/net/fq_band_pktlimit.sh
-+++ b/tools/testing/selftests/net/fq_band_pktlimit.sh
-@@ -8,7 +8,7 @@
- # 3. send 20 pkts on band A: verify that  0 are queued, 20 dropped
- # 4. send 20 pkts on band B: verify that 10 are queued, 10 dropped
- #
--# Send packets with a 100ms delay to ensure that previously sent
-+# Send packets with a delay to ensure that previously sent
- # packets are still queued when later ones are sent.
- # Use SO_TXTIME for this.
- 
-@@ -29,19 +29,21 @@ ip -6 addr add fdaa::1/128 dev dummy0
- ip -6 route add fdaa::/64 dev dummy0
- tc qdisc replace dev dummy0 root handle 1: fq quantum 1514 initial_quantum 1514 limit 10
- 
--./cmsg_sender -6 -p u -d 100000 -n 20 fdaa::2 8000
-+DELAY=400000
-+
-+./cmsg_sender -6 -p u -d "${DELAY}" -n 20 fdaa::2 8000
- OUT1="$(tc -s qdisc show dev dummy0 | grep '^\ Sent')"
- 
--./cmsg_sender -6 -p u -d 100000 -n 20 fdaa::2 8000
-+./cmsg_sender -6 -p u -d "${DELAY}" -n 20 fdaa::2 8000
- OUT2="$(tc -s qdisc show dev dummy0 | grep '^\ Sent')"
- 
--./cmsg_sender -6 -p u -d 100000 -n 20 -P 7 fdaa::2 8000
-+./cmsg_sender -6 -p u -d "${DELAY}" -n 20 -P 7 fdaa::2 8000
- OUT3="$(tc -s qdisc show dev dummy0 | grep '^\ Sent')"
- 
- # Initial stats will report zero sent, as all packets are still
--# queued in FQ. Sleep for the delay period (100ms) and see that
-+# queued in FQ. Sleep for at least the delay period and see that
- # twenty are now sent.
--sleep 0.1
-+sleep 0.6
- OUT4="$(tc -s qdisc show dev dummy0 | grep '^\ Sent')"
- 
- # Log the output after the test
+diff --git a/net/tipc/node.c b/net/tipc/node.c
+index 3105abe97bb9..c1e890a82434 100644
+--- a/net/tipc/node.c
++++ b/net/tipc/node.c
+@@ -86,8 +86,6 @@ struct tipc_bclink_entry {
+  * @lock: rwlock governing access to structure
+  * @net: the applicable net namespace
+  * @hash: links to adjacent nodes in unsorted hash chain
+- *
+ @inputq: pointer to input queue containing messages for msg event
+- * @namedq: pointer to name table input queue with name table messages
+  * @active_links: bearer ids of active links, used as index into links[] array
+  * @links: array containing references to all links to node
+  * @bc_entry: broadcast link entry
+diff --git a/net/tipc/socket.c b/net/tipc/socket.c
+index bb1118d02f95..a022719882ce 100644
+--- a/net/tipc/socket.c
++++ b/net/tipc/socket.c
+@@ -80,11 +80,10 @@ struct sockaddr_pair {
+  * @phdr: preformatted message header used when sending messages
+  * @cong_links: list of congested links
+  * @publications: list of publications for port
+- * @blocking_link: address of the congested link we are currently sleeping on
+  * @pub_count: total # of publications port has made during its lifetime
++ * @dupl_rcvcnt: number of bytes counted twice, in both backlog and rcv queue
+  * @conn_timeout: the time we can wait for an unresponded setup request
+  * @probe_unacked: prob
+e has not received ack yet
+- * @dupl_rcvcnt: number of bytes counted twice, in both backlog and rcv queue
+  * @cong_link_cnt: number of congested links
+  * @snt_unacked: # messages sent by socket, and not yet acked by peer
+  * @snd_win: send window size
 -- 
-2.43.0.429.g432eaa2c6b-goog
+2.43.0
+
+
+--------8a7865ae482313782a62a2e5020667e351c62284c97e1e61b255d216c997144a
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: ProtonMail
+
+wnUEARYIACcFAmW0dqQJEP/88erosmiBFiEEK5py9W+SnfjCVyLD//zx6uiy
+aIEAAE3RAQDz1vnRwvq19AGgFyW2nVa6d0X9Nv5jXSb69oIW0An7EwEAujd9
+ieOXKgSS2WIq3RyNkf+MmZc+8eEgsauBWE3nzgA=
+=7v4p
+-----END PGP SIGNATURE-----
+
+
+--------8a7865ae482313782a62a2e5020667e351c62284c97e1e61b255d216c997144a--
 
 
