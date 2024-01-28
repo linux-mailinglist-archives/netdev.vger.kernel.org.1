@@ -1,125 +1,223 @@
-Return-Path: <netdev+bounces-66533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0007A83F9D5
-	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 21:16:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9132883F9F1
+	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 21:56:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B00DB2833C8
-	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 20:16:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF1831C21C46
+	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 20:56:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 624A23C463;
-	Sun, 28 Jan 2024 20:12:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA68331A6B;
+	Sun, 28 Jan 2024 20:56:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="bkXwz3GF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A73B33CFC;
-	Sun, 28 Jan 2024 20:12:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0202F31A7E;
+	Sun, 28 Jan 2024 20:56:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706472778; cv=none; b=hL42yziUCntn+SrqSqu3ysAuLyjva4pFYQ0DfLdq8GHt+9LLeiXJoJZ19UIIBowMcoM0MHlF55Hc4zw4SpV5dLlgfG+ekl9WIstpsUvhpYVcwc0S6/cARwGrtck+jtvGtKlpKzQNgRiSPNY91ByWDvMSzDw/umVCo84BEqxzYy0=
+	t=1706475411; cv=none; b=pVLRvikIZaKaC8KhZHgqUY3U+pAVlHfstej6dyeOxu/VkEZ8iWyWO3gd+amUUznbDzw7kSu9vgcOXA4X+cMsjKbodC21hrsq/cyEfL12La11kGf9driTe3wyX26WFim/5D2UMT6onOdb45QKQ8JqbHg4zNM9vzugc/h8BA6aCUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706472778; c=relaxed/simple;
-	bh=eLB+vP2BqWigZLoa+gqJwPItZJUPUQPTdY+BITXJySA=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=NSpr0r7xIm+p58/+1+w1RVwa7YvoPFTjbDvr9pxAmbf0DPDbMCXUlwM6vOrK1D8Taq9aui8k5TrkbcA5E3kHAQ8Fgdvd14F7JxFrluQq02qwy/KGfO++4lGrdvOg0DJESlPJrQ+qgCfMmfD48hR6rdigGxgAZIf5m2AyNPRORF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (178.176.74.225) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Sun, 28 Jan
- 2024 23:12:44 +0300
-Subject: Re: [PATCH net-next v4 13/15] net: ravb: Set config mode in ndo_open
- and reset mode in ndo_close
-To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
-	<geert+renesas@glider.be>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>
-References: <20240123125829.3970325-1-claudiu.beznea.uj@bp.renesas.com>
- <20240123125829.3970325-14-claudiu.beznea.uj@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <fc7a8b50-76a8-f75e-c350-f98276d85a10@omp.ru>
-Date: Sun, 28 Jan 2024 23:12:43 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1706475411; c=relaxed/simple;
+	bh=zQPpEUHp5eKj9EhyK7RuxwngFTVum61WXyXTsZdGoLA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Kar06IDagJGhzesuO2TqBOspHVjmepp3hEEQTJu317hoNPJI+w8+kgrOlPtnp/Xq4FI4ldbMZm/s+I5T8C2heOZ2vTVZVtx9sCaHsxUwsdhUnAvOEld37FrX7jJD1feAjde2TJf2SXBWzkKCbOfHukybRdrIcip2ggEksfAvgIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=bkXwz3GF; arc=none smtp.client-ip=99.78.197.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1706475410; x=1738011410;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=kNjMyJ+fMASTc2wcvJOQRFW38HN5NRSbZjppugncMZ4=;
+  b=bkXwz3GFwWBo4hVI+2kTN+ZFgQweXRFupBhXOnkjq70/EC97uGgp7Tg1
+   gfygGgNNoKEOju0K9SvDrN4TLovT0zYs3g8uwRvBzdS98B0wN0ft6TKtk
+   kOT+hvx70MoU6+MfTqKVx8fa29f2LhOiWEEOoMDgZg2xm14dCf4moPyAB
+   s=;
+X-IronPort-AV: E=Sophos;i="6.05,220,1701129600"; 
+   d="scan'208";a="270070340"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-3e1fab07.us-east-1.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2024 20:56:48 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan3.iad.amazon.com [10.32.235.38])
+	by email-inbound-relay-iad-1e-m6i4x-3e1fab07.us-east-1.amazon.com (Postfix) with ESMTPS id B9CCD80632;
+	Sun, 28 Jan 2024 20:56:45 +0000 (UTC)
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:53888]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.6.162:2525] with esmtp (Farcaster)
+ id b7ac26ac-411e-4303-8e3e-96e5a3a16879; Sun, 28 Jan 2024 20:56:45 +0000 (UTC)
+X-Farcaster-Flow-ID: b7ac26ac-411e-4303-8e3e-96e5a3a16879
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Sun, 28 Jan 2024 20:56:44 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.101.48) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.40;
+ Sun, 28 Jan 2024 20:56:41 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kent.overstreet@linux.dev>
+CC: <boqun.feng@gmail.com>, <kuniyu@amazon.com>,
+	<linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <peterz@infradead.org>
+Subject: Re: [PATCH 4/4] af_unix: convert to lock_cmp_fn
+Date: Sun, 28 Jan 2024 12:56:32 -0800
+Message-ID: <20240128205632.93670-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <suyvonwf55vfeumeujeats2mtozs2q4wcx6ijz4hqfd54mibjj@6dt26flhrfdh>
+References: <suyvonwf55vfeumeujeats2mtozs2q4wcx6ijz4hqfd54mibjj@6dt26flhrfdh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240123125829.3970325-14-claudiu.beznea.uj@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 01/28/2024 19:59:59
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 182981 [Jan 28 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.74.225 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.74.225 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2;178.176.74.225:7.7.3,7.4.1,7.1.2
-X-KSE-AntiSpam-Info: {cloud_iprep_silent}
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.74.225
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 01/28/2024 20:05:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 1/28/2024 7:00:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D035UWB002.ant.amazon.com (10.13.138.97) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
 
-On 1/23/24 3:58 PM, Claudiu wrote:
-
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+From: Kent Overstreet <kent.overstreet@linux.dev>
+Date: Sun, 28 Jan 2024 14:38:02 -0500
+> On Sun, Jan 28, 2024 at 12:28:38AM -0800, Kuniyuki Iwashima wrote:
+> > From: Kent Overstreet <kent.overstreet@linux.dev>
+> > Date: Fri, 26 Jan 2024 21:08:31 -0500
+> > > Kill
+> > >  - unix_state_lock_nested
+> > >  - _nested usage for net->unx.table.locks[].
+> > > 
+> > > replace both with lock_set_cmp_fn_ptr_order(&u->lock).
+> > > 
+> > > The lock ordering in sk_diag_dump_icons() looks suspicious; this may
+> > > turn up a real issue.
+> > 
+> > Yes, you cannot use lock_cmp_fn() for unix_state_lock_nested().
+> > 
+> > The lock order in sk_diag_dump_icons() is
+> > 
+> >   listening socket -> child socket in the listener's queue
+> > 
+> > , and the inverse order never happens.  ptr comparison does not make
+> > sense in this case, and lockdep will complain about false positive.
 > 
-> As some IP variants switch to reset mode (and thus registers content is
-
-   The register contents?
-
-> lost) when setting clocks (due to module standby functionality) to be able
-> to implement runtime PM and save more power, set the IP's operating mode to
-> reset at the end of the probe. Along with it, in the ndo_open API the IP
-> will be switched to configuration, then operation mode. In the ndo_close
-> API, the IP will be switched back to reset mode. This allows implementing
-> runtime PM and, along with it, save more power when the IP is not used.
+> Is that a real lock ordering? Is this parent -> child relationship well
+> defined?
 > 
-> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> If it is, we should be able to write a lock_cmp_fn for it, as long as
+> it's not some handwavy "this will never happen but _nested won't check
+> for it" like I saw elsewhere in the net code... :)
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+The problem would be there's no handy way to detect the relationship
+except for iterating the queue again.
 
-[...]
+---8<---
+static int unix_state_lock_cmp_fn(const struct lockdep_map *_a,
+				  const struct lockdep_map *_b)
+{
+	const struct unix_sock *a = container_of(_a, struct unix_sock, lock.dep_map);
+	const struct unix_sock *b = container_of(_b, struct unix_sock, lock.dep_map);
 
-MBR, Sergey
+	if (a->sk.sk_state == TCP_LISTEN && b->sk.sk_state == TCP_ESTABLISHED) {
+		/* check if b is a's cihld */
+	}
+
+	/* otherwise, ptr comparison here. */
+}
+---8<---
+
+
+This can be resolved by a patch like this, which is in my local tree
+for another series.
+
+So, after posting the series, I can revisit this and write lock_cmp_fn
+for u->lock.
+
+---8<---
+commit 12d39766b06068fda5987f4e7b4827e8c3273137
+Author: Kuniyuki Iwashima <kuniyu@amazon.com>
+Date:   Thu Jan 11 22:36:58 2024 +0000
+
+    af_unix: Save listener for embryo socket.
+    
+    Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+
+diff --git a/include/net/af_unix.h b/include/net/af_unix.h
+index 9ea04653c7c9..d0c0d81bcb1d 100644
+--- a/include/net/af_unix.h
++++ b/include/net/af_unix.h
+@@ -82,6 +82,7 @@ struct scm_stat {
+ struct unix_sock {
+ 	/* WARNING: sk has to be the first member */
+ 	struct sock		sk;
++#define usk_listener		sk.__sk_common.skc_unix_listener
+ 	struct unix_address	*addr;
+ 	struct path		path;
+ 	struct mutex		iolock, bindlock;
+diff --git a/include/net/sock.h b/include/net/sock.h
+index a9d99a9c583f..3df3d068345a 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -142,6 +142,8 @@ typedef __u64 __bitwise __addrpair;
+  *		[union with @skc_incoming_cpu]
+  *	@skc_tw_rcv_nxt: (aka tw_rcv_nxt) TCP window next expected seq number
+  *		[union with @skc_incoming_cpu]
++ *	@skc_unix_listener: connection request listener socket for AF_UNIX
++ *		[union with @skc_rxhash]
+  *	@skc_refcnt: reference count
+  *
+  *	This is the minimal network layer representation of sockets, the header
+@@ -227,6 +229,7 @@ struct sock_common {
+ 		u32		skc_rxhash;
+ 		u32		skc_window_clamp;
+ 		u32		skc_tw_snd_nxt; /* struct tcp_timewait_sock */
++		struct sock	*skc_unix_listener; /* struct unix_sock */
+ 	};
+ 	/* public: */
+ };
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 5f9871555ec6..4a41bb727c32 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -991,6 +991,7 @@ static struct sock *unix_create1(struct net *net, struct socket *sock, int kern,
+ 	sk->sk_max_ack_backlog	= net->unx.sysctl_max_dgram_qlen;
+ 	sk->sk_destruct		= unix_sock_destructor;
+ 	u = unix_sk(sk);
++	u->usk_listener = NULL;
+ 	u->inflight = 0;
+ 	u->path.dentry = NULL;
+ 	u->path.mnt = NULL;
+@@ -1612,6 +1613,7 @@ static int unix_stream_connect(struct socket *sock, struct sockaddr *uaddr,
+ 	newsk->sk_type		= sk->sk_type;
+ 	init_peercred(newsk);
+ 	newu = unix_sk(newsk);
++	newu->usk_listener = other;
+ 	RCU_INIT_POINTER(newsk->sk_wq, &newu->peer_wq);
+ 	otheru = unix_sk(other);
+ 
+@@ -1707,8 +1709,8 @@ static int unix_accept(struct socket *sock, struct socket *newsock, int flags,
+ 		       bool kern)
+ {
+ 	struct sock *sk = sock->sk;
+-	struct sock *tsk;
+ 	struct sk_buff *skb;
++	struct sock *tsk;
+ 	int err;
+ 
+ 	err = -EOPNOTSUPP;
+@@ -1733,6 +1735,7 @@ static int unix_accept(struct socket *sock, struct socket *newsock, int flags,
+ 	}
+ 
+ 	tsk = skb->sk;
++	unix_sk(tsk)->usk_listener = NULL;
+ 	skb_free_datagram(sk, skb);
+ 	wake_up_interruptible(&unix_sk(sk)->peer_wait);
+ 
+---8<---
+
 
