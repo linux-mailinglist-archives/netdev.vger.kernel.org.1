@@ -1,71 +1,75 @@
-Return-Path: <netdev+bounces-66454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3037783F4F3
-	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 11:19:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 665A783F500
+	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 11:38:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 62AA51C2104F
-	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 10:19:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 977EF1C20C11
+	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 10:37:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2331611CAF;
-	Sun, 28 Jan 2024 10:18:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 594191805E;
+	Sun, 28 Jan 2024 10:37:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="HuO0w6lr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31E2CDF55;
-	Sun, 28 Jan 2024 10:18:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCC541B286
+	for <netdev@vger.kernel.org>; Sun, 28 Jan 2024 10:37:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706437137; cv=none; b=LX5Q34AZhQLjMrISZW45ouMuFH0OKajJCkmyJrGn/QPEoUoWDH9XePCTK1vZK3rhiuLOS1lDuEmbFLb0O/xWVl/oFBD8Vt0Rk1Nh6nZtKaf90ZwEmJy/9egFI3DEUgbGE+5m3WdMpGMWL+WRWkrojV+H9uRNRErKvFTsJpy3zko=
+	t=1706438277; cv=none; b=DiKPic1fGKOFkYDFaolLOmJWNYsX1SIgb6WTIW0c5O074mPJw2t0aN33iWPix76qkpHmEaT0OQM8jwn9+NbB/Jh0O7Z6nIL+dEMtiagAW3ZySdcozJ2C/z8m6wtkXB/0lykiNfFVqFDllVk1HqTfpwg9brLvdBcpAanuNFUR1hM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706437137; c=relaxed/simple;
-	bh=xY9d5ERXouy1ZaiI+F1+aXQOChBlb7NLWX7kgpBMQkg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IIBJeAYZNdkxFukYxywHvKYT0U3wBSY7bZ5G9zrP/x7aAc9Cbk58Mj2aCWMVL+KZ0zjak8MmSfsMkSLkJ/1BxUG86ypWSxDFiuZ26zwVV//2blwZSTFfoa7VtoTWe/O50gmJgayhcl6RceiN8cpqC8Tgh+SCtBFiFga2qzQKhaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-40ef64d8955so747715e9.3;
-        Sun, 28 Jan 2024 02:18:54 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706437133; x=1707041933;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+jLClgMgKHAYy8oi26SoamRje703fIGbCXV126plVXY=;
-        b=NPRFWsja7jrGluOBwcp6Sp6UcAy4MfJMtatrukG97sa8m0GB++CtBnpP3YV94guOgD
-         CIhkTtJpOU6H2eYnouwRu6OEqcisDZ9oMcOSKJ36YridA3JtplbDMr0iS1Np/BA7A8gX
-         mWLTpAy+tQgSJjbV2OYwC5XmxMPfWRK/Rz3TbBI37EkHyGp1hLxHIjHegLmKzaq5MHSF
-         mKd+W1enDb9WEonNCTudoafkq2XokAb0SXGKZ08MA7LfNMQoTwt40d/nNeZ0BjaieWdd
-         sqwtAAPmcIrViAf0wmLZvoUFC4IF7aGJW326NVIStzdR5U6xKvW80vMfxwEAhHF+NY8t
-         MLyg==
-X-Gm-Message-State: AOJu0Yy/dSp9vtm6adUNWuYlCKnN2z8AICLzTzooSIlKDAeoycZu9Q+H
-	jLzkqtoBDBx2F54potv6LjHCtgAwZtvfqEdERgempC7gOwENRL8Z
-X-Google-Smtp-Source: AGHT+IGkaMhTMf/7LomVjGIRaR8Le+S1R05a9PLNUKI7dKlEL9Quuc9mhxceiJs/myFU1LsgSsaWJA==
-X-Received: by 2002:a05:600c:35d6:b0:40e:6703:af8a with SMTP id r22-20020a05600c35d600b0040e6703af8amr2667929wmq.41.1706437133059;
-        Sun, 28 Jan 2024 02:18:53 -0800 (PST)
-Received: from ryzen.lan (cpc147820-finc19-2-0-cust1005.4-2.cable.virginm.net. [86.16.175.238])
-        by smtp.gmail.com with ESMTPSA id g9-20020a05600c310900b0040ef2e7041esm1594505wmo.6.2024.01.28.02.18.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 28 Jan 2024 02:18:52 -0800 (PST)
-From: Lucas Tanure <tanure@linux.com>
-To: Bryan Whitehead <bryan.whitehead@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Lucas Tanure <tanure@linux.com>
-Subject: [PATCH] ptp: lan743x: Use spin_lock instead of spin_lock_bh
-Date: Sun, 28 Jan 2024 10:18:49 +0000
-Message-ID: <20240128101849.107298-1-tanure@linux.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1706438277; c=relaxed/simple;
+	bh=hPHer1PJYP15HYJzuvsC4vBuD70njz+XDMDlodksLHI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nbHRjKQ/O+PKkEElrQfAjIFcqKQXRxKhHRx8xLTrUWBC7/1QFpuiJm6oq6rDXSMocOhQCEUOFX/ogY3Oq/r9CsSiIbQ7bm1s/RSv9xzdmIJO9qLXiEivUw7+hIPgEVvBNJzZwUHm7w3hwc8sm56XdV+BN/0MvgF3Nk0LhZrbm54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=HuO0w6lr; arc=none smtp.client-ip=207.171.184.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1706438276; x=1737974276;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=AQR9CDAuy+wyW2OgzVavteLe7uJqmD5VW+V40Ddw9/Y=;
+  b=HuO0w6lrCTpZj62vNzcRmA04ti3rcM8Gni+7wqDMfTsFmgLsrIjDMyZG
+   4sp45MNjd2eVZ0Ni+pLEVqGy/RnK+vFlTFl9sxvjzEklatI62JSmVftXQ
+   ZuF6fNW3io7xtvP2r5yxiQiiXyFK19XoKWEf/6JfHjhjI7GKOp1v2rsef
+   g=;
+X-IronPort-AV: E=Sophos;i="6.05,220,1701129600"; 
+   d="scan'208";a="392985016"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-153b24bc.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2024 10:37:50 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan3.iad.amazon.com [10.32.235.38])
+	by email-inbound-relay-iad-1d-m6i4x-153b24bc.us-east-1.amazon.com (Postfix) with ESMTPS id D4643C1665;
+	Sun, 28 Jan 2024 10:37:47 +0000 (UTC)
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:27720]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.3.8:2525] with esmtp (Farcaster)
+ id 07c17b67-905e-4a86-8dda-cef9aea5a418; Sun, 28 Jan 2024 10:37:47 +0000 (UTC)
+X-Farcaster-Flow-ID: 07c17b67-905e-4a86-8dda-cef9aea5a418
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Sun, 28 Jan 2024 10:37:46 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.101.48) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Sun, 28 Jan 2024 10:37:44 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Kent Overstreet <kent.overstreet@linux.dev>, Kuniyuki Iwashima
+	<kuniyu@amazon.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+	<netdev@vger.kernel.org>
+Subject: [PATCH v1 net-next 0/2] af_unix: Clean up unnecessary spin_lock(&sk->sk_peer_lock).
+Date: Sun, 28 Jan 2024 02:37:30 -0800
+Message-ID: <20240128103732.18185-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,39 +77,26 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D031UWC004.ant.amazon.com (10.13.139.246) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
 
-lan743x_ptp_request_tx_timestamp uses spin_lock_bh, but it is
-only called from lan743x_tx_xmit_frame where all IRQs are
-already disabled.
+Except for updating sk_peer_pid/sk_peer_cred, we do not need to hold
+sk_peer_lock during initialisation.
 
-This fixes the "IRQs not enabled as expected" warning.
+This series removes unnecessary spin_lock() and spin_unlock() in such
+places.
 
-Signed-off-by: Lucas Tanure <tanure@linux.com>
----
- drivers/net/ethernet/microchip/lan743x_ptp.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/microchip/lan743x_ptp.c b/drivers/net/ethernet/microchip/lan743x_ptp.c
-index 2f04bc77a118..2801f08bf1c9 100644
---- a/drivers/net/ethernet/microchip/lan743x_ptp.c
-+++ b/drivers/net/ethernet/microchip/lan743x_ptp.c
-@@ -1712,13 +1712,13 @@ bool lan743x_ptp_request_tx_timestamp(struct lan743x_adapter *adapter)
- 	struct lan743x_ptp *ptp = &adapter->ptp;
- 	bool result = false;
- 
--	spin_lock_bh(&ptp->tx_ts_lock);
-+	spin_lock(&ptp->tx_ts_lock);
- 	if (ptp->pending_tx_timestamps < LAN743X_PTP_NUMBER_OF_TX_TIMESTAMPS) {
- 		/* request granted */
- 		ptp->pending_tx_timestamps++;
- 		result = true;
- 	}
--	spin_unlock_bh(&ptp->tx_ts_lock);
-+	spin_unlock(&ptp->tx_ts_lock);
- 	return result;
- }
- 
+Kuniyuki Iwashima (2):
+  af_unix: Set sk_peer_pid/sk_peer_cred locklessly for new socket.
+  af_unix: Don't hold client's sk_peer_lock in copy_peercred().
+
+ net/unix/af_unix.c | 31 ++++++++++---------------------
+ 1 file changed, 10 insertions(+), 21 deletions(-)
+
 -- 
-2.43.0
+2.30.2
 
 
