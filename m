@@ -1,150 +1,99 @@
-Return-Path: <netdev+bounces-66485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66484-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92CB683F734
-	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 17:27:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 37F0683F6FC
+	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 17:22:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C52971C20B89
-	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 16:27:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B4461C20BD9
+	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 16:22:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 968C6446C3;
-	Sun, 28 Jan 2024 16:13:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECA6D28DD7;
+	Sun, 28 Jan 2024 16:13:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WuvcB7Yw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eNZbx0yk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5998A62A02;
-	Sun, 28 Jan 2024 16:13:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 469BB5A795
+	for <netdev@vger.kernel.org>; Sun, 28 Jan 2024 16:13:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706458432; cv=none; b=OvHPPmG4WIJ/0lp8tFbN4/rUSUcTKg97xGD96IOpZ0egLByRqC8UBECaapMMQjJfxw/ISHqRvd/R7e2LyHqxc08zFh6/I8wr2qDEJNFBaE00zI6hIv0lzO80U/kTkwYRQgXpo6FNG2bCzXotlx8KQ380nEbOcTAbWQCmKIVQBoI=
+	t=1706458388; cv=none; b=mZsMhkQ7D7STGLLuLlNnYczGpLS1KVojKQkFeXzCoyZrqtaP/MPNKoRml4EhROsMmzk6yjmCPgh4P8QUE5o98XZdp1tXic8SJ0dmAnjW/oieiQrDcXTb9dHZd43Wh4jVrv9Wh42Jyb7uKzjv6s6KsImwQwNjIN0cqTZqf5ZIg1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706458432; c=relaxed/simple;
-	bh=G/AX13p2dR571C5h9STUJyc9qaJ6fDywTyzK9hYV/vg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=q3rrhOxjy6LPAz6B8AuYSiQ7wWJUN597McchBUACLCafDP/z9TygSsKAdkbWU4mSrz7AaFt1aB8/LXNeIHrjE9wlO6c/eutZ2jqQ/dGdZRdtGcMkLyaw8flkB4VOgXqHvjQJ4Tg0WFScPqxMr8WzPPALEGV8yka/iAJzIrgfpNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WuvcB7Yw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61236C43394;
-	Sun, 28 Jan 2024 16:13:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706458431;
-	bh=G/AX13p2dR571C5h9STUJyc9qaJ6fDywTyzK9hYV/vg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WuvcB7Ywmus7nBQZjvy+CmqLYOLjoqken92l+BIWd+sQjlAyL1W0IQNfa1Nl6GErs
-	 alH0cOj1gjudcRLyuiCR+s/I7Cwmel4zS7Vx3e9bVB3+H8rAvc+R2XAa/m3gXn3XzG
-	 pJqjzX5Xll+2j7QfSx+DxiDuiFKivYPhATx0chh9ZUCYlA1Wwxvju4D+Ql83tBFY4E
-	 sUuJXy9qyLT5t3buW45LMxk4MU39xWCY8hHevWsMfUJ6NeXAqk24x8cf0Pn1KqvY5d
-	 uVuU6Ptuhd5zU6nHCx8mPufgfAFqerRoQ/iVDk2cJ988Cqwrc8FZFZBrGSQHNJpSL4
-	 QaiirhbLVk0pw==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Zhu Yanjun <yanjun.zhu@linux.dev>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Sasha Levin <sashal@kernel.org>,
-	mst@redhat.com,
-	jasowang@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	virtualization@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 21/31] =?UTF-8?q?virtio=5Fnet:=20Fix=20"?= =?UTF-8?q?=E2=80=98%d=E2=80=99=20directive=20writing=20between=201=20and?= =?UTF-8?q?=2011=20bytes=20into=20a=20region=20of=20size=2010"=20warnings?=
-Date: Sun, 28 Jan 2024 11:12:51 -0500
-Message-ID: <20240128161315.201999-21-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240128161315.201999-1-sashal@kernel.org>
-References: <20240128161315.201999-1-sashal@kernel.org>
+	s=arc-20240116; t=1706458388; c=relaxed/simple;
+	bh=Smqo+EHF0lEdyV0zeSEmvOP0S/l9vDnzcFtmwrTLtVs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Wn9OOeA7lzDUTxgWtU/Z92wzqSfMQtA4PivL71l1CvS+cB3AF/pEbebFtljQaZM300qE3ZwX+yHeur+LZUYJxw6cX9xxN0kPLEUmCaaeEuxpImHaHEU6nmqWz4iPhstNkWIJRXXgy+qJeD6mGBdZHov+oW0mNmCQvAZEdty7yDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eNZbx0yk; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a2f79e79f0cso208097066b.2
+        for <netdev@vger.kernel.org>; Sun, 28 Jan 2024 08:13:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706458385; x=1707063185; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Smqo+EHF0lEdyV0zeSEmvOP0S/l9vDnzcFtmwrTLtVs=;
+        b=eNZbx0ykcMruqPUBEhBf4H1BLPKfME1b5ttWUM+4dHArK2IKB+l/EP00VQ+Y22Q/ar
+         QzySVwHpW0f8ILXcVexl5MjySz7UBQxQ096Z9zvxMr9C4KL5+XkPHePGvsUkBP1vPU5O
+         /CAe07IrrNBBh4d8wXYwLLiKb0MrK3CCeMzGl+jYeVvWpXNAyOLs92DWpF/RIO9p610x
+         P4SMh7Zpir9TkZXiY+VeXozVVfLTs0Hh2hJTqyuzzdDnN+IisUSwHgZ6E+cyErkUKEbd
+         +fwsPlPYWOUvpbVlpckRDZcLvWfPxf1M71v5sE5ApeYgz5VoBZ76PaQGdZFQJ6kMI8hB
+         8nbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706458385; x=1707063185;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Smqo+EHF0lEdyV0zeSEmvOP0S/l9vDnzcFtmwrTLtVs=;
+        b=BQn+10fptW//s/mDIkVEA6Gu4hSY+h0RizdaQhYnPBLxd3/Nv5ZDBeZAh0jBX8umfG
+         dXoqHl1FUwxlIYHcz02jrSCkbCF3nBYUyzc5IagDIaktnP74vl8fHnhqATISLO0LGSCD
+         u2/tyRFvpY5FXwyu1KSJh+sjqnTaazak6Gg6OeFmY6FdIffDRRnd3IJLPHmGtb2hQuom
+         o/Vr17uHOm4JR+zj4kz77w6WsKy4NUByg1E4N8/Qjl2t56sD/D5cB+CkcUJHHQBphD/D
+         BQKHKsaZdR7rjun/kXfcPZYTWX5OTa2Pog7epipzT6gQJJHSXNgBiTlk08SZWZA3WmfK
+         BGKw==
+X-Gm-Message-State: AOJu0YzuX8mgdyI0asyG8rC5XaD45VF9gmPlrMp8ItSiRDjZ+2cM8hed
+	VH4v84aeUjpP9RkCYwZj5HrCVAqO7He4odBMnCHtu2gsTGZRdbqD
+X-Google-Smtp-Source: AGHT+IF8JzUCxFVABHiB2F5NtP1A/goC6qLdMp32fml10XY+bQAgX3aYztcjiVKtQhz1YqYGQq7+Jg==
+X-Received: by 2002:a17:906:ad98:b0:a2f:7201:8608 with SMTP id la24-20020a170906ad9800b00a2f72018608mr2871359ejb.16.1706458385214;
+        Sun, 28 Jan 2024 08:13:05 -0800 (PST)
+Received: from ?IPV6:2001:b07:646f:4a4d:e17a:bd08:d035:d8c2? ([2001:b07:646f:4a4d:e17a:bd08:d035:d8c2])
+        by smtp.gmail.com with ESMTPSA id i9-20020a170906264900b00a34a0163ee7sm2946889ejc.205.2024.01.28.08.13.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 28 Jan 2024 08:13:04 -0800 (PST)
+Message-ID: <cacb4e78-9ec1-437a-9017-9101a3014b8d@gmail.com>
+Date: Sun, 28 Jan 2024 17:13:56 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 net-next] taprio: validate TCA_TAPRIO_ATTR_FLAGS
+ through policy instead of open-coding
+Content-Language: en-US
+To: Simon Horman <horms@kernel.org>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org
+References: <20240125165942.37920-1-alessandromarcolini99@gmail.com>
+ <20240126211441.GF401354@kernel.org>
+From: Alessandro Marcolini <alessandromarcolini99@gmail.com>
+In-Reply-To: <20240126211441.GF401354@kernel.org>
 Content-Type: text/plain; charset=UTF-8
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.14
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-
-[ Upstream commit e3fe8d28c67bf6c291e920c6d04fa22afa14e6e4 ]
-
-Fix the warnings when building virtio_net driver.
-
-"
-drivers/net/virtio_net.c: In function ‘init_vqs’:
-drivers/net/virtio_net.c:4551:48: warning: ‘%d’ directive writing between 1 and 11 bytes into a region of size 10 [-Wformat-overflow=]
- 4551 |                 sprintf(vi->rq[i].name, "input.%d", i);
-      |                                                ^~
-In function ‘virtnet_find_vqs’,
-    inlined from ‘init_vqs’ at drivers/net/virtio_net.c:4645:8:
-drivers/net/virtio_net.c:4551:41: note: directive argument in the range [-2147483643, 65534]
- 4551 |                 sprintf(vi->rq[i].name, "input.%d", i);
-      |                                         ^~~~~~~~~~
-drivers/net/virtio_net.c:4551:17: note: ‘sprintf’ output between 8 and 18 bytes into a destination of size 16
- 4551 |                 sprintf(vi->rq[i].name, "input.%d", i);
-      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-drivers/net/virtio_net.c: In function ‘init_vqs’:
-drivers/net/virtio_net.c:4552:49: warning: ‘%d’ directive writing between 1 and 11 bytes into a region of size 9 [-Wformat-overflow=]
- 4552 |                 sprintf(vi->sq[i].name, "output.%d", i);
-      |                                                 ^~
-In function ‘virtnet_find_vqs’,
-    inlined from ‘init_vqs’ at drivers/net/virtio_net.c:4645:8:
-drivers/net/virtio_net.c:4552:41: note: directive argument in the range [-2147483643, 65534]
- 4552 |                 sprintf(vi->sq[i].name, "output.%d", i);
-      |                                         ^~~~~~~~~~~
-drivers/net/virtio_net.c:4552:17: note: ‘sprintf’ output between 9 and 19 bytes into a destination of size 16
- 4552 |                 sprintf(vi->sq[i].name, "output.%d", i);
-
-"
-
-Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Signed-off-by: Zhu Yanjun <yanjun.zhu@linux.dev>
-Link: https://lore.kernel.org/r/20240104020902.2753599-1-yanjun.zhu@intel.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/net/virtio_net.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index deb2229ab4d8..7cb0548d17a3 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -4096,10 +4096,11 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
- {
- 	vq_callback_t **callbacks;
- 	struct virtqueue **vqs;
--	int ret = -ENOMEM;
--	int i, total_vqs;
- 	const char **names;
-+	int ret = -ENOMEM;
-+	int total_vqs;
- 	bool *ctx;
-+	u16 i;
- 
- 	/* We expect 1 RX virtqueue followed by 1 TX virtqueue, followed by
- 	 * possible N-1 RX/TX queue pairs used in multiqueue mode, followed by
-@@ -4136,8 +4137,8 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
- 	for (i = 0; i < vi->max_queue_pairs; i++) {
- 		callbacks[rxq2vq(i)] = skb_recv_done;
- 		callbacks[txq2vq(i)] = skb_xmit_done;
--		sprintf(vi->rq[i].name, "input.%d", i);
--		sprintf(vi->sq[i].name, "output.%d", i);
-+		sprintf(vi->rq[i].name, "input.%u", i);
-+		sprintf(vi->sq[i].name, "output.%u", i);
- 		names[rxq2vq(i)] = vi->rq[i].name;
- 		names[txq2vq(i)] = vi->sq[i].name;
- 		if (ctx)
--- 
-2.43.0
-
+On 1/26/24 22:14, Simon Horman wrote:
+> For reference, and I don't think it's probably not
+> necessary to repost because of this, these days
+> it is normal to put the Changes below the scissors (---).
+> This means they don't end up in the git history.
+> But now we have lore that seems to be less of an issue.
+Thank you very much! I'll keep this in mind for future patches :)
 
