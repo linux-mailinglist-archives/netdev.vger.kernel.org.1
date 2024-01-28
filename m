@@ -1,91 +1,106 @@
-Return-Path: <netdev+bounces-66513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B55C83F983
-	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 20:38:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CE0983F98B
+	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 20:52:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D629E1F218B2
-	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 19:38:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5E7E2824EB
+	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 19:51:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DBD526AF7;
-	Sun, 28 Jan 2024 19:38:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76CF2321B0;
+	Sun, 28 Jan 2024 19:51:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lB5VtcFy"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="uPCpuVrs"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93AE731A9D
-	for <netdev@vger.kernel.org>; Sun, 28 Jan 2024 19:38:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D7AE1E4A8;
+	Sun, 28 Jan 2024 19:51:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706470690; cv=none; b=axQ108WgT4iYsYLGJ1YM0QRW00j09cyGzBQ/Ox1s3X084Y9I7InjhaJ0HXxa6Dn7E1MV+YUGX6INQtBMTvgvHt69DaUUJzSsHz6vu7uF5bGMYSD9I6P92/S3LCSt5OervcRUmZSlHY9Caq1G9/GSLI+y+s8EhcnS4/Pf/6NVaHU=
+	t=1706471516; cv=none; b=hAvwM70iS+yBqlzfOAHJJO82SpVn6KhnaAkKCOLfkQniTI+SHXQdhXc3H3MeydlE74Nk1KwiNlq1gvhK6aTeYnH+EhHbXyrLrPbpreEZJhPkDlaQEk7gJE6wspgHvLnX1PWmcV7woc1nnxFZAjxxq2sbuKF4yRrvKRyfgGy62tI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706470690; c=relaxed/simple;
-	bh=fX9kLBzWyB/CMt5krU9aRo2/9LWbOP//s9WREBYu03U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RBkC2f3Mnsb7hfFC4zD7rW/NsqAu18JIDY+e+IiSvg30CR7Ar+t/nwZZ5ieuRhyTzDmXZtR9Q+XBQq4nrF5yI7P7PIcfyyz0pNcuO+2yIF5Zfxc/GpQ4Te1opeNY9pn0avHv6PDinW6wEc1ZDl1zfQlwqRrdFeG6rsQewTQwyWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lB5VtcFy; arc=none smtp.client-ip=95.215.58.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Sun, 28 Jan 2024 14:38:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706470686;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/XSVKc6w+A+XmgwvfzwCcqpDMcWCgObA9/bvZvw48qU=;
-	b=lB5VtcFy7aF6cpkgma6yez8sMpMAz/mpV/YD1xJVy1FuCar5hxpJTFi3bXxiuHfPR8T3mx
-	7OqKn9T7SJlh2lOz/oCvxWjLIIlfuiaupGHKe3sIwWauc3J+ctzrPr+EvTIOTQ/AFWHEB7
-	4LKC5jHFfK6Wrvnby/iaqtNonDci1xc=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: boqun.feng@gmail.com, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, peterz@infradead.org
-Subject: Re: [PATCH 4/4] af_unix: convert to lock_cmp_fn
-Message-ID: <suyvonwf55vfeumeujeats2mtozs2q4wcx6ijz4hqfd54mibjj@6dt26flhrfdh>
-References: <20240127020833.487907-5-kent.overstreet@linux.dev>
- <20240128082838.3961-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1706471516; c=relaxed/simple;
+	bh=lLilySja1+gc0vAWoFafuKa9MQjftBe1Lq4AAaEBby8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=orXgTYmq8OHMDJwlTaH+njaMVBlu2fvzKLo2atxsH3aFDZfyI1W+Mn+6vJ2xEN7jYdmytKuigSzK+5gumfQTKbEAgyrMuXzgZd0yNnYs4AjlOF6hbvySw61eOGOBj31gNxDzSxoO5Fxq7afT6nGM9P+Pa2gsEPXAujrP3vZ9qOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=uPCpuVrs; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1706471515; x=1738007515;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=lLilySja1+gc0vAWoFafuKa9MQjftBe1Lq4AAaEBby8=;
+  b=uPCpuVrsJHf4raNSdf87QdrOG+ea0SOvRHoOB6j6/1G9FqIofDMasJLJ
+   Hh4aL604EB3gXfVqAfuVyW4HYEzRj+W7daL4P0aAXbW+T+upRhlF9ozA5
+   eIlGYFvUoQVazEXXRZKYWJdukcHBJCa8ilIFpv6W0t/CBuqrcQmuXXdhX
+   d9zUSPFUTrg6O7LWHrsGTyb+0wSeia1yZkDB7Fy78nxY2OvCeIXSY3Ia3
+   VnuBCZdcJKY5r3MejxOpLsitcYwXmUUAMeKUnZVWK4GoUhmqUzjWYZB+C
+   053qiX7eykYJ0jbaNFYvaP4hjU7Xi3noneEwuIFwN1+P3oj6BtS8px3vX
+   Q==;
+X-CSE-ConnectionGUID: HmkKQebqTiaf2PC3A5r6Ng==
+X-CSE-MsgGUID: 66EsYmfdS92wC7EMm983ng==
+X-IronPort-AV: E=Sophos;i="6.05,220,1701154800"; 
+   d="scan'208";a="246137979"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 28 Jan 2024 12:51:48 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Sun, 28 Jan 2024 12:51:39 -0700
+Received: from DEN-DL-M31836.microsemi.net (10.10.85.11) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Sun, 28 Jan 2024 12:51:38 -0700
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <UNGLinuxDriver@microchip.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Horatiu Vultur
+	<horatiu.vultur@microchip.com>
+Subject: [PATCH net-next] net: lan966x: debugfs: Fix showing the port keyset
+Date: Sun, 28 Jan 2024 20:51:34 +0100
+Message-ID: <20240128195134.3600629-1-horatiu.vultur@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240128082838.3961-1-kuniyu@amazon.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On Sun, Jan 28, 2024 at 12:28:38AM -0800, Kuniyuki Iwashima wrote:
-> From: Kent Overstreet <kent.overstreet@linux.dev>
-> Date: Fri, 26 Jan 2024 21:08:31 -0500
-> > Kill
-> >  - unix_state_lock_nested
-> >  - _nested usage for net->unx.table.locks[].
-> > 
-> > replace both with lock_set_cmp_fn_ptr_order(&u->lock).
-> > 
-> > The lock ordering in sk_diag_dump_icons() looks suspicious; this may
-> > turn up a real issue.
-> 
-> Yes, you cannot use lock_cmp_fn() for unix_state_lock_nested().
-> 
-> The lock order in sk_diag_dump_icons() is
-> 
->   listening socket -> child socket in the listener's queue
-> 
-> , and the inverse order never happens.  ptr comparison does not make
-> sense in this case, and lockdep will complain about false positive.
+On lan966x, it is possible to use debugfs to print different information
+about the VCAPs. Information like, if it is enabled, how the ports are
+configured, print the actual rules. The issue is that when printing how
+the ports are configured for IS1 lookups, it was parsing the wrong
+register to get this information. The fix consists in reading the
+correct register that contains this information.
 
-Is that a real lock ordering? Is this parent -> child relationship well
-defined?
+Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+---
+ drivers/net/ethernet/microchip/lan966x/lan966x_vcap_debugfs.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-If it is, we should be able to write a lock_cmp_fn for it, as long as
-it's not some handwavy "this will never happen but _nested won't check
-for it" like I saw elsewhere in the net code... :)
+diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_vcap_debugfs.c b/drivers/net/ethernet/microchip/lan966x/lan966x_vcap_debugfs.c
+index ac525ff1503e6..3a01e13bd10b7 100644
+--- a/drivers/net/ethernet/microchip/lan966x/lan966x_vcap_debugfs.c
++++ b/drivers/net/ethernet/microchip/lan966x/lan966x_vcap_debugfs.c
+@@ -25,6 +25,8 @@ static void lan966x_vcap_is1_port_keys(struct lan966x_port *port,
+ 	for (int l = 0; l < admin->lookups; ++l) {
+ 		out->prf(out->dst, "\n    Lookup %d: ", l);
+ 
++		val = lan_rd(lan966x, ANA_VCAP_S1_CFG(port->chip_port, l));
++
+ 		out->prf(out->dst, "\n      other: ");
+ 		switch (ANA_VCAP_S1_CFG_KEY_OTHER_CFG_GET(val)) {
+ 		case VCAP_IS1_PS_OTHER_NORMAL:
+-- 
+2.34.1
+
 
