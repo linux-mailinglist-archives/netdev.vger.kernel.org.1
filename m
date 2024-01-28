@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-66483-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1525683F6DF
-	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 17:19:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 92CB683F734
+	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 17:27:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47ADE1C20CC5
-	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 16:19:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C52971C20B89
+	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 16:27:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 186315576E;
-	Sun, 28 Jan 2024 16:12:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 968C6446C3;
+	Sun, 28 Jan 2024 16:13:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rnHoGkij"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WuvcB7Yw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E067055761;
-	Sun, 28 Jan 2024 16:12:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5998A62A02;
+	Sun, 28 Jan 2024 16:13:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706458359; cv=none; b=lU5R1xYrNYnX4nMLOAgkDDoKrBGBJsgyUWhkCaVnuZ4eAh+aw1I9+V2n7d5xt5rWnb53Or9U01/vwNFuiJcZuw1j2s6iLnfXsEcY7q1VlstTUPmS3aIhftadKp54SSoG8n27KqvZit2R5o2wZIn+mVgLtQB5n7MKMAIJoLn/trk=
+	t=1706458432; cv=none; b=OvHPPmG4WIJ/0lp8tFbN4/rUSUcTKg97xGD96IOpZ0egLByRqC8UBECaapMMQjJfxw/ISHqRvd/R7e2LyHqxc08zFh6/I8wr2qDEJNFBaE00zI6hIv0lzO80U/kTkwYRQgXpo6FNG2bCzXotlx8KQ380nEbOcTAbWQCmKIVQBoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706458359; c=relaxed/simple;
-	bh=6QH+OrglpnmleDhcenEX4vVIDStz6FnK9DRSXxbjPgs=;
+	s=arc-20240116; t=1706458432; c=relaxed/simple;
+	bh=G/AX13p2dR571C5h9STUJyc9qaJ6fDywTyzK9hYV/vg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sv3o8OGyBDflcvwAPLkUUaJ5nBI/0zF1DsuJeMjoPNIq6RQWJmi+W3an3Uk0GQQviIvS8Lg/dIPCqYmv8ftwS+15+9aull0pBgG4ZTZ7Dk+mSiMS/4G1xwHmz2+VLTztgR41R5SMgelhoIFMsLrJkl0xp2HqD6NKzpJkv9K3iqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rnHoGkij; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 149ABC433C7;
-	Sun, 28 Jan 2024 16:12:36 +0000 (UTC)
+	 MIME-Version:Content-Type; b=q3rrhOxjy6LPAz6B8AuYSiQ7wWJUN597McchBUACLCafDP/z9TygSsKAdkbWU4mSrz7AaFt1aB8/LXNeIHrjE9wlO6c/eutZ2jqQ/dGdZRdtGcMkLyaw8flkB4VOgXqHvjQJ4Tg0WFScPqxMr8WzPPALEGV8yka/iAJzIrgfpNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WuvcB7Yw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61236C43394;
+	Sun, 28 Jan 2024 16:13:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706458358;
-	bh=6QH+OrglpnmleDhcenEX4vVIDStz6FnK9DRSXxbjPgs=;
+	s=k20201202; t=1706458431;
+	bh=G/AX13p2dR571C5h9STUJyc9qaJ6fDywTyzK9hYV/vg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rnHoGkijQi9IRGQNLwtsxzFd2DtfWtTN9jBhLvypo9xQOkD1/Afz24tWHCEMLll7Q
-	 VoeDmqqU7mgXkDhTdyScRc9pZGJKh/hPZrhcNa2OLQzn2325SPXiNM1BvOuAtrTWvx
-	 rGvnYTKwIAwHCo2z/vMSupjhsBHl4kE/G1bQlqz3QmZB2qgp6lOj4C4wchwv1sd4e3
-	 6Pcr7v6qiX9BsImMXAeF4xCJwZnXRMgT9GUlPDM5KTYbmPKGFEuVBKbTZkRZvDdjUr
-	 hwW80nLw9QkKNR8bpGPxCIhol0BKOzNmNiaJIUsM5YWt1y3ahZoLx+u2/obr8/UeoP
-	 f4EgXzMywoloQ==
+	b=WuvcB7Ywmus7nBQZjvy+CmqLYOLjoqken92l+BIWd+sQjlAyL1W0IQNfa1Nl6GErs
+	 alH0cOj1gjudcRLyuiCR+s/I7Cwmel4zS7Vx3e9bVB3+H8rAvc+R2XAa/m3gXn3XzG
+	 pJqjzX5Xll+2j7QfSx+DxiDuiFKivYPhATx0chh9ZUCYlA1Wwxvju4D+Ql83tBFY4E
+	 sUuJXy9qyLT5t3buW45LMxk4MU39xWCY8hHevWsMfUJ6NeXAqk24x8cf0Pn1KqvY5d
+	 uVuU6Ptuhd5zU6nHCx8mPufgfAFqerRoQ/iVDk2cJ988Cqwrc8FZFZBrGSQHNJpSL4
+	 QaiirhbLVk0pw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -55,12 +55,12 @@ Cc: Zhu Yanjun <yanjun.zhu@linux.dev>,
 	pabeni@redhat.com,
 	virtualization@lists.linux.dev,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.7 29/39] =?UTF-8?q?virtio=5Fnet:=20Fix=20"?= =?UTF-8?q?=E2=80=98%d=E2=80=99=20directive=20writing=20between=201=20and?= =?UTF-8?q?=2011=20bytes=20into=20a=20region=20of=20size=2010"=20warnings?=
-Date: Sun, 28 Jan 2024 11:10:49 -0500
-Message-ID: <20240128161130.200783-29-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 21/31] =?UTF-8?q?virtio=5Fnet:=20Fix=20"?= =?UTF-8?q?=E2=80=98%d=E2=80=99=20directive=20writing=20between=201=20and?= =?UTF-8?q?=2011=20bytes=20into=20a=20region=20of=20size=2010"=20warnings?=
+Date: Sun, 28 Jan 2024 11:12:51 -0500
+Message-ID: <20240128161315.201999-21-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240128161130.200783-1-sashal@kernel.org>
-References: <20240128161130.200783-1-sashal@kernel.org>
+In-Reply-To: <20240128161315.201999-1-sashal@kernel.org>
+References: <20240128161315.201999-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,7 +70,7 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.7.2
+X-stable-base: Linux 6.6.14
 Content-Transfer-Encoding: 8bit
 
 From: Zhu Yanjun <yanjun.zhu@linux.dev>
@@ -116,7 +116,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 51b1868d2f22..1caf21fd5032 100644
+index deb2229ab4d8..7cb0548d17a3 100644
 --- a/drivers/net/virtio_net.c
 +++ b/drivers/net/virtio_net.c
 @@ -4096,10 +4096,11 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
