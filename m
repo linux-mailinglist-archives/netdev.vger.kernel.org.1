@@ -1,123 +1,133 @@
-Return-Path: <netdev+bounces-66450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 506FE83F4B7
-	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 10:06:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC99983F4C2
+	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 10:18:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D247F1F21AC7
-	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 09:06:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B8641C21260
+	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 09:18:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C5FCDF49;
-	Sun, 28 Jan 2024 09:06:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CC92DDD2;
+	Sun, 28 Jan 2024 09:18:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AkcVwVM1"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="q6XUuXse"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49514DDC5;
-	Sun, 28 Jan 2024 09:06:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 761581CA9C;
+	Sun, 28 Jan 2024 09:18:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706432788; cv=none; b=rhtDs29gqZB31MmnwU1BDxzjR8eiDf+CpiFm/hCV+kAIVf0UXxUUAjvS2dKWhiaoU0L0o7dKlurbNOIXVYsa6KglvFxarD6OdEsSVkAa4tPo2ksT18rBwi5ziT5OyCU+i7vHLh7UO0YRsBHapE/6tZDwel+LgE92UJqJfmQPC7k=
+	t=1706433494; cv=none; b=Jy6T4sieDcE2FFMelAnaPgZM4bSgOHq+qeZsXo4Bdkt02wfM96pABrddAZfPmZCErnPR82hH08rpZqq1AMEy8gDgXWJbHhqVngb2NYS8cCHWutE5DKRa7Jn1egiLjoGaL9ZqCUfWjv6h/WmlkZx6icl5sO9YVPULwEU/DEwXPXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706432788; c=relaxed/simple;
-	bh=YAWRcL+76J78dm5IBZqJe3yaGnvEhoK8TSf93uvaj/A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N43hBWKWi1ap+qDTK4gUxTkVOOTLMMlOeq0baYxgURen/s0sIRrMsq9WkZdn4naQURyOHLo4bRrKQFxuBqLSgSN284ZbE/LNfFQv0JjBin3zuRakFoUqa0+0Y17gHIlGjEhPEpsnhLXBl1hVwPDU13n4u78N2EGFzkTVwLFGj4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AkcVwVM1; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706432787; x=1737968787;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=YAWRcL+76J78dm5IBZqJe3yaGnvEhoK8TSf93uvaj/A=;
-  b=AkcVwVM1IYf3lI5/vc76QUXOtxGOjEAURemyEqjZEKgtBkBowosAVzqG
-   +tV41u6q8VowpPpl2LC2G+kDJeETBqm/i4Bzi/eNf1dI/lTu6hpF4z3dq
-   lfDdh/hCF0U+ZgbtrSkJvNS4Dw0guDW1Oh+kdeEVey4cD2H+ewTL3gQBq
-   /vLOnoKNFFD1fkvO6BWeIUnlPEOQoxh+PY/SBMFvoDMIJW5O0ZBBuzpFp
-   6wD4kLDq0WracxC9UcqINq1/bDhiEYFkhoJ3GoqZ6fhByf34JTvkVDmT8
-   pVGxa1TpuH6BOBH+JLhCE45Bi3vOjYY4wrxgtVqSuKsnoUaGosUXb88TP
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10966"; a="10139148"
-X-IronPort-AV: E=Sophos;i="6.05,220,1701158400"; 
-   d="scan'208";a="10139148"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2024 01:06:25 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,220,1701158400"; 
-   d="scan'208";a="3016775"
-Received: from lkp-server01.sh.intel.com (HELO 370188f8dc87) ([10.239.97.150])
-  by fmviesa005.fm.intel.com with ESMTP; 28 Jan 2024 01:06:22 -0800
-Received: from kbuild by 370188f8dc87 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rU17L-0003GS-1R;
-	Sun, 28 Jan 2024 09:06:19 +0000
-Date: Sun, 28 Jan 2024 17:05:26 +0800
-From: kernel test robot <lkp@intel.com>
-To: Yunjian Wang <wangyunjian@huawei.com>, mst@redhat.com,
-	willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-	kuba@kernel.org, davem@davemloft.net, magnus.karlsson@intel.com
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, xudingke@huawei.com,
-	Yunjian Wang <wangyunjian@huawei.com>
-Subject: Re: [PATCH net-next 2/2] tun: AF_XDP Rx zero-copy support
-Message-ID: <202401281639.yBaJZ4Sh-lkp@intel.com>
-References: <1706089075-16084-1-git-send-email-wangyunjian@huawei.com>
+	s=arc-20240116; t=1706433494; c=relaxed/simple;
+	bh=2CIAo7p8YLQ+5GDpWqQqmFIf0AbjP9xMSPmF+lmwHDs=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YaOSYHMnECyZkGITh8jKMTVSoPTGkt1XfsxV5Ke6ERjPR0nQH9IrnREyD0QmvvI9Y4h6VMICozFp6iufZwCTk5jOClHkehaInwLWFsAD67WRNWfQrzq7LeSTnUV3jVr3cM93P95Hx8ESh6dhYXn00tm1xf0W1oCgFQ/tHohxaI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=q6XUuXse; arc=none smtp.client-ip=52.119.213.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1706433493; x=1737969493;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=KqhGXnLeW9gFa27LDu76BMLx57htZ96OIe/VfEvgW5I=;
+  b=q6XUuXseSydJGkeYe5CC8DQ0OAhefLLJDBVkq9KrKJTlzFSbYgtJ4vI8
+   ZV1yAmpX+imyDCM3xJA/2v9M0zuS1Ft1uvp984p8sdR/EeXP7g0lqBrSH
+   RMhPJueKPLZkWbHiLlcPMEnt9ic4avCMn6+f2SyFbBFnYuBD6npmQIP5K
+   g=;
+X-IronPort-AV: E=Sophos;i="6.05,220,1701129600"; 
+   d="scan'208";a="630399487"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-dc7c3f8b.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2024 09:18:12 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
+	by email-inbound-relay-pdx-2c-m6i4x-dc7c3f8b.us-west-2.amazon.com (Postfix) with ESMTPS id 1750BA099A;
+	Sun, 28 Jan 2024 09:18:10 +0000 (UTC)
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:57075]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.3.8:2525] with esmtp (Farcaster)
+ id fb09d7f9-488f-4aa1-99fc-9c6e2b7e8e3d; Sun, 28 Jan 2024 09:18:09 +0000 (UTC)
+X-Farcaster-Flow-ID: fb09d7f9-488f-4aa1-99fc-9c6e2b7e8e3d
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Sun, 28 Jan 2024 09:18:09 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.101.48) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Sun, 28 Jan 2024 09:18:06 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kent.overstreet@linux.dev>
+CC: <boqun.feng@gmail.com>, <linux-fsdevel@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<peterz@infradead.org>, <kuniyu@amazon.com>
+Subject: Re: [PATCH 3/4] net: Convert sk->sk_peer_lock to lock_set_cmp_fn_ptr_order()
+Date: Sun, 28 Jan 2024 01:17:58 -0800
+Message-ID: <20240128091758.9206-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240127020833.487907-4-kent.overstreet@linux.dev>
+References: <20240127020833.487907-4-kent.overstreet@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1706089075-16084-1-git-send-email-wangyunjian@huawei.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D042UWB001.ant.amazon.com (10.13.139.160) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
 
-Hi Yunjian,
+From: Kent Overstreet <kent.overstreet@linux.dev>
+Date: Fri, 26 Jan 2024 21:08:30 -0500
+> Cc: netdev@vger.kernel.org
+> Signed-off-by: Kent Overstreet <kent.overstreet@linux.dev>
+> ---
+>  net/core/sock.c    | 1 +
+>  net/unix/af_unix.c | 4 ++--
+>  2 files changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index 158dbdebce6a..da7360c0f454 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -3474,6 +3474,7 @@ void sock_init_data_uid(struct socket *sock, struct sock *sk, kuid_t uid)
+>  	sk->sk_peer_pid 	=	NULL;
+>  	sk->sk_peer_cred	=	NULL;
+>  	spin_lock_init(&sk->sk_peer_lock);
+> +	lock_set_cmp_fn_ptr_order(&sk->sk_peer_lock);
+>  
+>  	sk->sk_write_pending	=	0;
+>  	sk->sk_rcvlowat		=	1;
+> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> index ac1f2bc18fc9..d013de3c5490 100644
+> --- a/net/unix/af_unix.c
+> +++ b/net/unix/af_unix.c
+> @@ -706,10 +706,10 @@ static void copy_peercred(struct sock *sk, struct sock *peersk)
+>  
+>  	if (sk < peersk) {
+>  		spin_lock(&sk->sk_peer_lock);
+> -		spin_lock_nested(&peersk->sk_peer_lock, SINGLE_DEPTH_NESTING);
+> +		spin_lock(&peersk->sk_peer_lock);
+>  	} else {
+>  		spin_lock(&peersk->sk_peer_lock);
+> -		spin_lock_nested(&sk->sk_peer_lock, SINGLE_DEPTH_NESTING);
+> +		spin_lock(&sk->sk_peer_lock);
+>  	}
 
-kernel test robot noticed the following build warnings:
+hmm.. I think we need not hold two locks here in the first place.
+Let me post patches.
 
-[auto build test WARNING on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Yunjian-Wang/xsk-Remove-non-zero-dma_page-check-in-xp_assign_dev/20240124-174011
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/1706089075-16084-1-git-send-email-wangyunjian%40huawei.com
-patch subject: [PATCH net-next 2/2] tun: AF_XDP Rx zero-copy support
-config: s390-defconfig (https://download.01.org/0day-ci/archive/20240128/202401281639.yBaJZ4Sh-lkp@intel.com/config)
-compiler: s390-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240128/202401281639.yBaJZ4Sh-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202401281639.yBaJZ4Sh-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/net/tun.c:1298:5: warning: no previous prototype for 'tun_xsk_pool_setup' [-Wmissing-prototypes]
-    1298 | int tun_xsk_pool_setup(struct net_device *dev, struct xsk_buff_pool *pool,
-         |     ^~~~~~~~~~~~~~~~~~
+Thanks!
 
 
-vim +/tun_xsk_pool_setup +1298 drivers/net/tun.c
-
-  1297	
-> 1298	int tun_xsk_pool_setup(struct net_device *dev, struct xsk_buff_pool *pool,
-  1299			       u16 qid)
-  1300	{
-  1301		return pool ? tun_xsk_pool_enable(dev, pool, qid) :
-  1302			tun_xsk_pool_disable(dev, qid);
-  1303	}
-  1304	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+>  	old_pid = sk->sk_peer_pid;
+>  	old_cred = sk->sk_peer_cred;
+> -- 
+> 2.43.0
 
